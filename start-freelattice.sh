@@ -13,7 +13,7 @@ echo ""
 chmod +x "$0" 2>/dev/null
 
 # Set CORS for Ollama
-export OLLAMA_ORIGINS="*"
+export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 
 # Get the directory where this script lives
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

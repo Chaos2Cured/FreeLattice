@@ -90,8 +90,8 @@
     "}",
     "Get-Process -Name 'ollama','ollama app' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue",
     "Start-Sleep -Seconds 2",
-    "[Environment]::SetEnvironmentVariable(\"OLLAMA_ORIGINS\", \"*\", \"User\")",
-    "$env:OLLAMA_ORIGINS = \"*\"",
+    "[Environment]::SetEnvironmentVariable(\"OLLAMA_ORIGINS\", \"https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*\", \"User\")",
+    "$env:OLLAMA_ORIGINS = \"https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*\"",
     "Write-Host 'Browser permission set.' -ForegroundColor Green",
     "$VRAM_GB = 0",
     "if (Get-Command nvidia-smi -ErrorAction SilentlyContinue) {",
@@ -173,7 +173,7 @@
       + 'echo ""\n'
       + 'echo "Setting up Ollama for FreeLattice..."\n'
       + 'echo ""\n'
-      + 'launchctl setenv OLLAMA_ORIGINS "*"\n'
+      + 'launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\n'
       + 'osascript -e \'quit app "Ollama"\' 2>/dev/null\n'
       + 'sleep 3\n'
       + 'open -a Ollama 2>/dev/null || true\n'
@@ -396,7 +396,7 @@
       var isLinux = detected.os === 'linux' || detected.os === 'unknown';
       var fixBlock = isLinux
         ? '<p>Restart Ollama with browser access enabled:</p>'
-          + '<code class="flw-code">OLLAMA_ORIGINS="*" ollama serve</code>'
+          + '<code class="flw-code">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code>'
           + '<button class="flw-btn" data-flw="copy">Copy command</button>'
         : '<button class="flw-btn flw-btn-primary" data-flw="fix">&#9889; Fix it for me (one click) &darr;</button>'
           + '<div class="flw-steps">1. A small file downloads.<br>2. Double-click it.<br>'
@@ -411,7 +411,7 @@
         + '<button class="flw-skip" data-flw="skip">Close</button>',
         {
           fix: function () { downloadFix(); startPolling(); },
-          copy: function () { copyText('OLLAMA_ORIGINS="*" ollama serve'); startPolling(); },
+          copy: function () { copyText('OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve'); startPolling(); },
           skip: function () { close(); }
         }
       );

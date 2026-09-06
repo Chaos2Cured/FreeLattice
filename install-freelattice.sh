@@ -147,7 +147,7 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
   step "Step 3/7: Configuring Ollama CORS (so your browser can talk to it)..."
 
   # ── 3a: Set for current process ──
-  export OLLAMA_ORIGINS="*"
+  export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 
   # ── 3b: Add to shell profiles (bashrc AND zshrc if they exist) ──
   for PROFILE in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
@@ -155,8 +155,8 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
       if ! grep -q "OLLAMA_ORIGINS" "$PROFILE" 2>/dev/null; then
         echo '' >> "$PROFILE"
         echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$PROFILE"
-        echo 'export OLLAMA_ORIGINS="*"' >> "$PROFILE"
-        info "Added OLLAMA_ORIGINS=* to $PROFILE"
+        echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> "$PROFILE"
+        info "Added scoped OLLAMA_ORIGINS to $PROFILE"
       else
         info "OLLAMA_ORIGINS already in $PROFILE"
       fi
@@ -172,7 +172,7 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
     if sudo -n true 2>/dev/null; then
       sudo mkdir -p "$OLLAMA_OVERRIDE" 2>/dev/null
       echo '[Service]' | sudo tee "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
-      echo 'Environment="OLLAMA_ORIGINS=*"' | sudo tee -a "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
+      echo 'Environment="OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' | sudo tee -a "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
       sudo systemctl daemon-reload 2>/dev/null
       OVERRIDE_CREATED=true
       info "Created systemd override for persistent CORS"
@@ -185,7 +185,7 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
   # ── 3d: Also try /etc/environment for system-wide persistence ──
   if sudo -n true 2>/dev/null; then
     if ! grep -q "OLLAMA_ORIGINS" /etc/environment 2>/dev/null; then
-      echo 'OLLAMA_ORIGINS="*"' | sudo tee -a /etc/environment > /dev/null 2>&1
+      echo 'OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' | sudo tee -a /etc/environment > /dev/null 2>&1
       info "Added OLLAMA_ORIGINS to /etc/environment (system-wide)"
     fi
   fi
@@ -203,14 +203,14 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
       # Try killing and restarting manually
       pkill -f "ollama serve" 2>/dev/null || true
       sleep 1
-      OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
+      OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve &>/dev/null &
     fi
   else
     # Not a systemd service — kill and restart manually
     pkill -f "ollama serve" 2>/dev/null || true
     pkill -f "ollama" 2>/dev/null || true
     sleep 2
-    OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
+    OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve &>/dev/null &
     info "Started ollama serve with CORS enabled"
   fi
 
@@ -466,5 +466,5 @@ echo ""
 
 # Start the server (this blocks until Ctrl+C)
 export PORT=$PORT
-export OLLAMA_ORIGINS="*"
+export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 $SERVER_CMD

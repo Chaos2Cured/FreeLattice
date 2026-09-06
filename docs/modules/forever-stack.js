@@ -1101,7 +1101,7 @@ if __name__ == '__main__':
             '<button onclick="window.ForeverStack.checkAndShow(\'' + layerId + '\')" style="width:100%;margin-top:8px;padding:9px;border-radius:8px;border:1px solid #30363d;background:#21262d;color:#8b949e;font-size:0.8rem;cursor:pointer;min-height:40px;">Check again</button>';
         } else {
           var fsUa = (navigator.userAgent || '').toLowerCase();
-          var fsServe = /win/.test(fsUa) ? 'set OLLAMA_ORIGINS=* &amp;&amp; ollama serve' : 'OLLAMA_ORIGINS="*" ollama serve';
+          var fsServe = /win/.test(fsUa) ? 'set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* &amp;&amp; ollama serve' : 'OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve';
           resultEl.innerHTML =
             '<div style="font-weight:600;margin-bottom:8px;">⚠ ' + layer.name + ' is running but needs permission to connect.</div>' +
             '<div style="margin-bottom:6px;color:#e6edf3;">Quit ' + layer.name + ', then restart it with browser access enabled:</div>' +

@@ -8,7 +8,7 @@ echo   ========================================================
 echo.
 
 :: Set CORS for Ollama
-set "OLLAMA_ORIGINS=*"
+set "OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 
 :: Get script directory (handles spaces in paths)
 set "SCRIPT_DIR=%~dp0"

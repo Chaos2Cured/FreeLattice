@@ -622,11 +622,11 @@ details[open] summary::before{
     <div class="details-body">
       <p>The installer configures CORS automatically, but if you're running manually:</p>
       <p><strong>Windows:</strong></p>
-      <pre><code>setx OLLAMA_ORIGINS "*"</code></pre>
+      <pre><code>setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"</code></pre>
       <p><strong>Mac:</strong></p>
-      <pre><code>launchctl setenv OLLAMA_ORIGINS "*"</code></pre>
+      <pre><code>launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"</code></pre>
       <p><strong>Linux:</strong></p>
-      <pre><code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc && source ~/.bashrc</code></pre>
+      <pre><code>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc && source ~/.bashrc</code></pre>
       <div style="background: rgba(255,100,100,0.1); border: 2px solid #ff6b6b; border-radius: 8px; padding: 14px 18px; margin: 14px 0;">
         <p style="font-weight: 700; color: #ff6b6b; margin-bottom: 6px;">&#9888; CRITICAL: You MUST restart Ollama after setting CORS!</p>
         <p style="margin-bottom: 4px;">The setting will NOT take effect until Ollama is fully restarted:</p>
@@ -658,7 +658,7 @@ details[open] summary::before{
 cd FreeLattice
 python3 server.py</code></pre>
       <p>Open <code>http://localhost:3000</code> in your browser. That's it.</p>
-      <p>If you want Ollama (local AI), install it from <a href="https://ollama.com" target="_blank">ollama.com</a> and set <code>OLLAMA_ORIGINS=*</code> before starting Ollama.</p>
+      <p>If you want Ollama (local AI), install it from <a href="https://ollama.com" target="_blank">ollama.com</a> and set <code>OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code> before starting Ollama.</p>
     </div>
   </details>
 </section>

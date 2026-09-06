@@ -12,7 +12,7 @@ color 0F
 :: WHAT THIS DOES:
 ::   1. Checks for Python 3 (auto-installs via winget if possible)
 ::   2. Checks for Ollama (auto-installs via winget if possible)
-::   3. Sets OLLAMA_ORIGINS=* permanently (CORS fix)
+::   3. Sets scoped OLLAMA_ORIGINS permanently (CORS fix)
 ::   4. Restarts Ollama so CORS takes effect
 ::   5. Pulls a default AI model if none exist
 ::   6. Locates or downloads FreeLattice
@@ -256,18 +256,18 @@ if "!OLLAMA_INSTALLED!"=="0" (
 )
 
 :: 3a: Set for current session
-set "OLLAMA_ORIGINS=*"
-echo         Set OLLAMA_ORIGINS=* for current session.
+set "OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
+echo         Set scoped OLLAMA_ORIGINS for current session.
 
 :: 3b: Set persistently via setx (for future sessions)
-setx OLLAMA_ORIGINS "*" >nul 2>nul
+setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" >nul 2>nul
 if !ERRORLEVEL! EQU 0 (
-    echo         Set OLLAMA_ORIGINS=* permanently (survives reboot^).
+    echo         Set OLLAMA_ORIGINS to scoped list permanently (survives reboot^).
 ) else (
     :: Try PowerShell as fallback
-    powershell -NoProfile -Command "[Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', '*', 'User')" >nul 2>nul
+    powershell -NoProfile -Command "[Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*', 'User')" >nul 2>nul
     if !ERRORLEVEL! EQU 0 (
-        echo         Set OLLAMA_ORIGINS=* permanently via PowerShell.
+        echo         Set OLLAMA_ORIGINS to scoped list permanently via PowerShell.
     ) else (
         echo         Set for this session only. Run as Administrator for permanent setting.
     )
@@ -525,7 +525,7 @@ if "!OLLAMA_RUNNING!"=="1" (
 echo.
 
 :: Start the server — prefer server.py (has Ollama proxy), fall back to http.server
-set "OLLAMA_ORIGINS=*"
+set "OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 set "PORT=!PORT!"
 
 if exist "server.py" (

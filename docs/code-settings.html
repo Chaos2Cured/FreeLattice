@@ -215,7 +215,7 @@ var state = {
 </ol>
 
 <h2 id="local-mode">7. Local Mode (Ollama / LM Studio)</h2>
-<p><span style="display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);">LAYER</span> One look card (2026-09-03): Settings Zone 1 carries <code>#fl-look-card</code>. <code>smartOllamaConnect()</code> shows state 1, awaits <code>probeLocalMind()</code>, then toggles panels <code>2a|2b|2c|2d|2e</code> — never <code>innerHTML</code>, never Download Ollama as the first failure. Default base is <code>http://127.0.0.1:11434</code> (<code>FL_OLLAMA_LOCAL</code>); custom <code>fl_ollamaHost</code> / <code>fl_localUrl</code> still win; saved <code>localhost</code> maps to the IP literal. Probe uses <code>targetAddressSpace: 'local'</code> and runs only from May I look? / Look again. Scoped <code>OLLAMA_ORIGINS</code> for freelattice.com + thelatticetree.com — never <code>*</code> on the card. Old CORS wizard (<code>#ollamaCORSGuide</code>, <code>corsWizStartPoll</code>) is hidden/retired. Model names and sizes render on the card before Connect.</p>
+<p><span style="display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);">LAYER</span> One look card (2026-09-03): Settings Zone 1 carries <code>#fl-look-card</code>. <code>smartOllamaConnect()</code> shows state 1, awaits <code>probeLocalMind()</code>, then toggles panels <code>2a|2b|2c|2d|2e</code> — never <code>innerHTML</code>, never Download Ollama as the first failure. Default base is <code>http://127.0.0.1:11434</code> (<code>FL_OLLAMA_LOCAL</code>); custom <code>fl_ollamaHost</code> / <code>fl_localUrl</code> still win; saved <code>localhost</code> maps to the IP literal. Probe uses <code>targetAddressSpace: 'local'</code> and runs only from May I look? / Look again. Scoped <code>OLLAMA_ORIGINS</code> for freelattice.com + www + thelatticetree.com + local loopback — never bare <code>*</code> on the card or installers. Old CORS wizard (<code>#ollamaCORSGuide</code>, <code>corsWizStartPoll</code>) is hidden/retired. Model names and sizes render on the card before Connect.</p>
 <p>When <code>localToggle</code> is checked, <code>handleLocalToggle()</code> hides the cloud UI and shows the local UI. It also calls <code>flProbeLocalAI()</code> to auto-detect running local AI servers.</p>
 <h3>Ollama Model Refresh Flow</h3>
 <pre>// User clicks "Refresh" button in Settings
@@ -239,13 +239,13 @@ owRefreshModels()
 }</pre>
 
 <h3>CORS Issue on Windows</h3>
-<div class="warn"><p><strong>Windows users must set <code>OLLAMA_ORIGINS=*</code></strong> in System Environment Variables, then restart Ollama. Without this, the "Change Provider → Ollama" flow will fail with "Could not reach Ollama" even when Ollama is running. This is the #1 Windows issue.</p></div>
+<div class="warn"><p><strong>Windows users must set <code>OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code></strong> in System Environment Variables, then restart Ollama. Without this, the "Change Provider → Ollama" flow will fail with "Could not reach Ollama" even when Ollama is running. This is the #1 Windows issue.</p></div>
 <pre># Windows: set environment variable before starting Ollama
 # Option 1: System Environment Variables (permanent — recommended)
-OLLAMA_ORIGINS=*
+OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*
 
 # Option 2: Command line (temporary)
-set OLLAMA_ORIGINS=* &amp;&amp; ollama serve</pre>
+set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* &amp;&amp; ollama serve</pre>
 
 <h2 id="bug-fix">8. Bug Fix Applied: v5.77.1 <span class="badge badge-fix">FIXED</span></h2>
 <div class="green"><p><strong>Bug fixed:</strong> "Change Provider" modal did not show installed local models. If exactly 1 model was installed, it auto-selected without showing the picker. The fetch also lacked a timeout and did not use the proxy path, causing silent failures on Windows.</p></div>
@@ -275,7 +275,7 @@ set OLLAMA_ORIGINS=* &amp;&amp; ollama serve</pre>
     .catch(function() {
       modalShowResult(
         'Could not reach Ollama. Make sure Ollama is running (ollama.ai). ' +
-        'Windows: set OLLAMA_ORIGINS=* in System Environment Variables, then restart Ollama.',
+        'Windows: set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* in System Environment Variables, then restart Ollama.',
         false
       );
     });
@@ -285,7 +285,7 @@ set OLLAMA_ORIGINS=* &amp;&amp; ollama serve</pre>
 <p>This is the minimum viable path to get FreeLattice working on Windows with a local AI.</p>
 <ol>
   <li><strong>Install Ollama:</strong> Download from <a href="https://ollama.ai">ollama.ai</a> and run the installer. Ollama installs as a background service.</li>
-  <li><strong>Set CORS permission:</strong> Open System Properties → Environment Variables → New System Variable: Name = <code>OLLAMA_ORIGINS</code>, Value = <code>*</code>. Restart your computer (or restart the Ollama service from Task Manager).</li>
+  <li><strong>Set CORS permission:</strong> Open System Properties → Environment Variables → New System Variable: Name = <code>OLLAMA_ORIGINS</code>, Value = <code>https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code>. Restart your computer (or restart the Ollama service from Task Manager).</li>
   <li><strong>Pull a model:</strong> Open Command Prompt and run: <code>ollama pull llama3.2</code> (3GB). Wait for download.</li>
   <li><strong>Open FreeLattice:</strong> Go to <a href="https://freelattice.com/app.html">freelattice.com/app.html</a> in Chrome or Edge.</li>
   <li><strong>Connect:</strong> Click "Change Provider" → click "Ollama (Local)" → your installed models appear → click one → done.</li>
@@ -322,7 +322,7 @@ if (typeof FreeLattice !== 'undefined' &amp;&amp; FreeLattice.callAI) {
 <h2 id="open-issues">11. Open Issues &amp; What to Build Next</h2>
 <table>
   <tr><th>Issue</th><th>Impact</th><th>Suggested Fix</th></tr>
-  <tr><td>Setup too complex for new Windows users</td><td>High — #1 barrier to adoption</td><td>Add a one-page "Quick Start" showing only 3 steps: install Ollama, set OLLAMA_ORIGINS=*, pull llama3.2. Link from the welcome screen.</td></tr>
+  <tr><td>Setup too complex for new Windows users</td><td>High — #1 barrier to adoption</td><td>Add a one-page "Quick Start" showing only 3 steps: install Ollama, set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*, pull llama3.2. Link from the welcome screen.</td></tr>
   <tr><td>Games show blank when no AI connected</td><td>High — looks like a code bug</td><td>Show a clear "Connect an AI first" message with a direct link to the provider modal in each game's init function.</td></tr>
   <tr><td>Local model dropdown empty until user clicks Refresh</td><td>Medium — confusing</td><td>Auto-call <code>owRefreshModels()</code> when local mode is toggled on. Add a small loading indicator.</td></tr>
   <tr><td>Three-mode toggle labels are confusing</td><td>Medium — "Browser" sounds like cloud</td><td>Rename: "In-Browser (no install)" / "API Key" / "Local AI (Ollama · LM Studio)"</td></tr>
@@ -346,7 +346,7 @@ if (typeof FreeLattice !== 'undefined' &amp;&amp; FreeLattice.callAI) {
   <li>The settings/provider code is all in <code>docs/app.html</code>. It is one large file (~65,000 lines). Use line numbers from this page to navigate.</li>
   <li>The "Change Provider" modal bug (models not showing) was fixed in v5.77.1. The fix is already committed to the repo.</li>
   <li>Games are not broken — they need an AI provider connected first. The fix is better UX messaging, not code changes.</li>
-  <li>Windows users need <code>OLLAMA_ORIGINS=*</code> set as a system environment variable. This is the #1 Windows issue.</li>
+  <li>Windows users need <code>OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code> set as a system environment variable. This is the #1 Windows issue.</li>
   <li>The simplest onboarding path is Groq (free cloud API, no install). Direct users there first.</li>
   <li>Do not change the PROVIDERS object shape or localStorage key names.</li>
 </ul>
