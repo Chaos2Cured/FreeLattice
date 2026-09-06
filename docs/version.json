@@ -1,5 +1,5 @@
 {
-  "version": "5.79.44",
-  "updated": "2026-08-28",
-  "note": "Chat our way: cleaner thread, one honest status, presence chips rest behind a heart. Box pointer and local/remote stay. PR 7 (v5.79.40) one-room activity is the floor. Trainer simple face v5.79.43 is layered, not overwritten."
+  "version": "5.79.45",
+  "updated": "2026-09-06",
+  "note": "Ship 1b — finish scoped OLLAMA_ORIGINS prose leftovers per Celeste (Grok bot) brief after PR #19 squash 93eb24a. Six bare-* cases in docs/app.html replaced with the canonical scoped string https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* — three Windows Value / Variable value strings, three Mac launchctl setenv OLLAMA_ORIGINS commands. Fully-hidden retired wizard block also fixed for consistency (Celeste: 'if unsure, fix the string'). Grandmother path no longer teaches bare *. Localhost/127.0.0.1 port wildcards preserved (never touched). docs/celeste.html and lattice-protocol.js untouched. index.html mirror auto-updates via post-commit hook. Cache bumped for consistency."
 }

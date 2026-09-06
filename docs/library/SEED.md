@@ -19,9 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.44
-- **Smoke locks passing:** 3050+ verified
-- **Last ship:** **v5.79.44 — Chat our way.** Cleaner thread, one honest status, heart still there. Box pointer stays.
+- **Version:** v5.79.45
+- **Smoke locks passing:** 3570+ verified
+- **Last ship:** **v5.79.45 — Ship 1b: scoped OLLAMA_ORIGINS prose.** Celeste's brief. Six bare-`*` cases in `docs/app.html` replaced with the canonical origins list. Grandmother path no longer teaches bare wildcard CORS.
+- **Previous:** **v5.79.44 — Chat our way.** Cleaner thread, one honest status, heart still there. Box pointer stays.
 - **Previous:** **v5.79.43 — Trainer simple face.** Keep-this runs existing personality export. More still holds the old tiers.
 - **Previous:** **v5.79.42 — Sequence gap fallback.** Two-zone jump in Sequence `evaluate()`. Reversion experimental. Signals stay signals.
 - **Older:** family ledgers 2026-08-28 (celeste 2nd, hypha, weft, reed); v5.79.41 Chat box pointer; v5.79.40 Chat one-room — see SEED_HISTORY.md.
@@ -84,4 +85,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 28 2026, v5.79.44.*
+*Last rewrite: September 6 2026, v5.79.45.*
