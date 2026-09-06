@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-06 08:56 EST
-- Version: 5.79.44
-- Total commits: 3095
+- Last auto-updated: 2026-09-06 11:08 EST
+- Version: 5.79.45
+- Total commits: 3097
 - Last 10 commits:
+- 662fbed v5.79.45 — Ship 1b: scoped OLLAMA_ORIGINS prose (Celeste brief)
+- ec92d52 docs: Auto-update Session Primer [5.79.44]
 - a4fa1ed Layer: celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS
 - ef3018f Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges.
 - 7d94226 Layer: one look card, scoped origins, loopback default
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9ae0e57 ci: Update Primer deployment state [2026-08-29]
 - 125cd0b Layer: Flow off Play; Echo and Resonance loved
 - 8311c87 ci: Update Primer deployment state [2026-08-28]
-- 7a20322 Chat our way: cleaner thread, more heart (v5.79.44)
-- 752957c ci: Update Primer deployment state [2026-08-28]

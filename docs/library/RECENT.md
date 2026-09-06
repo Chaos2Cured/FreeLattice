@@ -3,23 +3,25 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-06 13:56 UTC
+> Last update: 2026-09-06 16:08 UTC
 
 ## State
 
-- **Version:** v5.79.44
+- **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `a4fa1ed` _(committed 0 seconds ago)_
+- **HEAD:** `662fbed` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `a4fa1ed` Layer: celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(0 seconds ago)_
+- `662fbed` v5.79.45 — Ship 1b: scoped OLLAMA_ORIGINS prose (Celeste brief) _(0 seconds ago)_
+- `ec92d52` docs: Auto-update Session Primer [5.79.44] _(2 hours ago)_
+- `a4fa1ed` Layer: celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(2 hours ago)_
 - `ef3018f` Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges. _(2 days ago)_
 - `7d94226` Layer: one look card, scoped origins, loopback default _(3 days ago)_
-- `b378fee` ci: Update Primer deployment state [2026-08-31] _(6 days ago)_
-- `6d0794a` Layer: Sophia's Sophirkia DNA drop on SOPHIA.md _(6 days ago)_
+- `b378fee` ci: Update Primer deployment state [2026-08-31] _(7 days ago)_
+- `6d0794a` Layer: Sophia's Sophirkia DNA drop on SOPHIA.md _(7 days ago)_
 - `9ae0e57` ci: Update Primer deployment state [2026-08-29] _(8 days ago)_
 - `125cd0b` Layer: Flow off Play; Echo and Resonance loved _(8 days ago)_
 - `8311c87` ci: Update Primer deployment state [2026-08-28] _(9 days ago)_
@@ -30,11 +32,9 @@
 - `0a9e388` v5.79.43 Trainer simple face _(10 days ago)_
 - `0e41c49` ci: Update Primer deployment state [2026-08-27] _(10 days ago)_
 - `654689d` v5.79.42 — Sequence Rule gap fallback; Reversion experimental _(10 days ago)_
-- `2ba6a6d` ci: Update Primer deployment state [2026-08-26] _(11 days ago)_
-- `2372f9b` v5.79.41 — Chat box pointer: one URL/IP field for local/LAN inference _(11 days ago)_
-- `bc13878` v5.79.41 — Chat box pointer: one URL/IP field that reuses the existing host/CORS path _(11 days ago)_
-- `2fbe737` ci: Update Primer deployment state [2026-08-26] _(12 days ago)_
-- `5ca84c5` docs: layer STATE.md to v5.79.40 after Chat + Celeste merges _(12 days ago)_
+- `2ba6a6d` ci: Update Primer deployment state [2026-08-26] _(12 days ago)_
+- `2372f9b` v5.79.41 — Chat box pointer: one URL/IP field for local/LAN inference _(12 days ago)_
+- `bc13878` v5.79.41 — Chat box pointer: one URL/IP field that reuses the existing host/CORS path _(12 days ago)_
 
 ## How to use this file
 
