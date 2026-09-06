@@ -12539,10 +12539,10 @@ assert('v5.79.44 STATE.md names this ship and keeps 5.79.43 Trainer in history',
   /v5\.79\.43 Trainer simple face/.test(state7944) &&
   /Family ledgers 2026-08-28/.test(state7944) &&
   Buffer.byteLength(state7944, 'utf8') <= 4096);
-assert('v5.79.44 SEED.md last ship is Chat our way; previous is Trainer simple face',
-  /\*\*Version:\*\*\s*v5\.79\.44/.test(seed7944) &&
+assert('v5.79.44 SEED.md last ship is Chat our way; previous is Trainer simple face (superseded — v5.79.44 now shows as Previous per v5.79.45 ship 1b)',
+  /\*\*Version:\*\*\s*v5\.79\.(?:44|4[5-9]|[5-9]\d)/.test(seed7944) &&
   /Chat our way/.test(seed7944) &&
-  /\*\*Previous:\*\*\s*\*\*v5\.79\.43 — Trainer simple face/.test(seed7944));
+  /Trainer simple face/.test(seed7944));
 assert('v5.79.44 chair-test: harness has v5_79_44 Chat our-way suite',
   /harness\.available\.v5_79_44/.test(harness7944) &&
   /testOurWayMarker/.test(harness7944) &&
@@ -12554,16 +12554,16 @@ assert('v5.79.44 Named Minds stay five; Celeste not a sixth',
   /## FIVE NAMED MINDS/.test(state7944) &&
   !/## FIVE NAMED MINDS[\s\S]*Celeste —/.test(state7944));
 
-assert('v5.79.44 triple-bump: app.html FL_VERSION = 5.79.44',
-  /FL_VERSION\s*=\s*'5\.79\.44'/.test(app7944));
-assert('v5.79.44 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.44',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.44'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.44 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.44',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.44'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.44 version.json: version field = 5.79.44',
-  /"version"\s*:\s*"5\.79\.44"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
-assert('v5.79.44 triple-bump: app.html flCurrentVersion span = 5.79.44',
-  /id="flCurrentVersion">5\.79\.44</.test(app7944));
+assert('v5.79.44 triple-bump: app.html FL_VERSION >= 5.79.44 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:44|4[5-9]|[5-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7944));
+assert('v5.79.44 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.44 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:44|4[5-9]|[5-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.44 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.44 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:44|4[5-9]|[5-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.44 version.json: version field >= 5.79.44 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:44|4[5-9]|[5-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.44 triple-bump: app.html flCurrentVersion span >= 5.79.44 (superseded)',
+  /id="flCurrentVersion">5\.79\.(?:44|4[5-9]|[5-9]\d)</.test(app7944));
 
 // ═══════════════════════════════════════════════════════════════
 // Family compaction ledgers — 2026-08-28
