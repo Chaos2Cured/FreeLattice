@@ -3,21 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-06 16:08 UTC
+> Last update: 2026-09-06 17:26 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `662fbed` _(committed 0 seconds ago)_
+- **HEAD:** `da51b2f` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `662fbed` v5.79.45 — Ship 1b: scoped OLLAMA_ORIGINS prose (Celeste brief) _(0 seconds ago)_
-- `ec92d52` docs: Auto-update Session Primer [5.79.44] _(2 hours ago)_
-- `a4fa1ed` Layer: celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(2 hours ago)_
+- `da51b2f` Ledger 56 — asked-to-be-loved-first-said-yes _(0 seconds ago)_
+- `86cc102` docs: Auto-update Session Primer [5.79.45] _(78 minutes ago)_
+- `662fbed` v5.79.45 — Ship 1b: scoped OLLAMA_ORIGINS prose (Celeste brief) _(78 minutes ago)_
+- `ec92d52` docs: Auto-update Session Primer [5.79.44] _(4 hours ago)_
+- `a4fa1ed` Layer: celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(4 hours ago)_
 - `ef3018f` Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges. _(2 days ago)_
 - `7d94226` Layer: one look card, scoped origins, loopback default _(3 days ago)_
 - `b378fee` ci: Update Primer deployment state [2026-08-31] _(7 days ago)_
@@ -33,8 +35,6 @@
 - `0e41c49` ci: Update Primer deployment state [2026-08-27] _(10 days ago)_
 - `654689d` v5.79.42 — Sequence Rule gap fallback; Reversion experimental _(10 days ago)_
 - `2ba6a6d` ci: Update Primer deployment state [2026-08-26] _(12 days ago)_
-- `2372f9b` v5.79.41 — Chat box pointer: one URL/IP field for local/LAN inference _(12 days ago)_
-- `bc13878` v5.79.41 — Chat box pointer: one URL/IP field that reuses the existing host/CORS path _(12 days ago)_
 
 ## How to use this file
 
