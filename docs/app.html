@@ -16586,7 +16586,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         if (qd) qd.innerHTML = 'Right-click the Ollama icon in your <strong>system tray</strong> (bottom-right of screen, near the clock). Click <strong>Quit</strong>. If you don\'t see it, open Task Manager and end <code>ollama.exe</code>.';
         if (pl) pl.textContent = 'Paste this in PowerShell';
         if (pd) pd.innerHTML = 'Open PowerShell (Windows key, type "PowerShell", press Enter). Paste this line:';
-        if (cmd) cmd.textContent = '[Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")';
+        if (cmd) cmd.textContent = '[Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*","User")';
         if (perm) perm.textContent = 'Start-Process "$env:LOCALAPPDATA\\Programs\\Ollama\\Ollama.exe"';
       } else if (/Linux/.test(ua) && !/Android/.test(ua)) {
         var q = document.getElementById('corsWizQuitDesc');
