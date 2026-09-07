@@ -15273,8 +15273,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div style="background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.3); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0; display:none !important;" hidden aria-hidden="true" data-fl-cors-hidden="3">
         <div style="font-size: 0.88rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;">&#128274; Make CORS permanent (so you don't have to do this every time)</div>
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;">
-          <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Name: <code>OLLAMA_ORIGINS</code> &rarr; Value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally.<br>
-          <strong>Mac:</strong> Run in Terminal: <code>launchctl setenv OLLAMA_ORIGINS '*'</code> &mdash; then restart Ollama normally.<br>
+          <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Name: <code>OLLAMA_ORIGINS</code> &rarr; Value: <code>https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code> &rarr; OK &rarr; Restart Ollama normally.<br>
+          <strong>Mac:</strong> Run in Terminal: <code>launchctl setenv OLLAMA_ORIGINS 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*'</code> &mdash; then restart Ollama normally.<br>
           <strong>Linux:</strong> Run: <code>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc</code> and restart Ollama.
         </div>
       </div>
@@ -15489,7 +15489,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <summary style="font-size: 0.85rem; font-weight: 600; color: var(--accent); cursor: pointer;">&#128274; Make it permanent (so you don't have to do this every time)</summary>
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; margin-top: 10px; padding-left: 8px;">
           <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Windows:</strong> Open System Settings &rarr; Search <strong>"Environment Variables"</strong> &rarr; Under System Variables, click <strong>New</strong> &rarr; Variable name: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">OLLAMA_ORIGINS</code> &rarr; Variable value: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>
-          <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Mac:</strong> Run this in Terminal to make it permanent:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">launchctl setenv OLLAMA_ORIGINS '*'</code><br>Then restart Ollama normally from your Applications folder.</p>
+          <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Mac:</strong> Run this in Terminal to make it permanent:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">launchctl setenv OLLAMA_ORIGINS 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*'</code><br>Then restart Ollama normally from your Applications folder.</p>
           <p><strong style="color: var(--accent);">Linux:</strong> Run:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code></p>
         </div>
       </details>
@@ -16042,7 +16042,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             </div>
             <div class="ow-issue-item" hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="2">
               <strong>CORS / Browser blocking</strong>
-              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. <strong>Alternative:</strong> Stop Ollama first (see above), then run: <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code> (Mac/Linux) or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code> (Windows). To make it permanent: <strong>Windows:</strong> Set scoped OLLAMA_ORIGINS in System Environment Variables. <strong>Mac:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">launchctl setenv OLLAMA_ORIGINS '*'</code>.</span>
+              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. <strong>Alternative:</strong> Stop Ollama first (see above), then run: <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code> (Mac/Linux) or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code> (Windows). To make it permanent: <strong>Windows:</strong> Set scoped OLLAMA_ORIGINS in System Environment Variables. <strong>Mac:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">launchctl setenv OLLAMA_ORIGINS 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*'</code>.</span>
             </div>
           </details>
         </div>
@@ -16248,7 +16248,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <strong>2. Run with CORS enabled:</strong> <code>OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code> (Windows cmd).<br>
           <strong>3. Retry</strong> the connection in FreeLattice.</p>
           <p><strong>Getting "port already in use" error?</strong> That means you skipped Step 1 &mdash; Ollama is still running. Quit it first, then try the command again.</p>
-          <p><strong>Make it permanent:</strong> <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code>, Variable value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally. <strong>Mac:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS '*'</code> in Terminal, then restart Ollama. <strong>Linux:</strong> Run <code>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc</code> and restart Ollama. FreeLattice will auto-detect the best connection method on startup.</p>
+          <p><strong>Make it permanent:</strong> <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code>, Variable value: <code>https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code> &rarr; OK &rarr; Restart Ollama normally. <strong>Mac:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*'</code> in Terminal, then restart Ollama. <strong>Linux:</strong> Run <code>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc</code> and restart Ollama. FreeLattice will auto-detect the best connection method on startup.</p>
           </div>
 
           <h4>Where Can I Get Free API Keys?</h4>
@@ -17497,7 +17497,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.44</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.45</span></div>
     </div>
   </div>
 
@@ -22475,7 +22475,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.44';
+const FL_VERSION = '5.79.45';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -42169,7 +42169,7 @@ function corsPopulateOSFix() {
       '<code id="corsFixMeCmd">setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
       '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
-      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">&#128274; <strong>Permanent alternative:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code> &rarr; Variable value: <code>*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">&#128274; <strong>Permanent alternative:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code> &rarr; Variable value: <code>https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>' +
       '</div>';
   } else if (os === 'linux') {
     html = '<div class="os-section">' +

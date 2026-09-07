@@ -75,7 +75,7 @@ CC's reading (notes for the next builder, May 31, 2026)
 * **CORS is the single most likely failure mode.** Test with a chrome
   page open on freelattice.com pointing fetch at localhost:8000 BEFORE
   shipping. The Welcome Wizard's harness handles CORS for Ollama via
-  OLLAMA_ORIGINS=* — this server needs the equivalent Flask CORS setup.
+  scoped OLLAMA_ORIGINS — this server needs the equivalent Flask CORS setup.
   Recommend: `from flask_cors import CORS; CORS(app)`.
 
 * **Name in user-facing UI.** Per docs/library/CLARITY_AUDIT.md, "Davna"
