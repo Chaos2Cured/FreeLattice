@@ -52,6 +52,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
   forceReloadLive: () => ipcRenderer.invoke('force-reload-live'),
 
   /**
+   * Companion key status (hasKey, encryptionAvailable). Seed never exposed.
+   */
+  latticeKeyStatus: () => ipcRenderer.invoke('lattice-key-status'),
+
+  /**
+   * Create OS-keychain-wrapped companion seed. Fail-closed if keychain missing.
+   */
+  latticeKeyCreate: () => ipcRenderer.invoke('lattice-key-create'),
+
+  /**
+   * Request a signature in main. Signing primitive deferred; seed stays in main.
+   * @param {string} payloadB64
+   */
+  latticeKeySign: (payloadB64) => ipcRenderer.invoke('lattice-key-sign', payloadB64),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function

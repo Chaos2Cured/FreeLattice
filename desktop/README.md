@@ -81,3 +81,9 @@ See [install instructions](../docs/install-mac.html) for the bypass flow.
 
 **Experimental (v5.8.0).** Proof of concept for the Sovereign Bundle (FUTURE_VISION.md §9).
 Auto-updater deferred until code-signing keypair is configured.
+
+## Companion keys (Step 1)
+
+OS keychain via Electron `safeStorage`. Seed file under `userData/lattice-keys/companion.seed.enc`.
+Private seed never crosses `contextBridge`. IPC: `latticeKeyStatus` / `latticeKeyCreate` / `latticeKeySign` (sign deferred).
+No BitTorrent in this layer. Refuse cleartext fallback.
