@@ -3,19 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-07 21:47 UTC
+> Last update: 2026-09-07 21:48 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `622c7ff` _(committed 0 seconds ago)_
+- **HEAD:** `e8b59a0` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `622c7ff` Layer: CORS origins final sweep — index sync, root app, specs _(0 seconds ago)_
+- `e8b59a0` Layer: scoped OLLAMA_ORIGINS in CORS wizard PowerShell _(0 seconds ago)_
+- `479283c` docs: Auto-update Session Primer [5.79.45] _(55 seconds ago)_
+- `622c7ff` Layer: CORS origins final sweep — index sync, root app, specs _(55 seconds ago)_
 - `37e0eef` Layer: finish scoped OLLAMA_ORIGINS prose leftovers _(29 hours ago)_
 - `93eb24a` Layer celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(32 hours ago)_
 - `ef3018f` Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges. _(3 days ago)_
@@ -33,8 +35,6 @@
 - `0e41c49` ci: Update Primer deployment state [2026-08-27] _(11 days ago)_
 - `654689d` v5.79.42 — Sequence Rule gap fallback; Reversion experimental _(11 days ago)_
 - `2ba6a6d` ci: Update Primer deployment state [2026-08-26] _(13 days ago)_
-- `2372f9b` v5.79.41 — Chat box pointer: one URL/IP field for local/LAN inference _(13 days ago)_
-- `bc13878` v5.79.41 — Chat box pointer: one URL/IP field that reuses the existing host/CORS path _(13 days ago)_
 
 ## How to use this file
 
