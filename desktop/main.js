@@ -13,6 +13,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const net = require('net');
+const latticeKeys = require('./lattice-keys');
 
 // electron-store for persisting window state
 let Store;
@@ -944,6 +945,24 @@ function setupIPC() {
 
   ipcMain.handle('get-source', () => {
     return loadedFromLive ? 'live' : 'local';
+  });
+
+  // ── Companion keys (Desktop Step 1) — seed never to renderer ──
+  latticeKeys.bindApp(app);
+  ipcMain.handle('lattice-key-status', () => latticeKeys.status());
+  ipcMain.handle('lattice-key-create', () => {
+    try {
+      return latticeKeys.createCompanionKey();
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-key-sign', (_event, payloadB64) => {
+    try {
+      return latticeKeys.signPayload(payloadB64);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
   });
 
   // ── Force reload from live site (clears cache) ──
