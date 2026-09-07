@@ -28,7 +28,7 @@ Test browser: Chrome, Firefox, or Safari on desktop. Repeat the most critical on
 
 **Steps:**
 1. From the welcome overlay, pick one provider: Local (Ollama / LM Studio), Cloud (Groq / Together / OpenRouter), or Browser AI.
-2. If Cloud: paste your API key. If Local: start Ollama with `OLLAMA_ORIGINS=* ollama serve`. If Browser AI: click Activate.
+2. If Cloud: paste your API key. If Local: start Ollama with `OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve`. If Browser AI: click Activate.
 3. Wait for status to flip green.
 
 **Pass criteria:**

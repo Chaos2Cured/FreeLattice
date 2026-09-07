@@ -271,8 +271,8 @@ Get-Process -Name "ollama","ollama app" -ErrorAction SilentlyContinue | Stop-Pro
 Start-Sleep -Seconds 2
 
 # 3. The CORS fix — let the browser talk to Ollama
-[Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS", "*", "User")
-$env:OLLAMA_ORIGINS = "*"
+[Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS", "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*", "User")
+$env:OLLAMA_ORIGINS = "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 Write-Host "Browser permission set." -ForegroundColor Green
 
 # 4. Detect GPU / VRAM for smart model selection
@@ -364,7 +364,7 @@ function downloadMacFix() {
     'echo "Setting up Ollama for FreeLattice..."\n' +
     'echo ""\n' +
     'echo "Step 1: Setting permissions..."\n' +
-    'launchctl setenv OLLAMA_ORIGINS "*"\n' +
+    'launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\n' +
     'echo ""\n' +
     'echo "Step 2: Restarting Ollama..."\n' +
     'osascript -e \'quit app "Ollama"\' 2>/dev/null\n' +
@@ -394,10 +394,10 @@ function downloadMacFix() {
 Linux users can handle a terminal. Show:
 
 ```bash
-OLLAMA_ORIGINS="*" ollama serve
+OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve
 ```
 
-Or, for systemd users, the drop-in override (`systemctl edit ollama.service` → add `Environment="OLLAMA_ORIGINS=*"`).
+Or, for systemd users, the drop-in override (`systemctl edit ollama.service` → add `Environment="OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"`).
 
 ---
 
