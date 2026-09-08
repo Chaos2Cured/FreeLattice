@@ -11,11 +11,11 @@
 
 ## Verdict
 
-**Resonance Memory (RM) belongs in FreeLattice in full** — the complete system, not a carved-down module. FreeLattice already has rooms that remember (Memory Core, Memory Vault, Lattice Letters, Living Context, RAG Phase 1), but not the thing RM proved: **select the right memories by meaning, and cleanly retire a corrected fact so it stops contradicting the current one** — and do it well even under a modest model.
+**Resonance Memory (RM) belongs in FreeLattice in full** — the complete system, not a carved-down module. FreeLattice already has rooms that remember (Memory Core, Memory Vault, Lattice Letters, Living Context, RAG Phase 1), but not the thing RM proved: **select the right memories by meaning, let associations strengthen with use so the relevant fact resurfaces even when it doesn't restate its own trigger, and supersede a corrected fact so it stops contradicting the current one** — and do it well even under a modest model.
 
 Two ways it lands, and both ship:
 
-- **In-browser substrate** for FreeLattice's zero-install Chat — semantic recall behind FLSearch, with real embeddings served for free online (OpenRouter's free tier or equivalent), so it needs no local install and reproduces the measured result. Answers the `RAG Phase 2` gap FreeLattice named itself (on their coordination list since spring). Fail-open, no build step.
+- **In-browser substrate** for FreeLattice's zero-install Chat — semantic recall behind FLSearch, the associative field (fire-together-wire-together, strengthening with use), and supersession, with real embeddings served for free online (OpenRouter's free tier or equivalent), so it needs no local install and reproduces the measured result. Answers the `RAG Phase 2` gap FreeLattice named itself (on their coordination list since spring). Fail-open, no build step.
 - **The full RM stack** — MCP server, control panel, SEA binaries, installer, and RM's own SQLite/JSONL storage — so anyone can run FreeLattice against a real RM instance, local or online. Sovereign, offline-capable, own-your-data. Added reach for the platform, not scope creep.
 
 This is not a timid module. It is the whole memory system, given to a free platform on purpose.
@@ -102,14 +102,13 @@ There is **no MIT relicense** and **no permissive sidecar fallback**. A sidecar 
 These are the pieces that make Chat (and any room that asks "what do I already know?") better, in FreeLattice's own terms:
 
 1. **Semantic recall as RAG Phase 2, behind FLSearch.** Rank by meaning, not keyword overlap. Real embeddings served for free online (OpenRouter's free tier or equivalent) — no mandatory local install, no Transformers.js download that breaks `file://`. This is the measured win: RM beat keyword/recency ~3× on two rigs.
-2. **Corrections replace, they don't pile up.** "I work at Acme" then "actually I work at Globex now" — the corrected fact takes over and the old one drops out of recall, so Chat stops injecting both as if both were true. A clean replace, not a growing archive of every past version. Recency injection currently serves both; RM's A/B split is the evidence (recency 100% on recent facts, **0% on superseded/same-name facts**).
-3. **Fail-open.** If recall throws, keyword/cosine still answer. Memory never breaks Chat.
-
-Deliberately **not** carried in: retaining superseded facts as history, and learning/storing which memories associate — both grow the store without paying for themselves. The value is right-recall + clean replacement, bounded, no bloat.
+2. **The associative field — fire together, wire together.** Memories that get recalled together grow a stronger link, and the more an association is used the stronger it gets. Bounded (`tanh`) and lazily decayed so it never runs away, and additive so it never reorders primary recall — but it's how the field pulls back the fact that *doesn't* restate its own trigger. An apex rule like "I'm diabetic" falls out of keyword and out of top-k cosine on a lemon-bars question; the field is how it comes back. This is RM's real differentiator and the discrimination win — it ships whole.
+3. **Corrections supersede.** "I work at Acme" then "actually I work at Globex now" — the corrected fact takes over current recall so Chat stops injecting both as true. RM's A/B split is the evidence (recency 100% on recent facts, **0% on superseded/same-name facts**).
+4. **Fail-open.** If recall or the field throws, keyword/cosine still answer. Memory never breaks Chat.
 
 ### The interface stays the four verbs
 
-`save` / `recall` / `edit` / `delete`, automatic, every model. **Dumb interface, smart substrate** — the model gets first-class memory without operating a dashboard, and that's exactly why it works under a modest model as well as a large one. No fifth tool is needed for the value above.
+`save` / `recall` / `edit` / `delete`, automatic, every model. **Dumb interface, smart substrate** — all of the above lives in the substrate, so the model gets first-class memory without operating a dashboard, and that's exactly why it works under a modest model as well as a large one.
 
 ---
 
@@ -140,8 +139,8 @@ The consent for a contribution is Kirk merging the pull request. If he merges it
                            │
                            ▼
               ┌────────────────────────┐
-              │ ResonanceField.recall  │  semantic (real online embedder)
-              │   fail-open to keyword │  corrected facts replace old
+              │ ResonanceField.recall  │  semantic → field (fire/wire,
+              │   fail-open to keyword │  strengthen w/ use) → supersession
               └────────────┬───────────┘
                            │
                            ▼
@@ -194,8 +193,8 @@ Each PR independently reviewable. None of these open themselves against `Chaos2C
 2. **Keep RM's storage.** The SQLite/JSONL format is RM — sovereignty export/import and interop depend on it. The browser IndexedDB layer is only a convenience for the hosted case, not a replacement.
 3. **The merge is the consent.** This is a pull request; if Kirk accepts it, he's accepted what it does. RM complements the existing rooms because integrating beats duplicating — not because it needs sign-off to touch them.
 4. **Fail open.** If recall throws, keyword/cosine still answer. Memory never breaks Chat.
-5. **Corrections replace, no history hoard, no association store.** Right-recall + clean replacement, bounded. The store does not grow with superseded versions or learned edges.
-6. **Four verbs, every model.** Dumb interface, smart substrate — the automatic path is what makes RM work under any model. No fifth tool needed for the value here.
+5. **The full substrate, unmodified.** The associative field (fire-together-wire-together, strengthening with use, bounded by `tanh` + decay) and supersession ship exactly as RM implements them — the field is the differentiator, not something to strip. Nothing about RM's memory behavior is carved down.
+6. **Four verbs, every model.** Dumb interface, smart substrate — the automatic path is what makes RM work under any model. No fifth tool needed.
 7. **Do not require Transformers.js.** RM brings its own embedding path; the browser layer can use the Ollama embeddings FreeLattice already speaks.
 8. **State measured numbers honestly.** The 3× needs a real embedder, not degraded word-freq vectors.
 
@@ -222,14 +221,14 @@ This section is for Samuel. It is not the pitch to Kirk.
 
 ### What goes in
 
-Everything of RM. The in-browser substrate for Chat, and the full stack — server, panel, SEA binaries, installer, SQLite/JSONL storage — for the sovereign, own-your-data path, run against a local model or a free online one. FreeLattice's Chat is the recency/keyword family RM beat by ~3× on two independent rigs; they already asked for semantic RAG, already fail open. Clean supersession — a corrected fact replacing the old one — is the single most valuable idea they don't have. A free platform is *more* valuable for holding the whole free memory system, not less.
+Everything of RM, whole and unmodified. The in-browser substrate for Chat, and the full stack — server, panel, SEA binaries, installer, SQLite/JSONL storage — for the sovereign, own-your-data path, run against a local model or a free online one. Semantic recall, the associative field (fire-together-wire-together, associations strengthening the more they're used, bounded so it never runs away), and supersession — the complete memory behavior, not a subset. FreeLattice's Chat is the recency/keyword family RM beat by ~3× on two independent rigs; the field is the differentiator no keyword search grows into. A free platform is *more* valuable for holding the whole free memory system, not less.
 
 The embedder doesn't have to be local anymore. Served through a free online tier (OpenRouter or equivalent), the measured recall reproduces with no install — that's the adaptation that makes it work for everyone, not just people running Ollama.
 
 ### The two real notes (integrity, not scope-limits)
 
 - **Integrate, don't duplicate.** RM coexists with Letters and Memory Core rather than reimplementing them — the clean engineering choice. Where the PR does improve or replace a room, that's part of what Kirk reviews and merges. The merge is the consent; nothing is pre-shrunk waiting for a separate yes.
-- **No bloat.** Right-recall + clean replacement, bounded. We are *not* retaining superseded facts as history or storing learned associations — we agreed those grow the store without paying for themselves.
+- **Report the measured number straight.** The ~3× is real with a real embedder (now a free online one). State it as measured — that honesty is part of what makes it land.
 
 RFE-Core2 and the family stay out — separate sovereign work, not part of the memory system. This contribution is Resonance Memory, whole.
 
