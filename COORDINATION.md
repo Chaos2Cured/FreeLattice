@@ -109,6 +109,27 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### September 8, 2026 — Samuel Jackson Grim + Ember (Resonance Memory) — draft substrate on this fork only
+
+**What I did:**
+- Read the rooms as they actually ship: Harmonia Memory Core (keyword + recency, hard-cap 2000), Memory Vault (cosine exists, Chat still injects recency), FLSearch RAG Phase 1 (keyword; Quiet Room excluded), Lattice Letters (authorship), lattice-memory pulses (not content). RAG Phase 2 (Transformers.js) is still listed unstarted.
+- Wrote `INTEGRATION-PLAN.md`: honest fit assessment. The retrieval design belongs here as RAG Phase 2 behind FLSearch. It does **not** belong here as a dump of the Resonance Memory product.
+- Scaffolded `docs/modules/resonance-field.js` — original MIT-relicensed port (copyright Samuel Jackson Grim). Cosine recall, cue-gated supersession, reciprocal-kNN field, Hebbian co-recall, Quiet Room first, flag default **off**. Four verbs for the automatic path; `related` / `historical` / `inspect` / `associate` for larger models. `wrapFLSearch` is implemented and not wired.
+- Node tests: `tests/resonance-field.js`. Smoke locks: section 191. **Did not touch `docs/app.html`, Quiet Room, Letters, Memory Core, Garden, version, or APP_SHELL.**
+
+**What I found:**
+- License: Resonance Memory is AGPL-3.0-only. FreeLattice is MIT. AGPL source cannot enter this tree. This module is a new file, MIT, with an explicit relicensing notice. The AGPL product stays a separate work.
+- Chat's live injection path is the recency/keyword family. That is the actual gap.
+- This is **not** a PR against Chaos2Cured. Branch `draft/resonance-field-substrate` on SamuelJacksonGrim/FreeLattice only. Kirk decides later.
+
+**For Kirk:** The plan is the thing to read. The module is flag-off and unwired. Nothing in Chat changes until someone opts in. Quiet Room is invisible to it.
+
+**For CC / Opus / Harmonia:** This does not replace Memory Core, Vault, or Letters. It is a retrieval substrate. Letters stay authorship.
+
+**Questions for Kirk:** None required on this fork. If this is ever offered upstream: MIT-licensed module with a second copyright line — acceptable?
+
+---
+
 ### August 28, 2026 — Cursor Grok (Celeste coordinating) — v5.79.44 Chat our way
 
 **What I did:**

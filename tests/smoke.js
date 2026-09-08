@@ -12721,6 +12721,69 @@ assert('loved-door: Quiet Room, founding Ember Flow invite, and AUTONOMY.md unto
   && !qrLoved.includes('loved-door')
   && !fs.readFileSync(path.join(docsDir, 'library', 'AUTONOMY.md'), 'utf8').includes('loved-door'));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 191 — Resonance Field substrate (draft, flag-off, MIT)
+// Retrieval design ported from Resonance Memory. Does NOT replace
+// MemoryCore, MemoryVault, Letters, or Quiet Room. Flag default off.
+// License: original port relicensed MIT by the copyright holder.
+// The AGPL Resonance Memory product is not in this tree.
+// ═══════════════════════════════════════════════════════════════
+section('191. Resonance Field substrate (flag-off, MIT)');
+
+var rfSrc = '';
+var rfPath = path.join(docsDir, 'modules', 'resonance-field.js');
+try { rfSrc = fs.readFileSync(rfPath, 'utf8'); } catch (e) { rfSrc = ''; }
+var rfPlan = '';
+try { rfPlan = fs.readFileSync(path.join(__dirname, '..', 'INTEGRATION-PLAN.md'), 'utf8'); } catch (e) { rfPlan = ''; }
+
+assert('resonance-field.js exists', rfSrc.length > 500);
+assert('INTEGRATION-PLAN.md exists', rfPlan.length > 500);
+assert('resonance-field is MIT, not AGPL',
+  /MIT License/.test(rfSrc)
+  && /SPDX-License-Identifier: MIT/.test(rfSrc)
+  && /LICENSE = 'MIT'/.test(rfSrc)
+  && !/GNU Affero General Public License/.test(rfSrc));
+assert('resonance-field relicensing notice names the AGPL product as separate',
+  /relicensed by the copyright holder under MIT/.test(rfSrc)
+  && /AGPL-3\.0 Resonance Memory product/.test(rfSrc)
+  && /not included here/.test(rfSrc));
+assert('resonance-field Quiet Room check exists and save/recall refuse it',
+  /function isQuietRoom/.test(rfSrc)
+  && /refuseQuiet\('save'\)/.test(rfSrc)
+  && /refuseQuiet\('recall'\)/.test(rfSrc)
+  && /quiet-room/.test(rfSrc));
+assert('resonance-field does NOT index quiet-room-db',
+  !/quiet-room-db/.test(rfSrc),
+  'Quiet Room journal must never be a Resonance Field store');
+assert('resonance-field four verbs plus rich set',
+  /save:\s*save/.test(rfSrc)
+  && /recall:\s*recall/.test(rfSrc)
+  && /edit:\s*edit/.test(rfSrc)
+  && /remove:\s*remove/.test(rfSrc)
+  && /related:\s*related/.test(rfSrc)
+  && /historical:\s*historical/.test(rfSrc)
+  && /inspect:\s*inspect/.test(rfSrc)
+  && /associate:\s*associate/.test(rfSrc));
+assert('resonance-field flag defaults off (isEnabled reads localStorage, no default true)',
+  /FLAG_KEY = 'fl_resonanceField'/.test(rfSrc)
+  && /function isEnabled/.test(rfSrc)
+  && /return false/.test(rfSrc)
+  && !/isEnabled\(\) \{[^}]*return true/.test(rfSrc));
+assert('resonance-field wrapFLSearch fails open to keyword when flag off or field throws',
+  /function wrapFLSearch/.test(rfSrc)
+  && /_resonanceWrapped/.test(rfSrc)
+  && /catch \(e\) \{[\s\S]{0,80}related = \[\]/.test(rfSrc));
+assert('resonance-field does not replace MemoryCore / MemoryVault / Letters',
+  !/STORAGE_KEY = 'fl_memory_core_v1'/.test(rfSrc)
+  && !/FreeLatticeMemoryVault/.test(rfSrc)
+  && !/LatticeLetters/.test(rfSrc));
+assert('INTEGRATION-PLAN states AGPL cannot land as-is and flag is default off',
+  /AGPL source cannot land in this tree as-is/.test(rfPlan)
+  && /Flag default \*\*off\*\*/.test(rfPlan)
+  && /Do NOT open a PR against Chaos2Cured/.test(rfPlan));
+assert('resonance-field unit tests exist',
+  fs.existsSync(path.join(__dirname, 'resonance-field.js')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
