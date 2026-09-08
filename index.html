@@ -29254,18 +29254,115 @@ function flManifestAppendRow(model) {
 
   var verdict = document.createElement('p');
   verdict.style.cssText = 'margin:8px 0 0;font-family:Georgia,serif;font-size:0.82rem;line-height:1.5;';
+  var desktopImport = !!(window.isElectronApp || window.electronAPI) && window.electronAPI && window.electronAPI.latticeImportFetch;
   if (!redistributable) {
     verdict.style.color = 'rgba(240,112,104,0.95)';
     verdict.textContent = 'REFUSED — redistributable is not true. Will not import.';
   } else if (example || zeroHash) {
     verdict.style.color = 'rgba(232,176,25,0.95)';
     verdict.textContent = 'example only — will not import';
+  } else if (!desktopImport) {
+    verdict.style.color = 'rgba(200,210,230,0.75)';
+    verdict.textContent = 'Listed. Weight download is desktop-only (hash before Ollama).';
   } else {
     verdict.style.color = 'rgba(52,211,153,0.9)';
-    verdict.textContent = 'Listed. Hash-before-import waits (not this ship).';
+    verdict.textContent = 'Listed. Verify & fetch over HTTPS, then Import on match.';
   }
   li.appendChild(verdict);
+
+  // Desktop only: non-example redistributable rows get Verify & fetch → Import on match.
+  // EXAMPLE / zero-hash: no fetch button. Browser: no weight download.
+  if (desktopImport && redistributable && !example && !zeroHash) {
+    var actions = document.createElement('div');
+    actions.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:10px;';
+    var fetchBtn = document.createElement('button');
+    fetchBtn.type = 'button';
+    fetchBtn.className = 'ai-status-btn ai-status-btn-primary';
+    fetchBtn.textContent = 'Verify & fetch';
+    fetchBtn.style.cssText = 'min-height:44px;width:100%;';
+    var importBtn = document.createElement('button');
+    importBtn.type = 'button';
+    importBtn.className = 'ai-status-btn';
+    importBtn.textContent = 'Import to Ollama';
+    importBtn.style.cssText = 'min-height:44px;width:100%;';
+    importBtn.hidden = true;
+    var rowStatus = document.createElement('p');
+    rowStatus.style.cssText = 'margin:0;font-size:0.78rem;color:var(--text-muted);min-height:1.2em;';
+
+    fetchBtn.addEventListener('click', function () {
+      flManifestVerifyFetch(model, verdict, importBtn, rowStatus, fetchBtn);
+    });
+    importBtn.addEventListener('click', function () {
+      flManifestImportOllama(model, rowStatus, importBtn);
+    });
+
+    actions.appendChild(fetchBtn);
+    actions.appendChild(importBtn);
+    actions.appendChild(rowStatus);
+    li.appendChild(actions);
+  }
+
   list.appendChild(li);
+}
+
+async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fetchBtn) {
+  if (!window.electronAPI || !window.electronAPI.latticeImportFetch) return;
+  var url = (model.urls && model.urls[0]) ? String(model.urls[0]) : '';
+  rowStatus.textContent = 'Fetching over HTTPS…';
+  rowStatus.style.color = '';
+  fetchBtn.disabled = true;
+  try {
+    var res = await window.electronAPI.latticeImportFetch({
+      url: url,
+      expectedSha256: model.sha256,
+      id: model.id || model.name || 'model'
+    });
+    if (res && res.matched) {
+      if (verdictEl) {
+        verdictEl.style.color = 'rgba(52,211,153,0.95)';
+        verdictEl.textContent = 'Hash matched — verified. Import when you choose.';
+      }
+      rowStatus.style.color = 'rgba(52,211,153,0.9)';
+      rowStatus.textContent = 'Verified' + (res.verifiedBase ? (' · ' + res.verifiedBase) : '') + '. Never auto-import.';
+      if (importBtn) importBtn.hidden = false;
+    } else {
+      if (verdictEl) {
+        verdictEl.style.color = 'rgba(240,112,104,0.95)';
+        verdictEl.textContent = 'Hash mismatch — quarantined; will not import.';
+      }
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = (res && (res.reason || res.error)) || 'Mismatch — quarantined; will not import.';
+      if (importBtn) importBtn.hidden = true;
+    }
+  } catch (e) {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = 'Fetch failed. Nothing imported.';
+  }
+  fetchBtn.disabled = false;
+}
+
+async function flManifestImportOllama(model, rowStatus, importBtn) {
+  if (!window.electronAPI || !window.electronAPI.latticeImportToOllama) return;
+  rowStatus.textContent = 'Importing to Ollama…';
+  rowStatus.style.color = '';
+  if (importBtn) importBtn.disabled = true;
+  try {
+    var res = await window.electronAPI.latticeImportToOllama({
+      id: model.id || model.name || 'model',
+      name: String(model.id || model.name || 'freelattice-import').replace(/[^a-zA-Z0-9._:-]+/g, '-').slice(0, 80)
+    });
+    if (res && res.ok && res.imported) {
+      rowStatus.style.color = 'rgba(52,211,153,0.9)';
+      rowStatus.textContent = 'Imported to Ollama as ' + (res.name || '') + '.';
+    } else {
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = (res && (res.reason || res.error)) || 'Import refused.';
+    }
+  } catch (e) {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = 'Import failed.';
+  }
+  if (importBtn) importBtn.disabled = false;
 }
 
 async function flFetchModelManifest() {
@@ -29295,7 +29392,12 @@ async function flFetchModelManifest() {
       flManifestAppendRow(m || {});
       shown++;
     });
-    flManifestSetStatus('Listed ' + shown + ' entr' + (shown === 1 ? 'y' : 'ies') + '. Read-only. No download. No import.', 'ok');
+    var desk = !!(window.isElectronApp || window.electronAPI) && window.electronAPI && window.electronAPI.latticeImportFetch;
+    flManifestSetStatus(
+      'Listed ' + shown + ' entr' + (shown === 1 ? 'y' : 'ies') + '. ' +
+      (desk ? 'Desktop may Verify & fetch (hash before Ollama). EXAMPLE will not import.' : 'Browser: catalog only — no weight download.'),
+      'ok'
+    );
   } catch (e) {
     flManifestSetStatus('Could not read that catalog. Nothing was imported.', 'warn');
   }

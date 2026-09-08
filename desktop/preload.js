@@ -89,6 +89,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeLedgerVerify: () => ipcRenderer.invoke('lattice-ledger-verify'),
 
   /**
+   * Verified HTTPS import v0.1 — status only (counts). No path write. No seed.
+   */
+  latticeImportStatus: () => ipcRenderer.invoke('lattice-import-status'),
+
+  /**
+   * HTTPS fetch → quarantine → hash. Renderer passes url + expectedSha256 + id only.
+   * @param {{ url: string, expectedSha256: string, id: string }} opts
+   */
+  latticeImportFetch: (opts) => ipcRenderer.invoke('lattice-import-fetch', opts),
+
+  /**
+   * User-gesture Import to Ollama after verified hash match. Never auto.
+   * @param {{ id: string, name: string }} opts
+   */
+  latticeImportToOllama: (opts) => ipcRenderer.invoke('lattice-import-to-ollama', opts),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function

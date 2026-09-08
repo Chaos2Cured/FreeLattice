@@ -1,0 +1,1 @@
+fixture.verify-only — tiny bytes for hash-before-import smoke. Not a model weight.

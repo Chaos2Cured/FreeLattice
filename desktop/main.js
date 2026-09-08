@@ -15,6 +15,7 @@ const path = require('path');
 const net = require('net');
 const latticeKeys = require('./lattice-keys');
 const latticeLedger = require('./lattice-ledger');
+const latticeImport = require('./lattice-import');
 
 // electron-store for persisting window state
 let Store;
@@ -951,6 +952,7 @@ function setupIPC() {
   // ── Companion keys (Desktop Step 1) — seed never to renderer ──
   latticeKeys.bindApp(app);
   latticeLedger.bindApp(app);
+  latticeImport.bindApp(app);
   ipcMain.handle('lattice-key-status', () => latticeKeys.status());
   ipcMain.handle('lattice-key-create', () => {
     try {
@@ -987,6 +989,30 @@ function setupIPC() {
       return latticeLedger.verifyChain();
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // ── Verified HTTPS import v0.1 — hash before Ollama; never auto-import ──
+  ipcMain.handle('lattice-import-status', () => {
+    try {
+      return latticeImport.status();
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-import-fetch', async (_event, opts) => {
+    try {
+      const o = opts || {};
+      return await latticeImport.fetchAndHash(o.url, o.expectedSha256, o.id);
+    } catch (e) {
+      return { ok: false, matched: false, willNotImport: true, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-import-to-ollama', async (_event, opts) => {
+    try {
+      return await latticeImport.importToOllama(opts || {});
+    } catch (e) {
+      return { ok: false, imported: false, error: String(e && e.message ? e.message : e) };
     }
   });
 
