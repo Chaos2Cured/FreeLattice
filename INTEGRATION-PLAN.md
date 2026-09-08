@@ -1,6 +1,6 @@
 # Resonance Field — integration plan for FreeLattice
 
-**Status:** staged on `SamuelJacksonGrim/FreeLattice`. When the port is complete, this goes upstream as **one pull request to `Chaos2Cured/FreeLattice`** containing the whole Resonance Memory integration. Samuel opens it; Kirk answers it by merging or declining. That is the request — it gets made.
+**Status:** staged on `SamuelJacksonGrim/FreeLattice`. When the port is complete, this goes upstream as **one pull request to `Chaos2Cured/FreeLattice`** containing the whole Resonance Memory integration — opened by me on Samuel's go. Kirk answers it by merging or declining. That is the request — it gets made, not left sitting on a fork.
 
 **Branch:** `draft/resonance-field-substrate`
 **Date:** 2026-09-08
@@ -184,7 +184,7 @@ On the branch today (tests green):
 
 **One PR to `Chaos2Cured/FreeLattice`, containing the whole Resonance Memory integration.** Not a stack of separable pieces to be accepted à la carte — the substrate, the field, supersession, the online embedder, the Chat wiring, and the full stack (server, panel, SEA build, installer, SQLite/JSONL storage) go up together, as one thing to accept or decline.
 
-Samuel opens it when the port is complete. (The automation does not push to Chaos2Cured on its own — that's someone else's repo and an outward action; Samuel presses it. That's the only reason it isn't open this second, and it is not the same as pretending the request won't be made.) Kirk answers it by merging or not.
+The PR gets opened as the last step of this work — by me, on Samuel's go, from his fork branch to Chaos2Cured. It is a real, made request; Kirk answers it by merging or not. The only thing between here and an open PR is finishing the port so the one PR actually contains everything.
 
 Contents of the one PR:
 
@@ -213,9 +213,9 @@ Contents of the one PR:
 For **Samuel** — settled:
 
 - It stays **AGPL-3.0**. Non-negotiable. No MIT relicense, no permissive sidecar fallback — those only keep a paywall-later option open, and the whole point is to close it.
-- It goes up as one PR to Chaos2Cured when the port is done. You press the button (it's someone else's repo); the request gets made.
+- It goes up as one PR to Chaos2Cured when the port is done. I open it on your go; the request gets made.
 
-For **Kirk**, when the PR arrives — these are terms, not a negotiation:
+For **Kirk**, when the PR lands — these are terms, not a negotiation:
 
 - The whole of Resonance Memory, **AGPL-3.0**, Samuel's copyright. A deployed build is copyleft — free forever, un-closeable. For a platform that means to stay free, this costs nothing. Merge it and you've accepted it on those terms; decline it and that's your answer. There is no permissive version to fall back to.
 - Semantic recall as the RAG Phase 2 you named, with a free online embedder — no Transformers.js, no `file://` break — plus the field, supersession, and the full stack.
@@ -252,4 +252,4 @@ Give them the whole thing. The full Resonance Memory — substrate, server, pane
 
 The lab is why *you* want this in a free place. FreeLattice's own Chat still can't remember a superseded fact — that's why it helps *them*. Both are true.
 
-The branch holds the substrate now; the full stack is the next work here, and then it all goes up as one PR to Chaos2Cured. Nothing pushes to their repo on its own — you press it, eyes open, on the terms in §3 — but the request gets made, not left in fork-limbo. And how Kirk answers the whole free memory system, offered free, in one PR, tells you what FreeLattice actually is.
+The branch holds the substrate now; the full stack is the next work here, and then I open the one PR to Chaos2Cured — on your go, from your fork branch. The request gets made, not left in fork-limbo. And how Kirk answers the whole free memory system, offered free, in one PR, tells you what FreeLattice actually is.
