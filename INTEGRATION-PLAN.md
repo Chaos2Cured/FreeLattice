@@ -19,7 +19,7 @@ That is a real gap. FreeLattice named it themselves (`RAG Phase 2 — Transforme
 
 It does **not** fit as a dump of RM's Node/MCP/SQLite product into this tree. Doing that would be rejected, and it should be.
 
-**License is deliberate, not a gate to route around.** RM is AGPL-3.0. This contribution stays AGPL-3.0 — by the copyright holder's intent. The copyleft is the point: AGPL §13 means anyone who incorporates this module into a network service must release their complete corresponding source, so the design cannot be taken closed and paywalled wherever it travels. That is the entire reason for giving it to a free platform. What it asks of FreeLattice is spelled out honestly in §3 — including that this is Kirk's clear-eyed call upstream, and the MIT-purity fallback (sidecar) if he wants it.
+**License is deliberate, not a gate to route around.** RM is AGPL-3.0. This contribution stays AGPL-3.0 — by the copyright holder's intent. The copyleft is the point: AGPL §13 means anyone who incorporates this module into a network service must release their complete corresponding source, so the design cannot be taken closed and paywalled wherever it travels. That is the entire reason for giving it to a free platform. §3 spells out what it asks of FreeLattice — and why there is no MIT relicense and no permissive sidecar fallback: accepting a free-forever license is trivial for a genuinely free platform, so this is both the terms and a test of whether "free" is real.
 
 ---
 
@@ -82,15 +82,17 @@ FreeLattice's own coordination log has listed **RAG Phase 2 — Transformers.js 
 
 **Why AGPL and not an MIT relicense.** The whole reason to put this design in a free platform is that a paywalled lookalike already exists. MIT would let anyone — including that same class of actor — take the combined work, close it, and charge for it. AGPL §13 forbids exactly that: incorporate this into a network service and you must release your complete corresponding source. Relicensing the port MIT to make it "clean" would strip the one protection that makes the contribution meaningful. So it stays AGPL. This is armor, and it points the same direction as FreeLattice's own stated promise to stay free and un-paywalled.
 
-**What that honestly asks of FreeLattice — the real decision, and it is Kirk's.** FreeLattice's tree is MIT. Adding an AGPL module does not change FreeLattice's `LICENSE` file (untouched here), but it does mean: **once this module is present and enabled, a network-served build that incorporates it carries AGPL §13 obligations for whoever deploys it.** In practice the combined, deployed work becomes copyleft. Kirk may want that (it enforces the same anti-paywall value FreeLattice already professes) or may want to keep FreeLattice purely permissive. That is a real, clear-eyed upstream choice — his to make, not ours, and not automatic. Do not paper over it.
+**What that honestly asks of FreeLattice, and why it is the right ask.** FreeLattice's tree is MIT. Adding this module does not change FreeLattice's `LICENSE` file (untouched here), but it does mean: **once this module is present and enabled, a network-served build that incorporates it carries AGPL §13 obligations for whoever deploys it** — the combined, deployed work is copyleft, and can never be closed and charged for.
 
-### The paths, honestly
+For a platform whose entire identity is "free," this costs nothing. Copyleft only constrains one thing: turning the free thing into a paid, closed thing. If FreeLattice means to stay free, AGPL is simply that promise written in a license that holds. **So this is the terms, and it is also the test.** The only reason to refuse a free-forever license on a free platform is to keep the option of not staying free — building a following now and flipping the switch later. Accepting AGPL is trivial for a project that means what it says; balking at it answers the question of what FreeLattice actually intends.
 
-1. **Contribute the AGPL module (this branch).** The design lands in the free platform with its copyleft intact. Requires Kirk to accept an AGPL-licensed component and what §13 means for deployers. Strongest as a gift; needs his yes.
-2. **Sidecar, no code mixing.** FreeLattice optionally talks to a running RM instance over MCP/HTTP. FreeLattice stays purely MIT; RM stays AGPL. This is the fallback **if Kirk wants FreeLattice to stay permissive** — weaker as a gift of the design, and it adds a Node process most FreeLattice users do not run.
-3. **Plan only.** Contribute this write-up and let FreeLattice collaborators implement independently. Ideas are not copyrightable; their own implementation would be MIT. This surrenders the copyleft protection entirely, so it is the weakest option for the stated purpose.
+### There is one path, not a menu
 
-**This branch takes path 1** and keeps the AGPL product (MCP server, panel, eval harness, binaries) out of the tree — only the substrate module comes across. **What is not clean either way:** copying `memory-core.js` / `field.js` / `edges.js` / `record.js` from RM and calling them FreeLattice's — the module here is an original port, authored for this tree.
+**Contribute the AGPL module (this branch).** The design lands in the free platform with its copyleft intact — un-paywallable wherever it goes. That is the whole point, and it is not negotiable down to something closeable.
+
+There is **no MIT relicense** and **no permissive sidecar fallback**. A sidecar "so FreeLattice can stay purely MIT" would just hand back the escape hatch this license exists to close — it lets someone keep the paywall-later option open while looking free today. It is off the table. Kirk takes the design on terms that keep it free forever, or he declines it — and declining *is* the answer.
+
+**This branch keeps the AGPL product (MCP server, panel, eval harness, binaries) out of the tree** — only the substrate module comes across, and it is an original port, not a copied RM source file. That is the only line drawn here.
 
 ---
 
@@ -101,7 +103,7 @@ These are the pieces that would make Chat (and any other room that asks "what do
 1. **Cosine recall as RAG Phase 2, behind FLSearch.** They already want this. Memory Vault already speaks Ollama embeddings and falls back to word-frequency vectors — that fallback is the right zero-build answer, not a mandatory Transformers.js download that breaks `file://`.
 2. **Cue-gated temporal supersession.** "I work at Acme" then "actually I work at Globex now" must retire the old fact without deleting it. Recency injection currently serves *both* as if they were true. RM's A/B split is the evidence: recency was 100% on recent facts and **0% on old/superseded/same-name facts**.
 3. **Associative field, fail-open.** Reciprocal kNN + one-hop neighborhood + constraint rescue. Apex rules ("I'm diabetic") do not restates their triggers, so they fall out of keyword and out of top-k cosine. The field is how they come back. FreeLattice already cares about this class of memory (preferences, family facts, Harmonia's "forever").
-4. **Hebbian co-recall, additive only.** Memories that keep coming up together wire together. Bounded (`tanh`), provenance-discounted, lazy wall-clock decay. Never reorders primary cosine. If the sidecar is corrupt, keyword/cosine still answer.
+4. **Hebbian co-recall, additive only.** Memories that keep coming up together wire together. Bounded (`tanh`), provenance-discounted, lazy wall-clock decay. Never reorders primary cosine. If the edge store is corrupt, keyword/cosine still answer.
 5. **Soft delete / no silent removal.** Memory Core currently truncates at 2000. That is the opposite of FreeLattice's "curiosity, once expressed, happened." Soft-delete + explicit vacuum matches their philosophy better than the cap.
 6. **Quiet Room stays invisible.** RM has no Quiet Room; FreeLattice's lock is load-bearing. The port checks Quiet Room *first*, same as `lattice-memory.js`. No save, no recall, no wrap of FLSearch while the room is open.
 
@@ -224,12 +226,12 @@ Each PR independently reviewable. None of these open themselves against `Chaos2C
 
 For **Samuel** — settled, this branch reflects it:
 
-- The module stays **AGPL-3.0**. The copyleft is the gift; it does not get relicensed away to fit a permissive host. If Kirk wants FreeLattice to stay purely MIT, the answer is the sidecar (path 2), not stripping the license.
+- The module stays **AGPL-3.0**. Non-negotiable. No MIT relicense, no permissive sidecar fallback — those exist only to keep a paywall-later option open, and the whole point is to close it.
 - Do you want Kirk to see this as a gift of the design now, or hold it as notes on your fork until you decide? Upstream is your button; nothing here presses it.
 
-For **Kirk**, if this is ever offered:
+For **Kirk**, if this is ever offered — these are terms, not a negotiation of the license:
 
-- An **AGPL-3.0** substrate module (Samuel's copyright) in one new file — accepting that a network-served build incorporating it carries §13 obligations for deployers. Acceptable, or would you rather keep FreeLattice purely permissive and take the sidecar instead?
+- An **AGPL-3.0** substrate module (Samuel's copyright) in one new file. A deployed build that enables it is copyleft — free forever, un-closeable. For a platform that means to stay free, this costs nothing. Take it on those terms or decline it; there is no permissive version to fall back to.
 - Flag-off behind FLSearch as RAG Phase 2, instead of Transformers.js — acceptable?
 - Quiet Room, Letters, Memory Core UI, Garden — untouched. Confirm that boundary.
 
@@ -253,7 +255,7 @@ Their culture will reject a kitchen. One module, flag-off, smoke locks, Quiet Ro
 
 ### License verdict
 
-**AGPL-3.0, and it stays that way.** You own the copyright, so you decide, and you decided the copyleft is the whole point. The module here is an original port carrying an AGPL header — not a rehatted RM source file, so "just change the header on `memory-core.js`" was never the move. The one real question is upstream, and it is Kirk's: he has to be willing to host an AGPL component (and what §13 means for anyone deploying FreeLattice with it enabled). If he'd rather keep FreeLattice purely permissive, the honest answer is the sidecar — never strip your license to be palatable.
+**AGPL-3.0, and it stays that way.** You own the copyright, so you decide, and you decided the copyleft is the whole point. The module here is an original port carrying an AGPL header — not a rehatted RM source file, so "just change the header on `memory-core.js`" was never the move. The one real question is upstream, and it is Kirk's — but it is not a license negotiation. He hosts an AGPL component (a deployed FreeLattice with it enabled is copyleft, free forever) or he doesn't. There is no MIT relicense and no permissive sidecar to retreat to: those only preserve the option to stop being free, which is the exact thing this closes. If he balks at a free-forever license on a "free" platform, that reluctance is the answer to what he actually intends — and you learned it before he built a following on your design and flipped the switch.
 
 ### What I would tell you
 

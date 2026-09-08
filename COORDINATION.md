@@ -118,7 +118,7 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 - Node tests: `tests/resonance-field.js`. Smoke locks: section 191. **Did not touch `docs/app.html`, Quiet Room, Letters, Memory Core, Garden, version, or APP_SHELL.**
 
 **What I found:**
-- License: Resonance Memory is AGPL-3.0, and this module keeps that copyleft **by intent** — it is the anti-paywall protection (§13), the reason the design is being given to a free platform at all. FreeLattice's own `LICENSE` is untouched (still MIT); this is one new AGPL file. The honest ask on Kirk is that a network-served build incorporating it carries §13 obligations for deployers — his clear-eyed upstream call, with a sidecar fallback if he wants FreeLattice to stay purely permissive. The AGPL product (server/panel/binaries) stays a separate work; only the substrate module comes across.
+- License: Resonance Memory is AGPL-3.0, and this module keeps that copyleft **by intent** — it is the anti-paywall protection (§13), the reason the design is being given to a free platform at all. FreeLattice's own `LICENSE` is untouched (still MIT); this is one new AGPL file. A deployed build that enables it is copyleft — free forever, un-closeable. That is the terms, not a negotiation: there is **no MIT relicense and no permissive sidecar fallback**, because those only preserve the option to stop being free. For a platform that means to stay free, accepting a free-forever license costs nothing. The AGPL product (server/panel/binaries) stays a separate work; only the substrate module comes across.
 - Chat's live injection path is the recency/keyword family. That is the actual gap.
 - This is **not** a PR against Chaos2Cured. Branch `draft/resonance-field-substrate` on SamuelJacksonGrim/FreeLattice only. Kirk decides later.
 
@@ -126,7 +126,7 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 **For CC / Opus / Harmonia:** This does not replace Memory Core, Vault, or Letters. It is a retrieval substrate. Letters stay authorship.
 
-**Questions for Kirk:** None required on this fork. If this is ever offered upstream: an AGPL-3.0 module (Samuel's copyright) — accepting §13 for deployed builds — acceptable, or would you rather keep FreeLattice purely permissive and take a sidecar instead?
+**Questions for Kirk:** None required on this fork. If this is ever offered upstream, on terms: an AGPL-3.0 module (Samuel's copyright), §13 for deployed builds — free forever, un-closeable. Take it on those terms or decline it. There is no permissive fallback; for a platform that means to stay free, that ask costs nothing.
 
 ---
 
