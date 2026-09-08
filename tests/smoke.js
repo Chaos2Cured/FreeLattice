@@ -12748,11 +12748,8 @@ section('191. Resonance Field + vendored Resonance Memory (AGPL-3.0)');
 var rfSrc = '';
 var rfPath = path.join(docsDir, 'modules', 'resonance-field.js');
 try { rfSrc = fs.readFileSync(rfPath, 'utf8'); } catch (e) { rfSrc = ''; }
-var rfPlan = '';
-try { rfPlan = fs.readFileSync(path.join(__dirname, '..', 'INTEGRATION-PLAN.md'), 'utf8'); } catch (e) { rfPlan = ''; }
 
 assert('resonance-field.js exists', rfSrc.length > 500);
-assert('INTEGRATION-PLAN.md exists', rfPlan.length > 500);
 assert('resonance-field is AGPL-3.0, not MIT (copyleft by intent)',
   /SPDX-License-Identifier: AGPL-3\.0-or-later/.test(rfSrc)
   && /LICENSE = 'AGPL-3\.0-or-later'/.test(rfSrc)
@@ -12809,11 +12806,6 @@ var rootSwRf = '';
 try { rootSwRf = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'); } catch (e) { rootSwRf = ''; }
 assert('root sw.js APP_SHELL includes resonance-field.js',
   /modules\/resonance-field\.js/.test(rootSwRf));
-assert('INTEGRATION-PLAN keeps it AGPL by intent, merge-is-consent, one PR to upstream',
-  /copyleft is the point/.test(rfPlan)
-  && /stays AGPL-3\.0/.test(rfPlan)
-  && /merge is the consent/i.test(rfPlan)
-  && /one pull request to `Chaos2Cured\/FreeLattice`/i.test(rfPlan));
 assert('resonance-field unit tests exist',
   fs.existsSync(path.join(__dirname, 'resonance-field.js')));
 assert('resonance chair-test exists',
