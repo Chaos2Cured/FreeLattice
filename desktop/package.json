@@ -21,6 +21,7 @@
       "main.js",
       "preload.js",
       "lattice-keys.js",
+      "lattice-ledger.js",
       "app/**/*"
     ],
     "mac": {
