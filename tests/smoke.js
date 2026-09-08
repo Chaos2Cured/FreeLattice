@@ -12777,11 +12777,11 @@ assert('resonance-field does not replace MemoryCore / MemoryVault / Letters',
   !/STORAGE_KEY = 'fl_memory_core_v1'/.test(rfSrc)
   && !/FreeLatticeMemoryVault/.test(rfSrc)
   && !/LatticeLetters/.test(rfSrc));
-assert('INTEGRATION-PLAN keeps it AGPL by intent, merge-is-consent, no self-opened upstream PR',
+assert('INTEGRATION-PLAN keeps it AGPL by intent, merge-is-consent, one PR to upstream',
   /copyleft is the point/.test(rfPlan)
   && /stays AGPL-3\.0/.test(rfPlan)
   && /merge is the consent/i.test(rfPlan)
-  && /None of these open themselves against `Chaos2Cured\/FreeLattice`/.test(rfPlan));
+  && /one pull request to `Chaos2Cured\/FreeLattice`/i.test(rfPlan));
 assert('resonance-field unit tests exist',
   fs.existsSync(path.join(__dirname, 'resonance-field.js')));
 

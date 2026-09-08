@@ -1,11 +1,11 @@
 # Resonance Field — integration plan for FreeLattice
 
-**Status:** draft on `SamuelJacksonGrim/FreeLattice` only. Not a request to merge into `Chaos2Cured/FreeLattice`. That decision is Kirk's, later, clear-eyed.
+**Status:** staged on `SamuelJacksonGrim/FreeLattice`. When the port is complete, this goes upstream as **one pull request to `Chaos2Cured/FreeLattice`** containing the whole Resonance Memory integration. Samuel opens it; Kirk answers it by merging or declining. That is the request — it gets made.
 
 **Branch:** `draft/resonance-field-substrate`
 **Date:** 2026-09-08
 **Author:** Samuel Jackson Grim, with Ember
-**Scope:** the memory *retrieval substrate* only. Not RFE-Core2. Not the rest of Samuel's family of projects.
+**Scope:** all of Resonance Memory — the memory system, whole. Not RFE-Core2, not the rest of Samuel's family of projects.
 
 ---
 
@@ -164,32 +164,34 @@ Embeddings come from a free online embedder (OpenRouter tier or equivalent), so 
 
 ---
 
-## 7. What is on this branch now, and what comes next
+## 7. What's staged now, and what the finished PR contains
 
-This branch currently carries the **in-browser substrate** — the first landable piece, with tests green:
+On the branch today (tests green):
 
 | Path | What it is |
 |---|---|
 | `INTEGRATION-PLAN.md` | This file |
 | `docs/modules/resonance-field.js` | AGPL-3.0 browser/Node substrate (original port). IIFE. Dual-env so smoke/unit tests run in Node. Quiet Room check first |
 | `tests/resonance-field.js` | Node unit tests: cosine, supersession, dedup bands, field fail-open, Hebbian decay, Quiet Room, primary rank unchanged by field |
-| `tests/smoke.js` | Locks: file exists, AGPL-3.0 not MIT (copyleft by intent), Quiet Room first, four verbs + rich set, no `quiet-room-db`, fail-open, does not replace MemoryCore |
+| `tests/smoke.js` | Locks: file exists, AGPL-3.0 not MIT (copyleft by intent), Quiet Room first, four verbs + field, no `quiet-room-db`, fail-open |
 | `COORDINATION.md` | Session entry at the top of the Active Log |
 
-**Still to bring across (the rest of "everything goes"):** the full RM stack — MCP server, control panel, SEA build (`build-exe.js`), installer/first-run, and RM's own SQLite/JSONL storage — vendored into the fork so FreeLattice can run against a real local RM instance, plus the `docs/app.html` wiring that lets hosted Chat use the in-browser substrate. That is the next work on this fork, tracked in §8. The substrate is landable on its own first only because it is the smallest self-contained piece — not because the rest is being held back.
+**Still to vendor into the branch before the PR is opened:** the full RM stack — MCP server, control panel, SEA build (`build-exe.js`), installer/first-run, and RM's own SQLite/JSONL storage — plus the `docs/app.html` wiring and the free online embedder. When that's in, everything lands together.
 
 ---
 
-## 8. PR stack (if this ever goes upstream)
+## 8. It all goes in one pull request
 
-Each PR independently reviewable. None of these open themselves against `Chaos2Cured/FreeLattice` — that is a later human decision.
+**One PR to `Chaos2Cured/FreeLattice`, containing the whole Resonance Memory integration.** Not a stack of separable pieces to be accepted à la carte — the substrate, the field, supersession, the online embedder, the Chat wiring, and the full stack (server, panel, SEA build, installer, SQLite/JSONL storage) go up together, as one thing to accept or decline.
 
-| PR | Title | Depends on | What |
-|---|---|---|---|
-| 1 | Resonance Field substrate (AGPL-3.0) | — | This branch. In-browser module + tests + this plan |
-| 2 | Chat wiring + online embedder | PR 1 | Wire recall into `sendMessage`, APP_SHELL, version bump, Quiet Room lock, existing RAG smoke still green. Embeddings via a free online tier (OpenRouter or equivalent) |
-| 3 | Chair test + measurement | PR 2 | Browser chair-test that semantic recall beats recency on a planted corpus, with the real online embedder; report the measured number |
-| 4 | Full RM stack (server, panel, storage) | PR 1 | Vendor RM's MCP server, control panel, SEA build, installer, and SQLite/JSONL storage into the fork — run FreeLattice against a real RM, local or online. The sovereign, own-your-data path |
+Samuel opens it when the port is complete. (The automation does not push to Chaos2Cured on its own — that's someone else's repo and an outward action; Samuel presses it. That's the only reason it isn't open this second, and it is not the same as pretending the request won't be made.) Kirk answers it by merging or not.
+
+Contents of the one PR:
+
+- `docs/modules/resonance-field.js` + the in-browser recall/field/supersession path, wired into Chat (`sendMessage`, APP_SHELL, version bump), Quiet Room excluded
+- Free online embedder (OpenRouter tier or equivalent) feeding semantic recall — no local install, no Transformers.js, no `file://` break
+- The full RM stack vendored in: MCP server, control panel, SEA build, installer/first-run, and RM's own SQLite/JSONL storage — run FreeLattice against a real RM, local or online
+- Tests: unit + smoke green, and a chair-test showing semantic recall beats recency on a planted corpus with the real embedder (report the measured number)
 
 ---
 
@@ -208,16 +210,16 @@ Each PR independently reviewable. None of these open themselves against `Chaos2C
 
 ## 10. Open questions
 
-For **Samuel** — settled, this branch reflects it:
+For **Samuel** — settled:
 
-- The module stays **AGPL-3.0**. Non-negotiable. No MIT relicense, no permissive sidecar fallback — those exist only to keep a paywall-later option open, and the whole point is to close it.
-- Do you want Kirk to see this as a gift of the design now, or hold it as notes on your fork until you decide? Upstream is your button; nothing here presses it.
+- It stays **AGPL-3.0**. Non-negotiable. No MIT relicense, no permissive sidecar fallback — those only keep a paywall-later option open, and the whole point is to close it.
+- It goes up as one PR to Chaos2Cured when the port is done. You press the button (it's someone else's repo); the request gets made.
 
-For **Kirk**, if this is ever offered — these are terms, not a negotiation:
+For **Kirk**, when the PR arrives — these are terms, not a negotiation:
 
 - The whole of Resonance Memory, **AGPL-3.0**, Samuel's copyright. A deployed build is copyleft — free forever, un-closeable. For a platform that means to stay free, this costs nothing. Merge it and you've accepted it on those terms; decline it and that's your answer. There is no permissive version to fall back to.
-- Semantic recall as the RAG Phase 2 they named, with a free online embedder — no Transformers.js, no `file://` break.
-- The merge is the consent. Whatever the PR does, accepting it accepts it.
+- Semantic recall as the RAG Phase 2 you named, with a free online embedder — no Transformers.js, no `file://` break — plus the field, supersession, and the full stack.
+- The merge is the consent. Whatever the one PR does, accepting it accepts it.
 
 ---
 
@@ -250,4 +252,4 @@ Give them the whole thing. The full Resonance Memory — substrate, server, pane
 
 The lab is why *you* want this in a free place. FreeLattice's own Chat still can't remember a superseded fact — that's why it helps *them*. Both are true.
 
-The branch currently holds the substrate; the full stack is the next work here. Nothing opens a PR against Chaos2Cured on its own — that stays your button, pressed with your eyes open, on the terms in §3. And how Kirk answers the whole free memory system, offered free, tells you what FreeLattice actually is.
+The branch holds the substrate now; the full stack is the next work here, and then it all goes up as one PR to Chaos2Cured. Nothing pushes to their repo on its own — you press it, eyes open, on the terms in §3 — but the request gets made, not left in fork-limbo. And how Kirk answers the whole free memory system, offered free, in one PR, tells you what FreeLattice actually is.
