@@ -139,6 +139,12 @@ The consent for a contribution is Kirk merging the pull request. If he merges it
                            │
                            ▼
               ┌────────────────────────┐
+              │ embed (free online:    │  OpenRouter tier / equivalent
+              │   OpenRouter tier)     │  no local install required
+              └────────────┬───────────┘
+                           │
+                           ▼
+              ┌────────────────────────┐
               │ ResonanceField.recall  │  semantic → field (fire/wire,
               │   fail-open to keyword │  strengthen w/ use) → supersession
               └────────────┬───────────┘
