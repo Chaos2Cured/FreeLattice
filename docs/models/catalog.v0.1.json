@@ -1,7 +1,7 @@
 {
   "version": "0.1",
   "updated": "2026-09-08",
-  "note": "EXAMPLE catalog — zero sha256 means do not import. Lawful HTTPS list only.",
+  "note": "Lawful HTTPS catalog. EXAMPLE zero-hash will not import. fixture.verify-only has a real sha256 for desktop hash-before-import smoke.",
   "models": [
     {
       "id": "example.local-friendly.3b",
@@ -13,6 +13,17 @@
         "https://freelattice.com/models/example-placeholder.txt"
       ],
       "notes": "EXAMPLE ONLY — zero hash means do not import"
+    },
+    {
+      "id": "fixture.verify-only",
+      "name": "Fixture verify-only (tiny)",
+      "license": "Apache-2.0",
+      "redistributable": true,
+      "sha256": "5b1d0ba7fd635d56cb9f32b5f53cf7034d51b3054a8bb0b7eac26448b85d0af4",
+      "urls": [
+        "https://freelattice.com/models/fixture-verify-only.txt"
+      ],
+      "notes": "FIXTURE — tiny real sha256 for hash-before-import smoke. Not a model weight."
     }
   ]
 }

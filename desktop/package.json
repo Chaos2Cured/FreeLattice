@@ -22,6 +22,7 @@
       "preload.js",
       "lattice-keys.js",
       "lattice-ledger.js",
+      "lattice-import.js",
       "app/**/*"
     ],
     "mac": {
