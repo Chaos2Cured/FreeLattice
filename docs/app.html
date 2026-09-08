@@ -15089,12 +15089,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   #fl-look-may,
   #fl-look-connect,
   #fl-look-copy-origin,
-  #fl-look-copy-pull {
+  #fl-look-copy-pull,
+  #fl-manifest-fetch {
     display: block;
     width: 100%;
     box-sizing: border-box;
     text-align: center;
     min-height: 44px;
+  }
+  #fl-model-manifest-card {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
   }
   #fl-look-card pre {
     max-width: 100%;
@@ -16535,6 +16540,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <ul id="fl-look-3-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
       <p style="font-size:0.78rem;color:var(--text-muted);margin:0;"><button type="button" onclick="flLookShowAnother()" style="background:none;border:none;color:var(--text-muted);text-decoration:underline;cursor:pointer;font-family:Georgia,serif;font-size:0.78rem;padding:0;">another way to connect</button></p>
     </div>
+  </div>
+
+
+  <!-- Layer: HTTPS model manifests v0.1 — read-only list. Gesture fetch. textContent only. No import. -->
+  <div id="fl-model-manifest-card" class="fl-card" style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Model list (HTTPS)</h3>
+    <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Lawful catalog over HTTPS. License and redistributable before hash before import. Import waits. Nothing downloads from this card.</p>
+    <label for="fl-manifest-url" style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Catalog URL</label>
+    <input type="url" id="fl-manifest-url" value="./models/catalog.v0.1.json" autocomplete="off" spellcheck="false" aria-label="Model catalog URL" style="width:100%;box-sizing:border-box;padding:10px 12px;min-height:44px;margin-bottom:10px;background:rgba(0,0,0,0.28);border:1px solid rgba(200,210,230,0.14);border-radius:8px;color:var(--text-primary,#e6ebf5);font-size:16px;font-family:Georgia,serif;" />
+    <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-manifest-fetch" onclick="flFetchModelManifest()" style="min-height:44px;width:100%;">Fetch list</button>
+    <p id="fl-manifest-status" style="font-size:0.82rem;color:var(--text-muted);margin:10px 0 0;min-height:1.2em;"></p>
+    <ul id="fl-manifest-list" style="list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px;"></ul>
   </div>
 
   <!-- Browser AI — zero setup, runs in the browser via WebLLM -->
@@ -29126,6 +29143,139 @@ async function flAutoPull(modelName, btn) {
     }
   }
 }
+
+
+// ── HTTPS model manifests v0.1 — read-only. Gesture only. textContent only. No import. ──
+function flManifestShortHash(hex) {
+  var s = String(hex || '');
+  if (!s) return '';
+  if (/^0+$/.test(s)) return '0…0 (zero)';
+  if (s.length <= 14) return s;
+  return s.slice(0, 8) + '…' + s.slice(-6);
+}
+
+function flManifestUrlAllowed(raw) {
+  var u = String(raw || '').trim();
+  if (!u) return { ok: false, reason: 'empty' };
+  if (u.indexOf('://') === -1) {
+    // same-origin relative
+    if (u.charAt(0) === '/' || u.indexOf('./') === 0 || u.indexOf('../') === 0 || u.indexOf('models/') === 0) {
+      return { ok: true, url: u };
+    }
+    return { ok: false, reason: 'relative' };
+  }
+  try {
+    var parsed = new URL(u, location.href);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      return { ok: false, reason: 'protocol' };
+    }
+    // Allow https always; http only for localhost loopback during local serve
+    if (parsed.protocol === 'http:') {
+      var h = parsed.hostname;
+      if (h !== '127.0.0.1' && h !== 'localhost' && h !== '::1') {
+        return { ok: false, reason: 'http' };
+      }
+    }
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return { ok: true, url: parsed.href };
+    }
+  } catch (e) {
+    return { ok: false, reason: 'bad' };
+  }
+  return { ok: false, reason: 'bad' };
+}
+
+function flManifestSetStatus(msg, kind) {
+  var el = document.getElementById('fl-manifest-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = kind === 'warn' ? 'rgba(240,112,104,0.9)' : (kind === 'ok' ? 'rgba(52,211,153,0.9)' : '');
+}
+
+function flManifestClearList() {
+  var list = document.getElementById('fl-manifest-list');
+  if (!list) return;
+  while (list.firstChild) list.removeChild(list.firstChild);
+}
+
+function flManifestAppendRow(model) {
+  var list = document.getElementById('fl-manifest-list');
+  if (!list || !model) return;
+  var li = document.createElement('li');
+  li.style.cssText = 'padding:12px 14px;border-radius:10px;background:rgba(12,10,26,0.45);border:1px solid rgba(200,210,230,0.1);';
+
+  function line(label, value) {
+    var row = document.createElement('div');
+    row.style.cssText = 'font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);margin:0 0 4px;line-height:1.5;';
+    var lab = document.createElement('strong');
+    lab.textContent = label + ': ';
+    lab.style.color = 'rgba(232,176,25,0.85)';
+    row.appendChild(lab);
+    row.appendChild(document.createTextNode(value == null ? '' : String(value)));
+    li.appendChild(row);
+  }
+
+  var redistributable = model.redistributable === true;
+  var sha = String(model.sha256 || '');
+  var notes = String(model.notes || '');
+  var zeroHash = !sha || /^0+$/.test(sha);
+  var example = /EXAMPLE ONLY/i.test(notes) || zeroHash;
+
+  line('name', model.name || model.id || 'unnamed');
+  line('license', model.license || '(missing)');
+  line('redistributable', redistributable ? 'true' : String(model.redistributable));
+  line('sha256', flManifestShortHash(sha) || '(missing)');
+  if (notes) line('notes', notes);
+
+  var verdict = document.createElement('p');
+  verdict.style.cssText = 'margin:8px 0 0;font-family:Georgia,serif;font-size:0.82rem;line-height:1.5;';
+  if (!redistributable) {
+    verdict.style.color = 'rgba(240,112,104,0.95)';
+    verdict.textContent = 'REFUSED — redistributable is not true. Will not import.';
+  } else if (example || zeroHash) {
+    verdict.style.color = 'rgba(232,176,25,0.95)';
+    verdict.textContent = 'example only — will not import';
+  } else {
+    verdict.style.color = 'rgba(52,211,153,0.9)';
+    verdict.textContent = 'Listed. Hash-before-import waits (not this ship).';
+  }
+  li.appendChild(verdict);
+  list.appendChild(li);
+}
+
+async function flFetchModelManifest() {
+  var input = document.getElementById('fl-manifest-url');
+  var raw = input ? input.value : './models/catalog.v0.1.json';
+  var allowed = flManifestUrlAllowed(raw);
+  flManifestClearList();
+  if (!allowed.ok) {
+    flManifestSetStatus('That catalog address is not allowed. Use https: or a same-origin path like ./models/catalog.v0.1.json.', 'warn');
+    return;
+  }
+  flManifestSetStatus('Fetching catalog…', '');
+  try {
+    var res = await fetch(allowed.url, { method: 'GET', cache: 'no-store', credentials: 'omit' });
+    if (!res.ok) {
+      flManifestSetStatus('Catalog did not answer (' + res.status + '). Nothing was imported.', 'warn');
+      return;
+    }
+    var data = await res.json();
+    var models = (data && Array.isArray(data.models)) ? data.models : [];
+    if (!models.length) {
+      flManifestSetStatus('Catalog had no models. Nothing was imported.', 'warn');
+      return;
+    }
+    var shown = 0;
+    models.forEach(function (m) {
+      flManifestAppendRow(m || {});
+      shown++;
+    });
+    flManifestSetStatus('Listed ' + shown + ' entr' + (shown === 1 ? 'y' : 'ies') + '. Read-only. No download. No import.', 'ok');
+  } catch (e) {
+    flManifestSetStatus('Could not read that catalog. Nothing was imported.', 'warn');
+  }
+}
+
 
 // ── Smart Ollama Connection — one look card (gesture-only probe) ──
 async function smartOllamaConnect() {
