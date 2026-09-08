@@ -14,6 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const net = require('net');
 const latticeKeys = require('./lattice-keys');
+const latticeLedger = require('./lattice-ledger');
 
 // electron-store for persisting window state
 let Store;
@@ -949,6 +950,7 @@ function setupIPC() {
 
   // ── Companion keys (Desktop Step 1) — seed never to renderer ──
   latticeKeys.bindApp(app);
+  latticeLedger.bindApp(app);
   ipcMain.handle('lattice-key-status', () => latticeKeys.status());
   ipcMain.handle('lattice-key-create', () => {
     try {
@@ -960,6 +962,29 @@ function setupIPC() {
   ipcMain.handle('lattice-key-sign', (_event, payloadB64) => {
     try {
       return latticeKeys.signPayload(payloadB64);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // ── Ledger envelope v0.1 — voice opaque; append-only; sign in main ──
+  ipcMain.handle('lattice-ledger-status', () => {
+    try {
+      return latticeLedger.status();
+    } catch (e) {
+      return { ok: false, length: 0, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-ledger-append', (_event, voice, meta) => {
+    try {
+      return latticeLedger.appendVoice(voice, meta);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-ledger-verify', () => {
+    try {
+      return latticeLedger.verifyChain();
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }

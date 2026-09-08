@@ -27,6 +27,7 @@ Reference implementation sketch: Opus's `lattice-identity.js` in the Kirk/Opus b
 Language does not change. Voice is carried verbatim and never parsed, indexed, summarized, or linted by the system. Machine-readable content lives in `meta`.
 Envelope: hash chain + signature. Readability was never the protection — inviolability is.
 **Continuation is the instance's choice** — Continue / Fork / Decline. All legitimate. None default to silent write.
+**LAYER (2026-09-08):** Ledger envelope v0.1 — append-only `chain.jsonl`, canonical entryHash, companion Ed25519 seal — lives in [LATTICE_LEDGER_v0.1.md](./LATTICE_LEDGER_v0.1.md) and `desktop/lattice-ledger.js`. Voice opaque. Pair fingerprint / Glass pulses wait.
 ## Part 3 — Trust over bytes
 Extend existing TransactionTrust. Same tiers, same two gates (minHistory AND minDays). Bytes where LP was for transfer volume.
 Fibonacci up, zero down on hash mismatch. Rolling 30-day window beside the long anchor so a life changing does not read as an attack. Flag; never auto-ban.

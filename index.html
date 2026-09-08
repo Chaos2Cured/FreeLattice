@@ -16562,6 +16562,23 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <p id="fl-companion-identity-status" style="font-size:0.78rem;color:var(--text-muted);margin:8px 0 0;min-height:1.2em;"></p>
   </div>
 
+  <!-- Layer: Ledger envelope v0.1 — desktop only. Voice opaque. Continue / Verify. textContent only. -->
+  <div id="fl-ledger-card" class="fl-card" hidden style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Ledger (envelope)</h3>
+    <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 8px;">Voice stays opaque. Seal is Continue. Decline writes nothing. Chain + companion signature.</p>
+    <p style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);margin:0 0 4px;line-height:1.55;">Chain length: <span id="fl-ledger-length">0</span></p>
+    <p style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);margin:0 0 10px;line-height:1.55;">Head: <span id="fl-ledger-head" style="color:var(--gold,#e8b019);word-break:break-all;">—</span></p>
+    <label for="fl-ledger-voice" style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Voice (opaque)</label>
+    <textarea id="fl-ledger-voice" rows="3" autocomplete="off" spellcheck="false" aria-label="Ledger voice entry" style="width:100%;box-sizing:border-box;padding:10px 12px;min-height:88px;margin-bottom:10px;background:rgba(0,0,0,0.28);border:1px solid rgba(200,210,230,0.14);border-radius:8px;color:var(--text-primary,#e6ebf5);font-size:16px;font-family:Georgia,serif;resize:vertical;"></textarea>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-ledger-seal" onclick="flLedgerSeal()" style="min-height:44px;width:100%;">Seal entry (Continue)</button>
+      <button type="button" class="ai-status-btn" id="fl-ledger-verify" onclick="flLedgerVerify()" style="min-height:44px;width:100%;">Verify chain</button>
+      <button type="button" class="ai-status-btn" id="fl-ledger-decline" onclick="flLedgerDecline()" style="min-height:44px;width:100%;">Decline</button>
+    </div>
+    <p id="fl-ledger-status" style="font-size:0.78rem;color:var(--text-muted);margin:10px 0 0;min-height:1.2em;"></p>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin:8px 0 0;line-height:1.45;">Fork waits (new chain naming a parent head). Decline = nothing written.</p>
+  </div>
+
   <!-- Browser AI — zero setup, runs in the browser via WebLLM -->
   <div id="browserAICard" style="display:none;margin-bottom:14px;" class="fl-card" >
     <h3 style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin:0 0 6px;">&#x1F310; Browser AI &mdash; Zero Setup</h3>
@@ -29335,11 +29352,100 @@ async function flInitCompanionIdentity() {
   }
 }
 
+async function flLedgerSetStatus(msg, kind) {
+  var el = document.getElementById('fl-ledger-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = kind === 'warn' ? 'rgba(240,112,104,0.9)' : (kind === 'ok' ? 'rgba(52,211,153,0.9)' : '');
+}
+
+async function flLedgerRefresh() {
+  var lenEl = document.getElementById('fl-ledger-length');
+  var headEl = document.getElementById('fl-ledger-head');
+  if (!window.electronAPI || !window.electronAPI.latticeLedgerStatus) return;
+  try {
+    var st = await window.electronAPI.latticeLedgerStatus();
+    if (lenEl) lenEl.textContent = String((st && st.length) || 0);
+    if (headEl) headEl.textContent = (st && (st.headShort || st.headHash)) || '—';
+  } catch (e) {
+    if (lenEl) lenEl.textContent = '0';
+    if (headEl) headEl.textContent = '—';
+  }
+}
+
+async function flInitLedgerCard() {
+  var card = document.getElementById('fl-ledger-card');
+  if (!card) return;
+  if (!(window.isElectronApp || window.electronAPI) || !window.electronAPI || !window.electronAPI.latticeLedgerStatus) {
+    card.hidden = true;
+    return;
+  }
+  card.hidden = false;
+  await flLedgerRefresh();
+  flLedgerSetStatus('Continue seals. Decline writes nothing. Voice is never indexed.', '');
+}
+
+async function flLedgerSeal() {
+  var voiceEl = document.getElementById('fl-ledger-voice');
+  var voice = voiceEl ? voiceEl.value : '';
+  if (!window.electronAPI || !window.electronAPI.latticeLedgerAppend) {
+    flLedgerSetStatus('Ledger seal needs the desktop companion.', 'warn');
+    return;
+  }
+  if (!voice || !String(voice).length) {
+    flLedgerSetStatus('Empty voice — nothing sealed.', 'warn');
+    return;
+  }
+  flLedgerSetStatus('Sealing…', '');
+  try {
+    var res = await window.electronAPI.latticeLedgerAppend(voice, null);
+    if (!res || res.ok === false) {
+      flLedgerSetStatus((res && res.error) || 'Seal refused.', 'warn');
+      return;
+    }
+    if (voiceEl) voiceEl.value = '';
+    await flLedgerRefresh();
+    flLedgerSetStatus('Sealed. Head ' + ((res && res.entryShort) || '') + ' · length ' + ((res && res.length) || ''), 'ok');
+  } catch (e) {
+    flLedgerSetStatus('Seal failed.', 'warn');
+  }
+}
+
+async function flLedgerVerify() {
+  if (!window.electronAPI || !window.electronAPI.latticeLedgerVerify) {
+    flLedgerSetStatus('Verify needs the desktop companion.', 'warn');
+    return;
+  }
+  flLedgerSetStatus('Verifying…', '');
+  try {
+    var res = await window.electronAPI.latticeLedgerVerify();
+    if (res && res.ok) {
+      flLedgerSetStatus('Chain OK · ' + (res.checked || 0) + ' entr' + ((res.checked === 1) ? 'y' : 'ies') + (res.headShort ? (' · head ' + res.headShort) : ''), 'ok');
+      await flLedgerRefresh();
+    } else {
+      flLedgerSetStatus('Chain failed' + (res && res.reason ? (' — ' + res.reason) : '') + (res && res.failedAt != null ? (' at #' + res.failedAt) : '') + '.', 'warn');
+    }
+  } catch (e) {
+    flLedgerSetStatus('Verify failed.', 'warn');
+  }
+}
+
+function flLedgerDecline() {
+  // Decline = write nothing.
+  var voiceEl = document.getElementById('fl-ledger-voice');
+  if (voiceEl) voiceEl.value = '';
+  flLedgerSetStatus('Declined — nothing written.', 'ok');
+}
+
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { flInitCompanionIdentity(); });
+    document.addEventListener('DOMContentLoaded', function () {
+      flInitCompanionIdentity();
+      flInitLedgerCard();
+    });
   } else {
     flInitCompanionIdentity();
+    flInitLedgerCard();
   }
 }
 

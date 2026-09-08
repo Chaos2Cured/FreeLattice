@@ -72,6 +72,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeKeySign: (payloadB64) => ipcRenderer.invoke('lattice-key-sign', payloadB64),
 
   /**
+   * Ledger envelope v0.1 — status (length, head hash). Voice never indexed here.
+   */
+  latticeLedgerStatus: () => ipcRenderer.invoke('lattice-ledger-status'),
+
+  /**
+   * Continue: append opaque voice + optional meta. Signs in main.
+   * @param {string} voice
+   * @param {object} [meta]
+   */
+  latticeLedgerAppend: (voice, meta) => ipcRenderer.invoke('lattice-ledger-append', voice, meta),
+
+  /**
+   * Verify append-only chain (rehash + Ed25519).
+   */
+  latticeLedgerVerify: () => ipcRenderer.invoke('lattice-ledger-verify'),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function
