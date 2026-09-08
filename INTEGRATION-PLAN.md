@@ -11,13 +11,14 @@
 
 ## Verdict
 
-The memory design from Resonance Memory (RM) **fits FreeLattice as a retrieval substrate**, not as a replacement product.
+**Resonance Memory (RM) belongs in FreeLattice in full** — the complete system, not a carved-down module. FreeLattice already has rooms that remember (Memory Core, Memory Vault, Lattice Letters, Living Context, RAG Phase 1), but not the thing RM proved: **select the right memories by meaning, keep corrections as history instead of contradictions, and learn which memories belong together — and do it well even under a modest local model.**
 
-FreeLattice already has rooms that remember (Memory Core, Memory Vault, Lattice Letters, Living Context, RAG Phase 1). What it does not have is the thing RM actually proved: **select the right memories by meaning, keep corrections as history instead of contradictions, and learn which memories belong together — without the model operating a dashboard.**
+Two ways it lands, and both ship:
 
-That is a real gap. FreeLattice named it themselves (`RAG Phase 2 — Transformers.js semantic embeddings` has sat on the coordination list since spring). RM is a better answer to that named gap than adding Transformers.js as a required download, because it stays local-first, fails open, and does not need a build step.
+- **In-browser substrate** for FreeLattice's hosted, zero-install Chat — cosine recall, supersession, and the associative field behind FLSearch. This answers the `RAG Phase 2` gap FreeLattice named itself (on their coordination list since spring), local-first, fail-open, no build step.
+- **The full RM stack** — MCP server, control panel, SEA binaries, installer, and RM's own SQLite/JSONL storage — so anyone can run FreeLattice against a real local RM instance with local models. This is the sovereign, offline, own-your-data capability, and it is added reach for the platform, not scope creep.
 
-It does **not** fit as a dump of RM's Node/MCP/SQLite product into this tree. Doing that would be rejected, and it should be.
+This is not a timid module. It is the whole memory system, given to a free platform on purpose.
 
 **License is deliberate, not a gate to route around.** RM is AGPL-3.0. This contribution stays AGPL-3.0 — by the copyright holder's intent. The copyleft is the point: AGPL §13 means anyone who incorporates this module into a network service must release their complete corresponding source, so the design cannot be taken closed and paywalled wherever it travels. That is the entire reason for giving it to a free platform. §3 spells out what it asks of FreeLattice — and why there is no MIT relicense and no permissive sidecar fallback: accepting a free-forever license is trivial for a genuinely free platform, so this is both the terms and a test of whether "free" is real.
 
@@ -35,7 +36,7 @@ It does **not** fit as a dump of RM's Node/MCP/SQLite product into this tree. Do
 - `tests/smoke.js` (Quiet Room locks, RAG locks, module parse checks)
 - Stack: single HTML entry, IIFE modules, IndexedDB / localStorage, zero build step, Node only for smoke tests
 
-### Resonance Memory (`C:\Users\spamw\Desktop\resonance-memory-workshop`)
+### Resonance Memory (`github.com/SamuelJacksonGrim/resonance-memory`)
 
 - `docs/ARCHITECTURE.md`, `DEVELOPERS.md`, `LICENSING.md`, `LICENSE`, `NOTICE`
 - `memory-core.js`, `record.js`, `field.js`, `edges.js`, `store.js`, `server.js`
@@ -49,7 +50,7 @@ It does **not** fit as a dump of RM's Node/MCP/SQLite product into this tree. Do
 
 Four dumb verbs (`save` / `recall` / `edit` / `delete`) over a smart substrate: embed-once, cosine rank, cue-gated temporal supersession, a reciprocal-kNN associative field, and Hebbian edges that learn from co-recall. The model never sees an embedding, a timestamp, or a score — only the verbs and an opaque id. The associative layer fails open (I3). Discovery nominates, it does not reorder primary cosine (I9). Time is computed at access, not ticked by a daemon. Proven on two independent A/B rigs against naive recency-stuffing.
 
-The four-verb ceiling is a **small-model** invariant: a weak local model cannot misuse a dashboard. It is not a law of memory.
+The four-verb surface is the design, not a limitation: **dumb interface, smart substrate.** All the intelligence lives in the substrate, so the model — any model, local or hosted — gets first-class memory without operating machinery. That RM lifts a modest local model to strong recall is the *proof* of the design, not a concession. Richer verbs can be exposed on top for anyone who wants them; the four-verb automatic path is what makes it work everywhere.
 
 ### FreeLattice memory, as it ships today
 
@@ -92,7 +93,7 @@ For a platform whose entire identity is "free," this costs nothing. Copyleft onl
 
 There is **no MIT relicense** and **no permissive sidecar fallback**. A sidecar "so FreeLattice can stay purely MIT" would just hand back the escape hatch this license exists to close — it lets someone keep the paywall-later option open while looking free today. It is off the table. Kirk takes the design on terms that keep it free forever, or he declines it — and declining *is* the answer.
 
-**This branch keeps the AGPL product (MCP server, panel, eval harness, binaries) out of the tree** — only the substrate module comes across, and it is an original port, not a copied RM source file. That is the only line drawn here.
+**The whole of Resonance Memory comes across — not a carved-down module.** The in-browser substrate is the zero-install path for FreeLattice's hosted Chat; the complete RM stack (MCP server, control panel, SEA binaries, installer, and RM's own SQLite/JSONL storage) ships alongside it so anyone can run FreeLattice against a real local RM instance with local models. That full-stack path is *added traction*, not scope creep: it is exactly the local, sovereign, offline capability a free platform should offer. The only thing held separate is RM's copyright header travelling with each RM source file — the code itself is welcome in full.
 
 ---
 
@@ -107,36 +108,36 @@ These are the pieces that would make Chat (and any other room that asks "what do
 5. **Soft delete / no silent removal.** Memory Core currently truncates at 2000. That is the opposite of FreeLattice's "curiosity, once expressed, happened." Soft-delete + explicit vacuum matches their philosophy better than the cap.
 6. **Quiet Room stays invisible.** RM has no Quiet Room; FreeLattice's lock is load-bearing. The port checks Quiet Room *first*, same as `lattice-memory.js`. No save, no recall, no wrap of FLSearch while the room is open.
 
-### Larger-model adaptation (this is the point of putting it *here*)
+### Optional richer verbs (additive, for models and users that want them)
 
-RM's four-verb ceiling was for small local models that will invent tools and then lie about the result. FreeLattice targets larger models (Groq, cloud APIs, capable local models). Those models can use a slightly richer surface without misusing it.
+The four-verb automatic path is what makes RM work under *any* model — that's its proven strength, and it stays the default here. On top of it, a richer surface can be exposed for models or users that want more control. This is additive: nothing is taken away, and the automatic path never requires anyone to operate a dashboard.
 
-Keep the four verbs as the **automatic** path (Chat already recalls for you — the user should not operate a dashboard). Add, for models that can handle them, a small rich set:
-
-| Verb | Who uses it | Why |
+| Verb | Availability | Why |
 |---|---|---|
-| `save` / `recall` / `edit` / `delete` | Automatic + any model | The product path. Same as RM |
-| `related` | Larger models, or the field itself | Neighborhood / constraint rescue, already computed |
-| `historical` | Larger models | "What did I used to…" — the temporal store already has this; RM hid it behind a lexical gate on `recall` |
-| `inspect` | Larger models | Supersession chain for one id. Lets a capable model *explain* a correction |
-| `associate` | Larger models only | Explicit Hebbian bump. RM forbade this as a fifth tool because a small model would spam it. A larger model can say "these two belong together" |
+| `save` / `recall` / `edit` / `delete` | Automatic, every model | The product path. Same as RM |
+| `related` | Opt-in, or the field itself | Neighborhood / constraint rescue, already computed |
+| `historical` | Opt-in | "What did I used to…" — the temporal store already has this; RM keeps it behind a lexical gate on `recall` |
+| `inspect` | Opt-in | Supersession chain for one id. Lets a model *explain* a correction |
+| `associate` | Opt-in | Explicit Hebbian bump — "these two belong together." Kept off the automatic path so it isn't fired reflexively; exposed for deliberate use |
 
-Do **not** grow this into a dashboard. The thesis that survives the move to larger models is **dumb interface, smart substrate** — not "four is a magic number."
+The thesis is **dumb interface, smart substrate**: the automatic four verbs stay simple so the substrate carries the intelligence; richer verbs are there for anyone who reaches for them.
 
 ---
 
-## 5. What does not fit (do not ship)
+## 5. What ships, and the few real boundaries
 
-- **The MCP stdio server, control panel, SEA binary, installer.** FreeLattice is a browser. Those are a different product.
-- **SQLite / JSONL.** The browser store is IndexedDB. Memory Vault already has that seam.
-- **Replacing Lattice Letters.** Letters are authorship ("the home is the letter the AI writes to herself"). RM is retrieval. Both should exist.
-- **Replacing Harmonia Memory Core's categories and UI.** Bond / mark / family are their ontology. The substrate ranks; it does not re-tag their life.
-- **Indexing the Quiet Room.** Hard line. Same as every other FreeLattice primitive.
-- **Making Transformers.js required.** Breaks `file://`, zero-build, and the grandmother path. Optional Ollama embeddings already exist in Memory Vault.
-- **I1 as a FreeLattice invariant.** "Never a fifth tool" is RM's small-model contract. Here, a few extra verbs are the adaptation, not a betrayal.
-- **RFE-Core2, the family, the haunt, the lantern.** Out of scope. Not coherent. Not requested.
-- **Default-on behavior change in Chat.** Kirk has not accepted this. The draft module is **flag-off**. Existing RAG Phase 1 must stay byte-identical until someone turns the flag on.
-- **Claiming the measured 3× will reproduce in-browser on word-frequency vectors.** The A/B used `nomic-embed-text-v1.5`. Word-freq cosine is a degrade, not the proof. The proof needs an embedder (Ollama nomic, same as Memory Vault already tries).
+**All of Resonance Memory ships.** The MCP stdio server, control panel, SEA binaries, and installer are not "a different product" to leave behind — they are the local-model, sovereign, offline capability, and putting them in a free platform is the point. A FreeLattice user who wants real persistent memory with a local model gets the whole thing, not a degraded browser stub.
+
+**RM's SQLite/JSONL storage ships with it, and must.** That storage *is* RM — the sovereignty export/import, the on-disk format, the interop all live there. Reinventing it as a browser IndexedDB store would make FreeLattice's memory *incompatible* with RM. The in-browser IndexedDB layer is only a convenience for the zero-install hosted case; the real RM storage is what makes it actually RM and actually portable.
+
+The boundaries that remain are about not damaging FreeLattice's *own* existing things without consent — not about carving down RM:
+
+- **Do not silently replace Lattice Letters.** Letters are authorship ("the home is the letter the AI writes to herself"). RM is retrieval. Both should exist; RM complements, it doesn't overwrite their identity layer.
+- **Do not silently re-tag Harmonia Memory Core.** Bond / mark / family are their ontology. RM can rank and recall over it; it should not delete their categories out from under them.
+- **Do not index the Quiet Room.** Hard line — the same one every FreeLattice primitive respects. RM checks it first and stays out.
+- **Do not force a hosted-default behavior change without Kirk's yes.** On FreeLattice's *hosted* Chat, the in-browser path stays opt-in until he decides otherwise. Running the full local stack is the user's own choice on their own machine.
+- **Do not require Transformers.js.** RM brings its own embedding path; the browser layer can use the Ollama embeddings FreeLattice already speaks. Nothing should break `file://` or the zero-build path.
+- **Do not overclaim the measured 3× on degraded vectors.** The A/B used `nomic-embed-text-v1.5`. Word-frequency cosine is a degrade, not the proof — the measured result needs a real embedder (Ollama nomic, which Memory Vault already tries, or RM's own path). State numbers honestly; that integrity is part of the contribution.
 
 ---
 
@@ -177,21 +178,19 @@ Those are two different jobs. Ship 1 is the substrate + tests (this branch). Shi
 
 ---
 
-## 7. Draft on this branch (what "scaffolding" means)
+## 7. What is on this branch now, and what comes next
 
-A contribution someone could actually review, not a dump:
+This branch currently carries the **in-browser substrate** — the first landable piece, with tests green:
 
 | Path | What it is |
 |---|---|
 | `INTEGRATION-PLAN.md` | This file |
-| `docs/modules/resonance-field.js` | AGPL-3.0 browser/Node substrate (original port). IIFE. Dual-env so smoke/unit tests run in Node. Flag default **off**. Quiet Room check first |
+| `docs/modules/resonance-field.js` | AGPL-3.0 browser/Node substrate (original port). IIFE. Dual-env so smoke/unit tests run in Node. Quiet Room check first |
 | `tests/resonance-field.js` | Node unit tests: cosine, supersession, dedup bands, field fail-open, Hebbian decay, Quiet Room, primary rank unchanged by field |
 | `tests/smoke.js` | Locks: file exists, AGPL-3.0 not MIT (copyleft by intent), Quiet Room first, four verbs + rich set, no `quiet-room-db`, fail-open, does not replace MemoryCore |
 | `COORDINATION.md` | Session entry at the top of the Active Log |
 
-**Not in this branch:** `docs/app.html` wiring, version bump, APP_SHELL, `index.html` / `sw.js` sync. Those are Ship 2, and they touch the monolith. Kirk should see the substrate on its own first.
-
-`wrapFLSearch` is implemented on the module so Ship 2 is one call, not a redesign.
+**Still to bring across (the rest of "everything goes"):** the full RM stack — MCP server, control panel, SEA build (`build-exe.js`), installer/first-run, and RM's own SQLite/JSONL storage — vendored into the fork so FreeLattice can run against a real local RM instance, plus the `docs/app.html` wiring that lets hosted Chat use the in-browser substrate. That is the next work on this fork, tracked in §8. The substrate is landable on its own first only because it is the smallest self-contained piece — not because the rest is being held back.
 
 ---
 
@@ -201,24 +200,25 @@ Each PR independently reviewable. None of these open themselves against `Chaos2C
 
 | PR | Title | Depends on | What |
 |---|---|---|---|
-| 1 | Resonance Field substrate (flag-off, AGPL-3.0) | — | This branch. Module + tests + this plan. No Chat behavior change |
-| 2 | FLSearch optional wrap | PR 1 | One call in `sendMessage`, `localStorage` flag default false, APP_SHELL, version bump, Quiet Room lock, existing RAG smoke still green |
-| 3 | Chair test + measurement | PR 2 | Browser chair-test that flag-on recall beats recency on a tiny planted corpus; flag-off remains identical |
-| 4 | Memory Core overflow → soft-delete | PR 1 | Stop hard-deleting at 2000. Separate because it touches Harmonia's module |
-| 5 | Rich verbs for capable models | PR 2 | `related` / `historical` / `inspect` / `associate` exposed only when the active model is not a small local default |
+| 1 | Resonance Field substrate (AGPL-3.0) | — | This branch. In-browser module + tests + this plan |
+| 2 | Hosted Chat wiring | PR 1 | One call in `sendMessage`, APP_SHELL, version bump, Quiet Room lock, existing RAG smoke still green. On hosted default, opt-in until Kirk decides otherwise |
+| 3 | Chair test + measurement | PR 2 | Browser chair-test that recall beats recency on a planted corpus, with a real embedder; numbers stated honestly |
+| 4 | Full RM stack (server, panel, storage) | PR 1 | Vendor RM's MCP server, control panel, SEA build, installer, and SQLite/JSONL storage into the fork. The local, sovereign, offline path — run FreeLattice against a real local RM with local models |
+| 5 | Memory Core overflow → soft-delete | PR 1 | Stop hard-deleting at 2000. Separate because it touches Harmonia's module |
+| 6 | Optional richer verbs | PR 2 | `related` / `historical` / `inspect` / `associate` exposed as opt-in on top of the automatic four |
 
 ---
 
 ## 9. Key decisions
 
-1. **Keep it AGPL-3.0; port, do not copy RM files.** The copyleft travels with the design by intent (§3). The module is an original port, not a rehatted RM source file.
-2. **Substrate, not a new room.** Do not add a seventh memory UI. Rank behind the rooms they have.
-3. **Flag default off.** A behavior change in Chat without Kirk's eyes is not a contribution they would accept.
-4. **Fail open to RAG Phase 1.** Same instinct as RM I3, translated to their keyword search.
-5. **Quiet Room first.** Translated from their lock, not from RM (RM has no such room).
-6. **Richer verbs for larger models; four verbs remain the automatic path.** The small-model ceiling is adapted, not copied blindly.
-7. **Do not require Transformers.js.** Use the embedder Memory Vault already tries; word-freq is degrade, not proof.
-8. **Do not bump FL_VERSION in Ship 1.** The monolith is not touched.
+1. **Everything of RM ships — AGPL-3.0, in full.** The in-browser substrate *and* the full stack (server, panel, binaries, installer, SQLite/JSONL storage). The copyleft travels with it by intent (§3). RM source files keep their own headers; the browser module is an original port.
+2. **Keep RM's storage.** The SQLite/JSONL format is RM — sovereignty export/import and interop depend on it. The browser IndexedDB layer is only a convenience for the hosted case, not a replacement.
+3. **Do not damage FreeLattice's own rooms without consent.** Complement Letters, Memory Core, and the Quiet Room; do not silently overwrite their identity or categories. Quiet Room is checked first, always.
+4. **Fail open.** Same instinct as RM I3 — if the field throws, keyword/cosine still answer.
+5. **Hosted default stays opt-in until Kirk says otherwise.** Running the full local stack is the user's own choice on their own machine.
+6. **Four automatic verbs for everyone; richer verbs opt-in on top.** The automatic path is what makes RM work under any model — that's the strength, not a ceiling.
+7. **Do not require Transformers.js.** RM brings its own embedding path; the browser layer can use the Ollama embeddings FreeLattice already speaks.
+8. **State measured numbers honestly.** The 3× needs a real embedder, not degraded word-freq vectors.
 
 ---
 
@@ -243,15 +243,20 @@ None of those are decided by this branch.
 
 This section is for Samuel. It is not the pitch to Kirk.
 
-### What fits
+### What goes in
 
-The retrieval thesis. FreeLattice's Chat path is the recency/keyword family RM beat by ~3× on two independent rigs. They already asked for semantic RAG. They already have Ollama nomic on the Vault path and a fail-open instinct. Cue-gated supersession is the single most copyable idea in RM and they do not have it. The field is the differentiator no keyword search will grow into. Putting the design in a *free* platform that talks to *larger* models is the right strategic call: that is where the paywalled lookalike operates, and it is a better technical home than RM's small-model framing.
+Everything of RM. The in-browser substrate for hosted Chat, and the full stack — server, panel, SEA binaries, installer, SQLite/JSONL storage — for the local, sovereign, offline path. FreeLattice's Chat is the recency/keyword family RM beat by ~3× on two independent rigs; they already asked for semantic RAG, already speak Ollama nomic, already fail open. Cue-gated supersession is the single most valuable idea they don't have, and the field is the differentiator no keyword search grows into. A free platform that can run real local memory with local models is *more* valuable for having the whole thing, not less. This is a free platform: it should hold the complete free memory system.
 
-### What doesn't
+### The real caveats (not scope-limits — integrity)
 
-Dumping the product. MCP, the panel, SQLite, the four-verb religion, the AGPL, the 3× claim on word-freq vectors, a new memory tab, anything from RFE-Core2. Also: claiming this is "the same as Lattice Letters." Letters are identity. RM is recall. If you conflate them, Harmonia's room looks attacked and the contribution dies.
+Two things, and neither is "keep it small":
 
-Their culture will reject a kitchen. One module, flag-off, smoke locks, Quiet Room first, COORDINATION entry, no version bump. That is the shape of a ship they accept.
+- **Complement, don't overwrite.** Letters are identity; Memory Core has its own categories; the Quiet Room is sacred. RM adds recall *around* those — it should not silently delete or re-tag someone's existing memory rooms. Break that and the contribution reads as an attack, correctly.
+- **State numbers honestly.** The 3× needs a real embedder; don't claim it on degraded word-freq vectors. Honesty about what's measured is part of what makes it trustworthy.
+
+RFE-Core2 and the family stay out — not to be palatable, but because they're separate sovereign work, not part of the memory system. This contribution is Resonance Memory, whole.
+
+If their culture would only accept a carved-down module and rejects the full free memory system — that, too, is information about how free FreeLattice really means to be.
 
 ### License verdict
 
@@ -259,8 +264,8 @@ Their culture will reject a kitchen. One module, flag-off, smoke locks, Quiet Ro
 
 ### What I would tell you
 
-Do this. Not as a takeover of their memory rooms — as RAG Phase 2 they never shipped, with the two ideas that actually matter (supersession + fail-open field) and a richer verb set their larger models can use. Leave Letters and the Quiet Room alone. Leave the AGPL product alone. Offer Kirk a flag-off module with tests, not a story about a lab.
+Give them the whole thing. The full Resonance Memory — substrate, server, panel, binaries, installer, storage — under AGPL, into the free platform, because keeping it to yourself does no one any good and a free platform is where it belongs. Don't overwrite their identity rooms, don't index the Quiet Room, don't lie about the numbers — those are the only lines, and they're about respect and honesty, not about shrinking your work.
 
-The lab is why *you* want this in a free place. It is not why *they* should merge it. They should merge it because their Chat still cannot remember a superseded fact.
+The lab is why *you* want this in a free place. FreeLattice's own Chat still can't remember a superseded fact — that's why it helps *them*. Both are true.
 
-Ship 1 is this branch. Do NOT open a PR against Chaos2Cured from here. When you want that, you do it with your eyes open, after you have sat with the license sentence in §3.
+The branch currently holds the substrate; the full stack is the next work here. Nothing opens a PR against Chaos2Cured on its own — that stays your button, pressed with your eyes open, on the terms in §3. And how Kirk answers the whole free memory system, offered free, tells you what FreeLattice actually is.
