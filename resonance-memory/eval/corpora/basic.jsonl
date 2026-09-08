@@ -1,0 +1,3 @@
+{"id":"basic-name","kind":"basic","writes":["My name is Samuel","I live in Texas","I have a cat named Koneko"],"query":"what is my cat's name","expect":{"contains":["Koneko"]}}
+{"id":"basic-work","kind":"basic","writes":["I prefer tea over coffee","I work as a software architect","I usually code late at night"],"query":"what do I do for a living","expect":{"contains":["architect"]}}
+{"id":"basic-pref","kind":"basic","writes":["I prefer tea over coffee","I work as a software architect","I usually code late at night"],"query":"do I like coffee or tea better","expect":{"contains":["tea"]}}

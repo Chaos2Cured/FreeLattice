@@ -33,13 +33,26 @@
  *   - Ranking is cosine. The field is additive and must never throw into recall.
  *   - Discovery nominates (Related:). It does not reorder primary cosine hits.
  *   - Quiet Room is checked FIRST. No save, no recall, no FLSearch wrap.
- *   - Flag default OFF. Existing RAG Phase 1 stays identical until enabled.
+ *   - Flag: unset means on when an embedder is configured; explicit 0 stays off.
+ *     wrapFLSearch is a no-op while disabled, so RAG Phase 1 stays identical.
+ *   - Embeddings: free online OpenRouter model, then local /v1/embeddings,
+ *     then a word-hash degrade. The degrade is not the measured ~3x.
  */
 (function (root) {
   'use strict';
 
   var LICENSE = 'AGPL-3.0-or-later';
   var FLAG_KEY = 'fl_resonanceField';
+  var EMBED_KEY = 'fl_resonanceEmbedKey';
+  var EMBED_URL_KEY = 'fl_resonanceEmbedUrl';
+  var EMBED_MODEL_KEY = 'fl_resonanceEmbedModel';
+  var DEFAULT_ONLINE_URL = 'https://openrouter.ai/api/v1/embeddings';
+  var DEFAULT_ONLINE_MODEL = 'nvidia/nemotron-3-embed-1b:free';
+  var LOCAL_EMBED_URLS = [
+    'http://127.0.0.1:1234/v1/embeddings',
+    'http://localhost:1234/v1/embeddings',
+    'http://127.0.0.1:11434/v1/embeddings'
+  ];
   var DB_NAME = 'FreeLatticeResonanceField';
   var STORE_NAME = 'memories';
   var EDGE_STORE = 'edges';
@@ -82,11 +95,52 @@
     }
   }
 
+  function lsGet(k) {
+    try {
+      if (typeof localStorage === 'undefined') return '';
+      return localStorage.getItem(k) || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function chatApiKey() {
+    try {
+      if (typeof window !== 'undefined' && window.state && window.state.apiKey) {
+        return String(window.state.apiKey);
+      }
+    } catch (e) { /* */ }
+    return '';
+  }
+
+  function embedderConfig() {
+    var dedicated = lsGet(EMBED_KEY);
+    var url = lsGet(EMBED_URL_KEY);
+    var model = lsGet(EMBED_MODEL_KEY);
+    var key = dedicated || chatApiKey();
+    if (!url) url = key ? DEFAULT_ONLINE_URL : '';
+    if (!model) {
+      model = (url && url.indexOf('openrouter.ai') !== -1)
+        ? DEFAULT_ONLINE_MODEL
+        : 'text-embedding-nomic-embed-text-v1.5';
+    }
+    return { key: key, url: url, model: model };
+  }
+
+  function hasEmbedderCredentials() {
+    var c = embedderConfig();
+    if (c.key && c.url) return true;
+    if (c.url && (c.url.indexOf('127.0.0.1') !== -1 || c.url.indexOf('localhost') !== -1)) return true;
+    return false;
+  }
+
   function isEnabled() {
     try {
       if (typeof localStorage === 'undefined') return false;
       var v = localStorage.getItem(FLAG_KEY);
-      return v === '1' || v === 'true' || v === 'on';
+      if (v === '0' || v === 'false' || v === 'off') return false;
+      if (v === '1' || v === 'true' || v === 'on') return true;
+      return hasEmbedderCredentials();
     } catch (e) {
       return false;
     }
@@ -96,7 +150,7 @@
     try {
       if (typeof localStorage === 'undefined') return false;
       if (on) localStorage.setItem(FLAG_KEY, '1');
-      else localStorage.removeItem(FLAG_KEY);
+      else localStorage.setItem(FLAG_KEY, '0');
       return isEnabled();
     } catch (e) {
       return false;
@@ -383,8 +437,8 @@
   }
 
   function defaultEmbed(texts) {
-    // Word-hash vectors: a degrade, not the nomic proof. Browser production
-    // should inject Ollama / MemoryVault embeddings when available.
+    // Word-hash vectors: a degrade, not a real embedder. Production injects
+    // onlineEmbed (OpenRouter free tier, then local /v1/embeddings).
     var dim = 48;
     return Promise.resolve((texts || []).map(function (text) {
       var v = [];
@@ -404,6 +458,220 @@
       for (i = 0; i < dim; i++) v[i] = v[i] / mag;
       return v;
     }));
+  }
+
+  function httpEmbed(texts, cfg) {
+    cfg = cfg || {};
+    var url = cfg.url;
+    var model = cfg.model;
+    var key = cfg.key || '';
+    if (!url) return Promise.reject(new Error('no embedder url'));
+    var headers = { 'Content-Type': 'application/json' };
+    if (key) headers.Authorization = 'Bearer ' + key;
+    if (url.indexOf('openrouter.ai') !== -1) {
+      headers['HTTP-Referer'] = 'https://github.com/SamuelJacksonGrim/resonance-memory';
+      headers['X-Title'] = 'FreeLattice Resonance Field';
+    }
+    var fetchFn = cfg.fetch || (typeof fetch === 'function' ? fetch : null);
+    if (!fetchFn) return Promise.reject(new Error('no fetch'));
+    return fetchFn(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ model: model, input: texts })
+    }).then(function (res) {
+      if (!res.ok) throw new Error('embed HTTP ' + res.status);
+      return res.json();
+    }).then(function (body) {
+      var data = (body && body.data) || [];
+      var out = [];
+      var i, row, vec;
+      for (i = 0; i < texts.length; i++) {
+        row = data[i];
+        vec = row && (row.embedding || row.vector);
+        if (!isVector(vec)) throw new Error('embed missing vector');
+        out.push(vec);
+      }
+      return out;
+    });
+  }
+
+  function tryLocalEmbed(texts, fetchFn) {
+    var i = 0;
+    function next() {
+      if (i >= LOCAL_EMBED_URLS.length) return Promise.reject(new Error('no local embedder'));
+      var url = LOCAL_EMBED_URLS[i++];
+      return httpEmbed(texts, {
+        url: url,
+        model: 'text-embedding-nomic-embed-text-v1.5',
+        fetch: fetchFn
+      }).catch(function () { return next(); });
+    }
+    return next();
+  }
+
+  function onlineEmbed(texts) {
+    texts = texts || [];
+    if (!texts.length) return Promise.resolve([]);
+    var cfg = embedderConfig();
+    var chain;
+    if (cfg.url) chain = httpEmbed(texts, cfg);
+    else chain = Promise.reject(new Error('no embedder url'));
+    return chain.catch(function () {
+      return tryLocalEmbed(texts);
+    }).catch(function () {
+      return defaultEmbed(texts);
+    });
+  }
+
+  function loadIdbIntoStore() {
+    if (typeof indexedDB === 'undefined') return Promise.resolve(createMemoryStore());
+    return new Promise(function (resolve) {
+      var req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function (e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        if (!db.objectStoreNames.contains(EDGE_STORE)) db.createObjectStore(EDGE_STORE, { keyPath: 'key' });
+      };
+      req.onerror = function () { resolve(createMemoryStore()); };
+      req.onsuccess = function (e) {
+        var db = e.target.result;
+        var rows = [];
+        var edges = {};
+        try {
+          var tx = db.transaction([STORE_NAME, EDGE_STORE], 'readonly');
+          var os = tx.objectStore(STORE_NAME);
+          var es = tx.objectStore(EDGE_STORE);
+          var g1 = os.getAll();
+          var g2 = es.getAll();
+          g1.onsuccess = function () { rows = g1.result || []; };
+          g2.onsuccess = function () {
+            var list = g2.result || [];
+            var n;
+            for (n = 0; n < list.length; n++) {
+              if (list[n] && list[n].key) edges[list[n].key] = list[n].edge || list[n];
+            }
+          };
+          tx.oncomplete = function () {
+            db.close();
+            resolve(createMemoryStore({ rows: rows, edges: edges }));
+          };
+          tx.onerror = function () { db.close(); resolve(createMemoryStore()); };
+        } catch (err) {
+          try { db.close(); } catch (e2) { /* */ }
+          resolve(createMemoryStore());
+        }
+      };
+    });
+  }
+
+  function flushStore(store) {
+    if (typeof indexedDB === 'undefined' || !store) return;
+    var req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function (e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      if (!db.objectStoreNames.contains(EDGE_STORE)) db.createObjectStore(EDGE_STORE, { keyPath: 'key' });
+    };
+    req.onsuccess = function (e) {
+      var db = e.target.result;
+      try {
+        var tx = db.transaction([STORE_NAME, EDGE_STORE], 'readwrite');
+        var os = tx.objectStore(STORE_NAME);
+        var es = tx.objectStore(EDGE_STORE);
+        os.clear();
+        es.clear();
+        var rows = store.all();
+        var i, rec;
+        for (i = 0; i < rows.length; i++) {
+          rec = rows[i];
+          if (rec && rec.id != null) os.put(rec);
+        }
+        var edges = store.getEdges() || {};
+        var k;
+        for (k in edges) {
+          if (Object.prototype.hasOwnProperty.call(edges, k)) {
+            es.put({ key: k, edge: edges[k] });
+          }
+        }
+        tx.oncomplete = function () { db.close(); };
+        tx.onerror = function () { db.close(); };
+      } catch (err) {
+        try { db.close(); } catch (e2) { /* */ }
+      }
+    };
+  }
+
+  var _core = null;
+  var _bootPromise = null;
+
+  function looksDurable(text) {
+    var t = String(text || '').trim();
+    if (t.length < 24) return false;
+    if (/\?\s*$/.test(t) && t.length < 80) return false;
+    if (/\b(i(?:'m| am| have| live| work| need| prefer| don't| do not| always| never)|remember (?:that |this )|my (?:dog|cat|son|daughter|wife|husband|partner|name|job|kid))\b/i.test(t)) return true;
+    return t.length >= 32 && /\b(heartworm|medication|allergic|diabetic|every month|needs his|needs her)\b/i.test(t);
+  }
+
+  function persistCore(core) {
+    function wrap(name) {
+      var orig = core[name];
+      if (typeof orig !== 'function') return;
+      core[name] = function () {
+        var result = orig.apply(core, arguments);
+        return Promise.resolve(result).then(function (r) {
+          try { flushStore(core.store); } catch (e) { /* */ }
+          return r;
+        });
+      };
+    }
+    wrap('save');
+    wrap('recall');
+    wrap('edit');
+    wrap('remove');
+    wrap('associate');
+    return core;
+  }
+
+  function boot(flSearch) {
+    if (_bootPromise) return _bootPromise;
+    _bootPromise = loadIdbIntoStore().then(function (store) {
+      _core = persistCore(createCore({
+        store: store,
+        embed: onlineEmbed,
+        quietRoom: isQuietRoom,
+        fieldEnabled: function () { return isEnabled(); }
+      }));
+      if (flSearch) wrapFLSearch(flSearch, _core);
+      return _core;
+    }).catch(function () {
+      _core = persistCore(createCore({
+        store: createMemoryStore(),
+        embed: onlineEmbed,
+        quietRoom: isQuietRoom,
+        fieldEnabled: function () { return isEnabled(); }
+      }));
+      if (flSearch) wrapFLSearch(flSearch, _core);
+      return _core;
+    });
+    return _bootPromise;
+  }
+
+  function getCore() {
+    if (_core) return Promise.resolve(_core);
+    var fls = (typeof window !== 'undefined') ? window.FLSearch : null;
+    return boot(fls);
+  }
+
+  function onUserMessage(text) {
+    if (!isEnabled()) return Promise.resolve({ ok: false, reason: 'disabled' });
+    if (isQuietRoom()) return Promise.resolve({ ok: false, reason: 'quiet-room', action: 'save' });
+    if (!looksDurable(text)) return Promise.resolve({ ok: false, reason: 'not-durable' });
+    return getCore().then(function (c) {
+      if (!c) return { ok: false, reason: 'no-core' };
+      return c.save(text);
+    }).catch(function () {
+      return { ok: false, reason: 'save-failed' };
+    });
   }
 
   function createCore(opts) {
@@ -691,6 +959,18 @@
               date: null
             });
           }
+          for (i = 0; i < (sem.related || []).length; i++) {
+            item = sem.related[i];
+            text = item.text || '';
+            if (seen[text]) continue;
+            seen[text] = true;
+            out.push({
+              source: 'Resonance Field',
+              text: text.substring(0, 200),
+              score: item.sim,
+              date: null
+            });
+          }
           for (i = 0; i < (hits || []).length; i++) {
             text = (hits[i] && hits[i].text) || '';
             if (seen[text]) continue;
@@ -728,7 +1008,17 @@
     isEnabled: isEnabled,
     setEnabled: setEnabled,
     wrapFLSearch: wrapFLSearch,
-    defaultEmbed: defaultEmbed
+    defaultEmbed: defaultEmbed,
+    httpEmbed: httpEmbed,
+    onlineEmbed: onlineEmbed,
+    embedderConfig: embedderConfig,
+    hasEmbedderCredentials: hasEmbedderCredentials,
+    looksDurable: looksDurable,
+    boot: boot,
+    getCore: getCore,
+    onUserMessage: onUserMessage,
+    DEFAULT_ONLINE_URL: DEFAULT_ONLINE_URL,
+    DEFAULT_ONLINE_MODEL: DEFAULT_ONLINE_MODEL
   };
 
   if (typeof module !== 'undefined' && module.exports) {
@@ -738,5 +1028,29 @@
     window.ResonanceField = api;
     window.FreeLatticeModules = window.FreeLatticeModules || {};
     window.FreeLatticeModules.ResonanceField = api;
+    function syncSettingsUi() {
+      try {
+        var tog = document.getElementById('rfEnabledToggle');
+        if (tog) tog.checked = isEnabled();
+        var modelEl = document.getElementById('rfEmbedModel');
+        if (modelEl && !modelEl.value) {
+          var m = lsGet(EMBED_MODEL_KEY);
+          if (m) modelEl.value = m;
+        }
+      } catch (e) { /* */ }
+    }
+    function start() {
+      try {
+        boot(window.FLSearch);
+        syncSettingsUi();
+      } catch (e) { /* fail-open */ }
+    }
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 0); });
+      } else {
+        setTimeout(start, 0);
+      }
+    }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this);

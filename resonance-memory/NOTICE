@@ -1,0 +1,28 @@
+Resonance Memory
+Copyright (C) 2026 Samuel Jackson Grim
+
+This product is dual-licensed. You may use it under EITHER:
+  (1) the GNU Affero General Public License, version 3 only (AGPL-3.0-only),
+      as set out in the LICENSE file; OR
+  (2) a separate commercial license obtained from the copyright holder,
+      as described in LICENSING.md and COMMERCIAL-LICENSE.md.
+
+SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Commercial
+
+Commercial licensing contact:
+  Samuel Jackson Grim <collectiveaifamily@gmail.com>
+
+-------------------------------------------------------------------------------
+Third-party components
+-------------------------------------------------------------------------------
+This project currently contains no bundled third-party source code. Any
+third-party components added in the future, and their licenses, must be listed
+here and must be compatible with BOTH license tracks (AGPL-3.0 and the
+commercial license). Do not add code that cannot be relicensed commercially
+without first recording its provenance and license in this file.
+
+---
+
+## Related
+
+[[LICENSING]] · [[README]] · [[CONTRIBUTING]]

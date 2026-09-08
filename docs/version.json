@@ -1,5 +1,5 @@
 {
-  "version": "5.79.45",
-  "updated": "2026-09-06",
-  "note": "Ship 1b — finish scoped OLLAMA_ORIGINS prose leftovers per Celeste (Grok bot) brief after PR #19 squash 93eb24a. Six bare-* cases in docs/app.html replaced with the canonical scoped string https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* — three Windows Value / Variable value strings, three Mac launchctl setenv OLLAMA_ORIGINS commands. Fully-hidden retired wizard block also fixed for consistency (Celeste: 'if unsure, fix the string'). Grandmother path no longer teaches bare *. Localhost/127.0.0.1 port wildcards preserved (never touched). docs/celeste.html and lattice-protocol.js untouched. index.html mirror auto-updates via post-commit hook. Cache bumped for consistency."
+  "version": "5.80.0",
+  "updated": "2026-09-08",
+  "note": "Resonance Memory — full stack (AGPL-3.0) + in-browser substrate wired into Chat. Semantic recall behind FLSearch, associative field, supersession, free online embedder (OpenRouter nvidia/nemotron-3-embed-1b:free). Quiet Room stays out. Quiet Room, Letters, and Memory Core are not replaced."
 }

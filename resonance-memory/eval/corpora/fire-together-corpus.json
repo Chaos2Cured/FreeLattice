@@ -1,0 +1,332 @@
+{
+  "version": "4.0b-hermes-v1",
+  "note": "Text-only fixture for entity-layer-measure.js. Vectors omitted (they are unused by the lexical entity resolver; nomic field-kNN uses the gitignored fair-run cache).",
+  "themes": [
+    {
+      "id": "morning-drink",
+      "name": "Morning Drink / Cortado"
+    },
+    {
+      "id": "climbing",
+      "name": "Indoor Bouldering"
+    },
+    {
+      "id": "sister-naima",
+      "name": "Sister Naima"
+    },
+    {
+      "id": "bookshelf",
+      "name": "Walnut Bookshelf Project"
+    },
+    {
+      "id": "allergy",
+      "name": "Penicillin Allergy"
+    }
+  ],
+  "records": [
+    {
+      "id": "t1_m1",
+      "text": "I drink an oat-milk cortado every morning",
+      "theme_id": "morning-drink",
+      "role": "member"
+    },
+    {
+      "id": "t1_m2",
+      "text": "My morning coffee is a double cortado with oat milk and no sugar",
+      "theme_id": "morning-drink",
+      "role": "member"
+    },
+    {
+      "id": "t1_m3",
+      "text": "I brew a cortado with steamed oat milk right before starting work",
+      "theme_id": "morning-drink",
+      "role": "member"
+    },
+    {
+      "id": "t1_nm",
+      "text": "I drink hot chamomile tea with honey at night before bed",
+      "theme_id": "morning-drink",
+      "role": "near-miss"
+    },
+    {
+      "id": "t2_m1",
+      "text": "I climb at the south bouldering gym on Tuesday evenings",
+      "theme_id": "climbing",
+      "role": "member"
+    },
+    {
+      "id": "t2_m2",
+      "text": "Tuesday nights I go indoor bouldering at the south gym",
+      "theme_id": "climbing",
+      "role": "member"
+    },
+    {
+      "id": "t2_m3",
+      "text": "The south climbing gym is where I work on my bouldering projects",
+      "theme_id": "climbing",
+      "role": "member"
+    },
+    {
+      "id": "t2_nm",
+      "text": "I lift free weights at the downtown fitness center on Thursday mornings",
+      "theme_id": "climbing",
+      "role": "near-miss"
+    },
+    {
+      "id": "t3_m1",
+      "text": "My sister Naima teaches chemistry at the local high school",
+      "theme_id": "sister-naima",
+      "role": "member"
+    },
+    {
+      "id": "t3_m2",
+      "text": "Naima is my sister and she works as a high school chemistry teacher",
+      "theme_id": "sister-naima",
+      "role": "member"
+    },
+    {
+      "id": "t3_m3",
+      "text": "I call my sister Naima every Sunday evening to catch up",
+      "theme_id": "sister-naima",
+      "role": "member"
+    },
+    {
+      "id": "t3_nm",
+      "text": "My coworker Naima is a frontend engineer on the infrastructure team",
+      "theme_id": "sister-naima",
+      "role": "near-miss"
+    },
+    {
+      "id": "t4_m1",
+      "text": "I am building a custom walnut bookshelf in my garage workshop",
+      "theme_id": "bookshelf",
+      "role": "member"
+    },
+    {
+      "id": "t4_m2",
+      "text": "The walnut bookcase in my garage is six feet tall with four shelves",
+      "theme_id": "bookshelf",
+      "role": "member"
+    },
+    {
+      "id": "t4_m3",
+      "text": "I am applying oil finish to my handmade walnut bookcase",
+      "theme_id": "bookshelf",
+      "role": "member"
+    },
+    {
+      "id": "t4_nm",
+      "text": "I bought a flat-pack pine desk from IKEA for my study",
+      "theme_id": "bookshelf",
+      "role": "near-miss"
+    },
+    {
+      "id": "t5_m1",
+      "text": "I have a severe allergic reaction to penicillin and amoxicillin",
+      "theme_id": "allergy",
+      "role": "member"
+    },
+    {
+      "id": "t5_m2",
+      "text": "My medical chart notes an anaphylactic allergy to penicillin antibiotics",
+      "theme_id": "allergy",
+      "role": "member"
+    },
+    {
+      "id": "t5_m3",
+      "text": "I wear a medical alert bracelet for my penicillin allergy",
+      "theme_id": "allergy",
+      "role": "member"
+    },
+    {
+      "id": "t5_nm",
+      "text": "I take daily vitamin D and zinc supplements with breakfast",
+      "theme_id": "allergy",
+      "role": "near-miss"
+    },
+    {
+      "id": "d1",
+      "text": "The capital of Oregon is Salem, which was incorporated in 1857",
+      "theme_id": null,
+      "role": "distractor"
+    },
+    {
+      "id": "d2",
+      "text": "My car is a blue 2018 Honda Civic with manual transmission",
+      "theme_id": null,
+      "role": "distractor"
+    },
+    {
+      "id": "d3",
+      "text": "I renewed my passport at the downtown post office last September",
+      "theme_id": null,
+      "role": "distractor"
+    },
+    {
+      "id": "d4",
+      "text": "Apollo 11 landed on the lunar surface on July 20, 1969",
+      "theme_id": null,
+      "role": "distractor"
+    },
+    {
+      "id": "d5",
+      "text": "I replaced the furnace filter with an allergen-rated pleated filter",
+      "theme_id": null,
+      "role": "distractor"
+    }
+  ],
+  "true_pairs": [
+    {
+      "a": "t1_m1",
+      "b": "t1_m2",
+      "theme_id": "morning-drink"
+    },
+    {
+      "a": "t1_m1",
+      "b": "t1_m3",
+      "theme_id": "morning-drink"
+    },
+    {
+      "a": "t1_m2",
+      "b": "t1_m3",
+      "theme_id": "morning-drink"
+    },
+    {
+      "a": "t2_m1",
+      "b": "t2_m2",
+      "theme_id": "climbing"
+    },
+    {
+      "a": "t2_m1",
+      "b": "t2_m3",
+      "theme_id": "climbing"
+    },
+    {
+      "a": "t2_m2",
+      "b": "t2_m3",
+      "theme_id": "climbing"
+    },
+    {
+      "a": "t3_m1",
+      "b": "t3_m2",
+      "theme_id": "sister-naima"
+    },
+    {
+      "a": "t3_m1",
+      "b": "t3_m3",
+      "theme_id": "sister-naima"
+    },
+    {
+      "a": "t3_m2",
+      "b": "t3_m3",
+      "theme_id": "sister-naima"
+    },
+    {
+      "a": "t4_m1",
+      "b": "t4_m2",
+      "theme_id": "bookshelf"
+    },
+    {
+      "a": "t4_m1",
+      "b": "t4_m3",
+      "theme_id": "bookshelf"
+    },
+    {
+      "a": "t4_m2",
+      "b": "t4_m3",
+      "theme_id": "bookshelf"
+    },
+    {
+      "a": "t5_m1",
+      "b": "t5_m2",
+      "theme_id": "allergy"
+    },
+    {
+      "a": "t5_m1",
+      "b": "t5_m3",
+      "theme_id": "allergy"
+    },
+    {
+      "a": "t5_m2",
+      "b": "t5_m3",
+      "theme_id": "allergy"
+    }
+  ],
+  "near_miss_pairs": [
+    {
+      "a": "t1_m1",
+      "b": "t1_nm",
+      "theme_id": "morning-drink"
+    },
+    {
+      "a": "t1_m2",
+      "b": "t1_nm",
+      "theme_id": "morning-drink"
+    },
+    {
+      "a": "t1_m3",
+      "b": "t1_nm",
+      "theme_id": "morning-drink"
+    },
+    {
+      "a": "t2_m1",
+      "b": "t2_nm",
+      "theme_id": "climbing"
+    },
+    {
+      "a": "t2_m2",
+      "b": "t2_nm",
+      "theme_id": "climbing"
+    },
+    {
+      "a": "t2_m3",
+      "b": "t2_nm",
+      "theme_id": "climbing"
+    },
+    {
+      "a": "t3_m1",
+      "b": "t3_nm",
+      "theme_id": "sister-naima"
+    },
+    {
+      "a": "t3_m2",
+      "b": "t3_nm",
+      "theme_id": "sister-naima"
+    },
+    {
+      "a": "t3_m3",
+      "b": "t3_nm",
+      "theme_id": "sister-naima"
+    },
+    {
+      "a": "t4_m1",
+      "b": "t4_nm",
+      "theme_id": "bookshelf"
+    },
+    {
+      "a": "t4_m2",
+      "b": "t4_nm",
+      "theme_id": "bookshelf"
+    },
+    {
+      "a": "t4_m3",
+      "b": "t4_nm",
+      "theme_id": "bookshelf"
+    },
+    {
+      "a": "t5_m1",
+      "b": "t5_nm",
+      "theme_id": "allergy"
+    },
+    {
+      "a": "t5_m2",
+      "b": "t5_nm",
+      "theme_id": "allergy"
+    },
+    {
+      "a": "t5_m3",
+      "b": "t5_nm",
+      "theme_id": "allergy"
+    }
+  ]
+}

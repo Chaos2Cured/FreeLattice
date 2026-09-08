@@ -316,6 +316,48 @@ seq([
 
   ['isEnabled defaults off (no localStorage in node)', function () {
     assert.strictEqual(RF.isEnabled(), false);
+  }],
+
+  ['looksDurable accepts first-person facts and rejects small talk', function () {
+    assert.strictEqual(RF.looksDurable('I live in Austin and I work at Globex now'), true);
+    assert.strictEqual(RF.looksDurable('The dog needs his heartworm pill on the 1st'), true);
+    assert.strictEqual(RF.looksDurable('hi'), false);
+    assert.strictEqual(RF.looksDurable('what time is it?'), false);
+  }],
+
+  ['httpEmbed maps OpenAI-shaped responses; missing vectors reject', function () {
+    var fake = function () {
+      return Promise.resolve({
+        ok: true,
+        json: function () {
+          return Promise.resolve({ data: [{ embedding: [1, 0] }, { embedding: [0, 1] }] });
+        }
+      });
+    };
+    return RF.httpEmbed(['a', 'b'], {
+      url: 'https://openrouter.ai/api/v1/embeddings',
+      model: RF.DEFAULT_ONLINE_MODEL,
+      key: 'test',
+      fetch: fake
+    }).then(function (vecs) {
+      assert.strictEqual(vecs.length, 2);
+      assert.strictEqual(vecs[0][0], 1);
+    });
+  }],
+
+  ['onlineEmbed fails open to word-hash when the network is gone', function () {
+    var origFetch = global.fetch;
+    global.fetch = function () { return Promise.reject(new Error('offline')); };
+    return RF.onlineEmbed(['heartworm pill']).then(function (vecs) {
+      if (origFetch) global.fetch = origFetch;
+      else delete global.fetch;
+      assert.strictEqual(vecs.length, 1);
+      assert.ok(RF.isVector(vecs[0]));
+    }).catch(function (err) {
+      if (origFetch) global.fetch = origFetch;
+      else delete global.fetch;
+      throw err;
+    });
   }]
 ]).then(function () {
   process.stdout.write('\n');

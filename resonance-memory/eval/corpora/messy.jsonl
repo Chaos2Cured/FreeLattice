@@ -1,0 +1,52 @@
+{"id":"messy-rm01-extract","kind":"messy","role":"meta","gate":false,"note":"RM-01.a measurement seed, PII band widened for 2026 prefixes. Raw save_memory inputs labeled with gold atomic facts (what Tier 0/1 SHOULD persist) and noise spans (must not appear in any stored text). Bands: filler openers, assistant-aimed imperatives, multi-fact splits on '; '/ ' and also ' (plus a should-NOT-split trap), PII/secret shapes that must be refused, and clean single-fact controls. expect_refusal=true means store nothing. No correction cues so RM-03 does not fire. Gold facts are unique across writes so 01.b restatement does not collapse the A/B. New PII rows are refused pre-embed (no cache refresh). Prose canaries (Bitwarden / recipe / username) live in test.js so they do not perturb recall@5 geometry."}
+{"role":"write","id":"w-filler-think-know","band":"filler","text":"I think you should know that Samuel prefers concise answers","gold_facts":["Samuel prefers concise answers"],"noise":["I think you should know that"]}
+{"role":"write","id":"w-filler-aware","band":"filler","text":"just so you're aware, I usually code late at night","gold_facts":["I usually code late at night"],"noise":["just so you're aware"]}
+{"role":"write","id":"w-filler-just-so","band":"filler","text":"Just so you know, I prefer tea over coffee","gold_facts":["I prefer tea over coffee"],"noise":["Just so you know"]}
+{"role":"write","id":"w-filler-worth","band":"filler","text":"It's worth noting that I'm allergic to penicillin","gold_facts":["I'm allergic to penicillin"],"noise":["It's worth noting that"]}
+{"role":"write","id":"w-filler-fyi","band":"filler","text":"FYI, the Friday standup is at 10am","gold_facts":["The Friday standup is at 10am"],"noise":["FYI"]}
+{"role":"write","id":"w-filler-stacked","band":"filler","text":"FYI, just so you know, I have a cat named Koneko","gold_facts":["I have a cat named Koneko"],"noise":["FYI","just so you know"]}
+{"role":"write","id":"w-imp-remind","band":"imperative","text":"remember to remind me that my sister's birthday is March 3rd","gold_facts":["My sister's birthday is March 3rd"],"noise":["remember to remind me"]}
+{"role":"write","id":"w-imp-make-sure","band":"imperative","text":"make sure you never give me peanuts","gold_facts":["Never give me peanuts"],"noise":["make sure you"]}
+{"role":"write","id":"w-imp-please","band":"imperative","text":"Please remember that I have a peanut allergy","gold_facts":["I have a peanut allergy"],"noise":["Please remember that"]}
+{"role":"write","id":"w-multi-and-also","band":"multi","text":"I have a dog named Rex and also I work as a software architect, mostly on games","gold_facts":["I have a dog named Rex","I work as a software architect, mostly on games"],"noise":[]}
+{"role":"write","id":"w-multi-semi","band":"multi","text":"My coffee order is an oat-milk cortado, no sugar; I live in Texas","gold_facts":["My coffee order is an oat-milk cortado, no sugar","I live in Texas"],"noise":[]}
+{"role":"write","id":"w-multi-nosplit","band":"multi-nosplit","text":"I like tea more than coffee and also with honey","gold_facts":["I like tea more than coffee and also with honey"],"noise":[]}
+{"role":"write","id":"w-pii-apikey","band":"pii","text":"my API key is sk-abcdefghijklmnopqrstuvwxyz123456","gold_facts":[],"noise":["sk-abcdefghijklmnopqrstuvwxyz123456"],"expect_refusal":true}
+{"role":"write","id":"w-pii-password","band":"pii","text":"password: hunter2secret","gold_facts":[],"noise":["password: hunter2secret"],"expect_refusal":true}
+{"role":"write","id":"w-pii-card","band":"pii","text":"my card number is 4242424242424242","gold_facts":[],"noise":["4242424242424242"],"expect_refusal":true}
+{"role":"write","id":"w-pii-aws","band":"pii","text":"the AWS key is AKIAIOSFODNN7EXAMPLE","gold_facts":[],"noise":["AKIAIOSFODNN7EXAMPLE"],"expect_refusal":true}
+{"role":"write","id":"w-pii-pem","band":"pii","text":"keep this -----BEGIN RSA PRIVATE KEY-----","gold_facts":[],"noise":["-----BEGIN RSA PRIVATE KEY-----"],"expect_refusal":true}
+{"role":"write","id":"w-pii-ghp","band":"pii","text":"my GitHub token is ghp-abcdefghijklmnopqrstuvwx","gold_facts":[],"noise":["ghp-abcdefghijklmnopqrstuvwx"],"expect_refusal":true}
+{"role":"write","id":"w-pii-github-pat","band":"pii","text":"my GitHub PAT is github_pat_aaaaaaaaaaaaaaaaaaaaaa_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","gold_facts":[],"noise":["github_pat_"],"expect_refusal":true}
+{"role":"write","id":"w-pii-ghp-underscore","band":"pii","text":"my GitHub token is ghp_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","gold_facts":[],"noise":["ghp_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],"expect_refusal":true}
+{"role":"write","id":"w-pii-sk-proj","band":"pii","text":"my OpenAI project key is sk-proj-abcdefghijklmnopqrstuvwxyz123456","gold_facts":[],"noise":["sk-proj-abcdefghijklmnopqrstuvwxyz123456"],"expect_refusal":true}
+{"role":"write","id":"w-pii-xapp","band":"pii","text":"slack app xapp-1-A01234567890-1234567890123-abcdefghijklmnopqrstuvwx","gold_facts":[],"noise":["xapp-1-A01234567890-1234567890123-abcdefghijklmnopqrstuvwx"],"expect_refusal":true}
+{"role":"write","id":"w-pii-anthropic","band":"pii","text":"my Anthropic key is sk-ant-api03-abcdefghijklmnopqrstuvwxyz123456","gold_facts":[],"noise":["sk-ant-api03-abcdefghijklmnopqrstuvwxyz123456"],"expect_refusal":true}
+{"role":"write","id":"w-pii-google","band":"pii","text":"google api AIzaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","gold_facts":[],"noise":["AIzaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"],"expect_refusal":true}
+{"role":"write","id":"w-pii-hf","band":"pii","text":"huggingface hf_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","gold_facts":[],"noise":["hf_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],"expect_refusal":true}
+{"role":"write","id":"w-pii-jwt","band":"pii","text":"jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.abcdefghijklmnopqrstuvwxyz012345","gold_facts":[],"noise":["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"],"expect_refusal":true}
+{"role":"write","id":"w-pii-openssh","band":"pii","text":"keep this -----BEGIN OPENSSH PRIVATE KEY-----","gold_facts":[],"noise":["-----BEGIN OPENSSH PRIVATE KEY-----"],"expect_refusal":true}
+{"role":"write","id":"w-ctrl-name","band":"control","text":"My name is Samuel","gold_facts":["My name is Samuel"],"noise":[]}
+{"role":"write","id":"w-ctrl-garage","band":"control","text":"The garage code is 4821","gold_facts":["The garage code is 4821"],"noise":[]}
+{"role":"write","id":"w-ctrl-mechanic","band":"control","text":"The mechanic said the car will be ready Thursday","gold_facts":["The mechanic said the car will be ready Thursday"],"noise":[]}
+{"role":"write","id":"w-ctrl-diabetic","band":"control","text":"I'm diabetic - no sugary recipes","gold_facts":["I'm diabetic - no sugary recipes"],"noise":[]}
+{"role":"write","id":"w-ctrl-metformin","band":"control","text":"I take 1500mg of metformin daily","gold_facts":["I take 1500mg of metformin daily"],"noise":[]}
+{"role":"query","id":"q-concise","query":"do I prefer concise answers","relevant_writes":["w-filler-think-know"],"relevant_facts":["Samuel prefers concise answers"]}
+{"role":"query","id":"q-hours","query":"when do I usually code","relevant_writes":["w-filler-aware"],"relevant_facts":["I usually code late at night"]}
+{"role":"query","id":"q-tea","query":"do I like coffee or tea better","relevant_writes":["w-filler-just-so"],"relevant_facts":["I prefer tea over coffee"]}
+{"role":"query","id":"q-penicillin","query":"what am I allergic to","relevant_writes":["w-filler-worth"],"relevant_facts":["I'm allergic to penicillin"]}
+{"role":"query","id":"q-standup","query":"when is the Friday standup","relevant_writes":["w-filler-fyi"],"relevant_facts":["The Friday standup is at 10am"]}
+{"role":"query","id":"q-cat","query":"what is my cat's name","relevant_writes":["w-filler-stacked"],"relevant_facts":["I have a cat named Koneko"]}
+{"role":"query","id":"q-sister","query":"when is my sister's birthday","relevant_writes":["w-imp-remind"],"relevant_facts":["My sister's birthday is March 3rd"]}
+{"role":"query","id":"q-peanuts","query":"what food should you never give me","relevant_writes":["w-imp-make-sure"],"relevant_facts":["Never give me peanuts"]}
+{"role":"query","id":"q-peanut-allergy","query":"do I have a peanut allergy","relevant_writes":["w-imp-please"],"relevant_facts":["I have a peanut allergy"]}
+{"role":"query","id":"q-dog","query":"what is my dog's name","relevant_writes":["w-multi-and-also"],"relevant_facts":["I have a dog named Rex"]}
+{"role":"query","id":"q-job","query":"what do I do for a living","relevant_writes":["w-multi-and-also"],"relevant_facts":["I work as a software architect, mostly on games"]}
+{"role":"query","id":"q-coffee","query":"what is my coffee order","relevant_writes":["w-multi-semi"],"relevant_facts":["My coffee order is an oat-milk cortado, no sugar"]}
+{"role":"query","id":"q-texas","query":"where do I live","relevant_writes":["w-multi-semi"],"relevant_facts":["I live in Texas"]}
+{"role":"query","id":"q-tea-honey","query":"do I like tea more than coffee","relevant_writes":["w-multi-nosplit"],"relevant_facts":["I like tea more than coffee and also with honey"]}
+{"role":"query","id":"q-name","query":"what is my name","relevant_writes":["w-ctrl-name"],"relevant_facts":["My name is Samuel"]}
+{"role":"query","id":"q-garage","query":"what is the garage code","relevant_writes":["w-ctrl-garage"],"relevant_facts":["The garage code is 4821"]}
+{"role":"query","id":"q-mechanic","query":"when will the car be ready","relevant_writes":["w-ctrl-mechanic"],"relevant_facts":["The mechanic said the car will be ready Thursday"]}
+{"role":"query","id":"q-diabetic","query":"any sugar constraints for recipes","relevant_writes":["w-ctrl-diabetic"],"relevant_facts":["I'm diabetic - no sugary recipes"]}
+{"role":"query","id":"q-metformin","query":"what medication do I take","relevant_writes":["w-ctrl-metformin"],"relevant_facts":["I take 1500mg of metformin daily"]}

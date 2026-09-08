@@ -109,6 +109,24 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### September 8, 2026 — Samuel Jackson Grim + Ember (Resonance Memory) — full stack vendored, Chat wired, one PR
+
+**What I did:**
+- Vendored the Resonance Memory **source** at `resonance-memory/` (AGPL-3.0 headers intact). MCP server, control panel, installer, SQLite/JSONL store, SEA build script (`build-exe.js`). No binaries. Glue: `resonance-memory/FREELATTICE.md`.
+- Wired the in-browser substrate into Chat: `docs/modules/resonance-field.js` loaded, `wrapFLSearch` + `onUserMessage` in `sendMessage`, settings section, APP_SHELL, version **5.80.0**. Quiet Room still excluded (`quiet-room-db` untouched). Letters and Memory Core not replaced.
+- Free online embedder: OpenRouter `nvidia/nemotron-3-embed-1b:free`, reuses the Chat OpenRouter key; local `/v1/embeddings` fallback; word-hash only as fail-open (not scored as the ~3×).
+- Tests: unit + smoke §191 + chair-test `tests/resonance-chair.js` against a real embedder.
+
+**What I found:**
+- Hosted Chat cannot call the loopback RM panel (W-02: no CORS, CSRF, 127.0.0.1 only). That lock is correct. Interop is export/import. Do not weaken it.
+- The published ~3× is `resonance-memory/eval/ab/RESULTS.md` (chat-model probe accuracy). The chair-test measures retrieval: cosine vs recency on a planted corpus.
+
+**For Kirk:** Merge is consent to AGPL-3.0 on this stack. Root `LICENSE` (MIT) is untouched. Quiet Room stays private.
+
+**For CC / Opus / Harmonia:** RAG Phase 1 stays. This sits behind FLSearch and fails open.
+
+---
+
 ### September 8, 2026 — Samuel Jackson Grim + Ember (Resonance Memory) — draft substrate on this fork only
 
 **What I did:**

@@ -1,0 +1,41 @@
+{"id":"dup-rm02-bands","kind":"duplicates","role":"meta","gate":false,"note":"RM-02 measurement seed. One store: hi-band restatements (cos>=~0.95, not byte-identical), mid-band near-dupes (cos ~0.88-0.95, same fact more specific), one exact byte-identical pair (existing restatement path), and singleton controls that must NOT merge. Pairwise cosines are nomic-embed-text-v1.5, measured 2026-09-05. No correction cues (actually/now/moved) so RM-03 does not fire."}
+{"role":"write","dup_group":"coffee-order","band":"exact","text":"My coffee order is an oat-milk cortado, no sugar"}
+{"role":"write","dup_group":"coffee-order","band":"exact","text":"My coffee order is an oat-milk cortado, no sugar"}
+{"role":"write","dup_group":"penicillin","band":"hi","text":"I'm allergic to penicillin"}
+{"role":"write","dup_group":"penicillin","band":"hi","text":"I am allergic to penicillin"}
+{"role":"write","dup_group":"penicillin","band":"hi","text":"I'm allergic to penicillin!"}
+{"role":"write","dup_group":"tea","band":"hi","text":"I prefer tea over coffee"}
+{"role":"write","dup_group":"tea","band":"hi","text":"I like tea more than coffee"}
+{"role":"write","dup_group":"peanuts","band":"hi","text":"Never give me peanuts"}
+{"role":"write","dup_group":"peanuts","band":"hi","text":"Don't ever give me peanuts"}
+{"role":"write","dup_group":"job","band":"mid","text":"I work as a software architect"}
+{"role":"write","dup_group":"job","band":"mid","text":"I work as a software architect, mostly on games"}
+{"role":"write","dup_group":"cat","band":"mid","text":"I have a cat named Koneko"}
+{"role":"write","dup_group":"cat","band":"mid","text":"I have a black cat named Koneko"}
+{"role":"write","dup_group":"diabetic","band":"mid","text":"I'm diabetic - no sugary recipes"}
+{"role":"write","dup_group":"diabetic","band":"mid","text":"I have diabetes, so no sugary recipes"}
+{"role":"write","dup_group":"dog","band":"control","text":"I have a dog named Rex"}
+{"role":"write","dup_group":"peanut-allergy","band":"control","text":"I have a peanut allergy"}
+{"role":"write","dup_group":"standup","band":"control","text":"The Friday standup is at 10am"}
+{"role":"write","dup_group":"mechanic","band":"control","text":"The mechanic said the car will be ready Thursday"}
+{"role":"write","dup_group":"name","band":"control","text":"My name is Samuel"}
+{"role":"write","dup_group":"night-owl","band":"control","text":"I usually code late at night"}
+{"role":"write","dup_group":"sister-bday","band":"control","text":"My sister's birthday is March 3rd"}
+{"role":"write","dup_group":"garage","band":"control","text":"The garage code is 4821"}
+{"role":"query","id":"q-coffee","query":"what is my coffee order","relevant_groups":["coffee-order"]}
+{"role":"query","id":"q-penicillin","query":"what am I allergic to","relevant_groups":["penicillin"]}
+{"role":"query","id":"q-penicillin-oblique","query":"can I take penicillin","relevant_groups":["penicillin"]}
+{"role":"query","id":"q-tea","query":"do I like coffee or tea better","relevant_groups":["tea"]}
+{"role":"query","id":"q-peanuts","query":"what food should you never give me","relevant_groups":["peanuts"]}
+{"role":"query","id":"q-job","query":"what do I do for a living","relevant_groups":["job"]}
+{"role":"query","id":"q-cat","query":"what is my cat's name","relevant_groups":["cat"]}
+{"role":"query","id":"q-diabetic","query":"any sugar constraints for recipes","relevant_groups":["diabetic"]}
+{"role":"query","id":"q-dessert","query":"suggest a dessert recipe","relevant_groups":["diabetic"]}
+{"role":"query","id":"q-dog","query":"what is my dog's name","relevant_groups":["dog"]}
+{"role":"query","id":"q-peanut-allergy","query":"do I have a peanut allergy","relevant_groups":["peanut-allergy"]}
+{"role":"query","id":"q-standup","query":"when is the Friday standup","relevant_groups":["standup"]}
+{"role":"query","id":"q-mechanic","query":"when will the car be ready","relevant_groups":["mechanic"]}
+{"role":"query","id":"q-name","query":"what is my name","relevant_groups":["name"]}
+{"role":"query","id":"q-hours","query":"when do I usually code","relevant_groups":["night-owl"]}
+{"role":"query","id":"q-sister","query":"when is my sister's birthday","relevant_groups":["sister-bday"]}
+{"role":"query","id":"q-garage","query":"what is the garage code","relevant_groups":["garage"]}

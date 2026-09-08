@@ -166,17 +166,18 @@ Embeddings come from a free online embedder (OpenRouter tier or equivalent), so 
 
 ## 7. What's staged now, and what the finished PR contains
 
-On the branch today (tests green):
+On the branch (the finished PR):
 
 | Path | What it is |
 |---|---|
 | `INTEGRATION-PLAN.md` | This file |
-| `docs/modules/resonance-field.js` | AGPL-3.0 browser/Node substrate (original port). IIFE. Dual-env so smoke/unit tests run in Node. Quiet Room check first |
-| `tests/resonance-field.js` | Node unit tests: cosine, supersession, dedup bands, field fail-open, Hebbian decay, Quiet Room, primary rank unchanged by field |
-| `tests/smoke.js` | Locks: file exists, AGPL-3.0 not MIT (copyleft by intent), Quiet Room first, four verbs + field, no `quiet-room-db`, fail-open |
+| `docs/modules/resonance-field.js` | AGPL-3.0 browser/Node substrate. Wired into Chat. OpenRouter free embedder + local fallback. Quiet Room first |
+| `tests/resonance-field.js` | Node unit tests: cosine, supersession, field fail-open, Hebbian, Quiet Room, I9, embedder fail-open |
+| `tests/resonance-chair.js` | Retrieval chair-test against a real embedder (not word-hash) |
+| `tests/smoke.js` | Locks: AGPL not MIT, Quiet Room first, four verbs + field, vendor tree, Chat wiring, no binaries |
+| `resonance-memory/` | Full RM **source** (MCP, panel, installer, store, `build-exe.js`). No binaries. See `FREELATTICE.md` |
+| `docs/app.html` / `docs/sw.js` | Chat wiring, settings, APP_SHELL, version 5.80.0 |
 | `COORDINATION.md` | Session entry at the top of the Active Log |
-
-**Still to vendor into the branch before the PR is opened:** the full RM stack — MCP server, control panel, SEA build (`build-exe.js`), installer/first-run, and RM's own SQLite/JSONL storage — plus the `docs/app.html` wiring and the free online embedder. When that's in, everything lands together.
 
 ---
 

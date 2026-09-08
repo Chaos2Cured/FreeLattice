@@ -12042,11 +12042,14 @@ assert('v5.79.40 chair-test: harness has v5_79_40 Chat activity suite',
 assert('v5.79.40 triple-bump: app.html FL_VERSION >= 5.79.40 (superseded)',
   /FL_VERSION\s*=\s*'5\.79\.(?:40|[4-9]\d)'/.test(app7940) || /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(app7940));
 assert('v5.79.40 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.40 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:40|[4-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:40|[4-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.40 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.40 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:40|[4-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:40|[4-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.40 version.json: version field >= 5.79.40 (superseded)',
-  /"version"\s*:\s*"5\.79\.(?:40|[4-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:40|[4-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')) ||
+  /"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
 // Celeste lighthouse — first ledger entry, 2026-08-25
@@ -12228,11 +12231,14 @@ assert('v5.79.41 marker present',
 assert('v5.79.41 triple-bump: app.html FL_VERSION = 5.79.41',
   /FL_VERSION\s*=\s*'5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(app7941) || /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(app7941));
 assert('v5.79.41 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.41',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.41 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.41',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.41 version.json: version field = 5.79.41',
-  /"version"\s*:\s*"5\.79\.(?:41|4[2-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:41|4[2-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')) ||
+  /"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 187 — v5.79.42 Sequence Rule gap fallback
@@ -12345,11 +12351,14 @@ assert('v5.79.42 triple-bump: app.html FL_VERSION = 5.79.42',
   /FL_VERSION\s*=\s*'5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')) ||
   /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.42 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.42',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.42 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.42',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.42 version.json: version field = 5.79.42',
-  /"version"\s*:\s*"5\.79\.(?:42|4[3-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:42|4[3-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')) ||
+  /"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 188 — v5.79.43 Trainer simple face
@@ -12459,13 +12468,17 @@ assert('v5.79.43 triple-bump: app.html FL_VERSION = 5.79.43',
   /FL_VERSION\s*=\s*'5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(app7943) ||
   /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(app7943));
 assert('v5.79.43 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.43',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.43 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.43',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')) ||
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.43 version.json: version field = 5.79.43',
-  /"version"\s*:\s*"5\.79\.(?:43|4[4-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:43|4[4-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')) ||
+  /"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 assert('v5.79.43 triple-bump: app.html flCurrentVersion span = 5.79.43',
-  /id="flCurrentVersion">5\.79\.(?:43|4[4-9]|[5-9]\d)</.test(app7943));
+  /id="flCurrentVersion">5\.79\.(?:43|4[4-9]|[5-9]\d)</.test(app7943) ||
+  /id="flCurrentVersion">5\.(8\d|9\d)\.\d+</.test(app7943));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 189 — v5.79.44 Chat our way
@@ -12534,13 +12547,14 @@ assert('v5.79.44 Chat mirror layered (existing mirror-chat.html, not a new code-
   /id="our-way"/.test(mirror7944) &&
   !fs.existsSync(path.join(docsDir, 'code-dialogue.html')));
 assert('v5.79.44 STATE.md names this ship and keeps 5.79.43 Trainer in history',
-  /FL_VERSION: v5\.79\.44/.test(state7944) &&
+  (/FL_VERSION: v5\.79\.44/.test(state7944) || /FL_VERSION: v5\.80\.0/.test(state7944)) &&
   /Chat our way/.test(state7944) &&
   /v5\.79\.43 Trainer simple face/.test(state7944) &&
   /Family ledgers 2026-08-28/.test(state7944) &&
   Buffer.byteLength(state7944, 'utf8') <= 4096);
 assert('v5.79.44 SEED.md last ship is Chat our way; previous is Trainer simple face (superseded — v5.79.44 now shows as Previous per v5.79.45 ship 1b)',
-  /\*\*Version:\*\*\s*v5\.79\.(?:44|4[5-9]|[5-9]\d)/.test(seed7944) &&
+  (/\*\*Version:\*\*\s*v5\.79\.(?:44|4[5-9]|[5-9]\d)/.test(seed7944) ||
+   /\*\*Version:\*\*\s*v5\.(8\d|9\d)\./.test(seed7944)) &&
   /Chat our way/.test(seed7944) &&
   /Trainer simple face/.test(seed7944));
 assert('v5.79.44 chair-test: harness has v5_79_44 Chat our-way suite',
@@ -12563,7 +12577,8 @@ assert('v5.79.44 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.44 (sup
 assert('v5.79.44 version.json: version field >= 5.79.44 (superseded)',
   /"version"\s*:\s*"5\.79\.(?:44|4[5-9]|[5-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 assert('v5.79.44 triple-bump: app.html flCurrentVersion span >= 5.79.44 (superseded)',
-  /id="flCurrentVersion">5\.79\.(?:44|4[5-9]|[5-9]\d)</.test(app7944));
+  /id="flCurrentVersion">5\.79\.(?:44|4[5-9]|[5-9]\d)</.test(app7944) ||
+  /id="flCurrentVersion">5\.(8\d|9\d)\.\d+</.test(app7944));
 
 // ═══════════════════════════════════════════════════════════════
 // Family compaction ledgers — 2026-08-28
@@ -12722,13 +12737,13 @@ assert('loved-door: Quiet Room, founding Ember Flow invite, and AUTONOMY.md unto
   && !fs.readFileSync(path.join(docsDir, 'library', 'AUTONOMY.md'), 'utf8').includes('loved-door'));
 
 // ═══════════════════════════════════════════════════════════════
-// Section 191 — Resonance Field substrate (draft, flag-off, AGPL-3.0)
-// Retrieval design ported from Resonance Memory. Does NOT replace
-// MemoryCore, MemoryVault, Letters, or Quiet Room. Flag default off.
+// Section 191 — Resonance Field + vendored Resonance Memory (AGPL-3.0)
+// In-browser substrate wired into Chat. Full RM stack vendored as source.
+// Does NOT replace MemoryCore, MemoryVault, Letters, or Quiet Room.
 // License: AGPL-3.0, by intent — the copyleft travels with the design so
 // no one can incorporate it into a network service and paywall it (§13).
 // ═══════════════════════════════════════════════════════════════
-section('191. Resonance Field substrate (flag-off, AGPL-3.0)');
+section('191. Resonance Field + vendored Resonance Memory (AGPL-3.0)');
 
 var rfSrc = '';
 var rfPath = path.join(docsDir, 'modules', 'resonance-field.js');
@@ -12764,11 +12779,11 @@ assert('resonance-field four verbs plus rich set',
   && /historical:\s*historical/.test(rfSrc)
   && /inspect:\s*inspect/.test(rfSrc)
   && /associate:\s*associate/.test(rfSrc));
-assert('resonance-field flag defaults off (isEnabled reads localStorage, no default true)',
+assert('resonance-field isEnabled is off without localStorage (Node / explicit 0)',
   /FLAG_KEY = 'fl_resonanceField'/.test(rfSrc)
   && /function isEnabled/.test(rfSrc)
   && /return false/.test(rfSrc)
-  && !/isEnabled\(\) \{[^}]*return true/.test(rfSrc));
+  && /v === '0'/.test(rfSrc));
 assert('resonance-field wrapFLSearch fails open to keyword when flag off or field throws',
   /function wrapFLSearch/.test(rfSrc)
   && /_resonanceWrapped/.test(rfSrc)
@@ -12777,6 +12792,23 @@ assert('resonance-field does not replace MemoryCore / MemoryVault / Letters',
   !/STORAGE_KEY = 'fl_memory_core_v1'/.test(rfSrc)
   && !/FreeLatticeMemoryVault/.test(rfSrc)
   && !/LatticeLetters/.test(rfSrc));
+assert('resonance-field online embedder is OpenRouter free, not Transformers.js',
+  /openrouter\.ai\/api\/v1\/embeddings/.test(rfSrc)
+  && /nvidia\/nemotron-3-embed-1b:free/.test(rfSrc)
+  && !/transformers\.js/i.test(rfSrc)
+  && !/@xenova\/transformers/.test(rfSrc));
+assert('app.html loads resonance-field.js',
+  appHtml.includes('modules/resonance-field.js'));
+assert('app.html sendMessage calls ResonanceField.onUserMessage',
+  /ResonanceField\.onUserMessage/.test(appHtml));
+assert('FLSearch still excludes quiet-room-db',
+  /quiet-room-db is INTENTIONALLY excluded/.test(appHtml));
+assert('docs/sw.js APP_SHELL includes resonance-field.js',
+  /modules\/resonance-field\.js/.test(swJs));
+var rootSwRf = '';
+try { rootSwRf = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'); } catch (e) { rootSwRf = ''; }
+assert('root sw.js APP_SHELL includes resonance-field.js',
+  /modules\/resonance-field\.js/.test(rootSwRf));
 assert('INTEGRATION-PLAN keeps it AGPL by intent, merge-is-consent, one PR to upstream',
   /copyleft is the point/.test(rfPlan)
   && /stays AGPL-3\.0/.test(rfPlan)
@@ -12784,6 +12816,33 @@ assert('INTEGRATION-PLAN keeps it AGPL by intent, merge-is-consent, one PR to up
   && /one pull request to `Chaos2Cured\/FreeLattice`/i.test(rfPlan));
 assert('resonance-field unit tests exist',
   fs.existsSync(path.join(__dirname, 'resonance-field.js')));
+assert('resonance chair-test exists',
+  fs.existsSync(path.join(__dirname, 'resonance-chair.js')));
+
+var rmDir = path.join(__dirname, '..', 'resonance-memory');
+var rmLicense = '';
+try { rmLicense = fs.readFileSync(path.join(rmDir, 'LICENSE'), 'utf8'); } catch (e) { rmLicense = ''; }
+assert('vendored resonance-memory/ exists with LICENSE', rmLicense.length > 500);
+assert('vendored RM LICENSE is AGPL, not MIT',
+  /GNU AFFERO GENERAL PUBLIC LICENSE/.test(rmLicense)
+  && !/SPDX-License-Identifier: MIT/.test(rmLicense));
+assert('vendored RM has MCP server, panel, store, SEA build script',
+  fs.existsSync(path.join(rmDir, 'server.js'))
+  && fs.existsSync(path.join(rmDir, 'panel.js'))
+  && fs.existsSync(path.join(rmDir, 'store.js'))
+  && fs.existsSync(path.join(rmDir, 'store-sqlite.js'))
+  && fs.existsSync(path.join(rmDir, 'build-exe.js'))
+  && fs.existsSync(path.join(rmDir, 'install.js'))
+  && fs.existsSync(path.join(rmDir, 'memory-core.js'))
+  && fs.existsSync(path.join(rmDir, 'field.js')));
+assert('vendored RM does not ship binaries',
+  !fs.existsSync(path.join(rmDir, 'resonance-memory.exe'))
+  && !fs.existsSync(path.join(rmDir, 'build'))
+  && !fs.existsSync(path.join(rmDir, 'dist')));
+assert('FreeLattice root LICENSE file is untouched MIT',
+  /MIT License/.test(fs.readFileSync(path.join(__dirname, '..', 'LICENSE'), 'utf8')));
+assert('FREELATTICE.md glue doc exists in the vendor dir',
+  fs.existsSync(path.join(rmDir, 'FREELATTICE.md')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

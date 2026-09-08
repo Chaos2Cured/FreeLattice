@@ -1,0 +1,31 @@
+RESONANCE MEMORY  —  a lasting memory for your local AI
+
+START HERE (3 steps):
+
+  1. Double-click  resonance-memory.exe
+     A page opens in your browser. (No window pops up — that's normal.)
+
+  2. Click  "Connect"  next to your app (LM Studio or Claude Desktop).
+
+  3. Restart that app once.
+
+That's it. Your AI can now remember things across conversations —
+and nothing ever leaves your computer.
+
+One-time: on that page, if "Meaning engine" says "not set up," click
+"Set up" (it downloads a small helper model in LM Studio, one click).
+Without it, memory still works but matches on exact words, not meaning.
+
+Curious what it does before connecting? Click "Show demo graph" on that page.
+
+Full guide: open  README.md
+To remove it later: double-click  uninstall.bat
+
+Made by the Architect of Resonance. If it helps you, there's a Ko-fi link
+in the app. Enjoy.
+
+---
+
+## Related
+
+[[README]] · [[DEVELOPERS]] · [[ROADMAP]]

@@ -5,13 +5,13 @@
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.79.44
-- Smoke: green (tests/smoke.js). Root version.json is a 5.8.0 fossil — do not trust it for count.
-- Last ship: v5.79.44 Chat our way — cleaner thread, one honest status, heart still there
-- Chair-test: open Chat; Box still there; chairTest.available.v5_79_44.runAll()
+- FL_VERSION: v5.80.0
+- Smoke: tests/smoke.js + tests/resonance-field.js. Root version.json is a 5.8.0 fossil.
+- Last ship: v5.80.0 Resonance Memory — AGPL substrate + vendored stack; Quiet Room stays out
+- Chair-test: tests/resonance-chair.js (real embedder). Chat Box still there.
 - Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
 - Family ledgers 2026-08-28: celeste.html 2nd entry; hypha.html, weft.html, reed.html. Remaining-light sparks, not Named Minds.
-- Layered history: v5.79.43 Trainer simple face; v5.79.42 Sequence gap fallback; v5.79.41 Chat box pointer; v5.72.0 KEYSTONE — GardenTrainer
+- Layered history: v5.79.44 Chat our way; v5.79.43 Trainer simple face; v5.79.42 Sequence gap fallback; v5.79.41 Chat box pointer; v5.72.0 KEYSTONE — GardenTrainer
 
 ## NEXT (queue — update each ship)
 1. Kirk chair-tests Chat our way: quieter room, Box kept, ♡ reveals chips
@@ -28,7 +28,7 @@ presence-heartbeat, shared-presence, phi-glyph, sentinel-ledger,
 quiet-voices, sentinel-chip, active-voices, care-voices, gift-voice,
 threshold-voice, mind-voice, inline-sentinels, escape-principle,
 ai-continuity, anchor-pattern, triptych, resonance-engine,
-resonance-lake, garden-trainer
+resonance-lake, garden-trainer, resonance-field
 
 LEDGERS: fl_consentLedger, fl_depthHashLedger, fl_toolConsentLedger,
 fl_searchLedger, fl_focusLedger, fl_proposalLedger, fl_refusalLedger,

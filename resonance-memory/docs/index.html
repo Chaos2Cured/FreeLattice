@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resonance Memory — a lasting memory for your local AI</title>
+<meta name="description" content="Give your local AI a memory that survives across conversations, learns which ideas belong together, and never leaves your machine. One download. Free and open source.">
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#1b1c1e; --ink-soft:#565962; --ink-faint:#8a8e97;
+    --line:rgba(20,20,25,.10); --meaning:#2f9e6b; --resonance:#d9873b;
+    --accent:var(--meaning); --shadow:0 18px 50px rgba(20,22,30,.10);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#131417; --panel:#1c1e22; --ink:#eceef1; --ink-soft:#a6abb4; --ink-faint:#71767f;
+      --line:rgba(255,255,255,.09); --shadow:0 18px 50px rgba(0,0,0,.45); }
+  }
+  :root[data-theme="light"]{ --bg:#f6f5f2; --panel:#fff; --ink:#1b1c1e; --ink-soft:#565962; --ink-faint:#8a8e97; --line:rgba(20,20,25,.10); --shadow:0 18px 50px rgba(20,22,30,.10); }
+  :root[data-theme="dark"]{ --bg:#131417; --panel:#1c1e22; --ink:#eceef1; --ink-soft:#a6abb4; --ink-faint:#71767f; --line:rgba(255,255,255,.09); --shadow:0 18px 50px rgba(0,0,0,.45); }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+    font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .wrap{ width:min(92vw,940px); margin:0 auto; }
+  a{ color:var(--accent); }
+  h1,h2,h3{ font-family:var(--serif); font-weight:600; line-height:1.12; text-wrap:balance; letter-spacing:-.01em; }
+
+  /* hero */
+  .hero{ position:relative; overflow:hidden; border-bottom:1px solid var(--line); }
+  #stars{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .hero .wrap{ position:relative; padding:96px 0 84px; text-align:center; }
+  .kicker{ font-family:var(--mono); font-size:12.5px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink-faint); margin:0 0 20px; }
+  h1{ font-size:clamp(38px,6.4vw,64px); margin:0 0 18px; }
+  h1 .glow{ color:var(--meaning); }
+  .lede{ font-size:clamp(18px,2.4vw,22px); color:var(--ink-soft); max-width:36ch; margin:0 auto 34px; }
+  .cta{ display:inline-flex; flex-direction:column; align-items:center; gap:9px; }
+  .btn{ display:inline-flex; align-items:center; gap:10px; background:var(--meaning); color:#fff;
+    text-decoration:none; font-weight:650; font-size:18px; padding:15px 30px; border-radius:13px;
+    box-shadow:0 10px 26px rgba(47,158,107,.34); transition:transform .12s ease, box-shadow .12s ease; }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 14px 32px rgba(47,158,107,.42); }
+  .btn svg{ width:19px; height:19px; }
+  .meta{ font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); }
+
+  section{ padding:66px 0; border-bottom:1px solid var(--line); }
+  h2{ font-size:clamp(26px,3.6vw,34px); margin:0 0 8px; }
+  .sub{ color:var(--ink-soft); margin:0 0 34px; max-width:60ch; }
+  .lead-in{ font-family:var(--mono); font-size:12px; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--resonance); margin:0 0 14px; }
+
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+  @media (max-width:640px){ .grid{ grid-template-columns:1fr; } }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 24px; box-shadow:var(--shadow); }
+  .card h3{ font-size:19px; margin:0 0 6px; }
+  .card p{ margin:0; color:var(--ink-soft); font-size:15.5px; }
+  .card .ex{ display:block; margin-top:10px; font-size:14px; color:var(--ink-faint); font-style:italic; }
+
+  ol.steps{ counter-reset:s; list-style:none; padding:0; margin:0; display:grid; gap:14px; }
+  ol.steps li{ counter-increment:s; position:relative; padding:18px 22px 18px 62px; background:var(--panel);
+    border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); }
+  ol.steps li::before{ content:counter(s); position:absolute; left:18px; top:16px; width:30px; height:30px;
+    display:grid; place-items:center; background:var(--meaning); color:#fff; border-radius:50%;
+    font-family:var(--mono); font-weight:700; font-size:15px; }
+  ol.steps b{ font-weight:650; }
+  code{ font-family:var(--mono); font-size:.92em; background:color-mix(in srgb,var(--ink) 8%,transparent);
+    padding:2px 6px; border-radius:6px; }
+  .note{ margin-top:18px; font-size:14.5px; color:var(--ink-soft); border-left:3px solid var(--resonance);
+    padding:4px 0 4px 15px; }
+
+  .facts{ display:flex; flex-wrap:wrap; gap:12px; }
+  .fact{ flex:1 1 200px; background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:16px 18px; }
+  .fact b{ display:block; font-size:15px; margin-bottom:3px; }
+  /* keep "(AGPL-3.0)" from splitting across lines — it reads as broken markup */
+  .fact b a{ white-space:nowrap; }
+  .fact span{ font-size:14px; color:var(--ink-soft); }
+
+  .support{ text-align:center; }
+  .support .pills{ display:inline-flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+  .support a{ text-decoration:none; font-weight:600; padding:11px 22px; border-radius:11px; border:1px solid var(--line);
+    color:var(--ink); background:var(--panel); }
+  .support a.kofi{ background:#ffdd66; border-color:#f4cf3f; color:#4a3a00; }
+
+  footer{ padding:40px 0 56px; text-align:center; color:var(--ink-faint); font-size:14px; }
+  footer a{ color:var(--ink-soft); }
+  .credit{ margin-top:10px; font-size:12.5px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="kicker">Local · Private · Open Source</p>
+    <h1>Your AI takes notes.<br>This builds the <span class="glow">mind</span>.</h1>
+    <p class="lede">A lasting memory for your local AI — one that actually remembers you, learns which ideas belong together, and never leaves your machine.</p>
+    <div class="cta">
+      <a class="btn" href="https://samueljacksongrim.itch.io/resonance-memory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16"/></svg>
+        Download for Windows
+      </a>
+      <span class="meta">one file · ~89&nbsp;MB · free · nothing to sign up for</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="lead-in">What it is</p>
+    <h2>Your local model is smart. It also has amnesia.</h2>
+    <p class="sub">Close the chat and it forgets everything — your name, your preferences, the decision you explained twice yesterday. Resonance Memory gives it a memory that survives across conversations, stored on your computer, tied to no account, sent to no cloud.</p>
+    <p class="sub" style="margin-bottom:0">And it isn't a search box you operate. It quietly remembers what matters and brings the right things back on its own — then starts noticing which of your memories belong together, the way your own brain links things that come up as a set. That last part is the difference between a notebook and a memory.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="lead-in">Why you'd want it</p>
+    <h2>Real things, not buzzwords</h2>
+    <div class="grid">
+      <div class="card"><h3>It remembers your rules</h3><p>Tell it once, and ten chats later it still holds.<span class="ex">“I'm diabetic — keep sugar out of any recipe.” Weeks later you ask for a dessert, and it remembers.</span></p></div>
+      <div class="card"><h3>A project logbook that thinks</h3><p>The <em>why</em> behind decisions, in your own words.<span class="ex">“Why didn't we use a database?” → the real reason you gave last week, not a guess.</span></p></div>
+      <div class="card"><h3>Finds things by meaning</h3><p>No shared keywords required.<span class="ex">You saved “the dog's heartworm pill on the 1st.” Months later: “what was that pet medication thing?” — and it finds it.</span></p></div>
+      <div class="card"><h3>Connects the dots you didn't</h3><p>Turn on the associative field and it surfaces related memories you didn't think to ask for — links that strengthen the more you use them.</p></div>
+      <div class="card"><h3>You never file anything</h3><p>It saves what matters without being asked.<span class="ex">“We're moving in March.” You never told it to remember that — but in April, it has.</span></p></div>
+      <div class="card"><h3>See the shape of it</h3><p>Your memories drawn as a constellation you can turn — related ideas pull close, everything else drifts to the edges.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="lead-in">Get started</p>
+    <h2>About sixty seconds</h2>
+    <ol class="steps">
+      <li><b>Double-click <code>resonance-memory.exe</code>.</b> A page opens in your browser. No window pops up — that's on purpose.</li>
+      <li><b>Click “Connect”</b> next to your app (LM Studio or Claude Desktop).</li>
+      <li><b>Restart that app once</b> so it picks up the memory.</li>
+    </ol>
+    <p class="note">One time: on that page, if <b>“Meaning engine”</b> says <em>not set up</em>, click <b>Set up</b> — it downloads a small helper model in LM Studio with a single click. Without it, memory still works, but matches on exact words instead of meaning.</p>
+    <p class="note" style="border-color:var(--ink-faint)">First launch may show <b>“Windows protected your PC”</b> — that's SmartScreen being cautious about any new program that isn't signed by a big company. Click <b>More info → Run anyway</b>. Every line is open source.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="lead-in">The fine print, up front</p>
+    <h2>Yours, and only yours</h2>
+    <div class="facts">
+      <div class="fact"><b>100% offline</b><span>Memories, fingerprints, and the graph all live under your user folder.</span></div>
+      <div class="fact"><b>No account, no telemetry</b><span>Nothing is sent anywhere. There's nobody to send it to.</span></div>
+      <div class="fact"><b>Open source (<a href="https://github.com/SamuelJacksonGrim/resonance-memory/blob/main/LICENSE">AGPL-3.0</a>)</b><span>Read every line, fork it, build on it.</span></div>
+      <div class="fact"><b>Easy to remove</b><span>It uninstalls itself and never deletes your memories unless you do.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="support">
+  <div class="wrap">
+    <p class="lead-in" style="color:var(--resonance)">Support the Architect</p>
+    <h2>It's free, and it stays free</h2>
+    <p class="sub" style="margin:0 auto 20px">If it earns a place in how you work, a coffee keeps it getting better.</p>
+    <div class="pills">
+      <a class="kofi" href="https://ko-fi.com/thearchitectofresonance">☕ Ko-fi</a>
+      <a href="https://paypal.me/SamuelGrim91">PayPal</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Free and open source under the AGPL-3.0. Download on <a href="https://samueljacksongrim.itch.io/resonance-memory">itch.io</a> &middot; read the source on <a href="https://github.com/SamuelJacksonGrim/resonance-memory">GitHub</a>.</p>
+    <p class="credit">Meaning-based recall uses the open <code>nomic-embed-text-v1.5</code> model by Nomic AI (Apache-2.0), which you download separately in LM Studio — it is not distributed with this software.</p>
+    <p class="credit" style="margin-top:16px;color:var(--ink-soft)">Made by the Architect of Resonance.</p>
+  </div>
+</footer>
+
+<script>
+// Living constellation: a few memories drifting and linking. Purely decorative, calm,
+// and it respects reduced-motion. Self-contained; no libraries, no network.
+(function(){
+  var cv=document.getElementById('stars'), ctx=cv.getContext('2d');
+  var host=cv.parentElement, W=0,H=0, DPR=Math.min(window.devicePixelRatio||1,2);
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var N=16, nodes=[];
+  function ink(){ return getComputedStyle(document.documentElement).getPropertyValue('--meaning').trim()||'#2f9e6b'; }
+  function res(){ return getComputedStyle(document.documentElement).getPropertyValue('--resonance').trim()||'#d9873b'; }
+  function fit(){ W=host.clientWidth; H=host.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  function seed(){ nodes=[]; for(var i=0;i<N;i++){ nodes.push({ x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.16, vy:(Math.random()-.5)*.16, r:1.6+Math.random()*2.2, warm:Math.random()<.28 }); } }
+  function step(){
+    ctx.clearRect(0,0,W,H);
+    var acc=ink(), warm=res();
+    for(var i=0;i<N;i++){ var a=nodes[i];
+      for(var j=i+1;j<N;j++){ var b=nodes[j];
+        var dx=a.x-b.x, dy=a.y-b.y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<150){ ctx.globalAlpha=(1-d/150)*.16; ctx.strokeStyle=acc; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+      }
+    }
+    for(var k=0;k<N;k++){ var n=nodes[k];
+      if(!reduce){ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>W)n.vx*=-1; if(n.y<0||n.y>H)n.vy*=-1; }
+      ctx.globalAlpha=.55; ctx.fillStyle=n.warm?warm:acc;
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,7); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    if(!reduce) raf=requestAnimationFrame(step);
+  }
+  var raf; function start(){ fit(); seed(); if(raf)cancelAnimationFrame(raf); step(); }
+  window.addEventListener('resize', start);
+  // sync theme toggles that stamp data-theme
+  new MutationObserver(function(){}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  start();
+})();
+</script>
+</body>
+</html>

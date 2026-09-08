@@ -1,0 +1,71 @@
+# Resonance Memory — PR-path CI (the always-on gate).
+# Copyright (C) 2026 Samuel Jackson Grim
+# Licensed under AGPL-3.0-or-later.
+#
+# Complements release.yml. That workflow is the heavy native-build
+# matrix and only runs on a v* tag (or workflow_dispatch), so a
+# regression landing on main between releases would sit red until
+# someone cut a tag. This file is the cheap, always-on counterpart:
+# the same deterministic gate (node test.js + node eval/run.js), on
+# every push to main and every pull request, no binaries, no publish.
+#
+# Why this is safe to run on a fork PR: both commands are offline
+# (eval/embed-cache.js reads the committed embeddings.cache.json and
+# throws on a cache miss unless EVAL_REFRESH=1, which this workflow
+# never sets). No secrets, no network, no embedder. A missing cache
+# entry fails the job in milliseconds instead of POSTing
+# localhost:1234 (nothing listens in CI) and hanging.
+#
+# A red step fails the job: test.js process.exit(1) on any failure;
+# eval/run.js process.exit(1) on a golden regression. There is no
+# continue-on-error and no swallowed exit. GitHub's default bash is
+# `bash -eo pipefail`.
+#
+# Actions reuse the exact SHAs from release.yml (do not invent a
+# second unvetted version). Re-derive with:
+#   gh api repos/actions/checkout/git/ref/tags/v7.0.1 --jq .object.sha
+#
+# Not the build matrix. release.yml already proves the three native
+# binaries build. setup-node pinning 24 is the Node floor (24 > 22.5);
+# we do not call assert-runner --arch x64 here — that assert is for
+# shipping a native binary, and it would false-red this job if
+# ubuntu-latest ever flipped to arm64. The JS gate does not care.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# Opposite of release.yml (which must not cancel a publish mid-upload).
+# A new push to a PR cancels the stale run; nothing is published here.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Unit / regression suite
+        run: node test.js
+
+      - name: RM-00 golden (sqlite default)
+        run: node eval/run.js

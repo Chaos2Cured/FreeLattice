@@ -1,0 +1,33 @@
+{
+  "name": "resonance-memory",
+  "version": "0.2.0",
+  "private": true,
+  "description": "A local memory for your AI. An MCP memory server a small model cannot misuse. Nothing leaves your machine.",
+  "license": "AGPL-3.0-or-later",
+  "author": "Samuel Jackson Grim",
+  "type": "commonjs",
+  "main": "entry.js",
+  "bin": { "resonance-memory": "entry.js" },
+  "engines": { "node": ">=22.5" },
+  "scripts": {
+    "test": "node test.js",
+    "build": "node build-exe.js",
+    "mcp": "node server.js",
+    "panel": "node panel.js",
+    "seed": "node build-demo-seed.js",
+    "inspect": "node inspect_sidecar.js",
+    "dedup-existing": "node entry.js --dedup-existing",
+    "migrate": "node entry.js --migrate",
+    "export": "node entry.js --export",
+    "import": "node entry.js --import",
+    "eval": "node eval/run.js",
+    "measure": "node eval/measure.js",
+    "scale": "node eval/substrate/scale.js",
+    "soak": "node eval/soak/run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SamuelJacksonGrim/resonance-memory.git"
+  },
+  "keywords": ["mcp", "memory", "llm", "local-first", "embeddings", "associative-memory"]
+}

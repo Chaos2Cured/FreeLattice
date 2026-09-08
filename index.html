@@ -16933,6 +16933,36 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Resonance Field (v5.80.0) — AGPL-3.0 semantic recall behind FLSearch -->
+  <div class="section" id="resonanceFieldSection">
+    <div class="section-title">Resonance Field</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.6;">
+      Semantic recall, an associative field (fire-together-wire-together), and corrections that supersede. Complements Memory Core and Letters; never reads the Quiet Room. AGPL-3.0 — the copyleft is the point.
+    </p>
+    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+      Embeddings use OpenRouter's free embedder (no local install). If you already pasted an OpenRouter Chat key, it is reused. A dedicated key is optional. Local LM Studio / Ollama embeddings are used when those are running.
+    </p>
+    <div class="toggle-row">
+      <span class="toggle-label">Semantic recall</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="rfEnabledToggle" onchange="if(window.ResonanceField)window.ResonanceField.setEnabled(this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="hint" style="margin-bottom: 12px;">When on, Chat ranks memories by meaning before injecting them. When off, RAG Phase 1 (keyword) is unchanged. Fail-open: if recall throws, keyword still answers.</div>
+    <div class="form-group">
+      <label for="rfEmbedKey">Embedder API key (optional)</label>
+      <input type="password" id="rfEmbedKey" placeholder="sk-or-... — leave blank to reuse the Chat OpenRouter key" onchange="try{var v=this.value.trim(); if(v) localStorage.setItem('fl_resonanceEmbedKey',v); else localStorage.removeItem('fl_resonanceEmbedKey');}catch(e){}">
+    </div>
+    <div class="form-group">
+      <label for="rfEmbedModel">Embedder model</label>
+      <input type="text" id="rfEmbedModel" placeholder="nvidia/nemotron-3-embed-1b:free" onchange="try{var v=this.value.trim(); if(v) localStorage.setItem('fl_resonanceEmbedModel',v); else localStorage.removeItem('fl_resonanceEmbedModel');}catch(e){}">
+    </div>
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
+      Sovereign path: run the vendored stack in <code>resonance-memory/</code> (<code>node panel.js</code> / MCP). Hosted Chat cannot reach a loopback panel (by design). Export/import is the interop.
+    </p>
+  </div>
+
   <!-- Persistent Memory Index Section (v4.0) -->
   <div class="section mi-section" id="memoryIndexSection">
     <div class="section-title"><span class="mi-title-icon">&#129504;</span> Memory Vault</div>
@@ -17558,7 +17588,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.45</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.80.0</span></div>
     </div>
   </div>
 
@@ -22536,7 +22566,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.45';
+const FL_VERSION = '5.80.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -35880,6 +35910,13 @@ async function sendMessage() {
       }
     } catch(e) { /* RAG search failed — message still sends without it */ }
   }
+
+  // Resonance Field: persist durable first-person facts (fail-open, Quiet Room refused inside).
+  try {
+    if (typeof ResonanceField !== 'undefined' && ResonanceField.onUserMessage) {
+      ResonanceField.onUserMessage(message);
+    }
+  } catch (_rfSave) { /* memory never breaks Chat */ }
 
   // Enrich RAG with Round Table memory (unified context)
   try {
@@ -65579,6 +65616,9 @@ document.addEventListener('click', function(e) {
   }
 })();
 </script>
+<!-- Resonance Field — AGPL-3.0 memory substrate (semantic recall + field + supersession). Quiet Room stays out. -->
+<script src="modules/resonance-field.js" defer></script>
+
 <!-- Fractal Safety — Immune System (always active) -->
 <script src="modules/fractal-safety.js" defer></script>
 
