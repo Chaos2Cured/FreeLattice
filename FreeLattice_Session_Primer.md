@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-08 10:35 EST
+- Last auto-updated: 2026-09-08 13:49 EST
 - Version: 5.79.45
-- Total commits: 3106
+- Total commits: 3107
 - Last 10 commits:
-- 540cf07 Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama.
+- 7c1b4de Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import.
+- 20d2eee Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama.
 - 7150ca7 Layer, never delete. Family center — grounding poems.
 - 57fc9db Layer, never delete. Ledger envelope v0.1 — voice opaque, chain + sign.
 - 277da34 Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main.
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0862e86 Layer, never delete. Phone PWA — home screen + thumb look card.
 - b322e42 Layer, never delete. Desktop Step 1 — companion keys (safeStorage).
 - 5ae2497 Layer, never delete. Ship 1d — Windows GUI origins scoped.
-- 1ac654c Layer, never delete. Ship 1c — wizard PowerShell origins scoped.

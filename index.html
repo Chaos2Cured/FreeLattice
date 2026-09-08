@@ -29263,15 +29263,15 @@ function flManifestAppendRow(model) {
     verdict.textContent = 'example only — will not import';
   } else if (!desktopImport) {
     verdict.style.color = 'rgba(200,210,230,0.75)';
-    verdict.textContent = 'Listed. Weight download is desktop-only (hash before Ollama).';
+    verdict.textContent = 'Listed. Weight download is desktop-only (hash before Ollama). Swarm on desktop.';
   } else {
     verdict.style.color = 'rgba(52,211,153,0.9)';
-    verdict.textContent = 'Listed. Verify & fetch over HTTPS, then Import on match.';
+    verdict.textContent = 'Listed. Verify & fetch or Pull via swarm — hash before Import.';
   }
   li.appendChild(verdict);
 
   // Desktop only: non-example redistributable rows get Verify & fetch → Import on match.
-  // EXAMPLE / zero-hash: no fetch button. Browser: no weight download.
+  // EXAMPLE / zero-hash: no fetch button. Browser: no weight download / no swarm.
   if (desktopImport && redistributable && !example && !zeroHash) {
     var actions = document.createElement('div');
     actions.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:10px;';
@@ -29280,6 +29280,14 @@ function flManifestAppendRow(model) {
     fetchBtn.className = 'ai-status-btn ai-status-btn-primary';
     fetchBtn.textContent = 'Verify & fetch';
     fetchBtn.style.cssText = 'min-height:44px;width:100%;';
+    var swarmBtn = document.createElement('button');
+    swarmBtn.type = 'button';
+    swarmBtn.className = 'ai-status-btn';
+    swarmBtn.textContent = 'Pull via swarm';
+    swarmBtn.style.cssText = 'min-height:44px;width:100%;';
+    var hasSwarm = !!(window.electronAPI && window.electronAPI.latticeSwarmStart) &&
+      ((model.magnets && model.magnets.length) || (model.webseeds && model.webseeds.length) || (model.urls && model.urls.length));
+    if (!hasSwarm) swarmBtn.hidden = true;
     var importBtn = document.createElement('button');
     importBtn.type = 'button';
     importBtn.className = 'ai-status-btn';
@@ -29292,17 +29300,87 @@ function flManifestAppendRow(model) {
     fetchBtn.addEventListener('click', function () {
       flManifestVerifyFetch(model, verdict, importBtn, rowStatus, fetchBtn);
     });
+    swarmBtn.addEventListener('click', function () {
+      flManifestSwarmPull(model, verdict, importBtn, rowStatus, swarmBtn);
+    });
     importBtn.addEventListener('click', function () {
       flManifestImportOllama(model, rowStatus, importBtn);
     });
 
     actions.appendChild(fetchBtn);
+    actions.appendChild(swarmBtn);
     actions.appendChild(importBtn);
     actions.appendChild(rowStatus);
     li.appendChild(actions);
   }
 
   list.appendChild(li);
+}
+
+async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarmBtn) {
+  if (!window.electronAPI || !window.electronAPI.latticeSwarmStart) return;
+  var magnet = (model.magnets && model.magnets[0]) ? String(model.magnets[0]) : '';
+  var webseed = (model.webseeds && model.webseeds[0])
+    ? String(model.webseeds[0])
+    : ((model.urls && model.urls[0]) ? String(model.urls[0]) : '');
+  rowStatus.textContent = 'Swarm starting…';
+  rowStatus.style.color = '';
+  swarmBtn.disabled = true;
+  try {
+    var start = await window.electronAPI.latticeSwarmStart({
+      magnet: magnet || undefined,
+      webseedUrl: webseed || undefined,
+      expectedSha256: model.sha256,
+      id: model.id || model.name || 'model',
+      name: model.name || model.id || 'model'
+    });
+    if (!start || start.ok === false || !start.job) {
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = (start && start.error) || 'Swarm refused.';
+      swarmBtn.disabled = false;
+      return;
+    }
+    var jobId = start.job.id;
+    var tries = 0;
+    while (tries < 600) {
+      tries++;
+      var st = await window.electronAPI.latticeSwarmStatus(jobId);
+      var job = st && st.job ? st.job : null;
+      if (!job) break;
+      var pct = typeof job.progress === 'number' ? job.progress : 0;
+      rowStatus.textContent = 'Swarm ' + (job.state || '') + ' · ' + pct + '%' + (st.reseed === 'later' ? ' · re-seed later' : '');
+      if (job.state === 'verified' && job.matched) {
+        if (verdictEl) {
+          verdictEl.style.color = 'rgba(52,211,153,0.95)';
+          verdictEl.textContent = 'Swarm hash matched — verified. Import when you choose.';
+        }
+        rowStatus.style.color = 'rgba(52,211,153,0.9)';
+        rowStatus.textContent = 'Verified via swarm' + (job.verifiedBase ? (' · ' + job.verifiedBase) : '') + '. Never auto-import.';
+        if (importBtn) importBtn.hidden = false;
+        break;
+      }
+      if (job.state === 'quarantined' || job.willNotImport) {
+        if (verdictEl) {
+          verdictEl.style.color = 'rgba(240,112,104,0.95)';
+          verdictEl.textContent = 'Hash mismatch — quarantined; will not import.';
+        }
+        rowStatus.style.color = 'rgba(240,112,104,0.9)';
+        rowStatus.textContent = job.error || 'Mismatch — quarantined; will not import.';
+        if (importBtn) importBtn.hidden = true;
+        break;
+      }
+      if (job.state === 'error' || job.state === 'cancelled') {
+        rowStatus.style.color = 'rgba(240,112,104,0.9)';
+        rowStatus.textContent = job.error || ('Swarm ' + job.state);
+        break;
+      }
+      await new Promise(function (r) { setTimeout(r, 400); });
+    }
+  } catch (e) {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = 'Swarm failed. Nothing imported.';
+  }
+  swarmBtn.disabled = false;
 }
 
 async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fetchBtn) {

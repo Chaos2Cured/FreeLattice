@@ -106,6 +106,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeImportToOllama: (opts) => ipcRenderer.invoke('lattice-import-to-ollama', opts),
 
   /**
+   * Swarm bridge v0.1 — start magnet/webseed pull in main. Returns job id/state.
+   * @param {{ magnet?: string, webseedUrl?: string, expectedSha256: string, id?: string, name?: string }} opts
+   */
+  latticeSwarmStart: (opts) => ipcRenderer.invoke('lattice-swarm-start', opts),
+
+  /**
+   * Swarm job status — progress % + state strings only.
+   * @param {string} [id]
+   */
+  latticeSwarmStatus: (id) => ipcRenderer.invoke('lattice-swarm-status', id),
+
+  /**
+   * Cancel a swarm job.
+   * @param {string} id
+   */
+  latticeSwarmCancel: (id) => ipcRenderer.invoke('lattice-swarm-cancel', id),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function

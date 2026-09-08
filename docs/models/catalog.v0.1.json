@@ -1,7 +1,7 @@
 {
   "version": "0.1",
   "updated": "2026-09-08",
-  "note": "Lawful HTTPS catalog. EXAMPLE zero-hash will not import. fixture.verify-only has a real sha256 for desktop hash-before-import smoke.",
+  "note": "Lawful HTTPS catalog. EXAMPLE zero-hash will not import. fixture.verify-only has real sha256 + webseeds for desktop swarm→hash smoke.",
   "models": [
     {
       "id": "example.local-friendly.3b",
@@ -23,7 +23,10 @@
       "urls": [
         "https://freelattice.com/models/fixture-verify-only.txt"
       ],
-      "notes": "FIXTURE — tiny real sha256 for hash-before-import smoke. Not a model weight."
+      "webseeds": [
+        "https://freelattice.com/models/fixture-verify-only.txt"
+      ],
+      "notes": "FIXTURE — tiny real sha256 for hash-before-import + swarm webseed smoke. Not a model weight."
     }
   ]
 }
