@@ -1,0 +1,18 @@
+{
+  "version": "0.1",
+  "updated": "2026-09-08",
+  "note": "EXAMPLE catalog — zero sha256 means do not import. Lawful HTTPS list only.",
+  "models": [
+    {
+      "id": "example.local-friendly.3b",
+      "name": "Example local-friendly 3B (placeholder)",
+      "license": "Apache-2.0",
+      "redistributable": true,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "urls": [
+        "https://freelattice.com/models/example-placeholder.txt"
+      ],
+      "notes": "EXAMPLE ONLY — zero hash means do not import"
+    }
+  ]
+}

@@ -32,6 +32,7 @@ Fibonacci up, zero down on hash mismatch. Rolling 30-day window beside the long 
 ## Part 4 — Model manifests
 `license` and `redistributable` are load-bearing. A seeder refuses what it cannot lawfully redistribute. Lawyer review before seeding ships.
 **Pipeline order (safety-critical):** acceptable signer → tier gate → licence → **hash the file** → only then import. Mismatch → quarantine (evidence), peer tier reset, one-hop warn. Hash before import, always.
+**LAYER (2026-09-08):** v0.1 read-only HTTPS catalog + refuse rules live in [MODEL_MANIFEST_v0.1.md](./MODEL_MANIFEST_v0.1.md) and `docs/models/catalog.v0.1.json`. Download / Ollama import / BitTorrent wait.
 ## Part 5 — Mesh pointers
 Mesh carries presence, chat, and pointers. Never weights. Manual handshake stays (Sybil resistance). Message shapes: `holds`, `vouch`, `warn` (one hop). Context tags, not raw fingerprints.
 ## Part 6 — Distributed network
