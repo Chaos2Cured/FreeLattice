@@ -20,6 +20,7 @@
     "files": [
       "main.js",
       "preload.js",
+      "lattice-keys.js",
       "app/**/*"
     ],
     "mac": {

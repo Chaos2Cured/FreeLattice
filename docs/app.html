@@ -16554,6 +16554,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <ul id="fl-manifest-list" style="list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px;"></ul>
   </div>
 
+  <!-- Layer: Companion identity v0.1 — desktop only. Public fingerprint. textContent only. No phrase UI. -->
+  <div id="fl-companion-identity-card" class="fl-card" hidden style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Companion identity</h3>
+    <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 8px;">Public fingerprint only. Seed stays in main. Sign never leaves the companion.</p>
+    <p style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);margin:0;line-height:1.55;">Companion fingerprint: <span id="fl-companion-fp" style="color:var(--gold,#e8b019);word-break:break-all;"></span></p>
+    <p id="fl-companion-identity-status" style="font-size:0.78rem;color:var(--text-muted);margin:8px 0 0;min-height:1.2em;"></p>
+  </div>
+
   <!-- Browser AI — zero setup, runs in the browser via WebLLM -->
   <div id="browserAICard" style="display:none;margin-bottom:14px;" class="fl-card" >
     <h3 style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin:0 0 6px;">&#x1F310; Browser AI &mdash; Zero Setup</h3>
@@ -29273,6 +29281,65 @@ async function flFetchModelManifest() {
     flManifestSetStatus('Listed ' + shown + ' entr' + (shown === 1 ? 'y' : 'ies') + '. Read-only. No download. No import.', 'ok');
   } catch (e) {
     flManifestSetStatus('Could not read that catalog. Nothing was imported.', 'warn');
+  }
+}
+
+
+// ── Companion identity v0.1 — desktop only. Public fingerprint. textContent only. ──
+function flCompanionShortFp(hex) {
+  var s = String(hex || '');
+  if (!s) return '';
+  if (s.length <= 16) return s;
+  return s.slice(0, 8) + '…' + s.slice(-6);
+}
+
+async function flInitCompanionIdentity() {
+  var card = document.getElementById('fl-companion-identity-card');
+  var fpEl = document.getElementById('fl-companion-fp');
+  var stEl = document.getElementById('fl-companion-identity-status');
+  if (!card || !fpEl) return;
+  // Browser: no seed — keep card hidden/absent from the walk.
+  if (!(window.isElectronApp || window.electronAPI) || !window.electronAPI || !window.electronAPI.latticeKeyStatus) {
+    card.hidden = true;
+    return;
+  }
+  card.hidden = false;
+  try {
+    var st = await window.electronAPI.latticeKeyStatus();
+    if (!st || !st.hasKey) {
+      if (st && st.encryptionAvailable && window.electronAPI.latticeKeyCreate) {
+        if (stEl) stEl.textContent = 'Creating companion key in main…';
+        var created = await window.electronAPI.latticeKeyCreate();
+        if (created && created.ok === false) {
+          if (stEl) stEl.textContent = 'Could not create companion key. Keychain may be unavailable.';
+          fpEl.textContent = '—';
+          return;
+        }
+        st = await window.electronAPI.latticeKeyStatus();
+      } else {
+        if (stEl) stEl.textContent = 'No companion key yet. OS keychain required.';
+        fpEl.textContent = '—';
+        return;
+      }
+    }
+    var fp = (st && st.fingerprintHex) || '';
+    fpEl.textContent = flCompanionShortFp(fp) || '—';
+    if (stEl) {
+      stEl.textContent = fp
+        ? ('domain ' + ((st && st.domain) || 'lattice.pair.v1') + ' · public only · seed never to page')
+        : 'Fingerprint unavailable.';
+    }
+  } catch (e) {
+    fpEl.textContent = '—';
+    if (stEl) stEl.textContent = 'Companion identity could not be read.';
+  }
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { flInitCompanionIdentity(); });
+  } else {
+    flInitCompanionIdentity();
   }
 }
 
