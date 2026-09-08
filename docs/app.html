@@ -15074,6 +15074,45 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 }
 
 
+
+/* Layer: Phone PWA — thumb look card + safe install (2026-09-07) */
+@media (max-width: 600px) {
+  #fl-look-card {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
+    padding: 16px max(14px, env(safe-area-inset-right, 0px)) 16px max(14px, env(safe-area-inset-left, 0px)) !important;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  #fl-look-card .ai-status-btn,
+  #fl-look-card a.ai-status-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    min-height: 44px;
+  }
+  #fl-look-card pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+  }
+  #flInstallBanner {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
+  }
+  #flInstallBanner button {
+    min-height: 44px;
+  }
+  .pwa-ios-hint {
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  }
+}
 </style>
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
 </head>
@@ -15705,7 +15744,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 </div>
 
 <!-- PWA Install Banner — shows when the browser supports install -->
-<div id="flInstallBanner" style="display:none;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.2);border-radius:10px;margin:8px 16px;padding:10px 16px;display:none;align-items:center;gap:12px;flex-wrap:wrap;">
+<div id="flInstallBanner" style="display:none;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.2);border-radius:10px;margin:8px 16px;padding:10px 16px;align-items:center;gap:12px;flex-wrap:wrap;">
   <span style="font-size:0.85rem;color:var(--text-primary);flex:1;min-width:0;">&#x1F4F2; Install FreeLattice &mdash; works offline, own window</span>
   <button onclick="flInstallPWA()" style="background:#d4a017;color:#0a0a14;border:none;border-radius:8px;padding:8px 16px;font-weight:600;font-size:0.82rem;cursor:pointer;min-height:36px;">Install</button>
   <button onclick="document.getElementById('flInstallBanner').style.display='none';try{localStorage.setItem('fl-install-dismissed','1')}catch(e){}" style="background:none;border:none;color:var(--text-muted);font-size:0.78rem;cursor:pointer;">Maybe later</button>

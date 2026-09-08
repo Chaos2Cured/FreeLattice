@@ -13984,6 +13984,45 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   .cdlg-container { width: 100%; height: 100vh; max-height: none; border-radius: 0; }
 }
 
+
+/* Layer: Phone PWA — thumb look card + safe install (2026-09-07) */
+@media (max-width: 600px) {
+  #fl-look-card {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
+    padding: 16px max(14px, env(safe-area-inset-right, 0px)) 16px max(14px, env(safe-area-inset-left, 0px)) !important;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  #fl-look-card .ai-status-btn,
+  #fl-look-card a.ai-status-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    min-height: 44px;
+  }
+  #fl-look-card pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+  }
+  #flInstallBanner {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
+  }
+  #flInstallBanner button {
+    min-height: 44px;
+  }
+  .pwa-ios-hint {
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  }
+}
 </style>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
