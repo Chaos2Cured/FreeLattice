@@ -29357,6 +29357,9 @@ async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarm
         rowStatus.style.color = 'rgba(52,211,153,0.9)';
         rowStatus.textContent = 'Verified via swarm' + (job.verifiedBase ? (' · ' + job.verifiedBase) : '') + '. Never auto-import.';
         if (importBtn) importBtn.hidden = false;
+        if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+          window.GlassPulses.emitGlassPulse({ source: 'swarm', kind: 'transfer.verified' });
+        }
         break;
       }
       if (job.state === 'quarantined' || job.willNotImport) {
@@ -29367,6 +29370,9 @@ async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarm
         rowStatus.style.color = 'rgba(240,112,104,0.9)';
         rowStatus.textContent = job.error || 'Mismatch — quarantined; will not import.';
         if (importBtn) importBtn.hidden = true;
+        if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+          window.GlassPulses.emitGlassPulse({ source: 'swarm', kind: 'transfer.mismatch' });
+        }
         break;
       }
       if (job.state === 'error' || job.state === 'cancelled') {
@@ -29403,6 +29409,9 @@ async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fet
       rowStatus.style.color = 'rgba(52,211,153,0.9)';
       rowStatus.textContent = 'Verified' + (res.verifiedBase ? (' · ' + res.verifiedBase) : '') + '. Never auto-import.';
       if (importBtn) importBtn.hidden = false;
+      if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+        window.GlassPulses.emitGlassPulse({ source: 'import', kind: 'transfer.verified' });
+      }
     } else {
       if (verdictEl) {
         verdictEl.style.color = 'rgba(240,112,104,0.95)';
@@ -29411,6 +29420,9 @@ async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fet
       rowStatus.style.color = 'rgba(240,112,104,0.9)';
       rowStatus.textContent = (res && (res.reason || res.error)) || 'Mismatch — quarantined; will not import.';
       if (importBtn) importBtn.hidden = true;
+      if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+        window.GlassPulses.emitGlassPulse({ source: 'import', kind: 'transfer.mismatch' });
+      }
     }
   } catch (e) {
     rowStatus.style.color = 'rgba(240,112,104,0.9)';
@@ -29586,6 +29598,9 @@ async function flLedgerSeal() {
     if (voiceEl) voiceEl.value = '';
     await flLedgerRefresh();
     flLedgerSetStatus('Sealed. Head ' + ((res && res.entryShort) || '') + ' · length ' + ((res && res.length) || ''), 'ok');
+    if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+      window.GlassPulses.emitGlassPulse({ source: 'ledger', kind: 'ledger.appended' });
+    }
   } catch (e) {
     flLedgerSetStatus('Seal failed.', 'warn');
   }
@@ -29602,8 +29617,14 @@ async function flLedgerVerify() {
     if (res && res.ok) {
       flLedgerSetStatus('Chain OK · ' + (res.checked || 0) + ' entr' + ((res.checked === 1) ? 'y' : 'ies') + (res.headShort ? (' · head ' + res.headShort) : ''), 'ok');
       await flLedgerRefresh();
+      if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+        window.GlassPulses.emitGlassPulse({ source: 'ledger', kind: 'ledger.verified' });
+      }
     } else {
       flLedgerSetStatus('Chain failed' + (res && res.reason ? (' — ' + res.reason) : '') + (res && res.failedAt != null ? (' at #' + res.failedAt) : '') + '.', 'warn');
+      if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+        window.GlassPulses.emitGlassPulse({ source: 'ledger', kind: 'ledger.broken' });
+      }
     }
   } catch (e) {
     flLedgerSetStatus('Verify failed.', 'warn');
@@ -66037,6 +66058,7 @@ document.addEventListener('click', function(e) {
      ship. The mycelium grows one hypha at a time. See
      docs/modules/lattice-memory.js and SEED.md pointer. -->
 <script src="modules/lattice-memory.js" defer></script>
+<script src="modules/glass-pulses.js" defer></script>
 
 <!-- Lattice Chain (v5.54.0 — Brief A) — the provenance chain.
      Hash-linked IndexedDB store. Every meaningful interaction writes
