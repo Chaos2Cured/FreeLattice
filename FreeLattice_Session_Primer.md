@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-08 07:13 EST
+- Last auto-updated: 2026-09-08 08:09 EST
 - Version: 5.79.45
-- Total commits: 3102
+- Total commits: 3103
 - Last 10 commits:
-- 52c9e02 Layer, never delete. HTTPS model manifests v0.1 — license before hash before import.
+- 3904124 Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main.
+- 02d5e76 Layer, never delete. HTTPS model manifests v0.1 — license before hash before import.
 - 90e356c Layer, never delete. Phone PWA leftovers — Install 44px + landing meta.
 - 0862e86 Layer, never delete. Phone PWA — home screen + thumb look card.
 - b322e42 Layer, never delete. Desktop Step 1 — companion keys (safeStorage).
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 37e0eef Layer: finish scoped OLLAMA_ORIGINS prose leftovers
 - 93eb24a Layer celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS
 - ef3018f Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges.
-- 7d94226 Layer: one look card, scoped origins, loopback default
