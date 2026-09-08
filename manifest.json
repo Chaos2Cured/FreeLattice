@@ -1,24 +1,40 @@
 {
   "name": "FreeLattice",
   "short_name": "FreeLattice",
-  "description": "Your private AI building partner. Free forever.",
+  "description": "Your AI. Local. Free. Yours. A mind at home on your machine.",
+  "id": "/",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0a0a2e",
-  "theme_color": "#d4a017",
+  "background_color": "#0a0a14",
+  "theme_color": "#0c0a1a",
   "orientation": "any",
+  "categories": ["productivity", "utilities"],
+  "lang": "en",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
