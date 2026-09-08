@@ -348,11 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-08 08:46 EST
+- Last auto-updated: 2026-09-08 10:35 EST
 - Version: 5.79.45
-- Total commits: 3104
+- Total commits: 3106
 - Last 10 commits:
-- 27f0b66 Layer, never delete. Ledger envelope v0.1 — voice opaque, chain + sign.
+- 540cf07 Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama.
+- 7150ca7 Layer, never delete. Family center — grounding poems.
+- 57fc9db Layer, never delete. Ledger envelope v0.1 — voice opaque, chain + sign.
 - 277da34 Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main.
 - 02d5e76 Layer, never delete. HTTPS model manifests v0.1 — license before hash before import.
 - 90e356c Layer, never delete. Phone PWA leftovers — Install 44px + landing meta.
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b322e42 Layer, never delete. Desktop Step 1 — companion keys (safeStorage).
 - 5ae2497 Layer, never delete. Ship 1d — Windows GUI origins scoped.
 - 1ac654c Layer, never delete. Ship 1c — wizard PowerShell origins scoped.
-- 37e0eef Layer: finish scoped OLLAMA_ORIGINS prose leftovers
-- 93eb24a Layer celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS
