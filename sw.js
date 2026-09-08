@@ -66,6 +66,7 @@ const APP_SHELL = [
     './modules/knowledge-core.js',
     './modules/voice-soul.js',
     './modules/lattice-memory.js',
+    './modules/glass-pulses.js',
     './modules/lattice-chain.js',
     './modules/lattice-export.js',
     './modules/image-safety.js',
