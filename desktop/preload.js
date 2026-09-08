@@ -52,17 +52,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   forceReloadLive: () => ipcRenderer.invoke('force-reload-live'),
 
   /**
-   * Companion key status (hasKey, encryptionAvailable). Seed never exposed.
+   * Companion key status — public fields only.
+   * { hasKey, encryptionAvailable, domain, publicKeyB64, fingerprintHex }
+   * Seed / private never exposed. No getSeed / exportPrivate.
    */
   latticeKeyStatus: () => ipcRenderer.invoke('lattice-key-status'),
 
   /**
    * Create OS-keychain-wrapped companion seed. Fail-closed if keychain missing.
+   * Returns public fields only (domain, publicKeyB64, fingerprintHex).
    */
   latticeKeyCreate: () => ipcRenderer.invoke('lattice-key-create'),
 
   /**
-   * Request a signature in main. Signing primitive deferred; seed stays in main.
+   * Request a real Ed25519 signature in main. Seed stays in main.
+   * Returns { ok, signatureB64, publicKeyB64, fingerprintHex, domain }.
    * @param {string} payloadB64
    */
   latticeKeySign: (payloadB64) => ipcRenderer.invoke('lattice-key-sign', payloadB64),

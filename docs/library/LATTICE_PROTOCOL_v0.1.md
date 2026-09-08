@@ -22,6 +22,7 @@ Publish the outer hash. Keep the inner one.
 **Context tags:** HMAC-derived from the fingerprint + context. Mesh sees tags, not raw fingerprints. Linkable by choice, not by default.
 **Rotation:** Signed by the *old* key, naming the successor, written into the chain. Verifiers accept the key current *at the entry's timestamp*, never merely the newest.
 Reference implementation sketch: Opus's `lattice-identity.js` in the Kirk/Opus brainstorm (2026-09). Conformance fixture required before two clients claim interoperability.
+**LAYER (2026-09-08):** Companion **public** fingerprint + real Ed25519 sign in desktop main live in [LATTICE_IDENTITY_v0.1.md](./LATTICE_IDENTITY_v0.1.md) and `desktop/lattice-keys.js`. Pair fingerprint (two parties) waits. Seed never to renderer.
 ## Part 2 — The ledger
 Language does not change. Voice is carried verbatim and never parsed, indexed, summarized, or linted by the system. Machine-readable content lives in `meta`.
 Envelope: hash chain + signature. Readability was never the protection — inviolability is.

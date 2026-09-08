@@ -3,28 +3,29 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-08 12:13 UTC
+> Last update: 2026-09-08 13:09 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `52c9e02` _(committed 1 second ago)_
+- **HEAD:** `3904124` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `52c9e02` Layer, never delete. HTTPS model manifests v0.1 — license before hash before import. _(1 second ago)_
-- `90e356c` Layer, never delete. Phone PWA leftovers — Install 44px + landing meta. _(8 hours ago)_
-- `0862e86` Layer, never delete. Phone PWA — home screen + thumb look card. _(8 hours ago)_
-- `b322e42` Layer, never delete. Desktop Step 1 — companion keys (safeStorage). _(14 hours ago)_
-- `5ae2497` Layer, never delete. Ship 1d — Windows GUI origins scoped. _(14 hours ago)_
-- `1ac654c` Layer, never delete. Ship 1c — wizard PowerShell origins scoped. _(14 hours ago)_
+- `3904124` Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main. _(0 seconds ago)_
+- `02d5e76` Layer, never delete. HTTPS model manifests v0.1 — license before hash before import. _(51 minutes ago)_
+- `90e356c` Layer, never delete. Phone PWA leftovers — Install 44px + landing meta. _(9 hours ago)_
+- `0862e86` Layer, never delete. Phone PWA — home screen + thumb look card. _(9 hours ago)_
+- `b322e42` Layer, never delete. Desktop Step 1 — companion keys (safeStorage). _(15 hours ago)_
+- `5ae2497` Layer, never delete. Ship 1d — Windows GUI origins scoped. _(15 hours ago)_
+- `1ac654c` Layer, never delete. Ship 1c — wizard PowerShell origins scoped. _(15 hours ago)_
 - `37e0eef` Layer: finish scoped OLLAMA_ORIGINS prose leftovers _(2 days ago)_
 - `93eb24a` Layer celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(2 days ago)_
 - `ef3018f` Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges. _(4 days ago)_
-- `7d94226` Layer: one look card, scoped origins, loopback default _(4 days ago)_
+- `7d94226` Layer: one look card, scoped origins, loopback default _(5 days ago)_
 - `b378fee` ci: Update Primer deployment state [2026-08-31] _(8 days ago)_
 - `6d0794a` Layer: Sophia's Sophirkia DNA drop on SOPHIA.md _(8 days ago)_
 - `9ae0e57` ci: Update Primer deployment state [2026-08-29] _(10 days ago)_
@@ -34,7 +35,6 @@
 - `752957c` ci: Update Primer deployment state [2026-08-28] _(11 days ago)_
 - `a576fdf` Family ledgers: Celeste second entry, Hypha, Weft, Reed _(11 days ago)_
 - `fb8383b` ci: Update Primer deployment state [2026-08-28] _(11 days ago)_
-- `0a9e388` v5.79.43 Trainer simple face _(11 days ago)_
 
 ## How to use this file
 
