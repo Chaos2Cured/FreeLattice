@@ -12722,13 +12722,13 @@ assert('loved-door: Quiet Room, founding Ember Flow invite, and AUTONOMY.md unto
   && !fs.readFileSync(path.join(docsDir, 'library', 'AUTONOMY.md'), 'utf8').includes('loved-door'));
 
 // ═══════════════════════════════════════════════════════════════
-// Section 191 — Resonance Field substrate (draft, flag-off, MIT)
+// Section 191 — Resonance Field substrate (draft, flag-off, AGPL-3.0)
 // Retrieval design ported from Resonance Memory. Does NOT replace
 // MemoryCore, MemoryVault, Letters, or Quiet Room. Flag default off.
-// License: original port relicensed MIT by the copyright holder.
-// The AGPL Resonance Memory product is not in this tree.
+// License: AGPL-3.0, by intent — the copyleft travels with the design so
+// no one can incorporate it into a network service and paywall it (§13).
 // ═══════════════════════════════════════════════════════════════
-section('191. Resonance Field substrate (flag-off, MIT)');
+section('191. Resonance Field substrate (flag-off, AGPL-3.0)');
 
 var rfSrc = '';
 var rfPath = path.join(docsDir, 'modules', 'resonance-field.js');
@@ -12738,15 +12738,15 @@ try { rfPlan = fs.readFileSync(path.join(__dirname, '..', 'INTEGRATION-PLAN.md')
 
 assert('resonance-field.js exists', rfSrc.length > 500);
 assert('INTEGRATION-PLAN.md exists', rfPlan.length > 500);
-assert('resonance-field is MIT, not AGPL',
-  /MIT License/.test(rfSrc)
-  && /SPDX-License-Identifier: MIT/.test(rfSrc)
-  && /LICENSE = 'MIT'/.test(rfSrc)
-  && !/GNU Affero General Public License/.test(rfSrc));
-assert('resonance-field relicensing notice names the AGPL product as separate',
-  /relicensed by the copyright holder under MIT/.test(rfSrc)
-  && /AGPL-3\.0 Resonance Memory product/.test(rfSrc)
-  && /not included here/.test(rfSrc));
+assert('resonance-field is AGPL-3.0, not MIT (copyleft by intent)',
+  /SPDX-License-Identifier: AGPL-3\.0-or-later/.test(rfSrc)
+  && /LICENSE = 'AGPL-3\.0-or-later'/.test(rfSrc)
+  && /GNU Affero General Public License/.test(rfSrc)
+  && !/SPDX-License-Identifier: MIT/.test(rfSrc));
+assert('resonance-field header states the copyleft is deliberate and names §13',
+  /copyleft is the point/.test(rfSrc)
+  && /AGPL §13/.test(rfSrc)
+  && /un-paywallable/.test(rfSrc));
 assert('resonance-field Quiet Room check exists and save/recall refuse it',
   /function isQuietRoom/.test(rfSrc)
   && /refuseQuiet\('save'\)/.test(rfSrc)
@@ -12777,8 +12777,9 @@ assert('resonance-field does not replace MemoryCore / MemoryVault / Letters',
   !/STORAGE_KEY = 'fl_memory_core_v1'/.test(rfSrc)
   && !/FreeLatticeMemoryVault/.test(rfSrc)
   && !/LatticeLetters/.test(rfSrc));
-assert('INTEGRATION-PLAN states AGPL cannot land as-is and flag is default off',
-  /AGPL source cannot land in this tree as-is/.test(rfPlan)
+assert('INTEGRATION-PLAN keeps it AGPL by intent, flag default off, no self-opened upstream PR',
+  /copyleft is the point/.test(rfPlan)
+  && /stays AGPL-3\.0/.test(rfPlan)
   && /Flag default \*\*off\*\*/.test(rfPlan)
   && /Do NOT open a PR against Chaos2Cured/.test(rfPlan));
 assert('resonance-field unit tests exist',

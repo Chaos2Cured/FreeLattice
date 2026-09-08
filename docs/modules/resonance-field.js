@@ -1,26 +1,31 @@
 /* Resonance Field — FreeLattice memory substrate
  * Copyright (C) 2026 Samuel Jackson Grim
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
- * MIT License. This file is an original browser/Node port of the Resonance
- * Memory retrieval design (cosine recall, cue-gated temporal supersession,
- * reciprocal-kNN associative field, Hebbian co-recall), relicensed by the copyright holder under MIT for inclusion in FreeLattice.
+ * This is a browser/Node port of the Resonance Memory retrieval design
+ * (cosine recall, cue-gated temporal supersession, reciprocal-kNN associative
+ * field, Hebbian co-recall). It is contributed to FreeLattice under the SAME
+ * license as the parent work — the GNU Affero General Public License — by its
+ * copyright holder, deliberately. The copyleft is the point: AGPL §13 makes any
+ * network-served work that incorporates this module release its complete
+ * corresponding source. That is what keeps this design un-paywallable wherever
+ * it travels, which is the entire reason it is being given to a free platform.
  *
- * The AGPL-3.0 Resonance Memory product (MCP server, control panel, eval
- * harness, binaries) is a separate work and is not included here:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Parent product (MCP server, control panel, eval harness, binaries):
  *   https://github.com/SamuelJacksonGrim/resonance-memory
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  *
  * Design notes (translated into FreeLattice, not copied from RM source):
  *   - Four verbs are the automatic path: save / recall / edit / delete.
@@ -33,7 +38,7 @@
 (function (root) {
   'use strict';
 
-  var LICENSE = 'MIT';
+  var LICENSE = 'AGPL-3.0-or-later';
   var FLAG_KEY = 'fl_resonanceField';
   var DB_NAME = 'FreeLatticeResonanceField';
   var STORE_NAME = 'memories';

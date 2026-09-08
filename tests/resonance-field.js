@@ -78,8 +78,8 @@ function seq(fns) {
 }
 
 seq([
-  ['LICENSE is MIT, not AGPL', function () {
-    assert.strictEqual(RF.LICENSE, 'MIT');
+  ['LICENSE is AGPL-3.0 (copyleft travels with the design, by intent)', function () {
+    assert.strictEqual(RF.LICENSE, 'AGPL-3.0-or-later');
   }],
 
   ['cosine of identical vectors is 1', function () {
