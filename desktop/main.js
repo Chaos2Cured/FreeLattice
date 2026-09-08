@@ -16,6 +16,7 @@ const net = require('net');
 const latticeKeys = require('./lattice-keys');
 const latticeLedger = require('./lattice-ledger');
 const latticeImport = require('./lattice-import');
+const latticeSwarm = require('./lattice-swarm');
 
 // electron-store for persisting window state
 let Store;
@@ -953,6 +954,14 @@ function setupIPC() {
   latticeKeys.bindApp(app);
   latticeLedger.bindApp(app);
   latticeImport.bindApp(app);
+  latticeSwarm.bindApp(app);
+  app.on('before-quit', function () {
+    try {
+      latticeSwarm.destroyClient();
+    } catch (e) {
+      /* ignore */
+    }
+  });
   ipcMain.handle('lattice-key-status', () => latticeKeys.status());
   ipcMain.handle('lattice-key-create', () => {
     try {
@@ -1013,6 +1022,29 @@ function setupIPC() {
       return await latticeImport.importToOllama(opts || {});
     } catch (e) {
       return { ok: false, imported: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // ── Swarm bridge v0.1 — desktop pull → existing hash-before-import ──
+  ipcMain.handle('lattice-swarm-start', async (_event, opts) => {
+    try {
+      return await latticeSwarm.startFetch(opts || {});
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-swarm-status', (_event, id) => {
+    try {
+      return latticeSwarm.status(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-swarm-cancel', (_event, id) => {
+    try {
+      return latticeSwarm.cancel(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
     }
   });
 

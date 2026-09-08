@@ -39,6 +39,7 @@ Fibonacci up, zero down on hash mismatch. Rolling 30-day window beside the long 
 Mesh carries presence, chat, and pointers. Never weights. Manual handshake stays (Sybil resistance). Message shapes: `holds`, `vouch`, `warn` (one hop). Context tags, not raw fingerprints.
 ## Part 6 — Distributed network
 Browsers: WebTorrent + web seeds. Desktop: real BitTorrent + WebTorrent bridge. Desktop pulls the wide swarm and re-seeds into WebTorrent. Verified file → Ollama import only outside the browser's LNA/CORS traps.
+**LAYER (2026-09-08):** Swarm bridge v0.1 — desktop WebTorrent/webseed pull → existing hash-before-import — lives in [SWARM_BRIDGE_v0.1.md](./SWARM_BRIDGE_v0.1.md) and `desktop/lattice-swarm.js`. Browser/phone swarm UI waits. Swarm never bypasses hash.
 ## Part 7 — Desktop
 Removes LNA, CORS, and gives real BitTorrent — and is the only proper home for keys.
 Private keys never cross `contextBridge`. Signing in main. OS keychain via `safeStorage`; refuse cleartext fallback. `nodeIntegration: false`, `contextIsolation: true`, allowlisted IPC.
