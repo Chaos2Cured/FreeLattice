@@ -32,6 +32,7 @@ Envelope: hash chain + signature. Readability was never the protection — invio
 ## Part 3 — Trust over bytes
 Extend existing TransactionTrust. Same tiers, same two gates (minHistory AND minDays). Bytes where LP was for transfer volume.
 Fibonacci up, zero down on hash mismatch. Rolling 30-day window beside the long anchor so a life changing does not read as an attack. Flag; never auto-ban.
+**LAYER (2026-09-09):** Genesis catalog v0.1 — named signers + sunset toward Infinite (89 / 1095), never quietly waive — lives in [GENESIS_CATALOG_v0.1.md](./GENESIS_CATALOG_v0.1.md) and `docs/models/catalog.v0.1.json`. Byte-volume TransactionTrust enforcement waits. Genesis does not bypass hash.
 ## Part 4 — Model manifests
 `license` and `redistributable` are load-bearing. A seeder refuses what it cannot lawfully redistribute. Lawyer review before seeding ships.
 **Pipeline order (safety-critical):** acceptable signer → tier gate → licence → **hash the file** → only then import. Mismatch → quarantine (evidence), peer tier reset, one-hop warn. Hash before import, always.
