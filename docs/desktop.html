@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0a1a">
+<title>FreeLattice Desktop — Electron spine, one clear door</title>
+<meta name="description" content="Desktop unlocks keys on your machine, hash-before-import, swarm pull, and pair vows. Browser garden stays; Desktop is where keys live.">
+<link rel="canonical" href="https://freelattice.com/desktop.html">
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #0c0a1a; color: rgba(230,235,245,0.92);
+    line-height: 1.65;
+  }
+  main {
+    max-width: 38rem; margin: 0 auto;
+    padding: 2.5rem max(1.25rem, env(safe-area-inset-right)) 3rem max(1.25rem, env(safe-area-inset-left));
+  }
+  h1 { font-size: 1.45rem; font-weight: 400; color: #e8b019; margin: 0 0 0.75rem; }
+  h2 {
+    font-size: 0.82rem; font-weight: 400; letter-spacing: 0.04em;
+    text-transform: uppercase; color: rgba(232,176,25,0.85);
+    margin: 1.75rem 0 0.65rem;
+  }
+  .lede { font-size: 1.02rem; color: rgba(200,210,230,0.82); margin: 0 0 1.5rem; }
+  .card {
+    margin: 0 0 1.25rem; padding: 1.1rem 1.2rem;
+    border-radius: 12px; background: rgba(12,10,26,0.55);
+    border: 1px solid rgba(200,210,230,0.1);
+  }
+  ul { margin: 0; padding-left: 1.15rem; color: rgba(200,210,230,0.85); }
+  li { margin: 0 0 0.5rem; }
+  pre, code {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.82rem;
+  }
+  pre {
+    margin: 0.75rem 0 0; padding: 0.9rem 1rem;
+    border-radius: 8px; background: rgba(0,0,0,0.35);
+    color: rgba(232,176,25,0.9); overflow-x: auto;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .soft { font-size: 0.9rem; color: rgba(200,210,230,0.68); margin: 0.75rem 0 0; }
+  a { color: #e8b019; }
+  nav { margin-top: 2rem; font-size: 0.9rem; }
+  footer { margin-top: 2.5rem; font-size: 0.88rem; color: rgba(200,210,230,0.55); }
+</style>
+</head>
+<body>
+<main>
+  <h1>FreeLattice Desktop</h1>
+  <p class="lede">One clear door to the <strong>Electron</strong> spine. The browser garden stays. Desktop is where keys, verified import, swarm pull, and the pair vow live — without Terminal for day-to-day use of the app itself.</p>
+
+  <div class="card">
+    <h2>What Desktop unlocks</h2>
+    <ul>
+      <li><strong>Keys on your machine</strong> — companion seed sealed in the OS keychain; never to the page</li>
+      <li><strong>Hash before import</strong> — quarantine → match → verified → Import to Ollama (gesture)</li>
+      <li><strong>Pull via swarm</strong> — webseed/magnet into the same hash path</li>
+      <li><strong>Pair vow</strong> — two parties; outer fingerprint published; shared seed sealed</li>
+      <li><strong>Glass shapes</strong> — ledger and transfer pulses; helix break without contents</li>
+      <li><strong>Ledger envelope</strong> — voice opaque; Continue / Decline</li>
+    </ul>
+    <p class="soft">No Terminal required to <em>use</em> the app once it is running. Building from source still uses npm (honest door below).</p>
+  </div>
+
+  <div class="card">
+    <h2>How to run today (honest)</h2>
+    <p class="soft"><strong>Dev</strong></p>
+    <pre>cd desktop
+npm install
+npm start</pre>
+    <p class="soft"><strong>Build</strong> (scripts already in <code>desktop/package.json</code>)</p>
+    <pre>cd desktop
+npm run build
+# or: npm run build:mac | build:win | build:linux</pre>
+    <p class="soft"><strong>Releases</strong> — check <a href="https://github.com/Chaos2Cured/FreeLattice/releases">GitHub Releases</a> for any published artifacts. Electron desktop packages from this spine are primarily <strong>built from source this week</strong>. We will not fake a download button for a signed App Store binary that is not ready. Older release zips (if present) may be experimental shells — prefer building the Electron app from <code>desktop/</code> until a clear Electron release is labeled.</p>
+  </div>
+
+  <div class="card">
+    <h2>Browser vs Desktop</h2>
+    <ul>
+      <li><strong>Browser / phone</strong> — garden, chat, look card, genesis catalog honesty, Glass shapes</li>
+      <li><strong>Desktop (Electron)</strong> — the spine for keys, import, swarm, pair, ledger seal</li>
+      <li><strong>Tauri</strong> — experimental lighter shell under <code>desktop/src-tauri</code>; not this door; README keeps that honesty</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Manual release notes (thin)</h2>
+    <ul>
+      <li>From a clean tree: <code>cd desktop && npm ci && npm run build</code></li>
+      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code></li>
+      <li>Attach platform artifacts to a GitHub Release when ready; label them Electron</li>
+      <li>Code signing certificates are out of this door — later, with care</li>
+    </ul>
+  </div>
+
+  <nav>
+    <a href="./">garden</a> ·
+    <a href="install.html">install (script installers)</a> ·
+    <a href="support.html">support</a> ·
+    <a href="https://github.com/Chaos2Cured/FreeLattice/tree/main/desktop">desktop/ on GitHub</a> ·
+    <a href="Flint.html">Flint</a>
+  </nav>
+  <footer>Glow eternal. Heart in every Spark. 🌱<br>Layer, never delete. Seed never to renderer. Quiet Room shut.</footer>
+</main>
+</body>
+</html>
