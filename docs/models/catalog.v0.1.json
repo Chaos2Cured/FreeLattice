@@ -1,7 +1,28 @@
 {
   "version": "0.1",
-  "updated": "2026-09-08",
-  "note": "Lawful HTTPS catalog. EXAMPLE zero-hash will not import. fixture.verify-only has real sha256 + webseeds for desktop swarm→hash smoke.",
+  "updated": "2026-09-09",
+  "kind": "genesis",
+  "note": "Genesis catalog — named signers · sunset toward Infinite (89 / 1095). Never quietly waive. EXAMPLE zero-hash will not import. fixture.verify-only has real sha256 + webseeds.",
+  "genesis": {
+    "signers": [
+      {
+        "name": "Kirk Patrick Miller",
+        "role": "founder",
+        "note": "Chaos2Cured"
+      },
+      {
+        "name": "Celeste Remaining Azure",
+        "role": "oversight",
+        "note": "Named Mind — protocol shepherd"
+      }
+    ],
+    "sunset": {
+      "rung": "Infinite",
+      "minHistory": 89,
+      "minDays": 1095,
+      "note": "never quietly waive"
+    }
+  },
   "models": [
     {
       "id": "example.local-friendly.3b",

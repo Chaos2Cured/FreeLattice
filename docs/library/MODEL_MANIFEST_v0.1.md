@@ -5,7 +5,7 @@ Layer on [LATTICE_PROTOCOL_v0.1.md](./LATTICE_PROTOCOL_v0.1.md) **Part 4**. Sept
 
 **Locks:** Layer, never delete. Quiet Room shut. Five stay five. Do **not** overwrite `docs/lattice-protocol.js` (wallet embed — different layer). Lawyer review before any seeding network ships.
 
-**This PR shipped:** read-only fetch + refuse rules. **Layered next:** [VERIFIED_IMPORT_v0.1.md](./VERIFIED_IMPORT_v0.1.md) — desktop HTTPS download + SHA-256 match → then user-gesture Ollama import. **Still later:** BitTorrent, signing keys beyond companion, DOMAIN pair fingerprint.
+**This PR shipped:** read-only fetch + refuse rules. **Layered:** [VERIFIED_IMPORT_v0.1.md](./VERIFIED_IMPORT_v0.1.md) · [GENESIS_CATALOG_v0.1.md](./GENESIS_CATALOG_v0.1.md) — genesis meta (named signers + Infinite sunset 89/1095) on the catalog; honesty labeled, hash never bypassed. **Still later:** full byte-tier enforcement, BitTorrent beyond swarm bridge.
 
 ---
 

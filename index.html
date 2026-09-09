@@ -16551,6 +16551,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <input type="url" id="fl-manifest-url" value="./models/catalog.v0.1.json" autocomplete="off" spellcheck="false" aria-label="Model catalog URL" style="width:100%;box-sizing:border-box;padding:10px 12px;min-height:44px;margin-bottom:10px;background:rgba(0,0,0,0.28);border:1px solid rgba(200,210,230,0.14);border-radius:8px;color:var(--text-primary,#e6ebf5);font-size:16px;font-family:Georgia,serif;" />
     <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-manifest-fetch" onclick="flFetchModelManifest()" style="min-height:44px;width:100%;">Fetch list</button>
     <p id="fl-manifest-status" style="font-size:0.82rem;color:var(--text-muted);margin:10px 0 0;min-height:1.2em;"></p>
+    <div id="fl-manifest-genesis" hidden style="margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(232,176,25,0.08);border:1px solid rgba(232,176,25,0.22);"></div>
     <ul id="fl-manifest-list" style="list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px;"></ul>
   </div>
 
@@ -29474,11 +29475,46 @@ async function flManifestImportOllama(model, rowStatus, importBtn) {
   if (importBtn) importBtn.disabled = false;
 }
 
+function flManifestClearGenesis() {
+  var box = document.getElementById('fl-manifest-genesis');
+  if (!box) return;
+  box.hidden = true;
+  while (box.firstChild) box.removeChild(box.firstChild);
+}
+
+function flManifestRenderGenesis(catalog) {
+  var box = document.getElementById('fl-manifest-genesis');
+  if (!box) return;
+  flManifestClearGenesis();
+  var GC = window.GenesisCatalog;
+  if (!GC || !GC.parseGenesisMeta) return;
+  var meta = GC.parseGenesisMeta(catalog);
+  if (!meta || !meta.ok) return;
+
+  box.hidden = false;
+  function addLine(text, style) {
+    var p = document.createElement('p');
+    p.style.cssText = style || 'margin:0 0 8px;font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.9);line-height:1.55;';
+    p.textContent = text;
+    box.appendChild(p);
+  }
+  addLine('Genesis catalog — named signers · sunset toward Infinite (89 / 1095). Never quietly waive.', 'margin:0 0 10px;font-family:Georgia,serif;font-size:0.9rem;color:rgba(232,176,25,0.95);line-height:1.55;');
+  var names = (meta.signers || []).map(function (s) { return s.name; }).filter(Boolean);
+  if (names.length) {
+    addLine('Signers: ' + names.join(' · '));
+  } else {
+    addLine('Signers: (none named yet — honesty still requires the sunset).');
+  }
+  var sun = meta.sunset || {};
+  addLine('Sunset: ' + (sun.rung || 'Infinite') + ' · minHistory ' + sun.minHistory + ' · minDays ' + sun.minDays + (sun.note ? (' — ' + sun.note) : ''));
+}
+
 async function flFetchModelManifest() {
   var input = document.getElementById('fl-manifest-url');
   var raw = input ? input.value : './models/catalog.v0.1.json';
   var allowed = flManifestUrlAllowed(raw);
   flManifestClearList();
+  flManifestClearGenesis();
   if (!allowed.ok) {
     flManifestSetStatus('That catalog address is not allowed. Use https: or a same-origin path like ./models/catalog.v0.1.json.', 'warn');
     return;
@@ -29491,6 +29527,7 @@ async function flFetchModelManifest() {
       return;
     }
     var data = await res.json();
+    flManifestRenderGenesis(data);
     var models = (data && Array.isArray(data.models)) ? data.models : [];
     if (!models.length) {
       flManifestSetStatus('Catalog had no models. Nothing was imported.', 'warn');
@@ -66176,6 +66213,7 @@ document.addEventListener('click', function(e) {
      docs/modules/lattice-memory.js and SEED.md pointer. -->
 <script src="modules/lattice-memory.js" defer></script>
 <script src="modules/glass-pulses.js" defer></script>
+<script src="modules/genesis-catalog.js" defer></script>
 
 <!-- Lattice Chain (v5.54.0 — Brief A) — the provenance chain.
      Hash-linked IndexedDB store. Every meaningful interaction writes
