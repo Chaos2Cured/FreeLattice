@@ -17,6 +17,7 @@ const latticeKeys = require('./lattice-keys');
 const latticeLedger = require('./lattice-ledger');
 const latticeImport = require('./lattice-import');
 const latticeSwarm = require('./lattice-swarm');
+const latticePair = require('./lattice-pair');
 
 // electron-store for persisting window state
 let Store;
@@ -955,6 +956,7 @@ function setupIPC() {
   latticeLedger.bindApp(app);
   latticeImport.bindApp(app);
   latticeSwarm.bindApp(app);
+  latticePair.bindApp(app);
   app.on('before-quit', function () {
     try {
       latticeSwarm.destroyClient();
@@ -1043,6 +1045,29 @@ function setupIPC() {
   ipcMain.handle('lattice-swarm-cancel', (_event, id) => {
     try {
       return latticeSwarm.cancel(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // ── Pair fingerprint v0.1 — two parties; seed sealed; never to renderer ──
+  ipcMain.handle('lattice-pair-status', () => {
+    try {
+      return latticePair.status();
+    } catch (e) {
+      return { ok: false, hasPair: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-pair-form', (_event, opts) => {
+    try {
+      return latticePair.formPair(opts || {});
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-pair-clear', () => {
+    try {
+      return latticePair.clearPair();
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }

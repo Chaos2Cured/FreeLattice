@@ -20,7 +20,7 @@
   };
 
   var RESERVED_KINDS = {
-    'pair.formed': true,
+    // pair.formed — emit live (Pair fingerprint v0.1)
     'pair.rotated': true,
     'manifest.signed': true,
     'tier.advanced': true,

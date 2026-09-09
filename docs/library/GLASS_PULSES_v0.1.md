@@ -24,7 +24,7 @@ Ledger / import / identity already keep vows. Glass should **show the vow shape*
 | `ledger.broken` | emit on chain verify fail |
 | `transfer.verified` | emit on import/swarm hash match |
 | `transfer.mismatch` | emit on import/swarm hash mismatch |
-| `pair.formed` | **reserved** — emit only when pair APIs exist |
+| `pair.formed` | **emit live** — on desktop Form pair success |
 | `pair.rotated` | **reserved** — emit only when rotate path exists |
 | `manifest.signed` | **reserved** — stub later |
 | `tier.advanced` | **reserved** — emit only if trust-tier hooks exist |
@@ -52,7 +52,7 @@ Ledger / import / identity already keep vows. Glass should **show the vow shape*
 | `ledger.broken` | `ledger chain broke` |
 | `transfer.verified` | `transfer hash matched` |
 | `transfer.mismatch` | `transfer hash mismatched` |
-| `pair.formed` | `pair formed` (reserved) |
+| `pair.formed` | `pair formed` |
 | `pair.rotated` | `pair rotated` (reserved) |
 | `manifest.signed` | `manifest signed` (reserved) |
 | `tier.advanced` | `trust tier advanced` (reserved) |

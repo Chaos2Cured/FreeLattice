@@ -5,7 +5,7 @@ Layer on [LATTICE_PROTOCOL_v0.1.md](./LATTICE_PROTOCOL_v0.1.md) **Part 1**. Sept
 
 **Locks:** Layer, never delete. Quiet Room shut. Five stay five. Do **not** overwrite `docs/lattice-protocol.js` (wallet embed — different layer). Seed never to renderer. Never auto-append a ledger. Never force one mind into one key.
 
-**This PR ships:** companion **public** fingerprint + real Ed25519 `signPayload` in main. **Not this PR:** pair fingerprint (two parties), ledger/genesis, recovery phrase UI, BitTorrent, Alpha, mesh tags.
+**This PR shipped:** companion **public** fingerprint + real Ed25519 `signPayload` in main. **Layered next:** [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) — two parties, outer hash published.
 
 ---
 
@@ -45,9 +45,9 @@ fingerprintHex = SHA-256(
 - `publicKeyBytes` — 32-byte Ed25519 public key
 - `0x00` — single null separator between domain and key material
 
-### Pair fingerprint (two parties) — NOT this PR
+### Pair fingerprint (two parties)
 
-Named here so the next ship does not invent a third shape: a hash with a hash inside it, held by two parties, that neither can produce alone. Construction stays in Protocol Part 1. **This ship only seals the companion public half.**
+Frozen construction and desktop form live in [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md). Companion half (this file) stays unchanged.
 
 ---
 

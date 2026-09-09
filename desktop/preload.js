@@ -124,6 +124,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeSwarmCancel: (id) => ipcRenderer.invoke('lattice-swarm-cancel', id),
 
   /**
+   * Pair fingerprint v0.1 — public fields only (pairFpHex, peer pub). No seed.
+   */
+  latticePairStatus: () => ipcRenderer.invoke('lattice-pair-status'),
+
+  /**
+   * Form pair (gesture). { peerPublicKeyB64, sharedSeedB64 } — seed stays in main.
+   */
+  latticePairForm: (opts) => ipcRenderer.invoke('lattice-pair-form', opts),
+
+  /**
+   * Clear pair (gesture) — wipe sealed seed + public record.
+   */
+  latticePairClear: () => ipcRenderer.invoke('lattice-pair-clear'),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function

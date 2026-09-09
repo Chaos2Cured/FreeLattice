@@ -16562,6 +16562,25 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <p id="fl-companion-identity-status" style="font-size:0.78rem;color:var(--text-muted);margin:8px 0 0;min-height:1.2em;"></p>
   </div>
 
+  <!-- Layer: Pair fingerprint v0.1 — desktop form; browser note only. Seed never to page. -->
+  <div id="fl-pair-card" class="fl-card" style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Pair fingerprint</h3>
+    <p id="fl-pair-browser-note" style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0;">Pair on desktop — two parties, outer hash published. Shared seed never enters the browser.</p>
+    <div id="fl-pair-desktop" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Vow between two. Outer hash published. Shared seed sealed in main — never to this page. Never auto-form.</p>
+      <p style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);margin:0 0 10px;line-height:1.55;">Pair fingerprint: <span id="fl-pair-fp" style="color:var(--gold,#e8b019);word-break:break-all;">—</span></p>
+      <div id="fl-pair-form-fields">
+        <label for="fl-pair-peer" style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Peer public key (base64)</label>
+        <input type="text" id="fl-pair-peer" autocomplete="off" spellcheck="false" aria-label="Peer public key base64" style="width:100%;box-sizing:border-box;padding:10px 12px;min-height:44px;margin-bottom:10px;background:rgba(0,0,0,0.28);border:1px solid rgba(200,210,230,0.14);border-radius:8px;color:var(--text-primary,#e6ebf5);font-size:16px;font-family:ui-monospace,Menlo,monospace;" />
+        <label for="fl-pair-seed" style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Shared seed (base64, 32 bytes)</label>
+        <input type="password" id="fl-pair-seed" autocomplete="off" spellcheck="false" aria-label="Shared seed base64" style="width:100%;box-sizing:border-box;padding:10px 12px;min-height:44px;margin-bottom:10px;background:rgba(0,0,0,0.28);border:1px solid rgba(200,210,230,0.14);border-radius:8px;color:var(--text-primary,#e6ebf5);font-size:16px;font-family:ui-monospace,Menlo,monospace;" />
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-pair-form" onclick="flPairForm()" style="min-height:44px;width:100%;margin-bottom:8px;">Form pair</button>
+      </div>
+      <button type="button" class="ai-status-btn" id="fl-pair-clear" onclick="flPairClear()" style="min-height:44px;width:100%;">Clear pair</button>
+      <p id="fl-pair-status" style="font-size:0.78rem;color:var(--text-muted);margin:10px 0 0;min-height:1.2em;"></p>
+    </div>
+  </div>
+
   <!-- Layer: Ledger envelope v0.1 — desktop only. Voice opaque. Continue / Verify. textContent only. -->
   <div id="fl-ledger-card" class="fl-card" hidden style="margin-bottom:14px;padding:16px 18px;">
     <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Ledger (envelope)</h3>
@@ -29638,14 +29657,112 @@ function flLedgerDecline() {
   flLedgerSetStatus('Declined — nothing written.', 'ok');
 }
 
+function flPairShortFp(hex) {
+  var s = String(hex || '');
+  if (!s) return '—';
+  if (s.length <= 16) return s;
+  return s.slice(0, 8) + '…' + s.slice(-6);
+}
+
+function flPairSetStatus(msg, kind) {
+  var el = document.getElementById('fl-pair-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = kind === 'warn' ? 'rgba(240,112,104,0.9)' : (kind === 'ok' ? 'rgba(52,211,153,0.9)' : '');
+}
+
+async function flPairRefresh() {
+  var fpEl = document.getElementById('fl-pair-fp');
+  var formFields = document.getElementById('fl-pair-form-fields');
+  if (!window.electronAPI || !window.electronAPI.latticePairStatus) return;
+  try {
+    var st = await window.electronAPI.latticePairStatus();
+    if (fpEl) fpEl.textContent = (st && st.hasPair && st.pairFpHex) ? flPairShortFp(st.pairFpHex) : '—';
+    if (formFields) formFields.hidden = !!(st && st.hasPair);
+    if (st && st.hasPair) {
+      flPairSetStatus('Paired · domain ' + ((st && st.domain) || 'lattice.pair.v1') + ' · seed sealed in main', 'ok');
+    }
+  } catch (e) {
+    if (fpEl) fpEl.textContent = '—';
+  }
+}
+
+async function flInitPairCard() {
+  var note = document.getElementById('fl-pair-browser-note');
+  var desk = document.getElementById('fl-pair-desktop');
+  var hasApi = !!(window.isElectronApp || window.electronAPI) && window.electronAPI && window.electronAPI.latticePairForm;
+  if (!hasApi) {
+    if (note) note.hidden = false;
+    if (desk) desk.hidden = true;
+    return;
+  }
+  if (note) note.hidden = true;
+  if (desk) desk.hidden = false;
+  await flPairRefresh();
+}
+
+async function flPairForm() {
+  if (!window.electronAPI || !window.electronAPI.latticePairForm) {
+    flPairSetStatus('Pair form needs the desktop companion.', 'warn');
+    return;
+  }
+  var peerEl = document.getElementById('fl-pair-peer');
+  var seedEl = document.getElementById('fl-pair-seed');
+  var peer = peerEl ? peerEl.value : '';
+  var seed = seedEl ? seedEl.value : '';
+  flPairSetStatus('Forming pair…', '');
+  try {
+    var res = await window.electronAPI.latticePairForm({
+      peerPublicKeyB64: String(peer || '').trim(),
+      sharedSeedB64: String(seed || '').trim()
+    });
+    if (!res || res.ok === false) {
+      flPairSetStatus((res && res.error) || 'Form refused.', 'warn');
+      return;
+    }
+    if (seedEl) seedEl.value = '';
+    if (peerEl) peerEl.value = '';
+    await flPairRefresh();
+    flPairSetStatus('Pair formed · ' + flPairShortFp(res.pairFpHex), 'ok');
+    if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+      window.GlassPulses.emitGlassPulse({ source: 'identity', kind: 'pair.formed' });
+    }
+  } catch (e) {
+    flPairSetStatus('Form failed.', 'warn');
+  }
+}
+
+async function flPairClear() {
+  if (!window.electronAPI || !window.electronAPI.latticePairClear) {
+    flPairSetStatus('Clear needs the desktop companion.', 'warn');
+    return;
+  }
+  try {
+    var res = await window.electronAPI.latticePairClear();
+    if (!res || res.ok === false) {
+      flPairSetStatus((res && res.error) || 'Clear refused.', 'warn');
+      return;
+    }
+    var formFields = document.getElementById('fl-pair-form-fields');
+    if (formFields) formFields.hidden = false;
+    var fpEl = document.getElementById('fl-pair-fp');
+    if (fpEl) fpEl.textContent = '—';
+    flPairSetStatus('Pair cleared — nothing sealed.', 'ok');
+  } catch (e) {
+    flPairSetStatus('Clear failed.', 'warn');
+  }
+}
+
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       flInitCompanionIdentity();
+      flInitPairCard();
       flInitLedgerCard();
     });
   } else {
     flInitCompanionIdentity();
+    flInitPairCard();
     flInitLedgerCard();
   }
 }
