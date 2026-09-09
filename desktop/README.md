@@ -10,7 +10,7 @@ Layer, never delete. Seed never to renderer. Quiet Room shut. Five stay five.
 1. Read **[Desktop door](../docs/desktop.html)** — what unlocks, how to run, honest release status
 2. Dev: `cd desktop && npm install && npm start`
 3. Build: `npm run build` (or `build:mac` / `build:win` / `build:linux`)
-4. Check [GitHub Releases](https://github.com/Chaos2Cured/FreeLattice/releases) for labeled Electron artifacts when published — do not expect a fake App Store button here
+4. **No signed installer yet — build from source / check [Releases](https://github.com/Chaos2Cured/FreeLattice/releases)** for labeled Electron artifacts when published
 
 ## What this Electron app carries
 
