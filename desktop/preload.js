@@ -89,6 +89,42 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeLedgerVerify: () => ipcRenderer.invoke('lattice-ledger-verify'),
 
   /**
+   * Companion memory v0.1 — Remember opaque voice (wish|carry|note). Gesture only.
+   * @param {string} voice
+   * @param {{ kind?: string }} [meta]
+   */
+  latticeMemoryRemember: (voice, meta) => ipcRenderer.invoke('lattice-memory-remember', voice, meta),
+
+  /**
+   * List summaries only — no voice bodies.
+   * @param {{ includeTombstoned?: boolean }} [opts]
+   */
+  latticeMemoryList: (opts) => ipcRenderer.invoke('lattice-memory-list', opts),
+
+  /**
+   * Explicit read — full voice for one id.
+   * @param {string} id
+   */
+  latticeMemoryRead: (id) => ipcRenderer.invoke('lattice-memory-read', id),
+
+  /**
+   * Optional Seal into existing ledger (Continue). No fork.
+   * @param {string} id
+   */
+  latticeMemorySeal: (id) => ipcRenderer.invoke('lattice-memory-seal', id),
+
+  /**
+   * Soft leave — tombstone meta. Layer, never delete.
+   * @param {string} id
+   */
+  latticeMemoryTombstone: (id) => ipcRenderer.invoke('lattice-memory-tombstone', id),
+
+  /**
+   * Memory shelf status — counts only.
+   */
+  latticeMemoryStatus: () => ipcRenderer.invoke('lattice-memory-status'),
+
+  /**
    * Verified HTTPS import v0.1 — status only (counts). No path write. No seed.
    */
   latticeImportStatus: () => ipcRenderer.invoke('lattice-import-status'),

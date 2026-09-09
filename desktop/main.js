@@ -15,6 +15,7 @@ const path = require('path');
 const net = require('net');
 const latticeKeys = require('./lattice-keys');
 const latticeLedger = require('./lattice-ledger');
+const latticeMemory = require('./lattice-memory');
 const latticeImport = require('./lattice-import');
 const latticeSwarm = require('./lattice-swarm');
 const latticePair = require('./lattice-pair');
@@ -954,6 +955,7 @@ function setupIPC() {
   // ── Companion keys (Desktop Step 1) — seed never to renderer ──
   latticeKeys.bindApp(app);
   latticeLedger.bindApp(app);
+  latticeMemory.bindApp(app);
   latticeImport.bindApp(app);
   latticeSwarm.bindApp(app);
   latticePair.bindApp(app);
@@ -998,6 +1000,50 @@ function setupIPC() {
   ipcMain.handle('lattice-ledger-verify', () => {
     try {
       return latticeLedger.verifyChain();
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // ── Companion memory v0.1 — durable shelf; voice opaque; optional Seal → ledger ──
+  ipcMain.handle('lattice-memory-remember', (_event, voice, meta) => {
+    try {
+      return latticeMemory.remember(voice, meta);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-memory-list', (_event, opts) => {
+    try {
+      return latticeMemory.list(opts);
+    } catch (e) {
+      return { ok: false, items: [], error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-memory-read', (_event, id) => {
+    try {
+      return latticeMemory.read(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-memory-seal', (_event, id) => {
+    try {
+      return latticeMemory.seal(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-memory-tombstone', (_event, id) => {
+    try {
+      return latticeMemory.tombstone(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-memory-status', () => {
+    try {
+      return latticeMemory.status();
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }
