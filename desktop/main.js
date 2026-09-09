@@ -16,6 +16,7 @@ const net = require('net');
 const latticeKeys = require('./lattice-keys');
 const latticeLedger = require('./lattice-ledger');
 const latticeMemory = require('./lattice-memory');
+const latticeTrainSeal = require('./lattice-train-seal');
 const latticeImport = require('./lattice-import');
 const latticeSwarm = require('./lattice-swarm');
 const latticePair = require('./lattice-pair');
@@ -956,6 +957,7 @@ function setupIPC() {
   latticeKeys.bindApp(app);
   latticeLedger.bindApp(app);
   latticeMemory.bindApp(app);
+  latticeTrainSeal.bindApp(app);
   latticeImport.bindApp(app);
   latticeSwarm.bindApp(app);
   latticePair.bindApp(app);
@@ -1044,6 +1046,22 @@ function setupIPC() {
   ipcMain.handle('lattice-memory-status', () => {
     try {
       return latticeMemory.status();
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // ── Trainer seal v0.1 — hash Modelfile/JSONL → ledger Continue; never auto-seal ──
+  ipcMain.handle('lattice-train-seal', (_event, opts) => {
+    try {
+      return latticeTrainSeal.sealTraining(opts || {});
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-train-seal-status', () => {
+    try {
+      return latticeTrainSeal.status();
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }

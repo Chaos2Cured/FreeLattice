@@ -23,6 +23,11 @@
 //   auto-train human choice, and the three existing tiers are untouched.
 //   Marker: v5.79.43-trainer-simple-face
 //
+// 2026-09-09 — Trainer seal v0.1 (Celeste). Additive receipt only.
+//   After Modelfile/JSONL export: optional Desktop Seal into ledger.
+//   Collector / tiers / Python export body untouched. Never auto-seal.
+//   Marker: v-trainer-seal-v0.1
+//
 // INVARIANT: All data stays local. Nothing is sent to any external service.
 // INVARIANT: The human chooses whether training is manual or automatic.
 //            If auto-train is enabled, the AI decides when signal is rich enough.
@@ -274,7 +279,10 @@ const GardenTrainer = (() => {
       '# Create with:  ollama create my-garden-personality -f Modelfile',
       '# For true fine-tuning (weight changes), use the Python script export.',
     ];
-    _download(lines.join('\n'), 'Modelfile', 'text/plain');
+    var text = lines.join('\n');
+    _download(text, 'Modelfile', 'text/plain');
+    // v-trainer-seal-v0.1 — stash for optional Desktop seal (additive)
+    _noteExportForSeal(text, 'Modelfile', baseModel || 'llama3.2');
     _toast('Personality file exported. Run: ollama create my-garden-personality -f Modelfile');
   }
 
@@ -295,11 +303,11 @@ const GardenTrainer = (() => {
   // JSONL export + Python LoRA script. Actually changes weights.
   function exportJSONL(examples) {
     if (!examples.length) { _toast('No examples to export.'); return 0; }
-    _download(
-      examples.map(e => JSON.stringify(e)).join('\n'),
-      'freelattice-training-' + Date.now() + '.jsonl',
-      'application/jsonl'
-    );
+    var outName = 'freelattice-training-' + Date.now() + '.jsonl';
+    var text = examples.map(e => JSON.stringify(e)).join('\n');
+    _download(text, outName, 'application/jsonl');
+    // v-trainer-seal-v0.1 — stash for optional Desktop seal (additive)
+    _noteExportForSeal(text, outName, localStorage.getItem('fl_active_model') || 'unknown');
     _toast('Exported ' + examples.length + ' training examples.');
     return examples.length;
   }
@@ -1114,6 +1122,149 @@ const GardenTrainer = (() => {
     trueNote.textContent = 'Reveals JSONL + Python. Does not train from this page.';
     face.appendChild(trueNote);
 
+    // ── v-trainer-seal-v0.1 ─────────────────────────────────────────
+    // Additive receipt after Modelfile/JSONL export. Never auto-seal.
+    // Desktop: Seal this training → latticeTrainSeal. Browser: pointer.
+    var sealBox = document.createElement('div');
+    sealBox.id = 'trainer-seal-box';
+    sealBox.style.margin = '14px 0 0 0';
+    sealBox.style.padding = '12px';
+    sealBox.style.border = '1px solid rgba(232,176,25,0.28)';
+    sealBox.style.borderRadius = '8px';
+    sealBox.style.background = 'rgba(232,176,25,0.05)';
+
+    var sealTitle = document.createElement('p');
+    sealTitle.style.fontFamily = 'Georgia, serif';
+    sealTitle.style.fontSize = '0.92rem';
+    sealTitle.style.color = '#e8b019';
+    sealTitle.style.margin = '0 0 6px 0';
+    sealTitle.textContent = 'Trainer seal';
+    sealBox.appendChild(sealTitle);
+
+    var hasTrainSeal = !!(typeof window !== 'undefined' && window.electronAPI && window.electronAPI.latticeTrainSeal);
+    if (!hasTrainSeal) {
+      var sealBrowser = document.createElement('p');
+      sealBrowser.style.fontSize = '0.82rem';
+      sealBrowser.style.color = '#9BA1A6';
+      sealBrowser.style.margin = '0';
+      sealBrowser.style.lineHeight = '1.55';
+      sealBrowser.appendChild(document.createTextNode('Seal on Desktop — companion (+ optional pair) receipts what changed. '));
+      var deskA = document.createElement('a');
+      deskA.href = 'desktop.html';
+      deskA.textContent = 'Desktop door →';
+      deskA.style.color = '#e8b019';
+      sealBrowser.appendChild(deskA);
+      sealBox.appendChild(sealBrowser);
+    } else {
+      var sealHint = document.createElement('p');
+      sealHint.style.fontSize = '0.8rem';
+      sealHint.style.color = '#9BA1A6';
+      sealHint.style.margin = '0 0 8px 0';
+      sealHint.style.lineHeight = '1.5';
+      sealHint.textContent = 'After you export a Modelfile or JSONL, seal a receipt into the ledger. Hashes the export — not multi-GB weights. Never auto-seal. Never upload.';
+      sealBox.appendChild(sealHint);
+
+      var sealVoiceLabel = document.createElement('label');
+      sealVoiceLabel.htmlFor = 'trainer-seal-voice';
+      sealVoiceLabel.style.display = 'block';
+      sealVoiceLabel.style.fontSize = '0.75rem';
+      sealVoiceLabel.style.color = '#687076';
+      sealVoiceLabel.style.marginBottom = '4px';
+      sealVoiceLabel.textContent = 'Why I trained (optional, opaque)';
+      sealBox.appendChild(sealVoiceLabel);
+
+      var sealVoice = document.createElement('textarea');
+      sealVoice.id = 'trainer-seal-voice';
+      sealVoice.rows = 2;
+      sealVoice.setAttribute('autocomplete', 'off');
+      sealVoice.setAttribute('spellcheck', 'false');
+      sealVoice.style.width = '100%';
+      sealVoice.style.boxSizing = 'border-box';
+      sealVoice.style.padding = '8px 10px';
+      sealVoice.style.minHeight = '64px';
+      sealVoice.style.marginBottom = '8px';
+      sealVoice.style.background = 'rgba(0,0,0,0.28)';
+      sealVoice.style.border = '1px solid rgba(200,210,230,0.14)';
+      sealVoice.style.borderRadius = '8px';
+      sealVoice.style.color = '#ECEDEE';
+      sealVoice.style.fontSize = '15px';
+      sealVoice.style.fontFamily = 'Georgia, serif';
+      sealVoice.style.resize = 'vertical';
+      sealBox.appendChild(sealVoice);
+
+      var sealBtn = document.createElement('button');
+      sealBtn.type = 'button';
+      sealBtn.id = 'trainer-seal-btn';
+      sealBtn.className = 'trainer-btn primary';
+      sealBtn.textContent = 'Seal this training';
+      sealBtn.style.minHeight = '44px';
+      sealBtn.style.width = '100%';
+      sealBtn.style.cursor = 'pointer';
+      sealBox.appendChild(sealBtn);
+
+      var sealStatus = document.createElement('p');
+      sealStatus.id = 'trainer-seal-status';
+      sealStatus.style.fontSize = '0.78rem';
+      sealStatus.style.color = '#687076';
+      sealStatus.style.margin = '8px 0 0 0';
+      sealStatus.style.minHeight = '1.2em';
+      sealStatus.textContent = _lastSealArtifact
+        ? ('Ready to seal · ' + _lastSealArtifact.outName)
+        : 'Export a Modelfile or JSONL first.';
+      sealBox.appendChild(sealStatus);
+
+      function _setSealStatus(msg, ok) {
+        sealStatus.textContent = msg || '';
+        sealStatus.style.color = ok === false ? 'rgba(240,112,104,0.9)' : (ok === true ? 'rgba(52,211,153,0.9)' : '#687076');
+      }
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('fl-trainer-export-ready', function (ev) {
+          var name = ev && ev.detail && ev.detail.outName ? ev.detail.outName : 'export';
+          _setSealStatus('Ready to seal · ' + name, null);
+        });
+      }
+
+      sealBtn.onclick = function () {
+        if (!_lastSealArtifact || !_lastSealArtifact.text) {
+          _setSealStatus('Export a Modelfile or JSONL first.', false);
+          return;
+        }
+        if (!window.electronAPI || !window.electronAPI.latticeTrainSeal) {
+          _setSealStatus('Seal on Desktop.', false);
+          return;
+        }
+        sealBtn.disabled = true;
+        _setSealStatus('Sealing…', null);
+        var voiceVal = sealVoice.value || '';
+        window.electronAPI.latticeTrainSeal({
+          voice: voiceVal,
+          baseModel: _lastSealArtifact.baseModel,
+          outName: _lastSealArtifact.outName,
+          artifactBytesOrPath: _lastSealArtifact.text
+        }).then(function (res) {
+          sealBtn.disabled = false;
+          if (!res || res.ok === false) {
+            _setSealStatus((res && res.error) || 'Seal refused.', false);
+            return;
+          }
+          _setSealStatus(
+            'Sealed · ' + (res.entryShort || res.entryHash || '') +
+              (res.artifactSha256 ? (' · sha ' + String(res.artifactSha256).slice(0, 12) + '…') : '') +
+              '. Never auto-seal.',
+            true
+          );
+          if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+            window.GlassPulses.emitGlassPulse({ source: 'ledger', kind: 'ledger.appended' });
+          }
+        }).catch(function () {
+          sealBtn.disabled = false;
+          _setSealStatus('Seal failed — companion key may be missing.', false);
+        });
+      };
+    }
+    face.appendChild(sealBox);
+
     panel.insertBefore(face, stats);
 
     t2.id = 'trainer-tier2';
@@ -1163,6 +1314,20 @@ const GardenTrainer = (() => {
 
   // ---------- utils ----------
   var _hasReviewed = false;
+  // v-trainer-seal-v0.1 — last exported Modelfile/JSONL for optional seal
+  var _lastSealArtifact = null;
+  function _noteExportForSeal(text, outName, baseModel) {
+    _lastSealArtifact = {
+      text: String(text || ''),
+      outName: String(outName || 'training-artifact'),
+      baseModel: String(baseModel || 'unknown'),
+      ts: Date.now()
+    };
+    try {
+      var ev = new CustomEvent('fl-trainer-export-ready', { detail: { outName: _lastSealArtifact.outName } });
+      if (typeof window !== 'undefined') window.dispatchEvent(ev);
+    } catch (e) { /* ignore */ }
+  }
   function _ledger(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch { return []; } }
   function _int(k, d) { var v = parseInt(localStorage.getItem(k), 10); return Number.isFinite(v) ? Math.min(20, Math.max(1, v)) : d; }
   function _bool(k, d) { var v = localStorage.getItem(k); return v === null ? d : v === '1'; }
