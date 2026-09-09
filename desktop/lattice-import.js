@@ -345,9 +345,11 @@ module.exports = {
   fetchAndHash,
   ingestAndVerify,
   importToOllama,
+  getVerifiedPathForId,
   isZeroHash,
   isExampleRow,
   assertHttpsUrl,
   sha256Buffer,
-  verifiedById
+  verifiedById,
+  verifiedDir
 };

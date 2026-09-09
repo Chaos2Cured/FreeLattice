@@ -1049,6 +1049,20 @@ function setupIPC() {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }
   });
+  ipcMain.handle('lattice-swarm-reseed-start', async (_event, opts) => {
+    try {
+      return await latticeSwarm.startReseed(opts || {});
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+  ipcMain.handle('lattice-swarm-reseed-stop', async (_event, id) => {
+    try {
+      return await latticeSwarm.stopReseed(id);
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
 
   // ── Pair fingerprint v0.1 — two parties; seed sealed; never to renderer ──
   ipcMain.handle('lattice-pair-status', () => {

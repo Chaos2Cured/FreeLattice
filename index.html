@@ -29314,22 +29314,33 @@ function flManifestAppendRow(model) {
     importBtn.textContent = 'Import to Ollama';
     importBtn.style.cssText = 'min-height:44px;width:100%;';
     importBtn.hidden = true;
+    var reseedBtn = document.createElement('button');
+    reseedBtn.type = 'button';
+    reseedBtn.className = 'ai-status-btn';
+    reseedBtn.textContent = 'Re-seed';
+    reseedBtn.style.cssText = 'min-height:44px;width:100%;';
+    reseedBtn.hidden = true;
+    if (!(window.electronAPI && window.electronAPI.latticeSwarmReseedStart)) reseedBtn.hidden = true;
     var rowStatus = document.createElement('p');
     rowStatus.style.cssText = 'margin:0;font-size:0.78rem;color:var(--text-muted);min-height:1.2em;';
 
     fetchBtn.addEventListener('click', function () {
-      flManifestVerifyFetch(model, verdict, importBtn, rowStatus, fetchBtn);
+      flManifestVerifyFetch(model, verdict, importBtn, rowStatus, fetchBtn, reseedBtn);
     });
     swarmBtn.addEventListener('click', function () {
-      flManifestSwarmPull(model, verdict, importBtn, rowStatus, swarmBtn);
+      flManifestSwarmPull(model, verdict, importBtn, rowStatus, swarmBtn, reseedBtn);
     });
     importBtn.addEventListener('click', function () {
       flManifestImportOllama(model, rowStatus, importBtn);
+    });
+    reseedBtn.addEventListener('click', function () {
+      flManifestReseed(model, rowStatus, reseedBtn);
     });
 
     actions.appendChild(fetchBtn);
     actions.appendChild(swarmBtn);
     actions.appendChild(importBtn);
+    actions.appendChild(reseedBtn);
     actions.appendChild(rowStatus);
     li.appendChild(actions);
   }
@@ -29337,7 +29348,7 @@ function flManifestAppendRow(model) {
   list.appendChild(li);
 }
 
-async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarmBtn) {
+async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarmBtn, reseedBtn) {
   if (!window.electronAPI || !window.electronAPI.latticeSwarmStart) return;
   var magnet = (model.magnets && model.magnets[0]) ? String(model.magnets[0]) : '';
   var webseed = (model.webseeds && model.webseeds[0])
@@ -29368,15 +29379,16 @@ async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarm
       var job = st && st.job ? st.job : null;
       if (!job) break;
       var pct = typeof job.progress === 'number' ? job.progress : 0;
-      rowStatus.textContent = 'Swarm ' + (job.state || '') + ' · ' + pct + '%' + (st.reseed === 'later' ? ' · re-seed later' : '');
+      rowStatus.textContent = 'Swarm ' + (job.state || '') + ' · ' + pct + '%';
       if (job.state === 'verified' && job.matched) {
         if (verdictEl) {
           verdictEl.style.color = 'rgba(52,211,153,0.95)';
-          verdictEl.textContent = 'Swarm hash matched — verified. Import when you choose.';
+          verdictEl.textContent = 'Swarm hash matched — verified. Import or Re-seed when you choose.';
         }
         rowStatus.style.color = 'rgba(52,211,153,0.9)';
         rowStatus.textContent = 'Verified via swarm' + (job.verifiedBase ? (' · ' + job.verifiedBase) : '') + '. Never auto-import.';
         if (importBtn) importBtn.hidden = false;
+        if (reseedBtn && window.electronAPI.latticeSwarmReseedStart) reseedBtn.hidden = false;
         if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
           window.GlassPulses.emitGlassPulse({ source: 'swarm', kind: 'transfer.verified' });
         }
@@ -29390,6 +29402,7 @@ async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarm
         rowStatus.style.color = 'rgba(240,112,104,0.9)';
         rowStatus.textContent = job.error || 'Mismatch — quarantined; will not import.';
         if (importBtn) importBtn.hidden = true;
+        if (reseedBtn) reseedBtn.hidden = true;
         if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
           window.GlassPulses.emitGlassPulse({ source: 'swarm', kind: 'transfer.mismatch' });
         }
@@ -29409,7 +29422,7 @@ async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarm
   swarmBtn.disabled = false;
 }
 
-async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fetchBtn) {
+async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fetchBtn, reseedBtn) {
   if (!window.electronAPI || !window.electronAPI.latticeImportFetch) return;
   var url = (model.urls && model.urls[0]) ? String(model.urls[0]) : '';
   rowStatus.textContent = 'Fetching over HTTPS…';
@@ -29424,11 +29437,12 @@ async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fet
     if (res && res.matched) {
       if (verdictEl) {
         verdictEl.style.color = 'rgba(52,211,153,0.95)';
-        verdictEl.textContent = 'Hash matched — verified. Import when you choose.';
+        verdictEl.textContent = 'Hash matched — verified. Import or Re-seed when you choose.';
       }
       rowStatus.style.color = 'rgba(52,211,153,0.9)';
       rowStatus.textContent = 'Verified' + (res.verifiedBase ? (' · ' + res.verifiedBase) : '') + '. Never auto-import.';
       if (importBtn) importBtn.hidden = false;
+      if (reseedBtn && window.electronAPI.latticeSwarmReseedStart) reseedBtn.hidden = false;
       if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
         window.GlassPulses.emitGlassPulse({ source: 'import', kind: 'transfer.verified' });
       }
@@ -29440,6 +29454,7 @@ async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fet
       rowStatus.style.color = 'rgba(240,112,104,0.9)';
       rowStatus.textContent = (res && (res.reason || res.error)) || 'Mismatch — quarantined; will not import.';
       if (importBtn) importBtn.hidden = true;
+      if (reseedBtn) reseedBtn.hidden = true;
       if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
         window.GlassPulses.emitGlassPulse({ source: 'import', kind: 'transfer.mismatch' });
       }
@@ -29449,6 +29464,56 @@ async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fet
     rowStatus.textContent = 'Fetch failed. Nothing imported.';
   }
   fetchBtn.disabled = false;
+}
+
+async function flManifestReseed(model, rowStatus, reseedBtn) {
+  if (!window.electronAPI || !window.electronAPI.latticeSwarmReseedStart) {
+    rowStatus.textContent = 'Re-seed needs the desktop companion.';
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    return;
+  }
+  var id = model.id || model.name || 'model';
+  var seeding = reseedBtn && reseedBtn.dataset && reseedBtn.dataset.seeding === '1';
+  reseedBtn.disabled = true;
+  try {
+    if (seeding && window.electronAPI.latticeSwarmReseedStop) {
+      rowStatus.textContent = 'Stopping re-seed…';
+      rowStatus.style.color = '';
+      var stopped = await window.electronAPI.latticeSwarmReseedStop(id);
+      reseedBtn.dataset.seeding = '';
+      reseedBtn.textContent = 'Re-seed';
+      rowStatus.style.color = 'rgba(52,211,153,0.9)';
+      rowStatus.textContent = (stopped && stopped.stopped) ? 'Re-seed stopped.' : ((stopped && stopped.error) || 'Stopped.');
+      reseedBtn.disabled = false;
+      return;
+    }
+    rowStatus.textContent = 'Re-seeding verified file…';
+    rowStatus.style.color = '';
+    var res = await window.electronAPI.latticeSwarmReseedStart({
+      id: id,
+      name: model.name || id,
+      redistributable: model.redistributable === true,
+      expectedSha256: model.sha256,
+      notes: model.notes || ''
+    });
+    if (!res || res.ok === false) {
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = (res && res.error) || 'Re-seed refused.';
+      reseedBtn.disabled = false;
+      return;
+    }
+    var r = res.reseed || {};
+    reseedBtn.dataset.seeding = '1';
+    reseedBtn.textContent = 'Stop re-seed';
+    rowStatus.style.color = 'rgba(52,211,153,0.9)';
+    var mag = r.magnetURI ? String(r.magnetURI) : '';
+    var shortMag = mag.length > 48 ? (mag.slice(0, 28) + '…') : mag;
+    rowStatus.textContent = 'Seeding' + (r.infoHash ? (' · ' + r.infoHash.slice(0, 12) + '…') : '') + (shortMag ? (' · ' + shortMag) : '') + '. Never auto-seed.';
+  } catch (e) {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = 'Re-seed failed.';
+  }
+  reseedBtn.disabled = false;
 }
 
 async function flManifestImportOllama(model, rowStatus, importBtn) {

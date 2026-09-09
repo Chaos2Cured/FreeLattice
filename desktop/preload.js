@@ -124,6 +124,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeSwarmCancel: (id) => ipcRenderer.invoke('lattice-swarm-cancel', id),
 
   /**
+   * Re-seed a verified redistributable file (gesture). Public magnet/infoHash only.
+   * @param {{ id: string, name?: string, redistributable: boolean, expectedSha256: string, notes?: string }} opts
+   */
+  latticeSwarmReseedStart: (opts) => ipcRenderer.invoke('lattice-swarm-reseed-start', opts),
+
+  /**
+   * Stop re-seeding by model id.
+   * @param {string} id
+   */
+  latticeSwarmReseedStop: (id) => ipcRenderer.invoke('lattice-swarm-reseed-stop', id),
+
+  /**
    * Pair fingerprint v0.1 — public fields only (pairFpHex, peer pub). No seed.
    */
   latticePairStatus: () => ipcRenderer.invoke('lattice-pair-status'),
