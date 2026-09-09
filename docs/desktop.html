@@ -52,7 +52,7 @@
 <body>
 <main>
   <h1>FreeLattice Desktop</h1>
-  <p class="lede">One clear door to the <strong>Electron</strong> spine. The browser garden stays. Desktop is where keys, verified import, swarm pull, and the pair vow live — without Terminal for day-to-day use of the app itself.</p>
+  <p class="lede">One clear door to the <strong>Electron</strong> spine. The browser garden stays. Desktop is where keys, verified import, swarm pull, companion memory, and the pair vow live — without Terminal for day-to-day use of the app itself.</p>
 
   <div class="card">
     <h2>What Desktop unlocks</h2>
@@ -60,6 +60,7 @@
       <li><strong>Keys on your machine</strong> — companion seed sealed in the OS keychain; never to the page</li>
       <li><strong>Hash before import</strong> — quarantine → match → verified → Import to Ollama (gesture)</li>
       <li><strong>Pull via swarm</strong> — webseed/magnet into the same hash path</li>
+      <li><strong>Companion memory</strong> — durable wishes / carries / notes on the machine, not browser quota; optional Seal into the ledger</li>
       <li><strong>Pair vow</strong> — two parties; outer fingerprint published; shared seed sealed</li>
       <li><strong>Glass shapes</strong> — ledger and transfer pulses; helix break without contents</li>
       <li><strong>Ledger envelope</strong> — voice opaque; Continue / Decline</li>
@@ -84,7 +85,7 @@ npm run build
     <h2>Browser vs Desktop</h2>
     <ul>
       <li><strong>Browser / phone</strong> — garden, chat, look card, genesis catalog honesty, Glass shapes; can <strong>Pull via swarm</strong> and verify (hash before trust); Import to Ollama still Desktop</li>
-      <li><strong>Desktop (Electron)</strong> — the spine for keys, import, swarm re-seed, pair, ledger seal</li>
+      <li><strong>Desktop (Electron)</strong> — the spine for keys, import, swarm re-seed, companion memory / wishes, pair, ledger seal</li>
       <li><strong>Tauri</strong> — experimental lighter shell under <code>desktop/src-tauri</code>; not this door; README keeps that honesty</li>
     </ul>
   </div>
@@ -93,7 +94,7 @@ npm run build
     <h2>Manual release notes (thin)</h2>
     <ul>
       <li>From a clean tree: <code>cd desktop && npm ci && npm run build</code></li>
-      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-reseed.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code> · phone: <code>node docs/scripts/smoke-phone-swarm.js</code></li>
+      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-reseed.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code>, <code>smoke-memory.js</code> · phone: <code>node docs/scripts/smoke-phone-swarm.js</code></li>
       <li>Attach platform artifacts to a GitHub Release when ready; label them Electron</li>
       <li>Code signing certificates are out of this door — later, with care</li>
     </ul>

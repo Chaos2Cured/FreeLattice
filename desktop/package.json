@@ -22,6 +22,7 @@
       "preload.js",
       "lattice-keys.js",
       "lattice-ledger.js",
+      "lattice-memory.js",
       "lattice-import.js",
       "lattice-swarm.js",
       "lattice-pair.js",
