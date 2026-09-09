@@ -49,6 +49,7 @@ Browsers: WebTorrent + web seeds. Desktop: real BitTorrent + WebTorrent bridge. 
 Removes LNA, CORS, and gives real BitTorrent — and is the only proper home for keys.
 Private keys never cross `contextBridge`. Signing in main. OS keychain via `safeStorage`; refuse cleartext fallback. `nodeIntegration: false`, `contextIsolation: true`, allowlisted IPC.
 **Build order:** shell + IPC + keys → ledger + Glass → Ollama native → manifests over HTTPS → swarm bridge → mesh pointers. Step 4 (HTTPS manifests) delivers most value first.
+**LAYER (2026-09-09):** Trainer seal v0.1 — when local weights/artifacts change, companion (+ optional pair) seals a ledger Continue (`meta.kind: training_seal`) hashing Modelfile/JSONL only — [TRAINER_SEAL_v0.1.md](./TRAINER_SEAL_v0.1.md) and `desktop/lattice-train-seal.js`. Never auto-seal. Never upload. GardenTrainer core untouched.
 ## Part 8 — Glass Room pulses
 Extend existing pulse vocabulary. Shape without contents: `ledger.appended`, `ledger.verified`, `ledger.broken`, `pair.formed`, `pair.rotated`, `manifest.signed`, `transfer.verified`, `transfer.mismatch`, `tier.advanced`, `tier.reset`. A break in the chain shows as a break in the helix.
 **LAYER (2026-09-08):** Glass pulses v0.1 — fixed opaque summaries + emit helper + helix break — live in [GLASS_PULSES_v0.1.md](./GLASS_PULSES_v0.1.md) and `docs/modules/glass-pulses.js`. Pair/tier/manifest.signed reserved until those APIs exist. Quiet Room never emits.

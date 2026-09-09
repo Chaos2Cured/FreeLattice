@@ -125,6 +125,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeMemoryStatus: () => ipcRenderer.invoke('lattice-memory-status'),
 
   /**
+   * Trainer seal v0.1 — hash Modelfile/JSONL → ledger Continue. Gesture only.
+   * @param {{ voice?: string, baseModel?: string, outName?: string, artifactBytesOrPath: string, pairOuterHex?: string }} opts
+   */
+  latticeTrainSeal: (opts) => ipcRenderer.invoke('lattice-train-seal', opts),
+
+  /**
+   * Trainer seal status — public fields only.
+   */
+  latticeTrainSealStatus: () => ipcRenderer.invoke('lattice-train-seal-status'),
+
+  /**
    * Verified HTTPS import v0.1 — status only (counts). No path write. No seed.
    */
   latticeImportStatus: () => ipcRenderer.invoke('lattice-import-status'),

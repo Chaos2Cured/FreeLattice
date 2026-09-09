@@ -23,6 +23,7 @@
       "lattice-keys.js",
       "lattice-ledger.js",
       "lattice-memory.js",
+      "lattice-train-seal.js",
       "lattice-import.js",
       "lattice-swarm.js",
       "lattice-pair.js",
