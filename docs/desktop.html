@@ -83,8 +83,8 @@ npm run build
   <div class="card">
     <h2>Browser vs Desktop</h2>
     <ul>
-      <li><strong>Browser / phone</strong> — garden, chat, look card, genesis catalog honesty, Glass shapes</li>
-      <li><strong>Desktop (Electron)</strong> — the spine for keys, import, swarm, pair, ledger seal</li>
+      <li><strong>Browser / phone</strong> — garden, chat, look card, genesis catalog honesty, Glass shapes; can <strong>Pull via swarm</strong> and verify (hash before trust); Import to Ollama still Desktop</li>
+      <li><strong>Desktop (Electron)</strong> — the spine for keys, import, swarm re-seed, pair, ledger seal</li>
       <li><strong>Tauri</strong> — experimental lighter shell under <code>desktop/src-tauri</code>; not this door; README keeps that honesty</li>
     </ul>
   </div>
@@ -93,7 +93,7 @@ npm run build
     <h2>Manual release notes (thin)</h2>
     <ul>
       <li>From a clean tree: <code>cd desktop && npm ci && npm run build</code></li>
-      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code></li>
+      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-reseed.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code> · phone: <code>node docs/scripts/smoke-phone-swarm.js</code></li>
       <li>Attach platform artifacts to a GitHub Release when ready; label them Electron</li>
       <li>Code signing certificates are out of this door — later, with care</li>
     </ul>

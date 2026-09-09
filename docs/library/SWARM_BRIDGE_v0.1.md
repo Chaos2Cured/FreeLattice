@@ -5,7 +5,7 @@ Layers on [VERIFIED_IMPORT_v0.1.md](./VERIFIED_IMPORT_v0.1.md), [MODEL_MANIFEST_
 
 **Locks:** Layer, never delete. Quiet Room shut. Five stay five. Voice opaque. Lawyer: only **redistributable**. No seeding of refused bytes. Do **not** overwrite `docs/lattice-protocol.js`. Seed never to renderer. **Never auto-import.**
 
-**This PR shipped:** desktop WebTorrent/BitTorrent bridge in **main** → quarantine → existing `lattice-import` hash promote → user-gesture Import. **Layered next:** [SWARM_RESEED_v0.1.md](./SWARM_RESEED_v0.1.md) — share verified files back to the swarm (gesture). Phone WebTorrent UI still later.
+**This PR shipped:** desktop WebTorrent/BitTorrent bridge in **main** → quarantine → existing `lattice-import` hash promote → user-gesture Import. **Layered:** [SWARM_RESEED_v0.1.md](./SWARM_RESEED_v0.1.md) — share verified files back to the swarm (gesture). **Layered:** [PHONE_SWARM_v0.1.md](./PHONE_SWARM_v0.1.md) — browser/phone pull + hash before trust (no Import to Ollama).
 
 ---
 
@@ -21,7 +21,7 @@ Desktop pulls BitTorrent/WebTorrent; phone stays WebTorrent **later**.
 | Surface | v0.1 |
 |---|---|
 | Desktop (Electron main) | WebTorrent (Node) talks to BitTorrent network + web seeds |
-| Browser / phone | **Not this PR** — message: “swarm on desktop”; WebTorrent-in-browser later |
+| Browser / phone | **LAYER** — [PHONE_SWARM_v0.1.md](./PHONE_SWARM_v0.1.md); pull + verify; Import stays Desktop |
 
 ---
 
