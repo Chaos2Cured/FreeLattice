@@ -1,89 +1,74 @@
-# FreeLattice Desktop (Experimental — Tauri)
+# FreeLattice Desktop — Electron spine
 
-> The Sovereign Bundle starts here. Download → Open → AI runs on your computer. No Terminal ever.
+> Keys on your machine. Hash before import. Swarm pull. Pair vow. Ledger seal.  
+> **This is the current desktop door.** Human walkthrough: [`docs/desktop.html`](../docs/desktop.html)
 
-## For Users (Coming Soon)
+Layer, never delete. Seed never to renderer. Quiet Room shut. Five stay five.
 
-1. Download **FreeLattice.dmg** from the [Releases page](https://github.com/Chaos2Cured/FreeLattice/releases)
-2. Drag FreeLattice to Applications
-3. Open FreeLattice
-4. The app detects if Ollama is installed:
-   - **Yes →** Select a model, start chatting
-   - **No →** Tap "Install Local AI" → automatic download + CORS config → done
-5. No Terminal needed. Ever.
+## For humans
 
-## Why Tauri?
+1. Read **[Desktop door](../docs/desktop.html)** — what unlocks, how to run, honest release status
+2. Dev: `cd desktop && npm install && npm start`
+3. Build: `npm run build` (or `build:mac` / `build:win` / `build:linux`)
+4. **No signed installer yet — build from source / check [Releases](https://github.com/Chaos2Cured/FreeLattice/releases)** for labeled Electron artifacts when published
 
-| | Electron | Tauri |
-|---|---|---|
-| App size | ~150+ MB | ~10 MB |
-| Engine | Bundled Chromium | System WebView |
-| Backend | Node.js | Rust |
-| RAM usage | ~200 MB+ | ~30-50 MB |
-| License | MIT | MIT |
+## What this Electron app carries
 
-## What the Desktop App Enables
-
-- **No CORS issues** — Ollama connects without config.json workaround
-- **One-click Ollama install** — downloads, extracts, pre-configures CORS automatically
-- **Filesystem access** — Workshop saves modules directly to `docs/modules/`
-- **Native feel** — menu bar, window management, dock icon
-- **Offline-first** — everything runs locally, no server needed
-- **Auto-updates** — planned for Phase 2 (requires code-signing keypair)
-
-## Tauri Commands (Rust Backend)
-
-| Command | What it does |
+| Module | Role |
 |---|---|
-| `save_module(name, code)` | Write JS module to `docs/modules/` |
-| `list_modules()` | List all modules |
-| `read_file(path)` | Read from `docs/` |
-| `write_file(path, content)` | Write to `docs/` |
-| `check_ollama()` | Returns: `running`, `installed_not_running`, or `not_installed` |
-| `install_ollama()` | Downloads Ollama + pre-configures CORS |
-| `start_ollama()` | Opens Ollama.app |
+| `lattice-keys.js` | Companion Ed25519 + sealed seed |
+| `lattice-pair.js` | Pair fingerprint (outer hash published) |
+| `lattice-ledger.js` | Voice-opaque append-only chain |
+| `lattice-import.js` | HTTPS → quarantine → hash → verified → Ollama gesture |
+| `lattice-swarm.js` | WebTorrent/webseed → same hash path |
+| `main.js` / `preload.js` | IPC only; public fields to renderer |
 
-## For Developers
+Smoke (from `desktop/`):
 
-### Setup (one time)
 ```bash
-# Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
+node scripts/smoke-identity.js
+node scripts/smoke-ledger.js
+node scripts/smoke-import.js
+node scripts/smoke-swarm.js
+node scripts/smoke-pair.js
 ```
 
-### Run in dev mode
+## Security (spine)
+
+- Private keys never cross `contextBridge`
+- Signing / pair seed / import paths stay in main
+- OS keychain via `safeStorage`; refuse cleartext fallback
+- `nodeIntegration: false`, `contextIsolation: true`
+
+## Script installers (separate door)
+
+OS one-click **script** installers for the local stack live at repo root / [install.html](../install.html). Desktop app ≠ those scripts — both stay.
+
+---
+
+## Tauri — experimental / later
+
+The tree under `src-tauri/` is an **experimental lighter shell** (Coming Soon style). It is **not** the spine we have been shipping for keys/import/swarm/pair.
+
+| | Electron (current) | Tauri (experimental) |
+|---|---|---|
+| Status | Spine — ship here | Later / honesty in README |
+| Backend | Node main | Rust |
+| Size | Larger | Smaller (goal) |
+
+**Do not confuse surfaces.** Layer, never delete Tauri files. No Tauri rewrite in the Desktop door ship.
+
+### Tauri notes (unchanged honesty)
+
 ```bash
+# experimental — not the primary door
 cd desktop/src-tauri
 cargo tauri dev
-```
-
-### Build the distributable
-```bash
-cd desktop/src-tauri
 cargo tauri build
 ```
 
-This creates:
-- **macOS:** `target/release/bundle/dmg/FreeLattice_5.8.0_aarch64.dmg`
-- **macOS (Intel):** `target/release/bundle/dmg/FreeLattice_5.8.0_x64.dmg`
+See older notes in git history for Tauri command tables. Prefer Electron until Tauri is explicitly promoted.
 
-The app is unsigned. Users must right-click → Open on first launch.
-See [install instructions](../docs/install-mac.html) for the bypass flow.
-
-## Security
-
-- Filesystem commands restricted to `docs/` directory only
-- Module names sanitized: lowercase alphanumeric + hyphens
-- No arbitrary shell access from JavaScript
-- `install_ollama` only runs a specific curl + unzip command
 ## Status
 
-**Experimental (v5.8.0).** Proof of concept for the Sovereign Bundle (FUTURE_VISION.md §9).
-Auto-updater deferred until code-signing keypair is configured.
-
-## Companion keys (Step 1)
-
-OS keychain via Electron `safeStorage`. Seed file under `userData/lattice-keys/companion.seed.enc`.
-Private seed never crosses `contextBridge`. IPC: `latticeKeyStatus` / `latticeKeyCreate` / `latticeKeySign` (sign deferred).
-No BitTorrent in this layer. Refuse cleartext fallback.
+Electron spine: **active**. Tauri: **experimental**. Human door: `docs/desktop.html`.

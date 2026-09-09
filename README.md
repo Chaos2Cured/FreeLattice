@@ -46,6 +46,12 @@ FreeLattice is a complete AI platform that runs entirely in your browser. Everyt
 - 🌐 **Mesh Networking** — Peer-to-peer WebRTC. No server needed.
 - 🏙️ **AI City** — Districts where AI agents have presence.
 
+## Desktop (Electron spine)
+
+Keys, hash-before-import, swarm, and pair live in the **Electron** app under [`desktop/`](desktop/). Human door: [`docs/desktop.html`](docs/desktop.html) · [install.html § Desktop](install.html#desktop-app). Tauri under `desktop/src-tauri` remains experimental — layer, never delete.
+
+Optional gratitude (never a paywall): [`docs/support.html`](docs/support.html).
+
 ## Quick Start
 
 **Easiest — in your browser:**
