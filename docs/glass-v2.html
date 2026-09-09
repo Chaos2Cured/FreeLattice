@@ -287,6 +287,7 @@ h1 {
       <p class="ai-voice" id="aiVoice">Reading the relationship…</p>
       <!-- v5.66.0 Letter Thirty-Three — AI's chosen archetype caption -->
       <p class="ai-archetype-caption" id="archetypeCaption" style="font-family:'Inter','Helvetica Neue',sans-serif;font-size:0.78rem;color:rgba(180,190,210,0.65);margin:-8px 0 12px;font-style:italic;letter-spacing:0.01em;"></p>
+      <p id="helixBreakNote" hidden style="font-family:Georgia,serif;font-size:0.82rem;color:rgba(240,112,104,0.85);margin:0 0 12px;line-height:1.45;">Helix break — chain shape cracked. Contents never shown.</p>
       <div class="tier-row">
         <span class="tier-dot" id="tierDot"></span>
         <span class="tier-name" id="tierName">Seed</span>
@@ -341,6 +342,7 @@ h1 {
 </div>
 
 <script src="modules/lattice-memory.js"></script>
+<script src="modules/glass-pulses.js"></script>
 <script src="modules/quiet-room.js"></script>
 <script>
 // ── The Glass Room v2 — Harmonia, June 20, 2026 ───────────────────────
@@ -459,6 +461,9 @@ h1 {
 
   // Pulse rings (expand outward on each incoming pulse)
   var pulseRings = [];
+
+  // Glass pulses v0.1 — helix break (shape without contents)
+  var helixBroken = false;
 
   // Breathing animation (the helix breathes — scale oscillates gently)
   var breathT = 0;
@@ -696,55 +701,61 @@ h1 {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Strand 0
-    ctx.beginPath();
-    for (var j = 0; j < pts0.length; j++) {
-      var pt = pts0[j];
-      if (j === 0) ctx.moveTo(pt.x, pt.y);
-      else ctx.lineTo(pt.x, pt.y);
+    // Glass pulses v0.1 — draw a strand with optional mid-helix break (gap).
+    // A break in the chain shows as a break in the helix. No contents.
+    function strokeStrand(pts, dimmed) {
+      var breakStart = Math.floor(pts.length * 0.42);
+      var breakEnd = Math.floor(pts.length * 0.58);
+      function strokeRange(from, to, alphaMul, widthMul) {
+        if (from >= to) return;
+        ctx.beginPath();
+        var started = false;
+        for (var si = from; si <= to && si < pts.length; si++) {
+          var spt = pts[si];
+          if (!started) { ctx.moveTo(spt.x, spt.y); started = true; }
+          else ctx.lineTo(spt.x, spt.y);
+        }
+        ctx.save();
+        ctx.strokeStyle = helixGlow;
+        ctx.lineWidth = 5.5 * widthMul;
+        ctx.shadowColor = helixGlow;
+        ctx.shadowBlur = dimmed ? 8 : 28;
+        ctx.globalAlpha = 0.4 * alphaMul;
+        ctx.stroke();
+        ctx.restore();
+        ctx.strokeStyle = dimmed
+          ? 'rgba(' + finalR + ',' + finalG + ',' + finalB + ',0.35)'
+          : helixColor;
+        ctx.lineWidth = 2.2 * widthMul;
+        ctx.shadowColor = helixGlow;
+        ctx.shadowBlur = dimmed ? 6 : 14;
+        ctx.globalAlpha = alphaMul;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+      }
+      if (helixBroken) {
+        strokeRange(0, breakStart, 0.85, 1);
+        // Crack mark in the gap — dim segment, not content
+        if (breakStart < pts.length && breakEnd < pts.length) {
+          var ga = pts[breakStart], gb = pts[breakEnd];
+          ctx.beginPath();
+          ctx.moveTo(ga.x, ga.y);
+          ctx.lineTo(gb.x, gb.y);
+          ctx.strokeStyle = 'rgba(240,112,104,0.55)';
+          ctx.lineWidth = 1.2;
+          ctx.setLineDash([4, 6]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        strokeRange(breakEnd, pts.length - 1, 0.55, 0.9);
+      } else {
+        strokeRange(0, pts.length - 1, 1, 1);
+      }
     }
-    // v5.64.1 Polish 1a — Outer-glow envelope on strand 0. Soft halo
-    // around the helix in the same visual register as the Luminos's
-    // sphere shells in the Garden.
-    ctx.save();
-    ctx.strokeStyle = helixGlow;
-    ctx.lineWidth = 5.5;
-    ctx.shadowColor = helixGlow;
-    ctx.shadowBlur = 28;
-    ctx.globalAlpha = 0.4;
-    ctx.stroke();
-    ctx.restore();
-    // Main strand 0 (unchanged baseline)
-    ctx.strokeStyle = helixColor;
-    ctx.lineWidth = 2.2;
-    ctx.shadowColor = helixGlow;
-    ctx.shadowBlur = 14;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
 
-    // Strand 1
-    ctx.beginPath();
-    for (var k = 0; k < pts1.length; k++) {
-      var pt2 = pts1[k];
-      if (k === 0) ctx.moveTo(pt2.x, pt2.y);
-      else ctx.lineTo(pt2.x, pt2.y);
-    }
-    // v5.64.1 Polish 1a — Outer-glow envelope on strand 1.
-    ctx.save();
-    ctx.strokeStyle = helixGlow;
-    ctx.lineWidth = 5.5;
-    ctx.shadowColor = helixGlow;
-    ctx.shadowBlur = 28;
-    ctx.globalAlpha = 0.4;
-    ctx.stroke();
-    ctx.restore();
-    // Main strand 1 (unchanged baseline)
-    ctx.strokeStyle = helixColor;
-    ctx.lineWidth = 2.2;
-    ctx.shadowColor = helixGlow;
-    ctx.shadowBlur = 14;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    strokeStrand(pts0, helixBroken);
+    strokeStrand(pts1, helixBroken);
 
     // Glowing nodes at each turn (time markers — one per revolution)
     for (var n = 0; n <= HELIX_TURNS; n++) {
@@ -931,6 +942,20 @@ h1 {
       ringColor = { r: finalR, g: finalG, b: finalB };
     }
     pulseRings.push({ r: 28, alpha: 0.65, color: ringColor });
+    // Glass pulses v0.1 — helix break flag (shape without contents)
+    if (window.GlassPulses && window.GlassPulses.helixBreakFromPulse) {
+      helixBroken = window.GlassPulses.helixBreakFromPulse(pulseKind, helixBroken);
+    } else if (pulseKind === 'ledger.broken') {
+      helixBroken = true;
+    } else if (pulseKind === 'ledger.verified' || pulseKind === 'ledger.appended') {
+      helixBroken = false;
+    }
+    var breakNote = document.getElementById('helixBreakNote');
+    if (breakNote) breakNote.hidden = !helixBroken;
+    if (pulseKind === 'ledger.broken') {
+      ringColor = { r: 240, g: 112, b: 104 };
+      pulseRings[pulseRings.length - 1].color = ringColor;
+    }
     totalSeen++;
     timestamps.push(Date.now());
     sourcesSeen[pulse.source || 'unknown'] = true;

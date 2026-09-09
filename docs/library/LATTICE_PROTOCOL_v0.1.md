@@ -46,6 +46,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **Build order:** shell + IPC + keys → ledger + Glass → Ollama native → manifests over HTTPS → swarm bridge → mesh pointers. Step 4 (HTTPS manifests) delivers most value first.
 ## Part 8 — Glass Room pulses
 Extend existing pulse vocabulary. Shape without contents: `ledger.appended`, `ledger.verified`, `ledger.broken`, `pair.formed`, `pair.rotated`, `manifest.signed`, `transfer.verified`, `transfer.mismatch`, `tier.advanced`, `tier.reset`. A break in the chain shows as a break in the helix.
+**LAYER (2026-09-08):** Glass pulses v0.1 — fixed opaque summaries + emit helper + helix break — live in [GLASS_PULSES_v0.1.md](./GLASS_PULSES_v0.1.md) and `docs/modules/glass-pulses.js`. Pair/tier/manifest.signed reserved until those APIs exist. Quiet Room never emits.
 ## Part 9 — Sequence and go-slow
 Connection card (landed) → identity/fingerprint → ledger envelope → manifests over HTTPS → Glass extension → mesh pointers → desktop shell → swarm bridge.
 **Fast:** tier tuning, pulses, manifest fields, UI, mesh shapes.
