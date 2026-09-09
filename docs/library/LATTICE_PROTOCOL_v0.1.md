@@ -42,6 +42,7 @@ Mesh carries presence, chat, and pointers. Never weights. Manual handshake stays
 ## Part 6 — Distributed network
 Browsers: WebTorrent + web seeds. Desktop: real BitTorrent + WebTorrent bridge. Desktop pulls the wide swarm and re-seeds into WebTorrent. Verified file → Ollama import only outside the browser's LNA/CORS traps.
 **LAYER (2026-09-08):** Swarm bridge v0.1 — desktop WebTorrent/webseed pull → existing hash-before-import — lives in [SWARM_BRIDGE_v0.1.md](./SWARM_BRIDGE_v0.1.md) and `desktop/lattice-swarm.js`. Browser/phone swarm UI waits. Swarm never bypasses hash.
+**LAYER (2026-09-09):** Swarm re-seed v0.1 — share verified redistributable files back to the swarm — [SWARM_RESEED_v0.1.md](./SWARM_RESEED_v0.1.md). Never refuse-bytes. Phone WebTorrent later.
 ## Part 7 — Desktop
 Removes LNA, CORS, and gives real BitTorrent — and is the only proper home for keys.
 Private keys never cross `contextBridge`. Signing in main. OS keychain via `safeStorage`; refuse cleartext fallback. `nodeIntegration: false`, `contextIsolation: true`, allowlisted IPC.

@@ -22,6 +22,9 @@ let wtLoadPromise = null;
 /** @type {Map<string, object>} */
 const jobs = new Map();
 
+/** @type {Map<string, object>} reseed sessions keyed by model id */
+const reseeds = new Map();
+
 /**
  * WebTorrent 2.x is ESM — load via dynamic import() from Electron/CommonJS main.
  */
@@ -63,9 +66,18 @@ function bindSmoke(rootDir) {
   // Share import smoke root so hash promote lands in the same tree
   latticeImport.bindSmoke(rootDir);
   jobs.clear();
+  reseeds.clear();
 }
 
 function destroyClient() {
+  reseeds.forEach(function (r) {
+    try {
+      if (r.torrent) r.torrent.destroy();
+    } catch (e) {
+      /* ignore */
+    }
+  });
+  reseeds.clear();
   if (wtClient) {
     try {
       wtClient.destroy(function () {});
@@ -121,14 +133,36 @@ function publicJob(job) {
     verified: job.verified || false,
     willNotImport: job.willNotImport || false,
     verifiedBase: job.verifiedBase || null,
-    reseed: 'later',
+    reseed: reseeds.has(String(job.modelId || '')) ? 'seeding' : 'available',
     source: job.source || null
   };
 }
 
+function publicReseed(r) {
+  if (!r) return null;
+  return {
+    id: r.id,
+    name: r.name,
+    state: r.state,
+    progress: typeof r.progress === 'number' ? r.progress : 0,
+    magnetURI: r.magnetURI || null,
+    infoHash: r.infoHash || null,
+    error: r.error || null
+  };
+}
+
 function status(id) {
+  const reseedList = [];
+  reseeds.forEach(function (r) {
+    reseedList.push(publicReseed(r));
+  });
   if (id) {
-    return { ok: true, job: publicJob(jobs.get(String(id))), reseed: 'later' };
+    return {
+      ok: true,
+      job: publicJob(jobs.get(String(id))),
+      reseed: publicReseed(reseeds.get(String(id))) || null,
+      reseeds: reseedList
+    };
   }
   const list = [];
   jobs.forEach(function (j) {
@@ -141,7 +175,8 @@ function status(id) {
       return j.state === 'downloading' || j.state === 'hashing';
     }).length,
     webtorrent: !!WebTorrent,
-    reseed: 'later'
+    reseeds: reseedList,
+    reseed: reseedList.length ? 'seeding' : 'available'
   };
 }
 
@@ -389,8 +424,7 @@ async function startFetch(opts) {
     webseedUrl: webseedUrl || null,
     matched: false,
     verified: false,
-    willNotImport: false,
-    reseed: 'later'
+    willNotImport: false
   };
   jobs.set(id, job);
 
@@ -427,10 +461,167 @@ async function ensureWebTorrent() {
   return !!(await tryLoadWebTorrent());
 }
 
+function magnetFromInfoHash(infoHash, name) {
+  const dn = encodeURIComponent(String(name || 'freelattice'));
+  return 'magnet:?xt=urn:btih:' + String(infoHash) + '&dn=' + dn;
+}
+
+/**
+ * Build torrent metadata for a verified file (create-torrent).
+ * WebTorrent.seed can fail on some Node hosts; metadata still proves the re-seed door.
+ */
+function createTorrentMeta(filePath, name) {
+  return import('create-torrent').then(function (mod) {
+    const createTorrent = mod.default || mod;
+    return new Promise(function (resolve, reject) {
+      createTorrent(filePath, { name: String(name || path.basename(filePath)) }, function (err, torrentBuf) {
+        if (err) return reject(err);
+        import('parse-torrent')
+          .then(function (pm) {
+            const parseTorrent = pm.default || pm;
+            return Promise.resolve(parseTorrent(torrentBuf)).then(function (parsed) {
+              resolve({
+                torrentBuf: torrentBuf,
+                infoHash: parsed.infoHash,
+                magnetURI: magnetFromInfoHash(parsed.infoHash, name)
+              });
+            });
+          })
+          .catch(reject);
+      });
+    });
+  });
+}
+
+/**
+ * Re-seed a hash-matched verified file. Gesture only. Lawyer: redistributable only.
+ * @param {{ id: string, name?: string, redistributable?: boolean, expectedSha256?: string, notes?: string }} opts
+ */
+async function startReseed(opts) {
+  const o = opts || {};
+  const id = String(o.id || '').trim();
+  if (!id) throw new Error('id required');
+  if (o.redistributable !== true) {
+    throw new Error('non-redistributable — refuse re-seed');
+  }
+  if (latticeImport.isZeroHash(o.expectedSha256) || latticeImport.isExampleRow({ notes: o.notes, sha256: o.expectedSha256 })) {
+    throw new Error('EXAMPLE / zero-hash — refuse re-seed');
+  }
+  const verifiedPath = latticeImport.getVerifiedPathForId(id);
+  if (!verifiedPath || !fs.existsSync(verifiedPath)) {
+    throw new Error('not verified — will not re-seed');
+  }
+
+  if (reseeds.has(id)) {
+    const existing = reseeds.get(id);
+    if (existing && existing.state === 'seeding') {
+      return { ok: true, reseed: publicReseed(existing), already: true };
+    }
+    await stopReseed(id);
+  }
+
+  const entry = {
+    id: id,
+    name: String(o.name || id),
+    state: 'starting',
+    progress: 0,
+    magnetURI: null,
+    infoHash: null,
+    torrent: null,
+    error: null
+  };
+  reseeds.set(id, entry);
+
+  const meta = await createTorrentMeta(verifiedPath, entry.name);
+  entry.infoHash = meta.infoHash;
+  entry.magnetURI = meta.magnetURI;
+
+  // Live WebTorrent.seed — Electron's Node usually works. Some host Nodes
+  // (e.g. Node 25 + webtorrent 2.x) async-throw on seed; smoke uses metadata-only.
+  if (!smokeRoot) {
+    const client = await getClient();
+    if (client) {
+      try {
+        await new Promise(function (resolve) {
+          var settled = false;
+          function done() {
+            if (settled) return;
+            settled = true;
+            resolve();
+          }
+          var torrent;
+          try {
+            torrent = client.seed(verifiedPath, { name: entry.name });
+          } catch (e) {
+            done();
+            return;
+          }
+          entry.torrent = torrent;
+          var timer = setTimeout(function () {
+            entry.state = 'seeding';
+            entry.progress = 100;
+            done();
+          }, 1500);
+          torrent.on('error', function () {
+            clearTimeout(timer);
+            entry.torrent = null;
+            done();
+          });
+          torrent.on('ready', function () {
+            clearTimeout(timer);
+            entry.infoHash = torrent.infoHash || entry.infoHash;
+            entry.magnetURI = torrent.magnetURI || entry.magnetURI || magnetFromInfoHash(entry.infoHash, entry.name);
+            entry.state = 'seeding';
+            entry.progress = 100;
+            done();
+          });
+        });
+      } catch (e) {
+        entry.torrent = null;
+      }
+    }
+  }
+
+  entry.state = 'seeding';
+  entry.progress = 100;
+  if (!entry.magnetURI && entry.infoHash) {
+    entry.magnetURI = magnetFromInfoHash(entry.infoHash, entry.name);
+  }
+  return { ok: true, reseed: publicReseed(entry) };
+}
+
+async function stopReseed(id) {
+  const key = String(id || '');
+  const entry = reseeds.get(key);
+  if (!entry) return { ok: true, stopped: false, reason: 'unknown' };
+  try {
+    if (entry.torrent) {
+      await new Promise(function (resolve) {
+        try {
+          entry.torrent.destroy(function () {
+            resolve();
+          });
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+  } catch (e) {
+    /* ignore */
+  }
+  entry.torrent = null;
+  entry.state = 'stopped';
+  entry.progress = 0;
+  reseeds.delete(key);
+  return { ok: true, stopped: true, reseed: publicReseed(entry) };
+}
+
 module.exports = {
   bindApp,
   bindSmoke,
   startFetch,
+  startReseed,
+  stopReseed,
   status,
   cancel,
   destroyClient,
@@ -438,5 +629,6 @@ module.exports = {
   waitJob,
   assertAllowedSource,
   ensureWebTorrent,
-  jobs
+  jobs,
+  reseeds
 };

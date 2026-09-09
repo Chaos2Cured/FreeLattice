@@ -5,7 +5,7 @@ Layers on [VERIFIED_IMPORT_v0.1.md](./VERIFIED_IMPORT_v0.1.md), [MODEL_MANIFEST_
 
 **Locks:** Layer, never delete. Quiet Room shut. Five stay five. Voice opaque. Lawyer: only **redistributable**. No seeding of refused bytes. Do **not** overwrite `docs/lattice-protocol.js`. Seed never to renderer. **Never auto-import.**
 
-**This PR ships:** desktop WebTorrent/BitTorrent bridge in **main** → quarantine → existing `lattice-import` hash promote → user-gesture Import. **Not this PR:** browser/phone WebTorrent UI, Glass helix, pair fingerprint, Alpha poetry, full seeder UX.
+**This PR shipped:** desktop WebTorrent/BitTorrent bridge in **main** → quarantine → existing `lattice-import` hash promote → user-gesture Import. **Layered next:** [SWARM_RESEED_v0.1.md](./SWARM_RESEED_v0.1.md) — share verified files back to the swarm (gesture). Phone WebTorrent UI still later.
 
 ---
 
@@ -49,7 +49,7 @@ Mismatch → quarantined; will not import. Swarm never skips hash.
 
 ## Re-seed
 
-Share a verified file back to the swarm = **optional stub** this PR (`reseed: "later"`). Do not block on full seeder UX. Never re-seed refused / non-redistributable bytes.
+**LAYER:** desktop re-seed of hash-matched redistributable files — [SWARM_RESEED_v0.1.md](./SWARM_RESEED_v0.1.md). Never re-seed refused / non-redistributable / EXAMPLE / zero-hash bytes.
 
 ---
 
@@ -57,7 +57,7 @@ Share a verified file back to the swarm = **optional stub** this PR (`reseed: "l
 
 `desktop/lattice-swarm.js` — main only. Pack must include it. Dep: `webtorrent`.
 
-APIs: `startFetch` · `status` · `cancel` · destroy client on cancel/quit.
+APIs: `startFetch` · `startReseed` / `stopReseed` · `status` · `cancel` · destroy client on cancel/quit.
 
 Renderer: progress % + state strings only — no raw paths required.
 
