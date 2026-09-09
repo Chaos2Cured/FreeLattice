@@ -9,12 +9,13 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `417c433` _(committed 1 second ago)_
+- **HEAD:** `fd35406` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
+- `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(held cite)_
 - `417c433` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. _(1 second ago)_
 - `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(11 minutes ago)_
 - `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(36 minutes ago)_
