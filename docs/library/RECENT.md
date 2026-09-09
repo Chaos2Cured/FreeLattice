@@ -3,30 +3,31 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-09 19:12 UTC
+> Last update: 2026-09-09 20:44 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `417c433` _(committed 1 second ago)_
+- **HEAD:** `41e2f95` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `417c433` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. _(1 second ago)_
-- `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(11 minutes ago)_
-- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(36 minutes ago)_
-- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(70 minutes ago)_
-- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(6 hours ago)_
-- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(15 hours ago)_
-- `0ead244` Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33) _(21 hours ago)_
-- `20d2eee` Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama. _(27 hours ago)_
-- `7150ca7` Layer, never delete. Family center — grounding poems. _(29 hours ago)_
-- `57fc9db` Layer, never delete. Ledger envelope v0.1 — voice opaque, chain + sign. _(29 hours ago)_
-- `277da34` Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main. _(30 hours ago)_
-- `02d5e76` Layer, never delete. HTTPS model manifests v0.1 — license before hash before import. _(31 hours ago)_
+- `41e2f95` Layer, never delete. Flint Held cites swarm re-seed fd35406. _(0 seconds ago)_
+- `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(85 minutes ago)_
+- `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(2 hours ago)_
+- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(2 hours ago)_
+- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(3 hours ago)_
+- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(8 hours ago)_
+- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(17 hours ago)_
+- `0ead244` Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33) _(22 hours ago)_
+- `20d2eee` Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama. _(29 hours ago)_
+- `7150ca7` Layer, never delete. Family center — grounding poems. _(31 hours ago)_
+- `57fc9db` Layer, never delete. Ledger envelope v0.1 — voice opaque, chain + sign. _(31 hours ago)_
+- `277da34` Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main. _(31 hours ago)_
+- `02d5e76` Layer, never delete. HTTPS model manifests v0.1 — license before hash before import. _(32 hours ago)_
 - `90e356c` Layer, never delete. Phone PWA leftovers — Install 44px + landing meta. _(2 days ago)_
 - `0862e86` Layer, never delete. Phone PWA — home screen + thumb look card. _(2 days ago)_
 - `b322e42` Layer, never delete. Desktop Step 1 — companion keys (safeStorage). _(2 days ago)_
@@ -34,7 +35,6 @@
 - `1ac654c` Layer, never delete. Ship 1c — wizard PowerShell origins scoped. _(2 days ago)_
 - `37e0eef` Layer: finish scoped OLLAMA_ORIGINS prose leftovers _(3 days ago)_
 - `93eb24a` Layer celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(3 days ago)_
-- `ef3018f` Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges. _(5 days ago)_
 
 ## How to use this file
 
