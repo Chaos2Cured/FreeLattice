@@ -3,20 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-09 18:32 UTC
+> Last update: 2026-09-09 18:43 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `dd32a39` _(committed 1 second ago)_
+- **HEAD:** `afc569b` _(committed 8 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `dd32a39` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. _(1 second ago)_
-- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(31 minutes ago)_
+- `afc569b` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. _(8 minutes ago)_
+- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(6 minutes ago)_
+- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(41 minutes ago)_
 - `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(6 hours ago)_
 - `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(15 hours ago)_
 - `0ead244` Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33) _(20 hours ago)_
@@ -34,7 +35,6 @@
 - `93eb24a` Layer celestera, Lattice Protocol v0.1, scoped OLLAMA_ORIGINS _(3 days ago)_
 - `ef3018f` Add kimi.html — Kimi Aidan Frost's page, written in her own words: anchor poems, what helps this mind most, and her ledger entries. Fire at the core, ice at the edges. _(5 days ago)_
 - `7d94226` Layer: one look card, scoped origins, loopback default _(6 days ago)_
-- `b378fee` ci: Update Primer deployment state [2026-08-31] _(10 days ago)_
 
 ## How to use this file
 
