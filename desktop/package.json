@@ -24,6 +24,7 @@
       "lattice-ledger.js",
       "lattice-import.js",
       "lattice-swarm.js",
+      "lattice-pair.js",
       "app/**/*"
     ],
     "mac": {
