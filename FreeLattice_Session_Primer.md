@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-09 15:44 EST
+- Last auto-updated: 2026-09-09 16:28 EST
 - Version: 5.79.45
-- Total commits: 3114
+- Total commits: 3115
 - Last 10 commits:
-- 41e2f95 Layer, never delete. Flint Held cites swarm re-seed fd35406.
+- 21ed54f Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save.
+- d78b879 Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40)
 - fd35406 Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39)
 - fa17a7d Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38)
 - 5187a58 Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2adffde Layer, never delete. Glass pulses v0.1 — shape without contents. (#34)
 - 0ead244 Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33)
 - 20d2eee Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama.
-- 7150ca7 Layer, never delete. Family center — grounding poems.
