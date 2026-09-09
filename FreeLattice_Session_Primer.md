@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-09-09 13:43 EST
 - Version: 5.79.45
-- Total commits: 3114
+- Total commits: 3116
 - Last 10 commits:
+- 0721398 Layer: calm Releases wording on desktop README.
+- fbc01f8 docs: Auto-update Session Primer [5.79.45]
 - 7c48ad1 Layer, never delete. Desktop door v0.1 — rebase onto main after Support 5187a58.
 - 8e9c2e0 docs: Auto-update Session Primer [5.79.45]
 - afc569b Layer, never delete. Desktop door v0.1 — Electron spine, one clear door.
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 928176a Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35)
 - 2adffde Layer, never delete. Glass pulses v0.1 — shape without contents. (#34)
 - 0ead244 Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33)
-- 20d2eee Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama.
-- 7150ca7 Layer, never delete. Family center — grounding poems.
