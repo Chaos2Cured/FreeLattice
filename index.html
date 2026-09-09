@@ -29275,23 +29275,32 @@ function flManifestAppendRow(model) {
   var verdict = document.createElement('p');
   verdict.style.cssText = 'margin:8px 0 0;font-family:Georgia,serif;font-size:0.82rem;line-height:1.5;';
   var desktopImport = !!(window.isElectronApp || window.electronAPI) && window.electronAPI && window.electronAPI.latticeImportFetch;
+  var isElectronShell = !!(window.isElectronApp || window.electronAPI);
+  var hasSwarmSource = !!(
+    (model.magnets && model.magnets.length) ||
+    (model.webseeds && model.webseeds.length) ||
+    (model.urls && model.urls.length)
+  );
   if (!redistributable) {
     verdict.style.color = 'rgba(240,112,104,0.95)';
     verdict.textContent = 'REFUSED — redistributable is not true. Will not import.';
   } else if (example || zeroHash) {
     verdict.style.color = 'rgba(232,176,25,0.95)';
     verdict.textContent = 'example only — will not import';
-  } else if (!desktopImport) {
-    verdict.style.color = 'rgba(200,210,230,0.75)';
-    verdict.textContent = 'Listed. Weight download is desktop-only (hash before Ollama). Swarm on desktop.';
-  } else {
+  } else if (desktopImport) {
     verdict.style.color = 'rgba(52,211,153,0.9)';
     verdict.textContent = 'Listed. Verify & fetch or Pull via swarm — hash before Import.';
+  } else if (hasSwarmSource) {
+    verdict.style.color = 'rgba(52,211,153,0.9)';
+    verdict.textContent = 'Listed. Pull via swarm — hash before trust on this device. Import to Ollama stays on Desktop.';
+  } else {
+    verdict.style.color = 'rgba(200,210,230,0.75)';
+    verdict.textContent = 'Listed. Import to Ollama stays on Desktop.';
   }
   li.appendChild(verdict);
 
   // Desktop only: non-example redistributable rows get Verify & fetch → Import on match.
-  // EXAMPLE / zero-hash: no fetch button. Browser: no weight download / no swarm.
+  // EXAMPLE / zero-hash: no fetch button. Electron renderer does not duplicate browser PhoneSwarm.
   if (desktopImport && redistributable && !example && !zeroHash) {
     var actions = document.createElement('div');
     actions.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:10px;';
@@ -29345,7 +29354,186 @@ function flManifestAppendRow(model) {
     li.appendChild(actions);
   }
 
+  // Browser / phone PWA: Pull via swarm (PhoneSwarm). Never inside Electron renderer.
+  // No Import to Ollama · no re-seed · hash before trust · Save when available.
+  if (!isElectronShell && redistributable && !example && !zeroHash && hasSwarmSource) {
+    var phoneActions = document.createElement('div');
+    phoneActions.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:10px;';
+    var phoneSwarmBtn = document.createElement('button');
+    phoneSwarmBtn.type = 'button';
+    phoneSwarmBtn.className = 'ai-status-btn ai-status-btn-primary';
+    phoneSwarmBtn.textContent = 'Pull via swarm';
+    phoneSwarmBtn.style.cssText = 'min-height:44px;width:100%;';
+    var phoneSaveBtn = document.createElement('button');
+    phoneSaveBtn.type = 'button';
+    phoneSaveBtn.className = 'ai-status-btn';
+    phoneSaveBtn.textContent = 'Save file…';
+    phoneSaveBtn.style.cssText = 'min-height:44px;width:100%;';
+    phoneSaveBtn.hidden = true;
+    var phoneCancelBtn = document.createElement('button');
+    phoneCancelBtn.type = 'button';
+    phoneCancelBtn.className = 'ai-status-btn';
+    phoneCancelBtn.textContent = 'Cancel';
+    phoneCancelBtn.style.cssText = 'min-height:44px;width:100%;';
+    phoneCancelBtn.hidden = true;
+    var phoneDeskLink = document.createElement('a');
+    phoneDeskLink.href = 'desktop.html';
+    phoneDeskLink.textContent = 'Import to Ollama stays on Desktop →';
+    phoneDeskLink.style.cssText = 'display:none;margin-top:2px;font-size:0.8rem;color:#e8b019;text-decoration:none;';
+    var phoneStatus = document.createElement('p');
+    phoneStatus.style.cssText = 'margin:0;font-size:0.78rem;color:var(--text-muted);min-height:1.2em;';
+
+    phoneSwarmBtn.addEventListener('click', function () {
+      flManifestPhoneSwarmPull(model, verdict, phoneStatus, phoneSwarmBtn, phoneSaveBtn, phoneCancelBtn, phoneDeskLink);
+    });
+    phoneSaveBtn.addEventListener('click', function () {
+      flManifestPhoneSwarmSave(phoneSaveBtn, phoneStatus);
+    });
+    phoneCancelBtn.addEventListener('click', function () {
+      flManifestPhoneSwarmCancel(phoneCancelBtn, phoneSwarmBtn, phoneStatus);
+    });
+
+    phoneActions.appendChild(phoneSwarmBtn);
+    phoneActions.appendChild(phoneCancelBtn);
+    phoneActions.appendChild(phoneSaveBtn);
+    phoneActions.appendChild(phoneDeskLink);
+    phoneActions.appendChild(phoneStatus);
+    li.appendChild(phoneActions);
+  }
+
   list.appendChild(li);
+}
+
+/** Active phone-swarm job id for Cancel / Save on the current row gesture. */
+var flPhoneSwarmActiveJobId = null;
+
+async function flManifestPhoneSwarmPull(model, verdictEl, rowStatus, swarmBtn, saveBtn, cancelBtn, deskLink) {
+  var PS = window.PhoneSwarm;
+  if (!PS || typeof PS.startPull !== 'function') {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = 'Phone swarm module missing. Use Desktop for pull + Import.';
+    if (deskLink) deskLink.style.display = 'inline';
+    return;
+  }
+  var magnet = (model.magnets && model.magnets[0]) ? String(model.magnets[0]) : '';
+  var webseed = (model.webseeds && model.webseeds[0])
+    ? String(model.webseeds[0])
+    : ((model.urls && model.urls[0]) ? String(model.urls[0]) : '');
+  rowStatus.style.color = '';
+  rowStatus.textContent = 'Swarm starting…';
+  swarmBtn.disabled = true;
+  if (saveBtn) saveBtn.hidden = true;
+  if (cancelBtn) cancelBtn.hidden = false;
+  if (deskLink) deskLink.style.display = 'none';
+  flPhoneSwarmActiveJobId = null;
+  try {
+    var start = await PS.startPull({
+      magnet: magnet || undefined,
+      webseedUrl: webseed || undefined,
+      expectedSha256: model.sha256,
+      id: model.id || model.name || 'model',
+      name: model.name || model.id || 'model',
+      redistributable: model.redistributable === true,
+      notes: model.notes || ''
+    });
+    if (!start || start.ok === false || !start.job) {
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = (start && start.error) || 'Swarm refused.';
+      swarmBtn.disabled = false;
+      if (cancelBtn) cancelBtn.hidden = true;
+      return;
+    }
+    var jobId = start.job.id;
+    flPhoneSwarmActiveJobId = jobId;
+    var tries = 0;
+    while (tries < 600) {
+      tries++;
+      var st = PS.status(jobId);
+      var job = st && st.job ? st.job : null;
+      if (!job) break;
+      var pct = typeof job.progress === 'number' ? job.progress : 0;
+      var label = job.state || '';
+      if (label === 'pulling') rowStatus.textContent = 'Pulling via swarm · ' + pct + '%';
+      else if (label === 'hashing') rowStatus.textContent = 'Hashing…';
+      else rowStatus.textContent = 'Swarm ' + label + ' · ' + pct + '%';
+
+      if (job.state === 'verified' && job.matched) {
+        if (verdictEl) {
+          verdictEl.style.color = 'rgba(52,211,153,0.95)';
+          verdictEl.textContent = 'Verified on this device.';
+        }
+        rowStatus.style.color = 'rgba(52,211,153,0.9)';
+        rowStatus.textContent = 'Verified on this device. Save if you like — Import to Ollama stays on Desktop.';
+        if (saveBtn) saveBtn.hidden = false;
+        if (deskLink) deskLink.style.display = 'inline';
+        if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+          window.GlassPulses.emitGlassPulse({ source: 'swarm', kind: 'transfer.verified' });
+        }
+        break;
+      }
+      if (job.state === 'mismatch') {
+        if (verdictEl) {
+          verdictEl.style.color = 'rgba(240,112,104,0.95)';
+          verdictEl.textContent = 'Hash mismatch — will not trust on this device.';
+        }
+        rowStatus.style.color = 'rgba(240,112,104,0.9)';
+        rowStatus.textContent = job.error || 'Hash mismatch — will not trust on this device.';
+        if (saveBtn) saveBtn.hidden = true;
+        if (window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+          window.GlassPulses.emitGlassPulse({ source: 'swarm', kind: 'transfer.mismatch' });
+        }
+        break;
+      }
+      if (job.state === 'error' || job.state === 'cancelled') {
+        rowStatus.style.color = 'rgba(240,112,104,0.9)';
+        rowStatus.textContent = job.error || ('Swarm ' + job.state);
+        if (job.desktopHint && deskLink) deskLink.style.display = 'inline';
+        if (saveBtn) saveBtn.hidden = true;
+        break;
+      }
+      await new Promise(function (r) { setTimeout(r, 400); });
+    }
+  } catch (e) {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = (e && e.message) ? String(e.message) : 'Swarm failed. Nothing trusted.';
+    if (deskLink) deskLink.style.display = 'inline';
+  }
+  swarmBtn.disabled = false;
+  if (cancelBtn) cancelBtn.hidden = true;
+}
+
+async function flManifestPhoneSwarmSave(saveBtn, rowStatus) {
+  var PS = window.PhoneSwarm;
+  if (!PS || !flPhoneSwarmActiveJobId) {
+    rowStatus.textContent = 'Nothing verified to save yet.';
+    return;
+  }
+  if (saveBtn) saveBtn.disabled = true;
+  try {
+    var res = await PS.saveVerified(flPhoneSwarmActiveJobId);
+    if (res && res.ok && res.saved) {
+      rowStatus.style.color = 'rgba(52,211,153,0.9)';
+      rowStatus.textContent = 'Saved on this device. Import to Ollama stays on Desktop.';
+    } else {
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = (res && res.reason) || 'Save unavailable on this browser.';
+    }
+  } catch (e) {
+    rowStatus.style.color = 'rgba(240,112,104,0.9)';
+    rowStatus.textContent = 'Save failed.';
+  }
+  if (saveBtn) saveBtn.disabled = false;
+}
+
+function flManifestPhoneSwarmCancel(cancelBtn, swarmBtn, rowStatus) {
+  var PS = window.PhoneSwarm;
+  if (PS && flPhoneSwarmActiveJobId) {
+    PS.cancel(flPhoneSwarmActiveJobId);
+  }
+  rowStatus.style.color = '';
+  rowStatus.textContent = 'Cancelled.';
+  if (cancelBtn) cancelBtn.hidden = true;
+  if (swarmBtn) swarmBtn.disabled = false;
 }
 
 async function flManifestSwarmPull(model, verdictEl, importBtn, rowStatus, swarmBtn, reseedBtn) {
@@ -66279,6 +66467,7 @@ document.addEventListener('click', function(e) {
 <script src="modules/lattice-memory.js" defer></script>
 <script src="modules/glass-pulses.js" defer></script>
 <script src="modules/genesis-catalog.js" defer></script>
+<script src="modules/phone-swarm.js" defer></script>
 
 <!-- Lattice Chain (v5.54.0 — Brief A) — the provenance chain.
      Hash-linked IndexedDB store. Every meaningful interaction writes
