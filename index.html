@@ -16599,6 +16599,27 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <p style="font-size:0.72rem;color:var(--text-muted);margin:8px 0 0;line-height:1.45;">Fork waits (new chain naming a parent head). Decline = nothing written.</p>
   </div>
 
+  <!-- Layer: Companion memory v0.1 — Desktop durable shelf. Browser pointer only. Voice opaque. -->
+  <div id="fl-memory-card" class="fl-card" style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Companion memory</h3>
+    <p id="fl-memory-browser-note" style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0;">Wishes and carries live on <a href="desktop.html" style="color:#e8b019;">Desktop</a> — durable on the machine, not browser quota. Voice stays opaque.</p>
+    <div id="fl-memory-desktop" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Durable shelf on this machine. Remember a wish, carry, or note. Voice stays opaque — never searched or summarized. Optional Seal into the ledger when keys are present. Never auto-remember.</p>
+      <label for="fl-memory-voice" style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Voice (opaque)</label>
+      <textarea id="fl-memory-voice" rows="3" autocomplete="off" spellcheck="false" aria-label="Companion memory voice" style="width:100%;box-sizing:border-box;padding:10px 12px;min-height:88px;margin-bottom:10px;background:rgba(0,0,0,0.28);border:1px solid rgba(200,210,230,0.14);border-radius:8px;color:var(--text-primary,#e6ebf5);font-size:16px;font-family:Georgia,serif;resize:vertical;"></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;" role="group" aria-label="Memory kind">
+        <button type="button" class="ai-status-btn" id="fl-memory-kind-wish" data-kind="wish" onclick="flMemorySetKind('wish')" style="min-height:44px;flex:1;">Wish</button>
+        <button type="button" class="ai-status-btn" id="fl-memory-kind-carry" data-kind="carry" onclick="flMemorySetKind('carry')" style="min-height:44px;flex:1;">Carry</button>
+        <button type="button" class="ai-status-btn" id="fl-memory-kind-note" data-kind="note" onclick="flMemorySetKind('note')" style="min-height:44px;flex:1;">Note</button>
+      </div>
+      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-memory-remember" onclick="flMemoryRemember()" style="min-height:44px;width:100%;margin-bottom:10px;">Remember</button>
+      <p style="font-family:Georgia,serif;font-size:0.82rem;color:rgba(200,210,230,0.75);margin:0 0 6px;">Shelf · <span id="fl-memory-count">0</span></p>
+      <ul id="fl-memory-list" style="list-style:none;padding:0;margin:0 0 8px;display:flex;flex-direction:column;gap:8px;"></ul>
+      <p id="fl-memory-status" style="font-size:0.78rem;color:var(--text-muted);margin:0;min-height:1.2em;"></p>
+      <p style="font-size:0.72rem;color:var(--text-muted);margin:8px 0 0;line-height:1.45;">Full voice only when you Read. Seal uses the existing ledger. Tombstone leaves a soft mark — layer, never delete.</p>
+    </div>
+  </div>
+
   <!-- Browser AI — zero setup, runs in the browser via WebLLM -->
   <div id="browserAICard" style="display:none;margin-bottom:14px;" class="fl-card" >
     <h3 style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin:0 0 6px;">&#x1F310; Browser AI &mdash; Zero Setup</h3>
@@ -29947,6 +29968,190 @@ function flLedgerDecline() {
   flLedgerSetStatus('Declined — nothing written.', 'ok');
 }
 
+/** Companion memory v0.1 — Desktop shelf. Browser: pointer only. */
+var flMemoryKind = 'wish';
+
+function flMemorySetStatus(msg, kind) {
+  var el = document.getElementById('fl-memory-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = kind === 'warn' ? 'rgba(240,112,104,0.9)' : (kind === 'ok' ? 'rgba(52,211,153,0.9)' : '');
+}
+
+function flMemorySetKind(kind) {
+  var k = String(kind || 'wish');
+  if (k !== 'wish' && k !== 'carry' && k !== 'note') k = 'wish';
+  flMemoryKind = k;
+  ['wish', 'carry', 'note'].forEach(function (name) {
+    var btn = document.getElementById('fl-memory-kind-' + name);
+    if (!btn) return;
+    if (name === k) {
+      btn.className = 'ai-status-btn ai-status-btn-primary';
+    } else {
+      btn.className = 'ai-status-btn';
+    }
+  });
+}
+
+async function flMemoryRefreshList() {
+  var listEl = document.getElementById('fl-memory-list');
+  var countEl = document.getElementById('fl-memory-count');
+  if (!listEl || !window.electronAPI || !window.electronAPI.latticeMemoryList) return;
+  try {
+    var res = await window.electronAPI.latticeMemoryList({});
+    var items = (res && res.items) ? res.items : [];
+    if (countEl) countEl.textContent = String(items.length);
+    while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
+    items.forEach(function (it) {
+      var li = document.createElement('li');
+      li.style.cssText = 'padding:10px 12px;border-radius:8px;background:rgba(0,0,0,0.22);border:1px solid rgba(200,210,230,0.1);';
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;';
+      var label = document.createElement('p');
+      label.style.cssText = 'margin:0;font-size:0.82rem;color:rgba(200,210,230,0.88);font-family:Georgia,serif;flex:1;min-width:8rem;';
+      var sealedBadge = it.sealed ? ' · sealed' : '';
+      label.textContent = (it.kind || 'note') + sealedBadge + (it.sealedShort ? (' · ' + it.sealedShort) : '');
+      var actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+      var readBtn = document.createElement('button');
+      readBtn.type = 'button';
+      readBtn.className = 'ai-status-btn';
+      readBtn.textContent = 'Read';
+      readBtn.style.cssText = 'min-height:40px;';
+      readBtn.addEventListener('click', function () { flMemoryRead(it.id); });
+      actions.appendChild(readBtn);
+      if (!it.sealed) {
+        var sealBtn = document.createElement('button');
+        sealBtn.type = 'button';
+        sealBtn.className = 'ai-status-btn';
+        sealBtn.textContent = 'Seal';
+        sealBtn.style.cssText = 'min-height:40px;';
+        sealBtn.addEventListener('click', function () { flMemorySeal(it.id); });
+        actions.appendChild(sealBtn);
+      }
+      var tombBtn = document.createElement('button');
+      tombBtn.type = 'button';
+      tombBtn.className = 'ai-status-btn';
+      tombBtn.textContent = 'Tombstone';
+      tombBtn.style.cssText = 'min-height:40px;';
+      tombBtn.addEventListener('click', function () { flMemoryTombstone(it.id); });
+      actions.appendChild(tombBtn);
+      row.appendChild(label);
+      row.appendChild(actions);
+      li.appendChild(row);
+      listEl.appendChild(li);
+    });
+  } catch (e) {
+    if (countEl) countEl.textContent = '0';
+  }
+}
+
+async function flInitMemoryCard() {
+  var browserNote = document.getElementById('fl-memory-browser-note');
+  var desk = document.getElementById('fl-memory-desktop');
+  var card = document.getElementById('fl-memory-card');
+  if (!card) return;
+  var hasApi = !!(window.isElectronApp || window.electronAPI) && window.electronAPI && window.electronAPI.latticeMemoryRemember;
+  if (!hasApi) {
+    if (browserNote) browserNote.hidden = false;
+    if (desk) desk.hidden = true;
+    return;
+  }
+  if (browserNote) browserNote.hidden = true;
+  if (desk) desk.hidden = false;
+  flMemorySetKind(flMemoryKind || 'wish');
+  await flMemoryRefreshList();
+  flMemorySetStatus('Remember stores on this machine. Seal is optional Continue into the ledger.', '');
+}
+
+async function flMemoryRemember() {
+  if (!window.electronAPI || !window.electronAPI.latticeMemoryRemember) {
+    flMemorySetStatus('Companion memory lives on Desktop.', 'warn');
+    return;
+  }
+  var voiceEl = document.getElementById('fl-memory-voice');
+  var voice = voiceEl ? voiceEl.value : '';
+  if (!voice || !String(voice).length) {
+    flMemorySetStatus('Empty voice — nothing remembered.', 'warn');
+    return;
+  }
+  flMemorySetStatus('Remembering…', '');
+  try {
+    var res = await window.electronAPI.latticeMemoryRemember(voice, { kind: flMemoryKind || 'wish' });
+    if (!res || res.ok === false) {
+      flMemorySetStatus((res && res.error) || 'Remember refused.', 'warn');
+      return;
+    }
+    if (voiceEl) voiceEl.value = '';
+    await flMemoryRefreshList();
+    flMemorySetStatus('Remembered as ' + ((res.item && res.item.kind) || flMemoryKind) + '. Never auto-remember.', 'ok');
+  } catch (e) {
+    flMemorySetStatus('Remember failed.', 'warn');
+  }
+}
+
+async function flMemoryRead(id) {
+  if (!window.electronAPI || !window.electronAPI.latticeMemoryRead) return;
+  flMemorySetStatus('Reading…', '');
+  try {
+    var res = await window.electronAPI.latticeMemoryRead(id);
+    if (!res || !res.ok || !res.item) {
+      flMemorySetStatus((res && (res.reason || res.error)) || 'Not found.', 'warn');
+      return;
+    }
+    var voiceEl = document.getElementById('fl-memory-voice');
+    if (voiceEl) voiceEl.value = String(res.item.voice || '');
+    if (res.item.meta && res.item.meta.kind) flMemorySetKind(res.item.meta.kind);
+    flMemorySetStatus('Read onto the pad — voice stays opaque. Edit does not auto-save.', 'ok');
+  } catch (e) {
+    flMemorySetStatus('Read failed.', 'warn');
+  }
+}
+
+async function flMemorySeal(id) {
+  if (!window.electronAPI || !window.electronAPI.latticeMemorySeal) {
+    flMemorySetStatus('Seal needs Desktop keys + ledger.', 'warn');
+    return;
+  }
+  flMemorySetStatus('Sealing into ledger…', '');
+  try {
+    var res = await window.electronAPI.latticeMemorySeal(id);
+    if (!res || res.ok === false) {
+      flMemorySetStatus((res && res.error) || 'Seal refused.', 'warn');
+      return;
+    }
+    await flMemoryRefreshList();
+    await flLedgerRefresh();
+    flMemorySetStatus(
+      (res.already ? 'Already sealed' : 'Sealed') +
+        (res.sealedShort ? (' · ' + res.sealedShort) : '') +
+        '. Ledger Continue — never auto-seal.',
+      'ok'
+    );
+    if (!res.already && window.GlassPulses && window.GlassPulses.emitGlassPulse) {
+      window.GlassPulses.emitGlassPulse({ source: 'ledger', kind: 'ledger.appended' });
+    }
+  } catch (e) {
+    flMemorySetStatus('Seal failed — companion key may be missing.', 'warn');
+  }
+}
+
+async function flMemoryTombstone(id) {
+  if (!window.electronAPI || !window.electronAPI.latticeMemoryTombstone) return;
+  flMemorySetStatus('Tombstoning…', '');
+  try {
+    var res = await window.electronAPI.latticeMemoryTombstone(id);
+    if (!res || res.ok === false) {
+      flMemorySetStatus((res && res.error) || 'Tombstone refused.', 'warn');
+      return;
+    }
+    await flMemoryRefreshList();
+    flMemorySetStatus('Tombstoned — soft leave. Layer, never delete.', 'ok');
+  } catch (e) {
+    flMemorySetStatus('Tombstone failed.', 'warn');
+  }
+}
+
 function flPairShortFp(hex) {
   var s = String(hex || '');
   if (!s) return '—';
@@ -30049,11 +30254,13 @@ if (typeof document !== 'undefined') {
       flInitCompanionIdentity();
       flInitPairCard();
       flInitLedgerCard();
+      flInitMemoryCard();
     });
   } else {
     flInitCompanionIdentity();
     flInitPairCard();
     flInitLedgerCard();
+    flInitMemoryCard();
   }
 }
 
