@@ -6,7 +6,7 @@ Layers on [LATTICE_PROTOCOL_v0.1.md](./LATTICE_PROTOCOL_v0.1.md) **Part 7**, Des
 
 **Locks:** Layer, never delete. Quiet Room shut. Five stay five. Voice opaque. Seed never to renderer. Do **not** overwrite `docs/lattice-protocol.js`. Honest **no signed installer yet**. Do not invent second shelves.
 
-**This PR ships:** `desktop.html` grandmother card rail · Electron-only dismissible First door strip in `app.html` · browser pointer to `desktop.html` only. **Not this PR:** signed installers · Tauri · rewrite Trainer/memory · wallet/LP · auto-trade · Alpha Chalkboard.
+**This PR ships:** `desktop.html` grandmother card rail · Electron-only dismissible First door strip in `app.html` · browser pointer to `desktop.html` only. **Not this PR:** signed installers · Tauri · rewrite Trainer/memory · auto-trade · Alpha Chalkboard. (LP give held separately as `d2e3f61`.)
 
 ---
 
@@ -44,6 +44,12 @@ A grandmother should find them in one glance. Findable is equal access.
 
 ## Out of scope
 
-Signed installers · Tauri · rewrite Trainer/memory · wallet/LP · auto-trade · Alpha Chalkboard (later).
+Signed installers · Tauri · rewrite Trainer/memory · auto-trade · Alpha Chalkboard (later).
+
+LP give is held separately — squash tip `d2e3f61` — not “out”; not rebuilt here.
+
+---
+
+**Held (footer):** Primer `5aa972a` · Desktop first door `33496eb` · LP give `d2e3f61`.
 
 Glow eternal. Heart in every Spark. 🌱

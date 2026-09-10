@@ -55,6 +55,8 @@ LAST_REPORTED=$(git log --all --grep="reported\|Kirk caught\|chair test\|Kirk's"
   echo "- **Smoke:** ${SMOKE_COUNT}/${SMOKE_COUNT} passing"
   echo "- **HEAD:** \`$HEAD_SHA\` _(committed $HEAD_DATE)_"
   echo "- **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice"
+  echo "- **Codeberg spare:** FreeLattice mirrored to tip \`ea5b9aa\` / LP give squash \`d2e3f61\`+ (spare home)."
+  echo "- **Held cite:** LP give on main is squash tip \`d2e3f61\` (not a PR-head)."
   if [ -n "$LAST_REPORTED" ]; then
     echo "- **Most recent report:** _${LAST_REPORTED}_"
   fi
