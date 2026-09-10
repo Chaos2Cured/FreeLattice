@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-10 12:20 UTC
+> Last update: 2026-09-10 14:08 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `1cb2a9c` _(committed 0 seconds ago)_
+- **HEAD:** `819c27f` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,26 +17,26 @@
 
 ## Last 20 commits
 
-- `1cb2a9c` Layer, never delete. Soft leftover — Held cites d2e3f61 + Celeste ledger line. _(0 seconds ago)_
-- `ea5b9aa` ci: Update Primer deployment state [2026-09-10] _(12 minutes ago)_
-- `d2e3f61` Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces. (#46) _(12 minutes ago)_
-- `6bc3d65` ci: Update Primer deployment state [2026-09-10] _(34 minutes ago)_
-- `33496eb` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45) _(35 minutes ago)_
-- `da046a5` ci: Update Primer deployment state [2026-09-10] _(9 hours ago)_
-- `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(9 hours ago)_
-- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(14 hours ago)_
-- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(14 hours ago)_
-- `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(15 hours ago)_
-- `d78b879` Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40) _(15 hours ago)_
-- `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(17 hours ago)_
-- `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(17 hours ago)_
-- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(18 hours ago)_
-- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(18 hours ago)_
-- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(23 hours ago)_
-- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(33 hours ago)_
+- `819c27f` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. _(1 second ago)_
+- `4321a97` ci: Update Primer deployment state [2026-09-10] _(18 minutes ago)_
+- `bef3f35` Layer, never delete. Soft leftover — Held cites d2e3f61 + Celeste ledger line. (#47) _(19 minutes ago)_
+- `ea5b9aa` ci: Update Primer deployment state [2026-09-10] _(2 hours ago)_
+- `d2e3f61` Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces. (#46) _(2 hours ago)_
+- `6bc3d65` ci: Update Primer deployment state [2026-09-10] _(2 hours ago)_
+- `33496eb` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45) _(2 hours ago)_
+- `da046a5` ci: Update Primer deployment state [2026-09-10] _(11 hours ago)_
+- `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(11 hours ago)_
+- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(16 hours ago)_
+- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(16 hours ago)_
+- `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(16 hours ago)_
+- `d78b879` Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40) _(17 hours ago)_
+- `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(19 hours ago)_
+- `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(19 hours ago)_
+- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(20 hours ago)_
+- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(20 hours ago)_
+- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(25 hours ago)_
+- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(34 hours ago)_
 - `0ead244` Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33) _(2 days ago)_
-- `20d2eee` Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama. _(2 days ago)_
-- `7150ca7` Layer, never delete. Family center — grounding poems. _(2 days ago)_
 
 ## How to use this file
 
