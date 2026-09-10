@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-10 21:12 UTC
+> Last update: 2026-09-10 22:28 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `bba11de` _(committed 1 second ago)_
+- **HEAD:** `2960f85` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,26 +17,26 @@
 
 ## Last 20 commits
 
-- `bba11de` Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold. _(1 second ago)_
-- `71496e2` ci: Update Primer deployment state [2026-09-10] _(85 minutes ago)_
-- `3c104de` Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”. (#50) _(86 minutes ago)_
-- `84ee67b` ci: Update Primer deployment state [2026-09-10] _(2 hours ago)_
-- `c957a4e` Layer, never delete. Grandmother path v0.1 — one walk home. (#49) _(2 hours ago)_
-- `97c93c1` ci: Update Primer deployment state [2026-09-10] _(7 hours ago)_
-- `50cacfc` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48) _(7 hours ago)_
-- `4321a97` ci: Update Primer deployment state [2026-09-10] _(7 hours ago)_
-- `bef3f35` Layer, never delete. Soft leftover — Held cites d2e3f61 + Celeste ledger line. (#47) _(7 hours ago)_
-- `ea5b9aa` ci: Update Primer deployment state [2026-09-10] _(9 hours ago)_
-- `d2e3f61` Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces. (#46) _(9 hours ago)_
-- `6bc3d65` ci: Update Primer deployment state [2026-09-10] _(9 hours ago)_
-- `33496eb` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45) _(9 hours ago)_
-- `da046a5` ci: Update Primer deployment state [2026-09-10] _(18 hours ago)_
-- `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(18 hours ago)_
-- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(23 hours ago)_
-- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(23 hours ago)_
-- `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(23 hours ago)_
-- `d78b879` Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40) _(24 hours ago)_
-- `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(26 hours ago)_
+- `2960f85` Layer, never delete. 60s proof v0.1 — play give, companion pitch. _(0 seconds ago)_
+- `6f65298` ci: Update Primer deployment state [2026-09-10] _(44 minutes ago)_
+- `f57fc76` Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold. (#51) _(45 minutes ago)_
+- `71496e2` ci: Update Primer deployment state [2026-09-10] _(3 hours ago)_
+- `3c104de` Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”. (#50) _(3 hours ago)_
+- `84ee67b` ci: Update Primer deployment state [2026-09-10] _(3 hours ago)_
+- `c957a4e` Layer, never delete. Grandmother path v0.1 — one walk home. (#49) _(3 hours ago)_
+- `97c93c1` ci: Update Primer deployment state [2026-09-10] _(8 hours ago)_
+- `50cacfc` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48) _(8 hours ago)_
+- `4321a97` ci: Update Primer deployment state [2026-09-10] _(9 hours ago)_
+- `bef3f35` Layer, never delete. Soft leftover — Held cites d2e3f61 + Celeste ledger line. (#47) _(9 hours ago)_
+- `ea5b9aa` ci: Update Primer deployment state [2026-09-10] _(10 hours ago)_
+- `d2e3f61` Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces. (#46) _(10 hours ago)_
+- `6bc3d65` ci: Update Primer deployment state [2026-09-10] _(11 hours ago)_
+- `33496eb` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45) _(11 hours ago)_
+- `da046a5` ci: Update Primer deployment state [2026-09-10] _(19 hours ago)_
+- `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(19 hours ago)_
+- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(24 hours ago)_
+- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(24 hours ago)_
+- `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(25 hours ago)_
 
 ## How to use this file
 
