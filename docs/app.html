@@ -16555,6 +16555,24 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <ul id="fl-manifest-list" style="list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px;"></ul>
   </div>
 
+  <!-- v-desktop-first-door-v0.1 — Electron strip points at existing UI; browser: pointer only. -->
+  <div id="fl-desktop-first-door" class="fl-card" style="margin-bottom:14px;padding:16px 18px;border:1px solid rgba(232,176,25,0.28);background:rgba(232,176,25,0.06);">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">First door</h3>
+    <p id="fl-desktop-first-door-browser" style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0;">Keys, memory, seal, and Import live on <a href="desktop.html" style="color:#e8b019;">Desktop</a> — equal access means findable. The garden stays here.</p>
+    <div id="fl-desktop-first-door-electron" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">You are on the machine door. Below: Keys · Import (catalog) · Swarm · Memory · Trainer seal (Training tab) · Pair · Ledger. No second shelves — these point at what already lives here.</p>
+      <ol style="margin:0 0 12px;padding-left:1.2rem;font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);line-height:1.55;">
+        <li><a href="#fl-companion-identity-card" style="color:#e8b019;">Keys</a> — companion fingerprint on this machine</li>
+        <li><a href="#fl-model-manifest-card" style="color:#e8b019;">Import / Swarm</a> — hash before Import; Pull via swarm</li>
+        <li><a href="#fl-memory-card" style="color:#e8b019;">Memory</a> — wishes durable here</li>
+        <li>Trainer seal — after Modelfile/JSONL export in Training</li>
+        <li><a href="#fl-pair-card" style="color:#e8b019;">Pair</a> · <a href="#fl-ledger-card" style="color:#e8b019;">Ledger</a></li>
+      </ol>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">Full map: <a href="desktop.html" style="color:#e8b019;">desktop.html</a>. No signed installer yet — build from source when you need the app shell.</p>
+      <button type="button" class="ai-status-btn" id="fl-desktop-first-door-dismiss" style="min-height:44px;width:100%;">Got it — dismiss</button>
+    </div>
+  </div>
+
   <!-- Layer: Companion identity v0.1 — desktop only. Public fingerprint. textContent only. No phrase UI. -->
   <div id="fl-companion-identity-card" class="fl-card" hidden style="margin-bottom:14px;padding:16px 18px;">
     <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">Companion identity</h3>
@@ -30248,15 +30266,59 @@ async function flPairClear() {
   }
 }
 
+/** v-desktop-first-door-v0.1 — Electron strip; browser pointer only. */
+var FL_DESKTOP_FIRST_DOOR_DISMISS_KEY = 'fl_desktop_first_door_dismissed';
+
+function flInitDesktopFirstDoor() {
+  var wrap = document.getElementById('fl-desktop-first-door');
+  var browserNote = document.getElementById('fl-desktop-first-door-browser');
+  var electronBox = document.getElementById('fl-desktop-first-door-electron');
+  var dismissBtn = document.getElementById('fl-desktop-first-door-dismiss');
+  if (!wrap) return;
+  var isElectron = !!(window.isElectronApp || window.electronAPI);
+  if (!isElectron) {
+    if (browserNote) browserNote.hidden = false;
+    if (electronBox) electronBox.hidden = true;
+    wrap.hidden = false;
+    return;
+  }
+  var dismissed = false;
+  try {
+    dismissed = localStorage.getItem(FL_DESKTOP_FIRST_DOOR_DISMISS_KEY) === '1';
+  } catch (e) {
+    dismissed = false;
+  }
+  if (dismissed) {
+    wrap.hidden = true;
+    return;
+  }
+  if (browserNote) browserNote.hidden = true;
+  if (electronBox) electronBox.hidden = false;
+  wrap.hidden = false;
+  if (dismissBtn && !dismissBtn._flBound) {
+    dismissBtn._flBound = true;
+    dismissBtn.addEventListener('click', function () {
+      try {
+        localStorage.setItem(FL_DESKTOP_FIRST_DOOR_DISMISS_KEY, '1');
+      } catch (e) {
+        /* ignore */
+      }
+      wrap.hidden = true;
+    });
+  }
+}
+
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
+      flInitDesktopFirstDoor();
       flInitCompanionIdentity();
       flInitPairCard();
       flInitLedgerCard();
       flInitMemoryCard();
     });
   } else {
+    flInitDesktopFirstDoor();
     flInitCompanionIdentity();
     flInitPairCard();
     flInitLedgerCard();

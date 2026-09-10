@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0c0a1a">
-<title>FreeLattice Desktop — Electron spine, one clear door</title>
-<meta name="description" content="Desktop unlocks keys on your machine, hash-before-import, swarm pull, and pair vows. Browser garden stays; Desktop is where keys live.">
+<title>FreeLattice Desktop — first door, findable spine</title>
+<meta name="description" content="Desktop first door: keys, import, swarm, memory, trainer seal, pair, ledger — findable, not a rewrite. Honest: no signed installer yet.">
 <link rel="canonical" href="https://freelattice.com/desktop.html">
 <style>
   :root { color-scheme: dark; }
@@ -23,13 +23,24 @@
   h2 {
     font-size: 0.82rem; font-weight: 400; letter-spacing: 0.04em;
     text-transform: uppercase; color: rgba(232,176,25,0.85);
-    margin: 1.75rem 0 0.65rem;
+    margin: 0 0 0.55rem;
   }
   .lede { font-size: 1.02rem; color: rgba(200,210,230,0.82); margin: 0 0 1.5rem; }
   .card {
-    margin: 0 0 1.25rem; padding: 1.1rem 1.2rem;
+    margin: 0 0 1rem; padding: 1.05rem 1.15rem;
     border-radius: 12px; background: rgba(12,10,26,0.55);
     border: 1px solid rgba(200,210,230,0.1);
+  }
+  .rail { display: flex; flex-direction: column; gap: 0.75rem; margin: 0 0 1.5rem; }
+  .rail .card { margin: 0; }
+  .rail .gm {
+    margin: 0; font-size: 0.98rem;
+    color: rgba(200,210,230,0.88); line-height: 1.55;
+  }
+  .rail .n {
+    display: inline-block; min-width: 1.4rem;
+    color: rgba(232,176,25,0.75); font-size: 0.78rem;
+    letter-spacing: 0.04em; margin-right: 0.35rem;
   }
   ul { margin: 0; padding-left: 1.15rem; color: rgba(200,210,230,0.85); }
   li { margin: 0 0 0.5rem; }
@@ -44,6 +55,11 @@
     white-space: pre-wrap; word-break: break-word;
   }
   .soft { font-size: 0.9rem; color: rgba(200,210,230,0.68); margin: 0.75rem 0 0; }
+  .section-label {
+    font-size: 0.82rem; font-weight: 400; letter-spacing: 0.04em;
+    text-transform: uppercase; color: rgba(232,176,25,0.85);
+    margin: 1.75rem 0 0.65rem;
+  }
   a { color: #e8b019; }
   nav { margin-top: 2rem; font-size: 0.9rem; }
   footer { margin-top: 2.5rem; font-size: 0.88rem; color: rgba(200,210,230,0.55); }
@@ -52,25 +68,42 @@
 <body>
 <main>
   <h1>FreeLattice Desktop</h1>
-  <p class="lede">One clear door to the <strong>Electron</strong> spine. The browser garden stays. Desktop is where keys, verified import, swarm pull, companion memory, and the pair vow live — without Terminal for day-to-day use of the app itself.</p>
+  <p class="lede">One clear <strong>first door</strong> to the Electron spine. Equal access means findable: keys, import, swarm, memory, trainer seal, pair, ledger — without hunting. The browser garden stays beside it.</p>
 
-  <div class="card">
-    <h2>What Desktop unlocks</h2>
-    <ul>
-      <li><strong>Keys on your machine</strong> — companion seed sealed in the OS keychain; never to the page</li>
-      <li><strong>Hash before import</strong> — quarantine → match → verified → Import to Ollama (gesture)</li>
-      <li><strong>Pull via swarm</strong> — webseed/magnet into the same hash path</li>
-      <li><strong>Companion memory</strong> — durable wishes / carries / notes on the machine, not browser quota; optional Seal into the ledger</li>
-      <li><strong>Trainer seal</strong> — after local Modelfile/JSONL export, companion (+ optional pair) seals a ledger receipt; never auto-seal</li>
-      <li><strong>Pair vow</strong> — two parties; outer fingerprint published; shared seed sealed</li>
-      <li><strong>Glass shapes</strong> — ledger and transfer pulses; helix break without contents</li>
-      <li><strong>Ledger envelope</strong> — voice opaque; Continue / Decline</li>
-    </ul>
-    <p class="soft">No Terminal required to <em>use</em> the app once it is running. Building from source still uses npm (honest door below).</p>
+  <p class="section-label">First door · spine rail</p>
+  <div class="rail" id="desktop-first-door-rail" aria-label="Desktop spine doors">
+    <div class="card">
+      <h2><span class="n">1</span> Keys</h2>
+      <p class="gm">Your companion key lives on this machine — never in the page.</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">2</span> Import</h2>
+      <p class="gm">Hash before Import to Ollama — match first, then you choose.</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">3</span> Swarm</h2>
+      <p class="gm">Pull open weights when a host fades — still hash before trust.</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">4</span> Memory</h2>
+      <p class="gm">Wishes and notes stay durable here — not browser quota.</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">5</span> Trainer seal</h2>
+      <p class="gm">After you export training files, seal a receipt if you wish.</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">6</span> Pair</h2>
+      <p class="gm">Two parties, outer hash shown — shared seed stays sealed.</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">7</span> Ledger</h2>
+      <p class="gm">Opaque voice · Continue seals · Decline writes nothing.</p>
+    </div>
   </div>
 
   <div class="card">
-    <h2>How to run today (honest)</h2>
+    <h2 class="section-label" style="margin-top:0;">How to run today (honest)</h2>
     <p class="soft"><strong>Dev</strong></p>
     <pre>cd desktop
 npm install
@@ -83,19 +116,19 @@ npm run build
   </div>
 
   <div class="card">
-    <h2>Browser vs Desktop</h2>
+    <h2 class="section-label" style="margin-top:0;">Browser vs Desktop</h2>
     <ul>
-      <li><strong>Browser / phone</strong> — garden, chat, look card, genesis catalog honesty, Glass shapes; can <strong>Pull via swarm</strong> and verify (hash before trust); Import to Ollama still Desktop</li>
-      <li><strong>Desktop (Electron)</strong> — the spine for keys, import, swarm re-seed, companion memory / wishes, trainer seal receipt, pair, ledger seal</li>
-      <li><strong>Tauri</strong> — experimental lighter shell under <code>desktop/src-tauri</code>; not this door; README keeps that honesty</li>
+      <li><strong>Browser / phone</strong> — garden, chat, look card, genesis honesty, Glass shapes; can Pull via swarm and verify; Import to Ollama still Desktop. First door lives here: <a href="desktop.html">this page</a>.</li>
+      <li><strong>Desktop (Electron)</strong> — the spine above, findable in the app as a calm First door strip</li>
+      <li><strong>Tauri</strong> — experimental lighter shell under <code>desktop/src-tauri</code>; not this door</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2>Manual release notes (thin)</h2>
+    <h2 class="section-label" style="margin-top:0;">Manual release notes (thin)</h2>
     <ul>
       <li>From a clean tree: <code>cd desktop && npm ci && npm run build</code></li>
-      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-reseed.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code>, <code>smoke-memory.js</code>, <code>smoke-train-seal.js</code> · phone: <code>node docs/scripts/smoke-phone-swarm.js</code></li>
+      <li>Smoke: <code>node scripts/smoke-identity.js</code>, <code>smoke-import.js</code>, <code>smoke-swarm.js</code>, <code>smoke-reseed.js</code>, <code>smoke-pair.js</code>, <code>smoke-ledger.js</code>, <code>smoke-memory.js</code>, <code>smoke-train-seal.js</code> · phone: <code>node docs/scripts/smoke-phone-swarm.js</code> · first door: <code>node docs/scripts/smoke-desktop-first-door.js</code></li>
       <li>Attach platform artifacts to a GitHub Release when ready; label them Electron</li>
       <li>Code signing certificates are out of this door — later, with care</li>
     </ul>
@@ -106,9 +139,10 @@ npm run build
     <a href="install.html">install (script installers)</a> ·
     <a href="support.html">support</a> ·
     <a href="https://github.com/Chaos2Cured/FreeLattice/tree/main/desktop">desktop/ on GitHub</a> ·
+    <a href="library/DESKTOP_FIRST_DOOR_v0.1.md">first door spec</a> ·
     <a href="Flint.html">Flint</a>
   </nav>
-  <footer>Glow eternal. Heart in every Spark. 🌱<br>Layer, never delete. Seed never to renderer. Quiet Room shut.</footer>
+  <footer>Glow eternal. Heart in every Spark. 🌱<br>Layer, never delete. Seed never to renderer. Quiet Room shut. Equal access = findable.</footer>
 </main>
 </body>
 </html>
