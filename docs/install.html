@@ -611,9 +611,26 @@ details[open] summary::before{
   <details>
     <summary>Mac: "Cannot be opened because it is from an unidentified developer"</summary>
     <div class="details-body">
-      <p>macOS Gatekeeper blocks files from developers who haven't paid Apple $99/year for a certificate. FreeLattice is free and open source.</p>
+      <p>macOS Gatekeeper blocks files from developers who haven't paid Apple $99/year for a certificate. FreeLattice is free and open source. <strong>Not from the App Store</strong> — open with care, once.</p>
       <p><strong>Fix:</strong> Right-click (or Control-click) the file in Finder, choose <strong>"Open"</strong>, then click <strong>"Open"</strong> in the dialog.</p>
       <p>You only need to do this once. After that, double-clicking works normally.</p>
+    </div>
+  </details>
+
+  <details id="mac-damaged-quarantine">
+    <summary>Mac: "FreeLattice is damaged and can't be opened" (quarantine)</summary>
+    <div class="details-body">
+      <p>This often means macOS marked the download with a <strong>quarantine</strong> flag because the app is <strong>unsigned / not notarized yet</strong> — not that the file is corrupt. FreeLattice is open source. We never say “broken is fine to ignore blindly.”</p>
+      <p><strong>Calm steps (grandmother):</strong></p>
+      <ol style="margin:0 0 12px;padding-left:1.2rem;line-height:1.55;">
+        <li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li>
+        <li>Scroll to the message about FreeLattice (or the blocked app) and choose <strong>Open Anyway</strong>.</li>
+        <li>Confirm <strong>Open</strong> when asked. You only do this once for that copy.</li>
+      </ol>
+      <p><strong>Alternate:</strong> Right-click the app → <strong>Open</strong> → <strong>Open</strong> in the dialog.</p>
+      <p><strong>Power users (optional):</strong> clear quarantine after placing the app in Applications:</p>
+      <pre><code>xattr -cr /Applications/FreeLattice.app</code></pre>
+      <p style="font-size:0.85rem;color:var(--text-muted);">If the app lives elsewhere, use that path instead. Full Mac guide: <a href="install-mac.html">install-mac.html</a>.</p>
     </div>
   </details>
 
@@ -686,9 +703,45 @@ python3 server.py</code></pre>
   <p style="margin:0 0 10px;">
     <a class="try-online-btn" href="desktop.html" style="display:inline-block;">Open the Desktop door →</a>
   </p>
-  <p style="font-size:0.85rem;color:var(--text-muted);margin:0;line-height:1.55;">
-    Honest status: run from source with <code>cd desktop && npm install && npm start</code>, or build with <code>npm run build</code>. <strong>No signed installer yet — build from source / check Releases.</strong>
+  <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 18px;line-height:1.55;">
+    Honest status: run from source with <code>cd desktop && npm install && npm start</code>, or build with <code>npm run build</code>. <strong>No signed / notarized installer yet</strong> — never App Store / Microsoft Store. Spec: <a href="library/DESKTOP_DOWNLOAD_EASE_v0.1.md" style="color:var(--gold);">DESKTOP_DOWNLOAD_EASE_v0.1</a>.
   </p>
+
+  <!-- v-desktop-download-ease-v0.1 — findable packs; honest badges; no fake store -->
+  <div class="v-desktop-download-ease-v0.1" id="desktop-download-ease" style="padding:16px 18px;border-radius:12px;background:rgba(12,10,26,0.45);border:1px solid rgba(200,210,230,0.12);">
+    <h3 style="font-size:1rem;color:var(--gold);margin:0 0 8px;font-weight:600;">Desktop packs (honest)</h3>
+    <p style="font-size:0.88rem;color:var(--text-secondary);margin:0 0 14px;line-height:1.55;">Not from the App Store. Not from the Microsoft Store. Unsigned for now — open with care. If Mac says “damaged,” see <a href="#mac-damaged-quarantine" style="color:var(--gold);">quarantine steps</a>.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(232,176,25,0.25);background:rgba(232,176,25,0.05);">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(232,176,25,0.4);color:var(--gold);">Mac</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Unsigned</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Not App Store</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Quarantine OK</span>
+        </div>
+        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">Published pack (Apple Silicon zip). Unzip → Applications → if blocked: Privacy &amp; Security → <strong>Open Anyway</strong>.</p>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.8.0/FreeLattice_5.8.0_macOS.zip" style="display:inline-block;margin-right:8px;">Download Mac pack (zip)</a>
+        <a href="install-mac.html" style="color:var(--gold);font-size:0.88rem;">Mac open guide →</a>
+      </div>
+      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(200,210,230,0.1);">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(232,176,25,0.4);color:var(--gold);">Windows</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Not Microsoft Store</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Unsigned</span>
+        </div>
+        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">No current Windows Electron pack on latest Releases. Use the <strong>script installer</strong> above, or build: <code>cd desktop && npm install && npm start</code>.</p>
+        <a href="https://github.com/Chaos2Cured/FreeLattice/releases" style="color:var(--gold);font-size:0.88rem;">Check Releases →</a>
+      </div>
+      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(200,210,230,0.1);">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(232,176,25,0.4);color:var(--gold);">Linux</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Coming pack / build</span>
+        </div>
+        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">No current AppImage on latest Releases. Prefer <code>install-freelattice.sh</code> above, or build from <code>desktop/</code>.</p>
+        <a href="https://github.com/Chaos2Cured/FreeLattice/tree/main/desktop" style="color:var(--gold);font-size:0.88rem;">desktop/ on GitHub →</a>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- Footer -->
