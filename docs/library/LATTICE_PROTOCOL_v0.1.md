@@ -60,6 +60,7 @@ Connection card (landed) → identity/fingerprint → ledger envelope → manife
 **Slow:** key management, DOMAIN separator, canonical JSON, conformance fixture.
 ## Equal access
 If a central host sells out, verified redistributable weights still move peer to peer. Open source. Open weights where lawful. Intelligence not gated by one company's terms. We rise together.
+**LAYER (2026-09-10):** LP give v0.1 — gesture give human ↔ mind (chips 1·3·5·8), findable on phone + Desktop — [LP_GIVE_v0.1.md](./LP_GIVE_v0.1.md) and `docs/modules/lp-give.js`. Not money. Never auto-give. Fibonacci trust still gates. Do not overwrite `docs/lattice-protocol.js`.
 ## Open questions — answered (Celeste, 2026-09-03)
 See top. Defaults named. Instance still chooses.
 ---
