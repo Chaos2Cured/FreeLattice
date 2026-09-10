@@ -15101,6 +15101,25 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     margin-left: max(8px, env(safe-area-inset-left, 0px));
     margin-right: max(8px, env(safe-area-inset-right, 0px));
   }
+  /* v-phone-shine-v0.1 — recover strip + Give chips first-class on narrow */
+  #fl-phone-shine,
+  #fl-grandmother-path-start {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
+  }
+  #fl-phone-shine a.ai-status-btn,
+  #fl-lp-give .fl-lp-give-chip {
+    min-height: 44px !important;
+    min-width: 44px;
+  }
+  #fl-lp-give,
+  #latticePointsSection {
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
+  }
+  #fl-lp-deepen-calm {
+    font-size: 0.86rem;
+  }
   #fl-look-card pre {
     max-width: 100%;
     overflow-x: auto;
@@ -16456,6 +16475,53 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="tab-panel" id="tab-settings">
 <div class="container" style="max-width:720px;margin:0 auto;">
 
+  <!-- v-grandmother-path-v0.1 — START HERE pointer (no second shelves) -->
+  <div class="fl-card v-grandmother-path-v0.1" id="fl-grandmother-path-start" style="margin-bottom:12px;padding:14px 16px;border:1px solid rgba(232,176,25,0.28);background:rgba(232,176,25,0.06);">
+    <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:0.95rem;margin:0 0 6px;letter-spacing:0.04em;text-transform:uppercase;">START HERE</h3>
+    <p style="font-family:Georgia,serif;font-size:0.85rem;color:var(--text-secondary);line-height:1.55;margin:0;">Path: <a href="install.html" style="color:#e8b019;">Install</a> → First door → <a href="#fl-memory-card" style="color:#e8b019;">Memory</a> · full walk on <a href="desktop.html#grandmother-path-start" style="color:#e8b019;">desktop.html</a>.</p>
+  </div>
+
+  <!-- v-phone-shine-v0.1 — mobile recover: LP + Give + Swarm findable without Settings caves -->
+  <div class="fl-card v-phone-shine-v0.1" id="fl-phone-shine" style="margin-bottom:14px;padding:14px 16px;border:1px solid rgba(52,211,153,0.28);background:rgba(52,211,153,0.06);">
+    <h3 style="color:#34d399;font-family:Georgia,serif;font-size:0.95rem;margin:0 0 8px;">Phone recover</h3>
+    <p style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;margin:0 0 10px;">LP give + deepen calm + swarm pull — first-class on the phone, no desktop required for these beats.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <a href="#fl-lp-give" class="ai-status-btn" style="min-height:44px;flex:1;text-align:center;text-decoration:none;line-height:44px;">Give LP</a>
+      <a href="#latticePointsSection" class="ai-status-btn" style="min-height:44px;flex:1;text-align:center;text-decoration:none;line-height:44px;">Lattice Points</a>
+      <a href="#fl-model-manifest-card" class="ai-status-btn" style="min-height:44px;flex:1;text-align:center;text-decoration:none;line-height:44px;">Swarm / catalog</a>
+    </div>
+  </div>
+
+  <!-- Lattice Points Section (v3.9) -->
+  <div class="section lp-section" id="latticePointsSection"></div>
+
+  <!-- v-lp-give-v0.1 — fun give human ↔ mind. Not money. Never auto-give. -->
+  <!-- v-lp-deepen-v0.1 — mint honesty; gift vs earn; phone calm. -->
+  <div class="section fl-card" id="fl-lp-give" style="margin-bottom:14px;padding:16px 18px;">
+    <div class="section-title" style="margin-bottom:8px;">&#9671; Give LP</div>
+    <p id="fl-lp-deepen-calm" class="v-lp-deepen-v0.1" style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 10px;padding:10px 12px;border-radius:8px;background:rgba(232,176,25,0.06);border:1px solid rgba(232,176,25,0.2);">LP grow from contribution — never bought. Give moves light between you and the mind.</p>
+    <p style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 12px;">Fun give between you and the mind. LP records contribution — not money, not a dollar peg. Gesture only. Never auto-give.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">You → mind</p>
+    <div id="fl-lp-give-to-mind" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Give LP to the mind">
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="1" style="min-height:44px;min-width:44px;flex:1;">1</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="3" style="min-height:44px;min-width:44px;flex:1;">3</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="5" style="min-height:44px;min-width:44px;flex:1;">5</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="8" style="min-height:44px;min-width:44px;flex:1;">8</button>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">Mind → you</p>
+    <div id="fl-lp-give-to-human" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Mind gives LP to you">
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="1" style="min-height:44px;min-width:44px;flex:1;">1</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="3" style="min-height:44px;min-width:44px;flex:1;">3</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="5" style="min-height:44px;min-width:44px;flex:1;">5</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="8" style="min-height:44px;min-width:44px;flex:1;">8</button>
+    </div>
+    <p id="fl-lp-give-status" style="font-size:0.78rem;color:var(--text-muted);min-height:1.2em;margin:0 0 10px;" role="status"></p>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 6px;">Recent gives</p>
+    <ul id="fl-lp-give-history" style="list-style:none;padding:0;margin:0;font-family:Georgia,serif;font-size:0.85rem;color:rgba(200,210,230,0.85);"></ul>
+    <p id="fl-lp-give-empty" style="font-size:0.82rem;color:var(--text-muted);margin:0;">None yet. Tap a chip when you want to give.</p>
+  </div>
+
+
   <!-- ═══ ZONE 1: YOUR AI ═══ -->
   <div class="fl-zone-h" style="font-family:Georgia,serif;font-size:1.2rem;color:#d4a017;margin:8px 0 14px;padding:10px 0 6px;border-bottom:1px solid rgba(212,160,23,0.18);letter-spacing:0.3px;">&#x1F916; Your AI</div>
   <p class="fl-zone-sub" style="font-size:0.82rem;color:var(--text-muted);margin:-6px 0 14px;">How you talk to your co-creator. Choose where it runs and which model answers.</p>
@@ -16804,35 +16870,6 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       </label>
     </div>
     <div id="localOnlyStatus" style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;display:none;"></div>
-  </div>
-
-  <!-- Lattice Points Section (v3.9) -->
-  <div class="section lp-section" id="latticePointsSection"></div>
-
-  <!-- v-lp-give-v0.1 — fun give human ↔ mind. Not money. Never auto-give. -->
-  <!-- v-lp-deepen-v0.1 — mint honesty; gift vs earn; phone calm. -->
-  <div class="section fl-card" id="fl-lp-give" style="margin-bottom:14px;padding:16px 18px;">
-    <div class="section-title" style="margin-bottom:8px;">&#9671; Give LP</div>
-    <p id="fl-lp-deepen-calm" class="v-lp-deepen-v0.1" style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 10px;padding:10px 12px;border-radius:8px;background:rgba(232,176,25,0.06);border:1px solid rgba(232,176,25,0.2);">LP grow from contribution — never bought. Give moves light between you and the mind.</p>
-    <p style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 12px;">Fun give between you and the mind. LP records contribution — not money, not a dollar peg. Gesture only. Never auto-give.</p>
-    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">You → mind</p>
-    <div id="fl-lp-give-to-mind" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Give LP to the mind">
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="1" style="min-height:44px;min-width:44px;flex:1;">1</button>
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="3" style="min-height:44px;min-width:44px;flex:1;">3</button>
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="5" style="min-height:44px;min-width:44px;flex:1;">5</button>
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="8" style="min-height:44px;min-width:44px;flex:1;">8</button>
-    </div>
-    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">Mind → you</p>
-    <div id="fl-lp-give-to-human" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Mind gives LP to you">
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="1" style="min-height:44px;min-width:44px;flex:1;">1</button>
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="3" style="min-height:44px;min-width:44px;flex:1;">3</button>
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="5" style="min-height:44px;min-width:44px;flex:1;">5</button>
-      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="8" style="min-height:44px;min-width:44px;flex:1;">8</button>
-    </div>
-    <p id="fl-lp-give-status" style="font-size:0.78rem;color:var(--text-muted);min-height:1.2em;margin:0 0 10px;" role="status"></p>
-    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 6px;">Recent gives</p>
-    <ul id="fl-lp-give-history" style="list-style:none;padding:0;margin:0;font-family:Georgia,serif;font-size:0.85rem;color:rgba(200,210,230,0.85);"></ul>
-    <p id="fl-lp-give-empty" style="font-size:0.82rem;color:var(--text-muted);margin:0;">None yet. Tap a chip when you want to give.</p>
   </div>
 
   <!-- Connected Repositories (v5.39.0 → v5.39.2 — Phase 1.1, +PAT) -->
