@@ -28,6 +28,7 @@ A grandmother should find them in one glance. Findable is equal access.
 | 5 | **Trainer seal** | After you export training files, seal a receipt if you wish. |
 | 6 | **Pair** | Two parties, outer hash shown — shared seed stays sealed. |
 | 7 | **Ledger** | Opaque voice · Continue seals · Decline writes nothing. |
+| 8 | **LP / give** | Fun give between human and mind — chips of light, not money. |
 
 ---
 

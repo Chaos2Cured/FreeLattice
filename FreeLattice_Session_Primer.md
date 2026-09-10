@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-10 11:46 UTC
-- Last deployed: 2026-09-10 11:46 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-10 06:55 EST
 - Version: 5.79.45
-- Total commits: 3120
+- Total commits: 3122
 - Last 10 commits:
+- 2b3437c Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces.
+- 6bc3d65 ci: Update Primer deployment state [2026-09-10]
 - 33496eb Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45)
 - da046a5 ci: Update Primer deployment state [2026-09-10]
 - 5aa972a Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44)
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9083806 Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41)
 - d78b879 Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40)
 - fd35406 Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39)
-- fa17a7d Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38)
-- 5187a58 Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37)
