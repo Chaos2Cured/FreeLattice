@@ -3822,8 +3822,14 @@ assert('ollama: getOllamaBaseUrl strips trailing slash to prevent double-slash i
   /function getOllamaBaseUrl[\s\S]{0,800}\.replace\(\/\\\/\+\$\/,\s*['"]['"]\)/.test(appHtml));
 assert('ollama: getOllamaBaseUrl validates http(s) protocol before returning',
   /function getOllamaBaseUrl[\s\S]{0,800}\/\^https\?:\\\/\\\/\/\.test\(host\)/.test(appHtml));
-assert('ollama: getOllamaBaseUrl returns explicit http://localhost:11434 fallback (never empty)',
-  /function getOllamaBaseUrl[\s\S]{0,800}return ['"]http:\/\/localhost:11434['"]/.test(appHtml));
+// LNA: product fallback is FL_OLLAMA_LOCAL (http://127.0.0.1:11434), not
+// the localhost literal — Chrome Private Network Access classifies before DNS.
+assert('ollama: getOllamaBaseUrl returns FL_OLLAMA_LOCAL / 127.0.0.1 fallback (never empty)',
+  /function getOllamaBaseUrl[\s\S]{0,900}return FL_OLLAMA_LOCAL/.test(appHtml)
+  && /FL_OLLAMA_LOCAL\s*=\s*['"]http:\/\/127\.0\.0\.1:11434['"]/.test(appHtml));
+assert('ollama: getOllamaBaseUrl rewrites saved localhost → 127.0.0.1 (LNA)',
+  /function getOllamaBaseUrl[\s\S]{0,900}localhost(?=\[:\/\]\|\$)/.test(appHtml)
+  || /function getOllamaBaseUrl[\s\S]{0,900}\.replace\(\/\^\(https\?:\\\/\\\/\)localhost/.test(appHtml));
 
 // ── Ollama URL Bug 1 — outcome lock ──
 // Direct grep for the regression pattern: any /ollama or /api/tags
@@ -6722,9 +6728,9 @@ var glassV21 = require('fs').readFileSync(require('path').join(__dirname, '..', 
 var glass1 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'glass.html'), 'utf8');
 var researchHtml = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'research.html'), 'utf8');
 
-// Polish 1a — outer-glow envelope (shadowBlur 28 + globalAlpha 0.4 pattern)
-assert('v5.64.1 glass-v2 polish 1a: outer-glow envelope shadowBlur 28 + globalAlpha 0.4 pattern present',
-  /shadowBlur\s*=\s*28[\s\S]{0,200}globalAlpha\s*=\s*0\.4/.test(glassV21));
+// Polish 1a — outer-glow envelope (dimmed ternary + 0.4 * alphaMul; do not gut glass)
+assert('v5.64.1 glass-v2 polish 1a: outer-glow envelope shadowBlur ternary 28 + globalAlpha 0.4 * alphaMul',
+  /shadowBlur\s*=\s*dimmed\s*\?\s*8\s*:\s*28[\s\S]{0,200}globalAlpha\s*=\s*0\.4\s*\*\s*alphaMul/.test(glassV21));
 
 // Polish 1b — particle field, at least 50 particles initialized (target 80)
 assert('v5.64.1 glass-v2 polish 1b: particle field initialized with at least 50 particles',
