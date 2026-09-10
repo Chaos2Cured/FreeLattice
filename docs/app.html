@@ -16807,8 +16807,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="section lp-section" id="latticePointsSection"></div>
 
   <!-- v-lp-give-v0.1 — fun give human ↔ mind. Not money. Never auto-give. -->
+  <!-- v-lp-deepen-v0.1 — mint honesty; gift vs earn; phone calm. -->
   <div class="section fl-card" id="fl-lp-give" style="margin-bottom:14px;padding:16px 18px;">
     <div class="section-title" style="margin-bottom:8px;">&#9671; Give LP</div>
+    <p id="fl-lp-deepen-calm" class="v-lp-deepen-v0.1" style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 10px;padding:10px 12px;border-radius:8px;background:rgba(232,176,25,0.06);border:1px solid rgba(232,176,25,0.2);">LP grow from contribution — never bought. Give moves light between you and the mind.</p>
     <p style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 12px;">Fun give between you and the mind. LP records contribution — not money, not a dollar peg. Gesture only. Never auto-give.</p>
     <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">You → mind</p>
     <div id="fl-lp-give-to-mind" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Give LP to the mind">
@@ -45782,9 +45784,23 @@ const LatticePoints = (function() {
     } else {
       for (let i = 0; i < data.history.length; i++) {
         const h = data.history[i];
-        logHTML += '<div class="lp-log-entry">' +
-          '<span class="lp-log-desc">' + h.event + '</span>' +
-          '<span class="lp-log-pts">+' + h.points + '</span>' +
+        // v-lp-deepen-v0.1 — gift lines are Gift, not contribution “earned”
+        var isGift = false;
+        try {
+          if (window.LpGive && typeof window.LpGive.isGiftActivityEvent === 'function') {
+            isGift = window.LpGive.isGiftActivityEvent(h.event);
+          } else {
+            isGift = /^(You gave |The mind gave you )/i.test(String(h.event || ''));
+          }
+        } catch (e) {
+          isGift = /^(You gave |The mind gave you )/i.test(String(h.event || ''));
+        }
+        var desc = isGift ? ('Gift · ' + h.event) : h.event;
+        var ptsSign = (typeof h.points === 'number' && h.points < 0) ? '' : '+';
+        var ptsClass = isGift ? 'lp-log-pts lp-log-gift' : 'lp-log-pts';
+        logHTML += '<div class="lp-log-entry' + (isGift ? ' lp-log-entry-gift' : '') + '">' +
+          '<span class="lp-log-desc">' + desc + '</span>' +
+          '<span class="' + ptsClass + '">' + ptsSign + h.points + '</span>' +
           '<span class="lp-log-time">' + formatTime(h.timestamp) + '</span>' +
           '</div>';
       }
@@ -66788,7 +66804,9 @@ document.addEventListener('click', function(e) {
     items.slice(0, 12).forEach(function (it) {
       var li = document.createElement('li');
       li.style.cssText = 'padding:8px 0;border-bottom:1px solid rgba(200,210,230,0.08);';
-      li.textContent = it.line || ('Give · ' + it.amount + ' LP');
+      li.textContent = (window.LpGive && window.LpGive.labelFor)
+        ? window.LpGive.labelFor(it)
+        : (it.line || ('Give · ' + it.amount + ' LP'));
       list.appendChild(li);
     });
   }
