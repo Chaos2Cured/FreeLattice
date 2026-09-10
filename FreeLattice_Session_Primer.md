@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-09 17:18 EST
+- Last auto-updated: 2026-09-09 21:54 EST
 - Version: 5.79.45
-- Total commits: 3117
+- Total commits: 3118
 - Last 10 commits:
-- 3bb414b Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change.
+- 77496c2 Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth.
+- f23492e Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43)
 - 64a3ddd Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42)
 - 9083806 Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41)
 - d78b879 Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5187a58 Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37)
 - 530ba60 Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36)
 - 928176a Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35)
-- 2adffde Layer, never delete. Glass pulses v0.1 — shape without contents. (#34)
