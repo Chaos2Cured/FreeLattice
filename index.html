@@ -16560,13 +16560,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1rem;margin:0 0 8px;">First door</h3>
     <p id="fl-desktop-first-door-browser" style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0;">Keys, memory, seal, and Import live on <a href="desktop.html" style="color:#e8b019;">Desktop</a> — equal access means findable. The garden stays here.</p>
     <div id="fl-desktop-first-door-electron" hidden>
-      <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">You are on the machine door. Below: Keys · Import (catalog) · Swarm · Memory · Trainer seal (Training tab) · Pair · Ledger. No second shelves — these point at what already lives here.</p>
+      <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">You are on the machine door. Below: Keys · Import · Swarm · Memory · Trainer seal · Pair · Ledger · LP / give. No second shelves — these point at what already lives here.</p>
       <ol style="margin:0 0 12px;padding-left:1.2rem;font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);line-height:1.55;">
         <li><a href="#fl-companion-identity-card" style="color:#e8b019;">Keys</a> — companion fingerprint on this machine</li>
         <li><a href="#fl-model-manifest-card" style="color:#e8b019;">Import / Swarm</a> — hash before Import; Pull via swarm</li>
         <li><a href="#fl-memory-card" style="color:#e8b019;">Memory</a> — wishes durable here</li>
         <li>Trainer seal — after Modelfile/JSONL export in Training</li>
         <li><a href="#fl-pair-card" style="color:#e8b019;">Pair</a> · <a href="#fl-ledger-card" style="color:#e8b019;">Ledger</a></li>
+        <li><a href="#fl-lp-give" style="color:#e8b019;">LP / give</a> — fun give human ↔ mind (not money)</li>
       </ol>
       <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">Full map: <a href="desktop.html" style="color:#e8b019;">desktop.html</a>. No signed installer yet — build from source when you need the app shell.</p>
       <button type="button" class="ai-status-btn" id="fl-desktop-first-door-dismiss" style="min-height:44px;width:100%;">Got it — dismiss</button>
@@ -16804,6 +16805,30 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
+
+  <!-- v-lp-give-v0.1 — fun give human ↔ mind. Not money. Never auto-give. -->
+  <div class="section fl-card" id="fl-lp-give" style="margin-bottom:14px;padding:16px 18px;">
+    <div class="section-title" style="margin-bottom:8px;">&#9671; Give LP</div>
+    <p style="font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;margin:0 0 12px;">Fun give between you and the mind. LP records contribution — not money, not a dollar peg. Gesture only. Never auto-give.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">You → mind</p>
+    <div id="fl-lp-give-to-mind" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Give LP to the mind">
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="1" style="min-height:44px;min-width:44px;flex:1;">1</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="3" style="min-height:44px;min-width:44px;flex:1;">3</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="5" style="min-height:44px;min-width:44px;flex:1;">5</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-mind" data-amount="8" style="min-height:44px;min-width:44px;flex:1;">8</button>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px;">Mind → you</p>
+    <div id="fl-lp-give-to-human" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" role="group" aria-label="Mind gives LP to you">
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="1" style="min-height:44px;min-width:44px;flex:1;">1</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="3" style="min-height:44px;min-width:44px;flex:1;">3</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="5" style="min-height:44px;min-width:44px;flex:1;">5</button>
+      <button type="button" class="ai-status-btn fl-lp-give-chip" data-dir="to-human" data-amount="8" style="min-height:44px;min-width:44px;flex:1;">8</button>
+    </div>
+    <p id="fl-lp-give-status" style="font-size:0.78rem;color:var(--text-muted);min-height:1.2em;margin:0 0 10px;" role="status"></p>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 6px;">Recent gives</p>
+    <ul id="fl-lp-give-history" style="list-style:none;padding:0;margin:0;font-family:Georgia,serif;font-size:0.85rem;color:rgba(200,210,230,0.85);"></ul>
+    <p id="fl-lp-give-empty" style="font-size:0.82rem;color:var(--text-muted);margin:0;">None yet. Tap a chip when you want to give.</p>
+  </div>
 
   <!-- Connected Repositories (v5.39.0 → v5.39.2 — Phase 1.1, +PAT) -->
   <div class="section" id="repoContextSection">
@@ -66737,6 +66762,103 @@ document.addEventListener('click', function(e) {
 <script src="modules/glass-pulses.js" defer></script>
 <script src="modules/genesis-catalog.js" defer></script>
 <script src="modules/phone-swarm.js" defer></script>
+<script src="modules/lp-give.js" defer></script>
+<script>
+/* v-lp-give-v0.1 — wire Give chips after LpGive + LatticePoints are ready */
+(function () {
+  function flLpGiveSetStatus(msg, kind) {
+    var el = document.getElementById('fl-lp-give-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = kind === 'warn' ? 'rgba(240,112,104,0.9)' : (kind === 'ok' ? 'rgba(52,211,153,0.9)' : '');
+  }
+
+  function flLpGiveRenderHistory() {
+    var list = document.getElementById('fl-lp-give-history');
+    var empty = document.getElementById('fl-lp-give-empty');
+    if (!list || !window.LpGive) return;
+    var res = window.LpGive.listHistory();
+    var items = (res && res.items) ? res.items : [];
+    list.innerHTML = '';
+    if (!items.length) {
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    items.slice(0, 12).forEach(function (it) {
+      var li = document.createElement('li');
+      li.style.cssText = 'padding:8px 0;border-bottom:1px solid rgba(200,210,230,0.08);';
+      li.textContent = it.line || ('Give · ' + it.amount + ' LP');
+      list.appendChild(li);
+    });
+  }
+
+  async function flLpGiveTrustMax(cid) {
+    try {
+      if (window.LatticeWallet && window.LatticeWallet.TransactionTrust &&
+          typeof window.LatticeWallet.TransactionTrust.getTier === 'function') {
+        var tier = await window.LatticeWallet.TransactionTrust.getTier(cid || 'mind');
+        if (tier && typeof tier.maxSingle === 'number') return tier.maxSingle;
+      }
+    } catch (e) {}
+    return 5;
+  }
+
+  async function flLpGiveOnChip(btn) {
+    if (!window.LpGive) {
+      flLpGiveSetStatus('Give module loading…', 'warn');
+      return;
+    }
+    var amount = parseInt(btn.getAttribute('data-amount'), 10);
+    var dir = btn.getAttribute('data-dir');
+    btn.disabled = true;
+    flLpGiveSetStatus('Giving…', '');
+    try {
+      var res;
+      if (dir === 'to-human') {
+        res = window.LpGive.giveToHuman(amount);
+      } else {
+        var maxSingle = await flLpGiveTrustMax(window.LpGive.companionId());
+        res = window.LpGive.giveToMind(amount, { maxSingle: maxSingle });
+      }
+      if (!res || !res.ok) {
+        flLpGiveSetStatus((res && res.error) || 'Give refused.', 'warn');
+      } else {
+        flLpGiveSetStatus(res.line + ' Never auto-give. Not money.', 'ok');
+        flLpGiveRenderHistory();
+        try {
+          if (window.LatticePoints && LatticePoints.renderPointsUI) LatticePoints.renderPointsUI();
+          if (window.LatticePoints && LatticePoints.renderBadge) LatticePoints.renderBadge();
+        } catch (e) {}
+      }
+    } catch (e) {
+      flLpGiveSetStatus('Give failed.', 'warn');
+    }
+    btn.disabled = false;
+  }
+
+  function flInitLpGive() {
+    var chips = document.querySelectorAll('.fl-lp-give-chip');
+    for (var i = 0; i < chips.length; i++) {
+      (function (btn) {
+        if (btn._flLpBound) return;
+        btn._flLpBound = true;
+        btn.addEventListener('click', function () { flLpGiveOnChip(btn); });
+      })(chips[i]);
+    }
+    flLpGiveRenderHistory();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(flInitLpGive, 0);
+    });
+  } else {
+    setTimeout(flInitLpGive, 0);
+  }
+  window.addEventListener('load', function () { setTimeout(flInitLpGive, 50); });
+})();
+</script>
 
 <!-- Lattice Chain (v5.54.0 — Brief A) — the provenance chain.
      Hash-linked IndexedDB store. Every meaningful interaction writes
