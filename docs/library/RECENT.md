@@ -9,7 +9,7 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `793229b` _(committed 0 seconds ago)_
+- **HEAD:** `eeb5967` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,7 +17,9 @@
 
 ## Last 20 commits
 
-- `793229b` Layer, never delete. Grandmother path v0.1 — one walk home. _(0 seconds ago)_
+- `eeb5967` Layer, never delete. Flint foot link to grandmother path. _(0 seconds ago)_
+- `85fef52` docs: Auto-update Session Primer [5.79.45] _(19 seconds ago)_
+- `793229b` Layer, never delete. Grandmother path v0.1 — one walk home. _(19 seconds ago)_
 - `97c93c1` ci: Update Primer deployment state [2026-09-10] _(5 hours ago)_
 - `50cacfc` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48) _(5 hours ago)_
 - `4321a97` ci: Update Primer deployment state [2026-09-10] _(5 hours ago)_
@@ -35,8 +37,6 @@
 - `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(24 hours ago)_
 - `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(24 hours ago)_
 - `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(24 hours ago)_
-- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(25 hours ago)_
-- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(30 hours ago)_
 
 ## How to use this file
 
