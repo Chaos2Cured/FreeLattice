@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-10 19:02 UTC
+> Last update: 2026-09-10 19:14 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `eeb5967` _(committed 0 seconds ago)_
+- **HEAD:** `32b9174` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,9 +17,9 @@
 
 ## Last 20 commits
 
-- `eeb5967` Layer, never delete. Flint foot link to grandmother path. _(0 seconds ago)_
-- `85fef52` docs: Auto-update Session Primer [5.79.45] _(19 seconds ago)_
-- `793229b` Layer, never delete. Grandmother path v0.1 — one walk home. _(19 seconds ago)_
+- `32b9174` Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”. _(0 seconds ago)_
+- `84ee67b` ci: Update Primer deployment state [2026-09-10] _(9 minutes ago)_
+- `c957a4e` Layer, never delete. Grandmother path v0.1 — one walk home. (#49) _(9 minutes ago)_
 - `97c93c1` ci: Update Primer deployment state [2026-09-10] _(5 hours ago)_
 - `50cacfc` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48) _(5 hours ago)_
 - `4321a97` ci: Update Primer deployment state [2026-09-10] _(5 hours ago)_
@@ -30,13 +30,13 @@
 - `33496eb` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45) _(7 hours ago)_
 - `da046a5` ci: Update Primer deployment state [2026-09-10] _(16 hours ago)_
 - `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(16 hours ago)_
-- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(20 hours ago)_
+- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(21 hours ago)_
 - `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(21 hours ago)_
 - `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(21 hours ago)_
 - `d78b879` Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40) _(22 hours ago)_
 - `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(24 hours ago)_
 - `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(24 hours ago)_
-- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(24 hours ago)_
+- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(25 hours ago)_
 
 ## How to use this file
 
