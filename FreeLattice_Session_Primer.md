@@ -348,13 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-10 14:02 EST
+- Last auto-updated: 2026-09-10 19:05 UTC
+- Last deployed: 2026-09-10 19:05 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3130
+- Total commits: 3128
 - Last 10 commits:
-- eeb5967 Layer, never delete. Flint foot link to grandmother path.
-- 85fef52 docs: Auto-update Session Primer [5.79.45]
-- 793229b Layer, never delete. Grandmother path v0.1 — one walk home.
+- c957a4e Layer, never delete. Grandmother path v0.1 — one walk home. (#49)
 - 97c93c1 ci: Update Primer deployment state [2026-09-10]
 - 50cacfc Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48)
 - 4321a97 ci: Update Primer deployment state [2026-09-10]
@@ -362,3 +362,5 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ea5b9aa ci: Update Primer deployment state [2026-09-10]
 - d2e3f61 Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces. (#46)
 - 6bc3d65 ci: Update Primer deployment state [2026-09-10]
+- 33496eb Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45)
+- da046a5 ci: Update Primer deployment state [2026-09-10]
