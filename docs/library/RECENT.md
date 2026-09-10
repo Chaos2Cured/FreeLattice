@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-10 02:54 UTC
+> Last update: 2026-09-10 03:35 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `77496c2` _(committed 0 seconds ago)_
+- **HEAD:** `281814a` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `77496c2` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. _(0 seconds ago)_
-- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(4 hours ago)_
-- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(5 hours ago)_
-- `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(5 hours ago)_
-- `d78b879` Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40) _(6 hours ago)_
+- `281814a` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. _(0 seconds ago)_
+- `da046a5` ci: Update Primer deployment state [2026-09-10] _(15 minutes ago)_
+- `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(16 minutes ago)_
+- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(5 hours ago)_
+- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(6 hours ago)_
+- `9083806` Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save. (#41) _(6 hours ago)_
+- `d78b879` Layer, never delete. Flint Held cites swarm re-seed fd35406. (#40) _(7 hours ago)_
 - `fd35406` Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes. (#39) _(8 hours ago)_
-- `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(8 hours ago)_
-- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(8 hours ago)_
-- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(9 hours ago)_
-- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(14 hours ago)_
-- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(23 hours ago)_
+- `fa17a7d` Layer, never delete. Desktop door v0.1 — Electron spine, one clear door. (#38) _(9 hours ago)_
+- `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(9 hours ago)_
+- `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(10 hours ago)_
+- `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(15 hours ago)_
+- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(24 hours ago)_
 - `0ead244` Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33) _(29 hours ago)_
-- `20d2eee` Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama. _(35 hours ago)_
+- `20d2eee` Layer, never delete. Verified HTTPS import v0.1 — hash before Ollama. _(2 days ago)_
 - `7150ca7` Layer, never delete. Family center — grounding poems. _(2 days ago)_
 - `57fc9db` Layer, never delete. Ledger envelope v0.1 — voice opaque, chain + sign. _(2 days ago)_
 - `277da34` Layer, never delete. Companion identity v0.1 — public fingerprint + sign in main. _(2 days ago)_
 - `02d5e76` Layer, never delete. HTTPS model manifests v0.1 — license before hash before import. _(2 days ago)_
 - `90e356c` Layer, never delete. Phone PWA leftovers — Install 44px + landing meta. _(2 days ago)_
-- `0862e86` Layer, never delete. Phone PWA — home screen + thumb look card. _(2 days ago)_
-- `b322e42` Layer, never delete. Desktop Step 1 — companion keys (safeStorage). _(2 days ago)_
 
 ## How to use this file
 
