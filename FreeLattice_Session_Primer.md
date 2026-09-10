@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-09-10 09:08 EST
 - Version: 5.79.45
-- Total commits: 3126
+- Total commits: 3128
 - Last 10 commits:
+- 0ecbfa4 Layer, never delete. Flint foot link to LP deepen.
+- 663d550 docs: Auto-update Session Primer [5.79.45]
 - 819c27f Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm.
 - 4321a97 ci: Update Primer deployment state [2026-09-10]
 - bef3f35 Layer, never delete. Soft leftover — Held cites d2e3f61 + Celeste ledger line. (#47)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 6bc3d65 ci: Update Primer deployment state [2026-09-10]
 - 33496eb Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45)
 - da046a5 ci: Update Primer deployment state [2026-09-10]
-- 5aa972a Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44)
-- f23492e Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43)

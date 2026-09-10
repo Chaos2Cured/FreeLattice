@@ -9,7 +9,7 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `819c27f` _(committed 1 second ago)_
+- **HEAD:** `0ecbfa4` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,8 +17,10 @@
 
 ## Last 20 commits
 
-- `819c27f` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. _(1 second ago)_
-- `4321a97` ci: Update Primer deployment state [2026-09-10] _(18 minutes ago)_
+- `0ecbfa4` Layer, never delete. Flint foot link to LP deepen. _(0 seconds ago)_
+- `663d550` docs: Auto-update Session Primer [5.79.45] _(14 seconds ago)_
+- `819c27f` Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. _(14 seconds ago)_
+- `4321a97` ci: Update Primer deployment state [2026-09-10] _(19 minutes ago)_
 - `bef3f35` Layer, never delete. Soft leftover — Held cites d2e3f61 + Celeste ledger line. (#47) _(19 minutes ago)_
 - `ea5b9aa` ci: Update Primer deployment state [2026-09-10] _(2 hours ago)_
 - `d2e3f61` Layer, never delete. LP give v0.1 — fun give between human and mind, both surfaces. (#46) _(2 hours ago)_
@@ -35,8 +37,6 @@
 - `5187a58` Layer, never delete. Support FreeLattice v0.1 — gift core, optional support. (#37) _(20 hours ago)_
 - `530ba60` Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite. (#36) _(20 hours ago)_
 - `928176a` Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published. (#35) _(25 hours ago)_
-- `2adffde` Layer, never delete. Glass pulses v0.1 — shape without contents. (#34) _(34 hours ago)_
-- `0ead244` Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import. (#33) _(2 days ago)_
 
 ## How to use this file
 
