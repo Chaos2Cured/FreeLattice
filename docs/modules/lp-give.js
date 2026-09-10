@@ -1,6 +1,7 @@
-// docs/modules/lp-give.js — LP give v0.1
+// docs/modules/lp-give.js — LP give v0.1 + deepen v0.1
 // Gesture give human ↔ mind. Not money. Never auto-give.
-// Marker: v-lp-give-v0.1
+// History kinds: gift_out (human→mind) · gift_in (mind→human).
+// Marker: v-lp-give-v0.1 · deepen: v-lp-deepen-v0.1
 // — Flint / Celeste brief, September 2026
 
 (function (root) {
@@ -145,6 +146,7 @@
     var line = 'You gave ' + n + ' LP to ' + companionLabel() + '.';
     var entry = {
       dir: 'human_to_mind',
+      kind: 'gift_out',
       amount: n,
       ts: Date.now(),
       line: line,
@@ -182,6 +184,7 @@
     var line = 'The mind gave you ' + n + ' LP.';
     var entry = {
       dir: 'mind_to_human',
+      kind: 'gift_in',
       amount: n,
       ts: Date.now(),
       line: line,
@@ -192,7 +195,33 @@
   }
 
   function listHistory() {
-    return { ok: true, items: loadHistory(), count: loadHistory().length };
+    var items = loadHistory();
+    return { ok: true, items: items, count: items.length };
+  }
+
+  /**
+   * Calm label for UI — Gift out / Gift in / legacy line.
+   * @param {{ kind?: string, dir?: string, line?: string, amount?: number }} entry
+   */
+  function labelFor(entry) {
+    if (!entry) return '';
+    if (entry.kind === 'gift_out' || entry.dir === 'human_to_mind') {
+      return 'Gift out · ' + (entry.line || ('you gave ' + (entry.amount || '') + ' LP'));
+    }
+    if (entry.kind === 'gift_in' || entry.dir === 'mind_to_human') {
+      return 'Gift in · ' + (entry.line || ('the mind gave you ' + (entry.amount || '') + ' LP'));
+    }
+    return entry.line || 'Give';
+  }
+
+  /** Detect LatticePoints activity log rows that are gifts (not contribution earn). */
+  function isGiftActivityEvent(eventText) {
+    var s = String(eventText || '');
+    if (/^You gave\s/i.test(s)) return true;
+    if (/^The mind gave you\s/i.test(s)) return true;
+    if (/lp_give_from_mind/i.test(s)) return true;
+    if (/\bGift\b/i.test(s) && /LP/i.test(s)) return true;
+    return false;
   }
 
   var api = {
@@ -201,6 +230,8 @@
     giveToMind: giveToMind,
     giveToHuman: giveToHuman,
     listHistory: listHistory,
+    labelFor: labelFor,
+    isGiftActivityEvent: isGiftActivityEvent,
     companionId: companionId,
     bindMemory: bindMemory,
     clearMemory: clearMemory,
