@@ -348,11 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-10 14:14 EST
+- Last auto-updated: 2026-09-10 19:46 UTC
+- Last deployed: 2026-09-10 19:46 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
 - Total commits: 3130
 - Last 10 commits:
-- 32b9174 Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”.
+- 3c104de Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”. (#50)
 - 84ee67b ci: Update Primer deployment state [2026-09-10]
 - c957a4e Layer, never delete. Grandmother path v0.1 — one walk home. (#49)
 - 97c93c1 ci: Update Primer deployment state [2026-09-10]
