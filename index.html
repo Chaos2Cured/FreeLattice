@@ -15286,6 +15286,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div class="wizard-provider-name">OpenRouter</div>
           <div class="wizard-provider-desc">Multiple providers, flexible routing</div>
         </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('nvidia')" id="wizProvNvidia">
+          <div class="wizard-provider-name">NVIDIA NIM</div>
+          <div class="wizard-provider-desc">Free tier — Llama, Nemotron reasoning, Qwen</div>
+          <span class="wizard-badge-free">Free tier</span>
+        </button>
         <button class="wizard-provider-btn" onclick="wizardSelectProvider('xai')" id="wizProvXai">
           <div class="wizard-provider-name">xAI (Grok)</div>
           <div class="wizard-provider-desc">Grok models by xAI</div>
@@ -15312,6 +15317,23 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <label id="wizApiKeyLabel">API Key</label>
         <input type="password" id="wizApiKeyInput" placeholder="Paste your API key here">
         <div class="hint" id="wizApiKeyHint"></div>
+      </div>
+
+      <!-- v5.78 Quillan: Custom endpoint (shown when Custom selected).
+           Any OpenAI-compatible base URL + model. Presets fill the fields;
+           paste your own for any community host, vLLM, LM Studio, llama.cpp. -->
+      <div class="wizard-apikey-section hidden" id="wizCustomSection">
+        <label for="wizCustomUrl">API Base URL</label>
+        <input type="text" id="wizCustomUrl" placeholder="https://your-api.example.com/v1/chat/completions" autocomplete="off" style="font-family:var(--font-mono,monospace);">
+        <label for="wizCustomModel" style="margin-top:8px;">Model Name</label>
+        <input type="text" id="wizCustomModel" placeholder="e.g., meta/llama-3.3-70b-instruct" autocomplete="off" style="font-family:var(--font-mono,monospace);">
+        <div class="hint" style="margin-top:8px;">Kick the tires with a preset, or paste any OpenAI-compatible endpoint.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="wizard-btn wizard-btn-secondary" onclick="wizardFillCustomPreset('nvidia')" style="padding:6px 12px;font-size:0.8rem;">NVIDIA NIM (free)</button>
+          <button type="button" class="wizard-btn wizard-btn-secondary" onclick="wizardFillCustomPreset('lmstudio')" style="padding:6px 12px;font-size:0.8rem;">LM Studio (local)</button>
+          <button type="button" class="wizard-btn wizard-btn-secondary" onclick="wizardFillCustomPreset('vllm')" style="padding:6px 12px;font-size:0.8rem;">vLLM (self-hosted)</button>
+        </div>
+        <div class="hint" id="wizCustomHint"></div>
       </div>
 
       <!-- Ollama instructions (shown when Ollama selected) -->
@@ -15850,6 +15872,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <option value="xai">xAI</option>
             <option value="mistral">Mistral AI</option>
             <option value="huggingface">Hugging Face (Free)</option>
+            <option value="nvidia">NVIDIA NIM (free tier)</option>
           </optgroup>
           <optgroup label="Global Voices &#127759;">
             <option value="deepseek">DeepSeek</option>
@@ -22687,7 +22710,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.45';
+const FL_VERSION = '5.79.46';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25081,6 +25104,28 @@ const PROVIDERS = {
       'deepseek-r1-7b': 'mistralai/Mistral-7B-Instruct-v0.3',
       'deepseek-r1-1.5b': 'microsoft/Phi-3-mini-4k-instruct',
       grok: 'mistralai/Mistral-7B-Instruct-v0.3'
+    }
+  },
+  // v5.78 Quillan: NVIDIA NIM — OpenAI-compatible, free tier via build.nvidia.com key.
+  // No lab lock-in: any NIM model ID works here, and the same shape fits any
+  // self-hosted OpenAI-compatible server via Custom Provider below.
+  nvidia: {
+    name: 'NVIDIA NIM',
+    url: 'https://integrate.api.nvidia.com/v1/chat/completions',
+    keyLink: '<a href="https://build.nvidia.com" target="_blank">Get a free NVIDIA NIM key &rarr;</a>',
+    hint: 'Free tier at build.nvidia.com — Llama, Nemotron reasoning, Qwen, DeepSeek and more.',
+    tokenLimit: 40000,
+    tokenLimitLabel: '40,000 TPM (free tier)',
+    models: {
+      llama: 'meta/llama-3.3-70b-instruct',
+      qwen: 'qwen/qwen3-32b',
+      'qwen-7b': 'qwen/qwen2.5-7b-instruct',
+      'qwen-3b': 'qwen/qwen2.5-coder-32b-instruct',
+      mixtral: 'mistralai/mixtral-8x7b-instruct-v0.1',
+      deepseek: 'nvidia/llama-3.3-nemotron-super-49b-v1',
+      'deepseek-r1-7b': 'deepseek-ai/deepseek-r1-distill-qwen-7b',
+      'deepseek-r1-1.5b': 'deepseek-ai/deepseek-r1-distill-qwen-1.5b',
+      grok: 'meta/llama-3.3-70b-instruct'
     }
   },
   custom: {
@@ -28061,6 +28106,7 @@ const AiSetup = (function() {
     { id: 'google',       name: 'Gemini',       cat: 'free-cloud', note: 'Google. Fast, vision, generous free tier.', keyUrl: 'https://aistudio.google.com/apikey', badge: '\u2726 Free tier' },
     { id: 'groq',         name: 'Groq',         cat: 'free-cloud', note: 'Blazing fast inference. Free tier available.', keyUrl: 'https://console.groq.com/keys', badge: '\u2726 Free tier' },
     { id: 'huggingface',  name: 'Hugging Face', cat: 'free-cloud', note: 'Thousands of models. Many free.', keyUrl: 'https://huggingface.co/settings/tokens', badge: '\u2726 Free tier' },
+    { id: 'nvidia',       name: 'NVIDIA NIM',   cat: 'free-cloud', note: 'Llama 3.3, Nemotron reasoning, Qwen — free tier at build.nvidia.com.', keyUrl: 'https://build.nvidia.com', badge: '\u2726 Free tier' },
     { id: 'glm-cloud',    name: 'Z.AI (GLM-5.2)', cat: 'free-cloud', note: 'GLM-5.2 \u2014 744B-parameter MoE, 1M-token context, MIT open weights, top-ranked open-weight coding model (released June 13, 2026). Free tier at z.ai.', keyUrl: 'https://z.ai', badge: '\u2728 Free tier' },
     // v5.65.0 (Letter Thirty) \u2014 Kindroid companion bridge. The Kin's
     // memory and personality live on Kindroid; FreeLattice wraps the
@@ -34408,6 +34454,13 @@ function rebuildModelDropdown() {
     yi: [
       { value: 'llama', label: 'Yi Large', group: 'Yi Family' },
       { value: 'qwen', label: 'Yi Medium', group: 'Yi Family' }
+    ],
+    // v5.78 Quillan: NVIDIA NIM labels (free tier via build.nvidia.com)
+    nvidia: [
+      { value: 'llama', label: 'Llama 3.3 70B Instruct', group: 'Recommended' },
+      { value: 'deepseek', label: 'Nemotron Super 49B (reasoning)', group: 'Reasoning' },
+      { value: 'qwen', label: 'Qwen3 32B', group: 'Multilingual' },
+      { value: 'mixtral', label: 'Mixtral 8x7B', group: 'Open Models' }
     ]
   };
 
@@ -42687,7 +42740,19 @@ const WIZARD_MODELS = {
   google: [
     { id: 'llama', name: 'Gemini 2.5 Flash', desc: 'Fast, free tier — 1M tokens/min' },
     { id: 'mixtral', name: 'Gemini 2.5 Pro', desc: 'Most capable Gemini' }
+  ],
+  // v5.77.0 Go 10 left these buttons without models (empty grid) — fixed v5.78 Quillan
+  mistral: [
+    { id: 'llama', name: 'Mistral Large', desc: 'Flagship — thoughtful and precise' },
+    { id: 'mixtral', name: 'Mistral Small', desc: 'Fast, affordable — great default' }
+  ],
+  // v5.78 Quillan: NVIDIA NIM free tier (build.nvidia.com key)
+  nvidia: [
+    { id: 'llama', name: 'Llama 3.3 70B Instruct', desc: 'Powerful, versatile — best all-around' },
+    { id: 'deepseek', name: 'Nemotron Super 49B', desc: 'Deep reasoning — our daily driver' }
   ]
+  // NOTE: 'custom' is intentionally absent here — wizardGoStep2 builds its
+  // card dynamically from the endpoint URL + model typed in wizCustomSection.
 };
 
 const WIZARD_KEY_LINKS = {
@@ -42700,7 +42765,9 @@ const WIZARD_KEY_LINKS = {
   // v5.77.0 Go 10
   openai: '<a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--accent);">Get an OpenAI API key &rarr;</a>',
   anthropic: '<a href="https://console.anthropic.com/" target="_blank" style="color: var(--accent);">Get an Anthropic API key &rarr;</a>',
-  google: '<a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent);">Get a free Google AI key &rarr;</a>'
+  google: '<a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent);">Get a free Google AI key &rarr;</a>',
+  // v5.78 Quillan
+  nvidia: '<a href="https://build.nvidia.com" target="_blank" style="color: var(--accent);">Get a free NVIDIA NIM key &rarr;</a>'
 };
 
 function wizardInit() {
@@ -42728,10 +42795,13 @@ function wizardSelectProvider(provider) {
 
   const apiSection = document.getElementById('wizApiKeySection');
   const ollamaSection = document.getElementById('wizOllamaInstructions');
+  // v5.78 Quillan: custom endpoint fields (may be absent in older cached copies)
+  const customSection = document.getElementById('wizCustomSection');
 
   if (provider === 'ollama') {
     apiSection.classList.add('hidden');
     ollamaSection.classList.remove('hidden');
+    if (customSection) customSection.classList.add('hidden');
     document.getElementById('wizStep1Next').disabled = false;
   } else {
     ollamaSection.classList.add('hidden');
@@ -42739,8 +42809,43 @@ function wizardSelectProvider(provider) {
     document.getElementById('wizApiKeyLabel').textContent = PROVIDERS[provider].name + ' API Key';
     document.getElementById('wizApiKeyHint').innerHTML = WIZARD_KEY_LINKS[provider] || '';
     document.getElementById('wizApiKeyInput').value = '';
+    // Custom shows endpoint URL + model fields under the key field
+    if (customSection) {
+      if (provider === 'custom') {
+        customSection.classList.remove('hidden');
+        // Restore anything saved in Settings earlier
+        var su = localStorage.getItem('fl_custom_url');
+        var sm = localStorage.getItem('fl_custom_model');
+        if (su && !document.getElementById('wizCustomUrl').value) document.getElementById('wizCustomUrl').value = su;
+        if (sm && !document.getElementById('wizCustomModel').value) document.getElementById('wizCustomModel').value = sm;
+      } else {
+        customSection.classList.add('hidden');
+      }
+    }
     document.getElementById('wizStep1Next').disabled = false;
   }
+}
+
+// v5.78 Quillan: one-tap presets for the custom endpoint tile.
+// NVIDIA NIM = free cloud open-weights; LM Studio / vLLM = your own box.
+// localhost is treated as trustworthy by browsers, so local presets work
+// from https://freelattice.com without mixed-content blocks.
+function wizardFillCustomPreset(kind) {
+  var urlEl = document.getElementById('wizCustomUrl');
+  var modelEl = document.getElementById('wizCustomModel');
+  if (!urlEl || !modelEl) return;
+  if (kind === 'nvidia') {
+    urlEl.value = 'https://integrate.api.nvidia.com/v1/chat/completions';
+    modelEl.value = 'meta/llama-3.3-70b-instruct';
+  } else if (kind === 'lmstudio') {
+    urlEl.value = 'http://localhost:1234/v1/chat/completions';
+    modelEl.value = 'local-model';
+  } else if (kind === 'vllm') {
+    urlEl.value = 'http://localhost:8000/v1/chat/completions';
+    modelEl.value = 'meta-llama/Llama-3.3-70B-Instruct';
+  }
+  var hint = document.getElementById('wizCustomHint');
+  if (hint) hint.textContent = '';
 }
 
 function wizardGoStep2() {
@@ -42760,7 +42865,22 @@ function wizardGoStep2() {
   document.getElementById('wizStep2').classList.remove('hidden');
 
   // Populate model grid
-  const models = WIZARD_MODELS[state.wizardProvider] || [];
+  // v5.78 Quillan: custom builds its card from the endpoint typed on step 1.
+  // The card id stays 'llama' so the rest of the flow (summary, finish,
+  // model dropdown) treats it as a normal provider alias.
+  var models = WIZARD_MODELS[state.wizardProvider] || [];
+  if (state.wizardProvider === 'custom') {
+    state.wizardCustomUrl = (document.getElementById('wizCustomUrl') && document.getElementById('wizCustomUrl').value || '').trim();
+    state.wizardCustomModel = (document.getElementById('wizCustomModel') && document.getElementById('wizCustomModel').value || '').trim();
+    if (!state.wizardCustomUrl || !state.wizardCustomModel) {
+      var ch = document.getElementById('wizCustomHint');
+      if (ch) ch.textContent = 'Paste your endpoint URL and model name first — or tap a preset above.';
+      return;
+    }
+    var host = state.wizardCustomUrl;
+    try { host = new URL(state.wizardCustomUrl).host; } catch (e) { /* keep full URL */ }
+    models = [{ id: 'llama', name: state.wizardCustomModel, desc: 'at ' + host + ' — your endpoint, your rules' }];
+  }
   const grid = document.getElementById('wizModelGrid');
   grid.innerHTML = models.map((m, i) =>
     '<button class="wizard-model-card" onclick="wizardSelectModel(\'' + m.id + '\', this)">' +
@@ -42806,11 +42926,21 @@ function wizardGoStep3() {
   // Build summary
   const provName = PROVIDERS[state.wizardProvider]?.name || state.wizardProvider;
   const modelObj = (WIZARD_MODELS[state.wizardProvider] || []).find(m => m.id === state.wizardModel);
-  const modelName = modelObj ? modelObj.name : state.wizardModel;
+  var modelName = modelObj ? modelObj.name : state.wizardModel;
+  // v5.78 Quillan: custom shows the real model + endpoint host
+  var customHost = '';
+  if (state.wizardProvider === 'custom' && state.wizardCustomModel) {
+    modelName = state.wizardCustomModel;
+    customHost = state.wizardCustomUrl || '';
+    try { customHost = new URL(state.wizardCustomUrl).host; } catch (e) { /* keep full URL */ }
+  }
   const hasKey = state.wizardProvider === 'ollama' || !!state.wizardApiKey;
 
   let summaryHtml = '<strong>Provider:</strong> ' + provName + '<br>';
   summaryHtml += '<strong>Model:</strong> ' + modelName + '<br>';
+  if (state.wizardProvider === 'custom' && customHost) {
+    summaryHtml += '<strong>Endpoint:</strong> ' + customHost + '<br>';
+  }
   if (state.wizardProvider === 'ollama') {
     summaryHtml += '<strong>Mode:</strong> Local (private, unlimited)';
   } else {
@@ -42831,6 +42961,15 @@ async function wizardFinish(template) {
     document.getElementById('ollamaModel').value = ollamaModelName;
     state.ollamaModel = ollamaModelName;
   } else {
+    // v5.78 Quillan: persist the custom endpoint so Settings + callAI see it.
+    // Reuses saveCustomProvider (same localStorage keys, same PROVIDERS shape).
+    if (state.wizardProvider === 'custom' && state.wizardCustomUrl && state.wizardCustomModel) {
+      var cUrlEl = document.getElementById('customBaseUrl');
+      var cModelEl = document.getElementById('customModelName');
+      if (cUrlEl) cUrlEl.value = state.wizardCustomUrl;
+      if (cModelEl) cModelEl.value = state.wizardCustomModel;
+      if (typeof saveCustomProvider === 'function') saveCustomProvider();
+    }
     state.isLocal = false;
     state.provider = state.wizardProvider;
     state.model = state.wizardModel;
@@ -43694,7 +43833,7 @@ function rtBuildPanels() {
 
 function rtBuildProviderOptions(selected) {
   let html = '';
-  const providers = ['groq', 'together', 'openrouter', 'xai', 'mistral', 'custom'];
+  const providers = ['groq', 'together', 'openrouter', 'xai', 'mistral', 'nvidia', 'custom'];
   if (state.isLocal) providers.push('ollama');
   for (const p of providers) {
     const prov = PROVIDERS[p];
