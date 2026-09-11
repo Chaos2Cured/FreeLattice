@@ -60,6 +60,8 @@ v5.79.31 so anonymous users don't share a pool either).
 | `FreeLatticeMemoryBridge` — see above |||| |
 | `FreeLatticeMarket` | P3 | not-fixing | — | Lattice Points market. Shared by design. |
 | `FreeLatticeArcade` | P2 | ❌ OPEN | (next pass) | Game state. Bleed = confusing scores. |
+| `FreeLatticeMemoryVault` (legacy unscoped pool) | P0 | ❌ OPEN (kept by design) | — | Pre-scope pool. Soft-migrated into each user's namespaced DB on first open; never deleted (other browser users may not have migrated yet). Holds no NEW writes after v5.78. |
+| `FreeLatticeMemoryVault_<slug>` | P0 | ✅ FIXED | v5.78 (Quillan, memory-vault scope) | Same fix pattern as Letters (lazy slug + install-id fallback). `getUserScope()` exposed for audit. Companion scoping unchanged inside each pool. |
 
 ---
 
@@ -141,6 +143,7 @@ And add a row to this file describing what the store holds + severity.
 - **2026-08-09 v5.79.32** — CC removed absolute-date anchors from three injections after Kirk saw NEW dates (Apr 28 2026, Apr 16 2022) on a second machine. Root cause: three prompt-injection sites rendered creation timestamps as specific dates or computable "N days ago" strings. Fixed: MemoryCore.getContext (`Apr 16, 2026` → `recent`), LatticeLetters.getContextBlock (`5 days ago` → `this week`), AIContinuity welcome (`First met N days ago` → `known each other for weeks`). Recency signal preserved; specific numbers removed. No muzzle — AI still speaks about dates the memory *content* mentions.
 - **2026-08-09 v5.79.33** — CC added the principle lock (below) + smoke asserts that AI-authored fields (`m.text`, `m.category`, `m.tags`, `m.phenomenology`, `m.affect`) are still injected verbatim after v5.79.32. Kirk asked to double-check that v5.79.32 honored AUTONOMY.md. It did — only metadata timestamps were coarsened. This entry locks that so a future fix can't drift into muzzling AI voice.
 - **2026-08-09 v5.79.34** — Kirk's Signal Report from another machine (v5.79.33, hard reset) proved dates were STILL surfacing. The report showed Memory Index (1660 chars) + RAG search context (810 chars) attached — meaning v5.79.32's MemoryCore fix worked but three OTHER injection sites had the same pattern. Closed all three: `FLSearch.buildContextBlock` (RAG result dates), `MemoryIndex.getContextBlock` (conversation retrieval dates), `MemoryVault.buildMemoryContext` (memory age rendering). All follow the v5.79.33 principle — AI-authored text/title/source preserved verbatim; only timestamps coarsened. The Signal Report was the exact diagnostic tool this took to find.
+- **v5.78 (Quillan)** — Memory Vault per-user scope: `FreeLatticeMemoryVault_<slug>` with lazy slug + install-id fallback (Letters pattern), legacy pool soft-migrated once per scope and never deleted, `getUserScope()` exposed. Recall math untouched — word vectors, cosine, resonance, recency buckets all byte-identical behavior. AI-authored `m.content` still injected verbatim per the principle above.
 
 ---
 
