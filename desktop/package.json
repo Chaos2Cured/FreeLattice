@@ -3,6 +3,9 @@
   "productName": "FreeLattice",
   "version": "5.8.0",
   "description": "Your AI. Your Data. Your Freedom.",
+  "author": "Kirk Miller <kirkpmiller@hotmail.com>",
+  "homepage": "https://freelattice.com",
+  "license": "MIT",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -15,6 +18,7 @@
   "build": {
     "appId": "com.freelattice.app",
     "productName": "FreeLattice",
+    "publish": null,
     "directories": {
       "output": "dist"
     },
@@ -51,6 +55,8 @@
         "deb"
       ],
       "category": "Utility",
+      "maintainer": "Kirk Miller <kirkpmiller@hotmail.com>",
+      "vendor": "FreeLattice",
       "artifactName": "FreeLattice_${version}_Linux.${ext}"
     },
     "nsis": {
