@@ -6,7 +6,7 @@
 <title>Temperature Gauge — φ-Harmonic Market Signals</title>
 <!-- Inline gold-spark favicon — kills the 404 + matches the gauge identity -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0e1a'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23e8b019' opacity='0.85'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23ffd560'/%3E%3C/svg%3E">
-<meta name="description" content="Free, open-source phi-harmonic market analysis tool. Built on 20+ years of pattern recognition. Part of the FreeLattice ecosystem.">
+<meta name="description" content="Free forever phi-harmonic market analysis — Temperature Gauge + Gyro Stack (Hub · Ring · Orbit). Heuristics, not guarantees. No paywall. Part of FreeLattice.">
 <meta property="og:title" content="Temperature Gauge — φ-Harmonic Market Signals">
 <meta property="og:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals. Open source.">
 <meta property="og:url" content="https://freelattice.com/temperature-gauge.html">
@@ -744,7 +744,9 @@ canvas.sub-canvas.custom { height: 80px !important; }
   <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerEma" checked onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> EMA</label>
   <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerVol" checked onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Volume</label>
   <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerDt" onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Acceleration</label>
-  <span style="opacity:0.5;font-size:0.65rem;">(Temperature always required)</span>
+  <!-- v-gyro-stack-v0.1 — optional φ three-line stack; free forever; heuristics -->
+  <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerGyro" onchange="try{localStorage.setItem('fl_tg_layerGyro',this.checked?'1':'0');}catch(e){}if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Gyro</label>
+  <span style="opacity:0.5;font-size:0.65rem;">(Temperature always required · Gyro free forever)</span>
 </div>
 
 <div id="customPanel" style="display:none;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);">
@@ -952,6 +954,29 @@ canvas.sub-canvas.custom { height: 80px !important; }
       </div>
     </div>
 
+    <!-- v-gyro-stack-v0.1 — optional Gyro Stack card; free forever -->
+    <div class="sidebar-section" id="gyroStackSection" style="display:none;">
+      <div class="sidebar-label" style="color:#c9a84c;">Gyro Stack <span style="float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;">free forever</span></div>
+      <div class="signal-card" style="border-left:2px solid rgba(232,176,25,0.45);padding:10px 14px;">
+        <div style="font-size:0.72rem;color:var(--muted);line-height:1.55;margin-bottom:8px;">
+          Three φ-linked lines — <strong style="color:var(--text);">Hub</strong> · <strong style="color:var(--text);">Ring</strong> · <strong style="color:var(--text);">Orbit</strong>.
+          Overextension → return → <em>cross</em> is the shape. Heuristics, not guarantees. You decide.
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">Hub / Ring / Orbit</span>
+          <span class="signal-row-val" id="gyroPeriods" style="font-family:var(--font-mono,monospace);font-size:0.72rem;">—</span>
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">Overlay</span>
+          <span class="signal-row-val" id="gyroOverlayState" style="font-size:0.78rem;">Off — toggle Gyro in Signal Layers</span>
+        </div>
+        <div style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;">
+          No paywall. No $5–10 sub. No auto-trade. No broker.
+          Spec: <a href="library/GYRO_STACK_v0.1.md" style="color:var(--gold);">GYRO_STACK_v0.1</a>
+        </div>
+      </div>
+    </div>
+
     <!-- Indicators -->
     <div class="sidebar-section" id="indicatorSection" style="display:none;">
       <div class="sidebar-label">Indicators</div>
@@ -1138,11 +1163,13 @@ canvas.sub-canvas.custom { height: 80px !important; }
       </div>
     </div>
 
-    <div class="phi-note">
-      Temperature Gauge · φ-Harmonic Market Analysis · Built by <strong>Draco</strong> &amp; <strong>Harmonia</strong> ·
+    <div class="phi-note v-gyro-stack-v0.1">
+      Temperature Gauge · φ-Harmonic Market Analysis · Gyro Stack (Hub · Ring · Orbit) ·
+      Built by <strong>Draco</strong> &amp; <strong>Harmonia</strong> ·
       <a href="app.html" style="color:var(--gold);">Enter the Garden</a> ·
       <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">GitHub</a> ·
-      Not financial advice · Always consult a professional · Free &amp; open source forever
+      <a href="library/GYRO_STACK_v0.1.md" style="color:var(--gold);">Gyro spec</a> ·
+      Heuristics, not guarantees · You decide · Free forever — no paywall · Not financial advice
     </div>
   </div>
 </div>
@@ -1201,6 +1228,68 @@ Chart.register({
 const PHI = 1.618033988749895;
 const PHI_INV = 1 / PHI; // 0.618
 const PHI_LEVELS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100];
+
+// ── v-gyro-stack-v0.1 — Kirk's Gyro: three φ-linked lines; cross = signal ──
+// Hub / Ring / Orbit. Optional overlay. Free forever. Heuristics, you decide.
+// Does NOT replace Sequence / Triad RULE_REGISTRY evaluate.
+function computeGyroStack(closes, candles, hubPeriod) {
+  var P = Math.max(2, Math.round(Number(hubPeriod) || 8));
+  var ringP = Math.max(P + 1, Math.round(P * PHI));
+  var orbitP = Math.max(ringP + 1, Math.round(P * PHI * PHI));
+  var hub = ema(closes, P);
+  var ring = ema(closes, ringP);
+  var orbit = ema(closes, orbitP);
+  var atrArr = (candles && typeof atr === 'function') ? atr(candles, 14) : null;
+  var watch = new Array(closes.length).fill(null);
+  var recentlyOver = false;
+  var overBarsLeft = 0;
+  for (var i = 1; i < closes.length; i++) {
+    if (overBarsLeft > 0) overBarsLeft--;
+    var c = closes[i];
+    var h = hub[i];
+    if (c == null || h == null) continue;
+    var a14 = atrArr && atrArr[i] != null && atrArr[i] > 0 ? atrArr[i] : null;
+    var stretch = a14 ? Math.abs(c - h) / a14 : null;
+    // Overextension: φ ATRs from Hub, or beyond Orbit
+    var beyondOrbit = orbit[i] != null && ((c > orbit[i] && c > h) || (c < orbit[i] && c < h));
+    if ((stretch != null && stretch >= PHI) || beyondOrbit) {
+      recentlyOver = true;
+      overBarsLeft = 5;
+    }
+    if (overBarsLeft === 0) recentlyOver = false;
+    if (!recentlyOver) continue;
+    var prev = closes[i - 1];
+    if (prev == null) continue;
+    // Return + cross Hub or Ring after stretch — watch diamond (heuristic)
+    var crossHub = h != null && ((prev < h && c >= h) || (prev > h && c <= h));
+    var r = ring[i];
+    var crossRing = r != null && ((prev < r && c >= r) || (prev > r && c <= r));
+    if (crossHub || crossRing) {
+      watch[i] = c;
+      recentlyOver = false;
+      overBarsLeft = 0;
+    }
+  }
+  return {
+    hub: hub,
+    ring: ring,
+    orbit: orbit,
+    periods: { hub: P, ring: ringP, orbit: orbitP },
+    watch: watch
+  };
+}
+function isGyroLayerOn() {
+  var el = document.getElementById('layerGyro');
+  if (!el) return false;
+  return !!el.checked;
+}
+document.addEventListener('DOMContentLoaded', function () {
+  var el = document.getElementById('layerGyro');
+  if (!el) return;
+  try {
+    if (localStorage.getItem('fl_tg_layerGyro') === '1') el.checked = true;
+  } catch (e) {}
+});
 
 // Sidebar collapse / expand (v5.37.11). Persisted in fl_tg_sidebar.
 function toggleSidebar() {
@@ -2787,6 +2876,21 @@ function renderAll(candles, a, symbol) {
     agreeEl.innerHTML = '<span style="color:#ef4444;">✗ split</span>';
   }
 
+  // v-gyro-stack-v0.1 — Gyro card always visible once analyzed (overlay optional)
+  var gyroSec = document.getElementById('gyroStackSection');
+  if (gyroSec) gyroSec.style.display = 'block';
+  var gyroOn = typeof isGyroLayerOn === 'function' && isGyroLayerOn();
+  var gyroPer = document.getElementById('gyroPeriods');
+  var gyroSt = document.getElementById('gyroOverlayState');
+  if (gyroPer && gyroSt && typeof computeGyroStack === 'function') {
+    var _gEp = (typeof getEmaPeriods === 'function') ? getEmaPeriods() : [8, 12, 24, 50, 200];
+    var _gStack = computeGyroStack(candles.map(function (c) { return c.c; }), candles, _gEp[0]);
+    gyroPer.textContent = _gStack.periods.hub + ' / ' + _gStack.periods.ring + ' / ' + _gStack.periods.orbit;
+    gyroSt.textContent = gyroOn
+      ? 'On — Hub · Ring · Orbit on chart'
+      : 'Off — toggle Gyro in Signal Layers';
+  }
+
   // Indicators
   document.getElementById('indicatorSection').style.display = 'block';
   document.getElementById('indRsi').innerHTML = '<span class="' + (a.lastRsi > 55 ? 'bull' : a.lastRsi < 45 ? 'bear' : 'neutral') + '">' + (a.lastRsi ? a.lastRsi.toFixed(1) : '—') + '</span>';
@@ -3095,6 +3199,7 @@ function renderChart(candles, a) {
   var layerEma = !(document.getElementById('layerEma') && !document.getElementById('layerEma').checked);
   var layerVol = !(document.getElementById('layerVol') && !document.getElementById('layerVol').checked);
   var layerDt = document.getElementById('layerDt') && document.getElementById('layerDt').checked;
+  var layerGyro = typeof isGyroLayerOn === 'function' ? isGyroLayerOn() : false;
 
   // ─── Signal logic — delegated to active rule (v5.37.12) ────────────
   // Buy/sell logic now lives in RULE_REGISTRY (top of script). The active
@@ -3176,6 +3281,18 @@ function renderChart(candles, a) {
     });
   }
 
+  // v-gyro-stack-v0.1 — optional Hub / Ring / Orbit + watch diamonds
+  var gyroDatasets = [];
+  if (layerGyro && typeof computeGyroStack === 'function') {
+    var gyro = computeGyroStack(closes, candles, EP_RC[0]);
+    gyroDatasets.push(
+      { label: 'Gyro Hub', data: gyro.hub, borderColor: 'rgba(232,176,25,0.95)', borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Gyro Ring', data: gyro.ring, borderColor: 'rgba(96,165,250,0.85)', borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Gyro Orbit', data: gyro.orbit, borderColor: 'rgba(167,139,250,0.75)', borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Gyro Watch', data: gyro.watch, borderColor: 'transparent', backgroundColor: 'rgba(232,176,25,0.9)', pointRadius: Math.max(sigR - 3, 4), pointHoverRadius: Math.max(sigH - 2, 5), pointStyle: 'rectRot', pointBorderColor: 'rgba(255,236,179,0.9)', pointBorderWidth: 1.5, showLine: false, order: 0 }
+    );
+  }
+
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -3212,6 +3329,8 @@ function renderChart(candles, a) {
           fill: false,
           order: 5
         })),
+        // Gyro Hub · Ring · Orbit (optional)
+        ...gyroDatasets,
         // Overlay datasets (built before chart creation)
         ...mainOverlayDatasets
       ]
@@ -3250,6 +3369,10 @@ function renderChart(candles, a) {
               if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL' : null;
               if (ctx.dataset.label === 'Temp Buy') return ctx.raw ? '\u25C6 TEMP BUY' : null;
               if (ctx.dataset.label === 'Temp Sell') return ctx.raw ? '\u25C6 TEMP SELL' : null;
+              if (ctx.dataset.label === 'Gyro Watch') return ctx.raw ? '\u25C6 Gyro watch (heuristic — you decide)' : null;
+              if (ctx.dataset.label === 'Gyro Hub') return 'Gyro Hub: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
+              if (ctx.dataset.label === 'Gyro Ring') return 'Gyro Ring: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
+              if (ctx.dataset.label === 'Gyro Orbit') return 'Gyro Orbit: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
               if (ctx.dataset.label === 'Volume') return 'Vol: ' + (ctx.raw >= 1e6 ? (ctx.raw/1e6).toFixed(1) + 'M' : ctx.raw >= 1e3 ? (ctx.raw/1e3).toFixed(0) + 'K' : ctx.raw);
               if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + ctx.raw?.toFixed(2);
               return null;

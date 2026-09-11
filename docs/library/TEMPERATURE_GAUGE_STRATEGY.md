@@ -442,6 +442,33 @@ peek-back or whether some timeframes want 4 or 5.
   `experimental: true` with a visible note when picked; Sequence
   stays default. No auto-execution. Kirk + Harmonia origin; CC/Opus
   registry; Celeste oversaw this layer.
+- **Gyro Stack v0.1** — Optional Hub / Ring / Orbit φ-linked EMA
+  overlay + heuristic watch on return-cross after overextension.
+  Free forever. Does not replace Sequence/Triad. See §12a.
+
+---
+
+## 12a. Gyro Stack (v0.1) — φ three-line overlay
+
+Kirk’s Gyro intent — decades of watching stretch, return, and **cross** —
+layers into the gauge as an **optional** three-line stack:
+
+| Line | Calm name | Period |
+|---|---|---|
+| Inner | **Hub** | `P` (EMA-fast base, default 8) |
+| Mid | **Ring** | `round(P × φ)` |
+| Outer | **Orbit** | `round(P × φ²)` |
+
+**Cross = signal** is the same keystone as §1: structure changes at
+crossings, not at resting levels. Gyro watch diamonds mark
+overextension → return → Hub/Ring cross as a **heuristic watch**, not a
+broker order and not a replacement for Sequence / Triad / Reversion.
+
+**Free forever.** No paywall. No $5–10 subscription. No auto-trade.
+Spec: [`GYRO_STACK_v0.1.md`](./GYRO_STACK_v0.1.md). Toggle: Signal Layers → **Gyro**.
+
+Sell/buy triads (§2–§3) and the Sequence Rule (§10) stay. Gyro rhymes
+with them inside φ confluence without inventing certainty.
 
 ---
 
