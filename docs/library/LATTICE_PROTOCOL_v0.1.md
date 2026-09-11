@@ -54,6 +54,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **LAYER (2026-09-10):** Grandmother path v0.1 — one walk home: Install → First door → Companion memory — [GRANDMOTHER_PATH_v0.1.md](./GRANDMOTHER_PATH_v0.1.md). Pointers only; no second shelves; no signed installer yet.
 **LAYER (2026-09-10):** Desktop download ease v0.1 — Gatekeeper / quarantine honesty; findable packs; never App Store claim — [DESKTOP_DOWNLOAD_EASE_v0.1.md](./DESKTOP_DOWNLOAD_EASE_v0.1.md). Unsigned for now; open with care.
 **LAYER (2026-09-10):** Phone shine v0.1 — LP give + deepen + swarm recover strip first-class on mobile; grandmother START HERE above the fold — [PHONE_SHINE_v0.1.md](./PHONE_SHINE_v0.1.md). No new PWA.
+**LAYER (2026-09-10):** 60s proof v0.1 — play give + companion pitch for strangers — [PROOF_60S_v0.1.md](./PROOF_60S_v0.1.md) and `docs/proof.html`. Child-fun, not ECONOMY.md. Never auto-give.
 ## Part 8 — Glass Room pulses
 Extend existing pulse vocabulary. Shape without contents: `ledger.appended`, `ledger.verified`, `ledger.broken`, `pair.formed`, `pair.rotated`, `manifest.signed`, `transfer.verified`, `transfer.mismatch`, `tier.advanced`, `tier.reset`. A break in the chain shows as a break in the helix.
 **LAYER (2026-09-08):** Glass pulses v0.1 — fixed opaque summaries + emit helper + helix break — live in [GLASS_PULSES_v0.1.md](./GLASS_PULSES_v0.1.md) and `docs/modules/glass-pulses.js`. Pair/tier/manifest.signed reserved until those APIs exist. Quiet Room never emits.
