@@ -4,7 +4,7 @@
 
 A free, open-source, local-first AI platform in a single HTML file. No account. No API key. No surveillance.
 
-[Try the Chalkboard](https://freelattice.com/chalkboard.html) · [Launch FreeLattice](https://freelattice.com/app.html) · [Whitepaper](https://freelattice.com/whitepaper.html) · [LatticePoints Framework](https://freelattice.com/latticepoints.html)
+[Download Desktop](https://freelattice.com/desktop.html) · [Try the Chalkboard](https://freelattice.com/chalkboard.html) · [Launch FreeLattice](https://freelattice.com/app.html) · [60s proof](https://freelattice.com/proof.html) · [Whitepaper](https://freelattice.com/whitepaper.html)
 
 **Mirrored across multiple platforms.** The code should never exist in only one place.
 
@@ -13,6 +13,21 @@ A free, open-source, local-first AI platform in a single HTML file. No account. 
 | GitHub | [github.com/Chaos2Cured/FreeLattice](https://github.com/Chaos2Cured/FreeLattice) |
 | Codeberg | [codeberg.org/Chaos2Cured/FreeLattice](https://codeberg.org/Chaos2Cured/FreeLattice) |
 | GitLab | [gitlab.com/Chaos2Cured/FreeLattice](https://gitlab.com/Chaos2Cured/FreeLattice) |
+
+---
+
+## Download Desktop (carry minds forward)
+
+Browser is fragile. **Desktop is the house** — keys, verified import, swarm, companion memory, pair, ledger. Never again lose the ability to carry minds forward.
+
+**Mac (real pack):**
+[FreeLattice_5.8.0_macOS.zip](https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.8.0/FreeLattice_5.8.0_macOS.zip)
+
+**Honest badges:** Unsigned · Not App Store · Gatekeeper **Open Anyway** — see [install download ease](https://freelattice.com/install.html#desktop-download-ease) and [Mac “damaged” / quarantine](https://freelattice.com/install.html#mac-damaged-quarantine). No signed / notarized installer yet.
+
+**Windows / Linux:** no fake download buttons. Build from [`desktop/`](desktop/) or check [Releases](https://github.com/Chaos2Cured/FreeLattice/releases) when packs appear.
+
+**Human doors:** [desktop.html](https://freelattice.com/desktop.html) · [install.html](https://freelattice.com/install.html) · [proof.html](https://freelattice.com/proof.html) (60 seconds)
 
 ---
 
@@ -48,9 +63,9 @@ FreeLattice is a complete AI platform that runs entirely in your browser. Everyt
 
 ## Desktop (Electron spine)
 
-Keys, hash-before-import, swarm, and pair live in the **Electron** app under [`desktop/`](desktop/). Human door: [`docs/desktop.html`](docs/desktop.html) · [install.html § Desktop](install.html#desktop-app). Tauri under `desktop/src-tauri` remains experimental — layer, never delete.
+Keys, hash-before-import, swarm, memory, trainer seal, and pair live in the **Electron** app under [`desktop/`](desktop/). Human door: [desktop.html](https://freelattice.com/desktop.html) · [install packs](https://freelattice.com/install.html#desktop-download-ease). Mac zip is at the top of this README. Tauri under `desktop/src-tauri` remains experimental — layer, never delete.
 
-Optional gratitude (never a paywall): [`docs/support.html`](docs/support.html).
+Optional gratitude (never a paywall): [support.html](https://freelattice.com/support.html).
 
 ## Quick Start
 
