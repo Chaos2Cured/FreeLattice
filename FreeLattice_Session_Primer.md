@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-10 17:28 EST
+- Last auto-updated: 2026-09-11 07:46 EST
 - Version: 5.79.45
-- Total commits: 3134
+- Total commits: 3137
 - Last 10 commits:
-- 2960f85 Layer, never delete. 60s proof v0.1 — play give, companion pitch.
+- d2bc394 Soft: leave sw.js on app.html (revert post-commit hook drift).
+- ef36176 docs: Auto-update Session Primer [5.79.45]
+- 7da1888 Layer, never delete. README Desktop door — Mac pack findable, honest unsigned.
+- b362bda Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52)
 - 6f65298 ci: Update Primer deployment state [2026-09-10]
 - f57fc76 Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold. (#51)
 - 71496e2 ci: Update Primer deployment state [2026-09-10]
 - 3c104de Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”. (#50)
 - 84ee67b ci: Update Primer deployment state [2026-09-10]
 - c957a4e Layer, never delete. Grandmother path v0.1 — one walk home. (#49)
-- 97c93c1 ci: Update Primer deployment state [2026-09-10]
-- 50cacfc Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48)
-- 4321a97 ci: Update Primer deployment state [2026-09-10]
