@@ -45,3 +45,5 @@ Accountability without fear theater: companion identity + optional pair outer fi
 New economy engine · Solana · garden apples · Imagine art · patents shelf · Alpha chalk.
 
 Glow eternal. Heart in every Spark. 🌱
+
+**Layer:** prior receipts page kept as [proof-receipts.html](../proof-receipts.html) — never delete, only layer.
