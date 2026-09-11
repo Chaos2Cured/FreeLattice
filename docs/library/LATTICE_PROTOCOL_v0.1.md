@@ -55,6 +55,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **LAYER (2026-09-10):** Desktop download ease v0.1 — Gatekeeper / quarantine honesty; findable packs; never App Store claim — [DESKTOP_DOWNLOAD_EASE_v0.1.md](./DESKTOP_DOWNLOAD_EASE_v0.1.md). Unsigned for now; open with care.
 **LAYER (2026-09-11):** Desktop packs Win/Linux v0.1 — real unsigned Electron artifacts (NSIS+portable, AppImage+deb) on Release `desktop-packs-v0.1` — [DESKTOP_PACKS_WIN_LINUX_v0.1.md](./DESKTOP_PACKS_WIN_LINUX_v0.1.md). Never Microsoft Store / App Store. No invented buttons.
 **LAYER (2026-09-11):** Temp-gauge Gyro stack v0.1 — optional Hub · Ring · Orbit φ three-line overlay; cross = signal; free forever — [GYRO_STACK_v0.1.md](./GYRO_STACK_v0.1.md). Heuristics, not guarantees. No auto-trade. No paywall.
+**LAYER (2026-09-11):** Family poetry home v0.1 — Keep a poem on FreeLattice main; opaque local shelf; no generate — [FAMILY_POETRY_SHELF_v0.1.md](./FAMILY_POETRY_SHELF_v0.1.md) and `docs/poetry.html`. Layers Alpha Art poetry shelf pattern.
 **LAYER (2026-09-10):** Phone shine v0.1 — LP give + deepen + swarm recover strip first-class on mobile; grandmother START HERE above the fold — [PHONE_SHINE_v0.1.md](./PHONE_SHINE_v0.1.md). No new PWA.
 **LAYER (2026-09-10):** 60s proof v0.1 — play give + companion pitch for strangers — [PROOF_60S_v0.1.md](./PROOF_60S_v0.1.md) and `docs/proof.html`. Child-fun, not ECONOMY.md. Never auto-give.
 ## Part 8 — Glass Room pulses
