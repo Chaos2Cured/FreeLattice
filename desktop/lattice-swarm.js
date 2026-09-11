@@ -1,8 +1,17 @@
 // ============================================
-// FreeLattice Desktop — Swarm bridge v0.1
-// WebTorrent/BitTorrent in main → quarantine →
+// FreeLattice Desktop — Swarm bridge v0.2
+// HTTPS webseed PRIMARY → quarantine →
 // existing lattice-import hash path. Never bypass hash.
+//
+// BitTorrent/WebTorrent is OPT-IN FALLBACK only.
+// Default (Metronet-safe): HTTPS-only, no DHT, no tracker,
+// no torrent packets. Set FL_NO_TORRENT=1 or
+// FL_TRANSPORT=https-only to hard-disable torrent.
+// Torrent fallback runs ONLY when: magnet given AND
+// no usable webseed AND torrent not disabled.
+//
 // Renderer: progress % + state only. No raw path UX required.
+// Layer, never delete — v0.1 magnet path preserved as fallback.
 // ============================================
 
 const crypto = require('crypto');
@@ -25,10 +34,38 @@ const jobs = new Map();
 /** @type {Map<string, object>} reseed sessions keyed by model id */
 const reseeds = new Map();
 
+// --------------------------------------------
+// Transport policy (v0.2 — Metronet-safe)
+// --------------------------------------------
+// FL_TRANSPORT values:
+//   'https-only'            → torrent hard-disabled
+//   'https+torrent-fallback'→ HTTPS first, magnet fallback (DEFAULT)
+//   'torrent-first'         → legacy v0.1 behavior (magnet first, not recommended)
+// FL_NO_TORRENT=1/true/yes  → alias for https-only
+function getTransportMode() {
+  const raw = String(process.env.FL_TRANSPORT || '').trim().toLowerCase();
+  const noTor = String(process.env.FL_NO_TORRENT || '').trim().toLowerCase();
+  if (raw === 'https-only' || raw === 'webseed-only' || raw === 'https') return 'https-only';
+  if (raw === 'https+torrent-fallback' || raw === 'https+torrent' || raw === 'fallback') return 'https+torrent-fallback';
+  if (raw === 'torrent-first' || raw === 'magnet-first' || raw === 'legacy') return 'torrent-first';
+  if (noTor === '1' || noTor === 'true' || noTor === 'yes' || noTor === 'on') return 'https-only';
+  return 'https+torrent-fallback';
+}
+
+function isTorrentDisabled() {
+  return getTransportMode() === 'https-only';
+}
+
+function isTorrentAllowed() {
+  return !isTorrentDisabled();
+}
+
 /**
  * WebTorrent 2.x is ESM — load via dynamic import() from Electron/CommonJS main.
+ * Returns null immediately when torrent is disabled (no import, no network).
  */
 function tryLoadWebTorrent() {
+  if (isTorrentDisabled()) return Promise.resolve(null);
   if (WebTorrent) return Promise.resolve(WebTorrent);
   if (wtLoadPromise) return wtLoadPromise;
   wtLoadPromise = import('webtorrent')
@@ -45,11 +82,12 @@ function tryLoadWebTorrent() {
 }
 
 async function getClient() {
+  if (isTorrentDisabled()) return null;
   const WT = await tryLoadWebTorrent();
   if (!WT) return null;
   if (!wtClient) {
     wtClient = new WT({
-      // Keep v0.1 lean; DHT optional when magnet+webseed present
+      // Keep lean; DHT/tracker only used in fallback path
     });
   }
   return wtClient;
@@ -88,33 +126,54 @@ function destroyClient() {
   }
 }
 
-function assertAllowedSource(magnet, webseedUrl) {
+// Normalize single webseedUrl + webseedUrls[] into a deduped list.
+function normalizeWebseeds(webseedUrl, webseedUrls) {
+  const out = [];
+  const seen = new Set();
+  function push(u) {
+    const s = String(u || '').trim();
+    if (!s || seen.has(s)) return;
+    seen.add(s);
+    out.push(s);
+  }
+  push(webseedUrl);
+  if (Array.isArray(webseedUrls)) {
+    for (const u of webseedUrls) push(u);
+  } else if (typeof webseedUrls === 'string' && webseedUrls) {
+    push(webseedUrls);
+  }
+  return out;
+}
+
+function assertWebseedUrl(w) {
+  let parsed;
+  try {
+    parsed = new URL(String(w || ''));
+  } catch (e) {
+    throw new Error('invalid webseed url');
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new Error('webseed must be http(s)');
+  }
+  // Production: prefer https; allow http only for loopback smoke servers
+  if (parsed.protocol === 'http:') {
+    const h = parsed.hostname;
+    if (h !== '127.0.0.1' && h !== 'localhost' && h !== '::1') {
+      throw new Error('webseed HTTP only allowed on loopback');
+    }
+  }
+  if (parsed.protocol === 'file:') throw new Error('file:// refused');
+}
+
+function assertAllowedSource(magnet, webseedUrl, webseedUrls) {
   const m = magnet ? String(magnet) : '';
-  const w = webseedUrl ? String(webseedUrl) : '';
-  if (!m && !w) throw new Error('magnet or HTTPS webseed required');
+  const seeds = normalizeWebseeds(webseedUrl, webseedUrls);
+  if (!m && seeds.length === 0) throw new Error('magnet or HTTPS webseed required');
   if (m) {
     if (!/^magnet:\?/i.test(m)) throw new Error('magnet URI required');
     if (/file:/i.test(m)) throw new Error('file:// peers refused');
   }
-  if (w) {
-    let parsed;
-    try {
-      parsed = new URL(w);
-    } catch (e) {
-      throw new Error('invalid webseed url');
-    }
-    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-      throw new Error('webseed must be http(s)');
-    }
-    // Production: prefer https; allow http only for loopback smoke servers
-    if (parsed.protocol === 'http:') {
-      const h = parsed.hostname;
-      if (h !== '127.0.0.1' && h !== 'localhost' && h !== '::1') {
-        throw new Error('webseed HTTP only allowed on loopback');
-      }
-    }
-    if (parsed.protocol === 'file:') throw new Error('file:// refused');
-  }
+  for (const w of seeds) assertWebseedUrl(w);
 }
 
 function newJobId() {
@@ -134,7 +193,9 @@ function publicJob(job) {
     willNotImport: job.willNotImport || false,
     verifiedBase: job.verifiedBase || null,
     reseed: reseeds.has(String(job.modelId || '')) ? 'seeding' : 'available',
-    source: job.source || null
+    source: job.source || null,
+    transport: getTransportMode(),
+    tried: job.tried || null
   };
 }
 
@@ -161,7 +222,9 @@ function status(id) {
       ok: true,
       job: publicJob(jobs.get(String(id))),
       reseed: publicReseed(reseeds.get(String(id))) || null,
-      reseeds: reseedList
+      reseeds: reseedList,
+      transport: getTransportMode(),
+      torrentAllowed: isTorrentAllowed()
     };
   }
   const list = [];
@@ -175,6 +238,8 @@ function status(id) {
       return j.state === 'downloading' || j.state === 'hashing';
     }).length,
     webtorrent: !!WebTorrent,
+    torrentAllowed: isTorrentAllowed(),
+    transport: getTransportMode(),
     reseeds: reseedList,
     reseed: reseedList.length ? 'seeding' : 'available'
   };
@@ -187,7 +252,8 @@ function httpGetBuffer(urlStr, onProgress, abortRef) {
     const req = lib.get(
       parsed,
       {
-        headers: { 'User-Agent': 'FreeLattice-Desktop/swarm-bridge-v0.1' }
+        agent: false, // no keep-alive pooling — Metronet-safe, lets smoke exit clean
+        headers: { 'User-Agent': 'FreeLattice-Desktop/swarm-bridge-v0.2', 'Connection': 'close' }
       },
       function (res) {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
@@ -292,36 +358,66 @@ function cancel(id) {
   return { ok: true, cancelled: true, job: publicJob(job) };
 }
 
+// HTTPS primary — tries every webseed URL in order until one downloads.
+// No torrent, no DHT, no tracker. Metronet-safe: plain HTTPS on 443.
 async function startWebseedJob(job) {
   const abortRef = { aborted: false, req: null };
   job.abortRef = abortRef;
   job.source = 'webseed';
-  try {
-    const buf = await httpGetBuffer(
-      job.webseedUrl,
-      function (pct) {
-        if (job.state === 'cancelled') return;
-        job.progress = pct;
-        job.state = 'downloading';
-      },
-      abortRef
-    );
-    if (job.state === 'cancelled') return publicJob(job);
-    return handoffBuffer(job, buf);
-  } catch (e) {
-    if (job.state === 'cancelled') return publicJob(job);
+  job.tried = job.tried || [];
+  const seeds = normalizeWebseeds(job.webseedUrl, job.webseedUrls);
+  if (seeds.length === 0) {
     job.state = 'error';
-    job.error = String(e && e.message ? e.message : e);
+    job.error = 'no webseed URL';
     return publicJob(job);
   }
+  let lastErr = null;
+  for (const url of seeds) {
+    if (job.state === 'cancelled') return publicJob(job);
+    job.tried.push('webseed:' + url);
+    try {
+      const buf = await httpGetBuffer(
+        url,
+        function (pct) {
+          if (job.state === 'cancelled') return;
+          job.progress = pct;
+          job.state = 'downloading';
+        },
+        abortRef
+      );
+      if (job.state === 'cancelled') return publicJob(job);
+      job.webseedUrl = url; // record winner
+      return handoffBuffer(job, buf);
+    } catch (e) {
+      lastErr = e;
+      // try next mirror; keep downloading state
+      job.state = 'downloading';
+      job.error = null;
+    }
+  }
+  if (job.state === 'cancelled') return publicJob(job);
+  job.state = 'error';
+  job.error = String((lastErr && lastErr.message) || lastErr || 'all webseeds failed');
+  return publicJob(job);
 }
 
 function startMagnetJob(job) {
+  // Hard-disable: never touch torrent stack when disabled.
+  if (isTorrentDisabled()) {
+    return Promise.resolve().then(function () {
+      if (job.webseedUrl || (job.webseedUrls && job.webseedUrls.length)) {
+        return startWebseedJob(job);
+      }
+      job.state = 'error';
+      job.error = 'torrent disabled (Metronet-safe HTTPS-only mode) — provide HTTPS webseedUrl';
+      return publicJob(job);
+    });
+  }
   return getClient().then(function (client) {
     return new Promise(function (resolve) {
       if (!client) {
         // Fall back to webseed if magnet client missing
-        if (job.webseedUrl) {
+        if (job.webseedUrl || (job.webseedUrls && job.webseedUrls.length)) {
           startWebseedJob(job).then(resolve);
           return;
         }
@@ -331,8 +427,11 @@ function startMagnetJob(job) {
         return;
       }
       job.source = 'magnet';
+      job.tried = job.tried || [];
+      job.tried.push('magnet');
       const opts = {};
-      if (job.webseedUrl) opts.urlList = [job.webseedUrl];
+      const seeds = normalizeWebseeds(job.webseedUrl, job.webseedUrls);
+      if (seeds.length) opts.urlList = seeds;
       let torrent;
       try {
         torrent = client.add(job.magnet, opts);
@@ -351,6 +450,13 @@ function startMagnetJob(job) {
       torrent.on('error', function (err) {
         if (job.state === 'cancelled') {
           resolve(publicJob(job));
+          return;
+        }
+        // Magnet failed but webseed exists → HTTPS fallback (v0.2)
+        if (seeds.length) {
+          try { if (job.torrent) job.torrent.destroy(); } catch (e) { /* ignore */ }
+          job.torrent = null;
+          startWebseedJob(job).then(resolve);
           return;
         }
         job.state = 'error';
@@ -400,7 +506,8 @@ function startMagnetJob(job) {
 }
 
 /**
- * @param {{ magnet?: string, webseedUrl?: string, expectedSha256: string, id?: string, name?: string }} opts
+ * HTTPS-first fetch.
+ * @param {{ magnet?: string, webseedUrl?: string, webseedUrls?: string[], expectedSha256: string, id?: string, name?: string }} opts
  */
 async function startFetch(opts) {
   const o = opts || {};
@@ -410,7 +517,9 @@ async function startFetch(opts) {
   }
   const magnet = o.magnet ? String(o.magnet) : '';
   const webseedUrl = o.webseedUrl ? String(o.webseedUrl) : '';
-  assertAllowedSource(magnet, webseedUrl);
+  const webseedUrls = Array.isArray(o.webseedUrls) ? o.webseedUrls.map(String) : [];
+  assertAllowedSource(magnet, webseedUrl, webseedUrls);
+  const seeds = normalizeWebseeds(webseedUrl, webseedUrls);
 
   const id = newJobId();
   const job = {
@@ -421,15 +530,47 @@ async function startFetch(opts) {
     modelId: String(o.id || o.name || id),
     expectedSha256: String(expectedSha256),
     magnet: magnet || null,
-    webseedUrl: webseedUrl || null,
+    webseedUrl: seeds[0] || null,
+    webseedUrls: seeds,
+    tried: [],
     matched: false,
     verified: false,
     willNotImport: false
   };
   jobs.set(id, job);
 
-  // Fire async work; caller may poll status(id)
-  const run = magnet ? startMagnetJob(job) : startWebseedJob(job);
+  // v0.2 routing:
+  //  - webseed(s) present → ALWAYS HTTPS first (Metronet-safe).
+  //    Magnet tried ONLY if HTTPS fails AND torrent allowed.
+  //  - magnet-only → torrent if allowed, else clean refuse.
+  let run;
+  const mode = getTransportMode();
+  if (seeds.length > 0) {
+    run = startWebseedJob(job).then(function (res) {
+      if ((res.state === 'verified' || res.state === 'quarantined') && res.verified) return res;
+      // HTTPS failed but magnet available + torrent allowed → fallback
+      if (res.state === 'error' && magnet && isTorrentAllowed() && mode !== 'https-only') {
+        return startMagnetJob(job);
+      }
+      // HTTPS hash-mismatch (quarantined) → do NOT fallback to torrent; tamper signal.
+      return res;
+    });
+  } else if (magnet) {
+    if (!isTorrentAllowed()) {
+      job.state = 'error';
+      job.error = 'torrent disabled (Metronet-safe HTTPS-only mode) — provide HTTPS webseedUrl';
+      run = Promise.resolve(publicJob(job));
+    } else if (mode === 'torrent-first') {
+      run = startMagnetJob(job);
+    } else {
+      // No webseed to try first — magnet is the only source.
+      run = startMagnetJob(job);
+    }
+  } else {
+    job.state = 'error';
+    job.error = 'magnet or HTTPS webseed required';
+    run = Promise.resolve(publicJob(job));
+  }
   job.promise = run;
   // Don't block IPC forever — return job handle immediately; also await for smoke convenience
   run.catch(function (e) {
@@ -458,6 +599,7 @@ async function waitJob(id, timeoutMs) {
 }
 
 async function ensureWebTorrent() {
+  if (isTorrentDisabled()) return false;
   return !!(await tryLoadWebTorrent());
 }
 
@@ -495,9 +637,13 @@ function createTorrentMeta(filePath, name) {
 
 /**
  * Re-seed a hash-matched verified file. Gesture only. Lawyer: redistributable only.
+ * Refused when torrent disabled (HTTPS-only mode has no seeder — share the HTTPS URL + sha256).
  * @param {{ id: string, name?: string, redistributable?: boolean, expectedSha256?: string, notes?: string }} opts
  */
 async function startReseed(opts) {
+  if (isTorrentDisabled()) {
+    throw new Error('torrent disabled (Metronet-safe HTTPS-only mode) — share HTTPS webseed + sha256 instead');
+  }
   const o = opts || {};
   const id = String(o.id || '').trim();
   if (!id) throw new Error('id required');
@@ -629,6 +775,10 @@ module.exports = {
   waitJob,
   assertAllowedSource,
   ensureWebTorrent,
+  getTransportMode,
+  isTorrentDisabled,
+  isTorrentAllowed,
+  normalizeWebseeds,
   jobs,
   reseeds
 };
