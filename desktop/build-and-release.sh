@@ -70,6 +70,12 @@ echo "  ✅ App files copied to desktop/app/ (offline fallback)"
 echo "  ℹ️  The Electron app loads from freelattice.com by default"
 echo ""
 
+# Prepare-only: copy offline fallback files, then stop (CI uses this).
+if [ "$1" = "--prepare-only" ]; then
+  echo "  ✅ Prepare-only complete (no build)."
+  exit 0
+fi
+
 # Step 2: Install dependencies if needed
 if [ ! -d "node_modules" ]; then
   echo "  📥 Installing dependencies..."

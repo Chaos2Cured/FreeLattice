@@ -28,7 +28,10 @@ assert.ok(
 );
 assert.ok(/never say|We never say/i.test(install) && /ignore blindly/i.test(install), 'explicit refuse of blind-ignore');
 assert.ok(/FreeLattice_5\.8\.0_macOS\.zip/.test(install), 'real Mac pack URL when asset exists');
-assert.ok(/No current Windows Electron pack|build from source|Check Releases/i.test(install), 'honest Windows when no pack');
+assert.ok(
+  /No current Windows Electron pack|build from source|Check Releases|Windows_Setup\.exe|Download Windows Setup/i.test(install),
+  'honest Windows — coming/build, or real unsigned Setup when published'
+);
 assert.ok(/install\.html#desktop-download-ease|Desktop packs/.test(desktop), 'desktop points at install downloads');
 
 assert.ok(/no signed \/ notarized|No signed \/ notarized|unsigned/i.test(spec));
