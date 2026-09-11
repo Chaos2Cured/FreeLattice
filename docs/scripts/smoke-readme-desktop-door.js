@@ -49,8 +49,8 @@ assert.ok(
   'front-door section title'
 );
 assert.ok(
-  /no fake download buttons|Build from|check \[Releases\]/i.test(readme),
-  'Windows/Linux stay honest — no fake buttons'
+  /no fake download buttons|Build from|check \[Releases\]|Windows_Setup\.exe|Windows \(real packs/i.test(readme),
+  'Windows/Linux honest — no fake buttons, or real unsigned packs'
 );
 assert.ok(
   /README Desktop door/i.test(flint),

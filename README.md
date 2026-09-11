@@ -23,9 +23,13 @@ Browser is fragile. **Desktop is the house** — keys, verified import, swarm, c
 **Mac (real pack):**
 [FreeLattice_5.8.0_macOS.zip](https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.8.0/FreeLattice_5.8.0_macOS.zip)
 
-**Honest badges:** Unsigned · Not App Store · Gatekeeper **Open Anyway** — see [install download ease](https://freelattice.com/install.html#desktop-download-ease) and [Mac “damaged” / quarantine](https://freelattice.com/install.html#mac-damaged-quarantine). No signed / notarized installer yet.
+**Windows (real packs — unsigned):**
+[Setup.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Windows_Setup.exe) · [Portable.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Windows_Portable.exe)
 
-**Windows / Linux:** no fake download buttons. Build from [`desktop/`](desktop/) or check [Releases](https://github.com/Chaos2Cured/FreeLattice/releases) when packs appear.
+**Linux (real packs — unsigned):**
+[AppImage](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Linux.AppImage) · [.deb](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Linux.deb)
+
+**Honest badges:** Unsigned · Not App Store · Not Microsoft Store · Gatekeeper **Open Anyway** / SmartScreen **Run anyway** — see [install download ease](https://freelattice.com/install.html#desktop-download-ease) and [Mac “damaged” / quarantine](https://freelattice.com/install.html#mac-damaged-quarantine). No signed / notarized installer yet. Release: [desktop-packs-v0.1](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.1).
 
 **Human doors:** [desktop.html](https://freelattice.com/desktop.html) · [install.html](https://freelattice.com/install.html) · [proof.html](https://freelattice.com/proof.html) (60 seconds)
 

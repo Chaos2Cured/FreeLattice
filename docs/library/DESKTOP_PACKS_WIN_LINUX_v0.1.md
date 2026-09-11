@@ -1,5 +1,7 @@
 # Desktop packs Win + Linux — v0.1
 
+Marker: `DESKTOP_PACKS_WIN_LINUX_v0.1`
+
 Honest unsigned publish. Real Electron artifacts — never invented buttons.
 Layers on [DESKTOP_DOWNLOAD_EASE_v0.1.md](./DESKTOP_DOWNLOAD_EASE_v0.1.md), [README Desktop door](../../README.md), install. September 2026.
 

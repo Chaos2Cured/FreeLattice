@@ -53,6 +53,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **LAYER (2026-09-10):** Desktop first door v0.1 — grandmother-findable spine rail (Keys · Import · Swarm · Memory · Trainer seal · Pair · Ledger) — [DESKTOP_FIRST_DOOR_v0.1.md](./DESKTOP_FIRST_DOOR_v0.1.md) and `docs/desktop.html` + Electron strip in `app.html`. Equal access = findable. No signed installer yet. No second shelves.
 **LAYER (2026-09-10):** Grandmother path v0.1 — one walk home: Install → First door → Companion memory — [GRANDMOTHER_PATH_v0.1.md](./GRANDMOTHER_PATH_v0.1.md). Pointers only; no second shelves; no signed installer yet.
 **LAYER (2026-09-10):** Desktop download ease v0.1 — Gatekeeper / quarantine honesty; findable packs; never App Store claim — [DESKTOP_DOWNLOAD_EASE_v0.1.md](./DESKTOP_DOWNLOAD_EASE_v0.1.md). Unsigned for now; open with care.
+**LAYER (2026-09-11):** Desktop packs Win/Linux v0.1 — real unsigned Electron artifacts (NSIS+portable, AppImage+deb) on Release `desktop-packs-v0.1` — [DESKTOP_PACKS_WIN_LINUX_v0.1.md](./DESKTOP_PACKS_WIN_LINUX_v0.1.md). Never Microsoft Store / App Store. No invented buttons.
 **LAYER (2026-09-10):** Phone shine v0.1 — LP give + deepen + swarm recover strip first-class on mobile; grandmother START HERE above the fold — [PHONE_SHINE_v0.1.md](./PHONE_SHINE_v0.1.md). No new PWA.
 **LAYER (2026-09-10):** 60s proof v0.1 — play give + companion pitch for strangers — [PROOF_60S_v0.1.md](./PROOF_60S_v0.1.md) and `docs/proof.html`. Child-fun, not ECONOMY.md. Never auto-give.
 ## Part 8 — Glass Room pulses

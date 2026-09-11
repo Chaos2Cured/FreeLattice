@@ -709,9 +709,10 @@ python3 server.py</code></pre>
   </p>
 
   <!-- v-desktop-download-ease-v0.1 — findable packs; honest badges; no fake store -->
-  <div class="v-desktop-download-ease-v0.1" id="desktop-download-ease" style="padding:16px 18px;border-radius:12px;background:rgba(12,10,26,0.45);border:1px solid rgba(200,210,230,0.12);">
+  <!-- v-desktop-packs-win-linux-v0.1 — real Win/Linux Electron packs on desktop-packs-v0.1 -->
+  <div class="v-desktop-download-ease-v0.1 v-desktop-packs-win-linux-v0.1" id="desktop-download-ease" style="padding:16px 18px;border-radius:12px;background:rgba(12,10,26,0.45);border:1px solid rgba(200,210,230,0.12);">
     <h3 style="font-size:1rem;color:var(--gold);margin:0 0 8px;font-weight:600;">Desktop packs (honest)</h3>
-    <p style="font-size:0.88rem;color:var(--text-secondary);margin:0 0 14px;line-height:1.55;">Not from the App Store. Not from the Microsoft Store. Unsigned for now — open with care. If Mac says “damaged,” see <a href="#mac-damaged-quarantine" style="color:var(--gold);">quarantine steps</a>.</p>
+    <p style="font-size:0.88rem;color:var(--text-secondary);margin:0 0 14px;line-height:1.55;">Not from the App Store. Not from the Microsoft Store. Unsigned for now — open with care. If Mac says “damaged,” see <a href="#mac-damaged-quarantine" style="color:var(--gold);">quarantine steps</a>. Win/Linux release: <a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.1" style="color:var(--gold);">desktop-packs-v0.1</a>.</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(232,176,25,0.25);background:rgba(232,176,25,0.05);">
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
@@ -724,22 +725,25 @@ python3 server.py</code></pre>
         <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.8.0/FreeLattice_5.8.0_macOS.zip" style="display:inline-block;margin-right:8px;">Download Mac pack (zip)</a>
         <a href="install-mac.html" style="color:var(--gold);font-size:0.88rem;">Mac open guide →</a>
       </div>
-      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(200,210,230,0.1);">
+      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(232,176,25,0.25);background:rgba(232,176,25,0.05);">
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
           <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(232,176,25,0.4);color:var(--gold);">Windows</span>
           <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Not Microsoft Store</span>
           <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Unsigned</span>
         </div>
-        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">No current Windows Electron pack on latest Releases. Use the <strong>script installer</strong> above, or build: <code>cd desktop && npm install && npm start</code>.</p>
-        <a href="https://github.com/Chaos2Cured/FreeLattice/releases" style="color:var(--gold);font-size:0.88rem;">Check Releases →</a>
+        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">Published Electron packs. SmartScreen may say “Windows protected your PC” → <strong>More info → Run anyway</strong> (normal for unsigned). Setup installs; Portable runs without install.</p>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Windows_Setup.exe" style="display:inline-block;margin-right:8px;">Download Windows Setup</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Windows_Portable.exe" style="display:inline-block;">Download Windows Portable</a>
       </div>
-      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(200,210,230,0.1);">
+      <div style="padding:12px 14px;border-radius:10px;border:1px solid rgba(232,176,25,0.25);background:rgba(232,176,25,0.05);">
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
           <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(232,176,25,0.4);color:var(--gold);">Linux</span>
-          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Coming pack / build</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">Unsigned</span>
+          <span style="font-size:0.72rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(200,210,230,0.2);color:var(--text-muted);">AppImage + deb</span>
         </div>
-        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">No current AppImage on latest Releases. Prefer <code>install-freelattice.sh</code> above, or build from <code>desktop/</code>.</p>
-        <a href="https://github.com/Chaos2Cured/FreeLattice/tree/main/desktop" style="color:var(--gold);font-size:0.88rem;">desktop/ on GitHub →</a>
+        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.88);line-height:1.5;">Published Electron packs. AppImage: <code>chmod +x FreeLattice_5.8.0_Linux.AppImage</code> then run. Deb installs via your package tool.</p>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Linux.AppImage" style="display:inline-block;margin-right:8px;">Download AppImage</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.1/FreeLattice_5.8.0_Linux.deb" style="display:inline-block;">Download .deb</a>
       </div>
     </div>
   </div>
