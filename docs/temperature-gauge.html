@@ -738,14 +738,14 @@ canvas.sub-canvas.custom { height: 80px !important; }
 </div>
 
 <!-- Custom Indicator Builder -->
-<!-- Signal Layer Toggles -->
-<div id="layerToggles" style="display:none;padding:6px 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);display:none;">
+<!-- Signal Layer Toggles — v-soft-gyro-polish-v0.1: visible on load (before Analyze) -->
+<div id="layerToggles" style="display:block;padding:6px 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
   <span style="color:var(--gold);font-weight:600;margin-right:8px;">Signal Layers:</span>
   <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerEma" checked onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> EMA</label>
   <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerVol" checked onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Volume</label>
   <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerDt" onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Acceleration</label>
-  <!-- v-gyro-stack-v0.1 — optional φ three-line stack; free forever; heuristics -->
-  <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerGyro" onchange="try{localStorage.setItem('fl_tg_layerGyro',this.checked?'1':'0');}catch(e){}if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Gyro</label>
+  <!-- v-gyro-stack-v0.1 / v-soft-gyro-polish-v0.1 — optional φ stack; toggle redraws when analyzed -->
+  <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerGyro" onchange="tgOnGyroLayerChange(this)" style="accent-color:var(--gold);"> Gyro</label>
   <span style="opacity:0.5;font-size:0.65rem;">(Temperature always required · Gyro free forever)</span>
 </div>
 
@@ -1283,12 +1283,56 @@ function isGyroLayerOn() {
   if (!el) return false;
   return !!el.checked;
 }
+/** Soft polish: refresh Gyro sidebar state immediately (no second Analyze). */
+function tgUpdateGyroUi(candles) {
+  var gyroSec = document.getElementById('gyroStackSection');
+  if (gyroSec) gyroSec.style.display = 'block';
+  var gyroOn = isGyroLayerOn();
+  var gyroPer = document.getElementById('gyroPeriods');
+  var gyroSt = document.getElementById('gyroOverlayState');
+  if (!gyroPer || !gyroSt) return;
+  var hubP = 8;
+  try {
+    if (typeof getEmaPeriods === 'function') hubP = getEmaPeriods()[0] || 8;
+  } catch (e) {}
+  if (candles && candles.length && typeof computeGyroStack === 'function') {
+    var closes = candles.map(function (c) { return c.c; });
+    var stack = computeGyroStack(closes, candles, hubP);
+    gyroPer.textContent = stack.periods.hub + ' / ' + stack.periods.ring + ' / ' + stack.periods.orbit;
+  } else {
+    var ringP = Math.max(hubP + 1, Math.round(hubP * PHI));
+    var orbitP = Math.max(ringP + 1, Math.round(hubP * PHI * PHI));
+    gyroPer.textContent = hubP + ' / ' + ringP + ' / ' + orbitP;
+  }
+  if (gyroOn) {
+    gyroSt.textContent = (candles && candles.length)
+      ? 'On — Hub · Ring · Orbit on chart'
+      : 'On — Analyze to draw Hub · Ring · Orbit';
+  } else {
+    gyroSt.textContent = 'Off — toggle Gyro in Signal Layers';
+  }
+}
+/** Gyro checkbox — persist, update UI now, redraw chart when analyzed (same path as EMA). */
+function tgOnGyroLayerChange(el) {
+  try {
+    localStorage.setItem('fl_tg_layerGyro', el && el.checked ? '1' : '0');
+  } catch (e) {}
+  var candles = (typeof lastCandles !== 'undefined' && lastCandles) ? lastCandles : null;
+  tgUpdateGyroUi(candles);
+  if (candles && typeof lastAnalysis !== 'undefined' && lastAnalysis && typeof renderChart === 'function') {
+    renderChart(candles, lastAnalysis);
+  }
+}
 document.addEventListener('DOMContentLoaded', function () {
   var el = document.getElementById('layerGyro');
-  if (!el) return;
-  try {
-    if (localStorage.getItem('fl_tg_layerGyro') === '1') el.checked = true;
-  } catch (e) {}
+  if (el) {
+    try {
+      if (localStorage.getItem('fl_tg_layerGyro') === '1') el.checked = true;
+    } catch (e) {}
+  }
+  var toggles = document.getElementById('layerToggles');
+  if (toggles) toggles.style.display = 'block';
+  tgUpdateGyroUi(null);
 });
 
 // Sidebar collapse / expand (v5.37.11). Persisted in fl_tg_sidebar.
@@ -2876,20 +2920,8 @@ function renderAll(candles, a, symbol) {
     agreeEl.innerHTML = '<span style="color:#ef4444;">✗ split</span>';
   }
 
-  // v-gyro-stack-v0.1 — Gyro card always visible once analyzed (overlay optional)
-  var gyroSec = document.getElementById('gyroStackSection');
-  if (gyroSec) gyroSec.style.display = 'block';
-  var gyroOn = typeof isGyroLayerOn === 'function' && isGyroLayerOn();
-  var gyroPer = document.getElementById('gyroPeriods');
-  var gyroSt = document.getElementById('gyroOverlayState');
-  if (gyroPer && gyroSt && typeof computeGyroStack === 'function') {
-    var _gEp = (typeof getEmaPeriods === 'function') ? getEmaPeriods() : [8, 12, 24, 50, 200];
-    var _gStack = computeGyroStack(candles.map(function (c) { return c.c; }), candles, _gEp[0]);
-    gyroPer.textContent = _gStack.periods.hub + ' / ' + _gStack.periods.ring + ' / ' + _gStack.periods.orbit;
-    gyroSt.textContent = gyroOn
-      ? 'On — Hub · Ring · Orbit on chart'
-      : 'Off — toggle Gyro in Signal Layers';
-  }
+  // v-gyro-stack-v0.1 / v-soft-gyro-polish-v0.1 — Gyro card + overlay state
+  if (typeof tgUpdateGyroUi === 'function') tgUpdateGyroUi(candles);
 
   // Indicators
   document.getElementById('indicatorSection').style.display = 'block';
@@ -3281,15 +3313,15 @@ function renderChart(candles, a) {
     });
   }
 
-  // v-gyro-stack-v0.1 — optional Hub / Ring / Orbit + watch diamonds
+  // v-gyro-stack-v0.1 / v-soft-gyro-polish-v0.1 — Hub · Ring · Orbit · Watch (legend matches card)
   var gyroDatasets = [];
   if (layerGyro && typeof computeGyroStack === 'function') {
     var gyro = computeGyroStack(closes, candles, EP_RC[0]);
     gyroDatasets.push(
-      { label: 'Gyro Hub', data: gyro.hub, borderColor: 'rgba(232,176,25,0.95)', borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
-      { label: 'Gyro Ring', data: gyro.ring, borderColor: 'rgba(96,165,250,0.85)', borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
-      { label: 'Gyro Orbit', data: gyro.orbit, borderColor: 'rgba(167,139,250,0.75)', borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
-      { label: 'Gyro Watch', data: gyro.watch, borderColor: 'transparent', backgroundColor: 'rgba(232,176,25,0.9)', pointRadius: Math.max(sigR - 3, 4), pointHoverRadius: Math.max(sigH - 2, 5), pointStyle: 'rectRot', pointBorderColor: 'rgba(255,236,179,0.9)', pointBorderWidth: 1.5, showLine: false, order: 0 }
+      { label: 'Hub', data: gyro.hub, borderColor: 'rgba(232,176,25,0.95)', borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Ring', data: gyro.ring, borderColor: 'rgba(96,165,250,0.85)', borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Orbit', data: gyro.orbit, borderColor: 'rgba(167,139,250,0.75)', borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Watch', data: gyro.watch, borderColor: 'transparent', backgroundColor: 'rgba(232,176,25,0.9)', pointRadius: Math.max(sigR - 3, 4), pointHoverRadius: Math.max(sigH - 2, 5), pointStyle: 'rectRot', pointBorderColor: 'rgba(255,236,179,0.9)', pointBorderWidth: 1.5, showLine: false, order: 0 }
     );
   }
 
@@ -3369,10 +3401,10 @@ function renderChart(candles, a) {
               if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL' : null;
               if (ctx.dataset.label === 'Temp Buy') return ctx.raw ? '\u25C6 TEMP BUY' : null;
               if (ctx.dataset.label === 'Temp Sell') return ctx.raw ? '\u25C6 TEMP SELL' : null;
-              if (ctx.dataset.label === 'Gyro Watch') return ctx.raw ? '\u25C6 Gyro watch (heuristic — you decide)' : null;
-              if (ctx.dataset.label === 'Gyro Hub') return 'Gyro Hub: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
-              if (ctx.dataset.label === 'Gyro Ring') return 'Gyro Ring: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
-              if (ctx.dataset.label === 'Gyro Orbit') return 'Gyro Orbit: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
+              if (ctx.dataset.label === 'Watch') return ctx.raw ? '\u25C6 Watch (heuristic — you decide)' : null;
+              if (ctx.dataset.label === 'Hub') return 'Hub: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
+              if (ctx.dataset.label === 'Ring') return 'Ring: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
+              if (ctx.dataset.label === 'Orbit') return 'Orbit: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
               if (ctx.dataset.label === 'Volume') return 'Vol: ' + (ctx.raw >= 1e6 ? (ctx.raw/1e6).toFixed(1) + 'M' : ctx.raw >= 1e3 ? (ctx.raw/1e3).toFixed(0) + 'K' : ctx.raw);
               if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + ctx.raw?.toFixed(2);
               return null;

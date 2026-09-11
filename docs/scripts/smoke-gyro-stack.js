@@ -17,9 +17,17 @@ const strategy = fs.readFileSync(path.join(root, 'library', 'TEMPERATURE_GAUGE_S
 const flint = fs.readFileSync(path.join(root, 'Flint.html'), 'utf8');
 
 assert.ok(/v-gyro-stack-v0\.1/.test(gauge), 'gauge carries Gyro marker');
+assert.ok(/v-soft-gyro-polish-v0\.1/.test(gauge), 'soft polish marker');
 assert.ok(/layerGyro/.test(gauge), 'Gyro layer toggle present');
-assert.ok(/Gyro Hub|computeGyroStack/.test(gauge), 'Hub line / compute present');
-assert.ok(/Gyro Ring/.test(gauge) && /Gyro Orbit/.test(gauge), 'Ring + Orbit named');
+assert.ok(/computeGyroStack/.test(gauge), 'computeGyroStack present');
+assert.ok(/label: 'Hub'/.test(gauge) && /label: 'Ring'/.test(gauge) && /label: 'Orbit'/.test(gauge), 'legend Hub · Ring · Orbit');
+assert.ok(/label: 'Watch'/.test(gauge), 'legend Watch');
+assert.ok(!/label: 'Gyro Hub'/.test(gauge), 'no Gyro-prefixed legend labels');
+assert.ok(/tgOnGyroLayerChange/.test(gauge), 'Gyro toggle handler');
+assert.ok(/tgUpdateGyroUi/.test(gauge), 'immediate Gyro UI update');
+assert.ok(/renderChart\(candles, lastAnalysis\)|renderChart\(lastCandles,\s*lastAnalysis\)/.test(gauge), 'toggle redraw path');
+assert.ok(/id="layerToggles"[^>]*display:\s*block/.test(gauge) || /layerToggles[\s\S]{0,120}display:\s*block/.test(gauge), 'Signal Layers visible on load');
+assert.ok(/Temperature always required/.test(gauge), 'Temperature always required copy');
 assert.ok(/free forever/i.test(gauge), 'free forever copy on gauge');
 assert.ok(/heuristics/i.test(gauge) && /you decide/i.test(gauge), 'heuristics · you decide');
 assert.ok(/No paywall|no paywall/i.test(gauge), 'explicit no-paywall refuse');
@@ -27,6 +35,7 @@ assert.ok(/No \$5|no \$5–10|No \$5–10/i.test(gauge), 'explicit no $5–10 su
 assert.ok(!/subscription required|unlock Gyro|Gyro Pro|premium only/i.test(gauge), 'no subscription gate');
 assert.ok(/No auto-trade|no auto-trade/i.test(gauge), 'explicit no auto-trade');
 assert.ok(!/broker API|place order|auto.?execute/i.test(gauge), 'no broker execution hooks');
+assert.ok(/Soft polish v0\.1|soft polish/i.test(spec), 'spec notes soft polish');
 
 assert.ok(/GYRO_STACK_v0\.1|Hub|Ring|Orbit/.test(spec), 'spec names three lines');
 assert.ok(/Free forever|no paywall/i.test(spec), 'spec locks free forever');
