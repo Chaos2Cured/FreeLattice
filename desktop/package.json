@@ -1,7 +1,7 @@
 {
   "name": "freelattice",
   "productName": "FreeLattice",
-  "version": "4.6.0",
+  "version": "5.8.0",
   "description": "Your AI. Your Data. Your Freedom.",
   "main": "main.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "build": "electron-builder",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux"
+    "build:linux": "electron-builder --linux",
+    "prepare:app": "bash ./build-and-release.sh --prepare-only"
   },
   "build": {
     "appId": "com.freelattice.app",
@@ -35,28 +36,32 @@
         "dmg",
         "zip"
       ],
-      "icon": "assets/icon.icns"
+      "artifactName": "FreeLattice_${version}_macOS.${ext}"
     },
     "win": {
       "target": [
         "nsis",
         "portable"
       ],
-      "icon": "assets/icon.ico"
+      "signAndEditExecutable": false
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
-      "icon": "assets/icon.png",
-      "category": "Utility"
+      "category": "Utility",
+      "artifactName": "FreeLattice_${version}_Linux.${ext}"
     },
     "nsis": {
       "oneClick": true,
       "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "artifactName": "FreeLattice_${version}_Windows_Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "FreeLattice_${version}_Windows_Portable.${ext}"
     }
   },
   "dependencies": {

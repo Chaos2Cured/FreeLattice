@@ -1,0 +1,173 @@
+# FreeLattice — Desktop packs Win + Linux (honest unsigned)
+# Layer, never delete. No Microsoft Store / App Store claim. No code signing.
+# Produces real Electron artifacts on GitHub runners — not invented assets.
+
+name: Desktop packs Win Linux
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'GitHub Release tag to create/upload (e.g. desktop-packs-v0.1)'
+        required: true
+        default: 'desktop-packs-v0.1'
+  push:
+    tags:
+      - 'desktop-packs-v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-packs-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Unsigned publish — never auto-discover signing identities
+  CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+jobs:
+  build-windows:
+    name: Build Windows (nsis + portable)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Prepare offline app fallback
+        shell: bash
+        run: bash ./build-and-release.sh --prepare-only
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Windows packs (unsigned)
+        run: npm run build:win
+
+      - name: List dist
+        shell: bash
+        run: ls -la dist/
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-packs
+          path: |
+            desktop/dist/FreeLattice_*_Windows_Setup.exe
+            desktop/dist/FreeLattice_*_Windows_Portable.exe
+          if-no-files-found: error
+
+  build-linux:
+    name: Build Linux (AppImage + deb)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Prepare offline app fallback
+        run: bash ./build-and-release.sh --prepare-only
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Linux packs (unsigned)
+        run: npm run build:linux
+
+      - name: List dist
+        run: ls -la dist/
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packs
+          path: |
+            desktop/dist/FreeLattice_*_Linux.AppImage
+            desktop/dist/FreeLattice_*_Linux.deb
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish unsigned Release assets
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Windows packs
+        uses: actions/download-artifact@v4
+        with:
+          name: win-packs
+          path: release-assets
+
+      - name: Download Linux packs
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packs
+          path: release-assets
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: List assets
+        run: ls -lah release-assets/
+
+      - name: Create or update GitHub Release (unsigned)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: FreeLattice Desktop packs — Win + Linux (${{ steps.tag.outputs.name }})
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+          body: |
+            ## Desktop packs — Win + Linux (honest unsigned)
+
+            **Not from the Microsoft Store. Not from the App Store.** Unsigned for now — open with care.
+
+            Mac pack remains on [v5.8.0](https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.8.0) (`FreeLattice_5.8.0_macOS.zip`).
+
+            ### Windows
+            - Setup (NSIS) + Portable `.exe`
+            - SmartScreen may say “Windows protected your PC” → **More info → Run anyway** (normal for unsigned)
+
+            ### Linux
+            - AppImage + `.deb`
+            - `chmod +x` the AppImage before run
+
+            Human doors: [desktop.html](https://freelattice.com/desktop.html) · [install.html#desktop-download-ease](https://freelattice.com/install.html#desktop-download-ease)
+
+            Layer, never delete. Quiet Room shut. Five stay five.
+            Glow eternal. Heart in every Spark.
+          files: |
+            release-assets/FreeLattice_*_Windows_Setup.exe
+            release-assets/FreeLattice_*_Windows_Portable.exe
+            release-assets/FreeLattice_*_Linux.AppImage
+            release-assets/FreeLattice_*_Linux.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
