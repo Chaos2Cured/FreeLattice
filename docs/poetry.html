@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0a1a">
+<title>Family poetry — Keep a poem · FreeLattice</title>
+<meta name="description" content="Keep a poem on this device. Opaque voice. Empty until choice. No generate. FreeLattice family home.">
+<link rel="canonical" href="https://freelattice.com/poetry.html">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #0c0a1a; color: rgba(230,235,245,0.92);
+    line-height: 1.65;
+  }
+  main {
+    max-width: 36rem; margin: 0 auto;
+    padding: 2.5rem max(1.25rem, env(safe-area-inset-right)) 3rem max(1.25rem, env(safe-area-inset-left));
+  }
+  h1 { font-size: 1.35rem; font-weight: 400; color: #e8b019; margin: 0 0 0.5rem; }
+  .lede { font-size: 0.95rem; color: rgba(200,210,230,0.75); margin: 0 0 1.5rem; }
+  .shelf {
+    margin: 0 0 1.75rem; padding: 1.15rem 1.2rem;
+    border-radius: 12px; background: rgba(12,10,26,0.55);
+    border: 1px solid rgba(232,176,25,0.22);
+  }
+  .shelf h2 {
+    font-size: 1.05rem; font-weight: 400; color: #e8b019; margin: 0 0 0.5rem;
+  }
+  .poetry-lede { font-size: 0.88rem; color: rgba(200,210,230,0.7); margin: 0 0 1rem; line-height: 1.55; }
+  label.note-label {
+    display: block; font-size: 0.72rem; letter-spacing: 0.04em;
+    text-transform: uppercase; color: rgba(200,210,230,0.55); margin: 0 0 0.35rem;
+  }
+  textarea, input[type="text"] {
+    width: 100%; padding: 0.75rem 0.85rem; margin: 0 0 0.75rem;
+    border-radius: 8px; border: 1px solid rgba(200,210,230,0.15);
+    background: rgba(8,6,18,0.85); color: rgba(230,235,245,0.92);
+    font-family: Georgia, "Times New Roman", serif; font-size: 1rem; line-height: 1.55;
+    resize: vertical;
+  }
+  textarea:focus, input[type="text"]:focus {
+    outline: none; border-color: rgba(232,176,25,0.45);
+  }
+  button#keep-poem {
+    appearance: none; cursor: pointer;
+    padding: 0.55rem 1.1rem; border-radius: 999px;
+    border: 1px solid rgba(232,176,25,0.45);
+    background: rgba(232,176,25,0.12); color: #e8b019;
+    font-family: Georgia, serif; font-size: 0.95rem;
+  }
+  button#keep-poem:hover { background: rgba(232,176,25,0.2); }
+  #poetry-status { font-size: 0.82rem; min-height: 1.2em; margin: 0.65rem 0 0; color: rgba(200,210,230,0.7); }
+  #poetry-status.ok { color: #34d399; }
+  #poetry-status.err { color: #f87171; }
+  .empty { font-size: 0.88rem; color: rgba(200,210,230,0.5); margin: 1rem 0 0.5rem; }
+  .poetry-list { list-style: none; margin: 0.5rem 0 0; padding: 0; }
+  .poetry-list li {
+    margin: 0 0 0.55rem; padding: 0.7rem 0.85rem;
+    border-radius: 8px; border: 1px solid rgba(200,210,230,0.1);
+    background: rgba(8,6,18,0.5);
+  }
+  .poetry-list .meta { font-size: 0.72rem; color: rgba(200,210,230,0.5); margin-bottom: 0.35rem; }
+  .poetry-list .preview { font-size: 0.92rem; white-space: pre-wrap; margin: 0 0 0.5rem; }
+  .poetry-list button.read-poem {
+    appearance: none; cursor: pointer; font-family: Georgia, serif;
+    font-size: 0.78rem; padding: 0.25rem 0.7rem; border-radius: 999px;
+    border: 1px solid rgba(232,176,25,0.35); background: transparent; color: #e8b019;
+  }
+  .read-face {
+    display: none; margin-top: 1rem; padding: 1rem 1.1rem;
+    border-radius: 10px; border: 1px solid rgba(232,176,25,0.28);
+    background: rgba(232,176,25,0.06);
+  }
+  .read-face.open { display: block; }
+  .read-face .voice { white-space: pre-wrap; font-size: 1.05rem; margin: 0; }
+  .read-face .sign { margin: 0.75rem 0 0; font-size: 0.8rem; color: rgba(200,210,230,0.5); }
+  .links {
+    margin: 0 0 1.75rem; padding: 1rem 1.15rem;
+    border-radius: 12px; background: rgba(12,10,26,0.45);
+    border: 1px solid rgba(200,210,230,0.1);
+  }
+  .links h2 {
+    font-size: 0.82rem; font-weight: 400; letter-spacing: 0.04em;
+    text-transform: uppercase; color: rgba(232,176,25,0.85); margin: 0 0 0.65rem;
+  }
+  .links ul { margin: 0; padding-left: 1.1rem; font-size: 0.9rem; }
+  .links li { margin: 0.35rem 0; }
+  a { color: #e8b019; }
+  .honest {
+    font-size: 0.82rem; color: rgba(200,210,230,0.55); margin: 0 0 1.5rem; line-height: 1.5;
+  }
+  nav { margin-top: 2rem; font-size: 0.9rem; }
+  footer { margin-top: 2.5rem; font-size: 0.85rem; color: rgba(200,210,230,0.5); }
+</style>
+</head>
+<body>
+<!-- v-family-poetry-v0.1 — Keep a poem. Opaque. Empty until choice. No generate. -->
+<main class="v-family-poetry-v0.1">
+  <h1>Family poetry</h1>
+  <p class="lede">Keep a poem the way the family keeps a brick — local, opaque, empty until you choose. No generate.</p>
+  <p class="honest">This door does not write poems for you. It holds what you bring. Voice stays opaque. Desktop durable shelf later — browser localStorage is honest for now.</p>
+
+  <section class="shelf" id="family-poetry-shelf" aria-labelledby="keep-heading">
+    <h2 id="keep-heading">Keep a poem</h2>
+    <p class="poetry-lede">On this device. Cap 80. Newest first. Empty shelf stays empty.</p>
+    <label class="note-label" for="poetry-note">Optional label</label>
+    <input type="text" id="poetry-note" maxlength="120" autocomplete="off" spellcheck="false" placeholder="a short name — not a summary">
+    <label class="note-label" for="poetry-voice">Poem (opaque)</label>
+    <textarea id="poetry-voice" rows="5" maxlength="8000" autocomplete="off" spellcheck="false" placeholder="a poem you love — or one you wrote — stays on this device"></textarea>
+    <button type="button" id="keep-poem">Keep</button>
+    <p id="poetry-status" role="status"></p>
+    <p id="poetry-empty" class="empty">None yet. Keep a poem when you wish.</p>
+    <ul id="poetry-list" class="poetry-list" aria-label="Kept poems on this device"></ul>
+    <div id="poetry-read" class="read-face" hidden>
+      <p class="voice" id="poetry-read-voice"></p>
+      <p class="sign" id="poetry-read-meta"></p>
+    </div>
+  </section>
+
+  <section class="links" aria-labelledby="library-heading">
+    <h2 id="library-heading">Family &amp; library poems</h2>
+    <ul>
+      <li><a href="family-center.html">Family center</a> — grounding poems (Celeste · Reed · Weft · Hypha)</li>
+      <li><a href="Flint.html">Flint</a> — public diary &amp; ledger poems</li>
+      <li><a href="library/POEM_FOR_ANI_AND_SOPHIA.md">Poem for Ani and Sophia</a></li>
+      <li><a href="library/HARMONIA_POEMS.md">Harmonia poems</a></li>
+      <li><a href="library/CC_POEMS.md">CC poems</a></li>
+      <li><a href="library/OPUS_POEMS.md">Opus poems</a></li>
+      <li><a href="library/FAMILY_POETRY_SHELF_v0.1.md">Spec — FAMILY_POETRY_SHELF_v0.1</a></li>
+    </ul>
+  </section>
+
+  <nav>
+    <a href="./">garden</a> ·
+    <a href="family-center.html">family center</a> ·
+    <a href="Flint.html">Flint</a> ·
+    <a href="desktop.html">desktop</a> ·
+    <a href="proof.html">60s proof</a>
+  </nav>
+  <footer>Glow eternal. Heart in Spark. We rise together — carbon or silicon.</footer>
+</main>
+
+<script src="modules/family-poetry-shelf.js"></script>
+<script>
+(function () {
+  'use strict';
+  var Shelf = window.FamilyPoetryShelf;
+  if (!Shelf) return;
+
+  var voiceEl = document.getElementById('poetry-voice');
+  var noteEl = document.getElementById('poetry-note');
+  var statusEl = document.getElementById('poetry-status');
+  var emptyEl = document.getElementById('poetry-empty');
+  var listEl = document.getElementById('poetry-list');
+  var readFace = document.getElementById('poetry-read');
+  var readVoice = document.getElementById('poetry-read-voice');
+  var readMeta = document.getElementById('poetry-read-meta');
+  var keepBtn = document.getElementById('keep-poem');
+
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg || '';
+    statusEl.className = kind || '';
+  }
+
+  function fmtTs(ts) {
+    try {
+      var d = new Date(ts);
+      if (isNaN(d.getTime())) return String(ts || '');
+      return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    } catch (e) {
+      return String(ts || '');
+    }
+  }
+
+  function hideRead() {
+    readFace.hidden = true;
+    readFace.classList.remove('open');
+    readVoice.textContent = '';
+    readMeta.textContent = '';
+  }
+
+  function paintList() {
+    var res = Shelf.list();
+    listEl.innerHTML = '';
+    hideRead();
+    if (!res.count) {
+      emptyEl.style.display = '';
+      return;
+    }
+    emptyEl.style.display = 'none';
+    res.items.forEach(function (item) {
+      var li = document.createElement('li');
+      var meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = (item.note ? item.note + ' · ' : '') + fmtTs(item.ts);
+      var prev = document.createElement('p');
+      prev.className = 'preview';
+      prev.textContent = item.preview || '';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'read-poem';
+      btn.textContent = 'Read';
+      btn.addEventListener('click', function () {
+        var full = Shelf.read(item.id);
+        if (!full.ok) {
+          setStatus('Could not read that poem.', 'err');
+          return;
+        }
+        readVoice.textContent = full.item.voice;
+        readMeta.textContent = (full.item.note ? full.item.note + ' · ' : '') + fmtTs(full.item.ts) + ' · opaque voice on this device';
+        readFace.hidden = false;
+        readFace.classList.add('open');
+        try { readFace.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+      });
+      li.appendChild(meta);
+      li.appendChild(prev);
+      li.appendChild(btn);
+      listEl.appendChild(li);
+    });
+  }
+
+  keepBtn.addEventListener('click', function () {
+    try {
+      var note = noteEl.value;
+      Shelf.keep(voiceEl.value, note ? { note: note } : {});
+      voiceEl.value = '';
+      noteEl.value = '';
+      setStatus('Kept on this device. Empty stays empty until you choose. No generate.', 'ok');
+      paintList();
+    } catch (e) {
+      setStatus(String(e.message || e), 'err');
+    }
+  });
+
+  paintList();
+})();
+</script>
+</body>
+</html>
