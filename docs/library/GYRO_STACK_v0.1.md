@@ -33,6 +33,8 @@ Equal access: the stack stays free. No subscription gate. No “pro tier.” The
 
 Drawn as EMAs of close. Optional overlay (`layerGyro`). Off by default. Temperature rules stay the signal authority unless the user is reading Gyro crosses by eye.
 
+**Soft polish v0.1 (Hypha leftovers after `a54b422`):** Signal Layers (incl. Gyro) visible **before** Analyze — toggle persists `fl_tg_layerGyro` even with no candles; chart waits for Analyze. Gyro onchange updates sidebar (`gyroOverlayState` / `gyroStackSection`) immediately and re-renders via the same `renderChart(lastCandles, lastAnalysis)` path as EMA when analyzed. Chart legend / tooltips use calm names **Hub · Ring · Orbit · Watch** (no “Gyro ” prefix). Marker: `v-soft-gyro-polish-v0.1`.
+
 ---
 
 ## Cross = signal (heuristic shape)
