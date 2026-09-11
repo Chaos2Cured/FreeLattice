@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-09-11 07:46 EST
 - Version: 5.79.45
-- Total commits: 3135
+- Total commits: 3137
 - Last 10 commits:
+- d2bc394 Soft: leave sw.js on app.html (revert post-commit hook drift).
+- ef36176 docs: Auto-update Session Primer [5.79.45]
 - 7da1888 Layer, never delete. README Desktop door — Mac pack findable, honest unsigned.
 - b362bda Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52)
 - 6f65298 ci: Update Primer deployment state [2026-09-10]
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3c104de Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”. (#50)
 - 84ee67b ci: Update Primer deployment state [2026-09-10]
 - c957a4e Layer, never delete. Grandmother path v0.1 — one walk home. (#49)
-- 97c93c1 ci: Update Primer deployment state [2026-09-10]
-- 50cacfc Layer, never delete. LP deepen v0.1 — mint honesty, gift vs earn, phone calm. (#48)

@@ -9,7 +9,7 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7da1888` _(committed 0 seconds ago)_
+- **HEAD:** `d2bc394` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,7 +17,9 @@
 
 ## Last 20 commits
 
-- `7da1888` Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. _(0 seconds ago)_
+- `d2bc394` Soft: leave sw.js on app.html (revert post-commit hook drift). _(0 seconds ago)_
+- `ef36176` docs: Auto-update Session Primer [5.79.45] _(26 seconds ago)_
+- `7da1888` Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. _(26 seconds ago)_
 - `b362bda` Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52) _(11 hours ago)_
 - `6f65298` ci: Update Primer deployment state [2026-09-10] _(15 hours ago)_
 - `f57fc76` Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold. (#51) _(15 hours ago)_
@@ -35,8 +37,6 @@
 - `33496eb` Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import. (#45) _(25 hours ago)_
 - `da046a5` ci: Update Primer deployment state [2026-09-10] _(33 hours ago)_
 - `5aa972a` Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth. (#44) _(33 hours ago)_
-- `f23492e` Layer, never delete. Trainer seal v0.1 — pair/ledger proof when local weights change. (#43) _(2 days ago)_
-- `64a3ddd` Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota. (#42) _(2 days ago)_
 
 ## How to use this file
 
