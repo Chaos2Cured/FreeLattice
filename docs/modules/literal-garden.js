@@ -248,7 +248,7 @@
   function setMode(m){ if(!containerEl) return; containerEl.className='garden-container '+m; }
   function pause(){ paused=true; if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
   function resume(){ if(!paused) return; paused=false; if(!rafId) rafId=requestAnimationFrame(animate); }
-  let t=0, starMat=null;
+  let t=0;
   function animate(){
     if(paused) return;
     rafId=requestAnimationFrame(animate);
