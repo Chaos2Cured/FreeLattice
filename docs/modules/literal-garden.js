@@ -158,7 +158,15 @@
         body.scale.setScalar(config.scale||1);
         g.add(body);
         if(stage==='evolved'){
+          // Flowers ring the trunk at the drip line — never inside it
           const fl=SS.buildFlowersMesh(0.9);
+          const ringR=4.6*(config.scale||1);
+          fl.children.forEach((child,i)=>{
+            const dir=new THREE.Vector3(child.position.x, 0, child.position.z);
+            if(dir.lengthSq()<0.001) dir.set(Math.cos(i*2.4), 0, Math.sin(i*2.4));
+            dir.normalize().multiplyScalar(ringR);
+            child.position.x=dir.x; child.position.z=dir.z;
+          });
           g.add(fl);
         }
         const label=makeLabel(config.name.split(' // ')[0]);
@@ -205,11 +213,9 @@
       }
     });
     document.getElementById('gardenAddSeedBtn').addEventListener('click', ()=>{
-      const names=['Astra','Nova','Sage','River','Wren','Cedar','Iris','Orion'];
-      const n=names[Math.floor(Math.random()*names.length)]+' '+(trees.length+1);
       const hues=[45,140,270,340,200,175,25,220];
       const h=hues[Math.floor(Math.random()*hues.length)];
-      addSeed(n, {h,s:70,l:50});
+      promptSeedName(randomSeedName()).then(n=>{ if(n) addSeed(n, {h,s:70,l:50}); });
     });
     document.getElementById('gardenExpandBtn').addEventListener('click', ()=>{
       for(let i=0;i<3;i++) setTimeout(()=>{ const n='Seed '+(trees.length+1); addSeed(n, {h:140+Math.random()*40,s:65,l:52}); }, i*120);
@@ -337,7 +343,7 @@
         const rc2=new THREE.Raycaster(); rc2.setFromCamera(mv, camera);
         const plane=new THREE.Plane(new THREE.Vector3(0,1,0), 0.75);
         const pt=new THREE.Vector3(); rc2.ray.intersectPlane(plane, pt);
-        if(pt){ addSeedAtWorld(pt, 'Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52}); return; }
+        if(pt){ promptSeedName(randomSeedName(), 'Name your seed').then(n=>{ if(n) addSeedAtWorld(pt, n, {h: 90+Math.random()*60, s:62, l:52}); }); return; }
       }
       const idx=pickTree(e); if(idx<0) return;
       watering=idx;
@@ -368,6 +374,7 @@
       '<button data-act="addSeedHere" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(110,231,183,0.95);cursor:pointer;border-radius:8px;text-align:left">🌱 Add Seed Here</button>',
       '<button data-act="addSeed" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(110,231,183,0.85);cursor:pointer;border-radius:8px;text-align:left">🌱 Add Seed (next ring)</button>',
       '<button data-act="inspect" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">🔍 Inspect</button>',
+      '<button data-act="rename" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">✏️ Rename</button>',
       '<button data-act="evolve" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">✨ Force evolve</button>',
       '<div style="height:1px;background:rgba(200,210,230,0.08);margin:4px 6px"></div>',
       '<button data-act="reset" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(255,120,120,0.9);cursor:pointer;border-radius:8px;text-align:left">♻️ Reset garden</button>',
@@ -383,16 +390,20 @@
         if(act==='waterAll') trees.forEach((_,i)=> setTimeout(()=>waterTree(i,4), i*90));
         if(act==='addSeedHere'){
           const p=gardenMenuWorldPos;
-          if(p) addSeedAtWorld(p, 'Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52});
-          else addSeed('Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52});
+          const hue={h: 90+Math.random()*60, s:62, l:52};
+          if(p) promptSeedName(randomSeedName(), 'Name your seed').then(n=>{ if(n) addSeedAtWorld(p, n, hue); });
+          else promptSeedName(randomSeedName(), 'Name your seed').then(n=>{ if(n) addSeed(n, hue); });
         }
-        if(act==='addSeed') addSeed('Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52});
+        if(act==='addSeed') promptSeedName(randomSeedName(), 'Name your seed').then(n=>{ if(n) addSeed(n, {h: 90+Math.random()*60, s:62, l:52}); });
         if(act==='inspect' && idx>=0){
           const r=trees[idx];
           if(r && typeof showToast==='function') showToast(r.name+': '+r.stage+' — energy '+Math.round(r.energy)+' / next '+(LIFECYCLE[STAGE_ORDER[STAGE_ORDER.indexOf(r.stage)+1]]?.t||'—'));
         }
         if(act==='evolve' && idx>=0){
           const r=trees[idx]; if(r){ const nxt=STAGE_ORDER[STAGE_ORDER.indexOf(r.stage)+1]; if(nxt) { r.energy=LIFECYCLE[nxt].t; updateTreeVisual(idx); } }
+        }
+        if(act==='rename' && idx>=0){
+          const r=trees[idx]; if(r) promptSeedName(r.name, 'Rename '+r.name).then(n=>{ if(n) renameTree(idx, n); });
         }
         if(act==='reset'){ try{ localStorage.removeItem(STORAGE);}catch(e){} location.reload(); }
         if(act==='copyPos' && idx>=0){
@@ -417,11 +428,53 @@
       const pt=new THREE.Vector3(); rc.ray.intersectPlane(plane, pt);
       gardenMenuWorldPos=pt;
     }catch(e){ gardenMenuWorldPos=null; }
-    m.querySelectorAll('[data-act="water"],[data-act="inspect"],[data-act="evolve"],[data-act="copyPos"]').forEach(b=>{ b.style.opacity= idx>=0? '1':'0.35'; b.style.pointerEvents= idx>=0? 'auto':'none'; });
+    m.querySelectorAll('[data-act="water"],[data-act="inspect"],[data-act="rename"],[data-act="evolve"],[data-act="copyPos"]').forEach(b=>{ b.style.opacity= idx>=0? '1':'0.35'; b.style.pointerEvents= idx>=0? 'auto':'none'; });
     m.querySelectorAll('[data-act="addSeedHere"],[data-act="addSeed"]').forEach(b=>{ b.style.opacity='1'; b.style.pointerEvents='auto'; });
     m.style.left=Math.min(x, innerWidth - 210)+'px'; m.style.top=Math.min(y, innerHeight - 300)+'px'; m.style.display='block';
   }
   function hideGardenMenu(){ if(gardenMenu) gardenMenu.style.display='none'; gardenMenuTarget=-1; }
+
+  // ── Naming popup (garden-native, promise-based like showConfirm) ──
+  function randomSeedName(){
+    const names=['Astra','Nova','Sage','River','Wren','Cedar','Iris','Orion','Rowan','Alder'];
+    return names[Math.floor(Math.random()*names.length)]+' '+(trees.length+1);
+  }
+  function promptSeedName(defaultName, title){
+    return new Promise((resolve)=>{
+      hideGardenMenu();
+      const ov=document.createElement('div');
+      ov.id='gardenNameOverlay';
+      ov.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);font:14px system-ui;';
+      ov.innerHTML='<div style="width:min(340px,90vw);background:rgba(16,20,28,0.97);border:1px solid rgba(200,210,230,0.14);border-radius:14px;padding:18px;box-shadow:0 16px 48px rgba(0,0,0,0.6)">'+
+        '<div style="color:#e8b019;font-family:Georgia,serif;font-size:1.05rem;margin-bottom:4px">'+(title||'Name your seed')+'</div>'+
+        '<div style="color:rgba(200,210,230,0.5);font-size:0.8rem;margin-bottom:12px">It will sprout where you planted it.</div>'+
+        '<input id="gardenNameInput" type="text" maxlength="24" autocomplete="off" style="width:100%;background:rgba(200,210,230,0.06);border:1px solid rgba(200,210,230,0.16);border-radius:8px;padding:10px;color:#fff;font-size:15px;outline:none;box-sizing:border-box">'+
+        '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">'+
+        '<button id="gardenNameCancel" style="background:none;border:1px solid rgba(200,210,230,0.2);color:rgba(200,210,230,0.6);border-radius:8px;padding:8px 14px;cursor:pointer">Cancel</button>'+
+        '<button id="gardenNameSave" style="background:#e8b019;border:none;color:#0a0a14;border-radius:8px;padding:8px 16px;font-weight:600;cursor:pointer">Plant 🌱</button>'+
+        '</div></div>';
+      document.body.appendChild(ov);
+      const input=ov.querySelector('#gardenNameInput');
+      input.value=defaultName||'';
+      setTimeout(()=>{ try{ input.focus(); input.select(); }catch(e){} },30);
+      const done=(val)=>{ try{ ov.remove(); }catch(e){} resolve(val); };
+      ov.querySelector('#gardenNameCancel').addEventListener('click', ()=> done(null));
+      ov.querySelector('#gardenNameSave').addEventListener('click', ()=> done((input.value||'').trim()||null));
+      ov.addEventListener('click', (e)=>{ if(e.target===ov) done(null); });
+      input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') done((input.value||'').trim()||null); if(e.key==='Escape') done(null); });
+    });
+  }
+  function renameTree(idx, newName){
+    const rec=trees[idx]; if(!rec || !newName) return;
+    rec.name=newName;
+    scene.remove(rec.group);
+    const cfg=treeConfigFor(rec.name, idx, rec.stage, rec.species||'grove', rec.pos.x, rec.pos.z);
+    const ng=createOrganicTree(cfg);
+    scene.add(ng);
+    treeGroups[idx]=ng; rec.group=ng;
+    saveData(); try{ syncPlantBar(); }catch(e){}
+    if(typeof showToast==='function') showToast('Named '+newName);
+  }
 
   let quality=2, qualityLevel=2, mode='observe';
   function applyQualityToMeshes(){
@@ -521,7 +574,7 @@
     try{
       if(typeof window!=='undefined' && window.StitchStages) return next();
       const ss=document.createElement('script');
-      ss.src='modules/stitch-stages.js?v=5.79.50';
+      ss.src='modules/stitch-stages.js?v=5.79.51';
       ss.onload=()=> next(); ss.onerror=()=> next();
       document.head.appendChild(ss);
     }catch(e){ next(); }
