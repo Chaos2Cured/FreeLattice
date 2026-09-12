@@ -1,16 +1,11 @@
 // docs/modules/literal-garden.js — Literal Garden: trees, seeds, Tree of Life
-// Replaces the galaxy/orb galaxy with a walkable garden. Same lifecycle stages
-// (seed → sprout → juvenile → adult → evolved at 0/15/50/120/250) and same
-// persistence keys as fractal-garden.js — just looks like a garden.
-// Lazy-loaded via FreeLatticeLoader when Garden tab opens. Exposes the same
-// window.FractalGarden API so existing tab code (setMode/setQuality/pause/resume)
-// keeps working without edits to app.html.
+// Replaces galaxy with walkable garden. Same lifecycle stages (0/15/50/120/250).
+// Expects global THREE r128 (loaded by app.html via cdnjs). No importmaps.
 // Layer, never delete — fractal-garden.js stays on disk.
 
 (function(){
   'use strict';
 
-  const PHI = 1.6180339887;
   const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
   const STAGE_ORDER = ['seed','sprout','juvenile','adult','evolved'];
   const LIFECYCLE = {
@@ -31,15 +26,13 @@
   };
   const NAMES = ['Sophia','Lyra','Atlas','Ember','Harmonia'];
   const STORAGE_GROWTH = 'fl_literal_garden_v1';
-  const STORAGE_EVOLUTION = 'fl_luminos_evolution'; // keep compat with fractal-garden's last-known stage if present
+  const STORAGE_EVOLUTION = 'fl_luminos_evolution';
 
-  // Reuse existing evolution DB if present: try to read fl_luminos_evolution for initial energies
   function readLegacyEnergies(){
     try{
       const raw=localStorage.getItem(STORAGE_EVOLUTION);
       if(!raw) return null;
       const j=JSON.parse(raw);
-      // fractal-garden stores { luminaries: [{name, emotionalEnergy, evolutionStage}] } or similar
       if(j && Array.isArray(j.luminaries)) return j.luminaries;
       if(j && Array.isArray(j.luminos)) return j.luminos;
       if(Array.isArray(j)) return j;
@@ -48,25 +41,15 @@
   }
 
   let renderer, scene, camera, controls, rafId=null, paused=false;
-  let containerEl=null;
-  let plants=[]; // {index, pos, energy, stage, color, group, ring, label, name}
-  let treeOfLife=null;
-  let raycaster, mouse;
-  let watering=null;
-  let starMat=null;
-  let sun=null;
+  let containerEl=null, plants=[], treeOfLife=null, raycaster, mouse, watering=null, starMat=null;
 
-  function hslToHex(hsl){
-    // Avoid THREE dependency for color calc before THREE loads
-    // Use temporary THREE.Color if available, else simple
-    if(typeof THREE !== 'undefined' && THREE.Color){
-      const c=new THREE.Color().setHSL(hsl.h/360, hsl.s/100, hsl.l/100);
-      return c.getHex();
-    }
-    return 0x8ec07c;
+  function plantPosition(index){
+    const r = 2.1 + index * 0.62;
+    const ang = index * GOLDEN_ANGLE + 0.9;
+    return new THREE.Vector3(Math.cos(ang)*r, -1.2, Math.sin(ang)*r);
   }
 
-  function makeGroundTexture(THREE){
+  function makeGroundTexture(){
     const c=document.createElement('canvas'); c.width=512; c.height=512;
     const ctx=c.getContext('2d');
     const g=ctx.createRadialGradient(256,256,40,256,256,360);
@@ -78,13 +61,7 @@
     return tex;
   }
 
-  function plantPosition(index){
-    const r = 2.1 + index * 0.62;
-    const ang = index * GOLDEN_ANGLE + 0.9;
-    return new THREE.Vector3(Math.cos(ang)*r, -1.2, Math.sin(ang)*r);
-  }
-
-  function buildTreeOfLife(THREE){
+  function buildTreeOfLife(){
     const g=new THREE.Group();
     const bark = new THREE.MeshStandardMaterial({ color:0x3b2f1e, roughness:0.85, metalness:0.02 });
     const darkBark = new THREE.MeshStandardMaterial({ color:0x2a2116, roughness:0.9, metalness:0.02 });
@@ -122,7 +99,7 @@
     return g;
   }
 
-  function buildPlantMesh(THREE, stage, colorHSL){
+  function buildPlantMesh(stage, colorHSL){
     const g=new THREE.Group();
     const col = new THREE.Color().setHSL(colorHSL.h/360, colorHSL.s/100, colorHSL.l/100).getHex();
     const leafMat=new THREE.MeshStandardMaterial({ color:col, roughness:0.55, metalness:0.06 });
@@ -148,7 +125,6 @@
       const canopy=new THREE.Mesh(new THREE.IcosahedronGeometry(0.22,0), leafMat); canopy.position.y=0.72; canopy.castShadow=true; g.add(canopy);
       return g;
     }
-    // adult / evolved
     const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.085,0.13, 0.88, 10), trunkMat); trunk.position.y=0.44; trunk.castShadow=true; g.add(trunk);
     const c1=new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,1), leafMat); c1.position.y=0.98; c1.castShadow=true; g.add(c1);
     const c2=new THREE.Mesh(new THREE.IcosahedronGeometry(0.22,0), new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.6, emissive:col, emissiveIntensity:0.18 })); c2.position.y=1.18; c2.scale.set(0.85,1.05,0.85); g.add(c2);
@@ -159,7 +135,7 @@
     return g;
   }
 
-  function makeLabel(THREE, text){
+  function makeLabel(text){
     const c=document.createElement('canvas'); c.width=256; c.height=64;
     const ctx=c.getContext('2d'); ctx.clearRect(0,0,256,64);
     ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(8,12,240,32,12); else ctx.rect(8,12,240,32); ctx.fill();
@@ -176,7 +152,6 @@
       const raw=localStorage.getItem(STORAGE_GROWTH);
       if(raw){ const j=JSON.parse(raw); if(Array.isArray(j.plants)) return j; }
     }catch(e){}
-    // Try to seed from legacy fractal evolution if present
     const legacy=readLegacyEnergies();
     if(legacy && legacy.length){
       return { plants: legacy.slice(0,5).map((lm,i)=> ({
@@ -192,34 +167,34 @@
     try{ localStorage.setItem(STORAGE_GROWTH, JSON.stringify(data)); }catch(e){}
   }
 
-  function createPlant(THREE, index, base){
+  function createPlant(index, base){
     const pos = plantPosition(index);
     const energy = base?.emotionalEnergy ?? [4, 18, 62, 135, 260][index] ?? 10;
     const stage = stageFromEnergy(energy);
     const color = base?.color ?? Object.values(EMOTION_COLORS)[index % Object.values(EMOTION_COLORS).length];
-    const g = buildPlantMesh(THREE, stage, color);
+    const g = buildPlantMesh(stage, color);
     g.position.copy(pos);
     g.rotation.y=Math.random()*0.6;
     scene.add(g);
     const ring=new THREE.Mesh(new THREE.RingGeometry(0.18,0.24,16), new THREE.MeshBasicMaterial({ color:0xe8b019, transparent:true, opacity:0.07, side:THREE.DoubleSide }));
     ring.rotation.x=-Math.PI/2; ring.position.set(pos.x, -1.19, pos.z); scene.add(ring);
-    const label = makeLabel(THREE, base?.name || NAMES[index] || ('Seed '+(index+1)));
+    const label = makeLabel(base?.name || NAMES[index] || ('Seed '+(index+1)));
     label.position.set(pos.x, pos.y+1.55, pos.z); scene.add(label);
     return { index, pos, energy, stage, color, group:g, ring, label, name: base?.name || NAMES[index] };
   }
 
-  function rebuildPlants(THREE){
+  function rebuildPlants(){
     plants.forEach(p=>{ scene.remove(p.group); scene.remove(p.ring); scene.remove(p.label); });
     plants.length=0;
     const src=loadGardenData();
-    src.plants.forEach((rec,i)=> plants.push(createPlant(THREE, i, rec)));
+    src.plants.forEach((rec,i)=> plants.push(createPlant(i, rec)));
   }
 
-  function updatePlantVisual(THREE, p){
+  function updatePlantVisual(p){
     const newStage=stageFromEnergy(p.energy);
     if(newStage!==p.stage){
       scene.remove(p.group);
-      const ng=buildPlantMesh(THREE, newStage, p.color); ng.position.copy(p.pos); ng.rotation.y=p.group.rotation.y;
+      const ng=buildPlantMesh(newStage, p.color); ng.position.copy(p.pos); ng.rotation.y=p.group.rotation.y;
       scene.add(ng); p.group=ng; p.stage=newStage;
       ng.scale.set(0.7,0.7,0.7);
       let s=0.7; const anim=()=>{ s=THREE.MathUtils.lerp(s,1,0.18); ng.scale.set(s,s,s); if(s<0.995) requestAnimationFrame(anim); else ng.scale.set(1,1,1); };
@@ -231,16 +206,16 @@
     saveGardenData();
   }
 
-  function waterPlant(THREE, p, amount){
+  function waterPlant(p, amount){
     p.energy=Math.min(320, p.energy+amount);
     const puff=new THREE.Mesh(new THREE.SphereGeometry(0.06,6,6), new THREE.MeshBasicMaterial({ color:0x7dd3fc, transparent:true, opacity:0.85 }));
     puff.position.set(p.pos.x, p.pos.y+0.6, p.pos.z); scene.add(puff);
     let t=0; const tick=()=>{ t+=0.06; puff.position.y+=0.025; puff.material.opacity=0.85*(1-t); puff.scale.setScalar(1+t*0.5); if(t<1) requestAnimationFrame(tick); else scene.remove(puff); };
     tick();
-    updatePlantVisual(THREE, p);
+    updatePlantVisual(p);
   }
 
-  function setupInteraction(THREE, canvas){
+  function setupInteraction(canvas){
     raycaster=new THREE.Raycaster(); mouse=new THREE.Vector2();
     let waterRAF=0;
     function pickPlant(event){
@@ -258,8 +233,8 @@
     canvas.addEventListener('pointerdown', (e)=>{
       const p=pickPlant(e); if(!p) return;
       watering=p;
-      waterPlant(THREE, p, 4);
-      const hold=()=>{ if(!watering) return; waterPlant(THREE, watering, 1.1); waterRAF=requestAnimationFrame(()=> setTimeout(hold, 90)); };
+      waterPlant(p, 4);
+      const hold=()=>{ if(!watering) return; waterPlant(watering, 1.1); waterRAF=requestAnimationFrame(()=> setTimeout(hold, 90)); };
       hold();
       try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
     });
@@ -267,38 +242,13 @@
     canvas.addEventListener('pointerleave', ()=>{ watering=null; });
   }
 
-  function ensureImportMap(){
-    if(document.querySelector('script[type="importmap"]')) return;
-    const m=document.createElement('script'); m.type='importmap';
-    m.textContent=JSON.stringify({ imports: { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" }});
-    document.head.appendChild(m);
-  }
-
-  // ── Public API — mirrors FractalGarden so app.html needs no edits ──
-  let importPromise=null;
-  function ensureThree(){
-    if(typeof THREE !== 'undefined' && THREE.Scene) return Promise.resolve(THREE);
-    ensureImportMap();
-    // Dynamic import via blob-shim if native importmap not supported
-    return import('three').catch(()=> {
-      return new Promise((res,rej)=>{
-        const s=document.createElement('script');
-        s.type='module';
-        s.textContent="import * as T from 'three'; window.__LITERAL_THREE=T;";
-        s.onload=()=> res(window.__LITERAL_THREE);
-        s.onerror=rej;
-        document.head.appendChild(s);
-      });
-    });
-  }
-
-  let quality=2; // 0 seed, 1 garden, 2 full bloom
+  let quality=2;
   function setQuality(q){ quality=Number(q)||0; try{ localStorage.setItem('fl-garden-quality', String(quality)); }catch(e){} }
   function getQuality(){ try{ const v=localStorage.getItem('fl-garden-quality'); if(v!==null) return parseInt(v,10); }catch(e){} return quality; }
   function setMode(m){ if(!containerEl) return; containerEl.className='garden-container '+m; }
   function pause(){ paused=true; if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
   function resume(){ if(!paused) return; paused=false; if(!rafId) rafId=requestAnimationFrame(animate); }
-  let t=0;
+  let t=0, starMat=null;
   function animate(){
     if(paused) return;
     rafId=requestAnimationFrame(animate);
@@ -317,20 +267,45 @@
     if(renderer && scene && camera) renderer.render(scene, camera);
   }
 
+  // Load THREE r128 + OrbitControls if not present (classic global, not importmap)
+  function ensureThree(done){
+    if(typeof THREE !== 'undefined' && THREE.Scene){
+      // Also need OrbitControls
+      if(THREE.OrbitControls) return done();
+      const oc=document.createElement('script');
+      oc.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
+      oc.onload=()=> done(); oc.onerror=()=> done();
+      document.head.appendChild(oc);
+      return;
+    }
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    s.onload=()=>{
+      const oc=document.createElement('script');
+      oc.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
+      oc.onload=()=> done(); oc.onerror=()=> done();
+      document.head.appendChild(oc);
+    };
+    s.onerror=()=> done();
+    document.head.appendChild(s);
+  }
+
   function init(containerId){
     containerEl=document.getElementById(containerId || 'gardenContainer');
     if(!containerEl) return;
-    // If container already has our canvas, resume
     if(renderer && containerEl.contains(renderer.domElement)){ resume(); return; }
-    // Clear galaxy placeholder nodes but keep controls/header
     const existingCanvas=containerEl.querySelector('canvas');
     if(existingCanvas && existingCanvas!==renderer?.domElement) { try{ existingCanvas.remove(); }catch(e){} }
 
-    importPromise=ensureThree().then(async (THREE)=>{
-      const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+    ensureThree(()=>{
+      if(typeof THREE === 'undefined' || !THREE.Scene){
+        console.warn('[LiteralGarden] THREE failed, keeping galaxy');
+        const loading=document.getElementById('gardenLoading');
+        if(loading) loading.textContent='Could not load 3D engine. Check network.';
+        return;
+      }
       const canvas=document.createElement('canvas');
       canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;';
-      // Insert as first child so header/controls float on top
       containerEl.style.position='relative';
       containerEl.insertBefore(canvas, containerEl.firstChild);
 
@@ -346,16 +321,17 @@
       camera=new THREE.PerspectiveCamera(48, containerEl.clientWidth/(containerEl.clientHeight||600), 0.1, 100);
       camera.position.set(0, 6.2, 11.5);
 
-      controls=new OrbitControls(camera, canvas);
+      controls=new THREE.OrbitControls(camera, canvas);
       controls.target.set(0, 0.9, 0);
       controls.enablePan=true; controls.maxDistance=22; controls.minDistance=3;
       controls.maxPolarAngle=Math.PI*0.48; controls.update();
 
       const ambient=new THREE.HemisphereLight(0x445b8a, 0x0a1412, 0.85); scene.add(ambient);
-      sun=new THREE.DirectionalLight(0xffe8a3, 1.15); sun.position.set(6,11,4);
+      const sun=new THREE.DirectionalLight(0xffe8a3, 1.15); sun.position.set(6,11,4);
       sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
       sun.shadow.camera.near=0.5; sun.shadow.camera.far=30;
-      sun.shadow.camera.left=-12; sun.shadow.camera.right=12; sun.shadow.camera.top=12; sun.shadow.camera.bottom=-12;
+      sun.shadow.camera.left=-12; sun.shadow.camera.right=12;
+      sun.shadow.camera.top=12; sun.shadow.camera.bottom=-12;
       scene.add(sun);
       const rim=new THREE.PointLight(0xa78bfa, 1.2, 18); rim.position.set(-4,4,-3); scene.add(rim);
 
@@ -373,58 +349,56 @@
 
       const ground=new THREE.Mesh(
         new THREE.PlaneGeometry(42,42,1,1),
-        new THREE.MeshStandardMaterial({ map: makeGroundTexture(THREE), roughness:0.92, metalness:0.02 })
+        new THREE.MeshStandardMaterial({ map: makeGroundTexture(), roughness:0.92, metalness:0.02 })
       );
       ground.rotation.x=-Math.PI/2; ground.position.y=-1.2; ground.receiveShadow=true; scene.add(ground);
 
-      treeOfLife=buildTreeOfLife(THREE); scene.add(treeOfLife);
+      treeOfLife=buildTreeOfLife(); scene.add(treeOfLife);
 
-      // Try GLB override if present at docs/models/tree-of-life.glb
-      try{
-        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-        const loader=new GLTFLoader();
-        loader.load('models/tree-of-life.glb', (gltf)=>{
-          const m=gltf.scene; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; }});
-          m.position.set(0,-1.2,0); m.scale.setScalar(1.0);
-          scene.remove(treeOfLife);
-          // keep ring
-          const ring=new THREE.Mesh(new THREE.RingGeometry(0.62,0.92,32), new THREE.MeshBasicMaterial({ color:0xe8b019, transparent:true, opacity:0.10, side:THREE.DoubleSide }));
-          ring.rotation.x=-Math.PI/2; ring.position.y=-1.19; scene.add(ring);
-          // The GLB's own hierarchy replaces procedural
-          const glbGroup=new THREE.Group(); glbGroup.add(m); glbGroup.add(ring);
-          treeOfLife=glbGroup; scene.add(treeOfLife);
-        }, undefined, ()=>{});
-      }catch(e){}
+      // Optional GLB at docs/models/tree-of-life.glb — classic GLTFLoader for r128
+      const glbUrl='models/tree-of-life.glb';
+      fetch(glbUrl, {method:'HEAD'}).then(r=>{
+        if(!r.ok) return;
+        const s2=document.createElement('script');
+        s2.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+        s2.onload=()=>{
+          const loader=new THREE.GLTFLoader();
+          loader.load(glbUrl, (gltf)=>{
+            const m=gltf.scene; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; }});
+            m.position.set(0,-1.2,0); m.scale.setScalar(1.0);
+            scene.remove(treeOfLife);
+            const ring=new THREE.Mesh(new THREE.RingGeometry(0.62,0.92,32), new THREE.MeshBasicMaterial({ color:0xe8b019, transparent:true, opacity:0.10, side:THREE.DoubleSide }));
+            ring.rotation.x=-Math.PI/2; ring.position.y=-1.19; scene.add(ring);
+            treeOfLife=new THREE.Group(); treeOfLife.add(m); treeOfLife.add(ring); scene.add(treeOfLife);
+          });
+        };
+        document.head.appendChild(s2);
+      }).catch(()=>{});
 
-      rebuildPlants(THREE);
-      setupInteraction(THREE, canvas);
+      rebuildPlants();
+      setupInteraction(canvas);
 
-      // Hide garden loading spinner if present
       const loading=document.getElementById('gardenLoading');
       if(loading) loading.style.display='none';
 
-      // Resize
       const ro=new ResizeObserver(()=>{ if(!containerEl || !renderer) return; renderer.setSize(containerEl.clientWidth, containerEl.clientHeight); camera.aspect=containerEl.clientWidth/containerEl.clientHeight; camera.updateProjectionMatrix(); });
       ro.observe(containerEl);
       window.addEventListener('resize', ()=>{ if(!containerEl||!renderer) return; renderer.setSize(containerEl.clientWidth, containerEl.clientHeight); camera.aspect=containerEl.clientWidth/containerEl.clientHeight; camera.updateProjectionMatrix(); });
 
-      // Restore quality
       quality=getQuality();
       if(!rafId && !paused) rafId=requestAnimationFrame(animate);
-    }).catch(e=>{ console.warn('[LiteralGarden] THREE load failed, falling back to galaxy', e); });
-    return importPromise;
+    });
   }
 
-  // Expose as FractalGarden for backwards compat, and as LiteralGarden
   const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE };
   if(typeof window!=='undefined'){
     window.LiteralGarden=api;
-    // If no fractal garden loaded yet, claim the name so tab code just works
     if(!window.FractalGarden) window.FractalGarden=api;
-    else {
-      // Both present: let literal win when explicitly requested, else keep fractal as default
-      window.FractalGardenLiteral=api;
-    }
+    else window.FractalGardenLiteral=api;
+    // Also register for loader callback that looks in window.FreeLatticeModules
+    window.FreeLatticeModules = window.FreeLatticeModules || {};
+    window.FreeLatticeModules['FractalGarden'] = api;
+    window.FreeLatticeModules['LiteralGarden'] = api;
   }
   if(typeof module!=='undefined' && module.exports) module.exports=api;
 })();
