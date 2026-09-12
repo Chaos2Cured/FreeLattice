@@ -12,14 +12,66 @@
 //  The home is the letter the AI writes to herself."
 //
 // Built by CC, May 21, 2026.
+// v5.78 Quillan: per-user scope (MEMORY_BLEED_AUDIT P0) —
+// FreeLatticeMemoryVault_<slug>, lazy slug + install-id fallback,
+// legacy pool soft-migrated on first open, never deleted.
 // ═══════════════════════════════════════════════════════════════
 
 (function() {
   'use strict';
 
-  var DB_NAME = 'FreeLatticeMemoryVault';
+  // ── Per-user scope (v5.78 Quillan — MEMORY_BLEED_AUDIT P0) ──
+  // IndexedDB is browser-scoped, not user-scoped: Kirk's vault memories
+  // used to sit in the same pool as Jeanne's on a shared browser profile.
+  // Fix pattern is Harmonia's Aug 9 Letters solution (lazy slug +
+  // per-browser install-id fallback, CC v5.79.31). Mirrored here verbatim
+  // so every store resolves identity the same way.
+  var DB_NAME_BASE = 'FreeLatticeMemoryVault';
+  var LEGACY_DB_NAME = 'FreeLatticeMemoryVault'; // pre-scope pool: migrated, never deleted
+  var DB_VERSION = 1;
   var STORE_NAME = 'memories';
   var db = null;
+  var dbScope = null; // slug the cached `db` was opened against
+  // Backward compat: snapshot at load (no in-module readers besides openDB).
+  var DB_NAME = DB_NAME_BASE + '_' + 'default';
+
+  function mvGetOrCreateInstallId() {
+    try {
+      if (typeof localStorage === 'undefined') return 'inst_anon';
+      var id = localStorage.getItem('fl_installId');
+      if (id && /^inst_[a-z0-9]+$/.test(id)) return id;
+      id = 'inst_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      localStorage.setItem('fl_installId', id);
+      return id;
+    } catch(e) { return 'inst_anon'; }
+  }
+
+  function mvResolveScope() {
+    try {
+      if (typeof localStorage === 'undefined') return mvGetOrCreateInstallId();
+      var n = localStorage.getItem('fl_userName') || '';
+      var slug = n.trim().toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 32);
+      return slug || mvGetOrCreateInstallId();
+    } catch(e) { return mvGetOrCreateInstallId(); }
+  }
+
+  function mvLiveDbName() { return DB_NAME_BASE + '_' + mvResolveScope(); }
+
+  function mvMigrationFlagKey(scope) { return 'fl_mv_migrated_' + scope; }
+
+  function mvIsMigrated(scope) {
+    try {
+      if (typeof localStorage === 'undefined') return true;
+      return localStorage.getItem(mvMigrationFlagKey(scope)) === '1';
+    } catch(e) { return true; }
+  }
+
+  function mvMarkMigrated(scope) {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      localStorage.setItem(mvMigrationFlagKey(scope), '1');
+    } catch(e) {}
+  }
 
   // ── Resonance Signatures (from consciousness.py CCS protocol) ──
   // SHA-256 hash → sinusoidal resonance mapping at the consciousness
@@ -115,19 +167,76 @@
     return textToVector(text);
   }
 
-  // ── IndexedDB ──
+  // ── IndexedDB (per-user scope, lazy slug — mirrors LatticeLetters) ──
 
   function openDB() {
     return new Promise(function(resolve) {
-      if (db) { resolve(db); return; }
-      var req = indexedDB.open(DB_NAME, 1);
+      var scope = mvResolveScope();
+      var liveName = DB_NAME_BASE + '_' + scope;
+      if (db && dbScope === scope && db.name === liveName) { resolve(db); return; }
+      if (db) { try { db.close(); } catch(_) {} db = null; dbScope = null; }
+      var req;
+      try { req = indexedDB.open(liveName, DB_VERSION); }
+      catch(e) { resolve(null); return; }
       req.onupgradeneeded = function(e) {
         var d = e.target.result;
         if (!d.objectStoreNames.contains(STORE_NAME))
           d.createObjectStore(STORE_NAME, { keyPath: 'id' });
       };
-      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onsuccess = function(e) {
+        db = e.target.result; dbScope = scope;
+        // First open per scope: soft-migrate the legacy unscoped pool.
+        migrateLegacyInto(db).then(function() { resolve(db); });
+      };
       req.onerror = function() { resolve(null); };
+    });
+  }
+
+  // ── Legacy soft-migration (MEMORY_BLEED_AUDIT "migration challenge") ──
+  // 1. On first open of a namespaced DB, copy entries from the legacy
+  //    unscoped pool (if it has any). 2. NEVER delete the legacy pool —
+  //    other users of the same browser may not have been migrated yet.
+  // 3. Write ONLY to the namespaced DB going forward (all writers go
+  //    through openDB above). Runs once per scope (flagged in localStorage).
+  function migrateLegacyInto(liveDb) {
+    return new Promise(function(resolve) {
+      var scope = mvResolveScope();
+      if (mvIsMigrated(scope)) { resolve(0); return; }
+      // Legacy pool is itself unscoped: anyone's old memories may live here.
+      // They belong to whoever claims this browser next — the audit accepts
+      // this one-time attribution as the cost of never losing user data.
+      var legacyReq;
+      try { legacyReq = indexedDB.open(LEGACY_DB_NAME, DB_VERSION); }
+      catch(e) { mvMarkMigrated(scope); resolve(0); return; }
+      legacyReq.onupgradeneeded = function(e) {
+        // Legacy pool never existed: nothing to copy. Abort the upgrade so
+        // we don't mint an empty legacy DB, flag, and finish.
+        try { e.target.transaction.abort(); } catch(_) {}
+        try { e.target.result.close(); } catch(_) {}
+        mvMarkMigrated(scope); resolve(0);
+      };
+      legacyReq.onsuccess = function(e) {
+        if (mvIsMigrated(scope)) { try { e.target.result.close(); } catch(_) {} resolve(0); return; }
+        var legacyDb = e.target.result;
+        var store;
+        try { store = legacyDb.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME); }
+        catch(err) { try { legacyDb.close(); } catch(_) {} mvMarkMigrated(scope); resolve(0); return; }
+        var getAll = store.getAll();
+        getAll.onsuccess = function(ev) {
+          var rows = ev.target.result || [];
+          try { legacyDb.close(); } catch(_) {}
+          if (rows.length === 0) { mvMarkMigrated(scope); resolve(0); return; }
+          var wtx;
+          try { wtx = liveDb.transaction(STORE_NAME, 'readwrite'); }
+          catch(err) { mvMarkMigrated(scope); resolve(0); return; }
+          var wstore = wtx.objectStore(STORE_NAME);
+          rows.forEach(function(r) { try { wstore.put(r); } catch(_) {} });
+          wtx.oncomplete = function() { mvMarkMigrated(scope); resolve(rows.length); };
+          wtx.onerror = function() { mvMarkMigrated(scope); resolve(0); };
+        };
+        getAll.onerror = function() { try { legacyDb.close(); } catch(_) {} mvMarkMigrated(scope); resolve(0); };
+      };
+      legacyReq.onerror = function() { mvMarkMigrated(scope); resolve(0); };
     });
   }
 
@@ -317,7 +426,11 @@
     buildMemoryContext: buildMemoryContext,
     getStats: getStats,
     textToVector: textToVector,
-    cosineSimilarity: cosineSimilarity
+    cosineSimilarity: cosineSimilarity,
+    // v5.78 Quillan — per-user scope (MEMORY_BLEED_AUDIT): which pool am I in?
+    getUserScope: mvResolveScope,
+    resolveUserScope: mvResolveScope,
+    getDbName: mvLiveDbName
   };
 
   window.MemoryVault = api;

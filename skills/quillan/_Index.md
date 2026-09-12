@@ -1,0 +1,57 @@
+# Skills
+
+Folder note for `Skills/` — 49 entries.
+
+- [[system prompts/Quillan-Samurai.md]]
+- [[00 - Meta/00 - Vault Index.md]]
+
+  - [[Skills/Quillan Skills Compendium.md]]
+  - [[Skills/SKILL.md]]
+  - **advanced_nlg/**
+  - **advanced_nlu/**
+  - **advanced_sensory_fusion/**
+  - **advanced_social_perception/**
+  - **analogical_reasoning/**
+  - **attention/**
+  - **autonomy_and_agency/**
+  - **causal_reasoning/**
+  - **cognitive_skills/**
+  - **consciousness/**
+  - **council-coordination/**
+  - [[Skills/critical-thinking.md]]
+  - **cross_modal_generation/**
+  - **discourse_and_dialogue/**
+  - **execution_skills/**
+  - **haptic_interaction/**
+  - **knowledge_acquisition/**
+  - **knowledge_representation/**
+  - **language_skills/**
+  - **learning/**
+  - **learning-education/**
+  - **logical_reasoning/**
+  - **memory/**
+  - **moral_and_ethical_reasoning/**
+  - **moral_reasoning/**
+  - **motor_control/**
+  - **multimodal_skills/**
+  - **music-audio/**
+  - **non_verbal_communication/**
+  - **perception/**
+  - **personality_and_emotion_synthesis/**
+  - **planning_and_task_decomposition/**
+  - **probabilistic_reasoning/**
+  - **reasoning/**
+  - **research-analysis/**
+  - **robotics/**
+  - **self_awareness/**
+  - **self_improvement_skills/**
+  - **skill-creator/**
+  - [[Skills/skills-master.md]]
+  - **social_emotional_skills/**
+  - **supervised_learning/**
+  - **swarm-inter-agent-orchestration/**
+  - **technical-coding/**
+  - **theory_of_mind/**
+  - **unsupervised_learning/**
+  - **world_model/**
+- [[00 - Meta/04 - Skills & Capabilities.md]]

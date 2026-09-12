@@ -35,6 +35,31 @@
   var DESKTOP_HINT =
     'Swarm pull needs a modern browser (or Desktop). Import to Ollama stays on Desktop.';
 
+  // v0.2 Quillan: Metronet-safe — HTTPS-first, torrent opt-in fallback.
+  // Mirrors desktop/lattice-swarm.js transport. Browser uses localStorage
+  // flags FL_NO_TORRENT / FL_TRANSPORT so Metronet users can hard-disable
+  // torrent (no DHT/tracker packets). Default https+torrent-fallback.
+  function getTransportMode() {
+    try {
+      var raw = (typeof localStorage !== 'undefined' ? localStorage.getItem('FL_TRANSPORT') : '') || '';
+      raw = String(raw).trim().toLowerCase();
+      var noTor = (typeof localStorage !== 'undefined' ? localStorage.getItem('FL_NO_TORRENT') : '') || '';
+      // also honor process env when running under Node smoke
+      if (typeof process !== 'undefined' && process.env) {
+        if (!raw && process.env.FL_TRANSPORT) raw = String(process.env.FL_TRANSPORT).trim().toLowerCase();
+        if (!String(noTor).trim() && process.env.FL_NO_TORRENT) noTor = String(process.env.FL_NO_TORRENT).trim().toLowerCase();
+      }
+      noTor = String(noTor).trim().toLowerCase();
+      if (raw === 'https-only' || raw === 'webseed-only' || raw === 'https') return 'https-only';
+      if (raw === 'https+torrent-fallback' || raw === 'https+torrent' || raw === 'fallback') return 'https+torrent-fallback';
+      if (raw === 'torrent-first' || raw === 'magnet-first' || raw === 'legacy') return 'torrent-first';
+      if (noTor === '1' || noTor === 'true' || noTor === 'yes' || noTor === 'on') return 'https-only';
+      return 'https+torrent-fallback';
+    } catch(e) { return 'https+torrent-fallback'; }
+  }
+  function isTorrentDisabled() { return getTransportMode() === 'https-only'; }
+  function isTorrentAllowed() { return !isTorrentDisabled(); }
+
   function isZeroHash(sha) {
     var s = String(sha || '').trim().toLowerCase();
     return !s || /^0+$/.test(s);
@@ -370,6 +395,7 @@
   }
 
   function tryLoadWebTorrent() {
+    if (isTorrentDisabled()) return Promise.resolve(null);
     if (WebTorrentCtor) return Promise.resolve(WebTorrentCtor);
     if (wtLoadPromise) return wtLoadPromise;
     wtLoadPromise = loadWebTorrentScript()
@@ -387,12 +413,14 @@
   }
 
   function ensureWebTorrent() {
+    if (isTorrentDisabled()) return Promise.resolve(false);
     return tryLoadWebTorrent().then(function (ctor) {
       return !!ctor;
     });
   }
 
   function getClient() {
+    if (isTorrentDisabled()) return Promise.resolve(null);
     return tryLoadWebTorrent().then(function (WT) {
       if (!WT) return null;
       if (!wtClient) {
@@ -599,7 +627,30 @@
     };
     jobs.set(id, job);
 
-    var run = magnet ? startMagnetJob(job) : startWebseedJob(job);
+    var run;
+    var mode = getTransportMode();
+    if (webseedUrl) {
+      run = startWebseedJob(job).then(function(res) {
+        // verified / mismatch: keep it, don't fallback to torrent on tamper
+        if (res && (res.state === 'verified' || res.state === 'mismatch')) return res;
+        if (res && res.state === 'error' && magnet && isTorrentAllowed() && mode !== 'https-only') {
+          return startMagnetJob(job);
+        }
+        return res;
+      });
+    } else if (magnet) {
+      if (isTorrentDisabled()) {
+        job.state = 'error';
+        job.error = 'torrent disabled (Metronet-safe HTTPS-only mode) — provide HTTPS webseedUrl';
+        run = Promise.resolve(publicJob(job));
+      } else {
+        run = startMagnetJob(job);
+      }
+    } else {
+      job.state = 'error';
+      job.error = 'magnet or HTTPS webseed required';
+      run = Promise.resolve(publicJob(job));
+    }
     job.promise = run;
     run.catch(function (e) {
       if (job.state === 'cancelled') return;
