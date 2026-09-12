@@ -127,7 +127,83 @@
     return treeGroup;
   }
 
+
+  // ── Plant bar + Add Seed (expanding garden) ──
+  let plantBar=null, plantSelect=null;
+  function ensurePlantBar(){
+    if(plantBar) return;
+    const header=document.querySelector('#gardenContainer .garden-header') || containerEl;
+    plantBar=document.createElement('div');
+    plantBar.id='gardenPlantBar';
+    plantBar.style.cssText='display:flex;gap:8px;align-items:center;margin:8px 0 0;flex-wrap:wrap;';
+    plantBar.innerHTML='<select id="gardenPlantSelect" style="flex:1;min-width:140px;background:rgba(200,210,230,0.06);border:1px solid rgba(200,210,230,0.12);color:rgba(230,235,245,0.92);border-radius:8px;padding:6px 8px;font:13px system-ui"></select><button id="gardenAddSeedBtn" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;border-radius:999px;padding:6px 14px;cursor:pointer;font:600 12px system-ui">+ Seed</button><button id="gardenExpandBtn" style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.3);color:#a78bfa;border-radius:999px;padding:6px 12px;cursor:pointer;font:600 12px system-ui">Expand</button>';
+    // insert after garden-controls
+    const controlsEl=document.querySelector('.garden-controls');
+    if(controlsEl) controlsEl.parentNode.insertBefore(plantBar, controlsEl.nextSibling);
+    else header.appendChild(plantBar);
+    plantSelect=document.getElementById('gardenPlantSelect');
+    plantSelect.addEventListener('change', ()=>{
+      const idx=parseInt(plantSelect.value,10);
+      if(!isNaN(idx) && trees[idx]){
+        const p=trees[idx];
+        if(controls){ controls.target.copy(p.pos); controls.target.y=1.0; controls.update(); }
+        if(typeof showToast==='function') showToast('Focused '+p.name+' — '+p.stage);
+      }
+    });
+    document.getElementById('gardenAddSeedBtn').addEventListener('click', ()=>{
+      const names=['Astra','Nova','Sage','River','Wren','Cedar','Iris','Orion'];
+      const n=names[Math.floor(Math.random()*names.length)]+' '+(plants.length+1);
+      const hues=[45,140,270,340,200,175,25,220];
+      const h=hues[Math.floor(Math.random()*hues.length)];
+      addSeed(n, {h,s:70,l:50});
+    });
+    document.getElementById('gardenExpandBtn').addEventListener('click', ()=>{
+      // add 3 seeds at next phi rings
+      for(let i=0;i<3;i++) setTimeout(()=>{ const n='Seed '+(plants.length+1); addSeed(n, {h:140+Math.random()*40,s:65,l:52}); }, i*120);
+    });
+  }
+  function syncPlantBar(){
+    if(!plantSelect) return;
+    plantSelect.innerHTML='';
+    trees.forEach((p,i)=>{
+      const o=document.createElement('option');
+      o.value=String(i);
+      o.textContent=p.name+' — '+p.stage+' ('+Math.round(p.energy)+')';
+      plantSelect.appendChild(o);
+    });
+  }
+  function addSeed(name, colorHSL){
+    const idx=plants.length;
+    // phi spiral keeps expanding outward, so garden grows procedurally
+    const pos=plantPosition(idx);
+    const rec={ name, emotionalEnergy:0, color: colorHSL || {h:140,s:65,l:50} };
+    const p=createPlant(idx, rec);
+    // override pos to expanded ring (createPlant already uses phi, but we placed via plantPosition above)
+    // keep as created — already at correct expanded radius
+    plants.push(p);
+    syncPlantBar();
+    saveData(plants);
+    if(typeof showToast==='function') showToast('Planted '+name);
+    // focus new plant
+    if(controls){ controls.target.copy(p.pos); controls.target.y=1.0; controls.update(); }
+    return p;
+  }
+  function addSeedAtWorld(pos, name, colorHSL){
+    const idx=plants.length;
+    const rec={ name: name||('Seed '+(idx+1)), emotionalEnergy:0, color: colorHSL||{h:120,s:60,l:50} };
+    const p=createPlant(idx, rec);
+    // move to clicked ground pos (keep y -1.2)
+    const worldPos=new THREE.Vector3(pos.x, -1.2, pos.z);
+    p.group.position.copy(worldPos); p.pos.copy(worldPos);
+    p.ring.position.set(worldPos.x, -1.19, worldPos.z);
+    p.label.position.set(worldPos.x, worldPos.y+1.55, worldPos.z);
+    syncPlantBar(); saveData(plants);
+    return p;
+  }
+
   function rebuildTrees(){
+    // ensure bar exists before first build
+    try{ if(containerEl) ensurePlantBar(); }catch(e){}
     treeGroups.forEach(g=> scene.remove(g));
     treeGroups.length=0; trees.length=0;
     const src=loadData();
@@ -140,6 +216,7 @@
       treeGroups.push(g);
       trees.push({ name, energy:rec.energy||0, stage, group:g, index:i, pos:new THREE.Vector3(cfg.x,0,cfg.z) });
     });
+    try{ syncPlantBar(); }catch(e){}
   }
 
   function updateTreeVisual(idx){
@@ -162,6 +239,7 @@
       rec.group.scale.set(1.04,1.04,1.04); setTimeout(()=>rec.group.scale.set(1,1,1),120);
     }
     saveData(trees);
+    try{ syncPlantBar(); }catch(e){}
   }
 
   function waterTree(idx, amount){
@@ -192,6 +270,17 @@
       return best;
     }
     canvas.addEventListener('pointerdown', (e)=>{
+      // Shift+click on ground = plant seed at ground
+      if(e.shiftKey){
+        const rect=canvas.getBoundingClientRect();
+        const mv=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1, -((e.clientY-rect.top)/rect.height)*2+1);
+        const rc2=new THREE.Raycaster(); rc2.setFromCamera(mv, camera);
+        const groundMeshes=[]; scene.traverse(o=>{ if(o.isMesh && o.geometry && o.geometry.type==='CylinderGeometry') groundMeshes.push(o); });
+        // also test ground plane via y=-0.75 plane intersect
+        const plane=new THREE.Plane(new THREE.Vector3(0,1,0), 0.75);
+        const pt=new THREE.Vector3(); rc2.ray.intersectPlane(plane, pt);
+        if(pt){ addSeedAtWorld(pt, 'Seed '+(plants.length+1), {h: 90+Math.random()*60, s:62, l:52}); return; }
+      }
       const idx=pickTree(e); if(idx<0) return;
       watering=idx;
       waterTree(idx, 5);
