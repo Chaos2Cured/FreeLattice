@@ -584,7 +584,7 @@
     });
   }
 
-  const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE, waterTree };
+  const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE, waterTree, isInitialized: function(){ return !!scene && !!renderer; }, getMode: function(){ return mode; } };
   if(typeof window!=='undefined'){
     window.LiteralGarden=api;
     if(!window.FractalGarden) window.FractalGarden=api; else window.FractalGardenLiteral=api;
