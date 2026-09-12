@@ -27,7 +27,7 @@ A seeder (later) refuses what it cannot lawfully redistribute. A reader (this sh
 
 ## Pipeline order (safety-critical — print this order)
 
-1. **Acceptable signer** — stub in v0.1: unsigned catalog is OK for **read-only** list display.
+1. **Acceptable signer** — **LAYER (trust-root v0.1):** Desktop verifies Ed25519 catalog signature before honoring rows ([CATALOG_SIGN_v0.1.md](./CATALOG_SIGN_v0.1.md)). Fail closed if missing/bad. Genesis `signers` byline ≠ cryptographic signatures. Browser may still list with honesty copy; Desktop import/swarm honors only after verify.
 2. **Tier gate** — stub in v0.1: **not enforced** this PR (TransactionTrust / byte tiers later).
 3. **Licence + redistributable** — require `redistributable === true` **or REFUSE**. Show license. Never soft-pass proprietary.
 4. **Hash the file** — compare downloaded bytes to `sha256` (download **not** this PR; UI may still warn on zero-hash / EXAMPLE).
@@ -39,7 +39,13 @@ A seeder (later) refuses what it cannot lawfully redistribute. A reader (this sh
 
 ## Zero-hash / EXAMPLE rule
 
-If `sha256` is all zeros, or `notes` mark the row as EXAMPLE ONLY, the UI must say **example only — will not import**. Do not offer download or import controls in v0.1.
+**EXAMPLE** = zero-hash or notes marked EXAMPLE ONLY — will not import or re-seed.
+
+If `sha256` is all zeros, or `notes` mark the row as EXAMPLE ONLY, the UI must say **example only — will not import**. Do not offer download or import controls for that row.
+
+## withdrawn (stub)
+
+Optional: `"withdrawn": { "date": "YYYY-MM-DD", "reason": "…" }`. Clients refuse re-seed. Layer, never delete.
 
 ---
 
