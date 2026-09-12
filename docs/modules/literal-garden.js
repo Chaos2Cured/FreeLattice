@@ -28,7 +28,7 @@
   function loadData(){
     try{ const r=localStorage.getItem(STORAGE); if(r){ const j=JSON.parse(r); if(Array.isArray(j.plants)) return j; } }catch(e){}
     const leg=readLegacy();
-    if(leg && leg.length) return { plants: leg.slice(0,5).map((lm,i)=>({ name: lm.name||NAMES[i], energy: typeof lm.emotionalEnergy==='number'?lm.emotionalEnergy:[4,18,62,135,260][i])) };
+    if(leg && leg.length) return { plants: leg.slice(0,5).map((lm,i)=>({ name: lm.name||NAMES[i], energy: typeof lm.emotionalEnergy==='number'?lm.emotionalEnergy:[4,18,62,135,260][i] })) };
     return { plants: NAMES.map((n,i)=>({ name:n, energy:[4,18,62,135,260][i] })) };
   }
   function saveData(plants){ try{ localStorage.setItem(STORAGE, JSON.stringify({ plants: plants.map(p=>({ name:p.name, energy:p.energy })) })); }catch(e){} }
