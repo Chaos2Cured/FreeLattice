@@ -29726,7 +29726,8 @@ async function flManifestVerifyFetch(model, verdictEl, importBtn, rowStatus, fet
     var res = await window.electronAPI.latticeImportFetch({
       url: url,
       expectedSha256: model.sha256,
-      id: model.id || model.name || 'model'
+      id: model.id || model.name || 'model',
+      model: model
     });
     if (res && res.matched) {
       if (verdictEl) {
@@ -29783,12 +29784,19 @@ async function flManifestReseed(model, rowStatus, reseedBtn) {
     }
     rowStatus.textContent = 'Re-seeding verified file…';
     rowStatus.style.color = '';
+    if (model && model.withdrawn) {
+      rowStatus.style.color = 'rgba(240,112,104,0.9)';
+      rowStatus.textContent = 'Withdrawn — refuse re-seed (layer never delete).';
+      reseedBtn.disabled = false;
+      return;
+    }
     var res = await window.electronAPI.latticeSwarmReseedStart({
       id: id,
       name: model.name || id,
       redistributable: model.redistributable === true,
       expectedSha256: model.sha256,
-      notes: model.notes || ''
+      notes: model.notes || '',
+      withdrawn: model.withdrawn || null
     });
     if (!res || res.ok === false) {
       rowStatus.style.color = 'rgba(240,112,104,0.9)';
@@ -29802,7 +29810,8 @@ async function flManifestReseed(model, rowStatus, reseedBtn) {
     rowStatus.style.color = 'rgba(52,211,153,0.9)';
     var mag = r.magnetURI ? String(r.magnetURI) : '';
     var shortMag = mag.length > 48 ? (mag.slice(0, 28) + '…') : mag;
-    rowStatus.textContent = 'Seeding' + (r.infoHash ? (' · ' + r.infoHash.slice(0, 12) + '…') : '') + (shortMag ? (' · ' + shortMag) : '') + '. Never auto-seed.';
+    // Soft: seeding shares your IP with the swarm
+    rowStatus.textContent = 'Seeding' + (r.infoHash ? (' · ' + r.infoHash.slice(0, 12) + '…') : '') + (shortMag ? (' · ' + shortMag) : '') + '. Seeding shares your IP with the swarm. Never auto-seed.';
   } catch (e) {
     rowStatus.style.color = 'rgba(240,112,104,0.9)';
     rowStatus.textContent = 'Re-seed failed.';
@@ -29886,6 +29895,16 @@ async function flFetchModelManifest() {
       return;
     }
     var data = await res.json();
+    // v-catalog-sign-v0.1 — Desktop verifies signed catalog before honoring rows
+    var catalogAuthNote = 'Hash verifies integrity against the published catalog; catalog authenticity = signed manifest. Genesis signers byline ≠ cryptographic signatures. EXAMPLE = zero-hash / EXAMPLE ONLY — will not import.';
+    if (window.electronAPI && window.electronAPI.latticeCatalogVerify) {
+      var auth = await window.electronAPI.latticeCatalogVerify();
+      if (!auth || !auth.ok) {
+        flManifestSetStatus('Catalog signature missing or bad — fail closed. Nothing honored. ' + ((auth && auth.reason) || ''), 'warn');
+        return;
+      }
+      catalogAuthNote = (auth.honesty || catalogAuthNote) + ' Trust-root verified.';
+    }
     flManifestRenderGenesis(data);
     var models = (data && Array.isArray(data.models)) ? data.models : [];
     if (!models.length) {
@@ -29899,8 +29918,8 @@ async function flFetchModelManifest() {
     });
     var desk = !!(window.isElectronApp || window.electronAPI) && window.electronAPI && window.electronAPI.latticeImportFetch;
     flManifestSetStatus(
-      'Listed ' + shown + ' entr' + (shown === 1 ? 'y' : 'ies') + '. ' +
-      (desk ? 'Desktop may Verify & fetch (hash before Ollama). EXAMPLE will not import.' : 'Browser: catalog only — no weight download.'),
+      'Listed ' + shown + ' entr' + (shown === 1 ? 'y' : 'ies') + '. ' + catalogAuthNote + ' ' +
+      (desk ? 'Desktop may Verify & fetch (hash before Ollama).' : 'Browser: catalog only — no weight download.'),
       'ok'
     );
   } catch (e) {
