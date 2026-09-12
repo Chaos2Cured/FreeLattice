@@ -201,12 +201,122 @@
     });
     canvas.addEventListener('pointerup', ()=>{ watering=null; cancelAnimationFrame(waterRAF); });
     canvas.addEventListener('pointerleave', ()=>{ watering=null; });
+    canvas.addEventListener('contextmenu', (e)=>{
+      e.preventDefault();
+      const idx=pickTree(e);
+      showGardenMenu(e.clientX, e.clientY, idx);
+    });
   }
 
-  let quality=2;
-  function setQuality(q){ quality=Number(q)||0; try{ localStorage.setItem('fl-garden-quality', String(quality)); }catch(e){} }
-  function getQuality(){ try{ const v=localStorage.getItem('fl-garden-quality'); if(v!==null) return parseInt(v,10); }catch(e){} return quality; }
-  function setMode(m){ if(!containerEl) return; containerEl.className='garden-container '+m; }
+  // ── Right-click garden menu ──
+  let gardenMenu=null, gardenMenuTarget=-1;
+  function ensureGardenMenu(){
+    if(gardenMenu) return gardenMenu;
+    gardenMenu=document.createElement('div');
+    gardenMenu.id='literalGardenMenu';
+    gardenMenu.style.cssText='position:fixed;z-index:9999;display:none;min-width:190px;background:rgba(16,20,28,0.96);border:1px solid rgba(200,210,230,0.12);border-radius:12px;padding:6px;box-shadow:0 12px 36px rgba(0,0,0,0.55);backdrop-filter:blur(10px);font:13px system-ui;';
+    gardenMenu.innerHTML=[
+      '<button data-act="water" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">💧 Water</button>',
+      '<button data-act="waterAll" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">🌧️ Water all</button>',
+      '<button data-act="inspect" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">🔍 Inspect</button>',
+      '<button data-act="evolve" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(230,235,245,0.92);cursor:pointer;border-radius:8px;text-align:left">✨ Force evolve</button>',
+      '<div style="height:1px;background:rgba(200,210,230,0.08);margin:4px 6px"></div>',
+      '<button data-act="reset" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(255,120,120,0.9);cursor:pointer;border-radius:8px;text-align:left">♻️ Reset garden</button>',
+      '<button data-act="copyPos" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:rgba(200,210,230,0.65);cursor:pointer;border-radius:8px;text-align:left">📋 Copy pos</button>'
+    ].join('');
+    gardenMenu.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('mouseenter',()=> b.style.background='rgba(200,210,230,0.08)');
+      b.addEventListener('mouseleave',()=> b.style.background='none');
+      b.addEventListener('click',()=>{
+        const act=b.dataset.act;
+        const idx=gardenMenuTarget;
+        if(act==='water' && idx>=0) waterTree(idx, 6);
+        if(act==='waterAll') trees.forEach((_,i)=> setTimeout(()=>waterTree(i,4), i*90));
+        if(act==='inspect' && idx>=0){
+          const r=trees[idx];
+          if(r && typeof showToast==='function') showToast(r.name+': '+r.stage+' — energy '+Math.round(r.energy)+' / next '+(LIFECYCLE[STAGE_ORDER[STAGE_ORDER.indexOf(r.stage)+1]]?.t||'—'));
+        }
+        if(act==='evolve' && idx>=0){
+          const r=trees[idx]; if(r){ const nxt=STAGE_ORDER[STAGE_ORDER.indexOf(r.stage)+1]; if(nxt) { r.energy=LIFECYCLE[nxt].t; updateTreeVisual(idx); } }
+        }
+        if(act==='reset'){ try{ localStorage.removeItem(STORAGE);}catch(e){} location.reload(); }
+        if(act==='copyPos' && idx>=0){
+          const r=trees[idx]; const txt=r? r.pos.x.toFixed(2)+','+r.pos.y.toFixed(2)+','+r.pos.z.toFixed(2):'0,0,0';
+          navigator.clipboard?.writeText(txt); if(typeof showToast==='function') showToast('Copied '+txt);
+        }
+        hideGardenMenu();
+      });
+    });
+    document.body.appendChild(gardenMenu);
+    document.addEventListener('click', e=>{ if(gardenMenu && !gardenMenu.contains(e.target)) hideGardenMenu(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') hideGardenMenu(); });
+    return gardenMenu;
+  }
+  function showGardenMenu(x,y, idx){
+    const m=ensureGardenMenu(); gardenMenuTarget=idx;
+    // enable/disable per-target
+    m.querySelectorAll('[data-act="water"],[data-act="inspect"],[data-act="evolve"],[data-act="copyPos"]').forEach(b=>{ b.style.opacity= idx>=0? '1':'0.35'; b.style.pointerEvents= idx>=0? 'auto':'none'; });
+    m.style.left=Math.min(x, innerWidth - 200)+'px'; m.style.top=Math.min(y, innerHeight - 220)+'px'; m.style.display='block';
+  }
+  function hideGardenMenu(){ if(gardenMenu) gardenMenu.style.display='none'; gardenMenuTarget=-1; }
+
+  let quality=2, qualityLevel=2, mode='observe';
+  function applyQualityToMeshes(){
+    // Scale star count / particle opacity by quality
+    const scale={0:0.3,1:0.6,2:1.0}[qualityLevel]||1.0;
+    if(starMat){ starMat.opacity=0.35*scale + 0.15; starMat.size=0.07*scale; }
+    // Dim rings in Seed mode
+    if(scene){
+      scene.traverse(o=>{ if(o.isMesh && o.material && o.geometry && o.geometry.type==='RingGeometry'){ o.material.opacity=(0.28 - (o.geometry.parameters.innerRadius*0.004))*scale; } });
+    }
+  }
+  function setQuality(q){
+    const lvl=parseInt(q,10);
+    if(isNaN(lvl)||lvl<0||lvl>2) return;
+    quality=qualityLevel=lvl;
+    try{ localStorage.setItem('fl-garden-quality', String(lvl)); }catch(e){}
+    document.querySelectorAll('.garden-quality-btn').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.quality,10)===lvl));
+    try{ applyQualityToMeshes(); }catch(e){}
+    if(typeof showToast==='function'){
+      const labels=['🌱 Seed — quiet and still','🌿 Garden — alive and breathing','🌟 Full Bloom — everything at once'];
+      showToast(labels[lvl]);
+    }
+  }
+  function getQuality(){ try{ const v=localStorage.getItem('fl-garden-quality'); if(v!==null) return parseInt(v,10); }catch(e){} return qualityLevel; }
+  function setMode(newMode){
+    if(!['observe','explore','immerse'].includes(newMode)) return;
+    mode=newMode;
+    if(containerEl) containerEl.className='garden-container '+newMode;
+    ['gardenModeObserve','gardenModeExplore','gardenModeImmerse'].forEach((id,idx)=>{
+      const btn=document.getElementById(id);
+      if(btn) btn.classList.toggle('active', ['observe','explore','immerse'][idx]===newMode);
+    });
+    if(controls){
+      if(newMode==='observe'){
+        controls.autoRotate=true; controls.autoRotateSpeed=1.2; controls.enableZoom=false; controls.enablePan=false; controls.enableRotate=false;
+        setTimeout(()=>{ if(mode==='observe'&&controls) controls.autoRotateSpeed=0.3; },2000);
+      } else if(newMode==='explore'){
+        controls.autoRotate=false; controls.enableZoom=true; controls.enablePan=true; controls.enableRotate=true;
+      } else if(newMode==='immerse'){
+        controls.autoRotate=true; controls.autoRotateSpeed=0.15; controls.enableZoom=true; controls.enablePan=false; controls.enableRotate=true;
+      }
+    }
+    if(newMode==='immerse'){
+      if(containerEl) containerEl.classList.add('immersive');
+      if(containerEl && containerEl.requestFullscreen) containerEl.requestFullscreen().catch(()=>{});
+    } else {
+      if(containerEl) containerEl.classList.remove('immersive');
+      if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    }
+    if(typeof showToast==='function'){
+      const m={ observe:'Observing the Garden…', explore:'Free camera — drag to explore', immerse:'Immersive mode' };
+      if(m[newMode]) showToast(m[newMode]);
+    }
+    if(controls) controls.update();
+  }
+  // fullscreen exit -> back to observe
+  document.addEventListener('fullscreenchange', ()=>{ if(!document.fullscreenElement && mode==='immerse') setMode('observe'); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && mode==='immerse') setMode('observe'); });
   function pause(){ paused=true; if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
   function resume(){ if(!paused) return; paused=false; if(!rafId) rafId=requestAnimationFrame(animate); }
   let t=0;
