@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_13 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_13" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_13');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  // Stage 3: Fully Grown Ancient Sovereign Sequoia (Sophia Tier)
+// Self-contained Three.js interactive asset
+(function() {
+  const container = document.getElementById('threejs-container-fullygrown') || document.body;
+  const getW = () => container.clientWidth || window.innerWidth || 600;
+  const getH = () => container.clientHeight || window.innerHeight || 600;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x06110c, 0.015);
+
+  const camera = new THREE.PerspectiveCamera(45, getW() / getH(), 0.1, 800);
+  camera.position.set(0, 15, 30);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(getW(), getH());
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+
+  // Lighting
+  const amb = new THREE.AmbientLight(0x132a21, 2.4);
+  scene.add(amb);
+  const moon = new THREE.DirectionalLight(0x6ee7b7, 3.2);
+  moon.position.set(20, 45, 20);
+  moon.castShadow = true;
+  scene.add(moon);
+  const underGlow = new THREE.PointLight(0x10b981, 4.5, 35);
+  underGlow.position.set(0, 3, 0);
+  scene.add(underGlow);
+  const amberGlow = new THREE.PointLight(0xfbbf24, 3.0, 30);
+  amberGlow.position.set(8, 8, 8);
+  scene.add(amberGlow);
+
+  // Massive Island Soil Bed
+  const islandGeo = new THREE.CylinderGeometry(20, 22, 2.0, 64);
+  const islandMat = new THREE.MeshLambertMaterial({ color: 0x091410 });
+  const island = new THREE.Mesh(islandGeo, islandMat);
+  island.position.y = -1.0;
+  island.receiveShadow = true;
+  scene.add(island);
+
+  // Concentric runic rings
+  for (let r = 5; r <= 18; r += 4) {
+    const rGeo = new THREE.RingGeometry(r - 0.06, r + 0.06, 64);
+    const rMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.25 - (r * 0.01), side: THREE.DoubleSide });
+    const rMesh = new THREE.Mesh(rGeo, rMat);
+    rMesh.rotation.x = -Math.PI / 2;
+    rMesh.position.y = 0.03;
+    scene.add(rMesh);
+  }
+
+  // Ancient Tree
+  const ancientGroup = new THREE.Group();
+  scene.add(ancientGroup);
+
+  const barkMat = new THREE.MeshLambertMaterial({ color: 0x2b1c14 });
+  const leafMat = new THREE.MeshStandardMaterial({
+    color: 0x10b981,
+    emissive: 0x064e3b,
+    emissiveIntensity: 0.45,
+    roughness: 0.35,
+    flatShading: true
+  });
+  const flowerMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+
+  // 8 Buttress Root Flares
+  for (let i = 0; i < 8; i++) {
+    const ang = (i / 8) * Math.PI * 2;
+    const rGeo = new THREE.CylinderGeometry(0.3, 0.9, 5.5, 8);
+    const rMesh = new THREE.Mesh(rGeo, barkMat);
+    rMesh.position.set(Math.cos(ang) * 2.6, 0.6, Math.sin(ang) * 2.6);
+    rMesh.rotation.z = Math.cos(ang) * 0.75;
+    rMesh.rotation.x = Math.sin(ang) * 0.75;
+    rMesh.castShadow = true;
+    ancientGroup.add(rMesh);
+  }
+
+  // Massive Girth Trunk with 3 Sections
+  const trunkLower = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2.4, 6, 16), barkMat);
+  trunkLower.position.y = 3;
+  trunkLower.castShadow = true;
+  ancientGroup.add(trunkLower);
+
+  const trunkUpper = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.5, 7, 14), barkMat);
+  trunkUpper.position.y = 8.5;
+  trunkUpper.castShadow = true;
+  ancientGroup.add(trunkUpper);
+
+  // Recursive Canopy Branches
+  function createCanopyTier(yPos, branchCount, spreadRadius, leafRadius) {
+    for (let b = 0; b < branchCount; b++) {
+      const bAng = (b / branchCount) * Math.PI * 2 + (yPos * 0.4);
+      const bPivot = new THREE.Group();
+      bPivot.position.y = yPos;
+      bPivot.rotation.y = bAng;
+      bPivot.rotation.z = 0.68;
+
+      const branchGeo = new THREE.CylinderGeometry(0.2, 0.45, spreadRadius, 8);
+      const branchMesh = new THREE.Mesh(branchGeo, barkMat);
+      branchMesh.position.y = spreadRadius * 0.45;
+      branchMesh.castShadow = true;
+      bPivot.add(branchMesh);
+
+      // Foliage Clusters
+      const folCluster = new THREE.Group();
+      folCluster.position.y = spreadRadius * 0.9;
+
+      const numOrbs = 3;
+      for (let o = 0; o < numOrbs; o++) {
+        const folGeo = new THREE.DodecahedronGeometry(leafRadius * (0.8 + Math.random() * 0.4), 1);
+        const fol = new THREE.Mesh(folGeo, leafMat);
+        fol.position.set((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 2);
+        fol.castShadow = true;
+        folCluster.add(fol);
+
+        // Bioluminescent Orbs
+        const orb = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), flowerMat);
+        orb.position.copy(fol.position).add(new THREE.Vector3(0, 0.5, 0));
+        folCluster.add(orb);
+      }
+
+      bPivot.add(folCluster);
+      ancientGroup.add(bPivot);
+    }
+  }
+
+  createCanopyTier(6.5, 5, 6.0, 2.2); // Lower canopy
+  createCanopyTier(10.0, 6, 5.0, 2.0); // Mid canopy
+  createCanopyTier(12.5, 4, 3.5, 1.8); // High crown
+
+  // Sovereign Halo Ring
+  const haloGeo = new THREE.TorusGeometry(5.2, 0.12, 16, 64);
+  const haloMat = new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.6 });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.rotation.x = Math.PI / 2;
+  halo.position.y = 2.5;
+  ancientGroup.add(halo);
+
+  // Spores
+  const pCount = 180;
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount * 3; i += 3) {
+    pPos[i] = (Math.random() - 0.5) * 25;
+    pPos[i + 1] = Math.random() * 18 + 0.5;
+    pPos[i + 2] = (Math.random() - 0.5) * 25;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({ size: 0.35, color: 0x6ee7b7, transparent: true, opacity: 0.85 });
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // Orbit
+  let isDown = false, px = 0, py = 0, angle = 0, camY = 15, dist = 30;
+  window.addEventListener('mousedown', e => { isDown = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    angle -= (e.clientX - px) * 0.008;
+    camY = Math.max(3, Math.min(25, camY + (e.clientY - py) * 0.03));
+    px = e.clientX; py = e.clientY;
+  });
+  window.addEventListener('mouseup', () => isDown = false);
+  window.addEventListener('resize', () => {
+    camera.aspect = getW() / getH();
+    camera.updateProjectionMatrix();
+    renderer.setSize(getW(), getH());
+  });
+
+  let clock = new THREE.Clock();
+  function loop() {
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    if (!isDown) angle += 0.003;
+    camera.position.x = dist * Math.sin(angle);
+    camera.position.z = dist * Math.cos(angle);
+    camera.position.y = camY;
+    camera.lookAt(0, 8, 0);
+
+    halo.rotation.z += 0.008;
+    halo.scale.setScalar(1 + Math.sin(t * 1.8) * 0.06);
+    underGlow.intensity = 4.0 + Math.sin(t * 2) * 1.2;
+
+    renderer.render(scene, camera);
+  }
+  loop();
+})();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_13 -->
+</body>
+</html>

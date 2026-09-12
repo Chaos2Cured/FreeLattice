@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_15 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_15" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_15');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  // Variant: Weeping Willow of Coordination (Fluid tendril boughs & cascading golden spore weeping branches)
+(function() {
+  const container = document.getElementById('threejs-container-willow') || document.body;
+  const getW = () => container.clientWidth || window.innerWidth || 600;
+  const getH = () => container.clientHeight || window.innerHeight || 600;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x08120e, 0.018);
+
+  const camera = new THREE.PerspectiveCamera(45, getW() / getH(), 0.1, 800);
+  camera.position.set(0, 14, 28);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(getW(), getH());
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+
+  // Lighting
+  const amb = new THREE.AmbientLight(0x11241a, 2.4);
+  scene.add(amb);
+  const moon = new THREE.DirectionalLight(0xa7f3d0, 3.0);
+  moon.position.set(15, 35, 15);
+  moon.castShadow = true;
+  scene.add(moon);
+  const amberGlow = new THREE.PointLight(0xf59e0b, 4.5, 35);
+  amberGlow.position.set(0, 4, 0);
+  scene.add(amberGlow);
+
+  // Soil island bed
+  const soilGeo = new THREE.CylinderGeometry(16, 18, 1.5, 64);
+  const soilMat = new THREE.MeshLambertMaterial({ color: 0x09140f });
+  const soil = new THREE.Mesh(soilGeo, soilMat);
+  soil.position.y = -0.75;
+  soil.receiveShadow = true;
+  scene.add(soil);
+
+  // Glowing ripple rings
+  for (let r = 4; r <= 14; r += 3) {
+    const rGeo = new THREE.RingGeometry(r - 0.05, r + 0.05, 48);
+    const rMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.3 - r * 0.015, side: THREE.DoubleSide });
+    const rMesh = new THREE.Mesh(rGeo, rMat);
+    rMesh.rotation.x = -Math.PI / 2;
+    rMesh.position.y = 0.03;
+    scene.add(rMesh);
+  }
+
+  const treeGroup = new THREE.Group();
+  scene.add(treeGroup);
+
+  const barkMat = new THREE.MeshLambertMaterial({ color: 0x332014 });
+  const vineMat = new THREE.MeshStandardMaterial({
+    color: 0x10b981,
+    emissive: 0x044e3b,
+    emissiveIntensity: 0.4,
+    roughness: 0.3,
+    wireframe: false
+  });
+  const emberMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
+
+  // 6 Curving Buttress Roots
+  for (let i = 0; i < 6; i++) {
+    const ang = (i / 6) * Math.PI * 2;
+    const rCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 1.2, 0),
+      new THREE.Vector3(Math.cos(ang) * 1.8, 0.4, Math.sin(ang) * 1.8),
+      new THREE.Vector3(Math.cos(ang) * 3.4, 0.05, Math.sin(ang) * 3.4)
+    ]);
+    const rGeo = new THREE.TubeGeometry(rCurve, 16, 0.4, 8, false);
+    const rMesh = new THREE.Mesh(rGeo, barkMat);
+    rMesh.castShadow = true;
+    treeGroup.add(rMesh);
+  }
+
+  // Gnarled, twisting trunk
+  const trunkCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0.4, 3.5, 0.2),
+    new THREE.Vector3(-0.3, 7.0, -0.1),
+    new THREE.Vector3(0, 10.5, 0)
+  ]);
+  const trunkGeo = new THREE.TubeGeometry(trunkCurve, 32, 1.1, 12, false);
+  const trunkMesh = new THREE.Mesh(trunkGeo, barkMat);
+  trunkMesh.castShadow = true;
+  treeGroup.add(trunkMesh);
+
+  // Arched High Branches with Cascading Weeping Vines
+  const weepingVines = [];
+  const mainBranchCount = 7;
+
+  for (let b = 0; b < mainBranchCount; b++) {
+    const bAng = (b / mainBranchCount) * Math.PI * 2 + 0.2;
+    const branchCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 10.0, 0),
+      new THREE.Vector3(Math.cos(bAng) * 3.0, 12.0, Math.sin(bAng) * 3.0),
+      new THREE.Vector3(Math.cos(bAng) * 6.5, 11.2, Math.sin(bAng) * 6.5),
+      new THREE.Vector3(Math.cos(bAng) * 8.5, 8.5, Math.sin(bAng) * 8.5)
+    ]);
+    const branchGeo = new THREE.TubeGeometry(branchCurve, 24, 0.35, 8, false);
+    const bMesh = new THREE.Mesh(branchGeo, barkMat);
+    bMesh.castShadow = true;
+    treeGroup.add(bMesh);
+
+    // Cascading Weeping Tendrils
+    const tendrilCount = 6;
+    for (let v = 0; v < tendrilCount; v++) {
+      const u = 0.4 + (v / tendrilCount) * 0.6;
+      const pt = branchCurve.getPoint(u);
+      const vineLen = 4.5 + Math.random() * 3.5;
+      const vCurve = new THREE.CatmullRomCurve3([
+        pt,
+        new THREE.Vector3(pt.x + (Math.random() - 0.5) * 0.8, pt.y - vineLen * 0.5, pt.z + (Math.random() - 0.5) * 0.8),
+        new THREE.Vector3(pt.x + (Math.random() - 0.5) * 1.4, pt.y - vineLen, pt.z + (Math.random() - 0.5) * 1.4)
+      ]);
+      const vGeo = new THREE.TubeGeometry(vCurve, 16, 0.07, 6, false);
+      const vMesh = new THREE.Mesh(vGeo, vineMat);
+      vMesh.castShadow = true;
+      treeGroup.add(vMesh);
+      weepingVines.push({ mesh: vMesh, baseRot: vMesh.rotation.y, phase: Math.random() * Math.PI * 2 });
+
+      // Glowing tips
+      const tipGeo = new THREE.SphereGeometry(0.2, 8, 8);
+      const tip = new THREE.Mesh(tipGeo, emberMat);
+      tip.position.set(pt.x, pt.y - vineLen, pt.z);
+      treeGroup.add(tip);
+    }
+  }
+
+  // Atmospheric spore particles
+  const pCount = 140;
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount * 3; i += 3) {
+    pPos[i] = (Math.random() - 0.5) * 20;
+    pPos[i + 1] = Math.random() * 15 + 0.5;
+    pPos[i + 2] = (Math.random() - 0.5) * 20;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({ size: 0.3, color: 0xfde047, transparent: true, opacity: 0.85 });
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // Orbit controls
+  let isDown = false, px = 0, py = 0, angle = 0, camY = 14, dist = 28;
+  window.addEventListener('mousedown', e => { isDown = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    angle -= (e.clientX - px) * 0.008;
+    camY = Math.max(2, Math.min(22, camY + (e.clientY - py) * 0.025));
+    px = e.clientX; py = e.clientY;
+  });
+  window.addEventListener('mouseup', () => isDown = false);
+  window.addEventListener('resize', () => {
+    camera.aspect = getW() / getH();
+    camera.updateProjectionMatrix();
+    renderer.setSize(getW(), getH());
+  });
+
+  let clock = new THREE.Clock();
+  function loop() {
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    if (!isDown) angle += 0.004;
+    camera.position.x = dist * Math.sin(angle);
+    camera.position.z = dist * Math.cos(angle);
+    camera.position.y = camY;
+    camera.lookAt(0, 6.5, 0);
+
+    // Wind sway on weeping branches
+    weepingVines.forEach(v => {
+      v.mesh.rotation.z = Math.sin(t * 1.5 + v.phase) * 0.04;
+      v.mesh.rotation.x = Math.cos(t * 1.2 + v.phase) * 0.04;
+    });
+    amberGlow.intensity = 4.0 + Math.sin(t * 2.2) * 1.2;
+
+    renderer.render(scene, camera);
+  }
+  loop();
+})();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_15 -->
+</body>
+</html>

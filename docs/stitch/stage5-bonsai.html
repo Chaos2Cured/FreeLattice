@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_16 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_16" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_16');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  // Variant: Crystalline Geometric Bonsai & Prismatic Lotus Flora (Fractal Polyhedral Growth Stage)
+(function() {
+  const container = document.getElementById('threejs-container-crystal-bonsai') || document.body;
+  const getW = () => container.clientWidth || window.innerWidth || 600;
+  const getH = () => container.clientHeight || window.innerHeight || 600;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0c0c1a, 0.02);
+
+  const camera = new THREE.PerspectiveCamera(45, getW() / getH(), 0.1, 600);
+  camera.position.set(0, 8, 18);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(getW(), getH());
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+
+  // Dynamic Lighting
+  const amb = new THREE.AmbientLight(0x1e1533, 2.5);
+  scene.add(amb);
+  const cyanLight = new THREE.PointLight(0x38bdf8, 3.5, 20);
+  cyanLight.position.set(-6, 8, 6);
+  scene.add(cyanLight);
+  const magentaLight = new THREE.PointLight(0xf43f5e, 4.0, 22);
+  magentaLight.position.set(6, 6, -4);
+  scene.add(magentaLight);
+  const coreLight = new THREE.PointLight(0xa855f7, 4.5, 18);
+  coreLight.position.set(0, 3, 0);
+  scene.add(coreLight);
+
+  // Hexagonal Obsidian Pedestal
+  const pedGeo = new THREE.CylinderGeometry(8, 9, 1.2, 6);
+  const pedMat = new THREE.MeshLambertMaterial({ color: 0x0f0b18 });
+  const pedestal = new THREE.Mesh(pedGeo, pedMat);
+  pedestal.position.y = -0.6;
+  pedestal.receiveShadow = true;
+  scene.add(pedestal);
+
+  // Hexagonal runic rings
+  const hexRingGeo = new THREE.RingGeometry(5.5, 5.7, 6);
+  const hexRingMat = new THREE.MeshBasicMaterial({ color: 0xc084fc, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+  const hexRing = new THREE.Mesh(hexRingGeo, hexRingMat);
+  hexRing.rotation.x = -Math.PI / 2;
+  hexRing.position.y = 0.03;
+  scene.add(hexRing);
+
+  const bonsaiGroup = new THREE.Group();
+  scene.add(bonsaiGroup);
+
+  // Crystalline Trunk Materials (Faceted Shading)
+  const trunkMat = new THREE.MeshStandardMaterial({
+    color: 0x1f1730,
+    roughness: 0.35,
+    flatShading: true
+  });
+  const crystalMat = new THREE.MeshStandardMaterial({
+    color: 0xa855f7,
+    emissive: 0x581c87,
+    emissiveIntensity: 0.7,
+    roughness: 0.15,
+    flatShading: true,
+    transparent: true,
+    opacity: 0.9
+  });
+  const amberCrystalMat = new THREE.MeshStandardMaterial({
+    color: 0xfbbf24,
+    emissive: 0x92400e,
+    emissiveIntensity: 0.6,
+    roughness: 0.2,
+    flatShading: true
+  });
+
+  // Angular Fractal Trunk (Bonsai silhouette with 3 segmented bends)
+  const seg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 1.2, 3.2, 6), trunkMat);
+  seg1.position.set(0, 1.6, 0);
+  seg1.rotation.z = -0.25;
+  bonsaiGroup.add(seg1);
+
+  const seg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 3.0, 6), trunkMat);
+  seg2.position.set(0.6, 4.2, 0.3);
+  seg2.rotation.z = 0.45;
+  seg2.rotation.x = -0.2;
+  bonsaiGroup.add(seg2);
+
+  const seg3 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2.8, 6), trunkMat);
+  seg3.position.set(0.2, 6.4, 0.1);
+  seg3.rotation.z = -0.3;
+  bonsaiGroup.add(seg3);
+
+  // Prismatic Polyhedral Foliage Clouds & Floating Shards
+  const floatingCrystals = [];
+
+  function createCrystalCanopy(x, y, z, scale, colorMat) {
+    const cluster = new THREE.Group();
+    cluster.position.set(x, y, z);
+
+    // Central polyhedral node
+    const coreGeo = new THREE.OctahedronGeometry(1.6 * scale, 0);
+    const coreMesh = new THREE.Mesh(coreGeo, colorMat);
+    coreMesh.castShadow = true;
+    cluster.add(coreMesh);
+
+    // Orbiting faceted shards
+    for (let s = 0; s < 5; s++) {
+      const sGeo = new THREE.TetrahedronGeometry(0.5 * scale, 0);
+      const sMesh = new THREE.Mesh(sGeo, amberCrystalMat);
+      const ang = (s / 5) * Math.PI * 2;
+      sMesh.position.set(Math.cos(ang) * 2.2 * scale, (Math.random() - 0.5) * 1.2 * scale, Math.sin(ang) * 2.2 * scale);
+      sMesh.rotation.set(Math.random() * 2, Math.random() * 2, Math.random() * 2);
+      cluster.add(sMesh);
+      floatingCrystals.push({ mesh: sMesh, speed: 0.02 + Math.random() * 0.02, axis: ang });
+    }
+
+    bonsaiGroup.add(cluster);
+    return cluster;
+  }
+
+  createCrystalCanopy(-1.8, 4.8, 0.5, 1.0, crystalMat); // Lower left terrace
+  createCrystalCanopy(2.2, 5.8, -0.6, 1.1, crystalMat); // Mid right terrace
+  createCrystalCanopy(0.3, 7.8, 0.2, 1.35, crystalMat); // Crown apex
+
+  // Bioluminescent Ground Crystals & Prismatic Flora
+  for (let c = 0; c < 7; c++) {
+    const cAng = (c / 7) * Math.PI * 2 + 0.4;
+    const cGeo = new THREE.ConeGeometry(0.25 + Math.random() * 0.15, 1.6 + Math.random() * 0.8, 5);
+    const cMesh = new THREE.Mesh(cGeo, amberCrystalMat);
+    cMesh.position.set(Math.cos(cAng) * (3.5 + Math.random() * 2.5), 0.8, Math.sin(cAng) * (3.5 + Math.random() * 2.5));
+    cMesh.rotation.x = (Math.random() - 0.5) * 0.4;
+    cMesh.rotation.z = (Math.random() - 0.5) * 0.4;
+    scene.add(cMesh);
+  }
+
+  // Floating crystalline dust / spores
+  const pCount = 90;
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount * 3; i += 3) {
+    pPos[i] = (Math.random() - 0.5) * 14;
+    pPos[i + 1] = Math.random() * 10 + 0.5;
+    pPos[i + 2] = (Math.random() - 0.5) * 14;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({ size: 0.35, color: 0x38bdf8, transparent: true, opacity: 0.8 });
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // Orbit controls
+  let isDown = false, px = 0, py = 0, angle = 0, camY = 8, dist = 18;
+  window.addEventListener('mousedown', e => { isDown = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    angle -= (e.clientX - px) * 0.01;
+    camY = Math.max(1, Math.min(15, camY + (e.clientY - py) * 0.02));
+    px = e.clientX; py = e.clientY;
+  });
+  window.addEventListener('mouseup', () => isDown = false);
+  window.addEventListener('resize', () => {
+    camera.aspect = getW() / getH();
+    camera.updateProjectionMatrix();
+    renderer.setSize(getW(), getH());
+  });
+
+  let clock = new THREE.Clock();
+  function loop() {
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    if (!isDown) angle += 0.006;
+    camera.position.x = dist * Math.sin(angle);
+    camera.position.z = dist * Math.cos(angle);
+    camera.position.y = camY;
+    camera.lookAt(0, 4.5, 0);
+
+    // Animate shard rotations
+    floatingCrystals.forEach((fc, idx) => {
+      fc.mesh.rotation.y += fc.speed;
+      fc.mesh.rotation.x += fc.speed * 0.7;
+      fc.mesh.position.y += Math.sin(t * 2 + idx) * 0.005;
+    });
+
+    coreLight.intensity = 4.0 + Math.sin(t * 2.5) * 1.5;
+    cyanLight.position.x = -6 + Math.sin(t * 1.4) * 1.5;
+
+    renderer.render(scene, camera);
+  }
+  loop();
+})();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_16 -->
+</body>
+</html>
