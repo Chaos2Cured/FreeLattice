@@ -509,6 +509,10 @@ async function startReseed(opts) {
   if (latticeImport.isZeroHash(o.expectedSha256) || latticeImport.isExampleRow({ notes: o.notes, sha256: o.expectedSha256 })) {
     throw new Error('EXAMPLE / zero-hash — refuse re-seed');
   }
+  // withdrawn stub — refuse re-seed; layer never delete
+  if (typeof latticeImport.isWithdrawn === 'function' && latticeImport.isWithdrawn(o)) {
+    throw new Error('withdrawn — refuse re-seed');
+  }
   const verifiedPath = latticeImport.getVerifiedPathForId(id);
   if (!verifiedPath || !fs.existsSync(verifiedPath)) {
     throw new Error('not verified — will not re-seed');

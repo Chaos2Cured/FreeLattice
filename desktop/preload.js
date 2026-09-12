@@ -141,8 +141,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeImportStatus: () => ipcRenderer.invoke('lattice-import-status'),
 
   /**
-   * HTTPS fetch → quarantine → hash. Renderer passes url + expectedSha256 + id only.
-   * @param {{ url: string, expectedSha256: string, id: string }} opts
+   * Catalog trust-root v0.1 — verify signed catalog before honoring rows.
+   */
+  latticeCatalogVerify: () => ipcRenderer.invoke('lattice-catalog-verify'),
+
+  /**
+   * HTTPS fetch → quarantine → hash. Pass model row for fail-closed catalog honor.
+   * @param {{ url: string, expectedSha256: string, id: string, model?: object }} opts
    */
   latticeImportFetch: (opts) => ipcRenderer.invoke('lattice-import-fetch', opts),
 

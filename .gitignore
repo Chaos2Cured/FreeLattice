@@ -12,3 +12,7 @@ desktop/app/*.png
 desktop/src-tauri/target/
 desktop/src-tauri/gen/
 desktop/telegram-worker/node_modules/
+
+# Catalog / trust-root private material — never commit
+desktop/.secrets/
+

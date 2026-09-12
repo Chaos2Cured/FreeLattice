@@ -1075,10 +1075,18 @@ function setupIPC() {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }
   });
+  // v-catalog-sign-v0.1 — verify signed catalog before honoring rows
+  ipcMain.handle('lattice-catalog-verify', async () => {
+    try {
+      return latticeImport.verifyCatalogFromDisk(path.join(__dirname, '..'));
+    } catch (e) {
+      return { ok: false, reason: String(e && e.message ? e.message : e) };
+    }
+  });
   ipcMain.handle('lattice-import-fetch', async (_event, opts) => {
     try {
       const o = opts || {};
-      return await latticeImport.fetchAndHash(o.url, o.expectedSha256, o.id);
+      return await latticeImport.fetchAndHash(o.url, o.expectedSha256, o.id, o.model);
     } catch (e) {
       return { ok: false, matched: false, willNotImport: true, error: String(e && e.message ? e.message : e) };
     }

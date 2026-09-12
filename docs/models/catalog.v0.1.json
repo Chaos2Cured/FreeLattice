@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "updated": "2026-09-09",
+  "updated": "2026-09-12",
   "kind": "genesis",
   "note": "Genesis catalog — named signers · sunset toward Infinite (89 / 1095). Never quietly waive. EXAMPLE zero-hash will not import. fixture.verify-only has real sha256 + webseeds.",
   "genesis": {
@@ -33,7 +33,7 @@
       "urls": [
         "https://freelattice.com/models/example-placeholder.txt"
       ],
-      "notes": "EXAMPLE ONLY — zero hash means do not import"
+      "notes": "EXAMPLE ONLY — zero hash means do not import. EXAMPLE = placeholder row, not a weight."
     },
     {
       "id": "fixture.verify-only",
@@ -49,5 +49,15 @@
       ],
       "notes": "FIXTURE — tiny real sha256 for hash-before-import + swarm webseed smoke. Not a model weight."
     }
-  ]
+  ],
+  "trust": {
+    "catalogSign": "Ed25519",
+    "domain": "lattice.catalog.v1",
+    "pubkey": "./catalog-sign.v0.1.pubkey.json",
+    "note": "hash verifies integrity against the published catalog; catalog authenticity = signed manifest. genesis.signers byline ≠ cryptographic signatures."
+  },
+  "schemaNotes": {
+    "EXAMPLE": "EXAMPLE = zero-hash or notes marked EXAMPLE ONLY — will not import or re-seed.",
+    "withdrawn": "Optional model.withdrawn: { date, reason? }. Clients refuse re-seed of withdrawn rows. Layer, never delete."
+  }
 }

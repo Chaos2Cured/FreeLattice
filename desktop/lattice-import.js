@@ -11,9 +11,12 @@ const http = require('http');
 const https = require('https');
 const path = require('path');
 const { URL } = require('url');
+const latticeCatalog = require('./lattice-catalog');
 
 let appRef = null;
 let smokeRoot = null;
+/** Last successful catalog authenticity proof — required before honoring rows. */
+let lastCatalogAuth = null;
 
 /** id → absolute verified path (main memory only; not exposed as writable path API). */
 const verifiedById = new Map();
@@ -54,11 +57,49 @@ function isZeroHash(sha) {
 }
 
 function isExampleRow(model) {
-  if (!model) return true;
-  const notes = String(model.notes || '');
-  if (/EXAMPLE ONLY/i.test(notes)) return true;
-  if (isZeroHash(model.sha256)) return true;
-  return false;
+  return latticeCatalog.isExampleRow(model);
+}
+
+function getCatalogAuth() {
+  return lastCatalogAuth;
+}
+
+/**
+ * Verify signed catalog (fail closed). Call before honoring any row.
+ * v-catalog-sign-v0.1 / trust-root
+ */
+function verifyCatalogFromDisk(repoRoot) {
+  const root = repoRoot || path.join(__dirname, '..');
+  const catalogPath = path.join(root, 'docs', 'models', 'catalog.v0.1.json');
+  const sigPath = path.join(root, 'docs', 'models', 'catalog.v0.1.json.sig');
+  const result = latticeCatalog.verifyCatalogFiles(catalogPath, sigPath, root);
+  lastCatalogAuth = result.ok ? result : null;
+  return result;
+}
+
+function verifyCatalogPayload(catalogBytes, sigDoc, repoRoot) {
+  const pinned = latticeCatalog.loadPinnedPubkey(repoRoot || path.join(__dirname, '..'));
+  if (
+    sigDoc &&
+    sigDoc.publicKeyFingerprintHex &&
+    String(sigDoc.publicKeyFingerprintHex).toLowerCase() !==
+      String(pinned.doc.fingerprintHex).toLowerCase()
+  ) {
+    lastCatalogAuth = null;
+    return { ok: false, reason: 'signature fingerprint does not match pinned trust-root' };
+  }
+  const result = latticeCatalog.verifyCatalogBytes(
+    catalogBytes,
+    sigDoc,
+    pinned.publicKeyBytes
+  );
+  lastCatalogAuth = result.ok ? result : null;
+  return result;
+}
+
+function honorModelRow(model) {
+  latticeCatalog.assertRowHonorable(model, lastCatalogAuth);
+  return true;
 }
 
 function assertHttpsUrl(urlStr) {
@@ -226,9 +267,22 @@ function ingestAndVerify(buffer, expectedSha256, id) {
 
 /**
  * HTTPS download to quarantine, hash, promote on match.
+ * Optional model row — fail closed unless catalog authenticity proven.
  */
-async function fetchAndHash(url, expectedSha256, id) {
+async function fetchAndHash(url, expectedSha256, id, model) {
   assertHttpsUrl(url);
+  if (model) {
+    try {
+      honorModelRow(model);
+    } catch (e) {
+      return {
+        ok: false,
+        matched: false,
+        willNotImport: true,
+        reason: String(e && e.message ? e.message : e)
+      };
+    }
+  }
   if (isZeroHash(expectedSha256)) {
     return {
       ok: false,
@@ -351,5 +405,10 @@ module.exports = {
   assertHttpsUrl,
   sha256Buffer,
   verifiedById,
-  verifiedDir
+  verifiedDir,
+  verifyCatalogFromDisk,
+  verifyCatalogPayload,
+  honorModelRow,
+  getCatalogAuth,
+  isWithdrawn: latticeCatalog.isWithdrawn
 };

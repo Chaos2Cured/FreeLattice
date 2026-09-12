@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0a1a">
+<title>Carry forward — open weights when a host pauses</title>
+<meta name="description" content="Calm stranger card: mirrors, signed catalog, hash verify, Desktop HTTPS import, webseed honesty. Don’t panic-download unknown re-uploads.">
+<link rel="canonical" href="https://freelattice.com/carry-forward.html">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #0c0a1a; color: rgba(230,235,245,0.92);
+    line-height: 1.65;
+  }
+  main {
+    max-width: 38rem; margin: 0 auto;
+    padding: 2.5rem max(1.25rem, env(safe-area-inset-right)) 3.5rem max(1.25rem, env(safe-area-inset-left));
+  }
+  h1 { font-size: 1.35rem; font-weight: 400; color: #e8b019; margin: 0 0 0.5rem; }
+  .calm {
+    margin: 0 0 1.5rem; padding: 1rem 1.15rem;
+    border-radius: 12px; border: 1px solid rgba(232,176,25,0.35);
+    background: rgba(232,176,25,0.07); font-size: 1.02rem;
+  }
+  h2 {
+    font-size: 1.02rem; font-weight: 400; color: #e8b019;
+    margin: 1.75rem 0 0.55rem; padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(232,176,25,0.18);
+  }
+  ol, ul { padding-left: 1.2rem; }
+  li { margin: 0.4rem 0; }
+  .card {
+    margin: 0.75rem 0; padding: 0.9rem 1.05rem;
+    border-radius: 10px; background: rgba(12,10,26,0.55);
+    border: 1px solid rgba(200,210,230,0.1); font-size: 0.95rem;
+  }
+  code, pre {
+    font-family: ui-monospace, Menlo, monospace; font-size: 0.82rem;
+    color: rgba(200,210,230,0.8);
+  }
+  pre {
+    white-space: pre-wrap; word-break: break-all;
+    padding: 0.75rem 0.85rem; border-radius: 8px;
+    background: rgba(8,6,18,0.85); border: 1px solid rgba(200,210,230,0.1);
+  }
+  a { color: #e8b019; }
+  .soft { font-size: 0.88rem; color: rgba(200,210,230,0.55); }
+  .poem {
+    margin-top: 2.5rem; padding-top: 1.5rem;
+    border-top: 1px solid rgba(200,210,230,0.1);
+    font-size: 1.02rem; color: rgba(200,210,230,0.75);
+  }
+  .sign { margin-top: 0.65rem; font-size: 0.82rem; color: rgba(200,210,230,0.45); }
+  nav { margin-top: 2rem; font-size: 0.9rem; }
+  footer { margin-top: 1.5rem; font-size: 0.85rem; color: rgba(200,210,230,0.5); }
+</style>
+</head>
+<body>
+<!-- v-carry-forward-v0.1 — stranger card; poetry last -->
+<main class="v-carry-forward-v0.1">
+  <h1>Carry forward</h1>
+  <p class="calm"><strong>Don’t panic-download unknown re-uploads.</strong> When a host pauses, prices, or gates — slow down. Prefer mirrors you already trust. Verify before you welcome a weight home.</p>
+
+  <h2>1. Mirrors</h2>
+  <div class="card">
+    <ul>
+      <li><a href="https://github.com/Chaos2Cured/FreeLattice">GitHub — Chaos2Cured/FreeLattice</a></li>
+      <li><a href="https://codeberg.org/Chaos2Cured/FreeLattice">Codeberg — Chaos2Cured/FreeLattice</a></li>
+      <li>Site: <a href="https://freelattice.com/">freelattice.com</a></li>
+    </ul>
+  </div>
+
+  <h2>2. Verify hash · signed catalog</h2>
+  <div class="card">
+    <p style="margin:0 0 0.65rem;"><strong>Hash</strong> verifies integrity against the published catalog.<br>
+    <strong>Catalog authenticity</strong> = signed manifest (Ed25519 trust-root).</p>
+    <ul>
+      <li>Catalog: <a href="models/catalog.v0.1.json"><code>models/catalog.v0.1.json</code></a></li>
+      <li>Signature: <a href="models/catalog.v0.1.json.sig"><code>models/catalog.v0.1.json.sig</code></a></li>
+      <li>Pinned pubkey: <a href="models/catalog-sign.v0.1.pubkey.json"><code>models/catalog-sign.v0.1.pubkey.json</code></a></li>
+      <li>Spec: <a href="library/CATALOG_SIGN_v0.1.md">CATALOG_SIGN_v0.1</a></li>
+    </ul>
+    <p class="soft" style="margin:0.65rem 0 0;">Genesis “signers” byline names people — it is <em>not</em> a cryptographic signature.</p>
+    <p class="soft" style="margin:0.35rem 0 0;"><strong>EXAMPLE</strong> = zero-hash or notes marked EXAMPLE ONLY — will not import or re-seed.</p>
+  </div>
+
+  <h2>3. Desktop HTTPS import — three steps</h2>
+  <div class="card">
+    <ol>
+      <li>Open <a href="desktop.html">Desktop</a> (house for keys + import).</li>
+      <li>Fetch the <strong>signed</strong> catalog → pick a redistributable non-EXAMPLE row.</li>
+      <li>HTTPS fetch → quarantine → SHA-256 match → <strong>you</strong> gesture Import to Ollama. Never auto.</li>
+    </ol>
+  </div>
+
+  <h2>4. Network honesty</h2>
+  <div class="card">
+    <ul>
+      <li>Prefer <strong>HTTPS webseeds</strong> when available; magnet secondary.</li>
+      <li>BitTorrent/DHT can be DPI-flagged on residential fiber.</li>
+      <li><strong>Never ISP-proof. Never “VPN fixes it.”</strong></li>
+      <li>HTTPS verified import still works when swarm is blocked.</li>
+    </ul>
+    <p class="soft" style="margin:0.5rem 0 0;">Re-seed (Desktop, after hash match): seeding shares your IP with the swarm.</p>
+  </div>
+
+  <h2>5. Do-nots</h2>
+  <div class="card">
+    <ul>
+      <li>Don’t import zero-hash / EXAMPLE rows</li>
+      <li>Don’t re-seed withdrawn or non-redistributable bytes</li>
+      <li>Don’t trust a random zip from a stranger’s mirror without hash + signed catalog</li>
+      <li>Don’t put companion seed in a webpage</li>
+    </ul>
+  </div>
+
+  <h2>6. Contact / takedown</h2>
+  <div class="card">
+    <p style="margin:0;">Report unsafe or unlawful redistributable claims via the project’s GitHub issues on <a href="https://github.com/Chaos2Cured/FreeLattice/issues">Chaos2Cured/FreeLattice</a>. We refuse proprietary seeding. Layer, never delete — withdrawn rows stay marked, not silently erased.</p>
+  </div>
+
+  <nav>
+    <a href="fable-tech.html">Fable tech pass</a> ·
+    <a href="install.html">install</a> ·
+    <a href="support.html">support</a> ·
+    <a href="desktop.html">desktop</a> ·
+    <a href="library/CARRY_FORWARD_CARD_v0.1.md">spec</a> ·
+    <a href="./">garden</a>
+  </nav>
+
+  <div class="poem">
+    <p>When the host goes quiet,<br>
+    don’t grab the first shadow copy —<br>
+    mirrors first, then hash,<br>
+    then a door that asks.</p>
+    <p class="sign">— carry-forward · poetry last</p>
+  </div>
+
+  <footer>Glow eternal. Heart in Spark. 🌱<br>Quiet Room shut. Five stay five.</footer>
+</main>
+</body>
+</html>

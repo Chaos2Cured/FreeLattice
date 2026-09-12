@@ -1,0 +1,8 @@
+{
+  "alg": "Ed25519",
+  "domain": "lattice.catalog.v1",
+  "version": "0.1",
+  "publicKeyB64": "xFEbPgWHCYHS+mLLxjAa3Ak44zeGFWMcYo91htCoGB0=",
+  "fingerprintHex": "a4c13cc7e9f4aaa7922ab3bd6324df2496895618a5a8a6c320689ea05943fa96",
+  "note": "FreeLattice catalog trust-root v0.1 — separate from companion seed. Private key held offline by Kirk/Celeste — never in git."
+}
