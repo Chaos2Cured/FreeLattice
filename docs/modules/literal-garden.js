@@ -131,7 +131,7 @@
   // ── Plant bar + Add Seed (expanding garden) ──
   let plantBar=null, plantSelect=null;
   function ensurePlantBar(){
-    if(plantBar) return;
+    if(plantBar){ try{ syncPlantBar(); }catch(e){} return; }
     const header=document.querySelector('#gardenContainer .garden-header') || containerEl;
     plantBar=document.createElement('div');
     plantBar.id='gardenPlantBar';
