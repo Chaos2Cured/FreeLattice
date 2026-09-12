@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_12 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_12" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_12');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  // Stage 2: Mid-Growth Branching Tree (Adolescent Arbor / Bough Network)
+// Self-contained Three.js interactive asset
+(function() {
+  const container = document.getElementById('threejs-container-midgrowth') || document.body;
+  const getW = () => container.clientWidth || window.innerWidth || 600;
+  const getH = () => container.clientHeight || window.innerHeight || 600;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a1410, 0.018);
+
+  const camera = new THREE.PerspectiveCamera(45, getW() / getH(), 0.1, 500);
+  camera.position.set(0, 9, 20);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(getW(), getH());
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+
+  // Lighting
+  const amb = new THREE.AmbientLight(0x1a3328, 2.2);
+  scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xfef08a, 2.8);
+  dir.position.set(15, 30, 15);
+  dir.castShadow = true;
+  scene.add(dir);
+  const warmGlow = new THREE.PointLight(0xfbbf24, 3.2, 25);
+  warmGlow.position.set(0, 5, 0);
+  scene.add(warmGlow);
+
+  // Soil Bed with Mycelial Veins
+  const soilGeo = new THREE.CylinderGeometry(12, 13, 1.2, 48);
+  const soilMat = new THREE.MeshLambertMaterial({ color: 0x09140f });
+  const soil = new THREE.Mesh(soilGeo, soilMat);
+  soil.position.y = -0.6;
+  soil.receiveShadow = true;
+  scene.add(soil);
+
+  // Tree Materials
+  const woodMat = new THREE.MeshLambertMaterial({ color: 0x2e1e15 });
+  const foliageMat = new THREE.MeshStandardMaterial({
+    color: 0x10b981,
+    emissive: 0x044e3b,
+    emissiveIntensity: 0.35,
+    roughness: 0.4,
+    flatShading: true
+  });
+  const fruitMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+
+  const treeGroup = new THREE.Group();
+  scene.add(treeGroup);
+
+  // Exposed Root Flares (4 roots)
+  for (let r = 0; r < 4; r++) {
+    const rAngle = (r / 4) * Math.PI * 2 + 0.3;
+    const rootGeo = new THREE.CylinderGeometry(0.2, 0.45, 3.2, 8);
+    const root = new THREE.Mesh(rootGeo, woodMat);
+    root.position.set(Math.cos(rAngle) * 1.2, 0.3, Math.sin(rAngle) * 1.2);
+    root.rotation.z = Math.cos(rAngle) * 0.7;
+    root.rotation.x = Math.sin(rAngle) * 0.7;
+    root.castShadow = true;
+    treeGroup.add(root);
+  }
+
+  // Trunk
+  const trunkGeo = new THREE.CylinderGeometry(0.5, 0.9, 7.5, 12);
+  const trunk = new THREE.Mesh(trunkGeo, woodMat);
+  trunk.position.y = 3.75;
+  trunk.castShadow = true;
+  treeGroup.add(trunk);
+
+  // Secondary Main Branches (4 branches branching out at mid-height)
+  const branchAngles = [0, Math.PI * 0.55, Math.PI * 1.1, Math.PI * 1.6];
+  branchAngles.forEach((ang, idx) => {
+    const pivot = new THREE.Group();
+    pivot.position.y = 5.2;
+    pivot.rotation.y = ang;
+    pivot.rotation.z = 0.65;
+
+    const bGeo = new THREE.CylinderGeometry(0.25, 0.4, 4.2, 8);
+    const bMesh = new THREE.Mesh(bGeo, woodMat);
+    bMesh.position.y = 2.1;
+    bMesh.castShadow = true;
+    pivot.add(bMesh);
+
+    // Sub branches & Foliage Canopies
+    for (let sub = -1; sub <= 1; sub += 2) {
+      const subP = new THREE.Group();
+      subP.position.y = 3.5;
+      subP.rotation.y = sub * 0.6;
+      subP.rotation.z = sub * 0.4;
+
+      const subGeo = new THREE.CylinderGeometry(0.12, 0.22, 2.5, 6);
+      const subMesh = new THREE.Mesh(subGeo, woodMat);
+      subMesh.position.y = 1.25;
+      subP.add(subMesh);
+
+      // Clustered Dodecahedron Foliage
+      const folGeo = new THREE.DodecahedronGeometry(1.6 + Math.random() * 0.4, 1);
+      const folMesh = new THREE.Mesh(folGeo, foliageMat);
+      folMesh.position.y = 2.5;
+      folMesh.castShadow = true;
+      subP.add(folMesh);
+
+      // Glowing Seed Fruit
+      const fGeo = new THREE.SphereGeometry(0.3, 8, 8);
+      const fMesh = new THREE.Mesh(fGeo, fruitMat);
+      fMesh.position.set((Math.random() - 0.5) * 1.2, 2.7, (Math.random() - 0.5) * 1.2);
+      subP.add(fMesh);
+
+      pivot.add(subP);
+    }
+
+    treeGroup.add(pivot);
+  });
+
+  // Central Top Foliage Dome
+  const topFolGeo = new THREE.IcosahedronGeometry(2.4, 1);
+  const topFol = new THREE.Mesh(topFolGeo, foliageMat);
+  topFol.position.y = 8.5;
+  topFol.castShadow = true;
+  treeGroup.add(topFol);
+
+  // Interactive Orbit
+  let isDown = false, px = 0, py = 0, angle = 0.5, camY = 9, dist = 20;
+  window.addEventListener('mousedown', e => { isDown = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    angle -= (e.clientX - px) * 0.01;
+    camY = Math.max(2, Math.min(16, camY + (e.clientY - py) * 0.02));
+    px = e.clientX; py = e.clientY;
+  });
+  window.addEventListener('mouseup', () => isDown = false);
+  window.addEventListener('resize', () => {
+    camera.aspect = getW() / getH();
+    camera.updateProjectionMatrix();
+    renderer.setSize(getW(), getH());
+  });
+
+  let clock = new THREE.Clock();
+  function loop() {
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    if (!isDown) angle += 0.005;
+    camera.position.x = dist * Math.sin(angle);
+    camera.position.z = dist * Math.cos(angle);
+    camera.position.y = camY;
+    camera.lookAt(0, 5, 0);
+
+    warmGlow.intensity = 2.8 + Math.sin(t * 2) * 0.8;
+    treeGroup.rotation.y = Math.sin(t * 0.3) * 0.03;
+    renderer.render(scene, camera);
+  }
+  loop();
+})();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_12 -->
+</body>
+</html>

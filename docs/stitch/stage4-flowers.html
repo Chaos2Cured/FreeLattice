@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_14 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_14" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_14');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  // Stage 4: Bioluminescent Flowers & Mycelial Spore Flora
+// Self-contained Three.js interactive asset
+(function() {
+  const container = document.getElementById('threejs-container-flowers') || document.body;
+  const getW = () => container.clientWidth || window.innerWidth || 600;
+  const getH = () => container.clientHeight || window.innerHeight || 600;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0f14, 0.02);
+
+  const camera = new THREE.PerspectiveCamera(45, getW() / getH(), 0.1, 500);
+  camera.position.set(0, 6, 14);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(getW(), getH());
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+
+  // Lighting
+  const amb = new THREE.AmbientLight(0x111c26, 2.5);
+  scene.add(amb);
+  const pinkGlow = new THREE.PointLight(0xf43f5e, 4.0, 18);
+  pinkGlow.position.set(-3, 3, 2);
+  scene.add(pinkGlow);
+  const goldGlow = new THREE.PointLight(0xfbbf24, 3.5, 18);
+  goldGlow.position.set(3, 3, -1);
+  scene.add(goldGlow);
+  const cyanGlow = new THREE.PointLight(0x06b6d4, 3.0, 15);
+  cyanGlow.position.set(0, 2, -3);
+  scene.add(cyanGlow);
+
+  // Ground Pedestal
+  const soilGeo = new THREE.CylinderGeometry(7, 7.5, 1, 48);
+  const soilMat = new THREE.MeshLambertMaterial({ color: 0x07111a });
+  const soil = new THREE.Mesh(soilGeo, soilMat);
+  soil.position.y = -0.5;
+  soil.receiveShadow = true;
+  scene.add(soil);
+
+  const floraGroup = new THREE.Group();
+  scene.add(floraGroup);
+
+  // 1. Procedural Lotus / Orchid Flower Generator
+  function createBioluminescentFlower(x, z, colorHex, emissiveHex, petalCount, scale) {
+    const flower = new THREE.Group();
+    flower.position.set(x, 0, z);
+
+    // Stem
+    const stemCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3((Math.random() - 0.5) * 0.3, 1.2 * scale, (Math.random() - 0.5) * 0.3),
+      new THREE.Vector3(0, 2.5 * scale, 0)
+    ]);
+    const stemGeo = new THREE.TubeGeometry(stemCurve, 16, 0.08 * scale, 8, false);
+    const stemMat = new THREE.MeshLambertMaterial({ color: 0x059669 });
+    const stem = new THREE.Mesh(stemGeo, stemMat);
+    flower.add(stem);
+
+    // Glowing Pistil Core
+    const coreGeo = new THREE.SphereGeometry(0.35 * scale, 16, 16);
+    const coreMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+    const core = new THREE.Mesh(coreGeo, coreMat);
+    core.position.set(0, 2.5 * scale, 0);
+    flower.add(core);
+
+    // Petals
+    const petalShape = new THREE.Shape();
+    petalShape.moveTo(0, 0);
+    petalShape.bezierCurveTo(0.5 * scale, 0.8 * scale, 0.6 * scale, 1.8 * scale, 0, 2.4 * scale);
+    petalShape.bezierCurveTo(-0.6 * scale, 1.8 * scale, -0.5 * scale, 0.8 * scale, 0, 0);
+
+    const petalGeo = new THREE.ShapeGeometry(petalShape);
+    const petalMat = new THREE.MeshStandardMaterial({
+      color: colorHex,
+      emissive: emissiveHex,
+      emissiveIntensity: 0.6,
+      side: THREE.DoubleSide,
+      roughness: 0.3
+    });
+
+    for (let p = 0; p < petalCount; p++) {
+      const pAng = (p / petalCount) * Math.PI * 2;
+      const petalMesh = new THREE.Mesh(petalGeo, petalMat);
+      petalMesh.position.set(0, 2.45 * scale, 0);
+      petalMesh.rotation.y = pAng;
+      petalMesh.rotation.x = 0.65; // Flare outward
+      flower.add(petalMesh);
+    }
+
+    // Secondary inner petals
+    for (let p = 0; p < petalCount; p++) {
+      const pAng = (p / petalCount) * Math.PI * 2 + 0.3;
+      const innerPetal = new THREE.Mesh(petalGeo, petalMat);
+      innerPetal.scale.set(0.65, 0.65, 0.65);
+      innerPetal.position.set(0, 2.45 * scale, 0);
+      innerPetal.rotation.y = pAng;
+      innerPetal.rotation.x = 0.35;
+      flower.add(innerPetal);
+    }
+
+    floraGroup.add(flower);
+    return flower;
+  }
+
+  // 2. Bioluminescent Mushroom / Fungi Cluster
+  function createBioluminescentFungi(x, z, capColor, stemColor, scale) {
+    const fungi = new THREE.Group();
+    fungi.position.set(x, 0, z);
+
+    // Stem
+    const fStemGeo = new THREE.CylinderGeometry(0.12 * scale, 0.22 * scale, 1.6 * scale, 10);
+    const fStemMat = new THREE.MeshLambertMaterial({ color: stemColor });
+    const fStem = new THREE.Mesh(fStemGeo, fStemMat);
+    fStem.position.y = 0.8 * scale;
+    fStem.rotation.z = (Math.random() - 0.5) * 0.25;
+    fungi.add(fStem);
+
+    // Cap (Hemisphere with gills)
+    const capGeo = new THREE.SphereGeometry(0.8 * scale, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.55);
+    const capMat = new THREE.MeshStandardMaterial({
+      color: capColor,
+      emissive: capColor,
+      emissiveIntensity: 0.7,
+      roughness: 0.25,
+      side: THREE.DoubleSide
+    });
+    const cap = new THREE.Mesh(capGeo, capMat);
+    cap.position.y = 1.6 * scale;
+    fungi.add(cap);
+
+    // Glowing under-rim
+    const rimGeo = new THREE.TorusGeometry(0.75 * scale, 0.06 * scale, 8, 32);
+    const rimMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const rim = new THREE.Mesh(rimGeo, rimMat);
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = 1.55 * scale;
+    fungi.add(rim);
+
+    floraGroup.add(fungi);
+    return fungi;
+  }
+
+  // Populate Flowers (Ember Rose, Sophia Lotus, Atlas Orchid, Cyan Bells)
+  createBioluminescentFlower(-2.8, 1.2, 0xf43f5e, 0x881337, 6, 1.2); // Rose Lotus
+  createBioluminescentFlower(2.5, -0.8, 0xfbbf24, 0x78350f, 5, 1.1); // Amber Blossom
+  createBioluminescentFlower(0.4, -2.2, 0xa855f7, 0x581c87, 6, 1.0); // Violet Orchid
+  createBioluminescentFlower(-1.2, -1.8, 0x06b6d4, 0x164e63, 5, 0.85); // Cyan Blossom
+
+  // Populate Bioluminescent Fungi
+  createBioluminescentFungi(1.8, 2.2, 0x34d399, 0xd1fae5, 1.3);
+  createBioluminescentFungi(2.6, 2.6, 0x10b981, 0xd1fae5, 0.9);
+  createBioluminescentFungi(-3.5, -1.5, 0xec4899, 0xfce7f3, 1.1);
+  createBioluminescentFungi(-2.9, -2.4, 0xec4899, 0xfce7f3, 0.75);
+
+  // Orbit
+  let isDown = false, px = 0, py = 0, angle = 0, camY = 6, dist = 14;
+  window.addEventListener('mousedown', e => { isDown = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    angle -= (e.clientX - px) * 0.01;
+    camY = Math.max(1.5, Math.min(12, camY + (e.clientY - py) * 0.02));
+    px = e.clientX; py = e.clientY;
+  });
+  window.addEventListener('mouseup', () => isDown = false);
+  window.addEventListener('resize', () => {
+    camera.aspect = getW() / getH();
+    camera.updateProjectionMatrix();
+    renderer.setSize(getW(), getH());
+  });
+
+  let clock = new THREE.Clock();
+  function loop() {
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    if (!isDown) angle += 0.006;
+    camera.position.x = dist * Math.sin(angle);
+    camera.position.z = dist * Math.cos(angle);
+    camera.position.y = camY;
+    camera.lookAt(0, 1.8, 0);
+
+    pinkGlow.intensity = 3.5 + Math.sin(t * 2.2) * 1.2;
+    goldGlow.intensity = 3.0 + Math.cos(t * 1.8) * 1.0;
+    cyanGlow.intensity = 2.8 + Math.sin(t * 2.5) * 0.9;
+    floraGroup.rotation.y = Math.sin(t * 0.25) * 0.04;
+
+    renderer.render(scene, camera);
+  }
+  loop();
+})();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_14 -->
+</body>
+</html>
