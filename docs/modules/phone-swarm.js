@@ -599,7 +599,9 @@
     };
     jobs.set(id, job);
 
-    var run = magnet ? startMagnetJob(job) : startWebseedJob(job);
+    // Prefer HTTPS webseed when present — DHT/P2P can be DPI-flagged; magnet secondary.
+    // v-fable-tech-pass-v0.1 swarm network honesty (one-line prefer).
+    var run = webseedUrl ? startWebseedJob(job) : startMagnetJob(job);
     job.promise = run;
     run.catch(function (e) {
       if (job.state === 'cancelled') return;

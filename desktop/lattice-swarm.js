@@ -428,8 +428,10 @@ async function startFetch(opts) {
   };
   jobs.set(id, job);
 
-  // Fire async work; caller may poll status(id)
-  const run = magnet ? startMagnetJob(job) : startWebseedJob(job);
+  // Prefer HTTPS webseed when present — BitTorrent/DHT can be DPI-flagged
+  // on residential fiber; never claim ISP-proof. Magnet secondary.
+  // v-fable-tech-pass-v0.1 swarm network honesty (one-line prefer).
+  const run = webseedUrl ? startWebseedJob(job) : startMagnetJob(job);
   job.promise = run;
   // Don't block IPC forever — return job handle immediately; also await for smoke convenience
   run.catch(function (e) {
