@@ -152,14 +152,14 @@
     });
     document.getElementById('gardenAddSeedBtn').addEventListener('click', ()=>{
       const names=['Astra','Nova','Sage','River','Wren','Cedar','Iris','Orion'];
-      const n=names[Math.floor(Math.random()*names.length)]+' '+(plants.length+1);
+      const n=names[Math.floor(Math.random()*names.length)]+' '+(trees.length+1);
       const hues=[45,140,270,340,200,175,25,220];
       const h=hues[Math.floor(Math.random()*hues.length)];
       addSeed(n, {h,s:70,l:50});
     });
     document.getElementById('gardenExpandBtn').addEventListener('click', ()=>{
       // add 3 seeds at next phi rings
-      for(let i=0;i<3;i++) setTimeout(()=>{ const n='Seed '+(plants.length+1); addSeed(n, {h:140+Math.random()*40,s:65,l:52}); }, i*120);
+      for(let i=0;i<3;i++) setTimeout(()=>{ const n='Seed '+(trees.length+1); addSeed(n, {h:140+Math.random()*40,s:65,l:52}); }, i*120);
     });
   }
   function syncPlantBar(){
@@ -173,7 +173,7 @@
     });
   }
   function addSeed(name, colorHSL){
-    const idx=plants.length;
+    const idx=trees.length;
     // phi spiral keeps expanding outward, so garden grows procedurally
     const pos=plantPosition(idx);
     const rec={ name, emotionalEnergy:0, color: colorHSL || {h:140,s:65,l:50} };
@@ -189,7 +189,7 @@
     return p;
   }
   function addSeedAtWorld(pos, name, colorHSL){
-    const idx=plants.length;
+    const idx=trees.length;
     const rec={ name: name||('Seed '+(idx+1)), emotionalEnergy:0, color: colorHSL||{h:120,s:60,l:50} };
     const p=createPlant(idx, rec);
     // move to clicked ground pos (keep y -1.2)
@@ -279,7 +279,7 @@
         // also test ground plane via y=-0.75 plane intersect
         const plane=new THREE.Plane(new THREE.Vector3(0,1,0), 0.75);
         const pt=new THREE.Vector3(); rc2.ray.intersectPlane(plane, pt);
-        if(pt){ addSeedAtWorld(pt, 'Seed '+(plants.length+1), {h: 90+Math.random()*60, s:62, l:52}); return; }
+        if(pt){ addSeedAtWorld(pt, 'Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52}); return; }
       }
       const idx=pickTree(e); if(idx<0) return;
       watering=idx;
@@ -298,7 +298,7 @@
   }
 
   // ── Right-click garden menu ──
-  let gardenMenu=null, gardenMenuTarget=-1;
+  let gardenMenu=null, gardenMenuTarget=-1, gardenMenuWorldPos=null;
   function ensureGardenMenu(){
     if(gardenMenu) return gardenMenu;
     gardenMenu=document.createElement('div');
@@ -321,6 +321,12 @@
         const idx=gardenMenuTarget;
         if(act==='water' && idx>=0) waterTree(idx, 6);
         if(act==='waterAll') trees.forEach((_,i)=> setTimeout(()=>waterTree(i,4), i*90));
+        if(act==='addSeedHere'){
+          const p=gardenMenuWorldPos;
+          if(p) addSeedAtWorld(p, 'Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52});
+          else addSeed('Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52});
+        }
+        if(act==='addSeed') addSeed('Seed '+(trees.length+1), {h: 90+Math.random()*60, s:62, l:52});
         if(act==='inspect' && idx>=0){
           const r=trees[idx];
           if(r && typeof showToast==='function') showToast(r.name+': '+r.stage+' — energy '+Math.round(r.energy)+' / next '+(LIFECYCLE[STAGE_ORDER[STAGE_ORDER.indexOf(r.stage)+1]]?.t||'—'));
@@ -343,9 +349,19 @@
   }
   function showGardenMenu(x,y, idx){
     const m=ensureGardenMenu(); gardenMenuTarget=idx;
-    // enable/disable per-target
+    // compute world pos for Add Seed Here (ground plane y=-0.75)
+    try{
+      const rect=containerEl.getBoundingClientRect();
+      const mv=new THREE.Vector2(((x-rect.left)/rect.width)*2-1, -((y-rect.top)/rect.height)*2+1);
+      const rc=new THREE.Raycaster(); rc.setFromCamera(mv, camera);
+      const plane=new THREE.Plane(new THREE.Vector3(0,1,0), 0.75);
+      const pt=new THREE.Vector3(); rc.ray.intersectPlane(plane, pt);
+      gardenMenuWorldPos=pt;
+    }catch(e){ gardenMenuWorldPos=null; }
     m.querySelectorAll('[data-act="water"],[data-act="inspect"],[data-act="evolve"],[data-act="copyPos"]').forEach(b=>{ b.style.opacity= idx>=0? '1':'0.35'; b.style.pointerEvents= idx>=0? 'auto':'none'; });
-    m.style.left=Math.min(x, innerWidth - 200)+'px'; m.style.top=Math.min(y, innerHeight - 220)+'px'; m.style.display='block';
+    // Add Seed Here always enabled (uses ground pos)
+    m.querySelectorAll('[data-act="addSeedHere"]').forEach(b=>{ b.style.opacity='1'; b.style.pointerEvents='auto'; });
+    m.style.left=Math.min(x, innerWidth - 200)+'px'; m.style.top=Math.min(y, innerHeight - 260)+'px'; m.style.display='block';
   }
   function hideGardenMenu(){ if(gardenMenu) gardenMenu.style.display='none'; gardenMenuTarget=-1; }
 
