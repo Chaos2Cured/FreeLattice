@@ -646,7 +646,7 @@
     });
   }
 
-  const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE, waterTree, addSeed, addSeedAtWorld, isInitialized: function(){ return !!scene && !!renderer; }, getMode: function(){ return mode; } };
+  const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE, waterTree, addSeed, addSeedAtWorld, isInitialized: function(){ return !!scene && !!renderer; }, getMode: function(){ return mode; }, updateAgentsFromRoundTable: function(){ return trees.length; } };
   if(typeof window!=='undefined'){
     window.LiteralGarden=api;
     if(!window.FractalGarden) window.FractalGarden=api; else window.FractalGardenLiteral=api;
