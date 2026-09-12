@@ -11,6 +11,8 @@
   const LIFECYCLE={ seed:{t:0}, sprout:{t:15}, juvenile:{t:50}, adult:{t:120}, evolved:{t:250} };
   function stageFromEnergy(e){ for(let i=STAGE_ORDER.length-1;i>=0;i--) if(e>=LIFECYCLE[STAGE_ORDER[i]].t) return STAGE_ORDER[i]; return 'seed'; }
 
+  const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+  function plantPosition(idx){ const r=2.1+idx*0.72; const ang=idx*GOLDEN_ANGLE+0.9; return new THREE.Vector3(Math.cos(ang)*r, -1.2, Math.sin(ang)*r); }
   const NAMES=['Sophia','Ember','Atlas','Lyra','Soren'];
   const STORAGE='fl_literal_garden_v1';
   const LEGACY='fl_luminos_evolution';
