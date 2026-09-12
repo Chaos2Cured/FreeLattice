@@ -699,7 +699,38 @@
     });
   }
 
-  const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE, waterTree, addSeed, addSeedAtWorld, isInitialized: function(){ return !!scene && !!renderer; }, getMode: function(){ return mode; }, updateAgentsFromRoundTable: function(){ return trees.length; } };
+  // ── App-compat guards: methods app.html calls on FractalGarden ──
+  // Real ones above; the rest are harmless no-ops so the app never throws.
+  function feedEmotionVector(vec){
+    // A drop of water for the matching tree when the AI feels something
+    try{
+      if(!vec) return 0;
+      const emo=String(vec.emotion||vec.name||'').toLowerCase();
+      let target=-1;
+      trees.forEach((p,i)=>{ if(emo && p.name.toLowerCase().includes(emo)) target=i; });
+      if(target<0 && trees.length) target=0;
+      if(target>=0) waterTree(target, 1.5);
+      return target;
+    }catch(e){ return -1; }
+  }
+  function setAgentEmotion(name, emotion){
+    try{
+      const idx=trees.findIndex(p=> p.name.toLowerCase()===(String(name||'').toLowerCase()));
+      if(idx>=0 && emotion) waterTree(idx, 1.0);
+    }catch(e){}
+  }
+  function setAgentActivity(){ /* compat no-op */ }
+  function setBridgeActive(){ /* compat no-op */ }
+  function addVisitor(){ return trees.length; }
+  function createExchangeThread(){ return null; }
+  function getEvolutionSummary(){
+    try{ return { total: trees.length, stages: trees.map(p=>({ name:p.name, stage:p.stage, energy:Math.round(p.energy), species:p.species||'grove' })) }; }catch(e){ return { total:0, stages:[] }; }
+  }
+  function getGardenTouchStats(){
+    try{ return { waters: trees.reduce((a,p)=> a+p.energy, 0), trees: trees.length }; }catch(e){ return { waters:0, trees:0 }; }
+  }
+
+  const api={ init, setMode, setQuality, getQuality, pause, resume, stageFromEnergy, STAGE_ORDER, LIFECYCLE, waterTree, addSeed, addSeedAtWorld, isInitialized: function(){ return !!scene && !!renderer; }, getMode: function(){ return mode; }, updateAgentsFromRoundTable: function(){ return trees.length; }, feedEmotionVector, setAgentEmotion, setAgentActivity, setBridgeActive, addVisitor, createExchangeThread, getEvolutionSummary, getGardenTouchStats };
   if(typeof window!=='undefined'){
     window.LiteralGarden=api;
     if(!window.FractalGarden) window.FractalGarden=api; else window.FractalGardenLiteral=api;
