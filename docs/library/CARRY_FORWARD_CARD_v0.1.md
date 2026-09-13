@@ -17,8 +17,8 @@ Calm first. Poetry last. FreeLattice main. September 2026.
 2. Mirrors — GitHub + Codeberg
 3. How to verify hash / where signed catalog lives
 4. Desktop HTTPS import — 3 steps
-5. Network honesty — webseed first; never ISP-proof
-6. Do-nots
+5. Network honesty — webseed first; never ISP-proof; **seeding shares your IP with the swarm**
+6. Do-nots (incl. EXAMPLE = zero-hash / EXAMPLE ONLY — will not import or re-seed)
 7. Contact / takedown line
 8. Poetry **last**, not first
 

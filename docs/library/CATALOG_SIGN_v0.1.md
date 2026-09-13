@@ -49,6 +49,8 @@ Module: `desktop/lattice-catalog.js` — `verifyCatalogFiles` / `assertRowHonora
 
 **EXAMPLE** = zero-hash or notes marked `EXAMPLE ONLY` — will not import or re-seed.
 
+Re-seed (after hash match, Desktop only): seeding shares your IP with the swarm.
+
 ## withdrawn (stub)
 
 Optional on a model row: `"withdrawn": { "date": "YYYY-MM-DD", "reason": "…" }`.
