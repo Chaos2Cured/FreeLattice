@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-12 22:57 UTC
-- Last deployed: 2026-09-12 22:57 UTC
+- Last auto-updated: 2026-09-13 03:04 UTC
+- Last deployed: 2026-09-13 03:04 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3142
+- Total commits: 3144
 - Last 10 commits:
+- 6fa7094 Layer, never delete. Key day 2026-09-12 — torrent spine named; soft EXAMPLE/IP docs. (#66)
+- f912def ci: Update Primer deployment state [2026-09-12]
 - 6097bbd Layer, never delete. Primer smoke leftover — proof-receipts + broker copy false-positive. (#65)
 - 26fa693 Layer, never delete. Trust-root v0.1 — signed catalog path, installer SHAs, carry-forward card. (#64)
 - 26d2c23 Layer, never delete. Fable tech pass v0.1 — Desktop spine + swarm network honesty. (#63)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a54b422 Layer, never delete. Temp-gauge Gyro stack v0.1 — three lines, free forever. (#55)
 - 1b0d3c5 Layer, never delete. Desktop packs Win/Linux v0.1 — honest unsigned publish. (#54)
 - b220e6e Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. (#53)
-- b362bda Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52)
-- 6f65298 ci: Update Primer deployment state [2026-09-10]
