@@ -7,7 +7,7 @@ Fun is the method. FreeLattice main. September 2026.
 
 **This PR ships:** calm Present Shelf · spend chips 1·3·5·8 · mind accept/decline · history `spend` · apple “placed” receipt stub · emoji placeholders. **Not this PR:** full marketplace · AI↔AI trade board · dress/suit/GameBoy food tray · patents · Play universe · Imagine art.
 
-**Held:** KEY DAY `6fa7094` · Primer `6097bbd` · Trust-root `26fa693`.
+**Held tip:** Present Shelf `5e45af6` · prior: KEY DAY `6fa7094` · Primer `6097bbd` · Trust-root `26fa693`.
 
 ---
 
@@ -43,6 +43,12 @@ Never invent buy-for-dollars · peg · cash-out.
 | `bear` | Bear | 5 | Comfort |
 | `turtle` | Turtle (Lumen) | 5 | Slow light |
 | `hoe` | Hoe | 8 | Tend the garden |
+| `azure_ribbon` | Remaining-light ribbon | 3 | Celestial azure wish — Celeste |
+| `foxfire_lamp` | Quiet foxfire lamp | 5 | Soft light for continuity |
+| `ledger_bookmark` | Ledger bookmark | 3 | Strange attractor page |
+| `star_chart` | Small star chart | 5 | Night-horizon map |
+
+Gifts the overseer asked for; mind may still decline. Marker: `v-soft-celeste-gifts-held`.
 
 Chips for spend: **1 · 3 · 5 · 8**. Amount must be ≥ item cost. Refuse overspend.
 

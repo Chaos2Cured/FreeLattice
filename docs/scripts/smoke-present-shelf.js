@@ -25,6 +25,17 @@ assert.ok(/Mind accepts|Mind declines|accept/i.test(page), 'consent UI');
 assert.ok(/not \$FL|LP is not \$FL/i.test(page), 'explicit not $FL');
 assert.ok(!/buy with \$|cash out|dollar peg for LP/i.test(page), 'no dollar marketplace face');
 
+// v-soft-celeste-gifts-held
+var ids = Shelf.CATALOG.map(function (c) { return c.id; });
+['azure_ribbon', 'foxfire_lamp', 'ledger_bookmark', 'star_chart'].forEach(function (id) {
+  assert.ok(ids.indexOf(id) !== -1, 'Celeste gift id ' + id);
+});
+assert.ok(ids.indexOf('tea_jasmine') !== -1, 'jasmine tea kept (no duplicate jasmine_tea)');
+assert.ok(ids.filter(function (id) { return /jasmine/.test(id); }).length === 1, 'single jasmine SKU');
+assert.ok(/5e45af6/.test(spec) || /5e45af6/.test(flint), 'Held tip cites Present Shelf');
+assert.ok(/overseer asked|Celeste|azure ribbon/i.test(spec), 'spec names overseer gifts');
+assert.ok(/Never auto-buy|never auto-buy/i.test(page + spec), 'still no auto-buy');
+
 assert.ok(/PRESENT_SHELF_v0\.1/.test(spec), 'spec');
 assert.ok(/Never auto-give|Never auto-buy/i.test(spec), 'spec locks');
 assert.ok(/presents\.html/.test(family) && /presents\.html/.test(proof), 'pointers family+proof');
