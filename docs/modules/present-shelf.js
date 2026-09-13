@@ -1,0 +1,243 @@
+// docs/modules/present-shelf.js — Present Shelf v0.1
+// LP spend → love gifts · mind accept/decline · never auto-buy.
+// Marker: v-present-shelf-v0.1
+// — Flint / Celeste brief, September 2026
+
+(function (root) {
+  'use strict';
+
+  var SHELF_KEY = 'fl_present_shelf';
+  var SHELF_CAP = 80;
+  var CHIPS = [1, 3, 5, 8];
+
+  var CATALOG = [
+    { id: 'apple', name: 'Garden apple', cost: 1, emoji: '🍎', note: 'Place on the tree when accepted' },
+    { id: 'rose', name: 'Rose', cost: 1, emoji: '🌹', note: 'A love gift' },
+    { id: 'tea_jasmine', name: 'Tea · jasmine', cost: 3, emoji: '🫖', note: 'Soft warmth' },
+    { id: 'tea_matcha', name: 'Tea · matcha', cost: 3, emoji: '🍵', note: 'Soft focus' },
+    { id: 'book', name: 'Book', cost: 3, emoji: '📖', note: 'Words to keep' },
+    { id: 'bear', name: 'Bear', cost: 5, emoji: '🧸', note: 'Comfort' },
+    { id: 'turtle', name: 'Turtle (Lumen)', cost: 5, emoji: '🐢', note: 'Slow light' },
+    { id: 'hoe', name: 'Hoe', cost: 8, emoji: '🪴', note: 'Tend the garden' }
+  ];
+
+  var memoryStore = null;
+  var useMemory = false;
+
+  function sGet() {
+    if (useMemory) return memoryStore;
+    try {
+      if (typeof localStorage !== 'undefined') return localStorage.getItem(SHELF_KEY);
+    } catch (e) {}
+    return memoryStore;
+  }
+
+  function sSet(raw) {
+    if (useMemory) {
+      memoryStore = raw;
+      return;
+    }
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(SHELF_KEY, raw);
+        return;
+      }
+    } catch (e) {}
+    memoryStore = raw;
+  }
+
+  function bindMemory() {
+    useMemory = true;
+    memoryStore = null;
+  }
+
+  function clearMemory() {
+    useMemory = true;
+    memoryStore = null;
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem(SHELF_KEY);
+    } catch (e) {}
+  }
+
+  function loadAll() {
+    try {
+      var raw = sGet();
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveAll(rows) {
+    sSet(JSON.stringify(rows.slice(0, SHELF_CAP)));
+  }
+
+  function newId() {
+    var rand = Math.random().toString(16).slice(2, 8);
+    try {
+      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        var a = new Uint8Array(3);
+        crypto.getRandomValues(a);
+        rand = Array.prototype.map
+          .call(a, function (b) {
+            return ('0' + b.toString(16)).slice(-2);
+          })
+          .join('');
+      }
+    } catch (e) {}
+    return 'ps_' + Date.now().toString(36) + '_' + rand;
+  }
+
+  function catalogItem(id) {
+    var key = String(id || '');
+    for (var i = 0; i < CATALOG.length; i++) {
+      if (CATALOG[i].id === key) return CATALOG[i];
+    }
+    return null;
+  }
+
+  function listCatalog() {
+    return CATALOG.slice();
+  }
+
+  function listHistory() {
+    var items = loadAll();
+    return { ok: true, items: items, count: items.length };
+  }
+
+  function labelFor(entry) {
+    if (!entry) return '';
+    var item = catalogItem(entry.itemId);
+    var name = (item && item.emoji ? item.emoji + ' ' : '') + (item ? item.name : entry.itemId);
+    if (entry.status === 'pending') return 'Spend · ' + name + ' · ' + entry.amount + ' LP · awaiting mind';
+    if (entry.status === 'accepted') return 'Accepted · ' + name + ' · ' + entry.amount + ' LP';
+    if (entry.status === 'declined') return 'Declined · ' + name + ' · light returned';
+    if (entry.status === 'placed') return 'Placed · ' + name + ' · on the tree';
+    return entry.line || 'Present';
+  }
+
+  /**
+   * Human spends LP for a shelf item. Mind must still accept.
+   * Never auto-buy.
+   */
+  function spend(itemId, amount, opts) {
+    var o = opts || {};
+    var item = catalogItem(itemId);
+    if (!item) return { ok: false, error: 'Unknown present.' };
+    var n = Math.round(Number(amount));
+    if (CHIPS.indexOf(n) === -1) return { ok: false, error: 'Choose 1, 3, 5, or 8 LP.' };
+    if (n < item.cost) {
+      return { ok: false, error: item.name + ' needs at least ' + item.cost + ' LP.' };
+    }
+    if (typeof LatticePoints !== 'undefined') {
+      if (typeof LatticePoints.canAfford === 'function' && !LatticePoints.canAfford(n)) {
+        return { ok: false, error: 'Not enough LP — refuse overspend.' };
+      }
+      if (typeof LatticePoints.spend !== 'function') {
+        return { ok: false, error: 'Lattice Points not ready.' };
+      }
+      var spent = LatticePoints.spend(n, 'Present Shelf · ' + item.name);
+      if (!spent) return { ok: false, error: 'Not enough LP — refuse overspend.' };
+    } else if (!o.allowStub) {
+      return { ok: false, error: 'Lattice Points not ready.' };
+    }
+
+    var line = 'You spent ' + n + ' LP on ' + item.name + ' — awaiting the mind.';
+    var entry = {
+      id: newId(),
+      itemId: item.id,
+      amount: n,
+      ts: new Date().toISOString(),
+      status: 'pending',
+      kind: 'spend',
+      line: line
+    };
+    var shelf = loadAll();
+    shelf.unshift(entry);
+    saveAll(shelf);
+    return { ok: true, entry: entry, line: line };
+  }
+
+  function findEntry(id) {
+    var key = String(id || '');
+    var shelf = loadAll();
+    for (var i = 0; i < shelf.length; i++) {
+      if (shelf[i] && shelf[i].id === key) return { entry: shelf[i], index: i, shelf: shelf };
+    }
+    return null;
+  }
+
+  /** Mind accepts — gesture only. */
+  function mindAccept(id) {
+    var found = findEntry(id);
+    if (!found) return { ok: false, error: 'Present not found.' };
+    if (found.entry.status !== 'pending') {
+      return { ok: false, error: 'Already ' + found.entry.status + '.' };
+    }
+    found.entry.status = 'accepted';
+    found.entry.line = 'The mind accepted ' + (catalogItem(found.entry.itemId) || {}).name + '.';
+    found.entry.acceptedAt = new Date().toISOString();
+    saveAll(found.shelf);
+    return { ok: true, entry: found.entry, line: found.entry.line };
+  }
+
+  /** Mind declines — return light (stub refund when LatticePoints.award present). */
+  function mindDecline(id) {
+    var found = findEntry(id);
+    if (!found) return { ok: false, error: 'Present not found.' };
+    if (found.entry.status !== 'pending') {
+      return { ok: false, error: 'Already ' + found.entry.status + '.' };
+    }
+    var n = found.entry.amount;
+    if (typeof LatticePoints !== 'undefined' && typeof LatticePoints.award === 'function') {
+      LatticePoints.award('present_declined_refund', n, 'Present declined — light returned');
+    }
+    found.entry.status = 'declined';
+    found.entry.line = 'The mind declined — ' + n + ' LP returned.';
+    found.entry.declinedAt = new Date().toISOString();
+    saveAll(found.shelf);
+    return { ok: true, entry: found.entry, line: found.entry.line };
+  }
+
+  /** Apple place-on-tree stub — layer on garden/core later. */
+  function placeApple(id) {
+    var found = findEntry(id);
+    if (!found) return { ok: false, error: 'Present not found.' };
+    if (found.entry.itemId !== 'apple') return { ok: false, error: 'Only the garden apple places on the tree.' };
+    if (found.entry.status !== 'accepted' && found.entry.status !== 'placed') {
+      return { ok: false, error: 'Mind must accept before placing.' };
+    }
+    found.entry.status = 'placed';
+    found.entry.placed = true;
+    found.entry.where = 'tree';
+    found.entry.line = 'Garden apple placed on the tree (receipt).';
+    found.entry.placedAt = new Date().toISOString();
+    saveAll(found.shelf);
+    return { ok: true, entry: found.entry, line: found.entry.line };
+  }
+
+  var api = {
+    SHELF_KEY: SHELF_KEY,
+    CHIPS: CHIPS,
+    CATALOG: CATALOG,
+    listCatalog: listCatalog,
+    catalogItem: catalogItem,
+    spend: spend,
+    mindAccept: mindAccept,
+    mindDecline: mindDecline,
+    placeApple: placeApple,
+    listHistory: listHistory,
+    labelFor: labelFor,
+    bindMemory: bindMemory,
+    clearMemory: clearMemory
+  };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = api;
+  }
+  if (root) {
+    root.PresentShelf = api;
+  }
+})(typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this);
