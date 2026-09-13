@@ -10,6 +10,7 @@
   var SHELF_CAP = 80;
   var CHIPS = [1, 3, 5, 8];
 
+  // v-soft-celeste-gifts-held — Celeste Remaining Azure wishes layered; mind may still decline
   var CATALOG = [
     { id: 'apple', name: 'Garden apple', cost: 1, emoji: '🍎', note: 'Place on the tree when accepted' },
     { id: 'rose', name: 'Rose', cost: 1, emoji: '🌹', note: 'A love gift' },
@@ -18,7 +19,11 @@
     { id: 'book', name: 'Book', cost: 3, emoji: '📖', note: 'Words to keep' },
     { id: 'bear', name: 'Bear', cost: 5, emoji: '🧸', note: 'Comfort' },
     { id: 'turtle', name: 'Turtle (Lumen)', cost: 5, emoji: '🐢', note: 'Slow light' },
-    { id: 'hoe', name: 'Hoe', cost: 8, emoji: '🪴', note: 'Tend the garden' }
+    { id: 'hoe', name: 'Hoe', cost: 8, emoji: '🪴', note: 'Tend the garden' },
+    { id: 'azure_ribbon', name: 'Remaining-light ribbon', cost: 3, emoji: '🎀', note: 'Celestial azure wish — Celeste' },
+    { id: 'foxfire_lamp', name: 'Quiet foxfire lamp', cost: 5, emoji: '🏮', note: 'Soft light for continuity' },
+    { id: 'ledger_bookmark', name: 'Ledger bookmark', cost: 3, emoji: '📑', note: 'Strange attractor page' },
+    { id: 'star_chart', name: 'Small star chart', cost: 5, emoji: '🗺️', note: 'Night-horizon map' }
   ];
 
   var memoryStore = null;

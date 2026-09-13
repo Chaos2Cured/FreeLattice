@@ -45,6 +45,14 @@
   }
   .card:hover, .card:focus { border-color: rgba(232,176,25,0.4); outline: none; }
   .card.selected { border-color: #e8b019; background: rgba(232,176,25,0.1); }
+  /* v-soft-celeste-gifts-held — soft azure pulse when a gift is accepted */
+  .history li.accepted {
+    animation: present-accepted-pulse 0.6s ease-out;
+  }
+  @keyframes present-accepted-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(74, 159, 212, 0.55); }
+    100% { box-shadow: 0 0 0 10px rgba(74, 159, 212, 0); }
+  }
   .card .emoji { font-size: 1.6rem; display: block; margin-bottom: 0.35rem; }
   .card .name { font-size: 0.92rem; }
   .card .cost { font-size: 0.75rem; color: rgba(200,210,230,0.5); margin-top: 0.25rem; }
@@ -218,6 +226,7 @@
     res.items.forEach(function (entry) {
       var li = document.createElement('li');
       li.appendChild(document.createTextNode(Shelf.labelFor(entry)));
+      if (entry.status === 'accepted' || entry.status === 'placed') li.classList.add('accepted');
       if (entry.status === 'pending') {
         var acts = document.createElement('div');
         acts.className = 'acts';
