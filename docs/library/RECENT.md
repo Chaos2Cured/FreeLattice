@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-14 02:06 UTC
+> Last update: 2026-09-14 02:07 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `f14c300` _(committed 1 second ago)_
+- **HEAD:** `aa104e6` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,7 +17,9 @@
 
 ## Last 20 commits
 
-- `f14c300` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. _(1 second ago)_
+- `aa104e6` Soft: leave sw.js on app.html (Celeste leave-alone). _(1 second ago)_
+- `03d4b82` docs: Auto-update Session Primer [5.79.45] _(18 seconds ago)_
+- `f14c300` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. _(18 seconds ago)_
 - `bc465e0` Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69) _(9 hours ago)_
 - `d187c2e` Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68) _(9 hours ago)_
 - `23f9bcf` ci: Update Primer deployment state [2026-09-13] _(22 hours ago)_
@@ -35,8 +37,6 @@
 - `b220e6e` Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. (#53) _(3 days ago)_
 - `b362bda` Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52) _(3 days ago)_
 - `6f65298` ci: Update Primer deployment state [2026-09-10] _(3 days ago)_
-- `f57fc76` Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold. (#51) _(3 days ago)_
-- `71496e2` ci: Update Primer deployment state [2026-09-10] _(3 days ago)_
 
 ## How to use this file
 
