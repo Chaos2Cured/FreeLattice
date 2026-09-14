@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-13 03:49 UTC
-- Last deployed: 2026-09-13 03:49 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-13 20:06 MDT
 - Version: 5.79.45
-- Total commits: 3146
+- Total commits: 3150
 - Last 10 commits:
+- f14c300 Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held.
+- bc465e0 Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69)
+- d187c2e Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68)
+- 23f9bcf ci: Update Primer deployment state [2026-09-13]
 - 5e45af6 Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67)
 - 8cacae8 ci: Update Primer deployment state [2026-09-13]
 - 6fa7094 Layer, never delete. Key day 2026-09-12 — torrent spine named; soft EXAMPLE/IP docs. (#66)
 - f912def ci: Update Primer deployment state [2026-09-12]
 - 6097bbd Layer, never delete. Primer smoke leftover — proof-receipts + broker copy false-positive. (#65)
 - 26fa693 Layer, never delete. Trust-root v0.1 — signed catalog path, installer SHAs, carry-forward card. (#64)
-- 26d2c23 Layer, never delete. Fable tech pass v0.1 — Desktop spine + swarm network honesty. (#63)
-- c6c5389 Layer, never delete. Soft Gyro polish v0.1 — layers early, toggle redraw, Hub·Ring·Orbit names. (#57)
-- 9f8c200 Layer, never delete. Family poetry home v0.1 — Keep a poem, no generate. (#56)
-- a54b422 Layer, never delete. Temp-gauge Gyro stack v0.1 — three lines, free forever. (#55)
