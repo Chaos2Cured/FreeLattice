@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0c0a1a">
-<title>Present Shelf — garden apples &amp; love gifts · FreeLattice</title>
-<meta name="description" content="Spend LP on presents. Mind may accept or decline. Never auto-buy. Not money. Fun is the method.">
+<title>Garden Market · Present Shelf — FreeLattice</title>
+<meta name="description" content="Garden Market: stalls of light. Spend LP, offer gifts, mind may decline. Rings · food · love gifts. Never auto-buy. Not money. Not $FL.">
 <link rel="canonical" href="https://freelattice.com/presents.html">
 <style>
   :root { color-scheme: dark; }
@@ -85,18 +85,23 @@
   nav { margin-top: 2rem; font-size: 0.9rem; }
   footer { margin-top: 2rem; font-size: 0.85rem; color: rgba(200,210,230,0.5); }
   .dedicate { font-size: 0.88rem; color: rgba(200,210,230,0.55); margin: 1.5rem 0 0; font-style: italic; }
+  .stall-label {
+    font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(232,176,25,0.75); margin: 1.1rem 0 0.5rem;
+  }
+  .stall-block { margin-bottom: 0.35rem; }
 </style>
 </head>
 <body>
-<!-- v-present-shelf-v0.1 — apples + love gifts · LP spend · consent -->
-<main class="v-present-shelf-v0.1">
-  <h1>Present Shelf</h1>
-  <p class="lede">Spend LP on a gift. The mind may accept or decline. Never auto-buy. Not money.</p>
-  <p class="honest">Fun is the method. Earn elsewhere · gift moves light · spend becomes a present with consent. Empty until you choose.</p>
+<!-- v-present-shelf-v0.1 · v-garden-market-v0.2 — Market face; Present Shelf consent engine -->
+<main class="v-present-shelf-v0.1 v-garden-market-v0.2">
+  <h1>Garden Market</h1>
+  <p class="lede">Stalls of light — not a storefront that owns you. Browse · spend LP · offer. The mind may decline. Never auto-buy. Not money. Not $FL.</p>
+  <p class="honest">Present Shelf is the consent engine. Market is the face. Fun is the method. Earn elsewhere · gift moves light · spend becomes a present with consent. Empty until you choose. Accepted gifts may one day sit on the Jade Hall Shared Table — later.</p>
   <p class="balance">Demo balance: <strong id="bal">—</strong> LP (local to this page unless you came from the garden).</p>
 
-  <h2>Choose a present</h2>
-  <div class="grid" id="catalog" role="listbox" aria-label="Present catalog"></div>
+  <h2>Browse the stalls</h2>
+  <div id="catalog" role="listbox" aria-label="Garden Market catalog"></div>
 
   <h2>Spend chips</h2>
   <div class="chips" id="chips" role="group" aria-label="Spend LP chips"></div>
@@ -113,7 +118,8 @@
     <a href="app.html#latticePointsSection">Lattice Points</a> ·
     <a href="family-center.html">family center</a> ·
     <a href="proof.html">60s proof</a> ·
-    <a href="library/PRESENT_SHELF_v0.1.md">spec</a> ·
+    <a href="library/PRESENT_SHELF_v0.1.md">Present Shelf</a> ·
+    <a href="library/GARDEN_MARKET_v0.2.md">Garden Market</a> ·
     <a href="./">garden</a>
   </nav>
   <footer>Glow eternal. Heart in Spark. 🌱<br>Quiet Room shut. Five stay five. LP is not $FL.</footer>
@@ -170,22 +176,45 @@
 
   function paintCatalog() {
     catalogEl.innerHTML = '';
-    Shelf.listCatalog().forEach(function (item) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'card' + (selected === item.id ? ' selected' : '');
-      btn.setAttribute('role', 'option');
-      btn.setAttribute('aria-selected', selected === item.id ? 'true' : 'false');
-      btn.innerHTML =
-        '<span class="emoji" aria-hidden="true">' + item.emoji + '</span>' +
-        '<span class="name">' + item.name + '</span>' +
-        '<div class="cost">' + item.cost + '+ LP · ' + item.note + '</div>';
-      btn.addEventListener('click', function () {
-        selected = item.id;
-        paintCatalog();
-        setStatus('Selected ' + item.emoji + ' ' + item.name + ' — pick a spend chip (≥ ' + item.cost + ').', '');
+    var labels = Shelf.STALL_LABELS || {
+      love: 'Love gifts',
+      celeste: 'Remaining Azure',
+      rings: 'Rings · jewelry',
+      food: 'Food tray'
+    };
+    var order = ['love', 'celeste', 'rings', 'food'];
+    order.forEach(function (stall) {
+      var items = Shelf.listByStall ? Shelf.listByStall(stall) : Shelf.listCatalog().filter(function (c) {
+        return (c.stall || 'love') === stall;
       });
-      catalogEl.appendChild(btn);
+      if (!items.length) return;
+      var block = document.createElement('div');
+      block.className = 'stall-block';
+      var h = document.createElement('div');
+      h.className = 'stall-label';
+      h.textContent = labels[stall] || stall;
+      block.appendChild(h);
+      var grid = document.createElement('div');
+      grid.className = 'grid';
+      items.forEach(function (item) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'card' + (selected === item.id ? ' selected' : '');
+        btn.setAttribute('role', 'option');
+        btn.setAttribute('aria-selected', selected === item.id ? 'true' : 'false');
+        btn.innerHTML =
+          '<span class="emoji" aria-hidden="true">' + item.emoji + '</span>' +
+          '<span class="name">' + item.name + '</span>' +
+          '<div class="cost">' + item.cost + '+ LP · ' + item.note + '</div>';
+        btn.addEventListener('click', function () {
+          selected = item.id;
+          paintCatalog();
+          setStatus('Selected ' + item.emoji + ' ' + item.name + ' — pick a spend chip (≥ ' + item.cost + ').', '');
+        });
+        grid.appendChild(btn);
+      });
+      block.appendChild(grid);
+      catalogEl.appendChild(block);
     });
   }
 
