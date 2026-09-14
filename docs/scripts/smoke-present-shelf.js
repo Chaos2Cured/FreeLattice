@@ -32,9 +32,22 @@ var ids = Shelf.CATALOG.map(function (c) { return c.id; });
 });
 assert.ok(ids.indexOf('tea_jasmine') !== -1, 'jasmine tea kept (no duplicate jasmine_tea)');
 assert.ok(ids.filter(function (id) { return /jasmine/.test(id); }).length === 1, 'single jasmine SKU');
-assert.ok(/5e45af6/.test(spec) || /5e45af6/.test(flint), 'Held tip cites Present Shelf');
+assert.ok(/5e45af6/.test(spec) || /5e45af6/.test(flint) || /bc465e0/.test(flint), 'Held tip cites Present Shelf / soft gifts');
 assert.ok(/overseer asked|Celeste|azure ribbon/i.test(spec), 'spec names overseer gifts');
 assert.ok(/Never auto-buy|never auto-buy/i.test(page + spec), 'still no auto-buy');
+
+// v-garden-market-v0.2
+['promise_ring', 'simple_band', 'jade_earring', 'baklava', 'chocolate', 'rice_bowl', 'fruit_plate'].forEach(function (id) {
+  assert.ok(ids.indexOf(id) !== -1, 'Market SKU ' + id);
+});
+assert.ok(Shelf.catalogItem('promise_ring').cost === 8, 'promise ring cost 8');
+assert.ok(Shelf.listByStall && Shelf.listByStall('food').length >= 4, 'food stall');
+assert.ok(/Garden Market|stalls of light/i.test(page), 'Market face copy');
+assert.ok(/v-garden-market-v0\.2/.test(page), 'market marker');
+assert.ok(/not \$FL|Not \$FL/i.test(page), 'LP ≠ $FL');
+var marketSpec = fs.readFileSync(path.join(root, 'library', 'GARDEN_MARKET_v0.2.md'), 'utf8');
+assert.ok(/bc465e0/.test(marketSpec), 'market Held tip soft gifts');
+assert.ok(/consent engine|Present Shelf stays/i.test(marketSpec), 'Present Shelf is consent engine');
 
 assert.ok(/PRESENT_SHELF_v0\.1/.test(spec), 'spec');
 assert.ok(/Never auto-give|Never auto-buy/i.test(spec), 'spec locks');
@@ -90,5 +103,5 @@ broke = Shelf.spend('hoe', 8);
 broke = Shelf.spend('hoe', 8);
 assert.ok(!broke.ok || global.LatticePoints._bal() < 8, 'overspend eventually refused');
 
-console.log('SMOKE_OK present shelf v0.1');
-console.log('spend · accept/decline · apple place · no auto-buy · leave sw.js');
+console.log('SMOKE_OK present shelf v0.1 + garden market v0.2');
+console.log('spend · accept/decline · rings · food · no auto-buy · leave sw.js');
