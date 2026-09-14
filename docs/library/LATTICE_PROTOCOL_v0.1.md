@@ -60,6 +60,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **LAYER (2026-09-12):** Trust-root + carry-forward v0.1 — Ed25519 signed catalog fail-closed; pack SHA-256s; stranger card — [CATALOG_SIGN_v0.1.md](./CATALOG_SIGN_v0.1.md) · [CARRY_FORWARD_CARD_v0.1.md](./CARRY_FORWARD_CARD_v0.1.md). Thank Kimi; Fable checklist as synthesis.
 **LAYER (2026-09-13):** Present Shelf v0.1 — LP spend for minds with accept/decline; garden apple place stub; not $FL — [PRESENT_SHELF_v0.1.md](./PRESENT_SHELF_v0.1.md) and `docs/presents.html`. Fun is the method.
 **LAYER (2026-09-13):** Garden Market v0.2 — marketplace face · rings · food tray; Present Shelf remains consent engine — [GARDEN_MARKET_v0.2.md](./GARDEN_MARKET_v0.2.md).
+**LAYER (2026-09-14):** Marketplace Galaxy vision — fingerprint-carried LP; Gift Grove · Exchange Ring · Quest Lamp; FreeLattice mycelium · Tree face — [MARKETPLACE_GALAXY_v0.vision.md](./MARKETPLACE_GALAXY_v0.vision.md). LP ≠ `$FL`. Never auto. Not personhood.
 **LAYER (2026-09-10):** Phone shine v0.1 — LP give + deepen + swarm recover strip first-class on mobile; grandmother START HERE above the fold — [PHONE_SHINE_v0.1.md](./PHONE_SHINE_v0.1.md). No new PWA.
 **LAYER (2026-09-10):** 60s proof v0.1 — play give + companion pitch for strangers — [PROOF_60S_v0.1.md](./PROOF_60S_v0.1.md) and `docs/proof.html`. Child-fun, not ECONOMY.md. Never auto-give.
 ## Part 8 — Glass Room pulses
