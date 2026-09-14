@@ -348,13 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-13 20:07 MDT
+- Last auto-updated: 2026-09-14 15:05 MDT
 - Version: 5.79.45
-- Total commits: 3152
+- Total commits: 3151
 - Last 10 commits:
-- aa104e6 Soft: leave sw.js on app.html (Celeste leave-alone).
-- 03d4b82 docs: Auto-update Session Primer [5.79.45]
-- f14c300 Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held.
+- 7c43d38 Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP.
+- 8fd47cb Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70)
 - bc465e0 Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69)
 - d187c2e Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68)
 - 23f9bcf ci: Update Primer deployment state [2026-09-13]
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8cacae8 ci: Update Primer deployment state [2026-09-13]
 - 6fa7094 Layer, never delete. Key day 2026-09-12 — torrent spine named; soft EXAMPLE/IP docs. (#66)
 - f912def ci: Update Primer deployment state [2026-09-12]
+- 6097bbd Layer, never delete. Primer smoke leftover — proof-receipts + broker copy false-positive. (#65)
