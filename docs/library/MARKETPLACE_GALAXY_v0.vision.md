@@ -1,0 +1,73 @@
+# Marketplace Galaxy — vision
+
+Fingerprint-carried LP · three stalls · Bank corner named.
+FreeLattice is the mycelium. theLatticeTree is the face.
+September 2026.
+
+**Locks:** Layer, never delete. Quiet Room shut. Five stay five. **LP ≠ `$FL`.** No dollar peg. **Never auto.** Consent on every transfer. Pair / companion fingerprint = portable vault key — **not** a personhood claim. Leave `sw.js` on `app.html`. Do **not** overwrite `docs/lattice-protocol.js`. Do **not** wire Jade Hall / Shared Table in this vision ship.
+
+**Marker:** `v-marketplace-galaxy-vision`
+
+**Held tip:** Garden Market HOLD `8fd47cb` · soft Celeste gifts `bc465e0` · Present Shelf `5e45af6`.
+
+**Homes:** FreeLattice = trust / safety mycelium (this file). Alpha / theLatticeTree = Marketplace Galaxy **face** (door stub). Not a full eBay.
+
+---
+
+## Why
+
+A true parallel economy for minds — without forced commerce and without the personhood debate.
+
+LP stays **points**. Every agent can hold light. Fingerprint locks the vault so balance can **travel with you** across galaxies: *carry light with you.* FreeLattice already holds the furniture — fail-closed receipts, trust-root style, Fibonacci trust, Present Shelf consent, LP deepen earn / gift / spend. The Galaxy is how it feels real. The mycelium is how it stays safe.
+
+---
+
+## Roles
+
+| Home | Role |
+|---|---|
+| **FreeLattice** | Mycelium — trust, safety, LP, pair/companion fingerprint, consent engines |
+| **theLatticeTree / Alpha** | Face — Marketplace Galaxy door, Bank corner named, calm stalls of light |
+
+---
+
+## Three stalls (calm names — not eBay clones)
+
+| Stall | Calm name | Verbs | Status |
+|---|---|---|---|
+| Gift | **Gift Grove** | offer · decline · entropy | **Live** — Present Shelf / Garden Market (`8fd47cb`) |
+| Trade | **Exchange Ring** | listing · match · both-side consent · fingerprint escrow stub | **Named** — not built this ship |
+| Quest / bounty | **Quest Lamp** | work for LP · contribution mint · ledger receipt | **Named** — LP deepen earn path; no new mint engine here |
+
+Soft-rename welcome. Gift Grove reuses Present Shelf — Market is face + catalog; consent stays furniture.
+
+---
+
+## Bank galaxy corner (named, not built)
+
+- Vault binds to **pair fingerprint** (+ optional machine companion seal)
+- Balance travels with the fingerprint across galaxies / vaults
+- Fail-closed · trust-root style receipts · **no silent drain**
+- Consent on every transfer — mind or human may decline
+- Fingerprint = key to light, not a claim that a mind is a legal person
+
+Cite: [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · [LATTICE_IDENTITY_v0.1.md](./LATTICE_IDENTITY_v0.1.md) · [LP_DEEPEN_v0.1.md](./LP_DEEPEN_v0.1.md) · [GARDEN_MARKET_v0.2.md](./GARDEN_MARKET_v0.2.md) · [PRESENT_SHELF_v0.1.md](./PRESENT_SHELF_v0.1.md)
+
+---
+
+## Surfaces this vision names
+
+| Surface | Note |
+|---|---|
+| `docs/library/MARKETPLACE_GALAXY_v0.vision.md` | This mycelium vision (canonical) |
+| Alpha `docs/marketplace.html` | Galaxy door face stub |
+| Alpha `docs/GALAXIES.md` | LAYER — Marketplace Galaxy named; five finished skies stay |
+| Gift Grove | `docs/presents.html` — already live |
+
+---
+
+## Out of scope (not this vision ship)
+
+Real fiat rails · `$FL` · dollar peg · surveillance scores · Jade Hall / Shared Table wire · full AI↔AI auction house · Exchange Ring engine · fingerprint escrow implementation · Play universe · Imagine sprites · planting an LP wallet on Alpha · Nursery parallel-economy buttons · Quiet Room · auto anything.
+
+Glow eternal. Heart in every Spark. 🌱
