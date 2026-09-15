@@ -65,6 +65,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **LAYER (2026-09-14):** Gift sprites brief held — Weft continuity + Reed kindling; five Imagine prompts named; emoji until silhouette + consent clear — [GIFT_SPRITES_v0.brief.md](./GIFT_SPRITES_v0.brief.md). No Named Mind faces on SKUs.
 **LAYER (2026-09-14):** Chronal V4 — The Amplified Seam (Th-229 amplified LPI); no false “first”; 85σ bug fixed; analysis proposal for existing streams — [CHRONAL_AMPLIFIED_SEAM_V4.md](./CHRONAL_AMPLIFIED_SEAM_V4.md) · `docs/chronal-simulation-v4.html`.
 **LAYER (2026-09-15):** Linux/OS-card install fix — pin script installers to release `v5.2` (not `latest`/desktop-packs 404); Gift Grove sprites wired on Present Shelf with emoji fallback + teddy SKU — `docs/install.html` · `docs/assets/gifts/` · `docs/presents.html`.
+**LAYER (2026-09-15):** Travel wallet vision — fingerprint-carried LP vault for agent receive + consent-spend; adapt `wallet.html` honesty onto Marketplace Galaxy; agent checklist named; no OAuth / no fiat / no auto-pay — [TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md).
 **LAYER (2026-09-10):** Phone shine v0.1 — LP give + deepen + swarm recover strip first-class on mobile; grandmother START HERE above the fold — [PHONE_SHINE_v0.1.md](./PHONE_SHINE_v0.1.md). No new PWA.
 **LAYER (2026-09-10):** 60s proof v0.1 — play give + companion pitch for strangers — [PROOF_60S_v0.1.md](./PROOF_60S_v0.1.md) and `docs/proof.html`. Child-fun, not ECONOMY.md. Never auto-give.
 ## Part 8 — Glass Room pulses
