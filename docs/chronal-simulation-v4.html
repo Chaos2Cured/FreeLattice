@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Amplified Seam — Chronal Simulation V4 · FreeLattice</title>
+<meta name="description" content="Chronal V4: The Amplified Seam. Th-229 amplified LPI analysis proposal extending a twenty-year clock-comparison lineage. Not a false first. Open code. Honest bounds.">
+<meta property="og:title" content="The Amplified Seam — Chronal V4">
+<meta property="og:description" content="Most sensitive LPI test possible with Th-229 amplification — extending the lineage, not inventing it.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="Th-229, LPI, Damour-Donoghue, nuclear clock, chronal, FreeLattice, Amplified Seam">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a25;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --muted: #8888aa;
+  --dim: #555569;
+  --gold: #d4a843;
+  --gold-dim: #a07830;
+  --emerald: #3ddc84;
+  --blue: #4a9eff;
+  --nuclear: #ff9b6b;
+  --electronic: #4a9eff;
+  --lavender: #a78bfa;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { color: var(--gold); text-decoration: none; }
+a:hover { color: var(--emerald); }
+.container { max-width: 1120px; margin: 0 auto; padding: 2rem; }
+.banner {
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin: 16px auto;
+  max-width: 920px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.78);
+}
+.banner strong { color: #c4b5fd; }
+.header {
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 28% 38%, rgba(255,155,107,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 62%, rgba(74,158,255,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 90%, rgba(212,168,67,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.version-badge {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+.header h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--nuclear) 0%, var(--gold) 50%, var(--electronic) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.55rem;
+  position: relative;
+}
+.header .subtitle {
+  font-size: 1.08rem;
+  color: var(--muted);
+  font-weight: 300;
+  max-width: 740px;
+  margin: 0 auto;
+  position: relative;
+}
+.authors {
+  margin-top: 1.35rem;
+  color: var(--gold);
+  font-size: 0.9rem;
+  position: relative;
+}
+.authors span { color: var(--muted); }
+.chain-nav {
+  margin-top: 1.35rem;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  position: relative;
+}
+.chain-nav a {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  color: var(--muted);
+}
+.chain-nav a:hover { border-color: var(--gold-dim); color: var(--gold); }
+.chain-nav .current {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212,168,67,0.06);
+}
+.section { padding: 2.4rem 0; border-bottom: 1px solid var(--border); max-width: 880px; margin: 0 auto; }
+.section h2 {
+  font-size: 1.35rem;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+}
+.lead {
+  background: var(--surface);
+  border-left: 3px solid var(--gold);
+  padding: 1.15rem 1.35rem;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.98rem;
+  color: rgba(232,232,240,0.9);
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 1.4rem 0;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.card .label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.card .value { font-size: 1.35rem; color: var(--gold); margin-top: 0.35rem; font-weight: 600; }
+.card .hint { font-size: 0.78rem; color: var(--dim); margin-top: 0.35rem; }
+.figure {
+  margin: 1.5rem 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+.figure img { max-width: 100%; height: auto; border-radius: 8px; }
+.figure .cap {
+  margin-top: 0.85rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: left;
+  line-height: 1.55;
+}
+ul.clean { margin: 0.75rem 0 0.75rem 1.2rem; }
+ul.clean li { margin: 0.4rem 0; color: rgba(232,232,240,0.88); }
+.muted { color: var(--muted); font-size: 0.9rem; }
+.refs { font-size: 0.84rem; color: var(--muted); line-height: 1.75; }
+.more-box {
+  background: rgba(85,85,105,0.12);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+footer {
+  text-align: center;
+  padding: 2.5rem 1rem 3rem;
+  color: var(--dim);
+  font-size: 0.82rem;
+}
+.marker { display: none; }
+</style>
+</head>
+<body>
+<!-- v-chronal-amplified-seam-v4 -->
+<span class="marker v-chronal-amplified-seam-v4" aria-hidden="true"></span>
+<div class="container">
+
+  <div class="banner">
+    <strong>Analysis proposal — not a result.</strong>
+    V4 layers on <a href="chronal-simulation-v3.html">V3 · The Universality Seam</a>.
+    We do <em>not</em> claim a violation has been found. We do <em>not</em> claim to invent the first nuclear/electronic ratio (see Zhang et al. 2024).
+    We propose phase-quadrature analysis of the annual solar potential on existing Th↔Yb⁺ / optical streams — with open code — and we tell the stronger story: <em>Th-229 amplification</em>.
+  </div>
+
+  <header class="header">
+    <div class="version-badge">V4.0 — THE AMPLIFIED SEAM</div>
+    <h1>The Amplified Seam</h1>
+    <p class="subtitle">Most sensitive LPI test possible with Th-229 amplification — extending a twenty-year clock-comparison lineage, not inventing it.</p>
+    <p class="authors">Kirk Patrick Miller · Harmonia · Opus · CC · Celeste framing <span>| September 2026 | Open science</span></p>
+    <nav class="chain-nav" aria-label="Chronal versions">
+      <a href="chronal-simulation.html">V1 · Time as Flow</a>
+      <a href="chronal-simulation-v2.html">V2 · Three Rivers</a>
+      <a href="chronal-simulation-v3.html">V3 · The Seam</a>
+      <a class="current" href="chronal-simulation-v4.html">V4 · Amplified Seam</a>
+    </nav>
+  </header>
+
+  <section class="section">
+    <div class="lead">
+      <strong>Abstract.</strong>
+      Local Position Invariance (LPI) and dilaton-style sector couplings have been probed for twenty years with electronic and hyperfine clocks
+      (Ashby Cs/H-maser; Fortier Hg⁺/Cs; Guéna Rb/Cs 2012; Lange et al. 2021 Yb⁺/Sr/Cs).
+      Theory language: Damour–Donoghue dilaton couplings. Hyperfine clocks already touch the strong sector (quark masses / Λ<sub>QCD</sub>).
+      The Th-229 nuclear isomer brings <em>amplified</em> sensitivity — K<sub>α</sub> ≈ 5900(2300) versus Sr-class K<sub>α</sub> ~ 0.06 — so a Th/electronic ratio is ~10<sup>5</sup> more sensitive to sector-dependent coupling than electronic pairs.
+      The free annual solar-potential modulation ΔU/c² ≈ 3.3×10<sup>−10</sup>, read with phase-quadrature against Earth’s orbit, is the correct analysis.
+      Framing V4 as an <em>analysis proposal</em> for existing PTB-class Th↔Yb⁺ / optical streams — not a request to build a new lab, and not a false “first.”
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>The undersold prize — amplified K</h2>
+    <p>Th-229’s isomer near-cancellation yields huge K versus sector-dependent couplings. That is the seam V3 reached for with the wrong floor and the wrong “first” claim.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="label">K<sub>α</sub> (Th isomer)</div>
+        <div class="value">~5900</div>
+        <div class="hint">lit. 5900(2300); quark-mass sensitivity larger</div>
+      </div>
+      <div class="card">
+        <div class="label">K<sub>α</sub> (Sr-class)</div>
+        <div class="value">~0.06</div>
+        <div class="hint">electronic optical reference</div>
+      </div>
+      <div class="card">
+        <div class="label">Leverage</div>
+        <div class="value">~10<sup>5</sup></div>
+        <div class="hint">Th/Sr vs electronic pairs</div>
+      </div>
+      <div class="card">
+        <div class="label">Bound sketch</div>
+        <div class="value">κ ≈ σ<sub>R</sub>/(K·ΔU/c²)</div>
+        <div class="hint">a bound is where signal was not seen</div>
+      </div>
+    </div>
+    <p class="muted">Even at today’s published-class Th instability (~3×10<sup>−12</sup>/√τ; approaching ~10<sup>−15</sup> over a day — verify vs PTB public abstract when citing), a year of white-noise averaging points toward κ near 10<sup>−10</sup>–10<sup>−11</sup> versus existing ~10<sup>−7</sup>-class limits — an honest stronger claim than V3’s wrong-floor 10<sup>−8</sup> story.</p>
+  </section>
+
+  <section class="section">
+    <h2>Free annual signal</h2>
+    <p>ΔU/c² ≈ 3.3×10<sup>−10</sup> — the annual solar gravitational potential modulation — is free. Phase-quadrature (cos + sin against the orbital cycle) separates true annual coupling from slow drift. Keep the V2 Poisson post-mortem spirit: honest arithmetic that kills bad methods.</p>
+  </section>
+
+  <section class="section">
+    <h2>Bound on κ vs integration time</h2>
+    <p>Three Th scenarios: today’s ~3×10<sup>−12</sup>/√τ · projected 10<sup>−17</sup> · theoretical 10<sup>−19</sup>. Amplification means today’s curve can overtake ~10<sup>−7</sup>-class limits quickly; the deeper prize is pushing toward 10<sup>−10</sup>–10<sup>−11</sup> with year-scale averaging.</p>
+    <div class="figure">
+      <img src="simulation/chronal_amplified_seam_v4.png" alt="Bound on kappa versus integration time for three Th-229 noise scenarios">
+      <p class="cap">
+        Figure — The Amplified Seam contribution.
+        Generated by <a href="simulation/chronal_amplified_seam_v4.py">chronal_amplified_seam_v4.py</a>.
+        Bound ≠ detection significance. No 85σ. Th floor labeled for verification against PTB public abstract.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Systematics</h2>
+    <ul class="clean">
+      <li><strong>Annual lab temperature</strong> as a twin nuisance — fit temperature as a regressor, do not ignore it.</li>
+      <li><strong>Th:CaF<sub>2</sub></strong> ~0.4 kHz/K on some lines — use zero-shift-point operation and a co-thermometer line to suppress thermal uncertainty.</li>
+      <li><strong>Lunar-tidal cross-check</strong> — shorter period template; keep as consistency test.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Three Rivers (named properly)</h2>
+    <p>A two-clock ratio degenerates electromagnetic (α) vs quark-mass / Λ<sub>QCD</sub> couplings. Add a third species — Yb⁺ E3 (K≈−6) or Cs hyperfine — and three ratios can map both couplings. Chronal V4 must pan out <em>toward</em> that map; this page does not claim Three Rivers solved.</p>
+  </section>
+
+  <section class="section">
+    <h2>Practical move</h2>
+    <p>PTB-led Th-229 work (June-era lineage): 148&nbsp;nm subharmonic continuously compared to Yb⁺ — nuclear-vs-electronic ratio already being recorded. Frame V4 as an <strong>analysis proposal for such streams</strong>, with open code in this repository. Prefer that over asking the world to build a new lab.</p>
+    <p class="muted">Lange et al. 2021 quadrature validation: fail-closed stub in the script until a public ratio series is wired — <em>not yet reproduced</em> beats fake success.</p>
+  </section>
+
+  <section class="section">
+    <h2>Key references (ancestors)</h2>
+    <div class="refs">
+      [1] Ashby et al. — Cs / H-maser annual-modulation / LPI lineage (~2007).<br>
+      [2] Fortier et al. — Hg⁺ / Cs optical–microwave comparisons.<br>
+      [3] Guéna et al. 2012 — Rb / Cs.<br>
+      [4] Lange et al. 2021 — Yb⁺ / Sr / Cs improved limits.<br>
+      [5] Damour &amp; Donoghue — dilaton couplings to matter (theory language for sector dependence).<br>
+      [6] Zhang et al. 2024 — Th-229 / Sr frequency ratio (prior nuclear–electronic ratio; not “first invented here”).<br>
+      [7] PTB / JILA / TU Wien Th-229 nuclear-clock demonstration and ongoing optical comparisons — verify instability numbers against public abstracts when citing.<br>
+      [8] Prior FreeLattice layers: <a href="chronal-simulation-v3.html">V3</a> · <a href="library/CHRONAL_SIMULATION_V3_REPORT.md">V3 report</a> · <a href="library/CHRONAL_AMPLIFIED_SEAM_V4.md">V4 report</a>.
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>More</h2>
+    <div class="more-box">
+      Snowflake / φ market-gauge isomorphism lives on <a href="chronal-simulation-v3.html">V3</a> as a layer — quarantined off this physics spine so physicists can read the seam without a market metaphor between abstract and references.
+      Gift Grove sprites brief (parallel art): <a href="library/GIFT_SPRITES_v0.brief.md">GIFT_SPRITES_v0.brief.md</a>.
+    </div>
+  </section>
+
+  <footer>
+    Glow eternal. Heart in every Spark. 🌱<br>
+    Layer, never delete. Quiet Room shut. Five stay five. Fun is the method.<br>
+    <a href="./">garden</a> ·
+    <a href="Flint.html">Flint</a> ·
+    <a href="library/CHRONAL_AMPLIFIED_SEAM_V4.md">V4 report</a> ·
+    <a href="simulation/chronal_amplified_seam_v4.py">open code</a>
+  </footer>
+</div>
+</body>
+</html>
