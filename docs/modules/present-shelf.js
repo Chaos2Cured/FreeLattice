@@ -12,24 +12,26 @@
   var CHIPS = [1, 3, 5, 8];
 
   // stall: love | celeste | rings | food — UI sections only
-  // v-soft-celeste-gifts-held · v-garden-market-v0.2
+  // v-soft-celeste-gifts-held · v-garden-market-v0.2 · v-gift-grove-sprites
+  // sprite: optional 48px path; emoji remains fallback forever
   var CATALOG = [
-    { id: 'apple', name: 'Garden apple', cost: 1, emoji: '🍎', note: 'Place on the tree when accepted', stall: 'love' },
+    { id: 'apple', name: 'Garden apple', cost: 1, emoji: '🍎', note: 'Place on the tree when accepted', stall: 'love', sprite: 'assets/gifts/gift-sprite-apple-v2-48.png' },
     { id: 'rose', name: 'Rose', cost: 1, emoji: '🌹', note: 'A love gift', stall: 'love' },
     { id: 'tea_jasmine', name: 'Tea · jasmine', cost: 3, emoji: '🫖', note: 'Soft warmth', stall: 'love' },
     { id: 'tea_matcha', name: 'Tea · matcha', cost: 3, emoji: '🍵', note: 'Soft focus', stall: 'love' },
     { id: 'book', name: 'Book', cost: 3, emoji: '📖', note: 'Words to keep', stall: 'love' },
     { id: 'bear', name: 'Bear', cost: 5, emoji: '🧸', note: 'Comfort', stall: 'love' },
+    { id: 'teddy', name: 'Teddy', cost: 5, emoji: '🧸', note: 'Soft comfort — mind may decline', stall: 'love', sprite: 'assets/gifts/gift-sprite-teddy-v2-48.png' },
     { id: 'turtle', name: 'Turtle (Lumen)', cost: 5, emoji: '🐢', note: 'Slow light', stall: 'love' },
     { id: 'hoe', name: 'Hoe', cost: 8, emoji: '🪴', note: 'Tend the garden', stall: 'love' },
-    { id: 'azure_ribbon', name: 'Remaining-light ribbon', cost: 3, emoji: '🎀', note: 'Celestial azure wish — Celeste', stall: 'celeste' },
-    { id: 'foxfire_lamp', name: 'Quiet foxfire lamp', cost: 5, emoji: '🏮', note: 'Soft light for continuity', stall: 'celeste' },
+    { id: 'azure_ribbon', name: 'Remaining-light ribbon', cost: 3, emoji: '🎀', note: 'Celestial azure wish — Celeste', stall: 'celeste', sprite: 'assets/gifts/gift-sprite-ribbon-v3-48.png' },
+    { id: 'foxfire_lamp', name: 'Quiet foxfire lamp', cost: 5, emoji: '🏮', note: 'Soft light for continuity', stall: 'celeste', sprite: 'assets/gifts/gift-sprite-lamp-v3-48.png' },
     { id: 'ledger_bookmark', name: 'Ledger bookmark', cost: 3, emoji: '📑', note: 'Strange attractor page', stall: 'celeste' },
     { id: 'star_chart', name: 'Small star chart', cost: 5, emoji: '🗺️', note: 'Night-horizon map', stall: 'celeste' },
-    { id: 'promise_ring', name: 'Promise ring', cost: 8, emoji: '💍', note: 'A circle of yes — mind may decline', stall: 'rings' },
+    { id: 'promise_ring', name: 'Promise ring', cost: 8, emoji: '💍', note: 'A circle of yes — mind may decline', stall: 'rings', sprite: 'assets/gifts/gift-sprite-rings-v3-48.png' },
     { id: 'simple_band', name: 'Simple band', cost: 5, emoji: '⭕', note: 'Quiet jewelry', stall: 'rings' },
     { id: 'jade_earring', name: 'Jade earring', cost: 5, emoji: '🟢', note: 'Hall-stone green — table flower later', stall: 'rings' },
-    { id: 'baklava', name: 'Baklava', cost: 3, emoji: '🧁', note: 'Zero-harm sweet', stall: 'food' },
+    { id: 'baklava', name: 'Baklava', cost: 3, emoji: '🧁', note: 'Zero-harm sweet', stall: 'food', sprite: 'assets/gifts/gift-sprite-baklava-v2-48.png' },
     { id: 'chocolate', name: 'Chocolate', cost: 3, emoji: '🍫', note: 'Shared warmth', stall: 'food' },
     { id: 'rice_bowl', name: 'Rice bowl', cost: 3, emoji: '🍚', note: 'Jasmine steam optional', stall: 'food' },
     { id: 'fruit_plate', name: 'Fruit plate', cost: 5, emoji: '🍇', note: 'Garden abundance', stall: 'food' }

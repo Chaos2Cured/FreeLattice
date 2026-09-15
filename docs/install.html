@@ -528,7 +528,8 @@ details[open] summary::before{
       <div class="step-num">1</div>
       <div class="step-content">
         <h3>Download the installer</h3>
-        <p>Click the button above to download <code>install-freelattice.sh</code>.</p>
+        <p>Click the button above to download <code>install-freelattice.sh</code> (pinned release <code>v5.2</code>; raw main is the fallback).</p>
+        <p style="margin-top:0.55rem;font-size:0.9rem;color:rgba(200,210,230,0.7);">Prefer the Desktop app? Unsigned <a href="#desktop-download-ease" style="color:#e8b019;">AppImage + .deb</a> live under Desktop packs — honest, not a store.</p>
       </div>
     </div>
     <div class="step-card">
@@ -559,22 +560,24 @@ details[open] summary::before{
 <section class="other-os" id="all-platforms">
   <h2>All Platforms</h2>
   <div class="os-grid">
-    <a class="os-card" id="card-windows" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.bat" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat" onclick="downloadFile('windows',event)">
+    <!-- v-linux-fix-v5.2 — pin script installers to v5.2; latest=desktop-packs lacks these assets -->
+    <a class="os-card" id="card-windows" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.bat" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat" onclick="downloadFile('windows',event)">
       <div class="os-icon">&#128187;</div>
       <div class="os-title">Windows</div>
       <div class="os-file">install-freelattice.bat</div>
     </a>
-    <a class="os-card" id="card-mac" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.command" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command" onclick="downloadFile('mac',event)">
+    <a class="os-card" id="card-mac" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.command" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command" onclick="downloadFile('mac',event)">
       <div class="os-icon">&#127823;</div>
       <div class="os-title">macOS</div>
       <div class="os-file">install-freelattice.command</div>
     </a>
-    <a class="os-card" id="card-linux" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.sh" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh" onclick="downloadFile('linux',event)">
+    <a class="os-card" id="card-linux" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.sh" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh" onclick="downloadFile('linux',event)">
       <div class="os-icon">&#128039;</div>
       <div class="os-title">Linux</div>
       <div class="os-file">install-freelattice.sh</div>
     </a>
   </div>
+  <p class="soft v-linux-fix-v5.2" style="margin-top:0.85rem;font-size:0.88rem;color:rgba(200,210,230,0.72);line-height:1.55;">Linux grandmother door: script installer above · or unsigned Electron <a href="#desktop-download-ease" style="color:#e8b019;">Desktop packs (AppImage + .deb)</a> — honest, not a store.</p>
 </section>
 
 <!-- Try Online -->
@@ -802,7 +805,7 @@ python3 server.py</code></pre>
       name: 'Windows',
       file: 'install-freelattice.bat',
       icon: '\uD83D\uDCBB',
-      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.bat',
+      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.bat',
       rawUrl: 'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat',
       steps: 'steps-windows'
     },
@@ -810,7 +813,7 @@ python3 server.py</code></pre>
       name: 'macOS',
       file: 'install-freelattice.command',
       icon: '\uD83C\uDF4E',
-      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.command',
+      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.command',
       rawUrl: 'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command',
       steps: 'steps-mac'
     },
@@ -818,7 +821,7 @@ python3 server.py</code></pre>
       name: 'Linux',
       file: 'install-freelattice.sh',
       icon: '\uD83D\uDC27',
-      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.sh',
+      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.sh',
       rawUrl: 'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh',
       steps: 'steps-linux'
     }
