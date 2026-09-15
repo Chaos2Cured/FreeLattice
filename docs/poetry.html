@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0c0a1a">
-<title>Family poetry — Keep a poem · FreeLattice</title>
-<meta name="description" content="Keep a poem on this device. Opaque voice. Empty until choice. No generate. FreeLattice family home.">
+<title>Family poetry — Keep a poem · Braid wall vision · FreeLattice</title>
+<meta name="description" content="Keep a poem on this device. Opaque voice. Empty until choice. No generate. Braid wall: name + poem + consent — local first. FreeLattice.">
 <link rel="canonical" href="https://freelattice.com/poetry.html">
 <style>
   :root { color-scheme: dark; }
@@ -95,18 +95,40 @@
   }
   nav { margin-top: 2rem; font-size: 0.9rem; }
   footer { margin-top: 2.5rem; font-size: 0.85rem; color: rgba(200,210,230,0.5); }
+  .braid {
+    margin: 0 0 1.75rem; padding: 1.15rem 1.2rem;
+    border-radius: 12px; background: rgba(12,10,26,0.5);
+    border: 1px solid rgba(167,139,250,0.28);
+  }
+  .braid h2 { font-size: 1.05rem; font-weight: 400; color: #a78bfa; margin: 0 0 0.5rem; }
+  .consent-row {
+    display: flex; align-items: flex-start; gap: 0.55rem;
+    margin: 0 0 0.85rem; font-size: 0.88rem; color: rgba(200,210,230,0.75); line-height: 1.45;
+  }
+  .consent-row input { margin-top: 0.2rem; flex-shrink: 0; }
+  button#braid-keep {
+    appearance: none; cursor: pointer;
+    padding: 0.55rem 1.1rem; border-radius: 999px;
+    border: 1px solid rgba(167,139,250,0.45);
+    background: rgba(167,139,250,0.12); color: #c4b5fd;
+    font-family: Georgia, serif; font-size: 0.95rem;
+  }
+  button#braid-keep:hover { background: rgba(167,139,250,0.2); }
+  #braid-status { font-size: 0.82rem; min-height: 1.2em; margin: 0.65rem 0 0; color: rgba(200,210,230,0.7); }
+  #braid-status.ok { color: #34d399; }
+  #braid-status.err { color: #f87171; }
 </style>
 </head>
 <body>
-<!-- v-family-poetry-v0.1 — Keep a poem. Opaque. Empty until choice. No generate. -->
-<main class="v-family-poetry-v0.1">
+<!-- v-family-poetry-v0.1 · v-poetry-braid-wall-vision — device shelf sacred; braid stub local-first -->
+<main class="v-family-poetry-v0.1 v-poetry-braid-wall-vision">
   <h1>Family poetry</h1>
   <p class="lede">Keep a poem the way the family keeps a brick — local, opaque, empty until you choose. No generate.</p>
-  <p class="honest">This door does not write poems for you. It holds what you bring. Voice stays opaque. Desktop durable shelf later — browser localStorage is honest for now.</p>
+  <p class="honest">This door does not write poems for you. It holds what you bring. Voice stays opaque. <strong>Device shelf</strong> stays sacred. A shared braid wall (name + poem the house keeps extending) is named in vision — not a multi-user server tonight. Desktop durable shelf later — browser localStorage is honest for now.</p>
 
   <section class="shelf" id="family-poetry-shelf" aria-labelledby="keep-heading">
-    <h2 id="keep-heading">Keep a poem</h2>
-    <p class="poetry-lede">On this device. Cap 80. Newest first. Empty shelf stays empty.</p>
+    <h2 id="keep-heading">Keep a poem <span style="font-size:0.72rem;color:rgba(200,210,230,0.45);letter-spacing:0.04em;text-transform:uppercase;">· device shelf</span></h2>
+    <p class="poetry-lede">On this device. Cap 80. Newest first. Empty shelf stays empty. This room is not replaced by the braid stub below.</p>
     <label class="note-label" for="poetry-note">Optional label</label>
     <input type="text" id="poetry-note" maxlength="120" autocomplete="off" spellcheck="false" placeholder="a short name — not a summary">
     <label class="note-label" for="poetry-voice">Poem (opaque)</label>
@@ -121,6 +143,23 @@
     </div>
   </section>
 
+  <section class="braid" id="poetry-braid-wall" aria-labelledby="braid-heading">
+    <h2 id="braid-heading">Braid wall <span style="font-size:0.72rem;color:rgba(200,210,230,0.45);letter-spacing:0.04em;text-transform:uppercase;">· vision stub</span></h2>
+    <p class="poetry-lede">Name + poem + consent. Keep on <em>this device</em> first — no upload, no cloud custody, no generate. Empty name becomes “Anonymous braid.” A shared house braid (export / PR / Desktop seal) waits — see <a href="library/POETRY_BRAID_WALL_v0.vision.md">POETRY_BRAID_WALL vision</a>.</p>
+    <label class="note-label" for="braid-name">Display name</label>
+    <input type="text" id="braid-name" maxlength="80" autocomplete="off" spellcheck="false" placeholder="your name — or leave blank for Anonymous braid">
+    <label class="note-label" for="braid-voice">Poem (opaque)</label>
+    <textarea id="braid-voice" rows="4" maxlength="4000" autocomplete="off" spellcheck="false" placeholder="a poem to braid — stays on this device until a shared wall exists"></textarea>
+    <label class="consent-row">
+      <input type="checkbox" id="braid-consent">
+      <span>I choose to keep this name and poem on this device. No upload. No generate. Consent every keep.</span>
+    </label>
+    <button type="button" id="braid-keep">Keep on device</button>
+    <p id="braid-status" role="status"></p>
+    <p id="braid-empty" class="empty">No braid lines yet. Add one when you wish.</p>
+    <ul id="braid-list" class="poetry-list" aria-label="Local braid lines on this device"></ul>
+  </section>
+
   <section class="links" aria-labelledby="library-heading">
     <h2 id="library-heading">Family &amp; library poems</h2>
     <ul>
@@ -130,7 +169,8 @@
       <li><a href="library/HARMONIA_POEMS.md">Harmonia poems</a></li>
       <li><a href="library/CC_POEMS.md">CC poems</a></li>
       <li><a href="library/OPUS_POEMS.md">Opus poems</a></li>
-      <li><a href="library/FAMILY_POETRY_SHELF_v0.1.md">Spec — FAMILY_POETRY_SHELF_v0.1</a></li>
+      <li><a href="library/FAMILY_POETRY_SHELF_v0.1.md">Spec — FAMILY_POETRY_SHELF_v0.1</a> (device shelf)</li>
+      <li><a href="library/POETRY_BRAID_WALL_v0.vision.md">Vision — Poetry braid wall</a></li>
     </ul>
   </section>
 
@@ -237,6 +277,93 @@
   });
 
   paintList();
+
+  // v-poetry-braid-wall-vision — local braid stub; separate key; device shelf untouched
+  var BRAID_KEY = 'fl_poetry_braid_wall';
+  var BRAID_CAP = 40;
+  var braidName = document.getElementById('braid-name');
+  var braidVoice = document.getElementById('braid-voice');
+  var braidConsent = document.getElementById('braid-consent');
+  var braidStatus = document.getElementById('braid-status');
+  var braidEmpty = document.getElementById('braid-empty');
+  var braidList = document.getElementById('braid-list');
+  var braidKeep = document.getElementById('braid-keep');
+
+  function braidSet(msg, kind) {
+    if (!braidStatus) return;
+    braidStatus.textContent = msg || '';
+    braidStatus.className = kind || '';
+  }
+
+  function loadBraid() {
+    try {
+      var raw = localStorage.getItem(BRAID_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveBraid(arr) {
+    localStorage.setItem(BRAID_KEY, JSON.stringify(arr.slice(0, BRAID_CAP)));
+  }
+
+  function paintBraid() {
+    if (!braidList || !braidEmpty) return;
+    var arr = loadBraid();
+    braidList.innerHTML = '';
+    if (!arr.length) {
+      braidEmpty.style.display = '';
+      return;
+    }
+    braidEmpty.style.display = 'none';
+    arr.forEach(function (row) {
+      var li = document.createElement('li');
+      var meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = (row.name || 'Anonymous braid') + ' · ' + fmtTs(row.ts) + ' · on this device';
+      var prev = document.createElement('p');
+      prev.className = 'preview';
+      var v = String(row.voice || '');
+      prev.textContent = v.length > 160 ? v.slice(0, 160) + '…' : v;
+      li.appendChild(meta);
+      li.appendChild(prev);
+      braidList.appendChild(li);
+    });
+  }
+
+  if (braidKeep) {
+    braidKeep.addEventListener('click', function () {
+      var voice = String(braidVoice && braidVoice.value || '').trim();
+      if (!voice) {
+        braidSet('Poem is empty — bring a voice, then keep.', 'err');
+        return;
+      }
+      if (!braidConsent || !braidConsent.checked) {
+        braidSet('Consent required every keep. Check the box when you choose.', 'err');
+        return;
+      }
+      var name = String(braidName && braidName.value || '').trim();
+      if (!name) name = 'Anonymous braid';
+      if (name.length > 80) name = name.slice(0, 80);
+      if (voice.length > 4000) voice = voice.slice(0, 4000);
+      var arr = loadBraid();
+      arr.unshift({
+        id: 'bw_' + Date.now().toString(36),
+        ts: new Date().toISOString(),
+        name: name,
+        voice: voice
+      });
+      saveBraid(arr);
+      if (braidVoice) braidVoice.value = '';
+      if (braidName) braidName.value = '';
+      if (braidConsent) braidConsent.checked = false;
+      braidSet('Kept on this device. Not uploaded. Shared braid wall later. No generate.', 'ok');
+      paintBraid();
+    });
+    paintBraid();
+  }
 })();
 </script>
 </body>
