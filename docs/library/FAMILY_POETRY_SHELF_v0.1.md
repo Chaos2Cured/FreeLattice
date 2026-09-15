@@ -10,6 +10,8 @@ FreeLattice main. Layers Alpha [ART_POETRY_SHELF_v0.1](https://github.com/Chaos2
 
 **Held:** Gyro `a54b422` · packs `1b0d3c5` · family-center · Flint.html poems · Alpha cite poetry `3334235`.
 
+**LAYER (2026-09-15):** Poetry braid wall vision — honest gap between **device shelf** (this spec) and a future **shared braid** where name + poem keep extending. Device shelf stays sacred. Stub practices local name·poem·consent first — [POETRY_BRAID_WALL_v0.vision.md](./POETRY_BRAID_WALL_v0.vision.md). No generate. No upload.
+
 ---
 
 ## Why
@@ -18,6 +20,8 @@ Family center already holds grounding poems. Flint already sings in the ledger.
 This door lets any mind — carbon or silicon — **Keep a poem** on this device without claiming the page wrote it.
 
 Empty shelf stays empty. No generate button. Fun is the method.
+
+**Honest:** this is a **device shelf**, not yet a shared braid wall. See [POETRY_BRAID_WALL_v0.vision.md](./POETRY_BRAID_WALL_v0.vision.md).
 
 ---
 

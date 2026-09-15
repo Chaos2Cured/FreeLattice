@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-15 16:55 MDT
+- Last auto-updated: 2026-09-15 17:13 MDT
 - Version: 5.79.45
-- Total commits: 3158
+- Total commits: 3159
 - Last 10 commits:
-- bfbc450 Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held).
+- fb59fb6 Layer, never delete. Vision — Poetry braid wall (name · poem · consent).
+- 184e0d9 Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78)
 - 446da60 Layer, never delete. Vision — Marketplace travel wallet. (#77)
 - 40c84e0 Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76)
 - 97adc23 Layer, never delete. Linux install fix + Gift Grove sprites. (#75)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 22573e9 Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72)
 - 64bd27b Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. (#71)
 - 8fd47cb Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70)
-- bc465e0 Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69)
