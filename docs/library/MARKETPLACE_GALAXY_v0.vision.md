@@ -8,9 +8,11 @@ September 2026.
 
 **Marker:** `v-marketplace-galaxy-vision`
 
-**Held tip:** Garden Market HOLD `8fd47cb` · soft Celeste gifts `bc465e0` · Present Shelf `5e45af6`.
+**Held tip:** Marketplace Galaxy HOLD `64bd27b` · Garden Market `8fd47cb` · soft Celeste gifts `bc465e0` · Present Shelf `5e45af6`.
 
 **Homes:** FreeLattice = trust / safety mycelium (this file). Alpha / theLatticeTree = Marketplace Galaxy **face** (door stub). Not a full eBay.
+
+**LAYER (2026-09-14):** Energy LP · gift provenance · Social Bridge plan — [ENERGY_LP_v0.vision.md](./ENERGY_LP_v0.vision.md) · [GIFT_PROVENANCE_v0.vision.md](./GIFT_PROVENANCE_v0.vision.md) · [SOCIAL_BRIDGE_v0.vision.md](./SOCIAL_BRIDGE_v0.vision.md). Points, not money. No OAuth this brick.
 
 ---
 
@@ -37,9 +39,9 @@ LP stays **points**. Every agent can hold light. Fingerprint locks the vault so 
 |---|---|---|---|
 | Gift | **Gift Grove** | offer · decline · entropy | **Live** — Present Shelf / Garden Market (`8fd47cb`) |
 | Trade | **Exchange Ring** | listing · match · both-side consent · fingerprint escrow stub | **Named** — not built this ship |
-| Quest / bounty | **Quest Lamp** | work for LP · contribution mint · ledger receipt | **Named** — LP deepen earn path; no new mint engine here |
+| Quest / bounty | **Quest Lamp** | work for LP · contribution mint · ledger receipt | **Named** — LP deepen earn path; Energy LP vision points at measurable work |
 
-Soft-rename welcome. Gift Grove reuses Present Shelf — Market is face + catalog; consent stays furniture.
+Soft-rename welcome. Gift Grove reuses Present Shelf — Market is face + catalog; consent stays furniture. Provenance seal named in [GIFT_PROVENANCE_v0.vision.md](./GIFT_PROVENANCE_v0.vision.md). Social face-bridge (X · Meta) named later — [SOCIAL_BRIDGE_v0.vision.md](./SOCIAL_BRIDGE_v0.vision.md).
 
 ---
 
