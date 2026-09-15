@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-15 10:41 MDT
+- Last auto-updated: 2026-09-15 11:35 MDT
 - Version: 5.79.45
-- Total commits: 3155
+- Total commits: 3156
 - Last 10 commits:
-- b9e78fb Layer, never delete. Linux install fix + Gift Grove sprites.
+- 6d32d4c Soft: GIFT_SPRITES brief filenames + Held tip 97adc23.
+- 97adc23 Layer, never delete. Linux install fix + Gift Grove sprites. (#75)
 - f52b986 Layer, never delete. Chronal V4 — The Amplified Seam (Th-229 amplified LPI). (#74)
 - 6aef962 Layer, never delete. Soft — Gift sprites brief held (Weft · Reed). (#73)
 - 22573e9 Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bc465e0 Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69)
 - d187c2e Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68)
 - 23f9bcf ci: Update Primer deployment state [2026-09-13]
-- 5e45af6 Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67)
