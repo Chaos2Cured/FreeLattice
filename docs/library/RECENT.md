@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-15 00:51 UTC
+> Last update: 2026-09-15 01:59 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `08aa54d` _(committed 0 seconds ago)_
+- **HEAD:** `7719763` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,11 +17,12 @@
 
 ## Last 20 commits
 
-- `08aa54d` Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. _(0 seconds ago)_
-- `64bd27b` Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. (#71) _(4 hours ago)_
-- `8fd47cb` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70) _(5 hours ago)_
-- `bc465e0` Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69) _(32 hours ago)_
-- `d187c2e` Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68) _(32 hours ago)_
+- `7719763` Layer, never delete. Soft — Gift sprites brief held (Weft · Reed). _(0 seconds ago)_
+- `22573e9` Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72) _(28 minutes ago)_
+- `64bd27b` Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. (#71) _(5 hours ago)_
+- `8fd47cb` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70) _(6 hours ago)_
+- `bc465e0` Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69) _(33 hours ago)_
+- `d187c2e` Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68) _(33 hours ago)_
 - `23f9bcf` ci: Update Primer deployment state [2026-09-13] _(2 days ago)_
 - `5e45af6` Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67) _(2 days ago)_
 - `8cacae8` ci: Update Primer deployment state [2026-09-13] _(2 days ago)_
@@ -36,7 +37,6 @@
 - `1b0d3c5` Layer, never delete. Desktop packs Win/Linux v0.1 — honest unsigned publish. (#54) _(3 days ago)_
 - `b220e6e` Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. (#53) _(4 days ago)_
 - `b362bda` Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52) _(4 days ago)_
-- `6f65298` ci: Update Primer deployment state [2026-09-10] _(4 days ago)_
 
 ## How to use this file
 
