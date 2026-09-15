@@ -10,6 +10,8 @@ FreeLattice main. September 2026.
 
 **Held tip:** Soft Celeste gifts `bc465e0` · prior Present Shelf `5e45af6` · KEY DAY `6fa7094`.
 
+**LAYER (2026-09-14):** Gift sprites brief held — Weft + Reed; emoji stay until Imagine clears tests — [GIFT_SPRITES_v0.brief.md](./GIFT_SPRITES_v0.brief.md).
+
 **Engine:** Present Shelf stays the consent engine (`present-shelf.js`). Market is **face + catalog layer** — browse · spend LP · offer · accept/decline. Alias: `GardenMarket === PresentShelf`.
 
 ---
