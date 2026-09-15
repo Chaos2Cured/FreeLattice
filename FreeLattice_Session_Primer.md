@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-14 18:51 MDT
+- Last auto-updated: 2026-09-14 19:59 MDT
 - Version: 5.79.45
-- Total commits: 3152
+- Total commits: 3153
 - Last 10 commits:
-- 08aa54d Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan.
+- 7719763 Layer, never delete. Soft — Gift sprites brief held (Weft · Reed).
+- 22573e9 Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72)
 - 64bd27b Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. (#71)
 - 8fd47cb Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70)
 - bc465e0 Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5e45af6 Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67)
 - 8cacae8 ci: Update Primer deployment state [2026-09-13]
 - 6fa7094 Layer, never delete. Key day 2026-09-12 — torrent spine named; soft EXAMPLE/IP docs. (#66)
-- f912def ci: Update Primer deployment state [2026-09-12]
