@@ -44,8 +44,15 @@ assert.ok(shelf.catalogItem('baklava').sprite, 'baklava sprite');
 assert.ok(shelf.catalogItem('promise_ring').sprite, 'rings sprite');
 assert.ok(/onerror=/.test(page), 'emoji fallback onerror');
 assert.ok(/🍎|emoji/.test(page + JSON.stringify(shelf.CATALOG)), 'emoji kept');
-assert.ok(/f52b986/.test(flint), 'Held tip Chronal V4');
+assert.ok(/97adc23/.test(flint) || /f52b986/.test(flint), 'Held tip Gift Grove / Chronal');
 assert.ok(/Never auto|never auto/i.test(page), 'no auto');
+
+// Soft brief filenames match live assets
+const brief = fs.readFileSync(path.join(root, 'library', 'GIFT_SPRITES_v0.brief.md'), 'utf8');
+assert.ok(/97adc23/.test(brief), 'brief Held tip 97adc23');
+files.forEach(function (f) {
+  assert.ok(brief.indexOf(f) !== -1, 'brief names live file ' + f);
+});
 
 console.log('SMOKE_OK linux fix + gift grove sprites');
 console.log('v5.2 pin · six sprites · teddy · emoji fallback');

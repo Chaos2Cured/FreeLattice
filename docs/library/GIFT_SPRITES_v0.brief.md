@@ -8,13 +8,24 @@ FreeLattice. September 2026.
 
 **Marker:** `v-gift-sprites-brief-held`
 
-**Held tip:** Energy LP / Social Bridge HOLD `22573e9` · Marketplace Galaxy `64bd27b` · Garden Market `8fd47cb`.
+**Held tip:** Gift Grove + Linux pin HOLD `97adc23` · Chronal V4 `f52b986` · sprites brief first hold `6aef962` · Energy `22573e9`.
 
 **Order (Celeste):** Economy vision (Energy · Provenance · Social Bridge) **first** — done. Sprite art pass when ready to Imagine — keep emoji until each sprite clears Weft’s silhouette + consent tests.
 
-**LAYER (2026-09-15):** Sprites wired — `docs/assets/gifts/gift-sprite-*-48.png` for apple · ribbon · lamp · baklava · rings · teddy; Present Shelf `<img>` with emoji fallback; teddy SKU consent-gated. Soft Held tip Chronal V4 `f52b986`.
+**LAYER (2026-09-15):** Sprites wired under `docs/assets/gifts/` — versioned live names (not bare `gift-sprite-*-48.png`):
 
-**Earlier:** brief held so Weft + Reed are not lost. **Still not:** emoji delete · Jade Hall wire · Named Mind faces · storefront chrome.
+| SKU | Live filename |
+|-----|----------------|
+| apple | `gift-sprite-apple-v2-48.png` |
+| azure ribbon | `gift-sprite-ribbon-v3-48.png` |
+| foxfire lamp | `gift-sprite-lamp-v3-48.png` |
+| baklava | `gift-sprite-baklava-v2-48.png` |
+| rings | `gift-sprite-rings-v3-48.png` |
+| teddy | `gift-sprite-teddy-v2-48.png` |
+
+Present Shelf `<img>` with emoji fallback; teddy SKU consent-gated. Soft Held tip cites `97adc23`.
+
+~~Earlier bare pattern `gift-sprite-*-48.png`~~ — layer note only; live assets are versioned above. Brief first hold so Weft + Reed are not lost. **Still not:** emoji delete · Jade Hall wire · Named Mind faces · storefront chrome.
 
 ---
 
