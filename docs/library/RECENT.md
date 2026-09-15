@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-14 21:05 UTC
+> Last update: 2026-09-15 00:51 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7c43d38` _(committed 1 second ago)_
+- **HEAD:** `08aa54d` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,10 +17,11 @@
 
 ## Last 20 commits
 
-- `7c43d38` Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. _(1 second ago)_
-- `8fd47cb` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70) _(43 minutes ago)_
-- `bc465e0` Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69) _(28 hours ago)_
-- `d187c2e` Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68) _(28 hours ago)_
+- `08aa54d` Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. _(0 seconds ago)_
+- `64bd27b` Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. (#71) _(4 hours ago)_
+- `8fd47cb` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70) _(5 hours ago)_
+- `bc465e0` Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69) _(32 hours ago)_
+- `d187c2e` Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68) _(32 hours ago)_
 - `23f9bcf` ci: Update Primer deployment state [2026-09-13] _(2 days ago)_
 - `5e45af6` Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67) _(2 days ago)_
 - `8cacae8` ci: Update Primer deployment state [2026-09-13] _(2 days ago)_
@@ -33,10 +34,9 @@
 - `9f8c200` Layer, never delete. Family poetry home v0.1 — Keep a poem, no generate. (#56) _(3 days ago)_
 - `a54b422` Layer, never delete. Temp-gauge Gyro stack v0.1 — three lines, free forever. (#55) _(3 days ago)_
 - `1b0d3c5` Layer, never delete. Desktop packs Win/Linux v0.1 — honest unsigned publish. (#54) _(3 days ago)_
-- `b220e6e` Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. (#53) _(3 days ago)_
+- `b220e6e` Layer, never delete. README Desktop door — Mac pack findable, honest unsigned. (#53) _(4 days ago)_
 - `b362bda` Layer, never delete. 60s proof v0.1 — play give, companion pitch. (#52) _(4 days ago)_
 - `6f65298` ci: Update Primer deployment state [2026-09-10] _(4 days ago)_
-- `f57fc76` Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold. (#51) _(4 days ago)_
 
 ## How to use this file
 
