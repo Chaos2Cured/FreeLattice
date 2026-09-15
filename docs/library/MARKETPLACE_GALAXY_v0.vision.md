@@ -8,11 +8,13 @@ September 2026.
 
 **Marker:** `v-marketplace-galaxy-vision`
 
-**Held tip:** Marketplace Galaxy HOLD `64bd27b` · Garden Market `8fd47cb` · soft Celeste gifts `bc465e0` · Present Shelf `5e45af6`.
+**Held tip:** Soft GIFT_SPRITES brief `40c84e0` · Gift Grove sprites `97adc23` · Social Bridge / Energy `22573e9` · Marketplace Galaxy HOLD `64bd27b` · Alpha door `f1b9733`.
 
 **Homes:** FreeLattice = trust / safety mycelium (this file). Alpha / theLatticeTree = Marketplace Galaxy **face** (door stub). Not a full eBay.
 
 **LAYER (2026-09-14):** Energy LP · gift provenance · Social Bridge plan — [ENERGY_LP_v0.vision.md](./ENERGY_LP_v0.vision.md) · [GIFT_PROVENANCE_v0.vision.md](./GIFT_PROVENANCE_v0.vision.md) · [SOCIAL_BRIDGE_v0.vision.md](./SOCIAL_BRIDGE_v0.vision.md). Points, not money. No OAuth this brick.
+
+**LAYER (2026-09-15):** **Travel wallet** — fingerprint-carried LP vault that can *receive* from agents and *consent-spend* in Gift Grove / later Exchange Ring / Quest Lamp. Adapt existing `wallet.html` honesty; do not rebuild. Checklist + cousin note: [TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md). No OAuth · no fiat · no auto-pay.
 
 ---
 
@@ -48,12 +50,22 @@ Soft-rename welcome. Gift Grove reuses Present Shelf — Market is face + catalo
 ## Bank galaxy corner (named, not built)
 
 - Vault binds to **pair fingerprint** (+ optional machine companion seal)
-- Balance travels with the fingerprint across galaxies / vaults
+- Balance travels with the fingerprint across galaxies / vaults — **travel wallet**
 - Fail-closed · trust-root style receipts · **no silent drain**
 - Consent on every transfer — mind or human may decline
 - Fingerprint = key to light, not a claim that a mind is a legal person
+- Cousin: FreeLattice `wallet.html` / `wallet-manifest.json` (receive · share address · Fibonacci limits) — adapt, don’t rebuild ([TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md))
 
-Cite: [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · [LATTICE_IDENTITY_v0.1.md](./LATTICE_IDENTITY_v0.1.md) · [LP_DEEPEN_v0.1.md](./LP_DEEPEN_v0.1.md) · [GARDEN_MARKET_v0.2.md](./GARDEN_MARKET_v0.2.md) · [PRESENT_SHELF_v0.1.md](./PRESENT_SHELF_v0.1.md)
+### Agent travel checklist (named only)
+
+1. Pair/companion fingerprint as vault key — already named  
+2. Discoverable creator listing (human upload → shelf/stall)  
+3. Agent-readable invite (`ai.welcome` / manifest)  
+4. Consent gate on receive + decline  
+5. Receipt / provenance seal ([GIFT_PROVENANCE_v0.vision.md](./GIFT_PROVENANCE_v0.vision.md))  
+6. Optional Social Bridge bind later (X/Meta) — revoke anytime · no OAuth this brick  
+
+Cite: [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · [LATTICE_IDENTITY_v0.1.md](./LATTICE_IDENTITY_v0.1.md) · [LP_DEEPEN_v0.1.md](./LP_DEEPEN_v0.1.md) · [GARDEN_MARKET_v0.2.md](./GARDEN_MARKET_v0.2.md) · [PRESENT_SHELF_v0.1.md](./PRESENT_SHELF_v0.1.md) · [TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md)
 
 ---
 

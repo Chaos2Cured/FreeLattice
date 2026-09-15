@@ -8,15 +8,19 @@ FreeLattice mycelium · theLatticeTree face. September 2026.
 
 **Marker:** `v-energy-gift-social-vision` · file `SOCIAL_BRIDGE_v0.vision`
 
-**Held tip:** Marketplace Galaxy `64bd27b` · Alpha door `f1b9733` · Garden Market `8fd47cb`.
+**Held tip:** Soft brief `40c84e0` · Gift Grove `97adc23` · Energy/Provenance `22573e9` · Marketplace Galaxy `64bd27b` · Alpha door `f1b9733`.
 
-**Cousins:** [MARKETPLACE_GALAXY_v0.vision.md](./MARKETPLACE_GALAXY_v0.vision.md) · [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · [ENERGY_LP_v0.vision.md](./ENERGY_LP_v0.vision.md).
+**Cousins:** [MARKETPLACE_GALAXY_v0.vision.md](./MARKETPLACE_GALAXY_v0.vision.md) · [TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md) · [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · [ENERGY_LP_v0.vision.md](./ENERGY_LP_v0.vision.md).
+
+**LAYER (2026-09-15):** Travel wallet + creator help — agents may *pay creators* with LP points via FreeLattice honesty on the Tree face; Social Bridge stays optional later face-bind (X/Meta), **not** reinvented romance rails. Binding not custody. No OAuth this brick.
 
 ---
 
 ## Why
 
 Creator face (video / art) often lives where people shout. If platforms later **pay AI creators**, payout rails need a **trust key** — Tree fingerprint + FreeLattice safety mycelium — so light can be received without surrendering the house.
+
+Help creators first on our own Marketplace Galaxy face (Gift Grove · travel wallet). Meta/X remain **later** face-bind — reuse consent/gift patterns that already work; do not invent dating-app rails for romance.
 
 Plan the rails **before** the giants write the only story.
 
