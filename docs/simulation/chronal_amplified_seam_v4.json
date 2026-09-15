@@ -1,0 +1,32 @@
+{
+  "title": "The Amplified Seam",
+  "marker": "v-chronal-amplified-seam-v4",
+  "delta_U_c2": 3.3e-10,
+  "K_alpha_Th": 5900.0,
+  "K_alpha_Sr": 0.06,
+  "existing_kappa_limit": 1e-07,
+  "day_scale_check": {
+    "sigma_R_1day": 1.0206207261596575e-14,
+    "sigma_R_1year": 5.340344467600012e-16,
+    "kappa_1year_today": 2.742857970005142e-10,
+    "note": "Day-scale ~1e-15 class is order-of-magnitude; verify vs PTB abstract."
+  },
+  "lange_reproduction": {
+    "status": "not_yet_reproduced",
+    "ok": false,
+    "todo": "Wire public Lange et al. 2021 ratio series when available; fail-closed until then.",
+    "method": "phase-quadrature annual template vs published ratio residuals",
+    "cite": "Lange et al. 2021 Yb+/Sr/Cs (improved limits / LPI lineage)"
+  },
+  "crossover_seconds": {
+    "today_3e-12": 237.41634041704566,
+    "projected_1e-17": 2.637959337967174e-09,
+    "theory_1e-19": 2.6379593379671727e-13
+  },
+  "honesty": [
+    "no_first_cross_sector_claim",
+    "no_85sigma_vs_bound",
+    "th_noise_verify_vs_PTB_abstract",
+    "analysis_proposal_not_new_lab"
+  ]
+}
