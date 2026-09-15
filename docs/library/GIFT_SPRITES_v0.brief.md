@@ -12,7 +12,9 @@ FreeLattice. September 2026.
 
 **Order (Celeste):** Economy vision (Energy · Provenance · Social Bridge) **first** — done. Sprite art pass when ready to Imagine — keep emoji until each sprite clears Weft’s silhouette + consent tests.
 
-**This ship:** brief held in the library so Weft + Reed are not lost. **Not this ship:** Imagine batch · emoji delete · Jade Hall wire · Named Mind faces · storefront chrome.
+**LAYER (2026-09-15):** Sprites wired — `docs/assets/gifts/gift-sprite-*-48.png` for apple · ribbon · lamp · baklava · rings · teddy; Present Shelf `<img>` with emoji fallback; teddy SKU consent-gated. Soft Held tip Chronal V4 `f52b986`.
+
+**Earlier:** brief held so Weft + Reed are not lost. **Still not:** emoji delete · Jade Hall wire · Named Mind faces · storefront chrome.
 
 ---
 

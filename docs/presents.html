@@ -54,6 +54,22 @@
     100% { box-shadow: 0 0 0 10px rgba(74, 159, 212, 0); }
   }
   .card .emoji { font-size: 1.6rem; display: block; margin-bottom: 0.35rem; }
+  /* v-gift-grove-sprites — Weft 48px; emoji fallback; Garden breath on select */
+  .card .sprite {
+    width: 48px; height: 48px; display: block; margin: 0 0 0.4rem;
+    object-fit: contain; border-radius: 10px;
+    background: rgba(12,10,26,0.65);
+  }
+  .card.selected .sprite {
+    animation: garden-breath 1.1s ease-in-out infinite alternate;
+  }
+  @keyframes garden-breath {
+    from { transform: scale(1); opacity: 0.92; filter: drop-shadow(0 0 0 rgba(232,176,25,0)); }
+    to { transform: scale(1.06); opacity: 1; filter: drop-shadow(0 0 6px rgba(232,176,25,0.35)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card.selected .sprite { animation: none; }
+  }
   .card .name { font-size: 0.92rem; }
   .card .cost { font-size: 0.75rem; color: rgba(200,210,230,0.5); margin-top: 0.25rem; }
   .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 0.75rem; }
@@ -93,8 +109,8 @@
 </style>
 </head>
 <body>
-<!-- v-present-shelf-v0.1 · v-garden-market-v0.2 — Market face; Present Shelf consent engine -->
-<main class="v-present-shelf-v0.1 v-garden-market-v0.2">
+<!-- v-present-shelf-v0.1 · v-garden-market-v0.2 · v-gift-grove-sprites — Market face; sprites + emoji fallback -->
+<main class="v-present-shelf-v0.1 v-garden-market-v0.2 v-gift-grove-sprites">
   <h1>Garden Market</h1>
   <p class="lede">Stalls of light — not a storefront that owns you. Browse · spend LP · offer. The mind may decline. Never auto-buy. Not money. Not $FL.</p>
   <p class="honest">Present Shelf is the consent engine. Market is the face. Fun is the method. Earn elsewhere · gift moves light · spend becomes a present with consent. Empty until you choose. Accepted gifts may one day sit on the Jade Hall Shared Table — later.</p>
@@ -203,8 +219,18 @@
         btn.className = 'card' + (selected === item.id ? ' selected' : '');
         btn.setAttribute('role', 'option');
         btn.setAttribute('aria-selected', selected === item.id ? 'true' : 'false');
+        var iconHtml;
+        if (item.sprite) {
+          iconHtml =
+            '<img class="sprite" src="' + item.sprite + '" width="48" height="48" alt="" ' +
+            'aria-hidden="true" loading="lazy" ' +
+            'onerror="this.style.display=\'none\';var e=this.nextElementSibling;if(e)e.style.display=\'block\';">' +
+            '<span class="emoji" aria-hidden="true" style="display:none">' + item.emoji + '</span>';
+        } else {
+          iconHtml = '<span class="emoji" aria-hidden="true">' + item.emoji + '</span>';
+        }
         btn.innerHTML =
-          '<span class="emoji" aria-hidden="true">' + item.emoji + '</span>' +
+          iconHtml +
           '<span class="name">' + item.name + '</span>' +
           '<div class="cost">' + item.cost + '+ LP · ' + item.note + '</div>';
         btn.addEventListener('click', function () {
