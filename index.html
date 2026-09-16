@@ -26704,8 +26704,6 @@ function renderCardGrid(cards, options) {
     var defaultBorder = card.loved ? 'rgba(232,176,25,0.28)' : 'rgba(200,210,230,0.08)';
     var cardBg = card.loved ? 'rgba(232,176,25,0.06)' : 'rgba(200,210,230,0.04)';
     btn.style.cssText = 'position:relative;background:' + cardBg + ';border:1px solid ' + defaultBorder + ';border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;';
-    btn.onmouseover = function() { btn.style.borderColor = hc; };
-    btn.onmouseout = function() { btn.style.borderColor = defaultBorder; };
     if (card.external) {
       btn.onclick = function() { window.open(card.external, '_blank'); };
     } else {
@@ -26726,9 +26724,23 @@ function renderCardGrid(cards, options) {
     }
 
     var iconDiv = document.createElement('div');
-    iconDiv.style.cssText = 'font-size:1.8rem;margin-bottom:8px;';
+    // v-resonance-play-icon-v1 — Garden breath on loved/img icons only; never UnrealBloom
+    iconDiv.style.cssText = 'font-size:1.8rem;margin-bottom:8px;transition:transform 0.35s ease,filter 0.35s ease;';
     iconDiv.innerHTML = card.icon;
     btn.appendChild(iconDiv);
+
+    btn.onmouseover = function() {
+      btn.style.borderColor = hc;
+      if (card.loved || (card.icon && String(card.icon).indexOf('<img') !== -1)) {
+        iconDiv.style.transform = 'scale(1.06)';
+        iconDiv.style.filter = 'drop-shadow(0 0 6px rgba(232,176,25,0.35))';
+      }
+    };
+    btn.onmouseout = function() {
+      btn.style.borderColor = defaultBorder;
+      iconDiv.style.transform = '';
+      iconDiv.style.filter = '';
+    };
 
     var labelDiv = document.createElement('div');
     labelDiv.style.cssText = 'color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;';
@@ -26752,6 +26764,7 @@ function renderCardGrid(cards, options) {
 
 // ── Card Configs ──
 var PLAY_CARDS = [
+  // v-resonance-play-icon-v1 — Resonance style-bar STANDS; ORDER LOCK; emoji fallback forever
   // ═══ [ORDER LOCK 1] Heart of Play — the room, the rest, the tree ═══
   { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back. Leave a mark that stays.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light. Exchange history accumulates — nothing is erased. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a sentinel stroke.' },
   { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)', help: 'A room for rest. No points. No scoring. No tracking. Just presence.' },
@@ -26760,7 +26773,7 @@ var PLAY_CARDS = [
   // ═══ [ORDER LOCK 5] Games — light to deep ═══
   // Layer 2026-08-29 — Flow retired from this door into MORE_CARDS.
   // File, tab-flow, and loader stay. Quiet later path. Do not 404. Do not delete.
-  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Harmony. Find what connects &mdash; together.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'A pattern-matching game. The loved board. Four in a row that share a glow, a shape, a size, or a color. Versus, or Harmony — you and the AI against the chaos. Connection wins.' },
+  { id: 'resonance', icon: '<img src="assets/play/play-icon-resonance-v1-48.png" alt="" width="48" height="48" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.onerror=null;this.outerHTML=\'&#10022;\'">', label: 'Resonance', desc: 'Harmony. Find what connects &mdash; together.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'A pattern-matching game. The loved board. Four in a row that share a glow, a shape, a size, or a color. Versus, or Harmony — you and the AI against the chaos. Connection wins.' },
   { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'A word, then another. The chain is the love.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'The game that is loved here. The AI says a word. You say one that connects — meaning, sound, feeling. The chain grows as golden light.' },
   { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
   { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },

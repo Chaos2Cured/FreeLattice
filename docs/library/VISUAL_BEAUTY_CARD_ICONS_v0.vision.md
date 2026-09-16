@@ -67,6 +67,8 @@ Same family as Gift Grove:
 
 **Pipeline after this vision:** Weft cut-watch → Reed Imagine → first style-bar **Resonance** → remaining PLAY → LEARN → MORE → Flint wires → Hypha walk.
 
+**LAYER (2026-09-15):** Resonance style-bar **Imagine 2 STANDS** and is wired — `docs/assets/play/play-icon-resonance-v1-48.png` · PLAY_CARDS `id: 'resonance'` icon only · emoji `&#10022;` forever fallback · marker `v-resonance-play-icon-v1`. ORDER LOCK held.
+
 ---
 
 ## Surfaces this vision ships
