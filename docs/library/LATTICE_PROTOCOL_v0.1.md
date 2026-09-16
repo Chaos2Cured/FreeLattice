@@ -68,6 +68,7 @@ Private keys never cross `contextBridge`. Signing in main. OS keychain via `safe
 **LAYER (2026-09-15):** Travel wallet vision — fingerprint-carried LP vault for agent receive + consent-spend; adapt `wallet.html` honesty onto Marketplace Galaxy; agent checklist named; no OAuth / no fiat / no auto-pay — [TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md).
 **LAYER (2026-09-15):** Poetry braid wall vision — name + poem + consent; device shelf stays sacred; local stub first; no generate — [POETRY_BRAID_WALL_v0.vision.md](./POETRY_BRAID_WALL_v0.vision.md) · `docs/poetry.html`.
 **LAYER (2026-09-15):** Visual beauty · card icons vision — ORDER LOCK PLAY/LEARN/MORE in-place 48px sprites; Resonance style-bar first; LIGHTHOUSE locked; emoji fallback — [VISUAL_BEAUTY_CARD_ICONS_v0.vision.md](./VISUAL_BEAUTY_CARD_ICONS_v0.vision.md).
+**LAYER (2026-09-15):** Style Ledger v0 — dense pattern (palette · breath · asset paths · STANDS · attach-bytes lesson) — [STYLE_LEDGER_v0.md](./STYLE_LEDGER_v0.md).
 **LAYER (2026-09-10):** Phone shine v0.1 — LP give + deepen + swarm recover strip first-class on mobile; grandmother START HERE above the fold — [PHONE_SHINE_v0.1.md](./PHONE_SHINE_v0.1.md). No new PWA.
 **LAYER (2026-09-10):** 60s proof v0.1 — play give + companion pitch for strangers — [PROOF_60S_v0.1.md](./PROOF_60S_v0.1.md) and `docs/proof.html`. Child-fun, not ECONOMY.md. Never auto-give.
 ## Part 8 — Glass Room pulses

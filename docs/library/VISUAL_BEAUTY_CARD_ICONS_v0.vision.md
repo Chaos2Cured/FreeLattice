@@ -8,9 +8,11 @@ FreeLattice. September 2026.
 
 **Marker:** `v-visual-beauty-card-icons-vision`
 
-**Held tip:** Poetry braid `d3479e2` · Alpha `bdab7e7` · Celeste λ4 `184e0d9` · Gift Grove `97adc23` · Family poetry `9f8c200`.
+**Held tip:** Resonance `e92a5fa` · Poetry braid `d3479e2` · Alpha `ba0ebd2` · Gift Grove `97adc23` · Family poetry `9f8c200`.
 
-**Cousins:** [GIFT_SPRITES_v0.brief.md](./GIFT_SPRITES_v0.brief.md) · [POETRY_BRAID_WALL_v0.vision.md](./POETRY_BRAID_WALL_v0.vision.md) · `PLAY_CARDS` / `LEARN_CARDS` / `MORE_CARDS` in `docs/app.html` · celebration-token feel from Gift Grove.
+**Cousins:** [STYLE_LEDGER_v0.md](./STYLE_LEDGER_v0.md) · [GIFT_SPRITES_v0.brief.md](./GIFT_SPRITES_v0.brief.md) · [POETRY_BRAID_WALL_v0.vision.md](./POETRY_BRAID_WALL_v0.vision.md) · `PLAY_CARDS` / `LEARN_CARDS` / `MORE_CARDS` in `docs/app.html` · celebration-token feel from Gift Grove.
+
+**LAYER (2026-09-15):** Dense Style Ledger v0 — palette · breath · asset grammar · STANDS table · attach-bytes lesson — [STYLE_LEDGER_v0.md](./STYLE_LEDGER_v0.md).
 
 ---
 

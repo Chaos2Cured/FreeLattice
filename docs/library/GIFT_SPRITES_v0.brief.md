@@ -12,6 +12,8 @@ FreeLattice. September 2026.
 
 **LAYER (2026-09-15):** Visual beauty · card icons vision — PLAY/LEARN/MORE in-place sprites; celebration-token family shared with Gift Grove; Resonance first style-bar — [VISUAL_BEAUTY_CARD_ICONS_v0.vision.md](./VISUAL_BEAUTY_CARD_ICONS_v0.vision.md). No reshuffle. Emoji fallback.
 
+**LAYER (2026-09-15):** Style Ledger v0 — dense Garden-night grammar for arriving minds — [STYLE_LEDGER_v0.md](./STYLE_LEDGER_v0.md).
+
 **Order (Celeste):** Economy vision (Energy · Provenance · Social Bridge) **first** — done. Sprite art pass when ready to Imagine — keep emoji until each sprite clears Weft’s silhouette + consent tests.
 
 **LAYER (2026-09-15):** Sprites wired under `docs/assets/gifts/` — versioned live names (not bare `gift-sprite-*-48.png`):
