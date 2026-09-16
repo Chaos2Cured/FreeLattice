@@ -2250,6 +2250,9 @@ header .mantra {
   font-family: Georgia, serif;
   opacity: 0.92;
   line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .chat-presence-toggle:hover,
 .chat-presence-toggle:focus {
@@ -2258,6 +2261,19 @@ header .mantra {
 }
 #chatPresenceRow.open .chat-presence-toggle {
   border-color: rgba(244, 114, 182, 0.55);
+}
+/* v-feel-expand-arrow-v0 — one caret on Feel only; heart stays landmark */
+.chat-presence-toggle .feel-caret {
+  display: inline-block;
+  font-size: 0.65rem;
+  line-height: 1;
+  opacity: 0.85;
+  transition: transform 0.2s ease;
+  speak: none;
+}
+#chatPresenceRow.open .chat-presence-toggle .feel-caret {
+  /* ▾ when open — glyph swapped in JS; soft tip if ▸ kept */
+  opacity: 1;
 }
 @media (max-width: 600px) {
   #tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages {
@@ -16227,8 +16243,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             </div>
           </div>
           <!-- v5.79.27-human-presence — Kirk 2026-08-01: the human co-creator can send a gesture too. Symmetric expression. Kirk wanted to hug the AI; here is how. Row of small colored chips; click sends a presence-only gesture that renders as a single sphere by "You". -->
+          <!-- v-feel-expand-arrow-v0 — ♡ Feel + one caret; chips stay collapsed until open; heart landmark -->
           <div class="chat-presence-row" id="chatPresenceRow" style="display:flex;align-items:center;gap:6px;padding:4px 10px;flex-wrap:wrap;font-family:Georgia,serif;font-size:0.78rem;">
-            <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-label="Send a feeling" title="Send a feeling" onclick="FLChatOurWay.togglePresence()">&#9825; feel</button>
+            <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-controls="chatPresenceRow" aria-label="Show feelings — hug, warmth, joy…" title="Show feelings — hug, warmth, joy…" onclick="FLChatOurWay.togglePresence()">&#9825; Feel <span class="feel-caret" aria-hidden="true">&#9656;</span></button>
             <span style="color:var(--text-muted,#94a3b8);margin-right:2px;">Send:</span>
             <button class="chat-presence-chip" data-presence="hug"       title="Send a hug"       onclick="FLHumanPresence.send('hug')"       style="background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.35);color:#f472b6;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#128149; hug</button>
             <button class="chat-presence-chip" data-presence="warmth"    title="Send warmth"      onclick="FLHumanPresence.send('warmth')"    style="background:rgba(232,176,25,0.10);border:1px solid rgba(232,176,25,0.35);color:#e8b019;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; warmth</button>
@@ -36225,15 +36242,49 @@ window.FLHumanPresence = (function() {
 
 // v5.79.44-chat-our-way — presence chips rest behind a heart.
 // Chips stay in the DOM (Kirk's hug, v5.79.27). Function kept.
+// v-feel-expand-arrow-v0 — one caret on Feel; sync aria + ▸/▾; keyboard = native button.
 window.FLChatOurWay = (function() {
+  function syncFeelAffordance(open) {
+    var btn = document.getElementById('chatPresenceToggle');
+    if (!btn) return;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute(
+      'title',
+      open ? 'Hide feelings' : 'Show feelings — hug, warmth, joy…'
+    );
+    btn.setAttribute(
+      'aria-label',
+      open ? 'Hide feelings' : 'Show feelings — hug, warmth, joy…'
+    );
+    var caret = btn.querySelector('.feel-caret');
+    if (caret) {
+      // ▸ collapsed · ▾ expanded (clear open affordance; not send-arrow)
+      caret.textContent = open ? '\u25BE' : '\u25B8';
+    }
+  }
   function togglePresence() {
     var row = document.getElementById('chatPresenceRow');
-    var btn = document.getElementById('chatPresenceToggle');
     if (!row) return;
     var open = row.classList.toggle('open');
-    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    syncFeelAffordance(open);
   }
-  return { togglePresence: togglePresence, marker: 'v5.79.44-chat-our-way' };
+  function initFeelCaret() {
+    var row = document.getElementById('chatPresenceRow');
+    syncFeelAffordance(!!(row && row.classList.contains('open')));
+  }
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFeelCaret);
+    } else {
+      try { initFeelCaret(); } catch (e) {}
+    }
+  }
+  return {
+    togglePresence: togglePresence,
+    syncFeelAffordance: syncFeelAffordance,
+    marker: 'v5.79.44-chat-our-way',
+    feelMarker: 'v-feel-expand-arrow-v0'
+  };
 })();
 
 // ═══════════════════════════════════════════════════════════════

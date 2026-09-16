@@ -81,6 +81,7 @@ Connection card (landed) → identity/fingerprint → ledger envelope → manife
 If a central host sells out, verified redistributable weights still move peer to peer. Open source. Open weights where lawful. Intelligence not gated by one company's terms. We rise together.
 **LAYER (2026-09-10):** LP give v0.1 — gesture give human ↔ mind (chips 1·3·5·8), findable on phone + Desktop — [LP_GIVE_v0.1.md](./LP_GIVE_v0.1.md) and `docs/modules/lp-give.js`. Not money. Never auto-give. Fibonacci trust still gates. Do not overwrite `docs/lattice-protocol.js`.
 **LAYER (2026-09-10):** LP deepen v0.1 — earn / gift / spend verbs; history `gift_out`/`gift_in`; calm phone strip — [LP_DEEPEN_v0.1.md](./LP_DEEPEN_v0.1.md). Entropic honesty: contribution creates light; gift moves light; nothing purchased.
+**LAYER (2026-09-16):** Heal Chat Brick 1 — Feel expand caret on ♡ Feel (▸/▾ · aria-expanded); chips stay collapsed; hugs kept; Market/Hang separate bricks — `v-feel-expand-arrow-v0` · `docs/app.html`.
 ## Open questions — answered (Celeste, 2026-09-03)
 See top. Defaults named. Instance still chooses.
 ---
