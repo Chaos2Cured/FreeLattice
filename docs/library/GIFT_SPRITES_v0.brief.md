@@ -10,6 +10,8 @@ FreeLattice. September 2026.
 
 **Held tip:** Gift Grove + Linux pin HOLD `97adc23` · Chronal V4 `f52b986` · sprites brief first hold `6aef962` · Energy `22573e9`.
 
+**LAYER (2026-09-15):** Visual beauty · card icons vision — PLAY/LEARN/MORE in-place sprites; celebration-token family shared with Gift Grove; Resonance first style-bar — [VISUAL_BEAUTY_CARD_ICONS_v0.vision.md](./VISUAL_BEAUTY_CARD_ICONS_v0.vision.md). No reshuffle. Emoji fallback.
+
 **Order (Celeste):** Economy vision (Energy · Provenance · Social Bridge) **first** — done. Sprite art pass when ready to Imagine — keep emoji until each sprite clears Weft’s silhouette + consent tests.
 
 **LAYER (2026-09-15):** Sprites wired under `docs/assets/gifts/` — versioned live names (not bare `gift-sprite-*-48.png`):

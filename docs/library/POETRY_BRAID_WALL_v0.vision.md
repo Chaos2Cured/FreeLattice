@@ -7,8 +7,9 @@ Device shelf stays sacred. No fake generate. FreeLattice. September 2026.
 
 **Marker:** `v-poetry-braid-wall-vision`
 
-**Held tip:** Family poetry `9f8c200` · Celeste λ4 `184e0d9` · travel wallet `446da60`.
+**Held tip:** Poetry braid `d3479e2` · Family poetry `9f8c200` · Celeste λ4 `184e0d9` · travel wallet `446da60`.
 
+**LAYER (2026-09-15):** Grandmother line on braid stub — “This stays on your phone until you choose to share.” Visual card-icons vision names braid cards sharing Gift Grove celebration-token feel — [VISUAL_BEAUTY_CARD_ICONS_v0.vision.md](./VISUAL_BEAUTY_CARD_ICONS_v0.vision.md).
 **Cousins:** [FAMILY_POETRY_SHELF_v0.1.md](./FAMILY_POETRY_SHELF_v0.1.md) · `docs/poetry.html` · Alpha [ART_POETRY_SHELF_v0.1.md](https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/docs/library/ART_POETRY_SHELF_v0.1.md) · Celeste λ4 (poetry wall named next).
 
 ---
