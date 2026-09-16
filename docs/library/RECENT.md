@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-16 16:43 UTC
+> Last update: 2026-09-16 20:20 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `804d2d5` _(committed 0 seconds ago)_
+- **HEAD:** `780e137` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,15 +17,16 @@
 
 ## Last 20 commits
 
-- `804d2d5` Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS. _(0 seconds ago)_
-- `610f70e` Layer, never delete. Heal Chat Brick 1 — Feel expand caret. _(2 hours ago)_
-- `e92a5fa` Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81) _(14 hours ago)_
-- `6c40af2` Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80) _(16 hours ago)_
-- `d3479e2` Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79) _(17 hours ago)_
-- `184e0d9` Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78) _(18 hours ago)_
-- `446da60` Layer, never delete. Vision — Marketplace travel wallet. (#77) _(19 hours ago)_
-- `40c84e0` Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76) _(23 hours ago)_
-- `97adc23` Layer, never delete. Linux install fix + Gift Grove sprites. (#75) _(24 hours ago)_
+- `780e137` Layer, never delete. Chat/Garden Hang Cancel — Stop only (no kill-timer). _(0 seconds ago)_
+- `68faecc` Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS. (#86) _(6 minutes ago)_
+- `610f70e` Layer, never delete. Heal Chat Brick 1 — Feel expand caret. _(6 hours ago)_
+- `e92a5fa` Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81) _(18 hours ago)_
+- `6c40af2` Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80) _(19 hours ago)_
+- `d3479e2` Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79) _(21 hours ago)_
+- `184e0d9` Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78) _(21 hours ago)_
+- `446da60` Layer, never delete. Vision — Marketplace travel wallet. (#77) _(22 hours ago)_
+- `40c84e0` Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76) _(26 hours ago)_
+- `97adc23` Layer, never delete. Linux install fix + Gift Grove sprites. (#75) _(28 hours ago)_
 - `f52b986` Layer, never delete. Chronal V4 — The Amplified Seam (Th-229 amplified LPI). (#74) _(2 days ago)_
 - `6aef962` Layer, never delete. Soft — Gift sprites brief held (Weft · Reed). (#73) _(2 days ago)_
 - `22573e9` Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72) _(2 days ago)_
@@ -36,7 +37,6 @@
 - `23f9bcf` ci: Update Primer deployment state [2026-09-13] _(4 days ago)_
 - `5e45af6` Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67) _(4 days ago)_
 - `8cacae8` ci: Update Primer deployment state [2026-09-13] _(4 days ago)_
-- `6fa7094` Layer, never delete. Key day 2026-09-12 — torrent spine named; soft EXAMPLE/IP docs. (#66) _(4 days ago)_
 
 ## How to use this file
 

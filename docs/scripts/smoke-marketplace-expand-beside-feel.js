@@ -67,9 +67,8 @@ assert.ok(/FLHumanPresence\.send\('hug'\)/.test(app), 'hug chip kept');
 assert.ok(/#chatPresenceRow:not\(\.open\) \.chat-presence-chip/.test(app), 'chips hide when Feel collapsed');
 assert.ok(/v-feel-expand-arrow-v0/.test(app), 'Feel marker kept');
 
-// Out of scope
-assert.ok(!/v-chat-hang-cancel-v0/.test(app), 'no Hang Cancel');
-assert.ok(!/AbortController/.test(app.slice(app.indexOf('FLChatMarket'), app.indexOf('FLChatMarket') + 800)),
+// Hang Cancel may LAYER later — must not live inside Market neighborhood
+assert.ok(!/AbortController|FLHangCancel/.test(app.slice(app.indexOf('FLChatMarket'), app.indexOf('FLChatMarket') + 800)),
   'no Abort in Market neighborhood');
 
 assert.ok(/v-marketplace-expand-beside-feel|Marketplace expand|sibling/i.test(flint), 'Flint note');

@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-16 10:43 MDT
+- Last auto-updated: 2026-09-16 14:20 MDT
 - Version: 5.79.45
-- Total commits: 3163
+- Total commits: 3164
 - Last 10 commits:
-- 804d2d5 Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS.
+- 780e137 Layer, never delete. Chat/Garden Hang Cancel — Stop only (no kill-timer).
+- 68faecc Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS. (#86)
 - 610f70e Layer, never delete. Heal Chat Brick 1 — Feel expand caret.
 - e92a5fa Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81)
 - 6c40af2 Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 446da60 Layer, never delete. Vision — Marketplace travel wallet. (#77)
 - 40c84e0 Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76)
 - 97adc23 Layer, never delete. Linux install fix + Gift Grove sprites. (#75)
-- f52b986 Layer, never delete. Chronal V4 — The Amplified Seam (Th-229 amplified LPI). (#74)

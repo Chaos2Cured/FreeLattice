@@ -20,16 +20,15 @@ assert.ok(/FLChatOurWay\.togglePresence/.test(app), 'toggle kept');
 assert.ok(/#chatPresenceRow:not\(\.open\) \.chat-presence-chip/.test(app), 'chips hide when collapsed');
 assert.ok(/feelMarker:\s*'v-feel-expand-arrow-v0'|feelMarker: 'v-feel-expand-arrow-v0'/.test(app), 'JS feelMarker');
 
-// Brick 1 proved Feel alone; Market sibling may LAYER beside (Weft PASS).
-// Still forbid Hang Cancel in Feel neighborhood.
-assert.ok(!/v-chat-hang-cancel-v0/.test(app), 'no Hang brick marker');
-assert.ok(!/chatHangCancel|AbortController/.test(
+// Brick 1 proved Feel alone; Market sibling + Hang Cancel may LAYER later.
+// Still forbid Hang wiring inside the Feel control neighborhood itself.
+assert.ok(!/chatHangCancel|FLHangCancel|AbortController/.test(
   app.slice(app.indexOf('chatPresenceToggle'), app.indexOf('chatPresenceToggle') + 800)
-), 'no Hang in Feel control neighborhood');
+), 'no Hang wiring in Feel control neighborhood');
 
 assert.ok(/e92a5fa|446da60|97adc23|610f70e/.test(flint), 'Held tip lineage in Flint');
 assert.ok(/Feel expand|feel-expand|Feel caret/i.test(flint), 'Flint note');
 assert.ok(/sw\.js/.test(app), 'leave sw.js');
 
 console.log('SMOKE_OK feel expand arrow v0');
-console.log('caret · aria · chips hide · hug kept · no Hang');
+console.log('caret · aria · chips hide · hug kept · Feel neighborhood clean');
