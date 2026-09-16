@@ -96,9 +96,10 @@ assert.ok(/depthTier/.test(app), 'depthTier in Signal Report');
 // Full / Minimal remain authoritative
 assert.ok(/contextMode !== 'smart'|Full \/ Minimal/.test(app), 'Full/Minimal override Adaptive');
 
-// No Hang / Feel / Market / quant swap in this brick neighborhood
-assert.ok(!/v-chat-hang-cancel-v0/.test(app), 'no Hang brick marker');
-assert.ok(!/v-marketplace-expand-beside-feel-v0/.test(app), 'no Market sibling marker');
+// Heal groove coexistence (after rebase onto Hang tip): Hang + Market stay
+assert.ok(/v-chat-hang-cancel-v0/.test(app), 'Hang Cancel kept on tip');
+assert.ok(/v-marketplace-expand-beside-feel-v0/.test(app), 'Market sibling kept on tip');
+assert.ok(/v-feel-expand-arrow-v0/.test(app), 'Feel caret kept');
 assert.ok(!/auto-download.*quant|silent.*quant|swap quantized/i.test(modSrc), 'no quant swap in module');
 
 // Garden Surface
@@ -109,9 +110,9 @@ assert.ok(/Do not import|never import|Never import full global Chat|no Chat impo
 
 // Flint LAYER
 assert.ok(/v-adaptive-context-depth-v0|Adaptive [Cc]ontext/.test(flint), 'Flint note');
-assert.ok(/610f70e/.test(flint), 'Held tip cites Feel');
+assert.ok(/d14eaf8|68faecc|610f70e/.test(flint), 'Held tip cites Hang · Market · Feel');
 assert.ok(/Minimal|not actually light|Minimal-not-light/i.test(flint), 'Flint cites Minimal flaw');
 assert.ok(/sw\.js/.test(app), 'leave sw.js');
 
 console.log('SMOKE_OK adaptive context depth v0');
-console.log('Surface · Standard · Deep · classify-before-search · Signal Report · Garden · no Hang/Market');
+console.log('Surface · Standard · Deep · classify-before-search · Hang+Market kept · Signal Report · Garden');

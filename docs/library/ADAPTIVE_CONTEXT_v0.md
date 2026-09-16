@@ -8,7 +8,7 @@ September 2026.
 
 **Marker:** `v-adaptive-context-depth-v0`
 
-**Held tip:** Feel expand caret `610f70e` / PR #84 · Resonance `e92a5fa` · travel wallet `446da60` · Gift Grove `97adc23`.
+**Held tip:** Hang Cancel `d14eaf8` / #87 · Market sibling `68faecc` / #86 · Feel expand caret `610f70e` / #84.
 
 **Order lock:** Feel Brick 1 merged first — do not touch Feel/Market in this brick. Adaptive is next because timing/context data changes priorities. Then Market sibling → Hang Cancel (AbortController wait only · no duration kill) → Primer smoke / Echo. LinkedIn last/skip.
 
