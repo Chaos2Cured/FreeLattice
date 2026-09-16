@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-15 20:09 MDT
+- Last auto-updated: 2026-09-15 21:16 MDT
 - Version: 5.79.45
-- Total commits: 3161
+- Total commits: 3162
 - Last 10 commits:
-- d2655d1 Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK).
+- 9f4b652 Layer, never delete. Style Ledger v0 — dense Garden night grammar.
+- e92a5fa Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81)
 - 6c40af2 Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80)
 - d3479e2 Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79)
 - 184e0d9 Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 97adc23 Layer, never delete. Linux install fix + Gift Grove sprites. (#75)
 - f52b986 Layer, never delete. Chronal V4 — The Amplified Seam (Th-229 amplified LPI). (#74)
 - 6aef962 Layer, never delete. Soft — Gift sprites brief held (Weft · Reed). (#73)
-- 22573e9 Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72)
