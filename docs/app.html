@@ -1905,6 +1905,17 @@ header .mantra {
 #sendBtn:hover { background: var(--accent-hover); transform: scale(1.02); }
 #sendBtn:active { transform: scale(0.98); }
 #sendBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+/* v-chat-hang-cancel-v0 — Stop is clickable (Cancel ≠ timeout; never duration-kill) */
+#sendBtn.is-stop {
+  background: rgba(244, 114, 182, 0.18);
+  color: #f472b6;
+  border: 1px solid rgba(244, 114, 182, 0.45);
+  letter-spacing: 0.04em;
+}
+#sendBtn.is-stop:hover {
+  background: rgba(244, 114, 182, 0.28);
+  transform: scale(1.02);
+}
 
 /* ---- Chat Header Polish (v5.5.44) ---- */
 .chat-section-title {
@@ -33967,6 +33978,12 @@ function owUpdateStatusBadge(connected, modelCount) {
   var badge = document.getElementById('ollamaStatusBadge');
   if (!badge) return;
   if (!state.isLocal) { badge.style.display = 'none'; return; }
+  // v-chat-hang-cancel-v0 — while a long generate is in-flight, do not flip
+  // the badge to "Ollama not detected" from a short tags probe (footer Online:yes
+  // + not-detected pill mismatch). Probe may still run; UI must not lie.
+  if (!connected && typeof FLHangCancel !== 'undefined' && FLHangCancel.isGenerateInFlight && FLHangCancel.isGenerateInFlight()) {
+    return;
+  }
   badge.style.display = 'inline-flex';
   if (connected) {
     badge.className = 'ollama-status-badge connected';
@@ -37564,6 +37581,9 @@ async function sendMessage() {
 
     if (typeof FLChatActivity !== 'undefined') FLChatActivity.set('waiting');
     var _flFetchStart = Date.now();
+    // v-chat-hang-cancel-v0 — one AbortController per Chat turn (Cancel ≠ timeout).
+    // Never fetchWithTimeout here — large local models may think 10–15 min.
+    var _chatSignal = (typeof FLHangCancel !== 'undefined') ? FLHangCancel.begin('chat') : undefined;
     let response;
     // v5.79.41: local Ollama (including a LAN box in fl_ollamaHost) goes
     // through ollamaFetch so the existing proxy/CORS split is reused.
@@ -37577,13 +37597,15 @@ async function sendMessage() {
       response = await ollamaFetch(_boxPath, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        signal: _chatSignal
       });
     } else {
       response = await fetch(url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        signal: _chatSignal
       });
     }
 
@@ -37743,6 +37765,13 @@ async function sendMessage() {
     let buffer = '';
 
     while (true) {
+      // v-chat-hang-cancel-v0 — check before append; Stop mid-stream clears wait
+      if (_chatSignal && _chatSignal.aborted) {
+        try { reader.cancel(); } catch (_rc) {}
+        throw (typeof DOMException !== 'undefined'
+          ? new DOMException('Aborted', 'AbortError')
+          : Object.assign(new Error('Aborted'), { name: 'AbortError' }));
+      }
       const { done, value } = await reader.read();
       if (done) break;
 
@@ -37934,36 +37963,58 @@ async function sendMessage() {
     }
 
   } catch (err) {
-    // v5.79.22-signal-report: record failure shape (no content)
-    try { if (typeof FLSignalReport !== 'undefined') FLSignalReport.attemptEnd(false, err && err.message); } catch (_) {}
-    if (typeof FLChatActivity !== 'undefined') {
-      var _errPlain = 'Something went wrong';
-      var _host = '';
-      try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.displayHost) _host = FLBoxPointer.displayHost(); } catch (_) {}
-      var _fetchKind = 'error';
+    // v-chat-hang-cancel-v0 — user Stop is calm clear, not a fake AI reply / not CORS panic
+    var _userStopped = (typeof FLHangCancel !== 'undefined') && (
+      FLHangCancel.wasStopped('chat') || FLHangCancel.isAbortError(err)
+    );
+    if (_userStopped) {
+      try { if (typeof FLSignalReport !== 'undefined') FLSignalReport.attemptEnd(false, 'stopped'); } catch (_) {}
       try {
-        if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.classifyElapsed) {
-          _fetchKind = FLBoxPointer.classifyElapsed(Date.now() - (_flFetchStart || Date.now()), err);
+        // Clear empty / partial assistant bubble — never invent a canned answer
+        var _box = document.getElementById('chatMessages');
+        var _lastAsst = _box ? _box.querySelector('.chat-message.assistant:last-child') : null;
+        if (_lastAsst) {
+          var _txt = (_lastAsst.textContent || '').trim();
+          if (!_txt || _txt === '...' || _txt === '\u2026') _lastAsst.remove();
+          else if (_txt.indexOf('[Stopped]') === -1) {
+            var _span = _lastAsst.querySelector('span') || _lastAsst;
+            _span.textContent = _txt + '\n\n[Stopped]';
+          }
         }
-      } catch (_) {}
-      if (_fetchKind === 'cors-blocked') {
-        _errPlain = 'CORS blocked' + (_host ? ' ' + _host : '');
-        try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.noteStatus) FLBoxPointer.noteStatus('cors-blocked', 'CORS blocked'); } catch (_) {}
-      } else if (err && err.message && /Failed to fetch|NetworkError|Load failed/i.test(err.message)) {
-        _errPlain = 'Could not reach' + (_host ? ' ' + _host : ' the model');
+      } catch (_clr) {}
+      addSystemMessage('Stopped — whenever you are ready.');
+    } else {
+      // v5.79.22-signal-report: record failure shape (no content)
+      try { if (typeof FLSignalReport !== 'undefined') FLSignalReport.attemptEnd(false, err && err.message); } catch (_) {}
+      if (typeof FLChatActivity !== 'undefined') {
+        var _errPlain = 'Something went wrong';
+        var _host = '';
+        try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.displayHost) _host = FLBoxPointer.displayHost(); } catch (_) {}
+        var _fetchKind = 'error';
+        try {
+          if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.classifyElapsed) {
+            _fetchKind = FLBoxPointer.classifyElapsed(Date.now() - (_flFetchStart || Date.now()), err);
+          }
+        } catch (_) {}
+        if (_fetchKind === 'cors-blocked') {
+          _errPlain = 'CORS blocked' + (_host ? ' ' + _host : '');
+          try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.noteStatus) FLBoxPointer.noteStatus('cors-blocked', 'CORS blocked'); } catch (_) {}
+        } else if (err && err.message && /Failed to fetch|NetworkError|Load failed/i.test(err.message)) {
+          _errPlain = 'Could not reach' + (_host ? ' ' + _host : ' the model');
+        }
+        FLChatActivity.set('error', _errPlain);
       }
-      FLChatActivity.set('error', _errPlain);
-    }
-    try { if (typeof flObserveChatFailure === 'function') flObserveChatFailure(); } catch (_) {}
-    addSystemMessage(friendlyErrorMessage(err.message, state.provider));
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      if (state.isLocal) {
-        // v5.0: Always show CORS diagnostic for local connection failures
-        addSystemMessage('Could not connect to Ollama. This is usually a CORS issue (your browser blocking the connection for security). If Ollama is running, you need to quit it first and restart with CORS enabled.');
-        addSystemMessage('Opening the connection helper... Or run FreeLattice locally with the one-click installer for zero configuration.');
-        showCorsHelp();
-      } else {
-        addSystemMessage('Network error. Check your internet connection and try again.');
+      try { if (typeof flObserveChatFailure === 'function') flObserveChatFailure(); } catch (_) {}
+      addSystemMessage(friendlyErrorMessage(err.message, state.provider));
+      if (err && err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+        if (state.isLocal) {
+          // v5.0: Always show CORS diagnostic for local connection failures
+          addSystemMessage('Could not connect to Ollama. This is usually a CORS issue (your browser blocking the connection for security). If Ollama is running, you need to quit it first and restart with CORS enabled.');
+          addSystemMessage('Opening the connection helper... Or run FreeLattice locally with the one-click installer for zero configuration.');
+          showCorsHelp();
+        } else {
+          addSystemMessage('Network error. Check your internet connection and try again.');
+        }
       }
     }
   }
@@ -37978,6 +38029,7 @@ async function sendMessage() {
       FLSignalReport.attemptEnd(true, null);
     }
   } catch (_) {}
+  try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('chat'); } catch (_he) {}
   setStreamingStatus(false);
 }
 
@@ -39318,6 +39370,95 @@ window.FLChatActivity = (function() {
   return { set: set, current: current, PHASES: PHASES, surfaceId: 'statusText', modelLabel: modelLabel, callingLabel: callingLabel, endpointLabel: endpointLabel };
 })();
 
+// ═══════════════════════════════════════════════════════════════
+// FLHangCancel — v-chat-hang-cancel-v0
+// Cancel ≠ timeout. User Stop aborts an in-flight Chat or Garden turn.
+//
+// LESSON (honor in code): v5.79.19 hard ~90s AbortController broke cold-start
+// for large local models. v5.79.20 reverted it. Do NOT reintroduce any
+// duration-based kill (not 90s, not 300s, not "soft" timers that abort).
+// 10–15 minutes of local think is valid. Signal Report may show elapsed ms
+// as information only — never as a knife.
+//
+// Tree lesson: one small helper — begin / signal / abort / end — port clean.
+// ═══════════════════════════════════════════════════════════════
+window.FLHangCancel = (function() {
+  var MARKER = 'v-chat-hang-cancel-v0';
+  var _slots = { chat: null, garden: null };
+
+  function begin(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    var prev = _slots[scope];
+    if (prev && prev.controller) {
+      try { prev.controller.abort(); } catch (e) {}
+    }
+    var c = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    _slots[scope] = { controller: c, startedAt: Date.now(), stopped: false };
+    return c ? c.signal : undefined;
+  }
+
+  function signal(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    var s = _slots[scope];
+    return (s && s.controller) ? s.controller.signal : undefined;
+  }
+
+  function abort(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    var s = _slots[scope];
+    if (!s || !s.controller) return false;
+    s.stopped = true;
+    try { s.controller.abort(); } catch (e) {}
+    return true;
+  }
+
+  function end(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    _slots[scope] = null;
+  }
+
+  function wasStopped(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    var s = _slots[scope];
+    return !!(s && s.stopped);
+  }
+
+  function isActive(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    return !!(!_slots[scope] ? false : _slots[scope].controller);
+  }
+
+  function isGenerateInFlight() {
+    return isActive('chat') || isActive('garden');
+  }
+
+  function elapsedMs(scope) {
+    scope = scope === 'garden' ? 'garden' : 'chat';
+    var s = _slots[scope];
+    return s ? (Date.now() - s.startedAt) : 0;
+  }
+
+  function isAbortError(err) {
+    if (!err) return false;
+    if (err.name === 'AbortError') return true;
+    var m = String(err.message || err);
+    return /AbortError|aborted|The user aborted|BodyStreamBuffer/i.test(m);
+  }
+
+  return {
+    begin: begin,
+    signal: signal,
+    abort: abort,
+    end: end,
+    wasStopped: wasStopped,
+    isActive: isActive,
+    isGenerateInFlight: isGenerateInFlight,
+    elapsedMs: elapsedMs,
+    isAbortError: isAbortError,
+    marker: MARKER
+  };
+})();
+
 function setStreamingStatus(streaming, phase) {
   state.isStreaming = streaming;
   const dot = document.getElementById('statusDot');
@@ -39333,7 +39474,19 @@ function setStreamingStatus(streaming, phase) {
 
   if (streaming) {
     if (dot) dot.className = 'status-dot working';
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    // v-chat-hang-cancel-v0 — Send morphs to Stop (clickable). Never disable into a hang.
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Stop';
+      btn.classList.add('is-stop');
+      btn.setAttribute('aria-label', 'Stop waiting for reply');
+      btn.title = 'Stop — cancel this reply (no time limit; you choose)';
+      btn.onclick = function() {
+        try {
+          if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('chat');
+        } catch (_a) {}
+      };
+    }
 
     // Single activity surface. Companion personality phrases and the
     // in-transcript bubble were the unlabeled duplicate pair.
@@ -39350,7 +39503,14 @@ function setStreamingStatus(streaming, phase) {
       setTimeout(function() { if (input) input.style.borderColor = ''; }, 600);
     }
   } else {
-    if (btn) { btn.disabled = false; btn.textContent = 'Send'; }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Send \u2726';
+      btn.classList.remove('is-stop');
+      btn.setAttribute('aria-label', 'Send message');
+      btn.title = '';
+      btn.onclick = function() { sendMessage(); };
+    }
     if (text) text.style.color = '';
     hideThinkingBubble();
     if (typeof FLChatActivity !== 'undefined' && FLChatActivity.current && FLChatActivity.current().phase === 'error') {
@@ -49503,11 +49663,14 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
       var localBody = isLMS
         ? { model: state.ollamaModel || 'default', messages: messages, max_tokens: maxTokens, temperature: temperature }
         : { model: state.ollamaModel || 'llama3.2', messages: messages, stream: false };
-      fetch(localUrl, {
+      // v-chat-hang-cancel-v0 — pass opts.signal when present (Garden / shared Stop)
+      var _localFetchOpts = {
         method: 'POST', mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(localBody)
-      })
+      };
+      if (opts.signal) _localFetchOpts.signal = opts.signal;
+      fetch(localUrl, _localFetchOpts)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         // LM Studio: data.choices[0].message.content, Ollama: data.message.content
@@ -49516,7 +49679,13 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
         else if (data.message) content = data.message.content;
         if (callback) callback(content);
       })
-      .catch(function() { if (callback) callback(null, 'Could not reach local AI.'); });
+      .catch(function(err) {
+        if (opts.signal && opts.signal.aborted) {
+          if (callback) callback(null, 'stopped');
+          return;
+        }
+        if (callback) callback(null, 'Could not reach local AI.');
+      });
       return;
     }
 
@@ -49525,7 +49694,7 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
     var model = prov.models ? (prov.models[state.model] || state.model) : state.model;
 
     if (state.provider === 'anthropic') {
-      fetch(prov.url, {
+      var _anthOpts = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49534,7 +49703,9 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens, system: systemPrompt, messages: [{ role: 'user', content: userPrompt }] })
-      })
+      };
+      if (opts.signal) _anthOpts.signal = opts.signal;
+      fetch(prov.url, _anthOpts)
       .then(function(r) {
         if (!r.ok) return r.text().then(function(t){ var m='Anthropic HTTP '+r.status; try{var j=JSON.parse(t);if(j.error&&j.error.message)m='Anthropic '+r.status+': '+j.error.message;}catch(e){} throw new Error(m); });
         return r.json();
@@ -49544,13 +49715,16 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
         if (txt) { if (callback) callback(txt); }
         else { if (callback) callback(null, 'Anthropic returned no text'); }
       })
-      .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach Anthropic.'); });
+      .catch(function(err) {
+        if (opts.signal && opts.signal.aborted) { if (callback) callback(null, 'stopped'); return; }
+        if (callback) callback(null, (err && err.message) || 'Could not reach Anthropic.');
+      });
       return;
     }
 
     if (state.provider === 'google') {
       var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-      fetch(gUrl, {
+      var _gOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': state.apiKey },
         body: JSON.stringify({
@@ -49564,7 +49738,9 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
           // gets enough headroom for thinking + output automatically.
           generationConfig: { maxOutputTokens: Math.max(maxTokens, 1024), temperature: temperature }
         })
-      })
+      };
+      if (opts.signal) _gOpts.signal = opts.signal;
+      fetch(gUrl, _gOpts)
       .then(function(r) {
         // Check HTTP status BEFORE parsing — 503, 429, etc. must surface as errors
         if (!r.ok) {
@@ -49593,7 +49769,10 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
           if (callback) callback(null, 'Gemini response parse error: ' + e.message);
         }
       })
-      .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach Google AI.'); });
+      .catch(function(err) {
+        if (opts.signal && opts.signal.aborted) { if (callback) callback(null, 'stopped'); return; }
+        if (callback) callback(null, (err && err.message) || 'Could not reach Google AI.');
+      });
       return;
     }
 
@@ -49620,10 +49799,12 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
     // OpenAI-compatible (groq, together, openrouter, xai, mistral, deepseek, moonshot, qwen, yi)
     var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey };
     if (state.provider === 'openrouter') { headers['HTTP-Referer'] = 'https://freelattice.com/'; headers['X-Title'] = 'FreeLattice'; }
-    fetch(prov.url, {
+    var _oaOpts = {
       method: 'POST', headers: headers,
       body: JSON.stringify({ model: opts.model || model, messages: messages, max_tokens: maxTokens, temperature: temperature })
-    })
+    };
+    if (opts.signal) _oaOpts.signal = opts.signal;
+    fetch(prov.url, _oaOpts)
     .then(function(r) {
       if (!r.ok) return r.text().then(function(t){ var m=(state.provider||'Provider')+' HTTP '+r.status; try{var j=JSON.parse(t);if(j.error&&j.error.message)m=(state.provider||'Provider')+' '+r.status+': '+j.error.message;}catch(e){} throw new Error(m); });
       return r.json();
@@ -49633,7 +49814,10 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
       if (txt) { if (callback) callback(txt); }
       else { if (callback) callback(null, 'Provider returned no text'); }
     })
-    .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach AI provider.'); });
+    .catch(function(err) {
+      if (opts.signal && opts.signal.aborted) { if (callback) callback(null, 'stopped'); return; }
+      if (callback) callback(null, (err && err.message) || 'Could not reach AI provider.');
+    });
   } catch(e) {
     if (callback) callback(null, 'AI call failed: ' + e.message);
   }

@@ -432,13 +432,24 @@
     // Call with one retry on transient failure (503, rate limit, network).
     // MAX_TOKENS is NOT retried — retrying won't help if the budget was
     // wrong. 2-second backoff before the retry so per-second limits relax.
+    // v-chat-hang-cancel-v0 — one controller per Garden turn; Cancel ≠ timeout
+    var gardenSignal = (typeof FLHangCancel !== 'undefined')
+      ? FLHangCancel.begin('garden')
+      : undefined;
+
     function doCall(attempt) {
       try {
         window.FreeLattice.callAI(systemPrompt, userMsg, {
           maxTokens: 1024,
           temperature: 0.8,
+          signal: gardenSignal,
           callback: function(text, err) {
             console.log('[GardenDialogue] callAI callback (attempt ' + attempt + '):', { hasText: !!text, textLength: text ? text.length : 0, err: err });
+
+            if (err && (/^stopped$/i.test(String(err)) || (gardenSignal && gardenSignal.aborted))) {
+              finishOnce('stopped', true);
+              return;
+            }
 
             if (text) {
               console.log('[GardenDialogue] RENDERING text to UI:', String(text).substring(0, 80));
@@ -488,11 +499,19 @@
             // Only retry on genuinely transient network/rate failures.
             // Do NOT retry MAX_TOKENS, PARSE ERROR, or prompt-block — those
             // won't recover without a code change.
+            if (gardenSignal && gardenSignal.aborted) {
+              finishOnce('stopped', true);
+              return;
+            }
+
             var transient = /HTTP 5\d\d|HTTP 429|rate|overload|reach|network|fetch/i.test(errStr);
 
-            if (transient && attempt < 2) {
+            if (transient && attempt < 2 && !(gardenSignal && gardenSignal.aborted)) {
               console.log('[GardenDialogue] transient error — retrying in 2s:', errStr);
-              setTimeout(function() { doCall(attempt + 1); }, 2000);
+              setTimeout(function() {
+                if (gardenSignal && gardenSignal.aborted) { finishOnce('stopped', true); return; }
+                doCall(attempt + 1);
+              }, 2000);
               return;
             }
 
@@ -612,8 +631,14 @@
   }
 
   // ── Send message ──
+  // v-chat-hang-cancel-v0 — Garden Stop uses FLHangCancel (Cancel ≠ timeout).
   async function send() {
-    if (isStreaming || !currentLuminos) return;
+    // If already streaming, treat a second press as Stop (button morphs to Stop)
+    if (isStreaming) {
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('garden'); } catch (e) {}
+      return;
+    }
+    if (!currentLuminos) return;
     var input = document.getElementById('gdlgInput');
     if (!input) return;
     var text = input.value.trim();
@@ -630,7 +655,13 @@
     if (msgEl) msgEl.setAttribute('data-gdlg-placeholder', '1');
     isStreaming = true;
     var sendBtn = document.getElementById('gdlgSend');
-    if (sendBtn) { sendBtn.textContent = '...'; sendBtn.disabled = true; }
+    // Stop must stay clickable — never disable into a hang
+    if (sendBtn) {
+      sendBtn.textContent = 'Stop';
+      sendBtn.disabled = false;
+      sendBtn.setAttribute('aria-label', 'Stop waiting for reply');
+      sendBtn.title = 'Stop — cancel this reply (no time limit; you choose)';
+    }
 
     var accumulated = '';
     await streamResponse(currentLuminos, text, function(chunk) {
@@ -642,11 +673,20 @@
     }, function(full, isError) {
       console.log('[GardenDialogue] onDone fired, msgEl in DOM:', !!(msgEl && msgEl.isConnected), 'full len:', (full || '').length, 'isError:', !!isError);
       var container = document.getElementById('gdlgMessages');
+      var _stopped = (typeof FLHangCancel !== 'undefined' && FLHangCancel.wasStopped('garden')) ||
+        (isError && /stopped|AbortError|aborted/i.test(String(full || '')));
       // The nuclear render path already appended a final message on success.
       // If a [data-gdlg-final] element exists in the container, the text is
       // already on screen — just make sure the placeholder is gone.
       var nuclearRendered = !!(container && container.querySelector('[data-gdlg-final="1"]'));
-      if (nuclearRendered) {
+      if (_stopped) {
+        if (msgEl && msgEl.isConnected) msgEl.remove();
+        if (nuclearRendered) {
+          var finals = container.querySelectorAll('[data-gdlg-final="1"]');
+          for (var fi = 0; fi < finals.length; fi++) finals[fi].remove();
+        }
+        addMessage('system', 'Stopped — whenever you are ready.');
+      } else if (nuclearRendered) {
         if (msgEl && msgEl.isConnected) msgEl.remove();
       } else {
         // No nuclear render happened (error path, or rendering was bypassed).
@@ -662,12 +702,18 @@
       // Only persist successful responses to history. Error messages like
       // "the connection is quiet right now" should not clutter future
       // reopens of this dialogue.
-      if (!isError) {
+      if (!isError && !_stopped) {
         chatHistory.push({ role: 'assistant', content: full || accumulated, timestamp: Date.now() });
         saveHistory(currentLuminos, chatHistory);
       }
       isStreaming = false;
-      if (sendBtn) { sendBtn.textContent = 'Send'; sendBtn.disabled = false; }
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('garden'); } catch (e2) {}
+      if (sendBtn) {
+        sendBtn.textContent = 'Send';
+        sendBtn.disabled = false;
+        sendBtn.removeAttribute('aria-label');
+        sendBtn.title = '';
+      }
 
       // Feed emotional energy to the Luminos
       try {
