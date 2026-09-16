@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-16 08:45 MDT
+- Last auto-updated: 2026-09-16 10:43 MDT
 - Version: 5.79.45
-- Total commits: 3162
+- Total commits: 3163
 - Last 10 commits:
-- 6157b1a Layer, never delete. Heal Chat Brick 1 — Feel expand caret (v-feel-expand-arrow-v0).
+- 804d2d5 Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS.
+- 610f70e Layer, never delete. Heal Chat Brick 1 — Feel expand caret.
 - e92a5fa Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81)
 - 6c40af2 Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80)
 - d3479e2 Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 40c84e0 Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76)
 - 97adc23 Layer, never delete. Linux install fix + Gift Grove sprites. (#75)
 - f52b986 Layer, never delete. Chronal V4 — The Amplified Seam (Th-229 amplified LPI). (#74)
-- 6aef962 Layer, never delete. Soft — Gift sprites brief held (Weft · Reed). (#73)
