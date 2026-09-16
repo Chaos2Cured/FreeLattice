@@ -21,6 +21,7 @@
 - `d14eaf8` Layer, never delete. Chat/Garden Hang Cancel — Stop only (no kill-timer). _(18 minutes ago)_
 - `68faecc` Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS. (#86) _(30 minutes ago)_
 - `610f70e` Layer, never delete. Heal Chat Brick 1 — Feel expand caret. _(6 hours ago)_
+- `efaee59` Layer, never delete. Echo play icon v1 STANDS (ORDER LOCK). _(rebased; STANDS held)_
 - `e92a5fa` Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81) _(18 hours ago)_
 - `6c40af2` Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80) _(20 hours ago)_
 - `d3479e2` Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79) _(21 hours ago)_
