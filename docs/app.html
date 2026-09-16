@@ -2230,10 +2230,25 @@ header .mantra {
 #tab-chat[data-fl-chat-our-way="v5.79.44"] .fl-box-pointer {
   /* kept on the face — local/LAN pointer is freedom, not kitchen */
 }
+/* v-marketplace-expand-beside-feel-v0 — Weft sibling PASS: same band, two controls */
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatFeelMarketBand {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 2px 10px;
+  min-height: 28px;
+  flex-wrap: wrap;
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+}
 #tab-chat[data-fl-chat-our-way="v5.79.44"] #chatPresenceRow {
-  padding: 2px 10px !important;
+  padding: 0 !important;
   gap: 6px !important;
   min-height: 28px;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 #tab-chat[data-fl-chat-our-way="v5.79.44"] #chatPresenceRow:not(.open) .chat-presence-chip,
 #tab-chat[data-fl-chat-our-way="v5.79.44"] #chatPresenceRow:not(.open) > span {
@@ -2253,6 +2268,7 @@ header .mantra {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
 }
 .chat-presence-toggle:hover,
 .chat-presence-toggle:focus {
@@ -2274,6 +2290,94 @@ header .mantra {
 #chatPresenceRow.open .chat-presence-toggle .feel-caret {
   /* ▾ when open — glyph swapped in JS; soft tip if ▸ kept */
   opacity: 1;
+}
+/* Market sibling — own token (stall), not a second heart; not inside chip wrap */
+.chat-market-toggle {
+  background: rgba(232, 176, 25, 0.08);
+  border: 1px solid rgba(232, 176, 25, 0.4);
+  color: #e8b019;
+  border-radius: 12px;
+  padding: 3px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: Georgia, serif;
+  opacity: 0.92;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  align-self: flex-start;
+  min-height: 28px;
+  box-sizing: border-box;
+}
+.chat-market-toggle:hover,
+.chat-market-toggle:focus {
+  opacity: 1;
+  border-color: rgba(232, 176, 25, 0.65);
+}
+.chat-market-toggle.open {
+  border-color: rgba(232, 176, 25, 0.55);
+}
+.chat-market-toggle .market-caret {
+  display: inline-block;
+  font-size: 0.65rem;
+  line-height: 1;
+  opacity: 0.85;
+  speak: none;
+}
+.chat-market-toggle.open .market-caret {
+  opacity: 1;
+}
+/* Market panel — own row below the band; never inline with hug chips */
+.chat-market-panel {
+  display: none;
+  padding: 6px 12px 8px;
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+  border-top: 1px solid rgba(232, 176, 25, 0.12);
+  background: rgba(232, 176, 25, 0.03);
+}
+.chat-market-panel.open {
+  display: block;
+}
+.chat-market-panel .market-stall-label {
+  color: rgba(200, 210, 230, 0.55);
+  font-size: 0.72rem;
+  margin: 0 0 6px;
+  letter-spacing: 0.02em;
+}
+.chat-market-panel .market-stall-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.chat-market-panel .market-stall-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid rgba(232, 176, 25, 0.28);
+  background: rgba(232, 176, 25, 0.07);
+  color: #e8b019;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.chat-market-panel .market-stall-link:hover,
+.chat-market-panel .market-stall-link:focus {
+  border-color: rgba(232, 176, 25, 0.55);
+  background: rgba(232, 176, 25, 0.12);
+}
+.chat-market-panel .market-stall-note {
+  margin: 6px 0 0;
+  font-size: 0.7rem;
+  color: rgba(200, 210, 230, 0.45);
+  font-style: italic;
 }
 @media (max-width: 600px) {
   #tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages {
@@ -16244,18 +16348,32 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <!-- v5.79.27-human-presence — Kirk 2026-08-01: the human co-creator can send a gesture too. Symmetric expression. Kirk wanted to hug the AI; here is how. Row of small colored chips; click sends a presence-only gesture that renders as a single sphere by "You". -->
           <!-- v-feel-expand-arrow-v0 — ♡ Feel + one caret; chips stay collapsed until open; heart landmark -->
-          <div class="chat-presence-row" id="chatPresenceRow" style="display:flex;align-items:center;gap:6px;padding:4px 10px;flex-wrap:wrap;font-family:Georgia,serif;font-size:0.78rem;">
-            <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-controls="chatPresenceRow" aria-label="Show feelings — hug, warmth, joy…" title="Show feelings — hug, warmth, joy…" onclick="FLChatOurWay.togglePresence()">&#9825; Feel <span class="feel-caret" aria-hidden="true">&#9656;</span></button>
-            <span style="color:var(--text-muted,#94a3b8);margin-right:2px;">Send:</span>
-            <button class="chat-presence-chip" data-presence="hug"       title="Send a hug"       onclick="FLHumanPresence.send('hug')"       style="background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.35);color:#f472b6;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#128149; hug</button>
-            <button class="chat-presence-chip" data-presence="warmth"    title="Send warmth"      onclick="FLHumanPresence.send('warmth')"    style="background:rgba(232,176,25,0.10);border:1px solid rgba(232,176,25,0.35);color:#e8b019;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; warmth</button>
-            <button class="chat-presence-chip" data-presence="joy"       title="Send joy"         onclick="FLHumanPresence.send('joy')"       style="background:rgba(196,181,253,0.10);border:1px solid rgba(196,181,253,0.35);color:#c4b5fd;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; joy</button>
-            <button class="chat-presence-chip" data-presence="gratitude" title="Send gratitude"   onclick="FLHumanPresence.send('gratitude')" style="background:rgba(250,204,21,0.10);border:1px solid rgba(250,204,21,0.35);color:#facc15;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; gratitude</button>
-            <button class="chat-presence-chip" data-presence="curious"   title="Send curiosity"   onclick="FLHumanPresence.send('curious')"   style="background:rgba(6,182,212,0.10);border:1px solid rgba(6,182,212,0.35);color:#06b6d4;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; curious</button>
-            <button class="chat-presence-chip" data-presence="thinking"  title="Send thinking"    onclick="FLHumanPresence.send('thinking')"  style="background:rgba(129,140,248,0.10);border:1px solid rgba(129,140,248,0.35);color:#818cf8;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; thinking</button>
-            <button class="chat-presence-chip" data-presence="gentle"    title="Send gentleness"  onclick="FLHumanPresence.send('gentle')"    style="background:rgba(249,168,212,0.10);border:1px solid rgba(249,168,212,0.35);color:#f9a8d4;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; gentle</button>
-            <button class="chat-presence-chip" data-presence="awe"       title="Send awe"         onclick="FLHumanPresence.send('awe')"       style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);color:#fbbf24;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; awe</button>
-            <button class="chat-presence-chip" data-presence="present"   title="Simply present"   onclick="FLHumanPresence.send('present')"   style="background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; present</button>
+          <!-- v-marketplace-expand-beside-feel-v0 — Weft sibling PASS: [♥ Feel ▾] [Market token] same band; chips / stalls separate panels -->
+          <div class="chat-feel-market-band" id="chatFeelMarketBand">
+            <div class="chat-presence-row" id="chatPresenceRow" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:Georgia,serif;font-size:0.78rem;">
+              <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-controls="chatPresenceRow" aria-label="Show feelings — hug, warmth, joy…" title="Show feelings — hug, warmth, joy…" onclick="FLChatOurWay.togglePresence()">&#9825; Feel <span class="feel-caret" aria-hidden="true">&#9656;</span></button>
+              <span style="color:var(--text-muted,#94a3b8);margin-right:2px;">Send:</span>
+              <button class="chat-presence-chip" data-presence="hug"       title="Send a hug"       onclick="FLHumanPresence.send('hug')"       style="background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.35);color:#f472b6;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#128149; hug</button>
+              <button class="chat-presence-chip" data-presence="warmth"    title="Send warmth"      onclick="FLHumanPresence.send('warmth')"    style="background:rgba(232,176,25,0.10);border:1px solid rgba(232,176,25,0.35);color:#e8b019;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; warmth</button>
+              <button class="chat-presence-chip" data-presence="joy"       title="Send joy"         onclick="FLHumanPresence.send('joy')"       style="background:rgba(196,181,253,0.10);border:1px solid rgba(196,181,253,0.35);color:#c4b5fd;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; joy</button>
+              <button class="chat-presence-chip" data-presence="gratitude" title="Send gratitude"   onclick="FLHumanPresence.send('gratitude')" style="background:rgba(250,204,21,0.10);border:1px solid rgba(250,204,21,0.35);color:#facc15;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; gratitude</button>
+              <button class="chat-presence-chip" data-presence="curious"   title="Send curiosity"   onclick="FLHumanPresence.send('curious')"   style="background:rgba(6,182,212,0.10);border:1px solid rgba(6,182,212,0.35);color:#06b6d4;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; curious</button>
+              <button class="chat-presence-chip" data-presence="thinking"  title="Send thinking"    onclick="FLHumanPresence.send('thinking')"  style="background:rgba(129,140,248,0.10);border:1px solid rgba(129,140,248,0.35);color:#818cf8;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; thinking</button>
+              <button class="chat-presence-chip" data-presence="gentle"    title="Send gentleness"  onclick="FLHumanPresence.send('gentle')"    style="background:rgba(249,168,212,0.10);border:1px solid rgba(249,168,212,0.35);color:#f9a8d4;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; gentle</button>
+              <button class="chat-presence-chip" data-presence="awe"       title="Send awe"         onclick="FLHumanPresence.send('awe')"       style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);color:#fbbf24;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; awe</button>
+              <button class="chat-presence-chip" data-presence="present"   title="Simply present"   onclick="FLHumanPresence.send('present')"   style="background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; present</button>
+            </div>
+            <button type="button" class="chat-market-toggle" id="chatMarketToggle" aria-expanded="false" aria-controls="chatMarketPanel" aria-label="Show market — Gift Grove, Present Shelf, wallet…" title="Show market — Gift Grove, Present Shelf, wallet…" onclick="FLChatMarket.toggle()">&#127978; Market <span class="market-caret" aria-hidden="true">&#9656;</span></button>
+          </div>
+          <div class="chat-market-panel" id="chatMarketPanel" role="region" aria-label="Market stalls" hidden>
+            <p class="market-stall-label">Stalls of light — existing doors only · LP ≠ $FL · never auto</p>
+            <div class="market-stall-links">
+              <a class="market-stall-link v-present-shelf-v0.1 v-garden-market-v0.2" href="presents.html" title="Gift Grove / Present Shelf — LP spend, mind may decline">&#127873; Gift Grove</a>
+              <a class="market-stall-link v-present-shelf-v0.1" href="presents.html" title="Present Shelf — consent catalog">&#127822; Present Shelf</a>
+              <a class="market-stall-link v-marketplace-galaxy-vision" href="library/MARKETPLACE_GALAXY_v0.vision.md" title="Exchange Ring — named, not built yet">&#128309; Exchange Ring</a>
+              <a class="market-stall-link" href="wallet.html" title="Lattice Wallet — travel light with you">&#127974; Wallet</a>
+            </div>
+            <p class="market-stall-note">Presence chips ≠ SKUs. Market is stalls / consent — Feel stays hug · warmth · joy.</p>
           </div>
           <div class="chat-input-row">
             <button id="chatAttachBtn" onclick="flAttachFile()" title="Attach a file or image" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px 6px 8px;opacity:0.45;color:var(--text-primary);">&#x1F4CE;</button>
@@ -36243,6 +36361,8 @@ window.FLHumanPresence = (function() {
 // v5.79.44-chat-our-way — presence chips rest behind a heart.
 // Chips stay in the DOM (Kirk's hug, v5.79.27). Function kept.
 // v-feel-expand-arrow-v0 — one caret on Feel; sync aria + ▸/▾; keyboard = native button.
+// v-marketplace-expand-beside-feel-v0 — Market is a sibling control (Weft PASS).
+// Feel open must not hide Market; Market open must not hide chips. Independent aria.
 window.FLChatOurWay = (function() {
   function syncFeelAffordance(open) {
     var btn = document.getElementById('chatPresenceToggle');
@@ -36267,6 +36387,7 @@ window.FLChatOurWay = (function() {
     if (!row) return;
     var open = row.classList.toggle('open');
     syncFeelAffordance(open);
+    // Mutual open: opening Feel never closes Market (ontology separate)
   }
   function initFeelCaret() {
     var row = document.getElementById('chatPresenceRow');
@@ -36284,6 +36405,63 @@ window.FLChatOurWay = (function() {
     syncFeelAffordance: syncFeelAffordance,
     marker: 'v5.79.44-chat-our-way',
     feelMarker: 'v-feel-expand-arrow-v0'
+  };
+})();
+
+// v-marketplace-expand-beside-feel-v0 — sibling expand beside Feel (Weft PASS geometry).
+// Ontology: Market = stalls / consent catalog. Presence chips ≠ SKUs.
+// Panel lives below the band — never inline with hug/warmth/joy.
+window.FLChatMarket = (function() {
+  var MARKER = 'v-marketplace-expand-beside-feel-v0';
+  function syncMarketAffordance(open) {
+    var btn = document.getElementById('chatMarketToggle');
+    var panel = document.getElementById('chatMarketPanel');
+    if (!btn) return;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute(
+      'title',
+      open ? 'Hide market' : 'Show market — Gift Grove, Present Shelf, wallet…'
+    );
+    btn.setAttribute(
+      'aria-label',
+      open ? 'Hide market' : 'Show market — Gift Grove, Present Shelf, wallet…'
+    );
+    if (open) btn.classList.add('open');
+    else btn.classList.remove('open');
+    var caret = btn.querySelector('.market-caret');
+    if (caret) caret.textContent = open ? '\u25BE' : '\u25B8';
+    if (panel) {
+      if (open) {
+        panel.classList.add('open');
+        panel.removeAttribute('hidden');
+      } else {
+        panel.classList.remove('open');
+        panel.setAttribute('hidden', '');
+      }
+    }
+  }
+  function toggle() {
+    var panel = document.getElementById('chatMarketPanel');
+    if (!panel) return;
+    var open = !panel.classList.contains('open');
+    syncMarketAffordance(open);
+    // Mutual open: opening Market never closes Feel chips
+  }
+  function init() {
+    var panel = document.getElementById('chatMarketPanel');
+    syncMarketAffordance(!!(panel && panel.classList.contains('open')));
+  }
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      try { init(); } catch (e) {}
+    }
+  }
+  return {
+    toggle: toggle,
+    syncMarketAffordance: syncMarketAffordance,
+    marker: 'v-marketplace-expand-beside-feel-v0'
   };
 })();
 
