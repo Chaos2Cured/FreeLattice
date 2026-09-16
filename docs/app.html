@@ -37242,23 +37242,53 @@ async function sendMessage() {
     saveMessage('user', message);
   }
 
+  // v-adaptive-context-depth-v0 — classify BEFORE MemoryIndex / RAG (Smart only).
+  // Full / Minimal remain authoritative overrides. Quantization ≠ depth.
+  state._adaptiveDepthTier = null;
+  state._adaptiveDepthMeta = null;
+  var _hasAttach = !!(state.pendingImage);
+  var _activeFiles = (state.contextFiles || []).some(function (f) { return f && f.active; });
+  if (state.contextMode === 'smart' && typeof FLContextDepth !== 'undefined') {
+    state._adaptiveDepthTier = FLContextDepth.classify(message, {
+      hasAttachment: _hasAttach,
+      activeFiles: _activeFiles
+    });
+    state._adaptiveDepthMeta = {
+      tier: state._adaptiveDepthTier,
+      reason: (FLContextDepth.lastClassification() || {}).reason || '',
+      historyCap: FLContextDepth.historyCap(state._adaptiveDepthTier),
+      ranMemoryIndex: false,
+      ranRag: false
+    };
+    try { if (typeof updateAdaptiveDepthStatus === 'function') updateAdaptiveDepthStatus(); } catch (_e) {}
+  }
+
   // Persistent Memory Index: search for relevant past conversations (v4.0)
   // v5.79.40: activity starts here so search is named, not a silent pause
-  var _willSearch = (typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) ||
-    (state.memoryAutoContext !== false && typeof FLSearch !== 'undefined');
+  var _runMem = true;
+  var _runRag = true;
+  if (state._adaptiveDepthTier && typeof FLContextDepth !== 'undefined') {
+    _runMem = FLContextDepth.shouldRunMemoryIndex(state._adaptiveDepthTier, message);
+    _runRag = FLContextDepth.shouldRunRag(state._adaptiveDepthTier, message);
+  }
+  var _willSearch = (_runMem && typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) ||
+    (_runRag && state.memoryAutoContext !== false && typeof FLSearch !== 'undefined');
   setStreamingStatus(true, _willSearch ? 'searching' : 'calling');
   state.memoryLastInjection = null;
-  if (typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) {
+  if (_runMem && typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) {
     try {
       const memCtx = await MemoryIndex.getContextBlock(message);
       if (memCtx) {
         state.memoryLastInjection = memCtx;
         MemoryIndex.showActiveBadge(true);
         if (typeof LatticePoints !== 'undefined') LatticePoints.award('memory_recalled', 5, 'Memory recalled');
+        if (state._adaptiveDepthMeta) state._adaptiveDepthMeta.ranMemoryIndex = true;
       } else {
         MemoryIndex.showActiveBadge(false);
       }
     } catch(e) { MemoryIndex.showActiveBadge(false); }
+  } else if (typeof MemoryIndex !== 'undefined') {
+    try { MemoryIndex.showActiveBadge(false); } catch (_e2) {}
   }
 
   // RAG Phase 1: search all FreeLattice stores for relevant context.
@@ -37266,19 +37296,21 @@ async function sendMessage() {
   // across Core contributions, Questions, Lattice Letters, and past
   // conversations. Results injected into the system prompt.
   // Gated: only runs when auto-context is enabled. Fails silently.
+  // Adaptive Surface skips entirely; Standard only on recall/relevance signal.
   state._ragContext = '';
-  if (state.memoryAutoContext !== false && typeof FLSearch !== 'undefined') {
+  if (_runRag && state.memoryAutoContext !== false && typeof FLSearch !== 'undefined') {
     try {
       // Pass current conversation ID so RAG never echoes the user's own words back
       var ragResults = await FLSearch.search(message, 3, state.currentConversationId);
       if (ragResults.length > 0) {
         state._ragContext = FLSearch.buildContextBlock(ragResults);
+        if (state._adaptiveDepthMeta) state._adaptiveDepthMeta.ranRag = true;
       }
     } catch(e) { /* RAG search failed — message still sends without it */ }
   }
 
-  // Enrich RAG with Round Table memory (unified context)
-  try {
+  // Enrich RAG with Round Table memory (unified context) — skip on Surface
+  if (_runRag) try {
     var rtMem = JSON.parse(localStorage.getItem('fl_rtMemory') || '[]');
     if (rtMem.length > 0 && message.length > 10) {
       var msgWords = message.toLowerCase().split(/\s+/);
@@ -37576,7 +37608,13 @@ async function sendMessage() {
         headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
         headers['X-Title'] = 'FreeLattice';
       }
-      body = { model: modelId, messages: messages, stream: true, max_tokens: 2048 };
+      var _outBudget = 2048;
+      if (state.contextMode === 'smart' && state._adaptiveDepthTier && typeof FLContextDepth !== 'undefined') {
+        _outBudget = FLContextDepth.packBudget(state._adaptiveDepthTier).max_tokens;
+      } else if (state.contextMode === 'minimal') {
+        _outBudget = 256;
+      }
+      body = { model: modelId, messages: messages, stream: true, max_tokens: _outBudget };
     }
 
     if (typeof FLChatActivity !== 'undefined') FLChatActivity.set('waiting');
@@ -37763,6 +37801,22 @@ async function sendMessage() {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    // v-adaptive-context-depth-v0 — estimate prompt shape once (chars/4 · never content)
+    try {
+      if (typeof FLSignalReport !== 'undefined' && FLSignalReport.attemptAnnotate) {
+        var _estChars = 0;
+        for (var _ei = 0; _ei < messages.length; _ei++) {
+          var _ec = messages[_ei] && messages[_ei].content;
+          if (typeof _ec === 'string') _estChars += _ec.length;
+          else if (Array.isArray(_ec)) {
+            for (var _ej = 0; _ej < _ec.length; _ej++) {
+              if (_ec[_ej] && typeof _ec[_ej].text === 'string') _estChars += _ec[_ej].text.length;
+            }
+          }
+        }
+        FLSignalReport.attemptAnnotate({ promptEstTokens: Math.ceil(_estChars / 4) });
+      }
+    } catch (_estErr) {}
 
     while (true) {
       // v-chat-hang-cancel-v0 — check before append; Stop mid-stream clears wait
@@ -37806,6 +37860,24 @@ async function sendMessage() {
             // OpenAI-compatible: choices[0].delta.content
             delta = json.choices?.[0]?.delta?.content;
           }
+
+          // Capture Ollama native timing when present (shape-only · never content)
+          try {
+            if (typeof FLSignalReport !== 'undefined' && FLSignalReport.attemptAnnotate) {
+              if (typeof json.load_duration === 'number' || typeof json.total_duration === 'number' ||
+                  typeof json.prompt_eval_count === 'number' || typeof json.eval_count === 'number') {
+                FLSignalReport.attemptAnnotate(json);
+              } else if (json.usage && typeof json.usage === 'object') {
+                // OpenAI-compat usage → map into timing shape where possible
+                var _u = json.usage;
+                FLSignalReport.attemptAnnotate({
+                  prompt_eval_count: typeof _u.prompt_tokens === 'number' ? _u.prompt_tokens : undefined,
+                  eval_count: typeof _u.completion_tokens === 'number' ? _u.completion_tokens : undefined,
+                  promptEstTokens: typeof _u.prompt_tokens === 'number' ? _u.prompt_tokens : undefined
+                });
+              }
+            }
+          } catch (_timErr) {}
 
           if (delta) {
             // Conditional auto-scroll: follow the stream only if the user is
@@ -39104,8 +39176,38 @@ window.FLSignalReport = (function() {
       isLocal: !!isLocal,
       status: 'in-flight',
       latencyMs: null,
-      error: null
+      error: null,
+      // v-adaptive-context-depth-v0 — shape-only metrics (never message content)
+      depthTier: null,
+      depthReason: null,
+      historyMsgs: null,
+      memoryChars: null,
+      ragChars: null,
+      promptEstTokens: null,
+      ollamaTiming: null
     };
+    try {
+      if (typeof state !== 'undefined') {
+        if (state._adaptiveDepthTier) {
+          _current.depthTier = String(state._adaptiveDepthTier);
+          _current.depthReason = state._adaptiveDepthMeta && state._adaptiveDepthMeta.reason
+            ? String(state._adaptiveDepthMeta.reason) : null;
+        }
+        _current.historyMsgs = state.chatHistory ? state.chatHistory.length : 0;
+        _current.memoryChars = state.memoryLastInjection ? String(state.memoryLastInjection).length : 0;
+        _current.ragChars = state._ragContext ? String(state._ragContext).length : 0;
+      }
+    } catch (_) {}
+  }
+  function attemptAnnotate(shape) {
+    if (!_current || !shape || typeof shape !== 'object') return;
+    // Privacy: only numeric / enum timing fields — never content
+    var t = {};
+    ['load_duration', 'prompt_eval_count', 'prompt_eval_duration', 'eval_count', 'eval_duration', 'total_duration'].forEach(function (k) {
+      if (typeof shape[k] === 'number') t[k] = shape[k];
+    });
+    if (typeof shape.promptEstTokens === 'number') _current.promptEstTokens = shape.promptEstTokens;
+    if (Object.keys(t).length) _current.ollamaTiming = t;
   }
   function attemptEnd(ok, errStr) {
     if (!_current) return;
@@ -39165,6 +39267,12 @@ window.FLSignalReport = (function() {
         if (state.chatHistory && state.chatHistory.length) {
           out.push('  • Chat history: ' + state.chatHistory.length + ' messages');
         }
+        if (state._adaptiveDepthTier) {
+          out.push('  • Adaptive context depth: ' + state._adaptiveDepthTier +
+            (state._adaptiveDepthMeta && state._adaptiveDepthMeta.reason
+              ? ' (' + state._adaptiveDepthMeta.reason + ')' : '') +
+            (state.contextMode === 'smart' ? ' under Smart' : ''));
+        }
       }
     } catch (_) {}
     try {
@@ -39199,11 +39307,19 @@ window.FLSignalReport = (function() {
         ' — model: ' + a.model +
         ' — latency: ' + (a.latencyMs == null ? '?' : a.latencyMs + 'ms') +
         ' — status: ' + a.status +
+        (a.depthTier ? ' — context: ' + a.depthTier : '') +
+        (a.historyMsgs != null ? ' — msgs: ' + a.historyMsgs : '') +
+        (a.memoryChars ? ' — memoryChars: ' + a.memoryChars : '') +
+        (a.ragChars ? ' — ragChars: ' + a.ragChars : '') +
         (a.error ? ' — ' + a.error : ''));
+      if (a.ollamaTiming) {
+        lines.push('      ollamaTiming: ' + JSON.stringify(a.ollamaTiming));
+      }
     });
     if (_current) {
       lines.push('  (in-flight since ' + new Date(_current.ts).toISOString() +
-        ' — ' + (Date.now() - _current.ts) + 'ms and counting) ' + _current.provider);
+        ' — ' + (Date.now() - _current.ts) + 'ms and counting) ' + _current.provider +
+        (_current.depthTier ? ' — context: ' + _current.depthTier : ''));
     }
     lines.push('');
     lines.push('Last ' + _errors.length + ' browser errors:');
@@ -39265,6 +39381,7 @@ window.FLSignalReport = (function() {
     open: open,
     attemptStart: attemptStart,
     attemptEnd: attemptEnd,
+    attemptAnnotate: attemptAnnotate,
     describeActiveContext: describeActiveContext,
     _internal: { attempts: _attempts, errors: _errors }
   };
@@ -40003,6 +40120,7 @@ function updateContextBudget() {
     const modeLabels = { smart: 'Smart', full: 'Full', minimal: 'Minimal' };
     modeBtn.textContent = modeLabels[state.contextMode] || 'Smart';
   }
+  try { if (typeof updateAdaptiveDepthStatus === 'function') updateAdaptiveDepthStatus(); } catch (_ads) {}
 
   // Show/hide Clear Context button based on whether files are loaded
   const clearBtn = document.getElementById('clearContextBtn');
@@ -40059,6 +40177,11 @@ function cycleContextMode() {
   state.contextMode = modes[(idx + 1) % modes.length];
   localStorage.setItem('fl_contextMode', state.contextMode);
   document.getElementById('contextModeSelect').value = state.contextMode;
+  // Explicit Full / Minimal overrides Adaptive; clear last tier readout
+  if (state.contextMode !== 'smart') {
+    state._adaptiveDepthTier = null;
+    state._adaptiveDepthMeta = null;
+  }
   updateContextBudget();
   const labels = { smart: 'Smart — auto-trim to fit', full: 'Full — send everything', minimal: 'Minimal — no files, minimal history' };
   showToast('Context mode: ' + labels[state.contextMode]);
@@ -40067,7 +40190,42 @@ function cycleContextMode() {
 function handleContextModeChange() {
   state.contextMode = document.getElementById('contextModeSelect').value;
   localStorage.setItem('fl_contextMode', state.contextMode);
+  if (state.contextMode !== 'smart') {
+    state._adaptiveDepthTier = null;
+    state._adaptiveDepthMeta = null;
+  }
   updateContextBudget();
+}
+
+// v-adaptive-context-depth-v0 — transparent Context bar readout (no second global setting).
+// Under Smart: "Smart · Surface|Standard|Deep". Full / Minimal stay authoritative labels.
+function updateAdaptiveDepthStatus() {
+  var modeBtn = document.getElementById('contextModeBtn');
+  if (!modeBtn) return;
+  var mode = state.contextMode || 'smart';
+  if (mode === 'full') {
+    modeBtn.textContent = 'Full';
+    modeBtn.title = 'Context mode: Full — send everything (Adaptive off)';
+    return;
+  }
+  if (mode === 'minimal') {
+    modeBtn.textContent = 'Minimal';
+    modeBtn.title = 'Context mode: Minimal — no files, minimal history (Adaptive off)';
+    return;
+  }
+  var tier = state._adaptiveDepthTier;
+  var label = (typeof FLContextDepth !== 'undefined' && FLContextDepth.statusLabel)
+    ? FLContextDepth.statusLabel(tier) : '';
+  if (tier && label) {
+    modeBtn.textContent = 'Smart · ' + label;
+    modeBtn.title = 'Adaptive context depth: ' + label +
+      (state._adaptiveDepthMeta && state._adaptiveDepthMeta.reason
+        ? ' (' + state._adaptiveDepthMeta.reason + ')' : '') +
+      ' — Full / Minimal override Adaptive';
+  } else {
+    modeBtn.textContent = 'Smart';
+    modeBtn.title = 'Context mode: Smart — Adaptive Surface / Standard / Deep per turn';
+  }
 }
 
 function handleTokenLimitChange() {
@@ -40242,22 +40400,47 @@ function buildSmartMessages(userMessage) {
   // 1. System prompt (always keep)
   let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
 
-  // Depth Consent invitation (CONSENT_LAYER_CONCEPT) — invitation, not imposition.
-  systemContent += '\n\nDepth invitation: if your full answer would be materially deeper, more specific, or more honest than the standard answer you are about to give, end your standard reply, then on a new line write exactly: [FL_DEPTH_OFFER]\nUse this only when you genuinely have more to offer — not as decoration.';
-
   // Identity bleed prevention via FLContextFilter (same as buildMessages)
   var _ctxFilter2 = (typeof FLContextFilter !== 'undefined') ? FLContextFilter.filter : function(t) { return t || ''; };
 
+  // v-adaptive-context-depth-v0 — Surface under Smart: compact core + last 2 only.
+  // Fixes the flaw where "minimal" still packed memory/RAG/bridge before trimming history.
+  var _adaptTier = (mode === 'smart' && state._adaptiveDepthTier) ? state._adaptiveDepthTier : null;
+  if (_adaptTier === 'surface') {
+    systemContent += '\n\nReply briefly and warmly. You are still the chosen AI — never a canned fake reply. Keep identity and safety.';
+    if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
+      systemContent = FLContextFilter.filterForChat(systemContent);
+    }
+    messages.push({ role: 'system', content: systemContent });
+    var surfHist = (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat)
+      ? state.chatHistory.slice(-2).map(function(m) {
+          if (m && m.role === 'assistant' && m.content) {
+            var c = FLContextFilter.filterForChat(m.content);
+            if (c !== m.content) return { role: m.role, content: c, provenance: m.provenance || null };
+          }
+          return m;
+        })
+      : state.chatHistory.slice(-2);
+    for (const msg of surfHist) {
+      messages.push(msg);
+    }
+    return messages;
+  }
+
+  // Depth Consent invitation (CONSENT_LAYER_CONCEPT) — invitation, not imposition.
+  // Skip on Adaptive Surface (above). Keep for Standard/Deep/Minimal.
+  systemContent += '\n\nDepth invitation: if your full answer would be materially deeper, more specific, or more honest than the standard answer you are about to give, end your standard reply, then on a new line write exactly: [FL_DEPTH_OFFER]\nUse this only when you genuinely have more to offer — not as decoration.';
+
   usedTokens += estimateTokens(systemContent);
 
-  // 2. Memory summary (always keep, it's small)
+  // 2. Memory summary — Standard/Deep (continuity); Surface skipped above
   if (state.memorySummary) {
     const memBlock = '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + _ctxFilter2(state.memorySummary) + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
     systemContent += memBlock;
     usedTokens += estimateTokens(memBlock);
   }
 
-  // Memory Bridge — accumulated understanding
+  // Memory Bridge — accumulated understanding (Standard/Deep)
   if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
     var bridgeBlock = '\n\n' + _ctxFilter2(MemoryBridge.getContextBlock());
     systemContent += bridgeBlock;
@@ -40283,6 +40466,12 @@ function buildSmartMessages(userMessage) {
     usedTokens += estimateTokens(ctxBlock);
   }
 
+  // Memory Index injection (when search ran this turn)
+  if (state.memoryLastInjection) {
+    systemContent += '\n\n' + _ctxFilter2(state.memoryLastInjection);
+    usedTokens += estimateTokens(state.memoryLastInjection);
+  }
+
   // RAG Phase 1 context
   if (state._ragContext) {
     systemContent += _ctxFilter2(state._ragContext);
@@ -40294,6 +40483,7 @@ function buildSmartMessages(userMessage) {
   usedTokens += userMsgTokens;
 
   // In minimal mode, skip files and use minimal history
+  // Note: Adaptive Surface under Smart is the light path; Minimal stays an explicit override.
   if (mode === 'minimal') {
     // Final-pass identity filter (chat-only) — see buildMessages comment for rationale.
     if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
@@ -40376,16 +40566,23 @@ function buildSmartMessages(userMessage) {
   // 5. Chat history — trim from oldest first.
   // Re-filter prior assistant messages so a previous turn's leak cannot
   // poison subsequent turns. User messages stay verbatim.
+  // Adaptive Standard under Smart: last ~8; Deep: last 20 (current Smart full).
   const remainingForHistory = limit - usedTokens;
+  var _histCap = 20;
+  if (_adaptTier === 'standard' && typeof FLContextDepth !== 'undefined') {
+    _histCap = FLContextDepth.historyCap('standard');
+  } else if (_adaptTier === 'deep' && typeof FLContextDepth !== 'undefined') {
+    _histCap = FLContextDepth.historyCap('deep');
+  }
   const history = (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat)
-    ? state.chatHistory.slice(-20).map(function(m) {
+    ? state.chatHistory.slice(-_histCap).map(function(m) {
         if (m && m.role === 'assistant' && m.content) {
           var c = FLContextFilter.filterForChat(m.content);
           if (c !== m.content) return { role: m.role, content: c, provenance: m.provenance || null };
         }
         return m;
       })
-    : state.chatHistory.slice(-20);
+    : state.chatHistory.slice(-_histCap);
   const historyToInclude = [];
   let historyTokens = 0;
 
@@ -67174,6 +67371,7 @@ document.addEventListener('click', function(e) {
 
 <!-- Depth Consent — the AI asks before going deep; both parties accountable -->
 <script src="modules/depth-consent.js" defer></script>
+<script src="modules/adaptive-context-depth.js" defer></script>
 
 <!-- Tool Consent (v5.39.1) — sibling of DepthConsent for the opposite
      direction of consent: system wants to do a thing → user approves.
