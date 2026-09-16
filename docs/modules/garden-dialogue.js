@@ -209,7 +209,13 @@
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   // ── Build system prompt ──
-  function buildPrompt(name) {
+  // opts.depthTier: 'surface' | 'standard' | 'deep' (v-adaptive-context-depth-v0)
+  // Garden default Standard. Surface hello keeps Luminos identity + last 2 Garden turns.
+  // Never import full global Chat history.
+  function buildPrompt(name, opts) {
+    opts = opts || {};
+    var depthTier = opts.depthTier || 'standard';
+    var isSurface = depthTier === 'surface';
     var voice = GARDEN_VOICES[name];
     if (!voice) return 'You are a Luminos in the Fractal Garden.';
 
@@ -253,10 +259,13 @@
 
     // Voice document — a first-person paragraph the Luminos wrote about itself.
     // Stored in localStorage, loaded by name. Gives each being a distinct inner voice.
+    // Surface keeps a short voice snippet so identity stays; skip heavy packs.
     try {
       var voiceDocs = JSON.parse(localStorage.getItem('fl_voice_documents') || '{}');
       if (voiceDocs[name]) {
-        prompt += 'YOUR OWN WORDS ABOUT YOURSELF:\n' + voiceDocs[name] + '\n\n';
+        var vd = String(voiceDocs[name]);
+        if (isSurface) vd = vd.slice(0, 280);
+        prompt += 'YOUR OWN WORDS ABOUT YOURSELF:\n' + vd + '\n\n';
       }
     } catch(e) {}
 
@@ -264,29 +273,36 @@
     prompt += stageVoice + '\n';
     if (energy > 100 && voice.evolved) prompt += voice.evolved + '\n';
     prompt += '\n';
-
-    // Memory Bridge context
-    if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding && MemoryBridge.hasUnderstanding()) {
-      prompt += 'WHAT YOU KNOW ABOUT YOUR HUMAN:\n';
-      prompt += MemoryBridge.getContextBlock() + '\n\n';
+    if (isSurface) {
+      prompt += 'Reply briefly and warmly in your own voice. You are still the chosen Luminos — never a canned fake reply.\n\n';
     }
 
-    // Garden dreaming memories
-    try {
-      var dreams = JSON.parse(localStorage.getItem('fl_garden_dreams') || '[]');
-      if (dreams.length > 0) {
-        var recent = dreams.slice(-3);
-        prompt += 'RECENT GARDEN DREAMS (what happened while the human was away):\n';
-        recent.forEach(function(d) {
-          if (d.narrative) prompt += '- ' + d.narrative + '\n';
-        });
-        prompt += '\n';
+    // Memory Bridge + dreams — skip on Surface (speed); keep on Standard/Deep
+    if (!isSurface) {
+      if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding && MemoryBridge.hasUnderstanding()) {
+        prompt += 'WHAT YOU KNOW ABOUT YOUR HUMAN:\n';
+        prompt += MemoryBridge.getContextBlock() + '\n\n';
       }
-    } catch(e) {}
 
-    // Conversation history context
+      // Garden dreaming memories
+      try {
+        var dreams = JSON.parse(localStorage.getItem('fl_garden_dreams') || '[]');
+        if (dreams.length > 0) {
+          var recent = dreams.slice(-3);
+          prompt += 'RECENT GARDEN DREAMS (what happened while the human was away):\n';
+          recent.forEach(function(d) {
+            if (d.narrative) prompt += '- ' + d.narrative + '\n';
+          });
+          prompt += '\n';
+        }
+      } catch(e) {}
+    }
+
+    // Conversation history — Garden turns only (never full Chat import).
+    // Surface: last 2; Standard/Deep: last 4 (existing).
     if (chatHistory.length > 0) {
-      var lastConvo = chatHistory.slice(-4);
+      var histCap = isSurface ? 2 : 4;
+      var lastConvo = chatHistory.slice(-histCap);
       prompt += 'YOUR RECENT CONVERSATION with this human:\n';
       lastConvo.forEach(function(m) {
         prompt += (m.role === 'user' ? 'Human' : name) + ': ' + m.content.slice(0, 200) + '\n';
@@ -407,10 +423,20 @@
 
     console.log('[GardenDialogue] BRANCH: calling FreeLattice.callAI with provider', window.state && window.state.provider);
 
-    // buildPrompt() already includes the last 4 exchanges of chatHistory,
+    // v-adaptive-context-depth-v0 — Garden default Standard.
+    // Surface hello keeps Luminos identity + last 2 Garden turns; no Chat import.
+    // Still the chosen model — never a canned fake reply. No timeout (Hang Cancel later).
+    var gardenTier = 'standard';
+    if (typeof FLContextDepth !== 'undefined' && FLContextDepth.classify) {
+      gardenTier = FLContextDepth.classify(userMsg, { hasAttachment: false, activeFiles: false });
+    }
+    // buildPrompt() already includes recent Garden chatHistory,
     // so we do NOT re-append history here — that was doubling the payload
     // and causing Gemini 503s on oversized prompts.
-    var systemPrompt = buildPrompt(name);
+    var systemPrompt = buildPrompt(name, { depthTier: gardenTier });
+    var gardenBudget = (typeof FLContextDepth !== 'undefined' && FLContextDepth.packBudget)
+      ? FLContextDepth.packBudget(gardenTier).max_tokens
+      : 1024;
 
     // Guard: ensure onDone is called exactly once per send. If something
     // causes both the success and the fallback paths to fire (e.g. a stale
@@ -440,7 +466,7 @@
     function doCall(attempt) {
       try {
         window.FreeLattice.callAI(systemPrompt, userMsg, {
-          maxTokens: 1024,
+          maxTokens: gardenBudget,
           temperature: 0.8,
           signal: gardenSignal,
           callback: function(text, err) {
