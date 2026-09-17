@@ -15208,6 +15208,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 /* Layer: Phone PWA — thumb look card + safe install (2026-09-07) */
 @media (max-width: 600px) {
+  #fl-connect-card,
   #fl-look-card {
     margin-left: max(8px, env(safe-area-inset-left, 0px));
     margin-right: max(8px, env(safe-area-inset-right, 0px));
@@ -15215,9 +15216,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     box-sizing: border-box;
     max-width: 100%;
   }
+  #fl-connect-card .ai-status-btn,
+  #fl-connect-card a.ai-status-btn,
   #fl-look-card .ai-status-btn,
   #fl-look-card a.ai-status-btn,
   #fl-look-may,
+  #fl-look-allowed,
   #fl-look-connect,
   #fl-look-copy-origin,
   #fl-look-copy-pull,
@@ -16704,55 +16708,86 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="ai-status-actions" id="settingsActions">
       <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
-      <button class="ai-status-btn" onclick="document.getElementById('fl-look-card')&&document.getElementById('fl-look-card').scrollIntoView({behavior:'smooth',block:'center'})" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
+      <button class="ai-status-btn" onclick="flOpenConnectWizard('home')" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
     </div>
   </div>
 
 
-  <!-- Layer: one look card. Scoped origins. Never innerHTML. Probe only on gesture. -->
-  <div id="fl-look-card" class="fl-card" style="margin-bottom:14px;padding:16px 18px;">
+  <!-- v-connect-card-yesno-wizard-v0 — Connect card · yes/no wizard · every panel forward + way out -->
+  <!-- Keystone door: Settings points here. Probe only on user gesture. Soft leave sw.js. -->
+  <div id="fl-connect-card" class="fl-card v-connect-card-yesno-wizard-v0" style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--emerald,#34d399);font-family:Georgia,serif;font-size:1.05rem;margin:0 0 6px;">Connect a mind at home</h3>
+    <p style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin:0 0 14px;">One wizard. You allow the door; we list minds. Browser permission ≠ setting Ollama origins.</p>
+    <div id="fl-look-card">
     <div data-look="0">
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">FreeLattice can look for minds already living on this computer. It only knocks on well-known local doors, and only when you ask.</p>
-      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="smartOllamaConnect()" style="min-height:44px;">May I look?</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="flOpenConnectWizard('may')" style="min-height:44px;">May I look?</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="1" hidden>
-      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0;">Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-allowed" onclick="flOpenConnectWizard('allowed')" style="min-height:44px;">I allowed it — look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0;">Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> — no browser CORS. Not the only door.</p>
     </div>
     <div data-look="2a" hidden>
       <p id="fl-look-2a-count" style="font-family:Georgia,serif;font-size:0.95rem;color:var(--emerald,#34d399);margin:0 0 10px;"></p>
       <ul id="fl-look-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
-      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-connect" onclick="flLookConnect()" style="min-height:44px;">Connect</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-connect" onclick="flLookConnect()" style="min-height:44px;">Connect</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="2b" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Ollama is running. The browser blocked this page from knocking (CORS) — that is not “Ollama missing.”</p>
       <pre id="fl-look-origin-cmd" style="white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;"></pre>
       <button type="button" class="ai-status-btn" id="fl-look-copy-origin" onclick="flLookCopyOrigin()" style="min-height:44px;margin-bottom:10px;">copy</button>
-      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Mac: paste in Terminal, then <strong>Quit Ollama</strong> from the menu bar and reopen it. Windows/Linux: set the same origins, restart Ollama, then Look again.</p>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Mac: paste in Terminal, then <strong>Quit Ollama</strong> from the menu bar and reopen it. Windows/Linux: set the same origins, restart Ollama, then look again.</p>
       <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 8px;">A wildcard <code>*</code> would let any site knock on this computer — we use scoped origins only.</p>
       <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 12px;">Optional (no browser CORS): <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> — not the only door.</p>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">I set that — look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="2c" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Your browser is holding the door. Click the icon beside the address bar, allow local network access, then look again.</p>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);margin-bottom:10px;">Look again</button>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Already installed? open Ollama once, then Look again.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Already installed? open Ollama once, then Look again. Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">Desktop</a>.</p>
     </div>
     <div data-look="2d" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">Nothing is running on this computer yet.</p>
       <a href="https://ollama.com/download" target="_blank" rel="noopener" class="ai-status-btn ai-status-btn-primary" style="display:inline-block;text-decoration:none;min-height:44px;line-height:44px;padding:0 16px;margin-bottom:10px;">Get Ollama</a>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;">Already installed? open it once, then look again.</p>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;">Already installed? open it once, then look again. Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">Desktop</a>.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="2e" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">The door is open, no minds live here yet.</p>
       <pre id="fl-look-pull-cmd" style="white-space:pre-wrap;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;">ollama pull llama3.2:3b</pre>
       <button type="button" class="ai-status-btn" id="fl-look-copy-pull" onclick="flLookCopyPull()" style="min-height:44px;margin-bottom:10px;">copy</button>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="3" hidden>
       <p id="fl-look-3-summary" style="font-family:Georgia,serif;font-size:0.95rem;color:var(--emerald,#34d399);margin:0 0 10px;"></p>
       <ul id="fl-look-3-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;"><button type="button" onclick="flLookShowAnother()" style="background:none;border:none;color:var(--text-muted);text-decoration:underline;cursor:pointer;font-family:Georgia,serif;font-size:0.78rem;padding:0;">another way to connect</button></p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flLookShow('0')" style="min-height:44px;">Done</button>
+        <button type="button" class="ai-status-btn" onclick="flLookShowAnother()" style="min-height:44px;">another way to connect</button>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -30562,10 +30597,16 @@ if (typeof document !== 'undefined') {
 }
 
 
-// ── Smart Ollama Connection — one look card (gesture-only probe) ──
-async function smartOllamaConnect() {
-  // Probe only from May I look? / Look again / Use My Computer hero (user gesture).
-  // Chrome LNA needs the click. v-browser-local-ai-wizard-v0
+// ── Connect card yes/no wizard (v-connect-card-yesno-wizard-v0) ──
+// Panel 1 is the permission pause — buttons required (I allowed / Not now).
+// Probe runs on 'allowed' / 'again' only — never leave Mom on prose-only panel 1.
+
+function flLookNotNow() {
+  flLookShow('0');
+}
+
+async function flLookProbeNow() {
+  // Actual probe — Look again / I allowed it (user gesture). Chrome LNA needs the click.
   flLookShow('1');
   var result;
   try {
@@ -30605,37 +30646,60 @@ async function smartOllamaConnect() {
   flLookShow('2c');
 }
 
-// v-browser-local-ai-wizard-v0 — Change Provider hero → look-card wizard
-// Fixes stale fl_isLocal early-return that made "Use My Computer's AI" feel dead.
+// One entry for hero · may · home · local · again · allowed
+function flOpenConnectWizard(source) {
+  source = String(source || 'may');
+  try {
+    var overlay = document.getElementById('pmOverlay');
+    if (overlay) overlay.remove();
+  } catch (e0) {}
+  try {
+    if (typeof switchTab === 'function') switchTab('settings');
+  } catch (e1) {}
+  window._flAutoConnected = false;
+
+  function scrollConnect() {
+    var card = document.getElementById('fl-connect-card') || document.getElementById('fl-look-card');
+    if (card && card.scrollIntoView) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // again / allowed → probe now (permission already handled or CORS fixed)
+  if (source === 'again' || source === 'allowed') {
+    scrollConnect();
+    return flLookProbeNow();
+  }
+
+  // may / hero / home / local → open Connect card at panel 1 (yes/no — unstick)
+  scrollConnect();
+  flLookShow('1');
+  var status = document.getElementById('pmHeroLocalStatus');
+  if (status && source === 'hero') {
+    status.textContent = 'Connect card open — allow the browser door, then tap I allowed it.';
+    status.style.color = 'var(--text-muted)';
+  }
+}
+
+function smartOllamaConnect() {
+  // Backward-compatible alias → probe (Look again paths)
+  return flLookProbeNow();
+}
+
+// v-browser-local-ai-wizard-v0 + v-connect-card-yesno-wizard-v0
 function flProviderHeroLocalAI(ev) {
   try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e0) {}
   var status = document.getElementById('pmHeroLocalStatus');
   if (status) {
-    status.textContent = 'Opening May I look? — listing minds on this computer…';
+    status.textContent = 'Opening Connect card…';
     status.style.color = 'var(--text-muted)';
   }
-  try {
-    var overlay = document.getElementById('pmOverlay');
-    if (overlay) overlay.remove();
-  } catch (e1) {}
-  try {
-    if (typeof switchTab === 'function') switchTab('settings');
-  } catch (e2) {}
-  window._flAutoConnected = false;
-  setTimeout(function () {
-    var card = document.getElementById('fl-look-card');
-    if (card && card.scrollIntoView) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    // User-gesture probe (same door as May I look?)
-    if (typeof smartOllamaConnect === 'function') {
-      smartOllamaConnect();
-    } else if (typeof flAutoConnect === 'function') {
-      flAutoConnect({ force: true });
-    }
-  }, 120);
+  flOpenConnectWizard('hero');
 }
 window.flProviderHeroLocalAI = flProviderHeroLocalAI;
+window.flOpenConnectWizard = flOpenConnectWizard;
+window.flLookNotNow = flLookNotNow;
+window.flLookProbeNow = flLookProbeNow;
 
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');
@@ -30671,10 +30735,17 @@ function settingsSetMode(mode) {
     // Highlight Local
     if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
 
+    // v-connect-card-yesno-wizard-v0 — Local mode points at Connect card (one wizard)
+    try {
+      if (typeof flOpenConnectWizard === 'function') {
+        setTimeout(function () { flOpenConnectWizard('local'); }, 80);
+      }
+    } catch (eWiz) {}
+
     // v5.77.0 Go 10: parallel probe — Ollama + LM Studio (Promise.allSettled)
     var statusText = document.getElementById('settingsStatusText');
     var statusDot = document.getElementById('settingsStatusDot');
-    if (statusText) statusText.textContent = 'Looking for local AI…';
+    if (statusText) statusText.textContent = 'Connect card — allow the door, then look again…';
     var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
     var ollamaProbe = fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
