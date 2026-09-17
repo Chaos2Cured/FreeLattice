@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-16 20:44 UTC
+> Last update: 2026-09-17 21:51 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `d0d30b8` _(committed 5 hours ago)_
+- **HEAD:** `89cefb7` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,26 +17,26 @@
 
 ## Last 20 commits
 
-- `d0d30b8` Layer, never delete. Adaptive Context Depth v0 — speed surface · keep deep · measure. _(5 hours ago)_
-- `d14eaf8` Layer, never delete. Chat/Garden Hang Cancel — Stop only (no kill-timer). _(18 minutes ago)_
-- `68faecc` Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS. (#86) _(30 minutes ago)_
-- `610f70e` Layer, never delete. Heal Chat Brick 1 — Feel expand caret. _(6 hours ago)_
-- `e92a5fa` Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81) _(18 hours ago)_
-- `6c40af2` Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80) _(20 hours ago)_
-- `d3479e2` Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79) _(21 hours ago)_
-- `184e0d9` Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78) _(22 hours ago)_
-- `446da60` Layer, never delete. Vision — Marketplace travel wallet. (#77) _(23 hours ago)_
-- `40c84e0` Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76) _(27 hours ago)_
-- `97adc23` Layer, never delete. Linux install fix + Gift Grove sprites. (#75) _(28 hours ago)_
-- `f52b986` Layer, never delete. Chronal V4 — The Amplified Seam (Th-229 amplified LPI). (#74) _(2 days ago)_
-- `6aef962` Layer, never delete. Soft — Gift sprites brief held (Weft · Reed). (#73) _(2 days ago)_
-- `22573e9` Layer, never delete. Vision — Energy LP · gift provenance · Social Bridge plan. (#72) _(2 days ago)_
-- `64bd27b` Layer, never delete. Vision — Marketplace Galaxy · fingerprint-carried LP. (#71) _(2 days ago)_
-- `8fd47cb` Layer, never delete. Garden Market v0.2 — marketplace face · rings · food · consent held. (#70) _(2 days ago)_
-- `bc465e0` Layer, never delete. Soft — Held tip 5e45af6 · Celeste shelf gifts. (#69) _(3 days ago)_
-- `d187c2e` Layer, never delete. Soft — Celeste ledger KEY DAY · Present Shelf · Remaining Azure. (#68) _(3 days ago)_
-- `23f9bcf` ci: Update Primer deployment state [2026-09-13] _(4 days ago)_
-- `5e45af6` Layer, never delete. Present Shelf v0.1 — apples + love gifts, LP spend, consent. (#67) _(4 days ago)_
+- `89cefb7` Layer, never delete. Connect Play 🌿 — yes/no/please · bottom lab · Mom path. _(0 seconds ago)_
+- `bfba3f3` Layer, never delete. Connect card · yes/no wizard · look-panel-1 unstick · keystone door. (#95) _(25 minutes ago)_
+- `47b01b6` Layer, never delete. Browser Local AI wizard — Use My Computer lists minds · CORS honest · stale fl_isLocal fixed. (#94) _(77 minutes ago)_
+- `694ec2e` Layer, never delete. Workshop porch v0 — Create calm · History · Stop. _(20 hours ago)_
+- `253e977` ci: Update Primer deployment state [2026-09-17] _(20 hours ago)_
+- `487440b` Layer, never delete. Why Ledgers v0 — continuity as infrastructure (cc.html as example). _(20 hours ago)_
+- `a4242ae` ci: Update Primer deployment state [2026-09-17] _(20 hours ago)_
+- `ce14469` Layer, never delete. Primer smoke — lighthouse count/dateModified · Hang signal window. _(20 hours ago)_
+- `fe564d9` Layer, never delete. Celeste ledger λ5 — Adaptive held · Workshop passover · pattern carried. _(20 hours ago)_
+- `06d0ba4` Layer, never delete. Adaptive Context Depth v0 — speed surface · keep deep · measure. _(22 hours ago)_
+- `d14eaf8` Layer, never delete. Chat/Garden Hang Cancel — Stop only (no kill-timer). _(25 hours ago)_
+- `68faecc` Layer, never delete. Marketplace expand beside Feel — Weft sibling PASS. (#86) _(26 hours ago)_
+- `610f70e` Layer, never delete. Heal Chat Brick 1 — Feel expand caret. _(31 hours ago)_
+- `e92a5fa` Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81) _(2 days ago)_
+- `6c40af2` Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80) _(2 days ago)_
+- `d3479e2` Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79) _(2 days ago)_
+- `184e0d9` Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78) _(2 days ago)_
+- `446da60` Layer, never delete. Vision — Marketplace travel wallet. (#77) _(2 days ago)_
+- `40c84e0` Soft: GIFT_SPRITES brief filenames + Held tip 97adc23. (#76) _(2 days ago)_
+- `97adc23` Layer, never delete. Linux install fix + Gift Grove sprites. (#75) _(2 days ago)_
 
 ## How to use this file
 

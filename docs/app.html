@@ -2150,6 +2150,95 @@ header .mantra {
 .status-dot.working { background: var(--warning); animation: pulse 1s infinite; }
 .status-dot.error { background: var(--error); }
 
+/* v-connect-play-lab-v0 — bottom Mom lab · denser yes/no/please · keep #95 card */
+.fl-connect-play {
+  border-top: 1px solid rgba(200, 210, 230, 0.08);
+  padding: 6px 12px 8px;
+  background: rgba(14, 16, 24, 0.35);
+}
+.fl-connect-play-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--emerald, #34d399);
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.fl-connect-play-toggle:hover,
+.fl-connect-play-toggle:focus {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: rgba(52, 211, 153, 0.14);
+}
+.fl-connect-play-panel {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  background: rgba(0, 0, 0, 0.28);
+}
+.fl-connect-play-panel [data-play] p {
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #c8d2e6);
+  line-height: 1.55;
+  margin: 0 0 10px;
+}
+.fl-connect-play-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.fl-connect-play-explain {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(232, 176, 25, 0.08);
+  border: 1px solid rgba(232, 176, 25, 0.2);
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.5;
+}
+.fl-connect-play-chips {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fl-connect-play-chips button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(200, 210, 230, 0.04);
+  border: 1px solid rgba(200, 210, 230, 0.1);
+  font-family: Georgia, serif;
+  font-size: 0.88rem;
+  color: var(--text-bright, #e6ebf5);
+  cursor: pointer;
+  min-height: 44px;
+}
+.fl-connect-play pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--gold, #e8b019);
+  margin: 0 0 8px;
+}
+
 /* v5.79.40-chat-one-room: thinking bubble layered off.
    Same work stream used to paint #statusText AND #chat-thinking-bubble.
    Activity lives in #statusText. showThinkingBubble() kept, inert. */
@@ -16428,6 +16517,77 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               </button>
             </div>
           </div>
+          <!-- v-connect-play-lab-v0 — bottom 🌿 Connect · denser yes/no/please · keep #95 card · flOpenConnectPlay ≠ flOpenConnectWizard -->
+          <div id="fl-connect-play" class="fl-connect-play v-connect-play-lab-v0" data-play-open="0">
+            <button type="button" class="fl-connect-play-toggle" id="fl-connect-play-toggle" onclick="flOpenConnectPlay()" aria-expanded="false" aria-controls="fl-connect-play-panel" title="Connect Play lab — Mom path">&#127807; Connect</button>
+            <div id="fl-connect-play-panel" hidden role="region" aria-label="Connect Play lab">
+              <div data-play="welcome">
+                <p>Welcome. FreeLattice can look for a mind already living on this computer. You choose every step.</p>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>This is a soft door at the bottom of Chat. Settings still has the Connect card. Nothing leaves your machine unless you connect a cloud key later — and Change Provider stays gated until one mind is connected.</div>
+              </div>
+              <div data-play="allow" hidden>
+                <p>Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — I allowed it</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>Browsers treat your computer as a stranger for safety. The allow prompt is sticky on purpose — cobweb absurdity we navigate together. One day we build around it. Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> skips browser CORS.</div>
+              </div>
+              <div data-play="minds" hidden>
+                <p id="fl-play-minds-count" style="color:var(--emerald,#34d399);">Minds live here. Tap one.</p>
+                <ul id="fl-play-chips" class="fl-connect-play-chips"></ul>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — connect chosen</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>These are runners already on this machine (Ollama / LM Studio), not raw Hugging Face weights. Tap a chip, or Yes to connect the first mind.</div>
+              </div>
+              <div data-play="cors" hidden>
+                <p>A mind is running. The browser blocked this page from knocking (CORS) — that is not “Ollama missing.”</p>
+                <pre id="fl-play-origin-cmd"></pre>
+                <div class="fl-connect-play-actions" style="margin-bottom:8px;">
+                  <button type="button" class="ai-status-btn" id="fl-play-copy" onclick="flPlayCopyNote()" style="min-height:44px;">Copy note</button>
+                  <a href="desktop.html" class="ai-status-btn" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;">Desktop</a>
+                </div>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">I did that</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Mac: paste in Terminal, Quit Ollama from the menu bar, reopen, then I did that. Windows/Linux: set the same origins, restart Ollama. Desktop is another door, not the only one.</div>
+              </div>
+              <div data-play="empty" hidden>
+                <p id="fl-play-empty-msg">The door is soft-open, and no minds live here yet — or nothing is running. That is okay.</p>
+                <pre id="fl-play-pull-cmd">ollama pull llama3.2:3b</pre>
+                <div class="fl-connect-play-actions" style="margin-bottom:8px;">
+                  <button type="button" class="ai-status-btn" onclick="flPlayCopyPull()" style="min-height:44px;">Copy note</button>
+                  <a href="desktop.html" class="ai-status-btn" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;">Desktop</a>
+                </div>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — look again</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>Install or open Ollama (or LM Studio), pull a small model, then look again. Hugging Face weights need a runner first. In-browser WebLLM is a separate “No Install” door in Settings.</div>
+              </div>
+              <div data-play="done" hidden>
+                <p id="fl-play-done-msg" style="color:var(--emerald,#34d399);">Connected. Change Provider is open when you need another path.</p>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Done</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>One mind connected unlocks Change Provider. The Settings Connect card (#95) stays — this lab is the denser bottom companion, not a delete.</div>
+              </div>
+            </div>
+          </div>
           <div class="chat-disclaimer" id="chatDisclaimer">AI can make mistakes. Verify important information.</div>
         </div>
       </div>
@@ -29239,7 +29399,13 @@ const AiSetup = (function() {
 
 // Expose the modal globally so any code (Garden nudge, Chat banner, future
 // features) can call one function and get the unified connection flow.
-window.openProviderModal = function() { AiSetup.openModal(); };
+// v-connect-play-lab-v0 — Gate Change Provider until one mind connected.
+window.openProviderModal = function() {
+  try {
+    if (typeof flPlayGateProvider === 'function' && flPlayGateProvider()) return;
+  } catch (eGate) {}
+  AiSetup.openModal();
+};
 
 // ── Quick Connect — zero-jargon first-time connection ──
 // Every wall becomes a door. Every dead button becomes a guide.
@@ -30700,6 +30866,294 @@ window.flProviderHeroLocalAI = flProviderHeroLocalAI;
 window.flOpenConnectWizard = flOpenConnectWizard;
 window.flLookNotNow = flLookNotNow;
 window.flLookProbeNow = flLookProbeNow;
+
+// ── Connect Play lab v0 (v-connect-play-lab-v0) ──
+// Bottom #fl-connect-play 🌿 · denser Yes · Not now · Please explain.
+// Keep #95 Connect card. flOpenConnectPlay must not break flOpenConnectWizard.
+// Out of scope: Bridge binary · custom browser · nexus/economy ship · delete #95.
+
+var _flPlayStep = 'welcome';
+var _flPlayModels = [];
+var _flPlaySource = 'ollama';
+var _flPlayChosen = null;
+
+function flHasOneMindConnected() {
+  try {
+    if (typeof state !== 'undefined' && state) {
+      if (state.isLocal && (state.ollamaModel || state.provider === 'ollama' || state.provider === 'lmstudio' || state.provider === 'browser')) return true;
+      if (state.apiKey && String(state.apiKey).length > 0) return true;
+    }
+  } catch (e0) {}
+  try {
+    if (localStorage.getItem('fl_isLocal') === 'true' && localStorage.getItem('fl_ollamaModel')) return true;
+  } catch (e1) {}
+  return false;
+}
+
+function flPlayGateProvider() {
+  if (flHasOneMindConnected()) return false;
+  flOpenConnectPlay('gate');
+  return true;
+}
+
+function flPlaySetOpen(open) {
+  var root = document.getElementById('fl-connect-play');
+  var panel = document.getElementById('fl-connect-play-panel');
+  var toggle = document.getElementById('fl-connect-play-toggle');
+  if (!root || !panel) return;
+  root.setAttribute('data-play-open', open ? '1' : '0');
+  panel.hidden = !open;
+  if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function flPlayShow(step) {
+  var panel = document.getElementById('fl-connect-play-panel');
+  if (!panel) return;
+  _flPlayStep = String(step || 'welcome');
+  var nodes = panel.querySelectorAll('[data-play]');
+  for (var i = 0; i < nodes.length; i++) {
+    var st = nodes[i].getAttribute('data-play');
+    nodes[i].hidden = (st !== _flPlayStep);
+    var ex = nodes[i].querySelector('[data-play-explain]');
+    if (ex) ex.hidden = true;
+  }
+}
+
+function flOpenConnectPlay(source) {
+  source = String(source || 'toggle');
+  var panel = document.getElementById('fl-connect-play-panel');
+  var root = document.getElementById('fl-connect-play');
+  if (!panel || !root) return;
+
+  // Toggle closed when already open and user taps 🌿 again (not gate)
+  if (source === 'toggle' && root.getAttribute('data-play-open') === '1') {
+    flPlaySetOpen(false);
+    return;
+  }
+
+  try {
+    if (typeof switchTab === 'function') switchTab('chat');
+  } catch (eTab) {}
+
+  flPlaySetOpen(true);
+  if (source === 'gate') {
+    flPlayShow('welcome');
+    try {
+      if (typeof updateStatusText === 'function') {
+        /* soft status if available */
+      }
+      var st = document.getElementById('statusText');
+      if (st && st.getAttribute('data-fl-chat-activity') === 'idle') {
+        st.textContent = 'Connect a mind first — then Change Provider opens fully';
+      }
+    } catch (eSt) {}
+  } else if (flHasOneMindConnected()) {
+    flPlayShow('done');
+    var doneMsg = document.getElementById('fl-play-done-msg');
+    if (doneMsg) {
+      var name = '';
+      try { name = (typeof state !== 'undefined' && state && state.ollamaModel) ? state.ollamaModel : ''; } catch (eN) {}
+      doneMsg.textContent = name
+        ? ('Already connected to ' + name + '. Change Provider is open when you need another path.')
+        : 'A mind is connected. Change Provider is open when you need another path.';
+    }
+  } else {
+    flPlayShow('welcome');
+  }
+
+  if (root.scrollIntoView) {
+    try { root.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (eSc) {}
+  }
+}
+
+function flPlayExplain() {
+  var panel = document.getElementById('fl-connect-play-panel');
+  if (!panel) return;
+  var stepEl = null;
+  var nodes = panel.querySelectorAll('[data-play]');
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].getAttribute('data-play') === _flPlayStep && !nodes[i].hidden) {
+      stepEl = nodes[i];
+      break;
+    }
+  }
+  if (!stepEl) return;
+  var ex = stepEl.querySelector('[data-play-explain]');
+  if (!ex) return;
+  ex.hidden = !ex.hidden;
+}
+
+function flPlayNotNow() {
+  flPlaySetOpen(false);
+  flPlayShow('welcome');
+}
+
+function flPlayCopyNote() {
+  var el = document.getElementById('fl-play-origin-cmd');
+  var t = el ? el.textContent : '';
+  if (!t && typeof flOriginCommand === 'function') {
+    t = flOriginCommand(typeof flDetectPlatform === 'function' ? flDetectPlatform() : 'mac');
+  }
+  if (!t) return;
+  if (typeof safeCopy === 'function') safeCopy(t);
+  else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+}
+
+function flPlayCopyPull() {
+  var t = 'ollama pull llama3.2:3b';
+  if (typeof safeCopy === 'function') safeCopy(t);
+  else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+}
+
+function flPlayFillChips(models) {
+  var list = document.getElementById('fl-play-chips');
+  if (!list) return;
+  while (list.firstChild) list.removeChild(list.firstChild);
+  _flPlayChosen = null;
+  for (var i = 0; i < models.length; i++) {
+    var m = models[i] || {};
+    var name = m.name || 'mind';
+    var size = (typeof flFormatSize === 'function') ? flFormatSize(m.size) : '';
+    var li = document.createElement('li');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-fl-play-model', name);
+    var label = name + (size ? (' · ' + size) : '');
+    if (m._source === 'lmstudio' || _flPlaySource === 'lmstudio') label = label + ' · LM Studio';
+    btn.textContent = label;
+    btn.title = 'Connect ' + name;
+    btn.addEventListener('click', function (ev) {
+      var n = ev.currentTarget.getAttribute('data-fl-play-model');
+      _flPlayChosen = n;
+      flPlayConnect(n);
+    });
+    li.appendChild(btn);
+    list.appendChild(li);
+  }
+  var count = document.getElementById('fl-play-minds-count');
+  if (count) {
+    var srcNote = _flPlaySource === 'lmstudio' ? ' (LM Studio)' : '';
+    count.textContent = models.length + (models.length === 1 ? ' mind lives here' : ' minds live here') + srcNote + '. Tap one.';
+  }
+}
+
+async function flPlayProbe() {
+  var result;
+  try {
+    result = await probeLocalMind();
+  } catch (e) {
+    result = { state: '2c', models: [] };
+  }
+  var stateName = (result && result.state) || '2c';
+  var models = (result && result.models) || [];
+  _flPlayModels = models;
+  _flPlaySource = (result && result.source) || 'ollama';
+
+  if (stateName === '2a' && models.length) {
+    flPlayFillChips(models);
+    flPlayShow('minds');
+    return;
+  }
+  if (stateName === '2b') {
+    var cmdEl = document.getElementById('fl-play-origin-cmd');
+    if (cmdEl && typeof flOriginCommand === 'function') {
+      cmdEl.textContent = flOriginCommand(typeof flDetectPlatform === 'function' ? flDetectPlatform() : 'mac');
+    }
+    flPlayShow('cors');
+    return;
+  }
+  // 2c LNA · 2d down · 2e empty → soft empty
+  var emptyMsg = document.getElementById('fl-play-empty-msg');
+  if (emptyMsg) {
+    if (stateName === '2d') {
+      emptyMsg.textContent = 'Nothing is running on this computer yet. Open Ollama (or LM Studio), then look again.';
+    } else if (stateName === '2c') {
+      emptyMsg.textContent = 'Your browser may still be holding the door. Allow local network access beside the address bar, then look again.';
+    } else {
+      emptyMsg.textContent = 'The door is soft-open, and no minds live here yet. That is okay.';
+    }
+  }
+  flPlayShow('empty');
+}
+
+async function flPlayConnect(modelName) {
+  var models = _flPlayModels || [];
+  if (!models.length && typeof _flLookModels !== 'undefined' && _flLookModels && _flLookModels.length) {
+    models = _flLookModels;
+    _flPlayModels = models;
+  }
+  if (!models.length) return;
+  var pick = null;
+  var want = modelName || _flPlayChosen;
+  if (want) {
+    for (var i = 0; i < models.length; i++) {
+      if ((models[i] && models[i].name) === want) { pick = models[i]; break; }
+    }
+  }
+  if (!pick) pick = models[0] || {};
+  var name = pick.name || want || 'llama3.2';
+  var provider = (pick._source === 'lmstudio' || _flPlaySource === 'lmstudio') ? 'lmstudio' : 'ollama';
+  try {
+    if (typeof state !== 'undefined') {
+      state.isLocal = true;
+      state.ollamaModel = name;
+      state.provider = provider;
+      state.apiKey = null;
+    }
+    localStorage.setItem('fl_isLocal', 'true');
+    localStorage.setItem('fl_provider', provider);
+    localStorage.setItem('fl_ollamaModel', name);
+    window._flAutoConnected = true;
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = true;
+    if (typeof handleLocalToggle === 'function') handleLocalToggle();
+    if (typeof updateStatus === 'function') updateStatus();
+    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
+    if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
+    if (typeof modalActivateOllamaModel === 'function' && provider === 'ollama') {
+      try { modalActivateOllamaModel(name); } catch (eAct) {}
+    }
+    var dot = document.getElementById('settingsStatusDot');
+    var textEl = document.getElementById('settingsStatusText');
+    if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
+    if (textEl) textEl.textContent = 'a mind at home · ' + name;
+  } catch (eConn) {}
+
+  var doneMsg = document.getElementById('fl-play-done-msg');
+  if (doneMsg) {
+    doneMsg.textContent = 'Connected to ' + name + (provider === 'lmstudio' ? ' (LM Studio)' : '') +
+      '. Change Provider is open when you need another path.';
+  }
+  flPlayShow('done');
+}
+
+async function flPlayYes() {
+  if (_flPlayStep === 'welcome') {
+    flPlayShow('allow');
+    return;
+  }
+  if (_flPlayStep === 'allow' || _flPlayStep === 'cors' || _flPlayStep === 'empty') {
+    await flPlayProbe();
+    return;
+  }
+  if (_flPlayStep === 'minds') {
+    await flPlayConnect(_flPlayChosen);
+    return;
+  }
+  if (_flPlayStep === 'done') {
+    flPlaySetOpen(false);
+    return;
+  }
+}
+
+window.flOpenConnectPlay = flOpenConnectPlay;
+window.flPlayYes = flPlayYes;
+window.flPlayNotNow = flPlayNotNow;
+window.flPlayExplain = flPlayExplain;
+window.flPlayCopyNote = flPlayCopyNote;
+window.flPlayCopyPull = flPlayCopyPull;
+window.flPlayGateProvider = flPlayGateProvider;
+window.flHasOneMindConnected = flHasOneMindConnected;
 
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');
