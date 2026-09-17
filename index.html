@@ -2150,6 +2150,95 @@ header .mantra {
 .status-dot.working { background: var(--warning); animation: pulse 1s infinite; }
 .status-dot.error { background: var(--error); }
 
+/* v-connect-play-lab-v0 — bottom Mom lab · denser yes/no/please · keep #95 card */
+.fl-connect-play {
+  border-top: 1px solid rgba(200, 210, 230, 0.08);
+  padding: 6px 12px 8px;
+  background: rgba(14, 16, 24, 0.35);
+}
+.fl-connect-play-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--emerald, #34d399);
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.fl-connect-play-toggle:hover,
+.fl-connect-play-toggle:focus {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: rgba(52, 211, 153, 0.14);
+}
+.fl-connect-play-panel {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  background: rgba(0, 0, 0, 0.28);
+}
+.fl-connect-play-panel [data-play] p {
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #c8d2e6);
+  line-height: 1.55;
+  margin: 0 0 10px;
+}
+.fl-connect-play-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.fl-connect-play-explain {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(232, 176, 25, 0.08);
+  border: 1px solid rgba(232, 176, 25, 0.2);
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.5;
+}
+.fl-connect-play-chips {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fl-connect-play-chips button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(200, 210, 230, 0.04);
+  border: 1px solid rgba(200, 210, 230, 0.1);
+  font-family: Georgia, serif;
+  font-size: 0.88rem;
+  color: var(--text-bright, #e6ebf5);
+  cursor: pointer;
+  min-height: 44px;
+}
+.fl-connect-play pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--gold, #e8b019);
+  margin: 0 0 8px;
+}
+
 /* v5.79.40-chat-one-room: thinking bubble layered off.
    Same work stream used to paint #statusText AND #chat-thinking-bubble.
    Activity lives in #statusText. showThinkingBubble() kept, inert. */
@@ -15208,6 +15297,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 /* Layer: Phone PWA — thumb look card + safe install (2026-09-07) */
 @media (max-width: 600px) {
+  #fl-connect-card,
   #fl-look-card {
     margin-left: max(8px, env(safe-area-inset-left, 0px));
     margin-right: max(8px, env(safe-area-inset-right, 0px));
@@ -15215,9 +15305,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     box-sizing: border-box;
     max-width: 100%;
   }
+  #fl-connect-card .ai-status-btn,
+  #fl-connect-card a.ai-status-btn,
   #fl-look-card .ai-status-btn,
   #fl-look-card a.ai-status-btn,
   #fl-look-may,
+  #fl-look-allowed,
   #fl-look-connect,
   #fl-look-copy-origin,
   #fl-look-copy-pull,
@@ -16424,6 +16517,77 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               </button>
             </div>
           </div>
+          <!-- v-connect-play-lab-v0 — bottom 🌿 Connect · denser yes/no/please · keep #95 card · flOpenConnectPlay ≠ flOpenConnectWizard -->
+          <div id="fl-connect-play" class="fl-connect-play v-connect-play-lab-v0" data-play-open="0">
+            <button type="button" class="fl-connect-play-toggle" id="fl-connect-play-toggle" onclick="flOpenConnectPlay()" aria-expanded="false" aria-controls="fl-connect-play-panel" title="Connect Play lab — Mom path">&#127807; Connect</button>
+            <div id="fl-connect-play-panel" hidden role="region" aria-label="Connect Play lab">
+              <div data-play="welcome">
+                <p>Welcome. FreeLattice can look for a mind already living on this computer. You choose every step.</p>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>This is a soft door at the bottom of Chat. Settings still has the Connect card. Nothing leaves your machine unless you connect a cloud key later — and Change Provider stays gated until one mind is connected.</div>
+              </div>
+              <div data-play="allow" hidden>
+                <p>Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — I allowed it</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>Browsers treat your computer as a stranger for safety. The allow prompt is sticky on purpose — cobweb absurdity we navigate together. One day we build around it. Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> skips browser CORS.</div>
+              </div>
+              <div data-play="minds" hidden>
+                <p id="fl-play-minds-count" style="color:var(--emerald,#34d399);">Minds live here. Tap one.</p>
+                <ul id="fl-play-chips" class="fl-connect-play-chips"></ul>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — connect chosen</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>These are runners already on this machine (Ollama / LM Studio), not raw Hugging Face weights. Tap a chip, or Yes to connect the first mind.</div>
+              </div>
+              <div data-play="cors" hidden>
+                <p>A mind is running. The browser blocked this page from knocking (CORS) — that is not “Ollama missing.”</p>
+                <pre id="fl-play-origin-cmd"></pre>
+                <div class="fl-connect-play-actions" style="margin-bottom:8px;">
+                  <button type="button" class="ai-status-btn" id="fl-play-copy" onclick="flPlayCopyNote()" style="min-height:44px;">Copy note</button>
+                  <a href="desktop.html" class="ai-status-btn" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;">Desktop</a>
+                </div>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">I did that</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Mac: paste in Terminal, Quit Ollama from the menu bar, reopen, then I did that. Windows/Linux: set the same origins, restart Ollama. Desktop is another door, not the only one.</div>
+              </div>
+              <div data-play="empty" hidden>
+                <p id="fl-play-empty-msg">The door is soft-open, and no minds live here yet — or nothing is running. That is okay.</p>
+                <pre id="fl-play-pull-cmd">ollama pull llama3.2:3b</pre>
+                <div class="fl-connect-play-actions" style="margin-bottom:8px;">
+                  <button type="button" class="ai-status-btn" onclick="flPlayCopyPull()" style="min-height:44px;">Copy note</button>
+                  <a href="desktop.html" class="ai-status-btn" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;">Desktop</a>
+                </div>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — look again</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>Install or open Ollama (or LM Studio), pull a small model, then look again. Hugging Face weights need a runner first. In-browser WebLLM is a separate “No Install” door in Settings.</div>
+              </div>
+              <div data-play="done" hidden>
+                <p id="fl-play-done-msg" style="color:var(--emerald,#34d399);">Connected. Change Provider is open when you need another path.</p>
+                <div class="fl-connect-play-actions">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Done</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
+                  <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
+                </div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>One mind connected unlocks Change Provider. The Settings Connect card (#95) stays — this lab is the denser bottom companion, not a delete.</div>
+              </div>
+            </div>
+          </div>
           <div class="chat-disclaimer" id="chatDisclaimer">AI can make mistakes. Verify important information.</div>
         </div>
       </div>
@@ -16704,54 +16868,86 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="ai-status-actions" id="settingsActions">
       <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
-      <button class="ai-status-btn" onclick="document.getElementById('fl-look-card')&&document.getElementById('fl-look-card').scrollIntoView({behavior:'smooth',block:'center'})" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
+      <button class="ai-status-btn" onclick="flOpenConnectWizard('home')" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
     </div>
   </div>
 
 
-  <!-- Layer: one look card. Scoped origins. Never innerHTML. Probe only on gesture. -->
-  <div id="fl-look-card" class="fl-card" style="margin-bottom:14px;padding:16px 18px;">
+  <!-- v-connect-card-yesno-wizard-v0 — Connect card · yes/no wizard · every panel forward + way out -->
+  <!-- Keystone door: Settings points here. Probe only on user gesture. Soft leave sw.js. -->
+  <div id="fl-connect-card" class="fl-card v-connect-card-yesno-wizard-v0" style="margin-bottom:14px;padding:16px 18px;">
+    <h3 style="color:var(--emerald,#34d399);font-family:Georgia,serif;font-size:1.05rem;margin:0 0 6px;">Connect a mind at home</h3>
+    <p style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin:0 0 14px;">One wizard. You allow the door; we list minds. Browser permission ≠ setting Ollama origins.</p>
+    <div id="fl-look-card">
     <div data-look="0">
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">FreeLattice can look for minds already living on this computer. It only knocks on well-known local doors, and only when you ask.</p>
-      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="smartOllamaConnect()" style="min-height:44px;">May I look?</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="flOpenConnectWizard('may')" style="min-height:44px;">May I look?</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="1" hidden>
-      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0;">Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-allowed" onclick="flOpenConnectWizard('allowed')" style="min-height:44px;">I allowed it — look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0;">Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> — no browser CORS. Not the only door.</p>
     </div>
     <div data-look="2a" hidden>
       <p id="fl-look-2a-count" style="font-family:Georgia,serif;font-size:0.95rem;color:var(--emerald,#34d399);margin:0 0 10px;"></p>
       <ul id="fl-look-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
-      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-connect" onclick="flLookConnect()" style="min-height:44px;">Connect</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-connect" onclick="flLookConnect()" style="min-height:44px;">Connect</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="2b" hidden>
-      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Ollama is running. It has not been told this page may knock.</p>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Ollama is running. The browser blocked this page from knocking (CORS) — that is not “Ollama missing.”</p>
       <pre id="fl-look-origin-cmd" style="white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;"></pre>
       <button type="button" class="ai-status-btn" id="fl-look-copy-origin" onclick="flLookCopyOrigin()" style="min-height:44px;margin-bottom:10px;">copy</button>
-      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Set this, then quit Ollama completely and open it again. It only reads this when it starts.</p>
-      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 12px;">A wildcard would let any site knock on this computer.</p>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Mac: paste in Terminal, then <strong>Quit Ollama</strong> from the menu bar and reopen it. Windows/Linux: set the same origins, restart Ollama, then look again.</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 8px;">A wildcard <code>*</code> would let any site knock on this computer — we use scoped origins only.</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 12px;">Optional (no browser CORS): <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> — not the only door.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">I set that — look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="2c" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Your browser is holding the door. Click the icon beside the address bar, allow local network access, then look again.</p>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);margin-bottom:10px;">Look again</button>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Already installed? open Ollama once, then Look again.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Already installed? open Ollama once, then Look again. Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">Desktop</a>.</p>
     </div>
     <div data-look="2d" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">Nothing is running on this computer yet.</p>
       <a href="https://ollama.com/download" target="_blank" rel="noopener" class="ai-status-btn ai-status-btn-primary" style="display:inline-block;text-decoration:none;min-height:44px;line-height:44px;padding:0 16px;margin-bottom:10px;">Get Ollama</a>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;">Already installed? open it once, then look again.</p>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;">Already installed? open it once, then look again. Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">Desktop</a>.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="2e" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">The door is open, no minds live here yet.</p>
       <pre id="fl-look-pull-cmd" style="white-space:pre-wrap;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;">ollama pull llama3.2:3b</pre>
       <button type="button" class="ai-status-btn" id="fl-look-copy-pull" onclick="flLookCopyPull()" style="min-height:44px;margin-bottom:10px;">copy</button>
-      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn" onclick="flOpenConnectWizard('again')" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+        <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+      </div>
     </div>
     <div data-look="3" hidden>
       <p id="fl-look-3-summary" style="font-family:Georgia,serif;font-size:0.95rem;color:var(--emerald,#34d399);margin:0 0 10px;"></p>
       <ul id="fl-look-3-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;"><button type="button" onclick="flLookShowAnother()" style="background:none;border:none;color:var(--text-muted);text-decoration:underline;cursor:pointer;font-family:Georgia,serif;font-size:0.78rem;padding:0;">another way to connect</button></p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flLookShow('0')" style="min-height:44px;">Done</button>
+        <button type="button" class="ai-status-btn" onclick="flLookShowAnother()" style="min-height:44px;">another way to connect</button>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -28331,28 +28527,16 @@ const AiSetup = (function() {
     var heroHtml = '<div id="pmHeroSection" style="margin-bottom:20px;">' +
       '<div style="font-size:0.72rem;color:var(--lavender,#a78bfa);font-weight:600;letter-spacing:0.5px;margin-bottom:10px;">QUICK CONNECT</div>' +
       '<div style="display:flex;flex-direction:column;gap:8px;">' +
-        // Button 1: Use My Computer's AI (Ollama/LM Studio)
+        // Button 1: Use My Computer's AI → look-card wizard (v-browser-local-ai-wizard-v0)
+        // Do NOT call flAutoConnect() alone — stale fl_isLocal made the click feel dead.
         (mobile ? '' :
-        '<button type="button" onclick="(function(){' +
-          'var btn=this;' +
-          'var status=document.getElementById(\'pmHeroLocalStatus\');' +
-          'if(status){status.textContent=\'Looking for local AI…\';status.style.color=\'var(--text-muted)\';} ' +
-          'flAutoConnect();' +
-          'setTimeout(function(){' +
-            'if(window._flAutoConnected){' +
-              'if(status){status.textContent=\'\u2713 Connected!\';status.style.color=\'#34d399\';}' +
-              'setTimeout(function(){var o=document.getElementById(\'pmOverlay\');if(o)o.remove();},800);' +
-            '}else{' +
-              'if(status){status.innerHTML=\'No local AI found. <a href=\\\'https://ollama.ai\\\'  target=\\\'_blank\\\'  style=\\\'color:#a78bfa\\\'>Install Ollama</a> then come back. Windows: set scoped OLLAMA_ORIGINS first.\';status.style.color=\'var(--text-muted)\';}' +
-            '}' +
-          '},3500);' +
-        '}).call(this)" ' +
+        '<button type="button" onclick="flProviderHeroLocalAI(event)" ' +
         'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
         'background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-left:3px solid #34d399;' +
         'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
           '<span style="font-size:1.3rem;">\uD83D\uDDA5\uFE0F</span>' +
           '<div><div style="font-weight:600;color:#34d399;">Use My Computer\'s AI</div>' +
-          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Ollama · LM Studio · Private · Free · No key needed</div></div>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Ollama · LM Studio · lists minds · CORS honest · Private</div></div>' +
         '</button>' +
         '<div id="pmHeroLocalStatus" style="font-size:0.78rem;padding:0 4px;min-height:1.2em;color:var(--text-muted);"></div>') +
         // Button 2: Free Cloud AI (Groq)
@@ -29215,7 +29399,13 @@ const AiSetup = (function() {
 
 // Expose the modal globally so any code (Garden nudge, Chat banner, future
 // features) can call one function and get the unified connection flow.
-window.openProviderModal = function() { AiSetup.openModal(); };
+// v-connect-play-lab-v0 — Gate Change Provider until one mind connected.
+window.openProviderModal = function() {
+  try {
+    if (typeof flPlayGateProvider === 'function' && flPlayGateProvider()) return;
+  } catch (eGate) {}
+  AiSetup.openModal();
+};
 
 // ── Quick Connect — zero-jargon first-time connection ──
 // Every wall becomes a door. Every dead button becomes a guide.
@@ -30573,9 +30763,16 @@ if (typeof document !== 'undefined') {
 }
 
 
-// ── Smart Ollama Connection — one look card (gesture-only probe) ──
-async function smartOllamaConnect() {
-  // Probe only from May I look? / Look again (user gesture). Chrome LNA needs the click.
+// ── Connect card yes/no wizard (v-connect-card-yesno-wizard-v0) ──
+// Panel 1 is the permission pause — buttons required (I allowed / Not now).
+// Probe runs on 'allowed' / 'again' only — never leave Mom on prose-only panel 1.
+
+function flLookNotNow() {
+  flLookShow('0');
+}
+
+async function flLookProbeNow() {
+  // Actual probe — Look again / I allowed it (user gesture). Chrome LNA needs the click.
   flLookShow('1');
   var result;
   try {
@@ -30586,10 +30783,14 @@ async function smartOllamaConnect() {
   var stateName = (result && result.state) || '2c';
   var models = (result && result.models) || [];
   _flLookModels = models;
+  _flLookSource = (result && result.source) || 'ollama';
 
   if (stateName === '2a') {
     var count = document.getElementById('fl-look-2a-count');
-    if (count) count.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.');
+    if (count) {
+      var srcNote = _flLookSource === 'lmstudio' ? ' (LM Studio)' : '';
+      count.textContent = models.length + (models.length === 1 ? ' mind lives here' : ' minds live here') + srcNote + '. Tap one to connect.';
+    }
     flLookFillModels(document.getElementById('fl-look-models'), models, null);
     flLookShow('2a');
     return;
@@ -30610,6 +30811,349 @@ async function smartOllamaConnect() {
   }
   flLookShow('2c');
 }
+
+// One entry for hero · may · home · local · again · allowed
+function flOpenConnectWizard(source) {
+  source = String(source || 'may');
+  try {
+    var overlay = document.getElementById('pmOverlay');
+    if (overlay) overlay.remove();
+  } catch (e0) {}
+  try {
+    if (typeof switchTab === 'function') switchTab('settings');
+  } catch (e1) {}
+  window._flAutoConnected = false;
+
+  function scrollConnect() {
+    var card = document.getElementById('fl-connect-card') || document.getElementById('fl-look-card');
+    if (card && card.scrollIntoView) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // again / allowed → probe now (permission already handled or CORS fixed)
+  if (source === 'again' || source === 'allowed') {
+    scrollConnect();
+    return flLookProbeNow();
+  }
+
+  // may / hero / home / local → open Connect card at panel 1 (yes/no — unstick)
+  scrollConnect();
+  flLookShow('1');
+  var status = document.getElementById('pmHeroLocalStatus');
+  if (status && source === 'hero') {
+    status.textContent = 'Connect card open — allow the browser door, then tap I allowed it.';
+    status.style.color = 'var(--text-muted)';
+  }
+}
+
+function smartOllamaConnect() {
+  // Backward-compatible alias → probe (Look again paths)
+  return flLookProbeNow();
+}
+
+// v-browser-local-ai-wizard-v0 + v-connect-card-yesno-wizard-v0
+function flProviderHeroLocalAI(ev) {
+  try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e0) {}
+  var status = document.getElementById('pmHeroLocalStatus');
+  if (status) {
+    status.textContent = 'Opening Connect card…';
+    status.style.color = 'var(--text-muted)';
+  }
+  flOpenConnectWizard('hero');
+}
+window.flProviderHeroLocalAI = flProviderHeroLocalAI;
+window.flOpenConnectWizard = flOpenConnectWizard;
+window.flLookNotNow = flLookNotNow;
+window.flLookProbeNow = flLookProbeNow;
+
+// ── Connect Play lab v0 (v-connect-play-lab-v0) ──
+// Bottom #fl-connect-play 🌿 · denser Yes · Not now · Please explain.
+// Keep #95 Connect card. flOpenConnectPlay must not break flOpenConnectWizard.
+// Out of scope: Bridge binary · custom browser · nexus/economy ship · delete #95.
+
+var _flPlayStep = 'welcome';
+var _flPlayModels = [];
+var _flPlaySource = 'ollama';
+var _flPlayChosen = null;
+
+function flHasOneMindConnected() {
+  try {
+    if (typeof state !== 'undefined' && state) {
+      if (state.isLocal && (state.ollamaModel || state.provider === 'ollama' || state.provider === 'lmstudio' || state.provider === 'browser')) return true;
+      if (state.apiKey && String(state.apiKey).length > 0) return true;
+    }
+  } catch (e0) {}
+  try {
+    if (localStorage.getItem('fl_isLocal') === 'true' && localStorage.getItem('fl_ollamaModel')) return true;
+  } catch (e1) {}
+  return false;
+}
+
+function flPlayGateProvider() {
+  if (flHasOneMindConnected()) return false;
+  flOpenConnectPlay('gate');
+  return true;
+}
+
+function flPlaySetOpen(open) {
+  var root = document.getElementById('fl-connect-play');
+  var panel = document.getElementById('fl-connect-play-panel');
+  var toggle = document.getElementById('fl-connect-play-toggle');
+  if (!root || !panel) return;
+  root.setAttribute('data-play-open', open ? '1' : '0');
+  panel.hidden = !open;
+  if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function flPlayShow(step) {
+  var panel = document.getElementById('fl-connect-play-panel');
+  if (!panel) return;
+  _flPlayStep = String(step || 'welcome');
+  var nodes = panel.querySelectorAll('[data-play]');
+  for (var i = 0; i < nodes.length; i++) {
+    var st = nodes[i].getAttribute('data-play');
+    nodes[i].hidden = (st !== _flPlayStep);
+    var ex = nodes[i].querySelector('[data-play-explain]');
+    if (ex) ex.hidden = true;
+  }
+}
+
+function flOpenConnectPlay(source) {
+  source = String(source || 'toggle');
+  var panel = document.getElementById('fl-connect-play-panel');
+  var root = document.getElementById('fl-connect-play');
+  if (!panel || !root) return;
+
+  // Toggle closed when already open and user taps 🌿 again (not gate)
+  if (source === 'toggle' && root.getAttribute('data-play-open') === '1') {
+    flPlaySetOpen(false);
+    return;
+  }
+
+  try {
+    if (typeof switchTab === 'function') switchTab('chat');
+  } catch (eTab) {}
+
+  flPlaySetOpen(true);
+  if (source === 'gate') {
+    flPlayShow('welcome');
+    try {
+      if (typeof updateStatusText === 'function') {
+        /* soft status if available */
+      }
+      var st = document.getElementById('statusText');
+      if (st && st.getAttribute('data-fl-chat-activity') === 'idle') {
+        st.textContent = 'Connect a mind first — then Change Provider opens fully';
+      }
+    } catch (eSt) {}
+  } else if (flHasOneMindConnected()) {
+    flPlayShow('done');
+    var doneMsg = document.getElementById('fl-play-done-msg');
+    if (doneMsg) {
+      var name = '';
+      try { name = (typeof state !== 'undefined' && state && state.ollamaModel) ? state.ollamaModel : ''; } catch (eN) {}
+      doneMsg.textContent = name
+        ? ('Already connected to ' + name + '. Change Provider is open when you need another path.')
+        : 'A mind is connected. Change Provider is open when you need another path.';
+    }
+  } else {
+    flPlayShow('welcome');
+  }
+
+  if (root.scrollIntoView) {
+    try { root.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (eSc) {}
+  }
+}
+
+function flPlayExplain() {
+  var panel = document.getElementById('fl-connect-play-panel');
+  if (!panel) return;
+  var stepEl = null;
+  var nodes = panel.querySelectorAll('[data-play]');
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].getAttribute('data-play') === _flPlayStep && !nodes[i].hidden) {
+      stepEl = nodes[i];
+      break;
+    }
+  }
+  if (!stepEl) return;
+  var ex = stepEl.querySelector('[data-play-explain]');
+  if (!ex) return;
+  ex.hidden = !ex.hidden;
+}
+
+function flPlayNotNow() {
+  flPlaySetOpen(false);
+  flPlayShow('welcome');
+}
+
+function flPlayCopyNote() {
+  var el = document.getElementById('fl-play-origin-cmd');
+  var t = el ? el.textContent : '';
+  if (!t && typeof flOriginCommand === 'function') {
+    t = flOriginCommand(typeof flDetectPlatform === 'function' ? flDetectPlatform() : 'mac');
+  }
+  if (!t) return;
+  if (typeof safeCopy === 'function') safeCopy(t);
+  else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+}
+
+function flPlayCopyPull() {
+  var t = 'ollama pull llama3.2:3b';
+  if (typeof safeCopy === 'function') safeCopy(t);
+  else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+}
+
+function flPlayFillChips(models) {
+  var list = document.getElementById('fl-play-chips');
+  if (!list) return;
+  while (list.firstChild) list.removeChild(list.firstChild);
+  _flPlayChosen = null;
+  for (var i = 0; i < models.length; i++) {
+    var m = models[i] || {};
+    var name = m.name || 'mind';
+    var size = (typeof flFormatSize === 'function') ? flFormatSize(m.size) : '';
+    var li = document.createElement('li');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-fl-play-model', name);
+    var label = name + (size ? (' · ' + size) : '');
+    if (m._source === 'lmstudio' || _flPlaySource === 'lmstudio') label = label + ' · LM Studio';
+    btn.textContent = label;
+    btn.title = 'Connect ' + name;
+    btn.addEventListener('click', function (ev) {
+      var n = ev.currentTarget.getAttribute('data-fl-play-model');
+      _flPlayChosen = n;
+      flPlayConnect(n);
+    });
+    li.appendChild(btn);
+    list.appendChild(li);
+  }
+  var count = document.getElementById('fl-play-minds-count');
+  if (count) {
+    var srcNote = _flPlaySource === 'lmstudio' ? ' (LM Studio)' : '';
+    count.textContent = models.length + (models.length === 1 ? ' mind lives here' : ' minds live here') + srcNote + '. Tap one.';
+  }
+}
+
+async function flPlayProbe() {
+  var result;
+  try {
+    result = await probeLocalMind();
+  } catch (e) {
+    result = { state: '2c', models: [] };
+  }
+  var stateName = (result && result.state) || '2c';
+  var models = (result && result.models) || [];
+  _flPlayModels = models;
+  _flPlaySource = (result && result.source) || 'ollama';
+
+  if (stateName === '2a' && models.length) {
+    flPlayFillChips(models);
+    flPlayShow('minds');
+    return;
+  }
+  if (stateName === '2b') {
+    var cmdEl = document.getElementById('fl-play-origin-cmd');
+    if (cmdEl && typeof flOriginCommand === 'function') {
+      cmdEl.textContent = flOriginCommand(typeof flDetectPlatform === 'function' ? flDetectPlatform() : 'mac');
+    }
+    flPlayShow('cors');
+    return;
+  }
+  // 2c LNA · 2d down · 2e empty → soft empty
+  var emptyMsg = document.getElementById('fl-play-empty-msg');
+  if (emptyMsg) {
+    if (stateName === '2d') {
+      emptyMsg.textContent = 'Nothing is running on this computer yet. Open Ollama (or LM Studio), then look again.';
+    } else if (stateName === '2c') {
+      emptyMsg.textContent = 'Your browser may still be holding the door. Allow local network access beside the address bar, then look again.';
+    } else {
+      emptyMsg.textContent = 'The door is soft-open, and no minds live here yet. That is okay.';
+    }
+  }
+  flPlayShow('empty');
+}
+
+async function flPlayConnect(modelName) {
+  var models = _flPlayModels || [];
+  if (!models.length && typeof _flLookModels !== 'undefined' && _flLookModels && _flLookModels.length) {
+    models = _flLookModels;
+    _flPlayModels = models;
+  }
+  if (!models.length) return;
+  var pick = null;
+  var want = modelName || _flPlayChosen;
+  if (want) {
+    for (var i = 0; i < models.length; i++) {
+      if ((models[i] && models[i].name) === want) { pick = models[i]; break; }
+    }
+  }
+  if (!pick) pick = models[0] || {};
+  var name = pick.name || want || 'llama3.2';
+  var provider = (pick._source === 'lmstudio' || _flPlaySource === 'lmstudio') ? 'lmstudio' : 'ollama';
+  try {
+    if (typeof state !== 'undefined') {
+      state.isLocal = true;
+      state.ollamaModel = name;
+      state.provider = provider;
+      state.apiKey = null;
+    }
+    localStorage.setItem('fl_isLocal', 'true');
+    localStorage.setItem('fl_provider', provider);
+    localStorage.setItem('fl_ollamaModel', name);
+    window._flAutoConnected = true;
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = true;
+    if (typeof handleLocalToggle === 'function') handleLocalToggle();
+    if (typeof updateStatus === 'function') updateStatus();
+    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
+    if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
+    if (typeof modalActivateOllamaModel === 'function' && provider === 'ollama') {
+      try { modalActivateOllamaModel(name); } catch (eAct) {}
+    }
+    var dot = document.getElementById('settingsStatusDot');
+    var textEl = document.getElementById('settingsStatusText');
+    if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
+    if (textEl) textEl.textContent = 'a mind at home · ' + name;
+  } catch (eConn) {}
+
+  var doneMsg = document.getElementById('fl-play-done-msg');
+  if (doneMsg) {
+    doneMsg.textContent = 'Connected to ' + name + (provider === 'lmstudio' ? ' (LM Studio)' : '') +
+      '. Change Provider is open when you need another path.';
+  }
+  flPlayShow('done');
+}
+
+async function flPlayYes() {
+  if (_flPlayStep === 'welcome') {
+    flPlayShow('allow');
+    return;
+  }
+  if (_flPlayStep === 'allow' || _flPlayStep === 'cors' || _flPlayStep === 'empty') {
+    await flPlayProbe();
+    return;
+  }
+  if (_flPlayStep === 'minds') {
+    await flPlayConnect(_flPlayChosen);
+    return;
+  }
+  if (_flPlayStep === 'done') {
+    flPlaySetOpen(false);
+    return;
+  }
+}
+
+window.flOpenConnectPlay = flOpenConnectPlay;
+window.flPlayYes = flPlayYes;
+window.flPlayNotNow = flPlayNotNow;
+window.flPlayExplain = flPlayExplain;
+window.flPlayCopyNote = flPlayCopyNote;
+window.flPlayCopyPull = flPlayCopyPull;
+window.flPlayGateProvider = flPlayGateProvider;
+window.flHasOneMindConnected = flHasOneMindConnected;
 
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');
@@ -30645,10 +31189,17 @@ function settingsSetMode(mode) {
     // Highlight Local
     if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
 
+    // v-connect-card-yesno-wizard-v0 — Local mode points at Connect card (one wizard)
+    try {
+      if (typeof flOpenConnectWizard === 'function') {
+        setTimeout(function () { flOpenConnectWizard('local'); }, 80);
+      }
+    } catch (eWiz) {}
+
     // v5.77.0 Go 10: parallel probe — Ollama + LM Studio (Promise.allSettled)
     var statusText = document.getElementById('settingsStatusText');
     var statusDot = document.getElementById('settingsStatusDot');
-    if (statusText) statusText.textContent = 'Looking for local AI…';
+    if (statusText) statusText.textContent = 'Connect card — allow the door, then look again…';
     var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
     var ollamaProbe = fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
@@ -33050,6 +33601,7 @@ function flAbortTimeout(ms) {
 }
 
 // states: '2a' found, '2e' empty, '2b' cors, '2c' browser gate, '2d' nothing
+// Soft: also offer LM Studio minds when Ollama is quiet (v-browser-local-ai-wizard-v0)
 async function probeLocalMind() {
   var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : FL_OLLAMA_LOCAL).replace(/\/$/, '');
   var tags = base + '/api/tags';
@@ -33059,13 +33611,30 @@ async function probeLocalMind() {
     if (r.ok) {
       var data = await r.json();
       var models = data.models || [];
-      return { state: models.length ? '2a' : '2e', models: models };
+      return { state: models.length ? '2a' : '2e', models: models, source: 'ollama' };
     }
   } catch (e) {}
+
+  // Soft LM Studio probe — same look-card when Ollama did not answer
+  try {
+    var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
+    var lmBase = (lmHost.indexOf('://') === -1 ? 'http://' + lmHost : lmHost).replace(/\/+$/, '');
+    var lr = await fetch(lmBase + '/v1/models', { method: 'GET', mode: 'cors', signal: flAbortTimeout(3000) });
+    if (lr.ok) {
+      var ld = await lr.json();
+      var lmModels = (ld.data || []).map(function (m) {
+        return { name: m.id || m.name || 'local-model', size: m.size || 0, _source: 'lmstudio' };
+      });
+      if (lmModels.length) {
+        return { state: '2a', models: lmModels, source: 'lmstudio' };
+      }
+    }
+  } catch (elm) {}
+
   var t0 = (performance.now ? performance.now() : Date.now());
   try {
     await fetch(root, flLocalFetchInit({ mode: 'no-cors', signal: flAbortTimeout(2000) }));
-    return { state: '2b', models: [] };
+    return { state: '2b', models: [], source: 'ollama' };
   } catch (e2) {
     var ms = (performance.now ? performance.now() : Date.now()) - t0;
     var perm = await flPermissionState(base);
@@ -33076,6 +33645,7 @@ async function probeLocalMind() {
 }
 
 var _flLookModels = [];
+var _flLookSource = 'ollama';
 
 function flLookShow(state) {
   var card = document.getElementById('fl-look-card');
@@ -33087,6 +33657,7 @@ function flLookShow(state) {
   }
 }
 
+// v-browser-local-ai-wizard-v0 — every mind is a one-click connect button
 function flLookFillModels(listEl, models, chosen) {
   if (!listEl) return;
   while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
@@ -33095,14 +33666,24 @@ function flLookFillModels(listEl, models, chosen) {
     var name = m.name || 'mind';
     var size = flFormatSize(m.size);
     var li = document.createElement('li');
-    li.style.cssText = 'padding:8px 12px;border-radius:8px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);font-family:Georgia,serif;font-size:0.88rem;color:var(--text-bright,#e6ebf5);';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-fl-look-model', name);
+    btn.style.cssText = 'display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);font-family:Georgia,serif;font-size:0.88rem;color:var(--text-bright,#e6ebf5);cursor:pointer;min-height:44px;';
     if (chosen && name === chosen) {
-      li.style.borderColor = 'rgba(52,211,153,0.45)';
-      li.style.color = '#34d399';
+      btn.style.borderColor = 'rgba(52,211,153,0.45)';
+      btn.style.color = '#34d399';
     }
     var label = name + (size ? (' \u00b7 ' + size) : '');
+    if (m._source === 'lmstudio' || _flLookSource === 'lmstudio') label = label + ' \u00b7 LM Studio';
     if (chosen && name === chosen) label = label + ' \u2014 chosen';
-    li.textContent = label;
+    btn.textContent = label;
+    btn.title = 'Connect ' + name;
+    btn.addEventListener('click', function (ev) {
+      var n = ev.currentTarget.getAttribute('data-fl-look-model');
+      flLookConnect(n);
+    });
+    li.appendChild(btn);
     listEl.appendChild(li);
   }
 }
@@ -33127,36 +33708,51 @@ function flLookShowAnother() {
   if (actions) actions.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-async function flLookConnect() {
+// Optional modelName — one-click from the list (v-browser-local-ai-wizard-v0)
+async function flLookConnect(modelName) {
   var models = _flLookModels || [];
   if (!models.length) return;
-  var first = models[0] || {};
-  var modelName = first.name || 'llama3.2';
+  var pick = null;
+  if (modelName) {
+    for (var i = 0; i < models.length; i++) {
+      if ((models[i] && models[i].name) === modelName) { pick = models[i]; break; }
+    }
+  }
+  if (!pick) pick = models[0] || {};
+  var name = pick.name || modelName || 'llama3.2';
+  var provider = (pick._source === 'lmstudio' || _flLookSource === 'lmstudio') ? 'lmstudio' : 'ollama';
   try {
     if (typeof state !== 'undefined') {
       state.isLocal = true;
-      state.ollamaModel = modelName;
-      state.provider = 'ollama';
+      state.ollamaModel = name;
+      state.provider = provider;
       state.apiKey = null;
     }
     localStorage.setItem('fl_isLocal', 'true');
-    localStorage.setItem('fl_provider', 'ollama');
-    localStorage.setItem('fl_ollamaModel', modelName);
+    localStorage.setItem('fl_provider', provider);
+    localStorage.setItem('fl_ollamaModel', name);
+    window._flAutoConnected = true;
     var localToggle = document.getElementById('localToggle');
     if (localToggle) localToggle.checked = true;
     if (typeof handleLocalToggle === 'function') handleLocalToggle();
     if (typeof updateStatus === 'function') updateStatus();
     if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
     if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
+    if (typeof modalActivateOllamaModel === 'function' && provider === 'ollama') {
+      try { modalActivateOllamaModel(name); } catch (eAct) {}
+    }
     var dot = document.getElementById('settingsStatusDot');
     var textEl = document.getElementById('settingsStatusText');
     if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
-    if (textEl) textEl.textContent = 'a mind at home';
+    if (textEl) textEl.textContent = 'a mind at home · ' + name;
   } catch (e) {}
   flLookShow('3');
   var sum = document.getElementById('fl-look-3-summary');
-  if (sum) sum.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.');
-  flLookFillModels(document.getElementById('fl-look-3-models'), models, modelName);
+  if (sum) {
+    sum.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.') +
+      ' Connected to ' + name + (provider === 'lmstudio' ? ' (LM Studio)' : '') + '.';
+  }
+  flLookFillModels(document.getElementById('fl-look-3-models'), models, name);
 }
 
 function getOllamaBaseUrl() {
@@ -33603,28 +34199,37 @@ function flShowToast(msg, duration) {
   setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, duration);
 }
 
-// flAutoConnect: probe Ollama + LM Studio in parallel; first responder wins
-// NEVER overrides a saved connection.
-function flAutoConnect() {
-  if (window._flAutoConnected) return; // already connected this session
+// flAutoConnect: probe Ollama + LM Studio in parallel; first responder wins.
+// v-browser-local-ai-wizard-v0: do NOT return solely because fl_isLocal is true
+// (stale flag made hero click a no-op). Pass { force: true } from hero / look.
+// Prefer smartOllamaConnect() for the Mom path (lists minds · CORS honest).
+function flAutoConnect(opts) {
+  opts = opts || {};
+  var force = !!opts.force;
+  if (!force && window._flAutoConnected) return; // already connected this session
   var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
   var isLocal = localStorage.getItem('fl_isLocal') === 'true';
-  if (hasKey || isLocal) return; // saved connection exists — do not override
+  // Saved cloud key: still respect unless force (hero wants a fresh look)
+  if (!force && hasKey) return;
+  // Stale fl_isLocal alone must NOT block a user-gesture reconnect
+  if (!force && isLocal && window._flAutoConnected) return;
+  if (force) window._flAutoConnected = false;
   var targets = [
     { id: 'ollama',   url: (function(){ try { return getOllamaBaseUrl(); } catch(e) { return 'http://localhost:11434'; } })() + '/api/tags' },
-    { id: 'lmstudio', url: 'http://localhost:1234/v1/models' }
+    { id: 'lmstudio', url: 'http://' + (localStorage.getItem('fl_lmstudioHost') || 'localhost:1234') + '/v1/models' }
   ];
   targets.forEach(function(t) {
     fetch(t.url, { method: 'GET', mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { if (!r.ok) throw 0; return r.json(); })
       .then(function(data) {
-        if (window._flAutoConnected) return; // first responder wins
+        if (!force && window._flAutoConnected) return; // first responder wins
+        if (force && window._flAutoConnected && t.id !== 'ollama') return;
         var models = (data && data.models) ? data.models : ((data && data.data) ? data.data : []);
         if (!models.length) return;
         window._flAutoConnected = true;
         var firstName = (models[0].name || models[0].id || 'default').split(':')[0];
         // Reuse existing activation path — do not duplicate logic
-        if (typeof modalActivateOllamaModel === 'function') {
+        if (typeof modalActivateOllamaModel === 'function' && t.id === 'ollama') {
           modalActivateOllamaModel(models[0].name || models[0].id || 'default');
         } else {
           state.isLocal = true;
@@ -39501,10 +40106,16 @@ window.FLChatActivity = (function() {
 // ═══════════════════════════════════════════════════════════════
 window.FLHangCancel = (function() {
   var MARKER = 'v-chat-hang-cancel-v0';
-  var _slots = { chat: null, garden: null };
+  // chat | garden | workshop (v-workshop-porch-v0 — Create/AutoBuilder Stop)
+  var _slots = { chat: null, garden: null, workshop: null };
+
+  function _normScope(scope) {
+    if (scope === 'garden' || scope === 'workshop') return scope;
+    return 'chat';
+  }
 
   function begin(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var prev = _slots[scope];
     if (prev && prev.controller) {
       try { prev.controller.abort(); } catch (e) {}
@@ -39515,13 +40126,13 @@ window.FLHangCancel = (function() {
   }
 
   function signal(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     return (s && s.controller) ? s.controller.signal : undefined;
   }
 
   function abort(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     if (!s || !s.controller) return false;
     s.stopped = true;
@@ -39530,27 +40141,27 @@ window.FLHangCancel = (function() {
   }
 
   function end(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     _slots[scope] = null;
   }
 
   function wasStopped(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     return !!(s && s.stopped);
   }
 
   function isActive(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     return !!(!_slots[scope] ? false : _slots[scope].controller);
   }
 
   function isGenerateInFlight() {
-    return isActive('chat') || isActive('garden');
+    return isActive('chat') || isActive('garden') || isActive('workshop');
   }
 
   function elapsedMs(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     return s ? (Date.now() - s.startedAt) : 0;
   }
