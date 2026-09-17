@@ -33,12 +33,25 @@
 //   identical to blob 5417eb36. MD5 changes only where these two comment
 //   blocks were added at the top. Parse-check: clean. Smoke: green.
 //   Nothing that worked was deleted. The pattern held.
+//
+// 2026-09-17 — Flint: Workshop porch v0 (v-workshop-porch-v0).
+//   Create = calm front door · Code/Projects deepen · History shelf ·
+//   Stop via FLHangCancel('workshop') · sandbox allow-scripts only held.
 // ═══════════════════════════════════════════════════════════════
 (function() {
   'use strict';
 
   var initialized = false;
   var isGenerating = false;
+  var HISTORY_KEY = 'fl_workshop_history_v0';
+  var HISTORY_MAX = 24;
+  var EXAMPLE_CHIPS = [
+    { label: 'Simple calculator', prompt: 'Create a simple calculator with dark FreeLattice styling' },
+    { label: 'Pomodoro timer', prompt: 'Create a pomodoro focus timer with start, pause, and reset' },
+    { label: 'Color palette', prompt: 'Create a color palette picker that shows hex codes' },
+    { label: 'Markdown preview', prompt: 'Create a tiny markdown previewer with a textarea and live preview' },
+    { label: 'Breathing circle', prompt: 'Create a calm breathing circle animation with inhale and exhale cues' }
+  ];
 
   var CODE_SYSTEM_PROMPT = 'You are a FreeLattice developer. You write clean, working HTML/CSS/JS code.\n\n' +
     'When asked to create something:\n' +
@@ -83,6 +96,26 @@
       '.ws-action-btn.primary { border-color: #10b981; color: #10b981; }',
       '.ws-action-btn.primary:hover { background: #0d2818; }',
       '.ws-status { font-size: 0.72rem; color: #484f58; padding: 0 12px; line-height: 36px; margin-left: auto; }',
+      /* v-workshop-porch-v0 */
+      '.ws-mode-bar { display:flex; gap:0; border-bottom:1px solid #21262d; }',
+      '.ws-mode-create { flex:1.35 !important; font-size:0.9rem !important; }',
+      '.ws-mode-secondary { flex:0.85 !important; font-size:0.78rem !important; opacity:0.85; }',
+      '.ws-porch-chips { display:flex; flex-wrap:wrap; gap:6px; padding:8px 16px 0; }',
+      '.ws-chip { background:rgba(212,160,23,0.08); border:1px solid rgba(212,160,23,0.28); color:#d4a017; border-radius:999px; padding:5px 12px; font-size:0.75rem; cursor:pointer; font-family:Georgia,serif; line-height:1.3; }',
+      '.ws-chip:hover { border-color:rgba(212,160,23,0.55); background:rgba(212,160,23,0.14); }',
+      '.ws-history { margin:10px 16px 0; padding:10px 12px; border:1px solid rgba(200,210,230,0.08); border-radius:10px; background:rgba(255,255,255,0.02); }',
+      '.ws-history-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }',
+      '.ws-history-title { font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b949e; font-family:Georgia,serif; }',
+      '.ws-history-clear { background:none; border:none; color:#64748b; font-size:0.72rem; cursor:pointer; font-family:Georgia,serif; }',
+      '.ws-history-clear:hover { color:#f07068; }',
+      '.ws-history-list { display:flex; flex-direction:column; gap:4px; max-height:140px; overflow:auto; }',
+      '.ws-history-row { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:rgba(0,0,0,0.2); }',
+      '.ws-history-meta { flex:1; min-width:0; }',
+      '.ws-history-name { font-size:0.8rem; color:#e6edf3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }',
+      '.ws-history-time { font-size:0.68rem; color:#64748b; }',
+      '.ws-history-btn { background:#161b22; border:1px solid #30363d; border-radius:6px; color:#8b949e; font-size:0.7rem; padding:4px 8px; cursor:pointer; font-family:inherit; }',
+      '.ws-history-btn:hover { border-color:#d4a017; color:#d4a017; }',
+      '.ws-build-btn.is-stop { background:rgba(244,114,182,0.18); color:#f472b6; border:1px solid rgba(244,114,182,0.45); }',
       '@media (max-width: 600px) {',
       '  .ws-split { flex-direction: column; }',
       '  .ws-code-pane, .ws-preview-pane { flex: none; height: 40vh; }',
@@ -94,24 +127,116 @@
     document.head.appendChild(style);
   }
 
+  // ── History shelf (local · consent clear · Remix) ──
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(HISTORY_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+  function saveHistory(list) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, HISTORY_MAX))); } catch (e) {}
+  }
+  function pushHistory(prompt, code) {
+    var name = String(prompt || 'Untitled').trim().slice(0, 72) || 'Untitled';
+    var list = loadHistory();
+    list.unshift({
+      id: 'ws_' + Date.now().toString(36),
+      name: name,
+      prompt: String(prompt || ''),
+      code: String(code || ''),
+      ts: Date.now()
+    });
+    saveHistory(list);
+    renderHistory();
+  }
+  function clearHistoryConsent() {
+    if (!window.confirm('Clear Workshop history on this device? This cannot be undone.')) return;
+    try { localStorage.removeItem(HISTORY_KEY); } catch (e) {}
+    renderHistory();
+  }
+  function remixHistory(id) {
+    var item = loadHistory().filter(function (h) { return h.id === id; })[0];
+    if (!item) return;
+    var input = document.getElementById('wsPromptInput');
+    var editor = document.getElementById('wsCodeEditor');
+    if (input) input.value = item.prompt || item.name || '';
+    if (editor) editor.value = item.code || '';
+    if (item.code) runPreview(item.code);
+    var chips = document.getElementById('wsPorchChips');
+    if (chips) chips.style.display = 'none';
+    var status = document.getElementById('wsStatus');
+    if (status) status.textContent = 'Remixed from history';
+  }
+  function loadHistoryItem(id) {
+    var item = loadHistory().filter(function (h) { return h.id === id; })[0];
+    if (!item) return;
+    var editor = document.getElementById('wsCodeEditor');
+    if (editor) editor.value = item.code || '';
+    if (item.code) runPreview(item.code);
+    var status = document.getElementById('wsStatus');
+    if (status) status.textContent = 'Loaded · ' + (item.name || 'history');
+  }
+  function renderHistory() {
+    var host = document.getElementById('wsHistoryList');
+    if (!host) return;
+    var list = loadHistory();
+    if (!list.length) {
+      host.innerHTML = '<div style="font-size:0.75rem;color:#64748b;font-family:Georgia,serif;padding:4px 2px;">No local builds yet. Build something — it will wait here.</div>';
+      return;
+    }
+    host.innerHTML = list.slice(0, 12).map(function (h) {
+      var when = new Date(h.ts || Date.now()).toLocaleString();
+      var safeName = String(h.name || 'Untitled').replace(/[<>&]/g, '');
+      return '<div class="ws-history-row">' +
+        '<div class="ws-history-meta"><div class="ws-history-name">' + safeName + '</div>' +
+        '<div class="ws-history-time">' + when + '</div></div>' +
+        '<button type="button" class="ws-history-btn" data-ws-load="' + h.id + '">Load</button>' +
+        '<button type="button" class="ws-history-btn" data-ws-remix="' + h.id + '">Remix</button>' +
+        '</div>';
+    }).join('');
+  }
+  function fillExample(prompt) {
+    var input = document.getElementById('wsPromptInput');
+    if (input) {
+      input.value = prompt;
+      input.focus();
+    }
+    var chips = document.getElementById('wsPorchChips');
+    if (chips) chips.style.display = 'none';
+  }
+
   // ── Build UI ──
   function buildUI(container) {
     injectStyles();
     container.innerHTML = [
-      '<div class="ws-root">',
-      '  <div style="display:flex;gap:0;border-bottom:1px solid #21262d;">',
-      '    <button id="ws-mode-create" onclick="Workshop.setMode(\'create\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">\u2728 Create</button>',
-      '    <button id="ws-mode-code" onclick="Workshop.setMode(\'code\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;font-size:0.85rem;cursor:pointer;">\uD83D\uDD27 Code</button>',
-      '    <button id="ws-mode-projects" onclick="Workshop.setMode(\'projects\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;font-size:0.85rem;cursor:pointer;">\uD83D\uDC19 Projects</button>',
+      '<div class="ws-root v-workshop-porch-v0">',
+      '  <div class="ws-mode-bar">',
+      '    <button id="ws-mode-create" class="ws-mode-create" onclick="Workshop.setMode(\'create\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;cursor:pointer;font-weight:600;">\u2728 Create</button>',
+      '    <button id="ws-mode-code" class="ws-mode-secondary" onclick="Workshop.setMode(\'code\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;cursor:pointer;" title="Deepen — AutoBuilder">\uD83D\uDD27 Code</button>',
+      '    <button id="ws-mode-projects" class="ws-mode-secondary" onclick="Workshop.setMode(\'projects\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;cursor:pointer;" title="Deepen — GitHub projects">\uD83D\uDC19 Projects</button>',
       '  </div>',
       '  <div id="ws-create-view">',
       '  <div class="ws-header">',
-      '    <h2 class="ws-title">\uD83D\uDEE0 The Workshop</h2>',
-      '    <p class="ws-subtitle">Describe what you want. The AI builds it. You see it live.</p>',
+      '    <h2 class="ws-title">Create</h2>',
+      '    <p class="ws-subtitle">Calm porch. Describe what you want. Build. See it live. Code and Projects deepen when you need them.</p>',
       '  </div>',
+      '  <div class="ws-porch-chips" id="wsPorchChips">' +
+        EXAMPLE_CHIPS.map(function (c, i) {
+          return '<button type="button" class="ws-chip" data-ws-chip="' + i + '">' + c.label + '</button>';
+        }).join('') +
+      '</div>',
       '  <div class="ws-prompt-row">',
       '    <textarea class="ws-prompt-input" id="wsPromptInput" rows="2" placeholder="Describe what you want to build\u2026 e.g. \u201CCreate a simple calculator\u201D"></textarea>',
       '    <button class="ws-build-btn" id="wsBuildBtn" onclick="window.Workshop.generate()">Build it \u2726</button>',
+      '  </div>',
+      '  <div class="ws-history" id="wsHistoryShelf">',
+      '    <div class="ws-history-head">',
+      '      <span class="ws-history-title">Local History</span>',
+      '      <button type="button" class="ws-history-clear" id="wsHistoryClear">Clear\u2026</button>',
+      '    </div>',
+      '    <div class="ws-history-list" id="wsHistoryList"></div>',
       '  </div>',
       '  <div class="ws-split">',
       '    <div class="ws-code-pane">',
@@ -143,7 +268,7 @@
       '    <textarea id="code-task" rows="3" placeholder="e.g., Fix the CORS guide in Settings to show the launchctl command" style="width:100%;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>',
       '    <div style="display:flex;gap:8px;margin:12px 0;">',
       '      <button onclick="AutoBuilder.start(document.getElementById(\'code-task\').value)" style="padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;min-height:44px;">\uD83D\uDD27 Build it</button>',
-      '      <button onclick="AutoBuilder.stop()" style="padding:10px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.5);font-size:0.85rem;min-height:44px;">\u23F8 Stop</button>',
+      '      <button id="wsAutoStopBtn" onclick="AutoBuilder.stop()" title="Stop — cancel this build (no time limit; you choose)" style="padding:10px 16px;background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.35);border-radius:8px;cursor:pointer;color:#f472b6;font-size:0.85rem;min-height:44px;">Stop</button>',
       '      <button onclick="Workshop.commitCode()" id="code-commit-btn" style="display:none;padding:10px 16px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:8px;cursor:pointer;color:#34d399;font-size:0.85rem;min-height:44px;">\u2705 Commit</button>',
       '      <button onclick="Workshop.reviewCode()" style="padding:10px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.4);font-size:0.85rem;min-height:44px;">\uD83D\uDCCB Diff</button>',
       '      <div id="autobuilder-iteration" style="margin-left:auto;line-height:44px;font-size:0.72rem;color:rgba(255,255,255,0.25);"></div>',
@@ -175,7 +300,40 @@
           window.Workshop.generate();
         }
       });
+      input.addEventListener('input', function() {
+        var chips = document.getElementById('wsPorchChips');
+        if (chips) chips.style.display = input.value.trim() ? 'none' : '';
+      });
     }
+
+    // Example chips → fill prompt
+    var chipHost = document.getElementById('wsPorchChips');
+    if (chipHost) {
+      chipHost.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t || !t.getAttribute) return;
+        var idx = t.getAttribute('data-ws-chip');
+        if (idx == null) return;
+        var chip = EXAMPLE_CHIPS[parseInt(idx, 10)];
+        if (chip) fillExample(chip.prompt);
+      });
+    }
+
+    // History Load / Remix / Clear
+    var histList = document.getElementById('wsHistoryList');
+    if (histList) {
+      histList.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t || !t.getAttribute) return;
+        var loadId = t.getAttribute('data-ws-load');
+        var remixId = t.getAttribute('data-ws-remix');
+        if (loadId) loadHistoryItem(loadId);
+        if (remixId) remixHistory(remixId);
+      });
+    }
+    var clearBtn = document.getElementById('wsHistoryClear');
+    if (clearBtn) clearBtn.addEventListener('click', clearHistoryConsent);
+    renderHistory();
 
     // Detect Tauri after a tick (window.__TAURI__ may load late)
     setTimeout(function() {
@@ -186,9 +344,32 @@
     }, 500);
   }
 
+  function bindBuildIdle(btn) {
+    if (!btn) return;
+    btn.disabled = false;
+    btn.textContent = 'Build it \u2726';
+    btn.classList.remove('is-stop');
+    btn.onclick = function() { window.Workshop.generate(); };
+    btn.title = '';
+  }
+  function bindBuildStop(btn) {
+    if (!btn) return;
+    btn.disabled = false;
+    btn.textContent = 'Stop';
+    btn.classList.add('is-stop');
+    btn.title = 'Stop — cancel this build (no time limit; you choose)';
+    btn.onclick = function() {
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('workshop'); } catch (e) {}
+    };
+  }
+
   // ── Generate code from prompt ──
+  // v-workshop-porch-v0 — Stop via FLHangCancel('workshop'); Cancel ≠ timeout
   function generate() {
-    if (isGenerating) return;
+    if (isGenerating) {
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('workshop'); } catch (e) {}
+      return;
+    }
     var input = document.getElementById('wsPromptInput');
     var prompt = input ? input.value.trim() : '';
     if (!prompt) return;
@@ -196,20 +377,36 @@
     var btn = document.getElementById('wsBuildBtn');
     var status = document.getElementById('wsStatus');
     var editor = document.getElementById('wsCodeEditor');
+    var chips = document.getElementById('wsPorchChips');
+    if (chips) chips.style.display = 'none';
 
     isGenerating = true;
-    if (btn) { btn.disabled = true; btn.textContent = 'Building\u2026'; }
+    bindBuildStop(btn);
     if (status) status.textContent = 'Generating code\u2026';
     if (editor) editor.value = '// Generating\u2026\n';
+
+    var signal = (typeof FLHangCancel !== 'undefined') ? FLHangCancel.begin('workshop') : undefined;
 
     // Use FreeLattice.callAI if available
     if (typeof window.FreeLattice !== 'undefined' && window.FreeLattice.callAI) {
       window.FreeLattice.callAI(CODE_SYSTEM_PROMPT, prompt, {
         maxTokens: 4096,
         temperature: 0.4,
+        signal: signal,
         callback: function(text, err) {
           isGenerating = false;
-          if (btn) { btn.disabled = false; btn.textContent = 'Build it \u2726'; }
+          try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (e2) {}
+          bindBuildIdle(btn);
+
+          var stopped = (err && /^stopped$/i.test(String(err))) ||
+            (typeof FLHangCancel !== 'undefined' && FLHangCancel.wasStopped && FLHangCancel.wasStopped('workshop'));
+          if (stopped) {
+            if (status) status.textContent = 'Stopped — whenever you are ready.';
+            if (editor && (/^\/\/ Generating/.test(editor.value) || !editor.value.trim())) {
+              editor.value = '// Stopped.\n';
+            }
+            return;
+          }
 
           if (err || !text) {
             if (status) status.textContent = 'Error: ' + (err || 'no response');
@@ -225,6 +422,7 @@
 
           if (editor) editor.value = code;
           if (status) status.textContent = '\u2713 Code generated (' + code.length + ' chars)';
+          pushHistory(prompt, code);
 
           // Auto-run the preview
           runPreview(code);
@@ -232,7 +430,8 @@
       });
     } else {
       isGenerating = false;
-      if (btn) { btn.disabled = false; btn.textContent = 'Build it \u2726'; }
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (e3) {}
+      bindBuildIdle(btn);
       if (status) status.textContent = 'No AI connected. Go to Settings first.';
       if (editor) editor.value = '// No AI provider connected.\n// Go to Settings and connect Ollama or a cloud provider.';
     }
@@ -403,6 +602,12 @@
     exportFile: exportFile,
     saveModule: saveModule,
     clear: clear,
+    // v-workshop-porch-v0
+    fillExample: fillExample,
+    remixHistory: remixHistory,
+    loadHistoryItem: loadHistoryItem,
+    clearHistory: clearHistoryConsent,
+    porchMarker: 'v-workshop-porch-v0',
 
     // ── Code Mode ──
     setMode: function(mode) {
@@ -763,9 +968,18 @@ window.AutoBuilder = (function() {
         resolve(null);
         return;
       }
-      FreeLattice.callAI(systemPrompt, userPrompt, Object.assign({
-        callback: function(text) { resolve(text || null); }
-      }, opts || {}));
+      var merged = Object.assign({}, opts || {}, {
+        callback: function(text, err) {
+          if (err && /^stopped$/i.test(String(err))) { resolve(null); return; }
+          resolve(text || null);
+        }
+      });
+      // v-workshop-porch-v0 — long AutoBuilder thinks use Hang Cancel signal
+      if (!merged.signal && typeof FLHangCancel !== 'undefined' && FLHangCancel.signal) {
+        var sig = FLHangCancel.signal('workshop');
+        if (sig) merged.signal = sig;
+      }
+      FreeLattice.callAI(systemPrompt, userPrompt, merged);
     });
   }
 
@@ -913,6 +1127,8 @@ window.AutoBuilder = (function() {
 
     running = true;
     showCommitBtn(false);
+    // v-workshop-porch-v0 — one controller per long AutoBuilder turn (Cancel ≠ timeout)
+    try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.begin('workshop'); } catch (e0) {}
 
     // Clear log
     var feed = document.getElementById('autobuilder-log');
@@ -924,6 +1140,7 @@ window.AutoBuilder = (function() {
       log('Start it with: node tools/agent-bridge.js', 'info');
       log('The AutoBuilder needs the bridge to read files, apply patches, and run tests.', 'info');
       running = false;
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (e1) {}
       return;
     }
     log('Agent Bridge connected.', 'success');
@@ -931,11 +1148,12 @@ window.AutoBuilder = (function() {
     if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) {
       log('No AI connected. Go to Settings and connect Ollama or a cloud provider.', 'error');
       running = false;
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (e2) {}
       return;
     }
 
     log('Starting autonomous build: "' + taskDescription.trim() + '"', 'info');
-    log('Max iterations: ' + MAX_ITERATIONS + '. Press Stop to halt at any time.\n');
+    log('Max iterations: ' + MAX_ITERATIONS + '. Press Stop anytime — no kill-timer.\n');
 
     var task = taskDescription.trim();
     var originalTask = task;
@@ -1018,6 +1236,7 @@ window.AutoBuilder = (function() {
 
     running = false;
     updateIteration(0, 0);
+    try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (e3) {}
 
     if (iteration >= MAX_ITERATIONS) {
       log('\nReached iteration limit (' + MAX_ITERATIONS + '). Review the changes and decide whether to commit.', 'info');
@@ -1031,9 +1250,13 @@ window.AutoBuilder = (function() {
   }
 
   function stop() {
-    if (!running) return;
+    if (!running) {
+      try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('workshop'); } catch (e4) {}
+      return;
+    }
     running = false;
-    log('\nStopped by user.', 'info');
+    try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('workshop'); } catch (e5) {}
+    log('\nStopped by user — whenever you are ready.', 'info');
     updateIteration(0, 0);
   }
 

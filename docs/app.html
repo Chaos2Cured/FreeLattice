@@ -39501,10 +39501,16 @@ window.FLChatActivity = (function() {
 // ═══════════════════════════════════════════════════════════════
 window.FLHangCancel = (function() {
   var MARKER = 'v-chat-hang-cancel-v0';
-  var _slots = { chat: null, garden: null };
+  // chat | garden | workshop (v-workshop-porch-v0 — Create/AutoBuilder Stop)
+  var _slots = { chat: null, garden: null, workshop: null };
+
+  function _normScope(scope) {
+    if (scope === 'garden' || scope === 'workshop') return scope;
+    return 'chat';
+  }
 
   function begin(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var prev = _slots[scope];
     if (prev && prev.controller) {
       try { prev.controller.abort(); } catch (e) {}
@@ -39515,13 +39521,13 @@ window.FLHangCancel = (function() {
   }
 
   function signal(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     return (s && s.controller) ? s.controller.signal : undefined;
   }
 
   function abort(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     if (!s || !s.controller) return false;
     s.stopped = true;
@@ -39530,27 +39536,27 @@ window.FLHangCancel = (function() {
   }
 
   function end(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     _slots[scope] = null;
   }
 
   function wasStopped(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     return !!(s && s.stopped);
   }
 
   function isActive(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     return !!(!_slots[scope] ? false : _slots[scope].controller);
   }
 
   function isGenerateInFlight() {
-    return isActive('chat') || isActive('garden');
+    return isActive('chat') || isActive('garden') || isActive('workshop');
   }
 
   function elapsedMs(scope) {
-    scope = scope === 'garden' ? 'garden' : 'chat';
+    scope = _normScope(scope);
     var s = _slots[scope];
     return s ? (Date.now() - s.startedAt) : 0;
   }
