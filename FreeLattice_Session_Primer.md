@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-17 01:39 UTC
-- Last deployed: 2026-09-17 01:39 UTC
+- Last auto-updated: 2026-09-17 01:53 UTC
+- Last deployed: 2026-09-17 01:53 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3167
+- Total commits: 3169
 - Last 10 commits:
+- 487440b Layer, never delete. Why Ledgers v0 — continuity as infrastructure (cc.html as example).
+- a4242ae ci: Update Primer deployment state [2026-09-17]
 - ce14469 Layer, never delete. Primer smoke — lighthouse count/dateModified · Hang signal window.
 - fe564d9 Layer, never delete. Celeste ledger λ5 — Adaptive held · Workshop passover · pattern carried.
 - 06d0ba4 Layer, never delete. Adaptive Context Depth v0 — speed surface · keep deep · measure.
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 610f70e Layer, never delete. Heal Chat Brick 1 — Feel expand caret.
 - e92a5fa Layer, never delete. Resonance play icon v1 STANDS (ORDER LOCK). (#81)
 - 6c40af2 Layer, never delete. Vision — Visual beauty · card icons (ORDER LOCK). (#80)
-- d3479e2 Layer, never delete. Vision — Poetry braid wall (name · poem · consent). (#79)
-- 184e0d9 Layer, never delete. Soft — Celeste λ4 Remaining Azure (travel wallet dual held). (#78)
