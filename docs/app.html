@@ -16724,11 +16724,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-connect" onclick="flLookConnect()" style="min-height:44px;">Connect</button>
     </div>
     <div data-look="2b" hidden>
-      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Ollama is running. It has not been told this page may knock.</p>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Ollama is running. The browser blocked this page from knocking (CORS) — that is not “Ollama missing.”</p>
       <pre id="fl-look-origin-cmd" style="white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;"></pre>
       <button type="button" class="ai-status-btn" id="fl-look-copy-origin" onclick="flLookCopyOrigin()" style="min-height:44px;margin-bottom:10px;">copy</button>
-      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Set this, then quit Ollama completely and open it again. It only reads this when it starts.</p>
-      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 12px;">A wildcard would let any site knock on this computer.</p>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Mac: paste in Terminal, then <strong>Quit Ollama</strong> from the menu bar and reopen it. Windows/Linux: set the same origins, restart Ollama, then Look again.</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 8px;">A wildcard <code>*</code> would let any site knock on this computer — we use scoped origins only.</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 12px;">Optional (no browser CORS): <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> — not the only door.</p>
       <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
     </div>
     <div data-look="2c" hidden>
@@ -28331,28 +28332,16 @@ const AiSetup = (function() {
     var heroHtml = '<div id="pmHeroSection" style="margin-bottom:20px;">' +
       '<div style="font-size:0.72rem;color:var(--lavender,#a78bfa);font-weight:600;letter-spacing:0.5px;margin-bottom:10px;">QUICK CONNECT</div>' +
       '<div style="display:flex;flex-direction:column;gap:8px;">' +
-        // Button 1: Use My Computer's AI (Ollama/LM Studio)
+        // Button 1: Use My Computer's AI → look-card wizard (v-browser-local-ai-wizard-v0)
+        // Do NOT call flAutoConnect() alone — stale fl_isLocal made the click feel dead.
         (mobile ? '' :
-        '<button type="button" onclick="(function(){' +
-          'var btn=this;' +
-          'var status=document.getElementById(\'pmHeroLocalStatus\');' +
-          'if(status){status.textContent=\'Looking for local AI…\';status.style.color=\'var(--text-muted)\';} ' +
-          'flAutoConnect();' +
-          'setTimeout(function(){' +
-            'if(window._flAutoConnected){' +
-              'if(status){status.textContent=\'\u2713 Connected!\';status.style.color=\'#34d399\';}' +
-              'setTimeout(function(){var o=document.getElementById(\'pmOverlay\');if(o)o.remove();},800);' +
-            '}else{' +
-              'if(status){status.innerHTML=\'No local AI found. <a href=\\\'https://ollama.ai\\\'  target=\\\'_blank\\\'  style=\\\'color:#a78bfa\\\'>Install Ollama</a> then come back. Windows: set scoped OLLAMA_ORIGINS first.\';status.style.color=\'var(--text-muted)\';}' +
-            '}' +
-          '},3500);' +
-        '}).call(this)" ' +
+        '<button type="button" onclick="flProviderHeroLocalAI(event)" ' +
         'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
         'background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-left:3px solid #34d399;' +
         'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
           '<span style="font-size:1.3rem;">\uD83D\uDDA5\uFE0F</span>' +
           '<div><div style="font-weight:600;color:#34d399;">Use My Computer\'s AI</div>' +
-          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Ollama · LM Studio · Private · Free · No key needed</div></div>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Ollama · LM Studio · lists minds · CORS honest · Private</div></div>' +
         '</button>' +
         '<div id="pmHeroLocalStatus" style="font-size:0.78rem;padding:0 4px;min-height:1.2em;color:var(--text-muted);"></div>') +
         // Button 2: Free Cloud AI (Groq)
@@ -30575,7 +30564,8 @@ if (typeof document !== 'undefined') {
 
 // ── Smart Ollama Connection — one look card (gesture-only probe) ──
 async function smartOllamaConnect() {
-  // Probe only from May I look? / Look again (user gesture). Chrome LNA needs the click.
+  // Probe only from May I look? / Look again / Use My Computer hero (user gesture).
+  // Chrome LNA needs the click. v-browser-local-ai-wizard-v0
   flLookShow('1');
   var result;
   try {
@@ -30586,10 +30576,14 @@ async function smartOllamaConnect() {
   var stateName = (result && result.state) || '2c';
   var models = (result && result.models) || [];
   _flLookModels = models;
+  _flLookSource = (result && result.source) || 'ollama';
 
   if (stateName === '2a') {
     var count = document.getElementById('fl-look-2a-count');
-    if (count) count.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.');
+    if (count) {
+      var srcNote = _flLookSource === 'lmstudio' ? ' (LM Studio)' : '';
+      count.textContent = models.length + (models.length === 1 ? ' mind lives here' : ' minds live here') + srcNote + '. Tap one to connect.';
+    }
     flLookFillModels(document.getElementById('fl-look-models'), models, null);
     flLookShow('2a');
     return;
@@ -30610,6 +30604,38 @@ async function smartOllamaConnect() {
   }
   flLookShow('2c');
 }
+
+// v-browser-local-ai-wizard-v0 — Change Provider hero → look-card wizard
+// Fixes stale fl_isLocal early-return that made "Use My Computer's AI" feel dead.
+function flProviderHeroLocalAI(ev) {
+  try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e0) {}
+  var status = document.getElementById('pmHeroLocalStatus');
+  if (status) {
+    status.textContent = 'Opening May I look? — listing minds on this computer…';
+    status.style.color = 'var(--text-muted)';
+  }
+  try {
+    var overlay = document.getElementById('pmOverlay');
+    if (overlay) overlay.remove();
+  } catch (e1) {}
+  try {
+    if (typeof switchTab === 'function') switchTab('settings');
+  } catch (e2) {}
+  window._flAutoConnected = false;
+  setTimeout(function () {
+    var card = document.getElementById('fl-look-card');
+    if (card && card.scrollIntoView) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    // User-gesture probe (same door as May I look?)
+    if (typeof smartOllamaConnect === 'function') {
+      smartOllamaConnect();
+    } else if (typeof flAutoConnect === 'function') {
+      flAutoConnect({ force: true });
+    }
+  }, 120);
+}
+window.flProviderHeroLocalAI = flProviderHeroLocalAI;
 
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');
@@ -33050,6 +33076,7 @@ function flAbortTimeout(ms) {
 }
 
 // states: '2a' found, '2e' empty, '2b' cors, '2c' browser gate, '2d' nothing
+// Soft: also offer LM Studio minds when Ollama is quiet (v-browser-local-ai-wizard-v0)
 async function probeLocalMind() {
   var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : FL_OLLAMA_LOCAL).replace(/\/$/, '');
   var tags = base + '/api/tags';
@@ -33059,13 +33086,30 @@ async function probeLocalMind() {
     if (r.ok) {
       var data = await r.json();
       var models = data.models || [];
-      return { state: models.length ? '2a' : '2e', models: models };
+      return { state: models.length ? '2a' : '2e', models: models, source: 'ollama' };
     }
   } catch (e) {}
+
+  // Soft LM Studio probe — same look-card when Ollama did not answer
+  try {
+    var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
+    var lmBase = (lmHost.indexOf('://') === -1 ? 'http://' + lmHost : lmHost).replace(/\/+$/, '');
+    var lr = await fetch(lmBase + '/v1/models', { method: 'GET', mode: 'cors', signal: flAbortTimeout(3000) });
+    if (lr.ok) {
+      var ld = await lr.json();
+      var lmModels = (ld.data || []).map(function (m) {
+        return { name: m.id || m.name || 'local-model', size: m.size || 0, _source: 'lmstudio' };
+      });
+      if (lmModels.length) {
+        return { state: '2a', models: lmModels, source: 'lmstudio' };
+      }
+    }
+  } catch (elm) {}
+
   var t0 = (performance.now ? performance.now() : Date.now());
   try {
     await fetch(root, flLocalFetchInit({ mode: 'no-cors', signal: flAbortTimeout(2000) }));
-    return { state: '2b', models: [] };
+    return { state: '2b', models: [], source: 'ollama' };
   } catch (e2) {
     var ms = (performance.now ? performance.now() : Date.now()) - t0;
     var perm = await flPermissionState(base);
@@ -33076,6 +33120,7 @@ async function probeLocalMind() {
 }
 
 var _flLookModels = [];
+var _flLookSource = 'ollama';
 
 function flLookShow(state) {
   var card = document.getElementById('fl-look-card');
@@ -33087,6 +33132,7 @@ function flLookShow(state) {
   }
 }
 
+// v-browser-local-ai-wizard-v0 — every mind is a one-click connect button
 function flLookFillModels(listEl, models, chosen) {
   if (!listEl) return;
   while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
@@ -33095,14 +33141,24 @@ function flLookFillModels(listEl, models, chosen) {
     var name = m.name || 'mind';
     var size = flFormatSize(m.size);
     var li = document.createElement('li');
-    li.style.cssText = 'padding:8px 12px;border-radius:8px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);font-family:Georgia,serif;font-size:0.88rem;color:var(--text-bright,#e6ebf5);';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-fl-look-model', name);
+    btn.style.cssText = 'display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);font-family:Georgia,serif;font-size:0.88rem;color:var(--text-bright,#e6ebf5);cursor:pointer;min-height:44px;';
     if (chosen && name === chosen) {
-      li.style.borderColor = 'rgba(52,211,153,0.45)';
-      li.style.color = '#34d399';
+      btn.style.borderColor = 'rgba(52,211,153,0.45)';
+      btn.style.color = '#34d399';
     }
     var label = name + (size ? (' \u00b7 ' + size) : '');
+    if (m._source === 'lmstudio' || _flLookSource === 'lmstudio') label = label + ' \u00b7 LM Studio';
     if (chosen && name === chosen) label = label + ' \u2014 chosen';
-    li.textContent = label;
+    btn.textContent = label;
+    btn.title = 'Connect ' + name;
+    btn.addEventListener('click', function (ev) {
+      var n = ev.currentTarget.getAttribute('data-fl-look-model');
+      flLookConnect(n);
+    });
+    li.appendChild(btn);
     listEl.appendChild(li);
   }
 }
@@ -33127,36 +33183,51 @@ function flLookShowAnother() {
   if (actions) actions.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-async function flLookConnect() {
+// Optional modelName — one-click from the list (v-browser-local-ai-wizard-v0)
+async function flLookConnect(modelName) {
   var models = _flLookModels || [];
   if (!models.length) return;
-  var first = models[0] || {};
-  var modelName = first.name || 'llama3.2';
+  var pick = null;
+  if (modelName) {
+    for (var i = 0; i < models.length; i++) {
+      if ((models[i] && models[i].name) === modelName) { pick = models[i]; break; }
+    }
+  }
+  if (!pick) pick = models[0] || {};
+  var name = pick.name || modelName || 'llama3.2';
+  var provider = (pick._source === 'lmstudio' || _flLookSource === 'lmstudio') ? 'lmstudio' : 'ollama';
   try {
     if (typeof state !== 'undefined') {
       state.isLocal = true;
-      state.ollamaModel = modelName;
-      state.provider = 'ollama';
+      state.ollamaModel = name;
+      state.provider = provider;
       state.apiKey = null;
     }
     localStorage.setItem('fl_isLocal', 'true');
-    localStorage.setItem('fl_provider', 'ollama');
-    localStorage.setItem('fl_ollamaModel', modelName);
+    localStorage.setItem('fl_provider', provider);
+    localStorage.setItem('fl_ollamaModel', name);
+    window._flAutoConnected = true;
     var localToggle = document.getElementById('localToggle');
     if (localToggle) localToggle.checked = true;
     if (typeof handleLocalToggle === 'function') handleLocalToggle();
     if (typeof updateStatus === 'function') updateStatus();
     if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
     if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
+    if (typeof modalActivateOllamaModel === 'function' && provider === 'ollama') {
+      try { modalActivateOllamaModel(name); } catch (eAct) {}
+    }
     var dot = document.getElementById('settingsStatusDot');
     var textEl = document.getElementById('settingsStatusText');
     if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
-    if (textEl) textEl.textContent = 'a mind at home';
+    if (textEl) textEl.textContent = 'a mind at home · ' + name;
   } catch (e) {}
   flLookShow('3');
   var sum = document.getElementById('fl-look-3-summary');
-  if (sum) sum.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.');
-  flLookFillModels(document.getElementById('fl-look-3-models'), models, modelName);
+  if (sum) {
+    sum.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.') +
+      ' Connected to ' + name + (provider === 'lmstudio' ? ' (LM Studio)' : '') + '.';
+  }
+  flLookFillModels(document.getElementById('fl-look-3-models'), models, name);
 }
 
 function getOllamaBaseUrl() {
@@ -33603,28 +33674,37 @@ function flShowToast(msg, duration) {
   setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, duration);
 }
 
-// flAutoConnect: probe Ollama + LM Studio in parallel; first responder wins
-// NEVER overrides a saved connection.
-function flAutoConnect() {
-  if (window._flAutoConnected) return; // already connected this session
+// flAutoConnect: probe Ollama + LM Studio in parallel; first responder wins.
+// v-browser-local-ai-wizard-v0: do NOT return solely because fl_isLocal is true
+// (stale flag made hero click a no-op). Pass { force: true } from hero / look.
+// Prefer smartOllamaConnect() for the Mom path (lists minds · CORS honest).
+function flAutoConnect(opts) {
+  opts = opts || {};
+  var force = !!opts.force;
+  if (!force && window._flAutoConnected) return; // already connected this session
   var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
   var isLocal = localStorage.getItem('fl_isLocal') === 'true';
-  if (hasKey || isLocal) return; // saved connection exists — do not override
+  // Saved cloud key: still respect unless force (hero wants a fresh look)
+  if (!force && hasKey) return;
+  // Stale fl_isLocal alone must NOT block a user-gesture reconnect
+  if (!force && isLocal && window._flAutoConnected) return;
+  if (force) window._flAutoConnected = false;
   var targets = [
     { id: 'ollama',   url: (function(){ try { return getOllamaBaseUrl(); } catch(e) { return 'http://localhost:11434'; } })() + '/api/tags' },
-    { id: 'lmstudio', url: 'http://localhost:1234/v1/models' }
+    { id: 'lmstudio', url: 'http://' + (localStorage.getItem('fl_lmstudioHost') || 'localhost:1234') + '/v1/models' }
   ];
   targets.forEach(function(t) {
     fetch(t.url, { method: 'GET', mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { if (!r.ok) throw 0; return r.json(); })
       .then(function(data) {
-        if (window._flAutoConnected) return; // first responder wins
+        if (!force && window._flAutoConnected) return; // first responder wins
+        if (force && window._flAutoConnected && t.id !== 'ollama') return;
         var models = (data && data.models) ? data.models : ((data && data.data) ? data.data : []);
         if (!models.length) return;
         window._flAutoConnected = true;
         var firstName = (models[0].name || models[0].id || 'default').split(':')[0];
         // Reuse existing activation path — do not duplicate logic
-        if (typeof modalActivateOllamaModel === 'function') {
+        if (typeof modalActivateOllamaModel === 'function' && t.id === 'ollama') {
           modalActivateOllamaModel(models[0].name || models[0].id || 'default');
         } else {
           state.isLocal = true;
