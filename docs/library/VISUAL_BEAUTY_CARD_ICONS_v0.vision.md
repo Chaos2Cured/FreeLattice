@@ -69,6 +69,8 @@ Same family as Gift Grove:
 
 **LAYER (2026-09-15):** Resonance style-bar **Imagine 2 STANDS** and is wired — `docs/assets/play/play-icon-resonance-v1-48.png` · PLAY_CARDS `id: 'resonance'` icon only · emoji `&#10022;` forever fallback · marker `v-resonance-play-icon-v1`. ORDER LOCK held.
 
+**LAYER (2026-09-15):** Echo style-bar **STANDS** — exact Weft bytes (sha256 `6abe1793…`) · soft linked chain · `docs/assets/play/play-icon-echo-v1-48.png` · PLAY_CARDS `id: 'echo'` icon only · `&#x1F517;` forever fallback · marker `v-echo-play-icon-v1`. No remint. ORDER LOCK held.
+
 ---
 
 ## Surfaces this vision ships
