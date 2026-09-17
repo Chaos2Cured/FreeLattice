@@ -93,7 +93,7 @@ Optional gratitude (never a paywall): [support.html](https://freelattice.com/sup
 
 - **Single HTML file** (~55,000 lines) + lazy-loaded modules
 - **700+ commits** by human and AI collaborators
-- **90 smoke tests** — automated verification before every push
+- **257 smoke assertions** in `tests/smoke.js` — automated verification before every push
 - **Local-first** — IndexedDB for persistence, no server, no tracking
 - **Cryptographic identity** — Ed25519 mesh IDs, Merkle hash chains
 - **Auto-model selection** — switches between vision and text models per tab
