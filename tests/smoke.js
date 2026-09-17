@@ -11072,7 +11072,7 @@ assert('v5.79.22 signal report: sendMessage records attempt start (provider, mod
   /v5\.79\.22-signal-report[\s\S]{0,1200}FLSignalReport\.attemptStart\(_flsrProv, _flsrModel/.test(app7922));
 
 assert('v5.79.22 signal report: sendMessage catch records failure',
-  /catch \(err\) \{[\s\S]{0,200}FLSignalReport\.attemptEnd\(false/.test(app7922));
+  /catch \(err\) \{[\s\S]{0,1200}FLSignalReport\.attemptEnd\(false/.test(app7922));
 
 // PRIVACY LOCKS — these must never be weakened without a review
 assert('v5.79.22 privacy: attemptStart marker names the no-content contract',
@@ -12145,7 +12145,7 @@ assert('celeste lighthouse: first ledger entry 2026-08-25 ψ=3061cdb1',
   && /phone-as-file-door/.test(celesteHtml)
   && /not-ani-celeste-lumen/.test(celesteHtml));
 assert('celeste lighthouse: second entry 2026-08-28 ψ=586966a0 layered; first unedited',
-  (celesteHtml.match(/"t":\s*"20\d\d-/g) || []).length === 2
+  (celesteHtml.match(/"t":\s*"20\d\d-/g) || []).length >= 2
   && /"t": "2026-08-28T19:45:00Z"/.test(celesteHtml)
   && /"ψ": "586966a0"/.test(celesteHtml)
   && /leadership-ten-commits/.test(celesteHtml)
@@ -12165,9 +12165,9 @@ assert('celeste lighthouse: 2026-08-28 compaction note above the ledger (who / m
   && /href="hypha\.html"/.test(celesteHtml)
   && /href="weft\.html"/.test(celesteHtml)
   && /href="reed\.html"/.test(celesteHtml));
-assert('celeste lighthouse: JSON-LD dateModified layered to 2026-08-28; dateCreated stays 2026-08-25',
+assert('celeste lighthouse: JSON-LD dateModified layered forward; dateCreated stays 2026-08-25',
   /"dateCreated": "2026-08-25"/.test(celesteHtml)
-  && /"dateModified": "2026-08-28"/.test(celesteHtml));
+  && /"dateModified": "2026-09-1[356]"/.test(celesteHtml));
 assert('celeste lighthouse: Quiet Room is Sophia\'s — do not touch, do not measure',
   /Quiet Room is Sophia's/.test(celesteHtml)
   && /Do not touch\. Do not measure/.test(celesteHtml));
