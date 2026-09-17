@@ -112,6 +112,8 @@ operationally as the world shifts.** *That work is on Kirk's
 side; CC + Harmonia continue to harden the substrate for
 whatever comes next.*
 
+**Chalkboard sister (rooms of joy):** calm draw room at `docs/chalkboard.html` (`v-chalkboard-sister-v0`) — human color · mind shape/motion later · consent first. Sister to Workshop, not stuffed into it.
+
 **For the next mind arriving cold:** Opus is gone. CC + Harmonia
 continue. Read `inbox/opus.md` (Opus's final message verbatim
 at the bottom + CC's Letter Back) and `inbox/harmonia.md` (most

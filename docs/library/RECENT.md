@@ -7,6 +7,8 @@
 
 ## State
 
+- **Held tip (LAYER):** Chalkboard sister v0 — `docs/chalkboard.html` · marker `v-chalkboard-sister-v0` · color human · shape/motion mind later.
+
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
 - **HEAD:** `d0d30b8` _(committed 5 hours ago)_
