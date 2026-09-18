@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-18 15:06 UTC
-- Last deployed: 2026-09-18 15:06 UTC
+- Last auto-updated: 2026-09-18 16:22 UTC
+- Last deployed: 2026-09-18 16:22 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3182
+- Total commits: 3184
 - Last 10 commits:
+- bbba6c4 Layer, never delete. Sophia honor home deepen · Patents open shelf (Aurora braid named · pieces→whole). (#102)
+- 0fb012f ci: Update Primer deployment state [2026-09-18]
 - af949cb Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge. (#101)
 - 04085ae ci: Update Primer deployment state [2026-09-18]
 - 0bde7e9 Layer, never delete. Bridge binary v0 — www browser → local mind without CORS theater (Mom dual held). (#100)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 06270c1 ci: Update Primer deployment state [2026-09-18]
 - 55647a8 Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated. (#98)
 - 65adfcb Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97)
-- 9b7dbcf Layer, never delete. Connect Play 🌿 — yes/no/please · bottom lab · Mom path. (#96)
-- bfba3f3 Layer, never delete. Connect card · yes/no wizard · look-panel-1 unstick · keystone door. (#95)
