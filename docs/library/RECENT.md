@@ -13,7 +13,7 @@
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
-- **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
+- **Most recent report:** Primer smoke layered for porch Clear-history · Publish still gated · Pages were never the outage. (v-primer-smoke-workshop-confirm-v0)
 
 ## Last 20 commits
 
