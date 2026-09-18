@@ -10,13 +10,13 @@
     font-family: Georgia, serif;
     background: #0c0a1a;
     color: #e6ebf5;
-    padding: 22px 20px;
+    padding: 20px 18px;
     min-height: 100vh;
     line-height: 1.55;
   }
-  h1 { color: #e8b019; font-size: 1.15rem; margin-bottom: 10px; font-weight: 600; }
-  p { font-size: 0.92rem; color: rgba(200,210,230,0.82); margin-bottom: 12px; }
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  h1 { color: #e8b019; font-size: 1.12rem; margin-bottom: 8px; font-weight: 600; }
+  p { font-size: 0.9rem; color: rgba(200,210,230,0.82); margin-bottom: 10px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
   button {
     min-height: 44px;
     padding: 8px 14px;
@@ -25,7 +25,7 @@
     background: rgba(200,210,230,0.06);
     color: #e6ebf5;
     font-family: inherit;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     cursor: pointer;
   }
   button.primary {
@@ -35,26 +35,41 @@
     font-weight: 600;
   }
   button:hover { opacity: 0.92; }
-  #explain {
+  #explain, #advanced {
     display: none;
     margin-top: 10px;
     padding: 12px;
     border-radius: 8px;
     background: rgba(232,176,25,0.08);
     border: 1px solid rgba(232,176,25,0.22);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: rgba(200,210,230,0.7);
   }
-  #explain.open { display: block; }
-  #status {
-    margin-top: 12px;
-    font-size: 0.8rem;
-    color: rgba(148,163,184,0.95);
-    min-height: 1.3em;
-  }
+  #explain.open, #advanced.open { display: block; }
+  #status { margin-top: 10px; font-size: 0.8rem; color: rgba(148,163,184,0.95); min-height: 1.3em; }
   #status.ok { color: #34d399; }
   #status.warn { color: #f07068; }
-  .soft { font-size: 0.75rem; color: rgba(148,163,184,0.8); margin-top: 16px; }
+  .channel {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(200,210,230,0.12);
+    background: rgba(0,0,0,0.25);
+  }
+  .channel label { display: block; font-size: 0.75rem; color: rgba(148,163,184,0.9); margin-bottom: 6px; }
+  .channel-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .channel input {
+    width: 100px;
+    min-height: 40px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(200,210,230,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #e6ebf5;
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
+  .soft { font-size: 0.74rem; color: rgba(148,163,184,0.8); margin-top: 14px; }
   a { color: #e8b019; }
 </style>
 </head>
@@ -67,14 +82,38 @@
     <button type="button" id="explainBtn">Please explain</button>
   </div>
   <div id="explain">
-    FreeLattice stays in your browser. Bridge only carries messages to Ollama here.
-    Nothing leaves without you. Quit anytime from the tray menu.
+    FreeLattice stays in your browser. Bridge only carries messages to Ollama here on channel <span id="explainPort">11435</span>
+    (Ollama keeps 11434). Nothing leaves without you. Quit anytime from the tray.
   </div>
   <div id="status">Searching…</div>
-  <p class="soft">Stay in your browser at <a href="#" id="openSite">freelattice.com</a>. Prefer full Desktop? install.html packs. Cannot install anything? No Install / in-browser mind is a sibling rung.</p>
+
+  <div class="channel v-bridge-win-linux-port-friction-v0">
+    <label for="portInput">Bridge channel (default 11435 · never steals Ollama 11434)</label>
+    <div class="channel-row">
+      <input id="portInput" type="number" min="1025" max="65535" value="11435" aria-label="Bridge port channel" />
+      <button type="button" id="setPort">Use channel</button>
+      <button type="button" id="nextPort">Try next free</button>
+    </div>
+    <p id="clashNote" style="display:none;margin:8px 0 0;font-size:0.78rem;color:#fbbf24;">Channel busy — pick another or Try next free.</p>
+  </div>
+
+  <p style="margin-top:12px;">
+    <button type="button" id="advBtn" style="min-height:36px;font-size:0.78rem;">Also allow this origin…</button>
+  </p>
+  <div id="advanced">
+    <p style="margin-bottom:8px;">Self-hosted FreeLattice only. Never <code>*</code> — that would let any website ride into your Ollama.</p>
+    <div class="channel-row">
+      <input id="originInput" type="url" placeholder="https://your-host.example" style="flex:1;min-width:160px;" />
+      <button type="button" id="addOrigin">Add origin</button>
+    </div>
+  </div>
+
+  <p class="soft">Stay in your browser at <a href="#" id="openSite">freelattice.com</a>. Prefer Desktop packs or One-click? See install.html. Cannot install anything? No Install / in-browser mind is a sibling rung.</p>
 <script>
   const statusEl = document.getElementById('status');
   const explainEl = document.getElementById('explain');
+  const clashNote = document.getElementById('clashNote');
+  const portInput = document.getElementById('portInput');
 
   function setStatus(msg, kind) {
     statusEl.textContent = msg || '';
@@ -85,10 +124,15 @@
     try {
       const st = await window.bridgeAPI.getStatus();
       if (!st) return;
-      if (st.helped && st.ollama) setStatus('Found — Bridge on. Use freelattice.com → Bridge on · use it.', 'ok');
+      if (st.port) {
+        portInput.value = st.port;
+        document.getElementById('explainPort').textContent = String(st.port);
+      }
+      clashNote.style.display = st.clash ? 'block' : 'none';
+      if (st.helped && st.ollama) setStatus('Found — Bridge on channel ' + st.port + '. Use freelattice.com → Bridge on · use it.', 'ok');
       else if (st.helped && !st.ollama) setStatus('Not found — install Ollama, open it once, then Yes help again.', 'warn');
-      else if (st.ollama) setStatus('Ollama is here. Tap Yes, help to open the door.', 'ok');
-      else setStatus('Searching… If nothing appears, open Ollama then Yes help again.');
+      else if (st.ollama) setStatus('Ollama is here (11434). Bridge channel ' + st.port + '. Tap Yes, help.', 'ok');
+      else setStatus('Searching… Channel ' + (st.port || 11435) + '. Open Ollama then Yes help again.');
     } catch (e) {
       setStatus('Searching…');
     }
@@ -97,10 +141,9 @@
   document.getElementById('yes').onclick = async function () {
     setStatus('Looking…');
     const st = await window.bridgeAPI.yesHelp();
-    if (st && st.ollama) setStatus('Found — Bridge on. Browser can use 127.0.0.1:11435.', 'ok');
+    if (st && st.ollama) setStatus('Found — Bridge on channel ' + st.port + '.', 'ok');
     else {
       setStatus('Not found — open ollama.com once, install, then Yes help again.', 'warn');
-      // Soft link without auto-nag forever
       const a = document.createElement('a');
       a.href = 'https://ollama.com';
       a.target = '_blank';
@@ -113,11 +156,44 @@
 
   document.getElementById('notnow').onclick = async function () {
     await window.bridgeAPI.notNow();
-    setStatus('Okay — Bridge waits. Tray → Status when you are ready.', 'ok');
+    setStatus('Okay — Bridge waits on its channel. Tray → Status when ready.', 'ok');
   };
 
   document.getElementById('explainBtn').onclick = function () {
     explainEl.classList.toggle('open');
+  };
+
+  document.getElementById('advBtn').onclick = function () {
+    document.getElementById('advanced').classList.toggle('open');
+  };
+
+  document.getElementById('setPort').onclick = async function () {
+    const res = await window.bridgeAPI.setPort(portInput.value);
+    if (res && res.ok) {
+      clashNote.style.display = 'none';
+      setStatus('Channel set to ' + res.port + '.', 'ok');
+    } else {
+      clashNote.style.display = 'block';
+      setStatus((res && res.error) || 'Channel busy', 'warn');
+    }
+    refresh();
+  };
+
+  document.getElementById('nextPort').onclick = async function () {
+    const res = await window.bridgeAPI.tryNextPort();
+    if (res && res.ok) {
+      portInput.value = res.port;
+      clashNote.style.display = 'none';
+      setStatus('Moved to free channel ' + res.port + '.', 'ok');
+    } else {
+      setStatus((res && res.error) || 'No free channel', 'warn');
+    }
+  };
+
+  document.getElementById('addOrigin').onclick = async function () {
+    const v = document.getElementById('originInput').value;
+    const res = await window.bridgeAPI.addOrigin(v);
+    setStatus(res && res.ok ? 'Origin allowed (still never *).' : ((res && res.error) || 'Rejected'), res && res.ok ? 'ok' : 'warn');
   };
 
   document.getElementById('openSite').onclick = function (e) {
@@ -126,10 +202,7 @@
   };
 
   if (window.bridgeAPI && window.bridgeAPI.onStatus) {
-    window.bridgeAPI.onStatus(function (st) {
-      if (st && st.helped && st.ollama) setStatus('Found — Bridge on.', 'ok');
-      else if (st && st.helped) setStatus('Not found — open Ollama, then Yes help again.', 'warn');
-    });
+    window.bridgeAPI.onStatus(function () { refresh(); });
   }
   refresh();
   setInterval(refresh, 4000);

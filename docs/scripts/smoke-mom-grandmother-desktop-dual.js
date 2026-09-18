@@ -25,7 +25,7 @@ assert.ok(/raw\.githubusercontent\.com.*install-freelattice/.test(install), 'raw
 
 assert.ok(/install\.html#grandmother-path-start/.test(app), 'Connect Play → grandmother');
 assert.ok(/install\.html#desktop-download-ease/.test(app), 'Connect Play Prefer Desktop');
-assert.ok(/Tired of browser allow notes/.test(app), 'soft Prefer copy');
+assert.ok(/Tired of browser allow notes|Browser blocked|Double-click Bridge|bridge-download/.test(app), 'soft Prefer / Bridge copy');
 assert.ok(/id="fl-connect-play"/.test(app) && /flPlayYes/.test(app), 'Connect Play held');
 assert.ok(/Please explain/.test(app), 'Yes/Not now/Please explain kept');
 

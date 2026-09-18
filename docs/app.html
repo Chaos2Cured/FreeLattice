@@ -16556,34 +16556,44 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                 <div class="fl-connect-play-explain" data-play-explain hidden>These are runners already on this machine (Ollama / LM Studio), not raw Hugging Face weights. Tap a chip, or Yes to connect the first mind.</div>
               </div>
               <div data-play="cors" hidden>
+                <!-- v-bridge-win-linux-port-friction-v0 — Bridge → Desktop → One-click · Terminal Advanced last -->
                 <p>A mind is running. The browser blocked this page from knocking (CORS) — that is not “Ollama missing.”</p>
-                <pre id="fl-play-origin-cmd"></pre>
-                <div class="fl-connect-play-actions" style="margin-bottom:8px;">
-                  <button type="button" class="ai-status-btn" id="fl-play-copy" onclick="flPlayCopyNote()" style="min-height:44px;">Copy note</button>
-                  <a href="desktop.html" class="ai-status-btn" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;">Desktop</a>
-                </div>
+                <ol class="v-bridge-win-linux-port-friction-v0" style="margin:0 0 12px;padding-left:1.2rem;font-family:Georgia,serif;font-size:0.88rem;color:var(--text-secondary);line-height:1.55;">
+                  <li style="margin-bottom:6px;"><strong>1. Double-click Bridge</strong> — stay in your browser. <a href="install.html#bridge-download" style="color:var(--emerald,#34d399);">Download Bridge</a></li>
+                  <li style="margin-bottom:6px;"><strong>2. Desktop</strong> — no CORS. <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop packs</a></li>
+                  <li style="margin-bottom:6px;"><strong>3. One-click</strong> — grandmother script. <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">install.html</a></li>
+                  <li><strong>4. Advanced</strong> — Terminal / <code>OLLAMA_ORIGINS</code> (last resort).</li>
+                </ol>
+                <details style="margin:0 0 10px;">
+                  <summary style="cursor:pointer;color:var(--text-muted);font-size:0.82rem;">Advanced — Terminal CORS (collapse)</summary>
+                  <pre id="fl-play-origin-cmd" style="margin-top:8px;"></pre>
+                  <button type="button" class="ai-status-btn" id="fl-play-copy" onclick="flPlayCopyNote()" style="min-height:44px;margin-top:6px;">Copy note</button>
+                </details>
+                <p class="v-bridge-win-linux-port-friction-v0" style="font-size:0.75rem;color:var(--text-muted);margin:0 0 10px;">Bridge on another channel? <input id="fl-bridge-port-field" type="number" min="1025" max="65535" placeholder="11435" style="width:88px;min-height:36px;padding:4px 8px;border-radius:6px;border:1px solid rgba(200,210,230,0.2);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:0.85rem;" /> <button type="button" class="ai-status-btn" onclick="flUseBridgePort()" style="min-height:36px;">Use channel</button></p>
                 <div class="fl-connect-play-actions">
                   <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">I did that</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
                 </div>
-                <p class="v-mom-grandmother-desktop-dual-v0 v-bridge-binary-www-local-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">Browser blocked? <a href="install.html#bridge-download" style="color:var(--emerald,#34d399);">Double-click Bridge</a> · <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click script</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop (no CORS)</a>.</p>
-                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Prefer Bridge — stay in your browser; double-click one thin helper. Or Desktop / One-click. CMD is never the primary door.</div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb. Prefer Bridge (channel 11435 by default — Ollama keeps 11434). Desktop and One-click next. Terminal CMD is Advanced only — never the primary door. Allowlist never bare *.</div>
               </div>
               <div data-play="empty" hidden>
                 <p id="fl-play-empty-msg">The door is soft-open, and no minds live here yet — or nothing is running. That is okay.</p>
+                <ol class="v-bridge-win-linux-port-friction-v0" style="margin:0 0 10px;padding-left:1.2rem;font-family:Georgia,serif;font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+                  <li><a href="install.html#bridge-download" style="color:var(--emerald,#34d399);">Bridge</a> · stay in browser</li>
+                  <li><a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop</a> · no CORS</li>
+                  <li><a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click</a> · grandmother script</li>
+                </ol>
                 <pre id="fl-play-pull-cmd">ollama pull llama3.2:3b</pre>
                 <div class="fl-connect-play-actions" style="margin-bottom:8px;">
                   <button type="button" class="ai-status-btn" onclick="flPlayCopyPull()" style="min-height:44px;">Copy note</button>
-                  <a href="desktop.html" class="ai-status-btn" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;">Desktop</a>
                 </div>
                 <div class="fl-connect-play-actions">
                   <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes — look again</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
                 </div>
-                <p class="v-mom-grandmother-desktop-dual-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:10px 0 0;">Tired of browser allow notes? <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click script</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop (no CORS)</a>.</p>
-                <div class="fl-connect-play-explain" data-play-explain hidden>Install or open Ollama (or LM Studio), pull a small model, then look again. Hugging Face weights need a runner first. In-browser WebLLM is a separate “No Install” door in Settings. Prefer Desktop when you want Yes/No without CORS cobwebs.</div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>Install or open Ollama (or LM Studio), pull a small model, then look again. Prefer Bridge / Desktop / One-click before any Terminal. WebLLM is the No Install sibling door in Settings.</div>
               </div>
               <div data-play="done" hidden>
                 <p id="fl-play-done-msg" style="color:var(--emerald,#34d399);">Connected. Change Provider is open when you need another path.</p>
@@ -31259,41 +31269,95 @@ window.flPlayCopyPull = flPlayCopyPull;
 window.flPlayGateProvider = flPlayGateProvider;
 window.flHasOneMindConnected = flHasOneMindConnected;
 
-// ── Bridge binary www-local v0 (v-bridge-binary-www-local-v0) ──
-// Soft-detect http://127.0.0.1:11435/bridge/health · chip Bridge on · use it
-var FL_BRIDGE_URL = 'http://127.0.0.1:11435';
+// ── Bridge binary www-local + port channel (v-bridge-win-linux-port-friction-v0) ──
+// Default channel 11435 (Ollama keeps 11434). Probe saved port then 11435…11445.
+var FL_BRIDGE_PORT_DEFAULT = 11435;
+var _flBridgeLivePort = FL_BRIDGE_PORT_DEFAULT;
 
-async function flBridgeHealth() {
+function flBridgePortCandidates() {
+  var ports = [];
   try {
-    var r = await fetch(FL_BRIDGE_URL + '/bridge/health', {
-      method: 'GET',
-      mode: 'cors',
-      signal: (typeof flAbortTimeout === 'function' ? flAbortTimeout(2000) : AbortSignal.timeout(2000))
-    });
-    if (!r.ok) return null;
-    return await r.json();
-  } catch (e) {
-    return null;
+    var saved = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
+    if (saved && saved !== 11434) ports.push(saved);
+  } catch (e0) {}
+  if (ports.indexOf(FL_BRIDGE_PORT_DEFAULT) < 0) ports.push(FL_BRIDGE_PORT_DEFAULT);
+  for (var i = 1; i <= 10; i++) {
+    var p = FL_BRIDGE_PORT_DEFAULT + i;
+    if (p !== 11434 && ports.indexOf(p) < 0) ports.push(p);
   }
+  return ports;
 }
 
-function flBridgeShowChip(on) {
+async function flBridgeHealthAt(port) {
+  try {
+    var r = await fetch('http://127.0.0.1:' + port + '/bridge/health', {
+      method: 'GET',
+      mode: 'cors',
+      signal: (typeof flAbortTimeout === 'function' ? flAbortTimeout(1500) : AbortSignal.timeout(1500))
+    });
+    if (!r.ok) return null;
+    var j = await r.json();
+    if (j && j.bridge) {
+      j._probedPort = port;
+      return j;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function flBridgeHealth() {
+  var ports = flBridgePortCandidates();
+  for (var i = 0; i < ports.length; i++) {
+    var h = await flBridgeHealthAt(ports[i]);
+    if (h) {
+      _flBridgeLivePort = h.port || ports[i];
+      try { localStorage.setItem('fl_bridgePort', String(_flBridgeLivePort)); } catch (e1) {}
+      return h;
+    }
+  }
+  return null;
+}
+
+function flBridgeShowChip(on, port) {
   var row = document.getElementById('fl-bridge-chip-row');
   var offer = document.getElementById('fl-bridge-soft-offer');
+  var note = document.getElementById('fl-bridge-chip-note');
   if (row) row.style.display = on ? 'flex' : 'none';
-  if (offer && on) offer.style.display = 'none';
+  if (offer) offer.style.display = on ? 'none' : '';
+  if (note && on && port) note.textContent = 'Channel ' + port + ' — local helper carrying messages · no CORS CMD.';
 }
 
 async function flBridgeDetect() {
   var health = await flBridgeHealth();
   var ready = !!(health && health.bridge && health.helped);
-  flBridgeShowChip(ready);
+  flBridgeShowChip(ready, health && (health.port || health._probedPort));
+  var field = document.getElementById('fl-bridge-port-field');
+  if (field && health && health.port) field.value = health.port;
   return health;
 }
 
+function flUseBridgePort() {
+  var field = document.getElementById('fl-bridge-port-field');
+  var n = field ? parseInt(field.value, 10) : FL_BRIDGE_PORT_DEFAULT;
+  if (!n || n === 11434) n = FL_BRIDGE_PORT_DEFAULT;
+  _flBridgeLivePort = n;
+  try { localStorage.setItem('fl_bridgePort', String(n)); } catch (e) {}
+  flUseBridge();
+}
+
 function flUseBridge() {
+  var port = _flBridgeLivePort || FL_BRIDGE_PORT_DEFAULT;
   try {
-    localStorage.setItem('fl_ollamaHost', '127.0.0.1:11435');
+    var field = document.getElementById('fl-bridge-port-field');
+    if (field && field.value) {
+      var n = parseInt(field.value, 10);
+      if (n && n !== 11434) port = n;
+    }
+  } catch (eF) {}
+  _flBridgeLivePort = port;
+  try {
+    localStorage.setItem('fl_ollamaHost', '127.0.0.1:' + port);
+    localStorage.setItem('fl_bridgePort', String(port));
     localStorage.setItem('fl_provider', 'ollama');
     localStorage.setItem('fl_isLocal', 'true');
   } catch (e0) {}
@@ -31307,7 +31371,7 @@ function flUseBridge() {
     }
   } catch (e2) {}
   var note = document.getElementById('fl-bridge-chip-note');
-  if (note) note.textContent = 'Using Bridge at 127.0.0.1:11435 — looking for minds…';
+  if (note) note.textContent = 'Using Bridge channel ' + port + ' — looking for minds…';
   try {
     if (typeof flOpenConnectWizard === 'function') flOpenConnectWizard('allowed');
     else if (typeof flLookProbeNow === 'function') flLookProbeNow();
@@ -31315,7 +31379,6 @@ function flUseBridge() {
   } catch (e3) {}
 }
 
-// Soft poll when Connect Play opens / page idle
 (function flBridgeDetectBoot() {
   function run() {
     try { flBridgeDetect(); } catch (e) {}
@@ -31328,6 +31391,7 @@ function flUseBridge() {
 })();
 window.flBridgeDetect = flBridgeDetect;
 window.flUseBridge = flUseBridge;
+window.flUseBridgePort = flUseBridgePort;
 window.flBridgeHealth = flBridgeHealth;
 
 function settingsSetMode(mode) {
