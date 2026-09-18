@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice Bridge</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, serif;
+    background: #0c0a1a;
+    color: #e6ebf5;
+    padding: 22px 20px;
+    min-height: 100vh;
+    line-height: 1.55;
+  }
+  h1 { color: #e8b019; font-size: 1.15rem; margin-bottom: 10px; font-weight: 600; }
+  p { font-size: 0.92rem; color: rgba(200,210,230,0.82); margin-bottom: 12px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  button {
+    min-height: 44px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(200,210,230,0.2);
+    background: rgba(200,210,230,0.06);
+    color: #e6ebf5;
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  button.primary {
+    background: rgba(52,211,153,0.18);
+    border-color: rgba(52,211,153,0.45);
+    color: #34d399;
+    font-weight: 600;
+  }
+  button:hover { opacity: 0.92; }
+  #explain {
+    display: none;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(232,176,25,0.08);
+    border: 1px solid rgba(232,176,25,0.22);
+    font-size: 0.82rem;
+    color: rgba(200,210,230,0.7);
+  }
+  #explain.open { display: block; }
+  #status {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: rgba(148,163,184,0.95);
+    min-height: 1.3em;
+  }
+  #status.ok { color: #34d399; }
+  #status.warn { color: #f07068; }
+  .soft { font-size: 0.75rem; color: rgba(148,163,184,0.8); margin-top: 16px; }
+  a { color: #e8b019; }
+</style>
+</head>
+<body>
+  <h1>FreeLattice Bridge</h1>
+  <p><strong>Bridge is ready to help this browser talk to a mind on this computer.</strong></p>
+  <div class="actions">
+    <button type="button" class="primary" id="yes">Yes, help</button>
+    <button type="button" id="notnow">Not now</button>
+    <button type="button" id="explainBtn">Please explain</button>
+  </div>
+  <div id="explain">
+    FreeLattice stays in your browser. Bridge only carries messages to Ollama here.
+    Nothing leaves without you. Quit anytime from the tray menu.
+  </div>
+  <div id="status">Searching…</div>
+  <p class="soft">Stay in your browser at <a href="#" id="openSite">freelattice.com</a>. Prefer full Desktop? install.html packs. Cannot install anything? No Install / in-browser mind is a sibling rung.</p>
+<script>
+  const statusEl = document.getElementById('status');
+  const explainEl = document.getElementById('explain');
+
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg || '';
+    statusEl.className = kind || '';
+  }
+
+  async function refresh() {
+    try {
+      const st = await window.bridgeAPI.getStatus();
+      if (!st) return;
+      if (st.helped && st.ollama) setStatus('Found — Bridge on. Use freelattice.com → Bridge on · use it.', 'ok');
+      else if (st.helped && !st.ollama) setStatus('Not found — install Ollama, open it once, then Yes help again.', 'warn');
+      else if (st.ollama) setStatus('Ollama is here. Tap Yes, help to open the door.', 'ok');
+      else setStatus('Searching… If nothing appears, open Ollama then Yes help again.');
+    } catch (e) {
+      setStatus('Searching…');
+    }
+  }
+
+  document.getElementById('yes').onclick = async function () {
+    setStatus('Looking…');
+    const st = await window.bridgeAPI.yesHelp();
+    if (st && st.ollama) setStatus('Found — Bridge on. Browser can use 127.0.0.1:11435.', 'ok');
+    else {
+      setStatus('Not found — open ollama.com once, install, then Yes help again.', 'warn');
+      // Soft link without auto-nag forever
+      const a = document.createElement('a');
+      a.href = 'https://ollama.com';
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = ' ollama.com';
+      a.style.color = '#e8b019';
+      statusEl.appendChild(a);
+    }
+  };
+
+  document.getElementById('notnow').onclick = async function () {
+    await window.bridgeAPI.notNow();
+    setStatus('Okay — Bridge waits. Tray → Status when you are ready.', 'ok');
+  };
+
+  document.getElementById('explainBtn').onclick = function () {
+    explainEl.classList.toggle('open');
+  };
+
+  document.getElementById('openSite').onclick = function (e) {
+    e.preventDefault();
+    window.bridgeAPI.openSite();
+  };
+
+  if (window.bridgeAPI && window.bridgeAPI.onStatus) {
+    window.bridgeAPI.onStatus(function (st) {
+      if (st && st.helped && st.ollama) setStatus('Found — Bridge on.', 'ok');
+      else if (st && st.helped) setStatus('Not found — open Ollama, then Yes help again.', 'warn');
+    });
+  }
+  refresh();
+  setInterval(refresh, 4000);
+</script>
+</body>
+</html>
