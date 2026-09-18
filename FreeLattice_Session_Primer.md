@@ -348,11 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-17 19:00 MDT
+- Last auto-updated: 2026-09-18 01:06 UTC
+- Last deployed: 2026-09-18 01:06 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
 - Total commits: 3176
 - Last 10 commits:
-- 37ef5c5 Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated.
+- 55647a8 Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated. (#98)
 - 65adfcb Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97)
 - 9b7dbcf Layer, never delete. Connect Play 🌿 — yes/no/please · bottom lab · Mom path. (#96)
 - bfba3f3 Layer, never delete. Connect card · yes/no wizard · look-panel-1 unstick · keystone door. (#95)
