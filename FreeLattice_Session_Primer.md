@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-17 16:53 MDT
+- Last auto-updated: 2026-09-17 19:00 MDT
 - Version: 5.79.45
-- Total commits: 3175
+- Total commits: 3176
 - Last 10 commits:
-- 247a4f5 Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held).
+- 37ef5c5 Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated.
+- 65adfcb Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97)
 - 9b7dbcf Layer, never delete. Connect Play 🌿 — yes/no/please · bottom lab · Mom path. (#96)
 - bfba3f3 Layer, never delete. Connect card · yes/no wizard · look-panel-1 unstick · keystone door. (#95)
 - 47b01b6 Layer, never delete. Browser Local AI wizard — Use My Computer lists minds · CORS honest · stale fl_isLocal fixed. (#94)
@@ -361,4 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 487440b Layer, never delete. Why Ledgers v0 — continuity as infrastructure (cc.html as example).
 - a4242ae ci: Update Primer deployment state [2026-09-17]
 - ce14469 Layer, never delete. Primer smoke — lighthouse count/dateModified · Hang signal window.
-- fe564d9 Layer, never delete. Celeste ledger λ5 — Adaptive held · Workshop passover · pattern carried.
