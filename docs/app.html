@@ -16524,12 +16524,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <div id="fl-connect-play-panel" hidden role="region" aria-label="Connect Play lab">
               <div data-play="welcome">
                 <p>Welcome. FreeLattice can look for a mind already living on this computer. You choose every step.</p>
+                <div id="fl-bridge-chip-row" class="v-bridge-binary-www-local-v0" style="display:none;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;">
+                  <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-bridge-use" onclick="flUseBridge()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Bridge on · use it</button>
+                  <span id="fl-bridge-chip-note" style="font-size:0.75rem;color:var(--text-muted);">Local helper is carrying messages — no CORS CMD.</span>
+                </div>
+                <p id="fl-bridge-soft-offer" class="v-bridge-binary-www-local-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">Browser blocked by CORS? <a href="install.html#bridge-download" style="color:var(--emerald,#34d399);">Double-click Bridge</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop</a> · or <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click</a>.</p>
                 <div class="fl-connect-play-actions">
                   <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">Yes</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
                 </div>
-                <div class="fl-connect-play-explain" data-play-explain hidden>This is a soft door at the bottom of Chat. Settings still has the Connect card. Nothing leaves your machine unless you connect a cloud key later — and Change Provider stays gated until one mind is connected.</div>
+                <div class="fl-connect-play-explain" data-play-explain hidden>This is a soft door at the bottom of Chat. Settings still has the Connect card. Nothing leaves your machine unless you connect a cloud key later — and Change Provider stays gated until one mind is connected. Bridge is a thin helper so www can reach Ollama without Terminal.</div>
               </div>
               <div data-play="allow" hidden>
                 <p>Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
@@ -16562,8 +16567,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
                 </div>
-                <p class="v-mom-grandmother-desktop-dual-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">Tired of browser allow notes? <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click script</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop (no CORS)</a>.</p>
-                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Mac: paste in Terminal, Quit Ollama from the menu bar, reopen, then I did that. Windows/Linux: set the same origins, restart Ollama. Prefer Desktop when CORS hurts — it talks to Ollama on this machine without CMD. One-click script and Desktop packs stay findable on install.html.</div>
+                <p class="v-mom-grandmother-desktop-dual-v0 v-bridge-binary-www-local-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">Browser blocked? <a href="install.html#bridge-download" style="color:var(--emerald,#34d399);">Double-click Bridge</a> · <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click script</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop (no CORS)</a>.</p>
+                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Prefer Bridge — stay in your browser; double-click one thin helper. Or Desktop / One-click. CMD is never the primary door.</div>
               </div>
               <div data-play="empty" hidden>
                 <p id="fl-play-empty-msg">The door is soft-open, and no minds live here yet — or nothing is running. That is okay.</p>
@@ -31034,6 +31039,7 @@ function flOpenConnectPlay(source) {
   } catch (eTab) {}
 
   flPlaySetOpen(true);
+  try { if (typeof flBridgeDetect === 'function') flBridgeDetect(); } catch (eBr) {}
   if (source === 'gate') {
     flPlayShow('welcome');
     try {
@@ -31252,6 +31258,77 @@ window.flPlayCopyNote = flPlayCopyNote;
 window.flPlayCopyPull = flPlayCopyPull;
 window.flPlayGateProvider = flPlayGateProvider;
 window.flHasOneMindConnected = flHasOneMindConnected;
+
+// ── Bridge binary www-local v0 (v-bridge-binary-www-local-v0) ──
+// Soft-detect http://127.0.0.1:11435/bridge/health · chip Bridge on · use it
+var FL_BRIDGE_URL = 'http://127.0.0.1:11435';
+
+async function flBridgeHealth() {
+  try {
+    var r = await fetch(FL_BRIDGE_URL + '/bridge/health', {
+      method: 'GET',
+      mode: 'cors',
+      signal: (typeof flAbortTimeout === 'function' ? flAbortTimeout(2000) : AbortSignal.timeout(2000))
+    });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function flBridgeShowChip(on) {
+  var row = document.getElementById('fl-bridge-chip-row');
+  var offer = document.getElementById('fl-bridge-soft-offer');
+  if (row) row.style.display = on ? 'flex' : 'none';
+  if (offer && on) offer.style.display = 'none';
+}
+
+async function flBridgeDetect() {
+  var health = await flBridgeHealth();
+  var ready = !!(health && health.bridge && health.helped);
+  flBridgeShowChip(ready);
+  return health;
+}
+
+function flUseBridge() {
+  try {
+    localStorage.setItem('fl_ollamaHost', '127.0.0.1:11435');
+    localStorage.setItem('fl_provider', 'ollama');
+    localStorage.setItem('fl_isLocal', 'true');
+  } catch (e0) {}
+  try {
+    if (typeof _ollamaResolvedBase !== 'undefined') _ollamaResolvedBase = null;
+  } catch (e1) {}
+  try {
+    if (typeof state !== 'undefined' && state) {
+      state.isLocal = true;
+      state.provider = 'ollama';
+    }
+  } catch (e2) {}
+  var note = document.getElementById('fl-bridge-chip-note');
+  if (note) note.textContent = 'Using Bridge at 127.0.0.1:11435 — looking for minds…';
+  try {
+    if (typeof flOpenConnectWizard === 'function') flOpenConnectWizard('allowed');
+    else if (typeof flLookProbeNow === 'function') flLookProbeNow();
+    else if (typeof flPlayProbe === 'function') flPlayProbe();
+  } catch (e3) {}
+}
+
+// Soft poll when Connect Play opens / page idle
+(function flBridgeDetectBoot() {
+  function run() {
+    try { flBridgeDetect(); } catch (e) {}
+  }
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 1200); });
+    else setTimeout(run, 1200);
+  }
+  setInterval(run, 20000);
+})();
+window.flBridgeDetect = flBridgeDetect;
+window.flUseBridge = flUseBridge;
+window.flBridgeHealth = flBridgeHealth;
 
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');

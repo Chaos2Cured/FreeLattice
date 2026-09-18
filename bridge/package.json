@@ -1,0 +1,59 @@
+{
+  "name": "freelattice-bridge",
+  "productName": "FreeLattice Bridge",
+  "version": "0.1.0",
+  "description": "Thin helper: freelattice.com browser → local Ollama without CORS theater.",
+  "author": "Kirk Miller <kirkpmiller@hotmail.com>",
+  "homepage": "https://freelattice.com",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.freelattice.bridge",
+    "productName": "FreeLattice Bridge",
+    "publish": null,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "proxy-core.js",
+      "ui/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": ["zip", "dmg"],
+      "artifactName": "FreeLattice-Bridge_${version}_macOS.${ext}",
+      "identity": null
+    },
+    "win": {
+      "target": ["portable", "nsis"],
+      "signAndEditExecutable": false,
+      "artifactName": "FreeLattice-Bridge_${version}_Windows.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility",
+      "artifactName": "FreeLattice-Bridge_${version}_Linux.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "artifactName": "FreeLattice-Bridge_${version}_Windows_Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "FreeLattice-Bridge_${version}_Windows_Portable.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  }
+}

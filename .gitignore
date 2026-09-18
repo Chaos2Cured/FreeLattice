@@ -4,6 +4,8 @@ node_modules/
 # Desktop app build artifacts
 desktop/node_modules/
 desktop/dist/
+bridge/node_modules/
+bridge/dist/
 desktop/app/*.html
 desktop/app/*.js
 desktop/app/*.json
