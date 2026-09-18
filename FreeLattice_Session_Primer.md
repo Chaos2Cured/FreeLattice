@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-18 01:06 UTC
-- Last deployed: 2026-09-18 01:06 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-17 20:43 MDT
 - Version: 5.79.45
-- Total commits: 3176
+- Total commits: 3178
 - Last 10 commits:
+- 3a33c5d Layer, never delete. Mom dual — Grandmother One-click findable · Desktop Yes/No first-run (Connect Play held).
+- 06270c1 ci: Update Primer deployment state [2026-09-18]
 - 55647a8 Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated. (#98)
 - 65adfcb Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97)
 - 9b7dbcf Layer, never delete. Connect Play 🌿 — yes/no/please · bottom lab · Mom path. (#96)
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 694ec2e Layer, never delete. Workshop porch v0 — Create calm · History · Stop.
 - 253e977 ci: Update Primer deployment state [2026-09-17]
 - 487440b Layer, never delete. Why Ledgers v0 — continuity as infrastructure (cc.html as example).
-- a4242ae ci: Update Primer deployment state [2026-09-17]
-- ce14469 Layer, never delete. Primer smoke — lighthouse count/dateModified · Hang signal window.

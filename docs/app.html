@@ -16562,7 +16562,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
                 </div>
-                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Mac: paste in Terminal, Quit Ollama from the menu bar, reopen, then I did that. Windows/Linux: set the same origins, restart Ollama. Desktop is another door, not the only one.</div>
+                <p class="v-mom-grandmother-desktop-dual-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">Tired of browser allow notes? <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click script</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop (no CORS)</a>.</p>
+                <div class="fl-connect-play-explain" data-play-explain hidden>CORS is a sticky cobweb: the browser refuses cross-origin knocks unless Ollama lists this site in OLLAMA_ORIGINS (scoped — never bare *). Mac: paste in Terminal, Quit Ollama from the menu bar, reopen, then I did that. Windows/Linux: set the same origins, restart Ollama. Prefer Desktop when CORS hurts — it talks to Ollama on this machine without CMD. One-click script and Desktop packs stay findable on install.html.</div>
               </div>
               <div data-play="empty" hidden>
                 <p id="fl-play-empty-msg">The door is soft-open, and no minds live here yet — or nothing is running. That is okay.</p>
@@ -16576,7 +16577,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayExplain()" style="min-height:44px;">Please explain</button>
                 </div>
-                <div class="fl-connect-play-explain" data-play-explain hidden>Install or open Ollama (or LM Studio), pull a small model, then look again. Hugging Face weights need a runner first. In-browser WebLLM is a separate “No Install” door in Settings.</div>
+                <p class="v-mom-grandmother-desktop-dual-v0" style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:10px 0 0;">Tired of browser allow notes? <a href="install.html#grandmother-path-start" style="color:var(--emerald,#34d399);">One-click script</a> · or <a href="install.html#desktop-download-ease" style="color:var(--emerald,#34d399);">Desktop (no CORS)</a>.</p>
+                <div class="fl-connect-play-explain" data-play-explain hidden>Install or open Ollama (or LM Studio), pull a small model, then look again. Hugging Face weights need a runner first. In-browser WebLLM is a separate “No Install” door in Settings. Prefer Desktop when you want Yes/No without CORS cobwebs.</div>
               </div>
               <div data-play="done" hidden>
                 <p id="fl-play-done-msg" style="color:var(--emerald,#34d399);">Connected. Change Provider is open when you need another path.</p>
@@ -16971,6 +16973,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <p id="fl-desktop-first-door-browser" style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0;">Keys, memory, seal, and Import live on <a href="desktop.html" style="color:#e8b019;">Desktop</a> — equal access means findable. The garden stays here.</p>
     <p class="v-grandmother-path-v0.1" style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:8px 0 0;">Path: <a href="install.html" style="color:#e8b019;">Install</a> → First door → Memory — one walk on <a href="desktop.html#grandmother-path-start" style="color:#e8b019;">desktop.html</a>.</p>
     <div id="fl-desktop-first-door-electron" hidden>
+      <!-- v-mom-grandmother-desktop-dual-v0 — Mom Desktop Yes/No first-run · reuse Ollama probe · no second settings galaxy -->
+      <div id="fl-mom-desktop-firstrun" class="v-mom-grandmother-desktop-dual-v0" style="margin:0 0 14px;padding:12px 14px;border-radius:10px;border:1px solid rgba(52,211,153,0.28);background:rgba(52,211,153,0.06);">
+        <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.55;margin:0 0 10px;"><strong style="color:var(--emerald,#34d399);">A mind lives on this computer?</strong></p>
+        <div id="fl-mom-desktop-firstrun-actions" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+          <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-mom-desktop-yes" onclick="flMomDesktopYesLook()" style="min-height:44px;">Yes, look</button>
+          <button type="button" class="ai-status-btn" id="fl-mom-desktop-notnow" onclick="flMomDesktopNotNow()" style="min-height:44px;">Not now</button>
+          <button type="button" class="ai-status-btn" id="fl-mom-desktop-explain" onclick="flMomDesktopExplain()" style="min-height:44px;">Please explain</button>
+        </div>
+        <div id="fl-mom-desktop-explain" hidden style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;padding:10px 12px;border-radius:8px;background:rgba(232,176,25,0.08);border:1px solid rgba(232,176,25,0.2);">Desktop talks to Ollama on this machine — no browser CORS, nothing leaves without you. If you stay on the website, Connect Play 🌿 is still there. Prefer One-click script? <a href="install.html#grandmother-path-start" style="color:#e8b019;">install.html</a>.</div>
+        <p id="fl-mom-desktop-status" style="font-size:0.78rem;color:var(--text-muted);margin:0;min-height:1.2em;"></p>
+      </div>
       <p style="font-family:Georgia,serif;font-size:0.9rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">You are on the machine door. Below: Keys · Import · Swarm · Memory · Trainer seal · Pair · Ledger · LP / give. No second shelves — these point at what already lives here.</p>
       <ol style="margin:0 0 12px;padding-left:1.2rem;font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.88);line-height:1.55;">
         <li><a href="#fl-companion-identity-card" style="color:#e8b019;">Keys</a> — companion fingerprint on this machine</li>
@@ -16980,9 +16993,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <li><a href="#fl-pair-card" style="color:#e8b019;">Pair</a> · <a href="#fl-ledger-card" style="color:#e8b019;">Ledger</a></li>
         <li><a href="#fl-lp-give" style="color:#e8b019;">LP / give</a> — fun give human ↔ mind (not money)</li>
       </ol>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">Full map: <a href="desktop.html" style="color:#e8b019;">desktop.html</a>. No signed installer yet — build from source when you need the app shell.</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">Full map: <a href="desktop.html" style="color:#e8b019;">desktop.html</a>. No signed installer yet — packs on <a href="install.html#desktop-download-ease" style="color:#e8b019;">install.html</a>.</p>
       <!-- v-grandmother-path-v0.1 — path pointer, not new chrome -->
-      <p class="v-grandmother-path-v0.1" style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">Path: <a href="install.html" style="color:#e8b019;">Install</a> → First door → <a href="#fl-memory-card" style="color:#e8b019;">Memory</a> · full story on <a href="desktop.html#grandmother-path-start" style="color:#e8b019;">desktop.html</a>.</p>
+      <p class="v-grandmother-path-v0.1" style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">Path: <a href="install.html#grandmother-path-start" style="color:#e8b019;">Install One-click</a> → First door → <a href="#fl-memory-card" style="color:#e8b019;">Memory</a> · full story on <a href="desktop.html#grandmother-path-start" style="color:#e8b019;">desktop.html</a>.</p>
       <button type="button" class="ai-status-btn" id="fl-desktop-first-door-dismiss" style="min-height:44px;width:100%;">Got it — dismiss</button>
     </div>
   </div>
@@ -30704,13 +30717,89 @@ async function flPairClear() {
 }
 
 /** v-desktop-first-door-v0.1 — Electron strip; browser pointer only. */
+/** v-mom-grandmother-desktop-dual-v0 — Mom Yes/No first-run on Desktop (no CORS CMD). */
 var FL_DESKTOP_FIRST_DOOR_DISMISS_KEY = 'fl_desktop_first_door_dismissed';
+var FL_MOM_DESKTOP_FIRSTRUN_KEY = 'fl_mom_desktop_firstrun_dismissed';
+
+function flMomDesktopSetStatus(msg, kind) {
+  var el = document.getElementById('fl-mom-desktop-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = kind === 'ok' ? 'rgba(52,211,153,0.95)'
+    : (kind === 'warn' ? 'rgba(240,112,104,0.9)' : '');
+}
+
+function flMomDesktopExplain() {
+  var ex = document.getElementById('fl-mom-desktop-explain');
+  if (!ex) return;
+  ex.hidden = !ex.hidden;
+}
+
+function flMomDesktopNotNow() {
+  try { localStorage.setItem(FL_MOM_DESKTOP_FIRSTRUN_KEY, '1'); } catch (e) {}
+  var card = document.getElementById('fl-mom-desktop-firstrun');
+  if (card) card.hidden = true;
+  flMomDesktopSetStatus('Okay — soft re-offer lives on First door when you want it.', 'ok');
+}
+
+async function flMomDesktopYesLook() {
+  flMomDesktopSetStatus('Looking for a mind on this computer…', '');
+  var connected = null;
+  try {
+    if (window.electronAPI && typeof window.electronAPI.getOllamaStatus === 'function') {
+      connected = await window.electronAPI.getOllamaStatus();
+    }
+  } catch (e0) { connected = null; }
+
+  // Reuse Connect wizard / look probe — Desktop proxy means no OLLAMA_ORIGINS CMD
+  try {
+    if (typeof flOpenConnectWizard === 'function') {
+      flOpenConnectWizard('allowed');
+    } else if (typeof flLookProbeNow === 'function') {
+      await flLookProbeNow();
+    }
+  } catch (e1) {}
+
+  if (connected === false) {
+    flMomDesktopSetStatus('Nothing answered yet. Install Ollama, open it once, then Yes look again.', 'warn');
+    try {
+      if (window.electronAPI && typeof window.electronAPI.openExternal === 'function') {
+        /* soft — only if Mom asks again; do not auto-open every Yes */
+      }
+      var status = document.getElementById('fl-mom-desktop-status');
+      if (status && !status.querySelector('a')) {
+        var a = document.createElement('a');
+        a.href = 'https://ollama.com';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = ' Open ollama.com';
+        a.style.color = '#e8b019';
+        a.addEventListener('click', function (ev) {
+          try {
+            if (window.electronAPI && window.electronAPI.openExternal) {
+              ev.preventDefault();
+              window.electronAPI.openExternal('https://ollama.com');
+            }
+          } catch (e2) {}
+        });
+        status.appendChild(a);
+      }
+    } catch (e3) {}
+    return;
+  }
+  if (connected === true) {
+    flMomDesktopSetStatus('Ollama is here — Connect card is listing minds. Pick one.', 'ok');
+  } else {
+    flMomDesktopSetStatus('Looking… if the Connect card opens empty, install Ollama then Yes look again.', '');
+  }
+}
 
 function flInitDesktopFirstDoor() {
   var wrap = document.getElementById('fl-desktop-first-door');
   var browserNote = document.getElementById('fl-desktop-first-door-browser');
   var electronBox = document.getElementById('fl-desktop-first-door-electron');
   var dismissBtn = document.getElementById('fl-desktop-first-door-dismiss');
+  var momCard = document.getElementById('fl-mom-desktop-firstrun');
   if (!wrap) return;
   var isElectron = !!(window.isElectronApp || window.electronAPI);
   if (!isElectron) {
@@ -30732,6 +30821,11 @@ function flInitDesktopFirstDoor() {
   if (browserNote) browserNote.hidden = true;
   if (electronBox) electronBox.hidden = false;
   wrap.hidden = false;
+  try {
+    if (momCard && localStorage.getItem(FL_MOM_DESKTOP_FIRSTRUN_KEY) === '1') {
+      momCard.hidden = true;
+    }
+  } catch (eMom) {}
   if (dismissBtn && !dismissBtn._flBound) {
     dismissBtn._flBound = true;
     dismissBtn.addEventListener('click', function () {
@@ -30744,6 +30838,9 @@ function flInitDesktopFirstDoor() {
     });
   }
 }
+window.flMomDesktopYesLook = flMomDesktopYesLook;
+window.flMomDesktopNotNow = flMomDesktopNotNow;
+window.flMomDesktopExplain = flMomDesktopExplain;
 
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
