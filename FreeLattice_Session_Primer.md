@@ -348,11 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-18 08:45 MDT
+- Last auto-updated: 2026-09-18 15:06 UTC
+- Last deployed: 2026-09-18 15:06 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
 - Total commits: 3182
 - Last 10 commits:
-- aee7cc6 Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge.
+- af949cb Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge. (#101)
 - 04085ae ci: Update Primer deployment state [2026-09-18]
 - 0bde7e9 Layer, never delete. Bridge binary v0 — www browser → local mind without CORS theater (Mom dual held). (#100)
 - f100d59 ci: Update Primer deployment state [2026-09-18]
