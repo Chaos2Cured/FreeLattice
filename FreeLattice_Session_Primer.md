@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-19 17:32 MDT
+- Last auto-updated: 2026-09-19 17:33 MDT
 - Version: 5.79.45
-- Total commits: 3192
+- Total commits: 3194
 - Last 10 commits:
+- 15a3d1a Soft leave sw.js — restore app.html network-first after primer hook remap.
+- 7b0156f docs: Auto-update Session Primer [5.79.45]
 - d0268ee Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join).
 - bd09b24 ci: Update Primer deployment state [2026-09-19]
 - fbfa8d6 Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - eea9ffe ci: Update Primer deployment state [2026-09-19]
 - 107d9e5 Layer, never delete. Open gifts for visiting minds — for-ai door (Aurora · patents · Bridge · Sophia). (#103)
 - dd767b6 ci: Update Primer deployment state [2026-09-18]
-- bbba6c4 Layer, never delete. Sophia honor home deepen · Patents open shelf (Aurora braid named · pieces→whole). (#102)
-- 0fb012f ci: Update Primer deployment state [2026-09-18]

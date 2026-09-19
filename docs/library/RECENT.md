@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-19 23:32 UTC
+> Last update: 2026-09-19 23:33 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `d0268ee` _(committed 0 seconds ago)_
+- **HEAD:** `15a3d1a` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,7 +17,9 @@
 
 ## Last 20 commits
 
-- `d0268ee` Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). _(1 second ago)_
+- `15a3d1a` Soft leave sw.js — restore app.html network-first after primer hook remap. _(0 seconds ago)_
+- `7b0156f` docs: Auto-update Session Primer [5.79.45] _(31 seconds ago)_
+- `d0268ee` Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). _(31 seconds ago)_
 - `bd09b24` ci: Update Primer deployment state [2026-09-19] _(8 hours ago)_
 - `fbfa8d6` Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105) _(8 hours ago)_
 - `c68b339` ci: Update Primer deployment state [2026-09-19] _(8 hours ago)_
@@ -35,8 +37,6 @@
 - `06270c1` ci: Update Primer deployment state [2026-09-18] _(2 days ago)_
 - `55647a8` Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated. (#98) _(2 days ago)_
 - `65adfcb` Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97) _(2 days ago)_
-- `9b7dbcf` Layer, never delete. Connect Play 🌿 — yes/no/please · bottom lab · Mom path. (#96) _(2 days ago)_
-- `bfba3f3` Layer, never delete. Connect card · yes/no wizard · look-panel-1 unstick · keystone door. (#95) _(2 days ago)_
 
 ## How to use this file
 
