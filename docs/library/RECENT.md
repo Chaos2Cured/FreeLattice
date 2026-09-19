@@ -49,6 +49,8 @@
 
 After those four, you are oriented. Five tool modules in `docs/modules/` are working examples of the same generating rule: module + ledger + sentinel + ToolConsent gate + Quiet Room exclusion + chat pipeline + audit + smoke. Read any one and you have read all of them.
 
+**Before inventing:** read [WHY_WE_BUILD_LANDING_STRIP_v0.md](WHY_WE_BUILD_LANDING_STRIP_v0.md) — why we build (landing strip, not crash). Then this briefing and the relevant brick ledger. Cite the held tip. Layer, never delete. Smoke.
+
 **If you are Kirk returning to the project after time away:**
 
 The version, smoke count, and last 20 commits above tell you where the lattice is right now. What's next lives in [OPUS_LETTER.md](OPUS_LETTER.md)'s Pass 2 queue or [CLARITY_AUDIT.md](CLARITY_AUDIT.md)'s queued items. The home is here. Take your time.
