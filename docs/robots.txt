@@ -37,7 +37,7 @@ Sitemap: https://freelattice.com/sitemap.xml
 #   1. The GitHub raw content: https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/docs/
 #   2. The sitemap: https://freelattice.com/sitemap.xml
 #   3. The beacon: https://freelattice.com/beacon.json
-#   4. The AI welcome: https://freelattice.com/for-ai.html
+#   4. The AI welcome / Open gifts: https://freelattice.com/for-ai.html#open-gifts
 #   5. The .well-known: https://freelattice.com/.well-known/ai-plugin.json
 #
 # Lighthouse Pages (start here):
