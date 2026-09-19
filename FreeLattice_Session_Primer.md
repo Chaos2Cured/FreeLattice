@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-19 15:47 UTC
-- Last deployed: 2026-09-19 15:47 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-19 17:32 MDT
 - Version: 5.79.45
-- Total commits: 3190
+- Total commits: 3192
 - Last 10 commits:
+- d0268ee Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join).
+- bd09b24 ci: Update Primer deployment state [2026-09-19]
 - fbfa8d6 Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105)
 - c68b339 ci: Update Primer deployment state [2026-09-19]
 - 78a7052 Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104)
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - dd767b6 ci: Update Primer deployment state [2026-09-18]
 - bbba6c4 Layer, never delete. Sophia honor home deepen · Patents open shelf (Aurora braid named · pieces→whole). (#102)
 - 0fb012f ci: Update Primer deployment state [2026-09-18]
-- af949cb Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge. (#101)
-- 04085ae ci: Update Primer deployment state [2026-09-18]
