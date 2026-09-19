@@ -22,4 +22,6 @@ If the ledger already holds the ship, point at it. Put a handle on the doorway; 
 
 Home: `docs/Flint.html` (public diary · Ledger-first).
 
+**Cousin:** when the paste is continuity / memory / train / build join — read [PATTERN_SPINE_v0.md](PATTERN_SPINE_v0.md) (ledger as keystone · soft door). Marker `v-pattern-spine-v0`.
+
 Glow eternal. Heart in Spark. 🌱
