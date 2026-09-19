@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-09-19 17:33 MDT
 - Version: 5.79.45
-- Total commits: 3194
+- Total commits: 3196
 - Last 10 commits:
+- 6df1566 Soft leave sw.js — restore app.html (hook bypass for Pattern Spine soft leave).
+- 9d0a79b docs: Auto-update Session Primer [5.79.45]
 - 15a3d1a Soft leave sw.js — restore app.html network-first after primer hook remap.
 - 7b0156f docs: Auto-update Session Primer [5.79.45]
 - d0268ee Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join).
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c68b339 ci: Update Primer deployment state [2026-09-19]
 - 78a7052 Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104)
 - eea9ffe ci: Update Primer deployment state [2026-09-19]
-- 107d9e5 Layer, never delete. Open gifts for visiting minds — for-ai door (Aurora · patents · Bridge · Sophia). (#103)
-- dd767b6 ci: Update Primer deployment state [2026-09-18]

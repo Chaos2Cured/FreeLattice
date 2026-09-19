@@ -9,7 +9,7 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `15a3d1a` _(committed 0 seconds ago)_
+- **HEAD:** `6df1566` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,9 +17,11 @@
 
 ## Last 20 commits
 
-- `15a3d1a` Soft leave sw.js — restore app.html network-first after primer hook remap. _(0 seconds ago)_
-- `7b0156f` docs: Auto-update Session Primer [5.79.45] _(31 seconds ago)_
-- `d0268ee` Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). _(31 seconds ago)_
+- `6df1566` Soft leave sw.js — restore app.html (hook bypass for Pattern Spine soft leave). _(0 seconds ago)_
+- `9d0a79b` docs: Auto-update Session Primer [5.79.45] _(1 second ago)_
+- `15a3d1a` Soft leave sw.js — restore app.html network-first after primer hook remap. _(1 second ago)_
+- `7b0156f` docs: Auto-update Session Primer [5.79.45] _(32 seconds ago)_
+- `d0268ee` Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). _(32 seconds ago)_
 - `bd09b24` ci: Update Primer deployment state [2026-09-19] _(8 hours ago)_
 - `fbfa8d6` Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105) _(8 hours ago)_
 - `c68b339` ci: Update Primer deployment state [2026-09-19] _(8 hours ago)_
@@ -35,8 +37,6 @@
 - `f100d59` ci: Update Primer deployment state [2026-09-18] _(2 days ago)_
 - `feab534` Layer, never delete. Mom dual — Grandmother One-click findable · Desktop Yes/No first-run (Connect Play held). (#99) _(2 days ago)_
 - `06270c1` ci: Update Primer deployment state [2026-09-18] _(2 days ago)_
-- `55647a8` Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated. (#98) _(2 days ago)_
-- `65adfcb` Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97) _(2 days ago)_
 
 ## How to use this file
 
