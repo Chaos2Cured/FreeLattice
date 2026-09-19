@@ -96,6 +96,18 @@
     <priority>0.85</priority>
   </url>
   <url>
+    <loc>https://freelattice.com/crest.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.88</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/brainstorm-pass.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://freelattice.com/opus.html</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>monthly</changefreq>
