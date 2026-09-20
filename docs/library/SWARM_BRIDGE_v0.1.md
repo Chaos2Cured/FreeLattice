@@ -7,6 +7,8 @@ Layers on [VERIFIED_IMPORT_v0.1.md](./VERIFIED_IMPORT_v0.1.md), [MODEL_MANIFEST_
 
 **This PR shipped:** desktop WebTorrent/BitTorrent bridge in **main** → quarantine → existing `lattice-import` hash promote → user-gesture Import. **Layered:** [SWARM_RESEED_v0.1.md](./SWARM_RESEED_v0.1.md) — share verified files back to the swarm (gesture). **Layered:** [PHONE_SWARM_v0.1.md](./PHONE_SWARM_v0.1.md) — browser/phone pull + hash before trust (no Import to Ollama).
 
+**Stigmergy cousin:** hash-before-trust is stigmergy-with-teeth — see [STIGMERGY_SHAMIR_COUSINS_v0.md](./STIGMERGY_SHAMIR_COUSINS_v0.md).
+
 ---
 
 ## Why
