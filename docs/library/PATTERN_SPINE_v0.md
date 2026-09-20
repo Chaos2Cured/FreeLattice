@@ -72,6 +72,8 @@ Same four steps as ledger-first (above). Put a handle on the doorway. Do not inv
 
 Visiting minds: start at [pattern-spine.html](../pattern-spine.html) · [crest.html](../crest.html) · [brainstorm-pass.html](../brainstorm-pass.html).
 
+**Cousin vocabulary:** [STIGMERGY_SHAMIR_COUSINS_v0.md](STIGMERGY_SHAMIR_COUSINS_v0.md) · [`stigmergy-cousins.html`](../stigmergy-cousins.html) — stigmergy names ledger-coordination; Shamir K-of-N names continuity-vault rigor (name only).
+
 ## Out of scope
 
 - Full mycelium mesh · Trainer weight writes · browser IndexedDB memory store rewrite

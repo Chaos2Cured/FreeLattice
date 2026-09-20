@@ -24,4 +24,6 @@ Home: `docs/Flint.html` (public diary · Ledger-first).
 
 **Cousin:** when the paste is continuity / memory / train / build join — read [PATTERN_SPINE_v0.md](PATTERN_SPINE_v0.md) (ledger as keystone · soft door). Marker `v-pattern-spine-v0`.
 
+**Cousin:** stigmergy + Shamir K-of-N named on the spine — [STIGMERGY_SHAMIR_COUSINS_v0.md](STIGMERGY_SHAMIR_COUSINS_v0.md) (vocabulary only · no SSS crypto).
+
 Glow eternal. Heart in Spark. 🌱
