@@ -71,6 +71,8 @@ Soft habit, not bureaucracy. The paste that skips the ledger wastes the window.
 
 See [LEDGER_FIRST_BUILD_v0.md](LEDGER_FIRST_BUILD_v0.md).
 
+**Cousin:** [PATTERN_SPINE_v0.md](PATTERN_SPINE_v0.md) — ledger joins memory · train · build; soft public face [`pattern-spine.html`](../pattern-spine.html).
+
 ## Soft leave classic FreeLattice
 
 Classic FreeLattice stays. If theLatticeTree becomes a primary face later, this house is not deleted. Layer. Do not replace the kitchen to make a speech. Soft leave `sw.js`.
