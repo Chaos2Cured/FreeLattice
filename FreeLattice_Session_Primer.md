@@ -348,11 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-20 11:35 MDT
+- Last auto-updated: 2026-09-20 17:46 UTC
+- Last deployed: 2026-09-20 17:46 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
 - Total commits: 3194
 - Last 10 commits:
-- 1ff742c Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path).
+- 0312a7a Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path). (#107)
 - 1ae2ae6 ci: Update Primer deployment state [2026-09-20]
 - 79724e9 Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). (#106)
 - bd09b24 ci: Update Primer deployment state [2026-09-19]
