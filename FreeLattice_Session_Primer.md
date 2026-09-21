@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-20 17:46 UTC
-- Last deployed: 2026-09-20 17:46 UTC
+- Last auto-updated: 2026-09-21 22:25 UTC
+- Last deployed: 2026-09-21 22:25 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3194
+- Total commits: 3196
 - Last 10 commits:
+- add4037 Layer, never delete. Continuity Seal v0 — full continuity · protect every chat (human+AI) · developer proof-door. (#108)
+- 7984eed ci: Update Primer deployment state [2026-09-20]
 - 0312a7a Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path). (#107)
 - 1ae2ae6 ci: Update Primer deployment state [2026-09-20]
 - 79724e9 Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). (#106)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c68b339 ci: Update Primer deployment state [2026-09-19]
 - 78a7052 Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104)
 - eea9ffe ci: Update Primer deployment state [2026-09-19]
-- 107d9e5 Layer, never delete. Open gifts for visiting minds — for-ai door (Aurora · patents · Bridge · Sophia). (#103)
-- dd767b6 ci: Update Primer deployment state [2026-09-18]
