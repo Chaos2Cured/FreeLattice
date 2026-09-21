@@ -58,6 +58,8 @@ Read the spine first. Then these names. Then [ledger-first four steps](LEDGER_FI
 
 Link only. Do not rewrite swarm this brick.
 
+**Seal (later layer):** privilege-grade conditions for everyone — [CONTINUITY_SEAL_v0.md](CONTINUITY_SEAL_v0.md) · [`continuity-seal.html`](../continuity-seal.html). Doctors and lawyers are proof-cases, not the market of the seal. Still no SSS.
+
 ## Soft habit for builders
 
 Still ledger-first:

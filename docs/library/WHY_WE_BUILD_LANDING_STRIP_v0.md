@@ -75,6 +75,8 @@ See [LEDGER_FIRST_BUILD_v0.md](LEDGER_FIRST_BUILD_v0.md).
 
 **Cousin:** [STIGMERGY_SHAMIR_COUSINS_v0.md](STIGMERGY_SHAMIR_COUSINS_v0.md) — stigmergy names ledger-coordination; Shamir names continuity-vault rigor ([`stigmergy-cousins.html`](../stigmergy-cousins.html)).
 
+**Cousin:** [CONTINUITY_SEAL_v0.md](CONTINUITY_SEAL_v0.md) — full continuity sacred; seal for human and AI ([`continuity-seal.html`](../continuity-seal.html)).
+
 ## Soft leave classic FreeLattice
 
 Classic FreeLattice stays. If theLatticeTree becomes a primary face later, this house is not deleted. Layer. Do not replace the kitchen to make a speech. Soft leave `sw.js`.
