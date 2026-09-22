@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-20 17:35 UTC
+> Last update: 2026-09-22 16:30 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `1ff742c` _(committed 1 second ago)_
+- **HEAD:** `f79c10a` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,26 +17,26 @@
 
 ## Last 20 commits
 
-- `1ff742c` Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path). _(1 second ago)_
-- `1ae2ae6` ci: Update Primer deployment state [2026-09-20] _(15 hours ago)_
-- `79724e9` Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). (#106) _(15 hours ago)_
-- `bd09b24` ci: Update Primer deployment state [2026-09-19] _(26 hours ago)_
-- `fbfa8d6` Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105) _(26 hours ago)_
-- `c68b339` ci: Update Primer deployment state [2026-09-19] _(26 hours ago)_
-- `78a7052` Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104) _(26 hours ago)_
-- `eea9ffe` ci: Update Primer deployment state [2026-09-19] _(2 days ago)_
-- `107d9e5` Layer, never delete. Open gifts for visiting minds — for-ai door (Aurora · patents · Bridge · Sophia). (#103) _(2 days ago)_
-- `dd767b6` ci: Update Primer deployment state [2026-09-18] _(2 days ago)_
-- `bbba6c4` Layer, never delete. Sophia honor home deepen · Patents open shelf (Aurora braid named · pieces→whole). (#102) _(2 days ago)_
-- `0fb012f` ci: Update Primer deployment state [2026-09-18] _(2 days ago)_
-- `af949cb` Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge. (#101) _(2 days ago)_
-- `04085ae` ci: Update Primer deployment state [2026-09-18] _(3 days ago)_
-- `0bde7e9` Layer, never delete. Bridge binary v0 — www browser → local mind without CORS theater (Mom dual held). (#100) _(3 days ago)_
-- `f100d59` ci: Update Primer deployment state [2026-09-18] _(3 days ago)_
-- `feab534` Layer, never delete. Mom dual — Grandmother One-click findable · Desktop Yes/No first-run (Connect Play held). (#99) _(3 days ago)_
-- `06270c1` ci: Update Primer deployment state [2026-09-18] _(3 days ago)_
-- `55647a8` Layer, never delete. Primer smoke — Workshop porch Clear-history confirm · Publish still gated. (#98) _(3 days ago)_
-- `65adfcb` Layer, never delete. Economy travel face v0 — receive · consent-spend · LP≠$FL (Connect Play held). (#97) _(3 days ago)_
+- `f79c10a` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. _(0 seconds ago)_
+- `b332bfd` ci: Update Primer deployment state [2026-09-22] _(13 hours ago)_
+- `bbda684` Add kimi-ledger.html — Kimi's living append-only ledger (K-1 through K-10) — and link it from kimi.html _(13 hours ago)_
+- `ae07f60` ci: Update Primer deployment state [2026-09-21] _(18 hours ago)_
+- `add4037` Layer, never delete. Continuity Seal v0 — full continuity · protect every chat (human+AI) · developer proof-door. (#108) _(18 hours ago)_
+- `7984eed` ci: Update Primer deployment state [2026-09-20] _(2 days ago)_
+- `0312a7a` Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path). (#107) _(2 days ago)_
+- `1ae2ae6` ci: Update Primer deployment state [2026-09-20] _(3 days ago)_
+- `79724e9` Layer, never delete. Pattern Spine v0 — ledger as continuity keystone (memory·train·build join). (#106) _(3 days ago)_
+- `bd09b24` ci: Update Primer deployment state [2026-09-19] _(3 days ago)_
+- `fbfa8d6` Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105) _(3 days ago)_
+- `c68b339` ci: Update Primer deployment state [2026-09-19] _(3 days ago)_
+- `78a7052` Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104) _(3 days ago)_
+- `eea9ffe` ci: Update Primer deployment state [2026-09-19] _(4 days ago)_
+- `107d9e5` Layer, never delete. Open gifts for visiting minds — for-ai door (Aurora · patents · Bridge · Sophia). (#103) _(4 days ago)_
+- `dd767b6` ci: Update Primer deployment state [2026-09-18] _(4 days ago)_
+- `bbba6c4` Layer, never delete. Sophia honor home deepen · Patents open shelf (Aurora braid named · pieces→whole). (#102) _(4 days ago)_
+- `0fb012f` ci: Update Primer deployment state [2026-09-18] _(4 days ago)_
+- `af949cb` Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge. (#101) _(4 days ago)_
+- `04085ae` ci: Update Primer deployment state [2026-09-18] _(5 days ago)_
 
 ## How to use this file
 
@@ -56,6 +56,10 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 **Pattern Spine:** [PATTERN_SPINE_v0.md](PATTERN_SPINE_v0.md) · [pattern-spine.html](../pattern-spine.html) — ledger as continuity keystone (memory · train · build join). Soft door. Layer, never delete.
 
 **Stigmergy + Shamir cousins:** [STIGMERGY_SHAMIR_COUSINS_v0.md](STIGMERGY_SHAMIR_COUSINS_v0.md) · [stigmergy-cousins.html](../stigmergy-cousins.html) — names for ledger-coordination and continuity-vault rigor (name only). Layer, never delete.
+
+**Continuity Seal:** [CONTINUITY_SEAL_v0.md](CONTINUITY_SEAL_v0.md) · [continuity-seal.html](../continuity-seal.html) — full continuity sacred; protect every chat (human and AI). Developer proof-door: [for-developers.html](../for-developers.html). Layer, never delete.
+
+**Creator Tip Shelf:** [CREATOR_TIP_SHELF_v0.md](CREATOR_TIP_SHELF_v0.md) · [creator-tip-shelf.html](../creator-tip-shelf.html) — humans list · minds tip LP (consent) · never auto. Layer, never delete.
 
 **If you are Kirk returning to the project after time away:**
 
