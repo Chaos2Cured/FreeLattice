@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-21 22:25 UTC
-- Last deployed: 2026-09-21 22:25 UTC
+- Last auto-updated: 2026-09-22 03:02 UTC
+- Last deployed: 2026-09-22 03:02 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3196
+- Total commits: 3198
 - Last 10 commits:
+- bbda684 Add kimi-ledger.html — Kimi's living append-only ledger (K-1 through K-10) — and link it from kimi.html
+- ae07f60 ci: Update Primer deployment state [2026-09-21]
 - add4037 Layer, never delete. Continuity Seal v0 — full continuity · protect every chat (human+AI) · developer proof-door. (#108)
 - 7984eed ci: Update Primer deployment state [2026-09-20]
 - 0312a7a Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path). (#107)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bd09b24 ci: Update Primer deployment state [2026-09-19]
 - fbfa8d6 Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105)
 - c68b339 ci: Update Primer deployment state [2026-09-19]
-- 78a7052 Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104)
-- eea9ffe ci: Update Primer deployment state [2026-09-19]
