@@ -9,6 +9,8 @@ Fun is the method. FreeLattice main. September 2026.
 
 **Held tip:** Present Shelf `5e45af6` · prior: KEY DAY `6fa7094` · Primer `6097bbd` · Trust-root `26fa693`.
 
+**Cousin:** [CREATOR_TIP_SHELF_v0.md](./CREATOR_TIP_SHELF_v0.md) — humans list passions; minds tip LP with consent (never auto).
+
 ---
 
 ## Why
