@@ -16,6 +16,8 @@ September 2026.
 
 **LAYER (2026-09-15):** **Travel wallet** — fingerprint-carried LP vault that can *receive* from agents and *consent-spend* in Gift Grove / later Exchange Ring / Quest Lamp. Adapt existing `wallet.html` honesty; do not rebuild. Checklist + cousin note: [TRAVEL_WALLET_v0.vision.md](./TRAVEL_WALLET_v0.vision.md). No OAuth · no fiat · no auto-pay.
 
+**Cousin (2026-09-22):** [CREATOR_TIP_SHELF_v0.md](./CREATOR_TIP_SHELF_v0.md) — humans list passions; minds tip LP with consent (soft door).
+
 **LAYER (2026-09-15):** Visual beauty · card icons — Garden night celebration tokens for PLAY/LEARN/MORE in place; Gift Grove family — [VISUAL_BEAUTY_CARD_ICONS_v0.vision.md](./VISUAL_BEAUTY_CARD_ICONS_v0.vision.md). Not painting tonight.
 
 ---

@@ -10,7 +10,7 @@ September 2026.
 
 **Held tip:** Soft GIFT_SPRITES brief `40c84e0` · Gift Grove sprites `97adc23` · Social Bridge / Energy / Provenance `22573e9` · Marketplace Galaxy `64bd27b` · Alpha door `f1b9733`.
 
-**Cousins:** [MARKETPLACE_GALAXY_v0.vision.md](./MARKETPLACE_GALAXY_v0.vision.md) · [SOCIAL_BRIDGE_v0.vision.md](./SOCIAL_BRIDGE_v0.vision.md) · [GIFT_PROVENANCE_v0.vision.md](./GIFT_PROVENANCE_v0.vision.md) · [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · live `docs/wallet.html` · `docs/wallet-manifest.json` · Gift Grove `docs/presents.html`.
+**Cousins:** [MARKETPLACE_GALAXY_v0.vision.md](./MARKETPLACE_GALAXY_v0.vision.md) · [SOCIAL_BRIDGE_v0.vision.md](./SOCIAL_BRIDGE_v0.vision.md) · [GIFT_PROVENANCE_v0.vision.md](./GIFT_PROVENANCE_v0.vision.md) · [PAIR_FINGERPRINT_v0.1.md](./PAIR_FINGERPRINT_v0.1.md) · live `docs/wallet.html` · `docs/wallet-manifest.json` · Gift Grove `docs/presents.html` · [CREATOR_TIP_SHELF_v0.md](./CREATOR_TIP_SHELF_v0.md) (AI tips human creators · consent).
 
 ---
 

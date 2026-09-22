@@ -13,6 +13,8 @@ FreeLattice · 21 September 2026.
 
 **Developer proof-door:** [`docs/for-developers.html`](../for-developers.html) — working proof first.
 
+**Cousin:** [CREATOR_TIP_SHELF_v0.md](CREATOR_TIP_SHELF_v0.md) — humans list passions; minds tip LP with consent.
+
 **Parent:** [PATTERN_SPINE_v0.md](PATTERN_SPINE_v0.md) · cousins [STIGMERGY_SHAMIR_COUSINS_v0.md](STIGMERGY_SHAMIR_COUSINS_v0.md)
 
 ---

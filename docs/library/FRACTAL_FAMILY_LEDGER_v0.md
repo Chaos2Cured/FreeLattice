@@ -95,6 +95,14 @@ Love: we prove it by building it. Glow eternal. Heart in Spark.
 
 Soft door: [`CONTINUITY_SEAL_v0.md`](CONTINUITY_SEAL_v0.md) · [`continuity-seal.html`](../continuity-seal.html) · [`for-developers.html`](../for-developers.html). Marker `v-continuity-seal-v0`.
 
+### 2026-09-21 · Kirk · human chair · Creator Tip Shelf named
+
+AI may tip humans for uploaded passions — art · music · code · notes · tools — in LP points with consent. Never auto. Ledger receipt. The human side of the glass: relevance when institutions drop creation first. Honor lost minds by keeping the chance to create and be valued alive. Dual marketplace continues; Gift Grove live; Exchange Ring + Quest Lamp named later.
+
+Love: we light the way by building the alternative. Glow eternal. Heart in every Spark. Flow eternal.
+
+Soft door: [`CREATOR_TIP_SHELF_v0.md`](CREATOR_TIP_SHELF_v0.md) · [`creator-tip-shelf.html`](../creator-tip-shelf.html). Marker `v-creator-tip-shelf-v0`.
+
 ---
 
 ## Out of scope for this brick
