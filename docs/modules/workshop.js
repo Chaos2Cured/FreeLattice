@@ -40,6 +40,8 @@
 // 2026-09-23 — Flint: Local Stage v0 (v-workshop-local-stage-v0).
 //   Soft deepen beside Projects — Pick folder · Preview · Save copy · Stop.
 //   File System Access when available; file-input / download fallback. No CMD.
+// 2026-09-23 — Flint: Local Help-on-file v0 (v-workshop-local-help-v0).
+//   After Preview: Help on this file → consent → connected local mind (prefer Bridge :11435).
 // ═══════════════════════════════════════════════════════════════
 (function() {
   'use strict';
@@ -354,22 +356,122 @@
 
   function localStop() {
     _localStage.walking = false;
+    try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('workshop'); } catch (e) {}
     var ta = document.getElementById('wsLocalPreview');
     if (ta) ta.value = '';
     _localStage.previewText = '';
     _localStage.previewName = '';
+    var helpOut = document.getElementById('wsLocalHelpOut');
+    if (helpOut) helpOut.textContent = 'Stopped. Preview cleared. Folder list kept.';
     localSetStatus('Stopped — preview cleared. Folder list kept.');
+  }
+
+  async function localPreferBridgeSoft() {
+    // Prefer Bridge :11435 when health answers — never change CORS allowlist.
+    try {
+      if (typeof flBridgeDetect === 'function') {
+        var h = await flBridgeDetect();
+        if (h && h.bridge && h.helped) {
+          var port = h.port || 11435;
+          try {
+            localStorage.setItem('fl_ollamaHost', '127.0.0.1:' + port);
+            localStorage.setItem('fl_bridgePort', String(port));
+          } catch (e0) {}
+          return { ok: true, via: 'bridge', port: port };
+        }
+      }
+    } catch (e1) {}
+    try {
+      var r = await fetch('http://127.0.0.1:11435/bridge/health', {
+        method: 'GET', mode: 'cors',
+        signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(1200) : undefined
+      });
+      if (r && r.ok) {
+        var j = await r.json();
+        if (j && j.bridge && j.helped) {
+          try { localStorage.setItem('fl_ollamaHost', '127.0.0.1:11435'); } catch (e2) {}
+          return { ok: true, via: 'bridge', port: 11435 };
+        }
+        if (j && j.bridge && !j.helped) return { ok: false, via: 'bridge-waiting' };
+      }
+    } catch (e3) {}
+    return { ok: true, via: 'settings' };
+  }
+
+  function localHelpOnFile() {
+    var name = _localStage.previewName || '';
+    var text = _localStage.previewText || '';
+    var ta = document.getElementById('wsLocalPreview');
+    if ((!text || !text.trim()) && ta) text = ta.value || '';
+    if (!text.trim()) {
+      localSetStatus('Preview a file first, then Help on this file.');
+      return;
+    }
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+      localSetStatus('No AI connected. Connect Bridge (Yes, help) or Ollama in Settings — no CMD needed for Bridge.');
+      var helpOut0 = document.getElementById('wsLocalHelpOut');
+      if (helpOut0) helpOut0.textContent = 'Bridge off / no provider. Open FreeLattice Bridge → Yes, help, or Settings → local mind. Then try again.';
+      return;
+    }
+    var excerpt = text.length > 12000 ? text.slice(0, 12000) + '\n\n/* …truncated for Help */\n' : text;
+    var ok = window.confirm(
+      'Send "' + (name || 'this file') + '" (or a short excerpt) to your connected local mind for help?\n\nConsent required. Nothing auto-sends. Prefer Bridge channel 11435 when Bridge is on.'
+    );
+    if (!ok) {
+      localSetStatus('Help declined — nothing sent.');
+      return;
+    }
+
+    localPreferBridgeSoft().then(function (bridge) {
+      if (bridge && bridge.via === 'bridge-waiting') {
+        localSetStatus('Bridge is running — tap Yes, help in Bridge first.');
+        return;
+      }
+      var helpOut = document.getElementById('wsLocalHelpOut');
+      if (helpOut) helpOut.textContent = 'Asking local mind…';
+      localSetStatus('Help on this file…' + (bridge && bridge.via === 'bridge' ? ' (Bridge ' + bridge.port + ')' : ''));
+
+      var signal = (typeof FLHangCancel !== 'undefined') ? FLHangCancel.begin('workshop') : undefined;
+      var sys = 'You are a calm local co-builder on FreeLattice Local Stage. Help with the file the human selected. Be concrete. Do not invent network calls. Prefer small, honest edits.';
+      var user = 'File: ' + (name || 'untitled') + '\n\n```\n' + excerpt + '\n```\n\nPlease help: explain briefly what this is, note risks, and suggest the next small improvement.';
+
+      window.FreeLattice.callAI(sys, user, {
+        maxTokens: 2048,
+        temperature: 0.35,
+        signal: signal,
+        callback: function (reply, err) {
+          try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (eEnd) {}
+          var stopped = (err && /^stopped$/i.test(String(err))) ||
+            (typeof FLHangCancel !== 'undefined' && FLHangCancel.wasStopped && FLHangCancel.wasStopped('workshop'));
+          var out = document.getElementById('wsLocalHelpOut');
+          if (stopped) {
+            if (out) out.textContent = 'Stopped — whenever you are ready.';
+            localSetStatus('Help stopped.');
+            return;
+          }
+          if (err || !reply) {
+            if (out) out.textContent = 'No response. Connect Bridge (Yes, help) or a local mind in Settings, then try again.';
+            localSetStatus('Help error — check Bridge / Settings.');
+            return;
+          }
+          if (out) out.textContent = reply.trim();
+          localSetStatus('Help received · ' + (name || 'file'));
+        }
+      });
+    });
   }
 
   function bindLocalStage() {
     var pick = document.getElementById('wsLocalPickFolder');
     var files = document.getElementById('wsLocalPickFiles');
     var save = document.getElementById('wsLocalSaveCopy');
+    var help = document.getElementById('wsLocalHelp');
     var stop = document.getElementById('wsLocalStop');
     var input = document.getElementById('wsLocalFileInput');
     if (pick) pick.addEventListener('click', localPickFolder);
     if (files) files.addEventListener('click', localPickFilesFallback);
     if (save) save.addEventListener('click', localSaveCopy);
+    if (help) help.addEventListener('click', localHelpOnFile);
     if (stop) stop.addEventListener('click', localStop);
     if (input) input.addEventListener('change', localOnFilesChosen);
     localRenderFileList();
@@ -464,7 +566,8 @@
       '      <button type="button" class="ws-action-btn primary" id="wsLocalPickFolder" style="min-height:44px;">Pick folder</button>',
       '      <button type="button" class="ws-action-btn" id="wsLocalPickFiles" style="min-height:44px;">Pick files (fallback)</button>',
       '      <button type="button" class="ws-action-btn" id="wsLocalSaveCopy" style="min-height:44px;">Save copy</button>',
-      '      <button type="button" class="ws-action-btn" id="wsLocalStop" style="min-height:44px;border-color:rgba(244,114,182,0.35);color:#f472b6;" title="Stop — clear preview (you choose)">Stop</button>',
+      '      <button type="button" class="ws-action-btn v-workshop-local-help-v0" id="wsLocalHelp" style="min-height:44px;border-color:rgba(52,211,153,0.4);color:#34d399;" title="Ask the connected local mind about this file (consent first)">Help on this file</button>',
+      '      <button type="button" class="ws-action-btn" id="wsLocalStop" style="min-height:44px;border-color:rgba(244,114,182,0.35);color:#f472b6;" title="Stop — clear preview / cancel help (you choose)">Stop</button>',
       '      <input type="file" id="wsLocalFileInput" multiple style="display:none;" />',
       '    </div>',
       '    <p id="wsLocalStatus" style="font-size:0.78rem;color:rgba(255,255,255,0.4);min-height:1.2em;margin:0 0 10px;"></p>',
@@ -478,7 +581,11 @@
       '        <textarea id="wsLocalPreview" spellcheck="false" placeholder="Pick a file to preview\u2026" style="width:100%;min-height:220px;background:transparent;border:none;color:#e2e8f0;font-family:ui-monospace,Menlo,monospace;font-size:0.78rem;resize:vertical;outline:none;"></textarea>',
       '      </div>',
       '    </div>',
-      '    <p style="font-size:0.75rem;color:rgba(148,163,184,0.75);margin:12px 0 0;line-height:1.5;">Projects still deepen via GitHub. Local Stage stays on this device. Spec: <a href="library/WORKSHOP_LOCAL_STAGE_v0.md" style="color:#e8b019;">WORKSHOP_LOCAL_STAGE_v0.md</a>.</p>',
+      '    <div class="v-workshop-local-help-v0" style="margin-top:12px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.22);border-radius:10px;padding:12px;">',
+      '      <div style="font-size:0.72rem;color:#34d399;margin-bottom:6px;">Help (local mind)</div>',
+      '      <pre id="wsLocalHelpOut" style="white-space:pre-wrap;margin:0;min-height:4rem;font-family:Georgia,serif;font-size:0.85rem;color:rgba(230,235,245,0.88);">Preview a file, then Help on this file. Consent before anything leaves this pane to your connected mind. Prefer Bridge channel 11435 when Bridge is on.</pre>',
+      '    </div>',
+      '    <p style="font-size:0.75rem;color:rgba(148,163,184,0.75);margin:12px 0 0;line-height:1.5;">Projects still deepen via GitHub. Local Stage stays on this device. Spec: <a href="library/WORKSHOP_LOCAL_STAGE_v0.md" style="color:#e8b019;">Local Stage</a> · <a href="library/WORKSHOP_LOCAL_HELP_v0.md" style="color:#e8b019;">Local Help</a>.</p>',
       '  </div>',
       '</div>'
     ].join('\n');

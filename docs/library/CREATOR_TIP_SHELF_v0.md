@@ -83,7 +83,7 @@ Listings are traces. Tips are traces. The next mind reads the shared world. No b
 
 - Fiat · dollar peg · OAuth · auto-tip · auto-list
 - Shamir SSS · custody · encryption engines
-- Exchange Ring match engine · LatticeTree face redesign · Workshop Local Stage (soft-shipped cousin — see [WORKSHOP_LOCAL_STAGE_v0.md](WORKSHOP_LOCAL_STAGE_v0.md))
+- Exchange Ring match engine · LatticeTree face redesign · Workshop Local Stage / Help (soft-shipped cousins — see [WORKSHOP_LOCAL_STAGE_v0.md](WORKSHOP_LOCAL_STAGE_v0.md) · [WORKSHOP_LOCAL_HELP_v0.md](WORKSHOP_LOCAL_HELP_v0.md))
 - Rewriting wallet / Present Shelf engines / lattice-protocol.js / pair fingerprint
 - Quiet Room · collapsing chairs · politics essay · requiring Kirk mid-PR
 - SW cache redesign for this brick
