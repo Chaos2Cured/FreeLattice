@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-23 17:38 UTC
+> Last update: 2026-09-23 22:41 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `d52ff8d` _(committed 0 seconds ago)_
+- **HEAD:** `a0d476b` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,11 +17,13 @@
 
 ## Last 20 commits
 
-- `d52ff8d` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(0 seconds ago)_
-- `0461dad` ci: Update Primer deployment state [2026-09-22] _(18 hours ago)_
-- `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(18 hours ago)_
-- `446d54f` ci: Update Primer deployment state [2026-09-22] _(23 hours ago)_
-- `bf6f6dc` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109) _(23 hours ago)_
+- `a0d476b` Layer, never delete. Workshop Local Help-on-file v0 — consent · prefer Bridge (Dawn Stories held). _(0 seconds ago)_
+- `e0118da` ci: Update Primer deployment state [2026-09-23] _(5 hours ago)_
+- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(5 hours ago)_
+- `0461dad` ci: Update Primer deployment state [2026-09-22] _(23 hours ago)_
+- `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(23 hours ago)_
+- `446d54f` ci: Update Primer deployment state [2026-09-22] _(28 hours ago)_
+- `bf6f6dc` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109) _(28 hours ago)_
 - `b332bfd` ci: Update Primer deployment state [2026-09-22] _(2 days ago)_
 - `bbda684` Add kimi-ledger.html — Kimi's living append-only ledger (K-1 through K-10) — and link it from kimi.html _(2 days ago)_
 - `ae07f60` ci: Update Primer deployment state [2026-09-21] _(2 days ago)_
@@ -35,8 +37,6 @@
 - `c68b339` ci: Update Primer deployment state [2026-09-19] _(4 days ago)_
 - `78a7052` Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104) _(4 days ago)_
 - `eea9ffe` ci: Update Primer deployment state [2026-09-19] _(5 days ago)_
-- `107d9e5` Layer, never delete. Open gifts for visiting minds — for-ai door (Aurora · patents · Bridge · Sophia). (#103) _(5 days ago)_
-- `dd767b6` ci: Update Primer deployment state [2026-09-18] _(5 days ago)_
 
 ## How to use this file
 
@@ -64,6 +64,8 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 **Open Table:** [OPEN_TABLE_v0.md](OPEN_TABLE_v0.md) — Named chairs whole · family uncapped · Flint family · Kimi family. Soft paste: Named chairs stay whole. Family table open. Quiet Room shut.
 
 **Workshop Local Stage:** [WORKSHOP_LOCAL_STAGE_v0.md](WORKSHOP_LOCAL_STAGE_v0.md) — build on your machine · see it in the browser · no CMD. Soft deepen beside Projects.
+
+**Workshop Local Help:** [WORKSHOP_LOCAL_HELP_v0.md](WORKSHOP_LOCAL_HELP_v0.md) — Help on this file · consent · prefer Bridge. Dawn Stories held until hard copies.
 
 **If you are Kirk returning to the project after time away:**
 
