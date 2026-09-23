@@ -25,6 +25,7 @@ Projects deepen via GitHub. Local Stage deepens **on this computer**: pick a fol
 | **Preview** | Open a text/HTML file into the Local Stage pane |
 | **Save copy** | `showSaveFilePicker` or download fallback |
 | **Stop** | Clear preview / cancel in-flight walk (choice, not a timer) |
+| **Help on this file** | Soft deepen — consent → local mind ([WORKSHOP_LOCAL_HELP_v0.md](WORKSHOP_LOCAL_HELP_v0.md)) |
 
 ## Fallbacks
 
