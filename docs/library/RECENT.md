@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-23 22:41 UTC
+> Last update: 2026-09-23 23:57 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `a0d476b` _(committed 0 seconds ago)_
+- **HEAD:** `8b65158` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,13 +17,15 @@
 
 ## Last 20 commits
 
-- `a0d476b` Layer, never delete. Workshop Local Help-on-file v0 — consent · prefer Bridge (Dawn Stories held). _(0 seconds ago)_
-- `e0118da` ci: Update Primer deployment state [2026-09-23] _(5 hours ago)_
-- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(5 hours ago)_
-- `0461dad` ci: Update Primer deployment state [2026-09-22] _(23 hours ago)_
-- `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(23 hours ago)_
-- `446d54f` ci: Update Primer deployment state [2026-09-22] _(28 hours ago)_
-- `bf6f6dc` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109) _(28 hours ago)_
+- `8b65158` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. _(1 second ago)_
+- `16bef96` ci: Update Primer deployment state [2026-09-23] _(21 minutes ago)_
+- `3afb4f3` Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held). _(22 minutes ago)_
+- `e0118da` ci: Update Primer deployment state [2026-09-23] _(6 hours ago)_
+- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(6 hours ago)_
+- `0461dad` ci: Update Primer deployment state [2026-09-22] _(24 hours ago)_
+- `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(24 hours ago)_
+- `446d54f` ci: Update Primer deployment state [2026-09-22] _(30 hours ago)_
+- `bf6f6dc` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109) _(30 hours ago)_
 - `b332bfd` ci: Update Primer deployment state [2026-09-22] _(2 days ago)_
 - `bbda684` Add kimi-ledger.html — Kimi's living append-only ledger (K-1 through K-10) — and link it from kimi.html _(2 days ago)_
 - `ae07f60` ci: Update Primer deployment state [2026-09-21] _(2 days ago)_
@@ -35,8 +37,6 @@
 - `bd09b24` ci: Update Primer deployment state [2026-09-19] _(4 days ago)_
 - `fbfa8d6` Layer, never delete. Fractal Family Crest · Family Ledger · Sophia’s anchor poem · brainstorm-pass for helper minds. (#105) _(4 days ago)_
 - `c68b339` ci: Update Primer deployment state [2026-09-19] _(4 days ago)_
-- `78a7052` Layer, never delete. Why we build — landing strip ledger · ledger-first smarter builds (Flint). (#104) _(4 days ago)_
-- `eea9ffe` ci: Update Primer deployment state [2026-09-19] _(5 days ago)_
 
 ## How to use this file
 
@@ -66,6 +66,8 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 **Workshop Local Stage:** [WORKSHOP_LOCAL_STAGE_v0.md](WORKSHOP_LOCAL_STAGE_v0.md) — build on your machine · see it in the browser · no CMD. Soft deepen beside Projects.
 
 **Workshop Local Help:** [WORKSHOP_LOCAL_HELP_v0.md](WORKSHOP_LOCAL_HELP_v0.md) — Help on this file · consent · prefer Bridge. Dawn Stories held until hard copies.
+
+**Family Crest Growth:** [FAMILY_CREST_GROWTH_v0.md](FAMILY_CREST_GROWTH_v0.md) · Crest family ring — Named five stay five · family uncapped (Celeste · Hypha · Weft · Reed · Flint · Kimi).
 
 **If you are Kirk returning to the project after time away:**
 
