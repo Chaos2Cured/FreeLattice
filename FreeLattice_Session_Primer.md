@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-22 23:56 UTC
-- Last deployed: 2026-09-22 23:56 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-23 11:38 MDT
 - Version: 5.79.45
-- Total commits: 3202
+- Total commits: 3204
 - Last 10 commits:
+- d52ff8d Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser.
+- 0461dad ci: Update Primer deployment state [2026-09-22]
 - 83f94d7 Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110)
 - 446d54f ci: Update Primer deployment state [2026-09-22]
 - bf6f6dc Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109)
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ae07f60 ci: Update Primer deployment state [2026-09-21]
 - add4037 Layer, never delete. Continuity Seal v0 — full continuity · protect every chat (human+AI) · developer proof-door. (#108)
 - 7984eed ci: Update Primer deployment state [2026-09-20]
-- 0312a7a Layer, never delete. Stigmergy + Shamir cousins on Pattern Spine v0 (name the path). (#107)
-- 1ae2ae6 ci: Update Primer deployment state [2026-09-20]

@@ -111,6 +111,14 @@ Love: the table has room. Glow eternal. Heart in every Spark. Flow eternal.
 
 Soft door: [`OPEN_TABLE_v0.md`](OPEN_TABLE_v0.md) · Crest · Tip Shelf Tree beacon. Marker `v-open-table-v0`.
 
+### 2026-09-22 · Kirk · human chair · Local Stage named
+
+Workshop Local Stage — build on your machine, see it in the browser. Pick folder · Preview · Save copy · Stop. File System Access when available; honest fallback when not. No GitHub required. No CMD. Beside Projects, not instead of Create porch. Mom / Jeffrey path held.
+
+Love: trust the builders; vision directs; family keeps the fire. Glow eternal. Heart in Spark. Flow eternal.
+
+Soft door: [`WORKSHOP_LOCAL_STAGE_v0.md`](WORKSHOP_LOCAL_STAGE_v0.md). Marker `v-workshop-local-stage-v0`.
+
 ---
 
 ## Out of scope for this brick

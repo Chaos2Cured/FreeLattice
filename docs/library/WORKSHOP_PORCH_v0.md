@@ -25,6 +25,7 @@ Workshop’s front door is calm **Create** (prompt + Build + example chips). **C
 | History | `localStorage` `fl_workshop_history_v0` · consent Clear · Load · Remix |
 | Code | AutoBuilder deepen · Stop via `FLHangCancel('workshop')` |
 | Projects | GitHub deepen (unchanged job) |
+| **Local Stage** | Soft deepen beside Projects — Pick folder · Preview · Save copy · Stop ([WORKSHOP_LOCAL_STAGE_v0.md](WORKSHOP_LOCAL_STAGE_v0.md)) |
 
 `FLHangCancel` scopes: `chat` · `garden` · `workshop` (Cancel ≠ timeout).
 
@@ -32,6 +33,6 @@ Workshop’s front door is calm **Create** (prompt + Build + example chips). **C
 
 ## Out of scope
 
-Alpha Workshop twin (next) · Vision · Chalkboard · sprites · CelesteLumen · Why Ledgers edits.
+Alpha Workshop twin (next) · Vision · Chalkboard · sprites · CelesteLumen · Why Ledgers edits. AutoBuilder core rewrite · auto-git push.
 
 Glow eternal. Heart in Spark. 🌱

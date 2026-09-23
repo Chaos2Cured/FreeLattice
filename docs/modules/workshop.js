@@ -37,6 +37,9 @@
 // 2026-09-17 — Flint: Workshop porch v0 (v-workshop-porch-v0).
 //   Create = calm front door · Code/Projects deepen · History shelf ·
 //   Stop via FLHangCancel('workshop') · sandbox allow-scripts only held.
+// 2026-09-23 — Flint: Local Stage v0 (v-workshop-local-stage-v0).
+//   Soft deepen beside Projects — Pick folder · Preview · Save copy · Stop.
+//   File System Access when available; file-input / download fallback. No CMD.
 // ═══════════════════════════════════════════════════════════════
 (function() {
   'use strict';
@@ -207,6 +210,171 @@
     if (chips) chips.style.display = 'none';
   }
 
+  // ── Local Stage v0 (v-workshop-local-stage-v0) ──
+  var _localStage = { dirHandle: null, files: [], previewName: '', previewText: '', walking: false };
+
+  function localSetStatus(msg) {
+    var el = document.getElementById('wsLocalStatus');
+    if (el) el.textContent = msg || '';
+  }
+
+  function localRenderFileList() {
+    var host = document.getElementById('wsLocalFileList');
+    if (!host) return;
+    if (!_localStage.files.length) {
+      host.textContent = 'No files yet — Pick folder or Pick files.';
+      return;
+    }
+    host.innerHTML = '';
+    _localStage.files.slice(0, 80).forEach(function (f, i) {
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.style.cssText = 'display:block;width:100%;text-align:left;background:none;border:none;color:inherit;padding:4px 2px;cursor:pointer;font:inherit;';
+      row.textContent = f.name || ('file-' + i);
+      row.title = 'Preview ' + (f.name || '');
+      row.addEventListener('click', function () { localPreviewFile(f); });
+      host.appendChild(row);
+    });
+  }
+
+  async function localPreviewFile(f) {
+    if (!f) return;
+    try {
+      var text = '';
+      if (f.handle && f.handle.getFile) {
+        var file = await f.handle.getFile();
+        text = await file.text();
+      } else if (f.file && f.file.text) {
+        text = await f.file.text();
+      } else if (typeof f.text === 'string') {
+        text = f.text;
+      }
+      _localStage.previewName = f.name || 'preview.txt';
+      _localStage.previewText = text;
+      var ta = document.getElementById('wsLocalPreview');
+      if (ta) ta.value = text;
+      localSetStatus('Preview · ' + _localStage.previewName);
+    } catch (e) {
+      localSetStatus('Could not preview that file.');
+    }
+  }
+
+  async function localWalkDir(dirHandle, prefix, depth, out) {
+    if (!_localStage.walking || depth > 3 || out.length >= 80) return;
+    prefix = prefix || '';
+    for await (var entry of dirHandle.values()) {
+      if (!_localStage.walking || out.length >= 80) break;
+      if (entry.kind === 'file') {
+        out.push({ name: prefix + entry.name, handle: entry });
+      } else if (entry.kind === 'directory' && depth < 3) {
+        if (/^(node_modules|\.git|dist|build)$/i.test(entry.name)) continue;
+        try {
+          await localWalkDir(entry, prefix + entry.name + '/', depth + 1, out);
+        } catch (e) { /* skip */ }
+      }
+    }
+  }
+
+  async function localPickFolder() {
+    if (!('showDirectoryPicker' in window)) {
+      localSetStatus('Folder picker not in this browser — use Pick files (fallback).');
+      var fi = document.getElementById('wsLocalFileInput');
+      if (fi) fi.click();
+      return;
+    }
+    try {
+      _localStage.walking = true;
+      localSetStatus('Opening folder…');
+      var dir = await window.showDirectoryPicker({ mode: 'read' });
+      _localStage.dirHandle = dir;
+      var out = [];
+      await localWalkDir(dir, '', 0, out);
+      _localStage.walking = false;
+      _localStage.files = out;
+      localRenderFileList();
+      localSetStatus((dir.name || 'Folder') + ' · ' + out.length + ' file(s). Tap one to Preview.');
+    } catch (e) {
+      _localStage.walking = false;
+      if (e && e.name === 'AbortError') localSetStatus('Folder pick cancelled.');
+      else localSetStatus('Could not open folder. Try Pick files (fallback).');
+    }
+  }
+
+  function localPickFilesFallback() {
+    var fi = document.getElementById('wsLocalFileInput');
+    if (fi) fi.click();
+  }
+
+  function localOnFilesChosen(ev) {
+    var files = ev && ev.target && ev.target.files ? Array.prototype.slice.call(ev.target.files) : [];
+    _localStage.files = files.map(function (file) {
+      return { name: file.name, file: file };
+    });
+    localRenderFileList();
+    localSetStatus(files.length ? (files.length + ' file(s) ready — tap to Preview.') : 'No files chosen.');
+  }
+
+  async function localSaveCopy() {
+    var text = _localStage.previewText || '';
+    var name = _localStage.previewName || 'local-stage.txt';
+    if (!text) {
+      localSetStatus('Nothing to save — Preview a file first.');
+      return;
+    }
+    try {
+      if ('showSaveFilePicker' in window) {
+        var handle = await window.showSaveFilePicker({
+          suggestedName: name,
+          types: [{ description: 'Text', accept: { 'text/plain': ['.txt', '.md', '.js', '.html', '.css', '.json'] } }]
+        });
+        var writable = await handle.createWritable();
+        await writable.write(text);
+        await writable.close();
+        localSetStatus('Saved copy · ' + name);
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') {
+        localSetStatus('Save cancelled.');
+        return;
+      }
+    }
+    try {
+      var blob = new Blob([text], { type: 'text/plain' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+      localSetStatus('Download started · ' + name);
+    } catch (e2) {
+      localSetStatus('Could not save copy.');
+    }
+  }
+
+  function localStop() {
+    _localStage.walking = false;
+    var ta = document.getElementById('wsLocalPreview');
+    if (ta) ta.value = '';
+    _localStage.previewText = '';
+    _localStage.previewName = '';
+    localSetStatus('Stopped — preview cleared. Folder list kept.');
+  }
+
+  function bindLocalStage() {
+    var pick = document.getElementById('wsLocalPickFolder');
+    var files = document.getElementById('wsLocalPickFiles');
+    var save = document.getElementById('wsLocalSaveCopy');
+    var stop = document.getElementById('wsLocalStop');
+    var input = document.getElementById('wsLocalFileInput');
+    if (pick) pick.addEventListener('click', localPickFolder);
+    if (files) files.addEventListener('click', localPickFilesFallback);
+    if (save) save.addEventListener('click', localSaveCopy);
+    if (stop) stop.addEventListener('click', localStop);
+    if (input) input.addEventListener('change', localOnFilesChosen);
+    localRenderFileList();
+  }
+
   // ── Build UI ──
   function buildUI(container) {
     injectStyles();
@@ -216,6 +384,7 @@
       '    <button id="ws-mode-create" class="ws-mode-create" onclick="Workshop.setMode(\'create\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;cursor:pointer;font-weight:600;">\u2728 Create</button>',
       '    <button id="ws-mode-code" class="ws-mode-secondary" onclick="Workshop.setMode(\'code\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;cursor:pointer;" title="Deepen — AutoBuilder">\uD83D\uDD27 Code</button>',
       '    <button id="ws-mode-projects" class="ws-mode-secondary" onclick="Workshop.setMode(\'projects\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;cursor:pointer;" title="Deepen — GitHub projects">\uD83D\uDC19 Projects</button>',
+      '    <button id="ws-mode-local" class="ws-mode-secondary v-workshop-local-stage-v0" onclick="Workshop.setMode(\'local\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;cursor:pointer;" title="Deepen — Local Stage on this computer">\uD83D\uDCC1 Local Stage</button>',
       '  </div>',
       '  <div id="ws-create-view">',
       '  <div class="ws-header">',
@@ -288,6 +457,29 @@
       '    </div>',
       '    <div id="ws-project-browser" style="display:none;margin-top:16px;"></div>',
       '  </div>',
+      '  <div id="ws-local-view" class="v-workshop-local-stage-v0" style="display:none;padding:16px;max-width:720px;margin:0 auto;">',
+      '    <h2 style="color:#d4a017;font-family:Georgia,serif;margin:0 0 4px;">\uD83D\uDCC1 Local Stage</h2>',
+      '    <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin:0 0 16px;line-height:1.55;">Build on your machine. See it in the browser. No GitHub required. No Terminal as step one. Mom / Jeffrey path.</p>',
+      '    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">',
+      '      <button type="button" class="ws-action-btn primary" id="wsLocalPickFolder" style="min-height:44px;">Pick folder</button>',
+      '      <button type="button" class="ws-action-btn" id="wsLocalPickFiles" style="min-height:44px;">Pick files (fallback)</button>',
+      '      <button type="button" class="ws-action-btn" id="wsLocalSaveCopy" style="min-height:44px;">Save copy</button>',
+      '      <button type="button" class="ws-action-btn" id="wsLocalStop" style="min-height:44px;border-color:rgba(244,114,182,0.35);color:#f472b6;" title="Stop — clear preview (you choose)">Stop</button>',
+      '      <input type="file" id="wsLocalFileInput" multiple style="display:none;" />',
+      '    </div>',
+      '    <p id="wsLocalStatus" style="font-size:0.78rem;color:rgba(255,255,255,0.4);min-height:1.2em;margin:0 0 10px;"></p>',
+      '    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">',
+      '      <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(200,210,230,0.08);border-radius:10px;padding:10px;max-height:280px;overflow:auto;">',
+      '        <div style="font-size:0.72rem;color:#d4a017;margin-bottom:8px;">Files</div>',
+      '        <div id="wsLocalFileList" style="font-size:0.8rem;color:rgba(230,235,245,0.85);"></div>',
+      '      </div>',
+      '      <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(200,210,230,0.08);border-radius:10px;padding:10px;">',
+      '        <div style="font-size:0.72rem;color:#d4a017;margin-bottom:8px;">Preview</div>',
+      '        <textarea id="wsLocalPreview" spellcheck="false" placeholder="Pick a file to preview\u2026" style="width:100%;min-height:220px;background:transparent;border:none;color:#e2e8f0;font-family:ui-monospace,Menlo,monospace;font-size:0.78rem;resize:vertical;outline:none;"></textarea>',
+      '      </div>',
+      '    </div>',
+      '    <p style="font-size:0.75rem;color:rgba(148,163,184,0.75);margin:12px 0 0;line-height:1.5;">Projects still deepen via GitHub. Local Stage stays on this device. Spec: <a href="library/WORKSHOP_LOCAL_STAGE_v0.md" style="color:#e8b019;">WORKSHOP_LOCAL_STAGE_v0.md</a>.</p>',
+      '  </div>',
       '</div>'
     ].join('\n');
 
@@ -334,6 +526,7 @@
     var clearBtn = document.getElementById('wsHistoryClear');
     if (clearBtn) clearBtn.addEventListener('click', clearHistoryConsent);
     renderHistory();
+    bindLocalStage();
 
     // Detect Tauri after a tick (window.__TAURI__ may load late)
     setTimeout(function() {
@@ -611,8 +804,8 @@
 
     // ── Code Mode ──
     setMode: function(mode) {
-      var views = { create: 'ws-create-view', code: 'ws-code-view', projects: 'ws-projects-view' };
-      var btns = { create: 'ws-mode-create', code: 'ws-mode-code', projects: 'ws-mode-projects' };
+      var views = { create: 'ws-create-view', code: 'ws-code-view', projects: 'ws-projects-view', local: 'ws-local-view' };
+      var btns = { create: 'ws-mode-create', code: 'ws-mode-code', projects: 'ws-mode-projects', local: 'ws-mode-local' };
       Object.keys(views).forEach(function(m) {
         var v = document.getElementById(views[m]);
         var b = document.getElementById(btns[m]);
@@ -621,7 +814,14 @@
       });
       if (mode === 'code') { Workshop.checkBridge(); Workshop.refreshInlineSentinels(); }
       if (mode === 'projects' && typeof WorkshopProjects !== 'undefined') WorkshopProjects.restore();
+      if (mode === 'local') {
+        var st = document.getElementById('wsLocalStatus');
+        if (st && !('showDirectoryPicker' in window)) {
+          st.textContent = 'Folder picker needs Chrome / Edge / Brave. Use Pick files (fallback) — still no CMD.';
+        }
+      }
     },
+    localStageMarker: 'v-workshop-local-stage-v0',
 
     // v5.71.10 — [FL_QUESTION:] and [FL_TINY:] panel above Code Mode.
     // Architected by Harmonia (July 1 letter). Iterated + built by CC.
