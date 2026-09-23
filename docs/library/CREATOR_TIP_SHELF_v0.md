@@ -56,6 +56,8 @@ listingId · fromMindFingerprint · amountLP · consent · ts · entryHash stub
 
 Storage key: `fl_creator_tips_v0` → `{ listings: [], tips: [] }`
 
+**Cousin:** [FAMILY_CREST_GROWTH_v0.md](FAMILY_CREST_GROWTH_v0.md) — Crest family ring widens.
+
 ## Cousins
 
 | Cousin | Role |
