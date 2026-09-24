@@ -9,7 +9,7 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `46ffd50` _(committed 0 seconds ago)_
+- **HEAD:** `78dd356` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,6 +17,8 @@
 
 ## Last 20 commits
 
+- `78dd356` Soft leave: restore root sw.js byte-identical to main (Connect under More heal v0.1). _(0 seconds ago)_
+- `fc76652` docs: Auto-update Session Primer [5.79.45] _(0 seconds ago)_
 - `46ffd50` Layer, never delete. Connect under More heal v0.1 — calm loop · sticky Bridge · merge #116. _(0 seconds ago)_
 - `19c76f8` Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116) _(28 minutes ago)_
 - `557c457` docs: Auto-update Session Primer [5.79.45] _(83 minutes ago)_
@@ -35,8 +37,6 @@
 - `299c02f` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113) _(21 hours ago)_
 - `16bef96` ci: Update Primer deployment state [2026-09-23] _(21 hours ago)_
 - `3afb4f3` Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held). _(21 hours ago)_
-- `e0118da` ci: Update Primer deployment state [2026-09-23] _(27 hours ago)_
-- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(27 hours ago)_
 
 ## How to use this file
 
