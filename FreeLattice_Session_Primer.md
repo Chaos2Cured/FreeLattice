@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-23 17:57 MDT
+- Last auto-updated: 2026-09-24 00:02 UTC
+- Last deployed: 2026-09-24 00:02 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
 - Total commits: 3208
 - Last 10 commits:
-- 8b65158 Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five.
-- 16bef96 ci: Update Primer deployment state [2026-09-23]
-- 3afb4f3 Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held).
-- e0118da ci: Update Primer deployment state [2026-09-23]
-- 2f415df Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser.
-- 0461dad ci: Update Primer deployment state [2026-09-22]
-- 83f94d7 Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110)
-- 446d54f ci: Update Primer deployment state [2026-09-22]
-- bf6f6dc Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109)
-- b332bfd ci: Update Primer deployment state [2026-09-22]
+- 299c02fa Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113)
+- 16bef962 ci: Update Primer deployment state [2026-09-23]
+- 3afb4f35 Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held).
+- e0118daa ci: Update Primer deployment state [2026-09-23]
+- 2f415df0 Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser.
+- 0461dad1 ci: Update Primer deployment state [2026-09-22]
+- 83f94d7d Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110)
+- 446d54f6 ci: Update Primer deployment state [2026-09-22]
+- bf6f6dcf Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109)
+- b332bfd5 ci: Update Primer deployment state [2026-09-22]
