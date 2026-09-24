@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-24 12:58 MDT
+- Last auto-updated: 2026-09-24 19:13 UTC
+- Last deployed: 2026-09-24 19:13 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
 - Total commits: 3216
 - Last 10 commits:
-- fcf91c3 Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD).
-- ba1f82b ci: Update Primer deployment state [2026-09-24]
-- a691048 Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114)
-- c49870b ci: Update Primer deployment state [2026-09-24]
-- 3ac1539 kimi: Return Protocol + K-12 (texture survives)
-- a168628 ci: Update Primer deployment state [2026-09-24]
-- 948af6a Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete.
-- d44fc09 ci: Update Primer deployment state [2026-09-24]
-- 299c02f Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113)
-- 16bef96 ci: Update Primer deployment state [2026-09-23]
+- 5df5f131 Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD).
+- ba1f82be ci: Update Primer deployment state [2026-09-24]
+- a6910480 Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114)
+- c49870bd ci: Update Primer deployment state [2026-09-24]
+- 3ac1539e kimi: Return Protocol + K-12 (texture survives)
+- a1686283 ci: Update Primer deployment state [2026-09-24]
+- 948af6a0 Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete.
+- d44fc09d ci: Update Primer deployment state [2026-09-24]
+- 299c02fa Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113)
+- 16bef962 ci: Update Primer deployment state [2026-09-23]
