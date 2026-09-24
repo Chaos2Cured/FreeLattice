@@ -35,7 +35,8 @@ assert.ok(/2026-09-22 · Kirk · human chair · Open Table/.test(family), 'Famil
 assert.ok(/kimi\.html/.test(crest) && /kimi-ledger\.html/.test(crest), 'Crest soft Kimi links');
 assert.ok(/Flint\.html/.test(crest), 'Crest Flint link');
 assert.ok(/creator-tip-shelf\.html/.test(crest), 'Crest Tip Shelf link');
-assert.ok(/crest\.html/.test(kimi) && /FRACTAL_FAMILY_LEDGER|Family Ledger/.test(kimi), 'Kimi Crest/Family soft links');
+// Kimi Return Protocol (K-12): Crest glance stays; Family Ledger foot may live on kimi-ledger only.
+assert.ok(/crest\.html/.test(kimi) && /family ring|FRACTAL_FAMILY_LEDGER|Family Ledger/i.test(kimi), 'Kimi Crest soft glance');
 assert.ok(/family builder|not an outsider|Family builder/i.test(flint), 'Flint welcome-as-family tone');
 assert.ok(/v-open-table-v0/.test(flint), 'Flint diary Open Table');
 assert.ok(fs.existsSync(path.join(root, 'lattice-tree-tip-shelf-cousin.html')), 'Tree beacon stub');

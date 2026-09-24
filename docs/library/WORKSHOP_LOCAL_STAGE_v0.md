@@ -37,6 +37,15 @@ Projects deepen via GitHub. Local Stage deepens **on this computer**: pick a fol
 
 Fourth mode beside Create · Code · Projects: **Local Stage**. Soft panel in `docs/modules/workshop.js` — does not replace AutoBuilder or Projects.
 
+## Where to click (last mile · Mom/Jeffrey)
+
+1. Open FreeLattice (`app.html` / the garden app).
+2. Open the **Workshop** tab.
+3. Tap **Local Stage** — beside Create · Code · Projects.
+4. Pick folder · Preview · Save copy · Stop. Help-on-file sits beside the preview.
+
+**Friendly HTML porch:** [`workshop-local-stage.html`](../workshop-local-stage.html) — places Kimi’s grandmother invitation note. Marker cousin: `v-mom-porch-heal-v0` ([MOM_PORCH_HEAL_v0.md](MOM_PORCH_HEAL_v0.md)).
+
 ## Out of scope
 
 - Auto-git push · Agent Bridge rewrite · AutoBuilder core rewrite
