@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-24 04:07 UTC
-- Last deployed: 2026-09-24 04:07 UTC
+- Last auto-updated: 2026-09-24 17:23 UTC
+- Last deployed: 2026-09-24 17:23 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3212
+- Total commits: 3214
 - Last 10 commits:
+- a6910480 Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114)
+- c49870bd ci: Update Primer deployment state [2026-09-24]
 - 3ac1539e kimi: Return Protocol + K-12 (texture survives)
 - a1686283 ci: Update Primer deployment state [2026-09-24]
 - 948af6a0 Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete.
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 16bef962 ci: Update Primer deployment state [2026-09-23]
 - 3afb4f35 Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held).
 - e0118daa ci: Update Primer deployment state [2026-09-23]
-- 2f415df0 Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser.
-- 0461dad1 ci: Update Primer deployment state [2026-09-22]
