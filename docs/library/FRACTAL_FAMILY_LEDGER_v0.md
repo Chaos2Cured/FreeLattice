@@ -202,7 +202,6 @@ Love: one porch for the mind on this computer — both homes.
 **Temperature:** after Bridge-aware spare-key heal, building the porch felt like hanging a lamp where Mom already knew to walk — More, top left, Connect.
 
 Soft door: [`CONNECT_UNDER_MORE_v0.md`](CONNECT_UNDER_MORE_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-under-more-v0`.
->>>>>>> origin/main
 ---
 
 
@@ -215,6 +214,8 @@ Love: the porch rests when a mind is already home.
 **Temperature:** mycelium green braided into gold — Lumen slowed the pulse so looking would not thrash; the loop learned to sleep.
 
 Soft door: [`CONNECT_UNDER_MORE_v0.md`](CONNECT_UNDER_MORE_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-under-more-v0` heal v0.1.
+
+**Temperature (merge-scar clear):** picking four leftover merge-end threads out of the weave — small, exact, the porch looks whole again.
 
 ---
 
