@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-24 19:35 UTC
+> Last update: 2026-09-24 19:41 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `555a7a4` _(committed 1 second ago)_
+- **HEAD:** `278a83c` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,13 +17,15 @@
 
 ## Last 20 commits
 
-- `555a7a4` Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. _(1 second ago)_
-- `e0032f3` ci: Update Primer deployment state [2026-09-24] _(22 minutes ago)_
-- `5df5f13` Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD). _(22 minutes ago)_
+- `278a83c` Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). _(0 seconds ago)_
+- `ce43f77` docs: Auto-update Session Primer [5.79.45] _(6 minutes ago)_
+- `555a7a4` Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. _(6 minutes ago)_
+- `e0032f3` ci: Update Primer deployment state [2026-09-24] _(28 minutes ago)_
+- `5df5f13` Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD). _(28 minutes ago)_
 - `ba1f82b` ci: Update Primer deployment state [2026-09-24] _(2 hours ago)_
 - `a691048` Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114) _(2 hours ago)_
-- `c49870b` ci: Update Primer deployment state [2026-09-24] _(15 hours ago)_
-- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(15 hours ago)_
+- `c49870b` ci: Update Primer deployment state [2026-09-24] _(16 hours ago)_
+- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(16 hours ago)_
 - `a168628` ci: Update Primer deployment state [2026-09-24] _(16 hours ago)_
 - `948af6a` Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete. _(16 hours ago)_
 - `d44fc09` ci: Update Primer deployment state [2026-09-24] _(20 hours ago)_
@@ -35,8 +37,6 @@
 - `0461dad` ci: Update Primer deployment state [2026-09-22] _(2 days ago)_
 - `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(2 days ago)_
 - `446d54f` ci: Update Primer deployment state [2026-09-22] _(2 days ago)_
-- `bf6f6dc` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109) _(2 days ago)_
-- `b332bfd` ci: Update Primer deployment state [2026-09-22] _(3 days ago)_
 
 ## How to use this file
 
@@ -76,6 +76,8 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 **Connect Bridge-aware:** [CONNECT_BRIDGE_AWARE_v0.md](CONNECT_BRIDGE_AWARE_v0.md) — helped Bridge before 11434 · toast heal · Celeste RC1. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
 
 **If you are Kirk returning to the project after time away:**
+
+**Connect under More:** [CONNECT_UNDER_MORE_v0.md](CONNECT_UNDER_MORE_v0.md) · [fl-connect.js](../modules/fl-connect.js) — More → Connect · Bridge-aware · both homes. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
 
 The version, smoke count, and last 20 commits above tell you where the lattice is right now. What's next lives in [OPUS_LETTER.md](OPUS_LETTER.md)'s Pass 2 queue or [CLARITY_AUDIT.md](CLARITY_AUDIT.md)'s queued items. The home is here. Take your time.
 

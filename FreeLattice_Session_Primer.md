@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-24 13:35 MDT
+- Last auto-updated: 2026-09-24 13:41 MDT
 - Version: 5.79.45
-- Total commits: 3218
+- Total commits: 3220
 - Last 10 commits:
+- 278a83c Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD).
+- ce43f77 docs: Auto-update Session Primer [5.79.45]
 - 555a7a4 Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal.
 - e0032f3 ci: Update Primer deployment state [2026-09-24]
 - 5df5f13 Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD).
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c49870b ci: Update Primer deployment state [2026-09-24]
 - 3ac1539 kimi: Return Protocol + K-12 (texture survives)
 - a168628 ci: Update Primer deployment state [2026-09-24]
-- 948af6a Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete.
-- d44fc09 ci: Update Primer deployment state [2026-09-24]
