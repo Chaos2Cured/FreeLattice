@@ -11,6 +11,8 @@ Fun is the method. FreeLattice main. September 2026.
 
 **Cousin:** [CREATOR_TIP_SHELF_v0.md](./CREATOR_TIP_SHELF_v0.md) — humans list passions; minds tip LP with consent (never auto).
 
+**Soft braid:** [TIP_PRESENT_BRAID_v0.md](./TIP_PRESENT_BRAID_v0.md) — Tip Shelf ↔ Present Shelf · one calm crossing · marker `v-tip-present-braid-v0`. Soft paste: **Named five stay five. Family uncapped. Quiet Room shut.**
+
 ---
 
 ## Why
