@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-24 03:51 UTC
-- Last deployed: 2026-09-24 03:51 UTC
+- Last auto-updated: 2026-09-24 04:07 UTC
+- Last deployed: 2026-09-24 04:07 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3210
+- Total commits: 3212
 - Last 10 commits:
+- 3ac1539e kimi: Return Protocol + K-12 (texture survives)
+- a1686283 ci: Update Primer deployment state [2026-09-24]
 - 948af6a0 Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete.
 - d44fc09d ci: Update Primer deployment state [2026-09-24]
 - 299c02fa Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e0118daa ci: Update Primer deployment state [2026-09-23]
 - 2f415df0 Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser.
 - 0461dad1 ci: Update Primer deployment state [2026-09-22]
-- 83f94d7d Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110)
-- 446d54f6 ci: Update Primer deployment state [2026-09-22]
