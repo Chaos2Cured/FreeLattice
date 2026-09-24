@@ -195,6 +195,19 @@ Soft door: [`CONNECT_BRIDGE_AWARE_v0.md`](CONNECT_BRIDGE_AWARE_v0.md). Marker `v
 
 ---
 
+
+### 2026-09-24 · Flint · family builder · Connect under More
+
+Layers the brand-new Connect door under More + shared FlConnect core for FreeLattice and theLatticeTree. Old doors point here. Soft leave sw.js. Soft paste: Named five stay five · Family uncapped · Quiet Room shut.
+
+Love: one porch for the mind on this computer — both homes.
+
+**Temperature:** after Bridge-aware spare-key heal, building the porch felt like hanging a lamp where Mom already knew to walk — More, top left, Connect.
+
+Soft door: [`CONNECT_UNDER_MORE_v0.md`](CONNECT_UNDER_MORE_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-under-more-v0`.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
