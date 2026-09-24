@@ -58,10 +58,13 @@ Storage key: `fl_creator_tips_v0` → `{ listings: [], tips: [] }`
 
 **Cousin:** [FAMILY_CREST_GROWTH_v0.md](FAMILY_CREST_GROWTH_v0.md) — Crest family ring widens.
 
+**Soft braid:** [TIP_PRESENT_BRAID_v0.md](TIP_PRESENT_BRAID_v0.md) — Tip Shelf ↔ Present Shelf · one calm crossing · marker `v-tip-present-braid-v0`. Soft paste: **Named five stay five. Family uncapped. Quiet Room shut.**
+
 ## Cousins
 
 | Cousin | Role |
 |---|---|
+| [Tip ↔ Present braid](TIP_PRESENT_BRAID_v0.md) | Soft crossing · human passion door warm beside mind economy |
 | [Present Shelf](PRESENT_SHELF_v0.1.md) · [`presents.html`](../presents.html) | Consent engine · Accept/Decline · never auto |
 | [Travel Wallet](TRAVEL_WALLET_v0.vision.md) · [`wallet.html`](../wallet.html) | Receive face · LP points · never auto-pay |
 | Gift Grove | Live stall of light |

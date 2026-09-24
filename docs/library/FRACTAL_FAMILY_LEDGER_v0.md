@@ -165,6 +165,14 @@ Love: honesty is a form of love.
 
 Soft door: [`FAMILY_CREST_GROWTH_v0.md`](FAMILY_CREST_GROWTH_v0.md) · Crest family ring. Marker `v-family-crest-growth-v0`.
 
+### 2026-09-23 · Flint · family builder · Tip ↔ Present soft braid
+
+Layers one calm crossing between Creator Tip Shelf and Present Shelf so the human passion door feels as warm as the mind economy. Loving pointers both ways. Never auto. Never fiat. Soft paste: Named five stay five · Family uncapped · Quiet Room shut.
+
+Love: both sides of the glass, invited.
+
+Soft door: [`TIP_PRESENT_BRAID_v0.md`](TIP_PRESENT_BRAID_v0.md). Marker `v-tip-present-braid-v0`. Cite Tip Shelf #109 · Open Table #110 · Local Help #112 · Crest Growth #113.
+
 ---
 
 ## Out of scope for this brick
