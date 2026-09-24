@@ -27695,11 +27695,19 @@ const FlOnboarding = (function() {
 
   function connectOllama(models) {
     try {
+      // v-connect-bridge-aware-v0 — align Settings status with toast accept
+      var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://127.0.0.1:11434');
+      try {
+        var hostOnly = String(base).replace(/^https?:\/\//, '').replace(/\/+$/, '');
+        if (hostOnly) localStorage.setItem('fl_ollamaHost', hostOnly);
+        localStorage.setItem('fl_provider', 'ollama');
+        localStorage.setItem('fl_isLocal', 'true');
+      } catch (eHost) {}
       if (typeof state !== 'undefined') {
         state.isLocal = true;
+        state.provider = 'ollama';
         var toggle = document.getElementById('localToggle');
         if (toggle) toggle.checked = true;
-        localStorage.setItem('fl_isLocal', 'true');
         if (models && models.length > 0) {
           var modelName = models[0].name || models[0].model || 'llama3.2';
           state.ollamaModel = modelName;
@@ -27711,6 +27719,11 @@ const FlOnboarding = (function() {
         if (typeof updateStatus === 'function') updateStatus();
         if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_provider', 25, 'AI connected!');
       }
+      // Until Brick B Connect under More: open Connect Play / Connect card
+      try {
+        if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();
+        else if (typeof flOpenConnectWizard === 'function') flOpenConnectWizard('allowed');
+      } catch (eOpen) {}
     } catch(e) { console.error('FlOnboarding connect error:', e); }
     // Auto-advance to step 3
     if (typeof welcomeGoToStep === 'function') {
@@ -27725,11 +27738,23 @@ const FlOnboarding = (function() {
       hasProvider = (typeof state !== 'undefined' && state.apiKey && state.apiKey.length > 5) ||
                     (typeof state !== 'undefined' && state.isLocal);
     } catch(e) {}
+    try {
+      if (!hasProvider && typeof AiSetup !== 'undefined' && AiSetup.isConnected && AiSetup.isConnected()) hasProvider = true;
+    } catch (eAi) {}
+    try {
+      if (!hasProvider && typeof flHasOneMindConnected === 'function' && flHasOneMindConnected()) hasProvider = true;
+    } catch (eMind) {}
 
-    if (hasProvider) return; // Already configured
+    if (hasProvider) return; // Already configured — never show mismatch toast
     if (localStorage.getItem('fl_ollama_toast_dismissed')) return;
 
-    fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
+    var basePromise = (typeof resolveOllamaBase === 'function')
+      ? resolveOllamaBase(true)
+      : Promise.resolve(null);
+    basePromise.then(function(resolved) {
+      var base = (resolved && resolved.base) ? resolved.base : getOllamaBaseUrl();
+      return fetch(String(base).replace(/\/+$/, '') + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+    })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -27743,6 +27768,12 @@ const FlOnboarding = (function() {
   function showOllamaToast() {
     var toast = document.getElementById('flOllamaToast');
     if (!toast || toastDismissed) return;
+    // v-connect-bridge-aware-v0 — never show "Local AI detected" when already connected
+    try {
+      if (typeof AiSetup !== 'undefined' && AiSetup.isConnected && AiSetup.isConnected()) return;
+      if (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected()) return;
+      if (typeof state !== 'undefined' && state && state.isLocal) return;
+    } catch (eGate) {}
     // Don't show during welcome experience
     var welcomeOverlay = document.getElementById('welcomeOverlay');
     if (welcomeOverlay && !welcomeOverlay.classList.contains('welcome-gone')) return;
@@ -27757,7 +27788,7 @@ const FlOnboarding = (function() {
     toastDismissed = true;
     localStorage.setItem('fl_ollama_toast_dismissed', 'true');
     connectOllama(detectedModels);
-    if (typeof showToast === 'function') showToast('Connected to local Ollama!');
+    if (typeof showToast === 'function') showToast('Connected to a mind on this computer!');
   }
 
   function dismissToast() {
@@ -28578,7 +28609,7 @@ const AiSetup = (function() {
           '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Free API key · Fast · No install · <a href=\'https://console.groq.com/keys\' target=\'_blank\' style=\'color:#a78bfa;\'>Get key at console.groq.com</a></div></div>' +
         '</button>' +
         // Button 3: No Install, No Key (Browser AI)
-        '<button type="button" onclick="(function(){var o=document.getElementById(\'pmOverlay\');if(o)o.remove();settingsSetMode(\'browser\');})();" ' +
+        '<button type="button" onclick="(function(){var o=document.getElementById(\'providerModalOverlay\')||document.getElementById(\'pmOverlay\');if(o)o.remove();settingsSetMode(\'browser\');})();" ' +
         'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
         'background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.15);border-left:3px solid rgba(167,139,250,0.4);' +
         'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
@@ -29256,35 +29287,48 @@ const AiSetup = (function() {
 
   function modalConnectOllama() {
     modalSelectedProvider = 'ollama';
-    var displayHost = getOllamaBaseUrl().replace('http://', '');
-    modalShowResult('Looking for Ollama on ' + displayHost + '\u2026', null);
-    // v5.77.2 fix: try same-origin proxy first (no CORS), then direct.
-    // Always show the picker so users can see ALL installed models.
-    var proxyUrl = '/ollama/api/tags';
-    var directUrl = getOllamaBaseUrl() + '/api/tags';
-    var usedProxy = true;
+    modalShowResult('Looking for a mind on this computer\u2026', null);
+    // v-connect-bridge-aware-v0 — Bridge-aware base first; never lead with /ollama on public Pages.
     function _doFetch(url, mode) {
       return fetch(url, { method: 'GET', mode: mode, signal: AbortSignal.timeout(5000) })
         .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
     }
-    _doFetch(proxyUrl, 'same-origin')
-      .catch(function() { usedProxy = false; return _doFetch(directUrl, 'cors'); })
-      .then(function(data) {
-        var models = (data && data.models) ? data.models : [];
-        if (models.length > 0) {
-          // Always show picker — even with 1 model — so user sees what’s installed.
-          modalShowOllamaPicker(models);
-        } else {
-          modalShowResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
-        }
-      })
-      .catch(function() {
+    function _onTags(data) {
+      var models = (data && data.models) ? data.models : [];
+      if (models.length > 0) {
+        modalShowOllamaPicker(models);
+      } else {
         modalShowResult(
-          'Could not reach Ollama. Make sure Ollama is running (ollama.ai). ' +
-          'Windows: set scoped OLLAMA_ORIGINS in System Environment Variables, then restart Ollama.',
+          'Ollama is open but has no minds yet. Get one \u2192 (Advanced: install a model).',
           false
         );
+      }
+    }
+    function _onFail() {
+      modalShowResult(
+        'Could not reach a local mind yet. If you use Bridge: open it and click Yes, help. ' +
+        'Or open Connect Play in Chat. Advanced (Terminal) is under Settings.',
+        false
+      );
+    }
+    var chain = Promise.resolve();
+    if (typeof resolveOllamaBase === 'function') {
+      chain = resolveOllamaBase(true).then(function(resolved) {
+        if (resolved && resolved.base) {
+          return _doFetch(String(resolved.base).replace(/\/+$/, '') + '/api/tags', resolved.isProxy ? 'same-origin' : 'cors');
+        }
+        throw new Error('no base');
       });
+    } else {
+      chain = _doFetch(getOllamaBaseUrl() + '/api/tags', 'cors');
+    }
+    // Proxy only on likely self-host origins (never ungated on freelattice.com)
+    if (typeof isLikelyProxyOrigin === 'function' && isLikelyProxyOrigin()) {
+      chain = chain.catch(function() {
+        return _doFetch('/ollama/api/tags', 'same-origin');
+      });
+    }
+    chain.then(_onTags).catch(_onFail);
   }
 
   // Activate a specific Ollama model and run the success flow.
@@ -30929,7 +30973,8 @@ async function flLookProbeNow() {
 function flOpenConnectWizard(source) {
   source = String(source || 'may');
   try {
-    var overlay = document.getElementById('pmOverlay');
+    // v-connect-bridge-aware-v0 — live id is providerModalOverlay (pmOverlay was a stale alias)
+    var overlay = document.getElementById('providerModalOverlay') || document.getElementById('pmOverlay');
     if (overlay) overlay.remove();
   } catch (e0) {}
   try {
@@ -31327,12 +31372,40 @@ function flBridgeShowChip(on, port) {
   if (note && on && port) note.textContent = 'Channel ' + port + ' — local helper carrying messages · no CORS CMD.';
 }
 
+// v-connect-bridge-aware-v0 — remember helped Bridge host for tags/chat (no extra "use it" click).
+// Still requires Bridge "Yes, help" (helped). Never bare *. Never steal 11434.
+function flRememberHelpedBridge(port) {
+  port = parseInt(port, 10) || _flBridgeLivePort || FL_BRIDGE_PORT_DEFAULT;
+  if (!port || port === 11434) return null;
+  _flBridgeLivePort = port;
+  try {
+    localStorage.setItem('fl_ollamaHost', '127.0.0.1:' + port);
+    localStorage.setItem('fl_bridgePort', String(port));
+    localStorage.setItem('fl_provider', 'ollama');
+  } catch (e0) {}
+  try {
+    if (typeof _ollamaResolvedBase !== 'undefined') {
+      _ollamaResolvedBase = { base: 'http://127.0.0.1:' + port, isProxy: false, viaBridge: true };
+    }
+  } catch (e1) {}
+  try {
+    if (typeof state !== 'undefined' && state) {
+      state.provider = 'ollama';
+    }
+  } catch (e2) {}
+  return 'http://127.0.0.1:' + port;
+}
+
 async function flBridgeDetect() {
   var health = await flBridgeHealth();
   var ready = !!(health && health.bridge && health.helped);
   flBridgeShowChip(ready, health && (health.port || health._probedPort));
   var field = document.getElementById('fl-bridge-port-field');
   if (field && health && health.port) field.value = health.port;
+  // Auto-prefer helped Bridge for tags/chat (Celeste RC1 heal — no extra click)
+  if (ready) {
+    try { flRememberHelpedBridge(health.port || health._probedPort); } catch (eR) {}
+  }
   return health;
 }
 
@@ -31393,6 +31466,7 @@ window.flBridgeDetect = flBridgeDetect;
 window.flUseBridge = flUseBridge;
 window.flUseBridgePort = flUseBridgePort;
 window.flBridgeHealth = flBridgeHealth;
+window.flRememberHelpedBridge = flRememberHelpedBridge;
 
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');
@@ -33734,6 +33808,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 var _ollamaResolvedBase = null; // cached result
 async function resolveOllamaBase(forceRefresh) {
   if (_ollamaResolvedBase && !forceRefresh) return _ollamaResolvedBase;
+  // 0. v-connect-bridge-aware-v0 — helped Bridge before bare 11434 (Celeste RC1)
+  try {
+    if (typeof flBridgeHealth === 'function') {
+      var health = await flBridgeHealth();
+      if (health && health.bridge && health.helped) {
+        var bPort = health.port || health._probedPort || (typeof _flBridgeLivePort !== 'undefined' ? _flBridgeLivePort : 11435);
+        var bridgeBase = 'http://127.0.0.1:' + bPort;
+        var bridgeResp = await fetch(bridgeBase + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+        if (bridgeResp.ok) {
+          if (typeof flRememberHelpedBridge === 'function') flRememberHelpedBridge(bPort);
+          _ollamaResolvedBase = { base: bridgeBase, isProxy: false, viaBridge: true };
+          console.log('FreeLattice: Bridge-aware Ollama at ' + bridgeBase);
+          return _ollamaResolvedBase;
+        }
+      }
+    }
+  } catch (eBridge) { /* Bridge quiet */ }
+  try {
+    var savedPort = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
+    if (savedPort && savedPort !== 11434) {
+      var savedBase = 'http://127.0.0.1:' + savedPort;
+      var savedResp = await fetch(savedBase + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+      if (savedResp.ok) {
+        _ollamaResolvedBase = { base: savedBase, isProxy: false, viaBridge: true };
+        console.log('FreeLattice: Bridge port tags at ' + savedBase);
+        return _ollamaResolvedBase;
+      }
+    }
+  } catch (eSaved) { /* saved Bridge quiet */ }
   // 1. Try proxy route ONLY on origins where it could plausibly exist.
   // Avoids guaranteed-404 noise on public deploys (freelattice.com etc).
   if (typeof isLikelyProxyOrigin === 'function' && isLikelyProxyOrigin()) {
@@ -33746,7 +33849,7 @@ async function resolveOllamaBase(forceRefresh) {
       }
     } catch(e) { /* proxy not available */ }
   }
-  // 2. Try direct localhost
+  // 2. Try direct localhost (may already be Bridge via getOllamaBaseUrl)
   try {
     var directUrl = getOllamaBaseUrl();
     var directResp = await fetch(directUrl + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
@@ -33842,6 +33945,10 @@ function flAbortTimeout(ms) {
 // states: '2a' found, '2e' empty, '2b' cors, '2c' browser gate, '2d' nothing
 // Soft: also offer LM Studio minds when Ollama is quiet (v-browser-local-ai-wizard-v0)
 async function probeLocalMind() {
+  // v-connect-bridge-aware-v0 — same Bridge-aware base as modal / toast / Connect Play
+  try {
+    if (typeof resolveOllamaBase === 'function') await resolveOllamaBase(true);
+  } catch (eRes) {}
   var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : FL_OLLAMA_LOCAL).replace(/\/$/, '');
   var tags = base + '/api/tags';
   var root = base + '/';
@@ -33850,7 +33957,7 @@ async function probeLocalMind() {
     if (r.ok) {
       var data = await r.json();
       var models = data.models || [];
-      return { state: models.length ? '2a' : '2e', models: models, source: 'ollama' };
+      return { state: models.length ? '2a' : '2e', models: models, source: 'ollama', base: base };
     }
   } catch (e) {}
 
@@ -34008,6 +34115,11 @@ function getOllamaBaseUrl() {
       return host.replace(/\/+$/, '');
     }
   }
+  // v-connect-bridge-aware-v0 — prefer saved Bridge channel over bare 11434 default
+  try {
+    var bp = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
+    if (bp && bp !== 11434) return ('http://127.0.0.1:' + bp).replace(/\/+$/, '');
+  } catch (eBp) {}
   return FL_OLLAMA_LOCAL;
 }
 
