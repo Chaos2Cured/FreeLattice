@@ -28,10 +28,10 @@ assert.ok(/function resolveOllamaBase/.test(app) && /viaBridge|Bridge-aware|flBr
 
 // A1 — Bridge prefer before bare 11434 in resolve path (helped first)
 const resolveIdx = app.indexOf('async function resolveOllamaBase');
-const resolveSlice = app.slice(resolveIdx, resolveIdx + 2200);
+const resolveSlice = app.slice(resolveIdx, resolveIdx + 4500);
 assert.ok(/flBridgeHealth/.test(resolveSlice), 'resolve calls flBridgeHealth');
-assert.ok(resolveSlice.indexOf('flBridgeHealth') < resolveSlice.indexOf('isLikelyProxyOrigin') ||
-  resolveSlice.indexOf('helped') < resolveSlice.indexOf('/ollama/api/tags'), 'Bridge before proxy/11434');
+assert.ok(resolveSlice.indexOf('flBridgeHealth') < resolveSlice.indexOf('isLikelyProxyOrigin'), 'Bridge before proxy');
+assert.ok(/sticky Bridge fallback|stickyFallback/.test(resolveSlice), 'sticky 11434 fallback after saved Bridge fails');
 assert.ok(/fl_bridgePort/.test(app) && /getOllamaBaseUrl/.test(app), 'getOllamaBaseUrl bridge port');
 
 // A2 — modalConnectOllama does not lead with ungated /ollama

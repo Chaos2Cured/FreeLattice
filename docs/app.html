@@ -27744,7 +27744,7 @@ const FlOnboarding = (function() {
       try {
         if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
         else if (typeof switchTab === 'function') switchTab('connect');
-        else if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();
+        else if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();>>>>>>> origin/main
         else if (typeof flOpenConnectWizard === 'function') flOpenConnectWizard('allowed');
       } catch (eOpen) {}
     } catch(e) { console.error('FlOnboarding connect error:', e); }
@@ -33866,6 +33866,16 @@ async function resolveOllamaBase(forceRefresh) {
         console.log('FreeLattice: Bridge port tags at ' + savedBase);
         return _ollamaResolvedBase;
       }
+      // v0.1 sticky Bridge fallback — saved Bridge failed; try 11434 for this probe.
+      // Do not erase fl_bridgePort / fl_ollamaHost.
+      try {
+        var sticky = await fetch('http://127.0.0.1:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+        if (sticky.ok) {
+          _ollamaResolvedBase = { base: 'http://127.0.0.1:11434', isProxy: false, stickyFallback: true };
+          console.log('FreeLattice: sticky fallback to 11434 (saved Bridge quiet; keys kept)');
+          return _ollamaResolvedBase;
+        }
+      } catch (eSticky) { /* direct quiet too */ }
     }
   } catch (eSaved) { /* saved Bridge quiet */ }
   // 1. Try proxy route ONLY on origins where it could plausibly exist.

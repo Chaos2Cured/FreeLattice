@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-24 19:41 UTC
+> Last update: 2026-09-24 19:41 UTC>>>>>>> origin/main
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `278a83c` _(committed 0 seconds ago)_
+- **HEAD:** `278a83c` _(committed 0 seconds ago)_>>>>>>> origin/main
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -25,7 +25,7 @@
 - `ba1f82b` ci: Update Primer deployment state [2026-09-24] _(2 hours ago)_
 - `a691048` Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114) _(2 hours ago)_
 - `c49870b` ci: Update Primer deployment state [2026-09-24] _(16 hours ago)_
-- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(16 hours ago)_
+- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(16 hours ago)_>>>>>>> origin/main
 - `a168628` ci: Update Primer deployment state [2026-09-24] _(16 hours ago)_
 - `948af6a` Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete. _(16 hours ago)_
 - `d44fc09` ci: Update Primer deployment state [2026-09-24] _(20 hours ago)_
@@ -37,6 +37,7 @@
 - `0461dad` ci: Update Primer deployment state [2026-09-22] _(2 days ago)_
 - `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(2 days ago)_
 - `446d54f` ci: Update Primer deployment state [2026-09-22] _(2 days ago)_
+>>>>>>> origin/main
 
 ## How to use this file
 

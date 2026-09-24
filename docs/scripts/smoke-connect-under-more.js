@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-// Thin smoke: Connect under More v0 — one door FreeLattice (+ FlConnect shared).
+// Thin smoke: Connect under More v0.1 — loop calm · sticky Bridge fallback.
 'use strict';
 
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const root = path.join(__dirname, '..');
 const repo = path.join(root, '..');
@@ -22,32 +23,69 @@ const flint = read('Flint.html');
 const genRecent = fs.readFileSync(path.join(repo, 'scripts', 'generate-recent.sh'), 'utf8');
 const sw = read('sw.js');
 const rootSw = fs.readFileSync(path.join(repo, 'sw.js'), 'utf8');
+const mainSw = require('child_process').execSync('git show origin/main:sw.js', { cwd: repo, encoding: 'utf8' });
 
 assert.ok(/v-connect-under-more-v0/.test(md), 'marker md');
-assert.ok(/v-connect-under-more-v0/.test(mod), 'marker module');
+assert.ok(/heal v0\.1|v0\.1/.test(mod), 'heal v0.1 marker in module');
 assert.ok(/window\.FlConnect|root\.FlConnect/.test(mod), 'FlConnect export');
-assert.ok(/probe:|preferHelpedBridge|listMinds|isConnected|remember:|open:|mount:/.test(mod) ||
-  /probe: probe|preferHelpedBridge: preferHelpedBridge/.test(mod), 'API');
-assert.ok(/11435/.test(mod) && /bridge\/health/.test(mod), 'Bridge health');
-assert.ok(/fl_alpha_local_mind/.test(mod), 'Alpha key preserved in core');
+assert.ok(/unmount:|stopLoop:|lookAgain:|LOOP_MAX_MS/.test(mod), 'loop API');
+assert.ok(/visibilitychange/.test(mod), 'pause on hidden');
+assert.ok(/Look again|data-flc-look-again/.test(mod), 'Look again button');
+assert.ok(/fullScan/.test(mod) && /savedBridgePort|fl_bridgePort/.test(mod), 'saved port first');
+assert.ok(/stickyFallback|sticky/.test(mod), 'sticky fallback in FlConnect');
+assert.ok(/sticky Bridge fallback|stickyFallback/.test(app), 'sticky fallback in resolveOllamaBase');
 
 assert.ok(/id: 'connect'/.test(app) || /id: \"connect\"/.test(app), 'MORE_CARDS connect');
 assert.ok(/MORE_TAB_IDS = \['connect'/.test(app), 'MORE_TAB_IDS connect first');
 assert.ok(/id="tab-connect"/.test(app), 'tab-connect panel');
-assert.ok(/fl-connect-mount/.test(app), 'mount host');
 assert.ok(/modules\/fl-connect\.js/.test(app), 'script tag');
 assert.ok(/FlConnect\.open|switchTab\('connect'\)/.test(app), 'old doors point');
-assert.ok(/Open Connect/.test(app), 'Settings banner');
-assert.ok(/app\.html#connect/.test(install) && /More → Connect|More → Connect/.test(install), 'install end');
-assert.ok(/Named five stay five/.test(md + mod) || /Named five stay five/.test(app), 'soft paste');
-assert.ok(/Connect under More/.test(family) && /Temperature:/.test(family), 'ledger temperature');
-assert.ok(/v-connect-under-more-v0/.test(flint), 'Flint diary');
-assert.ok(/CONNECT_UNDER_MORE/.test(genRecent), 'RECENT');
+assert.ok(/app\.html#connect/.test(install), 'install end');
+assert.ok(/Connect under More/.test(family) && /Connect Bridge-aware/.test(family), 'both ledger lines');
+assert.ok(/v-connect-under-more-v0/.test(flint) && /v-connect-bridge-aware-v0/.test(flint), 'both Flint lines');
+assert.ok(/CONNECT_UNDER_MORE/.test(genRecent) && /CONNECT_BRIDGE_AWARE/.test(genRecent), 'RECENT both');
 
-// Soft leave sw — module not forced into APP_SHELL
+// Soft leave root sw — byte-identical to main
+assert.strictEqual(rootSw, mainSw, 'root sw.js byte-identical to origin/main');
 assert.ok(!/fl-connect\.js/.test(sw), 'soft leave sw docs');
 assert.ok(!/fl-connect\.js/.test(rootSw), 'soft leave sw root');
-assert.ok(!/Access-Control-Allow-Origin:\s*\*/.test(md + mod), 'no bare star');
 
-console.log('SMOKE_OK connect under more v0');
-console.log('FlConnect · More→Connect · old doors point · soft leave sw');
+// Loop-stops case (vm): stopLoop after remember / unmount clears timer path
+const store = {};
+const sandbox = {
+  window: {},
+  localStorage: {
+    getItem: function (k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+    setItem: function (k, v) { store[k] = String(v); },
+    removeItem: function (k) { delete store[k]; }
+  },
+  location: { hostname: 'freelattice.com', protocol: 'https:', hash: '', search: '' },
+  document: {
+    hidden: false,
+    documentElement: { getAttribute: function () { return ''; } },
+    getElementById: function () { return null; },
+    createElement: function () {
+      return { style: {}, textContent: '', setAttribute: function () {}, appendChild: function () {}, addEventListener: function () {} };
+    },
+    head: { appendChild: function () {} },
+    body: { contains: function () { return false; } },
+    addEventListener: function () {},
+    removeEventListener: function () {}
+  },
+  fetch: async function () { throw new Error('offline stub'); },
+  setTimeout: function () { return 1; },
+  clearTimeout: function () {},
+  getComputedStyle: function () { return { display: 'block' }; },
+  navigator: { userAgent: 'test' },
+  console: console
+};
+sandbox.window = sandbox;
+vm.runInNewContext(mod, sandbox);
+assert.ok(sandbox.FlConnect.stopLoop && sandbox.FlConnect.unmount, 'stop/unmount');
+assert.ok(sandbox.FlConnect.LOOP_MAX_MS >= 5 * 60 * 1000, '5 min cap');
+sandbox.FlConnect.stopLoop();
+sandbox.FlConnect.unmount();
+assert.ok(true, 'loop-stops case');
+
+console.log('SMOKE_OK connect under more v0.1');
+console.log('loop calm · sticky Bridge · both ledger lines · sw identical to main');

@@ -27744,7 +27744,7 @@ const FlOnboarding = (function() {
       try {
         if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
         else if (typeof switchTab === 'function') switchTab('connect');
-        else if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();
+        else if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();>>>>>>> origin/main
         else if (typeof flOpenConnectWizard === 'function') flOpenConnectWizard('allowed');
       } catch (eOpen) {}
     } catch(e) { console.error('FlOnboarding connect error:', e); }

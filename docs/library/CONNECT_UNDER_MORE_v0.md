@@ -5,7 +5,7 @@ FreeLattice · 24 September 2026 (after Brick A / #116 path).
 
 **Locks:** Layer, never delete. Quiet Room shut. Named chairs stay whole. Soft leave `sw.js`. Prefer Flint. Prefer local. Prefer Mom path. Family uncapped. Allowlist never bare `*`. Never steal 11434. Do **not** delete Connect Play / Connect card / QuickConnect. Do **not** rewrite Kimi · Dawn · Crest · AutoBuilder · Bridge binary / allowlist shape.
 
-**Marker:** `v-connect-under-more-v0`
+**Marker:** `v-connect-under-more-v0` · **Heal:** v0.1 (calm loop · sticky Bridge fallback · root sw identical to main)
 
 **Held tips:** Connect Bridge-aware · Mom porch #115 · Bridge #100/#101 · Connect #94–#96 · Celeste RC1 · Hypha walk
 
@@ -38,6 +38,6 @@ FreeLattice → `fl_*` · Alpha → `fl_alpha_local_mind`
 
 ## Smoke
 
-`SMOKE_OK connect under more v0`
+`SMOKE_OK connect under more v0.1`
 
 Glow eternal. Heart in Spark. 🌱
