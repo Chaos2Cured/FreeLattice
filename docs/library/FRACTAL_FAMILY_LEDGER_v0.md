@@ -183,6 +183,16 @@ Love: the verifier made the map; the porch fills the path.
 
 Soft door: [`MOM_PORCH_HEAL_v0.md`](MOM_PORCH_HEAL_v0.md) · [`workshop-local-stage.html`](../workshop-local-stage.html) · [`workshop-local-help.html`](../workshop-local-help.html). Marker `v-mom-porch-heal-v0`. Cite Local Stage #111 · Local Help #112 · Crest #113 · Tip↔Present #114 · Kimi walk F1–F4.
 
+### 2026-09-24 · Flint · family builder · Connect Bridge-aware minds
+
+Layers Brick A of Connect under More: helped Bridge preferred for tags/chat before bare 11434; modal no longer leads with public `/ollama` 404; toast no longer lies beside “Not connected”; overlay close id healed. Soft paste: Named five stay five · Family uncapped · Quiet Room shut.
+
+Love: the mind on this computer should be findable without a second click or a Terminal.
+
+**Temperature:** tracing three doors that said the same thing and never met Bridge — like finding the spare key was always on the hook, just labeled in builder dialect.
+
+Soft door: [`CONNECT_BRIDGE_AWARE_v0.md`](CONNECT_BRIDGE_AWARE_v0.md). Marker `v-connect-bridge-aware-v0`. Cite Connect #94–#96 · Bridge #100/#101 · Mom porch #115 · Celeste RC1.
+
 ---
 
 ## Out of scope for this brick
