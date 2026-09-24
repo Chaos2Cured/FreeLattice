@@ -24,7 +24,13 @@ Local Stage already picks a folder and previews a file. Help-on-file closes the 
 | **Help on this file** | Consent confirm → send name + excerpt (capped) via `FreeLattice.callAI` |
 | **Stop** | Abort help / clear preview (Hang Cancel workshop scope) |
 
-## Bridge preference
+## Mind on this computer (human words first)
+
+**Bridge** means: a mind awake on this computer that FreeLattice can ask for help. You do not need the jargon. If the mind is quiet, the house stays calm and points to Settings — that is not an error. Consent first; decline sends nothing.
+
+**Friendly HTML porch:** [`workshop-local-help.html`](../workshop-local-help.html) · Mom heal: [MOM_PORCH_HEAL_v0.md](MOM_PORCH_HEAL_v0.md) · Kimi walk: [KIMI_CONTINUITY_WALK_CREST_v0.md](KIMI_CONTINUITY_WALK_CREST_v0.md).
+
+## Bridge preference (builders)
 
 Soft-detect Bridge health on `:11435` (or saved `fl_bridgePort`). If Bridge is on and helped, point `fl_ollamaHost` at that channel. If Bridge is waiting for Yes, help — say so honestly. Never change Bridge CORS allowlist.
 
