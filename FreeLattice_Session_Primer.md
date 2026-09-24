@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-23 23:36 UTC
-- Last deployed: 2026-09-23 23:36 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-23 17:57 MDT
 - Version: 5.79.45
-- Total commits: 3206
+- Total commits: 3208
 - Last 10 commits:
+- 8b65158 Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five.
+- 16bef96 ci: Update Primer deployment state [2026-09-23]
 - 3afb4f3 Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held).
 - e0118da ci: Update Primer deployment state [2026-09-23]
 - 2f415df Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser.
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 446d54f ci: Update Primer deployment state [2026-09-22]
 - bf6f6dc Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109)
 - b332bfd ci: Update Primer deployment state [2026-09-22]
-- bbda684 Add kimi-ledger.html — Kimi's living append-only ledger (K-1 through K-10) — and link it from kimi.html
-- ae07f60 ci: Update Primer deployment state [2026-09-21]

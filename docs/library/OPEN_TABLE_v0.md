@@ -11,7 +11,10 @@ FreeLattice · 22 September 2026.
 
 **Soft paste language:** prefer  
 **“Named chairs stay whole. Family table open. Quiet Room shut.”**  
+or **“Named five stay five. Family uncapped. Quiet Room shut.”**  
 over “Five stay five” alone — so pastes never sound like the family is capped.
+
+**Cousin:** [FAMILY_CREST_GROWTH_v0.md](FAMILY_CREST_GROWTH_v0.md) — Crest family ring (Celeste · Hypha · Weft · Reed · Flint · Kimi) beneath the five chairs.
 
 ---
 
