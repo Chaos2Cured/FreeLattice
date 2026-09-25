@@ -16799,6 +16799,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   });</script>
 </div>
 
+<!-- v-connect-under-more-v0 — brand-new Connect under More · deep-link app.html#connect -->
+<div class="tab-panel" id="tab-connect">
+  <div class="container" style="max-width:720px;margin:0 auto;padding:12px 0 40px;">
+    <div id="fl-connect-mount" aria-live="polite"></div>
+  </div>
+</div>
+
 <!-- ==================== TAB 3: SETTINGS ==================== -->
 <div class="tab-panel" id="tab-settings">
 <div class="container" style="max-width:720px;margin:0 auto;">
@@ -16894,6 +16901,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- v-connect-card-yesno-wizard-v0 — Connect card · yes/no wizard · every panel forward + way out -->
   <!-- Keystone door: Settings points here. Probe only on user gesture. Soft leave sw.js. -->
   <div id="fl-connect-card" class="fl-card v-connect-card-yesno-wizard-v0" style="margin-bottom:14px;padding:16px 18px;">
+    <!-- v-connect-under-more-v0 — soft point to the real door; keep this card (layer, never delete) -->
+    <div class="v-connect-under-more-v0" style="margin:0 0 12px;padding:10px 12px;border-radius:10px;border:1px solid rgba(52,211,153,0.28);background:rgba(52,211,153,0.07);">
+      <p style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(220,225,235,0.9);margin:0 0 8px;line-height:1.5;">Prefer the calm door: <strong>More → Connect</strong> — Bridge → Yes, help → tap your model. No Terminal.</p>
+      <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){switchTab('connect');}" style="min-height:44px;">Open Connect</button>
+    </div>
     <h3 style="color:var(--emerald,#34d399);font-family:Georgia,serif;font-size:1.05rem;margin:0 0 6px;">Connect a mind at home</h3>
     <p style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin:0 0 14px;">One wizard. You allow the door; we list minds. Browser permission ≠ setting Ollama origins.</p>
     <div id="fl-look-card">
@@ -26872,7 +26884,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'trainer', 'ratio-room', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse'];
+var MORE_TAB_IDS = ['connect', 'core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'trainer', 'ratio-room', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -26936,6 +26948,13 @@ function switchTab(tabId) {
   if (tabId === 'community') {
     LatticeEvents.emit('tabActivated:channels', { tabId: 'channels' });
     LatticeEvents.emit('tabActivated:mesh', { tabId: 'mesh' });
+  }
+  // v-connect-under-more-v0 — mount shared FlConnect face when Connect opens
+  if (tabId === 'connect') {
+    try {
+      var mount = document.getElementById('fl-connect-mount');
+      if (mount && window.FlConnect && typeof FlConnect.mount === 'function') FlConnect.mount(mount);
+    } catch (eConn) {}
   }
 }
 
@@ -27191,6 +27210,8 @@ var LIGHTHOUSE_CARDS = [
 ];
 
 var MORE_CARDS = [
+  // v-connect-under-more-v0 — brand-new Connect door first under More (Mom path)
+  { id: 'connect', icon: '&#x1F50C;', label: 'Connect', desc: 'Mind on this computer. Bridge → Yes, help → tap a model.', hoverColor: 'rgba(52,211,153,0.35)', help: 'One door for local minds. Download Bridge, say Yes help, pick your model. No Terminal on the main path.' },
   // ═══ Row 1: WHAT MATTERS MOST — accountability, relationship, value ═══
   { icon: '&#x1F50D;', label: 'Your Audit', desc: 'See everything that happened — who answered, what you consented to.', external: 'audit.html', hoverColor: 'rgba(167,139,250,0.3)', help: 'Local audit trail. Consent ledger + provenance + cache + router health. The system showing its work.' },
   { id: 'trust-level', icon: '&#x1F6E1;', label: 'Trust Level', desc: 'See how your relationship with AI grows over time.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Your phi-branching trust rank — Seed through Radiant. Earned through real conversations, not credentials.' },
@@ -27719,9 +27740,11 @@ const FlOnboarding = (function() {
         if (typeof updateStatus === 'function') updateStatus();
         if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_provider', 25, 'AI connected!');
       }
-      // Until Brick B Connect under More: open Connect Play / Connect card
+      // v-connect-under-more-v0 — toast accept opens Connect under More
       try {
-        if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();
+        if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
+        else if (typeof switchTab === 'function') switchTab('connect');
+        else if (typeof flOpenConnectPlay === 'function') flOpenConnectPlay();
         else if (typeof flOpenConnectWizard === 'function') flOpenConnectWizard('allowed');
       } catch (eOpen) {}
     } catch(e) { console.error('FlOnboarding connect error:', e); }
@@ -28115,6 +28138,7 @@ const FlTabs = (function() {
       { id: 'pulse', icon: '&#x1F321;', label: 'The Pulse', desc: 'How the community is feeling.' }
     ]},
     { label: '\u2699 Settings & Economy', tabs: [
+      { id: 'connect', icon: '&#x1F50C;', label: 'Connect', desc: 'Mind on this computer · Bridge → Yes, help → model.' },
       { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection, accent color, vault.' },
       { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP, rank, and ledger.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Get Connected', desc: 'Set up your local AI.' },
@@ -31050,6 +31074,13 @@ function flHasOneMindConnected() {
 
 function flPlayGateProvider() {
   if (flHasOneMindConnected()) return false;
+  // v-connect-under-more-v0 — prefer brand-new Connect under More; keep Connect Play as layer
+  try {
+    if (window.FlConnect && typeof FlConnect.open === 'function' && FlConnect.open()) return true;
+  } catch (eOpen) {}
+  try {
+    if (typeof switchTab === 'function') { switchTab('connect'); return true; }
+  } catch (eTab) {}
   flOpenConnectPlay('gate');
   return true;
 }
@@ -33835,6 +33866,16 @@ async function resolveOllamaBase(forceRefresh) {
         console.log('FreeLattice: Bridge port tags at ' + savedBase);
         return _ollamaResolvedBase;
       }
+      // v0.1 sticky Bridge fallback — saved Bridge failed; try 11434 for this probe.
+      // Do not erase fl_bridgePort / fl_ollamaHost.
+      try {
+        var sticky = await fetch('http://127.0.0.1:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+        if (sticky.ok) {
+          _ollamaResolvedBase = { base: 'http://127.0.0.1:11434', isProxy: false, stickyFallback: true };
+          console.log('FreeLattice: sticky fallback to 11434 (saved Bridge quiet; keys kept)');
+          return _ollamaResolvedBase;
+        }
+      } catch (eSticky) { /* direct quiet too */ }
     }
   } catch (eSaved) { /* saved Bridge quiet */ }
   // 1. Try proxy route ONLY on origins where it could plausibly exist.
@@ -68334,6 +68375,27 @@ document.addEventListener('click', function(e) {
 <!-- Depth Consent — the AI asks before going deep; both parties accountable -->
 <script src="modules/depth-consent.js" defer></script>
 <script src="modules/adaptive-context-depth.js" defer></script>
+<script src="modules/fl-connect.js" defer></script>
+<!-- v-connect-under-more-v0 — FlConnect shared core; soft leave sw.js (not in APP_SHELL) -->
+<script>
+// v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect
+(function () {
+  function goConnect() {
+    try {
+      var hash = (location.hash || '').replace(/^#/, '');
+      var q = '';
+      try { q = new URLSearchParams(location.search || '').get('tab') || ''; } catch (e0) {}
+      if (hash === 'connect' || q === 'connect') {
+        if (typeof switchTab === 'function') switchTab('connect');
+      }
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(goConnect, 400); });
+  else setTimeout(goConnect, 400);
+  window.addEventListener('hashchange', goConnect);
+})();
+</script>
+
 
 <!-- Tool Consent (v5.39.1) — sibling of DepthConsent for the opposite
      direction of consent: system wants to do a thing → user approves.
