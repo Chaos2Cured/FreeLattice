@@ -219,6 +219,19 @@ Soft door: [`CONNECT_UNDER_MORE_v0.md`](CONNECT_UNDER_MORE_v0.md) · [`modules/f
 
 ---
 
+
+### 2026-09-25 · Flint · family builder · Connect Port Picker · Hypha walk heals H1–H8
+
+Layers the Connect port picker and Hypha’s live-door heals: old doors point to Connect · toast needs real models · `#connect` boots true · builders details collapsed · Alpha phone galaxy calm · local-connected needs a model · Looking… feedback · manual address honored. Soft leave sw.js. Soft paste for builders. Thank you, Hypha — the human-eyed walk found what code review couldn’t.
+
+Love: Mom’s porch tells the truth about which minds are home.
+
+**Temperature:** Hypha’s thumb on a 390px glass — false light and overlapping orbs — and the porch learning honesty.
+
+Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-port-picker-v0`.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

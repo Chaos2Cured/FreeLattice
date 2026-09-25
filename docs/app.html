@@ -16020,9 +16020,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="ai-setup-banner" id="aiSetupBanner" style="display:none;">
     <div class="ai-setup-title" style="margin-bottom:10px;">Connect an AI to start chatting</div>
     <div class="ai-setup-providers" id="aiSetupProviders" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-      <button class="ai-provider-btn" onclick="switchTab('settings')" style="flex:1;min-width:200px;min-height:60px;">
-        <span class="ai-setup-name">Open Settings &rarr;</span>
-        <span class="ai-setup-note">Set up cloud or local AI in one tap</span>
+      <button class="ai-provider-btn" onclick="(window.FlConnect&amp;&amp;FlConnect.open)?FlConnect.open():switchTab('connect')" style="flex:1;min-width:200px;min-height:60px;">
+        <span class="ai-setup-name">Open Connect &rarr;</span>
+        <span class="ai-setup-note">Mind on this computer · or cloud in one tap</span>
       </button>
     </div>
     <!-- Legacy form elements kept for AiSetup.select/testConnection/testOllama compatibility -->
@@ -16133,7 +16133,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="form-group hidden" id="ollamaHostGroup">
         <label for="ollamaHostInput">&#x1F3E0; Ollama Address</label>
         <input type="text" id="ollamaHostInput" placeholder="localhost:11434" value="" oninput="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
-        <div class="hint">Default: localhost:11434. Change to a remote IP (e.g., 192.168.1.50:11434) for faster AI on another machine.</div>
+        <div class="hint">Default: localhost:11434. Change to a remote IP (e.g., 192.168.1.50:11434) for faster AI on another machine. <a href="#connect" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){}" style="color:var(--emerald,#34d399);">Or set this in Connect</a></div>
       </div>
 
       <!-- Mesh Compute Sharing (Local only) -->
@@ -16520,7 +16520,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <!-- v-connect-play-lab-v0 — bottom 🌿 Connect · denser yes/no/please · keep #95 card · flOpenConnectPlay ≠ flOpenConnectWizard -->
           <div id="fl-connect-play" class="fl-connect-play v-connect-play-lab-v0" data-play-open="0">
-            <button type="button" class="fl-connect-play-toggle" id="fl-connect-play-toggle" onclick="flOpenConnectPlay()" aria-expanded="false" aria-controls="fl-connect-play-panel" title="Connect Play lab — Mom path">&#127807; Connect</button>
+            <button type="button" class="fl-connect-play-toggle" id="fl-connect-play-toggle" onclick="(window.FlConnect&amp;&amp;FlConnect.open)?FlConnect.open():(typeof switchTab==='function'&amp;&amp;switchTab('connect'))" aria-expanded="false" aria-controls="fl-connect-play-panel" title="Connect — mind on this computer">&#127807; Connect</button>
             <div id="fl-connect-play-panel" hidden role="region" aria-label="Connect Play lab">
               <div data-play="welcome">
                 <p>Welcome. FreeLattice can look for a mind already living on this computer. You choose every step.</p>
@@ -16569,7 +16569,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                   <pre id="fl-play-origin-cmd" style="margin-top:8px;"></pre>
                   <button type="button" class="ai-status-btn" id="fl-play-copy" onclick="flPlayCopyNote()" style="min-height:44px;margin-top:6px;">Copy note</button>
                 </details>
-                <p class="v-bridge-win-linux-port-friction-v0" style="font-size:0.75rem;color:var(--text-muted);margin:0 0 10px;">Bridge on another channel? <input id="fl-bridge-port-field" type="number" min="1025" max="65535" placeholder="11435" style="width:88px;min-height:36px;padding:4px 8px;border-radius:6px;border:1px solid rgba(200,210,230,0.2);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:0.85rem;" /> <button type="button" class="ai-status-btn" onclick="flUseBridgePort()" style="min-height:36px;">Use channel</button></p>
+                <p class="v-bridge-win-linux-port-friction-v0" style="font-size:0.75rem;color:var(--text-muted);margin:0 0 10px;">Bridge on another channel? <input id="fl-bridge-port-field" type="number" min="1025" max="65535" placeholder="11435" style="width:88px;min-height:36px;padding:4px 8px;border-radius:6px;border:1px solid rgba(200,210,230,0.2);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:0.85rem;" /> <button type="button" class="ai-status-btn" onclick="flUseBridgePort()" style="min-height:36px;">Use channel</button> · <a href="#connect" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){}" style="color:var(--emerald,#34d399);font-size:0.75rem;">Or set this in Connect</a></p>
                 <div class="fl-connect-play-actions">
                   <button type="button" class="ai-status-btn ai-status-btn-primary" onclick="flPlayYes()" style="min-height:44px;">I did that</button>
                   <button type="button" class="ai-status-btn" onclick="flPlayNotNow()" style="min-height:44px;">Not now</button>
@@ -16893,7 +16893,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="ai-status-actions" id="settingsActions">
       <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
-      <button class="ai-status-btn" onclick="flOpenConnectWizard('home')" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
+      <button class="ai-status-btn" onclick="(window.FlConnect&amp;&amp;FlConnect.open)?FlConnect.open():switchTab('connect')" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
     </div>
   </div>
 
@@ -16919,7 +16919,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div data-look="1" hidden>
       <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
-        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-allowed" onclick="flOpenConnectWizard('allowed')" style="min-height:44px;">I allowed it — look again</button>
+        <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-allowed" onclick="(window.FlConnect&amp;&amp;FlConnect.lookAgain)?(FlConnect.open(),FlConnect.lookAgain()):flOpenConnectWizard('allowed')" style="min-height:44px;">I allowed it — look again</button>
         <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
       </div>
       <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0;">Optional: <a href="desktop.html" style="color:var(--emerald,#34d399);">FreeLattice Desktop</a> — no browser CORS. Not the only door.</p>
@@ -27758,8 +27758,8 @@ const FlOnboarding = (function() {
   function detectOnLoad() {
     var hasProvider = false;
     try {
-      hasProvider = (typeof state !== 'undefined' && state.apiKey && state.apiKey.length > 5) ||
-                    (typeof state !== 'undefined' && state.isLocal);
+      hasProvider = (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected());
+      if (!hasProvider && typeof state !== 'undefined' && state && state.apiKey && state.apiKey.length > 5) hasProvider = true;
     } catch(e) {}
     try {
       if (!hasProvider && typeof AiSetup !== 'undefined' && AiSetup.isConnected && AiSetup.isConnected()) hasProvider = true;
@@ -27791,11 +27791,11 @@ const FlOnboarding = (function() {
   function showOllamaToast() {
     var toast = document.getElementById('flOllamaToast');
     if (!toast || toastDismissed) return;
-    // v-connect-bridge-aware-v0 — never show "Local AI detected" when already connected
+    // v-connect-port-picker-v0 / Hypha H2 — only after real models; never if already connected
     try {
-      if (typeof AiSetup !== 'undefined' && AiSetup.isConnected && AiSetup.isConnected()) return;
+      if (!(detectedModels && detectedModels.length > 0)) return;
       if (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected()) return;
-      if (typeof state !== 'undefined' && state && state.isLocal) return;
+      if (window.FlConnect && typeof FlConnect.hasLocalMind === 'function' && FlConnect.hasLocalMind()) return;
     } catch (eGate) {}
     // Don't show during welcome experience
     var welcomeOverlay = document.getElementById('welcomeOverlay');
@@ -28614,7 +28614,7 @@ const AiSetup = (function() {
         // Button 1: Use My Computer's AI → look-card wizard (v-browser-local-ai-wizard-v0)
         // Do NOT call flAutoConnect() alone — stale fl_isLocal made the click feel dead.
         (mobile ? '' :
-        '<button type="button" onclick="flProviderHeroLocalAI(event)" ' +
+        '<button type="button" onclick="(function(e){try{if(e&amp;&amp;e.preventDefault)e.preventDefault();}catch(x){}try{var o=document.getElementById('providerModalOverlay')||document.getElementById('pmOverlay');if(o)o.remove();}catch(y){}if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else if(typeof switchTab==='function')switchTab('connect');})(event)" ' +
         'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
         'background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-left:3px solid #34d399;' +
         'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
@@ -29556,7 +29556,9 @@ function showQuickConnect() {
 
   card.innerHTML =
     '<div style="font-family:Georgia,serif;font-size:1.2rem;color:var(--gold,#e8b019);margin-bottom:8px;">' + greeting + '</div>' +
-    '<div style="font-size:0.88rem;color:rgba(200,210,230,0.5);line-height:1.6;margin-bottom:20px;">Let\'s connect you to AI.</div>' +
+    '<div style="font-size:0.88rem;color:rgba(200,210,230,0.5);line-height:1.6;margin-bottom:12px;">Let\'s connect you to AI.</div>' +
+    '<button onclick="document.getElementById(\''+'flQuickConnect'+'\').remove();if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else if(typeof switchTab===\'function\')switchTab(\''+'connect'+'\');" '
+    + 'style="width:100%;margin-bottom:16px;padding:12px;min-height:44px;background:rgba(52,211,153,0.15);border:1px solid #34d399;border-radius:8px;color:#34d399;font-size:0.9rem;cursor:pointer;font-family:Georgia,serif;">Open Connect</button>' +
 
     browserAISection +
 
@@ -31060,9 +31062,12 @@ var _flPlaySource = 'ollama';
 var _flPlayChosen = null;
 
 function flHasOneMindConnected() {
+  // v-connect-port-picker-v0 / Hypha H6 — local needs a real model name (not isLocal alone)
   try {
     if (typeof state !== 'undefined' && state) {
-      if (state.isLocal && (state.ollamaModel || state.provider === 'ollama' || state.provider === 'lmstudio' || state.provider === 'browser')) return true;
+      if (state.isLocal && state.ollamaModel && String(state.ollamaModel).trim()) return true;
+      if (state.provider === 'lmstudio' && state.ollamaModel && String(state.ollamaModel).trim()) return true;
+      if (state.provider === 'browser' && state.isLocal) return true;
       if (state.apiKey && String(state.apiKey).length > 0) return true;
     }
   } catch (e0) {}
@@ -31074,14 +31079,13 @@ function flHasOneMindConnected() {
 
 function flPlayGateProvider() {
   if (flHasOneMindConnected()) return false;
-  // v-connect-under-more-v0 — prefer brand-new Connect under More; keep Connect Play as layer
-  try {
-    if (window.FlConnect && typeof FlConnect.open === 'function' && FlConnect.open()) return true;
-  } catch (eOpen) {}
+  // v-connect-port-picker-v0 / Hypha H1 — always open Connect tab (never land on Chat Connect Play)
   try {
     if (typeof switchTab === 'function') { switchTab('connect'); return true; }
   } catch (eTab) {}
-  flOpenConnectPlay('gate');
+  try {
+    if (window.FlConnect && typeof FlConnect.open === 'function' && FlConnect.open()) return true;
+  } catch (eOpen) {}
   return true;
 }
 
@@ -33839,6 +33843,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 var _ollamaResolvedBase = null; // cached result
 async function resolveOllamaBase(forceRefresh) {
   if (_ollamaResolvedBase && !forceRefresh) return _ollamaResolvedBase;
+  // 0a. v-connect-port-picker-v0 — manual Connect address before Bridge / 11434
+  try {
+    var manualBase = (typeof flGetManualConnectHost === 'function') ? flGetManualConnectHost() : null;
+    if (manualBase) {
+      var manResp = await fetch(String(manualBase).replace(/\/+$/, '') + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+      if (manResp.ok) {
+        _ollamaResolvedBase = { base: String(manualBase).replace(/\/+$/, ''), isProxy: false, viaManual: true };
+        console.log('FreeLattice: manual Connect host tags at ' + _ollamaResolvedBase.base);
+        return _ollamaResolvedBase;
+      }
+    }
+  } catch (eMan) { /* manual quiet */ }
   // 0. v-connect-bridge-aware-v0 — helped Bridge before bare 11434 (Celeste RC1)
   try {
     if (typeof flBridgeHealth === 'function') {
@@ -33912,6 +33928,41 @@ async function resolveOllamaBase(forceRefresh) {
 // FL_OLLAMA_LOCAL is the default only. The probe always calls getOllamaBaseUrl().
 var FL_OLLAMA_ORIGINS = 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*';
 var FL_OLLAMA_LOCAL = 'http://127.0.0.1:11434';
+
+// v-connect-port-picker-v0 — shared manual host (Connect picker is the Mom door)
+var FL_CONNECT_MANUAL_KEY = 'fl_connect_manual_host';
+function flGetManualConnectHost() {
+  try {
+    if (window.FlConnect && typeof FlConnect.getManualBase === 'function') {
+      var b = FlConnect.getManualBase();
+      if (b) return b;
+    }
+  } catch (e0) {}
+  try {
+    var raw = localStorage.getItem(FL_CONNECT_MANUAL_KEY) || '';
+    raw = String(raw).trim();
+    if (!raw) return null;
+    if (raw.indexOf('://') === -1) raw = 'http://' + raw;
+    raw = raw.replace(/^(https?:\/\/)localhost(?=[:/]|$)/i, '$1127.0.0.1');
+    return raw.replace(/\/+$/, '');
+  } catch (e1) { return null; }
+}
+function flSetManualConnectHost(raw) {
+  try {
+    if (window.FlConnect && typeof FlConnect.setManualHost === 'function') {
+      FlConnect.setManualHost(raw);
+      return;
+    }
+  } catch (e0) {}
+  try {
+    raw = String(raw || '').trim();
+    if (!raw) { localStorage.removeItem(FL_CONNECT_MANUAL_KEY); return; }
+    localStorage.setItem(FL_CONNECT_MANUAL_KEY, raw);
+  } catch (e1) {}
+}
+window.flGetManualConnectHost = flGetManualConnectHost;
+window.flSetManualConnectHost = flSetManualConnectHost;
+
 
 function flLocalFetchInit(extra) {
   var init = extra || {};
@@ -34156,6 +34207,12 @@ function getOllamaBaseUrl() {
       return host.replace(/\/+$/, '');
     }
   }
+  // v-connect-port-picker-v0 — manual Connect host before Bridge default
+  try {
+    var man = (typeof flGetManualConnectHost === 'function') ? flGetManualConnectHost() : null;
+    if (man) return String(man).replace(/\/+$/, '');
+  } catch (eManSync) {}
+  // viaManual sync
   // v-connect-bridge-aware-v0 — prefer saved Bridge channel over bare 11434 default
   try {
     var bp = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
@@ -34993,7 +35050,9 @@ function owUpdateStatusBadge(connected, modelCount) {
 
 // Auto-detect Ollama on app load (proxy-aware)
 async function owAutoDetect() {
+  // v-connect-port-picker-v0 / Hypha H2 owAutoDetect — real models only; open Connect not fake toast
   try {
+    if (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected()) return;
     var resolved = await resolveOllamaBase(true);
     if (!resolved) throw new Error('Ollama not reachable');
     updateOllamaProviderUrl();
@@ -35019,8 +35078,8 @@ async function owAutoDetect() {
       if (testBtn) { testBtn.className = 'ow-test-btn success'; }
       var testIcon = document.getElementById('owTestIcon');
       if (testIcon) { testIcon.innerHTML = '&#10003;'; }
-    } else {
-      // Not in local mode — show suggestion banner (one-time)
+    } else if (models.length > 0) {
+      // Not in local mode — real models found; suggest Connect (one-time)
       var dismissed = localStorage.getItem('fl_ollama_suggest_dismissed');
       if (!dismissed) {
         var banner = document.getElementById('ollamaSuggestBanner');
@@ -35055,21 +35114,14 @@ async function owAutoDetect() {
 
 // Accept the auto-detect suggestion to switch to Ollama
 function owAcceptSuggestion() {
-  state.isLocal = true;
-  document.getElementById('localToggle').checked = true;
-  localStorage.setItem('fl_isLocal', 'true');
-  handleLocalToggle(false);
-  updateStatus();
   var banner = document.getElementById('ollamaSuggestBanner');
   if (banner) banner.classList.remove('show');
   localStorage.setItem('fl_ollama_suggest_dismissed', 'true');
-}
-
-// Dismiss the auto-detect suggestion
-function owDismissSuggestion() {
-  var banner = document.getElementById('ollamaSuggestBanner');
-  if (banner) banner.classList.remove('show');
-  localStorage.setItem('fl_ollama_suggest_dismissed', 'true');
+  // v-connect-port-picker-v0 / Hypha H1 — open Connect (do not set isLocal without a model)
+  try {
+    if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
+    else if (typeof switchTab === 'function') switchTab('connect');
+  } catch (e) {}
 }
 
 // ============================================
@@ -51377,8 +51429,8 @@ if ('serviceWorker' in navigator) {
     // Check if a real provider is configured
     var hasProvider = false;
     try {
-      hasProvider = (typeof state !== 'undefined' && state.apiKey && state.apiKey.length > 5) ||
-                    (typeof state !== 'undefined' && state.isLocal);
+      hasProvider = (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected());
+      if (!hasProvider && typeof state !== 'undefined' && state && state.apiKey && state.apiKey.length > 5) hasProvider = true;
     } catch(e) {}
 
     if (hasProvider) {
@@ -68380,6 +68432,7 @@ document.addEventListener('click', function(e) {
 <script>
 // v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect
 (function () {
+  // v-connect-port-picker-v0 / Hypha H3 — honor #connect after tabs init
   function goConnect() {
     try {
       var hash = (location.hash || '').replace(/^#/, '');
@@ -68387,11 +68440,18 @@ document.addEventListener('click', function(e) {
       try { q = new URLSearchParams(location.search || '').get('tab') || ''; } catch (e0) {}
       if (hash === 'connect' || q === 'connect') {
         if (typeof switchTab === 'function') switchTab('connect');
+        else if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
       }
     } catch (e) {}
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(goConnect, 400); });
-  else setTimeout(goConnect, 400);
+  function schedule() {
+    setTimeout(goConnect, 400);
+    setTimeout(goConnect, 1200);
+    setTimeout(goConnect, 2500);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+  else schedule();
+  window.addEventListener('load', function () { setTimeout(goConnect, 600); });
   window.addEventListener('hashchange', goConnect);
 })();
 </script>

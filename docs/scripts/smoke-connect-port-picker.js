@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+'use strict';
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..');
+const repo = path.join(root, '..');
+const read = (r) => fs.readFileSync(path.join(root, r), 'utf8');
+const md = read('library/CONNECT_PORT_PICKER_v0.md');
+const mod = read('modules/fl-connect.js');
+const app = read('app.html');
+const family = read('library/FRACTAL_FAMILY_LEDGER_v0.md');
+const flint = read('Flint.html');
+const genRecent = fs.readFileSync(path.join(repo, 'scripts', 'generate-recent.sh'), 'utf8');
+const rootSw = fs.readFileSync(path.join(repo, 'sw.js'), 'utf8');
+const mainSw = require('child_process').execSync('git show origin/main:sw.js', { cwd: repo, encoding: 'utf8' });
+
+assert.ok(/v-connect-port-picker-v0/.test(md + mod), 'marker');
+assert.ok(/Hypha walk heals H1–H8|H1–H8/.test(md), 'H1-H8 section');
+assert.ok(/Temperature:/.test(md + family), 'temperature');
+assert.ok(/getManualBase|setManualHost|fl_connect_manual_host|MANUAL_KEY/.test(mod), 'manual port');
+assert.ok(/For builders|flc-builders/.test(mod), 'builders details');
+assert.ok(!/Named five stay five[\s\S]{0,80}flc-lede/.test(mod) || /flc-builders[\s\S]*Named five stay five/.test(mod), 'paste not on main path');
+assert.ok(/hasLocalMind|Looking…|next look|ollamaReadyWhileBridgeWaits|Use a different address/.test(mod), 'H6-H8 UI');
+assert.ok(/classList\.contains\('active'\)/.test(mod), 'panelVisible class');
+assert.ok(/goConnect|#connect/.test(app), 'boot #connect');
+assert.ok(/viaManual|flGetManualConnectHost|FL_CONNECT_MANUAL_KEY/.test(app), 'resolve manual');
+assert.ok(/function modalConnectOllama/.test(app) && /resolveOllamaBase/.test(app), 'modal + resolveOllamaBase present');
+const modalIdx = app.indexOf('function modalConnectOllama');
+assert.ok(modalIdx > 0 && /resolveOllamaBase/.test(app.slice(modalIdx, modalIdx + 2500)), 'modalConnectOllama uses resolveOllamaBase');
+assert.ok(/detectedModels && detectedModels\.length/.test(app) || /detectedModels\.length > 0/.test(app), 'toast gated by models');
+assert.ok(/switchTab\('connect'\)|FlConnect\.open/.test(app), 'doors point Connect');
+assert.ok(/Thank you, Hypha|Hypha/.test(family), 'thank Hypha');
+assert.ok(/v-connect-port-picker-v0/.test(flint), 'Flint');
+assert.ok(/CONNECT_PORT_PICKER/.test(genRecent), 'RECENT');
+assert.strictEqual(rootSw, mainSw, 'sw identical to main');
+assert.ok(!/fl-connect\.js/.test(rootSw), 'soft leave sw');
+
+console.log('SMOKE_OK connect port picker v0.1');
+console.log('#connect boot · toast gated · resolveOllamaBase · builders details · Hypha thanks');

@@ -1,14 +1,16 @@
 // ═══════════════════════════════════════════════════════════════
 // fl-connect.js — FlConnect shared core (FreeLattice + theLatticeTree)
 //
-// Marker: v-connect-under-more-v0 · heal v0.1
+// Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0
 // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
 // Still requires Bridge "Yes, help". Never bare * allowlist. No CMD on main path.
 // FreeLattice remembers fl_* keys. Alpha remembers fl_alpha_local_mind (do not collapse).
 // Soft leave sw.js — load via script tag; not added to APP_SHELL by default.
 //
-// v0.1 loop: stop when connected / panel gone; pause on hidden; backoff 8→16→30s;
-// stop after ~5 min with Look again; saved Bridge port first; redraw only on change.
+// Port picker v0.1 + Hypha walk H4–H8: manual address · builders details ·
+// local-connected needs a model · show found models even if Bridge waits ·
+// Looking… feedback · Look again always · class-based panelVisible ·
+// full Bridge rescan every 3rd tick.
 // ═══════════════════════════════════════════════════════════════
 
 (function (root) {
@@ -16,6 +18,7 @@
 
   var BRIDGE_DEFAULT = 11435;
   var ALPHA_KEY = 'fl_alpha_local_mind';
+  var MANUAL_KEY = 'fl_connect_manual_host';
   var INSTALL_BRIDGE = 'https://freelattice.com/install.html#bridge-download';
   var LOOP_MAX_MS = 5 * 60 * 1000;
 
@@ -28,6 +31,8 @@
   var _pausedHidden = false;
   var _visBound = false;
   var _lastReport = null;
+  var _tickN = 0;
+  var _fullScanMiss = false;
 
   function isAlpha() {
     try {
@@ -41,19 +46,47 @@
     return false;
   }
 
+  function normalizeHost(raw) {
+    raw = String(raw || '').trim();
+    if (!raw) return null;
+    if (raw.indexOf('://') === -1) raw = 'http://' + raw;
+    raw = raw.replace(/^(https?:\/\/)localhost(?=[:/]|$)/i, '$1127.0.0.1');
+    return raw.replace(/\/+$/, '');
+  }
+
+  function getManualBase() {
+    try {
+      return normalizeHost(localStorage.getItem(MANUAL_KEY) || '');
+    } catch (e) { return null; }
+  }
+
+  function setManualHost(raw) {
+    try {
+      raw = String(raw || '').trim();
+      if (!raw) { localStorage.removeItem(MANUAL_KEY); return null; }
+      localStorage.setItem(MANUAL_KEY, raw);
+      return normalizeHost(raw);
+    } catch (e) { return null; }
+  }
+
+  function clearManualHost() {
+    try { localStorage.removeItem(MANUAL_KEY); } catch (e) {}
+  }
+
+  function directOllamaBases() {
+    var out = [];
+    var man = getManualBase();
+    if (man) out.push(man);
+    var d = 'http://127.0.0.1:11434';
+    if (!man || man.replace(/\/+$/, '') !== d) out.push(d);
+    return out;
+  }
+
   function savedBridgePort() {
     try {
       var saved = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
       if (saved && saved !== 11434) return saved;
     } catch (e0) {}
-    try {
-      var host = localStorage.getItem('fl_ollamaHost') || '';
-      var m = String(host).match(/127\.0\.0\.1:(\d+)/);
-      if (m) {
-        var p = parseInt(m[1], 10);
-        if (p && p !== 11434) return p;
-      }
-    } catch (e1) {}
     return null;
   }
 
@@ -62,7 +95,7 @@
     var ports = [];
     var saved = savedBridgePort();
     if (saved) ports.push(saved);
-    if (!opts.fullScan) return ports.length ? ports : [BRIDGE_DEFAULT];
+    if (!opts.fullScan) return ports.length ? ports : [];
     if (ports.indexOf(BRIDGE_DEFAULT) < 0) ports.push(BRIDGE_DEFAULT);
     for (var i = 1; i <= 10; i++) {
       var p = BRIDGE_DEFAULT + i;
@@ -101,6 +134,18 @@
     return (data && data.models) ? data.models : [];
   }
 
+  async function probeDirectTags() {
+    var bases = directOllamaBases();
+    for (var i = 0; i < bases.length; i++) {
+      try {
+        var models = await tagsAt(bases[i]);
+        if (models && models.length) return { base: bases[i], models: models };
+        if (models) return { base: bases[i], models: [] };
+      } catch (e) {}
+    }
+    return null;
+  }
+
   function preferHelpedBridge(port) {
     port = parseInt(port, 10) || BRIDGE_DEFAULT;
     if (!port || port === 11434) return null;
@@ -129,16 +174,19 @@
 
   async function probe(opts) {
     opts = opts || {};
+    _tickN += 1;
     var report = {
       bridge: null, ollama: null, models: [], helped: false, port: null,
-      waitingHelp: false, base: null, stickyFallback: false, loopStopped: _loopStopped
+      waitingHelp: false, base: null, stickyFallback: false, loopStopped: _loopStopped,
+      ollamaReadyWhileBridgeWaits: false, nextLookSec: Math.round(_intervalMs / 1000),
+      cloudReady: hasCloudMind()
     };
 
-    // 1) Saved Bridge port first (not full 11435–11445 every tick)
+    var wantFull = opts.fullScan || !_fullScanMiss || (_tickN % 3 === 0);
     var hit = await probeBridgePorts(bridgeCandidates({ fullScan: false }));
-    if (!hit) {
-      // 2) Full scan only when saved port failed / missing
+    if (!hit && wantFull) {
       hit = await probeBridgePorts(bridgeCandidates({ fullScan: true }));
+      if (!hit) _fullScanMiss = true;
     }
 
     if (hit) {
@@ -152,37 +200,35 @@
           report.ollama = { via: 'bridge', base: report.base };
           return report;
         } catch (eTags) {
-          // sticky Bridge fallback — don't erase saved keys; try 11434 for this probe
-          try {
-            var directFail = 'http://127.0.0.1:11434';
-            report.models = await tagsAt(directFail);
-            report.base = directFail;
-            report.ollama = { via: 'direct-sticky', base: directFail };
+          var sticky = await probeDirectTags();
+          if (sticky) {
+            report.models = sticky.models;
+            report.base = sticky.base;
+            report.ollama = { via: 'direct-sticky', base: sticky.base };
             report.stickyFallback = true;
-          } catch (eSticky) {}
+          }
           return report;
         }
       }
       report.waitingHelp = true;
-      // Bridge up but not helped — still allow sticky direct tags if available
-      try {
-        var dWait = 'http://127.0.0.1:11434';
-        report.models = await tagsAt(dWait);
-        report.base = dWait;
-        report.ollama = { via: 'direct', base: dWait };
+      var directWhile = await probeDirectTags();
+      if (directWhile && directWhile.models && directWhile.models.length) {
+        report.models = directWhile.models;
+        report.base = directWhile.base;
+        report.ollama = { via: 'direct', base: directWhile.base };
+        report.ollamaReadyWhileBridgeWaits = true;
         report.stickyFallback = true;
-      } catch (eW) {}
+      }
       return report;
     }
 
-    // 3) No Bridge health — direct Ollama 11434 (sticky fallback path)
-    try {
-      var direct = 'http://127.0.0.1:11434';
-      report.models = await tagsAt(direct);
-      report.base = direct;
-      report.ollama = { via: 'direct', base: direct };
+    var direct = await probeDirectTags();
+    if (direct) {
+      report.models = direct.models || [];
+      report.base = direct.base;
+      report.ollama = { via: 'direct', base: direct.base };
       if (savedBridgePort()) report.stickyFallback = true;
-    } catch (eDirect) {}
+    }
     return report;
   }
 
@@ -191,22 +237,40 @@
     return r.models || [];
   }
 
-  function isConnected() {
+  function hasLocalMind() {
     if (isAlpha()) {
       try {
         if (root.LocalMindProbe && typeof root.LocalMindProbe.getRemembered === 'function') {
           var m = root.LocalMindProbe.getRemembered();
-          return !!(m && (m.model || m.url) && (m.model || (m.models && m.models.length)));
+          return !!(m && m.model && String(m.model).trim());
         }
       } catch (eA) {}
+      try {
+        var raw = localStorage.getItem(ALPHA_KEY);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          return !!(parsed && parsed.model && String(parsed.model).trim());
+        }
+      } catch (eB) {}
       return false;
     }
     try {
-      if (typeof root.flHasOneMindConnected === 'function' && root.flHasOneMindConnected()) return true;
-      if (root.AiSetup && typeof root.AiSetup.isConnected === 'function' && root.AiSetup.isConnected()) return true;
+      if (typeof root.state !== 'undefined' && root.state && root.state.isLocal && root.state.ollamaModel && String(root.state.ollamaModel).trim()) return true;
       if (localStorage.getItem('fl_isLocal') === 'true' && localStorage.getItem('fl_ollamaModel')) return true;
     } catch (e) {}
     return false;
+  }
+
+  function hasCloudMind() {
+    if (isAlpha()) return false;
+    try {
+      if (typeof root.state !== 'undefined' && root.state && root.state.apiKey && String(root.state.apiKey).length > 5) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  function isConnected() {
+    return hasLocalMind();
   }
 
   function remember(mind) {
@@ -222,10 +286,7 @@
         url: (base ? String(base).replace(/\/+$/, '') + '/api/tags' : ''),
         model: name,
         models: name ? [name] : [],
-        minds: [],
-        roster: [],
-        gatheringBinds: {},
-        speakingChair: ''
+        minds: [], roster: [], gatheringBinds: {}, speakingChair: ''
       };
       try {
         if (root.LocalMindProbe && typeof root.LocalMindProbe.remember === 'function') {
@@ -300,21 +361,24 @@
     return html;
   }
 
+  function portPickerHtml(idSuffix) {
+    var cur = '';
+    try { cur = localStorage.getItem(MANUAL_KEY) || ''; } catch (e) {}
+    var id = 'flc-manual-' + (idSuffix || 'a');
+    return '<div class="flc-picker">' +
+      '<label class="flc-soft" for="' + id + '">Use a different address</label>' +
+      '<div class="flc-picker-row">' +
+      '<input id="' + id + '" type="text" value="' + String(cur).replace(/"/g, '&quot;') + '" placeholder="127.0.0.1:11434" autocomplete="off" />' +
+      '<button type="button" class="flc-btn flc-primary" data-flc-try-addr="' + id + '">Try</button>' +
+      '</div></div>';
+  }
+
   function reportSignature(report) {
     report = report || {};
     var names = (report.models || []).map(function (m) {
       return (m && (m.name || m.model)) || String(m);
     }).join('|');
-    return [
-      report.helped ? 1 : 0,
-      report.waitingHelp ? 1 : 0,
-      report.port || '',
-      report.base || '',
-      report.stickyFallback ? 1 : 0,
-      names,
-      isConnected() ? 1 : 0,
-      _loopStopped ? 1 : 0
-    ].join('::');
+    return [report.helped?1:0, report.waitingHelp?1:0, report.port||'', report.base||'', report.stickyFallback?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, report.nextLookSec||0, getManualBase()||''].join('::');
   }
 
   function panelVisible() {
@@ -322,61 +386,41 @@
     try {
       if (!document.body.contains(_hostEl)) return false;
       if (_hostEl.hidden) return false;
-      if (_hostEl.offsetParent === null && getComputedStyle(_hostEl).display === 'none') return false;
       var tab = document.getElementById('tab-connect');
-      if (tab && !tab.classList.contains('active') && tab.style.display === 'none') return false;
+      if (tab && !tab.classList.contains('active')) return false;
     } catch (e) {}
     return true;
   }
 
   function stopLoop() {
     _loopStopped = true;
-    if (_timer) {
-      clearTimeout(_timer);
-      _timer = null;
-    }
+    if (_timer) { clearTimeout(_timer); _timer = null; }
   }
 
   function clearTimer() {
-    if (_timer) {
-      clearTimeout(_timer);
-      _timer = null;
-    }
+    if (_timer) { clearTimeout(_timer); _timer = null; }
   }
 
   function nextBackoff() {
     if (_intervalMs < 16000) _intervalMs = 16000;
-    else if (_intervalMs < 30000) _intervalMs = 30000;
     else _intervalMs = 30000;
   }
 
   function scheduleLoop() {
     clearTimer();
     if (_loopStopped || _pausedHidden) return;
-    _timer = setTimeout(function () {
-      tickLoop();
-    }, _intervalMs);
+    _timer = setTimeout(function () { tickLoop(); }, _intervalMs);
   }
 
   async function tickLoop() {
     if (_loopStopped || _pausedHidden) return;
-    if (!panelVisible()) {
-      stopLoop();
-      return;
-    }
-    if (isConnected()) {
-      stopLoop();
-      if (_lastReport) render(_lastReport, true);
-      return;
-    }
+    if (!panelVisible()) { stopLoop(); return; }
+    if (hasLocalMind()) { stopLoop(); if (_lastReport) render(_lastReport, true); return; }
     if (_startedAt && (Date.now() - _startedAt) >= LOOP_MAX_MS) {
       stopLoop();
-      if (_lastReport) {
-        _lastReport.loopStopped = true;
-        render(_lastReport, true);
-      } else {
-        render({ models: [], loopStopped: true }, true);
-      }
+      var r = _lastReport || { models: [] };
+      r.loopStopped = true;
+      render(r, true);
       return;
     }
     await refreshUI({ fromLoop: true });
@@ -385,21 +429,9 @@
   }
 
   function onVisibility() {
-    if (document.hidden) {
-      _pausedHidden = true;
-      clearTimer();
-      return;
-    }
+    if (document.hidden) { _pausedHidden = true; clearTimer(); return; }
     _pausedHidden = false;
-    if (_loopStopped) return;
-    if (isConnected()) {
-      stopLoop();
-      return;
-    }
-    if (!panelVisible()) {
-      stopLoop();
-      return;
-    }
+    if (_loopStopped || hasLocalMind() || !panelVisible()) return;
     _intervalMs = 8000;
     scheduleLoop();
   }
@@ -416,27 +448,58 @@
     document.removeEventListener('visibilitychange', onVisibility);
   }
 
+  function bindPicker(report) {
+    if (!_hostEl) return;
+    var tries = _hostEl.querySelectorAll('[data-flc-try-addr]');
+    for (var i = 0; i < tries.length; i++) {
+      tries[i].addEventListener('click', function (ev) {
+        var id = ev.currentTarget.getAttribute('data-flc-try-addr');
+        var input = document.getElementById(id);
+        var raw = input ? input.value : '';
+        setManualHost(raw);
+        lookAgain();
+      });
+    }
+  }
+
   function render(report, force) {
     if (!_hostEl) return;
     report = report || {};
+    report.nextLookSec = Math.round(_intervalMs / 1000);
     var sig = reportSignature(report);
     if (!force && sig === _lastSig) return;
     _lastSig = sig;
     _lastReport = report;
 
     var models = report.models || [];
+    var alpha = isAlpha();
     var html = '';
-    html += '<div class="flc-wrap v-connect-under-more-v0">';
+    html += '<div class="flc-wrap v-connect-under-more-v0 v-connect-port-picker-v0">';
     html += '<p class="flc-eyebrow">Connect · mind on this computer</p>';
     html += '<h2 class="flc-title">Connect</h2>';
     html += '<p class="flc-lede">One door. Download Bridge → Open → Yes, help → tap your model. No Terminal on the main path.</p>';
-    html += '<p class="flc-paste"><strong>Named five stay five. Family uncapped. Quiet Room shut.</strong></p>';
 
-    if (isConnected()) {
-      html += '<div class="flc-card flc-ok">A mind is connected on this device. Looking rests until you need another.</div>';
+    if (hasCloudMind() && !hasLocalMind()) {
+      html += '<div class="flc-card flc-ok"><strong>Cloud mind: ready</strong> — you can still look for a mind on this computer below.</div>';
+    }
+    if (hasLocalMind()) {
+      html += '<div class="flc-card flc-ok">A mind on this computer is connected. Looking rests until you need another.</div>';
     }
 
-    if (report.helped && models.length) {
+    if (!_loopStopped && !hasLocalMind()) {
+      html += '<p class="flc-status">Looking… next look in ' + (report.nextLookSec || 8) + 's</p>';
+    }
+    html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+
+    if (report.ollamaReadyWhileBridgeWaits && models.length) {
+      html += '<div class="flc-card"><p class="flc-tag">Ollama is ready, pick a mind</p><div class="flc-models" role="list">';
+      models.forEach(function (m) {
+        var name = (m && (m.name || m.model)) || String(m);
+        html += '<button type="button" class="flc-model" data-flc-model="' + String(name).replace(/"/g, '&quot;') + '">' + name + '</button>';
+      });
+      html += '</div></div>';
+      html += '<div class="flc-card flc-wait"><p><strong>Your Bridge is also open.</strong> Click <em>Yes, help</em> in its window if you want Bridge instead.</p></div>';
+    } else if (report.helped && models.length) {
       html += '<div class="flc-card"><p class="flc-tag">Minds found</p><div class="flc-models" role="list">';
       models.forEach(function (m) {
         var name = (m && (m.name || m.model)) || String(m);
@@ -444,9 +507,10 @@
       });
       html += '</div></div>';
     } else if (report.waitingHelp || (report.bridge && !report.helped)) {
-      html += '<div class="flc-card flc-wait"><p><strong>Your Bridge is open.</strong> Click <em>Yes, help</em> in its window.</p><p class="flc-soft">We look quietly, then rest.</p></div>';
+      html += '<div class="flc-card flc-wait"><p><strong>Your Bridge is open.</strong> Click <em>Yes, help</em> in its window.</p></div>';
+      html += portPickerHtml('wait');
     } else if (models.length) {
-      html += '<div class="flc-card"><p class="flc-tag">Minds found' + (report.stickyFallback ? ' (direct)' : '') + '</p><div class="flc-models" role="list">';
+      html += '<div class="flc-card"><p class="flc-tag">Minds found</p><div class="flc-models" role="list">';
       models.forEach(function (m) {
         var name = (m && (m.name || m.model)) || String(m);
         html += '<button type="button" class="flc-model" data-flc-model="' + String(name).replace(/"/g, '&quot;') + '">' + name + '</button>';
@@ -455,39 +519,48 @@
     } else {
       html += '<div class="flc-card flc-download"><p class="flc-tag">No local mind yet</p>';
       html += bridgeLinksHtml();
-      html += '<p class="flc-soft">After Yes, help — models appear here.</p></div>';
+      html += portPickerHtml('miss');
+      html += '</div>';
     }
 
-    if (_loopStopped && !isConnected()) {
-      html += '<div class="flc-card flc-wait"><p>Looking paused to keep the porch calm.</p>';
-      html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button></div>';
+    if (_loopStopped && !hasLocalMind()) {
+      html += '<div class="flc-card flc-wait"><p>Looking paused to keep the porch calm.</p></div>';
     }
 
-    html += '<details class="flc-other"><summary>Other ways</summary>';
-    html += '<ul>';
+    html += '<details class="flc-other"><summary>Other ways</summary><ul>';
     html += '<li><a href="https://freelattice.com/desktop.html">Desktop app</a> — double-click home</li>';
-    html += '<li>No-install browser mind — in FreeLattice Settings → Browser AI</li>';
-    html += '<li>Cloud key — Change Provider when you have one</li>';
+    if (alpha) {
+      html += '<li>No-install browser mind — Garden → Settings</li>';
+      html += '<li>Cloud key — when your garden offers one</li>';
+    } else {
+      html += '<li>No-install browser mind — Settings → Browser AI</li>';
+      html += '<li>Cloud key — Change Provider when you have one</li>';
+    }
     html += '</ul>';
-    html += '<p class="flc-soft">Advanced (Terminal · OLLAMA_ORIGINS · ollama pull) stays under Settings — never on this main path.</p>';
-    html += '</details>';
-    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · soft leave sw.js</p>';
-    html += '</div>';
+    html += portPickerHtml('other');
+    html += '<p class="flc-soft">Advanced (Terminal) stays under Settings — never on this main path.</p></details>';
+
+    html += '<details class="flc-builders"><summary>For builders</summary>';
+    html += '<p>Named five stay five. Family uncapped. Quiet Room shut.</p>';
+    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · soft leave sw.js</p>';
+    html += '</details></div>';
 
     _hostEl.innerHTML = html;
+
     var btns = _hostEl.querySelectorAll('[data-flc-model]');
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', function (ev) {
         var n = ev.currentTarget.getAttribute('data-flc-model');
         remember({ name: n, base: report.base, port: report.port });
         refreshUI({ force: true });
-        try {
-          if (typeof root.showToast === 'function') root.showToast('Connected · ' + n);
-        } catch (eT) {}
+        try { if (typeof root.showToast === 'function') root.showToast('Connected · ' + n); } catch (eT) {}
       });
     }
-    var again = _hostEl.querySelector('[data-flc-look-again]');
-    if (again) again.addEventListener('click', function () { lookAgain(); });
+    var again = _hostEl.querySelectorAll('[data-flc-look-again]');
+    for (var j = 0; j < again.length; j++) {
+      again[j].addEventListener('click', function () { lookAgain(); });
+    }
+    bindPicker(report);
   }
 
   async function refreshUI(opts) {
@@ -495,7 +568,7 @@
     var report = await probe({ gesture: true });
     report.loopStopped = _loopStopped;
     render(report, !!opts.force);
-    if (isConnected()) stopLoop();
+    if (hasLocalMind()) stopLoop();
     return report;
   }
 
@@ -505,8 +578,9 @@
     _intervalMs = 8000;
     _startedAt = Date.now();
     _lastSig = '';
+    _fullScanMiss = false;
     refreshUI({ force: true }).then(function () {
-      if (!_loopStopped && !_pausedHidden && !isConnected()) scheduleLoop();
+      if (!_loopStopped && !_pausedHidden && !hasLocalMind()) scheduleLoop();
     });
   }
 
@@ -515,11 +589,12 @@
     var s = document.createElement('style');
     s.id = 'fl-connect-styles';
     s.textContent = [
-      '.flc-wrap{max-width:40rem;margin:0 auto;padding:1.25rem 1rem 2rem;font-family:Georgia,serif;color:rgba(220,225,235,.92)}',
+      '.flc-wrap{max-width:40rem;margin:0 auto;padding:1.25rem 1rem 2rem;font-family:Georgia,serif;color:rgba(220,225,235,.92);position:relative;z-index:40;max-height:calc(100dvh - 4.5rem);overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '.flc-eyebrow{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(52,211,153,.75);margin:0 0 .5rem;font-family:ui-monospace,Menlo,monospace}',
       '.flc-title{font-size:1.55rem;color:#34d399;margin:0 0 .5rem;font-weight:600}',
       '.flc-lede{font-size:.95rem;line-height:1.55;margin:0 0 1rem;color:rgba(200,210,230,.85)}',
-      '.flc-paste{font-size:.82rem;color:rgba(196,181,230,.9);margin:0 0 1rem}',
+      '.flc-status{font-size:.85rem;color:rgba(196,181,230,.9);margin:0 0 .5rem}',
+      '.flc-look-again{margin:0 0 1rem}',
       '.flc-card{padding:1rem 1.05rem;border-radius:12px;border:1px solid rgba(52,211,153,.28);background:rgba(52,211,153,.06);margin:0 0 1rem}',
       '.flc-wait{border-color:rgba(232,176,25,.35);background:rgba(232,176,25,.07)}',
       '.flc-ok{border-color:rgba(52,211,153,.4)}',
@@ -530,10 +605,14 @@
       '.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}',
       '.flc-primary{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.45);color:#34d399}',
       '.flc-soft{font-size:.8rem;color:rgba(148,163,184,.95);margin:.65rem 0 0;line-height:1.45}',
-      '.flc-other{margin:1rem 0;font-size:.88rem;color:rgba(200,210,230,.8)}',
+      '.flc-other,.flc-builders{margin:1rem 0;font-size:.88rem;color:rgba(200,210,230,.8)}',
       '.flc-other ul{margin:.5rem 0 0;padding-left:1.2rem}',
-      '.flc-other a{color:#e8b019}',
-      '.flc-marker{font-size:.68rem;font-family:ui-monospace,Menlo,monospace;color:rgba(148,163,184,.65);margin-top:1rem}'
+      '.flc-other a,.flc-builders a{color:#e8b019}',
+      '.flc-marker{font-size:.68rem;font-family:ui-monospace,Menlo,monospace;color:rgba(148,163,184,.65);margin-top:1rem}',
+      '.flc-picker{margin-top:.75rem}',
+      '.flc-picker-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.35rem}',
+      '.flc-picker input{flex:1;min-width:10rem;min-height:44px;padding:.55rem .7rem;border-radius:8px;border:1px solid rgba(200,210,230,.2);background:rgba(0,0,0,.28);color:#e6ebf5;font:inherit}',
+      '@media (max-width:480px){.flc-btn,.flc-model,.flc-picker-row .flc-btn{width:100%}.flc-picker-row{flex-direction:column}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -560,6 +639,8 @@
     preferHelpedBridge: preferHelpedBridge,
     listMinds: listMinds,
     isConnected: isConnected,
+    hasLocalMind: hasLocalMind,
+    hasCloudMind: hasCloudMind,
     remember: remember,
     open: open,
     mount: mount,
@@ -567,9 +648,13 @@
     refresh: refreshUI,
     lookAgain: lookAgain,
     stopLoop: stopLoop,
+    getManualBase: getManualBase,
+    setManualHost: setManualHost,
+    clearManualHost: clearManualHost,
     INSTALL_BRIDGE: INSTALL_BRIDGE,
     BRIDGE_DEFAULT: BRIDGE_DEFAULT,
     STORAGE_ALPHA: ALPHA_KEY,
+    MANUAL_KEY: MANUAL_KEY,
     LOOP_MAX_MS: LOOP_MAX_MS
   };
 })(typeof window !== 'undefined' ? window : this);
