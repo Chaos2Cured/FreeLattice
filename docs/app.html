@@ -27720,7 +27720,7 @@ const FlOnboarding = (function() {
       var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://127.0.0.1:11434');
       try {
         var hostOnly = String(base).replace(/^https?:\/\//, '').replace(/\/+$/, '');
-        if (hostOnly) localStorage.setItem('fl_ollamaHost', hostOnly);
+        if (hostOnly) { if (typeof flWriteOllamaHostLoopbackOnly === 'function') flWriteOllamaHostLoopbackOnly(hostOnly); else if (/^(https?:\/\/)?(127\.0\.0\.1|localhost)(:\d+)?/i.test(hostOnly)) localStorage.setItem('fl_ollamaHost', hostOnly.replace(/^https?:\/\//,'')); }
         localStorage.setItem('fl_provider', 'ollama');
         localStorage.setItem('fl_isLocal', 'true');
       } catch (eHost) {}
@@ -28614,7 +28614,7 @@ const AiSetup = (function() {
         // Button 1: Use My Computer's AI → look-card wizard (v-browser-local-ai-wizard-v0)
         // Do NOT call flAutoConnect() alone — stale fl_isLocal made the click feel dead.
         (mobile ? '' :
-        '<button type="button" onclick="(function(e){try{if(e&amp;&amp;e.preventDefault)e.preventDefault();}catch(x){}try{var o=document.getElementById('providerModalOverlay')||document.getElementById('pmOverlay');if(o)o.remove();}catch(y){}if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else if(typeof switchTab==='function')switchTab('connect');})(event)" ' +
+        '<button type="button" onclick="flProviderHeroLocalAI(event)" ' +
         'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
         'background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-left:3px solid #34d399;' +
         'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
@@ -31036,15 +31036,26 @@ function smartOllamaConnect() {
   return flLookProbeNow();
 }
 
-// v-browser-local-ai-wizard-v0 + v-connect-card-yesno-wizard-v0
+// v-browser-local-ai-wizard-v0 + v-connect-port-picker-v0 heal —
+// Use My Computer's AI closes the provider modal and opens Connect (never JS-in-string).
 function flProviderHeroLocalAI(ev) {
   try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e0) {}
+  try {
+    var overlay = document.getElementById('providerModalOverlay') || document.getElementById('pmOverlay');
+    if (overlay) overlay.remove();
+  } catch (e1) {}
   var status = document.getElementById('pmHeroLocalStatus');
   if (status) {
-    status.textContent = 'Opening Connect card…';
+    status.textContent = 'Opening Connect…';
     status.style.color = 'var(--text-muted)';
   }
-  flOpenConnectWizard('hero');
+  try {
+    if (typeof switchTab === 'function') { switchTab('connect'); return; }
+  } catch (e2) {}
+  try {
+    if (window.FlConnect && typeof FlConnect.open === 'function') { FlConnect.open(); return; }
+  } catch (e3) {}
+  try { flOpenConnectWizard('hero'); } catch (e4) {}
 }
 window.flProviderHeroLocalAI = flProviderHeroLocalAI;
 window.flOpenConnectWizard = flOpenConnectWizard;
@@ -31079,13 +31090,16 @@ function flHasOneMindConnected() {
 
 function flPlayGateProvider() {
   if (flHasOneMindConnected()) return false;
-  // v-connect-port-picker-v0 / Hypha H1 — always open Connect tab (never land on Chat Connect Play)
+  // v-connect-port-picker-v0 / Hypha H1 — prefer Connect; keep Connect Play as layered fallback
   try {
     if (typeof switchTab === 'function') { switchTab('connect'); return true; }
   } catch (eTab) {}
   try {
     if (window.FlConnect && typeof FlConnect.open === 'function' && FlConnect.open()) return true;
   } catch (eOpen) {}
+  try {
+    if (typeof flOpenConnectPlay === 'function') { flOpenConnectPlay('gate'); return true; }
+  } catch (ePlay) {}
   return true;
 }
 
@@ -33843,18 +33857,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 var _ollamaResolvedBase = null; // cached result
 async function resolveOllamaBase(forceRefresh) {
   if (_ollamaResolvedBase && !forceRefresh) return _ollamaResolvedBase;
-  // 0a. v-connect-port-picker-v0 — manual Connect address before Bridge / 11434
+  // 0a. v-connect-port-picker-v0 heal — manual port first; quiet = no silent fallthrough
   try {
     var manualBase = (typeof flGetManualConnectHost === 'function') ? flGetManualConnectHost() : null;
     if (manualBase) {
-      var manResp = await fetch(String(manualBase).replace(/\/+$/, '') + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
-      if (manResp.ok) {
-        _ollamaResolvedBase = { base: String(manualBase).replace(/\/+$/, ''), isProxy: false, viaManual: true };
-        console.log('FreeLattice: manual Connect host tags at ' + _ollamaResolvedBase.base);
-        return _ollamaResolvedBase;
-      }
+      try {
+        var manResp = await fetch(String(manualBase).replace(/\/+$/, '') + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+        if (manResp.ok) {
+          _ollamaResolvedBase = { base: String(manualBase).replace(/\/+$/, ''), isProxy: false, viaManual: true };
+          console.log('FreeLattice: manual port tags at ' + _ollamaResolvedBase.base);
+          return _ollamaResolvedBase;
+        }
+      } catch (eTags) {}
+      // Manual set but quiet — do not silently pick Bridge/11434
+      _ollamaResolvedBase = null;
+      return { base: null, manualQuiet: true, wanted: String(manualBase).replace(/\/+$/, '') };
     }
-  } catch (eMan) { /* manual quiet */ }
+  } catch (eMan) {}
   // 0. v-connect-bridge-aware-v0 — helped Bridge before bare 11434 (Celeste RC1)
   try {
     if (typeof flBridgeHealth === 'function') {
@@ -33929,8 +33948,23 @@ async function resolveOllamaBase(forceRefresh) {
 var FL_OLLAMA_ORIGINS = 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*';
 var FL_OLLAMA_LOCAL = 'http://127.0.0.1:11434';
 
-// v-connect-port-picker-v0 — shared manual host (Connect picker is the Mom door)
-var FL_CONNECT_MANUAL_KEY = 'fl_connect_manual_host';
+// v-connect-port-picker-v0 heal — port-only loopback (fl_localPort_manual)
+// Accepts "11500" or extracts port from localhost/127.0.0.1 forms. Rejects other hosts.
+var FL_LOCAL_PORT_MANUAL_KEY = 'fl_localPort_manual';
+function flNormalizeLocalPort(raw) {
+  raw = String(raw || '').trim();
+  if (!raw) return null;
+  if (/^\d{1,5}$/.test(raw)) {
+    var n = parseInt(raw, 10);
+    return (n >= 1 && n <= 65535) ? String(n) : null;
+  }
+  var m = raw.match(/^(?:https?:\/\/)?(127\.0\.0\.1|localhost)(?::(\d{1,5}))?(?:\/.*)?$/i);
+  if (m) {
+    var p = m[2] ? parseInt(m[2], 10) : 11434;
+    return (p >= 1 && p <= 65535) ? String(p) : null;
+  }
+  return null; // foreign host — reject
+}
 function flGetManualConnectHost() {
   try {
     if (window.FlConnect && typeof FlConnect.getManualBase === 'function') {
@@ -33939,29 +33973,48 @@ function flGetManualConnectHost() {
     }
   } catch (e0) {}
   try {
-    var raw = localStorage.getItem(FL_CONNECT_MANUAL_KEY) || '';
-    raw = String(raw).trim();
-    if (!raw) return null;
-    if (raw.indexOf('://') === -1) raw = 'http://' + raw;
-    raw = raw.replace(/^(https?:\/\/)localhost(?=[:/]|$)/i, '$1127.0.0.1');
-    return raw.replace(/\/+$/, '');
+    var port = localStorage.getItem(FL_LOCAL_PORT_MANUAL_KEY) || '';
+    port = flNormalizeLocalPort(port);
+    if (!port) return null;
+    return 'http://127.0.0.1:' + port;
   } catch (e1) { return null; }
 }
 function flSetManualConnectHost(raw) {
   try {
     if (window.FlConnect && typeof FlConnect.setManualHost === 'function') {
-      FlConnect.setManualHost(raw);
-      return;
+      return FlConnect.setManualHost(raw);
     }
   } catch (e0) {}
   try {
-    raw = String(raw || '').trim();
-    if (!raw) { localStorage.removeItem(FL_CONNECT_MANUAL_KEY); return; }
-    localStorage.setItem(FL_CONNECT_MANUAL_KEY, raw);
-  } catch (e1) {}
+    var port = flNormalizeLocalPort(raw);
+    if (!String(raw || '').trim()) {
+      localStorage.removeItem(FL_LOCAL_PORT_MANUAL_KEY);
+      return { ok: true, cleared: true };
+    }
+    if (!port) return { ok: false, reason: 'foreign' };
+    localStorage.setItem(FL_LOCAL_PORT_MANUAL_KEY, port);
+    return { ok: true, port: port, base: 'http://127.0.0.1:' + port };
+  } catch (e1) { return { ok: false }; }
 }
+window.flNormalizeLocalPort = flNormalizeLocalPort;
 window.flGetManualConnectHost = flGetManualConnectHost;
 window.flSetManualConnectHost = flSetManualConnectHost;
+
+function flWriteOllamaHostLoopbackOnly(host) {
+  host = String(host || '').trim();
+  if (!host) return false;
+  if (host.indexOf('://') === -1) host = 'http://' + host;
+  try {
+    var u = new URL(host);
+    var h = (u.hostname || '').toLowerCase();
+    if (h !== '127.0.0.1' && h !== 'localhost') return false;
+    var port = u.port || '11434';
+    localStorage.setItem('fl_ollamaHost', '127.0.0.1:' + port);
+    return true;
+  } catch (e) { return false; }
+}
+window.flWriteOllamaHostLoopbackOnly = flWriteOllamaHostLoopbackOnly;
+
 
 
 function flLocalFetchInit(extra) {
@@ -35122,6 +35175,13 @@ function owAcceptSuggestion() {
     if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
     else if (typeof switchTab === 'function') switchTab('connect');
   } catch (e) {}
+}
+
+// Layer, never delete — Dismiss must stay callable (onclick on banner)
+function owDismissSuggestion() {
+  var banner = document.getElementById('ollamaSuggestBanner');
+  if (banner) banner.classList.remove('show');
+  try { localStorage.setItem('fl_ollama_suggest_dismissed', '1'); } catch (e) {}
 }
 
 // ============================================

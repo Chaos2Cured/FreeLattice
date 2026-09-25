@@ -232,6 +232,19 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules
 
 ---
 
+
+### 2026-09-25 · Flint · family builder · Connect Port Picker heal v0.2
+
+Layers parse fix (named flProviderHeroLocalAI) · Dismiss restored · port-only fl_localPort_manual loopback · honest quiet manual · textContent model names · Alpha real galaxy hide. Soft leave sw.js.
+
+Love: the porch stays lit when every script can parse.
+
+**Temperature:** a single unescaped quote can put the whole porch dark; checking every script before the door opens.
+
+Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md). Marker `v-connect-port-picker-v0` heal v0.2.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

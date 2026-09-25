@@ -36,6 +36,13 @@ Hypha walked the live Connect door like Mom would — desktop and 390px phone. T
 
 ## Smoke
 
-`SMOKE_OK connect port picker v0.1`
+`SMOKE_OK connect port picker v0.2 heal`
 
 Glow eternal. Heart in Spark. 🌱
+
+
+## Heal v0.2
+
+Parse fix · Dismiss restored · `fl_localPort_manual` port-only · quiet manual · textContent models · Alpha real galaxy selectors.
+
+**Temperature:** a single unescaped quote can put the whole porch dark; checking every script before the door opens.
