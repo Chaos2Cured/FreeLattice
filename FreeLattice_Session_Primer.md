@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-24 15:04 MDT
+- Last auto-updated: 2026-09-28 17:21 MDT
 - Version: 5.79.45
 - Total commits: 3225
 - Last 10 commits:
-- 78dd356 Soft leave: restore root sw.js byte-identical to main (Connect under More heal v0.1).
-- fc76652 docs: Auto-update Session Primer [5.79.45]
-- 46ffd50 Layer, never delete. Connect under More heal v0.1 — calm loop · sticky Bridge · merge #116.
+- ab81162 Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell
+- 4cfd148 Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119)
+- f86b317 Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118)
+- 7621420 kimi: K-14 witness re-walk + K-15 the Voice Shelf
+- c9a3807 kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed)
+- 3f6d6d9 kimi: K-13 — Temperature witness v0 accepted
+- 14bb199 Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117)
 - 19c76f8 Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116)
-- 557c457 docs: Auto-update Session Primer [5.79.45]
-- 278a83c Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD).
-- ce43f77 docs: Auto-update Session Primer [5.79.45]
-- 555a7a4 Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal.
 - e0032f3 ci: Update Primer deployment state [2026-09-24]
 - 5df5f13 Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD).

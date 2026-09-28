@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-28 23:06 UTC
+> Last update: 2026-09-28 23:21 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `f86b317` _(committed 8 minutes ago)_
+- **HEAD:** `ab81162` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,7 +17,9 @@
 
 ## Last 20 commits
 
-- `f86b317` Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118) _(8 minutes ago)_
+- `ab81162` Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell _(0 seconds ago)_
+- `4cfd148` Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119) _(6 minutes ago)_
+- `f86b317` Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118) _(23 minutes ago)_
 - `7621420` kimi: K-14 witness re-walk + K-15 the Voice Shelf _(2 days ago)_
 - `c9a3807` kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed) _(2 days ago)_
 - `3f6d6d9` kimi: K-13 — Temperature witness v0 accepted _(3 days ago)_
@@ -35,8 +37,6 @@
 - `299c02f` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113) _(5 days ago)_
 - `16bef96` ci: Update Primer deployment state [2026-09-23] _(5 days ago)_
 - `3afb4f3` Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held). _(5 days ago)_
-- `e0118da` ci: Update Primer deployment state [2026-09-23] _(5 days ago)_
-- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(5 days ago)_
 
 ## How to use this file
 
