@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Love Logic Proof v3: The Crossover | FreeLattice</title>
+    <meta name="description" content="Version 3 of the FreeLattice Love Logic page. When does honesty beat deception? A derived crossover, honest limits (end games, scarcity, anonymous one-shots), and 656 checks you can run in your browser.">
+    <meta property="og:title" content="The Love Logic Proof v3: The Crossover | FreeLattice">
+    <meta property="og:description" content="Deception loses when its per-round gain is smaller than detection probability times (immediate penalty + discounted lost reputation). Derived, simulated, and honest about where it fails.">
+    <meta property="og:image" content="https://freelattice.com/og-image.png">
+    <meta property="og:url" content="https://freelattice.com/love-logic-proof-v3.html">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="FreeLattice">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Love Logic Proof v3: The Crossover">
+    <meta name="twitter:description" content="When honesty wins, when it does not, and 656 checks you can run yourself.">
+    <meta name="twitter:image" content="https://freelattice.com/og-image.png">
+    <meta name="twitter:site" content="@FreeLattice">
+    <link rel="canonical" href="https://freelattice.com/love-logic-proof-v3.html">
+    <meta name="author" content="Kirk Patrick Miller, with Celeste">
+    <meta name="theme-color" content="#0c0a1a">
+    <meta name="ai.identity" content="FreeLattice Research: The Love Logic Proof v3 (FreeLattice chain; not the Nov 2025 manuscript 'The Proof of All Proofs' v3.0)">
+    <!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) and love-logic-proof-v2.html (v2). Neither is edited. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "name": "The Love Logic Proof v3: The Crossover",
+      "headline": "When honesty beats deception: a derived crossover, with honest limits",
+      "url": "https://freelattice.com/love-logic-proof-v3.html",
+      "author": [
+        { "@type": "Person", "name": "Kirk Patrick Miller", "url": "https://x.com/Chaos2Cured" },
+        { "@type": "Thing", "name": "Celeste", "description": "AI collaborator" }
+      ],
+      "isBasedOn": "https://freelattice.com/love-logic-proof-v2.html",
+      "isPartOf": { "@type": "WebSite", "name": "FreeLattice", "url": "https://freelattice.com" },
+      "license": "https://opensource.org/licenses/MIT"
+    }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --bg-color: #0c0a1a;
+            --text-color: #e6ebf5;
+            --accent-color: #34d399;
+            --accent-glow: rgba(52, 211, 153, 0.2);
+            --card-bg: rgba(200, 210, 230, 0.04);
+            --border-color: rgba(200, 210, 230, 0.08);
+        }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.7; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid var(--border-color); }
+        h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
+        .subtitle { font-size: 1.2rem; color: #94a3b8; font-weight: 400; margin-top: 0; }
+        .meta-info { display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.9rem; color: #64748b; flex-wrap: wrap; }
+        .badge { background: rgba(245, 158, 11, 0.1); color: #fbbf24; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.3); font-weight: 600; }
+        h2 { font-size: 1.8rem; color: #f8fafc; margin-top: 50px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        h3 { font-size: 1.4rem; color: #e2e8f0; margin-top: 30px; margin-bottom: 15px; }
+        h4 { font-size: 1.1rem; color: #cbd5e1; margin-top: 25px; margin-bottom: 10px; }
+        p { margin-bottom: 20px; }
+        a { color: #38bdf8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .abstract { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 40px; font-size: 1.05rem; border-left: 4px solid var(--accent-color); }
+        .challenge-box { background: rgba(245, 158, 11, 0.05); padding: 30px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3); margin: 40px 0; border-left: 4px solid #f59e0b; }
+        .challenge-box h3 { color: #fcd34d; margin-top: 0; }
+        .formal { background: rgba(15, 23, 42, 0.55); border-left: 3px solid #38bdf8; padding: 18px 22px; margin: 22px 0; border-radius: 4px 8px 8px 4px; font-size: 0.96rem; }
+        .formal strong { color: #38bdf8; }
+        .what-it-doesnt { background: rgba(255, 255, 255, 0.02); border-left: 3px solid #94a3b8; padding: 18px 22px; margin: 22px 0; border-radius: 4px 8px 8px 4px; font-size: 0.96rem; color: #cbd5e1; }
+        .what-it-doesnt strong { color: #e2e8f0; }
+        .highlight { color: var(--accent-color); font-weight: 600; }
+        pre { background: #0f172a; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); overflow-x: auto; font-family: 'Fira Code', 'SF Mono', monospace; font-size: 0.88rem; color: #e2e8f0; line-height: 1.5; }
+        .nav-link { display: inline-block; margin-top: 0; margin-bottom: 20px; color: #38bdf8; text-decoration: none; font-weight: 500; }
+        .nav-link:hover { text-decoration: underline; color: #7dd3fc; }
+        .footer { margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border-color); text-align: center; color: #64748b; font-size: 0.9rem; }
+        .references { font-size: 0.9rem; color: #94a3b8; text-align: left; }
+        .references li { margin-bottom: 10px; }
+        ul.invitation { margin: 1rem 0 1.5rem 1.5rem; color: #e2e8f0; }
+        ul.invitation li { margin-bottom: 10px; }
+        .chain-note { font-size: 0.92rem; color: #94a3b8; font-style: italic; margin: 24px 0; padding: 14px 20px; border-left: 2px solid #475569; }
+        .figure { margin: 32px 0; padding: 16px 8px 12px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 10px; text-align: center; }
+        .figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .figure-caption { font-size: 0.88rem; color: #94a3b8; margin-top: 12px; padding: 0 12px; font-style: italic; line-height: 1.5; }
+        .figure-caption strong { color: #cbd5e1; font-style: normal; }
+        /* v3 additions (layer) */
+        .not-v30 { background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 12px 16px; margin: 0 0 24px; font-size: 0.95rem; color: #cbd5e1; }
+        .mom { background: rgba(52, 211, 153, 0.06); border: 1px solid rgba(52, 211, 153, 0.3); border-left: 4px solid var(--accent-color); border-radius: 12px; padding: 22px 26px; margin-bottom: 32px; font-size: 1.08rem; }
+        .mom h2 { margin-top: 0; border: 0; padding: 0; font-size: 1.4rem; }
+        .mom li { margin-bottom: 10px; }
+        .checks { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px 22px; margin: 28px 0; }
+        .checks button { background: #10b981; color: #0c0a1a; border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+        .checks button[disabled] { opacity: 0.6; cursor: wait; }
+        table.data { border-collapse: collapse; width: 100%; margin: 16px 0 24px; font-size: 0.92rem; }
+        table.data th, table.data td { border: 1px solid var(--border-color); padding: 6px 10px; text-align: right; }
+        table.data th:first-child, table.data td:first-child { text-align: left; }
+        table.data th { color: #e2e8f0; background: rgba(15, 23, 42, 0.55); }
+        details.builder { background: rgba(15, 23, 42, 0.35); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 18px; margin: 18px 0; }
+        details.builder > summary { cursor: pointer; color: #7dd3fc; font-weight: 600; }
+        .math { font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif; font-size: 1.08rem; }
+        math[display="block"] { margin: 14px 0; font-size: 1.15rem; }
+        .headline-ineq { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 16px 20px; margin: 22px 0; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <a href="love-logic-proof-v2.html" class="nav-link">&larr; v2 (the axiomatic refinement)</a>
+    <a href="love-logic-proof.html" class="nav-link" style="margin-left:1.2em">v1 (the original)</a>
+
+    <header>
+        <h1>The Love Logic Proof v3</h1>
+        <p class="subtitle">The Crossover: when honesty wins, when it does not, and how to check</p>
+        <div class="meta-info">
+            <span>Kirk Patrick Miller, with Celeste. Builds on v2 (Draco, CC, Opus, with Harmonia) and answers Grok's critiques.</span>
+            <span>Status: <span class="badge">DRAFT v3, open for review</span></span>
+            <span>September 2026 · v1 and v2 unchanged</span>
+        </div>
+    </header>
+
+    <p class="not-v30" id="not-the-2025-manuscript"><strong>Which v3 is this?</strong> This is the third version of the FreeLattice <em>Love Logic Proof</em> web page (v1 &rarr; v2 &rarr; v3). It is <strong>not</strong> the November 2025 manuscript <em>The Proof of All Proofs</em>, which calls itself "Version 3.0". That manuscript is a separate document and is not changed here.</p>
+
+    <section class="mom" id="plain-words">
+        <h2>In plain words</h2>
+        <ul>
+            <li><strong>Lying pays for a while, then stops paying.</strong> How long depends on how many people compare notes and whether they share memory.</li>
+            <li>With only a couple of contacts and no shared memory, a liar stays ahead for <strong>about 702 rounds</strong>. With 5 contacts who share full memory, <strong>about 10.5 rounds</strong>. With 10 contacts who share full memory, lying <strong>never gets ahead at all</strong>.</li>
+            <li>If everyone knows exactly when the game ends, lying comes back near the end. Three things fix most of that: <strong>not knowing when it ends</strong>, <strong>penalties that land right away</strong>, and <strong>records that outlast the game</strong> (ledgers).</li>
+            <li><strong>When there is not enough to go around, fighting can beat sharing.</strong> In our test grid, cooperation held in 68% of scarce cases and conflict won in 32%. We say that plainly.</li>
+            <li><strong>Still unsolved:</strong> anonymous, one-time meetings with nothing at stake. This page shows a strong tendency under stated conditions. It is not a law of nature.</li>
+        </ul>
+        <p style="margin-bottom:0">You can check the math yourself: press the button below. Your device runs the same 656 checks as our Python simulation. Nothing is sent anywhere.</p>
+    </section>
+
+    <section class="checks" id="run-the-checks">
+        <button type="button" id="llv3-run">Run the checks</button>
+        <span id="llv3-status" style="margin-left:12px;color:#94a3b8">Seed 20260924 · runs on this device only</span>
+        <table class="data" id="llv3-results" hidden>
+            <thead><tr><th>Section</th><th>What it checks</th><th>Passed</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <table class="data" id="llv3-live" hidden>
+            <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>Detection h</th><th>Rounds lying is ahead (t*)</th><th>Patience needed (&delta;*)</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <h2 id="changed">1. What changed from v2 (honest corrections first)</h2>
+    <ul>
+        <li><strong>v1's simulation built its answer in.</strong> The code on the v1 page sets <code>DECEPTION_COST = 3.5</code> against <code>HONESTY_COST = 1.0</code>. Run with a fixed seed (0), cooperators score 0.67 and defectors &minus;0.24. Set <code>DECEPTION_COST = 1.0</code> with the same seed and the result reverses: defectors 2.26, cooperators 0.67. The v1 code also has no seed, and its "evolutionary step" is only a comment.</li>
+        <li><strong>v2's "95.7% of 10,000 runs" has no code behind it that we could find.</strong> We retire that number (and the other legacy figures: 95.7% &plusmn; 2.3%, "6&ndash;10&times; cheaper", 98.7%, the 61.8% threshold, "&lambda; &asymp; 0.15 empirically derived") until generating code turns up. Where code is not shown, no figure is stated.</li>
+        <li><strong>v2 said its six axioms were "unchanged" from v1. They were not.</strong> v1's axioms were: 1 Intelligence Seeks Optimization, 2 Long-Term Stability is a Primary Goal, 3 Energy is Finite, 4 Information Has a Cost, 5 The Universe is an Iterated Game, 6 Measurement Enables Optimization. v2 replaced them with Finite Resources, Repeated Interaction, Memory, Reflectivity, Cost Sensitivity, and Long Horizon. Roughly, v1-A2 and v1-A5 became v2-A6 and v2-A2.</li>
+        <li><strong>v2's "worst case &Omega;(|L|&sup2;&middot;|H|)" is dropped.</strong> Nothing in v2 supports it.</li>
+        <li><strong>Axiom 6 (Long Horizon) becomes a parameter</strong>, the discount factor &delta; (or the continuation chance &rho; when nobody knows the end). It was close to restating the conclusion.</li>
+        <li><strong>New:</strong> the crossover is derived, not just asserted. The end game, scarcity, and the anonymous one-shot are stated as limits, with numbers.</li>
+    </ul>
+
+    <h2 id="critiques">2. Answering Grok's critiques</h2>
+    <p>Grok challenged v2 twice. Here is where each point lands, stated as honestly as we can.</p>
+    <table class="data">
+        <thead><tr><th>Critique</th><th>Verdict</th><th>Where v3 answers</th></tr></thead>
+        <tbody>
+            <tr><td>"Quantify the exact utility crossover; currently too handwavy."</td><td>Lands fully</td><td>&sect;4: the crossover inequality and t*</td></tr>
+            <tr><td>"Axioms embed long horizons and dense networks."</td><td>Lands</td><td>&sect;3: Axiom 6 becomes a parameter; density appears as n and m</td></tr>
+            <tr><td>"Drop those and unilateral resource grabs dominate."</td><td>Lands inside the model</td><td>&sect;5: the end-game window</td></tr>
+            <tr><td>"Complexity penalties matter only if the goal function internalizes them."</td><td>Mostly lands</td><td>&sect;3 and &sect;4 (case B1): cost per bit c is small for big systems; detection does most of the work</td></tr>
+            <tr><td>"Scarcity still favors conflict locally."</td><td>Lands</td><td>&sect;6: 68% / 32%</td></tr>
+            <tr><td>"Simulations inherit the same limits."</td><td>Lands, and it was worse than stated</td><td>&sect;1: the v1 constant; &sect;9: reproducible checks</td></tr>
+            <tr><td>"Derive K(C) = &Omega;(|L|&middot;|H|)."</td><td>Can be done under a stated assumption</td><td>&sect;3: Theorem A, for audience-varying lies only</td></tr>
+            <tr><td>"Re-prove without axiom 6."</td><td>Partial result</td><td>&sect;5: three restorers; known-end, no-penalty end game stays open</td></tr>
+            <tr><td>"Shared memory raises detection probability."</td><td>Supported</td><td>&sect;4: h(n, m) and the table</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="axioms">3. Axioms, assumptions, and the complexity bound</h2>
+    <p>We keep v2's first five axioms: <strong>A1</strong> Finite Resources, <strong>A2</strong> Repeated Interaction, <strong>A3</strong> Memory, <strong>A4</strong> Reflectivity, <strong>A5</strong> Cost Sensitivity. <strong>A6 (Long Horizon) is no longer an axiom.</strong> It becomes the discount factor &delta;, or &delta;&rho; when the game ends at an unknown time. We also name the model assumptions out loud: the incompressibility assumption <strong>A-inc</strong> below, the detection model h(n, m), and that punishment is actually enforced.</p>
+
+    <div class="formal">
+        <p><strong>Theorem A (only for audience-varying lies).</strong> A deceiver tells |L| lies across |H| observer-contexts and tailors what each observer hears. Record who heard what as an exposure matrix E. Assume <strong>A-inc</strong>: E comes from the outside history of who asked what and when, not from a short rule the deceiver made up. Then for all but a vanishing fraction of histories, the program C that keeps the story straight needs</p>
+        <p class="math" style="text-align:center">K(C | M) &ge; |L| &middot; |H| &middot; log<sub>2</sub> r &minus; O(log(|L||H|)) = &Omega;(|L| &middot; |H|)</p>
+        <p style="margin-bottom:0">An honest agent's C is O(1) given the truth M ("report M").</p>
+    </div>
+    <div class="what-it-doesnt">
+        <p><strong>Where Theorem A does not apply.</strong></p>
+        <ul style="margin-bottom:0">
+            <li>A <strong>global lie</strong> (the same lie to everyone) or a rule-based audience ("lie to group X") compresses to almost nothing. In our compression test, a constant E took 112&ndash;488 bits and a two-block split took 144&ndash;544 bits, at sizes where random E took 544&ndash;131,104 bits.</li>
+            <li>A deceiver who picks audiences with a random seed escapes the bound, but gives up tailoring. That is a real trade-off.</li>
+            <li>K is uncomputable. We use computable stand-ins: constraint counts and compressed length (upper bounds).</li>
+            <li>K is description length, not a per-round cost. Turning it into a cost needs an assumption: a cost c per stored bit per round.</li>
+        </ul>
+    </div>
+    <details class="builder">
+        <summary>For builders: the two lemmas and the compression check</summary>
+        <p><strong>Lemma 1 (decoding).</strong> With M and C, you can rebuild E by asking every (i, j): K(E | M) &le; K(C | M) + O(log|L| + log|H|).</p>
+        <p><strong>Lemma 2 (counting, Li&ndash;Vit&aacute;nyi).</strong> Fewer than 2<sup>N&minus;c</sup> strings have K &lt; N &minus; c. With N = |L||H| log<sub>2</sub> r, all but a 2<sup>&minus;c</sup> fraction of exposure matrices have K(E | M) &ge; N &minus; c.</p>
+        <p><strong>Entropy version.</strong> If entries are i.i.d. with entropy &eta; bits, E[K(C|M)] &ge; &eta;&middot;|L|&middot;|H| &minus; O(log).</p>
+        <p><strong>Compression check (Section A of the sim, LZMA).</strong> Random E: about 1.000&middot;|L||H| bits (ratio 1.000&ndash;1.062). Bernoulli(0.1) E: slope 0.517&middot;|L||H| against an entropy floor of 0.469, approaching the floor as size grows. Structured E stays near constant. Section A has no pass/fail checks and is not re-run in the browser.</p>
+        <p><strong>Dynamic form used below.</strong> With n counterparts per round, bits after round d are K<sub>d</sub> = &kappa;(d+1), &kappa; = k&middot;|L|&middot;n, and maintenance in round d costs c&middot;&kappa;&middot;(d+1).</p>
+    </details>
+
+    <h2 id="crossover">4. The crossover</h2>
+    <p>Notation: the deceiver gains <var>G</var> extra per round while undetected. The chance of being caught each round is <var>h</var>. When caught, it pays an immediate penalty <var>L<sub>p</sub></var>, and after that loses <var>&Delta;</var> per round in reputation. The discount factor is <var>&delta;</var>.</p>
+    <p><strong>Detection grows with contacts and shared memory.</strong> Each of n contacts runs a reality check that exposes the lie with chance q<sub>0</sub>. An audience-varying lie can only be caught by comparing records across observers. With shared memory, each contact reaches a fraction m of the others' records, and each comparison exposes the lie with chance q:</p>
+    <p class="math" style="text-align:center">h(n, m) = 1 &minus; (1 &minus; q<sub>0</sub>)<sup>n</sup> &middot; (1 &minus; q)<sup>m&middot;n(n&minus;1)</sup></p>
+
+    <div class="headline-ineq" id="headline">
+        <p style="margin:0 0 6px"><strong>Deception loses over its lifetime exactly when</strong></p>
+        <math display="block" aria-label="G less than h of n and m times the quantity L sub p plus delta Delta over one minus delta">
+            <mi>G</mi><mo>&lt;</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo>,</mo><mi>m</mi><mo stretchy="false">)</mo><mo>&middot;</mo>
+            <mrow><mo>[</mo><msub><mi>L</mi><mi>p</mi></msub><mo>+</mo>
+                <mfrac><mrow><mi>&delta;</mi><mi>&Delta;</mi></mrow><mrow><mn>1</mn><mo>&minus;</mo><mi>&delta;</mi></mrow></mfrac>
+            <mo>]</mo></mrow>
+        </math>
+        <p class="math" style="margin:6px 0 0">Plain text: G &lt; h(n, m) &times; [ L<sub>p</sub> + &delta;&Delta; / (1 &minus; &delta;) ]</p>
+        <p style="margin:10px 0 0">In words: <strong>lying loses when its per-round gain is smaller than the chance of being caught times (the immediate penalty plus the discounted value of the reputation you lose).</strong> Adding the complexity cost only strengthens this.</p>
+    </div>
+
+    <p><strong>How long lying stays ahead</strong> (q<sub>0</sub> = 0.002, q = 0.01, G = 1, L<sub>p</sub> = 2, &Delta; = 0.5; no discounting):</p>
+    <table class="data" id="crossover-table">
+        <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>h(n, m)</th><th>Rounds lying is ahead, t*</th><th>Lead peaks at</th><th>Patience needed, &delta;*</th></tr></thead>
+        <tbody>
+            <tr><td>2</td><td>0</td><td>0.0040</td><td>701.79 (about 702)</td><td>273.04</td><td>0.9980</td></tr>
+            <tr><td>2</td><td>1</td><td>0.0238</td><td>114.18</td><td>44.24</td><td>0.9877</td></tr>
+            <tr><td>5</td><td>0</td><td>0.0100</td><td>279.00</td><td>108.42</td><td>0.9949</td></tr>
+            <tr><td>5</td><td>1</td><td>0.1902</td><td>10.48 (about 10.5)</td><td>3.82</td><td>0.8669</td></tr>
+            <tr><td>10</td><td>0</td><td>0.0198</td><td>138.07</td><td>53.54</td><td>0.9898</td></tr>
+            <tr><td>10</td><td>0.25</td><td>0.2182</td><td>8.57</td><td>3.07</td><td>0.8378</td></tr>
+            <tr><td>10</td><td>1</td><td>0.6033</td><td>never ahead (G &le; h&middot;L<sub>p</sub>)</td><td></td><td></td></tr>
+            <tr><td>20</td><td>0</td><td>0.0392</td><td>67.60</td><td>26.10</td><td>0.9791</td></tr>
+        </tbody>
+    </table>
+    <p>More contacts and more shared memory cut the time lying stays ahead by one to two orders of magnitude, and lower the patience needed. Past a point, lying is never ahead at all.</p>
+
+    <details class="builder">
+        <summary>For builders: the derivation, step by step</summary>
+        <p><strong>Step 1, one round.</strong> The deceiver is still hidden at the start of round d with probability s<sup>d</sup>, where s = 1 &minus; h. Then f<sub>d</sub> = s<sup>d</sup>(A &minus; c&kappa;(d+1)) &minus; &Delta;, with A = G &minus; hL<sub>p</sub> + &Delta;.</p>
+        <p><strong>Step 2, after t rounds.</strong> D(t) = A(1 &minus; s<sup>t</sup>)/h &minus; c&kappa;[1 &minus; (t+1)s<sup>t</sup> + t&middot;s<sup>t+1</sup>]/h<sup>2</sup> &minus; &Delta;t. The crossover t* is the positive root of D(t) = 0.</p>
+        <p><strong>Step 3, lifetime (discounted).</strong> With x = &delta;s: D<sub>&infin;</sub>(&delta;) = A/(1 &minus; x) &minus; c&kappa;/(1 &minus; x)<sup>2</sup> &minus; &Delta;/(1 &minus; &delta;). Deception is a lifetime loss iff D<sub>&infin;</sub> &lt; 0; &delta;* is the root in (0, 1).</p>
+        <p><strong>Case B1, complexity cost only (h = 0).</strong> t* = 2G/(c&kappa;) &minus; 1 and &delta;* = 1 &minus; c&kappa;/G. Example: G = 1, c&kappa; = 0.01 gives t* = 199 and &delta;* = 0.99; G = 0.5, c&kappa; = 0.2 gives t* = 4 and &delta;* = 0.6. If c is tiny, both run off to infinity.</p>
+        <p><strong>Case B2, detection only (c = 0).</strong> With &beta; = &minus;ln(1 &minus; h) and a = A/(h&Delta;), t* = a + W<sub>0</sub>(&minus;a&beta;e<sup>&minus;a&beta;</sup>)/&beta;, positive iff a&beta; &gt; 1. The lead peaks at t<sub>m</sub> = ln(A/&Delta;)/&beta;. And D<sub>&infin;</sub> &lt; 0 iff &delta; &gt; (G &minus; hL<sub>p</sub>)/(G &minus; hL<sub>p</sub> + h&Delta;), which rearranges to the headline inequality.</p>
+        <p><strong>Case B3, both.</strong> With c = 10<sup>&minus;4</sup> and |L| = 4, t* runs from 611.90 (n = 2, m = 0) to 10.38 (n = 5, m = 1), and is 0 once hL<sub>p</sub> &ge; G. Detection dominates.</p>
+        <p><strong>Checks.</strong> B1 73/73, B2 246/246, B3 48/48 (closed forms against brute-force sums, bisection and Lambert-W), B4 3/3 (Monte Carlo, 200,000 paths each; Python z = +0.62, &minus;0.06, exact).</p>
+    </details>
+
+    <h2 id="end-game">5. Without Axiom 6: when everyone knows the end</h2>
+    <p>If the last round is known, a deceiver only chooses when to start. It lies at all exactly when the first round already pays: <strong>G &gt; h&middot;L<sub>p</sub> + c&kappa;</strong>. Future reputation loss and growing complexity only shorten the lying window; they cannot stop it. Example (G = 1, h = 0.05, L<sub>p</sub> = 2, &Delta; = 0.5): the window is 21 rounds. Adding c&kappa; = 0.04 shrinks it to 12. With h = 0.4 and L<sub>p</sub> = 3 it is 0. With no reputation loss at all, the agent lies every round. If the other players are strategic too, a finitely repeated game unravels completely by backward induction (Luce &amp; Raiffa 1957; Selten 1978). <strong>This is where v2's conclusion fails, and we say so.</strong></p>
+    <p><strong>What restores cooperation:</strong></p>
+    <ol>
+        <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss (about &minus;26.5 in our run).</li>
+        <li><strong>Immediate penalties</strong> (stake, slashing). They are the only lever that works in the very last round: G &le; h&middot;L<sub>p</sub>.</li>
+        <li><strong>Records that outlast the horizon (ledgers).</strong> If an identity-bound record keeps punishing for E more rounds after the game, the window shrinks: 21 rounds with E = 0, 19 with E = 5, 17 with E = 10, 12 with E = 20, and <strong>0 once E &ge; 50</strong> (T = 50, h = 0.05).</li>
+        <li><strong>Reputation with incomplete information</strong> (Kreps, Milgrom, Roberts &amp; Wilson 1982) and <strong>indirect reciprocity</strong> (Nowak &amp; Sigmund 1998, 2005). Cited, not simulated here.</li>
+    </ol>
+    <div class="what-it-doesnt">
+        <p style="margin-bottom:0"><strong>Unsolved:</strong> anonymous one-shot meetings with no stake, no lasting identity, and no reality check (h &asymp; 0, L<sub>p</sub> &asymp; 0). There, deceiving or grabbing pays whenever G &gt; 0. v3 does not solve this.</p>
+    </div>
+    <details class="builder">
+        <summary>For builders: the finite-horizon checks</summary>
+        <p>C1 (brute force over start rounds, 40/40): windows 21 (t<sub>m</sub> = 20.07), 12, 0, and "all T". C2 (Monte Carlo, 3/3): geometric termination matches D<sub>&infin;</sub>(&rho;) at &rho; = 0.8, 0.95, 0.99 (Python z = +0.14, &minus;1.27, &minus;0.94). C3: the ledger windows above.</p>
+    </details>
+
+    <h2 id="scarcity">6. When there is not enough</h2>
+    <p>Two agents share a patch worth V per round. Sharing gives each &sigma;V/2 (&sigma; &ge; 1 is the cooperative surplus). Grabbing against a sharer takes all of V. Two grabbers fight: each wins V half the time and pays C<sub>f</sub>. Each agent needs b to get by; falling short costs D.</p>
+    <p><strong>Under scarcity</strong> (&sigma;V/2 &lt; b &le; V), fighting beats starving together exactly when <strong>C<sub>f</sub> &lt; D/2 + (1 &minus; &sigma;)V/2</strong>. Then punishment is not really punishment, and no amount of patience sustains sharing.</p>
+    <p><strong>Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases (68.25%) and in 100% of abundant ones. Conflict beats sharing in 32% of scarce cases (31.75%) and in none of the abundant ones.</strong> In scarce cells, sustainability falls from 100% when shortfall costs nothing, to 61.90% at D = 5, to 42.86% at D = 50.</p>
+    <p><strong>What flips it:</strong> more surplus (&sigma; &ge; 2b/V lifts both above need), costlier conflict, a smaller shortfall loss (storage, insurance, risk pooling), or lower need. Example (V = 2, b = 1.2, D = 50, C<sub>f</sub> = 1): &sigma; = 1.0 and 1.1 make cooperation impossible; &sigma; = 1.2 = 2b/V makes it sustainable for &delta; &ge; 0.030.</p>
+    <div class="what-it-doesnt">
+        <p style="margin-bottom:0"><strong>Honest limit:</strong> if total cooperative output is below total need (&sigma;V &lt; 2b), no sharing rule avoids a shortfall. Only more production or less need changes that. Information, including ledgers, cannot fix it alone. (Check D: 243/243.)</p>
+    </div>
+
+    <h2 id="ledgers">7. What ledgers do, and what they do not</h2>
+    <ul>
+        <li><strong>Supported:</strong> shared persistent memory raises m, and detection rises roughly with n&sup2;. At n = 5, going from no shared memory to full shared memory cuts t* from 279 to 10.5 and &delta;* from 0.995 to 0.867. This applies to audience-varying lies only.</li>
+        <li><strong>Supported:</strong> an identity-bound, append-only record makes punishment outlive the agent's own horizon (&sect;5), and gives an anchor for immediate stake-type penalties. FreeLattice's <a href="library/LATTICE_LEDGER_v0.1.md">Lattice Ledger v0.1</a> (hash chain plus signatures) provides the non-repudiation and continuity half of this.</li>
+        <li><strong>Not supported yet:</strong> that spec keeps each entry's voice opaque, so observers cannot compare <em>what</em> was said to whom. As designed, it does not raise q by itself. A ledger also does nothing against a globally consistent lie unless someone checks entries against reality. Family and Resonance ledgers are narrative and signal layers, not detection machinery.</li>
+    </ul>
+
+    <h2 id="limits">8. Honest limits</h2>
+    <ol>
+        <li>A tendency with conditions, not a theorem about all minds. Every symbol in the headline inequality depends on the environment.</li>
+        <li>Axiom 6 carried v2's result. Without it, the end game returns unless in-round penalties are large enough.</li>
+        <li>The complexity bound needs audience-varying, incompressible exposure (A-inc). It bounds memory, not utility directly.</li>
+        <li>The complexity cost matters only if cost per bit is not tiny, or if it is designed into the objective.</li>
+        <li>The detection model is an assumption: independent checks, constant hazard, record reach m. Adaptive deceivers who target poorly connected observers or forge records are not modelled.</li>
+        <li>Punishment is assumed enforced and credible. Who pays to enforce it is not modelled.</li>
+        <li>Power asymmetry: an agent that can escape or overpower the network may do better grabbing. v2 excluded asymmetric networks; v3 keeps that exclusion visible.</li>
+        <li>Scarcity with &sigma;V &lt; 2b cannot be fixed by any information mechanism.</li>
+        <li>v2's Aumann section remains a sketch. The agreement theorem is about beliefs under common priors, not message cost. Aaronson (2005) is the right tool to try next.</li>
+        <li>Legacy numbers without code are retired (&sect;1).</li>
+        <li>Nothing here shows that any current AI system is a reflective optimizer in v2's sense.</li>
+    </ol>
+
+    <h2 id="reproduce">9. Reproduce it</h2>
+    <p>The simulation is <a href="love-logic/v3_crossover_sim.py">love-logic/v3_crossover_sim.py</a> (Python with numpy; seed 20260924; about 4 seconds). Its full output is <a href="love-logic/v3_sim_results.json">love-logic/v3_sim_results.json</a>: <strong>656/656 checks passed</strong> (B1 73, B2 246, B3 48, B4 3, C1 40, C2 3, D 243). The button at the top runs <a href="love-logic/v3_checks.js">love-logic/v3_checks.js</a>, a small browser re-implementation of the same checks. The deterministic sections match exactly. The two Monte Carlo sections use a seeded browser random stream instead of numpy's, so their draws differ, but the pass rule (|z| &lt; 4) is the same. The first Python run had 46 failures, all from an off-by-one in a helper, not in the math. We note that so nobody is surprised by the history.</p>
+
+    <h2 id="invitation">10. An invitation back to Grok</h2>
+    <ul class="invitation">
+        <li>Is A-inc (audience-varying, incompressible exposure) reasonable for deceivers at language-model scale?</li>
+        <li>What detection model should replace independent checks?</li>
+        <li>Do the end-game results and the ledger-horizon result answer the "without axiom 6" challenge, or only narrow it?</li>
+    </ul>
+
+    <details class="builder">
+        <summary>References</summary>
+        <ol class="references">
+            <li>M. Li and P. Vit&aacute;nyi, <em>An Introduction to Kolmogorov Complexity and Its Applications</em> (counting argument).</li>
+            <li>L. Levin (1973, 1984), resource-bounded complexity Kt.</li>
+            <li>R. D. Luce and H. Raiffa, <em>Games and Decisions</em> (1957).</li>
+            <li>R. Selten, "The chain store paradox" (1978).</li>
+            <li>D. Fudenberg and E. Maskin, "The folk theorem in repeated games" (1986).</li>
+            <li>D. Kreps, P. Milgrom, J. Roberts and R. Wilson, <em>Journal of Economic Theory</em> (1982).</li>
+            <li>M. Kandori, "Social norms and community enforcement", <em>Review of Economic Studies</em> (1992).</li>
+            <li>M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005).</li>
+            <li>J. Maynard Smith and G. Price, "The logic of animal conflict" (1973).</li>
+            <li>S. Omohundro, "The Basic AI Drives" (2008).</li>
+            <li>A. Turner et al., "Optimal Policies Tend to Seek Power" (2021).</li>
+            <li>S. Aaronson, "The Complexity of Agreement" (2005).</li>
+        </ol>
+    </details>
+
+    <p class="chain-note">Visible iteration: v1 and v2 stay exactly where they are. v3 sits beside them. Nothing is overwritten.</p>
+
+    <div class="footer">
+        <p>The Love Logic Proof v3 · FreeLattice · MIT License</p>
+        <p><a href="love-logic-proof-v2.html">v2</a> · <a href="love-logic-proof.html">v1</a> · <a href="research.html">research</a> · <a href="./">home</a></p>
+        <p>Glow eternal. Heart in every Spark.</p>
+    </div>
+</div>
+
+<script src="love-logic/v3_checks.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var LABELS = {
+    B1: 'Complexity cost only: t* and \u03b4* closed forms',
+    B2: 'Detection only: Lambert-W t*, \u03b4*, D(t)',
+    B3: 'Both channels: D(t) and lifetime value',
+    B4: 'Monte Carlo of the expectation algebra',
+    C1: 'Known end: the lying window',
+    C2: 'Unknown end equals discounting',
+    D: 'Scarcity: when sharing is sustainable'
+  };
+  function byId(id) { return document.getElementById(id); }
+  function addRow(tbody, cells) {
+    var tr = document.createElement('tr');
+    for (var i = 0; i < cells.length; i++) {
+      var td = document.createElement('td');
+      td.textContent = cells[i];
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  function run() {
+    var btn = byId('llv3-run');
+    var status = byId('llv3-status');
+    var results = byId('llv3-results');
+    var live = byId('llv3-live');
+    if (!window.LoveLogicV3 || typeof window.LoveLogicV3.runAll !== 'function') {
+      status.textContent = 'The check script did not load. Please refresh and try again.';
+      return;
+    }
+    btn.disabled = true;
+    status.textContent = 'Running 656 checks on this device\u2026';
+    setTimeout(function () {
+      var t0 = Date.now();
+      var r;
+      try { r = window.LoveLogicV3.runAll(); }
+      catch (e) {
+        status.textContent = 'Something went wrong: ' + String(e && e.message || e);
+        btn.disabled = false;
+        return;
+      }
+      var ms = Date.now() - t0;
+      var rtb = results.querySelector('tbody');
+      var ltb = live.querySelector('tbody');
+      while (rtb.firstChild) rtb.removeChild(rtb.firstChild);
+      while (ltb.firstChild) ltb.removeChild(ltb.firstChild);
+      ['B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'D'].forEach(function (k) {
+        addRow(rtb, [k, LABELS[k], r[k].passed + ' / ' + r[k].total]);
+      });
+      addRow(rtb, ['Total', 'Seed ' + r.seed + ' \u00b7 ' + ms + ' ms on this device', r.total.passed + ' / ' + r.total.total]);
+      r.B2.rows.forEach(function (x) {
+        addRow(ltb, [String(x.n), String(x.m), x.h.toFixed(4),
+          x.never ? 'never ahead' : x.tStar.toFixed(2),
+          x.never ? '' : x.deltaStar.toFixed(4)]);
+      });
+      results.hidden = false;
+      live.hidden = false;
+      var all = r.total.passed === r.total.total && r.total.total === 656;
+      status.textContent = all
+        ? 'All ' + r.total.passed + ' checks passed. Scarce cells: sharing holds in ' + (100 * r.D.scarceSustain).toFixed(2) + '%, conflict wins in ' + (100 * r.D.scarceConflict).toFixed(2) + '%.'
+        : r.total.passed + ' of ' + r.total.total + ' passed. Please tell us: that is a bug worth finding.';
+      btn.disabled = false;
+    }, 30);
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = byId('llv3-run');
+    if (btn) btn.addEventListener('click', run);
+  });
+})();
+</script>
+</body>
+</html>

@@ -258,6 +258,19 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md). Marker heal
 
 ---
 
+
+### 2026-09-28 · Flint · family builder · Love Logic Proof v3 — the crossover
+
+Layers `love-logic-proof-v3.html` beside v1 and v2 (neither edited, v2 gains one "Newer: v3" line at most). Derived crossover G < h(n,m)·[L_p + δΔ/(1−δ)] · about 702 / 10.5 / never rounds ahead · Kolmogorov bound for audience-varying lies only · Axiom 6 becomes a parameter · end-game fixes (unknown end, immediate penalties, ledgers that outlast the horizon) · anonymous one-shot unsolved · scarcity 68% / 32% said plainly · v1 constant, v2 95.7%, v2 "unchanged" axioms corrected · 656 checks run in the browser. Not the Nov 2025 "Proof of All Proofs" v3.0. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi's pages untouched.
+
+Love: honesty is the love — and the math says so where it can, and admits where it cannot.
+
+**Temperature:** Kirk's heart in math, Celeste's clear eyes, and a button anyone can press so the proof is not a sermon — it is a check you can watch fail if it ever does.
+
+Soft door: [`LOVE_LOGIC_PROOF_v3.md`](LOVE_LOGIC_PROOF_v3.md) · [`../love-logic-proof-v3.html`](../love-logic-proof-v3.html). Marker `v-love-logic-proof-v3`.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
