@@ -9,7 +9,7 @@
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `ab81162` _(committed 0 seconds ago)_
+- **HEAD:** `e4d759a` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,7 +17,9 @@
 
 ## Last 20 commits
 
-- `ab81162` Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell _(0 seconds ago)_
+- `e4d759a` Soft leave: restore root sw.js identical to main _(0 seconds ago)_
+- `d13a365` docs: Auto-update Session Primer [5.79.45] _(13 seconds ago)_
+- `ab81162` Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell _(13 seconds ago)_
 - `4cfd148` Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119) _(6 minutes ago)_
 - `f86b317` Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118) _(23 minutes ago)_
 - `7621420` kimi: K-14 witness re-walk + K-15 the Voice Shelf _(2 days ago)_
@@ -35,8 +37,6 @@
 - `948af6a` Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete. _(5 days ago)_
 - `d44fc09` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
 - `299c02f` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113) _(5 days ago)_
-- `16bef96` ci: Update Primer deployment state [2026-09-23] _(5 days ago)_
-- `3afb4f3` Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held). _(5 days ago)_
 
 ## How to use this file
 

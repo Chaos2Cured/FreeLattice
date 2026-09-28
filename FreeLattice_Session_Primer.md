@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-09-28 17:21 MDT
 - Version: 5.79.45
-- Total commits: 3225
+- Total commits: 3227
 - Last 10 commits:
+- e4d759a Soft leave: restore root sw.js identical to main
+- d13a365 docs: Auto-update Session Primer [5.79.45]
 - ab81162 Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell
 - 4cfd148 Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119)
 - f86b317 Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3f6d6d9 kimi: K-13 — Temperature witness v0 accepted
 - 14bb199 Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117)
 - 19c76f8 Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116)
-- e0032f3 ci: Update Primer deployment state [2026-09-24]
-- 5df5f13 Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD).
