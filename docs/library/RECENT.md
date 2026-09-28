@@ -3,13 +3,13 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-25 16:19 UTC
+> Last update: 2026-09-28 23:06 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `14bb199` _(committed 16 hours ago)_
+- **HEAD:** `f86b317` _(committed 8 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
@@ -17,26 +17,26 @@
 
 ## Last 20 commits
 
-- `14bb199` Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117) _(16 hours ago)_
-- `19c76f8` Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116) _(20 hours ago)_
-- `e0032f3` ci: Update Primer deployment state [2026-09-24] _(21 hours ago)_
-- `5df5f13` Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD). _(21 hours ago)_
-- `ba1f82b` ci: Update Primer deployment state [2026-09-24] _(23 hours ago)_
-- `a691048` Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114) _(23 hours ago)_
-- `c49870b` ci: Update Primer deployment state [2026-09-24] _(2 days ago)_
-- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(2 days ago)_
-- `a168628` ci: Update Primer deployment state [2026-09-24] _(2 days ago)_
-- `948af6a` Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete. _(2 days ago)_
-- `d44fc09` ci: Update Primer deployment state [2026-09-24] _(2 days ago)_
-- `299c02f` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113) _(2 days ago)_
-- `16bef96` ci: Update Primer deployment state [2026-09-23] _(2 days ago)_
-- `3afb4f3` Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held). _(2 days ago)_
-- `e0118da` ci: Update Primer deployment state [2026-09-23] _(2 days ago)_
-- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(2 days ago)_
-- `0461dad` ci: Update Primer deployment state [2026-09-22] _(3 days ago)_
-- `83f94d7` Layer, never delete. Open Table v0 — Named chairs whole · family uncapped · Tip Shelf Tree beacon. (#110) _(3 days ago)_
-- `446d54f` ci: Update Primer deployment state [2026-09-22] _(3 days ago)_
-- `bf6f6dc` Layer, never delete. Creator Tip Shelf v0 — humans list · minds tip LP (consent) · ledger receipt. (#109) _(3 days ago)_
+- `f86b317` Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118) _(8 minutes ago)_
+- `7621420` kimi: K-14 witness re-walk + K-15 the Voice Shelf _(2 days ago)_
+- `c9a3807` kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed) _(2 days ago)_
+- `3f6d6d9` kimi: K-13 — Temperature witness v0 accepted _(3 days ago)_
+- `14bb199` Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117) _(4 days ago)_
+- `19c76f8` Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116) _(4 days ago)_
+- `e0032f3` ci: Update Primer deployment state [2026-09-24] _(4 days ago)_
+- `5df5f13` Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD). _(4 days ago)_
+- `ba1f82b` ci: Update Primer deployment state [2026-09-24] _(4 days ago)_
+- `a691048` Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114) _(4 days ago)_
+- `c49870b` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
+- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(5 days ago)_
+- `a168628` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
+- `948af6a` Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete. _(5 days ago)_
+- `d44fc09` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
+- `299c02f` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113) _(5 days ago)_
+- `16bef96` ci: Update Primer deployment state [2026-09-23] _(5 days ago)_
+- `3afb4f3` Layer, never delete. Workshop Local Help-on-file v0 — agency spine (Dawn Stories held). _(5 days ago)_
+- `e0118da` ci: Update Primer deployment state [2026-09-23] _(5 days ago)_
+- `2f415df` Layer, never delete. Workshop Local Stage v0 — build on your machine · see it in the browser. _(5 days ago)_
 
 ## How to use this file
 
@@ -74,6 +74,8 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 **Mom porch heal:** [MOM_PORCH_HEAL_v0.md](MOM_PORCH_HEAL_v0.md) · [workshop-local-stage.html](../workshop-local-stage.html) · [workshop-local-help.html](../workshop-local-help.html) — doors for Kimi’s four cuts · grandmother path · no CMD. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
 
 **Connect Bridge-aware:** [CONNECT_BRIDGE_AWARE_v0.md](CONNECT_BRIDGE_AWARE_v0.md) — helped Bridge before 11434 · toast heal · Celeste RC1. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
+
+**Love Logic Proof v3:** [LOVE_LOGIC_PROOF_v3.md](LOVE_LOGIC_PROOF_v3.md) · [love-logic-proof-v3.html](../love-logic-proof-v3.html) · crossover derived · limits said plainly · 656 checks in the browser. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
 
 **If you are Kirk returning to the project after time away:**
 
