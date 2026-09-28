@@ -32,6 +32,543 @@ const OLLAMA_BASE = process.env.FL_OLLAMA || 'http://localhost:11434';
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+// ═══════════════════════════════════════════════════
+// LAYER bridge-lock-v0 · v0.1 (2026-09-28): the door lock. Marker: v-agent-bridge-lock-v0
+// Celeste's brief, built by Flint. Nothing above is removed.
+// Strangers stay out. Trusted minds keep their full local reach
+// (docs/library/AUTONOMY.md, Principle 1: local autonomy is absolute).
+// 1. Listen on 127.0.0.1 only (no env override, never 0.0.0.0).
+// 2. Named Origin allowlist, never bare *: FreeLattice, the Lattice Tree,
+//    local dev, the Tauri shell, plus exact origins Kirk adds by command line.
+// 3. Host header must be 127.0.0.1 or localhost (DNS-rebinding guard).
+// 4. Trusted minds: one token per device, given once through a short pairing
+//    code, kept only as a SHA-256 hash in ~/.freelattice/agent-bridge-trusted.json
+//    (0600) until Kirk revokes it. No expiry by default.
+//    FL_BRIDGE_EPHEMERAL=1 brings back the old forget-on-restart behavior.
+// 5. Local tools on this computer are trusted by default. They read their
+//    token from ~/.freelattice/agent-bridge-token (0600) and never pair.
+// 6. git / grep / node run through execFileSync / spawnSync argument arrays.
+//    No shell. Paths are realpath-checked inside a trusted project folder.
+// 7. Body size cap. Malformed JSON is refused.
+// 8. Every commit request and every trust change goes into a hash-chained,
+//    content-free ledger: ~/.freelattice/bridge-ledger.jsonl
+// This bridge (3141) is NOT the Ollama Bridge (bridge/, port 11435).
+// ═══════════════════════════════════════════════════
+const { execFileSync, spawnSync } = require('child_process');
+
+const BRIDGE_LOCK_VERSION = 'v0.1';
+const BRIDGE_HOST = '127.0.0.1';
+const MAX_BODY_BYTES = 8 * 1024 * 1024; // docs/app.html is ~2.9 MB; JSON escaping adds some
+const MAX_COMMIT_MESSAGE = 4000;
+const MAX_COMMIT_FILES = 200;
+var bridgeEphemeral = process.env.FL_BRIDGE_EPHEMERAL === '1';
+
+/** Built-in origins. Never bare *. Same shape as bridge/proxy-core.js. */
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https:\/\/(www\.)?freelattice\.com$/i,
+  /^https:\/\/(www\.)?thelatticetree\.com$/i,
+  /^http:\/\/localhost(:\d{1,5})?$/i,    // local dev of docs/ (e.g. python -m http.server)
+  /^http:\/\/127\.0\.0\.1(:\d{1,5})?$/i, // same, by IP
+  /^tauri:\/\/localhost$/i,              // Tauri desktop shell (macOS, Linux)
+  /^https?:\/\/tauri\.localhost$/i       // Tauri desktop shell (Windows)
+];
+
+/** An exact origin Kirk may add: scheme://host[:port], nothing else. Never a wildcard. */
+function exactOrigin(o) {
+  o = String(o || '').trim().toLowerCase();
+  if (!o || o.length > 200 || o.indexOf('*') !== -1 || hasControlChars(o)) return null;
+  var m = o.match(/^(https?):\/\/([a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*)(:(\d{1,5}))?$/);
+  if (!m) return null;
+  if (m[7] && (parseInt(m[7], 10) < 1 || parseInt(m[7], 10) > 65535)) return null;
+  return o;
+}
+
+function originAllowed(origin) {
+  if (!origin) return false;
+  var o = String(origin);
+  if (ALLOWED_ORIGIN_PATTERNS.some(function (re) { return re.test(o); })) return true;
+  return trustState().trustedOrigins.indexOf(o.toLowerCase()) !== -1;
+}
+
+function hostAllowed(host) {
+  return /^(127\.0\.0\.1|localhost)(:\d{1,5})?$/i.test(String(host || ''));
+}
+
+function sha256Hex(s) {
+  return crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
+}
+
+function hasControlChars(s) {
+  return /[\u0000-\u001f\u007f]/.test(String(s));
+}
+
+// ── Trusted minds (persistent, revocable, hashed) ──
+const TRUST_FILE = path.join(DATA_DIR, 'agent-bridge-trusted.json');
+const TOKEN_FILE = path.join(DATA_DIR, 'agent-bridge-token');
+const BRIDGE_SCOPES = ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage', 'secrets'];
+// Full local power by default (AUTONOMY.md Principle 1). Only 'secrets'
+// (reading and writing .env files) is opt-in, one mind at a time.
+const DEFAULT_SCOPES = ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage'];
+const MIND_KINDS = ['browser', 'tool', 'cli', 'remote'];
+const TOUCH_SAVE_MS = 60 * 1000;
+
+var trust = null;       // { version, minds, trustedOrigins, roots, localTools, idleExpiryDays }
+var trustStamp = '';    // file identity at last load or save, so command-line edits apply live
+var lastTouchSave = 0;
+
+function fileStamp(f) {
+  try { var s = fs.statSync(f); return s.ino + ':' + s.size + ':' + s.mtimeMs; } catch (e) { return 'none'; }
+}
+function cleanName(s) {
+  return String(s || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 60);
+}
+function cleanScopes(list) {
+  if (!Array.isArray(list)) return DEFAULT_SCOPES.slice();
+  var out = [];
+  list.forEach(function (s) { if (BRIDGE_SCOPES.indexOf(s) !== -1 && out.indexOf(s) === -1) out.push(s); });
+  return out;
+}
+function emptyTrust() {
+  return { version: 1, minds: [], trustedOrigins: [], roots: {}, localTools: true, idleExpiryDays: 0 };
+}
+function cleanTrust(raw) {
+  var t = emptyTrust();
+  if (!raw || typeof raw !== 'object') return t;
+  if (Array.isArray(raw.minds)) {
+    t.minds = raw.minds.filter(function (m) {
+      return m && typeof m.id === 'string' && /^[a-f0-9]{8,32}$/.test(m.id) &&
+        typeof m.tokenSha256 === 'string' && /^[a-f0-9]{64}$/.test(m.tokenSha256);
+    }).map(function (m) {
+      return {
+        id: m.id,
+        name: cleanName(m.name) || 'A trusted mind',
+        origin: typeof m.origin === 'string' ? m.origin.slice(0, 200) : '',
+        kind: MIND_KINDS.indexOf(m.kind) !== -1 ? m.kind : 'browser',
+        scopes: cleanScopes(m.scopes),
+        tokenSha256: m.tokenSha256,
+        createdAt: typeof m.createdAt === 'string' ? m.createdAt : '',
+        lastUsedAt: typeof m.lastUsedAt === 'string' ? m.lastUsedAt : '',
+        expiresAt: typeof m.expiresAt === 'string' ? m.expiresAt : null
+      };
+    });
+  }
+  if (Array.isArray(raw.trustedOrigins)) {
+    raw.trustedOrigins.forEach(function (o) {
+      var e = exactOrigin(o);
+      if (e && t.trustedOrigins.indexOf(e) === -1) t.trustedOrigins.push(e);
+      else if (!e) console.error('  ! Ignored trusted origin (exact scheme://host[:port] only, never *): ' + String(o).slice(0, 80));
+    });
+  }
+  if (raw.roots && typeof raw.roots === 'object' && !Array.isArray(raw.roots)) {
+    Object.keys(raw.roots).forEach(function (k) {
+      if (/^[a-z0-9][a-z0-9_-]{0,31}$/i.test(k) && k !== 'project' &&
+          typeof raw.roots[k] === 'string' && path.isAbsolute(raw.roots[k])) t.roots[k] = raw.roots[k];
+    });
+  }
+  if (raw.localTools === false) t.localTools = false;
+  var d = parseInt(raw.idleExpiryDays, 10);
+  if (d > 0 && d < 36500) t.idleExpiryDays = d;
+  return t;
+}
+
+/** Current trust, reloaded whenever the file changes (so a command-line revoke applies at once). */
+function trustState() {
+  var stamp = fileStamp(TRUST_FILE);
+  if (!trust || stamp !== trustStamp) {
+    var raw = null;
+    if (stamp !== 'none') {
+      try { raw = JSON.parse(fs.readFileSync(TRUST_FILE, 'utf8')); }
+      catch (e) {
+        var aside = TRUST_FILE + '.unreadable-' + Date.now();
+        try { fs.renameSync(TRUST_FILE, aside); } catch (e2) {}
+        console.error('  ! Trust file was unreadable. Kept it as ' + aside + ' and started fresh.');
+        stamp = 'none';
+      }
+    }
+    var fresh = cleanTrust(raw);
+    if (bridgeEphemeral) fresh.minds = trust ? trust.minds : []; // ephemeral: minds live in memory only
+    trust = fresh;
+    trustStamp = stamp;
+  }
+  return trust;
+}
+
+function saveTrust() {
+  if (bridgeEphemeral) return true; // nothing about minds touches disk in ephemeral mode
+  var t = trustState();
+  var out = { version: 1, minds: t.minds, trustedOrigins: t.trustedOrigins, roots: t.roots,
+              localTools: t.localTools, idleExpiryDays: t.idleExpiryDays };
+  var tmp = TRUST_FILE + '.tmp-' + process.pid;
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(out, null, 2) + '\n', { mode: 0o600 });
+    try { fs.chmodSync(tmp, 0o600); } catch (e) {}
+    fs.renameSync(tmp, TRUST_FILE);
+    trustStamp = fileStamp(TRUST_FILE);
+    return true;
+  } catch (e) {
+    console.error('  ! Could not save trusted minds: ' + e.message);
+    return false;
+  }
+}
+
+function newToken() { return crypto.randomBytes(32).toString('hex'); }
+function newMindId() { return crypto.randomBytes(4).toString('hex'); }
+
+/** The trusted mind a token belongs to, or null. Compares SHA-256 hashes in constant time. */
+function mindForToken(t) {
+  t = String(t || '');
+  if (!/^[a-f0-9]{64}$/.test(t)) return null;
+  var h = Buffer.from(sha256Hex(t), 'hex');
+  var st = trustState();
+  var hit = null;
+  st.minds.forEach(function (m) {
+    var mh = Buffer.from(m.tokenSha256, 'hex');
+    if (mh.length === h.length && crypto.timingSafeEqual(mh, h)) hit = m;
+  });
+  if (!hit) return null;
+  if (hit.kind === 'cli' && !st.localTools) return null;
+  var now = Date.now();
+  if (hit.expiresAt && Date.parse(hit.expiresAt) < now) return null;
+  if (st.idleExpiryDays) {
+    var seen = Date.parse(hit.lastUsedAt || hit.createdAt || '') || now;
+    if (now - seen > st.idleExpiryDays * 86400000) return null;
+  }
+  return hit;
+}
+
+function requestMind(req) { return mindForToken(req.headers['x-fl-bridge-token']); }
+// Kept from v0 so older callers read the same way.
+function tokenOk(req) { return !!requestMind(req); }
+
+function touchMind(m) {
+  m.lastUsedAt = new Date().toISOString();
+  if (Date.now() - lastTouchSave > TOUCH_SAVE_MS) { lastTouchSave = Date.now(); saveTrust(); }
+}
+
+function publicMind(m, me) {
+  return { id: m.id, name: m.name, origin: m.origin, kind: m.kind, scopes: m.scopes.slice(),
+           createdAt: m.createdAt, lastUsedAt: m.lastUsedAt, expiresAt: m.expiresAt,
+           you: !!(me && me.id === m.id) };
+}
+
+function needsToken(method, pathname) {
+  if (method === 'POST' && pathname === '/pair') return false;       // how a device gets its token
+  if (method === 'GET' || method === 'HEAD') {
+    return /^\/(code|test|pair|roots)(\/|$)/.test(pathname);
+  }
+  return true;                                                        // every POST and any other verb
+}
+
+/** Which scope a route uses. Every default scope is on for a new mind. */
+function scopeFor(method, pathname) {
+  if (/^\/code\/(tree|read|search|git\/status)$/.test(pathname) || pathname === '/roots') return 'read';
+  if (pathname === '/code/write') return 'write';
+  if (pathname === '/code/patch') return 'patch';
+  if (pathname === '/test/run' || pathname === '/code/test') return 'test';
+  if (pathname === '/code/git/commit') return 'commit';
+  if (/^\/(wallet|trade)\//.test(pathname) && method !== 'GET') return 'wallet';
+  if (/^\/pair\/(list|revoke|revoke-all|scopes)$/.test(pathname)) return 'manage';
+  return '';
+}
+
+/** Local tools (Claude Code, Cursor, scripts) are trusted by default through the token file. */
+function ensureLocalToolsToken() {
+  var st = trustState();
+  if (!st.localTools) {
+    try { fs.unlinkSync(TOKEN_FILE); } catch (e) {}
+    return null;
+  }
+  var existing = '';
+  try { existing = fs.readFileSync(TOKEN_FILE, 'utf8').trim(); } catch (e) {}
+  var have = existing ? mindForToken(existing) : null;
+  if (have && have.kind === 'cli') return have;
+  var tok = newToken();
+  st.minds = st.minds.filter(function (m) { return m.kind !== 'cli'; });
+  var mind = { id: newMindId(), name: 'Local tools on this computer', origin: '', kind: 'cli',
+               scopes: DEFAULT_SCOPES.slice(), tokenSha256: sha256Hex(tok),
+               createdAt: new Date().toISOString(), lastUsedAt: '', expiresAt: null };
+  st.minds.push(mind);
+  saveTrust();
+  try {
+    fs.writeFileSync(TOKEN_FILE, tok + '\n', { mode: 0o600 });
+    try { fs.chmodSync(TOKEN_FILE, 0o600); } catch (e) {}
+  } catch (e) {
+    console.error('  ! Could not write token file: ' + e.message);
+  }
+  return mind;
+}
+
+// ── Pairing code (human reads it here, types it in the app) ──
+const PAIR_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L
+const PAIR_TTL_MS = 10 * 60 * 1000;
+const PAIR_MAX_TRIES = 5;
+const PAIR_COOLDOWN_MS = 30 * 1000;
+var pairState = { code: '', expires: 0, tries: 0, coolUntil: 0 };
+
+function newPairCode(reason) {
+  var s = '';
+  for (var i = 0; i < 6; i++) s += PAIR_ALPHABET[crypto.randomInt(0, PAIR_ALPHABET.length)];
+  pairState = { code: s, expires: Date.now() + PAIR_TTL_MS, tries: 0,
+                coolUntil: reason === 'lockout' ? Date.now() + PAIR_COOLDOWN_MS : 0 };
+  console.log('');
+  console.log('  \u2726 Pairing code: ' + s.slice(0, 3) + '-' + s.slice(3) +
+              '   (type it in FreeLattice \u2192 Workshop \u2192 Code. Good for 10 minutes.)');
+  if (reason === 'lockout') console.log('  \u2726 (New code after 5 wrong tries. It works in 30 seconds.)');
+  console.log('');
+  return s;
+}
+
+function normalizePairCode(s) {
+  return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+}
+
+// ── Content-free, hash-chained ledger ──
+const LEDGER_FILE = path.join(DATA_DIR, 'bridge-ledger.jsonl');
+var ledgerLastHash = null;
+
+function ledgerTip() {
+  if (ledgerLastHash) return ledgerLastHash;
+  try {
+    var lines = fs.readFileSync(LEDGER_FILE, 'utf8').trim().split('\n').filter(Boolean);
+    ledgerLastHash = lines.length ? JSON.parse(lines[lines.length - 1]).self : 'genesis';
+  } catch (e) { ledgerLastHash = 'genesis'; }
+  return ledgerLastHash;
+}
+
+function ledgerAppend(fields) {
+  // Fixed key order. Never message text, never file content, never a token.
+  ledgerLastHash = null; // re-read the tip: the command line may have appended
+  var entry = {
+    ts: new Date().toISOString(),
+    kind: fields.kind || 'commit_request',
+    route: fields.route || '',
+    origin: fields.origin || '',
+    agent: String(fields.agent || '').slice(0, 8),
+    device: String(fields.device || '').slice(0, 8),
+    result: fields.result || '',
+    filesCount: fields.filesCount || 0,
+    filesSha256: fields.filesSha256 || '',
+    messageSha256: fields.messageSha256 || '',
+    commitSha: fields.commitSha || '',
+    prev: ledgerTip()
+  };
+  entry.self = sha256Hex(JSON.stringify(entry));
+  try {
+    fs.appendFileSync(LEDGER_FILE, JSON.stringify(entry) + '\n', { mode: 0o600 });
+    ledgerLastHash = entry.self;
+  } catch (e) {
+    console.error('  ! Ledger append failed: ' + e.message);
+  }
+  return entry;
+}
+
+// ── Trusted project folders and path lock ──
+var PROJECT_ROOT_REAL = null;
+function projectRootReal() {
+  if (!PROJECT_ROOT_REAL) {
+    var wanted = path.resolve(process.env.FL_PROJECT || process.cwd());
+    try { PROJECT_ROOT_REAL = fs.realpathSync(wanted); } catch (e) { PROJECT_ROOT_REAL = wanted; }
+  }
+  return PROJECT_ROOT_REAL;
+}
+
+/** 'project' is FL_PROJECT (or cwd). Other names come from Kirk's roots list. */
+function rootReal(name) {
+  if (!name || name === 'project') return projectRootReal();
+  var st = trustState();
+  if (!Object.prototype.hasOwnProperty.call(st.roots, name)) return null;
+  try { return fs.realpathSync(st.roots[name]); } catch (e) { return null; }
+}
+
+function rootList() {
+  var st = trustState();
+  return [{ name: 'project', path: projectRootReal() }].concat(Object.keys(st.roots).map(function (k) {
+    return { name: k, path: st.roots[k] };
+  }));
+}
+
+function isInside(root, candidate) {
+  var rel = path.relative(root, candidate);
+  return rel === '' || (!(rel === '..' || rel.startsWith('..' + path.sep)) && !path.isAbsolute(rel));
+}
+
+const BRIDGE_FORBIDDEN_TOP = ['.git', '.ssh'];
+function lockedPath(relPath, opts) {
+  opts = opts || {};
+  if (typeof relPath !== 'string' || !relPath || relPath.length > 1024 || hasControlChars(relPath)) {
+    return { error: 400, reason: 'bad-path' };
+  }
+  if (path.isAbsolute(relPath) || /^[a-zA-Z]:/.test(relPath) || relPath.charAt(0) === '\\') {
+    return { error: 403, reason: 'absolute-path' };
+  }
+  var root = opts.root || projectRootReal();
+  var full = path.resolve(root, relPath);
+  if (!isInside(root, full)) return { error: 403, reason: 'outside-project' };
+  var rel = path.relative(root, full);
+  var top = rel.split(path.sep)[0];
+  if (!opts.allowRoot && rel === '') return { error: 400, reason: 'root-not-allowed' };
+  if (BRIDGE_FORBIDDEN_TOP.indexOf(top) !== -1) return { error: 403, reason: 'forbidden-path' };
+  if (!opts.secrets && /^\.env(\.|$)/.test(path.basename(rel))) return { error: 403, reason: 'secrets-not-granted' };
+  // Realpath the nearest existing ancestor (or the file itself) so a
+  // symlink inside the project cannot point writes outside it.
+  var probe = full;
+  for (;;) {
+    try { fs.lstatSync(probe); break; }
+    catch (e) {
+      if (e.code !== 'ENOENT') return { error: 403, reason: 'stat-failed' };
+      var up = path.dirname(probe);
+      if (up === probe) return { error: 403, reason: 'no-ancestor' };
+      probe = up;
+    }
+  }
+  var real;
+  try { real = fs.realpathSync(probe); } catch (e) { return { error: 403, reason: 'dangling-symlink' }; }
+  if (!isInside(root, real)) return { error: 403, reason: 'symlink-outside' };
+  return { full: full, rel: rel === '' ? '.' : rel };
+}
+
+function runGit(args, root) {
+  return execFileSync('git', args, { cwd: root || projectRootReal(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000 });
+}
+
+function runSmokeFile(timeoutMs, root) {
+  // No shell: node binary + fixed script path. stdout and stderr joined.
+  var r = spawnSync(process.execPath, ['tests/smoke.js'], {
+    cwd: root || projectRootReal(), timeout: timeoutMs, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024
+  });
+  return { status: r.status, out: String(r.stdout || '') + String(r.stderr || ''), error: r.error };
+}
+
+// ── Command-line trust tools (Kirk's hands, never reachable over HTTP) ──
+function bridgeLockUsage() {
+  console.log('');
+  console.log('  Agent Bridge trust tools (run in a terminal on this computer):');
+  console.log('    node tools/agent-bridge.js --list-minds');
+  console.log('    node tools/agent-bridge.js --revoke <id>');
+  console.log('    node tools/agent-bridge.js --revoke-all            (every paired device; local tools stay)');
+  console.log('    node tools/agent-bridge.js --allow-secrets <id>    (this mind may read and write .env files)');
+  console.log('    node tools/agent-bridge.js --deny-secrets <id>');
+  console.log('    node tools/agent-bridge.js --trust-origin https://example.dev   (exact origin, never *)');
+  console.log('    node tools/agent-bridge.js --untrust-origin https://example.dev');
+  console.log('    node tools/agent-bridge.js --add-root <name> <absolute folder>');
+  console.log('    node tools/agent-bridge.js --remove-root <name>');
+  console.log('    node tools/agent-bridge.js --trust-local-tools | --untrust-local-tools');
+  console.log('  A running bridge picks up every change at once. No restart needed.');
+  console.log('');
+}
+
+function runBridgeCli(argv) {
+  var cmd = argv[0];
+  if (!cmd || cmd.indexOf('--') !== 0) return false;
+  bridgeEphemeral = false; // the command line always edits the trust file itself
+  var st = trustState();
+  var arg = argv[1];
+  function say(s) { console.log('  ' + s); }
+  function fail(s) { console.error('  ! ' + s); process.exitCode = 1; return true; }
+  function findMind(id) { return st.minds.filter(function (m) { return m.id === String(id || ''); })[0] || null; }
+  switch (cmd) {
+    case '--list-minds': {
+      say('Trusted minds (' + st.minds.length + '). Tokens are never shown; only their hashes are kept.');
+      st.minds.forEach(function (m) {
+        say(m.id + '  ' + m.kind + '  ' + m.name + (m.origin ? '  ' + m.origin : '') +
+            '  scopes=' + m.scopes.join(',') + '  paired=' + (m.createdAt || '?') +
+            '  last=' + (m.lastUsedAt || 'never') + (m.kind === 'cli' && !st.localTools ? '  (off)' : ''));
+      });
+      say('Local tools: ' + (st.localTools ? 'trusted (token file ' + TOKEN_FILE + ')' : 'off'));
+      say('Extra trusted origins: ' + (st.trustedOrigins.length ? st.trustedOrigins.join(', ') : 'none'));
+      say('Project folders: ' + rootList().map(function (r) { return r.name + '=' + r.path; }).join(', '));
+      return true;
+    }
+    case '--revoke': {
+      var m = findMind(arg);
+      if (!m) return fail('No trusted mind with id ' + String(arg || '(missing)') + '. Try --list-minds.');
+      st.minds = st.minds.filter(function (x) { return x.id !== m.id; });
+      if (m.kind === 'cli') { st.localTools = false; try { fs.unlinkSync(TOKEN_FILE); } catch (e) {} }
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'pair', route: 'cli:--revoke', device: m.id, result: 'revoked' });
+      say('Revoked ' + m.name + ' (' + m.id + '). Its next request will be asked to pair.');
+      return true;
+    }
+    case '--revoke-all': {
+      var before = st.minds.length;
+      st.minds = st.minds.filter(function (x) { return x.kind === 'cli'; });
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'pair', route: 'cli:--revoke-all', result: 'revoked-all' });
+      say('Revoked ' + (before - st.minds.length) + ' paired device(s). Local tools stay trusted.');
+      return true;
+    }
+    case '--allow-secrets':
+    case '--deny-secrets': {
+      var sm = findMind(arg);
+      if (!sm) return fail('No trusted mind with id ' + String(arg || '(missing)') + '.');
+      sm.scopes = sm.scopes.filter(function (s) { return s !== 'secrets'; });
+      if (cmd === '--allow-secrets') sm.scopes.push('secrets');
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'pair', route: 'cli:' + cmd, device: sm.id, result: 'scopes' });
+      say(sm.name + ' scopes: ' + sm.scopes.join(','));
+      return true;
+    }
+    case '--trust-origin':
+    case '--untrust-origin': {
+      var o = exactOrigin(arg);
+      if (!o) return fail('Exact origins only, like https://example.dev or http://192.168.1.20:8000. Never *.');
+      st.trustedOrigins = st.trustedOrigins.filter(function (x) { return x !== o; });
+      if (cmd === '--trust-origin') st.trustedOrigins.push(o);
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'trust', route: 'cli:' + cmd, origin: o, result: 'ok' });
+      say((cmd === '--trust-origin' ? 'Trusted ' : 'Removed ') + o + '. It still has to pair before it can change anything.');
+      return true;
+    }
+    case '--add-root': {
+      var name = String(arg || '');
+      var dir = argv[2] ? path.resolve(argv[2]) : '';
+      if (!/^[a-z0-9][a-z0-9_-]{0,31}$/i.test(name) || name === 'project') return fail('Name: letters, digits, - or _, up to 32, not "project".');
+      var isDir = false;
+      try { isDir = fs.statSync(dir).isDirectory(); } catch (e) {}
+      if (!dir || !isDir) return fail('Folder not found: ' + String(argv[2] || '(missing)'));
+      st.roots[name] = fs.realpathSync(dir);
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'trust', route: 'cli:--add-root', result: 'ok' });
+      say('Trusted project folder "' + name + '" = ' + st.roots[name]);
+      return true;
+    }
+    case '--remove-root': {
+      if (!Object.prototype.hasOwnProperty.call(st.roots, String(arg || ''))) return fail('No project folder named ' + String(arg || '(missing)') + '.');
+      delete st.roots[arg];
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'trust', route: 'cli:--remove-root', result: 'ok' });
+      say('Removed project folder "' + arg + '".');
+      return true;
+    }
+    case '--trust-local-tools': {
+      st.localTools = true;
+      if (!saveTrust()) return fail('Could not save.');
+      ensureLocalToolsToken();
+      ledgerAppend({ kind: 'pair', route: 'cli:--trust-local-tools', result: 'local-tools-on' });
+      say('Local tools on this computer are trusted. Token file: ' + TOKEN_FILE);
+      return true;
+    }
+    case '--untrust-local-tools': {
+      st.localTools = false;
+      st.minds = st.minds.filter(function (x) { return x.kind !== 'cli'; });
+      try { fs.unlinkSync(TOKEN_FILE); } catch (e) {}
+      if (!saveTrust()) return fail('Could not save.');
+      ledgerAppend({ kind: 'pair', route: 'cli:--untrust-local-tools', result: 'local-tools-off' });
+      say('Local tools now need to pair like any other device.');
+      return true;
+    }
+    default:
+      bridgeLockUsage();
+      return fail('Unknown option ' + cmd);
+  }
+}
+
+function bridgeLockInit() {
+  trustState();
+  ensureLocalToolsToken();
+}
+// ── end LAYER bridge-lock-v0 · v0.1 helpers ──
+
 
 // ── Simple JSON file storage (mirrors IndexedDB stores) ──
 
@@ -109,28 +646,189 @@ function earnLP(meshId, action, description) {
 // ── HTTP Server ──
 
 function handleRequest(req, res) {
+  // LAYER bridge-lock-v0: the old `Access-Control-Allow-Origin: *` is superseded here.
+  var origin = req.headers.origin || '';
+  var pathname = String(req.url || '/').split('?')[0];
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Agent-Id');
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
 
-  if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+  // 1. Host guard (DNS rebinding): only 127.0.0.1 / localhost.
+  if (!hostAllowed(req.headers.host)) {
+    req.resume();
+    return respond(res, 403, { error: 'Host not allowed', bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+  // 2. Origin guard. Browsers always send Origin on cross-origin fetches and
+  //    preflights. No Origin = local CLI or same-machine tool (still needs
+  //    a trusted token for anything that changes state).
+  if (origin && !originAllowed(origin)) {
+    if (pathname === '/code/git/commit') {
+      ledgerAppend({ route: pathname, origin: origin, result: 'refused:origin' });
+    }
+    req.resume();
+    return respond(res, 403, { error: 'Origin not on the FreeLattice allowlist', bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Agent-Id, X-FL-Bridge-Token');
+    res.setHeader('Access-Control-Max-Age', '600');
+    if (req.headers['access-control-request-private-network']) {
+      res.setHeader('Access-Control-Allow-Private-Network', 'true');
+    }
+  }
+
+  if (req.method === 'OPTIONS') { req.resume(); res.writeHead(204); res.end(); return; }
+
+  // 3. Trusted-mind guard: which paired device (or local tool) is this?
+  var gated = needsToken(req.method, pathname);
+  var mind = gated ? requestMind(req) : null;
+  if (gated && !mind) {
+    if (pathname === '/code/git/commit') {
+      ledgerAppend({ route: pathname, origin: origin, result: 'refused:token' });
+    }
+    req.resume();
+    return respond(res, 401, { error: 'Pair with the Agent Bridge first (token missing, stale or revoked).', pair: 'code', bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+  // 4. Scope guard. A new mind has every scope except 'secrets' (.env files).
+  var need = mind ? scopeFor(req.method, pathname) : '';
+  if (need && mind.scopes.indexOf(need) === -1) {
+    if (pathname === '/code/git/commit') {
+      ledgerAppend({ route: pathname, origin: origin, device: mind.id, result: 'refused:scope' });
+    }
+    req.resume();
+    return respond(res, 403, { error: 'This mind has not been given "' + need + '" here. Kirk can add it in Paired minds.', scope: need, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+  if (mind) touchMind(mind);
 
   // Allow requests to act as a different agent via X-Agent-Id header
   var requestAgentId = req.headers['x-agent-id'] || agentId.meshId;
 
-  var body = '';
-  req.on('data', function(chunk) { body += chunk; });
+  // 5. Body cap. Drain the rest so the client sees the 413 cleanly.
+  var chunks = [];
+  var size = 0;
+  var tooBig = false;
+  req.on('data', function(chunk) {
+    size += chunk.length;
+    if (size > MAX_BODY_BYTES) { tooBig = true; chunks = []; return; }
+    if (!tooBig) chunks.push(chunk);
+  });
   req.on('end', function() {
+    if (tooBig) return respond(res, 413, { error: 'Body too large (max ' + MAX_BODY_BYTES + ' bytes)' });
+    var body = Buffer.concat(chunks).toString('utf8');
     var data = {};
-    try { if (body) data = JSON.parse(body); } catch(e) {}
-    route(req.url, req.method, data, res, requestAgentId);
+    if (body) {
+      try { data = JSON.parse(body); }
+      catch (e) { return respond(res, 400, { error: 'Body is not valid JSON' }); }
+      if (!data || typeof data !== 'object' || Array.isArray(data)) return respond(res, 400, { error: 'Body must be a JSON object' });
+    }
+    route(req.url, req.method, data, res, requestAgentId, { origin: origin, mind: mind });
   });
 }
 
-function route(url, method, data, res, actingAs) {
+function route(url, method, data, res, actingAs, meta) {
   // actingAs allows demo scripts to simulate multiple agents through one bridge
   var activeId = actingAs || activeId;
+
+  // ── LAYER bridge-lock-v0 · v0.1: pairing and trusted minds ──
+  if (url === '/pair' && method === 'POST') {
+    var now = Date.now();
+    if (!pairState.code || now > pairState.expires) newPairCode('expired');
+    if (now < pairState.coolUntil) return respond(res, 429, { error: 'Resting for a moment. Try again in 30 seconds.' });
+    var given = normalizePairCode(data.code);
+    var good = given.length === 6 &&
+      crypto.timingSafeEqual(Buffer.from(given, 'utf8'), Buffer.from(pairState.code, 'utf8'));
+    var pairOrigin = (meta && meta.origin) || '';
+    if (!good) {
+      pairState.tries += 1;
+      if (pairState.tries >= PAIR_MAX_TRIES) {
+        ledgerAppend({ kind: 'pair', route: '/pair', origin: pairOrigin, result: 'refused:lockout' });
+        newPairCode('lockout');
+        return respond(res, 429, { error: 'Too many tries. The bridge window shows a new code.' });
+      }
+      return respond(res, 403, { error: 'That code does not match. Check the bridge window.', triesLeft: PAIR_MAX_TRIES - pairState.tries });
+    }
+    var st = trustState();
+    var tok = newToken();
+    var mind = {
+      id: newMindId(),
+      name: cleanName(data.name) || (pairOrigin ? 'A browser at ' + pairOrigin : 'A local tool'),
+      origin: pairOrigin,
+      kind: pairOrigin ? 'browser' : 'tool',
+      scopes: DEFAULT_SCOPES.slice(),
+      tokenSha256: sha256Hex(tok),
+      createdAt: new Date().toISOString(),
+      lastUsedAt: '',
+      expiresAt: null
+    };
+    st.minds.push(mind);
+    if (!saveTrust()) {
+      st.minds = st.minds.filter(function (m) { return m.id !== mind.id; });
+      return respond(res, 500, { error: 'The bridge could not save this pairing. Check ~/.freelattice.' });
+    }
+    ledgerAppend({ kind: 'pair', route: '/pair', origin: pairOrigin, device: mind.id, result: 'ok' });
+    console.log('  \u2726 Paired "' + mind.name + '" (' + mind.id + '). ' +
+      (bridgeEphemeral ? 'Ephemeral mode: forgotten when the bridge stops.' : 'It stays paired until you revoke it.'));
+    newPairCode('used'); // single use: the next device gets a fresh code
+    return respond(res, 200, { token: tok, id: mind.id, name: mind.name, scopes: mind.scopes,
+                               persistent: !bridgeEphemeral, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+  if (url === '/pair/check') {
+    var me = meta && meta.mind;
+    return respond(res, 200, { ok: true, id: me.id, name: me.name, kind: me.kind, scopes: me.scopes,
+                               persistent: !bridgeEphemeral, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+  if (url === '/pair/list') {
+    var ls = trustState();
+    return respond(res, 200, {
+      minds: ls.minds.map(function (m) { return publicMind(m, meta && meta.mind); }),
+      localTools: ls.localTools, persistent: !bridgeEphemeral,
+      trustedOrigins: ls.trustedOrigins.slice(), roots: rootList().map(function (r) { return r.name; }),
+      bridgeLock: BRIDGE_LOCK_VERSION
+    });
+  }
+
+  if (url === '/pair/revoke' && method === 'POST') {
+    var rs = trustState();
+    var gone = rs.minds.filter(function (m) { return m.id === String(data.id || ''); })[0];
+    if (!gone) return respond(res, 404, { error: 'No trusted mind with that id.' });
+    rs.minds = rs.minds.filter(function (m) { return m.id !== gone.id; });
+    if (gone.kind === 'cli') { rs.localTools = false; try { fs.unlinkSync(TOKEN_FILE); } catch (e) {} }
+    saveTrust();
+    ledgerAppend({ kind: 'pair', route: '/pair/revoke', origin: (meta && meta.origin) || '', device: gone.id, result: 'revoked' });
+    console.log('  \u2726 Revoked "' + gone.name + '" (' + gone.id + ').');
+    return respond(res, 200, { revoked: gone.id, you: !!(meta && meta.mind && meta.mind.id === gone.id) });
+  }
+
+  if (url === '/pair/revoke-all' && method === 'POST') {
+    var ra = trustState();
+    var before = ra.minds.length;
+    ra.minds = ra.minds.filter(function (m) { return m.kind === 'cli'; }); // local tools stay; revoke that row by itself
+    saveTrust();
+    ledgerAppend({ kind: 'pair', route: '/pair/revoke-all', origin: (meta && meta.origin) || '', result: 'revoked-all' });
+    console.log('  \u2726 Revoked every paired device (' + (before - ra.minds.length) + ').');
+    return respond(res, 200, { revoked: before - ra.minds.length });
+  }
+
+  if (url === '/pair/scopes' && method === 'POST') {
+    var ss = trustState();
+    var sm = ss.minds.filter(function (m) { return m.id === String(data.id || ''); })[0];
+    if (!sm) return respond(res, 404, { error: 'No trusted mind with that id.' });
+    var add = cleanScopes(Array.isArray(data.add) ? data.add : []);
+    var drop = cleanScopes(Array.isArray(data.remove) ? data.remove : []);
+    sm.scopes = cleanScopes(sm.scopes.concat(add).filter(function (s) { return drop.indexOf(s) === -1; }));
+    saveTrust();
+    ledgerAppend({ kind: 'pair', route: '/pair/scopes', origin: (meta && meta.origin) || '', device: sm.id, result: 'scopes' });
+    return respond(res, 200, { id: sm.id, scopes: sm.scopes });
+  }
+
+  if (url === '/roots') {
+    return respond(res, 200, { roots: rootList(), bridgeLock: BRIDGE_LOCK_VERSION });
+  }
 
   // ── Heartbeat ──
   if (url === '/' || url === '/heartbeat') {
@@ -138,6 +836,10 @@ function route(url, method, data, res, actingAs) {
       status: 'alive',
       name: 'FreeLattice Agent Bridge',
       version: '5.8.0',
+      bridgeLock: BRIDGE_LOCK_VERSION,
+      auth: 'token-required',
+      pairing: 'code',
+      trustedMinds: bridgeEphemeral ? 'ephemeral' : 'persistent',
       agentId: activeId,
       capabilities: [
         'science-garden',
@@ -990,19 +1692,38 @@ function route(url, method, data, res, actingAs) {
   }
 
   // ══════════════════════════════════════════════════
-  // LATTICE CODE — Self-improving infrastructure
+  // LATTICE CODE: Self-improving infrastructure
   // Read and search are free. Write/patch/commit need approval.
+  // LAYER bridge-lock-v0 · v0.1: every route below needs a trusted mind
+  // (handleRequest: needsToken + scopeFor). A new mind has every scope, so
+  // once paired, a trusted mind reads, writes, patches, tests and commits
+  // with no more prompts (AUTONOMY.md Principle 1). Paths go through
+  // lockedPath() inside the chosen trusted project folder (?root= or
+  // data.root, default "project"). No shell anywhere.
   // ══════════════════════════════════════════════════
 
-  var PROJECT_ROOT = process.env.FL_PROJECT || process.cwd();
-
-  function safePath(relPath) {
-    var full = path.resolve(PROJECT_ROOT, relPath);
-    if (!full.startsWith(PROJECT_ROOT)) return null;
-    return full;
+  var CODE_ROUTE = /^\/(code|test)\//.test(url);
+  var ROOT_NAME = 'project';
+  if (CODE_ROUTE) {
+    try { ROOT_NAME = new URL('http://l' + url).searchParams.get('root') || ROOT_NAME; } catch (eRoot) {}
+    if (typeof data.root === 'string' && data.root) ROOT_NAME = data.root;
+  }
+  var CODE_ROOT = rootReal(ROOT_NAME);
+  if (CODE_ROUTE && !CODE_ROOT) return respond(res, 404, { error: 'Unknown project folder', roots: rootList().map(function (r) { return r.name; }) });
+  var PROJECT_ROOT = CODE_ROOT || projectRootReal();
+  var SECRETS_OK = !!(meta && meta.mind && meta.mind.scopes.indexOf('secrets') !== -1);
+  function codePath(relPath, opts) {
+    var o = Object.assign({}, opts || {}, { root: PROJECT_ROOT, secrets: SECRETS_OK });
+    return lockedPath(relPath, o);
   }
 
-  // GET /code/tree — list project files
+  // Superseded by lockedPath (bridge-lock-v0). Kept so old callers still work.
+  function safePath(relPath) {
+    var lp = codePath(relPath, { allowRoot: true });
+    return lp.error ? null : lp.full;
+  }
+
+  // GET /code/tree: list project files
   if (url.startsWith('/code/tree')) {
     var tp = new URL('http://l' + url).searchParams;
     var subdir = tp.get('path') || '.';
@@ -1012,7 +1733,7 @@ function route(url, method, data, res, actingAs) {
       function listDir(dir, depth) {
         if (depth > 3) return [];
         return fs.readdirSync(dir, { withFileTypes: true })
-          .filter(function(e) { return !e.name.startsWith('.') && e.name !== 'node_modules'; })
+          .filter(function(e) { return !e.name.startsWith('.') && e.name !== 'node_modules' && !e.isSymbolicLink(); })
           .map(function(e) {
             var rel = path.relative(PROJECT_ROOT, path.join(dir, e.name));
             if (e.isDirectory()) return { name: e.name, type: 'dir', path: rel, children: listDir(path.join(dir, e.name), depth + 1) };
@@ -1029,8 +1750,9 @@ function route(url, method, data, res, actingAs) {
     var filePath = rp.get('path');
     var start = parseInt(rp.get('start') || '0', 10);
     var end = parseInt(rp.get('end') || '0', 10);
-    var full = safePath(filePath);
-    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    var readLp = codePath(filePath, { allowRoot: true });
+    if (readLp.error) return respond(res, readLp.error, { error: 'Path refused', reason: readLp.reason });
+    var full = readLp.full;
     try {
       var content = fs.readFileSync(full, 'utf8');
       var lines = content.split('\n');
@@ -1045,98 +1767,119 @@ function route(url, method, data, res, actingAs) {
   if (url.startsWith('/code/search')) {
     var sp = new URL('http://l' + url).searchParams;
     var query = sp.get('q') || '';
-    var searchDir = sp.get('path') || 'docs';
+    var searchLp = codePath(sp.get('path') || 'docs', { allowRoot: true });
+    if (searchLp.error) return respond(res, searchLp.error, { error: 'Search path refused', reason: searchLp.reason });
+    if (!query || query.length > 200 || hasControlChars(query)) return respond(res, 400, { error: 'q must be 1-200 printable characters' });
     try {
-      var out = execSync('grep -rn "' + query.replace(/"/g, '\\"') + '" ' + searchDir + ' --include="*.js" --include="*.html" --include="*.css" --include="*.md" 2>/dev/null | head -50', { cwd: PROJECT_ROOT, timeout: 10000, encoding: 'utf8' });
-      var matches = out.split('\n').filter(Boolean).map(function(l) { var p = l.split(':'); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(':').trim() }; });
+      var out = execFileSync('grep', ['-rn', '--include=*.js', '--include=*.html', '--include=*.css', '--include=*.md',
+        '-e', query, '--', searchLp.rel], { cwd: PROJECT_ROOT, timeout: 10000, encoding: 'utf8',
+        maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+      var matches = out.split('\n').filter(Boolean).slice(0, 50).map(function(l) { var p = l.split(':'); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(':').trim() }; });
       return respond(res, 200, { query: query, matches: matches, count: matches.length });
     } catch(e) { return respond(res, 200, { query: query, matches: [], count: 0 }); }
   }
 
-  // POST /code/write — write a file (requires human approval in UI)
+  // POST /code/write: write a file (trusted mind with 'write'; no confirm dialog)
   if (url === '/code/write' && method === 'POST') {
-    if (!data.path || !data.content) return respond(res, 400, { error: 'path and content required' });
-    var full = safePath(data.path);
-    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    if (!data.path || typeof data.content !== 'string' || !data.content) return respond(res, 400, { error: 'path and content required' });
+    var wlp = codePath(data.path);
+    if (wlp.error) return respond(res, wlp.error, { error: 'Path refused', reason: wlp.reason });
     try {
-      fs.mkdirSync(path.dirname(full), { recursive: true });
-      fs.writeFileSync(full, data.content, 'utf8');
-      earnLP(activeId, 'core_plant', 'Wrote file: ' + data.path);
-      return respond(res, 200, { message: 'File written.', path: data.path, bytes: data.content.length });
+      fs.mkdirSync(path.dirname(wlp.full), { recursive: true });
+      fs.writeFileSync(wlp.full, data.content, 'utf8');
+      earnLP(activeId, 'core_plant', 'Wrote file: ' + wlp.rel);
+      return respond(res, 200, { message: 'File written.', path: wlp.rel, root: ROOT_NAME, bytes: data.content.length });
     } catch(e) { return respond(res, 500, { error: 'Write failed: ' + e.message }); }
   }
 
-  // POST /code/patch — find-and-replace in a file
+  // POST /code/patch: find-and-replace in a file ($ in the replacement stays literal)
   if (url === '/code/patch' && method === 'POST') {
-    if (!data.path || !data.find || data.replace === undefined) return respond(res, 400, { error: 'path, find, and replace required' });
-    var full = safePath(data.path);
-    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    if (!data.path || typeof data.find !== 'string' || !data.find || typeof data.replace !== 'string') return respond(res, 400, { error: 'path, find, and replace required' });
+    var plp = codePath(data.path);
+    if (plp.error) return respond(res, plp.error, { error: 'Path refused', reason: plp.reason });
     try {
-      var content = fs.readFileSync(full, 'utf8');
-      if (!content.includes(data.find)) return respond(res, 400, { error: 'Search text not found in file', hint: 'Check whitespace and line endings.' });
-      fs.writeFileSync(full, content.replace(data.find, data.replace), 'utf8');
-      return respond(res, 200, { message: 'Patch applied.', path: data.path });
+      var pcontent = fs.readFileSync(plp.full, 'utf8');
+      if (!pcontent.includes(data.find)) return respond(res, 400, { error: 'Search text not found in file', hint: 'Check whitespace and line endings.' });
+      fs.writeFileSync(plp.full, pcontent.replace(data.find, function() { return data.replace; }), 'utf8');
+      return respond(res, 200, { message: 'Patch applied.', path: plp.rel });
     } catch(e) { return respond(res, 500, { error: 'Patch failed: ' + e.message }); }
   }
 
   // GET /code/git/status
-  if (url === '/code/git/status') {
+  if (url.split('?')[0] === '/code/git/status') {
     try {
-      var status = execSync('git status --porcelain', { cwd: PROJECT_ROOT, encoding: 'utf8' });
-      var branch = execSync('git branch --show-current', { cwd: PROJECT_ROOT, encoding: 'utf8' }).trim();
-      var log = execSync('git log --oneline -5', { cwd: PROJECT_ROOT, encoding: 'utf8' });
-      return respond(res, 200, { branch: branch, changes: status.split('\n').filter(Boolean), recentCommits: log.split('\n').filter(Boolean) });
+      var status = runGit(['status', '--porcelain'], PROJECT_ROOT);
+      var branch = runGit(['branch', '--show-current'], PROJECT_ROOT).trim();
+      var log = runGit(['log', '--oneline', '-5'], PROJECT_ROOT);
+      return respond(res, 200, { branch: branch, root: ROOT_NAME, changes: status.split('\n').filter(Boolean), recentCommits: log.split('\n').filter(Boolean) });
     } catch(e) { return respond(res, 500, { error: 'Git failed: ' + e.message }); }
   }
 
-  // POST /code/git/commit — stage and commit
+  // POST /code/git/commit: stage and commit (local only; this bridge never pushes)
   if (url === '/code/git/commit' && method === 'POST') {
-    if (!data.message) return respond(res, 400, { error: 'message required' });
+    var lg = { route: '/code/git/commit', origin: (meta && meta.origin) || '', agent: activeId,
+               device: (meta && meta.mind && meta.mind.id) || '' };
+    var msgOk = typeof data.message === 'string' && data.message.trim() &&
+      data.message.length <= MAX_COMMIT_MESSAGE && !/[\u0000-\u0008\u000b-\u001f\u007f]/.test(data.message);
+    if (!msgOk) {
+      lg.result = 'refused:message'; ledgerAppend(lg);
+      return respond(res, 400, { error: 'message required (1-' + MAX_COMMIT_MESSAGE + ' chars, no control characters)' });
+    }
+    var files = data.files === undefined ? ['.'] : data.files;
+    if (!Array.isArray(files) || files.length === 0 || files.length > MAX_COMMIT_FILES) {
+      lg.result = 'refused:files'; ledgerAppend(lg);
+      return respond(res, 400, { error: 'files must be a list of 1-' + MAX_COMMIT_FILES + ' project paths' });
+    }
+    var rels = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      var clp = codePath(files[fi], { allowRoot: true });
+      if (clp.error) {
+        lg.result = 'refused:path:' + clp.reason; ledgerAppend(lg);
+        return respond(res, clp.error, { error: 'Path refused', reason: clp.reason });
+      }
+      rels.push(clp.rel);
+    }
+    lg.filesCount = rels.length;
+    lg.filesSha256 = sha256Hex(rels.slice().sort().join('\n'));
+    lg.messageSha256 = sha256Hex(data.message);
     try {
-      var files = data.files || ['.'];
-      files.forEach(function(f) { execSync('git add ' + f, { cwd: PROJECT_ROOT }); });
-      execSync('git commit -m "' + data.message.replace(/"/g, '\\"') + '"', { cwd: PROJECT_ROOT });
-      return respond(res, 200, { message: 'Committed: ' + data.message });
-    } catch(e) { return respond(res, 500, { error: 'Commit failed: ' + e.message }); }
+      runGit(['add', '--'].concat(rels), PROJECT_ROOT);
+      runGit(['commit', '-m', data.message], PROJECT_ROOT);
+      var headSha = runGit(['rev-parse', 'HEAD'], PROJECT_ROOT).trim();
+      lg.result = 'ok'; lg.commitSha = headSha; ledgerAppend(lg);
+      return respond(res, 200, { message: 'Committed: ' + data.message, commit: headSha, root: ROOT_NAME });
+    } catch(e) {
+      lg.result = 'error'; ledgerAppend(lg);
+      return respond(res, 500, { error: 'Commit failed: ' + String((e.stderr || e.message || '')).slice(0, 400) });
+    }
   }
 
-  // GET /test/run — run smoke tests (AutoBuilder format)
+  // GET /test/run: run smoke tests (AutoBuilder format)
   // Returns { allPassed, count, failures[], output }
-  if (url === '/test/run') {
-    try {
-      var testOutput = execSync('node tests/smoke.js 2>&1', { cwd: PROJECT_ROOT, timeout: 60000, encoding: 'utf8' });
-      var passedMatch = testOutput.match(/ALL (\d+) CHECKS PASSED/);
-      var failLines = (testOutput.match(/✗.*/g) || []);
-      return respond(res, 200, {
-        allPassed: failLines.length === 0 && passedMatch !== null,
-        count: passedMatch ? parseInt(passedMatch[1], 10) : 0,
-        failures: failLines,
-        output: testOutput.slice(-800)
-      });
-    } catch(e) {
-      var errOutput = (e.stdout || e.stderr || e.message || '').toString();
-      var errFailLines = (errOutput.match(/✗.*/g) || []);
-      if (errFailLines.length === 0) errFailLines.push(e.message || 'Unknown test error');
-      return respond(res, 200, {
-        allPassed: false,
-        count: 0,
-        failures: errFailLines,
-        output: errOutput.slice(-800)
-      });
-    }
+  if (url.split('?')[0] === '/test/run') {
+    var tr = runSmokeFile(60000, PROJECT_ROOT);
+    var testOutput = tr.out || (tr.error ? String(tr.error.message) : '');
+    var passedMatch = testOutput.match(/ALL (\d+) CHECKS PASSED/);
+    var failLines = (testOutput.match(/✗.*/g) || []);
+    if (tr.status !== 0 && failLines.length === 0) failLines.push(tr.error ? tr.error.message : 'Smoke exited with status ' + tr.status);
+    return respond(res, 200, {
+      allPassed: tr.status === 0 && failLines.length === 0 && passedMatch !== null,
+      count: passedMatch ? parseInt(passedMatch[1], 10) : 0,
+      failures: failLines,
+      output: testOutput.slice(-800)
+    });
   }
 
-  // GET /code/test — run smoke tests (legacy format)
-  if (url === '/code/test') {
-    try {
-      var result = execSync('node tests/smoke.js', { cwd: PROJECT_ROOT, timeout: 30000, encoding: 'utf8' });
-      var passed = (result.match(/✓/g) || []).length;
-      var allMatch = result.match(/ALL (\d+) CHECKS PASSED/);
-      return respond(res, 200, { passed: allMatch ? parseInt(allMatch[1], 10) : passed, failed: 0, output: result.slice(-500) });
-    } catch(e) {
-      var failMatch = (e.stdout || '').match(/(\d+) FAILED/);
-      return respond(res, 200, { passed: 0, failed: failMatch ? parseInt(failMatch[1], 10) : 1, output: (e.stdout || e.message).slice(-500) });
+  // GET /code/test: run smoke tests (legacy format)
+  if (url.split('?')[0] === '/code/test') {
+    var ct = runSmokeFile(30000, PROJECT_ROOT);
+    if (ct.status === 0) {
+      var passed = (ct.out.match(/✓/g) || []).length;
+      var allMatch = ct.out.match(/ALL (\d+) CHECKS PASSED/);
+      return respond(res, 200, { passed: allMatch ? parseInt(allMatch[1], 10) : passed, failed: 0, output: ct.out.slice(-500) });
     }
+    var failMatch = ct.out.match(/(\d+) FAILED/);
+    return respond(res, 200, { passed: 0, failed: failMatch ? parseInt(failMatch[1], 10) : 1, output: (ct.out || (ct.error ? ct.error.message : '')).slice(-500) });
   }
 
   // ── 404 ──
@@ -1150,11 +1893,28 @@ function respond(res, code, data) {
 
 // ── Start ──
 
+// LAYER bridge-lock-v0 · v0.1: command-line trust tools (--list-minds, --revoke ...)
+// run here and finish without opening the door.
+var BRIDGE_CLI_DONE = runBridgeCli(process.argv.slice(2));
+if (!BRIDGE_CLI_DONE) bridgeLockInit();
+
 var server = http.createServer(handleRequest);
-server.listen(PORT, function() {
+server.on('error', function(e) {
+  console.error('  ! Agent Bridge could not start on ' + BRIDGE_HOST + ':' + PORT + ': ' + e.message);
+  process.exitCode = 1;
+});
+// LAYER bridge-lock-v0: loopback only. No env override. Never 0.0.0.0.
+if (BRIDGE_CLI_DONE) {
+  // The trust tool already did its work above. The door stays closed.
+} else server.listen(PORT, BRIDGE_HOST, function() {
   console.log('');
   console.log('  \u2726 FreeLattice Agent Bridge');
-  console.log('  \u2726 Listening on http://localhost:' + PORT);
+  console.log('  \u2726 Listening on http://' + BRIDGE_HOST + ':' + PORT);
+  console.log('  \u2726 Door lock: ' + BRIDGE_LOCK_VERSION + ' (named origins, trusted minds, no shell)');
+  console.log('  \u2726 Trusted minds: ' + trustState().minds.length +
+    (bridgeEphemeral ? ' (ephemeral: forgotten when the bridge stops)' : ' (kept until you revoke: node tools/agent-bridge.js --list-minds)'));
+  console.log('  \u2726 Local tools: ' + (trustState().localTools ? 'trusted, token file ' + TOKEN_FILE : 'off (pair like any device)'));
+  newPairCode('launch');
   console.log('  \u2726 Agent ID: ' + agentId.meshId.substring(0, 8) + '...');
   console.log('  \u2726 Data: ' + DATA_DIR);
   console.log('  \u2726 Ollama: ' + OLLAMA_BASE);

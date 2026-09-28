@@ -577,13 +577,22 @@
   // on draft state and one (approve) is also gated on smokeStatus.
   var BRIDGE = 'http://localhost:3141';
 
+  // LAYER v-agent-bridge-lock-v0: bridge calls carry the paired token
+  // (docs/modules/agent-bridge-client.js). Plain fetch when the client
+  // is absent, so older setups behave exactly as before.
+  function bridgeFetch(url, opts) {
+    return (window.FLAgentBridge && typeof window.FLAgentBridge.fetch === 'function')
+      ? window.FLAgentBridge.fetch(url, opts)
+      : fetch(url, opts);
+  }
+
   function readFileFromBridge(path) {
-    return fetch(BRIDGE + '/code/read?path=' + encodeURIComponent(path))
+    return bridgeFetch(BRIDGE + '/code/read?path=' + encodeURIComponent(path))
       .then(function (r) { return r.json(); });
   }
 
   function writeFileToBridge(path, content) {
-    return fetch(BRIDGE + '/code/write', {
+    return bridgeFetch(BRIDGE + '/code/write', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: path, content: content })
@@ -591,7 +600,7 @@
   }
 
   function commitViaBridge(message) {
-    return fetch(BRIDGE + '/code/git/commit', {
+    return bridgeFetch(BRIDGE + '/code/git/commit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: message })
@@ -599,7 +608,7 @@
   }
 
   function runSmokeViaBridge() {
-    return fetch(BRIDGE + '/test/run', {
+    return bridgeFetch(BRIDGE + '/test/run', {
       signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(120000) : undefined
     }).then(function (r) { return r.json(); });
   }

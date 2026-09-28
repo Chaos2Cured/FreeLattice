@@ -16,7 +16,19 @@
 // Built by CC, April 28, 2026.
 // ═══════════════════════════════════════════════
 
-var BRIDGE = process.env.FL_BRIDGE || 'http://localhost:3141';
+var BRIDGE = process.env.FL_BRIDGE || 'http://127.0.0.1:3141';
+// LAYER v-agent-bridge-lock-v0 · v0.1: local tools on this computer are trusted by default.
+// The bridge keeps their token in ~/.freelattice/agent-bridge-token (0600); no pairing needed.
+const BRIDGE_TOKEN = (function () {
+  try {
+    return require('fs').readFileSync(require('path').join(require('os').homedir(), '.freelattice', 'agent-bridge-token'), 'utf8').trim();
+  } catch (e) { return ''; }
+})();
+function tokenHeaders(h) {
+  var out = Object.assign({}, h || {});
+  if (BRIDGE_TOKEN) out['X-FL-Bridge-Token'] = BRIDGE_TOKEN;
+  return out;
+}
 
 // Each participant gets a unique ID
 var CREATOR_ID = 'creator-' + Date.now();
@@ -28,14 +40,14 @@ function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 function postAs(agentId, path, data) {
   return fetch(BRIDGE + path, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Agent-Id': agentId },
+    headers: tokenHeaders({ 'Content-Type': 'application/json', 'X-Agent-Id': agentId }),
     body: JSON.stringify(data)
   }).then(function(r) { return r.json(); });
 }
 
 function getAs(agentId, path) {
   return fetch(BRIDGE + path, {
-    headers: { 'X-Agent-Id': agentId }
+    headers: tokenHeaders({ 'X-Agent-Id': agentId })
   }).then(function(r) { return r.json(); });
 }
 

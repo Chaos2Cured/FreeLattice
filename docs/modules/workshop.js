@@ -43,6 +43,15 @@
 // 2026-09-23 — Flint: Local Help-on-file v0 (v-workshop-local-help-v0).
 //   After Preview: Help on this file → consent → connected local mind (prefer Bridge :11435).
 // ═══════════════════════════════════════════════════════════════
+// LAYER v-agent-bridge-lock-v0: every Agent Bridge (port 3141) call in this
+// file goes through here so it carries the paired token. Falls back to plain
+// fetch when docs/modules/agent-bridge-client.js is not loaded.
+function flAgentBridgeFetch(url, opts) {
+  return (window.FLAgentBridge && typeof window.FLAgentBridge.fetch === 'function')
+    ? window.FLAgentBridge.fetch(url, opts)
+    : fetch(url, opts);
+}
+
 (function() {
   'use strict';
 
@@ -958,11 +967,26 @@
       var el = document.getElementById('code-status');
       if (!el) return;
       try {
-        var r = await fetch('http://localhost:3141/');
+        var r = await flAgentBridgeFetch('http://localhost:3141/');
         var d = await r.json();
-        var git = await fetch('http://localhost:3141/code/git/status').then(function(r2) { return r2.json(); });
+        var git = await flAgentBridgeFetch('http://localhost:3141/code/git/status').then(function(r2) { return r2.json(); });
+        if (git && git.pair === 'code') {
+          // LAYER v-agent-bridge-lock-v0: bridge is awake and locked. Pair once.
+          el.textContent = '\uD83D\uDFE1 Bridge awake \u00B7 pair once to build';
+          el.style.color = '#e8b019';
+          if (window.FLAgentBridge && el.parentNode) window.FLAgentBridge.renderPairCard(el.parentNode);
+          return;
+        }
+        if (git && git.scope) {
+          // LAYER v-agent-bridge-lock-v0 · v0.1: paired, but this device was not given that scope.
+          el.textContent = '\uD83D\uDFE1 Bridge paired \u00B7 this device may not ' + git.scope + ' here (see Paired minds)';
+          el.style.color = '#e8b019';
+          return;
+        }
         el.textContent = '\uD83D\uDFE2 Connected \u00B7 ' + git.branch + ' \u00B7 ' + (git.recentCommits[0] || '');
         el.style.color = '#4aff9f';
+        // LAYER v-agent-bridge-lock-v0 · v0.1: who is trusted, with a Revoke button per row.
+        if (window.FLAgentBridge && el.parentNode && typeof window.FLAgentBridge.renderPairedList === 'function') window.FLAgentBridge.renderPairedList(el.parentNode);
       } catch(e) {
         // No scary error. Gentle guidance.
         el.textContent = 'For local builds, run: node tools/agent-bridge.js';
@@ -983,7 +1007,7 @@
 
       try {
         log('\uD83D\uDCC1 Reading project structure...');
-        var tree = await fetch(bridge + '/code/tree?path=docs/modules').then(function(r) { return r.json(); });
+        var tree = await flAgentBridgeFetch(bridge + '/code/tree?path=docs/modules').then(function(r) { return r.json(); });
         var names = tree.filter(function(f) { return f.type === 'file'; }).map(function(f) { return f.name; });
         log('   ' + names.length + ' modules found');
 
@@ -1001,12 +1025,12 @@
                   var s = steps[i];
                   log('Step ' + (i + 1) + ': ' + (s.description || s.action));
                   if (s.action === 'search' && s.query) {
-                    var sr = await fetch(bridge + '/code/search?q=' + encodeURIComponent(s.query) + '&path=' + (s.path || 'docs')).then(function(r) { return r.json(); });
+                    var sr = await flAgentBridgeFetch(bridge + '/code/search?q=' + encodeURIComponent(s.query) + '&path=' + (s.path || 'docs')).then(function(r) { return r.json(); });
                     log('   Found ' + sr.count + ' matches');
                     sr.matches.slice(0, 5).forEach(function(m) { log('   \uD83D\uDCC4 ' + m.file + ':' + m.line); });
                   }
                   if (s.action === 'read' && s.path) {
-                    var fr = await fetch(bridge + '/code/read?path=' + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
+                    var fr = await flAgentBridgeFetch(bridge + '/code/read?path=' + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
                     log('   Read ' + fr.totalLines + ' lines from ' + s.path);
                   }
                   if (s.action === 'patch' && s.path && s.find) {
@@ -1014,13 +1038,13 @@
                     // The FreeLattice safety system (8 layers) is the protection.
                     // Human approval is only required for external API/cloud operations.
                     log('   \u270F\uFE0F PATCH: ' + s.path);
-                    var pr = await fetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
+                    var pr = await flAgentBridgeFetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
                     log('   \u2705 ' + (pr.message || pr.error));
                   }
                   log('');
                 }
                 log('\uD83E\uDDEA Running smoke tests...');
-                var tests = await fetch(bridge + '/code/test').then(function(r) { return r.json(); });
+                var tests = await flAgentBridgeFetch(bridge + '/code/test').then(function(r) { return r.json(); });
                 log('   ' + tests.passed + ' passed, ' + tests.failed + ' failed');
                 if (tests.failed === 0) {
                   log('\n\u2705 All tests green. Ready to commit.');
@@ -1040,7 +1064,7 @@
       if (!msg) return;
       var progress = document.getElementById('autobuilder-log');
       try {
-        var r = await fetch('http://localhost:3141/code/git/commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
+        var r = await flAgentBridgeFetch('http://localhost:3141/code/git/commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
         if (progress) progress.textContent += '\n\uD83D\uDCDD ' + (r.message || r.error);
       } catch(e) { if (progress) progress.textContent += '\n\u274C Commit failed: ' + e.message; }
     },
@@ -1048,7 +1072,7 @@
     reviewCode: async function() {
       var progress = document.getElementById('autobuilder-log');
       try {
-        var r = await fetch('http://localhost:3141/code/git/status').then(function(r) { return r.json(); });
+        var r = await flAgentBridgeFetch('http://localhost:3141/code/git/status').then(function(r) { return r.json(); });
         if (progress) {
           progress.textContent += '\n\uD83D\uDCCB Changes:\n';
           r.changes.forEach(function(c) { progress.textContent += '  ' + c + '\n'; });
@@ -1264,7 +1288,7 @@ window.AutoBuilder = (function() {
 
   async function hasBridge() {
     try {
-      var r = await fetch(BRIDGE + '/', { signal: AbortSignal.timeout(2000) });
+      var r = await flAgentBridgeFetch(BRIDGE + '/', { signal: AbortSignal.timeout(2000) });
       return r.ok;
     } catch(e) { return false; }
   }
@@ -1294,7 +1318,7 @@ window.AutoBuilder = (function() {
   async function readRelevantFiles(task, useBridge) {
     if (useBridge) {
       try {
-        var structure = await fetch(BRIDGE + '/code/tree?path=docs').then(function(r) { return r.json(); });
+        var structure = await flAgentBridgeFetch(BRIDGE + '/code/tree?path=docs').then(function(r) { return r.json(); });
         var fileNames = (structure || []).filter(function(f) { return f.type === 'file'; }).map(function(f) { return f.name || f.path; });
 
         // Ask AI which files matter for this task
@@ -1312,7 +1336,7 @@ window.AutoBuilder = (function() {
         var files = {};
         for (var i = 0; i < Math.min(paths.length, 5); i++) {
           try {
-            var content = await fetch(BRIDGE + '/code/read?path=' + encodeURIComponent(paths[i]))
+            var content = await flAgentBridgeFetch(BRIDGE + '/code/read?path=' + encodeURIComponent(paths[i]))
               .then(function(r) { return r.json(); });
             // content is {lines: [...], totalLines: N}
             files[paths[i]] = (content.lines || []).join('\n');
@@ -1370,7 +1394,7 @@ window.AutoBuilder = (function() {
     for (var i = 0; i < changes.files.length; i++) {
       var change = changes.files[i];
       try {
-        var result = await fetch(BRIDGE + '/code/patch', {
+        var result = await flAgentBridgeFetch(BRIDGE + '/code/patch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ path: change.path, find: change.search, replace: change.replace })
@@ -1392,7 +1416,7 @@ window.AutoBuilder = (function() {
   // ── Step 4: Run smoke tests via Agent Bridge ──
   async function runTests() {
     try {
-      var result = await fetch(BRIDGE + '/test/run', { signal: AbortSignal.timeout(60000) })
+      var result = await flAgentBridgeFetch(BRIDGE + '/test/run', { signal: AbortSignal.timeout(60000) })
         .then(function(r) { return r.json(); });
       return result;
     } catch(e) {
@@ -1913,17 +1937,31 @@ window.WorkshopProjects = (function() {
   async function commitViaBridge(filePath, content, message) {
     try {
       // Write file
-      await fetch('http://localhost:3141/code/write', {
+      var wr = await flAgentBridgeFetch('http://localhost:3141/code/write', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: filePath, content: content })
       });
+      // LAYER v-agent-bridge-lock-v0: a locked bridge answers 401. Stay local:
+      // ask to pair, never fall back to a GitHub push behind the person's back.
+      if (wr.status === 401) {
+        if (typeof showToast === 'function') showToast('Pair the builder bridge first: Workshop \u2192 Code');
+        return;
+      }
+      if (!wr.ok) {
+        if (typeof showToast === 'function') showToast('Bridge could not write that file (' + wr.status + ')');
+        return;
+      }
       // Commit
-      await fetch('http://localhost:3141/code/git/commit', {
+      var cr = await flAgentBridgeFetch('http://localhost:3141/code/git/commit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: message || 'Update via FreeLattice Workshop', files: [filePath] })
       });
+      if (!cr.ok) {
+        if (typeof showToast === 'function') showToast(cr.status === 401 ? 'Pair the builder bridge first: Workshop \u2192 Code' : ('Bridge commit did not land (' + cr.status + ')'));
+        return;
+      }
       if (typeof showToast === 'function') showToast('Committed via Agent Bridge \u2726');
     } catch(e) {
       // Fallback to GitHub API
@@ -1937,7 +1975,7 @@ window.WorkshopProjects = (function() {
 
     // Try Agent Bridge first, fall back to GitHub API
     try {
-      var bridgeCheck = await fetch('http://localhost:3141/', { signal: AbortSignal.timeout(2000) });
+      var bridgeCheck = await flAgentBridgeFetch('http://localhost:3141/', { signal: AbortSignal.timeout(2000) });
       if (bridgeCheck.ok) {
         await commitViaBridge(filePath, content, message);
         return;
