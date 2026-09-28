@@ -33856,6 +33856,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Returns { base: 'http://...', isProxy: bool } or null if unreachable
 var _ollamaResolvedBase = null; // cached result
 async function resolveOllamaBase(forceRefresh) {
+  // v0.3 tiny heal — clear quiet flag; callers treat null as "not found"
+  try { window._flManualQuiet = null; } catch (eQ0) {}
   if (_ollamaResolvedBase && !forceRefresh) return _ollamaResolvedBase;
   // 0a. v-connect-port-picker-v0 heal — manual port first; quiet = no silent fallthrough
   try {
@@ -33869,9 +33871,12 @@ async function resolveOllamaBase(forceRefresh) {
           return _ollamaResolvedBase;
         }
       } catch (eTags) {}
-      // Manual set but quiet — do not silently pick Bridge/11434
+      // Manual set but quiet — return null (honest "not found"); stash wanted for optional UI
       _ollamaResolvedBase = null;
-      return { base: null, manualQuiet: true, wanted: String(manualBase).replace(/\/+$/, '') };
+      try {
+        window._flManualQuiet = { wanted: String(manualBase).replace(/\/+$/, '') };
+      } catch (eQ1) {}
+      return null;
     }
   } catch (eMan) {}
   // 0. v-connect-bridge-aware-v0 — helped Bridge before bare 11434 (Celeste RC1)

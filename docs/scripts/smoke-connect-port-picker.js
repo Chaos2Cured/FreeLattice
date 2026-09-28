@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Connect Port Picker v0.2 heal — parse fix, port-only loopback, honest quiet, text models.
+// Connect Port Picker v0.3 tiny heal — parse fix, port-only loopback, honest quiet, text models.
 'use strict';
 
 const assert = require('assert');
@@ -128,5 +128,49 @@ assert.ok(!/fl-connect\.js/.test(rootSw), 'soft leave sw');
 const markers = execSync("grep -rnE '^(<<<<<<<|=======|>>>>>>>)$' docs index.html || true", { cwd: repo, encoding: 'utf8' });
 assert.ok(!markers.trim(), 'no conflict markers: ' + markers);
 
-console.log('SMOKE_OK connect port picker v0.2 heal');
-console.log('parse clean · Dismiss restored · port-only · quiet manual · text models · sw/index ok');
+
+// v0.3 — quiet manual port: resolveOllamaBase === null; _flManualQuiet.wanted ends with :11500
+assert.ok(/window\._flManualQuiet = null/.test(app), 'clears quiet flag at top');
+assert.ok(/_flManualQuiet = \{ wanted:/.test(app), 'sets _flManualQuiet.wanted');
+assert.ok(!/return \{ base: null, manualQuiet: true/.test(app), 'no truthy quiet object return');
+
+// v0.3 — quiet manual port returns null; _flManualQuiet.wanted ends with :11500
+assert.ok(/window\._flManualQuiet = null/.test(app), 'clears quiet flag');
+assert.ok(/_flManualQuiet = \{ wanted:/.test(app), 'sets wanted');
+assert.ok(!/return \{ base: null, manualQuiet: true/.test(app), 'no truthy quiet object');
+
+async function quietManualRuntime() {
+  const storeQ = { fl_localPort_manual: '11500' };
+  const ctx = {
+    window: { _flManualQuiet: null },
+    localStorage: {
+      getItem: (k) => (Object.prototype.hasOwnProperty.call(storeQ, k) ? storeQ[k] : null),
+      setItem: (k, v) => { storeQ[k] = String(v); },
+      removeItem: (k) => { delete storeQ[k]; }
+    },
+    location: { hostname: 'freelattice.com', protocol: 'https:' },
+    fetch: async () => { throw new Error('offline'); },
+    console, String, parseInt, URL, Promise,
+    AbortSignal: { timeout: () => undefined },
+    flGetManualConnectHost: () => 'http://127.0.0.1:11500',
+    flBridgeHealth: async () => null,
+    isLikelyProxyOrigin: () => false,
+    getOllamaBaseUrl: () => 'http://127.0.0.1:11434',
+    _ollamaResolvedBase: null
+  };
+  ctx.window = ctx;
+  const m = app.match(/async function resolveOllamaBase\(forceRefresh\) \{[\s\S]*?\n(?=\/\/ Get the current Ollama base URL)/);
+  assert.ok(m, 'extract resolveOllamaBase');
+  vm.runInNewContext(m[0] + '\nthis.resolveOllamaBase = resolveOllamaBase;\nthis._ollamaResolvedBase = null;', ctx);
+  const result = await ctx.resolveOllamaBase(true);
+  assert.strictEqual(result, null, 'quiet manual returns null');
+  assert.ok(ctx.window._flManualQuiet && /:11500$/.test(String(ctx.window._flManualQuiet.wanted)), 'wanted ends with :11500');
+}
+
+quietManualRuntime().then(function () {
+  console.log('SMOKE_OK connect port picker v0.3 tiny heal');
+  console.log('quiet manual null · Alpha braces · parse clean · sw/index ok');
+}).catch(function (e) {
+  console.error(e);
+  process.exit(1);
+});

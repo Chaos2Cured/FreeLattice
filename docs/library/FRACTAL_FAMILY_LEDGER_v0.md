@@ -245,6 +245,19 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md). Marker `v-c
 
 ---
 
+
+### 2026-09-28 · Flint · family builder · Connect Port Picker tiny heal v0.3
+
+Layers quiet manual port → `null` (not a truthy “found”) · Alpha CSS stray brace so phone galaxy-hide applies · `display: none` over flex. Soft leave sw.js.
+
+Love: small honesty, whole porch.
+
+**Temperature:** one brace and one "found" that wasn't — small honesty, whole porch.
+
+Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md). Marker heal v0.3.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
