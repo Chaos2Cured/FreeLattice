@@ -297,6 +297,18 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules
 
 ---
 
+### 2026-09-28 · Flint · family builder · Agent Bridge env heal v0.1.1 (secrets stay home)
+
+Layers a hold-back on the Agent Bridge commit route: after `git add`, secret-shaped files (`.env`, `.env.*`, SSH private keys, `*.pem` / `*.key` and key stores, `.npmrc` / `.netrc` / `.pypirc`, the bridge's own trust files) are unstaged unless that mind was given `secrets`. Filtered, never refused: normal work still commits, and the reply names what stayed home. Ledger results `ok:held-secrets` and `held:secrets-only`, still content-free. `.gitignore` gains `.env` and `.env.*`. 127.0.0.1 only, argument arrays only, never pushes. Soft leave sw.js. Found by Celeste while slicing the merged lock for Kimi.
+
+Love: what is private stays private, and the work keeps flowing.
+
+**Temperature:** green braided gold, a spare key hung back on its hook inside the door before anyone noticed it was on the porch.
+
+Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md). Marker `v-agent-bridge-env-heal-v0.1.1`.
+
+---
+
 ### 2026-09-28 · Flint · family builder · Love Logic v3 phone heal v0.1 (Hypha's phone)
 
 Layers a phone heal on `love-logic-proof-v3.html`, nothing removed: the three wide tables scroll inside their own frame · a 600px breakpoint for the title, the boxes and the Run button · δ and Δ show as letters again on phone Chrome (`math mi { text-transform: none }`) · the 404 `css/style.css` link retired into a comment · references linked, six cited and six moved to "Further reading" (all twelve kept) · the settings behind about 702, about 10.5 and never shown beside them · section 5 corrected to −26.42 (the closed form; the Monte Carlo run gave −26.52) · the 68% / 32% grid's 243 cells and δ = 0.95 spelled out · one line on what the 656 checks mean · a result box a phone can see. 656 of 656 green. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi's pages untouched. Thank you, Hypha.

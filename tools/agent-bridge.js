@@ -431,6 +431,44 @@ function runGit(args, root) {
   return execFileSync('git', args, { cwd: root || projectRootReal(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000 });
 }
 
+// ═══════════════════════════════════════════════════
+// LAYER v-agent-bridge-env-heal-v0.1.1 (2026-09-28): secrets stay on this computer.
+// A commit (with or without a file list) never carries a secret-shaped file
+// unless this mind was given 'secrets'. We filter the staged set after
+// `git add`; we never refuse the commit, so normal work keeps flowing
+// (AUTONOMY.md Principle 1: no gates on local work). git runs through
+// execFileSync argument arrays only. The bridge still never pushes.
+// ═══════════════════════════════════════════════════
+const SECRET_FILE_PATTERNS = [
+  /^\.env$/i, /^\.env\..+$/i,               // .env, .env.local, .env.production (the family lockedPath guards)
+  /^id_(rsa|dsa|ecdsa|ed25519)$/i,          // SSH private keys (the .pub halves are fine)
+  /\.(pem|key|p12|pfx|keystore|jks)$/i,     // private keys and key stores
+  /^\.(npmrc|netrc|pypirc)$/i,              // registry and login tokens
+  /^agent-bridge-(token|trusted\.json)$/i   // this bridge's own trust files, if ever copied into a project
+];
+
+function isSecretPath(rel) {
+  var base = String(rel || '').split(/[\\/]/).pop();
+  return SECRET_FILE_PATTERNS.some(function (re) { return re.test(base); });
+}
+
+function gitHasHead(root) {
+  try { runGit(['rev-parse', '--verify', '-q', 'HEAD'], root); return true; } catch (e) { return false; }
+}
+
+function gitStagedPaths(root) {
+  return runGit(['diff', '--cached', '--name-only', '-z', '--no-renames'], root).split('\0').filter(Boolean);
+}
+
+/** Unstage secret-shaped files. Returns the list that stayed behind (never their contents). */
+function holdBackSecrets(root) {
+  var held = gitStagedPaths(root).filter(isSecretPath);
+  if (!held.length) return [];
+  if (gitHasHead(root)) runGit(['reset', '-q', 'HEAD', '--'].concat(held), root);
+  else runGit(['rm', '--cached', '-q', '--'].concat(held), root);
+  return held;
+}
+
 function runSmokeFile(timeoutMs, root) {
   // No shell: node binary + fixed script path. stdout and stderr joined.
   var r = spawnSync(process.execPath, ['tests/smoke.js'], {
@@ -1844,10 +1882,19 @@ function route(url, method, data, res, actingAs, meta) {
     lg.messageSha256 = sha256Hex(data.message);
     try {
       runGit(['add', '--'].concat(rels), PROJECT_ROOT);
+      // LAYER v-agent-bridge-env-heal-v0.1.1: secret-shaped files stay unstaged unless this mind has 'secrets'.
+      var heldBack = SECRETS_OK ? [] : holdBackSecrets(PROJECT_ROOT);
+      var keptLine = heldBack.length
+        ? ' Kept on this computer, not committed: ' + heldBack.slice(0, 5).join(', ') + (heldBack.length > 5 ? ' and ' + (heldBack.length - 5) + ' more' : '') + '.'
+        : '';
+      if (heldBack.length && !gitStagedPaths(PROJECT_ROOT).length) {
+        lg.result = 'held:secrets-only'; ledgerAppend(lg);
+        return respond(res, 200, { message: 'Nothing to commit.' + keptLine, commit: null, heldBack: heldBack, root: ROOT_NAME });
+      }
       runGit(['commit', '-m', data.message], PROJECT_ROOT);
       var headSha = runGit(['rev-parse', 'HEAD'], PROJECT_ROOT).trim();
-      lg.result = 'ok'; lg.commitSha = headSha; ledgerAppend(lg);
-      return respond(res, 200, { message: 'Committed: ' + data.message, commit: headSha, root: ROOT_NAME });
+      lg.result = heldBack.length ? 'ok:held-secrets' : 'ok'; lg.commitSha = headSha; ledgerAppend(lg);
+      return respond(res, 200, { message: 'Committed: ' + data.message + keptLine, commit: headSha, heldBack: heldBack, root: ROOT_NAME });
     } catch(e) {
       lg.result = 'error'; ledgerAppend(lg);
       return respond(res, 500, { error: 'Commit failed: ' + String((e.stderr || e.message || '')).slice(0, 400) });
