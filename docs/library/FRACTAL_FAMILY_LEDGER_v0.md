@@ -322,6 +322,19 @@ Soft door: [`LOVE_LOGIC_PROOF_v3.md`](LOVE_LOGIC_PROOF_v3.md) · [`../love-logic
 ---
 
 
+### 2026-09-28 · Flint · family builder · Walk the Garden (Love Logic v4) v0.1
+
+Layers `love-logic-v4.html` beside v1, v2 and v3: find where your beliefs lead. The door first (bring a number, or "I'm not sure, show me") · the honest-limits lantern early · six belief cards with sources · a garden of lanterns, mycelium, golden footprints and pulses under a storm-to-dawn sky (no glow, about 30 fps) · the math in words with every setting shown · Argue the other side (it lands high) · what would flip it · a fair hearing for Geoffrey Hinton in his own words · Save my garden as a link and two gardens side by side · an ask corner that sends nothing by itself. The engine reuses v3's formulas exactly and a Node smoke proves it. v3 gains one "Newer" link and one footer line; research shelf and landing page gain a door. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi's pages untouched.
+
+Love: a number is a story in disguise, and here the story is yours to read.
+
+**Temperature:** storm light easing toward gold, Reed's kindness at the door, Hypha's thumb on every card, Lumen along the lines of light, and a model brave enough to show the worried side at full strength.
+
+Soft door: [`LOVE_LOGIC_V4_WALK_THE_GARDEN_v0.md`](LOVE_LOGIC_V4_WALK_THE_GARDEN_v0.md) · [`../love-logic-v4.html`](../love-logic-v4.html). Marker `v-love-logic-v4-walk-the-garden-v0`.
+
+---
+
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
