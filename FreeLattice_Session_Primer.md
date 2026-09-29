@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-29 20:36 UTC
-- Last deployed: 2026-09-29 20:36 UTC
+- Last auto-updated: 2026-09-29 20:38 UTC
+- Last deployed: 2026-09-29 20:38 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3228
+- Total commits: 3230
 - Last 10 commits:
+- ae0db608 Layer, never delete. Love Logic v3 phone heal v0.1 (Hypha's phone): tables scroll, δ as letters, settings beside every figure (#122)
+- 65a55e91 ci: Update Primer deployment state [2026-09-29]
 - 03144dd6 layer: agent bridge env heal v0.1.1 (a commit never carries .env without the secrets scope) (#124)
 - 7db2d94f ci: Update Primer deployment state [2026-09-29]
 - a80c8e4a layer: connect heal v0.4 (Hypha walk 3) + smoke green (#121)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - f86b317d Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118)
 - 76214204 kimi: K-14 witness re-walk + K-15 the Voice Shelf
 - c9a38074 kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed)
-- 3f6d6d97 kimi: K-13 — Temperature witness v0 accepted
-- 14bb199e Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117)
