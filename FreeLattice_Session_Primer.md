@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-28 17:21 MDT
+- Last auto-updated: 2026-09-29 02:45 UTC
+- Last deployed: 2026-09-29 02:45 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3227
+- Total commits: 3226
 - Last 10 commits:
-- e4d759a Soft leave: restore root sw.js identical to main
-- d13a365 docs: Auto-update Session Primer [5.79.45]
-- ab81162 Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell
-- 4cfd148 Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119)
-- f86b317 Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118)
-- 7621420 kimi: K-14 witness re-walk + K-15 the Voice Shelf
-- c9a3807 kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed)
-- 3f6d6d9 kimi: K-13 — Temperature witness v0 accepted
-- 14bb199 Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117)
-- 19c76f8 Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116)
+- a80c8e4a layer: connect heal v0.4 (Hypha walk 3) + smoke green (#121)
+- e06c7dcd Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell (#120)
+- 4cfd1488 Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119)
+- f86b317d Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118)
+- 76214204 kimi: K-14 witness re-walk + K-15 the Voice Shelf
+- c9a38074 kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed)
+- 3f6d6d97 kimi: K-13 — Temperature witness v0 accepted
+- 14bb199e Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117)
+- 19c76f8e Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116)
+- e0032f38 ci: Update Primer deployment state [2026-09-24]
