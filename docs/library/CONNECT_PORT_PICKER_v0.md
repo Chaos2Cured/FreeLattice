@@ -64,3 +64,16 @@ Marker `v-connect-heal-v0.4`. Smoke `SMOKE_OK connect heal v0.4` (`docs/scripts/
 - v0.4.1: `window.AiSetup = AiSetup;` in app.html, because the shared core reads `root.AiSetup` and a top-level `const` is not a window property. Without it, Add a cloud key never rendered.
 
 **Temperature:** a yes means the person tapped it.
+
+
+## Heal: model choice sticks v0.1 (Hypha walk 4, items 7 and 10)
+
+Marker `v-model-choice-sticks-v0`. Smoke `SMOKE_OK model choice sticks v0.1` (`docs/scripts/smoke-model-choice-sticks.js`).
+
+- A model tapped in Connect is recorded as the person's own choice (`FLActiveModel.set(name, 'ollama', 'user')`, plus the preferred text or vision model). The automatic picker (`FLAutoModel.onTabChanged`) already leaves a user choice alone, so the second model now survives tab changes, opening Settings and a reload, and the chat request carries it. Settings and the model switcher already recorded user choices; Connect was the one door that did not. The bug was older than #121.
+- The automatic picker fills in only when there is no user choice, or when Ollama answers with a list that no longer has the chosen model. Then it says so: "The model you chose, X, is no longer on this computer. Using Y for now. You can pick another in Connect." A quiet or empty answer never replaces a choice.
+- Settings > Local: the button row (Change Provider, Test Connection, a mind at home) comes back right after the old wizard buttons are cleared.
+- A helped Bridge on a typed port with no mind behind it: "Your Bridge answered on 11500, but no mind is running behind it yet. Open Ollama on this computer, then tap Look again." Nothing is saved as the Ollama host or Bridge port until a mind answers.
+- Shared `fl-connect.js` matches the Tree byte for byte. On the Tree the remembered entry is already the choice; `markUserChoice` is a quiet no-op there.
+
+**Temperature:** green braided gold, the second cup stays where she set it down.

@@ -5,6 +5,7 @@
 // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
 // Port-only loopback: fl_localPort_manual holds "11500" only — never foreign hosts.
 // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
+// Marker: v-model-choice-sticks-v0 (a tapped model is the person's own choice; it stays)
 // ═══════════════════════════════════════════════════════════════
 
 (function (root) {
@@ -201,12 +202,18 @@
           report.bridge = mh;
           report.port = mh.port || parseInt(manPort, 10);
           report.helped = true;
-          report.base = preferHelpedBridge(report.port) || manBase;
+          // v-model-choice-sticks-v0: ask the helped Bridge first; save it as the Ollama door
+          // (fl_ollamaHost, fl_bridgePort) only once a mind really answers behind it.
+          report.base = (report.port && report.port !== 11434) ? 'http://127.0.0.1:' + report.port : manBase;
           try {
             report.models = await tagsAt(report.base);
+            report.base = preferHelpedBridge(report.port) || report.base;
             report.ollama = { via: 'manual-bridge', base: report.base };
             return report;
-          } catch (eMB) {}
+          } catch (eMB) {
+            report.bridgeNoMind = true;
+            report.models = [];
+          }
         } else if (mh) {
           report.bridge = mh;
           report.port = mh.port || parseInt(manPort, 10);
@@ -357,6 +364,9 @@
       // v-connect-heal-v0.4 item 10: handleLocalToggle reads #localToggle, so check it first
       try { var lt = document.getElementById('localToggle'); if (lt) lt.checked = true; } catch (eLt) {}
       if (typeof root.handleLocalToggle === 'function') root.handleLocalToggle(true);
+      // v-model-choice-sticks-v0: the tap is the person's own choice, so the automatic
+      // picker leaves it alone on tab changes, reloads and Settings.
+      markUserChoice(name, 'ollama');
       if (typeof root.updateStatus === 'function') root.updateStatus();
       if (root.AiSetup && typeof root.AiSetup.updateStatus === 'function') root.AiSetup.updateStatus();
       // v-connect-heal-v0.4 item 7: once they chose a mind, the Local AI toast stops asking
@@ -364,6 +374,29 @@
     } catch (eF) {}
     stopLoop();
     return { name: name, base: base };
+  }
+
+  // v-model-choice-sticks-v0: FreeLattice keeps one active model (FLActiveModel). A model the
+  // person tapped is recorded with source 'user' and as their preferred text (or vision) model.
+  // The Tree has neither helper, so this is a quiet no-op there (it keeps entry.model instead).
+  function markUserChoice(name, provider) {
+    if (!name) return false;
+    var marked = false;
+    try {
+      if (root.FLActiveModel && typeof root.FLActiveModel.set === 'function') {
+        root.FLActiveModel.set(String(name), provider || 'ollama', 'user');
+        marked = true;
+      }
+    } catch (e0) {}
+    try {
+      var auto = root.FLAutoModel;
+      if (auto && typeof auto.setPreferred === 'function') {
+        var kind = (typeof auto.isVision === 'function' && auto.isVision(String(name))) ? 'vision' : 'text';
+        auto.setPreferred(kind, String(name));
+        if (typeof auto.invalidateCache === 'function') auto.invalidateCache();
+      }
+    } catch (e1) {}
+    return marked;
   }
 
   function open() {
@@ -539,7 +572,12 @@
 
     if (report.manualReject) html += '<div class="flc-card flc-wait"><p>' + report.manualReject + '</p></div>';
     _manualRejectMsg = ''; // v-connect-heal-v0.4 item 5: shown once, never lingers
-    if (report.manualQuiet) {
+    if (report.manualQuiet && report.bridgeNoMind) {
+      // v-model-choice-sticks-v0: the Bridge did answer; say that, and what is still missing
+      html += '<div class="flc-card flc-wait"><p><strong>Your Bridge answered on ' + (parseInt(report.port, 10) || 'your port') + ', but no mind is running behind it yet.</strong> Open Ollama on this computer, then tap Look again.</p>';
+      html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button> ';
+      html += '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic</button></div>';
+    } else if (report.manualQuiet) {
       html += '<div class="flc-card flc-wait"><p>Nothing answered on ' + (report.wanted || 'your port') + '.</p>';
       html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button> ';
       html += '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic</button></div>';
@@ -690,6 +728,7 @@
     hasLocalMind: hasLocalMind,
     hasCloudMind: hasCloudMind,
     remember: remember,
+    markUserChoice: markUserChoice, // v-model-choice-sticks-v0
     open: open,
     mount: mount,
     unmount: unmount,
