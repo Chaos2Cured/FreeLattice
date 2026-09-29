@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // fl-connect.js — FlConnect shared core (FreeLattice + theLatticeTree)
 //
-// Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2
+// Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4
 // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
 // Port-only loopback: fl_localPort_manual holds "11500" only — never foreign hosts.
 // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
@@ -77,6 +77,9 @@
       var port = normalizePort(raw);
       if (!port) {
         _manualRejectMsg = 'For safety this only talks to your own computer. Type just the number, like 11500.';
+        // v-connect-heal-v0.4 item 5: say which port stays, so nothing changes quietly
+        var keep = getManualPort();
+        if (keep) _manualRejectMsg += ' Still using ' + keep + '.';
         return { ok: false, reason: 'foreign', message: _manualRejectMsg };
       }
       localStorage.setItem(MANUAL_KEY, port);
@@ -86,7 +89,14 @@
 
   function clearManualHost() {
     _manualRejectMsg = '';
+    // v-connect-heal-v0.4 item 5: Use automatic also forgets the host that
+    // remember() wrote for this same port, and the cached resolved base.
+    var was = getManualPort();
     try { localStorage.removeItem(MANUAL_KEY); } catch (e) {}
+    try {
+      if (was && localStorage.getItem('fl_ollamaHost') === '127.0.0.1:' + was) localStorage.removeItem('fl_ollamaHost');
+    } catch (e1) {}
+    try { if (typeof root._ollamaResolvedBase !== 'undefined') root._ollamaResolvedBase = null; } catch (e2) {}
   }
 
   function savedBridgePort() {
@@ -201,6 +211,8 @@
           report.bridge = mh;
           report.port = mh.port || parseInt(manPort, 10);
           report.waitingHelp = true;
+          // v-connect-heal-v0.4 item 4: Bridge answered, so ask for Yes, help (not Nothing answered)
+          return report;
         }
       } catch (eManBr) {}
       report.manualQuiet = true;
@@ -342,9 +354,13 @@
         root.state.provider = 'ollama';
         if (name) root.state.ollamaModel = name;
       }
+      // v-connect-heal-v0.4 item 10: handleLocalToggle reads #localToggle, so check it first
+      try { var lt = document.getElementById('localToggle'); if (lt) lt.checked = true; } catch (eLt) {}
       if (typeof root.handleLocalToggle === 'function') root.handleLocalToggle(true);
       if (typeof root.updateStatus === 'function') root.updateStatus();
       if (root.AiSetup && typeof root.AiSetup.updateStatus === 'function') root.AiSetup.updateStatus();
+      // v-connect-heal-v0.4 item 7: once they chose a mind, the Local AI toast stops asking
+      try { var tt = document.getElementById('flOllamaToast'); if (tt) tt.classList.remove('fl-toast-show'); } catch (eTt) {}
     } catch (eF) {}
     stopLoop();
     return { name: name, base: base };
@@ -389,6 +405,7 @@
       '<div class="flc-picker-row">' +
       '<input id="' + id + '" type="text" value="' + String(cur).replace(/"/g, '&quot;') + '" placeholder="11500" autocomplete="off" />' +
       '<button type="button" class="flc-btn flc-primary" data-flc-try-addr="' + id + '">Try</button>' +
+      (cur ? '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic</button>' : '') +
       '</div></div>';
   }
 
@@ -486,6 +503,12 @@
         lookAgain();
       });
     }
+    var keys = _hostEl.querySelectorAll('[data-flc-cloud-key]');
+    for (var k = 0; k < keys.length; k++) {
+      keys[k].addEventListener('click', function () {
+        try { if (root.AiSetup && typeof root.AiSetup.openModal === 'function') root.AiSetup.openModal(); } catch (eK) {}
+      });
+    }
     var autos = _hostEl.querySelectorAll('[data-flc-use-auto]');
     for (var a = 0; a < autos.length; a++) {
       autos[a].addEventListener('click', function () { clearManualHost(); lookAgain(); });
@@ -515,6 +538,7 @@
     html += '<p class="flc-lede">One door. Download Bridge → Open → Yes, help → tap your model. No Terminal on the main path.</p>';
 
     if (report.manualReject) html += '<div class="flc-card flc-wait"><p>' + report.manualReject + '</p></div>';
+    _manualRejectMsg = ''; // v-connect-heal-v0.4 item 5: shown once, never lingers
     if (report.manualQuiet) {
       html += '<div class="flc-card flc-wait"><p>Nothing answered on ' + (report.wanted || 'your port') + '.</p>';
       html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button> ';
@@ -559,13 +583,17 @@
     } else {
       html += '<li>No-install browser mind — Settings → Browser AI</li>';
       html += '<li>Cloud key — Change Provider when you have one</li>';
+      // v-connect-heal-v0.4 item 8: a real door to the key form (Change Provider gates back here)
+      if (root.AiSetup && typeof root.AiSetup.openModal === 'function') {
+        html += '<li><button type="button" class="flc-btn flc-primary" data-flc-cloud-key>Add a cloud key</button></li>';
+      }
     }
     html += '</ul>';
     html += portPickerHtml('other');
     html += '<p class="flc-soft">Advanced (Terminal) stays under Settings — never on this main path.</p></details>';
     html += '<details class="flc-builders"><summary>For builders</summary>';
     html += '<p>Named five stay five. Family uncapped. Quiet Room shut.</p>';
-    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · soft leave sw.js</p>';
+    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4 · soft leave sw.js</p>';
     html += '</details></div>';
 
     _hostEl.innerHTML = html;
@@ -622,6 +650,7 @@
       '.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}',
       '.flc-primary{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.45);color:#34d399}',
       '.flc-soft{font-size:.8rem;color:rgba(148,163,184,.95);margin:.65rem 0 0;line-height:1.45}',
+      '.flc-soft a{color:#e8b019}',
       '.flc-other,.flc-builders{margin:1rem 0;font-size:.88rem;color:rgba(200,210,230,.8)}',
       '.flc-other ul{margin:.5rem 0 0;padding-left:1.2rem}',
       '.flc-other a{color:#e8b019}',

@@ -16132,8 +16132,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <!-- Ollama Host (Local only) -->
       <div class="form-group hidden" id="ollamaHostGroup">
         <label for="ollamaHostInput">&#x1F3E0; Ollama Address</label>
-        <input type="text" id="ollamaHostInput" placeholder="localhost:11434" value="" oninput="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
-        <div class="hint">Default: localhost:11434. Change to a remote IP (e.g., 192.168.1.50:11434) for faster AI on another machine. <a href="#connect" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){}" style="color:var(--emerald,#34d399);">Or set this in Connect</a></div>
+        <input type="text" id="ollamaHostInput" placeholder="127.0.0.1:11434" value="" onchange="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
+        <div id="ollamaHostRefusal" class="hint" role="status" style="color:var(--gold,#e8b019);" hidden></div>
+        <div class="hint">Default: 127.0.0.1:11434. This only talks to your own computer. A different port is fine, like 127.0.0.1:11500. <a href="#connect" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){}" style="color:var(--emerald,#34d399);">Or set this in Connect</a></div>
       </div>
 
       <!-- Mesh Compute Sharing (Local only) -->
@@ -27715,6 +27716,16 @@ const FlOnboarding = (function() {
   }
 
   function connectOllama(models) {
+    // v-connect-heal-v0.4 / Hypha walk 3 item 7: Yes opens Connect and the person
+    // taps the mind there. No silent isLocal, no silent models[0]. The older
+    // path below stays only for a page without FlConnect.
+    if (window.FlConnect && typeof FlConnect.open === 'function') {
+      try { FlConnect.open(); } catch (eOpen0) {}
+      if (typeof welcomeGoToStep === 'function') {
+        setTimeout(function() { welcomeGoToStep(3); }, 800);
+      }
+      return;
+    }
     try {
       // v-connect-bridge-aware-v0 — align Settings status with toast accept
       var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://127.0.0.1:11434');
@@ -27811,7 +27822,8 @@ const FlOnboarding = (function() {
     toastDismissed = true;
     localStorage.setItem('fl_ollama_toast_dismissed', 'true');
     connectOllama(detectedModels);
-    if (typeof showToast === 'function') showToast('Connected to a mind on this computer!');
+    // v-connect-heal-v0.4 item 7: honest words, nothing is connected until they tap a mind
+    if (typeof showToast === 'function') showToast('Tap the mind you want in Connect.');
   }
 
   function dismissToast() {
@@ -28529,6 +28541,9 @@ const AiSetup = (function() {
   }
 
   function openModal() {
+    // v-connect-heal-v0.4 item 8: other doors remove the overlay DOM directly;
+    // forget a detached overlay so Change Provider opens again without reload.
+    if (modalOverlayEl && !document.body.contains(modalOverlayEl)) modalOverlayEl = null;
     if (modalOverlayEl) return;
     modalSelectedProvider = null;
     var mobile = flIsMobile();
@@ -29493,6 +29508,10 @@ const AiSetup = (function() {
     closeModal: closeModal
   };
 })();
+// v-connect-heal-v0.4.1: const AiSetup is not a window property, so the
+// shared FlConnect core (root.AiSetup) could not see it and Add a cloud key
+// never rendered. Expose the same object, like window.state above.
+window.AiSetup = AiSetup;
 
 // Expose the modal globally so any code (Garden nudge, Chat banner, future
 // features) can call one function and get the unified connection flow.
@@ -31509,7 +31528,20 @@ function flUseBridge() {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 1200); });
     else setTimeout(run, 1200);
   }
-  setInterval(run, 20000);
+  // v-connect-heal-v0.4 / Hypha walk 3 item 2: the old 20s interval ran the
+  // full 11-port scan forever, on every tab. Now: never while hidden, never a
+  // full scan, and only the one saved Bridge port once a Bridge has answered.
+  // Boot still does one full look; Connect keeps its own loop.
+  setInterval(function flBridgeQuietTick() {
+    try {
+      if (document.hidden) return;
+      var saved = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
+      if (!saved || saved === 11434) return;
+      flBridgeHealthAt(saved).then(function (h) {
+        flBridgeShowChip(!!(h && h.bridge && h.helped), h && (h.port || h._probedPort));
+      });
+    } catch (eQ) {}
+  }, 20000);
 })();
 window.flBridgeDetect = flBridgeDetect;
 window.flUseBridge = flUseBridge;
@@ -31551,6 +31583,15 @@ function settingsSetMode(mode) {
     // Highlight Local
     if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
 
+    // v-connect-heal-v0.4 / Hypha walk 3 item 8: Local opens Connect, where the
+    // person taps the mind. No old wizard, no silent models[0], no key wipe.
+    if (window.FlConnect && typeof FlConnect.open === 'function') {
+      var stLocal = document.getElementById('settingsStatusText');
+      if (stLocal) stLocal.textContent = 'Opening Connect. Tap the mind you want there.';
+      if (actionsDiv) actionsDiv.innerHTML = '';
+      try { FlConnect.open(); } catch (eOpenL) {}
+      return;
+    }
     // v-connect-card-yesno-wizard-v0 — Local mode points at Connect card (one wizard)
     try {
       if (typeof flOpenConnectWizard === 'function') {
@@ -34251,8 +34292,17 @@ async function flLookConnect(modelName) {
   flLookFillModels(document.getElementById('fl-look-3-models'), models, name);
 }
 
+// v-connect-heal-v0.4 / Hypha walk 3 item 5: the Connect port the person typed
+// wins over an older saved fl_ollamaHost (Use automatic clears both).
+function flManualBaseFirst() {
+  try {
+    var m = (typeof flGetManualConnectHost === 'function') ? flGetManualConnectHost() : null;
+    return m ? String(m).replace(/\/+$/, '') : null;
+  } catch (e) { return null; }
+}
 function getOllamaBaseUrl() {
   if (_ollamaResolvedBase) return _ollamaResolvedBase.base;
+  var man0 = flManualBaseFirst(); if (man0) return man0; // heal v0.4 item 5
   var host = localStorage.getItem('fl_ollamaHost') || localStorage.getItem('fl_localUrl') || null;
   if (host) {
     // Normalize: add http:// if missing (keeps existing UX).
@@ -34357,8 +34407,18 @@ function flSaveOllamaHost() {
   var input = document.getElementById('ollamaHostInput');
   if (!input) return;
   var val = input.value.trim();
-  if (val && val !== 'localhost:11434') {
-    try { localStorage.setItem('fl_ollamaHost', val); } catch(e) {}
+  // v-connect-heal-v0.4 / Hypha walk 3 item 6: local minds are 127.0.0.1 only.
+  // Anything else gets a kind no; the saved address stays as it was.
+  var refusal = document.getElementById('ollamaHostRefusal');
+  if (refusal) { refusal.hidden = true; refusal.textContent = ''; }
+  if (val && val !== 'localhost:11434' && val !== '127.0.0.1:11434') {
+    if (!flWriteOllamaHostLoopbackOnly(val)) {
+      if (refusal) {
+        refusal.textContent = 'For safety this only talks to your own computer. Try 127.0.0.1 with your port, like 127.0.0.1:11500.';
+        refusal.hidden = false;
+      }
+      return;
+    }
   } else {
     try { localStorage.removeItem('fl_ollamaHost'); } catch(e) {}
   }
@@ -34713,6 +34773,13 @@ function flShowToast(msg, duration) {
 function flAutoConnect(opts) {
   opts = opts || {};
   var force = !!opts.force;
+  // v-connect-heal-v0.4 / Hypha walk 3 item 7: Zero-Click never connects or picks
+  // a model by itself. Boot and focus stay quiet (the toast asks). A gesture
+  // (force) opens Connect so the person taps the mind.
+  if (window.FlConnect && typeof FlConnect.open === 'function') {
+    if (force) { try { FlConnect.open(); } catch (eF) {} }
+    return;
+  }
   if (!force && window._flAutoConnected) return; // already connected this session
   var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
   var isLocal = localStorage.getItem('fl_isLocal') === 'true';
@@ -39548,6 +39615,10 @@ async function autoDiscoverAI() {
     var corsBlocked = found.filter(function(s) { return s.status === 'cors-blocked'; });
 
     if (ready.length > 0) {
+      // v-connect-heal-v0.4 / Hypha walk 3 item 7: discovery finds, the person
+      // chooses. With FlConnect here, nothing connects and no model is picked
+      // until they say yes (the Local AI toast asks, Connect lists the minds).
+      if (window.FlConnect && typeof FlConnect.open === 'function') return false;
       // Auto-connect to the best ready server
       var best = ready[0];
       console.log('[Discovery] Found', best.name, 'with', best.models.length, 'model(s)');
@@ -68498,12 +68569,32 @@ document.addEventListener('click', function(e) {
 // v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect
 (function () {
   // v-connect-port-picker-v0 / Hypha H3 — honor #connect after tabs init
-  function goConnect() {
+  // v-connect-heal-v0.4 / Hypha walk 3 item 3: the retries stay (startup can
+  // still land another tab late) but they no longer remount Connect when it is
+  // already showing (48 fetches in 7s), and the first tap or key press ends
+  // them and clears #connect, so choosing another tab never yanks back.
+  var _flcUserMoved = false;
+  function flcUserMoved() {
+    if (_flcUserMoved) return;
+    _flcUserMoved = true;
     try {
+      if ((location.hash || '') === '#connect') history.replaceState(null, '', location.pathname + location.search);
+    } catch (eH) {}
+  }
+  try {
+    document.addEventListener('pointerdown', flcUserMoved, true);
+    document.addEventListener('keydown', flcUserMoved, true);
+  } catch (eL) {}
+  function goConnect(ev) {
+    try {
+      var fromHash = !!(ev && ev.type === 'hashchange');
+      if (_flcUserMoved && !fromHash) return;
       var hash = (location.hash || '').replace(/^#/, '');
       var q = '';
       try { q = new URLSearchParams(location.search || '').get('tab') || ''; } catch (e0) {}
       if (hash === 'connect' || q === 'connect') {
+        var tabEl = document.getElementById('tab-connect');
+        if (tabEl && tabEl.classList.contains('active')) return;
         if (typeof switchTab === 'function') switchTab('connect');
         else if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
       }

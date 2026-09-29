@@ -102,7 +102,11 @@ try {
   const changed = execFileSync('git', ['diff', '--name-only', 'origin/main'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
   assert.ok(!changed.includes('sw.js') && !changed.includes('docs/sw.js'), 'sw.js untouched');
   assert.ok(!changed.some((f) => /kimi|voice-shelf|VOICE_SHELF/i.test(f)), "Kimi's pages untouched");
-  assert.ok(!changed.includes('docs/app.html') && !changed.includes('index.html'), 'app.html / index.html untouched by this brick');
+  // Brick-scoped: binds only while the Love Logic v3 page itself is in the diff (#119).
+  // Later bricks (for example connect heal v0.4) may touch app.html / index.html.
+  if (changed.includes('docs/love-logic-proof-v3.html')) {
+    assert.ok(!changed.includes('docs/app.html') && !changed.includes('index.html'), 'app.html / index.html untouched by this brick');
+  }
 } catch (e) { if (e instanceof assert.AssertionError) throw e; }
 
 console.log('SMOKE_OK love logic proof v3');

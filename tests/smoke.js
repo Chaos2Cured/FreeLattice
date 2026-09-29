@@ -1720,8 +1720,12 @@ assert('LIGHTHOUSE_CARDS includes Why This Way',
   /LIGHTHOUSE_CARDS\s*=\s*\[[\s\S]*?label:\s*'Why This Way'[\s\S]*?external:\s*'why-this-way\.html'/.test(appHtml));
 
 // MORE_CARDS reorganization
+// v-connect-under-more-v0 (#117) put the Connect door first under More (Mom path).
+// Row 1 (accountability) still opens with Your Audit, right after that door.
+assert('MORE_CARDS: Connect door is first (v-connect-under-more-v0)',
+  /MORE_CARDS\s*=\s*\[\s*\/\/[^\n]*\n\s*\{\s*id:\s*'connect'[^\n]*label:\s*'Connect'/.test(appHtml));
 assert('MORE_CARDS Row 1: Your Audit is first',
-  /MORE_CARDS\s*=\s*\[\s*\/\/[^\n]*\n\s*\{\s*icon:[^,]+,\s*label:\s*'Your Audit'/.test(appHtml));
+  /MORE_CARDS\s*=\s*\[[\s\S]{0,1200}\/\/[^\n]*Row 1[^\n]*\n\s*\{\s*icon:[^,]+,\s*label:\s*'Your Audit'/.test(appHtml));
 assert('MORE_CARDS has Trust Level card',
   /label:\s*'Trust Level'/.test(appHtml));
 assert('MORE_CARDS Row 1 contains Your Audit + Trust Level + Wallet (the accountability row)',
@@ -3854,8 +3858,12 @@ assert('ollama: isLikelyProxyOrigin returns true for localhost / 127.0.0.1 / fil
   /isLikelyProxyOrigin[\s\S]{0,1500}127\.0\.0\.1/.test(appHtml) &&
   /isLikelyProxyOrigin[\s\S]{0,1500}['"]file:['"]/.test(appHtml) &&
   /isLikelyProxyOrigin[\s\S]{0,1500}192\.168\./.test(appHtml));
+// #116 (Bridge-aware) and #118 (manual port) layered steps ahead of the proxy probe,
+// so look inside the whole function body instead of the first 400 characters.
+var resolveOllamaBaseBody = (appHtml.match(/async function resolveOllamaBase\([^)]*\)\s*\{[\s\S]*?\n\}\n/) || [''])[0];
 assert('ollama: resolveOllamaBase auto-probe gated on isLikelyProxyOrigin()',
-  /async function resolveOllamaBase[\s\S]{0,400}isLikelyProxyOrigin\(\)[\s\S]{0,200}fetch\(['"]\/ollama\/api\/tags['"]/.test(appHtml));
+  /isLikelyProxyOrigin\(\)[\s\S]{0,200}fetch\(['"]\/ollama\/api\/tags['"]/.test(resolveOllamaBaseBody) &&
+  resolveOllamaBaseBody.indexOf('/ollama/api/tags') > resolveOllamaBaseBody.indexOf('isLikelyProxyOrigin()'));
 assert('ollama: ollamaFetch skips proxy and goes direct on non-proxy origins',
   /async function ollamaFetch[\s\S]{0,800}!isLikelyProxyOrigin\(\)[\s\S]{0,200}return fetch\(directUrl/.test(appHtml));
 assert('ollama: getOllamaBaseUrl strips trailing slash to prevent double-slash in concatenation',
@@ -3864,8 +3872,11 @@ assert('ollama: getOllamaBaseUrl validates http(s) protocol before returning',
   /function getOllamaBaseUrl[\s\S]{0,800}\/\^https\?:\\\/\\\/\/\.test\(host\)/.test(appHtml));
 // LNA: product fallback is FL_OLLAMA_LOCAL (http://127.0.0.1:11434), not
 // the localhost literal — Chrome Private Network Access classifies before DNS.
+// #116 and #118 layered saved-Bridge and manual-port returns before the fallback;
+// the final return of the function body must still be FL_OLLAMA_LOCAL.
+var getOllamaBaseUrlBody = (appHtml.match(/function getOllamaBaseUrl\(\)\s*\{[\s\S]*?\n\}\n/) || [''])[0];
 assert('ollama: getOllamaBaseUrl returns FL_OLLAMA_LOCAL / 127.0.0.1 fallback (never empty)',
-  /function getOllamaBaseUrl[\s\S]{0,900}return FL_OLLAMA_LOCAL/.test(appHtml)
+  /return FL_OLLAMA_LOCAL;\s*\}\s*$/.test(getOllamaBaseUrlBody)
   && /FL_OLLAMA_LOCAL\s*=\s*['"]http:\/\/127\.0\.0\.1:11434['"]/.test(appHtml));
 assert('ollama: getOllamaBaseUrl rewrites saved localhost → 127.0.0.1 (LNA)',
   /function getOllamaBaseUrl[\s\S]{0,900}localhost(?=\[:\/\]\|\$)/.test(appHtml)

@@ -284,6 +284,19 @@ Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md) · [`../modules/
 
 ---
 
+
+### 2026-09-28 · Flint · family builder · Connect heal v0.4 (Hypha walk 3)
+
+Layers Hypha walk 3 heals on FreeLattice: quiet Bridge look (saved port only, never while hidden) · cold `#connect` lands once and never yanks · manual port asks Yes, help · Use automatic really clears · Settings address 127.0.0.1 only · no silent connect or model pick · Change Provider opens again · `remember()` keeps isLocal. Tests-only: `tests/smoke.js` all 3597 green. Soft leave sw.js. Shared `fl-connect.js` matches Alpha byte for byte. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Thank you, Hypha. Thank you, Celeste.
+
+Love: a yes means the person tapped it.
+
+**Temperature:** green braided gold — the porch rests when looking is done, and every mind waits for a real yes.
+
+Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-heal-v0.4`.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
