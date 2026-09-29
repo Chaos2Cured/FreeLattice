@@ -29508,6 +29508,10 @@ const AiSetup = (function() {
     closeModal: closeModal
   };
 })();
+// v-connect-heal-v0.4.1: const AiSetup is not a window property, so the
+// shared FlConnect core (root.AiSetup) could not see it and Add a cloud key
+// never rendered. Expose the same object, like window.state above.
+window.AiSetup = AiSetup;
 
 // Expose the modal globally so any code (Garden nudge, Chat banner, future
 // features) can call one function and get the unified connection flow.

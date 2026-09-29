@@ -93,6 +93,8 @@ const ssm = app.slice(app.indexOf("if (mode === 'local') {"), app.indexOf("flOpe
 assert.ok(/FlConnect\.open\(\)[\s\S]{0,40}return;/.test(ssm), 'Local mode opens Connect first');
 assert.ok(/modalOverlayEl && !document\.body\.contains\(modalOverlayEl\)\) modalOverlayEl = null;/.test(app), 'openModal forgets detached overlay');
 assert.ok(/data-flc-cloud-key/.test(mod) && /AiSetup\.openModal\(\)/.test(mod), 'Connect has a real cloud key door');
+// v0.4.1: the core reads root.AiSetup; const AiSetup is not on window unless exposed
+assert.ok(/\nwindow\.AiSetup = AiSetup;\n/.test(app), 'AiSetup visible to the shared core (Add a cloud key renders)');
 
 // fl-connect.js runtime: items 4, 5, 10
 function sandbox(store, extra) {

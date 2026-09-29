@@ -61,5 +61,6 @@ Marker `v-connect-heal-v0.4`. Smoke `SMOKE_OK connect heal v0.4` (`docs/scripts/
 - No silent connect, no silent model pick: the Local AI toast, Connect Now, Zero-Click, discovery, and Settings Local all lead to Connect, where the person taps the mind.
 - Change Provider opens again after any door removed the overlay; Connect has an Add a cloud key door.
 - `remember()` checks `#localToggle` before `handleLocalToggle(true)`, so isLocal stays true.
+- v0.4.1: `window.AiSetup = AiSetup;` in app.html, because the shared core reads `root.AiSetup` and a top-level `const` is not a window property. Without it, Add a cloud key never rendered.
 
 **Temperature:** a yes means the person tapped it.
