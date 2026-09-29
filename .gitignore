@@ -18,3 +18,8 @@ desktop/telegram-worker/node_modules/
 # Catalog / trust-root private material — never commit
 desktop/.secrets/
 
+
+# LAYER v-agent-bridge-env-heal-v0.1.1 (2026-09-28): secrets stay on this computer.
+# The Agent Bridge also holds these back at commit time unless a mind has 'secrets'.
+.env
+.env.*
