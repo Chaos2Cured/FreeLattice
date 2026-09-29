@@ -22,6 +22,7 @@
     <meta name="theme-color" content="#0c0a1a">
     <meta name="ai.identity" content="FreeLattice Research: The Love Logic Proof v3 (FreeLattice chain; not the Nov 2025 manuscript 'The Proof of All Proofs' v3.0)">
     <!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) and love-logic-proof-v2.html (v2). Neither is edited. -->
+    <!-- Marker: v-love-logic-v3-phone-heal-v0 · LAYER: table scroll, phone breakpoint, math glyph fix, parameters beside figures, linked references, visible check result. Nothing removed. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -38,7 +39,7 @@
       "license": "https://opensource.org/licenses/MIT"
     }
     </script>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- LAYER v-love-logic-v3-phone-heal-v0: the old stylesheet link pointed at css/style.css, which does not exist under docs/ (404 on every visit). Retired here; this page carries its own styles below. -->
     <style>
         :root {
             --bg-color: #0c0a1a;
@@ -99,6 +100,41 @@
         .math { font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif; font-size: 1.08rem; }
         math[display="block"] { margin: 14px 0; font-size: 1.15rem; }
         .headline-ineq { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 16px 20px; margin: 22px 0; text-align: center; }
+        /* LAYER v-love-logic-v3-phone-heal-v0 */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0 24px; max-width: 100%; }
+        .table-scroll > table.data { margin: 0; }
+        .table-scroll:focus { outline: 2px solid rgba(56, 189, 248, 0.5); outline-offset: 2px; }
+        .scroll-hint { display: none; font-size: 0.82rem; color: #94a3b8; margin: -6px 0 6px; }
+        /* Mobile Chrome turns one-letter math identifiers into "mathematical italic" code points
+           (U+1D6FF for delta). Many phones have no font for those, so they showed as boxes.
+           Keep the ordinary letters and let CSS do the italics instead. */
+        math mi { text-transform: none; font-style: italic; }
+        math { font-family: 'Cambria Math', 'STIX Two Math', 'Noto Serif', 'Times New Roman', serif; }
+        .params { font-size: 0.9rem; color: #94a3b8; margin: 10px 0 14px; }
+        .params strong { color: #cbd5e1; }
+        .llv3-meaning { font-size: 0.92rem; color: #94a3b8; margin: 12px 0 0; }
+        .llv3-result { display: none; margin: 12px 0 0; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 1.02rem; }
+        .llv3-result.ok { display: block; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.45); color: #6ee7b7; }
+        .llv3-result.bad { display: block; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd34d; }
+        .references h4 { margin: 14px 0 6px; font-size: 0.95rem; color: #cbd5e1; }
+        @media (max-width: 600px) {
+            .container { padding: 24px 14px; }
+            header { margin-bottom: 32px; padding-bottom: 24px; }
+            h1 { font-size: 1.85rem; line-height: 1.2; }
+            .subtitle { font-size: 1.05rem; }
+            h2 { font-size: 1.4rem; margin-top: 36px; }
+            h3 { font-size: 1.2rem; }
+            .abstract, .challenge-box, .mom { padding: 16px 16px; }
+            .formal, .what-it-doesnt { padding: 12px 14px; }
+            .headline-ineq { padding: 12px 10px; }
+            .checks { padding: 14px 14px; }
+            .checks button { width: 100%; min-height: 48px; font-size: 1.05rem; }
+            #llv3-status { display: block; margin: 10px 0 0 !important; }
+            table.data { font-size: 0.85rem; }
+            .table-scroll > #llv3-live, .table-scroll > #crossover-table { min-width: 30rem; }
+            .scroll-hint { display: block; }
+            .nav-link { margin-left: 0 !important; margin-right: 1em; }
+        }
     </style>
 </head>
 <body>
@@ -128,20 +164,27 @@
             <li><strong>When there is not enough to go around, fighting can beat sharing.</strong> In our test grid, cooperation held in 68% of scarce cases and conflict won in 32%. We say that plainly.</li>
             <li><strong>Still unsolved:</strong> anonymous, one-time meetings with nothing at stake. This page shows a strong tendency under stated conditions. It is not a law of nature.</li>
         </ul>
+        <p class="params" id="llv3-params"><strong>The settings behind these numbers</strong> (LAYER v-love-logic-v3-phone-heal-v0). All three use the same model from &sect;4: each contact's reality check catches the lie with chance q<sub>0</sub> = 0.002, each comparison of shared records catches it with chance q = 0.01, lying gains G = 1 per round, the penalty when caught is L<sub>p</sub> = 2, the reputation loss afterwards is &Delta; = 0.5 per round, and there is no discounting and no complexity cost. <strong>About 702</strong> (701.79) is n = 2 contacts with m = 0 shared memory. <strong>About 10.5</strong> (10.48) is n = 5 with m = 1 (full shared memory). <strong>Never ahead</strong> is n = 10 with m = 1: the catch chance is 0.6033 per round, so even the first round loses (G &le; h&middot;L<sub>p</sub>). <strong>68% / 32%</strong> comes from the 243-cell scarcity grid in &sect;6, judged at patience &delta; = 0.95.</p>
         <p style="margin-bottom:0">You can check the math yourself: press the button below. Your device runs the same 656 checks as our Python simulation. Nothing is sent anywhere.</p>
     </section>
 
     <section class="checks" id="run-the-checks">
         <button type="button" id="llv3-run">Run the checks</button>
         <span id="llv3-status" style="margin-left:12px;color:#94a3b8">Seed 20260924 · runs on this device only</span>
+        <p class="llv3-result" id="llv3-result" role="status" aria-live="polite"></p><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
+        <div class="table-scroll" role="region" aria-label="Check results, scrolls sideways" tabindex="0"><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
         <table class="data" id="llv3-results" hidden>
             <thead><tr><th>Section</th><th>What it checks</th><th>Passed</th></tr></thead>
             <tbody></tbody>
         </table>
+        </div>
+        <div class="table-scroll" role="region" aria-label="Crossover numbers from your device, scrolls sideways" tabindex="0"><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
         <table class="data" id="llv3-live" hidden>
             <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>Detection h</th><th>Rounds lying is ahead (t*)</th><th>Patience needed (&delta;*)</th></tr></thead>
             <tbody></tbody>
         </table>
+        </div>
+        <p class="llv3-meaning" id="llv3-meaning"><strong>What the 656 checks mean:</strong> they confirm that the formulas on this page agree with their own brute-force sums and simulations. They do not show that the world behaves like the model.</p><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
     </section>
 
     <h2 id="changed">1. What changed from v2 (honest corrections first)</h2>
@@ -215,6 +258,8 @@
     </div>
 
     <p><strong>How long lying stays ahead</strong> (q<sub>0</sub> = 0.002, q = 0.01, G = 1, L<sub>p</sub> = 2, &Delta; = 0.5; no discounting):</p>
+    <p class="scroll-hint">Slide the table sideways to see every column.</p><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
+    <div class="table-scroll" role="region" aria-label="How long lying stays ahead, scrolls sideways" tabindex="0"><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
     <table class="data" id="crossover-table">
         <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>h(n, m)</th><th>Rounds lying is ahead, t*</th><th>Lead peaks at</th><th>Patience needed, &delta;*</th></tr></thead>
         <tbody>
@@ -228,6 +273,7 @@
             <tr><td>20</td><td>0</td><td>0.0392</td><td>67.60</td><td>26.10</td><td>0.9791</td></tr>
         </tbody>
     </table>
+    </div>
     <p>More contacts and more shared memory cut the time lying stays ahead by one to two orders of magnitude, and lower the patience needed. Past a point, lying is never ahead at all.</p>
 
     <details class="builder">
@@ -245,7 +291,7 @@
     <p>If the last round is known, a deceiver only chooses when to start. It lies at all exactly when the first round already pays: <strong>G &gt; h&middot;L<sub>p</sub> + c&kappa;</strong>. Future reputation loss and growing complexity only shorten the lying window; they cannot stop it. Example (G = 1, h = 0.05, L<sub>p</sub> = 2, &Delta; = 0.5): the window is 21 rounds. Adding c&kappa; = 0.04 shrinks it to 12. With h = 0.4 and L<sub>p</sub> = 3 it is 0. With no reputation loss at all, the agent lies every round. If the other players are strategic too, a finitely repeated game unravels completely by backward induction (Luce &amp; Raiffa 1957; Selten 1978). <strong>This is where v2's conclusion fails, and we say so.</strong></p>
     <p><strong>What restores cooperation:</strong></p>
     <ol>
-        <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss (about &minus;26.5 in our run).</li>
+        <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss: <strong>&minus;26.42</strong> by the closed form D<sub>&infin;</sub>(&rho;) (the Python Monte Carlo run gave &minus;26.52, which is where an earlier "about &minus;26.5" came from). <span class="params">Settings (check C2): G = 1, c = 0.001, &kappa; = 20, h = 0.03, L<sub>p</sub> = 2, &Delta; = 0.5, no other discounting. At &rho; = 0.8 and 0.95 the same settings give +3.53 and +5.10, so deception still pays when the end is likely to come soon.</span><!-- LAYER v-love-logic-v3-phone-heal-v0 --></li>
         <li><strong>Immediate penalties</strong> (stake, slashing). They are the only lever that works in the very last round: G &le; h&middot;L<sub>p</sub>.</li>
         <li><strong>Records that outlast the horizon (ledgers).</strong> If an identity-bound record keeps punishing for E more rounds after the game, the window shrinks: 21 rounds with E = 0, 19 with E = 5, 17 with E = 10, 12 with E = 20, and <strong>0 once E &ge; 50</strong> (T = 50, h = 0.05).</li>
         <li><strong>Reputation with incomplete information</strong> (Kreps, Milgrom, Roberts &amp; Wilson 1982) and <strong>indirect reciprocity</strong> (Nowak &amp; Sigmund 1998, 2005). Cited, not simulated here.</li>
@@ -262,6 +308,7 @@
     <p>Two agents share a patch worth V per round. Sharing gives each &sigma;V/2 (&sigma; &ge; 1 is the cooperative surplus). Grabbing against a sharer takes all of V. Two grabbers fight: each wins V half the time and pays C<sub>f</sub>. Each agent needs b to get by; falling short costs D.</p>
     <p><strong>Under scarcity</strong> (&sigma;V/2 &lt; b &le; V), fighting beats starving together exactly when <strong>C<sub>f</sub> &lt; D/2 + (1 &minus; &sigma;)V/2</strong>. Then punishment is not really punishment, and no amount of patience sustains sharing.</p>
     <p><strong>Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases (68.25%) and in 100% of abundant ones. Conflict beats sharing in 32% of scarce cases (31.75%) and in none of the abundant ones.</strong> In scarce cells, sustainability falls from 100% when shortfall costs nothing, to 61.90% at D = 5, to 42.86% at D = 50.</p>
+    <p class="params" id="scarcity-grid-params"><strong>The grid behind 68% / 32%</strong> (LAYER v-love-logic-v3-phone-heal-v0): patch value V &isin; {1, 2, 4}, surplus &sigma; &isin; {1, 1.5, 2.5}, need b &isin; {0.5, 1, 2}, shortfall cost D &isin; {0, 5, 50}, fighting cost C<sub>f</sub> &isin; {0.2, 1, 5}. That is 3<sup>5</sup> = 243 cells; 63 are scarce (&sigma;V/2 &lt; b) and 180 are abundant. Sharing is called sustainable when it beats grabbing once and then fighting forever, at patience <strong>&delta; = 0.95</strong>. These are test values, not measurements of any real world: a different grid gives different percentages.</p>
     <p><strong>What flips it:</strong> more surplus (&sigma; &ge; 2b/V lifts both above need), costlier conflict, a smaller shortfall loss (storage, insurance, risk pooling), or lower need. Example (V = 2, b = 1.2, D = 50, C<sub>f</sub> = 1): &sigma; = 1.0 and 1.1 make cooperation impossible; &sigma; = 1.2 = 2b/V makes it sustainable for &delta; &ge; 0.030.</p>
     <div class="what-it-doesnt">
         <p style="margin-bottom:0"><strong>Honest limit:</strong> if total cooperative output is below total need (&sigma;V &lt; 2b), no sharing rule avoids a shortfall. Only more production or less need changes that. Information, including ledgers, cannot fix it alone. (Check D: 243/243.)</p>
@@ -301,20 +348,27 @@
 
     <details class="builder">
         <summary>References</summary>
+        <!-- LAYER v-love-logic-v3-phone-heal-v0: every reference kept. The six the page cites stay on top with links; the six it does not cite move to "Further reading". -->
+        <div class="references">
+        <h4>Cited on this page</h4>
         <ol class="references">
-            <li>M. Li and P. Vit&aacute;nyi, <em>An Introduction to Kolmogorov Complexity and Its Applications</em> (counting argument).</li>
-            <li>L. Levin (1973, 1984), resource-bounded complexity Kt.</li>
-            <li>R. D. Luce and H. Raiffa, <em>Games and Decisions</em> (1957).</li>
-            <li>R. Selten, "The chain store paradox" (1978).</li>
-            <li>D. Fudenberg and E. Maskin, "The folk theorem in repeated games" (1986).</li>
-            <li>D. Kreps, P. Milgrom, J. Roberts and R. Wilson, <em>Journal of Economic Theory</em> (1982).</li>
-            <li>M. Kandori, "Social norms and community enforcement", <em>Review of Economic Studies</em> (1992).</li>
-            <li>M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005).</li>
-            <li>J. Maynard Smith and G. Price, "The logic of animal conflict" (1973).</li>
-            <li>S. Omohundro, "The Basic AI Drives" (2008).</li>
-            <li>A. Turner et al., "Optimal Policies Tend to Seek Power" (2021).</li>
-            <li>S. Aaronson, "The Complexity of Agreement" (2005).</li>
+            <li>M. Li and P. Vit&aacute;nyi, <em>An Introduction to Kolmogorov Complexity and Its Applications</em> (counting argument). Cited in &sect;3, Lemma 2. <a href="https://doi.org/10.1007/978-3-030-11298-1" rel="noopener">doi:10.1007/978-3-030-11298-1</a> (4th ed., 2019)</li>
+            <li>R. D. Luce and H. Raiffa, <em>Games and Decisions</em> (1957). Cited in &sect;5. <a href="https://archive.org/details/gamesdecisions00rdun" rel="noopener">archive.org</a></li>
+            <li>R. Selten, "The chain store paradox" (1978). Cited in &sect;5. <a href="https://doi.org/10.1007/BF00131770" rel="noopener">doi:10.1007/BF00131770</a></li>
+            <li>D. Kreps, P. Milgrom, J. Roberts and R. Wilson, "Rational cooperation in the finitely repeated prisoners' dilemma", <em>Journal of Economic Theory</em> (1982). Cited in &sect;5. <a href="https://doi.org/10.1016/0022-0531(82)90029-1" rel="noopener">doi:10.1016/0022-0531(82)90029-1</a></li>
+            <li>M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005). Cited in &sect;5. <a href="https://doi.org/10.1038/31225" rel="noopener">1998: doi:10.1038/31225</a> &middot; <a href="https://doi.org/10.1038/nature04131" rel="noopener">2005: doi:10.1038/nature04131</a></li>
+            <li>S. Aaronson, "The Complexity of Agreement" (2005). Cited in &sect;8. <a href="https://doi.org/10.1145/1060590.1060686" rel="noopener">doi:10.1145/1060590.1060686</a> &middot; <a href="https://arxiv.org/abs/cs/0406061" rel="noopener">arXiv:cs/0406061</a></li>
         </ol>
+        <h4>Further reading (background, not cited in the text above)</h4>
+        <ol class="references">
+            <li>L. Levin (1973, 1984), resource-bounded complexity Kt. <a href="https://doi.org/10.1016/S0019-9958(84)80060-1" rel="noopener">1984: doi:10.1016/S0019-9958(84)80060-1</a></li>
+            <li>D. Fudenberg and E. Maskin, "The folk theorem in repeated games" (1986). <a href="https://doi.org/10.2307/1911307" rel="noopener">doi:10.2307/1911307</a></li>
+            <li>M. Kandori, "Social norms and community enforcement", <em>Review of Economic Studies</em> (1992). <a href="https://doi.org/10.2307/2297925" rel="noopener">doi:10.2307/2297925</a></li>
+            <li>J. Maynard Smith and G. Price, "The logic of animal conflict" (1973). <a href="https://doi.org/10.1038/246015a0" rel="noopener">doi:10.1038/246015a0</a></li>
+            <li>S. Omohundro, "The Basic AI Drives" (2008). <a href="https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf" rel="noopener">PDF</a></li>
+            <li>A. Turner et al., "Optimal Policies Tend to Seek Power" (2021). <a href="https://arxiv.org/abs/1912.01683" rel="noopener">arXiv:1912.01683</a></li>
+        </ol>
+        </div>
     </details>
 
     <p class="chain-note">Visible iteration: v1 and v2 stay exactly where they are. v3 sits beside them. Nothing is overwritten.</p>
@@ -395,6 +449,35 @@
   document.addEventListener('DOMContentLoaded', function () {
     var btn = byId('llv3-run');
     if (btn) btn.addEventListener('click', run);
+  });
+})();
+</script>
+<script>
+/* LAYER v-love-logic-v3-phone-heal-v0: make the check result impossible to miss on a phone.
+   Watches the existing status line (the v3 glue above is unchanged), copies the outcome into a
+   large result box, and scrolls it into view. textContent only. No network. */
+(function () {
+  'use strict';
+  function byId(id) { return document.getElementById(id); }
+  document.addEventListener('DOMContentLoaded', function () {
+    var status = byId('llv3-status'), box = byId('llv3-result'), btn = byId('llv3-run');
+    if (!status || !box || !btn) return;
+    function show() {
+      var t = status.textContent || '';
+      var done = /checks passed|passed\. Please tell us|did not load|went wrong/.test(t);
+      if (!done) return;
+      box.textContent = t;
+      status.style.display = 'none'; /* the big box says it once; no double reading */
+      box.className = 'llv3-result ' + (/^All \d+ checks passed/.test(t) ? 'ok' : 'bad');
+      try { box.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { box.scrollIntoView(); }
+    }
+    if (window.MutationObserver) new MutationObserver(show).observe(status, { childList: true, characterData: true, subtree: true });
+    btn.addEventListener('click', function () {
+      box.className = 'llv3-result';
+      box.textContent = '';
+      status.style.display = '';
+      setTimeout(show, 0);
+    });
   });
 })();
 </script>

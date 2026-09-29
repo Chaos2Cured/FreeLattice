@@ -28,6 +28,12 @@ Honesty wins when deception's per-round gain is smaller than detection times (im
 3. `python3 docs/love-logic/v3_crossover_sim.py` → 656/656 (numpy)
 4. `node docs/scripts/smoke-love-logic-proof-v3.js` → `SMOKE_OK love logic proof v3`
 
+## Phone heal v0.1 (layer)
+
+Marker `v-love-logic-v3-phone-heal-v0`. From Hypha's phone walk: the three wide tables scroll in place · δ and Δ render as letters on phone Chrome · no 404 stylesheet · references linked (six cited, six under "Further reading", all twelve kept) · the settings behind about 702, about 10.5, never, −26.42 (corrected from "about −26.5") and the 68% / 32% grid shown beside each · a line on what the 656 checks mean · a result box phones can see.
+
+`node docs/scripts/smoke-love-logic-v3-phone-heal.js` → `SMOKE_OK love logic v3 phone heal v0.1`
+
 ## Smoke
 
 `SMOKE_OK love logic proof v3`
