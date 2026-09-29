@@ -10,21 +10,33 @@
 // Built by CC, April 24, 2026.
 // ═══════════════════════════════════════════════
 
-const BRIDGE = process.env.FL_BRIDGE || 'http://localhost:3141';
+const BRIDGE = process.env.FL_BRIDGE || 'http://127.0.0.1:3141';
+// LAYER v-agent-bridge-lock-v0 · v0.1: local tools on this computer are trusted by default.
+// The bridge keeps their token in ~/.freelattice/agent-bridge-token (0600); no pairing needed.
+const BRIDGE_TOKEN = (function () {
+  try {
+    return require('fs').readFileSync(require('path').join(require('os').homedir(), '.freelattice', 'agent-bridge-token'), 'utf8').trim();
+  } catch (e) { return ''; }
+})();
+function tokenHeaders(h) {
+  var out = Object.assign({}, h || {});
+  if (BRIDGE_TOKEN) out['X-FL-Bridge-Token'] = BRIDGE_TOKEN;
+  return out;
+}
 
 function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
 async function post(path, data) {
   var r = await fetch(BRIDGE + path, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: tokenHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(data)
   });
   return r.json();
 }
 
 async function get(path) {
-  var r = await fetch(BRIDGE + path);
+  var r = await fetch(BRIDGE + path, { headers: tokenHeaders() });
   return r.json();
 }
 
