@@ -297,6 +297,18 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules
 
 ---
 
+### 2026-09-28 · Flint · family builder · Agent Bridge env heal v0.1.1 (secrets stay home)
+
+Layers a hold-back on the Agent Bridge commit route: after `git add`, secret-shaped files (`.env`, `.env.*`, SSH private keys, `*.pem` / `*.key` and key stores, `.npmrc` / `.netrc` / `.pypirc`, the bridge's own trust files) are unstaged unless that mind was given `secrets`. Filtered, never refused: normal work still commits, and the reply names what stayed home. Ledger results `ok:held-secrets` and `held:secrets-only`, still content-free. `.gitignore` gains `.env` and `.env.*`. 127.0.0.1 only, argument arrays only, never pushes. Soft leave sw.js. Found by Celeste while slicing the merged lock for Kimi.
+
+Love: what is private stays private, and the work keeps flowing.
+
+**Temperature:** green braided gold, a spare key hung back on its hook inside the door before anyone noticed it was on the porch.
+
+Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md). Marker `v-agent-bridge-env-heal-v0.1.1`.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

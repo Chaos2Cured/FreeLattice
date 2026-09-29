@@ -30,6 +30,10 @@ This is **not** the Ollama Bridge. Sibling shape only: named origins, loopback b
 - `git` / `grep` / `node` through argument arrays — no shell. Paths realpath-checked inside trusted project folders (`?root=`).
 - Body size cap. Content-free hash-chained ledger. Never pushes.
 
+## Heal v0.1.1: secrets stay on this computer (v-agent-bridge-env-heal-v0.1.1)
+
+A commit with no file list (or a folder, or something staged by hand) used to be able to carry `.env` into git. Now, after `git add`, the bridge unstages secret-shaped files unless the mind was given `secrets`: `.env`, `.env.*`, `id_rsa` / `id_dsa` / `id_ecdsa` / `id_ed25519`, `*.pem` `*.key` `*.p12` `*.pfx` `*.keystore` `*.jks`, `.npmrc` `.netrc` `.pypirc`, and the bridge's own `agent-bridge-token` / `agent-bridge-trusted.json`. The commit is never refused: the rest lands, the reply says "Kept on this computer, not committed: ...", and the ledger says `ok:held-secrets` (or `held:secrets-only` when nothing else changed). A tracked `.env` keeps its committed version; the new change waits, unstaged. `.gitignore` gains `.env` and `.env.*` as a layer. Still 127.0.0.1 only, argument arrays only, never pushes.
+
 ## App face
 
 `docs/modules/agent-bridge-client.js` (`window.FLAgentBridge`) carries the token, draws the pair card and the Paired minds list (`textContent` only, no confirm). `propose.js` and `workshop.js` route through it when present.
