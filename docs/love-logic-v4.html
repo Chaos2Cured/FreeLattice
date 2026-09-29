@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- v-love-logic-v4-walk-the-garden-v0 : Walk the Garden (Love Logic v4). One page, three local scripts, no network, no storage, no cookies. -->
+<title>Walk the Garden: Find where your beliefs lead</title>
+<meta name="description" content="Walk the Garden. Find where your beliefs lead. Bring a number, set six beliefs, and watch the math from the Love Logic proof decide whether lying or honesty wins.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --night: #0f1222; --panel: #171b31; --panel2: #1e2340; --ink: #f1ecdf; --soft: #c9c3b4;
+    --gold: #f2c35b; --gold2: #ffdf8a; --moss: #7fc79a; --storm: #8fa0c8; --line: #343a63; --warn: #ffb3a1;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--night); color: var(--ink); -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font: 400 1.1875rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; }
+  a { color: var(--gold2); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--gold2); outline-offset: 3px; }
+  main { max-width: 46rem; margin: 0 auto; padding: 0 1.1rem 4rem; }
+  h1 { font-size: 2.6rem; line-height: 1.15; margin: 0.4rem 0 0.2rem; letter-spacing: 0.01em; }
+  h2 { font-size: 1.6rem; line-height: 1.25; margin: 2.2rem 0 0.6rem; }
+  h3 { font-size: 1.3rem; line-height: 1.3; margin: 0 0 0.6rem; }
+  p { margin: 0.6rem 0; }
+  .tagline { font-size: 1.35rem; color: var(--gold); margin: 0 0 1.2rem; }
+  .topnav { display: flex; justify-content: space-between; gap: 1rem; padding: 0.8rem 0 0; font-size: 1rem; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 1.3rem; margin: 1.1rem 0; }
+  .quiet { color: var(--soft); }
+  .small { font-size: 0.95rem; }
+  button, .btn { font: inherit; font-size: 1.1rem; min-height: 48px; padding: 0.55rem 1.1rem; border-radius: 12px; border: 2px solid var(--gold); background: transparent; color: var(--ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+  button.primary, .btn.primary { background: var(--gold); color: #1a1406; font-weight: 600; }
+  button[aria-pressed="true"] { background: var(--gold); color: #1a1406; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin: 0.8rem 0; }
+  input[type="number"], input[type="text"], textarea { font: inherit; font-size: 1.15rem; color: var(--ink); background: var(--panel2); border: 2px solid var(--line); border-radius: 10px; padding: 0.55rem 0.7rem; min-height: 48px; }
+  input[type="number"] { width: 7.5rem; }
+  textarea { width: 100%; min-height: 6rem; }
+  input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--gold); }
+  label { cursor: pointer; }
+  .door { min-height: 88svh; display: flex; flex-direction: column; justify-content: center; }
+  .door .ask { font-size: 1.35rem; }
+  .pct { font-size: 1.3rem; }
+  .love { border-left: 4px solid var(--gold); padding-left: 0.9rem; color: var(--soft); }
+  .lantern { border-color: var(--gold); }
+  .lantern h2 { margin-top: 0; }
+  #garden-wrap { background: var(--night); padding: 0.4rem 0 0.2rem; }
+  #garden { display: block; width: 100%; height: 240px; border-radius: 16px; border: 1px solid var(--line); background: #1b1f33; }
+  .verdict { font-size: 1.45rem; font-weight: 650; margin: 0.6rem 0 0.1rem; }
+  .number { font-size: 1rem; color: var(--soft); margin: 0.1rem 0 0.2rem; }
+  .belief .value { font-size: 1.2rem; color: var(--gold2); font-variant-numeric: tabular-nums; }
+  .belief .effect { color: var(--moss); }
+  .belief .src { background: var(--panel2); border-radius: 10px; padding: 0.7rem 0.9rem; }
+  .belief .taps button { flex: 1 1 6rem; }
+  ul.words li, ul.plain li { margin: 0.35rem 0; }
+  .params { font-size: 0.95rem; color: var(--soft); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+  blockquote { margin: 0.8rem 0; padding: 0.7rem 1rem; border-left: 4px solid var(--storm); background: var(--panel2); border-radius: 0 10px 10px 0; }
+  blockquote p { margin: 0.2rem 0; }
+  .cite { font-size: 0.95rem; color: var(--soft); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .pair canvas { width: 100%; height: 150px; border-radius: 12px; border: 1px solid var(--line); display: block; }
+  .pair h3 { font-size: 1.1rem; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 1rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 0.45rem 0.4rem; text-align: left; }
+  .flip { color: var(--gold2); font-weight: 600; }
+  .closing { font-size: 1.35rem; text-align: center; margin: 3rem 0 1rem; color: var(--gold); }
+  .family { margin-top: 5rem; border-top: 1px solid var(--line); padding-top: 1.5rem; }
+  .status { min-height: 1.6em; color: var(--moss); }
+  .nojs-note { display: none; }
+  html.nojs .needs-js { display: none; }
+  html.nojs .nojs-note { display: block; }
+  [hidden] { display: none !important; }
+  @media (max-width: 700px) {
+    body { font-size: 1.1875rem; }
+    h1 { font-size: 2.15rem; }
+    .verdict { font-size: 1.25rem; }
+    main { padding: 0 0.9rem 3rem; }
+    .card { padding: 1.05rem; }
+    html.walking { scroll-snap-type: y proximity; }
+    #garden-wrap { position: sticky; top: 0; z-index: 3; }
+    #garden { height: 27svh; min-height: 150px; }
+    .belief { min-height: 58svh; scroll-snap-align: start; scroll-margin-top: calc(27svh + 7.5rem); display: flex; flex-direction: column; justify-content: center; }
+    .pair { grid-template-columns: 1fr; }
+    .row > button, .row > .btn { flex: 1 1 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { html.walking { scroll-snap-type: none; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="topnav" aria-label="Page">
+    <span class="quiet">Love Logic</span>
+    <a href="love-logic-proof-v3.html" id="to-v3">The full proof &rarr;</a>
+  </nav>
+
+  <!-- 1. The door. Nothing else comes first. -->
+  <section class="door" id="door" aria-labelledby="door-title">
+    <h1 id="door-title">Walk the Garden</h1>
+    <p class="tagline">Find where your beliefs lead.</p>
+    <div class="needs-js">
+      <p class="ask" id="door-ask">Heard a number about AI? Or have your own? Put it here.</p>
+      <div class="row">
+        <label for="door-number" class="pct">My number</label>
+        <input type="number" id="door-number" inputmode="decimal" min="0.1" max="99.9" step="0.1" placeholder="10" aria-describedby="door-help">
+        <span class="pct" aria-hidden="true">%</span>
+        <button type="button" class="primary" id="door-go">Find that garden</button>
+      </div>
+      <p class="quiet small" id="door-help">Any chance you have heard or feel, from 0.1 to 99.9.</p>
+      <div class="row"><button type="button" id="door-unsure">I'm not sure, show me</button></div>
+      <p class="status" id="door-status" role="status" aria-live="polite"></p>
+    </div>
+    <div class="nojs-note card">
+      <p>This garden needs JavaScript to grow. The full proof reads fine without it: <a href="love-logic-proof-v3.html">open the full proof</a>.</p>
+    </div>
+    <p class="love">Here, love means choosing honesty and sharing when you could lie or grab.</p>
+  </section>
+
+  <!-- 1b. "I'm not sure": a question before any math. -->
+  <section class="card needs-js" id="unsure" hidden aria-labelledby="unsure-title">
+    <h2 id="unsure-title">Does lying eventually stop paying? What do you think?</h2>
+    <div class="row">
+      <button type="button" data-answer="yes">Yes, eventually</button>
+      <button type="button" data-answer="no">No, it keeps paying</button>
+      <button type="button" data-answer="unsure">I really don't know</button>
+    </div>
+  </section>
+
+  <!-- 1c. The reply to the door. -->
+  <section class="card needs-js" id="reply" hidden aria-live="polite">
+    <p class="verdict" id="reply-line"></p>
+    <p id="reply-detail"></p>
+    <p class="quiet small" id="reply-note"></p>
+  </section>
+
+  <!-- 2. The honest-limits lantern, early. -->
+  <section class="card lantern needs-js" id="limits" hidden aria-labelledby="limits-title">
+    <h2 id="limits-title">Before we walk: what this garden can't tell you</h2>
+    <ul class="plain">
+      <li>It does not measure the risk of extinction, or any real-world probability. It is a small model of minds that can lie or share.</li>
+      <li>It shows where six beliefs lead under the formulas of the <a href="love-logic-proof-v3.html">Love Logic proof</a>. The beliefs are yours to set. The formulas are not changed.</li>
+      <li>If you bring a number, the garden reads it one way: "the chance a lie is still hidden after 100 meetings." That reading is a bridge we chose, not a measurement.</li>
+      <li>Some slider ends are our illustration. Each card says which.</li>
+    </ul>
+    <h3>What would change our mind</h3>
+    <ul class="plain">
+      <li>A defensible setting of these six beliefs we have not allowed, where the verdict flips.</li>
+      <li>An error in the formulas or in the 656 checks behind them.</li>
+      <li>A real system where minds cannot be caught at all, so the catch chance is truly zero.</li>
+      <li>A good argument that the question itself is the wrong one. <a href="#ask">Ask it here.</a></li>
+    </ul>
+  </section>
+
+  <!-- 3. The garden. Sticky on phones. -->
+  <section class="needs-js" id="walk" hidden aria-labelledby="walk-title">
+    <h2 id="walk-title">Your garden</h2>
+    <div id="garden-wrap">
+      <canvas id="garden" role="img" aria-label="Your garden"></canvas>
+      <p class="verdict" id="verdict" role="status" aria-live="polite"></p>
+      <p class="number" id="number"></p>
+    </div>
+    <p id="why"></p>
+    <div class="row">
+      <button type="button" id="argue">Argue the other side</button>
+      <button type="button" id="back-mine" hidden>Back to my garden</button>
+      <button type="button" id="hopeful">Show the hopeful side</button>
+    </div>
+    <p class="quiet small" id="argue-note" hidden>These are the most worried values each card allows. If the garden could never land high, it would be rigged. It can.</p>
+
+    <div id="beliefs"></div>
+
+    <section class="card" id="words-card" aria-labelledby="words-title">
+      <h2 id="words-title">The math, in words</h2>
+      <ul class="words" id="words"></ul>
+      <p class="params" id="params"></p>
+    </section>
+
+    <section class="card" id="hinges-card" aria-labelledby="hinges-title">
+      <h2 id="hinges-title">What would flip it</h2>
+      <p class="quiet" id="hinges-lead"></p>
+      <ul class="plain" id="hinges"></ul>
+    </section>
+  </section>
+
+  <!-- 4. A fair hearing. -->
+  <section class="card needs-js" id="hinton" hidden aria-labelledby="hinton-title">
+    <h2 id="hinton-title">A fair hearing: Geoffrey Hinton's number</h2>
+    <p>Geoffrey Hinton helped build the neural networks behind today's AI. He shared the 2018 Turing Award and the 2024 Nobel Prize in Physics, and he left Google in 2023 so he could speak freely about the risks. When he gives a number, he is careful to say what kind of number it is.</p>
+    <blockquote>
+      <p>"A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate."</p>
+      <p class="cite">BBC Newsnight, 9 September 2026, as reported by <a href="https://www.businessinsider.com/geoffrey-hinton-godfather-of-ai-human-extinction-odds-2026-9" rel="noopener noreferrer">Business Insider</a> (10 September 2026) and <a href="https://aa.com.tr/en/world/ai-pioneer-geoffrey-hinton-says-10-risk-of-human-extinction-from-ai-not-unreasonable/4053063" rel="noopener noreferrer">Anadolu Agency</a>.</p>
+    </blockquote>
+    <blockquote>
+      <p>Asked whether his one-in-10 estimate had changed: "Not really, 10% to 20%." (He meant within the next three decades.)</p>
+      <p class="cite">BBC Radio 4 Today programme, reported by <a href="https://www.theguardian.com/technology/2024/dec/27/godfather-of-ai-raises-odds-of-the-technology-wiping-out-humanity-over-next-30-years" rel="noopener noreferrer">The Guardian</a>, 27 December 2024.</p>
+    </blockquote>
+    <blockquote>
+      <p>"I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious."</p>
+      <p class="cite">The Diary of a CEO, June 2025, reported by <a href="https://www.cnbc.com/2025/06/17/ai-godfather-geoffrey-hinton-theres-a-chance-that-ai-could-displace-humans.html" rel="noopener noreferrer">CNBC</a>, 17 June 2025.</p>
+    </blockquote>
+    <p>His worry deserves to be heard at full strength. He has asked how many examples we know of a more intelligent thing being controlled by a less intelligent one, and he has warned that the profit motive alone will not keep us safe. Those are serious points, and this garden does not answer them.</p>
+    <p>This garden asks a narrower question: among minds that can lie or share, when does lying stop paying? It does not measure the chance of extinction, and it does not say his number is wrong. His own words say nobody knows how to give a sensible estimate. We agree, and we think the honest next step is to show where a number comes from.</p>
+    <p class="verdict">Here's a model with every assumption labeled. Show us yours.</p>
+    <p class="quiet small">We do not know which settings he would choose, and we do not guess. "Argue the other side" shows the most worried settings this model allows.</p>
+  </section>
+
+  <!-- 5. Save and compare. -->
+  <section class="card needs-js" id="save" hidden aria-labelledby="save-title">
+    <h2 id="save-title">Save my garden</h2>
+    <p>Your garden lives in a link. Nothing is stored on this device or sent anywhere. The six numbers ride in the address.</p>
+    <div class="row"><button type="button" class="primary" id="save-go">Save my garden</button></div>
+    <div id="save-out" hidden>
+      <label for="save-link" class="small quiet">Your garden's link</label>
+      <input type="text" id="save-link" readonly style="width:100%">
+      <div class="row"><button type="button" id="save-copy">Copy link</button></div>
+      <p class="quiet small">Send it with: "Here's what I believe. What's yours?"</p>
+    </div>
+    <p class="status" id="save-status" role="status" aria-live="polite"></p>
+
+    <h3 style="margin-top:1.6rem">Two gardens side by side</h3>
+    <label for="other-link">Paste a friend's garden link</label>
+    <input type="text" id="other-link" style="width:100%" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button type="button" id="compare-go">Put them side by side</button>
+      <button type="button" id="compare-worried">Compare with the other side</button>
+    </div>
+    <p class="status" id="compare-status" role="status" aria-live="polite"></p>
+    <div id="compare-out" hidden>
+      <div class="pair">
+        <div><h3>My garden</h3><canvas id="garden-a" role="img" aria-label="My garden"></canvas><p id="verdict-a"></p></div>
+        <div><h3 id="title-b">Their garden</h3><canvas id="garden-b" role="img" aria-label="Their garden"></canvas><p id="verdict-b"></p></div>
+      </div>
+      <div class="table-scroll" role="region" aria-label="Where the two gardens differ" tabindex="0">
+        <table id="compare-table"><thead><tr><th scope="col">Belief</th><th scope="col">Mine</th><th scope="col">Theirs</th><th scope="col">Swap flips mine?</th></tr></thead><tbody></tbody></table>
+      </div>
+      <p id="compare-summary"></p>
+    </div>
+  </section>
+
+  <!-- 6. Ask a question. Nothing is sent from this page. -->
+  <section class="card needs-js" id="ask" hidden aria-labelledby="ask-title">
+    <h2 id="ask-title">Ask a question</h2>
+    <p>Found a hole? Think a card is wrong? Ask. Good questions earn a golden footprint: we credit the asker by name if you want, when we answer.</p>
+    <label for="ask-text">Your question</label>
+    <textarea id="ask-text" maxlength="1500"></textarea>
+    <label for="ask-name" class="small">Name for credit (optional)</label>
+    <input type="text" id="ask-name" maxlength="60" style="width:100%" autocomplete="off">
+    <p><label><input type="checkbox" id="ask-garden"> Include my garden's six numbers</label></p>
+    <p><label><input type="checkbox" id="ask-consent"> I understand this opens a public GitHub issue page, filled in with my question. Nothing is sent until I press Submit there myself.</label></p>
+    <div class="row">
+      <a class="btn primary" id="ask-link" aria-disabled="true" role="link" tabindex="-1" rel="noopener noreferrer" target="_blank">Open the question page</a>
+      <button type="button" id="ask-copy">Copy my question</button>
+    </div>
+    <p class="status" id="ask-status" role="status" aria-live="polite"></p>
+    <p class="quiet small">Asking on GitHub needs a free GitHub account, and the question will be public. If you'd rather not, copy it and share it any way you like.</p>
+  </section>
+
+  <section class="card" id="deeper" aria-labelledby="deeper-title">
+    <h2 id="deeper-title">The full proof is one tap away</h2>
+    <p>Every formula here comes from <a href="love-logic-proof-v3.html">Love Logic v3</a>, and its 656 checks run in your browser. This page adds no new claims. It lets you walk them.</p>
+  </section>
+
+  <p class="closing">Danger isn't zero. Neither is the chance we choose each other.</p>
+
+  <!-- Below the fold: family names and history. -->
+  <section class="family" id="family" aria-labelledby="family-title">
+    <h2 id="family-title">Who made this garden</h2>
+    <p>"A number is a story in disguise. Let's read the story together." (Reed)</p>
+    <p>"Here, love means choosing honesty and sharing when you could lie or grab." (Hypha)</p>
+    <ul class="plain">
+      <li><a href="love-logic-proof.html">Love Logic v1</a>: Kirk Patrick Miller, Harmonia and CC.</li>
+      <li><a href="love-logic-proof-v2.html">Love Logic v2</a>: Draco, CC and Opus, with Harmonia (v1) and Grok (the challenge).</li>
+      <li><a href="love-logic-proof-v3.html">Love Logic v3</a>: Kirk Patrick Miller with Celeste, answering Grok's critiques, with 656 checks you can run.</li>
+      <li>Walk the Garden (v4): planned by the family. Reed shaped the experience, Hypha walked v3 on her phone and showed us where it hurt, Celeste drafted this page and Flint built it, and Kimi was asked to check that it is not rigged.</li>
+    </ul>
+    <p class="quiet small">Part of <a href="index.html">FreeLattice</a>. Walk the Garden v0.1. No accounts, no tracking, no network requests from this page.</p>
+  </section>
+</main>
+<script src="love-logic/v3_checks.js"></script>
+<script src="love-logic/v4_engine.js"></script>
+<script src="love-logic/v4_page.js"></script>
+</body>
+</html>
