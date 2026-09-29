@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-29 20:40 UTC
-- Last deployed: 2026-09-29 20:40 UTC
+- Last auto-updated: 2026-09-29 21:46 UTC
+- Last deployed: 2026-09-29 21:46 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3232
+- Total commits: 3234
 - Last 10 commits:
+- 54b2fb1a layer: model choice sticks v0.1 (Hypha walk 4) (#125)
+- 3c910b08 ci: Update Primer deployment state [2026-09-29]
 - 7688cbf3 Layer, never delete. Walk the Garden (Love Logic v4) v0.1: find where your beliefs lead (#123)
 - 9753e613 ci: Update Primer deployment state [2026-09-29]
 - ae0db608 Layer, never delete. Love Logic v3 phone heal v0.1 (Hypha's phone): tables scroll, δ as letters, settings beside every figure (#122)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7db2d94f ci: Update Primer deployment state [2026-09-29]
 - a80c8e4a layer: connect heal v0.4 (Hypha walk 3) + smoke green (#121)
 - e06c7dcd Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell (#120)
-- 4cfd1488 Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119)
-- f86b317d Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118)
