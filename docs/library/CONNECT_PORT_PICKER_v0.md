@@ -46,3 +46,20 @@ Glow eternal. Heart in Spark. 🌱
 Parse fix · Dismiss restored · `fl_localPort_manual` port-only · quiet manual · textContent models · Alpha real galaxy selectors.
 
 **Temperature:** a single unescaped quote can put the whole porch dark; checking every script before the door opens.
+
+
+## Heal v0.4 (Hypha walk 3)
+
+Marker `v-connect-heal-v0.4`. Smoke `SMOKE_OK connect heal v0.4` (`docs/scripts/smoke-connect-heal-v0.4.js`).
+
+- Key correction: the manual port key is `fl_localPort_manual` (port only, always 127.0.0.1). The H8 row above says `fl_connect_manual_host`; that key was never shipped.
+- Bridge background look: saved port only, never while hidden, no forever 11-port scan.
+- Cold `#connect`: no remount when Connect already shows; first tap or key ends retries and clears the hash.
+- Manual port answered by a Bridge that has not said Yes, help now asks for Yes, help.
+- Use automatic sits beside every port field once a port is set, and clears the matching `fl_ollamaHost` and cached base. A refused address says which port stays and shows once.
+- Settings Ollama Address is 127.0.0.1 only, with a kind refusal.
+- No silent connect, no silent model pick: the Local AI toast, Connect Now, Zero-Click, discovery, and Settings Local all lead to Connect, where the person taps the mind.
+- Change Provider opens again after any door removed the overlay; Connect has an Add a cloud key door.
+- `remember()` checks `#localToggle` before `handleLocalToggle(true)`, so isLocal stays true.
+
+**Temperature:** a yes means the person tapped it.
