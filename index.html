@@ -31549,6 +31549,27 @@ window.flUseBridgePort = flUseBridgePort;
 window.flBridgeHealth = flBridgeHealth;
 window.flRememberHelpedBridge = flRememberHelpedBridge;
 
+// v-model-choice-sticks-v0: the Settings button row (Change Provider, Test Connection,
+// a mind at home) comes back after Local empties it. Built with createElement/textContent.
+function flRefillSettingsActions(actionsDiv) {
+  if (!actionsDiv || actionsDiv.children.length) return;
+  function add(label, cls, onTap, green) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = cls;
+    b.textContent = label;
+    if (green) { b.style.borderColor = 'var(--emerald)'; b.style.color = 'var(--emerald)'; }
+    b.addEventListener('click', function() { try { onTap(); } catch (e) {} });
+    actionsDiv.appendChild(b);
+  }
+  add('Change Provider', 'ai-status-btn ai-status-btn-primary', function() { if (typeof openProviderModal === 'function') openProviderModal(); });
+  add('Test Connection', 'ai-status-btn', function() { if (typeof AiSetup !== 'undefined' && AiSetup.testFromSettings) AiSetup.testFromSettings(); });
+  add('\uD83C\uDFE0 a mind at home', 'ai-status-btn', function() {
+    if (window.FlConnect && FlConnect.open) FlConnect.open(); else if (typeof switchTab === 'function') switchTab('connect');
+  }, true);
+}
+window.flRefillSettingsActions = flRefillSettingsActions;
+
 function settingsSetMode(mode) {
   var browserBtn = document.getElementById('settingsModeBrowser');
   var cloudBtn = document.getElementById('settingsModeCloud');
@@ -31589,6 +31610,8 @@ function settingsSetMode(mode) {
       var stLocal = document.getElementById('settingsStatusText');
       if (stLocal) stLocal.textContent = 'Opening Connect. Tap the mind you want there.';
       if (actionsDiv) actionsDiv.innerHTML = '';
+      // v-model-choice-sticks-v0: the old wizard buttons are gone; put the everyday row back
+      flRefillSettingsActions(actionsDiv);
       try { FlConnect.open(); } catch (eOpenL) {}
       return;
     }
@@ -36259,6 +36282,40 @@ window.FLAutoModel = (function() {
   }
 
   function isVision(name) { return VISION_RE.test(name || ''); }
+
+  // v-model-choice-sticks-v0: is the chosen model still installed? ('qwen2.5' matches 'qwen2.5:latest')
+  function onInstalledList(models, name) {
+    if (!name) return false;
+    var n = String(name);
+    return (models || []).some(function(m) {
+      var mn = String((m && (m.name || m.model)) || '');
+      return mn === n || mn === n + ':latest' || (n.indexOf(':') === -1 && mn.split(':')[0] === n);
+    });
+  }
+  // v-model-choice-sticks-v0: a user choice is only replaced when Ollama answers with a list that
+  // no longer has it. A quiet or empty answer never replaces anything. The words go in with textContent (showToast).
+  function checkChosenStillHere(current, tabId) {
+    if (!current || !current.model) return;
+    if (current.provider && current.provider !== 'ollama') return;
+    getInstalledModels(function(models) {
+      if (!models || !models.length) return;
+      if (typeof FLActiveModel === 'undefined' || !FLActiveModel.isUserChosen()) return;
+      if (FLActiveModel.get().model !== current.model) return;
+      if (onInstalledList(models, current.model)) return;
+      var needsVision = VISION_TABS.indexOf(tabId) !== -1;
+      var pool = models.filter(function(m) { return needsVision ? isVision(m.name) : !isVision(m.name); });
+      if (!pool.length) pool = models;
+      var pick = String((pool[0] && (pool[0].name || pool[0].model)) || '');
+      if (!pick) return;
+      safeSet('fl_modelChoiceGone', current.model);
+      FLActiveModel.set(pick, 'ollama', 'auto');
+      try {
+        if (typeof showToast === 'function') showToast('The model you chose, ' + current.model + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
+      } catch (eT) {}
+      try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
+    });
+  }
+
   function getPreferred(type) { return safeGet('fl_preferred_' + type + '_model', null); }
   function setPreferred(type, model) { safeSet('fl_preferred_' + type + '_model', model); }
 
@@ -36269,6 +36326,9 @@ window.FLAutoModel = (function() {
     // "User choice is sacred" — the auto-switcher must never lose it
     if (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen()) {
       var current = FLActiveModel.get();
+      // v-model-choice-sticks-v0: the person's model stays. Only if it left this computer
+      // does the picker fill in, and then it says so in plain words.
+      checkChosenStillHere(current, tabId);
       var needsVision = VISION_TABS.indexOf(tabId) !== -1;
       var currentIsVision = isVision(current.model);
       if (needsVision && !currentIsVision) {
