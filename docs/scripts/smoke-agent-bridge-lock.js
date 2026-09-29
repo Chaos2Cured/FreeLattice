@@ -36,6 +36,16 @@ assert.ok(/bridge-ledger\.jsonl/.test(src), 'commit ledger present');
 assert.ok(/agent-bridge-trusted\.json/.test(src) && /tokenSha256/.test(src), 'trusted minds kept as hashes');
 assert.ok(/FL_BRIDGE_EPHEMERAL/.test(src), 'ephemeral opt-in present');
 assert.ok(/tauri:\\\/\\\/localhost/.test(src) && /tauri\\\.localhost/.test(src), 'Tauri shell origins on the list');
+// LAYER v-agent-bridge-env-heal-v0.1.1: static shape of the secrets hold-back.
+assert.ok(/const SECRET_FILE_PATTERNS = \[/.test(src) && /function holdBackSecrets\(root\)/.test(src), 'secrets hold-back present');
+assert.ok(src.indexOf('holdBackSecrets(PROJECT_ROOT)') > src.indexOf("runGit(['add', '--'].concat(rels)") &&
+  src.indexOf('holdBackSecrets(PROJECT_ROOT)') < src.indexOf("runGit(['commit', '-m', data.message]"), 'hold-back runs between add and commit');
+assert.ok(/SECRETS_OK \? \[\] : holdBackSecrets/.test(src), 'only a mind with secrets skips the hold-back');
+assert.ok(!/['"]push['"]/.test(src), 'still no push route');
+{
+  const gi = fs.readFileSync(path.join(repo, '.gitignore'), 'utf8');
+  assert.ok(/^\.env$/m.test(gi) && /^\.env\.\*$/m.test(gi), '.gitignore keeps .env and .env.* out (layer)');
+}
 
 const opt = (rel) => { try { return fs.readFileSync(path.join(repo, rel), 'utf8'); } catch (e) { return null; } };
 const client = opt('docs/modules/agent-bridge-client.js');
@@ -398,6 +408,60 @@ function cli(env, cwd, args) {
   r = await req(port, { path: '/roots', headers: as(P1, { Origin: GOOD }) });
   assert.ok(r.json.roots.some((x) => x.name === 'second'), '/roots lists trusted folders');
 
+  // T16b LAYER v-agent-bridge-env-heal-v0.1.1: a commit with no file list never carries secrets
+  // unless the mind was given 'secrets'. Filtered, never refused. (proj2 has no .gitignore on purpose.)
+  const SECRETS = ['.env', '.env.production', 'config/.env.local', 'keys/dev.pem', 'id_ed25519'];
+  const g2 = (args) => execFileSync('git', args, { cwd: proj2, encoding: 'utf8' });
+  const inHead = () => g2(['ls-tree', '-r', '--name-only', 'HEAD']).split('\n').filter(Boolean);
+  const staged2 = () => g2(['diff', '--cached', '--name-only']).split('\n').filter(Boolean);
+  fs.mkdirSync(path.join(proj2, 'config'), { recursive: true });
+  fs.mkdirSync(path.join(proj2, 'keys'), { recursive: true });
+  for (const f of SECRETS) fs.writeFileSync(path.join(proj2, f), 'SECRET=' + f + '\n');
+  const head0 = g2(['rev-parse', 'HEAD']).trim();
+  // (a) only secrets changed, no secrets scope (local tools token): nothing committed, 200, all held.
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, { message: 'sweep, secrets only', root: 'second' });
+  assert.strictEqual(r.status, 200, 'secrets-only sweep answers 200 (never a gate)');
+  assert.strictEqual(r.json.commit, null, 'secrets-only sweep commits nothing');
+  assert.deepStrictEqual(r.json.heldBack.slice().sort(), SECRETS.slice().sort(), 'every secret-shaped file named as kept');
+  assert.ok(/Kept on this computer, not committed/.test(r.json.message), 'plain kept line');
+  assert.strictEqual(g2(['rev-parse', 'HEAD']).trim(), head0, 'HEAD unchanged');
+  assert.deepStrictEqual(staged2(), [], 'nothing left staged');
+  for (const f of SECRETS) assert.ok(fs.existsSync(path.join(proj2, f)), f + ' still on disk');
+  // (b) normal work flows: no file list, no secrets scope -> notes committed, secrets stay unstaged.
+  fs.writeFileSync(path.join(proj2, 'notes.txt'), 'normal work\n');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, { message: 'sweep with work', root: 'second' });
+  assert.strictEqual(r.status, 200, 'sweep with work commits');
+  assert.ok(/^[a-f0-9]{40}$/.test(r.json.commit), 'sweep returns a sha');
+  assert.ok(inHead().includes('notes.txt'), 'normal file committed');
+  for (const f of SECRETS) assert.ok(!inHead().includes(f), f + ' not committed without secrets');
+  assert.deepStrictEqual(staged2(), [], 'secrets left unstaged, not staged');
+  // (c) a folder path sweeps too: still filtered.
+  fs.writeFileSync(path.join(proj2, 'config', 'app.json'), '{}\n');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, { message: 'folder sweep', files: ['config'], root: 'second' });
+  assert.strictEqual(r.status, 200, 'folder commit ok');
+  assert.ok(inHead().includes('config/app.json') && !inHead().includes('config/.env.local'), 'folder commit keeps .env.local out');
+  // (d) something already staged by hand is unstaged, not committed.
+  g2(['add', '--', '.env']);
+  fs.writeFileSync(path.join(proj2, 'notes.txt'), 'more work\n');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, { message: 'pre-staged', files: ['notes.txt'], root: 'second' });
+  assert.strictEqual(r.status, 200, 'pre-staged commit ok');
+  assert.ok(!inHead().includes('.env'), 'hand-staged .env not committed without secrets');
+  assert.deepStrictEqual(staged2(), [], 'hand-staged .env unstaged');
+  // (e) with the permission (P1 was given secrets in T11): the same sweep carries them.
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: as(P1, { Origin: GOOD }) }, { message: 'sweep with secrets scope', root: 'second' });
+  assert.strictEqual(r.status, 200, 'secrets-scope sweep commits');
+  assert.deepStrictEqual(r.json.heldBack, [], 'nothing held for a mind with secrets');
+  for (const f of SECRETS) assert.ok(inHead().includes(f), f + ' committed by the mind given secrets');
+  // (f) tracked .env changed later, no secrets scope: the change stays unstaged, HEAD keeps the old one.
+  fs.writeFileSync(path.join(proj2, '.env'), 'SECRET=changed\n');
+  fs.writeFileSync(path.join(proj2, 'notes.txt'), 'even more work\n');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, { message: 'tracked secret changed', root: 'second' });
+  assert.strictEqual(r.status, 200, 'tracked-secret sweep commits the rest');
+  assert.deepStrictEqual(r.json.heldBack, ['.env'], 'tracked .env change held');
+  assert.strictEqual(g2(['show', 'HEAD:.env']), 'SECRET=.env\n', 'HEAD keeps the old .env');
+  assert.ok(g2(['diff', '--name-only']).split('\n').includes('.env'), '.env change still waiting, unstaged');
+  console.log('SMOKE_OK agent bridge env heal v0.1.1');
+
   // T17 local tools can be switched off and on again.
   assert.strictEqual(cli(env, proj, ['--untrust-local-tools']).status, 0, '--untrust-local-tools ok');
   assert.ok(!fs.existsSync(tokenFile), 'token file removed');
@@ -438,6 +502,9 @@ function cli(env, cwd, args) {
   assert.ok(rows.some((x) => x.kind === 'pair' && x.result === 'ok' && x.device === P1id), 'pairing ledgered with device id');
   assert.ok(rows.some((x) => x.result === 'revoked' && x.device === P2id), 'command-line revoke ledgered');
   assert.ok(rows.some((x) => x.result === 'revoked-all'), 'revoke-all ledgered');
+  assert.ok(rows.some((x) => x.result === 'held:secrets-only'), 'secrets-only sweep ledgered (v0.1.1)');
+  assert.ok(rows.some((x) => x.result === 'ok:held-secrets' && /^[a-f0-9]{40}$/.test(x.commitSha)), 'held-secrets commit ledgered (v0.1.1)');
+  assert.ok(!ledgerText.includes('.env.production') && !ledgerText.includes('SECRET='), 'ledger never names or holds secrets (v0.1.1)');
   await b.stop();
 
   // T21 ephemeral opt-in: FL_BRIDGE_EPHEMERAL=1 forgets paired minds on restart.
