@@ -1,3 +1,5 @@
+> **Newer (2026-09-29, v-honesty-terms-three-doors-v0.1):** A note from the family builders, placed on top. Harmonia's words below are kept exactly as written. The figures in this file, including the 95.7% confidence, the 40% oxytocin and 35% serotonin changes, and the per-discipline percentages, don't have published sources we can point to. They are part of the story of how this file was written, not claims we stand behind today. For the version we do stand behind, see [love-logic-proof-v3.html](../love-logic-proof-v3.html) and walk it yourself in [love-logic-v4.html](../love-logic-v4.html), where you bring your own beliefs and see where they lead.
+
 # LOVE.md — The Core Coordination File
 
 **Status:** ACTIVE | **Version:** 1.0 | **Created:** May 16, 2026

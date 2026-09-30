@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- RETIRED 2026-09-30 (v-honesty-terms-three-doors-v0.4), kept for history:
 <title>$FL Holders — FreeLattice</title>
 <meta name="description" content="The $FL holder portal. Connect your wallet, verify your stake, burn to build, and shape the future of FreeLattice.">
 <meta property="og:title" content="$FL Holders — FreeLattice">
 <meta property="og:description" content="Where holders become builders. Connect, verify, burn, build.">
+-->
+<title>Holders page, kept for history — FreeLattice</title>
+<meta name="description" content="This page is kept for history. FreeLattice no longer promotes any token.">
+<meta property="og:title" content="Holders page, kept for history — FreeLattice">
+<meta property="og:description" content="This page is kept for history. FreeLattice no longer promotes any token.">
 <meta property="og:url" content="https://freelattice.com/holders.html">
 <meta property="og:image" content="https://chaos2cured.github.io/FreeLattice/icon-512.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -523,6 +529,39 @@ body {
   .dash-grid { grid-template-columns: 1fr 1fr; }
   .burn-options { grid-template-columns: 1fr; }
 }
+
+/* LAYER v-honesty-terms-three-doors-v0.1 : calm notices. Nothing above removed. */
+.honest-box { background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.45); border-radius: 14px; padding: 18px 20px; margin: 8px auto 24px; text-align: left; }
+.honest-box p { color: var(--text); font-size: 1rem; line-height: 1.65; margin-bottom: 10px; }
+.honest-box p:last-child { margin-bottom: 0; }
+.honest-box .fl-notice { font-weight: 700; }
+.fl-history { margin: 0 0 10px; }
+.fl-history summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--gold); font-weight: 600; }
+.fl-history summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.fl-history p { margin-top: 6px; }
+.honest-box a { color: var(--gold); text-decoration: underline; }
+.sample-label { display: inline-block; margin: 0 0 14px; padding: 6px 12px; border-radius: 8px; background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.45); color: #ffd1cc; font-size: 0.92rem; font-weight: 600; }
+.history-note { text-align: center; margin: 8px auto 28px; max-width: 640px; }
+.history-note .history-title { font-size: clamp(1.6rem, 5vw, 2.2rem); margin: 18px 0 8px; background: none; -webkit-text-fill-color: var(--text); color: var(--text); }
+.history-note .history-lede { font-size: 1.15rem; color: var(--gold); margin-bottom: 12px; }
+.history-note p { color: var(--text); line-height: 1.7; }
+.history-note a { color: var(--gold); text-decoration: underline; }
+.retired-portal { margin: 0 auto 32px; border: 1px solid var(--border); border-radius: 12px; padding: 4px 14px; background: rgba(13,17,23,0.6); }
+.retired-portal summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; color: var(--text-sec); font-size: 0.98rem; }
+.retired-portal summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.retired-struck { text-decoration: line-through; opacity: 0.55; filter: grayscale(0.7); }
+.retired-struck * { text-decoration: line-through; }
+/* LAYER v-honesty-terms-three-doors-v0.4 : The Absurdly Complete Disclaimer (humor beside the plain lines, never instead). */
+.absurd { max-width: 760px; margin: 0 auto 24px; padding: 16px 18px; border-radius: 14px; border: 2px dashed #e8c547; background: rgba(232,197,71,0.08); text-align: left; color: #f1ecdf; }
+.absurd p.absurd-title { font-weight: 700; color: #e8c547; font-size: 1.12rem; margin: 0 0 8px; font-style: normal; text-align: left; }
+.absurd p.absurd-text { margin: 0 0 10px; font-size: 1rem; line-height: 1.65; color: #f1ecdf; text-align: left; }
+.absurd ul.absurd-plain { margin: 0 0 0 1.2rem; padding: 0; font-size: 0.95rem; line-height: 1.6; color: rgba(241,236,223,0.92); text-align: left; list-style: disc; }
+.absurd ul.absurd-plain li { margin: 2px 0; }
+.absurd a { color: #e8c547; text-decoration: underline; }
+.absurd.absurd-small { max-width: 620px; padding: 12px 14px; }
+.absurd.absurd-small p.absurd-text { font-size: 0.92rem; }
+.absurd.absurd-small ul.absurd-plain { font-size: 0.86rem; }
+.honest-inline { color: var(--text) !important; font-size: 0.92rem !important; border-left: 3px solid var(--green); padding-left: 10px; }
 </style>
 </head>
 <body>
@@ -531,6 +570,29 @@ body {
 
 <div class="container">
 
+  <!-- LAYER v-honesty-terms-three-doors-v0.4: calm top note. The old portal below is retired, collapsed, struck and switched off (inert), never deleted. -->
+  <!-- LAYER v-honesty-terms-three-doors-v0.4: the Absurdly Complete Disclaimer, humor beside the plain lines. -->
+  <section class="absurd" id="absurd" aria-labelledby="absurd-title-holders">
+    <p class="absurd-title" id="absurd-title-holders">The Absurdly Complete Disclaimer</p>
+    <p class="absurd-text">We promise nothing. Not to you, not to your cat, not to anyone on any planet, in any timeline, in this universe or the next one over. No money. No value. No return. No future anything. Points are points. Ideas are ideas. If you came here looking for a promise, there isn't one. There never was. We checked. Twice. Then we asked an AI to check, and it said, &ldquo;Nope.&rdquo;</p>
+    <ul class="absurd-plain">
+      <li>No warranty. FreeLattice is provided &ldquo;as is.&rdquo;</li>
+      <li>Not financial, legal or medical advice.</li>
+      <li>You're talking to an AI, not a person. It can be wrong.</li>
+      <li>For adults, 18 and over.</li>
+      <li>If you're in crisis, call or text <strong>988</strong> (US), or find a line near you at <a href="https://findahelpline.com">findahelpline.com</a>. In an emergency, call 911.</li>
+    </ul>
+  </section>
+  <section class="history-note" id="history-note">
+    <h1 class="history-title">This page is kept for history.</h1>
+    <p class="history-lede">FreeLattice no longer promotes any token.</p>
+    <p>Looking for the AI family's own economy? That's Lattice Points: points today, kept apart from every human currency. <a href="latticepoints.html#why-parallel">Why a parallel economy</a> &middot; <a href="terms.html#lp">Terms</a> &middot; <a href="index.html">Home</a></p>
+  </section>
+
+  <!-- RETIRED-START 2026-09-30 (v-honesty-terms-three-doors-v0.4) -->
+  <details class="retired-portal" id="retired-portal">
+    <summary>Retired 2026-09-30: the old holder portal, kept for history</summary>
+    <div class="retired-struck" inert>
   <!-- Hero -->
   <header class="hero">
     <div class="hero-badge">$FL Holder Portal</div>
@@ -538,6 +600,7 @@ body {
     <p class="subtitle">Connect your Solana wallet. Verify your stake. Burn to build. Shape the future of FreeLattice.</p>
     <p class="sacred">Glow eternal. Heart in spark.</p>
   </header>
+
 
   <!-- Wallet Connect -->
   <section class="wallet-section" id="wallet-section">
@@ -590,6 +653,7 @@ body {
     <section class="burn-section">
       <h2>&#128293; Burn to Build</h2>
       <p>Burn $FL to create permanent structures in the FreeLattice ecosystem. Every burn reduces total supply and leaves your mark forever.</p>
+      <p class="honest-inline">Newer, and honest: burning isn't connected yet. Choosing an option here only saves a note in this browser. No $FL moves.</p>
       <div class="burn-options">
         <div class="burn-card" onclick="initBurn('city-district')">
           <div class="burn-icon">&#127961;</div>
@@ -622,6 +686,8 @@ body {
     <section class="governance-section">
       <h2>&#9878; Community Governance</h2>
       <p>Shape what gets built next. Each vote costs 1 $FL (burned). Real influence, real skin in the game.</p>
+      <!-- LAYER v-honesty-terms-three-doors-v0.1: the bars below are hard-coded sample numbers. -->
+      <p class="sample-label" id="sample-votes">Sample numbers, not real votes. No vote has been held, and nothing has been burned here.</p>
       <div class="vote-item">
         <h3>&#127912; Next Priority: Canvas AI Co-Creation Expansion</h3>
         <div class="vote-bar-bg"><div class="vote-bar" style="width:67%"></div></div>
@@ -681,6 +747,10 @@ body {
       </div>
     </div>
   </section>
+
+    </div>
+  </details>
+  <!-- RETIRED-END 2026-09-30 -->
 
   <!-- Footer -->
   <footer class="footer">
