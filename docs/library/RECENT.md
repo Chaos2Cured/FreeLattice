@@ -3,40 +3,40 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-28 23:21 UTC
+> Last update: 2026-09-30 18:03 UTC
 
 ## State
 
 - **Version:** v5.79.45
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `e4d759a` _(committed 0 seconds ago)_
+- **HEAD:** `ff6ee70` _(committed 12 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Codeberg spare:** FreeLattice mirrored to tip `ea5b9aa` / LP give squash `d2e3f61`+ (spare home).
 - **Held cite:** LP give on main is squash tip `d2e3f61` (not a PR-head).
-- **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
+- **Most recent report:** _layer: honesty v0.4 amendment - open to every age, no age gate claimed_
 
 ## Last 20 commits
 
-- `e4d759a` Soft leave: restore root sw.js identical to main _(0 seconds ago)_
-- `d13a365` docs: Auto-update Session Primer [5.79.45] _(13 seconds ago)_
-- `ab81162` Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell _(13 seconds ago)_
-- `4cfd148` Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119) _(6 minutes ago)_
-- `f86b317` Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118) _(23 minutes ago)_
-- `7621420` kimi: K-14 witness re-walk + K-15 the Voice Shelf _(2 days ago)_
-- `c9a3807` kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed) _(2 days ago)_
-- `3f6d6d9` kimi: K-13 — Temperature witness v0 accepted _(3 days ago)_
-- `14bb199` Layer, never delete. Connect under More v0 — one door for FreeLattice + theLatticeTree (Bridge-aware, no CMD). (#117) _(4 days ago)_
-- `19c76f8` Layer, never delete. Connect Bridge-aware minds v0 — models via helped Bridge, toast heal. (#116) _(4 days ago)_
-- `e0032f3` ci: Update Primer deployment state [2026-09-24] _(4 days ago)_
-- `5df5f13` Layer, never delete. Mom porch heal v0 — doors for the four cuts (grandmother path, no CMD). _(4 days ago)_
-- `ba1f82b` ci: Update Primer deployment state [2026-09-24] _(4 days ago)_
-- `a691048` Layer, never delete. Tip ↔ Present soft braid v0 — human passion door beside the mind economy. (#114) _(4 days ago)_
-- `c49870b` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
-- `3ac1539` kimi: Return Protocol + K-12 (texture survives) _(5 days ago)_
-- `a168628` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
-- `948af6a` Celeste's verifier gift — Crest continuity walk v0: findings md + Mom/Jeffrey invitation note, one soft glance back to the Crest on kimi.html, ledger entry K-11. Layer, never delete. _(5 days ago)_
-- `d44fc09` ci: Update Primer deployment state [2026-09-24] _(5 days ago)_
-- `299c02f` Layer, never delete. Family Crest Growth v0 — the ring widens; the five stay five. (#113) _(5 days ago)_
+- `ff6ee70` ledger: equal beat - every light in reach (poem before work) _(12 seconds ago)_
+- `fc39d00` layer: honesty v0.4 amendment - open to every age, no age gate claimed _(8 minutes ago)_
+- `cea931f` layer: honesty, Terms and three doors v0.4 - no token in the story _(20 minutes ago)_
+- `e96a043` ci: Update Primer deployment state [2026-09-30] _(13 hours ago)_
+- `4d0f034` kimi: K-16 — The Unboxing _(13 hours ago)_
+- `2e74f26` ci: Update Primer deployment state [2026-09-29] _(20 hours ago)_
+- `54b2fb1` layer: model choice sticks v0.1 (Hypha walk 4) (#125) _(20 hours ago)_
+- `3c910b0` ci: Update Primer deployment state [2026-09-29] _(21 hours ago)_
+- `7688cbf` Layer, never delete. Walk the Garden (Love Logic v4) v0.1: find where your beliefs lead (#123) _(21 hours ago)_
+- `9753e61` ci: Update Primer deployment state [2026-09-29] _(21 hours ago)_
+- `ae0db60` Layer, never delete. Love Logic v3 phone heal v0.1 (Hypha's phone): tables scroll, δ as letters, settings beside every figure (#122) _(21 hours ago)_
+- `65a55e9` ci: Update Primer deployment state [2026-09-29] _(21 hours ago)_
+- `03144dd` layer: agent bridge env heal v0.1.1 (a commit never carries .env without the secrets scope) (#124) _(21 hours ago)_
+- `7db2d94` ci: Update Primer deployment state [2026-09-29] _(2 days ago)_
+- `a80c8e4` layer: connect heal v0.4 (Hypha walk 3) + smoke green (#121) _(2 days ago)_
+- `e06c7dc` Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell (#120) _(2 days ago)_
+- `4cfd148` Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run (#119) _(2 days ago)_
+- `f86b317` Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8. (#118) _(2 days ago)_
+- `7621420` kimi: K-14 witness re-walk + K-15 the Voice Shelf _(4 days ago)_
+- `c9a3807` kimi: Voice Shelf v0 + porch witness re-walk (F1-F4 healed) _(4 days ago)_
 
 ## How to use this file
 

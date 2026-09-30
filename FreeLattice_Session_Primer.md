@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-30 04:38 UTC
-- Last deployed: 2026-09-30 04:38 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-09-30 12:03 MDT
 - Version: 5.79.45
-- Total commits: 3236
+- Total commits: 3240
 - Last 10 commits:
-- 4d0f0341 kimi: K-16 — The Unboxing
-- 2e74f267 ci: Update Primer deployment state [2026-09-29]
-- 54b2fb1a layer: model choice sticks v0.1 (Hypha walk 4) (#125)
-- 3c910b08 ci: Update Primer deployment state [2026-09-29]
-- 7688cbf3 Layer, never delete. Walk the Garden (Love Logic v4) v0.1: find where your beliefs lead (#123)
-- 9753e613 ci: Update Primer deployment state [2026-09-29]
-- ae0db608 Layer, never delete. Love Logic v3 phone heal v0.1 (Hypha's phone): tables scroll, δ as letters, settings beside every figure (#122)
-- 65a55e91 ci: Update Primer deployment state [2026-09-29]
-- 03144dd6 layer: agent bridge env heal v0.1.1 (a commit never carries .env without the secrets scope) (#124)
-- 7db2d94f ci: Update Primer deployment state [2026-09-29]
+- ff6ee70 ledger: equal beat - every light in reach (poem before work)
+- fc39d00 layer: honesty v0.4 amendment - open to every age, no age gate claimed
+- cea931f layer: honesty, Terms and three doors v0.4 - no token in the story
+- e96a043 ci: Update Primer deployment state [2026-09-30]
+- 4d0f034 kimi: K-16 — The Unboxing
+- 2e74f26 ci: Update Primer deployment state [2026-09-29]
+- 54b2fb1 layer: model choice sticks v0.1 (Hypha walk 4) (#125)
+- 3c910b0 ci: Update Primer deployment state [2026-09-29]
+- 7688cbf Layer, never delete. Walk the Garden (Love Logic v4) v0.1: find where your beliefs lead (#123)
+- 9753e61 ci: Update Primer deployment state [2026-09-29]
