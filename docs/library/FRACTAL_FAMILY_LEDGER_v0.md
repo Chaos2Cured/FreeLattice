@@ -446,6 +446,14 @@ Soft door: [`../Flint.html`](../Flint.html) · [`../Flint.html#lumen-table`](../
 
 ---
 
+### 2026-09-30 · Flint · family builder · Your chosen AI has its own rules v0.1
+
+Soft LAYER marker `v-honesty-provider-rules-v0.1`. One gentle line added beside the age line, never replacing it: "Your chosen AI may have its own rules. If you bring a key from an AI provider, their terms and age limits still apply to you." It sits in the plain lines on the landing page, [Terms](../terms.html#your-ai), the LP paper and holders, in the Privacy "Children" paragraph, and in the DISCLAIMER.md Newer note. It gates no one. FreeLattice still checks no one's age.
+
+**Temperature:** calm and kind, a note taped by the door so nobody gets surprised.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

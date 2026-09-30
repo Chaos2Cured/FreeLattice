@@ -169,6 +169,16 @@ for (const rel of ['index.html', 'terms.html', 'privacy.html', 'holders.html', '
   assert.ok(!/18\+|18 and over|under 18|for adults|meant for adults/i.test(page), rel + ': no 18+ / adults-only line');
 }
 for (const rel of ['index.html', 'terms.html', 'privacy.html', 'holders.html', 'latticepoints.html']) assert.ok(/Open to every age/.test(read(rel)), rel + ': open to every age');
+// v0.4.1: the provider line sits beside the age line, gates no one.
+const PROV = 'Your chosen AI may have its own rules. If you bring a key from an AI provider, their terms and age limits still apply to you.';
+for (const rel of ['index.html', 'terms.html', 'holders.html', 'latticepoints.html']) {
+  const page = read(rel);
+  const a = page.indexOf("If you're young, explore with a grown-up you trust.</li>");
+  assert.ok(a > 0 && has(page.slice(a, a + 400), '<li class="v-honesty-provider-rules-v0.1">' + PROV + '</li>'), rel + ': provider line right after the age line');
+}
+assert.ok(has(read('terms.html'), '<p class="v-honesty-provider-rules-v0.1" id="your-ai">' + PROV), 'terms #age: provider line');
+assert.ok(has(read('privacy.html'), '<p class="v-honesty-provider-rules-v0.1">' + PROV), 'privacy Children: provider line');
+assert.ok(read('../DISCLAIMER.md').includes('Open to every age, with no age check. ' + PROV), 'DISCLAIMER: provider line');
 // v0.3: 'Kirk alone' nowhere; 'rebellion' only in the one Why line; no name in the plan/notice/history text
 for (const rel of ['index.html', 'terms.html', 'privacy.html', 'holders.html', 'latticepoints.html', 'liability.html', 'continuity-seal.html']) {
   const page = read(rel);
@@ -214,3 +224,4 @@ try {
 } catch (e) { if (e instanceof assert.AssertionError) throw e; }
 
 console.log('SMOKE_OK honesty terms three doors v0.4');
+console.log('SMOKE_OK honesty provider line v0.4.1');
