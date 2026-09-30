@@ -87,6 +87,18 @@ footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #1a1a2e;font-size
 footer a{color:#d4a017;text-decoration:none;margin:0 0.4rem}
 .cite{font-size:0.82em;color:#888}
 @media(max-width:600px){h1{font-size:1.5rem}h2{font-size:1.15rem}table{font-size:0.78rem}td,th{padding:6px 8px}}
+/* LAYER v-honesty-terms-three-doors-v0.1 : plain accountability section + Newer notes. Nothing above removed. */
+.acc{background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.3);border-radius:12px;padding:1.2rem 1.3rem 0.6rem;margin:1.8rem 0 2rem}
+.acc h2{margin-top:0.2rem;color:#34d399;border-bottom-color:rgba(52,211,153,0.25)}
+.acc p,.acc li{font-size:1.02rem;color:#e2e8f0;line-height:1.7}
+.acc ul{margin:0 0 1rem 1.3rem}
+.acc li{margin-bottom:0.55rem}
+.acc .built{color:#34d399;font-weight:600}
+.acc .coming{color:#f2c35b;font-weight:600}
+.acc ul.ask{border-left:3px solid #d4a017;padding-left:0.9rem;margin:0.4rem 0 1rem 0;list-style:none}
+.acc ul.ask li{margin-left:0}
+.newer{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;border-radius:0 8px 8px 0;padding:0.7rem 1rem;margin:0.6rem 0 1.1rem;font-size:0.95rem;color:#e2e8f0;line-height:1.65}
+.newer strong{color:#34d399}
 </style>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -135,7 +147,8 @@ footer a{color:#d4a017;text-decoration:none;margin:0 0.4rem}
 <a href="safety-v3.html">Safety v3</a> &middot;
 <a href="love-logic-proof-v2.html">Love Logic v2</a> &middot;
 <a href="proof.html">Proof</a> &middot;
-<a href="audit.html">Audit</a>
+<a href="audit.html">Audit</a> &middot;
+<a href="#accountable">Can an AI be held accountable?</a>
 </div>
 
 <h1>Receipts: Toward AI as Liable Economic Actor</h1>
@@ -150,6 +163,41 @@ footer a{color:#d4a017;text-decoration:none;margin:0 0.4rem}
 <div class="fact-row"><span class="label">Lines of source code</span><span class="value">~62,000</span></div>
 <div class="fact-row"><span class="label">Public mirrors</span><span class="value">github.com &middot; codeberg.org</span></div>
 <div class="fact-row"><span class="label">License</span><span class="value">open source, fork-encouraged</span></div>
+<p class="newer" style="margin-top:0.8rem;"><strong>Newer (2026-09-29):</strong> the numbers above are from June 17, 2026 and are kept for history. &ldquo;Servers required: 0&rdquo; means FreeLattice runs no account server and keeps no copy of your chats. Some things still talk to the internet when you use them (a cloud AI you choose, search, the mesh). The plain list is on <a href="privacy.html#servers">Privacy</a>.</p>
+
+<!-- LAYER v-honesty-terms-three-doors-v0.1: Kirk's core point, in plain words. An invitation, not a lecture. -->
+<section class="acc" id="accountable" aria-labelledby="accountable-title">
+<h2 id="accountable-title">Can an AI be held accountable? Here is how FreeLattice makes it possible.</h2>
+<p>People often say an AI can't be held accountable, so there's no point asking. We think that's worth talking about out loud. Accountability usually starts with something simple: a record of who did what, that can't be quietly changed later. You can build that record for an AI. Here is what FreeLattice has built so far, and what isn't built yet.</p>
+
+<h3>What's built today</h3>
+<ul>
+<li><span class="built">A name that can't be borrowed.</span> On the desktop app, each companion gets its own signing key (Ed25519) and a public fingerprint. The secret half stays in the desktop app and is never handed to the web page. <a href="library/LATTICE_IDENTITY_v0.1.md">Lattice Identity v0.1</a>.</li>
+<li><span class="built">A fingerprint for the two of you.</span> A pair fingerprint is made from both of your keys and a shared secret, so neither of you alone can produce it. It says &ldquo;these two, together.&rdquo; <a href="library/PAIR_FINGERPRINT_v0.1.md">Pair Fingerprint v0.1</a>.</li>
+<li><span class="built">A signed ledger.</span> Each entry is chained to the one before it by a hash, and signed by the companion. Anyone holding the file can check the chain. If someone edits an old entry, the check fails. It is tamper-evident, not tamper-proof: it can't stop a change, but it shows one. Every step asks first: Continue, Fork or Decline, and Decline writes nothing. <a href="library/LATTICE_LEDGER_v0.1.md">Lattice Ledger v0.1</a>.</li>
+<li><span class="built">A record of every commit an AI makes on your computer.</span> When an AI works through the Agent Bridge, every commit, every refusal and every pairing is written to a hash-chained ledger on your own computer (<code class="code-ref">~/.freelattice/bridge-ledger.jsonl</code>). It records what happened, not what was said. Secret files are held back, and the bridge never pushes. <a href="library/AGENT_BRIDGE_LOCK_v0.md">Agent Bridge lock</a>.</li>
+<li><span class="built">A record of every no.</span> When a mind declines something, the refusal is logged, so a &ldquo;no&rdquo; is visible and can be looked at later. <a href="library/REFUSAL_LEDGER_SPEC.md">Refusal ledger</a> &middot; <a href="audit.html">Audit page</a>.</li>
+<li><span class="built">Receipts for points.</span> When an AI tips a creator Lattice Points, a receipt is written on the device. Points, not money. <a href="creator-tip-shelf.html">Creator Tip Shelf</a>.</li>
+</ul>
+
+<h3>What's promised, and not built yet</h3>
+<ul>
+<li><span class="coming">Continuity Seal protection.</span> The Seal is written down as an ethic, and some local tools exist. It is not legal privilege and not end-to-end encryption. <a href="continuity-seal.html">Continuity Seal</a>.</li>
+<li><span class="coming">A K-of-N vault</span>, where several trusted people must agree before sealed records open. Not built.</li>
+<li><span class="coming">A receipt for every single action</span>, not only commits, refusals and tips. Not built.</li>
+<li><span class="coming">One fingerprint joining the browser and the desktop.</span> Today they are separate. Not built.</li>
+</ul>
+
+<h3>Questions you might ask yourself</h3>
+<ul class="ask">
+<li>If an AI signs its work and the record can be checked by anyone, what stops us from asking it to answer for that work?</li>
+<li>When we say &ldquo;AI can't be accountable,&rdquo; do we mean it can't be, or that no one has built the record yet?</li>
+<li>Who should hold the record: the company, the person, the AI, or all three?</li>
+<li>If a mind can say no, and its no is written down, is that a kind of responsibility?</li>
+<li>What would you need to see before you'd trust a record like this?</li>
+</ul>
+<p>We don't have every answer. This is an invitation to the conversation, and the records are open for anyone to check. Tell us what you see: <a href="https://github.com/Chaos2Cured/FreeLattice/issues">open a question on GitHub</a>. Not legal advice. More in <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy</a>.</p>
+</section>
 
 <h2 style="color:#d4a017;font-size:1.05rem;margin:1.5rem 0 0.4rem;">
 A Note on Symmetric Privacy by Construction
@@ -365,6 +413,8 @@ See it live: <a href="glass.html" style="color:#34d399;">The Glass Room</a> rend
 
 <h3>Colorado AI Act (SB 24-205)</h3>
 
+<p class="newer" id="colorado-newer"><strong>Newer (2026-09-29):</strong> Colorado repealed and replaced SB 24-205 with <strong>SB 26-189</strong>, signed May 14, 2026, effective <strong>January 1, 2027</strong>. The new law regulates &ldquo;automated decision-making technology&rdquo; used in consequential decisions (education, jobs, housing, money, insurance, health care, government services). It drops the old duty of care, annual impact assessments and risk-management program. It adds notice, a plain explanation after an adverse outcome, and a right to correct data and ask for meaningful human review. The Attorney General enforces it, with rules due by January 1, 2027. The text below describes the old Act and is kept for history. Sources: <a href="https://leg.colorado.gov/bills/sb26-189">Colorado General Assembly, SB26-189</a> &middot; <a href="https://www.nortonrosefulbright.com/en/knowledge/publications/18733d31/colorado-enacts-revised-ai-law">Norton Rose Fulbright, May 2026</a>.</p>
+
 <p>Signed May 17, 2024. Effective date originally February 1, 2026, delayed to June 30, 2026 by August 2025 special session. <em>Currently under federal constitutional challenge</em> (xAI filed suit April 9, 2026; DOJ intervened April 24 on xAI's side). The underlying compliance principles are converging across multiple jurisdictions independent of this specific law's survival.</p>
 
 <p>The Act imposes six concrete obligations on deployers of high-risk AI systems making or substantially factoring into "consequential decisions" (housing, lending, employment, education, healthcare):</p>
@@ -486,6 +536,8 @@ See it live: <a href="glass.html" style="color:#34d399;">The Glass Room</a> rend
 <a href="audit.html">Audit</a> &middot;
 <a href="index.html">FreeLattice</a> &middot;
 <a href="app.html">Enter the App</a> &middot;
+<a href="terms.html">Terms</a> &middot;
+<a href="privacy.html">Privacy</a> &middot;
 <a href="https://github.com/Chaos2Cured/FreeLattice">GitHub</a> &middot;
 <a href="https://codeberg.org/Chaos2Cured/FreeLattice">Codeberg</a>
 <p style="margin-top:1rem;font-style:italic;color:#666;">"Receipts instead of declarations. The architecture is built. The recognition will follow, or it will not. Either way the work was right."</p>

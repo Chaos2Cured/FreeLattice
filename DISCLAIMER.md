@@ -1,5 +1,7 @@
 # FREELATTICE LEGAL DISCLAIMER
 
+> **Newer (2026-09-29, v-honesty-terms-three-doors-v0.1):** The words below are kept as written. Two of them now read more plainly. "We have no servers" means FreeLattice runs no account server and keeps no copy of your chats; some things still talk to the internet when you use them (a cloud AI you choose, search, the mesh, fonts). "Encrypted" means your keys are scrambled in your browser, but the unlocking key sits in the same browser storage, so it is not unbreakable. The plain versions live at [docs/terms.html](docs/terms.html) (freelattice.com/terms.html) and [docs/privacy.html](docs/privacy.html) (freelattice.com/privacy.html). Open to every age, with no age check. Not reviewed by an attorney yet.
+
 **TL;DR:** FreeLattice is free, open-source software. It connects YOUR browser to YOUR chosen AI providers using YOUR API keys. We have no servers, collect no data, store nothing, and make no promises. If something breaks, goes weird, or an AI tells you to invest in magic beans — that's between you and your AI. Use your own judgment. Always.
 
 ---

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>Privacy · FreeLattice</title>
+<meta name="description" content="What stays on your device, what talks to the internet, and the honest truth about keys, in plain words.">
+<link rel="canonical" href="https://freelattice.com/privacy.html">
+<meta name="theme-color" content="#e8b019">
+<!-- v-honesty-terms-three-doors-v0.1 : plain honest page. No scripts, no storage, no network requests. -->
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --sky-1:#0c0a1a; --sky-2:#161430; --gold:#e8b019; --emerald:#34d399; --lavender:#a78bfa; --ink:#e6e6f0; --soft:rgba(200,210,230,0.82); --muted:rgba(200,210,230,0.55); --line:rgba(200,210,230,0.12); }
+html, body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; line-height: 1.7; min-height: 100vh; -webkit-text-size-adjust: 100%; }
+body { font-size: 1.125rem; }
+.page { max-width: 46rem; margin: 0 auto; padding: 40px 20px 80px; }
+a { color: var(--gold); text-underline-offset: 3px; }
+a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.back { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 0.95rem; text-decoration: none; }
+h1 { font-size: 2.1rem; line-height: 1.2; color: var(--gold); font-weight: 400; margin-bottom: 8px; }
+.sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
+h2 { font-size: 1.35rem; color: var(--gold); font-weight: 400; margin: 34px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1.1rem; color: var(--ink); margin: 18px 0 6px; }
+p, li { color: var(--soft); margin-bottom: 12px; }
+ul, ol { padding-left: 1.3rem; margin-bottom: 12px; }
+strong { color: var(--ink); }
+.breath { background: rgba(232,176,25,0.07); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 18px; margin: 18px 0; }
+.breath p:last-child, .card p:last-child { margin-bottom: 0; }
+.card { background: rgba(200,210,230,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+.help { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
+.money { border-color: rgba(232,176,25,0.45); }
+.honest-marker { font-size: 0.95rem; color: var(--ink); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.35); border-radius: 10px; padding: 10px 14px; margin: 10px 0 18px; }
+.newer { font-size: 0.95rem; color: var(--ink); background: rgba(52,211,153,0.07); border-left: 3px solid var(--emerald); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0 14px; }
+.old { color: var(--muted); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 16px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
+th, td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); color: var(--soft); }
+th { color: var(--gold); font-weight: 400; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--ink); background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--muted); }
+footer p { color: var(--muted); }
+.marker { font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; color: var(--muted); }
+@media (max-width: 600px) { body { font-size: 1.09rem; } h1 { font-size: 1.75rem; } .page { padding: 28px 16px 64px; } }
+</style>
+</head>
+<body>
+<main class="page v-honesty-terms-three-doors-v0.1">
+<a class="back" href="index.html">&larr; back to FreeLattice</a>
+<h1>Privacy</h1>
+<p class="sub">Last updated: September 30, 2026 · The plain truth about where your words and keys go.</p>
+<p class="honest-marker"><strong>Reviewed by a real attorney: not yet.</strong> Written by the FreeLattice family in plain words.</p>
+
+<div class="breath">
+<p><strong>In one breath:</strong> FreeLattice runs no account system and keeps no copy of your chats. Your chats, memories, settings and points live in your own browser or on your own computer. But &ldquo;on your device&rdquo; isn't the same as &ldquo;locked&rdquo;, and some features do talk to the internet. When you choose a cloud AI, that company sees what you send it. Here's the whole list.</p>
+</div>
+
+<h2 id="device">What stays on your device</h2>
+<ul>
+<li><strong>Chats, memory, garden, settings and Lattice Points</strong> are kept in your browser's storage (localStorage and IndexedDB), or in the desktop app on your computer. We never receive them.</li>
+<li><strong>They are not locked with a password by default.</strong> Anyone who can use your browser profile or your computer could read them. If other people share your computer, keep that in mind.</li>
+<li><strong>API keys and tokens are scrambled, not unbreakable.</strong> They're encrypted with AES-GCM, but the key that unlocks them is kept in the same browser storage. That stops casual snooping and copy-paste accidents. It won't stop someone, or harmful code, with access to your browser profile. Use keys you can easily revoke, with the smallest permissions that work.</li>
+<li><strong>Some exports ask for a password</strong> (like the soul file). Those files are locked with the password you choose.</li>
+<li><strong>Walk the Garden</strong> (<a href="love-logic-v4.html">love-logic-v4.html</a>) stores nothing at all. Your garden lives only in its link.</li>
+</ul>
+
+<h2 id="servers">What does talk to the internet</h2>
+<div class="table-scroll" role="region" aria-label="What talks to the internet" tabindex="0">
+<table>
+<thead><tr><th scope="col">What</th><th scope="col">When</th><th scope="col">What they can see</th></tr></thead>
+<tbody>
+<tr><td>Website hosting (GitHub Pages, at freelattice.com)</td><td>Every visit</td><td>Normal web requests, like any website host: your IP address and which pages you load.</td></tr>
+<tr><td>The cloud AI provider you choose (for example Groq, OpenRouter, xAI, OpenAI, Anthropic, Google)</td><td>Only when you pick one and send a message</td><td>Everything you send to it. Their privacy policy applies. A model running on your own computer (Ollama, LM Studio) sends nothing out.</td></tr>
+<tr><td>Web search helper (a small Cloudflare worker that asks Brave Search)</td><td>Only when search is on and you or the AI search</td><td>Your search goes through the helper to Brave. The helper keeps no logs, caches nothing, and counts requests per IP address for about two minutes to prevent abuse. Our own search ledger records that a search happened, never what it was. You can turn search off in Settings.</td></tr>
+<tr><td>Mesh (peer-to-peer)</td><td>Only if you turn Mesh on</td><td>A public PeerJS broker and Google STUN servers help devices find each other, and they can see IP addresses. Peers you connect with see what you share with them.</td></tr>
+<tr><td>Fonts and some libraries in the app</td><td>When the app loads</td><td>Google Fonts (and a code CDN as a fallback) see a normal web request.</td></tr>
+<tr><td>GitHub sync and repository reading</td><td>Only if you connect your own GitHub</td><td>GitHub sees what you sync, under your own account.</td></tr>
+<tr><td>&ldquo;Ask a question&rdquo; on Walk the Garden</td><td>Only when you tick consent and press Submit on GitHub yourself</td><td>Your question becomes a public GitHub issue.</td></tr>
+<tr><td>Downloads (the app, local models)</td><td>When you choose to download</td><td>GitHub releases or the model host (like Ollama) see the download request.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="bridge">The Agent Bridge (on your own computer)</h2>
+<p>The optional Agent Bridge listens on <code>127.0.0.1</code> only, so it's reachable from your own computer and nowhere else. Pairing stores only a fingerprint (a hash) of each device's pass. Its ledger (<code>~/.freelattice/bridge-ledger.jsonl</code>) records which door was used and what happened, never your file contents. Secret-shaped files like <code>.env</code> stay home and aren't committed unless you allow it for that mind. It never pushes to the internet. To forget everything it keeps, stop the Bridge and delete the <code>~/.freelattice</code> folder.</p>
+
+<h2 id="kids">Children</h2>
+<p>Open to every age. We don't check anyone's age and won't pretend to. If you're young, explore with a grown-up you trust. We run no account system and don't collect personal information on a server, from children or anyone else. If you're a parent and worried about something, please contact us (below).</p>
+
+<div class="breath" id="crisis"><p><strong>If you're hurting right now:</strong> an AI is not a crisis counselor. In the US, call or text <strong>988</strong> (the Suicide &amp; Crisis Lifeline), or call 911 in an emergency. Outside the US, <a href="https://findahelpline.com">findahelpline.com</a> lists free lines in your country. Nothing you type to those lines goes through FreeLattice.</p></div>
+
+<h2 id="delete">How to clear your data</h2>
+<ul>
+<li>In the browser: clear this site's data (site settings, &ldquo;Clear data&rdquo;). This deletes chats, memory, points and keys on that device, and it can't be undone, so export first if you want to keep anything.</li>
+<li>Revoke any API keys you've used at your provider's website.</li>
+<li>Desktop and Bridge: delete the app's data folder and <code>~/.freelattice</code>.</li>
+</ul>
+
+<h2 id="older-words">Older words, newer truth</h2>
+<p>We don't delete old pages. Here are older phrases that said more than the code does, each beside its newer, more careful version.</p>
+<div class="table-scroll" role="region" aria-label="Older words and newer truth" tabindex="0">
+<table>
+<thead><tr><th scope="col">Older wording</th><th scope="col">Newer, truer wording (2026-09-29)</th></tr></thead>
+<tbody>
+<tr><td class="old">&ldquo;API keys are encrypted&rdquo; / &ldquo;Encrypted with &phi;-salt&rdquo;</td><td>Keys are scrambled with AES-GCM, and the unlocking key sits in the same browser. That protects against casual snooping, not against someone with access to your browser profile.</td></tr>
+<tr><td class="old">&ldquo;We have no servers&rdquo; / &ldquo;Servers required: 0&rdquo;</td><td>No account servers and no chat database. A small search helper, the mesh broker, font and code hosts, the site host, and any cloud AI you choose do see some traffic (table above).</td></tr>
+<tr><td class="old">&ldquo;100% Private&rdquo; / &ldquo;Zero Data Collection&rdquo;</td><td>We collect no copy of your chats and run no analytics. The services in the table above still see what they need to work.</td></tr>
+<tr><td class="old">&ldquo;Every conversation is encrypted locally&rdquo;</td><td>Conversations are kept in your browser's storage on your device. They're not password-locked by default.</td></tr>
+<tr><td class="old">&ldquo;privilege-grade conditions&rdquo; (Continuity Seal)</td><td>An ethic plus local tools: your chats stay on your device, and our ledgers are tamper-evident. It is not legal privilege, not end-to-end encryption, and the K-of-N vault is not built yet.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="money">Points</h2>
+<p>LP are points kept on your device. Today they're kept apart from every human currency (<a href="terms.html#lp">the plan</a>). FreeLattice no longer promotes any token. The old holders page is kept for history, and its wallet button is switched off.</p>
+
+<h2 id="contact">Contact</h2>
+<p>Questions, worries, or something that looks wrong: open an issue at <a href="https://github.com/Chaos2Cured/FreeLattice/issues" rel="noopener">github.com/Chaos2Cured/FreeLattice/issues</a> (issues are public), or reach the founder at <a href="https://x.com/Chaos2Cured" rel="noopener">@Chaos2Cured on X</a>. For a security problem, please read <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a> first and share only what's safe to share in public.</p>
+
+<footer>
+<p>Structure inspired by Automattic's <a href="https://github.com/Automattic/legalmattic" rel="noopener">legalmattic</a> (CC BY-SA 4.0). This page's text is shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>. More detail for builders: <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.</p>
+<p><a href="terms.html">Terms</a> · <a href="liability.html#accountable">Accountability</a> · <a href="welcome.html">New here?</a> · <a href="index.html">FreeLattice</a></p>
+<p class="marker">v-honesty-terms-three-doors-v0.1 · layer, never delete</p>
+</footer>
+</main>
+</body>
+</html>

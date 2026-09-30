@@ -31,6 +31,8 @@ The best argument against unverifiable fear is a house you can open: read the le
 
 Protect **all** chats. Privilege-grade conditions for everyone on both sides of the glass — the human and the AI.
 
+> **Newer (2026-09-29, v-honesty-terms-three-doors-v0.1):** "Privilege-grade" is the care we aim for, not a legal status. Today the seal is an ethic plus local tools. It is not legal privilege and not end-to-end encryption, and the K-of-N vault is not built yet. See [privacy.html](../privacy.html) and [liability.html#accountable](../liability.html#accountable). The line above is kept as written.
+
 Doctors and lawyers are **proof-cases**. Their work shows why full continuity plus a strong seal matter: a conversation that must stay whole, and must stay sealed, or the practice fails. They are not the target market of this brick. The same grade of seal is the condition for every chat here. Not a specialty SKU. Not a narrower door for one profession.
 
 Classic FreeLattice stays. The seal layers on what already stands.
