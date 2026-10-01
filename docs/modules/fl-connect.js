@@ -317,6 +317,26 @@
 
   function isConnected() { return hasLocalMind(); }
 
+  // v-tree-any-model-v0: 11434 is the Ollama door; any other 127.0.0.1 port here is the Bridge
+  function doorNameFor(base, port) {
+    var p = String(port || '');
+    var m = String(base || '').match(/:(\d{1,5})\/?$/);
+    if (!p && m) p = m[1];
+    return (!p || p === '11434') ? 'Ollama' : 'Bridge';
+  }
+
+  // v-tree-any-model-v0: which model speaks now, so the Connect card can show it
+  function chosenModelName() {
+    try {
+      if (isAlpha()) {
+        var m = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
+        return m && m.model ? String(m.model) : '';
+      }
+      if (root.state && root.state.ollamaModel) return String(root.state.ollamaModel);
+      return String(localStorage.getItem('fl_ollamaModel') || '');
+    } catch (e) { return ''; }
+  }
+
   function remember(mind) {
     mind = mind || {};
     var name = mind.name || mind.model || (mind.models && mind.models[0] && (mind.models[0].name || mind.models[0])) || '';
@@ -325,6 +345,18 @@
     if (!base && mind.port) base = 'http://127.0.0.1:' + mind.port;
 
     if (isAlpha()) {
+      // v-tree-any-model-v0: on the Tree, Connect merges into the sky (all models, other doors kept)
+      if (root.LocalMindProbe && typeof root.LocalMindProbe.mergeFound === 'function') {
+        try {
+          var merged = root.LocalMindProbe.mergeFound({
+            name: doorNameFor(base, mind.port),
+            url: base ? String(base).replace(/\/+$/, '') + '/api/tags' : '',
+            models: mind.models || [],
+            model: name
+          });
+          if (merged) { stopLoop(); return merged; }
+        } catch (eM) {}
+      }
       var entry = {
         name: name || 'local mind',
         url: (base ? String(base).replace(/\/+$/, '') + '/api/tags' : ''),
@@ -516,8 +548,13 @@
         btn.className = 'flc-model';
         btn.textContent = name;
         btn.dataset.model = name;
+        // v-tree-any-model-v0: show what speaks
+        var isOn = chosenModelName() === name;
+        btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+        if (isOn) btn.classList.add('is-chosen');
         btn.addEventListener('click', function () {
-          remember({ name: name, base: report.base, port: report.port });
+          // v-tree-any-model-v0: pass the whole list along (FreeLattice's branch ignores it)
+          remember({ name: name, base: report.base, port: report.port, models: report.models });
           refreshUI({ force: true });
           try { if (typeof root.showToast === 'function') root.showToast('Connected · ' + name); } catch (eT) {}
         });
@@ -685,6 +722,7 @@
       '.flc-tag{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#a5f3fc;margin:0 0 .6rem;font-family:ui-monospace,Menlo,monospace}',
       '.flc-models{display:flex;flex-direction:column;gap:.45rem}',
       '.flc-model{min-height:44px;text-align:left;padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(200,210,230,.16);background:rgba(8,6,18,.45);color:#e6ebf5;font:inherit;cursor:pointer}',
+      '.flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}', /* v-tree-any-model-v0 */
       '.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}',
       '.flc-primary{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.45);color:#34d399}',
       '.flc-soft{font-size:.8rem;color:rgba(148,163,184,.95);margin:.65rem 0 0;line-height:1.45}',
