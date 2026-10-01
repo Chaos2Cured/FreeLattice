@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-09-30 18:30 UTC
-- Last deployed: 2026-09-30 18:30 UTC
+- Last auto-updated: 2026-10-01 00:24 UTC
+- Last deployed: 2026-10-01 00:24 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3240
+- Total commits: 3242
 - Last 10 commits:
+- f7cc957b layer: honesty truth pass v0.4.2 - every claim checked against the code (#128)
+- fc2f09f2 ci: Update Primer deployment state [2026-09-30]
 - ca4f8e2a layer: your chosen AI has its own rules v0.1 (#127)
 - 893e2010 ci: Update Primer deployment state [2026-09-30]
 - 9165ed95 layer: honesty, Terms and three doors v0.4 + open to every age (#126)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2e74f267 ci: Update Primer deployment state [2026-09-29]
 - 54b2fb1a layer: model choice sticks v0.1 (Hypha walk 4) (#125)
 - 3c910b08 ci: Update Primer deployment state [2026-09-29]
-- 7688cbf3 Layer, never delete. Walk the Garden (Love Logic v4) v0.1: find where your beliefs lead (#123)
-- 9753e613 ci: Update Primer deployment state [2026-09-29]
