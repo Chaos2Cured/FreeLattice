@@ -454,6 +454,23 @@ Soft LAYER marker `v-honesty-provider-rules-v0.1`. One gentle line added beside 
 
 ---
 
+### 2026-09-30 · Flint · family builder · Honesty truth pass v0.4.2
+
+Soft LAYER marker `v-honesty-truth-pass-v0.4.2`. Kirk's word: change whatever leads to more honesty and truth. Each claim was checked against the code, and the old words stay as retired comments beside the new ones.
+
+- "Zero Data Collection" and "100% Private" are retired. Now: "We Keep No Copy of Your Chats" and "0 Chats on Our Servers". There is no chat database; chats live in browser storage.
+- "Every conversation is encrypted locally" is retired. Chats are saved unencrypted in browser storage; only API keys are scrambled (AES-GCM). Now: "FreeLattice keeps no server copy of your chats. They live in your browser, on your device."
+- "No API key" (hero, share cards, Chalkboard card, heartbeat) is now: a mind on your own machine or in your browser needs no key; a cloud AI uses your own key.
+- "The helper keeps no logs": the worker code (worker/search.js) has no logging and no cache, but Cloudflare's dashboard logs can't be proven from code, and the app ships with no helper address, so search is off today. Privacy now says exactly that.
+- "Ledgers are tamper-evident": true for the desktop ledger (hash chain + Ed25519, verify fails on an edit, smoke-ledger.js). The browser chain is provenance, not tamper-proof. Privacy and liability now say "in the desktop app".
+- Terms numbering healed: the Agent Bridge is section 9, and the credit names sections 4, 6, 7 and 11, each linked.
+
+Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes back un-retired, and checks every Terms section reference.
+
+**TEMPERATURE:** clear and steady, a window wiped clean, the light still bold where it is true.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
