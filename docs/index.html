@@ -18,7 +18,8 @@
 
 <!-- Open Graph -->
 <meta property="og:title" content="FreeLattice — Your AI. Local. Free. Yours.">
-<meta property="og:description" content="An open-source AI platform that runs on your computer. No account. No API key. No surveillance. Draw, chat, create with AI that belongs to you.">
+<!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: og:description said "No account. No API key. No surveillance." A cloud AI needs your own key. -->
+<meta property="og:description" content="An open-source AI platform that runs on your computer or in your browser. No account. A mind on your own machine needs no key; a cloud AI uses your own. Draw, chat, create with AI that belongs to you.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://freelattice.com">
 <!-- NOTE: og-image.png (1200x630) needs to be uploaded to docs/ — showing the Chalkboard or Garden with the tagline -->
@@ -28,7 +29,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@Chaos2Cured">
 <meta name="twitter:title" content="FreeLattice — Your AI. Local. Free. Yours.">
-<meta name="twitter:description" content="Open-source AI that runs on your computer. No account. No API key. Free forever.">
+<!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: twitter:description said "No API key." -->
+<meta name="twitter:description" content="Open-source AI that runs on your computer. No account. Local minds need no key. Free forever.">
 <meta name="twitter:image" content="https://freelattice.com/og-image.png">
 
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -1130,12 +1132,14 @@ a:hover{opacity:0.85}
   <div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(to bottom, rgba(6,10,20,0.3) 0%, rgba(6,10,20,0.55) 40%, rgba(6,10,20,0.75) 80%, rgba(10,14,26,0.95) 100%);pointer-events:none;"></div>
   <div class="hero-badge" style="position:relative;z-index:2;">
     <span class="dot"></span>
-    Open Source &middot; Free Forever &middot; Zero Data Collection
+    <!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: "Zero Data Collection". The site host, fonts and any cloud AI you choose still see some traffic (privacy.html#servers). What is true: FreeLattice keeps no server copy of your chats (no chat database exists; chats are saved in your browser's IndexedDB and localStorage). -->
+    Open Source &middot; Free Forever &middot; We Keep No Copy of Your Chats
   </div>
   <h1>FreeLattice</h1>
   <div class="hero-tagline">Your AI. Local. Free. Yours.</div>
   <p class="hero-desc">
-    An open-source AI platform that runs on your computer. No account. No API key. No surveillance.
+    <!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: "An open-source AI platform that runs on your computer. No account. No API key. No surveillance." A cloud AI needs your own key. -->
+    An open-source AI platform that runs on your computer or right in your browser. No account. No tracking. A mind on your own machine or in your browser needs no key. A cloud AI uses your own key.
   </p>
   <p style="font-family:Georgia,serif;font-size:0.95rem;color:rgba(255,255,255,0.7);max-width:520px;margin:0 auto 12px;line-height:1.6;position:relative;z-index:2;">
     Your AI remembers you. Your conversations persist. Your creations publish. Your data stays yours.<br>
@@ -1186,9 +1190,15 @@ a:hover{opacity:0.85}
       <span class="hero-stat-num">10+</span>
       <span class="hero-stat-label">AI Providers</span>
     </div>
+    <!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: hero stat "100% Private". Any cloud AI you choose sees what you send it. What is true and checkable: no chat database, no server copy of your chats.
     <div class="hero-stat">
       <span class="hero-stat-num">100%</span>
       <span class="hero-stat-label">Private</span>
+    </div>
+    -->
+    <div class="hero-stat">
+      <span class="hero-stat-num">0</span>
+      <span class="hero-stat-label">Chats on Our Servers</span>
     </div>
     <div class="hero-stat">
       <span class="hero-stat-num">1</span>
@@ -1211,8 +1221,8 @@ a:hover{opacity:0.85}
       <span class="hero-stat-label">Lighthouse</span>
     </div>
   </div>
-  <!-- LAYER v-honesty-terms-three-doors-v0.1: Newer note beside "100% Private" and "Zero Data Collection" (old words kept above). -->
-  <p class="honest-note">Newer, and honest: &ldquo;100% Private&rdquo; and &ldquo;Zero Data Collection&rdquo; mean no accounts, no analytics, and no copy of your chats with us. When you choose a cloud AI, it sees what you send it. <a href="privacy.html">Privacy</a> lists everything that talks to the internet. <a href="terms.html">Terms</a> · Open to every age.</p>
+  <!-- LAYER v-honesty-terms-three-doors-v0.1: Newer note beside "100% Private" and "Zero Data Collection". v-honesty-truth-pass-v0.4.2: those words are now retired in comments above. -->
+  <p class="honest-note">Newer, and honest: the older words &ldquo;100% Private&rdquo; and &ldquo;Zero Data Collection&rdquo; are retired. Plainly: no accounts, no analytics, and no copy of your chats with us. When you choose a cloud AI, it sees what you send it. <a href="privacy.html">Privacy</a> lists everything that talks to the internet. <a href="terms.html">Terms</a> · Open to every age.</p>
 </section>
 
 <!-- ============================================================
@@ -1321,9 +1331,10 @@ a:hover{opacity:0.85}
         <span class="why-icon">&#128274;</span>
         <div class="why-title">Privacy</div>
         <div class="why-text">
-          Your data stays on your machine. Period. No accounts, no telemetry, no analytics, no tracking pixels. Every conversation is encrypted locally. When you run Ollama, even the AI itself runs on your hardware. Your thoughts are yours alone.
+          <!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: "Your data stays on your machine. Period. No accounts, no telemetry, no analytics, no tracking pixels. Every conversation is encrypted locally. When you run Ollama, even the AI itself runs on your hardware. Your thoughts are yours alone." Chats are saved unencrypted in browser storage (app.html saves messages with a plain IndexedDB put); only API keys are AES-GCM scrambled. -->
+          FreeLattice keeps no server copy of your chats. They live in your browser, on your device. No accounts, no telemetry, no analytics, no tracking pixels. When you run Ollama, even the AI itself runs on your hardware, and your words never leave your computer. Your thoughts are yours.
         </div>
-        <!-- LAYER v-honesty-terms-three-doors-v0.1: Newer note beside "encrypted locally" (old words kept above). -->
+        <!-- LAYER v-honesty-terms-three-doors-v0.1: Newer note beside "encrypted locally". v-honesty-truth-pass-v0.4.2: the old words are retired in the comment above. -->
         <div class="why-newer">Newer, and honest: your chats are kept in your browser on your device, but they aren't password-locked by default. Keys are scrambled, not unbreakable. <a href="privacy.html">The full, plain truth</a>.</div>
       </div>
       <div class="why-card reveal">

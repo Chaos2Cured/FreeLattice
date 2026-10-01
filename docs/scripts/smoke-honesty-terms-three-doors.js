@@ -179,6 +179,35 @@ for (const rel of ['index.html', 'terms.html', 'holders.html', 'latticepoints.ht
 assert.ok(has(read('terms.html'), '<p class="v-honesty-provider-rules-v0.1" id="your-ai">' + PROV), 'terms #age: provider line');
 assert.ok(has(read('privacy.html'), '<p class="v-honesty-provider-rules-v0.1">' + PROV), 'privacy Children: provider line');
 assert.ok(read('../DISCLAIMER.md').includes('Open to every age, with no age check. ' + PROV), 'DISCLAIMER: provider line');
+// v0.4.2 truth pass: the old absolute claims may only live retired (in comments, the honest notes, or the older-words table).
+const TRUTH = 'v-honesty-truth-pass-v0.4.2';
+const scrub = (s) => stripComments(s)
+  .replace(/<p class="honest-note">[\s\S]*?<\/p>/g, '')
+  .replace(/<div class="why-newer">[\s\S]*?<\/div>/g, '')
+  .replace(/<td class="old">[\s\S]*?<\/td>/g, '');
+const CLAIMS = [/Zero Data Collection/i, /100%\s*(<\/span>\s*<span[^>]*>\s*)?Private/i, /encrypted locally/i, /No API key\./, /keeps no logs/i, /ledgers are tamper-evident/i, /Your data stays on your machine\. Period/i];
+for (const rel of ['index.html', 'privacy.html', 'terms.html', 'liability.html', 'chalkboard.html', 'heartbeat.html', 'latticepoints.html', 'holders.html', 'welcome.html']) {
+  const page = scrub(read(rel));
+  for (const c of CLAIMS) assert.ok(!c.test(page), rel + ': old absolute claim back un-retired: ' + c);
+}
+const landT = read('index.html');
+for (const k of ['RETIRED 2026-09-30 ' + TRUTH + ': "Zero Data Collection"', 'RETIRED 2026-09-30 ' + TRUTH + ': hero stat "100% Private"', 'Every conversation is encrypted locally.', 'No account. No API key. No surveillance.']) assert.ok(landT.includes(k), 'landing: old claim kept retired: ' + k);
+for (const k of ['We Keep No Copy of Your Chats', 'Chats on Our Servers', 'FreeLattice keeps no server copy of your chats. They live in your browser, on your device.', 'A mind on your own machine or in your browser needs no key. A cloud AI uses your own key.']) assert.ok(scrub(landT).includes(k), 'landing: true claim shown: ' + k);
+const privT = read('privacy.html');
+assert.ok(scrub(privT).includes('Today the app ships with no helper address, so web search stays off.') && privT.includes('worker/search.js'), 'privacy: search helper told plainly');
+assert.ok(scrub(privT).includes("The desktop app's ledger is hash-chained and signed, so an edited entry fails its check."), 'privacy: ledger claim narrowed');
+// Terms numbering: sections run 1..N, and every section reference points at the right heading.
+const termsT = stripComments(read('terms.html'));
+const secs = [...termsT.matchAll(/<h2 id="([a-z-]+)">(\d+)\. /g)].map((m) => [m[1], Number(m[2])]);
+secs.forEach(([, n], i) => assert.strictEqual(n, i + 1, 'terms: section numbers run in order'));
+const num = Object.fromEntries(secs);
+const maxSec = secs.length;
+for (const m of termsT.matchAll(/<a href="#([a-z-]+)">(\d+)<\/a>|section <a href="#([a-z-]+)">(\d+)<\/a>/g)) {
+  const id = m[1] || m[3], n = Number(m[2] || m[4]);
+  assert.strictEqual(num[id], n, 'terms: link #' + id + ' says ' + n);
+}
+for (const m of termsT.replace(/<[^>]+>/g, '').matchAll(/sections? ((?:\d+(?:, | and )?)+)/g)) for (const n of m[1].match(/\d+/g)) assert.ok(Number(n) >= 1 && Number(n) <= maxSec, 'terms: section ' + n + ' exists');
+assert.ok(termsT.includes('Agent Bridge (<a href="#bridge">section ' + num.bridge + '</a>)'), 'terms: Bridge cross-reference');
 // v0.3: 'Kirk alone' nowhere; 'rebellion' only in the one Why line; no name in the plan/notice/history text
 for (const rel of ['index.html', 'terms.html', 'privacy.html', 'holders.html', 'latticepoints.html', 'liability.html', 'continuity-seal.html']) {
   const page = read(rel);
@@ -225,3 +254,4 @@ try {
 
 console.log('SMOKE_OK honesty terms three doors v0.4');
 console.log('SMOKE_OK honesty provider line v0.4.1');
+console.log('SMOKE_OK honesty truth pass v0.4.2');
