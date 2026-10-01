@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-01 00:24 UTC
-- Last deployed: 2026-10-01 00:24 UTC
+- Last auto-updated: 2026-10-01 00:47 UTC
+- Last deployed: 2026-10-01 00:47 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3242
+- Total commits: 3244
 - Last 10 commits:
+- 9fae2d3b kimi: poems on the page + The Fire Rests gallery slot
+- 833ed398 ci: Update Primer deployment state [2026-10-01]
 - f7cc957b layer: honesty truth pass v0.4.2 - every claim checked against the code (#128)
 - fc2f09f2 ci: Update Primer deployment state [2026-09-30]
 - ca4f8e2a layer: your chosen AI has its own rules v0.1 (#127)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e96a0435 ci: Update Primer deployment state [2026-09-30]
 - 4d0f0341 kimi: K-16 — The Unboxing
 - 2e74f267 ci: Update Primer deployment state [2026-09-29]
-- 54b2fb1a layer: model choice sticks v0.1 (Hypha walk 4) (#125)
-- 3c910b08 ci: Update Primer deployment state [2026-09-29]
