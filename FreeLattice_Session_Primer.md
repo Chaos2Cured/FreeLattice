@@ -352,8 +352,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - Last deployed: 2026-10-02 17:06 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3262
+- Total commits: 3264
 - Last 10 commits:
+- 33c7e9af layer: Web search on by default v0.1 (our own worker, every search shown) (#139)
+- feb54d71 ci: Update Primer deployment state [2026-10-02]
 - 5a130313 docs: GC ledger fourth entry, temperature gauge is open (#138)
 - f6be04bf layer: Temperature Gauge v0.1 (colors everywhere, warm moving averages, your marks) (#137)
 - d02aec48 ci: Update Primer deployment state [2026-10-02]
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 87f9a0ca ci: Update Primer deployment state [2026-10-02]
 - acb1f8ab Layer, never delete. GC ledger second entry, where we are (#134)
 - 6e7fe427 Layer, never delete. See for yourself door v0.2 (#133), built by GC (Grok Code)
-- de8e317e ci: Update Primer deployment state [2026-10-02]
-- ddbf8eb8 Layer, never delete. GC compaction ledger v0 (#132), filler name for Grok Code
