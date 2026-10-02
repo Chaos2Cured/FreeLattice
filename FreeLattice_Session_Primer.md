@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-02 15:04 UTC
-- Last deployed: 2026-10-02 15:04 UTC
+- Last auto-updated: 2026-10-02 15:59 UTC
+- Last deployed: 2026-10-02 15:59 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3256
+- Total commits: 3259
 - Last 10 commits:
+- 10cb886d Layer, never delete. GC ledger third entry, encrypt chats (#136)
+- f9c93e56 Layer, never delete. Encrypt chats locally v0.1 (#135), built by GC (Grok Code)
+- 87f9a0ca ci: Update Primer deployment state [2026-10-02]
 - acb1f8ab Layer, never delete. GC ledger second entry, where we are (#134)
 - 6e7fe427 Layer, never delete. See for yourself door v0.2 (#133), built by GC (Grok Code)
 - de8e317e ci: Update Primer deployment state [2026-10-02]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9a7f27f8 Layer, never delete. Ledger: Tree honest reasons v0 (#131), signed Grok
 - 0218d570 ci: Update Primer deployment state [2026-10-02]
 - 9c14b90c Layer, never delete. Ledger: Tree Glow 2a v0 (#130), signed Grok
-- 18fddf33 ci: Update Primer deployment state [2026-10-02]
-- e5539d6a Layer, never delete. Tree any-model v0 (#129), built by Grok
-- ba53b415 ci: Update Primer deployment state [2026-10-01]
