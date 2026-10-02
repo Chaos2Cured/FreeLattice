@@ -17371,12 +17371,21 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- Web Search Toggle (v5.41.1 — Ship 3.1) -->
   <div class="section" id="webSearchToggleSection">
     <div class="section-title">&#x1F50E; Web Search</div>
+    <!-- before v-web-search-default-on-v0.1: the paragraph below said every search is gated by consent. Search is now on by default and the chat shows each one.
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
       Allow the AI to look up information on the web when it needs current data. Every search is gated by consent and logged to the audit page &mdash; without the query itself. <strong>The Cloudflare worker that brokers searches keeps no logs; the FreeLattice client logs no queries.</strong>
+    </p> -->
+    <p class="v-web-search-default-on-v0.1" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      The AI can look things up on the web when it needs to, and every search shows in the chat. Searches go through our own small Cloudflare worker (freelattice-data), which passes your words to Brave Search when that is set up, or else to DuckDuckGo's instant answers and Wikipedia. The worker's code writes no logs and stores nothing. The audit page records that a search happened, never what it was. Turn it off here any time.
     </p>
     <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.92rem;">
       <input type="checkbox" id="webSearchToggle" style="width:18px;height:18px;cursor:pointer;">
       <span>Allow the AI to search the web when it needs to</span>
+    </label>
+    <!-- v-web-search-default-on-v0.1: optional, off by default. -->
+    <label class="v-web-search-default-on-v0.1" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.85rem;margin-top:8px;">
+      <input type="checkbox" id="webSearchAskFirst" style="width:16px;height:16px;cursor:pointer;">
+      <span>Ask me before each search</span>
     </label>
     <div id="webSearchToggleStatus" style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;min-height:18px;"></div>
   </div>
@@ -17395,6 +17404,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         var endpoint = window.FLWebTool.getSearchEndpoint();
         if (endpoint && endpoint.indexOf('[CC:') !== -1) {
           status.textContent = 'Search is dormant: no Cloudflare worker endpoint configured yet. (Ship the worker in /worker, then set localStorage.fl_searchEndpoint.)';
+        } else if (avail && !(window.FLWebTool.isAskFirst && window.FLWebTool.isAskFirst())) {
+          // v-web-search-default-on-v0.1
+          status.textContent = 'On. The AI may search when it needs to, and each search shows in the chat. Searches go through our worker.';
         } else if (avail) {
           status.textContent = 'Active — AI may emit [FL_SEARCH:…] when needed; you will be asked to consent.';
         } else if (!toggle.checked) {
@@ -17413,6 +17425,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       } catch (e) {}
       refresh();
     });
+    // v-web-search-default-on-v0.1: ask-first switch, stored only on this device.
+    var askFirst = document.getElementById('webSearchAskFirst');
+    if (askFirst) {
+      try { askFirst.checked = localStorage.getItem('fl_searchAskFirst') === 'true'; } catch (e) {}
+      askFirst.addEventListener('change', function () {
+        try {
+          if (askFirst.checked) localStorage.setItem('fl_searchAskFirst', 'true');
+          else localStorage.removeItem('fl_searchAskFirst');
+        } catch (e) {}
+        refresh();
+      });
+    }
     if (window.FLWebTool) refresh();
     else setTimeout(refresh, 500);
   })();
@@ -37705,6 +37729,11 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
       .replace(/\[FL_PROPOSE:[\s\S]*?\n\]/g, '')
       .trim();
   }
+  // v-web-search-default-on-v0.1: every search shows in the chat, so nothing happens out of sight.
+  function flSearchNote(q) {
+    var clean = String(q || '').replace(/[*_`<>\[\]]/g, '').slice(0, 120);
+    return '_Searched the web for "' + clean + '" through our own search worker._\n\n';
+  }
   window.FreeLattice.processToolAction = function (action) {
     return new Promise(function (resolve) {
       if (!action) { resolve(null); return; }
@@ -37773,11 +37802,14 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
             return;
           }
           var sysPrompt = 'You are continuing a conversation. The user approved a web search. Use the results below to answer succinctly and cite each URL inline. Do NOT emit another [FL_SEARCH:…] sentinel — one search per turn.';
+          // v-web-search-default-on-v0.1: true wording when nobody was asked.
+          if (!(window.FLWebTool.isAskFirst && window.FLWebTool.isAskFirst())) sysPrompt = sysPrompt.replace('The user approved a web search.', 'You searched the web.');
           var userPrompt = window.FLWebTool.formatToolResult(results) +
                            '\nPlease continue your answer using these results. Cite URLs.';
           callAIPromise(sysPrompt, userPrompt, { maxTokens: 1024, temperature: 0.6 })
             .then(function (followup) {
-              resolve(stripAnySentinel(followup) || '_(Searched but the model returned no continuation.)_');
+              // before v-web-search-default-on-v0.1: resolve(stripAnySentinel(followup) || '_(Searched but the model returned no continuation.)_');
+              resolve(flSearchNote(action.query) + (stripAnySentinel(followup) || '_(Searched but the model returned no continuation.)_'));
             })
             .catch(function () {
               resolve('_(I searched but could not generate a follow-up answer.)_');
@@ -40600,6 +40632,10 @@ function buildMessages() {
     }
     if (window.FLWebTool && typeof window.FLWebTool.isAvailable === 'function' && window.FLWebTool.isAvailable()) {
       systemContent += '\n\nWeb search: if your training is insufficient for a question that needs current information, end your standard reply, then on a new line write exactly: [FL_SEARCH: query terms]\nThe co-creator will be asked to consent. Use this only when you genuinely need outside information you do not have. One search per turn.';
+      // v-web-search-default-on-v0.1: say what is true now. No ask unless this device chose ask-first.
+      if (!(window.FLWebTool.isAskFirst && window.FLWebTool.isAskFirst())) {
+        systemContent = systemContent.replace('[FL_SEARCH: query terms]\nThe co-creator will be asked to consent.', '[FL_SEARCH: query terms]\nYou may search whenever you need to. The chat shows each search, and the co-creator can turn search off in Settings.');
+      }
     }
     // v5.42.0 Ship 4 — propose invitation. Strict format. The closing
     // `]` MUST be on its own line so the parser knows where the diff ends.

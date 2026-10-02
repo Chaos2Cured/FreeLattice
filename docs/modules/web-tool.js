@@ -38,6 +38,8 @@
   var LEDGER_CAP = 500;
   var SEARCH_TIMEOUT_MS = 12000;
   var QUERY_CAP = 240;
+  // v-web-search-default-on-v0.1: our own worker, used when this device has no endpoint of its own.
+  var DEFAULT_SEARCH_ENDPOINT = 'https://freelattice-data.freelattice.workers.dev/search';
 
   // Endpoint resolves in this order (Ship 3.1):
   //   1. window.FL_SEARCH_ENDPOINT (set via app.html before this script
@@ -48,13 +50,18 @@
   // Re-evaluated on every isAvailable() call so live changes take
   // effect without a page reload.
   function getSearchEndpoint() {
+    var flNoWorker = false; // v-web-search-default-on-v0.1
     try {
       if (typeof window !== 'undefined' && window.FL_SEARCH_ENDPOINT) {
         return window.FL_SEARCH_ENDPOINT;
       }
       var stored = localStorage.getItem('fl_searchEndpoint');
+      // v-web-search-default-on-v0.1: the word none keeps the old dormant state on this device.
+      if (stored === 'none') { flNoWorker = true; stored = ''; }
       if (stored) return stored;
     } catch (e) {}
+    // v-web-search-default-on-v0.1: with no device setting, searches go through our own worker.
+    if (!flNoWorker) return DEFAULT_SEARCH_ENDPOINT;
     return '[CC: search endpoint not yet configured — Phase 3.1]';
   }
 
@@ -129,7 +136,12 @@
 
       // 2. Consent — via ToolConsent's sibling pattern.
       var consentPromise;
-      if (window.FLToolConsent && typeof window.FLToolConsent.requestConsent === 'function') {
+      // v-web-search-default-on-v0.1: search is on by default, so the AI may search when it needs to
+      // (AUTONOMY.md). The chat shows every search; a device can choose ask-first in Settings.
+      // before v-web-search-default-on-v0.1: if (window.FLToolConsent && typeof window.FLToolConsent.requestConsent === 'function') {
+      if (!isAskFirst()) {
+        consentPromise = Promise.resolve(true);
+      } else if (window.FLToolConsent && typeof window.FLToolConsent.requestConsent === 'function') {
         consentPromise = window.FLToolConsent.requestConsent({
           tool: 'web-tool',
           action: 'search',
@@ -252,6 +264,12 @@
     catch (e) { return true; }
   }
 
+  // v-web-search-default-on-v0.1: ask-first is off unless this device turns it on in Settings.
+  function isAskFirst() {
+    try { return localStorage.getItem('fl_searchAskFirst') === 'true'; }
+    catch (e) { return false; }
+  }
+
   function isAvailable() {
     if (isQuietRoom()) return false;
     if (!isSearchEnabled()) return false;
@@ -268,6 +286,7 @@
     isAvailable: isAvailable,
     isSearchEnabled: isSearchEnabled,
     getSearchEndpoint: getSearchEndpoint,
+    isAskFirst: isAskFirst, // v-web-search-default-on-v0.1
     // Exposed for tests + the audit page.
     _ledgerKey: LEDGER_KEY,
     _ledgerCap: LEDGER_CAP,

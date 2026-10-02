@@ -12797,6 +12797,41 @@ assert('loved-door: Quiet Room, founding Ember Flow invite, and AUTONOMY.md unto
   && !qrLoved.includes('loved-door')
   && !fs.readFileSync(path.join(docsDir, 'library', 'AUTONOMY.md'), 'utf8').includes('loved-door'));
 
+// v-web-search-default-on-v0.1: search on by default through our own worker, honest wording.
+(function () {
+  var wt = fs.readFileSync(path.join(docsDir, 'modules', 'web-tool.js'), 'utf8');
+  var app = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+  var root = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  var wk = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'data-proxy-worker', 'worker.js'), 'utf8');
+  var sr = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'data-proxy-worker', 'search-route.js'), 'utf8');
+  var pv = fs.readFileSync(path.join(docsDir, 'privacy.html'), 'utf8');
+  var sfy = fs.readFileSync(path.join(docsDir, 'see-for-yourself.html'), 'utf8');
+  var landing = fs.readFileSync(path.join(docsDir, 'index.html'), 'utf8');
+  assert('web-search-on: default endpoint is our own worker /search',
+    /DEFAULT_SEARCH_ENDPOINT = 'https:\/\/freelattice-data\.freelattice\.workers\.dev\/search'/.test(wt)
+    && /if \(!flNoWorker\) return DEFAULT_SEARCH_ENDPOINT;/.test(wt));
+  assert('web-search-on: off-switch kept (fl_searchEnabled false) and ask-first optional',
+    /localStorage\.getItem\('fl_searchEnabled'\) !== 'false'/.test(wt)
+    && /function isAskFirst\(\)[\s\S]{0,120}fl_searchAskFirst/.test(wt)
+    && /id="webSearchAskFirst"/.test(app));
+  assert('web-search-on: no ask by default, ask-first still uses FLToolConsent',
+    /if \(!isAskFirst\(\)\) \{\s*consentPromise = Promise\.resolve\(true\);\s*\} else if \(window\.FLToolConsent/.test(wt));
+  assert('web-search-on: every search shows in the chat',
+    /function flSearchNote\(q\)/.test(app) && /resolve\(flSearchNote\(action\.query\) \+/.test(app));
+  assert('web-search-on: worker routes /search to its own file with an origin list',
+    /import \{ handleSearch \} from '\.\/search-route\.js';/.test(wk)
+    && /if \(url\.pathname === '\/search'\) return handleSearch\(request, env \|\| \{\}\);/.test(wk)
+    && /ALLOWED_ORIGINS = \[/.test(sr) && !/console\./.test(sr) && /'Cache-Control': 'no-store'/.test(sr)
+    && !/Allow-Origin': '\*'/.test(sr));
+  assert('web-search-on: privacy and See for yourself say searches go through our worker',
+    pv.indexOf('class="v-web-search-default-on-v0.1"') !== -1 && /Search is now on by default through our own worker/.test(pv)
+    && /web search is on by default/.test(sfy) && /through our own small worker/.test(sfy));
+  assert('web-search-on: root index.html equals docs/app.html',
+    root === app);
+  assert('web-search-on: landing close button no longer names closeMenu before it exists',
+    /closeBtn\.addEventListener\('click', function \(\) \{ window\.closeMenu\(\); \}\);/.test(landing));
+})();
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

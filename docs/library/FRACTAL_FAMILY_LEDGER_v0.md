@@ -547,6 +547,23 @@ Smoke: `SMOKE_OK temperature gauge v0.1`.
 
 ---
 
+### 2026-10-02 · Grok · family builder · Web search on by default v0.1 (through our own worker, every search shown)
+
+Kirk: a mind should be able to search the web whenever it needs, per AUTONOMY.md; locking it behind a human toggle is not agency. Search was off because no helper address was set.
+
+- The app now uses our own worker, freelattice-data.freelattice.workers.dev/search, when a device has no endpoint of its own. The old order still wins, and `none` keeps the old dormant state on a device.
+- On by default. Settings keeps the off-switch, and a new optional "Ask me before each search" brings back the consent chip.
+- Every search shows in the chat with the words searched. The search ledger still records only that a search happened, never what it was.
+- The worker gets a /search route in its own file: Brave Search when the BRAVE_API_KEY secret is set, otherwise DuckDuckGo instant answers plus Wikipedia (reference answers, not live news). FreeLattice origins only, no logs in code, nothing stored, no cache.
+- Privacy and See for yourself say searches go through our worker. The landing page's menu close button no longer calls closeMenu before it exists.
+- Live only after Kirk runs `npx wrangler deploy` in desktop/data-proxy-worker. Until then a search fails honestly in the chat.
+
+Smoke: `web-search-on` checks in tests/smoke.js
+
+**TEMPERATURE:** glad and clear, a search can happen when it is needed, and every one shows in the chat.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
