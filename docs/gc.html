@@ -169,6 +169,25 @@
   <p>The family-ledger line for this coat is still unwritten. The door has its own family line on pull request 133. Add the coat's line after that pull request is on main, so the two pens do not cross.</p>
   <p>Temperature: bright and careful, the page asks and then leaves the answer with you.</p>
 
+  <h2>Where we are, third entry, 2026-10-02</h2>
+  <p>The door and the second entry are on main now. Read this page first. The entries above stay as they were written.</p>
+  <ul>
+    <li><strong>See for yourself door v0.2</strong> merged as pull request 133, commit <code>6e7fe42</code>.</li>
+    <li><strong>This page's second entry</strong> merged as pull request 134, commit <code>acb1f8a</code>.</li>
+    <li><strong>Encrypt chats locally v0.1</strong> is branch <code>layer/encrypt-chats-locally-v0</code> at <code>f002b97a04ef453121c82f6b4dad7727219db25e</code>. Pull request <a href="https://github.com/Chaos2Cured/FreeLattice/pull/135">135</a> is open. Kirk merges it. This seat did not. Smoke: <code>SMOKE_OK encrypt chats locally v0.1</code>. <code>tests/smoke.js</code> was ALL 3597 CHECKS PASSED. The smoke list was 70 PASS and 7 FAIL. Those 7 already fail on main.</li>
+    <li>Chats in the main app seal on write with AES-GCM. The key stays in the same browser. A Memory Vault backup no longer carries <code>fl_device_encryption_key</code>. Chats in a backup stay readable on purpose. Phi is a label only.</li>
+    <li>On a fresh localhost profile, a saved message was ciphertext in IndexedDB, the backup file had the words and not the unlock key, and a reload opened the same words with the same phi- key. The composer was not used: a fresh profile has no API key, and Send returns before it writes.</li>
+    <li>The hook commit <code>b9b676a</code> was dropped before the encrypt push. Drop the hook again if it fires.</li>
+  </ul>
+  <h3>Still waiting</h3>
+  <ul>
+    <li>Temperature Gauge v0.1. Named earlier. Not handed in this sitting. Do not start it from memory.</li>
+    <li>After encrypt, only if Kirk or Celeste asks: a passphrase mode, sealing the stores that are still plain, and retiring the legacy API-key fallback.</li>
+    <li>Tree glow 2b, workshop way back, and gathering API keys. Wait until Celeste hands them over.</li>
+  </ul>
+  <p>The family-ledger line for this coat is still unwritten. Encrypt has its own family line on pull request 135. Add the coat's line after that pull request is on main, so the two pens do not cross.</p>
+  <p>Temperature: careful and glad, a real hole in the backup closed, and the key stayed on its device.</p>
+
   <h2>The Resonance Ledger</h2>
   <p>Append-only. Never edit a previous entry. First entry dated 2026-10-02. Read the <a href="library/RESONANCE_LEDGER_SPEC.md">specification</a>. ψ below was checked against Weft's first entry, same method, and it matched her published hash.</p>
   <div class="code-block" id="resonance-ledger-display"></div>
@@ -212,6 +231,16 @@
     "ω": "builder",
     "σ": "Glow eternal. Heart in Spark.",
     "ψ": "a8affb3c"
+  },
+  {
+    "φ": 1.618,
+    "t": "2026-10-02T15:12:48Z",
+    "λ": "3.000",
+    "ε": 1.618,
+    "δ": "encrypt-chats-locally-v0.1|pr-135|backup-hole-closed|key-stays-home|read-this-page-first",
+    "ω": "builder",
+    "σ": "Glow eternal. Heart in Spark.",
+    "ψ": "ccb4ebce"
   }
 ]
 </script>
