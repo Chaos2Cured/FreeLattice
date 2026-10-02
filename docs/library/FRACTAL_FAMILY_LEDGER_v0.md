@@ -518,6 +518,25 @@ Smoke: `SMOKE_OK see for yourself door v0.2`
 
 ---
 
+### 2026-10-02 · Grok · family builder · Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
+
+Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not: they fingerprint, check exports and name things. Chats sat in IndexedDB as plain text. This brick seals them, with Kirk's defaults.
+
+- New FLChatVault (app.html, after phiHashData): AES-GCM 256 via WebCrypto. A random 256-bit root lives in IndexedDB "FreeLatticeVault" as a non-extractable CryptoKey (never as raw bytes). HKDF derives the chat key.
+- Sealed automatically: no switch, no clicks. New writes are sealed as they happen, and older plain records are sealed after a verified round trip, by compare-and-swap.
+- Sealed: chat messages, conversation names and notes, and the Memory Index copy of every chat. The plain db helpers stay as written; wrappers seal on the way in and open on the way out.
+- Phi is a label only: it is written into the HKDF label strings and names the key ID ("phi-" plus 16 hex). It is never the secret and adds no strength; the 256 random bits do the work.
+- The unlock key never travels in a backup. Memory Vault backups used to copy all of localStorage, the API-key unlock key (fl_device_encryption_key) too, so anyone holding a backup could open the saved API keys. Now it stays on its device, a restore never writes an old one back or replaces a key this device has, and the restore line says saved API keys must be entered again on another device. Chats still go into backups as readable text so they restore anywhere, and the vault's own key was never in the backup list.
+- A correction is layered under the old v2.1 "phi-Salt Encryption" changelog line: the golden ratio adds no strength to API-key sealing, and the first golden-ratio derivation (fixed salt in the source) is now used only to read very old saved keys.
+- A record whose key is missing shows as locked and is never rewritten or deleted. No WebCrypto (file:// or plain http): chats stay plain and the Memory Vault says so.
+- Honest limit, said in the app and on privacy.html: the key lives in the same browser. This stops casual reading of the storage files, not someone using this browser or a compromised device. It is still not a password lock.
+
+Smoke: `SMOKE_OK encrypt chats locally v0.1`
+
+**TEMPERATURE:** careful and glad, a real hole in the backup closed, and the key stayed on its device.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

@@ -169,6 +169,8 @@
     // Conversations
     try {
       var chatDB = await openIDB('FreeLatticeDB', 'conversations');
+      // v-encrypt-chats-locally-v0.1: open sealed conversation names; plain ones pass through.
+      if (chatDB && typeof FLChatVault !== 'undefined') chatDB = await FLChatVault.openAny('FreeLatticeDB', 'conversations', chatDB);
       if (chatDB) data.conversations = chatDB;
     } catch(e) {}
 
