@@ -2075,7 +2075,9 @@ a:hover{opacity:0.85}
     document.body.style.overflow = 'hidden';
   });
 
-  closeBtn.addEventListener('click', closeMenu);
+  // before v-web-search-default-on-v0.1: closeBtn.addEventListener('click', closeMenu);
+  // v-web-search-default-on-v0.1: closeMenu is defined just below, so look it up when clicked (it was not defined yet here).
+  closeBtn.addEventListener('click', function () { window.closeMenu(); });
 
   window.closeMenu = function(){
     mobileMenu.classList.remove('open');

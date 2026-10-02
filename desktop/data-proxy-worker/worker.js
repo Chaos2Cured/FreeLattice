@@ -6,9 +6,15 @@
  * Usage: https://YOUR-WORKER.workers.dev/chart/TSLA?range=1y&interval=1d
  */
 
+// v-web-search-default-on-v0.1: web search for the app lives in its own file (GET /search?q=words).
+import { handleSearch } from './search-route.js';
+
 export default {
-  async fetch(request) {
+  // before v-web-search-default-on-v0.1: async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
+    // v-web-search-default-on-v0.1: /search has its own CORS list and never reaches the chart route.
+    if (url.pathname === '/search') return handleSearch(request, env || {});
 
     // CORS preflight
     if (request.method === 'OPTIONS') {

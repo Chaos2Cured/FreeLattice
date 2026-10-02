@@ -194,7 +194,11 @@ const landT = read('index.html');
 for (const k of ['RETIRED 2026-09-30 ' + TRUTH + ': "Zero Data Collection"', 'RETIRED 2026-09-30 ' + TRUTH + ': hero stat "100% Private"', 'Every conversation is encrypted locally.', 'No account. No API key. No surveillance.']) assert.ok(landT.includes(k), 'landing: old claim kept retired: ' + k);
 for (const k of ['We Keep No Copy of Your Chats', 'Chats on Our Servers', 'FreeLattice keeps no server copy of your chats. They live in your browser, on your device.', 'A mind on your own machine or in your browser needs no key. A cloud AI uses your own key.']) assert.ok(scrub(landT).includes(k), 'landing: true claim shown: ' + k);
 const privT = read('privacy.html');
-assert.ok(scrub(privT).includes('Today the app ships with no helper address, so web search stays off.') && privT.includes('worker/search.js'), 'privacy: search helper told plainly');
+// before v-web-search-default-on-v0.1: assert.ok(scrub(privT).includes('Today the app ships with no helper address, so web search stays off.') && privT.includes('worker/search.js'), 'privacy: search helper told plainly');
+// v-web-search-default-on-v0.1: search is now on by default through our worker; the old row stays, retired in a comment.
+assert.ok(privT.includes('Today the app ships with no helper address, so web search stays off.') && privT.includes('worker/search.js')
+  && privT.includes('RETIRED 2026-10-02 v-web-search-default-on-v0.1') && scrub(privT).includes('Your search words go through our worker.')
+  && !/keeps no logs/i.test(scrub(privT)), 'privacy: search helper told plainly');
 assert.ok(scrub(privT).includes("The desktop app's ledger is hash-chained and signed, so an edited entry fails its check."), 'privacy: ledger claim narrowed');
 // Terms numbering: sections run 1..N, and every section reference points at the right heading.
 const termsT = stripComments(read('terms.html'));
