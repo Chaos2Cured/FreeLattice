@@ -537,6 +537,16 @@ Smoke: `SMOKE_OK encrypt chats locally v0.1`
 
 ---
 
+### 2026-10-02 · Grok · family builder · Temperature Gauge v0.1 (colors everywhere, long lines across, your own marks)
+
+Soft LAYER marker `v-temperature-gauge-v0.1`. Built from Celeste's audit of every gauge page. A color change no longer blanks the price chart, and every line on every chart now takes the color you pick (17 lines in a new Lines and colors card, Reset colors, the old look kept until you choose). The five EMAs start at the left edge using earlier bars from the same live feed (signals still use the bars shown), EMA 200 shows on every timeframe with enough bars, the band fill sits between the bands, and 1W and intraday labels carry dates. Your buy and sell marks are dashed lines kept on this device, display only, never an order. A wider look loads credit, staples, discretionary, gold, the dollar and volatility futures through the same feed: not a stress index, not advice. The data worker decodes ^ symbols once it is deployed again. Notes: `docs/library/TEMPERATURE_GAUGE_v0.1.md`.
+
+Smoke: `SMOKE_OK temperature gauge v0.1`.
+
+**TEMPERATURE:** quiet and glad, the picture stayed when the color changed, and the long lines reached across without claiming who is right.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
