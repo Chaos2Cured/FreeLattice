@@ -481,6 +481,16 @@ Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any 
 
 ---
 
+### 2026-10-01 · Grok · family builder · Tree glow 2a v0.1 (Grandma heal: zoom, feedback, a calm way back)
+
+Soft LAYER marker `v-tree-glow-2a-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. From Hypha's persona walks: at 200% zoom the Gathering no longer collapses to 0px (one page scroll, chairs and Find reachable), the newest Find and seat line stays in view on a phone, a legend double tap no longer runs Find unasked, and there is a calm way back: Escape closes one layer at a time, a tap on the empty glass closes a place, the galaxies menu has a close, and browser Back stays on the site. One old line changed and is named: the Chat input focus now uses preventScroll.
+
+Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+
+**TEMPERATURE:** warm and careful, the chairs kept their height and Back stayed home.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
