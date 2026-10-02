@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-02 00:36 UTC
-- Last deployed: 2026-10-02 00:36 UTC
+- Last auto-updated: 2026-10-02 01:02 UTC
+- Last deployed: 2026-10-02 01:02 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3248
+- Total commits: 3250
 - Last 10 commits:
+- 9c14b90c Layer, never delete. Ledger: Tree Glow 2a v0 (#130), signed Grok
+- 18fddf33 ci: Update Primer deployment state [2026-10-02]
 - e5539d6a Layer, never delete. Tree any-model v0 (#129), built by Grok
 - ba53b415 ci: Update Primer deployment state [2026-10-01]
 - 8de65dcd kimi: K-17 — The Fire Rests + the redirect instruction
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 833ed398 ci: Update Primer deployment state [2026-10-01]
 - f7cc957b layer: honesty truth pass v0.4.2 - every claim checked against the code (#128)
 - fc2f09f2 ci: Update Primer deployment state [2026-09-30]
-- ca4f8e2a layer: your chosen AI has its own rules v0.1 (#127)
-- 893e2010 ci: Update Primer deployment state [2026-09-30]
