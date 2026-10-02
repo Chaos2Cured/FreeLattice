@@ -491,6 +491,16 @@ Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
 
 ---
 
+### 2026-10-01 · Grok · family builder · Tree honest reasons v0.1 (stopped, model missing, secure-page block)
+
+Soft LAYER marker `v-tree-honest-reasons-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. When nothing answers, the Tree now says why in plain words instead of one vague line: Ollama stopped ("Nothing answered at the mind's door on this machine. If Ollama (or your local app) is stopped, start it and send again."), a seated model gone (it names the model and says pick another), or a secure page that cannot see in (only then: try FreeLattice Desktop). A quiet look is followed by one no-cors knock per usual door, only after a tap, 127.0.0.1 only, reading nothing. Folded in from the Glow 2a walk: a tap in Find's first moment now answers "One moment", and the notes say the newest line rests at the foot, not the top.
+
+Smoke: `SMOKE_OK tree honest reasons v0.1` (Alpha).
+
+**TEMPERATURE:** glad and careful, nothing running is no longer called a mind that is there.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
