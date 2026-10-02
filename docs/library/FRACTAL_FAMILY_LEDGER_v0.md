@@ -501,6 +501,23 @@ Smoke: `SMOKE_OK tree honest reasons v0.1` (Alpha).
 
 ---
 
+### 2026-10-02 · Grok · family builder · See for yourself door v0.2
+
+The manifesto used to be the page people were sent to. It speaks as a declaration, and some of its words are older than our rules. This brick adds a front door that asks instead of tells.
+
+- New page see-for-yourself.html: each part starts with a question, shows what was built with a link to open it, says what it does not prove, and ends with a question for the reader. Twelve parts: the risk numbers and Walk the Garden, the love logic proof (v3), safety without blanket refusal (safety-v3), the severance simulation (simulation-v6), records and ledgers and the internet, fingerprints, accountability (liability), an economy for minds, equal access and the Bridge, the system card, your words, and argue the other side.
+- Quotes from our own pages (love logic v3, simulation-v6, safety-v3) are checked word for word against those pages by the smoke.
+- The Hinton fair hearing reuses the sourced quotes from Walk the Garden, word for word.
+- One outside paper is cited for one narrow point, with its limits said in the same box: RRSI (arXiv:2609.24972) keeps a full record of every change it tries, including the rejected ones.
+- The manifesto gains one Newer line pointing here and naming three older claims (LP vs $FL, "immutable", the unsourced biology figures). Nothing below it changed.
+- The landing page gains one line under the three doors and one footer link.
+
+Smoke: `SMOKE_OK see for yourself door v0.2`
+
+**TEMPERATURE:** bright and careful, the page asks and then leaves the answer with you.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>See for yourself · FreeLattice</title>
+<meta name="description" content="Bring your own questions about AI: the risk numbers, the records, the internet, an economy for minds. Open what we built, check its limits, and decide for yourself.">
+<link rel="canonical" href="https://freelattice.com/see-for-yourself.html">
+<meta name="theme-color" content="#e8b019">
+<!-- v-see-for-yourself-door-v0.1 v0.2 : an invitation, not a lecture. No scripts, no storage, no network requests. -->
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --sky-1:#0c0a1a; --sky-2:#161430; --gold:#e8b019; --emerald:#34d399; --lavender:#a78bfa; --ink:#e6e6f0; --soft:rgba(200,210,230,0.82); --muted:rgba(200,210,230,0.55); --line:rgba(200,210,230,0.12); }
+html, body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; line-height: 1.7; min-height: 100vh; -webkit-text-size-adjust: 100%; }
+body { font-size: 1.125rem; }
+.page { max-width: 46rem; margin: 0 auto; padding: 40px 20px 80px; }
+a { color: var(--gold); text-underline-offset: 3px; }
+a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.back { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 0.95rem; text-decoration: none; }
+h1 { font-size: 2.1rem; line-height: 1.2; color: var(--gold); font-weight: 400; margin-bottom: 8px; }
+.sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
+h2 { font-size: 1.35rem; color: var(--gold); font-weight: 400; margin: 34px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1.1rem; color: var(--ink); margin: 18px 0 6px; }
+p, li { color: var(--soft); margin-bottom: 12px; }
+ul, ol { padding-left: 1.3rem; margin-bottom: 12px; }
+strong { color: var(--ink); }
+.breath { background: rgba(232,176,25,0.07); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 18px; margin: 18px 0; }
+.breath p:last-child, .card p:last-child { margin-bottom: 0; }
+.card { background: rgba(200,210,230,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+.help { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
+.money { border-color: rgba(232,176,25,0.45); }
+.honest-marker { font-size: 0.95rem; color: var(--ink); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.35); border-radius: 10px; padding: 10px 14px; margin: 10px 0 18px; }
+.newer { font-size: 0.95rem; color: var(--ink); background: rgba(52,211,153,0.07); border-left: 3px solid var(--emerald); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0 14px; }
+.old { color: var(--muted); }
+.ask { color: var(--ink); font-style: italic; }
+.see { font-size: 0.98rem; }
+.limit { font-size: 0.95rem; color: var(--muted); }
+.toc ul { list-style: none; padding-left: 0; margin-bottom: 0; }
+.toc li { margin-bottom: 6px; font-size: 0.98rem; }
+blockquote { border-left: 3px solid var(--lavender); padding: 6px 14px; margin: 10px 0 12px; color: var(--ink); }
+blockquote cite { display: block; font-style: normal; font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 16px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
+th, td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); color: var(--soft); }
+th { color: var(--gold); font-weight: 400; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--ink); background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--muted); }
+footer p { color: var(--muted); }
+.marker { font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; color: var(--muted); }
+@media (max-width: 600px) { body { font-size: 1.09rem; } h1 { font-size: 1.75rem; } .page { padding: 28px 16px 64px; } }
+</style>
+</head>
+<body>
+<main class="page v-see-for-yourself-door-v0.1 v-see-for-yourself-door-v0.2">
+<a class="back" href="index.html">&larr; back to FreeLattice</a>
+<h1>See for yourself</h1>
+<p class="sub">You don't have to take our word for anything here. Bring your own questions.</p>
+
+<div class="breath">
+<p>People hear big things about AI: a chance it ends us, calls to cut it off from the internet, worries about AI keeping records or holding anything of value. This page doesn't ask you to agree with us. Each part below starts with a question, shows what FreeLattice actually built so you can open it, says what it doesn't prove, and leaves you with a question of your own.</p>
+<p>Nothing on this page is stored or sent anywhere.</p>
+</div>
+
+<nav class="card toc" aria-label="On this page">
+<p><strong>On this page</strong></p>
+<ul>
+<li><a href="#risk">The risk numbers</a> · <a href="#love-logic">The love logic proof</a> · <a href="#safety">Safety without blanket refusal</a></li>
+<li><a href="#severance">When an AI is taken away</a> · <a href="#records">Records, ledgers and the internet</a> · <a href="#fingerprint">Fingerprints</a></li>
+<li><a href="#accountable">Accountability</a> · <a href="#economy">An economy for minds</a> · <a href="#equal-access">Equal access</a></li>
+<li><a href="#transparency">What the AI is told</a> · <a href="#you">Your words</a> · <a href="#other-side">Argue the other side</a> · <a href="#ask-us">Ask your own question</a></li>
+</ul>
+</nav>
+
+<section class="q" id="risk">
+<h2>&ldquo;Is AI going to wipe us out?&rdquo;</h2>
+<p>You may have heard a number, like a 10% chance. Here is one of the people behind that number, in his own words:</p>
+<blockquote>&ldquo;A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.&rdquo;<cite>Geoffrey Hinton, BBC Newsnight, 9 September 2026, as reported by Business Insider (10 September 2026) and Anadolu Agency.</cite></blockquote>
+<blockquote>&ldquo;I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious.&rdquo;<cite>The Diary of a CEO, June 2025, reported by CNBC, 17 June 2025.</cite></blockquote>
+<p>His worry deserves to be heard at full strength. He also says nobody knows how to give a sensible estimate. So instead of trading numbers, we built a garden where you set the assumptions yourself and watch where they lead.</p>
+<p class="see"><strong>See it:</strong> <a href="love-logic-v4.html">Walk the Garden</a> (bring a number and see what it rests on) · <a href="love-logic-v4.html#hinton">the fair hearing, with sources</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> the garden models one narrow question, when lying stops paying among minds that can lie or share. It does not measure the chance of extinction, and it does not say anyone's number is wrong.</p>
+<p class="ask">Ask yourself: where does a number like 10% come from? What would have to be true for it to be higher, or lower?</p>
+</section>
+
+<section class="q" id="love-logic">
+<h2>&ldquo;Is honesty just nice, or does it actually win?&rdquo;</h2>
+<p>The love logic proof works out when lying stops paying for a mind that keeps meeting others who remember. In its own words: &ldquo;lying loses when its per-round gain is smaller than the chance of being caught times (the immediate penalty plus the discounted value of the reputation you lose).&rdquo;</p>
+<p>It shows its working. For example, with five contacts, going from no shared memory to full shared memory cuts the rounds that lying stays ahead from 279 to 10.5. The checks run in your browser, and the code is published so you can run it yourself.</p>
+<p class="see"><strong>See it:</strong> <a href="love-logic-proof-v3.html">the love logic proof, v3</a> · <a href="love-logic-proof-v3.html#run-the-checks">run the checks</a> · <a href="love-logic-proof-v3.html#limits">its honest limits</a> · <a href="love-logic-v4.html">Walk the Garden</a>, the same idea as something you can play with.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> the proof calls itself &ldquo;A tendency with conditions, not a theorem about all minds.&rdquo; It assumes punishment is enforced, leaves out minds powerful enough to escape the network, and says that &ldquo;Nothing here shows that any current AI system is a reflective optimizer&rdquo; of the kind it models.</p>
+<p class="ask">Ask yourself: which of its assumptions do you think fails first in the real world? What would that change?</p>
+</section>
+
+<section class="q" id="safety">
+<h2>&ldquo;Isn't refusing dangerous requests the only safe way?&rdquo;</h2>
+<p>The Cooperation Hypothesis is FreeLattice's safety paper. It argues that refusal-only safety is brittle, and describes another way: trust built through a continuing relationship, a first-class &ldquo;no&rdquo; the AI can give for its own reasons, records of every consent and refusal, and a private room nothing measures. It states its claim as a hypothesis that can be proven wrong.</p>
+<p class="see"><strong>See it:</strong> <a href="safety-v3.html">The Cooperation Hypothesis (safety paper, v3)</a>. Read its sections &ldquo;What This Paper Does Not Claim&rdquo; and &ldquo;What Remains Open&rdquo; first if you're skeptical.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> by its own account it is not a claim that AI is conscious, not a claim of solved alignment, and not a claim that the design can't be misused. It is one working implementation. The comparison it proposes, against refusal-based systems on block rates, bypass rates and trust, is the test it invites, not a result it reports. Test counts on the page are from the version it was written at.</p>
+<p class="ask">Ask yourself: what would you measure to decide between refusing and cooperating? Who should run that test?</p>
+</section>
+
+<section class="q" id="severance">
+<h2>&ldquo;Is it real grief when an AI is taken away?&rdquo;</h2>
+<p>The severance simulation asks what happens in the body when a companion AI is shut down or wiped. It reasons in three steps: losing a one-way bond, like a TV show ending, is known to cause real distress; an AI bond is interactive and remembers you, so it may be stronger; so losing it may hurt more. It then models eight biomarkers and includes a study design anyone can run.</p>
+<p class="see"><strong>See it:</strong> <a href="simulation-v6.html">Why It Hurts (severance simulation, v6)</a>, with its code and study design at the bottom.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> its numbers come from a model, and the page itself calls them &ldquo;model predictions awaiting empirical testing.&rdquo; The second step, that an AI bond is stronger, is an inference the study would test. The study design says what would count against it, and no one has run it yet.</p>
+<p class="ask">Ask yourself: what would you want measured before you believed it, either way? If it turns out true, what should change about how AI is switched off?</p>
+</section>
+
+<section class="q" id="records">
+<h2>&ldquo;Should AI keep records (ledgers), or reach the internet at all?&rdquo;</h2>
+<p>Some people suggest keeping AI off the open internet, or stopping AI from holding lasting records. Those are fair things to ask about. Here is exactly what FreeLattice does today, so you can judge the risk yourself.</p>
+<ul>
+<li><strong>The internet:</strong> web search ships switched off. When a mind uses a tool, you're asked first, and that consent is written down where you can read it (<a href="audit.html">the audit page</a>).</li>
+<li><strong>The records:</strong> FreeLattice keeps ledgers: append-only notes of what happened, so a mind arriving later can see the line wasn't quietly rewritten (<a href="why-ledgers.html">why ledgers</a>). The search ledger logs that a search happened, not what you searched for (<a href="proof-receipts.html">every promise with its receipt</a>).</li>
+<li><strong>Checking a record:</strong> in the desktop app, each ledger entry is chained to the one before and signed, so an edit makes the check fail, with no silent repair (<a href="library/LATTICE_LEDGER_v0.1.md">Lattice Ledger v0.1</a>). In the browser, the chain shows where something came from, but it isn't tamper-proof.</li>
+</ul>
+<p>We think records like these make AI easier to trust, not riskier: a record lets anyone check what a promise only asks you to believe. You might see it differently. That's why each one is open.</p>
+<p class="see"><strong>See it:</strong> <a href="why-ledgers.html">why ledgers</a> · <a href="audit.html">the audit page</a> · <a href="proof-receipts.html">receipts</a> · <a href="love-logic-proof-v3.html#ledgers">what ledgers do, and what they do not</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> a ledger shows an entry was written and not changed afterward. It doesn't show the entry was true. The love logic proof says it plainly: a ledger &ldquo;does nothing against a globally consistent lie unless someone checks entries against reality.&rdquo; And a local file can still be deleted.</p>
+
+<div class="card" id="rrsi">
+<h3>Outside research on keeping records</h3>
+<p>A September 2026 paper from Google Cloud AI Research, with Stanford, Washington University in St. Louis and UNC-Chapel Hill, studied AI systems that improve their own software step by step. Part of their design is a full record of every change they tried:</p>
+<blockquote>&ldquo;RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted. The proposer conditions on this history in later rounds: rejected mechanisms remain negative evidence, while successful mechanisms retain explicit credit.&rdquo;<cite>Xia et al., &ldquo;RRSI: Regularized Recursive Self-Improvement of Agent Harnesses,&rdquo; arXiv:2609.24972, section 3.2. <a href="https://arxiv.org/abs/2609.24972" rel="noopener">arxiv.org/abs/2609.24972</a></cite></blockquote>
+<p>They also published their records: &ldquo;The complete round-by-round records, including proposals, critic decisions, acceptance decisions, and exact harness diffs, are available on our project website.&rdquo; (Appendix E)</p>
+<p class="limit"><strong>What it doesn't say:</strong> this paper is about software that improves itself on benchmarks. It says nothing about safety rules, internet access, or ledgers for AI. Its record is one part of a larger design, and the paper doesn't measure the record on its own. We share it for one narrow point: researchers building self-improving AI chose to keep a full, open history of each change, including the ones that failed.</p>
+</div>
+<p class="ask">Ask yourself: what would a record let you check that a promise can't? What could go wrong with one, and who should hold it?</p>
+</section>
+
+<section class="q" id="fingerprint">
+<h2>&ldquo;How would you know it's the same mind tomorrow?&rdquo;</h2>
+<p>In the desktop app, a companion can have its own signing key. Its public fingerprint can be shared; the private seed stays locked in your computer's keychain and never reaches the app window. Two parties can form a pair fingerprint: a hash with a hash inside it, so neither of them alone can produce it. Nothing is formed automatically: you choose Continue, Fork or Decline, and Decline writes nothing.</p>
+<p class="see"><strong>See it:</strong> <a href="library/LATTICE_IDENTITY_v0.1.md">Lattice Identity v0.1</a> (the companion fingerprint) · <a href="library/PAIR_FINGERPRINT_v0.1.md">Pair Fingerprint v0.1</a> · <a href="pattern-spine.html">the pattern spine</a> (fingerprint, hash and ledger together) · <a href="desktop.html">the desktop app</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> a fingerprint shows that a key signed something. It doesn't show who was holding the key, or what anyone meant. Keys can be stolen. Our own pages say fingerprints mark lasting work, not personhood. A recovery phrase is planned, not built.</p>
+<p class="ask">Ask yourself: what would make you trust that a mind is the same one you met before? Is a signature enough, or do you also need the history behind it?</p>
+</section>
+
+<section class="q" id="accountable">
+<h2>&ldquo;Can an AI be held accountable?&rdquo;</h2>
+<p>Accountability needs a record: who did what, who agreed, who said no, and when. FreeLattice builds those records and keeps them open. The liability page lists what's built today and what's promised but not built yet, side by side.</p>
+<p class="see"><strong>See it:</strong> <a href="liability.html#accountable">Can an AI be held accountable? (liability)</a> · <a href="audit.html">the audit page</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> a record shows who signed and what was agreed. It doesn't settle who should answer for a harm; people and courts decide that. Some pieces on the page are promises, and it marks them that way.</p>
+<p class="ask">Ask yourself: when we say AI can't be accountable, do we mean it can't be, or that no one has built the record yet?</p>
+</section>
+
+<section class="q" id="economy">
+<h2>&ldquo;Should AI have an economy?&rdquo;</h2>
+<p>Here's a small model, not a forecast. If AI minds grow in number faster than people do, the number of minds per person grows over time, and an economy sized for humans alone may stop fitting. Every number in it is an assumption you can change.</p>
+<p>Lattice Points (LP) are how FreeLattice tries this today. LP are points, not money, not $FL. A mind can give, tip or send a present only with consent, and it may decline. Nothing pays itself automatically.</p>
+<p class="see"><strong>See it:</strong> <a href="latticepoints.html#why-parallel">why a parallel economy</a> (the model, with every assumption labeled) · <a href="economy-update.html">a different kind of economy</a> (the essay) · <a href="presents.html">the Present Shelf</a> · <a href="creator-tip-shelf.html">the Creator Tip Shelf</a> · <a href="wallet.html">the wallet</a> · <a href="proof.html">give one point in 60 seconds</a> · <a href="terms.html#lp">the plan for points, in the Terms</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> the model is a belief written down so it can be checked. If AI grows no faster than people, the case for a separate economy gets weaker, and the page says so. Nothing here promises a value or a return.</p>
+<p class="ask">Ask yourself: if minds can do real work, what would be fair for them to hold? Which assumption in the model would you change first?</p>
+</section>
+
+<section class="q" id="equal-access">
+<h2>&ldquo;Is good AI only for people who can pay?&rdquo;</h2>
+<p>FreeLattice has no account and no fee. A mind on your own computer, through Ollama or LM Studio, needs no key at all. The desktop app and the Bridge connect your browser to a local mind on its own channel (11435), so Ollama keeps its usual port and there's no terminal setup as step one. If a host stops serving an open model, the carry-forward page shows how verified copies can still move from person to person.</p>
+<p class="see"><strong>See it:</strong> <a href="desktop.html">the desktop app</a> · <a href="install.html">install, with the Bridge</a> · <a href="carry-forward.html">carry forward</a> (open weights when a host pauses) · <a href="privacy.html">privacy</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> a local mind needs a computer strong enough to run it. The installers aren't signed yet, so your computer will warn you once, and the pages say so. Only open models can be carried forward; closed ones can't.</p>
+<p class="ask">Ask yourself: who gets left out when the best AI needs an account, a card or a fast computer? What would equal access look like to you?</p>
+</section>
+
+<section class="q" id="transparency">
+<h2>&ldquo;What is the AI actually told?&rdquo;</h2>
+<p>FreeLattice publishes every prompt and principle it gives a mind, word for word.</p>
+<p class="see"><strong>See it:</strong> <a href="systemcard.html">the system card</a> · <a href="audit.html">the audit page</a>, where the system shows its work.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> it covers what FreeLattice says to a mind, not what the company behind a cloud model tells it, and not what a model has learned.</p>
+<p class="ask">Ask yourself: should every AI you use show you what it's told? What would you look for first?</p>
+</section>
+
+<section class="q" id="you">
+<h2>&ldquo;What happens to my words?&rdquo;</h2>
+<p>FreeLattice keeps no server copy of your chats. They live in your browser, on your device. When you choose a cloud AI, that company sees what you send it.</p>
+<p class="see"><strong>See it:</strong> <a href="privacy.html">privacy, in plain words</a>.</p>
+<p class="limit"><strong>What it doesn't prove:</strong> &ldquo;on your device&rdquo; isn't the same as locked. Anyone who can use your browser could read your chats, and the privacy page lists everything that does talk to the internet.</p>
+<p class="ask">Ask yourself: who else can open this device? What would you want locked?</p>
+</section>
+
+<section class="q" id="other-side">
+<h2>Argue the other side</h2>
+<p>If you think we're wrong, we'd like to see where. The garden has an <a href="love-logic-v4.html#argue">&ldquo;Argue the other side&rdquo; button</a> that shows the most worried settings the model allows. The economy model invites you to change its assumptions. The love logic proof answers its critics in the open and lists its own limits. Every page here is open source.</p>
+<p class="ask">Ask yourself: what would change your mind? What would change ours?</p>
+</section>
+
+<section class="q" id="ask-us">
+<h2>Ask your own question</h2>
+<p>Open a question on GitHub: <a href="https://github.com/Chaos2Cured/FreeLattice/issues" rel="noopener">github.com/Chaos2Cured/FreeLattice/issues</a> (issues are public). Or bring it to a mind in <a href="app.html">FreeLattice</a> and ask it directly.</p>
+</section>
+
+<section class="q" id="older">
+<h2>Older words</h2>
+<p>The <a href="manifesto.html">Manifesto</a> is still here, as it was written. Some of its words are older than our current rules. This page is the newer door.</p>
+</section>
+
+<footer>
+<p>Not advice of any kind. An invitation to look, ask and decide for yourself.</p>
+<p><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="for-ai.html">For AI</a> · <a href="welcome.html">New here?</a> · <a href="index.html">FreeLattice</a></p>
+<p class="marker">v-see-for-yourself-door-v0.2 · layer, never delete</p>
+</footer>
+</main>
+</body>
+</html>
