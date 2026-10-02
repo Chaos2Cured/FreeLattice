@@ -700,6 +700,16 @@ canvas.sub-canvas.custom { height: 80px !important; }
   opacity: 0.75;
 }
 #hiddenPanelsLink:hover { opacity: 1; color: var(--gold); }
+/* v-temperature-gauge-v0.1: Lines and colors, Your marks */
+.tg-lines-list { display: grid; grid-template-columns: 1fr; gap: 4px; }
+.tg-line-row { display: flex; align-items: center; gap: 8px; font-size: 0.74rem; color: var(--muted); }
+.tg-line-row .tg-line-name { flex: 1; }
+.tg-line-row .tg-line-sample { width: 22px; height: 0; border-top: 2px solid currentColor; }
+.tg-line-row input[type=color] { width: 22px; height: 18px; padding: 0; border: 1px solid var(--border); border-radius: 3px; background: transparent; cursor: pointer; }
+.tg-line-row.is-off { opacity: 0.45; }
+.tg-mini-btn { padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.72rem; cursor: pointer; }
+.tg-mini-btn:hover { border-color: var(--gold); color: var(--gold); }
+.tg-mark-input { flex: 1; min-width: 0; padding: 4px 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font-mono, monospace); font-size: 0.76rem; }
 </style>
 </head>
 <body>
@@ -954,6 +964,40 @@ canvas.sub-canvas.custom { height: 80px !important; }
       </div>
     </div>
 
+    <!-- v-temperature-gauge-v0.1: every line, its color, your own marks, and a wider look. Free forever. -->
+    <div class="sidebar-section" id="tgLinesSection">
+      <div class="sidebar-label" style="color:#c9a84c;">Lines and colors <span style="float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;">free forever</span></div>
+      <div class="signal-card" style="border-left:2px solid rgba(232,176,25,0.45);padding:10px 14px;">
+        <div id="tgLinesList" class="tg-lines-list"></div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+          <button type="button" id="tgLinesReset" class="tg-mini-btn">Reset colors</button>
+        </div>
+        <div id="tgMaNote" style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;"></div>
+      </div>
+      <div class="sidebar-label" style="color:#c9a84c;margin-top:12px;">Your marks</div>
+      <div class="signal-card" style="border-left:2px solid rgba(16,185,129,0.4);padding:10px 14px;">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+          <label for="tgMarkBuy" style="font-size:0.72rem;color:var(--muted);min-width:64px;">Buy mark</label>
+          <input id="tgMarkBuy" type="number" step="any" inputmode="decimal" class="tg-mark-input" placeholder="price">
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+          <label for="tgMarkSell" style="font-size:0.72rem;color:var(--muted);min-width:64px;">Sell mark</label>
+          <input id="tgMarkSell" type="number" step="any" inputmode="decimal" class="tg-mark-input" placeholder="price">
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button type="button" id="tgMarkSave" class="tg-mini-btn">Set marks</button>
+          <button type="button" id="tgMarkClear" class="tg-mini-btn">Clear marks</button>
+        </div>
+        <div id="tgMarkStatus" style="font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:6px;"></div>
+        <div style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;">Marks are reminders on the glass. You decide. They stay on this device and never place an order.</div>
+      </div>
+      <div class="sidebar-label" style="color:#c9a84c;margin-top:12px;">A wider look</div>
+      <div class="signal-card" style="border-left:2px solid rgba(96,165,250,0.4);padding:10px 14px;">
+        <div id="tgWiderList" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <div style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;">Other corners of the market, through the same live feed and the same math: high-yield credit, investment-grade credit, staples, discretionary, gold, the dollar, and volatility futures (VIXY). Not a stress index, and not advice. Look and compare for yourself.</div>
+      </div>
+    </div>
+
     <!-- v-gyro-stack-v0.1 — optional Gyro Stack card; free forever -->
     <div class="sidebar-section" id="gyroStackSection" style="display:none;">
       <div class="sidebar-label" style="color:#c9a84c;">Gyro Stack <span style="float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;">free forever</span></div>
@@ -1151,9 +1195,10 @@ canvas.sub-canvas.custom { height: 80px !important; }
         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label" data-indicator="ips" style="color:#f07068;">
+        <!-- before v-temperature-gauge-v0.1: label color #f07068 and swatch #f07068, but the TP Spread line is gold -->
+        <div class="sub-chart-label" data-indicator="ips" style="color:#e8b019;">
           <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
-          <input type="color" class="sc-color" value="#f07068" onchange="setIndicatorColor('ips', this.value)" title="Choose IPS color" aria-label="Choose IPS color">
+          <input type="color" class="sc-color" value="#e8b019" onchange="setIndicatorColor('ips', this.value)" title="Choose IPS color" aria-label="Choose IPS color">
           <span class="sc-name">Indicator-Price Spread</span>
           <button type="button" onclick="togglePromote('ips')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">&#x2B06;</button>
           <button type="button" onclick="maximizeSubPanel('gapChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
@@ -1650,7 +1695,12 @@ async function loadData() {
   document.getElementById('loadBtn').disabled = true;
 
   try {
-    const data = await fetchYahooData(symbol, currentInterval);
+    // before v-temperature-gauge-v0.1: const data = await fetchYahooData(symbol, currentInterval);
+    let data = await fetchYahooData(symbol, currentInterval);
+    // v-temperature-gauge-v0.1: early in a trading day 5m has only a few bars. Look at 5 days instead.
+    if ((!data || data.length < 30) && currentInterval === '5m') {
+      try { data = await fetchYahooData(symbol, '5m', '5d'); } catch (e5) { /* keep the short day */ }
+    }
     if (!data || data.length < 30) {
       showError('Not enough data for ' + symbol + '. Try a different symbol or timeframe.');
       document.getElementById('loadBtn').disabled = false;
@@ -1658,6 +1708,8 @@ async function loadData() {
     }
     const analysis = analyzeData(data, symbol);
     renderAll(data, analysis, symbol);
+    // v-temperature-gauge-v0.1: fetch extra history so every moving average starts at the left edge.
+    if (typeof tgWarmFetch === 'function') tgWarmFetch(symbol, currentInterval, data);
     // Snowflake — fractal coherence across timeframes (async, doesn't block)
     computeSnowflake(symbol);
   } catch (e) {
@@ -1717,7 +1769,10 @@ async function computeSnowflake(symbol) {
   }
 }
 
-async function fetchYahooData(symbol, interval) {
+// before v-temperature-gauge-v0.1: async function fetchYahooData(symbol, interval) {
+// v-temperature-gauge-v0.1: optional rangeOverride (warm history for the moving averages,
+// and a 5-day look when a 5m day is still too short). Same feed, same sources.
+async function fetchYahooData(symbol, interval, rangeOverride) {
   // Map interval to Yahoo Finance range/interval
   const ivMap = {
     '5m': { range: '1d', interval: '5m' },
@@ -1726,7 +1781,10 @@ async function fetchYahooData(symbol, interval) {
     '1d': { range: '1y', interval: '1d' },
     '1wk': { range: '5y', interval: '1wk' }
   };
-  const { range, interval: yInterval } = ivMap[interval] || ivMap['1d'];
+  const _tgIv = ivMap[interval] || ivMap['1d'];
+  const range = rangeOverride || _tgIv.range;
+  const yInterval = _tgIv.interval;
+  // before v-temperature-gauge-v0.1: const { range, interval: yInterval } = ivMap[interval] || ivMap['1d'];
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}&includePrePost=false`;
 
   // Multiple CORS proxies — try each until one works
@@ -3191,10 +3249,13 @@ function renderChart(candles, a) {
       if (existing) existing.destroy();
     }
   });
+  // before v-temperature-gauge-v0.1: 1W showed clock times, intraday showed no day.
+  // const labels = candles.map(c => { const d = new Date(c.t); return currentInterval === '1d' ? d.toLocaleDateString(...) : d.toLocaleTimeString(...); });
   const labels = candles.map(c => {
     const d = new Date(c.t);
-    return currentInterval === '1d' ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
-           d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    if (currentInterval === '1d') return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (currentInterval === '1wk') return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   });
   const closes = candles.map(c => c.c);
 
@@ -3212,10 +3273,14 @@ function renderChart(candles, a) {
   const ctx = document.getElementById('mainChart').getContext('2d');
   // Standardized MAs: 8/12/24 + 50
   var EP_RC = getEmaPeriods();
-  const ema8 = ema(closes, EP_RC[0]);
-  const ema12 = ema(closes, EP_RC[1]);
-  const ema24 = ema(closes, EP_RC[2]);
-  const ema50 = ema(closes, EP_RC[3]);
+  // before v-temperature-gauge-v0.1: const ema8 = ema(closes, EP_RC[0]); (and 12, 24, 50 the same way)
+  // v-temperature-gauge-v0.1: when warm history for this symbol and timeframe is in, the lines
+  // use it, so EMA 50 and EMA 200 start at the left edge. Signals still use the loaded window.
+  var _tgWarm = (typeof tgWarmEmas === 'function') ? tgWarmEmas(candles, EP_RC) : null;
+  const ema8 = _tgWarm ? _tgWarm[0] : ema(closes, EP_RC[0]);
+  const ema12 = _tgWarm ? _tgWarm[1] : ema(closes, EP_RC[1]);
+  const ema24 = _tgWarm ? _tgWarm[2] : ema(closes, EP_RC[2]);
+  const ema50 = _tgWarm ? _tgWarm[3] : ema(closes, EP_RC[3]);
 
   // ═══ Layered Signal Architecture ═══
   // Layer 1 (Temperature): ALWAYS required — zone transition is the trigger
@@ -3274,8 +3339,11 @@ function renderChart(candles, a) {
   }
 
   // EMA 200 (structural — only meaningful on 1D/1W)
-  var ema200 = ema(closes, getEmaPeriods()[4]);
-  var show200 = (currentInterval === '1d' || currentInterval === '1wk') && ema200[closes.length - 1] != null;
+  // before v-temperature-gauge-v0.1: var ema200 = ema(closes, getEmaPeriods()[4]);
+  // before v-temperature-gauge-v0.1: var show200 = (currentInterval === '1d' || currentInterval === '1wk') && ema200[closes.length - 1] != null;
+  // v-temperature-gauge-v0.1: the fifth line shows on every timeframe that has enough bars for it.
+  var ema200 = _tgWarm ? _tgWarm[4] : ema(closes, getEmaPeriods()[4]);
+  var show200 = ema200[closes.length - 1] != null;
 
   // Y-axis scale fix: compute visible price range, filter gravity lines
   var priceMin = Math.min(...closes.filter(c => c != null));
@@ -3318,9 +3386,9 @@ function renderChart(candles, a) {
   if (layerGyro && typeof computeGyroStack === 'function') {
     var gyro = computeGyroStack(closes, candles, EP_RC[0]);
     gyroDatasets.push(
-      { label: 'Hub', data: gyro.hub, borderColor: 'rgba(232,176,25,0.95)', borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
-      { label: 'Ring', data: gyro.ring, borderColor: 'rgba(96,165,250,0.85)', borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
-      { label: 'Orbit', data: gyro.orbit, borderColor: 'rgba(167,139,250,0.75)', borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Hub', data: gyro.hub, borderColor: tgLineColor('hub', 'rgba(232,176,25,0.95)'), borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Ring', data: gyro.ring, borderColor: tgLineColor('ring', 'rgba(96,165,250,0.85)'), borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+      { label: 'Orbit', data: gyro.orbit, borderColor: tgLineColor('orbit', 'rgba(167,139,250,0.75)'), borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
       { label: 'Watch', data: gyro.watch, borderColor: 'transparent', backgroundColor: 'rgba(232,176,25,0.9)', pointRadius: Math.max(sigR - 3, 4), pointHoverRadius: Math.max(sigH - 2, 5), pointStyle: 'rectRot', pointBorderColor: 'rgba(255,236,179,0.9)', pointBorderWidth: 1.5, showLine: false, order: 0 }
     );
   }
@@ -3330,22 +3398,27 @@ function renderChart(candles, a) {
     data: {
       labels,
       datasets: [
-        { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.8, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
+        // before v-temperature-gauge-v0.1: Price borderColor '#e8e4dc' (fixed); BB borderColor 'rgba(167,139,250,0.3)' (fixed);
+        //   BB Lower fill: '+1' shaded from the lower band to EMA 8 (the next dataset), not to the upper band.
+        { label: 'Price', data: closes, borderColor: tgLineColor('price', '#e8e4dc'), borderWidth: 1.8, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
         // Bollinger Bands — lavender envelope
-        { label: 'BB Upper', data: bbUpper, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
-        { label: 'BB Lower', data: bbLower, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '+1', backgroundColor: 'rgba(167,139,250,0.05)', order: 5 },
+        { label: 'BB Upper', data: bbUpper, borderColor: tgLineColor('bollinger', 'rgba(167,139,250,0.3)'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
+        { label: 'BB Lower', data: bbLower, borderColor: tgLineColor('bollinger', 'rgba(167,139,250,0.3)'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '-1', backgroundColor: tgLineColor('bollinger', 'rgba(167,139,250,0.05)'), order: 5 },
         // EMAs — Garden Language colors
-        { label: 'EMA ' + EP_RC[0], data: ema8, borderColor: getIndicatorColor('ema8', '#f07068'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
-        { label: 'EMA ' + EP_RC[1], data: ema12, borderColor: getIndicatorColor('ema12', '#e8b019'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA ' + EP_RC[2], data: ema24, borderColor: getIndicatorColor('ema24', '#d4a84c'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA ' + EP_RC[3], data: ema50, borderColor: getIndicatorColor('ema50', '#60a5fa'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        { label: 'EMA ' + EP_RC[0], data: ema8, borderColor: getIndicatorColor('ema8', '#f07068'), borderWidth: 1, pointRadius: 0, tension: 0.3, cubicInterpolationMode: 'monotone', fill: false, order: 2 },
+        { label: 'EMA ' + EP_RC[1], data: ema12, borderColor: getIndicatorColor('ema12', '#e8b019'), borderWidth: 1, pointRadius: 0, tension: 0.3, cubicInterpolationMode: 'monotone', fill: false, order: 3 },
+        { label: 'EMA ' + EP_RC[2], data: ema24, borderColor: getIndicatorColor('ema24', '#d4a84c'), borderWidth: 1, pointRadius: 0, tension: 0.3, cubicInterpolationMode: 'monotone', fill: false, order: 3 },
+        { label: 'EMA ' + EP_RC[3], data: ema50, borderColor: getIndicatorColor('ema50', '#60a5fa'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, cubicInterpolationMode: 'monotone', fill: false, order: 4 },
         // EMA 200 — lavender (sanctuary color)
-        ...(show200 ? [{ label: 'EMA ' + EP_RC[4], data: ema200, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
+        // before v-temperature-gauge-v0.1: borderColor 'rgba(167,139,250,0.3)' (fixed, the same lavender as the bands, hard to see)
+        ...(show200 ? [{ label: 'EMA ' + EP_RC[4], data: ema200, borderColor: tgLineColor('ema200', 'rgba(196,181,253,0.7)'), borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, cubicInterpolationMode: 'monotone', fill: false, order: 4 }] : []),
         // Gravity — bright gold
-        { label: 'Gravity', data: gravCenter, borderColor: 'rgba(232,176,25,0.6)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
+        // before v-temperature-gauge-v0.1: borderColor 'rgba(232,176,25,0.6)' (fixed)
+        { label: 'Gravity', data: gravCenter, borderColor: tgLineColor('gravity', 'rgba(232,176,25,0.6)'), borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
         // Buy/Sell — density-scaled
-        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: sigB, showLine: false, order: 0 },
-        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: sigB, showLine: false, order: 0 },
+        // before v-temperature-gauge-v0.1: Buy backgroundColor '#10B981', pointBorderColor '#34d399'; Sell '#EF4444' / '#f87171' (fixed)
+        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: tgLineColor('buy', '#10B981'), pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointBorderColor: tgLineColor('buy', '#34d399', 0.75), pointBorderWidth: sigB, showLine: false, order: 0 },
+        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: tgLineColor('sell', '#EF4444'), pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: tgLineColor('sell', '#f87171', 0.75), pointBorderWidth: sigB, showLine: false, order: 0 },
         // (Old diamond signals removed — unified temperature-first system)
         // Volume overlay — brighter, semi-transparent bars at chart bottom
         { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.3)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
@@ -3363,6 +3436,8 @@ function renderChart(candles, a) {
         })),
         // Gyro Hub · Ring · Orbit (optional)
         ...gyroDatasets,
+        // v-temperature-gauge-v0.1: your own buy and sell marks (display only, never orders)
+        ...((typeof tgTriggerDatasets === 'function') ? tgTriggerDatasets(closes.length) : []),
         // Overlay datasets (built before chart creation)
         ...mainOverlayDatasets
       ]
@@ -3407,6 +3482,9 @@ function renderChart(candles, a) {
               if (ctx.dataset.label === 'Orbit') return 'Orbit: ' + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : '—');
               if (ctx.dataset.label === 'Volume') return 'Vol: ' + (ctx.raw >= 1e6 ? (ctx.raw/1e6).toFixed(1) + 'M' : ctx.raw >= 1e3 ? (ctx.raw/1e3).toFixed(0) + 'K' : ctx.raw);
               if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + ctx.raw?.toFixed(2);
+              // v-temperature-gauge-v0.1: moving averages and your marks read out too
+              if (/^EMA \d+$/.test(ctx.dataset.label || '') && ctx.raw != null) return ctx.dataset.label + ': ' + Number(ctx.raw).toFixed(ctx.raw < 10 ? 4 : 2);
+              if ((ctx.dataset.label === 'Your buy mark' || ctx.dataset.label === 'Your sell mark') && ctx.dataIndex === ctx.dataset.data.length - 1) return ctx.dataset.label + ': ' + Number(ctx.raw).toFixed(2);
               return null;
             }
           }
@@ -3464,6 +3542,12 @@ function renderChart(candles, a) {
     }
   });
 
+  // v-temperature-gauge-v0.1: Chart.js puts back a canvas's first inline style when its chart is
+  // destroyed. The first price chart was made while the loading screen had the canvas hidden, so
+  // every later renderChart (a color change, Stack, Log, the warm lines) left the price chart blank.
+  // Show it again here. Compose mode still decides after this (its post-render hook runs last).
+  document.getElementById('mainChart').style.display = 'block';
+
   // RSI sub-chart
   const rsiCtx = document.getElementById('rsiChart').getContext('2d');
   rsiChartInstance = new Chart(rsiCtx, {
@@ -3513,6 +3597,9 @@ function renderChart(candles, a) {
       labels,
       datasets: [
         { data: a.temps, backgroundColor: tempColors, borderWidth: 0, order: 2 },
+        // v-temperature-gauge-v0.1: the Temperature swatch now colors a line over the zone bars
+        // (the bars keep their green / gold / red zone meaning).
+        { label: 'Temperature', data: a.temps, type: 'line', borderColor: tgLineColor('temperature', '#e8b019'), borderWidth: 1.4, pointRadius: 0, tension: 0.25, cubicInterpolationMode: 'monotone', fill: false, order: 0 },
         // Classic thresholds (55/45) — untouched
         { data: new Array(closes.length).fill(55), borderColor: 'rgba(16,185,129,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 },
         { data: new Array(closes.length).fill(45), borderColor: 'rgba(239,68,68,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 },
@@ -3548,6 +3635,8 @@ function renderChart(candles, a) {
         labels: labels,
         datasets: [
           { data: dtData, backgroundColor: dtColors, borderWidth: 0 },
+          // v-temperature-gauge-v0.1: the ΔT swatch colors this line (bars keep up green, down red)
+          { label: '\u0394T', data: dtData, type: 'line', borderColor: tgLineColor('dt', '#34d399'), borderWidth: 1.2, pointRadius: 0, tension: 0.25, cubicInterpolationMode: 'monotone', fill: false, order: 0 },
           { data: new Array(closes.length).fill(0), borderColor: 'rgba(200,210,230,0.15)', borderWidth: 1, pointRadius: 0, type: 'line', fill: false }
         ]
       },
@@ -3570,9 +3659,10 @@ function renderChart(candles, a) {
       type: 'line',
       data: { labels: labels, datasets: [
         // Temperature-Price Spread (gold line) — where temp "thinks" price should be vs where it is
-        { label: 'TP Spread', data: a.tpSpread, borderColor: 'rgba(232,176,25,0.7)', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        // before v-temperature-gauge-v0.1: TP Spread 'rgba(232,176,25,0.7)' and RSI Spread 'rgba(139,92,246,0.6)' (fixed)
+        { label: 'TP Spread', data: a.tpSpread, borderColor: tgLineColor('ips', 'rgba(232,176,25,0.7)'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
         // RSI-Price Spread (purple line) — where RSI "thinks" price should be
-        { label: 'RSI Spread', data: a.rpSpread, borderColor: 'rgba(139,92,246,0.6)', borderWidth: 1.2, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'RSI Spread', data: a.rpSpread, borderColor: tgLineColor('rsi', 'rgba(139,92,246,0.6)'), borderWidth: 1.2, pointRadius: 0, tension: 0.3, fill: false },
         // Zero line — the moment of agreement
         { data: new Array(closes.length).fill(0), borderColor: 'rgba(200,210,230,0.2)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false }
       ]},
@@ -3886,6 +3976,26 @@ function restoreHiddenPanels() {
   setTimeout(_polishResizeAllCharts, 50);
 }
 
+// v-temperature-gauge-v0.1: every line on every chart reads its color here.
+// With no saved color the line keeps its old look exactly (same color, same alpha).
+// With a saved color (#rrggbb) the line takes it, keeping the old line's alpha.
+function tgAlphaOf(css) {
+  var m = /rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)/.exec(String(css || ''));
+  return m ? parseFloat(m[1]) : 1;
+}
+function tgHexA(hex, alpha) {
+  if (!/^#[0-9a-fA-F]{6}$/.test(String(hex || ''))) return hex;
+  if (alpha == null || alpha >= 1) return hex;
+  var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+function tgLineColor(id, defaultCss, alphaOverride) {
+  var saved = null;
+  try { saved = (JSON.parse(localStorage.getItem('fl_tg_indicatorColors') || '{}') || {})[id] || null; } catch (e) { saved = null; }
+  if (!saved) return alphaOverride != null && /^#/.test(defaultCss) ? tgHexA(defaultCss, alphaOverride) : defaultCss;
+  return tgHexA(saved, alphaOverride != null ? alphaOverride : tgAlphaOf(defaultCss));
+}
+
 // User-configurable indicator colors (persists in localStorage).
 function getIndicatorColor(indicator, defaultColor) {
   try {
@@ -3901,9 +4011,12 @@ function setIndicatorColor(indicator, color) {
   } catch (e) {}
   var label = document.querySelector('.sub-chart-label[data-indicator="' + indicator + '"]');
   if (label) label.style.color = color;
+  // v-temperature-gauge-v0.1: the sub-chart swatch and the Lines panel swatch stay in step.
+  if (label) { var _sw = label.querySelector('.sc-color'); if (_sw && /^#[0-9a-fA-F]{6}$/.test(color)) _sw.value = color; }
   if (typeof lastCandles !== 'undefined' && typeof lastAnalysis !== 'undefined' && lastCandles && lastAnalysis) {
     renderChart(lastCandles, lastAnalysis);
   }
+  if (typeof tgLinesPanelRender === 'function') tgLinesPanelRender();
 }
 
 // Sub-chart layout toggle: stacked (default, full-width) \u2194 grid (compact).
@@ -4386,7 +4499,8 @@ hideLoading = function() {
     rsi:         { label: 'RSI (14)',       defaultColor: '#8B5CF6', canvas: 'rsiChart',  getData: function (a, c) { return (a && a.rsiArr) || []; } },
     temperature: { label: 'Temperature',    defaultColor: '#e8b019', canvas: 'tempChart', getData: function (a, c) { return (a && a.temps)  || []; } },
     dt:          { label: 'ΔT',             defaultColor: '#34d399', canvas: 'dtChart',   getData: function (a, c) { return (a && a.tempROC) || []; } },
-    ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
+    // before v-temperature-gauge-v0.1: ips defaultColor '#f07068' (coral) while the drawn line is gold
+    ips:         { label: 'IPS',            defaultColor: '#e8b019', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
     price:       { label: 'Price',          defaultColor: '#e2d9c8', canvas: null,
                    getData: function (a, c) { return (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); } },
     // EMA labels are recomputed in updateComposeUI() so they track getEmaPeriods()
@@ -4398,6 +4512,9 @@ hideLoading = function() {
                    getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[2] : 24)); } },
     ema50:       { label: 'EMA',             defaultColor: '#60a5fa', canvas: null,
                    getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[3] : 50)); } },
+    // v-temperature-gauge-v0.1: the fifth moving average can be promoted in compose mode too
+    ema200:      { label: 'EMA',             defaultColor: '#c4b5fd', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[4] : 200)); } },
     volume:      { label: 'Volume',         defaultColor: '#60a5fa', canvas: null,        chartType: 'bar',
                    getData: function (a, c) { return (c || []).map(function (k) { return k && k.v != null ? k.v : null; }); } },
     bollinger:   { label: 'Bollinger Bands', defaultColor: '#a78bfa', canvas: null,
@@ -6227,6 +6344,274 @@ hideLoading = function() {
   document.addEventListener('DOMContentLoaded', function() {
     if (typeof tgRenderRulesList === 'function') tgRenderRulesList();
   });
+})();
+</script>
+
+<!-- v-temperature-gauge-v0.1: Lines and colors, warm moving averages, your marks, a wider look.
+     Live data only (the same feed as the chart). Nothing here trades, sends, or alerts. -->
+<script>
+(function tgTemperatureGaugeV01() {
+  // ── Lines and colors ────────────────────────────────────────────
+  // id: the color key (fl_tg_indicatorColors); hex: the swatch default.
+  function lineList() {
+    var EP = (typeof getEmaPeriods === 'function') ? getEmaPeriods() : [8, 12, 24, 50, 200];
+    return [
+      { id: 'price', name: 'Price', hex: '#e8e4dc' },
+      { id: 'ema8', name: 'EMA ' + EP[0], hex: '#f07068' },
+      { id: 'ema12', name: 'EMA ' + EP[1], hex: '#e8b019' },
+      { id: 'ema24', name: 'EMA ' + EP[2], hex: '#d4a84c' },
+      { id: 'ema50', name: 'EMA ' + EP[3], hex: '#60a5fa' },
+      { id: 'ema200', name: 'EMA ' + EP[4], hex: '#c4b5fd' },
+      { id: 'bollinger', name: 'Bollinger bands', hex: '#a78bfa' },
+      { id: 'gravity', name: 'Gravity', hex: '#e8b019' },
+      { id: 'buy', name: 'Buy signals and your buy mark', hex: '#10b981' },
+      { id: 'sell', name: 'Sell signals and your sell mark', hex: '#ef4444' },
+      { id: 'hub', name: 'Gyro Hub', hex: '#e8b019' },
+      { id: 'ring', name: 'Gyro Ring', hex: '#60a5fa' },
+      { id: 'orbit', name: 'Gyro Orbit', hex: '#a78bfa' },
+      { id: 'rsi', name: 'RSI and RSI spread', hex: '#8b5cf6' },
+      { id: 'temperature', name: 'Temperature', hex: '#e8b019' },
+      { id: 'dt', name: '\u0394T', hex: '#34d399' },
+      { id: 'ips', name: 'TP spread', hex: '#e8b019' }
+    ];
+  }
+  function savedColors() {
+    try { return JSON.parse(localStorage.getItem('fl_tg_indicatorColors') || '{}') || {}; } catch (e) { return {}; }
+  }
+  function isHex(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')); }
+
+  function renderLines() {
+    var list = document.getElementById('tgLinesList');
+    if (!list) return;
+    var saved = savedColors();
+    var gyroOn = (typeof isGyroLayerOn === 'function') ? isGyroLayerOn() : false;
+    while (list.firstChild) list.removeChild(list.firstChild);
+    lineList().forEach(function (L) {
+      var color = isHex(saved[L.id]) ? saved[L.id] : L.hex;
+      var row = document.createElement('label');
+      row.className = 'tg-line-row';
+      row.setAttribute('data-line', L.id);
+      if ((L.id === 'hub' || L.id === 'ring' || L.id === 'orbit') && !gyroOn) row.className += ' is-off';
+      var sample = document.createElement('span');
+      sample.className = 'tg-line-sample';
+      sample.style.color = color;
+      var name = document.createElement('span');
+      name.className = 'tg-line-name';
+      name.textContent = L.name + ((L.id === 'hub' || L.id === 'ring' || L.id === 'orbit') && !gyroOn ? ' (Gyro is off)' : '');
+      var pick = document.createElement('input');
+      pick.type = 'color';
+      pick.value = color.toLowerCase();
+      pick.setAttribute('aria-label', 'Choose ' + L.name + ' color');
+      pick.addEventListener('change', function () {
+        if (typeof setIndicatorColor === 'function') setIndicatorColor(L.id, pick.value);
+      });
+      row.appendChild(sample); row.appendChild(name); row.appendChild(pick);
+      list.appendChild(row);
+    });
+    renderMaNote();
+  }
+
+  function resetColors() {
+    try { localStorage.removeItem('fl_tg_indicatorColors'); } catch (e) {}
+    var defaults = { rsi: '#8B5CF6', temperature: '#e8b019', dt: '#34d399', ips: '#e8b019' };
+    Object.keys(defaults).forEach(function (id) {
+      var label = document.querySelector('.sub-chart-label[data-indicator="' + id + '"]');
+      if (!label) return;
+      label.style.color = defaults[id];
+      var sw = label.querySelector('.sc-color');
+      if (sw) sw.value = defaults[id].toLowerCase();
+    });
+    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+    renderLines();
+  }
+
+  // ── Warm history for the moving averages ─────────────────────────
+  // An EMA of N bars has no value for its first N bars. With 252 daily bars, EMA 200 drew only
+  // the last 53. We fetch a longer range from the same feed, run the EMAs over it, and line the
+  // values up with the loaded bars by timestamp. Signals and the sidebar still use the loaded window.
+  var WARM_RANGE = { '5m': '1mo', '15m': '1mo', '1h': '6mo', '1d': '2y', '1wk': '10y' };
+  var warm = { key: '', ts: [], closes: [], state: 'off', extra: 0 };
+
+  window.tgWarmFetch = function (symbol, interval, candles) {
+    var key = symbol + '|' + interval;
+    if (warm.key === key && warm.state === 'ready') return;
+    warm = { key: key, ts: [], closes: [], state: 'loading', extra: 0 };
+    renderMaNote();
+    var range = WARM_RANGE[interval];
+    if (!range || typeof fetchYahooData !== 'function') { warm.state = 'off'; renderMaNote(); return; }
+    fetchYahooData(symbol, interval, range).then(function (longer) {
+      if (warm.key !== key) return;
+      if (!longer || !longer.length || !candles || !candles.length || longer[0].t >= candles[0].t) {
+        warm.state = 'off'; renderMaNote(); return;
+      }
+      warm.ts = longer.map(function (c) { return c.t; });
+      warm.closes = longer.map(function (c) { return c.c; });
+      warm.extra = longer.filter(function (c) { return c.t < candles[0].t; }).length;
+      warm.state = 'ready';
+      if (typeof lastSymbol !== 'undefined' && lastSymbol === symbol && currentInterval === interval &&
+          typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
+        renderChart(lastCandles, lastAnalysis);
+      }
+      renderMaNote();
+    }, function () {
+      if (warm.key !== key) return;
+      warm.state = 'off'; renderMaNote();
+    });
+  };
+
+  window.tgWarmEmas = function (candles, periods) {
+    if (warm.state !== 'ready' || !candles || !candles.length) return null;
+    var sym = (typeof lastSymbol !== 'undefined') ? lastSymbol : '';
+    if (warm.key !== sym + '|' + currentInterval) return null;
+    if (!(warm.ts[0] < candles[0].t)) return null;
+    var closes = candles.map(function (c) { return c.c; });
+    return periods.map(function (p) {
+      var long = ema(warm.closes, p);
+      var byT = {};
+      for (var i = 0; i < warm.ts.length; i++) if (long[i] != null) byT[warm.ts[i]] = long[i];
+      var k = 2 / (p + 1);
+      var local = ema(closes, p);
+      var out = new Array(candles.length).fill(null);
+      for (var j = 0; j < candles.length; j++) {
+        var v = byT[candles[j].t];
+        if (v != null) { out[j] = v; continue; }
+        // a bar the longer fetch does not have (often the live bar): carry the EMA forward
+        if (j > 0 && out[j - 1] != null && closes[j] != null) { out[j] = closes[j] * k + out[j - 1] * (1 - k); continue; }
+        out[j] = local[j];
+      }
+      return out;
+    });
+  };
+
+  function renderMaNote() {
+    var el = document.getElementById('tgMaNote');
+    if (!el) return;
+    var EP = (typeof getEmaPeriods === 'function') ? getEmaPeriods() : [8, 12, 24, 50, 200];
+    var n = (typeof lastCandles !== 'undefined' && lastCandles) ? lastCandles.length : 0;
+    var line = 'Moving averages: EMA ' + EP.join(', ') + ' (exponential). Change them under the chart.';
+    if (warm.state === 'ready') line += ' Lines use ' + warm.extra + ' earlier bars from the same feed, so they start at the left edge. Signals use the ' + n + ' bars shown.';
+    else if (warm.state === 'loading') line += ' Fetching earlier bars so the longer lines start at the left edge.';
+    else if (n) {
+      var longest = EP[4];
+      line += n >= longest ? ' The longer lines start once they have enough bars.' : ' EMA ' + longest + ' needs ' + longest + ' bars; this view has ' + n + ', so it is not drawn.';
+    }
+    el.textContent = line;
+  }
+
+  // ── Your marks (display only) ────────────────────────────────────
+  var MARK_KEY = 'fl_tg_triggers_v0';
+  function allMarks() { try { return JSON.parse(localStorage.getItem(MARK_KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function curSym() {
+    if (typeof lastSymbol !== 'undefined' && lastSymbol) return String(lastSymbol).toUpperCase();
+    var inp = document.getElementById('symbolInput');
+    return inp ? String(inp.value || '').trim().toUpperCase() : '';
+  }
+  function marksFor(sym) { var m = allMarks()[sym]; return m && typeof m === 'object' ? m : {}; }
+  function num(v) { var x = parseFloat(v); return isFinite(x) && x > 0 ? x : null; }
+
+  window.tgTriggerDatasets = function (n) {
+    var m = marksFor(curSym());
+    var out = [];
+    if (num(m.buy)) out.push({ label: 'Your buy mark', data: new Array(n).fill(num(m.buy)), borderColor: tgLineColor('buy', 'rgba(16,185,129,0.85)'), borderWidth: 1.5, borderDash: [10, 4, 2, 4], pointRadius: 0, fill: false, order: 1 });
+    if (num(m.sell)) out.push({ label: 'Your sell mark', data: new Array(n).fill(num(m.sell)), borderColor: tgLineColor('sell', 'rgba(239,68,68,0.85)'), borderWidth: 1.5, borderDash: [10, 4, 2, 4], pointRadius: 0, fill: false, order: 1 });
+    setTimeout(renderMarks, 0);
+    return out;
+  };
+
+  function renderMarks() {
+    var sym = curSym();
+    var m = marksFor(sym);
+    var b = document.getElementById('tgMarkBuy'), s = document.getElementById('tgMarkSell');
+    if (b && document.activeElement !== b) b.value = num(m.buy) != null ? String(num(m.buy)) : '';
+    if (s && document.activeElement !== s) s.value = num(m.sell) != null ? String(num(m.sell)) : '';
+    var st = document.getElementById('tgMarkStatus');
+    if (!st) return;
+    var candles = (typeof lastCandles !== 'undefined') ? lastCandles : null;
+    if (!sym || !candles || !candles.length) { st.textContent = 'Load a symbol, then set a price for either mark.'; return; }
+    var last = candles[candles.length - 1].c;
+    var closes = candles.map(function (c) { return c.c; }).filter(function (c) { return c != null; });
+    var lo = Math.min.apply(null, closes), hi = Math.max.apply(null, closes), pad = (hi - lo) * 0.08;
+    var parts = [];
+    function say(name, v) {
+      if (v == null) return;
+      var pct = ((v - last) / last) * 100;
+      var where = Math.abs(pct) < 0.005 ? 'at the last close' : (Math.abs(pct).toFixed(1) + '% ' + (pct < 0 ? 'below' : 'above') + ' the last close');
+      var seen = (v < lo - pad || v > hi + pad) ? ' It is outside what this chart shows.' : '';
+      parts.push('Your ' + name + ' mark ' + v.toFixed(2) + ' is ' + where + '.' + seen);
+    }
+    say('buy', num(m.buy)); say('sell', num(m.sell));
+    if (num(m.buy) != null && last <= num(m.buy)) parts.push('The last close is at or under your buy mark.');
+    if (num(m.sell) != null && last >= num(m.sell)) parts.push('The last close is at or over your sell mark.');
+    st.textContent = parts.length ? sym + ': ' + parts.join(' ') : sym + ': no marks yet.';
+  }
+
+  function saveMarks() {
+    var sym = curSym();
+    if (!sym) return;
+    var all = allMarks();
+    var b = num((document.getElementById('tgMarkBuy') || {}).value);
+    var s = num((document.getElementById('tgMarkSell') || {}).value);
+    if (b == null && s == null) delete all[sym]; else all[sym] = { buy: b, sell: s, at: new Date().toISOString() };
+    try { localStorage.setItem(MARK_KEY, JSON.stringify(all)); } catch (e) {}
+    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+    renderMarks();
+  }
+  function clearMarks() {
+    var sym = curSym();
+    var all = allMarks();
+    delete all[sym];
+    try { localStorage.setItem(MARK_KEY, JSON.stringify(all)); } catch (e) {}
+    var b = document.getElementById('tgMarkBuy'), s = document.getElementById('tgMarkSell');
+    if (b) b.value = ''; if (s) s.value = '';
+    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+    renderMarks();
+  }
+
+  // ── A wider look (real symbols, same feed) ───────────────────────
+  var WIDER = [
+    { sym: 'HYG', title: 'High-yield corporate bonds (ETF)' },
+    { sym: 'LQD', title: 'Investment-grade corporate bonds (ETF)' },
+    { sym: 'XLP', title: 'Consumer staples (ETF)' },
+    { sym: 'XLY', title: 'Consumer discretionary (ETF)' },
+    { sym: 'GLD', title: 'Gold (ETF)' },
+    { sym: 'DX-Y.NYB', title: 'US dollar index' },
+    // ^VIX (the index itself) needs the data worker deployed again (desktop/data-proxy-worker, this
+    // brick decodes ^ in the path). Until then it does not load, so the list offers VIXY, which does.
+    { sym: 'VIXY', title: 'VIX short-term futures (ETF), a stand-in for the volatility index' }
+  ];
+  function renderWider() {
+    var box = document.getElementById('tgWiderList');
+    if (!box) return;
+    while (box.firstChild) box.removeChild(box.firstChild);
+    WIDER.forEach(function (w) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tg-mini-btn';
+      btn.textContent = w.sym;
+      btn.title = w.title;
+      btn.setAttribute('aria-label', 'Load ' + w.title);
+      btn.addEventListener('click', function () {
+        var inp = document.getElementById('symbolInput');
+        if (inp) inp.value = w.sym;
+        if (typeof loadData === 'function') loadData();
+      });
+      box.appendChild(btn);
+    });
+  }
+
+  window.tgLinesPanelRender = function () { renderLines(); renderMarks(); };
+
+  function boot() {
+    renderLines(); renderMarks(); renderWider();
+    var r = document.getElementById('tgLinesReset'); if (r) r.addEventListener('click', resetColors);
+    var sv = document.getElementById('tgMarkSave'); if (sv) sv.addEventListener('click', saveMarks);
+    var cl = document.getElementById('tgMarkClear'); if (cl) cl.addEventListener('click', clearMarks);
+    ['tgMarkBuy', 'tgMarkSell'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('keydown', function (e) { if (e.key === 'Enter') saveMarks(); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
 

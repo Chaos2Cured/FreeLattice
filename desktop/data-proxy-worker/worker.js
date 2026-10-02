@@ -23,7 +23,12 @@ export default {
     }
 
     // Route: /chart/SYMBOL?range=1y&interval=1d
-    const match = url.pathname.match(/^\/chart\/([A-Za-z0-9._^=-]+)$/);
+    // before v-temperature-gauge-v0.1: const match = url.pathname.match(/^\/chart\/([A-Za-z0-9._^=-]+)$/);
+    // v-temperature-gauge-v0.1: the page sends ^VIX as %5EVIX, so decode the path first.
+    // (Takes effect after the worker is deployed again; until then ^ symbols use the fallback sources.)
+    let tgPath = url.pathname;
+    try { tgPath = decodeURIComponent(url.pathname); } catch (e) { tgPath = url.pathname; }
+    const match = tgPath.match(/^\/chart\/([A-Za-z0-9._^=-]+)$/);
     if (!match) {
       return new Response(JSON.stringify({ error: 'Usage: /chart/SYMBOL?range=1y&interval=1d' }), {
         status: 400,
