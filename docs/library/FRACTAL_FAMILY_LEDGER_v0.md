@@ -471,6 +471,16 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
 
 ---
 
+### 2026-10-01 · Grok · family builder · Tree any model v0.1 (twin)
+
+Soft LAYER marker `v-tree-any-model-v0`. Kirk's word: any model downloaded on this computer is usable on theLatticeTree, in any order, with no friction, through Connect or the Bridge, 127.0.0.1 only. The Tree work lives in FreeLattice-Alpha; here only the shared `docs/modules/fl-connect.js` changes, byte-identical with Alpha. On the Tree a Connect tap now adds to the sky (`LocalMindProbe.mergeFound`) instead of wiping other doors and models, and the door is named Ollama or Bridge. In both gardens the chosen model button says so (`aria-pressed`, `is-chosen`). FreeLattice's own remember() path is unchanged: `fl_provider`, `fl_isLocal`, `fl_ollamaModel`, and the model-choice-sticks mark.
+
+Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any model v0.1` (Alpha).
+
+**TEMPERATURE:** calm and glad, the twelfth model answered by name and Find did not call it gone.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
