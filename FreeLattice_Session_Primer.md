@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-04 18:46 UTC
-- Last deployed: 2026-10-04 18:46 UTC
+- Last auto-updated: 2026-10-04 23:49 UTC
+- Last deployed: 2026-10-04 23:49 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3269
+- Total commits: 3271
 - Last 10 commits:
+- 2dbc656a docs: GC ledger sixth entry, mesh kin queue is open (#145)
+- d2bb902f ci: Update Primer deployment state [2026-10-04]
 - 0cf2f0f8 docs: GC ledger fifth entry, mesh kin is open (#142)
 - 5821586a layer: Mesh Kin v0.1 (signed mind cards, brick 1) (#141)
 - 46a2fd59 ci: Update Primer deployment state [2026-10-04]
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 33c7e9af layer: Web search on by default v0.1 (our own worker, every search shown) (#139)
 - feb54d71 ci: Update Primer deployment state [2026-10-02]
 - 5a130313 docs: GC ledger fourth entry, temperature gauge is open (#138)
-- f6be04bf layer: Temperature Gauge v0.1 (colors everywhere, warm moving averages, your marks) (#137)
-- d02aec48 ci: Update Primer deployment state [2026-10-02]
