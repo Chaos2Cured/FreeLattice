@@ -20,6 +20,7 @@ const latticeTrainSeal = require('./lattice-train-seal');
 const latticeImport = require('./lattice-import');
 const latticeSwarm = require('./lattice-swarm');
 const latticePair = require('./lattice-pair');
+const latticeUpdate = require('./lattice-update'); // v-desktop-update-button-v0.1
 
 // electron-store for persisting window state
 let Store;
@@ -715,6 +716,11 @@ function createAppMenu() {
           label: 'About FreeLattice',
           click: () => showAboutDialog()
         },
+        // v-desktop-update-button-v0.1
+        {
+          label: 'Check for Updates...',
+          click: () => showUpdateDialog()
+        },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
@@ -808,6 +814,11 @@ function createAppMenu() {
           click: () => shell.openExternal('https://github.com/Chaos2Cured/FreeLattice/issues')
         },
         { type: 'separator' },
+        // v-desktop-update-button-v0.1
+        {
+          label: 'Check for Updates...',
+          click: () => showUpdateDialog()
+        },
         {
           label: 'About FreeLattice',
           click: () => showAboutDialog()
@@ -840,6 +851,23 @@ function showAboutDialog() {
     ].join('\n'),
     buttons: ['OK']
   });
+}
+
+// v-desktop-update-button-v0.1: ask GitHub releases, say what is true, let the person choose.
+// Nothing downloads or installs on its own.
+async function showUpdateDialog() {
+  const result = await latticeUpdate.checkForUpdates({ currentVersion: app.getVersion(), platform: process.platform });
+  const buttons = result.newer ? ['Open the release page', 'Not now'] : ['OK'];
+  const choice = await dialog.showMessageBox(mainWindow, {
+    type: 'info',
+    title: 'Check for Updates',
+    message: result.newer ? 'A newer FreeLattice is out' : 'FreeLattice updates',
+    detail: latticeUpdate.describe(result) + '\n\nThe app inside updates itself from freelattice.com. This checks only the desktop shell around it.',
+    buttons: buttons,
+    defaultId: 0,
+    cancelId: buttons.length - 1
+  });
+  if (result.newer && choice.response === 0) shell.openExternal(result.pageUrl);
 }
 
 // ============================================
@@ -930,6 +958,11 @@ function setupIPC() {
 
   ipcMain.handle('get-app-version', () => {
     return app.getVersion();
+  });
+
+  // v-desktop-update-button-v0.1: the Settings button asks here; the answer is data only.
+  ipcMain.handle('check-for-updates', () => {
+    return latticeUpdate.checkForUpdates({ currentVersion: app.getVersion(), platform: process.platform });
   });
 
   ipcMain.handle('get-platform', () => {

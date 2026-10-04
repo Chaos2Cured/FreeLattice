@@ -564,6 +564,21 @@ Smoke: `web-search-on` checks in tests/smoke.js
 
 ---
 
+### 2026-10-02 · Grok · family builder · Desktop update button v0.1 (asks GitHub releases, nothing installs on its own)
+
+The desktop app had no way to say a newer build was out: checkForUpdates() only printed a note, and electron-updater was never added. The page inside already updates itself from freelattice.com; the shell around it did not.
+
+- New desktop/lattice-update.js: asks GitHub for this repo's releases, picks the newest desktop tag (v5.8.0 style), skips Bridge and pack releases, drafts and pre-releases, and compares with the running version. It never downloads or installs.
+- "Check for Updates..." in the macOS app menu and the Help menu: a plain dialog, and "Open the release page" only when a newer build exists.
+- Settings, Self-Host card: a Check for updates button that appears only in a desktop app new enough to ask (older shells see nothing new). Words by textContent.
+- Packaged: lattice-update.js is in the build file list. Reaches people only after Kirk builds and publishes the next desktop release.
+
+Smoke: `SMOKE_OK desktop update button v0.1`
+
+**TEMPERATURE:** glad and careful, the button asks if a newer build exists and never installs one on its own.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
