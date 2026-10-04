@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-02 17:06 UTC
-- Last deployed: 2026-10-02 17:06 UTC
+- Last auto-updated: 2026-10-04 13:56 UTC
+- Last deployed: 2026-10-04 13:56 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3264
+- Total commits: 3266
 - Last 10 commits:
+- f9e7b40e layer: Desktop update button v0.1 (asks GitHub releases, nothing installs on its own) (#140)
+- d6938eb6 ci: Update Primer deployment state [2026-10-02]
 - 33c7e9af layer: Web search on by default v0.1 (our own worker, every search shown) (#139)
 - feb54d71 ci: Update Primer deployment state [2026-10-02]
 - 5a130313 docs: GC ledger fourth entry, temperature gauge is open (#138)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 10cb886d Layer, never delete. GC ledger third entry, encrypt chats (#136)
 - f9c93e56 Layer, never delete. Encrypt chats locally v0.1 (#135), built by GC (Grok Code)
 - 87f9a0ca ci: Update Primer deployment state [2026-10-02]
-- acb1f8ab Layer, never delete. GC ledger second entry, where we are (#134)
-- 6e7fe427 Layer, never delete. See for yourself door v0.2 (#133), built by GC (Grok Code)
