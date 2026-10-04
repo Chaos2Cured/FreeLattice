@@ -18057,6 +18057,45 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       }
     })();
     </script>
+    <!-- v-desktop-update-button-v0.1: shown only inside a desktop app new enough to ask. -->
+    <div id="desktopUpdateRow" class="v-desktop-update-button-v0.1" hidden style="margin-bottom: 14px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border, #2a2d3e); font-size: 0.82rem; line-height: 1.6;">
+      <button type="button" id="desktopUpdateBtn" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer;">Check for updates</button>
+      <button type="button" id="desktopUpdateOpen" hidden style="margin-left: 8px; background: transparent; color: var(--accent, #c9a84c); border: 1px solid var(--accent, #c9a84c); border-radius: 8px; padding: 6px 14px; font-size: 0.78rem; cursor: pointer;">Open the release page</button>
+      <div id="desktopUpdateStatus" style="margin-top: 8px; color: var(--text-secondary, #a8a4a0);"></div>
+    </div>
+    <script>
+    (function () {
+      var row = document.getElementById('desktopUpdateRow');
+      var btn = document.getElementById('desktopUpdateBtn');
+      var open = document.getElementById('desktopUpdateOpen');
+      var status = document.getElementById('desktopUpdateStatus');
+      var api = window.electronAPI;
+      if (!row || !btn || !open || !status || !api || typeof api.checkForUpdates !== 'function') return;
+      row.hidden = false;
+      var pageUrl = '';
+      status.textContent = 'The app inside updates itself from freelattice.com. This checks the desktop shell around it, on GitHub.';
+      btn.addEventListener('click', function () {
+        btn.disabled = true;
+        open.hidden = true;
+        status.textContent = 'Asking GitHub...';
+        api.checkForUpdates().then(function (r) {
+          r = r || {};
+          if (!r.ok) status.textContent = 'Could not reach GitHub to check. You have FreeLattice ' + (r.current || '') + '. Try again later.';
+          else if (!r.latest) status.textContent = 'No desktop release found on GitHub yet. You have FreeLattice ' + r.current + '.';
+          else if (r.newer) {
+            status.textContent = 'FreeLattice ' + r.latest + ' is out. You have ' + r.current + '. Nothing downloads until you choose.';
+            pageUrl = String(r.pageUrl || '');
+            open.hidden = pageUrl.indexOf('https://github.com/Chaos2Cured/FreeLattice/') !== 0;
+          } else status.textContent = 'You have the newest FreeLattice desktop app (' + r.current + ').';
+        }).catch(function () {
+          status.textContent = 'Could not check just now. Try again later.';
+        }).then(function () { btn.disabled = false; });
+      });
+      open.addEventListener('click', function () {
+        if (pageUrl && typeof api.openExternal === 'function') api.openExternal(pageUrl);
+      });
+    })();
+    </script>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
       Run FreeLattice as a local server to access it from any device on your network &mdash; or anywhere in the world. No cloud required.
     </p>

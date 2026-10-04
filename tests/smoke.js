@@ -12832,6 +12832,19 @@ assert('loved-door: Quiet Room, founding Ember Flow invite, and AUTONOMY.md unto
     /closeBtn\.addEventListener\('click', function \(\) \{ window\.closeMenu\(\); \}\);/.test(landing));
 })();
 
+// v-desktop-update-button-v0.1: desktop "Check for updates" asks GitHub releases, never installs.
+(function () {
+  var app = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+  var root = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  var pre = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'preload.js'), 'utf8');
+  assert('desktop-update: preload exposes checkForUpdates',
+    /checkForUpdates: \(\) => ipcRenderer\.invoke\('check-for-updates'\)/.test(pre));
+  assert('desktop-update: Settings row shows only when the shell can ask, words by textContent',
+    /id="desktopUpdateRow"[^>]*hidden/.test(app) && /typeof api\.checkForUpdates !== 'function'\) return;/.test(app)
+    && /Nothing downloads until you choose\./.test(app));
+  assert('desktop-update: root index.html equals docs/app.html', root === app);
+})();
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

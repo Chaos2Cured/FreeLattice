@@ -18,6 +18,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    */
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 
+  // v-desktop-update-button-v0.1: ask GitHub releases whether a newer desktop app is out (no download).
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+
   /**
    * Get the current platform.
    * @returns {Promise<string>} 'darwin', 'win32', or 'linux'
