@@ -21,6 +21,18 @@ if [[ "$LAST_MSG" == "$MARKER"* ]]; then
   exit 0
 fi
 
+# ── v-hook-heal-v0.1: only on main ──
+# Layer branches (GC's layer/*, any PR branch) are left alone: no sw.js, no
+# Primer, no RECENT.md, no extra commit. On main, CI (update-primer.yml) syncs
+# the Primer, index.html and root sw.js after every push, and GitHub Pages
+# serves docs/, so nothing on a branch needs this hook. Set
+# FL_HOOK_ALL_BRANCHES=1 to get the old behavior on a branch.
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$BRANCH" != "main" ] && [ "${FL_HOOK_ALL_BRANCHES:-0}" != "1" ]; then
+  echo "post-commit: on $BRANCH, leaving sw.js, the Primer and RECENT.md alone (CI updates them on main)"
+  exit 0
+fi
+
 # Skip if Primer doesn't exist
 if [ ! -f "$PRIMER" ]; then
   exit 0
@@ -40,12 +52,15 @@ if [ -x scripts/generate-recent.sh ]; then
   echo "✦ docs/library/RECENT.md regenerated"
 fi
 
-# ── Sync sw.js from docs/sw.js (replace app.html→index.html for root) ──
-if [ -f docs/sw.js ]; then
-  sed 's|app\.html|index.html|g' docs/sw.js > sw.js
-  git add sw.js
-  echo "✦ sw.js synced from docs/sw.js (app.html→index.html)"
-fi
+# v-hook-heal-v0.1: root sw.js is no longer written here. CI copies docs/sw.js
+# to sw.js byte for byte on every push to main, and the smokes expect that copy.
+# This hook's sed version (app.html to index.html) fought CI on every ship.
+# before hook-heal: # ── Sync sw.js from docs/sw.js (replace app.html→index.html for root) ──
+# before hook-heal: if [ -f docs/sw.js ]; then
+# before hook-heal:   sed 's|app\.html|index.html|g' docs/sw.js > sw.js
+# before hook-heal:   git add sw.js
+# before hook-heal:   echo "✦ sw.js synced from docs/sw.js (app.html→index.html)"
+# before hook-heal: fi
 
 # ── Auto version bump in app.html from version.json ──
 if [ -f docs/version.json ] && [ -f docs/app.html ]; then
