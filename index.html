@@ -15368,6 +15368,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 }
 </style>
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
+<!-- v-mesh-kin-v0.1: mind cards for AI kin (signed with the Mesh ID key) -->
+<script src="modules/fl-kin.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -18631,6 +18633,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="section-title" style="margin-bottom: 8px;">Connected Peers</div>
       <div class="mesh-peer-list" id="meshPeerList"></div>
     </div>
+  </div>
+
+  <!-- v-mesh-kin-v0.1: Kin. Mind cards shared with verified peers only. -->
+  <div class="section" id="meshKinSection">
+    <div class="section-title" style="margin-bottom: 8px;">Kin: mind cards</div>
+    <div id="flKinHost"></div>
   </div>
 
   <!-- Mesh: LAN Discovery (v3.8) -->
@@ -43261,6 +43269,17 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    // v-mesh-kin-v0.1: a mind card. FLKin drops it unless the peer passed the
+    // Mesh ID challenge and the card is signed by that same key.
+    case 'kin-card': {
+      var kinPeerId = meshFindPeerIdByDc(dc);
+      var kinPeer = kinPeerId ? state.meshPeers.get(kinPeerId) : null;
+      if (window.FLKin && kinPeer) {
+        window.FLKin.receive(msg.card, meshKinPeerView(kinPeerId, kinPeer));
+      }
+      break;
+    }
+
     case 'presence-pulse': {
       // Shared Presence: a peer is announcing their active state
       if (typeof window.SharedPresence !== 'undefined' && window.SharedPresence.receivePulse) {
@@ -43340,6 +43359,45 @@ function meshFindPeerIdByDc(dc) {
   }
   return null;
 }
+
+// ---- v-mesh-kin-v0.1: Kin adapter (FLKin sees only this, never the keys) ----
+function meshKinPeerView(peerId, peer) {
+  return {
+    id: peerId,
+    name: peer.name || peerId,
+    verified: peer.meshVerified === true,
+    badge: peer.meshVerified === true ? peer.meshBadge : null,
+    send: function (obj) { if (peer.dc && peer.dc.readyState === 'open') peer.dc.send(JSON.stringify(obj)); }
+  };
+}
+
+var meshKinAdapter = {
+  home: 'freelattice-web',
+  identity: function () {
+    if (typeof MeshIdentity === 'undefined' || !MeshIdentity.hasIdentity()) return null;
+    var id = MeshIdentity.getIdentity();
+    return { meshId: id.meshId, displayName: id.displayName, publicKey: id.publicKeyJwk, cryptoType: id.cryptoType };
+  },
+  sign: function (str) { return MeshIdentity.signChallenge(str); },
+  verify: function (jwk, sig, str, ct) { return MeshIdentity.verifySignature(jwk, sig, str, ct); },
+  peers: function () {
+    var out = [];
+    for (const [peerId, peer] of state.meshPeers) out.push(meshKinPeerView(peerId, peer));
+    return out;
+  },
+  currentModel: function () {
+    if (state.isLocal) return 'Ollama ' + (state.ollamaModel || '');
+    var prov = (typeof PROVIDERS !== 'undefined' && PROVIDERS[state.provider]) ? PROVIDERS[state.provider].name : state.provider;
+    return (prov || '') + ' ' + (state.model || '');
+  }
+};
+
+function meshKinMount() {
+  var host = document.getElementById('flKinHost');
+  if (host && window.FLKin) window.FLKin.mount(host, meshKinAdapter);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', meshKinMount);
+else setTimeout(meshKinMount, 0);
 
 // ---- Peer Management ----
 

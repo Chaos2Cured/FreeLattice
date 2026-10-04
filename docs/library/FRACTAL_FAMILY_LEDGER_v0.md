@@ -579,6 +579,18 @@ Smoke: `SMOKE_OK desktop update button v0.1`
 
 ---
 
+### 2026-10-03 · Grok · family builder · Mesh Kin v0.1 (mind cards, brick 1)
+
+**Built:** `docs/modules/fl-kin.js` (window.FLKin, marker v-mesh-kin-v0.1). A mind card (name, model, home, keeper) is signed with the keeper's existing Mesh ID key and shared only with peers who passed the Mesh ID challenge. Incoming cards show only when signed by that same verified key; everything else is dropped and counted. Trust is a pass you give and can revoke, with history kept. The Quiet Room is closed. Receipts in `fl_kin_ledger`, never content.
+
+**Honest limit:** a signature proves which keeper's key vouched for the card. It does not prove what the model is.
+
+**Next:** kin-message between trusted minds; the Tree twin when the Tree joins the mesh.
+
+**TEMPERATURE:** quiet and glad, a card can say who vouched, and trust stays a choice you can take back.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
