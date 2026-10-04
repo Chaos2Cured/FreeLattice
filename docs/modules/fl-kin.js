@@ -76,9 +76,25 @@
     });
   }
   // A mind's fingerprint: keeper + name + model. A new model means a new card and a new pass.
-  function fingerprint(c) {
+  // v-mesh-kin-v0.2: the keeper's public key is part of the fingerprint too. A badge's
+  // meshId is a label the badge carries, so a stranger could repeat someone's meshId with
+  // their own key. With the key inside, that stranger gets a different fingerprint and
+  // shows as "Seen, not trusted". Passes from v0.1 need one new Trust tap.
+  // before v-mesh-kin-v0.2: function fingerprint(c) {
+  // before v-mesh-kin-v0.2:   var b = cardBody(c);
+  // before v-mesh-kin-v0.2:   return sha256Hex(b.keeperMeshId + '|' + b.name + '|' + b.model).then(function (h) { return h.slice(0, 16); });
+  // before v-mesh-kin-v0.2: }
+  function keyHash(publicKey) {
+    if (!publicKey) return Promise.resolve('');
+    var str = '';
+    try { str = JSON.stringify(publicKey); } catch (e) { return Promise.resolve(''); }
+    return sha256Hex(str).then(function (h) { return h.slice(0, 32); });
+  }
+  function fingerprint(c, publicKey) {
     var b = cardBody(c);
-    return sha256Hex(b.keeperMeshId + '|' + b.name + '|' + b.model).then(function (h) { return h.slice(0, 16); });
+    return keyHash(publicKey || (c && c.publicKey)).then(function (kh) {
+      return sha256Hex(kh + '|' + b.keeperMeshId + '|' + b.name + '|' + b.model);
+    }).then(function (h) { return h.slice(0, 16); });
   }
 
   function sameKey(a, b) {
@@ -118,6 +134,7 @@
     var p = passes();
     var prior = p[fp];
     p[fp] = { name: body.name, model: body.model, keeperMeshId: body.keeperMeshId, keeperName: body.keeperName,
+      keyHash: clip(body.keyHash, 32), // v-mesh-kin-v0.2
       grantedAt: Date.now(), revokedAt: 0, history: ((prior && prior.history) || []).concat(prior && prior.revokedAt ? [{ grantedAt: prior.grantedAt, revokedAt: prior.revokedAt }] : []).slice(-20) };
     writeJson(PASSES_KEY, p);
     ledger('trusted', fp, '');
@@ -130,14 +147,27 @@
     ledger('revoked', fp, '');
   }
 
-  function remember(fp, body, peerName) {
+  // before v-mesh-kin-v0.2: function remember(fp, body, peerName) {
+  function remember(fp, body, peerName, kh) {
     var seen = readJson(SEEN_KEY, []);
     if (!Array.isArray(seen)) seen = [];
     seen = seen.filter(function (s) { return s && s.fp !== fp; });
     seen.push({ fp: fp, name: body.name, model: body.model, home: body.home, keeperName: body.keeperName,
-      keeperMeshId: body.keeperMeshId, via: clip(peerName, 60), at: Date.now() });
+      // before v-mesh-kin-v0.2:   keeperMeshId: body.keeperMeshId, via: clip(peerName, 60), at: Date.now() });
+      keeperMeshId: body.keeperMeshId, keyHash: clip(kh, 32), via: clip(peerName, 60), at: Date.now() });
     if (seen.length > SEEN_CAP) seen = seen.slice(-SEEN_CAP);
     writeJson(SEEN_KEY, seen);
+  }
+
+  // v-mesh-kin-v0.2: is this verified peer's key one you hold an active pass for?
+  // Used by the kin work queue (fl-kin-queue.js). Strangers and revoked kin are false.
+  function trustedPeer(peer) {
+    if (!peer || !peer.verified || !peer.badge || !peer.badge.publicKey) return Promise.resolve(false);
+    return keyHash(peer.badge.publicKey).then(function (kh) {
+      if (!kh) return false;
+      var p = passes();
+      return Object.keys(p).some(function (fp) { var x = p[fp]; return x && x.grantedAt && !x.revokedAt && x.keyHash === kh; });
+    });
   }
 
   var _adapter = null, _host = null, _dropped = 0, _paint = null;
@@ -147,8 +177,11 @@
     if (isQuietRoom()) { ledger('dropped', '', 'quiet-room'); return Promise.resolve({ ok: false, reason: 'quiet-room' }); }
     return verifyCard(card, peer, _adapter).then(function (r) {
       if (!r.ok) { _dropped += 1; ledger('dropped', '', r.reason); if (_paint) _paint(); return r; }
-      return fingerprint(r.body).then(function (fp) {
-        remember(fp, r.body, peer.name);
+      // before v-mesh-kin-v0.2: return fingerprint(r.body).then(function (fp) {
+      // before v-mesh-kin-v0.2:   remember(fp, r.body, peer.name);
+      return Promise.all([fingerprint(r.body, card.publicKey), keyHash(card.publicKey)]).then(function (both) {
+        var fp = both[0];
+        remember(fp, r.body, peer.name, both[1]);
         ledger('received', fp, isTrusted(fp) ? 'trusted' : 'seen');
         if (_paint) _paint();
         return { ok: true, fp: fp, trusted: isTrusted(fp) };
@@ -221,7 +254,8 @@
         var peers = [];
         try { peers = (_adapter.peers ? _adapter.peers() : []).filter(function (p) { return p && p.verified; }); } catch (e) { peers = []; }
         peers.forEach(function (p) { try { p.send({ type: 'kin-card', card: r.card }); } catch (e) {} });
-        fingerprint(r.card).then(function (fp) { ledger('shared', fp, String(peers.length)); });
+        // before v-mesh-kin-v0.2: fingerprint(r.card).then(function (fp) { ledger('shared', fp, String(peers.length)); });
+        fingerprint(r.card, r.card.publicKey).then(function (fp) { ledger('shared', fp, String(peers.length)); });
         note.textContent = peers.length
           ? 'Shared ' + r.card.name + '\'s card with ' + peers.length + ' verified ' + (peers.length === 1 ? 'peer' : 'peers') + '.'
           : 'No verified peers connected yet. Connect on the mesh, then share again.';
@@ -240,6 +274,8 @@
     verifyCard: verifyCard,
     canonical: canonical,
     fingerprint: fingerprint,
+    keyHash: keyHash,
+    trustedPeer: trustedPeer,
     isTrusted: isTrusted,
     grant: grant,
     revoke: revoke,

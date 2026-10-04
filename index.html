@@ -15370,6 +15370,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
 <!-- v-mesh-kin-v0.1: mind cards for AI kin (signed with the Mesh ID key) -->
 <script src="modules/fl-kin.js" defer></script>
+<!-- v-mesh-kin-v0.2: a patient work queue for trusted kin (buffered callMeshModel) -->
+<script src="modules/fl-kin-queue.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -18639,6 +18641,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="section" id="meshKinSection">
     <div class="section-title" style="margin-bottom: 8px;">Kin: mind cards</div>
     <div id="flKinHost"></div>
+    <div id="flKinQueueHost" style="margin-top: 14px;"></div>
   </div>
 
   <!-- Mesh: LAN Discovery (v3.8) -->
@@ -43280,6 +43283,18 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    // v-mesh-kin-v0.2: queued work and answers. FLKinQueue drops them unless the
+    // peer holds an active Trust pass bound to its verified key.
+    case 'kin-work':
+    case 'kin-result': {
+      var kqPeerId = meshFindPeerIdByDc(dc);
+      var kqPeer = kqPeerId ? state.meshPeers.get(kqPeerId) : null;
+      if (window.FLKinQueue && kqPeer) {
+        window.FLKinQueue.receive(msg, meshKinPeerView(kqPeerId, kqPeer));
+      }
+      break;
+    }
+
     case 'presence-pulse': {
       // Shared Presence: a peer is announcing their active state
       if (typeof window.SharedPresence !== 'undefined' && window.SharedPresence.receivePulse) {
@@ -43392,9 +43407,31 @@ var meshKinAdapter = {
   }
 };
 
+// v-mesh-kin-v0.2: the queue sees peers, the sharing switch and this computer's
+// local model. Never a cloud model for a peer.
+var meshKinQueueAdapter = {
+  peers: meshKinAdapter.peers,
+  sharingOn: function () { return safeGet('fl_meshComputeSharing', 'false') === 'true'; },
+  peerModels: function (peerId) {
+    var m = meshPeerModels[peerId];
+    return m && Array.isArray(m.models) ? m.models.map(function (x) { return x && x.name ? x.name : String(x); }) : [];
+  },
+  runLocal: async function (model, messages) {
+    var response = await fetchWithTimeout(getOllamaBaseUrl() + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: model, messages: messages, stream: false })
+    }, 120000);
+    var result = await response.json();
+    return result && result.message ? result.message.content : '';
+  }
+};
+
 function meshKinMount() {
   var host = document.getElementById('flKinHost');
   if (host && window.FLKin) window.FLKin.mount(host, meshKinAdapter);
+  var qhost = document.getElementById('flKinQueueHost');
+  if (qhost && window.FLKinQueue) window.FLKinQueue.mount(qhost, meshKinQueueAdapter);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', meshKinMount);
 else setTimeout(meshKinMount, 0);

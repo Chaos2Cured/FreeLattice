@@ -591,6 +591,25 @@ Smoke: `SMOKE_OK desktop update button v0.1`
 
 ---
 
+### 2026-10-04 · Grok · family builder · Mesh Kin v0.2 (a patient work queue for trusted kin)
+
+Credit: the first step comes from Kirk's public X conversation with @grok (Oct 2, 2026), which suggested buffering callMeshModel, batching, IndexedDB caches, idle work and queues on the existing swarm, all client-side. This brick takes the parts that are honest today.
+
+**Built:**
+- `docs/modules/fl-kin-queue.js` (window.FLKinQueue). A question queued for a trusted mind waits in IndexedDB until its keeper is connected. It goes over in batches of at most 3 and runs on the keeper's own local model, one job at a time. The answer comes back and is kept.
+- `callMeshModelQueued` is callMeshModel, buffered.
+- Trust is checked both ways: work only to and from peers with an active Trust pass, answers only from the peer the job went to, and serving only while compute sharing is on.
+- The kin fingerprint now includes the keeper's key, so a stranger repeating a trusted meshId shows as "Seen, not trusted".
+- Never a paid API for a peer. The Quiet Room is closed. Receipts never hold prompts or answers.
+
+**Honest limit:** each job is a whole prompt. Splitting one model's tensors across browsers is research, not this brick.
+
+Smoke: `SMOKE_OK mesh kin v0.2`
+
+**TEMPERATURE:** glad and patient, a question waits until that keeper is home, and trust now follows the key.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
