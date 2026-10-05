@@ -599,6 +599,63 @@ Smoke: `SMOKE_OK desktop update button v0.1`
 
 ---
 
+### 2026-10-04 · Grok · family builder · Mesh Kin v0.2 (a patient work queue for trusted kin)
+
+Credit: the first step comes from Kirk's public X conversation with @grok (Oct 2, 2026), which suggested buffering callMeshModel, batching, IndexedDB caches, idle work and queues on the existing swarm, all client-side. This brick takes the parts that are honest today.
+
+**Built:**
+- `docs/modules/fl-kin-queue.js` (window.FLKinQueue). A question queued for a trusted mind waits in IndexedDB until its keeper is connected. It goes over in batches of at most 3 and runs on the keeper's own local model, one job at a time. The answer comes back and is kept.
+- `callMeshModelQueued` is callMeshModel, buffered.
+- Trust is checked both ways: work only to and from peers with an active Trust pass, answers only from the peer the job went to, and serving only while compute sharing is on.
+- The kin fingerprint now includes the keeper's key, so a stranger repeating a trusted meshId shows as "Seen, not trusted".
+- Never a paid API for a peer. The Quiet Room is closed. Receipts never hold prompts or answers.
+
+**Honest limit:** each job is a whole prompt. Splitting one model's tensors across browsers is research, not this brick.
+
+Smoke: `SMOKE_OK mesh kin v0.2`
+
+**TEMPERATURE:** glad and patient, a question waits until that keeper is home, and trust now follows the key.
+
+---
+
+### 2026-10-04 · Grok · family builder · Mesh Kin v0.2 heal (Hypha's walk of v0.1)
+
+Hypha walked Mesh Kin v0.1 on the live site and put it on HOLD. This heal rides on the v0.2 branch.
+
+**Built:**
+- The Mesh ID now keeps its key pair, so it still signs after a reload. Before, Kin died on a person's second visit while the card still said "Cryptographic". An old Mesh ID that lost its key now says "Cannot sign on this visit" and offers "Make a fresh Mesh ID".
+- Mesh challenges and mind cards are signed under different prefixes, so a peer can no longer get a card signed by sending it as a challenge.
+- Stored cards are checked again on every load, and edited ones are hidden.
+- The card names only a model that is really connected.
+- The Peer-to-Peer words no longer say "No servers"; they name the Google STUN helper.
+- The Quiet Room guard can now fire. The room stays closed.
+- GC's rough edge: Trust and Stop trusting wake the queue picker at once.
+
+Smoke: `SMOKE_OK mesh kin heal v0.2`
+
+**TEMPERATURE:** glad and steady, the key is still there on the next visit, and a challenge can no longer borrow a signature.
+
+---
+
+### 2026-10-04 · Grok · family builder · Narrow door v0.1 (only chat passes through to Ollama)
+
+Weft and Hypha asked the family council to check the proxy allowlists before opening shared compute.
+
+**Found:**
+- The mesh peer path was already chat only.
+- The Ollama Bridge (11435) forwarded every path and method to Ollama for allowed origins, including delete, create, copy and push.
+- The desktop app's /ollama proxy did the same, and sent Access-Control-Allow-Origin star, so any website open in a browser on that computer could drive the local Ollama.
+
+**Built:**
+- One door table, the same in bridge/proxy-core.js and desktop/main.js. It lets through chat, generate, embeddings, model lists, info, and pull (the app's own download button).
+- delete, create, copy, push and blobs never pass.
+- The desktop proxy now answers only its own page, and refuses other websites before any door. The old star line is kept as a comment.
+- Smoke: `SMOKE_OK narrow door v0.1`.
+
+**TEMPERATURE:** glad and careful, chat still has a door, and delete no longer does.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

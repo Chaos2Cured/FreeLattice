@@ -227,6 +227,24 @@ function stopOllamaPolling() {
 // Ollama Proxy
 // ============================================
 
+// v-narrow-door-v0.1: only these Ollama doors open through this proxy. Chat, generate,
+// embeddings, model lists and info, and pull (your own app's download button) pass.
+// delete, create, copy, push and blobs never pass. The same table lives in
+// bridge/proxy-core.js and desktop/main.js; smoke-narrow-door-v0.1.js keeps them equal.
+const OLLAMA_DOORS = {
+  'GET /': 1, 'HEAD /': 1,
+  'GET /api/tags': 1, 'HEAD /api/tags': 1, 'GET /api/version': 1, 'GET /api/ps': 1, 'GET /v1/models': 1,
+  'POST /api/chat': 1, 'POST /api/generate': 1, 'POST /api/show': 1,
+  'POST /api/embeddings': 1, 'POST /api/embed': 1,
+  'POST /v1/chat/completions': 1, 'POST /v1/completions': 1, 'POST /v1/embeddings': 1,
+  'POST /api/pull': 1
+};
+function ollamaDoorOpen(method, ollamaPath) {
+  const p = String(ollamaPath || '/').split('?')[0].replace(/\/+$/, '') || '/';
+  return OLLAMA_DOORS[String(method || '').toUpperCase() + ' ' + p] === 1;
+}
+// end v-narrow-door-v0.1 table
+
 function proxyToOllama(req, res, ollamaPath) {
   const chunks = [];
   req.on('data', (chunk) => chunks.push(chunk));
@@ -288,7 +306,12 @@ function startLocalServer(port) {
   return new Promise((resolve, reject) => {
     localServer = http.createServer((req, res) => {
       // CORS headers
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      // v-narrow-door-v0.1: only this app's own page may read across origins. A star
+      // here let any website you visit drive your local Ollama through /ollama.
+      // before v-narrow-door-v0.1: res.setHeader('Access-Control-Allow-Origin', '<star>');
+      const _ndOrigin = req.headers.origin || '';
+      const _ndSelf = 'http://127.0.0.1:' + serverPort;
+      if (_ndOrigin === _ndSelf) res.setHeader('Access-Control-Allow-Origin', _ndSelf);
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -304,6 +327,20 @@ function startLocalServer(port) {
       if (urlPath.startsWith('/ollama/') || urlPath === '/ollama') {
         const ollamaPath = urlPath.replace(/^\/ollama/, '') || '/';
         const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+        // v-narrow-door-v0.1: other websites never reach Ollama here, and even this app
+        // only reaches the chat doors (plus pull for its own download button).
+        if (_ndOrigin && _ndOrigin !== _ndSelf) {
+          req.resume();
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Only this app may use its local AI', marker: 'v-narrow-door-v0.1' }));
+          return;
+        }
+        if (!ollamaDoorOpen(req.method, ollamaPath)) {
+          req.resume();
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'This door only lets chat through', marker: 'v-narrow-door-v0.1' }));
+          return;
+        }
         proxyToOllama(req, res, ollamaPath + queryString);
         return;
       }

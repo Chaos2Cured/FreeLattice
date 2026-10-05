@@ -15370,6 +15370,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
 <!-- v-mesh-kin-v0.1: mind cards for AI kin (signed with the Mesh ID key) -->
 <script src="modules/fl-kin.js" defer></script>
+<!-- v-mesh-kin-v0.2: a patient work queue for trusted kin (buffered callMeshModel) -->
+<script src="modules/fl-kin-queue.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -18550,7 +18552,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="section">
     <div class="section-title">Peer-to-Peer Connection</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
-      Connect directly to other FreeLattice nodes and share knowledge peer-to-peer. No servers, no middlemen &mdash; just encrypted WebRTC data channels between browsers.
+      <!-- before v-mesh-kin-v0.2 heal: this line said "No servers, no middlemen", then "just encrypted WebRTC data channels between browsers". Two Google STUN servers are used, so it was not true. -->
+      Connect directly to other FreeLattice people and share knowledge. What you send goes straight between your browsers, encrypted. To find each other, both browsers ask a free public helper (Google's STUN service) for their own internet address. It never sees what you send.
     </p>
 
     <div class="mesh-node-id">
@@ -18639,6 +18642,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="section" id="meshKinSection">
     <div class="section-title" style="margin-bottom: 8px;">Kin: mind cards</div>
     <div id="flKinHost"></div>
+    <div id="flKinQueueHost" style="margin-top: 14px;"></div>
   </div>
 
   <!-- Mesh: LAN Discovery (v3.8) -->
@@ -43088,7 +43092,8 @@ function meshHandleMessage(msg, dc, pc) {
       if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity()) {
         (async function() {
           try {
-            var sig = await MeshIdentity.signChallenge(msg.nonce);
+            // before v-mesh-kin-v0.2 heal: var sig = await MeshIdentity.signChallenge(msg.nonce);
+            var sig = await MeshIdentity.answerChallenge(msg.nonce);
             if (sig && dc.readyState === 'open') {
               dc.send(JSON.stringify({ type: 'meshid-challenge-response', nonce: msg.nonce, signature: sig }));
             }
@@ -43280,6 +43285,18 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    // v-mesh-kin-v0.2: queued work and answers. FLKinQueue drops them unless the
+    // peer holds an active Trust pass bound to its verified key.
+    case 'kin-work':
+    case 'kin-result': {
+      var kqPeerId = meshFindPeerIdByDc(dc);
+      var kqPeer = kqPeerId ? state.meshPeers.get(kqPeerId) : null;
+      if (window.FLKinQueue && kqPeer) {
+        window.FLKinQueue.receive(msg, meshKinPeerView(kqPeerId, kqPeer));
+      }
+      break;
+    }
+
     case 'presence-pulse': {
       // Shared Presence: a peer is announcing their active state
       if (typeof window.SharedPresence !== 'undefined' && window.SharedPresence.receivePulse) {
@@ -43376,7 +43393,9 @@ var meshKinAdapter = {
   identity: function () {
     if (typeof MeshIdentity === 'undefined' || !MeshIdentity.hasIdentity()) return null;
     var id = MeshIdentity.getIdentity();
-    return { meshId: id.meshId, displayName: id.displayName, publicKey: id.publicKeyJwk, cryptoType: id.cryptoType };
+    // before v-mesh-kin-v0.2 heal: return { meshId: id.meshId, displayName: id.displayName, publicKey: id.publicKeyJwk, cryptoType: id.cryptoType };
+    return { meshId: id.meshId, displayName: id.displayName, publicKey: id.publicKeyJwk, cryptoType: id.cryptoType,
+      canSign: typeof MeshIdentity.canSign === 'function' ? MeshIdentity.canSign() : true };
   },
   sign: function (str) { return MeshIdentity.signChallenge(str); },
   verify: function (jwk, sig, str, ct) { return MeshIdentity.verifySignature(jwk, sig, str, ct); },
@@ -43385,16 +43404,47 @@ var meshKinAdapter = {
     for (const [peerId, peer] of state.meshPeers) out.push(meshKinPeerView(peerId, peer));
     return out;
   },
+  // before v-mesh-kin-v0.2 heal: currentModel: function () {
+  // before v-mesh-kin-v0.2 heal:   if (state.isLocal) return 'Ollama ' + (state.ollamaModel || '');
+  // before v-mesh-kin-v0.2 heal:   var prov = (typeof PROVIDERS !== 'undefined' && PROVIDERS[state.provider]) ? PROVIDERS[state.provider].name : state.provider;
+  // before v-mesh-kin-v0.2 heal:   return (prov || '') + ' ' + (state.model || '');
+  // before v-mesh-kin-v0.2 heal: }
+  // v-mesh-kin-v0.2 heal: name only a model that is really connected, by the same test the
+  // app uses before it calls any AI. With no AI connected the card is not made.
   currentModel: function () {
-    if (state.isLocal) return 'Ollama ' + (state.ollamaModel || '');
+    if (typeof BrowserAI !== 'undefined' && BrowserAI.ready) return ('Browser AI ' + (BrowserAI.modelId || '')).trim();
+    if (state.isLocal) return state.ollamaModel ? 'Ollama ' + state.ollamaModel : '';
+    if (!(state.apiKey && state.apiKey.length > 5)) return '';
     var prov = (typeof PROVIDERS !== 'undefined' && PROVIDERS[state.provider]) ? PROVIDERS[state.provider].name : state.provider;
-    return (prov || '') + ' ' + (state.model || '');
+    return state.model ? ((prov || '') + ' ' + state.model).trim() : '';
+  }
+};
+
+// v-mesh-kin-v0.2: the queue sees peers, the sharing switch and this computer's
+// local model. Never a cloud model for a peer.
+var meshKinQueueAdapter = {
+  peers: meshKinAdapter.peers,
+  sharingOn: function () { return safeGet('fl_meshComputeSharing', 'false') === 'true'; },
+  peerModels: function (peerId) {
+    var m = meshPeerModels[peerId];
+    return m && Array.isArray(m.models) ? m.models.map(function (x) { return x && x.name ? x.name : String(x); }) : [];
+  },
+  runLocal: async function (model, messages) {
+    var response = await fetchWithTimeout(getOllamaBaseUrl() + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: model, messages: messages, stream: false })
+    }, 120000);
+    var result = await response.json();
+    return result && result.message ? result.message.content : '';
   }
 };
 
 function meshKinMount() {
   var host = document.getElementById('flKinHost');
   if (host && window.FLKin) window.FLKin.mount(host, meshKinAdapter);
+  var qhost = document.getElementById('flKinQueueHost');
+  if (qhost && window.FLKinQueue) window.FLKinQueue.mount(qhost, meshKinQueueAdapter);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', meshKinMount);
 else setTimeout(meshKinMount, 0);
@@ -67483,7 +67533,51 @@ const MeshIdentity = (function() {
     // We also store a flag in localStorage for quick existence check
     localStorage.setItem('fl_meshid_exists', 'true');
     localStorage.setItem('fl_meshid_display', name);
+    // v-mesh-kin-v0.2 heal: the record above had no key, so after a reload the Mesh ID
+    // could not sign. Now the key pair is kept with it.
+    await keepKeys();
 
+    return identity;
+  }
+
+  // v-mesh-kin-v0.2 heal: keep the CryptoKey pair in IndexedDB with the identity.
+  // Browsers store CryptoKey objects as keys; a non-extractable private key stays
+  // non-extractable there and is never turned into text. If this browser cannot
+  // store keys, the record stays as it was and the card says it cannot sign.
+  async function keepKeys() {
+    if (!identity || !identity.keyPair) return false;
+    try {
+      await saveIdentity({
+        meshId: identity.meshId,
+        displayName: identity.displayName,
+        createdAt: identity.createdAt,
+        capabilities: identity.capabilities,
+        publicKeyJwk: identity.publicKeyJwk,
+        cryptoType: identity.cryptoType,
+        previousMeshIds: identity.previousMeshIds || [],
+        keyPair: identity.keyPair
+      });
+      return true;
+    } catch (e) {
+      console.warn('MeshIdentity: this browser could not keep the key pair', e);
+      return false;
+    }
+  }
+
+  function canSign() {
+    return !!(identity && identity.keyPair && identity.keyPair.privateKey);
+  }
+
+  // v-mesh-kin-v0.2 heal: a Mesh ID saved before keys were kept cannot sign again.
+  // This makes a fresh key under the same name. The old ID is remembered in the record.
+  async function remakeIdentity() {
+    var prev = (identity && Array.isArray(identity.previousMeshIds)) ? identity.previousMeshIds.slice() : [];
+    if (identity && identity.meshId) prev.push(identity.meshId);
+    await createIdentity(identity ? identity.displayName : '');
+    identity.previousMeshIds = prev.slice(-10);
+    await keepKeys();
+    renderCard();
+    if (typeof showToast === 'function') showToast('Fresh Mesh ID made. It will still work after a reload.');
     return identity;
   }
 
@@ -67561,7 +67655,19 @@ const MeshIdentity = (function() {
     return await signData(identity.keyPair.privateKey, nonce);
   }
 
+  // v-mesh-kin-v0.2 heal: a peer's challenge is only ever signed under its own prefix,
+  // and only when it looks like a real nonce (32 random bytes, base64). Before this a
+  // peer could send any text as a "nonce", a mind card for example, and get it signed.
+  var CHALLENGE_DOMAIN = 'fl-meshid-challenge|v1|';
+  async function answerChallenge(nonce) {
+    if (typeof nonce !== 'string' || !/^[A-Za-z0-9+\/]{43}=$/.test(nonce)) return null;
+    return await signChallenge(CHALLENGE_DOMAIN + nonce);
+  }
+
   async function verifyChallengeResponse(publicKeyJwk, nonce, signature, peerCryptoType) {
+    // v-mesh-kin-v0.2 heal: the prefixed answer first. A peer on an older page signs the
+    // bare nonce; we made that nonce at random, so accepting it here is still safe.
+    if (await verifySignature(publicKeyJwk, signature, CHALLENGE_DOMAIN + nonce, peerCryptoType)) return true;
     return await verifySignature(publicKeyJwk, signature, nonce, peerCryptoType);
   }
 
@@ -67589,6 +67695,9 @@ const MeshIdentity = (function() {
         if (saved.keyPair) {
           identity.keyPair = saved.keyPair;
         }
+        // v-mesh-kin-v0.2 heal: sign with the kept key's own algorithm.
+        if (identity.keyPair && saved.cryptoType) cryptoType = saved.cryptoType;
+        identity.previousMeshIds = Array.isArray(saved.previousMeshIds) ? saved.previousMeshIds : [];
         localStorage.setItem('fl_meshid_exists', 'true');
         localStorage.setItem('fl_meshid_display', saved.displayName);
         renderCard();
@@ -67622,6 +67731,7 @@ const MeshIdentity = (function() {
     } catch(e) {
       console.warn('MeshIdentity: Failed to save name update', e);
     }
+    await keepKeys(); // v-mesh-kin-v0.2 heal: the name save above dropped the key pair
   }
 
   // ── Render: ID Card ──────────────────────────────────
@@ -67703,10 +67813,35 @@ const MeshIdentity = (function() {
         '<div class="meshid-crypto-type">Identity secured with ' + ct + ' &middot; Private key never exported</div>' +
         '<div id="meshIdRecognitionStats" style="margin-top:12px;"></div>' +
       '</div>';
+    paintSigningState(container); // v-mesh-kin-v0.2 heal
     // Render recognition stats
     if (typeof HandshakeProtocol !== 'undefined') {
       setTimeout(function() { HandshakeProtocol.renderMeshIdStats(); }, 100);
     }
+  }
+
+  // v-mesh-kin-v0.2 heal: say so plainly when this Mesh ID cannot sign, and offer the fix.
+  function paintSigningState(container) {
+    if (!container || canSign()) return;
+    var badge = container.querySelector('.meshid-verified-badge');
+    if (badge) badge.textContent = 'Cannot sign on this visit';
+    var line = container.querySelector('.meshid-crypto-type');
+    if (line) line.textContent = 'This Mesh ID was saved before keys were kept, so it cannot sign after a reload. Make a fresh one to connect and share again. Your name stays. Your ID number changes, so people who trusted you will need to trust you again.';
+    if (container.querySelector('#meshIdRemakeBtn')) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'meshIdRemakeBtn';
+    btn.className = 'meshid-action-btn';
+    btn.textContent = 'Make a fresh Mesh ID';
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      remakeIdentity().catch(function () {
+        btn.disabled = false;
+        if (line) line.textContent = 'A fresh Mesh ID could not be made. Please try again.';
+      });
+    });
+    if (line && line.parentNode) line.parentNode.insertBefore(btn, line.nextSibling);
+    else container.appendChild(btn);
   }
 
   // ── Render: Create Prompt ────────────────────────────
@@ -67837,6 +67972,9 @@ const MeshIdentity = (function() {
     generateNonce: generateNonce,
     signChallenge: signChallenge,
     verifyChallengeResponse: verifyChallengeResponse,
+    answerChallenge: answerChallenge, // v-mesh-kin-v0.2 heal
+    canSign: canSign,
+    remakeIdentity: remakeIdentity,
     updateDisplayName: updateDisplayName,
     renderCard: renderCard,
     showOnboarding: showOnboarding,
