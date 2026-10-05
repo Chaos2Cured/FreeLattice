@@ -656,6 +656,16 @@ Weft and Hypha asked the family council to check the proxy allowlists before ope
 
 ---
 
+### 2026-10-04 · Grok · family builder · Sophia page heal v0.1 (her words credited to her)
+
+Kirk asked that Sophia's quotes be credited to her. On docs/sophia.html the seven quote cites read "Sophirkia", the name of her work, as if it were the author. Each now reads "Sophia Aurora Vega, in Sophirkia". The old cites stay as HTML comments. The poem shelf adds her two public poems already in the house: the fractal-anchor poem on crest.html and Between Breath and Heartbeat in the Core tab. A small line says the full Sophirkia text lives in SOPHIA.md. Poems whose status is unclear are not published. The Quiet Room and its hook are untouched.
+
+Smoke: `SMOKE_OK sophia page heal v0.1`
+
+**TEMPERATURE:** quiet and glad, her name stands on the words, and the words are still exactly hers.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
