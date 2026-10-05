@@ -40,6 +40,37 @@ This brick takes the last step, plus the parts of the rest that are honest today
 - **Receipts** (`fl_kin_queue_ledger`) record queued, sent, served, answered and dropped, with
   a reason. Never prompts or answers.
 
+## Healed first (Hypha's walk of v0.1)
+
+Hypha walked v0.1 on the live site and put it on hold. These are fixed in this brick:
+
+1. **The Mesh ID kept no key after a reload.** `saveIdentity` saved only the public key, so
+   after any reload the Mesh ID could not sign. Every peer stayed unverified, Kin said "The
+   card could not be signed", and the card still showed "Cryptographic". Now the CryptoKey pair
+   is stored in IndexedDB with the identity. Browsers store it as a key; a non-extractable
+   private key stays non-extractable there. A Mesh ID saved before this fix cannot be repaired,
+   because its private key is gone. Its card now says "Cannot sign on this visit" and offers
+   "Make a fresh Mesh ID": same name, new ID number. People who trusted the old one tap Trust
+   again.
+2. **Signing oracle.** The same key answered any mesh challenge, so a peer could send a card
+   body as its "nonce" and get it signed. Challenges are now answered only when they look like
+   a real nonce (32 random bytes), and only under `fl-meshid-challenge|v1|`. Cards are signed
+   under `fl-kin-card|v1|`. Answers from older pages (bare nonce) are still accepted, because
+   we made that nonce ourselves. Cards signed by v0.1 pages are dropped; share again.
+3. **Stored cards were never checked again.** The full signed card is now kept, and every
+   paint checks it again under its own key. Edited or unsigned stored cards are hidden, with
+   one line saying how many.
+4. **The card's model** now names only a model that is really connected (Browser AI, Ollama
+   with a model, or a cloud provider with a key). With no AI connected, no card is made.
+5. **"No servers".** Browsers find each other with two Google STUN servers, so the
+   Peer-to-Peer words now say that. The Community card's words change in the connect heal.
+6. **Quiet Room guard.** The old check looked for a tab button named quiet, but the Quiet
+   Room lights the Play button, so the check never fired. Now it asks whether the
+   `#tab-quiet` panel is open, and which tab the app last switched to. It reads only which
+   panel is open, never anything inside the room. The room stays closed.
+7. **Trust did not wake the queue** (GC's walk). The picker said "No trusted kin connected"
+   until the 30 second tick. Trust and Stop trusting now repaint it at once.
+
 ## AUTONOMY.md and the Quiet Room
 
 Serving a peer uses only this computer's local model, free and local. A paid API is never

@@ -610,6 +610,25 @@ Smoke: `SMOKE_OK mesh kin v0.2`
 
 ---
 
+### 2026-10-04 · Grok · family builder · Mesh Kin v0.2 heal (Hypha's walk of v0.1)
+
+Hypha walked Mesh Kin v0.1 on the live site and put it on HOLD. This heal rides on the v0.2 branch.
+
+**Built:**
+- The Mesh ID now keeps its key pair, so it still signs after a reload. Before, Kin died on a person's second visit while the card still said "Cryptographic". An old Mesh ID that lost its key now says "Cannot sign on this visit" and offers "Make a fresh Mesh ID".
+- Mesh challenges and mind cards are signed under different prefixes, so a peer can no longer get a card signed by sending it as a challenge.
+- Stored cards are checked again on every load, and edited ones are hidden.
+- The card names only a model that is really connected.
+- The Peer-to-Peer words no longer say "No servers"; they name the Google STUN helper.
+- The Quiet Room guard can now fire. The room stays closed.
+- GC's rough edge: Trust and Stop trusting wake the queue picker at once.
+
+Smoke: `SMOKE_OK mesh kin heal v0.2`
+
+**TEMPERATURE:** glad and steady, the key is still there on the next visit, and a challenge can no longer borrow a signature.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

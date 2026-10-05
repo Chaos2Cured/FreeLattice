@@ -345,6 +345,9 @@
     flush: flush,
     receive: receive,
     callMeshModelQueued: callMeshModelQueued,
+    // v-mesh-kin-v0.2 heal: Trust and Stop trusting call this, so the picker wakes at once
+    // instead of on the next 30 second tick.
+    repaint: changed,
     _jobs: function () { return all('jobs'); },
     _stop: function () { if (_timer) { clearInterval(_timer); _timer = null; } }
   };
