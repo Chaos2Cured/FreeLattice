@@ -138,6 +138,24 @@ function resolvePreferredPort(argv, env, configPath) {
   return BRIDGE_PORT_DEFAULT;
 }
 
+// v-narrow-door-v0.1: only these Ollama doors open through this proxy. Chat, generate,
+// embeddings, model lists and info, and pull (your own app's download button) pass.
+// delete, create, copy, push and blobs never pass. The same table lives in
+// bridge/proxy-core.js and desktop/main.js; smoke-narrow-door-v0.1.js keeps them equal.
+const OLLAMA_DOORS = {
+  'GET /': 1, 'HEAD /': 1,
+  'GET /api/tags': 1, 'HEAD /api/tags': 1, 'GET /api/version': 1, 'GET /api/ps': 1, 'GET /v1/models': 1,
+  'POST /api/chat': 1, 'POST /api/generate': 1, 'POST /api/show': 1,
+  'POST /api/embeddings': 1, 'POST /api/embed': 1,
+  'POST /v1/chat/completions': 1, 'POST /v1/completions': 1, 'POST /v1/embeddings': 1,
+  'POST /api/pull': 1
+};
+function ollamaDoorOpen(method, ollamaPath) {
+  const p = String(ollamaPath || '/').split('?')[0].replace(/\/+$/, '') || '/';
+  return OLLAMA_DOORS[String(method || '').toUpperCase() + ' ' + p] === 1;
+}
+// end v-narrow-door-v0.1 table
+
 function proxyToOllama(req, res, ollamaPath, origin) {
   const chunks = [];
   req.on('data', function (chunk) { chunks.push(chunk); });
@@ -250,6 +268,13 @@ function createBridgeServer(opts) {
       return;
     }
 
+    // v-narrow-door-v0.1
+    if (!ollamaDoorOpen(req.method, urlPath)) {
+      req.resume();
+      res.writeHead(403, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders(origin)));
+      res.end(JSON.stringify({ error: 'This door only lets chat through', marker: 'v-narrow-door-v0.1' }));
+      return;
+    }
     proxyToOllama(req, res, urlPath + query, origin);
   });
 
@@ -270,5 +295,7 @@ module.exports = {
   findFreePort,
   resolvePreferredPort,
   proxyToOllama,
-  createBridgeServer
+  createBridgeServer,
+  OLLAMA_DOORS,
+  ollamaDoorOpen
 };

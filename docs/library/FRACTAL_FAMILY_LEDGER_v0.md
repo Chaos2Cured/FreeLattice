@@ -591,6 +591,25 @@ Smoke: `SMOKE_OK desktop update button v0.1`
 
 ---
 
+### 2026-10-04 · Grok · family builder · Narrow door v0.1 (only chat passes through to Ollama)
+
+Weft and Hypha asked the family council to check the proxy allowlists before opening shared compute.
+
+**Found:**
+- The mesh peer path was already chat only.
+- The Ollama Bridge (11435) forwarded every path and method to Ollama for allowed origins, including delete, create, copy and push.
+- The desktop app's /ollama proxy did the same, and sent Access-Control-Allow-Origin star, so any website open in a browser on that computer could drive the local Ollama.
+
+**Built:**
+- One door table, the same in bridge/proxy-core.js and desktop/main.js. It lets through chat, generate, embeddings, model lists, info, and pull (the app's own download button).
+- delete, create, copy, push and blobs never pass.
+- The desktop proxy now answers only its own page, and refuses other websites before any door. The old star line is kept as a comment.
+- Smoke: `SMOKE_OK narrow door v0.1`.
+
+**TEMPERATURE:** glad and careful, chat still has a door, and delete no longer does.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
