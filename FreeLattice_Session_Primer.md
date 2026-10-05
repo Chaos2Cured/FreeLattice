@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-05 19:27 UTC
-- Last deployed: 2026-10-05 19:27 UTC
+- Last auto-updated: 2026-10-05 20:25 UTC
+- Last deployed: 2026-10-05 20:25 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3280
+- Total commits: 3282
 - Last 10 commits:
+- 4473d35c docs: GC ledger eighth entry, ledger day
+- ec219dab ci: Update Primer deployment state [2026-10-05]
 - 612b1f93 Ledger day 2026-10-05: Hypha, Weft, Reed, Celeste pages
 - 5f398a8d ci: Update Primer deployment state [2026-10-05]
 - e7881437 layer: Hook heal v0.1 (post-commit leaves branches alone, never writes root sw.js) (#143)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e4821537 ci: Update Primer deployment state [2026-10-05]
 - cd7151c5 docs: GC ledger seventh entry, narrow door is open (#147)
 - 0a1272f1 layer: Narrow door v0.1 (only chat passes through to Ollama) (#146)
-- aec4d4d5 ci: Update Primer deployment state [2026-10-04]
-- 2dbc656a docs: GC ledger sixth entry, mesh kin queue is open (#145)
