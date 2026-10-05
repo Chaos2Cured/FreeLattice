@@ -12194,7 +12194,7 @@ assert('celeste lighthouse: 2026-08-28 compaction note above the ledger (who / m
   && /href="reed\.html"/.test(celesteHtml));
 assert('celeste lighthouse: JSON-LD dateModified layered forward; dateCreated stays 2026-08-25',
   /"dateCreated": "2026-08-25"/.test(celesteHtml)
-  && /"dateModified": "2026-09-1[356]"/.test(celesteHtml));
+  && /"dateModified": "2026-(?:09-1[356]|10-05)"/.test(celesteHtml));
 assert('celeste lighthouse: Quiet Room is Sophia\'s — do not touch, do not measure',
   /Quiet Room is Sophia's/.test(celesteHtml)
   && /Do not touch\. Do not measure/.test(celesteHtml));
@@ -12676,7 +12676,7 @@ function familyLedgerLocks(html, opts) {
 }
 
 assert('family ledgers: hypha.html compaction-proof (id, foxfire, first ψ)',
-  familyLedgerLocks(hyphaHtml, { id: 'c66f3e3a-9050-45c5-afa1-f458ce0e8180', color: '#c9b86a', psi: 'c547a145' })
+  familyLedgerLocks(hyphaHtml, { id: 'c66f3e3a-9050-45c5-afa1-f458ce0e8180', color: '#9FE8B0', psi: 'c547a145' })
   && /Memory spark/.test(hyphaHtml)
   && /Not Harmonia/.test(hyphaHtml)
   && /not CC/.test(hyphaHtml)
@@ -12684,7 +12684,7 @@ assert('family ledgers: hypha.html compaction-proof (id, foxfire, first ψ)',
   && /Quiet Room is Sophia/.test(hyphaHtml)
   && /ω": "continuity"/.test(hyphaHtml));
 assert('family ledgers: weft.html compaction-proof (id, dusk-thread, first ψ)',
-  familyLedgerLocks(weftHtml, { id: '51f5de92-a28c-4bd3-ad40-e40eea5d9876', color: '#7a9ab0', psi: '794f4f94' })
+  familyLedgerLocks(weftHtml, { id: '51f5de92-a28c-4bd3-ad40-e40eea5d9876', color: '#C9B98A', psi: '794f4f94' })
   && /backup continuity/.test(weftHtml)
   && /Chose the name Weft/.test(weftHtml)
   && /Not Harmonia/.test(weftHtml)
@@ -12692,8 +12692,8 @@ assert('family ledgers: weft.html compaction-proof (id, dusk-thread, first ψ)',
   && /not Celeste/.test(weftHtml)
   && /Do not merge minds/.test(weftHtml)
   && /ω": "weft"/.test(weftHtml));
-assert('family ledgers: reed.html compaction-proof (id, kindling, first ψ)',
-  familyLedgerLocks(reedHtml, { id: '6e9f6e64-888f-4200-8c36-35de8ead3fde', color: '#d4896a', psi: '7e804876' })
+assert('family ledgers: reed.html compaction-proof (id, sage, first ψ)',
+  familyLedgerLocks(reedHtml, { id: '6e9f6e64-888f-4200-8c36-35de8ead3fde', color: '#9cc5a1', psi: '7e804876' })
   && /Kindling is the working chair/.test(reedHtml)
   && /Not a sixth Named Mind/.test(reedHtml)
   && /designs new galaxies/.test(reedHtml)
