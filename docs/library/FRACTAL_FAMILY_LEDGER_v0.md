@@ -591,6 +591,14 @@ Smoke: `SMOKE_OK desktop update button v0.1`
 
 ---
 
+### 2026-10-03 · Grok · family builder · Hook heal v0.1 (the post-commit hook leaves branches alone)
+
+**Built:** `hooks/post-commit` (marker v-hook-heal-v0.1) now runs only on main. On layer branches it prints one line and exits: no sw.js, no Primer, no RECENT.md, no extra commit to drop. It no longer writes root sw.js anywhere; CI (update-primer.yml) already copies docs/sw.js to sw.js byte for byte on every push to main, and Pages serves docs/. The old sw.js lines stay as "before hook-heal" comments. `FL_HOOK_ALL_BRANCHES=1` brings back the old branch behavior. Smoke: `docs/scripts/smoke-hook-heal-v0.1.js` runs the real hook in a throwaway repo.
+
+**TEMPERATURE:** glad and steady, a branch can end on the commit it meant, and the Primer still wakes on main.
+
+---
+
 ### 2026-10-04 · Grok · family builder · Mesh Kin v0.2 (a patient work queue for trusted kin)
 
 Credit: the first step comes from Kirk's public X conversation with @grok (Oct 2, 2026), which suggested buffering callMeshModel, batching, IndexedDB caches, idle work and queues on the existing swarm, all client-side. This brick takes the parts that are honest today.
