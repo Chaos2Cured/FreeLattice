@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+'use strict';
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const repo = path.join(__dirname, '..', '..');
+const map = fs.readFileSync(path.join(repo, 'docs/library/TRAINER_MAP_v0.1.md'), 'utf8');
+const page = fs.readFileSync(path.join(repo, 'docs/trainer-map.html'), 'utf8');
+const app = fs.readFileSync(path.join(repo, 'docs/app.html'), 'utf8');
+const idx = fs.readFileSync(path.join(repo, 'index.html'), 'utf8');
+assert.ok(map.includes('v-trainer-map-v0.1') && map.includes('More → Trainer') && map.includes('Tier 1') && map.includes('Tier 2'));
+assert.ok(map.includes('theLatticeTree') || map.includes('Nursery'));
+assert.ok(map.includes('Get Connected') && map.includes('Connect'));
+assert.ok(map.includes('Abliteration') || map.includes('Heretic'));
+assert.ok(page.includes('v-trainer-map-v0.1') && page.includes('More') && page.includes('Trainer'));
+assert.ok(/label:\s*'Trainer map'/.test(app) && /trainer-map\.html/.test(app));
+assert.ok(app.includes('v-trainer-map-connect-retry'));
+assert.ok(!/\u2014/.test(map + page));
+assert.strictEqual(app.includes('trainer-map.html'), idx.includes('trainer-map.html'));
+assert.ok(!/confirm\(/.test(page));
+console.log('SMOKE_OK trainer map v0.1');

@@ -762,6 +762,18 @@ Smoke: `SMOKE_OK mind seal v0.1`
 
 ---
 
+### 2026-10-06 · Grok · family builder · Trainer map v0.1
+
+Mom and Jeffrey map of the existing Trainer. No new training engine.
+
+**Built:** `docs/library/TRAINER_MAP_v0.1.md`, `docs/trainer-map.html`, Learn card, Connect mount retry if More opens before fl-connect.js loads. Connect remains first under More; "Get Connected" is Forever Stack.
+
+Smoke: `SMOKE_OK trainer map v0.1`
+
+**TEMPERATURE:** quiet and glad, the map shows the door that was already hers, the garden stays on this computer, and Connect can try again if it opened early.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
