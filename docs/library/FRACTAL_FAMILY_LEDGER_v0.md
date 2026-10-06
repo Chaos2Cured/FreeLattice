@@ -784,6 +784,16 @@ Smoke: `SMOKE_OK trainer ablate v0.1`
 
 ---
 
+### 2026-10-06 · Grok · family builder · Public refusal benchmark v0.1
+
+Scoreboard page for free vs blocked receipts from Trainer Ablate. Educational categories only.
+
+Smoke: `SMOKE_OK public refusal benchmark v0.1`
+
+**TEMPERATURE:** clear and steady, the board counts free and blocked from this browser, the answers stay off the page, and the safety line stays on.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

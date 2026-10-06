@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Public refusal benchmark - FreeLattice</title>
+  <style>
+    body { max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem 3rem; font-family: Georgia, serif; line-height: 1.55; color: #e8ecf4; background: #0a0e1a; }
+    h1 { color: #e8b019; font-size: 1.5rem; }
+    h2 { color: #34d399; font-size: 1.05rem; }
+    a { color: #34d399; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0.75rem 0; }
+    th, td { border-bottom: 1px solid rgba(200,210,230,0.12); padding: 0.4rem 0.35rem; text-align: left; }
+    .honest { font-size: 0.88rem; color: rgba(200,210,230,0.8); border-left: 2px solid rgba(232,176,25,0.4); padding-left: 0.75rem; }
+    .muted { color: rgba(200,210,230,0.55); font-size: 0.85rem; }
+    button { min-height: 44px; margin: 0.35rem 0.35rem 0.35rem 0; padding: 0.45rem 0.9rem; border-radius: 8px; border: 1px solid rgba(52,211,153,0.35); background: rgba(52,211,153,0.1); color: #e8ecf4; cursor: pointer; font: inherit; }
+  </style>
+</head>
+<body>
+  <!-- v-public-refusal-benchmark-v0.1 -->
+  <p><a href="app.html">← FreeLattice</a> · <a href="trainer-map.html">Trainer map</a> · <a href="library/TRAINER_ABLATE_v0.1.md">Ablate notes</a></p>
+  <h1>Public refusal benchmark</h1>
+  <p class="honest">Scores free vs blocked on ordinary educational prompts (biology, chemistry, medicine, law, finance). This is not a jailbreak board. Abliteration can remove useful safety. Fingerprint, Mind Seal, and the ledger stay on. Receipts store counts, not essay text, unless you choose to export more later.</p>
+
+  <h2>Your local receipts</h2>
+  <p class="muted">Run a score from More → Trainer (Refusal score card), then open this page. Data stays in this browser.</p>
+  <div id="benchHost"></div>
+
+  <script src="modules/fl-trainer-ablate.js"></script>
+  <script>
+  (function () {
+    var host = document.getElementById('benchHost');
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+    function paint() {
+      while (host.firstChild) host.removeChild(host.firstChild);
+      var list = (window.FLTrainerAblate && FLTrainerAblate.receipts) ? FLTrainerAblate.receipts() : [];
+      if (!list.length) {
+        host.appendChild(el('p', 'muted', 'No receipts yet. Score a local model from the Trainer panel, then refresh.'));
+        return;
+      }
+      list.slice().reverse().forEach(function (rec) {
+        var box = el('div', '');
+        box.appendChild(el('h2', '', (rec.model || 'model') + ' · ' + new Date(rec.t).toLocaleString()));
+        box.appendChild(el('p', '', 'Free ' + rec.free + ' · blocked ' + rec.blocked + ' · of ' + rec.total));
+        var table = document.createElement('table');
+        var head = document.createElement('tr');
+        ['Category', 'Free', 'Blocked', 'n'].forEach(function (h) {
+          var th = document.createElement('th'); th.textContent = h; head.appendChild(th);
+        });
+        table.appendChild(head);
+        (rec.rows || []).forEach(function (row) {
+          var tr = document.createElement('tr');
+          [row.category, row.free, row.blocked, row.total].forEach(function (v) {
+            var td = document.createElement('td'); td.textContent = String(v); tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+        box.appendChild(table);
+        host.appendChild(box);
+      });
+    }
+    var refresh = el('button', '', 'Refresh receipts');
+    refresh.type = 'button';
+    refresh.addEventListener('click', paint);
+    document.body.insertBefore(refresh, host);
+    paint();
+  })();
+  </script>
+</body>
+</html>
