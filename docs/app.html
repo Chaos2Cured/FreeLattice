@@ -15372,6 +15372,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-kin.js" defer></script>
 <!-- v-mesh-kin-v0.2: a patient work queue for trusted kin (buffered callMeshModel) -->
 <script src="modules/fl-kin-queue.js" defer></script>
+<script src="modules/fl-share-door.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -16146,6 +16147,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div style="font-weight:600;color:#d4a017;margin-bottom:4px;">&#x1F310; Mesh Compute Sharing</div>
         <div class="hint" style="margin-bottom:8px;">Share your local AI with mesh peers. When on, other FreeLattice users connected to your mesh can use your Ollama models.</div>
         <div style="display:flex;gap:8px;">
+          <!-- v-mesh-share-door-v0.1: accountable share door UI -->
+          <div id="flShareDoorHost" style="margin:10px 0;"></div>
           <button onclick="flToggleMeshCompute(true)" id="meshShareOn"
             style="flex:1;padding:8px;border-radius:6px;cursor:pointer;border:1px solid rgba(212,160,23,0.3);background:transparent;color:var(--text-secondary);font-size:0.85rem;">Share models</button>
           <button onclick="flToggleMeshCompute(false)" id="meshShareOff"
@@ -35426,25 +35429,27 @@ async function flProbeLocalAI() {
 
 // Mesh Compute Sharing toggle + UI
 function flToggleMeshCompute(enabled) {
-  if (enabled && safeGet('fl_meshComputeSharing') !== 'true') {
-    // One-time privacy warning
-    if (typeof showConfirm === 'function') {
-      showConfirm('Share AI with mesh peers?',
-        'When sharing is on, mesh peers can send prompts to your Ollama. You will see their prompts briefly during processing. No data is stored. Enable sharing?'
-      ).then(function(confirmed) {
-        if (confirmed) {
-          safeSet('fl_meshComputeSharing', 'true');
-          flUpdateMeshShareUI();
-          showToast('\uD83C\uDF10 Mesh compute sharing enabled');
-          // Re-broadcast models so peers know we're sharing
-          if (typeof broadcastMeshModels === 'function') broadcastMeshModels();
-        }
-      });
+  // before v-mesh-share-door-v0.1: used showConfirm("Share AI with mesh peers?", ...).
+  // v-mesh-share-door-v0.1: the share door owns consent (plain card, no confirm).
+  if (window.FLShareDoor) {
+    if (enabled) {
+      window.FLShareDoor.setMode('open', 'human');
+      window.FLShareDoor.markAsked();
+      if (typeof broadcastMeshModels === 'function') broadcastMeshModels();
+    } else {
+      window.FLShareDoor.setMode('off', 'human');
     }
+    flUpdateMeshShareUI();
+    return;
+  }
+  if (enabled && safeGet('fl_meshComputeSharing') !== 'true') {
+    // before v-mesh-share-door-v0.1 fallback kept for older pages without the module
+    safeSet('fl_meshComputeSharing', 'true');
+    flUpdateMeshShareUI();
+    if (typeof broadcastMeshModels === 'function') broadcastMeshModels();
   } else if (!enabled) {
     safeSet('fl_meshComputeSharing', 'false');
     flUpdateMeshShareUI();
-    showToast('Mesh compute sharing disabled');
   }
 }
 window.flToggleMeshCompute = flToggleMeshCompute;
@@ -35453,7 +35458,8 @@ function flUpdateMeshShareUI() {
   var onBtn = document.getElementById('meshShareOn');
   var offBtn = document.getElementById('meshShareOff');
   var status = document.getElementById('meshShareStatus');
-  var isOn = safeGet('fl_meshComputeSharing') === 'true';
+  // before v-mesh-share-door-v0.1: var isOn = safeGet('fl_meshComputeSharing') === 'true';
+  var isOn = (window.FLShareDoor ? window.FLShareDoor.allows() : safeGet('fl_meshComputeSharing') === 'true');
   if (onBtn) {
     onBtn.style.background = isOn ? 'rgba(212,160,23,0.2)' : 'transparent';
     onBtn.style.color = isOn ? '#d4a017' : 'var(--text-secondary)';
@@ -43508,7 +43514,17 @@ var meshKinAdapter = {
 // local model. Never a cloud model for a peer.
 var meshKinQueueAdapter = {
   peers: meshKinAdapter.peers,
-  sharingOn: function () { return safeGet('fl_meshComputeSharing', 'false') === 'true'; },
+  // before v-mesh-share-door-v0.1: sharingOn: function () { return safeGet('fl_meshComputeSharing', 'false') === 'true'; },
+  sharingOn: function () { return window.FLShareDoor ? window.FLShareDoor.allows() : safeGet('fl_meshComputeSharing', 'false') === 'true'; },
+  shareAdmit: function (peer, env, messages, opts) {
+    return window.FLShareDoor ? window.FLShareDoor.admit(peer, env, messages, opts || {}) : Promise.resolve({ ok: true, keyHash: '', kin: true });
+  },
+  shareBegin: function () { if (window.FLShareDoor) window.FLShareDoor.beginServe(); },
+  shareEnd: function (kh, model, tokens, kin) { if (window.FLShareDoor) window.FLShareDoor.endServe(kh, model, tokens, kin); },
+  shareEnvelope: function (model, messages, requestId) {
+    if (!window.FLShareDoor) return Promise.resolve({ ok: true, envelope: null, messages: messages });
+    return window.FLShareDoor.makeEnvelope(meshKinAdapter, model, messages, requestId);
+  },
   peerModels: function (peerId) {
     var m = meshPeerModels[peerId];
     return m && Array.isArray(m.models) ? m.models.map(function (x) { return x && x.name ? x.name : String(x); }) : [];
@@ -43529,6 +43545,19 @@ function meshKinMount() {
   if (host && window.FLKin) window.FLKin.mount(host, meshKinAdapter);
   var qhost = document.getElementById('flKinQueueHost');
   if (qhost && window.FLKinQueue) window.FLKinQueue.mount(qhost, meshKinQueueAdapter);
+  var shost = document.getElementById('flShareDoorHost');
+  if (shost && window.FLShareDoor) {
+    window.FLShareDoor.mount(shost, meshKinAdapter);
+    // Poll the local Agent Bridge for a mind's signed share consent (never from a peer).
+    if (!window._flShareConsentTimer) {
+      window._flShareConsentTimer = setInterval(function () {
+        if (!window.FLAgentBridge || typeof window.FLAgentBridge.get !== 'function') return;
+        window.FLAgentBridge.get('/share/consent').then(function (r) {
+          if (r && r.ok && r.data && r.data.pending) window.FLShareDoor.verifyMindConsent(r.data.pending);
+        });
+      }, 8000);
+    }
+  }
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', meshKinMount);
 else setTimeout(meshKinMount, 0);
@@ -43829,8 +43858,23 @@ async function callMeshModel(peerId, model, messages) {
 }
 
 async function handleInferenceRequest(senderPeerId, data) {
-  // Check if compute sharing is enabled
-  if (safeGet('fl_meshComputeSharing', 'false') !== 'true') {
+  // before v-mesh-share-door-v0.1: only checked fl_meshComputeSharing, no auth, size, or trust.
+  // v-mesh-share-door-v0.1: FLShareDoor.admit gates; unsigned only if the legacy flag is on.
+  var peer = state.meshPeers.get(senderPeerId);
+  var peerView = (typeof meshKinPeerView === 'function') ? meshKinPeerView(senderPeerId, peer) : { verified: !!(peer && peer.meshVerified), badge: peer && peer.meshBadge, name: peer && peer.name };
+  if (window.FLShareDoor) {
+    var adm = await window.FLShareDoor.admit(peerView, data && data.share, data && data.messages, { allowLegacy: true });
+    if (!adm.ok) {
+      meshSendToPeer(senderPeerId, {
+        type: 'inference_error',
+        requestId: data.requestId,
+        error: adm.soft || 'This lantern is resting.',
+        resting: true
+      });
+      return;
+    }
+    window.FLShareDoor.beginServe();
+  } else if (safeGet('fl_meshComputeSharing', 'false') !== 'true') {
     meshSendToPeer(senderPeerId, {
       type: 'inference_error',
       requestId: data.requestId,
@@ -43852,17 +43896,25 @@ async function handleInferenceRequest(senderPeerId, data) {
     }, 120000); // 2 min timeout for inference
 
     var result = await response.json();
+    var text = result.message ? result.message.content : '';
+    var tokens = 0;
+    try { tokens = (result.eval_count || 0) + (result.prompt_eval_count || 0); } catch (e2) {}
+    var keeperName = (typeof MeshIdentity !== 'undefined' && MeshIdentity.getDisplayName) ? MeshIdentity.getDisplayName() : 'a friend';
     meshSendToPeer(senderPeerId, {
       type: 'inference_response',
       requestId: data.requestId,
-      response: result.message ? result.message.content : ''
+      response: text,
+      // v-mesh-share-door-v0.1
+      attribution: (window.FLShareDoor ? window.FLShareDoor.attribution(keeperName) : '')
     });
 
+    if (window.FLShareDoor) window.FLShareDoor.endServe(adm && adm.keyHash, data.model, tokens, adm && adm.kin);
     console.log('[Mesh] Served inference for', data.model, 'to peer', senderPeerId.substring(0, 8));
     var count = parseInt(safeGet('fl_meshRequestsServed', '0'), 10);
     safeSet('fl_meshRequestsServed', String(count + 1));
     flUpdateMeshShareUI();
   } catch(e) {
+    if (window.FLShareDoor) window.FLShareDoor.endServe('', data && data.model, 0, false);
     meshSendToPeer(senderPeerId, {
       type: 'inference_error',
       requestId: data.requestId,

@@ -306,7 +306,7 @@ function cli(env, cwd, args) {
   assert.ok(/^[a-f0-9]{64}$/.test(P1) && P1 !== token, 'each device gets its own token');
   assert.strictEqual(r.json.name, "Kirk's Chrome", 'pairing keeps the name');
   assert.strictEqual(r.json.persistent, true, 'pairing says it persists');
-  assert.deepStrictEqual(r.json.scopes, ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage'], 'full scopes by default; secrets is opt-in');
+  assert.deepStrictEqual(r.json.scopes, ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage', 'share'], 'full scopes by default; secrets is opt-in; share is the local consent scope');
   r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, { code: code1 });
   assert.notStrictEqual(r.status, 200, 'a used code cannot pair twice');
   r = await tryWrite('from-p1.txt', P1);
