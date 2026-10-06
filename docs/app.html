@@ -22805,6 +22805,37 @@ function switchWalletView(view) {
   });</script>
 </div>
 
+<!-- v-gathering-shared-v0.1: The Gathering, opened from a Learn card. The chairs come from modules/fl-gathering.js (a byte-identical twin of the Tree's copy). -->
+<div class="tab-panel" id="tab-gathering">
+  <div id="fl-gathering-mount"></div>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var host = document.getElementById('fl-gathering-mount');
+    if (!host || !window.FLGathering) return;
+    var NOT_CLOUD = ['ollama', 'lmstudio', 'custom', 'custom-openai', 'browser'];
+    window.FLGathering.mount(host, {
+      storageKey: 'fl_gathering_chairs_v0',
+      // Cloud minds: the provider whose key is saved here, and its models. The key itself stays in FreeLattice's own storage.
+      cloudMinds: function () {
+        var out = [];
+        try {
+          if (typeof state === 'undefined' || !state || !state.apiKey || String(state.apiKey).length < 6) return out;
+          var id = String(state.provider || '');
+          if (NOT_CLOUD.indexOf(id) !== -1 || typeof PROVIDERS === 'undefined' || !PROVIDERS[id] || !PROVIDERS[id].models) return out;
+          var prov = PROVIDERS[id];
+          var current = prov.models[state.model];
+          if (current) out.push({ provider: id, providerName: prov.name, model: current });
+          Object.keys(prov.models).forEach(function (k) { out.push({ provider: id, providerName: prov.name, model: prov.models[k] }); });
+        } catch (e) {}
+        return out;
+      },
+      manualBase: function () {
+        try { return (window.FlConnect && window.FlConnect.getManualBase && window.FlConnect.getManualBase()) || ''; } catch (e) { return ''; }
+      }
+    });
+  });
+  </script>
+</div>
 <!-- ==================== TAB: LIGHTHOUSE — Research Papers ==================== -->
 <div class="tab-panel" id="tab-lighthouse">
   <div id="lighthouseBreadcrumb"></div>
@@ -27366,7 +27397,8 @@ function switchTab(tabId) {
   }
   // Highlight the correct top-level tab (Play/Learn act as parents)
   var PLAY_TABS = ['resonance', 'puzzles', 'canvas', 'echo', 'arcade', 'nursery', 'core', 'quiet', 'sparring'];
-  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'workshop', 'skills'];
+  // before v-gathering-shared-v0.1: var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'workshop', 'skills'];
+  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'workshop', 'skills', 'gathering'];
   var effectiveTab = tabId;
   if (PLAY_TABS.indexOf(tabId) !== -1) effectiveTab = 'play';
   else if (LEARN_TABS.indexOf(tabId) !== -1) effectiveTab = 'learn';
@@ -27649,6 +27681,8 @@ var LEARN_CARDS = [
   // ═══ [ORDER LOCK 9] Community learning ═══
   { id: 'round-table', icon: '&#x1F9E9;', label: 'Consensus Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
   { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
+  // v-gathering-shared-v0.1: The Gathering, chairs that wait (shared with theLatticeTree)
+  { id: 'gathering', icon: '&#x1FA91;', label: 'The Gathering', desc: 'Seat minds in chairs that wait.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Seven chairs, unnamed, with choice. Seat a mind on this computer or a cloud mind with your own key. Empty chairs stay empty.' },
   // ═══ [ORDER LOCK 11] Skills — last, deepest ═══
   // Go 7: Drawing Board merged into Chalkboard (canvas tab). See code-chalkboard.html.
   { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you’ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
@@ -69353,6 +69387,7 @@ document.addEventListener('click', function(e) {
 <script src="modules/depth-consent.js" defer></script>
 <script src="modules/adaptive-context-depth.js" defer></script>
 <script src="modules/fl-connect.js" defer></script>
+<script src="modules/fl-gathering.js" defer></script><!-- v-gathering-shared-v0.1 -->
 <!-- v-connect-under-more-v0 — FlConnect shared core; soft leave sw.js (not in APP_SHELL) -->
 <script>
 // v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect

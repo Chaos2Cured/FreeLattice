@@ -684,6 +684,21 @@ Smoke: `SMOKE_OK mesh kin connect heal`
 
 ---
 
+### 2026-10-02 · Grok · family builder · The Gathering shared v0.1 (chairs that wait, now on FreeLattice too)
+
+Kirk asked for the Tree's Gathering in FreeLattice's Learn tab, with local and cloud minds both able to sit. This is brick 1 of 3.
+
+- New docs/modules/fl-gathering.js, byte-identical in both repos like fl-connect.js: seven chairs (cortex, memory, continuity, dream, and three seats for later), a picker, Find local minds, Clear, and which chair speaks first. Empty chairs stay empty.
+- A chair can seat a mind on this computer (127.0.0.1 only, found only when asked, read only) or a cloud mind through the key already saved in FreeLattice. A seat keeps the mind's name, never a key.
+- FreeLattice: a Learn card, The Gathering, opens it. The Tree carries the same file but does not use it yet; its own Gathering is unchanged.
+- Seating only. Seated minds speak in brick 2; the Tree switches to the shared core in brick 3.
+
+Smoke: `SMOKE_OK gathering shared v0.1`
+
+**TEMPERATURE:** quiet and glad, the chairs wait, a local mind sits only when asked, and the key stays out of the seat.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
