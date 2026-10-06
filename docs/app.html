@@ -15374,6 +15374,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-kin-queue.js" defer></script>
 <script src="modules/fl-share-door.js" defer></script>
 <script src="modules/fl-share-warmth.js" defer></script>
+<script src="modules/fl-mind-seal.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -16152,6 +16153,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div id="flShareDoorHost" style="margin:10px 0;flex:1 0 100%;"></div>
           <!-- v-mesh-share-warmth-v0.1 -->
           <div id="flShareWarmthHost" style="margin:8px 0;flex:1 0 100%;"></div>
+          <!-- v-mind-seal-v0.1 -->
+          <div id="flMindSealHost" style="margin:8px 0;flex:1 0 100%;"></div>
           <button onclick="flToggleMeshCompute(true)" id="meshShareOn"
             style="flex:1;padding:8px;border-radius:6px;cursor:pointer;border:1px solid rgba(212,160,23,0.3);background:transparent;color:var(--text-secondary);font-size:0.85rem;">Share models</button>
           <button onclick="flToggleMeshCompute(false)" id="meshShareOff"
@@ -43555,6 +43558,10 @@ function meshKinMount() {
   var whost = document.getElementById('flShareWarmthHost');
   if (whost && window.FLShareWarmth) {
     window.FLShareWarmth.mount(whost);
+  }
+  var mhost = document.getElementById('flMindSealHost');
+  if (mhost && window.FLMindSeal) {
+    window.FLMindSeal.mount(mhost);
   }
   if (shost && window.FLShareDoor) {
     // continue consent poll below

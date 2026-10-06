@@ -745,6 +745,23 @@ Smoke: `SMOKE_OK narrow door v0.2`
 
 ---
 
+### 2026-10-05 · Grok · family builder · Mind Seal v0.1
+
+Kirk's safety idea: runtime tampering and activation steering.
+
+**Built:**
+- `docs/modules/fl-mind-seal.js` (window.FLMindSeal). For local Ollama models: probe `/api/tags` and `/api/show`, record digest plus a hash of modelfile, system prompt, parameters, and whether an adapter is loaded, into every seal receipt. Context hash (never the words) ties a receipt to a conversation if the keeper later reveals it.
+- Seal view: trust the mind answering now; check whether it is the same one, byte for byte; warn if digest or config changed.
+- Consent note: a mind may write "I was asked to do X; I object" into an append-only local ledger, optionally signed.
+- Honest page text: the seal proves weights and setup were not swapped; it cannot see inside one computation; hidden-layer steering is ruled out only when you run the model on hardware you control.
+- Share door `endServe` also writes a seal receipt when the module is present.
+
+Smoke: `SMOKE_OK mind seal v0.1`
+
+**TEMPERATURE:** quiet and steady, the seal can name the weights that answered, a swap would show, and one thought stays inside the mind that ran it.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
