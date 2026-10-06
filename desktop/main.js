@@ -7,7 +7,7 @@
 // and bypasses CORS so Ollama always works.
 // ============================================
 
-const { app, BrowserWindow, Menu, Tray, shell, dialog, Notification, ipcMain, nativeImage, session } = require('electron');
+const { app, BrowserWindow, Menu, Tray, shell, dialog, Notification, ipcMain, nativeImage, session, webContents } = require('electron');
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -429,6 +429,15 @@ function setupCORSBypass() {
     }
     if (details.requestHeaders && details.requestHeaders.Origin) {
       candidates.push(String(details.requestHeaders.Origin));
+    }
+    // onBeforeRequest often has no Origin, and an https page omits the referrer
+    // when it calls http on this machine. Use the window's own page then.
+    if (!candidates.length && details.webContentsId != null) {
+      try {
+        const wc = webContents.fromId(details.webContentsId);
+        const pageUrl = wc && !wc.isDestroyed() && typeof wc.getURL === 'function' ? wc.getURL() : '';
+        if (pageUrl) candidates.push(new URL(pageUrl).origin);
+      } catch (e) {}
     }
     for (const c of candidates) {
       if (!c) continue;

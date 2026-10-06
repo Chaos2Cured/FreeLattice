@@ -25,6 +25,7 @@ assert.ok(!/Allow-Origin['"\s]*:\s*['"]\*/.test(live), 'no star literal in bypas
 assert.ok(/Access-Control-Allow-Origin'\] = \[origin\]/.test(body), 'echoes allowed origin');
 assert.ok(body.includes('before v-narrow-door-v0.2'), 'before comment kept');
 assert.ok(/callback\(\{ cancel: true \}\)/.test(body), 'cancels closed doors');
+assert.ok(body.includes('webContents.fromId'), 'window page used when the request carries no origin');
 assert.ok(!/\u2014/.test(body), 'no emdash in bypass');
 
 // v0.1 still holds
