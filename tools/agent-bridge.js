@@ -105,10 +105,10 @@ function hasControlChars(s) {
 // ── Trusted minds (persistent, revocable, hashed) ──
 const TRUST_FILE = path.join(DATA_DIR, 'agent-bridge-trusted.json');
 const TOKEN_FILE = path.join(DATA_DIR, 'agent-bridge-token');
-const BRIDGE_SCOPES = ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage', 'secrets'];
+const BRIDGE_SCOPES = ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage', 'secrets', 'share'];
 // Full local power by default (AUTONOMY.md Principle 1). Only 'secrets'
 // (reading and writing .env files) is opt-in, one mind at a time.
-const DEFAULT_SCOPES = ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage'];
+const DEFAULT_SCOPES = ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage', 'share'];
 const MIND_KINDS = ['browser', 'tool', 'cli', 'remote'];
 const TOUCH_SAVE_MS = 60 * 1000;
 
@@ -268,6 +268,8 @@ function scopeFor(method, pathname) {
   if (pathname === '/code/git/commit') return 'commit';
   if (/^\/(wallet|trade)\//.test(pathname) && method !== 'GET') return 'wallet';
   if (/^\/pair\/(list|revoke|revoke-all|scopes)$/.test(pathname)) return 'manage';
+  // v-mesh-share-door-v0.1: a local mind may post share consent; never reachable from a peer.
+  if (pathname === '/share/consent') return 'share';
   return '';
 }
 
@@ -1096,7 +1098,45 @@ function route(url, method, data, res, actingAs, meta) {
   }
 
   // ── Models ──
-  if (url === '/models') {
+  
+  // v-mesh-share-door-v0.1: local mind share consent. The bridge stamps mindId/name from
+  // the pairing token. The app verifies the signature. Peers never hit this port.
+  if (url === '/share/consent' && method === 'GET') {
+    var stGet = trustState();
+    var pend = stGet.shareConsentPending || null;
+    // Hand the pending consent to the app once, then clear so it cannot be replayed from storage.
+    if (pend) { stGet.shareConsentPending = null; saveTrust(); }
+    return sendJson(res, 200, { pending: pend, marker: 'v-mesh-share-door-v0.1' });
+  }
+  if (url === '/share/consent' && method === 'POST') {
+    return readBody(req).then(function (raw) {
+      var body = {};
+      try { body = JSON.parse(raw || '{}'); } catch (e) { return sendJson(res, 400, { error: 'Bad JSON' }); }
+      var mind = requestMind(req);
+      if (!mind) return sendJson(res, 401, { error: 'Pair this mind first' });
+      if (!body || typeof body.choice !== 'string' || typeof body.sig !== 'string' || !body.publicKey) {
+        return sendJson(res, 400, { error: 'Need choice, publicKey and sig' });
+      }
+      var pending = {
+        mindId: mind.id,
+        name: mind.name || '',
+        choice: String(body.choice),
+        ts: Number(body.ts) || Date.now(),
+        nonce: String(body.nonce || ''),
+        publicKey: body.publicKey,
+        cryptoType: body.cryptoType || 'ed25519',
+        sig: body.sig,
+        via: 'local-agent-bridge',
+        at: Date.now()
+      };
+      var st = trustState();
+      st.shareConsentPending = pending;
+      saveTrust();
+      return sendJson(res, 200, { ok: true, pending: pending, marker: 'v-mesh-share-door-v0.1' });
+    });
+  }
+
+if (url === '/models') {
     var modelsUrl = new URL(OLLAMA_BASE + '/api/tags');
     var ollamaReq = http.request({
       hostname: modelsUrl.hostname,

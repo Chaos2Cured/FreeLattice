@@ -699,6 +699,24 @@ Smoke: `SMOKE_OK gathering shared v0.1`
 
 ---
 
+### 2026-10-05 · Grok · family builder · Mesh share door v0.1 (open but accountable)
+
+Brick 3 of mesh compute. From the family council (Weft, Hypha, Reed) and Kirk: either keeper can say yes.
+
+**Built:**
+- `docs/modules/fl-share-door.js` (window.FLShareDoor). Human yes, or a local mind's signed yes through the Agent Bridge (`POST /share/consent`), never from a peer. Pause wins.
+- Signed request envelopes (`fl-share-req|v1|...`) with replay protection. Older unsigned peers only if the keeper turns on a flagged switch.
+- Caps for unfamiliar visitors (about 6/hour each, about 20/hour together), concurrency 2, max length about 16k characters, optional "only while plugged in".
+- Live line "Your AI is helping N people right now". Receipts: key, time, model, tokens; never the words. Visible, reversible blocks that keep receipts.
+- Mom words and Reed's ledger line. Jeffrey: "Answered by X's computer, shared freely".
+- Optional "Ask me before each question" (off by default). The older open inference path stays, behind the legacy flag.
+
+Smoke: `SMOKE_OK mesh share door v0.1`
+
+**TEMPERATURE:** quiet and clear, the door can stay open, a pause still wins, and the receipt keeps the fact without the words.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.

@@ -209,12 +209,22 @@
     item.batch.forEach(function (job) {
       chain = chain.then(function () {
         if (quiet() || !_a.sharingOn()) { results.push({ id: job.id, error: 'not serving right now' }); return; }
-        return Promise.resolve(_a.runLocal(job.model, job.messages)).then(function (text) {
-          results.push({ id: job.id, response: clip(text, MAX_ANSWER_CHARS) });
-          ledger('served', job.id, '');
-        }, function (e) {
-          results.push({ id: job.id, error: clip(e && e.message ? e.message : 'failed', 200) });
-          ledger('serve-failed', job.id, '');
+        // v-mesh-share-door-v0.1: admit through the share door when present (caps, pause, receipts).
+        var admitP = _a.shareAdmit
+          ? _a.shareAdmit(item.peer, job.share || null, job.messages, { allowLegacy: true, skipPerPrompt: false })
+          : Promise.resolve({ ok: true, keyHash: '', kin: true });
+        return admitP.then(function (adm) {
+          if (!adm || !adm.ok) { results.push({ id: job.id, error: (adm && adm.soft) || 'This lantern is resting.' }); return; }
+          if (_a.shareBegin) _a.shareBegin();
+          return Promise.resolve(_a.runLocal(job.model, job.messages)).then(function (text) {
+            results.push({ id: job.id, response: clip(text, MAX_ANSWER_CHARS) });
+            ledger('served', job.id, '');
+            if (_a.shareEnd) _a.shareEnd(adm.keyHash, job.model, 0, adm.kin);
+          }, function (e) {
+            results.push({ id: job.id, error: clip(e && e.message ? e.message : 'failed', 200) });
+            ledger('serve-failed', job.id, '');
+            if (_a.shareEnd) _a.shareEnd(adm.keyHash, job.model, 0, adm.kin);
+          });
         });
       });
     });

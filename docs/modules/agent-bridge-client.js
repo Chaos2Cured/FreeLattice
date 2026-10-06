@@ -278,6 +278,9 @@
     revokeAll: revokeAll,
     setScopes: setScopes,
     hasToken: function () { return !!getToken(); },
+    // v-mesh-share-door-v0.1: thin helpers for the share-consent poll
+    get: function (path) { return jsonCall(path, 'GET'); },
+    post: function (path, body) { return jsonCall(path, 'POST', body); },
     forget: function () { setToken(''); },
     defaultName: defaultName,
     renderPairCard: renderPairCard,
