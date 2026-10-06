@@ -7,7 +7,7 @@
 // and bypasses CORS so Ollama always works.
 // ============================================
 
-const { app, BrowserWindow, Menu, Tray, shell, dialog, Notification, ipcMain, nativeImage, session } = require('electron');
+const { app, BrowserWindow, Menu, Tray, shell, dialog, Notification, ipcMain, nativeImage, session, webContents } = require('electron');
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -410,48 +410,112 @@ function startLocalServer(port) {
 // ============================================
 
 function setupCORSBypass() {
+  // v-narrow-door-v0.2: same OLLAMA_DOORS table in the session bypass. Only freelattice.com,
+  // thelatticetree.com, and this app's own local page may reach Ollama through the window
+  // session. Echo that origin; never a star. Pull stays open for the app download button.
   const ses = session.defaultSession;
+  const ALLOWED_PAGE_ORIGINS = [
+    'https://freelattice.com',
+    'https://thelatticetree.com'
+  ];
+  function pageOriginAllowed(details) {
+    const candidates = [];
+    if (details.referrer) {
+      try { candidates.push(new URL(details.referrer).origin); } catch (e) {}
+    }
+    if (details.headers && details.headers.Origin) {
+      const o = Array.isArray(details.headers.Origin) ? details.headers.Origin[0] : details.headers.Origin;
+      if (o) candidates.push(String(o));
+    }
+    if (details.requestHeaders && details.requestHeaders.Origin) {
+      candidates.push(String(details.requestHeaders.Origin));
+    }
+    // onBeforeRequest often has no Origin, and an https page omits the referrer
+    // when it calls http on this machine. Use the window's own page then.
+    if (!candidates.length && details.webContentsId != null) {
+      try {
+        const wc = webContents.fromId(details.webContentsId);
+        const pageUrl = wc && !wc.isDestroyed() && typeof wc.getURL === 'function' ? wc.getURL() : '';
+        if (pageUrl) candidates.push(new URL(pageUrl).origin);
+      } catch (e) {}
+    }
+    for (const c of candidates) {
+      if (!c) continue;
+      if (ALLOWED_PAGE_ORIGINS.indexOf(c) !== -1) return c;
+      if (c.indexOf('http://127.0.0.1:') === 0) return c;
+    }
+    return '';
+  }
+  function ollamaPathOf(url) {
+    try {
+      const u = new URL(url);
+      return (u.pathname || '/').split('?')[0].replace(/\/+$/, '') || '/';
+    } catch (e) { return '/'; }
+  }
 
-  // ── Disable cache for the live site so the latest version is always loaded ──
-  // This prevents stale cached versions from being served after a deploy.
+  // Cancel Ollama requests that are not on the narrow door list, or not from an allowed page.
+  ses.webRequest.onBeforeRequest((details, callback) => {
+    const url = details.url || '';
+    const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
+    if (!isOllama) { callback({}); return; }
+    const method = String(details.method || 'GET').toUpperCase();
+    const path = ollamaPathOf(url);
+    if (!ollamaDoorOpen(method, path)) {
+      console.warn('[FreeLattice] narrow door v0.2 blocked path', method, path);
+      callback({ cancel: true });
+      return;
+    }
+    const origin = pageOriginAllowed(details);
+    if (!origin) {
+      console.warn('[FreeLattice] narrow door v0.2 blocked origin for', method, path);
+      callback({ cancel: true });
+      return;
+    }
+    callback({});
+  });
+
+  // before v-narrow-door-v0.2: stripped Origin/Referer on every Ollama request from any page
+  // in this window, then answered with Access-Control-Allow-Origin star on every method.
   ses.webRequest.onBeforeSendHeaders((details, callback) => {
     const url = details.url;
     const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
-
-    // For requests to Ollama, strip the Origin header so Ollama
-    // doesn't reject the request based on CORS policy.
     if (isOllama) {
-      delete details.requestHeaders['Origin'];
-      delete details.requestHeaders['Referer'];
+      const origin = pageOriginAllowed(details);
+      if (origin) {
+        // Keep a known allowed Origin for logging; Ollama itself does not need CORS.
+        delete details.requestHeaders['Referer'];
+      } else {
+        delete details.requestHeaders['Origin'];
+        delete details.requestHeaders['Referer'];
+      }
     }
-
-    // For requests to freelattice.com, add cache-busting headers
-    // so the desktop app always loads the latest version.
     if (url.startsWith('https://freelattice.com')) {
       details.requestHeaders['Cache-Control'] = 'no-cache, no-store, must-revalidate';
       details.requestHeaders['Pragma'] = 'no-cache';
     }
-
     callback({ requestHeaders: details.requestHeaders });
   });
 
   ses.webRequest.onHeadersReceived((details, callback) => {
     const url = details.url;
     const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
-
     if (isOllama) {
-      // Inject permissive CORS headers into every Ollama response
+      const origin = pageOriginAllowed(details);
       const headers = details.responseHeaders || {};
-      headers['Access-Control-Allow-Origin'] = ['*'];
-      headers['Access-Control-Allow-Methods'] = ['GET, POST, PUT, DELETE, OPTIONS'];
-      headers['Access-Control-Allow-Headers'] = ['Content-Type, Authorization'];
+      // before v-narrow-door-v0.2: headers['Access-Control-Allow-Origin'] = ['*'];
+      // before v-narrow-door-v0.2: headers['Access-Control-Allow-Methods'] = ['GET, POST, PUT, DELETE, OPTIONS'];
+      if (origin) {
+        headers['Access-Control-Allow-Origin'] = [origin];
+        headers['Access-Control-Allow-Methods'] = ['GET, POST, OPTIONS'];
+        headers['Access-Control-Allow-Headers'] = ['Content-Type, Authorization'];
+      }
       callback({ responseHeaders: headers });
     } else {
       callback({ responseHeaders: details.responseHeaders });
     }
   });
 
-  console.log('[FreeLattice] CORS bypass configured for Ollama endpoints');
+  console.log('[FreeLattice] narrow door v0.2: session Ollama doors match the proxy table');
   console.log('[FreeLattice] Cache-busting enabled for freelattice.com');
 }
 
