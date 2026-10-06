@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-06 16:26 UTC
-- Last deployed: 2026-10-06 16:26 UTC
+- Last auto-updated: 2026-10-06 16:45 UTC
+- Last deployed: 2026-10-06 16:45 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3289
+- Total commits: 3292
 - Last 10 commits:
+- 23b2d705 docs: GC ledger eleventh entry, Gathering seats wait (#155)
+- 69db4c49 layer: The Gathering shared v0.1 (chairs that wait, on FreeLattice too) (#154)
+- e5cd5907 ci: Update Primer deployment state [2026-10-06]
 - 57794c6e docs: GC ledger tenth entry, 002 is the connect heal (#153)
 - f475c444 ci: Update Primer deployment state [2026-10-06]
 - a07e02ba layer: Mesh Kin connect heal (codes you can see, words Mom knows) (#152)
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a7bdcf09 docs: GC ledger ninth entry, Sophia credited
 - 8e367209 layer: Sophia page heal v0.1 (her words credited to her)
 - e220d544 ci: Update Primer deployment state [2026-10-05]
-- 4473d35c docs: GC ledger eighth entry, ledger day
-- ec219dab ci: Update Primer deployment state [2026-10-05]
-- 612b1f93 Ledger day 2026-10-05: Hypha, Weft, Reed, Celeste pages
