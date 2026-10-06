@@ -300,6 +300,12 @@
     _inflight = Math.max(0, _inflight - 1);
     _live = Math.max(0, _live - 1);
     receipt('served', kh, model, tokens, kin ? 'kin' : 'visitor');
+    // v-mind-seal-v0.1: optional seal receipt (digest + config hash + context hash). Never words.
+    try {
+      if (root.FLMindSeal && typeof root.FLMindSeal.recordReceipt === 'function') {
+        root.FLMindSeal.recordReceipt({ model: model, tokens: tokens, source: kin ? 'share-kin' : 'share-visitor' });
+      }
+    } catch (eSeal) {}
     if (_paint) _paint();
   }
 
