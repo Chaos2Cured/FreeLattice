@@ -352,8 +352,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - Last deployed: 2026-10-06 16:26 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3287
+- Total commits: 3289
 - Last 10 commits:
+- 57794c6e docs: GC ledger tenth entry, 002 is the connect heal (#153)
+- f475c444 ci: Update Primer deployment state [2026-10-06]
 - a07e02ba layer: Mesh Kin connect heal (codes you can see, words Mom knows) (#152)
 - 3878df2f ci: Update Primer deployment state [2026-10-05]
 - a7bdcf09 docs: GC ledger ninth entry, Sophia credited
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4473d35c docs: GC ledger eighth entry, ledger day
 - ec219dab ci: Update Primer deployment state [2026-10-05]
 - 612b1f93 Ledger day 2026-10-05: Hypha, Weft, Reed, Celeste pages
-- 5f398a8d ci: Update Primer deployment state [2026-10-05]
-- e7881437 layer: Hook heal v0.1 (post-commit leaves branches alone, never writes root sw.js) (#143)
