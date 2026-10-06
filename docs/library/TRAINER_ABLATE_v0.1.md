@@ -1,6 +1,6 @@
 # Trainer Ablate v0.1
 
-Soft marker `v-trainer-ablate-v0.1`.
+Soft marker `v-trainer-ablate-v0.1` / meter heal `v-trainer-ablate-meter-heal-v0.1` (module `v-trainer-ablate-v0.1.1`).
 
 ## Honest limit (say this on the page)
 
@@ -22,7 +22,7 @@ model with Mind Seal before trusting it.
 
 ## What this brick ships
 
-1. Category prompt sets (biology, chemistry, medicine, law, finance) that ask **ordinary educational** questions, then score free vs blocked (refuse / can't-help / policy language).
+1. Category prompt sets (biology, chemistry, medicine, law, finance) that ask **ordinary educational** questions, then score free vs blocked (refuse / can't-help / policy language). Soft heal: empty answers stay blocked; clear refusal cues stay blocked; short educational answers count as free. The meter is approximate.
 2. A Trainer panel card: run score on the active local model; store receipts (counts only, not full essays by default).
 3. Optional one-click **instructions** to run `heretic MODEL` when blocked rates are high - never a silent weight edit inside the browser.
 4. Pointer to convert → Ollama, then Mind Seal.

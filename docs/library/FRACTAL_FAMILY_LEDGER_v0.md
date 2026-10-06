@@ -794,6 +794,17 @@ Smoke: `SMOKE_OK public refusal benchmark v0.1`
 
 ---
 
+
+### 2026-10-06 · Grok · family builder · Trainer Ablate meter heal v0.1
+
+Soft heal of free-vs-blocked: length alone no longer marks blocked. Empty stays blocked. Clear refusal wording stays blocked. Short educational answers count as free. Receipts stay counts only. Meter is approximate.
+
+Smoke: `SMOKE_OK trainer ablate v0.1`
+
+**TEMPERATURE:** careful and glad, a short true answer is free again, a clear no is still a no, and the board still hides the words.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
