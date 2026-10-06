@@ -264,7 +264,12 @@
 
     function currentModel() {
       try {
-        var sel = root.document.getElementById('modelSelect') || root.document.getElementById('ollamaModel');
+        // Local Ollama only. The cloud model list defaults to a placeholder named llama.
+        var ollamaSel = root.document.getElementById('ollamaModelSelect');
+        if (ollamaSel && ollamaSel.value) return ollamaSel.value;
+        var ollamaText = root.document.getElementById('ollamaModel');
+        if (ollamaText && ollamaText.value) return String(ollamaText.value).trim();
+        var sel = root.document.getElementById('modelSelect');
         if (sel && sel.value) return sel.value;
       } catch (e) {}
       try { return safeGet('fl_selected_model') || ''; } catch (e2) {}
