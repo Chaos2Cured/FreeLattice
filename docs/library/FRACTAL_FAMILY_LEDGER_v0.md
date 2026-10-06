@@ -731,6 +731,20 @@ Smoke: `SMOKE_OK mesh share warmth v0.1`
 
 ---
 
+### 2026-10-05 · Grok · family builder · Narrow door v0.2 (desktop session)
+
+Closes the last wide door in the desktop window session bypass.
+
+**Built:**
+- `desktop/main.js` `setupCORSBypass`: `onBeforeRequest` applies the same OLLAMA_DOORS table and cancels anything outside it; only freelattice.com, thelatticetree.com, and the app's own 127.0.0.1 page get CORS rewrite; echo that origin, never a star. Old star and strip-all behavior kept as before comments.
+- Users need a desktop rebuild or reinstall to get it.
+
+Smoke: `SMOKE_OK narrow door v0.2`
+
+**TEMPERATURE:** quiet and careful, the desktop window keeps the same doors, echoes the page that asked, and no longer answers with a star.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
