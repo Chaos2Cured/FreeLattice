@@ -27676,6 +27676,9 @@ var PLAY_CARDS = [
 ];
 
 var LEARN_CARDS = [
+  // v-trainer-map-v0.1 - Mom/Jeffrey map of the existing Trainer door
+  { icon: '&#127793;', label: 'Trainer map', desc: 'Where training lives today, and what you need to know.', external: 'trainer-map.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Opens a short map of Garden Trainer. No new training engine.' },
+
   // ═══ [ORDER LOCK 1] Flagship — the 80-specialist room ═══
   { id: 'roundtable', icon: '&#x1F9E0;', label: 'Round Table', desc: 'Consult 80 AI specialists.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Bring any question to a table of 80 domain specialists. Each speaks in their voice. The room remembers.' },
   // ═══ [ORDER LOCK 2] Learn by doing ═══
@@ -69457,6 +69460,52 @@ document.addEventListener('click', function(e) {
 <script src="modules/adaptive-context-depth.js" defer></script>
 <script src="modules/fl-connect.js" defer></script>
 <script src="modules/fl-gathering.js" defer></script><!-- v-gathering-shared-v0.1 -->
+<!-- v-trainer-map-connect-retry: if More→Connect opened before FlConnect loaded, mount when ready -->
+<script>
+(function () {
+  function retryMount() {
+    try {
+      var tab = document.getElementById('tab-connect');
+      var mount = document.getElementById('fl-connect-mount');
+      if (!tab || !mount || !tab.classList.contains('active')) return;
+      if (!window.FlConnect || typeof FlConnect.mount !== 'function') return;
+      if (mount.getAttribute('data-flc-mounted') === '1' && mount.childNodes.length) return;
+      FlConnect.mount(mount);
+      mount.setAttribute('data-flc-mounted', '1');
+    } catch (e) {}
+  }
+  var n = 0;
+  var t = setInterval(function () {
+    retryMount();
+    n += 1;
+    if (n > 40 || (window.FlConnect && document.getElementById('fl-connect-mount') && document.getElementById('fl-connect-mount').childNodes.length)) clearInterval(t);
+  }, 250);
+})();
+</script>
+<!-- v-trainer-map-open-tab: the map link sets fl-open-tab. Kept out of the research print string so this page script stays open. -->
+<script>
+(function () {
+  var tab = '';
+  try { tab = sessionStorage.getItem('fl-open-tab') || ''; } catch (e) { return; }
+  if (!tab) return;
+  var done = false;
+  var userMoved = false;
+  function stop() { userMoved = true; }
+  try {
+    document.addEventListener('pointerdown', stop, true);
+    document.addEventListener('keydown', stop, true);
+  } catch (eL) {}
+  function go() {
+    if (done || userMoved) return;
+    if (typeof switchTab !== 'function') return;
+    try { sessionStorage.removeItem('fl-open-tab'); } catch (eR) {}
+    switchTab(tab);
+    done = true;
+  }
+  [600, 1200, 2500].forEach(function (ms) { setTimeout(go, ms); });
+})();
+</script>
+
 <!-- v-connect-under-more-v0 — FlConnect shared core; soft leave sw.js (not in APP_SHELL) -->
 <script>
 // v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect
