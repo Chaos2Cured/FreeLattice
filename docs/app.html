@@ -17672,7 +17672,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- ═══ ZONE 3: ADVANCED (collapsed) ═══ -->
   <details class="fl-zone-advanced" style="margin-top:32px;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;">
-    <summary class="fl-zone-h" style="font-family:Georgia,serif;font-size:1.2rem;color:rgba(255,255,255,0.65);cursor:pointer;user-select:none;padding:10px 0;letter-spacing:0.3px;">&#x2699; Advanced <span style="font-size:0.75rem;font-weight:400;opacity:0.55;margin-left:6px;">— mesh, debug, developer</span></summary>
+    <!-- before v-mesh-kin-connect-heal: the summary's small line was 0.75rem at opacity 0.55, about 12px at 3.2:1, after a dash. -->
+    <summary class="fl-zone-h" style="font-family:Georgia,serif;font-size:1.2rem;color:rgba(255,255,255,0.8);cursor:pointer;user-select:none;padding:10px 0;letter-spacing:0.3px;min-height:44px;">&#x2699; Advanced <span style="font-size:1rem;font-weight:400;color:rgba(255,255,255,0.78);margin-left:6px;">&middot; mesh, debug, developer (your Mesh ID lives here)</span></summary>
     <div style="padding-top:12px;">
 
   <!-- System Prompt Section -->
@@ -18573,7 +18574,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <!-- Offer Code Area (hidden by default) -->
     <div class="mesh-code-area hidden" id="meshOfferArea">
-      <label>Your Offer Code &mdash; send this to your peer</label>
+      <!-- before v-mesh-kin-connect-heal: label "Your Offer Code", send this to your peer -->
+      <label>Your invite code. Copy all of it and send it to your friend by text or email.</label>
       <textarea id="meshOfferCode" readonly placeholder="Generating offer code..."></textarea>
       <div class="mesh-code-actions">
         <button class="action-btn" onclick="meshCopyOffer()">&#128203; Copy Code</button>
@@ -18583,8 +18585,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <!-- Paste Answer Area (hidden by default) -->
     <div class="mesh-code-area hidden" id="meshAnswerPasteArea">
-      <label>Paste your peer's Answer Code here</label>
-      <textarea id="meshAnswerPasteInput" placeholder="Paste the answer code from your peer..."></textarea>
+      <!-- before v-mesh-kin-connect-heal: <label>Paste your peer's Answer Code here</label> -->
+      <!-- before v-mesh-kin-connect-heal: <textarea id="meshAnswerPasteInput" placeholder="Paste the answer code from your peer..."></textarea> -->
+      <label>When your friend sends back their reply code, paste it here.</label>
+      <textarea id="meshAnswerPasteInput" placeholder="Paste your friend's reply code"></textarea>
       <div class="mesh-code-actions">
         <button class="action-btn primary" onclick="meshAcceptAnswer()">&#10003; Connect</button>
         <button class="action-btn" onclick="meshCancelOffer()" style="color: var(--text-muted);">Cancel</button>
@@ -18593,17 +18597,21 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <!-- Join Area (hidden by default) -->
     <div class="mesh-code-area hidden" id="meshJoinArea">
-      <label>Paste the Offer Code from your peer</label>
-      <textarea id="meshJoinOfferInput" placeholder="Paste the offer code here..."></textarea>
+      <!-- before v-mesh-kin-connect-heal: <label>Paste the Offer Code from your peer</label> -->
+      <!-- before v-mesh-kin-connect-heal: <textarea id="meshJoinOfferInput" placeholder="Paste the offer code here..."></textarea> -->
+      <!-- before v-mesh-kin-connect-heal: button text "Generate Answer" -->
+      <label>Paste the invite code your friend sent you.</label>
+      <textarea id="meshJoinOfferInput" placeholder="Paste your friend's invite code"></textarea>
       <div class="mesh-code-actions">
-        <button class="action-btn primary" onclick="meshCreateAnswer()">Generate Answer</button>
+        <button class="action-btn primary" onclick="meshCreateAnswer()">Make my reply code</button>
         <button class="action-btn" onclick="meshCancelJoin()" style="color: var(--text-muted);">Cancel</button>
       </div>
     </div>
 
     <!-- Answer Code Area (hidden by default) -->
     <div class="mesh-code-area hidden" id="meshAnswerArea">
-      <label>Your Answer Code &mdash; send this back to your peer</label>
+      <!-- before v-mesh-kin-connect-heal: label "Your Answer Code", send this back to your peer -->
+      <label>Your reply code. Copy all of it and send it back to your friend. They have 10 minutes.</label>
       <textarea id="meshAnswerCode" readonly placeholder="Generating answer code..."></textarea>
       <div class="mesh-code-actions">
         <button class="action-btn" onclick="meshCopyAnswer()">&#128203; Copy Code</button>
@@ -18615,19 +18623,23 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div style="font-weight: 600; color: var(--accent); margin-bottom: 10px;">How to connect to a peer:</div>
       <div class="step">
         <span class="step-num">1</span>
-        <span>Click <strong>Create Connection</strong> to generate an offer code.</span>
+        <!-- before v-mesh-kin-connect-heal: Click Create Connection to generate an offer code. -->
+        <span>Tap <strong>Create Connection</strong>. You get a long invite code.</span>
       </div>
       <div class="step">
         <span class="step-num">2</span>
-        <span>Send the offer code to your friend (text, email, Discord, etc.).</span>
+        <!-- before v-mesh-kin-connect-heal: Send the offer code to your friend (text, email, Discord, etc.). -->
+        <span>Copy all of it and send it to your friend (text, email, Discord).</span>
       </div>
       <div class="step">
         <span class="step-num">3</span>
-        <span>Your friend clicks <strong>Join Connection</strong>, pastes your code, and sends back their answer code.</span>
+        <!-- before v-mesh-kin-connect-heal: Your friend clicks Join Connection, pastes your code, and sends back their answer code. -->
+        <span>Your friend taps <strong>Join Connection</strong>, pastes it, and sends back their reply code.</span>
       </div>
       <div class="step">
         <span class="step-num">4</span>
-        <span>Paste their answer code here. <strong>Connected!</strong> Knowledge flows freely.</span>
+        <!-- before v-mesh-kin-connect-heal: Paste their answer code here. Connected! Knowledge flows freely. -->
+        <span>Paste their reply code here within 10 minutes. <strong>Connected!</strong> Some phone and work networks block direct connections; home Wi-Fi works best.</span>
       </div>
     </div>
 
@@ -18640,7 +18652,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- v-mesh-kin-v0.1: Kin. Mind cards shared with verified peers only. -->
   <div class="section" id="meshKinSection">
-    <div class="section-title" style="margin-bottom: 8px;">Kin: mind cards</div>
+    <!-- before v-mesh-kin-connect-heal: <div class="section-title" style="margin-bottom: 8px;">Kin: mind cards</div> -->
+    <div class="section-title" style="margin-bottom: 8px; font-size: 1.05rem; color: rgba(255,255,255,0.9);">AI cards from people you connected with</div>
     <div id="flKinHost"></div>
     <div id="flKinQueueHost" style="margin-top: 14px;"></div>
   </div>
@@ -18843,11 +18856,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <!-- Section 2: Connect — simple code exchange -->
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin-bottom:14px;">
       <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;margin-bottom:4px;">&#x1F91D; Connect with someone</div>
-      <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Share your code with a friend. They share theirs back. That's it &mdash; you're connected. No accounts. No servers.</div>
+      <!-- before v-mesh-kin-connect-heal: this line said to share your short code, they share theirs back, and you are connected, with "No accounts. No servers." It takes two long codes, and Google STUN helps browsers find each other. -->
+      <div style="font-size:1rem;color:rgba(255,255,255,0.85);margin-bottom:12px;line-height:1.55;">Tap <strong>Start Connection</strong> and send the long invite code to a friend by text or email. They tap <strong>Join a Peer</strong>, paste it, and send you their reply code. Paste that, and you are connected. You have 10 minutes. No accounts. To find each other, your browsers ask Google's free STUN helper for their internet address; it never sees what you send.</div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
         <div style="flex:1;min-width:140px;">
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-bottom:4px;">Your code</div>
+          <!-- before v-mesh-kin-connect-heal: <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-bottom:4px;">Your code</div> -->
+          <div style="font-size:0.9rem;color:rgba(255,255,255,0.75);margin-bottom:4px;">Your short name on the mesh (so friends can spot you; not used to connect)</div>
           <div style="display:flex;gap:6px;align-items:center;">
             <span id="communityNodeCode" style="font-family:monospace;font-size:1rem;color:#4ade80;letter-spacing:2px;background:rgba(74,222,128,0.08);padding:6px 12px;border-radius:6px;border:1px solid rgba(74,222,128,0.2);">------</span>
             <button onclick="if(typeof meshCopyNodeId==='function')meshCopyNodeId();else{var t=document.getElementById('meshNodeId');if(t)navigator.clipboard.writeText(t.textContent).then(function(){showToast('Code copied!')})}" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:rgba(255,255,255,0.5);padding:6px 10px;font-size:0.75rem;cursor:pointer;">&#x1F4CB; Copy</button>
@@ -18871,8 +18886,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
 
     <!-- Advanced: mesh details, collapsed by default -->
-    <details style="margin-bottom:14px;">
-      <summary style="cursor:pointer;font-size:0.82rem;color:rgba(255,255,255,0.35);padding:8px 0;user-select:none;">&#x25B6; Advanced &middot; Mesh Details</summary>
+    <!-- before v-mesh-kin-connect-heal: <details style="margin-bottom:14px;"> -->
+    <!-- before v-mesh-kin-connect-heal: summary at 0.82rem, rgba(255,255,255,0.35), text "Advanced, Mesh Details" -->
+    <details id="communityMeshDetails" style="margin-bottom:14px;padding-bottom:120px;">
+      <summary style="cursor:pointer;font-size:1rem;color:rgba(255,255,255,0.8);padding:10px 0;min-height:44px;user-select:none;scroll-margin-bottom:140px;">&#x25B6; Connection codes and people connected</summary>
       <div style="padding:8px 0;">
         <!-- Original mesh content moves here at runtime -->
         <div id="communityMeshSection"></div>
@@ -27698,6 +27715,11 @@ function mountCommunityTab() {
   var chTarget = document.getElementById('communityChannelsSection');
   if (meshContainer && meshTarget) meshTarget.appendChild(meshContainer);
   if (channelsLayout && chTarget) chTarget.appendChild(channelsLayout);
+  // v-mesh-kin-connect-heal: AI cards sit in plain view on Community, not inside the
+  // collapsed details.
+  var kinSection = document.getElementById('meshKinSection');
+  var sharedSection = document.getElementById('communitySharedSection');
+  if (kinSection && sharedSection && sharedSection.parentNode) sharedSection.parentNode.insertBefore(kinSection, sharedSection);
   window._communityMounted = true;
 
   // Sync node code to simplified UI
@@ -42635,7 +42657,25 @@ const MESH_RTC_CONFIG = {
 };
 
 const MESH_MAX_PEERS = 5;
-const MESH_HANDSHAKE_TIMEOUT = 30000; // 30 seconds
+// before v-mesh-kin-connect-heal: const MESH_HANDSHAKE_TIMEOUT = 30000; // 30 seconds
+// v-mesh-kin-connect-heal: 30 seconds was too short to text a code there and back.
+const MESH_HANDSHAKE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+
+// v-mesh-kin-connect-heal: open the connection details and bring a code into view, so
+// Start and Join show what they made.
+function meshRevealCodeArea(areaId) {
+  try {
+    var area = document.getElementById(areaId);
+    if (!area) return;
+    var details = area.closest ? area.closest('details') : null;
+    if (details && !details.open) details.open = true;
+    if (area.scrollIntoView) area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var box = area.querySelector('textarea');
+    if (box && box.focus) box.focus({ preventScroll: true });
+  } catch (e) {}
+}
+var MESH_TIMEOUT_WORDS = 'The invite ran out before the reply code came back. Tap Start Connection again. If it keeps happening, try home Wi-Fi on both sides; some phone and work networks block direct connections.';
+
 const MESH_RECONNECT_DELAY = 5000; // 5 seconds
 
 function meshInit() {
@@ -42762,6 +42802,8 @@ async function meshCreateOffer() {
     document.getElementById('meshJoinBtn').disabled = true;
 
     meshSetStatus('connecting', 'Waiting for peer to respond...');
+    meshRevealCodeArea('meshOfferArea'); // v-mesh-kin-connect-heal
+    if (!iceCandidates.length) showToast('This network hid your address, so the invite may not reach your friend. Home Wi-Fi works best.', 7000);
 
     // Setup data channel handlers
     meshSetupDataChannel(dc, pc);
@@ -42769,7 +42811,8 @@ async function meshCreateOffer() {
     // Handshake timeout
     const timeout = setTimeout(() => {
       if (pc.connectionState !== 'connected' && pc.connectionState !== 'completed') {
-        showToast('Connection timed out. Try again.');
+        // before v-mesh-kin-connect-heal: showToast('Connection timed out. Try again.');
+        showToast(MESH_TIMEOUT_WORDS, 9000);
         meshCancelOffer();
       }
     }, MESH_HANDSHAKE_TIMEOUT);
@@ -42851,6 +42894,7 @@ function meshShowJoin() {
   document.getElementById('meshJoinOfferInput').value = '';
   document.getElementById('meshCreateBtn').disabled = true;
   document.getElementById('meshJoinBtn').disabled = true;
+  meshRevealCodeArea('meshJoinArea'); // v-mesh-kin-connect-heal
 }
 
 async function meshCreateAnswer() {
@@ -42921,11 +42965,13 @@ async function meshCreateAnswer() {
     document.getElementById('meshJoinArea').classList.add('hidden');
     document.getElementById('meshAnswerArea').classList.remove('hidden');
     meshSetStatus('connecting', 'Waiting for peer to accept answer...');
+    meshRevealCodeArea('meshAnswerArea'); // v-mesh-kin-connect-heal
 
     // Handshake timeout
     const timeout = setTimeout(() => {
       if (pc.connectionState !== 'connected' && pc.connectionState !== 'completed') {
-        showToast('Connection timed out.');
+        // before v-mesh-kin-connect-heal: showToast('Connection timed out.');
+        showToast(MESH_TIMEOUT_WORDS, 9000);
         meshCancelJoin();
       }
     }, MESH_HANDSHAKE_TIMEOUT);
@@ -43280,7 +43326,11 @@ function meshHandleMessage(msg, dc, pc) {
       var kinPeerId = meshFindPeerIdByDc(dc);
       var kinPeer = kinPeerId ? state.meshPeers.get(kinPeerId) : null;
       if (window.FLKin && kinPeer) {
-        window.FLKin.receive(msg.card, meshKinPeerView(kinPeerId, kinPeer));
+        // before v-mesh-kin-connect-heal: window.FLKin.receive(msg.card, meshKinPeerView(kinPeerId, kinPeer));
+        // v-mesh-kin-connect-heal: say when a card arrives, and where it is.
+        window.FLKin.receive(msg.card, meshKinPeerView(kinPeerId, kinPeer)).then(function (r) {
+          if (r && r.ok && msg.card) showToast(String(msg.card.keeperName || 'Someone').slice(0, 40) + ' shared an AI card: ' + String(msg.card.name || '').slice(0, 40) + '. It is on Community, under AI cards.', 6000);
+        }, function () {});
       }
       break;
     }

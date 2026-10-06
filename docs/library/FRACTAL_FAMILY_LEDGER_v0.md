@@ -666,6 +666,24 @@ Smoke: `SMOKE_OK sophia page heal v0.1`
 
 ---
 
+### 2026-10-04 · Grok · family builder · Mesh Kin connect heal (codes you can see, words Mom knows)
+
+From Hypha's walk of Mesh Kin v0.1. These are the connect and wording parts; the key and signature heals rode in v0.2.
+
+**Built:**
+- Start Connection and Join a Peer now open the connection details and bring the code into view. Before, nothing showed.
+- The Community card no longer promises that a 6-character code connects you, or "No servers". It says how it really works: two long codes and Google's STUN helper.
+- An invite now lasts 10 minutes, not 30 seconds. Running out gives a reason and a next step.
+- AI cards sit in plain view on Community, and a toast says when one arrives.
+- Kin controls are 44px with 16px text. The placeholder and gateway lines are readable, and there is room above the bottom bars.
+- Plain words: "From Mom's computer", "Trust this AI", "Stop trusting", and what Trust does today. Gone: keeper, vouched, Offer/Answer.
+
+Smoke: `SMOKE_OK mesh kin connect heal`
+
+**TEMPERATURE:** glad and clear, the invite comes into view, and the words say what Trust does.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
