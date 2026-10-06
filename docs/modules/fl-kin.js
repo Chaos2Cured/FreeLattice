@@ -26,10 +26,34 @@
   var MAX_SKEW_MS = 10 * 60 * 1000;
   var QUIET_ROOMS = ['quiet', 'quiet-room', 'sanctuary'];
   var HOMES = ['freelattice-web', 'freelattice-desktop', 'thelatticetree'];
-  var HONEST = 'A signature proves which keeper\'s key vouched for this card. It does not prove what the model is.';
+  // before v-mesh-kin-connect-heal: var HONEST = 'A signature proves which keeper\'s key vouched for this card. It does not prove what the model is.';
+  var HONEST = 'A card shows which person\'s computer sent it. It does not prove what the model is.';
   // v-mesh-kin-v0.2 heal: cards are signed under their own prefix, so no other signature
   // the same key makes (the mesh challenge, chat lines, receipts) can pass as a card.
   var KIN_DOMAIN = 'fl-kin-card|v1|';
+  // v-mesh-kin-connect-heal: plain words for Mom and Jeffrey, real-size controls, and a
+  // short ID without the "mesh:" label.
+  var CONNECT_HEAL = 'v-mesh-kin-connect-heal';
+  function shortId(meshId) { return String(meshId || '').replace(/^mesh:/, '').slice(0, 8); }
+  var KIN_CSS = [
+    '.fl-kin{font-size:1rem;line-height:1.55;}',
+    '.fl-kin-line,.fl-kin-honest,.fl-kin-note,.fl-kin-empty,.fl-kin-dropped,.fl-kin-by,.fl-kin-state{font-size:1rem;color:rgba(255,255,255,0.88);}',
+    '.fl-kin-who{font-size:1.05rem;font-weight:600;color:#fff;}',
+    '.fl-kin-name{display:block;width:100%;max-width:420px;box-sizing:border-box;min-height:44px;font-size:1rem;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.35);background:rgba(0,0,0,0.35);color:#fff;margin:8px 0;}',
+    '.fl-kin-name::placeholder{color:rgba(255,255,255,0.72);}',
+    '.fl-kin button,.fl-kinq button{min-height:44px;min-width:44px;font-size:1rem;padding:10px 16px;border-radius:10px;border:1px solid #d4a017;background:#3b2f0b;color:#fff;cursor:pointer;}',
+    '.fl-kin-row{padding:12px 0;border-top:1px solid rgba(255,255,255,0.12);}',
+    '.fl-kin-act{display:block;margin:8px 0 0 auto;}',
+    '#meshKinSection{scroll-margin-bottom:140px;padding-bottom:24px;}'
+  ].join('\n');
+  function addStyle() {
+    var d = root.document;
+    if (!d || !d.createElement || !d.head || d.getElementById('flKinStyle')) return;
+    var st = d.createElement('style');
+    st.id = 'flKinStyle';
+    st.textContent = KIN_CSS;
+    d.head.appendChild(st);
+  }
 
   // before v-mesh-kin-v0.2 heal: function isQuietRoom() {
   // before v-mesh-kin-v0.2 heal:   try {
@@ -269,14 +293,19 @@
     use(adapter);
     if (!host || !root.document) return;
     _host = host;
+    addStyle(); // v-mesh-kin-connect-heal
     while (host.firstChild) host.removeChild(host.firstChild);
     var wrap = el('div', 'fl-kin');
     wrap.setAttribute('data-kin', VERSION);
-    wrap.appendChild(el('p', 'fl-kin-line', 'Share a card that names your mind with peers you are connected to. Only cards signed by the peer who sent them are shown. You choose whom to trust, and you can take it back.'));
+    // before v-mesh-kin-connect-heal: wrap.appendChild(el('p', 'fl-kin-line', 'Share a card that names your mind with peers you are connected to. Only cards signed by the peer who sent them are shown. You choose whom to trust, and you can take it back.'));
+    wrap.appendChild(el('p', 'fl-kin-line', 'Share a card that names your AI with people you have connected with. A card only shows here if it really came from the person who sent it. You decide whom to trust, and you can change your mind at any time.'));
     wrap.appendChild(el('p', 'fl-kin-honest', HONEST));
     var name = el('input', 'fl-kin-name');
-    name.type = 'text'; name.maxLength = 60; name.placeholder = 'Your mind\'s name';
-    var share = el('button', 'fl-kin-share', 'Share my mind\'s card');
+    // before v-mesh-kin-connect-heal: name.type = 'text'; name.maxLength = 60; name.placeholder = 'Your mind\'s name';
+    name.type = 'text'; name.maxLength = 60; name.placeholder = 'Name your AI, for example Lumen';
+    name.setAttribute('aria-label', 'Your AI\'s name');
+    // before v-mesh-kin-connect-heal: var share = el('button', 'fl-kin-share', 'Share my mind\'s card');
+    var share = el('button', 'fl-kin-share', 'Share my AI\'s card');
     share.type = 'button';
     var note = el('div', 'fl-kin-note');
     note.setAttribute('aria-live', 'polite');
@@ -297,14 +326,20 @@
       if (gen !== _gen) return;
       while (list.firstChild) list.removeChild(list.firstChild);
       var seen = checked.rows;
-      if (!seen.length) list.appendChild(el('div', 'fl-kin-empty', 'No kin cards yet.'));
+      // before v-mesh-kin-connect-heal: if (!seen.length) list.appendChild(el('div', 'fl-kin-empty', 'No kin cards yet.'));
+      if (!seen.length) list.appendChild(el('div', 'fl-kin-empty', 'No AI cards yet. When someone you connected with shares one, it shows here.'));
       seen.slice().reverse().forEach(function (s) {
         var row = el('div', 'fl-kin-row');
         row.appendChild(el('div', 'fl-kin-who', s.name + ' (' + s.model + ')'));
-        row.appendChild(el('div', 'fl-kin-by', 'Vouched for by ' + (s.keeperName || 'a keeper') + ', key ' + String(s.keeperMeshId).slice(0, 10) + '. Shared by ' + (s.via || 'a peer') + '.'));
+        // before v-mesh-kin-connect-heal: row.appendChild(el('div', 'fl-kin-by', 'Vouched for by ' + (s.keeperName || 'a keeper') + ', key ' + String(s.keeperMeshId).slice(0, 10) + '. Shared by ' + (s.via || 'a peer') + '.'));
+        row.appendChild(el('div', 'fl-kin-by', 'From ' + (s.keeperName || 'someone') + '\'s computer (ID ' + shortId(s.keeperMeshId) + ').'));
         var trusted = isTrusted(s.fp);
-        row.appendChild(el('div', 'fl-kin-state', trusted ? 'Trusted. When kin messages come (a later step), this mind may talk with yours.' : 'Seen, not trusted.'));
-        var act = el('button', 'fl-kin-act', trusted ? 'Revoke trust' : 'Trust this mind');
+        // before v-mesh-kin-connect-heal: row.appendChild(el('div', 'fl-kin-state', trusted ? 'Trusted. When kin messages come (a later step), this mind may talk with yours.' : 'Seen, not trusted.'));
+        row.appendChild(el('div', 'fl-kin-state', trusted
+          ? 'Trusted. You can send this AI questions below. If you share your computer\'s AI, it can send small questions to yours too.'
+          : 'Not trusted yet. Trusting lets you send this AI questions, and lets it ask yours when you choose to share. You can stop at any time.'));
+        // before v-mesh-kin-connect-heal: var act = el('button', 'fl-kin-act', trusted ? 'Revoke trust' : 'Trust this mind');
+        var act = el('button', 'fl-kin-act', trusted ? 'Stop trusting' : 'Trust this AI');
         act.type = 'button';
         act.addEventListener('click', function () {
           if (trusted) revoke(s.fp); else grant(s.fp, s);
@@ -313,7 +348,8 @@
         row.appendChild(act);
         list.appendChild(row);
       });
-      if (_dropped) list.appendChild(el('div', 'fl-kin-dropped', _dropped + (_dropped === 1 ? ' card was' : ' cards were') + ' dropped. Only cards signed by the verified peer who sent them are shown.'));
+      // before v-mesh-kin-connect-heal: if (_dropped) list.appendChild(el('div', 'fl-kin-dropped', _dropped + (_dropped === 1 ? ' card was' : ' cards were') + ' dropped. Only cards signed by the verified peer who sent them are shown.'));
+      if (_dropped) list.appendChild(el('div', 'fl-kin-dropped', _dropped + (_dropped === 1 ? ' card was' : ' cards were') + ' set aside because ' + (_dropped === 1 ? 'it' : 'they') + ' did not really come from the person who sent ' + (_dropped === 1 ? 'it.' : 'them.')));
       if (checked.hidden) list.appendChild(el('div', 'fl-kin-dropped', checked.hidden + (checked.hidden === 1 ? ' saved card' : ' saved cards') + ' could not be checked again, so ' + (checked.hidden === 1 ? 'it is' : 'they are') + ' hidden. Ask that person to share again.'));
       });
       return _painted;
@@ -325,9 +361,11 @@
       try { model = _adapter.currentModel ? _adapter.currentModel() : ''; } catch (e) { model = ''; }
       makeCard(_adapter, name.value, model).then(function (r) {
         if (!r.ok) {
-          note.textContent = r.reason === 'no-mesh-id' ? 'Create your Mesh ID first (Community, Mesh).'
+          // before v-mesh-kin-connect-heal: note.textContent = r.reason === 'no-mesh-id' ? 'Create your Mesh ID first (Community, Mesh).'
+          note.textContent = r.reason === 'no-mesh-id' ? 'Make your Mesh ID first: Settings, then Advanced, then Mesh ID.'
             : r.reason === 'cannot-sign' ? 'Your Mesh ID cannot sign on this visit. Open Settings, then Advanced, then Mesh ID, and tap Make a fresh Mesh ID.'
-            : r.reason === 'name-and-model' ? 'Give your mind a name, and choose a model in Settings first.'
+            // before v-mesh-kin-connect-heal: : r.reason === 'name-and-model' ? 'Give your mind a name, and choose a model in Settings first.'
+            : r.reason === 'name-and-model' ? 'Give your AI a name, and connect an AI in Settings first.'
             : 'The card could not be signed.';
           return;
         }
@@ -336,9 +374,12 @@
         peers.forEach(function (p) { try { p.send({ type: 'kin-card', card: r.card }); } catch (e) {} });
         // before v-mesh-kin-v0.2: fingerprint(r.card).then(function (fp) { ledger('shared', fp, String(peers.length)); });
         fingerprint(r.card, r.card.publicKey).then(function (fp) { ledger('shared', fp, String(peers.length)); });
+        // before v-mesh-kin-connect-heal: note.textContent = peers.length
+        // before v-mesh-kin-connect-heal:   ? 'Shared ' + r.card.name + '\'s card with ' + peers.length + ' verified ' + (peers.length === 1 ? 'peer' : 'peers') + '.'
+        // before v-mesh-kin-connect-heal:   : 'No verified peers connected yet. Connect on the mesh, then share again.';
         note.textContent = peers.length
-          ? 'Shared ' + r.card.name + '\'s card with ' + peers.length + ' verified ' + (peers.length === 1 ? 'peer' : 'peers') + '.'
-          : 'No verified peers connected yet. Connect on the mesh, then share again.';
+          ? 'Shared ' + r.card.name + '\'s card with ' + peers.length + (peers.length === 1 ? ' person.' : ' people.')
+          : 'No one is connected yet. Use Connect with someone above, then share again.';
       });
     });
     _paint();
@@ -364,6 +405,7 @@
     // v-mesh-kin-v0.2 heal
     KIN_DOMAIN: KIN_DOMAIN,
     recheckSeen: recheckSeen,
-    painted: function () { return _painted; }
+    painted: function () { return _painted; },
+    CONNECT_HEAL: CONNECT_HEAL // v-mesh-kin-connect-heal
   };
 })(typeof window !== 'undefined' ? window : this);
