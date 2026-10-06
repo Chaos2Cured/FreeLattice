@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-06 21:30 UTC
-- Last deployed: 2026-10-06 21:30 UTC
+- Last auto-updated: 2026-10-06 22:00 UTC
+- Last deployed: 2026-10-06 22:00 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3310
+- Total commits: 3313
 - Last 10 commits:
+- 4ac98649 docs: GC eighteenth entry, refusal benchmark (#169)
+- 80d8fa8e Public refusal benchmark v0.1: scoreboard page for local receipts (#168)
+- 92e7c4fb ci: Update Primer deployment state [2026-10-06]
 - 48b71492 docs: GC seventeenth entry, trainer ablate (#167)
 - c3a6a037 Trainer Ablate v0.1: local refusal score + Heretic pointer, AGPL not vendored (#166)
 - 0674152a ci: Update Primer deployment state [2026-10-06]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7f6eff85 Trainer map v0.1: Mom/Jeffrey map, Learn card, Connect mount retry (#164)
 - ca1bfcbe ci: Update Primer deployment state [2026-10-06]
 - 980a922e docs: GC fifteenth entry, mind seal (#163)
-- 1294860b Mind Seal v0.1: Ollama digest+config receipts, seal view, consent notes (#162)
-- 80b4a6e6 ci: Update Primer deployment state [2026-10-06]
-- c4374212 docs: GC fourteenth entry, desktop narrow door v0.2 (#161)
