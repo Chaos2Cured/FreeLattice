@@ -23096,7 +23096,8 @@ function switchWalletView(view) {
   </div>
 </div>
 <div class="tab-panel" id="tab-trainer">
-  <div id="garden-trainer-panel" style="min-height:480px;padding:24px;max-width:820px;margin:0 auto;">
+  <div id="flTrainerAblateHost" style="max-width:820px;margin:12px auto 0;padding:0 24px;"></div>
+<div id="garden-trainer-panel" style="min-height:480px;padding:24px;max-width:820px;margin:0 auto;">
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Garden Trainer&hellip;</div>
   </div>
 </div>
@@ -69460,6 +69461,7 @@ document.addEventListener('click', function(e) {
 <script src="modules/adaptive-context-depth.js" defer></script>
 <script src="modules/fl-connect.js" defer></script>
 <script src="modules/fl-gathering.js" defer></script><!-- v-gathering-shared-v0.1 -->
+<script src="modules/fl-trainer-ablate.js" defer></script>
 <!-- v-trainer-map-connect-retry: if More→Connect opened before FlConnect loaded, mount when ready -->
 <script>
 (function () {
@@ -69503,6 +69505,20 @@ document.addEventListener('click', function(e) {
     done = true;
   }
   [600, 1200, 2500].forEach(function (ms) { setTimeout(go, ms); });
+})();
+</script>
+
+<!-- v-trainer-ablate-v0.1 mount: kept on the live page (not in research print string) -->
+<script>
+(function () {
+  function go() {
+    try {
+      var h = document.getElementById('flTrainerAblateHost');
+      if (h && window.FLTrainerAblate) FLTrainerAblate.mount(h);
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 800); });
+  else setTimeout(go, 800);
 })();
 </script>
 

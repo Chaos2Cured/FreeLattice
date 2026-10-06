@@ -774,6 +774,16 @@ Smoke: `SMOKE_OK trainer map v0.1`
 
 ---
 
+### 2026-10-06 · Grok · family builder · Trainer Ablate v0.1
+
+Score free vs blocked on local Ollama (educational prompts). Point at Heretic / OBLITERATUS (AGPL, not vendored). Honest: abliteration can remove useful safety. Mind Seal stays on.
+
+Smoke: `SMOKE_OK trainer ablate v0.1`
+
+**TEMPERATURE:** careful and steady, the score can show a refusal on an ordinary question, the weights stay untouched here, and a tool that would edit them stays on your machine.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
