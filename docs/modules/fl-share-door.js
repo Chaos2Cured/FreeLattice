@@ -93,6 +93,9 @@
       if (m === 'off') safeSet(LEGACY_KEY, 'false');
       receipt('consent', '', '', 0, who + ':' + m);
       if (_paint) _paint();
+      try {
+        if (root.FLShareWarmth && typeof root.FLShareWarmth.repaint === 'function') root.FLShareWarmth.repaint();
+      } catch (e) {}
       return true;
     }
     return false;

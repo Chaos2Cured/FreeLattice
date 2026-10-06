@@ -8,6 +8,7 @@
   var THANKS_KEY = 'fl_share_warmth_thanks';
   var GUEST_KEY = 'fl_share_warmth_guests';
   var KIN_DAYS = 14;
+  var _host = null;
 
   function safeGet(k) { try { return root.localStorage.getItem(k); } catch (e) { return null; } }
   function safeSet(k, v) { try { root.localStorage.setItem(k, v); } catch (e) {} }
@@ -168,19 +169,27 @@
     if (typeof end === 'function') {
       d.endServe = function (kh, model, tokens, kin) {
         try { onServed(kh, ''); } catch (e) {}
-        return end.apply(d, arguments);
+        var out = end.apply(d, arguments);
+        try { repaint(); } catch (e2) {}
+        return out;
       };
     }
   }
 
+  function repaint() {
+    if (_host) mountLantern(_host);
+  }
+
   function mount(host) {
+    _host = host || _host;
     hookDoor();
-    mountLantern(host);
+    mountLantern(_host);
   }
 
   root.FLShareWarmth = {
     VERSION: VERSION,
     mount: mount,
+    repaint: repaint,
     restingCopy: restingCopy,
     thankYou: thankYou,
     noteGuest: noteGuest,

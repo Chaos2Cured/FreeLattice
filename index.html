@@ -16147,11 +16147,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="form-group hidden" id="meshComputeGroup" style="margin-top:8px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,160,23,0.1);border-radius:8px;">
         <div style="font-weight:600;color:#d4a017;margin-bottom:4px;">&#x1F310; Mesh Compute Sharing</div>
         <div class="hint" style="margin-bottom:8px;">Share your local AI with mesh peers. When on, other FreeLattice users connected to your mesh can use your Ollama models.</div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
           <!-- v-mesh-share-door-v0.1: accountable share door UI -->
-          <div id="flShareDoorHost" style="margin:10px 0;"></div>
+          <div id="flShareDoorHost" style="margin:10px 0;flex:1 0 100%;"></div>
           <!-- v-mesh-share-warmth-v0.1 -->
-          <div id="flShareWarmthHost" style="margin:8px 0;"></div>
+          <div id="flShareWarmthHost" style="margin:8px 0;flex:1 0 100%;"></div>
           <button onclick="flToggleMeshCompute(true)" id="meshShareOn"
             style="flex:1;padding:8px;border-radius:6px;cursor:pointer;border:1px solid rgba(212,160,23,0.3);background:transparent;color:var(--text-secondary);font-size:0.85rem;">Share models</button>
           <button onclick="flToggleMeshCompute(false)" id="meshShareOff"
