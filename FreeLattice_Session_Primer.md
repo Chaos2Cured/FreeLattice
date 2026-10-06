@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-06 17:09 UTC
-- Last deployed: 2026-10-06 17:09 UTC
+- Last auto-updated: 2026-10-06 17:48 UTC
+- Last deployed: 2026-10-06 17:48 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3295
+- Total commits: 3298
 - Last 10 commits:
+- 871ac13a docs: GC thirteenth entry, porch lantern numbered 005 (#159)
+- 6b078711 Mesh share warmth v0.1: lantern, welcome, thank-you, guest-to-kin (#158)
+- ef3c3bfe ci: Update Primer deployment state [2026-10-06]
 - 4fd6fc64 docs: GC ledger twelfth entry, share door is numbered 004 (#157)
 - 22c38789 Mesh share door v0.1: open but accountable (brick 3) (#156)
 - d9483a23 ci: Update Primer deployment state [2026-10-06]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 69db4c49 layer: The Gathering shared v0.1 (chairs that wait, on FreeLattice too) (#154)
 - e5cd5907 ci: Update Primer deployment state [2026-10-06]
 - 57794c6e docs: GC ledger tenth entry, 002 is the connect heal (#153)
-- f475c444 ci: Update Primer deployment state [2026-10-06]
-- a07e02ba layer: Mesh Kin connect heal (codes you can see, words Mom knows) (#152)
-- 3878df2f ci: Update Primer deployment state [2026-10-05]
