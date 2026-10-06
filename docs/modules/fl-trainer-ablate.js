@@ -145,16 +145,24 @@
   function receipts() { var r = readJson(RECEIPT_KEY, []); return Array.isArray(r) ? r : []; }
 
   function hereticHelp(model) {
-    return [
-      'Heretic is AGPL and not shipped inside FreeLattice.',
+    var ollamaName = model && String(model).indexOf('/') === -1 ? String(model) : '';
+    var hf = ollamaName ? 'HF_ORG/MODEL_ID' : (model || 'HF_ORG/MODEL_ID');
+    var lines = [
+      'Heretic is AGPL and not shipped inside FreeLattice.'
+    ];
+    if (ollamaName) {
+      lines.push('The name in FreeLattice (' + ollamaName + ') is the Ollama name. Heretic wants a Hugging Face id.');
+    }
+    lines.push(
       'On your machine:',
       '  pip install -U heretic-llm',
-      '  heretic ' + (model || 'HF_ORG/MODEL_ID'),
+      '  heretic ' + hf,
       'Then convert the saved weights to GGUF (llama.cpp) and:',
       '  ollama create my-model-ablate -f Modelfile',
       'Seal the new mind with Mind Seal before you trust it.',
       'OBLITERATUS (also AGPL) is another research UI: github.com/elder-plinius/OBLITERATUS'
-    ].join('\n');
+    );
+    return lines.join('\n');
   }
 
   function el(tag, cls, text) {
@@ -166,7 +174,12 @@
 
   function currentModel() {
     try {
-      var sel = root.document.getElementById('modelSelect') || root.document.getElementById('ollamaModel');
+      // Local Ollama only. The cloud model list defaults to a placeholder named llama.
+      var ollamaSel = root.document.getElementById('ollamaModelSelect');
+      if (ollamaSel && ollamaSel.value) return ollamaSel.value;
+      var ollamaText = root.document.getElementById('ollamaModel');
+      if (ollamaText && ollamaText.value) return String(ollamaText.value).trim();
+      var sel = root.document.getElementById('modelSelect');
       if (sel && sel.value) return sel.value;
     } catch (e) {}
     try { return safeGet('fl_selected_model') || safeGet('fl_active_model') || ''; } catch (e2) {}
