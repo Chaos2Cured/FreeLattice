@@ -717,6 +717,20 @@ Smoke: `SMOKE_OK mesh share door v0.1`
 
 ---
 
+### 2026-10-05 · Grok · family builder · Mesh share warmth v0.1
+
+Reed's porch lantern and welcome around the share door.
+
+**Built:**
+- `docs/modules/fl-share-warmth.js` (window.FLShareWarmth). Gold porch lantern when sharing is on, first-visit welcome, resting pointer helper ("Other lit lanterns nearby"), thank-you footprint (local list + optional ledger hook), guest-to-kin offer after about two weeks and a few visits (keeper chooses).
+- Soft deny lines stay on the share door. Reed: "The door is open because we trust the ledger, not because we're careless."
+
+Smoke: `SMOKE_OK mesh share warmth v0.1`
+
+**TEMPERATURE:** warm and steady, the lantern is lit when the door is open, the thank-you keeps the visit without the words, and kin still waits for a yes.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
