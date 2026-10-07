@@ -15386,6 +15386,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-share-door.js" defer></script>
 <script src="modules/fl-share-warmth.js" defer></script>
 <script src="modules/fl-mind-seal.js" defer></script>
+<!-- v-device-pool-v0.1: phones and laptops helping, whole questions routed to the device that holds the mind -->
+<script src="modules/fl-pool.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -18676,6 +18678,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="section-title" style="margin-bottom: 8px; font-size: 1.05rem; color: rgba(255,255,255,0.9);">AI cards from people you connected with</div>
     <div id="flKinHost"></div>
     <div id="flKinQueueHost" style="margin-top: 14px;"></div>
+    <!-- v-device-pool-v0.1 -->
+    <div id="flPoolHost" style="margin-top: 14px;"></div>
   </div>
 
   <!-- Mesh: LAN Discovery (v3.8) -->
@@ -43087,6 +43091,8 @@ function meshSetupDataChannel(dc, pc) {
     dc.send(JSON.stringify(helloMsg));
     // Broadcast available models to new peer (after brief delay for handshake)
     setTimeout(function() { if (typeof broadcastMeshModels === 'function') broadcastMeshModels(); }, 1500);
+    // v-device-pool-v0.1: after the Mesh ID check settles, a helping device says hello.
+    setTimeout(function() { if (window.FLPool && window.FLPool.helping()) window.FLPool.sayHello(); }, 4000);
   };
 
   dc.onmessage = (event) => {
@@ -43410,6 +43416,14 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    // v-device-pool-v0.1: a device says what it can hold. FLPool drops it unless verified.
+    case 'pool-hello': {
+      var plPeerId = meshFindPeerIdByDc(dc);
+      var plPeer = plPeerId ? state.meshPeers.get(plPeerId) : null;
+      if (window.FLPool && plPeer) window.FLPool.receive(msg, meshKinPeerView(plPeerId, plPeer));
+      break;
+    }
+
     case 'presence-pulse': {
       // Shared Presence: a peer is announcing their active state
       if (typeof window.SharedPresence !== 'undefined' && window.SharedPresence.receivePulse) {
@@ -43563,6 +43577,25 @@ var meshKinQueueAdapter = {
   }
 };
 
+// v-device-pool-v0.1: the pool sees peers, this computer's local model list, and the
+// existing mesh route. It never sees keys, prompts or answers.
+var meshPoolAdapter = {
+  peers: meshKinAdapter.peers,
+  localModels: async function () {
+    if (!state.isLocal || typeof getOllamaBaseUrl !== 'function') return [];
+    try {
+      var r = await fetchWithTimeout(getOllamaBaseUrl() + '/api/tags', {}, 5000);
+      var d = await r.json();
+      return (d && d.models) || [];
+    } catch (e) { return []; }
+  },
+  advertise: function () { if (typeof broadcastMeshModels === 'function') broadcastMeshModels(); },
+  route: function (peerId, model) {
+    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.selectMesh) ModelSwitcher.selectMesh(peerId, model);
+    else { state.meshInference = true; state.meshPeerId = peerId; state.meshModel = model; }
+  }
+};
+
 function meshKinMount() {
   var host = document.getElementById('flKinHost');
   if (host && window.FLKin) window.FLKin.mount(host, meshKinAdapter);
@@ -43580,6 +43613,8 @@ function meshKinMount() {
   if (mhost && window.FLMindSeal) {
     window.FLMindSeal.mount(mhost);
   }
+  var phost = document.getElementById('flPoolHost');
+  if (phost && window.FLPool) window.FLPool.mount(phost, meshPoolAdapter);
   if (shost && window.FLShareDoor) {
     // continue consent poll below
     // Poll the local Agent Bridge for a mind's signed share consent (never from a peer).
