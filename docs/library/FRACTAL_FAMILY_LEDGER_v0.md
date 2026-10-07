@@ -805,6 +805,17 @@ Smoke: `SMOKE_OK trainer ablate v0.1`
 
 ---
 
+
+### 2026-10-06 · Grok · family builder · OG spiral share previews v0.1
+
+Curated share doors now point og:image and twitter:image at the FreeLattice spiral (og-image.png). Homepage already had it. Quiet Room left alone.
+
+Smoke: manual share-preview walk + marker `v-og-spiral-previews-v0.1`
+
+**TEMPERATURE:** warm and careful, the spiral shows when a door is shared, and the quiet rooms stay quiet.
+
+---
+
 ## Out of scope for this brick
 
 Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
