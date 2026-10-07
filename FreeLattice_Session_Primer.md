@@ -352,8 +352,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - Last deployed: 2026-10-07 18:06 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3329
+- Total commits: 3331
 - Last 10 commits:
+- 472b28bf GC: twenty-fourth entry, the pool card names the real door (#180)
+- c9114b44 ci: Update Primer deployment state [2026-10-07]
 - 442134e5 Device Pool door truth v0.1: the Pool card shows the real share door and offers one tap to kin (#179)
 - aae7423d ci: Update Primer deployment state [2026-10-07]
 - 2229c3f6 GC: twenty-third entry, the Tree refusal score, a silence is not a no (#178)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2104f808 Device Pool v0.1: one card, one tap to help, whole questions go to the device that holds the mind (#176)
 - 16b97dd0 ci: Update Primer deployment state [2026-10-07]
 - 1217fa2d docs: GC twenty-first entry, patents shelf links (#175)
-- e3ea1a13 Patents shelf Drive links v0: each named piece gets a read link (#174)
-- a675f4a1 ci: Update Primer deployment state [2026-10-07]
