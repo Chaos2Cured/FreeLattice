@@ -352,8 +352,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - Last deployed: 2026-10-07 21:21 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3333
+- Total commits: 3335
 - Last 10 commits:
+- c700569a GC: twenty-fifth entry, the pool card tells the truth while not helping (#182)
+- 0c0871f4 ci: Update Primer deployment state [2026-10-07]
 - 4c1c4948 Pool card honest off v0.1: not helping also tells the real share door; pause wins visibly; plain words; a real card (#181)
 - 208bfbab ci: Update Primer deployment state [2026-10-07]
 - 472b28bf GC: twenty-fourth entry, the pool card names the real door (#180)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - aae7423d ci: Update Primer deployment state [2026-10-07]
 - 2229c3f6 GC: twenty-third entry, the Tree refusal score, a silence is not a no (#178)
 - a9a2c1c4 ci: Update Primer deployment state [2026-10-07]
-- 450d7ef7 GC: twenty-second entry, the pool card, memory is not joined (#177)
-- 2104f808 Device Pool v0.1: one card, one tap to help, whole questions go to the device that holds the mind (#176)
