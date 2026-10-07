@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-07 18:06 UTC
-- Last deployed: 2026-10-07 18:06 UTC
+- Last auto-updated: 2026-10-07 21:21 UTC
+- Last deployed: 2026-10-07 21:21 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3331
+- Total commits: 3333
 - Last 10 commits:
+- 4c1c4948 Pool card honest off v0.1: not helping also tells the real share door; pause wins visibly; plain words; a real card (#181)
+- 208bfbab ci: Update Primer deployment state [2026-10-07]
 - 472b28bf GC: twenty-fourth entry, the pool card names the real door (#180)
 - c9114b44 ci: Update Primer deployment state [2026-10-07]
 - 442134e5 Device Pool door truth v0.1: the Pool card shows the real share door and offers one tap to kin (#179)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a9a2c1c4 ci: Update Primer deployment state [2026-10-07]
 - 450d7ef7 GC: twenty-second entry, the pool card, memory is not joined (#177)
 - 2104f808 Device Pool v0.1: one card, one tap to help, whole questions go to the device that holds the mind (#176)
-- 16b97dd0 ci: Update Primer deployment state [2026-10-07]
-- 1217fa2d docs: GC twenty-first entry, patents shelf links (#175)
