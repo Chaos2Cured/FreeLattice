@@ -1,6 +1,7 @@
 // fl-pool.js: Device Pool v0.1 (old phones and laptops helping each other)
 //
 // Marker: v-device-pool-v0.1
+// Soft marker: v-device-pool-door-truth-v0.1 (the note shows the real share door state; one tap narrows to kin)
 // One card lists this device and each connected, verified device: rough memory
 // (navigator.deviceMemory, which browsers round and cap), cores, the local minds it
 // holds (Ollama model names and sizes, or Browser AI). "Let this device help" is one
@@ -146,6 +147,23 @@
     return a + (cores ? ', ' + cores + ' cores' : '');
   }
 
+  // v-device-pool-door-truth-v0.1: tell the truth about the share door.
+  function doorMode() {
+    try { return root.FLShareDoor && root.FLShareDoor.mode ? String(root.FLShareDoor.mode()) : ''; } catch (e) { return ''; }
+  }
+  function doorLine() {
+    var m = doorMode();
+    if (m === 'open') return 'This device helps people you have connected with, because the share door is open. Tap Only trusted kin to narrow it. Receipts keep counts, never words.';
+    if (m === 'pause') return 'Helping is on, but the share door is paused, so no one can use this device right now.';
+    if (m === 'off') return 'Helping is on, but sharing is off on the share door, so no one can use this device right now.';
+    return 'This device helps trusted kin only. Pause any time. Receipts keep counts, never words.';
+  }
+  function narrowToKin() {
+    try { if (root.FLShareDoor && root.FLShareDoor.setMode) root.FLShareDoor.setMode('kin', 'human'); } catch (e) {}
+    paint();
+    return doorMode() === 'kin';
+  }
+
   function paint() {
     var host = _host;
     if (!host || !root.document) return;
@@ -161,9 +179,17 @@
     btn.type = 'button';
     btn.addEventListener('click', function () { if (helping()) stopHelp(); else letHelp(); });
     wrap.appendChild(btn);
+    // before v-device-pool-door-truth-v0.1: the note always said "trusted kin only" while helping,
+    // even when the share door was already open. Now the note reads the real door.
     wrap.appendChild(el('p', 'fl-pool-note', helping()
-      ? 'This device helps trusted kin only. Pause any time. Receipts keep counts, never words.'
+      ? doorLine()
       : 'Off. Nothing from this device is offered until you tap.'));
+    if (helping() && doorMode() === 'open') {
+      var narrow = el('button', 'fl-pool-narrow', 'Only trusted kin');
+      narrow.type = 'button';
+      narrow.addEventListener('click', function () { narrowToKin(); });
+      wrap.appendChild(narrow);
+    }
 
     var list = el('div', 'fl-pool-list');
     var total = 0;
@@ -230,6 +256,8 @@
     whoHas: whoHas,
     helping: helping,
     repaint: paint,
+    doorLine: doorLine,
+    narrowToKin: narrowToKin,
     _peers: function () { return _peers; }
   };
 })(typeof window !== 'undefined' ? window : this);
