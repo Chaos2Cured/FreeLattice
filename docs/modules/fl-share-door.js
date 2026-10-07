@@ -96,6 +96,11 @@
       try {
         if (root.FLShareWarmth && typeof root.FLShareWarmth.repaint === 'function') root.FLShareWarmth.repaint();
       } catch (e) {}
+      // v-device-pool-honest-off-v0.1: the Pool card reads this door. A mode change
+      // has to repaint it, or "Off" stays on screen after the door opens.
+      try {
+        if (root.FLPool && typeof root.FLPool.repaint === 'function') root.FLPool.repaint();
+      } catch (e2) {}
       return true;
     }
     return false;
@@ -491,6 +496,9 @@
     legacyOpenOn: legacyOpenOn,
     setLegacyOpen: setLegacyOpen,
     answerPerPrompt: answerPerPrompt,
+    // v-device-pool-honest-off-v0.1: read and set "Only while plugged in" from the Pool card (exports only; the gate is unchanged)
+    pluggedOnlyOn: pluggedOnlyOn,
+    setPluggedOnly: setPluggedOnly,
     keyHash: keyHash,
     bodyHash: bodyHash,
     liveCount: function () { return _live; },
