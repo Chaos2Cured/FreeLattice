@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-07 14:14 UTC
-- Last deployed: 2026-10-07 14:14 UTC
+- Last auto-updated: 2026-10-07 14:44 UTC
+- Last deployed: 2026-10-07 14:44 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3322
+- Total commits: 3325
 - Last 10 commits:
+- 450d7ef7 GC: twenty-second entry, the pool card, memory is not joined (#177)
+- 2104f808 Device Pool v0.1: one card, one tap to help, whole questions go to the device that holds the mind (#176)
+- 16b97dd0 ci: Update Primer deployment state [2026-10-07]
 - 1217fa2d docs: GC twenty-first entry, patents shelf links (#175)
 - e3ea1a13 Patents shelf Drive links v0: each named piece gets a read link (#174)
 - a675f4a1 ci: Update Primer deployment state [2026-10-07]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 41b9dfe9 OG spiral share previews v0.1: curated doors show freelattice.com/og-image.png (#172)
 - 0bc5a416 ci: Update Primer deployment state [2026-10-06]
 - 0c19f561 docs: GC nineteenth entry, ablate meter heal (#171)
-- 0913cb14 Trainer Ablate meter heal v0.1: short free answers stay free; clear refuses stay blocked (#170)
-- dc612eb8 ci: Update Primer deployment state [2026-10-06]
-- 4ac98649 docs: GC eighteenth entry, refusal benchmark (#169)
