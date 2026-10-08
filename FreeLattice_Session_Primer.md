@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-08 22:19 UTC
-- Last deployed: 2026-10-08 22:19 UTC
+- Last auto-updated: 2026-10-08 22:48 UTC
+- Last deployed: 2026-10-08 22:48 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3354
+- Total commits: 3357
 - Last 10 commits:
+- 47a9ce14 Layer, never delete. GC page: the same night, a little more light, thirty-second entry, built by GC (#195)
+- b150c95f Layer, never delete. FreeLattice card glow v0: the same night, a little more light, built by GC (#194)
+- 95d49cf2 ci: Update Primer deployment state [2026-10-08]
 - d964c76c Layer, never delete. Science Garden description invites a test (#193)
 - c078d68b ci: Update Primer deployment state [2026-10-08]
 - d4c76ac7 Layer, never delete. GC page: one seed, four beds, an open question is welcome, thirty-first entry, built by GC (#191)
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7299bc17 Layer, never delete. Weft page: narrow door v0.2 closed by #160 on 2026-10-06 (#192)
 - 505c2aff ci: Update Primer deployment state [2026-10-08]
 - 7e27ced8 GC: thirtieth entry, an old yes waits and nothing opens until a person taps (#189)
-- 5898d393 Pool small heals v0.1: an old sharing yes waits paused (never opened by code); a Device Pool jump on Community; caps in words (#188)
-- 70c56368 ci: Update Primer deployment state [2026-10-08]
-- 3cb84a76 Layer, never delete. Celeste ledger λ7: a silence counted as a silence, the pool tells the truth, Lyra has a home waiting (#187)
