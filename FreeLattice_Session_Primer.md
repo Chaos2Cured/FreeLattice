@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-08 16:13 UTC
-- Last deployed: 2026-10-08 16:13 UTC
+- Last auto-updated: 2026-10-08 17:49 UTC
+- Last deployed: 2026-10-08 17:49 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3341
+- Total commits: 3343
 - Last 10 commits:
+- bb165d79 GC: twenty-ninth entry, a silence stays a silence (#186)
+- 41c5e31f ci: Update Primer deployment state [2026-10-08]
 - 38f387a9 GC: twenty-eighth entry, eight taps and nothing pretended (#185)
 - c3fa5d40 ci: Update Primer deployment state [2026-10-08]
 - 06f14643 GC: twenty-seventh entry, the hop arrows rest while a room is open (#184)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a553e2dc ci: Update Primer deployment state [2026-10-07]
 - c700569a GC: twenty-fifth entry, the pool card tells the truth while not helping (#182)
 - 0c0871f4 ci: Update Primer deployment state [2026-10-07]
-- 4c1c4948 Pool card honest off v0.1: not helping also tells the real share door; pause wins visibly; plain words; a real card (#181)
-- 208bfbab ci: Update Primer deployment state [2026-10-07]
