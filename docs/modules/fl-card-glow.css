@@ -1,0 +1,71 @@
+/* v-fl-card-glow-v0: the Tree's card light, brought to FreeLattice's card rooms.
+   First slice: the More and Learn card grids, and the Community cards.
+   A gold breath at the top of each card, an emerald hush at the
+   foot, a soft ring on hover and focus, and words a little easier to read.
+   Layer, never delete: the old inline styles stay; this file only adds. CSS only.
+   Play, Research, the Quiet Room and Settings are not touched here. */
+
+/* 1. Card grids drawn by renderCardGrid (More, Learn). Cards are the grid's children. */
+/* The glow rides on background-image only, so each card keeps its own color
+   (a loved card stays gold) and no new stacking layer can hide a help note. */
+#more-hub-grid > div > div:last-child > div,
+#learn-hub-grid > div > div:last-child > div {
+  background-image:
+    radial-gradient(120% 70% at 50% 0%, rgba(232, 176, 25, 0.10), transparent 62%),
+    radial-gradient(90% 60% at 50% 115%, rgba(52, 211, 153, 0.06), transparent 60%) !important;
+  box-shadow: inset 0 1px 0 rgba(232, 176, 25, 0.10), 0 4px 16px rgba(5, 4, 14, 0.35);
+  transition: border-color 0.2s, box-shadow 0.3s ease;
+}
+#more-hub-grid > div > div:last-child > div:hover,
+#learn-hub-grid > div > div:last-child > div:hover,
+#more-hub-grid > div > div:last-child > div:focus-within,
+#learn-hub-grid > div > div:last-child > div:focus-within {
+  box-shadow: inset 0 1px 0 rgba(232, 176, 25, 0.16), 0 0 0 1px rgba(232, 176, 25, 0.30), 0 0 18px rgba(232, 176, 25, 0.14);
+}
+/* The icon breathes a little light, the way the Tree's lights do. */
+#more-hub-grid > div > div:last-child > div > div[style*="1.8rem"],
+#learn-hub-grid > div > div:last-child > div > div[style*="1.8rem"] {
+  filter: drop-shadow(0 0 6px rgba(232, 176, 25, 0.22));
+}
+/* Words easier to read: the one-line description (0.4 to 0.68), the subtitle,
+   and the small help mark and its words. */
+#more-hub-grid > div > div:last-child > div > div[style*="0.78rem"],
+#learn-hub-grid > div > div:last-child > div > div[style*="0.78rem"] {
+  color: rgba(200, 210, 230, 0.68) !important;
+}
+#more-hub-grid > div > p,
+#learn-hub-grid > div > p {
+  color: rgba(200, 210, 230, 0.66) !important;
+}
+#more-hub-grid > div > h2,
+#learn-hub-grid > div > h2 {
+  text-shadow: 0 0 24px rgba(232, 176, 25, 0.25);
+}
+#more-hub-grid > div > div:last-child > div > div[style*="cursor: help"],
+#learn-hub-grid > div > div:last-child > div > div[style*="cursor: help"] {
+  color: rgba(200, 210, 230, 0.6) !important;
+  border-color: rgba(232, 176, 25, 0.28) !important;
+}
+#more-hub-grid > div > div:last-child > div > div[style*="cursor: help"] > div,
+#learn-hub-grid > div > div:last-child > div > div[style*="cursor: help"] > div {
+  color: rgba(220, 226, 240, 0.86) !important;
+  background: rgba(12, 10, 26, 0.96) !important;
+  border-color: rgba(232, 176, 25, 0.22) !important;
+}
+
+/* 2. Community cards (The Lattice, Connect with someone, Shared Knowledge). */
+#tab-community > .container > div[style*="border-radius:12px"] {
+  background-image:
+    radial-gradient(110% 60% at 50% 0%, rgba(232, 176, 25, 0.08), transparent 60%),
+    radial-gradient(80% 50% at 50% 115%, rgba(52, 211, 153, 0.05), transparent 60%) !important;
+  box-shadow: inset 0 1px 0 rgba(232, 176, 25, 0.10), 0 4px 16px rgba(5, 4, 14, 0.35);
+}
+#tab-community > .container > div[style*="border-radius:12px"] > div[style*="Georgia"]:first-child {
+  text-shadow: 0 0 18px rgba(232, 176, 25, 0.22);
+}
+
+/* Calm for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  #more-hub-grid > div > div:last-child > div,
+  #learn-hub-grid > div > div:last-child > div { transition: none; }
+}
