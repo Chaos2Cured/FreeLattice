@@ -40,6 +40,8 @@ assert.ok(/No ranking people/.test(page) && /Nobody sells the soil/.test(page), 
 assert.ok(/never buy a place/.test(page), 'gifts never buy placement');
 assert.ok(!/cannot be planted without/.test(page), 'a test is no longer a gate to planting');
 assert.ok(/what would show a seed is wrong is encouraged, not required/.test(page), 'wrong-if encouraged, not required, said aloud');
+assert.ok(/Every seed is invited to ask what would show it is wrong/.test(page), 'the description invites a test');
+assert.ok(!/Every seed says what would show it is wrong/.test(page), 'the description does not say every seed already has a test');
 assert.ok(/Looking for its test/.test(page) && /how could we check this\?/.test(page), 'open seed named on the page');
 assert.ok(/offer a test for a seed that is looking for one/.test(page) && /footprint with the helper's fingerprint/.test(page), 'anyone can offer a test, as a footprint');
 assert.ok(/The planter chooses which test to adopt, or the planter and helpers write it together/.test(page), 'planter adopts, or writes it together');
