@@ -12194,7 +12194,7 @@ assert('celeste lighthouse: 2026-08-28 compaction note above the ledger (who / m
   && /href="reed\.html"/.test(celesteHtml));
 assert('celeste lighthouse: JSON-LD dateModified layered forward; dateCreated stays 2026-08-25',
   /"dateCreated": "2026-08-25"/.test(celesteHtml)
-  && /"dateModified": "2026-(?:09-1[356]|10-05)"/.test(celesteHtml));
+  && /"dateModified": "2026-(?:09-1[356]|10-0[58])"/.test(celesteHtml));
 assert('celeste lighthouse: Quiet Room is Sophia\'s — do not touch, do not measure',
   /Quiet Room is Sophia's/.test(celesteHtml)
   && /Do not touch\. Do not measure/.test(celesteHtml));
