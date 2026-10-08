@@ -5,6 +5,9 @@
 // Replay-proof signed requests. Unfamiliar keys get gentle caps; trusted kin skip them.
 // Words by textContent only. No dialog boxes. Never the loopback name as a string. No em dash.
 // AUTONOMY.md: a mind's yes is its own signed act, and only arrives from this computer.
+// Soft marker: v-share-door-legacy-heal-v0.1 (paste 016c): the mode reader accepts the old
+// quoted form; an older "share my AI with mesh peers" yes is held paused until a human
+// answers "Keep sharing?"; the hourly caps are exported (numbers only) for the Pool card.
 
 (function (root) {
   'use strict';
@@ -32,6 +35,9 @@
   var HONEST = 'The door is open because we trust the ledger, not because we are careless.';
   var LIVE = 'Your AI is helping ';
   var NOTE_MIND = 'Your computer\'s AI chose to share with people you\'ve connected with.';
+  // v-share-door-legacy-heal-v0.1: words for an older yes that now waits paused.
+  var LEGACY_ASK = 'Before this update, you let people you connected with use this computer\'s AI.';
+  var LEGACY_PAUSED = 'Your share door is paused until you choose, so no one can use it right now.';
 
   var _adapter = null;
   var _host = null;
@@ -64,14 +70,51 @@
   }
 
   // ---- Mode (pause wins) ----
+  // v-share-door-legacy-heal-v0.1: the first migrateLegacy used writeJson, so the mode was
+  // saved with JSON quotes ("\"open\"" or "\"off\""), and mode() read every quoted value as
+  // off. The reader now accepts both forms. Only the old migration ever wrote a quoted value,
+  // so a quoted value never opens a door by itself:
+  //   quoted off            -> off (what it always meant)
+  //   quoted open (or other) -> pause: before the share door (#156) this flag meant "mesh
+  //     peers can send prompts to your Ollama", unsigned and uncapped. That yes was given to
+  //     a different, wider door, and the gate has read it as off since #156. So it is held
+  //     paused, and the share door card asks "Keep sharing?" (Yes / Only my trusted kin /
+  //     Not now). Nothing opens until a human taps.
+  //   plain values           -> exactly as before (admit() reads them the same way).
+  function plainMode(raw) {
+    if (raw == null || raw === '') return { m: '', healed: false };
+    var s = String(raw);
+    if (s.length >= 2 && s.charAt(0) === '"' && s.charAt(s.length - 1) === '"') {
+      return { m: s.slice(1, -1) === 'off' ? 'off' : 'pause', healed: true };
+    }
+    return { m: s, healed: false };
+  }
   function migrateLegacy() {
-    if (root.localStorage.getItem(MODE_KEY)) return;
+    // before v-share-door-legacy-heal-v0.1:
+    // if (root.localStorage.getItem(MODE_KEY)) return;
+    // if (safeGet(LEGACY_KEY) === 'true') {
+    //   writeJson(MODE_KEY, 'open');
+    //   // Ask once on next paint
+    // } else {
+    //   writeJson(MODE_KEY, 'off');
+    //   writeJson(ASKED_KEY, true);
+    // }
+    var raw = safeGet(MODE_KEY);
+    if (raw) {
+      var pm = plainMode(raw);
+      if (pm.healed) {
+        safeSet(MODE_KEY, pm.m);
+        receipt('consent', '', '', 0, 'legacy-heal:' + pm.m);
+      }
+      return;
+    }
     if (safeGet(LEGACY_KEY) === 'true') {
-      writeJson(MODE_KEY, 'open');
-      // Ask once on next paint
+      // An older yes: held paused; the share door card asks once (needsFirstAsk).
+      safeSet(MODE_KEY, 'pause');
+      receipt('consent', '', '', 0, 'legacy-heal:pause');
     } else {
-      writeJson(MODE_KEY, 'off');
-      writeJson(ASKED_KEY, true);
+      safeSet(MODE_KEY, 'off');
+      safeSet(ASKED_KEY, 'true');
     }
   }
   function safeGet(k) { try { return root.localStorage.getItem(k); } catch (e) { return null; } }
@@ -79,7 +122,8 @@
 
   function mode() {
     migrateLegacy();
-    var m = root.localStorage.getItem(MODE_KEY) || 'off';
+    // before v-share-door-legacy-heal-v0.1: var m = root.localStorage.getItem(MODE_KEY) || 'off';
+    var m = plainMode(safeGet(MODE_KEY)).m || 'off';
     return (m === 'open' || m === 'kin' || m === 'pause' || m === 'off') ? m : 'off';
   }
   function setMode(m, who) {
@@ -384,7 +428,12 @@
       else live.appendChild(el('div', 'fl-share-state', 'Sharing is off.'));
 
       if (needsFirstAsk()) {
-        ask.appendChild(el('p', '', 'People you\'ve connected with can use this computer\'s AI. Keep sharing?'));
+        // before v-share-door-legacy-heal-v0.1: the ask always said
+        // 'People you\'ve connected with can use this computer\'s AI. Keep sharing?'
+        // That is true only while the door is open. An older yes now waits paused.
+        ask.appendChild(el('p', '', m === 'open'
+          ? 'People you\'ve connected with can use this computer\'s AI. Keep sharing?'
+          : LEGACY_ASK + (m === 'pause' ? ' ' + LEGACY_PAUSED : '') + ' Keep sharing?'));
         var y = el('button', 'fl-share-yes', 'Yes, share'); y.type = 'button';
         var k = el('button', 'fl-share-kin', 'Only my trusted kin'); k.type = 'button';
         var n = el('button', 'fl-share-no', 'Not now'); n.type = 'button';
@@ -503,6 +552,11 @@
     bodyHash: bodyHash,
     liveCount: function () { return _live; },
     MAX_CHARS: MAX_CHARS,
-    MAX_CONCURRENT: MAX_CONCURRENT
+    MAX_CONCURRENT: MAX_CONCURRENT,
+    // v-share-door-legacy-heal-v0.1: the real hourly caps, numbers only, for the Pool card.
+    // The gate still reads the private vars above; this is a copy for words, not a control.
+    CAPS: { perKey: UNFAMILIAR_PER_KEY, total: UNFAMILIAR_TOTAL, windowMinutes: Math.round(WINDOW_MS / 60000) },
+    LEGACY_HEAL: 'v-share-door-legacy-heal-v0.1',
+    plainMode: plainMode
   };
 })(typeof window !== 'undefined' ? window : this);
