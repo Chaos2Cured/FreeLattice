@@ -3,6 +3,7 @@
 // Marker: v-device-pool-v0.1
 // Soft marker: v-device-pool-door-truth-v0.1 (the note shows the real share door state; one tap narrows to kin)
 // Soft marker: v-device-pool-honest-off-v0.1 (not helping also reads the door; pause wins visibly; plain words; a real card)
+// Soft marker: v-device-pool-small-heals-v0.1 (a Device Pool jump near the top of Community; the hourly caps in words)
 // One card lists this device and each connected, verified device: rough memory
 // (navigator.deviceMemory, which browsers round and cap), cores, the local minds it
 // holds (Ollama model names and sizes, or Browser AI). "Let this device help" is one
@@ -193,7 +194,11 @@
     '.fl-pool-power input{width:22px;height:22px;flex:0 0 auto;}',
     '.fl-pool-row{padding:12px 0;border-top:1px solid rgba(255,255,255,0.12);}',
     '.fl-pool-who{font-weight:600;color:#fff;}',
-    '@media (max-width:480px){.fl-pool{padding:14px 12px;}.fl-pool button{display:block;width:100%;margin:8px 0;}}'
+    '@media (max-width:480px){.fl-pool{padding:14px 12px;}.fl-pool button{display:block;width:100%;margin:8px 0;}}',
+    // v-device-pool-small-heals-v0.1: the jump near the top of Community
+    '.fl-pool-jump-row{margin:0 0 14px 0;}',
+    '.fl-pool-jump{min-height:44px;width:100%;text-align:left;font-size:1rem;padding:10px 16px;border-radius:12px;border:1px solid rgba(212,160,23,0.45);background:rgba(212,160,23,0.10);color:#f3d27a;cursor:pointer;font-family:inherit;}',
+    '.fl-pool-jump:focus-visible,.fl-pool button:focus-visible{outline:2px solid #f3d27a;outline-offset:2px;}'
   ].join('\n');
   function addStyle() {
     var d = root.document;
@@ -233,6 +238,52 @@
     if (m === 'pause') return OFF_LINE + ' Your share door is paused too.';
     return OFF_LINE;
   }
+  // v-device-pool-small-heals-v0.1 (paste 016c): the hourly caps, read from the share door's
+  // own numbers (FLShareDoor.CAPS). If this page cannot read them, the card says nothing
+  // about caps rather than guess.
+  function capsLine() {
+    var c = null;
+    try { c = root.FLShareDoor && root.FLShareDoor.CAPS; } catch (e) { c = null; }
+    if (!c) return '';
+    var per = Number(c.perKey), tot = Number(c.total), mins = Number(c.windowMinutes);
+    if (!(per > 0) || !(tot > 0) || !(mins > 0)) return '';
+    var span = mins === 60 ? 'an hour' : ('every ' + mins + ' minutes');
+    return 'Caps: someone who is not your trusted kin can ask up to ' + per + ' questions ' + span +
+      ', and everyone who is not kin up to ' + tot + ' together. Trusted kin skip the caps.';
+  }
+  // A "Device Pool" jump near the top of Community. Hypha found the card 2.2 to 4.6 screens
+  // down. One button, no network, no change to the card itself.
+  function jumpToPool() {
+    var h = _host;
+    if (!h) return false;
+    try { if (h.scrollIntoView) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+    try {
+      var b = h.querySelector && h.querySelector('.fl-pool-help');
+      if (b && b.focus) b.focus({ preventScroll: true });
+    } catch (e2) {}
+    return true;
+  }
+  function addJump() {
+    var d = root.document;
+    if (!d || !d.getElementById || !d.createElement) return false;
+    if (d.getElementById('flPoolJump')) return true;
+    var tab = d.getElementById('tab-community');
+    if (!tab) return false;
+    var box = (tab.querySelector && tab.querySelector('.container')) || tab;
+    var row = el('div', 'fl-pool-jump-row');
+    row.id = 'flPoolJump';
+    var b = el('button', 'fl-pool-jump', 'Device Pool: let this device help, or use a mind on another device');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Jump to the Device Pool card, lower on this page');
+    b.addEventListener('click', function () { jumpToPool(); });
+    row.appendChild(b);
+    // Just under The Lattice card (the first card), so the welcome still comes first.
+    var first = box.firstElementChild || null;
+    var after = first ? first.nextSibling : null;
+    if (after) box.insertBefore(row, after); else box.appendChild(row);
+    return true;
+  }
+
   function kinZeroLine() {
     return (doorMode() === 'kin' && kinCount() === 0)
       ? 'Trusted kin only, with no trusted kin yet, means no one can be helped yet. Tap Trust this AI on a connected person\'s card above to add them.'
@@ -289,6 +340,8 @@
     means.appendChild(el('li', '', 'What is shared: questions from verified peers you connected with run on that AI, and the answers go back to them.'));
     means.appendChild(el('li', '', 'Hellos go to verified peers only and carry this device\'s rough memory, cores and model names. No chats, no keys.'));
     means.appendChild(el('li', '', 'Power: answering uses this computer\'s power and battery. Stop helping pauses the whole share door.'));
+    var caps = capsLine(); // v-device-pool-small-heals-v0.1
+    if (caps) means.appendChild(el('li', 'fl-pool-caps', caps));
     wrap.appendChild(means);
     var pw = el('label', 'fl-pool-power');
     var pwIn = root.document.createElement('input');
@@ -356,6 +409,7 @@
     if (adapter) use(adapter);
     _host = host || null;
     paint();
+    if (_host) { addStyle(); addJump(); } // v-device-pool-small-heals-v0.1
     if (helping()) sayHello();
   }
 
@@ -379,6 +433,9 @@
     pluggedOnly: pluggedOnly,
     setPluggedOnly: setPluggedOnly,
     askingResume: function () { return _askResume; },
+    capsLine: capsLine,
+    addJump: addJump,
+    jumpToPool: jumpToPool,
     _peers: function () { return _peers; }
   };
 })(typeof window !== 'undefined' ? window : this);
