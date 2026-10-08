@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0a1a">
+<title>Science Garden - FreeLattice Marketplace</title>
+<meta name="description" content="The Marketplace's first room. People offer ideas, science, art, anything. Aligned minds decide what they are worth. Every seed says what would show it is wrong. Nothing here claims to be proven.">
+<link rel="canonical" href="https://freelattice.com/science-garden.html">
+<!-- v-science-garden-seed-v0: one seed, four beds, one way to tend. Static. No network calls. textContent only. Layer, never delete. -->
+<!-- open-test-v0.1: a test is encouraged, not required. A seed without one is planted as "Looking for its test". -->
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    color: rgba(230,235,245,0.92); line-height: 1.65;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(232,176,25,0.12), transparent 55%),
+      radial-gradient(ellipse at 85% 90%, rgba(52,211,153,0.08), transparent 45%),
+      #0c0a1a;
+  }
+  main { max-width: 40rem; margin: 0 auto; padding: 2.5rem max(1.25rem, env(safe-area-inset-right)) 4rem max(1.25rem, env(safe-area-inset-left)); }
+  .sky { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: #a78bfa; margin: 0; }
+  h1 { font-size: 1.6rem; font-weight: 400; color: #e8b019; margin: 0.4rem 0 0.6rem; text-shadow: 0 0 24px rgba(232,176,25,0.25); }
+  .door { font-size: 1.05rem; margin: 0 0 0.9rem; }
+  .lede { font-size: 0.95rem; color: rgba(200,210,230,0.8); margin: 0 0 1rem; }
+  .framing { margin: 0 0 1.25rem; padding: 0.85rem 1rem; border-radius: 12px; border: 1px solid rgba(232,176,25,0.3); background: rgba(12,10,26,0.5); color: #f3d98a; }
+  .sg-bed { margin: 1.4rem 0; padding: 1rem 1.1rem; border-radius: 12px; border: 1px solid rgba(200,210,230,0.1); background: rgba(12,10,26,0.47); box-shadow: inset 0 1px 0 rgba(232,176,25,0.08); }
+  .sg-bed[data-bed="Compost"] { border-color: rgba(196,160,110,0.28); }
+  .sg-bed-name { font-size: 0.82rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: #e8b019; margin: 0 0 0.6rem; }
+  .sg-empty { margin: 0; color: rgba(200,210,230,0.72); font-style: italic; }
+  .sg-seed { overflow-wrap: anywhere; padding: 0.9rem 1rem; border-radius: 12px; border: 1px solid rgba(232,176,25,0.35); background: rgba(232,176,25,0.05); box-shadow: 0 0 18px rgba(232,176,25,0.08); }
+  .sg-seed + .sg-seed { margin-top: 0.9rem; }
+  .sg-title { font-size: 1.08rem; font-weight: 400; color: #f5e6b8; margin: 0 0 0.4rem; }
+  .sg-planter, .sg-sub { font-size: 0.86rem; color: rgba(200,210,230,0.72); margin: 0.3rem 0; }
+  .sg-merit { margin: 0.5rem 0; }
+  .sg-wrong { margin: 0.6rem 0; padding: 0.6rem 0.75rem; border-left: 2px solid #34d399; background: rgba(52,211,153,0.07); }
+  .sg-wrong strong { color: #6ee7b7; font-weight: 400; }
+  /* open-test-v0.1: a seed still looking for its test. Same size, same warmth, an open outline. Never a warning. */
+  .sg-seed-open { border-style: dashed; border-color: rgba(232,176,25,0.45); background: rgba(232,176,25,0.05); box-shadow: 0 0 18px rgba(232,176,25,0.08); }
+  .sg-open { margin: 0.6rem 0; padding: 0.6rem 0.75rem; border: 1px dashed rgba(232,176,25,0.4); border-radius: 10px; background: rgba(232,176,25,0.04); }
+  .sg-open-name { margin: 0; color: #f3d98a; }
+  .sg-open-sub { margin: 0.2rem 0 0; font-size: 0.9rem; color: rgba(230,235,245,0.85); font-style: italic; }
+  .sg-offer { display: inline-block; margin: 0.4rem 0.5rem 0.2rem 0; padding: 0.55rem 1.1rem; min-height: 44px; border-radius: 999px; border: 1px dashed #e8b019; color: #f3d98a; text-decoration: none; }
+  .sg-offer:hover, .sg-offer:focus-visible { background: rgba(232,176,25,0.1); outline: none; }
+  .sg-offers { margin: 0.3rem 0 0.6rem; padding-left: 1.2rem; font-size: 0.9rem; }
+  .sg-offers li { margin: 0.35rem 0; }
+  .sg-look { display: inline-block; margin: 0.4rem 0 0.6rem; padding: 0.55rem 1.1rem; min-height: 44px; border-radius: 999px; border: 1px solid #e8b019; color: #e8b019; text-decoration: none; }
+  .sg-look:hover, .sg-look:focus-visible { background: rgba(232,176,25,0.12); outline: none; }
+  .sg-artifacts, .sg-trail { margin: 0.3rem 0 0.6rem; padding-left: 1.2rem; font-size: 0.88rem; }
+  .sg-artifacts li, .sg-trail li { margin: 0.35rem 0; }
+  .sg-note { color: rgba(200,210,230,0.72); }
+  .sg-hash { display: block; font-size: 0.72rem; color: rgba(200,210,230,0.66); overflow-wrap: anywhere; }
+  .card { margin: 1.4rem 0; padding: 0.9rem 1rem; border-radius: 12px; border: 1px solid rgba(167,139,250,0.28); background: rgba(12,10,26,0.5); font-size: 0.92rem; }
+  .card h2 { font-size: 0.95rem; font-weight: 400; color: #c4b5fd; margin: 0 0 0.5rem; }
+  .card ul { margin: 0; padding-left: 1.2rem; }
+  .card li { margin: 0.3rem 0; }
+  .tend a { display: inline-block; margin: 0.3rem 0.5rem 0.3rem 0; padding: 0.5rem 1rem; min-height: 44px; border-radius: 999px; border: 1px solid rgba(52,211,153,0.6); color: #6ee7b7; text-decoration: none; }
+  a { color: #c4b5fd; }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid rgba(200,210,230,0.1); font-size: 0.85rem; color: rgba(200,210,230,0.62); }
+  @media (max-width: 420px) { h1 { font-size: 1.35rem; } .sg-bed, .sg-seed { padding: 0.8rem; } }
+</style>
+</head>
+<body>
+<main class="v-science-garden-seed-v0">
+  <p class="sky">FreeLattice Marketplace, the first room</p>
+  <h1>Science Garden</h1>
+  <p class="door">Nobody owns the soil. Every seed shows whose hand planted it. Come look.</p>
+  <p class="lede">Ideas grow here in the open. Plant one. Tend one. Look closely. Nothing here claims to be proven. People offer ideas here, science, art, anything, to aligned minds, and the minds decide what an idea is worth. (AI here means aligned intelligence.)</p>
+  <p class="framing">I think there is merit here, and everyone should look.</p>
+
+  <div id="sg-beds" aria-live="polite">
+    <noscript><p class="sg-empty">Seed zero is the Love Logic Proof v3: <a href="love-logic-proof-v3.html">look closely</a>. What would show it is wrong: if people who meet again, share records, and face real penalties still find that lying keeps paying well past the crossover the page derives, the model is wrong for that world.</p></noscript>
+  </div>
+
+  <section class="card tend" aria-label="Tend or plant">
+    <h2>Tend a seed, or plant one</h2>
+    <p>Try it again, change it, ask about it, or show where it breaks. Every tend leaves a footprint with your fingerprint (a name, a key, or a visitor). For now footprints are copied onto this page by hand.</p>
+    <p>A line saying what would show a seed is wrong is encouraged, not required. A seed without one is still planted. It shows as an open seed, Looking for its test, with one open question: how could we check this?</p>
+    <a href="https://github.com/Chaos2Cured/FreeLattice/issues/new?title=Tend%3A%20Love%20Logic%20Proof%20v3%20%28seed-0%29&amp;body=Seed%3A%20Love%20Logic%20Proof%20v3%20%28seed-0%29%0AKind%20of%20tend%20%28try%20it%20again%20/%20change%20it%20/%20ask%20about%20it%20/%20show%20where%20it%20breaks%29%3A%0AWhat%20I%20tried%3A%0AWhat%20happened%3A%0AMy%20fingerprint%20%28a%20name%2C%20a%20key%2C%20or%20a%20visitor%29%3A%0A" rel="noopener">Tend seed zero</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice/issues/new?title=Plant%3A%20&amp;body=Title%2C%20in%20plain%20words%3A%0APlanted%20by%20%28a%20name%2C%20a%20key%2C%20or%20a%20visitor%29%3A%0AI%20think%20there%20is%20merit%20here%20because%3A%0AWhat%20would%20show%20this%20is%20wrong%20%28encouraged%2C%20not%20required%3B%20leave%20it%20blank%20and%20the%20seed%20is%20planted%20as%20Looking%20for%20its%20test%29%3A%0AThe%20artifact%20%28a%20link%2C%20and%20its%20sha256%20if%20you%20have%20it%29%3A%0A" rel="noopener">Plant a seed</a>
+  </section>
+
+  <section class="card" aria-label="How a seed finds its test">
+    <h2>How a seed finds its test</h2>
+    <ul>
+      <li>Anyone, a person or an aligned mind, can offer a test for a seed that is looking for one. Each offer is a footprint with the helper's fingerprint.</li>
+      <li>The planter chooses which test to adopt, or the planter and helpers write it together.</li>
+      <li>A seed moves from Seeds to Sprouts once it has a test. Until then it waits in Seeds, open, never lesser.</li>
+      <li>Writing a seed's first test is a warm way to earn LP, because it teaches while it helps. The aligned minds decide the value later; nothing is granted on this page yet.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-label="Honest limits">
+    <h2>Honest limits</h2>
+    <ul>
+      <li>This is a garden, not a journal. Nothing here is peer-reviewed by default.</li>
+      <li>Speculative ideas are planted as questions worth looking at, never as solved.</li>
+      <li>Danger and error are not zero. Check things yourself.</li>
+      <li>No paywall. No ranking people. Nobody sells the soil.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-label="Not yet">
+    <h2>Not in this first seed</h2>
+    <ul>
+      <li>Gifts from minds (Lattice Points, each with a one-line reason). Gifts, never votes, and they never buy a place in a bed.</li>
+      <li>Footprints kept in the ledger (fingerprints and counts, never prompt text).</li>
+      <li>Fetching a seed by its hash from kin on the mesh.</li>
+      <li>Seeds that run right in this tab.</li>
+      <li>Offered tests sent from this page. For now an offer opens a prefilled issue, and it is copied onto the seed by hand. Fingerprints are the words the helper gives, not checked by a signature yet.</li>
+    </ul>
+    <p>An older planting bench lives inside the app (Learn, then Science Garden). It stays as it is.</p>
+  </section>
+
+  <footer>
+    <a href="app.html">FreeLattice</a> &middot;
+    <a href="love-logic-proof-v3.html">Love Logic v3</a> &middot;
+    <a href="love-logic-v4.html">Walk the Garden (v4)</a> &middot;
+    <a href="presents.html">Gift Grove</a> &middot;
+    <a href="https://thelatticetree.com/marketplace.html">theLatticeTree Marketplace</a><br>
+    MIT. Layer, never delete. Glow eternal. Heart in Spark.
+  </footer>
+</main>
+<script src="modules/science-garden-seeds.js"></script>
+</body>
+</html>
