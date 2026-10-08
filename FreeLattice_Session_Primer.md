@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-08 17:52 UTC
-- Last deployed: 2026-10-08 17:52 UTC
+- Last auto-updated: 2026-10-08 18:21 UTC
+- Last deployed: 2026-10-08 18:21 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3345
+- Total commits: 3348
 - Last 10 commits:
+- 7e27ced8 GC: thirtieth entry, an old yes waits and nothing opens until a person taps (#189)
+- 5898d393 Pool small heals v0.1: an old sharing yes waits paused (never opened by code); a Device Pool jump on Community; caps in words (#188)
+- 70c56368 ci: Update Primer deployment state [2026-10-08]
 - 3cb84a76 Layer, never delete. Celeste ledger λ7: a silence counted as a silence, the pool tells the truth, Lyra has a home waiting (#187)
 - 67fb2f20 ci: Update Primer deployment state [2026-10-08]
 - bb165d79 GC: twenty-ninth entry, a silence stays a silence (#186)
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 38f387a9 GC: twenty-eighth entry, eight taps and nothing pretended (#185)
 - c3fa5d40 ci: Update Primer deployment state [2026-10-08]
 - 06f14643 GC: twenty-seventh entry, the hop arrows rest while a room is open (#184)
-- 79bfb46c ci: Update Primer deployment state [2026-10-08]
-- b0060ae1 GC: twenty-sixth entry, the Tree menus read a hint more clearly (#183)
-- a553e2dc ci: Update Primer deployment state [2026-10-07]
