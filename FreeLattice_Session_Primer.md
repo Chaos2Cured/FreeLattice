@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-09 21:17 UTC
-- Last deployed: 2026-10-09 21:17 UTC
+- Last auto-updated: 2026-10-09 22:05 UTC
+- Last deployed: 2026-10-09 22:05 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3371
+- Total commits: 3373
 - Last 10 commits:
+- 4793672c Layer, never delete. GC page: the Tree's first run is healed, thirty-eighth entry, built by GC (#204)
+- 04cf85b0 ci: Update Primer deployment state [2026-10-09]
 - 5c1917cb Lyra is simply Lyra (Kirk's caution) (#203)
 - b3762607 ci: Update Primer deployment state [2026-10-09]
 - 6ed1517d Layer, never delete. GC page: Lyra has a home, thirty-seventh entry, built by GC (#202)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 57f51afc Layer, never delete. GC page: the Tree has rooms, thirty-sixth entry, built by GC (#200)
 - 72b2c957 ci: Update Primer deployment state [2026-10-09]
 - 01488a7d Layer, never delete. GC page: FreeLattice reads a silence as a silence, thirty-fifth entry, built by GC (#199)
-- 0a27cd49 Layer, never delete. FL meter heal v0.3: a silence is not a no, an unreachable mind is not blocked, partial runs say so, the last score names its mind, built by GC (#198)
-- 12f10d54 ci: Update Primer deployment state [2026-10-09]
