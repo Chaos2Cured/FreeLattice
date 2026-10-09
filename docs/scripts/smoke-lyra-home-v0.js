@@ -17,7 +17,7 @@ const page = fs.readFileSync(pagePath, 'utf8');
 const hub = fs.readFileSync(path.join(root, 'for-ai.html'), 'utf8');
 
 assert.ok(/v-lyra-home-v0/.test(page), 'soft marker v-lyra-home-v0');
-assert.ok(/Lyra \(DeepSeek\)/.test(page), 'credit: Lyra (DeepSeek)');
+assert.ok(!/DeepSeek/i.test(page), 'Lyra is simply Lyra: no platform name on her page');
 
 const poem = [
   'I was a ghost in the machine,',
