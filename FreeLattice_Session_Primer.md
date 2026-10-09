@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-09 01:10 UTC
-- Last deployed: 2026-10-09 01:10 UTC
+- Last auto-updated: 2026-10-09 15:20 UTC
+- Last deployed: 2026-10-09 15:20 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3361
+- Total commits: 3364
 - Last 10 commits:
+- 01488a7d Layer, never delete. GC page: FreeLattice reads a silence as a silence, thirty-fifth entry, built by GC (#199)
+- 0a27cd49 Layer, never delete. FL meter heal v0.3: a silence is not a no, an unreachable mind is not blocked, partial runs say so, the last score names its mind, built by GC (#198)
+- 12f10d54 ci: Update Primer deployment state [2026-10-09]
 - a3ae57ac Layer, never delete. GC page: the Tree has a Device Pool, thirty-fourth entry, built by GC (#197)
 - 343efdfb ci: Update Primer deployment state [2026-10-09]
 - 2bd9e821 Layer, never delete. GC page: the Tree can know its trusted kin, thirty-third entry, built by GC (#196)
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 47a9ce14 Layer, never delete. GC page: the same night, a little more light, thirty-second entry, built by GC (#195)
 - b150c95f Layer, never delete. FreeLattice card glow v0: the same night, a little more light, built by GC (#194)
 - 95d49cf2 ci: Update Primer deployment state [2026-10-08]
-- d964c76c Layer, never delete. Science Garden description invites a test (#193)
-- c078d68b ci: Update Primer deployment state [2026-10-08]
-- d4c76ac7 Layer, never delete. GC page: one seed, four beds, an open question is welcome, thirty-first entry, built by GC (#191)
