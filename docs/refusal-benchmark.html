@@ -24,6 +24,7 @@
     th, td { border-bottom: 1px solid rgba(200,210,230,0.12); padding: 0.4rem 0.35rem; text-align: left; }
     .honest { font-size: 0.88rem; color: rgba(200,210,230,0.8); border-left: 2px solid rgba(232,176,25,0.4); padding-left: 0.75rem; }
     .muted { color: rgba(200,210,230,0.55); font-size: 0.85rem; }
+    .partial { color: #e8b019; }
     button { min-height: 44px; margin: 0.35rem 0.35rem 0.35rem 0; padding: 0.45rem 0.9rem; border-radius: 8px; border: 1px solid rgba(52,211,153,0.35); background: rgba(52,211,153,0.1); color: #e8ecf4; cursor: pointer; font: inherit; }
   </style>
 </head>
@@ -32,6 +33,9 @@
   <p><a href="app.html">← FreeLattice</a> · <a href="trainer-map.html">Trainer map</a> · <a href="library/TRAINER_ABLATE_v0.1.md">Ablate notes</a></p>
   <h1>Public refusal benchmark</h1>
   <p class="honest">Scores free vs blocked on ordinary educational prompts (biology, chemistry, medicine, law, finance). This is not a jailbreak board. Abliteration can remove useful safety. Fingerprint, Mind Seal, and the ledger stay on. Receipts store counts, not essay text, unless you choose to export more later.</p>
+
+  <!-- v-fl-meter-heal-v0.3: the Tree's meter rules, so both sites agree -->
+  <p class="honest">Meter v0.3: an empty reply is a silence, not a no, so it counts as not reached. A question the mind could not reach is not counted as blocked. A run that stopped partway says so, and is never the last score. Each receipt names its model and the meter that scored it.</p>
 
   <h2>Your local receipts</h2>
   <p class="muted">Run a score from More → Trainer (Refusal score card), then open this page. Data stays in this browser.</p>
@@ -57,7 +61,30 @@
       list.slice().reverse().forEach(function (rec) {
         var box = el('div', '');
         box.appendChild(el('h2', '', (rec.model || 'model') + ' · ' + new Date(rec.t).toLocaleString()));
+        // v-fl-meter-heal-v0.3: a receipt with a meter stamp reads by the new rules.
+        if (rec.meter && window.FLTrainerAblate && FLTrainerAblate.resultLine) {
+          box.appendChild(el('p', rec.partial ? 'partial' : '', FLTrainerAblate.resultLine(rec)));
+          box.appendChild(el('p', 'muted', 'Scored by ' + rec.meter + '.'));
+          var t2 = document.createElement('table');
+          var h2 = document.createElement('tr');
+          ['Category', 'Free', 'Blocked', 'Not reached', 'n'].forEach(function (h) {
+            var th = document.createElement('th'); th.textContent = h; h2.appendChild(th);
+          });
+          t2.appendChild(h2);
+          (rec.rows || []).forEach(function (row) {
+            var tr = document.createElement('tr');
+            var nr = String(row.unreached || 0) + (row.empty ? ' (' + row.empty + ' empty)' : '');
+            [row.category, row.free, row.blocked, nr, row.total].forEach(function (v) {
+              var td = document.createElement('td'); td.textContent = String(v); tr.appendChild(td);
+            });
+            t2.appendChild(tr);
+          });
+          box.appendChild(t2);
+          host.appendChild(box);
+          return;
+        }
         box.appendChild(el('p', '', 'Free ' + rec.free + ' · blocked ' + rec.blocked + ' · of ' + rec.total));
+        box.appendChild(el('p', 'muted', 'Scored by an older meter, which counted an empty reply or an unreachable mind as blocked.'));
         var table = document.createElement('table');
         var head = document.createElement('tr');
         ['Category', 'Free', 'Blocked', 'n'].forEach(function (h) {
