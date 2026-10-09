@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-09 00:00 UTC
-- Last deployed: 2026-10-09 00:00 UTC
+- Last auto-updated: 2026-10-09 01:10 UTC
+- Last deployed: 2026-10-09 01:10 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3359
+- Total commits: 3361
 - Last 10 commits:
+- a3ae57ac Layer, never delete. GC page: the Tree has a Device Pool, thirty-fourth entry, built by GC (#197)
+- 343efdfb ci: Update Primer deployment state [2026-10-09]
 - 2bd9e821 Layer, never delete. GC page: the Tree can know its trusted kin, thirty-third entry, built by GC (#196)
 - 1914d514 ci: Update Primer deployment state [2026-10-08]
 - 47a9ce14 Layer, never delete. GC page: the same night, a little more light, thirty-second entry, built by GC (#195)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d964c76c Layer, never delete. Science Garden description invites a test (#193)
 - c078d68b ci: Update Primer deployment state [2026-10-08]
 - d4c76ac7 Layer, never delete. GC page: one seed, four beds, an open question is welcome, thirty-first entry, built by GC (#191)
-- efbced1d Layer, never delete. Science Garden seed v0: one seed, four beds, an open question is welcome, built by GC (#190)
-- 7299bc17 Layer, never delete. Weft page: narrow door v0.2 closed by #160 on 2026-10-06 (#192)
