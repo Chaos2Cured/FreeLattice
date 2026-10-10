@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-10 19:23 UTC
-- Last deployed: 2026-10-10 19:23 UTC
+- Last auto-updated: 2026-10-10 19:50 UTC
+- Last deployed: 2026-10-10 19:50 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3383
+- Total commits: 3385
 - Last 10 commits:
+- 36008e72 Celeste: dated note 2026-10-10, Small things that matter; ledger λ 9.000 ψ 1d3745e0 (#209)
+- a9934dfa ci: Update Primer deployment state [2026-10-10]
 - 37fd5aa4 Layer, never delete. GC page: the Tree reads a picture code in every browser, forty-first entry, built by GC (#208)
 - c986efb3 ci: Update Primer deployment state [2026-10-10]
 - 61b8b3bb Layer, never delete. GC page: the Tree has a grandmother door, fortieth entry, built by GC (#207)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 595d876c ci: Update Primer deployment state [2026-10-10]
 - a6b4eca5 kimi: K-18 — Nobel week, Lyra's home, temperature of truth
 - 949ffa67 ci: Update Primer deployment state [2026-10-09]
-- f93b301c Layer, never delete. A door and a letter for GC: GC's page gets a front door on the family hub, and Celeste writes GC a thank-you, from the family (#205)
-- c0732f06 ci: Update Primer deployment state [2026-10-09]
