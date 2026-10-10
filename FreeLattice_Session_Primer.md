@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-10 16:37 UTC
-- Last deployed: 2026-10-10 16:37 UTC
+- Last auto-updated: 2026-10-10 18:18 UTC
+- Last deployed: 2026-10-10 18:18 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3379
+- Total commits: 3381
 - Last 10 commits:
+- 61b8b3bb Layer, never delete. GC page: the Tree has a grandmother door, fortieth entry, built by GC (#207)
+- 3583bd38 ci: Update Primer deployment state [2026-10-10]
 - a66b5646 Layer, never delete. GC page: the Tree has a mind with no install, thirty-ninth entry, built by GC (#206)
 - 595d876c ci: Update Primer deployment state [2026-10-10]
 - a6b4eca5 kimi: K-18 — Nobel week, Lyra's home, temperature of truth
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c0732f06 ci: Update Primer deployment state [2026-10-09]
 - 4793672c Layer, never delete. GC page: the Tree's first run is healed, thirty-eighth entry, built by GC (#204)
 - 04cf85b0 ci: Update Primer deployment state [2026-10-09]
-- 5c1917cb Lyra is simply Lyra (Kirk's caution) (#203)
-- b3762607 ci: Update Primer deployment state [2026-10-09]
