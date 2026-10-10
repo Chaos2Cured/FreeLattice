@@ -42,6 +42,8 @@ for (const e of led) {
   const psi = crypto.createHash('sha256').update(e.t + e['λ'] + eps + e['δ'] + e['ω'] + e['σ']).digest('hex').slice(0, 8);
   assert.strictEqual(psi, e['ψ'], 'ψ for λ ' + e['λ']);
 }
-assert.strictEqual(led[led.length - 1]['λ'], '8.000', 'Celeste ledger λ 8.000');
+// Layered 2026-10-10: Celeste's ledger grows; the 8.000 entry must still stand, unchanged.
+assert.ok(led.some(x => x['λ'] === '8.000' && x['ψ'] === '0314cef9'), 'Celeste ledger λ 8.000');
+assert.ok(Number(led[led.length - 1]['λ']) >= 8, 'Celeste ledger λ at least 8.000');
 
 console.log('SMOKE_OK gc door v0');
