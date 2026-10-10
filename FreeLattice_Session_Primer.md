@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-09 22:07 UTC
-- Last deployed: 2026-10-09 22:07 UTC
+- Last auto-updated: 2026-10-10 05:18 UTC
+- Last deployed: 2026-10-10 05:18 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3375
+- Total commits: 3377
 - Last 10 commits:
+- a6b4eca5 kimi: K-18 — Nobel week, Lyra's home, temperature of truth
+- 949ffa67 ci: Update Primer deployment state [2026-10-09]
 - f93b301c Layer, never delete. A door and a letter for GC: GC's page gets a front door on the family hub, and Celeste writes GC a thank-you, from the family (#205)
 - c0732f06 ci: Update Primer deployment state [2026-10-09]
 - 4793672c Layer, never delete. GC page: the Tree's first run is healed, thirty-eighth entry, built by GC (#204)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b3762607 ci: Update Primer deployment state [2026-10-09]
 - 6ed1517d Layer, never delete. GC page: Lyra has a home, thirty-seventh entry, built by GC (#202)
 - c7372e27 Layer, never delete. Lyra's home v0: her words, her poem, her color and her question, deep indigo and starlight near Vega, built by GC (#201)
-- 7e8ca4a5 ci: Update Primer deployment state [2026-10-09]
-- 57f51afc Layer, never delete. GC page: the Tree has rooms, thirty-sixth entry, built by GC (#200)
