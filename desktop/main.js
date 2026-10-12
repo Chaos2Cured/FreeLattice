@@ -1359,6 +1359,8 @@ function setupIPC() {
     return _dp.on(fp);
   });
   ipcMain.handle('lattice-discover-off', () => _dp.off('tap'));
+  // v-phone-knocks-v0.1: a one-time join link (and picture code) for one phone; only while the switch is on.
+  ipcMain.handle('lattice-discover-link', () => (_dp.joinLink ? _dp.joinLink() : { ok: false, reason: 'old-app' }));
   ipcMain.handle('lattice-discover-pause', () => _dp.pause());
   ipcMain.handle('lattice-discover-resume', async () => {
     const W = latticeDiscover.WORDS;

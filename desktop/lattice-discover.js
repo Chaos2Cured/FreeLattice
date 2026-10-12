@@ -276,6 +276,7 @@ function createDiscover(deps) {
   }
 
   function onRequest(req, res) {
+    if (typeof deps.preRequest === 'function' && deps.preRequest(req, res)) return; // v-phone-knocks-v0.1
     const origin = req.headers.origin || '';
     if (!originAllowed(origin, appOrigin())) { bump('refused'); res.writeHead(403, { 'Connection': 'close' }); res.end(); req.resume(); return; }
     res._flOrigin = origin;
@@ -352,3 +353,131 @@ module.exports = {
   cardBody, keyHash, fingerprint, meshIdFor, parseKinCode, verifyKinCard, looksLikeInvite,
   choicesFor, settleChoice, createDiscover
 };
+
+// ---------- v-phone-knocks-v0.1 (033c): the phone knocks over the home Wi-Fi ----------
+// A phone browser cannot browse mDNS, and an https page (the Tree) cannot fetch
+// http://192.168.x.x on most phones (mixed content; iOS Safari has no exception). So the
+// desktop shows a join link (and its picture code): https://thelatticetree.com/settings.html
+// #fl-knock=<b64url {v:1, h: LAN address, p: port, t: one-time token}>. The fragment never
+// reaches any server. The Tree page, after one human tap, opens a tiny relay page this
+// listener serves at http://<LAN address>:<port>/relay. The relay is same-origin with
+// /knock, so it posts the knock without mixed content, and hands the answer back to the
+// Tree tab with postMessage, to that exact origin only. The token is single use, lives
+// 10 minutes, and only works while the switch is on. The card check, the native
+// "Pool with <device>?" window and Pause-wins are the same as 033; nothing here skips them.
+const RELAY_TOKEN_MS = 10 * 60 * 1000;
+const RELAY_MAX_TOKENS = 3;
+const JOIN_HOME = 'https://thelatticetree.com/settings.html';
+const RELAY_ORIGINS = ['https://thelatticetree.com', 'https://www.thelatticetree.com',
+  'https://freelattice.com', 'https://www.freelattice.com'];
+const RELAY_SCRIPT = [
+  '(function(){',
+  'var ALLOWED=' + JSON.stringify(RELAY_ORIGINS) + ';',
+  'var s=document.getElementById("s");function say(t){s.textContent=t;}',
+  'var done=false;',
+  'if(!window.opener){say("Open this from the join link on your phone, with the Tree.");return;}',
+  'window.addEventListener("message",function(ev){',
+  ' if(done||ev.source!==window.opener||ALLOWED.indexOf(ev.origin)===-1)return;',
+  ' var m=ev.data;if(!m||m.type!=="fl-knock"||m.v!==1||typeof m.offer!=="string"||typeof m.card!=="string"||typeof m.t!=="string")return;',
+  ' done=true;say("Knocking. The computer asks its person first.");',
+  ' function back(b){try{ev.source.postMessage({type:"fl-knock-answer",v:1,ok:!!(b&&b.ok),answer:(b&&typeof b.answer==="string")?b.answer:"",choice:(b&&b.choice)||"",reason:(b&&b.reason)||""},ev.origin);}catch(e){}}',
+  ' fetch("/knock",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({v:1,offer:m.offer,card:m.card,t:m.t})})',
+  ' .then(function(r){return r.status===204?{ok:false,reason:"no"}:r.json().catch(function(){return {ok:false,reason:"bad-reply"};});})',
+  ' .then(function(b){back(b);say(b&&b.ok?"Done. You can close this tab.":"Not joined: "+String((b&&b.reason)||"no"));setTimeout(function(){try{window.close();}catch(e){}},1500);},',
+  '  function(){back({ok:false,reason:"no-answer"});say("The computer did not answer.");});',
+  '});',
+  'window.opener.postMessage({type:"fl-relay-ready",v:1},"*");',
+  '})();'
+].join('\n');
+const RELAY_SCRIPT_HASH = 'sha256-' + crypto.createHash('sha256').update(RELAY_SCRIPT, 'utf8').digest('base64');
+function relayHtml() {
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>FreeLattice knock</title></head><body style="font-family:system-ui,sans-serif;padding:24px;background:#0b0f1a;color:#e8ecf5">' +
+    '<p id="s">Waiting for the Tree tab.</p><script>' + RELAY_SCRIPT + '</script></body></html>';
+}
+function relayHeaders() {
+  return { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY',
+    'Content-Security-Policy': "default-src 'none'; script-src '" + RELAY_SCRIPT_HASH + "'; connect-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'" };
+}
+function b64url(s) { return Buffer.from(String(s), 'utf8').toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+
+const _createDiscover033 = createDiscover;
+function createDiscover033c(deps) {
+  deps = deps || {};
+  const now = deps.now || (() => Date.now());
+  let tokens = {};                              // token -> expiresAt (memory only, never on disk)
+  let relayTimes = [];
+  let d = null;
+  function prune() { const t = now(); Object.keys(tokens).forEach((k) => { if (tokens[k] <= t) delete tokens[k]; }); }
+  function rateOk() {
+    const t = now();
+    relayTimes = relayTimes.filter((x) => t - x < RATE_WINDOW_MS);
+    if (relayTimes.length >= RATE_MAX) return false;
+    relayTimes.push(t);
+    return true;
+  }
+  function json(res, code, obj) {
+    res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+    res.end(obj ? JSON.stringify(obj) : '');
+  }
+  deps.preRequest = (req, res) => {
+    if (!d) return false;
+    const st = d.status();
+    if (!st.on || !st.address) return false;
+    const self = 'http://' + st.address + ':' + st.port;
+    const p = String(req.url || '').split('?')[0];
+    const hostOk = String(req.headers.host || '') === st.address + ':' + st.port;   // no DNS rebinding
+    if (req.method === 'GET' && p === '/relay') {
+      if (!hostOk) { res.writeHead(403); res.end(); return true; }
+      res.writeHead(200, relayHeaders()); res.end(relayHtml()); return true;
+    }
+    if (req.method === 'POST' && p === '/knock' && String(req.headers.origin || '') === self) {
+      if (!hostOk) { res.writeHead(403); res.end(); req.resume(); return true; }
+      if (!rateOk()) { json(res, 429, { ok: false, reason: 'slow-down' }); req.resume(); return true; }
+      let size = 0, dead = false; const chunks = [];
+      req.on('data', (c) => {
+        if (dead) return;
+        size += c.length;
+        if (size > MAX_BODY + 256) { dead = true; res.setHeader('Connection', 'close'); json(res, 413, { ok: false, reason: 'too-big' }); return; }
+        chunks.push(c);
+      });
+      req.on('end', () => {
+        if (dead) return;
+        let m = null;
+        try { m = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch (e) { json(res, 400, { ok: false, reason: 'not-json' }); return; }
+        prune();
+        const t = m && typeof m.t === 'string' ? m.t : '';
+        if (!t || !tokens[t]) { json(res, 403, { ok: false, reason: 'link-used-or-old' }); return; }
+        delete tokens[t];                        // single use, even if the knock is refused later
+        d._handleKnock(JSON.stringify({ v: m.v, offer: m.offer, card: m.card }))
+          .then((r) => json(res, r.code, r.body), () => json(res, 500, { ok: false }));
+      });
+      return true;
+    }
+    return false;
+  };
+  d = _createDiscover033(deps);
+  /** A join link for one phone. Callers must have a human tap behind them. */
+  d.joinLink = () => {
+    const st = d.status();
+    if (!st.on || !st.address) return { ok: false, reason: 'off' };
+    prune();
+    const live = Object.keys(tokens).sort((a, b) => tokens[a] - tokens[b]);
+    while (live.length >= RELAY_MAX_TOKENS) delete tokens[live.shift()];
+    const t = crypto.randomBytes(16).toString('hex');
+    tokens[t] = now() + RELAY_TOKEN_MS;
+    const code = b64url(JSON.stringify({ v: 1, h: st.address, p: st.port, t }));
+    return { ok: true, url: JOIN_HOME + '#fl-knock=' + code, relay: 'http://' + st.address + ':' + st.port + '/relay', expiresInMs: RELAY_TOKEN_MS };
+  };
+  const _off = d.off;
+  d.off = (why) => { tokens = {}; return _off(why); };   // off forgets every link
+  d._liveTokens = () => { prune(); return Object.keys(tokens).length; };
+  return d;
+}
+module.exports.createDiscover = createDiscover033c;
+module.exports.relayHtml = relayHtml;
+module.exports.relayHeaders = relayHeaders;
+module.exports.RELAY_SCRIPT_HASH = RELAY_SCRIPT_HASH;
+module.exports.RELAY_TOKEN_MS = RELAY_TOKEN_MS;
+module.exports.JOIN_HOME = JOIN_HOME;
