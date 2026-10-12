@@ -209,6 +209,11 @@ function sleep(ms) {
     const buildAt = block.search(/electron-builder\/cli\.js --(win|linux|mac)/);
     ok(smokeAt > 0 && smoke2 > smokeAt && buildAt > smoke2, runner + ' runs both smokes before the build');
   });
+  ['Windows', 'Linux', 'Mac'].forEach((name) => {
+    const step = yml.split('Prove discovery on ' + name)[1] || '';
+    const head = step.slice(0, step.indexOf('node scripts/smoke-discover.js'));
+    ok(head.indexOf('shell: bash') !== -1, name + ' prove step uses bash so a failed smoke stops the pack');
+  });
   ok(!/CSC_LINK|WIN_CSC|APPLE_ID|APPLE_APP|CSC_KEY_PASSWORD/.test(yml), 'workflow sets no signing secret');
   ok(/CSC_IDENTITY_AUTO_DISCOVERY:\s*'false'/.test(yml), 'signing discovery stays off');
   ok(/buildVersion=5\.8\.0-035/.test(yml) && /extraMetadata\.version=5\.8\.0/.test(yml), 'version label stays 5.8.0');

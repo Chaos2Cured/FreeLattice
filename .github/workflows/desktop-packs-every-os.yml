@@ -5,6 +5,9 @@
 # buildVersion 5.8.0-035 is a label electron-builder accepts here because Windows
 # signAndEditExecutable is false, so rcedit (which wants four numbers) does not run.
 # The builder is called with --config.prop. Windows npm splits -c.prop into a filename.
+# The prove step sets shell: bash. windows-latest otherwise uses PowerShell, which
+# keeps going after a failed smoke. A Windows checkout is CRLF. The discovery smoke
+# accepts that.
 # Later: Windows code signing (so SmartScreen stops warning) and Mac notarization.
 # Both cost money and need Kirk's accounts. Not in 035.
 
@@ -65,6 +68,7 @@ jobs:
         run: npm ci
 
       - name: Prove discovery on Windows
+        shell: bash
         run: |
           node scripts/smoke-discover.js
           node scripts/smoke-reconnect.js
@@ -110,6 +114,7 @@ jobs:
         run: npm ci
 
       - name: Prove discovery on Linux
+        shell: bash
         run: |
           node scripts/smoke-discover.js
           node scripts/smoke-reconnect.js
@@ -154,6 +159,7 @@ jobs:
         run: npm ci
 
       - name: Prove discovery on Mac
+        shell: bash
         run: |
           node scripts/smoke-discover.js
           node scripts/smoke-reconnect.js
