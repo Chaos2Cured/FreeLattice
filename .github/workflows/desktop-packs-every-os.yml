@@ -4,6 +4,7 @@
 # Artifact names stay FreeLattice_5.8.0_*. The release tag tells an old pack from a new one.
 # buildVersion 5.8.0-035 is a label electron-builder accepts here because Windows
 # signAndEditExecutable is false, so rcedit (which wants four numbers) does not run.
+# The builder is called with --config.prop. Windows npm splits -c.prop into a filename.
 # Later: Windows code signing (so SmartScreen stops warning) and Mac notarization.
 # Both cost money and need Kirk's accounts. Not in 035.
 
@@ -69,7 +70,8 @@ jobs:
           node scripts/smoke-reconnect.js
 
       - name: Build Windows packs (unsigned)
-        run: npm run build:win -- -c.extraMetadata.version=5.8.0 -c.buildVersion=5.8.0-035
+        shell: bash
+        run: node node_modules/electron-builder/cli.js --win --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
 
       - name: List dist
         shell: bash
@@ -113,7 +115,8 @@ jobs:
           node scripts/smoke-reconnect.js
 
       - name: Build Linux packs (unsigned)
-        run: npm run build:linux -- -c.extraMetadata.version=5.8.0 -c.buildVersion=5.8.0-035
+        shell: bash
+        run: node node_modules/electron-builder/cli.js --linux --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
 
       - name: List dist
         run: ls -la dist/
@@ -156,7 +159,8 @@ jobs:
           node scripts/smoke-reconnect.js
 
       - name: Build Mac packs (unsigned)
-        run: npm run build:mac -- -c.extraMetadata.version=5.8.0 -c.buildVersion=5.8.0-035
+        shell: bash
+        run: node node_modules/electron-builder/cli.js --mac --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 

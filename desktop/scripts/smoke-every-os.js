@@ -206,7 +206,7 @@ function sleep(ms) {
     const block = rest.slice(0, end);
     const smokeAt = block.indexOf('node scripts/smoke-discover.js');
     const smoke2 = block.indexOf('node scripts/smoke-reconnect.js');
-    const buildAt = block.search(/npm run build:(win|linux|mac)/);
+    const buildAt = block.search(/electron-builder\/cli\.js --(win|linux|mac)/);
     ok(smokeAt > 0 && smoke2 > smokeAt && buildAt > smoke2, runner + ' runs both smokes before the build');
   });
   ok(!/CSC_LINK|WIN_CSC|APPLE_ID|APPLE_APP|CSC_KEY_PASSWORD/.test(yml), 'workflow sets no signing secret');
