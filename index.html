@@ -15388,6 +15388,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-mind-seal.js" defer></script>
 <!-- v-device-pool-v0.1: phones and laptops helping, whole questions routed to the device that holds the mind -->
 <script src="modules/fl-pool.js" defer></script>
+<!-- v-page-answers-knock-v0.1 (033b): a Yes in the desktop app finishes the pool join here. Does nothing outside the desktop app; loads tree-kin.js and tree-pool.js (same origin) only there. -->
+<script src="modules/pool-knock.js" defer></script>
 <!-- v-fl-card-glow-v0: the Tree's card light on More, Learn and Community cards (CSS layer, adds only) -->
 <link rel="stylesheet" href="modules/fl-card-glow.css">
 </head>
@@ -18684,6 +18686,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="flKinQueueHost" style="margin-top: 14px;"></div>
     <!-- v-device-pool-v0.1 -->
     <div id="flPoolHost" style="margin-top: 14px;"></div>
+    <!-- v-page-answers-knock-v0.1 (033b): the home Wi-Fi switch, desktop app only; empty in a browser -->
+    <div id="pool-knock-host" style="margin-top: 14px;"></div>
   </div>
 
   <!-- Mesh: LAN Discovery (v3.8) -->
