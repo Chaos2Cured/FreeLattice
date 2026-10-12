@@ -55,6 +55,13 @@ if [ -d "../modules" ]; then
 else
   echo "     ⚠ modules/ directory not found (optional)"
 fi
+# v-every-os-desktop-v0.1 v-tester-fixes-v0.1: these live beside the site copy.
+for f in chat-wait.js pool-every-os.js; do
+  if [ -f "../docs/modules/$f" ]; then
+    mkdir -p app/modules
+    cp "../docs/modules/$f" "app/modules/$f" && echo "     ✓ $f"
+  fi
+done
 
 # Verify we have an app file
 if [ ! -f "app/app.html" ] && [ ! -f "app/index.html" ]; then

@@ -12,6 +12,8 @@ Layer, never delete. Seed never to renderer. Quiet Room shut. Five stay five.
 3. Build: `npm run build` (or `build:mac` / `build:win` / `build:linux`)
 4. **No signed installer yet — build from source / check [Releases](https://github.com/Chaos2Cured/FreeLattice/releases)** for labeled Electron artifacts when published
 
+Later: Windows code signing (so SmartScreen stops warning) and Mac notarization. Both cost money and need Kirk's accounts. Not in 035.
+
 ## What this Electron app carries
 
 | Module | Role |

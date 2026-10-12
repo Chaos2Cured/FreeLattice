@@ -189,8 +189,13 @@ const ORIGIN = { Origin: 'https://thelatticetree.com' };
 
   // ---------- 6. proxy CORS heal (narrowProxyHeaders, read from main.js) ----------
   const mainSrc = fs.readFileSync(path.join(__dirname, '..', 'main.js'), 'utf8');
-  const m = /function narrowProxyHeaders\([\s\S]*?\n\}\n/.exec(mainSrc);
-  ok(!!m, 'narrowProxyHeaders present');
+  // LF is the repo. A windows-latest checkout writes CRLF, so the same door is read both ways.
+  const mLf = /function narrowProxyHeaders\([\s\S]*?\n\}\n/.exec(mainSrc);
+  const mCr = /function narrowProxyHeaders\([\s\S]*?\r\n\}\r\n/.exec(mainSrc);
+  const asCrlf = mainSrc.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');
+  const mCrCopy = /function narrowProxyHeaders\([\s\S]*?\r\n\}\r\n/.exec(asCrlf);
+  const m = mLf || mCr;
+  ok(!!m && !!mCrCopy, 'narrowProxyHeaders present');
   const narrow = new Function(m[0] + '; return narrowProxyHeaders;')();
   let h = narrow({ 'Access-Control-Allow-Origin': '*', 'content-type': 'application/json' }, 'https://evil.example', 5555);
   ok(!('Access-Control-Allow-Origin' in h) && h['content-type'] === 'application/json', 'star stripped for other sites');

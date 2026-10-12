@@ -1,0 +1,246 @@
+# FreeLattice: Desktop packs for every OS (honest unsigned)
+# Layer, never delete. The older desktop-packs-win-linux.yml stays as it is.
+# v-every-os-desktop-v0.1
+# Artifact names stay FreeLattice_5.8.0_*. The release tag tells an old pack from a new one.
+# buildVersion 5.8.0-035 is a label electron-builder accepts here because Windows
+# signAndEditExecutable is false, so rcedit (which wants four numbers) does not run.
+# The builder is called with --config.prop. Windows npm splits -c.prop into a filename.
+# The prove step sets shell: bash. windows-latest otherwise uses PowerShell, which
+# keeps going after a failed smoke. A Windows checkout is CRLF. The discovery smoke
+# accepts that.
+# Later: Windows code signing (so SmartScreen stops warning) and Mac notarization.
+# Both cost money and need Kirk's accounts. Not in 035.
+
+name: Desktop packs every OS
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'GitHub Release tag (default desktop-packs-v0.2)'
+        required: true
+        default: 'desktop-packs-v0.2'
+      publish:
+        description: 'Upload a GitHub Release (false keeps the artifacts only)'
+        type: boolean
+        default: true
+      prerelease:
+        description: 'Mark the release as a prerelease'
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'desktop-packs-v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-packs-every-os-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+jobs:
+  build-windows:
+    name: Build Windows (nsis + portable)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Prepare offline app fallback
+        shell: bash
+        run: bash ./build-and-release.sh --prepare-only
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prove discovery on Windows
+        shell: bash
+        run: |
+          node scripts/smoke-discover.js
+          node scripts/smoke-reconnect.js
+
+      - name: Build Windows packs (unsigned)
+        shell: bash
+        run: node node_modules/electron-builder/cli.js --win --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
+
+      - name: List dist
+        shell: bash
+        run: ls -la dist/
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-packs
+          path: |
+            desktop/dist/FreeLattice_*_Windows_Setup.exe
+            desktop/dist/FreeLattice_*_Windows_Portable.exe
+          if-no-files-found: error
+
+  build-linux:
+    name: Build Linux (AppImage + deb)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Prepare offline app fallback
+        run: bash ./build-and-release.sh --prepare-only
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prove discovery on Linux
+        shell: bash
+        run: |
+          node scripts/smoke-discover.js
+          node scripts/smoke-reconnect.js
+
+      - name: Build Linux packs (unsigned)
+        shell: bash
+        run: node node_modules/electron-builder/cli.js --linux --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
+
+      - name: List dist
+        run: ls -la dist/
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packs
+          path: |
+            desktop/dist/FreeLattice_*_Linux.AppImage
+            desktop/dist/FreeLattice_*_Linux.deb
+          if-no-files-found: error
+
+  build-mac:
+    name: Build Mac (zip + dmg)
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Prepare offline app fallback
+        run: bash ./build-and-release.sh --prepare-only
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prove discovery on Mac
+        shell: bash
+        run: |
+          node scripts/smoke-discover.js
+          node scripts/smoke-reconnect.js
+
+      - name: Build Mac packs (unsigned)
+        shell: bash
+        run: node node_modules/electron-builder/cli.js --mac --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: List dist
+        run: ls -la dist/
+
+      - name: Upload Mac artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-packs
+          path: |
+            desktop/dist/FreeLattice_*_macOS.zip
+            desktop/dist/FreeLattice_*_macOS.dmg
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish unsigned Release assets
+    needs: [build-windows, build-linux, build-mac]
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Windows packs
+        uses: actions/download-artifact@v4
+        with:
+          name: win-packs
+          path: release-assets
+
+      - name: Download Linux packs
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packs
+          path: release-assets
+
+      - name: Download Mac packs
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-packs
+          path: release-assets
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: List assets
+        run: ls -lah release-assets/
+
+      - name: Create or update GitHub Release (unsigned)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: FreeLattice Desktop packs (${{ steps.tag.outputs.name }})
+          draft: false
+          prerelease: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true') || contains(steps.tag.outputs.name, '-rc') }}
+          generate_release_notes: false
+          body: |
+            Unsigned for now. Windows may say Windows protected your PC. Tap More info, then Run anyway. That warning means the file has no paid signature yet, not that it is harmful. Mac: right click, Open. Linux: make the AppImage executable, then open it.
+
+            The file names still say 5.8.0. This tag is how you tell this pack from the older one.
+
+            Later: Windows code signing (so SmartScreen stops warning) and Mac notarization. Both cost money and need Kirk's accounts. Not in 035.
+          files: |
+            release-assets/FreeLattice_*_Windows_Setup.exe
+            release-assets/FreeLattice_*_Windows_Portable.exe
+            release-assets/FreeLattice_*_Linux.AppImage
+            release-assets/FreeLattice_*_Linux.deb
+            release-assets/FreeLattice_*_macOS.zip
+            release-assets/FreeLattice_*_macOS.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
