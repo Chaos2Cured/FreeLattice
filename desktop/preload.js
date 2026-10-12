@@ -211,6 +211,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeDiscoverOn: () => ipcRenderer.invoke('lattice-discover-on'),
   latticeDiscoverOff: () => ipcRenderer.invoke('lattice-discover-off'),
   latticeDiscoverLink: () => ipcRenderer.invoke('lattice-discover-link'), // v-phone-knocks-v0.1
+  // v-tree-reconnect-v0.1: read trusted devices, forget one, undo. No keep-on setter.
+  latticeDiscoverKin: () => ipcRenderer.invoke('lattice-discover-kin'),
+  latticeDiscoverForget: (fp) => ipcRenderer.invoke('lattice-discover-forget', fp),
+  latticeDiscoverForgetUndo: (fp) => ipcRenderer.invoke('lattice-discover-forget-undo', fp),
   latticeDiscoverPause: () => ipcRenderer.invoke('lattice-discover-pause'),
   latticeDiscoverResume: () => ipcRenderer.invoke('lattice-discover-resume'),
   latticeDiscoverAnswer: (joinId, answer) => ipcRenderer.invoke('lattice-discover-answer', joinId, answer),

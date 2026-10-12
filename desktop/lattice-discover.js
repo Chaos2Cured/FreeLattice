@@ -481,3 +481,505 @@ module.exports.relayHeaders = relayHeaders;
 module.exports.RELAY_SCRIPT_HASH = RELAY_SCRIPT_HASH;
 module.exports.RELAY_TOKEN_MS = RELAY_TOKEN_MS;
 module.exports.JOIN_HOME = JOIN_HOME;
+
+// ---------- v-tree-reconnect-v0.1 (034): a remembered phone comes back ----------
+// Wraps 033c. The 033 and 033c bodies stay as written. A phone that already joined
+// can knock again with a fresh challenge and its kin signature. No one-time link.
+// A remembered device is not asked again. Pause still wins. Keep-on is chosen only
+// in the native window. Added lines only.
+const RECONNECT_MS = 60 * 1000;
+const RECONNECT_MAX = 4;
+const UNDO_MS = 10 * 1000;
+const WORDS034 = {
+  keepOn: 'Turn on and keep it on',
+  keepOnLine: 'On. Stays on until you turn it off.',
+  reconnected: ' reconnected.',
+  forget: 'Forget this device',
+  forgetAll: 'Forget all devices',
+  forgetAllAsk: 'Forget every trusted device? Each one will need a new join link.',
+  forgotten: 'Forgotten.',
+  undo: 'Undo'
+};
+const RECONNECT_SCRIPT = [
+  '(function(){',
+  'var ALLOWED=' + JSON.stringify(RELAY_ORIGINS) + ';',
+  'var s=document.getElementById("s");function say(t){s.textContent=t;}',
+  'var done=false, chal="";',
+  'if(!window.opener){say("Open this from the phone, with the Tree.");return;}',
+  'function back(b, origin){try{window.opener.postMessage({type:"fl-knock-answer",v:1,ok:!!(b&&b.ok),answer:(b&&typeof b.answer==="string")?b.answer:"",choice:(b&&b.choice)||"",reason:(b&&b.reason)||""},origin);}catch(e){}}',
+  'window.addEventListener("message",function(ev){',
+  ' if(ev.source!==window.opener||ALLOWED.indexOf(ev.origin)===-1)return;',
+  ' var m=ev.data;if(!m||m.v!==1)return;',
+  ' if(m.type==="fl-reconnect-hello"){',
+  '  fetch("/challenge").then(function(r){return r.json();}).then(function(j){',
+  '   if(!j||typeof j.c!=="string"){say("This computer did not answer.");return;}',
+  '   chal=j.c; ev.source.postMessage({type:"fl-reconnect-challenge",v:1,c:j.c},ev.origin);',
+  '  }).catch(function(){say("This computer did not answer.");});',
+  '  return;',
+  ' }',
+  ' if(done||m.type!=="fl-reconnect"||typeof m.offer!=="string"||typeof m.card!=="string"||typeof m.challenge!=="string"||typeof m.sig!=="string")return;',
+  ' if(chal&&m.challenge!==chal)return;',
+  ' done=true;say("Asking the computer.");',
+  ' fetch("/knock?r=1",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({v:1,r:1,offer:m.offer,card:m.card,c:m.challenge,sig:m.sig})})',
+  ' .then(function(r){return r.status===204?{ok:false,reason:"no"}:r.json().catch(function(){return {ok:false,reason:"bad-reply"};});})',
+  ' .then(function(b){back(b, ev.origin);say(b&&b.ok?"Done. You can close this tab.":"Not reconnected.");setTimeout(function(){try{window.close();}catch(e){}},1500);},',
+  '  function(){back({ok:false,reason:"no-answer"}, ev.origin);say("This computer did not answer.");});',
+  '});',
+  '})();'
+].join('\n');
+const RECONNECT_SCRIPT_HASH = 'sha256-' + crypto.createHash('sha256').update(RECONNECT_SCRIPT, 'utf8').digest('base64');
+function relay034Html() {
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>FreeLattice reconnect</title></head><body style="font-family:system-ui,sans-serif;padding:24px;background:#0b0f1a;color:#e8ecf5">' +
+    '<p id="s">Waiting for the phone.</p><script>' + RECONNECT_SCRIPT + '</script></body></html>';
+}
+function relay034Headers() {
+  return { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY',
+    'Content-Security-Policy': "default-src 'none'; script-src '" + RECONNECT_SCRIPT_HASH + "'; connect-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'" };
+}
+function hex16(s) { const h = String(s || '').toLowerCase().slice(0, 16); return /^[0-9a-f]{16}$/.test(h) ? h : ''; }
+function verifyReconnectSig(card, sigB64, data) {
+  try {
+    if (!card || typeof sigB64 !== 'string' || sigB64.length > 400) return false;
+    const key = crypto.createPublicKey({ key: card.publicKey, format: 'jwk' });
+    const sig = Buffer.from(sigB64, 'base64');
+    if (card.cryptoType === 'ed25519') return crypto.verify(null, data, key, sig);
+    if (card.cryptoType === 'ecdsa-p256') return crypto.verify('sha256', data, { key, dsaEncoding: 'ieee-p1363' }, sig);
+  } catch (e) { return false; }
+  return false;
+}
+
+if (!fs.__fl034RealWrite) fs.__fl034RealWrite = fs.writeFileSync.bind(fs);
+if (!fs.__fl034RealStringify) {
+  fs.__fl034RealStringify = JSON.stringify;
+  const _realStringify = JSON.stringify;
+  JSON.stringify = function (v) {
+    const s = _realStringify.apply(JSON, arguments);
+    if (v && typeof v === 'object') fs.__fl034Last = { v: v, s: s };
+    return s;
+  };
+}
+
+const _createDiscover033c = createDiscover033c;
+function createDiscover034(deps) {
+  deps = deps || {};
+  const now = deps.now || (() => Date.now());
+  const storeDir = deps.storeDir || null;
+  const delayMs = deps.reconnectAskDelay == null ? 25 : Number(deps.reconnectAskDelay);
+  let capturedCounts = null;
+  const realAssign = Object.assign;
+  Object.assign = function (target) {
+    if (!capturedCounts && target && Object.prototype.hasOwnProperty.call(target, 'announced') &&
+        Object.prototype.hasOwnProperty.call(target, 'knocks') && Object.prototype.hasOwnProperty.call(target, 'autoOff')) {
+      capturedCounts = target;
+    }
+    return realAssign.apply(Object, arguments);
+  };
+  let innerPre = null;
+  if (typeof deps.preRequest === 'function') innerPre = deps.preRequest;
+  let d = null;
+  let reconnectSilent = null;
+  let lastPicked = null;
+  const realAsk = deps.ask;
+  deps.ask = async (q) => {
+    if (reconnectSilent) {
+      const choice = reconnectSilent.choice;
+      await new Promise((res) => { const t = setTimeout(res, delayMs); if (t.unref) t.unref(); });
+      return choice;
+    }
+    const picked = typeof realAsk === 'function' ? await realAsk(q) : 'no';
+    lastPicked = picked;
+    return picked;
+  };
+  try {
+    Object.defineProperty(deps, 'preRequest', {
+      configurable: true, enumerable: true,
+      get: function () { return chainedPre; },
+      set: function (fn) { innerPre = fn; }
+    });
+  } catch (e) {}
+  try { d = _createDiscover033c(deps); }
+  finally { Object.assign = realAssign; }
+  const counts = capturedCounts;
+
+  let challenges = {};
+  let challengeTimes = [];
+  let onFp = '';
+  let deskFp = '';
+  let portSaved = 0;
+  let keepOn = false;
+  let offDeadline = 0;
+  let innerKin = null;
+  let reconnectChoice = null;
+  const names = {};
+  const choiceMem = {};
+  const lastAtMem = {};
+  const mirror = {};
+  const stripped = new Set();
+  const banAt = {};
+  const forgotten = {};
+
+  function kinFile() { return storeDir ? path.join(storeDir, 'kin.json') : ''; }
+  function readJsonFile(p, fb) { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return fb; } }
+  function readKinFile() { const p = kinFile(); return p ? (readJsonFile(p, {}) || {}) : {}; }
+  function writeStore(name, value) {
+    if (!storeDir) return;
+    try { fs.mkdirSync(storeDir, { recursive: true }); fs.writeFileSync(path.join(storeDir, name), JSON.stringify(value)); } catch (e) {}
+  }
+  try {
+    const savedPort = Number(readJsonFile(storeDir ? path.join(storeDir, 'port.json') : '', {}).port);
+    if (savedPort > 0 && savedPort < 65536) portSaved = savedPort;
+  } catch (e) {}
+  try { keepOn = !!readJsonFile(storeDir ? path.join(storeDir, 'keepon.json') : '', {}).keepOn; } catch (e) {}
+  try {
+    const savedDesk = readJsonFile(storeDir ? path.join(storeDir, 'desk.json') : '', {});
+    if (hex16(savedDesk && savedDesk.fp)) deskFp = hex16(savedDesk.fp);
+  } catch (e) {}
+
+  function bumpBoth(k) {
+    if (!counts) return;
+    counts[k] = (Number(counts[k]) || 0) + 1;
+    writeStore('counts.json', counts);
+  }
+  function applyBans(obj) {
+    if (!obj || typeof obj !== 'object') return;
+    Array.from(stripped).forEach((fp) => {
+      const row = obj[fp];
+      if (!row) return;
+      if (banAt[fp] != null && Number(row.grantedAt) > banAt[fp]) { stripped.delete(fp); delete banAt[fp]; return; }
+      delete obj[fp];
+    });
+  }
+  function applyChoices(obj) {
+    Object.keys(choiceMem).forEach((fp) => {
+      if (obj[fp] && (choiceMem[fp] === 'help' || choiceMem[fp] === 'connect')) obj[fp].choice = choiceMem[fp];
+    });
+    Object.keys(lastAtMem).forEach((fp) => { if (obj[fp]) obj[fp].lastAt = lastAtMem[fp]; });
+  }
+  // Keep kin.json honest when 033 saves the whole map: a forgotten row stays gone,
+  // unless a new join link trusted it again (a later grantedAt).
+  const prevWrite = fs.writeFileSync;
+  fs.writeFileSync = function (p, data, enc) {
+    try {
+      if (kinFile() && path.resolve(String(p)) === path.resolve(kinFile())) {
+        const last = fs.__fl034Last;
+        if (last && last.s === String(data) && last.v && typeof last.v === 'object' && !Array.isArray(last.v)) {
+          if (!innerKin) innerKin = last.v;
+          if (last.v === innerKin) {
+            applyBans(innerKin);
+            applyChoices(innerKin);
+            data = fs.__fl034RealStringify(innerKin);
+          } else {
+            const copy = JSON.parse(fs.__fl034RealStringify(last.v));
+            applyBans(copy);
+            data = fs.__fl034RealStringify(copy);
+          }
+        }
+      }
+    } catch (e) {}
+    return prevWrite.call(fs, p, data, enc);
+  };
+
+  function recordFor(fp) {
+    if (stripped.has(fp)) return null;
+    if (kinFile()) {
+      const file = readKinFile();
+      if (file && file[fp]) return file[fp];
+      return null;
+    }
+    return mirror[fp] || null;
+  }
+  function ownFps() {
+    const list = [];
+    if (hex16(deskFp)) list.push(hex16(deskFp));
+    if (hex16(onFp) && list.indexOf(hex16(onFp)) === -1) list.push(hex16(onFp));
+    return list;
+  }
+  function noteDesk(result) {
+    try {
+      const ans = result && result.body && result.body.answer;
+      if (!ans || String(ans).indexOf('TREEPOOL1:') !== 0) return;
+      const json = JSON.parse(b64urlToBuf(String(ans).slice('TREEPOOL1:'.length)).toString('utf8'));
+      if (!json || typeof json.card !== 'string') return;
+      const v = verifyKinCard(parseKinCode(json.card), now());
+      if (!v.ok || !hex16(v.fp)) return;
+      deskFp = hex16(v.fp);
+      writeStore('desk.json', { fp: deskFp });
+    } catch (e) {}
+  }
+  function afterKnock(raw, result, mode) {
+    let v = null;
+    try { v = verifyKinCard(parseKinCode(JSON.parse(raw).card), now()); } catch (e) { v = null; }
+    if (v && v.ok) names[v.fp] = clip(v.body.name, 60);
+    const settled = result && result.body && (result.body.choice === 'help' || result.body.choice === 'connect');
+    if (v && v.ok && settled) {
+      const stored = mode === 'reconnect'
+        ? (reconnectChoice === 'help' ? 'help' : 'connect')
+        : (lastPicked === 'help' || lastPicked === 'connect' ? lastPicked : (result.body.choice === 'help' ? 'help' : 'connect'));
+      choiceMem[v.fp] = stored;
+      lastAtMem[v.fp] = now();
+      mirror[v.fp] = { keyHash: v.keyHash, grantedAt: now(), choice: stored, lastAt: now() };
+      if (mode === 'link') { stripped.delete(v.fp); delete banAt[v.fp]; }
+      offDeadline = now() + (Number(deps.autoOffMs) || AUTO_OFF_MS);
+      if (innerKin && innerKin[v.fp]) {
+        innerKin[v.fp].choice = stored;
+        innerKin[v.fp].lastAt = lastAtMem[v.fp];
+        writeStore('kin.json', innerKin);
+      } else if (kinFile()) {
+        const file = readKinFile();
+        if (file[v.fp]) { file[v.fp].choice = stored; file[v.fp].lastAt = lastAtMem[v.fp]; writeStore('kin.json', file); }
+      }
+    }
+    noteDesk(result);
+    if (mode === 'reconnect' && result && result.code === 200 && result.body && result.body.ok) {
+      bumpBoth('reconnects');
+      const nm = (v && v.ok && names[v.fp]) ? names[v.fp] : 'A device';
+      if (typeof deps.notify === 'function') { try { deps.notify(clip(nm, 60) + WORDS034.reconnected); } catch (e) {} }
+    }
+  }
+
+  function chainedPre(req, res) {
+    if (from034(req, res)) return true;
+    if (typeof innerPre === 'function') return innerPre(req, res);
+    return false;
+  }
+  function selfOrigin() {
+    if (!d) return '';
+    const st = d.status();
+    if (!st.on || !st.address || !st.port) return '';
+    return 'http://' + st.address + ':' + st.port;
+  }
+  function hostOk() {
+    return true;
+  }
+  function guard(req) {
+    const st = d.status();
+    const origin = String(req.headers.origin || '');
+    const host = String(req.headers.host || '');
+    const self = 'http://' + st.address + ':' + st.port;
+    const goodHost = host === st.address + ':' + st.port;
+    const goodOrigin = origin === self;
+    return { st, self, goodHost, goodOrigin };
+  }
+  function sendJson(res, code, obj) {
+    res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+    res.end(obj ? JSON.stringify(obj) : '');
+  }
+  function deny(res) {
+    bumpBoth('refused');
+    bumpBoth('reconnectRefused');
+    sendJson(res, 403, { ok: false, reason: 'not-remembered' });
+  }
+  function issueChallenge() {
+    const t = now();
+    Object.keys(challenges).forEach((c) => { if (!(challenges[c] > t)) delete challenges[c]; });
+    const keys = Object.keys(challenges);
+    while (keys.length >= RECONNECT_MAX) delete challenges[keys.shift()];
+    const c = crypto.randomBytes(16).toString('hex');
+    challenges[c] = t + RECONNECT_MS;
+    return c;
+  }
+  function challengeRateOk() {
+    const t = now();
+    challengeTimes = challengeTimes.filter((x) => t - x < RATE_WINDOW_MS);
+    if (challengeTimes.length >= RECONNECT_MAX) return false;
+    challengeTimes.push(t);
+    return true;
+  }
+  function takeChallenge(c) {
+    if (!c || !Object.prototype.hasOwnProperty.call(challenges, c)) return false;
+    const exp = challenges[c];
+    delete challenges[c];
+    return exp > now();
+  }
+  function hasR1(url) {
+    const q = String(url || '').split('?')[1] || '';
+    return q.split('&').indexOf('r=1') !== -1;
+  }
+  function from034(req, res) {
+    if (!d) return false;
+    const st = d.status();
+    if (!st.on || !st.address) return false;
+    const url = String(req.url || '');
+    const p = url.split('?')[0];
+    const g = guard(req);
+    if (req.method === 'GET' && p === '/relay' && hasR1(url)) {
+      if (!g.goodHost) { res.writeHead(403); res.end(); return true; }
+      res.writeHead(200, relay034Headers()); res.end(relay034Html()); return true;
+    }
+    if (req.method === 'GET' && p === '/challenge') {
+      if (!g.goodHost || !g.goodOrigin) { res.writeHead(403); res.end(); return true; }
+      if (!challengeRateOk()) { sendJson(res, 429, { ok: false, reason: 'slow-down' }); return true; }
+      sendJson(res, 200, { v: 1, c: issueChallenge() });
+      return true;
+    }
+    if (req.method === 'POST' && p === '/knock' && hasR1(url)) {
+      if (!g.goodHost || !g.goodOrigin) { deny(res); try { req.resume(); } catch (e) {} return true; }
+      let size = 0, dead = false; const chunks = [];
+      req.on('data', (c) => {
+        if (dead) return;
+        size += c.length;
+        if (size > MAX_BODY + 256) { dead = true; res.setHeader('Connection', 'close'); sendJson(res, 413, { ok: false, reason: 'too-big' }); }
+        else chunks.push(c);
+      });
+      req.on('end', () => {
+        if (dead) return;
+        let m = null;
+        try { m = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch (e) { deny(res); return; }
+        const card = parseKinCode(m && m.card);
+        const v = verifyKinCard(card, now());
+        if (!v.ok) { deny(res); return; }
+        const row = recordFor(v.fp);
+        if (!row || !row.keyHash || row.keyHash !== v.keyHash) { deny(res); return; }
+        const c = m && (typeof m.c === 'string' ? m.c : (typeof m.challenge === 'string' ? m.challenge : ''));
+        if (!takeChallenge(c)) { deny(res); return; }
+        const sigOk = ownFps().some((fp) => verifyReconnectSig(card, m.sig, Buffer.from('fl-reconnect|v1|' + c + '|' + fp + '|' + v.fp, 'utf8')));
+        if (!sigOk) { deny(res); return; }
+        names[v.fp] = clip(v.body.name, 60);
+        const remembered = row.choice === 'help' ? 'help' : 'connect';
+        reconnectChoice = remembered;
+        choiceMem[v.fp] = remembered;
+        reconnectSilent = { choice: remembered };
+        innerHandle(JSON.stringify({ v: 1, offer: m.offer, card: m.card })).then((r) => {
+          reconnectSilent = null;
+          afterKnock(JSON.stringify({ v: 1, offer: m.offer, card: m.card }), r, 'reconnect');
+          sendJson(res, r.code, r.body);
+        }, () => { reconnectSilent = null; sendJson(res, 500, { ok: false }); });
+      });
+      return true;
+    }
+    return false;
+  }
+
+  const innerHandle = d._handleKnock.bind(d);
+  d._handleKnock = (raw) => Promise.resolve(innerHandle(raw)).then((r) => { afterKnock(raw, r, 'link'); return r; });
+
+  const _off = d.off;
+  d.off = (why) => {
+    if (why === 'auto' && keepOn) return d.status();
+    challenges = {};
+    challengeTimes = [];
+    offDeadline = 0;
+    return _off(why);
+  };
+  const _status = d.status.bind(d);
+  d.status = () => {
+    const s = _status();
+    s.keepOn = !!keepOn;
+    s.offAt = s.on && !keepOn ? offDeadline : 0;
+    return s;
+  };
+  const _on = d.on;
+  d.on = function (fp) {
+    onFp = String(fp || '').toLowerCase().slice(0, 16);
+    const origListen = http.Server.prototype.listen;
+    let tried = false;
+    function rememberPort(server) {
+      try {
+        const a = server.address();
+        if (a && a.port > 0 && a.port < 65536) { portSaved = a.port; writeStore('port.json', { port: a.port }); }
+      } catch (e) {}
+    }
+    http.Server.prototype.listen = function (port, host, cb) {
+      if (typeof host === 'function') { cb = host; host = undefined; }
+      const self = this;
+      function wrap(fn) {
+        return function () { rememberPort(self); if (typeof fn === 'function') return fn.apply(this, arguments); };
+      }
+      if (!tried && port === 0 && portSaved > 0 && portSaved < 65536) {
+        tried = true;
+        const prior = self.listeners('error').slice();
+        self.removeAllListeners('error');
+        const onErr = (err) => {
+          self.removeListener('error', onErr);
+          prior.forEach((fn) => self.on('error', fn));
+          if (err && err.code === 'EADDRINUSE') { origListen.call(self, 0, host, wrap(cb)); return; }
+          self.emit('error', err);
+        };
+        self.on('error', onErr);
+        origListen.call(self, portSaved, host, function () {
+          self.removeListener('error', onErr);
+          const have = self.listeners('error');
+          prior.forEach((fn) => { if (have.indexOf(fn) === -1) self.on('error', fn); });
+          rememberPort(self);
+          if (typeof cb === 'function') cb.apply(this, arguments);
+        });
+        return self;
+      }
+      return origListen.call(self, port, host, wrap(cb));
+    };
+    return Promise.resolve(_on(fp)).then((st) => {
+      if (st && st.on) offDeadline = now() + (Number(deps.autoOffMs) || AUTO_OFF_MS);
+      return st;
+    }).finally(() => { http.Server.prototype.listen = origListen; });
+  };
+  d.keepOn = () => !!keepOn;
+  d.rememberKeepOn = (v) => {
+    keepOn = !!v;
+    writeStore('keepon.json', { keepOn: keepOn });
+    return { keepOn: keepOn };
+  };
+  d.forget = (fp) => {
+    fp = hex16(fp);
+    const file = readKinFile();
+    const row = (innerKin && innerKin[fp]) || file[fp] || mirror[fp];
+    if (!fp || !row) return { ok: false, reason: 'none' };
+    const snap = Object.assign({}, row);
+    stripped.add(fp);
+    banAt[fp] = now();
+    forgotten[fp] = { row: snap, until: now() + UNDO_MS };
+    delete mirror[fp];
+    if (innerKin && innerKin[fp]) delete innerKin[fp];
+    const next = readKinFile();
+    delete next[fp];
+    if (kinFile()) writeStore('kin.json', next);
+    bumpBoth('forgotten');
+    return { ok: true, fp: fp };
+  };
+  d.forgetUndo = (fp) => {
+    fp = hex16(fp);
+    const s = forgotten[fp];
+    if (!fp || !s || !(now() < s.until)) { if (s) delete forgotten[fp]; return { ok: false, reason: 'too-late' }; }
+    stripped.delete(fp);
+    delete banAt[fp];
+    mirror[fp] = Object.assign({}, s.row);
+    if (s.row && (s.row.choice === 'help' || s.row.choice === 'connect')) choiceMem[fp] = s.row.choice;
+    if (innerKin) innerKin[fp] = Object.assign({}, s.row);
+    const file = readKinFile();
+    file[fp] = Object.assign({}, s.row);
+    if (kinFile()) writeStore('kin.json', file);
+    delete forgotten[fp];
+    return { ok: true, fp: fp };
+  };
+  d.kinList = () => {
+    const file = kinFile() ? readKinFile() : mirror;
+    return Object.keys(file || {}).filter((fp) => file[fp] && !stripped.has(fp) && hex16(fp)).map((fp) => ({
+      fp: fp,
+      name: clip(names[fp] || '', 60),
+      choice: (file[fp].choice === 'help' || choiceMem[fp] === 'help') ? 'help' : 'connect',
+      lastAt: Number(file[fp].lastAt || lastAtMem[fp] || file[fp].grantedAt) || 0
+    }));
+  };
+  d._liveChallenges = () => {
+    const t = now();
+    Object.keys(challenges).forEach((c) => { if (!(challenges[c] > t)) delete challenges[c]; });
+    return Object.keys(challenges).length;
+  };
+  // 033 arms auto-off with its own timer and calls its own off, not d.off.
+  // While keep-on is set, that timer does nothing. A page cannot set keep-on.
+  const autoMs = Number(deps.autoOffMs) || AUTO_OFF_MS;
+  const prevTimeout = global.setTimeout;
+  global.setTimeout = function (fn, ms) {
+    if (typeof fn === 'function' && ms === autoMs) {
+      const wrapped = () => { if (keepOn) return; return fn(); };
+      return prevTimeout(wrapped, ms);
+    }
+    return prevTimeout.apply(global, arguments);
+  };
+  return d;
+}
+module.exports.createDiscover = createDiscover034;
+module.exports.createDiscover034 = createDiscover034;
+module.exports.WORDS034 = WORDS034;
+module.exports.RECONNECT_SCRIPT_HASH = RECONNECT_SCRIPT_HASH;

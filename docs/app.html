@@ -15392,6 +15392,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/pool-knock.js" defer></script>
 <!-- v-phone-knocks-v0.1 (033c): does nothing outside the desktop app -->
 <script src="modules/pool-knock-link.js" defer></script>
+<!-- v-tree-reconnect-v0.1 (034): trusted devices and the keep-on line. A page can read keep-on. It cannot set it. -->
+<script src="modules/pool-reconnect-desk.js" defer></script>
 <!-- v-fl-card-glow-v0: the Tree's card light on More, Learn and Community cards (CSS layer, adds only) -->
 <link rel="stylesheet" href="modules/fl-card-glow.css">
 </head>
@@ -18688,6 +18690,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="flKinQueueHost" style="margin-top: 14px;"></div>
     <!-- v-device-pool-v0.1 -->
     <div id="flPoolHost" style="margin-top: 14px;"></div>
+    <!-- v-tree-reconnect-v0.1 (034): the truth line, then trusted devices. Empty in a browser. -->
+    <div id="pool-reconnect-host" style="margin-top: 14px;"></div>
     <!-- v-page-answers-knock-v0.1 (033b): the home Wi-Fi switch, desktop app only; empty in a browser -->
     <div id="pool-knock-host" style="margin-top: 14px;"></div>
     <!-- v-phone-knocks-v0.1 (033c): a one-time join link and picture code for one phone, desktop app only -->

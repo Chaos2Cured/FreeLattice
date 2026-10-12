@@ -1344,6 +1344,15 @@ function setupIPC() {
       mainWindow.webContents.send('lattice-discover-knock', { joinId: k.joinId, offer: k.offer, fp: k.fp, name: k.name, choice: k.choice });
       setTimeout(() => { if (_dpPending.has(k.joinId)) { _dpPending.delete(k.joinId); resolve(''); } }, 60000);
     })
+    , notify: (text) => {
+      // v-tree-reconnect-v0.1: a small note, no buttons. "<device> reconnected."
+      try {
+        const body = String(text || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 140);
+        if (!body || typeof Notification !== 'function') return;
+        const n = new Notification({ title: 'FreeLattice', body: body });
+        if (n && n.show) n.show();
+      } catch (e) {}
+    }
   });
   latticeDiscoverDoor = _dp;
   ipcMain.handle('lattice-discover-status', () => _dp.status());
@@ -1377,6 +1386,33 @@ function setupIPC() {
     done(a.length <= latticeDiscover.MAX_BODY ? a : '');
     return { ok: true };
   });
+  // v-tree-reconnect-v0.1: the page may read trusted devices and forget one. Added beside 033.
+  ipcMain.handle('lattice-discover-kin', () => (typeof _dp.kinList === 'function' ? _dp.kinList() : []));
+  ipcMain.handle('lattice-discover-forget', (_event, fp) => (typeof _dp.forget === 'function' ? _dp.forget(fp) : { ok: false, reason: 'old-app' }));
+  ipcMain.handle('lattice-discover-forget-undo', (_event, fp) => (typeof _dp.forgetUndo === 'function' ? _dp.forgetUndo(fp) : { ok: false, reason: 'old-app' }));
+  // Keep-on is a second choice in the native Turn on window only. The handler above still
+  // treats response 0 as Turn on and anything else as Not now. This wrap adds the words and
+  // maps the tap. A page has no IPC that writes keepon.json.
+  const _flShowBox034 = dialog.showMessageBox.bind(dialog);
+  dialog.showMessageBox = function (a, b) {
+    const opts = (b && typeof b === 'object') ? b : a;
+    const win = (b && typeof b === 'object') ? a : undefined;
+    try {
+      const W = latticeDiscover.WORDS;
+      const K = latticeDiscover.WORDS034;
+      if (K && opts && Array.isArray(opts.buttons) && opts.buttons.length === 2 && opts.buttons[0] === W.turnOn && opts.buttons[1] === W.notNow && _dp && typeof _dp.rememberKeepOn === 'function') {
+        const prefer = typeof _dp.keepOn === 'function' && !!_dp.keepOn();
+        const buttons = prefer ? [K.keepOn, W.turnOn, W.notNow] : [W.turnOn, K.keepOn, W.notNow];
+        return Promise.resolve(_flShowBox034(win, Object.assign({}, opts, { buttons: buttons, defaultId: buttons.length - 1, cancelId: buttons.length - 1, noLink: true }))).then((r) => {
+          const picked = buttons[r.response];
+          if (picked === K.keepOn) { try { _dp.rememberKeepOn(true); } catch (e) {} return { response: 0 }; }
+          if (picked === W.turnOn) { try { _dp.rememberKeepOn(false); } catch (e) {} return { response: 0 }; }
+          return { response: 1 };
+        });
+      }
+    } catch (e) {}
+    return _flShowBox034(win, opts);
+  };
 
   // ── Force reload from live site (clears cache) ──
   ipcMain.handle('force-reload-live', async () => {
