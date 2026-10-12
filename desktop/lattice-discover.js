@@ -209,7 +209,11 @@ function createDiscover(deps) {
 
   function armAutoOff() {
     if (autoOffTimer) clearTimeout(autoOffTimer);
-    autoOffTimer = setTimeout(() => { bump('autoOff'); off('auto'); }, deps.autoOffMs || AUTO_OFF_MS);
+    autoOffTimer = setTimeout(() => {
+      // v-reconnect-hook-heal-v0.1: this door only. Re-arm so a later clear still gets a fresh window.
+      if (typeof deps.holdAutoOff === 'function' && deps.holdAutoOff()) { armAutoOff(); return; }
+      bump('autoOff'); off('auto');
+    }, deps.autoOffMs || AUTO_OFF_MS);
     if (autoOffTimer.unref) autoOffTimer.unref();
   }
 
@@ -247,12 +251,22 @@ function createDiscover(deps) {
     try {
       const device = clip(v.body.name, 60) || 'A device';
       const pausedAtAsk = state.paused;
-      const picked = await ask({
+      const question = {
         title: 'Pool with ' + device + '?',
         message: 'Pool with ' + device + '?',
         detail: device + ' on this Wi-Fi wants to join. Card ' + v.fp + '. Only say Yes to a device you know.',
         choices: choicesFor(pausedAtAsk)
-      });
+      };
+      // v-reconnect-hook-heal-v0.1: a remembered choice skips the window. Null asks as before.
+      let picked = null;
+      const silent = typeof deps.silentChoice === 'function' ? deps.silentChoice(question) : null;
+      if (silent === 'help' || silent === 'connect') {
+        const delayMs = deps.reconnectAskDelay == null ? 25 : Number(deps.reconnectAskDelay);
+        await new Promise((res) => { const timer = setTimeout(res, delayMs); if (timer.unref) timer.unref(); });
+        picked = silent;
+      } else {
+        picked = await ask(question);
+      }
       // Pause always wins, even if it was pressed while the window was open.
       const choice = settleChoice(picked, state.paused || pausedAtAsk);
       if (choice === 'no') { bump('no'); return { code: 204, body: null }; }
@@ -276,6 +290,7 @@ function createDiscover(deps) {
   }
 
   function onRequest(req, res) {
+    if (typeof deps.preRequest034 === 'function' && deps.preRequest034(req, res)) return; // v-reconnect-hook-heal-v0.1
     if (typeof deps.preRequest === 'function' && deps.preRequest(req, res)) return; // v-phone-knocks-v0.1
     const origin = req.headers.origin || '';
     if (!originAllowed(origin, appOrigin())) { bump('refused'); res.writeHead(403, { 'Connection': 'close' }); res.end(); req.resume(); return; }
@@ -310,10 +325,21 @@ function createDiscover(deps) {
       server = http.createServer(onRequest);
       server.headersTimeout = 10000;
       server.requestTimeout = ANSWER_WAIT_MS + 30000;
-      server.on('error', () => { off('error'); resolve(Object.assign(status(), { ok: false, reason: 'listen-failed' })); });
-      server.listen(0, pick.address, () => {
+      // v-reconnect-hook-heal-v0.1: try the remembered port once, then the same listen(0) path.
+      let preferred = 0;
+      try {
+        if (typeof deps.preferredPort === 'function') {
+          const n = Number(deps.preferredPort());
+          if (n >= 1 && n <= 65535 && n === Math.floor(n)) preferred = n;
+        }
+      } catch (e) { preferred = 0; }
+      let retried = false;
+      let ready = false;
+      function finish(obj) { if (ready) return; ready = true; resolve(obj); }
+      function onUp() {
         const a = server.address();
-        if (!a || !safeBindAddress(a.address, { smokeLoopback })) { off('bind'); resolve(Object.assign(status(), { ok: false, reason: 'bad-bind' })); return; }
+        if (!a || !safeBindAddress(a.address, { smokeLoopback })) { off('bind'); finish(Object.assign(status(), { ok: false, reason: 'bad-bind' })); return; }
+        try { if (typeof deps.onBound === 'function') deps.onBound(a.port); } catch (e) {}
         state = { on: true, paused: state.paused, address: a.address, port: a.port, instance: 'fl-' + crypto.randomBytes(4).toString('hex'), since: now() };
         if (mdnsFactory) {
           try {
@@ -324,8 +350,22 @@ function createDiscover(deps) {
           } catch (e) { mdns = null; service = null; }
         }
         armAutoOff();
-        resolve(Object.assign(status(), { ok: true }));
-      });
+        finish(Object.assign(status(), { ok: true }));
+      }
+      function onListenErr(err) {
+        if (ready) return;
+        if (!retried && preferred && err && err.code === 'EADDRINUSE') {
+          retried = true;
+          server.removeListener('error', onListenErr);
+          server.on('error', onListenErr);
+          server.listen(0, pick.address, onUp);
+          return;
+        }
+        off('error');
+        finish(Object.assign(status(), { ok: false, reason: 'listen-failed' }));
+      }
+      server.on('error', onListenErr);
+      server.listen(preferred || 0, pick.address, onUp);
     });
   }
 
@@ -566,7 +606,6 @@ function createDiscover034(deps) {
   deps = deps || {};
   const now = deps.now || (() => Date.now());
   const storeDir = deps.storeDir || null;
-  const delayMs = deps.reconnectAskDelay == null ? 25 : Number(deps.reconnectAskDelay);
   let capturedCounts = null;
   const realAssign = Object.assign;
   Object.assign = function (target) {
@@ -576,29 +615,8 @@ function createDiscover034(deps) {
     }
     return realAssign.apply(Object, arguments);
   };
-  let innerPre = null;
-  if (typeof deps.preRequest === 'function') innerPre = deps.preRequest;
   let d = null;
   let reconnectSilent = null;
-  let lastPicked = null;
-  const realAsk = deps.ask;
-  deps.ask = async (q) => {
-    if (reconnectSilent) {
-      const choice = reconnectSilent.choice;
-      await new Promise((res) => { const t = setTimeout(res, delayMs); if (t.unref) t.unref(); });
-      return choice;
-    }
-    const picked = typeof realAsk === 'function' ? await realAsk(q) : 'no';
-    lastPicked = picked;
-    return picked;
-  };
-  try {
-    Object.defineProperty(deps, 'preRequest', {
-      configurable: true, enumerable: true,
-      get: function () { return chainedPre; },
-      set: function (fn) { innerPre = fn; }
-    });
-  } catch (e) {}
   try { d = _createDiscover033c(deps); }
   finally { Object.assign = realAssign; }
   const counts = capturedCounts;
@@ -716,7 +734,7 @@ function createDiscover034(deps) {
     if (v && v.ok && settled) {
       const stored = mode === 'reconnect'
         ? (reconnectChoice === 'help' ? 'help' : 'connect')
-        : (lastPicked === 'help' || lastPicked === 'connect' ? lastPicked : (result.body.choice === 'help' ? 'help' : 'connect'));
+        : (result.body.choice === 'help' ? 'help' : 'connect');
       choiceMem[v.fp] = stored;
       lastAtMem[v.fp] = now();
       mirror[v.fp] = { keyHash: v.keyHash, grantedAt: now(), choice: stored, lastAt: now() };
@@ -739,11 +757,6 @@ function createDiscover034(deps) {
     }
   }
 
-  function chainedPre(req, res) {
-    if (from034(req, res)) return true;
-    if (typeof innerPre === 'function') return innerPre(req, res);
-    return false;
-  }
   function selfOrigin() {
     if (!d) return '';
     const st = d.status();
@@ -873,46 +886,10 @@ function createDiscover034(deps) {
   const _on = d.on;
   d.on = function (fp) {
     onFp = String(fp || '').toLowerCase().slice(0, 16);
-    const origListen = http.Server.prototype.listen;
-    let tried = false;
-    function rememberPort(server) {
-      try {
-        const a = server.address();
-        if (a && a.port > 0 && a.port < 65536) { portSaved = a.port; writeStore('port.json', { port: a.port }); }
-      } catch (e) {}
-    }
-    http.Server.prototype.listen = function (port, host, cb) {
-      if (typeof host === 'function') { cb = host; host = undefined; }
-      const self = this;
-      function wrap(fn) {
-        return function () { rememberPort(self); if (typeof fn === 'function') return fn.apply(this, arguments); };
-      }
-      if (!tried && port === 0 && portSaved > 0 && portSaved < 65536) {
-        tried = true;
-        const prior = self.listeners('error').slice();
-        self.removeAllListeners('error');
-        const onErr = (err) => {
-          self.removeListener('error', onErr);
-          prior.forEach((fn) => self.on('error', fn));
-          if (err && err.code === 'EADDRINUSE') { origListen.call(self, 0, host, wrap(cb)); return; }
-          self.emit('error', err);
-        };
-        self.on('error', onErr);
-        origListen.call(self, portSaved, host, function () {
-          self.removeListener('error', onErr);
-          const have = self.listeners('error');
-          prior.forEach((fn) => { if (have.indexOf(fn) === -1) self.on('error', fn); });
-          rememberPort(self);
-          if (typeof cb === 'function') cb.apply(this, arguments);
-        });
-        return self;
-      }
-      return origListen.call(self, port, host, wrap(cb));
-    };
     return Promise.resolve(_on(fp)).then((st) => {
       if (st && st.on) offDeadline = now() + (Number(deps.autoOffMs) || AUTO_OFF_MS);
       return st;
-    }).finally(() => { http.Server.prototype.listen = origListen; });
+    });
   };
   d.keepOn = () => !!keepOn;
   d.rememberKeepOn = (v) => {
@@ -966,17 +943,20 @@ function createDiscover034(deps) {
     Object.keys(challenges).forEach((c) => { if (!(challenges[c] > t)) delete challenges[c]; });
     return Object.keys(challenges).length;
   };
-  // 033 arms auto-off with its own timer and calls its own off, not d.off.
-  // While keep-on is set, that timer does nothing. A page cannot set keep-on.
-  const autoMs = Number(deps.autoOffMs) || AUTO_OFF_MS;
-  const prevTimeout = global.setTimeout;
-  global.setTimeout = function (fn, ms) {
-    if (typeof fn === 'function' && ms === autoMs) {
-      const wrapped = () => { if (keepOn) return; return fn(); };
-      return prevTimeout(wrapped, ms);
-    }
-    return prevTimeout.apply(global, arguments);
+  // v-reconnect-hook-heal-v0.1: these three live inside the 033 door. A page still cannot set keep-on.
+  deps.holdAutoOff = function () { return !!keepOn; };
+  deps.preferredPort = function () { return (portSaved >= 1 && portSaved <= 65535) ? portSaved : 0; };
+  deps.onBound = function (port) {
+    const n = Number(port);
+    if (!(n >= 1 && n <= 65535 && n === Math.floor(n))) return;
+    portSaved = n;
+    writeStore('port.json', { port: n });
   };
+  deps.silentChoice = function () {
+    if (!reconnectSilent) return null;
+    return reconnectSilent.choice === 'help' ? 'help' : 'connect';
+  };
+  deps.preRequest034 = function (req, res) { return from034(req, res); };
   return d;
 }
 module.exports.createDiscover = createDiscover034;

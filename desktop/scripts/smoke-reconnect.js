@@ -46,6 +46,10 @@ function req(port, method, p, headers, body) {
 }
 
 (async () => {
+  // v-reconnect-hook-heal-v0.1: these stay the originals. The door does not patch the process.
+  const origTimeout = global.setTimeout;
+  const origListen = http.Server.prototype.listen;
+
   // ---- 16 and 18 can be read before any listener ----
   const pre = fs.readFileSync(path.join(__dirname, '..', 'preload.js'), 'utf8');
   const main = fs.readFileSync(path.join(__dirname, '..', 'main.js'), 'utf8');
@@ -301,7 +305,56 @@ function req(port, method, p, headers, body) {
   ok(oldPage.code === 200 && oldPage.body.indexOf('fl-relay-ready') !== -1 && oldPage.body.indexOf('fl-reconnect-hello') === -1, 'plain relay is still the 033c page');
   doorR.off('tap');
 
+  // ---- v-reconnect-hook-heal-v0.1: the hooks stay inside the door ----
+  ok(global.setTimeout === origTimeout, 'setTimeout is the original after createDiscover034');
+  const tmpH = fs.mkdtempSync(path.join(os.tmpdir(), 'fl-reconnect-hooks-'));
+  let asksH = 0;
+  const doorH = D.createDiscover({
+    storeDir: tmpH, smokeLoopback: true, autoOffMs: 3600000,
+    ask: async () => { asksH++; return 'help'; },
+    answerOffer: async () => answerCode
+  });
+  ok(http.Server.prototype.listen === origListen, 'listen is the original before on');
+  const pendingH = doorH.on(deskFp);
+  ok(http.Server.prototype.listen === origListen, 'listen is the original during on');
+  const stH = await pendingH;
+  ok(http.Server.prototype.listen === origListen && stH.on, 'listen is the original after on');
+  const hostH = '127.0.0.1:' + stH.port;
+  const HH = { Host: hostH, Origin: 'http://' + hostH };
+  const linkH = doorH.joinLink();
+  const tokH = JSON.parse(Buffer.from(linkH.url.split('#fl-knock=')[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString()).t;
+  const asked = await req(stH.port, 'POST', '/knock', HH, JSON.stringify({ v: 1, offer: invite, card: reed.code, t: tokH }));
+  ok(asked.code === 200 && asksH === 1, 'no silent choice: the window is asked');
+  doorH.pause();
+  const chH = await req(stH.port, 'GET', '/challenge', HH);
+  const cH = JSON.parse(chH.body).c;
+  const pausedH = await req(stH.port, 'POST', '/knock?r=1', HH, JSON.stringify({
+    v: 1, r: 1, offer: invite, card: reed.code, c: cH, sig: sign(reed.kp, cH, deskFp, reed.fp)
+  }));
+  ok(pausedH.code === 200 && JSON.parse(pausedH.body).choice === 'connect' && asksH === 1, 'silent choice help while paused comes back as connect');
+  doorH.off('tap');
+
+  const hookMs = 200;
+  let outsideFired = false;
+  const tmpT = fs.mkdtempSync(path.join(os.tmpdir(), 'fl-reconnect-hooks-time-'));
+  const doorT = D.createDiscover({
+    storeDir: tmpT, smokeLoopback: true, autoOffMs: hookMs,
+    ask: async () => 'no', answerOffer: async () => ''
+  });
+  doorT.rememberKeepOn(true);
+  const stT = await doorT.on(deskFp);
+  ok(stT.on && doorT.status().keepOn === true, 'keep-on is set for the outside timer');
+  setTimeout(() => { outsideFired = true; }, hookMs);
+  await sleep(hookMs * 2 + 80);
+  ok(outsideFired, 'outside timer of autoOffMs still fires while keep-on is set');
+  ok(doorT.status().on === true && (doorT.status().counts.autoOff || 0) === 0, 'keep-on set: auto-off does not turn the switch off');
+  ok(global.setTimeout === origTimeout && http.Server.prototype.listen === origListen, 'setTimeout and listen stay the originals while the door is up');
+  doorT.rememberKeepOn(false);
+  await sleep(hookMs + 120);
+  ok(doorT.status().on === false, 'keep-on cleared: off within one autoOffMs');
+
   console.log('checks passed: ' + passed);
   console.log('SMOKE_OK tree reconnect v0.1');
+  console.log('SMOKE_OK reconnect hooks v0.1');
   process.exit(0);
 })().catch((e) => { console.log('FAIL ' + (e && e.stack ? e.stack : e)); process.exit(1); });
