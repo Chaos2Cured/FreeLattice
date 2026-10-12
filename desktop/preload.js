@@ -205,6 +205,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
    */
   latticePairClear: () => ipcRenderer.invoke('lattice-pair-clear'),
 
+  // v-desktop-pooling-v0.1: home Wi-Fi discovery. Public fields only. Turning on and
+  // resuming each open a native window in main; the page cannot skip that tap.
+  latticeDiscoverStatus: () => ipcRenderer.invoke('lattice-discover-status'),
+  latticeDiscoverOn: () => ipcRenderer.invoke('lattice-discover-on'),
+  latticeDiscoverOff: () => ipcRenderer.invoke('lattice-discover-off'),
+  latticeDiscoverPause: () => ipcRenderer.invoke('lattice-discover-pause'),
+  latticeDiscoverResume: () => ipcRenderer.invoke('lattice-discover-resume'),
+  latticeDiscoverAnswer: (joinId, answer) => ipcRenderer.invoke('lattice-discover-answer', joinId, answer),
+  onLatticeDiscoverKnock: (callback) => {
+    const handler = (_event, k) => callback({ joinId: k.joinId, offer: k.offer, fp: k.fp, name: k.name, choice: k.choice });
+    ipcRenderer.on('lattice-discover-knock', handler);
+    return () => ipcRenderer.removeListener('lattice-discover-knock', handler);
+  },
+
   /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes

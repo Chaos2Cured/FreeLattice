@@ -21,6 +21,8 @@ const latticeImport = require('./lattice-import');
 const latticeSwarm = require('./lattice-swarm');
 const latticePair = require('./lattice-pair');
 const latticeUpdate = require('./lattice-update'); // v-desktop-update-button-v0.1
+const latticeDiscover = require('./lattice-discover'); // v-desktop-pooling-v0.1
+let latticeDiscoverDoor = null; // v-desktop-pooling-v0.1
 
 // electron-store for persisting window state
 let Store;
@@ -245,7 +247,30 @@ function ollamaDoorOpen(method, ollamaPath) {
 }
 // end v-narrow-door-v0.1 table
 
+// v-desktop-pooling-v0.1 heal: strip any Access-Control-Allow-Origin and echo the app's own
+// origin only (http://127.0.0.1:<port>), never a star. Exported for the headless test.
+function narrowProxyHeaders(headers, origin, port) {
+  const out = {};
+  for (const k of Object.keys(headers || {})) {
+    if (k.toLowerCase() === 'access-control-allow-origin') continue;
+    out[k] = headers[k];
+  }
+  const self = 'http://127.0.0.1:' + port;
+  if (port && (origin || '') === self) { out['Access-Control-Allow-Origin'] = self; out['Vary'] = 'Origin'; }
+  return out;
+}
+
 function proxyToOllama(req, res, ollamaPath) {
+  // v-desktop-pooling-v0.1 heal: this proxy used to answer Access-Control-Allow-Origin star
+  // on every reply and on the 502, which undid v-narrow-door-v0.1. Every head written here
+  // now passes through narrowProxyHeaders, so only this app's own page origin is echoed.
+  // The older lines below stay as they were written (layer, never delete).
+  const _pdWriteHead = res.writeHead.bind(res);
+  res.writeHead = function (code, a1, a2) {
+    if (a2 && typeof a2 === 'object') return _pdWriteHead(code, a1, narrowProxyHeaders(a2, req.headers.origin, serverPort));
+    if (a1 && typeof a1 === 'object') return _pdWriteHead(code, narrowProxyHeaders(a1, req.headers.origin, serverPort));
+    return _pdWriteHead(code, a1, a2);
+  };
   const chunks = [];
   req.on('data', (chunk) => chunks.push(chunk));
   req.on('end', () => {
@@ -1293,6 +1318,64 @@ function setupIPC() {
     }
   });
 
+  // ── v-desktop-pooling-v0.1: home Wi-Fi discovery. Off by default. Every turn-on and
+  // every resume is a native window with a human tap; a page can never do either alone.
+  // Pause always wins. Public fields only cross to the page; keys stay in main.
+  const _dpPending = new Map(); // joinId -> resolve(answer)
+  const _dp = latticeDiscover.createDiscover({
+    storeDir: path.join(app.getPath('userData'), 'lattice-discover'),
+    appOrigin: () => 'http://127.0.0.1:' + serverPort,
+    mdns: (opts) => {
+      const { Bonjour } = require('bonjour-service');
+      return new Bonjour({ interface: opts.interface });
+    },
+    ask: async (q) => {
+      const buttons = q.choices.map((c) => c.label);
+      const r = await dialog.showMessageBox(mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined, {
+        type: 'question', title: q.title, message: q.message, detail: q.detail,
+        buttons, defaultId: buttons.length - 1, cancelId: buttons.length - 1, noLink: true
+      });
+      const c = q.choices[r.response];
+      return c ? c.id : 'no';
+    },
+    answerOffer: (k) => new Promise((resolve) => {
+      if (!mainWindow || mainWindow.isDestroyed()) { resolve(''); return; }
+      _dpPending.set(k.joinId, resolve);
+      mainWindow.webContents.send('lattice-discover-knock', { joinId: k.joinId, offer: k.offer, fp: k.fp, name: k.name, choice: k.choice });
+      setTimeout(() => { if (_dpPending.has(k.joinId)) { _dpPending.delete(k.joinId); resolve(''); } }, 60000);
+    })
+  });
+  latticeDiscoverDoor = _dp;
+  ipcMain.handle('lattice-discover-status', () => _dp.status());
+  ipcMain.handle('lattice-discover-on', async () => {
+    const W = latticeDiscover.WORDS;
+    const r = await dialog.showMessageBox(mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined, {
+      type: 'question', title: W.switchLabel, message: W.switchLabel + '?', detail: W.switchAsk,
+      buttons: [W.turnOn, W.notNow], defaultId: 1, cancelId: 1, noLink: true
+    });
+    if (r.response !== 0) return Object.assign(_dp.status(), { ok: false, reason: 'not-now' });
+    let fp = '';
+    try { fp = String((latticeKeys.status() || {}).fingerprintHex || '').slice(0, 16); } catch (e) {}
+    return _dp.on(fp);
+  });
+  ipcMain.handle('lattice-discover-off', () => _dp.off('tap'));
+  ipcMain.handle('lattice-discover-pause', () => _dp.pause());
+  ipcMain.handle('lattice-discover-resume', async () => {
+    const W = latticeDiscover.WORDS;
+    const r = await dialog.showMessageBox(mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined, {
+      type: 'question', title: W.resumeAsk, message: W.resumeAsk, buttons: [W.resume, W.stayPaused], defaultId: 1, cancelId: 1, noLink: true
+    });
+    return r.response === 0 ? _dp.resume() : _dp.status();
+  });
+  ipcMain.handle('lattice-discover-answer', (_event, joinId, answer) => {
+    const done = _dpPending.get(String(joinId || ''));
+    if (!done) return { ok: false, reason: 'no-join' };
+    _dpPending.delete(String(joinId));
+    const a = String(answer || '');
+    done(a.length <= latticeDiscover.MAX_BODY ? a : '');
+    return { ok: true };
+  });
+
   // ── Force reload from live site (clears cache) ──
   ipcMain.handle('force-reload-live', async () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
@@ -1399,6 +1482,8 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   app.isQuitting = true;
   stopOllamaPolling();
+  // v-desktop-pooling-v0.1: the Wi-Fi switch is off on quit, always.
+  try { if (latticeDiscoverDoor) latticeDiscoverDoor.off('quit'); } catch (e) {}
 
   if (localServer) {
     localServer.close();
