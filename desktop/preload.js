@@ -210,6 +210,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   latticeDiscoverStatus: () => ipcRenderer.invoke('lattice-discover-status'),
   latticeDiscoverOn: () => ipcRenderer.invoke('lattice-discover-on'),
   latticeDiscoverOff: () => ipcRenderer.invoke('lattice-discover-off'),
+  latticeDiscoverLink: () => ipcRenderer.invoke('lattice-discover-link'), // v-phone-knocks-v0.1
   latticeDiscoverPause: () => ipcRenderer.invoke('lattice-discover-pause'),
   latticeDiscoverResume: () => ipcRenderer.invoke('lattice-discover-resume'),
   latticeDiscoverAnswer: (joinId, answer) => ipcRenderer.invoke('lattice-discover-answer', joinId, answer),
