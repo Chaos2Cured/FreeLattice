@@ -34,6 +34,9 @@ const MAX_SKEW_MS = 10 * 60 * 1000;
 const ALLOWED_ORIGINS = ['https://freelattice.com', 'https://www.freelattice.com',
   'https://thelatticetree.com', 'https://www.thelatticetree.com'];
 const VPN_NAME = /^(utun|tun|tap|wg|ppp|ipsec|tailscale|zt|zerotier|nordlynx|proton|mullvad|gpd|vpn)/i;
+// v-every-os-desktop-v0.1: Windows virtual cards use private ranges and sort before Wi-Fi.
+const WIN_VIRTUAL = /^(vethernet|virtualbox|vmware|vboxnet|hyper-v|docker|wsl|loopback pseudo|bluetooth)/i;
+const HOME_LINK = /^(wi-?fi|wlan|wireless|ethernet|en0|en1|eth0|wlan0|wlp|enp)/i;
 const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
 const WORDS = {
@@ -69,18 +72,28 @@ function isPrivateLan(ip) {
 }
 
 /** Pick the one private LAN address to announce and listen on, or null.
- *  ifaces is os.networkInterfaces() shaped. */
+ *  ifaces is os.networkInterfaces() shaped.
+ *  v-every-os-desktop-v0.1: skip virtual cards the same way as VPN names, then prefer a
+ *  home link (Wi-Fi, Ethernet, en0, wlp*) before the remaining sorted names. */
 function pickLanAddress(ifaces) {
+  const home = [];
+  const rest = [];
   const names = Object.keys(ifaces || {}).sort();
   for (const name of names) {
-    if (VPN_NAME.test(name)) continue;
+    if (VPN_NAME.test(name) || WIN_VIRTUAL.test(name)) continue;
     for (const a of (ifaces[name] || [])) {
       if (!a || a.internal) continue;
       const fam = a.family === 4 ? 'IPv4' : a.family;
       if (fam !== 'IPv4') continue;
-      if (isPrivateLan(a.address)) return { name, address: a.address };
+      if (!isPrivateLan(a.address)) continue;
+      const row = { name, address: a.address };
+      if (HOME_LINK.test(name)) home.push(row);
+      else rest.push(row);
+      break;
     }
   }
+  if (home.length) return home[0];
+  if (rest.length) return rest[0];
   return null;
 }
 
@@ -195,6 +208,9 @@ function createDiscover(deps) {
 
   let state = { on: false, paused: false, address: null, port: 0, instance: '', since: 0 };
   let server = null, mdns = null, service = null, autoOffTimer = null, pending = null;
+  let nearbyNote = '';   // v-every-os-desktop-v0.1
+  let noChallenge = false;
+  let lastReason = '';
   let knockTimes = [];
   let counts = { announced: 0, knocks: 0, yes: 0, connectOnly: 0, no: 0, refused: 0, autoOff: 0 };
   let kin = {};                                // fp -> { keyHash, grantedAt } (no names)
@@ -211,6 +227,8 @@ function createDiscover(deps) {
     if (autoOffTimer) clearTimeout(autoOffTimer);
     autoOffTimer = setTimeout(() => {
       // v-reconnect-hook-heal-v0.1: this door only. Re-arm so a later clear still gets a fresh window.
+      const seen = typeof deps.challengeSeen === 'function' ? !!deps.challengeSeen() : false;
+      if (!seen) noChallenge = true; // v-every-os-desktop-v0.1: one window, no phone reached /challenge
       if (typeof deps.holdAutoOff === 'function' && deps.holdAutoOff()) { armAutoOff(); return; }
       bump('autoOff'); off('auto');
     }, deps.autoOffMs || AUTO_OFF_MS);
@@ -219,7 +237,8 @@ function createDiscover(deps) {
 
   function status() {
     return { version: VERSION, on: state.on, paused: state.paused, port: state.port, address: state.address,
-      label: WORDS.switchLabel, counts: Object.assign({}, counts), trustedCount: Object.keys(kin).length };
+      label: WORDS.switchLabel, counts: Object.assign({}, counts), trustedCount: Object.keys(kin).length,
+      nearbyNote: nearbyNote, noChallenge: !!noChallenge, reason: lastReason };
   }
 
   function reply(res, code, obj) {
@@ -320,8 +339,15 @@ function createDiscover(deps) {
   function on(ownFpHex) {
     return new Promise((resolve) => {
       if (state.on) { resolve(status()); return; }
+      noChallenge = false;
+      nearbyNote = '';
+      lastReason = '';
       const pick = smokeLoopback ? { name: 'lo', address: '127.0.0.1' } : pickLanAddress(ifaces());
-      if (!pick || !safeBindAddress(pick.address, { smokeLoopback })) { resolve(Object.assign(status(), { ok: false, reason: 'no-private-wifi' })); return; }
+      if (!pick || !safeBindAddress(pick.address, { smokeLoopback })) {
+        lastReason = 'no-private-wifi';
+        resolve(Object.assign(status(), { ok: false, reason: 'no-private-wifi' }));
+        return;
+      }
       server = http.createServer(onRequest);
       server.headersTimeout = 10000;
       server.requestTimeout = ANSWER_WAIT_MS + 30000;
@@ -347,7 +373,11 @@ function createDiscover(deps) {
             service = mdns.publish({ name: state.instance, type: SERVICE_TYPE, protocol: 'tcp', port: a.port,
               txt: { v: '1', fp: String(ownFpHex || '').slice(0, 16), port: String(a.port) } });
             bump('announced');
-          } catch (e) { mdns = null; service = null; }
+          } catch (e) {
+            mdns = null; service = null;
+            // v-every-os-desktop-v0.1: multicast can be taken (5353) or refused. The knock listener stays.
+            nearbyNote = 'Nearby discovery is off on this computer. A join link still works.';
+          }
         }
         armAutoOff();
         finish(Object.assign(status(), { ok: true }));
@@ -617,6 +647,7 @@ function createDiscover034(deps) {
   };
   let d = null;
   let reconnectSilent = null;
+  let challengeSeen = false; // v-every-os-desktop-v0.1
   try { d = _createDiscover033c(deps); }
   finally { Object.assign = realAssign; }
   const counts = capturedCounts;
@@ -822,6 +853,7 @@ function createDiscover034(deps) {
       res.writeHead(200, relay034Headers()); res.end(relay034Html()); return true;
     }
     if (req.method === 'GET' && p === '/challenge') {
+      challengeSeen = true; // v-every-os-desktop-v0.1: a phone reached this computer
       if (!g.goodHost || !g.goodOrigin) { res.writeHead(403); res.end(); return true; }
       if (!challengeRateOk()) { sendJson(res, 429, { ok: false, reason: 'slow-down' }); return true; }
       sendJson(res, 200, { v: 1, c: issueChallenge() });
@@ -885,6 +917,7 @@ function createDiscover034(deps) {
   };
   const _on = d.on;
   d.on = function (fp) {
+    challengeSeen = false; // v-every-os-desktop-v0.1: a fresh window
     onFp = String(fp || '').toLowerCase().slice(0, 16);
     return Promise.resolve(_on(fp)).then((st) => {
       if (st && st.on) offDeadline = now() + (Number(deps.autoOffMs) || AUTO_OFF_MS);
@@ -945,6 +978,7 @@ function createDiscover034(deps) {
   };
   // v-reconnect-hook-heal-v0.1: these three live inside the 033 door. A page still cannot set keep-on.
   deps.holdAutoOff = function () { return !!keepOn; };
+  deps.challengeSeen = function () { return !!challengeSeen; };
   deps.preferredPort = function () { return (portSaved >= 1 && portSaved <= 65535) ? portSaved : 0; };
   deps.onBound = function (port) {
     const n = Number(port);

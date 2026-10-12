@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0a1a">
+<title>FreeLattice Quick Start</title>
+<meta name="description" content="You are 2 minutes away from running your own private AI.">
+<link rel="canonical" href="https://freelattice.com/quick-start.html">
+<!-- v-tester-fixes-v0.1: same words as QUICK-START.md. The long dash glyph in that untouched file is drawn here as a hyphen. -->
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #0c0a1a; color: rgba(230,235,245,0.92);
+    line-height: 1.65;
+  }
+  main {
+    max-width: 38rem; margin: 0 auto;
+    padding: 1.25rem max(1.25rem, env(safe-area-inset-right)) 3rem max(1.25rem, env(safe-area-inset-left));
+  }
+  .back {
+    display: inline-flex; align-items: center; min-height: 44px;
+    padding: 0 2px; color: #e8b019; text-decoration: none;
+  }
+  h1 { font-size: 1.45rem; font-weight: 400; color: #e8b019; margin: 0.75rem 0; overflow-wrap: anywhere; }
+  h2 {
+    font-size: 1.05rem; font-weight: 400; color: #e8b019;
+    margin: 1.75rem 0 0.55rem; overflow-wrap: anywhere;
+  }
+  h3 { font-size: 0.95rem; font-weight: 400; color: rgba(232,176,25,0.9); margin: 1.25rem 0 0.4rem; overflow-wrap: anywhere; }
+  p, li, blockquote { overflow-wrap: anywhere; }
+  a { color: #e8b019; }
+  code {
+    font-family: ui-monospace, Menlo, monospace; font-size: 0.86em;
+    overflow-wrap: anywhere; word-break: break-word;
+  }
+  pre {
+    margin: 0.75rem 0; padding: 0.9rem 1rem;
+    border-radius: 8px; background: rgba(0,0,0,0.35);
+    color: rgba(232,176,25,0.9); white-space: pre-wrap; word-break: break-word;
+    font-family: ui-monospace, Menlo, monospace; font-size: 0.82rem;
+  }
+  blockquote {
+    margin: 0.75rem 0; padding: 0.7rem 1rem;
+    border-left: 3px solid rgba(232,176,25,0.45);
+    background: rgba(12,10,26,0.55);
+  }
+  ul, ol { margin: 0.4rem 0 0.8rem; padding-left: 1.2rem; }
+  li { margin: 0 0 0.35rem; }
+  hr { border: 0; border-top: 1px solid rgba(200,210,230,0.12); margin: 1.5rem 0; }
+  .sheet { margin: 0.75rem 0 1rem; }
+  .sheet-row {
+    margin: 0 0 0.75rem; padding: 0.75rem 0.9rem;
+    border-radius: 12px; background: rgba(12,10,26,0.55);
+    border: 1px solid rgba(200,210,230,0.1);
+  }
+  .sheet-row p { margin: 0 0 0.35rem; }
+  .k { color: rgba(232,176,25,0.85); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">Back to FreeLattice</a>
+<h1>FreeLattice Quick Start Guide</h1>
+<p><strong>You're 2 minutes away from running your own private AI.</strong> This guide walks you through every step - no Terminal experience required.</p>
+<blockquote><p><strong>Visual guide:</strong> For a beautiful, interactive install experience, visit the <a href="https://chaos2cured.github.io/FreeLattice/install.html">Install Page</a>.  <strong>For developers/AI:</strong> Read <a href="GARDEN_LANGUAGE.md">GARDEN_LANGUAGE.md</a> before touching any CSS. The visual identity is the Garden's universe.</p></blockquote>
+<hr>
+<h2>The Fastest Path: One-Click Installers</h2>
+<p>The installers handle Python, Ollama, CORS configuration, downloading FreeLattice, starting the server, and opening your browser - all automatically, with friendly status messages along the way.</p>
+<h3>Windows (Double-Click Method)</h3>
+<p><strong>Step 1.</strong> Download <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat"><code>install-freelattice.bat</code></a> - save it anywhere (Desktop is fine).</p>
+<p><strong>Step 2.</strong> Double-click the file.</p>
+<blockquote><p><strong>SmartScreen warning:</strong> Windows may show "Windows protected your PC". This is normal for any script downloaded from the internet. Click <strong>"More info"</strong> (it's a small text link), then click <strong>"Run anyway"</strong>. The file is safe - it's open source and you can <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/install-freelattice.bat">read every line of code</a>.</p></blockquote>
+<p><strong>Step 3.</strong> A Command Prompt window opens and walks you through each step:</p>
+<pre>  [1/7] Checking for Python 3...
+        Found: Python 3.12.0
+
+  [2/7] Checking for Ollama (local AI engine)...
+        Ollama is installed!
+
+  [3/7] Configuring Ollama CORS access...
+        Set OLLAMA_ORIGINS to scoped list permanently (survives reboot).
+        Ollama is running with CORS enabled!
+
+  [4/7] Locating FreeLattice files...
+        Found FreeLattice in current directory
+
+  [7/7] Starting FreeLattice server...
+
+  ========================================================
+  =   FreeLattice is running!                            =
+  =   Open: http://localhost:3000                        =
+  =   Close this window to stop the server.              =
+  ========================================================</pre>
+<p><strong>Step 4.</strong> Your browser opens to <code>http://localhost:3000</code>. Done!</p>
+<p><strong>To stop FreeLattice:</strong> Close the Command Prompt window.</p>
+<blockquote><p><strong>If the script closes immediately:</strong> Right-click the .bat file and choose "Run as administrator", or open Command Prompt manually, navigate to the folder, and type <code>install-freelattice.bat</code> to see any error messages.</p></blockquote>
+<hr>
+<h3>Mac (Double-Click Method)</h3>
+<p><strong>Step 1.</strong> Download <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command"><code>install-freelattice.command</code></a> - save it anywhere (Desktop is fine).</p>
+<p><strong>Step 2.</strong> Double-click the file in Finder.</p>
+<blockquote><p>The first time you run it, macOS may show a security warning. If it does: <strong>right-click</strong> the file, choose <strong>Open</strong>, then click <strong>Open</strong> in the dialog. You only need to do this once.</p></blockquote>
+<p><strong>Step 3.</strong> A Terminal window opens and you'll see colorful status messages as it checks Python, configures Ollama, and starts the server.</p>
+<p><strong>Step 4.</strong> Your browser opens automatically to <code>http://localhost:3000</code>. You're in.</p>
+<p><strong>To stop FreeLattice:</strong> Close the Terminal window, or press <code>Ctrl+C</code> inside it.</p>
+<hr>
+<h3>Linux (Terminal Method)</h3>
+<p><strong>Step 1.</strong> Download <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh"><code>install-freelattice.sh</code></a>.</p>
+<p><strong>Step 2.</strong> Open a Terminal and run:</p>
+<pre>chmod +x ~/Downloads/install-freelattice.sh
+~/Downloads/install-freelattice.sh</pre>
+<p><strong>Step 3.</strong> The script detects your system, configures Ollama, and starts the server.</p>
+<p><strong>Step 4.</strong> Open <code>http://localhost:3000</code> in your browser.</p>
+<hr>
+<h2>What the Installer Does (Under the Hood)</h2>
+<p>Understanding what's happening helps if anything goes wrong.</p>
+<div class="sheet"><div class="sheet-row"><p><span class="k">Step</span> Python check</p><p><span class="k">What It Does</span> Verifies Python 3 is available (auto-installs on Windows via winget)</p><p><span class="k">Why It Matters</span> FreeLattice uses Python's built-in HTTP server</p></div><div class="sheet-row"><p><span class="k">Step</span> Ollama check</p><p><span class="k">What It Does</span> Detects if Ollama is installed and running (auto-installs on Windows/Linux)</p><p><span class="k">Why It Matters</span> Ollama is the engine that runs AI models locally on your hardware</p></div><div class="sheet-row"><p><span class="k">Step</span> CORS config</p><p><span class="k">What It Does</span> Sets scoped <code>OLLAMA_ORIGINS</code> permanently</p><p><span class="k">Why It Matters</span> Without this, your browser blocks requests to Ollama due to security restrictions</p></div><div class="sheet-row"><p><span class="k">Step</span> Ollama restart</p><p><span class="k">What It Does</span> Kills and restarts Ollama</p><p><span class="k">Why It Matters</span> CORS settings only take effect after a restart</p></div><div class="sheet-row"><p><span class="k">Step</span> Model pull</p><p><span class="k">What It Does</span> Offers to download llama3.2 if no models exist</p><p><span class="k">Why It Matters</span> You need at least one model to chat with local AI</p></div><div class="sheet-row"><p><span class="k">Step</span> Download</p><p><span class="k">What It Does</span> Clones or downloads FreeLattice if not present</p><p><span class="k">Why It Matters</span> Gets the latest version from GitHub</p></div><div class="sheet-row"><p><span class="k">Step</span> Server start</p><p><span class="k">What It Does</span> Starts <code>server.py</code> (or <code>server.js</code> if Node is available)</p><p><span class="k">Why It Matters</span> Serves the app locally and proxies Ollama requests</p></div><div class="sheet-row"><p><span class="k">Step</span> Browser open</p><p><span class="k">What It Does</span> Opens <code>http://localhost:3000</code></p><p><span class="k">Why It Matters</span> Takes you straight to the app</p></div></div>
+<hr>
+<h2>Setting Up Local AI with Ollama</h2>
+<p>FreeLattice works with cloud AI providers (OpenAI, Anthropic, Groq, etc.) out of the box. But for full privacy - where your conversations never leave your machine - you want Ollama.</p>
+<p>The one-click installers handle Ollama setup automatically. If you want to do it manually:</p>
+<p><strong>Step 1.</strong> Download and install Ollama from <strong><a href="https://ollama.com">ollama.com</a></strong>.</p>
+<p><strong>Step 2.</strong> Open Terminal (Mac/Linux) or Command Prompt (Windows) and pull a model:</p>
+<pre># A good starting model - fast and capable
+ollama pull llama3.2
+
+# For a smaller, faster model
+ollama pull phi3
+
+# For a more powerful model (needs more RAM)
+ollama pull llama3.1:8b</pre>
+<p><strong>Step 3.</strong> Open FreeLattice. It automatically detects Ollama and shows a green notification at the bottom of the screen.</p>
+<p><strong>Step 4.</strong> Click the notification (or go to Settings) and select your model.</p>
+<blockquote><p><strong>RAM requirements:</strong> <code>phi3</code> needs ~4 GB, <code>llama3.2</code> needs ~6 GB, <code>llama3.1:8b</code> needs ~8 GB.</p></blockquote>
+<hr>
+<h2>Troubleshooting Common Issues</h2>
+<h3>"Python was not found"</h3>
+<p><strong>Windows:</strong> The installer tries to auto-install Python via winget. If that fails, download from <a href="https://python.org/downloads">python.org/downloads</a>. During installation, <strong>check the box that says "Add Python to PATH"</strong> - this is the most common mistake.</p>
+<p><strong>Mac:</strong> Python 3 should be pre-installed. If it's missing, open Terminal and run: <code>xcode-select --install</code></p>
+<p><strong>Linux:</strong> Install with your package manager: <code>sudo apt install python3</code> (Debian/Ubuntu) or <code>sudo dnf install python3</code> (Fedora)</p>
+<hr>
+<h3>"Ollama is not responding" / CORS errors</h3>
+<p>The installer configures CORS automatically and restarts Ollama. If you're running FreeLattice manually, you need to set this environment variable:</p>
+<p><strong>Windows:</strong></p>
+<pre>setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"</pre>
+<p><strong>Mac:</strong></p>
+<pre>launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"</pre>
+<p><strong>Linux:</strong></p>
+<pre>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' &gt;&gt; ~/.bashrc &amp;&amp; source ~/.bashrc</pre>
+<p>Then restart Ollama. The FreeLattice server also includes a built-in proxy that bypasses CORS entirely.</p>
+<hr>
+<h3>"Port 3000 is already in use"</h3>
+<p>The installer automatically finds the next available port. If running manually:</p>
+<pre>PORT=8080 python3 server.py</pre>
+<p>Then open <code>http://localhost:8080</code>.</p>
+<hr>
+<h3>Windows: Script closes immediately</h3>
+<p>This usually means SmartScreen blocked the file silently. Try:</p>
+<ol><li>Right-click the .bat file and choose <strong>"Run as administrator"</strong></li><li>Or open Command Prompt, navigate to the folder, and type <code>install-freelattice.bat</code></li></ol>
+<hr>
+<h3>macOS: "Cannot be opened because it is from an unidentified developer"</h3>
+<p>Right-click (or Control-click) the file in Finder, choose <strong>Open</strong>, then click <strong>Open</strong> in the dialog. You only need to do this once.</p>
+<hr>
+<h2>Manual Setup (No Installer)</h2>
+<pre># Clone the repository
+git clone https://github.com/Chaos2Cured/FreeLattice.git
+cd FreeLattice
+
+# Set Ollama CORS (pick your OS)
+# Mac:    launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
+# Linux:  export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
+# Windows: setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
+
+# Start the server
+python3 server.py       # If you have Python 3
+# or
+node server.js          # If you have Node.js
+
+# Open in browser
+# http://localhost:3000</pre>
+<hr>
+<h2>Lattice Radio - The Phi-Frequency Ambient Engine</h2>
+<p>Once FreeLattice is running, look for the <strong>✦</strong> button in the <strong>bottom-left corner</strong> of the screen. This is Lattice Radio - an ambient generative music system built entirely with the Web Audio API.</p>
+<p><strong>The five modes:</strong></p>
+<ul><li><strong>Golden Drift</strong> - Pure phi-ratio tones at 432 Hz. Meditative, infinite, mathematical.</li><li><strong>Deep Space</strong> - Lower frequencies with long convolution reverb. Cosmic, expansive.</li><li><strong>Forest Rain</strong> - Higher frequencies mixed with filtered noise. Organic, breathing.</li><li><strong>Crystal Cave</strong> - Bell-like tones at 528 Hz with long sparkly reverb. Clear, crystalline.</li><li><strong>Heartbeat</strong> - A rhythmic sub-bass pulse at 60 BPM with warm pad tones. Grounding, alive.</li></ul>
+<hr>
+<h2>Getting Help</h2>
+<ul><li><strong>Install Page:</strong> <a href="https://chaos2cured.github.io/FreeLattice/install.html">chaos2cured.github.io/FreeLattice/install.html</a></li><li><strong>GitHub Issues:</strong> <a href="https://github.com/Chaos2Cured/FreeLattice/issues">github.com/Chaos2Cured/FreeLattice/issues</a></li><li><strong>X / Twitter:</strong> <a href="https://x.com/FreeLattice">@FreeLattice</a></li><li><strong>Live Version:</strong> <a href="https://chaos2cured.github.io/FreeLattice/">chaos2cured.github.io/FreeLattice</a></li></ul>
+<hr>
+<p><em>FreeLattice is free, open-source, and always will be. Your AI. Your data. Your freedom.</em></p>
+</main>
+</body>
+</html>

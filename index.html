@@ -15390,6 +15390,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-pool.js" defer></script>
 <!-- v-page-answers-knock-v0.1 (033b): a Yes in the desktop app finishes the pool join here. Does nothing outside the desktop app; loads tree-kin.js and tree-pool.js (same origin) only there. -->
 <script src="modules/pool-knock.js" defer></script>
+<script src="modules/chat-wait.js" defer></script>
+<script src="modules/pool-every-os.js" defer></script>
 <!-- v-phone-knocks-v0.1 (033c): does nothing outside the desktop app -->
 <script src="modules/pool-knock-link.js" defer></script>
 <!-- v-tree-reconnect-v0.1 (034): trusted devices and the keep-on line. A page can read keep-on. It cannot set it. -->
@@ -39027,7 +39029,9 @@ async function sendMessage() {
 
   // Validate setup — guide instead of failing
   if (!state.isLocal && !state.apiKey) {
-    showQuickConnect();
+    // v-tester-fixes-v0.1: the words stay in the chat. The send below is unchanged.
+    if (window.FLChatWait && typeof FLChatWait.hold === 'function') FLChatWait.hold(message, input);
+    else showQuickConnect();
     return;
   }
 
