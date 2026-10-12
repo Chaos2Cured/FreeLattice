@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-12 04:47 UTC
-- Last deployed: 2026-10-12 04:47 UTC
+- Last auto-updated: 2026-10-12 13:51 UTC
+- Last deployed: 2026-10-12 13:51 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3396
+- Total commits: 3399
 - Last 10 commits:
+- 97b8bb4c GC page: the phone knocks, forty-sixth entry (#217)
+- f2b60ce8 The phone knocks v0.1 (#216)
+- 255607c6 ci: Update Primer deployment state [2026-10-12]
 - 1151377a Layer, never delete. GC page: the page answers the knock, forty-fifth entry, built by GC. (#215)
 - c537090d The page answers the knock v0.1: a desktop Yes finishes the pool join, Pause wins, built by GC (#214)
 - 76cf6d47 ci: Update Primer deployment state [2026-10-12]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2f655f7c Desktop pooling v0.1: home Wi-Fi knock, off by default, Pause wins, built by GC (#212)
 - 88df7bbe ci: Update Primer deployment state [2026-10-12]
 - 5708c2ab GC page: tree galaxy consistency, forty-third entry (#211)
-- f56143ff Layer, never delete. GC page: one shared sheet for every galaxy, forty-third entry, built by GC.
-- 0d83e702 ci: Update Primer deployment state [2026-10-11]
-- a9305fef Layer, never delete. GC page: a night heart and a table of favorites, forty-second entry, built by GC. (#210)
