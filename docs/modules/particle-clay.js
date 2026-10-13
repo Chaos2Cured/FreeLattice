@@ -1,4 +1,4 @@
-// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1
+// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 (function (root) {
@@ -20,11 +20,12 @@
     off: 'Clay: Off',
     sent: 'Sent',
     waiting: "Saved for your mind. They'll feel it when connected.",
+    soft: 'One moment with your mind.',
     shaped: 'shaped by the AI',
     guessed: "guessed from words (the AI didn't choose)"
   };
   var PROMPT = 'Clay is light you may shape. End with [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]. Forms: heart star spark dog cat bird tree flower present sun moon wave book seed grid. Mood is a feeling or #rrggbb. Energy is 0 to 1. Hug becomes a heart. Dog food becomes a dog. Christmas becomes a tree.';
-  var TAG = /\[FL_CLAY:\s*([\s\S]{0,2048}?)\]/;
+  var CLAY_MARK = '[FL_CLAY:';
   var HEX = /^#[0-9a-f]{6}$/i;
   var FORMS = { heart: 1, star: 1, spark: 1, dog: 1, cat: 1, bird: 1, tree: 1, flower: 1, present: 1, sun: 1, moon: 1, wave: 1, book: 1, seed: 1, grid: 1, shells: 1 };
   var MOTIONS = { gather: 1, breath: 1, wave: 1, ripple: 1, pulse: 1, branch: 1, braid: 1, scatter: 1 };
@@ -50,6 +51,7 @@
   var labelEl = null;
   var sayEl = null;
   var liveEl = null;
+  var lastLive = '';
   var sentTimer = 0;
   var pulseUntil = 0;
   var rafId = 0;
@@ -112,7 +114,8 @@
     for (var i = 0; i < grid.length; i++) {
       var row = String(grid[i]);
       if (row.length > 16) return null;
-      if (!/^[.x0-7]*$/i.test(row)) return null;
+      // A space is a blank cell, so a grid tag like ["xx","x x"] can parse.
+      if (!/^[.x0-7 ]*$/i.test(row)) return null;
       rows.push(row.toLowerCase());
     }
     return rows;
@@ -150,17 +153,60 @@
     if (obj.say != null) out.say = String(obj.say).slice(0, 24);
     return out;
   }
+  function isWs(ch) {
+    return ch === ' ' || ch === '\n' || ch === '\r' || ch === '\t';
+  }
+  function cleanVisible(text) {
+    return String(text || '').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function malformedTag(raw, at) {
+    var cap = Math.min(raw.length, at + CLAY_MARK.length + 2048);
+    var close = raw.slice(at, cap).indexOf(']');
+    var end = close >= 0 ? at + close + 1 : at + CLAY_MARK.length;
+    return {
+      tag: true,
+      ok: false,
+      value: null,
+      visible: cleanVisible(raw.slice(0, at) + ' ' + raw.slice(end))
+    };
+  }
   function parseTag(text) {
     var raw = typeof text === 'string' ? text : '';
-    var match = raw.match(TAG);
-    if (!match) return { tag: false, ok: false, value: null, visible: raw };
-    var visible = raw.replace(TAG, ' ').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
-    var value = null;
-    var body = String(match[1] || '').trim();
-    if (body.charAt(0) === '{') {
-      try { value = sanitize(JSON.parse(body)); }
-      catch (err) { value = null; }
+    var at = raw.indexOf(CLAY_MARK);
+    if (at < 0) return { tag: false, ok: false, value: null, visible: raw };
+    var i = at + CLAY_MARK.length;
+    while (i < raw.length && isWs(raw.charAt(i))) i += 1;
+    if (raw.charAt(i) !== '{') return malformedTag(raw, at);
+    var bodyAt = i;
+    var depth = 0;
+    var inStr = false;
+    var esc = false;
+    var endBody = -1;
+    var limit = Math.min(raw.length, bodyAt + 2048);
+    for (; i < limit; i += 1) {
+      var ch = raw.charAt(i);
+      if (inStr) {
+        if (esc) { esc = false; continue; }
+        if (ch === '\\') { esc = true; continue; }
+        if (ch === '"') inStr = false;
+        continue;
+      }
+      if (ch === '"') { inStr = true; continue; }
+      if (ch === '{') depth += 1;
+      else if (ch === '}') {
+        depth -= 1;
+        if (depth === 0) { endBody = i; break; }
+      }
     }
+    if (endBody < 0) return malformedTag(raw, at);
+    var j = endBody + 1;
+    while (j < raw.length && isWs(raw.charAt(j))) j += 1;
+    if (raw.charAt(j) !== ']') return malformedTag(raw, at);
+    var body = raw.slice(bodyAt, endBody + 1);
+    var visible = cleanVisible(raw.slice(0, at) + ' ' + raw.slice(j + 1));
+    var value = null;
+    try { value = sanitize(JSON.parse(body)); }
+    catch (err) { value = null; }
     return { tag: true, ok: !!value, value: value, visible: visible };
   }
   function keywordForm(hay) {
@@ -428,8 +474,9 @@
     return 'Your mind';
   }
   function showLive(text) {
+    lastLive = text || '';
     if (!liveEl) return;
-    liveEl.textContent = text || '';
+    liveEl.textContent = lastLive;
   }
   function showSent() {
     showLive(WORDS.sent);
@@ -450,8 +497,9 @@
       temperature: 0.6,
       silent: true,
       callback: function (text) {
-        if (!text) return;
+        if (!text || !String(text).trim()) return;
         var seen = consumeReply(text, null);
+        showLive(mindLabel() + ' felt your ' + word);
         var visible = seen && typeof seen.visible === 'string' ? seen.visible.trim() : '';
         if (!visible) return;
         try {
@@ -504,15 +552,19 @@
       showLive(WORDS.waiting);
       return { ok: true, called: false, line: WORDS.waiting, flown: flown, autoSend: false };
     }
-    var felt = mindLabel() + ' felt your ' + clean;
-    showLive(felt);
     var now = Date.now();
     if (lastCall && (now - lastCall) < RATE_MS) {
-      return { ok: true, called: false, reason: 'rate', line: felt, flown: flown, autoSend: false };
+      showLive(WORDS.soft);
+      return { ok: true, called: false, reason: 'rate', line: WORDS.soft, flown: flown, autoSend: false };
+    }
+    showLive(WORDS.soft);
+    var called = callMind(clean);
+    if (!called) {
+      showLive(WORDS.waiting);
+      return { ok: true, called: false, line: WORDS.waiting, flown: flown, autoSend: false };
     }
     lastCall = now;
-    var called = callMind(clean);
-    return { ok: true, called: called, line: felt, flown: flown, autoSend: false };
+    return { ok: true, called: true, line: WORDS.soft, flown: flown, autoSend: false };
   }
   function button(doc, text) {
     var el = doc.createElement('button');
@@ -690,6 +742,7 @@
   var api = {
     VERSION: 'v-particle-clay-v0.1',
     FEEL: 'v-feel-felt-v0.1',
+    HEAL: 'v-clay-grid-tag-heal-v0.1',
     WORDS: WORDS,
     PROMPT: PROMPT,
     parseTag: parseTag,
@@ -709,6 +762,7 @@
     resetRate: resetRate,
     canvasMounted: function () { return !!(canvas && canvas.parentNode); },
     rafHandles: function () { return rafHandles; },
+    liveLine: function () { return lastLive; },
     autoSend: function () { return false; },
     renderSay: function (el, say) { if (el) el.textContent = String(say == null ? '' : say).slice(0, 24); }
   };
