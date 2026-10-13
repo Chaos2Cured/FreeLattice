@@ -1,3 +1,4 @@
+# Kept for history. New packs build in desktop-packs-every-os.yml (036).
 # FreeLattice — Desktop packs Win + Linux (honest unsigned)
 # Layer, never delete. No Microsoft Store / App Store claim. No code signing.
 # Produces real Electron artifacts on GitHub runners — not invented assets.
@@ -13,7 +14,7 @@ on:
         default: 'desktop-packs-v0.1'
   push:
     tags:
-      - 'desktop-packs-v*'
+      - 'desktop-packs-v0.1*'
 
 permissions:
   contents: write

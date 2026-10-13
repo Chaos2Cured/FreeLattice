@@ -12,6 +12,7 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const net = require('net');
 const latticeKeys = require('./lattice-keys');
 const latticeLedger = require('./lattice-ledger');
@@ -21,8 +22,16 @@ const latticeImport = require('./lattice-import');
 const latticeSwarm = require('./lattice-swarm');
 const latticePair = require('./lattice-pair');
 const latticeUpdate = require('./lattice-update'); // v-desktop-update-button-v0.1
+const packUpdate = require('./pack-update'); // v-desktop-update-buttons-v0.2
 const latticeDiscover = require('./lattice-discover'); // v-desktop-pooling-v0.1
 let latticeDiscoverDoor = null; // v-desktop-pooling-v0.1
+let packChecksArmed = false; // v-desktop-update-buttons-v0.2
+let packLastAuto = 0;
+let packLastResult = null;
+let packSession = null;
+let packUpdater = null;
+let packReady = false;
+let packProgressWired = false;
 
 // electron-store for persisting window state
 let Store;
@@ -635,6 +644,14 @@ async function createMainWindow() {
     }
   });
 
+  mainWindow.webContents.on('did-finish-load', () => {
+    injectPackCard().catch(() => {});
+  });
+  if (!packChecksArmed) {
+    packChecksArmed = true;
+    schedulePackChecks();
+  }
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -845,7 +862,7 @@ function createAppMenu() {
         // v-desktop-update-button-v0.1
         {
           label: 'Check for Updates...',
-          click: () => showUpdateDialog()
+          click: () => offerPackUpdate()
         },
         { type: 'separator' },
         { role: 'services' },
@@ -943,7 +960,7 @@ function createAppMenu() {
         // v-desktop-update-button-v0.1
         {
           label: 'Check for Updates...',
-          click: () => showUpdateDialog()
+          click: () => offerPackUpdate()
         },
         {
           label: 'About FreeLattice',
@@ -964,6 +981,7 @@ function showAboutDialog() {
     message: 'FreeLattice',
     detail: [
       'Version ' + app.getVersion(),
+      'FreeLattice ' + app.getVersion() + ', ' + (readPackIdentity().packTag || 'unknown'),
       '',
       'Your AI. Your Data. Your Freedom.',
       '',
@@ -1073,6 +1091,252 @@ function checkForUpdates() {
   // autoUpdater.checkForUpdatesAndNotify();
 }
 
+// v-desktop-update-buttons-v0.2: pack card. A download or a restart starts only after a tap.
+function readPackIdentity() {
+  const version = app.getVersion();
+  if (!app.isPackaged) return { packTag: 'dev', version: version, packaged: false };
+  let info = null;
+  try {
+    info = JSON.parse(fs.readFileSync(path.join(process.resourcesPath, 'build-info.json'), 'utf8'));
+  } catch (e) {
+    info = null;
+  }
+  const tag = info && info.packTag ? String(info.packTag) : '';
+  if (tag && tag !== 'dev') return { packTag: tag, version: version, packaged: true };
+  if (version === '5.8.0') return { packTag: '', version: version, packaged: true };
+  return { packTag: 'dev', version: version, packaged: true };
+}
+
+function readUpdateChannel() {
+  try {
+    const raw = fs.readFileSync(path.join(app.getPath('userData'), 'fl_update_channel'), 'utf8').trim();
+    if (raw === 'rc') return 'rc';
+  } catch (e) { /* stable */ }
+  const env = String(process.env.fl_update_channel || process.env.FL_UPDATE_CHANNEL || '').trim();
+  return env === 'rc' ? 'rc' : 'stable';
+}
+
+function snoozePath() {
+  return path.join(app.getPath('userData'), 'fl_pack_snooze.json');
+}
+
+function readSnooze() {
+  try { return JSON.parse(fs.readFileSync(snoozePath(), 'utf8')); } catch (e) { return null; }
+}
+
+function runningLabelFor(id) {
+  const version = (id && id.version) || app.getVersion();
+  const tag = id && id.packTag ? id.packTag : 'unknown';
+  return packUpdate.card.runningLabel(version, tag);
+}
+
+function sendPack(view) {
+  if (!mainWindow || mainWindow.isDestroyed() || !mainWindow.webContents) return;
+  mainWindow.webContents.send('pack-update-status', view || { showCard: false });
+}
+
+function viewFor(result, extra) {
+  const id = readPackIdentity();
+  const base = {
+    showCard: false,
+    quiet: false,
+    ready: false,
+    progress: false,
+    detail: '',
+    line: (result && result.line) || '',
+    label: runningLabelFor(id)
+  };
+  return Object.assign(base, extra || {});
+}
+
+async function runPackCheck(opts) {
+  const manual = !!(opts && opts.manual);
+  let result;
+  try {
+    result = await latticeUpdate.checkPacks({ current: readPackIdentity(), channel: readUpdateChannel() });
+  } catch (e) {
+    result = { ok: false, newer: false, latest: null, line: 'Could not reach GitHub just now' };
+  }
+  packLastResult = result;
+  if (!result || result.ok === false) {
+    const quiet = viewFor(result, { quiet: true, showCard: false, label: '' });
+    sendPack(quiet);
+    return quiet;
+  }
+  const hidden = !manual && packUpdate.snoozed(readSnooze(), result.latest, Date.now());
+  const show = !!result.newer && !hidden;
+  const view = viewFor(result, {
+    showCard: show,
+    line: show ? (result.line || '') : '',
+    label: (show || manual) ? runningLabelFor(readPackIdentity()) : ''
+  });
+  sendPack(view);
+  return view;
+}
+
+function offerPackUpdate() {
+  return runPackCheck({ manual: true });
+}
+
+function shellUpdater() {
+  const { autoUpdater } = require('electron-updater');
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.setFeedURL({ provider: 'github', owner: 'Chaos2Cured', repo: 'FreeLattice' });
+  packUpdater = autoUpdater;
+  return autoUpdater;
+}
+
+function hashFile(file) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(file);
+    stream.on('error', reject);
+    stream.on('data', (chunk) => hash.update(chunk));
+    stream.on('end', () => resolve(hash.digest('hex')));
+  });
+}
+
+function downloadPack(url, dest, hops) {
+  const left = hops == null ? 4 : hops;
+  return new Promise((resolve, reject) => {
+    if (left < 0 || !packUpdate.allowedUrl(url)) {
+      reject(new Error('refused host'));
+      return;
+    }
+    const req = https.get(url, { headers: { 'User-Agent': 'FreeLattice-pack-update' } }, (res) => {
+      const code = res.statusCode || 0;
+      if (code >= 300 && code < 400 && res.headers.location) {
+        res.resume();
+        let next;
+        try { next = new URL(res.headers.location, url).toString(); } catch (e) {
+          reject(new Error('refused host'));
+          return;
+        }
+        downloadPack(next, dest, left - 1).then(resolve, reject);
+        return;
+      }
+      if (code !== 200) {
+        res.resume();
+        reject(new Error('status ' + code));
+        return;
+      }
+      const out = fs.createWriteStream(dest);
+      res.pipe(out);
+      out.on('finish', () => resolve(dest));
+      out.on('error', (err) => {
+        try { fs.unlinkSync(dest); } catch (e) { /* partial file already gone */ }
+        reject(err);
+      });
+    });
+    req.on('error', reject);
+  });
+}
+
+async function applyPackUpdate() {
+  const result = packLastResult;
+  if (!result || !result.newer) return { ok: false, reason: 'not-newer' };
+  const route = packUpdate.routeFor({ platform: process.platform, env: process.env });
+  if (packUpdate.usesUpdater(route)) {
+    const updater = shellUpdater();
+    packSession = packUpdate.createUpdaterSession(updater);
+    packReady = false;
+    if (!packProgressWired) {
+      packProgressWired = true;
+      updater.on('download-progress', () => {
+        sendPack(viewFor(packLastResult, { progress: true, showCard: false, label: runningLabelFor(readPackIdentity()) }));
+      });
+    }
+    sendPack(viewFor(result, { progress: true, showCard: false, label: runningLabelFor(readPackIdentity()) }));
+    try {
+      await updater.checkForUpdates();
+      const ready = await packSession.tapUpdate();
+      packReady = !!(ready && ready.ok);
+      sendPack(viewFor(result, { ready: packReady, showCard: false, progress: false, label: runningLabelFor(readPackIdentity()) }));
+      return ready;
+    } catch (e) {
+      const quiet = viewFor(result, { quiet: true, showCard: false, label: '' });
+      sendPack(quiet);
+      return { ok: false };
+    }
+  }
+  const asset = packUpdate.chooseAsset(route, result.assets);
+  if (!asset || !packUpdate.allowedUrl(asset.url)) {
+    sendPack(viewFor(result, { quiet: true, showCard: false, label: '' }));
+    return { ok: false, reason: 'refused' };
+  }
+  const name = packUpdate.safeName(asset.name);
+  const dest = path.join(app.getPath('downloads'), name);
+  sendPack(viewFor(result, { progress: true, showCard: false, label: runningLabelFor(readPackIdentity()) }));
+  try {
+    await downloadPack(asset.url, dest);
+    const hash = await hashFile(dest);
+    const accepted = packUpdate.acceptFile({
+      route: route,
+      file: dest,
+      name: name,
+      hash: hash,
+      sha256: asset.sha256 || '',
+      remove: (file) => { try { fs.unlinkSync(file); } catch (e) { /* already gone */ } },
+      openPath: (file) => { shell.openPath(file); },
+      showItem: (file) => { shell.showItemInFolder(file); }
+    });
+    sendPack(viewFor(result, {
+      showCard: false,
+      progress: false,
+      detail: accepted.line || '',
+      label: runningLabelFor(readPackIdentity())
+    }));
+    return accepted;
+  } catch (e) {
+    try { fs.unlinkSync(dest); } catch (err) { /* nothing saved */ }
+    sendPack(viewFor(result, { quiet: true, showCard: false, label: '' }));
+    return { ok: false };
+  }
+}
+
+function packNotNow() {
+  const tag = packLastResult && packLastResult.latest;
+  if (tag) {
+    try {
+      fs.writeFileSync(snoozePath(), JSON.stringify({ tag: tag, until: packUpdate.snoozeUntil(Date.now()) }));
+    } catch (e) { /* the card still hides for this session */ }
+  }
+  sendPack({ showCard: false, ready: false, progress: false });
+  return { ok: true };
+}
+
+function packRestart() {
+  if (!packReady || !packUpdater) return { ok: false, reason: 'not-ready' };
+  if (packSession) return packSession.tapRestart();
+  packUpdater.quitAndInstall();
+  return { ok: true };
+}
+
+function packLater() {
+  packReady = false;
+  const out = packSession ? packSession.tapLater() : { ok: true, installed: false };
+  sendPack({ showCard: false, ready: false, progress: false, label: runningLabelFor(readPackIdentity()) });
+  return out;
+}
+
+function schedulePackChecks() {
+  setTimeout(() => {
+    function tick() {
+      packLastAuto = Date.now();
+      runPackCheck({ manual: false }).catch(() => {});
+    }
+    tick();
+    setInterval(tick, packUpdate.DAY_MS);
+  }, 30000);
+}
+
+async function injectPackCard() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const src = fs.readFileSync(path.join(__dirname, 'pack-update-card.js'), 'utf8');
+  await mainWindow.webContents.executeJavaScript(src + '\nif (window.FLPackUpdate && FLPackUpdate.boot) FLPackUpdate.boot();');
+}
+
 // ============================================
 // IPC Handlers (communication with renderer)
 // ============================================
@@ -1090,6 +1354,14 @@ function setupIPC() {
   ipcMain.handle('check-for-updates', () => {
     return latticeUpdate.checkForUpdates({ currentVersion: app.getVersion(), platform: process.platform });
   });
+
+  // v-desktop-update-buttons-v0.2: the in-page card. Restart calls quitAndInstall only after Update.
+  ipcMain.handle('pack-update-state', () => viewFor(packLastResult, { showCard: false, label: '' }));
+  ipcMain.handle('pack-update-check', () => runPackCheck({ manual: true }));
+  ipcMain.handle('pack-update-apply', () => applyPackUpdate());
+  ipcMain.handle('pack-update-not-now', () => packNotNow());
+  ipcMain.handle('pack-update-restart', () => packRestart());
+  ipcMain.handle('pack-update-later', () => packLater());
 
   ipcMain.handle('get-platform', () => {
     return process.platform;
