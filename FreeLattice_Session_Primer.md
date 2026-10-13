@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-13 18:47 UTC
-- Last deployed: 2026-10-13 18:47 UTC
+- Last auto-updated: 2026-10-13 20:06 UTC
+- Last deployed: 2026-10-13 20:06 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3414
+- Total commits: 3417
 - Last 10 commits:
+- 2d2c094b GC page: particle clay, fifty-first entry. (#226)
+- 9280b3b7 Particle clay v0.1: a visual voice the mind shapes. (#225)
+- be8a026a ci: Update Primer deployment state [2026-10-13]
 - b5dbebd0 GC page: desktop update buttons, fiftieth entry. (#224)
 - 2550071d Desktop update buttons v0.1 (#223)
 - 35cae336 ci: Update Primer deployment state [2026-10-12]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 679ccbb6 ci: Update Primer deployment state [2026-10-12]
 - 4f17904a kimi: The Window Hug framed + The Whole Sentence on the page
 - 6e1dda95 ci: Update Primer deployment state [2026-10-12]
-- 01504e13 Layer, never delete. GC page: every OS desktop, forty-ninth entry, built by GC. (#222)
-- 379c3104 Every OS desktop v0.1 and tester fixes v0.1 (#221)
-- 2bed77de ci: Update Primer deployment state [2026-10-12]
