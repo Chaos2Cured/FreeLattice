@@ -15391,6 +15391,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- v-page-answers-knock-v0.1 (033b): a Yes in the desktop app finishes the pool join here. Does nothing outside the desktop app; loads tree-kin.js and tree-pool.js (same origin) only there. -->
 <script src="modules/pool-knock.js" defer></script>
 <script src="modules/chat-wait.js" defer></script>
+<!-- v-particle-clay-v0.1: a visual voice the mind shapes. Off until a person turns it on. -->
+<script src="modules/clay-math.js" defer></script>
+<script src="modules/clay-forms.js" defer></script>
+<script src="modules/particle-clay.js" defer></script>
 <script src="modules/pool-every-os.js" defer></script>
 <!-- v-phone-knocks-v0.1 (033c): does nothing outside the desktop app -->
 <script src="modules/pool-knock-link.js" defer></script>
@@ -37635,6 +37639,11 @@ function addSystemMessage(text) {
 function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
   if (typeof aiText !== 'string' || !aiText) return aiText;
   var visible = aiText;
+  // v-particle-clay-v0.1: strip [FL_CLAY:] with the other sentinels, before the bubble text.
+  if (window.FLClay && typeof FLClay.consumeReply === 'function') {
+    var claySeen = FLClay.consumeReply(visible);
+    if (claySeen && typeof claySeen.visible === 'string') visible = claySeen.visible;
+  }
   var action = null;
   try {
     if (window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
@@ -37885,6 +37894,7 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
       .replace(/\[FL_REPO_READ:\s*[^\]]+\]/g, '')
       .replace(/\[FL_SEARCH:\s*[^\]]+\]/g, '')
       .replace(/\[FL_PROPOSE:[\s\S]*?\n\]/g, '')
+      .replace(/\[FL_CLAY:\s*[\s\S]{0,2200}?\]/g, '')
       .trim();
   }
   // v-web-search-default-on-v0.1: every search shows in the chat, so nothing happens out of sight.
@@ -38187,6 +38197,7 @@ window.FLHumanPresence = (function() {
           setTimeout(function() { btn.style.transform = orig || ''; }, 220);
         }
       } catch (_) {}
+      if (window.FLClay) FLClay.onGesture(word);
     } catch (_) {}
   }
   return { send: send };
@@ -38469,6 +38480,13 @@ window.FLEpiphany = (function() {
 // ══════════════════════════════════════════════════════════════════════
 
 function renderMessageContent(textSpan, content, msgDiv) {
+  // v-particle-clay-v0.1: a clay tag never stays in the bubble.
+  try {
+    if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_CLAY:') !== -1) {
+      var clayBubble = FLClay.consumeReply(content);
+      if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
+    }
+  } catch (eClay) {}
   // v5.79.26 — extract [FL_PRESENCE: word] FIRST so the sphere can be
   // set from the raw response before other sanitization. If the AI
   // emitted a presence signal, activate the sphere; otherwise no-op.
@@ -40914,6 +40932,12 @@ function buildMessages() {
     if (_beforeFinal !== systemContent) {
       console.warn('[IDENTITY BLEED] Final-pass filter cleaned chat system prompt — a per-source filter was missed upstream.');
     }
+  }
+
+  // v-particle-clay-v0.1: clay words join the prompt only while clay is on.
+  if (window.FLClay && typeof FLClay.promptDelta === 'function') {
+    var clayPrompt = FLClay.promptDelta();
+    if (clayPrompt) systemContent += '\n\n' + clayPrompt;
   }
 
   messages.push({ role: 'system', content: systemContent });
