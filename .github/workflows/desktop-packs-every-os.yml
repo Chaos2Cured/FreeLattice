@@ -145,7 +145,7 @@ jobs:
         run: |
           ls -la dist/
           test -f dist/latest-linux.yml
-          ls dist/*.blockmap
+          # electron-builder 24 writes a .blockmap for NSIS. The AppImage target does not.
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
@@ -155,7 +155,6 @@ jobs:
             desktop/dist/FreeLattice_*_Linux.AppImage
             desktop/dist/FreeLattice_*_Linux.deb
             desktop/dist/latest-linux.yml
-            desktop/dist/*.blockmap
           if-no-files-found: error
 
   build-mac:
