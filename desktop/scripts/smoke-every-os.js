@@ -216,7 +216,7 @@ function sleep(ms) {
   });
   ok(!/CSC_LINK|WIN_CSC|APPLE_ID|APPLE_APP|CSC_KEY_PASSWORD/.test(yml), 'workflow sets no signing secret');
   ok(/CSC_IDENTITY_AUTO_DISCOVERY:\s*'false'/.test(yml), 'signing discovery stays off');
-  ok(/buildVersion=5\.8\.0-035/.test(yml) && /extraMetadata\.version=5\.8\.0/.test(yml), 'version label stays 5.8.0');
+  ok(/buildVersion=5\.8\.1-036/.test(yml) && /extraMetadata\.version=5\.8\.1/.test(yml), 'version label is 5.8.1');
 
   console.log('checks passed: ' + passed);
   console.log('SMOKE_OK every os desktop v0.1');

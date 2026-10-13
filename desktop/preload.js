@@ -21,6 +21,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // v-desktop-update-button-v0.1: ask GitHub releases whether a newer desktop app is out (no download).
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 
+  // v-desktop-update-buttons-v0.2: the in-page card. A tap is the only way a download or restart starts.
+  packUpdateState: () => ipcRenderer.invoke('pack-update-state'),
+  packUpdateCheck: () => ipcRenderer.invoke('pack-update-check'),
+  packUpdateApply: () => ipcRenderer.invoke('pack-update-apply'),
+  packUpdateNotNow: () => ipcRenderer.invoke('pack-update-not-now'),
+  packUpdateRestart: () => ipcRenderer.invoke('pack-update-restart'),
+  packUpdateLater: () => ipcRenderer.invoke('pack-update-later'),
+  onPackUpdate: (callback) => {
+    const handler = (_event, state) => callback(state);
+    ipcRenderer.on('pack-update-status', handler);
+    return () => ipcRenderer.removeListener('pack-update-status', handler);
+  },
+
   /**
    * Get the current platform.
    * @returns {Promise<string>} 'darwin', 'win32', or 'linux'

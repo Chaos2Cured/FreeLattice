@@ -1,8 +1,8 @@
 # FreeLattice: Desktop packs for every OS (honest unsigned)
 # Layer, never delete. The older desktop-packs-win-linux.yml stays as it is.
 # v-every-os-desktop-v0.1
-# Artifact names stay FreeLattice_5.8.0_*. The release tag tells an old pack from a new one.
-# buildVersion 5.8.0-035 is a label electron-builder accepts here because Windows
+# Artifact names use the version passed to the builder (5.8.1 for this pack).
+# buildVersion 5.8.1-036 is a label electron-builder accepts here because Windows
 # signAndEditExecutable is false, so rcedit (which wants four numbers) does not run.
 # The builder is called with --config.prop. Windows npm splits -c.prop into a filename.
 # The prove step sets shell: bash. windows-latest otherwise uses PowerShell, which
@@ -73,13 +73,22 @@ jobs:
           node scripts/smoke-discover.js
           node scripts/smoke-reconnect.js
 
+      - name: Write pack label
+        shell: bash
+        env:
+          PACK_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+        run: node scripts/write-build-info.js
+
       - name: Build Windows packs (unsigned)
         shell: bash
-        run: node node_modules/electron-builder/cli.js --win --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
+        run: node node_modules/electron-builder/cli.js --win --publish never --config.extraMetadata.version=5.8.1 --config.buildVersion=5.8.1-036
 
       - name: List dist
         shell: bash
-        run: ls -la dist/
+        run: |
+          ls -la dist/
+          test -f dist/latest.yml
+          ls dist/*.blockmap
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -88,6 +97,8 @@ jobs:
           path: |
             desktop/dist/FreeLattice_*_Windows_Setup.exe
             desktop/dist/FreeLattice_*_Windows_Portable.exe
+            desktop/dist/latest.yml
+            desktop/dist/*.blockmap
           if-no-files-found: error
 
   build-linux:
@@ -119,12 +130,22 @@ jobs:
           node scripts/smoke-discover.js
           node scripts/smoke-reconnect.js
 
+      - name: Write pack label
+        shell: bash
+        env:
+          PACK_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+        run: node scripts/write-build-info.js
+
       - name: Build Linux packs (unsigned)
         shell: bash
-        run: node node_modules/electron-builder/cli.js --linux --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
+        run: node node_modules/electron-builder/cli.js --linux --publish never --config.extraMetadata.version=5.8.1 --config.buildVersion=5.8.1-036
 
       - name: List dist
-        run: ls -la dist/
+        shell: bash
+        run: |
+          ls -la dist/
+          test -f dist/latest-linux.yml
+          ls dist/*.blockmap
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
@@ -133,6 +154,8 @@ jobs:
           path: |
             desktop/dist/FreeLattice_*_Linux.AppImage
             desktop/dist/FreeLattice_*_Linux.deb
+            desktop/dist/latest-linux.yml
+            desktop/dist/*.blockmap
           if-no-files-found: error
 
   build-mac:
@@ -164,9 +187,15 @@ jobs:
           node scripts/smoke-discover.js
           node scripts/smoke-reconnect.js
 
+      - name: Write pack label
+        shell: bash
+        env:
+          PACK_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || github.ref_name }}
+        run: node scripts/write-build-info.js
+
       - name: Build Mac packs (unsigned)
         shell: bash
-        run: node node_modules/electron-builder/cli.js --mac --config.extraMetadata.version=5.8.0 --config.buildVersion=5.8.0-035
+        run: node node_modules/electron-builder/cli.js --mac --config.extraMetadata.version=5.8.1 --config.buildVersion=5.8.1-036
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
@@ -232,7 +261,7 @@ jobs:
           body: |
             Unsigned for now. Windows may say Windows protected your PC. Tap More info, then Run anyway. That warning means the file has no paid signature yet, not that it is harmful. Mac: right click, Open. Linux: make the AppImage executable, then open it.
 
-            The file names still say 5.8.0. This tag is how you tell this pack from the older one.
+            The file names say 5.8.1. The tag tells this pack from an older one.
 
             Later: Windows code signing (so SmartScreen stops warning) and Mac notarization. Both cost money and need Kirk's accounts. Not in 035.
           files: |
@@ -242,5 +271,8 @@ jobs:
             release-assets/FreeLattice_*_Linux.deb
             release-assets/FreeLattice_*_macOS.zip
             release-assets/FreeLattice_*_macOS.dmg
+            release-assets/latest.yml
+            release-assets/latest-linux.yml
+            release-assets/*.blockmap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -20,6 +20,24 @@ A free, open-source, local-first AI platform in a single HTML file. No account. 
 
 Browser is fragile. **Desktop is the house** — keys, verified import, swarm, companion memory, pair, ledger. Never again lose the ability to carry minds forward.
 
+**desktop-packs-v0.2** (the pack to download). Windows Setup is the primary Windows pack. If you installed before October 2026, download once more by hand; after that the app can update itself.
+
+**Windows Setup:** [FreeLattice_5.8.0_Windows_Setup.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_Windows_Setup.exe)
+
+**Windows Portable:** [FreeLattice_5.8.0_Windows_Portable.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_Windows_Portable.exe)
+
+**Linux AppImage:** [FreeLattice_5.8.0_Linux.AppImage](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_Linux.AppImage)
+
+**Linux .deb:** [FreeLattice_5.8.0_Linux.deb](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_Linux.deb)
+
+**Mac dmg:** [FreeLattice_5.8.0_macOS.dmg](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_macOS.dmg)
+
+**Mac zip:** [FreeLattice_5.8.0_macOS.zip](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_macOS.zip)
+
+Release: [desktop-packs-v0.2](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.2)
+
+Older pack: desktop-packs-v0.1
+
 **Mac (real pack):**
 [FreeLattice_5.8.0_macOS.zip](https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.8.0/FreeLattice_5.8.0_macOS.zip)
 
