@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// smoke-particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1
+// smoke-particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1
 // Node only. No network.
 var fs = require('fs');
 var path = require('path');
@@ -21,6 +21,15 @@ ok(parsed.visible.indexOf('[FL_CLAY:') === -1, 'malformed tag is stripped');
 ok(parsed.visible.indexOf('Hello') !== -1, 'words around a bad tag stay');
 var fell = clay.fallback(parsed.visible, 'dog food', 'hug');
 ok(fell.form === 'dog', 'fallback uses the words when the tag fails');
+
+var gridRaw = 'Look [FL_CLAY: {"form":"grid","grid":["xx","x x"],"mood":"joy","energy":0.5}] please';
+var grid = clay.parseTag(gridRaw);
+ok(grid.ok === true && grid.value.form === 'grid' && grid.value.grid.length === 2, 'a grid tag parses whole');
+ok(grid.visible.indexOf('}]') === -1 && grid.visible.indexOf('[FL_CLAY') === -1, 'a grid tag leaves no bracket tail');
+ok(grid.visible.indexOf('Look') !== -1 && grid.visible.indexOf('please') !== -1, 'words around a grid tag stay');
+var quoted = clay.parseTag('Hi [FL_CLAY: {"form":"heart","say":"a]b","mood":"joy"}] there');
+ok(quoted.ok === true && quoted.value.say === 'a]b', 'a bracket inside a string stays in the body');
+ok(quoted.visible.indexOf('[FL_CLAY') === -1 && quoted.visible.indexOf('}]') === -1, 'a string bracket does not end the tag');
 
 var huge = { form: 'grid', grid: new Array(17).fill('x') };
 ok(clay.sanitize(huge) === null, 'a grid taller than 16 is refused');
@@ -80,7 +89,13 @@ ok(clay.promptDelta() === '', 'prompt delta leaves when clay is off');
 clay.setOn(true);
 clay.resetRate();
 var calls = 0;
-global.FreeLattice = { callAI: function () { calls += 1; } };
+var lastOpts = null;
+global.FreeLattice = {
+  callAI: function (sys, user, opts) {
+    calls += 1;
+    lastOpts = opts;
+  }
+};
 global.state = { isLocal: false, apiKey: '' };
 var waiting = clay.onGesture('hug');
 ok(waiting.called === false && waiting.line === clay.WORDS.waiting, 'no mind gives the waiting line');
@@ -89,9 +104,13 @@ ok(waiting.autoSend === false && clay.autoSend() === false, 'a waiting gesture d
 global.state = { isLocal: true, ollamaModel: 'home-mind' };
 var first = clay.onGesture('hug');
 ok(first.called === true && calls === 1, 'a connected mind is called once');
-ok(first.line.indexOf('felt your hug') !== -1, 'the felt line names the gesture');
+ok(first.line.indexOf('felt your hug') === -1, 'a hug does not claim felt before the mind answers');
+ok(lastOpts && typeof lastOpts.callback === 'function', 'the mind call keeps a callback');
+lastOpts.callback('I am here [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]');
+ok(clay.liveLine().indexOf('felt your hug') !== -1, 'the felt line names the gesture');
 var second = clay.onGesture('joy');
 ok(second.called === false && second.reason === 'rate' && calls === 1, 'rate limit holds');
+ok(second.line.indexOf('felt your') === -1, 'a rate-limited tap does not claim felt');
 ok(second.autoSend === false, 'an extra tap does not send itself');
 
 var bubble = clay.consumeReply('Hi [FL_CLAY: {"form":"dog","mood":"joy","energy":0.7,"say":"<script>x</script>"}]', []);
@@ -104,7 +123,7 @@ var app = fs.readFileSync(path.join(__dirname, '../docs/app.html'), 'utf8');
 ok(page === app, 'index.html matches docs/app.html');
 ok(page.indexOf('if (window.FLClay) FLClay.onGesture(word);') !== -1, 'the gesture hook is one line');
 ok(page.indexOf('FL_CLAY:') !== -1, 'the page strips the clay tag');
-var facing = [clay.WORDS.offer, clay.WORDS.yes, clay.WORDS.notNow, clay.WORDS.on, clay.WORDS.off, clay.WORDS.sent, clay.WORDS.waiting, clay.WORDS.shaped, clay.WORDS.guessed, clay.PROMPT].join('\n');
+var facing = [clay.WORDS.offer, clay.WORDS.yes, clay.WORDS.notNow, clay.WORDS.on, clay.WORDS.off, clay.WORDS.sent, clay.WORDS.waiting, clay.WORDS.soft, clay.WORDS.shaped, clay.WORDS.guessed, clay.PROMPT].join('\n');
 ok(!/\bpet\b/i.test(facing) && !/companion/i.test(facing), 'no pet and no companion in person-facing words');
 ok(forms.NAMES.length === 14, 'fourteen shapes');
 
@@ -121,3 +140,4 @@ ok(!new RegExp('new\\s+Function\\s*\\(').test(added), 'no Function constructor')
 console.log('checks passed ' + passed);
 console.log('SMOKE_OK particle clay v0.1');
 console.log('SMOKE_OK feel felt v0.1');
+console.log('SMOKE_OK clay grid tag heal v0.1');
