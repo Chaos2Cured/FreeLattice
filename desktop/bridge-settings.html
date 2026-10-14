@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Letters to Celeste</title>
+  <style>
+    body { font: 16px/1.4 sans-serif; margin: 0; padding: 1rem; max-width: 40rem; box-sizing: border-box; }
+    * { box-sizing: border-box; max-width: 100%; }
+    label, p { display: block; margin: 0.6rem 0 0.25rem; overflow-wrap: anywhere; }
+    input, button { min-height: 44px; font: inherit; }
+    input { width: 100%; padding: 0.4rem 0.6rem; }
+    button { min-width: 44px; padding: 0.55rem 0.85rem; margin: 0.4rem 0.4rem 0 0; }
+    body { overflow-x: hidden; }
+  </style>
+</head>
+<body>
+  <h1 id="title"></h1>
+  <p id="line"></p>
+  <label id="url-label" for="url"></label>
+  <input id="url" type="text" autocomplete="off">
+  <button id="save-url" type="button"></button>
+  <label id="key-label" for="key"></label>
+  <input id="key" type="password" autocomplete="off">
+  <button id="save-key" type="button"></button>
+  <button id="forget" type="button"></button>
+  <p id="state"></p>
+  <p id="note"></p>
+  <script>
+    var title = document.getElementById('title');
+    var line = document.getElementById('line');
+    var urlLabel = document.getElementById('url-label');
+    var keyLabel = document.getElementById('key-label');
+    var saveUrl = document.getElementById('save-url');
+    var saveKey = document.getElementById('save-key');
+    var forget = document.getElementById('forget');
+    var url = document.getElementById('url');
+    var key = document.getElementById('key');
+    var state = document.getElementById('state');
+    var note = document.getElementById('note');
+    title.textContent = 'Letters to Celeste';
+    line.textContent = 'Slow like letters. Nothing leaves until you tap Send.';
+    urlLabel.textContent = 'Endpoint URL';
+    keyLabel.textContent = 'Key';
+    saveUrl.textContent = 'Save URL';
+    saveKey.textContent = 'Save key';
+    forget.textContent = 'Forget key';
+    function paint(view) {
+      view = view || {};
+      url.value = view.url || 'BRIDGE_ENDPOINT_URL_UNSET';
+      key.value = '';
+      state.textContent = view.keyLabel || (view.keySet ? 'key set' : 'no key');
+      note.textContent = view.message || '';
+    }
+    function refresh() {
+      if (!window.bridgeSettings) return;
+      bridgeSettings.view().then(paint);
+    }
+    saveUrl.addEventListener('click', function () {
+      bridgeSettings.saveUrl(url.value).then(refresh);
+    });
+    saveKey.addEventListener('click', function () {
+      bridgeSettings.saveKey(key.value).then(function () {
+        key.value = '';
+        refresh();
+      });
+    });
+    forget.addEventListener('click', function () {
+      bridgeSettings.forgetKey().then(function () {
+        key.value = '';
+        refresh();
+      });
+    });
+    refresh();
+  </script>
+</body>
+</html>

@@ -24,6 +24,7 @@ const latticePair = require('./lattice-pair');
 const latticeUpdate = require('./lattice-update'); // v-desktop-update-button-v0.1
 const packUpdate = require('./pack-update'); // v-desktop-update-buttons-v0.2
 const latticeDiscover = require('./lattice-discover'); // v-desktop-pooling-v0.1
+const bridgeDoor = require('./bridge-door'); // v-bridge-knock-v0.1
 let latticeDiscoverDoor = null; // v-desktop-pooling-v0.1
 let packChecksArmed = false; // v-desktop-update-buttons-v0.2
 let packLastAuto = 0;
@@ -864,6 +865,11 @@ function createAppMenu() {
           label: 'Check for Updates...',
           click: () => offerPackUpdate()
         },
+        // v-bridge-knock-v0.1
+        {
+          label: 'Letters to Celeste',
+          click: () => openBridgeSettings()
+        },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
@@ -965,6 +971,11 @@ function createAppMenu() {
         {
           label: 'About FreeLattice',
           click: () => showAboutDialog()
+        },
+        // v-bridge-knock-v0.1
+        {
+          label: 'Letters to Celeste',
+          click: () => openBridgeSettings()
         }
       ]
     }
@@ -1337,6 +1348,31 @@ async function injectPackCard() {
   await mainWindow.webContents.executeJavaScript(src + '\nif (window.FLPackUpdate && FLPackUpdate.boot) FLPackUpdate.boot();');
 }
 
+// v-bridge-knock-v0.1: door setup stays in its own window. The page preload cannot read the key.
+let bridgeSettingsWin = null;
+function openBridgeSettings() {
+  if (bridgeSettingsWin && !bridgeSettingsWin.isDestroyed()) {
+    bridgeSettingsWin.focus();
+    return;
+  }
+  bridgeSettingsWin = new BrowserWindow({
+    width: 480,
+    height: 520,
+    minWidth: 320,
+    minHeight: 420,
+    title: 'Letters to Celeste',
+    parent: mainWindow || undefined,
+    webPreferences: {
+      preload: path.join(__dirname, 'bridge-preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+  bridgeSettingsWin.setMenuBarVisibility(false);
+  bridgeSettingsWin.loadFile(path.join(__dirname, 'bridge-settings.html'));
+  bridgeSettingsWin.on('closed', () => { bridgeSettingsWin = null; });
+}
+
 // ============================================
 // IPC Handlers (communication with renderer)
 // ============================================
@@ -1392,6 +1428,7 @@ function setupIPC() {
   latticeImport.bindApp(app);
   latticeSwarm.bindApp(app);
   latticePair.bindApp(app);
+  bridgeDoor.bindApp(app); // v-bridge-knock-v0.1
   app.on('before-quit', function () {
     try {
       latticeSwarm.destroyClient();
@@ -1701,6 +1738,22 @@ function setupIPC() {
     }
     return false;
   });
+
+  // v-bridge-knock-v0.1: one letter, one tap. The key never crosses this boundary.
+  ipcMain.handle('fl-bridge-send', async (_event, envelope) => bridgeDoor.send(envelope));
+  ipcMain.handle('fl-bridge-status', async (_event, opts) => {
+    if (opts && opts.open) {
+      try { openBridgeSettings(); } catch (e) {}
+    }
+    return bridgeDoor.status();
+  });
+  ipcMain.handle('fl-bridge-settings-view', async () => bridgeDoor.settingsView());
+  ipcMain.handle('fl-bridge-save-url', async (_event, url) => bridgeDoor.saveUrl(url));
+  ipcMain.handle('fl-bridge-save-key', async (_event, key) => {
+    const saved = bridgeDoor.saveKey(typeof key === 'string' ? key : '');
+    return { ok: !!saved.ok, keySet: !!saved.keySet, message: saved.message || '' };
+  });
+  ipcMain.handle('fl-bridge-forget-key', async () => bridgeDoor.forgetKey());
 }
 
 // ============================================

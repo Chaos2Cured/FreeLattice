@@ -36,6 +36,9 @@
       "lattice-discover.js",
       "pack-update.js",
       "pack-update-card.js",
+      "bridge-door.js",
+      "bridge-preload.js",
+      "bridge-settings.html",
       "app/**/*"
     ],
     "extraResources": [
