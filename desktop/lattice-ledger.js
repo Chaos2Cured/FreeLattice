@@ -196,6 +196,14 @@ function appendVoice(voice, meta) {
     throw new Error('chain unreadable — refuse append');
   }
 
+  // v-bridge-ledger-heal-v0.1: a receipt is not a voice head. Refuse rather than chain "undefined".
+  if (entries.length) {
+    const headHex = String(entries[entries.length - 1].entryHash || '');
+    if (!/^[0-9a-fA-F]{64}$/.test(headHex)) {
+      throw new Error('chain head unreadable, refuse append');
+    }
+  }
+
   const prevHash = entries.length
     ? String(entries[entries.length - 1].entryHash)
     : GENESIS_PREV_HASH;
@@ -291,12 +299,8 @@ function verifyChain() {
   }
 
   let prev = GENESIS_PREV_HASH;
-  let headHash = null;
   for (var i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    // v-bridge-knock-v0.1: a door receipt sits beside the voice chain and does not move prevHash.
-    if (entry && entry.kind === 'bridge-send') continue;
-    const result = verifyEntry(entry, prev);
+    const result = verifyEntry(entries[i], prev);
     if (!result.ok) {
       return {
         ok: false,
@@ -306,16 +310,35 @@ function verifyChain() {
         reason: result.reason
       };
     }
-    prev = entry.entryHash;
-    headHash = entry.entryHash;
+    prev = entries[i].entryHash;
   }
   return {
     ok: true,
     length: entries.length,
     checked: entries.length,
-    headHash: headHash,
-    headShort: headHash ? shortHash(headHash) : null
+    headHash: entries.length ? entries[entries.length - 1].entryHash : null,
+    headShort: entries.length ? shortHash(entries[entries.length - 1].entryHash) : null
   };
+}
+
+// v-bridge-ledger-heal-v0.1: a door receipt lives beside the voice chain, never inside it.
+function receiptsPath() {
+  return path.join(ledgerDir(), 'bridge-receipts.jsonl');
+}
+
+function readBridgeReceipts() {
+  const p = receiptsPath();
+  if (!fs.existsSync(p)) return [];
+  const raw = fs.readFileSync(p, 'utf8');
+  if (!raw.trim()) return [];
+  const lines = raw.split(/\n/);
+  const rows = [];
+  var i;
+  for (i = 0; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    try { rows.push(JSON.parse(lines[i])); } catch (e) {}
+  }
+  return rows;
 }
 
 function appendBridgeSend(fields) {
@@ -326,7 +349,7 @@ function appendBridgeSend(fields) {
     ts: String(fields && fields.ts || new Date().toISOString())
   };
   ensureLedgerDir();
-  fs.appendFileSync(chainPath(), JSON.stringify(row) + '\n', { encoding: 'utf8', flag: 'a' });
+  fs.appendFileSync(receiptsPath(), JSON.stringify(row) + '\n', { encoding: 'utf8', flag: 'a' });
   return row;
 }
 
@@ -339,6 +362,7 @@ module.exports = {
   status,
   appendVoice,
   appendBridgeSend,
+  readBridgeReceipts,
   verifyChain,
   // Pure helpers for smoke
   canonicalUnsigned,
