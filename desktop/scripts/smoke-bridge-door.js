@@ -121,10 +121,13 @@ async function main() {
   ok(good.ok === true && good.status === 200, 'a 2xx is sent');
   ok(JSON.stringify(good).indexOf(secret) === -1, 'send result has no key');
 
-  var ledgerPath = path.join(root, 'chain.jsonl');
+  var ledgerPath = path.join(root, 'bridge-receipts.jsonl');
   var ledgerText = fs.readFileSync(ledgerPath, 'utf8');
   ok(ledgerText.indexOf(secret) === -1, 'the ledger line has no key');
   ok(ledgerText.indexOf('"kind":"bridge-send"') !== -1, 'the ledger records the send');
+  var chainFile = path.join(root, 'chain.jsonl');
+  var chainText = fs.existsSync(chainFile) ? fs.readFileSync(chainFile, 'utf8') : '';
+  ok(chainText.indexOf('bridge-send') === -1, 'a receipt is not a voice line');
   ok(logs.join('\n').indexOf(secret) === -1, 'logs have no key');
 
   var badEnv = JSON.parse(JSON.stringify(env));
