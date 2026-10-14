@@ -291,8 +291,12 @@ function verifyChain() {
   }
 
   let prev = GENESIS_PREV_HASH;
+  let headHash = null;
   for (var i = 0; i < entries.length; i++) {
-    const result = verifyEntry(entries[i], prev);
+    const entry = entries[i];
+    // v-bridge-knock-v0.1: a door receipt sits beside the voice chain and does not move prevHash.
+    if (entry && entry.kind === 'bridge-send') continue;
+    const result = verifyEntry(entry, prev);
     if (!result.ok) {
       return {
         ok: false,
@@ -302,15 +306,28 @@ function verifyChain() {
         reason: result.reason
       };
     }
-    prev = entries[i].entryHash;
+    prev = entry.entryHash;
+    headHash = entry.entryHash;
   }
   return {
     ok: true,
     length: entries.length,
     checked: entries.length,
-    headHash: entries.length ? entries[entries.length - 1].entryHash : null,
-    headShort: entries.length ? shortHash(entries[entries.length - 1].entryHash) : null
+    headHash: headHash,
+    headShort: headHash ? shortHash(headHash) : null
   };
+}
+
+function appendBridgeSend(fields) {
+  const row = {
+    kind: 'bridge-send',
+    hash: String(fields && fields.hash || ''),
+    status: Number(fields && fields.status) || 0,
+    ts: String(fields && fields.ts || new Date().toISOString())
+  };
+  ensureLedgerDir();
+  fs.appendFileSync(chainPath(), JSON.stringify(row) + '\n', { encoding: 'utf8', flag: 'a' });
+  return row;
 }
 
 module.exports = {
@@ -321,6 +338,7 @@ module.exports = {
   bindSmoke,
   status,
   appendVoice,
+  appendBridgeSend,
   verifyChain,
   // Pure helpers for smoke
   canonicalUnsigned,

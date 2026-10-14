@@ -252,3 +252,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 // Signal that we're running inside Electron
 // This is checked by the FreeLattice app to enable desktop-specific features
 contextBridge.exposeInMainWorld('isElectronApp', true);
+
+// v-bridge-knock-v0.1: exactly these two calls. The key never crosses here.
+contextBridge.exposeInMainWorld('flBridge', {
+  send: (envelope) => ipcRenderer.invoke('fl-bridge-send', envelope),
+  status: (opts) => ipcRenderer.invoke('fl-bridge-status', opts || {})
+});

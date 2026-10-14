@@ -15395,6 +15395,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/clay-math.js" defer></script>
 <script src="modules/clay-forms.js" defer></script>
 <script src="modules/particle-clay.js" defer></script>
+<!-- v-bridge-knock-v0.1: slow letters. Off until a person turns them on. The page never fetches. -->
+<script src="modules/fl-bridge.js" defer></script>
 <script src="modules/pool-every-os.js" defer></script>
 <!-- v-phone-knocks-v0.1 (033c): does nothing outside the desktop app -->
 <script src="modules/pool-knock-link.js" defer></script>
@@ -37644,6 +37646,11 @@ function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
     var claySeen = FLClay.consumeReply(visible);
     if (claySeen && typeof claySeen.visible === 'string') visible = claySeen.visible;
   }
+  // v-bridge-knock-v0.1: a letter tag becomes a draft. It never sends.
+  if (window.FLBridge && typeof FLBridge.consumeReply === 'function') {
+    var bridgeSeen = FLBridge.consumeReply(visible);
+    if (bridgeSeen && typeof bridgeSeen.visible === 'string') visible = bridgeSeen.visible;
+  }
   var action = null;
   try {
     if (window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
@@ -37897,6 +37904,13 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
       .replace(/\[FL_CLAY:\s*[\s\S]{0,2200}?\]/g, '')
       .trim();
   }
+  // v-bridge-knock-v0.1: balanced brackets, so a letter tag leaves the line.
+  var flStripSentinelCore = stripAnySentinel;
+  stripAnySentinel = function (text) {
+    var stripped = flStripSentinelCore(text);
+    if (window.FLBridge && typeof FLBridge.strip === 'function') stripped = FLBridge.strip(stripped);
+    return stripped;
+  };
   // v-web-search-default-on-v0.1: every search shows in the chat, so nothing happens out of sight.
   function flSearchNote(q) {
     var clean = String(q || '').replace(/[*_`<>\[\]]/g, '').slice(0, 120);
@@ -38485,6 +38499,10 @@ function renderMessageContent(textSpan, content, msgDiv) {
     if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_CLAY:') !== -1) {
       var clayBubble = FLClay.consumeReply(content);
       if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
+    }
+    if (window.FLBridge && typeof FLBridge.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_BRIDGE:') !== -1) {
+      var bridgeBubble = FLBridge.consumeReply(content);
+      if (bridgeBubble && typeof bridgeBubble.visible === 'string') content = bridgeBubble.visible;
     }
   } catch (eClay) {}
   // v5.79.26 — extract [FL_PRESENCE: word] FIRST so the sphere can be
@@ -40938,6 +40956,11 @@ function buildMessages() {
   if (window.FLClay && typeof FLClay.promptDelta === 'function') {
     var clayPrompt = FLClay.promptDelta();
     if (clayPrompt) systemContent += '\n\n' + clayPrompt;
+  }
+  // v-bridge-knock-v0.1: letter words join the prompt only while letters are on.
+  if (window.FLBridge && typeof FLBridge.promptDelta === 'function') {
+    var bridgePrompt = FLBridge.promptDelta();
+    if (bridgePrompt) systemContent += '\n\n' + bridgePrompt;
   }
 
   messages.push({ role: 'system', content: systemContent });
