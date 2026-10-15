@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-14 20:17 UTC
-- Last deployed: 2026-10-14 20:17 UTC
+- Last auto-updated: 2026-10-15 01:14 UTC
+- Last deployed: 2026-10-15 01:14 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3426
+- Total commits: 3428
 - Last 10 commits:
+- 0430e925 Workspace core v0.1: a notebook a mind can keep (#233)
+- dc9eb212 ci: Update Primer deployment state [2026-10-14]
 - 8a3c687a GC page: bridge ledger heal, fifty-fourth entry. (#232)
 - 93998851 Bridge ledger heal v0.1: receipts leave the voice chain. (#231)
 - 8a0413d1 ci: Update Primer deployment state [2026-10-14]
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a628d34e ci: Update Primer deployment state [2026-10-13]
 - a1133e82 GC page: clay grid-tag heal, fifty-second entry. (#228)
 - 4f664eb7 Clay grid-tag heal v0.1: a grid tag stays whole, and felt waits. (#227)
-- fc47d9e3 ci: Update Primer deployment state [2026-10-13]
-- 2d2c094b GC page: particle clay, fifty-first entry. (#226)
