@@ -16,6 +16,7 @@ const path = require('path');
 const OLLAMA_HOSTNAME = '127.0.0.1';
 const OLLAMA_PORT = 11434;
 const BRIDGE_PORT_DEFAULT = 11435;
+const portHeal = require('../desktop/port-heal'); // v-port-self-heal-v0.1
 
 /** FreeLattice origins only — never bare * */
 const ALLOWED_ORIGIN_PATTERNS = [
@@ -93,15 +94,9 @@ function portFree(port) {
 }
 
 async function findFreePort(preferred) {
-  let p = Number(preferred) || BRIDGE_PORT_DEFAULT;
-  if (p === OLLAMA_PORT) p = BRIDGE_PORT_DEFAULT; // never steal Ollama
-  for (let i = 0; i < 40; i++) {
-    const tryPort = p + i;
-    if (tryPort === OLLAMA_PORT) continue;
-    if (tryPort > 65535) break;
-    if (await portFree(tryPort)) return tryPort;
-  }
-  throw new Error('No free Bridge channel near ' + preferred);
+  // v-port-self-heal-v0.1: the door is 11435..11445. Never 11434. Never past 11445.
+  // A start outside that band stays inside start..start+10.
+  return portHeal.pickFirstFree(portHeal.bridgeCandidates(preferred), portFree);
 }
 
 function resolvePreferredPort(argv, env, configPath) {

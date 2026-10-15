@@ -24,6 +24,7 @@ const latticePair = require('./lattice-pair');
 const latticeUpdate = require('./lattice-update'); // v-desktop-update-button-v0.1
 const packUpdate = require('./pack-update'); // v-desktop-update-buttons-v0.2
 const latticeDiscover = require('./lattice-discover'); // v-desktop-pooling-v0.1
+const portHeal = require('./port-heal'); // v-port-self-heal-v0.1
 const bridgeDoor = require('./bridge-door'); // v-bridge-knock-v0.1
 let latticeDiscoverDoor = null; // v-desktop-pooling-v0.1
 let packChecksArmed = false; // v-desktop-update-buttons-v0.2
@@ -145,16 +146,25 @@ const MIME_TYPES = {
 // ============================================
 
 function findAvailablePort(startPort) {
+  // v-port-self-heal-v0.1: a bounded walk. 45678 stays 45678..45688.
+  // A start inside 11434..11445 uses the door list and never takes 11434.
+  const candidates = portHeal.appCandidates(startPort);
   return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.listen(startPort, '127.0.0.1', () => {
-      const port = server.address().port;
-      server.close(() => resolve(port));
-    });
-    server.on('error', () => {
-      // Port in use, try next
-      resolve(findAvailablePort(startPort + 1));
-    });
+    function tryAt(i) {
+      if (i >= candidates.length) {
+        reject(new Error(portHeal.BUSY_LINE));
+        return;
+      }
+      const port = candidates[i];
+      if (port === portHeal.OLLAMA_PORT) { tryAt(i + 1); return; }
+      const server = net.createServer();
+      server.listen(port, '127.0.0.1', () => {
+        const bound = server.address().port;
+        server.close(() => resolve(bound));
+      });
+      server.on('error', () => { tryAt(i + 1); });
+    }
+    tryAt(0);
   });
 }
 
@@ -1631,7 +1641,7 @@ function setupIPC() {
   // every resume is a native window with a human tap; a page can never do either alone.
   // Pause always wins. Public fields only cross to the page; keys stay in main.
   const _dpPending = new Map(); // joinId -> resolve(answer)
-  const _dp = latticeDiscover.createDiscover({
+  const _dpDeps = {
     storeDir: path.join(app.getPath('userData'), 'lattice-discover'),
     appOrigin: () => 'http://127.0.0.1:' + serverPort,
     mdns: (opts) => {
@@ -1660,6 +1670,39 @@ function setupIPC() {
         if (!body || typeof Notification !== 'function') return;
         const n = new Notification({ title: 'FreeLattice', body: body });
         if (n && n.show) n.show();
+      } catch (e) {}
+    }
+  };
+  const _dp = latticeDiscover.createDiscover(_dpDeps);
+  // v-port-self-heal-v0.1: if the remembered knock port is busy, offer the next
+  // free door. The locked listener is not edited. A move tells trusted kin only.
+  portHeal.wrapDiscover(_dpDeps, {
+    listKin: function () {
+      try {
+        return (_dp.kinList ? _dp.kinList() : []).map(function (k) {
+          return { fp: k && k.fp, trusted: true };
+        });
+      } catch (e) { return []; }
+    },
+    sign: function (payload) {
+      try {
+        const signed = latticeKeys.signPayload(Buffer.from(String(payload || ''), 'utf8').toString('base64'));
+        return signed && signed.signatureB64 ? signed.signatureB64 : '';
+      } catch (e) { return ''; }
+    },
+    deliver: function (fp, note) {
+      try {
+        const dir = path.join(app.getPath('userData'), 'lattice-discover', 'kin-notes');
+        fs.mkdirSync(dir, { recursive: true });
+        const name = String(fp || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 32);
+        if (!name) return;
+        fs.writeFileSync(path.join(dir, name + '.json'), JSON.stringify(note));
+      } catch (e) {}
+    },
+    receipt: function (row) {
+      try {
+        const file = path.join(app.getPath('userData'), 'lattice-discover', 'port-receipt.json');
+        fs.writeFileSync(file, JSON.stringify({ event: row.event, count: row.count }));
       } catch (e) {}
     }
   });
