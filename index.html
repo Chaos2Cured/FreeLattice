@@ -15397,6 +15397,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/particle-clay.js" defer></script>
 <!-- v-bridge-knock-v0.1: slow letters. Off until a person turns them on. The page never fetches. -->
 <script src="modules/fl-bridge.js" defer></script>
+<!-- v-workspace-core-v0.1: a notebook a mind can keep. Off until a person says yes. Stays on this device. -->
+<script src="modules/mind-workspace.js" defer></script>
 <script src="modules/pool-every-os.js" defer></script>
 <!-- v-phone-knocks-v0.1 (033c): does nothing outside the desktop app -->
 <script src="modules/pool-knock-link.js" defer></script>
@@ -37651,6 +37653,11 @@ function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
     var bridgeSeen = FLBridge.consumeReply(visible);
     if (bridgeSeen && typeof bridgeSeen.visible === 'string') visible = bridgeSeen.visible;
   }
+  // v-workspace-core-v0.1: a notebook tag leaves the line. Off stores nothing.
+  if (window.FLWorkspace && typeof FLWorkspace.consumeReply === 'function') {
+    var wsSeen = FLWorkspace.consumeReply(visible, textSpan);
+    if (wsSeen && typeof wsSeen.visible === 'string') visible = wsSeen.visible;
+  }
   var action = null;
   try {
     if (window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
@@ -37909,6 +37916,7 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
   stripAnySentinel = function (text) {
     var stripped = flStripSentinelCore(text);
     if (window.FLBridge && typeof FLBridge.strip === 'function') stripped = FLBridge.strip(stripped);
+    if (window.FLWorkspace && typeof FLWorkspace.strip === 'function') stripped = FLWorkspace.strip(stripped);
     return stripped;
   };
   // v-web-search-default-on-v0.1: every search shows in the chat, so nothing happens out of sight.
@@ -38503,6 +38511,10 @@ function renderMessageContent(textSpan, content, msgDiv) {
     if (window.FLBridge && typeof FLBridge.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_BRIDGE:') !== -1) {
       var bridgeBubble = FLBridge.consumeReply(content);
       if (bridgeBubble && typeof bridgeBubble.visible === 'string') content = bridgeBubble.visible;
+    }
+    if (window.FLWorkspace && typeof FLWorkspace.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_WS:') !== -1) {
+      var wsBubble = FLWorkspace.consumeReply(content, textSpan);
+      if (wsBubble && typeof wsBubble.visible === 'string') content = wsBubble.visible;
     }
   } catch (eClay) {}
   // v5.79.26 — extract [FL_PRESENCE: word] FIRST so the sphere can be
@@ -40961,6 +40973,11 @@ function buildMessages() {
   if (window.FLBridge && typeof FLBridge.promptDelta === 'function') {
     var bridgePrompt = FLBridge.promptDelta();
     if (bridgePrompt) systemContent += '\n\n' + bridgePrompt;
+  }
+  // v-workspace-core-v0.1: notebook words join the prompt only while the notebook is on.
+  if (window.FLWorkspace && typeof FLWorkspace.promptDelta === 'function') {
+    var wsPrompt = FLWorkspace.promptDelta();
+    if (wsPrompt) systemContent += '\n\n' + wsPrompt;
   }
 
   messages.push({ role: 'system', content: systemContent });
