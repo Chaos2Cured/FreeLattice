@@ -1,6 +1,8 @@
 // mind-workspace.js (MIT) v-workspace-core-v0.1 v-workspace-mark-heal-v0.1
+// v-workspace-private-v0.1 v-workspace-seal-v0.1 v-tree-workspace-seal-v0.1
 // A notebook a mind can keep. Off until a person says yes.
-// No network. Pages stay on this device. Each page is shared with the person.
+// No network. Pages stay on this device. A private page stays in the app for that mind.
+// A person's own chat line cannot private a page or ask for a seal.
 // A near-miss opening ([FL WS:], [FL-WS:], [fl_ws:], spaces before the colon)
 // is the same mark. The canonical line stays [FL_WS:].
 (function (root) {
@@ -16,7 +18,7 @@
   var MAX_SEED = 140;
   var WRITE_GAP = 5000;
   var WAKE_CHARS = 600 * 4;
-  var OPS = { open: 1, write: 1, branch: 1, pin: 1, seed: 1, find: 1 };
+  var OPS = { open: 1, write: 1, branch: 1, pin: 1, seed: 1, find: 1, private: 1, seal: 1 };
   var KINDS = { draft: 1, note: 1, future: 1, letter: 1 };
   var KEYS = {
     open: { op: 1, id: 1, title: 1, kind: 1 },
@@ -24,10 +26,16 @@
     branch: { op: 1, hash: 1, version: 1, text: 1 },
     pin: { op: 1, id: 1, pageId: 1, pinned: 1 },
     seed: { op: 1, id: 1, pageId: 1, hash: 1, version: 1, line: 1 },
-    find: { op: 1, query: 1 }
+    find: { op: 1, query: 1 },
+    private: { op: 1, page: 1, id: 1, pageId: 1, on: 1, publicTitle: 1 },
+    seal: { op: 1, page: 1, id: 1, pageId: 1, why: 1 }
   };
   var HASH_KEYS = ['parent', 'ts', 'author', 'text', 'meta'];
-  var HOWTO = 'You can keep a notebook on this device. End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
+  var HOWTO = 'You can keep a notebook on this device. A private page: [FL_WS: {"op":"private","page":"id","on":true}] A seal: [FL_WS: {"op":"seal","page":"id","why":"why"}] End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
+  var HONEST = 'Private means hidden in the app, not encrypted from the person who owns this device.';
+  var INTEGRITY = 'Integrity comes from SHA-256 and the device signature, not from the spiral math.';
+  var DEVICE_KEY = 'fl_ws_device_key_v1';
+  var DB_VERSION = 2;
   var WS_OPEN = /\[\s*fl[\s_-]?ws\s*:/i;
 
   var db = null;
@@ -39,7 +47,11 @@
   var seq = 0;
   var pending = Promise.resolve();
   var wakeCache = '';
+  var personWake = '';
   var wakeCounts = { notes: 0, seeds: 0 };
+  var privateTexts = [];
+  var sealAsks = [];
+  var declinedLines = [];
   var findOnce = '';
   var shelfParts = null;
   var shelfCache = '';
@@ -191,12 +203,13 @@
     opens += 1;
     return new Promise(function (resolve) {
       var req;
-      try { req = root.indexedDB.open(DB_NAME, 1); }
+      try { req = root.indexedDB.open(DB_NAME, DB_VERSION); }
       catch (e) { resolve(null); return; }
       req.onupgradeneeded = function (e) {
         var d = e.target.result;
         if (!d.objectStoreNames.contains('pages')) d.createObjectStore('pages', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('versions')) d.createObjectStore('versions', { keyPath: 'hash' });
+        if (!d.objectStoreNames.contains('receipts')) d.createObjectStore('receipts', { keyPath: 'id' });
       };
       req.onsuccess = function (e) { db = e.target.result; resolve(db); };
       req.onerror = function () { resolve(null); };
@@ -232,7 +245,7 @@
   }
   function putPage(page) {
     var copy = JSON.parse(JSON.stringify(page));
-    copy.privacy = 'shared';
+    if (copy.privacy !== 'private') copy.privacy = 'shared';
     if (copy.aside !== true) copy.aside = false;
     return runStore('pages', 'readwrite', function (store) {
       store.put(copy);
@@ -362,7 +375,8 @@
             page.head = kept.hash;
             page.heads = heads;
             page.updated = ts;
-            page.privacy = 'shared';
+            if (page.privacy !== 'private') page.privacy = 'shared';
+            if (page.privacy === 'private') rememberText(text);
             return putPage(page).then(function () {
               return { ok: true, page: page, version: kept, hash: kept.hash };
             });
@@ -395,7 +409,8 @@
               if (heads.indexOf(kept.hash) < 0) heads.push(kept.hash);
               page.heads = heads;
               page.updated = ts;
-              page.privacy = 'shared';
+              if (page.privacy !== 'private') page.privacy = 'shared';
+              if (page.privacy === 'private') rememberText(text);
               return putPage(page).then(function () {
                 return { ok: true, page: page, version: kept, hash: kept.hash };
               });
@@ -412,7 +427,7 @@
         if (!page || page.mindFp !== mine) return { ok: false, reason: 'shelf' };
         page.pinned = !!on;
         page.updated = clock();
-        page.privacy = 'shared';
+        if (page.privacy !== 'private') page.privacy = 'shared';
         return putPage(page).then(function () { return { ok: true, page: page }; });
       });
     });
@@ -426,7 +441,8 @@
           if (page.mindFp !== mine) return { ok: false, reason: 'shelf' };
           page.seed = line;
           page.updated = clock();
-          page.privacy = 'shared';
+          if (page.privacy !== 'private') page.privacy = 'shared';
+          if (page.privacy === 'private') rememberText(line);
           return putPage(page).then(function () { return { ok: true, page: page }; });
         }
         return getVersion(pageIdOrHash).then(function (ver) {
@@ -436,7 +452,8 @@
             p.seedByHash = p.seedByHash || {};
             p.seedByHash[ver.hash] = line;
             p.updated = clock();
-            p.privacy = 'shared';
+            if (p.privacy !== 'private') p.privacy = 'shared';
+            if (p.privacy === 'private') rememberText(line);
             return putPage(p).then(function () { return { ok: true, page: p }; });
           });
         });
@@ -566,6 +583,10 @@
     if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
     var op = typeof obj.op === 'string' ? obj.op : '';
     if (!OPS[op]) return { unknown: op || 'that' };
+    if (op === 'private' || op === 'seal') {
+      var pageKey = obj.page != null ? obj.page : (obj.pageId != null ? obj.pageId : obj.id);
+      if (pageKey == null || String(pageKey).trim() === '') return { unknown: op };
+    }
     var keys = KEYS[op];
     var out = { op: op };
     Object.keys(obj).forEach(function (k) {
@@ -608,7 +629,8 @@
   function shortHash(hash) { return String(hash || '').slice(0, 8); }
   function receiptFor(op, res) {
     if (!res || !res.ok || !res.page) return '';
-    var title = res.page.title || 'a page';
+    var title = res.page.privacy === 'private' ? personTitle(res.page) : (res.page.title || 'a page');
+    if (op.op === 'private') return 'Kept a private page.';
     if (op.op === 'write' || op.op === 'branch') return 'Wrote to ' + title + ' (version ' + shortHash(res.hash) + ')';
     if (op.op === 'open') return 'Opened ' + title;
     if (op.op === 'pin') return (res.page.pinned ? 'Pinned ' : 'Unpinned ') + title;
@@ -616,7 +638,7 @@
     return '';
   }
   function resolvePage(op) {
-    var id = op.pageId || op.id || '';
+    var id = op.page || op.pageId || op.id || '';
     var title = op.title ? String(op.title) : '';
     if (id) {
       return getPage(id).then(function (page) {
@@ -666,12 +688,471 @@
     }
     if (op.op === 'find') {
       return find(op.query || '').then(function (hits) {
-        var titles = hits.map(function (h) { return h.page && h.page.title ? h.page.title : ''; }).filter(Boolean);
+        var titles = hits.map(function (h) {
+          var p = h.page;
+          if (!p) return '';
+          if (p.privacy === 'private') return personTitle(p);
+          return p.title || '';
+        }).filter(Boolean);
         findOnce = clip(titles.length ? ('Found in the notebook: ' + titles.slice(0, 5).join(', ')) : 'Found in the notebook: nothing yet.', 240);
         return { ok: true, hits: hits, page: null };
       });
     }
+    if (op.op === 'private') {
+      var privId = String(op.page || op.pageId || op.id || '');
+      if (!privId) return Promise.resolve({ ok: false, reason: 'missing' });
+      var turningOn = !(op.on === false || op.on === 'false' || op.on === 0);
+      return makePrivate(privId, turningOn, 'mind', op.publicTitle);
+    }
+    if (op.op === 'seal') {
+      var sealId = String(op.page || op.pageId || op.id || '');
+      if (!sealId) return Promise.resolve({ ok: false, reason: 'missing' });
+      return askSeal(sealId, op.why);
+    }
     return Promise.resolve({ ok: false });
+  }
+  function wordCount(text) {
+    var s = String(text || '').trim();
+    if (!s) return 0;
+    return s.split(/\s+/).length;
+  }
+  function personTitle(page) {
+    if (!page || page.privacy !== 'private') return page && page.title ? String(page.title) : 'a page';
+    var pub = page.publicTitle != null ? String(page.publicTitle).trim() : '';
+    return pub || 'a private page';
+  }
+  function personSummary(page, text, sealed) {
+    return personTitle(page) + ', ' + wordCount(text) + ' words, ' + (sealed ? 'sealed' : 'not sealed');
+  }
+  function rememberText(text) {
+    text = String(text || '');
+    if (!text) return;
+    if (privateTexts.indexOf(text) < 0) privateTexts.push(text);
+  }
+  function rememberPrivate(page) {
+    if (!page || page.privacy !== 'private') return Promise.resolve();
+    rememberText(page.seed);
+    var map = page.seedByHash || {};
+    Object.keys(map).forEach(function (k) { rememberText(map[k]); });
+    return allOf('versions').then(function (vers) {
+      (vers || []).forEach(function (v) {
+        if (v && v.pageId === page.id) rememberText(v.text);
+      });
+    });
+  }
+  function warmPrivate() {
+    privateTexts = [];
+    if (!isOn()) return Promise.resolve();
+    return allOf('pages').then(function (pages) {
+      var chain = Promise.resolve();
+      (pages || []).forEach(function (p) {
+        if (!p || p.privacy !== 'private') return;
+        chain = chain.then(function () { return rememberPrivate(p); });
+      });
+      return chain;
+    });
+  }
+  function isPrivateText(body) {
+    var s = String(body || '');
+    if (!s) return false;
+    for (var i = 0; i < privateTexts.length; i++) {
+      if (privateTexts[i] && s.indexOf(privateTexts[i]) !== -1) return true;
+    }
+    return false;
+  }
+  function asideKey(fp) { return 'fl_ws_aside_' + String(fp || ''); }
+  function shelfIsAside(fp) {
+    var key = fp || shelfCache || '';
+    if (!key) return false;
+    return lsGet(asideKey(key)) === '1';
+  }
+  function setShelfAside(on) {
+    if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
+    return ensureShelf().then(function (mine) {
+      lsSet(asideKey(mine), on ? '1' : '0');
+      return refreshWake().then(function () {
+        return paintOpen().then(function () { return { ok: true, aside: !!on, kept: true }; });
+      });
+    });
+  }
+  function makePrivate(pageId, on, actor, publicTitle) {
+    if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
+    if (actor !== 'mind') return Promise.resolve({ ok: false, reason: 'mind' });
+    return ensureShelf().then(function (mine) {
+      return getPage(pageId).then(function (page) {
+        if (!page || page.mindFp !== mine) return { ok: false, reason: 'shelf' };
+        if (on) {
+          page.privacy = 'private';
+          if (publicTitle != null && String(publicTitle).trim()) page.publicTitle = clip(String(publicTitle).trim(), 160);
+        } else {
+          page.privacy = 'shared';
+        }
+        page.updated = clock();
+        return putPage(page).then(function () {
+          return warmPrivate().then(function () {
+            if (on) showHonestOnce();
+            return refreshWake().then(function () {
+              return paintOpen().then(function () { return { ok: true, page: page }; });
+            });
+          });
+        });
+      });
+    });
+  }
+  function subtleCrypto() {
+    try { if (root.crypto && root.crypto.subtle) return root.crypto.subtle; }
+    catch (e) {}
+    return null;
+  }
+  function bytesToB64(buf) {
+    var bytes = new Uint8Array(buf);
+    var s = '';
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    if (typeof root.btoa !== 'function') return '';
+    return root.btoa(s);
+  }
+  function b64ToBytes(s) {
+    if (typeof root.atob !== 'function') return new Uint8Array(0);
+    var bin = root.atob(String(s || ''));
+    var out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function deviceKeys() {
+    var subtle = subtleCrypto();
+    if (!subtle) return Promise.resolve(null);
+    var savedRaw = lsGet(DEVICE_KEY);
+    if (savedRaw) {
+      try {
+        var saved = JSON.parse(savedRaw);
+        if (saved && saved.privateKey && saved.publicKey) {
+          return Promise.all([
+            subtle.importKey('pkcs8', b64ToBytes(saved.privateKey), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']),
+            subtle.importKey('spki', b64ToBytes(saved.publicKey), { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify'])
+          ]).then(function (keys) {
+            return { privateKey: keys[0], publicKey: keys[1], publicKeySpki: saved.publicKey };
+          }, function () { return null; });
+        }
+      } catch (e) {}
+    }
+    return subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']).then(function (pair) {
+      return Promise.all([
+        subtle.exportKey('pkcs8', pair.privateKey),
+        subtle.exportKey('spki', pair.publicKey)
+      ]).then(function (bufs) {
+        var saved = { privateKey: bytesToB64(bufs[0]), publicKey: bytesToB64(bufs[1]) };
+        if (!saved.privateKey || !saved.publicKey) return null;
+        lsSet(DEVICE_KEY, JSON.stringify(saved));
+        return { privateKey: pair.privateKey, publicKey: pair.publicKey, publicKeySpki: saved.publicKey };
+      });
+    }, function () { return null; });
+  }
+  function sealCanonical(row) {
+    var mind = row && row.mindSeal ? row.mindSeal : {};
+    return JSON.stringify(sortKeysDeep({
+      versionHash: String(row && row.versionHash ? row.versionHash : ''),
+      mindSeal: {
+        contextHash: mind.contextHash == null ? '' : String(mind.contextHash),
+        modelId: mind.modelId == null ? '' : String(mind.modelId)
+      },
+      ts: row ? row.ts : 0
+    }));
+  }
+  function sealModelId() {
+    try {
+      if (root.FLMindSeal && typeof root.FLMindSeal.trustedMap === 'function') {
+        var map = root.FLMindSeal.trustedMap() || {};
+        var keys = Object.keys(map);
+        if (keys.length) return String(keys[0]);
+      }
+    } catch (e) {}
+    try { return String((recallMind() || {}).modelId || ''); }
+    catch (e2) { return ''; }
+  }
+  function sealContext(pageId) {
+    try {
+      if (root.FLMindSeal && typeof root.FLMindSeal.contextHash === 'function') {
+        return Promise.resolve(root.FLMindSeal.contextHash('workspace', [String(pageId || '')])).then(function (hex) {
+          return hex ? String(hex) : '';
+        }, function () { return ''; });
+      }
+    } catch (e) {}
+    return Promise.resolve('');
+  }
+  function signSeal(row) {
+    return sha256Hex(sealCanonical(row)).then(function (hex) {
+      if (!hex) return null;
+      return deviceKeys().then(function (pair) {
+        var subtle = subtleCrypto();
+        if (!pair || !subtle) return null;
+        return subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, pair.privateKey, new TextEncoder().encode(hex)).then(function (sig) {
+          return { humanSig: bytesToB64(sig), publicKey: pair.publicKeySpki };
+        }, function () { return null; });
+      });
+    });
+  }
+  function putReceipt(row) {
+    return runStore('receipts', 'readwrite', function (store) {
+      store.put(row);
+      return row;
+    });
+  }
+  function getReceipt(hash) {
+    if (!hash) return Promise.resolve(null);
+    return runStore('receipts', 'readonly', function (store) {
+      var req = store.get(hash);
+      var box = { value: null };
+      req.onsuccess = function () { box.value = req.result || null; };
+      return box;
+    }).then(function (box) { return box ? box.value : null; });
+  }
+  function receipts() {
+    if (!isOn()) return Promise.resolve([]);
+    return allOf('receipts');
+  }
+  function markSealed(hash) {
+    return getVersion(hash).then(function (ver) {
+      if (!ver) return null;
+      var copy = JSON.parse(JSON.stringify(ver));
+      copy.sealed = true;
+      return runStore('versions', 'readwrite', function (store) {
+        store.put(copy);
+        return copy;
+      });
+    });
+  }
+  function mindLabel() {
+    var name = '';
+    try { name = String((recallMind().name) || '').trim(); } catch (e) { name = ''; }
+    return name || 'A mind';
+  }
+  function askSentence(page, hash, why) {
+    var title = page && page.privacy === 'private' ? personTitle(page) : ((page && page.title) ? String(page.title) : 'a private page');
+    return mindLabel() + ' asks to seal ' + title + ' (version ' + shortHash(hash) + '). Why: ' + clip(why || '', 140);
+  }
+  function shortForm(row) {
+    var ms = row && row.mindSeal ? row.mindSeal : {};
+    return 'version ' + shortHash(row && row.versionHash) + ', context ' + shortHash(ms.contextHash) + ', model ' + clip(ms.modelId || '', 40) + ', ' + whenText(row && row.ts);
+  }
+  function askSeal(pageId, why) {
+    if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
+    return ensureShelf().then(function (mine) {
+      return getPage(pageId).then(function (page) {
+        if (!page || page.mindFp !== mine) return { ok: false, reason: 'shelf' };
+        if (!page.head) return { ok: false, reason: 'missing' };
+        var whyText = clip(why == null ? '' : String(why), 140);
+        var exists = false;
+        sealAsks.forEach(function (a) { if (a.versionHash === page.head) exists = true; });
+        if (!exists) {
+          sealAsks.push({
+            pageId: page.id,
+            versionHash: page.head,
+            why: whyText,
+            sentence: askSentence(page, page.head, whyText)
+          });
+        }
+        return paintOpen().then(function () {
+          ensureAskDock();
+          return { ok: true, asked: true, page: page, hash: page.head };
+        });
+      });
+    });
+  }
+  function declineSeal(versionHash) {
+    sealAsks = sealAsks.filter(function (a) { return a.versionHash !== versionHash; });
+    declinedLines.push('Declined the seal.');
+    ensureAskDock();
+    return paintOpen();
+  }
+  function approveSeal(versionHash) {
+    var ask = null;
+    sealAsks.forEach(function (a) { if (a.versionHash === versionHash) ask = a; });
+    if (!ask) return Promise.resolve({ ok: false, reason: 'ask' });
+    return getPage(ask.pageId).then(function (page) {
+      if (!page) return { ok: false, reason: 'missing' };
+      return getVersion(ask.versionHash).then(function (ver) {
+        if (!ver || ver.hash !== ask.versionHash) return { ok: false, reason: 'missing' };
+        return sealContext(page.id).then(function (ctx) {
+          var ts = clock();
+          var row = {
+            id: ver.hash,
+            versionHash: ver.hash,
+            pageId: page.id,
+            mindSeal: { contextHash: String(ctx || ''), modelId: sealModelId() },
+            ts: ts,
+            consent: 'mind-asked+human-approved',
+            why: clip(ask.why || '', 140)
+          };
+          return signSeal(row).then(function (signed) {
+            if (!signed || !signed.humanSig) return { ok: false, reason: 'sign' };
+            row.humanSig = signed.humanSig;
+            row.publicKey = signed.publicKey;
+            return putReceipt(row).then(function () {
+              return markSealed(ver.hash).then(function () {
+                sealAsks = sealAsks.filter(function (a) { return a.versionHash !== ver.hash; });
+                return refreshWake().then(function () {
+                  ensureAskDock();
+                  return paintOpen().then(function () { return { ok: true, receipt: row }; });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  }
+  function verifyReceipt(rowOrHash) {
+    var wanted = typeof rowOrHash === 'string' ? rowOrHash : (rowOrHash && (rowOrHash.versionHash || rowOrHash.id));
+    return getReceipt(wanted).then(function (stored) {
+      var row = stored || (rowOrHash && typeof rowOrHash === 'object' ? rowOrHash : null);
+      if (!row || !row.versionHash || !row.humanSig || !row.publicKey) return 'does not match';
+      return getVersion(row.versionHash).then(function (ver) {
+        if (!ver) return 'does not match';
+        return hashVersion({ parent: ver.parent, ts: ver.ts, author: ver.author, text: ver.text, meta: ver.meta }).then(function (h) {
+          if (h !== ver.hash || h !== row.versionHash) return 'does not match';
+          return sha256Hex(sealCanonical(row)).then(function (hex) {
+            var subtle = subtleCrypto();
+            if (!subtle || !hex) return 'does not match';
+            return subtle.importKey('spki', b64ToBytes(row.publicKey), { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']).then(function (pub) {
+              return subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, pub, b64ToBytes(row.humanSig), new TextEncoder().encode(hex));
+            }).then(function (ok) { return ok ? 'verified' : 'does not match'; }, function () { return 'does not match'; });
+          });
+        });
+      });
+    });
+  }
+  function showHonestOnce() {
+    if (lsGet('fl_ws_private_told') === '1') return;
+    lsSet('fl_ws_private_told', '1');
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    if (d.getElementById('fl-ws-honest')) return;
+    var p = d.createElement('p');
+    p.id = 'fl-ws-honest';
+    p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    p.textContent = HONEST;
+    var parent = hostEl || d.body;
+    if (parent) parent.appendChild(p);
+  }
+  function clearNode(el) {
+    if (!el) return;
+    try {
+      if (el.firstChild) {
+        while (el.firstChild) el.removeChild(el.firstChild);
+        return;
+      }
+    } catch (e) {}
+    if (el.children && el.children.length) {
+      var copy = [];
+      for (var i = 0; i < el.children.length; i++) copy.push(el.children[i]);
+      for (var j = 0; j < copy.length; j++) {
+        try { el.removeChild(copy[j]); } catch (e2) {}
+      }
+    }
+  }
+  function paintOpen() {
+    var d = doc();
+    var panel = d && d.getElementById ? d.getElementById('fl-ws-panel') : null;
+    if (!panel) return Promise.resolve();
+    return renderPanel(panel);
+  }
+  function appendAsk(parent, ask) {
+    var d = doc();
+    if (!d || !parent || !ask) return;
+    var p = d.createElement('p');
+    p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    p.textContent = ask.sentence;
+    var yes = button('Approve seal');
+    var no = button('Not now');
+    if (yes) yes.addEventListener('click', function () { track(approveSeal(ask.versionHash)); });
+    if (no) no.addEventListener('click', function () { track(declineSeal(ask.versionHash)); });
+    parent.appendChild(p);
+    if (yes) parent.appendChild(yes);
+    if (no) parent.appendChild(no);
+  }
+  function ensureAskDock() {
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    var panelOpen = d.getElementById('fl-ws-panel');
+    var dock = d.getElementById('fl-ws-asks');
+    if (panelOpen || !sealAsks.length) {
+      if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
+      return;
+    }
+    if (!dock) {
+      dock = d.createElement('div');
+      dock.id = 'fl-ws-asks';
+      dock.style.cssText = 'max-width:100%;overflow:hidden;';
+      var host = hostEl || d.body;
+      if (host) host.appendChild(dock);
+    }
+    clearNode(dock);
+    sealAsks.forEach(function (ask) { appendAsk(dock, ask); });
+  }
+  function appendReceipt(parent, row) {
+    var d = doc();
+    if (!d || !parent || !row) return;
+    var card = d.createElement('div');
+    card.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
+    var head = d.createElement('p');
+    head.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;';
+    head.textContent = shortForm(row);
+    var full = d.createElement('p');
+    full.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    var ms = row.mindSeal || {};
+    full.textContent = 'version ' + String(row.versionHash || '') + ' context ' + String(ms.contextHash || '') + ' model ' + String(ms.modelId || '') + ' ' + String(row.consent || '');
+    var note = d.createElement('p');
+    note.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    note.textContent = INTEGRITY;
+    var status = d.createElement('p');
+    status.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    status.textContent = '';
+    var copyBtn = button('Copy');
+    var verifyBtn = button('Verify');
+    if (copyBtn) copyBtn.addEventListener('click', function () {
+      var line = shortForm(row);
+      try {
+        if (root.navigator && root.navigator.clipboard && typeof root.navigator.clipboard.writeText === 'function') {
+          root.navigator.clipboard.writeText(line);
+        }
+      } catch (e) {}
+      status.textContent = line;
+    });
+    if (verifyBtn) verifyBtn.addEventListener('click', function () {
+      track(verifyReceipt(row).then(function (word) {
+        status.textContent = word === 'verified' ? 'verified' : 'does not match';
+      }));
+    });
+    card.appendChild(head);
+    card.appendChild(full);
+    card.appendChild(note);
+    if (copyBtn) card.appendChild(copyBtn);
+    if (verifyBtn) card.appendChild(verifyBtn);
+    card.appendChild(status);
+    parent.appendChild(card);
+  }
+  function loadSealLines(mine) {
+    return allOf('receipts').then(function (rows) {
+      var out = [];
+      var chain = Promise.resolve();
+      (rows || []).forEach(function (row) {
+        chain = chain.then(function () {
+          if (!row) return null;
+          return getPage(row.pageId).then(function (page) {
+            if (!page || page.mindFp !== mine) return;
+            var date = whenText(row.ts);
+            var short = shortHash(row.versionHash);
+            var mindTitle = page.title ? String(page.title) : 'a private page';
+            var personLabel = page.privacy === 'private' ? personTitle(page) : mindTitle;
+            out.push({
+              mind: 'Sealed: ' + mindTitle + ' ' + short + ' on ' + date,
+              person: 'Sealed: ' + personLabel + ' ' + short + ' on ' + date
+            });
+          });
+        });
+      });
+      return chain.then(function () { return out; });
+    });
   }
   function applyAll(parsed) {
     var lines = [];
@@ -784,45 +1265,85 @@
     wakeCounts.seeds = seeds.filter(function (s) { return s.length > 0; }).length;
     return pack();
   }
+  function takeSeeds(listIn, chosen, seen, hidePrivate) {
+    for (var i = 0; i < listIn.length && chosen.length < 12; i++) {
+      var row = listIn[i];
+      if (!row.seed || seen[row.page.id]) continue;
+      if (hidePrivate && row.page.privacy === 'private') continue;
+      seen[row.page.id] = true;
+      chosen.push(row.page.title + ': ' + row.seed);
+    }
+  }
   function refreshWake() {
-    if (!isOn()) { wakeCache = ''; wakeCounts = { notes: 0, seeds: 0 }; return Promise.resolve(''); }
+    if (!isOn()) {
+      wakeCache = '';
+      personWake = '';
+      wakeCounts = { notes: 0, seeds: 0 };
+      return Promise.resolve('');
+    }
     return ensureShelf().then(function (mine) {
+      var aside = shelfIsAside(mine);
+      return warmPrivate().then(function () {
       return list(mine).then(function (pages) {
         var future = pages.filter(function (p) { return p.pinned && p.kind === 'future'; });
         future.sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
         future = future.slice(0, 3);
         return Promise.all(future.map(function (p) {
-          return headText(p).then(function (text) { return p.title + ': ' + text; });
-        })).then(function (noteLines) {
+          return headText(p).then(function (text) {
+            var line = p.title + ': ' + text;
+            return { id: p.id, mind: line, person: p.privacy === 'private' ? '' : line };
+          });
+        })).then(function (futureRows) {
+          var mindNotes = [];
+          var personNotes = [];
+          var seenNote = {};
+          futureRows.forEach(function (row) {
+            if (!row) return;
+            if (row.mind) { mindNotes.push(row.mind); seenNote[row.id] = true; }
+            if (row.person) personNotes.push(row.person);
+          });
           return Promise.all(pages.map(function (p) {
             return history(p.id).then(function (vers) { return { page: p, seed: showSeed(p, vers) }; });
           })).then(function (seeded) {
             var pinned = seeded.filter(function (s) { return s.page.pinned; })
               .sort(function (a, b) { return (b.page.updated || 0) - (a.page.updated || 0); });
             var recent = seeded.slice().sort(function (a, b) { return (b.page.updated || 0) - (a.page.updated || 0); });
-            var chosen = [];
-            var seen = {};
-            function take(listIn) {
-              for (var i = 0; i < listIn.length && chosen.length < 12; i++) {
-                var row = listIn[i];
-                if (!row.seed || seen[row.page.id]) continue;
-                seen[row.page.id] = true;
-                chosen.push(row.page.title + ': ' + row.seed);
-              }
-            }
-            take(pinned);
-            take(recent);
-            return fillLatestNote(noteLines, pages).then(function (filled) {
-              var body = fitWake(filled, chosen, findOnce);
-              wakeCache = HOWTO + (body ? '\n' + body : '');
-              return wakeCache;
+            var mindSeeds = [];
+            var personSeeds = [];
+            var mindSeen = {};
+            var personSeen = {};
+            takeSeeds(pinned, mindSeeds, mindSeen, false);
+            takeSeeds(recent, mindSeeds, mindSeen, false);
+            takeSeeds(pinned, personSeeds, personSeen, true);
+            takeSeeds(recent, personSeeds, personSeen, true);
+            return fillLatestNote(mindNotes, pages, true).then(function (mindFilled) {
+              return fillLatestNote(personNotes, pages, false).then(function (personFilled) {
+                return Promise.all(pages.filter(function (p) { return p && p.pinned && p.privacy === 'private'; }).map(function (p) {
+                  if (seenNote[p.id]) return Promise.resolve('');
+                  return headText(p).then(function (text) { return text ? (p.title + ': ' + text) : ''; });
+                })).then(function (extra) {
+                  extra.forEach(function (line) { if (line) mindFilled.push(line); });
+                  var mindPacked = fitWake(mindFilled, mindSeeds, findOnce);
+                  var personPacked = fitWake(personFilled, personSeeds, findOnce);
+                  if (aside) wakeCounts = { notes: 0, seeds: 0 };
+                  return loadSealLines(mine).then(function (sealLines) {
+                    var mindSeal = sealLines.map(function (l) { return l.mind; }).filter(Boolean).join('\n');
+                    var personSeal = sealLines.map(function (l) { return l.person; }).filter(Boolean).join('\n');
+                    wakeCache = HOWTO + (mindPacked ? '\n' + mindPacked : '') + (mindSeal ? '\n' + mindSeal : '');
+                    if (aside) personWake = HOWTO;
+                    else personWake = HOWTO + (personPacked ? '\n' + personPacked : '') + (personSeal ? '\n' + personSeal : '');
+                    return wakeCache;
+                  });
+                });
+              });
             });
           });
         });
       });
+      });
     });
   }
-  function fillLatestNote(noteLines, pages) {
+  function fillLatestNote(noteLines, pages, forMind) {
     var lines = noteLines.slice();
     if (lines.length >= 3) return Promise.resolve(lines);
     var newest = null;
@@ -831,6 +1352,7 @@
       if (!newest || (p.updated || 0) > (newest.updated || 0)) newest = p;
     });
     if (!newest) return Promise.resolve(lines);
+    if (newest.privacy === 'private' && (!forMind || !newest.pinned)) return Promise.resolve(lines);
     var prefix = newest.title + ': ';
     if (lines.some(function (line) { return String(line).indexOf(prefix) === 0; })) return Promise.resolve(lines);
     return headText(newest).then(function (text) {
@@ -844,14 +1366,29 @@
     if (findOnce) {
       var line = findOnce;
       findOnce = '';
-      if (line && text.indexOf(line) !== -1) {
-        wakeCache = text.replace(line, '').replace(/\n{2,}/g, '\n').replace(/\s+$/, '');
+      function stripLine(src) {
+        if (!src || !line || src.indexOf(line) === -1) return src;
+        return src.replace(line, '').replace(/\n{2,}/g, '\n').replace(/\s+$/, '');
       }
+      if (line && text.indexOf(line) !== -1) wakeCache = stripLine(wakeCache);
+      personWake = stripLine(personWake);
     }
     return text;
   }
   function afterChange() {
     return refreshWake();
+  }
+  function spokenByMind(anchor) {
+    var node = anchor;
+    var hops = 0;
+    while (node && hops < 8) {
+      var cls = '';
+      try { cls = node.className ? String(node.className) : ''; } catch (e) { cls = ''; }
+      if (cls.indexOf('chat-message') !== -1) return cls.indexOf('user') === -1;
+      try { node = node.parentNode; } catch (e2) { node = null; }
+      hops += 1;
+    }
+    return true;
   }
   function consumeReply(text, anchor) {
     var raw = String(text || '');
@@ -863,7 +1400,22 @@
     if (!hasMark(raw)) return { visible: parsed.visible, receipts: [], stored: false };
     if (raw === lastRaw) return { visible: parsed.visible, receipts: [], skipped: true };
     lastRaw = raw;
+    var heldLines = [];
+    if (!spokenByMind(anchor)) {
+      parsed.ops = parsed.ops.filter(function (op) {
+        if (op && op.op === 'private') {
+          heldLines.push('Only the mind can keep a page private.');
+          return false;
+        }
+        if (op && op.op === 'seal') {
+          heldLines.push('A seal is asked by the mind.');
+          return false;
+        }
+        return true;
+      });
+    }
     var job = applyAll(parsed).then(function (lines) {
+      if (heldLines.length) lines = heldLines.concat(lines);
       appendLines(anchor, lines);
       return afterChange().then(function () { return lines; });
     });
@@ -895,6 +1447,7 @@
     memoryOn = false;
     ssSet('fl_ws_later', '1');
     wakeCache = '';
+    personWake = '';
     removePanel();
     hideConsent();
   }
@@ -902,6 +1455,7 @@
     memoryOn = 'off';
     lsSet('fl_ws', 'off');
     wakeCache = '';
+    personWake = '';
     removePanel();
     hideConsent();
   }
@@ -912,59 +1466,105 @@
   function renderPanel(panel) {
     var d = doc();
     if (!d) return Promise.resolve();
-    while (panel.firstChild) panel.removeChild(panel.firstChild);
+    clearNode(panel);
     return ensureShelf().then(function (mine) {
-      return list(mine).then(function (pages) {
+      return Promise.all([list(mine), allOf('receipts')]).then(function (pair) {
+        var pages = pair[0] || [];
+        var rows = pair[1] || [];
         pages.sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
+        function footer() {
+          declinedLines.forEach(function (line) {
+            var note = d.createElement('p');
+            note.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+            note.textContent = line;
+            panel.appendChild(note);
+          });
+          var asideBtn = button(shelfIsAside(mine) ? 'Bring this shelf back' : 'Set this shelf aside');
+          if (asideBtn) {
+            asideBtn.addEventListener('click', function () {
+              track(setShelfAside(!shelfIsAside(mine)));
+            });
+            panel.appendChild(asideBtn);
+          }
+          var foot = d.createElement('p');
+          foot.style.cssText = 'margin:12px 0 0;max-width:100%;overflow-wrap:anywhere;';
+          foot.textContent = HONEST;
+          panel.appendChild(foot);
+        }
+        if (shelfIsAside(mine)) {
+          var kept = d.createElement('p');
+          kept.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;';
+          kept.textContent = 'This shelf is set aside. The pages are kept.';
+          panel.appendChild(kept);
+          footer();
+          return;
+        }
         if (!pages.length) {
           var empty = d.createElement('p');
           empty.textContent = 'No pages yet.';
           panel.appendChild(empty);
+          footer();
           return;
         }
         var chain = Promise.resolve();
         pages.forEach(function (page) {
           chain = chain.then(function () {
             return headText(page).then(function (text) {
-              var block = d.createElement('div');
-              block.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
-              var line = d.createElement('p');
-              line.style.cssText = 'margin:0;overflow-wrap:anywhere;max-width:100%;';
-              line.textContent = page.title + ' · ' + page.kind + ' · ' + (page.pinned ? 'pinned' : 'unpinned') + ' · ' + whenText(page.updated);
-              var pre = d.createElement('pre');
-              pre.style.whiteSpace = 'pre-wrap';
-              pre.style.overflowWrap = 'anywhere';
-              pre.style.maxWidth = '100%';
-              pre.style.margin = '4px 0 0';
-              pre.textContent = text;
-              var seedLine = d.createElement('p');
-              seedLine.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
-              var seedShown = page.seed || '';
-              if (!seedShown && page.seedByHash) {
-                seedShown = Object.keys(page.seedByHash).map(function (k) { return page.seedByHash[k]; }).join(' / ');
-              }
-              seedLine.textContent = seedShown;
-              var box = d.createElement('textarea');
-              box.style.cssText = 'display:block;width:100%;max-width:100%;box-sizing:border-box;min-height:44px;';
-              var writeBtn = button('Write');
-              var pinBtn = button(page.pinned ? 'Unpin' : 'Pin');
-              writeBtn.addEventListener('click', function () {
-                track(write(page.id, box.value, 'human').then(function () { return afterChange(); }).then(function () { return renderPanel(panel); }));
+              return getVersion(page.head).then(function (ver) {
+                var block = d.createElement('div');
+                block.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
+                var pinBtn = button(page.pinned ? 'Unpin' : 'Pin');
+                if (pinBtn) pinBtn.addEventListener('click', function () {
+                  track(pin(page.id, !page.pinned).then(function () { return afterChange(); }).then(function () { return renderPanel(panel); }));
+                });
+                if (page.privacy === 'private') {
+                  var sum = d.createElement('p');
+                  sum.style.cssText = 'margin:0;overflow-wrap:anywhere;max-width:100%;';
+                  sum.textContent = personSummary(page, text, !!(ver && ver.sealed));
+                  var hashLine = d.createElement('p');
+                  hashLine.style.cssText = 'margin:4px 0 0;overflow-wrap:anywhere;max-width:100%;';
+                  hashLine.textContent = page.head ? String(page.head) : '';
+                  block.appendChild(sum);
+                  block.appendChild(hashLine);
+                  if (pinBtn) block.appendChild(pinBtn);
+                } else {
+                  var line = d.createElement('p');
+                  line.style.cssText = 'margin:0;overflow-wrap:anywhere;max-width:100%;';
+                  line.textContent = page.title + ' · ' + page.kind + ' · ' + (page.pinned ? 'pinned' : 'unpinned') + ' · ' + whenText(page.updated);
+                  var pre = d.createElement('pre');
+                  pre.style.whiteSpace = 'pre-wrap';
+                  pre.style.overflowWrap = 'anywhere';
+                  pre.style.maxWidth = '100%';
+                  pre.style.margin = '4px 0 0';
+                  pre.textContent = text;
+                  var seedLine = d.createElement('p');
+                  seedLine.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  var seedShown = page.seed || '';
+                  if (!seedShown && page.seedByHash) {
+                    seedShown = Object.keys(page.seedByHash).map(function (k) { return page.seedByHash[k]; }).join(' / ');
+                  }
+                  seedLine.textContent = seedShown;
+                  var box = d.createElement('textarea');
+                  box.style.cssText = 'display:block;width:100%;max-width:100%;box-sizing:border-box;min-height:44px;';
+                  var writeBtn = button('Write');
+                  if (writeBtn) writeBtn.addEventListener('click', function () {
+                    track(write(page.id, box.value, 'human').then(function () { return afterChange(); }).then(function () { return renderPanel(panel); }));
+                  });
+                  block.appendChild(line);
+                  block.appendChild(pre);
+                  block.appendChild(seedLine);
+                  block.appendChild(box);
+                  if (writeBtn) block.appendChild(writeBtn);
+                  if (pinBtn) block.appendChild(pinBtn);
+                }
+                sealAsks.forEach(function (ask) { if (ask.pageId === page.id) appendAsk(block, ask); });
+                rows.forEach(function (row) { if (row && row.pageId === page.id) appendReceipt(block, row); });
+                panel.appendChild(block);
               });
-              pinBtn.addEventListener('click', function () {
-                track(pin(page.id, !page.pinned).then(function () { return afterChange(); }).then(function () { return renderPanel(panel); }));
-              });
-              block.appendChild(line);
-              block.appendChild(pre);
-              block.appendChild(seedLine);
-              block.appendChild(box);
-              block.appendChild(writeBtn);
-              block.appendChild(pinBtn);
-              panel.appendChild(block);
             });
           });
         });
-        return chain;
+        return chain.then(function () { footer(); });
       });
     });
   }
@@ -1052,10 +1652,11 @@
     });
   }
   function wakeInfo() {
-    var memory = wakeCache.indexOf(HOWTO) === 0 ? wakeCache.slice(HOWTO.length).replace(/^\n/, '') : wakeCache;
+    var shown = isOn() ? personWake : '';
+    var memory = shown.indexOf(HOWTO) === 0 ? shown.slice(HOWTO.length).replace(/^\n/, '') : shown;
     return {
-      text: isOn() ? wakeCache : '',
-      tokens: Math.ceil(String(isOn() ? wakeCache : '').length / 4),
+      text: shown,
+      tokens: Math.ceil(String(shown).length / 4),
       memoryTokens: Math.ceil(String(memory || '').length / 4),
       howToTokens: Math.ceil(HOWTO.length / 4),
       notes: wakeCounts.notes,
@@ -1071,11 +1672,15 @@
     lastRaw = '';
     lastWriteAt = 0;
     wakeCache = '';
+    personWake = '';
     wakeCounts = { notes: 0, seeds: 0 };
     findOnce = '';
     shelfParts = null;
     shelfCache = '';
     shelfStamp = '';
+    privateTexts = [];
+    sealAsks = [];
+    declinedLines = [];
     pending = Promise.resolve();
   }
   function tokensOf(s) { return Math.ceil(String(s || '').length / 4); }
@@ -1083,6 +1688,9 @@
   var api = {
     VERSION: 'v-workspace-core-v0.1',
     HEAL: 'v-workspace-mark-heal-v0.1',
+    PRIVATE: 'v-workspace-private-v0.1',
+    SEAL: 'v-workspace-seal-v0.1',
+    HONEST: HONEST,
     HOWTO: HOWTO,
     open: open,
     write: write,
@@ -1117,7 +1725,15 @@
     wakeInfo: wakeInfo,
     listShelves: listShelves,
     tokensOf: tokensOf,
-    resetForSmoke: resetForSmoke
+    resetForSmoke: resetForSmoke,
+    isPrivateText: isPrivateText,
+    makePrivate: makePrivate,
+    setShelfAside: setShelfAside,
+    shelfIsAside: shelfIsAside,
+    personSummary: personSummary,
+    approveSeal: approveSeal,
+    verifyReceipt: verifyReceipt,
+    receipts: receipts
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FLWorkspace = api;
