@@ -1,6 +1,8 @@
-// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1
+// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
+// A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
+// is the same mark. The canonical line stays [FL_CLAY:].
 (function (root) {
   'use strict';
   var mathLib = null;
@@ -24,8 +26,9 @@
     shaped: 'shaped by the AI',
     guessed: "guessed from words (the AI didn't choose)"
   };
-  var PROMPT = 'Clay is light you may shape. End with [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]. Forms: heart star spark dog cat bird tree flower present sun moon wave book seed grid. Mood is a feeling or #rrggbb. Energy is 0 to 1. Hug becomes a heart. Dog food becomes a dog. Christmas becomes a tree.';
+  var PROMPT = 'Clay is light you may shape. Forms: heart star spark dog cat bird tree flower present sun moon wave book seed grid. Mood is a feeling or #rrggbb. Energy is 0 to 1. Hug becomes a heart. Dog food becomes a dog. Christmas becomes a tree. [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]';
   var CLAY_MARK = '[FL_CLAY:';
+  var CLAY_OPEN = /\[\s*fl[\s_-]?clay\s*:/i;
   var HEX = /^#[0-9a-f]{6}$/i;
   var FORMS = { heart: 1, star: 1, spark: 1, dog: 1, cat: 1, bird: 1, tree: 1, flower: 1, present: 1, sun: 1, moon: 1, wave: 1, book: 1, seed: 1, grid: 1, shells: 1 };
   var MOTIONS = { gather: 1, breath: 1, wave: 1, ripple: 1, pulse: 1, branch: 1, braid: 1, scatter: 1 };
@@ -159,10 +162,23 @@
   function cleanVisible(text) {
     return String(text || '').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
   }
+  function findClay(raw, from) {
+    var text = String(raw || '');
+    var start = from || 0;
+    if (start < 0) start = 0;
+    var m = CLAY_OPEN.exec(text.slice(start));
+    if (!m) return null;
+    return { at: start + m.index, len: m[0].length };
+  }
+  function clayLen(raw, at) {
+    var open = findClay(raw, at);
+    return (open && open.at === at) ? open.len : CLAY_MARK.length;
+  }
   function malformedTag(raw, at) {
-    var cap = Math.min(raw.length, at + CLAY_MARK.length + 2048);
+    var len = clayLen(raw, at);
+    var cap = Math.min(raw.length, at + len + 2048);
     var close = raw.slice(at, cap).indexOf(']');
-    var end = close >= 0 ? at + close + 1 : at + CLAY_MARK.length;
+    var end = close >= 0 ? at + close + 1 : at + len;
     return {
       tag: true,
       ok: false,
@@ -172,9 +188,10 @@
   }
   function parseTag(text) {
     var raw = typeof text === 'string' ? text : '';
-    var at = raw.indexOf(CLAY_MARK);
-    if (at < 0) return { tag: false, ok: false, value: null, visible: raw };
-    var i = at + CLAY_MARK.length;
+    var open = findClay(raw, 0);
+    if (!open) return { tag: false, ok: false, value: null, visible: raw };
+    var at = open.at;
+    var i = at + open.len;
     while (i < raw.length && isWs(raw.charAt(i))) i += 1;
     if (raw.charAt(i) !== '{') return malformedTag(raw, at);
     var bodyAt = i;
@@ -208,6 +225,9 @@
     try { value = sanitize(JSON.parse(body)); }
     catch (err) { value = null; }
     return { tag: true, ok: !!value, value: value, visible: visible };
+  }
+  function strip(text) {
+    return parseTag(text).visible;
   }
   function keywordForm(hay) {
     if (/\bdog\b/.test(hay)) return 'dog';
@@ -746,6 +766,7 @@
     WORDS: WORDS,
     PROMPT: PROMPT,
     parseTag: parseTag,
+    strip: strip,
     sanitize: sanitize,
     fallback: fallback,
     promptDelta: promptDelta,

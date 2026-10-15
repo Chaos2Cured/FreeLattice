@@ -34,6 +34,7 @@
       "lattice-pair.js",
       "lattice-update.js",
       "lattice-discover.js",
+      "port-heal.js",
       "pack-update.js",
       "pack-update-card.js",
       "bridge-door.js",

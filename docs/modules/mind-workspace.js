@@ -1,6 +1,8 @@
-// mind-workspace.js (MIT) v-workspace-core-v0.1
+// mind-workspace.js (MIT) v-workspace-core-v0.1 v-workspace-mark-heal-v0.1
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. Each page is shared with the person.
+// A near-miss opening ([FL WS:], [FL-WS:], [fl_ws:], spaces before the colon)
+// is the same mark. The canonical line stays [FL_WS:].
 (function (root) {
   'use strict';
 
@@ -25,7 +27,8 @@
     find: { op: 1, query: 1 }
   };
   var HASH_KEYS = ['parent', 'ts', 'author', 'text', 'meta'];
-  var HOWTO = 'You can keep a notebook on this device. End with one of these lines. [FL_WS: {"op":"open","title":"Today","kind":"future"}] [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}] [FL_WS: {"op":"seed","title":"Today","line":"Remember this day."}]';
+  var HOWTO = 'You can keep a notebook on this device. End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
+  var WS_OPEN = /\[\s*fl[\s_-]?ws\s*:/i;
 
   var db = null;
   var opens = 0;
@@ -491,13 +494,27 @@
     });
   }
   function isWs(ch) { return ch === ' ' || ch === '\n' || ch === '\t' || ch === '\r'; }
+  function findOpen(raw, from) {
+    var text = String(raw || '');
+    var start = from || 0;
+    if (start < 0) start = 0;
+    var m = WS_OPEN.exec(text.slice(start));
+    if (!m) return null;
+    return { at: start + m.index, len: m[0].length };
+  }
+  function hasMark(raw) { return !!findOpen(raw, 0); }
+  function openLen(raw, at) {
+    var open = findOpen(raw, at);
+    return (open && open.at === at) ? open.len : MARK.length;
+  }
   function malformedEnd(raw, at) {
-    var cap = Math.min(raw.length, at + MARK.length + 2048);
+    var len = openLen(raw, at);
+    var cap = Math.min(raw.length, at + len + 2048);
     var close = raw.slice(at, cap).indexOf(']');
-    return close >= 0 ? at + close + 1 : Math.min(raw.length, at + MARK.length);
+    return close >= 0 ? at + close + 1 : Math.min(raw.length, at + len);
   }
   function readTag(raw, at) {
-    var i = at + MARK.length;
+    var i = at + openLen(raw, at);
     while (i < raw.length && isWs(raw.charAt(i))) i += 1;
     if (raw.charAt(i) !== '{') return { end: malformedEnd(raw, at), skip: true };
     var start = i;
@@ -537,10 +554,10 @@
     var out = '';
     var i = 0;
     while (i < raw.length) {
-      var at = raw.indexOf(MARK, i);
-      if (at < 0) { out += raw.slice(i); break; }
-      out += raw.slice(i, at);
-      var tag = readTag(raw, at);
+      var found = findOpen(raw, i);
+      if (!found) { out += raw.slice(i); break; }
+      out += raw.slice(i, found.at);
+      var tag = readTag(raw, found.at);
       i = tag.end;
     }
     return cleanVisible(out);
@@ -564,10 +581,10 @@
     var i = 0;
     var seen = 0;
     while (i < raw.length) {
-      var at = raw.indexOf(MARK, i);
-      if (at < 0) { out += raw.slice(i); break; }
-      out += raw.slice(i, at);
-      var tag = readTag(raw, at);
+      var found = findOpen(raw, i);
+      if (!found) { out += raw.slice(i); break; }
+      out += raw.slice(i, found.at);
+      var tag = readTag(raw, found.at);
       i = tag.end;
       if (tag.skip || tag.oversized || !tag.body) continue;
       var value = null;
@@ -795,12 +812,30 @@
             }
             take(pinned);
             take(recent);
-            var body = fitWake(noteLines, chosen, findOnce);
-            wakeCache = HOWTO + (body ? '\n' + body : '');
-            return wakeCache;
+            return fillLatestNote(noteLines, pages).then(function (filled) {
+              var body = fitWake(filled, chosen, findOnce);
+              wakeCache = HOWTO + (body ? '\n' + body : '');
+              return wakeCache;
+            });
           });
         });
       });
+    });
+  }
+  function fillLatestNote(noteLines, pages) {
+    var lines = noteLines.slice();
+    if (lines.length >= 3) return Promise.resolve(lines);
+    var newest = null;
+    (pages || []).forEach(function (p) {
+      if (!p) return;
+      if (!newest || (p.updated || 0) > (newest.updated || 0)) newest = p;
+    });
+    if (!newest) return Promise.resolve(lines);
+    var prefix = newest.title + ': ';
+    if (lines.some(function (line) { return String(line).indexOf(prefix) === 0; })) return Promise.resolve(lines);
+    return headText(newest).then(function (text) {
+      if (text) lines.push(prefix + text);
+      return lines;
     });
   }
   function promptDelta() {
@@ -821,11 +856,11 @@
   function consumeReply(text, anchor) {
     var raw = String(text || '');
     if (!isOn()) {
-      if (raw.indexOf(MARK) !== -1) showConsent(anchor);
+      if (hasMark(raw)) showConsent(anchor);
       return { visible: stripOnly(raw), receipts: [], stored: false };
     }
     var parsed = parseTags(raw);
-    if (raw.indexOf(MARK) === -1) return { visible: parsed.visible, receipts: [], stored: false };
+    if (!hasMark(raw)) return { visible: parsed.visible, receipts: [], stored: false };
     if (raw === lastRaw) return { visible: parsed.visible, receipts: [], skipped: true };
     lastRaw = raw;
     var job = applyAll(parsed).then(function (lines) {
@@ -843,7 +878,7 @@
       if (nodes && nodes.length) anchor = nodes[nodes.length - 1];
     } catch (e) {}
     var seen = consumeReply(text, anchor);
-    if (anchor && seen && typeof seen.visible === 'string' && String(text || '').indexOf(MARK) !== -1) {
+    if (anchor && seen && typeof seen.visible === 'string' && hasMark(text)) {
       anchor.textContent = seen.visible;
     }
     return seen;
@@ -1025,6 +1060,7 @@
 
   var api = {
     VERSION: 'v-workspace-core-v0.1',
+    HEAL: 'v-workspace-mark-heal-v0.1',
     HOWTO: HOWTO,
     open: open,
     write: write,

@@ -38501,10 +38501,18 @@ window.FLEpiphany = (function() {
 //   2026-08-08
 // ══════════════════════════════════════════════════════════════════════
 
+// v-workspace-mark-heal-v0.1: the same opening the notebook and clay modules accept.
+function flHasMindMark(text, kind) {
+  var src = String(text || '');
+  if (kind === 'clay') return /\[\s*fl[\s_-]?clay\s*:/i.test(src);
+  if (kind === 'ws') return /\[\s*fl[\s_-]?ws\s*:/i.test(src);
+  return false;
+}
+
 function renderMessageContent(textSpan, content, msgDiv) {
   // v-particle-clay-v0.1: a clay tag never stays in the bubble.
   try {
-    if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_CLAY:') !== -1) {
+    if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) {
       var clayBubble = FLClay.consumeReply(content);
       if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
     }
@@ -38512,7 +38520,7 @@ function renderMessageContent(textSpan, content, msgDiv) {
       var bridgeBubble = FLBridge.consumeReply(content);
       if (bridgeBubble && typeof bridgeBubble.visible === 'string') content = bridgeBubble.visible;
     }
-    if (window.FLWorkspace && typeof FLWorkspace.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_WS:') !== -1) {
+    if (window.FLWorkspace && typeof FLWorkspace.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'ws')) {
       var wsBubble = FLWorkspace.consumeReply(content, textSpan);
       if (wsBubble && typeof wsBubble.visible === 'string') content = wsBubble.visible;
     }
@@ -40590,6 +40598,25 @@ function aiUpdateIdentity(field, value) {
   } catch(e) {}
 }
 
+// v-workspace-mark-heal-v0.1: clay, letters, and the notebook share one tail
+// so the everyday chat paths cannot drift. Off means an empty string.
+function flMindPromptTails() {
+  var parts = [];
+  if (window.FLClay && typeof FLClay.promptDelta === 'function') {
+    var clayPrompt = FLClay.promptDelta();
+    if (clayPrompt) parts.push(clayPrompt);
+  }
+  if (window.FLBridge && typeof FLBridge.promptDelta === 'function') {
+    var bridgePrompt = FLBridge.promptDelta();
+    if (bridgePrompt) parts.push(bridgePrompt);
+  }
+  if (window.FLWorkspace && typeof FLWorkspace.promptDelta === 'function') {
+    var wsPrompt = FLWorkspace.promptDelta();
+    if (wsPrompt) parts.push(wsPrompt);
+  }
+  return parts.length ? ('\n\n' + parts.join('\n\n')) : '';
+}
+
 function buildMessages() {
   const messages = [];
 
@@ -40964,21 +40991,9 @@ function buildMessages() {
     }
   }
 
-  // v-particle-clay-v0.1: clay words join the prompt only while clay is on.
-  if (window.FLClay && typeof FLClay.promptDelta === 'function') {
-    var clayPrompt = FLClay.promptDelta();
-    if (clayPrompt) systemContent += '\n\n' + clayPrompt;
-  }
-  // v-bridge-knock-v0.1: letter words join the prompt only while letters are on.
-  if (window.FLBridge && typeof FLBridge.promptDelta === 'function') {
-    var bridgePrompt = FLBridge.promptDelta();
-    if (bridgePrompt) systemContent += '\n\n' + bridgePrompt;
-  }
-  // v-workspace-core-v0.1: notebook words join the prompt only while the notebook is on.
-  if (window.FLWorkspace && typeof FLWorkspace.promptDelta === 'function') {
-    var wsPrompt = FLWorkspace.promptDelta();
-    if (wsPrompt) systemContent += '\n\n' + wsPrompt;
-  }
+  // v-workspace-mark-heal-v0.1: one tail. Clay, letters, and the notebook stay in it.
+  // v-particle-clay-v0.1 v-bridge-knock-v0.1 v-workspace-core-v0.1
+  systemContent += flMindPromptTails();
 
   messages.push({ role: 'system', content: systemContent });
 
@@ -42320,6 +42335,7 @@ function buildSmartMessages(userMessage) {
     if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
       systemContent = FLContextFilter.filterForChat(systemContent);
     }
+    systemContent += flMindPromptTails();
     messages.push({ role: 'system', content: systemContent });
     var surfHist = (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat)
       ? state.chatHistory.slice(-2).map(function(m) {
@@ -42398,6 +42414,11 @@ function buildSmartMessages(userMessage) {
     if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
       systemContent = FLContextFilter.filterForChat(systemContent);
     }
+    var _flMindTailMin = flMindPromptTails();
+    if (_flMindTailMin) {
+      systemContent += _flMindTailMin;
+      usedTokens += estimateTokens(_flMindTailMin);
+    }
     messages.push({ role: 'system', content: systemContent });
     // Add only last 2 messages of history; re-filter prior assistant turns
     // so a previous leak cannot poison this conversation.
@@ -42469,6 +42490,11 @@ function buildSmartMessages(userMessage) {
   // Final-pass identity filter (chat-only) — see buildMessages comment for rationale.
   if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
     systemContent = FLContextFilter.filterForChat(systemContent);
+  }
+  var _flMindTailSmart = flMindPromptTails();
+  if (_flMindTailSmart) {
+    systemContent += _flMindTailSmart;
+    usedTokens += estimateTokens(_flMindTailSmart);
   }
   messages.push({ role: 'system', content: systemContent });
 
