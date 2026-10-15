@@ -1,5 +1,6 @@
 // mind-workspace.js (MIT) v-workspace-core-v0.1 v-workspace-mark-heal-v0.1
 // v-workspace-private-v0.1 v-workspace-seal-v0.1 v-tree-workspace-seal-v0.1
+// v-workspace-export-v0.1 v-tree-workspace-export-v0.1
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -196,8 +197,8 @@
   function mindFp(modelId, name) {
     return sha256Hex(String(modelId || '') + '\n' + String(name || ''));
   }
-  function openDB() {
-    if (!isOn()) return Promise.resolve(null);
+  function openDB(force) {
+    if (!force && !isOn()) return Promise.resolve(null);
     if (db) return Promise.resolve(db);
     if (!root.indexedDB || typeof root.indexedDB.open !== 'function') return Promise.resolve(null);
     opens += 1;
@@ -215,8 +216,8 @@
       req.onerror = function () { resolve(null); };
     });
   }
-  function runStore(name, mode, fn) {
-    return openDB().then(function (d) {
+  function runStore(name, mode, fn, force) {
+    return openDB(force).then(function (d) {
       if (!d) return undefined;
       return new Promise(function (resolve) {
         var tx;
@@ -252,13 +253,13 @@
       return copy;
     });
   }
-  function allOf(storeName) {
+  function allOf(storeName, force) {
     return runStore(storeName, 'readonly', function (store) {
       var req = store.getAll();
       var box = { value: [] };
       req.onsuccess = function () { box.value = req.result || []; };
       return box;
-    }).then(function (box) { return box && box.value ? box.value : []; });
+    }, force).then(function (box) { return box && box.value ? box.value : []; });
   }
   function getVersion(hash) {
     if (!hash) return Promise.resolve(null);
@@ -1685,11 +1686,456 @@
   }
   function tokensOf(s) { return Math.ceil(String(s || '').length / 4); }
 
+  // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
+  // The notebook leaves with the export. A private page stays on this device.
+  var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on the device that made the export.';
+  var BRANCH_NOTE = 'Parent was not in this notebook, so this version came in as its own branch.';
+
+  function countWord(n, one, many) {
+    n = n | 0;
+    return String(n) + ' ' + (n === 1 ? one : many);
+  }
+  function notebookLine(total, priv) {
+    return 'Notebook: ' + countWord(total, 'page', 'pages') + ', ' + countWord(priv, 'private page', 'private pages') + ' stayed on this device.';
+  }
+  function privacyHidden(value) {
+    return value === 'private' || value === 'mind-private';
+  }
+  function pushSecret(list, value) {
+    if (value == null) return;
+    var s = String(value);
+    if (!s) return;
+    if (list.indexOf(s) < 0) list.push(s);
+  }
+  function sortBy(list, key) {
+    return list.sort(function (a, b) {
+      var as = String((a && a[key]) || '');
+      var bs = String((b && b[key]) || '');
+      if (as < bs) return -1;
+      if (as > bs) return 1;
+      return 0;
+    });
+  }
+  function sequence(items, fn) {
+    var chain = Promise.resolve();
+    (items || []).forEach(function (item) {
+      chain = chain.then(function () { return fn(item); });
+    });
+    return chain;
+  }
+  function shelfLabel(fp, mine, mindName) {
+    if (fp && fp === mine) return mindName || '';
+    var hex = String(fp || '').slice(0, 8);
+    return hex ? ('Shelf ' + hex) : 'Shelf';
+  }
+  function copyPageOut(p) {
+    return {
+      id: p.id,
+      mindFp: String(p.mindFp || ''),
+      title: p.title == null ? '' : String(p.title),
+      kind: p.kind || 'note',
+      privacy: p.privacy || 'shared',
+      pinned: p.pinned === true,
+      aside: p.aside === true,
+      head: p.head == null ? null : p.head,
+      heads: Array.isArray(p.heads) ? p.heads.slice() : [],
+      seed: p.seed == null ? '' : String(p.seed),
+      seedByHash: p.seedByHash && typeof p.seedByHash === 'object' ? JSON.parse(JSON.stringify(p.seedByHash)) : {},
+      updated: p.updated || 0,
+      publicTitle: p.publicTitle == null ? '' : String(p.publicTitle)
+    };
+  }
+  function copyVersionOut(v) {
+    var out = {
+      hash: v.hash,
+      pageId: v.pageId,
+      parent: v.parent == null ? null : v.parent,
+      branchOf: v.branchOf == null ? null : v.branchOf,
+      ts: v.ts,
+      author: v.author == null ? '' : String(v.author),
+      text: v.text == null ? '' : String(v.text),
+      meta: v.meta && typeof v.meta === 'object' ? JSON.parse(JSON.stringify(v.meta)) : {},
+      sealed: v.sealed === true
+    };
+    if (v.note) out.note = String(v.note);
+    return out;
+  }
+  function copyReceiptOut(r, mindFpValue) {
+    var mind = r && r.mindSeal ? r.mindSeal : {};
+    return {
+      id: r.id || r.versionHash,
+      versionHash: r.versionHash || r.id,
+      pageId: r.pageId || '',
+      mindFp: String(mindFpValue || r.mindFp || ''),
+      mindSeal: {
+        contextHash: mind.contextHash == null ? '' : String(mind.contextHash),
+        modelId: mind.modelId == null ? '' : String(mind.modelId)
+      },
+      ts: r.ts || 0,
+      consent: r.consent || '',
+      why: r.why == null ? '' : String(r.why),
+      humanSig: r.humanSig || '',
+      publicKey: r.publicKey || ''
+    };
+  }
+  function stubReceiptOut(r, mindFpValue) {
+    var hash = String(r.versionHash || r.id || '');
+    var mind = r && r.mindSeal ? r.mindSeal : {};
+    return {
+      id: r.id || hash,
+      versionHash: hash,
+      pageId: r.pageId || '',
+      mindFp: String(mindFpValue || r.mindFp || ''),
+      mindSeal: {
+        contextHash: mind.contextHash == null ? '' : String(mind.contextHash),
+        modelId: mind.modelId == null ? '' : String(mind.modelId)
+      },
+      ts: r.ts || 0,
+      consent: r.consent || '',
+      humanSig: r.humanSig || '',
+      publicKey: r.publicKey || '',
+      text: { private: true, versionHash: hash }
+    };
+  }
+  function emptyShelf(fp, mine, mindName) {
+    return {
+      mindFp: fp,
+      name: shelfLabel(fp, mine, mindName),
+      setAside: shelfIsAside(fp),
+      pages: [],
+      versions: [],
+      receipts: []
+    };
+  }
+  function exportSection() {
+    var secrets = [];
+    return ensureShelf().then(function (mine) {
+      var mindName = '';
+      try { mindName = String((recallMind().name) || ''); } catch (e) { mindName = ''; }
+      return Promise.all([allOf('pages', true), allOf('versions', true), allOf('receipts', true)]).then(function (rows) {
+        var pages = rows[0] || [];
+        var versions = rows[1] || [];
+        var receiptRows = rows[2] || [];
+        var hiddenIds = {};
+        var pageById = {};
+        var groups = {};
+        var order = [];
+        var total = 0;
+        var priv = 0;
+        function shelfFor(fp) {
+          var key = String(fp || '');
+          if (!key) return null;
+          if (!groups[key]) {
+            groups[key] = emptyShelf(key, mine, mindName);
+            order.push(key);
+          }
+          return groups[key];
+        }
+        pages.forEach(function (p) {
+          if (!p || !p.id) return;
+          total += 1;
+          pageById[p.id] = p;
+          var shelf = shelfFor(p.mindFp);
+          if (privacyHidden(p.privacy)) {
+            priv += 1;
+            hiddenIds[p.id] = true;
+            pushSecret(secrets, p.title);
+            pushSecret(secrets, p.seed);
+            var map = p.seedByHash || {};
+            Object.keys(map).forEach(function (k) { pushSecret(secrets, map[k]); });
+            return;
+          }
+          if (shelf) shelf.pages.push(copyPageOut(p));
+        });
+        versions.forEach(function (v) {
+          if (!v) return;
+          if (hiddenIds[v.pageId]) {
+            pushSecret(secrets, v.text);
+            return;
+          }
+          var page = pageById[v.pageId];
+          if (!page) return;
+          var shelf = shelfFor(page.mindFp);
+          if (shelf) shelf.versions.push(copyVersionOut(v));
+        });
+        receiptRows.forEach(function (r) {
+          if (!r) return;
+          var pid = r.pageId || '';
+          var page = pageById[pid];
+          var hidden = !!(hiddenIds[pid] || (r.text && r.text.private === true));
+          var fp = page ? page.mindFp : (r.mindFp || '');
+          var shelf = shelfFor(fp);
+          if (!shelf) return;
+          if (hidden) {
+            if (r.why) pushSecret(secrets, r.why);
+            shelf.receipts.push(stubReceiptOut(r, fp));
+            return;
+          }
+          if (!page) return;
+          shelf.receipts.push(copyReceiptOut(r, fp));
+        });
+        var shelves = order.sort().map(function (key) {
+          var shelf = groups[key];
+          sortBy(shelf.pages, 'id');
+          sortBy(shelf.versions, 'hash');
+          sortBy(shelf.receipts, 'versionHash');
+          return shelf;
+        });
+        return {
+          section: { v: 1, shelves: shelves, line: notebookLine(total, priv) },
+          secrets: secrets
+        };
+      });
+    });
+  }
+  function thisDeviceKey() {
+    try {
+      var raw = lsGet(DEVICE_KEY);
+      if (!raw) return '';
+      var saved = JSON.parse(raw);
+      return saved && saved.publicKey ? String(saved.publicKey) : '';
+    } catch (e) { return ''; }
+  }
+  function deviceMark(publicKey) {
+    return sha256Hex(String(publicKey || '')).then(function (hex) {
+      var h = String(hex || '').slice(0, 8);
+      if (h.length < 8) return '';
+      return 'sealed on another device (' + h.slice(0, 4) + ' ' + h.slice(4, 8) + '...)';
+    });
+  }
+  function verifySealSignature(row) {
+    if (!row || !row.humanSig || !row.publicKey || !row.versionHash) return Promise.resolve(false);
+    return sha256Hex(sealCanonical(row)).then(function (hex) {
+      var subtle = subtleCrypto();
+      if (!subtle || !hex) return false;
+      return subtle.importKey('spki', b64ToBytes(row.publicKey), { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']).then(function (pub) {
+        return subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, pub, b64ToBytes(row.humanSig), new TextEncoder().encode(hex));
+      }).then(function (ok) { return ok === true; }, function () { return false; });
+    });
+  }
+  function sectionVersions(section) {
+    var list = [];
+    (section.shelves || []).forEach(function (shelf) {
+      (shelf && shelf.versions || []).forEach(function (ver) { if (ver) list.push(ver); });
+    });
+    return list;
+  }
+  function sectionReceipts(section) {
+    var list = [];
+    (section.shelves || []).forEach(function (shelf) {
+      (shelf && shelf.receipts || []).forEach(function (row) { if (row) list.push(row); });
+    });
+    return list;
+  }
+  function verifyShelves(section) {
+    var report = {
+      ok: true,
+      line: section.line || '',
+      privateNote: PRIVATE_NOTE,
+      pages: 0,
+      versions: 0,
+      receipts: 0,
+      hashMismatches: 0,
+      receiptMismatches: 0,
+      parentGaps: 0,
+      notedBranches: 0,
+      lines: [],
+      errors: []
+    };
+    var versions = sectionVersions(section);
+    var have = {};
+    versions.forEach(function (ver) { if (ver && ver.hash) have[String(ver.hash)] = true; });
+    (section.shelves || []).forEach(function (shelf) {
+      report.pages += (shelf && shelf.pages ? shelf.pages.length : 0);
+    });
+    report.versions = versions.length;
+    var chain = sequence(versions, function (ver) {
+      return hashVersion({
+        parent: ver.parent, ts: ver.ts, author: ver.author, text: ver.text, meta: ver.meta
+      }).then(function (h) {
+        if (h !== ver.hash) {
+          report.hashMismatches += 1;
+          report.errors.push('hash-mismatch');
+          return;
+        }
+        var parent = ver.parent == null || ver.parent === '' ? '' : String(ver.parent);
+        if (!parent) return;
+        if (have[parent]) return;
+        if (ver.note) { report.notedBranches += 1; return; }
+        report.parentGaps += 1;
+      });
+    });
+    return chain.then(function () {
+      var rows = sectionReceipts(section);
+      report.receipts = rows.length;
+      var byHash = {};
+      versions.forEach(function (ver) { if (ver && ver.hash) byHash[String(ver.hash)] = ver; });
+      return sequence(rows, function (row) {
+        var stub = !!(row.text && row.text.private === true);
+        var check = Promise.resolve(true);
+        if (!stub) {
+          var ver = byHash[String(row.versionHash || '')];
+          if (!ver) {
+            report.receiptMismatches += 1;
+            report.errors.push('receipt-mismatch');
+            return;
+          }
+          check = hashVersion({
+            parent: ver.parent, ts: ver.ts, author: ver.author, text: ver.text, meta: ver.meta
+          }).then(function (h) { return h === ver.hash && h === row.versionHash; });
+        }
+        return check.then(function (hashOk) {
+          if (!hashOk) {
+            report.receiptMismatches += 1;
+            report.errors.push('receipt-mismatch');
+            return;
+          }
+          return verifySealSignature(row).then(function (ok) {
+            if (!ok) {
+              report.receiptMismatches += 1;
+              report.errors.push('receipt-mismatch');
+              return;
+            }
+            var mine = thisDeviceKey();
+            if (mine && row.publicKey === mine) return;
+            return deviceMark(row.publicKey).then(function (line) {
+              if (line && report.lines.indexOf(line) < 0) report.lines.push(line);
+            });
+          });
+        });
+      });
+    }).then(function () {
+      report.ok = report.hashMismatches === 0 && report.receiptMismatches === 0;
+      return report;
+    });
+  }
+  function parentPresent(parent, incoming) {
+    if (parent == null || parent === '') return Promise.resolve(true);
+    if (incoming[String(parent)]) return Promise.resolve(true);
+    return getVersion(String(parent)).then(function (found) { return !!found; });
+  }
+  function addPageIfAbsent(page) {
+    if (!page || !page.id) return Promise.resolve({ added: false, reason: 'missing' });
+    if (privacyHidden(page.privacy)) return Promise.resolve({ added: false, reason: 'private' });
+    var copy = {
+      id: String(page.id),
+      mindFp: String(page.mindFp || ''),
+      title: page.title == null ? '' : String(page.title),
+      kind: page.kind || 'note',
+      privacy: 'shared',
+      pinned: page.pinned === true,
+      aside: page.aside === true,
+      head: page.head == null ? null : page.head,
+      heads: Array.isArray(page.heads) ? page.heads.slice() : [],
+      seed: page.seed == null ? '' : String(page.seed),
+      seedByHash: page.seedByHash && typeof page.seedByHash === 'object' ? JSON.parse(JSON.stringify(page.seedByHash)) : {},
+      updated: page.updated || 0
+    };
+    if (page.publicTitle) copy.publicTitle = String(page.publicTitle);
+    return runStore('pages', 'readwrite', function (store) {
+      var req = store.get(copy.id);
+      var box = { value: { added: false } };
+      req.onsuccess = function () {
+        if (req.result) { box.value = { added: false, page: req.result }; return; }
+        try { store.add(copy); box.value = { added: true, page: copy }; }
+        catch (e) { box.value = { added: false }; }
+      };
+      return box;
+    }).then(function (box) { return box && box.value ? box.value : { added: false }; });
+  }
+  function addReceiptIfAbsent(row) {
+    if (!row || !(row.id || row.versionHash)) return Promise.resolve({ added: false });
+    var copy = JSON.parse(JSON.stringify(row));
+    if (!copy.id) copy.id = copy.versionHash;
+    return getReceipt(copy.id).then(function (existing) {
+      if (existing) return { added: false };
+      return putReceipt(copy).then(function () { return { added: true }; }, function () { return { added: false }; });
+    });
+  }
+  function rememberAside(shelf) {
+    if (!shelf || shelf.setAside !== true || !shelf.mindFp) return;
+    var key = asideKey(shelf.mindFp);
+    if (lsGet(key) === '1') return;
+    lsSet(key, '1');
+  }
+  function writeShelves(section) {
+    var added = { pages: 0, versions: 0, receipts: 0, skippedPages: 0, skippedVersions: 0, skippedReceipts: 0, branched: 0, refusedPrivate: 0 };
+    var incoming = {};
+    sectionVersions(section).forEach(function (ver) { if (ver && ver.hash) incoming[String(ver.hash)] = true; });
+    return sequence(section.shelves || [], function (shelf) {
+      if (!shelf) return;
+      rememberAside(shelf);
+      return sequence(shelf.pages || [], function (page) {
+        if (privacyHidden(page && page.privacy)) { added.refusedPrivate += 1; return; }
+        return addPageIfAbsent(page).then(function (res) {
+          if (res && res.added) added.pages += 1;
+          else added.skippedPages += 1;
+        });
+      }).then(function () {
+        return sequence(shelf.versions || [], function (ver) {
+          if (!ver || !ver.hash) return;
+          return getVersion(String(ver.hash)).then(function (existing) {
+            if (existing) { added.skippedVersions += 1; return; }
+            var parent = ver.parent == null || ver.parent === '' ? null : String(ver.parent);
+            return parentPresent(parent, incoming).then(function (present) {
+              var record = copyVersionOut(ver);
+              record.parent = parent;
+              if (!present) {
+                record.branchOf = null;
+                record.note = BRANCH_NOTE;
+                added.branched += 1;
+              }
+              return saveVersion(record).then(function (kept) {
+                if (kept && kept.hash === record.hash && !existing) added.versions += 1;
+              });
+            });
+          });
+        });
+      }).then(function () {
+        return sequence(shelf.receipts || [], function (row) {
+          return addReceiptIfAbsent(row).then(function (res) {
+            if (res && res.added) added.receipts += 1;
+            else added.skippedReceipts += 1;
+          });
+        });
+      });
+    }).then(function () { return added; });
+  }
+  function importSection(section, mode) {
+    mode = mode || 'verify-only';
+    if (!section || section.v !== 1 || !Array.isArray(section.shelves)) {
+      return Promise.resolve({
+        ok: false,
+        mode: mode,
+        line: '',
+        privateNote: PRIVATE_NOTE,
+        errors: ['workspace-section'],
+        lines: []
+      });
+    }
+    return verifyShelves(section).then(function (report) {
+      report.mode = mode;
+      if (mode === 'verify-only') return report;
+      if (!report.ok) return report;
+      if (!isOn()) {
+        report.ok = false;
+        report.errors = report.errors.concat(['notebook-off']);
+        return report;
+      }
+      return writeShelves(section).then(function (added) {
+        report.added = added;
+        return report;
+      });
+    });
+  }
+
   var api = {
     VERSION: 'v-workspace-core-v0.1',
     HEAL: 'v-workspace-mark-heal-v0.1',
     PRIVATE: 'v-workspace-private-v0.1',
     SEAL: 'v-workspace-seal-v0.1',
+    EXPORT: 'v-workspace-export-v0.1',
+    TREE_EXPORT: 'v-tree-workspace-export-v0.1',
     HONEST: HONEST,
     HOWTO: HOWTO,
     open: open,
@@ -1733,7 +2179,9 @@
     personSummary: personSummary,
     approveSeal: approveSeal,
     verifyReceipt: verifyReceipt,
-    receipts: receipts
+    receipts: receipts,
+    exportSection: exportSection,
+    importSection: importSection
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FLWorkspace = api;
