@@ -1,6 +1,7 @@
 // workspace-view.js (MIT) v-workspace-view-v0.1
 // The page list, the branch spiral, the version diff, and the wake strip.
 // The simple list stays. Nothing is stored here. No network.
+// v-workspace-private-v0.1: a private page shows its public summary only.
 (function (root) {
   'use strict';
 
@@ -306,7 +307,13 @@
     if (shelf && shelf.mindFp) return 'Shelf ' + String(shelf.mindFp).slice(0, 8);
     return 'Shelf';
   }
+  function privateLabel(page) {
+    if (!page || page.privacy !== 'private') return '';
+    var pub = page.publicTitle != null ? String(page.publicTitle).trim() : '';
+    return pub || 'a private page';
+  }
   function pageLine(page) {
+    if (page && page.privacy === 'private') return privateLabel(page);
     var pinned = page.pinned ? 'pinned' : 'unpinned';
     var seed = page.seed ? page.seed : '';
     return page.title + ' · ' + (page.kind || 'note') + ' · ' + pinned + ' · ' + whenText(page.updated) + (seed ? ' · ' + seed : '');
@@ -381,7 +388,7 @@
         }
         rows.forEach(function (row) {
           var page = row.page || row;
-          var b = button(d, page && page.title ? page.title : 'Page');
+          var b = button(d, page && page.privacy === 'private' ? privateLabel(page) : (page && page.title ? page.title : 'Page'));
           b.addEventListener('click', function () {
             if (page && page.id) selectedPageId = page.id;
             paintPanel(panel);
@@ -436,6 +443,13 @@
         head.style.margin = '12px 0 4px';
         head.textContent = shelfTitle(shelf);
         listCol.appendChild(head);
+        if (ws.shelfIsAside && ws.shelfIsAside(shelf.mindFp)) {
+          var asideNote = d.createElement('p');
+          asideNote.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
+          asideNote.textContent = 'This shelf is set aside. The pages are kept.';
+          listCol.appendChild(asideNote);
+          return;
+        }
         (shelf.pages || []).forEach(function (page) {
           if (!passes(page)) return;
           flat.push(page);
@@ -461,6 +475,29 @@
     }).catch(function () {});
   }
   function showPage(d, spiralCol, diff, page, versions, panel) {
+    if (page && page.privacy === 'private') {
+      var hidden = '';
+      var sealed = false;
+      var head = page.head || '';
+      (versions || []).forEach(function (v) {
+        if (v && head && v.hash === head) {
+          hidden = v.text || '';
+          sealed = v.sealed === true;
+        }
+      });
+      var summary = root.FLWorkspace && typeof root.FLWorkspace.personSummary === 'function'
+        ? root.FLWorkspace.personSummary(page, hidden, sealed)
+        : privateLabel(page);
+      var sum = d.createElement('p');
+      sum.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+      sum.textContent = summary;
+      var hashP = d.createElement('p');
+      hashP.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
+      hashP.textContent = head ? String(head) : '';
+      spiralCol.appendChild(sum);
+      spiralCol.appendChild(hashP);
+      return;
+    }
     var nodes = nodesOf(versions, page);
     var canvas = d.createElement('canvas');
     canvas.width = 640;
