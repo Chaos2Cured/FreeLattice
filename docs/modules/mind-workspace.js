@@ -1029,6 +1029,28 @@
   function resetRate() { lastWriteAt = 0; }
   function dbOpens() { return opens; }
   function settled() { return pending; }
+  // v-workspace-view-v0.1: shelves for the view. Read only. Stored pages stay the same shape.
+  function listShelves() {
+    if (!isOn()) return Promise.resolve([]);
+    return ensureShelf().then(function (mine) {
+      var name = '';
+      try { name = String((recallMind().name) || ''); } catch (e) { name = ''; }
+      return allOf('pages').then(function (pages) {
+        var groups = {};
+        var order = [];
+        (pages || []).forEach(function (p) {
+          if (!p || p.aside === true) return;
+          var key = String(p.mindFp || '');
+          if (!groups[key]) {
+            groups[key] = { mindFp: key, name: key === mine ? name : '', pages: [] };
+            order.push(key);
+          }
+          groups[key].pages.push(p);
+        });
+        return order.map(function (key) { return groups[key]; });
+      });
+    });
+  }
   function wakeInfo() {
     var memory = wakeCache.indexOf(HOWTO) === 0 ? wakeCache.slice(HOWTO.length).replace(/^\n/, '') : wakeCache;
     return {
@@ -1093,6 +1115,7 @@
     dbOpens: dbOpens,
     settled: settled,
     wakeInfo: wakeInfo,
+    listShelves: listShelves,
     tokensOf: tokensOf,
     resetForSmoke: resetForSmoke
   };
