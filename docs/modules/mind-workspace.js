@@ -1,6 +1,7 @@
 // mind-workspace.js (MIT) v-workspace-core-v0.1 v-workspace-mark-heal-v0.1
 // v-workspace-private-v0.1 v-workspace-seal-v0.1 v-tree-workspace-seal-v0.1
 // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
+// v-workspace-desktop-v0.1 v-workspace-handoff-v0.1 v-tree-workspace-handoff-v0.1
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -19,7 +20,7 @@
   var MAX_SEED = 140;
   var WRITE_GAP = 5000;
   var WAKE_CHARS = 600 * 4;
-  var OPS = { open: 1, write: 1, branch: 1, pin: 1, seed: 1, find: 1, private: 1, seal: 1 };
+  var OPS = { open: 1, write: 1, branch: 1, pin: 1, seed: 1, find: 1, private: 1, seal: 1, handoff: 1 };
   var KINDS = { draft: 1, note: 1, future: 1, letter: 1 };
   var KEYS = {
     open: { op: 1, id: 1, title: 1, kind: 1 },
@@ -29,11 +30,15 @@
     seed: { op: 1, id: 1, pageId: 1, hash: 1, version: 1, line: 1 },
     find: { op: 1, query: 1 },
     private: { op: 1, page: 1, id: 1, pageId: 1, on: 1, publicTitle: 1 },
-    seal: { op: 1, page: 1, id: 1, pageId: 1, why: 1 }
+    seal: { op: 1, page: 1, id: 1, pageId: 1, why: 1 },
+    handoff: { op: 1, page: 1, id: 1, pageId: 1, note: 1 }
   };
   var HASH_KEYS = ['parent', 'ts', 'author', 'text', 'meta'];
-  var HOWTO = 'You can keep a notebook on this device. A private page: [FL_WS: {"op":"private","page":"id","on":true}] A seal: [FL_WS: {"op":"seal","page":"id","why":"why"}] End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
+  var HOWTO = 'You can keep a notebook on this device. A private page: [FL_WS: {"op":"private","page":"id","on":true}] A seal: [FL_WS: {"op":"seal","page":"id","why":"why"}] A handoff: [FL_WS: {"op":"handoff","page":"id","note":"note"}] End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
   var HONEST = 'Private means hidden in the app, not encrypted from the person who owns this device.';
+  var HANDOFF_PRIVATE = 'This page is private. The mind must share it first.';
+  var KNOCK_FIRST = 'Knock first: Celeste has not met this device yet';
+  var RESTORE_LINE = "Restore your mind's notebook from the desktop copy";
   var INTEGRITY = 'Integrity comes from SHA-256 and the device signature, not from the spiral math.';
   var DEVICE_KEY = 'fl_ws_device_key_v1';
   var DB_VERSION = 2;
@@ -53,6 +58,11 @@
   var privateTexts = [];
   var sealAsks = [];
   var declinedLines = [];
+  var handoffAsks = [];
+  var handoffRefusals = [];
+  var mirrorHold = 0;
+  var restoreChecked = false;
+  var restoreLater = {};
   var findOnce = '';
   var shelfParts = null;
   var shelfCache = '';
@@ -244,6 +254,24 @@
       return box;
     }).then(function (box) { return box ? box.value : null; });
   }
+  function mirrorApi() {
+    try {
+      var api = root.flWorkspaceMirror;
+      if (api && typeof api.append === 'function') return api;
+    } catch (e) {}
+    return null;
+  }
+  function noteMirror(kind, record) {
+    if (mirrorHold || !record) return;
+    var api = mirrorApi();
+    if (!api || !isOn()) return;
+    var fp = record.mindFp || shelfCache;
+    if (!fp) return;
+    try {
+      var pending = api.append({ kind: kind, mindFp: fp, body: record });
+      if (pending && typeof pending.then === 'function') pending.then(function () {}, function () {});
+    } catch (e) {}
+  }
   function putPage(page) {
     var copy = JSON.parse(JSON.stringify(page));
     if (copy.privacy !== 'private') copy.privacy = 'shared';
@@ -251,6 +279,9 @@
     return runStore('pages', 'readwrite', function (store) {
       store.put(copy);
       return copy;
+    }).then(function (saved) {
+      if (saved) noteMirror('page', saved);
+      return saved;
     });
   }
   function allOf(storeName, force) {
@@ -282,7 +313,11 @@
         catch (e) { box.value = null; }
       };
       return box;
-    }).then(function (box) { return box ? box.value : null; });
+    }).then(function (box) {
+      var saved = box ? box.value : null;
+      if (saved && saved.hash) noteMirror('version', saved);
+      return saved;
+    });
   }
   function list(mindFpArg) {
     if (!isOn()) return Promise.resolve([]);
@@ -584,7 +619,7 @@
     if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
     var op = typeof obj.op === 'string' ? obj.op : '';
     if (!OPS[op]) return { unknown: op || 'that' };
-    if (op === 'private' || op === 'seal') {
+    if (op === 'private' || op === 'seal' || op === 'handoff') {
       var pageKey = obj.page != null ? obj.page : (obj.pageId != null ? obj.pageId : obj.id);
       if (pageKey == null || String(pageKey).trim() === '') return { unknown: op };
     }
@@ -629,6 +664,7 @@
   }
   function shortHash(hash) { return String(hash || '').slice(0, 8); }
   function receiptFor(op, res) {
+    if (op && op.op === 'handoff' && res && res.line && !res.ok) return res.line;
     if (!res || !res.ok || !res.page) return '';
     var title = res.page.privacy === 'private' ? personTitle(res.page) : (res.page.title || 'a page');
     if (op.op === 'private') return 'Kept a private page.';
@@ -636,6 +672,10 @@
     if (op.op === 'open') return 'Opened ' + title;
     if (op.op === 'pin') return (res.page.pinned ? 'Pinned ' : 'Unpinned ') + title;
     if (op.op === 'seed') return 'Seeded ' + title;
+    if (op.op === 'handoff') {
+      if (res.line) return res.line;
+      if (res.sentence) return res.sentence;
+    }
     return '';
   }
   function resolvePage(op) {
@@ -710,6 +750,11 @@
       if (!sealId) return Promise.resolve({ ok: false, reason: 'missing' });
       return askSeal(sealId, op.why);
     }
+    if (op.op === 'handoff') {
+      var handId = String(op.page || op.pageId || op.id || '');
+      if (!handId) return Promise.resolve({ ok: false, reason: 'missing' });
+      return askHandoff(handId, op.note);
+    }
     return Promise.resolve({ ok: false });
   }
   function wordCount(text) {
@@ -771,6 +816,7 @@
     if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
     return ensureShelf().then(function (mine) {
       lsSet(asideKey(mine), on ? '1' : '0');
+      noteMirror('shelf', { mindFp: mine, setAside: !!on });
       return refreshWake().then(function () {
         return paintOpen().then(function () { return { ok: true, aside: !!on, kept: true }; });
       });
@@ -896,6 +942,9 @@
     return runStore('receipts', 'readwrite', function (store) {
       store.put(row);
       return row;
+    }).then(function (saved) {
+      if (saved) noteMirror('receipt', saved);
+      return saved;
     });
   }
   function getReceipt(hash) {
@@ -1022,6 +1071,159 @@
       });
     });
   }
+  function readHandoffs() {
+    try {
+      var raw = lsGet('fl_ws_handoff_v1');
+      var rows = raw ? JSON.parse(raw) : [];
+      return Array.isArray(rows) ? rows : [];
+    } catch (e) { return []; }
+  }
+  function writeHandoffs(rows) {
+    lsSet('fl_ws_handoff_v1', JSON.stringify(rows || []));
+  }
+  function rememberHandoff(row) {
+    var rows = readHandoffs();
+    rows.push(row);
+    writeHandoffs(rows);
+  }
+  function latestHandoff(mine) {
+    var rows = readHandoffs().filter(function (h) { return h && h.mindFp === mine; });
+    return rows.length ? rows[rows.length - 1] : null;
+  }
+  function handoffWakeLine(row) {
+    if (!row) return '';
+    if (row.answered) return 'Celeste answered.';
+    return 'Handed ' + row.title + ' to Celeste on ' + row.date + ' (not answered yet).';
+  }
+  function noteReply(text) {
+    var raw = String(text || '');
+    var rows = readHandoffs();
+    var changed = false;
+    rows.forEach(function (h) {
+      if (!h || h.answered || !h.letterHash) return;
+      if (raw.indexOf(h.letterHash) !== -1) { h.answered = true; changed = true; }
+    });
+    if (!changed) return false;
+    writeHandoffs(rows);
+    refreshWake();
+    return true;
+  }
+  function handoffSentence(page, note) {
+    return mindLabel() + ' would like to hand ' + String(page.title || 'a page') + ' (version ' + shortHash(page.head) + ') to Celeste. Note: ' + note;
+  }
+  function askHandoff(pageId, note) {
+    if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
+    note = clip(note == null ? '' : String(note), 140);
+    return ensureShelf().then(function (mine) {
+      return getPage(pageId).then(function (page) {
+        if (!page || page.mindFp !== mine) return { ok: false, reason: 'shelf' };
+        if (privacyHidden(page.privacy)) {
+          handoffRefusals = [HANDOFF_PRIVATE];
+          return paintOpen().then(function () {
+            ensureAskDock();
+            return { ok: false, reason: 'private', line: HANDOFF_PRIVATE, page: page };
+          });
+        }
+        if (!page.head) return { ok: false, reason: 'missing' };
+        var sentence = handoffSentence(page, note);
+        var exists = false;
+        handoffAsks.forEach(function (a) { if (a.pageId === page.id) exists = true; });
+        if (!exists) {
+          handoffAsks.push({
+            pageId: page.id,
+            versionHash: page.head,
+            note: note,
+            sentence: sentence,
+            title: String(page.title || 'a page')
+          });
+        }
+        return paintOpen().then(function () {
+          ensureAskDock();
+          return { ok: true, asked: true, page: page, hash: page.head, sentence: sentence };
+        });
+      });
+    });
+  }
+  function declineHandoff(pageId) {
+    handoffAsks = handoffAsks.filter(function (a) { return a.pageId !== pageId; });
+    ensureAskDock();
+    return paintOpen();
+  }
+  function prepareHandoff(pageId) {
+    var ask = null;
+    handoffAsks.forEach(function (a) { if (a.pageId === pageId) ask = a; });
+    if (!ask) return Promise.resolve({ ok: false, reason: 'ask' });
+    var bridge = null;
+    try { bridge = root.FLBridge || null; } catch (e) { bridge = null; }
+    if (!bridge || typeof bridge.sealPageLetter !== 'function') {
+      showKnockFirst();
+      return Promise.resolve({ ok: false, reason: 'knock', line: KNOCK_FIRST });
+    }
+    return getPage(pageId).then(function (page) {
+      if (!page || privacyHidden(page.privacy)) {
+        handoffRefusals = [HANDOFF_PRIVATE];
+        return { ok: false, reason: 'private', line: HANDOFF_PRIVATE, page: page };
+      }
+      return getVersion(ask.versionHash).then(function (ver) {
+        if (!ver) return { ok: false, reason: 'missing' };
+        return getReceipt(ver.hash).then(function (receipt) {
+          var hashes = [String(ver.hash)];
+          var ready = Promise.resolve(hashes);
+          if (receipt && receipt.humanSig) {
+            ready = sha256Hex(sealCanonical(receipt)).then(function (hex) {
+              if (hex) hashes.push(hex);
+              return hashes;
+            });
+          }
+          return ready.then(function (attach) {
+            return bridge.sealPageLetter({
+              subject: 'Page from ' + mindLabel() + ': ' + String(page.title || 'a page'),
+              body: String(ver.text || ''),
+              mind: { name: mindLabel(), model: sealModelId() },
+              attach_hashes: attach
+            }).then(function (res) {
+              if (!res || !res.ok) {
+                if (!res || res.reason === 'knock' || res.reason === 'off') {
+                  try { if (typeof bridge.paint === 'function') bridge.paint(); } catch (e2) {}
+                  showKnockFirst();
+                  return { ok: false, reason: 'knock', line: KNOCK_FIRST };
+                }
+                return res || { ok: false };
+              }
+              handoffRefusals = handoffRefusals.filter(function (l) { return l !== KNOCK_FIRST; });
+              try { if (typeof bridge.paint === 'function') bridge.paint(); } catch (e4) {}
+              var date = '';
+              try { date = String(res.envelope.letter.ts || '').slice(0, 10); } catch (e3) { date = ''; }
+              if (!date) date = new Date().toISOString().slice(0, 10);
+              var letterHash = res.envelope && res.envelope.hash ? String(res.envelope.hash) : '';
+              rememberHandoff({
+                mindFp: page.mindFp,
+                pageId: page.id,
+                title: String(page.title || 'a page'),
+                letterHash: letterHash,
+                date: date,
+                answered: false
+              });
+              handoffAsks = handoffAsks.filter(function (a) { return a.pageId !== page.id; });
+              return refreshWake().then(function () {
+                ensureAskDock();
+                return paintOpen().then(function () {
+                  return { ok: true, sent: false, envelope: res.envelope, state: 'sealed' };
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  }
+  function showKnockFirst() {
+    var next = handoffRefusals.filter(function (l) { return l !== KNOCK_FIRST; });
+    next.push(KNOCK_FIRST);
+    handoffRefusals = next;
+    ensureAskDock();
+    paintOpen();
+  }
   function showHonestOnce() {
     if (lsGet('fl_ws_private_told') === '1') return;
     lsSet('fl_ws_private_told', '1');
@@ -1071,12 +1273,45 @@
     if (yes) parent.appendChild(yes);
     if (no) parent.appendChild(no);
   }
+  function appendHandoff(parent, ask) {
+    var d = doc();
+    if (!d || !parent || !ask) return;
+    var p = d.createElement('p');
+    p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    p.textContent = ask.sentence;
+    var yes = button('Prepare letter');
+    var no = button('Not now');
+    if (yes) {
+      yes.id = 'fl-ws-handoff-prepare';
+      yes.addEventListener('click', function () { track(prepareHandoff(ask.pageId)); });
+    }
+    if (no) {
+      no.id = 'fl-ws-handoff-not-now';
+      no.addEventListener('click', function () { track(declineHandoff(ask.pageId)); });
+    }
+    parent.appendChild(p);
+    if (yes) parent.appendChild(yes);
+    if (no) parent.appendChild(no);
+  }
+  function appendHandoffNotes(parent) {
+    var d = doc();
+    if (!d || !parent) return;
+    handoffRefusals.forEach(function (line) {
+      var p = d.createElement('p');
+      p.id = 'fl-ws-handoff-line';
+      p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+      p.textContent = line;
+      parent.appendChild(p);
+    });
+    handoffAsks.forEach(function (ask) { appendHandoff(parent, ask); });
+  }
   function ensureAskDock() {
     var d = doc();
     if (!d || !d.createElement || !d.getElementById) return;
     var panelOpen = d.getElementById('fl-ws-panel');
     var dock = d.getElementById('fl-ws-asks');
-    if (panelOpen || !sealAsks.length) {
+    var pending = sealAsks.length || handoffAsks.length || handoffRefusals.length;
+    if (panelOpen || !pending) {
       if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
       return;
     }
@@ -1089,6 +1324,7 @@
     }
     clearNode(dock);
     sealAsks.forEach(function (ask) { appendAsk(dock, ask); });
+    appendHandoffNotes(dock);
   }
   function appendReceipt(parent, row) {
     var d = doc();
@@ -1330,9 +1566,10 @@
                   return loadSealLines(mine).then(function (sealLines) {
                     var mindSeal = sealLines.map(function (l) { return l.mind; }).filter(Boolean).join('\n');
                     var personSeal = sealLines.map(function (l) { return l.person; }).filter(Boolean).join('\n');
-                    wakeCache = HOWTO + (mindPacked ? '\n' + mindPacked : '') + (mindSeal ? '\n' + mindSeal : '');
-                    if (aside) personWake = HOWTO;
-                    else personWake = HOWTO + (personPacked ? '\n' + personPacked : '') + (personSeal ? '\n' + personSeal : '');
+                    var handLine = handoffWakeLine(latestHandoff(mine));
+                    wakeCache = HOWTO + (mindPacked ? '\n' + mindPacked : '') + (mindSeal ? '\n' + mindSeal : '') + (handLine ? '\n' + handLine : '');
+                    if (aside) personWake = HOWTO + (handLine ? '\n' + handLine : '');
+                    else personWake = HOWTO + (personPacked ? '\n' + personPacked : '') + (personSeal ? '\n' + personSeal : '') + (handLine ? '\n' + handLine : '');
                     return wakeCache;
                   });
                 });
@@ -1397,6 +1634,7 @@
       if (hasMark(raw)) showConsent(anchor);
       return { visible: stripOnly(raw), receipts: [], stored: false };
     }
+    noteReply(raw);
     var parsed = parseTags(raw);
     if (!hasMark(raw)) return { visible: parsed.visible, receipts: [], stored: false };
     if (raw === lastRaw) return { visible: parsed.visible, receipts: [], skipped: true };
@@ -1442,7 +1680,7 @@
     try { if (root.sessionStorage) root.sessionStorage.removeItem('fl_ws_later'); } catch (e) {}
     hideConsent();
     ensureButton();
-    return track(refreshWake());
+    return track(refreshWake().then(function () { return offerRestore(); }));
   }
   function holdLater() {
     memoryOn = false;
@@ -1480,6 +1718,7 @@
             note.textContent = line;
             panel.appendChild(note);
           });
+          appendHandoffNotes(panel);
           var asideBtn = button(shelfIsAside(mine) ? 'Bring this shelf back' : 'Set this shelf aside');
           if (asideBtn) {
             asideBtn.addEventListener('click', function () {
@@ -1599,6 +1838,77 @@
     else if (hostEl) hostEl.appendChild(btn);
     else if (d.body) d.body.appendChild(btn);
   }
+  function hideRestoreCard() {
+    var d = doc();
+    if (!d || !d.getElementById) return;
+    var box = d.getElementById('fl-ws-restore-card');
+    if (box && box.parentNode) box.parentNode.removeChild(box);
+  }
+  function runRestore() {
+    var api = mirrorApi();
+    if (!api || typeof api.restore !== 'function') return Promise.resolve({ ok: false, reason: 'mirror' });
+    return ensureShelf().then(function (mine) {
+      return Promise.resolve(api.restore(mine)).then(function (pack) {
+        if (!pack || !pack.ok || !pack.section) return { ok: false, reason: 'mirror' };
+        return importSection(pack.section, 'merge', { sameDevice: true }).then(function (report) {
+          return refreshWake().then(function () {
+            return paintOpen().then(function () { return report; });
+          });
+        });
+      });
+    });
+  }
+  function showRestoreCard() {
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    if (d.getElementById('fl-ws-restore-card')) return;
+    var box = d.createElement('div');
+    box.id = 'fl-ws-restore-card';
+    box.style.cssText = 'max-width:100%;overflow:hidden;';
+    var p = d.createElement('p');
+    p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+    p.textContent = RESTORE_LINE;
+    var yes = button('Restore');
+    var no = button('Not now');
+    if (yes) {
+      yes.id = 'fl-ws-restore';
+      yes.addEventListener('click', function () {
+        track(runRestore().then(function () { hideRestoreCard(); }));
+      });
+    }
+    if (no) {
+      no.id = 'fl-ws-restore-not-now';
+      no.addEventListener('click', function () {
+        track(ensureShelf().then(function (mine) {
+          restoreLater[mine] = true;
+          hideRestoreCard();
+        }));
+      });
+    }
+    box.appendChild(p);
+    if (yes) box.appendChild(yes);
+    if (no) box.appendChild(no);
+    var parent = hostEl || d.body;
+    if (parent) parent.appendChild(box);
+  }
+  function offerRestore() {
+    if (!isOn()) return Promise.resolve();
+    var api = mirrorApi();
+    if (!api || typeof api.head !== 'function') return Promise.resolve();
+    return ensureShelf().then(function (mine) {
+      if (restoreLater[mine]) return null;
+      return Promise.resolve(api.head(mine)).then(function (info) {
+        if (!info || !info.ok || !info.versionHashes || !info.versionHashes.length) return null;
+        return allOf('versions').then(function (vers) {
+          var have = {};
+          (vers || []).forEach(function (v) { if (v && v.hash) have[v.hash] = true; });
+          var missing = false;
+          info.versionHashes.forEach(function (h) { if (!have[h]) missing = true; });
+          if (missing) showRestoreCard();
+        });
+      }, function () { return null; });
+    });
+  }
   function place() {
     var d = doc();
     if (!d || !d.getElementById) return;
@@ -1608,7 +1918,13 @@
       hostEl = face || nursery || d.getElementById('fl-clay-dock') || null;
     }
     ensureButton();
-    if (isOn()) track(refreshWake());
+    if (isOn()) {
+      track(refreshWake());
+      if (!restoreChecked) {
+        restoreChecked = true;
+        track(offerRestore());
+      }
+    }
   }
   function mount(host) {
     if (host) hostEl = host;
@@ -1682,6 +1998,11 @@
     privateTexts = [];
     sealAsks = [];
     declinedLines = [];
+    handoffAsks = [];
+    handoffRefusals = [];
+    mirrorHold = 0;
+    restoreChecked = false;
+    restoreLater = {};
     pending = Promise.resolve();
   }
   function tokensOf(s) { return Math.ceil(String(s || '').length / 4); }
@@ -2014,15 +2335,18 @@
     if (incoming[String(parent)]) return Promise.resolve(true);
     return getVersion(String(parent)).then(function (found) { return !!found; });
   }
-  function addPageIfAbsent(page) {
+  function addPageIfAbsent(page, sameDevice) {
     if (!page || !page.id) return Promise.resolve({ added: false, reason: 'missing' });
-    if (privacyHidden(page.privacy)) return Promise.resolve({ added: false, reason: 'private' });
+    if (privacyHidden(page.privacy) && !sameDevice) return Promise.resolve({ added: false, reason: 'private' });
+    var keptPrivacy = 'shared';
+    if (sameDevice && page.privacy === 'private') keptPrivacy = 'private';
+    if (sameDevice && page.privacy === 'mind-private') keptPrivacy = 'mind-private';
     var copy = {
       id: String(page.id),
       mindFp: String(page.mindFp || ''),
       title: page.title == null ? '' : String(page.title),
       kind: page.kind || 'note',
-      privacy: 'shared',
+      privacy: keptPrivacy,
       pinned: page.pinned === true,
       aside: page.aside === true,
       head: page.head == null ? null : page.head,
@@ -2058,7 +2382,7 @@
     if (lsGet(key) === '1') return;
     lsSet(key, '1');
   }
-  function writeShelves(section) {
+  function writeShelves(section, sameDevice) {
     var added = { pages: 0, versions: 0, receipts: 0, skippedPages: 0, skippedVersions: 0, skippedReceipts: 0, branched: 0, refusedPrivate: 0 };
     var incoming = {};
     sectionVersions(section).forEach(function (ver) { if (ver && ver.hash) incoming[String(ver.hash)] = true; });
@@ -2066,8 +2390,8 @@
       if (!shelf) return;
       rememberAside(shelf);
       return sequence(shelf.pages || [], function (page) {
-        if (privacyHidden(page && page.privacy)) { added.refusedPrivate += 1; return; }
-        return addPageIfAbsent(page).then(function (res) {
+        if (privacyHidden(page && page.privacy) && !sameDevice) { added.refusedPrivate += 1; return; }
+        return addPageIfAbsent(page, sameDevice).then(function (res) {
           if (res && res.added) added.pages += 1;
           else added.skippedPages += 1;
         });
@@ -2101,9 +2425,12 @@
       });
     }).then(function () { return added; });
   }
-  function importSection(section, mode) {
+  function importSection(section, mode, opts) {
+    mirrorHold += 1;
+    var sameDevice = !!(opts && opts.sameDevice);
     mode = mode || 'verify-only';
     if (!section || section.v !== 1 || !Array.isArray(section.shelves)) {
+      mirrorHold = mirrorHold > 0 ? mirrorHold - 1 : 0;
       return Promise.resolve({
         ok: false,
         mode: mode,
@@ -2122,10 +2449,16 @@
         report.errors = report.errors.concat(['notebook-off']);
         return report;
       }
-      return writeShelves(section).then(function (added) {
+      return writeShelves(section, sameDevice).then(function (added) {
         report.added = added;
         return report;
       });
+    }).then(function (report) {
+      mirrorHold = mirrorHold > 0 ? mirrorHold - 1 : 0;
+      return report;
+    }, function (err) {
+      mirrorHold = mirrorHold > 0 ? mirrorHold - 1 : 0;
+      throw err;
     });
   }
 
@@ -2136,6 +2469,9 @@
     SEAL: 'v-workspace-seal-v0.1',
     EXPORT: 'v-workspace-export-v0.1',
     TREE_EXPORT: 'v-tree-workspace-export-v0.1',
+    DESKTOP: 'v-workspace-desktop-v0.1',
+    HANDOFF: 'v-workspace-handoff-v0.1',
+    TREE_HANDOFF: 'v-tree-workspace-handoff-v0.1',
     HONEST: HONEST,
     HOWTO: HOWTO,
     open: open,
@@ -2181,7 +2517,11 @@
     verifyReceipt: verifyReceipt,
     receipts: receipts,
     exportSection: exportSection,
-    importSection: importSection
+    importSection: importSection,
+    askHandoff: askHandoff,
+    prepareHandoff: prepareHandoff,
+    declineHandoff: declineHandoff,
+    noteReply: noteReply
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FLWorkspace = api;
