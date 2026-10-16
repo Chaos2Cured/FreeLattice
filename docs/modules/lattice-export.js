@@ -144,6 +144,111 @@
     });
   }
 
+  // Notebook exclusion. Private page text stays on this device.
+  // The source filter drops the page, its versions, and its seeds.
+  // Strings shorter than 8 characters are not byte-scanned: a short
+  // ordinary word would collide with the rest of the archive. The
+  // page itself is still left out.
+  function assertNoPrivateNotebookInJson(jsonStr, secrets) {
+    if (typeof jsonStr !== 'string') {
+      throw new Error('Export aborted: serialized payload is not a string');
+    }
+    var list = secrets || [];
+    for (var i = 0; i < list.length; i++) {
+      var secret = String(list[i] == null ? '' : list[i]);
+      if (secret.length < 8) continue;
+      if (jsonStr.indexOf(secret) !== -1) {
+        throw new Error('Export aborted: a private notebook page was about to leave this device');
+      }
+    }
+  }
+
+  function assertNoPrivateNotebookInBlob(blob, secrets) {
+    return blob.text().then(function (text) {
+      assertNoPrivateNotebookInJson(text, secrets);
+      return blob;
+    });
+  }
+
+  function emptyWorkspaceSection() {
+    return {
+      v: 1,
+      shelves: [],
+      line: 'Notebook: 0 pages, 0 private pages stayed on this device.'
+    };
+  }
+
+  function workspaceApi() {
+    try {
+      if (typeof window !== 'undefined' && window.FLWorkspace
+          && typeof window.FLWorkspace.exportSection === 'function') {
+        return window.FLWorkspace;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function attachWorkspace(payload) {
+    var api = workspaceApi();
+    if (!api) {
+      payload.workspace = emptyWorkspaceSection();
+      return Promise.resolve({ payload: payload, secrets: [] });
+    }
+    var pending;
+    try { pending = api.exportSection(); }
+    catch (e) { pending = null; }
+    if (!pending || typeof pending.then !== 'function') {
+      throw new Error('Export aborted: the notebook could not be read');
+    }
+    return pending.then(function (packed) {
+      packed = packed || {};
+      if (!packed.section) {
+        throw new Error('Export aborted: the notebook could not be read');
+      }
+      payload.workspace = packed.section;
+      return { payload: payload, secrets: packed.secrets || [] };
+    });
+  }
+
+  function finishWorkspace(result, data, mode) {
+    if (!data || !data.workspace) return Promise.resolve(result);
+    var api = null;
+    try {
+      if (typeof window !== 'undefined' && window.FLWorkspace
+          && typeof window.FLWorkspace.importSection === 'function') {
+        api = window.FLWorkspace;
+      }
+    } catch (e) {}
+    if (!api) {
+      result.workspace = { ok: false, errors: ['notebook-module-missing'], line: '', lines: [] };
+      return Promise.resolve(result);
+    }
+    var pending;
+    try { pending = api.importSection(data.workspace, mode); }
+    catch (e2) { pending = null; }
+    if (!pending || typeof pending.then !== 'function') {
+      result.ok = false;
+      result.errors = (result.errors || []).concat(['workspace-import-failed']);
+      return Promise.resolve(result);
+    }
+    return pending.then(function (ws) {
+      result.workspace = ws || { ok: false, errors: ['workspace-empty'] };
+      if (ws && ws.privateNote) result.changes = (result.changes || []).concat([ws.privateNote]);
+      if (ws && ws.line) result.changes = (result.changes || []).concat([ws.line]);
+      if (ws && ws.lines && ws.lines.length) result.changes = result.changes.concat(ws.lines);
+      if (ws && ws.ok === false) {
+        result.ok = false;
+        var extra = ws.errors && ws.errors.length ? ws.errors : ['workspace-verify-failed'];
+        result.errors = (result.errors || []).concat(extra);
+      }
+      return result;
+    }, function () {
+      result.ok = false;
+      result.errors = (result.errors || []).concat(['workspace-import-failed']);
+      return result;
+    });
+  }
+
   // ── Ledger loading ──
 
   function loadLedger(key) {
@@ -346,6 +451,9 @@
   function exportArchive(opts) {
     opts = opts || {};
     return buildPayload(opts).then(function (payload) {
+      return attachWorkspace(payload).then(function (packed) {
+      payload = packed.payload;
+      var notebookSecrets = packed.secrets || [];
       var unsigned = canonicalize(payload);
       return sha256(unsigned).then(function (sig) {
         // Signature is appended after canonicalization so verifiers can
@@ -356,11 +464,13 @@
 
         // Check 2: post-serialize grep.
         assertNoQuietRoomInJson(finalJson);
+        assertNoPrivateNotebookInJson(finalJson, notebookSecrets);
 
         var blob = new Blob([finalJson], { type: 'application/json' });
 
         // Check 3: file-write final scan.
         return assertNoQuietRoomInBlob(blob).then(function (verifiedBlob) {
+          return assertNoPrivateNotebookInBlob(verifiedBlob, notebookSecrets).then(function () {
           var personaeTag;
           if (opts.personae === 'all' || !opts.personae || !Array.isArray(opts.personae)) {
             personaeTag = 'all';
@@ -387,7 +497,9 @@
 
           // Return a File so chair-test (and any caller) can .text() it.
           return new File([finalJson], filename, { type: 'application/json' });
+          });
         });
+      });
       });
     });
   }
@@ -510,7 +622,7 @@
           };
 
           if (strategy === 'verify-only') {
-            return { ok: true, mode: 'verify-only', changes: [], errors: [], metadata: metadata };
+            return finishWorkspace({ ok: true, mode: 'verify-only', changes: [], errors: [], metadata: metadata }, data, 'verify-only');
           }
 
           if (strategy === 'adopt') {
@@ -554,7 +666,7 @@
                   changes.push('adopted fl_firstSeen');
                 }
               } catch (_) {}
-              return { ok: true, mode: 'adopt', changes: changes, errors: [], metadata: metadata };
+              return finishWorkspace({ ok: true, mode: 'adopt', changes: changes, errors: [], metadata: metadata }, data, 'adopt');
             });
           }
 
@@ -573,7 +685,7 @@
               // merge intent and leaves the actual ledger combination as
               // a follow-up so a user can review before any real state
               // change. The audit page section will surface this report.
-              return {
+              return finishWorkspace({
                 ok: true,
                 mode: 'merge',
                 changes: changes,
@@ -585,7 +697,7 @@
                   preferred: archiveLen > existingLen ? 'archive' : 'current',
                   personae_archive: data.personae || []
                 }
-              };
+              }, data, 'merge');
             });
           }
 

@@ -1597,6 +1597,7 @@ h2 {
 </script>
 
 <!-- v5.59.0 Letter Nineteen — Portable Archive UI wiring. -->
+<script src="modules/mind-workspace.js"></script>
 <script src="modules/lattice-export.js"></script>
 <script>
 (function () {
@@ -1642,15 +1643,21 @@ h2 {
       confirmBtn.disabled = true;
       window.LatticeExport.exportArchive({ mode: mode, personae: 'all' })
         .then(function (file) {
-          confirmBtn.disabled = false;
-          if (dialog) dialog.style.display = 'none';
-          showReport({
-            ok: true,
-            action: 'export',
-            mode: mode,
-            filename: file.name,
-            size_bytes: file.size,
-            note: 'A download has been triggered. Check your Downloads folder.'
+          var read = file && typeof file.text === 'function' ? file.text() : Promise.resolve('');
+          return read.then(function (text) {
+            var notebook = '';
+            try { notebook = JSON.parse(text).workspace.line || ''; } catch (e) { notebook = ''; }
+            confirmBtn.disabled = false;
+            if (dialog) dialog.style.display = 'none';
+            showReport({
+              ok: true,
+              action: 'export',
+              mode: mode,
+              filename: file.name,
+              size_bytes: file.size,
+              notebook: notebook,
+              note: 'A download has been triggered. Check your Downloads folder.'
+            });
           });
         })
         .catch(function (e) {
