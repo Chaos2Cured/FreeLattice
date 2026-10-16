@@ -26,6 +26,7 @@ const packUpdate = require('./pack-update'); // v-desktop-update-buttons-v0.2
 const latticeDiscover = require('./lattice-discover'); // v-desktop-pooling-v0.1
 const portHeal = require('./port-heal'); // v-port-self-heal-v0.1
 const bridgeDoor = require('./bridge-door'); // v-bridge-knock-v0.1
+const workspaceMirror = require('./workspace-mirror'); // v-workspace-desktop-v0.1
 let latticeDiscoverDoor = null; // v-desktop-pooling-v0.1
 let packChecksArmed = false; // v-desktop-update-buttons-v0.2
 let packLastAuto = 0;
@@ -1439,6 +1440,7 @@ function setupIPC() {
   latticeSwarm.bindApp(app);
   latticePair.bindApp(app);
   bridgeDoor.bindApp(app); // v-bridge-knock-v0.1
+  workspaceMirror.bindApp(app); // v-workspace-desktop-v0.1
   app.on('before-quit', function () {
     try {
       latticeSwarm.destroyClient();
@@ -1797,6 +1799,11 @@ function setupIPC() {
     return { ok: !!saved.ok, keySet: !!saved.keySet, message: saved.message || '' };
   });
   ipcMain.handle('fl-bridge-forget-key', async () => bridgeDoor.forgetKey());
+
+  // v-workspace-desktop-v0.1: append, head, restore. Nothing else.
+  ipcMain.handle('fl-workspace-mirror-append', (_event, line) => workspaceMirror.append(line));
+  ipcMain.handle('fl-workspace-mirror-head', (_event, mindFp) => workspaceMirror.head(mindFp));
+  ipcMain.handle('fl-workspace-mirror-restore', (_event, mindFp) => workspaceMirror.restore(mindFp));
 }
 
 // ============================================

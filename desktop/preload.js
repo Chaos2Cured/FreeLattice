@@ -258,3 +258,10 @@ contextBridge.exposeInMainWorld('flBridge', {
   send: (envelope) => ipcRenderer.invoke('fl-bridge-send', envelope),
   status: (opts) => ipcRenderer.invoke('fl-bridge-status', opts || {})
 });
+
+// v-workspace-desktop-v0.1: exactly these three calls.
+contextBridge.exposeInMainWorld('flWorkspaceMirror', {
+  append: (line) => ipcRenderer.invoke('fl-workspace-mirror-append', line),
+  head: (mindFp) => ipcRenderer.invoke('fl-workspace-mirror-head', mindFp),
+  restore: (mindFp) => ipcRenderer.invoke('fl-workspace-mirror-restore', mindFp)
+});

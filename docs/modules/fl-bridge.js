@@ -1,4 +1,5 @@
 // fl-bridge.js (MIT) v-bridge-knock-v0.1
+// v-workspace-handoff-v0.1 v-tree-workspace-handoff-v0.1
 // Slow letters to Celeste. Default off. This file never calls the network.
 // A letter is sealed here. A person sends it, by their own mail app or by the desktop door.
 (function (root, factory) {
@@ -851,6 +852,65 @@
     return found;
   }
 
+  function firstKnockDone() {
+    if (mem.consent.celeste && mem.consent.celeste.approved_at) return true;
+    var rows = memList('outbox');
+    var i;
+    for (i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (row && row.kind === 'knock' && row.state !== 'withdrawn' && row.state !== 'drafted') return true;
+    }
+    return false;
+  }
+
+  function outboxView() {
+    return memList('outbox').map(function (row) {
+      return {
+        id: row && row.id || '',
+        state: row && row.state || '',
+        kind: row && row.kind || '',
+        hash: row && row.envelope && row.envelope.hash || ''
+      };
+    });
+  }
+
+  function sealPageLetter(spec) {
+    if (!isOn()) return Promise.resolve({ ok: false, reason: 'off', sent: false });
+    spec = spec || {};
+    return ensureKey().then(function () {
+      return loadRows('outbox').then(function () { return loadRows('consent'); });
+    }).then(function () {
+      if (!firstKnockDone()) return { ok: false, reason: 'knock', sent: false };
+      var filtered = filterLetter({ body: spec.body == null ? '' : String(spec.body) });
+      if (((filtered.held.quiet || 0) + (filtered.held.private || 0) + (filtered.held.key || 0)) > 0 && !filtered.body) {
+        return { ok: false, reason: 'held', held: filtered.held, line: heldLine(filtered.held), sent: false };
+      }
+      var letter = {
+        kind: 'letter',
+        subject: spec.subject || '',
+        body: filtered.body,
+        mind: spec.mind || null,
+        attach_hashes: Array.isArray(spec.attach_hashes) ? spec.attach_hashes : [],
+        prev: lastSealedHash(),
+        ts: new Date().toISOString()
+      };
+      return signLetter(letter, keyMem).then(function (env) {
+        var saved = {
+          id: env.hash,
+          state: 'sealed',
+          kind: 'letter',
+          letter: { kind: 'letter', subject: env.letter.subject, body: env.letter.body, to: 'celeste' },
+          envelope: env,
+          held: filtered.held,
+          ts: env.letter.ts
+        };
+        return saveRow('outbox', saved).then(function () {
+          return { ok: true, envelope: env, held: filtered.held, state: 'sealed', sent: false };
+        });
+      });
+    });
+  }
+
   function sealDraft(row) {
     if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
     if (!row) return Promise.resolve({ ok: false, reason: 'none' });
@@ -932,6 +992,9 @@
   function ingestReply(text) {
     if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
     var raw = String(text || '');
+    try {
+      if (root.FLWorkspace && typeof root.FLWorkspace.noteReply === 'function') root.FLWorkspace.noteReply(raw);
+    } catch (eNote) {}
     var envelope = null;
     function take(obj) {
       if (obj && obj.letter && typeof obj.letter === 'object') return obj;
@@ -1281,6 +1344,9 @@
     ensureKey: ensureKey,
     sealKnock: sealKnock,
     sealDraft: sealDraft,
+    sealPageLetter: sealPageLetter,
+    firstKnockDone: firstKnockDone,
+    outboxView: outboxView,
     savePersonDraft: savePersonDraft,
     lastDraft: lastDraft,
     mailtoFor: mailtoFor,
