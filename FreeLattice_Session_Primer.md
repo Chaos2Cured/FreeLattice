@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-15 22:23 UTC
-- Last deployed: 2026-10-15 22:23 UTC
+- Last auto-updated: 2026-10-16 00:08 UTC
+- Last deployed: 2026-10-16 00:08 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3439
+- Total commits: 3442
 - Last 10 commits:
+- f1a5efee GC page: workspace export, fifty-ninth entry (#242)
+- 0171719c Workspace export and import v0.1 (#241)
+- 96499ae4 ci: Update Primer deployment state [2026-10-15]
 - b3262523 GC page: workspace private and seals, fifty-eighth entry (#240)
 - ace8b4cc Workspace private pages and seals v0.1 (#239)
 - 48e9142f ci: Update Primer deployment state [2026-10-15]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b0ee4e6d Workspace view v0.1 (#237)
 - 35080e54 ci: Update Primer deployment state [2026-10-15]
 - dd194a70 GC page: workspace mark heal, fifty-sixth entry (#236)
-- f8023912 Workspace mark heal and port self-heal v0.1 (#235)
-- 8c150ea2 ci: Update Primer deployment state [2026-10-15]
-- c3c8baef GC page: workspace core, fifty-fifth entry (#234)
