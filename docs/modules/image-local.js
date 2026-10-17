@@ -13,20 +13,28 @@
   var HONEST_READY = 'A local image server on this computer is ready.';
   var HONEST_DOC = 'Look on this computer asks only this computer, and only after you say Yes. It looks for one local image server. If that server answers, image making uses it first. If it does not answer, the line says so, and the token above still works.';
   var CLEAR_MISS = 'That model is not available from the image service. You can choose another in Settings, or use a local image server on this computer.';
+  var REST_LINE = 'Image making is resting: the safety check did not load.';
 
   var _yes = false;
   var _found = false;
   var _status = null;
 
-  function assess(text) {
-    var gate = null;
+  function safetyReady() {
     try {
-      if (root.ImageSafety && typeof root.ImageSafety.assessImageRequest === 'function') {
-        gate = root.ImageSafety.assessImageRequest(String(text || ''));
-      }
-    } catch (e) { gate = null; }
+      if (!root.ImageSafety || typeof root.ImageSafety.assessImageRequest !== 'function') return false;
+      root.ImageSafety.assessImageRequest('a red door');
+      return true;
+    } catch (e) { return false; }
+  }
+  function assess(text) {
+    if (!root.ImageSafety || typeof root.ImageSafety.assessImageRequest !== 'function') {
+      return { allowed: false, reason: REST_LINE };
+    }
+    var gate = null;
+    try { gate = root.ImageSafety.assessImageRequest(String(text || '')); }
+    catch (e) { return { allowed: false, reason: REST_LINE }; }
     if (!gate || gate.allowed !== true) {
-      return { allowed: false, reason: (gate && gate.reason) || 'Image check is not available.' };
+      return { allowed: false, reason: (gate && gate.reason) || REST_LINE };
     }
     return gate;
   }
@@ -137,6 +145,10 @@
     });
   }
   function look() {
+    if (!safetyReady()) {
+      setStatus(REST_LINE);
+      return Promise.resolve(false);
+    }
     _yes = true;
     setStatus('Looking on this computer.');
     return probe();
@@ -242,6 +254,7 @@
     HONEST_READY: HONEST_READY,
     HONEST_DOC: HONEST_DOC,
     CLEAR_MISS: CLEAR_MISS,
+    REST_LINE: REST_LINE,
     ready: ready,
     look: look,
     generate: generate,

@@ -638,8 +638,8 @@
             }
             if (unsignedShelves > 0) {
               var unsignedLine = unsignedShelves === 1
-                ? '1 shelf had no fingerprint and was not checked.'
-                : (unsignedShelves + ' shelves had no fingerprint and were not checked.');
+                ? '1 shelf had no fingerprint and was not checked. Not imported.'
+                : (unsignedShelves + ' shelves had no fingerprint and were not checked. Not imported.');
               return {
                 ok: false,
                 mode: strategy,

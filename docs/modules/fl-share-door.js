@@ -46,8 +46,12 @@
   var _live = 0;
   var _pendingPrompt = null; // { resolve, reject, meta } when per-prompt is on
   // v-crown-shyness-v0.1: reserves beside the hourly caps. Kin skip the third, not the headroom.
+  // v-heals-043-v0.1: each reserve has its own id and frees itself after two minutes, once.
+  var CROWN_HOLD_MS = 120 * 1000;
   var _crownCount = {};
   var _crownWait = {};
+  var _crownSlots = {};
+  var _crownSeq = 1;
 
   function clip(s, n) { return String(s == null ? '' : s).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n); }
   function readJson(key, fallback) {
@@ -309,14 +313,49 @@
     for (var i = 0; i < keys.length; i++) if (_crownWait[keys[i]]) out.push(keys[i]);
     return out;
   }
+  function crownHeld(kh) {
+    return kh ? (_crownCount[kh] || 0) : 0;
+  }
+  function releaseCrownSlot(kh, id) {
+    var list = _crownSlots[kh];
+    if (!kh || !list || !list.length) {
+      if (kh) _crownCount[kh] = 0;
+      return false;
+    }
+    var keep = [];
+    var hit = null;
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (!hit && list[i].id === id) hit = list[i];
+      else keep.push(list[i]);
+    }
+    if (!hit) return false;
+    try { root.clearTimeout(hit.timer); } catch (e) {}
+    _crownSlots[kh] = keep;
+    _crownCount[kh] = keep.length;
+    return true;
+  }
   function noteCrown(kh) {
-    if (!kh) return;
-    _crownCount[kh] = (_crownCount[kh] || 0) + 1;
+    if (!kh) return 0;
+    var id = _crownSeq;
+    _crownSeq += 1;
+    if (!_crownSlots[kh]) _crownSlots[kh] = [];
+    var slot = { id: id, timer: 0 };
+    if (typeof root.setTimeout === 'function') {
+      slot.timer = root.setTimeout(function () { releaseCrownSlot(kh, id); }, CROWN_HOLD_MS);
+    }
+    _crownSlots[kh].push(slot);
+    _crownCount[kh] = _crownSlots[kh].length;
     _crownWait[kh] = false;
+    return id;
   }
   function releaseCrown(kh) {
-    if (!kh || !_crownCount[kh]) return;
-    _crownCount[kh] = Math.max(0, _crownCount[kh] - 1);
+    var list = _crownSlots[kh];
+    if (!kh || !list || !list.length) {
+      if (kh && _crownCount[kh]) _crownCount[kh] = 0;
+      return false;
+    }
+    return releaseCrownSlot(kh, list[0].id);
   }
   function crownGate(kh, kin) {
     var crown = null;
@@ -596,6 +635,10 @@
     legacyOpenOn: legacyOpenOn,
     setLegacyOpen: setLegacyOpen,
     answerPerPrompt: answerPerPrompt,
+    // v-heals-043-v0.1: a stuck crown slot frees once. endServe of the same slot does not free it again.
+    noteCrown: noteCrown,
+    crownHeld: crownHeld,
+    CROWN_HOLD_MS: CROWN_HOLD_MS,
     // v-device-pool-honest-off-v0.1: read and set "Only while plugged in" from the Pool card (exports only; the gate is unchanged)
     pluggedOnlyOn: pluggedOnlyOn,
     setPluggedOnly: setPluggedOnly,

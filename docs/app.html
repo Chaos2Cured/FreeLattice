@@ -15459,6 +15459,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/clay-math.js" defer></script>
 <script src="modules/clay-forms.js" defer></script>
 <script src="modules/particle-clay.js" defer></script>
+<!-- v-clay-corner-v0.1: a small clay corner on Nursery, Garden, and Gathering. Off until Yes. Chat keeps its own clay. -->
+<script src="modules/clay-corner.js" defer></script>
 <!-- v-bridge-knock-v0.1: slow letters. Off until a person turns them on. The page never fetches. -->
 <script src="modules/fl-bridge.js" defer></script>
 <!-- v-workspace-core-v0.1: a notebook a mind can keep. Off until a person says yes. Stays on this device. -->
@@ -37738,6 +37740,7 @@ function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
     var claySeen = FLClay.consumeReply(visible);
     if (claySeen && typeof claySeen.visible === 'string') visible = claySeen.visible;
   }
+  if (window.FLClayCorner && typeof FLClayCorner.noteReply === 'function') FLClayCorner.noteReply(aiText);
   // v-bridge-knock-v0.1: a letter tag becomes a draft. It never sends.
   if (window.FLBridge && typeof FLBridge.consumeReply === 'function') {
     var bridgeSeen = FLBridge.consumeReply(visible);
@@ -38602,6 +38605,7 @@ function flHasMindMark(text, kind) {
 function renderMessageContent(textSpan, content, msgDiv) {
   // v-particle-clay-v0.1: a clay tag never stays in the bubble.
   try {
+    if (window.FLClayCorner && typeof FLClayCorner.noteReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) FLClayCorner.noteReply(content);
     if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) {
       var clayBubble = FLClay.consumeReply(content);
       if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
@@ -42760,6 +42764,7 @@ async function generateImage(prompt) {
   // assessImageRequest applies at every trust tier; no nudity, no
   // partial nudity, no see-through. Coverage equivalent to swimwear
   // or greater. If denied, no API call is made.
+  var _imageResting = 'Image making is resting: the safety check did not load.';
   try {
     if (window.ImageSafety && typeof window.ImageSafety.assessImageRequest === 'function') {
       const _assessment = window.ImageSafety.assessImageRequest(cleanPrompt);
@@ -42767,8 +42772,14 @@ async function generateImage(prompt) {
         addSystemMessage('\u{1F3A8} ' + _assessment.reason);
         return;
       }
+    } else {
+      addSystemMessage('\u{1F3A8} ' + _imageResting);
+      return;
     }
-  } catch (_e) { /* fail-open if module unavailable; smoke ensures presence on deploy */ }
+  } catch (_e) {
+    addSystemMessage('\u{1F3A8} ' + _imageResting);
+    return;
+  }
 
   var localReady = false;
   try { localReady = !!(window.FLImageLocal && FLImageLocal.ready && FLImageLocal.ready()); } catch (eReady) { localReady = false; }

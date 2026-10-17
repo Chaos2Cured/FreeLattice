@@ -235,13 +235,13 @@ var LatticeExport = global.LatticeExport;
     strategy: 'merge'
   });
   assert.strictEqual(unsigned.ok, false, 'unsigned refused');
-  assert.strictEqual(unsigned.line, '2 shelves had no fingerprint and were not checked.');
+  assert.strictEqual(unsigned.line, '2 shelves had no fingerprint and were not checked. Not imported.');
   assert.strictEqual(global.localStorage.getItem(marker), 'same', 'unsigned changes nothing');
   var one = await LatticeExport.importArchive(asFile(archive([{ mindFp: '' }])), {
     expectMindFp: 'abcdef0123456789',
     strategy: 'verify-only'
   });
-  assert.strictEqual(one.line, '1 shelf had no fingerprint and was not checked.');
+  assert.strictEqual(one.line, '1 shelf had no fingerprint and was not checked. Not imported.');
   var wrong = await LatticeExport.importArchive(asFile(archive([{ mindFp: 'abcdef0123456789' }])), {
     expectMindFp: '1111222233334444',
     strategy: 'merge'
