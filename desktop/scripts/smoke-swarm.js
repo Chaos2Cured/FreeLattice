@@ -141,13 +141,14 @@ async function main() {
 
   const wtOk = await swarm.ensureWebTorrent();
   const st = swarm.status();
-  assert.strictEqual(st.reseed, 'later');
-  // webtorrent may be ESM-loaded; webseed path does not require it for SMOKE_OK
+  // v-heals-042-v0.1: the value follows whether the module loaded. This Mac loads it.
+  assert.strictEqual(st.reseed, wtOk ? 'available' : 'later');
+  // webseed path does not require the module for SMOKE_OK
   assert.strictEqual(st.webtorrent, wtOk);
 
   swarm.destroyClient();
   console.log('SMOKE_OK swarm bridge v0.1');
-  console.log('handoff→hash + local webseed→hash + cancel ok · reseed: later');
+  console.log('handoff→hash + local webseed→hash + cancel ok · reseed: ' + st.reseed);
   console.log('webtorrent loaded:', wtOk);
   console.log('tmp:', tmp);
 }

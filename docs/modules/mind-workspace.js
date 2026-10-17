@@ -2,6 +2,7 @@
 // v-workspace-private-v0.1 v-workspace-seal-v0.1 v-tree-workspace-seal-v0.1
 // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
 // v-workspace-desktop-v0.1 v-workspace-handoff-v0.1 v-tree-workspace-handoff-v0.1
+// v-heals-042-v0.1: the sketchbook keeps its own gap, apart from a mind write.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -50,6 +51,7 @@
   var offered = false;
   var lastRaw = '';
   var lastWriteAt = 0;
+  var sketchLastAt = 0;
   var seq = 0;
   var pending = Promise.resolve();
   var wakeCache = '';
@@ -1098,8 +1100,9 @@
   function noteLine(title, text) {
     if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
     var t = clock();
-    if (lastWriteAt && (t - lastWriteAt) < WRITE_GAP) return Promise.resolve({ ok: false, reason: 'rate' });
-    lastWriteAt = t;
+    // v-heals-042-v0.1: a sketch line never shares the mind's write gap.
+    if (sketchLastAt && (t - sketchLastAt) < WRITE_GAP) return Promise.resolve({ ok: false, reason: 'rate' });
+    sketchLastAt = t;
     return open(String(title || 'Clay sketchbook'), { kind: 'note' }).then(function (opened) {
       if (!opened || !opened.ok || !opened.page) return { ok: false, reason: 'missing' };
       return headText(opened.page).then(function (prev) {
@@ -1956,7 +1959,7 @@
     }
   }
   function bindClock(fn) { if (typeof fn === 'function') clock = fn; }
-  function resetRate() { lastWriteAt = 0; }
+  function resetRate() { lastWriteAt = 0; sketchLastAt = 0; }
   function dbOpens() { return opens; }
   function settled() { return pending; }
   // v-workspace-view-v0.1: shelves for the view. Read only. Stored pages stay the same shape.
@@ -2001,6 +2004,7 @@
     offered = false;
     lastRaw = '';
     lastWriteAt = 0;
+    sketchLastAt = 0;
     wakeCache = '';
     personWake = '';
     wakeCounts = { notes: 0, seeds: 0 };

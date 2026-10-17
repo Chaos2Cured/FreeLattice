@@ -19,7 +19,9 @@ function md5(file) {
 }
 
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/fl-bridge.js')), '3b5ef06849a142e50c78e7ba1e057980', 'bridge file stays the 041 hash');
-assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), 'a0c4596e20952d229d077daa3f397a31', 'notebook file stays');
+// 040d made the notebook 0573b53a9062360e901210f6e8840bfc (add-only noteLine, reviewed).
+// v-heals-042-v0.1 gives the sketchbook its own gap. Pin the final file.
+assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), '19355641954c7809609e8269842db834', 'notebook file stays');
 assert.strictEqual(md5(path.join(rootDir, 'desktop/workspace-mirror.js')), 'ba382400defc98001559c275e13d285d', 'mirror file stays');
 
 var pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'desktop/package.json'), 'utf8'));

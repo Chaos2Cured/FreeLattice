@@ -176,7 +176,9 @@ function status(id) {
     }).length,
     webtorrent: !!WebTorrent,
     reseeds: reseedList,
-    reseed: reseedList.length ? 'seeding' : 'available'
+    // v-heals-042-v0.1: idle used to say available even when the module had not loaded.
+    // The job (say whether a reseed is running, or that the door is ready) now also says later when the module did not load.
+    reseed: reseedList.length ? 'seeding' : (WebTorrent ? 'available' : 'later')
   };
 }
 
