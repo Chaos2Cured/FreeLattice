@@ -20,7 +20,8 @@ function md5(file) {
 var locks = {
   'docs/modules/fl-connect.js': 'aaff2bf1b037656989a9e1a89bb05908',
   'docs/modules/pool-knock.js': 'a0a72caad82c8e5cc34818d5e59eba2b',
-  'docs/modules/fl-bridge.js': '826dc6806c775f0348e5ec4fcd452fb4',
+  // 041: the handoff layer replaced this lock. The reviewed file is the hash below.
+  'docs/modules/fl-bridge.js': '3b5ef06849a142e50c78e7ba1e057980',
   'docs/Flint.html': '44be124b1183b7d9d060a58632464eff',
   'desktop/lattice-discover.js': '16de366e01cecc8dd505290a8d2f0e14',
   'desktop/lattice-update.js': '2c0f66569dd8ce27ef5dc0d3b80daf0a',

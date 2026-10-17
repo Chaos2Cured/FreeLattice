@@ -32,7 +32,9 @@ var memoryLine = "Your mind's notebook lives in this browser (IndexedDB) or the 
 assert.strictEqual(indexHtml, appHtml, 'index.html matches docs/app.html');
 assert.ok(indexHtml.indexOf(memoryLine) !== -1, 'memory line');
 assert.ok(fs.readFileSync(path.join(rootDir, 'app.html'), 'utf8').indexOf(memoryLine) === -1, 'root app.html untouched');
-assert.ok(fs.readFileSync(path.join(rootDir, 'desktop/app/index.html'), 'utf8').indexOf(memoryLine) === -1, 'desktop copy untouched');
+var desktopCopy = path.join(rootDir, 'desktop/app/index.html');
+if (!fs.existsSync(desktopCopy)) console.log('skip: desktop copy not built');
+else assert.ok(fs.readFileSync(desktopCopy, 'utf8').indexOf(memoryLine) === -1, 'desktop copy untouched');
 
 function memStore() {
   var s = {};
