@@ -43805,7 +43805,7 @@ var meshKinQueueAdapter = {
     return window.FLShareDoor ? window.FLShareDoor.admit(peer, env, messages, opts || {}) : Promise.resolve({ ok: true, keyHash: '', kin: true });
   },
   shareBegin: function () { if (window.FLShareDoor) window.FLShareDoor.beginServe(); },
-  shareEnd: function (kh, model, tokens, kin) { if (window.FLShareDoor) window.FLShareDoor.endServe(kh, model, tokens, kin); },
+  shareEnd: function (kh, model, tokens, kin, slotId) { if (window.FLShareDoor) window.FLShareDoor.endServe(kh, model, tokens, kin, slotId); },
   shareEnvelope: function (model, messages, requestId) {
     if (!window.FLShareDoor) return Promise.resolve({ ok: true, envelope: null, messages: messages });
     return window.FLShareDoor.makeEnvelope(meshKinAdapter, model, messages, requestId);
@@ -44225,7 +44225,7 @@ async function handleInferenceRequest(senderPeerId, data) {
       attribution: (window.FLShareDoor ? window.FLShareDoor.attribution(keeperName) : '')
     });
 
-    if (window.FLShareDoor) window.FLShareDoor.endServe(adm && adm.keyHash, data.model, tokens, adm && adm.kin);
+    if (window.FLShareDoor) window.FLShareDoor.endServe(adm && adm.keyHash, data.model, tokens, adm && adm.kin, adm && adm.crownSlot);
     console.log('[Mesh] Served inference for', data.model, 'to peer', senderPeerId.substring(0, 8));
     var count = parseInt(safeGet('fl_meshRequestsServed', '0'), 10);
     safeSet('fl_meshRequestsServed', String(count + 1));

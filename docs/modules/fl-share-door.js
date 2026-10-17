@@ -409,14 +409,15 @@
             if (gate.reason === 'headroom') return { ok: false, reason: 'headroom', soft: 'This lantern keeps a small gap for you.' };
             return { ok: false, reason: 'crown', soft: 'This lantern keeps a small gap so others can help too.' };
           }
-          noteCrown(kh);
+          // v-crown-slot-id-v0.1: the yes carries this job's slot. A later end frees that slot.
+          var slotId = noteCrown(kh);
           if (perPromptOn() && !opts.skipPerPrompt) {
             return new Promise(function (resolve) {
-              _pendingPrompt = { resolve: resolve, kh: kh, kin: kin, model: env && env.model, peerName: peer.name };
+              _pendingPrompt = { resolve: resolve, kh: kh, kin: kin, crownSlot: slotId, model: env && env.model, peerName: peer.name };
               if (_paint) _paint();
             });
           }
-          return { ok: true, keyHash: kh, kin: kin };
+          return { ok: true, keyHash: kh, kin: kin, crownSlot: slotId };
         });
       });
     });
@@ -425,19 +426,21 @@
   function answerPerPrompt(yes) {
     if (!_pendingPrompt) return;
     var p = _pendingPrompt; _pendingPrompt = null;
-    if (yes) p.resolve({ ok: true, keyHash: p.kh, kin: p.kin });
+    if (yes) p.resolve({ ok: true, keyHash: p.kh, kin: p.kin, crownSlot: p.crownSlot });
     else {
-      releaseCrown(p.kh);
+      releaseCrownSlot(p.kh, p.crownSlot);
       p.resolve({ ok: false, reason: 'keeper-said-no', soft: 'This lantern is resting for that question.' });
     }
     if (_paint) _paint();
   }
 
   function beginServe() { _inflight += 1; _live += 1; if (_paint) _paint(); }
-  function endServe(kh, model, tokens, kin) {
+  function endServe(kh, model, tokens, kin, slotId) {
     _inflight = Math.max(0, _inflight - 1);
     _live = Math.max(0, _live - 1);
-    releaseCrown(kh);
+    // v-crown-slot-id-v0.1: a number frees that slot. A missing id still frees the oldest.
+    if (typeof slotId === 'number') releaseCrownSlot(kh, slotId);
+    else releaseCrown(kh);
     receipt('served', kh, model, tokens, kin ? 'kin' : 'visitor');
     // v-mind-seal-v0.1: optional seal receipt (digest + config hash + context hash). Never words.
     try {
