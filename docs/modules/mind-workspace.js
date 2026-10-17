@@ -1095,6 +1095,19 @@
     if (row.answered) return 'Celeste answered.';
     return 'Handed ' + row.title + ' to Celeste on ' + row.date + ' (not answered yet).';
   }
+  function noteLine(title, text) {
+    if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
+    var t = clock();
+    if (lastWriteAt && (t - lastWriteAt) < WRITE_GAP) return Promise.resolve({ ok: false, reason: 'rate' });
+    lastWriteAt = t;
+    return open(String(title || 'Clay sketchbook'), { kind: 'note' }).then(function (opened) {
+      if (!opened || !opened.ok || !opened.page) return { ok: false, reason: 'missing' };
+      return headText(opened.page).then(function (prev) {
+        var next = prev ? (String(prev) + '\n' + String(text || '')) : String(text || '');
+        return write(opened.page.id, next, 'mind');
+      });
+    });
+  }
   function noteReply(text) {
     var raw = String(text || '');
     var rows = readHandoffs();
@@ -2521,6 +2534,8 @@
     askHandoff: askHandoff,
     prepareHandoff: prepareHandoff,
     declineHandoff: declineHandoff,
+    noteLine: noteLine,
+    currentFp: ensureShelf,
     noteReply: noteReply
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

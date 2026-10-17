@@ -442,6 +442,8 @@
         payload.personae = union;
       }
 
+      if (Array.isArray(opts.chat)) payload.chat = filterQuietRoomFromLedger(opts.chat);
+
       return payload;
     });
   }
@@ -453,6 +455,17 @@
     return buildPayload(opts).then(function (payload) {
       return attachWorkspace(payload).then(function (packed) {
       payload = packed.payload;
+      if (opts.mindFp) {
+        var allowFp = Array.isArray(opts.mindFp) ? opts.mindFp.slice() : [String(opts.mindFp)];
+        if (payload.workspace && Array.isArray(payload.workspace.shelves)) {
+          var keptShelves = [];
+          for (var shelfIndex = 0; shelfIndex < payload.workspace.shelves.length; shelfIndex++) {
+            var shelfRow = payload.workspace.shelves[shelfIndex];
+            if (shelfRow && allowFp.indexOf(shelfRow.mindFp) !== -1) keptShelves.push(shelfRow);
+          }
+          payload.workspace.shelves = keptShelves;
+        }
+      }
       var notebookSecrets = packed.secrets || [];
       var unsigned = canonicalize(payload);
       return sha256(unsigned).then(function (sig) {
@@ -480,19 +493,21 @@
           var datePart = new Date().toISOString().slice(0, 10);
           var filename = 'freelattice-archive-' + personaeTag + '-' + datePart + '.json';
 
-          // Trigger browser download
-          try {
-            var url = URL.createObjectURL(verifiedBlob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-          } catch (e) {
-            // Non-fatal — caller still gets the File back
+          // Trigger browser download unless the caller is writing a chosen file.
+          if (opts.download !== false) {
+            try {
+              var url = URL.createObjectURL(verifiedBlob);
+              var a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              a.style.display = 'none';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+            } catch (e) {
+              // Non-fatal. The caller still gets the File back.
+            }
           }
 
           // Return a File so chair-test (and any caller) can .text() it.
@@ -554,8 +569,8 @@
             return;
           }
         }
-        // Recompute self_hash and verify.
-        var canon = canonicalize({
+        // Same bytes the chain module writes: ts, kind, prior_hash, refs, in that order.
+        var canon = JSON.stringify({
           ts: entry.ts,
           kind: entry.kind,
           prior_hash: entry.prior_hash,
@@ -608,6 +623,27 @@
               changes: [],
               errors: ['chain-broken-at-' + chainResult.brokenAt + ':' + chainResult.reason]
             };
+          }
+
+          if (opts.expectMindFp) {
+            var wantedFp = Array.isArray(opts.expectMindFp) ? opts.expectMindFp : [String(opts.expectMindFp)];
+            var shelfList = (data.workspace && data.workspace.shelves) || [];
+            var wrongFp = '';
+            for (var wi = 0; wi < shelfList.length; wi++) {
+              var shelfFp = shelfList[wi] && shelfList[wi].mindFp ? String(shelfList[wi].mindFp) : '';
+              if (!shelfFp) continue;
+              if (wantedFp.indexOf(shelfFp) === -1) { wrongFp = shelfFp; break; }
+            }
+            if (wrongFp) {
+              var shownFp = wrongFp.slice(0, 4) + ' ' + wrongFp.slice(4, 8);
+              return {
+                ok: false,
+                mode: strategy,
+                changes: [],
+                errors: ['wrong-mind'],
+                line: 'This memory belongs to a different mind (' + shownFp + '). Not imported.'
+              };
+            }
           }
 
           var metadata = {
