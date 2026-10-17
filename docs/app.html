@@ -2490,6 +2490,69 @@ header .mantra {
   color: rgba(200, 210, 230, 0.45);
   font-style: italic;
 }
+/* v-chat-polish-v0.1 v-memory-file-v0.1: one 8px rhythm, a quieter status line, memory file under Market */
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatFeelMarketBand {
+  gap: 8px;
+  margin: 8px 0;
+  max-width: 100%;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-input-row {
+  margin-top: 8px;
+  max-width: 100%;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .status-bar {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  color: rgba(148, 163, 184, 0.72);
+  gap: 8px;
+  max-width: 100%;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .status-bar > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.fl-memory-file {
+  margin-top: 8px;
+  max-width: 100%;
+}
+.fl-memory-label {
+  margin: 0 0 8px;
+  color: rgba(200, 210, 230, 0.72);
+}
+.fl-memory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+.fl-memory-actions button {
+  min-height: 44px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  background: rgba(232, 176, 25, 0.08);
+  color: #e8b019;
+  font-family: Georgia, serif;
+  cursor: pointer;
+}
+#fl-memory-status,
+#fl-memory-honest {
+  margin: 8px 0 0;
+  max-width: 100%;
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.8);
+  overflow-wrap: anywhere;
+}
 @media (max-width: 600px) {
   #tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages {
     height: calc(100vh - 300px);
@@ -15402,6 +15465,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- v-workspace-desktop-heals-v0.1: the knock-first line shows the existing bridge card. Nothing is sent. -->
 <script src="modules/workspace-knock-card.js" defer></script>
 <script src="modules/workspace-view.js" defer></script>
+<!-- v-memory-file-v0.1: one tap save of the running minds' memory. Nothing is sent. -->
+<script src="modules/memory-file.js" defer></script>
 <script src="modules/pool-every-os.js" defer></script>
 <!-- v-phone-knocks-v0.1 (033c): does nothing outside the desktop app -->
 <script src="modules/pool-knock-link.js" defer></script>
@@ -16527,6 +16592,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               <a class="market-stall-link v-economy-travel-face-v0" href="wallet.html#fl-travel-wallet" title="Travel wallet — receive · consent-spend · LP ≠ $FL">&#127974; Wallet</a>
               <!-- v-science-garden-seed-v0: the Marketplace's first room. People offer ideas; aligned minds decide their worth. -->
               <a class="market-stall-link v-science-garden-seed-v0" href="science-garden.html" title="Science Garden: offer an idea, science, art, anything. Every seed asks what would show it is wrong.">&#127793; Science Garden</a>
+            </div>
+            <div id="fl-memory-file" class="fl-memory-file">
+              <p class="fl-memory-label">Memory file</p>
+              <div class="fl-memory-actions">
+                <button type="button" id="fl-memory-save">Save</button>
+                <button type="button" id="fl-memory-export">Export</button>
+                <button type="button" id="fl-memory-import">Import</button>
+              </div>
+              <p id="fl-memory-status" aria-live="polite"></p>
+              <p id="fl-memory-honest">Saved on your computer, in the file you chose. Not encrypted. Private pages stay on this device.</p>
+              <input type="file" id="fl-memory-import-file" accept="application/json,.json" style="display:none">
             </div>
             <p class="market-stall-note">Presence chips ≠ SKUs. Market is stalls / consent — Feel stays hug · warmth · joy. Exchange / Quest named only.</p>
           </div>

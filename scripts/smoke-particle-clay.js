@@ -125,7 +125,7 @@ ok(page.indexOf('if (window.FLClay) FLClay.onGesture(word);') !== -1, 'the gestu
 ok(page.indexOf('FL_CLAY:') !== -1, 'the page strips the clay tag');
 var facing = [clay.WORDS.offer, clay.WORDS.yes, clay.WORDS.notNow, clay.WORDS.on, clay.WORDS.off, clay.WORDS.sent, clay.WORDS.waiting, clay.WORDS.soft, clay.WORDS.shaped, clay.WORDS.guessed, clay.PROMPT].join('\n');
 ok(!/\bpet\b/i.test(facing) && !/companion/i.test(facing), 'no pet and no companion in person-facing words');
-ok(forms.NAMES.length === 14, 'fourteen shapes');
+ok(forms.NAMES.length === 17, 'seventeen shapes');
 
 var added = fs.readFileSync(path.join(__dirname, '../docs/modules/particle-clay.js'), 'utf8')
   + fs.readFileSync(path.join(__dirname, '../docs/modules/clay-math.js'), 'utf8')

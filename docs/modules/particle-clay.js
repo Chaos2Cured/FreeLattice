@@ -1,4 +1,4 @@
-// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1
+// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -24,19 +24,30 @@
     waiting: "Saved for your mind. They'll feel it when connected.",
     soft: 'One moment with your mind.',
     shaped: 'shaped by the AI',
-    guessed: "guessed from words (the AI didn't choose)"
+    guessed: "guessed from words (the AI didn't choose)",
+    quiet: 'the mind did not shape this time'
   };
-  var PROMPT = 'Clay is light you may shape. Forms: heart star spark dog cat bird tree flower present sun moon wave book seed grid. Mood is a feeling or #rrggbb. Energy is 0 to 1. Hug becomes a heart. Dog food becomes a dog. Christmas becomes a tree. [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]';
+  var PROMPT = 'Clay is light you may shape. Forms: heart star spark dog cat bird tree flower present sun moon wave book seed grid fractal fibonacci abstract. Mood is a feeling or #rrggbb. Also awe wonder serenity reverence inspiration yearning. Energy is 0 to 1, or up to 8 waves. Optional color, glow, size, motion, blend, morph. Hug becomes a heart. Dog food becomes a dog. Christmas becomes a tree. [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]';
   var CLAY_MARK = '[FL_CLAY:';
   var CLAY_OPEN = /\[\s*fl[\s_-]?clay\s*:/i;
   var HEX = /^#[0-9a-f]{6}$/i;
-  var FORMS = { heart: 1, star: 1, spark: 1, dog: 1, cat: 1, bird: 1, tree: 1, flower: 1, present: 1, sun: 1, moon: 1, wave: 1, book: 1, seed: 1, grid: 1, shells: 1 };
-  var MOTIONS = { gather: 1, breath: 1, wave: 1, ripple: 1, pulse: 1, branch: 1, braid: 1, scatter: 1 };
+  var FORMS = { heart: 1, star: 1, spark: 1, dog: 1, cat: 1, bird: 1, tree: 1, flower: 1, present: 1, sun: 1, moon: 1, wave: 1, book: 1, seed: 1, grid: 1, shells: 1, fractal: 1, fibonacci: 1, abstract: 1 };
+  var MOTIONS = { gather: 1, breath: 1, wave: 1, ripple: 1, pulse: 1, branch: 1, braid: 1, scatter: 1, drift: 1, sparkle: 1, settle: 1 };
   var MIRROR = { hug: 'heart', warmth: 'sun', joy: 'star', gratitude: 'flower', curious: 'spark', thinking: 'book', gentle: 'moon', awe: 'star', present: 'seed' };
   var RATE_MS = 5000;
   var CHIP = {
     hug: '#f472b6', warmth: '#e8b019', joy: '#c4b5fd', gratitude: '#facc15',
     curious: '#06b6d4', thinking: '#818cf8', gentle: '#f9a8d4', awe: '#fbbf24', present: '#a78bfa'
+  };
+  var MOOD_HEX = {
+    wonder: '#7dd3fc', serenity: '#a7f3d0', reverence: '#c4b5fd',
+    inspiration: '#fde68a', yearning: '#fb7185'
+  };
+  var NAMED = {
+    red: '#e11d48', orange: '#f97316', yellow: '#facc15', gold: '#eab308',
+    green: '#22c55e', blue: '#3b82f6', purple: '#a855f7', pink: '#ec4899',
+    white: '#f8fafc', black: '#111827', gray: '#9ca3af', grey: '#9ca3af',
+    cyan: '#06b6d4', teal: '#14b8a6', violet: '#8b5cf6', amber: '#f59e0b', silver: '#cbd5e1'
   };
   var memoryOn = false;
   var forcedReduced = null;
@@ -62,6 +73,16 @@
   var rafHandles = 0;
   var t0 = Date.now();
   var morphing = false;
+  var morphTimer = 0;
+  var currentSize = null;
+  var currentGlow = null;
+  var energyWave = null;
+  var waveStarted = 0;
+  var hugArmed = false;
+  var hugSpentKey = '';
+  var lastSketch = '';
+  var quietEl = null;
+  var pillObs = null;
 
   function mathApi() {
     if (root.FLClayMath) return root.FLClayMath;
@@ -123,29 +144,50 @@
     }
     return rows;
   }
+  function clampUnit(n) {
+    if (n < 0) return 0;
+    if (n > 1) return 1;
+    return n;
+  }
+  function knownForm(name) {
+    var form = String(name || '').toLowerCase();
+    return FORMS[form] ? form : '';
+  }
   function sanitize(obj) {
     if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
     var out = {};
+    var formHint = obj.form != null ? String(obj.form).toLowerCase() : '';
     if (obj.grid != null) {
       var grid = normalizeGrid(obj.grid);
-      if (!grid) return null;
-      out.grid = grid;
-      out.form = 'grid';
+      var knownOther = formHint && formHint !== 'grid' && FORMS[formHint];
+      if (!grid) {
+        if (!knownOther) return null;
+      } else {
+        out.grid = grid;
+        out.form = 'grid';
+      }
     }
-    if (obj.form != null && !out.grid) {
-      var form = String(obj.form).toLowerCase();
-      if (!FORMS[form]) return null;
-      out.form = form;
-    }
+    if (obj.form != null && !out.grid && FORMS[formHint]) out.form = formHint;
     if (obj.mood != null) {
       var mood = String(obj.mood).trim();
       if (HEX.test(mood)) out.mood = mood.toLowerCase();
       else if (/^[a-z\-]{2,32}$/i.test(mood)) out.mood = mood.toLowerCase();
     }
-    var energy = obj.energy == null ? 0.4 : Number(obj.energy);
-    if (!isFinite(energy)) energy = 0.4;
-    if (energy < 0) energy = 0;
-    if (energy > 1) energy = 1;
+    var energy = 0.4;
+    var wave = null;
+    if (Array.isArray(obj.energy)) {
+      wave = [];
+      for (var ei = 0; ei < obj.energy.length && wave.length < 8; ei++) {
+        var step = Number(obj.energy[ei]);
+        if (!isFinite(step)) continue;
+        wave.push(clampUnit(step));
+      }
+      energy = wave.length ? wave[0] : 0.4;
+    } else {
+      energy = obj.energy == null ? 0.4 : Number(obj.energy);
+      if (!isFinite(energy)) energy = 0.4;
+      energy = clampUnit(energy);
+    }
     out.energy = energy;
     if (obj.motion != null) {
       var motion = String(obj.motion).toLowerCase();
@@ -154,6 +196,40 @@
       out.motion = defaultMotion(energy);
     }
     if (obj.say != null) out.say = String(obj.say).slice(0, 24);
+    if (wave && wave.length) out.energyWave = wave;
+    if (obj.color != null) {
+      var color = String(obj.color).trim().toLowerCase();
+      if (HEX.test(color)) out.color = color;
+      else if (NAMED[color]) out.color = NAMED[color];
+    }
+    if (obj.glow != null && isFinite(Number(obj.glow))) out.glow = clampUnit(Number(obj.glow));
+    if (obj.size != null && isFinite(Number(obj.size))) {
+      var size = Number(obj.size);
+      if (size < 0.4) size = 0.4;
+      if (size > 1.6) size = 1.6;
+      out.size = size;
+    }
+    if (Array.isArray(obj.blend) && obj.blend.length >= 2) {
+      var left = knownForm(obj.blend[0]);
+      var right = knownForm(obj.blend[1]);
+      if (left && right) {
+        out.blend = [left, right];
+        if (obj.mix != null && isFinite(Number(obj.mix))) out.mix = clampUnit(Number(obj.mix));
+      }
+    }
+    if (Array.isArray(obj.morph) && obj.morph.length >= 2) {
+      var fromForm = knownForm(obj.morph[0]);
+      var toForm = knownForm(obj.morph[1]);
+      if (fromForm && toForm) out.morph = [fromForm, toForm];
+    }
+    if (obj.seed != null) {
+      var seed = String(obj.seed).replace(/[\u0000-\u001f]/g, '').slice(0, 80);
+      if (seed) out.seed = seed;
+    }
+    if (obj.why != null) {
+      var why = String(obj.why).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 160);
+      if (why) out.why = why;
+    }
     return out;
   }
   function isWs(ch) {
@@ -279,25 +355,98 @@
     };
   }
   function colorFor(choice, index) {
+    if (choice && choice.color && HEX.test(choice.color)) return choice.color;
     var math = mathApi();
     var mood = choice && choice.mood;
     if (mood && HEX.test(mood)) return mood;
+    if (mood && MOOD_HEX[String(mood).toLowerCase()]) return MOOD_HEX[String(mood).toLowerCase()];
     if (math) return math.palette(mood || 'present', (Date.now() - t0) / 1000 + index * 0.01).css;
     return '#a78bfa';
+  }
+  function hash32(text) {
+    var s = String(text || 'field');
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function fractalPoints() {
+    var math = mathApi();
+    var pts = [];
+    function walk(x, y, ang, depth) {
+      if (depth < 0 || pts.length >= 160) return;
+      var spec = math ? math.branch(4 - depth, 22) : { length: 12 };
+      var len = spec.length || 8;
+      var nx = x + Math.cos(ang) * len;
+      var ny = y + Math.sin(ang) * len;
+      pts.push({ x: nx, y: ny });
+      walk(nx, ny, ang - 0.55, depth - 1);
+      walk(nx, ny, ang + 0.55, depth - 1);
+    }
+    walk(0, 10, -Math.PI / 2, 4);
+    return pts;
+  }
+  function fibonacciPoints() {
+    var math = mathApi();
+    var pts = [];
+    if (!math) return pts;
+    var n = 89;
+    for (var i = 1; i <= n; i++) {
+      var g = math.gather(i, n, 30);
+      pts.push({ x: g.x, y: g.y });
+    }
+    return pts;
+  }
+  function abstractPoints(choice) {
+    var seed = hash32(choice && choice.seed ? choice.seed : 'field');
+    var pts = [];
+    for (var i = 0; i < 64; i++) {
+      seed = Math.imul(seed ^ (seed >>> 15), 2246822519) >>> 0;
+      var x = ((seed % 10000) / 10000 - 0.5) * 60;
+      seed = Math.imul(seed ^ (seed >>> 15), 2246822519) >>> 0;
+      var y = ((seed % 10000) / 10000 - 0.5) * 60;
+      pts.push({ x: x, y: y });
+    }
+    return pts;
   }
   function targetPoints(choice) {
     var math = mathApi();
     var forms = formsApi();
     var form = (choice && choice.form) || homeForm();
     var pts = [];
-    if (form === 'grid' && choice && choice.grid) {
+    if (choice && Array.isArray(choice.blend) && choice.blend.length >= 2 && !choice._mixing) {
+      var mix = choice.mix == null ? 0.5 : choice.mix;
+      var left = targetPoints({ form: choice.blend[0], energy: choice.energy, seed: choice.seed, _mixing: 1 });
+      var right = targetPoints({ form: choice.blend[1], energy: choice.energy, seed: choice.seed, _mixing: 1 });
+      var n = Math.max(left.length, right.length);
+      var mixed = [];
+      for (var bi = 0; bi < n && mixed.length < 200; bi++) {
+        var p = left[Math.min(bi, Math.max(left.length - 1, 0))] || { x: 0, y: 0 };
+        var q = right[Math.min(bi, Math.max(right.length - 1, 0))] || { x: 0, y: 0 };
+        mixed.push({ x: p.x * (1 - mix) + q.x * mix, y: p.y * (1 - mix) + q.y * mix });
+      }
+      if (choice.size != null) {
+        for (var si = 0; si < mixed.length; si++) {
+          mixed[si].x *= choice.size;
+          mixed[si].y *= choice.size;
+        }
+      }
+      return math ? math.spiralOrder(mixed) : mixed;
+    }
+    if (form === 'fractal' || form === 'fibonacci' || form === 'abstract') {
+      var grown = form === 'fractal' ? fractalPoints() : (form === 'fibonacci' ? fibonacciPoints() : abstractPoints(choice));
+      if (grown && grown.length) pts = grown;
+    }
+    if (!pts.length && form === 'grid' && choice && choice.grid) {
       choice.grid.forEach(function (row, r) {
         String(row).split('').forEach(function (ch, c) {
           if (ch === '.' || !ch) return;
           pts.push({ x: (c - 7.5) * 4.2, y: (r - 7.5) * 4.2, digit: ch });
         });
       });
-    } else if (form !== 'shells' && forms && forms.MASKS && forms.MASKS[form]) {
+    } else if (!pts.length && form !== 'shells' && forms && forms.MASKS && forms.MASKS[form]) {
       forms.MASKS[form].forEach(function (row, r) {
         String(row).split('').forEach(function (ch, c) {
           if (ch !== 'x') return;
@@ -313,7 +462,21 @@
       }
     }
     if (pts.length > 200) pts = pts.slice(0, 200);
+    if (choice && choice.size != null) {
+      for (var zi = 0; zi < pts.length; zi++) {
+        pts[zi].x *= choice.size;
+        pts[zi].y *= choice.size;
+      }
+    }
     return math ? math.spiralOrder(pts) : pts;
+  }
+  function playedEnergy() {
+    if (!energyWave || !energyWave.length) return currentEnergy;
+    if (reduced()) return energyWave[energyWave.length - 1];
+    var i = Math.floor((Date.now() - waveStarted) / 1500);
+    if (i < 0) i = 0;
+    if (i >= energyWave.length) i = energyWave.length - 1;
+    return energyWave[i];
   }
   function stopLoop() {
     morphing = false;
@@ -329,18 +492,22 @@
     if (!canvas || !isOn()) return;
     var ctx = canvas.getContext && canvas.getContext('2d');
     if (!ctx) return;
-    var w = canvas.width || 96;
-    var h = canvas.height || 96;
+    var w = canvas.width || 192;
+    var h = canvas.height || 192;
     ctx.clearRect(0, 0, w, h);
     var math = mathApi();
     var t = (Date.now() - t0) / 1000;
     var breath = (!reduced() && math) ? math.breath(t) : 1;
-    var knob = math ? math.energyKnob(currentEnergy, parts.length || 1) : { amplitude: 0 };
+    var energyNow = playedEnergy();
+    var knob = math ? math.energyKnob(energyNow, parts.length || 1) : { amplitude: 0 };
     var still = reduced();
     var beat = 1;
     if (!still && math && Date.now() < pulseUntil) beat = 0.92 + 0.08 * math.pulse(t);
+    var fit = w / 192;
     ctx.save();
     ctx.translate(w / 2, h / 2);
+    ctx.scale(fit, fit);
+    if (currentGlow != null) ctx.globalAlpha = 0.55 + currentGlow * 0.45;
     if (!still) ctx.scale((0.92 + breath * 0.08) * beat, (0.92 + breath * 0.08) * beat);
     var i;
     var nowDraw = Date.now();
@@ -357,8 +524,11 @@
           p.y += (p.ty - p.y) * 0.18;
           if (currentMotion === 'wave' && math) {
             p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
+          } else if (currentMotion === 'drift' && math) {
+            p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
+            p.y += math.wave(p.ty, p.tx, t, knob.amplitude) * 0.08;
           } else if (currentMotion === 'scatter' && math) {
-            var g = math.gather(i + 1, parts.length, 6 + currentEnergy * 10);
+            var g = math.gather(i + 1, parts.length, 6 + energyNow * 10);
             p.x += (g.x) * 0.002;
             p.y += (g.y) * 0.002;
           }
@@ -367,6 +537,7 @@
         p.x = p.tx;
         p.y = p.ty;
       }
+      if (!still && currentMotion === 'sparkle' && (Math.floor(t * 4 + i) % 3 === 0)) continue;
       ctx.fillStyle = p.color || colorFor({ mood: currentMood }, i);
       ctx.fillRect(p.x, p.y, 2.4, 2.4);
     }
@@ -412,26 +583,61 @@
       timerId = setTimeout(tick, 250);
     }
   }
+  function copyChoice(choice, form, dropMorph) {
+    var copy = {};
+    var k;
+    for (k in choice) {
+      if (Object.prototype.hasOwnProperty.call(choice, k)) copy[k] = choice[k];
+    }
+    if (form) copy.form = form;
+    if (dropMorph) copy.morph = null;
+    return copy;
+  }
   function applyChoice(choice, label) {
     if (!choice) return;
+    if (choice.morph && choice.morph.length === 2 && !choice._morphed) {
+      if (reduced()) {
+        choice = copyChoice(choice, choice.morph[1], true);
+      } else {
+        var toward = choice.morph[1];
+        var held = copyChoice(choice, toward, true);
+        held._morphed = 1;
+        choice = copyChoice(choice, choice.morph[0], true);
+        if (morphTimer) clearTimeout(morphTimer);
+        morphTimer = setTimeout(function () { applyChoice(held, label); }, 2000);
+      }
+    }
     currentForm = choice.form || currentForm || homeForm();
     currentEnergy = choice.energy == null ? currentEnergy : choice.energy;
     currentMotion = choice.motion || defaultMotion(currentEnergy);
     currentMood = choice.mood || currentMood;
+    currentSize = choice.size == null ? null : choice.size;
+    currentGlow = choice.glow == null ? null : choice.glow;
+    energyWave = Array.isArray(choice.energyWave) ? choice.energyWave.slice() : null;
+    waveStarted = Date.now();
     var targets = targetPoints(choice);
     var math = mathApi();
+    var flightMs = (!reduced() && choice._morphed) ? 2000 : 0;
+    var bornAt = Date.now();
     var next = [];
     var i;
     for (i = 0; i < targets.length; i++) {
       var from = (math && !reduced()) ? math.gather(i + 1, targets.length, 8) : targets[i];
       var prev = parts[i];
-      next.push({
+      var row = {
         x: prev ? prev.x : from.x,
         y: prev ? prev.y : from.y,
         tx: targets[i].x,
         ty: targets[i].y,
         color: colorFor(choice, i)
-      });
+      };
+      if (flightMs) {
+        row.sx = row.x;
+        row.sy = row.y;
+        row.born = bornAt;
+        row.flight = flightMs;
+      }
+      next.push(row);
     }
     if (reduced()) {
       for (i = 0; i < next.length; i++) {
@@ -446,14 +652,70 @@
     if (isOn()) ensureCanvas();
     arm();
   }
+  function mindChose(choice) {
+    return !!(choice && (choice.form || choice.grid));
+  }
+  function showQuiet(text) {
+    if (!quietEl) return;
+    quietEl.textContent = text || '';
+  }
+  function sketchLine(choice) {
+    var bits = [new Date().toISOString(), 'form ' + (choice.form || 'grid')];
+    if (choice.mood) bits.push('mood ' + choice.mood);
+    if (choice.color) bits.push('color ' + choice.color);
+    if (choice.motion) bits.push('motion ' + choice.motion);
+    if (choice.why) bits.push('why ' + choice.why);
+    return bits.join(' ');
+  }
+  function sketch(choice) {
+    if (!choice || (!choice.form && !choice.grid)) return;
+    var ws = null;
+    try { ws = root.FLWorkspace; } catch (e) { ws = null; }
+    if (!ws || typeof ws.isOn !== 'function' || !ws.isOn()) return;
+    if (typeof ws.noteLine !== 'function') return;
+    var line = sketchLine(choice);
+    if (!line || line === lastSketch) return;
+    try {
+      var pending = ws.noteLine('Clay sketchbook', line);
+      if (pending && typeof pending.then === 'function') {
+        pending.then(function (res) {
+          if (res && res.ok) lastSketch = line;
+        }, function () {});
+      }
+    } catch (e2) {}
+  }
   function consumeReply(text, history) {
     var parsed = parseTag(text);
     if (!isOn()) return { visible: parsed.visible, choice: null, label: '', autoSend: false };
-    var choice = parsed.ok ? parsed.value : null;
-    var label = WORDS.guessed;
-    if (choice) label = WORDS.shaped;
-    else choice = fallback(text, lastHuman(history), lastGesture);
-    applyChoice(choice, label);
+    var raw = parsed.ok ? parsed.value : null;
+    var chosen = mindChose(raw) ? raw : null;
+    var key = String(text || '');
+    var answeringHug = hugArmed || (hugSpentKey && hugSpentKey === key);
+    var choice = chosen;
+    var label = '';
+    if (chosen) {
+      if (answeringHug) { hugArmed = false; hugSpentKey = key; }
+      label = WORDS.shaped;
+      applyChoice(choice, label);
+      sketch(choice);
+      showQuiet('');
+      placeCanvas();
+    } else if (answeringHug) {
+      hugArmed = false;
+      hugSpentKey = key;
+      parts = [];
+      if (labelEl) labelEl.textContent = '';
+      if (sayEl) sayEl.textContent = '';
+      dropCanvas();
+      showQuiet(pillOpen() ? WORDS.quiet : '');
+      choice = null;
+    } else {
+      choice = fallback(text, lastHuman(history), lastGesture);
+      label = WORDS.guessed;
+      applyChoice(choice, label);
+      showQuiet(pillOpen() ? WORDS.quiet : '');
+      placeCanvas();
+    }
     return { visible: parsed.visible, choice: choice, label: label, autoSend: false };
   }
   function onReply(text, history) {
@@ -563,6 +825,7 @@
     var clean = String(word || '').toLowerCase().replace(/[^a-z\-]/g, '').slice(0, 32);
     if (!clean) return { ok: false, called: false, autoSend: false };
     lastGesture = clean;
+    if (clean !== 'hug') hugArmed = false;
     if (!isOn()) {
       showSent();
       return { ok: true, called: false, line: WORDS.sent, autoSend: false };
@@ -578,8 +841,10 @@
       return { ok: true, called: false, reason: 'rate', line: WORDS.soft, flown: flown, autoSend: false };
     }
     showLive(WORDS.soft);
+    if (clean === 'hug') hugArmed = true;
     var called = callMind(clean);
     if (!called) {
+      hugArmed = false;
       showLive(WORDS.waiting);
       return { ok: true, called: false, line: WORDS.waiting, flown: flown, autoSend: false };
     }
@@ -597,29 +862,89 @@
     el.style.boxSizing = 'border-box';
     return el;
   }
+  function dpr() {
+    var n = 1;
+    try { n = root.devicePixelRatio || 1; } catch (e) { n = 1; }
+    if (!isFinite(n) || n < 1) n = 1;
+    if (n > 3) n = 3;
+    return n;
+  }
+  function fitCanvas() {
+    if (!canvas) return;
+    var cssW = canvas.clientWidth || 0;
+    var cssH = canvas.clientHeight || 0;
+    if (cssW < 2 || cssH < 2) return;
+    var ratio = dpr();
+    var bw = Math.max(1, Math.round(cssW * ratio));
+    var bh = Math.max(1, Math.round(cssH * ratio));
+    if (canvas.width !== bw) canvas.width = bw;
+    if (canvas.height !== bh) canvas.height = bh;
+  }
+  function lastAssistant() {
+    var doc = root.document;
+    if (!doc || !doc.querySelectorAll) return null;
+    var nodes = [];
+    try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant'); }
+    catch (e) { nodes = []; }
+    if (!nodes || !nodes.length) return null;
+    return nodes[nodes.length - 1];
+  }
+  function syncDock() {
+    if (!dock) return;
+    var offer = root.__clayOffer && root.__clayOffer.parentNode;
+    var labeled = (labelEl && labelEl.textContent) || (sayEl && sayEl.textContent) || (liveEl && liveEl.textContent);
+    var holding = canvas && canvas.parentNode === dock;
+    dock.style.display = (offer || labeled || holding) ? 'block' : 'none';
+  }
+  function placeCanvas() {
+    if (!canvas || !isOn()) return;
+    if (!parts.length) {
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+      syncDock();
+      return;
+    }
+    var reply = lastAssistant();
+    if (reply && reply.parentNode) {
+      if (canvas.parentNode !== reply.parentNode || reply.nextSibling !== canvas) {
+        if (reply.nextSibling) reply.parentNode.insertBefore(canvas, reply.nextSibling);
+        else reply.parentNode.appendChild(canvas);
+      }
+    } else if (dock && canvas.parentNode !== dock) {
+      dock.insertBefore(canvas, dock.firstChild);
+    }
+    fitCanvas();
+    syncDock();
+  }
   function ensureCanvas() {
-    if (!dock || !isOn() || !root.document || !root.document.createElement) return null;
-    if (canvas && canvas.parentNode) return canvas;
-    canvas = root.document.createElement('canvas');
-    canvas.width = 192;
-    canvas.height = 192;
-    canvas.style.width = '96px';
-    canvas.style.height = '96px';
-    canvas.style.display = 'block';
-    canvas.style.maxWidth = '100%';
-    canvas.setAttribute('aria-label', 'Clay');
-    canvas.addEventListener('click', function () {
-      if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
-      else onGesture('present');
-    });
-    dock.insertBefore(canvas, dock.firstChild);
-    if (!parts.length) applyChoice({ form: currentForm || homeForm(), mood: 'present', energy: 0.35, motion: 'breath' }, '');
+    if (!isOn() || !root.document || !root.document.createElement) return null;
+    var fresh = !canvas;
+    if (!canvas) {
+      canvas = root.document.createElement('canvas');
+      canvas.id = 'fl-clay-canvas';
+      canvas.width = 192;
+      canvas.height = 192;
+      canvas.style.width = 'min(100%, 320px)';
+      canvas.style.height = 'clamp(180px, 40vw, 260px)';
+      canvas.style.maxWidth = '100%';
+      canvas.style.display = 'block';
+      canvas.style.boxSizing = 'border-box';
+      canvas.setAttribute('aria-label', 'Clay');
+      canvas.addEventListener('click', function () {
+        if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
+        else onGesture('present');
+      });
+    }
+    var doc = root.document;
+    var inChat = !!(doc && doc.getElementById && doc.getElementById('chatMessages'));
+    if (fresh && !parts.length && !inChat) applyChoice({ form: currentForm || homeForm(), mood: 'present', energy: 0.35, motion: 'breath' }, '');
+    placeCanvas();
     return canvas;
   }
   function dropCanvas() {
     if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
     canvas = null;
     stopLoop();
+    syncDock();
   }
   function setOn(on) {
     memoryOn = !!on;
@@ -628,9 +953,14 @@
       box.setItem('fl_clay', on ? 'on' : 'off');
       box.setItem('fl_clay_offer', on ? 'yes' : 'later');
     }
-    if (!on) dropCanvas();
-    else ensureCanvas();
+    if (!on) {
+      if (morphTimer) clearTimeout(morphTimer);
+      morphTimer = 0;
+      dropCanvas();
+      syncDock();
+    } else ensureCanvas();
     paintToggle();
+    paintPill();
     hideOffer();
     return isOn();
   }
@@ -657,6 +987,7 @@
     row.style.flexWrap = 'wrap';
     row.style.maxWidth = '100%';
     var toggle = button(doc, isOn() ? WORDS.on : WORDS.off);
+    toggle.id = 'fl-clay-toggle';
     toggle.setAttribute('aria-pressed', isOn() ? 'true' : 'false');
     toggle.addEventListener('click', function () { setOn(!isOn()); });
     root.__clayToggle = toggle;
@@ -697,6 +1028,7 @@
     }
     currentForm = currentForm || homeForm();
     if (isOn()) ensureCanvas();
+    ensurePill();
     return dock;
   }
   function boot() {
@@ -709,9 +1041,13 @@
       chatBox.id = 'fl-clay-dock';
       presence.parentNode.insertBefore(chatBox, presence.nextSibling);
       mount(chatBox);
+      ensurePill();
+      watchFold();
       return;
     }
     place();
+    ensurePill();
+    watchFold();
     if (!doc.getElementById('fl-clay-dock') && doc.body && typeof MutationObserver === 'function') {
       var obs = new MutationObserver(function () { place(); });
       obs.observe(doc.body, { childList: true, subtree: true });
@@ -752,6 +1088,110 @@
     host.insertBefore(box, host.firstChild);
     mount(box);
   }
+  function pillOpen() {
+    var box = storage();
+    if (!box) return false;
+    return box.getItem('fl_clay_pill') === 'open';
+  }
+  function paintPill() {
+    var doc = root.document;
+    if (!doc || !doc.getElementById) return;
+    var pill = doc.getElementById('fl-clay-pill');
+    var panel = doc.getElementById('fl-clay-pill-panel');
+    var pause = doc.getElementById('fl-clay-pause');
+    var open = pillOpen();
+    var nextLabel = open ? 'Clay \u25BE' : 'Clay \u25B8';
+    var nextExpanded = open ? 'true' : 'false';
+    if (pill) {
+      if (pill.textContent !== nextLabel) pill.textContent = nextLabel;
+      if (pill.getAttribute('aria-expanded') !== nextExpanded) pill.setAttribute('aria-expanded', nextExpanded);
+    }
+    if (panel) {
+      if (open) panel.removeAttribute('hidden');
+      else panel.setAttribute('hidden', '');
+    }
+    if (pause) pause.style.display = isOn() ? 'inline-flex' : 'none';
+  }
+  function setPillOpen(open) {
+    var box = storage();
+    if (box) box.setItem('fl_clay_pill', open ? 'open' : 'closed');
+    paintPill();
+    return pillOpen();
+  }
+  function foldButtons() {
+    var doc = root.document;
+    if (!doc || !doc.getElementById) return;
+    var panel = doc.getElementById('fl-clay-pill-panel');
+    if (!panel) return;
+    var toggle = doc.getElementById('fl-clay-toggle') || root.__clayToggle;
+    var ids = [toggle, doc.getElementById('fl-ws-open'), doc.getElementById('fl-ws-view-open')];
+    for (var i = 0; i < ids.length; i++) {
+      var el = ids[i];
+      if (!el || el.parentNode === panel) continue;
+      panel.appendChild(el);
+    }
+  }
+  function ensurePill() {
+    var doc = root.document;
+    if (!doc || !doc.createElement || !doc.getElementById) return null;
+    if (doc.getElementById('fl-clay-pill')) {
+      foldButtons();
+      paintPill();
+      return doc.getElementById('fl-clay-pill');
+    }
+    var host = doc.getElementById('chatFeelMarketBand') || dock;
+    if (!host) return null;
+    var wrap = doc.createElement('div');
+    wrap.id = 'fl-clay-pill-wrap';
+    wrap.style.cssText = 'display:inline-flex;align-items:center;gap:8px;max-width:100%;flex-wrap:wrap;';
+    var pill = doc.createElement('button');
+    pill.type = 'button';
+    pill.id = 'fl-clay-pill';
+    pill.style.cssText = 'min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(148,163,184,0.45);background:rgba(148,163,184,0.12);color:#cbd5e1;font-family:Georgia,serif;cursor:pointer;box-sizing:border-box;';
+    pill.setAttribute('aria-controls', 'fl-clay-pill-panel');
+    pill.addEventListener('click', function () { setPillOpen(!pillOpen()); });
+    var pause = doc.createElement('button');
+    pause.type = 'button';
+    pause.id = 'fl-clay-pause';
+    pause.setAttribute('aria-label', 'Pause');
+    pause.textContent = '\u25CF';
+    pause.style.cssText = 'min-height:44px;min-width:44px;box-sizing:border-box;border-radius:22px;border:1px solid rgba(148,163,184,0.45);background:transparent;color:#94a3b8;font-size:10px;line-height:44px;cursor:pointer;';
+    pause.addEventListener('click', function () { setOn(false); });
+    var panel = doc.createElement('div');
+    panel.id = 'fl-clay-pill-panel';
+    panel.style.cssText = 'max-width:100%;flex-basis:100%;';
+    quietEl = doc.createElement('p');
+    quietEl.id = 'fl-clay-quiet';
+    quietEl.style.cssText = 'margin:8px 0 0;font-size:0.75rem;color:#94a3b8;';
+    panel.appendChild(quietEl);
+    wrap.appendChild(pill);
+    wrap.appendChild(pause);
+    host.appendChild(wrap);
+    if (host.id === 'chatFeelMarketBand' && host.parentNode) {
+      var market = doc.getElementById('chatMarketPanel');
+      host.parentNode.insertBefore(panel, market || host.nextSibling);
+    } else host.appendChild(panel);
+    paintPill();
+    foldButtons();
+    return pill;
+  }
+  function watchFold() {
+    var doc = root.document;
+    if (!doc || !doc.body || typeof MutationObserver !== 'function' || pillObs) return;
+    pillObs = new MutationObserver(function () {
+      var here = root.document;
+      if (!here || !here.getElementById) return;
+      if (!here.getElementById('fl-clay-pill')) { ensurePill(); return; }
+      var panel = here.getElementById('fl-clay-pill-panel');
+      var toggle = here.getElementById('fl-clay-toggle') || root.__clayToggle;
+      var need = [toggle, here.getElementById('fl-ws-open'), here.getElementById('fl-ws-view-open')];
+      var n;
+      for (n = 0; n < need.length; n++) {
+        if (need[n] && (!panel || need[n].parentNode !== panel)) { foldButtons(); return; }
+      }
+    });
+    pillObs.observe(doc.body, { childList: true, subtree: true });
+  }
   function setReduced(value) {
     forcedReduced = !!value;
     if (forcedReduced) stopLoop();
@@ -761,6 +1201,7 @@
 
   var api = {
     VERSION: 'v-particle-clay-v0.1',
+    POLISH: 'v-clay-polish-v0.1',
     FEEL: 'v-feel-felt-v0.1',
     HEAL: 'v-clay-grid-tag-heal-v0.1',
     WORDS: WORDS,
@@ -782,6 +1223,31 @@
     mindConnected: mindConnected,
     resetRate: resetRate,
     canvasMounted: function () { return !!(canvas && canvas.parentNode); },
+    canvasCount: function () {
+      var n = 0;
+      var doc = root.document;
+      if (doc && doc.querySelectorAll) {
+        var list = [];
+        try { list = doc.querySelectorAll('#fl-clay-canvas'); } catch (e) { list = []; }
+        n = list.length || 0;
+      }
+      if (!n && canvas && canvas.parentNode) n = 1;
+      return n;
+    },
+    placeCanvas: placeCanvas,
+    ensurePill: ensurePill,
+    pillOpen: pillOpen,
+    setPillOpen: setPillOpen,
+    pause: function () { return setOn(false); },
+    snapshot: function () {
+      return {
+        form: currentForm,
+        energy: playedEnergy(),
+        motion: currentMotion,
+        glow: currentGlow,
+        size: currentSize
+      };
+    },
     rafHandles: function () { return rafHandles; },
     liveLine: function () { return lastLive; },
     autoSend: function () { return false; },
