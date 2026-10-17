@@ -1192,6 +1192,53 @@
     });
     pillObs.observe(doc.body, { childList: true, subtree: true });
   }
+  // v-clay-corner-v0.1: one settled form on a caller canvas. Not the chat clay.
+  var settledRaf = 0;
+  function paintSettled(target, choice, still) {
+    if (!target || typeof target.getContext !== 'function') return false;
+    var ctx = target.getContext('2d');
+    if (!ctx) return false;
+    var pts = targetPoints(choice || { form: 'seed' });
+    var w = target.width || 112;
+    var h = target.height || 112;
+    if (settledRaf && typeof root.cancelAnimationFrame === 'function') {
+      try { root.cancelAnimationFrame(settledRaf); } catch (eStop) {}
+    }
+    settledRaf = 0;
+    function frame(scale) {
+      ctx.clearRect(0, 0, w, h);
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.scale(scale, scale);
+      var i;
+      for (i = 0; i < pts.length; i++) {
+        var p = pts[i];
+        ctx.fillStyle = colorFor(choice || {}, i);
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath();
+        ctx.arc(p.x || 0, p.y || 0, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    var hold = !!still || reduced();
+    if (hold || typeof root.requestAnimationFrame !== 'function') {
+      frame(w / 192 || 1);
+      return true;
+    }
+    var born = Date.now();
+    function loop() {
+      if (!target || target.isConnected === false) { settledRaf = 0; return; }
+      if (target.parentNode == null && target.isConnected !== true) { settledRaf = 0; return; }
+      if (reduced()) { frame(w / 192 || 1); settledRaf = 0; return; }
+      var math = mathApi();
+      var breath = math && math.breath ? math.breath((Date.now() - born) / 1000) : 1;
+      frame((w / 192) * (0.92 + breath * 0.08));
+      settledRaf = root.requestAnimationFrame(loop);
+    }
+    loop();
+    return true;
+  }
   function setReduced(value) {
     forcedReduced = !!value;
     if (forcedReduced) stopLoop();
@@ -1218,6 +1265,7 @@
     setOn: setOn,
     reduced: reduced,
     setReduced: setReduced,
+    paintSettled: paintSettled,
     mount: mount,
     boot: boot,
     mindConnected: mindConnected,

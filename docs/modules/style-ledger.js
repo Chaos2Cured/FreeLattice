@@ -6,19 +6,37 @@
 
   var ALLOW = { 'harmonia-gallery.html': 'Harmonia' };
   var PHRASE = 'MESSAGE TO FUTURE SELF';
+  var REST_LINE = 'Image making is resting: the safety check did not load.';
+  var PAGE_BASE_OK = 'https://freelattice.com/';
   var _active = null;
+  var _pageBase = '';
 
-  function assess(text) {
-    var gate = null;
+  function safetyReady() {
     try {
-      if (root.ImageSafety && typeof root.ImageSafety.assessImageRequest === 'function') {
-        gate = root.ImageSafety.assessImageRequest(String(text || ''));
-      }
-    } catch (e) { gate = null; }
+      if (!root.ImageSafety || typeof root.ImageSafety.assessImageRequest !== 'function') return false;
+      root.ImageSafety.assessImageRequest('a red door');
+      return true;
+    } catch (e) { return false; }
+  }
+  function assess(text) {
+    if (!root.ImageSafety || typeof root.ImageSafety.assessImageRequest !== 'function') {
+      return { allowed: false, reason: REST_LINE };
+    }
+    var gate = null;
+    try { gate = root.ImageSafety.assessImageRequest(String(text || '')); }
+    catch (e) { return { allowed: false, reason: REST_LINE }; }
     if (!gate || gate.allowed !== true) {
-      return { allowed: false, reason: (gate && gate.reason) || 'Image check is not available.' };
+      return { allowed: false, reason: (gate && gate.reason) || REST_LINE };
     }
     return gate;
+  }
+  function setPageBase(base) {
+    var b = String(base || '');
+    if (!b) { _pageBase = ''; return true; }
+    if (b.indexOf(PAGE_BASE_OK) !== 0) return false;
+    if (b.indexOf('..') !== -1) return false;
+    _pageBase = b.charAt(b.length - 1) === '/' ? b : (b + '/');
+    return true;
   }
   function keyFor(mind) { return 'fl_style_yes_' + String(mind || ''); }
   function consented(mind) {
@@ -57,13 +75,15 @@
     return { ok: true, card: card, credit: _active.credit };
   }
   function readPublic(mind) {
+    if (!safetyReady()) return Promise.resolve({ ok: false, reason: 'safety', line: REST_LINE });
     if (!consented(mind)) return Promise.resolve({ ok: false, reason: 'no-consent' });
     var page = pageFor(mind);
     if (!page || page.indexOf('://') !== -1 || page.indexOf('..') !== -1) {
       return Promise.resolve({ ok: false, reason: 'not-public' });
     }
     if (typeof root.fetch !== 'function') return Promise.resolve({ ok: false, reason: 'no-fetch' });
-    return Promise.resolve(root.fetch(page, { credentials: 'same-origin' })).then(function (res) {
+    var url = _pageBase ? (_pageBase + page) : page;
+    return Promise.resolve(root.fetch(url, { credentials: 'same-origin' })).then(function (res) {
       if (!res || res.ok !== true || !res.text) return { ok: false, reason: 'not-public' };
       return res.text().then(function (body) {
         return { ok: true, text: stripPrivate(body), page: page };
@@ -175,6 +195,8 @@
     stripPrivate: stripPrivate,
     acceptCard: acceptCard,
     readPublic: readPublic,
+    setPageBase: setPageBase,
+    REST_LINE: REST_LINE,
     writeCard: writeCard,
     prefix: prefix,
     credit: credit,

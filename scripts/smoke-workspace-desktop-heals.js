@@ -20,8 +20,9 @@ function md5(file) {
 
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/fl-bridge.js')), '3b5ef06849a142e50c78e7ba1e057980', 'bridge file stays the 041 hash');
 // 040d made the notebook 0573b53a9062360e901210f6e8840bfc (add-only noteLine, reviewed).
-// v-heals-042-v0.1 gives the sketchbook its own gap. Pin the final file.
-assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), '19355641954c7809609e8269842db834', 'notebook file stays');
+// v-heals-042-v0.1 gives the sketchbook its own gap.
+// v-heals-043-v0.1 checks the shelf fingerprint before anything is kept. Pin the final file.
+assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), '0943268564d875bbb0093303d27ffc2c', 'notebook file stays');
 assert.strictEqual(md5(path.join(rootDir, 'desktop/workspace-mirror.js')), 'ba382400defc98001559c275e13d285d', 'mirror file stays');
 
 var pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'desktop/package.json'), 'utf8'));

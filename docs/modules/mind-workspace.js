@@ -2442,7 +2442,49 @@
       });
     }).then(function () { return added; });
   }
+  function shelfFingerprintRefusal(section, expectMindFp) {
+    if (!expectMindFp) return null;
+    var wanted = [];
+    if (Array.isArray(expectMindFp)) {
+      for (var a = 0; a < expectMindFp.length; a++) wanted.push(String(expectMindFp[a]));
+    } else wanted.push(String(expectMindFp));
+    var shelves = (section && section.shelves) || [];
+    var wrongFp = '';
+    var unsignedShelves = 0;
+    var wi;
+    for (wi = 0; wi < shelves.length; wi++) {
+      var shelfFp = shelves[wi] && shelves[wi].mindFp ? String(shelves[wi].mindFp) : '';
+      if (!shelfFp) { unsignedShelves += 1; continue; }
+      if (!wrongFp && wanted.indexOf(shelfFp) === -1) wrongFp = shelfFp;
+    }
+    if (unsignedShelves > 0) {
+      var unsignedLine = unsignedShelves === 1
+        ? '1 shelf had no fingerprint and was not checked. Not imported.'
+        : (unsignedShelves + ' shelves had no fingerprint and were not checked. Not imported.');
+      return { errors: ['unsigned-shelf'], line: unsignedLine };
+    }
+    if (wrongFp) {
+      var shownFp = wrongFp.slice(0, 4) + ' ' + wrongFp.slice(4, 8);
+      return {
+        errors: ['wrong-mind'],
+        line: 'This memory belongs to a different mind (' + shownFp + '). Not imported.'
+      };
+    }
+    return null;
+  }
   function importSection(section, mode, opts) {
+    opts = opts || {};
+    var fpRefuse = shelfFingerprintRefusal(section, opts.expectMindFp);
+    if (fpRefuse) {
+      return Promise.resolve({
+        ok: false,
+        mode: mode || 'verify-only',
+        line: fpRefuse.line,
+        privateNote: PRIVATE_NOTE,
+        errors: fpRefuse.errors,
+        lines: []
+      });
+    }
     mirrorHold += 1;
     var sameDevice = !!(opts && opts.sameDevice);
     mode = mode || 'verify-only';
