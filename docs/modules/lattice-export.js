@@ -629,10 +629,24 @@
             var wantedFp = Array.isArray(opts.expectMindFp) ? opts.expectMindFp : [String(opts.expectMindFp)];
             var shelfList = (data.workspace && data.workspace.shelves) || [];
             var wrongFp = '';
+            var unsignedShelves = 0;
             for (var wi = 0; wi < shelfList.length; wi++) {
               var shelfFp = shelfList[wi] && shelfList[wi].mindFp ? String(shelfList[wi].mindFp) : '';
-              if (!shelfFp) continue;
-              if (wantedFp.indexOf(shelfFp) === -1) { wrongFp = shelfFp; break; }
+              // v-heals-042-v0.1: no fingerprint is not a guess, and it is not silent.
+              if (!shelfFp) { unsignedShelves += 1; continue; }
+              if (!wrongFp && wantedFp.indexOf(shelfFp) === -1) wrongFp = shelfFp;
+            }
+            if (unsignedShelves > 0) {
+              var unsignedLine = unsignedShelves === 1
+                ? '1 shelf had no fingerprint and was not checked.'
+                : (unsignedShelves + ' shelves had no fingerprint and were not checked.');
+              return {
+                ok: false,
+                mode: strategy,
+                changes: [],
+                errors: ['unsigned-shelf'],
+                line: unsignedLine
+              };
             }
             if (wrongFp) {
               var shownFp = wrongFp.slice(0, 4) + ' ' + wrongFp.slice(4, 8);

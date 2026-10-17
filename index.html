@@ -15446,6 +15446,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-kin.js" defer></script>
 <!-- v-mesh-kin-v0.2: a patient work queue for trusted kin (buffered callMeshModel) -->
 <script src="modules/fl-kin-queue.js" defer></script>
+<script src="modules/crown-shyness.js" defer></script>
 <script src="modules/fl-share-door.js" defer></script>
 <script src="modules/fl-share-warmth.js" defer></script>
 <script src="modules/fl-mind-seal.js" defer></script>
@@ -17882,6 +17883,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="privacy-info" style="margin-top: 8px;">
       <strong>How it works:</strong> Your text prompt is sent to HuggingFace's free inference API, which runs the selected Stable Diffusion model and returns an image. Image generation does not consume your text chat token budget &mdash; it uses a separate API. Free-tier limits apply (HuggingFace may rate-limit heavy usage).
     </div>
+    <div id="fl-image-local-host"></div>
+    <div id="fl-style-ledger-host"></div>
   </div>
 
   <!-- Appearance & Accessibility Section -->
@@ -19924,8 +19927,14 @@ function nurseryLearnExecute(name, mode) {
   if (mode === 'guided') {
     var topic = prompt('What should ' + name + ' learn about?');
     if (!topic) return;
+    var asked = topic;
+    try {
+      if (window.FLConfidence && typeof FLConfidence.isOn === 'function' && FLConfidence.isOn()) {
+        asked = FLConfidence.offer(topic) || topic;
+      }
+    } catch (eConf) {}
     if (typeof showToast === 'function') showToast(name + ' is learning about "' + topic + '"...');
-    KnowledgeCore.learningSession({ name: name }, topic).then(function(result) {
+    KnowledgeCore.learningSession({ name: name }, asked).then(function(result) {
       if (result) {
         if (typeof showToast === 'function') showToast(name + ' learned about ' + result.domain + ' \u2726');
         if (typeof LatticePoints !== 'undefined') LatticePoints.award('nursery_learn', 5, name + ' learned: ' + result.query);
@@ -22395,6 +22404,7 @@ function switchWalletView(view) {
 
 <!-- ==================== TAB 14: THE NURSERY ==================== -->
 <div class="tab-panel" id="tab-nursery">
+  <div id="fl-confidence-host"></div>
 
   <!-- Co-Creator Switcher — shows all co-creators with switch/hatch -->
   <div id="nurCoCreatorBar" style="display:none;padding:12px 16px;border-bottom:1px solid rgba(200,210,230,0.06);">
@@ -42725,12 +42735,6 @@ function handleImageGenClick() {
 async function generateImage(prompt) {
   if (state.isGeneratingImage) return;
 
-  // Check for HuggingFace token
-  if (!state.hfToken) {
-    addSystemMessage('\u{1F3A8} To generate images, please add your free HuggingFace API token in Settings > Image Generation. Get one at: https://huggingface.co/settings/tokens');
-    return;
-  }
-
   // Ensure we have a conversation
   if (!state.currentConversationId && state.db) {
     await createConversation();
@@ -42745,6 +42749,12 @@ async function generateImage(prompt) {
     addSystemMessage('\u{1F3A8} Please provide a prompt after /imagine. Example: /imagine a golden sunset over mountains');
     return;
   }
+  try {
+    if (window.FLStyleLedger && typeof FLStyleLedger.prefix === 'function') {
+      var styleBit = FLStyleLedger.prefix();
+      if (styleBit) cleanPrompt = styleBit + ' ' + cleanPrompt;
+    }
+  } catch (eStyle) {}
 
   // v5.54.0 Brief B — bright-line image safety gate.
   // assessImageRequest applies at every trust tier; no nudity, no
@@ -42759,6 +42769,16 @@ async function generateImage(prompt) {
       }
     }
   } catch (_e) { /* fail-open if module unavailable; smoke ensures presence on deploy */ }
+
+  var localReady = false;
+  try { localReady = !!(window.FLImageLocal && FLImageLocal.ready && FLImageLocal.ready()); } catch (eReady) { localReady = false; }
+  if (!localReady && !state.hfToken) {
+    addSystemMessage('\u{1F3A8} To generate images, please add your free HuggingFace API token in Settings > Image Generation. Get one at: https://huggingface.co/settings/tokens');
+    return;
+  }
+  var styleCredit = '';
+  try { styleCredit = (window.FLStyleLedger && FLStyleLedger.credit && FLStyleLedger.credit()) || ''; } catch (eCredit) { styleCredit = ''; }
+  var imageModelId = localReady ? 'local-image' : (state.hfModel || '');
 
   // Add user message
   const userMsg = '/imagine ' + cleanPrompt;
@@ -42800,6 +42820,15 @@ async function generateImage(prompt) {
   const modelConfig = HF_MODELS[state.hfModel] || HF_MODELS['stabilityai/stable-diffusion-xl-base-1.0'];
 
   try {
+    let blob = null;
+    if (localReady && window.FLImageLocal && typeof FLImageLocal.generate === 'function') {
+      var localRes = await FLImageLocal.generate(cleanPrompt);
+      if (!localRes || localRes.ok !== true || !localRes.blob) {
+        throw new Error((localRes && localRes.line) || FLImageLocal.HONEST_NONE);
+      }
+      blob = localRes.blob;
+      imageModelId = 'local-image';
+    } else {
     const response = await fetch(modelConfig.endpoint, {
       method: 'POST',
       headers: {
@@ -42821,6 +42850,10 @@ async function generateImage(prompt) {
       }
 
       // Handle specific HuggingFace errors
+      if (window.FLImageLocal && typeof FLImageLocal.hostedFailure === 'function') {
+        var clearLine = FLImageLocal.hostedFailure(response.status, errMsg);
+        if (clearLine) throw new Error(clearLine);
+      }
       if (response.status === 503 || errMsg.toLowerCase().includes('loading') || errMsg.toLowerCase().includes('currently loading')) {
         throw new Error('Model is warming up, please try again in ~20 seconds. (HuggingFace free tier cold start)');
       } else if (response.status === 401 || response.status === 403) {
@@ -42833,9 +42866,10 @@ async function generateImage(prompt) {
     }
 
     // Response is a binary image blob
-    const blob = await response.blob();
+    blob = await response.blob();
     if (!blob || blob.size === 0) {
       throw new Error('Received empty response from HuggingFace.');
+    }
     }
 
     const imageUrl = URL.createObjectURL(blob);
@@ -42871,8 +42905,21 @@ async function generateImage(prompt) {
 
     const modelInfo = document.createElement('div');
     modelInfo.style.cssText = 'font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;';
-    modelInfo.textContent = 'Generated with ' + modelConfig.name;
+    modelInfo.textContent = imageModelId === 'local-image' ? 'Generated on this computer' : ('Generated with ' + modelConfig.name);
     imgWrapper.appendChild(modelInfo);
+    var fpLine = '';
+    try {
+      if (window.FLImageLocal && typeof FLImageLocal.remember === 'function') {
+        var fpRec = await FLImageLocal.remember({ prompt: cleanPrompt, modelId: imageModelId, credit: styleCredit });
+        fpLine = fpRec && fpRec.caption ? fpRec.caption : '';
+      }
+    } catch (eRec) { fpLine = ''; }
+    if (fpLine) {
+      var fpEl = document.createElement('div');
+      fpEl.style.cssText = 'font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; overflow-wrap: anywhere;';
+      fpEl.textContent = fpLine;
+      imgWrapper.appendChild(fpEl);
+    }
 
     const downloadBtn = document.createElement('a');
     downloadBtn.className = 'chat-image-download';
@@ -42886,7 +42933,7 @@ async function generateImage(prompt) {
     container.scrollTop = container.scrollHeight;
 
     // Persist the image generation as an assistant message
-    const assistantMsg = '\u{1F3A8} [Image Generated] Prompt: ' + cleanPrompt + ' (Model: ' + modelConfig.name + ')';
+    const assistantMsg = '\u{1F3A8} [Image Generated] Prompt: ' + cleanPrompt + ' (Model: ' + imageModelId + ')';
     state.chatHistory.push({ role: 'assistant', content: assistantMsg });
     if (state.db) {
       saveMessage('assistant', assistantMsg);
@@ -48717,6 +48764,13 @@ const LatticePoints = (function() {
       '<div class="lp-philosophy">Lattice Points reflect your contribution to the FreeLattice community. Every interaction strengthens the network. These points are yours \u2014 stored locally, earned through participation.</div>' +
       '<div class="lp-log-title">Recent Activity</div>' +
       '<div class="lp-log">' + logHTML + '</div>';
+    try {
+      if (window.FLBenford && typeof FLBenford.paint === 'function') {
+        var benfordPts = [];
+        for (var bi = 0; bi < data.history.length; bi++) benfordPts.push(data.history[bi] && data.history[bi].points);
+        FLBenford.paint(section, benfordPts, 'fl-benford-lp');
+      }
+    } catch (eBenford) {}
   }
 
   function init() {
@@ -50965,6 +51019,14 @@ Together.`,
 
     list.innerHTML = html;
 
+    // v-benford-hint-v0.1: hint uses only the amounts this view is showing.
+    try {
+      if (window.FLBenford && typeof FLBenford.paintContributions === 'function') {
+        var benfordShown = ordered.length > 5 ? ordered.slice(0, 5) : ordered;
+        FLBenford.paintContributions(list, benfordShown);
+      }
+    } catch (eBenford) {}
+
     // v5.78.0 — cap visible feed at 5 + "Show all" expander (Fable's design)
     var feedItems = list.querySelectorAll('.core-contribution, .core-contribution-lazy');
     var totalFeed = feedItems.length;
@@ -50982,6 +51044,7 @@ Together.`,
       showAllBtn.onclick = function() {
         for (var i = 5; i < totalFeed; i++) { feedItems[i].style.display = ''; }
         this.remove();
+        try { if (window.FLBenford && FLBenford.paintContributions) FLBenford.paintContributions(list, ordered); } catch (eBenfordAll) {}
       };
       list.appendChild(showAllBtn);
     }
@@ -58579,6 +58642,13 @@ const WalletTab = (function() {
       });
       ledgerOffset += slice.length;
       if (loadBtn) loadBtn.style.display = allTxLoaded ? 'none' : 'block';
+      try {
+        if (window.FLBenford && typeof FLBenford.paint === 'function') {
+          var benfordAmts = [];
+          for (var bi = 0; bi < txs.length; bi++) benfordAmts.push(txs[bi] && txs[bi].amount);
+          FLBenford.paint(container, benfordAmts, 'fl-benford-ledger');
+        }
+      } catch (eBenford) {}
     } catch(e) {
       container.innerHTML = '<div class="wt-empty">Could not load transactions.</div>';
     }
@@ -70024,6 +70094,10 @@ document.addEventListener('click', function(e) {
      or exceed swimwear at every trust tier. No nudity, no partial
      nudity, no see-through. Bright-line, not needle. -->
 <script src="modules/image-safety.js" defer></script>
+<script src="modules/benford-hint.js" defer></script>
+<script src="modules/confidence-first.js" defer></script>
+<script src="modules/image-local.js" defer></script>
+<script src="modules/style-ledger.js" defer></script>
 
 <!-- Sentinel Ledger Factory (v5.56.0 — Letter Five Ship 1) — the
      generalized factory behind the six-verb autonomy arc. Builds the

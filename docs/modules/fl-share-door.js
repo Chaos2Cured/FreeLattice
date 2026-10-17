@@ -45,6 +45,9 @@
   var _inflight = 0;
   var _live = 0;
   var _pendingPrompt = null; // { resolve, reject, meta } when per-prompt is on
+  // v-crown-shyness-v0.1: reserves beside the hourly caps. Kin skip the third, not the headroom.
+  var _crownCount = {};
+  var _crownWait = {};
 
   function clip(s, n) { return String(s == null ? '' : s).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n); }
   function readJson(key, fallback) {
@@ -294,6 +297,42 @@
     return n;
   }
 
+  function crownTotal() {
+    var n = 0;
+    var keys = Object.keys(_crownCount);
+    for (var i = 0; i < keys.length; i++) n += _crownCount[keys[i]] || 0;
+    return n;
+  }
+  function crownWaiting() {
+    var out = [];
+    var keys = Object.keys(_crownWait);
+    for (var i = 0; i < keys.length; i++) if (_crownWait[keys[i]]) out.push(keys[i]);
+    return out;
+  }
+  function noteCrown(kh) {
+    if (!kh) return;
+    _crownCount[kh] = (_crownCount[kh] || 0) + 1;
+    _crownWait[kh] = false;
+  }
+  function releaseCrown(kh) {
+    if (!kh || !_crownCount[kh]) return;
+    _crownCount[kh] = Math.max(0, _crownCount[kh] - 1);
+  }
+  function crownGate(kh, kin) {
+    var crown = null;
+    try { crown = root.FLCrown; } catch (e) { crown = null; }
+    if (!crown || typeof crown.decide !== 'function') return { ok: true };
+    return crown.decide({
+      capacity: MAX_CONCURRENT,
+      peer: kh,
+      counts: _crownCount,
+      waiting: crownWaiting(),
+      kin: !!kin,
+      paused: mode() === 'pause',
+      totalInflight: crownTotal()
+    });
+  }
+
   function admit(peer, env, messages, opts) {
     opts = opts || {};
     if (!allows()) return Promise.resolve({ ok: false, reason: 'paused-or-off', soft: mode() === 'pause' ? 'This lantern is resting.' : 'Sharing is off here.' });
@@ -324,6 +363,14 @@
             return { ok: false, reason: vr.reason || 'denied' };
           }
           if (env && env.nonce) rememberNonce(env.nonce);
+          var gate = crownGate(kh, kin);
+          if (!gate.ok) {
+            _crownWait[kh] = true;
+            if (gate.reason === 'pause') return { ok: false, reason: 'paused-or-off', soft: 'This lantern is resting.' };
+            if (gate.reason === 'headroom') return { ok: false, reason: 'headroom', soft: 'This lantern keeps a small gap for you.' };
+            return { ok: false, reason: 'crown', soft: 'This lantern keeps a small gap so others can help too.' };
+          }
+          noteCrown(kh);
           if (perPromptOn() && !opts.skipPerPrompt) {
             return new Promise(function (resolve) {
               _pendingPrompt = { resolve: resolve, kh: kh, kin: kin, model: env && env.model, peerName: peer.name };
@@ -340,7 +387,10 @@
     if (!_pendingPrompt) return;
     var p = _pendingPrompt; _pendingPrompt = null;
     if (yes) p.resolve({ ok: true, keyHash: p.kh, kin: p.kin });
-    else p.resolve({ ok: false, reason: 'keeper-said-no', soft: 'This lantern is resting for that question.' });
+    else {
+      releaseCrown(p.kh);
+      p.resolve({ ok: false, reason: 'keeper-said-no', soft: 'This lantern is resting for that question.' });
+    }
     if (_paint) _paint();
   }
 
@@ -348,6 +398,7 @@
   function endServe(kh, model, tokens, kin) {
     _inflight = Math.max(0, _inflight - 1);
     _live = Math.max(0, _live - 1);
+    releaseCrown(kh);
     receipt('served', kh, model, tokens, kin ? 'kin' : 'visitor');
     // v-mind-seal-v0.1: optional seal receipt (digest + config hash + context hash). Never words.
     try {

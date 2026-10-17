@@ -186,7 +186,7 @@
     '.fl-pool p{margin:8px 0;}',
     '.fl-pool button{min-height:44px;min-width:44px;font-size:1rem;padding:10px 16px;margin:6px 8px 6px 0;border-radius:10px;border:1px solid #d4a017;background:#3b2f0b;color:#fff;cursor:pointer;font-family:inherit;}',
     '.fl-pool button.fl-pool-help,.fl-pool button.fl-pool-resume{background:var(--accent,#e8b019);border-color:var(--accent,#e8b019);color:var(--bg-primary,#0e0c1e);font-weight:600;}',
-    '.fl-pool-honest,.fl-pool-later,.fl-pool-means{color:var(--text-secondary,#a0a5b8);font-size:0.95rem;}',
+    '.fl-pool-honest,.fl-pool-later,.fl-pool-means,.fl-pool-crown{color:var(--text-secondary,#a0a5b8);font-size:0.95rem;overflow-wrap:anywhere;}',
     '.fl-pool-note,.fl-pool-door,.fl-pool-ask{color:#fff;}',
     '.fl-pool-means{margin:8px 0;padding-left:20px;}',
     '.fl-pool-means li{margin:4px 0;}',
@@ -300,6 +300,10 @@
     wrap.appendChild(el('div', 'section-title', 'Device Pool: your phones and laptops, helping'));
     wrap.appendChild(el('p', 'fl-pool-line', 'Old phones and laptops, or a whole classroom lab, can each hold a mind. Tap once on each device you trust, then ask from any of them. In a lab the teacher machine asks and the student machines help.'));
     wrap.appendChild(el('p', 'fl-pool-honest', HONEST));
+    // v-crown-shyness-v0.1: the gap is shown on the quiet path and the open path.
+    var crownWords = 'Keeps a small gap: no one helper takes more than a third, and 20% stays yours.';
+    try { if (root.FLCrown && root.FLCrown.LINE) crownWords = root.FLCrown.LINE; } catch (eCrown) {}
+    wrap.appendChild(el('p', 'fl-pool-crown', crownWords));
     if (quiet()) { wrap.appendChild(el('p', 'fl-pool-note', 'The Quiet Room is closed to the pool.')); host.appendChild(wrap); return; }
 
     var btn = el('button', 'fl-pool-help', helping() ? 'Stop helping (pause sharing)' : 'Let this device help');
