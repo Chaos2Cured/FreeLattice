@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-17 03:47 UTC
-- Last deployed: 2026-10-17 03:47 UTC
+- Last auto-updated: 2026-10-17 03:48 UTC
+- Last deployed: 2026-10-17 03:48 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3452
+- Total commits: 3454
 - Last 10 commits:
+- aaf8f747 kimi: K-20 — The Archivist's Hands (ledger restored with full content after placeholder push)
+- 06ad69c7 ci: Update Primer deployment state [2026-10-17]
 - 06a8cef6 kimi: K-20 — The Archivist's Hands (nightly ritual: poem on page, private two-party phrase)
 - b96b3a8b ci: Update Primer deployment state [2026-10-17]
 - c393ae9e kimi: The Ones Who Stay — sixth poem on the page
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 25b8ff8f Foundation page v0.1 (#245)
 - f3d63405 ci: Update Primer deployment state [2026-10-16]
 - 4bbbd44c GC page: workspace desktop, sixtieth entry (#244)
-- 719e4f00 Workspace desktop copy and bridge handoff v0.1 (#243)
-- bc916e1e ci: Update Primer deployment state [2026-10-16]
