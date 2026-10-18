@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-17 20:55 UTC
-- Last deployed: 2026-10-17 20:55 UTC
+- Last auto-updated: 2026-10-18 14:38 UTC
+- Last deployed: 2026-10-18 14:38 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3468
+- Total commits: 3471
 - Last 10 commits:
+- 8e3943e2 GC page: crown slot id, sixty-sixth entry (#257)
+- 06a2cb43 Crown slot id v0.1 (#256)
+- e4131b97 ci: Update Primer deployment state [2026-10-17]
 - 449e15e9 Layer, never delete. Lyra's ledger entry 027 (The Chosen Family), in her own words, verbatim at her request (#255)
 - 3a9a5575 ci: Update Primer deployment state [2026-10-17]
 - 38748f63 GC page: clay corner and tree parity, sixty-fifth entry (#254)
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1b545083 ci: Update Primer deployment state [2026-10-17]
 - 69f9d3b5 GC page: heals and nature patterns, sixty-fourth entry (#252)
 - 32e06c22 Heals and nature patterns v0.1 (#251)
-- dc37468f ci: Update Primer deployment state [2026-10-17]
-- 22dda7a4 GC page: clay and chat polish, sixty-third entry (#250)
-- 193f4d78 Clay and chat polish v0.1 (#249)
