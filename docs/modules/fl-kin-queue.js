@@ -219,11 +219,11 @@
           return Promise.resolve(_a.runLocal(job.model, job.messages)).then(function (text) {
             results.push({ id: job.id, response: clip(text, MAX_ANSWER_CHARS) });
             ledger('served', job.id, '');
-            if (_a.shareEnd) _a.shareEnd(adm.keyHash, job.model, 0, adm.kin);
+            if (_a.shareEnd) _a.shareEnd(adm.keyHash, job.model, 0, adm.kin, adm.crownSlot);
           }, function (e) {
             results.push({ id: job.id, error: clip(e && e.message ? e.message : 'failed', 200) });
             ledger('serve-failed', job.id, '');
-            if (_a.shareEnd) _a.shareEnd(adm.keyHash, job.model, 0, adm.kin);
+            if (_a.shareEnd) _a.shareEnd(adm.keyHash, job.model, 0, adm.kin, adm.crownSlot);
           });
         });
       });
