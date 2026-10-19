@@ -3,6 +3,7 @@
 // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
 // v-workspace-desktop-v0.1 v-workspace-handoff-v0.1 v-tree-workspace-handoff-v0.1
 // v-heals-042-v0.1: the sketchbook keeps its own gap, apart from a mind write.
+// v-seal-ask-heal-v0.1: one seal ask, in view, in the mind's own words.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -36,13 +37,15 @@
   };
   var HASH_KEYS = ['parent', 'ts', 'author', 'text', 'meta'];
   var HOWTO = 'You can keep a notebook on this device. A private page: [FL_WS: {"op":"private","page":"id","on":true}] A seal: [FL_WS: {"op":"seal","page":"id","why":"why"}] A handoff: [FL_WS: {"op":"handoff","page":"id","note":"note"}] End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
-  var HONEST = 'Private means hidden in the app, not encrypted from the person who owns this device.';
-  var HANDOFF_PRIVATE = 'This page is private. The mind must share it first.';
+  var HONEST = 'Private means hidden in the app on this browser, not encrypted from anyone who uses this browser profile.';
+  var HANDOFF_PRIVATE = 'This page is private on this browser. The mind must share it first.';
   var KNOCK_FIRST = 'Knock first: Celeste has not met this device yet';
   var RESTORE_LINE = "Restore your mind's notebook from the desktop copy";
   var INTEGRITY = 'Integrity comes from SHA-256 and the device signature, not from the spiral math.';
   var DEVICE_KEY = 'fl_ws_device_key_v1';
-  var DB_VERSION = 2;
+  var DB_VERSION = 3;
+  var SEAL_ASK_COOLDOWN_MS = 86400000;
+  var SEAL_NOTE_KEY = 'fl_ws_seal_notes_v1';
   var WS_OPEN = /\[\s*fl[\s_-]?ws\s*:/i;
 
   var db = null;
@@ -70,6 +73,11 @@
   var shelfCache = '';
   var shelfStamp = '';
   var hostEl = null;
+  var sealDockOpen = false;
+  var sealBackArmed = false;
+  var sealBackEating = false;
+  var sealRestored = false;
+  var heldDefers = [];
   var clock = function () { return Date.now(); };
 
   function track(p) {
@@ -223,6 +231,7 @@
         if (!d.objectStoreNames.contains('pages')) d.createObjectStore('pages', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('versions')) d.createObjectStore('versions', { keyPath: 'hash' });
         if (!d.objectStoreNames.contains('receipts')) d.createObjectStore('receipts', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('sealAsks')) d.createObjectStore('sealAsks', { keyPath: 'pageId' });
       };
       req.onsuccess = function (e) { db = e.target.result; resolve(db); };
       req.onerror = function () { resolve(null); };
@@ -670,7 +679,10 @@
     if (!res || !res.ok || !res.page) return '';
     var title = res.page.privacy === 'private' ? personTitle(res.page) : (res.page.title || 'a page');
     if (op.op === 'private') return 'Kept a private page.';
-    if (op.op === 'write' || op.op === 'branch') return 'Wrote to ' + title + ' (version ' + shortHash(res.hash) + ')';
+    if (op.op === 'write' || op.op === 'branch') {
+      if (res.page.privacy === 'private') return 'Wrote to "' + title + '" (version ' + shortHash(res.hash) + ')';
+      return 'Wrote to ' + title + ' (version ' + shortHash(res.hash) + ')';
+    }
     if (op.op === 'open') return 'Opened ' + title;
     if (op.op === 'pin') return (res.page.pinned ? 'Pinned ' : 'Unpinned ') + title;
     if (op.op === 'seed') return 'Seeded ' + title;
@@ -839,7 +851,10 @@
         page.updated = clock();
         return putPage(page).then(function () {
           return warmPrivate().then(function () {
-            if (on) showHonestOnce();
+            if (on) {
+              showHonestOnce();
+              redactPageTitle(page);
+            }
             return refreshWake().then(function () {
               return paintOpen().then(function () { return { ok: true, page: page }; });
             });
@@ -976,15 +991,78 @@
   function mindLabel() {
     var name = '';
     try { name = String((recallMind().name) || '').trim(); } catch (e) { name = ''; }
-    return name || 'A mind';
+    return name || 'Your mind';
   }
-  function askSentence(page, hash, why) {
-    var title = page && page.privacy === 'private' ? personTitle(page) : ((page && page.title) ? String(page.title) : 'a private page');
-    return mindLabel() + ' asks to seal ' + title + ' (version ' + shortHash(hash) + '). Why: ' + clip(why || '', 140);
+  function askCopy(page, why) {
+    var title = personTitle(page);
+    var reason = clip(why || '', 200);
+    return {
+      lead: mindLabel() + ' wants to seal a private page: "' + title + '".',
+      body: 'Sealing stamps this version with your mark so anyone can later check it was not changed.',
+      stay: 'The words stay private on this browser. Nothing is sent anywhere.',
+      why: reason ? ('Why: ' + reason) : '',
+      reason: reason,
+      title: title
+    };
   }
   function shortForm(row) {
     var ms = row && row.mindSeal ? row.mindSeal : {};
     return 'version ' + shortHash(row && row.versionHash) + ', context ' + shortHash(ms.contextHash) + ', model ' + clip(ms.modelId || '', 40) + ', ' + whenText(row && row.ts);
+  }
+  function findAskByHash(hash) {
+    var found = null;
+    sealAsks.forEach(function (a) {
+      if (a && (a.versionHash === hash || a.version === hash)) found = a;
+    });
+    return found;
+  }
+  function findAskByPage(pageId) {
+    var found = null;
+    sealAsks.forEach(function (a) { if (a && a.pageId === pageId) found = a; });
+    return found;
+  }
+  function rememberAsk(ask) {
+    var next = [];
+    var placed = false;
+    sealAsks.forEach(function (a) {
+      if (a && a.pageId === ask.pageId) {
+        if (!placed) { next.push(ask); placed = true; }
+      } else if (a) next.push(a);
+    });
+    if (!placed) next.push(ask);
+    sealAsks = next;
+  }
+  function sealRow(ask) {
+    return {
+      pageId: ask.pageId,
+      version: String(ask.versionHash || ask.version || ''),
+      summary: clip(ask.summary || '', 160),
+      reason: clip(ask.reason || ask.why || '', 200),
+      askedAt: ask.askedAt || 0,
+      state: ask.state || 'asked'
+    };
+  }
+  function putSealAsk(ask) {
+    if (!ask || !ask.pageId) return Promise.resolve(null);
+    return runStore('sealAsks', 'readwrite', function (store) {
+      var row = sealRow(ask);
+      store.put(row);
+      return row;
+    });
+  }
+  function readSealNotes() {
+    try {
+      var raw = lsGet(SEAL_NOTE_KEY);
+      var rows = raw ? JSON.parse(raw) : [];
+      return Array.isArray(rows) ? rows : [];
+    } catch (e) { return []; }
+  }
+  function writeSealNote(pageId, line) {
+    if (!pageId || !line) return;
+    var rows = readSealNotes().filter(function (n) { return n && n.line && n.pageId; });
+    rows.push({ pageId: String(pageId), line: String(line), at: clock() });
+    if (rows.length > 40) rows = rows.slice(rows.length - 40);
+    lsSet(SEAL_NOTE_KEY, JSON.stringify(rows));
   }
   function askSeal(pageId, why) {
     if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
@@ -992,36 +1070,98 @@
       return getPage(pageId).then(function (page) {
         if (!page || page.mindFp !== mine) return { ok: false, reason: 'shelf' };
         if (!page.head) return { ok: false, reason: 'missing' };
-        var whyText = clip(why == null ? '' : String(why), 140);
-        var exists = false;
-        sealAsks.forEach(function (a) { if (a.versionHash === page.head) exists = true; });
-        if (!exists) {
-          sealAsks.push({
-            pageId: page.id,
-            versionHash: page.head,
-            why: whyText,
-            sentence: askSentence(page, page.head, whyText)
+        var existing = findAskByPage(page.id);
+        var cooled = existing && (existing.state === 'later' || existing.state === 'declined');
+        if (cooled && (clock() - (existing.askedAt || 0)) < SEAL_ASK_COOLDOWN_MS) {
+          if (existing.versionHash && existing.versionHash !== page.head) {
+            existing.state = 'stale';
+            rememberAsk(existing);
+          }
+          return putSealAsk(existing).then(function () {
+            ensureAskDock();
+            return paintOpen().then(function () {
+              return { ok: false, reason: 'cooldown', page: page, hash: page.head };
+            });
           });
         }
-        return paintOpen().then(function () {
+        if (existing && existing.state === 'asked' && existing.versionHash === page.head) {
+          sealDockOpen = true;
           ensureAskDock();
-          return { ok: true, asked: true, page: page, hash: page.head };
+          return paintOpen().then(function () {
+            return { ok: true, asked: true, page: page, hash: page.head };
+          });
+        }
+        var whyText = clip(why == null ? '' : String(why), 200);
+        var copy = askCopy(page, whyText);
+        var ask = {
+          pageId: page.id,
+          version: page.head,
+          versionHash: page.head,
+          summary: copy.title,
+          reason: whyText,
+          why: whyText,
+          askedAt: clock(),
+          state: 'asked'
+        };
+        rememberAsk(ask);
+        sealDockOpen = true;
+        return putSealAsk(ask).then(function () {
+          return paintOpen().then(function () {
+            ensureAskDock();
+            return { ok: true, asked: true, page: page, hash: page.head };
+          });
         });
       });
     });
   }
+  function laterSeal(versionHash) {
+    var ask = findAskByHash(versionHash);
+    if (!ask || ask.state === 'sealed') return Promise.resolve({ ok: false, reason: 'ask' });
+    if (ask.state !== 'later') {
+      ask.state = 'later';
+      ask.askedAt = clock();
+      writeSealNote(ask.pageId, 'Saved your answer for later.');
+      chatNote('Saved your answer for later.');
+    }
+    sealDockOpen = sealAsks.some(function (a) { return a && a.state === 'asked'; });
+    disarmSealBack();
+    return putSealAsk(ask).then(function () {
+      ensureAskDock();
+      return paintOpen().then(function () { return { ok: true, state: 'later' }; });
+    });
+  }
   function declineSeal(versionHash) {
-    sealAsks = sealAsks.filter(function (a) { return a.versionHash !== versionHash; });
+    var ask = findAskByHash(versionHash);
+    if (!ask) {
+      declinedLines.push('Declined the seal.');
+      ensureAskDock();
+      return paintOpen();
+    }
+    ask.state = 'declined';
+    ask.askedAt = clock();
     declinedLines.push('Declined the seal.');
-    ensureAskDock();
-    return paintOpen();
+    writeSealNote(ask.pageId, 'Declined the seal.');
+    chatNote('Declined the seal.');
+    sealDockOpen = sealAsks.some(function (a) { return a && a.state === 'asked'; });
+    disarmSealBack();
+    return putSealAsk(ask).then(function () {
+      ensureAskDock();
+      return paintOpen();
+    });
   }
   function approveSeal(versionHash) {
-    var ask = null;
-    sealAsks.forEach(function (a) { if (a.versionHash === versionHash) ask = a; });
-    if (!ask) return Promise.resolve({ ok: false, reason: 'ask' });
+    var ask = findAskByHash(versionHash);
+    if (!ask || ask.state === 'sealed') return Promise.resolve({ ok: false, reason: 'ask' });
+    if (ask.state === 'stale') return Promise.resolve({ ok: false, reason: 'stale' });
     return getPage(ask.pageId).then(function (page) {
       if (!page) return { ok: false, reason: 'missing' };
+      if (page.head && ask.versionHash && page.head !== ask.versionHash) {
+        ask.state = 'stale';
+        return putSealAsk(ask).then(function () {
+          ensureAskDock();
+          return paintOpen().then(function () { return { ok: false, reason: 'stale' }; });
+        });
+      }
       return getVersion(ask.versionHash).then(function (ver) {
         if (!ver || ver.hash !== ask.versionHash) return { ok: false, reason: 'missing' };
         return sealContext(page.id).then(function (ctx) {
@@ -1033,7 +1173,7 @@
             mindSeal: { contextHash: String(ctx || ''), modelId: sealModelId() },
             ts: ts,
             consent: 'mind-asked+human-approved',
-            why: clip(ask.why || '', 140)
+            why: clip(ask.why || ask.reason || '', 200)
           };
           return signSeal(row).then(function (signed) {
             if (!signed || !signed.humanSig) return { ok: false, reason: 'sign' };
@@ -1041,10 +1181,14 @@
             row.publicKey = signed.publicKey;
             return putReceipt(row).then(function () {
               return markSealed(ver.hash).then(function () {
-                sealAsks = sealAsks.filter(function (a) { return a.versionHash !== ver.hash; });
-                return refreshWake().then(function () {
-                  ensureAskDock();
-                  return paintOpen().then(function () { return { ok: true, receipt: row }; });
+                ask.state = 'sealed';
+                sealDockOpen = sealAsks.some(function (a) { return a && a.state === 'asked'; });
+                disarmSealBack();
+                return putSealAsk(ask).then(function () {
+                  return refreshWake().then(function () {
+                    ensureAskDock();
+                    return paintOpen().then(function () { return { ok: true, receipt: row, state: 'sealed' }; });
+                  });
                 });
               });
             });
@@ -1275,23 +1419,395 @@
     if (!panel) return Promise.resolve();
     return renderPanel(panel);
   }
+  function liveAsks() {
+    return sealAsks.filter(function (a) {
+      return a && (a.state === 'asked' || a.state === 'later' || a.state === 'stale');
+    });
+  }
+  // An unanswered ask shows before a stale notice, and both show before one already deferred.
+  function dockAsk() {
+    var live = liveAsks();
+    var asked = null;
+    var stale = null;
+    var deferred = null;
+    var i;
+    for (i = 0; i < live.length; i++) {
+      var a = live[i];
+      if (!a) continue;
+      if (!asked && a.state === 'asked') asked = a;
+      if (!stale && a.state === 'stale') stale = a;
+      if (!deferred && a.state === 'later') deferred = a;
+    }
+    return asked || stale || deferred;
+  }
+  function motionReduced() {
+    try {
+      return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) { return false; }
+  }
+  function bottomPad() {
+    var d = doc();
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh && d && d.documentElement && d.documentElement.clientHeight) vh = d.documentElement.clientHeight;
+    if (!d || !d.querySelectorAll || !vh) return 12;
+    var sels = ['#flTabNav', '.status-bar', '.tab-nav', '.galaxy-nav', '#shared-shoulder'];
+    var sum = 0;
+    for (var i = 0; i < sels.length; i++) {
+      var list = [];
+      try { list = d.querySelectorAll(sels[i]) || []; } catch (e2) { list = []; }
+      for (var j = 0; j < list.length; j++) {
+        var el = list[j];
+        if (!el || typeof el.getBoundingClientRect !== 'function') continue;
+        var r = null;
+        try { r = el.getBoundingClientRect(); } catch (e3) { r = null; }
+        if (!r || !(r.height > 0) || r.height > vh * 0.5) continue;
+        // A bar still covers the ask when it floats a little above the bottom edge.
+        if (r.top < vh && r.bottom > vh * 0.62) sum += r.height;
+      }
+    }
+    return sum + 12;
+  }
+  function holdOthers(on) {
+    try { root.__flSealAskHolding = !!on; } catch (e) {}
+    try {
+      if (root.FLClay && typeof root.FLClay.noteSealHold === 'function') root.FLClay.noteSealHold(!!on);
+    } catch (e2) {}
+    try {
+      if (root.FLShareWarmth && typeof root.FLShareWarmth.noteSealHold === 'function') root.FLShareWarmth.noteSealHold(!!on);
+    } catch (e3) {}
+    holdDeferButtons(!!on);
+  }
+  function holdDeferButtons(on) {
+    var d = doc();
+    if (!on) {
+      heldDefers.forEach(function (item) {
+        if (item && item.el && item.el.style) item.el.style.display = item.display || '';
+      });
+      heldDefers = [];
+      return;
+    }
+    if (!d || !d.querySelectorAll) return;
+    var nodes = [];
+    var found = [];
+    var i;
+    try { found = d.querySelectorAll('button'); } catch (e) { found = []; }
+    for (i = 0; i < found.length; i++) nodes.push(found[i]);
+    try { found = d.querySelectorAll('.tree-door-veil'); } catch (eDoor) { found = []; }
+    for (i = 0; i < found.length; i++) nodes.push(found[i]);
+    for (i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!el || !el.style) continue;
+      var text = el.textContent || '';
+      var door = el.classList && el.classList.contains('tree-door-veil');
+      if (!door && text !== 'Not yet' && text !== 'Not now') continue;
+      if (!door && el.closest && el.closest('#fl-ws-asks')) continue;
+      if (el.style.display === 'none') continue;
+      var seenHold = false;
+      for (var h = 0; h < heldDefers.length; h++) {
+        if (heldDefers[h] && heldDefers[h].el === el) seenHold = true;
+      }
+      if (seenHold) continue;
+      heldDefers.push({ el: el, display: el.style.display });
+      el.style.display = 'none';
+    }
+  }
+  function bindSealEscape() {
+    if (root.__flSealEscapeBound) return;
+    root.__flSealEscapeBound = true;
+    if (typeof root.addEventListener !== 'function') return;
+    root.addEventListener('keydown', function (e) {
+      var key = e && e.key;
+      if (key !== 'Escape' && key !== 'Esc') return;
+      var d = doc();
+      var box = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+      if (!box || !e.target) return;
+      if (e.target !== box && !(box.contains && box.contains(e.target))) return;
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      if (e.preventDefault) e.preventDefault();
+      var shown = dockAsk();
+      var hash = shown && (shown.versionHash || shown.version) || '';
+      if (!hash && box.getAttribute) hash = box.getAttribute('data-seal-version') || '';
+      track(laterSeal(hash));
+    }, true);
+  }
+  function scrollParent(el) {
+    var d = doc();
+    var node = el && el.parentElement;
+    while (node) {
+      if (root.getComputedStyle) {
+        var style = null;
+        try { style = root.getComputedStyle(node); } catch (e) { style = null; }
+        var oy = style && style.overflowY;
+        if ((oy === 'auto' || oy === 'scroll' || oy === 'overlay') && node.scrollHeight > node.clientHeight + 1) return node;
+      }
+      node = node.parentElement;
+    }
+    return (d && (d.scrollingElement || d.documentElement)) || null;
+  }
+  function pinScroll(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return;
+    if (!approveCovered(el)) return;
+    var scroller = scrollParent(el);
+    if (!scroller) return;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { r = null; }
+    if (!r) return;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e2) { vh = 0; }
+    var bars = Math.max(0, bottomPad() - 12);
+    var hostTop = 0;
+    var hostHeight = vh;
+    var d = doc();
+    var rootEl = d && (d.scrollingElement || d.documentElement);
+    if (scroller !== rootEl && scroller.getBoundingClientRect) {
+      var host = scroller.getBoundingClientRect();
+      hostTop = host.top || 0;
+      hostHeight = host.height || vh;
+    }
+    var limit = hostTop + hostHeight - bars;
+    var target = hostTop + Math.max(8, (hostHeight - bars) / 2 - r.height / 2);
+    if (target + r.height > limit) target = Math.max(hostTop + 8, limit - r.height);
+    var delta = r.top - target;
+    if (Math.abs(delta) < 1) return;
+    if (scroller === rootEl && typeof root.scrollBy === 'function') {
+      try { root.scrollBy(0, delta); return; } catch (eScroll) {}
+    }
+    try { scroller.scrollTop = scroller.scrollTop + delta; } catch (e3) {}
+  }
+  function revealEl(el, behavior) {
+    if (!el || typeof el.scrollIntoView !== 'function') return;
+    try { el.scrollIntoView({ block: 'center', behavior: behavior }); } catch (e) {}
+  }
+  function approveCovered(btn) {
+    if (!btn || typeof btn.getBoundingClientRect !== 'function') return false;
+    var r = null;
+    try { r = btn.getBoundingClientRect(); } catch (e) { r = null; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return true;
+    var vh = 0;
+    var vw = 0;
+    try { vh = root.innerHeight || 0; vw = root.innerWidth || 0; } catch (e2) { return false; }
+    var bars = Math.max(0, bottomPad() - 12);
+    if (r.top < 0 || r.left < -0.5 || r.right > vw + 0.5 || r.bottom > vh - bars + 0.5) return true;
+    var d = doc();
+    if (!d || typeof d.elementFromPoint !== 'function') return false;
+    var hit = null;
+    try { hit = d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); } catch (e3) { hit = null; }
+    if (!hit) return true;
+    return hit !== btn && !(btn.contains && btn.contains(hit));
+  }
+  function settleAsk(box) {
+    if (!box || !box.querySelector) return;
+    var btn = null;
+    try { btn = box.querySelector('[aria-label="Approve seal"]'); } catch (e) { btn = null; }
+    if (!btn) return;
+    try { btn.style.scrollMarginBottom = bottomPad() + 'px'; } catch (e2) {}
+    if (approveCovered(btn)) revealEl(btn, 'auto');
+    if (approveCovered(btn)) pinScroll(btn);
+  }
+  function ensureAskStyle() {
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    if (d.getElementById('fl-ws-ask-style')) return;
+    var style = d.createElement('style');
+    style.id = 'fl-ws-ask-style';
+    style.textContent = '#fl-ws-asks button:focus-visible{outline:2px solid var(--accent,#7c6af7);outline-offset:2px;}#fl-ws-asks button{font-family:inherit;}';
+    var parent = d.head || d.body;
+    if (parent && parent.appendChild && parent !== style) parent.appendChild(style);
+  }
+  function placeDock(dock) {
+    var d = doc();
+    var anchor = null;
+    if (d && d.querySelector) {
+      try { anchor = d.querySelector('#chatInput') || d.querySelector('[data-thread-input]'); }
+      catch (e) { anchor = null; }
+    }
+    var row = anchor && anchor.parentNode;
+    if (row && row.parentNode && typeof row.parentNode.insertBefore === 'function') {
+      if (row.nextSibling) row.parentNode.insertBefore(dock, row.nextSibling);
+      else row.parentNode.appendChild(dock);
+      return;
+    }
+    var host = hostEl || (d && d.body);
+    if (host && host.appendChild && host !== dock) host.appendChild(dock);
+  }
+  // Bound while this file loads, before the Nursery's own Back step, so this
+  // listener runs first. A later one cannot stop that step.
+  function onSealPop(e) {
+    if (sealBackEating) {
+      sealBackEating = false;
+      if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+      return;
+    }
+    if (!sealBackArmed) return;
+    sealBackArmed = false;
+    if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+    var shown = dockAsk();
+    var hash = shown && (shown.versionHash || shown.version) || '';
+    var d = doc();
+    var box = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!hash && box && box.getAttribute) hash = box.getAttribute('data-seal-version') || '';
+    track(laterSeal(hash));
+  }
+  function armSealBack() {
+    if (sealBackEating) return;
+    if (!root.history || typeof root.history.pushState !== 'function') return;
+    var state = null;
+    try { state = root.history.state; } catch (e) { state = null; }
+    if (state && state.flSealAsk) {
+      sealBackArmed = true;
+      return;
+    }
+    try { root.history.pushState({ flSealAsk: 1 }, ''); sealBackArmed = true; }
+    catch (e2) {}
+  }
+  function disarmSealBack() {
+    if (!sealBackArmed) return;
+    var state = null;
+    try { state = root.history && root.history.state; } catch (e) { state = null; }
+    sealBackArmed = false;
+    if (!state || !state.flSealAsk) return;
+    sealBackEating = true;
+    try {
+      if (root.history && typeof root.history.back === 'function') root.history.back();
+      else sealBackEating = false;
+    } catch (e2) { sealBackEating = false; }
+  }
+  function paintBadge() {
+    var d = doc();
+    if (!d || !d.getElementById) return;
+    var n = liveAsks().length;
+    var label = n ? ('Notebook (' + n + ')') : 'Notebook';
+    ['fl-ws-open', 'fl-ws-open-tools'].forEach(function (id) {
+      var btn = d.getElementById(id);
+      if (!btn) return;
+      // Same words are not a new change. Rewriting them woke the DOM watcher forever.
+      if (btn.textContent !== label) btn.textContent = label;
+    });
+  }
+  function chatNote(line) {
+    var d = doc();
+    if (!d || !line) return;
+    var anchor = null;
+    if (d.querySelectorAll) {
+      try {
+        var nodes = d.querySelectorAll('.chat-message.assistant, .thread-body');
+        if (nodes && nodes.length) anchor = nodes[nodes.length - 1];
+      } catch (e) { anchor = null; }
+    }
+    if (!anchor) anchor = hostEl || d.body;
+    appendLines(anchor, [line]);
+  }
+  function askButton(text, kind) {
+    var el = button(text);
+    if (!el) return null;
+    el.style.minHeight = '44px';
+    el.style.fontSize = '16px';
+    el.style.fontFamily = 'inherit';
+    el.style.margin = '0';
+    el.style.boxSizing = 'border-box';
+    el.style.maxWidth = '100%';
+    if (kind === 'yes') {
+      el.style.background = 'var(--accent, #7c6af7)';
+      el.style.color = '#fff';
+      el.style.border = '2px solid transparent';
+      el.setAttribute('aria-label', 'Approve seal');
+    } else {
+      el.style.background = 'transparent';
+      el.style.color = 'inherit';
+      el.style.border = '1px solid currentColor';
+    }
+    return el;
+  }
   function appendAsk(parent, ask) {
     var d = doc();
     if (!d || !parent || !ask) return;
-    var p = d.createElement('p');
-    p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
-    p.textContent = ask.sentence;
-    var yes = button('Approve seal');
-    var no = button('Not now');
-    if (yes) yes.addEventListener('click', function () { track(approveSeal(ask.versionHash)); });
-    if (no) no.addEventListener('click', function () { track(declineSeal(ask.versionHash)); });
-    parent.appendChild(p);
-    if (yes) parent.appendChild(yes);
-    if (no) parent.appendChild(no);
+    var pageStub = { privacy: 'private', publicTitle: ask.summary || '', title: ask.summary || '' };
+    var copy = askCopy(pageStub, ask.reason || ask.why || '');
+    var box = d.createElement('div');
+    box.setAttribute('data-seal-ask', ask.state || 'asked');
+    box.setAttribute('aria-live', 'polite');
+    box.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
+    try { box.style.scrollMarginBottom = bottomPad() + 'px'; } catch (ePad) {}
+    var heading = d.createElement('p');
+    heading.id = 'fl-ws-ask-heading';
+    heading.tabIndex = -1;
+    heading.setAttribute('tabindex', '-1');
+    heading.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    heading.textContent = copy.lead;
+    var body = d.createElement('p');
+    body.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    body.textContent = copy.body;
+    var stay = d.createElement('p');
+    stay.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    stay.textContent = copy.stay;
+    box.appendChild(heading);
+    box.appendChild(body);
+    box.appendChild(stay);
+    if (copy.why) {
+      var why = d.createElement('p');
+      why.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+      why.textContent = copy.why;
+      box.appendChild(why);
+    }
+    if (ask.state === 'stale') {
+      var stale = d.createElement('p');
+      stale.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+      stale.textContent = 'stale, ask again';
+      box.appendChild(stale);
+    } else {
+      var row = d.createElement('div');
+      row.id = 'fl-ws-ask-row';
+      row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;max-width:100%;margin-top:8px;';
+      var yes = askButton('Seal it', 'yes');
+      var later = askButton('Later', 'later');
+      var no = askButton("No, don't seal", 'no');
+      if (yes) yes.addEventListener('click', function () { track(approveSeal(ask.versionHash)); });
+      if (later) later.addEventListener('click', function () { track(laterSeal(ask.versionHash)); });
+      if (no) no.addEventListener('click', function () { track(declineSeal(ask.versionHash)); });
+      if (yes) row.appendChild(yes);
+      if (later) row.appendChild(later);
+      if (no) row.appendChild(no);
+      box.appendChild(row);
+    }
+    var details = d.createElement('details');
+    details.style.cssText = 'margin-top:8px;max-width:100%;';
+    var sum = d.createElement('summary');
+    sum.textContent = 'Details for checking (version ' + shortHash(ask.versionHash) + ')';
+    var full = d.createElement('p');
+    full.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    full.textContent = String(ask.versionHash || '');
+    details.appendChild(sum);
+    details.appendChild(full);
+    box.appendChild(details);
+    box.addEventListener('keydown', function (e) {
+      var key = e && e.key;
+      if (key !== 'Escape' && key !== 'Esc') return;
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+      track(laterSeal(ask.versionHash));
+    });
+    parent.appendChild(box);
+    bindSealEscape();
+    if (!ask._seen) {
+      ask._seen = true;
+      if (heading && typeof heading.focus === 'function') {
+        try { heading.focus({ preventScroll: true }); }
+        catch (eFocus) { try { heading.focus(); } catch (e2) {} }
+      }
+      revealEl(box, motionReduced() ? 'auto' : 'smooth');
+    }
+    // Keep the ask's Back step above the Nursery's, even when the ask is drawn again.
+    armSealBack();
+    // A later draw of the same ask still has to land in view. The first scroll does not survive a rebuild.
+    settleAsk(box);
+    try { root.requestAnimationFrame(function () { settleAsk(box); }); } catch (eFrame) {}
   }
   function appendHandoff(parent, ask) {
     var d = doc();
     if (!d || !parent || !ask) return;
+    if (root.__flSealAskHolding) return;
     var p = d.createElement('p');
     p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
     p.textContent = ask.sentence;
@@ -1324,23 +1840,42 @@
   function ensureAskDock() {
     var d = doc();
     if (!d || !d.createElement || !d.getElementById) return;
+    ensureAskStyle();
     var panelOpen = d.getElementById('fl-ws-panel');
     var dock = d.getElementById('fl-ws-asks');
-    var pending = sealAsks.length || handoffAsks.length || handoffRefusals.length;
-    if (panelOpen || !pending) {
+    var current = dockAsk();
+    var showSeal = false;
+    if (current && (current.state === 'asked' || current.state === 'stale')) showSeal = true;
+    else if (current && current.state === 'later') showSeal = !!(sealDockOpen || panelOpen);
+    var handoffPending = handoffAsks.length || handoffRefusals.length;
+    if (!showSeal && (panelOpen || !handoffPending)) {
       if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
+      holdOthers(false);
+      paintBadge();
       return;
     }
     if (!dock) {
       dock = d.createElement('div');
       dock.id = 'fl-ws-asks';
-      dock.style.cssText = 'max-width:100%;overflow:hidden;';
-      var host = hostEl || d.body;
-      if (host) host.appendChild(dock);
+      dock.style.cssText = 'display:block;width:100%;max-width:100%;overflow:hidden;box-sizing:border-box;';
     }
+    try {
+      var pad = bottomPad() + 'px';
+      dock.style.scrollMarginBottom = pad;
+      // scroll-margin does not add room. This margin does, so the button can sit above the bars.
+      dock.style.marginBottom = pad;
+    } catch (eMargin) {}
+    placeDock(dock);
     clearNode(dock);
-    sealAsks.forEach(function (ask) { appendAsk(dock, ask); });
-    appendHandoffNotes(dock);
+    if (showSeal && current) {
+      dock.setAttribute('data-seal-version', current.versionHash || '');
+      appendAsk(dock, current);
+      holdOthers(current.state === 'asked' || current.state === 'later');
+    } else {
+      holdOthers(false);
+      appendHandoffNotes(dock);
+    }
+    paintBadge();
   }
   function appendReceipt(parent, row) {
     var d = doc();
@@ -1415,11 +1950,28 @@
       chain = chain.then(function () {
         return applyOp(op).then(function (res) {
           var line = receiptFor(op, res);
-          if (line) lines.push(line);
+          if (line) lines.push({
+            text: line,
+            pageId: res && res.page ? res.page.id : (op.page || op.pageId || op.id || ''),
+            hash: res && res.hash ? res.hash : ''
+          });
         });
       });
     });
-    return chain.then(function () { return lines; });
+    return chain.then(function () {
+      var fix = Promise.resolve();
+      lines.forEach(function (line) {
+        fix = fix.then(function () {
+          if (!line || !line.pageId || !line.text || line.text.indexOf('Wrote to ') !== 0) return null;
+          return getPage(line.pageId).then(function (page) {
+            if (!page || page.privacy !== 'private') return null;
+            line.text = 'Wrote to "' + personTitle(page) + '" (version ' + shortHash(line.hash || page.head) + ')';
+            return null;
+          });
+        });
+      });
+      return fix.then(function () { return lines; });
+    });
   }
   function doc() {
     try { return root.document || null; }
@@ -1443,10 +1995,16 @@
     if (!d || !anchor || !lines || !lines.length) return;
     var parent = anchor.parentNode || anchor;
     lines.forEach(function (line) {
+      var text = typeof line === 'string' ? line : (line && line.text);
+      if (!text) return;
       var p = d.createElement('p');
       p.className = 'fl-ws-receipt';
       p.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
-      p.textContent = line;
+      p.textContent = text;
+      if (line && typeof line === 'object') {
+        if (line.pageId) p.setAttribute('data-ws-page', String(line.pageId));
+        if (line.hash) p.setAttribute('data-ws-hash', String(line.hash));
+      }
       try { parent.appendChild(p); } catch (e) {}
     });
   }
@@ -1672,7 +2230,10 @@
     var job = applyAll(parsed).then(function (lines) {
       if (heldLines.length) lines = heldLines.concat(lines);
       appendLines(anchor, lines);
-      return afterChange().then(function () { return lines; });
+      var notes = lines.map(function (line) {
+        return typeof line === 'string' ? line : (line && line.text) || '';
+      }).filter(Boolean);
+      return afterChange().then(function () { return notes; });
     });
     track(job);
     return { visible: parsed.visible, receipts: [], stored: true, done: job };
@@ -1690,13 +2251,183 @@
     }
     return seen;
   }
+  function wrotePublic(page, hash) {
+    return 'Wrote to "' + personTitle(page) + '" (version ' + shortHash(hash || (page && page.head) || '') + ')';
+  }
+  function replaceWrotePrefix(text, realTitle, publicTitle) {
+    if (!text || !realTitle) return text;
+    var from = 'Wrote to ' + realTitle + ' (version ';
+    var to = 'Wrote to "' + publicTitle + '" (version ';
+    if (String(text).indexOf(from) === -1) return text;
+    return String(text).split(from).join(to);
+  }
+  function walkPageNodes(node, pageId, out) {
+    if (!node || !out) return;
+    var id = '';
+    try { id = node.getAttribute ? (node.getAttribute('data-ws-page') || '') : ''; }
+    catch (e) { id = ''; }
+    if (id && id === String(pageId)) out.push(node);
+    var kids = node.children;
+    if (!kids || !kids.length) return;
+    for (var i = 0; i < kids.length; i++) walkPageNodes(kids[i], pageId, out);
+  }
+  function rewriteValue(value, realTitle, publicTitle) {
+    var changed = false;
+    if (!value || typeof value !== 'object') return false;
+    if (Array.isArray(value)) {
+      for (var i = 0; i < value.length; i++) {
+        if (typeof value[i] === 'string') {
+          var next = replaceWrotePrefix(value[i], realTitle, publicTitle);
+          if (next !== value[i]) { value[i] = next; changed = true; }
+        } else if (rewriteValue(value[i], realTitle, publicTitle)) changed = true;
+      }
+      return changed;
+    }
+    Object.keys(value).forEach(function (k) {
+      if (typeof value[k] === 'string') {
+        var next = replaceWrotePrefix(value[k], realTitle, publicTitle);
+        if (next !== value[k]) { value[k] = next; changed = true; }
+      } else if (rewriteValue(value[k], realTitle, publicTitle)) changed = true;
+    });
+    return changed;
+  }
+  function rewriteLogKey(key, realTitle, publicTitle) {
+    var raw = lsGet(key);
+    var from = 'Wrote to ' + realTitle + ' (version ';
+    if (!raw || raw.indexOf(from) === -1) return;
+    try {
+      var parsed = JSON.parse(raw);
+      if (rewriteValue(parsed, realTitle, publicTitle)) lsSet(key, JSON.stringify(parsed));
+    } catch (e) {}
+  }
+  function rewriteDbMessages(realTitle, publicTitle) {
+    var database = null;
+    try { database = root.state && root.state.db; } catch (e) { database = null; }
+    if (!database || typeof database.transaction !== 'function' || !database.objectStoreNames) return;
+    var has = false;
+    try { has = !!(database.objectStoreNames.contains && database.objectStoreNames.contains('messages')); }
+    catch (e2) { has = false; }
+    if (!has) return;
+    try {
+      var tx = database.transaction('messages', 'readwrite');
+      var store = tx.objectStore('messages');
+      var req = store.getAll();
+      if (!req) return;
+      req.onsuccess = function () {
+        var rows = req.result || [];
+        rows.forEach(function (row) {
+          if (!row || typeof row.content !== 'string') return;
+          var next = replaceWrotePrefix(row.content, realTitle, publicTitle);
+          if (next === row.content) return;
+          row.content = next;
+          try { store.put(row); } catch (e3) {}
+        });
+      };
+    } catch (e4) {}
+  }
+  function redactPageTitle(page) {
+    if (!page || page.privacy !== 'private' || !page.id) return;
+    var real = page.title ? String(page.title) : '';
+    var pub = personTitle(page);
+    var d = doc();
+    var nodes = [];
+    if (d && d.body) walkPageNodes(d.body, page.id, nodes);
+    if (d && d.documentElement && d.documentElement !== d.body) walkPageNodes(d.documentElement, page.id, nodes);
+    nodes.forEach(function (node) {
+      var text = '';
+      try { text = node.textContent || ''; } catch (e) { text = ''; }
+      if (text.indexOf('Wrote to ') === 0) {
+        var hash = '';
+        try { hash = node.getAttribute ? (node.getAttribute('data-ws-hash') || '') : ''; }
+        catch (e2) { hash = ''; }
+        node.textContent = wrotePublic(page, hash || page.head);
+        return;
+      }
+      if (!real) return;
+      var next = replaceWrotePrefix(text, real, pub);
+      if (next !== text) node.textContent = next;
+    });
+    if (!real) return;
+    try {
+      var hist = root.state && root.state.chatHistory;
+      if (Array.isArray(hist)) {
+        hist.forEach(function (m) {
+          if (!m) return;
+          if (typeof m.content === 'string') m.content = replaceWrotePrefix(m.content, real, pub);
+          if (typeof m.text === 'string') m.text = replaceWrotePrefix(m.text, real, pub);
+        });
+      }
+    } catch (e3) {}
+    rewriteLogKey('fl_alpha_thread_history', real, pub);
+    rewriteDbMessages(real, pub);
+  }
+  function appendEarlier(d, block, pageId) {
+    if (!d || !block || !pageId) return;
+    var notes = readSealNotes().filter(function (n) {
+      return n && String(n.pageId) === String(pageId) && n.line;
+    });
+    if (!notes.length) return;
+    var details = d.createElement('details');
+    details.style.cssText = 'margin-top:8px;max-width:100%;';
+    var sum = d.createElement('summary');
+    sum.textContent = 'Earlier answers';
+    details.appendChild(sum);
+    notes.forEach(function (n) {
+      var p = d.createElement('p');
+      p.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;color:#8a8a8a;';
+      p.textContent = String(n.line);
+      details.appendChild(p);
+    });
+    block.appendChild(details);
+  }
+  function restoreSealAsks() {
+    if (sealRestored || !isOn()) return Promise.resolve();
+    sealRestored = true;
+    return allOf('sealAsks').then(function (rows) {
+      var chain = Promise.resolve();
+      (rows || []).forEach(function (row) {
+        if (!row || !row.pageId) return;
+        chain = chain.then(function () {
+          return getPage(row.pageId).then(function (page) {
+            var ask = {
+              pageId: String(row.pageId),
+              version: String(row.version || ''),
+              versionHash: String(row.version || ''),
+              summary: row.summary || '',
+              reason: row.reason || '',
+              why: row.reason || '',
+              askedAt: row.askedAt || 0,
+              state: row.state || 'asked'
+            };
+            if ((ask.state === 'asked' || ask.state === 'later') && page && page.head && ask.versionHash && page.head !== ask.versionHash) {
+              ask.state = 'stale';
+              putSealAsk(ask);
+            }
+            rememberAsk(ask);
+            if (ask.state === 'asked' || ask.state === 'stale') sealDockOpen = true;
+          });
+        });
+      });
+      return chain.then(function () {
+        ensureAskDock();
+        paintBadge();
+      });
+    });
+  }
+  function sealState(pageId) {
+    var ask = findAskByPage(pageId);
+    if (!ask || !ask.state) return 'unsealed';
+    return ask.state;
+  }
   function accept() {
     memoryOn = true;
     lsSet('fl_ws', 'yes');
     try { if (root.sessionStorage) root.sessionStorage.removeItem('fl_ws_later'); } catch (e) {}
     hideConsent();
     ensureButton();
-    return track(refreshWake().then(function () { return offerRestore(); }));
+    return track(refreshWake().then(function () {
+      return restoreSealAsks().then(function () { return offerRestore(); });
+    }));
   }
   function holdLater() {
     memoryOn = false;
@@ -1728,12 +2459,8 @@
         var rows = pair[1] || [];
         pages.sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
         function footer() {
-          declinedLines.forEach(function (line) {
-            var note = d.createElement('p');
-            note.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
-            note.textContent = line;
-            panel.appendChild(note);
-          });
+          var prior = d.getElementById('fl-ws-honest');
+          if (prior && prior.parentNode) prior.parentNode.removeChild(prior);
           appendHandoffNotes(panel);
           var asideBtn = button(shelfIsAside(mine) ? 'Bring this shelf back' : 'Set this shelf aside');
           if (asideBtn) {
@@ -1746,6 +2473,13 @@
           foot.style.cssText = 'margin:12px 0 0;max-width:100%;overflow-wrap:anywhere;';
           foot.textContent = HONEST;
           panel.appendChild(foot);
+        }
+        if (liveAsks().length) {
+          var ptr = d.createElement('p');
+          ptr.id = 'fl-ws-ask-pointer';
+          ptr.style.cssText = 'margin:0 0 8px;max-width:100%;overflow-wrap:anywhere;';
+          ptr.textContent = 'Your answer is waiting above.';
+          panel.appendChild(ptr);
         }
         if (shelfIsAside(mine)) {
           var kept = d.createElement('p');
@@ -1813,7 +2547,29 @@
                   if (writeBtn) block.appendChild(writeBtn);
                   if (pinBtn) block.appendChild(pinBtn);
                 }
-                sealAsks.forEach(function (ask) { if (ask.pageId === page.id) appendAsk(block, ask); });
+                var ask = findAskByPage(page.id);
+                if (ask && (ask.state === 'asked' || ask.state === 'later') && page.head && ask.versionHash && ask.versionHash !== page.head) {
+                  ask.state = 'stale';
+                  putSealAsk(ask);
+                }
+                if (ver && ver.sealed) {
+                  var nowLine = d.createElement('p');
+                  nowLine.setAttribute('data-seal-current', 'sealed');
+                  nowLine.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  nowLine.textContent = 'Sealed';
+                  block.appendChild(nowLine);
+                  appendEarlier(d, block, page.id);
+                } else if (ask && ask.state === 'declined') {
+                  var declined = d.createElement('p');
+                  declined.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  declined.textContent = 'Declined the seal.';
+                  block.appendChild(declined);
+                } else if (ask && ask.state === 'stale') {
+                  var staleNote = d.createElement('p');
+                  staleNote.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  staleNote.textContent = 'stale, ask again';
+                  block.appendChild(staleNote);
+                }
                 rows.forEach(function (row) { if (row && row.pageId === page.id) appendReceipt(block, row); });
                 panel.appendChild(block);
               });
@@ -1829,30 +2585,53 @@
     var d = doc();
     if (!d || !d.createElement) return;
     var existing = d.getElementById('fl-ws-panel');
-    if (existing) { removePanel(); return; }
+    if (existing) { removePanel(); ensureAskDock(); return; }
+    if (liveAsks().length) sealDockOpen = true;
     var panel = d.createElement('div');
     panel.id = 'fl-ws-panel';
     panel.style.maxWidth = '100%';
     panel.style.overflow = 'hidden';
     var parent = hostEl || (d.getElementById && d.getElementById('fl-clay-dock')) || d.body;
     if (parent) parent.appendChild(panel);
-    track(renderPanel(panel));
+    track(renderPanel(panel).then(function () { ensureAskDock(); }));
   }
   function ensureButton() {
     var d = doc();
     if (!d || !d.createElement || !d.getElementById) return;
-    if (d.getElementById('fl-ws-open')) return;
+    if (!d.getElementById('fl-ws-open')) {
+      var btn = button('Notebook');
+      if (btn) {
+        btn.id = 'fl-ws-open';
+        btn.addEventListener('click', function () {
+          if (isOn()) { openPanel(); return; }
+          showConsent(btn);
+        });
+        var toggle = root.__clayToggle;
+        if (toggle && toggle.parentNode) toggle.parentNode.insertBefore(btn, toggle.nextSibling);
+        else if (hostEl) hostEl.appendChild(btn);
+        else if (d.body) d.body.appendChild(btn);
+      }
+    }
+    ensureToolsNotebook();
+    paintBadge();
+  }
+  function ensureToolsNotebook() {
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    if (d.getElementById('fl-ws-open-tools')) return;
+    var home = d.getElementById('chatOverflowPopup');
+    if (!home && d.querySelector) {
+      try { home = d.querySelector('[data-thread-tools]'); } catch (e) { home = null; }
+    }
+    if (!home) return;
     var btn = button('Notebook');
     if (!btn) return;
-    btn.id = 'fl-ws-open';
+    btn.id = 'fl-ws-open-tools';
     btn.addEventListener('click', function () {
       if (isOn()) { openPanel(); return; }
       showConsent(btn);
     });
-    var toggle = root.__clayToggle;
-    if (toggle && toggle.parentNode) toggle.parentNode.insertBefore(btn, toggle.nextSibling);
-    else if (hostEl) hostEl.appendChild(btn);
-    else if (d.body) d.body.appendChild(btn);
+    home.appendChild(btn);
   }
   function hideRestoreCard() {
     var d = doc();
@@ -1934,8 +2713,10 @@
       hostEl = face || nursery || d.getElementById('fl-clay-dock') || null;
     }
     ensureButton();
+    if (root.__flSealAskHolding) holdDeferButtons(true);
     if (isOn()) {
       track(refreshWake());
+      track(restoreSealAsks());
       if (!restoreChecked) {
         restoreChecked = true;
         track(offerRestore());
@@ -2017,6 +2798,12 @@
     declinedLines = [];
     handoffAsks = [];
     handoffRefusals = [];
+    sealDockOpen = false;
+    sealBackArmed = false;
+    sealBackEating = false;
+    sealRestored = false;
+    heldDefers = [];
+    try { if (root.localStorage && root.localStorage.removeItem) root.localStorage.removeItem(SEAL_NOTE_KEY); } catch (eNote) {}
     mirrorHold = 0;
     restoreChecked = false;
     restoreLater = {};
@@ -2025,8 +2812,8 @@
   function tokensOf(s) { return Math.ceil(String(s || '').length / 4); }
 
   // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
-  // The notebook leaves with the export. A private page stays on this device.
-  var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on the device that made the export.';
+  // The notebook leaves with the export. A private page stays on this browser.
+  var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on this browser, on the device that made the export.';
   var BRANCH_NOTE = 'Parent was not in this notebook, so this version came in as its own branch.';
 
   function countWord(n, one, many) {
@@ -2034,7 +2821,7 @@
     return String(n) + ' ' + (n === 1 ? one : many);
   }
   function notebookLine(total, priv) {
-    return 'Notebook: ' + countWord(total, 'page', 'pages') + ', ' + countWord(priv, 'private page', 'private pages') + ' stayed on this device.';
+    return 'Notebook: ' + countWord(total, 'page', 'pages') + ', ' + countWord(priv, 'private page', 'private pages') + ' stayed on this browser.';
   }
   function privacyHidden(value) {
     return value === 'private' || value === 'mind-private';
@@ -2531,6 +3318,8 @@
     DESKTOP: 'v-workspace-desktop-v0.1',
     HANDOFF: 'v-workspace-handoff-v0.1',
     TREE_HANDOFF: 'v-tree-workspace-handoff-v0.1',
+    SEAL_HEAL: 'v-seal-ask-heal-v0.1',
+    SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,
     open: open,
@@ -2573,6 +3362,10 @@
     shelfIsAside: shelfIsAside,
     personSummary: personSummary,
     approveSeal: approveSeal,
+    askSeal: askSeal,
+    laterSeal: laterSeal,
+    declineSeal: declineSeal,
+    sealState: sealState,
     verifyReceipt: verifyReceipt,
     receipts: receipts,
     exportSection: exportSection,
@@ -2586,6 +3379,10 @@
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FLWorkspace = api;
+  if (typeof root.addEventListener === 'function') {
+    root.addEventListener('popstate', onSealPop, true);
+    root.__flSealBackBound = true;
+  }
   if (root.document && root.document.addEventListener) {
     if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', boot);
     else boot();

@@ -1,4 +1,5 @@
 // particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
+// v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -488,6 +489,32 @@
   function hidden() {
     try { return !!(root.document && root.document.hidden); } catch (e) { return false; }
   }
+  function sealFillSpan() {
+    var minX = 0;
+    var maxX = 0;
+    var minY = 0;
+    var maxY = 0;
+    var n = 0;
+    var i;
+    for (i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (!p) continue;
+      var x = typeof p.tx === 'number' ? p.tx : p.x;
+      var y = typeof p.ty === 'number' ? p.ty : p.y;
+      if (typeof x !== 'number' || typeof y !== 'number') continue;
+      if (!n) { minX = maxX = x; minY = maxY = y; }
+      else {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+      n += 1;
+    }
+    if (!n) return 0;
+    var span = Math.max(maxX - minX, maxY - minY);
+    return span > 0 ? span : 0;
+  }
   function draw() {
     if (!canvas || !isOn()) return;
     var ctx = canvas.getContext && canvas.getContext('2d');
@@ -507,6 +534,12 @@
     ctx.save();
     ctx.translate(w / 2, h / 2);
     ctx.scale(fit, fit);
+    // v-seal-ask-heal-v0.1: bounds use about 80% of this canvas. The breath below stays.
+    var span = sealFillSpan();
+    if (span > 0 && fit) {
+      var want = (0.8 * Math.min(w, h)) / span;
+      ctx.scale(want / fit, want / fit);
+    }
     if (currentGlow != null) ctx.globalAlpha = 0.55 + currentGlow * 0.45;
     if (!still) ctx.scale((0.92 + breath * 0.08) * beat, (0.92 + breath * 0.08) * beat);
     var i;
@@ -700,6 +733,7 @@
       sketch(choice);
       showQuiet('');
       placeCanvas();
+      revealCanvas();
     } else if (answeringHug) {
       hugArmed = false;
       hugSpentKey = key;
@@ -715,6 +749,7 @@
       applyChoice(choice, label);
       showQuiet(pillOpen() ? WORDS.quiet : '');
       placeCanvas();
+      revealCanvas();
     }
     return { visible: parsed.visible, choice: choice, label: label, autoSend: false };
   }
@@ -915,6 +950,23 @@
     fitCanvas();
     syncDock();
   }
+  function revealCanvas() {
+    if (!canvas || typeof canvas.scrollIntoView !== 'function') return;
+    var behavior = reduced() ? 'auto' : 'smooth';
+    try { canvas.scrollIntoView({ block: 'nearest', behavior: behavior }); }
+    catch (e) {}
+  }
+  function noteSealHold(on) {
+    var offer = root.__clayOffer;
+    if (!offer) return;
+    var kids = offer.children || [];
+    var i;
+    for (i = 0; i < kids.length; i++) {
+      var el = kids[i];
+      if (!el || el.textContent !== WORDS.notNow) continue;
+      if (el.style) el.style.display = on ? 'none' : '';
+    }
+  }
   function ensureCanvas() {
     if (!isOn() || !root.document || !root.document.createElement) return null;
     var fresh = !canvas;
@@ -925,6 +977,9 @@
       canvas.height = 192;
       canvas.style.width = 'min(100%, 320px)';
       canvas.style.height = 'clamp(180px, 40vw, 260px)';
+      // v-seal-ask-heal-v0.1: the column width, and never taller than the chat view at 200%.
+      canvas.style.width = '100%';
+      canvas.style.height = 'min(320px, 45vh)';
       canvas.style.maxWidth = '100%';
       canvas.style.display = 'block';
       canvas.style.boxSizing = 'border-box';
@@ -1025,6 +1080,7 @@
       offer.appendChild(later);
       dock.appendChild(offer);
       root.__clayOffer = offer;
+      if (root.__flSealAskHolding) noteSealHold(true);
     }
     currentForm = currentForm || homeForm();
     if (isOn()) ensureCanvas();
@@ -1184,6 +1240,7 @@
       if (!here.getElementById('fl-clay-pill')) { ensurePill(); return; }
       var panel = here.getElementById('fl-clay-pill-panel');
       var toggle = here.getElementById('fl-clay-toggle') || root.__clayToggle;
+      // v-seal-ask-heal-v0.1: #fl-ws-open-tools stays outside this drawer.
       var need = [toggle, here.getElementById('fl-ws-open'), here.getElementById('fl-ws-view-open')];
       var n;
       for (n = 0; n < need.length; n++) {
@@ -1283,6 +1340,8 @@
       return n;
     },
     placeCanvas: placeCanvas,
+    revealCanvas: revealCanvas,
+    noteSealHold: noteSealHold,
     ensurePill: ensurePill,
     pillOpen: pillOpen,
     setPillOpen: setPillOpen,

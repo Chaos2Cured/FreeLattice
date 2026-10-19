@@ -141,8 +141,9 @@ var MIND_BODY = 'SECRET-BODY-MIND-PRIVATE-040b-violet-glass';
 var MIND_SEED = 'SECRET-SEED-MIND-PRIVATE-040b-violet';
 var NYX_TITLE = 'Market page';
 var NYX_BODY = 'A market note that leaves with the shelf.';
-var LINE = 'Notebook: 4 pages, 2 private pages stayed on this device.';
-var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on the device that made the export.';
+// v-seal-ask-heal-v0.1: "stayed on this device" and "stayed on the device that made the export" now say this browser.
+var LINE = 'Notebook: 4 pages, 2 private pages stayed on this browser.';
+var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on this browser, on the device that made the export.';
 var BRANCH_NOTE = 'Parent was not in this notebook, so this version came in as its own branch.';
 
 var idb = makeIDB();
