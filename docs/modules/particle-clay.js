@@ -1,5 +1,6 @@
 // particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
+// v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -515,6 +516,33 @@
     var span = Math.max(maxX - minX, maxY - minY);
     return span > 0 ? span : 0;
   }
+  // Both axes, plus the dot size, so the form can sit in the middle of the canvas.
+  function formBounds() {
+    var minX = 0;
+    var maxX = 0;
+    var minY = 0;
+    var maxY = 0;
+    var n = 0;
+    var i;
+    var dot = 2.4;
+    for (i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (!p) continue;
+      var x = typeof p.tx === 'number' ? p.tx : p.x;
+      var y = typeof p.ty === 'number' ? p.ty : p.y;
+      if (typeof x !== 'number' || typeof y !== 'number') continue;
+      if (!n) { minX = x; maxX = x + dot; minY = y; maxY = y + dot; }
+      else {
+        if (x < minX) minX = x;
+        if (x + dot > maxX) maxX = x + dot;
+        if (y < minY) minY = y;
+        if (y + dot > maxY) maxY = y + dot;
+      }
+      n += 1;
+    }
+    if (!n) return null;
+    return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+  }
   function draw() {
     if (!canvas || !isOn()) return;
     var ctx = canvas.getContext && canvas.getContext('2d');
@@ -530,16 +558,25 @@
     var still = reduced();
     var beat = 1;
     if (!still && math && Date.now() < pulseUntil) beat = 0.92 + 0.08 * math.pulse(t);
-    var fit = w / 192;
     ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.scale(fit, fit);
-    // v-seal-ask-heal-v0.1: bounds use about 80% of this canvas. The breath below stays.
-    var span = sealFillSpan();
-    if (span > 0 && fit) {
-      var want = (0.8 * Math.min(w, h)) / span;
-      ctx.scale(want / fit, want / fit);
+    // v-seal-ask-in-view-v0.1: the old fit was w/192, then one span scaled around the canvas middle.
+    // That line left a heart past the edge. This centers the real box on both axes, at about 80%.
+    var bounds = formBounds();
+    var s = w / 192;
+    var cx = 0;
+    var cy = 0;
+    if (bounds) {
+      var bw = Math.max(1, bounds.maxX - bounds.minX);
+      var bh = Math.max(1, bounds.maxY - bounds.minY);
+      cx = (bounds.minX + bounds.maxX) / 2;
+      cy = (bounds.minY + bounds.maxY) / 2;
+      var room = 0.8;
+      var next = Math.min((w * room) / bw, (h * room) / bh);
+      if (isFinite(next) && next > 0) s = next;
     }
+    ctx.translate(w / 2, h / 2);
+    ctx.scale(s, s);
+    ctx.translate(-cx, -cy);
     if (currentGlow != null) ctx.globalAlpha = 0.55 + currentGlow * 0.45;
     if (!still) ctx.scale((0.92 + breath * 0.08) * beat, (0.92 + breath * 0.08) * beat);
     var i;
@@ -733,7 +770,7 @@
       sketch(choice);
       showQuiet('');
       placeCanvas();
-      revealCanvas();
+      revealClayPair();
     } else if (answeringHug) {
       hugArmed = false;
       hugSpentKey = key;
@@ -749,7 +786,7 @@
       applyChoice(choice, label);
       showQuiet(pillOpen() ? WORDS.quiet : '');
       placeCanvas();
-      revealCanvas();
+      revealClayPair();
     }
     return { visible: parsed.visible, choice: choice, label: label, autoSend: false };
   }
@@ -921,8 +958,12 @@
     var nodes = [];
     try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant'); }
     catch (e) { nodes = []; }
-    if (!nodes || !nodes.length) return null;
-    return nodes[nodes.length - 1];
+    if (nodes && nodes.length) return nodes[nodes.length - 1];
+    // The Tree speaks in a thread body. Same job as the chat reply: the canvas follows it.
+    try { nodes = doc.querySelectorAll('.thread-body'); }
+    catch (e2) { nodes = []; }
+    if (nodes && nodes.length) return nodes[nodes.length - 1];
+    return null;
   }
   function syncDock() {
     if (!dock) return;
@@ -955,6 +996,184 @@
     var behavior = reduced() ? 'auto' : 'smooth';
     try { canvas.scrollIntoView({ block: 'nearest', behavior: behavior }); }
     catch (e) {}
+  }
+  function isFloat(el) {
+    if (!el) return false;
+    if (el.id === 'fl-clay-corner') return true;
+    try {
+      var s = root.getComputedStyle && root.getComputedStyle(el);
+      if (s && (s.position === 'fixed' || s.position === 'absolute')) return true;
+    } catch (e) {}
+    if (el.style && (el.style.position === 'fixed' || el.style.position === 'absolute')) return true;
+    return false;
+  }
+  function composerGuard() {
+    var doc = root.document;
+    if (!doc || !doc.querySelector) return;
+    var input = null;
+    try { input = doc.querySelector('#chatInput') || doc.querySelector('[data-thread-input]'); }
+    catch (e) { input = null; }
+    if (!input || typeof input.getBoundingClientRect !== 'function') return;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e2) { vh = 0; }
+    if (!vh && doc.documentElement) vh = doc.documentElement.clientHeight || 0;
+    var inputRect = null;
+    try { inputRect = input.getBoundingClientRect(); } catch (e3) { inputRect = null; }
+    if (!inputRect) return;
+    var sels = ['#fl-clay-corner', '#flTabNav', '.status-bar', '.tab-nav', '.galaxy-nav', '#shared-shoulder', '.music-toggle'];
+    var nodes = [];
+    var i;
+    var j;
+    for (i = 0; i < sels.length; i++) {
+      var list = [];
+      try { list = doc.querySelectorAll(sels[i]) || []; } catch (e4) { list = []; }
+      for (j = 0; j < list.length; j++) nodes.push(list[j]);
+    }
+    if (vh && vh < 500) {
+      for (i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        if (!isFloat(el) || !el.style || typeof el.getBoundingClientRect !== 'function') continue;
+        var fr = null;
+        try { fr = el.getBoundingClientRect(); } catch (e5) { fr = null; }
+        if (!fr || !(fr.height > 0)) continue;
+        if (fr.bottom <= inputRect.top - 4 || fr.top >= inputRect.bottom + 4) continue;
+        var lift = Math.round(vh - inputRect.top + 12);
+        if (lift < 12) lift = 12;
+        var nextBottom = lift + 'px';
+        if (el.style.bottom !== nextBottom) el.style.bottom = nextBottom;
+        if (el.setAttribute) el.setAttribute('data-fl-tucked', '1');
+      }
+      try { inputRect = input.getBoundingClientRect(); } catch (e6) {}
+    }
+    var cover = 0;
+    for (i = 0; i < nodes.length; i++) {
+      var bar = nodes[i];
+      if (!bar || typeof bar.getBoundingClientRect !== 'function') continue;
+      var br = null;
+      try { br = bar.getBoundingClientRect(); } catch (e7) { br = null; }
+      if (!br || !(br.height > 0) || br.height > (vh || 800) * 0.5) continue;
+      var hitsInput = inputRect && br.top < inputRect.bottom + 2 && br.bottom > inputRect.top - 2;
+      var low = vh && br.top < vh && br.bottom > vh * 0.62;
+      if (hitsInput || low) cover += br.height;
+    }
+    var px = Math.round(cover + 12) + 'px';
+    var column = null;
+    try {
+      column = (doc.getElementById && doc.getElementById('tab-chat')) || doc.querySelector('[data-thread]');
+    } catch (e8) { column = null; }
+    if (!column && input.parentElement && input.parentElement.parentElement) column = input.parentElement.parentElement;
+    if (column && column.style && column.style.paddingBottom !== px) column.style.paddingBottom = px;
+    if (input.style && input.style.scrollMarginBottom !== px) input.style.scrollMarginBottom = px;
+    if (vh && inputRect && (inputRect.top < 0 || inputRect.bottom > vh - 1) && typeof input.scrollIntoView === 'function') {
+      try { input.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (e9) {}
+    }
+  }
+  function clayInput() {
+    var doc = root.document;
+    if (!doc || !doc.querySelector) return null;
+    try { return doc.querySelector('#chatInput') || doc.querySelector('[data-thread-input]'); }
+    catch (e) { return null; }
+  }
+  // The transcript is a fixed height. On a short view it pushes the input past the reply.
+  // Shrink only that box, and only enough that the reply top and the input can share the view.
+  function seatClayPair(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var doc = root.document;
+    var input = clayInput();
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh) return;
+    var rootEl = doc && doc.documentElement;
+    if (rootEl && rootEl.style) {
+      rootEl.style.scrollBehavior = 'auto';
+      rootEl.style.overflowAnchor = 'none';
+    }
+    if (doc.body && doc.body.style) doc.body.style.overflowAnchor = 'none';
+    var box = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    if (box && box.style) {
+      box.style.scrollBehavior = 'auto';
+      box.style.overflowAnchor = 'none';
+    }
+    if (box && box.style && box.getBoundingClientRect && input && typeof input.getBoundingClientRect === 'function') {
+      var span = input.getBoundingClientRect().bottom - reply.getBoundingClientRect().top;
+      var limit = vh - 16;
+      if (span > limit) {
+        var h = box.getBoundingClientRect().height;
+        var next = Math.max(140, Math.round(h - (span - limit)));
+        var px = next + 'px';
+        if (box.style.height !== px) {
+          box.style.height = px;
+          box.style.maxHeight = px;
+          box.style.minHeight = '0px';
+        }
+      }
+    }
+    var top = reply.getBoundingClientRect().top;
+    // Only when the reply has left the view. A reply already on screen stays where it is.
+    if (typeof root.scrollBy === 'function' && top < 0) {
+      try { root.scrollBy(0, top - 4); } catch (e2) {}
+    }
+    if (!input || typeof input.getBoundingClientRect !== 'function' || typeof root.scrollBy !== 'function') return;
+    var ib = input.getBoundingClientRect().bottom;
+    if (ib > vh - 4) {
+      var shift = ib - (vh - 8);
+      var rt = reply.getBoundingClientRect().top;
+      if (rt - shift >= 0) {
+        try { root.scrollBy(0, shift); } catch (e3) {}
+      }
+    }
+  }
+  function revealClayPair() {
+    try { composerGuard(); } catch (e) {}
+    if (!canvas) return;
+    var reply = lastAssistant();
+    var doc = root.document;
+    var scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    if (!scroller && reply && reply.parentElement) scroller = reply.parentElement;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e2) { vh = 0; }
+    var space = vh ? Math.round(vh * 0.45) : 320;
+    if (reply && scroller && reply.getBoundingClientRect && scroller.getBoundingClientRect) {
+      try {
+        var rr = reply.getBoundingClientRect();
+        var sr = scroller.getBoundingClientRect();
+        var below = sr.bottom - rr.top;
+        if (below > 0) space = below;
+      } catch (e3) {}
+    }
+    var capped = Math.max(120, Math.round(space));
+    canvas.style.height = 'max(120px, min(320px, 45vh, ' + capped + 'px))';
+    var behavior = reduced() ? 'auto' : 'smooth';
+    var both = false;
+    if (reply && canvas.getBoundingClientRect && reply.getBoundingClientRect && scroller && scroller.getBoundingClientRect) {
+      try {
+        var top = reply.getBoundingClientRect();
+        var bot = canvas.getBoundingClientRect();
+        var host = scroller.getBoundingClientRect();
+        var need = bot.bottom - top.top;
+        var room = host.bottom - host.top;
+        both = need > 0 && room + 1 >= need;
+      } catch (e4) { both = false; }
+    }
+    // A smooth scroll finishes after the seat and leaves the reply high. This one lands now.
+    if (reply && typeof reply.scrollIntoView === 'function') {
+      try { reply.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e5) {}
+    }
+    if (both && scroller && typeof scroller.scrollTop === 'number' && reply && typeof reply.offsetTop === 'number') {
+      var origin = typeof scroller.offsetTop === 'number' ? scroller.offsetTop : 0;
+      try { scroller.scrollTop = Math.max(0, reply.offsetTop - origin); } catch (e6) {}
+    }
+    seatClayPair(reply);
+    // The reply scroll can leave a bar over the input. Measure again after it settles.
+    try { composerGuard(); } catch (e7) {}
+    seatClayPair(reply);
+    try {
+      root.requestAnimationFrame(function () {
+        seatClayPair(reply);
+        root.requestAnimationFrame(function () { seatClayPair(reply); });
+      });
+    } catch (e8) {}
+    try { root.setTimeout(function () { seatClayPair(reply); }, 160); } catch (e9) {}
   }
   function noteSealHold(on) {
     var offer = root.__clayOffer;
@@ -1088,6 +1307,13 @@
     return dock;
   }
   function boot() {
+    if (!root.__flClayGuardBound && typeof root.addEventListener === 'function') {
+      root.__flClayGuardBound = true;
+      root.addEventListener('resize', function () {
+        try { composerGuard(); } catch (e) {}
+      });
+    }
+    try { composerGuard(); } catch (eGuard) {}
     var doc = root.document;
     if (!doc || !doc.createElement || !doc.getElementById) return;
     if (doc.getElementById('fl-clay-dock')) return;

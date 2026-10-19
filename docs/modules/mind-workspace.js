@@ -4,6 +4,7 @@
 // v-workspace-desktop-v0.1 v-workspace-handoff-v0.1 v-tree-workspace-handoff-v0.1
 // v-heals-042-v0.1: the sketchbook keeps its own gap, apart from a mind write.
 // v-seal-ask-heal-v0.1: one seal ask, in view, in the mind's own words.
+// v-seal-ask-in-view-v0.1: the ask comes into view, and later stays a quiet row.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -78,6 +79,8 @@
   var sealBackEating = false;
   var sealRestored = false;
   var heldDefers = [];
+  var loadBringDone = false;
+  var nurseryWasOpen = false;
   var clock = function () { return Date.now(); };
 
   function track(p) {
@@ -988,10 +991,57 @@
       });
     });
   }
+  function programishName(name) {
+    var n = String(name || '').trim().toLowerCase();
+    if (!n) return true;
+    if (n.indexOf(':') !== -1) return true;
+    var folded = [
+      ['ol', 'lama'].join(''),
+      ['lm', ' studio'].join(''),
+      ['ll', 'ama.cpp'].join(''),
+      ['ll', 'ama cpp'].join(''),
+      ['gpt', '4all'].join(''),
+      ['kobold', 'cpp'].join(''),
+      ['web', 'llm'].join(''),
+      ['lm', 'studio'].join('')
+    ];
+    var i;
+    for (i = 0; i < folded.length; i++) {
+      if (n === folded[i]) return true;
+    }
+    return false;
+  }
+  function givenMindName() {
+    var found = [];
+    function push(v) {
+      var s = String(v || '').trim();
+      if (s) found.push(s);
+    }
+    try {
+      var st = root.state;
+      if (st) {
+        push(st.mindName);
+        push(st.aiName);
+        push(st.namedMind);
+      }
+    } catch (e) {}
+    try {
+      var mind = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
+      if (mind) {
+        push(mind.givenName);
+        push(mind.displayName);
+        push(mind.name);
+      }
+    } catch (e2) {}
+    try { push((recallMind() || {}).name); } catch (e3) {}
+    var i;
+    for (i = 0; i < found.length; i++) {
+      if (!programishName(found[i])) return found[i];
+    }
+    return '';
+  }
   function mindLabel() {
-    var name = '';
-    try { name = String((recallMind().name) || '').trim(); } catch (e) { name = ''; }
-    return name || 'Your mind';
+    return givenMindName() || 'Your mind';
   }
   function askCopy(page, why) {
     var title = personTitle(page);
@@ -1117,6 +1167,7 @@
   function laterSeal(versionHash) {
     var ask = findAskByHash(versionHash);
     if (!ask || ask.state === 'sealed') return Promise.resolve({ ok: false, reason: 'ask' });
+    ask._answerNow = false;
     if (ask.state !== 'later') {
       ask.state = 'later';
       ask.askedAt = clock();
@@ -1137,6 +1188,7 @@
       ensureAskDock();
       return paintOpen();
     }
+    ask._answerNow = false;
     ask.state = 'declined';
     ask.askedAt = clock();
     declinedLines.push('Declined the seal.');
@@ -1677,7 +1729,7 @@
   function paintBadge() {
     var d = doc();
     if (!d || !d.getElementById) return;
-    var n = liveAsks().length;
+    var n = badgeCount();
     var label = n ? ('Notebook (' + n + ')') : 'Notebook';
     ['fl-ws-open', 'fl-ws-open-tools'].forEach(function (id) {
       var btn = d.getElementById(id);
@@ -1714,9 +1766,11 @@
       el.style.border = '2px solid transparent';
       el.setAttribute('aria-label', 'Approve seal');
     } else {
-      el.style.background = 'transparent';
-      el.style.color = 'inherit';
-      el.style.border = '1px solid currentColor';
+      // v-seal-ask-in-view-v0.1: a transparent face disappeared on the sculpture.
+      // The solid panel face is the same job, readable at 4.5:1.
+      el.style.background = '#f6f3ea';
+      el.style.color = '#1e1b2e';
+      el.style.border = '2px solid #f6f3ea';
     }
     return el;
   }
@@ -1790,14 +1844,9 @@
     });
     parent.appendChild(box);
     bindSealEscape();
-    if (!ask._seen) {
-      ask._seen = true;
-      if (heading && typeof heading.focus === 'function') {
-        try { heading.focus({ preventScroll: true }); }
-        catch (eFocus) { try { heading.focus(); } catch (e2) {} }
-      }
-      revealEl(box, motionReduced() ? 'auto' : 'smooth');
-    }
+    if (!ask._seen) ask._seen = true;
+    // Focus and the first scroll moved to bringAsk. It runs after layout, and it
+    // leaves the caret alone when the person is already typing.
     // Keep the ask's Back step above the Nursery's, even when the ask is drawn again.
     armSealBack();
     // A later draw of the same ask still has to land in view. The first scroll does not survive a rebuild.
@@ -1837,21 +1886,278 @@
     });
     handoffAsks.forEach(function (ask) { appendHandoff(parent, ask); });
   }
+  function inWait(ask) {
+    if (!ask) return false;
+    if (ask.state !== 'later' && ask.state !== 'declined') return false;
+    return (clock() - (ask.askedAt || 0)) < SEAL_ASK_COOLDOWN_MS;
+  }
+  function badgeCount() {
+    var n = liveAsks().length;
+    var i;
+    for (i = 0; i < sealAsks.length; i++) {
+      if (sealAsks[i] && sealAsks[i].state === 'declined' && inWait(sealAsks[i])) n += 1;
+    }
+    return n;
+  }
+  function dockTarget() {
+    var asked = null;
+    var stale = null;
+    var later = null;
+    var declined = null;
+    var i;
+    for (i = 0; i < sealAsks.length; i++) {
+      var a = sealAsks[i];
+      if (!a) continue;
+      if (!asked && a.state === 'asked') asked = a;
+      if (!stale && a.state === 'stale') stale = a;
+      if (!later && a.state === 'later') later = a;
+      if (!declined && a.state === 'declined') declined = a;
+    }
+    return asked || stale || later || declined;
+  }
+  function pendingAnswer() {
+    var i;
+    for (i = 0; i < sealAsks.length; i++) {
+      var a = sealAsks[i];
+      if (!a) continue;
+      if (a.state === 'asked' || a.state === 'later' || a.state === 'stale') return a;
+      if (a.state === 'declined' && inWait(a)) return a;
+    }
+    return null;
+  }
+  function waitWhen(ask) {
+    var until = ((ask && ask.askedAt) || 0) + SEAL_ASK_COOLDOWN_MS;
+    try {
+      return new Date(until).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+    } catch (e) {
+      try { return new Date(until).toLocaleString(); } catch (e2) { return ''; }
+    }
+  }
+  function waitLabel(ask) {
+    var when = waitWhen(ask);
+    if (ask && ask.state === 'declined') return 'Declined. ' + mindLabel() + ' may ask again after ' + when + '.';
+    return 'Waiting until ' + when + '.';
+  }
+  function answerNow(ask) {
+    if (!ask) return;
+    ask._answerNow = true;
+    sealDockOpen = true;
+    ensureAskDock();
+    scheduleBring('open');
+  }
+  function appendQuiet(parent, ask) {
+    var d = doc();
+    if (!d || !parent || !ask) return;
+    var row = d.createElement('div');
+    row.setAttribute('data-seal-quiet', ask.state || 'later');
+    row.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
+    var line = d.createElement('p');
+    line.id = 'fl-ws-wait-line';
+    line.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    line.textContent = waitLabel(ask);
+    var nowBtn = askButton('Answer now', 'later');
+    if (nowBtn) {
+      nowBtn.id = 'fl-ws-answer-now';
+      nowBtn.addEventListener('click', function () { answerNow(ask); });
+    }
+    row.appendChild(line);
+    if (nowBtn) row.appendChild(nowBtn);
+    parent.appendChild(row);
+    revealEl(row, motionReduced() ? 'auto' : 'smooth');
+    try { root.requestAnimationFrame(function () { revealEl(row, 'auto'); }); } catch (eQuiet) {}
+  }
+  function hasClass(el, name) {
+    if (!el || !name) return false;
+    if (el.classList && typeof el.classList.contains === 'function') {
+      try { if (el.classList.contains(name)) return true; } catch (e) {}
+    }
+    var cn = el.className;
+    if (cn && cn.baseVal) cn = cn.baseVal;
+    if (typeof cn !== 'string') return false;
+    return (' ' + cn + ' ').indexOf(' ' + name + ' ') !== -1;
+  }
+  function nurseryOpen() {
+    var d = doc();
+    if (!d || !d.getElementById) return false;
+    var veil = d.getElementById('place-veil');
+    if (veil && hasClass(veil, 'is-open') && hasClass(veil, 'is-nursery')) return true;
+    if (!veil && d.getElementById('nursery-stage')) return true;
+    return false;
+  }
+  function typingNow() {
+    var d = doc();
+    var active = d && d.activeElement;
+    if (!active) return false;
+    if (active.id === 'chatInput') return true;
+    try {
+      if (active.hasAttribute && active.hasAttribute('data-thread-input')) return true;
+    } catch (e) {}
+    try {
+      if (active.getAttribute && active.getAttribute('data-thread-input') != null) return true;
+    } catch (e2) {}
+    return false;
+  }
+  function chatViewVisible() {
+    if (nurseryOpen()) return true;
+    var d = doc();
+    if (!d) return false;
+    var tab = d.getElementById ? d.getElementById('tab-chat') : null;
+    if (tab && hasClass(tab, 'active')) return true;
+    var input = null;
+    try {
+      input = d.querySelector && (d.querySelector('#chatInput') || d.querySelector('[data-thread-input]'));
+    } catch (e) { input = null; }
+    if (input && !tab) return true;
+    if (input && typeof input.getBoundingClientRect === 'function') {
+      var r = null;
+      try { r = input.getBoundingClientRect(); } catch (e2) { r = null; }
+      if (r && r.width > 0 && r.height > 0) return true;
+    }
+    return false;
+  }
+  function bringAsk(mode) {
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!dock) return;
+    var ask = dockAsk();
+    if (mode === 'load') {
+      if (!ask || ask.state !== 'asked') return;
+    } else if (!ask || (ask.state !== 'asked' && ask.state !== 'stale' && !ask._answerNow)) {
+      return;
+    }
+    var target = dock;
+    if (typeof dock.querySelector === 'function') {
+      try {
+        var found = dock.querySelector('[data-seal-ask]');
+        if (found) target = found;
+      } catch (e) {}
+    }
+    if (target === dock && dock.children) {
+      var ci;
+      for (ci = 0; ci < dock.children.length; ci++) {
+        var kid = dock.children[ci];
+        if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) target = kid;
+      }
+    }
+    revealEl(target, motionReduced() ? 'auto' : 'smooth');
+    if (typeof dock.querySelector === 'function') settleAsk(dock);
+    if (typingNow()) return;
+    var heading = d.getElementById('fl-ws-ask-heading');
+    if (heading && typeof heading.focus === 'function') {
+      try { heading.focus({ preventScroll: true }); }
+      catch (e2) { try { heading.focus(); } catch (e3) {} }
+    }
+  }
+  function scheduleBring(mode) {
+    var ran = false;
+    function go() {
+      if (ran) return;
+      ran = true;
+      bringAsk(mode);
+    }
+    try {
+      root.requestAnimationFrame(function () {
+        try { root.requestAnimationFrame(function () { go(); }); }
+        catch (e2) { go(); }
+      });
+    } catch (e) { go(); }
+  }
+  function watchViews() {
+    var open = nurseryOpen();
+    var openedNow = open && !nurseryWasOpen;
+    nurseryWasOpen = open;
+    var cur = dockAsk();
+    var showable = cur && (cur.state === 'asked' || cur.state === 'stale' || cur._answerNow);
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (openedNow && showable && dock) {
+      if (cur.state === 'asked') loadBringDone = true;
+      scheduleBring('open');
+      return;
+    }
+    if (!loadBringDone && chatViewVisible() && cur && cur.state === 'asked' && dock) {
+      loadBringDone = true;
+      scheduleBring('load');
+    }
+  }
+  function watchNursery() {
+    var d = doc();
+    var veil = d && d.getElementById ? d.getElementById('place-veil') : null;
+    if (!veil || veil.__flSealWatch || typeof MutationObserver !== 'function') return;
+    veil.__flSealWatch = true;
+    try {
+      var obs = new MutationObserver(function () { watchViews(); });
+      obs.observe(veil, { attributes: true, attributeFilter: ['class'] });
+    } catch (e) {}
+  }
+  // The chat tab is hidden on load. A class change is not a new child, so the
+  // body observer never sees it. This watches the tab the way the Nursery veil is watched.
+  function watchChat() {
+    var d = doc();
+    var tab = d && d.getElementById ? d.getElementById('tab-chat') : null;
+    if (!tab || tab.__flSealChatWatch || typeof MutationObserver !== 'function') return;
+    tab.__flSealChatWatch = true;
+    try {
+      var obs = new MutationObserver(function () { watchViews(); });
+      obs.observe(tab, { attributes: true, attributeFilter: ['class'] });
+    } catch (eChat) {}
+  }
+  function pointerWord(askEl, ptr) {
+    if (!askEl || !ptr || typeof askEl.getBoundingClientRect !== 'function') return 'above';
+    if (typeof ptr.getBoundingClientRect !== 'function') return 'above';
+    var ar = null;
+    var pr = null;
+    try {
+      ar = askEl.getBoundingClientRect();
+      pr = ptr.getBoundingClientRect();
+    } catch (e) { return 'above'; }
+    if (!ar || !pr) return 'above';
+    if (!(ar.height > 0) && !(pr.height > 0)) return 'above';
+    var askMid = ((ar.top || 0) + (ar.bottom || 0)) / 2;
+    var ptrMid = ((pr.top || 0) + (pr.bottom || 0)) / 2;
+    return askMid < ptrMid ? 'above' : 'below';
+  }
+  function syncPointer() {
+    var d = doc();
+    if (!d || !d.getElementById || !d.createElement) return;
+    var panel = d.getElementById('fl-ws-panel');
+    var ptr = d.getElementById('fl-ws-ask-pointer');
+    if (!panel || !pendingAnswer()) {
+      if (ptr && ptr.parentNode) ptr.parentNode.removeChild(ptr);
+      return;
+    }
+    if (!ptr) {
+      ptr = d.createElement('p');
+      ptr.id = 'fl-ws-ask-pointer';
+      ptr.style.cssText = 'margin:0 0 8px;max-width:100%;overflow-wrap:anywhere;';
+      if (panel.firstChild && panel.insertBefore) panel.insertBefore(ptr, panel.firstChild);
+      else panel.appendChild(ptr);
+    }
+    var askEl = d.getElementById('fl-ws-asks');
+    var word = pointerWord(askEl, ptr);
+    ptr.textContent = 'Your answer is waiting ' + word + '.';
+  }
   function ensureAskDock() {
     var d = doc();
     if (!d || !d.createElement || !d.getElementById) return;
     ensureAskStyle();
     var panelOpen = d.getElementById('fl-ws-panel');
     var dock = d.getElementById('fl-ws-asks');
-    var current = dockAsk();
-    var showSeal = false;
-    if (current && (current.state === 'asked' || current.state === 'stale')) showSeal = true;
-    else if (current && current.state === 'later') showSeal = !!(sealDockOpen || panelOpen);
+    var current = dockTarget();
+    var full = false;
+    var quiet = false;
+    var visible = !!(sealDockOpen || panelOpen);
+    if (current && (current.state === 'asked' || current.state === 'stale')) full = true;
+    else if (current && current._answerNow) full = true;
+    else if (current && (current.state === 'later' || current.state === 'declined') && !inWait(current)) full = visible;
+    else if (current && inWait(current)) quiet = visible;
     var handoffPending = handoffAsks.length || handoffRefusals.length;
-    if (!showSeal && (panelOpen || !handoffPending)) {
+    if (!full && !quiet && (panelOpen || !handoffPending)) {
       if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
       holdOthers(false);
       paintBadge();
+      syncPointer();
+      watchViews();
       return;
     }
     if (!dock) {
@@ -1859,6 +2165,10 @@
       dock.id = 'fl-ws-asks';
       dock.style.cssText = 'display:block;width:100%;max-width:100%;overflow:hidden;box-sizing:border-box;';
     }
+    dock.style.background = '#1e1b2e';
+    dock.style.color = '#f6f3ea';
+    dock.style.padding = '12px';
+    dock.style.borderRadius = '12px';
     try {
       var pad = bottomPad() + 'px';
       dock.style.scrollMarginBottom = pad;
@@ -1867,15 +2177,21 @@
     } catch (eMargin) {}
     placeDock(dock);
     clearNode(dock);
-    if (showSeal && current) {
+    if (full && current) {
       dock.setAttribute('data-seal-version', current.versionHash || '');
       appendAsk(dock, current);
-      holdOthers(current.state === 'asked' || current.state === 'later');
+      holdOthers(current.state === 'asked' || current.state === 'later' || current.state === 'declined');
+    } else if (quiet && current) {
+      dock.setAttribute('data-seal-version', current.versionHash || '');
+      appendQuiet(dock, current);
+      holdOthers(false);
     } else {
       holdOthers(false);
       appendHandoffNotes(dock);
     }
     paintBadge();
+    syncPointer();
+    watchViews();
   }
   function appendReceipt(parent, row) {
     var d = doc();
@@ -1885,10 +2201,17 @@
     var head = d.createElement('p');
     head.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;';
     head.textContent = shortForm(row);
+    var ms = row.mindSeal || {};
+    // The bare receipt line moved into details. Same words, eight hex on the summary.
+    var fullDetails = d.createElement('details');
+    fullDetails.style.cssText = 'margin:4px 0 0;max-width:100%;';
+    var fullSum = d.createElement('summary');
+    fullSum.textContent = 'Details for checking (version ' + shortHash(row.versionHash) + ')';
     var full = d.createElement('p');
     full.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
-    var ms = row.mindSeal || {};
     full.textContent = 'version ' + String(row.versionHash || '') + ' context ' + String(ms.contextHash || '') + ' model ' + String(ms.modelId || '') + ' ' + String(row.consent || '');
+    fullDetails.appendChild(fullSum);
+    fullDetails.appendChild(full);
     var note = d.createElement('p');
     note.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
     note.textContent = INTEGRITY;
@@ -1912,7 +2235,7 @@
       }));
     });
     card.appendChild(head);
-    card.appendChild(full);
+    card.appendChild(fullDetails);
     card.appendChild(note);
     if (copyBtn) card.appendChild(copyBtn);
     if (verifyBtn) card.appendChild(verifyBtn);
@@ -2474,13 +2797,8 @@
           foot.textContent = HONEST;
           panel.appendChild(foot);
         }
-        if (liveAsks().length) {
-          var ptr = d.createElement('p');
-          ptr.id = 'fl-ws-ask-pointer';
-          ptr.style.cssText = 'margin:0 0 8px;max-width:100%;overflow-wrap:anywhere;';
-          ptr.textContent = 'Your answer is waiting above.';
-          panel.appendChild(ptr);
-        }
+        // The pointer used to say "above" every time. syncPointer reads the two rects.
+        syncPointer();
         if (shelfIsAside(mine)) {
           var kept = d.createElement('p');
           kept.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;';
@@ -2511,11 +2829,18 @@
                   var sum = d.createElement('p');
                   sum.style.cssText = 'margin:0;overflow-wrap:anywhere;max-width:100%;';
                   sum.textContent = personSummary(page, text, !!(ver && ver.sealed));
+                  var hashDetails = d.createElement('details');
+                  hashDetails.style.cssText = 'margin:4px 0 0;max-width:100%;';
+                  var hashSum = d.createElement('summary');
+                  var headHex = page.head ? String(page.head) : '';
+                  hashSum.textContent = 'Details for checking' + (headHex ? (' (' + shortHash(headHex) + ')') : '');
                   var hashLine = d.createElement('p');
                   hashLine.style.cssText = 'margin:4px 0 0;overflow-wrap:anywhere;max-width:100%;';
-                  hashLine.textContent = page.head ? String(page.head) : '';
+                  hashLine.textContent = headHex;
+                  hashDetails.appendChild(hashSum);
+                  hashDetails.appendChild(hashLine);
                   block.appendChild(sum);
-                  block.appendChild(hashLine);
+                  block.appendChild(hashDetails);
                   if (pinBtn) block.appendChild(pinBtn);
                 } else {
                   var line = d.createElement('p');
@@ -2576,7 +2901,7 @@
             });
           });
         });
-        return chain.then(function () { footer(); });
+        return chain.then(function () { footer(); syncPointer(); });
       });
     });
   }
@@ -2714,6 +3039,8 @@
     }
     ensureButton();
     if (root.__flSealAskHolding) holdDeferButtons(true);
+    watchNursery();
+    watchChat();
     if (isOn()) {
       track(refreshWake());
       track(restoreSealAsks());
@@ -2722,6 +3049,7 @@
         track(offerRestore());
       }
     }
+    watchViews();
   }
   function mount(host) {
     if (host) hostEl = host;
@@ -2803,6 +3131,8 @@
     sealBackEating = false;
     sealRestored = false;
     heldDefers = [];
+    loadBringDone = false;
+    nurseryWasOpen = false;
     try { if (root.localStorage && root.localStorage.removeItem) root.localStorage.removeItem(SEAL_NOTE_KEY); } catch (eNote) {}
     mirrorHold = 0;
     restoreChecked = false;
@@ -3319,6 +3649,7 @@
     HANDOFF: 'v-workspace-handoff-v0.1',
     TREE_HANDOFF: 'v-tree-workspace-handoff-v0.1',
     SEAL_HEAL: 'v-seal-ask-heal-v0.1',
+    SEAL_VIEW: 'v-seal-ask-in-view-v0.1',
     SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,

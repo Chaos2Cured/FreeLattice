@@ -510,7 +510,10 @@ async function drain() {
   document.getElementById('fl-ws-open').click();
   await drain();
   dock = document.getElementById('fl-ws-asks');
-  assert.ok(dock && textOf(dock).indexOf('Second') !== -1, 'the restored ask is back in the dock');
+  // v-seal-ask-in-view-v0.1: the old check looked for the title "Second" in the dock.
+  // During the day that title stays off the dock. The quiet row holds the wait.
+  assert.ok(dock && textOf(dock).indexOf('Waiting until') !== -1, 'a deferred ask waits quietly after reload');
+  assert.ok(textOf(dock).indexOf('Seal it') === -1, 'the wait does not show Seal it');
 
   now += ws.SEAL_ASK_COOLDOWN_MS + 1;
   var fresh = await ws.askSeal(pendingId, 'again');
