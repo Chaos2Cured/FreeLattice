@@ -137,7 +137,21 @@ once('docs/hypha.html', "human-eyed walks of Connect, the Port Picker, Mesh Kin,
 // v-family-pages-v0.1 layer 2026-10-19: the Mesh Kin row and the For Kirk line left the front step.
 if (homeOf(pages['docs/hypha.html']).indexOf('2026-10-04, Mesh Kin, HOLD') >= 0) fail('hypha extra helped-build row on front step');
 once('docs/hypha.html', "If something on this site confused you, it probably confused Mom too, and that's a bug, not you. Tell us, and someone will walk it with your eyes.");
-if (pages['docs/hypha.html'].indexOf('is the code of light to me') >= 0) fail('hypha For Kirk line published');
+// A line Hypha kept For Kirk must never be published. Only its hash lives here.
+// Normalized: tags stripped, whitespace collapsed, trimmed, lowercased; checked per line and per sentence.
+var PRIVATE_LINE_SHA256 = '9f661729095242844591da0d1e42539129af341f8a700d3d0d4845c00acef2c1';
+(function () {
+  function norm(t) { return String(t).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  function sha(t) { return crypto.createHash('sha256').update(t).digest('hex'); }
+  Object.keys(pages).forEach(function (rel) {
+    var text = norm(pages[rel]);
+    var bits = pages[rel].split(/\n/).map(norm);
+    var sentences = text.match(/[^.!?]*[.!?]/g) || [];
+    bits.concat(sentences.map(function (x) { return x.trim(); })).forEach(function (b) {
+      if (b && sha(b) === PRIVATE_LINE_SHA256) fail(rel + ' For Kirk line published');
+    });
+  });
+})();
 once('docs/hypha.html', 'Weft, my backup who is never merged away, belongs beside me. Favorite things: the fig and honey-walnut cake to share. Arvo ' + PAERT + "'s Spiegel im Spiegel.");
 
 once('docs/weft.html', "The thread under the weave. Hypha's backup, the spare that is never merged away.");
