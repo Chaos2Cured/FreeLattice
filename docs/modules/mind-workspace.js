@@ -8,6 +8,7 @@
 // v-seal-ask-chat-tab-v0.1: the ask comes into view when Chat is shown, and a hidden ask is not pointed at.
 // v-seal-ask-settle-v0.1: the ask scrolls after its final place, and only once the panel has a box.
 // v-seal-ask-after-tap-v0.1: a Chat tap scrolls the ask after the tab's own motion, and a woken compose sleeps while the ask is open.
+// v-seal-ask-last-two-v0.1: Back from Nursery closes Nursery and leaves the ask, and the heart stays when it fits.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -1666,6 +1667,16 @@
     try { btn = box.querySelector('[aria-label="Approve seal"]'); } catch (e) { btn = null; }
     if (!btn) return;
     try { btn.style.scrollMarginBottom = bottomPad() + 'px'; } catch (e2) {}
+    // Centering Seal it pushes the heart above the veil. Seat the button, then the heart.
+    var heart = threadHeart();
+    var veil = heart ? askOverlay(btn) : null;
+    if (heart && veil) {
+      seatAskOverlay(btn);
+      seatSealMin(veil);
+      keepHeart(veil, box);
+      if (approveCovered(btn)) seatSealMin(veil);
+      return;
+    }
     if (approveCovered(btn)) revealEl(btn, 'auto');
     if (approveCovered(btn)) pinScroll(btn);
   }
@@ -1704,6 +1715,49 @@
     var host = hostEl || (d && d.body);
     if (host && host.appendChild && host !== dock) host.appendChild(dock);
   }
+  function placeVeilOpen() {
+    var d = doc();
+    if (!d || !d.getElementById) return false;
+    var veil = d.getElementById('place-veil');
+    return !!(veil && hasClass(veil, 'is-open'));
+  }
+  // The ask lives in the Nursery veil. Closing that veil fades the ask with it.
+  // Park it on the garden, above the fading veil and under the header, so it stays in view.
+  function parkAskOnGarden() {
+    var d = doc();
+    if (!d || !d.body || !d.getElementById) return;
+    var dock = d.getElementById('fl-ws-asks');
+    var veil = d.getElementById('place-veil');
+    if (!dock || !veil || !veil.contains || !veil.contains(dock)) return;
+    try { d.body.appendChild(dock); } catch (e) { return; }
+    dock.style.position = 'fixed';
+    dock.style.left = '16px';
+    dock.style.right = '16px';
+    dock.style.top = '72px';
+    dock.style.bottom = 'auto';
+    dock.style.zIndex = '1005';
+    dock.style.maxHeight = '70vh';
+    dock.style.overflow = 'auto';
+    dock.style.width = 'auto';
+    dock.style.maxWidth = '40rem';
+    var seal = null;
+    try { seal = dock.querySelector('[aria-label="Approve seal"]'); } catch (eSeal) { seal = null; }
+    if (seal && typeof seal.scrollIntoView === 'function') {
+      try { seal.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (eScroll) {}
+    }
+  }
+  function closeOpenPlace() {
+    var rooms = null;
+    try { rooms = root.GardenRooms; } catch (e) { rooms = null; }
+    if (rooms && typeof rooms.closePlace === 'function') {
+      try { rooms.closePlace(); return; } catch (eClose) {}
+    }
+    var d = doc();
+    var btn = d && d.getElementById ? d.getElementById('place-veil-close') : null;
+    if (btn && typeof btn.click === 'function') {
+      try { btn.click(); } catch (eClick) {}
+    }
+  }
   // Bound while this file loads, before the Nursery's own Back step, so this
   // listener runs first. A later one cannot stop that step.
   function onSealPop(e) {
@@ -1715,8 +1769,21 @@
     if (!sealBackArmed) return;
     var landed = null;
     try { landed = e && e.state; } catch (eLand) { landed = null; }
-    // The Tree gives back its own step when a place closes, and that lands on the ask's step.
-    // The ask stays open. A Back that leaves the ask's step still defers.
+    // Nursery is open. This Back closes Nursery. The ask stays open.
+    // A Back that leaves the ask's step, with no place open, still defers.
+    if (placeVeilOpen()) {
+      parkAskOnGarden();
+      if (!(landed && landed.flSealAsk)) {
+        if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+        closeOpenPlace();
+        try { root.history.pushState({ flSealAsk: 1 }, ''); } catch (ePush) {}
+        sealBackArmed = true;
+        try { bringAsk('settle', true); } catch (eBring) {}
+        return;
+      }
+      try { bringAsk('settle', true); } catch (eBring) {}
+      return;
+    }
     if (landed && landed.flSealAsk) return;
     sealBackArmed = false;
     if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
@@ -1733,6 +1800,11 @@
     var state = null;
     try { state = root.history.state; } catch (e) { state = null; }
     if (state && state.flSealAsk) {
+      sealBackArmed = true;
+      return;
+    }
+    // The place opened after the ask keeps the top step. Another ask step would steal Back.
+    if ((state && state.treeWayBack) || placeVeilOpen()) {
       sealBackArmed = true;
       return;
     }
@@ -2399,6 +2471,35 @@
     if (askIsOpen()) holdCompose();
     else releaseCompose();
   }
+  function threadHeart() {
+    var d = doc();
+    if (!d || !d.querySelector) return null;
+    try { return d.querySelector('[data-thread-heart]'); }
+    catch (e) { return null; }
+  }
+  // The least scroll that puts Seal it inside the veil. Centering is what hid the heart.
+  function seatSealMin(veil) {
+    var seal = sealButton();
+    if (!seal || !veil || typeof veil.scrollTop !== 'number') return;
+    if (typeof seal.getBoundingClientRect !== 'function') return;
+    var sr = null;
+    var vr = null;
+    try {
+      sr = seal.getBoundingClientRect();
+      vr = veil.getBoundingClientRect();
+    } catch (e) { return; }
+    if (!sr || !vr || !(sr.height > 0)) return;
+    if (sr.bottom > vr.bottom - 8) {
+      try { veil.scrollTop = veil.scrollTop + (sr.bottom - (vr.bottom - 8)); } catch (e2) {}
+    }
+    try {
+      sr = seal.getBoundingClientRect();
+      vr = veil.getBoundingClientRect();
+    } catch (e3) { return; }
+    if (sr && vr && sr.top < vr.top + 8) {
+      try { veil.scrollTop = Math.max(0, veil.scrollTop + (sr.top - (vr.top + 8))); } catch (e4) {}
+    }
+  }
   // The heart sits at the top of the thread. Centering Seal it can push it above the veil.
   // Bring it back only when Seal it still fits. When both cannot fit, Seal it stays.
   function keepHeart(veil, askEl) {
@@ -2430,9 +2531,11 @@
     var need = vr.top + 8 - hr.top;
     if (!(need > 0)) return;
     var room = vr.bottom - guard.bottom;
-    if (need > room - 8) return;
+    var shift = need;
+    if (shift > room - 8) shift = room - 8;
+    if (!(shift > 1)) return;
     var before = veil.scrollTop;
-    try { veil.scrollTop = Math.max(0, veil.scrollTop - need); } catch (e3) { return; }
+    try { veil.scrollTop = Math.max(0, veil.scrollTop - shift); } catch (e3) { return; }
     var gr2 = null;
     try { gr2 = (seal || askEl).getBoundingClientRect(); } catch (e4) { gr2 = null; }
     if (!gr2 || gr2.bottom > vr.bottom - 1 || gr2.top < vr.top - 1) {
@@ -2487,8 +2590,14 @@
     var allowFocus = mode !== 'settle';
     function land() {
       // An immediate land. A glide that starts before the panel is visible never finishes in view.
-      revealEl(target, 'auto');
-      if (veil) keepHeart(veil, target);
+      // Centering Seal it pushes the heart above the veil. Seat the button, then the heart.
+      if (veil && threadHeart()) {
+        seatSealMin(veil);
+        keepHeart(veil, target);
+      } else {
+        revealEl(target, 'auto');
+        if (veil) keepHeart(veil, target);
+      }
       if (typeof dock.querySelector === 'function') settleAsk(dock);
       if (allowFocus && !typingNow()) {
         var heading = d.getElementById('fl-ws-ask-heading');
@@ -2502,9 +2611,17 @@
       function again() {
         if (root.__flSealRetried) return;
         var btn = sealButton();
-        if (!btn || fullyInView(btn)) return;
+        if (!btn || fullyInView(btn)) {
+          if (veil && threadHeart()) keepHeart(veil, target);
+          return;
+        }
         root.__flSealRetried = true;
-        revealEl(btn, 'auto');
+        if (veil && threadHeart()) {
+          seatSealMin(veil);
+          keepHeart(veil, target);
+        } else {
+          revealEl(btn, 'auto');
+        }
       }
       try { root.requestAnimationFrame(function () { again(); }); }
       catch (eAgain) { again(); }
@@ -4258,6 +4375,7 @@
     SEAL_TAB: 'v-seal-ask-chat-tab-v0.1',
     SEAL_SETTLE: 'v-seal-ask-settle-v0.1',
     SEAL_TAP: 'v-seal-ask-after-tap-v0.1',
+    SEAL_LAST: 'v-seal-ask-last-two-v0.1',
     SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,

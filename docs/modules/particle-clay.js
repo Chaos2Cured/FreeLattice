@@ -4,6 +4,7 @@
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
 // v-seal-ask-settle-v0.1: the question mark stays off Send, and one veil scroll does not run twice in a turn.
 // v-seal-ask-after-tap-v0.1: the reply top stays at or below the window edge, and the canvas buffer follows the box it shows.
+// v-seal-ask-last-two-v0.1: the reply bubble stays at the top of the chat box, and a later scroll cannot hide it.
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -959,8 +960,14 @@
     var doc = root.document;
     if (!doc || !doc.querySelectorAll) return null;
     var nodes = [];
-    try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant'); }
+    // The whole reply bubble, including Copy, Listen, and Add to Core. Same node Hypha measures.
+    try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant, #chatMessages .chat-message:not(.user):not(.system)'); }
     catch (e) { nodes = []; }
+    // A reader that only answers the first half of that selector still gets the same bubble.
+    if (!nodes || !nodes.length) {
+      try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant'); }
+      catch (eOld) { nodes = []; }
+    }
     if (nodes && nodes.length) return nodes[nodes.length - 1];
     // The Tree speaks in a thread body. Same job as the chat reply: the canvas follows it.
     try { nodes = doc.querySelectorAll('.thread-body'); }
@@ -995,10 +1002,9 @@
     syncDock();
   }
   function revealCanvas() {
-    if (!canvas || typeof canvas.scrollIntoView !== 'function') return;
-    var behavior = reduced() ? 'auto' : 'smooth';
-    try { canvas.scrollIntoView({ block: 'nearest', behavior: behavior }); }
-    catch (e) {}
+    // The canvas sits lower. Scrolling it into view hides the reply bubble.
+    var reply = lastAssistant();
+    if (reply) aimReplyTop(reply);
   }
   function isFloat(el) {
     if (!el) return false;
@@ -1081,7 +1087,7 @@
     if (!blockInputScroll && vh && inputRect && (inputRect.top < 0 || inputRect.bottom > vh - 1) && typeof input.scrollIntoView === 'function') {
       try { input.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (e9) {}
       // The input scroll must not leave the reply above the window.
-      liftReplyOnce(replyGuard);
+      aimReplyTop(replyGuard);
     }
   }
   function overlapsInput(fr, inputRect) {
@@ -1173,6 +1179,74 @@
     if (!(top < -1)) return;
     scrollKeepingReply(reply, top - 4);
   }
+  // The reply bubble's top stays at or below the chat box, and at or below the window.
+  // The chat box is the scroller. A window scroll does not move a bubble inside it.
+  function aimReplyTop(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    if (root.__flReplyAiming) return;
+    root.__flReplyAiming = true;
+    try {
+      var guard = 0;
+      while (guard < 4) {
+        guard += 1;
+        var top = 0;
+        try { top = reply.getBoundingClientRect().top; } catch (e) { break; }
+        if (!isFinite(top)) break;
+        var scroller = null;
+        var doc = root.document;
+        try { scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null; } catch (e2) { scroller = null; }
+        if (scroller && scroller.contains && !scroller.contains(reply)) scroller = null;
+        var floor = 0;
+        if (scroller && typeof scroller.getBoundingClientRect === 'function') {
+          var st = 0;
+          try { st = scroller.getBoundingClientRect().top; } catch (e3) { st = 0; }
+          if (isFinite(st) && st > floor) floor = st;
+        }
+        if (!(top < floor - 1)) break;
+        var dy = top - floor;
+        if (scroller && typeof scroller.scrollTop === 'number') {
+          var next = scroller.scrollTop + dy;
+          if (next < 0) next = 0;
+          if (next !== scroller.scrollTop) {
+            try { scroller.scrollTop = next; } catch (e4) { break; }
+            continue;
+          }
+          // The chat box itself is above the window. Inner scroll has no room left.
+          var still = top;
+          try { still = reply.getBoundingClientRect().top; } catch (eStill) { break; }
+          if (!(still < -1)) break;
+          scrollKeepingReply(reply, still - 4);
+          break;
+        }
+        scrollKeepingReply(reply, top - 4);
+        break;
+      }
+    } catch (eAim) {}
+    root.__flReplyAiming = false;
+  }
+  function armReplyGuard() {
+    var doc = root.document;
+    if (!doc || root.__flReplyGuardOn) return;
+    var scroller = null;
+    try { scroller = doc.getElementById ? doc.getElementById('chatMessages') : null; } catch (e) { scroller = null; }
+    if (!scroller || typeof scroller.addEventListener !== 'function') return;
+    root.__flReplyGuardOn = true;
+    var queued = false;
+    function kick() {
+      if (queued || root.__flReplyAiming) return;
+      queued = true;
+      var run = function () {
+        queued = false;
+        if (root.__flReplyAiming) return;
+        if (!canvas || !canvas.parentNode) return;
+        var reply = lastAssistant();
+        if (!reply) return;
+        aimReplyTop(reply);
+      };
+      try { root.requestAnimationFrame(run); } catch (e2) { queued = false; run(); }
+    }
+    try { scroller.addEventListener('scroll', kick); } catch (e3) {}
+  }
   function matchCanvasBuffer() {
     if (!canvas) return;
     try { void canvas.offsetHeight; } catch (e) {}
@@ -1214,7 +1288,8 @@
     }
     var top = reply.getBoundingClientRect().top;
     // Only when the reply has left the view. A reply already on screen stays where it is.
-    if (top < 0) liftReplyOnce(reply);
+    // The chat box is the scroller. A window scroll does not move a bubble inside it.
+    if (top < 0) aimReplyTop(reply);
     if (!input || typeof input.getBoundingClientRect !== 'function' || typeof root.scrollBy !== 'function') return;
     var ib = input.getBoundingClientRect().bottom;
     if (ib > vh - 4) {
@@ -1281,15 +1356,9 @@
     calmScroll(scroller);
     calmScroll(doc && doc.documentElement);
     calmScroll(doc && doc.body);
-    if (scroller && typeof scroller.getBoundingClientRect === 'function' && typeof scroller.scrollTop === 'number') {
-      var rt = reply.getBoundingClientRect().top;
-      var st = scroller.getBoundingClientRect().top;
-      if (rt < st - 1) {
-        try { scroller.scrollTop = scroller.scrollTop + (rt - st); } catch (e2) {}
-      }
-    }
+    aimReplyTop(reply);
     var top = reply.getBoundingClientRect().top;
-    if (top < 0) liftReplyOnce(reply);
+    if (top < 0) aimReplyTop(reply);
     var replyRect = reply.getBoundingClientRect();
     var canvasRect = canvas.getBoundingClientRect();
     if (!(replyRect && replyRect.height > 0) || !(canvasRect && canvasRect.height > 0)) return;
@@ -1304,35 +1373,18 @@
         matchCanvasBuffer();
       }
     }
-    top = reply.getBoundingClientRect().top;
-    if (top < 0) liftReplyOnce(reply);
+    aimReplyTop(reply);
     fitReplyAndInput(reply);
     pinReplyDown(reply);
   }
   // A later scroll can leave the whole reply above the window. Bring the top back, once.
   function pinReplyDown(reply) {
     if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
-    var r = null;
-    try { r = reply.getBoundingClientRect(); } catch (e) { return; }
-    if (!r || !(r.height > 0) || r.top >= -1) return;
-    var doc = root.document;
-    var scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
-    if (scroller && typeof scroller.scrollTop === 'number' && typeof scroller.getBoundingClientRect === 'function') {
-      var st = 0;
-      try { st = scroller.getBoundingClientRect().top || 0; } catch (e2) { st = 0; }
-      if (r.top < st - 1) {
-        try { scroller.scrollTop = Math.max(0, scroller.scrollTop + (r.top - st)); } catch (e3) {}
-        try { r = reply.getBoundingClientRect(); } catch (e4) { return; }
-        if (!r || r.top >= -1) return;
-      }
-    }
-    if (r.top < -1 && typeof root.scrollBy === 'function') {
-      if (root.__flReplyNudge) return;
-      root.__flReplyNudge = true;
-      try { root.requestAnimationFrame(function () { root.__flReplyNudge = false; }); }
-      catch (e5) { root.__flReplyNudge = false; }
-      liftReplyOnce(reply);
-    }
+    if (root.__flReplyNudge) return;
+    root.__flReplyNudge = true;
+    try { root.requestAnimationFrame(function () { root.__flReplyNudge = false; }); }
+    catch (e5) { root.__flReplyNudge = false; }
+    aimReplyTop(reply);
   }
   // The reply top stays. The input has to fit under it. The canvas gives up space first, down to 120px.
   function fitReplyAndInput(reply) {
@@ -1387,7 +1439,7 @@
         }
       }
       try { rb = reply.getBoundingClientRect(); } catch (e6) { return; }
-      if (rb.top < 0) liftReplyOnce(reply);
+      if (rb.top < 0) aimReplyTop(reply);
       try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e8) { return; }
       if (rb.top >= -1 && ib.bottom <= vh - 1) break;
     }
@@ -1418,27 +1470,9 @@
     canvas.style.height = 'max(120px, min(320px, 45vh, ' + capped + 'px))';
     // The shown box is the space under the reply. The bitmap follows that box, not an older 320.
     matchCanvasBuffer();
-    liftReplyOnce(reply);
-    var behavior = reduced() ? 'auto' : 'smooth';
-    var both = false;
-    if (reply && canvas.getBoundingClientRect && reply.getBoundingClientRect && scroller && scroller.getBoundingClientRect) {
-      try {
-        var top = reply.getBoundingClientRect();
-        var bot = canvas.getBoundingClientRect();
-        var host = scroller.getBoundingClientRect();
-        var need = bot.bottom - top.top;
-        var room = host.bottom - host.top;
-        both = need > 0 && room + 1 >= need;
-      } catch (e4) { both = false; }
-    }
-    // A smooth scroll finishes after the seat and leaves the reply high. This one lands now.
-    if (reply && typeof reply.scrollIntoView === 'function') {
-      try { reply.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e5) {}
-    }
-    if (both && scroller && typeof scroller.scrollTop === 'number' && reply && typeof reply.offsetTop === 'number') {
-      var origin = typeof scroller.offsetTop === 'number' ? scroller.offsetTop : 0;
-      try { scroller.scrollTop = Math.max(0, reply.offsetTop - origin); } catch (e6) {}
-    }
+    // Land the bubble. Do not scroll the canvas into view. That hides the bubble.
+    aimReplyTop(reply);
+    armReplyGuard();
     seatClayPair(reply);
     holdReplyTop(reply);
     // The reply scroll can leave a bar over the input. Measure again after it settles.
@@ -1446,7 +1480,7 @@
     seatClayPair(reply);
     holdReplyTop(reply);
     // Same turn as the insert, so the first paint is already at or below the edge.
-    liftReplyOnce(reply);
+    aimReplyTop(reply);
     try {
       root.requestAnimationFrame(function () {
         seatClayPair(reply);
@@ -1454,9 +1488,9 @@
         root.requestAnimationFrame(function () {
           seatClayPair(reply);
           holdReplyTop(reply);
-          liftReplyOnce(reply);
+          aimReplyTop(reply);
           try { composerGuard(); } catch (eLate) {}
-          liftReplyOnce(reply);
+          aimReplyTop(reply);
         });
       });
     } catch (e8) {}
@@ -1464,15 +1498,15 @@
       root.setTimeout(function () {
         seatClayPair(reply);
         holdReplyTop(reply);
-        liftReplyOnce(reply);
+        aimReplyTop(reply);
         try { composerGuard(); } catch (eLater) {}
-        liftReplyOnce(reply);
+        aimReplyTop(reply);
       }, 160);
       root.setTimeout(function () {
         holdReplyTop(reply);
-        liftReplyOnce(reply);
+        aimReplyTop(reply);
         try { composerGuard(); } catch (eLater2) {}
-        liftReplyOnce(reply);
+        aimReplyTop(reply);
       }, 700);
     } catch (e9) {}
     watchClayFit(reply);
@@ -1919,7 +1953,7 @@
     },
     placeCanvas: placeCanvas,
     revealCanvas: revealCanvas,
-    keepReplyTop: function (reply) { liftReplyOnce(reply); return reply; },
+    keepReplyTop: function (reply) { aimReplyTop(reply); return reply; },
     noteSealHold: noteSealHold,
     ensurePill: ensurePill,
     pillOpen: pillOpen,
