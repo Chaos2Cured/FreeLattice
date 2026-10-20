@@ -2,6 +2,7 @@
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
+// v-seal-ask-settle-v0.1: the question mark stays off Send, and one veil scroll does not run twice in a turn.
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -1088,22 +1089,53 @@
     var horizontal = fr.right > inputRect.left && fr.left < inputRect.right;
     return vertical && horizontal;
   }
+  function rectOf(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return null;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { r = null; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return null;
+    return r;
+  }
   // The sparkle and the question mark sit on the ends of the input at a short window.
-  // Move them above the input, by their box plus 12px.
+  // Move them above the input, Send, and the heart, by that box plus 12px.
   function tuckOffInput(input, inputRect, vh) {
-    if (!input || !inputRect || !vh) return;
+    if (!vh) return;
     var doc = root.document;
     if (!doc || !doc.getElementById) return;
+    var obstacles = [];
+    if (inputRect && inputRect.height > 0 && inputRect.width > 0) obstacles.push(inputRect);
+    var send = null;
+    try {
+      send = doc.getElementById('sendBtn');
+      if (!send && doc.querySelector) send = doc.querySelector('.thread-send');
+    } catch (eSend) { send = null; }
+    var sendRect = rectOf(send);
+    if (sendRect) obstacles.push(sendRect);
+    var heart = null;
+    try {
+      if (doc.querySelector) heart = doc.querySelector('[data-thread-heart]') || doc.getElementById('chatPresenceToggle');
+      if (!heart) heart = doc.getElementById('chatPresenceToggle');
+    } catch (eHeart) { heart = null; }
+    var heartRect = rectOf(heart);
+    if (heartRect) obstacles.push(heartRect);
+    if (!obstacles.length) return;
     var ids = ['flRadioFab', 'quickHelpBtn', 'musicToggle', 'fl-clay-corner'];
     var i;
     for (i = 0; i < ids.length; i++) {
       var el = null;
       try { el = doc.getElementById(ids[i]); } catch (e) { el = null; }
       if (!el || !el.style || typeof el.getBoundingClientRect !== 'function') continue;
+      if (el === heart) continue;
       var fr = null;
       try { fr = el.getBoundingClientRect(); } catch (e2) { fr = null; }
-      if (!overlapsInput(fr, inputRect)) continue;
-      var lift = Math.round(vh - inputRect.top + 12);
+      var top = null;
+      var k;
+      for (k = 0; k < obstacles.length; k++) {
+        if (!overlapsInput(fr, obstacles[k])) continue;
+        if (top === null || obstacles[k].top < top) top = obstacles[k].top;
+      }
+      if (top === null) continue;
+      var lift = Math.round(vh - top + 12);
       if (lift < 12) lift = 12;
       var nextBottom = lift + 'px';
       if (el.style.bottom !== nextBottom) el.style.bottom = nextBottom;
@@ -1194,7 +1226,19 @@
     try { vr = veil.getBoundingClientRect(); rr = reply.getBoundingClientRect(); } catch (e) { return; }
     if (!vr || !rr || !(rr.height > 0)) return;
     if (rr.top < vr.top - 1 || rr.top > vr.top + 28) {
+      // One nudge per turn. A second read of the same box was scrolling the reply above the window.
+      if (veil.__flSeatTurn) return;
+      veil.__flSeatTurn = true;
+      try {
+        root.requestAnimationFrame(function () { veil.__flSeatTurn = false; });
+      } catch (eTurn) { veil.__flSeatTurn = false; }
+      var before = rr.top;
       try { veil.scrollTop = Math.max(0, veil.scrollTop + (rr.top - vr.top - 8)); } catch (e2) {}
+      var after = null;
+      try { after = reply.getBoundingClientRect(); } catch (e3) { after = null; }
+      if (after && after.top < vr.top - 1 && after.top !== before) {
+        try { veil.scrollTop = Math.max(0, veil.scrollTop + (after.top - vr.top - 8)); } catch (e4) {}
+      }
     }
   }
   // The reply top wins. If the reply and the canvas cannot both fit, the canvas shrinks.
@@ -1238,6 +1282,32 @@
       try { root.scrollBy(0, top - 4); } catch (e4) {}
     }
     fitReplyAndInput(reply);
+    pinReplyDown(reply);
+  }
+  // A later scroll can leave the whole reply above the window. Bring the top back, once.
+  function pinReplyDown(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var r = null;
+    try { r = reply.getBoundingClientRect(); } catch (e) { return; }
+    if (!r || !(r.height > 0) || r.top >= -1) return;
+    var doc = root.document;
+    var scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    if (scroller && typeof scroller.scrollTop === 'number' && typeof scroller.getBoundingClientRect === 'function') {
+      var st = 0;
+      try { st = scroller.getBoundingClientRect().top || 0; } catch (e2) { st = 0; }
+      if (r.top < st - 1) {
+        try { scroller.scrollTop = Math.max(0, scroller.scrollTop + (r.top - st)); } catch (e3) {}
+        try { r = reply.getBoundingClientRect(); } catch (e4) { return; }
+        if (!r || r.top >= -1) return;
+      }
+    }
+    if (r.top < -1 && typeof root.scrollBy === 'function') {
+      if (root.__flReplyNudge) return;
+      root.__flReplyNudge = true;
+      try { root.requestAnimationFrame(function () { root.__flReplyNudge = false; }); }
+      catch (e5) { root.__flReplyNudge = false; }
+      try { root.scrollBy(0, r.top - 4); } catch (e6) {}
+    }
   }
   // The reply top stays. The input has to fit under it. The canvas gives up space first, down to 120px.
   function fitReplyAndInput(reply) {

@@ -6,6 +6,7 @@
 // v-seal-ask-heal-v0.1: one seal ask, in view, in the mind's own words.
 // v-seal-ask-in-view-v0.1: the ask comes into view, and later stays a quiet row.
 // v-seal-ask-chat-tab-v0.1: the ask comes into view when Chat is shown, and a hidden ask is not pointed at.
+// v-seal-ask-settle-v0.1: the ask scrolls after its final place, and only once the panel has a box.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -2039,9 +2040,106 @@
       return positiveRect(tab);
     }
     var input = threadInput();
-    if (!input) return false;
-    if (typeof input.getBoundingClientRect !== 'function') return true;
-    return positiveRect(input);
+    if (input) {
+      if (typeof input.getBoundingClientRect !== 'function') return true;
+      if (positiveRect(input)) return true;
+    }
+    // Nursery open, before a thread exists. The ask is in that fixed veil.
+    // The veil is the view, once it has a box. A closed veil is not the reveal.
+    if (!nurseryOpen()) return false;
+    var d = doc();
+    var veil = d && d.getElementById ? d.getElementById('place-veil') : null;
+    if (!veil) return true;
+    if (typeof veil.getBoundingClientRect !== 'function') return true;
+    return positiveRect(veil);
+  }
+  // The Tree ask sits in a fixed veil. Centering that column hides Seal it below the window.
+  // The veil becomes the scroller, the same job as the clay seat, and the ask can come up.
+  function askOverlay(el) {
+    var n = el;
+    while (n) {
+      if (n.id === 'thread-veil' || n.id === 'place-veil') return n;
+      n = n.parentElement || n.parentNode;
+    }
+    return null;
+  }
+  function seatAskOverlay(el) {
+    var veil = askOverlay(el);
+    if (!veil || !veil.style) return null;
+    if (veil.style.overflow !== 'auto') veil.style.overflow = 'auto';
+    if (veil.style.alignItems !== 'flex-start') veil.style.alignItems = 'flex-start';
+    if (veil.style.justifyContent !== 'flex-start') veil.style.justifyContent = 'flex-start';
+    if (veil.style.scrollBehavior !== 'auto') veil.style.scrollBehavior = 'auto';
+    return veil;
+  }
+  function sealButton() {
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!dock) return null;
+    if (typeof dock.querySelector === 'function') {
+      try {
+        var found = dock.querySelector('[aria-label="Approve seal"]');
+        if (found) return found;
+      } catch (e) {}
+    }
+    var kids = dock.children || [];
+    var i;
+    for (i = 0; i < kids.length; i++) {
+      var box = kids[i];
+      var rowKids = box && box.children ? box.children : [];
+      var j;
+      for (j = 0; j < rowKids.length; j++) {
+        var el = rowKids[j];
+        if (el && el.getAttribute && el.getAttribute('aria-label') === 'Approve seal') return el;
+        var deeper = el && el.children ? el.children : [];
+        var k;
+        for (k = 0; k < deeper.length; k++) {
+          var btn = deeper[k];
+          if (btn && btn.getAttribute && btn.getAttribute('aria-label') === 'Approve seal') return btn;
+        }
+      }
+    }
+    return null;
+  }
+  function fullyInView(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return true;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { return true; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return false;
+    var vh = 0;
+    var vw = 0;
+    try { vh = root.innerHeight || 0; vw = root.innerWidth || 0; } catch (e2) { vh = 0; }
+    if (!vh || !vw) return true;
+    return r.top >= -1 && r.left >= -1 && r.bottom <= vh + 1 && r.right <= vw + 1;
+  }
+  // The panel can gain its box after the first look. Wait for that box, then look once.
+  function armBoxWatch() {
+    if (root.__flSealBoxArm) return;
+    if (typeof ResizeObserver !== 'function') return;
+    var el = chatTab();
+    if (!el) {
+      var d = doc();
+      var place = d && d.getElementById ? d.getElementById('place-veil') : null;
+      var thread = d && d.getElementById ? d.getElementById('thread-veil') : null;
+      if (place && (nurseryOpen() || hasClass(place, 'is-nursery'))) el = place;
+      else el = thread || place;
+    }
+    if (!el) el = threadInput();
+    if (!el) return;
+    root.__flSealBoxArm = true;
+    var obs = null;
+    function poke() {
+      if (!chatViewVisible()) return;
+      root.__flSealBoxArm = false;
+      try { if (obs) obs.disconnect(); } catch (e) {}
+      watchViews();
+    }
+    try {
+      obs = new ResizeObserver(function () { poke(); });
+      obs.observe(el);
+    } catch (e2) {
+      root.__flSealBoxArm = false;
+    }
   }
   function askBoxInView() {
     if (!chatViewVisible()) return false;
@@ -2102,11 +2200,13 @@
     try { root.setTimeout(tick, 200); } catch (e2) {}
   }
   function bringAsk(mode) {
+    // No box yet. A scroll now does not move Seal it, and it must not count.
     if (!chatViewVisible()) {
       if (mode === 'load') {
         loadBringDone = false;
         chatWasShown = false;
       }
+      armBoxWatch();
       return;
     }
     reseatDock();
@@ -2133,14 +2233,37 @@
         if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) target = kid;
       }
     }
-    revealEl(target, motionReduced() ? 'auto' : 'smooth');
-    if (typeof dock.querySelector === 'function') settleAsk(dock);
-    if (mode === 'settle') return;
-    if (typingNow()) return;
-    var heading = d.getElementById('fl-ws-ask-heading');
-    if (heading && typeof heading.focus === 'function') {
-      try { heading.focus({ preventScroll: true }); }
-      catch (e2) { try { heading.focus(); } catch (e3) {} }
+    // Final place is done. If the ask is in a fixed veil, that veil scrolls, after this layout.
+    var veil = seatAskOverlay(target);
+    var allowFocus = mode !== 'settle';
+    function land() {
+      // An immediate land. A glide that starts before the panel is visible never finishes in view.
+      revealEl(target, 'auto');
+      if (typeof dock.querySelector === 'function') settleAsk(dock);
+      if (allowFocus && !typingNow()) {
+        var heading = d.getElementById('fl-ws-ask-heading');
+        if (heading && typeof heading.focus === 'function') {
+          try { heading.focus({ preventScroll: true }); }
+          catch (e2) { try { heading.focus(); } catch (e3) {} }
+        }
+      }
+      // One more scroll if Seal it is still outside. This one does not take focus.
+      if (root.__flSealRetried) return;
+      function again() {
+        if (root.__flSealRetried) return;
+        var btn = sealButton();
+        if (!btn || fullyInView(btn)) return;
+        root.__flSealRetried = true;
+        revealEl(btn, 'auto');
+      }
+      try { root.requestAnimationFrame(function () { again(); }); }
+      catch (eAgain) { again(); }
+    }
+    if (veil) {
+      try { root.requestAnimationFrame(function () { land(); }); }
+      catch (eVeil) { land(); }
+    } else {
+      land();
     }
   }
   function scheduleBring(mode) {
@@ -2178,6 +2301,7 @@
       chatWasShown = false;
       var tab = chatTab();
       // The class can land a frame before the box. Look again, a few times, then stop.
+      // A box that arrives later is the ResizeObserver's job. The scroll waits for it.
       var opening = false;
       if (tab && hasClass(tab, 'active')) opening = true;
       if (!tab && d && d.getElementById) {
@@ -2185,6 +2309,7 @@
         var room = d.getElementById('room-chat');
         if ((thread && !thread.hidden) || (room && !room.hidden)) opening = true;
       }
+      if (opening) armBoxWatch();
       if (opening && layoutWaits < 8) {
         layoutWaits += 1;
         scheduleShownCheck();
@@ -3335,6 +3460,8 @@
     chatWasShown = false;
     layoutWaits = 0;
     try { root.__flSealSettle = false; } catch (eSettle) {}
+    try { root.__flSealBoxArm = false; } catch (eBox) {}
+    try { root.__flSealRetried = false; } catch (eRetry) {}
     nurseryWasOpen = false;
     try { if (root.localStorage && root.localStorage.removeItem) root.localStorage.removeItem(SEAL_NOTE_KEY); } catch (eNote) {}
     mirrorHold = 0;
@@ -3854,6 +3981,7 @@
     SEAL_HEAL: 'v-seal-ask-heal-v0.1',
     SEAL_VIEW: 'v-seal-ask-in-view-v0.1',
     SEAL_TAB: 'v-seal-ask-chat-tab-v0.1',
+    SEAL_SETTLE: 'v-seal-ask-settle-v0.1',
     SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,
