@@ -5,6 +5,7 @@
 // v-heals-042-v0.1: the sketchbook keeps its own gap, apart from a mind write.
 // v-seal-ask-heal-v0.1: one seal ask, in view, in the mind's own words.
 // v-seal-ask-in-view-v0.1: the ask comes into view, and later stays a quiet row.
+// v-seal-ask-chat-tab-v0.1: the ask comes into view when Chat is shown, and a hidden ask is not pointed at.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -80,6 +81,8 @@
   var sealRestored = false;
   var heldDefers = [];
   var loadBringDone = false;
+  var chatWasShown = false;
+  var layoutWaits = 0;
   var nurseryWasOpen = false;
   var clock = function () { return Date.now(); };
 
@@ -1650,6 +1653,8 @@
     return hit !== btn && !(btn.contains && btn.contains(hit));
   }
   function settleAsk(box) {
+    // A hidden Chat tab has no box yet. Scrolling then does not count.
+    if (!chatViewVisible()) return;
     if (!box || !box.querySelector) return;
     var btn = null;
     try { btn = box.querySelector('[aria-label="Approve seal"]'); } catch (e) { btn = null; }
@@ -1676,9 +1681,18 @@
       catch (e) { anchor = null; }
     }
     var row = anchor && anchor.parentNode;
-    if (row && row.parentNode && typeof row.parentNode.insertBefore === 'function') {
-      if (row.nextSibling) row.parentNode.insertBefore(dock, row.nextSibling);
-      else row.parentNode.appendChild(dock);
+    var host = row && row.parentNode;
+    // A closed Tree compose is inert. An ask inside that form cannot be tapped.
+    // Sit the ask just after the form. The same job, and the buttons receive the tap.
+    var form = host && host.tagName === 'FORM' ? host : null;
+    if (form && form.parentNode && typeof form.parentNode.insertBefore === 'function') {
+      if (form.nextSibling) form.parentNode.insertBefore(dock, form.nextSibling);
+      else form.parentNode.appendChild(dock);
+      return;
+    }
+    if (host && typeof host.insertBefore === 'function') {
+      if (row.nextSibling) host.insertBefore(dock, row.nextSibling);
+      else host.appendChild(dock);
       return;
     }
     var host = hostEl || (d && d.body);
@@ -1963,8 +1977,10 @@
     row.appendChild(line);
     if (nowBtn) row.appendChild(nowBtn);
     parent.appendChild(row);
-    revealEl(row, motionReduced() ? 'auto' : 'smooth');
-    try { root.requestAnimationFrame(function () { revealEl(row, 'auto'); }); } catch (eQuiet) {}
+    if (chatViewVisible()) {
+      revealEl(row, motionReduced() ? 'auto' : 'smooth');
+      try { root.requestAnimationFrame(function () { revealEl(row, 'auto'); }); } catch (eQuiet) {}
+    }
   }
   function hasClass(el, name) {
     if (!el || !name) return false;
@@ -1997,25 +2013,103 @@
     } catch (e2) {}
     return false;
   }
-  function chatViewVisible() {
-    if (nurseryOpen()) return true;
+  function chatTab() {
     var d = doc();
-    if (!d) return false;
-    var tab = d.getElementById ? d.getElementById('tab-chat') : null;
-    if (tab && hasClass(tab, 'active')) return true;
-    var input = null;
-    try {
-      input = d.querySelector && (d.querySelector('#chatInput') || d.querySelector('[data-thread-input]'));
-    } catch (e) { input = null; }
-    if (input && !tab) return true;
-    if (input && typeof input.getBoundingClientRect === 'function') {
-      var r = null;
-      try { r = input.getBoundingClientRect(); } catch (e2) { r = null; }
-      if (r && r.width > 0 && r.height > 0) return true;
+    return d && d.getElementById ? d.getElementById('tab-chat') : null;
+  }
+  function positiveRect(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return false;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { r = null; }
+    return !!(r && r.width > 0 && r.height > 0);
+  }
+  function threadInput() {
+    var d = doc();
+    if (!d || !d.querySelector) return null;
+    try { return d.querySelector('#chatInput') || d.querySelector('[data-thread-input]'); }
+    catch (e) { return null; }
+  }
+  function chatViewVisible() {
+    // A hidden Chat tab is not the reveal. The reveal is the tab shown, after it has a box.
+    // No tab means a thread. It counts when its input has a box, or when the box cannot be measured.
+    // A closed thread has no input yet, so that is not the reveal.
+    var tab = chatTab();
+    if (tab) {
+      if (!hasClass(tab, 'active')) return false;
+      return positiveRect(tab);
     }
-    return false;
+    var input = threadInput();
+    if (!input) return false;
+    if (typeof input.getBoundingClientRect !== 'function') return true;
+    return positiveRect(input);
+  }
+  function askBoxInView() {
+    if (!chatViewVisible()) return false;
+    var vh = 0;
+    var vw = 0;
+    try { vh = root.innerHeight || 0; vw = root.innerWidth || 0; } catch (e) { vh = 0; }
+    if (!vh || !vw) return true;
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    var el = null;
+    if (dock && typeof dock.querySelector === 'function') {
+      try { el = dock.querySelector('[data-seal-ask]'); } catch (e2) { el = null; }
+    }
+    if (!el && dock && dock.children) {
+      var i;
+      for (i = 0; i < dock.children.length; i++) {
+        var kid = dock.children[i];
+        if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) el = kid;
+      }
+    }
+    if (!el) el = dock;
+    if (!el || typeof el.getBoundingClientRect !== 'function') return true;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e3) { return true; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return false;
+    return r.top >= -1 && r.left >= -1 && r.bottom <= vh + 1 && r.right <= vw + 1;
+  }
+  // The ask can be drawn into a hidden host before Chat exists. Once the
+  // thread input has a box and the ask does not, move the ask beside that input.
+  function reseatDock() {
+    var input = threadInput();
+    if (!input || !positiveRect(input)) return;
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!dock || typeof dock.getBoundingClientRect !== 'function') return;
+    if (positiveRect(dock)) return;
+    var tries = dock.__flReseatTries || 0;
+    if (tries >= 4) return;
+    dock.__flReseatTries = tries + 1;
+    placeDock(dock);
+  }
+  function armSettle() {
+    if (root.__flSealSettle) return;
+    root.__flSealSettle = true;
+    var waits = 0;
+    function tick() {
+      waits += 1;
+      var cur = dockAsk();
+      var shown = chatViewVisible();
+      if (shown && cur && (cur.state === 'asked' || cur.state === 'stale') && !askBoxInView()) {
+        bringAsk('settle');
+      }
+      var done = shown && cur && askBoxInView();
+      if (!done && waits < 8) {
+        try { root.setTimeout(tick, 200); } catch (e) {}
+      }
+    }
+    try { root.setTimeout(tick, 200); } catch (e2) {}
   }
   function bringAsk(mode) {
+    if (!chatViewVisible()) {
+      if (mode === 'load') {
+        loadBringDone = false;
+        chatWasShown = false;
+      }
+      return;
+    }
+    reseatDock();
     var d = doc();
     var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
     if (!dock) return;
@@ -2041,6 +2135,7 @@
     }
     revealEl(target, motionReduced() ? 'auto' : 'smooth');
     if (typeof dock.querySelector === 'function') settleAsk(dock);
+    if (mode === 'settle') return;
     if (typingNow()) return;
     var heading = d.getElementById('fl-ws-ask-heading');
     if (heading && typeof heading.focus === 'function') {
@@ -2062,6 +2157,14 @@
       });
     } catch (e) { go(); }
   }
+  function scheduleShownCheck() {
+    try {
+      root.requestAnimationFrame(function () {
+        try { root.requestAnimationFrame(function () { watchViews(); }); }
+        catch (e2) { watchViews(); }
+      });
+    } catch (e) { watchViews(); }
+  }
   function watchViews() {
     var open = nurseryOpen();
     var openedNow = open && !nurseryWasOpen;
@@ -2070,15 +2173,46 @@
     var showable = cur && (cur.state === 'asked' || cur.state === 'stale' || cur._answerNow);
     var d = doc();
     var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    var shown = chatViewVisible();
+    if (!shown) {
+      chatWasShown = false;
+      var tab = chatTab();
+      // The class can land a frame before the box. Look again, a few times, then stop.
+      var opening = false;
+      if (tab && hasClass(tab, 'active')) opening = true;
+      if (!tab && d && d.getElementById) {
+        var thread = d.getElementById('thread-veil');
+        var room = d.getElementById('room-chat');
+        if ((thread && !thread.hidden) || (room && !room.hidden)) opening = true;
+      }
+      if (opening && layoutWaits < 8) {
+        layoutWaits += 1;
+        scheduleShownCheck();
+      }
+      return;
+    }
+    layoutWaits = 0;
+    if (cur && (cur.state === 'asked' || cur.state === 'stale') && !dock && !root.__flSealEnsure) {
+      root.__flSealEnsure = true;
+      ensureAskDock();
+      root.__flSealEnsure = false;
+      return;
+    }
+    reseatDock();
+    dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    var reveal = !chatWasShown;
+    if (dock && cur) chatWasShown = true;
     if (openedNow && showable && dock) {
       if (cur.state === 'asked') loadBringDone = true;
       scheduleBring('open');
       return;
     }
-    if (!loadBringDone && chatViewVisible() && cur && cur.state === 'asked' && dock) {
+    // Once for this reveal. A hidden tab, then Chat, is the reveal. The first paint is not.
+    if (reveal && !loadBringDone && cur && cur.state === 'asked' && dock) {
       loadBringDone = true;
       scheduleBring('load');
     }
+    if (cur && (cur.state === 'asked' || cur.state === 'stale')) armSettle();
   }
   function watchNursery() {
     var d = doc();
@@ -2094,13 +2228,55 @@
   // body observer never sees it. This watches the tab the way the Nursery veil is watched.
   function watchChat() {
     var d = doc();
-    var tab = d && d.getElementById ? d.getElementById('tab-chat') : null;
-    if (!tab || tab.__flSealChatWatch || typeof MutationObserver !== 'function') return;
-    tab.__flSealChatWatch = true;
-    try {
-      var obs = new MutationObserver(function () { watchViews(); });
-      obs.observe(tab, { attributes: true, attributeFilter: ['class'] });
-    } catch (eChat) {}
+    var tab = chatTab();
+    if (tab && !tab.__flSealChatWatch && typeof MutationObserver === 'function') {
+      tab.__flSealChatWatch = true;
+      try {
+        var obs = new MutationObserver(function () {
+          layoutWaits = 0;
+          watchViews();
+        });
+        obs.observe(tab, { attributes: true, attributeFilter: ['class'] });
+      } catch (eChat) {}
+    }
+    // A tab tap and a hash route both end in the panel being shown. The class watch
+    // covers the tap. This covers a tap whose class lands after the event, and a hash.
+    if (d && d.addEventListener && !d.__flSealChatClick) {
+      d.__flSealChatClick = true;
+      d.addEventListener('click', function () {
+        layoutWaits = 0;
+        scheduleShownCheck();
+      }, false);
+    }
+    if (root.addEventListener && !root.__flSealHashWatch) {
+      root.__flSealHashWatch = true;
+      try {
+        root.addEventListener('hashchange', function () {
+          layoutWaits = 0;
+          scheduleShownCheck();
+        });
+      } catch (eHash) {}
+    }
+  }
+  // The Tree chat is a veil, not a tab. Opening it changes hidden and class.
+  // A tap on Chat stops before it reaches the document, so the veil is the signal.
+  function watchThread() {
+    var d = doc();
+    if (!d || !d.getElementById || typeof MutationObserver !== 'function') return;
+    var ids = ['thread-veil', 'room-chat'];
+    var i;
+    for (i = 0; i < ids.length; i++) {
+      var veil = d.getElementById(ids[i]);
+      if (!veil || veil.__flSealThreadWatch) continue;
+      veil.__flSealThreadWatch = true;
+      try {
+        var obs = new MutationObserver(function () {
+          layoutWaits = 0;
+          scheduleShownCheck();
+        });
+        obs.observe(veil, { attributes: true, attributeFilter: ['class', 'hidden'] });
+      } catch (eThread) {}
+    }
   }
   function pointerWord(askEl, ptr) {
     if (!askEl || !ptr || typeof askEl.getBoundingClientRect !== 'function') return 'above';
@@ -2133,8 +2309,31 @@
       if (panel.firstChild && panel.insertBefore) panel.insertBefore(ptr, panel.firstChild);
       else panel.appendChild(ptr);
     }
-    var askEl = d.getElementById('fl-ws-asks');
-    var word = pointerWord(askEl, ptr);
+    var dock = d.getElementById('fl-ws-asks');
+    var askEl = null;
+    if (dock && typeof dock.querySelector === 'function') {
+      try { askEl = dock.querySelector('[data-seal-ask]'); } catch (eAsk) { askEl = null; }
+    }
+    if (!askEl && dock && dock.children) {
+      var ai;
+      for (ai = 0; ai < dock.children.length; ai++) {
+        var kid = dock.children[ai];
+        if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) askEl = kid;
+      }
+    }
+    // A live ask uses its dock box. During the wait, and after a decline, the ask
+    // is not shown, so this line stays off. It must not point at an ask that is hidden.
+    // An ask with no box method is the older check: the node itself means it is shown.
+    var target = null;
+    var canMeasure = (askEl && typeof askEl.getBoundingClientRect === 'function') || (dock && typeof dock.getBoundingClientRect === 'function');
+    if (askEl && !canMeasure) target = dock || askEl;
+    else if (askEl && positiveRect(dock)) target = dock;
+    else if (askEl && positiveRect(askEl)) target = askEl;
+    if (!target) {
+      if (ptr && ptr.parentNode) ptr.parentNode.removeChild(ptr);
+      return;
+    }
+    var word = pointerWord(target, ptr);
     ptr.textContent = 'Your answer is waiting ' + word + '.';
   }
   function ensureAskDock() {
@@ -3041,6 +3240,7 @@
     if (root.__flSealAskHolding) holdDeferButtons(true);
     watchNursery();
     watchChat();
+    watchThread();
     if (isOn()) {
       track(refreshWake());
       track(restoreSealAsks());
@@ -3132,6 +3332,9 @@
     sealRestored = false;
     heldDefers = [];
     loadBringDone = false;
+    chatWasShown = false;
+    layoutWaits = 0;
+    try { root.__flSealSettle = false; } catch (eSettle) {}
     nurseryWasOpen = false;
     try { if (root.localStorage && root.localStorage.removeItem) root.localStorage.removeItem(SEAL_NOTE_KEY); } catch (eNote) {}
     mirrorHold = 0;
@@ -3650,6 +3853,7 @@
     TREE_HANDOFF: 'v-tree-workspace-handoff-v0.1',
     SEAL_HEAL: 'v-seal-ask-heal-v0.1',
     SEAL_VIEW: 'v-seal-ask-in-view-v0.1',
+    SEAL_TAB: 'v-seal-ask-chat-tab-v0.1',
     SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,

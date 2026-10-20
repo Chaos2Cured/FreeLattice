@@ -1,6 +1,7 @@
 // particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
+// v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -1056,6 +1057,8 @@
       var low = vh && br.top < vh && br.bottom > vh * 0.62;
       if (hitsInput || low) cover += br.height;
     }
+    tuckOffInput(input, inputRect, vh);
+    try { inputRect = input.getBoundingClientRect(); } catch (eTuck) {}
     var px = Math.round(cover + 12) + 'px';
     var column = null;
     try {
@@ -1064,8 +1067,47 @@
     if (!column && input.parentElement && input.parentElement.parentElement) column = input.parentElement.parentElement;
     if (column && column.style && column.style.paddingBottom !== px) column.style.paddingBottom = px;
     if (input.style && input.style.scrollMarginBottom !== px) input.style.scrollMarginBottom = px;
-    if (vh && inputRect && (inputRect.top < 0 || inputRect.bottom > vh - 1) && typeof input.scrollIntoView === 'function') {
+    // Bringing the input in must not push the reply top off the window.
+    var blockInputScroll = false;
+    var replyGuard = lastAssistant();
+    if (replyGuard && typeof replyGuard.getBoundingClientRect === 'function' && inputRect && vh && inputRect.bottom > vh - 1) {
+      var replyTopNow = 0;
+      try { replyTopNow = replyGuard.getBoundingClientRect().top || 0; } catch (eTop) { replyTopNow = 0; }
+      var shift = inputRect.bottom - (vh - 8);
+      if (shift > 0 && replyTopNow - shift < 0) blockInputScroll = true;
+    }
+    if (!blockInputScroll && vh && inputRect && (inputRect.top < 0 || inputRect.bottom > vh - 1) && typeof input.scrollIntoView === 'function') {
       try { input.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (e9) {}
+    }
+  }
+  function overlapsInput(fr, inputRect) {
+    if (!fr || !inputRect || !(fr.width > 0) || !(fr.height > 0)) return false;
+    if (!(inputRect.width > 0) || !(inputRect.height > 0)) return false;
+    var gap = 12;
+    var vertical = fr.bottom > inputRect.top - gap && fr.top < inputRect.bottom + gap;
+    var horizontal = fr.right > inputRect.left && fr.left < inputRect.right;
+    return vertical && horizontal;
+  }
+  // The sparkle and the question mark sit on the ends of the input at a short window.
+  // Move them above the input, by their box plus 12px.
+  function tuckOffInput(input, inputRect, vh) {
+    if (!input || !inputRect || !vh) return;
+    var doc = root.document;
+    if (!doc || !doc.getElementById) return;
+    var ids = ['flRadioFab', 'quickHelpBtn', 'musicToggle', 'fl-clay-corner'];
+    var i;
+    for (i = 0; i < ids.length; i++) {
+      var el = null;
+      try { el = doc.getElementById(ids[i]); } catch (e) { el = null; }
+      if (!el || !el.style || typeof el.getBoundingClientRect !== 'function') continue;
+      var fr = null;
+      try { fr = el.getBoundingClientRect(); } catch (e2) { fr = null; }
+      if (!overlapsInput(fr, inputRect)) continue;
+      var lift = Math.round(vh - inputRect.top + 12);
+      if (lift < 12) lift = 12;
+      var nextBottom = lift + 'px';
+      if (el.style.bottom !== nextBottom) el.style.bottom = nextBottom;
+      if (el.setAttribute) el.setAttribute('data-fl-tucked', '1');
     }
   }
   function clayInput() {
@@ -1123,7 +1165,142 @@
       }
     }
   }
+  function calmScroll(el) {
+    if (!el || !el.style) return;
+    el.style.scrollBehavior = 'auto';
+    el.style.overflowAnchor = 'none';
+  }
+  // The Tree chat is a fixed veil. Centering a tall column hides the reply above the window.
+  // Start at the top and scroll that veil, so the reply and the input can share the view.
+  function clayOverlay(el) {
+    var n = el;
+    while (n) {
+      if (n.id === 'thread-veil' || n.id === 'place-veil') return n;
+      n = n.parentElement;
+    }
+    return null;
+  }
+  function seatOverlay(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var veil = clayOverlay(reply);
+    if (!veil || !veil.style || typeof veil.getBoundingClientRect !== 'function') return;
+    if (veil.style.overflow !== 'auto') veil.style.overflow = 'auto';
+    if (veil.style.alignItems !== 'flex-start') veil.style.alignItems = 'flex-start';
+    if (veil.style.justifyContent !== 'flex-start') veil.style.justifyContent = 'flex-start';
+    calmScroll(veil);
+    if (typeof veil.scrollTop !== 'number') return;
+    var vr = null;
+    var rr = null;
+    try { vr = veil.getBoundingClientRect(); rr = reply.getBoundingClientRect(); } catch (e) { return; }
+    if (!vr || !rr || !(rr.height > 0)) return;
+    if (rr.top < vr.top - 1 || rr.top > vr.top + 28) {
+      try { veil.scrollTop = Math.max(0, veil.scrollTop + (rr.top - vr.top - 8)); } catch (e2) {}
+    }
+  }
+  // The reply top wins. If the reply and the canvas cannot both fit, the canvas shrinks.
+  // The floor stays 120px. A smooth scroll on the transcript must not finish later and undo this.
+  function holdReplyTop(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    if (!canvas || typeof canvas.getBoundingClientRect !== 'function') return;
+    var doc = root.document;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh) return;
+    seatOverlay(reply);
+    var scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    calmScroll(scroller);
+    calmScroll(doc && doc.documentElement);
+    calmScroll(doc && doc.body);
+    if (scroller && typeof scroller.getBoundingClientRect === 'function' && typeof scroller.scrollTop === 'number') {
+      var rt = reply.getBoundingClientRect().top;
+      var st = scroller.getBoundingClientRect().top;
+      if (rt < st - 1) {
+        try { scroller.scrollTop = scroller.scrollTop + (rt - st); } catch (e2) {}
+      }
+    }
+    var top = reply.getBoundingClientRect().top;
+    if (top < 0 && typeof root.scrollBy === 'function') {
+      try { root.scrollBy(0, top - 4); } catch (e3) {}
+    }
+    var replyRect = reply.getBoundingClientRect();
+    var canvasRect = canvas.getBoundingClientRect();
+    if (!(replyRect && replyRect.height > 0) || !(canvasRect && canvasRect.height > 0)) return;
+    var replyTop = replyRect.top;
+    if (replyTop < 0) replyTop = 0;
+    var span = canvasRect.bottom - replyRect.top;
+    var room = vh - replyTop - 8;
+    if (span > room) {
+      var next = Math.max(120, Math.round(canvasRect.height - (span - room)));
+      if (next < canvasRect.height - 1) canvas.style.height = next + 'px';
+    }
+    top = reply.getBoundingClientRect().top;
+    if (top < 0 && typeof root.scrollBy === 'function') {
+      try { root.scrollBy(0, top - 4); } catch (e4) {}
+    }
+    fitReplyAndInput(reply);
+  }
+  // The reply top stays. The input has to fit under it. The canvas gives up space first, down to 120px.
+  function fitReplyAndInput(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var input = clayInput();
+    if (!input || typeof input.getBoundingClientRect !== 'function') return;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh) return;
+    seatOverlay(reply);
+    var doc = root.document;
+    var box = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    var guard;
+    for (guard = 0; guard < 3; guard++) {
+      var rb = null;
+      var ib = null;
+      try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e2) { return; }
+      if (!rb || !ib || !(rb.height > 0) || !(ib.height > 0)) return;
+      if (canvas && typeof canvas.getBoundingClientRect === 'function') {
+        var cb = null;
+        try { cb = canvas.getBoundingClientRect(); } catch (e3) { cb = null; }
+        if (cb && cb.height > 120 && cb.bottom > ib.top - 8) {
+          var cover = Math.ceil(cb.bottom - (ib.top - 8));
+          var nextH = Math.max(120, Math.round(cb.height - cover));
+          if (nextH < cb.height - 1) canvas.style.height = nextH + 'px';
+        }
+      }
+      try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e4) { return; }
+      var overflow = ib.bottom - (vh - 8);
+      if (overflow > 1 && box && box.style && typeof box.getBoundingClientRect === 'function') {
+        var bh = 0;
+        try { bh = box.getBoundingClientRect().height || 0; } catch (e5) { bh = 0; }
+        if (bh > 80) {
+          var nextBox = Math.max(80, Math.round(bh - overflow));
+          box.style.setProperty('height', nextBox + 'px', 'important');
+          box.style.setProperty('max-height', nextBox + 'px', 'important');
+          box.style.setProperty('min-height', '0px', 'important');
+        }
+      }
+      // The clay note can land after the first measure and push the input down.
+      var clayDock = doc && doc.getElementById ? doc.getElementById('fl-clay-dock') : null;
+      if (overflow > 1 && clayDock && clayDock.style && typeof clayDock.getBoundingClientRect === 'function') {
+        var dh = 0;
+        try { dh = clayDock.getBoundingClientRect().height || 0; } catch (eDock) { dh = 0; }
+        if (dh > 40) {
+          var nextDock = Math.max(40, Math.round(dh - overflow));
+          clayDock.style.setProperty('max-height', nextDock + 'px', 'important');
+          clayDock.style.setProperty('overflow', 'auto', 'important');
+        }
+      }
+      try { rb = reply.getBoundingClientRect(); } catch (e6) { return; }
+      if (rb.top < 0 && typeof root.scrollBy === 'function') {
+        try { root.scrollBy(0, rb.top); } catch (e7) {}
+      }
+      try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e8) { return; }
+      if (rb.top >= -1 && ib.bottom <= vh - 1) break;
+    }
+  }
   function revealClayPair() {
+    var doc0 = root.document;
+    calmScroll(doc0 && doc0.documentElement);
+    calmScroll(doc0 && doc0.body);
+    calmScroll(doc0 && doc0.getElementById ? doc0.getElementById('chatMessages') : null);
     try { composerGuard(); } catch (e) {}
     if (!canvas) return;
     var reply = lastAssistant();
@@ -1164,16 +1341,84 @@
       try { scroller.scrollTop = Math.max(0, reply.offsetTop - origin); } catch (e6) {}
     }
     seatClayPair(reply);
+    holdReplyTop(reply);
     // The reply scroll can leave a bar over the input. Measure again after it settles.
     try { composerGuard(); } catch (e7) {}
     seatClayPair(reply);
+    holdReplyTop(reply);
     try {
       root.requestAnimationFrame(function () {
         seatClayPair(reply);
-        root.requestAnimationFrame(function () { seatClayPair(reply); });
+        holdReplyTop(reply);
+        root.requestAnimationFrame(function () {
+          seatClayPair(reply);
+          holdReplyTop(reply);
+          try { composerGuard(); } catch (eLate) {}
+        });
       });
     } catch (e8) {}
-    try { root.setTimeout(function () { seatClayPair(reply); }, 160); } catch (e9) {}
+    try {
+      root.setTimeout(function () {
+        seatClayPair(reply);
+        holdReplyTop(reply);
+        try { composerGuard(); } catch (eLater) {}
+      }, 160);
+      root.setTimeout(function () {
+        holdReplyTop(reply);
+        try { composerGuard(); } catch (eLater2) {}
+      }, 700);
+    } catch (e9) {}
+    watchClayFit(reply);
+  }
+  // A sketch line can land after the first measure and push the input down.
+  // Watch the column for a short while, then stop.
+  function watchClayFit(reply) {
+    if (!reply || root.__flClayFitWatch) return;
+    var doc = root.document;
+    var column = null;
+    try {
+      column = doc && doc.getElementById ? (doc.getElementById('tab-chat') || doc.getElementById('thread-stage') || doc.getElementById('room-chat')) : null;
+    } catch (e) { column = null; }
+    if (!column && reply.parentNode) column = reply.parentNode;
+    if (!column || typeof MutationObserver !== 'function') return;
+    root.__flClayFitWatch = true;
+    var timer = null;
+    var stopAt = 0;
+    try { stopAt = Date.now() + 2000; } catch (eNow) { stopAt = 0; }
+    var obs = null;
+    function fit() {
+      holdReplyTop(reply);
+      try { composerGuard(); } catch (eFit) {}
+    }
+    try {
+      obs = new MutationObserver(function () {
+        var now = 0;
+        try { now = Date.now(); } catch (eTime) { now = 0; }
+        if (stopAt && now > stopAt) {
+          try { obs.disconnect(); } catch (eStop) {}
+          root.__flClayFitWatch = false;
+          return;
+        }
+        if (timer) return;
+        try {
+          timer = root.setTimeout(function () {
+            timer = null;
+            fit();
+          }, 80);
+        } catch (eTimer) {}
+      });
+      obs.observe(column, { childList: true, subtree: true });
+    } catch (eObs) {
+      root.__flClayFitWatch = false;
+      return;
+    }
+    try {
+      root.setTimeout(function () {
+        try { if (obs) obs.disconnect(); } catch (eDisc) {}
+        root.__flClayFitWatch = false;
+        fit();
+      }, 1200);
+    } catch (eEnd) {}
   }
   function noteSealHold(on) {
     var offer = root.__clayOffer;
