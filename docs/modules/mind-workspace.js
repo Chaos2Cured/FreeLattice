@@ -7,6 +7,7 @@
 // v-seal-ask-in-view-v0.1: the ask comes into view, and later stays a quiet row.
 // v-seal-ask-chat-tab-v0.1: the ask comes into view when Chat is shown, and a hidden ask is not pointed at.
 // v-seal-ask-settle-v0.1: the ask scrolls after its final place, and only once the panel has a box.
+// v-seal-ask-after-tap-v0.1: a Chat tap scrolls the ask after the tab's own motion, and a woken compose sleeps while the ask is open.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -84,6 +85,8 @@
   var loadBringDone = false;
   var chatWasShown = false;
   var layoutWaits = 0;
+  var formHold = null;
+  var tabClickAt = 0;
   var nurseryWasOpen = false;
   var clock = function () { return Date.now(); };
 
@@ -1655,6 +1658,8 @@
   }
   function settleAsk(box) {
     // A hidden Chat tab has no box yet. Scrolling then does not count.
+    // A running tab fade is the same: its own scroll has not finished.
+    if (tabMotionPending()) return;
     if (!chatViewVisible()) return;
     if (!box || !box.querySelector) return;
     var btn = null;
@@ -1708,6 +1713,11 @@
       return;
     }
     if (!sealBackArmed) return;
+    var landed = null;
+    try { landed = e && e.state; } catch (eLand) { landed = null; }
+    // The Tree gives back its own step when a place closes, and that lands on the ask's step.
+    // The ask stays open. A Back that leaves the ask's step still defers.
+    if (landed && landed.flSealAsk) return;
     sealBackArmed = false;
     if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
     var shown = dockAsk();
@@ -2199,7 +2209,246 @@
     }
     try { root.setTimeout(tick, 200); } catch (e2) {}
   }
-  function bringAsk(mode) {
+  // switchTab restarts the 200ms panel fade (neuro-fade-in, a 4px rise) and
+  // waits 50ms before tabVisible. A tap also focuses the Chat tab button, and
+  // the browser scrolls that button into view when the fade ends. That scroll
+  // stays. The ask scroll runs after it, and once more if Seal it is still outside.
+  function chatTabAnimating() {
+    var tab = chatTab();
+    if (!tab || typeof tab.getAnimations !== 'function') return false;
+    var list = [];
+    try { list = tab.getAnimations() || []; } catch (e) { return false; }
+    var i;
+    for (i = 0; i < list.length; i++) {
+      var anim = list[i];
+      if (anim && (anim.playState === 'running' || anim.playState === 'pending')) return true;
+    }
+    return false;
+  }
+  function tabMotionPending() {
+    if (chatTabAnimating()) return true;
+    var now = 0;
+    try { now = Date.now(); } catch (e) { now = 0; }
+    return !!(tabClickAt && now && (now - tabClickAt) < 260);
+  }
+  function twoFrames(fn) {
+    try {
+      root.requestAnimationFrame(function () {
+        try { root.requestAnimationFrame(fn); }
+        catch (e2) { fn(); }
+      });
+    } catch (e) { fn(); }
+  }
+  function afterTabMotion(fn) {
+    var gen = (root.__flSealTabGen || 0) + 1;
+    root.__flSealTabGen = gen;
+    function run() {
+      if (root.__flSealTabGen !== gen) return;
+      twoFrames(function () {
+        if (root.__flSealTabGen !== gen) return;
+        fn();
+      });
+    }
+    var tab = chatTab();
+    if (!tabMotionPending()) {
+      run();
+      return;
+    }
+    var fired = false;
+    function done() {
+      if (fired) return;
+      fired = true;
+      try { root.setTimeout(run, 50); }
+      catch (e) { run(); }
+    }
+    if (tab && tab.addEventListener) {
+      try { tab.addEventListener('animationend', done); }
+      catch (e2) {}
+    }
+    try { root.setTimeout(done, 280); } catch (e3) { done(); }
+  }
+  function armScrollAgree() {
+    if (root.__flSealAgree) return;
+    root.__flSealAgree = true;
+    var timer = null;
+    function correct() {
+      var btn = sealButton();
+      if (!btn || fullyInView(btn)) return;
+      if (root.__flSealAgreed) return;
+      root.__flSealAgreed = true;
+      revealEl(btn, 'auto');
+    }
+    function onScroll() {
+      if (timer) {
+        try { root.clearTimeout(timer); } catch (e) {}
+      }
+      try { timer = root.setTimeout(function () { twoFrames(correct); }, 40); }
+      catch (e2) { twoFrames(correct); }
+    }
+    if (root.addEventListener) {
+      try { root.addEventListener('scroll', onScroll); } catch (e3) {}
+    }
+    try {
+      root.setTimeout(function () {
+        if (root.removeEventListener) {
+          try { root.removeEventListener('scroll', onScroll); } catch (e4) {}
+        }
+        root.__flSealAgree = false;
+      }, 500);
+    } catch (e5) {}
+  }
+  function composeForm() {
+    var d = doc();
+    if (!d || typeof d.querySelector !== 'function') return null;
+    try { return d.querySelector('form.thread-compose'); }
+    catch (e) { return null; }
+  }
+  function askIsOpen() {
+    var cur = dockAsk();
+    if (!cur) return false;
+    if (cur._answerNow) return true;
+    return cur.state === 'asked' || cur.state === 'stale';
+  }
+  function composeControls(form) {
+    var out = [];
+    if (!form || typeof form.querySelectorAll !== 'function') return out;
+    var found = [];
+    try { found = form.querySelectorAll('input, button, textarea, select') || []; }
+    catch (e) { found = []; }
+    var i;
+    for (i = 0; i < found.length; i++) out.push(found[i]);
+    return out;
+  }
+  function setFlag(el, name, on) {
+    if (!el) return;
+    if (name === 'disabled') el.disabled = !!on;
+    if (!el.setAttribute || !el.removeAttribute) return;
+    if (on) el.setAttribute(name, name === 'disabled' ? '' : (name === 'tabindex' ? '-1' : 'true'));
+    else el.removeAttribute(name);
+  }
+  function holdCompose() {
+    var form = composeForm();
+    if (!form || !askIsOpen()) return;
+    if (formHold && formHold.form === form) {
+      var again = formHold.controls || [];
+      var j;
+      for (j = 0; j < again.length; j++) {
+        var held = again[j] && again[j].el;
+        if (!held) continue;
+        setFlag(held, 'disabled', true);
+        if (held.setAttribute) {
+          held.setAttribute('aria-disabled', 'true');
+          held.setAttribute('tabindex', '-1');
+        }
+      }
+      if (form.setAttribute) form.setAttribute('inert', '');
+      return;
+    }
+    var controls = composeControls(form);
+    var saved = [];
+    var i;
+    for (i = 0; i < controls.length; i++) {
+      var el = controls[i];
+      saved.push({
+        el: el,
+        disabled: !!(el && (el.disabled || (el.hasAttribute && el.hasAttribute('disabled')))),
+        tabIndex: el && el.getAttribute ? el.getAttribute('tabindex') : null,
+        aria: el && el.getAttribute ? el.getAttribute('aria-disabled') : null
+      });
+      setFlag(el, 'disabled', true);
+      if (el && el.setAttribute) {
+        el.setAttribute('aria-disabled', 'true');
+        el.setAttribute('tabindex', '-1');
+      }
+    }
+    formHold = {
+      form: form,
+      inert: !!(form.hasAttribute && form.hasAttribute('inert')),
+      controls: saved
+    };
+    if (form.setAttribute) form.setAttribute('inert', '');
+  }
+  function releaseCompose() {
+    if (!formHold || !formHold.form) {
+      formHold = null;
+      return;
+    }
+    var form = formHold.form;
+    var saved = formHold.controls || [];
+    var i;
+    for (i = 0; i < saved.length; i++) {
+      var row = saved[i];
+      var el = row && row.el;
+      if (!el) continue;
+      setFlag(el, 'disabled', !!row.disabled);
+      if (el.setAttribute && el.removeAttribute) {
+        if (row.aria == null) el.removeAttribute('aria-disabled');
+        else el.setAttribute('aria-disabled', row.aria);
+        if (row.tabIndex == null) el.removeAttribute('tabindex');
+        else el.setAttribute('tabindex', row.tabIndex);
+      }
+    }
+    if (formHold.inert) {
+      if (form.setAttribute) form.setAttribute('inert', '');
+    } else if (form.removeAttribute) {
+      form.removeAttribute('inert');
+    }
+    formHold = null;
+  }
+  function syncCompose() {
+    if (askIsOpen()) holdCompose();
+    else releaseCompose();
+  }
+  // The heart sits at the top of the thread. Centering Seal it can push it above the veil.
+  // Bring it back only when Seal it still fits. When both cannot fit, Seal it stays.
+  function keepHeart(veil, askEl) {
+    if (!veil || !askEl || typeof veil.scrollTop !== 'number') return;
+    if (typeof askEl.getBoundingClientRect !== 'function') return;
+    var d = doc();
+    var heart = null;
+    if (d && typeof d.querySelector === 'function') {
+      try { heart = d.querySelector('[data-thread-heart]'); } catch (e) { heart = null; }
+    }
+    if (!heart || typeof heart.getBoundingClientRect !== 'function') return;
+    if (typeof veil.getBoundingClientRect !== 'function') return;
+    var hr = null;
+    var ar = null;
+    var vr = null;
+    try {
+      hr = heart.getBoundingClientRect();
+      ar = askEl.getBoundingClientRect();
+      vr = veil.getBoundingClientRect();
+    } catch (e2) { return; }
+    if (!hr || !ar || !vr || !(hr.height > 0) || !(ar.height > 0)) return;
+    if (hr.top >= vr.top - 1) return;
+    var seal = sealButton();
+    var guard = ar;
+    if (seal && typeof seal.getBoundingClientRect === 'function') {
+      try { guard = seal.getBoundingClientRect() || ar; } catch (eSeal) { guard = ar; }
+    }
+    if (!guard || !(guard.height > 0)) guard = ar;
+    var need = vr.top + 8 - hr.top;
+    if (!(need > 0)) return;
+    var room = vr.bottom - guard.bottom;
+    if (need > room - 8) return;
+    var before = veil.scrollTop;
+    try { veil.scrollTop = Math.max(0, veil.scrollTop - need); } catch (e3) { return; }
+    var gr2 = null;
+    try { gr2 = (seal || askEl).getBoundingClientRect(); } catch (e4) { gr2 = null; }
+    if (!gr2 || gr2.bottom > vr.bottom - 1 || gr2.top < vr.top - 1) {
+      try { veil.scrollTop = before; } catch (e5) {}
+    }
+  }
+  function bringAsk(mode, settled) {
+    // The tab fade and its focus scroll finish first. A scroll during the fade does not stick.
+    if (!settled && tabMotionPending()) {
+      afterTabMotion(function () {
+        try { root.__flSealRetried = false; } catch (eWait) {}
+        bringAsk(mode, true);
+        armScrollAgree();
+      });
+      return;
+    }
     // No box yet. A scroll now does not move Seal it, and it must not count.
     if (!chatViewVisible()) {
       if (mode === 'load') {
@@ -2239,6 +2488,7 @@
     function land() {
       // An immediate land. A glide that starts before the panel is visible never finishes in view.
       revealEl(target, 'auto');
+      if (veil) keepHeart(veil, target);
       if (typeof dock.querySelector === 'function') settleAsk(dock);
       if (allowFocus && !typingNow()) {
         var heading = d.getElementById('fl-ws-ask-heading');
@@ -2317,6 +2567,8 @@
       return;
     }
     layoutWaits = 0;
+    // A reopen builds a new compose. The ask is already up, so the new form sleeps too.
+    syncCompose();
     if (cur && (cur.state === 'asked' || cur.state === 'stale') && !dock && !root.__flSealEnsure) {
       root.__flSealEnsure = true;
       ensureAskDock();
@@ -2368,8 +2620,24 @@
     // covers the tap. This covers a tap whose class lands after the event, and a hash.
     if (d && d.addEventListener && !d.__flSealChatClick) {
       d.__flSealChatClick = true;
-      d.addEventListener('click', function () {
+      d.addEventListener('click', function (ev) {
         layoutWaits = 0;
+        var node = ev && ev.target;
+        var onChatTab = false;
+        while (node) {
+          if (node.id === 'mnav-chat') onChatTab = true;
+          if (node.getAttribute && node.getAttribute('data-tab') === 'chat') onChatTab = true;
+          node = node.parentElement || node.parentNode;
+        }
+        if (onChatTab) {
+          // A fresh tap. The earlier land must not count, and it must not keep the focus.
+          loadBringDone = false;
+          chatWasShown = false;
+          try { tabClickAt = Date.now(); } catch (eClick) { tabClickAt = 1; }
+          try { root.__flSealRetried = false; } catch (eR) {}
+          try { root.__flSealSettle = false; } catch (eS) {}
+          try { root.__flSealAgreed = false; } catch (eA) {}
+        }
         scheduleShownCheck();
       }, false);
     }
@@ -2479,6 +2747,7 @@
     if (!full && !quiet && (panelOpen || !handoffPending)) {
       if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
       holdOthers(false);
+      syncCompose();
       paintBadge();
       syncPointer();
       watchViews();
@@ -2515,6 +2784,7 @@
     }
     paintBadge();
     syncPointer();
+    syncCompose();
     watchViews();
   }
   function appendReceipt(parent, row) {
@@ -3462,6 +3732,11 @@
     try { root.__flSealSettle = false; } catch (eSettle) {}
     try { root.__flSealBoxArm = false; } catch (eBox) {}
     try { root.__flSealRetried = false; } catch (eRetry) {}
+    try { root.__flSealAgree = false; } catch (eAgree) {}
+    try { root.__flSealAgreed = false; } catch (eAgreed) {}
+    try { releaseCompose(); } catch (eForm) {}
+    formHold = null;
+    tabClickAt = 0;
     nurseryWasOpen = false;
     try { if (root.localStorage && root.localStorage.removeItem) root.localStorage.removeItem(SEAL_NOTE_KEY); } catch (eNote) {}
     mirrorHold = 0;
@@ -3982,6 +4257,7 @@
     SEAL_VIEW: 'v-seal-ask-in-view-v0.1',
     SEAL_TAB: 'v-seal-ask-chat-tab-v0.1',
     SEAL_SETTLE: 'v-seal-ask-settle-v0.1',
+    SEAL_TAP: 'v-seal-ask-after-tap-v0.1',
     SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,
