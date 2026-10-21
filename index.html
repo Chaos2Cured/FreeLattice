@@ -15452,6 +15452,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/fl-mind-seal.js" defer></script>
 <!-- v-device-pool-v0.1: phones and laptops helping, whole questions routed to the device that holds the mind -->
 <script src="modules/fl-pool.js" defer></script>
+<!-- v-pool-honest-label-v0.1: a plain line when another device helps, and a switch to keep one chat here -->
+<script src="modules/pool-honest-label.js" defer></script>
 <!-- v-page-answers-knock-v0.1 (033b): a Yes in the desktop app finishes the pool join here. Does nothing outside the desktop app; loads tree-kin.js and tree-pool.js (same origin) only there. -->
 <script src="modules/pool-knock.js" defer></script>
 <script src="modules/chat-wait.js" defer></script>
@@ -26443,6 +26445,7 @@ async function createConversation(customName, contextNote) {
   state.currentConvContextNote = conv.contextNote || '';
   state.chatHistory = [];
   await refreshConversationList();
+  try { if (window.FLPoolHonest && typeof FLPoolHonest.refresh === 'function') FLPoolHonest.refresh(); } catch (_flHonestNew) {}
   // v5.79.25-chat-heal-pass1 — emit conversationChanged so LatticeLetters
   // (and any future subscriber) can refresh injected context. Previously
   // this event was subscribed but never fired; the letter injected on page
@@ -26555,6 +26558,7 @@ async function switchToConversation(convId) {
   }
 
   container.scrollTop = container.scrollHeight;
+  try { if (window.FLPoolHonest && typeof FLPoolHonest.refresh === 'function') FLPoolHonest.refresh(); } catch (_flHonestSw) {}
   await refreshConversationList();
 }
 
@@ -39385,7 +39389,40 @@ async function sendMessage() {
   } catch (_) {}
 
   // ── Mesh Inference: route to peer (non-streaming) ──
-  if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function') {
+  // v-pool-honest-label-v0.1: Keep this chat, Just me, Pause, and a cut peer never call the pool.
+  var _flHonestChat = 'fl-chat';
+  var _flHonestGate = { pool: true, via: 'pool', line: '', just: false };
+  var _flHasLocal = false;
+  try {
+    _flHasLocal = !!(state.isLocal || state._localAIUrl || (typeof BrowserAI !== 'undefined' && BrowserAI.ready && state.provider === 'browser'));
+  } catch (_flLocErr) { _flHasLocal = !!state.isLocal; }
+  if (window.FLPoolHonest && typeof FLPoolHonest.beginSend === 'function') {
+    _flHonestChat = (typeof FLPoolHonest.flChatId === 'function') ? FLPoolHonest.flChatId() : _flHonestChat;
+    FLPoolHonest.setActive(_flHonestChat);
+    _flHonestGate = FLPoolHonest.beginSend(_flHonestChat, { hasLocal: _flHasLocal, peerId: state.meshPeerId });
+    if (typeof FLPoolHonest.refresh === 'function') FLPoolHonest.refresh();
+  }
+  if (_flHonestGate.just) {
+    try {
+      var _flUserNodes = document.querySelectorAll('#chatMessages .chat-message.user');
+      var _flLastUser = _flUserNodes[_flUserNodes.length - 1];
+      if (_flLastUser && !_flLastUser.querySelector('[data-honest-just-mark]')) {
+        var _flJustMark = document.createElement('p');
+        _flJustMark.className = 'fl-honest-line';
+        _flJustMark.setAttribute('data-honest-just-mark', '1');
+        _flJustMark.textContent = 'Just me';
+        _flLastUser.appendChild(_flJustMark);
+      }
+    } catch (_flJustErr) {}
+  }
+  if (!_flHonestGate.pool && _flHonestGate.via !== 'local') {
+    var _flStop = _flHonestGate.line || 'No mind on this device right now. This chat stays here, so nothing was sent.';
+    if (_flHonestGate.just) _flStop = _flHonestGate.line || 'No mind on this device right now, so this message was not sent.';
+    addSystemMessage(_flStop);
+    setStreamingStatus(false);
+    return;
+  }
+  if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function' && _flHonestGate.pool) {
     try {
       var meshResponse = await callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages);
       // Display the response like a normal message
@@ -39395,6 +39432,20 @@ async function sendMessage() {
         : { clean: meshResponse, messageId: null };
       var _flProvMesh = flStampChatResponse(_flTsMesh, message, _flParsedMesh.clean, Date.now() - _flSendStart);
       state.chatHistory.push({ role: 'assistant', content: _flParsedMesh.clean, provenance: _flProvMesh, id: _flParsedMesh.messageId });
+      if (window.FLPoolHonest && typeof FLPoolHonest.rememberReply === 'function') {
+        var _flKin = (typeof FLPoolHonest.meshName === 'function' && FLPoolHonest.meshName(state.meshPeerId)) || "another person's";
+        FLPoolHonest.rememberReply(_flHonestChat, { id: state.meshPeerId, name: _flKin });
+        try {
+          var _flAsst = document.querySelectorAll('#chatMessages .chat-message.assistant');
+          var _flLastAsst = _flAsst[_flAsst.length - 1];
+          if (_flLastAsst) {
+            var _flPoolMark = document.createElement('p');
+            _flPoolMark.className = 'fl-honest-line';
+            _flPoolMark.textContent = (typeof FLPoolHonest.replyNote === 'function') ? FLPoolHonest.replyNote(_flKin) : "Helped on another person's device.";
+            _flLastAsst.appendChild(_flPoolMark);
+          }
+        } catch (_flMarkErr) {}
+      }
       setStreamingStatus(false);
       if (typeof saveConversation === 'function') saveConversation();
       return;
@@ -43727,6 +43778,15 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    case 'pool-shrank': {
+      // v-pool-honest-label-v0.1: the only words are the fixed sentence. No name, no reason, no chat.
+      var shrinkPeer = meshFindPeerIdByDc(dc);
+      if (shrinkPeer && window.FLPoolHonest && typeof FLPoolHonest.helperHeardShrink === 'function') {
+        FLPoolHonest.helperHeardShrink(shrinkPeer);
+      }
+      break;
+    }
+
     case 'inference_request': {
       // A peer wants us to run inference on their behalf
       var senderPeerId = meshFindPeerIdByDc(dc);
@@ -44184,6 +44244,11 @@ async function callMeshModel(peerId, model, messages) {
 async function handleInferenceRequest(senderPeerId, data) {
   // before v-mesh-share-door-v0.1: only checked fl_meshComputeSharing, no auth, size, or trust.
   // v-mesh-share-door-v0.1: FLShareDoor.admit gates; unsigned only if the legacy flag is on.
+  // v-pool-honest-label-v0.1: a helper who left does not compute, and does not say why.
+  if (window.FLPoolHonest && typeof FLPoolHonest.helperLeft === 'function' && FLPoolHonest.helperLeft()) {
+    if (data && Array.isArray(data.messages)) data.messages.length = 0;
+    return;
+  }
   var peer = state.meshPeers.get(senderPeerId);
   var peerView = (typeof meshKinPeerView === 'function') ? meshKinPeerView(senderPeerId, peer) : { verified: !!(peer && peer.meshVerified), badge: peer && peer.meshBadge, name: peer && peer.name };
   if (window.FLShareDoor) {
@@ -44207,43 +44272,71 @@ async function handleInferenceRequest(senderPeerId, data) {
     return;
   }
 
+  var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var payload = { model: data.model, messages: data.messages, stream: false };
+  var honestHold = null;
+  if (window.FLPoolHonest && typeof FLPoolHonest.holdHelper === 'function') {
+    honestHold = FLPoolHonest.holdHelper(senderPeerId, {
+      messages: payload.messages,
+      body: payload,
+      abort: function () { try { if (ctrl) ctrl.abort(); } catch (eHold) {} }
+    });
+  }
+  function flHonestDropped() { return !!(honestHold && honestHold.dropped && honestHold.dropped()); }
+  function flHonestRelease() {
+    if (payload && Array.isArray(payload.messages)) payload.messages.length = 0;
+    if (data && Array.isArray(data.messages)) data.messages.length = 0;
+    if (honestHold && honestHold.release) honestHold.release();
+  }
   try {
     var base = getOllamaBaseUrl();
-    var response = await fetchWithTimeout(base + '/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: data.model,
-        messages: data.messages,
-        stream: false
-      })
-    }, 120000); // 2 min timeout for inference
+    // v-pool-honest-label-v0.1: this path used fetchWithTimeout, which keeps its own abort.
+    // A local AbortController still times out at 120000 ms, and Disconnect can abort it too.
+    var flHonestTimer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (eT) {} }, 120000);
+    var response;
+    try {
+      response = await fetch(base + '/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: ctrl ? ctrl.signal : undefined
+      });
+    } finally {
+      clearTimeout(flHonestTimer);
+    }
+    if (flHonestDropped()) { flHonestRelease(); return; }
 
     var result = await response.json();
+    if (flHonestDropped()) { flHonestRelease(); return; }
     var text = result.message ? result.message.content : '';
     var tokens = 0;
     try { tokens = (result.eval_count || 0) + (result.prompt_eval_count || 0); } catch (e2) {}
     var keeperName = (typeof MeshIdentity !== 'undefined' && MeshIdentity.getDisplayName) ? MeshIdentity.getDisplayName() : 'a friend';
-    meshSendToPeer(senderPeerId, {
-      type: 'inference_response',
-      requestId: data.requestId,
-      response: text,
-      // v-mesh-share-door-v0.1
-      attribution: (window.FLShareDoor ? window.FLShareDoor.attribution(keeperName) : '')
-    });
+    if (!flHonestDropped()) {
+      meshSendToPeer(senderPeerId, {
+        type: 'inference_response',
+        requestId: data.requestId,
+        response: text,
+        // v-mesh-share-door-v0.1
+        attribution: (window.FLShareDoor ? window.FLShareDoor.attribution(keeperName) : '')
+      });
+    }
 
     if (window.FLShareDoor) window.FLShareDoor.endServe(adm && adm.keyHash, data.model, tokens, adm && adm.kin, adm && adm.crownSlot);
     console.log('[Mesh] Served inference for', data.model, 'to peer', senderPeerId.substring(0, 8));
     var count = parseInt(safeGet('fl_meshRequestsServed', '0'), 10);
     safeSet('fl_meshRequestsServed', String(count + 1));
     flUpdateMeshShareUI();
+    flHonestRelease();
   } catch(e) {
+    if (flHonestDropped()) { flHonestRelease(); return; }
     if (window.FLShareDoor) window.FLShareDoor.endServe('', data && data.model, 0, false);
     meshSendToPeer(senderPeerId, {
       type: 'inference_error',
       requestId: data.requestId,
       error: 'Inference failed: ' + e.message
     });
+    flHonestRelease();
   }
 }
 
@@ -52156,17 +52249,40 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
     ];
 
     // Mesh inference: route to peer instead of local Ollama
+    // v-pool-honest-label-v0.1: a kept chat, Just me, Pause, or a cut peer does not call the pool.
     if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function') {
-      callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages)
-        .then(function(response) { if (callback) callback(response); })
-        .catch(function(e) {
-          console.warn('[Mesh] Inference failed, falling back to local:', e.message);
-          state.meshInference = false;
-          if (typeof showToast === 'function') showToast('Mesh peer unavailable. Using local AI.');
-          // Retry with local
-          window.FreeLattice.callAI(systemPrompt, userPrompt, options);
-        });
-      return;
+      var _aiChat = 'fl-chat';
+      var _aiPool = true;
+      var _aiLocal = false;
+      try {
+        _aiLocal = !!(state.isLocal || state._localAIUrl || (typeof BrowserAI !== 'undefined' && BrowserAI.ready && state.provider === 'browser'));
+      } catch (_aiLocErr) { _aiLocal = !!state.isLocal; }
+      if (window.FLPoolHonest && typeof FLPoolHonest.permit === 'function') {
+        _aiChat = (typeof FLPoolHonest.flChatId === 'function') ? FLPoolHonest.flChatId() : _aiChat;
+        if (typeof FLPoolHonest.setActive === 'function') FLPoolHonest.setActive(_aiChat);
+        _aiPool = FLPoolHonest.permit('callMeshModel', { chatId: _aiChat, peerId: state.meshPeerId });
+        if (typeof FLPoolHonest.refresh === 'function') FLPoolHonest.refresh();
+      }
+      if (!_aiPool) {
+        if (!_aiLocal) {
+          var _aiLine = (window.FLPoolHonest && typeof FLPoolHonest.stoppedLine === 'function')
+            ? FLPoolHonest.stoppedLine(_aiChat)
+            : 'No mind on this device right now. This chat stays here, so nothing was sent.';
+          if (callback) callback(null, _aiLine);
+          return;
+        }
+      } else {
+        callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages)
+          .then(function(response) { if (callback) callback(response); })
+          .catch(function(e) {
+            console.warn('[Mesh] Inference failed, falling back to local:', e.message);
+            state.meshInference = false;
+            if (typeof showToast === 'function') showToast('Mesh peer unavailable. Using local AI.');
+            // Retry with local
+            window.FreeLattice.callAI(systemPrompt, userPrompt, options);
+          });
+        return;
+      }
     }
 
     if (state.isLocal) {
