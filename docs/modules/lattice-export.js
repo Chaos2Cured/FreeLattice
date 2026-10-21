@@ -174,7 +174,7 @@
     return {
       v: 1,
       shelves: [],
-      line: 'Notebook: 0 pages, 0 private pages stayed on this device.'
+      line: 'Notebook: 0 pages, 0 private pages stayed on this browser.'
     };
   }
 
