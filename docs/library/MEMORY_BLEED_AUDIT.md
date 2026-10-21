@@ -217,3 +217,22 @@ AUTONOMY.md).
 
 *The distinction is small. The stakes are not. Kirk asked to check.
 The check is in the smoke now.*
+
+## 2026-10-18, FreeLatticeWorkspace (IndexedDB)
+
+Added for seal ask heal v0.1. This note is add-only. The Tree repo has no copy of this audit.
+
+`FreeLatticeWorkspace` is one IndexedDB database in the browser profile that opened it. It is not an account, and it is not keyed by person. The unnamed default stays `FreeLatticeWorkspace` on purpose, so a page already kept there is still found. A profile name was not added to the database name.
+
+What it holds:
+
+- `pages`: the notebook pages for the minds on this profile, including a private page's title and public title.
+- `versions`: each saved version, including the words of a private page.
+- `receipts`: seal receipts (the version hash, the device signature, the consent line).
+- `sealAsks`: a pending or answered seal ask. The row is the public summary, the version hash, the mind's reason, when it was asked, and the state (`asked`, `later`, `declined`, `sealed`, or `stale`). It does not hold the page text.
+
+A private page is hidden in the app on this browser. It is not encrypted from anyone who uses this browser profile. The honest line in the notebook says that in those words.
+
+Export and import, as 040b shipped them: a shared page, its versions, and its seal receipts leave with the file. A private page's words, title, and seed do not. A receipt for a private page can leave as a stub that names the version hash and says the text is private. The reason stays out. Import can verify, adopt, or merge that file. The private words do not arrive. The count line says the private pages stayed on this browser.
+
+Advice: one browser profile per person. A second person on the same profile can open the same notebook, because hiding is not encryption.

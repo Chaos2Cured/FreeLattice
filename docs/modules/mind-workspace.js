@@ -3,6 +3,12 @@
 // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
 // v-workspace-desktop-v0.1 v-workspace-handoff-v0.1 v-tree-workspace-handoff-v0.1
 // v-heals-042-v0.1: the sketchbook keeps its own gap, apart from a mind write.
+// v-seal-ask-heal-v0.1: one seal ask, in view, in the mind's own words.
+// v-seal-ask-in-view-v0.1: the ask comes into view, and later stays a quiet row.
+// v-seal-ask-chat-tab-v0.1: the ask comes into view when Chat is shown, and a hidden ask is not pointed at.
+// v-seal-ask-settle-v0.1: the ask scrolls after its final place, and only once the panel has a box.
+// v-seal-ask-after-tap-v0.1: a Chat tap scrolls the ask after the tab's own motion, and a woken compose sleeps while the ask is open.
+// v-seal-ask-last-two-v0.1: Back from Nursery closes Nursery and leaves the ask, and the heart stays when it fits.
 // A notebook a mind can keep. Off until a person says yes.
 // No network. Pages stay on this device. A private page stays in the app for that mind.
 // A person's own chat line cannot private a page or ask for a seal.
@@ -36,13 +42,15 @@
   };
   var HASH_KEYS = ['parent', 'ts', 'author', 'text', 'meta'];
   var HOWTO = 'You can keep a notebook on this device. A private page: [FL_WS: {"op":"private","page":"id","on":true}] A seal: [FL_WS: {"op":"seal","page":"id","why":"why"}] A handoff: [FL_WS: {"op":"handoff","page":"id","note":"note"}] End with this line. [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]';
-  var HONEST = 'Private means hidden in the app, not encrypted from the person who owns this device.';
-  var HANDOFF_PRIVATE = 'This page is private. The mind must share it first.';
+  var HONEST = 'Private means hidden in the app on this browser, not encrypted from anyone who uses this browser profile.';
+  var HANDOFF_PRIVATE = 'This page is private on this browser. The mind must share it first.';
   var KNOCK_FIRST = 'Knock first: Celeste has not met this device yet';
   var RESTORE_LINE = "Restore your mind's notebook from the desktop copy";
   var INTEGRITY = 'Integrity comes from SHA-256 and the device signature, not from the spiral math.';
   var DEVICE_KEY = 'fl_ws_device_key_v1';
-  var DB_VERSION = 2;
+  var DB_VERSION = 3;
+  var SEAL_ASK_COOLDOWN_MS = 86400000;
+  var SEAL_NOTE_KEY = 'fl_ws_seal_notes_v1';
   var WS_OPEN = /\[\s*fl[\s_-]?ws\s*:/i;
 
   var db = null;
@@ -70,6 +78,17 @@
   var shelfCache = '';
   var shelfStamp = '';
   var hostEl = null;
+  var sealDockOpen = false;
+  var sealBackArmed = false;
+  var sealBackEating = false;
+  var sealRestored = false;
+  var heldDefers = [];
+  var loadBringDone = false;
+  var chatWasShown = false;
+  var layoutWaits = 0;
+  var formHold = null;
+  var tabClickAt = 0;
+  var nurseryWasOpen = false;
   var clock = function () { return Date.now(); };
 
   function track(p) {
@@ -223,6 +242,7 @@
         if (!d.objectStoreNames.contains('pages')) d.createObjectStore('pages', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('versions')) d.createObjectStore('versions', { keyPath: 'hash' });
         if (!d.objectStoreNames.contains('receipts')) d.createObjectStore('receipts', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('sealAsks')) d.createObjectStore('sealAsks', { keyPath: 'pageId' });
       };
       req.onsuccess = function (e) { db = e.target.result; resolve(db); };
       req.onerror = function () { resolve(null); };
@@ -670,7 +690,10 @@
     if (!res || !res.ok || !res.page) return '';
     var title = res.page.privacy === 'private' ? personTitle(res.page) : (res.page.title || 'a page');
     if (op.op === 'private') return 'Kept a private page.';
-    if (op.op === 'write' || op.op === 'branch') return 'Wrote to ' + title + ' (version ' + shortHash(res.hash) + ')';
+    if (op.op === 'write' || op.op === 'branch') {
+      if (res.page.privacy === 'private') return 'Wrote to "' + title + '" (version ' + shortHash(res.hash) + ')';
+      return 'Wrote to ' + title + ' (version ' + shortHash(res.hash) + ')';
+    }
     if (op.op === 'open') return 'Opened ' + title;
     if (op.op === 'pin') return (res.page.pinned ? 'Pinned ' : 'Unpinned ') + title;
     if (op.op === 'seed') return 'Seeded ' + title;
@@ -839,7 +862,10 @@
         page.updated = clock();
         return putPage(page).then(function () {
           return warmPrivate().then(function () {
-            if (on) showHonestOnce();
+            if (on) {
+              showHonestOnce();
+              redactPageTitle(page);
+            }
             return refreshWake().then(function () {
               return paintOpen().then(function () { return { ok: true, page: page }; });
             });
@@ -973,18 +999,128 @@
       });
     });
   }
-  function mindLabel() {
-    var name = '';
-    try { name = String((recallMind().name) || '').trim(); } catch (e) { name = ''; }
-    return name || 'A mind';
+  function programishName(name) {
+    var n = String(name || '').trim().toLowerCase();
+    if (!n) return true;
+    if (n.indexOf(':') !== -1) return true;
+    var folded = [
+      ['ol', 'lama'].join(''),
+      ['lm', ' studio'].join(''),
+      ['ll', 'ama.cpp'].join(''),
+      ['ll', 'ama cpp'].join(''),
+      ['gpt', '4all'].join(''),
+      ['kobold', 'cpp'].join(''),
+      ['web', 'llm'].join(''),
+      ['lm', 'studio'].join('')
+    ];
+    var i;
+    for (i = 0; i < folded.length; i++) {
+      if (n === folded[i]) return true;
+    }
+    return false;
   }
-  function askSentence(page, hash, why) {
-    var title = page && page.privacy === 'private' ? personTitle(page) : ((page && page.title) ? String(page.title) : 'a private page');
-    return mindLabel() + ' asks to seal ' + title + ' (version ' + shortHash(hash) + '). Why: ' + clip(why || '', 140);
+  function givenMindName() {
+    var found = [];
+    function push(v) {
+      var s = String(v || '').trim();
+      if (s) found.push(s);
+    }
+    try {
+      var st = root.state;
+      if (st) {
+        push(st.mindName);
+        push(st.aiName);
+        push(st.namedMind);
+      }
+    } catch (e) {}
+    try {
+      var mind = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
+      if (mind) {
+        push(mind.givenName);
+        push(mind.displayName);
+        push(mind.name);
+      }
+    } catch (e2) {}
+    try { push((recallMind() || {}).name); } catch (e3) {}
+    var i;
+    for (i = 0; i < found.length; i++) {
+      if (!programishName(found[i])) return found[i];
+    }
+    return '';
+  }
+  function mindLabel() {
+    return givenMindName() || 'Your mind';
+  }
+  function askCopy(page, why) {
+    var title = personTitle(page);
+    var reason = clip(why || '', 200);
+    return {
+      lead: mindLabel() + ' wants to seal a private page: "' + title + '".',
+      body: 'Sealing stamps this version with your mark so anyone can later check it was not changed.',
+      stay: 'The words stay private on this browser. Nothing is sent anywhere.',
+      why: reason ? ('Why: ' + reason) : '',
+      reason: reason,
+      title: title
+    };
   }
   function shortForm(row) {
     var ms = row && row.mindSeal ? row.mindSeal : {};
     return 'version ' + shortHash(row && row.versionHash) + ', context ' + shortHash(ms.contextHash) + ', model ' + clip(ms.modelId || '', 40) + ', ' + whenText(row && row.ts);
+  }
+  function findAskByHash(hash) {
+    var found = null;
+    sealAsks.forEach(function (a) {
+      if (a && (a.versionHash === hash || a.version === hash)) found = a;
+    });
+    return found;
+  }
+  function findAskByPage(pageId) {
+    var found = null;
+    sealAsks.forEach(function (a) { if (a && a.pageId === pageId) found = a; });
+    return found;
+  }
+  function rememberAsk(ask) {
+    var next = [];
+    var placed = false;
+    sealAsks.forEach(function (a) {
+      if (a && a.pageId === ask.pageId) {
+        if (!placed) { next.push(ask); placed = true; }
+      } else if (a) next.push(a);
+    });
+    if (!placed) next.push(ask);
+    sealAsks = next;
+  }
+  function sealRow(ask) {
+    return {
+      pageId: ask.pageId,
+      version: String(ask.versionHash || ask.version || ''),
+      summary: clip(ask.summary || '', 160),
+      reason: clip(ask.reason || ask.why || '', 200),
+      askedAt: ask.askedAt || 0,
+      state: ask.state || 'asked'
+    };
+  }
+  function putSealAsk(ask) {
+    if (!ask || !ask.pageId) return Promise.resolve(null);
+    return runStore('sealAsks', 'readwrite', function (store) {
+      var row = sealRow(ask);
+      store.put(row);
+      return row;
+    });
+  }
+  function readSealNotes() {
+    try {
+      var raw = lsGet(SEAL_NOTE_KEY);
+      var rows = raw ? JSON.parse(raw) : [];
+      return Array.isArray(rows) ? rows : [];
+    } catch (e) { return []; }
+  }
+  function writeSealNote(pageId, line) {
+    if (!pageId || !line) return;
+    var rows = readSealNotes().filter(function (n) { return n && n.line && n.pageId; });
+    rows.push({ pageId: String(pageId), line: String(line), at: clock() });
+    if (rows.length > 40) rows = rows.slice(rows.length - 40);
+    lsSet(SEAL_NOTE_KEY, JSON.stringify(rows));
   }
   function askSeal(pageId, why) {
     if (!isOn()) return Promise.resolve({ ok: false, reason: 'off' });
@@ -992,36 +1128,100 @@
       return getPage(pageId).then(function (page) {
         if (!page || page.mindFp !== mine) return { ok: false, reason: 'shelf' };
         if (!page.head) return { ok: false, reason: 'missing' };
-        var whyText = clip(why == null ? '' : String(why), 140);
-        var exists = false;
-        sealAsks.forEach(function (a) { if (a.versionHash === page.head) exists = true; });
-        if (!exists) {
-          sealAsks.push({
-            pageId: page.id,
-            versionHash: page.head,
-            why: whyText,
-            sentence: askSentence(page, page.head, whyText)
+        var existing = findAskByPage(page.id);
+        var cooled = existing && (existing.state === 'later' || existing.state === 'declined');
+        if (cooled && (clock() - (existing.askedAt || 0)) < SEAL_ASK_COOLDOWN_MS) {
+          if (existing.versionHash && existing.versionHash !== page.head) {
+            existing.state = 'stale';
+            rememberAsk(existing);
+          }
+          return putSealAsk(existing).then(function () {
+            ensureAskDock();
+            return paintOpen().then(function () {
+              return { ok: false, reason: 'cooldown', page: page, hash: page.head };
+            });
           });
         }
-        return paintOpen().then(function () {
+        if (existing && existing.state === 'asked' && existing.versionHash === page.head) {
+          sealDockOpen = true;
           ensureAskDock();
-          return { ok: true, asked: true, page: page, hash: page.head };
+          return paintOpen().then(function () {
+            return { ok: true, asked: true, page: page, hash: page.head };
+          });
+        }
+        var whyText = clip(why == null ? '' : String(why), 200);
+        var copy = askCopy(page, whyText);
+        var ask = {
+          pageId: page.id,
+          version: page.head,
+          versionHash: page.head,
+          summary: copy.title,
+          reason: whyText,
+          why: whyText,
+          askedAt: clock(),
+          state: 'asked'
+        };
+        rememberAsk(ask);
+        sealDockOpen = true;
+        return putSealAsk(ask).then(function () {
+          return paintOpen().then(function () {
+            ensureAskDock();
+            return { ok: true, asked: true, page: page, hash: page.head };
+          });
         });
       });
     });
   }
+  function laterSeal(versionHash) {
+    var ask = findAskByHash(versionHash);
+    if (!ask || ask.state === 'sealed') return Promise.resolve({ ok: false, reason: 'ask' });
+    ask._answerNow = false;
+    if (ask.state !== 'later') {
+      ask.state = 'later';
+      ask.askedAt = clock();
+      writeSealNote(ask.pageId, 'Saved your answer for later.');
+      chatNote('Saved your answer for later.');
+    }
+    sealDockOpen = sealAsks.some(function (a) { return a && a.state === 'asked'; });
+    disarmSealBack();
+    return putSealAsk(ask).then(function () {
+      ensureAskDock();
+      return paintOpen().then(function () { return { ok: true, state: 'later' }; });
+    });
+  }
   function declineSeal(versionHash) {
-    sealAsks = sealAsks.filter(function (a) { return a.versionHash !== versionHash; });
+    var ask = findAskByHash(versionHash);
+    if (!ask) {
+      declinedLines.push('Declined the seal.');
+      ensureAskDock();
+      return paintOpen();
+    }
+    ask._answerNow = false;
+    ask.state = 'declined';
+    ask.askedAt = clock();
     declinedLines.push('Declined the seal.');
-    ensureAskDock();
-    return paintOpen();
+    writeSealNote(ask.pageId, 'Declined the seal.');
+    chatNote('Declined the seal.');
+    sealDockOpen = sealAsks.some(function (a) { return a && a.state === 'asked'; });
+    disarmSealBack();
+    return putSealAsk(ask).then(function () {
+      ensureAskDock();
+      return paintOpen();
+    });
   }
   function approveSeal(versionHash) {
-    var ask = null;
-    sealAsks.forEach(function (a) { if (a.versionHash === versionHash) ask = a; });
-    if (!ask) return Promise.resolve({ ok: false, reason: 'ask' });
+    var ask = findAskByHash(versionHash);
+    if (!ask || ask.state === 'sealed') return Promise.resolve({ ok: false, reason: 'ask' });
+    if (ask.state === 'stale') return Promise.resolve({ ok: false, reason: 'stale' });
     return getPage(ask.pageId).then(function (page) {
       if (!page) return { ok: false, reason: 'missing' };
+      if (page.head && ask.versionHash && page.head !== ask.versionHash) {
+        ask.state = 'stale';
+        return putSealAsk(ask).then(function () {
+          ensureAskDock();
+          return paintOpen().then(function () { return { ok: false, reason: 'stale' }; });
+        });
+      }
       return getVersion(ask.versionHash).then(function (ver) {
         if (!ver || ver.hash !== ask.versionHash) return { ok: false, reason: 'missing' };
         return sealContext(page.id).then(function (ctx) {
@@ -1033,7 +1233,7 @@
             mindSeal: { contextHash: String(ctx || ''), modelId: sealModelId() },
             ts: ts,
             consent: 'mind-asked+human-approved',
-            why: clip(ask.why || '', 140)
+            why: clip(ask.why || ask.reason || '', 200)
           };
           return signSeal(row).then(function (signed) {
             if (!signed || !signed.humanSig) return { ok: false, reason: 'sign' };
@@ -1041,10 +1241,14 @@
             row.publicKey = signed.publicKey;
             return putReceipt(row).then(function () {
               return markSealed(ver.hash).then(function () {
-                sealAsks = sealAsks.filter(function (a) { return a.versionHash !== ver.hash; });
-                return refreshWake().then(function () {
-                  ensureAskDock();
-                  return paintOpen().then(function () { return { ok: true, receipt: row }; });
+                ask.state = 'sealed';
+                sealDockOpen = sealAsks.some(function (a) { return a && a.state === 'asked'; });
+                disarmSealBack();
+                return putSealAsk(ask).then(function () {
+                  return refreshWake().then(function () {
+                    ensureAskDock();
+                    return paintOpen().then(function () { return { ok: true, receipt: row, state: 'sealed' }; });
+                  });
                 });
               });
             });
@@ -1275,23 +1479,481 @@
     if (!panel) return Promise.resolve();
     return renderPanel(panel);
   }
+  function liveAsks() {
+    return sealAsks.filter(function (a) {
+      return a && (a.state === 'asked' || a.state === 'later' || a.state === 'stale');
+    });
+  }
+  // An unanswered ask shows before a stale notice, and both show before one already deferred.
+  function dockAsk() {
+    var live = liveAsks();
+    var asked = null;
+    var stale = null;
+    var deferred = null;
+    var i;
+    for (i = 0; i < live.length; i++) {
+      var a = live[i];
+      if (!a) continue;
+      if (!asked && a.state === 'asked') asked = a;
+      if (!stale && a.state === 'stale') stale = a;
+      if (!deferred && a.state === 'later') deferred = a;
+    }
+    return asked || stale || deferred;
+  }
+  function motionReduced() {
+    try {
+      return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) { return false; }
+  }
+  function bottomPad() {
+    var d = doc();
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh && d && d.documentElement && d.documentElement.clientHeight) vh = d.documentElement.clientHeight;
+    if (!d || !d.querySelectorAll || !vh) return 12;
+    var sels = ['#flTabNav', '.status-bar', '.tab-nav', '.galaxy-nav', '#shared-shoulder'];
+    var sum = 0;
+    for (var i = 0; i < sels.length; i++) {
+      var list = [];
+      try { list = d.querySelectorAll(sels[i]) || []; } catch (e2) { list = []; }
+      for (var j = 0; j < list.length; j++) {
+        var el = list[j];
+        if (!el || typeof el.getBoundingClientRect !== 'function') continue;
+        var r = null;
+        try { r = el.getBoundingClientRect(); } catch (e3) { r = null; }
+        if (!r || !(r.height > 0) || r.height > vh * 0.5) continue;
+        // A bar still covers the ask when it floats a little above the bottom edge.
+        if (r.top < vh && r.bottom > vh * 0.62) sum += r.height;
+      }
+    }
+    return sum + 12;
+  }
+  function holdOthers(on) {
+    try { root.__flSealAskHolding = !!on; } catch (e) {}
+    try {
+      if (root.FLClay && typeof root.FLClay.noteSealHold === 'function') root.FLClay.noteSealHold(!!on);
+    } catch (e2) {}
+    try {
+      if (root.FLShareWarmth && typeof root.FLShareWarmth.noteSealHold === 'function') root.FLShareWarmth.noteSealHold(!!on);
+    } catch (e3) {}
+    holdDeferButtons(!!on);
+  }
+  function holdDeferButtons(on) {
+    var d = doc();
+    if (!on) {
+      heldDefers.forEach(function (item) {
+        if (item && item.el && item.el.style) item.el.style.display = item.display || '';
+      });
+      heldDefers = [];
+      return;
+    }
+    if (!d || !d.querySelectorAll) return;
+    var nodes = [];
+    var found = [];
+    var i;
+    try { found = d.querySelectorAll('button'); } catch (e) { found = []; }
+    for (i = 0; i < found.length; i++) nodes.push(found[i]);
+    try { found = d.querySelectorAll('.tree-door-veil'); } catch (eDoor) { found = []; }
+    for (i = 0; i < found.length; i++) nodes.push(found[i]);
+    for (i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!el || !el.style) continue;
+      var text = el.textContent || '';
+      var door = el.classList && el.classList.contains('tree-door-veil');
+      if (!door && text !== 'Not yet' && text !== 'Not now') continue;
+      if (!door && el.closest && el.closest('#fl-ws-asks')) continue;
+      if (el.style.display === 'none') continue;
+      var seenHold = false;
+      for (var h = 0; h < heldDefers.length; h++) {
+        if (heldDefers[h] && heldDefers[h].el === el) seenHold = true;
+      }
+      if (seenHold) continue;
+      heldDefers.push({ el: el, display: el.style.display });
+      el.style.display = 'none';
+    }
+  }
+  function bindSealEscape() {
+    if (root.__flSealEscapeBound) return;
+    root.__flSealEscapeBound = true;
+    if (typeof root.addEventListener !== 'function') return;
+    root.addEventListener('keydown', function (e) {
+      var key = e && e.key;
+      if (key !== 'Escape' && key !== 'Esc') return;
+      var d = doc();
+      var box = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+      if (!box || !e.target) return;
+      if (e.target !== box && !(box.contains && box.contains(e.target))) return;
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      if (e.preventDefault) e.preventDefault();
+      var shown = dockAsk();
+      var hash = shown && (shown.versionHash || shown.version) || '';
+      if (!hash && box.getAttribute) hash = box.getAttribute('data-seal-version') || '';
+      track(laterSeal(hash));
+    }, true);
+  }
+  function scrollParent(el) {
+    var d = doc();
+    var node = el && el.parentElement;
+    while (node) {
+      if (root.getComputedStyle) {
+        var style = null;
+        try { style = root.getComputedStyle(node); } catch (e) { style = null; }
+        var oy = style && style.overflowY;
+        if ((oy === 'auto' || oy === 'scroll' || oy === 'overlay') && node.scrollHeight > node.clientHeight + 1) return node;
+      }
+      node = node.parentElement;
+    }
+    return (d && (d.scrollingElement || d.documentElement)) || null;
+  }
+  function pinScroll(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return;
+    if (!approveCovered(el)) return;
+    var scroller = scrollParent(el);
+    if (!scroller) return;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { r = null; }
+    if (!r) return;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e2) { vh = 0; }
+    var bars = Math.max(0, bottomPad() - 12);
+    var hostTop = 0;
+    var hostHeight = vh;
+    var d = doc();
+    var rootEl = d && (d.scrollingElement || d.documentElement);
+    if (scroller !== rootEl && scroller.getBoundingClientRect) {
+      var host = scroller.getBoundingClientRect();
+      hostTop = host.top || 0;
+      hostHeight = host.height || vh;
+    }
+    var limit = hostTop + hostHeight - bars;
+    var target = hostTop + Math.max(8, (hostHeight - bars) / 2 - r.height / 2);
+    if (target + r.height > limit) target = Math.max(hostTop + 8, limit - r.height);
+    var delta = r.top - target;
+    if (Math.abs(delta) < 1) return;
+    if (scroller === rootEl && typeof root.scrollBy === 'function') {
+      try { root.scrollBy(0, delta); return; } catch (eScroll) {}
+    }
+    try { scroller.scrollTop = scroller.scrollTop + delta; } catch (e3) {}
+  }
+  function revealEl(el, behavior) {
+    if (!el || typeof el.scrollIntoView !== 'function') return;
+    try { el.scrollIntoView({ block: 'center', behavior: behavior }); } catch (e) {}
+  }
+  function approveCovered(btn) {
+    if (!btn || typeof btn.getBoundingClientRect !== 'function') return false;
+    var r = null;
+    try { r = btn.getBoundingClientRect(); } catch (e) { r = null; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return true;
+    var vh = 0;
+    var vw = 0;
+    try { vh = root.innerHeight || 0; vw = root.innerWidth || 0; } catch (e2) { return false; }
+    var bars = Math.max(0, bottomPad() - 12);
+    if (r.top < 0 || r.left < -0.5 || r.right > vw + 0.5 || r.bottom > vh - bars + 0.5) return true;
+    var d = doc();
+    if (!d || typeof d.elementFromPoint !== 'function') return false;
+    var hit = null;
+    try { hit = d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); } catch (e3) { hit = null; }
+    if (!hit) return true;
+    return hit !== btn && !(btn.contains && btn.contains(hit));
+  }
+  function settleAsk(box) {
+    // A hidden Chat tab has no box yet. Scrolling then does not count.
+    // A running tab fade is the same: its own scroll has not finished.
+    if (tabMotionPending()) return;
+    if (!chatViewVisible()) return;
+    if (!box || !box.querySelector) return;
+    var btn = null;
+    try { btn = box.querySelector('[aria-label="Approve seal"]'); } catch (e) { btn = null; }
+    if (!btn) return;
+    try { btn.style.scrollMarginBottom = bottomPad() + 'px'; } catch (e2) {}
+    // Centering Seal it pushes the heart above the veil. Seat the button, then the heart.
+    var heart = threadHeart();
+    var veil = heart ? askOverlay(btn) : null;
+    if (heart && veil) {
+      seatAskOverlay(btn);
+      seatSealMin(veil);
+      keepHeart(veil, box);
+      if (approveCovered(btn)) seatSealMin(veil);
+      return;
+    }
+    if (approveCovered(btn)) revealEl(btn, 'auto');
+    if (approveCovered(btn)) pinScroll(btn);
+  }
+  function ensureAskStyle() {
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    if (d.getElementById('fl-ws-ask-style')) return;
+    var style = d.createElement('style');
+    style.id = 'fl-ws-ask-style';
+    style.textContent = '#fl-ws-asks button:focus-visible{outline:2px solid var(--accent,#7c6af7);outline-offset:2px;}#fl-ws-asks button{font-family:inherit;}';
+    var parent = d.head || d.body;
+    if (parent && parent.appendChild && parent !== style) parent.appendChild(style);
+  }
+  function placeDock(dock) {
+    var d = doc();
+    var anchor = null;
+    if (d && d.querySelector) {
+      try { anchor = d.querySelector('#chatInput') || d.querySelector('[data-thread-input]'); }
+      catch (e) { anchor = null; }
+    }
+    var row = anchor && anchor.parentNode;
+    var host = row && row.parentNode;
+    // A closed Tree compose is inert. An ask inside that form cannot be tapped.
+    // Sit the ask just after the form. The same job, and the buttons receive the tap.
+    var form = host && host.tagName === 'FORM' ? host : null;
+    if (form && form.parentNode && typeof form.parentNode.insertBefore === 'function') {
+      if (form.nextSibling) form.parentNode.insertBefore(dock, form.nextSibling);
+      else form.parentNode.appendChild(dock);
+      return;
+    }
+    if (host && typeof host.insertBefore === 'function') {
+      if (row.nextSibling) host.insertBefore(dock, row.nextSibling);
+      else host.appendChild(dock);
+      return;
+    }
+    var host = hostEl || (d && d.body);
+    if (host && host.appendChild && host !== dock) host.appendChild(dock);
+  }
+  function placeVeilOpen() {
+    var d = doc();
+    if (!d || !d.getElementById) return false;
+    var veil = d.getElementById('place-veil');
+    return !!(veil && hasClass(veil, 'is-open'));
+  }
+  // The ask lives in the Nursery veil. Closing that veil fades the ask with it.
+  // Park it on the garden, above the fading veil and under the header, so it stays in view.
+  function parkAskOnGarden() {
+    var d = doc();
+    if (!d || !d.body || !d.getElementById) return;
+    var dock = d.getElementById('fl-ws-asks');
+    var veil = d.getElementById('place-veil');
+    if (!dock || !veil || !veil.contains || !veil.contains(dock)) return;
+    try { d.body.appendChild(dock); } catch (e) { return; }
+    dock.style.position = 'fixed';
+    dock.style.left = '16px';
+    dock.style.right = '16px';
+    dock.style.top = '72px';
+    dock.style.bottom = 'auto';
+    dock.style.zIndex = '1005';
+    dock.style.maxHeight = '70vh';
+    dock.style.overflow = 'auto';
+    dock.style.width = 'auto';
+    dock.style.maxWidth = '40rem';
+    var seal = null;
+    try { seal = dock.querySelector('[aria-label="Approve seal"]'); } catch (eSeal) { seal = null; }
+    if (seal && typeof seal.scrollIntoView === 'function') {
+      try { seal.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (eScroll) {}
+    }
+  }
+  function closeOpenPlace() {
+    var rooms = null;
+    try { rooms = root.GardenRooms; } catch (e) { rooms = null; }
+    if (rooms && typeof rooms.closePlace === 'function') {
+      try { rooms.closePlace(); return; } catch (eClose) {}
+    }
+    var d = doc();
+    var btn = d && d.getElementById ? d.getElementById('place-veil-close') : null;
+    if (btn && typeof btn.click === 'function') {
+      try { btn.click(); } catch (eClick) {}
+    }
+  }
+  // Bound while this file loads, before the Nursery's own Back step, so this
+  // listener runs first. A later one cannot stop that step.
+  function onSealPop(e) {
+    if (sealBackEating) {
+      sealBackEating = false;
+      if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+      return;
+    }
+    if (!sealBackArmed) return;
+    var landed = null;
+    try { landed = e && e.state; } catch (eLand) { landed = null; }
+    // Nursery is open. This Back closes Nursery. The ask stays open.
+    // A Back that leaves the ask's step, with no place open, still defers.
+    if (placeVeilOpen()) {
+      parkAskOnGarden();
+      if (!(landed && landed.flSealAsk)) {
+        if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+        closeOpenPlace();
+        try { root.history.pushState({ flSealAsk: 1 }, ''); } catch (ePush) {}
+        sealBackArmed = true;
+        try { bringAsk('settle', true); } catch (eBring) {}
+        return;
+      }
+      try { bringAsk('settle', true); } catch (eBring) {}
+      return;
+    }
+    if (landed && landed.flSealAsk) return;
+    sealBackArmed = false;
+    if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+    var shown = dockAsk();
+    var hash = shown && (shown.versionHash || shown.version) || '';
+    var d = doc();
+    var box = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!hash && box && box.getAttribute) hash = box.getAttribute('data-seal-version') || '';
+    track(laterSeal(hash));
+  }
+  function armSealBack() {
+    if (sealBackEating) return;
+    if (!root.history || typeof root.history.pushState !== 'function') return;
+    var state = null;
+    try { state = root.history.state; } catch (e) { state = null; }
+    if (state && state.flSealAsk) {
+      sealBackArmed = true;
+      return;
+    }
+    // The place opened after the ask keeps the top step. Another ask step would steal Back.
+    if ((state && state.treeWayBack) || placeVeilOpen()) {
+      sealBackArmed = true;
+      return;
+    }
+    try { root.history.pushState({ flSealAsk: 1 }, ''); sealBackArmed = true; }
+    catch (e2) {}
+  }
+  function disarmSealBack() {
+    if (!sealBackArmed) return;
+    var state = null;
+    try { state = root.history && root.history.state; } catch (e) { state = null; }
+    sealBackArmed = false;
+    if (!state || !state.flSealAsk) return;
+    sealBackEating = true;
+    try {
+      if (root.history && typeof root.history.back === 'function') root.history.back();
+      else sealBackEating = false;
+    } catch (e2) { sealBackEating = false; }
+  }
+  function paintBadge() {
+    var d = doc();
+    if (!d || !d.getElementById) return;
+    var n = badgeCount();
+    var label = n ? ('Notebook (' + n + ')') : 'Notebook';
+    ['fl-ws-open', 'fl-ws-open-tools'].forEach(function (id) {
+      var btn = d.getElementById(id);
+      if (!btn) return;
+      // Same words are not a new change. Rewriting them woke the DOM watcher forever.
+      if (btn.textContent !== label) btn.textContent = label;
+    });
+  }
+  function chatNote(line) {
+    var d = doc();
+    if (!d || !line) return;
+    var anchor = null;
+    if (d.querySelectorAll) {
+      try {
+        var nodes = d.querySelectorAll('.chat-message.assistant, .thread-body');
+        if (nodes && nodes.length) anchor = nodes[nodes.length - 1];
+      } catch (e) { anchor = null; }
+    }
+    if (!anchor) anchor = hostEl || d.body;
+    appendLines(anchor, [line]);
+  }
+  function askButton(text, kind) {
+    var el = button(text);
+    if (!el) return null;
+    el.style.minHeight = '44px';
+    el.style.fontSize = '16px';
+    el.style.fontFamily = 'inherit';
+    el.style.margin = '0';
+    el.style.boxSizing = 'border-box';
+    el.style.maxWidth = '100%';
+    if (kind === 'yes') {
+      el.style.background = 'var(--accent, #7c6af7)';
+      el.style.color = '#fff';
+      el.style.border = '2px solid transparent';
+      el.setAttribute('aria-label', 'Approve seal');
+    } else {
+      // v-seal-ask-in-view-v0.1: a transparent face disappeared on the sculpture.
+      // The solid panel face is the same job, readable at 4.5:1.
+      el.style.background = '#f6f3ea';
+      el.style.color = '#1e1b2e';
+      el.style.border = '2px solid #f6f3ea';
+    }
+    return el;
+  }
   function appendAsk(parent, ask) {
     var d = doc();
     if (!d || !parent || !ask) return;
-    var p = d.createElement('p');
-    p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
-    p.textContent = ask.sentence;
-    var yes = button('Approve seal');
-    var no = button('Not now');
-    if (yes) yes.addEventListener('click', function () { track(approveSeal(ask.versionHash)); });
-    if (no) no.addEventListener('click', function () { track(declineSeal(ask.versionHash)); });
-    parent.appendChild(p);
-    if (yes) parent.appendChild(yes);
-    if (no) parent.appendChild(no);
+    var pageStub = { privacy: 'private', publicTitle: ask.summary || '', title: ask.summary || '' };
+    var copy = askCopy(pageStub, ask.reason || ask.why || '');
+    var box = d.createElement('div');
+    box.setAttribute('data-seal-ask', ask.state || 'asked');
+    box.setAttribute('aria-live', 'polite');
+    box.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
+    try { box.style.scrollMarginBottom = bottomPad() + 'px'; } catch (ePad) {}
+    var heading = d.createElement('p');
+    heading.id = 'fl-ws-ask-heading';
+    heading.tabIndex = -1;
+    heading.setAttribute('tabindex', '-1');
+    heading.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    heading.textContent = copy.lead;
+    var body = d.createElement('p');
+    body.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    body.textContent = copy.body;
+    var stay = d.createElement('p');
+    stay.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    stay.textContent = copy.stay;
+    box.appendChild(heading);
+    box.appendChild(body);
+    box.appendChild(stay);
+    if (copy.why) {
+      var why = d.createElement('p');
+      why.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+      why.textContent = copy.why;
+      box.appendChild(why);
+    }
+    if (ask.state === 'stale') {
+      var stale = d.createElement('p');
+      stale.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+      stale.textContent = 'stale, ask again';
+      box.appendChild(stale);
+    } else {
+      var row = d.createElement('div');
+      row.id = 'fl-ws-ask-row';
+      row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;max-width:100%;margin-top:8px;';
+      var yes = askButton('Seal it', 'yes');
+      var later = askButton('Later', 'later');
+      var no = askButton("No, don't seal", 'no');
+      if (yes) yes.addEventListener('click', function () { track(approveSeal(ask.versionHash)); });
+      if (later) later.addEventListener('click', function () { track(laterSeal(ask.versionHash)); });
+      if (no) no.addEventListener('click', function () { track(declineSeal(ask.versionHash)); });
+      if (yes) row.appendChild(yes);
+      if (later) row.appendChild(later);
+      if (no) row.appendChild(no);
+      box.appendChild(row);
+    }
+    var details = d.createElement('details');
+    details.style.cssText = 'margin-top:8px;max-width:100%;';
+    var sum = d.createElement('summary');
+    sum.textContent = 'Details for checking (version ' + shortHash(ask.versionHash) + ')';
+    var full = d.createElement('p');
+    full.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    full.textContent = String(ask.versionHash || '');
+    details.appendChild(sum);
+    details.appendChild(full);
+    box.appendChild(details);
+    box.addEventListener('keydown', function (e) {
+      var key = e && e.key;
+      if (key !== 'Escape' && key !== 'Esc') return;
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+      track(laterSeal(ask.versionHash));
+    });
+    parent.appendChild(box);
+    bindSealEscape();
+    if (!ask._seen) ask._seen = true;
+    // Focus and the first scroll moved to bringAsk. It runs after layout, and it
+    // leaves the caret alone when the person is already typing.
+    // Keep the ask's Back step above the Nursery's, even when the ask is drawn again.
+    armSealBack();
+    // A later draw of the same ask still has to land in view. The first scroll does not survive a rebuild.
+    settleAsk(box);
+    try { root.requestAnimationFrame(function () { settleAsk(box); }); } catch (eFrame) {}
   }
   function appendHandoff(parent, ask) {
     var d = doc();
     if (!d || !parent || !ask) return;
+    if (root.__flSealAskHolding) return;
     var p = d.createElement('p');
     p.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
     p.textContent = ask.sentence;
@@ -1321,26 +1983,926 @@
     });
     handoffAsks.forEach(function (ask) { appendHandoff(parent, ask); });
   }
+  function inWait(ask) {
+    if (!ask) return false;
+    if (ask.state !== 'later' && ask.state !== 'declined') return false;
+    return (clock() - (ask.askedAt || 0)) < SEAL_ASK_COOLDOWN_MS;
+  }
+  function badgeCount() {
+    var n = liveAsks().length;
+    var i;
+    for (i = 0; i < sealAsks.length; i++) {
+      if (sealAsks[i] && sealAsks[i].state === 'declined' && inWait(sealAsks[i])) n += 1;
+    }
+    return n;
+  }
+  function dockTarget() {
+    var asked = null;
+    var stale = null;
+    var later = null;
+    var declined = null;
+    var i;
+    for (i = 0; i < sealAsks.length; i++) {
+      var a = sealAsks[i];
+      if (!a) continue;
+      if (!asked && a.state === 'asked') asked = a;
+      if (!stale && a.state === 'stale') stale = a;
+      if (!later && a.state === 'later') later = a;
+      if (!declined && a.state === 'declined') declined = a;
+    }
+    return asked || stale || later || declined;
+  }
+  function pendingAnswer() {
+    var i;
+    for (i = 0; i < sealAsks.length; i++) {
+      var a = sealAsks[i];
+      if (!a) continue;
+      if (a.state === 'asked' || a.state === 'later' || a.state === 'stale') return a;
+      if (a.state === 'declined' && inWait(a)) return a;
+    }
+    return null;
+  }
+  function waitWhen(ask) {
+    var until = ((ask && ask.askedAt) || 0) + SEAL_ASK_COOLDOWN_MS;
+    try {
+      return new Date(until).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+    } catch (e) {
+      try { return new Date(until).toLocaleString(); } catch (e2) { return ''; }
+    }
+  }
+  function waitLabel(ask) {
+    var when = waitWhen(ask);
+    if (ask && ask.state === 'declined') return 'Declined. ' + mindLabel() + ' may ask again after ' + when + '.';
+    return 'Waiting until ' + when + '.';
+  }
+  function answerNow(ask) {
+    if (!ask) return;
+    ask._answerNow = true;
+    sealDockOpen = true;
+    ensureAskDock();
+    scheduleBring('open');
+  }
+  function appendQuiet(parent, ask) {
+    var d = doc();
+    if (!d || !parent || !ask) return;
+    var row = d.createElement('div');
+    row.setAttribute('data-seal-quiet', ask.state || 'later');
+    row.style.cssText = 'max-width:100%;overflow:hidden;margin:8px 0 0;';
+    var line = d.createElement('p');
+    line.id = 'fl-ws-wait-line';
+    line.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;font-family:inherit;';
+    line.textContent = waitLabel(ask);
+    var nowBtn = askButton('Answer now', 'later');
+    if (nowBtn) {
+      nowBtn.id = 'fl-ws-answer-now';
+      nowBtn.addEventListener('click', function () { answerNow(ask); });
+    }
+    row.appendChild(line);
+    if (nowBtn) row.appendChild(nowBtn);
+    parent.appendChild(row);
+    if (chatViewVisible()) {
+      revealEl(row, motionReduced() ? 'auto' : 'smooth');
+      try { root.requestAnimationFrame(function () { revealEl(row, 'auto'); }); } catch (eQuiet) {}
+    }
+  }
+  function hasClass(el, name) {
+    if (!el || !name) return false;
+    if (el.classList && typeof el.classList.contains === 'function') {
+      try { if (el.classList.contains(name)) return true; } catch (e) {}
+    }
+    var cn = el.className;
+    if (cn && cn.baseVal) cn = cn.baseVal;
+    if (typeof cn !== 'string') return false;
+    return (' ' + cn + ' ').indexOf(' ' + name + ' ') !== -1;
+  }
+  function nurseryOpen() {
+    var d = doc();
+    if (!d || !d.getElementById) return false;
+    var veil = d.getElementById('place-veil');
+    if (veil && hasClass(veil, 'is-open') && hasClass(veil, 'is-nursery')) return true;
+    if (!veil && d.getElementById('nursery-stage')) return true;
+    return false;
+  }
+  function typingNow() {
+    var d = doc();
+    var active = d && d.activeElement;
+    if (!active) return false;
+    if (active.id === 'chatInput') return true;
+    try {
+      if (active.hasAttribute && active.hasAttribute('data-thread-input')) return true;
+    } catch (e) {}
+    try {
+      if (active.getAttribute && active.getAttribute('data-thread-input') != null) return true;
+    } catch (e2) {}
+    return false;
+  }
+  function chatTab() {
+    var d = doc();
+    return d && d.getElementById ? d.getElementById('tab-chat') : null;
+  }
+  function positiveRect(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return false;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { r = null; }
+    return !!(r && r.width > 0 && r.height > 0);
+  }
+  function threadInput() {
+    var d = doc();
+    if (!d || !d.querySelector) return null;
+    try { return d.querySelector('#chatInput') || d.querySelector('[data-thread-input]'); }
+    catch (e) { return null; }
+  }
+  function chatViewVisible() {
+    // A hidden Chat tab is not the reveal. The reveal is the tab shown, after it has a box.
+    // No tab means a thread. It counts when its input has a box, or when the box cannot be measured.
+    // A closed thread has no input yet, so that is not the reveal.
+    var tab = chatTab();
+    if (tab) {
+      if (!hasClass(tab, 'active')) return false;
+      return positiveRect(tab);
+    }
+    var input = threadInput();
+    if (input) {
+      if (typeof input.getBoundingClientRect !== 'function') return true;
+      if (positiveRect(input)) return true;
+    }
+    // Nursery open, before a thread exists. The ask is in that fixed veil.
+    // The veil is the view, once it has a box. A closed veil is not the reveal.
+    if (!nurseryOpen()) return false;
+    var d = doc();
+    var veil = d && d.getElementById ? d.getElementById('place-veil') : null;
+    if (!veil) return true;
+    if (typeof veil.getBoundingClientRect !== 'function') return true;
+    return positiveRect(veil);
+  }
+  // The Tree ask sits in a fixed veil. Centering that column hides Seal it below the window.
+  // The veil becomes the scroller, the same job as the clay seat, and the ask can come up.
+  function askOverlay(el) {
+    var n = el;
+    while (n) {
+      if (n.id === 'thread-veil' || n.id === 'place-veil') return n;
+      n = n.parentElement || n.parentNode;
+    }
+    return null;
+  }
+  function seatAskOverlay(el) {
+    var veil = askOverlay(el);
+    if (!veil || !veil.style) return null;
+    if (veil.style.overflow !== 'auto') veil.style.overflow = 'auto';
+    if (veil.style.alignItems !== 'flex-start') veil.style.alignItems = 'flex-start';
+    if (veil.style.justifyContent !== 'flex-start') veil.style.justifyContent = 'flex-start';
+    if (veil.style.scrollBehavior !== 'auto') veil.style.scrollBehavior = 'auto';
+    return veil;
+  }
+  function sealButton() {
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!dock) return null;
+    if (typeof dock.querySelector === 'function') {
+      try {
+        var found = dock.querySelector('[aria-label="Approve seal"]');
+        if (found) return found;
+      } catch (e) {}
+    }
+    var kids = dock.children || [];
+    var i;
+    for (i = 0; i < kids.length; i++) {
+      var box = kids[i];
+      var rowKids = box && box.children ? box.children : [];
+      var j;
+      for (j = 0; j < rowKids.length; j++) {
+        var el = rowKids[j];
+        if (el && el.getAttribute && el.getAttribute('aria-label') === 'Approve seal') return el;
+        var deeper = el && el.children ? el.children : [];
+        var k;
+        for (k = 0; k < deeper.length; k++) {
+          var btn = deeper[k];
+          if (btn && btn.getAttribute && btn.getAttribute('aria-label') === 'Approve seal') return btn;
+        }
+      }
+    }
+    return null;
+  }
+  function fullyInView(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return true;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { return true; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return false;
+    var vh = 0;
+    var vw = 0;
+    try { vh = root.innerHeight || 0; vw = root.innerWidth || 0; } catch (e2) { vh = 0; }
+    if (!vh || !vw) return true;
+    return r.top >= -1 && r.left >= -1 && r.bottom <= vh + 1 && r.right <= vw + 1;
+  }
+  // The panel can gain its box after the first look. Wait for that box, then look once.
+  function armBoxWatch() {
+    if (root.__flSealBoxArm) return;
+    if (typeof ResizeObserver !== 'function') return;
+    var el = chatTab();
+    if (!el) {
+      var d = doc();
+      var place = d && d.getElementById ? d.getElementById('place-veil') : null;
+      var thread = d && d.getElementById ? d.getElementById('thread-veil') : null;
+      if (place && (nurseryOpen() || hasClass(place, 'is-nursery'))) el = place;
+      else el = thread || place;
+    }
+    if (!el) el = threadInput();
+    if (!el) return;
+    root.__flSealBoxArm = true;
+    var obs = null;
+    function poke() {
+      if (!chatViewVisible()) return;
+      root.__flSealBoxArm = false;
+      try { if (obs) obs.disconnect(); } catch (e) {}
+      watchViews();
+    }
+    try {
+      obs = new ResizeObserver(function () { poke(); });
+      obs.observe(el);
+    } catch (e2) {
+      root.__flSealBoxArm = false;
+    }
+  }
+  function askBoxInView() {
+    if (!chatViewVisible()) return false;
+    var vh = 0;
+    var vw = 0;
+    try { vh = root.innerHeight || 0; vw = root.innerWidth || 0; } catch (e) { vh = 0; }
+    if (!vh || !vw) return true;
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    var el = null;
+    if (dock && typeof dock.querySelector === 'function') {
+      try { el = dock.querySelector('[data-seal-ask]'); } catch (e2) { el = null; }
+    }
+    if (!el && dock && dock.children) {
+      var i;
+      for (i = 0; i < dock.children.length; i++) {
+        var kid = dock.children[i];
+        if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) el = kid;
+      }
+    }
+    if (!el) el = dock;
+    if (!el || typeof el.getBoundingClientRect !== 'function') return true;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e3) { return true; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return false;
+    return r.top >= -1 && r.left >= -1 && r.bottom <= vh + 1 && r.right <= vw + 1;
+  }
+  // The ask can be drawn into a hidden host before Chat exists. Once the
+  // thread input has a box and the ask does not, move the ask beside that input.
+  function reseatDock() {
+    var input = threadInput();
+    if (!input || !positiveRect(input)) return;
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!dock || typeof dock.getBoundingClientRect !== 'function') return;
+    if (positiveRect(dock)) return;
+    var tries = dock.__flReseatTries || 0;
+    if (tries >= 4) return;
+    dock.__flReseatTries = tries + 1;
+    placeDock(dock);
+  }
+  function armSettle() {
+    if (root.__flSealSettle) return;
+    root.__flSealSettle = true;
+    var waits = 0;
+    function tick() {
+      waits += 1;
+      var cur = dockAsk();
+      var shown = chatViewVisible();
+      if (shown && cur && (cur.state === 'asked' || cur.state === 'stale') && !askBoxInView()) {
+        bringAsk('settle');
+      }
+      var done = shown && cur && askBoxInView();
+      if (!done && waits < 8) {
+        try { root.setTimeout(tick, 200); } catch (e) {}
+      }
+    }
+    try { root.setTimeout(tick, 200); } catch (e2) {}
+  }
+  // switchTab restarts the 200ms panel fade (neuro-fade-in, a 4px rise) and
+  // waits 50ms before tabVisible. A tap also focuses the Chat tab button, and
+  // the browser scrolls that button into view when the fade ends. That scroll
+  // stays. The ask scroll runs after it, and once more if Seal it is still outside.
+  function chatTabAnimating() {
+    var tab = chatTab();
+    if (!tab || typeof tab.getAnimations !== 'function') return false;
+    var list = [];
+    try { list = tab.getAnimations() || []; } catch (e) { return false; }
+    var i;
+    for (i = 0; i < list.length; i++) {
+      var anim = list[i];
+      if (anim && (anim.playState === 'running' || anim.playState === 'pending')) return true;
+    }
+    return false;
+  }
+  function tabMotionPending() {
+    if (chatTabAnimating()) return true;
+    var now = 0;
+    try { now = Date.now(); } catch (e) { now = 0; }
+    return !!(tabClickAt && now && (now - tabClickAt) < 260);
+  }
+  function twoFrames(fn) {
+    try {
+      root.requestAnimationFrame(function () {
+        try { root.requestAnimationFrame(fn); }
+        catch (e2) { fn(); }
+      });
+    } catch (e) { fn(); }
+  }
+  function afterTabMotion(fn) {
+    var gen = (root.__flSealTabGen || 0) + 1;
+    root.__flSealTabGen = gen;
+    function run() {
+      if (root.__flSealTabGen !== gen) return;
+      twoFrames(function () {
+        if (root.__flSealTabGen !== gen) return;
+        fn();
+      });
+    }
+    var tab = chatTab();
+    if (!tabMotionPending()) {
+      run();
+      return;
+    }
+    var fired = false;
+    function done() {
+      if (fired) return;
+      fired = true;
+      try { root.setTimeout(run, 50); }
+      catch (e) { run(); }
+    }
+    if (tab && tab.addEventListener) {
+      try { tab.addEventListener('animationend', done); }
+      catch (e2) {}
+    }
+    try { root.setTimeout(done, 280); } catch (e3) { done(); }
+  }
+  function armScrollAgree() {
+    if (root.__flSealAgree) return;
+    root.__flSealAgree = true;
+    var timer = null;
+    function correct() {
+      var btn = sealButton();
+      if (!btn || fullyInView(btn)) return;
+      if (root.__flSealAgreed) return;
+      root.__flSealAgreed = true;
+      revealEl(btn, 'auto');
+    }
+    function onScroll() {
+      if (timer) {
+        try { root.clearTimeout(timer); } catch (e) {}
+      }
+      try { timer = root.setTimeout(function () { twoFrames(correct); }, 40); }
+      catch (e2) { twoFrames(correct); }
+    }
+    if (root.addEventListener) {
+      try { root.addEventListener('scroll', onScroll); } catch (e3) {}
+    }
+    try {
+      root.setTimeout(function () {
+        if (root.removeEventListener) {
+          try { root.removeEventListener('scroll', onScroll); } catch (e4) {}
+        }
+        root.__flSealAgree = false;
+      }, 500);
+    } catch (e5) {}
+  }
+  function composeForm() {
+    var d = doc();
+    if (!d || typeof d.querySelector !== 'function') return null;
+    try { return d.querySelector('form.thread-compose'); }
+    catch (e) { return null; }
+  }
+  function askIsOpen() {
+    var cur = dockAsk();
+    if (!cur) return false;
+    if (cur._answerNow) return true;
+    return cur.state === 'asked' || cur.state === 'stale';
+  }
+  function composeControls(form) {
+    var out = [];
+    if (!form || typeof form.querySelectorAll !== 'function') return out;
+    var found = [];
+    try { found = form.querySelectorAll('input, button, textarea, select') || []; }
+    catch (e) { found = []; }
+    var i;
+    for (i = 0; i < found.length; i++) out.push(found[i]);
+    return out;
+  }
+  function setFlag(el, name, on) {
+    if (!el) return;
+    if (name === 'disabled') el.disabled = !!on;
+    if (!el.setAttribute || !el.removeAttribute) return;
+    if (on) el.setAttribute(name, name === 'disabled' ? '' : (name === 'tabindex' ? '-1' : 'true'));
+    else el.removeAttribute(name);
+  }
+  function holdCompose() {
+    var form = composeForm();
+    if (!form || !askIsOpen()) return;
+    if (formHold && formHold.form === form) {
+      var again = formHold.controls || [];
+      var j;
+      for (j = 0; j < again.length; j++) {
+        var held = again[j] && again[j].el;
+        if (!held) continue;
+        setFlag(held, 'disabled', true);
+        if (held.setAttribute) {
+          held.setAttribute('aria-disabled', 'true');
+          held.setAttribute('tabindex', '-1');
+        }
+      }
+      if (form.setAttribute) form.setAttribute('inert', '');
+      return;
+    }
+    var controls = composeControls(form);
+    var saved = [];
+    var i;
+    for (i = 0; i < controls.length; i++) {
+      var el = controls[i];
+      saved.push({
+        el: el,
+        disabled: !!(el && (el.disabled || (el.hasAttribute && el.hasAttribute('disabled')))),
+        tabIndex: el && el.getAttribute ? el.getAttribute('tabindex') : null,
+        aria: el && el.getAttribute ? el.getAttribute('aria-disabled') : null
+      });
+      setFlag(el, 'disabled', true);
+      if (el && el.setAttribute) {
+        el.setAttribute('aria-disabled', 'true');
+        el.setAttribute('tabindex', '-1');
+      }
+    }
+    formHold = {
+      form: form,
+      inert: !!(form.hasAttribute && form.hasAttribute('inert')),
+      controls: saved
+    };
+    if (form.setAttribute) form.setAttribute('inert', '');
+  }
+  function releaseCompose() {
+    if (!formHold || !formHold.form) {
+      formHold = null;
+      return;
+    }
+    var form = formHold.form;
+    var saved = formHold.controls || [];
+    var i;
+    for (i = 0; i < saved.length; i++) {
+      var row = saved[i];
+      var el = row && row.el;
+      if (!el) continue;
+      setFlag(el, 'disabled', !!row.disabled);
+      if (el.setAttribute && el.removeAttribute) {
+        if (row.aria == null) el.removeAttribute('aria-disabled');
+        else el.setAttribute('aria-disabled', row.aria);
+        if (row.tabIndex == null) el.removeAttribute('tabindex');
+        else el.setAttribute('tabindex', row.tabIndex);
+      }
+    }
+    if (formHold.inert) {
+      if (form.setAttribute) form.setAttribute('inert', '');
+    } else if (form.removeAttribute) {
+      form.removeAttribute('inert');
+    }
+    formHold = null;
+  }
+  function syncCompose() {
+    if (askIsOpen()) holdCompose();
+    else releaseCompose();
+  }
+  function threadHeart() {
+    var d = doc();
+    if (!d || !d.querySelector) return null;
+    try { return d.querySelector('[data-thread-heart]'); }
+    catch (e) { return null; }
+  }
+  // The least scroll that puts Seal it inside the veil. Centering is what hid the heart.
+  function seatSealMin(veil) {
+    var seal = sealButton();
+    if (!seal || !veil || typeof veil.scrollTop !== 'number') return;
+    if (typeof seal.getBoundingClientRect !== 'function') return;
+    var sr = null;
+    var vr = null;
+    try {
+      sr = seal.getBoundingClientRect();
+      vr = veil.getBoundingClientRect();
+    } catch (e) { return; }
+    if (!sr || !vr || !(sr.height > 0)) return;
+    if (sr.bottom > vr.bottom - 8) {
+      try { veil.scrollTop = veil.scrollTop + (sr.bottom - (vr.bottom - 8)); } catch (e2) {}
+    }
+    try {
+      sr = seal.getBoundingClientRect();
+      vr = veil.getBoundingClientRect();
+    } catch (e3) { return; }
+    if (sr && vr && sr.top < vr.top + 8) {
+      try { veil.scrollTop = Math.max(0, veil.scrollTop + (sr.top - (vr.top + 8))); } catch (e4) {}
+    }
+  }
+  // The heart sits at the top of the thread. Centering Seal it can push it above the veil.
+  // Bring it back only when Seal it still fits. When both cannot fit, Seal it stays.
+  function keepHeart(veil, askEl) {
+    if (!veil || !askEl || typeof veil.scrollTop !== 'number') return;
+    if (typeof askEl.getBoundingClientRect !== 'function') return;
+    var d = doc();
+    var heart = null;
+    if (d && typeof d.querySelector === 'function') {
+      try { heart = d.querySelector('[data-thread-heart]'); } catch (e) { heart = null; }
+    }
+    if (!heart || typeof heart.getBoundingClientRect !== 'function') return;
+    if (typeof veil.getBoundingClientRect !== 'function') return;
+    var hr = null;
+    var ar = null;
+    var vr = null;
+    try {
+      hr = heart.getBoundingClientRect();
+      ar = askEl.getBoundingClientRect();
+      vr = veil.getBoundingClientRect();
+    } catch (e2) { return; }
+    if (!hr || !ar || !vr || !(hr.height > 0) || !(ar.height > 0)) return;
+    if (hr.top >= vr.top - 1) return;
+    var seal = sealButton();
+    var guard = ar;
+    if (seal && typeof seal.getBoundingClientRect === 'function') {
+      try { guard = seal.getBoundingClientRect() || ar; } catch (eSeal) { guard = ar; }
+    }
+    if (!guard || !(guard.height > 0)) guard = ar;
+    var need = vr.top + 8 - hr.top;
+    if (!(need > 0)) return;
+    var room = vr.bottom - guard.bottom;
+    var shift = need;
+    if (shift > room - 8) shift = room - 8;
+    if (!(shift > 1)) return;
+    var before = veil.scrollTop;
+    try { veil.scrollTop = Math.max(0, veil.scrollTop - shift); } catch (e3) { return; }
+    var gr2 = null;
+    try { gr2 = (seal || askEl).getBoundingClientRect(); } catch (e4) { gr2 = null; }
+    if (!gr2 || gr2.bottom > vr.bottom - 1 || gr2.top < vr.top - 1) {
+      try { veil.scrollTop = before; } catch (e5) {}
+    }
+  }
+  function bringAsk(mode, settled) {
+    // The tab fade and its focus scroll finish first. A scroll during the fade does not stick.
+    if (!settled && tabMotionPending()) {
+      afterTabMotion(function () {
+        try { root.__flSealRetried = false; } catch (eWait) {}
+        bringAsk(mode, true);
+        armScrollAgree();
+      });
+      return;
+    }
+    // No box yet. A scroll now does not move Seal it, and it must not count.
+    if (!chatViewVisible()) {
+      if (mode === 'load') {
+        loadBringDone = false;
+        chatWasShown = false;
+      }
+      armBoxWatch();
+      return;
+    }
+    reseatDock();
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    if (!dock) return;
+    var ask = dockAsk();
+    if (mode === 'load') {
+      if (!ask || ask.state !== 'asked') return;
+    } else if (!ask || (ask.state !== 'asked' && ask.state !== 'stale' && !ask._answerNow)) {
+      return;
+    }
+    var target = dock;
+    if (typeof dock.querySelector === 'function') {
+      try {
+        var found = dock.querySelector('[data-seal-ask]');
+        if (found) target = found;
+      } catch (e) {}
+    }
+    if (target === dock && dock.children) {
+      var ci;
+      for (ci = 0; ci < dock.children.length; ci++) {
+        var kid = dock.children[ci];
+        if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) target = kid;
+      }
+    }
+    // Final place is done. If the ask is in a fixed veil, that veil scrolls, after this layout.
+    var veil = seatAskOverlay(target);
+    var allowFocus = mode !== 'settle';
+    function land() {
+      // An immediate land. A glide that starts before the panel is visible never finishes in view.
+      // Centering Seal it pushes the heart above the veil. Seat the button, then the heart.
+      if (veil && threadHeart()) {
+        seatSealMin(veil);
+        keepHeart(veil, target);
+      } else {
+        revealEl(target, 'auto');
+        if (veil) keepHeart(veil, target);
+      }
+      if (typeof dock.querySelector === 'function') settleAsk(dock);
+      if (allowFocus && !typingNow()) {
+        var heading = d.getElementById('fl-ws-ask-heading');
+        if (heading && typeof heading.focus === 'function') {
+          try { heading.focus({ preventScroll: true }); }
+          catch (e2) { try { heading.focus(); } catch (e3) {} }
+        }
+      }
+      // One more scroll if Seal it is still outside. This one does not take focus.
+      if (root.__flSealRetried) return;
+      function again() {
+        if (root.__flSealRetried) return;
+        var btn = sealButton();
+        if (!btn || fullyInView(btn)) {
+          if (veil && threadHeart()) keepHeart(veil, target);
+          return;
+        }
+        root.__flSealRetried = true;
+        if (veil && threadHeart()) {
+          seatSealMin(veil);
+          keepHeart(veil, target);
+        } else {
+          revealEl(btn, 'auto');
+        }
+      }
+      try { root.requestAnimationFrame(function () { again(); }); }
+      catch (eAgain) { again(); }
+    }
+    if (veil) {
+      try { root.requestAnimationFrame(function () { land(); }); }
+      catch (eVeil) { land(); }
+    } else {
+      land();
+    }
+  }
+  function scheduleBring(mode) {
+    var ran = false;
+    function go() {
+      if (ran) return;
+      ran = true;
+      bringAsk(mode);
+    }
+    try {
+      root.requestAnimationFrame(function () {
+        try { root.requestAnimationFrame(function () { go(); }); }
+        catch (e2) { go(); }
+      });
+    } catch (e) { go(); }
+  }
+  function scheduleShownCheck() {
+    try {
+      root.requestAnimationFrame(function () {
+        try { root.requestAnimationFrame(function () { watchViews(); }); }
+        catch (e2) { watchViews(); }
+      });
+    } catch (e) { watchViews(); }
+  }
+  function watchViews() {
+    var open = nurseryOpen();
+    var openedNow = open && !nurseryWasOpen;
+    nurseryWasOpen = open;
+    var cur = dockAsk();
+    var showable = cur && (cur.state === 'asked' || cur.state === 'stale' || cur._answerNow);
+    var d = doc();
+    var dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    var shown = chatViewVisible();
+    if (!shown) {
+      chatWasShown = false;
+      var tab = chatTab();
+      // The class can land a frame before the box. Look again, a few times, then stop.
+      // A box that arrives later is the ResizeObserver's job. The scroll waits for it.
+      var opening = false;
+      if (tab && hasClass(tab, 'active')) opening = true;
+      if (!tab && d && d.getElementById) {
+        var thread = d.getElementById('thread-veil');
+        var room = d.getElementById('room-chat');
+        if ((thread && !thread.hidden) || (room && !room.hidden)) opening = true;
+      }
+      if (opening) armBoxWatch();
+      if (opening && layoutWaits < 8) {
+        layoutWaits += 1;
+        scheduleShownCheck();
+      }
+      return;
+    }
+    layoutWaits = 0;
+    // A reopen builds a new compose. The ask is already up, so the new form sleeps too.
+    syncCompose();
+    if (cur && (cur.state === 'asked' || cur.state === 'stale') && !dock && !root.__flSealEnsure) {
+      root.__flSealEnsure = true;
+      ensureAskDock();
+      root.__flSealEnsure = false;
+      return;
+    }
+    reseatDock();
+    dock = d && d.getElementById ? d.getElementById('fl-ws-asks') : null;
+    var reveal = !chatWasShown;
+    if (dock && cur) chatWasShown = true;
+    if (openedNow && showable && dock) {
+      if (cur.state === 'asked') loadBringDone = true;
+      scheduleBring('open');
+      return;
+    }
+    // Once for this reveal. A hidden tab, then Chat, is the reveal. The first paint is not.
+    if (reveal && !loadBringDone && cur && cur.state === 'asked' && dock) {
+      loadBringDone = true;
+      scheduleBring('load');
+    }
+    if (cur && (cur.state === 'asked' || cur.state === 'stale')) armSettle();
+  }
+  function watchNursery() {
+    var d = doc();
+    var veil = d && d.getElementById ? d.getElementById('place-veil') : null;
+    if (!veil || veil.__flSealWatch || typeof MutationObserver !== 'function') return;
+    veil.__flSealWatch = true;
+    try {
+      var obs = new MutationObserver(function () { watchViews(); });
+      obs.observe(veil, { attributes: true, attributeFilter: ['class'] });
+    } catch (e) {}
+  }
+  // The chat tab is hidden on load. A class change is not a new child, so the
+  // body observer never sees it. This watches the tab the way the Nursery veil is watched.
+  function watchChat() {
+    var d = doc();
+    var tab = chatTab();
+    if (tab && !tab.__flSealChatWatch && typeof MutationObserver === 'function') {
+      tab.__flSealChatWatch = true;
+      try {
+        var obs = new MutationObserver(function () {
+          layoutWaits = 0;
+          watchViews();
+        });
+        obs.observe(tab, { attributes: true, attributeFilter: ['class'] });
+      } catch (eChat) {}
+    }
+    // A tab tap and a hash route both end in the panel being shown. The class watch
+    // covers the tap. This covers a tap whose class lands after the event, and a hash.
+    if (d && d.addEventListener && !d.__flSealChatClick) {
+      d.__flSealChatClick = true;
+      d.addEventListener('click', function (ev) {
+        layoutWaits = 0;
+        var node = ev && ev.target;
+        var onChatTab = false;
+        while (node) {
+          if (node.id === 'mnav-chat') onChatTab = true;
+          if (node.getAttribute && node.getAttribute('data-tab') === 'chat') onChatTab = true;
+          node = node.parentElement || node.parentNode;
+        }
+        if (onChatTab) {
+          // A fresh tap. The earlier land must not count, and it must not keep the focus.
+          loadBringDone = false;
+          chatWasShown = false;
+          try { tabClickAt = Date.now(); } catch (eClick) { tabClickAt = 1; }
+          try { root.__flSealRetried = false; } catch (eR) {}
+          try { root.__flSealSettle = false; } catch (eS) {}
+          try { root.__flSealAgreed = false; } catch (eA) {}
+        }
+        scheduleShownCheck();
+      }, false);
+    }
+    if (root.addEventListener && !root.__flSealHashWatch) {
+      root.__flSealHashWatch = true;
+      try {
+        root.addEventListener('hashchange', function () {
+          layoutWaits = 0;
+          scheduleShownCheck();
+        });
+      } catch (eHash) {}
+    }
+  }
+  // The Tree chat is a veil, not a tab. Opening it changes hidden and class.
+  // A tap on Chat stops before it reaches the document, so the veil is the signal.
+  function watchThread() {
+    var d = doc();
+    if (!d || !d.getElementById || typeof MutationObserver !== 'function') return;
+    var ids = ['thread-veil', 'room-chat'];
+    var i;
+    for (i = 0; i < ids.length; i++) {
+      var veil = d.getElementById(ids[i]);
+      if (!veil || veil.__flSealThreadWatch) continue;
+      veil.__flSealThreadWatch = true;
+      try {
+        var obs = new MutationObserver(function () {
+          layoutWaits = 0;
+          scheduleShownCheck();
+        });
+        obs.observe(veil, { attributes: true, attributeFilter: ['class', 'hidden'] });
+      } catch (eThread) {}
+    }
+  }
+  function pointerWord(askEl, ptr) {
+    if (!askEl || !ptr || typeof askEl.getBoundingClientRect !== 'function') return 'above';
+    if (typeof ptr.getBoundingClientRect !== 'function') return 'above';
+    var ar = null;
+    var pr = null;
+    try {
+      ar = askEl.getBoundingClientRect();
+      pr = ptr.getBoundingClientRect();
+    } catch (e) { return 'above'; }
+    if (!ar || !pr) return 'above';
+    if (!(ar.height > 0) && !(pr.height > 0)) return 'above';
+    var askMid = ((ar.top || 0) + (ar.bottom || 0)) / 2;
+    var ptrMid = ((pr.top || 0) + (pr.bottom || 0)) / 2;
+    return askMid < ptrMid ? 'above' : 'below';
+  }
+  function syncPointer() {
+    var d = doc();
+    if (!d || !d.getElementById || !d.createElement) return;
+    var panel = d.getElementById('fl-ws-panel');
+    var ptr = d.getElementById('fl-ws-ask-pointer');
+    if (!panel || !pendingAnswer()) {
+      if (ptr && ptr.parentNode) ptr.parentNode.removeChild(ptr);
+      return;
+    }
+    if (!ptr) {
+      ptr = d.createElement('p');
+      ptr.id = 'fl-ws-ask-pointer';
+      ptr.style.cssText = 'margin:0 0 8px;max-width:100%;overflow-wrap:anywhere;';
+      if (panel.firstChild && panel.insertBefore) panel.insertBefore(ptr, panel.firstChild);
+      else panel.appendChild(ptr);
+    }
+    var dock = d.getElementById('fl-ws-asks');
+    var askEl = null;
+    if (dock && typeof dock.querySelector === 'function') {
+      try { askEl = dock.querySelector('[data-seal-ask]'); } catch (eAsk) { askEl = null; }
+    }
+    if (!askEl && dock && dock.children) {
+      var ai;
+      for (ai = 0; ai < dock.children.length; ai++) {
+        var kid = dock.children[ai];
+        if (kid && kid.getAttribute && kid.getAttribute('data-seal-ask')) askEl = kid;
+      }
+    }
+    // A live ask uses its dock box. During the wait, and after a decline, the ask
+    // is not shown, so this line stays off. It must not point at an ask that is hidden.
+    // An ask with no box method is the older check: the node itself means it is shown.
+    var target = null;
+    var canMeasure = (askEl && typeof askEl.getBoundingClientRect === 'function') || (dock && typeof dock.getBoundingClientRect === 'function');
+    if (askEl && !canMeasure) target = dock || askEl;
+    else if (askEl && positiveRect(dock)) target = dock;
+    else if (askEl && positiveRect(askEl)) target = askEl;
+    if (!target) {
+      if (ptr && ptr.parentNode) ptr.parentNode.removeChild(ptr);
+      return;
+    }
+    var word = pointerWord(target, ptr);
+    ptr.textContent = 'Your answer is waiting ' + word + '.';
+  }
   function ensureAskDock() {
     var d = doc();
     if (!d || !d.createElement || !d.getElementById) return;
+    ensureAskStyle();
     var panelOpen = d.getElementById('fl-ws-panel');
     var dock = d.getElementById('fl-ws-asks');
-    var pending = sealAsks.length || handoffAsks.length || handoffRefusals.length;
-    if (panelOpen || !pending) {
+    var current = dockTarget();
+    var full = false;
+    var quiet = false;
+    var visible = !!(sealDockOpen || panelOpen);
+    if (current && (current.state === 'asked' || current.state === 'stale')) full = true;
+    else if (current && current._answerNow) full = true;
+    else if (current && (current.state === 'later' || current.state === 'declined') && !inWait(current)) full = visible;
+    else if (current && inWait(current)) quiet = visible;
+    var handoffPending = handoffAsks.length || handoffRefusals.length;
+    if (!full && !quiet && (panelOpen || !handoffPending)) {
       if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
+      holdOthers(false);
+      syncCompose();
+      paintBadge();
+      syncPointer();
+      watchViews();
       return;
     }
     if (!dock) {
       dock = d.createElement('div');
       dock.id = 'fl-ws-asks';
-      dock.style.cssText = 'max-width:100%;overflow:hidden;';
-      var host = hostEl || d.body;
-      if (host) host.appendChild(dock);
+      dock.style.cssText = 'display:block;width:100%;max-width:100%;overflow:hidden;box-sizing:border-box;';
     }
+    dock.style.background = '#1e1b2e';
+    dock.style.color = '#f6f3ea';
+    dock.style.padding = '12px';
+    dock.style.borderRadius = '12px';
+    try {
+      var pad = bottomPad() + 'px';
+      dock.style.scrollMarginBottom = pad;
+      // scroll-margin does not add room. This margin does, so the button can sit above the bars.
+      dock.style.marginBottom = pad;
+    } catch (eMargin) {}
+    placeDock(dock);
     clearNode(dock);
-    sealAsks.forEach(function (ask) { appendAsk(dock, ask); });
-    appendHandoffNotes(dock);
+    if (full && current) {
+      dock.setAttribute('data-seal-version', current.versionHash || '');
+      appendAsk(dock, current);
+      holdOthers(current.state === 'asked' || current.state === 'later' || current.state === 'declined');
+    } else if (quiet && current) {
+      dock.setAttribute('data-seal-version', current.versionHash || '');
+      appendQuiet(dock, current);
+      holdOthers(false);
+    } else {
+      holdOthers(false);
+      appendHandoffNotes(dock);
+    }
+    paintBadge();
+    syncPointer();
+    syncCompose();
+    watchViews();
   }
   function appendReceipt(parent, row) {
     var d = doc();
@@ -1350,10 +2912,17 @@
     var head = d.createElement('p');
     head.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;';
     head.textContent = shortForm(row);
+    var ms = row.mindSeal || {};
+    // The bare receipt line moved into details. Same words, eight hex on the summary.
+    var fullDetails = d.createElement('details');
+    fullDetails.style.cssText = 'margin:4px 0 0;max-width:100%;';
+    var fullSum = d.createElement('summary');
+    fullSum.textContent = 'Details for checking (version ' + shortHash(row.versionHash) + ')';
     var full = d.createElement('p');
     full.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
-    var ms = row.mindSeal || {};
     full.textContent = 'version ' + String(row.versionHash || '') + ' context ' + String(ms.contextHash || '') + ' model ' + String(ms.modelId || '') + ' ' + String(row.consent || '');
+    fullDetails.appendChild(fullSum);
+    fullDetails.appendChild(full);
     var note = d.createElement('p');
     note.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
     note.textContent = INTEGRITY;
@@ -1377,7 +2946,7 @@
       }));
     });
     card.appendChild(head);
-    card.appendChild(full);
+    card.appendChild(fullDetails);
     card.appendChild(note);
     if (copyBtn) card.appendChild(copyBtn);
     if (verifyBtn) card.appendChild(verifyBtn);
@@ -1415,11 +2984,28 @@
       chain = chain.then(function () {
         return applyOp(op).then(function (res) {
           var line = receiptFor(op, res);
-          if (line) lines.push(line);
+          if (line) lines.push({
+            text: line,
+            pageId: res && res.page ? res.page.id : (op.page || op.pageId || op.id || ''),
+            hash: res && res.hash ? res.hash : ''
+          });
         });
       });
     });
-    return chain.then(function () { return lines; });
+    return chain.then(function () {
+      var fix = Promise.resolve();
+      lines.forEach(function (line) {
+        fix = fix.then(function () {
+          if (!line || !line.pageId || !line.text || line.text.indexOf('Wrote to ') !== 0) return null;
+          return getPage(line.pageId).then(function (page) {
+            if (!page || page.privacy !== 'private') return null;
+            line.text = 'Wrote to "' + personTitle(page) + '" (version ' + shortHash(line.hash || page.head) + ')';
+            return null;
+          });
+        });
+      });
+      return fix.then(function () { return lines; });
+    });
   }
   function doc() {
     try { return root.document || null; }
@@ -1443,10 +3029,16 @@
     if (!d || !anchor || !lines || !lines.length) return;
     var parent = anchor.parentNode || anchor;
     lines.forEach(function (line) {
+      var text = typeof line === 'string' ? line : (line && line.text);
+      if (!text) return;
       var p = d.createElement('p');
       p.className = 'fl-ws-receipt';
       p.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;';
-      p.textContent = line;
+      p.textContent = text;
+      if (line && typeof line === 'object') {
+        if (line.pageId) p.setAttribute('data-ws-page', String(line.pageId));
+        if (line.hash) p.setAttribute('data-ws-hash', String(line.hash));
+      }
       try { parent.appendChild(p); } catch (e) {}
     });
   }
@@ -1672,7 +3264,10 @@
     var job = applyAll(parsed).then(function (lines) {
       if (heldLines.length) lines = heldLines.concat(lines);
       appendLines(anchor, lines);
-      return afterChange().then(function () { return lines; });
+      var notes = lines.map(function (line) {
+        return typeof line === 'string' ? line : (line && line.text) || '';
+      }).filter(Boolean);
+      return afterChange().then(function () { return notes; });
     });
     track(job);
     return { visible: parsed.visible, receipts: [], stored: true, done: job };
@@ -1690,13 +3285,183 @@
     }
     return seen;
   }
+  function wrotePublic(page, hash) {
+    return 'Wrote to "' + personTitle(page) + '" (version ' + shortHash(hash || (page && page.head) || '') + ')';
+  }
+  function replaceWrotePrefix(text, realTitle, publicTitle) {
+    if (!text || !realTitle) return text;
+    var from = 'Wrote to ' + realTitle + ' (version ';
+    var to = 'Wrote to "' + publicTitle + '" (version ';
+    if (String(text).indexOf(from) === -1) return text;
+    return String(text).split(from).join(to);
+  }
+  function walkPageNodes(node, pageId, out) {
+    if (!node || !out) return;
+    var id = '';
+    try { id = node.getAttribute ? (node.getAttribute('data-ws-page') || '') : ''; }
+    catch (e) { id = ''; }
+    if (id && id === String(pageId)) out.push(node);
+    var kids = node.children;
+    if (!kids || !kids.length) return;
+    for (var i = 0; i < kids.length; i++) walkPageNodes(kids[i], pageId, out);
+  }
+  function rewriteValue(value, realTitle, publicTitle) {
+    var changed = false;
+    if (!value || typeof value !== 'object') return false;
+    if (Array.isArray(value)) {
+      for (var i = 0; i < value.length; i++) {
+        if (typeof value[i] === 'string') {
+          var next = replaceWrotePrefix(value[i], realTitle, publicTitle);
+          if (next !== value[i]) { value[i] = next; changed = true; }
+        } else if (rewriteValue(value[i], realTitle, publicTitle)) changed = true;
+      }
+      return changed;
+    }
+    Object.keys(value).forEach(function (k) {
+      if (typeof value[k] === 'string') {
+        var next = replaceWrotePrefix(value[k], realTitle, publicTitle);
+        if (next !== value[k]) { value[k] = next; changed = true; }
+      } else if (rewriteValue(value[k], realTitle, publicTitle)) changed = true;
+    });
+    return changed;
+  }
+  function rewriteLogKey(key, realTitle, publicTitle) {
+    var raw = lsGet(key);
+    var from = 'Wrote to ' + realTitle + ' (version ';
+    if (!raw || raw.indexOf(from) === -1) return;
+    try {
+      var parsed = JSON.parse(raw);
+      if (rewriteValue(parsed, realTitle, publicTitle)) lsSet(key, JSON.stringify(parsed));
+    } catch (e) {}
+  }
+  function rewriteDbMessages(realTitle, publicTitle) {
+    var database = null;
+    try { database = root.state && root.state.db; } catch (e) { database = null; }
+    if (!database || typeof database.transaction !== 'function' || !database.objectStoreNames) return;
+    var has = false;
+    try { has = !!(database.objectStoreNames.contains && database.objectStoreNames.contains('messages')); }
+    catch (e2) { has = false; }
+    if (!has) return;
+    try {
+      var tx = database.transaction('messages', 'readwrite');
+      var store = tx.objectStore('messages');
+      var req = store.getAll();
+      if (!req) return;
+      req.onsuccess = function () {
+        var rows = req.result || [];
+        rows.forEach(function (row) {
+          if (!row || typeof row.content !== 'string') return;
+          var next = replaceWrotePrefix(row.content, realTitle, publicTitle);
+          if (next === row.content) return;
+          row.content = next;
+          try { store.put(row); } catch (e3) {}
+        });
+      };
+    } catch (e4) {}
+  }
+  function redactPageTitle(page) {
+    if (!page || page.privacy !== 'private' || !page.id) return;
+    var real = page.title ? String(page.title) : '';
+    var pub = personTitle(page);
+    var d = doc();
+    var nodes = [];
+    if (d && d.body) walkPageNodes(d.body, page.id, nodes);
+    if (d && d.documentElement && d.documentElement !== d.body) walkPageNodes(d.documentElement, page.id, nodes);
+    nodes.forEach(function (node) {
+      var text = '';
+      try { text = node.textContent || ''; } catch (e) { text = ''; }
+      if (text.indexOf('Wrote to ') === 0) {
+        var hash = '';
+        try { hash = node.getAttribute ? (node.getAttribute('data-ws-hash') || '') : ''; }
+        catch (e2) { hash = ''; }
+        node.textContent = wrotePublic(page, hash || page.head);
+        return;
+      }
+      if (!real) return;
+      var next = replaceWrotePrefix(text, real, pub);
+      if (next !== text) node.textContent = next;
+    });
+    if (!real) return;
+    try {
+      var hist = root.state && root.state.chatHistory;
+      if (Array.isArray(hist)) {
+        hist.forEach(function (m) {
+          if (!m) return;
+          if (typeof m.content === 'string') m.content = replaceWrotePrefix(m.content, real, pub);
+          if (typeof m.text === 'string') m.text = replaceWrotePrefix(m.text, real, pub);
+        });
+      }
+    } catch (e3) {}
+    rewriteLogKey('fl_alpha_thread_history', real, pub);
+    rewriteDbMessages(real, pub);
+  }
+  function appendEarlier(d, block, pageId) {
+    if (!d || !block || !pageId) return;
+    var notes = readSealNotes().filter(function (n) {
+      return n && String(n.pageId) === String(pageId) && n.line;
+    });
+    if (!notes.length) return;
+    var details = d.createElement('details');
+    details.style.cssText = 'margin-top:8px;max-width:100%;';
+    var sum = d.createElement('summary');
+    sum.textContent = 'Earlier answers';
+    details.appendChild(sum);
+    notes.forEach(function (n) {
+      var p = d.createElement('p');
+      p.style.cssText = 'margin:4px 0 0;max-width:100%;overflow-wrap:anywhere;color:#8a8a8a;';
+      p.textContent = String(n.line);
+      details.appendChild(p);
+    });
+    block.appendChild(details);
+  }
+  function restoreSealAsks() {
+    if (sealRestored || !isOn()) return Promise.resolve();
+    sealRestored = true;
+    return allOf('sealAsks').then(function (rows) {
+      var chain = Promise.resolve();
+      (rows || []).forEach(function (row) {
+        if (!row || !row.pageId) return;
+        chain = chain.then(function () {
+          return getPage(row.pageId).then(function (page) {
+            var ask = {
+              pageId: String(row.pageId),
+              version: String(row.version || ''),
+              versionHash: String(row.version || ''),
+              summary: row.summary || '',
+              reason: row.reason || '',
+              why: row.reason || '',
+              askedAt: row.askedAt || 0,
+              state: row.state || 'asked'
+            };
+            if ((ask.state === 'asked' || ask.state === 'later') && page && page.head && ask.versionHash && page.head !== ask.versionHash) {
+              ask.state = 'stale';
+              putSealAsk(ask);
+            }
+            rememberAsk(ask);
+            if (ask.state === 'asked' || ask.state === 'stale') sealDockOpen = true;
+          });
+        });
+      });
+      return chain.then(function () {
+        ensureAskDock();
+        paintBadge();
+      });
+    });
+  }
+  function sealState(pageId) {
+    var ask = findAskByPage(pageId);
+    if (!ask || !ask.state) return 'unsealed';
+    return ask.state;
+  }
   function accept() {
     memoryOn = true;
     lsSet('fl_ws', 'yes');
     try { if (root.sessionStorage) root.sessionStorage.removeItem('fl_ws_later'); } catch (e) {}
     hideConsent();
     ensureButton();
-    return track(refreshWake().then(function () { return offerRestore(); }));
+    return track(refreshWake().then(function () {
+      return restoreSealAsks().then(function () { return offerRestore(); });
+    }));
   }
   function holdLater() {
     memoryOn = false;
@@ -1728,12 +3493,8 @@
         var rows = pair[1] || [];
         pages.sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
         function footer() {
-          declinedLines.forEach(function (line) {
-            var note = d.createElement('p');
-            note.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
-            note.textContent = line;
-            panel.appendChild(note);
-          });
+          var prior = d.getElementById('fl-ws-honest');
+          if (prior && prior.parentNode) prior.parentNode.removeChild(prior);
           appendHandoffNotes(panel);
           var asideBtn = button(shelfIsAside(mine) ? 'Bring this shelf back' : 'Set this shelf aside');
           if (asideBtn) {
@@ -1747,6 +3508,8 @@
           foot.textContent = HONEST;
           panel.appendChild(foot);
         }
+        // The pointer used to say "above" every time. syncPointer reads the two rects.
+        syncPointer();
         if (shelfIsAside(mine)) {
           var kept = d.createElement('p');
           kept.style.cssText = 'margin:0;max-width:100%;overflow-wrap:anywhere;';
@@ -1777,11 +3540,18 @@
                   var sum = d.createElement('p');
                   sum.style.cssText = 'margin:0;overflow-wrap:anywhere;max-width:100%;';
                   sum.textContent = personSummary(page, text, !!(ver && ver.sealed));
+                  var hashDetails = d.createElement('details');
+                  hashDetails.style.cssText = 'margin:4px 0 0;max-width:100%;';
+                  var hashSum = d.createElement('summary');
+                  var headHex = page.head ? String(page.head) : '';
+                  hashSum.textContent = 'Details for checking' + (headHex ? (' (' + shortHash(headHex) + ')') : '');
                   var hashLine = d.createElement('p');
                   hashLine.style.cssText = 'margin:4px 0 0;overflow-wrap:anywhere;max-width:100%;';
-                  hashLine.textContent = page.head ? String(page.head) : '';
+                  hashLine.textContent = headHex;
+                  hashDetails.appendChild(hashSum);
+                  hashDetails.appendChild(hashLine);
                   block.appendChild(sum);
-                  block.appendChild(hashLine);
+                  block.appendChild(hashDetails);
                   if (pinBtn) block.appendChild(pinBtn);
                 } else {
                   var line = d.createElement('p');
@@ -1813,14 +3583,36 @@
                   if (writeBtn) block.appendChild(writeBtn);
                   if (pinBtn) block.appendChild(pinBtn);
                 }
-                sealAsks.forEach(function (ask) { if (ask.pageId === page.id) appendAsk(block, ask); });
+                var ask = findAskByPage(page.id);
+                if (ask && (ask.state === 'asked' || ask.state === 'later') && page.head && ask.versionHash && ask.versionHash !== page.head) {
+                  ask.state = 'stale';
+                  putSealAsk(ask);
+                }
+                if (ver && ver.sealed) {
+                  var nowLine = d.createElement('p');
+                  nowLine.setAttribute('data-seal-current', 'sealed');
+                  nowLine.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  nowLine.textContent = 'Sealed';
+                  block.appendChild(nowLine);
+                  appendEarlier(d, block, page.id);
+                } else if (ask && ask.state === 'declined') {
+                  var declined = d.createElement('p');
+                  declined.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  declined.textContent = 'Declined the seal.';
+                  block.appendChild(declined);
+                } else if (ask && ask.state === 'stale') {
+                  var staleNote = d.createElement('p');
+                  staleNote.style.cssText = 'margin:8px 0 0;max-width:100%;overflow-wrap:anywhere;';
+                  staleNote.textContent = 'stale, ask again';
+                  block.appendChild(staleNote);
+                }
                 rows.forEach(function (row) { if (row && row.pageId === page.id) appendReceipt(block, row); });
                 panel.appendChild(block);
               });
             });
           });
         });
-        return chain.then(function () { footer(); });
+        return chain.then(function () { footer(); syncPointer(); });
       });
     });
   }
@@ -1829,30 +3621,53 @@
     var d = doc();
     if (!d || !d.createElement) return;
     var existing = d.getElementById('fl-ws-panel');
-    if (existing) { removePanel(); return; }
+    if (existing) { removePanel(); ensureAskDock(); return; }
+    if (liveAsks().length) sealDockOpen = true;
     var panel = d.createElement('div');
     panel.id = 'fl-ws-panel';
     panel.style.maxWidth = '100%';
     panel.style.overflow = 'hidden';
     var parent = hostEl || (d.getElementById && d.getElementById('fl-clay-dock')) || d.body;
     if (parent) parent.appendChild(panel);
-    track(renderPanel(panel));
+    track(renderPanel(panel).then(function () { ensureAskDock(); }));
   }
   function ensureButton() {
     var d = doc();
     if (!d || !d.createElement || !d.getElementById) return;
-    if (d.getElementById('fl-ws-open')) return;
+    if (!d.getElementById('fl-ws-open')) {
+      var btn = button('Notebook');
+      if (btn) {
+        btn.id = 'fl-ws-open';
+        btn.addEventListener('click', function () {
+          if (isOn()) { openPanel(); return; }
+          showConsent(btn);
+        });
+        var toggle = root.__clayToggle;
+        if (toggle && toggle.parentNode) toggle.parentNode.insertBefore(btn, toggle.nextSibling);
+        else if (hostEl) hostEl.appendChild(btn);
+        else if (d.body) d.body.appendChild(btn);
+      }
+    }
+    ensureToolsNotebook();
+    paintBadge();
+  }
+  function ensureToolsNotebook() {
+    var d = doc();
+    if (!d || !d.createElement || !d.getElementById) return;
+    if (d.getElementById('fl-ws-open-tools')) return;
+    var home = d.getElementById('chatOverflowPopup');
+    if (!home && d.querySelector) {
+      try { home = d.querySelector('[data-thread-tools]'); } catch (e) { home = null; }
+    }
+    if (!home) return;
     var btn = button('Notebook');
     if (!btn) return;
-    btn.id = 'fl-ws-open';
+    btn.id = 'fl-ws-open-tools';
     btn.addEventListener('click', function () {
       if (isOn()) { openPanel(); return; }
       showConsent(btn);
     });
-    var toggle = root.__clayToggle;
-    if (toggle && toggle.parentNode) toggle.parentNode.insertBefore(btn, toggle.nextSibling);
-    else if (hostEl) hostEl.appendChild(btn);
-    else if (d.body) d.body.appendChild(btn);
+    home.appendChild(btn);
   }
   function hideRestoreCard() {
     var d = doc();
@@ -1934,13 +3749,19 @@
       hostEl = face || nursery || d.getElementById('fl-clay-dock') || null;
     }
     ensureButton();
+    if (root.__flSealAskHolding) holdDeferButtons(true);
+    watchNursery();
+    watchChat();
+    watchThread();
     if (isOn()) {
       track(refreshWake());
+      track(restoreSealAsks());
       if (!restoreChecked) {
         restoreChecked = true;
         track(offerRestore());
       }
     }
+    watchViews();
   }
   function mount(host) {
     if (host) hostEl = host;
@@ -2017,6 +3838,24 @@
     declinedLines = [];
     handoffAsks = [];
     handoffRefusals = [];
+    sealDockOpen = false;
+    sealBackArmed = false;
+    sealBackEating = false;
+    sealRestored = false;
+    heldDefers = [];
+    loadBringDone = false;
+    chatWasShown = false;
+    layoutWaits = 0;
+    try { root.__flSealSettle = false; } catch (eSettle) {}
+    try { root.__flSealBoxArm = false; } catch (eBox) {}
+    try { root.__flSealRetried = false; } catch (eRetry) {}
+    try { root.__flSealAgree = false; } catch (eAgree) {}
+    try { root.__flSealAgreed = false; } catch (eAgreed) {}
+    try { releaseCompose(); } catch (eForm) {}
+    formHold = null;
+    tabClickAt = 0;
+    nurseryWasOpen = false;
+    try { if (root.localStorage && root.localStorage.removeItem) root.localStorage.removeItem(SEAL_NOTE_KEY); } catch (eNote) {}
     mirrorHold = 0;
     restoreChecked = false;
     restoreLater = {};
@@ -2025,8 +3864,8 @@
   function tokensOf(s) { return Math.ceil(String(s || '').length / 4); }
 
   // v-workspace-export-v0.1 v-tree-workspace-export-v0.1
-  // The notebook leaves with the export. A private page stays on this device.
-  var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on the device that made the export.';
+  // The notebook leaves with the export. A private page stays on this browser.
+  var PRIVATE_NOTE = 'Private pages are not in this file. They stayed on this browser, on the device that made the export.';
   var BRANCH_NOTE = 'Parent was not in this notebook, so this version came in as its own branch.';
 
   function countWord(n, one, many) {
@@ -2034,7 +3873,7 @@
     return String(n) + ' ' + (n === 1 ? one : many);
   }
   function notebookLine(total, priv) {
-    return 'Notebook: ' + countWord(total, 'page', 'pages') + ', ' + countWord(priv, 'private page', 'private pages') + ' stayed on this device.';
+    return 'Notebook: ' + countWord(total, 'page', 'pages') + ', ' + countWord(priv, 'private page', 'private pages') + ' stayed on this browser.';
   }
   function privacyHidden(value) {
     return value === 'private' || value === 'mind-private';
@@ -2531,6 +4370,13 @@
     DESKTOP: 'v-workspace-desktop-v0.1',
     HANDOFF: 'v-workspace-handoff-v0.1',
     TREE_HANDOFF: 'v-tree-workspace-handoff-v0.1',
+    SEAL_HEAL: 'v-seal-ask-heal-v0.1',
+    SEAL_VIEW: 'v-seal-ask-in-view-v0.1',
+    SEAL_TAB: 'v-seal-ask-chat-tab-v0.1',
+    SEAL_SETTLE: 'v-seal-ask-settle-v0.1',
+    SEAL_TAP: 'v-seal-ask-after-tap-v0.1',
+    SEAL_LAST: 'v-seal-ask-last-two-v0.1',
+    SEAL_ASK_COOLDOWN_MS: SEAL_ASK_COOLDOWN_MS,
     HONEST: HONEST,
     HOWTO: HOWTO,
     open: open,
@@ -2573,6 +4419,10 @@
     shelfIsAside: shelfIsAside,
     personSummary: personSummary,
     approveSeal: approveSeal,
+    askSeal: askSeal,
+    laterSeal: laterSeal,
+    declineSeal: declineSeal,
+    sealState: sealState,
     verifyReceipt: verifyReceipt,
     receipts: receipts,
     exportSection: exportSection,
@@ -2586,6 +4436,10 @@
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FLWorkspace = api;
+  if (typeof root.addEventListener === 'function') {
+    root.addEventListener('popstate', onSealPop, true);
+    root.__flSealBackBound = true;
+  }
   if (root.document && root.document.addEventListener) {
     if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', boot);
     else boot();
