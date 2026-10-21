@@ -182,7 +182,9 @@ var second = reply('two');
 clay.consumeReply('[FL_CLAY: {"form":"moon","mood":"calm","energy":0.3}]', []);
 ok(clay.canvasCount() === 1, 'still one canvas');
 ok(second.nextSibling === canvas, 'canvas moved under the new reply');
-ok(String(canvas.style.width).indexOf('320px') !== -1, 'width cap is 320');
+// v-seal-ask-heal-v0.1: "width cap is 320" (style.width held 320px). The canvas now fills the column.
+ok(canvas.style.width === '100%', 'width fills the bubble column');
+ok(String(canvas.style.height).indexOf('320px') !== -1, 'height ceiling is 320px');
 ok(canvas.style.maxWidth === '100%', 'width stays inside the column');
 ok(canvas.clientWidth <= messages.clientWidth, 'width never exceeds the chat column at 390');
 clay.setOn(false);
@@ -333,7 +335,7 @@ function memoryHalf() {
   var section = {
     v: 1,
     shelves: [{ mindFp: FP, name: 'home', pages: [{ id: 'p1', title: 'open', privacy: 'shared', mindFp: FP }], versions: [], receipts: [] }],
-    line: 'Notebook: 1 page, 1 private page stayed on this device.'
+    line: 'Notebook: 1 page, 1 private page stayed on this browser.'
   };
   global.FLWorkspace.exportSection = function () {
     return Promise.resolve({ section: section, secrets: [SECRET] });

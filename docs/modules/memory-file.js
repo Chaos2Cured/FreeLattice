@@ -301,7 +301,7 @@
 
   var api = {
     VERSION: 'v-memory-file-v0.1',
-    HONEST: 'Saved on your computer, in the file you chose. Not encrypted. Private pages stay on this device.',
+    HONEST: 'Saved on your computer, in the file you chose. Not encrypted. Private pages stay on this browser.',
     save: save,
     exportCopy: exportCopy,
     importFile: importFile,
