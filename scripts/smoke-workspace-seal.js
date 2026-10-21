@@ -6,7 +6,9 @@ var assert = require('assert');
 
 var rootDir = path.join(__dirname, '..');
 var src = fs.readFileSync(path.join(rootDir, 'docs/modules/mind-workspace.js'), 'utf8');
-var HONEST = 'Private means hidden in the app, not encrypted from the person who owns this device.';
+// v-seal-ask-heal-v0.1: the old honest line said "not encrypted from the person who owns this device."
+// That job moved into the browser-profile wording below.
+var HONEST = 'Private means hidden in the app on this browser, not encrypted from anyone who uses this browser profile.';
 assert.ok(src.indexOf('v-workspace-private-v0.1') !== -1, 'private marker');
 assert.ok(src.indexOf('v-workspace-seal-v0.1') !== -1, 'seal marker');
 assert.ok(src.indexOf('v-tree-workspace-seal-v0.1') !== -1, 'tree seal marker');
@@ -51,6 +53,11 @@ function findButton(el, label) {
   var found = buttons(el).filter(function (b) { return b.textContent === label; });
   assert.ok(found.length >= 1, 'button ' + label);
   return found[0];
+}
+function countExact(el, text) {
+  var n = 0;
+  walk(el, function (node) { if (node.textContent === text) n += 1; });
+  return n;
 }
 function makeDoc() {
   var nodes = [];
@@ -243,8 +250,9 @@ async function drain() {
   assert.ok(blob.indexOf(HONEST) !== -1, 'honest line is in the panel');
   assert.ok(blob.indexOf(PUBLIC + ', 6 words, not sealed') !== -1, 'summary names words and that it is not sealed');
   assert.ok(blob.indexOf(wrote.hash) !== -1, 'the head hash is shown');
-  var honestOnce = document.getElementById('fl-ws-honest');
-  assert.ok(honestOnce && honestOnce.textContent === HONEST, 'honest line shown once on first use');
+  // v-seal-ask-heal-v0.1: "#fl-ws-honest shown once on first use" expected a second node while the panel was open.
+  // That node is removed while the panel carries the same line. One copy on screen.
+  assert.strictEqual(countExact(document.body, HONEST), 1, 'honest line shown once');
   buttons(panel).forEach(function (b) {
     assert.strictEqual(b.style.minHeight, '44px', 'button is 44px');
   });
@@ -289,22 +297,35 @@ async function drain() {
   await drain();
   panel = document.getElementById('fl-ws-panel');
   blob = textOf(panel);
-  assert.ok(blob.indexOf('Lumen asks to seal ' + PUBLIC + ' (version ' + wrote.hash.slice(0, 8) + '). Why: keep the porch') !== -1, 'the ask is shown');
-  assert.ok(blob.indexOf(SECRET) === -1, 'the ask does not show the private text');
+  var dock = document.getElementById('fl-ws-asks');
+  assert.ok(dock, 'the ask is in the dock');
+  // v-seal-ask-heal-v0.1: "Lumen asks to seal Porch (version …). Why: keep the porch" moved out of the panel.
+  // The dock asks in the mind's words. The panel only points at it.
+  var askText = textOf(dock);
+  assert.ok(askText.indexOf('Lumen wants to seal a private page: "' + PUBLIC + '".') !== -1, 'the ask is shown');
+  assert.ok(askText.indexOf('Why: keep the porch') !== -1, 'the ask keeps the reason');
+  assert.ok(blob.indexOf('Your answer is waiting above.') !== -1, 'the notebook points at the one ask');
+  assert.ok(blob.indexOf('Lumen wants to seal') === -1, 'the notebook does not repeat the ask');
+  assert.ok(askText.indexOf(SECRET) === -1, 'the ask does not show the private text');
   assert.strictEqual((await ws.receipts()).length, 0, 'no receipt before approval');
-  findButton(panel, 'Not now').click();
+  // v-seal-ask-heal-v0.1: "Not now" on this ask declined. That job moved to "No, don't seal".
+  findButton(dock, "No, don't seal").click();
   await drain();
   panel = document.getElementById('fl-ws-panel');
   blob = textOf(panel);
   assert.ok(blob.indexOf('Declined the seal.') !== -1, 'not now leaves a declined line');
   assert.strictEqual((await ws.receipts()).length, 0, 'a decline stores no receipt');
 
-  now += 10;
+  // v-seal-ask-heal-v0.1: now += 10 let the mind ask again at once. A decline now waits out the cooldown.
+  now += ws.SEAL_ASK_COOLDOWN_MS + 1;
   var askedAgain = ws.consumeReply('Once more [FL_WS: {"op":"seal","page":"' + pageId + '","why":"keep the porch"}]');
   await askedAgain.done;
   await drain();
-  panel = document.getElementById('fl-ws-panel');
-  findButton(panel, 'Approve seal').click();
+  dock = document.getElementById('fl-ws-asks');
+  // v-seal-ask-heal-v0.1: the button reads "Seal it". "Approve seal" stays the aria-label.
+  var sealBtn = findButton(dock, 'Seal it');
+  assert.strictEqual(sealBtn.getAttribute('aria-label'), 'Approve seal', 'the old name stays on the button');
+  sealBtn.click();
   await drain();
   var rows = await ws.receipts();
   assert.strictEqual(rows.length, 1, 'approval stores one receipt');
