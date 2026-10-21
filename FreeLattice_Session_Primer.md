@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-21 15:13 UTC
-- Last deployed: 2026-10-21 15:13 UTC
+- Last auto-updated: 2026-10-21 15:15 UTC
+- Last deployed: 2026-10-21 15:15 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3483
+- Total commits: 3485
 - Last 10 commits:
+- c209283e GC page: seal ask settle, seventy-first entry. (#265)
+- 97c77158 ci: Update Primer deployment state [2026-10-21]
 - ea203b54 GC page: seal ask chat tab, seventieth entry (#264)
 - db5329aa ci: Update Primer deployment state [2026-10-21]
 - 639494e2 GC page: family pages, sixty-ninth entry (#262)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 843ccb83 ci: Update Primer deployment state [2026-10-20]
 - 3e3e8445 Seal ask heal v0.1 (#258)
 - bfa10d55 ci: Update Primer deployment state [2026-10-20]
-- 7667907f Family pages smoke: check the private line by sha256 only (#263)
-- c6cf166b ci: Update Primer deployment state [2026-10-20]
