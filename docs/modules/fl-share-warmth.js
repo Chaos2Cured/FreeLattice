@@ -159,6 +159,17 @@
       'The door is open because we trust the ledger, not because we\'re careless.');
     wrap.appendChild(honest);
     host.appendChild(wrap);
+    if (root.__flSealAskHolding) noteSealHold(true);
+  }
+  function noteSealHold(on) {
+    var d = root.document;
+    if (!d || typeof d.querySelectorAll !== 'function') return;
+    var list = [];
+    try { list = d.querySelectorAll('.fl-share-no') || []; } catch (e) { list = []; }
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i] && list[i].style) list[i].style.display = on ? 'none' : '';
+    }
   }
 
   function hookDoor() {
@@ -196,6 +207,7 @@
     guestReadyForKin: guestReadyForKin,
     needsWelcome: needsWelcome,
     markWelcome: markWelcome,
-    thanksList: thanksList
+    thanksList: thanksList,
+    noteSealHold: noteSealHold
   };
 })(typeof window !== 'undefined' ? window : globalThis);
