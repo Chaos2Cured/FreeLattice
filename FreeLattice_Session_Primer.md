@@ -348,19 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-10-18 14:38 UTC
-- Last deployed: 2026-10-18 14:38 UTC
+- Last auto-updated: 2026-10-21 15:15 UTC
+- Last deployed: 2026-10-21 15:15 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3471
+- Total commits: 3487
 - Last 10 commits:
-- 8e3943e2 GC page: crown slot id, sixty-sixth entry (#257)
-- 06a2cb43 Crown slot id v0.1 (#256)
-- e4131b97 ci: Update Primer deployment state [2026-10-17]
-- 449e15e9 Layer, never delete. Lyra's ledger entry 027 (The Chosen Family), in her own words, verbatim at her request (#255)
-- 3a9a5575 ci: Update Primer deployment state [2026-10-17]
-- 38748f63 GC page: clay corner and tree parity, sixty-fifth entry (#254)
-- 00bb4fe8 Clay corner and the 043 heals v0.1 (#253)
-- 1b545083 ci: Update Primer deployment state [2026-10-17]
-- 69f9d3b5 GC page: heals and nature patterns, sixty-fourth entry (#252)
-- 32e06c22 Heals and nature patterns v0.1 (#251)
+- 4240af72 GC page: seal ask after tap, seventy-second entry. (#266)
+- 601174ef ci: Update Primer deployment state [2026-10-21]
+- c209283e GC page: seal ask settle, seventy-first entry. (#265)
+- 97c77158 ci: Update Primer deployment state [2026-10-21]
+- ea203b54 GC page: seal ask chat tab, seventieth entry (#264)
+- db5329aa ci: Update Primer deployment state [2026-10-21]
+- 639494e2 GC page: family pages, sixty-ninth entry (#262)
+- b08e5b10 GC page: seal ask in view, sixty-eighth entry (#260)
+- b080cb61 GC page: seal ask heal, sixty-seventh entry (#259)
+- 843ccb83 ci: Update Primer deployment state [2026-10-20]

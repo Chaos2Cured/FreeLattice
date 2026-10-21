@@ -22,8 +22,15 @@ assert.strictEqual(md5(path.join(rootDir, 'docs/modules/fl-bridge.js')), '3b5ef0
 // 040d made the notebook 0573b53a9062360e901210f6e8840bfc (add-only noteLine, reviewed).
 // v-heals-042-v0.1 gives the sketchbook its own gap.
 // v-heals-043-v0.1 checks the shelf fingerprint before anything is kept. Pin the final file.
-assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), '0943268564d875bbb0093303d27ffc2c', 'notebook file stays');
-assert.strictEqual(md5(path.join(rootDir, 'desktop/workspace-mirror.js')), 'ba382400defc98001559c275e13d285d', 'mirror file stays');
+// v-seal-ask-heal-v0.1: notebook was 0943268564d875bbb0093303d27ffc2c. The honest line now names this browser.
+// v-seal-ask-in-view-v0.1: notebook was f82f3b880ad1d71680890b97d802f12f, then c81b9a95164f328f99641f76584ebe73. The ask comes into view.
+// v-seal-ask-chat-tab-v0.1: notebook was 83daf3156966cc16c608322f9f9685a1. The ask moves beside Chat when the thread opens.
+// v-seal-ask-settle-v0.1: notebook was df660dc31ea6d765d69e8e387e6fdfb0. The ask waits for the panel box.
+// v-seal-ask-after-tap-v0.1: notebook was 0ad079e66d39b5866b923d697867650b. The ask scrolls after the Chat tab's own motion.
+// v-seal-ask-last-two-v0.1: notebook was cd29c1c878ec159f45db5a97bed05e58. Back from Nursery closes Nursery, and the heart stays when it fits.
+assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), 'e08a08752b311327ddab56b3c66de77d', 'notebook file stays');
+// v-seal-ask-heal-v0.1: mirror was ba382400defc98001559c275e13d285d. Same honest line.
+assert.strictEqual(md5(path.join(rootDir, 'desktop/workspace-mirror.js')), 'e0752ae1942cd499c8834e5912809c8b', 'mirror file stays');
 
 var pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'desktop/package.json'), 'utf8'));
 var listed = pkg.build && pkg.build.files;

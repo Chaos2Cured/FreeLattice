@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const MARKER = 'v-workspace-desktop-v0.1';
-const HONEST = 'Private means hidden in the app, not encrypted from the person who owns this device.';
+const HONEST = 'Private means hidden in the app on this browser, not encrypted from anyone who uses this browser profile.';
 const GENESIS = '0000000000000000000000000000000000000000000000000000000000000000';
 
 let appRef = null;

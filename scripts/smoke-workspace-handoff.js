@@ -164,7 +164,8 @@ var SHARED = 'The porch page may be handed to Celeste.';
   ws.resetRate();
   var refused = ws.consumeReply('[FL_WS: {"op":"handoff","page":"' + lantern.page.id + '","note":"please read this"}]');
   var refusedLines = await refused.done;
-  assert.ok(refusedLines.join('\n').indexOf('This page is private. The mind must share it first.') !== -1, 'private page refused');
+  // v-seal-ask-heal-v0.1: "This page is private. The mind must share it first." now names this browser.
+  assert.ok(refusedLines.join('\n').indexOf('This page is private on this browser. The mind must share it first.') !== -1, 'private page refused');
   assert.ok(JSON.stringify(bridge.outboxView()).indexOf(SECRET) === -1, 'private text is not in the outbox');
   assert.ok(!bridge.outboxView().some(function (row) { return row.kind === 'letter'; }), 'no letter for a private page');
 
