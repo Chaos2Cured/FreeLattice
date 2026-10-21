@@ -207,7 +207,8 @@ var locks = {
   'docs/modules/particle-clay.js': '2da32883c514e4ad2a3cd8571e7a7b15',
   'docs/modules/clay-forms.js': 'dd193fa7b519d4c2a011a346d7993e5a',
   'docs/modules/image-safety.js': '9bd70e5a367228a5c72fc08ab731c881',
-  'docs/modules/mind-workspace.js': 'e08a08752b311327ddab56b3c66de77d',
+  // v-pool-honest-heals-v0.1: notebook was e08a08752b311327ddab56b3c66de77d. Back when Chat was already open keeps the ask.
+  'docs/modules/mind-workspace.js': 'f1c88664d3e99362e02c625defb241bc',
   'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
   'sw.js': '91726cf2228b794f7585f79f61418d12',
   'docs/modules/pool-knock-phone.js': 'a8024f341486a78558ef4158bc9e93a9',

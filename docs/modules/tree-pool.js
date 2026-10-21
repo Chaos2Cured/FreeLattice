@@ -1064,7 +1064,8 @@
                 if (!r.ok) { note(reasonWords(r)); return; }
                 _answers[id] = { model: model, text: r.text };
                 _drafts[key] = '';
-                note('Answered by ' + peerName(p) + ', on its own AI. Nothing is kept here but a count.');
+                // before 045b: note('Answered by ' + peerName(p) + ', on its own AI. Nothing is kept here but a count.');
+                note('Answered by ' + peerName(p) + ', on its own AI. The other computer had to read the words while it worked, and a count is all this card stores afterward.');
                 paintList();
               });
             }, 'tree-pool-main'));
@@ -1850,7 +1851,8 @@
     if (_chat) {
       var n = holders(_chat.model).length;
       c.appendChild(el('p', 'tree-pool-state', 'Chat is asking ' + _chat.model + ' through the pool, on the freest trusted kin device that holds it (' + n + (n === 1 ? ' device' : ' devices') + ' now).'));
-      c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. Nothing is kept there but a count. That device can pause at any time.'));
+      // before 045b: c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. Nothing is kept there but a count. That device can pause at any time.'));
+      c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. The other computer has to read the words while it works, and a count is all this card stores afterward. That device can pause at any time.'));
       c.appendChild(button('Stop asking through the pool', function () { useInChat(''); note('Chat asks this computer\'s own mind again.'); }));
     }
     var others = models.filter(function (m) { return !_chat || m.model !== _chat.model; });

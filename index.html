@@ -39064,7 +39064,18 @@ async function flDrivePickerCallback(data, token) {
 // bubble, the chatHistory record, the offline ResponseCache, and the global
 // status bar (via InferenceRouter.observe). Back-compat: old messages without
 // provenance simply render no chip. Silent downgrades are trust violations.
+function flDescriptorWithoutMesh() {
+  try {
+    if (typeof BrowserAI !== 'undefined' && BrowserAI.ready && state.provider === 'browser')
+      return { label: 'Browser AI', type: 'browser', isLocal: false, model: 'in-browser' };
+    if (state.isLocal)
+      return { label: state.provider === 'lmstudio' ? 'LM Studio' : (state.provider === 'custom-openai' ? 'Custom endpoint' : 'Ollama'), type: 'local', isLocal: true, model: state.ollamaModel || 'local' };
+    return { label: state.provider || 'Cloud', type: 'cloud', isLocal: false, model: state.model || state.provider || '' };
+  } catch (e) { return { label: 'AI', type: 'cloud', isLocal: false, model: '' }; }
+}
 function flProviderDescriptor() {
+  // v-pool-honest-heals-v0.1: a kept, just-me, cut, or paused reply is local. Mesh stays mesh.
+  try { if (window._flHonestStampLocal) return flDescriptorWithoutMesh(); } catch (eLocal) {}
   try { if (window.InferenceRouter && InferenceRouter.activeProvider) return InferenceRouter.activeProvider(); } catch (e) {}
   try {
     if (typeof BrowserAI !== 'undefined' && BrowserAI.ready && state.provider === 'browser')
@@ -39078,6 +39089,7 @@ function flProviderDescriptor() {
 }
 function flStampChatResponse(textSpan, userMessage, responseText, latencyMs) {
   var p = flProviderDescriptor();
+  try { window._flHonestStampLocal = false; } catch (eClear) {}
   var prov = {
     provider: p.label, model: p.model, format: p.type, isLocal: !!p.isLocal,
     latency_ms: (latencyMs == null ? null : latencyMs), cached: false,
@@ -39421,6 +39433,9 @@ async function sendMessage() {
     addSystemMessage(_flStop);
     setStreamingStatus(false);
     return;
+  }
+  if (!_flHonestGate.pool && _flHonestGate.via === 'local') {
+    try { window._flHonestStampLocal = true; } catch (_flStampErr) {}
   }
   if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function' && _flHonestGate.pool) {
     try {
@@ -52271,6 +52286,7 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
           if (callback) callback(null, _aiLine);
           return;
         }
+        try { window._flHonestStampLocal = true; } catch (_aiStamp) {}
       } else {
         callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages)
           .then(function(response) { if (callback) callback(response); })
@@ -52309,8 +52325,10 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
         if (data.choices && data.choices[0]) content = data.choices[0].message.content;
         else if (data.message) content = data.message.content;
         if (callback) callback(content);
+        try { window._flHonestStampLocal = false; } catch (_aiClear) {}
       })
       .catch(function(err) {
+        try { window._flHonestStampLocal = false; } catch (_aiClear2) {}
         if (opts.signal && opts.signal.aborted) {
           if (callback) callback(null, 'stopped');
           return;

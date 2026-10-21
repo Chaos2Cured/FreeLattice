@@ -1,6 +1,8 @@
 // pool-honest-label.js (MIT) v-pool-honest-label-v0.1
 // A calm line when a pooled device helps with a chat, a per-chat switch that
 // keeps that chat on this device, Disconnect, and Just me.
+// v-pool-honest-heals-v0.1: name a device once, Leave can be undone, and Leave
+// stays off the asker's own chat.
 // The pinned pool files stay as they are. Chat calls permit and run here first.
 (function (root) {
   'use strict';
@@ -18,6 +20,7 @@
   var LINE_JUST = 'No mind on this device right now, so this message was not sent.';
   var LINE_NEXT = 'From the next message, this chat stays on this device.';
   var LINE_SMALL = 'The pool is smaller now.';
+  var LINE_LEFT = 'You left the pool. Let it help again whenever you like.';
   var PATHS = ['ask', 'askTurns', 'askBest', 'askChat', 'callMeshModel', 'meshSendToPeer', 'useMind', 'relay', 'knock', 'split'];
   var _just = {};
   var _why = {};
@@ -103,6 +106,13 @@
     if (!n || n === "another person's") return "another person's";
     return n + "'s";
   }
+  // A kin card already says "Ada's computer (Ada)". Do not add "'s device" again.
+  function devicePhrase(name) {
+    var n = clip(name, 80);
+    if (!n || n === "another person's") return "another person's device";
+    if (/'s (computer|device|phone|laptop)/i.test(n)) return n;
+    return poss(n) + ' device';
+  }
   function labelFor(names) {
     var uniq = [];
     (names || []).forEach(function (n) {
@@ -111,9 +121,9 @@
     });
     if (!uniq.length) return '';
     var tail = ' They could see what it processes. Pool only with people you trust.';
-    if (uniq.length === 1) return 'Part of this chat runs on ' + poss(uniq[0]) + ' device.' + tail;
+    if (uniq.length === 1) return 'Part of this chat runs on ' + devicePhrase(uniq[0]) + '.' + tail;
     if (uniq.length > 3) return "Part of this chat runs on other people's devices." + tail;
-    var bits = uniq.map(function (n) { return poss(n) + ' device'; });
+    var bits = uniq.map(function (n) { return devicePhrase(n); });
     var last = bits.pop();
     return 'Part of this chat runs on ' + (bits.length ? bits.join(', ') + ' and ' : '') + last + '.' + tail;
   }
@@ -146,7 +156,7 @@
     refresh();
   }
   function replyNote(name) {
-    return 'Helped on ' + poss(name) + ' device.';
+    return 'Helped on ' + devicePhrase(name) + '.';
   }
   function permit(path, ctx) {
     ctx = ctx || {};
@@ -266,9 +276,57 @@
   function setHelperLeft(on) {
     try { root.localStorage.setItem(LEFT_KEY, on ? 'true' : 'false'); } catch (e) {}
   }
+  function deviceHelping() {
+    try { if (root.TreePool && typeof root.TreePool.mode === 'function' && root.TreePool.mode() === 'kin') return true; } catch (e) {}
+    try { if (root.FLPool && typeof root.FLPool.helping === 'function' && root.FLPool.helping()) return true; } catch (e2) {}
+    try {
+      var m = root.FLShareDoor && typeof root.FLShareDoor.mode === 'function' ? root.FLShareDoor.mode() : '';
+      if (m === 'open' || m === 'kin') return true;
+    } catch (e3) {}
+    return false;
+  }
+  function askerChat(chatId) {
+    if (!chatId) return false;
+    if (chatId === THREAD) return true;
+    return String(chatId).indexOf('fl-') === 0;
+  }
+  function showLeave(chatId) {
+    return !helperLeft() && !askerChat(chatId) && deviceHelping();
+  }
+  function onHelpChosen() {
+    setHelperLeft(false);
+    refresh();
+  }
+  // The door may already be open, so the old "Let this device help" button is not on screen.
+  // This one calls that same choice. Leave itself still sends only pool-shrank.
+  function chooseHelpAgain() {
+    var called = false;
+    try {
+      if (root.TreePool && typeof root.TreePool.letHelp === 'function') { root.TreePool.letHelp(); called = true; }
+    } catch (e) {}
+    try {
+      if (root.FLPool && typeof root.FLPool.letHelp === 'function') { root.FLPool.letHelp(); called = true; }
+    } catch (e2) {}
+    try {
+      if (root.FLShareDoor && typeof root.FLShareDoor.setMode === 'function') {
+        var m = typeof root.FLShareDoor.mode === 'function' ? root.FLShareDoor.mode() : '';
+        if (m !== 'open' && m !== 'kin') root.FLShareDoor.setMode('kin');
+        called = true;
+      }
+    } catch (e3) {}
+    if (!called) onHelpChosen();
+  }
+  function letAgainButton() {
+    var again = btn('Let it help', function () { chooseHelpAgain(); });
+    if (again) again.setAttribute('data-honest-let', '1');
+    return again;
+  }
   function helperHeardShrink(peerId) {
+    var helping = deviceHelping();
     clearHelper(peerId);
-    if (peerId) {
+    // A helper does not write the person who shrank the pool into this device's own cut list.
+    // The sender already recorded their cut. This side only stops the work in hand.
+    if (peerId && !helping) {
       var m = cutMap();
       var list = Array.isArray(m[_active]) ? m[_active].slice() : [];
       if (list.indexOf(peerId) === -1) list.push(peerId);
@@ -290,7 +348,7 @@
     } catch (e) {}
     Object.keys(_holds).forEach(function (id) { if (ids.indexOf(id) === -1) ids.push(id); });
     ids.forEach(function (id) { tellShrink(id); clearHelper(id); });
-    _shrinkLine = LINE_SMALL;
+    // before 045b: _shrinkLine = LINE_SMALL;
     refresh();
   }
   function el(tag, cls, text) {
@@ -367,6 +425,15 @@
       panel.appendChild(el('p', 'fl-honest-line', replyNote(row && row.name)));
     });
     if (_shrinkLine) panel.appendChild(el('p', 'fl-honest-line', _shrinkLine));
+    if (helperLeft()) {
+      var leftLine = el('p', 'fl-honest-line', LINE_LEFT);
+      if (leftLine) {
+        leftLine.setAttribute('data-honest-left', '1');
+        panel.appendChild(leftLine);
+      }
+      var again = letAgainButton();
+      if (again) panel.appendChild(again);
+    }
     if (keepOn(chatId)) panel.appendChild(el('p', 'fl-honest-line', LINE_NEXT));
     var keep = btn(keepOn(chatId) ? 'Keep this chat on my device only. On.' : 'Keep this chat on my device only', function () {
       setKeep(chatId, !keepOn(chatId));
@@ -400,10 +467,12 @@
       if (cut) { cut.setAttribute('data-honest-cut', peer.id); panel.appendChild(cut); }
       if (leave) panel.appendChild(leave);
     });
-    var leaveBtn = btn('Leave', function () { leaveHelping(); });
-    if (leaveBtn) {
-      leaveBtn.setAttribute('data-honest-leave', '1');
-      panel.appendChild(leaveBtn);
+    if (showLeave(chatId)) {
+      var leaveBtn = btn('Leave', function () { leaveHelping(); });
+      if (leaveBtn) {
+        leaveBtn.setAttribute('data-honest-leave', '1');
+        panel.appendChild(leaveBtn);
+      }
     }
   }
   function mountPanel(parent, chatId, before) {
@@ -469,6 +538,7 @@
       });
     }
     mountJustState(_active);
+    syncSettingsLeave();
   }
   function ensureSettingsNote(host) {
     var d = root.document;
@@ -482,11 +552,32 @@
     note.style.maxWidth = '100%';
     if (host.nextSibling) host.parentNode.insertBefore(note, host.nextSibling);
     else host.parentNode.appendChild(note);
-    var leave = btn('Leave', function () { leaveHelping(); });
-    if (leave) {
-      if (note.nextSibling) host.parentNode.insertBefore(leave, note.nextSibling);
-      else host.parentNode.appendChild(leave);
-    }
+    syncSettingsLeave();
+  }
+  function syncSettingsLeave() {
+    var d = root.document;
+    if (!d || !d.getElementById) return;
+    var note = d.getElementById('flHonestSettingsNote');
+    if (!note || !note.parentNode) return;
+    var old = d.getElementById('flHonestSettingsExtra');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var extra = null;
+    if (helperLeft()) {
+      extra = el('div', 'fl-honest');
+      var leftLine = el('p', 'fl-honest-line', LINE_LEFT);
+      if (leftLine) {
+        leftLine.setAttribute('data-honest-left', '1');
+        extra.appendChild(leftLine);
+      }
+      var again = letAgainButton();
+      if (again) extra.appendChild(again);
+    } else if (deviceHelping()) extra = btn('Leave', function () { leaveHelping(); });
+    if (!extra) return;
+    extra.id = 'flHonestSettingsExtra';
+    if (extra.setAttribute) extra.setAttribute('data-honest-left', helperLeft() ? '1' : '0');
+    if (!helperLeft() && extra.setAttribute) extra.setAttribute('data-honest-leave', 'settings');
+    if (note.nextSibling) note.parentNode.insertBefore(extra, note.nextSibling);
+    else note.parentNode.appendChild(extra);
   }
   function afterPoolMount(host) {
     ensureSettingsNote(host);
@@ -518,6 +609,35 @@
     wrapped._honestWrapped = true;
     pool.useMind = wrapped;
   }
+  function wrapHelp(obj, key) {
+    if (!obj || typeof obj[key] !== 'function' || obj[key]._honestHelp) return;
+    var inner = obj[key];
+    function wrapped() {
+      var result = inner.apply(this, arguments);
+      try {
+        var treeOn = root.TreePool && typeof root.TreePool.mode === 'function' && root.TreePool.mode() === 'kin';
+        var poolOn = root.FLPool && typeof root.FLPool.helping === 'function' && root.FLPool.helping();
+        if (treeOn || poolOn) onHelpChosen();
+      } catch (e) {}
+      return result;
+    }
+    wrapped._honestHelp = true;
+    obj[key] = wrapped;
+  }
+  function wrapShareMode(obj) {
+    if (!obj || typeof obj.setMode !== 'function' || obj.setMode._honestHelp) return;
+    var inner = obj.setMode;
+    function wrapped(m) {
+      var result = inner.apply(this, arguments);
+      try {
+        var now = obj.mode ? obj.mode() : m;
+        if (now === 'open' || now === 'kin') onHelpChosen();
+      } catch (e) {}
+      return result;
+    }
+    wrapped._honestHelp = true;
+    obj.setMode = wrapped;
+  }
   function boot() {
     addStyle();
     var d = root.document;
@@ -539,6 +659,9 @@
     wrapMount(root.TreePool, 'mount');
     wrapMount(root.FLPool, 'mount');
     wrapUseMind();
+    wrapHelp(root.TreePool, 'letHelp');
+    wrapHelp(root.FLPool, 'letHelp');
+    wrapShareMode(root.FLShareDoor);
     var pool = d.getElementById('flPoolHost') || d.getElementById('tree-pool-host');
     if (pool) afterPoolMount(pool);
   }
@@ -555,6 +678,7 @@
     LINE_JUST: LINE_JUST,
     LINE_NEXT: LINE_NEXT,
     LINE_SMALL: LINE_SMALL,
+    LINE_LEFT: LINE_LEFT,
     THREAD: THREAD,
     CARD: CARD,
     permit: permit,
@@ -578,6 +702,9 @@
     helperLeft: helperLeft,
     helperHeardShrink: helperHeardShrink,
     leaveHelping: leaveHelping,
+    onHelpChosen: onHelpChosen,
+    showLeave: showLeave,
+    deviceHelping: deviceHelping,
     rememberReply: rememberReply,
     replyNote: replyNote,
     labelFor: labelFor,

@@ -81,6 +81,7 @@
   var sealDockOpen = false;
   var sealBackArmed = false;
   var sealBackEating = false;
+  var sealBackChatAlready = false; // v-pool-honest-heals-v0.1: Chat was already open
   var sealRestored = false;
   var heldDefers = [];
   var loadBringDone = false;
@@ -1721,6 +1722,12 @@
     var veil = d.getElementById('place-veil');
     return !!(veil && hasClass(veil, 'is-open'));
   }
+  function threadVeilOpen() {
+    var d = doc();
+    if (!d || !d.getElementById) return false;
+    var veil = d.getElementById('thread-veil');
+    return !!(veil && hasClass(veil, 'is-open'));
+  }
   // The ask lives in the Nursery veil. Closing that veil fades the ask with it.
   // Park it on the garden, above the fading veil and under the header, so it stays in view.
   function parkAskOnGarden() {
@@ -1784,8 +1791,18 @@
       try { bringAsk('settle', true); } catch (eBring) {}
       return;
     }
+    // Chat was already open. This Back closes nothing. The ask stays. A further Back defers.
+    if (sealBackChatAlready && threadVeilOpen()) {
+      sealBackChatAlready = false;
+      if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+      try { root.history.pushState({ flSealAsk: 1 }, ''); } catch (ePush) {}
+      sealBackArmed = true;
+      try { bringAsk('settle', true); } catch (eBring2) {}
+      return;
+    }
     if (landed && landed.flSealAsk) return;
     sealBackArmed = false;
+    sealBackChatAlready = false;
     if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
     var shown = dockAsk();
     var hash = shown && (shown.versionHash || shown.version) || '';
@@ -1806,6 +1823,7 @@
     // The place opened after the ask keeps the top step. Another ask step would steal Back.
     if ((state && state.treeWayBack) || placeVeilOpen()) {
       sealBackArmed = true;
+      if (state && state.treeWayBack && !placeVeilOpen() && threadVeilOpen()) sealBackChatAlready = true;
       return;
     }
     try { root.history.pushState({ flSealAsk: 1 }, ''); sealBackArmed = true; }
@@ -3841,6 +3859,7 @@
     sealDockOpen = false;
     sealBackArmed = false;
     sealBackEating = false;
+    sealBackChatAlready = false;
     sealRestored = false;
     heldDefers = [];
     loadBringDone = false;
