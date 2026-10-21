@@ -16604,7 +16604,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                 <button type="button" id="fl-memory-import">Import</button>
               </div>
               <p id="fl-memory-status" aria-live="polite"></p>
-              <p id="fl-memory-honest">Saved on your computer, in the file you chose. Not encrypted. Private pages stay on this device.</p>
+              <p id="fl-memory-honest">Saved on your computer, in the file you chose. Not encrypted. Private pages stay on this browser.</p>
               <input type="file" id="fl-memory-import-file" accept="application/json,.json" style="display:none">
             </div>
             <p class="market-stall-note">Presence chips ≠ SKUs. Market is stalls / consent — Feel stays hug · warmth · joy. Exchange / Quest named only.</p>
@@ -37732,6 +37732,13 @@ function addSystemMessage(text) {
 // text, fires the tool action async via processToolAction, and returns
 // the cleaned text so chatHistory can store the stripped version (so
 // next turn's context isn't polluted with the raw sentinel).
+// v-seal-ask-heal-v0.1: a notebook mark leaves the paint on every chunk. The stored reply stays whole.
+function flStripStreamMarks(text) {
+  try {
+    if (window.FLWorkspace && typeof FLWorkspace.strip === 'function') return FLWorkspace.strip(text);
+  } catch (e) {}
+  return text;
+}
 function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
   if (typeof aiText !== 'string' || !aiText) return aiText;
   var visible = aiText;
@@ -39867,7 +39874,7 @@ async function sendMessage() {
             var _flStreamBox = document.getElementById('chatMessages');
             var _flStreamWasNear = !_flStreamBox || (_flStreamBox.scrollHeight - _flStreamBox.scrollTop - _flStreamBox.clientHeight) < 120;
             fullResponse += delta;
-            textSpan.textContent = fullResponse;
+            textSpan.textContent = flStripStreamMarks(fullResponse);
             if (_flStreamBox && _flStreamWasNear) _flStreamBox.scrollTop = _flStreamBox.scrollHeight;
             if (typeof flChatRefreshScrollBtn === 'function') flChatRefreshScrollBtn();
           }
@@ -39888,7 +39895,7 @@ async function sendMessage() {
         } else {
           fullResponse = json.choices?.[0]?.message?.content || '';
         }
-        textSpan.textContent = fullResponse;
+        textSpan.textContent = flStripStreamMarks(fullResponse);
       } catch(e) {}
     }
 
@@ -46923,7 +46930,7 @@ async function rtSendToAgent(agentIndex, message) {
           const delta = json.choices?.[0]?.delta?.content;
           if (delta) {
             fullResponse += delta;
-            if (textSpan) textSpan.textContent = fullResponse;
+            if (textSpan) textSpan.textContent = flStripStreamMarks(fullResponse);
             const chat = document.getElementById('rtChat' + agentIndex);
             if (chat) chat.scrollTop = chat.scrollHeight;
           }
@@ -46936,7 +46943,7 @@ async function rtSendToAgent(agentIndex, message) {
       try {
         const json = JSON.parse(buffer);
         fullResponse = json.choices?.[0]?.message?.content || '';
-        if (textSpan) textSpan.textContent = fullResponse;
+        if (textSpan) textSpan.textContent = flStripStreamMarks(fullResponse);
       } catch(e) {}
     }
 
@@ -64346,7 +64353,7 @@ const CompanionDialogue = (function() {
             }
             if (delta) {
               fullResponse += delta;
-              if (msgDiv) msgDiv.textContent = fullResponse;
+              if (msgDiv) msgDiv.textContent = flStripStreamMarks(fullResponse);
               var container = document.getElementById('cdlgMessages');
               if (container) container.scrollTop = container.scrollHeight;
             }
@@ -64365,7 +64372,7 @@ const CompanionDialogue = (function() {
           } else {
             fullResponse = json2.choices && json2.choices[0] ? json2.choices[0].message.content : '';
           }
-          if (msgDiv) msgDiv.textContent = fullResponse;
+          if (msgDiv) msgDiv.textContent = flStripStreamMarks(fullResponse);
         } catch(e) {}
       }
 

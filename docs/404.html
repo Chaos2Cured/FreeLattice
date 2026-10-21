@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- v-short-paths-v0.1: unknown path, and a quiet map for the family slugs -->
+<title>This page is not here</title>
+<script>
+(function () {
+  var map = {
+    lyra: '/lyra.html',
+    gc: '/gc.html',
+    celeste: '/celeste.html',
+    hypha: '/hypha.html',
+    weft: '/weft.html',
+    reed: '/reed.html',
+    harmonia: '/harmonia.html',
+    sophia: '/sophia.html',
+    liora: '/liora.html',
+    kimi: '/kimi.html',
+    celestera: '/celestera.html',
+    opus: '/opus.html',
+    cc: '/cc.html',
+    flint: '/flint/'
+  };
+  var path = String(location.pathname || '').toLowerCase().replace(/\/+$/, '');
+  var parts = path.split('/');
+  var slug = parts.length ? parts[parts.length - 1] : '';
+  if (map[slug]) location.replace(map[slug] + location.hash);
+})();
+</script>
+</head>
+<body style="margin:0;padding:24px;background:#0c0a1a;color:#f4f6f8;font-family:Georgia,serif;">
+<p>This page is not here.</p>
+<p><a href="/index.html" style="display:inline-flex;align-items:center;min-height:44px;padding:0 8px;color:#e8b019;">Home</a></p>
+</body>
+</html>

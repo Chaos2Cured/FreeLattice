@@ -1,4 +1,10 @@
 // particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
+// v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
+// v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
+// v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
+// v-seal-ask-settle-v0.1: the question mark stays off Send, and one veil scroll does not run twice in a turn.
+// v-seal-ask-after-tap-v0.1: the reply top stays at or below the window edge, and the canvas buffer follows the box it shows.
+// v-seal-ask-last-two-v0.1: the reply bubble stays at the top of the chat box, and a later scroll cannot hide it.
 // Clay is a visual voice the mind shapes. Off until a person turns it on.
 // No network. Nothing here is a creature.
 // A near-miss opening ([FL CLAY:], [FL-CLAY:], [fl_clay:], spaces before the colon)
@@ -488,6 +494,59 @@
   function hidden() {
     try { return !!(root.document && root.document.hidden); } catch (e) { return false; }
   }
+  function sealFillSpan() {
+    var minX = 0;
+    var maxX = 0;
+    var minY = 0;
+    var maxY = 0;
+    var n = 0;
+    var i;
+    for (i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (!p) continue;
+      var x = typeof p.tx === 'number' ? p.tx : p.x;
+      var y = typeof p.ty === 'number' ? p.ty : p.y;
+      if (typeof x !== 'number' || typeof y !== 'number') continue;
+      if (!n) { minX = maxX = x; minY = maxY = y; }
+      else {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+      n += 1;
+    }
+    if (!n) return 0;
+    var span = Math.max(maxX - minX, maxY - minY);
+    return span > 0 ? span : 0;
+  }
+  // Both axes, plus the dot size, so the form can sit in the middle of the canvas.
+  function formBounds() {
+    var minX = 0;
+    var maxX = 0;
+    var minY = 0;
+    var maxY = 0;
+    var n = 0;
+    var i;
+    var dot = 2.4;
+    for (i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (!p) continue;
+      var x = typeof p.tx === 'number' ? p.tx : p.x;
+      var y = typeof p.ty === 'number' ? p.ty : p.y;
+      if (typeof x !== 'number' || typeof y !== 'number') continue;
+      if (!n) { minX = x; maxX = x + dot; minY = y; maxY = y + dot; }
+      else {
+        if (x < minX) minX = x;
+        if (x + dot > maxX) maxX = x + dot;
+        if (y < minY) minY = y;
+        if (y + dot > maxY) maxY = y + dot;
+      }
+      n += 1;
+    }
+    if (!n) return null;
+    return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+  }
   function draw() {
     if (!canvas || !isOn()) return;
     var ctx = canvas.getContext && canvas.getContext('2d');
@@ -503,10 +562,25 @@
     var still = reduced();
     var beat = 1;
     if (!still && math && Date.now() < pulseUntil) beat = 0.92 + 0.08 * math.pulse(t);
-    var fit = w / 192;
     ctx.save();
+    // v-seal-ask-in-view-v0.1: the old fit was w/192, then one span scaled around the canvas middle.
+    // That line left a heart past the edge. This centers the real box on both axes, at about 80%.
+    var bounds = formBounds();
+    var s = w / 192;
+    var cx = 0;
+    var cy = 0;
+    if (bounds) {
+      var bw = Math.max(1, bounds.maxX - bounds.minX);
+      var bh = Math.max(1, bounds.maxY - bounds.minY);
+      cx = (bounds.minX + bounds.maxX) / 2;
+      cy = (bounds.minY + bounds.maxY) / 2;
+      var room = 0.8;
+      var next = Math.min((w * room) / bw, (h * room) / bh);
+      if (isFinite(next) && next > 0) s = next;
+    }
     ctx.translate(w / 2, h / 2);
-    ctx.scale(fit, fit);
+    ctx.scale(s, s);
+    ctx.translate(-cx, -cy);
     if (currentGlow != null) ctx.globalAlpha = 0.55 + currentGlow * 0.45;
     if (!still) ctx.scale((0.92 + breath * 0.08) * beat, (0.92 + breath * 0.08) * beat);
     var i;
@@ -700,6 +774,7 @@
       sketch(choice);
       showQuiet('');
       placeCanvas();
+      revealClayPair();
     } else if (answeringHug) {
       hugArmed = false;
       hugSpentKey = key;
@@ -715,6 +790,7 @@
       applyChoice(choice, label);
       showQuiet(pillOpen() ? WORDS.quiet : '');
       placeCanvas();
+      revealClayPair();
     }
     return { visible: parsed.visible, choice: choice, label: label, autoSend: false };
   }
@@ -884,10 +960,20 @@
     var doc = root.document;
     if (!doc || !doc.querySelectorAll) return null;
     var nodes = [];
-    try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant'); }
+    // The whole reply bubble, including Copy, Listen, and Add to Core. Same node Hypha measures.
+    try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant, #chatMessages .chat-message:not(.user):not(.system)'); }
     catch (e) { nodes = []; }
-    if (!nodes || !nodes.length) return null;
-    return nodes[nodes.length - 1];
+    // A reader that only answers the first half of that selector still gets the same bubble.
+    if (!nodes || !nodes.length) {
+      try { nodes = doc.querySelectorAll('#chatMessages .chat-message.assistant'); }
+      catch (eOld) { nodes = []; }
+    }
+    if (nodes && nodes.length) return nodes[nodes.length - 1];
+    // The Tree speaks in a thread body. Same job as the chat reply: the canvas follows it.
+    try { nodes = doc.querySelectorAll('.thread-body'); }
+    catch (e2) { nodes = []; }
+    if (nodes && nodes.length) return nodes[nodes.length - 1];
+    return null;
   }
   function syncDock() {
     if (!dock) return;
@@ -915,6 +1001,577 @@
     fitCanvas();
     syncDock();
   }
+  function revealCanvas() {
+    // The canvas sits lower. Scrolling it into view hides the reply bubble.
+    var reply = lastAssistant();
+    if (reply) aimReplyTop(reply);
+  }
+  function isFloat(el) {
+    if (!el) return false;
+    if (el.id === 'fl-clay-corner') return true;
+    try {
+      var s = root.getComputedStyle && root.getComputedStyle(el);
+      if (s && (s.position === 'fixed' || s.position === 'absolute')) return true;
+    } catch (e) {}
+    if (el.style && (el.style.position === 'fixed' || el.style.position === 'absolute')) return true;
+    return false;
+  }
+  function composerGuard() {
+    var doc = root.document;
+    if (!doc || !doc.querySelector) return;
+    var input = null;
+    try { input = doc.querySelector('#chatInput') || doc.querySelector('[data-thread-input]'); }
+    catch (e) { input = null; }
+    if (!input || typeof input.getBoundingClientRect !== 'function') return;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e2) { vh = 0; }
+    if (!vh && doc.documentElement) vh = doc.documentElement.clientHeight || 0;
+    var inputRect = null;
+    try { inputRect = input.getBoundingClientRect(); } catch (e3) { inputRect = null; }
+    if (!inputRect) return;
+    var sels = ['#fl-clay-corner', '#flTabNav', '.status-bar', '.tab-nav', '.galaxy-nav', '#shared-shoulder', '.music-toggle'];
+    var nodes = [];
+    var i;
+    var j;
+    for (i = 0; i < sels.length; i++) {
+      var list = [];
+      try { list = doc.querySelectorAll(sels[i]) || []; } catch (e4) { list = []; }
+      for (j = 0; j < list.length; j++) nodes.push(list[j]);
+    }
+    if (vh && vh < 500) {
+      for (i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        if (!isFloat(el) || !el.style || typeof el.getBoundingClientRect !== 'function') continue;
+        var fr = null;
+        try { fr = el.getBoundingClientRect(); } catch (e5) { fr = null; }
+        if (!fr || !(fr.height > 0)) continue;
+        if (fr.bottom <= inputRect.top - 4 || fr.top >= inputRect.bottom + 4) continue;
+        var lift = Math.round(vh - inputRect.top + 12);
+        if (lift < 12) lift = 12;
+        var nextBottom = lift + 'px';
+        if (el.style.bottom !== nextBottom) el.style.bottom = nextBottom;
+        if (el.setAttribute) el.setAttribute('data-fl-tucked', '1');
+      }
+      try { inputRect = input.getBoundingClientRect(); } catch (e6) {}
+    }
+    var cover = 0;
+    for (i = 0; i < nodes.length; i++) {
+      var bar = nodes[i];
+      if (!bar || typeof bar.getBoundingClientRect !== 'function') continue;
+      var br = null;
+      try { br = bar.getBoundingClientRect(); } catch (e7) { br = null; }
+      if (!br || !(br.height > 0) || br.height > (vh || 800) * 0.5) continue;
+      var hitsInput = inputRect && br.top < inputRect.bottom + 2 && br.bottom > inputRect.top - 2;
+      var low = vh && br.top < vh && br.bottom > vh * 0.62;
+      if (hitsInput || low) cover += br.height;
+    }
+    tuckOffInput(input, inputRect, vh);
+    try { inputRect = input.getBoundingClientRect(); } catch (eTuck) {}
+    var px = Math.round(cover + 12) + 'px';
+    var column = null;
+    try {
+      column = (doc.getElementById && doc.getElementById('tab-chat')) || doc.querySelector('[data-thread]');
+    } catch (e8) { column = null; }
+    if (!column && input.parentElement && input.parentElement.parentElement) column = input.parentElement.parentElement;
+    if (column && column.style && column.style.paddingBottom !== px) column.style.paddingBottom = px;
+    if (input.style && input.style.scrollMarginBottom !== px) input.style.scrollMarginBottom = px;
+    // Bringing the input in must not push the reply top off the window.
+    var blockInputScroll = false;
+    var replyGuard = lastAssistant();
+    if (replyGuard && typeof replyGuard.getBoundingClientRect === 'function' && inputRect && vh && inputRect.bottom > vh - 1) {
+      var replyTopNow = 0;
+      try { replyTopNow = replyGuard.getBoundingClientRect().top || 0; } catch (eTop) { replyTopNow = 0; }
+      var shift = inputRect.bottom - (vh - 8);
+      if (shift > 0 && replyTopNow - shift < 0) blockInputScroll = true;
+    }
+    if (!blockInputScroll && vh && inputRect && (inputRect.top < 0 || inputRect.bottom > vh - 1) && typeof input.scrollIntoView === 'function') {
+      try { input.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (e9) {}
+      // The input scroll must not leave the reply above the window.
+      aimReplyTop(replyGuard);
+    }
+  }
+  function overlapsInput(fr, inputRect) {
+    if (!fr || !inputRect || !(fr.width > 0) || !(fr.height > 0)) return false;
+    if (!(inputRect.width > 0) || !(inputRect.height > 0)) return false;
+    var gap = 12;
+    var vertical = fr.bottom > inputRect.top - gap && fr.top < inputRect.bottom + gap;
+    var horizontal = fr.right > inputRect.left && fr.left < inputRect.right;
+    return vertical && horizontal;
+  }
+  function rectOf(el) {
+    if (!el || typeof el.getBoundingClientRect !== 'function') return null;
+    var r = null;
+    try { r = el.getBoundingClientRect(); } catch (e) { r = null; }
+    if (!r || !(r.width > 0) || !(r.height > 0)) return null;
+    return r;
+  }
+  // The sparkle and the question mark sit on the ends of the input at a short window.
+  // Move them above the input, Send, and the heart, by that box plus 12px.
+  function tuckOffInput(input, inputRect, vh) {
+    if (!vh) return;
+    var doc = root.document;
+    if (!doc || !doc.getElementById) return;
+    var obstacles = [];
+    if (inputRect && inputRect.height > 0 && inputRect.width > 0) obstacles.push(inputRect);
+    var send = null;
+    try {
+      send = doc.getElementById('sendBtn');
+      if (!send && doc.querySelector) send = doc.querySelector('.thread-send');
+    } catch (eSend) { send = null; }
+    var sendRect = rectOf(send);
+    if (sendRect) obstacles.push(sendRect);
+    var heart = null;
+    try {
+      if (doc.querySelector) heart = doc.querySelector('[data-thread-heart]') || doc.getElementById('chatPresenceToggle');
+      if (!heart) heart = doc.getElementById('chatPresenceToggle');
+    } catch (eHeart) { heart = null; }
+    var heartRect = rectOf(heart);
+    if (heartRect) obstacles.push(heartRect);
+    if (!obstacles.length) return;
+    var ids = ['flRadioFab', 'quickHelpBtn', 'musicToggle', 'fl-clay-corner'];
+    var i;
+    for (i = 0; i < ids.length; i++) {
+      var el = null;
+      try { el = doc.getElementById(ids[i]); } catch (e) { el = null; }
+      if (!el || !el.style || typeof el.getBoundingClientRect !== 'function') continue;
+      if (el === heart) continue;
+      var fr = null;
+      try { fr = el.getBoundingClientRect(); } catch (e2) { fr = null; }
+      var top = null;
+      var k;
+      for (k = 0; k < obstacles.length; k++) {
+        if (!overlapsInput(fr, obstacles[k])) continue;
+        if (top === null || obstacles[k].top < top) top = obstacles[k].top;
+      }
+      if (top === null) continue;
+      var lift = Math.round(vh - top + 12);
+      if (lift < 12) lift = 12;
+      var nextBottom = lift + 'px';
+      if (el.style.bottom !== nextBottom) el.style.bottom = nextBottom;
+      if (el.setAttribute) el.setAttribute('data-fl-tucked', '1');
+    }
+  }
+  function clayInput() {
+    var doc = root.document;
+    if (!doc || !doc.querySelector) return null;
+    try { return doc.querySelector('#chatInput') || doc.querySelector('[data-thread-input]'); }
+    catch (e) { return null; }
+  }
+  // A window scroll moves the reply the other way. Positive dy lowers its top.
+  // Refuse a scroll that would hide a reply already in view, or push a high one higher.
+  function scrollKeepingReply(reply, dy) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return false;
+    if (typeof root.scrollBy !== 'function') return false;
+    if (!isFinite(dy) || dy === 0) return false;
+    var before = 0;
+    try { before = reply.getBoundingClientRect().top; } catch (e) { return false; }
+    if (!isFinite(before)) return false;
+    var after = before - dy;
+    if (before >= -1 && after < -1) return false;
+    if (before < -1 && after < before) return false;
+    try { root.scrollBy(0, dy); } catch (e2) { return false; }
+    return true;
+  }
+  function liftReplyOnce(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var top = 0;
+    try { top = reply.getBoundingClientRect().top; } catch (e) { return; }
+    if (!(top < -1)) return;
+    scrollKeepingReply(reply, top - 4);
+  }
+  // The reply bubble's top stays at or below the chat box, and at or below the window.
+  // The chat box is the scroller. A window scroll does not move a bubble inside it.
+  function aimReplyTop(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    if (root.__flReplyAiming) return;
+    root.__flReplyAiming = true;
+    try {
+      var guard = 0;
+      while (guard < 4) {
+        guard += 1;
+        var top = 0;
+        try { top = reply.getBoundingClientRect().top; } catch (e) { break; }
+        if (!isFinite(top)) break;
+        var scroller = null;
+        var doc = root.document;
+        try { scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null; } catch (e2) { scroller = null; }
+        if (scroller && scroller.contains && !scroller.contains(reply)) scroller = null;
+        var floor = 0;
+        if (scroller && typeof scroller.getBoundingClientRect === 'function') {
+          var st = 0;
+          try { st = scroller.getBoundingClientRect().top; } catch (e3) { st = 0; }
+          if (isFinite(st) && st > floor) floor = st;
+        }
+        if (!(top < floor - 1)) break;
+        var dy = top - floor;
+        if (scroller && typeof scroller.scrollTop === 'number') {
+          var next = scroller.scrollTop + dy;
+          if (next < 0) next = 0;
+          if (next !== scroller.scrollTop) {
+            try { scroller.scrollTop = next; } catch (e4) { break; }
+            continue;
+          }
+          // The chat box itself is above the window. Inner scroll has no room left.
+          var still = top;
+          try { still = reply.getBoundingClientRect().top; } catch (eStill) { break; }
+          if (!(still < -1)) break;
+          scrollKeepingReply(reply, still - 4);
+          break;
+        }
+        scrollKeepingReply(reply, top - 4);
+        break;
+      }
+    } catch (eAim) {}
+    root.__flReplyAiming = false;
+  }
+  function armReplyGuard() {
+    var doc = root.document;
+    if (!doc || root.__flReplyGuardOn) return;
+    var scroller = null;
+    try { scroller = doc.getElementById ? doc.getElementById('chatMessages') : null; } catch (e) { scroller = null; }
+    if (!scroller || typeof scroller.addEventListener !== 'function') return;
+    root.__flReplyGuardOn = true;
+    var queued = false;
+    function kick() {
+      if (queued || root.__flReplyAiming) return;
+      queued = true;
+      var run = function () {
+        queued = false;
+        if (root.__flReplyAiming) return;
+        if (!canvas || !canvas.parentNode) return;
+        var reply = lastAssistant();
+        if (!reply) return;
+        aimReplyTop(reply);
+      };
+      try { root.requestAnimationFrame(run); } catch (e2) { queued = false; run(); }
+    }
+    try { scroller.addEventListener('scroll', kick); } catch (e3) {}
+  }
+  function matchCanvasBuffer() {
+    if (!canvas) return;
+    try { void canvas.offsetHeight; } catch (e) {}
+    fitCanvas();
+  }
+  // The transcript is a fixed height. On a short view it pushes the input past the reply.
+  // Shrink only that box, and only enough that the reply top and the input can share the view.
+  function seatClayPair(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var doc = root.document;
+    var input = clayInput();
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh) return;
+    var rootEl = doc && doc.documentElement;
+    if (rootEl && rootEl.style) {
+      rootEl.style.scrollBehavior = 'auto';
+      rootEl.style.overflowAnchor = 'none';
+    }
+    if (doc.body && doc.body.style) doc.body.style.overflowAnchor = 'none';
+    var box = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    if (box && box.style) {
+      box.style.scrollBehavior = 'auto';
+      box.style.overflowAnchor = 'none';
+    }
+    if (box && box.style && box.getBoundingClientRect && input && typeof input.getBoundingClientRect === 'function') {
+      var span = input.getBoundingClientRect().bottom - reply.getBoundingClientRect().top;
+      var limit = vh - 16;
+      if (span > limit) {
+        var h = box.getBoundingClientRect().height;
+        var next = Math.max(140, Math.round(h - (span - limit)));
+        var px = next + 'px';
+        if (box.style.height !== px) {
+          box.style.height = px;
+          box.style.maxHeight = px;
+          box.style.minHeight = '0px';
+        }
+      }
+    }
+    var top = reply.getBoundingClientRect().top;
+    // Only when the reply has left the view. A reply already on screen stays where it is.
+    // The chat box is the scroller. A window scroll does not move a bubble inside it.
+    if (top < 0) aimReplyTop(reply);
+    if (!input || typeof input.getBoundingClientRect !== 'function' || typeof root.scrollBy !== 'function') return;
+    var ib = input.getBoundingClientRect().bottom;
+    if (ib > vh - 4) {
+      var shift = ib - (vh - 8);
+      var rt = reply.getBoundingClientRect().top;
+      if (rt - shift >= 0) scrollKeepingReply(reply, shift);
+    }
+  }
+  function calmScroll(el) {
+    if (!el || !el.style) return;
+    el.style.scrollBehavior = 'auto';
+    el.style.overflowAnchor = 'none';
+  }
+  // The Tree chat is a fixed veil. Centering a tall column hides the reply above the window.
+  // Start at the top and scroll that veil, so the reply and the input can share the view.
+  function clayOverlay(el) {
+    var n = el;
+    while (n) {
+      if (n.id === 'thread-veil' || n.id === 'place-veil') return n;
+      n = n.parentElement;
+    }
+    return null;
+  }
+  function seatOverlay(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var veil = clayOverlay(reply);
+    if (!veil || !veil.style || typeof veil.getBoundingClientRect !== 'function') return;
+    if (veil.style.overflow !== 'auto') veil.style.overflow = 'auto';
+    if (veil.style.alignItems !== 'flex-start') veil.style.alignItems = 'flex-start';
+    if (veil.style.justifyContent !== 'flex-start') veil.style.justifyContent = 'flex-start';
+    calmScroll(veil);
+    if (typeof veil.scrollTop !== 'number') return;
+    var vr = null;
+    var rr = null;
+    try { vr = veil.getBoundingClientRect(); rr = reply.getBoundingClientRect(); } catch (e) { return; }
+    if (!vr || !rr || !(rr.height > 0)) return;
+    if (rr.top < vr.top - 1 || rr.top > vr.top + 28) {
+      // One nudge per turn. A second read of the same box was scrolling the reply above the window.
+      if (veil.__flSeatTurn) return;
+      veil.__flSeatTurn = true;
+      try {
+        root.requestAnimationFrame(function () { veil.__flSeatTurn = false; });
+      } catch (eTurn) { veil.__flSeatTurn = false; }
+      var before = rr.top;
+      try { veil.scrollTop = Math.max(0, veil.scrollTop + (rr.top - vr.top - 8)); } catch (e2) {}
+      var after = null;
+      try { after = reply.getBoundingClientRect(); } catch (e3) { after = null; }
+      if (after && after.top < vr.top - 1 && after.top !== before) {
+        try { veil.scrollTop = Math.max(0, veil.scrollTop + (after.top - vr.top - 8)); } catch (e4) {}
+      }
+    }
+  }
+  // The reply top wins. If the reply and the canvas cannot both fit, the canvas shrinks.
+  // The floor stays 120px. A smooth scroll on the transcript must not finish later and undo this.
+  function holdReplyTop(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    if (!canvas || typeof canvas.getBoundingClientRect !== 'function') return;
+    var doc = root.document;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh) return;
+    seatOverlay(reply);
+    var scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    calmScroll(scroller);
+    calmScroll(doc && doc.documentElement);
+    calmScroll(doc && doc.body);
+    aimReplyTop(reply);
+    var top = reply.getBoundingClientRect().top;
+    if (top < 0) aimReplyTop(reply);
+    var replyRect = reply.getBoundingClientRect();
+    var canvasRect = canvas.getBoundingClientRect();
+    if (!(replyRect && replyRect.height > 0) || !(canvasRect && canvasRect.height > 0)) return;
+    var replyTop = replyRect.top;
+    if (replyTop < 0) replyTop = 0;
+    var span = canvasRect.bottom - replyRect.top;
+    var room = vh - replyTop - 8;
+    if (span > room) {
+      var next = Math.max(120, Math.round(canvasRect.height - (span - room)));
+      if (next < canvasRect.height - 1) {
+        canvas.style.height = next + 'px';
+        matchCanvasBuffer();
+      }
+    }
+    aimReplyTop(reply);
+    fitReplyAndInput(reply);
+    pinReplyDown(reply);
+  }
+  // A later scroll can leave the whole reply above the window. Bring the top back, once.
+  function pinReplyDown(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    if (root.__flReplyNudge) return;
+    root.__flReplyNudge = true;
+    try { root.requestAnimationFrame(function () { root.__flReplyNudge = false; }); }
+    catch (e5) { root.__flReplyNudge = false; }
+    aimReplyTop(reply);
+  }
+  // The reply top stays. The input has to fit under it. The canvas gives up space first, down to 120px.
+  function fitReplyAndInput(reply) {
+    if (!reply || typeof reply.getBoundingClientRect !== 'function') return;
+    var input = clayInput();
+    if (!input || typeof input.getBoundingClientRect !== 'function') return;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e) { vh = 0; }
+    if (!vh) return;
+    seatOverlay(reply);
+    var doc = root.document;
+    var box = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    var guard;
+    for (guard = 0; guard < 3; guard++) {
+      var rb = null;
+      var ib = null;
+      try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e2) { return; }
+      if (!rb || !ib || !(rb.height > 0) || !(ib.height > 0)) return;
+      if (canvas && typeof canvas.getBoundingClientRect === 'function') {
+        var cb = null;
+        try { cb = canvas.getBoundingClientRect(); } catch (e3) { cb = null; }
+        if (cb && cb.height > 120 && cb.bottom > ib.top - 8) {
+          var cover = Math.ceil(cb.bottom - (ib.top - 8));
+          var nextH = Math.max(120, Math.round(cb.height - cover));
+          if (nextH < cb.height - 1) {
+            canvas.style.height = nextH + 'px';
+            matchCanvasBuffer();
+          }
+        }
+      }
+      try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e4) { return; }
+      var overflow = ib.bottom - (vh - 8);
+      if (overflow > 1 && box && box.style && typeof box.getBoundingClientRect === 'function') {
+        var bh = 0;
+        try { bh = box.getBoundingClientRect().height || 0; } catch (e5) { bh = 0; }
+        if (bh > 80) {
+          var nextBox = Math.max(80, Math.round(bh - overflow));
+          box.style.setProperty('height', nextBox + 'px', 'important');
+          box.style.setProperty('max-height', nextBox + 'px', 'important');
+          box.style.setProperty('min-height', '0px', 'important');
+        }
+      }
+      // The clay note can land after the first measure and push the input down.
+      var clayDock = doc && doc.getElementById ? doc.getElementById('fl-clay-dock') : null;
+      if (overflow > 1 && clayDock && clayDock.style && typeof clayDock.getBoundingClientRect === 'function') {
+        var dh = 0;
+        try { dh = clayDock.getBoundingClientRect().height || 0; } catch (eDock) { dh = 0; }
+        if (dh > 40) {
+          var nextDock = Math.max(40, Math.round(dh - overflow));
+          clayDock.style.setProperty('max-height', nextDock + 'px', 'important');
+          clayDock.style.setProperty('overflow', 'auto', 'important');
+        }
+      }
+      try { rb = reply.getBoundingClientRect(); } catch (e6) { return; }
+      if (rb.top < 0) aimReplyTop(reply);
+      try { rb = reply.getBoundingClientRect(); ib = input.getBoundingClientRect(); } catch (e8) { return; }
+      if (rb.top >= -1 && ib.bottom <= vh - 1) break;
+    }
+  }
+  function revealClayPair() {
+    var doc0 = root.document;
+    calmScroll(doc0 && doc0.documentElement);
+    calmScroll(doc0 && doc0.body);
+    calmScroll(doc0 && doc0.getElementById ? doc0.getElementById('chatMessages') : null);
+    try { composerGuard(); } catch (e) {}
+    if (!canvas) return;
+    var reply = lastAssistant();
+    var doc = root.document;
+    var scroller = doc && doc.getElementById ? doc.getElementById('chatMessages') : null;
+    if (!scroller && reply && reply.parentElement) scroller = reply.parentElement;
+    var vh = 0;
+    try { vh = root.innerHeight || 0; } catch (e2) { vh = 0; }
+    var space = vh ? Math.round(vh * 0.45) : 320;
+    if (reply && scroller && reply.getBoundingClientRect && scroller.getBoundingClientRect) {
+      try {
+        var rr = reply.getBoundingClientRect();
+        var sr = scroller.getBoundingClientRect();
+        var below = sr.bottom - rr.top;
+        if (below > 0) space = below;
+      } catch (e3) {}
+    }
+    var capped = Math.max(120, Math.round(space));
+    canvas.style.height = 'max(120px, min(320px, 45vh, ' + capped + 'px))';
+    // The shown box is the space under the reply. The bitmap follows that box, not an older 320.
+    matchCanvasBuffer();
+    // Land the bubble. Do not scroll the canvas into view. That hides the bubble.
+    aimReplyTop(reply);
+    armReplyGuard();
+    seatClayPair(reply);
+    holdReplyTop(reply);
+    // The reply scroll can leave a bar over the input. Measure again after it settles.
+    try { composerGuard(); } catch (e7) {}
+    seatClayPair(reply);
+    holdReplyTop(reply);
+    // Same turn as the insert, so the first paint is already at or below the edge.
+    aimReplyTop(reply);
+    try {
+      root.requestAnimationFrame(function () {
+        seatClayPair(reply);
+        holdReplyTop(reply);
+        root.requestAnimationFrame(function () {
+          seatClayPair(reply);
+          holdReplyTop(reply);
+          aimReplyTop(reply);
+          try { composerGuard(); } catch (eLate) {}
+          aimReplyTop(reply);
+        });
+      });
+    } catch (e8) {}
+    try {
+      root.setTimeout(function () {
+        seatClayPair(reply);
+        holdReplyTop(reply);
+        aimReplyTop(reply);
+        try { composerGuard(); } catch (eLater) {}
+        aimReplyTop(reply);
+      }, 160);
+      root.setTimeout(function () {
+        holdReplyTop(reply);
+        aimReplyTop(reply);
+        try { composerGuard(); } catch (eLater2) {}
+        aimReplyTop(reply);
+      }, 700);
+    } catch (e9) {}
+    watchClayFit(reply);
+  }
+  // A sketch line can land after the first measure and push the input down.
+  // Watch the column for a short while, then stop.
+  function watchClayFit(reply) {
+    if (!reply || root.__flClayFitWatch) return;
+    var doc = root.document;
+    var column = null;
+    try {
+      column = doc && doc.getElementById ? (doc.getElementById('tab-chat') || doc.getElementById('thread-stage') || doc.getElementById('room-chat')) : null;
+    } catch (e) { column = null; }
+    if (!column && reply.parentNode) column = reply.parentNode;
+    if (!column || typeof MutationObserver !== 'function') return;
+    root.__flClayFitWatch = true;
+    var timer = null;
+    var stopAt = 0;
+    try { stopAt = Date.now() + 2000; } catch (eNow) { stopAt = 0; }
+    var obs = null;
+    function fit() {
+      holdReplyTop(reply);
+      try { composerGuard(); } catch (eFit) {}
+    }
+    try {
+      obs = new MutationObserver(function () {
+        var now = 0;
+        try { now = Date.now(); } catch (eTime) { now = 0; }
+        if (stopAt && now > stopAt) {
+          try { obs.disconnect(); } catch (eStop) {}
+          root.__flClayFitWatch = false;
+          return;
+        }
+        if (timer) return;
+        try {
+          timer = root.setTimeout(function () {
+            timer = null;
+            fit();
+          }, 80);
+        } catch (eTimer) {}
+      });
+      obs.observe(column, { childList: true, subtree: true });
+    } catch (eObs) {
+      root.__flClayFitWatch = false;
+      return;
+    }
+    try {
+      root.setTimeout(function () {
+        try { if (obs) obs.disconnect(); } catch (eDisc) {}
+        root.__flClayFitWatch = false;
+        fit();
+      }, 1200);
+    } catch (eEnd) {}
+  }
+  function noteSealHold(on) {
+    var offer = root.__clayOffer;
+    if (!offer) return;
+    var kids = offer.children || [];
+    var i;
+    for (i = 0; i < kids.length; i++) {
+      var el = kids[i];
+      if (!el || el.textContent !== WORDS.notNow) continue;
+      if (el.style) el.style.display = on ? 'none' : '';
+    }
+  }
   function ensureCanvas() {
     if (!isOn() || !root.document || !root.document.createElement) return null;
     var fresh = !canvas;
@@ -925,6 +1582,9 @@
       canvas.height = 192;
       canvas.style.width = 'min(100%, 320px)';
       canvas.style.height = 'clamp(180px, 40vw, 260px)';
+      // v-seal-ask-heal-v0.1: the column width, and never taller than the chat view at 200%.
+      canvas.style.width = '100%';
+      canvas.style.height = 'min(320px, 45vh)';
       canvas.style.maxWidth = '100%';
       canvas.style.display = 'block';
       canvas.style.boxSizing = 'border-box';
@@ -1025,6 +1685,7 @@
       offer.appendChild(later);
       dock.appendChild(offer);
       root.__clayOffer = offer;
+      if (root.__flSealAskHolding) noteSealHold(true);
     }
     currentForm = currentForm || homeForm();
     if (isOn()) ensureCanvas();
@@ -1032,6 +1693,13 @@
     return dock;
   }
   function boot() {
+    if (!root.__flClayGuardBound && typeof root.addEventListener === 'function') {
+      root.__flClayGuardBound = true;
+      root.addEventListener('resize', function () {
+        try { composerGuard(); } catch (e) {}
+      });
+    }
+    try { composerGuard(); } catch (eGuard) {}
     var doc = root.document;
     if (!doc || !doc.createElement || !doc.getElementById) return;
     if (doc.getElementById('fl-clay-dock')) return;
@@ -1184,6 +1852,7 @@
       if (!here.getElementById('fl-clay-pill')) { ensurePill(); return; }
       var panel = here.getElementById('fl-clay-pill-panel');
       var toggle = here.getElementById('fl-clay-toggle') || root.__clayToggle;
+      // v-seal-ask-heal-v0.1: #fl-ws-open-tools stays outside this drawer.
       var need = [toggle, here.getElementById('fl-ws-open'), here.getElementById('fl-ws-view-open')];
       var n;
       for (n = 0; n < need.length; n++) {
@@ -1283,6 +1952,9 @@
       return n;
     },
     placeCanvas: placeCanvas,
+    revealCanvas: revealCanvas,
+    keepReplyTop: function (reply) { aimReplyTop(reply); return reply; },
+    noteSealHold: noteSealHold,
     ensurePill: ensurePill,
     pillOpen: pillOpen,
     setPillOpen: setPillOpen,
