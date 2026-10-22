@@ -3,6 +3,7 @@
 // keeps that chat on this device, Disconnect, and Just me.
 // v-pool-honest-heals-v0.1: name a device once, Leave can be undone, and Leave
 // stays off the asker's own chat.
+// v-leave-cut-heal-v0.1: the cut follows the other device's role, not ours.
 // The pinned pool files stay as they are. Chat calls permit and run here first.
 (function (root) {
   'use strict';
@@ -321,17 +322,57 @@
     if (again) again.setAttribute('data-honest-let', '1');
     return again;
   }
+  // True when that peer was helping this device, not merely asking it.
+  // Read before clearHelper, which drops an in-flight hold.
+  function peerWasOurHelper(peerId) {
+    if (!peerId) return false;
+    var id = String(peerId);
+    try {
+      if (root.TreePool && typeof root.TreePool.peers === 'function') {
+        var peers = root.TreePool.peers() || [];
+        for (var i = 0; i < peers.length; i++) {
+          if (peers[i] && peers[i].id === id && peers[i].helping) return true;
+        }
+      }
+    } catch (e) {}
+    try {
+      if (root.FLPool && typeof root.FLPool._peers === 'function') {
+        var book = root.FLPool._peers();
+        if (book && book[id]) return true;
+      }
+    } catch (e2) {}
+    try {
+      if (root.state && root.state.meshInference && root.state.meshPeerId === id) return true;
+    } catch (e3) {}
+    var rows = helped(_active);
+    for (var h = 0; h < rows.length; h++) {
+      if (rows[h] && rows[h].id === id) return true;
+    }
+    var held = _holds[id];
+    if (held && held.length) return true;
+    return false;
+  }
   function helperHeardShrink(peerId) {
-    var helping = deviceHelping();
-    clearHelper(peerId);
     // A helper does not write the person who shrank the pool into this device's own cut list.
     // The sender already recorded their cut. This side only stops the work in hand.
-    if (peerId && !helping) {
+    // The cut follows the other device. Skip it only when this device is helping
+    // and that peer was purely asking (a helper does not cut the asker).
+    var helping = deviceHelping();
+    var peerHelped = peerWasOurHelper(peerId);
+    clearHelper(peerId);
+    // before 045c: if (peerId && !helping) { write peerId into the active chat cut list }
+    if (peerId && (peerHelped || !helping)) {
       var m = cutMap();
       var list = Array.isArray(m[_active]) ? m[_active].slice() : [];
       if (list.indexOf(peerId) === -1) list.push(peerId);
       m[_active] = list;
       write(CUT_KEY, m);
+    }
+    // No new wire message. Holders drop a helper who left because helping is now false.
+    if (peerHelped) {
+      try {
+        if (root.TreePool && typeof root.TreePool.markNotHelping === 'function') root.TreePool.markNotHelping(peerId);
+      } catch (e4) {}
     }
     _shrinkLine = LINE_SMALL;
     refresh();
@@ -425,7 +466,11 @@
       panel.appendChild(el('p', 'fl-honest-line', replyNote(row && row.name)));
     });
     if (_shrinkLine) panel.appendChild(el('p', 'fl-honest-line', _shrinkLine));
-    if (helperLeft()) {
+    // before 045c: if (helperLeft()) { append LINE_LEFT and Let it help on every panel }
+    // Settings already shows that line once, beside the pool card. A second copy on the card made three.
+    var settingsHostsLeave = false;
+    try { settingsHostsLeave = !!(root.document && root.document.getElementById && root.document.getElementById('flHonestSettingsNote')); } catch (eHost) {}
+    if (helperLeft() && !settingsHostsLeave) {
       var leftLine = el('p', 'fl-honest-line', LINE_LEFT);
       if (leftLine) {
         leftLine.setAttribute('data-honest-left', '1');
@@ -467,7 +512,8 @@
       if (cut) { cut.setAttribute('data-honest-cut', peer.id); panel.appendChild(cut); }
       if (leave) panel.appendChild(leave);
     });
-    if (showLeave(chatId)) {
+    // before 045c: if (showLeave(chatId)) { append Leave on the panel as well as Settings }
+    if (showLeave(chatId) && !settingsHostsLeave) {
       var leaveBtn = btn('Leave', function () { leaveHelping(); });
       if (leaveBtn) {
         leaveBtn.setAttribute('data-honest-leave', '1');

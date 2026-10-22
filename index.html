@@ -39142,6 +39142,8 @@ function flObserveChatFailure() {
 }
 
 async function sendMessage() {
+  // v-leave-cut-heal-v0.1: clear the local stamp on every exit, including a throw.
+  try {
   // NOTE: `message` below is `let` (not `const`) because the file-attachment
   // path reassigns it to append "--- Attached: <file> ---" context. The
   // const form threw TypeError when sending with an attachment. Caught by
@@ -40157,6 +40159,9 @@ async function sendMessage() {
   } catch (_) {}
   try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('chat'); } catch (_he) {}
   setStreamingStatus(false);
+  } finally {
+    try { window._flHonestStampLocal = false; } catch (_flStampDone) {}
+  }
 }
 
 // ============================================
