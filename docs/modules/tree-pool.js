@@ -502,6 +502,10 @@
       paintChat(); // v-tree-pool-room-v0.2: the minds Chat can ask follow the hellos
       return;
     }
+    if (msg.type === 'pool-shrank' && msg.v === 1) {
+      if (root.FLPoolHonest && typeof FLPoolHonest.helperHeardShrink === 'function') FLPoolHonest.helperHeardShrink(p.id);
+      return;
+    }
     if (msg.type === 'ask' && msg.v === 1) { serve(p, msg); return; }
     if (msg.type === 'answer' && msg.v === 1 && typeof msg.id === 'string' && _asks[msg.id]) {
       var a = _asks[msg.id];
@@ -626,6 +630,11 @@
     });
   }
   function serve(p, msg) {
+    // v-pool-honest-label-v0.1: a helper who left does not compute, and does not say why.
+    if (root.FLPoolHonest && FLPoolHonest.helperLeft && FLPoolHonest.helperLeft()) {
+      if (msg) msg.messages = [];
+      return Promise.resolve({ ok: false, reason: 'closed' });
+    }
     return admit(p, msg).then(function (a) {
       if (!a.ok) { paint(); return a; }
       var key = p.id + '|' + a.id;
@@ -635,6 +644,10 @@
       var timer = root.setTimeout(function () { if (_inflight[key]) { _inflight[key].why = 'local-ai-quiet'; try { ctrl && ctrl.abort(); } catch (e) {} } }, ANSWER_MS);
       paintState();
       var body = { model: a.door.model, stream: false, messages: a.messages }; // the same shape for Ollama and OpenAI-style doors
+      var honestHold = null;
+      if (root.FLPoolHonest && typeof FLPoolHonest.holdHelper === 'function') {
+        honestHold = FLPoolHonest.holdHelper(p.id, { messages: body.messages, body: body, abort: function () { try { ctrl && ctrl.abort(); } catch (eHold) {} } });
+      }
       var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
       if (ctrl) opts.signal = ctrl.signal;
       // before v-tree-no-install-mind-v0.1: return root .fetch (a.door.url, opts).then(function (r) {  (spaced so the one-fetch smoke counts the live line only)
@@ -650,10 +663,19 @@
         if (why) throw new Error(why);
         if (mode() !== 'kin') throw new Error(mode() === 'pause' ? 'paused' : 'off'); // pause wins, even at the last moment
         if (!isKin(p)) throw new Error('not-kin');
-        sendRaw(p, { type: 'answer', v: 1, id: a.id, ok: true, text: clip(text, MAX_ANSWER) });
+        if (!(honestHold && honestHold.dropped && honestHold.dropped())) {
+          sendRaw(p, { type: 'answer', v: 1, id: a.id, ok: true, text: clip(text, MAX_ANSWER) });
+        }
         bump('answered');
+        if (honestHold && honestHold.release) honestHold.release();
+        if (body) { if (Array.isArray(body.messages)) body.messages.length = 0; }
         return { ok: true };
       }).catch(function (e) {
+        if (honestHold && honestHold.dropped && honestHold.dropped()) {
+          if (body && Array.isArray(body.messages)) body.messages.length = 0;
+          if (honestHold.release) honestHold.release();
+          return { ok: false, reason: 'closed' };
+        }
         var why = (_inflight[key] && _inflight[key].why) || String((e && e.message) || '');
         if (['paused', 'off', 'not-kin', 'closed'].indexOf(why) === -1) why = 'local-ai-quiet';
         if (why !== 'closed') turnAway(p, a.id, why);
@@ -679,6 +701,10 @@
 
   // ---- asking (asker side) ----
   function ask(peerId, model, text) {
+    // v-pool-honest-label-v0.1
+    if (root.FLPoolHonest && FLPoolHonest.permit && !FLPoolHonest.permit('ask', { chatId: FLPoolHonest.activeChat(), peer: { id: peerId, name: (_peers[peerId] && peerName(_peers[peerId])) || '' } })) {
+      return Promise.resolve({ ok: false, reason: 'kept-here', line: FLPoolHonest.stoppedLine() });
+    }
     var p = _peers[peerId];
     var content = String(text == null ? '' : text);
     if (!p || p.state === 'closed' || p.state === 'set-aside') return Promise.resolve({ ok: false, reason: 'no-answer' });
@@ -689,6 +715,7 @@
     var id = nonce();
     return new Promise(function (resolve) {
       _asks[id] = { peerId: p.id, resolve: resolve, timer: root.setTimeout(function () { if (_asks[id]) { delete _asks[id]; resolve({ ok: false, reason: 'no-answer' }); } }, ANSWER_MS + 15000) };
+      if (root.FLPoolHonest && FLPoolHonest.noteShip) FLPoolHonest.noteShip('ask', p.id);
       if (!sendRaw(p, { type: 'ask', v: 1, id: id, model: line(model, 120), messages: [{ role: 'user', content: content }] })) {
         delete _asks[id];
         resolve({ ok: false, reason: 'no-answer' });
@@ -1032,11 +1059,13 @@
             row.appendChild(button('Ask', function () {
               _drafts[key] = box.value;
               note('Asking ' + model + ' on ' + peerName(p) + '...');
+              if (root.FLPoolHonest && FLPoolHonest.setActive) FLPoolHonest.setActive(FLPoolHonest.CARD || 'tree-pool-card');
               ask(id, model, box.value).then(function (r) {
                 if (!r.ok) { note(reasonWords(r)); return; }
                 _answers[id] = { model: model, text: r.text };
                 _drafts[key] = '';
-                note('Answered by ' + peerName(p) + ', on its own AI. Nothing is kept here but a count.');
+                // before 045b: note('Answered by ' + peerName(p) + ', on its own AI. Nothing is kept here but a count.');
+                note('Answered by ' + peerName(p) + ', on its own AI. The other computer had to read the words while it worked, and a count is all this card stores afterward.');
                 paintList();
               });
             }, 'tree-pool-main'));
@@ -1678,7 +1707,11 @@
   }
   function freeOf(p) { return (p.hello.max || MAX_CONCURRENT) - (p.hello.busy || 0) - (p.mine || 0); }
   function bestFor(model, skip) {
-    var list = holders(model).filter(function (p) { return skip.indexOf(p.id) === -1; });
+    var list = holders(model).filter(function (p) {
+      if (skip.indexOf(p.id) !== -1) return false;
+      if (root.FLPoolHonest && FLPoolHonest.peerBlocked && FLPoolHonest.peerBlocked(p.id, FLPoolHonest.activeChat())) return false;
+      return true;
+    });
     list.sort(function (a, b) { return (freeOf(b) - freeOf(a)) || (b.hello.mem - a.hello.mem) || (b.hello.cores - a.hello.cores) || (a.at - b.at); });
     return list[0] || null;
   }
@@ -1700,6 +1733,10 @@
     return out;
   }
   function askTurns(peerId, model, turns) {
+    // v-pool-honest-label-v0.1
+    if (root.FLPoolHonest && FLPoolHonest.permit && !FLPoolHonest.permit('askTurns', { chatId: FLPoolHonest.activeChat(), peer: { id: peerId, name: (_peers[peerId] && peerName(_peers[peerId])) || '' } })) {
+      return Promise.resolve({ ok: false, reason: 'kept-here', line: FLPoolHonest.stoppedLine() });
+    }
     var p = _peers[peerId];
     if (!p || p.state === 'closed' || p.state === 'set-aside') return Promise.resolve({ ok: false, reason: 'no-answer' });
     if (!isKin(p)) return Promise.resolve({ ok: false, reason: 'not-kin-here' });
@@ -1711,6 +1748,7 @@
     p.mine = (p.mine || 0) + 1;
     return new Promise(function (resolve) {
       _asks[id] = { peerId: p.id, resolve: resolve, timer: root.setTimeout(function () { if (_asks[id]) { delete _asks[id]; resolve({ ok: false, reason: 'no-answer' }); } }, ANSWER_MS + 15000) };
+      if (root.FLPoolHonest && FLPoolHonest.noteShip) FLPoolHonest.noteShip('askTurns', p.id);
       if (!sendRaw(p, { type: 'ask', v: 1, id: id, model: line(model, 120), messages: msgs })) {
         delete _asks[id];
         resolve({ ok: false, reason: 'no-answer' });
@@ -1724,13 +1762,17 @@
     });
   }
   function askBest(model, turns, tried) {
+    // v-pool-honest-label-v0.1
+    if (root.FLPoolHonest && FLPoolHonest.permit && !FLPoolHonest.permit('askBest', { chatId: FLPoolHonest.activeChat() })) {
+      return Promise.resolve({ ok: false, reason: 'kept-here', line: FLPoolHonest.stoppedLine() });
+    }
     tried = tried || [];
     var p = bestFor(line(model, 120), tried);
     // before v-tree-pool-honest-heals-v0.1: if (!p) return Promise.resolve({ ok: false, reason: tried.lastReason || 'no-helper' });
     if (!p) return Promise.resolve(whyNone(line(model, 120)) || { ok: false, reason: tried.lastReason || 'no-helper' });
     tried.push(p.id);
     return askTurns(p.id, model, turns).then(function (r) {
-      if (r.ok) { r.peerId = p.id; r.label = model + ' on ' + peerName(p); return r; }
+      if (r.ok) { r.peerId = p.id; r.peerName = peerName(p); r.label = model + ' on ' + peerName(p); return r; }
       if (RETRY_REASONS.indexOf(r.reason) !== -1 && tried.length < 3) { tried.lastReason = r.reason; return askBest(model, turns, tried); }
       return r;
     });
@@ -1740,6 +1782,10 @@
     return { model: _chat.model, devices: holders(_chat.model).length };
   }
   function askChat(turns) {
+    // v-pool-honest-label-v0.1
+    if (root.FLPoolHonest && FLPoolHonest.permit && !FLPoolHonest.permit('askChat', { chatId: FLPoolHonest.activeChat() })) {
+      return Promise.resolve({ ok: false, reason: 'kept-here', line: FLPoolHonest.stoppedLine() });
+    }
     if (!_chat) return Promise.resolve({ ok: false, reason: 'no-helper' });
     return askBest(_chat.model, turns);
   }
@@ -1805,7 +1851,8 @@
     if (_chat) {
       var n = holders(_chat.model).length;
       c.appendChild(el('p', 'tree-pool-state', 'Chat is asking ' + _chat.model + ' through the pool, on the freest trusted kin device that holds it (' + n + (n === 1 ? ' device' : ' devices') + ' now).'));
-      c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. Nothing is kept there but a count. That device can pause at any time.'));
+      // before 045b: c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. Nothing is kept there but a count. That device can pause at any time.'));
+      c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. The other computer has to read the words while it works, and a count is all this card stores afterward. That device can pause at any time.'));
       c.appendChild(button('Stop asking through the pool', function () { useInChat(''); note('Chat asks this computer\'s own mind again.'); }));
     }
     var others = models.filter(function (m) { return !_chat || m.model !== _chat.model; });
@@ -1843,6 +1890,16 @@
     });
   }
   function currentInvite() { return _flow.step === 'invited' && _pending ? _flow.code : ''; }
+  // v-leave-cut-heal-v0.1: a helper who left is not a holder. Nothing new is sent.
+  function markNotHelping(peerId) {
+    var p = _peers[peerId];
+    if (!p || !p.hello || p.hello.helping !== true) return false;
+    p.hello.helping = false;
+    p.hello.state = 'off';
+    try { paintList(); } catch (e) {}
+    try { paintChat(); } catch (e2) {}
+    return true;
+  }
   // before v-tree-pool-honest-heals-v0.1: peerState returned { state, kin, helping, models }
   function peerState(peerId) { var p = _peers[peerId]; return p ? { state: p.state, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [], helpState: p.hello ? p.hello.state || '' : '' } : null; }
 
@@ -1883,6 +1940,7 @@
         return { id: id, state: p.state, proved: p.proved, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [] };
       });
     },
+    markNotHelping: markNotHelping, // v-leave-cut-heal-v0.1
     liveCount: liveCount,
     counts: counts,
     // v-tree-pool-room-v0.2
@@ -1900,6 +1958,16 @@
     askTurns: askTurns,
     askBest: askBest,
     askChat: askChat,
+    namedHolders: function (model) {
+      var m = model || (_chat && _chat.model) || '';
+      if (!m) return [];
+      return holders(m).map(function (p) { return { id: p.id, name: peerName(p) }; });
+    },
+    emitShrink: function (peerId) {
+      var who = _peers[peerId];
+      if (!who) return false;
+      return !!sendRaw(who, { type: 'pool-shrank', v: 1 });
+    },
     useInChat: useInChat,
     chatRoute: chatRoute,
     chatModels: chatModels,

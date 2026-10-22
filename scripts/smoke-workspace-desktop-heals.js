@@ -28,7 +28,8 @@ assert.strictEqual(md5(path.join(rootDir, 'docs/modules/fl-bridge.js')), '3b5ef0
 // v-seal-ask-settle-v0.1: notebook was df660dc31ea6d765d69e8e387e6fdfb0. The ask waits for the panel box.
 // v-seal-ask-after-tap-v0.1: notebook was 0ad079e66d39b5866b923d697867650b. The ask scrolls after the Chat tab's own motion.
 // v-seal-ask-last-two-v0.1: notebook was cd29c1c878ec159f45db5a97bed05e58. Back from Nursery closes Nursery, and the heart stays when it fits.
-assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), 'e08a08752b311327ddab56b3c66de77d', 'notebook file stays');
+// v-pool-honest-heals-v0.1: notebook was e08a08752b311327ddab56b3c66de77d. Back when Chat was already open keeps the ask.
+assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), 'f1c88664d3e99362e02c625defb241bc', 'notebook file stays');
 // v-seal-ask-heal-v0.1: mirror was ba382400defc98001559c275e13d285d. Same honest line.
 assert.strictEqual(md5(path.join(rootDir, 'desktop/workspace-mirror.js')), 'e0752ae1942cd499c8834e5912809c8b', 'mirror file stays');
 
