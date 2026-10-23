@@ -7,6 +7,13 @@ on:
 permissions:
   contents: write
 
+# Two pushes to main a few seconds apart (code PR and page PR merged together)
+# start two runs. The older run then pushes behind main and fails with
+# non-fast-forward. Let only the newest run finish; it sees every commit.
+concurrency:
+  group: update-primer-main
+  cancel-in-progress: true
+
 jobs:
   update-primer:
     runs-on: ubuntu-latest
@@ -104,4 +111,11 @@ jobs:
           git add FreeLattice_Session_Primer.md index.html sw.js modules/fractal-garden.js modules/radio-immersive.js
           git diff --cached --quiet && exit 0
           git commit -m "ci: Update Primer deployment state [$(date -u +%Y-%m-%d)]"
-          git push
+          # before fix: git push
+          # Main may have moved while this run worked. Rebase onto it, then push.
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1
