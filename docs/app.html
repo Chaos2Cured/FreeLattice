@@ -1710,6 +1710,59 @@ header .mantra {
   margin: 0; /* v5.79.40: leftover 4px inset made the transcript sit uneven in the room */
 }
 
+/* v-chat-scroll-release-v0.1: the existing update check, quiet and findable from Chat */
+.fl-chat-update-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 8px;
+  max-width: 100%;
+}
+.fl-chat-update-check,
+.fl-chat-update-do,
+.fl-chat-get-newest {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  white-space: normal;
+}
+.fl-chat-update-refresh {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  max-width: 100%;
+}
+.fl-chat-update-refresh[hidden] {
+  display: none;
+}
+.fl-chat-update-note {
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+}
+@media (max-width: 700px) {
+  .chat-section-title { flex-wrap: wrap; }
+  .fl-chat-get-newest { flex: 1 0 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-chat-update-check,
+  .fl-chat-update-do,
+  .fl-chat-get-newest {
+    transition: none;
+  }
+}
+
 /* ── Chat Message Bubbles (v5.6.1 — Garden Dialogue quality) ── */
 .chat-message {
   max-width: 85%;
@@ -15460,6 +15513,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- v-particle-clay-v0.1: a visual voice the mind shapes. Off until a person turns it on. -->
 <script src="modules/clay-math.js" defer></script>
 <script src="modules/clay-forms.js" defer></script>
+<!-- v-chat-scroll-release-v0.1: a person's own hand wins. The clay file stays as it is. -->
+<script src="modules/chat-scroll-release.js" defer></script>
 <script src="modules/particle-clay.js" defer></script>
 <!-- v-clay-corner-v0.1: a small clay corner on Nursery, Garden, and Gathering. Off until Yes. Chat keeps its own clay. -->
 <script src="modules/clay-corner.js" defer></script>
@@ -16513,6 +16568,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="chat-header-icon-btn" id="chatAutoSpeakBtn" onclick="FLAutoSpeak.toggle()" title="Auto-speak OFF — tap to enable" aria-label="Toggle auto-speak" style="opacity:0.5;">&#x1F50A;</button>
       <!-- v5.79.22-signal-report: mom taps this if chat freezes; produces a diagnostic she can send Kirk without opening DevTools. -->
       <button class="chat-header-icon-btn" onclick="FLSignalReport.open()" title="Signal Report — show what's happening" aria-label="Signal Report">&#128268;</button>
+      <button type="button" id="flChatGetNewest" class="fl-chat-get-newest" onclick="flChatAskNewest()">Get the newest FreeLattice</button>
       <button class="chat-header-icon-btn" onclick="openNewConvModal()" title="New conversation" aria-label="New conversation">&#10010;</button>
     </div>
     <div class="chat-layout">
@@ -16617,6 +16673,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <button id="chatDriveBtn" onclick="flOpenDrivePicker()" title="Browse Google Drive" style="background:none;border:none;font-size:1.05rem;cursor:pointer;padding:6px 4px;opacity:0.45;color:var(--text-primary);">&#x1F4BB;</button>
             <textarea id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
+          </div>
+          <!-- v-chat-scroll-release-v0.1: calls the existing update check. No new update code. -->
+          <div class="fl-chat-update-row" id="flChatUpdateRow">
+            <button type="button" id="flChatUpdateCheck" class="fl-chat-update-check" onclick="flChatAskNewest()">Version. Get the newest</button>
+            <p id="flChatUpdateRefresh" class="fl-chat-update-refresh" hidden>
+              <button type="button" id="flChatUpdateDo" class="fl-chat-update-do" onclick="flChatRefreshCopy()">Still seeing something odd? Refresh FreeLattice</button>
+              <span class="fl-chat-update-note">Chats and the vault stay on this browser.</span>
+            </p>
           </div>
           <div class="chat-input-secondary" id="chatInputSecondary">
             <!-- Read-only status: shows what AI you're talking to. No tap action. -->
@@ -18650,7 +18714,52 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   function setAboutVersion() {
     var el = document.getElementById('aboutVersionNum');
     if (el && typeof FL_VERSION !== 'undefined') el.textContent = FL_VERSION;
+    var chatVer = document.getElementById('flChatUpdateCheck');
+    if (chatVer && typeof FL_VERSION !== 'undefined') chatVer.textContent = 'Version v' + FL_VERSION + '. Get the newest';
   }
+  function flChatAskNewest() {
+    var toast = document.getElementById('toast');
+    var line = document.getElementById('flChatUpdateRefresh');
+    var banner = document.getElementById('flUpdateBanner');
+    if (line) line.hidden = true;
+    if (typeof FlUpdater === 'undefined' || typeof FlUpdater.check !== 'function') return;
+    var obsToast = null;
+    var obsBanner = null;
+    var done = false;
+    function look() {
+      if (done) return;
+      var text = toast ? (toast.textContent || '') : '';
+      var newer = banner && banner.classList.contains('fl-update-visible');
+      var latest = text.indexOf('latest version') !== -1;
+      var missed = text.indexOf('Could not check') !== -1;
+      if (!newer && !latest && !missed) return;
+      done = true;
+      if (obsToast) obsToast.disconnect();
+      if (obsBanner) obsBanner.disconnect();
+      if (latest && line) line.hidden = false;
+    }
+    if (typeof MutationObserver === 'function') {
+      if (toast) {
+        obsToast = new MutationObserver(look);
+        obsToast.observe(toast, { childList: true, characterData: true, subtree: true, attributes: true });
+      }
+      if (banner) {
+        obsBanner = new MutationObserver(look);
+        obsBanner.observe(banner, { attributes: true });
+      }
+    }
+    try { FlUpdater.check(); } catch (eAsk) {}
+    setTimeout(function () {
+      done = true;
+      if (obsToast) obsToast.disconnect();
+      if (obsBanner) obsBanner.disconnect();
+    }, 8000);
+  }
+  function flChatRefreshCopy() {
+    if (typeof FlUpdater !== 'undefined' && typeof FlUpdater.doUpdate === 'function') FlUpdater.doUpdate();
+  }
+  try { window.flChatAskNewest = flChatAskNewest; } catch (ePub) {}
+  try { window.flChatRefreshCopy = flChatRefreshCopy; } catch (ePub2) {}
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setAboutVersion);
   else setTimeout(setAboutVersion, 300);
 })();
