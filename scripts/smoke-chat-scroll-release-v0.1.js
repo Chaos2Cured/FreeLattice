@@ -102,10 +102,14 @@ async function wheels(page, n) {
 
 (async function () {
   var pw;
-  try { pw = require('/tmp/gc043h-pw/node_modules/playwright-core'); }
+  // before 047: pw = require('/tmp/gc043h-pw/node_modules/playwright-core');
+  var pwPath = process.env.FL_PLAYWRIGHT || '/tmp/gc043h-pw/node_modules/playwright-core';
+  try { pw = require(pwPath); }
   catch (e) { fail('local playwright-core missing'); }
+  // before 047: executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  var chromePath = process.env.FL_CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
   var browser = await pw.chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    executablePath: chromePath,
     headless: true
   });
   var html = harness();

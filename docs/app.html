@@ -15516,6 +15516,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- v-chat-scroll-release-v0.1: a person's own hand wins. The clay file stays as it is. -->
 <script src="modules/chat-scroll-release.js" defer></script>
 <script src="modules/particle-clay.js" defer></script>
+<!-- v-mind-make-core-v0.1: a mind may ask to make something. The person decides. This file makes nothing by itself. -->
+<script src="modules/mind-make.js" defer></script>
 <!-- v-clay-corner-v0.1: a small clay corner on Nursery, Garden, and Gathering. Off until Yes. Chat keeps its own clay. -->
 <script src="modules/clay-corner.js" defer></script>
 <!-- v-bridge-knock-v0.1: slow letters. Off until a person turns them on. The page never fetches. -->
@@ -17023,6 +17025,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <a href="#fl-model-manifest-card" class="ai-status-btn" style="min-height:44px;flex:1;text-align:center;text-decoration:none;line-height:44px;">Swarm / catalog</a>
     </div>
   </div>
+
+  <!-- v-mind-make-core-v0.1: the person decides. Nothing is made until Yes. -->
+  <div class="fl-card v-mind-make-core-v0.1" id="fl-make-consent-mount" style="margin-bottom:14px;padding:14px 16px;border:1px solid rgba(232,176,25,0.28);background:rgba(232,176,25,0.06);max-width:100%;overflow-wrap:anywhere;"></div>
 
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
@@ -37847,10 +37852,14 @@ function addSystemMessage(text) {
 // next turn's context isn't polluted with the raw sentinel).
 // v-seal-ask-heal-v0.1: a notebook mark leaves the paint on every chunk. The stored reply stays whole.
 function flStripStreamMarks(text) {
+  var out = text;
   try {
-    if (window.FLWorkspace && typeof FLWorkspace.strip === 'function') return FLWorkspace.strip(text);
+    if (window.FLWorkspace && typeof FLWorkspace.strip === 'function') out = FLWorkspace.strip(text);
   } catch (e) {}
-  return text;
+  try {
+    if (window.FLMake && typeof FLMake.strip === 'function' && typeof out === 'string') out = FLMake.strip(out);
+  } catch (e2) {}
+  return out;
 }
 function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
   if (typeof aiText !== 'string' || !aiText) return aiText;
@@ -37859,6 +37868,11 @@ function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
   if (window.FLClay && typeof FLClay.consumeReply === 'function') {
     var claySeen = FLClay.consumeReply(visible);
     if (claySeen && typeof claySeen.visible === 'string') visible = claySeen.visible;
+  }
+  // v-mind-make-core-v0.1: one offer under the reply. The person decides. Clay files stay as they are.
+  if (window.FLMake && typeof FLMake.onReply === 'function') {
+    var makeSeen = FLMake.onReply(visible, textSpan);
+    if (makeSeen && typeof makeSeen.visible === 'string') visible = makeSeen.visible;
   }
   if (window.FLClayCorner && typeof FLClayCorner.noteReply === 'function') FLClayCorner.noteReply(aiText);
   // v-bridge-knock-v0.1: a letter tag becomes a draft. It never sends.
@@ -38729,6 +38743,10 @@ function renderMessageContent(textSpan, content, msgDiv) {
     if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) {
       var clayBubble = FLClay.consumeReply(content);
       if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
+    }
+    if (window.FLMake && typeof FLMake.onReply === 'function' && typeof content === 'string' && content.indexOf('[FL_MAKE:') !== -1) {
+      var makeBubble = FLMake.onReply(content, textSpan);
+      if (makeBubble && typeof makeBubble.visible === 'string') content = makeBubble.visible;
     }
     if (window.FLBridge && typeof FLBridge.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_BRIDGE:') !== -1) {
       var bridgeBubble = FLBridge.consumeReply(content);
@@ -40894,6 +40912,10 @@ function flMindPromptTails() {
   if (window.FLWorkspace && typeof FLWorkspace.promptDelta === 'function') {
     var wsPrompt = FLWorkspace.promptDelta();
     if (wsPrompt) parts.push(wsPrompt);
+  }
+  if (window.FLMake && typeof FLMake.promptDelta === 'function') {
+    var makePrompt = FLMake.promptDelta();
+    if (makePrompt) parts.push(makePrompt);
   }
   return parts.length ? ('\n\n' + parts.join('\n\n')) : '';
 }
