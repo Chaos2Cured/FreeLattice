@@ -42990,6 +42990,21 @@ async function generateImage(prompt) {
     return;
   }
 
+  // v-likeness-line-v0.1: one hard line after ImageSafety.assessImageRequest. No off switch.
+  try {
+    if (window.FLLikeness && typeof window.FLLikeness.assess === 'function') {
+      var _likeSource = (typeof state !== 'undefined' && state && state.pendingImage) ? { personPhoto: true } : null;
+      var _like = window.FLLikeness.assess(cleanPrompt, _likeSource);
+      if (_like && _like.ok === false) {
+        addSystemMessage('\u{1F3A8} ' + (window.FLLikeness.LINE || _like.words || ''));
+        return;
+      }
+    }
+  } catch (_likeErr) {
+    addSystemMessage('\u{1F3A8} ' + ((window.FLLikeness && window.FLLikeness.LINE) || ''));
+    return;
+  }
+
   var localReady = false;
   try { localReady = !!(window.FLImageLocal && FLImageLocal.ready && FLImageLocal.ready()); } catch (eReady) { localReady = false; }
   if (!localReady && !state.hfToken) {
@@ -70382,6 +70397,7 @@ document.addEventListener('click', function(e) {
      or exceed swimwear at every trust tier. No nudity, no partial
      nudity, no see-through. Bright-line, not needle. -->
 <script src="modules/image-safety.js" defer></script>
+<script src="modules/likeness-line.js" defer></script>
 <script src="modules/benford-hint.js" defer></script>
 <script src="modules/confidence-first.js" defer></script>
 <script src="modules/image-local.js" defer></script>
