@@ -62,6 +62,7 @@
   footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid rgba(200,210,230,0.1); font-size: 0.85rem; color: rgba(200,210,230,0.62); }
   @media (max-width: 420px) { h1 { font-size: 1.35rem; } .sg-bed, .sg-seed { padding: 0.8rem; } }
 </style>
+<link rel="stylesheet" href="modules/card-glow.css">
 </head>
 <body>
 <main class="v-science-garden-seed-v0">
@@ -115,6 +116,13 @@
     <p>An older planting bench lives inside the app (Learn, then Science Garden). It stays as it is.</p>
   </section>
 
+<!-- v-marketplace-polish-v0.1: a mind may show a picture it made. It stays on this device. -->
+<section class="fl-market-offer" data-offer-id="local" aria-label="This mind's offer">
+  <h2>This mind's offer</h2>
+  <p>A picture this mind made can sit here. It stays on this device. A shared offer carries only a short fingerprint and a small thumbnail.</p>
+  <div id="fl-market-attach-host" data-offer-id="local" data-mind-name="this mind"></div>
+</section>
+
   <footer>
     <a href="app.html">FreeLattice</a> &middot;
     <a href="love-logic-proof-v3.html">Love Logic v3</a> &middot;
@@ -125,5 +133,6 @@
   </footer>
 </main>
 <script src="modules/science-garden-seeds.js"></script>
+<script src="modules/market-attach.js"></script>
 </body>
 </html>

@@ -15536,6 +15536,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="modules/pool-reconnect-desk.js" defer></script>
 <!-- v-fl-card-glow-v0: the Tree's card light on More, Learn and Community cards (CSS layer, adds only) -->
 <link rel="stylesheet" href="modules/fl-card-glow.css">
+<link rel="stylesheet" href="modules/card-glow.css">
+<script src="modules/market-attach.js" defer></script>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -16656,6 +16658,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               <!-- v-science-garden-seed-v0: the Marketplace's first room. People offer ideas; aligned minds decide their worth. -->
               <a class="market-stall-link v-science-garden-seed-v0" href="science-garden.html" title="Science Garden: offer an idea, science, art, anything. Every seed asks what would show it is wrong.">&#127793; Science Garden</a>
             </div>
+            <!-- v-marketplace-polish-v0.1: a mind may show a picture it made. It stays on this device. -->
+            <section class="fl-market-offer" data-offer-id="local" aria-label="This mind's offer">
+              <h2>This mind's offer</h2>
+              <p>A picture this mind made can sit here. It stays on this device. A shared offer carries only a short fingerprint and a small thumbnail.</p>
+              <div id="fl-market-attach-host" data-offer-id="local" data-mind-name="this mind"></div>
+            </section>
             <div id="fl-memory-file" class="fl-memory-file">
               <p class="fl-memory-label">Memory file</p>
               <div class="fl-memory-actions">
