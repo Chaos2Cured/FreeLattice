@@ -1,0 +1,182 @@
+/* v-marketplace-polish-v0.1
+   Tree card light for Marketplace and Science Garden cards.
+   Old rules stay in their pages. This sheet only adds.
+   before 048m: market stall links used a 3px 10px pad in app.html. That rule stays there.
+   System fonts only. No fetched image. No hosted font.
+   Radius 12. Gold edge. Lavender hush. Gold glow. Same palette as the Tree.
+*/
+
+main.v-marketplace-galaxy-door .stalls,
+main.v-marketplace-galaxy-door .bank,
+main.v-science-garden-seed-v0 .sg-seed,
+main.v-science-garden-seed-v0 .sg-bed,
+main.v-science-garden-seed-v0 .card,
+#chatMarketPanel .market-stall-link,
+.fl-market-offer {
+  position: relative;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 176, 25, 0.35);
+  box-shadow: 0 0 18px rgba(232, 176, 25, 0.08), 0 0 0 1px rgba(167, 139, 250, 0.16);
+  background-image: linear-gradient(180deg, rgba(232, 176, 25, 0.10), rgba(12, 10, 26, 0) 46%);
+  color: #d7deea;
+  font-family: Georgia, "Iowan Old Style", Palatino, "Palatino Linotype", "Times New Roman", serif;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+main.v-marketplace-galaxy-door .stalls h2,
+main.v-science-garden-seed-v0 .sg-bed-name,
+main.v-science-garden-seed-v0 .sg-title,
+main.v-science-garden-seed-v0 .card h2,
+.fl-market-offer h2 {
+  color: #f3d98a;
+  text-shadow: 0 0 24px rgba(232, 176, 25, 0.25);
+}
+
+/* A small CSS mark per card kind. Absolute, so the words do not move. */
+main.v-marketplace-galaxy-door .stalls::after,
+main.v-science-garden-seed-v0 .sg-seed::after,
+main.v-marketplace-galaxy-door .bank::after,
+.fl-market-offer::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
+  pointer-events: none;
+}
+main.v-marketplace-galaxy-door .stalls::after { background: #e8b019; box-shadow: 0 0 8px rgba(232, 176, 25, 0.55); }
+main.v-science-garden-seed-v0 .sg-seed::after { background: #34d399; box-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
+main.v-marketplace-galaxy-door .bank::after { background: #a78bfa; box-shadow: 0 0 8px rgba(167, 139, 250, 0.5); }
+.fl-market-offer::after { background: #f3d98a; box-shadow: 0 0 8px rgba(232, 176, 25, 0.45); }
+
+@media (prefers-reduced-motion: no-preference) {
+  main.v-marketplace-galaxy-door .stalls,
+  main.v-marketplace-galaxy-door .bank,
+  main.v-science-garden-seed-v0 .sg-seed,
+  main.v-science-garden-seed-v0 .card,
+  #chatMarketPanel .market-stall-link,
+  .fl-market-offer {
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, opacity 200ms ease-out;
+  }
+  main.v-marketplace-galaxy-door .stalls:hover,
+  main.v-marketplace-galaxy-door .stalls:focus-within,
+  main.v-marketplace-galaxy-door .bank:hover,
+  main.v-marketplace-galaxy-door .bank:focus-within,
+  main.v-science-garden-seed-v0 .sg-seed:hover,
+  main.v-science-garden-seed-v0 .sg-seed:focus-within,
+  main.v-science-garden-seed-v0 .card:hover,
+  main.v-science-garden-seed-v0 .card:focus-within,
+  #chatMarketPanel .market-stall-link:hover,
+  #chatMarketPanel .market-stall-link:focus-visible,
+  .fl-market-offer:hover,
+  .fl-market-offer:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 0 26px rgba(232, 176, 25, 0.28), 0 0 0 1px rgba(232, 176, 25, 0.45);
+  }
+  main.v-marketplace-galaxy-door .stalls:first-of-type,
+  #sg-beds .sg-seed:first-of-type {
+    animation: fl-card-breathe 4800ms ease-in-out infinite;
+  }
+  @keyframes fl-card-breathe {
+    0%, 100% { box-shadow: 0 0 18px rgba(232, 176, 25, 0.10), 0 0 0 1px rgba(167, 139, 250, 0.16); }
+    50% { box-shadow: 0 0 28px rgba(232, 176, 25, 0.32), 0 0 0 1px rgba(232, 176, 25, 0.40); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.v-marketplace-galaxy-door .stalls,
+  main.v-marketplace-galaxy-door .bank,
+  main.v-science-garden-seed-v0 .sg-seed,
+  main.v-science-garden-seed-v0 .sg-bed,
+  main.v-science-garden-seed-v0 .card,
+  #chatMarketPanel .market-stall-link,
+  .fl-market-offer,
+  main.v-marketplace-galaxy-door .stalls:first-of-type,
+  #sg-beds .sg-seed:first-of-type {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+main.v-marketplace-galaxy-door .stalls a,
+main.v-marketplace-galaxy-door .bank a,
+main.v-science-garden-seed-v0 .sg-offer,
+main.v-science-garden-seed-v0 .sg-look,
+main.v-science-garden-seed-v0 .card a,
+main.v-science-garden-seed-v0 .tend a,
+#chatMarketPanel .market-stall-link,
+.fl-market-offer button,
+.fl-market-offer a,
+#scienceGardenContainer button {
+  min-height: 44px;
+  min-width: 44px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+main.v-marketplace-galaxy-door .stalls a:focus-visible,
+main.v-marketplace-galaxy-door .bank a:focus-visible,
+main.v-science-garden-seed-v0 .sg-offer:focus-visible,
+main.v-science-garden-seed-v0 .sg-look:focus-visible,
+main.v-science-garden-seed-v0 .card a:focus-visible,
+main.v-science-garden-seed-v0 .tend a:focus-visible,
+#chatMarketPanel .market-stall-link:focus-visible,
+.fl-market-offer button:focus-visible,
+.fl-market-offer a:focus-visible,
+#scienceGardenContainer button:focus-visible {
+  outline: 2px solid #f3d98a;
+  outline-offset: 2px;
+}
+
+main.v-marketplace-galaxy-door .stalls,
+main.v-marketplace-galaxy-door .bank,
+main.v-science-garden-seed-v0 .sg-seed,
+main.v-science-garden-seed-v0 .card,
+.fl-market-offer,
+#chatMarketPanel .market-stall-label,
+#chatMarketPanel .market-stall-note {
+  color: #d7deea;
+}
+
+#chatMarketPanel .market-stall-link { color: #f3d98a; }
+
+/* The shared bar is painted by a script after the first layout. Hold its band
+   from the first paint, and let the bar sit in that band, so the door does not jump.
+   before 048m: .tc-bar was position: relative and in normal flow (tree-consistency.css). */
+body:has(main.v-marketplace-galaxy-door) { padding-top: 45px; }
+body:has(main.v-marketplace-galaxy-door) .tc-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: auto;
+}
+
+/* Reserve the seed bed before the garden script paints, so the tend card does not jump. */
+#sg-beds { min-height: 1440px; }
+@media (max-width: 520px) {
+  #sg-beds { min-height: 2140px; }
+}
+.fl-market-pics { min-height: 44px; display: flex; flex-wrap: wrap; gap: 12px; }
+.fl-market-pics img,
+.fl-market-offer img {
+  width: 96px;
+  height: 96px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+.fl-market-picker, .fl-market-pic { max-width: 100%; }
+.fl-market-offer { padding: 1rem 1.1rem; margin: 1.2rem 0; }
+.fl-market-offer h2 { margin: 0 0 0.4rem; font-size: 1rem; font-weight: 400; }
+.fl-market-offer p { margin: 0.35rem 0; line-height: 1.5; }
