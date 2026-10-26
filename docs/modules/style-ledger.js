@@ -28,6 +28,17 @@
     if (!gate || gate.allowed !== true) {
       return { allowed: false, reason: (gate && gate.reason) || REST_LINE };
     }
+    // v-likeness-line-v0.1: right after ImageSafety.assessImageRequest. No off switch.
+    // before 047b: the next line was the only return after an allowed gate.
+    if (root.FLLikeness && typeof root.FLLikeness.assess === 'function') {
+      var like = null;
+      try { like = root.FLLikeness.assess(String(text || '')); }
+      catch (eLike) { like = { ok: false }; }
+      if (!like || like.ok === false) {
+        var likeLine = (root.FLLikeness && root.FLLikeness.LINE) || (like && like.words) || '';
+        return { allowed: false, reason: likeLine };
+      }
+    }
     return gate;
   }
   function setPageBase(base) {
