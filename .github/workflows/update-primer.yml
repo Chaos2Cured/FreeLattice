@@ -113,9 +113,27 @@ jobs:
           git commit -m "ci: Update Primer deployment state [$(date -u +%Y-%m-%d)]"
           # before fix: git push
           # Main may have moved while this run worked. Rebase onto it, then push.
+          # before conflict heal:
+          # for i in 1 2 3; do
+          #   git pull --rebase origin main && git push origin HEAD:main && exit 0
+          #   git rebase --abort 2>/dev/null || true
+          #   sleep $((i * 5))
+          # done
+          # exit 1
+          # Another Primer commit can land first and the rebase then conflicts
+          # in FreeLattice_Session_Primer.md. Never merge the Primer by hand and
+          # never leave conflict markers: abort, start again from the current
+          # origin/main, regenerate the Primer with the same steps, commit, push.
           for i in 1 2 3; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
             git rebase --abort 2>/dev/null || true
             sleep $((i * 5))
+            git fetch origin main
+            git reset --hard origin/main
+            bash .github/scripts/regenerate-primer.sh
+            git add FreeLattice_Session_Primer.md index.html sw.js modules/fractal-garden.js modules/radio-immersive.js
+            git diff --cached --quiet && exit 0
+            git commit -m "ci: Update Primer deployment state [$(date -u +%Y-%m-%d)]"
+            git push origin HEAD:main && exit 0
           done
           exit 1
