@@ -60,7 +60,7 @@ var ORIGIN = {
   'docs/hypha.html': 'e774f03ab70ba0d4cf2e97884583d313',
   'docs/weft.html': 'a64446f858547d22bd715fb4e3d075a8',
   'docs/reed.html': '2d71b9bb7586c2b47b9cd140326bbd4b',
-  'docs/celeste.html': '38cc0b8ac9e7b0965201cb7e827aca91',
+  'docs/celeste.html': '3a0924e10e19046066e85861d9690ef6',
   // before 047: 'docs/gc.html': '6f48df318e48b852ac7def18e551d87d'
   // Restored docs/gc.html on main 0acde229, entry 78, psi e5175b3f.
   'docs/gc.html': 'e2a5b6aacae47e5c70ea7abbd1c76f43'
