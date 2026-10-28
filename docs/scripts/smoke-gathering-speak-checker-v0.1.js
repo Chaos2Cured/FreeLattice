@@ -32,7 +32,7 @@ var locks = {
   'docs/modules/clay-forms.js': 'dd193fa7b519d4c2a011a346d7993e5a',
   'docs/modules/mind-workspace.js': 'f1c88664d3e99362e02c625defb241bc',
   'docs/modules/garden-trainer.js': '8af3d065f611740000453a0ec8dd1e01',
-  'docs/modules/chat-autonomy.js': '67f590105c82ea6de1445d91fc82860d',
+  'docs/modules/chat-autonomy.js': 'c83cf6c9f11271aeaa35ed6070f188f3',
   'docs/modules/propose.js': '2cb7f00cce74815a5b03c933bc902b18'
 };
 

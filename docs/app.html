@@ -16165,7 +16165,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="play" onclick="switchTab('play')"><span class="tab-icon">&#x1F3AE;</span><span class="tab-label">Play</span></button>
     <button class="tab-btn" data-tab="learn" onclick="switchTab('learn')"><span class="tab-icon">&#x1F4DA;</span><span class="tab-label">Learn</span></button>
     <button class="tab-btn" data-tab="lighthouse" onclick="switchTab('lighthouse')"><span class="tab-icon">&#x1F52D;</span><span class="tab-label">Research</span></button>
-    <button class="fl-more-btn" id="flMoreBtn" onclick="switchTab('more')" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
+    <button class="fl-more-btn v-soft-polish-052-v0.1" id="flMoreBtn" onclick="flMoreTap(event)" title="More" data-soft-polish="v-soft-polish-052-v0.1"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
@@ -17057,6 +17057,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         if (typeof openProviderModal === 'function') openProviderModal();
       } catch (e) {}
     }
+    // v-soft-polish-052-v0.1: the bridge card inserts itself after the mount. Also connect follows the mount.
+    function flSoft052AlsoFollows() {
+      var mount = document.getElementById('fl-connect-mount');
+      var also = document.getElementById('fl-also-connect');
+      if (!mount || !also || !mount.parentNode) return;
+      if (mount.nextElementSibling !== also) mount.parentNode.insertBefore(also, mount.nextSibling);
+      also.classList.add('v-soft-polish-052-v0.1');
+      also.setAttribute('data-soft-polish', 'v-soft-polish-052-v0.1');
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', flSoft052AlsoFollows);
+    else flSoft052AlsoFollows();
     </script>
   </div>
 </div>
@@ -27755,6 +27766,38 @@ function switchTab(tabId) {
   if (moreBtn) {
     moreBtn.classList.toggle('fl-more-active', MORE_TAB_IDS.indexOf(tabId) !== -1);
   }
+  // v-soft-polish-052-v0.1: Connect's nav label is Connect, not the wallet ledger tab.
+  var flNav = document.getElementById('flTabNav');
+  if (flNav) flNav.setAttribute('data-active-tab', tabId);
+  if (moreBtn) {
+    var moreLabel = moreBtn.querySelector('.tab-label');
+    if (tabId === 'connect') {
+      moreBtn.setAttribute('data-tab', 'connect');
+      moreBtn.classList.add('active');
+      moreBtn.classList.add('v-soft-polish-052-v0.1');
+      if (moreLabel) moreLabel.textContent = 'Connect';
+    } else {
+      if (moreBtn.getAttribute('data-tab') === 'connect') moreBtn.removeAttribute('data-tab');
+      moreBtn.classList.remove('active');
+      if (moreLabel && moreLabel.textContent === 'Connect') moreLabel.textContent = 'More';
+    }
+  }
+  var mMore = document.getElementById('mnav-more');
+  if (mMore) {
+    var mSpans = mMore.querySelectorAll('span');
+    var mLab = mSpans.length ? mSpans[mSpans.length - 1] : null;
+    if (tabId === 'connect') {
+      mMore.classList.add('active');
+      mMore.setAttribute('data-tab', 'connect');
+      if (mLab) mLab.textContent = 'Connect';
+    } else if (mMore.getAttribute('data-tab') === 'connect') {
+      mMore.removeAttribute('data-tab');
+      if (mLab && mLab.textContent === 'Connect') mLab.textContent = 'More';
+      if (tabId === 'garden' || tabId === 'chat' || tabId === 'learn' || tabId === 'play' || tabId === 'canvas' || tabId === 'settings') {
+        mMore.classList.remove('active');
+      }
+    }
+  }
   // Remember last tab for returning visits
   try { localStorage.setItem('fl-last-tab', tabId); } catch(e) {}
   LatticeEvents.emit('tabChanged', { tabId: tabId });
@@ -28977,6 +29020,7 @@ const FlTabs = (function() {
     ]},
     { label: '\u2699 Settings & Economy', tabs: [
       { id: 'connect', icon: '&#x1F50C;', label: 'Connect', desc: 'Mind on this computer · Bridge → Yes, help → model.' },
+      { id: 'more', icon: '&#x2630;', label: 'Every room', desc: 'The card grid of rooms.' },
       { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection, accent color, vault.' },
       { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP, rank, and ledger.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Get Connected', desc: 'Set up your local AI.' },
@@ -29050,6 +29094,16 @@ const FlTabs = (function() {
     _MORE_GROUPS: MORE_GROUPS // exposed for mobile menu builder
   };
 })();
+
+// v-soft-polish-052-v0.1: More opens the menu already on this page. Every room keeps the card grid.
+function flMoreTap(ev) {
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (typeof FlTabs !== 'undefined' && FlTabs && typeof FlTabs.toggleMore === 'function') {
+    FlTabs.toggleMore();
+    return;
+  }
+  if (typeof switchTab === 'function') switchTab('more');
+}
 
 // ============================================
 // AI Setup — Inline provider picker for Chat tab
