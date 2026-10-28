@@ -169,6 +169,9 @@
       '.fl-chat-autonomy-look{padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,0.45);background:transparent;color:inherit;white-space:normal;text-align:left;max-width:100%;}',
       '.fl-chat-autonomy-preview{max-width:100%;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:8px 0;}',
       '.fl-chat-build-trust{margin-top:14px;}',
+      '.fl-chat-autonomy-settings-jump{display:flex;align-items:center;min-height:44px;min-width:44px;padding:8px 0;color:inherit;text-decoration:underline;cursor:pointer;}',
+      '.fl-chat-autonomy-look-line{margin:6px 0 0;}',
+      '@media (max-height:520px){#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages{height:48px;min-height:32px;}#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatFeelMarketBand{max-height:48px;overflow-y:hidden;}#flChatSearchRow{position:relative;z-index:1;}#tab-chat .status-bar{position:relative;z-index:1;}#tab-chat .chat-input-row{position:relative;z-index:2;}}',
       '@media (prefers-reduced-motion: reduce){.fl-chat-search-toggle,.fl-chat-autonomy-actions button,.fl-chat-build-actions button{transition:none;}}'
     ].join('\n');
     (d.head || d.documentElement).appendChild(styleNode);
@@ -213,7 +216,8 @@
     if (askRow && askRow.isConnected) return;
     ensureStyle();
     var row = d.createElement('div');
-    row.className = 'fl-chat-autonomy-ask';
+    row.className = 'fl-chat-autonomy-ask v-soft-polish-052-v0.1';
+    row.setAttribute('data-soft-polish', 'v-soft-polish-052-v0.1');
     row.setAttribute('data-fl-autonomy', 'ask');
     row.setAttribute('role', 'group');
     row.setAttribute('aria-label', 'Build from chat');
@@ -227,16 +231,25 @@
     actions.className = 'fl-chat-autonomy-actions';
     var ai = choiceButton('AI decides', 'Applies local changes. You get a short receipt.', 'auto');
     var note = choiceButton('Notify on big ones', 'Applies, and pings you when a file is new, deleted, or large.', 'notify');
-    var look = choiceButton('I review each one', 'Nothing applies until you tap Apply.', 'review');
+    var look = choiceButton('I review each one myself', 'Nothing applies until you tap Apply.', 'review');
     actions.appendChild(ai);
     actions.appendChild(note);
     actions.appendChild(look);
-    var quiet = d.createElement('p');
-    quiet.className = 'fl-chat-autonomy-quiet';
+    var lookLine = d.createElement('p');
+    lookLine.className = 'fl-chat-autonomy-line fl-chat-autonomy-look-line';
+    lookLine.textContent = 'You look before anything applies.';
+    var quiet = d.createElement('a');
+    quiet.className = 'fl-chat-autonomy-quiet fl-chat-autonomy-settings-jump v-soft-polish-052-v0.1';
+    quiet.href = '#flChatBuildTrustSection';
     quiet.textContent = 'You can change this later in Settings.';
+    quiet.addEventListener('click', function (ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      openBuildSettings();
+    });
     row.appendChild(title);
     row.appendChild(line);
     row.appendChild(actions);
+    row.appendChild(lookLine);
     row.appendChild(quiet);
     function pick(value) {
       return function () {
@@ -694,7 +707,8 @@
     ensureStyle();
     bar.classList.add('fl-autonomy-tuck');
     var row = d.createElement('div');
-    row.className = 'fl-chat-search-row';
+    row.className = 'fl-chat-search-row v-soft-polish-052-v0.1';
+    row.setAttribute('data-soft-polish', 'v-soft-polish-052-v0.1');
     row.id = 'flChatSearchRow';
     var btn = d.createElement('button');
     btn.type = 'button';
@@ -733,7 +747,8 @@
     if (!anchor || !anchor.parentNode) return;
     ensureStyle();
     var section = d.createElement('div');
-    section.className = 'section fl-chat-build-trust';
+    section.className = 'section fl-chat-build-trust v-soft-polish-052-v0.1';
+    section.setAttribute('data-soft-polish', 'v-soft-polish-052-v0.1');
     section.id = 'flChatBuildTrustSection';
     var title = d.createElement('div');
     title.className = 'section-title';
@@ -758,12 +773,26 @@
     }
     actions.appendChild(radio('AI decides', 'auto'));
     actions.appendChild(radio('Notify on big ones', 'notify'));
-    actions.appendChild(radio('I review each one', 'review'));
+    actions.appendChild(radio('I review each one myself', 'review'));
+    var lookLine = d.createElement('p');
+    lookLine.className = 'fl-chat-build-note fl-chat-autonomy-look-line';
+    lookLine.textContent = 'You look before anything applies.';
     section.appendChild(title);
     section.appendChild(note);
     section.appendChild(actions);
+    section.appendChild(lookLine);
     anchor.parentNode.insertBefore(section, anchor.nextSibling);
     paintSettings();
+  }
+
+  function openBuildSettings() {
+    try { if (typeof root.switchTab === 'function') root.switchTab('settings'); } catch (e) {}
+    var section = doc() && doc().getElementById('flChatBuildTrustSection');
+    if (!section) return;
+    try { history.replaceState(null, '', '#flChatBuildTrustSection'); } catch (e1) {}
+    try { section.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (e2) {
+      try { section.scrollIntoView(); } catch (e3) {}
+    }
   }
 
   function onEscape(e) {

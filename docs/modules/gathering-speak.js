@@ -238,9 +238,10 @@
     var askBtn = el('button', 'flgs-btn', 'Ask');
     askBtn.type = 'button';
     askBtn.id = 'flgs-ask-btn';
-    var pauseBtn = el('button', 'flgs-btn', 'Pause');
+    var pauseBtn = el('button', 'flgs-btn v-soft-polish-052-v0.1', 'Pause');
     pauseBtn.type = 'button';
     pauseBtn.id = 'flgs-pause-btn';
+    pauseBtn.setAttribute('data-soft-polish', 'v-soft-polish-052-v0.1');
     speakActions.appendChild(askBtn);
     speakActions.appendChild(pauseBtn);
     speakCard.appendChild(speakActions);
@@ -339,6 +340,7 @@
         : askCloud(ask.slice(0, 500), ctl && ctl.signal);
       job.then(function (text) {
         if (mine !== turnId) return;
+        inflight = null;
         var turns = readThread();
         turns.push({ role: 'person', text: ask.slice(0, 500), label: 'You', chair: held.id });
         turns.push({ role: 'chair', text: String(text).slice(0, 2000), label: seat.label, chair: held.id });
@@ -348,6 +350,7 @@
         receipt.textContent = 'A turn was kept.';
       }, function () {
         if (mine !== turnId) return;
+        inflight = null;
         receipt.textContent = 'The speaking chair did not answer. Nothing was invented. Find local minds is above. More, then Connect, can help.';
       }).then(function () {
         if (mine !== turnId) return;
@@ -357,8 +360,12 @@
     }
 
     function onPause() {
+      if (!inflight) {
+        if (!receipt.textContent) receipt.textContent = 'Nothing in flight.';
+        return;
+      }
       turnId += 1;
-      if (inflight && typeof inflight.abort === 'function') {
+      if (typeof inflight.abort === 'function') {
         try { inflight.abort(); } catch (e) {}
       }
       inflight = null;
