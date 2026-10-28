@@ -1,0 +1,109 @@
+/* v-tree-love-connect-v0.1
+   Soft light on the Connect shelf and the START cards this brick touches.
+   Marketplace and Science Garden keep their own sheet.
+   System fonts only. No fetched image.
+*/
+.fl-also-connect {
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 12px 0 16px;
+  padding: 4px 0 8px;
+  overflow-wrap: anywhere;
+}
+.fl-also-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  margin: 0 0 6px;
+  color: #f3d98a;
+}
+.fl-also-porch,
+.fl-also-card p,
+.fl-also-later {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 10px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.fl-also-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+.fl-also-card {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 176, 25, 0.35);
+  box-shadow: 0 0 18px rgba(232, 176, 25, 0.12);
+  background: rgba(12, 10, 26, 0.35);
+}
+.fl-also-card h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0 0 6px;
+  color: #f3d98a;
+}
+.fl-also-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+.fl-also-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  background: rgba(232, 176, 25, 0.08);
+  color: #f3d98a;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+#fl-grandmother-path-start.v-tree-love-connect-v0\.1,
+#grandmother-path-start.v-tree-love-connect-v0\.1 {
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(232, 176, 25, 0.12);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fl-also-card,
+  #fl-grandmother-path-start.v-tree-love-connect-v0\.1,
+  #grandmother-path-start.v-tree-love-connect-v0\.1 {
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+  .fl-also-card:hover,
+  .fl-also-card:focus-within,
+  #fl-grandmother-path-start.v-tree-love-connect-v0\.1:hover,
+  #fl-grandmother-path-start.v-tree-love-connect-v0\.1:focus-within,
+  #grandmother-path-start.v-tree-love-connect-v0\.1:hover,
+  #grandmother-path-start.v-tree-love-connect-v0\.1:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 0 26px rgba(232, 176, 25, 0.28);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-also-card,
+  #fl-grandmother-path-start.v-tree-love-connect-v0\.1,
+  #grandmother-path-start.v-tree-love-connect-v0\.1 {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
