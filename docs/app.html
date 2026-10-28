@@ -23123,6 +23123,8 @@ function switchWalletView(view) {
 <!-- v-gathering-shared-v0.1: The Gathering, opened from a Learn card. The chairs come from modules/fl-gathering.js (a byte-identical twin of the Tree's copy). -->
 <div class="tab-panel" id="tab-gathering">
   <div id="fl-gathering-mount"></div>
+  <!-- v-gathering-speak-checker-v0.1: short thread and Checker notes, under the chairs. -->
+  <div id="fl-gathering-speak-mount" class="v-gathering-speak-checker-v0.1" data-marker="v-gathering-speak-checker-v0.1"></div>
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     var host = document.getElementById('fl-gathering-mount');
@@ -70129,6 +70131,7 @@ document.addEventListener('click', function(e) {
 <script src="modules/adaptive-context-depth.js" defer></script>
 <script src="modules/fl-connect.js" defer></script>
 <script src="modules/fl-gathering.js" defer></script><!-- v-gathering-shared-v0.1 -->
+<script src="modules/gathering-speak.js" defer></script><!-- v-gathering-speak-checker-v0.1 -->
 <script src="modules/fl-trainer-ablate.js" defer></script>
 <!-- v-trainer-map-connect-retry: if More→Connect opened before FlConnect loaded, mount when ready -->
 <script>
