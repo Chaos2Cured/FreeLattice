@@ -12,7 +12,7 @@ const app = fs.readFileSync(path.join(docs, 'app.html'), 'utf8');
 const root = fs.readFileSync(path.join(docs, '..', 'index.html'), 'utf8');
 
 // Twin lock: the Tree carries the same bytes (FreeLattice-Alpha docs/modules/fl-gathering.js).
-const TWIN_MD5 = 'ef514ece89405182a8b7cd0370e1ade9';
+const TWIN_MD5 = '4dbbff5d554c42256605b37939835080';
 assert.strictEqual(crypto.createHash('md5').update(src).digest('hex'), TWIN_MD5, 'fl-gathering.js twin bytes');
 assert.ok(/v-gathering-shared-v0\.1/.test(src));
 assert.ok(!/innerHTML|confirm\(|localhost|\u2014/.test(src), 'textContent only, no confirm, 127.0.0.1 only, no em dash');
@@ -24,14 +24,16 @@ ctx.window.localStorage = ctx.localStorage;
 vm.runInNewContext(src, ctx);
 const G = ctx.window.FLGathering;
 assert.strictEqual(G.CHAIRS.length, 7);
-assert.deepStrictEqual(Array.from(G.CHAIRS.filter((c) => c.later).map((c) => c.id)), ['seat-5', 'seat-6', 'seat-7']);
+assert.deepStrictEqual(Array.from(G.CHAIRS.filter((c) => c.later).map((c) => c.id)), ['seat-6', 'seat-7']);
+assert.strictEqual(G.CHAIRS.find((c) => c.id === 'seat-5').type, 'Checker');
+assert.strictEqual(G.CHAIRS.find((c) => c.id === 'seat-5').later, false);
 assert.ok(G.isLoopback('http://127.0.0.1:11434') && !G.isLoopback('http://localhost:11434') && !G.isLoopback('http://10.0.0.2:11434'));
 assert.strictEqual(G.normalizeSeat({ kind: 'local', model: 'm', base: 'http://evil.example:11434' }), null);
 const cloud = G.normalizeSeat({ kind: 'cloud', model: 'x', provider: 'groq', providerName: 'Groq', apiKey: 'SECRET' });
 assert.ok(cloud && !('apiKey' in cloud) && cloud.label === 'Groq: x', 'a seat keeps a name, never a key');
-store.k = JSON.stringify({ seats: { cortex: { kind: 'local', model: 'a', base: 'http://127.0.0.1:11434' }, 'seat-5': { kind: 'local', model: 'b', base: 'http://127.0.0.1:11434' } }, speaking: 'seat-5' });
+store.k = JSON.stringify({ seats: { cortex: { kind: 'local', model: 'a', base: 'http://127.0.0.1:11434' }, 'seat-5': { kind: 'local', model: 'b', base: 'http://127.0.0.1:11434' }, 'seat-6': { kind: 'local', model: 'c', base: 'http://127.0.0.1:11434' } }, speaking: 'seat-6' });
 const st = G.getState('k');
-assert.ok(st.seats.cortex && !st.seats['seat-5'] && st.speaking === '', 'later seats stay empty');
+assert.ok(st.seats.cortex && st.seats['seat-5'] && !st.seats['seat-6'] && st.speaking === '', 'later seats stay empty, Checker can sit');
 assert.strictEqual(G.cloudOptions({ cloudMinds: () => [{ provider: 'groq', model: 'a' }, { provider: 'groq', model: 'a' }] }).length, 1);
 
 // FreeLattice wiring: a Learn card, a panel, the module loaded, index.html a byte copy.

@@ -10,3 +10,4 @@ Kirk's choice: both local minds and cloud minds (bring your own key) may take ch
 - A seat stores kind, model, a label, and either the 127.0.0.1 address or the provider name. Never a key. Seats saved in localStorage `fl_gathering_chairs_v0`.
 - Seating only. Next: brick 2, the speaking chair answers in a short thread on FreeLattice; brick 3, the Tree's own Gathering moves onto this core.
 - Not yet: the module is not in sw.js's offline list (sw.js is never touched by hand), so the Gathering needs a connection the first time.
+- Brick 2 is speaking. The speaking chair can answer a short ask, and seat-5 is the Checker. See GATHERING_SPEAK_CHECKER_v0.1.md. The seating lines above stay as they were written.

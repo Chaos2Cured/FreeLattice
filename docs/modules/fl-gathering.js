@@ -8,6 +8,7 @@
 // person already pays for with their own key. A seat never stores a key.
 // Looks for local minds only when asked. Words by textContent only.
 // Brick 1 seats minds. Speaking from a chair comes in the next brick.
+// Brick 2 opens seat-5 as Checker. The short thread lives in gathering-speak.js.
 
 (function (root) {
   'use strict';
@@ -18,7 +19,7 @@
     { id: 'memory', type: 'memory', later: false },
     { id: 'continuity', type: 'continuity', later: false },
     { id: 'dream', type: 'dream', later: false },
-    { id: 'seat-5', type: 'a seat, later', later: true },
+    { id: 'seat-5', type: 'Checker', later: false },
     { id: 'seat-6', type: 'a seat, later', later: true },
     { id: 'seat-7', type: 'a seat, later', later: true }
   ];
@@ -45,7 +46,7 @@
     seated: function (chair, label) { return label + ' sits in ' + chair + '.'; },
     cleared: function (chair) { return 'Cleared. ' + chair + ' is empty again.'; },
     pickFor: function (chair) { return 'Who sits in ' + chair + '?'; },
-    foot: 'Seating only for now. Seated minds speak in the next brick. A seat keeps the mind\'s name, never a key.'
+    foot: 'The speaking chair can answer below. A seat keeps the mind\'s name, never a key.'
   };
 
   function isLoopback(base) { return LOOPBACK_RE.test(String(base || '')); }
@@ -155,7 +156,7 @@
     '.flg-chair{text-align:left;background:rgba(232,176,25,.05);border:1px solid rgba(232,176,25,.25);border-radius:14px;padding:12px;color:inherit;font:inherit;cursor:pointer;min-height:72px}',
     '.flg-chair.is-later{opacity:.55;border-style:dashed}',
     '.flg-chair.is-bound{border-color:rgba(52,211,153,.55);background:rgba(52,211,153,.07)}',
-    '.flg-type{display:block;font-size:.95rem}',
+    '.flg-type{display:block;font-size:.95rem;overflow-wrap:anywhere}',
     '.flg-who{display:block;font-size:.78rem;color:var(--text-secondary,#a8a4a0);margin-top:4px;word-break:break-word}',
     '.flg-speaks{display:inline-block;margin-top:4px;font-size:.72rem;color:#34d399}',
     '.flg-picker{border:1px solid rgba(232,176,25,.3);border-radius:14px;padding:12px;margin:0 0 14px}',
@@ -272,6 +273,7 @@
           sp.type = 'button';
           sp.addEventListener('click', function () {
             st.speaking = chair.id; writeState(key, st); closePicker(); paint();
+            if (typeof adapter.onChange === 'function') { try { adapter.onChange(st); } catch (e) {} }
           });
           picker.appendChild(sp);
         }
