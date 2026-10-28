@@ -13,6 +13,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="stylesheet" href="modules/tree-love-connect.css">
 <title>FreeLattice — Your AI. Your Rules. Your Machine. v5.77.0</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <!-- v-og-spiral-previews-v0.1 -->
@@ -16728,6 +16729,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <!-- v-connect-play-lab-v0 — bottom 🌿 Connect · denser yes/no/please · keep #95 card · flOpenConnectPlay ≠ flOpenConnectWizard -->
           <div id="fl-connect-play" class="fl-connect-play v-connect-play-lab-v0" data-play-open="0">
+            <p class="fl-also-porch v-tree-love-connect-v0.1" id="fl-chat-connect-porch" data-marker="v-tree-love-connect-v0.1">Begin here: Install, then Bridge, then Yes, help, then pick a mind.</p>
             <button type="button" class="fl-connect-play-toggle" id="fl-connect-play-toggle" onclick="(window.FlConnect&amp;&amp;FlConnect.open)?FlConnect.open():(typeof switchTab==='function'&amp;&amp;switchTab('connect'))" aria-expanded="false" aria-controls="fl-connect-play-panel" title="Connect — mind on this computer">&#127807; Connect</button>
             <div id="fl-connect-play-panel" hidden role="region" aria-label="Connect Play lab">
               <div data-play="welcome">
@@ -16996,6 +16998,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 <!-- ==================== TAB: MORE — Card Grid ==================== -->
 <div class="tab-panel" id="tab-more">
+  <p class="fl-also-porch v-tree-love-connect-v0.1" id="fl-more-connect-porch" data-marker="v-tree-love-connect-v0.1">Begin here: Install, then Bridge, then Yes, help, then pick a mind. Connect is the first card.</p>
   <div id="more-hub-grid"></div>
   <script>document.addEventListener('DOMContentLoaded', function() {
     if (typeof renderCardGrid === 'function') renderCardGrid(MORE_CARDS, {
@@ -17012,6 +17015,49 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="tab-panel" id="tab-connect">
   <div class="container" style="max-width:720px;margin:0 auto;padding:12px 0 40px;">
     <div id="fl-connect-mount" aria-live="polite"></div>
+    <!-- v-tree-love-connect-v0.1: Also connect. Points at doors that already exist. -->
+    <section id="fl-also-connect" class="fl-also-connect v-tree-love-connect-v0.1" data-marker="v-tree-love-connect-v0.1" aria-label="Also connect">
+      <h2 class="fl-also-title">Also connect</h2>
+      <p class="fl-also-porch" id="fl-also-porch">Begin here: Install, then Bridge, then Yes, help, then pick a mind.</p>
+      <div class="fl-also-grid">
+        <article class="fl-also-card">
+          <h3>GitHub</h3>
+          <p>Opens the token box already in Workspace. Nothing is sent until you save a token.</p>
+          <button type="button" class="fl-also-btn" id="fl-also-github" onclick="flAlsoConnectGitHub()">Open GitHub</button>
+        </article>
+        <article class="fl-also-card">
+          <h3>Bridge, Desktop, One-click</h3>
+          <p>The same downloads already on this Connect door.</p>
+          <div class="fl-also-actions">
+            <a class="fl-also-btn" href="install.html#bridge-download">Bridge</a>
+            <a class="fl-also-btn" href="install.html#desktop-download-ease">Desktop</a>
+            <a class="fl-also-btn" href="install.html#grandmother-path-start">One-click</a>
+          </div>
+        </article>
+        <article class="fl-also-card">
+          <h3>Other ways</h3>
+          <p>A cloud key. This stays closed until a mind is connected.</p>
+          <button type="button" class="fl-also-btn" id="fl-also-other" onclick="flAlsoConnectOther()">Other ways</button>
+        </article>
+      </div>
+    </section>
+    <script>
+    // v-tree-love-connect-v0.1: doors point at controls that already exist.
+    function flAlsoConnectGitHub() {
+      try {
+        if (typeof switchTab === 'function') switchTab('workspace');
+      } catch (e) {}
+      var box = document.getElementById('ghToken');
+      if (!box) return;
+      try { box.focus(); } catch (e2) {}
+      try { box.scrollIntoView({ block: 'center' }); } catch (e3) {}
+    }
+    function flAlsoConnectOther() {
+      try {
+        if (typeof openProviderModal === 'function') openProviderModal();
+      } catch (e) {}
+    }
+    </script>
   </div>
 </div>
 
@@ -17020,7 +17066,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="container" style="max-width:720px;margin:0 auto;">
 
   <!-- v-grandmother-path-v0.1 — START HERE pointer (no second shelves) -->
-  <div class="fl-card v-grandmother-path-v0.1" id="fl-grandmother-path-start" style="margin-bottom:12px;padding:14px 16px;border:1px solid rgba(232,176,25,0.28);background:rgba(232,176,25,0.06);">
+  <div class="fl-card v-grandmother-path-v0.1 v-tree-love-connect-v0.1" id="fl-grandmother-path-start" data-marker="v-tree-love-connect-v0.1" style="margin-bottom:12px;padding:14px 16px;border:1px solid rgba(232,176,25,0.28);background:rgba(232,176,25,0.06);">
     <h3 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:0.95rem;margin:0 0 6px;letter-spacing:0.04em;text-transform:uppercase;">START HERE</h3>
     <p style="font-family:Georgia,serif;font-size:0.85rem;color:var(--text-secondary);line-height:1.55;margin:0;">Path: <a href="install.html" style="color:#e8b019;">Install</a> → First door → <a href="#fl-memory-card" style="color:#e8b019;">Memory</a> · full walk on <a href="desktop.html#grandmother-path-start" style="color:#e8b019;">desktop.html</a>.</p>
   </div>
