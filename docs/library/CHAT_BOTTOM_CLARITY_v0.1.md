@@ -60,3 +60,5 @@ Save to my Drive appears only when Google sign-in from the existing Drive picker
 Quiet when the reply has no document.
 
 Before and after pictures at 1280 and 390 are in `docs/library/chat-bottom-055/`.
+
+The Add menu stays inside the window. On a short window it clamps or opens downward, with max-height `calc(100dvh - 24px)`, and it sits above the chat header so a click reaches Drive. The menu, the pills, and the file card are garden glass: `rgba(200, 210, 230, 0.04)` over the starfield, silver-blue borders, 12px radius. The file card icon and edge use the existing emerald token. Gold stays `--accent`. See `docs/library/GARDEN_LANGUAGE.md`.

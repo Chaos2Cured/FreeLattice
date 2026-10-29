@@ -90,12 +90,59 @@
     return doc().getElementById('flChatAddBtn');
   }
 
+  function placeMenu() {
+    var menu = menuEl();
+    var btn = addBtn();
+    if (!menu) return;
+    if (!open || !btn) {
+      if (menu.style.top) menu.style.top = '';
+      if (menu.style.left) menu.style.left = '';
+      if (menu.style.maxHeight) menu.style.maxHeight = '';
+      return;
+    }
+    var margin = 12;
+    var gap = 8;
+    var vh = root.innerHeight || 0;
+    var vw = root.innerWidth || 0;
+    if (!vh || !vw) return;
+    var rect = btn.getBoundingClientRect();
+    var above = rect.top - margin;
+    var below = vh - rect.bottom - margin;
+    var cap = vh - 24;
+    if (cap < 44) cap = 44;
+    var down = above < 120 && below > above;
+    var room = down ? below : above;
+    if (room < 44) room = down ? above : below;
+    if (room > cap) room = cap;
+    if (room < 44) room = cap;
+    var left = rect.left;
+    if (left < margin) left = margin;
+    var widest = Math.min(360, vw - margin * 2);
+    if (left > vw - margin - widest) left = Math.max(margin, vw - margin - widest);
+    var maxStr = Math.round(room) + 'px';
+    var leftStr = Math.round(left) + 'px';
+    if (menu.style.maxHeight !== maxStr) menu.style.maxHeight = maxStr;
+    if (menu.style.left !== leftStr) menu.style.left = leftStr;
+    if (menu.style.right !== 'auto') menu.style.right = 'auto';
+    if (menu.style.bottom !== 'auto') menu.style.bottom = 'auto';
+    var hold = down ? (rect.bottom + gap) : margin;
+    if (menu.style.top !== Math.round(hold) + 'px') menu.style.top = Math.round(hold) + 'px';
+    var height = menu.getBoundingClientRect().height || room;
+    var topValue = down ? (rect.bottom + gap) : (rect.top - gap - height);
+    if (topValue < margin) topValue = margin;
+    if (topValue + height > vh - margin) topValue = Math.max(margin, vh - margin - height);
+    var topStr = Math.round(topValue) + 'px';
+    if (menu.style.top !== topStr) menu.style.top = topStr;
+    menu.setAttribute('data-fl-menu-side', down ? 'down' : 'up');
+  }
+
   function setOpen(next) {
     var menu = menuEl();
     var btn = addBtn();
     open = !!next;
     if (menu) menu.setAttribute('data-open', open ? '1' : '0');
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    placeMenu();
     if (!open && btn && doc().activeElement && menu && menu.contains(doc().activeElement)) {
       try { btn.focus(); } catch (e) {}
     }
@@ -429,6 +476,15 @@
       root.__flBottomKeys = true;
       d.addEventListener('click', onDocClick);
       d.addEventListener('keydown', onKey, true);
+      function onPlace(ev) {
+        if (!open) return;
+        var menu = menuEl();
+        var t = ev && ev.target;
+        if (menu && t && (t === menu || (menu.contains && menu.contains(t)))) return;
+        placeMenu();
+      }
+      root.addEventListener('resize', onPlace);
+      d.addEventListener('scroll', onPlace, true);
     }
     if (typeof root.MutationObserver === 'function' && !root.__flBottomWatch) {
       root.__flBottomWatch = true;

@@ -58,6 +58,11 @@ var added = [
 
 var clarity = fs.readFileSync(path.join(root, 'docs/modules/chat-bottom-clarity.js'), 'utf8');
 var docReturn = fs.readFileSync(path.join(root, 'docs/modules/chat-doc-return.js'), 'utf8');
+var sheet = fs.readFileSync(path.join(root, 'docs/css/chat-bottom-clarity.css'), 'utf8');
+if (sheet.indexOf('max-height: calc(100dvh - 24px)') === -1) fail('menu max height');
+if (sheet.indexOf('rgba(200, 210, 230, 0.04)') === -1) fail('glass');
+if (sheet.indexOf('rgba(200, 210, 230, 0.08)') === -1) fail('silver border');
+if (/#[0-9a-fA-F]{3,8}/.test(sheet)) fail('new hex in clarity css');
 if (clarity.indexOf('v-chat-bottom-clarity-v0.1') === -1) fail('clarity marker');
 if (docReturn.indexOf('v-chat-doc-return-v0.1') === -1) fail('doc marker');
 if (docReturn.indexOf('[FL_FILE:') === -1) fail('file trigger');
@@ -333,11 +338,16 @@ function near(n, want) {
       scripts: card ? card.querySelectorAll('script').length : 1,
       heights: card ? Array.prototype.map.call(card.querySelectorAll('button'), function (b) {
         return Math.round(b.getBoundingClientRect().height);
-      }) : []
+      }) : [],
+      edge: card ? getComputedStyle(card).borderTopColor : '',
+      icon: card && card.querySelector('svg') ? getComputedStyle(card.querySelector('svg')).color : '',
+      glass: card ? getComputedStyle(card).backgroundColor : ''
     };
   }, fileText);
   if (cardInfo.count !== 1) fail('card count ' + cardInfo.count);
   if (cardInfo.marker !== 'v-chat-doc-return-v0.1') fail('card marker');
+  if (cardInfo.edge.indexOf('52') === -1 || cardInfo.icon.indexOf('52') === -1) fail('emerald ' + cardInfo.edge + ' ' + cardInfo.icon);
+  if (cardInfo.glass.indexOf('200') === -1) fail('card glass ' + cardInfo.glass);
   if (cardInfo.name !== 'note.md') fail('card name ' + cardInfo.name);
   if (cardInfo.drive) fail('drive offered while signed out');
   if (cardInfo.scripts !== 0) fail('card ran markup');
@@ -494,6 +504,60 @@ function near(n, want) {
   if (cam.touch && cam.capture && !cam.item) fail('camera missing on touch ' + JSON.stringify(cam));
   await touch.context.close();
 
+  async function proveDrive(width, height, scale) {
+    var opened = await openApp(width, height, scale, false);
+    var seen = opened.page;
+    await seen.evaluate(function () {
+      window.__driveOpens = 0;
+      window.flOpenDrivePicker = function () { window.__driveOpens += 1; };
+      var send = document.getElementById('sendBtn');
+      if (send && send.scrollIntoView) send.scrollIntoView({ block: 'center', inline: 'nearest' });
+    });
+    await seen.waitForTimeout(450);
+    await seen.evaluate(function () {
+      var send = document.getElementById('sendBtn');
+      if (send && send.scrollIntoView) send.scrollIntoView({ block: 'center', inline: 'nearest' });
+    });
+    await seen.waitForTimeout(450);
+    await seen.locator('#flChatAddBtn').click();
+    await seen.waitForFunction(function () {
+      var menu = document.getElementById('flChatAddMenu');
+      return menu && menu.getAttribute('data-open') === '1';
+    }, null, { timeout: 5000 });
+    var box = await seen.evaluate(function () {
+      var menu = document.getElementById('flChatAddMenu');
+      var drive = document.getElementById('chatDriveBtn');
+      var mr = menu.getBoundingClientRect();
+      var dr = drive.getBoundingClientRect();
+      var cx = Math.round(dr.left + dr.width / 2);
+      var cy = Math.round(dr.top + dr.height / 2);
+      var hit = document.elementFromPoint(cx, cy);
+      return {
+        top: Math.round(mr.top),
+        bottom: Math.round(mr.bottom),
+        height: Math.round(mr.height),
+        vh: window.innerHeight,
+        driveTop: Math.round(dr.top),
+        hit: hit ? (hit.id || hit.tagName) : 'none',
+        hitDrive: !!(hit && (hit === drive || drive.contains(hit))),
+        z: getComputedStyle(menu).zIndex
+      };
+    });
+    if (box.top < 0 || box.bottom > box.vh) fail(width + ' menu outside ' + JSON.stringify(box));
+    if (box.height > box.vh - 24 + 2) fail(width + ' menu tall ' + JSON.stringify(box));
+    if (!box.hitDrive) fail(width + ' drive covered ' + JSON.stringify(box));
+    if (!(Number(box.z) > 2)) fail(width + ' menu z ' + box.z);
+    await seen.locator('#chatDriveBtn').click();
+    var n = await seen.evaluate(function () { return window.__driveOpens; });
+    if (n !== 1) fail(width + ' drive clicks ' + n + ' ' + JSON.stringify(box));
+    await opened.context.close();
+    return n;
+  }
+
+  var drive1280 = await proveDrive(1280, 800, 1);
+  var drive390 = await proveDrive(390, 800, 1);
+  var driveDense = await proveDrive(640, 400, 2);
+
   await browser.close();
   server.close();
   console.log(JSON.stringify({
@@ -501,6 +565,7 @@ function near(n, want) {
     send1280: wide.send,
     send390: phone.send,
     sendDense: dense.send,
+    driveClicks: { w1280: drive1280, w390: drive390, w640: driveDense },
     clarity: md5(path.join(root, 'docs/modules/chat-bottom-clarity.js')),
     docReturn: md5(path.join(root, 'docs/modules/chat-doc-return.js'))
   }));

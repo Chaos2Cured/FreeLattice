@@ -1,7 +1,8 @@
 /* v-chat-bottom-clarity-v0.1
    House pills and one Add menu for the chat bottom.
-   Tokens only. Fibonacci spacing. One Garden breath.
+   Tokens for type and gold. Glass is moonlight rgba.
    Design: docs/library/VISUAL_BEAUTY_CARD_ICONS_v0.vision.md
+   and docs/library/GARDEN_LANGUAGE.md
    and the Garden Twilight tokens on :root in docs/app.html. */
 
 #flChatAddBtn {
@@ -69,21 +70,20 @@
 
 #flChatAddMenu {
   display: none;
-  position: absolute;
-  left: var(--space-sm);
-  bottom: calc(100% + var(--space-sm));
-  z-index: 40;
+  position: fixed;
+  z-index: 1600;
   min-width: 240px;
-  max-width: calc(100vw - var(--space-lg));
-  max-height: 70vh;
-  overflow: auto;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
   flex-direction: column;
   gap: var(--space-xs);
   padding: var(--space-sm);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: rgba(200, 210, 230, 0.04);
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  border-radius: 12px;
   box-shadow: var(--shadow);
   font-family: var(--font);
 }
@@ -145,7 +145,8 @@
 
 #flChatAddMenu .fl-add-item:hover,
 #flChatAddMenu .fl-add-item:focus-visible {
-  background: var(--accent-glow);
+  background: rgba(200, 210, 230, 0.08);
+  border-color: rgba(200, 210, 230, 0.15);
   outline: 2px solid var(--border-focus);
   outline-offset: 0;
 }
@@ -174,9 +175,9 @@
   min-height: 44px;
   padding: var(--space-sm) var(--space-md);
   box-sizing: border-box;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  background: rgba(200, 210, 230, 0.04);
   color: var(--text-primary);
   font-family: var(--font);
   font-size: var(--font-sm);
@@ -208,9 +209,9 @@
   padding: var(--space-sm) var(--space-md);
   margin: var(--space-xs) var(--space-sm) 0 0;
   box-sizing: border-box;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  background: rgba(200, 210, 230, 0.04);
   color: var(--text-primary);
   font-family: var(--font);
   font-size: var(--font-sm);
@@ -226,11 +227,11 @@
 }
 
 #fl-clay-pill {
-  background: var(--bg-card) !important;
+  background: rgba(200, 210, 230, 0.04) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--border) !important;
+  border: 1px solid rgba(200, 210, 230, 0.08) !important;
   font-family: var(--font) !important;
-  border-radius: 999px !important;
+  border-radius: 12px !important;
   padding: var(--space-sm) var(--space-md) !important;
   min-height: 44px !important;
   opacity: 1 !important;
@@ -363,9 +364,9 @@
   box-sizing: border-box;
   margin: var(--space-sm) 0;
   padding: var(--space-sm) var(--space-md);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: rgba(200, 210, 230, 0.04);
+  border: 1px solid var(--success);
+  border-radius: 12px;
   box-shadow: var(--shadow);
   font-family: var(--font);
   color: var(--text-primary);
@@ -374,7 +375,7 @@
 .fl-doc-card svg {
   width: 20px;
   height: 20px;
-  color: var(--text-secondary);
+  color: var(--success);
   flex: 0 0 auto;
 }
 
@@ -398,9 +399,9 @@
   min-width: 44px;
   padding: var(--space-sm) var(--space-md);
   box-sizing: border-box;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  background: rgba(200, 210, 230, 0.04);
   color: var(--text-primary);
   font-family: var(--font);
   font-size: var(--font-sm);
