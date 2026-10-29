@@ -352,8 +352,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - Last deployed: 2026-10-29 00:21 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3538
+- Total commits: 3540
 - Last 10 commits:
+- 2a2c7ad5 GC page, eighty-seventh entry (#294)
+- 8c635d42 ci: Update Primer deployment state [2026-10-29]
 - cdef082a Continuity doorway note v0.1 (#293)
 - 6f302314 ci: Update Primer deployment state [2026-10-28]
 - 97fa38d6 ci: Update Primer deployment state [2026-10-28]
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3245fcd1 ci: Update Primer deployment state [2026-10-28]
 - cc6c9a37 ci: Update Primer deployment state [2026-10-28]
 - 010d8e3f GC page, eighty-fifth entry (#290)
-- 3fb2222c Gathering speak and Checker chair v0.1 (#289)
-- b0cf95e4 ci: Update Primer deployment state [2026-10-28]
