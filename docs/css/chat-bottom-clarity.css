@@ -1,0 +1,497 @@
+/* v-chat-bottom-clarity-v0.1
+   House pills and one Add menu for the chat bottom.
+   Tokens for type and gold. Glass is moonlight rgba.
+   Design: docs/library/VISUAL_BEAUTY_CARD_ICONS_v0.vision.md
+   and docs/library/GARDEN_LANGUAGE.md
+   and the Garden Twilight tokens on :root in docs/app.html. */
+
+#flChatAddBtn {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  margin: var(--space-xs) 0 var(--space-xs) var(--space-sm);
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: var(--font-lg);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 1;
+  box-shadow: 0 0 0 1px var(--accent-glow);
+}
+
+#flChatAddBtn:hover,
+#flChatAddBtn:focus-visible {
+  background: var(--accent-glow);
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+#flChatAddBtn:active {
+  transform: scale(1.06);
+}
+
+#tab-chat .chat-input-row {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--space-sm);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#tab-chat .chat-input-row textarea {
+  min-width: 0;
+  font-family: var(--font);
+}
+
+#tab-chat .chat-input-row #sendBtn {
+  flex: 0 0 auto;
+}
+
+#tab-chat .chat-input-row [data-honest-just] {
+  margin: 0;
+  flex: 0 0 auto;
+  align-self: center;
+  opacity: 1;
+  font-family: var(--font);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+#flChatAddMenu {
+  display: none;
+  position: fixed;
+  z-index: 1600;
+  min-width: 240px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: rgba(200, 210, 230, 0.04);
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  font-family: var(--font);
+}
+
+#flChatAddMenu[data-open="1"] {
+  display: flex;
+  animation: fl-bottom-breath var(--transition-md) ease;
+}
+
+@keyframes fl-bottom-breath {
+  0% { transform: scale(1); box-shadow: var(--shadow); }
+  50% { transform: scale(1.06); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+  100% { transform: scale(1); box-shadow: var(--shadow); }
+}
+
+#flChatAddMenu .fl-add-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  text-align: left;
+  cursor: pointer;
+  opacity: 1;
+}
+
+#flChatAddMenu .fl-add-item svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+}
+
+#flChatAddMenu .fl-add-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#flChatAddMenu .fl-add-sub {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+#flChatAddMenu .fl-add-lead {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  font-weight: 600;
+}
+
+#flChatAddMenu .fl-add-item:hover,
+#flChatAddMenu .fl-add-item:focus-visible {
+  background: rgba(200, 210, 230, 0.08);
+  border-color: rgba(200, 210, 230, 0.15);
+  outline: 2px solid var(--border-focus);
+  outline-offset: 0;
+}
+
+#flChatAddMenu .fl-add-item[hidden] {
+  display: none;
+}
+
+.fl-chat-pill-row {
+  display: flex;
+  flex: 1 0 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font);
+}
+
+.fl-chat-pill-row > button,
+#fl-clay-pill,
+#fl-connect-play-toggle,
+#chatPresenceToggle,
+#chatMarketToggle {
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  background: rgba(200, 210, 230, 0.04);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  line-height: 1.2;
+  opacity: 1;
+  cursor: pointer;
+}
+
+#fl-clay-dock {
+  flex: 1 0 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-xs) var(--space-md) var(--space-sm);
+  font-family: var(--font);
+  color: var(--text-primary);
+}
+
+#fl-clay-dock p {
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+#fl-clay-dock button,
+#fl-clay-pill-panel button {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-xs) var(--space-sm) 0 0;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  background: rgba(200, 210, 230, 0.04);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  opacity: 1;
+  cursor: pointer;
+}
+
+#fl-clay-dock .fl-bottom-yes,
+#fl-clay-pill-panel .fl-bottom-yes {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+#fl-clay-pill {
+  background: rgba(200, 210, 230, 0.04) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(200, 210, 230, 0.08) !important;
+  font-family: var(--font) !important;
+  border-radius: 12px !important;
+  padding: var(--space-sm) var(--space-md) !important;
+  min-height: 44px !important;
+  opacity: 1 !important;
+}
+
+.fl-chat-calm-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-xs) var(--space-md) var(--space-sm);
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.fl-chat-calm-line > * + *::before {
+  content: " \00B7 ";
+  color: var(--text-muted);
+  font-family: var(--font);
+}
+
+.fl-box-pointer-label,
+#flBoxPointerInput,
+#flChatUpdateCheck,
+.fl-chat-search-toggle,
+.fl-chat-search-live {
+  font-family: var(--font);
+}
+
+#flBoxPointerInput {
+  min-height: 44px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+#flBoxPointerHelp {
+  flex: 1 0 100%;
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+#flBoxPointerHelp[hidden] {
+  display: none;
+}
+
+#chatOverflowBtn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  opacity: 1;
+  color: var(--text-secondary);
+  font-family: var(--font);
+}
+
+#flRadioFab:hover::after,
+#flRadioFab:focus-visible::after,
+#quickHelpBtn:hover::after,
+#quickHelpBtn:focus-visible::after,
+#musicToggle:hover::after,
+#musicToggle:focus-visible::after,
+#chatOverflowBtn:hover::after,
+#chatOverflowBtn:focus-visible::after,
+#flChatAddBtn:hover::after,
+#flChatAddBtn:focus-visible::after {
+  position: absolute;
+  z-index: 50;
+  white-space: nowrap;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  font-weight: 400;
+  line-height: 1.3;
+  opacity: 1;
+  pointer-events: none;
+}
+
+#flRadioFab:hover::after,
+#flRadioFab:focus-visible::after {
+  content: "Radio: calm background tones";
+  left: 52px;
+  bottom: var(--space-sm);
+}
+
+#quickHelpBtn:hover::after,
+#quickHelpBtn:focus-visible::after {
+  content: "Quick help";
+  right: 52px;
+  bottom: var(--space-sm);
+}
+
+#musicToggle:hover::after,
+#musicToggle:focus-visible::after {
+  content: "Ambient music";
+  right: 52px;
+  bottom: var(--space-sm);
+}
+
+#chatOverflowBtn:hover::after,
+#chatOverflowBtn:focus-visible::after {
+  content: "More";
+  right: 0;
+  bottom: 48px;
+}
+
+#flChatAddBtn:hover::after,
+#flChatAddBtn:focus-visible::after {
+  content: "Add";
+  left: 48px;
+  bottom: var(--space-xs);
+}
+
+.fl-doc-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: var(--space-sm) 0;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(200, 210, 230, 0.04);
+  border: 1px solid var(--success);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  font-family: var(--font);
+  color: var(--text-primary);
+}
+
+.fl-doc-card svg {
+  width: 20px;
+  height: 20px;
+  color: var(--success);
+  flex: 0 0 auto;
+}
+
+.fl-doc-name {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+}
+
+.fl-doc-meta {
+  margin: 0;
+  flex: 1 0 auto;
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.fl-doc-card button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--space-sm) var(--space-md);
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  background: rgba(200, 210, 230, 0.04);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  opacity: 1;
+}
+
+.fl-doc-card .fl-doc-yes {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.fl-doc-ask {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.fl-doc-ask[hidden] {
+  display: none;
+}
+
+.fl-doc-ask p,
+.fl-doc-note {
+  margin: 0;
+  flex: 1 0 100%;
+  font-family: var(--font);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  #tab-chat .chat-input-row {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 64px;
+    z-index: 40;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+  }
+  #tab-chat .chat-input-row #flChatAddBtn,
+  #tab-chat .chat-input-row [data-honest-just] {
+    order: 0;
+  }
+  #tab-chat .chat-input-row::after {
+    content: "";
+    order: 0;
+    flex: 0 0 100%;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  #tab-chat .chat-input-row textarea {
+    order: 1;
+    flex: 1 1 0%;
+    min-width: 0;
+    width: auto;
+  }
+  #tab-chat .chat-input-row #sendBtn {
+    order: 2;
+    flex: 0 0 auto;
+  }
+  #tab-chat {
+    padding-bottom: 168px;
+  }
+  #flRadioFab,
+  #quickHelpBtn,
+  #musicToggle {
+    bottom: 200px;
+  }
+  #tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages {
+    height: auto;
+    max-height: 28vh;
+    min-height: 80px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #flChatAddMenu,
+  #flChatAddMenu[data-open="1"],
+  #flChatAddBtn,
+  #flChatAddBtn:active {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}

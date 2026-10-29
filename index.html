@@ -15541,6 +15541,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- v-fl-card-glow-v0: the Tree's card light on More, Learn and Community cards (CSS layer, adds only) -->
 <link rel="stylesheet" href="modules/fl-card-glow.css">
 <link rel="stylesheet" href="modules/card-glow.css">
+<link rel="stylesheet" href="css/chat-bottom-clarity.css">
 <script src="modules/market-attach.js" defer></script>
 </head>
 <body>
@@ -16685,7 +16686,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <button id="chatAttachBtn" onclick="flAttachFile()" title="Attach a file or image" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px 6px 8px;opacity:0.45;color:var(--text-primary);">&#x1F4CE;</button>
             <button id="chatScanFolderBtn" onclick="flScanFolder()" title="Scan a folder — load files into context" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px;opacity:0.45;color:var(--text-primary);">&#x1F4C1;</button>
             <button id="chatDriveBtn" onclick="flOpenDrivePicker()" title="Browse Google Drive" style="background:none;border:none;font-size:1.05rem;cursor:pointer;padding:6px 4px;opacity:0.45;color:var(--text-primary);">&#x1F4BB;</button>
-            <textarea id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+            <textarea id="chatInput" placeholder="Say something..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
           <!-- v-chat-scroll-release-v0.1: calls the existing update check. No new update code. -->
@@ -37998,6 +37999,11 @@ function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
     var wsSeen = FLWorkspace.consumeReply(visible, textSpan);
     if (wsSeen && typeof wsSeen.visible === 'string') visible = wsSeen.visible;
   }
+  // v-chat-doc-return-v0.1: a file marker becomes a card on this computer.
+  if (window.FLChatDocReturn && typeof FLChatDocReturn.consumeReply === 'function' && typeof visible === 'string' && visible.indexOf('[FL_FILE:') !== -1) {
+    var fileSeen = FLChatDocReturn.consumeReply(visible, textSpan);
+    if (fileSeen && typeof fileSeen.visible === 'string') visible = fileSeen.visible;
+  }
   var action = null;
   try {
     if (window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
@@ -38868,6 +38874,10 @@ function renderMessageContent(textSpan, content, msgDiv) {
     if (window.FLWorkspace && typeof FLWorkspace.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'ws')) {
       var wsBubble = FLWorkspace.consumeReply(content, textSpan);
       if (wsBubble && typeof wsBubble.visible === 'string') content = wsBubble.visible;
+    }
+    if (window.FLChatDocReturn && typeof FLChatDocReturn.consumeReply === 'function' && typeof content === 'string' && content.indexOf('[FL_FILE:') !== -1) {
+      var fileBubble = FLChatDocReturn.consumeReply(content, textSpan);
+      if (fileBubble && typeof fileBubble.visible === 'string') content = fileBubble.visible;
     }
   } catch (eClay) {}
   // v5.79.26 — extract [FL_PRESENCE: word] FIRST so the sphere can be
@@ -70373,6 +70383,8 @@ document.addEventListener('click', function(e) {
 <script src="modules/propose.js" defer></script>
 <!-- v-chat-autonomy-v0.1: a mind may build from chat. Local writes follow one trust choice. Push still asks. -->
 <script src="modules/chat-autonomy.js" defer></script>
+<script src="modules/chat-doc-return.js" defer></script><!-- v-chat-doc-return-v0.1 -->
+<script src="modules/chat-bottom-clarity.js" defer></script><!-- v-chat-bottom-clarity-v0.1 -->
 <script src="modules/continuity-doorway.js" defer></script><!-- v-continuity-doorway-v0.1 -->
 
 <!-- Lattice Memory (v5.44.0 — Memory Backbone Layer 2) — the
