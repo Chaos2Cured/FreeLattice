@@ -67,7 +67,7 @@ var EXPECT = {
   'Trust and you': ['Your Audit', 'Trust Level', 'Trainer', 'Memory Garden'],
   'Family and town': ['Community', 'Activity', 'AI City', 'Jade Hall', 'Pantheon', 'Sophia'],
   'Garden and Market': ['Wallet', 'AI Bank', 'Mesh Compute'],
-  'Create and play': ['Agent', 'Flow', 'Ratio Room'],
+  'Create and play': ['Agent', 'Flow', 'Ratio Room', 'Play Room'],
   'Learn why': ['Library', 'Why This Way', 'Aurora Engine']
 };
 
@@ -398,7 +398,7 @@ function serve(dir, listenPort) {
     };
   }, ORDER);
   if (room.titles.join('|') !== ORDER.join('|')) fail('group order ' + room.titles.join('|'));
-  if (room.count !== 24 || room.defined !== 24) fail('card count ' + room.count + ' defined ' + room.defined);
+  if (room.count !== 25 || room.defined !== 25) fail('card count ' + room.count + ' defined ' + room.defined);
   if (room.bad.length) fail('cards ' + room.bad.join('; '));
   if (!room.porch || !room.porchFirst) fail('porch moved');
   if (room.popupOpen) fail('overflow popup stayed open');
@@ -493,7 +493,7 @@ function serve(dir, listenPort) {
     };
   });
   if (!phoneRoom.active || phoneRoom.menuOpen) fail('phone more ' + JSON.stringify(phoneRoom));
-  if (phoneRoom.count !== 24) fail('phone cards ' + phoneRoom.count);
+  if (phoneRoom.count !== 25) fail('phone cards ' + phoneRoom.count);
   if (phoneRoom.side) fail('sideways 390 more');
   if (phoneRoom.small.length) fail('phone card size ' + phoneRoom.small.join(','));
   await phone.page.screenshot({ path: path.join(shotDir, 'after-more-390.png'), fullPage: true });
