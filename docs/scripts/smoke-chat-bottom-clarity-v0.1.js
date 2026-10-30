@@ -347,7 +347,7 @@ function near(n, want) {
   if (cardInfo.count !== 1) fail('card count ' + cardInfo.count);
   if (cardInfo.marker !== 'v-chat-doc-return-v0.1') fail('card marker');
   if (cardInfo.edge.indexOf('52') === -1 || cardInfo.icon.indexOf('52') === -1) fail('emerald ' + cardInfo.edge + ' ' + cardInfo.icon);
-  if (cardInfo.glass.indexOf('200') === -1) fail('card glass ' + cardInfo.glass);
+  if (cardInfo.glass.indexOf('16, 18, 36') === -1 && cardInfo.glass.indexOf('16,18,36') === -1) fail('card glass ' + cardInfo.glass);
   if (cardInfo.name !== 'note.md') fail('card name ' + cardInfo.name);
   if (cardInfo.drive) fail('drive offered while signed out');
   if (cardInfo.scripts !== 0) fail('card ran markup');
