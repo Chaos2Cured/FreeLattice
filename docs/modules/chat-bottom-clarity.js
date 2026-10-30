@@ -382,14 +382,20 @@
       music.setAttribute('title', 'Ambient music');
     }
     if (more) {
-      if (more.getAttribute('aria-label') !== 'More') more.setAttribute('aria-label', 'More');
-      if (more.getAttribute('title') !== 'More') more.setAttribute('title', 'More');
+      // v-menu-contrast-v0.1: More opens the card room. The + button still opens this menu.
+      var moreLabel = 'More: every room in the Garden';
+      if (more.getAttribute('aria-label') !== moreLabel) more.setAttribute('aria-label', moreLabel);
+      if (more.getAttribute('title') !== moreLabel) more.setAttribute('title', moreLabel);
       if (!more.__flBottomAlias) {
         more.__flBottomAlias = true;
         more.addEventListener('click', function () {
-          setOpen(true);
+          var bottom = root.FLChatBottom;
+          if (bottom && bottom.moreOpensMenu) setOpen(true);
+          else if (typeof root.switchTab === 'function') {
+            try { root.switchTab('more'); } catch (eTab) {}
+          }
           if (root.FLChatOverflow && typeof root.FLChatOverflow.close === 'function') {
-            try { root.FLChatOverflow.close(); } catch (e) {}
+            try { root.FLChatOverflow.close(); } catch (eClose) {}
           }
         });
       }
@@ -517,7 +523,8 @@
     cameraOk: cameraOk,
     open: function () { setOpen(true); },
     close: closeMenu,
-    arrange: arrange
+    arrange: arrange,
+    moreOpensMenu: false
   };
   root.FLChatBottom = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
