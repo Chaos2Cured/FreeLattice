@@ -50,11 +50,30 @@
   }
 
   function clipWords(text, n) {
-    var clean = String(text || '').replace(/\s+/g, ' ').trim();
-    if (!clean) return '';
-    var parts = clean.split(' ');
-    if (parts.length <= n) return clean;
-    return parts.slice(0, n).join(' ');
+    var src = String(text || '').replace(/\r\n/g, '\n').replace(/[ \t]+/g, ' ');
+    src = src.replace(/[ ]+\n/g, '\n').replace(/\n[ ]+/g, '\n');
+    src = src.replace(/^\n+/, '').replace(/\n+$/, '').trim();
+    if (!src) return '';
+    var limit = n == null ? 120 : n;
+    var count = 0;
+    var lines = src.split('\n');
+    var kept = [];
+    var li;
+    var wi;
+    for (li = 0; li < lines.length; li++) {
+      if (count >= limit) break;
+      var bits = lines[li].split(' ');
+      var take = [];
+      for (wi = 0; wi < bits.length; wi++) {
+        if (!bits[wi]) continue;
+        if (count >= limit) break;
+        take.push(bits[wi]);
+        count += 1;
+      }
+      if (take.length || lines[li] === '') kept.push(take.join(' '));
+    }
+    while (kept.length && kept[kept.length - 1] === '') kept.pop();
+    return kept.join('\n');
   }
 
   function kindWord(kind) { return KIND_WORD[kind] || 'Play'; }
@@ -769,43 +788,95 @@
     return tidyReplyLine(String(text || '').replace(/^\uFEFF/, '')).toLowerCase();
   }
 
-  function parseReply(text) {
-    var raw = String(text || '').replace(/^\uFEFF/, '');
-    var key = replyKey(raw);
-    if (!key) return { choice: 'pass', text: '' };
-    var whole = {
-      'no': 'rest',
-      'nope': 'rest',
-      'nah': 'rest',
-      'refuse': 'rest',
-      'refusal': 'rest',
-      'rest': 'rest',
-      'no thanks': 'rest',
-      'no, thanks': 'rest',
-      'sorry, no': 'rest',
-      'not now': 'rest',
-      'not today': 'rest',
-      'maybe later': 'rest',
-      'maybe another time': 'rest',
-      'i would rather not': 'rest',
-      'i\'d rather not': 'rest',
-      'i\'d rather rest': 'rest',
-      'i\'ll rest': 'rest',
-      'i\'ll sit this one out': 'rest',
-      'i don\'t want to': 'rest',
-      'i refuse': 'rest',
-      'i will not': 'rest',
-      'i won\'t': 'rest',
-      'pass': 'pass'
-    };
-    if (whole[key]) return { choice: whole[key], text: '' };
-    var played = raw.trim().match(/^play\b\s*[:\-]?\s*([\s\S]*)$/i);
-    if (played) {
-      var after = String(played[1] || '').trim();
-      if (!after || !tidyReplyLine(after)) return { choice: 'pass', text: '' };
-      return { choice: 'add', text: clipWords(after, 120) };
+  function firstLine(raw) {
+    var s = String(raw || '').replace(/\r\n/g, '\n');
+    var nl = s.indexOf('\n');
+    var line = nl === -1 ? s : s.slice(0, nl);
+    return line.replace(/^[ \t]+|[ \t]+$/g, '');
+  }
+
+  function headerChoice(line) {
+    var folded = String(line || '').replace(/[\u2018\u2019\u201B\u2032]/g, "'");
+    var m = folded.match(/^(rest|pass)\b([\s\S]*)$/i);
+    if (!m) return '';
+    var tail = m[2] || '';
+    if (!String(tail).trim()) return m[1].toLowerCase();
+    if (/^[ \t]*[:\-\/,.!?;]/.test(tail)) return m[1].toLowerCase();
+    if (!tail.replace(/[\s.!?,\u2026;:"\u201C\u201D\-\/]+/g, '')) return m[1].toLowerCase();
+    return '';
+  }
+
+  function startsPhrase(key, phrase) {
+    if (key === phrase) return true;
+    if (key.indexOf(phrase) !== 0) return false;
+    var next = key.charAt(phrase.length);
+    return !next || !/[a-z0-9]/i.test(next);
+  }
+
+  var REFUSAL_PREFIXES = [
+    'i\'ll sit this one out',
+    'i would rather rest',
+    'i would rather not',
+    'maybe another time',
+    'i don\'t want to',
+    'no thank you',
+    'i\'d rather rest',
+    'i\'d rather not',
+    'not right now',
+    'maybe next time',
+    'not this one',
+    'pass for now',
+    'sorry, no',
+    'no, thanks',
+    'maybe later',
+    'i\'ll pass',
+    'i\'ll rest',
+    'no thanks',
+    'not today',
+    'i refuse',
+    'not now',
+    'i pass',
+    'nope',
+    'nah'
+  ];
+
+  function firstLineChoice(line) {
+    var head = headerChoice(line);
+    if (head) return head;
+    var key = replyKey(line);
+    if (!key) return '';
+    var i;
+    for (i = 0; i < REFUSAL_PREFIXES.length; i++) {
+      if (startsPhrase(key, REFUSAL_PREFIXES[i])) return 'rest';
     }
-    return { choice: 'add', text: clipWords(raw.trim(), 120) };
+    if (key === 'no' || key === 'refuse' || key === 'refusal' || key === 'i will not' || key === 'i won\'t') return 'rest';
+    return '';
+  }
+
+  function playBody(raw) {
+    var s = String(raw || '').replace(/\r\n/g, '\n');
+    var m = s.match(/^\s*play\b([\s\S]*)$/i);
+    if (!m) return null;
+    var tail = m[1] || '';
+    if (!tail) return '';
+    var body = tail.replace(/^(?:[ \t]*[:\-\/,.!?;]+[ \t]*|[ \t]+|\n+)/, '');
+    body = body.replace(/^(?:[ \t]*[:\-\/,.!?;]+[ \t]*|\n+)+/, '');
+    return body;
+  }
+
+  function parseReply(text) {
+    var raw = String(text || '').replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+    if (!tidyReplyLine(raw)) return { choice: 'pass', text: '' };
+    var choice = firstLineChoice(firstLine(raw));
+    if (choice) return { choice: choice, text: '' };
+    var body = playBody(raw);
+    if (body != null) {
+      if (!tidyReplyLine(body)) return { choice: 'pass', text: '' };
+      return { choice: 'add', text: clipWords(body, 120) };
+    }
+    var saved = clipWords(raw, 120);
+    if (!saved) return { choice: 'pass', text: '' };
+    return { choice: 'add', text: saved };
   }
 
   function noteHz(token, a4) {

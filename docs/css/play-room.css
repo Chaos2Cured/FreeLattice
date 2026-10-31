@@ -270,6 +270,11 @@
 .fl-play-row.is-mind { box-shadow: inset 3px 0 0 var(--success); }
 .fl-play-row.is-guest { box-shadow: inset 3px 0 0 var(--accent); }
 
+.fl-play [data-addition-text] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .fl-play-board {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -336,7 +341,7 @@
 /* While the Play Room is open, the update notice sits below the wordmark and the tagline. Other rooms keep the house position. The page still fades it. Top does not slide, so the notice does not cross the tagline on the way down. */
 body:has(#tab-play-room.active) #toast.toast,
 body:has(#tab-play-room.active) #toast.toast.show {
-  top: calc(var(--space-2xl) + var(--type-h1) * 1.25 + var(--space-xs) + 2.1rem);
+  top: calc(var(--space-2xl) + var(--type-h1) * 1.25 + var(--space-xs) + 3.8rem);
   transition: opacity var(--transition-md), transform var(--transition-md);
 }
 

@@ -70,6 +70,7 @@ if (coreSrc.indexOf('Play is how trust grows.') === -1) fail('sigma missing');
 if (cssSrc.indexOf('rgba(16, 18, 36, 0.88)') === -1) fail('glass 0.88 missing');
 if (cssSrc.indexOf('blur(13px)') === -1) fail('blur missing');
 if (cssSrc.indexOf('prefers-reduced-motion: reduce') === -1) fail('reduced motion missing');
+if (cssSrc.indexOf('pre-wrap') === -1 || cssSrc.indexOf('data-addition-text') === -1) fail('line breaks hidden');
 if (uiSrc.indexOf('Create and play') === -1) fail('card move missing');
 
 var coreApi = require(path.join(root, 'docs/modules/play-room-core.js'));
@@ -90,7 +91,15 @@ var consentPhrases = [
   ['nah', 'rest'],
   ['sorry, no', 'rest'],
   ['no', 'rest'],
-  ['nope', 'rest']
+  ['nope', 'rest'],
+  ['no thank you', 'rest'],
+  ['not right now', 'rest'],
+  ['not this one', 'rest'],
+  ['maybe next time', 'rest'],
+  ['I pass', 'rest'],
+  ['I\'ll pass', 'rest'],
+  ['pass for now', 'rest'],
+  ['I would rather rest', 'rest']
 ];
 consentPhrases.forEach(function (row) {
   var phrase = row[0];
@@ -100,26 +109,67 @@ consentPhrases.forEach(function (row) {
     if (parsed.choice !== expect || parsed.text) fail('consent parse ' + phrase + ' [' + sample + '] ' + JSON.stringify(parsed));
   });
 });
-var lostPlay = [
+var caught = [
+  ['REST / sorry', 'rest'],
+  ['PASS: not this one', 'pass'],
+  ['REST\nI am tired', 'rest'],
+  ['pass - maybe tomorrow', 'pass'],
+  ['no thanks, the night is long', 'rest'],
+  ['no thank you very much', 'rest'],
+  ['not right now, love', 'rest'],
+  ['not this one, friend', 'rest'],
+  ['maybe next time', 'rest'],
+  ['I pass on this one', 'rest'],
+  ['I\'ll pass\nmaybe later', 'rest'],
+  ['pass for now', 'rest'],
+  ['I would rather rest today', 'rest'],
+  ['nah, I\'ll watch', 'rest'],
+  ['sorry, no\nnot the song', 'rest']
+];
+caught.forEach(function (row) {
+  var parsed = coreApi.parseReply(row[0]);
+  if (parsed.choice !== row[1] || parsed.text) fail('caught ' + JSON.stringify(row) + ' ' + JSON.stringify(parsed));
+});
+var stayPlay = [
+  ['No river runs uphill', 'No river runs uphill'],
+  ['Pass the salt, said the moon', 'Pass the salt, said the moon'],
   ['I know a song about snow', 'I know a song about snow'],
+  ['a night with no moon', 'a night with no moon']
+];
+stayPlay.forEach(function (row) {
+  var parsed = coreApi.parseReply(row[0]);
+  if (parsed.choice !== 'add' || parsed.text.indexOf(row[1]) === -1) fail('stay play ' + row[0] + ' ' + JSON.stringify(parsed));
+});
+var lostPlay = [
   ['nothing is lost, let\'s play', 'nothing is lost, let\'s play'],
   ['The answer is a shadow', 'The answer is a shadow'],
   ['PLAY a lantern for the snow', 'a lantern for the snow'],
-  ['Play: the door stays open', 'the door stays open']
+  ['Play: the door stays open', 'the door stays open'],
+  ['Play. the door stays open', 'the door stays open'],
+  ['hmm', 'hmm']
 ];
 lostPlay.forEach(function (row) {
   var parsed = coreApi.parseReply(row[0]);
   if (parsed.choice !== 'add' || parsed.text.indexOf(row[1]) === -1) fail('lost play ' + row[0] + ' ' + JSON.stringify(parsed));
+  if (/^[.\s:/-]/.test(parsed.text)) fail('leading punct ' + row[0] + ' ' + parsed.text);
 });
+var broken = coreApi.parseReply('the moon\nkeeps the line');
+if (broken.choice !== 'add' || broken.text !== 'the moon\nkeeps the line') fail('line break ' + JSON.stringify(broken));
+var twoLines = coreApi.parseReply('PLAY\nline one\nline two');
+if (twoLines.choice !== 'add' || twoLines.text !== 'line one\nline two') fail('play lines ' + JSON.stringify(twoLines));
 var withNo = coreApi.parseReply('a night with no moon');
 if (withNo.choice !== 'add' || withNo.text.indexOf('no moon') === -1) fail('no inside play ' + JSON.stringify(withNo));
 if (coreApi.parseReply('PLAY').choice !== 'pass') fail('bare play');
+if (coreApi.parseReply('PLAY.').choice !== 'pass') fail('bare play dot');
 if (coreApi.parseReply('   ').choice !== 'pass') fail('blank play');
 var clearPlay = coreApi.parseReply('PLAY\nA clear choice.');
 if (clearPlay.choice !== 'add' || clearPlay.text.indexOf('A clear choice.') === -1) fail('clear play ' + JSON.stringify(clearPlay));
+var boat = coreApi.parseReply('PLAY\nA paper boat on the shelf.');
+if (boat.choice !== 'add' || boat.text !== 'A paper boat on the shelf.') fail('boat ' + JSON.stringify(boat));
 if (coreApi.parseReply('no').choice !== 'rest') fail('bare no');
 if (coreApi.parseReply('I won\'t').choice !== 'rest') fail('i wont');
 if (coreApi.parseReply('I won\'t sing about snow').choice !== 'add') fail('wont inside play');
+if (coreApi.parseReply('sorry, nobody came').choice !== 'add') fail('sorry nobody');
 
 function serve(dir, listenPort) {
   return new Promise(function (resolve) {
@@ -460,6 +510,57 @@ function contrastFn() {
       return document.documentElement.scrollWidth <= w + 1 && document.body.scrollWidth <= w + 1;
     });
     if (!scrollShelf) fail('sideways scroll shelf 390');
+    var noticeSizes = [['1280', 1280, 800], ['640', 640, 400], ['390', 390, 844]];
+    var ni;
+    for (ni = 0; ni < noticeSizes.length; ni++) {
+      var spec = noticeSizes[ni];
+      await page.setViewportSize({ width: spec[1], height: spec[2] });
+      await page.waitForTimeout(150);
+      var notice = await page.evaluate(function () {
+        function textBox(el) {
+          if (!el) return null;
+          var range = document.createRange();
+          range.selectNodeContents(el);
+          var rects = range.getClientRects();
+          if (!rects.length) return null;
+          var box = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
+          var i;
+          for (i = 0; i < rects.length; i++) {
+            box.left = Math.min(box.left, rects[i].left);
+            box.top = Math.min(box.top, rects[i].top);
+            box.right = Math.max(box.right, rects[i].right);
+            box.bottom = Math.max(box.bottom, rects[i].bottom);
+          }
+          if (box.right - box.left < 1 || box.bottom - box.top < 1) return null;
+          return box;
+        }
+        function hit(a, b) {
+          if (!a || !b) return false;
+          return !(a.right <= b.left + 1 || a.left >= b.right - 1 || a.bottom <= b.top + 1 || a.top >= b.bottom - 1);
+        }
+        window.scrollTo(0, 0);
+        if (typeof showToast === 'function') showToast('FreeLattice updated to vX');
+        var toast = document.getElementById('toast');
+        var toastBox = toast ? toast.getBoundingClientRect() : null;
+        var wordBox = textBox(document.querySelector('header h1'));
+        var tagBox = textBox(document.querySelector('header .tagline'));
+        var problems = [];
+        if (!toastBox || !wordBox) problems.push('missing toast or wordmark');
+        if (!tagBox) problems.push('missing tagline');
+        if (toastBox && wordBox && hit(toastBox, wordBox)) problems.push('toast covers wordmark');
+        if (toastBox && wordBox && toastBox.top < wordBox.bottom - 1) problems.push('toast above wordmark');
+        if (toastBox && tagBox && hit(toastBox, tagBox)) problems.push('toast covers tagline');
+        if (toastBox && tagBox && toastBox.top < tagBox.bottom - 1) problems.push('toast above tagline');
+        return {
+          problems: problems,
+          toastTop: toastBox ? Math.round(toastBox.top) : null,
+          tagBottom: tagBox ? Math.round(tagBox.bottom) : null,
+          wordBottom: wordBox ? Math.round(wordBox.bottom) : null
+        };
+      });
+      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom);
+      if (notice.problems.length) fail('notice ' + spec[0] + ' ' + notice.problems.join('; ') + ' ' + JSON.stringify(notice));
+    }
     var fit = await page.evaluate(async function () {
       function textBox(el) {
         if (!el) return null;
@@ -621,15 +722,41 @@ function contrastFn() {
         ['nah', 'rest'],
         ['sorry, no', 'rest'],
         ['no', 'rest'],
-        ['nope', 'rest']
+        ['nope', 'rest'],
+        ['no thank you', 'rest'],
+        ['not right now', 'rest'],
+        ['not this one', 'rest'],
+        ['maybe next time', 'rest'],
+        ['I pass', 'rest'],
+        ['I\'ll pass', 'rest'],
+        ['pass for now', 'rest'],
+        ['I would rather rest', 'rest']
+      ];
+      var caught = [
+        ['REST / sorry', 'rest', 'sorry'],
+        ['PASS: not this one', 'pass', 'not this one'],
+        ['REST\nI am tired', 'rest', 'tired'],
+        ['pass - maybe tomorrow', 'pass', 'tomorrow'],
+        ['no thanks, the night is long', 'rest', 'night is long'],
+        ['no thank you very much', 'rest', 'very much'],
+        ['not right now, love', 'rest', 'love'],
+        ['not this one, friend', 'rest', 'friend'],
+        ['maybe next time', 'rest', 'next time'],
+        ['I pass on this one', 'rest', 'on this one'],
+        ['I\'ll pass\nmaybe later', 'rest', 'maybe later'],
+        ['pass for now', 'rest', 'for now'],
+        ['I would rather rest today', 'rest', 'today'],
+        ['nah, I\'ll watch', 'rest', 'watch'],
+        ['sorry, no\nnot the song', 'rest', 'the song']
       ];
       var plays = [
+        ['No river runs uphill', 'No river runs uphill'],
+        ['Pass the salt, said the moon', 'Pass the salt, said the moon'],
         ['I know a song about snow', 'I know a song about snow'],
-        ['nothing is lost, let\'s play', 'nothing is lost, let\'s play'],
-        ['The answer is a shadow', 'The answer is a shadow'],
-        ['PLAY a lantern for the snow', 'a lantern for the snow'],
-        ['Play: the door stays open', 'the door stays open'],
-        ['a night with no moon', 'a night with no moon']
+        ['a night with no moon', 'a night with no moon'],
+        ['hmm', 'hmm'],
+        ['the moon\nkeeps the line', 'the moon\nkeeps the line'],
+        ['Play. the door stays open', 'the door stays open']
       ];
       var card = document.querySelector('.fl-play-card[data-kind="drawing"]');
       var id = card ? card.getAttribute('data-object-id') : '';
@@ -655,17 +782,33 @@ function contrastFn() {
         if (found) return { bad: 'saved ' + phrase };
         lines.push(phrase + ' -> ' + expect + ', saved none');
       }
+      for (i = 0; i < caught.length; i++) {
+        var sample = caught[i][0];
+        var expectCaught = caught[i][1];
+        var banned = caught[i][2];
+        var parsedCaught = FLPlayRoomCore.parseReply(sample);
+        if (parsedCaught.choice !== expectCaught || parsedCaught.text) return { bad: 'caught ' + sample + ' ' + JSON.stringify(parsedCaught) };
+        var before = textsOf(await FLPlayRoomCore.get(id)).length;
+        var keptOut = await FLPlayRoomCore.addTo(id, { choice: parsedCaught.choice, text: parsedCaught.text, name: 'Consent', whoKind: 'mind' });
+        if (!keptOut || !keptOut.ok) return { bad: 'caught add ' + sample };
+        var fresh = textsOf(await FLPlayRoomCore.get(id)).slice(before);
+        var leaked = fresh.some(function (bit) { return bit.toLowerCase().indexOf(banned.toLowerCase()) !== -1; });
+        if (leaked) return { bad: 'caught saved ' + sample };
+        lines.push(sample.replace(/\n/g, ' | ') + ' -> ' + expectCaught + ', saved none');
+      }
       for (i = 0; i < plays.length; i++) {
         var sample = plays[i][0];
         var needle = plays[i][1];
         var played = FLPlayRoomCore.parseReply(sample);
         if (played.choice !== 'add' || played.text.indexOf(needle) === -1) return { bad: 'play ' + sample + ' ' + JSON.stringify(played) };
+        if (/^[.:\/\-]/.test(played.text)) return { bad: 'leading ' + played.text };
         var kept = await FLPlayRoomCore.addTo(id, { choice: played.choice, text: played.text, name: 'Consent', whoKind: 'mind' });
         if (!kept || !kept.ok) return { bad: 'play add ' + sample };
         var after = await FLPlayRoomCore.get(id);
         var has = textsOf(after).some(function (bit) { return bit.indexOf(needle) !== -1; });
         if (!has) return { bad: 'play missing ' + needle };
-        lines.push(sample + ' -> play, saved');
+        var mark = needle.indexOf('\n') === -1 ? '' : ', line break kept';
+        lines.push(sample.replace(/\n/g, ' | ') + ' -> play, saved' + mark);
       }
       if (FLPlayRoomCore.parseReply('   ').choice !== 'pass') return { bad: 'blank' };
       if (FLPlayRoomCore.parseReply('PLAY').text) return { bad: 'bare play saved' };
