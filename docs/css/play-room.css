@@ -349,7 +349,13 @@ body:has(#tab-play-room.active) #toast.toast.show {
 @media (max-width: 600px) {
   body:has(#tab-play-room.active) #toast.toast,
   body:has(#tab-play-room.active) #toast.toast.show {
-    bottom: calc(200px + 3.25rem);
+    /* One line, under the welcome line and above the leave buttons. */
+    bottom: calc(100vh - 419px);
+    width: auto;
+    max-width: calc(100vw - 24px);
+    padding: 8px 12px;
+    line-height: 1.2;
+    white-space: nowrap;
   }
 }
 

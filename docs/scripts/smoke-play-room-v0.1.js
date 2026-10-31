@@ -144,7 +144,18 @@ var caught = [
   ['I pass on this one', 'rest', 'on this one'],
   ['PASS / reason', 'pass', 'reason'],
   ['nah, I\'ll watch', 'rest', 'watch'],
-  ['pass - maybe tomorrow', 'pass', 'tomorrow']
+  ['pass - maybe tomorrow', 'pass', 'tomorrow'],
+  ['Pass: tired tonight', 'pass', 'tonight'],
+  ['no thanks, I will just listen', 'rest', 'listen'],
+  ['nope, I\'ll sit with you instead', 'rest', 'instead'],
+  ['Not now, I\'m tired', 'rest', 'tired'],
+  ['no, I would rather watch', 'rest', 'watch'],
+  ['No thanks, I am listening', 'rest', 'listening'],
+  ['Not now, I am tired', 'rest', 'tired'],
+  ['no thanks, I\'ll just listen', 'rest', 'listen'],
+  ['no, I\'d rather watch', 'rest', 'watch'],
+  ['nope, I will sit with you instead', 'rest', 'instead'],
+  ['Pass tonight', 'pass', 'tonight']
 ];
 caught.forEach(function (row) {
   var parsed = coreApi.parseReply(row[0]);
@@ -163,6 +174,7 @@ var stayPlay = [
   ['Pass the salt, said the moon', 'Pass the salt, said the moon'],
   ['no thanks, the night is long', 'no thanks, the night is long'],
   ['maybe later, the hour is late', 'maybe later, the hour is late'],
+  ['the hour is late', 'the hour is late'],
   ['Not now. Not ever. Only the moon, always.', 'Not now. Not ever. Only the moon, always.'],
   ['No: a candle', 'No: a candle'],
   ['Pass, said the river, and ran on', 'Pass, said the river, and ran on'],
@@ -209,6 +221,9 @@ if (coreApi.parseReply('no').choice !== 'rest') fail('bare no');
 if (coreApi.parseReply('I won\'t').choice !== 'rest') fail('i wont');
 if (coreApi.parseReply('I won\'t sing about snow').choice !== 'add') fail('wont inside play');
 if (coreApi.parseReply('sorry, nobody came').choice !== 'add') fail('sorry nobody');
+if (coreApi.parseReply('tired').choice !== 'add') fail('bare tired');
+if (coreApi.parseReply('tonight').choice !== 'add') fail('bare tonight');
+if (coreApi.parseReply('reason').choice !== 'add') fail('bare reason');
 
 function serve(dir, listenPort) {
   return new Promise(function (resolve) {
@@ -618,6 +633,13 @@ function contrastFn() {
         var corners = ['#flRadioFab', '#quickHelpBtn', '#musicToggle'].map(function (sel) {
           return elBox(document.querySelector(sel));
         });
+        var drawBox = elBox(document.getElementById('fl-play-leave-drawing'));
+        var leaveBoxes = ['#fl-play-leave-puzzle', '#fl-play-leave-poem', '#fl-play-leave-song', '#fl-play-leave-riddle', '#fl-play-leave-drawing'].map(function (sel) {
+          return elBox(document.querySelector(sel));
+        });
+        var introBox = textBox(document.querySelector('.fl-play-intro'));
+        var shelfNote = document.querySelector('#fl-play-shelf .fl-play-note');
+        var shelfBox = elBox(shelfNote);
         var problems = [];
         if (!toastBox || !wordBox) problems.push('missing toast or wordmark');
         if (!tagBox) problems.push('missing tagline');
@@ -641,6 +663,15 @@ function contrastFn() {
         corners.forEach(function (button, index) {
           if (hit(toastBox, button)) problems.push('toast covers corner ' + index);
         });
+        if (window.innerWidth <= 400) {
+          if (!drawBox) problems.push('missing drawing prompt');
+          if (toastBox && introBox && hit(toastBox, introBox)) problems.push('toast covers welcome');
+          leaveBoxes.forEach(function (button, index) {
+            if (hit(toastBox, button)) problems.push('toast covers leave ' + index);
+          });
+          if (toastBox && drawBox && (hit(toastBox, drawBox) || toastBox.bottom > drawBox.top + 1)) problems.push('toast not above drawing prompt');
+          if (toastBox && shelfBox && (hit(toastBox, shelfBox) || toastBox.bottom > shelfBox.top + 1)) problems.push('toast not above empty shelf');
+        }
         return {
           problems: problems,
           toastTop: toastBox ? Math.round(toastBox.top) : null,
@@ -653,11 +684,13 @@ function contrastFn() {
           row: roundBox(rowBox),
           nav: roundBox(navBox),
           heading: roundBox(headingBox),
+          draw: roundBox(drawBox),
+          shelf: roundBox(shelfBox),
           corners: corners.map(roundBox),
           pillText: pillText.replace(/\s+/g, ' ').trim()
         };
       });
-      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + '-' + notice.toastBottom + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom + ' pill ' + notice.pillTop + '-' + notice.pillBottom + ' send ' + (notice.send ? notice.send.top + '-' + notice.send.bottom : 'none') + ' row ' + (notice.row ? notice.row.top + '-' + notice.row.bottom : 'none') + ' ' + notice.pillText);
+      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + '-' + notice.toastBottom + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom + ' pill ' + notice.pillTop + '-' + notice.pillBottom + ' send ' + (notice.send ? notice.send.top + '-' + notice.send.bottom : 'none') + ' row ' + (notice.row ? notice.row.top + '-' + notice.row.bottom : 'none') + ' draw ' + (notice.draw ? notice.draw.top + '-' + notice.draw.bottom : 'none') + ' shelf ' + (notice.shelf ? notice.shelf.top + '-' + notice.shelf.bottom : 'none') + ' ' + notice.pillText);
       if (notice.problems.length) fail('notice ' + spec[0] + ' ' + notice.problems.join('; ') + ' ' + JSON.stringify(notice));
     }
     var fit = await page.evaluate(async function () {

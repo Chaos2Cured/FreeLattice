@@ -816,24 +816,38 @@
   ];
 
   var STRIP_PHRASES = [
+    'i will sit with you instead',
+    'ill sit with you instead',
+    'i will just listen',
+    'i would rather watch',
+    'sit with you instead',
     'my lantern is low',
+    'i am listening',
+    'ill just listen',
+    'id rather watch',
     'maybe another time',
     'maybe next time',
     'not right now',
+    'i am tired',
     'on this one',
+    'tired tonight',
     'maybe tomorrow',
+    'im listening',
+    'rather watch',
     'maybe later',
+    'just listen',
     'too sleepy',
     'ill watch',
-    'just listen',
     'thank you',
     'this time',
     'long day',
     'this one',
     'right now',
+    'im tired',
     'for now',
     'not now',
     'im good',
+    'tonight',
     'reason',
     'tired',
     'today',
@@ -903,6 +917,10 @@
     return WHOLE_LINE_CHOICE[key];
   }
 
+  var REASON_ONLY = STRIP_PHRASES.filter(function (phrase) {
+    return !Object.prototype.hasOwnProperty.call(WHOLE_LINE_CHOICE, phrase);
+  });
+
   var REFUSAL_BITS = Object.keys(WHOLE_LINE_CHOICE).map(function (key) {
     return key.split(' ');
   }).sort(function (a, b) {
@@ -933,7 +951,8 @@
     return walk(0) ? 'rest' : '';
   }
 
-  // Exact line, then polite words, then short reasons.
+  // Exact line, then polite words, then reasons that are not refusal lines, then the full strip.
+  // "not now, im tired" stays "not now" before "not now" is removed.
   // "ill sit this one out" matches before "this one" is removed.
   // "not right now" becomes "not" before that whole phrase is removed.
   function firstLineChoice(line) {
@@ -942,6 +961,8 @@
     var widened;
     if (exact) return exact;
     exact = choiceForRemainder(stripPhrases(key, POLITE_PHRASES));
+    if (exact) return exact;
+    exact = choiceForRemainder(stripPhrases(key, REASON_ONLY));
     if (exact) return exact;
     widened = stripPhrases(key, STRIP_PHRASES);
     exact = choiceForRemainder(widened);
