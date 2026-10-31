@@ -136,7 +136,15 @@ var caught = [
   ['I\'ll pass\nmaybe later', 'rest', 'maybe later'],
   ['pass for now', 'pass', 'for now'],
   ['I would rather rest today', 'rest', 'today'],
-  ['sorry, no\nnot the song', 'rest', 'the song']
+  ['sorry, no\nnot the song', 'rest', 'the song'],
+  ['No thanks, maybe later', 'rest', 'maybe later'],
+  ['No thanks maybe later', 'rest', 'maybe later'],
+  ['REST - tired', 'rest', 'tired'],
+  ['PASS - not now', 'pass', 'not now'],
+  ['I pass on this one', 'rest', 'on this one'],
+  ['PASS / reason', 'pass', 'reason'],
+  ['nah, I\'ll watch', 'rest', 'watch'],
+  ['pass - maybe tomorrow', 'pass', 'tomorrow']
 ];
 caught.forEach(function (row) {
   var parsed = coreApi.parseReply(row[0]);
@@ -153,11 +161,12 @@ var stayPlay = [
   ['I refuse to stop singing', 'I refuse to stop singing'],
   ['No river runs uphill', 'No river runs uphill'],
   ['Pass the salt, said the moon', 'Pass the salt, said the moon'],
-  ['pass - maybe tomorrow', 'pass - maybe tomorrow'],
   ['no thanks, the night is long', 'no thanks, the night is long'],
+  ['maybe later, the hour is late', 'maybe later, the hour is late'],
+  ['Not now. Not ever. Only the moon, always.', 'Not now. Not ever. Only the moon, always.'],
+  ['No: a candle', 'No: a candle'],
+  ['Pass, said the river, and ran on', 'Pass, said the river, and ran on'],
   ['no thank you very much', 'no thank you very much'],
-  ['I pass on this one', 'I pass on this one'],
-  ['nah, I\'ll watch', 'nah, I\'ll watch'],
   ['I know a song about snow', 'I know a song about snow'],
   ['a night with no moon', 'a night with no moon']
 ];
@@ -555,7 +564,7 @@ function contrastFn() {
       var spec = noticeSizes[ni];
       await page.setViewportSize({ width: spec[1], height: spec[2] });
       await page.waitForTimeout(150);
-      var notice = await page.evaluate(function () {
+      var notice = await page.evaluate(async function () {
         function textBox(el) {
           if (!el) return null;
           var range = document.createRange();
@@ -583,18 +592,39 @@ function contrastFn() {
           if (r.width < 1 || r.height < 1) return null;
           return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
         }
+        function roundBox(box) {
+          if (!box) return null;
+          return { top: Math.round(box.top), bottom: Math.round(box.bottom), left: Math.round(box.left), right: Math.round(box.right) };
+        }
+        if (typeof switchTab === 'function') switchTab('chat');
+        await new Promise(function (resolve) { setTimeout(resolve, 400); });
+        window.scrollTo(0, 0);
+        var sendBox = elBox(document.getElementById('sendBtn'));
+        var rowBox = elBox(document.querySelector('#tab-chat .chat-input-row'));
+        if (typeof switchTab === 'function') switchTab('play-room');
+        await new Promise(function (resolve) { setTimeout(resolve, 50); });
         window.scrollTo(0, 0);
         if (typeof showToast === 'function') showToast('FreeLattice updated to vX');
+        await new Promise(function (resolve) { setTimeout(resolve, 400); });
         var toast = document.getElementById('toast');
         var toastBox = toast ? toast.getBoundingClientRect() : null;
         var wordBox = textBox(document.querySelector('header h1'));
         var tagBox = textBox(document.querySelector('header .tagline'));
+        var navBox = elBox(document.getElementById('flTabNav')) || elBox(document.getElementById('flMobileNav'));
+        var headingBox = textBox(document.querySelector('.fl-play-heading'));
         var pill = document.getElementById('latticePointsBadge');
         var pillBox = elBox(pill);
         var pillText = pill ? (pill.textContent || '') : '';
+        var corners = ['#flRadioFab', '#quickHelpBtn', '#musicToggle'].map(function (sel) {
+          return elBox(document.querySelector(sel));
+        });
         var problems = [];
         if (!toastBox || !wordBox) problems.push('missing toast or wordmark');
         if (!tagBox) problems.push('missing tagline');
+        if (!navBox) problems.push('missing tab bar');
+        if (!headingBox) problems.push('missing heading');
+        if (!sendBox) problems.push('missing send');
+        if (!rowBox) problems.push('missing chat bar');
         if (!pill || pill.style.display === 'none' || !pillBox) problems.push('pill hidden');
         if (pillText.indexOf('LP') === -1 || pillText.indexOf('Ember') === -1) problems.push('pill not ember ' + pillText);
         if (toastBox && wordBox && hit(toastBox, wordBox)) problems.push('toast covers wordmark');
@@ -603,17 +633,31 @@ function contrastFn() {
         if (toastBox && tagBox && toastBox.top < tagBox.bottom - 1) problems.push('toast above tagline');
         if (toastBox && pillBox && hit(toastBox, pillBox)) problems.push('toast covers pill');
         if (toastBox && pillBox && toastBox.top < pillBox.bottom - 1) problems.push('toast above pill');
+        if (toastBox && navBox && hit(toastBox, navBox)) problems.push('toast covers tab bar');
+        if (toastBox && headingBox && hit(toastBox, headingBox)) problems.push('toast covers heading');
+        if (toastBox && sendBox && hit(toastBox, sendBox)) problems.push('toast covers send');
+        if (toastBox && rowBox && hit(toastBox, rowBox)) problems.push('toast covers chat bar');
+        if (toastBox && sendBox && toastBox.top >= sendBox.bottom - 1) problems.push('toast below send');
+        corners.forEach(function (button, index) {
+          if (hit(toastBox, button)) problems.push('toast covers corner ' + index);
+        });
         return {
           problems: problems,
           toastTop: toastBox ? Math.round(toastBox.top) : null,
+          toastBottom: toastBox ? Math.round(toastBox.bottom) : null,
           tagBottom: tagBox ? Math.round(tagBox.bottom) : null,
           wordBottom: wordBox ? Math.round(wordBox.bottom) : null,
           pillTop: pillBox ? Math.round(pillBox.top) : null,
           pillBottom: pillBox ? Math.round(pillBox.bottom) : null,
+          send: roundBox(sendBox),
+          row: roundBox(rowBox),
+          nav: roundBox(navBox),
+          heading: roundBox(headingBox),
+          corners: corners.map(roundBox),
           pillText: pillText.replace(/\s+/g, ' ').trim()
         };
       });
-      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom + ' pill ' + notice.pillTop + '-' + notice.pillBottom + ' ' + notice.pillText);
+      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + '-' + notice.toastBottom + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom + ' pill ' + notice.pillTop + '-' + notice.pillBottom + ' send ' + (notice.send ? notice.send.top + '-' + notice.send.bottom : 'none') + ' row ' + (notice.row ? notice.row.top + '-' + notice.row.bottom : 'none') + ' ' + notice.pillText);
       if (notice.problems.length) fail('notice ' + spec[0] + ' ' + notice.problems.join('; ') + ' ' + JSON.stringify(notice));
     }
     var fit = await page.evaluate(async function () {
@@ -640,6 +684,7 @@ function contrastFn() {
       }
       window.scrollTo(0, 0);
       if (typeof showToast === 'function') showToast('FreeLattice updated to vX');
+      await new Promise(function (resolve) { setTimeout(resolve, 400); });
       var toast = document.getElementById('toast');
       var toastBox = toast ? toast.getBoundingClientRect() : null;
       var wordBox = textBox(document.querySelector('header h1'));
@@ -1044,7 +1089,10 @@ function contrastFn() {
 
     var quiet = await page.evaluate(async function () {
       var before = localStorage.getItem('fl_play_ledger_v0');
-      if (typeof switchTab === 'function') switchTab('quiet');
+      var panel = document.getElementById('tab-quiet');
+      if (!panel || panel.classList.contains('active')) return { reason: 'opened', reads: 0, same: false, active: true };
+      var prior = window.QuietRoom;
+      window.QuietRoom = { isActive: function () { return true; } };
       var reads = 0;
       var orig = localStorage.getItem.bind(localStorage);
       localStorage.getItem = function (key) {
@@ -1053,9 +1101,12 @@ function contrastFn() {
       };
       var res = await FLPlayRoomCore.createObject({ kind: 'poem', title: 'Shh', body: 'Nothing here.', makerName: 'You' });
       var same = orig('fl_play_ledger_v0') === before;
-      return { reason: res && res.reason, reads: reads, same: same, active: document.getElementById('tab-quiet').classList.contains('active') };
+      localStorage.getItem = orig;
+      if (prior === undefined) delete window.QuietRoom;
+      else window.QuietRoom = prior;
+      return { reason: res && res.reason, reads: reads, same: same, active: panel.classList.contains('active') };
     });
-    if (!quiet.active) fail('quiet tab not active');
+    if (quiet.active) fail('quiet tab opened');
     if (quiet.reason !== 'quiet') fail('quiet reason ' + quiet.reason);
     if (quiet.reads !== 0) fail('quiet reads ' + quiet.reads);
     if (!quiet.same) fail('quiet wrote the ledger');

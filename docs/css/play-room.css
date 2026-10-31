@@ -338,17 +338,34 @@
   }
 }
 
-/* While the Play Room is open, the update notice sits below the wordmark, the tagline, and the LP pill. Other rooms keep the house position. The page still fades it. Top does not slide, so the notice does not cross the header on the way down. */
+/* While the Play Room is open, the update notice sits at the bottom, above the chat bar and clear of Send. Other rooms keep the house position. The page still fades it. Top does not slide, so the notice does not cross the header. */
 body:has(#tab-play-room.active) #toast.toast,
 body:has(#tab-play-room.active) #toast.toast.show {
-  top: calc(var(--space-2xl) + var(--type-h1) * 1.25 + var(--space-xs) + 10.5rem);
+  top: auto;
+  bottom: 4.5rem;
   transition: opacity var(--transition-md), transform var(--transition-md);
 }
 
 @media (max-width: 600px) {
   body:has(#tab-play-room.active) #toast.toast,
   body:has(#tab-play-room.active) #toast.toast.show {
-    top: calc(var(--space-2xl) + var(--type-h2) * 1.3 + var(--space-xs) + 8.8rem);
+    bottom: calc(200px + 3.25rem);
+  }
+}
+
+/* At 640 by 400 the header, the tab bar, and the heading fill the width. The notice sits at the bottom right, beside the heading and clear of Send. */
+@media (max-height: 420px) and (min-width: 601px) {
+  body:has(#tab-play-room.active) #toast.toast,
+  body:has(#tab-play-room.active) #toast.toast.show {
+    top: auto;
+    bottom: 0.25rem;
+    left: auto;
+    right: 8.5rem;
+    width: auto;
+    max-width: 16rem;
+    padding: 8px 12px;
+    line-height: 1.2;
+    transform: none;
   }
 }
 

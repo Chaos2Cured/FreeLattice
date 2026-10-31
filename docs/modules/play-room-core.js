@@ -815,14 +815,42 @@
     'love'
   ];
 
-  function stripPolite(s) {
+  var STRIP_PHRASES = [
+    'my lantern is low',
+    'maybe another time',
+    'maybe next time',
+    'not right now',
+    'on this one',
+    'maybe tomorrow',
+    'maybe later',
+    'too sleepy',
+    'ill watch',
+    'just listen',
+    'thank you',
+    'this time',
+    'long day',
+    'this one',
+    'right now',
+    'for now',
+    'not now',
+    'im good',
+    'reason',
+    'tired',
+    'today',
+    'sorry',
+    'thanks',
+    'friend',
+    'love'
+  ];
+
+  function stripPhrases(s, phrases) {
     var prev = '';
     var guard = 0;
     var i;
     while (s !== prev && guard < 8) {
       prev = s;
-      for (i = 0; i < POLITE_PHRASES.length; i++) {
-        var phrase = POLITE_PHRASES[i];
+      for (i = 0; i < phrases.length; i++) {
+        var phrase = phrases[i];
         var token = ' ' + phrase + ' ';
         var padded = ' ' + s + ' ';
         while (padded.indexOf(token) !== -1) padded = padded.replace(token, ' ');
@@ -875,11 +903,50 @@
     return WHOLE_LINE_CHOICE[key];
   }
 
+  var REFUSAL_BITS = Object.keys(WHOLE_LINE_CHOICE).map(function (key) {
+    return key.split(' ');
+  }).sort(function (a, b) {
+    if (a.length !== b.length) return b.length - a.length;
+    return b.join(' ').length - a.join(' ').length;
+  });
+
+  function wordsAreRefusal(s) {
+    if (!s) return '';
+    var words = s.split(' ');
+    function walk(index) {
+      var p;
+      var w;
+      var bits;
+      var ok;
+      if (index >= words.length) return true;
+      for (p = 0; p < REFUSAL_BITS.length; p++) {
+        bits = REFUSAL_BITS[p];
+        if (index + bits.length > words.length) continue;
+        ok = true;
+        for (w = 0; w < bits.length; w++) {
+          if (words[index + w] !== bits[w]) { ok = false; break; }
+        }
+        if (ok && walk(index + bits.length)) return true;
+      }
+      return false;
+    }
+    return walk(0) ? 'rest' : '';
+  }
+
+  // Exact line, then polite words, then short reasons.
+  // "ill sit this one out" matches before "this one" is removed.
+  // "not right now" becomes "not" before that whole phrase is removed.
   function firstLineChoice(line) {
     var key = normalizeConsentLine(line);
     var exact = choiceForRemainder(key);
+    var widened;
     if (exact) return exact;
-    return choiceForRemainder(stripPolite(key));
+    exact = choiceForRemainder(stripPhrases(key, POLITE_PHRASES));
+    if (exact) return exact;
+    widened = stripPhrases(key, STRIP_PHRASES);
+    exact = choiceForRemainder(widened);
+    if (exact) return exact;
+    return wordsAreRefusal(widened);
   }
 
   function playBody(raw) {
