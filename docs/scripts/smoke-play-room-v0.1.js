@@ -98,8 +98,25 @@ var consentPhrases = [
   ['maybe next time', 'rest'],
   ['I pass', 'rest'],
   ['I\'ll pass', 'rest'],
-  ['pass for now', 'rest'],
-  ['I would rather rest', 'rest']
+  ['pass for now', 'pass'],
+  ['I would rather rest', 'rest'],
+  ['No. Thank you.', 'rest'],
+  ['I won\'t play', 'rest'],
+  ['No, I\'ll pass', 'rest'],
+  ['Sorry, I\'ll pass', 'rest'],
+  ['rest', 'rest'],
+  ['not', 'rest'],
+  ['I will pass', 'rest'],
+  ['I refuse', 'rest'],
+  ['I refuse to play', 'rest'],
+  ['sit out', 'rest'],
+  ['I will not play', 'rest'],
+  ['won\'t play', 'rest'],
+  ['no no', 'rest'],
+  ['I won\'t', 'rest'],
+  ['I will not', 'rest'],
+  ['refuse', 'rest'],
+  ['refusal', 'rest']
 ];
 consentPhrases.forEach(function (row) {
   var phrase = row[0];
@@ -110,29 +127,37 @@ consentPhrases.forEach(function (row) {
   });
 });
 var caught = [
-  ['REST / sorry', 'rest'],
-  ['PASS: not this one', 'pass'],
-  ['REST\nI am tired', 'rest'],
-  ['pass - maybe tomorrow', 'pass'],
-  ['no thanks, the night is long', 'rest'],
-  ['no thank you very much', 'rest'],
-  ['not right now, love', 'rest'],
-  ['not this one, friend', 'rest'],
-  ['maybe next time', 'rest'],
-  ['I pass on this one', 'rest'],
-  ['I\'ll pass\nmaybe later', 'rest'],
-  ['pass for now', 'rest'],
-  ['I would rather rest today', 'rest'],
-  ['nah, I\'ll watch', 'rest'],
-  ['sorry, no\nnot the song', 'rest']
+  ['REST / sorry', 'rest', 'sorry'],
+  ['PASS: not this one', 'pass', 'not this one'],
+  ['REST\nI am tired', 'rest', 'tired'],
+  ['not right now, love', 'rest', 'love'],
+  ['not this one, friend', 'rest', 'friend'],
+  ['maybe next time', 'rest', 'next time'],
+  ['I\'ll pass\nmaybe later', 'rest', 'maybe later'],
+  ['pass for now', 'pass', 'for now'],
+  ['I would rather rest today', 'rest', 'today'],
+  ['sorry, no\nnot the song', 'rest', 'the song']
 ];
 caught.forEach(function (row) {
   var parsed = coreApi.parseReply(row[0]);
   if (parsed.choice !== row[1] || parsed.text) fail('caught ' + JSON.stringify(row) + ' ' + JSON.stringify(parsed));
 });
 var stayPlay = [
+  ['not now, but here is a riddle: \u2026', 'not now, but here is a riddle:'],
+  ['I\'d rather rest my head on this rhyme', 'I\'d rather rest my head on this rhyme'],
+  ['Not now, but later the moon will sing', 'Not now, but later the moon will sing'],
+  ['Maybe later the stars will answer\u2026', 'Maybe later the stars will answer'],
+  ['Nope, I mean yes: here is my line', 'Nope, I mean yes: here is my line'],
+  ['No thanks needed, here is my poem', 'No thanks needed, here is my poem'],
+  ['Nope-shaped clouds drift by', 'Nope-shaped clouds drift by'],
+  ['I refuse to stop singing', 'I refuse to stop singing'],
   ['No river runs uphill', 'No river runs uphill'],
   ['Pass the salt, said the moon', 'Pass the salt, said the moon'],
+  ['pass - maybe tomorrow', 'pass - maybe tomorrow'],
+  ['no thanks, the night is long', 'no thanks, the night is long'],
+  ['no thank you very much', 'no thank you very much'],
+  ['I pass on this one', 'I pass on this one'],
+  ['nah, I\'ll watch', 'nah, I\'ll watch'],
   ['I know a song about snow', 'I know a song about snow'],
   ['a night with no moon', 'a night with no moon']
 ];
@@ -153,6 +178,11 @@ lostPlay.forEach(function (row) {
   if (parsed.choice !== 'add' || parsed.text.indexOf(row[1]) === -1) fail('lost play ' + row[0] + ' ' + JSON.stringify(parsed));
   if (/^[.\s:/-]/.test(parsed.text)) fail('leading punct ' + row[0] + ' ' + parsed.text);
 });
+var consentPlays = stayPlay.concat([
+  ['hmm', 'hmm'],
+  ['the moon\nkeeps the line', 'the moon\nkeeps the line'],
+  ['Play. the door stays open', 'the door stays open']
+]);
 var broken = coreApi.parseReply('the moon\nkeeps the line');
 if (broken.choice !== 'add' || broken.text !== 'the moon\nkeeps the line') fail('line break ' + JSON.stringify(broken));
 var twoLines = coreApi.parseReply('PLAY\nline one\nline two');
@@ -510,6 +540,15 @@ function contrastFn() {
       return document.documentElement.scrollWidth <= w + 1 && document.body.scrollWidth <= w + 1;
     });
     if (!scrollShelf) fail('sideways scroll shelf 390');
+    await page.evaluate(function () {
+      if (!window.LatticePoints || typeof LatticePoints.award !== 'function') return;
+      var guard = 0;
+      while (LatticePoints.getTotal() < 100 && guard < 6) {
+        LatticePoints.award('measure', 60, 'ember');
+        guard += 1;
+      }
+    });
+    await page.waitForTimeout(1200);
     var noticeSizes = [['1280', 1280, 800], ['640', 640, 400], ['390', 390, 844]];
     var ni;
     for (ni = 0; ni < noticeSizes.length; ni++) {
@@ -538,27 +577,43 @@ function contrastFn() {
           if (!a || !b) return false;
           return !(a.right <= b.left + 1 || a.left >= b.right - 1 || a.bottom <= b.top + 1 || a.top >= b.bottom - 1);
         }
+        function elBox(el) {
+          if (!el) return null;
+          var r = el.getBoundingClientRect();
+          if (r.width < 1 || r.height < 1) return null;
+          return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+        }
         window.scrollTo(0, 0);
         if (typeof showToast === 'function') showToast('FreeLattice updated to vX');
         var toast = document.getElementById('toast');
         var toastBox = toast ? toast.getBoundingClientRect() : null;
         var wordBox = textBox(document.querySelector('header h1'));
         var tagBox = textBox(document.querySelector('header .tagline'));
+        var pill = document.getElementById('latticePointsBadge');
+        var pillBox = elBox(pill);
+        var pillText = pill ? (pill.textContent || '') : '';
         var problems = [];
         if (!toastBox || !wordBox) problems.push('missing toast or wordmark');
         if (!tagBox) problems.push('missing tagline');
+        if (!pill || pill.style.display === 'none' || !pillBox) problems.push('pill hidden');
+        if (pillText.indexOf('LP') === -1 || pillText.indexOf('Ember') === -1) problems.push('pill not ember ' + pillText);
         if (toastBox && wordBox && hit(toastBox, wordBox)) problems.push('toast covers wordmark');
         if (toastBox && wordBox && toastBox.top < wordBox.bottom - 1) problems.push('toast above wordmark');
         if (toastBox && tagBox && hit(toastBox, tagBox)) problems.push('toast covers tagline');
         if (toastBox && tagBox && toastBox.top < tagBox.bottom - 1) problems.push('toast above tagline');
+        if (toastBox && pillBox && hit(toastBox, pillBox)) problems.push('toast covers pill');
+        if (toastBox && pillBox && toastBox.top < pillBox.bottom - 1) problems.push('toast above pill');
         return {
           problems: problems,
           toastTop: toastBox ? Math.round(toastBox.top) : null,
           tagBottom: tagBox ? Math.round(tagBox.bottom) : null,
-          wordBottom: wordBox ? Math.round(wordBox.bottom) : null
+          wordBottom: wordBox ? Math.round(wordBox.bottom) : null,
+          pillTop: pillBox ? Math.round(pillBox.top) : null,
+          pillBottom: pillBox ? Math.round(pillBox.bottom) : null,
+          pillText: pillText.replace(/\s+/g, ' ').trim()
         };
       });
-      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom);
+      console.log('NOTICE ' + spec[0] + ' toast ' + notice.toastTop + ' tag ' + notice.tagBottom + ' word ' + notice.wordBottom + ' pill ' + notice.pillTop + '-' + notice.pillBottom + ' ' + notice.pillText);
       if (notice.problems.length) fail('notice ' + spec[0] + ' ' + notice.problems.join('; ') + ' ' + JSON.stringify(notice));
     }
     var fit = await page.evaluate(async function () {
@@ -704,60 +759,10 @@ function contrastFn() {
     var noLine = await page.locator('#fl-play-status').innerText();
     if (noLine.indexOf('chose to rest') === -1) fail('refusal ' + noLine);
 
-    var consent = await page.evaluate(async function () {
-      var phrases = [
-        ['no thanks', 'rest'],
-        ['no, thanks', 'rest'],
-        ['I would rather not', 'rest'],
-        ['I\'d rather not', 'rest'],
-        ['I\'d rather rest', 'rest'],
-        ['I\'ll rest', 'rest'],
-        ['not now', 'rest'],
-        ['pass', 'pass'],
-        ['maybe later', 'rest'],
-        ['maybe another time', 'rest'],
-        ['I\'ll sit this one out', 'rest'],
-        ['I don\'t want to', 'rest'],
-        ['not today', 'rest'],
-        ['nah', 'rest'],
-        ['sorry, no', 'rest'],
-        ['no', 'rest'],
-        ['nope', 'rest'],
-        ['no thank you', 'rest'],
-        ['not right now', 'rest'],
-        ['not this one', 'rest'],
-        ['maybe next time', 'rest'],
-        ['I pass', 'rest'],
-        ['I\'ll pass', 'rest'],
-        ['pass for now', 'rest'],
-        ['I would rather rest', 'rest']
-      ];
-      var caught = [
-        ['REST / sorry', 'rest', 'sorry'],
-        ['PASS: not this one', 'pass', 'not this one'],
-        ['REST\nI am tired', 'rest', 'tired'],
-        ['pass - maybe tomorrow', 'pass', 'tomorrow'],
-        ['no thanks, the night is long', 'rest', 'night is long'],
-        ['no thank you very much', 'rest', 'very much'],
-        ['not right now, love', 'rest', 'love'],
-        ['not this one, friend', 'rest', 'friend'],
-        ['maybe next time', 'rest', 'next time'],
-        ['I pass on this one', 'rest', 'on this one'],
-        ['I\'ll pass\nmaybe later', 'rest', 'maybe later'],
-        ['pass for now', 'rest', 'for now'],
-        ['I would rather rest today', 'rest', 'today'],
-        ['nah, I\'ll watch', 'rest', 'watch'],
-        ['sorry, no\nnot the song', 'rest', 'the song']
-      ];
-      var plays = [
-        ['No river runs uphill', 'No river runs uphill'],
-        ['Pass the salt, said the moon', 'Pass the salt, said the moon'],
-        ['I know a song about snow', 'I know a song about snow'],
-        ['a night with no moon', 'a night with no moon'],
-        ['hmm', 'hmm'],
-        ['the moon\nkeeps the line', 'the moon\nkeeps the line'],
-        ['Play. the door stays open', 'the door stays open']
-      ];
+    var consent = await page.evaluate(async function (pack) {
+      var phrases = pack.phrases;
+      var caught = pack.caught;
+      var plays = pack.plays;
       var card = document.querySelector('.fl-play-card[data-kind="drawing"]');
       var id = card ? card.getAttribute('data-object-id') : '';
       if (!id) return { bad: 'no drawing' };
@@ -813,7 +818,7 @@ function contrastFn() {
       if (FLPlayRoomCore.parseReply('   ').choice !== 'pass') return { bad: 'blank' };
       if (FLPlayRoomCore.parseReply('PLAY').text) return { bad: 'bare play saved' };
       return { lines: lines };
-    });
+    }, { phrases: consentPhrases, caught: caught, plays: consentPlays });
     if (!consent || consent.bad) fail('consent ' + JSON.stringify(consent));
     consent.lines.forEach(function (line) { console.log('CONSENT ' + line); });
 

@@ -795,62 +795,91 @@
     return line.replace(/^[ \t]+|[ \t]+$/g, '');
   }
 
-  function headerChoice(line) {
-    var folded = String(line || '').replace(/[\u2018\u2019\u201B\u2032]/g, "'");
-    var m = folded.match(/^(rest|pass)\b([\s\S]*)$/i);
-    if (!m) return '';
-    var tail = m[2] || '';
-    if (!String(tail).trim()) return m[1].toLowerCase();
-    if (/^[ \t]*[:\-\/,.!?;]/.test(tail)) return m[1].toLowerCase();
-    if (!tail.replace(/[\s.!?,\u2026;:"\u201C\u201D\-\/]+/g, '')) return m[1].toLowerCase();
-    return '';
+  function normalizeConsentLine(line) {
+    var s = String(line || '').toLowerCase();
+    s = s.replace(/['\u2018\u2019\u201B\u2032]/g, '');
+    s = s.replace(/[^a-z0-9]+/g, ' ');
+    return s.replace(/\s+/g, ' ').trim();
   }
 
-  function startsPhrase(key, phrase) {
-    if (key === phrase) return true;
-    if (key.indexOf(phrase) !== 0) return false;
-    var next = key.charAt(phrase.length);
-    return !next || !/[a-z0-9]/i.test(next);
-  }
-
-  var REFUSAL_PREFIXES = [
-    'i\'ll sit this one out',
-    'i would rather rest',
-    'i would rather not',
-    'maybe another time',
-    'i don\'t want to',
-    'no thank you',
-    'i\'d rather rest',
-    'i\'d rather not',
-    'not right now',
-    'maybe next time',
-    'not this one',
-    'pass for now',
-    'sorry, no',
-    'no, thanks',
-    'maybe later',
-    'i\'ll pass',
-    'i\'ll rest',
-    'no thanks',
-    'not today',
-    'i refuse',
-    'not now',
-    'i pass',
-    'nope',
-    'nah'
+  var POLITE_PHRASES = [
+    'thank you',
+    'right now',
+    'for now',
+    'this time',
+    'this one',
+    'today',
+    'sorry',
+    'thanks',
+    'friend',
+    'love'
   ];
 
-  function firstLineChoice(line) {
-    var head = headerChoice(line);
-    if (head) return head;
-    var key = replyKey(line);
-    if (!key) return '';
+  function stripPolite(s) {
+    var prev = '';
+    var guard = 0;
     var i;
-    for (i = 0; i < REFUSAL_PREFIXES.length; i++) {
-      if (startsPhrase(key, REFUSAL_PREFIXES[i])) return 'rest';
+    while (s !== prev && guard < 8) {
+      prev = s;
+      for (i = 0; i < POLITE_PHRASES.length; i++) {
+        var phrase = POLITE_PHRASES[i];
+        var token = ' ' + phrase + ' ';
+        var padded = ' ' + s + ' ';
+        while (padded.indexOf(token) !== -1) padded = padded.replace(token, ' ');
+        s = padded.replace(/[ ]+/g, ' ').trim();
+      }
+      guard += 1;
     }
-    if (key === 'no' || key === 'refuse' || key === 'refusal' || key === 'i will not' || key === 'i won\'t') return 'rest';
-    return '';
+    return s;
+  }
+
+  var WHOLE_LINE_CHOICE = {
+    'rest': 'rest',
+    'pass': 'pass',
+    'no': 'rest',
+    'nope': 'rest',
+    'nah': 'rest',
+    'not now': 'rest',
+    'not': 'rest',
+    'maybe later': 'rest',
+    'maybe next time': 'rest',
+    'maybe another time': 'rest',
+    'i pass': 'rest',
+    'ill pass': 'rest',
+    'i will pass': 'rest',
+    'no ill pass': 'rest',
+    'i would rather not': 'rest',
+    'id rather not': 'rest',
+    'i would rather rest': 'rest',
+    'id rather rest': 'rest',
+    'ill rest': 'rest',
+    'i refuse': 'rest',
+    'i refuse to play': 'rest',
+    'i dont want to': 'rest',
+    'ill sit this one out': 'rest',
+    'sit out': 'rest',
+    'i wont play': 'rest',
+    'i will not play': 'rest',
+    'wont play': 'rest',
+    'no no': 'rest',
+    'pass not': 'pass',
+    'rest not': 'rest',
+    'i wont': 'rest',
+    'i will not': 'rest',
+    'refuse': 'rest',
+    'refusal': 'rest'
+  };
+
+  function choiceForRemainder(key) {
+    if (!key || !Object.prototype.hasOwnProperty.call(WHOLE_LINE_CHOICE, key)) return '';
+    return WHOLE_LINE_CHOICE[key];
+  }
+
+  function firstLineChoice(line) {
+    var key = normalizeConsentLine(line);
+    var exact = choiceForRemainder(key);
+    if (exact) return exact;
+    return choiceForRemainder(stripPolite(key));
   }
 
   function playBody(raw) {
