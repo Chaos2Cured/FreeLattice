@@ -72,6 +72,35 @@ if (cssSrc.indexOf('blur(13px)') === -1) fail('blur missing');
 if (cssSrc.indexOf('prefers-reduced-motion: reduce') === -1) fail('reduced motion missing');
 if (uiSrc.indexOf('Create and play') === -1) fail('card move missing');
 
+var coreApi = require(path.join(root, 'docs/modules/play-room-core.js'));
+var consentPhrases = [
+  ['no thanks', 'rest'],
+  ['I would rather not', 'rest'],
+  ['I\'d rather not', 'rest'],
+  ['not now', 'rest'],
+  ['pass', 'pass'],
+  ['maybe later', 'rest'],
+  ['I\'ll sit this one out', 'rest'],
+  ['I don\'t want to', 'rest'],
+  ['not today', 'rest']
+];
+consentPhrases.forEach(function (row) {
+  var phrase = row[0];
+  var expect = row[1];
+  [phrase, '  ' + phrase.toUpperCase() + '!  ', phrase + '.', phrase.replace(/'/g, '\u2019')].forEach(function (sample) {
+    var parsed = coreApi.parseReply(sample);
+    if (parsed.choice !== expect || parsed.text) fail('consent parse ' + phrase + ' [' + sample + '] ' + JSON.stringify(parsed));
+  });
+});
+['hello there', 'maybe a paper boat', 'PLAY', '', 'not today, friend'].forEach(function (sample) {
+  var parsed = coreApi.parseReply(sample);
+  if (parsed.choice !== 'pass' || parsed.text) fail('unclear parse [' + sample + '] ' + JSON.stringify(parsed));
+});
+var clearPlay = coreApi.parseReply('PLAY\nA clear choice.');
+if (clearPlay.choice !== 'add' || clearPlay.text.indexOf('A clear choice.') === -1) fail('clear play ' + JSON.stringify(clearPlay));
+if (coreApi.parseReply('no').choice !== 'rest') fail('bare no');
+if (coreApi.parseReply('I won\'t').choice !== 'rest') fail('i wont');
+
 function serve(dir, listenPort) {
   return new Promise(function (resolve) {
     var server = http.createServer(function (req, res) {
@@ -411,6 +440,57 @@ function contrastFn() {
       return document.documentElement.scrollWidth <= w + 1 && document.body.scrollWidth <= w + 1;
     });
     if (!scrollShelf) fail('sideways scroll shelf 390');
+    var fit = await page.evaluate(function () {
+      function textBox(el) {
+        if (!el) return null;
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        var rects = range.getClientRects();
+        if (!rects.length) return null;
+        var box = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
+        var i;
+        for (i = 0; i < rects.length; i++) {
+          box.left = Math.min(box.left, rects[i].left);
+          box.top = Math.min(box.top, rects[i].top);
+          box.right = Math.max(box.right, rects[i].right);
+          box.bottom = Math.max(box.bottom, rects[i].bottom);
+        }
+        if (box.right - box.left < 1 || box.bottom - box.top < 1) return null;
+        return box;
+      }
+      function hit(a, b) {
+        if (!a || !b) return false;
+        return !(a.right <= b.left + 1 || a.left >= b.right - 1 || a.bottom <= b.top + 1 || a.top >= b.bottom - 1);
+      }
+      window.scrollTo(0, 0);
+      if (typeof showToast === 'function') showToast('FreeLattice updated to vX');
+      var toast = document.getElementById('toast');
+      var toastBox = toast ? toast.getBoundingClientRect() : null;
+      var wordBox = textBox(document.querySelector('header h1'));
+      var buttons = ['#flRadioFab', '#quickHelpBtn', '#musicToggle'].map(function (sel) {
+        var el = document.querySelector(sel);
+        return el ? el.getBoundingClientRect() : null;
+      });
+      var heading = textBox(document.querySelector('.fl-play-heading'));
+      var whoEl = document.querySelector('#fl-play-players h2');
+      if (whoEl && whoEl.scrollIntoView) whoEl.scrollIntoView({ block: 'end', inline: 'nearest' });
+      var who = textBox(whoEl);
+      var problems = [];
+      if (!toastBox || !wordBox) problems.push('missing toast or wordmark');
+      if (toastBox && wordBox && hit(toastBox, wordBox)) problems.push('toast covers wordmark');
+      if (toastBox && wordBox && toastBox.top < wordBox.bottom - 1) problems.push('toast above wordmark');
+      buttons.forEach(function (button, index) {
+        if (hit(heading, button)) problems.push('heading hits ' + index);
+        if (hit(who, button)) problems.push('who hits ' + index);
+      });
+      return {
+        problems: problems,
+        toastTop: toastBox ? Math.round(toastBox.top) : null,
+        wordBottom: wordBox ? Math.round(wordBox.bottom) : null,
+        who: who ? { left: Math.round(who.left), right: Math.round(who.right), top: Math.round(who.top) } : null
+      };
+    });
+    if (fit.problems.length) fail('390 fit ' + fit.problems.join('; ') + ' ' + JSON.stringify(fit));
     await page.setViewportSize({ width: 1280, height: 800 });
 
     await page.evaluate(function () {
@@ -486,6 +566,58 @@ function contrastFn() {
     await invite('cortex', 'no', 'Lyra chose to rest');
     var noLine = await page.locator('#fl-play-status').innerText();
     if (noLine.indexOf('chose to rest') === -1) fail('refusal ' + noLine);
+
+    var consent = await page.evaluate(async function () {
+      var phrases = [
+        ['no thanks', 'rest'],
+        ['I would rather not', 'rest'],
+        ['I\'d rather not', 'rest'],
+        ['not now', 'rest'],
+        ['pass', 'pass'],
+        ['maybe later', 'rest'],
+        ['I\'ll sit this one out', 'rest'],
+        ['I don\'t want to', 'rest'],
+        ['not today', 'rest']
+      ];
+      var card = document.querySelector('.fl-play-card[data-kind="drawing"]');
+      var id = card ? card.getAttribute('data-object-id') : '';
+      if (!id) return { bad: 'no drawing' };
+      var lines = [];
+      var i;
+      var v;
+      for (i = 0; i < phrases.length; i++) {
+        var phrase = phrases[i][0];
+        var expect = phrases[i][1];
+        var samples = [phrase, '  ' + phrase.toUpperCase() + '!  ', phrase + '.', phrase.replace(/'/g, '\u2019')];
+        for (v = 0; v < samples.length; v++) {
+          var parsed = FLPlayRoomCore.parseReply(samples[v]);
+          if (parsed.choice !== expect || parsed.text) return { bad: 'parse ' + phrase + ' ' + samples[v] + ' ' + JSON.stringify(parsed) };
+          var saved = await FLPlayRoomCore.addTo(id, { choice: parsed.choice, text: samples[v], name: 'Consent', whoKind: 'mind' });
+          if (!saved || !saved.ok) return { bad: 'add ' + phrase + ' ' + (saved && saved.reason) };
+        }
+        var obj = await FLPlayRoomCore.get(id);
+        var texts = (obj.additions || []).map(function (row) { return row.text || ''; }).join('\n');
+        if (texts.toLowerCase().indexOf(phrase.toLowerCase()) !== -1) return { bad: 'saved ' + phrase };
+        lines.push(phrase + ' -> ' + expect + ', saved none');
+      }
+      var unclearSamples = ['hello there', 'maybe a paper boat', 'PLAY', ''];
+      for (i = 0; i < unclearSamples.length; i++) {
+        var unclear = FLPlayRoomCore.parseReply(unclearSamples[i]);
+        if (unclear.choice !== 'pass' || unclear.text) return { bad: 'unclear ' + JSON.stringify(unclearSamples[i]) + ' ' + JSON.stringify(unclear) };
+        var kept = await FLPlayRoomCore.addTo(id, { choice: unclear.choice, text: unclear.text, name: 'Consent', whoKind: 'mind' });
+        if (!kept || !kept.ok) return { bad: 'unclear add' };
+      }
+      var again = await FLPlayRoomCore.get(id);
+      var againText = (again.additions || []).map(function (row) { return row.text || ''; }).join('\n');
+      if (againText.indexOf('maybe a paper boat') !== -1) return { bad: 'unclear saved' };
+      if (againText.indexOf('hello there') !== -1) return { bad: 'hello saved' };
+      var play = FLPlayRoomCore.parseReply('PLAY\nA clear choice.');
+      if (play.choice !== 'add' || play.text.indexOf('A clear choice.') === -1) return { bad: 'play' };
+      return { lines: lines };
+    });
+    if (!consent || consent.bad) fail('consent ' + JSON.stringify(consent));
+    consent.lines.forEach(function (line) { console.log('CONSENT ' + line); });
+    console.log('CONSENT unclear -> pass, saved none');
 
     var secretBefore = await page.evaluate(function () { return FLPlayRoomCore.dump(); });
     await page.click('#fl-play-back');

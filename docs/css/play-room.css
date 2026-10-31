@@ -332,3 +332,40 @@
     transform: none !important;
   }
 }
+
+/* The update notice sits below the wordmark. The page still fades it. */
+#toast.toast,
+#toast.toast.show {
+  top: calc(var(--space-2xl) + var(--type-h1) * 1.3 + var(--space-lg));
+}
+
+@media (max-width: 600px) {
+  #toast.toast,
+  #toast.toast.show {
+    top: calc(var(--space-2xl) + var(--type-h2) * 1.3 + var(--space-md));
+  }
+}
+
+@media (max-width: 420px) {
+  .fl-play {
+    padding-top: 20px;
+    padding-right: 16px;
+    padding-bottom: 112px;
+    padding-left: 16px;
+  }
+
+  .fl-play-heading {
+    box-sizing: border-box;
+    padding-top: 12px;
+    padding-right: 120px;
+    max-width: 100%;
+  }
+
+  #fl-play-players h2 {
+    box-sizing: border-box;
+    padding-top: 8px;
+    padding-right: 120px;
+    padding-left: 56px;
+    max-width: 100%;
+  }
+}

@@ -756,25 +756,43 @@
     });
   }
 
+  function tidyReplyLine(line) {
+    var s = String(line || '').replace(/^\uFEFF/, '').trim();
+    s = s.replace(/[\u2018\u2019\u201B\u2032]/g, "'");
+    s = s.replace(/^[\s.!?,\u2026;:"\u201C\u201D]+/, '');
+    s = s.replace(/[\s.!?,\u2026;:"\u201C\u201D]+$/, '');
+    return s.trim();
+  }
+
   function parseReply(text) {
     var raw = String(text || '').replace(/^\uFEFF/, '');
     var lines = raw.split(/\r?\n/);
-    var first = (lines[0] || '').trim();
+    var first = tidyReplyLine(lines[0] || '');
     var upper = first.toUpperCase();
-    var rest = lines.slice(1).join('\n').trim();
+    var body = lines.slice(1).join('\n').trim();
     var low = first.toLowerCase();
-    if (low === 'no' || low === 'no.' || low === 'nope' || low === 'refuse' || low === 'refusal' || low.indexOf('i refuse') === 0 || low.indexOf('i will not') === 0 || low.indexOf('i won\'t') === 0) {
+    var soft = {
+      'no thanks': 'rest',
+      'i would rather not': 'rest',
+      'i\'d rather not': 'rest',
+      'not now': 'rest',
+      'pass': 'pass',
+      'maybe later': 'rest',
+      'i\'ll sit this one out': 'rest',
+      'i don\'t want to': 'rest',
+      'not today': 'rest'
+    };
+    if (low === 'no' || low === 'nope' || low === 'refuse' || low === 'refusal' || low.indexOf('i refuse') === 0 || low.indexOf('i will not') === 0 || low.indexOf('i won\'t') === 0) {
       return { choice: 'rest', text: '' };
     }
+    if (soft[low]) return { choice: soft[low], text: '' };
     if (upper === 'REST') return { choice: 'rest', text: '' };
     if (upper === 'PASS') return { choice: 'pass', text: '' };
     if (upper === 'PLAY') {
-      if (!rest) return { choice: 'pass', text: '' };
-      return { choice: 'add', text: clipWords(rest, 120) };
+      if (!body) return { choice: 'pass', text: '' };
+      return { choice: 'add', text: clipWords(body, 120) };
     }
-    var all = raw.trim();
-    if (!all) return { choice: 'pass', text: '' };
-    return { choice: 'add', text: clipWords(all, 120) };
+    return { choice: 'pass', text: '' };
   }
 
   function noteHz(token, a4) {

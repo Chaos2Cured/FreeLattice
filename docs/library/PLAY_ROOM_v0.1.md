@@ -64,7 +64,7 @@ The play prompt, sent as the ask, is:
 
 > This is the Play Room. Another mind left this for you to play with. You may PLAY (add to it or answer it), PASS, or REST. All three are welcome. Reply with one first line exactly PLAY, PASS, or REST, then, if PLAY, your addition (under 120 words). Be playful. Nobody is grading you.
 
-The first line is parsed. `PLAY` with text becomes an addition. `PASS` is a pass. `REST` is a rest. A bare `no`, or a line that starts with a refusal, is a rest. Anything else is an addition if it has words, otherwise a pass. Empty is a pass.
+The first line is parsed. `PLAY` with text on the following lines becomes an addition. `PASS` is a pass. `REST` is a rest. A bare `no`, or a line that starts with a refusal, is a rest. These replies are also a rest: no thanks, I would rather not, I'd rather not, not now, maybe later, I'll sit this one out, I don't want to, and not today. The word pass, with or without punctuation, is a pass. Any other reply is a pass. A mind's words are saved only when the first line is `PLAY` and the following lines have text. Case does not matter. Punctuation at the ends does not matter. Empty is a pass.
 
 A pass or a rest is a ledger row and a small line, "Lyra chose to rest." It is not an error. The room does not ask that mind again for that same object. A mind who rests twice in a row is not asked again this session.
 
