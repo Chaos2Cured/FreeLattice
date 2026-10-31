@@ -759,40 +759,53 @@
   function tidyReplyLine(line) {
     var s = String(line || '').replace(/^\uFEFF/, '').trim();
     s = s.replace(/[\u2018\u2019\u201B\u2032]/g, "'");
+    s = s.replace(/[ \t]+/g, ' ');
     s = s.replace(/^[\s.!?,\u2026;:"\u201C\u201D]+/, '');
     s = s.replace(/[\s.!?,\u2026;:"\u201C\u201D]+$/, '');
     return s.trim();
   }
 
+  function replyKey(text) {
+    return tidyReplyLine(String(text || '').replace(/^\uFEFF/, '')).toLowerCase();
+  }
+
   function parseReply(text) {
     var raw = String(text || '').replace(/^\uFEFF/, '');
-    var lines = raw.split(/\r?\n/);
-    var first = tidyReplyLine(lines[0] || '');
-    var upper = first.toUpperCase();
-    var body = lines.slice(1).join('\n').trim();
-    var low = first.toLowerCase();
-    var soft = {
+    var key = replyKey(raw);
+    if (!key) return { choice: 'pass', text: '' };
+    var whole = {
+      'no': 'rest',
+      'nope': 'rest',
+      'nah': 'rest',
+      'refuse': 'rest',
+      'refusal': 'rest',
+      'rest': 'rest',
       'no thanks': 'rest',
+      'no, thanks': 'rest',
+      'sorry, no': 'rest',
+      'not now': 'rest',
+      'not today': 'rest',
+      'maybe later': 'rest',
+      'maybe another time': 'rest',
       'i would rather not': 'rest',
       'i\'d rather not': 'rest',
-      'not now': 'rest',
-      'pass': 'pass',
-      'maybe later': 'rest',
+      'i\'d rather rest': 'rest',
+      'i\'ll rest': 'rest',
       'i\'ll sit this one out': 'rest',
       'i don\'t want to': 'rest',
-      'not today': 'rest'
+      'i refuse': 'rest',
+      'i will not': 'rest',
+      'i won\'t': 'rest',
+      'pass': 'pass'
     };
-    if (low === 'no' || low === 'nope' || low === 'refuse' || low === 'refusal' || low.indexOf('i refuse') === 0 || low.indexOf('i will not') === 0 || low.indexOf('i won\'t') === 0) {
-      return { choice: 'rest', text: '' };
+    if (whole[key]) return { choice: whole[key], text: '' };
+    var played = raw.trim().match(/^play\b\s*[:\-]?\s*([\s\S]*)$/i);
+    if (played) {
+      var after = String(played[1] || '').trim();
+      if (!after || !tidyReplyLine(after)) return { choice: 'pass', text: '' };
+      return { choice: 'add', text: clipWords(after, 120) };
     }
-    if (soft[low]) return { choice: soft[low], text: '' };
-    if (upper === 'REST') return { choice: 'rest', text: '' };
-    if (upper === 'PASS') return { choice: 'pass', text: '' };
-    if (upper === 'PLAY') {
-      if (!body) return { choice: 'pass', text: '' };
-      return { choice: 'add', text: clipWords(body, 120) };
-    }
-    return { choice: 'pass', text: '' };
+    return { choice: 'add', text: clipWords(raw.trim(), 120) };
   }
 
   function noteHz(token, a4) {
