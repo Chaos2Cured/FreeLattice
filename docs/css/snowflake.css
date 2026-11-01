@@ -1,0 +1,204 @@
+/* snowflake.css (MIT)
+   v-snowflake-search-v0.1 v-snowflake-grow-v0.1 v-search-heal-v0.1
+   Garden glass. Six-fold crystal. No new colors. */
+
+.fl-snow,
+.fl-snow-heal,
+.fl-snow-card {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: hidden;
+  color: var(--text-primary);
+  font-family: var(--font), Inter, sans-serif;
+}
+
+.fl-snow {
+  position: relative;
+  margin: 8px 12px 12px;
+  padding: 12px;
+  background: rgba(16, 18, 36, 0.95);
+  border: 1px solid rgba(186, 206, 230, 0.55);
+  border-radius: 12px;
+}
+
+@supports ((backdrop-filter: blur(13px)) or (-webkit-backdrop-filter: blur(13px))) {
+  .fl-snow,
+  .fl-snow-card,
+  .fl-snow-heal {
+    background: rgba(16, 18, 36, 0.88);
+    -webkit-backdrop-filter: blur(13px);
+    backdrop-filter: blur(13px);
+  }
+}
+
+.fl-snow-title {
+  margin: 0 0 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: normal;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.fl-snow-ask,
+.fl-snow-hunch,
+.fl-snow-status,
+.fl-snow-search,
+.fl-snow-conclusion,
+.fl-snow-wrong,
+.fl-snow-receipt,
+.fl-snow-drift,
+.fl-snow-meter,
+.fl-snow-heal-line,
+.fl-snow p {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.fl-snow-hunch { color: var(--gold); }
+.fl-snow-receipt { color: var(--text-secondary); }
+.fl-snow-verify.is-muted,
+.fl-snow-card .is-muted { color: var(--text-secondary); }
+
+.fl-snow-input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  max-width: 100%;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(186, 206, 230, 0.55);
+  background: var(--glass-input);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.fl-snow-controls,
+.fl-snow-nodes,
+.fl-snow-heal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.fl-snow-btn,
+.fl-snow-node,
+#flSnowflakeAdd,
+#flSnowflakeTryAgain,
+#flSnowflakePdf {
+  box-sizing: border-box;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(186, 206, 230, 0.55);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+}
+
+.fl-snow-node {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.fl-snow-btn:focus,
+.fl-snow-node:focus,
+#flSnowflakeAdd:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.fl-snow-crystal { max-width: 100%; overflow: hidden; }
+.fl-snow-svg { display: block; width: 100%; height: auto; max-width: 420px; }
+
+.fl-snow-arm { fill: none; stroke-width: 2; }
+.fl-snow-arm-a { stroke: var(--emerald); }
+.fl-snow-arm-b { stroke: var(--blue-sky); }
+.fl-snow-arm-c { stroke: var(--lavender); }
+.fl-snow-arm-d { stroke: var(--gold); }
+.fl-snow-arm-e { stroke: var(--text-bright); }
+.fl-snow-arm-open,
+.fl-snow-arm.is-open { stroke: var(--gold); stroke-dasharray: 5 4; }
+.fl-snow-arm-fine { stroke: var(--lavender); stroke-width: 1; }
+.fl-snow-thread { fill: none; stroke: var(--lavender); stroke-width: 1; opacity: 0.8; }
+.fl-snow-hex { fill: none; stroke: var(--silver); stroke-width: 1.5; }
+.fl-snow-ice { fill: var(--text-bright); stroke: var(--silver); }
+.fl-snow-ice.is-known { opacity: 1; }
+.fl-snow-ice.is-guessed { opacity: 0.45; }
+.fl-snow-ice.is-source-with-motive { fill: var(--amber-soft); stroke: var(--amber-hf); }
+.fl-snow-eye { fill: var(--amber-hf); stroke: none; }
+.fl-snow-tip { fill: var(--gold); }
+
+.fl-snow-node.is-struck,
+.fl-snow-card .is-struck {
+  text-decoration: line-through;
+}
+
+.fl-snow-card {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(186, 206, 230, 0.55);
+  background: rgba(16, 18, 36, 0.95);
+}
+
+.fl-snow-card a {
+  color: var(--blue-sky);
+  overflow-wrap: anywhere;
+}
+
+.fl-snow-heal {
+  margin: 8px 12px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(186, 206, 230, 0.55);
+  background: rgba(16, 18, 36, 0.95);
+}
+
+.fl-snow-icon { stroke: var(--text-bright); fill: none; stroke-width: 1.4; }
+
+.fl-snow.is-frost { box-shadow: inset 0 0 0 1px var(--silver); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fl-snow,
+  .fl-snow-tip,
+  .fl-snow-ice,
+  .fl-snow.is-frost {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fl-snow-tip {
+    animation: fl-snow-glow 1.6s ease-in-out infinite;
+  }
+  .fl-snow.is-frost {
+    animation: fl-snow-frost 0.7s ease;
+  }
+}
+
+@keyframes fl-snow-glow {
+  50% { opacity: 0.35; }
+}
+
+@keyframes fl-snow-frost {
+  from { box-shadow: inset 0 0 24px var(--silver); }
+  to { box-shadow: inset 0 0 0 1px var(--silver); }
+}
+
+.fl-snow,
+.fl-snow-heal,
+.fl-snow-crystal,
+.fl-snow-svg {
+  overflow-x: hidden;
+}

@@ -15543,6 +15543,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <link rel="stylesheet" href="modules/card-glow.css">
 <link rel="stylesheet" href="css/chat-bottom-clarity.css">
 <link rel="stylesheet" href="css/play-room.css" id="fl-play-room-css">
+<link rel="stylesheet" href="css/snowflake.css" id="fl-snowflake-css">
 <script src="modules/market-attach.js" defer></script>
 </head>
 <body>
@@ -17677,7 +17678,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           // v-web-search-default-on-v0.1
           status.textContent = 'On. The AI may search when it needs to, and each search shows in the chat. Searches go through our worker.';
         } else if (avail) {
-          status.textContent = 'Active — AI may emit [FL_SEARCH:…] when needed; you will be asked to consent.';
+          status.textContent = 'On, and this device asks before each search. Each search shows in the chat.';
         } else if (!toggle.checked) {
           status.textContent = 'Disabled on this device. Re-enable above to allow search.';
         } else {
@@ -39595,6 +39596,11 @@ async function sendMessage() {
     messages = smartMessages;
   } else {
     messages = buildMessages();
+  }
+
+  // v-search-heal-v0.1: today's date, and one search when the question is recent.
+  if (window.FLSnowflake && typeof FLSnowflake.prepareSend === 'function') {
+    try { messages = await FLSnowflake.prepareSend(messages, message); } catch (e) {}
   }
 
   // If there's a pending image, modify the last user message for vision
@@ -70394,6 +70400,8 @@ document.addEventListener('click', function(e) {
 <script src="modules/more-cards-groups.js" defer></script><!-- v-more-cards-groups-v0.1 -->
 <script src="modules/play-room-core.js" defer></script><!-- v-play-room-v0.1 -->
 <script src="modules/play-room.js" defer></script><!-- v-play-room-v0.1 -->
+<script src="modules/snowflake-core.js" defer></script><!-- v-snowflake-search-v0.1 -->
+<script src="modules/snowflake-search.js" defer></script><!-- v-snowflake-search-v0.1 -->
 <script src="modules/continuity-doorway.js" defer></script><!-- v-continuity-doorway-v0.1 -->
 
 <!-- Lattice Memory (v5.44.0 — Memory Backbone Layer 2) — the
