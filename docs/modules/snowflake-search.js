@@ -29,7 +29,6 @@
   var searchNote = null;
   var healHost = null;
   var healLine = null;
-  var tryBtn = null;
   var lastQuery = '';
   var lastOpen = '';
   var lastFlakeId = '';
@@ -213,17 +212,7 @@
     healHost.id = 'flSnowflakeHeal';
     healLine = el('p', 'fl-snow-heal-line', '');
     healLine.id = 'flSnowflakeHealLine';
-    tryBtn = btn('flSnowflakeTryAgain', 'Try again', function () {
-      if (!lastQuery || tryBtn.hidden) return;
-      showSearch(lastQuery);
-      core.searchNow(lastQuery).then(function (res) {
-        showSearchResult(res, lastQuery);
-        if (!res || res.ok !== true) tryBtn.hidden = true;
-      });
-    });
-    tryBtn.hidden = true;
     healHost.appendChild(healLine);
-    healHost.appendChild(tryBtn);
     var row = d.getElementById('flChatSearchRow');
     if (row && row.parentNode) row.parentNode.insertBefore(healHost, row.nextSibling);
     else if (host && host.parentNode) host.parentNode.insertBefore(healHost, host);
@@ -309,7 +298,6 @@
     lastQuery = text || lastQuery;
     res = res || {};
     if (healLine) healLine.textContent = res.line || '';
-    if (tryBtn) tryBtn.hidden = !(res.line && res.outcome !== 'secret' && res.outcome !== 'quiet-room');
     if (!res.line) {
       var live = doc().getElementById('flChatSearchLive');
       if (live && live.getAttribute('data-fl-searching') === '1') {
