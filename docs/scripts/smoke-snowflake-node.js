@@ -28,13 +28,27 @@ function install() {
     isSearchEnabled: function () { return true; },
     getSearchEndpoint: function () { return 'https://search.invalid/lookup'; },
     isAvailable: function () { return true; },
+    isAskFirst: function () { return !!global.__askFirst; },
     _ledgerKey: 'fl_searchLedger'
+  };
+  global.__consent = 0;
+  global.__askFirst = false;
+  global.__consentYes = true;
+  global.__forceDown = false;
+  global.FLToolConsent = {
+    requestConsent: function () {
+      global.__consent += 1;
+      return Promise.resolve(!!global.__consentYes);
+    }
   };
   global.__sent = [];
   global.__replay = [];
   global.fetch = function (url) {
     var href = String(url);
     global.__sent.push(href);
+    if (global.__forceDown) {
+      return Promise.resolve({ ok: false, status: 503, json: function () { return Promise.resolve({}); } });
+    }
     var kind = global.__replay.length ? global.__replay.shift() : 'ok';
     if (kind === 'dead') {
       return Promise.resolve({
@@ -199,6 +213,7 @@ async function bridge() {
   if (core.failureLine('off') !== 'Search is turned off on this device.') fail('off line');
   if (core.failureLine('down') !== 'Our search helper is down (error 5xx).') fail('down line');
   if (core.failureLine('empty') !== 'No results.') fail('empty line');
+  if (core.failureLine('declined') !== 'Not now. This one was not looked up.') fail('declined line');
   var omitted = core.normalizeBranches({ branches: [{ id: 'a', query: 'roots' }] }, 'frost');
   var ids = omitted.map(function (b) { return b.id; });
   if (ids.join(',') !== 'a,b,c,d,e') fail('floor ' + ids.join(','));
@@ -264,6 +279,8 @@ async function bridge() {
   if (!eNode) fail('no dissenter node');
   if (global.__dissent < 1) fail('dissent call');
   if (!eNode.source || !eNode.source.url || !eNode.date || !eNode.mind || !eNode.confidence) fail('provenance');
+  if (eNode.confidence === 'known' && !eNode.source.url) fail('known without source');
+  if (global.__consent) fail('asked while off ' + global.__consent);
   if (full.growth.become.indexOf(eNode.id) === -1) fail('selection dropped e');
   if (full.growth.reason.indexOf('dissenter') === -1 && full.growth.reason.indexOf('belong') === -1 && !full.growth.reason) fail('no reason');
   var book = core.loadLedger();
@@ -365,6 +382,66 @@ async function bridge() {
   if (offRes.sent) fail('off sent');
   global.FLWebTool.isSearchEnabled = function () { return true; };
   if (down && down.sent !== true && down.outcome !== 'completed') fail('sample search');
+
+  await bridge();
+  global.__forceDown = true;
+  global.__consent = 0;
+  global.__askFirst = false;
+  stubAI('omit');
+  var missed = await core.startRun('How does frost remember?');
+  global.__forceDown = false;
+  if (!missed || missed.status !== 'done') fail('down run ' + (missed && missed.status));
+  if (!missed.receipt || missed.receipt.failedFetches < 1) fail('failed fetches ' + (missed.receipt && missed.receipt.failedFetches));
+  if (missed.receipt.failedFetches !== missed.receipt.fetches) fail('failed count ' + missed.receipt.failedFetches + '/' + missed.receipt.fetches);
+  if (missed.receipt.text.indexOf('Failed fetches ' + missed.receipt.failedFetches) === -1) fail('receipt failed ' + missed.receipt.text);
+  if (missed.receipt.text.indexOf('Our search helper is down (error 5xx).') === -1) fail('receipt line ' + missed.receipt.text);
+  if (missed.receipt.text.indexOf('one device signature plus the mind\'s hash') === -1) fail('seal line');
+  if (missed.receipt.text.indexOf('Caps hit:') === -1) fail('caps still shown');
+  var missedNodes = missed.flake && missed.flake.nodes || [];
+  if (missedNodes.length < 5) fail('down nodes ' + missedNodes.length);
+  for (i = 0; i < missedNodes.length; i++) {
+    var mn = missedNodes[i];
+    if (mn.confidence === 'known') fail('down known');
+    if (mn.reason !== 'guessed (search unavailable)') fail('down mark ' + mn.reason);
+    if (mn.source && mn.source.url) fail('down source ' + mn.source.url);
+    if (mn.text && mn.text.indexOf('example.invalid/made-up') !== -1) fail('invented source');
+  }
+  var missedE = null;
+  for (i = 0; i < missedNodes.length; i++) if (missedNodes[i].branch === 'e') missedE = missedNodes[i];
+  if (!missedE) fail('down dissenter');
+  if (!missed.growth || missed.growth.become.indexOf(missedE.id) === -1) fail('down growth dropped e');
+  var concl = String(missed.flake.conclusion || '');
+  var conclLines = concl.split('\n').filter(function (l) { return l.trim(); });
+  if (conclLines.length < 2) fail('down conclusion lines ' + concl);
+  if (concl.indexOf('Our search helper is down (error 5xx).') === -1) fail('down conclusion ' + concl);
+  if (concl.indexOf('None of this is from a source I fetched') === -1) fail('down plain ' + concl);
+  if (global.__consent) fail('down asked ' + global.__consent);
+  if ((global.__searchShown || 0) < 1) fail('down indicator');
+
+  await bridge();
+  global.__askFirst = true;
+  global.__consentYes = false;
+  global.__consent = 0;
+  var sentBeforeAsk = global.__sent.length;
+  var denied = await core.searchNow('latest election results');
+  if (global.__consent !== 1) fail('no ask ' + global.__consent);
+  if (denied.sent) fail('denied sent');
+  if (denied.outcome !== 'declined') fail('denied ' + denied.outcome);
+  if (global.__sent.length !== sentBeforeAsk) fail('denied fetch');
+  global.__consentYes = true;
+  var allowed = await core.searchNow('latest election results');
+  if (!allowed.ok || !allowed.sent) fail('allowed search');
+  if (global.__consent !== 2) fail('allowed asks ' + global.__consent);
+  global.__askFirst = false;
+  var consentAtOff = global.__consent;
+  var still = await core.searchNow('latest election results');
+  if (!still.ok) fail('ask off search');
+  if (global.__consent !== consentAtOff) fail('asked while off again');
+  global.FLToolConsent = {};
+  global.__askFirst = true;
+  var closed = await core.searchNow('news today');
+  if (closed.sent || closed.outcome !== 'declined') fail('closed ' + (closed && closed.outcome));
+  global.__askFirst = false;
 
   console.log('NODE_OK snowflake');
 })().catch(function (err) {

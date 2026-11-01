@@ -48,6 +48,8 @@ Constants in the core. Shown in the receipt after the run, not before.
 
 A failed call is said in plain words and retried once. Not twice.
 
+A failed search is the same. Timeout, a 5xx, and an empty set are retried once, then the plain line stays, with one Try again. After that Try again also fails, the control hides. Each failed fetch is counted on its own in the receipt: `Failed fetches N`. A node from a failed search is `guessed (search unavailable)`. It carries no source. It is not marked known. When every search in the run failed, the two-line conclusion says so in those plain words. The receipt also says: The seal is one device signature plus the mind's hash.
+
 ## Canonical JSON
 
 Keys sorted at every object. Arrays keep their order. No whitespace. UTF-8. `JSON.stringify` for strings and numbers. Undefined is skipped on an object and null inside an array.
@@ -89,7 +91,7 @@ humanHash = SHA-256(canonical seal body)
 mindHash  = SHA-256(canonical seal body + "|" + mindFp)
 ```
 
-`sig` is the device signature. `seal` is the public SPKI. Both hashes sit on the flake. A bad signature shows "unverified" and the words stay.
+`sig` is the one device signature. `seal` is the public SPKI. `humanHash` is the device hash and `mindHash` is the mind's hash. The seal is one device signature plus the mind's hash. A bad signature shows "unverified" and the words stay.
 
 ## Growth and rollback
 
@@ -131,6 +133,8 @@ When search is on, one pre-search runs if the message has a recency word (latest
 
 No results, a timeout, a down helper, or a device that is off also shows one Try again control. A key-shaped query is not sent. The line is: That looks like a key. It stays here.
 
+When this device has `fl_searchAskFirst` on, each web fetch asks first, with the same chip as the rest of the house: "I would like to look something up on the web. Okay?" That covers the chat recency pre-search and Snowflake's fetches. A no is "Not now. This one was not looked up." and nothing is fetched. When ask-first is off, which is the default, Grow still starts the research right away. There is no preview and no ask.
+
 ## Controls
 
 - Snowflake, `flSnowflakeAdd`, click, `mountRow` opens the ask.
@@ -139,7 +143,7 @@ No results, a timeout, a down helper, or a device that is off also shows one Try
 - Resume, `flSnowflakeResume`, click, `resume`.
 - Stop, `flSnowflakeStop`, click, `stop`.
 - Want to grow this one together?, `flSnowflakeTogether`, click, `startRun` seeded from the open question.
-- Try again, `flSnowflakeTryAgain`, click, `searchNow` of the last query.
+- Try again, `flSnowflakeTryAgain`, click, `searchNow` of the last query. After that try fails, the control hides.
 - Roll back to vN, `flSnowflakeRollback`, click, `rollback`.
 - Let this flake rest, `flSnowflakeRest`, click, `tombstone`.
 - Close, `flSnowflakeCardClose`, click, hides the provenance card.

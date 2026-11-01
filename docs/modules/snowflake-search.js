@@ -214,9 +214,12 @@
     healLine = el('p', 'fl-snow-heal-line', '');
     healLine.id = 'flSnowflakeHealLine';
     tryBtn = btn('flSnowflakeTryAgain', 'Try again', function () {
-      if (!lastQuery) return;
+      if (!lastQuery || tryBtn.hidden) return;
       showSearch(lastQuery);
-      core.searchNow(lastQuery).then(function (res) { showSearchResult(res, lastQuery); });
+      core.searchNow(lastQuery).then(function (res) {
+        showSearchResult(res, lastQuery);
+        if (!res || res.ok !== true) tryBtn.hidden = true;
+      });
     });
     tryBtn.hidden = true;
     healHost.appendChild(healLine);
@@ -435,8 +438,13 @@
     return false;
   }
 
+  function confidenceWords(node) {
+    if (node && node.reason === 'guessed (search unavailable)') return 'guessed (search unavailable)';
+    return (node && node.confidence) || '';
+  }
+
   function nodeButton(node) {
-    var label = (node.branch === 'd' ? 'hunch' : node.branch) + ' ' + (node.confidence || '');
+    var label = (node.branch === 'd' ? 'hunch' : node.branch) + ' ' + confidenceWords(node);
     var b = el('button', 'fl-snow-node', label);
     b.type = 'button';
     b.setAttribute('data-node', node.id);
@@ -451,16 +459,22 @@
     card.hidden = false;
     while (card.firstChild) card.removeChild(card.firstChild);
     card.appendChild(el('p', 'fl-snow-card-k', 'Source'));
-    var link = doc().createElement('a');
-    link.id = 'flSnowflakeCardUrl';
-    link.href = (node.source && node.source.url) || '#';
-    link.textContent = (node.source && (node.source.title || node.source.url)) || 'Source';
-    link.rel = 'noopener';
-    card.appendChild(link);
+    if (node.source && node.source.url) {
+      var link = doc().createElement('a');
+      link.id = 'flSnowflakeCardUrl';
+      link.href = node.source.url;
+      link.textContent = node.source.title || node.source.url;
+      link.rel = 'noopener';
+      card.appendChild(link);
+    } else {
+      var none = el('p', '', 'No source');
+      none.id = 'flSnowflakeCardUrl';
+      card.appendChild(none);
+    }
     card.appendChild(el('p', '', 'Date ' + (node.date || '')));
     var mind = node.mind || {};
     card.appendChild(el('p', '', 'Mind ' + (mind.name || '') + ' ' + (mind.fp || node.mindFp || '')));
-    card.appendChild(el('p', '', 'Confidence ' + (node.confidence || '')));
+    card.appendChild(el('p', '', 'Confidence ' + confidenceWords(node)));
     var verify = el('p', 'fl-snow-verify', 'unverified');
     verify.id = 'flSnowflakeCardVerify';
     card.appendChild(verify);
@@ -623,7 +637,9 @@
       paintFlake();
     },
     onStatus: function (p) {
-      if (statusEl && p && p.line) statusEl.textContent = p.line;
+      if (!p) return;
+      if (statusEl && p.line) statusEl.textContent = p.line;
+      if (p.search) showSearchResult(p.search, p.query || '');
     },
     onReport: function (p) {
       if (!p) return;

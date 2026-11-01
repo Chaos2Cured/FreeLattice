@@ -51,8 +51,12 @@
     down: 'Our search helper is down (error 5xx).',
     empty: 'No results.',
     secret: 'That looks like a key. It stays here.',
+    declined: 'Not now. This one was not looked up.',
     callTimeout: 'That call took too long.',
-    callFail: 'That call did not come back.'
+    callFail: 'That call did not come back.',
+    unsourced: 'None of this is from a source I fetched, so it stays a guess.',
+    unmade: 'These lookups were not made.\nWhat I can say here is a guess.',
+    seal: 'The seal is one device signature plus the mind\'s hash.'
   };
 
   var FLOOR = [
@@ -353,7 +357,36 @@
     if (outcome === 'down' || outcome === 'error') return LINES.down;
     if (outcome === 'empty') return LINES.empty;
     if (outcome === 'secret') return LINES.secret;
+    if (outcome === 'declined') return LINES.declined;
     return '';
+  }
+
+  function askFirstOn() {
+    var tool = root.FLWebTool;
+    if (tool && typeof tool.isAskFirst === 'function') return !!tool.isAskFirst();
+    try { return !!(root.localStorage && root.localStorage.getItem('fl_searchAskFirst') === 'true'); }
+    catch (e) { return false; }
+  }
+
+  function allowWeb() {
+    if (!askFirstOn()) return Promise.resolve(true);
+    if (roomShut()) return Promise.resolve(false);
+    var consent = root.FLToolConsent;
+    if (!consent || typeof consent.requestConsent !== 'function') return Promise.resolve(false);
+    return Promise.resolve(consent.requestConsent({
+      tool: 'web-tool',
+      action: 'search',
+      detail: 'web',
+      trustTier: 'seed',
+      message: 'I would like to look something up on the web. Okay?',
+      allowLabel: 'Allow search',
+      denyLabel: 'Not now'
+    })).then(function (yes) { return !!yes; }, function () { return false; });
+  }
+
+  function shouldRetry(res) {
+    if (!res || res.ok) return false;
+    return res.outcome === 'down' || res.outcome === 'timeout' || res.outcome === 'empty';
   }
 
   function noteWeb(query) {
@@ -404,8 +437,25 @@
     if (!endpoint || endpoint.indexOf('[CC:') !== -1) {
       return Promise.resolve({ ok: false, outcome: 'off', items: [], line: LINES.off, sent: false });
     }
+    if (typeof root.fetch !== 'function') {
+      return Promise.resolve({ ok: false, outcome: 'down', items: [], line: LINES.down, sent: false });
+    }
+    return allowWeb().then(function (yes) {
+      if (!yes) {
+        auditSearch('declined', 0);
+        return { ok: false, outcome: 'declined', items: [], line: LINES.declined, sent: false };
+      }
+      return fetchQuery(q, endpoint);
+    });
+  }
+
+  function fetchQuery(q, endpoint) {
+    if (!endpoint) {
+      var tool = root.FLWebTool;
+      if (tool && typeof tool.getSearchEndpoint === 'function') endpoint = String(tool.getSearchEndpoint() || '');
+    }
     var fetchFn = root.fetch;
-    if (typeof fetchFn !== 'function') {
+    if (typeof fetchFn !== 'function' || !endpoint) {
       return Promise.resolve({ ok: false, outcome: 'down', items: [], line: LINES.down, sent: false });
     }
     noteWeb(q);
@@ -467,6 +517,9 @@
     }
     if (!looksRecent(text)) return Promise.resolve(out);
     return searchNow(text).then(function (res) {
+      if (shouldRetry(res)) return fetchQuery(text);
+      return res;
+    }).then(function (res) {
       res = res || { line: '', items: [], outcome: 'empty' };
       root.__flLastSearch = { line: res.line || '', outcome: res.outcome || '', count: (res.items || []).length, sent: !!res.sent };
       var ui = root.FLSnowflake;
@@ -742,7 +795,10 @@
       title: clip(fields.title || (fields.source && fields.source.title) || '', 180),
       fetched: fields.fetched || (fields.source && fields.source.fetched) || new Date().toISOString()
     };
-    if (!source.url) source.url = 'local://no-result';
+    if (fields.noSource) {
+      source.url = '';
+      source.title = '';
+    } else if (!source.url) source.url = 'local://no-result';
     var confidence = confidenceOf(fields.confidence, 'guessed');
     var branch = String(fields.branch || 'a');
     var kind = fields.kind || 'node';
@@ -966,9 +1022,9 @@
 
   function nodeFromParsed(job, res, parsed) {
     var item = (res && res.items && res.items[0]) || {};
-    var text = clip((parsed && parsed.text) || item.title || item.snippet || 'Nothing came back from this source.', 800);
-    var url = (parsed && parsed.url) || item.url || '';
-    var title = (parsed && parsed.title) || item.title || 'Source';
+    var text = clip((parsed && parsed.text) || item.title || item.snippet || 'A note from this source.', 800);
+    var url = item.url || '';
+    var title = item.title || 'Source';
     return makeNode({
       branch: job.branch,
       text: text,
@@ -984,18 +1040,38 @@
     });
   }
 
-  function saveSearchOnly(job, res) {
-    var item = (res && res.items && res.items[0]) || {};
+  function nodeFromFailed(job, res) {
+    var line = (res && res.line) || LINES.down;
     return makeNode({
       branch: job.branch,
-      text: clip(item.snippet || item.title || res && res.line || 'Saved at the pause.', 800),
-      url: item.url || '',
-      title: item.title || 'Source',
+      text: clip(line + ' This stays a guess.', 800),
+      url: '',
+      title: '',
+      fetched: new Date().toISOString(),
+      confidence: 'guessed',
+      kind: 'node',
+      flakeId: active ? active.flakeId : '',
+      depth: job.depth || 1,
+      reason: 'guessed (search unavailable)',
+      noSource: true,
+      date: new Date().toISOString().slice(0, 10)
+    });
+  }
+
+  function saveSearchOnly(job, res) {
+    var failed = !res || res.ok !== true;
+    var item = (!failed && res && res.items && res.items[0]) || {};
+    return makeNode({
+      branch: job.branch,
+      text: clip(failed ? ((res && res.line) || 'Saved at the pause. This stays a guess.') : (item.snippet || item.title || 'Saved at the pause.'), 800),
+      url: failed ? '' : (item.url || ''),
+      title: failed ? '' : (item.title || 'Source'),
       confidence: 'guessed',
       kind: 'node',
       flakeId: active.flakeId,
       depth: job.depth || 1,
-      reason: 'Saved when the run paused.'
+      reason: failed ? 'guessed (search unavailable)' : 'Saved when the run paused.',
+      noSource: failed
     }).then(function (node) {
       if (!node || node.skipped) return null;
       active.nodes.push(node);
@@ -1006,58 +1082,108 @@
     });
   }
 
+  function recordFail(res, query) {
+    if (!active) return;
+    var line = (res && res.line) || failureLine(res && res.outcome) || LINES.down;
+    active.failures.push(line);
+    if (res && res.sent) active.failedFetches = (active.failedFetches || 0) + 1;
+    emit('Status', { line: line, search: res || { ok: false, line: line, outcome: 'down' }, query: query || '' });
+  }
+
+  function keepNode(job, node, parsed) {
+    if (!node || node.skipped) {
+      if (node && node.line) emit('Status', { line: node.line });
+      return Promise.resolve('ok');
+    }
+    active.nodes.push(node);
+    emit('Node', { node: node });
+    if (parsed && parsed.expand && (job.depth || 1) < DEPTH_CAP && !active.pause && !active.stop) {
+      var finer = clip(parsed.query || ('finer: ' + job.query), 180);
+      if (!looksLikeSecret(finer)) {
+        active.jobs.splice(active.job + 1, 0, {
+          type: 'search-read',
+          branch: job.branch,
+          name: job.name,
+          query: finer,
+          depth: (job.depth || 1) + 1,
+          prompt: job.prompt || ''
+        });
+      }
+    }
+    return persistNode(node, active).then(function () { return 'ok'; });
+  }
+
+  function afterSearch(job, res) {
+    if (!active) return Promise.resolve('ok');
+    var failed = !res || res.ok !== true;
+    if (active.pause || active.stop) {
+      if (failed) recordFail(res, job.query);
+      return saveSearchOnly(job, res).then(function () { return 'ok'; });
+    }
+    if (failed) {
+      recordFail(res, job.query);
+      return nodeFromFailed(job, res).then(function (node) { return keepNode(job, node, null); });
+    }
+    if (active.calls >= CALL_CAP) {
+      hitCap('calls');
+      return saveSearchOnly(job, res).then(function () { return 'ok'; });
+    }
+    active.searchOk = (active.searchOk || 0) + 1;
+    var user = 'Branch ' + job.branch + ' ' + (job.name || '') + '\nQuery: ' + job.query + '\nSources: ' + JSON.stringify((res && res.items) || []) + '\n' + (job.prompt || '');
+    var phase = job.branch === 'e' ? 'dissent' : 'read';
+    return ask(phase, user).then(function (text) {
+      if (!active) return 'ok';
+      var parsed = parseJSON(text) || {};
+      return nodeFromParsed(job, res, parsed).then(function (node) { return keepNode(job, node, parsed); });
+    });
+  }
+
   function doJob(job) {
     if (!active) return Promise.resolve('ok');
     if (job.type === 'conclude') return conclude();
     if (looksLikeSecret(job.query)) {
       active.failures.push(LINES.secret);
-      emit('Status', { line: LINES.secret });
+      emit('Status', { line: LINES.secret, search: { ok: false, outcome: 'secret', line: LINES.secret } });
       return Promise.resolve('ok');
     }
     if (active.fetches >= FETCH_CAP) { hitCap('fetches'); return Promise.resolve('ok'); }
     if (active.pause || active.stop) return Promise.resolve('ok');
-    active.fetches += 1;
+    active.lookups = (active.lookups || 0) + 1;
     emit('Arm', { branch: job.branch, name: job.name, depth: job.depth || 1, thinking: true });
     return searchNow(job.query).then(function (res) {
       if (!active) return 'ok';
-      if (active.pause || active.stop) return saveSearchOnly(job, res).then(function () { return 'ok'; });
-      if (active.calls >= CALL_CAP) {
-        hitCap('calls');
-        return saveSearchOnly(job, res).then(function () { return 'ok'; });
-      }
-      var user = 'Branch ' + job.branch + ' ' + (job.name || '') + '\nQuery: ' + job.query + '\nSources: ' + JSON.stringify((res && res.items) || []) + '\n' + (job.prompt || '');
-      var phase = job.branch === 'e' ? 'dissent' : 'read';
-      return ask(phase, user).then(function (text) {
-        if (!active) return 'ok';
-        var parsed = parseJSON(text) || {};
-        return nodeFromParsed(job, res, parsed).then(function (node) {
-          if (!node || node.skipped) {
-            if (node && node.line) emit('Status', { line: node.line });
-            return 'ok';
-          }
-          active.nodes.push(node);
-          emit('Node', { node: node });
-          if (parsed.expand && (job.depth || 1) < DEPTH_CAP && !active.pause && !active.stop) {
-            var finer = clip(parsed.query || ('finer: ' + job.query), 180);
-            if (!looksLikeSecret(finer)) {
-              active.jobs.splice(active.job + 1, 0, {
-                type: 'search-read',
-                branch: job.branch,
-                name: job.name,
-                query: finer,
-                depth: (job.depth || 1) + 1,
-                prompt: job.prompt || ''
-              });
-            }
-          }
-          return persistNode(node, active).then(function () { return 'ok'; });
+      if (res && res.sent) active.fetches += 1;
+      if (shouldRetry(res) && !active.pause && !active.stop && active.fetches < FETCH_CAP) {
+        recordFail(res, job.query);
+        return fetchQuery(job.query).then(function (again) {
+          if (again && again.sent) active.fetches += 1;
+          return afterSearch(job, again || res);
         });
-      });
+      }
+      return afterSearch(job, res);
     });
+  }
+
+  function searchesMissed() {
+    return !!active && (active.lookups || 0) > 0 && !(active.searchOk > 0);
+  }
+
+  function plainMiss() {
+    var fails = (active.failures || []).filter(function (v, i, a) { return a.indexOf(v) === i; });
+    var line = fails[0] || LINES.down;
+    if ((active.failedFetches || 0) > 0) active.conclusion = line + '\n' + LINES.unsourced;
+    else active.conclusion = LINES.unmade;
+    active.wrong = 'I could not weigh the case against this, because no source came back.';
+    active.open = active.open || 'What would change this, once a source can be reached?';
   }
 
   function conclude() {
     if (!active || active.pause || active.stop) return Promise.resolve('ok');
+    if (searchesMissed()) {
+      plainMiss();
+      emit('Report', { conclusion: active.conclusion, wrong: active.wrong, open: active.open });
+      return Promise.resolve('ok');
+    }
     var dissent = '';
     var i;
     for (i = 0; i < active.nodes.length; i++) {
@@ -1066,6 +1192,11 @@
     var user = 'Question hash only. Nodes: ' + active.nodes.length + '\nDissenter: ' + dissent;
     return ask('conclude', user).then(function (text) {
       if (!active) return 'ok';
+      if (searchesMissed()) {
+        plainMiss();
+        emit('Report', { conclusion: active.conclusion, wrong: active.wrong, open: active.open });
+        return 'ok';
+      }
       var parsed = parseJSON(text) || {};
       active.conclusion = clip(parsed.conclusion || parsed.text || 'I learned something, and I am still looking.', 400);
       var lines = String(active.conclusion).split('\n').filter(function (l) { return l.trim(); });
@@ -1083,9 +1214,11 @@
     var caps = state.caps && state.caps.length ? state.caps.join(', ') : 'none';
     var ids = (state.branches || []).map(function (b) { return b.id; });
     var fails = (state.failures || []).filter(function (v, i, a) { return a.indexOf(v) === i; });
-    var text = 'Calls ' + state.calls + '. Fetches ' + state.fetches + '. Time ' + ms + ' ms. Caps hit: ' + caps + '. Branches ' + ids.join(', ') + '.';
+    var failed = state.failedFetches || 0;
+    var text = 'Calls ' + state.calls + '. Fetches ' + state.fetches + '. Failed fetches ' + failed + '. Time ' + ms + ' ms. Caps hit: ' + caps + '. Branches ' + ids.join(', ') + '.';
     if (fails.length) text += ' ' + fails.join(' ');
-    return { calls: state.calls, fetches: state.fetches, ms: ms, caps: (state.caps || []).slice(), branches: ids, text: text, failures: fails };
+    text += ' ' + LINES.seal;
+    return { calls: state.calls, fetches: state.fetches, failedFetches: failed, ms: ms, caps: (state.caps || []).slice(), branches: ids, text: text, failures: fails };
   }
 
   function sealFlake(flake) {
@@ -1405,6 +1538,9 @@
       jobs: active.jobs,
       calls: active.calls,
       fetches: active.fetches,
+      failedFetches: active.failedFetches || 0,
+      searchOk: active.searchOk || 0,
+      lookups: active.lookups || 0,
       caps: active.caps,
       failures: active.failures,
       nodes: active.nodes,
@@ -1574,6 +1710,9 @@
       stop: false,
       calls: 0,
       fetches: 0,
+      failedFetches: 0,
+      searchOk: 0,
+      lookups: 0,
       caps: [],
       failures: [],
       jobs: [],
@@ -1634,6 +1773,9 @@
     active.status = 'running';
     active.caps = active.caps || [];
     active.failures = active.failures || [];
+    active.failedFetches = active.failedFetches || 0;
+    active.searchOk = active.searchOk || 0;
+    active.lookups = active.lookups || 0;
     active.nodes = active.nodes || [];
     active.jobs = active.jobs || [];
     return proceed();

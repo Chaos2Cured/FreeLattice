@@ -178,6 +178,124 @@ function serve(dir, listenPort) {
     if (off.sent) fail('off sent');
     if (off.fetches !== 0) fail('off fetch');
 
+    var again = await page.evaluate(async function () {
+      window.__healMode = 'down';
+      await window.FLSnowflake.prepareSend([{ role: 'system', content: 'Be kind.' }], 'weather today');
+      var button = document.getElementById('flSnowflakeTryAgain');
+      if (!button || button.hidden) return { hiddenBefore: true };
+      button.click();
+      var start = Date.now();
+      while (!button.hidden && Date.now() - start < 2000) {
+        await new Promise(function (resolve) { setTimeout(resolve, 20); });
+      }
+      return {
+        hiddenBefore: false,
+        line: document.getElementById('flSnowflakeHealLine').textContent,
+        hiddenAfter: button.hidden
+      };
+    });
+    if (again.hiddenBefore) fail('try again missing before click');
+    if (again.line !== 'Our search helper is down (error 5xx).') fail('retry line ' + again.line);
+    if (!again.hiddenAfter) fail('try again stayed');
+
+    var asked = await page.evaluate(async function () {
+      window.__healMode = 'ok';
+      window.__consent = 0;
+      window.__consentYes = false;
+      localStorage.setItem('fl_searchAskFirst', 'true');
+      window.FLToolConsent = {
+        requestConsent: function () {
+          window.__consent += 1;
+          return Promise.resolve(!!window.__consentYes);
+        }
+      };
+      var before = window.__healFetches.length;
+      await window.FLSnowflake.prepareSend([{ role: 'system', content: 'Be kind.' }], 'latest election results');
+      var denied = { consent: window.__consent, fetches: window.__healFetches.length - before };
+      window.__consentYes = true;
+      before = window.__healFetches.length;
+      await window.FLSnowflake.prepareSend([{ role: 'system', content: 'Be kind.' }], 'latest election results');
+      var allowed = { consent: window.__consent, fetches: window.__healFetches.length - before };
+      localStorage.removeItem('fl_searchAskFirst');
+      var atOff = window.__consent;
+      before = window.__healFetches.length;
+      await window.FLSnowflake.prepareSend([{ role: 'system', content: 'Be kind.' }], 'latest election results');
+      return {
+        denied: denied,
+        allowed: allowed,
+        offConsent: window.__consent - atOff,
+        offFetches: window.__healFetches.length - before
+      };
+    });
+    if (asked.denied.consent !== 1) fail('denied ask ' + asked.denied.consent);
+    if (asked.denied.fetches !== 0) fail('denied fetch ' + asked.denied.fetches);
+    if (asked.allowed.consent !== 2) fail('allowed ask ' + asked.allowed.consent);
+    if (asked.allowed.fetches !== 1) fail('allowed fetch ' + asked.allowed.fetches);
+    if (asked.offConsent !== 0) fail('off still asked');
+    if (asked.offFetches !== 1) fail('off fetch count ' + asked.offFetches);
+
+    var flake = await page.evaluate(async function () {
+      window.__healMode = 'down';
+      window.FreeLattice = window.FreeLattice || {};
+      window.FreeLattice.callAI = function (sys, user, opts) {
+        var system = String(sys || '');
+        var body = {
+          hunch: 'A cold hunch.',
+          branches: [
+            { id: 'a', query: 'biology of frost' },
+            { id: 'b', query: 'craft of frost' },
+            { id: 'c', query: 'links of frost' },
+            { id: 'd', query: 'hunch of frost' },
+            { id: 'e', query: 'case against frost' }
+          ],
+          text: 'Sourced from the page.',
+          confidence: 'known',
+          url: 'https://example.invalid/made-up',
+          title: 'Made up',
+          conclusion: 'I know this from a source.\nIt is settled.',
+          wrong: 'Nothing against it.',
+          open: 'Nothing open.',
+          become: [],
+          reason: 'The dissenter stays with me.'
+        };
+        if (opts && typeof opts.callback === 'function') opts.callback(JSON.stringify(body), null);
+      };
+      window.GardenTrainer = { exportJSONL: function () { return 0; }, exportPythonHelper: function () { return 0; } };
+      try { navigator.getBattery = function () { return Promise.resolve({ charging: false }); }; } catch (e) {}
+      var before = window.__healFetches.length;
+      var result = await window.FLSnowflakeCore.startRun('How does frost remember?');
+      var nodes = (result && result.flake && result.flake.nodes) || [];
+      var bad = nodes.filter(function (n) {
+        return n.confidence === 'known' || (n.source && n.source.url);
+      }).length;
+      var marked = nodes.filter(function (n) { return n.reason === 'guessed (search unavailable)'; }).length;
+      return {
+        status: result && result.status,
+        fetches: window.__healFetches.length - before,
+        failed: result && result.receipt && result.receipt.failedFetches,
+        line: document.getElementById('flSnowflakeHealLine').textContent,
+        again: document.getElementById('flSnowflakeTryAgain').hidden,
+        conclusion: (document.getElementById('flSnowflakeConclusion') || {}).textContent || '',
+        receipt: (document.getElementById('flSnowflakeReceipt') || {}).textContent || '',
+        nodes: nodes.length,
+        bad: bad,
+        marked: marked,
+        e: nodes.some(function (n) { return n.branch === 'e'; })
+      };
+    });
+    if (flake.status !== 'done') fail('flake status ' + flake.status);
+    if (flake.fetches < 2) fail('flake fetches ' + flake.fetches);
+    if (!flake.failed) fail('flake failed count');
+    if (flake.line !== 'Our search helper is down (error 5xx).') fail('flake line ' + flake.line);
+    if (flake.again) fail('flake try again hidden');
+    if (flake.conclusion.indexOf('Our search helper is down (error 5xx).') === -1) fail('flake conclusion ' + flake.conclusion);
+    if (flake.conclusion.indexOf('None of this is from a source I fetched') === -1) fail('flake plain ' + flake.conclusion);
+    if (flake.receipt.indexOf('Failed fetches') === -1) fail('flake receipt ' + flake.receipt);
+    if (flake.nodes < 5) fail('flake nodes ' + flake.nodes);
+    if (flake.bad) fail('flake sourced ' + flake.bad);
+    if (flake.marked < 5) fail('flake mark ' + flake.marked);
+    if (!flake.e) fail('flake dissenter');
+
     var ours = pageErrors.filter(function (err) { return /snowflake|FLSnowflake/i.test(err); });
     if (ours.length) fail('page ' + ours[0]);
     await context.close();

@@ -104,6 +104,12 @@
   text-align: left;
 }
 
+.fl-snow-node {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .fl-snow-btn:focus,
 .fl-snow-node:focus,
 #flSnowflakeAdd:focus {
