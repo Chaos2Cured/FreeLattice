@@ -384,6 +384,37 @@
     })).then(function (yes) { return !!yes; }, function () { return false; });
   }
 
+  function decideWeb() {
+    if (active && active.webAsked) return Promise.resolve(!!active.webAllowed);
+    return allowWeb();
+  }
+
+  function runNeedsWeb() {
+    var jobs = (active && active.jobs) || [];
+    var i;
+    for (i = 0; i < jobs.length; i++) {
+      if (jobs[i] && jobs[i].type !== 'conclude') return true;
+    }
+    return false;
+  }
+
+  function armRunWeb() {
+    if (!active) return Promise.resolve(false);
+    if (active.webAsked) return Promise.resolve(!!active.webAllowed);
+    if (!runNeedsWeb() || !askFirstOn()) {
+      active.webAsked = true;
+      active.webAllowed = true;
+      return Promise.resolve(true);
+    }
+    return allowWeb().then(function (yes) {
+      if (active) {
+        active.webAsked = true;
+        active.webAllowed = !!yes;
+      }
+      return !!yes;
+    });
+  }
+
   function shouldRetry(res) {
     if (!res || res.ok) return false;
     return res.outcome === 'down' || res.outcome === 'timeout' || res.outcome === 'empty';
@@ -440,7 +471,7 @@
     if (typeof root.fetch !== 'function') {
       return Promise.resolve({ ok: false, outcome: 'down', items: [], line: LINES.down, sent: false });
     }
-    return allowWeb().then(function (yes) {
+    return decideWeb().then(function (yes) {
       if (!yes) {
         auditSearch('declined', 0);
         return { ok: false, outcome: 'declined', items: [], line: LINES.declined, sent: false };
@@ -1090,6 +1121,27 @@
     emit('Status', { line: line, search: res || { ok: false, line: line, outcome: 'down' }, query: query || '' });
   }
 
+  function branchLabel(job) {
+    var id = job && job.branch ? String(job.branch) : '';
+    var name = job && job.name ? String(job.name) : '';
+    var i;
+    for (i = 0; i < FLOOR.length; i++) {
+      if (FLOOR[i].id === id) {
+        if (!name || name === id) return FLOOR[i].name;
+        return name;
+      }
+    }
+    return name || id || 'a branch';
+  }
+
+  function rememberGuess(job, res) {
+    if (!active || !job || !res || res.ok === true) return;
+    if (res.outcome !== 'down' && res.outcome !== 'timeout' && res.outcome !== 'empty') return;
+    var label = branchLabel(job);
+    active.guessed = active.guessed || [];
+    if (active.guessed.indexOf(label) === -1) active.guessed.push(label);
+  }
+
   function keepNode(job, node, parsed) {
     if (!node || node.skipped) {
       if (node && node.line) emit('Status', { line: node.line });
@@ -1117,11 +1169,15 @@
     if (!active) return Promise.resolve('ok');
     var failed = !res || res.ok !== true;
     if (active.pause || active.stop) {
-      if (failed) recordFail(res, job.query);
+      if (failed) {
+        recordFail(res, job.query);
+        rememberGuess(job, res);
+      }
       return saveSearchOnly(job, res).then(function () { return 'ok'; });
     }
     if (failed) {
       recordFail(res, job.query);
+      rememberGuess(job, res);
       return nodeFromFailed(job, res).then(function (node) { return keepNode(job, node, null); });
     }
     if (active.calls >= CALL_CAP) {
@@ -1150,13 +1206,21 @@
     if (active.pause || active.stop) return Promise.resolve('ok');
     active.lookups = (active.lookups || 0) + 1;
     emit('Arm', { branch: job.branch, name: job.name, depth: job.depth || 1, thinking: true });
+    var sentNow = 0;
     return searchNow(job.query).then(function (res) {
       if (!active) return 'ok';
-      if (res && res.sent) active.fetches += 1;
-      if (shouldRetry(res) && !active.pause && !active.stop && active.fetches < FETCH_CAP) {
+      if (res && res.sent) {
+        active.fetches += 1;
+        sentNow += 1;
+      }
+      if (sentNow < 2 && shouldRetry(res) && !active.pause && !active.stop && active.fetches < FETCH_CAP) {
         recordFail(res, job.query);
         return fetchQuery(job.query).then(function (again) {
-          if (again && again.sent) active.fetches += 1;
+          if (!active) return 'ok';
+          if (again && again.sent) {
+            active.fetches += 1;
+            sentNow += 1;
+          }
           return afterSearch(job, again || res);
         });
       }
@@ -1177,11 +1241,27 @@
     active.open = active.open || 'What would change this, once a source can be reached?';
   }
 
+  function plainPartial() {
+    var names = (active.guessed || []).slice();
+    active.conclusion = 'Guessed because search failed: ' + names.join(', ') + '.\nThose branches stay a guess.';
+    active.wrong = 'I could not weigh every arm, because some searches failed.';
+    active.open = active.open || 'What would change the arms that had no source?';
+  }
+
+  function reportPlain() {
+    emit('Report', { conclusion: active.conclusion, wrong: active.wrong, open: active.open });
+  }
+
   function conclude() {
     if (!active || active.pause || active.stop) return Promise.resolve('ok');
     if (searchesMissed()) {
       plainMiss();
-      emit('Report', { conclusion: active.conclusion, wrong: active.wrong, open: active.open });
+      reportPlain();
+      return Promise.resolve('ok');
+    }
+    if (active.guessed && active.guessed.length) {
+      plainPartial();
+      reportPlain();
       return Promise.resolve('ok');
     }
     var dissent = '';
@@ -1194,7 +1274,12 @@
       if (!active) return 'ok';
       if (searchesMissed()) {
         plainMiss();
-        emit('Report', { conclusion: active.conclusion, wrong: active.wrong, open: active.open });
+        reportPlain();
+        return 'ok';
+      }
+      if (active.guessed && active.guessed.length) {
+        plainPartial();
+        reportPlain();
         return 'ok';
       }
       var parsed = parseJSON(text) || {};
@@ -1541,6 +1626,9 @@
       failedFetches: active.failedFetches || 0,
       searchOk: active.searchOk || 0,
       lookups: active.lookups || 0,
+      guessed: (active.guessed || []).slice(),
+      webAsked: !!active.webAsked,
+      webAllowed: !!active.webAllowed,
       caps: active.caps,
       failures: active.failures,
       nodes: active.nodes,
@@ -1661,6 +1749,12 @@
     if (!active) return Promise.resolve(null);
     if (active.stop) return closeStopped();
     if (active.pause) return park();
+    if (!active.webAsked) {
+      return armRunWeb().then(function () {
+        if (!active) return null;
+        return proceed();
+      });
+    }
     if (active.calls >= CALL_CAP) { hitCap('calls'); return finish(); }
     if (active.job >= active.jobs.length) return finish();
     var job = active.jobs[active.job];
@@ -1713,6 +1807,9 @@
       failedFetches: 0,
       searchOk: 0,
       lookups: 0,
+      guessed: [],
+      webAsked: false,
+      webAllowed: false,
       caps: [],
       failures: [],
       jobs: [],
@@ -1776,6 +1873,9 @@
     active.failedFetches = active.failedFetches || 0;
     active.searchOk = active.searchOk || 0;
     active.lookups = active.lookups || 0;
+    active.guessed = active.guessed || [];
+    active.webAsked = !!active.webAsked;
+    active.webAllowed = !!active.webAllowed;
     active.nodes = active.nodes || [];
     active.jobs = active.jobs || [];
     return proceed();

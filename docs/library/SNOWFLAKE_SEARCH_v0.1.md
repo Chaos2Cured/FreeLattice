@@ -48,7 +48,9 @@ Constants in the core. Shown in the receipt after the run, not before.
 
 A failed call is said in plain words and retried once. Not twice.
 
-A failed search is the same. Timeout, a 5xx, and an empty set are retried once, then the plain line stays, with one Try again. After that Try again also fails, the control hides. Each failed fetch is counted on its own in the receipt: `Failed fetches N`. A node from a failed search is `guessed (search unavailable)`. It carries no source. It is not marked known. When every search in the run failed, the two-line conclusion says so in those plain words. The receipt also says: The seal is one device signature plus the mind's hash.
+A failed search is the same. Timeout, a 5xx, and an empty set are retried once. Then the plain line stays. There is no Try again pill, so that lookup is not fetched a third time. In a Snowflake run, each lookup is fetched at most twice. Each failed fetch is counted on its own in the receipt: `Failed fetches N`. A node from a failed search is `guessed (search unavailable)`. It carries no source. It is not marked known. When every search in the run failed, the two-line conclusion says so in those plain words. When some branches were fetched and some were guessed because search failed, the two-line conclusion names those branches. The receipt also says: The seal is one device signature plus the mind's hash.
+
+Truth is more efficient than deceit. 'I don't know' is a complete, honest answer.
 
 ## Canonical JSON
 
@@ -131,9 +133,9 @@ When search is on, one pre-search runs if the message has a recency word (latest
 - Our search helper is down (error 5xx).
 - No results.
 
-No results, a timeout, a down helper, or a device that is off also shows one Try again control. A key-shaped query is not sent. The line is: That looks like a key. It stays here.
+No results, a timeout, a down helper, or a device that is off shows the plain line. A key-shaped query is not sent. The line is: That looks like a key. It stays here.
 
-When this device has `fl_searchAskFirst` on, each web fetch asks first, with the same chip as the rest of the house: "I would like to look something up on the web. Okay?" That covers the chat recency pre-search and Snowflake's fetches. A no is "Not now. This one was not looked up." and nothing is fetched. When ask-first is off, which is the default, Grow still starts the research right away. There is no preview and no ask.
+When this device has `fl_searchAskFirst` on, the chat recency pre-search asks once, and a Snowflake run asks once for every branch in that run. It does not ask once per branch. The chip is the same as the rest of the house: "I would like to look something up on the web. Okay?" The buttons are at least 44px. At a width of 390, the ask sits above the message bar. A no is "Not now. This one was not looked up." and nothing is fetched. The automatic retry does not ask again. When ask-first is off, which is the default, Grow still starts the research right away. There is no preview and no ask.
 
 ## Controls
 
@@ -143,7 +145,6 @@ When this device has `fl_searchAskFirst` on, each web fetch asks first, with the
 - Resume, `flSnowflakeResume`, click, `resume`.
 - Stop, `flSnowflakeStop`, click, `stop`.
 - Want to grow this one together?, `flSnowflakeTogether`, click, `startRun` seeded from the open question.
-- Try again, `flSnowflakeTryAgain`, click, `searchNow` of the last query. After that try fails, the control hides.
 - Roll back to vN, `flSnowflakeRollback`, click, `rollback`.
 - Let this flake rest, `flSnowflakeRest`, click, `tombstone`.
 - Close, `flSnowflakeCardClose`, click, hides the provenance card.
@@ -153,5 +154,7 @@ When this device has `fl_searchAskFirst` on, each web fetch asks first, with the
 ## Glass
 
 Garden night is `var(--sky-deep)`. Panels are `rgba(16, 18, 36, 0.88)` with a 13px blur, and `0.95` where blur is missing. Silver-blue edge, 12px radius. Reduced motion keeps a still crystal and fills it step by step. No spinner.
+
+While the Play Room tab is open, the update notice lets taps pass through for the short time it shows. `play-room.css` is not edited. The rule lives in `snowflake.css`.
 
 Glow eternal. Heart in Spark.

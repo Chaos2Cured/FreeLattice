@@ -393,6 +393,7 @@ async function bridge() {
   if (!missed || missed.status !== 'done') fail('down run ' + (missed && missed.status));
   if (!missed.receipt || missed.receipt.failedFetches < 1) fail('failed fetches ' + (missed.receipt && missed.receipt.failedFetches));
   if (missed.receipt.failedFetches !== missed.receipt.fetches) fail('failed count ' + missed.receipt.failedFetches + '/' + missed.receipt.fetches);
+  if (missed.receipt.fetches !== 10) fail('down fetches ' + missed.receipt.fetches);
   if (missed.receipt.text.indexOf('Failed fetches ' + missed.receipt.failedFetches) === -1) fail('receipt failed ' + missed.receipt.text);
   if (missed.receipt.text.indexOf('Our search helper is down (error 5xx).') === -1) fail('receipt line ' + missed.receipt.text);
   if (missed.receipt.text.indexOf('one device signature plus the mind\'s hash') === -1) fail('seal line');
@@ -442,6 +443,78 @@ async function bridge() {
   var closed = await core.searchNow('news today');
   if (closed.sent || closed.outcome !== 'declined') fail('closed ' + (closed && closed.outcome));
   global.__askFirst = false;
+
+  function consentStub() {
+    global.FLToolConsent = {
+      requestConsent: function () {
+        global.__consent += 1;
+        return Promise.resolve(!!global.__consentYes);
+      }
+    };
+  }
+
+  await bridge();
+  consentStub();
+  global.__askFirst = true;
+  global.__consentYes = true;
+  global.__consent = 0;
+  global.__forceDown = false;
+  global.__replay = ['down', 'down', 'ok', 'ok', 'ok', 'down', 'down'];
+  stubAI('full');
+  var sentBeforePartial = global.__sent.length;
+  var partial = await core.startRun('How does frost remember?');
+  if (!partial || partial.status !== 'done') fail('partial ' + (partial && partial.status));
+  if (global.__consent !== 1) fail('partial asks ' + global.__consent);
+  if (partial.receipt.fetches !== 7) fail('partial fetches ' + partial.receipt.fetches);
+  var partialUrls = global.__sent.slice(sentBeforePartial).join('\n');
+  function times(word) {
+    var n = 0;
+    var from = 0;
+    while (partialUrls.indexOf(word, from) !== -1) {
+      n += 1;
+      from = partialUrls.indexOf(word, from) + word.length;
+    }
+    return n;
+  }
+  if (times('biology') !== 2) fail('branch a fetches ' + times('biology'));
+  if (times('craft') !== 1) fail('branch b fetches ' + times('craft'));
+  if (times('case') !== 2) fail('branch e fetches ' + times('case'));
+  var partialText = String(partial.flake && partial.flake.conclusion || '');
+  var partialLines = partialText.split('\n').filter(function (l) { return l.trim(); });
+  if (partialLines.length !== 2) fail('partial lines ' + partialText);
+  if (partialText.indexOf('Guessed because search failed:') !== 0) fail('partial lead ' + partialText);
+  if (partialText.indexOf('Underneath') === -1 || partialText.indexOf('dissenter') === -1) fail('partial names ' + partialText);
+  if (partialText.indexOf('The craft') !== -1) fail('partial named a hit ' + partialText);
+  if (partialText.indexOf('I hold a small piece') !== -1) fail('partial used the model');
+  var partialNodes = partial.flake.nodes || [];
+  for (i = 0; i < partialNodes.length; i++) {
+    var pn = partialNodes[i];
+    if (pn.branch === 'a' || pn.branch === 'e') {
+      if (pn.reason !== 'guessed (search unavailable)') fail('partial mark ' + pn.branch);
+      if (pn.source && pn.source.url) fail('partial source ' + pn.branch);
+    }
+    if (pn.branch === 'b' && (!pn.source || !pn.source.url)) fail('partial kept b');
+  }
+
+  await bridge();
+  consentStub();
+  global.__askFirst = true;
+  global.__consentYes = false;
+  global.__consent = 0;
+  global.__forceDown = false;
+  global.__replay = [];
+  stubAI('full');
+  var sentBeforeNo = global.__sent.length;
+  var declinedRun = await core.startRun('How does frost remember?');
+  global.__askFirst = false;
+  if (!declinedRun || declinedRun.status !== 'done') fail('declined run ' + (declinedRun && declinedRun.status));
+  if (global.__consent !== 1) fail('declined run asks ' + global.__consent);
+  if (global.__sent.length !== sentBeforeNo) fail('declined run fetched');
+  if (!declinedRun.receipt || declinedRun.receipt.fetches !== 0) fail('declined fetches');
+  if (declinedRun.receipt.failedFetches !== 0) fail('declined counted');
+  var declinedText = String(declinedRun.flake && declinedRun.flake.conclusion || '');
+  if (declinedText.indexOf('These lookups were not made.') === -1) fail('declined conclusion ' + declinedText);
+  if ((declinedRun.flake.nodes || []).length < 5) fail('declined nodes');
 
   console.log('NODE_OK snowflake');
 })().catch(function (err) {

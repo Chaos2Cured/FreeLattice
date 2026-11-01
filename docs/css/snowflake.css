@@ -1,6 +1,7 @@
 /* snowflake.css (MIT)
-   v-snowflake-search-v0.1 v-snowflake-grow-v0.1 v-search-heal-v0.1
-   Garden glass. Six-fold crystal. No new colors. */
+   v-snowflake-search-v0.1 v-snowflake-grow-v0.1 v-search-heal-v0.1 v-snowflake-soft-v0.1
+   Garden glass. Six-fold crystal. No new colors.
+   The Play Room notice and the house ask are layered here. play-room.css and tool-consent.js stay locked. */
 
 .fl-snow,
 .fl-snow-heal,
@@ -90,7 +91,6 @@
 .fl-snow-btn,
 .fl-snow-node,
 #flSnowflakeAdd,
-#flSnowflakeTryAgain,
 #flSnowflakePdf {
   box-sizing: border-box;
   min-height: 44px;
@@ -201,4 +201,33 @@
 .fl-snow-crystal,
 .fl-snow-svg {
   overflow-x: hidden;
+}
+
+/* Taps pass through the Play Room update notice for the ~3.5s it shows. */
+body:has(#tab-play-room.active) #toast.toast,
+body:has(#tab-play-room.active) #toast.toast.show {
+  pointer-events: none;
+}
+
+/* The house ask. Buttons stay at least 44px. At 390 the chip sits above the message bar. */
+.fl-tool-consent-chip .fl-tool-consent-btn {
+  box-sizing: border-box;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 12px 16px;
+}
+
+@media (max-width: 390px) {
+  #chatMessages .fl-tool-consent-chip,
+  #tab-chat .fl-tool-consent-chip {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 232px;
+    z-index: 45;
+    width: auto;
+    max-width: calc(100vw - 16px);
+    box-sizing: border-box;
+    margin: 0;
+  }
 }
