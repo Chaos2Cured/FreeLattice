@@ -28,6 +28,18 @@ Counters record runs with a window and runs without one. Below 20 runs on each s
 
 Fountain-code memory is a queued design note only: `docs/library/FOUNTAIN_MEMORY_v0.note.md`.
 
-Tree: No. This seat did not merge. Hypha walks before merge.
+## 062b receipts
+
+before 062b: each `fl_healLedger` row kept the healed bytes. A full device then dropped the write, and Settings could say 0 repairs. A receipt now keeps facts only: id, time, what, whole hash, piece size, piece count, byte count, bad indexes, still-bad indexes, where the piece came from, tries, fetches, duration, and ok. The healed bytes stay on the value `heal` returns. They are not written to storage.
+
+before 062b: a row that still holds those bytes is rewritten once, in memory for this page, through the same fact list. The rewrite is not a flag stored beside the row. Rows from that first cut still count.
+
+A full device says so. The line is "Heal receipt could not be saved on this device (storage is full)." The newest 500 rows are tried once before that line. A manifest at or under 64MiB still carries the whole-file hash. Larger byte inputs carry `root`, the hash of the piece hashes, and are checked by that root. The version on a new manifest is v-self-heal-v0.2. A v-self-heal-v0.1 manifest still checks the whole-file hash.
+
+Capture windows carry their own id. Delete removes that id. An older window with no id is removed by time, and only the first match.
+
+This build does not fetch a ledger row back from a backup. The re-fetch control stays hidden, and the line says re-fetching needs a backup and none is on this device yet.
+
+Tree: No. This seat did not merge. Hypha re-walks before merge.
 
 Glow eternal. Heart in Spark.

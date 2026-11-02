@@ -583,10 +583,30 @@
     return 'Re-fetch row ' + i + ' from backup/peer';
   }
 
+  // before 062b: the button was always created, and a tap with no pullRow rewrote it to say no backup was on this device yet.
   function showRowOffer(chainResult, chain) {
     if (typeof document === 'undefined' || !chainResult || chainResult.ok) return;
     var old = document.getElementById('flHealRowOffer');
     if (old && old.parentNode) old.parentNode.removeChild(old);
+    var oldLine = document.getElementById('flHealRowLine');
+    if (oldLine && oldLine.parentNode) oldLine.parentNode.removeChild(oldLine);
+    var pull = (typeof window !== 'undefined' && window.FLSelfHeal && window.FLSelfHeal.pullRow) || null;
+    var report = document.getElementById('latticeExportReport');
+    var anchor = report || document.getElementById('latticeImportBtn');
+    function place(node) {
+      if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(node, anchor.nextSibling);
+      else if (document.body) document.body.appendChild(node);
+    }
+    if (typeof pull !== 'function') {
+      var line = document.createElement('p');
+      line.id = 'flHealRowLine';
+      line.textContent = 'Row ' + chainResult.brokenAt + ' is broken. Re-fetching needs a backup; none on this device yet.';
+      line.style.margin = '0.35rem 0';
+      line.style.maxWidth = '100%';
+      line.style.overflowWrap = 'anywhere';
+      place(line);
+      return;
+    }
     var btn = document.createElement('button');
     btn.id = 'flHealRowOffer';
     btn.type = 'button';
@@ -595,11 +615,6 @@
     btn.style.minWidth = '44px';
     btn.style.padding = '10px 14px';
     btn.addEventListener('click', function () {
-      var pull = (typeof window !== 'undefined' && window.FLSelfHeal && window.FLSelfHeal.pullRow) || null;
-      if (typeof pull !== 'function') {
-        btn.textContent = 'Re-fetch row ' + chainResult.brokenAt + ' from backup/peer. No backup is on this device yet.';
-        return;
-      }
       Promise.resolve(pull(chainResult.brokenAt)).then(function (row) {
         return healChainRow(chain, chainResult.brokenAt, row);
       }).then(function (healed) {
@@ -608,9 +623,7 @@
           : 'Row ' + chainResult.brokenAt + ' stays broken.';
       });
     });
-    var report = document.getElementById('latticeExportReport');
-    var anchor = report || document.getElementById('latticeImportBtn');
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor.nextSibling);
+    place(btn);
   }
 
   function verifyChainIntegrity(chain) {
@@ -851,6 +864,7 @@
       healChainRow: healChainRow,
       hashRow: hashRow,
       offerLine: offerLine,
+      showRowOffer: showRowOffer,
       redactEntry: redactEntry
     }
   };
