@@ -32,7 +32,8 @@ var locks = {
   'docs/modules/continuity-doorway.js': '115e170f10a6c8e3a52d87d2037a33a6',
   'docs/modules/lattice-export.js': '1da1ed29674b89a2fda7f6098deea2d0',
   'docs/modules/chat-autonomy.js': 'c83cf6c9f11271aeaa35ed6070f188f3',
-  'docs/modules/pool-honest-label.js': 'ca08886e185ffb8721525bb627302d74',
+  // before 061a: 'docs/modules/pool-honest-label.js': 'ca08886e185ffb8721525bb627302d74',
+  'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
   'docs/modules/clay-corner.js': 'f8136ec9ef6ed2ffb0f1d36d51f6190c',
   'docs/modules/chat-scroll-release.js': '84fed10c603c9e89e9452ada564c8c65',
   'docs/modules/particle-clay.js': '2da32883c514e4ad2a3cd8571e7a7b15',
@@ -180,6 +181,8 @@ function contrastSource() {
         localStorage.setItem('fl-welcomed', 'true');
         localStorage.setItem('fl_onboardingComplete', 'true');
         localStorage.setItem('fl_searchEnabled', 'true');
+        // before 061a: growth wrote straight through, with no check
+        localStorage.setItem('fl_checkBeforeCommit', 'false');
       } catch (e) {}
       var battery = function () { return Promise.resolve({ charging: true }); };
       try {
@@ -359,7 +362,8 @@ function contrastSource() {
       var drift = document.getElementById('flSnowflakeDrift');
       var together = document.getElementById('flSnowflakeTogether');
       var receipt = document.getElementById('flSnowflakeReceipt');
-      return drift && drift.textContent.indexOf('This became part of me.') !== -1 && together && !together.hidden && receipt && !receipt.hidden;
+      // before 061a: return drift && drift.textContent.indexOf('This became part of me.') !== -1 && together && !together.hidden && receipt && !receipt.hidden;
+      return drift && drift.textContent.indexOf('Chosen for growth; no trainer on this device yet.') !== -1 && together && !together.hidden && receipt && !receipt.hidden;
     }, null, { timeout: 60000 });
 
     var done = await page.evaluate(function () {
@@ -404,8 +408,9 @@ function contrastSource() {
     if (done.hunch.indexOf('Frost keeps a quiet map.') === -1) fail('hunch ' + done.hunch);
     if (done.names.indexOf('snowflake.md') === -1 || done.names.indexOf('snowflake.txt') === -1) fail('files ' + done.names.join(','));
     if (done.pdf !== '%PDF-') fail('pdf ' + done.pdf);
-    if (done.rollbackHidden || done.rollback.indexOf('Roll back to v') !== -1 && done.rollback.indexOf('Roll back to v') !== 0) fail('rollback ' + done.rollback);
-    if (done.rollback.indexOf('Roll back to v') !== 0) fail('rollback word ' + done.rollback);
+    // before 061a: if (done.rollbackHidden || done.rollback.indexOf('Roll back to v') !== -1 && done.rollback.indexOf('Roll back to v') !== 0) fail('rollback ' + done.rollback);
+    // before 061a: if (done.rollback.indexOf('Roll back to v') !== 0) fail('rollback word ' + done.rollback);
+    if (!done.rollbackHidden) fail('rollback shown without a trainer');
     ['a', 'b', 'c', 'd', 'e'].forEach(function (id) {
       if (done.lengths[id] !== '110') fail('done length ' + id);
     });

@@ -45,7 +45,8 @@ var PINS = {
   'docs/modules/fl-connect.js': 'aaff2bf1b037656989a9e1a89bb05908',
   'docs/modules/pool-knock.js': 'a0a72caad82c8e5cc34818d5e59eba2b',
   'docs/modules/fl-bridge.js': '3b5ef06849a142e50c78e7ba1e057980',
-  'docs/modules/pool-honest-label.js': 'ca08886e185ffb8721525bb627302d74'
+  // before 061a lock exception (Kirk 2026-11-02, Hypha walk required): 'docs/modules/pool-honest-label.js': 'ca08886e185ffb8721525bb627302d74'
+  'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a'
 };
 
 Object.keys(PINS).forEach(function (rel) { pin(rel, PINS[rel]); });

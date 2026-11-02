@@ -231,3 +231,16 @@ body:has(#tab-play-room.active) #toast.toast.show {
     margin: 0;
   }
 }
+
+/* before 061a: no check panel */
+.fl-snow-check {
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.fl-snow-check p {
+  flex-basis: 100%;
+  margin: 0.25rem 0;
+}
