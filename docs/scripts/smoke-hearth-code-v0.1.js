@@ -51,12 +51,20 @@ function sha(text) {
   if (hearth.PY_SHA !== 'b4cb23a53aba19c221659b9fb40a2f18281d685691dc06647fb0afd0681baf98') fail('pin sha');
   console.log('PARSE diff pin');
 
-  var before = fs.readFileSync('/tmp/063a-before.txt', 'utf8');
-  ['docs/modules/snowflake-search.js', 'docs/modules/snowflake-core.js', 'docs/modules/chat-bottom-clarity.js', 'docs/modules/pool-honest-label.js', 'docs/modules/gathering-speak.js', 'docs/modules/fl-bridge.js', 'docs/modules/tool-consent.js'].forEach(function (rel) {
+  var locks = {
+    'docs/modules/snowflake-search.js': '7b5dd9c332d12b3f28d3615256688477',
+    'docs/modules/snowflake-core.js': 'eaee889573225a53b1f0fb229464492a',
+    'docs/modules/chat-bottom-clarity.js': '5bbadf3320177a485b27c565bac64454',
+    'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
+    'docs/modules/gathering-speak.js': '0460fdc777a21f7a1744f401dda82cb2',
+    'docs/modules/fl-bridge.js': '3b5ef06849a142e50c78e7ba1e057980',
+    'docs/modules/tool-consent.js': '6f48032c6835e8d83e39af74abd63f6b'
+  };
+  Object.keys(locks).forEach(function (rel) {
     var got = crypto.createHash('md5').update(fs.readFileSync(path.join(root, rel))).digest('hex');
-    if (before.indexOf(got + '  ' + rel) === -1) fail('lock moved ' + rel + ' ' + got);
+    if (got !== locks[rel]) fail('lock moved ' + rel + ' ' + got);
   });
-  var appDiff = child.execSync('git diff -U0 -- docs/app.html', { cwd: root, encoding: 'utf8' });
+  var appDiff = child.execSync('git diff -U0 350233d00f5f50edea4564624b7e07bf5f0fbec2 -- docs/app.html', { cwd: root, encoding: 'utf8' });
   var added = appDiff.split('\n').filter(function (line) { return line.indexOf('+') === 0 && line.indexOf('+++') !== 0; });
   var removed = appDiff.split('\n').filter(function (line) { return line.indexOf('-') === 0 && line.indexOf('---') !== 0; });
   if (added.length !== 1 || removed.length !== 0) fail('app diff ' + appDiff);
