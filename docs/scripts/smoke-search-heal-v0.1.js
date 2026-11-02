@@ -252,6 +252,8 @@ function serve(dir, listenPort) {
     var flake = await page.evaluate(async function () {
       window.__healMode = 'down';
       try { localStorage.removeItem('fl_searchAskFirst'); } catch (e) {}
+      // before 061a: the check-before pause stays off so this run can finish
+      try { localStorage.setItem('fl_checkBeforeCommit', 'false'); } catch (eCheck) {}
       window.FreeLattice = window.FreeLattice || {};
       window.FreeLattice.callAI = function (sys, user, opts) {
         var system = String(sys || '');

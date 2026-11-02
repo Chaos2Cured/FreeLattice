@@ -537,6 +537,157 @@
     });
   }
 
+  function endpointPath(endpoint) {
+    var s = String(endpoint || '');
+    var q = s.indexOf('?');
+    if (q !== -1) s = s.slice(0, q);
+    var scheme = s.indexOf('://');
+    if (scheme !== -1) {
+      var rest = s.slice(scheme + 3);
+      var slash = rest.indexOf('/');
+      s = slash === -1 ? '/' : rest.slice(slash);
+    }
+    return s;
+  }
+
+  function pageRoute() {
+    var tool = root.FLWebTool || {};
+    var endpoint = '';
+    if (typeof tool.getSearchEndpoint === 'function') {
+      try { endpoint = String(tool.getSearchEndpoint() || ''); } catch (e) { endpoint = ''; }
+    }
+    var path = endpointPath(endpoint);
+    if (endpoint && endpoint.indexOf('[CC:') === -1 && path.length >= 5 && path.slice(-5) === '/page') return endpoint.split('?')[0];
+    if (tool.offersPage && endpoint && endpoint.indexOf('[CC:') === -1 && path.length >= 7 && path.slice(-7) === '/search') {
+      return endpoint.split('?')[0].slice(0, -7) + '/page';
+    }
+    if (typeof tool.getPageEndpoint === 'function') {
+      var pe = '';
+      try { pe = String(tool.getPageEndpoint() || ''); } catch (e2) { pe = ''; }
+      if (pe && pe.indexOf('[CC:') === -1) return pe;
+    }
+    if (typeof tool.fetchPage === 'function') return 'tool';
+    return '';
+  }
+
+  function pageMiss() {
+    return { ok: false, text: '', sha: '', depth: 'snippet', fetched: '', sent: false };
+  }
+
+  function readableText(raw) {
+    var s = String(raw || '');
+    var trimmed = s.trim();
+    if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') {
+      try {
+        var data = JSON.parse(trimmed);
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          var pick = data.text || data.page || data.content || data.body || data.extract || '';
+          if (pick) return clip(String(pick).replace(/\s+/g, ' ').trim(), 6000);
+        }
+      } catch (e) {}
+    }
+    s = s.replace(/<script[\s\S]*?<\/script>/gi, ' ');
+    s = s.replace(/<style[\s\S]*?<\/style>/gi, ' ');
+    s = s.replace(/<[^>]+>/g, ' ');
+    s = s.replace(/\s+/g, ' ').trim();
+    return clip(s, 6000);
+  }
+
+  function sealPage(text, sent) {
+    var body = clip(String(text || '').replace(/\s+/g, ' ').trim(), 6000);
+    if (!body) {
+      return Promise.resolve({ ok: false, outcome: 'empty', text: '', sha: '', depth: 'snippet', fetched: '', sent: !!sent });
+    }
+    return sha256Hex(body).then(function (sha) {
+      return {
+        ok: true,
+        text: body,
+        sha: sha || '',
+        depth: 'page',
+        fetched: new Date().toISOString(),
+        sent: true
+      };
+    });
+  }
+
+  function readBody(resp) {
+    if (resp && typeof resp.text === 'function') return Promise.resolve(resp.text());
+    if (resp && typeof resp.json === 'function') {
+      return Promise.resolve(resp.json()).then(function (data) { return JSON.stringify(data || {}); }, function () { return ''; });
+    }
+    return Promise.resolve('');
+  }
+
+  function countPageSend() {
+    fetchesSent += 1;
+    if (active) active.fetches += 1;
+  }
+
+  function fetchPageOnce(url, route) {
+    if (active && active.fetches >= FETCH_CAP) {
+      hitCap('fetches');
+      return Promise.resolve(pageMiss());
+    }
+    if (route === 'tool') {
+      var tool = root.FLWebTool;
+      countPageSend();
+      return Promise.resolve(tool.fetchPage(url)).then(function (data) {
+        var text = '';
+        if (typeof data === 'string') text = data;
+        else if (data) text = data.text || data.page || data.content || data.body || data.extract || '';
+        return sealPage(text, true);
+      }, function () {
+        return { ok: false, outcome: 'down', text: '', sha: '', depth: 'snippet', fetched: '', sent: true };
+      });
+    }
+    var fetchFn = root.fetch;
+    if (typeof fetchFn !== 'function') {
+      return Promise.resolve({ ok: false, outcome: 'down', text: '', sha: '', depth: 'snippet', fetched: '', sent: false });
+    }
+    countPageSend();
+    var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
+    var timer = null;
+    if (controller) {
+      timer = setTimeout(function () { try { controller.abort(); } catch (e) {} }, timeoutMs());
+    }
+    var opts = controller ? { signal: controller.signal } : {};
+    return Promise.resolve(fetchFn(route + '?url=' + encodeURIComponent(url), opts)).then(function (resp) {
+      if (timer) clearTimeout(timer);
+      if (!resp || !resp.ok) {
+        var status = resp && resp.status;
+        return { ok: false, outcome: status >= 500 ? 'down' : 'empty', text: '', sha: '', depth: 'snippet', fetched: '', sent: true, status: status || 0 };
+      }
+      return readBody(resp).then(function (raw) { return sealPage(readableText(raw), true); });
+    }).catch(function (err) {
+      if (timer) clearTimeout(timer);
+      var aborted = err && (err.name === 'AbortError' || /abort/i.test(String(err && err.message || '')));
+      return { ok: false, outcome: aborted ? 'timeout' : 'down', text: '', sha: '', depth: 'snippet', fetched: '', sent: true };
+    });
+  }
+
+  function fetchPage(url) {
+    if (roomShut()) return Promise.resolve(pageMiss());
+    var target = String(url || '');
+    if (!target || target.indexOf('local://') === 0) return Promise.resolve(pageMiss());
+    var route = pageRoute();
+    if (!route) return Promise.resolve(pageMiss());
+    if (active && active.fetches >= FETCH_CAP) {
+      hitCap('fetches');
+      return Promise.resolve(pageMiss());
+    }
+    return decideWeb().then(function (yes) {
+      if (!yes) return pageMiss();
+      return fetchPageOnce(target, route).then(function (res) {
+        if (shouldRetry(res)) return fetchPageOnce(target, route);
+        return res;
+      }).then(function (res) {
+        if (!res) return pageMiss();
+        if (!res.ok) return { ok: false, text: '', sha: '', depth: 'snippet', fetched: '', sent: !!res.sent };
+        return res;
+      }, function () { return pageMiss(); });
+    }, function () { return pageMiss(); });
+  }
+
   function prepareSend(messages, text) {
     var src = Array.isArray(messages) ? messages : [];
     var out = [];
@@ -619,10 +770,28 @@
     });
   }
 
+  function sourceList(list) {
+    var out = [];
+    var rows = Array.isArray(list) ? list : [];
+    var i;
+    for (i = 0; i < rows.length && out.length < 3; i++) {
+      var row = rows[i] || {};
+      out.push({
+        url: String(row.url || ''),
+        title: String(row.title || ''),
+        fetched: String(row.fetched || ''),
+        depth: String(row.depth || ''),
+        sha: String(row.sha || '')
+      });
+    }
+    return out;
+  }
+
   function signable(node) {
     var source = node.source || {};
     var mind = node.mind || {};
-    return {
+    // before 061a: return {
+    var body = {
       id: String(node.id || ''),
       branch: String(node.branch || ''),
       text: String(node.text || ''),
@@ -642,6 +811,11 @@
       delta: String(node.delta || ''),
       psi: String(node.psi || '')
     };
+    if (Number(node.sigV) === 2) {
+      body.sigV = 2;
+      body.sources = sourceList(node.sources);
+    }
+    return body;
   }
 
   function signCanon(canon, id) {
@@ -830,6 +1004,11 @@
       source.url = '';
       source.title = '';
     } else if (!source.url) source.url = 'local://no-result';
+    // before 061a: source held url, title, and fetched only
+    source.depth = fields.sourceDepth === 'page' ? 'page' : 'snippet';
+    source.sha = clip(fields.sourceSha || (fields.source && fields.source.sha) || '', 80);
+    var pageSources = sourceList(fields.sources);
+    var useV2 = pageSources.length > 0 || Number(fields.sigV) === 2;
     var confidence = confidenceOf(fields.confidence, 'guessed');
     var branch = String(fields.branch || 'a');
     var kind = fields.kind || 'node';
@@ -872,6 +1051,10 @@
                 humanFp: dfp,
                 mindFp: mfp
               };
+              if (useV2) {
+                node.sigV = 2;
+                node.sources = pageSources;
+              }
               var canon = canonical(signable(node));
               return signCanon(canon, id).then(function (signed) {
                 node.sig = signed.sig;
@@ -1051,24 +1234,62 @@
     return jobs;
   }
 
-  function nodeFromParsed(job, res, parsed) {
+  function rowsFromItems(items, page) {
+    var rows = [];
+    var list = Array.isArray(items) ? items.slice(0, 3) : [];
+    var now = new Date().toISOString();
+    var i;
+    for (i = 0; i < list.length; i++) {
+      var item = list[i] || {};
+      var row = {
+        url: String(item.url || ''),
+        title: String(item.title || ''),
+        fetched: now,
+        depth: 'snippet',
+        sha: ''
+      };
+      if (i === 0 && page && page.depth === 'page') {
+        row.depth = 'page';
+        row.sha = String(page.sha || '');
+        row.fetched = page.fetched || now;
+      }
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function nodeFromParsed(job, res, parsed, page) {
     var item = (res && res.items && res.items[0]) || {};
-    var text = clip((parsed && parsed.text) || item.title || item.snippet || 'A note from this source.', 800);
     var url = item.url || '';
-    var title = item.title || 'Source';
-    return makeNode({
-      branch: job.branch,
-      text: text,
-      url: url,
-      title: title,
-      fetched: new Date().toISOString(),
-      confidence: parsed && parsed.confidence,
-      kind: 'node',
-      flakeId: active.flakeId,
-      depth: job.depth || 1,
-      bead: !!(parsed && parsed.expand),
-      reason: job.branch === 'e' ? 'dissenter' : ''
-    });
+    function build(got) {
+      var text = clip((parsed && parsed.text) || item.title || item.snippet || 'A note from this source.', 800);
+      var title = item.title || 'Source';
+      var rows = rowsFromItems(res && res.items, got);
+      var fields = {
+        branch: job.branch,
+        text: text,
+        url: url,
+        title: title,
+        fetched: (got && got.depth === 'page' && got.fetched) || new Date().toISOString(),
+        confidence: parsed && parsed.confidence,
+        kind: 'node',
+        flakeId: active.flakeId,
+        depth: job.depth || 1,
+        bead: !!(parsed && parsed.expand),
+        reason: job.branch === 'e' ? 'dissenter' : '',
+        sourceDepth: got && got.depth === 'page' ? 'page' : 'snippet',
+        sourceSha: (got && got.sha) || '',
+        sources: rows
+      };
+      if (rows.length) fields.sigV = 2;
+      if (got && got.depth === 'page' && got.text) fields.pageText = clip(got.text, 6000);
+      return makeNode(fields).then(function (node) {
+        if (node && !node.skipped && fields.pageText) node.pageText = fields.pageText;
+        return node;
+      });
+    }
+    if (page) return build(page);
+    return fetchPage(url).then(build);
   }
 
   function nodeFromFailed(job, res) {
@@ -1185,12 +1406,17 @@
       return saveSearchOnly(job, res).then(function () { return 'ok'; });
     }
     active.searchOk = (active.searchOk || 0) + 1;
-    var user = 'Branch ' + job.branch + ' ' + (job.name || '') + '\nQuery: ' + job.query + '\nSources: ' + JSON.stringify((res && res.items) || []) + '\n' + (job.prompt || '');
-    var phase = job.branch === 'e' ? 'dissent' : 'read';
-    return ask(phase, user).then(function (text) {
+    var item0 = (res && res.items && res.items[0]) || {};
+    return fetchPage(item0.url || '').then(function (page) {
       if (!active) return 'ok';
-      var parsed = parseJSON(text) || {};
-      return nodeFromParsed(job, res, parsed).then(function (node) { return keepNode(job, node, parsed); });
+      var user = 'Branch ' + job.branch + ' ' + (job.name || '') + '\nQuery: ' + job.query + '\nSources: ' + JSON.stringify((res && res.items) || []) + '\n' + (job.prompt || '');
+      if (page && page.depth === 'page' && page.text) user += '\nPage: ' + clip(page.text, 1500);
+      var phase = job.branch === 'e' ? 'dissent' : 'read';
+      return ask(phase, user).then(function (text) {
+        if (!active) return 'ok';
+        var parsed = parseJSON(text) || {};
+        return nodeFromParsed(job, res, parsed, page).then(function (node) { return keepNode(job, node, parsed); });
+      });
     });
   }
 
@@ -1269,7 +1495,9 @@
     for (i = 0; i < active.nodes.length; i++) {
       if (active.nodes[i].branch === 'e') dissent = active.nodes[i].text;
     }
-    var user = 'Question hash only. Nodes: ' + active.nodes.length + '\nDissenter: ' + dissent;
+    // before 061a: var user = 'Question hash only. Nodes: ' + active.nodes.length + '\nDissenter: ' + dissent;
+    var user = composeAsk(active.nodes, 'conclude');
+    if (dissent && user.indexOf('Dissenter:') === -1) user += '\nDissenter: ' + clip(dissent, 280);
     return ask('conclude', user).then(function (text) {
       if (!active) return 'ok';
       if (searchesMissed()) {
@@ -1362,6 +1590,66 @@
       domain: 'wonder',
       query: 'snowflake ' + flake.id
     })).then(function () { return true; }, function () { return false; });
+  }
+
+  function sourceCount(n) {
+    if (n && Array.isArray(n.sources) && n.sources.length) return n.sources.length;
+    if (n && n.source && n.source.url) return 1;
+    return 0;
+  }
+
+  function composeAsk(nodes) {
+    var list = Array.isArray(nodes) ? nodes : [];
+    var dissent = '';
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i] && list[i].branch === 'e') dissent = clip(list[i].text, 280);
+    }
+    var rows = [];
+    for (i = 0; i < list.length; i++) {
+      var n = list[i];
+      if (!n) continue;
+      var row = {
+        id: String(n.id || ''),
+        branch: String(n.branch || ''),
+        confidence: String(n.confidence || ''),
+        summary: clip(n.text, 280),
+        sources: sourceCount(n)
+      };
+      var draft = 'Question hash only. Nodes: ' + JSON.stringify(rows.concat([row])) + '\nDissenter: ' + dissent;
+      if (draft.length > 3600 && rows.length) break;
+      rows.push(row);
+    }
+    var text = 'Question hash only. Nodes: ' + JSON.stringify(rows) + '\nDissenter: ' + dissent;
+    if (text.length > 4000) text = text.slice(0, 4000);
+    return text;
+  }
+
+  function growthLine(adapter) {
+    if (adapter && adapter.trained === true && adapter.loaded === true && adapter.checked === true) {
+      return 'This became part of me (adapter ' + (adapter.version || adapter.id || '') + ', checked).';
+    }
+    if (adapter && adapter.status === 'no-trainer') return 'Chosen for growth; no trainer on this device yet.';
+    return 'Chosen for growth; training queued.';
+  }
+
+  function checkBeforeOn() {
+    try {
+      if (!root.localStorage) return true;
+      return root.localStorage.getItem('fl_checkBeforeCommit') !== 'false';
+    } catch (e) { return true; }
+  }
+
+  function previewOrKeep(flake, choice) {
+    if (roomShut()) return Promise.resolve({ action: 'skip', choice: choice });
+    var ui = root.FLSnowflake;
+    if (ui && typeof ui.previewGrowth === 'function') {
+      return Promise.resolve(ui.previewGrowth(flake, choice)).then(function (decision) {
+        if (!decision || decision.action !== 'keep') return { action: 'skip', choice: choice };
+        return { action: 'keep', choice: decision.choice || choice };
+      }, function () { return { action: 'skip', choice: choice }; });
+    }
+    return Promise.resolve({ action: 'keep', choice: choice });
   }
 
   function chooseGrowth(flake, model) {
@@ -1476,10 +1764,16 @@
         return { prompt: n.branch + ' ' + (n.source && n.source.title || ''), response: n.text };
       });
       var trainer = root.GardenTrainer;
+      var canExport = trainer && (typeof trainer.exportJSONL === 'function' || typeof trainer.exportPythonHelper === 'function');
+      if (!canExport) {
+        var missing = { status: 'no-trainer', trained: false, loaded: false, checked: false, version: '' };
+        emit('Grew', { line: growthLine(missing), adapter: missing });
+        return missing;
+      }
       var queued = 'queued for desktop';
       try {
-        if (trainer && typeof trainer.exportJSONL === 'function') trainer.exportJSONL(examples);
-        if (trainer && typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper('local');
+        if (typeof trainer.exportJSONL === 'function') trainer.exportJSONL(examples);
+        if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper('local');
       } catch (e) { queued = 'queued for desktop'; }
       var ids = [flake.id].slice().sort();
       return sha8(ids.join('|')).then(function (idsHash) {
@@ -1509,8 +1803,25 @@
               };
               rows.push(adapter);
               return saveAdapters(rows).then(function () {
-                emit('Grew', { line: 'This became part of me.', adapter: adapter });
-                return adapter;
+                var hook = null;
+                try {
+                  if (trainer && typeof trainer.checkedAdapter === 'function') hook = trainer.checkedAdapter(examples);
+                } catch (e3) { hook = null; }
+                return Promise.resolve(hook).then(function (got) {
+                  if (got && got.trained === true && got.loaded === true && got.checked === true) {
+                    adapter.trained = true;
+                    adapter.loaded = true;
+                    adapter.checked = true;
+                    if (got.version) adapter.version = got.version;
+                    if (got.id) adapter.id = got.id;
+                  }
+                  // before 061a: the growth line spoke as if training had already finished.
+                  emit('Grew', { line: growthLine(adapter), adapter: adapter });
+                  return adapter;
+                }, function () {
+                  emit('Grew', { line: growthLine(adapter), adapter: adapter });
+                  return adapter;
+                });
               });
             });
           });
@@ -1724,22 +2035,37 @@
     }).then(function (sealed) {
       emit('Receipt', rec);
       emit('Done', { flake: sealed, receipt: rec });
-      return rememberFlake(sealed).then(function () {
-        if (holdGrowth || (active && (active.pause || active.stop))) {
+      // before 061a: rememberFlake ran, then the grow ask sent only id, branch, and psi.
+      if (holdGrowth || (active && (active.pause || active.stop))) {
+        return rememberFlake(sealed).then(function () {
           active = null;
           return { status: 'done', flake: sealed, receipt: rec, growth: null };
-        }
-        return ask('grow', 'Nodes: ' + JSON.stringify((sealed.nodes || []).map(function (n) {
-          return { id: n.id, branch: n.branch, psi: n.psi };
-        }))).then(function (text) {
-          var choice = chooseGrowth(sealed, parseJSON(text) || {});
-          return queueGrowth(sealed, choice).then(function (queued) {
-            return runGrowth(sealed, choice).then(function (adapter) {
-              var result = { status: 'done', flake: sealed, receipt: rec, growth: choice, queue: queued, adapter: adapter };
-              active = null;
-              return result;
-            });
+        });
+      }
+      function writeGrowth(choice) {
+        return queueGrowth(sealed, choice).then(function (queued) {
+          return runGrowth(sealed, choice).then(function (adapter) {
+            active = null;
+            return { status: 'done', flake: sealed, receipt: rec, growth: choice, queue: queued, adapter: adapter };
           });
+        });
+      }
+      if (!checkBeforeOn()) {
+        return rememberFlake(sealed).then(function () {
+          return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
+            return writeGrowth(chooseGrowth(sealed, parseJSON(text) || {}));
+          });
+        });
+      }
+      return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
+        var choice = chooseGrowth(sealed, parseJSON(text) || {});
+        return previewOrKeep(sealed, choice).then(function (decision) {
+          if (!decision || decision.action !== 'keep') {
+            active = null;
+            return { status: 'done', flake: sealed, receipt: rec, growth: null, skipped: true };
+          }
+          var kept = decision.choice || choice;
+          return rememberFlake(sealed).then(function () { return writeGrowth(kept); });
         });
       });
     });
@@ -2056,6 +2382,7 @@
     failureLine: failureLine,
     localDate: localDate,
     searchNow: searchNow,
+    fetchPage: fetchPage,
     prepareSend: prepareSend,
     roomShut: roomShut,
     ensureIdentity: ensureIdentity,
@@ -2077,6 +2404,9 @@
     chooseGrowth: chooseGrowth,
     queueGrowth: queueGrowth,
     runGrowth: runGrowth,
+    composeAsk: composeAsk,
+    growthLine: growthLine,
+    checkBeforeOn: checkBeforeOn,
     rollback: rollback,
     tombstone: tombstone,
     replayNow: replayNow,

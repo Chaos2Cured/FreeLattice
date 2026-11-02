@@ -9,6 +9,8 @@
   'use strict';
   var VERSION = 'v-pool-honest-label-v0.1';
   var KEEP_KEY = 'fl_pool_honest_keep_v1';
+  var BOX_KEY = 'fl_honestBoxesHidden';
+  var CHECK_KEY = 'fl_checkBeforeCommit';
   var CUT_KEY = 'fl_pool_honest_cut_v1';
   var POOLCUT_KEY = 'fl_pool_honest_poolcut_v1';
   var HELPED_KEY = 'fl_pool_honest_helped_v1';
@@ -56,6 +58,31 @@
     else delete m[id];
     write(KEEP_KEY, m);
     refresh();
+  }
+  function boxesHidden() {
+    try { return !!(root.localStorage && root.localStorage.getItem(BOX_KEY) === 'true'); }
+    catch (e) { return false; }
+  }
+  function setBoxesHidden(on) {
+    try {
+      if (!root.localStorage) return;
+      if (on) root.localStorage.setItem(BOX_KEY, 'true');
+      else root.localStorage.removeItem(BOX_KEY);
+    } catch (e) {}
+    refresh();
+  }
+  function checkBeforeOn() {
+    try {
+      if (!root.localStorage) return true;
+      return root.localStorage.getItem(CHECK_KEY) !== 'false';
+    } catch (e) { return true; }
+  }
+  function setCheckBefore(on) {
+    try {
+      if (!root.localStorage) return;
+      root.localStorage.setItem(CHECK_KEY, on ? 'true' : 'false');
+    } catch (e) {}
+    syncSettingsToggles();
   }
   function cutMap() { var m = read(CUT_KEY, {}); return m && typeof m === 'object' ? m : {}; }
   function cuts(id) { var list = cutMap()[id]; return Array.isArray(list) ? list : []; }
@@ -406,13 +433,18 @@
     b.type = 'button';
     b.style.minHeight = '44px';
     b.style.minWidth = '44px';
-    b.style.padding = '10px 14px';
+    // before 061a: b.style.padding = '10px 14px';
     b.style.margin = '4px 8px 4px 0';
     b.style.maxWidth = '100%';
     b.style.boxSizing = 'border-box';
     b.style.whiteSpace = 'normal';
     b.style.textAlign = 'left';
     b.addEventListener('click', press);
+    return b;
+  }
+  function textLink(text, press) {
+    var b = btn(text, press);
+    if (b) b.className = 'fl-honest-btn fl-honest-link';
     return b;
   }
   function addStyle() {
@@ -425,6 +457,10 @@
       '.fl-honest p,.fl-honest button{max-width:100%;}',
       '.fl-honest-line{margin:0.4rem 0;line-height:1.45;}',
       '.fl-honest-btn{scroll-margin:56px 0;}',
+      '.fl-honest-btn{background:var(--glass-bg,transparent);color:var(--text-primary,inherit);border:1px solid var(--glass-border,rgba(255,255,255,.15));border-radius:var(--btn-radius,10px);font:inherit;font-size:.9rem;cursor:pointer;padding:10px 14px;appearance:none;-webkit-appearance:none;}',
+      '.fl-honest-btn:hover{border-color:var(--glass-hover,currentColor);}',
+      '.fl-honest-btn[aria-pressed="true"]{border-color:var(--accent,currentColor);}',
+      '.fl-honest-btn.fl-honest-link{background:transparent;border-color:transparent;color:inherit;text-decoration:underline;}',
       '#thread-veil.is-open{overflow-y:auto;justify-content:safe center;scroll-padding:52px 0 24px;}',
       '@media (max-width: 420px){#thread-veil .fl-honest{padding-right:132px;box-sizing:border-box;}}',
       '@media (prefers-reduced-motion: reduce){.fl-honest,.fl-honest *{animation:none !important;transition:none !important;}}'
@@ -480,30 +516,43 @@
       if (again) panel.appendChild(again);
     }
     if (keepOn(chatId)) panel.appendChild(el('p', 'fl-honest-line', LINE_NEXT));
-    var keep = btn(keepOn(chatId) ? 'Keep this chat on my device only. On.' : 'Keep this chat on my device only', function () {
-      setKeep(chatId, !keepOn(chatId));
-    });
-    if (keep) {
-      keep.setAttribute('aria-pressed', keepOn(chatId) ? 'true' : 'false');
-      keep.setAttribute('role', 'switch');
-      keep.setAttribute('data-honest-keep', chatId);
-      panel.appendChild(keep);
-    }
-    var meaning = btn('What does this mean?', function () {
-      var open = panel.querySelector('[data-honest-note]');
-      if (!open) return;
-      if (open.hasAttribute('hidden')) open.removeAttribute('hidden');
-      else open.setAttribute('hidden', '');
-    });
-    if (meaning) {
-      meaning.setAttribute('data-honest-meaning', '1');
-      panel.appendChild(meaning);
-    }
-    var note = el('p', 'fl-honest-line', NOTE);
-    if (note) {
-      note.setAttribute('data-honest-note', '1');
-      note.setAttribute('hidden', '');
-      panel.appendChild(note);
+    if (boxesHidden()) {
+      var show = textLink('Show device-only controls', function () { setBoxesHidden(false); });
+      if (show) {
+        show.setAttribute('data-honest-show', '1');
+        panel.appendChild(show);
+      }
+    } else {
+      var keep = btn(keepOn(chatId) ? 'Keep this chat on my device only. On.' : 'Keep this chat on my device only', function () {
+        setKeep(chatId, !keepOn(chatId));
+      });
+      if (keep) {
+        keep.setAttribute('aria-pressed', keepOn(chatId) ? 'true' : 'false');
+        keep.setAttribute('role', 'switch');
+        keep.setAttribute('data-honest-keep', chatId);
+        panel.appendChild(keep);
+      }
+      var meaning = btn('What does this mean?', function () {
+        var open = panel.querySelector('[data-honest-note]');
+        if (!open) return;
+        if (open.hasAttribute('hidden')) open.removeAttribute('hidden');
+        else open.setAttribute('hidden', '');
+      });
+      if (meaning) {
+        meaning.setAttribute('data-honest-meaning', '1');
+        panel.appendChild(meaning);
+      }
+      var note = el('p', 'fl-honest-line', NOTE);
+      if (note) {
+        note.setAttribute('data-honest-note', '1');
+        note.setAttribute('hidden', '');
+        panel.appendChild(note);
+      }
+      var hide = textLink('Hide these', function () { setBoxesHidden(true); });
+      if (hide) {
+        hide.setAttribute('data-honest-hide', '1');
+        panel.appendChild(hide);
+      }
     }
     livePeers(chatId).forEach(function (peer) {
       var name = clip(peer.name, 80) || "another person's";
@@ -585,6 +634,7 @@
     }
     mountJustState(_active);
     syncSettingsLeave();
+    syncSettingsToggles();
   }
   function ensureSettingsNote(host) {
     var d = root.document;
@@ -599,6 +649,35 @@
     if (host.nextSibling) host.parentNode.insertBefore(note, host.nextSibling);
     else host.parentNode.appendChild(note);
     syncSettingsLeave();
+    syncSettingsToggles();
+  }
+  function syncSettingsToggles() {
+    var d = root.document;
+    if (!d || !d.getElementById) return;
+    var note = d.getElementById('flHonestSettingsNote');
+    if (!note || !note.parentNode) return;
+    var old = d.getElementById('flHonestBoxesLine');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var line = el('div', 'fl-honest');
+    if (!line) return;
+    line.id = 'flHonestBoxesLine';
+    var hideBtn = textLink(boxesHidden() ? 'Show device-only controls' : 'Hide these', function () {
+      setBoxesHidden(!boxesHidden());
+    });
+    if (hideBtn) line.appendChild(hideBtn);
+    var check = btn(checkBeforeOn() ? 'Check before it becomes memory. On.' : 'Check before it becomes memory', function () {
+      setCheckBefore(!checkBeforeOn());
+    });
+    if (check) {
+      check.id = 'flCheckBeforeCommit';
+      check.setAttribute('role', 'switch');
+      check.setAttribute('aria-pressed', checkBeforeOn() ? 'true' : 'false');
+      line.appendChild(check);
+    }
+    var extra = d.getElementById('flHonestSettingsExtra');
+    var anchor = extra && extra.parentNode === note.parentNode ? extra : note;
+    if (anchor.nextSibling) note.parentNode.insertBefore(line, anchor.nextSibling);
+    else note.parentNode.appendChild(line);
   }
   function syncSettingsLeave() {
     var d = root.document;

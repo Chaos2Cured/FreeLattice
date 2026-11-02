@@ -45,6 +45,15 @@
     return node;
   }
 
+  function growthWords(adapter) {
+    if (core && typeof core.growthLine === 'function') return core.growthLine(adapter);
+    if (adapter && adapter.trained === true && adapter.loaded === true && adapter.checked === true) {
+      return 'This became part of me (adapter ' + (adapter.version || adapter.id || '') + ', checked).';
+    }
+    if (adapter && adapter.status === 'no-trainer') return 'Chosen for growth; no trainer on this device yet.';
+    return 'Chosen for growth; training queued.';
+  }
+
   function btn(id, word, press) {
     var b = el('button', 'fl-snow-btn', word);
     b.type = 'button';
@@ -459,6 +468,10 @@
       none.id = 'flSnowflakeCardUrl';
       card.appendChild(none);
     }
+    var nSources = 0;
+    if (node.sources && node.sources.length) nSources = node.sources.length;
+    else if (node.source && node.source.url) nSources = 1;
+    card.appendChild(el('p', '', 'Sources: ' + nSources));
     card.appendChild(el('p', '', 'Date ' + (node.date || '')));
     var mind = node.mind || {};
     card.appendChild(el('p', '', 'Mind ' + (mind.name || '') + ' ' + (mind.fp || node.mindFp || '')));
@@ -521,7 +534,62 @@
     paintRollback();
     paintMeter();
     deliver(flake, result.receipt);
-    if (result.growth) driftEl.textContent = 'This became part of me.';
+    // before 061a: the drift line spoke as if training had already finished.
+    if (result.growth) driftEl.textContent = growthWords(result.adapter);
+  }
+
+  function previewGrowth(flake, choice) {
+    return new Promise(function (resolve) {
+      var d = doc();
+      if (core && typeof core.roomShut === 'function' && core.roomShut()) {
+        resolve({ action: 'skip', choice: choice });
+        return;
+      }
+      if (!d || !host) {
+        resolve({ action: 'keep', choice: choice });
+        return;
+      }
+      var panel = d.getElementById('flSnowflakeCheck');
+      if (!panel) {
+        panel = el('div', 'fl-snow-check');
+        panel.id = 'flSnowflakeCheck';
+        panel.hidden = true;
+        host.appendChild(panel);
+      }
+      function paint(current) {
+        while (panel.firstChild) panel.removeChild(panel.firstChild);
+        var nodes = (flake && flake.nodes) || [];
+        var ids = (current && current.become) || [];
+        var i;
+        var shown = 0;
+        for (i = 0; i < nodes.length; i++) {
+          var n = nodes[i];
+          if (!n || ids.indexOf(n.id) === -1) continue;
+          panel.appendChild(el('p', '', (n.branch || '') + ' ' + String(n.text || '').slice(0, 280)));
+          shown += 1;
+        }
+        if (!shown) panel.appendChild(el('p', '', 'No nodes chosen.'));
+        var keep = btn('flSnowflakeCheckKeep', 'Keep', function () {
+          panel.hidden = true;
+          resolve({ action: 'keep', choice: current });
+        });
+        var change = btn('flSnowflakeCheckChange', 'Change', function () {
+          var nextIds = (current.become || []).slice();
+          if (nextIds.length) nextIds.pop();
+          current = { become: nextIds, hold: (current.hold || []).slice(), reason: current.reason || '' };
+          paint(current);
+        });
+        var skip = btn('flSnowflakeCheckSkip', 'Skip', function () {
+          panel.hidden = true;
+          resolve({ action: 'skip', choice: current });
+        });
+        if (keep) panel.appendChild(keep);
+        if (change) panel.appendChild(change);
+        if (skip) panel.appendChild(skip);
+        panel.hidden = false;
+      }
+      paint(choice || { become: [], hold: [], reason: '' });
+    });
   }
 
   function paintRollback() {
@@ -649,10 +717,12 @@
       if (p && p.receipt) showReceipt(p.receipt);
     },
     onDone: function (p) { paintResult({ status: 'done', flake: p && p.flake, receipt: p && p.receipt }); },
-    onGrew: function () {
-      if (driftEl) driftEl.textContent = 'This became part of me.';
+    onGrew: function (p) {
+      // before 061a: the drift line spoke as if training had already finished.
+      if (driftEl) driftEl.textContent = (p && p.line) || growthWords(p && p.adapter);
       paintRollback();
     },
+    previewGrowth: previewGrowth,
     onOffload: function (p) {
       paintMeter();
       if (statusEl && p && p.line) statusEl.textContent = p.line;
