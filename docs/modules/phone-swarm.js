@@ -279,6 +279,86 @@
     });
   }
 
+  function markMismatch(job) {
+    job.matched = false;
+    job.verified = false;
+    job.willNotImport = true;
+    job.state = 'mismatch';
+    job.error = 'hash mismatch — will not trust on this device';
+    job.blob = null;
+    return publicJob(job);
+  }
+
+  function ensureHeal() {
+    if (root && root.FLSelfHeal && typeof root.FLSelfHeal.heal === 'function') {
+      return Promise.resolve(root.FLSelfHeal);
+    }
+    if (typeof require === 'function') {
+      try { require('./self-heal.js'); } catch (e) {}
+      if (root && root.FLSelfHeal && typeof root.FLSelfHeal.heal === 'function') {
+        return Promise.resolve(root.FLSelfHeal);
+      }
+    }
+    if (typeof document === 'undefined' || !document.head) return Promise.resolve(null);
+    return new Promise(function (resolve) {
+      var src = 'modules/self-heal.js';
+      var scripts = document.getElementsByTagName('script');
+      var i;
+      for (i = 0; i < scripts.length; i++) {
+        var have = scripts[i].getAttribute('src') || '';
+        if (have.indexOf('phone-swarm.js') !== -1) {
+          src = have.replace('phone-swarm.js', 'self-heal.js');
+          break;
+        }
+      }
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { resolve((root && root.FLSelfHeal) || null); };
+      s.onerror = function () { resolve(null); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function rangeFetch(job, manifest, index) {
+    var url = job && job.webseedUrl;
+    var size = (manifest && manifest.pieceSize) || (64 * 1024);
+    if (!url || typeof fetch !== 'function' || typeof size !== 'number') return Promise.resolve(null);
+    var start = index * size;
+    var end = start + size - 1;
+    return fetch(url, { headers: { Range: 'bytes=' + start + '-' + end } }).then(function (res) {
+      if (!res || (res.status !== 200 && res.status !== 206)) return null;
+      return res.arrayBuffer().then(function (buf) {
+        return { bytes: new Uint8Array(buf), from: job.peerWhole && manifest && job.peerWhole === manifest.whole ? 'peer' : 'source' };
+      });
+    }, function () { return null; });
+  }
+
+  function healOrMismatch(job, bytes, want) {
+    if (!job || !job.manifest) return Promise.resolve(markMismatch(job));
+    return ensureHeal().then(function (heal) {
+      if (!heal) return markMismatch(job);
+      var pull = typeof job.fetchPiece === 'function'
+        ? job.fetchPiece
+        : function (index) { return rangeFetch(job, job.manifest, index); };
+      return heal.heal(job.manifest, bytes, pull, { what: 'phone-swarm' }).then(function (receipt) {
+        job.healReceipt = receipt || null;
+        if (!receipt || !receipt.ok || !receipt.data) return markMismatch(job);
+        return sha256Hex(toUint8(receipt.data)).then(function (hex) {
+          var got = String(hex || '').toLowerCase();
+          if (!got || got !== want) return markMismatch(job);
+          job.matched = true;
+          job.verified = true;
+          job.willNotImport = true;
+          job.state = 'verified';
+          job.error = null;
+          return storeVerified(job, toUint8(receipt.data)).then(function () {
+            return publicJob(job);
+          });
+        });
+      }, function () { return markMismatch(job); });
+    });
+  }
+
   function handoffBuffer(job, bytes) {
     job.state = 'hashing';
     job.progress = 100;
@@ -301,10 +381,11 @@
       job.matched = false;
       job.verified = false;
       job.willNotImport = true;
-      job.state = 'mismatch';
-      job.error = 'hash mismatch — will not trust on this device';
-      job.blob = null;
-      return publicJob(job);
+      // before 062a: job.state = 'mismatch';
+      // before 062a: job.error = 'hash mismatch — will not trust on this device';
+      // before 062a: job.blob = null;
+      // before 062a: return publicJob(job);
+      return healOrMismatch(job, u8, want);
     });
   }
 
@@ -740,6 +821,17 @@
     DESKTOP_HINT: DESKTOP_HINT,
     /** @private smoke */ jobs: jobs
   };
+
+  if (typeof document !== 'undefined') {
+    ensureHeal().then(function (heal) {
+      if (!heal || typeof heal.mountSettings !== 'function') return;
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () { heal.mountSettings(); });
+      } else {
+        heal.mountSettings();
+      }
+    });
+  }
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;

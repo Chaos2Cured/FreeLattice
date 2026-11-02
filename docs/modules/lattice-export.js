@@ -541,6 +541,78 @@
     });
   }
 
+  // before 062a: a broken row stopped the walk and the chain was left with no re-fetch offer.
+  function hashRow(entry) {
+    var canon = JSON.stringify({
+      ts: entry && entry.ts,
+      kind: entry && entry.kind,
+      prior_hash: entry && entry.prior_hash,
+      refs: (entry && entry.refs) || []
+    });
+    return sha256(canon);
+  }
+
+  function healChainRow(chain, i, candidate) {
+    if (!Array.isArray(chain) || !chain[i] || !candidate) {
+      return Promise.resolve({ ok: false, brokenAt: i, reason: 'missing', refused: true });
+    }
+    var recorded = chain[i].self_hash;
+    return hashRow(candidate).then(function (hex) {
+      if (!hex || hex !== recorded) {
+        return { ok: false, brokenAt: i, reason: 'refused-different-hash', refused: true };
+      }
+      if (i > 0 && candidate.prior_hash !== chain[i - 1].self_hash) {
+        return { ok: false, brokenAt: i, reason: 'refused-prior', refused: true };
+      }
+      var healed = {};
+      var k;
+      for (k in candidate) {
+        if (Object.prototype.hasOwnProperty.call(candidate, k)) healed[k] = candidate[k];
+      }
+      healed.self_hash = recorded;
+      var next = chain.slice();
+      next[i] = healed;
+      return verifyChainIntegrity(next).then(function (result) {
+        if (!result.ok) return { ok: false, brokenAt: result.brokenAt, reason: result.reason, refused: true };
+        return { ok: true, brokenAt: null, chain: next, healed: i };
+      });
+    });
+  }
+
+  function offerLine(i) {
+    return 'Re-fetch row ' + i + ' from backup/peer';
+  }
+
+  function showRowOffer(chainResult, chain) {
+    if (typeof document === 'undefined' || !chainResult || chainResult.ok) return;
+    var old = document.getElementById('flHealRowOffer');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var btn = document.createElement('button');
+    btn.id = 'flHealRowOffer';
+    btn.type = 'button';
+    btn.textContent = offerLine(chainResult.brokenAt);
+    btn.style.minHeight = '44px';
+    btn.style.minWidth = '44px';
+    btn.style.padding = '10px 14px';
+    btn.addEventListener('click', function () {
+      var pull = (typeof window !== 'undefined' && window.FLSelfHeal && window.FLSelfHeal.pullRow) || null;
+      if (typeof pull !== 'function') {
+        btn.textContent = 'Re-fetch row ' + chainResult.brokenAt + ' from backup/peer. No backup is on this device yet.';
+        return;
+      }
+      Promise.resolve(pull(chainResult.brokenAt)).then(function (row) {
+        return healChainRow(chain, chainResult.brokenAt, row);
+      }).then(function (healed) {
+        btn.textContent = healed && healed.ok
+          ? 'Row ' + chainResult.brokenAt + ' matches the recorded hash.'
+          : 'Row ' + chainResult.brokenAt + ' stays broken.';
+      });
+    });
+    var report = document.getElementById('latticeExportReport');
+    var anchor = report || document.getElementById('latticeImportBtn');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor.nextSibling);
+  }
+
   function verifyChainIntegrity(chain) {
     return new Promise(function (resolve) {
       if (!Array.isArray(chain)) { resolve({ ok: false, brokenAt: 0, reason: 'chain-not-array' }); return; }
@@ -617,11 +689,14 @@
         // Verify chain integrity BEFORE any state change.
         return verifyChainIntegrity(data.chain || []).then(function (chainResult) {
           if (!chainResult.ok) {
+            showRowOffer(chainResult, data.chain || []);
             return {
               ok: false,
               mode: strategy,
               changes: [],
-              errors: ['chain-broken-at-' + chainResult.brokenAt + ':' + chainResult.reason]
+              errors: ['chain-broken-at-' + chainResult.brokenAt + ':' + chainResult.reason],
+              brokenAt: chainResult.brokenAt,
+              offer: offerLine(chainResult.brokenAt)
             };
           }
 
@@ -773,9 +848,14 @@
       assertNoQuietRoomInBlob: assertNoQuietRoomInBlob,
       verifySignature: verifySignature,
       verifyChainIntegrity: verifyChainIntegrity,
+      healChainRow: healChainRow,
+      hashRow: hashRow,
+      offerLine: offerLine,
       redactEntry: redactEntry
     }
   };
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = publicAPI;
 
   if (typeof window !== 'undefined') {
     window.LatticeExport = publicAPI;
