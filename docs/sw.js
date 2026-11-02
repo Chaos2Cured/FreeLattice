@@ -157,6 +157,7 @@ const APP_SHELL = [
     './modules/resonance-lake.js',
     './modules/garden-trainer.js',
     './modules/ratio-room.js',
+    './modules/hearth-code.js',
     './sophia.html',
     './library/MIND_WALL_SPEC.md',
     './library/LIABILITY_DRAFT.md',

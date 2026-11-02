@@ -20,8 +20,10 @@ function md5(file) {
 }
 
 var locks = {
-  'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
-  'sw.js': '91726cf2228b794f7585f79f61418d12',
+  // before 063a: 'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
+  'docs/sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  // before 063a: 'sw.js': '91726cf2228b794f7585f79f61418d12',
+  'sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
   'docs/modules/fl-connect.js': 'aaff2bf1b037656989a9e1a89bb05908',
   'docs/modules/ledger-shard-export.js': '75e7e548919617993e048a3fe61cd965',
   'docs/modules/ai-continuity.js': '079c072dc882ad189035f9d6c64489f4',
