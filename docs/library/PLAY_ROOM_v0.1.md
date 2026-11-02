@@ -145,3 +145,8 @@ Every one of these has a visible word and an aria-label. Pressable controls are 
 ## Glass
 
 `rgba(16, 18, 36, 0.88)` with a 13px blur when the browser can blur. Without that support the same glass is `0.95`. Silver-blue edge `rgba(200, 210, 230, 0.08)`, 12px radius. Emerald `var(--success)` for a mind. Gold `var(--accent)` for You and the primary buttons. New objects breathe to about 1.06 unless reduced motion is on. The sky is the house starfield in CSS, not a new canvas.
+
+## Lock exception note (added 2026-11-02, layered; history above unchanged)
+- `docs/modules/pool-honest-label.js` was pinned at md5 `ca08886e185ffb8721525bb627302d74` by the 056a lock list (the md5 pins in `docs/scripts/smoke-play-room-v0.1.js`).
+- Kirk approved an exception on 2026-11-02 for FL PR #310 (061a honest boxes): the file may change to md5 `91d8b79067f92e761474848dd2b9a75a`, **provided Hypha walks it and nothing breaks**.
+- The pins in the Play Room, chat-bottom and menu-contrast smokes now carry the new md5; the old pin stays as a "before" comment. Every other lock is unchanged.
