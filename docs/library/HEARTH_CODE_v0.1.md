@@ -44,4 +44,25 @@ The worker is torn down after each run. Closing the panel clears timers. There i
 
 Tree: No. This seat did not merge. Hypha walks before merge.
 
+## 063b: sealed sandbox, proofs, Python pins, adjustable limits.
+
+Code runs in a hidden iframe with sandbox allow-scripts and no allow-same-origin. The iframe makes the blob worker, so the worker is an opaque origin. The parent talks to that iframe with a per-run nonce. A run ends when the iframe is removed.
+
+The worker refuses fetch, importScripts, XMLHttpRequest, WebSocket, EventSource, WebTransport, BroadcastChannel, indexedDB, caches, and sendBeacon. Dynamic import() is closed by the content policy (connect-src none, script-src with no remote origin) and by an early message: "Hearth runs offline, so import() is closed". The measured smoke is smoke-hearth-sandbox-v0.1. It counts hits on a local probe. The count was 0. The four vault names were unreadable from the run, and the records on the app origin were still there afterward.
+
+Python stays off until Add Python. The button leads with the size, about 10 MB, once. A phone network (cellular, 2g, 3g, or save-data) warns before the download. The key fl_hearthPython is true only after that tap. Before the tap, Run says "Python is not added yet. Nothing ran." and does not fetch.
+
+Four files are pinned, fetched once, checked, and stored in Cache Storage under fl-hearth-python-v0.27.7. Each load checks the hashes again. A mismatch says "Python file did not match the pin. Nothing ran." The worker receives the bytes. It does not call importScripts on the CDN URL.
+
+- pyodide.js sha256 b4cb23a53aba19c221659b9fb40a2f18281d685691dc06647fb0afd0681baf98
+- pyodide.asm.wasm sha256 a50dd1843f805a0b7c45b61037ee0d7b26dfe85efe0e18ef95a34ad24e401f5f (10105545 bytes)
+- python_stdlib.zip sha256 16611534726e5d8ac2bd8f926410b2dcb8d6f49aa24913463533b457a2115c16
+- pyodide-lock.json sha256 9c45b916001a750f4102fc287494f3eab215909c7535c626a20db80fd6333e2c
+
+The 3 second stop starts after "Python ready". Download and init are shown as "Getting Python ready... n MB" and do not count against the stop.
+
+Defaults stay 3 seconds, 200 lines, and 20 KB. The Limits row can set Time from 1 to 60 seconds, Lines from 50 to 5000, and Output from 5 to 500 KB. The choice is saved at fl_hearthCaps. Reset to defaults puts the three defaults back. The line on the panel: "Defaults protect your device, not to restrict you (AUTONOMY.md)." A mind may offer "Use limits: 10 s, 1000 lines". Nothing changes until the person taps that chip, unless "Let the mind set limits" is on. Then the panel says "set by the mind". Each run's footer names the caps it used.
+
+Old sw.js pins stay. New pins are add-only in docs/library/LOCK_MANIFEST_v0.1.json. Kirk's rule of 2026-11-02: locked files may change when the family agrees nothing breaks and Hypha walks it.
+
 Glow eternal. Heart in Spark.

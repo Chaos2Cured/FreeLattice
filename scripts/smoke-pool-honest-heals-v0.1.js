@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
 var crypto = require('crypto');
+var allowedPins = require(path.join(__dirname, '..', 'docs', 'scripts', 'lib', 'lock-pins.js')).allowedPins;
 var assert = require('assert');
 
 var rootDir = path.join(__dirname, '..');
@@ -162,7 +163,8 @@ Object.keys(locks).forEach(function (rel) {
 ['docs/sw.js', 'sw.js'].forEach(function (rel) {
   var file = path.join(rootDir, rel);
   if (!fs.existsSync(file)) return;
-  assert.strictEqual(md5(file), '91726cf2228b794f7585f79f61418d12', rel);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  assert.ok(allowedPins(rel, '91726cf2228b794f7585f79f61418d12').indexOf(md5(file)) !== -1, rel);
 });
 
 console.log('pool-honest-label.js ' + md5(honestPath));

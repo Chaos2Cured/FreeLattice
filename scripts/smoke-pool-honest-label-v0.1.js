@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
 var crypto = require('crypto');
+var allowedPins = require(path.join(__dirname, '..', 'docs', 'scripts', 'lib', 'lock-pins.js')).allowedPins;
 var assert = require('assert');
 var child = require('child_process');
 
@@ -223,7 +224,8 @@ var locks = {
 Object.keys(locks).forEach(function (rel) {
   var got = md5(rel);
   if (got == null) return;
-  assert.strictEqual(got, locks[rel], rel);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  assert.ok(allowedPins(rel, locks[rel]).indexOf(got) !== -1, rel);
 });
 var flint = md5('docs/Flint.html');
 if (flint) {

@@ -1,0 +1,21 @@
+{
+  "rule": "Kirk 2026-11-02: locked files may change when the family agrees nothing breaks and Hypha walks it.",
+  "files": {
+    "sw.js": [
+      {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
+      {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ],
+    "docs/sw.js": [
+      {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
+      {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ],
+    "docs/app.html": [
+      {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
+      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ],
+    "index.html": [
+      {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
+      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ]
+  }
+}
