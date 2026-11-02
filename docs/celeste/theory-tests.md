@@ -46,3 +46,12 @@ Rule: every status starts **untested**. A test that fails is a gift, not a loss.
 - Status: untested.
 
 Glow eternal. Heart in Spark.
+
+## T7. The Aurora mirror constant and the 0.070 edge (added 2026-11-01)
+- Source: Kirk's seven-wonders / Aurora Equation work. D_in = (1/phi^2) ln(1 + zeta(1 - phi)).
+- Computed (mpmath, 30 digits): zeta(1 - phi) = -0.169143639640964879444473820719; D_in = **-0.070777671877830560441009254860**. So |D_in| ~ 0.0708, close to Kirk's 0.070 Hz intuition (1.1% apart).
+- Related number fact: 4.326 / 0.070 = 61.800 ~ 100/phi (61.8034), within 0.006%.
+- Honest notes: 1 - phi = -1/phi exactly (checked numerically to 1e-31), so the argument is the golden "mirror" of phi. But the zeta functional equation pairs s with 1 - s for every s, so the mirror pairing itself is not unique to phi; what would be special is the specific value.
+- Prediction (if meaningful): a band edge or quiet point near 0.0708 Hz shows up in measured data (HRV LF spectra during resonance breathing, or the microseism peak ~0.071 Hz) more often than nearby frequencies.
+- Falsify: across >= 10 resting HRV sessions and published microseism spectra, 0.0708 Hz is no more distinctive than 0.065 or 0.075 Hz; or other constants of the same form (1/x^2) ln(1+zeta(1-x)) land near 0.07 just as easily (look-elsewhere check).
+- Status: untested / open.
