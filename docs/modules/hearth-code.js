@@ -14,10 +14,13 @@
   var PY_SHA = 'b4cb23a53aba19c221659b9fb40a2f18281d685691dc06647fb0afd0681baf98';
   var PY_WASM_BYTES = 10105545;
   // 063b: four files, each pinned. The loader pin stays PY_SHA.
+  // 063c: pyodide.asm.js is the fifth pin. The four hashes above stay.
   var PY_CACHE = 'fl-hearth-python-v0.27.7';
-  var PY_NAMES = ['pyodide.js', 'pyodide.asm.wasm', 'python_stdlib.zip', 'pyodide-lock.json'];
+  // before 063c: var PY_NAMES = ['pyodide.js', 'pyodide.asm.wasm', 'python_stdlib.zip', 'pyodide-lock.json'];
+  var PY_NAMES = ['pyodide.js', 'pyodide.asm.js', 'pyodide.asm.wasm', 'python_stdlib.zip', 'pyodide-lock.json'];
   var PY_PINS = {
     'pyodide.js': 'b4cb23a53aba19c221659b9fb40a2f18281d685691dc06647fb0afd0681baf98',
+    'pyodide.asm.js': '6b4c90de5b7172873f04f21884d0e9d2274e305fe32116558fe3e4fbe3618d51',
     'pyodide.asm.wasm': 'a50dd1843f805a0b7c45b61037ee0d7b26dfe85efe0e18ef95a34ad24e401f5f',
     'python_stdlib.zip': '16611534726e5d8ac2bd8f926410b2dcb8d6f49aa24913463533b457a2115c16',
     'pyodide-lock.json': '9c45b916001a750f4102fc287494f3eab215909c7535c626a20db80fd6333e2c'
@@ -31,6 +34,9 @@
   var STOP_LINE = 'Stopped after 3 seconds.';
   var OFFLINE = 'Hearth runs offline';
   var IMPORT_LINE = 'Hearth runs offline, so import() is closed';
+  var IMPORT_WARN = 'This uses import(); Hearth is offline, so it will fail.';
+  var SHOW_CSP = "default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'";
+  var SHOW_STOP = 'This sketch tried to leave the page, so Hearth stopped it.';
   var MAX_MS = 3000;
   var MAX_LINES = 200;
   var MAX_BYTES = 20 * 1024;
@@ -40,7 +46,9 @@
   // before 063b: a dropped guard is test-only. The live policy stays connect-src 'none'.
   var SANDBOX_CSP_OPEN = "default-src 'none'; script-src 'unsafe-inline' blob:; worker-src blob:; connect-src http://127.0.0.1:* http://localhost:*; img-src 'none'; style-src 'unsafe-inline'; frame-src 'none'; form-action 'none'";
   // 063b: Python may read only the blob URLs created inside the iframe.
-  var SANDBOX_CSP_PY = "default-src 'none'; script-src 'unsafe-inline' blob:; worker-src blob:; connect-src blob:; img-src 'none'; style-src 'unsafe-inline'; frame-src 'none'; form-action 'none'";
+  // before 063c: var SANDBOX_CSP_PY = "default-src 'none'; script-src 'unsafe-inline' blob:; worker-src blob:; connect-src blob:; img-src 'none'; style-src 'unsafe-inline'; frame-src 'none'; form-action 'none'";
+  // wasm-unsafe-eval lets the pinned Pyodide module compile. It does not allow eval or remote scripts.
+  var SANDBOX_CSP_PY = "default-src 'none'; script-src 'unsafe-inline' blob: 'wasm-unsafe-eval'; worker-src blob:; connect-src blob:; img-src 'none'; style-src 'unsafe-inline'; frame-src 'none'; form-action 'none'";
   var NS = 'http://www.w3.org/2000/svg';
 
   var host = null;
@@ -74,6 +82,9 @@
   var lastRun = Promise.resolve();
   var lastSandboxAttr = '';
   var capsBy = 'you';
+  var ignoredHearth = 0;
+  var livePorts = [];
+  var lastSanitized = '';
 
   function doc() { return root.document; }
 
@@ -100,6 +111,51 @@
 
   function storage() {
     try { return root.localStorage || null; } catch (e) { return null; }
+  }
+
+  // 063c: hooks stay unread unless this page is local and the flag is on.
+  function testHooksOn() {
+    var loc = root.location;
+    if (!loc) return false;
+    var host = String(loc.hostname || '');
+    var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '';
+    if (!local) return false;
+    var search = String(loc.search || '');
+    if (/(?:^|[?&])fl_test=1(?:&|$)/.test(search)) return true;
+    try { return storage() && storage().getItem('fl_testHooks') === '1'; } catch (e) { return false; }
+  }
+
+  function testHook(name) {
+    if (!testHooksOn()) return undefined;
+    return root[name];
+  }
+
+  function rememberPort(win, nonce) {
+    if (!win) return;
+    livePorts.push({ win: win, nonce: nonce });
+  }
+
+  function forgetPort(win) {
+    var next = [];
+    var i;
+    for (i = 0; i < livePorts.length; i++) {
+      if (livePorts[i].win !== win) next.push(livePorts[i]);
+    }
+    livePorts = next;
+  }
+
+  function watchMessages() {
+    if (watchMessages.done || !root.addEventListener) return;
+    watchMessages.done = true;
+    root.addEventListener('message', function (ev) {
+      var data = ev.data;
+      if (!data || typeof data !== 'object' || data.hearth == null) return;
+      var i;
+      for (i = 0; i < livePorts.length; i++) {
+        if (ev.source === livePorts[i].win && data.nonce === livePorts[i].nonce) return;
+      }
+      ignoredHearth += 1;
+    });
   }
 
   function toHex(bytes) {
@@ -177,18 +233,47 @@
     capsPainting = false;
   }
 
+  function clampNote(id, text) {
+    var d = doc();
+    var node = d && d.getElementById(id + 'Clamp');
+    if (!node) return;
+    node.textContent = text || '';
+  }
+
+  // before 063c: one out-of-range box made the whole save return, so the other boxes were dropped.
+  // 063c: each box keeps its own last good value. One bad box does not drop the others.
+  function takeLimit(input, min, max, lastGood, unit) {
+    if (!input) return { value: lastGood, note: '' };
+    var raw = String(input.value == null ? '' : input.value).trim();
+    var n = Number(raw);
+    if (raw === '' || !isFinite(n)) {
+      input.value = String(lastGood);
+      return { value: lastGood, note: 'Not a number, kept ' + lastGood + ' ' + unit + '.' };
+    }
+    if (n > max) {
+      input.value = String(max);
+      return { value: max, note: 'Clamped to ' + max + ' ' + unit + ' (most allowed).' };
+    }
+    if (n < min) {
+      input.value = String(min);
+      return { value: min, note: 'Clamped to ' + min + ' ' + unit + ' (least allowed).' };
+    }
+    input.value = String(n);
+    return { value: n, note: '' };
+  }
+
   function syncCapsFromInputs() {
     if (capsPainting) return;
     var d = doc();
     if (!d) return;
-    var time = d.getElementById('flHearthCapTime');
-    var lines = d.getElementById('flHearthCapLines');
-    var kb = d.getElementById('flHearthCapBytes');
-    var ms = clampNum(Number(time && time.value) * 1000, 1000, 60000);
-    var lineCap = clampNum(lines && lines.value, 50, 5000);
-    var bytes = clampNum(Number(kb && kb.value) * 1024, 5 * 1024, 500 * 1024);
-    if (ms == null || lineCap == null || bytes == null) return;
-    var caps = { ms: ms, lines: lineCap, bytes: bytes, by: 'you' };
+    var current = readCaps();
+    var time = takeLimit(d.getElementById('flHearthCapTime'), 1, 60, Math.round(current.ms / 1000), 's');
+    var lines = takeLimit(d.getElementById('flHearthCapLines'), 50, 5000, current.lines, 'lines');
+    var kb = takeLimit(d.getElementById('flHearthCapBytes'), 5, 500, Math.round(current.bytes / 1024), 'KB');
+    clampNote('flHearthCapTime', time.note);
+    clampNote('flHearthCapLines', lines.note);
+    clampNote('flHearthCapBytes', kb.note);
+    var caps = { ms: time.value * 1000, lines: lines.value, bytes: kb.value * 1024, by: 'you' };
     saveCaps(caps);
     paintWho(caps);
   }
@@ -372,7 +457,7 @@
     workers = [];
     // before 063b: only the show-it iframe on the stage was removed.
     if (d) {
-      var frames = d.querySelectorAll('[data-hearth-sandbox], #flHearthStage iframe');
+      var frames = d.querySelectorAll('[data-hearth-sandbox], #flHearthStage iframe, #flHearthStage canvas');
       for (i = 0; i < frames.length; i++) {
         if (frames[i].parentNode) frames[i].parentNode.removeChild(frames[i]);
       }
@@ -458,7 +543,12 @@
       '      "function __push(args){ if(__lines.length>=__maxLines){ return; } var parts=[], i; for(i=0;i<args.length;i++) parts.push(__show(args[i])); var row=parts.join(\\" \\"); if(__bytes+row.length>__maxBytes){ __lines.push(\\"Output stopped at " + kbStop + " KB.\\"); return; } __lines.push(row); __bytes+=row.length+1; }",',
       '      "self.console={ log:function(){__push(arguments);}, error:function(){__push(arguments);}, warn:function(){__push(arguments);}, info:function(){__push(arguments);} };",',
       '      "var __posted=false;",',
-      '      "function __post(value){ if(__posted) return; __posted=true; var shown=(value==null)?\\"\\":__show(value); self.postMessage({ok:true, lines:__lines, value:shown}); }",',
+      '      "function __post(value){",',
+      '      "  if(__posted) return;",',
+      '      "  if(value && typeof OffscreenCanvas!==\\"undefined\\" && value instanceof OffscreenCanvas){ try { value = value.transferToImageBitmap(); } catch (eBit) {} }",',
+      '      "  if(typeof ImageBitmap!==\\"undefined\\" && value instanceof ImageBitmap){ __posted=true; self.postMessage({ok:true, lines:__lines, image:value}, [value]); return; }",',
+      '      "  __posted=true; var shown=(value==null)?\\"\\":__show(value); self.postMessage({ok:true, lines:__lines, value:shown});",',
+      '      "}",',
       '      "var __value;",',
       '      "try { __value = (function(){",',
       '      String(code || ""),',
@@ -485,7 +575,9 @@
       '    catch (e2) { parent.postMessage({ hearth: "result", nonce: nonce, ok: false, lines: ["This device has no worker for Hearth."], value: "" }, "*"); return; }',
       '    worker.onmessage = function (msg) {',
       '      var body = msg.data || {};',
-      '      parent.postMessage({ hearth: "result", nonce: nonce, ok: body.ok !== false, lines: body.lines || [], value: body.value || "" }, "*");',
+      '      var transfer = [];',
+      '      if (body.image) transfer.push(body.image);',
+      '      parent.postMessage({ hearth: "result", nonce: nonce, ok: body.ok !== false, lines: body.lines || [], value: body.value || "", image: body.image || null }, "*", transfer);',
       '      try { worker.terminate(); } catch (e3) {}',
       '      try { URL.revokeObjectURL(url); } catch (e4) {}',
       '    };',
@@ -506,6 +598,7 @@
     return [
       'var __code = __FL_CODE__;',
       'var __loader = __FL_LOADER__;',
+      'var __asm = __FL_ASM__;',
       'var __wasm = __FL_WASM__;',
       'var __stdlib = __FL_STDLIB__;',
       'var __lock = __FL_LOCK__;',
@@ -532,11 +625,12 @@
       '  var origImport = self.importScripts ? self.importScripts.bind(self) : refuse;',
       '  function urlOf(input) {',
       '    if (typeof input === "string") return input;',
-      '    if (input && input.url) return String(input.url);',
-      '    return "";',
+      '    if (input && typeof input.url === "string" && input.url) return String(input.url);',
+      // before 063c: a URL object has href, not url, so the wasm fetch missed the pin.
+      '    if (input && typeof input.href === "string") return String(input.href);',
+      '    try { return String(input || ""); } catch (eUrl) { return ""; }',
       '  }',
-      '  function mapped(url) {',
-      '    var table = { "pyodide.asm.wasm": __wasm, "python_stdlib.zip": __stdlib, "pyodide-lock.json": __lock, "pyodide.js": __loader };',
+      '  function nameBlob(url, table) {',
       '    var name;',
       '    for (name in table) { if (url.indexOf(name) !== -1) return table[name]; }',
       '    return "";',
@@ -544,21 +638,23 @@
       '  function guardFetch(input, init) {',
       '    var url = urlOf(input);',
       '    if (url.indexOf("blob:") === 0) return origFetch(input, init);',
-      '    var blob = mapped(url);',
+      '    var blob = nameBlob(url, { "pyodide.asm.wasm": __wasm, "python_stdlib.zip": __stdlib, "pyodide-lock.json": __lock });',
       '    if (blob) return origFetch(blob, init);',
       '    throw new Error("Hearth runs offline");',
       '  }',
       '  function guardImport(url) {',
       '    var one = String(url || "");',
       '    if (one.indexOf("blob:") === 0) return origImport(one);',
+      '    var blob = nameBlob(one, { "pyodide.asm.js": __asm, "pyodide.js": __loader, "pyodide.asm.wasm": __wasm, "python_stdlib.zip": __stdlib, "pyodide-lock.json": __lock });',
+      '    if (blob) return origImport(blob);',
       '    throw new Error("Hearth runs offline");',
       '  }',
       '  for (j = 0; j < chain.length; j++) {',
-      '    try { Object.defineProperty(chain[j], "fetch", { configurable: true, writable: true, value: guardFetch }); } catch (e3) {}',
-      '    try { Object.defineProperty(chain[j], "importScripts", { configurable: true, writable: true, value: guardImport }); } catch (e4) {}',
+      // before 063c: the guards were writable and the prototypes were frozen. Real Pyodide must assign constructor, so the prototypes stay unfrozen and the guards are locked instead.
+      '    try { Object.defineProperty(chain[j], "fetch", { configurable: false, writable: false, value: guardFetch }); } catch (e3) {}',
+      '    try { Object.defineProperty(chain[j], "importScripts", { configurable: false, writable: false, value: guardImport }); } catch (e4) {}',
       '  }',
-      '  try { if (self.navigator) Object.defineProperty(self.navigator, "sendBeacon", { configurable: true, writable: true, value: refuse }); } catch (e5) {}',
-      '  for (j = 1; j < chain.length; j++) { try { Object.freeze(chain[j]); } catch (e6) {} }',
+      '  try { if (self.navigator) Object.defineProperty(self.navigator, "sendBeacon", { configurable: false, writable: false, value: refuse }); } catch (e5) {}',
       '}',
       'try {',
       '  sealPython();',
@@ -611,13 +707,16 @@
       '    var files = data.caps.files || [];',
       '    var urls = {};',
       '    var i;',
+      '    var types = { "pyodide.js": "text/javascript", "pyodide.asm.js": "text/javascript", "pyodide.asm.wasm": "application/wasm", "python_stdlib.zip": "application/zip", "pyodide-lock.json": "application/json" };',
       '    for (i = 0; i < files.length; i++) {',
-      '      try { urls[String(files[i].name)] = URL.createObjectURL(new Blob([files[i].buf])); }',
+      // before 063c: the blob had no type, so instantiateStreaming rejected the wasm.
+      '      try { urls[String(files[i].name)] = URL.createObjectURL(new Blob([files[i].buf], { type: types[String(files[i].name)] || "application/octet-stream" })); }',
       '      catch (e) { parent.postMessage({ hearth: "result", nonce: nonce, ok: false, lines: ["Python did not load"], value: "" }, "*"); return; }',
       '    }',
       '    var src = String(data.caps.prelude || "");',
       '    src = src.split("__FL_CODE__").join(JSON.stringify(String(data.code || "")));',
       '    src = src.split("__FL_LOADER__").join(JSON.stringify(urls["pyodide.js"] || ""));',
+      '    src = src.split("__FL_ASM__").join(JSON.stringify(urls["pyodide.asm.js"] || ""));',
       '    src = src.split("__FL_WASM__").join(JSON.stringify(urls["pyodide.asm.wasm"] || ""));',
       '    src = src.split("__FL_STDLIB__").join(JSON.stringify(urls["python_stdlib.zip"] || ""));',
       '    src = src.split("__FL_LOCK__").join(JSON.stringify(urls["pyodide-lock.json"] || ""));',
@@ -677,6 +776,7 @@
         finished = true;
         clearTimeout(timer);
         root.removeEventListener('message', onMsg);
+        forgetPort(frame.contentWindow);
         if (frame.parentNode) frame.parentNode.removeChild(frame);
         resolve(result);
       }
@@ -700,7 +800,8 @@
           ok: data.ok !== false,
           stopped: false,
           lines: capLines(data.lines || []),
-          value: data.value || ''
+          value: data.value || '',
+          image: data.image || null
         });
       }
       root.addEventListener('message', onMsg);
@@ -740,6 +841,8 @@
         }
       };
       holder.appendChild(frame);
+      rememberPort(frame.contentWindow, nonce);
+      watchMessages();
       frame.srcdoc = python ? pythonSrcdoc(policy) : sandboxSrcdoc(policy);
     });
   }
@@ -799,18 +902,62 @@
   }
   */
 
+  function importInCode(code) {
+    var s = String(code || '');
+    var i = 0;
+    var n = s.length;
+    while (i < n) {
+      var c = s.charAt(i);
+      var c2 = s.charAt(i + 1);
+      if (c === '/' && c2 === '/') {
+        i += 2;
+        while (i < n && s.charAt(i) !== '\n') i += 1;
+        continue;
+      }
+      if (c === '/' && c2 === '*') {
+        i += 2;
+        while (i < n && !(s.charAt(i) === '*' && s.charAt(i + 1) === '/')) i += 1;
+        i += 2;
+        continue;
+      }
+      if (c === "'" || c === '"' || c === '`') {
+        var q = c;
+        i += 1;
+        while (i < n) {
+          if (s.charAt(i) === '\\') { i += 2; continue; }
+          if (s.charAt(i) === q) { i += 1; break; }
+          i += 1;
+        }
+        continue;
+      }
+      if (s.slice(i, i + 7) === 'import(') return true;
+      i += 1;
+    }
+    return false;
+  }
+
+  function warnImport(code) {
+    var d = doc();
+    var node = d && d.getElementById('flHearthImportWarn');
+    var flagged = importInCode(code);
+    if (node) {
+      node.hidden = !flagged;
+      node.textContent = flagged ? IMPORT_WARN : '';
+    }
+    return flagged;
+  }
+
   function runJS(code) {
     if (roomShut()) return Promise.resolve({ ok: false, lines: ['The Quiet Room stays shut.'], value: '' });
-    if (String(code || '').indexOf('import(') !== -1) {
-      return Promise.resolve({ ok: false, lines: [IMPORT_LINE], value: '' });
-    }
+    // before 063c: if (String(code || '').indexOf('import(') !== -1) return Promise.resolve({ ok: false, lines: [IMPORT_LINE], value: '' });
+    warnImport(code);
     // before 063b: caps were the fixed defaults on every run.
     var saved = readCaps();
     var caps = {
       ms: saved.ms,
       lines: saved.lines,
       bytes: saved.bytes,
-      dropFetch: root.__flHearthDropGuard === true
+      dropFetch: testHook('__flHearthDropGuard') === true
     };
     return sandboxHost(code, caps);
   }
@@ -840,13 +987,14 @@
   }
 
   function pythonBase() {
-    var base = (typeof root.__flHearthPythonFixtureCDN === 'string' && root.__flHearthPythonFixtureCDN) ? root.__flHearthPythonFixtureCDN : PY_INDEX;
+    var hooked = testHook('__flHearthPythonFixtureCDN');
+    var base = (typeof hooked === 'string' && hooked) ? hooked : PY_INDEX;
     if (base.slice(-1) !== '/') base += '/';
     return base;
   }
 
   function pinsFor() {
-    var over = root.__flHearthPythonPins;
+    var over = testHook('__flHearthPythonPins');
     if (over && typeof over === 'object') return over;
     return PY_PINS;
   }
@@ -954,9 +1102,10 @@
       offerPython();
       return Promise.resolve({ ok: false, lines: [NOT_ADDED], value: '' });
     }
-    if (typeof root.__flHearthPythonFixture === 'function') {
+    var fixture = testHook('__flHearthPythonFixture');
+    if (typeof fixture === 'function') {
       try {
-        var fixed = root.__flHearthPythonFixture(String(code || ''));
+        var fixed = fixture(String(code || ''));
         return Promise.resolve({
           ok: !fixed || fixed.ok !== false,
           lines: capLines((fixed && fixed.lines) || []),
@@ -1050,6 +1199,8 @@
     });
   }
 
+  /*
+  // before 063c: runShow put the sketch in an iframe with sandbox allow-scripts.
   function runShow(html) {
     var d = doc();
     if (!d || roomShut()) return Promise.resolve({ ok: false, lines: ['Nothing to show.'], value: '' });
@@ -1086,6 +1237,217 @@
       var timer = trackTimer(setTimeout(function () { finish(stopLine(showMs)); }, showMs));
       // before 063b: frame.srcdoc = String(html || '');
       frame.srcdoc = '<meta http-equiv="Content-Security-Policy" content="' + SANDBOX_CSP + '">' + String(html || '');
+    });
+  }
+  */
+
+  function isDataImage(url) {
+    var u = String(url || '').replace(/^\s+|\s+$/g, '').toLowerCase();
+    return u.indexOf('data:image/png') === 0 || u.indexOf('data:image/jpeg') === 0 || u.indexOf('data:image/gif') === 0 || u.indexOf('data:image/webp') === 0;
+  }
+
+  // A real data image has one comma. A second comma is a srcset list.
+  function dataImageOk(val) {
+    var u = String(val || '').replace(/^\s+|\s+$/g, '');
+    if (!isDataImage(u)) return false;
+    var comma = u.indexOf(',');
+    if (comma < 0) return false;
+    if (u.indexOf(',', comma + 1) !== -1) return false;
+    if (u.slice(0, comma).indexOf(' ') !== -1) return false;
+    return true;
+  }
+
+  function escapeShowText(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function serializeShowNode(node) {
+    if (!node) return '';
+    if (node.nodeType === 3 || node.nodeType === 4) return escapeShowText(node.nodeValue);
+    if (node.nodeType !== 1) return '';
+    var tag = String(node.tagName || '').toLowerCase();
+    var html = '<' + tag;
+    var i;
+    for (i = 0; i < node.attributes.length; i++) {
+      var attr = node.attributes[i];
+      html += ' ' + attr.name + '="' + escapeShowText(attr.value).replace(/"/g, '&quot;') + '"';
+    }
+    var voids = { area: 1, base: 1, br: 1, col: 1, embed: 1, hr: 1, img: 1, input: 1, link: 1, meta: 1, source: 1, track: 1, wbr: 1 };
+    if (voids[tag]) return html + '>';
+    html += '>';
+    var child = node.firstChild;
+    while (child) {
+      html += serializeShowNode(child);
+      child = child.nextSibling;
+    }
+    return html + '</' + tag + '>';
+  }
+
+  function cleanCssUrls(css) {
+    var s = String(css || '').replace(/@import[^;]*;?/gi, '');
+    return s.replace(/url\(\s*(['"]?)([^)'"]*)\1\s*\)/gi, function (all, q, u) {
+      if (isDataImage(u)) return 'url("' + u + '")';
+      return 'none';
+    });
+  }
+
+  function cleanShowElement(el) {
+    var names = [];
+    var i;
+    for (i = 0; i < el.attributes.length; i++) names.push(el.attributes[i].name);
+    for (i = 0; i < names.length; i++) {
+      var name = names[i];
+      var low = name.toLowerCase();
+      var local = low.indexOf(':') >= 0 ? low.slice(low.lastIndexOf(':') + 1) : low;
+      if (low.indexOf('on') === 0 || low === 'target') {
+        el.removeAttribute(name);
+        continue;
+      }
+      if (local === 'style') {
+        el.setAttribute(name, cleanCssUrls(el.getAttribute(name) || ''));
+        continue;
+      }
+      if (local === 'href' || local === 'src' || local === 'srcset' || local === 'action' || local === 'formaction' || local === 'poster' || local === 'background' || local === 'ping') {
+        var val = el.getAttribute(name) || '';
+        // before 063c: any comma was stripped, which also dropped a real data:image payload.
+        if (!dataImageOk(val)) el.removeAttribute(name);
+      }
+    }
+  }
+
+  function sanitizeShowHtml(html) {
+    var Parser = root.DOMParser;
+    if (!Parser) return '';
+    var parsed = new Parser().parseFromString(String(html || ''), 'text/html');
+    var drop = parsed.querySelectorAll('script,iframe,object,embed,form,link,base,animate,animatetransform,animatemotion,set');
+    var i;
+    for (i = drop.length - 1; i >= 0; i--) {
+      if (drop[i].parentNode) drop[i].parentNode.removeChild(drop[i]);
+    }
+    var metas = parsed.querySelectorAll('meta');
+    for (i = metas.length - 1; i >= 0; i--) {
+      var equiv = String(metas[i].getAttribute('http-equiv') || '').replace(/\s+/g, '').toLowerCase();
+      if (equiv === 'refresh' && metas[i].parentNode) metas[i].parentNode.removeChild(metas[i]);
+    }
+    var anchors = parsed.querySelectorAll('a,area');
+    for (i = anchors.length - 1; i >= 0; i--) {
+      var span = parsed.createElement('span');
+      while (anchors[i].firstChild) span.appendChild(anchors[i].firstChild);
+      if (anchors[i].parentNode) anchors[i].parentNode.replaceChild(span, anchors[i]);
+    }
+    var all = parsed.querySelectorAll('*');
+    for (i = 0; i < all.length; i++) cleanShowElement(all[i]);
+    var styles = parsed.querySelectorAll('style');
+    for (i = 0; i < styles.length; i++) styles[i].textContent = cleanCssUrls(styles[i].textContent || '');
+    // before 063c: return parsed.body ? parsed.body.innerHTML : '';
+    if (!parsed.body) return '';
+    var serial = '';
+    var child = parsed.body.firstChild;
+    while (child) {
+      serial += serializeShowNode(child);
+      child = child.nextSibling;
+    }
+    return serial;
+  }
+
+  function clearStage() {
+    if (!stage) return;
+    var old = stage.querySelectorAll('iframe,canvas');
+    var i;
+    for (i = old.length - 1; i >= 0; i--) {
+      if (old[i].parentNode) old[i].parentNode.removeChild(old[i]);
+    }
+  }
+
+  function paintBitmap(bitmap) {
+    var d = doc();
+    clearStage();
+    if (!d || !stage || !bitmap) return;
+    var canvas = d.createElement('canvas');
+    canvas.id = 'flHearthCanvas';
+    canvas.width = bitmap.width || 64;
+    canvas.height = bitmap.height || 64;
+    canvas.className = 'fl-hearth-frame';
+    stage.appendChild(canvas);
+    var g = canvas.getContext('2d');
+    if (g) g.drawImage(bitmap, 0, 0);
+    try { if (bitmap.close) bitmap.close(); } catch (e) {}
+  }
+
+  function renderMarkup(html) {
+    var d = doc();
+    if (!d) return Promise.resolve({ ok: false, lines: ['Nothing to show.'], value: '' });
+    warnImport('');
+    return new Promise(function (resolve) {
+      clearStage();
+      var rawScripts = testHooksOn() && testHook('__flHearthShowScripts') === true;
+      var safe = rawScripts ? String(html || '') : sanitizeShowHtml(html);
+      if (!rawScripts && testHooksOn() && testHook('__flHearthShowSlip') === 'refresh') {
+        // before 063c: safe += '<meta http-equiv="refresh" content="0;url=about:blank">';
+        var refreshUrl = String(testHook('__flHearthShowRefreshUrl') || 'about:blank').replace(/"/g, '');
+        safe += '<meta http-equiv="refresh" content="0;url=' + refreshUrl + '">';
+      }
+      if (!rawScripts && testHooksOn() && testHook('__flHearthShowSlip') === 'anchor') {
+        safe += '<a id="flSlip" href="about:blank">leave</a>';
+      }
+      lastSanitized = safe;
+      var frame = d.createElement('iframe');
+      frame.setAttribute('sandbox', rawScripts ? 'allow-scripts' : '');
+      frame.setAttribute('csp', rawScripts ? '' : SHOW_CSP);
+      frame.setAttribute('title', 'Hearth sketch');
+      frame.className = 'fl-hearth-frame';
+      lastSandboxAttr = frame.getAttribute('sandbox');
+      var holder = stage || d.body;
+      if (!holder) {
+        resolve({ ok: false, lines: ['Nothing to show.'], value: '' });
+        return;
+      }
+      var loads = 0;
+      var settled = false;
+      function settle(line, ok) {
+        if (settled) return;
+        settled = true;
+        resolve({ ok: ok !== false, lines: [line], value: '' });
+      }
+      frame.addEventListener('load', function () {
+        if (frame.getAttribute('srcdoc') == null) return;
+        loads += 1;
+        if (loads === 1) {
+          settle('Shown.', true);
+          return;
+        }
+        if (frame.parentNode) frame.parentNode.removeChild(frame);
+        if (outEl) outEl.textContent = SHOW_STOP;
+        settle(SHOW_STOP, false);
+      });
+      var head = rawScripts ? '' : '<meta http-equiv="Content-Security-Policy" content="' + SHOW_CSP + '">';
+      // before 063c: holder.appendChild(frame) ran before srcdoc, so about:blank could count as a second load.
+      frame.srcdoc = head + safe;
+      holder.appendChild(frame);
+      trackTimer(setTimeout(function () { settle('Shown.', true); }, 1500));
+    });
+  }
+
+  function runShow(input) {
+    var d = doc();
+    if (!d || roomShut()) return Promise.resolve({ ok: false, lines: ['Nothing to show.'], value: '' });
+    watchMessages();
+    var text = String(input || '');
+    if (text.replace(/^\s+/, '').charAt(0) === '<') return renderMarkup(text);
+    var saved = readCaps();
+    return sandboxHost(text, {
+      ms: saved.ms,
+      lines: saved.lines,
+      bytes: saved.bytes,
+      dropFetch: testHook('__flHearthDropGuard') === true
+    }).then(function (result) {
+      if (result && result.image) {
+        paintBitmap(result.image);
+        return { ok: true, lines: ['Shown.'], value: '' };
+      }
+      var value = result && result.value ? String(result.value) : '';
+      if (value.replace(/^\s+/, '').charAt(0) === '<') return renderMarkup(value);
+      return result || { ok: true, lines: ['Shown.'], value: '' };
     });
   }
 
@@ -1474,7 +1836,7 @@
       if (outEl) outEl.textContent = 'This network looks like a phone network. Tap again to download about 10 MB once.';
       return Promise.resolve({ ok: false, warned: true });
     }
-    if (typeof root.__flHearthPythonFixture === 'function') {
+    if (typeof testHook('__flHearthPythonFixture') === 'function') {
       rememberPython();
       if (pythonBtn) pythonBtn.textContent = 'Python is allowed on this device';
       return Promise.resolve({ ok: true, remembered: true });
@@ -1528,7 +1890,9 @@
       '.fl-hearth-btn,a.fl-hearth-btn{display:inline-block;min-height:44px;min-width:44px;padding:10px 12px;font:inherit;font-size:14px;color:inherit;background:var(--glass-bg,transparent);border:1px solid var(--glass-border,rgba(255,255,255,.2));border-radius:var(--btn-radius,8px);cursor:pointer;appearance:none;-webkit-appearance:none;text-decoration:none;line-height:22px;}',
       '.fl-hearth-btn:disabled{cursor:default;opacity:.6;}',
       '#flHearthRepo{width:100%;min-height:44px;font-size:14px;color:inherit;background:transparent;border:1px solid var(--glass-border,rgba(255,255,255,.15));border-radius:8px;padding:8px;}',
+      '#flHearthLang{min-height:44px;min-width:44px;max-width:100%;font-size:16px;color:inherit;background:transparent;border:1px solid var(--glass-border,rgba(255,255,255,.2));border-radius:8px;padding:8px;}',
       '.fl-hearth-frame{width:100%;height:180px;border:0;max-width:100%;}',
+      '#flHearthCanvas{width:auto;height:auto;max-width:100%;}',
       '.fl-hearth-sandbox{position:absolute;left:0;top:0;width:0;height:0;border:0;}',
       '@media (prefers-reduced-motion: reduce){#flHearthHost{animation:none;}}'
     ].join('');
@@ -1651,6 +2015,10 @@
       langSel.appendChild(opt);
     });
     host.appendChild(langSel);
+    var importWarn = el('p', 'fl-hearth-note', '');
+    importWarn.id = 'flHearthImportWarn';
+    importWarn.hidden = true;
+    host.appendChild(importWarn);
     var controls = el('div', 'fl-hearth-controls');
     controls.appendChild(btn('flHearthRun', 'Run', function () { onRun(); }));
     controls.appendChild(btn('flHearthShow', 'Show it', function () {
@@ -1697,6 +2065,10 @@
       input.addEventListener('input', syncCapsFromInputs);
       lab.appendChild(input);
       if (suffix) lab.appendChild(d.createTextNode(' ' + suffix));
+      var clamp = d.createElement('span');
+      clamp.id = id + 'Clamp';
+      clamp.className = 'fl-hearth-note';
+      lab.appendChild(clamp);
       return lab;
     }
     var opening = readCaps();
@@ -1707,6 +2079,9 @@
       var back = { ms: MAX_MS, lines: MAX_LINES, bytes: MAX_BYTES, by: 'you' };
       saveCaps(back);
       paintLimitFields(back);
+      clampNote('flHearthCapTime', '');
+      clampNote('flHearthCapLines', '');
+      clampNote('flHearthCapBytes', '');
     }));
     var mindLab = d.createElement('label');
     var mindBox = d.createElement('input');
@@ -1805,6 +2180,7 @@
     if (roomShut()) return;
     ensureHost();
     watchMenu();
+    watchMessages();
     if (host) host.hidden = true;
     panelOpen = false;
   }
@@ -1826,6 +2202,10 @@
     runJS: runJS,
     sandboxHost: sandboxHost,
     lastSandbox: function () { return lastSandboxAttr; },
+    lastSanitized: function () { return lastSanitized; },
+    ignored: function () { return ignoredHearth; },
+    sanitizeShow: sanitizeShowHtml,
+    testHooksOn: testHooksOn,
     runPython: runPython,
     runShow: runShow,
     keep: keep,

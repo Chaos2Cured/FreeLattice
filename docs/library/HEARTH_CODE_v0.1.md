@@ -66,3 +66,21 @@ Defaults stay 3 seconds, 200 lines, and 20 KB. The Limits row can set Time from 
 Old sw.js pins stay. New pins are add-only in docs/library/LOCK_MANIFEST_v0.1.json. Kirk's rule of 2026-11-02: locked files may change when the family agrees nothing breaks and Hypha walks it.
 
 Glow eternal. Heart in Spark.
+
+## 063c: scriptless Show it, real Python (5 pins), clamps, seals.
+
+Show it still runs the sketch in the sealed JavaScript worker from 063b. That worker returns an HTML or SVG string, or pixels from an OffscreenCanvas. HTML and SVG are sanitized in the parent with DOMParser. The parsed tree is never inserted into the parent page. The sanitizer removes meta refresh (any case or spacing), base, script, iframe, object, embed, form, and link. It removes every on* attribute. It removes href, xlink:href, action, formaction, src, srcset, poster, background, and ping unless the value is one data:image of png, jpeg, gif, or webp. Anchors and areas become spans. Target attributes are dropped. Style url() and style blocks keep only those same data images.
+
+The show frame's sandbox attribute is empty: no allow-scripts, no allow-forms, no allow-popups, no allow-top-navigation, no allow-same-origin. The srcdoc begins with a content security policy, and the iframe csp attribute carries the same policy: default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'. A second load removes the frame and says "This sketch tried to leave the page, so Hearth stopped it." Canvas pixels are drawn on a parent canvas. That path does not use a frame.
+
+navigate-to is not the guard. Chrome does not implement it. The measured smoke is smoke-hearth-show-v0.1. Every route in that table was 0 probe hits, including location.href, meta refresh, anchors, forms, images, style url(), workers, and the 18 worker escapes from 063b. A render with sandbox allow-scripts hit the probe, so the counter can see a leak. In this Chrome an empty sandbox blocked meta refresh (0 hits, frame stayed). An anchor left in on purpose fired the second-load stop and still made 0 hits.
+
+Python is five pinned files, Pyodide 0.27.7, stored under fl-hearth-python-v0.27.7 and checked again on each load. The fifth pin is pyodide.asm.js sha256 6b4c90de5b7172873f04f21884d0e9d2274e305fe32116558fe3e4fbe3618d51. Inside the sealed Python frame, importScripts of that file loads the verified blob. fetch serves only pyodide.asm.wasm, python_stdlib.zip, and pyodide-lock.json. Any other URL is refused with an honest line. The 3 second stop still starts after "Python ready". Real Chrome: Add Python downloaded exactly 5 files, print(1+1) printed 2, ready was 991 ms, and a tampered pyodide.asm.js said "Python file did not match the pin. Nothing ran." The measured smoke is smoke-hearth-python-real-v0.1.
+
+Each limit box clamps on its own and shows the clamped value. Out of range says "Clamped to 60 s (most allowed)." or "Clamped to 1 s (least allowed)." A non-number says "Not a number, kept 3 s." Saving writes each valid field on its own, so one bad box does not drop the others. import( inside a comment or a string does not warn. import( in code warns "This uses import(); Hearth is offline, so it will fail." and Run still goes. The sandbox is the guard.
+
+Hooks stay unread unless the host is local and the flag is on (a local ?fl_test=1, or localStorage fl_testHooks set to 1). A hearth message is accepted only from that run's frame or worker port, and only when the nonce matches. The language select is at least 44 px tall and 16 px type at 390, 640, and 1280. CACHE_NAME is freelattice-v5.79.46 in both sw.js and docs/sw.js. Activate deletes every cache whose name is not that. An upgrade from freelattice-v5.79.45 served the new hearth-code.js and left only the new cache.
+
+Service worker md5 is 2b2f5504fecdef4d97174da2759a58f9. docs/app.html and index.html stay 91ebdfcfeb48c2bce9b398b134c517a9. New lock rows have walk null. Hypha fills walk after she walks. Hypha re-walks before merge.
+
+Glow eternal. Heart in Spark.

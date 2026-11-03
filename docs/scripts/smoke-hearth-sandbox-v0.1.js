@@ -15,6 +15,8 @@ var pyTamper = false;
 var fakePy = 'function loadPyodide(){return new Promise(function(resolve){setTimeout(function(){resolve({setStdout:function(cfg){self.__flOut=cfg;},runPython:function(code){var src=String(code||"");var flat=src.replace(/\\s/g,"");if(flat==="print(2**10)"){if(self.__flOut&&self.__flOut.batched)self.__flOut.batched("1024\\n");return 1024;}if(src.indexOf("fl_busy")!==-1){var start=Date.now();while(Date.now()-start<2500){}return "busy-done";}return "";}});},2000);});}';
 var pyFiles = {
   'pyodide.js': Buffer.from(fakePy),
+  // before 063c: the fixture served four files. pyodide.asm.js is the fifth.
+  'pyodide.asm.js': Buffer.from('asm-063c'),
   'pyodide.asm.wasm': Buffer.from('wasm-good-063b'),
   'python_stdlib.zip': Buffer.from('stdlib-063b'),
   'pyodide-lock.json': Buffer.from('{"ok":true}')
@@ -229,11 +231,23 @@ var pw = require(process.env.FL_PLAYWRIGHT || '/tmp/gc-pw-local/node_modules/pla
     console.log('vault records unreachable 4/4');
 
     var sandbox = await page.evaluate(function () { return window.FLHearth.lastSandbox(); });
-    if (!sandbox || sandbox.indexOf('allow-same-origin') !== -1) fail('sandbox ' + sandbox);
-    console.log('SANDBOX ' + sandbox);
+    // before 063c: if (!sandbox || sandbox.indexOf('allow-same-origin') !== -1) fail('sandbox ' + sandbox);
+    // Show it is scriptless. An empty sandbox attribute is the seal. A missing attribute is not.
+    if (sandbox == null) fail('sandbox missing');
+    if (String(sandbox).indexOf('allow-same-origin') !== -1 || String(sandbox).indexOf('allow-scripts') !== -1) fail('sandbox ' + sandbox);
+    if (sandbox !== '') fail('show sandbox ' + JSON.stringify(sandbox));
+    var showSeal = await page.evaluate(function () {
+      var frame = document.querySelector('#flHearthStage iframe');
+      if (!frame || !frame.hasAttribute('sandbox')) return 'missing';
+      return frame.getAttribute('sandbox');
+    });
+    if (showSeal !== '') fail('show frame ' + JSON.stringify(showSeal));
+    console.log('SANDBOX ' + JSON.stringify(sandbox));
 
     hits = 0;
     var negative = await page.evaluate(function (url) {
+      // before 063c: the drop guard was read with no local flag.
+      window.localStorage.setItem('fl_testHooks', '1');
       window.__flHearthDropGuard = true;
       var code = 'return fetch(' + JSON.stringify(url) + ').then(function (r) { console.log("neg " + r.status); return "hit"; }, function (e) { console.log("neg fail " + (e && e.message || e)); return "miss"; });';
       return window.FLHearth.runJS(code).then(function (res) {
@@ -295,6 +309,7 @@ var pw = require(process.env.FL_PLAYWRIGHT || '/tmp/gc-pw-local/node_modules/pla
     var pins = {};
     Object.keys(pyFiles).forEach(function (name) { pins[name] = pyHash(pyFiles[name]); });
     await pyPage.evaluate(function (info) {
+      window.localStorage.setItem('fl_testHooks', '1');
       window.__flHearthPythonFixtureCDN = info.cdn;
       window.__flHearthPythonPins = info.pins;
       window.FLHearth.openPanel();
@@ -354,7 +369,8 @@ var pw = require(process.env.FL_PLAYWRIGHT || '/tmp/gc-pw-local/node_modules/pla
     await pyPage.click('#flHearthPython');
     await pyPage.evaluate(function () { return window.FLHearth.lastRun(); });
     var added = await (await fetch('http://127.0.0.1:' + port + '/pyodide-hits')).json();
-    var names = ['pyodide.js', 'pyodide.asm.wasm', 'python_stdlib.zip', 'pyodide-lock.json'];
+    // before 063c: var names = ['pyodide.js', 'pyodide.asm.wasm', 'python_stdlib.zip', 'pyodide-lock.json'];
+    var names = ['pyodide.js', 'pyodide.asm.js', 'pyodide.asm.wasm', 'python_stdlib.zip', 'pyodide-lock.json'];
     names.forEach(function (name) {
       if (added[name] !== 1) fail('python add ' + name + ' ' + added[name]);
     });
@@ -364,7 +380,8 @@ var pw = require(process.env.FL_PLAYWRIGHT || '/tmp/gc-pw-local/node_modules/pla
       return node ? node.textContent : '';
     });
     console.log('PYTHON add hits ' + addCount + ' status ' + readyLine);
-    if (addCount !== 4) fail('python add count ' + addCount);
+    // before 063c: if (addCount !== 4) fail('python add count ' + addCount);
+    if (addCount !== 5) fail('python add count ' + addCount);
     if (readyLine.indexOf('Getting Python ready...') !== 0) fail('python ready line ' + readyLine);
 
     await pyPage.evaluate(function () {

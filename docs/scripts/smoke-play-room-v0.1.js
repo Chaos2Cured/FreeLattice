@@ -43,9 +43,11 @@ var locks = {
   'docs/modules/fl-kin.js': '5e6a820b7e9f96e2a7af6c12a7db33ab',
   'docs/modules/fl-kin-queue.js': '70284cc27bd84bc06dd82489e615faab',
   // before 063a: 'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
-  'docs/sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  // before 063c: 'docs/sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  'docs/sw.js': '2b2f5504fecdef4d97174da2759a58f9',
   // before 063a: 'sw.js': '91726cf2228b794f7585f79f61418d12',
-  'sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  // before 063c: 'sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  'sw.js': '2b2f5504fecdef4d97174da2759a58f9',
   'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106'
 };
 

@@ -161,6 +161,7 @@ function sha(text) {
     console.log('PYTHON NET before tap:\n' + (netBefore || '(empty)'));
 
     await page.evaluate(function () {
+      window.localStorage.setItem('fl_testHooks', '1');
       window.__flHearthPythonFixture = function (code) {
         if (code.replace(/\s/g, '') === 'print(2**10)') return { ok: true, lines: ['1024'], value: '1024' };
         return { ok: false, lines: ['fixture'], value: '' };
