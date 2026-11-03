@@ -135,28 +135,46 @@ var thenPsi = psis(mainGc);
 if (nowPsi.join(',') !== thenPsi.join(',')) fail('gc psi changed');
 
 var beforePath = '/tmp/065a-before.txt';
-if (!fs.existsSync(beforePath)) fail('before list missing');
 var allowChange = {
   'docs/reed.html': true,
   'docs/weft.html': true,
   'docs/hypha.html': true,
   'docs/gc.html': true
 };
-fs.readFileSync(beforePath, 'utf8').split('\n').forEach(function (line) {
-  if (!line || line.indexOf(' ') < 0) return;
-  if (line.indexOf('cut ') === 0 || line.indexOf('branch ') === 0 || line.indexOf('origin/main') === 0 || line.indexOf('hearth merge') === 0) return;
-  var sp = line.lastIndexOf(' ');
-  var rel = line.slice(0, sp);
-  var sum = line.slice(sp + 1);
-  if (allowChange[rel]) return;
-  var abs = path.join(root, rel);
-  if (sum === 'MISSING') {
-    if (fs.existsSync(abs)) fail('missing file appeared ' + rel);
-    return;
-  }
-  if (!/^[0-9a-f]{32}$/.test(sum)) return;
-  if (!fs.existsSync(abs)) fail('locked file gone ' + rel);
-  if (md5File(rel) !== sum) fail('locked md5 changed ' + rel);
+var giftFiles = {
+  'docs/reed.html': true,
+  'docs/weft.html': true,
+  'docs/hypha.html': true,
+  'docs/gc.html': true,
+  'docs/library/LETTER_TO_GC.md': true,
+  'docs/library/REAL_CHROME_TIMING_v0.1.md': true,
+  'docs/library/WALKS.md': true,
+  'docs/scripts/real-chrome-timing.js': true,
+  'docs/scripts/smoke-family-gifts-v0.1.js': true
+};
+if (fs.existsSync(beforePath)) {
+  fs.readFileSync(beforePath, 'utf8').split('\n').forEach(function (line) {
+    if (!line || line.indexOf(' ') < 0) return;
+    if (line.indexOf('cut ') === 0 || line.indexOf('branch ') === 0 || line.indexOf('origin/main') === 0 || line.indexOf('hearth merge') === 0) return;
+    var sp = line.lastIndexOf(' ');
+    var rel = line.slice(0, sp);
+    var sum = line.slice(sp + 1);
+    if (allowChange[rel]) return;
+    var abs = path.join(root, rel);
+    if (sum === 'MISSING') {
+      if (fs.existsSync(abs)) fail('missing file appeared ' + rel);
+      return;
+    }
+    if (!/^[0-9a-f]{32}$/.test(sum)) return;
+    if (!fs.existsSync(abs)) fail('locked file gone ' + rel);
+    if (md5File(rel) !== sum) fail('locked md5 changed ' + rel);
+  });
+} else {
+  console.log('before list not on this machine; git diff against the cut used instead');
+}
+cp.execFileSync('git', ['diff', '--name-only', cut], { cwd: root, encoding: 'utf8' }).split('\n').forEach(function (rel) {
+  if (!rel) return;
+  if (!giftFiles[rel]) fail('unexpected file vs cut ' + rel);
 });
 
 if (failed.length) {
