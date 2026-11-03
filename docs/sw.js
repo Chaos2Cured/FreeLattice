@@ -3,7 +3,8 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.79.45';
+// before 063c: const CACHE_NAME = 'freelattice-v5.79.45';
+const CACHE_NAME = 'freelattice-v5.79.46';
 
 // mirror-chat.html + mirror-resonance.html — served static from GH Pages, no SW cache needed
 
@@ -157,6 +158,7 @@ const APP_SHELL = [
     './modules/resonance-lake.js',
     './modules/garden-trainer.js',
     './modules/ratio-room.js',
+    './modules/hearth-code.js',
     './sophia.html',
     './library/MIND_WALL_SPEC.md',
     './library/LIABILITY_DRAFT.md',

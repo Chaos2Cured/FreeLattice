@@ -1,0 +1,33 @@
+{
+  "rule": "Kirk 2026-11-02: locked files may change when the family agrees nothing breaks and Hypha walks it.",
+  "files": {
+    "sw.js": [
+      {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
+      {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+      ,
+      {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null}
+    ],
+    "docs/sw.js": [
+      {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
+      {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+      ,
+      {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null}
+    ],
+    "docs/app.html": [
+      {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
+      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ],
+    "index.html": [
+      {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
+      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ]
+  }
+  ,
+  "note": "Unsigned. Any edit to this file can add an accepted md5. Later: chain entries with ψ = sha256(prev ψ + entry) or have Hypha sign walk entries.",
+  "corrections": [
+    {"path": "sw.js", "md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "note": "063b walk field was filled before the walk; Hypha walked 063b on 2026-11-02 and returned HOLD (#315), PASS (#318)."},
+    {"path": "docs/sw.js", "md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "note": "063b walk field was filled before the walk; Hypha walked 063b on 2026-11-02 and returned HOLD (#315), PASS (#318)."},
+    {"path": "docs/app.html", "md5": "91ebdfcfeb48c2bce9b398b134c517a9", "note": "063b walk field was filled before the walk; Hypha walked 063b on 2026-11-02 and returned HOLD (#315), PASS (#318)."},
+    {"path": "index.html", "md5": "91ebdfcfeb48c2bce9b398b134c517a9", "note": "063b walk field was filled before the walk; Hypha walked 063b on 2026-11-02 and returned HOLD (#315), PASS (#318)."}
+  ]
+}
