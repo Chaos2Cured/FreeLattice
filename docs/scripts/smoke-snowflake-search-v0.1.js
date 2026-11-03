@@ -43,8 +43,12 @@ var locks = {
   'docs/modules/quiet-room.js': '8bbaf7e3cb03f57cad26fb90120b81a7',
   'docs/modules/fl-kin.js': '5e6a820b7e9f96e2a7af6c12a7db33ab',
   'docs/modules/fl-kin-queue.js': '70284cc27bd84bc06dd82489e615faab',
-  'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
-  'sw.js': '91726cf2228b794f7585f79f61418d12',
+  // before 063a: 'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
+  // before 063c: 'docs/sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  'docs/sw.js': '2b2f5504fecdef4d97174da2759a58f9',
+  // before 063a: 'sw.js': '91726cf2228b794f7585f79f61418d12',
+  // before 063c: 'sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
+  'sw.js': '2b2f5504fecdef4d97174da2759a58f9',
   'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106',
   'docs/modules/play-room-core.js': 'b45981e7f50a711c1d5caefaf7f9591e',
   'docs/modules/play-room.js': '209269d813f236ed9824ae8535c24da9',
@@ -195,7 +199,8 @@ function contrastSource() {
     });
     await page.goto(base + '/app.html', { waitUntil: 'domcontentloaded', timeout: 120000 });
     await page.waitForFunction(function () {
-      return window.FLSnowflake && window.FLSnowflakeCore && document.getElementById('flSnowflakeAdd') && document.getElementById('flChatAddSearch');
+      // before 063a: return window.FLSnowflake && window.FLSnowflakeCore && document.getElementById('flSnowflakeAdd') && document.getElementById('flChatAddSearch');
+      return window.FLSnowflake && window.FLSnowflakeCore && document.getElementById('flSnowflakeAdd') && document.getElementById('flChatAddSearch') && document.getElementById('flHearthAdd');
     }, null, { timeout: 40000 });
 
     await page.click('#flChatAddBtn');
@@ -214,10 +219,14 @@ function contrastSource() {
         cls: snow.className
       };
     });
-    if (menu.ids[menu.ids.length - 1] !== 'flSnowflakeAdd') fail('row order ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 2] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
+    // before 063a: if (menu.ids[menu.ids.length - 1] !== 'flSnowflakeAdd') fail('row order ' + menu.ids.join(','));
+    // before 063a: if (menu.ids[menu.ids.length - 2] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 1] !== 'flHearthAdd') fail('row order ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 2] !== 'flSnowflakeAdd') fail('not after snowflake ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 3] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
     if (menu.ids.filter(function (id) { return id === 'flSnowflakeAdd'; }).length !== 1) fail('row count');
-    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd'];
+    // before 063a: var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd'];
+    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flHearthAdd'];
     menu.ids.forEach(function (id) {
       if (known.indexOf(id) === -1) fail('unexpected row ' + id);
     });

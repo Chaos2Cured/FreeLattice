@@ -5,6 +5,7 @@
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
+var allowedPins = require(path.join(__dirname, '..', 'docs', 'scripts', 'lib', 'lock-pins.js')).allowedPins;
 
 var root = path.join(__dirname, '..');
 var sibling = '/Users/kirkmiller/FreeLattice-fresh';
@@ -202,7 +203,8 @@ Object.keys(LOCKS).forEach(function (rel) {
   var file = path.join(root, rel);
   if (!fs.existsSync(file)) fail('lock missing ' + rel);
   var got = md5(fs.readFileSync(file));
-  if (got !== LOCKS[rel]) fail('lock moved ' + rel);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  if (allowedPins(rel, LOCKS[rel]).indexOf(got) === -1) fail('lock moved ' + rel);
 });
 
 Object.keys(before).forEach(function (rel) {

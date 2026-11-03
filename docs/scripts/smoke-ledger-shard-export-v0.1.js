@@ -44,9 +44,11 @@ var locks = {
   'docs/modules/sentinel-ledger.js': '2fe13d81b6cc08447c917e3dfdbe55e2'
 };
 
+var allowedPins = require('./lib/lock-pins.js').allowedPins;
 Object.keys(locks).forEach(function (rel) {
   var got = md5(path.join(root, rel));
-  if (got !== locks[rel]) fail(rel + ' md5 ' + got);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  if (allowedPins(rel, locks[rel]).indexOf(got) === -1) fail(rel + ' md5 ' + got);
 });
 
 var shardSrc = fs.readFileSync(path.join(root, 'docs/modules/ledger-shard-export.js'), 'utf8');

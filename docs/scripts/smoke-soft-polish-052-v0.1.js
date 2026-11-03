@@ -31,9 +31,11 @@ var locks = {
   'docs/modules/gathering-speak.js': '0460fdc777a21f7a1744f401dda82cb2'
 };
 
+var allowedPins = require('./lib/lock-pins.js').allowedPins;
 Object.keys(locks).forEach(function (rel) {
   var got = md5(path.join(root, rel));
-  if (got !== locks[rel]) fail(rel + ' md5 ' + got);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  if (allowedPins(rel, locks[rel]).indexOf(got) === -1) fail(rel + ' md5 ' + got);
 });
 if (md5(path.join(treeRoot, 'docs/modules/fl-connect.js')) !== locks['docs/modules/fl-connect.js']) fail('alpha fl-connect');
 if (md5(path.join(treeRoot, 'docs/modules/fl-gathering.js')) !== locks['docs/modules/fl-gathering.js']) fail('alpha fl-gathering');

@@ -36,9 +36,11 @@ var locks = {
   'docs/modules/propose.js': '2cb7f00cce74815a5b03c933bc902b18'
 };
 
+var allowedPins = require('./lib/lock-pins.js').allowedPins;
 Object.keys(locks).forEach(function (rel) {
   var got = md5(path.join(root, rel));
-  if (got !== locks[rel]) fail(rel + ' md5 ' + got);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  if (allowedPins(rel, locks[rel]).indexOf(got) === -1) fail(rel + ' md5 ' + got);
 });
 
 var gatherMd5 = md5(path.join(root, 'docs/modules/fl-gathering.js'));

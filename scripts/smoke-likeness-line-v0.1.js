@@ -6,6 +6,7 @@
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
+var allowedPins = require(path.join(__dirname, '..', 'docs', 'scripts', 'lib', 'lock-pins.js')).allowedPins;
 var vm = require('vm');
 
 var repo = path.resolve(__dirname, '..');
@@ -33,7 +34,8 @@ function pin(rel, expect) {
     return;
   }
   var got = md5(fs.readFileSync(file));
-  assert(got === expect, rel + ' md5 ' + got + ' expected ' + expect);
+  // 063b: allowed pins live in docs/library/LOCK_MANIFEST_v0.1.json
+  assert(allowedPins(rel, expect).indexOf(got) !== -1, rel + ' md5 ' + got + ' expected ' + expect);
 }
 
 var PINS = {
