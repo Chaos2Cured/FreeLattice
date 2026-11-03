@@ -3,6 +3,7 @@
    Pieces keep their own hashes. A bad piece is fetched again. A good piece stays.
    Capture windows are experimental and local. Nothing here trains.
    062b: a receipt stores facts only. The healed bytes stay on the returned result.
+   062c: every size is checked by the piece-hash root. A v1 whole hash runs in a worker, one piece at a time.
 */
 (function (root) {
   'use strict';
@@ -26,6 +27,9 @@
   var maxGap = 0;
   var gapStart = 0;
   var yieldCount = 0;
+  var rehashCount = 0;
+  var byteDigestCount = 0;
+  var wholeDigestCount = 0;
 
   function bucket() {
     try {
@@ -101,8 +105,17 @@
 
   function sha256Hex(data) {
     var bytes = typeof data === 'string' ? new TextEncoder().encode(data) : toUint8(data);
-    // A piece, a short string, or a digest. Not a hex dump of a whole file.
-    if (typeof data !== 'string' && bytes.length > WHOLE_LIMIT) {
+    if (typeof data !== 'string') {
+      byteDigestCount += 1;
+      if (bytes.byteLength > PIECE && bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength) {
+        wholeDigestCount += 1;
+      }
+    }
+    // A piece, a short string, or the joined piece hashes. Not a whole file.
+    // before 062c: if (typeof data !== 'string' && bytes.length > WHOLE_LIMIT) {
+    // before 062c:   return Promise.reject(new Error('too-large-for-one-hash'));
+    // before 062c: }
+    if (typeof data !== 'string' && bytes.byteLength > WHOLE_LIMIT) {
       return Promise.reject(new Error('too-large-for-one-hash'));
     }
     var inNode = typeof process !== 'undefined' && process.versions && process.versions.node && typeof require === 'function';
@@ -113,10 +126,11 @@
         return Promise.resolve(nodeCrypto.createHash('sha256').update(buf).digest('hex'));
       } catch (e) {}
     }
-    var copy = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    // before 062c: var copy = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    var view = new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     var subtle = root.crypto && root.crypto.subtle;
     if (subtle && typeof subtle.digest === 'function') {
-      return subtle.digest('SHA-256', copy).then(function (digest) { return hexOf(digest); });
+      return subtle.digest('SHA-256', view).then(function (digest) { return hexOf(digest); });
     }
     return Promise.reject(new Error('no-sha256'));
   }
@@ -228,9 +242,15 @@
   }
 
   function breathe(done) {
-    if (done % 8 !== 0) return Promise.resolve();
+    // before 062c: if (done % 8 !== 0) return Promise.resolve();
     endGap();
     yieldCount += 1;
+    var sched = root.scheduler;
+    if (sched && typeof sched.yield === 'function') {
+      return Promise.resolve(sched.yield()).then(function () {
+        beginGap();
+      });
+    }
     return new Promise(function (resolve) {
       setTimeout(function () {
         beginGap();
@@ -239,33 +259,90 @@
     });
   }
 
-  function openWholeHasher(total) {
-    if (total > WHOLE_LIMIT) return null;
-    if (typeof require === 'function') {
-      try {
-        return require('crypto').createHash('sha256');
-      } catch (e) {}
+  function workerUrl() {
+    var scripts = document.getElementsByTagName('script');
+    var i;
+    for (i = 0; i < scripts.length; i++) {
+      var have = scripts[i].getAttribute('src') || '';
+      if (have.indexOf('self-heal.js') !== -1) return have.replace('self-heal.js', 'self-heal-sha256-worker.js');
     }
-    return { kind: 'browser' };
+    return 'modules/self-heal-sha256-worker.js';
   }
 
-  function feedWhole(hasher, piece) {
-    if (!hasher || hasher.kind === 'browser') return;
-    var view = piece instanceof Uint8Array ? piece : toUint8(piece);
-    hasher.update(Buffer.from(view.buffer, view.byteOffset, view.byteLength));
-  }
-
-  function finishWhole(hasher, original) {
-    if (!hasher) return Promise.resolve('');
-    if (hasher.kind === 'browser') {
-      if (isBlob(original)) {
-        return original.arrayBuffer().then(function (buf) {
-          return sha256Hex(new Uint8Array(buf));
-        });
+  // before 062c: openWholeHasher returned null above 64 MiB, otherwise a node hash or { kind: 'browser' }.
+  // before 062c: finishWhole on { kind: 'browser' } called sha256Hex on the whole buffer in one call.
+  function startStreamHasher() {
+    return new Promise(function (resolve, reject) {
+      var pending = [];
+      var worker = null;
+      function pump(msg) {
+        var wait = pending.shift();
+        if (wait) wait(msg);
       }
-      return sha256Hex(original instanceof Uint8Array ? original : toUint8(original));
-    }
-    return Promise.resolve(hasher.digest('hex'));
+      function fail(err) {
+        var error = err instanceof Error ? err : new Error('hasher worker failed');
+        while (pending.length) {
+          var wait = pending.shift();
+          wait({ op: 'error', error: error.message });
+        }
+        reject(error);
+      }
+      try {
+        if (typeof document !== 'undefined' && typeof Worker === 'function') {
+          worker = new Worker(workerUrl());
+          worker.onmessage = function (ev) { pump(ev.data); };
+          worker.onerror = function () { fail(new Error('hasher worker failed')); };
+        } else if (typeof require === 'function') {
+          var NodeWorker = require('worker_threads').Worker;
+          var file = require('path').join(__dirname, 'self-heal-sha256-worker.js');
+          worker = new NodeWorker(file);
+          worker.on('message', pump);
+          worker.on('error', fail);
+        } else {
+          fail(new Error('no-worker'));
+          return;
+        }
+      } catch (err) {
+        fail(err);
+        return;
+      }
+      resolve({
+        piece: function (view) {
+          var src = view instanceof Uint8Array ? view : new Uint8Array(0);
+          var copy = new Uint8Array(src.byteLength);
+          if (src.byteLength) copy.set(src);
+          return new Promise(function (res, rej) {
+            pending.push(function (msg) {
+              if (msg && msg.op === 'error') rej(new Error(msg.error || 'hasher worker failed'));
+              else res();
+            });
+            try {
+              worker.postMessage({ op: 'piece', buf: copy.buffer }, [copy.buffer]);
+            } catch (err2) {
+              pending.pop();
+              rej(err2);
+            }
+          });
+        },
+        finish: function () {
+          return new Promise(function (res, rej) {
+            pending.push(function (msg) {
+              if (!msg || msg.op !== 'done') rej(new Error(msg && msg.error ? msg.error : 'hasher unfinished'));
+              else res(msg.hex || '');
+            });
+            try {
+              worker.postMessage({ op: 'finish' });
+            } catch (err2) {
+              pending.pop();
+              rej(err2);
+            }
+          });
+        },
+        close: function () {
+          try { if (worker && worker.terminate) worker.terminate(); } catch (e) {}
+        }
+      });
+    });
   }
 
   function hashJoined(hexes) {
@@ -311,38 +388,45 @@
     var n = pieceCountOf(total, size);
     var pieces = [];
     var hexes = [];
-    var hasher = openWholeHasher(total);
     var i = 0;
-    beginGap();
-    function next() {
-      if (i >= n) {
-        return hashJoined(hexes).then(function (root) {
-          return finishWhole(hasher, input).then(function (whole) {
-            endGap();
-            var man = {
-              version: VERSION,
-              mode: 'bytes',
-              pieceSize: size,
-              pieces: pieces,
-              root: root
-            };
-            if (total <= WHOLE_LIMIT) man.whole = whole;
-            return man;
+    return startStreamHasher().then(function (hasher) {
+      beginGap();
+      function close() { try { hasher.close(); } catch (e) {} }
+      function next() {
+        if (i >= n) {
+          return hashJoined(hexes).then(function (root) {
+            return hasher.finish().then(function (whole) {
+              close();
+              endGap();
+              // before 062c: if (total <= WHOLE_LIMIT) man.whole = whole;
+              return {
+                version: VERSION,
+                mode: 'bytes',
+                pieceSize: size,
+                pieces: pieces,
+                root: root,
+                whole: whole
+              };
+            });
+          });
+        }
+        return pieceSlice(input, i, size).then(function (slice) {
+          var index = i;
+          return hasher.piece(slice).then(function () {
+            return sha256Hex(slice).then(function (hex) {
+              pieces.push({ i: index, sha256: hex });
+              hexes.push(hex);
+              i += 1;
+              return breathe(i).then(next);
+            });
           });
         });
       }
-      return pieceSlice(input, i, size).then(function (slice) {
-        feedWhole(hasher, slice);
-        var index = i;
-        return sha256Hex(slice).then(function (hex) {
-          pieces.push({ i: index, sha256: hex });
-          hexes.push(hex);
-          i += 1;
-          return breathe(i).then(next);
-        });
+      return next().catch(function (err) {
+        close();
+        return Promise.reject(err);
       });
-    }
-    return next();
+    });
   }
 
   function manifest(input, pieceSize) {
@@ -353,6 +437,7 @@
   function verifyRows(man, rowsInput) {
     var bad = [];
     var hexes = [];
+    var hexAt = [];
     var i = 0;
     var list = Array.isArray(rowsInput) ? rowsInput : [];
     beginGap();
@@ -364,7 +449,7 @@
             var sameLen = list.length === man.pieces.length;
             var rootOk = !man.root || root === man.root;
             var wholeOk = man.version === VERSION_V1 ? whole === man.whole : (!man.whole || whole === man.whole);
-            return { ok: bad.length === 0 && wholeOk && rootOk && sameLen, bad: bad };
+            return { ok: bad.length === 0 && wholeOk && rootOk && sameLen, bad: bad, hexes: hexAt };
           });
         });
       }
@@ -372,6 +457,7 @@
       var cell = spec.i < list.length ? canonical(list[spec.i]) : '';
       return sha256Hex(cell).then(function (hex) {
         hexes.push(hex);
+        hexAt[spec.i] = hex;
         if (hex !== spec.sha256) bad.push(spec.i);
         i += 1;
         return breathe(i).then(next);
@@ -385,37 +471,52 @@
     var total = byteLength(input);
     var bad = [];
     var hexes = [];
-    var hasher = openWholeHasher(total);
+    var hexAt = [];
     var i = 0;
-    beginGap();
-    function next() {
-      if (i >= man.pieces.length) {
-        return hashJoined(hexes).then(function (root) {
-          return finishWhole(hasher, input).then(function (whole) {
-            endGap();
+    // before 062c: var v1 = man.version === VERSION_V1 || (!man.root && man.whole);
+    // before 062c: a browser whole check hashed the entire buffer in one call when total <= 64 MiB.
+    var v1 = man.version === VERSION_V1 || (!man.root && man.whole);
+    function run(hasher) {
+      beginGap();
+      function close() { if (hasher) { try { hasher.close(); } catch (e) {} } }
+      function next() {
+        if (i >= man.pieces.length) {
+          return hashJoined(hexes).then(function (root) {
             var sameLen = pieceCountOf(total, size) === man.pieces.length;
             var rootOk = !man.root || root === man.root;
-            var v1 = man.version === VERSION_V1 || (!man.root && man.whole);
-            var wholeOk = true;
-            if (v1) wholeOk = whole === man.whole;
-            else if (man.whole && total <= WHOLE_LIMIT) wholeOk = whole === man.whole;
-            return { ok: bad.length === 0 && wholeOk && rootOk && sameLen, bad: bad };
+            function done(wholeOk) {
+              close();
+              endGap();
+              return { ok: bad.length === 0 && wholeOk && rootOk && sameLen, bad: bad, hexes: hexAt };
+            }
+            if (!v1) return Promise.resolve(done(true));
+            return hasher.finish().then(function (whole) {
+              return done(whole === man.whole);
+            });
+          });
+        }
+        var spec = man.pieces[i];
+        return pieceSlice(input, spec.i, size).then(function (slice) {
+          if (!slice.length && spec.i * size >= total) slice = new Uint8Array(0);
+          var feed = hasher ? hasher.piece(slice) : Promise.resolve();
+          return feed.then(function () {
+            return sha256Hex(slice).then(function (hex) {
+              hexes.push(hex);
+              hexAt[spec.i] = hex;
+              if (hex !== spec.sha256) bad.push(spec.i);
+              i += 1;
+              return breathe(i).then(next);
+            });
           });
         });
       }
-      var spec = man.pieces[i];
-      return pieceSlice(input, spec.i, size).then(function (slice) {
-        if (!slice.length && spec.i * size >= total) slice = new Uint8Array(0);
-        feedWhole(hasher, slice);
-        return sha256Hex(slice).then(function (hex) {
-          hexes.push(hex);
-          if (hex !== spec.sha256) bad.push(spec.i);
-          i += 1;
-          return breathe(i).then(next);
-        });
+      return next().catch(function (err) {
+        close();
+        return Promise.reject(err);
       });
     }
-    return next();
+    if (v1) return startStreamHasher().then(run);
+    return run(null);
   }
 
   function verify(man, data) {
@@ -503,17 +604,22 @@
     var rows = man.mode === 'rows' || man.pieceSize === 'rows';
     var size = rows ? 'rows' : (man.pieceSize || PIECE);
     var blobInput = !rows && isBlob(data);
+    var srcBytes = (!rows && !blobInput) ? toUint8(data) : null;
+    var inPlace = !!(meta.inPlace && srcBytes);
     var working;
+    // before 062c: byte input always copied into a new Uint8Array before the splice.
     if (rows) working = Array.isArray(data) ? data.slice() : [];
     else if (blobInput) working = data;
+    else if (inPlace) working = srcBytes;
     else {
-      var srcBytes = toUint8(data);
       working = new Uint8Array(srcBytes.length);
       working.set(srcBytes);
     }
     var replacements = {};
-    return verify(man, working).then(function (first) {
+    rehashCount = 0;
+    function afterFirst(first) {
       var bad = first.bad.slice();
+      var hexAt = (first.hexes || []).slice();
       var tries = 0;
       var fetches = 0;
       var froms = [];
@@ -525,8 +631,13 @@
           var outData;
           if (blobInput) outData = rebuiltBlob();
           else outData = working;
-          return verify(man, outData).then(function (again) {
-            var ok = !!(again.ok && still.length === 0);
+          var ordered = [];
+          var nPiece;
+          for (nPiece = 0; nPiece < man.pieces.length; nPiece++) ordered.push(hexAt[man.pieces[nPiece].i] || '');
+          // before 062c: return verify(man, outData) which hashed every piece again.
+          return hashJoined(ordered).then(function (root) {
+            var rootOk = !man.root || root === man.root;
+            var ok = !!(rootOk && still.length === 0);
             // before 062b: the stored row was the same object as the return value and held data: working
             var facts = {
               at: new Date().toISOString(),
@@ -541,12 +652,14 @@
               fetches: fetches,
               ms: Date.now() - started,
               ok: ok,
-              stillBad: ok ? [] : (still.length ? still.slice() : again.bad.slice())
+              stillBad: ok ? [] : (still.length ? still.slice() : bad.slice())
             };
             var stored = receiptOf(facts);
             var save = appendLedger(stored);
             paint();
-            return deliver(stored, outData, save.saved);
+            var delivered = deliver(stored, outData, save.saved);
+            delivered.root = root;
+            return delivered;
           });
         }
         var index = bad[p];
@@ -576,9 +689,12 @@
                   if (rows) working[index] = packed.value;
                   else if (blobInput) replacements[index] = slice;
                   else working = spliceBytes(working, index, size, slice);
+                  hexAt[index] = hex;
+                  rehashCount += 1;
                   if (froms.indexOf(packed.from) === -1) froms.push(packed.from);
+                  // before 062c: p += 1; return onePiece();
                   p += 1;
-                  return onePiece();
+                  return breathe(p).then(onePiece);
                 }
                 return attemptOnce();
               });
@@ -602,7 +718,11 @@
         return new Blob(parts);
       }
       return onePiece();
-    });
+    }
+    if (meta.knownBad && meta.knownHexes) {
+      return afterFirst({ bad: meta.knownBad.slice(), hexes: meta.knownHexes.slice() });
+    }
+    return verify(man, working).then(afterFirst);
   }
 
   // before 062b: ledger rows kept the healed bytes. A one-time rewrite stores facts only. The note lives in the doc, not in storage.
@@ -943,6 +1063,10 @@
     maxWorkGap: function () { return maxGap; },
     resetWorkGap: function () { maxGap = 0; yieldCount = 0; gapStart = 0; },
     yieldCount: function () { return yieldCount; },
+    rehashCount: function () { return rehashCount; },
+    byteDigestCount: function () { return byteDigestCount; },
+    wholeDigestCount: function () { return wholeDigestCount; },
+    resetByteDigestCount: function () { byteDigestCount = 0; wholeDigestCount = 0; },
     noteTrim: noteTrim,
     noteReply: noteReply,
     classify: classify,

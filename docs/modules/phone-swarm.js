@@ -146,16 +146,15 @@
       crypto.subtle &&
       typeof crypto.subtle.digest === 'function'
     ) {
-      var ab;
-      if (bytes instanceof ArrayBuffer) ab = bytes;
+      // before 062c: ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      var view;
+      if (bytes instanceof ArrayBuffer) view = new Uint8Array(bytes);
       else if (bytes && bytes.buffer && bytes.byteLength !== undefined) {
-        ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-      } else if (typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(bytes)) {
-        ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        view = new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
       } else {
         return Promise.reject(new Error('unsupported bytes for hash'));
       }
-      return crypto.subtle.digest('SHA-256', ab).then(function (digest) {
+      return crypto.subtle.digest('SHA-256', view).then(function (digest) {
         return bufToHex(digest);
       });
     }
@@ -207,14 +206,16 @@
             try {
               var db = req.result;
               var tx = db.transaction('verified', 'readwrite');
-              tx.objectStore('verified').put({
+              var row = {
                 id: id,
                 name: name,
                 sha256: job.expectedSha256,
                 label: 'verified',
-                bytes: u8,
                 savedAt: Date.now()
-              });
+              };
+              // before 062c: row.bytes = u8;
+              if (u8 && ((u8.byteLength || u8.size || u8.length || 0) < 8 * 1024 * 1024)) row.bytes = u8;
+              tx.objectStore('verified').put(row);
               tx.oncomplete = function () {
                 job.stored = 'idb';
                 resolve(true);
@@ -242,6 +243,11 @@
           !navigator.storage ||
           typeof navigator.storage.getDirectory !== 'function'
         ) {
+          resolve(false);
+          return;
+        }
+        if (u8 && ((u8.byteLength || u8.size || u8.length || 0) >= 8 * 1024 * 1024)) {
+          // before 062c: writable.write(u8) copied the whole file during the heal.
           resolve(false);
           return;
         }
@@ -333,33 +339,81 @@
     }, function () { return null; });
   }
 
-  function healOrMismatch(job, bytes, want) {
-    if (!job || !job.manifest) return Promise.resolve(markMismatch(job));
+  function yieldTurn() {
+    var sched = root.scheduler;
+    if (sched && typeof sched.yield === 'function') return Promise.resolve(sched.yield());
+    return new Promise(function (resolve) { setTimeout(resolve, 0); });
+  }
+
+  function handoffManifest(job, bytes) {
+    var man = job.manifest;
+    var blobInput = typeof Blob !== 'undefined' && bytes instanceof Blob;
+    var u8 = blobInput ? null : toUint8(bytes);
+    var size = typeof man.pieceSize === 'number' && man.pieceSize > 0 ? man.pieceSize : (64 * 1024);
+    var hexAt = [];
+    var bad = [];
+    var i = 0;
+    job.piecesInFlight = 1;
     return ensureHeal().then(function (heal) {
-      if (!heal) return markMismatch(job);
-      var pull = typeof job.fetchPiece === 'function'
-        ? job.fetchPiece
-        : function (index) { return rangeFetch(job, job.manifest, index); };
-      return heal.heal(job.manifest, bytes, pull, { what: 'phone-swarm' }).then(function (receipt) {
-        job.healReceipt = receipt || null;
-        if (!receipt || !receipt.ok || !receipt.data) return markMismatch(job);
-        return sha256Hex(toUint8(receipt.data)).then(function (hex) {
-          var got = String(hex || '').toLowerCase();
-          if (!got || got !== want) return markMismatch(job);
+      if (!heal || typeof heal.sha256Hex !== 'function' || typeof heal.heal !== 'function') return markMismatch(job);
+      if (typeof heal.resetByteDigestCount === 'function') heal.resetByteDigestCount();
+      function scan() {
+        if (i >= man.pieces.length) return scanned();
+        var spec = man.pieces[i];
+        var start = spec.i * size;
+        var len = blobInput ? Math.max(0, Math.min(size, bytes.size - start)) : Math.max(0, Math.min(size, u8.length - start));
+        var viewPromise = blobInput
+          ? bytes.slice(start, start + len).arrayBuffer().then(function (ab) { return new Uint8Array(ab); })
+          : Promise.resolve(u8.subarray(start, start + len));
+        return viewPromise.then(function (view) {
+          return heal.sha256Hex(view).then(function (hex) {
+            hexAt[spec.i] = hex;
+            if (hex !== spec.sha256) bad.push(spec.i);
+            i += 1;
+            return yieldTurn().then(scan);
+          });
+        });
+      }
+      function scanned() {
+        var pull = typeof job.fetchPiece === 'function'
+          ? job.fetchPiece
+          : function (index) { return rangeFetch(job, man, index); };
+        return heal.heal(man, blobInput ? bytes : u8, pull, {
+          what: 'phone-swarm',
+          inPlace: !blobInput,
+          knownBad: bad,
+          knownHexes: hexAt
+        }).then(function (receipt) {
+          job.healReceipt = receipt || null;
+          job.digestCount = typeof heal.byteDigestCount === 'function' ? heal.byteDigestCount() : 0;
+          job.wholeDigestCount = typeof heal.wholeDigestCount === 'function' ? heal.wholeDigestCount() : 0;
+          var root = man.root || '';
+          // before 062c: return sha256Hex(toUint8(receipt.data)).then(function (hex) { if (got !== want) return markMismatch(job); });
+          if (!receipt || !receipt.ok || !receipt.root || receipt.root !== root) return markMismatch(job);
           job.matched = true;
           job.verified = true;
           job.willNotImport = true;
           job.state = 'verified';
           job.error = null;
-          return storeVerified(job, toUint8(receipt.data)).then(function () {
+          return storeVerified(job, receipt.data).then(function () {
             return publicJob(job);
           });
-        });
-      }, function () { return markMismatch(job); });
+        }, function () { return markMismatch(job); });
+      }
+      return scan();
     });
   }
 
+  function healOrMismatch(job, bytes, want) {
+    if (!job || !job.manifest) return Promise.resolve(markMismatch(job));
+    // before 062c: heal() of the whole buffer, then sha256Hex of receipt.data, compared to want.
+    return handoffManifest(job, bytes, want);
+  }
+
   function handoffBuffer(job, bytes) {
+    if (job && job.manifest && job.manifest.pieces && job.manifest.pieces.length) {
+      return handoffManifest(job, bytes);
+    }
     job.state = 'hashing';
     job.progress = 100;
     var u8 = toUint8(bytes);
@@ -516,7 +570,12 @@
         });
       }
       var reader = res.body.getReader();
-      var chunks = [];
+      var man = job.manifest;
+      var pieceSize = man && typeof man.pieceSize === 'number' && man.pieceSize > 0 ? man.pieceSize : 0;
+      var prealloc = !!(man && man.pieces && man.pieces.length && pieceSize && len > 0);
+      // before 062c: var chunks = []; then one copy into new Uint8Array(total).
+      var chunks = prealloc ? null : [];
+      var filled = null;
       var total = 0;
       var MAX = 512 * 1024 * 1024;
 
@@ -524,6 +583,11 @@
         return reader.read().then(function (result) {
           if (job.state === 'cancelled' || abortRef.aborted) throw new Error('cancelled');
           if (result.done) {
+            if (prealloc) {
+              if (!filled) return new Uint8Array(0);
+              if (total === filled.length) return filled;
+              return filled.subarray(0, total);
+            }
             var out = new Uint8Array(total);
             var offset = 0;
             for (var i = 0; i < chunks.length; i++) {
@@ -535,7 +599,16 @@
           var value = result.value;
           total += value.length;
           if (total > MAX) throw new Error('download too large');
-          chunks.push(value);
+          if (prealloc) {
+            if (!filled) {
+              if (len > MAX) throw new Error('download too large');
+              filled = new Uint8Array(len);
+            }
+            if (total > filled.length) throw new Error('download too large');
+            filled.set(value, total - value.length);
+          } else {
+            chunks.push(value);
+          }
           job.progress = len
             ? Math.min(99, Math.floor((total / len) * 100))
             : Math.min(90, Math.floor(total / 1024));
@@ -676,7 +749,10 @@
       willNotImport: true,
       saved: false,
       blob: null,
-      stored: null
+      stored: null,
+      // before 062c: the job did not keep the manifest, so the pull hashed the whole file.
+      manifest: o.manifest || null,
+      fetchPiece: typeof o.fetchPiece === 'function' ? o.fetchPiece : null
     };
     jobs.set(id, job);
 
@@ -709,21 +785,7 @@
     });
   }
 
-  /**
-   * Offer Save file… for a verified job. Gesture only.
-   */
-  function saveVerified(id) {
-    var job = jobs.get(String(id));
-    if (!job || !job.verified || !job.blob) {
-      return Promise.resolve({ ok: false, reason: 'not verified' });
-    }
-    var u8 = toUint8(job.blob);
-    var name = String(job.name || job.modelId || 'verified.bin').replace(/[^\w.\-]+/g, '_');
-    var blob =
-      typeof Blob !== 'undefined'
-        ? new Blob([u8], { type: 'application/octet-stream' })
-        : null;
-
+  function finishSave(blob, name, job) {
     if (
       typeof window !== 'undefined' &&
       typeof window.showSaveFilePicker === 'function' &&
@@ -761,6 +823,42 @@
     return Promise.resolve({ ok: false, reason: 'save unavailable' });
   }
 
+  /**
+   * Offer Save file… for a verified job. Gesture only.
+   */
+  function saveVerified(id) {
+    var job = jobs.get(String(id));
+    if (!job || !job.verified || !job.blob) {
+      return Promise.resolve({ ok: false, reason: 'not verified' });
+    }
+    // before 062c: var u8 = toUint8(job.blob);
+    var held = job.blob;
+    var name = String(job.name || job.modelId || 'verified.bin').replace(/[^\w.\-]+/g, '_');
+    var blob = null;
+    if (typeof Blob !== 'undefined' && held instanceof Blob) {
+      blob = held;
+    } else if (held instanceof Uint8Array && typeof Blob !== 'undefined') {
+      blob = new Blob([held], { type: 'application/octet-stream' });
+    } else if (held && typeof held.arrayBuffer === 'function') {
+      return held.arrayBuffer().then(function (ab) {
+        var made = typeof Blob !== 'undefined'
+          ? new Blob([new Uint8Array(ab)], { type: 'application/octet-stream' })
+          : null;
+        return finishSave(made, name, job);
+      });
+    } else {
+      try {
+        var u8 = toUint8(held);
+        blob = typeof Blob !== 'undefined'
+          ? new Blob([u8], { type: 'application/octet-stream' })
+          : null;
+      } catch (e) {
+        return Promise.resolve({ ok: false, reason: 'save unavailable' });
+      }
+    }
+    return finishSave(blob, name, job);
+  }
+
   function downloadAnchor(blob, name, job) {
     if (typeof document === 'undefined' || typeof URL === 'undefined') {
       return { ok: false, reason: 'save unavailable' };
@@ -791,7 +889,11 @@
   function getVerifiedBlob(id) {
     var job = jobs.get(String(id));
     if (!job || !job.verified || !job.blob) return null;
-    return toUint8(job.blob);
+    // before 062c: return toUint8(job.blob);
+    var held = job.blob;
+    if (typeof Blob !== 'undefined' && held instanceof Blob) return held;
+    if (held instanceof Uint8Array) return held;
+    try { return toUint8(held); } catch (e) { return null; }
   }
 
   function destroyClient() {
@@ -815,6 +917,7 @@
     assertAllowedSource: assertAllowedSource,
     saveVerified: saveVerified,
     getVerifiedBlob: getVerifiedBlob,
+    piecesInFlight: function () { return 1; },
     destroyClient: destroyClient,
     isZeroHash: isZeroHash,
     isExampleRow: isExampleRow,

@@ -32,7 +32,8 @@ var locks = {
   'docs/modules/continuity-doorway.js': '115e170f10a6c8e3a52d87d2037a33a6',
   // before 062a: 'docs/modules/lattice-export.js': '1da1ed29674b89a2fda7f6098deea2d0',
   // before 062b: 'docs/modules/lattice-export.js': '4d4b8641ae245fa490daa7cba6161727',
-  'docs/modules/lattice-export.js': '80282656a99bd1267736d05ef32e7874',
+  // before 062c: 'docs/modules/lattice-export.js': '80282656a99bd1267736d05ef32e7874',
+  'docs/modules/lattice-export.js': 'aae3ae736d0cb8432d729ad1d744a561',
   'docs/modules/chat-autonomy.js': 'c83cf6c9f11271aeaa35ed6070f188f3',
   // before 061a lock exception (Kirk 2026-11-02, Hypha walk required): 'docs/modules/pool-honest-label.js': 'ca08886e185ffb8721525bb627302d74',
   'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
@@ -421,10 +422,16 @@ function near(n, want) {
   if (afterNo !== 0) fail('fetch on not now');
   await driveCard.locator('button', { hasText: 'Save to my Drive' }).click();
   await driveCard.locator('button.fl-doc-yes').click();
-  await page.waitForFunction(function () { return window.__fetches.length === 1; }, null, { timeout: 5000 });
+  // before 062c: await page.waitForFunction(function () { return window.__fetches.length === 1; }, null, { timeout: 5000 });
+  // The connect loop also calls fetch (bridge health on 11435-11445). That scan can land in this wait, so the list is not exactly one.
+  await page.waitForFunction(function () {
+    return window.__fetches.some(function (url) { return String(url).indexOf('upload') !== -1; });
+  }, null, { timeout: 5000 });
   var sent = await page.evaluate(function () {
-    return { n: window.__fetches.length, url: window.__fetches[0] || '' };
+    var uploads = window.__fetches.filter(function (url) { return String(url).indexOf('upload') !== -1; });
+    return { n: uploads.length, url: uploads[0] || '', all: window.__fetches.length };
   });
+  // before 062c: if (sent.n !== 1 || sent.url.indexOf('upload') === -1) fail('yes send ' + JSON.stringify(sent));
   if (sent.n !== 1 || sent.url.indexOf('upload') === -1) fail('yes send ' + JSON.stringify(sent));
 
   async function measure(width, height, scale) {

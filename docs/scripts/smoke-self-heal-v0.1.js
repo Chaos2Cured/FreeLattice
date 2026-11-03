@@ -203,7 +203,9 @@ function serve(listenPort) {
     fetchPiece: function (i) { return { bytes: good.subarray(i * size, (i + 1) * size), from: 'peer' }; }
   };
   swarm.jobs.set(job.id, job);
-  var swarmHealed = await swarm.completeWithBuffer(job.id, bad);
+  // before 062c: completeWithBuffer(job.id, bad) copied inside heal, so this buffer stayed torn.
+  var swarmInput = Buffer.from(bad);
+  var swarmHealed = await swarm.completeWithBuffer(job.id, swarmInput);
   if (!swarmHealed || swarmHealed.state !== 'verified' || swarmHealed.willNotImport !== true) fail('swarm heal ' + JSON.stringify(swarmHealed));
   var bare = {
     id: 'bare-job',

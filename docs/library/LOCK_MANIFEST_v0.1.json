@@ -20,6 +20,20 @@
     "index.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
       {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+    ],
+    "docs/modules/self-heal.js": [
+      {"md5": "aae57c04047e14b0744e5d54b83ade20", "since": "062b", "by": "GC", "walk": null},
+      {"md5": "6f90896352676e4ccef143367e621a93", "since": "062c", "by": "GC", "walk": null}
+    ],
+    "docs/modules/phone-swarm.js": [
+      {"md5": "dd9cafe2409b4bd00ceec911bfd620c0", "since": "062a", "by": "GC", "walk": null},
+      {"md5": "5053a72ac244fa309697bb74b0723bae", "since": "062c", "by": "GC", "walk": null}
+    ],
+    "docs/modules/lattice-export.js": [
+      {"md5": "1da1ed29674b89a2fda7f6098deea2d0", "since": "054", "by": "GC", "walk": null},
+      {"md5": "4d4b8641ae245fa490daa7cba6161727", "since": "062a", "by": "GC", "walk": null},
+      {"md5": "80282656a99bd1267736d05ef32e7874", "since": "062b", "by": "GC", "walk": null},
+      {"md5": "aae3ae736d0cb8432d729ad1d744a561", "since": "062c", "by": "GC", "walk": null}
     ]
   }
   ,

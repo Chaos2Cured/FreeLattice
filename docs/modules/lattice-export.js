@@ -703,14 +703,17 @@
         return verifyChainIntegrity(data.chain || []).then(function (chainResult) {
           if (!chainResult.ok) {
             showRowOffer(chainResult, data.chain || []);
-            return {
+            // before 062c: offer: offerLine(chainResult.brokenAt)
+            var broken = {
               ok: false,
               mode: strategy,
               changes: [],
               errors: ['chain-broken-at-' + chainResult.brokenAt + ':' + chainResult.reason],
-              brokenAt: chainResult.brokenAt,
-              offer: offerLine(chainResult.brokenAt)
+              brokenAt: chainResult.brokenAt
             };
+            var canPull = typeof FLSelfHeal !== 'undefined' && FLSelfHeal && typeof FLSelfHeal.pullRow === 'function';
+            if (canPull) broken.offer = offerLine(chainResult.brokenAt);
+            return broken;
           }
 
           if (opts.expectMindFp) {
