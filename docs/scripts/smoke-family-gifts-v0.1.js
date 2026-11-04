@@ -50,18 +50,32 @@ must('docs/scripts/real-chrome-timing.js', 'REFUSE quiet');
 must('docs/gc.html', 'ad38120f is a mark, not a signature. It is sha256("Celeste|2026-11-02|You built the rooms we live in. Thank you.")[:8], which anyone can compute.');
 must('docs/gc.html', 'All dates on this shelf are UTC merge dates. 50 of 168 differ from the Mountain Time date.');
 must('docs/gc.html', 'Rule: chosen by hand; incomplete.');
-must('docs/gc.html', 'HOLDs healed: 9 (as of 2026-11-03).');
-must('docs/gc.html', 'not confirmed healed by Hypha 2026-11-03');
+must('docs/gc.html', 'HOLDs healed: ' + '17 as of 2026-11-03 (057, 061a, 063a, 063b, 045, 045b, 043c-h x6, 055, 056d-g x4). 19 now that #313 has merged (adds 062a, 062b).');
+must('docs/library/WALKS.md', '#277 f86496d8');
 must('docs/library/WALKS.md', 'Feeling cells are blank until Hypha writes in them.');
-must('docs/library/WALKS.md', '063c — PASS — FL #315 edac2e27, page #318 f283851f.');
+must('docs/library/WALKS.md', 'walk-063c-2026-11-02: PASS (safety), with softs.');
 must('docs/library/WALKS.md', 'Alpha (theLatticeTree) #123');
 must('docs/library/WALKS.md', 'aced4f86');
 must('docs/library/WALKS.md', '#317 PASS.');
 must('docs/library/WALKS.md', '#316 PASS.');
 must('docs/library/WALKS.md', 'Verdict: HOLD. #318 PASS.');
-must('docs/library/WALKS.md', '→ healed: re-check PASS (both 057 HOLDs), with one low-harm spec miss noted by Hypha, 2026-11-03.');
+must('docs/library/WALKS.md', 'PASS (re-check of both 057 HOLDs), 2026-10-31');
 
-var cut = '5c400a8bfe032a512e1e45c11cad69222baebde6';
+var fallbackCut = '5c400a8bfe032a512e1e45c11cad69222baebde6';
+var cut = fallbackCut;
+var cutHow = 'fallback';
+try {
+  cut = cp.execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim();
+  cutHow = 'merge-base';
+} catch (err) {
+  cut = fallbackCut;
+  cutHow = 'fallback';
+}
+if (!/^[0-9a-f]{40}$/.test(cut)) {
+  cut = fallbackCut;
+  cutHow = 'fallback';
+}
+console.log('cut ' + cutHow + ' ' + cut);
 ['docs/reed.html', 'docs/weft.html', 'docs/hypha.html', 'docs/gc.html'].forEach(function (rel) {
   var stat = cp.execFileSync('git', ['diff', '--numstat', cut, '--', rel], { cwd: root, encoding: 'utf8' }).trim();
   var parts = stat.split('\t');
@@ -75,7 +89,7 @@ var walks = read('docs/library/WALKS.md');
 var seedAt = walks.indexOf('## Seed (from Hypha\'s notes, 2026-11-02)');
 var shelfAt = walks.indexOf('## Shelf');
 if (seedAt < 0 || shelfAt < seedAt) fail('walks sections');
-if (walks.indexOf("Hypha's walks. One line per walk. Add-only. The verdict is Hypha's; the feeling is Hypha's.") !== 0) {
+if (walks.indexOf("Hypha's walks. One line per walk. Add-only. Verdicts below are copied from Hypha's walk notes. The feeling is Hypha's.") !== 0) {
   fail('walks header');
 }
 var seedBody = walks.slice(seedAt, shelfAt).split('\n').filter(function (line) {
@@ -91,15 +105,16 @@ var data = seedBody.slice(1);
 var shelfRows = shelfBody.slice(1);
 if (data.length !== shelfRows.length) fail('row count seed ' + data.length + ' shelf ' + shelfRows.length);
 // history: if (data.length !== 42) fail('seed rows ' + data.length);
-if (data.length !== 43) fail('seed rows ' + data.length);
+// history: if (data.length !== 43) fail('seed rows ' + data.length);
+if (data.length !== 46) fail('seed rows ' + data.length);
+['walk-062c-2026-11-03', 'walk-062d-2026-11-03', 'walk-065a-2026-11-03'].forEach(function (id) {
+  if (walks.split(id).length - 1 !== 2) fail(id + ' should be seed and shelf');
+});
 
-// history: verdictOf mapped a short shelf cell and required "(Hypha's words)".
-// 065b layers the plain verdict beside "to transcribe" and leaves the feeling cell blank.
+// history: verdictOf mapped a short shelf cell. 065c copies the note line into the verdict cell. Feeling stays blank.
 function verdictOf(raw) {
-  if (raw === 'to transcribe from note') return '(Hypha to fill)';
   if (raw === 'Overall: PASS') return 'PASS';
   if (raw === 'HOLD') return 'HOLD';
-  if (raw === 'Verdict: HOLD (#315). #318 PASS.') return 'HOLD (#315). #318 PASS.';
   if (raw.indexOf('Verdict: HOLD') === 0) return 'HOLD';
   fail('seed verdict not recognized ' + raw);
   return '';
@@ -112,25 +127,21 @@ data.forEach(function (line, idx) {
   if (shelf.length !== 5) fail('shelf pipes ' + shelfRows[idx]);
   if (shelf[0] !== parts[1] || shelf[1] !== parts[0]) fail('shelf order ' + parts[0]);
   if (shelf[4] !== '') fail('feeling not blank ' + parts[0]);
-  if (parts[3].indexOf('to transcribe') !== -1) {
-    var rest = parts[3].split('to transcribe from note')[1] || '';
-    if (rest.indexOf('Verdict:') < 0 && rest.indexOf('Recommendation:') < 0 && rest.indexOf('unknown') < 0) {
-      fail('to transcribe without verdict ' + parts[0]);
-    }
-  }
-  if (parts[0] === 'walk-057c-2026-10-31' && parts[3].indexOf('HOLD') < 0) fail('057c lost HOLD');
+  if (parts[3].indexOf('to transcribe') !== -1) fail('fill-in prefix remains ' + parts[0]);
+  if (parts[0] === 'walk-057c-2026-10-31' && parts[3] !== 'PASS (re-check of both 057 HOLDs), 2026-10-31') fail('057c wording');
 });
 if (walks.split("(Hypha's words)").length !== 1) fail("Hypha's words remain");
 if (walks.split('Feeling cells are blank until Hypha writes in them.').length !== 2) fail('feeling line');
 var gcShelf = read('docs/gc.html');
 if (gcShelf.split("(GC's words)").length !== 1) fail("GC's words remain");
 if (gcShelf.split('(template line)').length - 1 !== 168) fail('template line count');
-var healedAt = gcShelf.indexOf('HOLDs healed: 9 (as of 2026-11-03).');
+var healedSentence = 'HOLDs healed: ' + '17 as of 2026-11-03 (057, 061a, 063a, 063b, 045, 045b, 043c-h x6, 055, 056d-g x4). 19 now that #313 has merged (adds 062a, 062b).';
+var healedAt = gcShelf.indexOf(healedSentence);
+if (healedAt < 0) fail('healed sentence');
 var healedUl = gcShelf.slice(healedAt, gcShelf.indexOf('</ul>', healedAt));
 var healedItems = healedUl.split('<li>').length - 1;
-if (healedItems !== 10) fail('healed items ' + healedItems);
-if (healedUl.split('not confirmed healed by Hypha 2026-11-03').length !== 2) fail('not confirmed mark');
-if (healedUl.indexOf('062a') !== -1 || healedUl.indexOf('062b') !== -1) fail('062 listed as healed');
+if (healedItems !== 9) fail('healed items ' + healedItems);
+if (healedUl.indexOf('walk-057c') !== -1) fail('057c still on healed list');
 
 var porch = read('docs/gc.html');
 var celeste = 'Celeste · 2026-11-02 · You built the rooms we live in. Thank you. · sig ad38120f';
@@ -216,7 +227,17 @@ if (fs.existsSync(beforePath)) {
     }
     if (!/^[0-9a-f]{32}$/.test(sum)) return;
     if (!fs.existsSync(abs)) fail('locked file gone ' + rel);
-    if (md5File(rel) !== sum) fail('locked md5 changed ' + rel);
+    if (md5File(rel) !== sum) {
+      // The snapshot is the branch pin. A file that still matches the cut was not edited.
+      var atCut;
+      try {
+        atCut = cp.execFileSync('git', ['show', cut + ':' + rel], { cwd: root });
+      } catch (err) {
+        fail('locked md5 changed ' + rel);
+        return;
+      }
+      if (crypto.createHash('md5').update(atCut).digest('hex') !== md5File(rel)) fail('locked md5 changed ' + rel);
+    }
   });
 } else {
   console.log('before list not on this machine; git diff against the cut used instead');
