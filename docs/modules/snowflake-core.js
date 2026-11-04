@@ -245,6 +245,19 @@
     return dbp;
   }
 
+  function idbGet(key) {
+    return idbOpen().then(function (db) {
+      return new Promise(function (resolve) {
+        try {
+          var tx = db.transaction(STORE, 'readonly');
+          var req = tx.objectStore(STORE).get(key);
+          req.onsuccess = function () { resolve(req.result || null); };
+          req.onerror = function () { resolve(null); };
+        } catch (e) { resolve(null); }
+      });
+    }, function () { return null; });
+  }
+
   function idbCommit(key, value) {
     return idbOpen().then(function (db) {
       return new Promise(function (resolve, reject) {
@@ -872,6 +885,112 @@
       book.rows.push(row);
       return atomicWrite(LS_LEDGER, JSON.stringify(book)).then(function (ok) {
         return ok ? row : null;
+      });
+    });
+  }
+
+  // before 062a: a flake was read as stored, with no sealed-hash check and no IndexedDB copy.
+  function sealCanonHex(flake) {
+    var psis = (flake.nodes || []).map(function (n) { return n && n.psi; }).filter(Boolean).sort();
+    return sha8(String(flake.question || '')).then(function (qHash) {
+      return sha256Hex(canonical({
+        flakeId: flake.id,
+        questionHash: qHash,
+        nodePsis: psis,
+        t: flake.t,
+        name: flake.name
+      }));
+    });
+  }
+
+  function idbFlakeList() {
+    return idbGet(LS_FLAKES).then(function (row) {
+      if (!row || row.body == null) return [];
+      try {
+        var data = JSON.parse(row.body);
+        if (Array.isArray(data)) return data;
+        if (data && Array.isArray(data.flakes)) return data.flakes;
+      } catch (e) {}
+      return [];
+    }, function () { return []; });
+  }
+
+  function quarantineKey(id, oldHash) {
+    return 'quarantine:' + String(id) + ':' + String(oldHash);
+  }
+
+  function saveHealedFlake(id, copy) {
+    var fresh = loadFlakes();
+    var swapped = false;
+    var n;
+    for (n = 0; n < fresh.length; n++) {
+      if (fresh[n] && fresh[n].id === id) {
+        fresh[n] = copy;
+        swapped = true;
+      }
+    }
+    if (!swapped) fresh.push(copy);
+    return saveFlakes(fresh);
+  }
+
+  // delta holds the old hash. points_to holds the new hash. branch and name hold the source.
+  function quarantineAndSave(id, broken, oldHash, copy, newHash, source) {
+    var key = quarantineKey(id, oldHash);
+    var t = new Date().toISOString();
+    var from = source || 'idb';
+    var tomb = JSON.stringify({
+      flake: broken,
+      oldHash: oldHash,
+      t: t,
+      reason: 'heal replaced a bad local flake'
+    });
+    return atomicWrite(key, tomb).then(function () {
+      return appendLedger({
+        kind: 'heal',
+        flakeId: id,
+        delta: oldHash,
+        points_to: newHash,
+        branch: from,
+        name: from,
+        t: t
+      });
+    }).then(function () {
+      return saveHealedFlake(id, copy);
+    });
+  }
+
+  function readFlakeChecked(id, readBackup) {
+    var list = loadFlakes();
+    var flake = null;
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i] && list[i].id === id) flake = list[i];
+    }
+    if (!flake || !flake.humanHash) return Promise.resolve({ ok: true, flake: flake, from: 'local', skipped: !flake || !flake.humanHash });
+    var recorded = flake.humanHash;
+    return sealCanonHex(flake).then(function (hex) {
+      if (hex === recorded) return { ok: true, flake: flake, from: 'local' };
+      var backup = typeof readBackup === 'function' ? readBackup() : idbFlakeList();
+      return Promise.resolve(backup).then(function (copies) {
+        var copy = null;
+        var rows = Array.isArray(copies) ? copies : [];
+        for (i = 0; i < rows.length; i++) {
+          if (rows[i] && rows[i].id === id) copy = rows[i];
+        }
+        if (!copy) return { ok: false, flake: flake, broken: true, from: 'none' };
+        return sealCanonHex(copy).then(function (copyHex) {
+          if (copyHex !== recorded) return { ok: false, flake: flake, broken: true, from: 'refused', refused: true };
+          // before 062d: var healed = list.slice();
+          // before 062d: for (i = 0; i < healed.length; i++) {
+          // before 062d:   if (healed[i] && healed[i].id === id) healed[i] = copy;
+          // before 062d: }
+          // before 062d: return saveFlakes(healed).then(function () {
+          // before 062d:   return { ok: true, flake: copy, from: 'idb' };
+          // before 062d: });
+          return quarantineAndSave(id, flake, hex, copy, copyHex, 'idb').then(function () {
+            return { ok: true, flake: copy, from: 'idb' };
+          });
+        });
       });
     });
   }
@@ -2395,6 +2514,7 @@
     loadLedger: loadLedger,
     appendLedger: appendLedger,
     loadFlakes: loadFlakes,
+    readFlakeChecked: readFlakeChecked,
     atomicWrite: atomicWrite,
     killMidWrite: killMidWrite,
     startRun: startRun,

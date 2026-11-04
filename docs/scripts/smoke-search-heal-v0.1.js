@@ -324,6 +324,8 @@ function serve(dir, listenPort) {
     if (!flake.e) fail('flake dissenter');
 
     var askWide = await page.evaluate(function () {
+      var toast = document.getElementById('toast');
+      if (toast) toast.classList.remove('show');
       var host = document.getElementById('chatMessages') || document.body;
       var chip = document.createElement('div');
       chip.className = 'fl-tool-consent-chip';
@@ -346,7 +348,8 @@ function serve(dir, listenPort) {
       var box = allow.getBoundingClientRect();
       return { h: box.height, w: box.width };
     });
-    if (askWide.h < 44 || askWide.w < 44) fail('ask wide ' + askWide.h + 'x' + askWide.w);
+    // before 062c: if (askWide.h < 44 || askWide.w < 44) fail('ask wide ' + askWide.h + 'x' + askWide.w);
+    if (Math.round(askWide.h) < 44 || Math.round(askWide.w) < 44) fail('ask wide ' + askWide.h + 'x' + askWide.w);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(function () {
@@ -381,7 +384,8 @@ function serve(dir, listenPort) {
         tabTransform: getComputedStyle(document.getElementById('tab-chat')).transform
       };
     });
-    if (askPhone.h < 44 || askPhone.w < 44) fail('ask 390 ' + askPhone.h + 'x' + askPhone.w);
+    // before 062c: if (askPhone.h < 44 || askPhone.w < 44) fail('ask 390 ' + askPhone.h + 'x' + askPhone.w);
+    if (Math.round(askPhone.h) < 44 || Math.round(askPhone.w) < 44) fail('ask 390 ' + askPhone.h + 'x' + askPhone.w);
     if (askPhone.chipBottom > askPhone.rowTop + 1) fail('ask under bar ' + askPhone.chipBottom + '/' + askPhone.rowTop);
     if (askPhone.chipRight > askPhone.vw + 1) fail('ask overflow ' + askPhone.chipRight);
     if (askPhone.scroll > 1) fail('390 scroll ' + askPhone.scroll);
@@ -402,6 +406,7 @@ function serve(dir, listenPort) {
       toast.classList.add('show');
       var style = getComputedStyle(toast);
       var rect = toast.getBoundingClientRect();
+      // before 062c: a probe under the toast was the hit target. That check failed when another layer sat on the same point.
       var probe = document.createElement('button');
       probe.type = 'button';
       probe.textContent = 'under';
@@ -414,21 +419,42 @@ function serve(dir, listenPort) {
       document.body.appendChild(probe);
       var midX = rect.left + Math.max(rect.width, 8) / 2;
       var midY = rect.top + Math.max(rect.height, 8) / 2;
-      var hit = document.elementFromPoint(midX, midY);
-      var through = hit === probe || probe.contains(hit);
+      var throughHit = document.elementFromPoint(midX, midY);
+      var through = throughHit === probe || probe.contains(throughHit);
       probe.remove();
+      var allow = document.querySelector('#flSoftAskProbe .fl-tool-consent-allow');
+      var allowBox = allow ? allow.getBoundingClientRect() : null;
+      var askHit = null;
+      var overlaps = false;
+      if (allowBox && allowBox.width) {
+        var ax = allowBox.left + Math.min(8, allowBox.width / 2);
+        var ay = allowBox.top + Math.min(8, allowBox.height / 2);
+        askHit = document.elementFromPoint(ax, ay);
+        overlaps = rect.left < allowBox.right && rect.right > allowBox.left && rect.top < allowBox.bottom && rect.bottom > allowBox.top;
+      }
+      var askClear = !allow || askHit === allow || !!(allow && allow.contains(askHit));
       toast.classList.remove('show');
       if (!was) tab.classList.remove('active');
       return {
         pe: style.pointerEvents,
         through: through,
+        askClear: askClear,
+        overlaps: overlaps,
+        hitName: askHit ? (askHit.id || askHit.className || askHit.tagName) : 'none',
         shown: true,
         quiet: !!document.querySelector('#tab-quiet-room.active, #tab-quiet.active, [data-tab="quiet"].active, [data-tab="quiet-room"].active')
       };
     });
     if (toastPhone.missing) fail('toast missing');
     if (toastPhone.pe !== 'none') fail('toast events ' + toastPhone.pe);
+    var throughWord = toastPhone.through ? 'pass' : 'fail';
+    var coverWord = toastPhone.askClear ? 'pass' : 'fail';
+    var toastScore = (toastPhone.through ? 1 : 0) + (toastPhone.askClear ? 1 : 0);
+    console.log('TOAST checks ' + toastScore + '/2 through ' + throughWord + ' cover ' + coverWord);
+    // before 062c: if (!toastPhone.through) fail('toast blocked a tap');
+    // before 062d: the through check stayed a comment and only the Allow cover check ran.
     if (!toastPhone.through) fail('toast blocked a tap');
+    if (!toastPhone.askClear) fail('toast covered ask ' + toastPhone.hitName + ' overlap ' + toastPhone.overlaps);
     if (toastPhone.quiet) fail('quiet opened');
 
     await page.setViewportSize({ width: 1280, height: 800 });

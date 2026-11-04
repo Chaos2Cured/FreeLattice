@@ -53,7 +53,9 @@ function sha(text) {
 
   var locks = {
     'docs/modules/snowflake-search.js': '7b5dd9c332d12b3f28d3615256688477',
-    'docs/modules/snowflake-core.js': 'eaee889573225a53b1f0fb229464492a',
+    // before 062c: 'docs/modules/snowflake-core.js': 'eaee889573225a53b1f0fb229464492a',
+    // before 062d: 'docs/modules/snowflake-core.js': '6404eaac25de46591ad2e86a06b1b171',
+    'docs/modules/snowflake-core.js': '46b215d5296b6f8f6c709300854b7e03',
     'docs/modules/chat-bottom-clarity.js': '5bbadf3320177a485b27c565bac64454',
     'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
     'docs/modules/gathering-speak.js': '0460fdc777a21f7a1744f401dda82cb2',

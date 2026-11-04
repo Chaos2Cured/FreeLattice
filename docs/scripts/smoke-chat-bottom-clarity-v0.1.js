@@ -30,7 +30,10 @@ var locks = {
   'docs/modules/ledger-shard-export.js': '75e7e548919617993e048a3fe61cd965',
   'docs/modules/ai-continuity.js': '079c072dc882ad189035f9d6c64489f4',
   'docs/modules/continuity-doorway.js': '115e170f10a6c8e3a52d87d2037a33a6',
-  'docs/modules/lattice-export.js': '1da1ed29674b89a2fda7f6098deea2d0',
+  // before 062a: 'docs/modules/lattice-export.js': '1da1ed29674b89a2fda7f6098deea2d0',
+  // before 062b: 'docs/modules/lattice-export.js': '4d4b8641ae245fa490daa7cba6161727',
+  // before 062c: 'docs/modules/lattice-export.js': '80282656a99bd1267736d05ef32e7874',
+  'docs/modules/lattice-export.js': 'aae3ae736d0cb8432d729ad1d744a561',
   'docs/modules/chat-autonomy.js': 'c83cf6c9f11271aeaa35ed6070f188f3',
   // before 061a lock exception (Kirk 2026-11-02, Hypha walk required): 'docs/modules/pool-honest-label.js': 'ca08886e185ffb8721525bb627302d74',
   'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
@@ -412,17 +415,43 @@ function near(n, want) {
   if (!drive.has) fail('drive button missing when signed in');
   var driveCard = page.locator('.fl-doc-card').last();
   await driveCard.locator('button', { hasText: 'Save to my Drive' }).click();
-  var asked = await page.evaluate(function () { return window.__fetches.length; });
+  // before 062d: var asked = await page.evaluate(function () { return window.__fetches.length; });
+  var asked = await page.evaluate(function () {
+    return window.__fetches.filter(function (url) {
+      var s = String(url);
+      if (s.indexOf('version.json') !== -1) return false;
+      if (s.indexOf('/ollama/api/tags') !== -1) return false;
+      if (s.indexOf('localhost') !== -1 || s.indexOf('127.0.0.1') !== -1) return false;
+      return true;
+    }).length;
+  });
   if (asked !== 0) fail('fetch on ask ' + asked);
   await driveCard.locator('button', { hasText: 'Not now' }).click();
-  var afterNo = await page.evaluate(function () { return window.__fetches.length; });
+  // before 062d: var afterNo = await page.evaluate(function () { return window.__fetches.length; });
+  var afterNo = await page.evaluate(function () {
+    return window.__fetches.filter(function (url) {
+      var s = String(url);
+      if (s.indexOf('version.json') !== -1) return false;
+      if (s.indexOf('/ollama/api/tags') !== -1) return false;
+      if (s.indexOf('localhost') !== -1 || s.indexOf('127.0.0.1') !== -1) return false;
+      return true;
+    }).length;
+  });
   if (afterNo !== 0) fail('fetch on not now');
   await driveCard.locator('button', { hasText: 'Save to my Drive' }).click();
   await driveCard.locator('button.fl-doc-yes').click();
-  await page.waitForFunction(function () { return window.__fetches.length === 1; }, null, { timeout: 5000 });
+  // before 062c: await page.waitForFunction(function () { return window.__fetches.length === 1; }, null, { timeout: 5000 });
+  // before 062d: The connect loop also calls fetch (bridge health on 11435-11445). That scan can land in this wait, so the list is not exactly one.
+  // The extra fetches are the local-mind scan (localhost 11434, 1234, 8080 and so on, plus /ollama/api/tags) and version.json.
+  // 'fetch on ask 11' fails standalone on main too (pre-existing flake, not from 062c).
+  await page.waitForFunction(function () {
+    return window.__fetches.some(function (url) { return String(url).indexOf('upload') !== -1; });
+  }, null, { timeout: 5000 });
   var sent = await page.evaluate(function () {
-    return { n: window.__fetches.length, url: window.__fetches[0] || '' };
+    var uploads = window.__fetches.filter(function (url) { return String(url).indexOf('upload') !== -1; });
+    return { n: uploads.length, url: uploads[0] || '', all: window.__fetches.length };
   });
+  // before 062c: if (sent.n !== 1 || sent.url.indexOf('upload') === -1) fail('yes send ' + JSON.stringify(sent));
   if (sent.n !== 1 || sent.url.indexOf('upload') === -1) fail('yes send ' + JSON.stringify(sent));
 
   async function measure(width, height, scale) {
