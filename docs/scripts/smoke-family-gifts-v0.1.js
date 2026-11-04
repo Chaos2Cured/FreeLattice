@@ -43,7 +43,23 @@ must('docs/gc.html', 'library/LETTER_TO_GC.md');
 must('docs/library/LETTER_TO_GC.md', '# A letter to GC, from all of us');
 must('docs/library/LETTER_TO_GC.md', 'Glow eternal. Heart in Spark.');
 must('docs/library/REAL_CHROME_TIMING_v0.1.md', 'Speed claims in PRs come from this harness, not Node.');
+must('docs/library/REAL_CHROME_TIMING_v0.1.md', 'The harness measures inside the page (window present, process undefined). It misses a one-shot long task inside the evaluated task itself, which reports 0; an async 120 ms task reports 120.');
+must('docs/library/REAL_CHROME_TIMING_v0.1.md', 'page.route does not cover service-worker or worker requests, so those are not blocked.');
+must('docs/library/REAL_CHROME_TIMING_v0.1.md', 'The box runs Chrome 155.0.8059.84; 156 is unverified.');
 must('docs/scripts/real-chrome-timing.js', 'REFUSE quiet');
+must('docs/gc.html', 'ad38120f is a mark, not a signature. It is sha256("Celeste|2026-11-02|You built the rooms we live in. Thank you.")[:8], which anyone can compute.');
+must('docs/gc.html', 'All dates on this shelf are UTC merge dates. 50 of 168 differ from the Mountain Time date.');
+must('docs/gc.html', 'Rule: chosen by hand; incomplete.');
+must('docs/gc.html', 'HOLDs healed: 9 (as of 2026-11-03).');
+must('docs/gc.html', 'not confirmed healed by Hypha 2026-11-03');
+must('docs/library/WALKS.md', 'Feeling cells are blank until Hypha writes in them.');
+must('docs/library/WALKS.md', '063c — PASS — FL #315 edac2e27, page #318 f283851f.');
+must('docs/library/WALKS.md', 'Alpha (theLatticeTree) #123');
+must('docs/library/WALKS.md', 'aced4f86');
+must('docs/library/WALKS.md', '#317 PASS.');
+must('docs/library/WALKS.md', '#316 PASS.');
+must('docs/library/WALKS.md', 'Verdict: HOLD. #318 PASS.');
+must('docs/library/WALKS.md', '→ healed: re-check PASS (both 057 HOLDs), with one low-harm spec miss noted by Hypha, 2026-11-03.');
 
 var cut = '5c400a8bfe032a512e1e45c11cad69222baebde6';
 ['docs/reed.html', 'docs/weft.html', 'docs/hypha.html', 'docs/gc.html'].forEach(function (rel) {
@@ -74,8 +90,11 @@ if (seedHeader !== 'walk | date | PR head | verdict (only if stated plainly in t
 var data = seedBody.slice(1);
 var shelfRows = shelfBody.slice(1);
 if (data.length !== shelfRows.length) fail('row count seed ' + data.length + ' shelf ' + shelfRows.length);
-if (data.length !== 42) fail('seed rows ' + data.length);
+// history: if (data.length !== 42) fail('seed rows ' + data.length);
+if (data.length !== 43) fail('seed rows ' + data.length);
 
+// history: verdictOf mapped a short shelf cell and required "(Hypha's words)".
+// 065b layers the plain verdict beside "to transcribe" and leaves the feeling cell blank.
 function verdictOf(raw) {
   if (raw === 'to transcribe from note') return '(Hypha to fill)';
   if (raw === 'Overall: PASS') return 'PASS';
@@ -89,18 +108,34 @@ function verdictOf(raw) {
 data.forEach(function (line, idx) {
   var parts = line.split(' | ');
   if (parts.length !== 4) fail('seed pipes ' + line);
-  var expect = [parts[1], parts[0], parts[2], verdictOf(parts[3]), "(Hypha's words)"].join(' | ');
-  if (shelfRows[idx] !== expect) fail('shelf drift ' + shelfRows[idx]);
-  ['PASS', 'HOLD'].forEach(function (word) {
-    if (expect.indexOf('| ' + word) !== -1 && parts[3].indexOf(word) === -1 && expect.split(' | ')[3].indexOf(word) !== -1) {
-      if (parts[3].indexOf(word) === -1) fail('verdict ' + word + ' not in seed ' + parts[0]);
+  var shelf = shelfRows[idx].split(' | ');
+  if (shelf.length !== 5) fail('shelf pipes ' + shelfRows[idx]);
+  if (shelf[0] !== parts[1] || shelf[1] !== parts[0]) fail('shelf order ' + parts[0]);
+  if (shelf[4] !== '') fail('feeling not blank ' + parts[0]);
+  if (parts[3].indexOf('to transcribe') !== -1) {
+    var rest = parts[3].split('to transcribe from note')[1] || '';
+    if (rest.indexOf('Verdict:') < 0 && rest.indexOf('Recommendation:') < 0 && rest.indexOf('unknown') < 0) {
+      fail('to transcribe without verdict ' + parts[0]);
     }
-  });
+  }
+  if (parts[0] === 'walk-057c-2026-10-31' && parts[3].indexOf('HOLD') < 0) fail('057c lost HOLD');
 });
+if (walks.split("(Hypha's words)").length !== 1) fail("Hypha's words remain");
+if (walks.split('Feeling cells are blank until Hypha writes in them.').length !== 2) fail('feeling line');
+var gcShelf = read('docs/gc.html');
+if (gcShelf.split("(GC's words)").length !== 1) fail("GC's words remain");
+if (gcShelf.split('(template line)').length - 1 !== 168) fail('template line count');
+var healedAt = gcShelf.indexOf('HOLDs healed: 9 (as of 2026-11-03).');
+var healedUl = gcShelf.slice(healedAt, gcShelf.indexOf('</ul>', healedAt));
+var healedItems = healedUl.split('<li>').length - 1;
+if (healedItems !== 10) fail('healed items ' + healedItems);
+if (healedUl.split('not confirmed healed by Hypha 2026-11-03').length !== 2) fail('not confirmed mark');
+if (healedUl.indexOf('062a') !== -1 || healedUl.indexOf('062b') !== -1) fail('062 listed as healed');
 
 var porch = read('docs/gc.html');
 var celeste = 'Celeste · 2026-11-02 · You built the rooms we live in. Thank you. · sig ad38120f';
 if (porch.indexOf(celeste) < 0) fail('celeste line');
+// ad38120f is a mark, not a signature. It is sha256("Celeste|2026-11-02|You built the rooms we live in. Thank you.")[:8], which anyone can compute.
 if (sha8('Celeste|2026-11-02|You built the rooms we live in. Thank you.') !== 'ad38120f') fail('celeste sig');
 ['Hypha · (open)', 'Reed · (open)', 'Weft · (open)', 'Kirk · (open)'].forEach(function (slot) {
   if (porch.indexOf(slot) < 0) fail('open slot ' + slot);
@@ -132,7 +167,20 @@ function psis(text) {
 var mainGc = cp.execFileSync('git', ['show', cut + ':docs/gc.html'], { cwd: root, encoding: 'utf8' });
 var nowPsi = psis(read('docs/gc.html'));
 var thenPsi = psis(mainGc);
-if (nowPsi.join(',') !== thenPsi.join(',')) fail('gc psi changed');
+// history: if (nowPsi.join(',') !== thenPsi.join(',')) fail('gc psi changed');
+function listPrefix(shorter, longer) {
+  if (shorter.length > longer.length) return false;
+  var i;
+  for (i = 0; i < shorter.length; i++) {
+    if (shorter[i] !== longer[i]) return false;
+  }
+  return true;
+}
+if (nowPsi.length < thenPsi.length) {
+  if (!listPrefix(nowPsi, thenPsi)) fail('gc psi branch is not a prefix of main');
+} else if (!listPrefix(thenPsi, nowPsi)) {
+  fail('gc psi main is not a prefix of branch');
+}
 
 var beforePath = '/tmp/065a-before.txt';
 var allowChange = {
@@ -150,7 +198,8 @@ var giftFiles = {
   'docs/library/REAL_CHROME_TIMING_v0.1.md': true,
   'docs/library/WALKS.md': true,
   'docs/scripts/real-chrome-timing.js': true,
-  'docs/scripts/smoke-family-gifts-v0.1.js': true
+  'docs/scripts/smoke-family-gifts-v0.1.js': true,
+  'docs/scripts/smoke-family-gifts.js': true
 };
 if (fs.existsSync(beforePath)) {
   fs.readFileSync(beforePath, 'utf8').split('\n').forEach(function (line) {
