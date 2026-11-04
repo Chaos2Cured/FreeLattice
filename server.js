@@ -18,6 +18,7 @@ const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
 const ollamaUrl = new URL(OLLAMA_HOST);
 const OLLAMA_HOSTNAME = ollamaUrl.hostname;
 const OLLAMA_PORT = parseInt(ollamaUrl.port, 10) || 11434;
+const QUILLAN_PORT = 8000;
 
 // --- MIME Types ---
 const MIME_TYPES = {
@@ -81,8 +82,8 @@ function checkOllama() {
   });
 }
 
-// --- Proxy request to Ollama ---
-function proxyToOllama(req, res, ollamaPath) {
+// --- Proxy request to LLM Backend ---
+function proxyToOllama(req, res, targetPath, targetHost = OLLAMA_HOSTNAME, targetPort = OLLAMA_PORT) {
   // Collect request body
   const chunks = [];
   req.on('data', (chunk) => chunks.push(chunk));
@@ -102,9 +103,9 @@ function proxyToOllama(req, res, ollamaPath) {
     }
 
     const proxyReq = http.request({
-      hostname: OLLAMA_HOSTNAME,
-      port: OLLAMA_PORT,
-      path: ollamaPath,
+      hostname: targetHost,
+      port: targetPort,
+      path: targetPath,
       method: req.method,
       headers: forwardHeaders
     }, (proxyRes) => {
@@ -154,6 +155,13 @@ const server = http.createServer((req, res) => {
 
   // Parse the requested URL
   let urlPath = req.url.split('?')[0]; // Remove query strings
+
+  // --- Quillan Sovereign Proxy: /v1/* → Quillan local gateway on port 8000 ---
+  if (urlPath.startsWith('/v1/') || urlPath === '/v1') {
+    const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+    proxyToOllama(req, res, urlPath + queryString, '127.0.0.1', QUILLAN_PORT);
+    return;
+  }
 
   // --- Ollama Proxy: /ollama/* → Ollama server ---
   if (urlPath.startsWith('/ollama/') || urlPath === '/ollama') {
