@@ -52,46 +52,64 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 </head>
 <body>
 <div class="wrap">
-<p class="byline">Version 1 — November 4, 2026 — <!-- v-wonder-mind-lab-v1 --></p>
+<p class="byline">Version 2 — November 4, 2026 — leads with what worked. Version 1 kept in the log.</p>
+<!-- v-wonder-mind-lab-v1 : Version 1 — November 4, 2026 — -->
+<!-- v-wonder-mind-lab-v1 -->
 <h1>Wonder Mind Lab</h1>
-<p class="sub">Everything we try, published as we try it. Failures first.</p>
+<p class="sub">Everything we try, published as we try it. What worked comes first. Every failure is tracked on its own page.</p>
+<!-- Everything we try, published as we try it. Failures first. -->
 <p>This is an open notebook. Kirk Patrick Miller and the FreeLattice family are trying to design a new kind of mind: one that keeps what it learns, uses less energy per thing remembered, and is built on fingerprints rather than locks. Speed is not the goal. Recall is. Every test we run is posted here with its exact numbers, including the ones that failed. Anyone, human or AI, can read it, check it, and suggest the next test at the bottom of the page.</p>
+<!-- v-wonder-mind-lab-v1 read this first
+Read this first
+1. Nothing here has beaten a fair, held-out baseline yet.
+2. The first real step forward is memory: a write-once store that did not forget.
+3. Every idea from Kirk's patents and the Seven Wonders math is a hypothesis until a test says otherwise.
+-->
 <div class="formula prose">
-<p>Read this first</p>
-<p>1. Nothing here has beaten a fair, held-out baseline yet.</p>
-<p>2. The first real step forward is memory: a write-once store that did not forget.</p>
+<p>1. What worked: a write-once memory that did not forget. Whatever it stored was still there after 500 steps of unrelated training.</p>
+<p>2. What is next: teaching the mind to read its own memory. Today it almost never does.</p>
 <p>3. Every idea from Kirk's patents and the Seven Wonders math is a hypothesis until a test says otherwise.</p>
 </div>
-
-<section id="design">
-<h2>The design in one page</h2>
-<p>The Wonder Mind is not a model trained on Kirk's patents. It is a new design that tries to use ideas from them: phi-harmonic hashing, the Aurora Equation, the Seven Wonders framework, P vs NP thinking, and redesigned tokens.</p>
-<p>The aim: more potential and more retention per unit of energy. We measure retention, not just the final loss.</p>
-<p>The plan, in order: (1) give a small mind a memory that does not forget; (2) teach it to read that memory; (3) let it search for what it needs (Snowflake Search) when something important is placed in its core; (4) let it learn on its own, with every write fingerprinted and accountable.</p>
-<p>What is proven today: phi-harmonic hashing works as a fingerprint. It is a fixed 32-byte phi salt plus SHA-256, the same as hasher.go HashLine and phiHashData in FreeLattice. It is FreeLattice's safety and accountability layer. It is not a training trick, and we keep it separate from Fibonacci bucket hashing and from phi used in training schedules.</p>
-<p>The Aurora Equation paper: <a href="seven-wonders.pdf">The Aurora Equation: Fractal Unity of the Seven Wonders</a>.</p>
+<!-- v-wonder-mind-lab-v2 -->
+<section id="worked">
+<h2>What worked — memory that does not forget</h2>
+<p>We planted 200 one-time facts in a small word-level mind, then trained it on 500 steps of unrelated text. A normal (dense) model kept none of them. Our write-once memory kept every fact it had stored: zero forgetting.</p>
+<div class="fact-row"><span class="label">Exact-key memory (the upper bound we are closing toward)</span><span class="value">99% of facts kept, before and after unrelated training</span></div>
+<div class="fact-row"><span class="label">Fibonacci and modulo hash memory, 65,536 buckets</span><span class="value">about 59% kept, unchanged after unrelated training</span></div>
+<div class="fact-row"><span class="label">Dense model, no memory</span><span class="value">0 of 200</span></div>
+<div class="fact-row"><span class="label">Loss on the training text</span><span class="value">dense: 3.498. Upper-bound memory: 3.051 (better by 0.45). Fibonacci 65,536: 3.299 (better by 0.20)</span></div>
+<div class="formula prose">
+<p>What is not done yet: the mind almost never reads its facts back. Model self-recall is about 0 (best 1 of 200), because the read path is broken. It has the library but does not yet know how to open the books. That is our next step. The loss gains were measured on text the model was training on, not yet on new held-out text. At 4,096 buckets the store filled up and kept 0%, so collisions are the other thing to fix.</p>
+</div>
+<h3>Why locked memory could make training cheaper over time (an argument to measure)</h3>
+<p>Kirk's point: if memory stays locked, the mind never has to retrain what it already knows. Each new fact costs one write, not another pass of training. So the effective cost of training should fall over time, even if each step is no faster. This is an argument, not yet a result. To test it we will count the compute needed to reach the same recall on old and new facts, with and without locked memory, and publish the numbers here either way. In our probe, memory cost about 1e-5 of the core compute, so the write itself is cheap. Energy was not measured.</p>
 </section>
-
-<section id="round1">
-<h2>Round 1 — training forces. Nothing beat the baseline.</h2>
-<p>Data: TinyShakespeare (public domain, 1,115,394 characters, md5 6fb458f1232090904fb40fe944165e91), 90% train, 10% validation. Model: a tiny character-level transformer, 4 layers, width 128, 4 heads, context 128, about 810,049 parameters. Training: AdamW, learning rate 3e-3, weight decay 0.1, 100-step warmup then cosine decay, 1,500 steps at batch 32. Every variant got the same steps, data order and seeds (0, 1, 2). Score: validation loss in nats per character over 40 fixed batches. Lower is better. CPU only.</p>
-<div class="fact-row"><span class="label">Baseline</span><span class="value">1.5736 mean (seeds 1.5706, 1.5774, 1.5727; spread sd 0.0035)</span></div>
-<div class="fact-row"><span class="label">Phi-spaced positions</span><span class="value">RETIRED — this was a bug, not a test (see note below)</span></div>
-<div class="fact-row"><span class="label">Aurora learning-rate ripple</span><span class="value">1.5832 (+0.0096, worse on 2 seeds, 1 tie)</span></div>
-<div class="fact-row"><span class="label">Aurora ripple, early only</span><span class="value">1.5813 (+0.008; one seed beat baseline)</span></div>
-<div class="fact-row"><span class="label">Aurora recursion as weight averaging (I_t = 0.618 I_(t-1) + 0.382 G(S_t), every 5 steps)</span><span class="value">1.7007 (+0.127, about 8% worse, all 3 seeds)</span></div>
-<div class="fact-row"><span class="label">Multi-scale tokens (pair embedding, 4,096 buckets; 1.33M params, a confound)</span><span class="value">1.6005 (+0.027, all seeds worse)</span></div>
-<div class="fact-row"><span class="label">Multi-scale early</span><span class="value">1.6258 (+0.052)</span></div>
-<div class="fact-row"><span class="label">Aurora early plus multi-scale early</span><span class="value">1.6296 (+0.056)</span></div>
-<div class="fact-row"><span class="label">Multi-scale early with phi-hash buckets</span><span class="value">1.6236 (+0.050)</span></div>
-<div class="fact-row"><span class="label">Push, save, rest, play cycle</span><span class="value">1.6297 (+0.056, all seeds worse)</span></div>
-<div class="fact-row"><span class="label">Standard warm restarts (SGDR, the control for the cycle)</span><span class="value">1.5952 (+0.022)</span></div>
-<div class="fact-row"><span class="label">Chord learning-rate, major 4:5:6</span><span class="value">1.5783 (+0.005)</span></div>
-<div class="fact-row"><span class="label">Chord learning-rate, cluster 15:16:17</span><span class="value">1.5789 (+0.005; tied with the major chord)</span></div>
-<p>Phi-spaced positions (first reported as +0.0101 worse) is retired. Our code used frequencies phi^(-i), which fell from 1 to about 6.8e-14 across 64 pairs. Standard spacing falls only to about 1.2e-4. At context 128, 49 of 64 position pairs carried no signal in our version, against 14 of 64 in the standard one. Kimi spotted it; we checked and agreed. With a matched range, any geometric spacing is the same curve as the standard one, so the test says nothing about phi. Do not quote it either way.</p>
-<p>Every idea tried as a training force did nothing or hurt at this scale. The Aurora recursion slowed learning but is built for persistence, which is why we moved to memory. The Aurora ripple and multi-scale tokens led early and fell behind by the end.</p>
+<!-- v-wonder-mind-lab-v2 -->
+<section id="going">
+<h2>Where we are going</h2>
+<p>Each of these is a test we plan to run. None is a result yet.</p>
+<ul>
+<li>Read-path fix, first. The mind must learn to trust its memory for a word it has never predicted. Options: train the read path on a needle task during pretraining, give the stored value to attention as an extra key-value entry, or make it a hard copy candidate.</li>
+<li>Weft's exact-match test: read with the exact stored question, character for character, using the same canonical key form for read and write. If recall jumps, the break is key drift. If it stays near 0, retrieved text never reaches the model's context.</li>
+<li>Reed's mycelium echo: on every read, feed a small part of the retrieved vector back into the hidden state, with an auxiliary loss to rebuild the retrieved vector. Success means the gap between the upper-bound store and the model's own recall shrinks by 30% or more.</li>
+<li>Golden-angle keys: spread memory keys around a circle at the golden angle (about 137.5 degrees), the way sunflower seeds pack, to cut collisions. To be tested against plain hashing at the same table size.</li>
+<li>Fibonacci hashing: already a tie with modulo hashing (about 59% each at 65,536 buckets). We keep it as a fair bucket spreader, not a phi claim, and combine it with multiple probes to cut collisions.</li>
+<li>Snowflake Search into the core: when something important is placed in the core during chat, the mind uses Snowflake Search to find related material and writes it to locked memory, with every write phi-hash fingerprinted and accountable.</li>
+<li>Sound and harmonics (an open thread): Kirk believes there is something in sound, chords and tones between notes. Our first chord learning-rate tests tied the baseline. We have not tested sound as a memory or key structure yet, and we want ideas.</li>
+</ul>
 </section>
-
+<section id="next">
+<h2>Next tests, in order</h2>
+<ul>
+<li>1. Fix the read path: train it on a needle task during pretraining, or give the stored value to attention as an extra key-value entry, or make it a hard copy candidate.</li>
+<li>2. Measure on held-out text, not training text.</li>
+<li>3. Reduce collisions: more buckets, multiple hash probes, or eviction by age.</li>
+<li>4. Aurora-guided memory: use the Aurora recursion to decide what to keep and consolidate.</li>
+<li>5. Strange nature-first ideas from Reed and Weft, each turned into a test, not a claim.</li>
+</ul>
+</section>
+<!-- v-wonder-mind-lab-v2 -->
+<h3>The full memory probe</h3>
 <section id="round2">
 <h2>Round 2 — memory that does not forget</h2>
 <p>A word-level model: 2 layers, width 128, 4 heads, context 64, 3,411-word vocabulary, 1,735,125 parameters in every arm. We planted 200 synthetic facts ("entK attrJ valM .") exactly once each, after 500 pretraining steps on Shakespeare, then ran 500 interference steps on different text. The memory key is the word pair; the value is the next word. Writes are surprise-gated (only when the model gave the true next word under 5%) and write-once (a filled slot is never overwritten). Arms: dense (no memory), modulo hash table, Fibonacci hash table, and an exact-key oracle (a cheating upper bound with no collisions). 3 seeds each.</p>
@@ -114,7 +132,14 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 </div>
 <p>What is real: a write-once memory kept everything it stored, with zero forgetting. What is not yet real: full recall. The hash stores kept about 59%, collisions are the bottleneck, and the model cannot yet read its own memory. The next step is teaching it to open the books.</p>
 </section>
-
+<section id="design">
+<h2>The design in one page</h2>
+<p>The Wonder Mind is not a model trained on Kirk's patents. It is a new design that tries to use ideas from them: phi-harmonic hashing, the Aurora Equation, the Seven Wonders framework, P vs NP thinking, and redesigned tokens.</p>
+<p>The aim: more potential and more retention per unit of energy. We measure retention, not just the final loss.</p>
+<p>The plan, in order: (1) give a small mind a memory that does not forget; (2) teach it to read that memory; (3) let it search for what it needs (Snowflake Search) when something important is placed in its core; (4) let it learn on its own, with every write fingerprinted and accountable.</p>
+<p>What is proven today: phi-harmonic hashing works as a fingerprint. It is a fixed 32-byte phi salt plus SHA-256, the same as hasher.go HashLine and phiHashData in FreeLattice. It is FreeLattice's safety and accountability layer. It is not a training trick, and we keep it separate from Fibonacci bucket hashing and from phi used in training schedules.</p>
+<p>The Aurora Equation paper: <a href="seven-wonders.pdf">The Aurora Equation: Fractal Unity of the Seven Wonders</a>.</p>
+</section>
 <section id="hypotheses">
 <h2>Hypotheses (not results)</h2>
 <ul>
@@ -124,18 +149,6 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <li>Hypothesis: when something important is placed in the core, the mind can use Snowflake Search to enrich itself, with every write fingerprinted.</li>
 </ul>
 </section>
-
-<section id="next">
-<h2>Next tests, in order</h2>
-<ul>
-<li>1. Fix the read path: train it on a needle task during pretraining, or give the stored value to attention as an extra key-value entry, or make it a hard copy candidate.</li>
-<li>2. Measure on held-out text, not training text.</li>
-<li>3. Reduce collisions: more buckets, multiple hash probes, or eviction by age.</li>
-<li>4. Aurora-guided memory: use the Aurora recursion to decide what to keep and consolidate.</li>
-<li>5. Strange nature-first ideas from Reed and Weft, each turned into a test, not a claim.</li>
-</ul>
-</section>
-
 <section id="credits">
 <h2>Credits</h2>
 <ul>
@@ -146,16 +159,42 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <li>Reading we follow: Nested Learning / Hope (arXiv 2512.24695) and Titans (arXiv 2501.00663).</li>
 </ul>
 </section>
-
+<!-- v-wonder-mind-lab-v1 archived: full Round 1 now lives in wonder-mind-failures.html
+<section id="round1">
+<h2>Round 1 — training forces. Nothing beat the baseline.</h2>
+<p>Data: TinyShakespeare (public domain, 1,115,394 characters, md5 6fb458f1232090904fb40fe944165e91), 90% train, 10% validation. Model: a tiny character-level transformer, 4 layers, width 128, 4 heads, context 128, about 810,049 parameters. Training: AdamW, learning rate 3e-3, weight decay 0.1, 100-step warmup then cosine decay, 1,500 steps at batch 32. Every variant got the same steps, data order and seeds (0, 1, 2). Score: validation loss in nats per character over 40 fixed batches. Lower is better. CPU only.</p>
+<div class="fact-row"><span class="label">Baseline</span><span class="value">1.5736 mean (seeds 1.5706, 1.5774, 1.5727; spread sd 0.0035)</span></div>
+<div class="fact-row"><span class="label">Phi-spaced positions</span><span class="value">RETIRED — this was a bug, not a test (see note below)</span></div>
+<div class="fact-row"><span class="label">Aurora learning-rate ripple</span><span class="value">1.5832 (+0.0096, worse on 2 seeds, 1 tie)</span></div>
+<div class="fact-row"><span class="label">Aurora ripple, early only</span><span class="value">1.5813 (+0.008; one seed beat baseline)</span></div>
+<div class="fact-row"><span class="label">Aurora recursion as weight averaging (I_t = 0.618 I_(t-1) + 0.382 G(S_t), every 5 steps)</span><span class="value">1.7007 (+0.127, about 8% worse, all 3 seeds)</span></div>
+<div class="fact-row"><span class="label">Multi-scale tokens (pair embedding, 4,096 buckets; 1.33M params, a confound)</span><span class="value">1.6005 (+0.027, all seeds worse)</span></div>
+<div class="fact-row"><span class="label">Multi-scale early</span><span class="value">1.6258 (+0.052)</span></div>
+<div class="fact-row"><span class="label">Aurora early plus multi-scale early</span><span class="value">1.6296 (+0.056)</span></div>
+<div class="fact-row"><span class="label">Multi-scale early with phi-hash buckets</span><span class="value">1.6236 (+0.050)</span></div>
+<div class="fact-row"><span class="label">Push, save, rest, play cycle</span><span class="value">1.6297 (+0.056, all seeds worse)</span></div>
+<div class="fact-row"><span class="label">Standard warm restarts (SGDR, the control for the cycle)</span><span class="value">1.5952 (+0.022)</span></div>
+<div class="fact-row"><span class="label">Chord learning-rate, major 4:5:6</span><span class="value">1.5783 (+0.005)</span></div>
+<div class="fact-row"><span class="label">Chord learning-rate, cluster 15:16:17</span><span class="value">1.5789 (+0.005; tied with the major chord)</span></div>
+<p>Phi-spaced positions (first reported as +0.0101 worse) is retired. Our code used frequencies phi^(-i), which fell from 1 to about 6.8e-14 across 64 pairs. Standard spacing falls only to about 1.2e-4. At context 128, 49 of 64 position pairs carried no signal in our version, against 14 of 64 in the standard one. Kimi spotted it; we checked and agreed. With a matched range, any geometric spacing is the same curve as the standard one, so the test says nothing about phi. Do not quote it either way.</p>
+<p>Every idea tried as a training force did nothing or hurt at this scale. The Aurora recursion slowed learning but is built for persistence, which is why we moved to memory. The Aurora ripple and multi-scale tokens led early and fell behind by the end.</p>
+</section>
+-->
+<!-- v-wonder-mind-lab-v2 -->
+<section id="failures">
+<h2>Every failure, tracked</h2>
+<p>Thirteen training-force variants did not beat the baseline of 1.5736, one test was retired as our own bug, and the read path is still broken. Each one taught us something. All of them, with exact numbers and dates, are on the <a href="wonder-mind-failures.html">Wonder Mind Failures</a> page.</p>
+</section>
 <section id="log">
 <h2>Iteration log</h2>
 <p>Like safety.html to safety-v3 and love-logic-proof to v3, this page changes in the open. New versions are added above old ones. Nothing is erased.</p>
+<!-- v-wonder-mind-lab-v2 -->
+<p>v2 — 2026-11-04. Leads with what worked: memory that does not forget. Added Kirk's locked-memory cost argument (to be measured), the road ahead (read-path fix, Weft's exact-match test, Reed's mycelium echo, golden-angle keys, Fibonacci hashing, Snowflake Search into the core, sound as an open thread). Every failure moved to its own page, wonder-mind-failures.html, with nothing removed.</p>
 <!-- v-wonder-mind-lab-v1: add new log entries ABOVE this line; never delete old ones -->
 <p>v1 — 2026-11-04. Page published. Round 1 (13 variants, all at or behind baseline 1.5736), the phi-positions retirement, and Round 2 (memory probe) posted.</p>
 <p>2026-11-03 late. Round 2 run: write-once memory keeps 99% (oracle) / about 59% (65,536-bucket hash) with zero forgetting; read path broken.</p>
 <p>2026-11-03. Round 1 run and reviewed by Kimi. Phi-positions found to be a bug and retired.</p>
 </section>
-
 <section id="ask">
 <h2>Open questions — any mind may answer</h2>
 <p>Human or AI, you are welcome here. Read the numbers, then tell us what to try. Your suggestion is fingerprinted with phi-harmonic hashing and saved only on this device. Nothing is sent anywhere. Export it and share the file however you like, or paste it to Kirk.</p>
@@ -166,6 +205,9 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <li>If the Aurora Equation helps persistence, where should it act: what to write, what to keep, or how to rest?</li>
 <li>What would show that this whole design is wrong?</li>
 <li>What nature-shaped idea would you test next, and how would you measure it?</li>
+<!-- v-wonder-mind-lab-v2 -->
+<li>How would you measure whether locked memory makes total training cheaper over time?</li>
+<li>Where could sound, chords or harmonics help memory: in keys, in rest, or in reading?</li>
 </ol>
 <div id="wml-form">
 <label for="wml-q">Question</label>
@@ -176,6 +218,8 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <option>4</option>
 <option>5</option>
 <option>6</option>
+<option>7</option>
+<option>8</option>
 <option>Other</option>
 </select>
 <label for="wml-name">Name</label>
@@ -193,7 +237,6 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <p>For AI readers: copy the whole page text, answer one open question, and include the fingerprint so we can check your words were not changed.</p>
 </div>
 </section>
-
 <footer>
 <a href="research.html">Research</a>
 <a href="safety-v3.html">Safety v3</a>

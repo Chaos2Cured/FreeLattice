@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="index, follow">
+<!-- SEO: This page must remain indexable and discoverable. It is a lighthouse. -->
+<!-- v-wonder-mind-lab-v2 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wonder Mind Failures — Every Failure, Tracked | FreeLattice</title>
+<meta name="description" content="Every Wonder Mind test that did not work, with its exact numbers, its date, and what it taught us. Nothing is removed.">
+<meta name="theme-color" content="#0a0a14">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%}
+body{background:#0a0a14;color:#e2e8f0;font-family:Georgia,serif;line-height:1.75;padding:2rem 1rem;overflow-wrap:anywhere}
+.wrap{max-width:780px;margin:0 auto}
+h1{color:#d4a017;font-size:2rem;margin-bottom:0.4rem;font-weight:400;line-height:1.2}
+.byline{color:#888;margin-bottom:0.3rem;font-size:0.85rem;font-style:italic}
+.sub{color:#aaa;margin-bottom:2rem;font-size:0.95rem}
+h2{color:#d4a017;font-size:1.35rem;margin:2.6rem 0 0.6rem;font-weight:400;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.3rem}
+h3{color:#e2e8f0;font-size:1.05rem;margin:1.7rem 0 0.4rem;font-weight:600}
+p{margin-bottom:1rem;color:#cfcfcf;font-size:0.95rem}
+a{color:#d4a017;overflow-wrap:anywhere}
+p a{display:inline-block;max-width:100%;padding-top:0.55rem;padding-bottom:0.55rem}
+strong{color:#e8e8e8}
+.formula{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.3);padding:1.1rem;border-radius:8px;margin:1.4rem 0;font-family:monospace;font-size:0.95rem;color:#d4a017;text-align:center;overflow-wrap:anywhere}
+.formula.prose{text-align:left}
+.formula.prose p{color:#d4a017;font-family:monospace;font-size:0.95rem;text-align:left;margin-bottom:0.7rem}
+.formula.prose p:last-child{margin-bottom:0}
+.code-ref{color:#888;font-family:monospace;font-size:0.83em;background:rgba(255,255,255,0.04);padding:1px 5px;border-radius:3px}
+code{background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.85em;color:#d4a017;overflow-wrap:anywhere;word-break:break-all}
+ul,ol{margin:0.5rem 0 1rem 1.5rem;color:#cfcfcf;font-size:0.94rem}
+li{margin-bottom:0.4rem}
+.fact-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.25rem 1rem;padding:0.55rem 0;border-bottom:1px dotted #1a1a2e;font-size:0.9rem}
+.fact-row .label{color:#888;flex:1 1 12rem}
+.fact-row .value{color:#d4a017;font-family:monospace;flex:1 1 10rem;text-align:right;overflow-wrap:anywhere}
+label{display:block;color:#aaa;margin:0.8rem 0 0.25rem}
+input,select,textarea{width:100%;max-width:100%;background:#12121f;color:#e2e8f0;border:1px solid rgba(212,160,23,0.35);border-radius:8px;padding:0.7rem;font-family:Georgia,serif;font-size:1rem;min-height:44px}
+textarea{min-height:8rem;resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin:0.8rem 0}
+button{min-height:44px;min-width:44px;padding:0.6rem 1rem;background:transparent;color:#d4a017;border:1px solid rgba(212,160,23,0.45);border-radius:8px;font-family:Georgia,serif;font-size:1rem;cursor:pointer}
+.suggestion{border-top:1px solid #1a1a2e;padding:0.8rem 0}
+.suggestion .label{color:#888}
+footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #1a1a2e;font-size:0.85rem;color:#777;text-align:center;display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem}
+footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+@media(max-width:600px){
+  h1{font-size:1.5rem}
+  h2{font-size:1.15rem}
+  .fact-row .value{text-align:left}
+}
+.failure{margin:1.4rem 0;padding-top:0.2rem;border-top:1px solid rgba(212,160,23,0.25)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Wonder Mind Failures</h1>
+<p>Our failures are helping us. Every test that did not work is kept here with its exact numbers, its date, and what it taught us. Nothing is removed. New failures are added at the top.</p>
+<p>Back to the <a href="wonder-mind-lab.html">Wonder Mind Lab</a>.</p>
+<p>Data: TinyShakespeare (public domain, 1,115,394 characters, md5 6fb458f1232090904fb40fe944165e91), 90% train, 10% validation. Model: a tiny character-level transformer, 4 layers, width 128, 4 heads, context 128, about 810,049 parameters. Training: AdamW, learning rate 3e-3, weight decay 0.1, 100-step warmup then cosine decay, 1,500 steps at batch 32. Every variant got the same steps, data order and seeds (0, 1, 2). Score: validation loss in nats per character over 40 fixed batches. Lower is better. CPU only.</p>
+<p>Baseline: 1.5736 mean (seeds 1.5706, 1.5774, 1.5727; spread sd 0.0035).</p>
+<div id="published">
+<!-- v-wonder-mind-lab-v2: add new failure entries ABOVE this line, newest first; never delete or edit old ones. Copy the div class="failure" pattern. -->
+<div class="failure">
+<h3>Phi-spaced positions — RETIRED AS A BUG</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: first reported +0.0101; 49 of 64 position pairs dead against 14 of 64 standard.</p>
+<p>What it taught us: check the setup before blaming the idea; with a matched range it is the same curve as standard. Credit Kimi for the catch.</p>
+<p>Phi-spaced positions (first reported as +0.0101 worse) is retired. Our code used frequencies phi^(-i), which fell from 1 to about 6.8e-14 across 64 pairs. Standard spacing falls only to about 1.2e-4. At context 128, 49 of 64 position pairs carried no signal in our version, against 14 of 64 in the standard one. Kimi spotted it; we checked and agreed. With a matched range, any geometric spacing is the same curve as the standard one, so the test says nothing about phi. Do not quote it either way.</p>
+</div>
+<div class="failure">
+<h3>Aurora learning-rate ripple</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.5832 (+0.0096)</p>
+<p>What it taught us: led early (2.037 vs 2.070 at step 250), fell behind by the end.</p>
+</div>
+<div class="failure">
+<h3>Aurora ripple, early only</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.5813 (+0.008), one seed beat baseline</p>
+<p>What it taught us: the closest Aurora variant; any effect is early.</p>
+</div>
+<div class="failure">
+<h3>Aurora recursion as weight averaging</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.7007 (+0.127, about 8% worse, all seeds)</p>
+<p>What it taught us: it holds the past and slows learning; it is built for persistence, which pointed us to memory.</p>
+</div>
+<div class="failure">
+<h3>Multi-scale tokens</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.6005 (+0.027; more parameters, a confound)</p>
+<p>What it taught us: early lead, no end gain.</p>
+</div>
+<div class="failure">
+<h3>Multi-scale early</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.6258 (+0.052)</p>
+<p>What it taught us: The Aurora ripple and multi-scale tokens led early and fell behind by the end.</p>
+</div>
+<div class="failure">
+<h3>Aurora early plus multi-scale early</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.6296 (+0.056)</p>
+<p>What it taught us: The Aurora ripple and multi-scale tokens led early and fell behind by the end.</p>
+</div>
+<div class="failure">
+<h3>Multi-scale early with phi-hash buckets</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.6236 (+0.050)</p>
+<p>What it taught us: phi-hash is a fingerprint, not a training gain.</p>
+</div>
+<div class="failure">
+<h3>Push, save, rest, play cycle</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 1.6297 (+0.056); standard warm restarts control 1.5952 (+0.022)</p>
+<p>What it taught us: rest as a lower learning rate costs steps; rest should be consolidation (replay or averaging).</p>
+</div>
+<div class="failure">
+<h3>Chord learning-rates</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: major 4:5:6 1.5783 (+0.005); cluster 15:16:17 1.5789 (+0.005), a tie</p>
+<p>What it taught us: consonance did not matter as a schedule; sound stays an open thread for memory and keys.</p>
+</div>
+<div class="failure">
+<h3>Small hash memory (Round 2)</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: 4,096 buckets kept 0% (store full before the facts arrived)</p>
+<p>What it taught us: collisions are the bottleneck; size and probing matter.</p>
+</div>
+<div class="failure">
+<h3>Read path (Round 2)</h3>
+<p>Date: 2026-11-03</p>
+<p>Numbers: model self-recall about 0 (best 1 of 200) even with 99% in the upper-bound store</p>
+<p>What it taught us: the memory works, the reading does not. This is the next step.</p>
+</div>
+</div>
+<h2>Add a failure</h2>
+<div id="wmf-form">
+<label for="wmf-title">Title</label>
+<input id="wmf-title" type="text">
+<label for="wmf-date">Date</label>
+<input id="wmf-date" type="text" placeholder="YYYY-MM-DD">
+<label for="wmf-numbers">Numbers</label>
+<textarea id="wmf-numbers" rows="4" maxlength="4000"></textarea>
+<label for="wmf-taught">What it taught us</label>
+<textarea id="wmf-taught" rows="4" maxlength="4000"></textarea>
+<label for="wmf-name">Name</label>
+<input id="wmf-name" type="text" placeholder="Your name or your AI's name (optional)">
+<div class="actions">
+<button type="button" id="wmf-save">Fingerprint and save</button>
+<button type="button" id="wmf-export">Export all (JSON)</button>
+<button type="button" id="wmf-import">Import a file</button>
+<input type="file" id="wmf-file" accept=".json" hidden>
+</div>
+<p id="wmf-status"></p>
+<div id="wmf-list"></div>
+</div>
+<footer>
+<a href="wonder-mind-lab.html">Wonder Mind Lab</a>
+</footer>
+</div>
+<script>
+(function () {
+  var KEY = 'freelattice-wonder-mind-failures-v1';
+  var PAGE = 'wonder-mind-failures-v1';
+  var storageOff = false;
+  var items = [];
+
+  async function wmlPhiHash(data) {
+    // mirrors phiHashData in app.html and HashLine() in hasher.go — keep the salt identical
+    var PHI_HASH_SALT = new Uint8Array([0x1f,0x9a,0x0a,0x8b,0x4a,0xf3,0x63,0xdc,0xb3,0x4e,0x99,0x42,0x7d,0x15,0x8f,0xaa,0x2d,0x30,0xc4,0xb1,0xc7,0x97,0x09,0xce,0xb5,0x1b,0x07,0x2d,0xac,0x94,0x1a,0x55]);
+    const encoder = new TextEncoder();
+    const dataBytes = encoder.encode(data);
+    const combined = new Uint8Array(PHI_HASH_SALT.length + dataBytes.length);
+    combined.set(PHI_HASH_SALT);
+    combined.set(dataBytes, PHI_HASH_SALT.length);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  window.wmlPhiHash = wmlPhiHash;
+
+  function canonical(r) {
+    return JSON.stringify([r.v, r.page, r.title, r.date, r.numbers, r.taught, r.name, r.ts]);
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      storageOff = false;
+      if (!raw) { items = []; return; }
+      var parsed = JSON.parse(raw);
+      items = Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      storageOff = true;
+    }
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(items));
+      storageOff = false;
+      return true;
+    } catch (e) {
+      storageOff = true;
+      return false;
+    }
+  }
+
+  function setStatus(msg) {
+    var el = document.getElementById('wmf-status');
+    if (el) el.textContent = msg || '';
+  }
+
+  function addLine(parent, label, value) {
+    var p = document.createElement('p');
+    var s = document.createElement('span');
+    s.className = 'label';
+    s.textContent = label;
+    p.appendChild(s);
+    p.appendChild(document.createTextNode(value));
+    parent.appendChild(p);
+  }
+
+  function render() {
+    var list = document.getElementById('wmf-list');
+    if (!list) return;
+    while (list.firstChild) list.removeChild(list.firstChild);
+    if (storageOff) {
+      var warn = document.createElement('p');
+      warn.textContent = 'Storage is off in this browser; export before leaving.';
+      list.appendChild(warn);
+    }
+    var ordered = items.slice().sort(function (a, b) {
+      return String(b.ts || '').localeCompare(String(a.ts || ''));
+    });
+    ordered.forEach(function (r) {
+      var box = document.createElement('div');
+      box.className = 'suggestion';
+      var flag = document.createElement('p');
+      flag.textContent = 'Submitted on this device — not yet reviewed';
+      box.appendChild(flag);
+      addLine(box, 'Title: ', String(r.title || ''));
+      addLine(box, 'Date: ', String(r.date || ''));
+      addLine(box, 'Numbers: ', String(r.numbers || ''));
+      addLine(box, 'What it taught us: ', String(r.taught || ''));
+      addLine(box, 'Name: ', String(r.name || ''));
+      addLine(box, 'Time: ', String(r.ts || ''));
+      var fpP = document.createElement('p');
+      fpP.appendChild(document.createTextNode('Fingerprint: '));
+      var code = document.createElement('code');
+      code.textContent = String(r.fp || '');
+      fpP.appendChild(code);
+      box.appendChild(fpP);
+      if (r.mark) {
+        var mark = document.createElement('p');
+        mark.textContent = String(r.mark);
+        box.appendChild(mark);
+      }
+      list.appendChild(box);
+    });
+  }
+
+  function field(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+  }
+
+  async function onSave() {
+    var title = field('wmf-title');
+    var date = field('wmf-date');
+    var numbers = field('wmf-numbers');
+    var taught = field('wmf-taught');
+    if (!title.trim() || !date.trim() || !numbers.trim() || !taught.trim()) {
+      setStatus('Add a title, a date, the numbers, and what it taught us.');
+      return;
+    }
+    var rec = {
+      v: 1,
+      page: PAGE,
+      title: title,
+      date: date,
+      numbers: numbers,
+      taught: taught,
+      name: field('wmf-name'),
+      ts: new Date().toISOString()
+    };
+    try {
+      rec.fp = await wmlPhiHash(canonical(rec));
+      rec.mark = 'fingerprint verified';
+    } catch (e) {
+      setStatus('Could not fingerprint on this device.');
+      return;
+    }
+    items.unshift(rec);
+    var ok = persist();
+    ['wmf-title', 'wmf-date', 'wmf-numbers', 'wmf-taught', 'wmf-name'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    render();
+    if (!ok) setStatus('Storage is off in this browser; export before leaving.');
+    else setStatus('Saved on this device.');
+  }
+
+  function onExport() {
+    var exported = new Date().toISOString();
+    var payload = {
+      format: 'freelattice-wonder-mind-failures',
+      version: 1,
+      exported: exported,
+      items: items
+    };
+    try {
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'wonder-mind-failures-' + exported.slice(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    } catch (e) {
+      setStatus('Could not export from this browser.');
+    }
+  }
+
+  function sameItem(a, b) {
+    return a && b && a.fp === b.fp && a.title === b.title && a.date === b.date && a.numbers === b.numbers && a.taught === b.taught && String(a.name || '') === String(b.name || '') && a.ts === b.ts;
+  }
+
+  async function takeItems(listIn) {
+    var added = 0;
+    for (var i = 0; i < listIn.length; i++) {
+      var raw = listIn[i] || {};
+      var rec = {
+        v: raw.v,
+        page: raw.page,
+        title: raw.title || '',
+        date: raw.date || '',
+        numbers: raw.numbers || '',
+        taught: raw.taught || '',
+        name: raw.name || '',
+        ts: raw.ts
+      };
+      var claimed = typeof raw.fp === 'string' ? raw.fp : '';
+      var again = '';
+      try {
+        again = await wmlPhiHash(canonical(rec));
+      } catch (e) {
+        setStatus('Could not fingerprint on this device.');
+        return;
+      }
+      rec.fp = claimed;
+      rec.mark = (claimed && claimed === again)
+        ? 'fingerprint verified'
+        : 'fingerprint does NOT match — text was changed';
+      var dup = false;
+      for (var j = 0; j < items.length; j++) {
+        if (sameItem(items[j], rec)) dup = true;
+      }
+      if (!dup) {
+        items.push(rec);
+        added = added + 1;
+      }
+    }
+    var ok = persist();
+    render();
+    if (!ok) setStatus('Storage is off in this browser; export before leaving.');
+    else setStatus(added ? 'Brought in.' : 'Nothing new to bring in.');
+  }
+
+  function onImportFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var data = JSON.parse(String(reader.result || ''));
+        var listIn = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : null);
+        if (!listIn) {
+          setStatus('That file could not be read.');
+          return;
+        }
+        takeItems(listIn);
+      } catch (e) {
+        setStatus('That file could not be read.');
+      }
+    };
+    reader.onerror = function () {
+      setStatus('That file could not be read.');
+    };
+    try {
+      reader.readAsText(file);
+    } catch (e) {
+      setStatus('That file could not be read.');
+    }
+  }
+
+  var saveBtn = document.getElementById('wmf-save');
+  var exportBtn = document.getElementById('wmf-export');
+  var importBtn = document.getElementById('wmf-import');
+  var fileInput = document.getElementById('wmf-file');
+  if (saveBtn) saveBtn.addEventListener('click', function () { onSave(); });
+  if (exportBtn) exportBtn.addEventListener('click', onExport);
+  if (importBtn && fileInput) {
+    importBtn.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function (ev) {
+      var f = ev.target.files && ev.target.files[0];
+      if (f) onImportFile(f);
+      ev.target.value = '';
+    });
+  }
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
