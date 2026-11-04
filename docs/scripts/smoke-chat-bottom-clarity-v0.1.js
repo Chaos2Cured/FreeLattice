@@ -415,15 +415,35 @@ function near(n, want) {
   if (!drive.has) fail('drive button missing when signed in');
   var driveCard = page.locator('.fl-doc-card').last();
   await driveCard.locator('button', { hasText: 'Save to my Drive' }).click();
-  var asked = await page.evaluate(function () { return window.__fetches.length; });
+  // before 062d: var asked = await page.evaluate(function () { return window.__fetches.length; });
+  var asked = await page.evaluate(function () {
+    return window.__fetches.filter(function (url) {
+      var s = String(url);
+      if (s.indexOf('version.json') !== -1) return false;
+      if (s.indexOf('/ollama/api/tags') !== -1) return false;
+      if (s.indexOf('localhost') !== -1 || s.indexOf('127.0.0.1') !== -1) return false;
+      return true;
+    }).length;
+  });
   if (asked !== 0) fail('fetch on ask ' + asked);
   await driveCard.locator('button', { hasText: 'Not now' }).click();
-  var afterNo = await page.evaluate(function () { return window.__fetches.length; });
+  // before 062d: var afterNo = await page.evaluate(function () { return window.__fetches.length; });
+  var afterNo = await page.evaluate(function () {
+    return window.__fetches.filter(function (url) {
+      var s = String(url);
+      if (s.indexOf('version.json') !== -1) return false;
+      if (s.indexOf('/ollama/api/tags') !== -1) return false;
+      if (s.indexOf('localhost') !== -1 || s.indexOf('127.0.0.1') !== -1) return false;
+      return true;
+    }).length;
+  });
   if (afterNo !== 0) fail('fetch on not now');
   await driveCard.locator('button', { hasText: 'Save to my Drive' }).click();
   await driveCard.locator('button.fl-doc-yes').click();
   // before 062c: await page.waitForFunction(function () { return window.__fetches.length === 1; }, null, { timeout: 5000 });
-  // The connect loop also calls fetch (bridge health on 11435-11445). That scan can land in this wait, so the list is not exactly one.
+  // before 062d: The connect loop also calls fetch (bridge health on 11435-11445). That scan can land in this wait, so the list is not exactly one.
+  // The extra fetches are the local-mind scan (localhost 11434, 1234, 8080 and so on, plus /ollama/api/tags) and version.json.
+  // 'fetch on ask 11' fails standalone on main too (pre-existing flake, not from 062c).
   await page.waitForFunction(function () {
     return window.__fetches.some(function (url) { return String(url).indexOf('upload') !== -1; });
   }, null, { timeout: 5000 });

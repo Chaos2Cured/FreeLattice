@@ -407,6 +407,21 @@ function serve(dir, listenPort) {
       var style = getComputedStyle(toast);
       var rect = toast.getBoundingClientRect();
       // before 062c: a probe under the toast was the hit target. That check failed when another layer sat on the same point.
+      var probe = document.createElement('button');
+      probe.type = 'button';
+      probe.textContent = 'under';
+      probe.style.position = 'fixed';
+      probe.style.left = rect.left + 'px';
+      probe.style.top = rect.top + 'px';
+      probe.style.width = Math.max(rect.width, 44) + 'px';
+      probe.style.height = Math.max(rect.height, 44) + 'px';
+      probe.style.zIndex = '1';
+      document.body.appendChild(probe);
+      var midX = rect.left + Math.max(rect.width, 8) / 2;
+      var midY = rect.top + Math.max(rect.height, 8) / 2;
+      var throughHit = document.elementFromPoint(midX, midY);
+      var through = throughHit === probe || probe.contains(throughHit);
+      probe.remove();
       var allow = document.querySelector('#flSoftAskProbe .fl-tool-consent-allow');
       var allowBox = allow ? allow.getBoundingClientRect() : null;
       var askHit = null;
@@ -422,6 +437,7 @@ function serve(dir, listenPort) {
       if (!was) tab.classList.remove('active');
       return {
         pe: style.pointerEvents,
+        through: through,
         askClear: askClear,
         overlaps: overlaps,
         hitName: askHit ? (askHit.id || askHit.className || askHit.tagName) : 'none',
@@ -431,7 +447,13 @@ function serve(dir, listenPort) {
     });
     if (toastPhone.missing) fail('toast missing');
     if (toastPhone.pe !== 'none') fail('toast events ' + toastPhone.pe);
+    var throughWord = toastPhone.through ? 'pass' : 'fail';
+    var coverWord = toastPhone.askClear ? 'pass' : 'fail';
+    var toastScore = (toastPhone.through ? 1 : 0) + (toastPhone.askClear ? 1 : 0);
+    console.log('TOAST checks ' + toastScore + '/2 through ' + throughWord + ' cover ' + coverWord);
     // before 062c: if (!toastPhone.through) fail('toast blocked a tap');
+    // before 062d: the through check stayed a comment and only the Allow cover check ran.
+    if (!toastPhone.through) fail('toast blocked a tap');
     if (!toastPhone.askClear) fail('toast covered ask ' + toastPhone.hitName + ' overlap ' + toastPhone.overlaps);
     if (toastPhone.quiet) fail('quiet opened');
 

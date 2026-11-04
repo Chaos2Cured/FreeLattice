@@ -915,6 +915,50 @@
     }, function () { return []; });
   }
 
+  function quarantineKey(id, oldHash) {
+    return 'quarantine:' + String(id) + ':' + String(oldHash);
+  }
+
+  function saveHealedFlake(id, copy) {
+    var fresh = loadFlakes();
+    var swapped = false;
+    var n;
+    for (n = 0; n < fresh.length; n++) {
+      if (fresh[n] && fresh[n].id === id) {
+        fresh[n] = copy;
+        swapped = true;
+      }
+    }
+    if (!swapped) fresh.push(copy);
+    return saveFlakes(fresh);
+  }
+
+  // delta holds the old hash. points_to holds the new hash. branch and name hold the source.
+  function quarantineAndSave(id, broken, oldHash, copy, newHash, source) {
+    var key = quarantineKey(id, oldHash);
+    var t = new Date().toISOString();
+    var from = source || 'idb';
+    var tomb = JSON.stringify({
+      flake: broken,
+      oldHash: oldHash,
+      t: t,
+      reason: 'heal replaced a bad local flake'
+    });
+    return atomicWrite(key, tomb).then(function () {
+      return appendLedger({
+        kind: 'heal',
+        flakeId: id,
+        delta: oldHash,
+        points_to: newHash,
+        branch: from,
+        name: from,
+        t: t
+      });
+    }).then(function () {
+      return saveHealedFlake(id, copy);
+    });
+  }
+
   function readFlakeChecked(id, readBackup) {
     var list = loadFlakes();
     var flake = null;
@@ -936,11 +980,14 @@
         if (!copy) return { ok: false, flake: flake, broken: true, from: 'none' };
         return sealCanonHex(copy).then(function (copyHex) {
           if (copyHex !== recorded) return { ok: false, flake: flake, broken: true, from: 'refused', refused: true };
-          var healed = list.slice();
-          for (i = 0; i < healed.length; i++) {
-            if (healed[i] && healed[i].id === id) healed[i] = copy;
-          }
-          return saveFlakes(healed).then(function () {
+          // before 062d: var healed = list.slice();
+          // before 062d: for (i = 0; i < healed.length; i++) {
+          // before 062d:   if (healed[i] && healed[i].id === id) healed[i] = copy;
+          // before 062d: }
+          // before 062d: return saveFlakes(healed).then(function () {
+          // before 062d:   return { ok: true, flake: copy, from: 'idb' };
+          // before 062d: });
+          return quarantineAndSave(id, flake, hex, copy, copyHex, 'idb').then(function () {
             return { ok: true, flake: copy, from: 'idb' };
           });
         });

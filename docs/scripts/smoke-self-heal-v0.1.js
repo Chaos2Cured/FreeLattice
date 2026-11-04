@@ -191,6 +191,59 @@ function serve(listenPort) {
   if (!no.refused || no.ok) fail('forged flake accepted');
   console.log('SEAL idb refused');
 
+  async function sealOf(row) {
+    var qHash = await core.sha8(row.question);
+    var psis = (row.nodes || []).map(function (n) { return n && n.psi; }).filter(Boolean).sort();
+    var body = { flakeId: row.id, questionHash: qHash, nodePsis: psis, t: row.t, name: row.name };
+    return crypto.createHash('sha256').update(core.canonical(body)).digest('hex');
+  }
+  global.localStorage.removeItem('fl_snowflake_ledger_v0');
+  global.localStorage.setItem('fl_snowflake_v0', JSON.stringify({ flakes: [JSON.parse(JSON.stringify(torn))] }));
+  var healedOnce = await core.readFlakeChecked('flake-062a', function () { return [flake]; });
+  if (!healedOnce.ok || !healedOnce.flake || healedOnce.flake.question !== question) fail('quarantine heal');
+  var oldHex = await sealOf(torn);
+  var tomb = core.readJSON('quarantine:' + torn.id + ':' + oldHex);
+  if (!tomb || tomb.oldHash !== oldHex || !tomb.flake || tomb.flake.question !== torn.question) {
+    fail('quarantine ' + JSON.stringify(tomb && tomb.oldHash));
+  }
+  var kept = core.loadFlakes().filter(function (row) { return row && row.id === 'flake-062a'; })[0];
+  if (!kept || kept.question !== question) fail('good copy missing');
+  var healRows = (core.loadLedger().rows || []).filter(function (row) { return row && row.kind === 'heal'; });
+  if (healRows.length !== 1) fail('heal rows ' + healRows.length);
+  var healRow = healRows[0];
+  if (healRow.flakeId !== 'flake-062a' || healRow.delta !== oldHex || healRow.points_to !== flake.humanHash) {
+    fail('heal fields ' + JSON.stringify(healRow));
+  }
+  if (healRow.branch !== 'idb' || healRow.name !== 'idb' || !healRow.t) fail('heal source ' + JSON.stringify(healRow));
+  var healPsi = await core.recomputePsi(healRow);
+  if (healPsi !== healRow.psi) fail('heal psi ' + healPsi + ' ' + healRow.psi);
+  console.log('QUARANTINE heal psi ' + healRow.psi);
+
+  var passN;
+  for (passN = 0; passN < 2; passN++) {
+    global.localStorage.setItem('fl_snowflake_v0', JSON.stringify({ flakes: [JSON.parse(JSON.stringify(torn))] }));
+    var extra = {
+      id: 'flake-neighbor-' + passN,
+      question: 'a second pane',
+      t: '2026-11-03T00:00:00Z',
+      name: 'Neighbor',
+      nodes: []
+    };
+    var both = await core.readFlakeChecked('flake-062a', function () {
+      var now = JSON.parse(global.localStorage.getItem('fl_snowflake_v0'));
+      now.flakes.push(extra);
+      global.localStorage.setItem('fl_snowflake_v0', JSON.stringify(now));
+      return [flake];
+    });
+    if (!both.ok || !both.flake || both.flake.question !== question) fail('concurrent heal ' + passN);
+    var after = core.loadFlakes();
+    var healedFlake = after.filter(function (row) { return row && row.id === 'flake-062a'; })[0];
+    var neighbor = after.filter(function (row) { return row && row.id === extra.id; })[0];
+    if (!healedFlake || healedFlake.question !== question) fail('concurrent torn left ' + passN);
+    if (!neighbor || neighbor.question !== extra.question) fail('concurrent missing ' + passN);
+  }
+  console.log('CONCURRENT flake kept');
+
   var job = {
     id: 'heal-job',
     state: 'pulling',

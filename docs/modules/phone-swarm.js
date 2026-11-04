@@ -108,7 +108,9 @@
       willNotImport: !!job.willNotImport,
       saved: !!job.saved,
       source: job.source || null,
-      desktopHint: job.desktopHint || null
+      desktopHint: job.desktopHint || null,
+      stored: job.stored || null,
+      storedLine: job.storedLine || null
     };
   }
 
@@ -187,6 +189,13 @@
     // Prefer OPFS; fall back to IndexedDB; memory blob always kept for Save.
     var id = job.modelId || job.id;
     var name = String(job.name || id || 'verified.bin');
+    var nbytes = u8 ? (u8.byteLength || u8.size || u8.length || 0) : 0;
+    if (nbytes >= 8 * 1024 * 1024) {
+      // before 062d: tryIdb wrote a row with no bytes and set job.stored = 'idb'.
+      job.stored = 'not-stored';
+      job.storedLine = 'Verified, but not kept on this device (too large for now).';
+      return Promise.resolve(false);
+    }
 
     function tryIdb() {
       return new Promise(function (resolve) {
@@ -347,6 +356,10 @@
 
   function handoffManifest(job, bytes) {
     var man = job.manifest;
+    // before 062d: this path compared only receipt.root to manifest.root and never read expectedSha256.
+    var wantWhole = String(job.expectedSha256 || '').trim().toLowerCase();
+    var gotWhole = String(man && man.whole != null ? man.whole : '').trim().toLowerCase();
+    if (wantWhole && gotWhole !== wantWhole) return Promise.resolve(markMismatch(job));
     var blobInput = typeof Blob !== 'undefined' && bytes instanceof Blob;
     var u8 = blobInput ? null : toUint8(bytes);
     var size = typeof man.pieceSize === 'number' && man.pieceSize > 0 ? man.pieceSize : (64 * 1024);
