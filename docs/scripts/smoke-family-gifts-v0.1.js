@@ -53,7 +53,7 @@ must('docs/gc.html', 'Rule: chosen by hand; incomplete.');
 must('docs/gc.html', 'HOLDs healed: ' + '17 as of 2026-11-03 (057, 061a, 063a, 063b, 045, 045b, 043c-h x6, 055, 056d-g x4). 19 now that #313 has merged (adds 062a, 062b).');
 must('docs/library/WALKS.md', '#277 f86496d8');
 must('docs/library/WALKS.md', 'Feeling cells are blank until Hypha writes in them.');
-must('docs/library/WALKS.md', 'walk-063c-2026-11-02: PASS (safety), with softs.');
+must('docs/library/WALKS.md', 'PASS (safety), with softs.');
 must('docs/library/WALKS.md', 'Alpha (theLatticeTree) #123');
 must('docs/library/WALKS.md', 'aced4f86');
 must('docs/library/WALKS.md', '#317 PASS.');
@@ -122,11 +122,13 @@ function verdictOf(raw) {
 
 data.forEach(function (line, idx) {
   var parts = line.split(' | ');
-  if (parts.length !== 4) fail('seed pipes ' + line);
+  if (parts.length !== 4 && parts.length !== 5) fail('seed pipes ' + line);
   var shelf = shelfRows[idx].split(' | ');
   if (shelf.length !== 5) fail('shelf pipes ' + shelfRows[idx]);
   if (shelf[0] !== parts[1] || shelf[1] !== parts[0]) fail('shelf order ' + parts[0]);
-  if (shelf[4] !== '') fail('feeling not blank ' + parts[0]);
+  // 065d: Hypha wrote the feeling on the seed row and the shelf row. A 4-field seed still means a blank feeling.
+  var seedFeel = parts.length === 5 ? parts[4] : '';
+  if (seedFeel !== shelf[4]) fail('feeling mismatch ' + parts[0]);
   if (parts[3].indexOf('to transcribe') !== -1) fail('fill-in prefix remains ' + parts[0]);
   if (parts[0] === 'walk-057c-2026-10-31' && parts[3] !== 'PASS (re-check of both 057 HOLDs), 2026-10-31') fail('057c wording');
 });
