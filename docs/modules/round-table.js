@@ -223,6 +223,25 @@ window.RoundTable = (() => {
        </div>`;
 
     // Wire form
+    try {
+      var shut = false;
+      try {
+        var sc = window.FLSnowflakeCore;
+        if (sc && typeof sc.roomShut === 'function' && sc.roomShut()) shut = true;
+      } catch (eShut) {
+        console.warn('roundtable prefill', eShut);
+        shut = true;
+      }
+      if (!shut && window.sessionStorage) {
+        var pre = window.sessionStorage.getItem('fl_roundtable_prefill_v0');
+        if (pre) {
+          var preBox = container.querySelector('#rtProposeText');
+          if (preBox && !preBox.value) preBox.value = pre;
+          window.sessionStorage.removeItem('fl_roundtable_prefill_v0');
+        }
+      }
+    } catch (ePre) { console.warn('roundtable prefill', ePre); }
+
     const form = container.querySelector('#rtProposeForm');
     if (form) {
       form.addEventListener('submit', function(e) {
@@ -255,7 +274,12 @@ window.RoundTable = (() => {
     if (container) renderPanel(container);
   }
 
-  function init(container) { renderPanel(container); }
+  var inits = 0;
+  function init(container) {
+    inits += 1;
+    try { window.__flRtInits = inits; } catch (eInit) { console.warn('roundtable init', eInit); }
+    renderPanel(container);
+  }
   function destroy() {}
 
   return { init, destroy, propose, vote, renderPanel, _submit, leaveFarewellNote, checkFarewellNote };
