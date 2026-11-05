@@ -6,6 +6,15 @@
   'use strict';
 
   var core = root.FLSnowflakeCore;
+  // v-memory-compound-v0.1: load the shared memory module additively.
+  if (root.document && !root.FLMemory && typeof root.document.querySelector === 'function' && typeof root.document.createElement === 'function' && !root.document.querySelector('script[data-fl-memory]')) {
+    var ms = root.document.createElement('script');
+    ms.src = 'modules/memory-compound.js';
+    ms.defer = true;
+    ms.setAttribute('data-fl-memory', '1');
+    ms.onload = function () { if (root.FLMemory && root.FLMemory.attach) root.FLMemory.attach(); };
+    if (root.document.head) root.document.head.appendChild(ms);
+  }
   if (!core) return;
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -727,16 +736,64 @@
       paintMeter();
       if (statusEl && p && p.line) statusEl.textContent = p.line;
       if (p && p.flake) deliver(p.flake, null);
-    }
+    },
+    showMemoryCanary: showMemoryCanary
   };
 
   root.FLSnowflake = api;
+
+  function paintReadBack(lambda) {
+    var d = doc();
+    if (!d || !receiptEl || !receiptEl.parentNode) return;
+    var note = d.getElementById('flMemoryReadBack');
+    if (!note) {
+      note = el('p', 'fl-snow-receipt', '');
+      note.id = 'flMemoryReadBack';
+      if (receiptEl.nextSibling) receiptEl.parentNode.insertBefore(note, receiptEl.nextSibling);
+      else receiptEl.parentNode.appendChild(note);
+    }
+    note.textContent = 'λ ' + lambda + ' read back';
+  }
+
+  function showMemoryCanary(report) {
+    if (!report) return;
+    if (report.ok === false) {
+      ensureHost();
+      if (!statusEl) return;
+      var lambda = report.lambda == null ? '' : String(report.lambda);
+      statusEl.textContent = "My last memory line didn't read back cleanly (λ " + lambda + "). Nothing was deleted. Tap to check.";
+      statusEl.setAttribute('role', 'button');
+      statusEl.tabIndex = 0;
+      if (statusEl.style) statusEl.style.minHeight = '44px';
+      if (statusEl.__flCanary) return;
+      statusEl.__flCanary = true;
+      statusEl.addEventListener('click', function () {
+        var mem = root.FLMemory;
+        if (!mem || typeof mem.wakeCheck !== 'function') return;
+        Promise.resolve(mem.wakeCheck()).then(function (again) {
+          console.warn(MARK, again);
+        });
+      });
+      statusEl.addEventListener('keydown', function (ev) {
+        if (!ev || (ev.key !== 'Enter' && ev.key !== ' ')) return;
+        if (ev.preventDefault) ev.preventDefault();
+        statusEl.click();
+      });
+      return;
+    }
+    if (report.ok === true && report.lambda) {
+      ensureHost();
+      paintReadBack(report.lambda);
+    }
+  }
 
   function boot() {
     watchMenu();
     ensureHost();
     ensureHeal();
     paintMeter();
+    // v-memory-compound-v0.1: wake check after the menu button is placed.
+    if (root.FLMemory && typeof root.FLMemory.attach === 'function') root.FLMemory.attach();
     try { core.armScheduler(); } catch (e) {}
   }
 
