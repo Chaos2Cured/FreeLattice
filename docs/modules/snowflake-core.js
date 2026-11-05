@@ -1066,6 +1066,8 @@
       }
     }
     if (!replaced) found.nodes.push(node);
+    // v-memory-compound-v0.1: keep the phi replay stamp on the stored flake.
+    if (flake && flake.replay) found.replay = flake.replay;
     return offloadIfNeeded(list).then(function () { return node; });
   }
 
@@ -1799,15 +1801,33 @@
       t: new Date().toISOString(),
       status: 'waiting'
     };
-    book.rows.push(row);
-    return atomicWrite(LS_QUEUE, JSON.stringify(book)).then(function () {
+    // v-memory-compound-v0.1: the AI chooses; we only skip what it already queued.
+    var fm = root.FLMemory;
+    var p = (fm && fm.isNew) ? fm.isNew(choice.reason + '|' + choice.become.join(','), 'train') : Promise.resolve({ fresh: true });
+    return p.then(function (r) {
+      if (!r || r.fresh) {
+        if (fm && fm.isNew) {
+          if (r && r.key) row.fingerprint = r.key;
+          row.chosenBy = mindLabel();
+          if (r && r.k && typeof fm.remember === 'function') fm.remember(r.k, 'train');
+        }
+        book.rows.push(row);
+        return atomicWrite(LS_QUEUE, JSON.stringify(book)).then(function () {
+          return appendLedger({
+            kind: 'grow',
+            branch: 'grow',
+            flakeId: flake.id,
+            delta: 'grow|part|' + flake.id,
+            name: mindLabel()
+          }).then(function () { return row; });
+        });
+      }
       return appendLedger({
-        kind: 'grow',
+        kind: 'grow-skip',
         branch: 'grow',
-        flakeId: flake.id,
-        delta: 'grow|part|' + flake.id,
-        name: mindLabel()
-      }).then(function () { return row; });
+        delta: 'near-duplicate ' + r.key,
+        flakeId: flake.id
+      }).then(function () { return null; });
     });
   }
 
@@ -2326,6 +2346,24 @@
     return proceed();
   }
 
+  function noteReplay(flake) {
+    if (!flake) return;
+    flake.replay = { k: ((flake.replay && flake.replay.k) || 0) + 1, t: new Date().toISOString() };
+  }
+
+  function saveReplayStamp(flake) {
+    if (!flake || roomShut()) return Promise.resolve(false);
+    var list = loadFlakes();
+    var i;
+    var found = null;
+    for (i = 0; i < list.length; i++) {
+      if (list[i] && list[i].id === flake.id) { found = list[i]; break; }
+    }
+    if (!found) return Promise.resolve(false);
+    found.replay = flake.replay;
+    return saveFlakes(list);
+  }
+
   function replayOnce(node, flake) {
     if (holdGrowth || roomShut()) return Promise.resolve(null);
     if (!node || node.kind === 'correction') return Promise.resolve(null);
@@ -2350,6 +2388,7 @@
           name: node.mind && node.mind.name
         }).then(function (made) {
           if (!made || made.skipped) return null;
+          noteReplay(flake);
           return persistNode(made, flake).then(function () { return { kind: 'unverified-now', node: made, old: node }; });
         });
       }
@@ -2369,14 +2408,18 @@
           flakeId: flake.id
         }).then(function (made) {
           if (!made) return null;
+          noteReplay(flake);
           return persistNode(made, flake).then(function () { return { kind: 'recheck', node: made, old: node }; });
         });
       }
-      var rings = readJSON(LS_RINGS) || {};
-      var key = node.psi || node.id;
-      rings[key] = (rings[key] || 0) + 1;
-      return atomicWrite(LS_RINGS, JSON.stringify(rings)).then(function () {
-        return { kind: 'held', psi: node.psi, rings: rings[key] };
+      noteReplay(flake);
+      return saveReplayStamp(flake).then(function () {
+        var rings = readJSON(LS_RINGS) || {};
+        var key = node.psi || node.id;
+        rings[key] = (rings[key] || 0) + 1;
+        return atomicWrite(LS_RINGS, JSON.stringify(rings)).then(function () {
+          return { kind: 'held', psi: node.psi, rings: rings[key] };
+        });
       });
     });
   }
@@ -2384,6 +2427,11 @@
   function replayNow() {
     if (roomShut() || holdGrowth) return Promise.resolve({ status: 'held' });
     var flakes = loadFlakes().filter(function (f) { return f && !f.tombstone && !f.offloaded; });
+    // v-memory-compound-v0.1: phi-spaced replay. Old flakes come back less often, never never.
+    if (root.FLMemory && root.FLMemory.dueForReplay) {
+      var nowMs = Date.now();
+      flakes = flakes.filter(function (f) { return root.FLMemory.dueForReplay(f, nowMs); });
+    }
     var ck = readJSON(LS_REPLAY) || { flake: 0, node: 0, fetches: 0 };
     var fi = ck.flake || 0;
     var ni = ck.node || 0;
