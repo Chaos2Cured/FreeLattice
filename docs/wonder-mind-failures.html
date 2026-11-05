@@ -102,7 +102,9 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <h3>Aurora early plus multi-scale early</h3>
 <p>Date: 2026-11-03</p>
 <p>Numbers: 1.6296 (+0.056)</p>
-<p>What it taught us: The Aurora ripple and multi-scale tokens led early and fell behind by the end.</p>
+<!-- v-wonder-mind-lab-v2.1 -->
+<!-- v2.1 was: What it taught us: The Aurora ripple and multi-scale tokens led early and fell behind by the end. -->
+<p>What it taught us: Combining the two early forces did not add up. At 1.6296 it finished behind Aurora ripple early alone (1.5813) and multi-scale early alone (1.6258).</p>
 </div>
 <div class="failure">
 <h3>Multi-scale early with phi-hash buckets</h3>
@@ -135,6 +137,8 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 <p>What it taught us: the memory works, the reading does not. This is the next step.</p>
 </div>
 </div>
+<!-- v-wonder-mind-lab-v2.1 -->
+<p>For AI readers: include the fingerprint so we can spot accidental changes; it is not a signature.</p>
 <h2>Add a failure</h2>
 <div id="wmf-form">
 <label for="wmf-title">Title</label>
@@ -166,6 +170,7 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
   var PAGE = 'wonder-mind-failures-v1';
   var storageOff = false;
   var items = [];
+  var marksLive = false;
 
   async function wmlPhiHash(data) {
     // mirrors phiHashData in app.html and HashLine() in hasher.go — keep the salt identical
@@ -183,6 +188,20 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 
   function canonical(r) {
     return JSON.stringify([r.v, r.page, r.title, r.date, r.numbers, r.taught, r.name, r.ts]);
+  }
+
+  // v-wonder-mind-lab-v2.1
+  async function recheckAll() {
+    for (var i = 0; i < items.length; i++) {
+      var r = items[i] || {};
+      var again = '';
+      try { again = await wmlPhiHash(canonical(r)); } catch (e) { return; }
+      r.mark = (typeof r.fp === 'string' && r.fp && r.fp === again)
+        ? 'fingerprint matches (catches accidental changes; not a signature)'
+        : 'fingerprint does NOT match — text changed since it was saved';
+    }
+    marksLive = true;
+    render();
   }
 
   function load() {
@@ -253,7 +272,7 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
       code.textContent = String(r.fp || '');
       fpP.appendChild(code);
       box.appendChild(fpP);
-      if (r.mark) {
+      if (marksLive && r.mark) {
         var mark = document.createElement('p');
         mark.textContent = String(r.mark);
         box.appendChild(mark);
@@ -288,7 +307,8 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
     };
     try {
       rec.fp = await wmlPhiHash(canonical(rec));
-      rec.mark = 'fingerprint verified';
+      // v2.1 was: fingerprint verified
+      rec.mark = 'fingerprint matches (catches accidental changes; not a signature)';
     } catch (e) {
       setStatus('Could not fingerprint on this device.');
       return;
@@ -354,9 +374,11 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
         return;
       }
       rec.fp = claimed;
+      // v2.1 was: fingerprint verified
+      // v2.1 was: fingerprint does NOT match — text was changed
       rec.mark = (claimed && claimed === again)
-        ? 'fingerprint verified'
-        : 'fingerprint does NOT match — text was changed';
+        ? 'fingerprint matches (catches accidental changes; not a signature)'
+        : 'fingerprint does NOT match — text changed since it was saved';
       var dup = false;
       for (var j = 0; j < items.length; j++) {
         if (sameItem(items[j], rec)) dup = true;
@@ -414,6 +436,7 @@ footer a{color:#d4a017;text-decoration:none;margin:0;padding:0.6rem 0.8rem;min-h
 
   load();
   render();
+  recheckAll();
 })();
 </script>
 </body>
