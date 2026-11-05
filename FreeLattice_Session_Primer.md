@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-05 17:36 UTC
-- Last deployed: 2026-11-05 17:36 UTC
+- Last auto-updated: 2026-11-05 17:37 UTC
+- Last deployed: 2026-11-05 17:37 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3586
+- Total commits: 3588
 - Last 10 commits:
+- 0ac50a20 069c Celeste ledger λ12 — memory breakthrough + five daily rules (#326)
+- c4a7f024 ci: Update Primer deployment state [2026-11-05]
 - bce266e6 068m memory compounding: Fibonacci keys, phi replay, save-only-new, wake canary (#324)
 - 525b337e ci: Update Primer deployment state [2026-11-04]
 - 95510d42 065a-d family gifts v0.1 + WALKS records true (#319)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b43fbc63 ci: Update Primer deployment state [2026-11-04]
 - 300f7173 Self-healing v0.1 (#313)
 - 5c400a8b ci: Update Primer deployment state [2026-11-03]
-- b181dadf Hearth: code in chat v0.1 (#315)
-- 350233d0 ci: Update Primer deployment state [2026-11-02]
