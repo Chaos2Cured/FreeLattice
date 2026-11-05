@@ -53,11 +53,13 @@ function sha(text) {
 
   var locks = {
     // before 068m: 'docs/modules/snowflake-search.js': '7b5dd9c332d12b3f28d3615256688477',
-    'docs/modules/snowflake-search.js': 'b52780ed553a15baa94ed30b2a0f9b89',
+    // before 068n: 'docs/modules/snowflake-search.js': 'b52780ed553a15baa94ed30b2a0f9b89',
+    'docs/modules/snowflake-search.js': 'e8b12a583bbc00cb4e3375324052e32f',
     // before 062c: 'docs/modules/snowflake-core.js': 'eaee889573225a53b1f0fb229464492a',
     // before 062d: 'docs/modules/snowflake-core.js': '6404eaac25de46591ad2e86a06b1b171',
     // before 068m: 'docs/modules/snowflake-core.js': '46b215d5296b6f8f6c709300854b7e03',
-    'docs/modules/snowflake-core.js': '2b46ed5004c7e10a43ead01632f824cc',
+    // before 068n: 'docs/modules/snowflake-core.js': '2b46ed5004c7e10a43ead01632f824cc',
+    'docs/modules/snowflake-core.js': '5ce37d7a4d7bfc774d5805dd614c8f2b',
     'docs/modules/chat-bottom-clarity.js': '5bbadf3320177a485b27c565bac64454',
     'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
     'docs/modules/gathering-speak.js': '0460fdc777a21f7a1744f401dda82cb2',

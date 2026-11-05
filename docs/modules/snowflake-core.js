@@ -1226,6 +1226,21 @@
     emit('Status', { line: line });
   }
 
+  // v-read-path-v0.1
+  function classify(err) {
+    var m = String((err && err.message) || err || '');
+    if (/no ai connected/i.test(m)) return 'no-ai';
+    if (/429|rate|limit/i.test(m)) return 'limit';
+    if (/fetch|network|cors|5\d\d/i.test(m)) return 'network';
+    return 'other';
+  }
+
+  function withWhy(result) {
+    var why = active && active.lastError;
+    if (result && typeof result === 'object' && why && !result.why) result.why = why;
+    return result;
+  }
+
   function onceCall(system, user) {
     return new Promise(function (resolve, reject) {
       var FL = root.FreeLattice;
@@ -1269,11 +1284,21 @@
     emit('Status', { phase: phase, calls: active.calls, thinking: true });
     var system = systemFor(phase);
     return onceCall(system, user).catch(function (err) {
-      if (!active || active.pause || active.stop) { sayFail(err); return null; }
-      if (active.calls >= CALL_CAP) { hitCap('calls'); sayFail(err); return null; }
+      if (!active || active.pause || active.stop) {
+        sayFail(err);
+        if (active) active.lastError = classify(err);
+        return null;
+      }
+      if (active.calls >= CALL_CAP) {
+        hitCap('calls');
+        sayFail(err);
+        if (active) active.lastError = classify(err);
+        return null;
+      }
       active.calls += 1;
       return onceCall(system, user).catch(function (err2) {
         sayFail(err2);
+        if (active) active.lastError = classify(err2 || err);
         return null;
       });
     });
@@ -1652,6 +1677,7 @@
     var text = 'Calls ' + state.calls + '. Fetches ' + state.fetches + '. Failed fetches ' + failed + '. Time ' + ms + ' ms. Caps hit: ' + caps + '. Branches ' + ids.join(', ') + '.';
     if (fails.length) text += ' ' + fails.join(' ');
     text += ' ' + LINES.seal;
+    if (state.memoryLine) text += ' ' + state.memoryLine;
     return { calls: state.calls, fetches: state.fetches, failedFetches: failed, ms: ms, caps: (state.caps || []).slice(), branches: ids, text: text, failures: fails };
   }
 
@@ -2110,8 +2136,10 @@
         emit('Stopped', { flake: flake, receipt: rec });
         emit('Receipt', rec);
         var done = active;
+        var out = { status: 'stopped', flake: flake, receipt: rec, run: done };
+        withWhy(out);
         active = null;
-        return { status: 'stopped', flake: flake, receipt: rec, run: done };
+        return out;
       });
     });
   }
@@ -2177,15 +2205,19 @@
       // before 061a: rememberFlake ran, then the grow ask sent only id, branch, and psi.
       if (holdGrowth || (active && (active.pause || active.stop))) {
         return rememberFlake(sealed).then(function () {
+          var out = { status: 'done', flake: sealed, receipt: rec, growth: null };
+          withWhy(out);
           active = null;
-          return { status: 'done', flake: sealed, receipt: rec, growth: null };
+          return out;
         });
       }
       function writeGrowth(choice) {
         return queueGrowth(sealed, choice).then(function (queued) {
           return runGrowth(sealed, choice).then(function (adapter) {
+            var out = { status: 'done', flake: sealed, receipt: rec, growth: choice, queue: queued, adapter: adapter };
+            withWhy(out);
             active = null;
-            return { status: 'done', flake: sealed, receipt: rec, growth: choice, queue: queued, adapter: adapter };
+            return out;
           });
         });
       }
@@ -2200,8 +2232,10 @@
         var choice = chooseGrowth(sealed, parseJSON(text) || {});
         return previewOrKeep(sealed, choice).then(function (decision) {
           if (!decision || decision.action !== 'keep') {
+            var out = { status: 'done', flake: sealed, receipt: rec, growth: null, skipped: true };
+            withWhy(out);
             active = null;
-            return { status: 'done', flake: sealed, receipt: rec, growth: null, skipped: true };
+            return out;
           }
           var kept = decision.choice || choice;
           return rememberFlake(sealed).then(function () { return writeGrowth(kept); });
@@ -2241,6 +2275,31 @@
     var arr = runsThisHour();
     arr.push(Date.now());
     try { ls().setItem(LS_RUNS, JSON.stringify(arr)); } catch (e) {}
+  }
+
+  function memorySentence(report) {
+    var exact = (report && report.exact) ? report.exact.length : 0;
+    var similar = (report && report.similar) ? report.similar.length : 0;
+    var reached = report && report.reachedContext ? 'yes' : 'no';
+    return 'Memory: ' + exact + ' exact, ' + similar + ' similar, reached the context: ' + reached + '.';
+  }
+
+  function planUser(q, report) {
+    var base = 'Question: ' + q + '\nReply JSON with hunch and branches a through e. Branch e is the dissenter and is required.';
+    if (!report) return base;
+    var lines = [];
+    var i;
+    var row;
+    for (i = 0; i < (report.exact || []).length; i++) {
+      row = report.exact[i];
+      if (row && row.norm) lines.push('exact: ' + row.norm);
+    }
+    for (i = 0; i < (report.similar || []).length; i++) {
+      row = report.similar[i];
+      if (row && row.norm) lines.push('similar: ' + row.norm);
+    }
+    if (!lines.length) return base;
+    return base + '\nMemory already held:\n' + lines.join('\n');
   }
 
   function startRun(question, opts) {
@@ -2288,7 +2347,18 @@
       started: Date.now()
     };
     emit('Began', { flakeId: active.flakeId, question: q });
-    return ask('plan', 'Question: ' + q + '\nReply JSON with hunch and branches a through e. Branch e is the dissenter and is required.').then(function (text) {
+    // v-read-path-v0.1: recall before the plan ask. Chat's context builder stays in app.html.
+    var memApi = root.FLMemory;
+    var pending = (memApi && typeof memApi.recall === 'function') ? memApi.recall(q) : Promise.resolve(null);
+    return pending.then(function (report) {
+      if (!active) return null;
+      var prompt = planUser(q, report);
+      if (report && memApi && typeof memApi.markReached === 'function') {
+        try { memApi.markReached(report, prompt); } catch (eMem) { console.warn('v-read-path-v0.1', eMem); }
+        active.memoryLine = memorySentence(report);
+      }
+      return ask('plan', prompt);
+    }).then(function (text) {
       if (!active) return null;
       var plan = parseJSON(text) || {};
       if (text) {

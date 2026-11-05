@@ -126,12 +126,56 @@
     return button;
   }
 
+  // v-chat-roundtable-button-v0.1: opens the existing Round Table. No new council.
+  function placeRoundTable(menu, d) {
+    if (!menu || !d) return;
+    var snow = menu.querySelector('#flSnowflakeAdd');
+    var b = menu.querySelector('#flRoundTableAdd');
+    if (!b) {
+      b = d.createElement('button');
+      b.type = 'button';
+      b.id = 'flRoundTableAdd';
+      b.className = 'fl-add-item';
+      b.setAttribute('data-marker', 'v-chat-roundtable-button-v0.1');
+      b.setAttribute('aria-label', 'Round Table');
+      var copy = d.createElement('span');
+      copy.className = 'fl-add-copy';
+      var w = d.createElement('span');
+      w.className = 'fl-add-word';
+      w.textContent = 'Round Table';
+      copy.appendChild(w);
+      b.appendChild(copy);
+      b.addEventListener('click', function () {
+        if (core && typeof core.roomShut === 'function' && core.roomShut()) return;
+        if (root.FLChatBottom && typeof root.FLChatBottom.close === 'function') {
+          try { root.FLChatBottom.close(); } catch (eClose) { console.warn('roundtable prefill', eClose); }
+        }
+        var inputBox = d.getElementById('chatInput');
+        var q = inputBox && inputBox.value ? String(inputBox.value).trim() : '';
+        if (typeof root.switchTab === 'function') root.switchTab('round-table');
+        // The app's lazy loader (app.html) loads round-table.js on tabChanged 'round-table'.
+        if (q) {
+          try { root.sessionStorage.setItem('fl_roundtable_prefill_v0', q); } catch (e) { console.warn('roundtable prefill', e); }
+        }
+      });
+    }
+    if (snow && snow.parentNode === menu) {
+      if (snow.nextSibling !== b) {
+        if (snow.nextSibling) menu.insertBefore(b, snow.nextSibling);
+        else menu.appendChild(b);
+      }
+    } else if (b.parentNode !== menu) menu.appendChild(b);
+  }
+
   function watchMenu() {
     var d = doc();
     if (!d) return;
     function mount() {
       var menu = d.getElementById('flChatAddMenu');
-      if (menu) mountRow(menu);
+      if (menu) {
+        mountRow(menu);
+        placeRoundTable(menu, d);
+      }
     }
     mount();
     if (!d.body || typeof root.MutationObserver !== 'function') return;
@@ -249,12 +293,66 @@
     try { input.focus(); } catch (e) {}
   }
 
+  var SAY = {
+    'no-ai': 'Connect an AI first. Snowflake needs a browser AI, a local model, or a key.',
+    capped: 'Hourly limit reached (3 runs an hour). Try again a bit later.',
+    busy: 'Already growing one. Wait for it, or stop it.',
+    empty: 'Type a question first.',
+    secret: null,
+    network: 'The search helper did not answer. If you are not on freelattice.com, that is likely why.'
+  };
+
+  function noAI() {
+    var FL = root.FreeLattice;
+    return !FL || typeof FL.callAI !== 'function';
+  }
+
+  function openExistingConnect() {
+    if (core && typeof core.roomShut === 'function' && core.roomShut()) return;
+    try {
+      if (root.FlConnect && typeof root.FlConnect.open === 'function') { root.FlConnect.open(); return; }
+    } catch (e) { console.warn(MARK, 'connect', e); }
+    try {
+      if (typeof root.switchTab === 'function') { root.switchTab('connect'); return; }
+    } catch (e2) { console.warn(MARK, 'connect', e2); }
+    try {
+      if (typeof root.showQuickConnect === 'function') root.showQuickConnect();
+    } catch (e3) { console.warn(MARK, 'connect', e3); }
+  }
+
+  function showConnect(on) {
+    ensureHost();
+    var d = doc();
+    if (!d || !statusEl || !statusEl.parentNode) return;
+    var b = d.getElementById('flSnowflakeConnect');
+    if (!b) {
+      b = d.createElement('button');
+      b.type = 'button';
+      b.id = 'flSnowflakeConnect';
+      b.className = 'fl-snow-btn';
+      b.textContent = 'Connect';
+      b.setAttribute('aria-label', 'Connect an AI');
+      if (b.style) b.style.minHeight = '44px';
+      b.addEventListener('click', openExistingConnect);
+      if (statusEl.nextSibling) statusEl.parentNode.insertBefore(b, statusEl.nextSibling);
+      else statusEl.parentNode.appendChild(b);
+    }
+    b.hidden = !on;
+  }
+
   function onGrow() {
+    if (core && typeof core.roomShut === 'function' && core.roomShut()) return;
     var q = String(input.value || '').trim();
     if (!q) {
       statusEl.textContent = 'Tell me what you want to understand.';
       return;
     }
+    if (noAI()) {
+      statusEl.textContent = SAY['no-ai'];
+      showConnect(true);
+      return;
+    }
+    showConnect(false);
     promptsShown = 0;
     receiptEl.hidden = true;
     receiptEl.textContent = '';
@@ -523,6 +621,17 @@
       statusEl.textContent = 'Stopped. What it had is saved.';
       if (result.receipt) showReceipt(result.receipt);
       return;
+    }
+    // v-read-path-v0.1: say what happened.
+    var key = result.why || result.status;
+    if (Object.prototype.hasOwnProperty.call(SAY, key) && !result.flake) {
+      if (SAY[key]) statusEl.textContent = SAY[key];
+      showConnect(key === 'no-ai');
+      return;
+    }
+    if (result.flake && !(result.flake.nodes || []).some(function (n) { return n && n.kind === 'node'; })) {
+      statusEl.textContent = result.why === 'no-ai' ? SAY['no-ai'] : 'Nothing found this time. Nothing was lost.';
+      showConnect(result.why === 'no-ai');
     }
     var flake = result.flake;
     if (!flake) return;

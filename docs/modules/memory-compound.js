@@ -255,6 +255,32 @@
     return { core: wrappedCore, bridge: wrappedBridge, woke: true, wake: pending };
   }
 
+  // Exact key hit first, then similar (Jaccard >= 0.5) from the index; report both.
+  function recall(text, opts) {
+    opts = opts || {};
+    return memoryKey(text).then(function (k) {
+      var ix = loadIndex();
+      var all = [];
+      var exact = [];
+      var similar = [];
+      Object.keys(ix.b).forEach(function (b) { all = all.concat(ix.b[b]); });
+      all.forEach(function (r) {
+        if (!r) return;
+        if (r.key === k.key) exact.push(r);
+        else if (r.norm && jaccard(tokens(r.norm), tokens(k.norm)) >= 0.5) similar.push(r);
+      });
+      return { key: k.key, exact: exact, similar: similar.slice(0, 5), reachedContext: false };
+    });
+  }
+
+  function markReached(report, injectedText) {
+    report.reachedContext = !!injectedText && report.exact.concat(report.similar).some(function (r) {
+      return r && r.norm && String(injectedText).toLowerCase().indexOf(String(r.norm).slice(0, 40)) !== -1;
+    });
+    console.info(MARK, 'recall', report.key, 'exact', report.exact.length, 'similar', report.similar.length, 'reached', report.reachedContext);
+    return report;
+  }
+
   var api = {
     MARK: MARK,
     PHI: PHI,
@@ -267,6 +293,8 @@
     memoryKey: memoryKey,
     isNew: isNew,
     remember: remember,
+    recall: recall,
+    markReached: markReached,
     wakeCheck: wakeCheck,
     attach: attach,
     notify: notify

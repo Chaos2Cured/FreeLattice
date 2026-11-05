@@ -224,12 +224,15 @@ function contrastSource() {
     });
     // before 063a: if (menu.ids[menu.ids.length - 1] !== 'flSnowflakeAdd') fail('row order ' + menu.ids.join(','));
     // before 063a: if (menu.ids[menu.ids.length - 2] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
+    // before 068n: second last was flSnowflakeAdd, third last was flChatAddSearch
     if (menu.ids[menu.ids.length - 1] !== 'flHearthAdd') fail('row order ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 2] !== 'flSnowflakeAdd') fail('not after snowflake ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 3] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 2] !== 'flRoundTableAdd') fail('not after snowflake ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 3] !== 'flSnowflakeAdd') fail('snowflake before round table ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 4] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
     if (menu.ids.filter(function (id) { return id === 'flSnowflakeAdd'; }).length !== 1) fail('row count');
     // before 063a: var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd'];
-    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flHearthAdd'];
+    // before 068n: var known = [..., 'flSnowflakeAdd', 'flHearthAdd'];
+    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flRoundTableAdd', 'flHearthAdd'];
     menu.ids.forEach(function (id) {
       if (known.indexOf(id) === -1) fail('unexpected row ' + id);
     });
