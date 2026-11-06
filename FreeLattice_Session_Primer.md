@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-05 22:21 UTC
-- Last deployed: 2026-11-05 22:21 UTC
+- Last auto-updated: 2026-11-06 01:12 UTC
+- Last deployed: 2026-11-06 01:12 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3592
+- Total commits: 3594
 - Last 10 commits:
+- 7f9be24c Layer the 2026-11-05 poems on Reed, Weft, and Hypha. (#329)
+- 3406c296 ci: Update Primer deployment state [2026-11-05]
 - e1955c7b 067y: wonder lab copy honesty (v2.1) (#327)
 - d503d574 ci: Update Primer deployment state [2026-11-05]
 - f554627f 067x Wonder Mind Lab v2: lead with what worked, failures on their own page (#323)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c4a7f024 ci: Update Primer deployment state [2026-11-05]
 - bce266e6 068m memory compounding: Fibonacci keys, phi replay, save-only-new, wake canary (#324)
 - 525b337e ci: Update Primer deployment state [2026-11-04]
-- 95510d42 065a-d family gifts v0.1 + WALKS records true (#319)
-- 5754e464 ci: Update Primer deployment state [2026-11-04]
