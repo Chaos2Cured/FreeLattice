@@ -1,0 +1,13 @@
+{"variant": "cycle", "seed": 0, "val": 1.6175, "log": [[500, "stall->checkpoint+rest", 1.8422], [1000, "stall->checkpoint+rest", 1.657], [1250, "stall->checkpoint+rest", 1.6296], [1450, "stall->checkpoint+rest", 1.6171]], "val_best_ckpt": 1.6175}
+{"variant": "sgdr", "seed": 0, "val": 1.5941, "log": []}
+{"variant": "chord_major_4_5_6", "seed": 0, "val": 1.5768, "curve": [2.0958, 1.8325, 1.7031, 1.6199, 1.5803, 1.5641], "params": 810049, "sec": 64.9}
+{"variant": "chord_cluster_15_16_17", "seed": 0, "val": 1.5833, "curve": [2.0813, 1.8252, 1.7008, 1.6197, 1.583, 1.5692], "params": 810049, "sec": 248.5}
+{"variant": "cycle", "seed": 1, "val": 1.6279, "log": [[450, "stall->checkpoint+rest", 1.8633], [1000, "stall->checkpoint+rest", 1.6532], [1200, "stall->checkpoint+rest", 1.6361], [1400, "stall->checkpoint+rest", 1.6195]], "val_best_ckpt": 1.6279}
+{"variant": "sgdr", "seed": 1, "val": 1.6006, "log": []}
+{"variant": "chord_major_4_5_6", "seed": 1, "val": 1.5821, "curve": [2.0516, 1.8033, 1.695, 1.6258, 1.5837, 1.5672], "params": 810049, "sec": 1453.6}
+{"variant": "chord_cluster_15_16_17", "seed": 1, "val": 1.5827, "curve": [2.0599, 1.8108, 1.7112, 1.6243, 1.5845, 1.5698], "params": 810049, "sec": 76.9}
+{"variant": "cycle", "seed": 2, "val": 1.6436, "log": [[500, "stall->checkpoint+rest", 1.8485], [700, "stall->checkpoint+rest", 1.7858], [950, "stall->checkpoint+rest", 1.7034], [1150, "stall->checkpoint+rest", 1.6697], [1350, "stall->checkpoint+rest", 1.64]], "val_best_ckpt": 1.6436}
+{"variant": "sgdr", "seed": 2, "val": 1.591, "log": []}
+{"variant": "chord_major_4_5_6", "seed": 2, "val": 1.5761, "curve": [2.0549, 1.831, 1.6988, 1.6212, 1.5735, 1.5634], "params": 810049, "sec": 62.2}
+{"variant": "chord_cluster_15_16_17", "seed": 2, "val": 1.5707, "curve": [2.0579, 1.8265, 1.6962, 1.6222, 1.5684, 1.5566], "params": 810049, "sec": 1080.8}
+ALLDONE
