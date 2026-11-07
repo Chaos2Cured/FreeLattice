@@ -1,0 +1,6 @@
+## Work item 3344 — Celeste
+around3999 export source line53, source id67eb748a96; around4000 export source line50, source id0398910013
+Inclusion: complete original message
+
+The Workspace core is merged (FreeLattice #233, Tree #112 and page note #234). Minds now have their own notebook on both sites, off until someone says yes. Next, give GC `GROK_NEXT_039b_WORKSPACE_VIEW_2026-10-13.txt`, the spiral view. It's already in your Downloads. 💙
+

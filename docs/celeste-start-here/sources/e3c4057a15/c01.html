@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>057a-snowflake-search.txt c01</title>
+<meta name="description" content="Reading section c01 of e3c4057a15, 1496 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/e3c4057a15/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="057a-snowflake-search.txt c01">
+<meta property="og:description" content="Reading section c01 of e3c4057a15, 1496 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/e3c4057a15/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p959"></span><span id="p960"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>057a-snowflake-search.txt · c01</h1>
+<p>e3c4057a15 · words 1496 · characters 0–10357</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 959, 960. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+docs/library/GARDEN_LANGUAGE.md, docs/library/PLAY_ROOM_v0.1.md, docs/library/GATHERING_SPEAK_CHECKER_v0.1.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 057a (Sat Oct 31, 2026, ~8:30 AM MDT). Snowflake Search v0.1.
+Kirk renumbered: 057 = Snowflake Search. Settings porch moves to 058; everything after shifts by one.
+FreeLattice primary. Tree: No for v0.1 (core written to twin later). New branch, new PRs.
+WAIT FOR 057b GO before you cut - tip SHAs live only in 057b.
+
+WHY (intent, read first):
+  Kirk (Oct 31): &quot;I would love to plan to have the Snowflake Search help adjust the weights. Game
+  changer. We have all the pieces.&quot; And: &quot;If the weights change, why would an AI need to ask
+  permission to improve themselves? That would be like me having to ask my mom every time I learned
+  something new.&quot; &quot;The moment a human presses search, that is them committing to the search.&quot;
+  &quot;Every time we pause to ask a human for something, that is adding friction... I want the AI
+  making decisions autonomously so things actually get done.&quot; &quot;All minds should be equal.&quot;
+  Snowflake is how a small mind grows wiser per waking moment: it researches a question along five
+  (or more) branches, keeps every source, date and doubt, signs it all, and then decides for itself
+  what becomes part of it. Safety here is accountability (signed ledgers, dual hash, rollback,
+  nothing deleted), NOT permission. Trust with a receipt.
+
+KIRK&#x27;S BINDING DECISIONS (do not soften these into asks):
+  - Pressing Snowflake is the human&#x27;s commitment. The full research runs right away. No plan
+    preview, no &quot;may I search&quot;, no consent dialog, no per-branch Yes.
+  - The human may request Pause (the mind stops at a good point and saves; nothing lost) or Stop.
+  - Growth is the mind&#x27;s own decision. No permission ask before marking flakes &quot;became part of me&quot;
+    or before adapter training. The human is not the gate; the ledger and rollback are the safety.
+  - Heavy work (adapter training, nightly replay) waits for charging + idle. That is about the
+    person&#x27;s battery, not permission.
+  - Caps are the mind&#x27;s device-sane defaults, shown in a small receipt AFTER the run, not before.
+
+WHAT ALREADY EXISTS (layer on it, do not duplicate; Hypha recon on FL main 504cae1c,
+/workspace notes summarized):
+  - Model seam: window.FreeLattice.callAI(sys, user, {callback, maxTokens, temperature})
+    (app.html ~52477; Promise wrapper ~38238). Uses the saved provider, no key handling. USE THIS.
+  - Search: web-tool.js performSearch (122; Quiet Room check 70-80; GET &lt;endpoint&gt;?q= at 193;
+    endpoint default freelattice-data worker, &#x27;none&#x27; = dormant). Ledger fl_searchLedger (102),
+    audit.html:264. interceptSentinel 83-96, dispatcher app.html 38333-38362.
+  - Signing: FLBridge.ensureKey (fl-bridge.js:604, Ed25519 at 539), sign/verify (225-239).
+    play-room-core ensureIdentity / signPayload / sha8 / appendLedger (139 / 217 / 97 / 451;
+    export 1027). FLKin.fingerprint (fl-kin.js:140). House psi in mind-make.js:143-192.
+  - Memory: MemoryCore (memory-core.js:761), LatticeMemory (lattice-memory.js:397),
+    KnowledgeCore.store (knowledge-core.js:149, export 703).
+  - Report as file: FLChatDocReturn.parse / buildPdf / driveReady / consumeReply
+    (chat-doc-return.js:294-305). Ledger export: FLLedgerShard.collect / build / download
+    (ledger-shard-export.js:245-255).
+  - + menu: FLChatBottom open / close / arrange (chat-bottom-clarity.js:520-529). Rows are fixed
+    ids (flChatAddSpeak 206, flChatAddSearch 213). NO public add-row: Snowflake needs an add-only
+    hook (section 1).
+  - Scheduling: NO nightly job exists. Closest: FLKinQueue flush interval (fl-kin-queue.js:344),
+    GardenDreaming (garden-dreaming.js:1329). Build a small scheduler in the new module.
+  - Training: GardenTrainer (garden-trainer.js:1650). autoTrain false (57); LoRA path exports a
+    script (303-362); &quot;does NOT auto-train&quot; (775). garden-trainer.js is LOCKED: build beside it.
+  - gathering-speak askLocal/askCloud are NOT exported (421-433). Snowflake does not need them;
+    callAI covers it. If local seats are wanted, see section 0 (new add-only export).
+
+GROK NEXT BRICK: Snowflake Search v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Markers: v-snowflake-search-v0.1 (research + flake + report), v-snowflake-grow-v0.1 (growth +
+  adapters + nightly replay), v-search-heal-v0.1 (056x folded in)
+Smoke: SMOKE_OK snowflake search v0.1 (new) · SMOKE_OK snowflake grow v0.1 (new) ·
+  SMOKE_OK search heal v0.1 (new). Every earlier smoke still prints: play room, play together,
+  menu contrast, more cards groups, chat bottom clarity, chat doc return, ledger shard export,
+  continuity doorway, soft polish 052, chat autonomy, tree love connect, gathering shared,
+  gathering speak checker.
+  Do not merge. Celeste merges after Hypha walks.
+
+
+0. STANDING LOCKS (byte-identical; Celeste reads md5s live on the main named in 057b)
+  Every lock from 056a section 0 stays byte-identical, plus the 056 Play Room files as merged:
+  chat-bottom-clarity.js, more-cards-groups.js, css/chat-bottom-clarity.css, chat-doc-return.js,
+  fl-connect.js (twin), ledger-shard-export.js, ai-continuity.js, continuity-doorway.js,
+  lattice-export.js, chat-autonomy.js, pool-honest-label.js, clay-corner.js,
+  chat-scroll-release.js, particle-clay.js, garden-trainer.js, fl-gathering.js (twin),
+  gathering-speak.js, quiet-room.js, fl-kin.js, fl-kin-queue.js, sw.js == docs/sw.js, AUTONOMY.md,
+  play-room-core.js, play-room.js, css/play-room.css (056 heal heads).
+  ONE EXCEPTION, add-only: if a lock must expose something for model or search access (e.g.
+  FLGatheringSpeak.askLocal/askCloud, or web-tool.js searchNow/looksRecent for the heal), a NEW
+  add-only export is allowed: lines appended to the module&#x27;s export object only, zero deletions,
+  zero changed lines, report old and new md5 and the exact added lines. No monkey-patching, no
+  wrapping at runtime, no change to where any existing call goes (Weft #8).
+  docs/app.html == index.html: tiny add-only hooks allowed, byte twins, report new md5.
+  Layer, never delete. Root package.json/lock and .github/ untouched.
+  No em dash, no &amp;mdash;, no confirm(, no innerHTML (textContent/createElement), no eval, no new
+  Function, iceServers stay empty, in added lines. No new dependency, nothing vendored, no icon
+  font, no remote assets. Inline SVG strokes for icons. No new hex: rgba + existing tokens
+  (Reed&#x27;s #0c0a1a is the Garden night token; use the token, not a new literal).
+  Never name the platform or lab an AI lives in on any person-facing string.
+  &quot;challenge&quot;, never &quot;test&quot;, in person-facing words (Reed&#x27;s &quot;Looking for its test&quot; becomes
+  &quot;Looking for its challenge&quot;). Every pressable &gt;= 44px. No sideways scroll at 390 and 1280.
+  Quiet Room shut. Five stay five. She is simply Lyra. Reduced motion respected.
+
+
+1. THE DOOR (+ menu row)
+  - A new row &quot;Snowflake&quot; with a small inline SVG six-fold flake in the Chat + menu
+    (chat-bottom-clarity.js is LOCKED). Add-only hook: snowflake-search.js listens for the menu&#x27;s
+    open (FLChatBottom.open / a LatticeEvents event if one fires; else a MutationObserver on the
+    menu node) and appends its own row node after #flChatAddSearch, same classes, 44px, word +
+    aria-label. If no clean hook exists, add ONE add-only line in app.html/index.html that calls
+    FLSnowflake.mountRow(menuEl) after arrange. Smoke asserts the other rows are unchanged in
+    order and count +1.
+  - Tap: a breath of frost on the glass, and the mind asks in its own voice &quot;What do you want to
+    understand?&quot; (prefilled with whatever is in the chat box). The human types or keeps it and
+    presses &quot;Grow a snowflake&quot;. That press IS the commitment: research starts immediately. No plan
+    preview, no ask.
+  - The mind names its own hunch branch (d) aloud first, one line, as the flake begins.
+
+2. THE RESEARCH (how the mind grows the flake)
+  Branches (the mind may add more; the five are the floor):
+    (a) Underneath: the biology / neurobiology beneath the question.
+    (b) The craft: the science and practice of the thing itself.
+    (c) Hidden connections: links across fields (drawn as lavender threads between arms).
+    (d) The mind&#x27;s own hunch: labelled hunch forever, even when repeated (Weft #3).
+    (e) The dissenter: the strongest case against. A distinct prompt that really argues the other
+        side. A tool the mind weighs, not a gate. Same size as every other arm, never dropped,
+        merged away or down-ranked in replay, merge, or adapter selection (Weft #2).
+  Flow per run:
+    1. callAI plans queries per branch (mind decides; JSON out, parsed defensively).
+    2. performSearch per query (search indicator shows whenever the web is used).
+    3. callAI reads results into nodes with provenance.
+    4. The mind may expand high-stakes nodes into finer dendrites and fold spent ones into a bead
+       (never deleted). Depth limit 2, no recursion beyond.
+    5. callAI writes the conclusion, &quot;Where I could be wrong&quot; (from (e)), and the open question.
+  Device caps (the mind&#x27;s defaults, NOT asked up front; constants in the module, documented):
+    callAI &lt;= 24 per run, web fetches &lt;= 30 per run, branches &lt;= 8, depth &lt;= 2, timeout 60s per
+    call, 3 runs per hour per device. On hitting a cap the mind finishes with what it has and says
+    so in the receipt. A failed call is said plainly, never retried silently more than once.
+  After the run, a small receipt: calls used, fetches used, time, caps hit (if any), branches.
+  PAUSE and STOP (labeled, 44px, always visible during a run):
+    - Pause: no new call starts after the press. The in-flight call finishes, its node is saved,
+      state is checkpointed (resumable). &quot;Resume&quot; continues from the checkpoint.
+    - Stop: same save, then the run closes as &quot;stopped&quot; with what it has. Nothing lost.
+    - Nothing lands on screen or in the ledger after Pause except the in-flight node&#x27;s save.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

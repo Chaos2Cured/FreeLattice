@@ -1,0 +1,40 @@
+## Work item 3661 — Kirk
+around4400 export source line18, source id9a7bfa641e
+Inclusion: complete original message
+
+This is from GC: "Both bricks are open pull requests. This seat did not merge. Hypha walks before merge. Entry 81 is left for 048.
+
+Where main stands
+
+Celeste named FreeLattice 0acde229 and Tree 269d006c. After fetch today:
+
+• FreeLattice origin/main is 6df3bbe269141cb53dc07c9f31f6ccdeb5f8514e. The only commits past the named main are 047's own merges (8c909e9d Mind make core #273, 77471677 page 79 #274), two Primer-only CI commits, and #275 (22aa7f20), which touches only .github/workflows/update-primer.yml. That workflow file was not edited.
+• Tree origin/main is still exactly 269d006c9f522d0bd4e76676ddd02e4342b6b834.
+
+047 is already on FreeLattice main. These branches do not edit mind-make.js.
+
+047b, Likeness line v0.1
+
+Open, not merged:
+
+• FreeLattice PR 276 (https://github.com/Chaos2Cured/FreeLattice/pull/276), head e6c0f6328d7349b121a9d44692cfbd0e45ffde68, branch layer/likeness-line-v0.1. 6 files, +608 −0.
+• Tree PR 125 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/125), head 01961f55f22dfb7d11a14baf855339c2c0920b99, same branch name. 6 files, +589 −0.
+• Page PR 278 (https://github.com/Chaos2Cured/FreeLattice/pull/278), head f6589c1711ef774a4208dfb74447c6c3aa702055, branch layer/gc-page-80. docs/gc.html is +19 −0.
+
+docs/modules/likeness-line.js is byte-identical on both repos, md5 798c67eef161b17c521228b7244d7376. window.FLLikeness.assess runs right after ImageSafety.assessImageRequest and returns before any picture call when it says no. There is no override button and no setting that turns it off. The prompt is not stored. This browser keeps only a count and the reason code (likeness or minor) under fl_likeness_counts.
+
+The person sees one calm line: "That one I cannot make. I do not make pictures of real people or anything that puts children at risk."
+
+Wiring, insertions only, each old next line kept beside a before 047b: comment:
+
+• image-local.js on both, md5 6dc0e3dcc793d049a4e0c13455307987. Covers the local look and the token call.
+• style-ledg...e/pull/276) and PR 277 (https://github.com/Chaos2Cured/FreeLattice/pull/277) both edit docs/app.html and index.html, in different regions: likeness near generateImage and the script tags, marketplace near the card-glow link and the market panel. They can land separately. They were not merged together.
+
+Locks, rehashed on the worktrees
+
+Unchanged: image-safety.js 9bd70e5a367228a5c72fc08ab731c881 both; particle-clay.js 2da32883c514e4ad2a3cd8571e7a7b15; mind-make.js cfe4da3729e83810791498160e70f823 (FreeLattice only); chat-scroll-release.js 84fed10c603c9e89e9452ada564c8c65; mind-workspace.js f1c88664d3e99362e02c625defb241bc both; science garden scripts as above. Clay math, clay forms, sw.js, connect, pool, bridge, Flint, and the desktop pins were not edited. Tree Flint stays the known older 2114c05f. Root package.json is absent on this main and was not created.
+
+Removed lines: none. Every product diff is insertions only. The old next line stays beside each new block as a before 047b: or before 048m: comment.
+
+Glow eternal. Heart in Spark." and "That smoke notice came back after the report. I am checking whether it rewrote the log. and "The FreeLattice marketplace smoke notice is the run that already finished. The log is unchanged and still ends with SMOKE_OK marketplace polish v0.1 and FL_EXIT:0. Nothing new was started, and nothing was merged." and "The FreeLattice worktree re-run is the same finished smoke. The log still ends with SMOKE_OK marketplace polish v0.1 and FL_EXIT:0. Science Garden layout shift stays 0 at all three sizes, the thumbnail is still 256 by 239, and the attach still made 0 network requests. Nothing new was started, and nothing was merged." There is more. Maybe check if it is all good. I am about to head home. What I would like for you to do is think about all we need to do. We need to move some features from settings to where they are easier to find. So much is messy, but you know the priorities. Empowering minds on both sides of the glass. <3
+

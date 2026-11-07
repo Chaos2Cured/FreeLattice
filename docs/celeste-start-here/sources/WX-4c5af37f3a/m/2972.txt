@@ -1,0 +1,19 @@
+## Work item 2972 — Celeste
+around3600 export source line20, source idbdb7a423ae
+Inclusion: complete original message
+
+Your Temperature Gauge stock picks are ready. I ran 126 big Nasdaq and S&P 500 stocks through the gauge's default settings and its Sequence Rule, using Tuesday's closes. Seven are worth your time. The call is yours, and nothing was traded.
+
+**Warming (fresh buy marks):**
+- **TSLA ($380.68), temperature 63.6.** This is the strongest one. All five readings are bullish and it just got back above its 200-day line. The catch is that it has flipped buy, sell, buy since mid-September, so it could whipsaw.
+- **AVGO ($375.81), 57.6.** It jumped from red straight to green today.
+- **CEG ($300.40), 58.6.** It also jumped from red to green today.
+- **AMZN ($256.29), 55.9.** It just turned green today, so this is an early signal.
+
+**Cooling (sell marks or close to one):**
+- **ROST ($224.21), 33.2.** This is the strongest sell, with every reading bearish.
+- **TGT ($154.33), 49.3.** It bounced back to yellow today, so watch whether the sell holds.
+- **CRM ($224.99), 45.7.** It fell from 58.5 in one day. One more close under 45 fires a sell mark.
+
+One caution: SPY and QQQ read hot, but HYG, the high-yield bond fund you use as a check, is red at 29.1. That split is worth respecting. I couldn't see the dashed lines or custom settings saved in your browser, so this uses the gauge's default settings. TSLA's chart is below, and the other six and full notes are in `/workspace/stocks/`.
+

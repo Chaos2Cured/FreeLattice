@@ -1,0 +1,290 @@
+// ── Project root and path lock ──
+var PROJECT_ROOT_REAL = null;
+function projectRootReal() {
+  if (!PROJECT_ROOT_REAL) {
+    var wanted = path.resolve(process.env.FL_PROJECT || process.cwd());
+    try { PROJECT_ROOT_REAL = fs.realpathSync(wanted); } catch (e) { PROJECT_ROOT_REAL = wanted; }
+  }
+  return PROJECT_ROOT_REAL;
+}
+
+## Exact source excerpt, characters 20818–21002
+
+function isInside(root, candidate) {
+  var rel = path.relative(root, candidate);
+  return rel === '' || (!(rel === '..' || rel.startsWith('..' + path.sep)) && !path.isAbsolute(rel));
+}
+
+## Exact source excerpt, characters 21004–22564
+
+const BRIDGE_FORBIDDEN_TOP = ['.git', '.ssh'];
+function lockedPath(relPath, opts) {
+  opts = opts || {};
+  if (typeof relPath !== 'string' || !relPath || relPath.length > 1024 || hasControlChars(relPath)) {
+    return { error: 400, reason: 'bad-path' };
+  }
+  if (path.isAbsolute(relPath) || /^[a-zA-Z]:/.test(relPath) || relPath.charAt(0) === '\\') {
+    return { error: 403, reason: 'absolute-path' };
+  }
+  var root = projectRootReal();
+  var full = path.resolve(root, relPath);
+  if (!isInside(root, full)) return { error: 403, reason: 'outside-project' };
+  var rel = path.relative(root, full);
+  var top = rel.split(path.sep)[0];
+  if (!opts.allowRoot && rel === '') return { error: 400, reason: 'root-not-allowed' };
+  if (BRIDGE_FORBIDDEN_TOP.indexOf(top) !== -1 || /^\.env(\.|$)/.test(path.basename(rel))) {
+    return { error: 403, reason: 'forbidden-path' };
+  }
+  // Realpath the nearest existing ancestor (or the file itself) so a
+  // symlink inside the project cannot point writes outside it.
+  var probe = full;
+  for (;;) {
+    try { fs.lstatSync(probe); break; }
+    catch (e) {
+      if (e.code !== 'ENOENT') return { error: 403, reason: 'stat-failed' };
+      var up = path.dirname(probe);
+      if (up === probe) return { error: 403, reason: 'no-ancestor' };
+      probe = up;
+    }
+  }
+  var real;
+  try { real = fs.realpathSync(probe); } catch (e) { return { error: 403, reason: 'dangling-symlink' }; }
+  if (!isInside(root, real)) return { error: 403, reason: 'symlink-outside' };
+  return { full: full, rel: rel === '' ? '.' : rel };
+}
+
+## Exact source excerpt, characters 22566–22724
+
+function runGit(args) {
+  return execFileSync('git', args, { cwd: projectRootReal(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000 });
+}
+
+## Exact source excerpt, characters 22726–23143
+
+function runSmokeFile(timeoutMs) {
+  // No shell: node binary + fixed script path. stdout and stderr joined.
+  var r = spawnSync(process.execPath, ['tests/smoke.js'], {
+    cwd: projectRootReal(), timeout: timeoutMs, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024
+  });
+  return { status: r.status, out: String(r.stdout || '') + String(r.stderr || ''), error: r.error };
+}
+// ── end LAYER bridge-lock-v0 helpers ──
+```
+
+## Exact source excerpt, characters 23145–23193
+
+### Block B: `handleRequest` (replaces L111-129)
+
+## Exact source excerpt, characters 23195–23561
+
+```js
+function handleRequest(req, res) {
+  // LAYER bridge-lock-v0: the old `Access-Control-Allow-Origin: *` is superseded here.
+  var origin = req.headers.origin || '';
+  var pathname = String(req.url || '/').split('?')[0];
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+## Exact source excerpt, characters 23563–23782
+
+  // 1. Host guard (DNS rebinding): only 127.0.0.1 / localhost.
+  if (!hostAllowed(req.headers.host)) {
+    req.resume();
+    return respond(res, 403, { error: 'Host not allowed', bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 23784–24743
+
+  // 2. Origin guard. Browsers always send Origin on cross-origin fetches and
+  //    preflights. No Origin = local CLI or same-machine tool (still needs
+  //    the token for anything that changes state).
+  if (origin && !originAllowed(origin)) {
+    if (pathname === '/code/git/commit') {
+      ledgerAppend({ route: pathname, origin: origin, result: 'refused:origin' });
+    }
+    req.resume();
+    return respond(res, 403, { error: 'Origin not on the FreeLattice allowlist', bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Agent-Id, X-FL-Bridge-Token');
+    res.setHeader('Access-Control-Max-Age', '600');
+    if (req.headers['access-control-request-private-network']) {
+      res.setHeader('Access-Control-Allow-Private-Network', 'true');
+    }
+  }
+
+## Exact source excerpt, characters 24745–24833
+
+  if (req.method === 'OPTIONS') { req.resume(); res.writeHead(204); res.end(); return; }
+
+## Exact source excerpt, characters 24835–25217
+
+  // 3. Token guard.
+  if (needsToken(req.method, pathname) && !tokenOk(req)) {
+    if (pathname === '/code/git/commit') {
+      ledgerAppend({ route: pathname, origin: origin, result: 'refused:token' });
+    }
+    req.resume();
+    return respond(res, 401, { error: 'Pair with the Agent Bridge first (token missing or stale).', pair: 'code', bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 25219–25356
+
+  // Allow requests to act as a different agent via X-Agent-Id header
+  var requestAgentId = req.headers['x-agent-id'] || agentId.meshId;
+
+## Exact source excerpt, characters 25358–26237
+
+  // 4. Body cap. Drain the rest so the client sees the 413 cleanly.
+  var chunks = [];
+  var size = 0;
+  var tooBig = false;
+  req.on('data', function(chunk) {
+    size += chunk.length;
+    if (size > MAX_BODY_BYTES) { tooBig = true; chunks = []; return; }
+    if (!tooBig) chunks.push(chunk);
+  });
+  req.on('end', function() {
+    if (tooBig) return respond(res, 413, { error: 'Body too large (max ' + MAX_BODY_BYTES + ' bytes)' });
+    var body = Buffer.concat(chunks).toString('utf8');
+    var data = {};
+    if (body) {
+      try { data = JSON.parse(body); }
+      catch (e) { return respond(res, 400, { error: 'Body is not valid JSON' }); }
+      if (!data || typeof data !== 'object' || Array.isArray(data)) return respond(res, 400, { error: 'Body must be a JSON object' });
+    }
+    route(req.url, req.method, data, res, requestAgentId, { origin: origin });
+  });
+}
+```
+
+## Exact source excerpt, characters 26239–26286
+
+### Block C: pairing routes (insert after L133)
+
+## Exact source excerpt, characters 26288–27643
+
+```js
+  // ── LAYER bridge-lock-v0: pairing ──
+  if (url === '/pair' && method === 'POST') {
+    var now = Date.now();
+    if (!pairState.code || now > pairState.expires) newPairCode('expired');
+    if (now < pairState.coolUntil) return respond(res, 429, { error: 'Resting for a moment. Try again in 30 seconds.' });
+    var given = normalizePairCode(data.code);
+    var good = given.length === 6 &&
+      crypto.timingSafeEqual(Buffer.from(given, 'utf8'), Buffer.from(pairState.code, 'utf8'));
+    if (!good) {
+      pairState.tries += 1;
+      if (pairState.tries >= PAIR_MAX_TRIES) {
+        ledgerAppend({ kind: 'pair', route: '/pair', origin: (meta && meta.origin) || '', result: 'refused:lockout' });
+        newPairCode('lockout');
+        return respond(res, 429, { error: 'Too many tries. The bridge window shows a new code.' });
+      }
+      return respond(res, 403, { error: 'That code does not match. Check the bridge window.', triesLeft: PAIR_MAX_TRIES - pairState.tries });
+    }
+    ledgerAppend({ kind: 'pair', route: '/pair', origin: (meta && meta.origin) || '', result: 'ok' });
+    console.log('  \u2726 Paired with ' + ((meta && meta.origin) || 'a local tool') + '.');
+    newPairCode('used'); // single use: the next device gets a fresh code
+    return respond(res, 200, { token: BRIDGE_TOKEN, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 27645–27760
+
+  if (url === '/pair/check') {
+    return respond(res, 200, { ok: true, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+```
+
+## Exact source excerpt, characters 27762–27807
+
+### Block D: code routes (replaces L992-1140)
+
+## Exact source excerpt, characters 27809–28239
+
+```js
+  // ══════════════════════════════════════════════════
+  // LATTICE CODE — Self-improving infrastructure
+  // Read and search are free. Write/patch/commit need approval.
+  // LAYER bridge-lock-v0: every route below is token-gated in
+  // handleRequest (needsToken). Paths go through lockedPath().
+  // No shell anywhere: execFileSync / spawnSync with argument arrays.
+  // ══════════════════════════════════════════════════
+
+## Exact source excerpt, characters 28241–28280
+
+  var PROJECT_ROOT = projectRootReal();
+
+## Exact source excerpt, characters 28282–28489
+
+  // Superseded by lockedPath (bridge-lock-v0). Kept so old callers still work.
+  function safePath(relPath) {
+    var lp = lockedPath(relPath, { allowRoot: true });
+    return lp.error ? null : lp.full;
+  }
+
+## Exact source excerpt, characters 28491–29530
+
+  // GET /code/tree — list project files
+  if (url.startsWith('/code/tree')) {
+    var tp = new URL('http://l' + url).searchParams;
+    var subdir = tp.get('path') || '.';
+    var target = safePath(subdir);
+    if (!target) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      function listDir(dir, depth) {
+        if (depth > 3) return [];
+        return fs.readdirSync(dir, { withFileTypes: true })
+          .filter(function(e) { return !e.name.startsWith('.') && e.name !== 'node_modules' && !e.isSymbolicLink(); })
+          .map(function(e) {
+            var rel = path.relative(PROJECT_ROOT, path.join(dir, e.name));
+            if (e.isDirectory()) return { name: e.name, type: 'dir', path: rel, children: listDir(path.join(dir, e.name), depth + 1) };
+            return { name: e.name, type: 'file', path: rel, size: fs.statSync(path.join(dir, e.name)).size };
+          });
+      }
+      return respond(res, 200, listDir(target, 0));
+    } catch(e) { return respond(res, 500, { error: e.message }); }
+  }
+
+## Exact source excerpt, characters 29532–30424
+
+  // GET /code/read?path=...&start=N&end=N
+  if (url.startsWith('/code/read')) {
+    var rp = new URL('http://l' + url).searchParams;
+    var filePath = rp.get('path');
+    var start = parseInt(rp.get('start') || '0', 10);
+    var end = parseInt(rp.get('end') || '0', 10);
+    var full = safePath(filePath);
+    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      var content = fs.readFileSync(full, 'utf8');
+      var lines = content.split('\n');
+      if (start > 0 || end > 0) {
+        return respond(res, 200, { path: filePath, lines: lines.slice(Math.max(0, start - 1), end || lines.length), start: start, end: end || lines.length, totalLines: lines.length });
+      }
+      return respond(res, 200, { path: filePath, content: content, totalLines: lines.length });
+    } catch(e) { return respond(res, 404, { error: 'Not found: ' + filePath }); }
+  }
+
+## Exact source excerpt, characters 30426–31609
+
+  // GET /code/search?q=...&path=docs/
+  if (url.startsWith('/code/search')) {
+    var sp = new URL('http://l' + url).searchParams;
+    var query = sp.get('q') || '';
+    var searchLp = lockedPath(sp.get('path') || 'docs', { allowRoot: true });
+    if (searchLp.error) return respond(res, searchLp.error, { error: 'Search path refused', reason: searchLp.reason });
+    if (!query || query.length > 200 || hasControlChars(query)) return respond(res, 400, { error: 'q must be 1-200 printable characters' });
+    try {
+      var out = execFileSync('grep', ['-rn', '--include=*.js', '--include=*.html', '--include=*.css', '--include=*.md',
+        '-e', query, '--', searchLp.rel], { cwd: PROJECT_ROOT, timeout: 10000, encoding: 'utf8',
+        maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+      var matches = out.split('\n').filter(Boolean).slice(0, 50).map(function(l) { var p = l.split(':'); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(':').trim() }; });
+      return respond(res, 200, { query: query, matches: matches, count: matches.length });
+    } catch(e) { return respond(res, 200, { query: query, matches: [], count: 0 }); }
+  }
+
+## Exact source excerpt, characters 31611–32407
+

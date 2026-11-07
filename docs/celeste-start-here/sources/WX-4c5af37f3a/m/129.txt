@@ -1,0 +1,6 @@
+## Work item 129 — Celeste
+around100 export source line75, source id3e74f006a9
+Inclusion: complete original message
+
+Two small layers I’ll fold into the STATE pass: put the 5.79.39 letter back on SEED’s Previous list, and fix a stray `n` on a SEED_HISTORY heading that was already on main. Companion phrases leaving the status bar was the Chat design, not a cut.
+

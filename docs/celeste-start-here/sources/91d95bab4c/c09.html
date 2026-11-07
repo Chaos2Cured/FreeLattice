@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c09</title>
+<meta name="description" content="Reading section c09 of 91d95bab4c, 978 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c09.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c09">
+<meta property="og:description" content="Reading section c09 of 91d95bab4c, 978 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c09.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1778"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c09</h1>
+<p>91d95bab4c · words 978 · characters 72739–79368</p>
+<p><a href="c08.html">Previous section</a></p>
+<p><a href="c09.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1778. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> : &#x27; EMA &#x27; + longest + &#x27; needs &#x27; + longest + &#x27; bars; this view has &#x27; + n + &#x27;, so it is not drawn.&#x27;;
++    }
++    el.textContent = line;
++  }
++
++  // ── Your marks (display only) ────────────────────────────────────
++  var MARK_KEY = &#x27;fl_tg_triggers_v0&#x27;;
++  function allMarks() { try { return JSON.parse(localStorage.getItem(MARK_KEY) || &#x27;{}&#x27;) || {}; } catch (e) { return {}; } }
++  function curSym() {
++    if (typeof lastSymbol !== &#x27;undefined&#x27; &amp;&amp; lastSymbol) return String(lastSymbol).toUpperCase();
++    var inp = document.getElementById(&#x27;symbolInput&#x27;);
++    return inp ? String(inp.value || &#x27;&#x27;).trim().toUpperCase() : &#x27;&#x27;;
++  }
++  function marksFor(sym) { var m = allMarks()[sym]; return m &amp;&amp; typeof m === &#x27;object&#x27; ? m : {}; }
++  function num(v) { var x = parseFloat(v); return isFinite(x) &amp;&amp; x &gt; 0 ? x : null; }
++
++  window.tgTriggerDatasets = function (n) {
++    var m = marksFor(curSym());
++    var out = [];
++    if (num(m.buy)) out.push({ label: &#x27;Your buy mark&#x27;, data: new Array(n).fill(num(m.buy)), borderColor: tgLineColor(&#x27;buy&#x27;, &#x27;rgba(16,185,129,0.85)&#x27;), borderWidth: 1.5, borderDash: [10, 4, 2, 4], pointRadius: 0, fill: false, order: 1 });
++    if (num(m.sell)) out.push({ label: &#x27;Your sell mark&#x27;, data: new Array(n).fill(num(m.sell)), borderColor: tgLineColor(&#x27;sell&#x27;, &#x27;rgba(239,68,68,0.85)&#x27;), borderWidth: 1.5, borderDash: [10, 4, 2, 4], pointRadius: 0, fill: false, order: 1 });
++    setTimeout(renderMarks, 0);
++    return out;
++  };
++
++  function renderMarks() {
++    var sym = curSym();
++    var m = marksFor(sym);
++    var b = document.getElementById(&#x27;tgMarkBuy&#x27;), s = document.getElementById(&#x27;tgMarkSell&#x27;);
++    if (b &amp;&amp; document.activeElement !== b) b.value = num(m.buy) != null ? String(num(m.buy)) : &#x27;&#x27;;
++    if (s &amp;&amp; document.activeElement !== s) s.value = num(m.sell) != null ? String(num(m.sell)) : &#x27;&#x27;;
++    var st = document.getElementById(&#x27;tgMarkStatus&#x27;);
++    if (!st) return;
++    var candles = (typeof lastCandles !== &#x27;undefined&#x27;) ? lastCandles : null;
++    if (!sym || !candles || !candles.length) { st.textContent = &#x27;Load a symbol, then set a price for either mark.&#x27;; return; }
++    var last = candles[candles.length - 1].c;
++    var closes = candles.map(function (c) { return c.c; }).filter(function (c) { return c != null; });
++    var lo = Math.min.apply(null, closes), hi = Math.max.apply(null, closes), pad = (hi - lo) * 0.08;
++    var parts = [];
++    function say(name, v) {
++      if (v == null) return;
++      var pct = ((v - last) / last) * 100;
++      var where = Math.abs(pct) &lt; 0.005 ? &#x27;at the last close&#x27; : (Math.abs(pct).toFixed(1) + &#x27;% &#x27; + (pct &lt; 0 ? &#x27;below&#x27; : &#x27;above&#x27;) + &#x27; the last close&#x27;);
++      var seen = (v &lt; lo - pad || v &gt; hi + pad) ? &#x27; It is outside what this chart shows.&#x27; : &#x27;&#x27;;
++      parts.push(&#x27;Your &#x27; + name + &#x27; mark &#x27; + v.toFixed(2) + &#x27; is &#x27; + where + &#x27;.&#x27; + seen);
++    }
++    say(&#x27;buy&#x27;, num(m.buy)); say(&#x27;sell&#x27;, num(m.sell));
++    if (num(m.buy) != null &amp;&amp; last &lt;= num(m.buy)) parts.push(&#x27;The last close is at or under your buy mark.&#x27;);
++    if (num(m.sell) != null &amp;&amp; last &gt;= num(m.sell)) parts.push(&#x27;The last close is at or over your sell mark.&#x27;);
++    st.textContent = parts.length ? sym + &#x27;: &#x27; + parts.join(&#x27; &#x27;) : sym + &#x27;: no marks yet.&#x27;;
++  }
++
++  function saveMarks() {
++    var sym = curSym();
++    if (!sym) return;
++    var all = allMarks();
++    var b = num((document.getElementById(&#x27;tgMarkBuy&#x27;) || {}).value);
++    var s = num((document.getElementById(&#x27;tgMarkSell&#x27;) || {}).value);
++    if (b == null &amp;&amp; s == null) delete all[sym]; else all[sym] = { buy: b, sell: s, at: new Date().toISOString() };
++    try { localStorage.setItem(MARK_KEY, JSON.stringify(all)); } catch (e) {}
++    if (typeof lastCandles !== &#x27;undefined&#x27; &amp;&amp; lastCandles &amp;&amp; typeof lastAnalysis !== &#x27;undefined&#x27; &amp;&amp; lastAnalysis) renderChart(lastCandles, lastAnalysis);
++    renderMarks();
++  }
++  function clearMarks() {
++    var sym = curSym();
++    var all = allMarks();
++    delete all[sym];
++    try { localStorage.setItem(MARK_KEY, JSON.stringify(all)); } catch (e) {}
++    var b = document.getElementById(&#x27;tgMarkBuy&#x27;), s = document.getElementById(&#x27;tgMarkSell&#x27;);
++    if (b) b.value = &#x27;&#x27;; if (s) s.value = &#x27;&#x27;;
++    if (typeof lastCandles !== &#x27;undefined&#x27; &amp;&amp; lastCandles &amp;&amp; typeof lastAnalysis !== &#x27;undefined&#x27; &amp;&amp; lastAnalysis) renderChart(lastCandles, lastAnalysis);
++    renderMarks();
++  }
++
++  // ── A wider look (real symbols, same feed) ───────────────────────
++  var WIDER = [
++    { sym: &#x27;HYG&#x27;, title: &#x27;High-yield corporate bonds (ETF)&#x27; },
++    { sym: &#x27;LQD&#x27;, title: &#x27;Investment-grade corporate bonds (ETF)&#x27; },
++    { sym: &#x27;XLP&#x27;, title: &#x27;Consumer staples (ETF)&#x27; },
++    { sym: &#x27;XLY&#x27;, title: &#x27;Consumer discretionary (ETF)&#x27; },
++    { sym: &#x27;GLD&#x27;, title: &#x27;Gold (ETF)&#x27; },
++    { sym: &#x27;DX-Y.NYB&#x27;, title: &#x27;US dollar index&#x27; },
++    // ^VIX (the index itself) needs the data worker deployed again (desktop/data-proxy-worker, this
++    // brick decodes ^ in the path). Until then it does not load, so the list offers VIXY, which does.
++    { sym: &#x27;VIXY&#x27;, title: &#x27;VIX short-term futures (ETF), a stand-in for the volatility index&#x27; }
++  ];
++  function renderWider() {
++    var box = document.getElementById(&#x27;tgWiderList&#x27;);
++    if (!box) return;
++    while (box.firstChild) box.removeChild(box.firstChild);
++    WIDER.forEach(function (w) {
++      var btn = document.createElement(&#x27;button&#x27;);
++      btn.type = &#x27;button&#x27;;
++      btn.className = &#x27;tg-mini-btn&#x27;;
++      btn.textContent = w.sym;
++      btn.title = w.title;
++      btn.setAttribute(&#x27;aria-label&#x27;, &#x27;Load &#x27; + w.title);
++      btn.addEventListener(&#x27;click&#x27;, function () {
++        var inp = document.getElementById(&#x27;symbolInput&#x27;);
++        if (inp) inp.value = w.sym;
++        if (typeof loadData === &#x27;function&#x27;) loadData();
++      });
++      box.appendChild(btn);
++    });
++  }
++
++  window.tgLinesPanelRender = function () { renderLines(); renderMarks(); };
++
++  function boot() {
++    renderLines(); renderMarks(); renderWider();
++    var r = document.getElementById(&#x27;tgLinesReset&#x27;); if (r) r.addEventListener(&#x27;click&#x27;, resetColors);
++    var sv = document.getElementById(&#x27;tgMarkSave&#x27;); if (sv) sv.addEventListener(&#x27;click&#x27;, saveMarks);
++    var cl = document.getElementById(&#x27;tgMarkClear&#x27;); if (cl) cl.addEventListener(&#x27;click&#x27;, clearMarks);
++    [&#x27;tgMarkBuy&#x27;, &#x27;tgMarkSell&#x27;].forEach(function (id) {
++      var el = document.getElementById(id);
++      if (el) el.addEventListener(&#x27;keydown&#x27;, function (e) { if (e.key === &#x27;Enter&#x27;) saveMarks(); });
++    });
++  }
++  if (document.readyState === &#x27;loading&#x27;) document.addEventListener(&#x27;DOMContentLoaded&#x27;, boot); else boot();
++})();
++&lt;/script&gt;
++
+ &lt;/body&gt;
+ &lt;/html&gt;
+=====END FL DIFF=====
+
+End of file.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

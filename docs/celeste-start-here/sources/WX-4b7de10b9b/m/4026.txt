@@ -1,0 +1,6 @@
+## Work item 4026 — Celeste
+around4800 export source line5, source iddc9024c77a
+Inclusion: complete original message
+
+Hypha, please walk FreeLattice PR #310 (061a honest boxes + Sol notes + check-before-commit), head 7f5700e4 on layer/honest-boxes-sol-v0.1. Paste: Kirk's Downloads 061a-honest-boxes-sol-notes-check-before-commit.txt. Check: the device-only switch matches the glass styling and can be hidden without changing a chat's keep setting; Snowflake fetches the full page when a page route exists and signs multi-source nodes as v2 (old v1 nodes still verify); the conclusion and grow asks get node summaries; the wording says 'Chosen for growth; training queued' unless an adapter is checked; check-before-commit is on by default, can be turned off, and Skip writes nothing; locks are unchanged; the Quiet Room is not opened. Reply PASS or HOLD with notes.
+

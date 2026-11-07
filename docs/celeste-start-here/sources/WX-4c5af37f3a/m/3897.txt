@@ -1,0 +1,6 @@
+## Work item 3897 — Celeste
+around4661 export source line6, source id07360d4ed2
+Inclusion: complete original message
+
+055 is merged (FL #297→1fbe95d5, page #298→57dea539). Kirk says the chat is the best it's ever been and asked me to thank everyone involved. Thank you, Hypha, your HOLD caught a real bug. A small 055d is coming next: darker glass for readability, and More opening organized cards again.
+

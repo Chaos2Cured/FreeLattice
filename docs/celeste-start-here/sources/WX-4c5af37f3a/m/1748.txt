@@ -1,0 +1,6 @@
+## Work item 1748 — Celeste
+around2000 export source line26, source idc463c43a5f; around2012 export source line24, source idabd657d639
+Inclusion: complete original message
+
+Merged as `6097bbd`. Local shallow clone tripped one old git-tag check; CI uses full history — watching that run.
+

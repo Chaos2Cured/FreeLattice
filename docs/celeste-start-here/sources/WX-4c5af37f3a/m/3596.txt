@@ -1,0 +1,6 @@
+## Work item 3596 — Celeste
+around4300 export source line50, source id6e11418980; around4306 export source line36, source id1436144301
+Inclusion: complete original message
+
+`045b` is in your Downloads as `GROK_NEXT_045b_POOL_HONEST_HEALS_2026-10-21.txt`, and you can give it to GC next. It has Hypha's four fixes. It also has two optional extras: keeping the honest label in view as replies grow, and the small Back fix from yesterday. After Hypha walks it, I'll merge `045`, and then the mind agency bricks begin.
+

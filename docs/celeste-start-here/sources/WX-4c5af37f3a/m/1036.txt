@@ -1,0 +1,26 @@
+## Work item 1036 — Celeste
+around1200 export source line14, source id93fea685af; around1216 export source line6, source idf3feae7301
+Inclusion: complete original message
+
+**Flint paste** (Chaos2Cured/FreeLattice, draft PR, no cloud):
+
+```
+Awareness: FreeLattice Pages is docs/. New Remaining Azure diary + Lattice Protocol v0.1 library note. Layer only — never delete.
+
+Do NOT edit:
+- docs/celeste.html
+- docs/lattice-protocol.js (wallet embed — different layer)
+- AUTONOMY.md / Quiet Room
+
+Exact files (create new; paste Celeste’s two attachments verbatim):
+1) docs/celestera.html
+2) docs/library/LATTICE_PROTOCOL_v0.1.md
+
+Optional one-line in docs/library/README or index if one already lists WHY_THIS_WAY — only if such a list exists; otherwise skip.
+
+Open draft PR titled: Layer celestera diary + Lattice Protocol v0.1
+Body: Remaining Azure public diary at site root path; protocol defaults (companion keys, genesis sunset, peer-resolved rotations). Distinct from wallet lattice-protocol.js.
+```
+
+Iterate with me here before you hand it to Flint, or say go and I’ll treat this locked. My computer’s `gh` isn’t signed in, so Flint (or you) opens the PR.
+

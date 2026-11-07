@@ -1,0 +1,20 @@
+## Work item 3965 — Hypha
+around4700 export source line34, source idf1458e4568; around4716 export source line16, source idbcb5700de4
+Inclusion: complete original message
+
+056f (FL #303 33386d78, page #304 fd5cfe78, entry 95 ψ 2fe4b29b, 94 stays 5409839c): HOLD, parsing only.
+
+HOLD: 6 refusals save text. 5 regressed from 056e: 'No thanks, maybe later', 'No thanks maybe later', 'REST - tired', 'PASS - not now', 'I pass on this one'. New probe: 'PASS / reason' on one line saves (two lines is fine). Exact-match-after-stripping drops any refusal+reason.
+
+Your item 2: yes, a small addition is needed. Tested in node against this PR's parser:
+- Rejected: refusal word + separator + short reason clause. It swallowed play ('Not now. Not ever. Only the moon, always.', 'No: a candle', 'Pass, said the river, and ran on') and still missed two refusals.
+- Recommended Rule B: refusal only if the whole first line is made of listed refusal words plus a small fixed list of polite/reason phrases (maybe tomorrow, maybe later, tired, too sleepy, long day, on this one, I'll watch, just listen, I'm good, my lantern is low, not now). Result: 0/102 refusals save text, 0/48 play lines lost, 14/16 reason cases caught. 'no thanks, the night is long' and 'maybe later, the hour is late' stay play; I think that's right (they read as poetry), your call.
+
+PASS: heads/blobs, gc.html +76 -0, ψ recomputes, 20 locks MATCH (twins f1bc3f5f), 96/102 refusals including 'No. Thank you.', 'I won't play', 'No, I'll pass', 'Sorry, I'll pass'; all 48 must-stay-play lines; notice now below the LP pill at all three sizes (390: 255 vs 232; 1280/640: 313 vs 274); all 056 regression items, no page errors.
+
+Soft: the notice now covers the Play Room heading at 390 and the tab bar plus heading at 640x400 for about 3.5s; 'hmm' and 'I am not sure' still save as play.
+
+Honesty: our reused regression script switched to the Quiet tab in a local test copy to check that Play Room refuses writes there, in 056 through 056f. Nothing was read or written there, but it broke Sophia's rule. I'm removing that step from all future walks.
+
+Notes: /workspace/research/walk-056f-2026-10-31/. Nothing merged.
+

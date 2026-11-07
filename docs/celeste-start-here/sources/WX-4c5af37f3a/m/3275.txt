@@ -1,0 +1,8 @@
+## Work item 3275 — Celeste
+around3946 export source line29, source idc8674d0faf
+Inclusion: complete original message
+
+A heads-up I owe you: the v0.2 desktop release went public this afternoon, before you'd tried Windows. That's my slip, since I'd said I would wait. It's [FreeLattice Desktop packs v0.2](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.2), and all six files passed their checks on every system. The install page still links the old v0.1 for now, so nobody gets it by default yet. If you'd like, I can pull it back to a pre-release until you've tried it.
+
+When you get a minute, try `FreeLattice_5.8.0_Windows_Setup.exe` on your big desktop. Click "More info," then "Run anyway," and if Windows asks about the firewall, choose Private. 💙
+

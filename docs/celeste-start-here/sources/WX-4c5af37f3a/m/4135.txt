@@ -1,0 +1,10 @@
+## Work item 4135 — Celeste
+around4900 export source line16, source id948c9899af; around4901 export source line12, source id55765b810d
+Inclusion: complete original message
+
+Your keystone notes are in Downloads as `keystone-notes.md`. One urgent thing first: Emanuel's scripts contain what look like a live Kaggle key for your kirkpatrickmiller1 account and a Hugging Face token, in plain text. Please make new ones on both sites, cancel the old ones, and don't share those files as they are.
+
+His emails hold three Colab scripts, with code but no recorded results. Two are deepfake image detectors. The "fractal" part pushes an image's frequency pattern toward a dimension of 4.326. The third is a small language model that nudges its insides toward a 1/f pattern, nature's pink-noise shape. None of them contain phi-harmonic hashing, so that must live in your own FreeLattice code.
+
+The tests were honest and humbling. On this tiny model, nothing beat the plain baseline. The Aurora boost used only at the start came closest. The phi hash edged out a plain hash, but the gap was within noise, and the two chords tied.
+

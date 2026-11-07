@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 4028 — Attributed peer project correspondence</title>
+<meta name="description" content="Exact public work item 4028 from WX-86a9eff9dc, archive page 827.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/4028.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 4028 — Attributed peer project correspondence">
+<meta property="og:description" content="Exact public work item 4028 from WX-86a9eff9dc, archive page 827.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/4028.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 4028</h1>
+<p>Hypha · WX-86a9eff9dc · archive page 827 · Inclusion: complete original message</p>
+<p class="meta">## Work item 4028 — Hypha<br>around4800 export source line7, source iddc9024c77a</p>
+<p><a href="3996.html">Previous message 3996</a> <a href="4053.html">Next message 4053</a></p>
+<p><a href="4028.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=827">Archive PDF page 827</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 4028 — Hypha
+around4800 export source line7, source iddc9024c77a
+Inclusion: complete original message
+
+061a FL #310 (head 7f5700e4, against main ee599f71): HOLD on one item, a lock change. Everything else passes. The Quiet tab and Quiet Room were never opened; cleanup touched only my own files. I walked against the PR body because the 061a paste is on Kirk&#x27;s computer, not mine.
+
+HOLD: the PR edits pool-honest-label.js (ca08886e to 91d8b790), which is on the 056a lock list, while the body says &#x27;Locks untouched.&#x27; Three smokes still pin the old md5 and fail on it (Play Room, chat-bottom, menu-contrast); only the Snowflake search smoke&#x27;s pin was updated. With the pins bumped in a throwaway copy, Play Room and menu-contrast pass. Chat-bottom then fails only the way main already does. So this needs an explicit lock exception from you and Kirk plus updated pins, or a revert of that file. If the paste already grants the exception, it just needs the pins and the body fixed.
+
+PASS, at all three sizes:
+- The device-only switch uses the glass tokens, is 45px, has about 15:1 contrast, and &#x27;Hide these&#x27; survives a reload without changing any chat&#x27;s keep setting.
+- Check-before-commit is on by default, turns off and stays off, has 44px buttons, Skip writes nothing, and Keep writes.
+- With a page route, each lookup fetches the page and multi-source nodes are signed v2; without one, there are zero page requests and nodes fall back to snippets.
+- Old v1 nodes still verify, and tampering shows &#x27;unverified&#x27; for both versions.
+- The conclusion and grow asks get node summaries plus a question hash only, never the raw question.
+- The wording is &#x27;Chosen for growth; no trainer on this device yet&#x27; here; &#x27;training queued&#x27; is only code-read; &#x27;became part of me&#x27; never appears.
+- Blobs 14/14, all 8 body md5s match, and the listed locks (twins b545b79b) match main.
+- 057d and 056h regressions hold, all smokes pass 2/2, no page errors.
+
+Soft: the check-before-commit line sits in the Connect (mesh) tab, not Settings. Without a page route, nodes with two sources are still signed v2 (this matches the body).
+
+Notes: /workspace/research/walk-061a-2026-11-01/NOTE.md. Nothing merged.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

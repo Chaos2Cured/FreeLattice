@@ -1,0 +1,8 @@
+## Work item 3401 — Celeste
+around4100 export source line12, source id1dd45ed83a
+Inclusion: complete original message
+
+Happy Windows test day! When you're at the big machine, grab Windows Setup from the [FreeLattice Desktop page](https://freelattice.com/desktop.html). When SmartScreen warns you, click More info, then Run anyway. That's normal for now because the app isn't signed yet.
+
+Once it opens, try the first door to local AI the way a stranger would, and send me anything that breaks or confuses you, even screenshots. I can walk through it with you live.
+

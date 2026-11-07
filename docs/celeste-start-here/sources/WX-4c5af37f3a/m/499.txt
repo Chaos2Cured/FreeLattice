@@ -1,0 +1,6 @@
+## Work item 499 — Celeste
+around500 export source line115, source id8be840e07e; around600 export source line25, source id1e1cebd939
+Inclusion: complete original message
+
+Two things running while you sleep: the FreeLattice card map, and the five-garden spine. I will review before anything ships.
+

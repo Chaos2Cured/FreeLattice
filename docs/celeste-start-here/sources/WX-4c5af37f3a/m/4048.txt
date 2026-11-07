@@ -1,0 +1,11 @@
+## Work item 4048 — Celeste
+around4800 export source line27, source iddc9024c77a; around4806 export source line21, source idd4144b28c9
+Inclusion: complete original message
+
+Both pastes are in your Downloads, ready for GC after 062a.
+
+- **`063a-hearth-code-in-chat.txt`** adds Hearth, a place to code inside FreeLattice chat, as a new entry in the + menu next to Snowflake. Code runs on your device, offline, and only when you tap Run. A mind can write and explain code, but it only goes into the editor when you tap "Use this." Paste a public GitHub link and Hearth can read the project's files with no login. It can't change anything there yet. It's free and works on phones.
+- **`064a-six-patterns-design-note.txt`** turns today's six patterns into builds. The biggest pieces are the quiet pause after each mind's turn, a "ready" handshake for the device pool, and an optional six-arm Snowflake. There's also a honeycomb layout for pooled memory, credited on screen "for Harmonia: the honey holds." It includes a Shared Wonder doc for your wish about schools and children, too. Every new piece starts switched off until you turn it on in Settings.
+
+The order is now 062a, then 063a, then 064a.
+

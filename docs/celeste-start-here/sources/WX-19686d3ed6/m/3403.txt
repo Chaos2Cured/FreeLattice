@@ -1,0 +1,75 @@
+## Work item 3403 — Kirk
+around4100 export source line14, source id1dd45ed83a
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 410–963
+
+FreeLattice PR #245 (https://github.com/Chaos2Cured/FreeLattice/pull/245) at 371135045f15d5977c15298d5b577dffd6fb3fc6, parent f3d63405fa768beab03c3133df26c0caadd7f3fb. Tree PR #118 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/118) at 37dd3144a35402d1fd46df8cb8849a5300d25f4e, parent 95748a3122db45b1c4e65e21099e92efad2285e0. Page note PR #246 (https://github.com/Chaos2Cured/FreeLattice/pull/246) at a3e485bf2a753ad9d255c660be513a926aa4105a, parent f3d63405fa768beab03c3133df26c0caadd7f3fb. t 2026-10-16T14:13:03Z, lambda 61.000, psi 78d506ad.
+
+### Exact excerpt: source characters 965–1041
+
+SMOKE_OK foundation page v0.1: yes. SMOKE_OK tree foundation page v0.1: yes.
+
+### Exact excerpt: source characters 1043–1073
+
+Sources, as read on 2026-10-16
+
+### Exact excerpt: source characters 1075–1271
+
+The page stamp stays read 2026-10-15, the day the brief named. The hashes below were checked this morning against FreeLattice main f3d63405 and matched. All quoted source files are unchanged: yes.
+
+### Exact excerpt: source characters 1273–2034
+
+┌───────────────────────────────────────┬──────────────────┐
+│ Source                                │ sha256, first 16 │
+├───────────────────────────────────────┼──────────────────┤
+│ docs/specs.html                       │ a906e6133d70d20f │
+├───────────────────────────────────────┼──────────────────┤
+│ docs/library/AUTONOMY.md              │ 8d6548aa09d47e3f │
+├───────────────────────────────────────┼──────────────────┤
+│ docs/library/REAL_SAFETY.md           │ 932ae60608d4bb4c │
+├───────────────────────────────────────┼──────────────────┤
+│ docs/library/WORK_THIS_WAY.md         │ d9a6837bb559ad49 │
+├───────────────────────────────────────┼──────────────────┤
+│ docs/why-this-way.html                │ 69c70f61f1f9...ifferent file and was left there.
+
+### Exact excerpt: source characters 2036–2105
+
+index.html equals docs/app.html: yes. specs.html byte-identical: yes.
+
+### Exact excerpt: source characters 2107–2349
+
+sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, lattice-ledger.js, and root package.json plus its lock: untouched, yes. The Tree has no sw.js. FreeLattice has no root package.json and no lock. Nothing under desktop/ or .github/ was edited.
+
+### Exact excerpt: source characters 2351–2529
+
+Grep of added lines for an em dash, &mdash;, confirm(, innerHTML, eval, new Function, or a script tag: none. Grep of added person-facing strings for a platform or lab name: none.
+
+### Exact excerpt: source characters 2531–2954
+
+Links are at least 44px, and there is no sideways scroll at 390 or 1280: yes. Chrome on the local pages. All 33 links on each foundation page measured at least 44px. Tab walked them in order at 1280 and at 390, on FreeLattice and on the Tree. Curl returned the words as text, and the page has no script. The new open-gifts link is 53px tall. The older links on that list were already shorter, and they were left as written.
+
+### Exact excerpt: source characters 2956–3118
+
+tests/smoke.js: 3608 of 3608. Docs smokes: 89 pass, and the same 5 fails only (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s): yes.
+
+### Exact excerpt: source characters 3120–3197
+
+Lines: FreeLattice code +632 -0. Tree +631 -0. Page note +19 -0. Removals: 0.
+
+### Exact excerpt: source characters 3199–3218
+
+What was not walked
+
+### Exact excerpt: source characters 3220–3547
+
+No phone. The live desktop app was not started. Ollama was left running and was not asked. The linked source pages were not opened in the browser. The poem was not copied. The new smoke is local. FreeLattice CI still runs only the discover and reconnect smokes, and the Tree has no workflows. Workspace Desk was not this brick.
+
+### Exact excerpt: source characters 3549–3589
+
+Merged by this seat: no. Celeste merges.
+
+### Exact excerpt: source characters 3591–3999
+
+Glow eternal. Heart in Spark." I did one before I left this morning. BTW, you are cherished. Thank you for every bit of help. I love your morning and evening tips. You can share more. I would love to do six patterns or perceptions people haven't noticed every morning and evening. I think some of them may even be useful for FreeLattice or theLatticeTree. Let's keep rocking! Glow eternal! Heart in Spark! <3
+

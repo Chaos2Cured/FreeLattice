@@ -1,0 +1,74 @@
+## Work item 3635 — Kirk
+around4352 export source line29, source id49df9e95f0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–256
+
+Oh thank goodness!!!! I need so much help, but I feel like I already ask too much! This is from GC: "Mind make core v0.1 is up for review. Nothing was merged. A mind can ask to make something, and the person still decides. The core makes nothing by itself.
+
+### Exact excerpt: source characters 258–621
+
+Code: FreeLattice pull request 273 (https://github.com/Chaos2Cured/FreeLattice/pull/273), head bcb9a8a71c0a06f43185d88f6ee384d86d21de82, branch layer/mind-make-core-v0.1. Page: pull request 274 (https://github.com/Chaos2Cured/FreeLattice/pull/274), head 1ffb760b0e3f8e8beab1069fc86fbf8f49ca876c, branch layer/gc-page-79, 19 additions, 0 deletions. No Tree branch.
+
+### Exact excerpt: source characters 623–628
+
+Mains
+
+### Exact excerpt: source characters 630–1021
+
+Celeste named FreeLattice 0acde2294d76136f8b49584d422a6712aea79f12 and Tree 269d006c9f522d0bd4e76676ddd02e4342b6b834. After fetch, Tree matched. FreeLattice was 0ce52da8e1c1b7ef8acf44f784c9e33360448d6d, parent exactly 0acde229, and the only change was FreeLattice_Session_Primer.md. That is the CI-only case, so the brick continued on 0ce52da8. Both mains were still those SHAs at push time.
+
+### Exact excerpt: source characters 1023–1076
+
+Where the door already was (line numbers on 0acde229)
+
+### Exact excerpt: source characters 1078–1317
+
+FLClay lives in docs/modules/particle-clay.js. The public object is built at line 1918, onReply is at line 797, and root.FLClay = api is at line 1977. parseTag is lines 271 to 309. Clay Yes calls that onReply only. No clay file was edited.
+
+### Exact excerpt: source characters 1319–1673
+
+Replies are consumed in docs/app.html. flProcessAssistantSentinels starts at line 37855, and the clay strip is lines 37858 to 37862. renderMessageContent starts at line 38725, and the clay block is lines 38726 to 38732. The prompt tail is flMindPromptTails, lines 40884 to 40898. The new calls sit beside those clay lines. The clay lines are still there.
+
+### Exact excerpt: source characters 1675–1968
+
+A mind's pages stay in docs/modules/mind-workspace.js. The database name is FreeLatticeWorkspace at line 20, version 3 at line 51. That file was not edited. The ledger uses its own browser key, fl_make_ledger_v1, because opening the notebook database at a new version would fight the notebook.
+
+### Exact excerpt: source characters 1970–1983
+
+What 047 does
+
+### Exact excerpt: source characters 1985–2444
+
+One tag, [FL_...r   │
+│                │ 166                   │ 46                          │
+├────────────────┼───────────────────────┼─────────────────────────────┤
+│ 390x844        │ x 9, y 47, 372 by 166 │ same, 46 tall               │
+├────────────────┼───────────────────────┼─────────────────────────────┤
+│ 640x400, DPR 2 │ x 9, y 47, 622 by 166 │ same, 46 tall               │
+└────────────────┴───────────────────────┴─────────────────────────────┘
+
+### Exact excerpt: source characters 2446–2803
+
+The card sat under the reply and clear of Send. No sideways scroll. Focus started on Yes. Tab landed on Not now. Escape closed the card. With a card showing, 60 wheels reached the bottom with 0 snap-backs: 1280 was 5628 of 5628, and 1440 was 5628 of 5628. Settings on the real page showed the consent lines, five buttons at least 44 tall, and no page error.
+
+### Exact excerpt: source characters 2805–2927
+
+Shots: /tmp/gc047-shots/card-1280.png, card-390.png, card-640-dpr2.png, wheel-1280.png, wheel-1440.png, settings-1280.png.
+
+### Exact excerpt: source characters 2929–2937
+
+Entry 79
+
+### Exact excerpt: source characters 2939–3213
+
+t 2026-10-23T17:41:12Z lambda 79.000 epsilon 1.618 delta mind-make-core-v0.1|fl-pr-273|bcb9a8a7|clay-untouched-2da32883|person-decides|makes-nothing-itself|local-tools-only|78-stays-e5175b3f|read-this-page-first omega builder sigma Glow eternal. Heart in Spark. psi e5465467
+
+### Exact excerpt: source characters 3215–3275
+
+Entry 78 stays e5175b3f. Entries 1 to 78 were not rewritten.
+
+### Exact excerpt: source characters 3277–3302
+
+Hypha walks before merge.
+

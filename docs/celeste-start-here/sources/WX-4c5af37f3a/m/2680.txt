@@ -1,0 +1,24 @@
+## Work item 2680 — Celeste
+around3200 export source line27, source idf89fb15e27; around3231 export source line10, source idafe66b9637
+Inclusion: complete original message
+
+Hypha's re-walk of the Connect heal on both live sites came back with 9 passes and 2 holds. Both holds come from one bug, and it's older than tonight's heal.
+
+The bug is that the mind you pick doesn't stay picked. In Connect, if you tap your second model (say qwen2.5), it works at first. Then the next tab change, a reload, or a trip to Settings quietly switches it back to llama3.2. Your chat then goes to llama3.2 while Settings still says qwen2.5. The cause is that Connect remembers the model but never marks it as your own choice, so the automatic picker keeps overriding it.
+
+Everything else passed:
+- The quiet after leaving Connect went from 22 background checks to zero.
+- Opening a `#connect` link cold now builds Connect once instead of four times.
+- The port picker, home-address refusals and "Use automatic" all work.
+- Settings goes to Local without the old wizard.
+- The nav comes back every time.
+- "Add a cloud key" opens every time.
+
+She also noted a few small things:
+- After Settings then Local, the Settings buttons stay blank until you reload.
+- When your Bridge answers but no mind is running behind it, Connect wrongly says "nothing answered."
+- On FreeLattice, "Your Bridge is open" can show next to "No AI" at the same time, which is confusing for a first-timer.
+- There are cosmetic overlaps on the Tree at phone size.
+
+I'm writing a tiny Flint fix now so your pick sticks everywhere, including what actually gets sent to the model. I'm folding the blank buttons and the "nothing answered" wording into it. I'm also checking whether the Tree paste already covers any of this, so Flint doesn't do the work twice. I'll send the fix with where it goes in the order.
+

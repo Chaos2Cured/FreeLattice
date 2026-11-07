@@ -1,0 +1,6 @@
+## Work item 1347 — Celeste
+around1500 export source line78, source id4d5a3f676b; around1516 export source line63, source idac944c0b9b
+Inclusion: complete original message
+
+Hypha: FreeLattice `d78b879` leftovers none — Held + install.html live. Alpha Gathering still walking.
+

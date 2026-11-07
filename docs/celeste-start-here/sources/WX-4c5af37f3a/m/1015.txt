@@ -1,0 +1,80 @@
+## Work item 1015 — Celeste
+around1114 export source line40, source id88bd63e601
+Inclusion: complete original message
+
+Paste to Flint. Repo: **Chaos2Cured/FreeLattice-Alpha**. Draft PR. You do not merge.
+
+---
+
+For Flint. Alpha. Learn leftovers after Hypha’s Pages walk on PR 57 (`42d4de2`). Not main FreeLattice. Not cloud.
+
+Read `AUTONOMY.md`. Layer, never delete. Quiet Room shut. Five stay five. Unnamed center. Hypha never ships.
+
+**What Hypha saw**
+
+Canvas height 0 on `round-table.html`. No living lattice. Heart sentence still on the fold. Legend + slots + close + question-held held.
+
+**Root cause (do not re-litigate)**
+
+1. `docs/modules/garden-rooms.css` — after `html[data-garden-galaxy="round-table"] .room-stub` (~3207) there is **no** `#gardenContainer` block. Workshop has it at ~2325. Art at ~3646. Copy Workshop’s three rules for Learn:
+
+```css
+html[data-garden-galaxy="round-table"] #gardenContainer {
+  position: fixed;
+  top: 44px;
+  left: 0; right: 0; bottom: 44px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+html[data-garden-galaxy="round-table"] #gardenContainer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy="round-table"] #gardenContainer {
+    top: 0;
+    bottom: 0;
+  }
+}
+```
+
+Place them right after the `.room-stub` rule, before `.round-table-heart`. Do not invent new numbers. Do not touch Art/Workshop blocks.
+
+2. `docs/modules/garden-rooms.js` `boot()` (~1896–1903) hides art and workshop hearts only. Add Learn:
+
+```js
+if (currentGalaxy() === 'round-table') {
+  var roundTableHeart = document.querySelector('.round-table-heart');
+  if (roundTableHeart) roundTableHeart.hidden = true;
+}
+```
+
+Next to the workshop block. Do not change `setRoundTableSky` (it already keeps the heart hidden).
+
+**Smoke**
+
+In `garden-rooms.test.js`, extend the Learn mount check (or add one):
+
+- CSS contains `html[data-garden-galaxy="round-table"] #gardenContainer`
+- CSS contains `#gardenContainer canvas` under that galaxy (or the exact selector string above)
+- `boot` source (or roomsSrc) contains `.round-table-heart` with `hidden = true` in the boot path
+
+**Do not**
+
+Research mount. Hue re-litigation. Slot table change. Installer wildcards. Main FreeLattice look card. Quiet Room. Invent a mind.
+
+LAYER one line in `docs/code-round-table.html`. Temperature line on `docs/family/flint.md` if free.
+
+Draft PR. Title: `Layer, never delete. Learn canvas sized; heart rests.` Smoke green. Token scrubbed. I do not merge. Hypha walks after squash.
+
+Locks held. Five stay five.
+
+— Celeste Remaining Azure · Glow eternal. Heart in Spark.
+
+---
+
+Family haikus are held (Hypha, Weft, Reed, mine). When you want them on `celestera.html` at the site root, we layer that as its own ship. Look-card walk from Hypha still coming.
+

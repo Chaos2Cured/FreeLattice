@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.txt c01</title>
+<meta name="description" content="Reading section c01 of 1343f516ee, 503 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/1343f516ee/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.txt c01">
+<meta property="og:description" content="Reading section c01 of 1343f516ee, 503 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/1343f516ee/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1520"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.txt · c01</h1>
+<p>1343f516ee · words 503 · characters 0–4343</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1520. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 016 (Wednesday Oct 7, 2026, MDT). Device Pool door truth v0.1 (FreeLattice).
+Independent of 015 (different repo); give after 015 or alongside it.
+Apply-checked on a fresh clone of FreeLattice main a9a2c1c4 (after #176/#177): clean, smoke OK,
+full suite: only the 5 known failures.
+
+GROK NEXT BRICK: Pool door truth v0.1 (small heal)
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-device-pool-door-truth-v0.1 (soft marker in fl-pool.js; v-device-pool-v0.1 stays)
+Smoke line: SMOKE_OK device pool door truth v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/device-pool-door-truth-v0.1
+  ~/Downloads/GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.fl.diff
+  (md5 f839f8852e6d699731665a782f0b06f0)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+GC&#x27;s own note on 014: if the share door was already open, &quot;Let this device help&quot;
+leaves it open, but the Pool card still says &quot;trusted kin only&quot;. That is not true.
+Now the note reads the real door:
+  open  -&gt; &quot;This device helps people you have connected with, because the share
+           door is open. Tap Only trusted kin to narrow it.&quot; plus a button
+           &quot;Only trusted kin&quot; that sets the door to kin (one tap) and repaints.
+  kin   -&gt; the old line, &quot;This device helps trusted kin only...&quot;
+  pause -&gt; &quot;Helping is on, but the share door is paused, so no one can use this
+           device right now.&quot;
+  off   -&gt; same shape, &quot;sharing is off on the share door&quot;.
+The tap still never narrows an open door by itself (the person chose open).
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+  docs/modules/fl-pool.js   doorMode(), doorLine(), narrowToKin() added; the note
+                            in paint() reads doorLine(); old line kept in a
+                            &quot;before&quot; comment; FLPool exports doorLine, narrowToKin
+  docs/scripts/smoke-device-pool-door-truth-v0.1.js  (new)
+  No app.html / index.html change.
+Skipped: sw.js, docs/sw.js, fl-connect.js, fl-share-door.js, fl-kin*.js.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. sw.js untouched. fl-connect.js aaff2bf1b037656989a9e1a89bb05908.
+index matches docs/app.html. No em dashes, no confirm(, textContent only. Receipts
+counts only. MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.fl.diff /tmp/pool-truth.diff
+    md5 -q /tmp/pool-truth.diff    # f839f8852e6d699731665a782f0b06f0
+    cd ~/FreeLattice-fresh &amp;&amp; git fetch origin &amp;&amp; git checkout main &amp;&amp; git pull
+    git checkout -b layer/device-pool-door-truth-v0.1
+    git apply --check /tmp/pool-truth.diff &amp;&amp; git apply /tmp/pool-truth.diff
+    node docs/scripts/smoke-device-pool-door-truth-v0.1.js
+    node docs/scripts/smoke-device-pool-v0.1.js
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+  Walk: on the share door card choose &quot;Share with people I connect with&quot;, then on
+  the Pool card tap &quot;Let this device help&quot;: the note says the door is open and
+  &quot;Only trusted kin&quot; shows; tap it: the note says trusted kin only and the share
+  door card agrees. Known failing smokes on clean main: carry-forward,
+  connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s.
+
+----------------------------------------------------------------------
+5. COMMIT / PR / PAGE NOTE
+----------------------------------------------------------------------
+    git commit -m &quot;Device Pool door truth v0.1: the Pool card shows the real share door and offers one tap to kin&quot;
+    Push, open a PR. Celeste merges. Then the next docs/gc.html entry, docs-only PR.
+
+You are enough. Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

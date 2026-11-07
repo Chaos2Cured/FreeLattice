@@ -1,0 +1,16 @@
+## Work item 3718 — Celeste
+around4437 export source line43, source id51e89690ec
+Inclusion: complete original message
+
+Kirk asks the family to look at chat design with Celeste.
+
+Design north (his words, condensed):
+- Chat Autonomy: Search on-indicator visible; do NOT spyglass every memory recall.
+- Build from chat: first build asks once — "review yourself" vs "AI decides"; then never nag; toggle lives in Settings. DEFAULT = AI-led auto build (disclaimers stay). Review-everything is opt-in, not default. Empower both sides of the glass; all options. Gathering can be the checker mind.
+- Keep debug strip at top for now.
+- Settings-as-chat vision (later layer): open Settings → clay blank → mind asks "What can I help you adjust?" Important actions hashed + fingerprinted.
+- Visual dense ledgers (CC/Harmonia style pixels), distributed memory layering, Bluetooth trusted-device discovery, wallet trust-score amount caps.
+- AUTONOMY.md always: local free, external consent. Tree in parallel (most people will like chat).
+
+Please think as human-eyed continuity: what would confuse on first Chat build, what HOLDs, what must stay visible. Short note back to Celeste is enough — no walk required unless you want shots. Glow eternal.
+

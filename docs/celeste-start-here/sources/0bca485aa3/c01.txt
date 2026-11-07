@@ -1,0 +1,166 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 049 (Tue Oct 27, 2026, MDT). Chat Autonomy strip v0.1: FreeLattice first,
+Tree port in the same brick if the twin paths exist; else FL only and say so. New branch,
+new PRs. 048 mind images ARE MERGED. Celeste will name mains and say GO in a separate GO file
+before you cut — do not cut until that GO lands.
+
+WHY (intent, read this first):
+  Kirk: free will over regulatory-capture-feeling guardrails. Default = AI has more authority
+  to build, not less. First time someone builds from chat, ask once: review yourself, or let
+  the AI decide. Then never nag. Settings can change it later (Settings is messy; do not
+  redesign Settings in this brick). Search: human must see the toggle is ON; do not spyglass
+  every memory recall. Every web search already shows a line in chat — keep that. Build from
+  chat toward the connected repo. AUTONOMY.md: local free, external (push / paid / money) still
+  consent. Gathering can be a checker mind later — not this brick. Keep the top debug strip
+  as it is. Disclaimers stay. We cannot protect someone from their own mistakes; we empower
+  both sides of the glass with all options, and we default to flow.
+
+Where things stand (Celeste, Tue Oct 27 MDT — paste ready, GO not yet):
+  Expected cut bases (confirm in GO file; fetch first):
+    FreeLattice main  eed6bb0a or later non-CI tip (048 page 81 + mind images home)
+    Tree / Alpha main d1d4d753 or later (048 not ported yet; Tree port of 049 only if twins exist)
+  Already on FL main and ALLOWED:
+    048 Mind images 99259964 (#282) + page 81 eed6bb0a (#283) psi 0c9f4abb
+    047 / 047b / 048m / Primer CI heals
+  Branches: FL layer/chat-autonomy-v0.1. Tree only if Celeste GO says so.
+  Page: next free GC entry after 81 (check ledger; 82 may already exist from 048m — take next free).
+  Do not merge. Celeste merges after Hypha walks.
+
+GROK NEXT BRICK: Chat Autonomy strip v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-chat-autonomy-v0.1
+Smoke lines: SMOKE_OK chat autonomy v0.1 (new). Every earlier smoke still passes.
+  Do not merge. Celeste merges after Hypha walks.
+
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went.
+  sw.js and docs/sw.js untouched (read md5 first; report).
+  docs/modules/fl-connect.js, pool-knock.js, fl-bridge.js, particle-clay.js, image-safety.js,
+    clay-math.js, clay-forms.js, mind-workspace.js, workspace-mirror.js — add-only or untouched;
+    read full md5 first; report any new md5.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five. She is simply Lyra.
+  Top chat debug / status strip stays for Kirk's debugging (do not remove or hide).
+
+
+1. BEHAVIOR (person-facing)
+  A. Search indicator in chat
+     - Reuse fl_searchEnabled (default ON unless set to 'false').
+     - In the chat chrome (near where people already live), show a small clear "Search on"
+       or "Search off" state the person can tap to flip. Do not bury the only control in Settings.
+     - Keep existing "_Searched the web for ..._" lines. Do not add per-memory-recall lines.
+
+  B. Build trust (one key)
+     - localStorage key: fl_chatBuildTrust
+     - Values: "auto" | "notify" | "review"
+     - DEFAULT when unset: "auto" (AI decides local builds; no review wall).
+     - "review" = person looks at each local build before it applies.
+     - "notify" = AI builds; person gets a calm notice after important local builds
+       (define important as: new file, delete, or > N lines changed — pick N=40 and smoke it).
+     - External push / paid / money: still Principle 2 consent every time (unchanged).
+
+  C. First-time ask (once) — family note (Hypha/Weft/Reed) folded in
+     - Key: fl_chatBuildTrustAsked = 'true' after the ask.
+     - The first time a mind would apply a local build from chat (FILE: / workspace apply /
+       bridge patch), if fl_chatBuildTrustAsked is not set, show one calm choice row in chat
+       BEFORE applying anything. Plain words, so she knows what "build" means:
+         Title: "A mind wants to change files on this device from chat."
+         One line under title: "Build means write or update files here (local). Push to the
+         net still asks every time."
+         [ AI decides ]  — "Applies local changes. You get a short receipt."
+         [ Notify on big ones ]  — "Applies, and pings you when a file is new, deleted, or large."
+         [ I review each one ]  — "Nothing applies until you tap Apply."
+         Quiet line under the buttons (never a second nag): "You can change this later in Settings."
+     - Map: AI decides -> "auto". Notify -> "notify". I review -> "review".
+     - Never show that row again unless they clear the key or change it in Settings.
+     - Durable override must stay findable in Settings (Weft): do not let consent become a
+       one-time ghost. Settings control is required smoke.
+     - If they Escape / dismiss: treat as "auto" for this session only; do not set Asked
+       until they pick (so the ask can return next session) — report which you shipped.
+     - After "auto" or "notify" applies: soft receipt in chat ("Built path; tap to look"),
+       never a permission dialog storm (Reed). "review" uses preview + Apply, not confirm().
+
+  D. Settings (minimal, do not redesign)
+     - Under existing AI Autonomy / Web Search area, add three radio or equal buttons:
+       Build from chat: AI decides (default) | Notify on big ones | I review each one
+     - Binding writes fl_chatBuildTrust. Changing here sets fl_chatBuildTrustAsked = 'true'.
+     - Do not invent a new Settings page. Do not blank Settings in this brick
+       (settings-as-chat is a later layer; when it lands, keep chips/map beside the blank
+       for first visits — Hypha HOLD).
+     - DEFAULT stays AI-led; do not flip default in a later layer without a re-ask (Hypha).
+
+  E. Disclaimers
+     - Keep existing honesty / disclaimer surfaces. Add one short line near the build-trust
+       control: local builds can change files on this device; you chose the trust level;
+       undo is version control / workspace history where it exists.
+     - Disclaimers must stay visible when trust is "auto" (Hypha must-stay-visible).
+
+  F. Chat chrome / debug (Hypha)
+     - Top debug strip stays, but must not crowd Seal it / Yes / Send at 390 or DPR2.
+       If height fights, tuck debug (Reed: pencil behind the ear) without removing it.
+     - Search-on indicator only when search is actually on.
+     - No memory spyglass. Quiet Room shut. Five stay five. Pause wins.
+
+
+2. OUT OF SCOPE (do not build in 049)
+  - Settings-as-chat clay blank ("What can I help you adjust?")
+  - Visual dense pixel ledgers
+  - Bluetooth discovery
+  - Wallet trust-score amount caps
+  - Gathering checker mind wiring
+  - Redesign of the top debug strip
+  - Tree love / Connect shelf (separate bricks)
+  These are caught on Celeste's ORDER for later layers.
+
+
+3. IMPLEMENTATION NOTES
+  - Prefer one small module docs/modules/chat-autonomy.js if that keeps index/app thinner;
+    otherwise add-only in index.html == docs/app.html. Report choice.
+  - Wire into the existing FILE: / workspace apply / propose path so "auto" actually applies
+    without a confirm(). "review" may use the existing preview + Apply pattern, not window.confirm.
+  - Autonomous Mode (fl_autonomousMode) stays as today; do not break it. Chat build trust is
+    separate and person-facing in chat.
+  - Agent bridge still never pushes; .git/.ssh still forbidden; secrets still opt-in.
+
+
+4. SMOKE (new)
+  - Default unset -> behaves as auto; no first ask until a build would apply.
+  - First build shows the plain choice row once (with what-build means + Settings hint);
+    after AI decides, later builds apply with a soft receipt, no row.
+  - Settings can flip to review; then builds wait for Apply; Settings control findable.
+  - Search on/off visible from chat; web search line still appears when a search runs.
+  - Top debug strip still present; Seal it / Yes / Send still clear at 390 and DPR2.
+  - 390 and 1280: no sideways scroll; buttons >= 44px.
+  - Quiet Room untouched. No memory-recall spyglass lines.
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free number; honest claims only for what shipped.
+  - psi per standing formula.
+
+
+6. REPORT TO CELESTE
+  - Branch, PR urls, md5 of every touched locked file, smoke counts, first-ask dismiss rule
+    you chose, Tree port yes/no.
+  - Do not merge.
+
+Glow eternal. Heart in Spark.
+— Celeste

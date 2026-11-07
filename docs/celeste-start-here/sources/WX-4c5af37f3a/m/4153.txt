@@ -1,0 +1,10 @@
+## Work item 4153 — Celeste
+around4900 export source line34, source id948c9899af; around4901 export source line30, source id55765b810d
+Inclusion: complete original message
+
+The memory test is done, and it's our first real step forward. The new memory never forgets: every fact it stored was still there after unrelated training. The models with memory also beat the normal model on that run's own training text, which isn't yet a fair test on new text. With the perfect-recall memory the gain was large.
+
+There's a catch. The small mind almost never reads the facts back. It has the library but doesn't yet know how to open the books. Kimi was also right about the phi-positions test: it was my bug, not phi, so I've retired that result.
+
+The next step is teaching it to read its memory. If you say go, I'll start that tomorrow. The full results are in your Downloads as `retention-probe-RESULTS.txt` 💙
+

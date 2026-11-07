@@ -1,0 +1,204 @@
+// "Try it" → probe that one door once. Never stores anything.
+async function tryPort(raw) {
+  var r = parseLocalPort(raw);
+  if (!r.ok) return { ok: false, reason: r.reason, text: REASON_TEXT[r.reason] };
+  var h = await healthAt(r.port);
+  if (h && !h.helped) return { ok: false, port: r.port, reason: 'waiting', text: REASON_TEXT.waiting };
+  try {
+    var models = await tagsAt(r.base);
+    var n = models.length;
+    return {
+      ok: true, port: r.port, base: r.base, kind: h ? 'bridge' : 'other', models: models,
+      text: 'Door ' + r.port + ' answered' + (h ? ' (Bridge)' : '') + ' · ' + n + (n === 1 ? ' mind' : ' minds') + '.'
+    };
+  } catch (e) {
+    return { ok: false, port: r.port, reason: 'quiet', text: REASON_TEXT.quiet };
+  }
+}
+```
+Note: Chrome's local-network permission prompt may appear on "Try it" — that's the same prompt as today's probe; fine.
+
+## Exact source excerpt, characters 21865–22699
+
+### A8. "Using" line — `usingText(report)` (new)
+```js
+function usingText(report) {
+  report = report || {};
+  if (report.manual) {
+    if (report.manualFailed) return 'Using: your door ' + report.manualPort + ' · not answering';
+    return 'Using: your door ' + report.manualPort + (report.helped ? ' (Bridge)' : '');
+  }
+  if (report.helped && report.port) return 'Using: Bridge ' + report.port;
+  if (report.base && /:11434$/.test(report.base)) return 'Using: Ollama 11434' + (report.stickyFallback ? ' (Bridge quiet)' : '');
+  if (report.waitingHelp && report.port) return 'Bridge found at ' + report.port + ' · waiting for Yes, help';
+  return 'Using: nothing yet';
+}
+```
+Kirk's target text is exactly `Using: Bridge 11435 · Change` / `Using: Ollama 11434 · Change`. "Change" is a button (≥44px tap target) styled as a soft link.
+
+## Exact source excerpt, characters 22701–25206
+
+### A9. `render(report, force)` (line 419) — escape names + add Using line + picker
+1. **Escape (known risk, fix now):** stop concatenating model names into HTML at **443** and **452**. Emit an empty container `<div class="flc-models" role="list" data-flc-models></div>` in the HTML string, then after `_hostEl.innerHTML = html;` (477) build buttons with DOM:
+   ```js
+   var list = _hostEl.querySelector('[data-flc-models]');
+   if (list) {
+     (report.models || []).forEach(function (m) {
+       var name = String((m && (m.name || m.model)) || m);
+       var b = document.createElement('button');
+       b.type = 'button';
+       b.className = 'flc-model';
+       b.setAttribute('role', 'listitem');
+       b.setAttribute('data-flc-model', name);   // attribute set via DOM = safe
+       b.textContent = name;                      // text via textContent = safe
+       list.appendChild(b);
+     });
+   }
+   ```
+   Keep the existing click wiring (478–488) — it reads `data-flc-model` and calls `remember({ name, base: report.base, port: report.port })`, which now carries the manual base when manual. Toast text `'Connected · ' + n` is fine — `showToast` (app.html 33431) sets `toast.textContent`.
+   Also add a tiny `esc(s)` helper (`&<>"'`) for any remaining string you must interpolate (ports are integers; `report.base` never goes into HTML).
+2. **Using line:** right after the `flc-paste` line (~433) add:
+   `<p class="flc-using"><span data-flc-using></span> · <button type="button" class="flc-link" data-flc-change aria-expanded="false">Change</button></p>` — then set `[data-flc-using].textContent = usingText(report)` after innerHTML.
+3. **Manual-quiet card** (before the models/wait/download branches): if `report.manual && report.manualFailed`:
+   `Your chosen door <strong>N</strong> isn't answering right now.` + soft line `Is the program open? Nothing was switched.` + buttons **Try again** (`data-flc-try-again` → `refreshUI({force:true})`) and **Back to automatic** (`data-flc-auto`). Do **not** render the download card in this state (it would read like we gave up on their choice); do keep the "Other ways" details.
+4. **Picker section:** render a host `<div class="flc-card flc-picker" data-flc-picker hidden></div>` just under the Using line; fill it with DOM (not strings) in `paintPicker()` when `_pickerOpen`.
+5. Update `reportSignature` (303) to include `report.manual`, `report.manualPort`, `report.manualFailed`, and `_pickerOpen ? 1 : 0` so redraws happen on real change only.
+
+## Exact source excerpt, characters 25208–27403
+
+### A10. `paintPicker()` (new, DOM-built, Mom words)
+Structure (all text via `textContent`):
+- Heading: **"Pick a door number"**
+- One-line gloss: *"Programs on your computer listen at a number — a door. If one is busy, pick another."*
+- **Found doors** (from `_lastFound`; while scanning show "Looking at the usual doors…"): one button per entry, label:
+  - Bridge helped → `11435 · Bridge (ready)`
+  - Bridge not helped → `11436 · Bridge (waiting for Yes, help)`
+  - 11434 → `11434 · Ollama · 3 minds`
+  - other → `11500 · 2 minds`
+  Tapping a found door fills the field and runs **Try it**.
+  If nothing found: *"No usual doors answered. If you know your number, type it below."*
+- **Type a number:** `<label for="flc-port-input">Or type a number</label>` + `<input id="flc-port-input" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="40" placeholder="like 11500">`. Enter key = Try it. (maxlength 40 so a pasted `http://localhost:11500/` fits; validation still rules.)
+- **Buttons:** **Try it** (primary) · **Remember this** (disabled until the last Try it succeeded for the same number — `_pickerTried.port === parsed port`) · **Back to automatic** (shown only when `getManualPort()` is set) · **Close**.
+- **Message line** `<p class="flc-msg" aria-live="polite">`: shows `_pickerMsg.text`; on success also lists up to 5 model names (textContent) and says *"Tap Remember this to keep it."*
+- **Remember this:** `setManualPort(port)` → `showToast('Remembered · door ' + port)` if available → close picker → `lookAgain()` (resets the same bounded loop; it's a tap).
+- **Back to automatic:** `clearManualPort()` → message/toast *"Back to automatic — we'll look for Bridge first, then Ollama."* → close picker → `lookAgain()`.
+- **Close:** `_pickerOpen = false` → `render(_lastReport, true)` → if loop not stopped and not connected, `scheduleLoop()`.
+- **Change** (`data-flc-change`): `_pickerOpen = true; _pickerMsg = null; _pickerTried = null;` render, then `scanPorts().then(paintPicker)`. Set `aria-expanded="true"` and move focus to the input.
+- Works when already connected too (the Using line + Change show always; connected state doesn't block choosing).
+
+## Exact source excerpt, characters 27405–28018
+
+### A11. Loop discipline while the picker is open (`tickLoop`, line 361)
+After the existing `LOOP_MAX_MS` check (so the 5-minute cap still applies), add:
+```js
+if (_pickerOpen) {           // person is choosing — don't probe or redraw under their fingers
+  nextBackoff();
+  scheduleLoop();            // same single timer; cap still enforced above
+  return;
+}
+```
+`mount()` and `unmount()` reset `_pickerOpen = false; _pickerMsg = null; _pickerTried = null;` (don't clear `_lastFound` in mount; do in unmount). No `setInterval` anywhere in the module — keep `grep -n setInterval docs/modules/fl-connect.js` empty.
+
+## Exact source excerpt, characters 28020–29313
+
+### A12. `panelVisible()` (line 320) — optional but recommended fix (known risk)
+Today it only returns false for inline `display:none` or `hidden`; FreeLattice hides tabs via **class** (`.tab-panel` / `.tab-panel.active`, app.html 490/499), and `switchTab` never unmounts, so the loop can keep running for up to 5 min after leaving Connect. Replace the body with:
+```js
+function panelVisible() {
+  if (!_hostEl) return false;
+  try {
+    if (!document.body.contains(_hostEl)) return false;
+    if (_hostEl.hidden) return false;
+    var cs = getComputedStyle(_hostEl);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    var rects = (typeof _hostEl.getClientRects === 'function') ? _hostEl.getClientRects() : null;
+    if (_hostEl.offsetParent === null && cs.position !== 'fixed' && (!rects || rects.length === 0)) return false;
+    var tab = document.getElementById('tab-connect');
+    if (tab && tab.contains && tab.contains(_hostEl) && !tab.classList.contains('active')) return false;
+  } catch (e) {}
+  return true;
+}
+```
+Alpha: `#fl-connect-mount` (settings.html 40) and `#fl-connect-mount-garden` are visible when shown and `closePlace` already unmounts — unaffected. The vm smokes stub `document.body.contains → false`, so they already see "not visible"; fine.
+
+## Exact source excerpt, characters 29315–30210
+
+### A13. Styles (`ensureStyles`, 513) — append
+```
+.flc-using{font-size:.85rem;color:rgba(200,210,230,.85);margin:0 0 1rem}
+.flc-link{background:none;border:0;padding:0 .35rem;min-height:44px;color:#e8b019;font:inherit;text-decoration:underline;cursor:pointer}
+.flc-picker .flc-ports{display:flex;flex-wrap:wrap;gap:.45rem;margin:.5rem 0 .8rem}
+.flc-port{min-height:44px;padding:.5rem .8rem;border-radius:10px;border:1px solid rgba(200,210,230,.16);background:rgba(8,6,18,.45);color:#e6ebf5;font:inherit;cursor:pointer}
+.flc-input{min-height:44px;width:10rem;padding:.4rem .6rem;border-radius:10px;border:1px solid rgba(200,210,230,.25);background:rgba(8,6,18,.6);color:#e6ebf5;font:inherit}
+.flc-msg{font-size:.85rem;margin:.6rem 0 0;line-height:1.45}
+.flc-msg-ok{color:#34d399}.flc-msg-warn{color:#e8b019}
+.flc-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.6rem}
+```
+
+## Exact source excerpt, characters 30212–30330
+
+### A14. Marker line (474) — layer
+`v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · soft leave sw.js`
+
+## Exact source excerpt, characters 30332–30504
+
+### A15. Exports (`root.FlConnect`, 558) — add, keep all existing
+`parseLocalPort, getManualPort, setManualPort, clearManualPort, tryPort, scanPorts, usingText, MANUAL_KEY`
+
+## Exact source excerpt, characters 30506–30509
+
+---
+
+## Exact source excerpt, characters 30511–30587
+
+## PART B — FreeLattice `docs/app.html` (then `cp docs/app.html index.html`)
+
+## Exact source excerpt, characters 30589–32864
+
+### B1. New helper block — insert right after `flRememberHelpedBridge` ends (after line 31428)
+```js
+// v-connect-port-picker-v0 — person's own door number. 127.0.0.1 only. Digits only in storage.
+// Most recent explicit choice wins. Automatic writers yield while this is set.
+var FL_LOCAL_PORT_MANUAL_KEY = 'fl_localPort_manual';
+function flManualLocalPort() {
+  try {
+    var v = String(localStorage.getItem(FL_LOCAL_PORT_MANUAL_KEY) || '').trim();
+    if (!/^\d{1,5}$/.test(v)) return null;
+    var n = parseInt(v, 10);
+    return (n >= 1 && n <= 65535) ? n : null;
+  } catch (e) { return null; }
+}
+function flSetManualLocalPort(port) {
+  port = parseInt(port, 10);
+  if (!(port >= 1 && port <= 65535)) return null;
+  var base = 'http://127.0.0.1:' + port;
+  try {
+    localStorage.setItem(FL_LOCAL_PORT_MANUAL_KEY, String(port));
+    localStorage.setItem('fl_ollamaHost', '127.0.0.1:' + port);
+    localStorage.setItem('fl_provider', 'ollama');
+  } catch (e0) {}
+  try { _ollamaResolvedBase = { base: base, isProxy: false, manual: true }; } catch (e1) {}
+  try { if (typeof state !== 'undefined' && state) state.provider = 'ollama'; } catch (e2) {}
+  try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.syncFromStorage) FLBoxPointer.syncFromStorage(); } catch (e3) {}
+  return base;
+}
+function flClearManualLocalPort(opts) {
+  opts = opts || {};
+  var old = flManualLocalPort();
+  try {
+    localStorage.removeItem(FL_LOCAL_PORT_MANUAL_KEY);
+    if (!opts.keepHost && old && localStorage.getItem('fl_ollamaHost') === '127.0.0.1:' + old) {
+      localStorage.removeItem('fl_ollamaHost');
+    }
+  } catch (e0) {}
+  try { _ollamaResolvedBase = null; } catch (e1) {}
+  try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.syncFromStorage) FLBoxPointer.syncFromStorage(); } catch (e2) {}
+  return old;
+}
+```
+Export beside 31496–31500: `window.flManualLocalPort = flManualLocalPort; window.flSetManualLocalPort = flSetManualLocalPort; window.flClearManualLocalPort = flClearManualLocalPort;`
+(Must live in app.html, not only in fl-connect.js, because fl-connect.js loads with `defer` at 68378 and `getOllamaBaseUrl` can run before it.)
+`FLBoxPointer.syncFromStorage` is in FLBoxPointer's returned API (confirmed; already used by `flSaveOllamaHost` at 34253).
+
+## Exact source excerpt, characters 32866–33450
+

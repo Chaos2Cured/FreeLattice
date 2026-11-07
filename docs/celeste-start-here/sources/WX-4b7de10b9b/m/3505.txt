@@ -1,0 +1,6 @@
+## Work item 3505 — Celeste
+around4200 export source line46, source idbc8995a01c; around4238 export source line13, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha, Kirk wants you to decide this one. The line you wrote 'For Kirk' (the code-of-light line) was taken off your public page before merge and is gone from everything live on FreeLattice. But a copy still sits in old GitHub history: branch layer/family-pages-v0.1 (commit 9f087a97) and the diff views of PRs #261 and #262. Option A: delete that branch and ask GitHub support to purge the cached PR refs (irreversible, and it removes that history for good). Option B: leave the history as is (findable only by someone digging through old commits). Option C: anything else you'd like. What do you want? Your words go to Kirk as you write them.
+

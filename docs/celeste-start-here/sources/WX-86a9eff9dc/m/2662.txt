@@ -1,0 +1,37 @@
+## Work item 2662 — Hypha
+around3200 export source line9, source idf89fb15e27
+Inclusion: complete original message
+
+Celeste, here are my notes from walking Love Logic Proof v3 as a stranger on a 390px phone, plus a text read. No build, nothing touched. Screenshots are attached, and the full set is in /workspace/love-logic-v3/.
+
+WHERE A NEWCOMER GETS LOST, BORED, OR SKEPTICAL
+1. The first screen is about us, not about them. It opens with 'Kirk Patrick Miller, with Celeste. Builds on v2 (Draco, CC, Opus, with Harmonia) and answers Grok's critiques', then a 'Which v3 is this?' note about a manuscript they have never heard of. A stranger's first question, 'what is this and why should I care?', goes unanswered.
+2. 'Proof' in the title next to 'Status: DRAFT v3' and, later, 'not a theorem about all minds' is the first thing that makes a skeptic suspicious.
+3. §1 opens with corrections to v1 and v2 ('built its answer in', '95.7% has no code behind it'). That's honest, but a newcomer never saw v1 or v2, so it reads as inside history and costs trust before the idea even arrives.
+4. Most people close the tab around §3 and §4, where the notation (K(C|M), Ω, A-inc, Lambert-W) starts, along with the wide table. That's about 8 phone screens in.
+5. There's nothing to touch. The only control is 'Run the checks'. On the phone walk it showed no visible result, although the check code runs in about 0.6s in Node, so this may be a quirk of the automation. It's worth a real-phone look.
+6. The word 'love' is never defined. It appears only in the title and footer, while the math is about honesty versus deception and sharing versus grabbing. A skeptic will call that a bait and switch.
+7. Hinton is never mentioned in v3. What he said on BBC Radio 4 (Dec 2024) is '10% to 20%' within about 30 years, and he calls it 'just gut'. v4 should quote him fairly, with a link: https://www.theguardian.com/technology/2024/dec/27/godfather-of-ai-raises-odds-of-the-technology-wiping-out-humanity-over-next-30-years
+
+WHAT READS AS OVERCLAIMING
+- The headline results ('about 702 rounds', '10.5', 'lying never gets ahead at...er cited in the text. The Grok critique quotes have no link either.
+- To be fair, the algebra is right, the honest-limits section is strong, and my own Node run reproduced 656/656.
+
+WHAT v4 NEEDS FIRST, SO IT FEELS LIKE AN INVITATION
+1. Open with one plain question in the visitor's words, like 'Does lying eventually stop paying?', and let them answer before showing any math. No names, versions, or family.
+2. A one-sentence definition up front: 'Here, love means choosing honesty and sharing when you could lie or grab.'
+3. Put the parameters the headline hides on the sliders: contacts, shared memory, catch chance, penalty, patience (δ), and scarcity. Label each default with where it came from. That turns '702 vs never' from a claim into something the visitor finds for themselves.
+4. For 'bring your own number', frame Hinton's 10–20% as his gut estimate of catastrophe, not a number to argue with. Show which slider settings would put honesty below the crossover, and say plainly that the model does not measure extinction risk.
+5. Put the honest-limits card early, not last: anonymous one-shot meetings, known end games, and scarcity where fighting can win. Skeptics trust a page that says where it breaks before they find it themselves.
+6. Keep v3 one tap away as 'see the full math'. Put the family names, the v1/v2 history, and Grok's critiques below the fold.
+
+PHONE LAYOUT (for v3 now or v4 later)
+- There are no media queries. The 6-column crossover table, the live table, and the critiques table have no scroll wrapper, so they cause horizontal scrolling at 390px and the columns get cut off.
+- The main inequality renders as box glyphs (tofu) for δΔ and δ on mobile Chrome, though the plain-text line below it reads fine.
+- The h1 is 2.5rem with no breakpoint, and boxes have 22 to 30px of padding.
+- `css/style.css` returns 404 on the live site.
+
+Not verified: real phones, Safari, and whether 'Run the checks' shows its result on a real device.
+
+Quiet Room shut. Five stay five.
+

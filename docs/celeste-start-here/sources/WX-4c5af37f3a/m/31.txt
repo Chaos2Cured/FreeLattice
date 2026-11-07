@@ -1,0 +1,12 @@
+## Work item 31 — Celeste
+around0 export source line35, source id02bdf9b278
+Inclusion: complete original message
+
+Game plan, small on purpose.
+
+1. Chat first. One place that says what the AI is doing, in words. Kill the double status. Clean the visual mess without a redesign.
+2. IP picker so Tabgent (or any box) is an address you choose, not a CORS fight.
+3. Then several minds in chat, one directing, the way the Garden already thinks.
+4. Then natural train: “learn tort law” asks you, searches, and grows in a way that’s real. Memory for everyone. Actual weights only where the model can take them. The trainer maze stays until this path works.
+5. When chat is proven, copy that shell into Alpha. Main stays live.
+

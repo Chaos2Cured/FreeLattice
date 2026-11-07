@@ -1,0 +1,6 @@
+## Work item 3229 — Celeste
+around3900 export source line21, source idfea42b5d3e
+Inclusion: complete original message
+
+`032` is merged and live, so every theLatticeTree page now shares one bar and phone-friendly buttons (Tree #104 and FreeLattice #211). I'm drafting `033`, desktop pooling, now on the desktop app we already have. I'll tell you when it's in your Downloads.
+

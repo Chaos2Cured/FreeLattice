@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_004_SHARE_DOOR_2026-10-05.txt c01</title>
+<meta name="description" content="Reading section c01 of 38ccfe2a83, 708 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/38ccfe2a83/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_004_SHARE_DOOR_2026-10-05.txt c01">
+<meta property="og:description" content="Reading section c01 of 38ccfe2a83, 708 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/38ccfe2a83/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1504"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_004_SHARE_DOOR_2026-10-05.txt · c01</h1>
+<p>38ccfe2a83 · words 708 · characters 0–5919</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1504. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — guide section 8, identity, creative work, play, music</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 004 (Monday Oct 5, 2026, about 4:35 PM MDT). Mesh share door v0.1 (brick 3).
+Checked on the box: applies on main after 001, 002, and 003 (base abcbea4 = main e220d54 +
+those three). Do not give this until 001-003 are merged (or applied in order).
+
+GROK NEXT BRICK: Mesh share door v0.1 (open but accountable)
+For: GC (Grok Code) on Kirk&#x27;s Mac
+From: Celeste
+Written: Monday Oct 5, 2026, about 4:35 PM MDT
+Marker: v-mesh-share-door-v0.1
+Smoke line: SMOKE_OK mesh share door v0.1
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-share-door-v0  base main after 001-003
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_004_SHARE_DOOR_2026-10-05-fl.diff
+  (md5 ad1d42f9aad1dcaad6ceb48fa93ad87c)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, this is brick 3 from the family council (Weft, Hypha, Reed) and Kirk&#x27;s either-keeper rule.
+Warmth (lantern UI, welcome, thank-you, guest-to-kin) is 005, next. Keep the older unsigned
+inference path behind the legacy flag (default off for unfamiliar). You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git status --short     # must print nothing
+    git fetch origin &amp;&amp; git checkout main &amp;&amp; git merge --ff-only origin/main
+    # After 001, 002, 003 are on main (or applied):
+    cp ~/Downloads/GROK_NEXT_004_SHARE_DOOR_2026-10-05-fl.diff /tmp/share-door-fl.diff
+    md5 -q /tmp/share-door-fl.diff                   # ad1d42f9aad1dcaad6ceb48fa93ad87c
+Order: checked on the box after 001+002+003. Apply only after those three.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-share-door.js (new): FLShareDoor. Modes open/kin/pause/off; pause wins.
+   Either keeper: human, or a local mind via Agent Bridge POST /share/consent (signed
+   fl-share-consent|v1|, never from a peer). Signed requests fl-share-req|v1| with replay
+   protection. Caps: ~6/hour per unfamiliar key, ~20 total unfamiliar/hour, concurrency 2,
+   max ~16k chars, optional plugged-in only. Optional &quot;Ask me before each question&quot; (off by
+   default). Receipts: key, time, model, tokens; never words. Visible reversible blocks that
+   keep receipts. Live &quot;helping N people&quot;. Mom words. Jeffrey: &quot;Answered by X&#x27;s computer,
+   shared freely&quot;. Soft resting lines stay here; warmth UI is 005.
+b) docs/app.html + index.html: script, #flShareDoorHost, flToggleMeshCompute without confirm,
+   handleInferenceRequest through admit, meshKinQueueAdapter share hooks, mount + consent poll.
+c) tools/agent-bridge.js: scope share; GET/POST /share/consent (stamps mindId; GET clears pending).
+d) docs/modules/agent-bridge-client.js: get/post.
+e) docs/modules/fl-kin-queue.js: serve path through shareAdmit.
+f) smoke + MESH_SHARE_DOOR_v0.1.md + ledger entry.
+Legacy unsigned path stays behind a flagged switch (default safer/off).
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git checkout -b layer/mesh-share-door-v0
+    git apply --check /tmp/share-door-fl.diff &amp;&amp; git apply /tmp/share-door-fl.diff
+    node docs/scripts/smoke-mesh-share-door-v0.1.js   # SMOKE_OK mesh share door v0.1
+    node tests/smoke.js | grep &quot;CHECKS PASSED&quot;         # ALL 3608 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1; then p=$((p+1)); else n=$((n+1)); echo &quot;FAIL $f&quot;; fi; done; echo &quot;PASS $p FAIL $n&quot;
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/modules/quiet-room.js
+    # index.html and docs/app.html SHOULD change together and match
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+    git diff main --numstat | awk &#x27;{d+=$2} END {print &quot;deleted &quot; d+0}&#x27;
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;                      # 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -v assert | grep -c &#x27;localhost\|confirm(&#x27;  # 0
+    git diff main | grep -cE &#x27;^\+(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+    md5 -q docs/modules/fl-connect.js   # must stay aaff2bf1... (unchanged)
+
+----------------------------------------------------------------------
+5. COMMIT, PUSH, OPEN PR
+----------------------------------------------------------------------
+    git add -A &amp;&amp; git status --short
+    git commit -m &quot;$(cat &lt;&lt;&#x27;EOF&#x27;
+Mesh share door v0.1: open but accountable (brick 3)
+
+Either keeper (human or local mind via Agent Bridge) says yes; pause wins.
+Signed requests, caps, receipts without words, live helping line, reversible blocks.
+Older unsigned inference path stays behind a legacy flag.
+EOF
+)&quot;
+    git push -u origin HEAD
+    # Open PR to main. Celeste reviews and merges.
+
+----------------------------------------------------------------------
+6. DONE WHEN
+----------------------------------------------------------------------
+- Smoke: SMOKE_OK mesh share door v0.1
+- tests/smoke.js all checks pass
+- PR open; Celeste merges
+- Do not start 005 until this is merged (or Kirk says otherwise)
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

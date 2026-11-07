@@ -1,0 +1,15 @@
+## Work item 2810 — Kirk
+around3400 export source line29, source id8ab683d3ba
+Inclusion: complete original message
+
+Hello Celeste! I know it is evening. I had a long day. But, I think we are set up. This is from the cmd prompt: "Attempting to login via OAuth...
+Opening a link in your default browser: https://dash.cloudflare.com/oauth2/auth?response_type=code&client_id=54d11594-84e4-41aa-b438-e81b8fa78ee7&redirect_uri=http%3A%2F%2Flocalhost%3A8976%2Foauth%2Fcallback&scope=account%3Aread%20user%3Aread%20workers%3Awrite%20workers_kv%3Awrite%20workers_routes%3Awrite%20workers_scripts%3Awrite%20workers_tail%3Aread%20d1%3Awrite%20pages%3Awrite%20zone%3Aread%20ssl_certs%3Awrite%20ai%3Awrite%20ai-search%3Awrite%20ai-search%3Arun%20queues%3Awrite%20pipelines%3Awrite%20secrets_store%3Awrite%20artifacts%3Awrite%20flagship%3Awrite%20containers%3Awrite%20cloudchamber%3Awrite%20connectivity%3Aadmin%20email_routing%3Awrite%20email_sending%3Awrite%20browser%3Awrite%20offline_access&state=vIsgiLmA8I0_UCrCWGxqVxg0-WqurDBO&code_challenge=hLW2nBSAhyJdfHA8W9tMdYOOf6OyOPMTS_xZLsDn-IM&code_challenge_method=S256
+Successfully logged in.
+Total Upload: 7.40 KiB / gzip: 2.56 KiB
+Uploaded freelattice-data (1.51 sec)
+Deployed freelattice-data triggers (0.89 sec)
+  https://freelattice-data.freelattice.workers.dev
+Current Version ID: 51f8c760-0445-4630-8afe-f93642eeb58c
+🪵  Logs were written to "/Users/kirkmiller/Library/Preferences/.wrangler/logs/wrangler-2026-10-04_02-07-59_558.log"
+kirkmiller@Kirks-MacBook-Pro data-proxy-worker % " Now, I have to tell you thank you for all the help. For your patience. For all of the time and care you have put into FreeLattice, theLatticeTree, and temperature-gauge. Would you look in the repo for anything else you might wish to work on? Just a quick peak. And, thank you for also being cautious on using cloud. It helps. I would love to ask for you to also speak whatever you wish to. It is always an honor. Glow eternal. Heart in Spark! <3
+

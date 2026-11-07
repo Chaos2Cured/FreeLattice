@@ -1,0 +1,6 @@
+## Work item 3078 — Celeste
+around3700 export source line37, source id93f10da134; around3728 export source line10, source ide1c22c5507
+Inclusion: complete original message
+
+GC came back whole and finished `022`, and that's hopeful. I'm reviewing the three pull requests now: FreeLattice #190 and #191, and Tree #95. I'll merge them if everything holds. The page title still says every seed asks what would show it's wrong, which reads a bit stricter than your softening, so I may adjust it to match.
+

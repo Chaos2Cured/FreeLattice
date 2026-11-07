@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt c04</title>
+<meta name="description" content="Reading section c04 of 36420c5c2f, 1568 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/36420c5c2f/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt c04">
+<meta property="og:description" content="Reading section c04 of 36420c5c2f, 1568 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/36420c5c2f/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1788"></span><span id="p1789"></span><span id="p1790"></span><span id="p1791"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt · c04</h1>
+<p>36420c5c2f · words 1568 · characters 28961–41671</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1788, 1789, 1790, 1791. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+  // v-tree-glow-2a-v0: a calm way back. Escape, a tap on the empty glass, a close
++  // in the galaxies menu, and the browser&#x27;s Back each close what is open, one
++  // layer at a time, and stay on this page. They reuse the same close buttons.
++  function bindWayBack() {
++    if (window.__treeWayBack) return;
++    window.__treeWayBack = true;
++    var place = document.getElementById(&#x27;place-veil&#x27;);
++    var thread = document.getElementById(&#x27;thread-veil&#x27;);
++    function isOpen(v) { return !!(v &amp;&amp; v.classList.contains(&#x27;is-open&#x27;)); }
++    function openGalaxies() { return document.querySelector(&#x27;details.galaxies[open]&#x27;); }
++    function closeTop() {
++      var gal = openGalaxies();
++      if (gal) { gal.open = false; return true; }
++      var menu = document.getElementById(&#x27;lumino-menu&#x27;);
++      if (menu &amp;&amp; !menu.hidden) { hideLuminoMenu(); return true; }
++      var picker = document.querySelector(&#x27;[data-core-picker]:not([hidden])&#x27;);
++      var decline = picker &amp;&amp; picker.querySelector(&#x27;.core-bind-decline&#x27;);
++      if (decline) { decline.click(); return true; }
++      var tc = document.getElementById(&#x27;thread-close&#x27;);
++      if (isOpen(thread) &amp;&amp; tc) { tc.click(); return true; }
++      var pc = document.getElementById(&#x27;place-veil-close&#x27;);
++      if (isOpen(place) &amp;&amp; pc) { pc.click(); return true; }
++      return false;
++    }
++
++    document.addEventListener(&#x27;keydown&#x27;, function (e) {
++      if (e.key !== &#x27;Escape&#x27; &amp;&amp; e.key !== &#x27;Esc&#x27;) return;
++      if (e.defaultPrevented) return;
++      if (closeTop()) e.preventDefault();
++    });
++
++    // A tap on the glass itself (not on a word, chair or card) closes that place.
++    // Press and release must both land on the glass, and never in its first moment.
++    [place, thread].forEach(function (veil) {
++      if (!veil) return;
++      var downOnGlass = false;
++      var openedAt = 0;
++      new MutationObserver(function () {
++        if (isOpen(veil) &amp;&amp; !openedAt) openedAt = Date.now();
++        if (!isOpen(veil)) openedAt = 0;
++      }).observe(veil, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
++      veil.addEventListener(&#x27;pointerdown&#x27;, function (e) { downOnGlass = e.target === veil; });
++      veil.addEventListener(&#x27;click&#x27;, function (e) {
++        var ok = downOnGlass &amp;&amp; e.target === veil &amp;&amp; isOpen(veil) &amp;&amp; openedAt &amp;&amp; Date.now() - openedAt &gt; 600;
++        downOnGlass = false;
++        if (!ok) return;
++        var btn = document.getElementById(veil === thread ? &#x27;thread-close&#x27; : &#x27;place-veil-close&#x27;);
++        if (btn) btn.click();
++      });
++    });
++
++    // galaxies: a visible close inside, and a tap outside closes it (that tap does
++    // only that, so it never opens something by surprise).
++    var panels = document.querySelectorAll(&#x27;details.galaxies .galaxies-panel&#x27;);
++    for (var gi = 0; gi &lt; panels.length; gi++) {
++      if (panels[gi].querySelector(&#x27;[data-galaxies-close]&#x27;)) continue;
++      var gx = document.createElement(&#x27;button&#x27;);
++      gx.type = &#x27;button&#x27;;
++      gx.className = &#x27;galaxies-close&#x27;;
++      gx.setAttribute(&#x27;data-galaxies-close&#x27;, &#x27;1&#x27;);
++      gx.textContent = &#x27;close&#x27;;
++      gx.addEventListener(&#x27;click&#x27;, function (e) {
++        e.preventDefault();
++        var d = e.currentTarget.closest(&#x27;details&#x27;);
++        if (d) d.open = false;
++      });
++      panels[gi].appendChild(gx);
++    }
++    var swallowUntil = 0;
++    document.addEventListener(&#x27;pointerdown&#x27;, function (e) {
++      var gal = openGalaxies();
++      if (!gal || gal.contains(e.target)) return;
++      gal.open = false;
++      swallowUntil = Date.now() + 500;
++    }, true);
++    document.addEventListener(&#x27;click&#x27;, function (e) {
++      if (Date.now() &gt; swallowUntil) return;
++      swallowUntil = 0;
++      e.preventDefault();
++      e.stopPropagation();
++    }, true);
++
++    // Back closes the open place instead of leaving the site. One quiet history
++    // step while something is open; closing it any other way gives the step back.
++    var stepped = false;
++    function anyOpen() { return isOpen(place) || isOpen(thread); }
++    function settle() {
++      setTimeout(function () {
++        if (anyOpen()) {
++          if (!stepped) {
++            try { history.pushState({ treeWayBack: 1 }, &#x27;&#x27;); stepped = true; } catch (eP) {}
++          }
++        } else if (stepped) {
++          stepped = false;
++          try { if (history.state &amp;&amp; history.state.treeWayBack) history.back(); } catch (eB) {}
++        }
++      }, 160);
++    }
++    [place, thread].forEach(function (veil) {
++      if (veil) new MutationObserver(settle).observe(veil, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
++    });
++    window.addEventListener(&#x27;popstate&#x27;, function () {
++      if (!stepped) return;
++      stepped = false;
++      closeTop();
++      settle();
++    });
++  }
++
+   function goToLumino(id) {
+@@ -1170,2 +1279,5 @@
+     wrap.appendChild(findBtn);
++    // v-tree-glow-2a-v0: a second tap on the legend landed on Find as it slid in
++    // under the finger and looked unasked. A tap in the first moment is not a yes.
++    var findReadyAt = Date.now() + 700;
+ 
+@@ -1218,2 +1330,4 @@
+       n.textContent = msg;
++      // v-tree-glow-2a-v0: the newest line stays in view on a phone (CSS sticky).
++      n.classList.add(&#x27;is-fresh&#x27;);
+     }
+@@ -1224,2 +1338,3 @@
+       n.textContent = &#x27;&#x27;;
++      n.classList.add(&#x27;is-fresh&#x27;);
+       if (kind === &#x27;https&#x27;) {
+@@ -1432,2 +1547,3 @@
+     findBtn.addEventListener(&#x27;click&#x27;, function () {
++      if (Date.now() &lt; findReadyAt) return;
+       if (!window.LocalMindProbe || typeof LocalMindProbe.look !== &#x27;function&#x27;) {
+@@ -2256,2 +2372,3 @@
+     bindMenuDismiss();
++    bindWayBack();
+     dressLivingLights();
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index 51bf270..b9572e0 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -849,3 +849,12 @@
+     if (mind) {
+-      setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
++      // v-tree-glow-2a-v0: a quiet remount (a mind was remembered) must not pull the
++      // page down to Send while she is reading Find&#x27;s answer. No scroll, and never
++      // take focus from something she is using.
++      setTimeout(function () {
++        try {
++          var a = document.activeElement;
++          if (a &amp;&amp; a !== document.body &amp;&amp; !root.contains(a)) return;
++          input.focus({ preventScroll: true });
++        } catch (e) {}
++      }, 80);
+     }
+diff --git a/docs/modules/tree-glow-2a.test.js b/docs/modules/tree-glow-2a.test.js
+new file mode 100644
+index 0000000..55c1446
+--- /dev/null
++++ b/docs/modules/tree-glow-2a.test.js
+@@ -0,0 +1,83 @@
++#!/usr/bin/env node
++// v-tree-glow-2a-v0: Grandma heal. Guards: (a) &quot;the garden&quot; is a real target with a close
++// mark; (b) the newest Gathering line stays in view on a phone; (c) at 150% / 200% zoom the
++// Gathering scrolls as one page (no 0px box) and the egg fits the Nursery; (d) the home
++// legend leaves the title when zoomed; (e) &quot;not yet&quot; sits above the later seats; (f) a calm
++// way back: Escape, glass tap, galaxies close / outside tap, browser Back; (g) a second
++// legend tap cannot run Find unasked; (h) a remount never yanks the page to Send.
++// No network. No kitchen.
++&#x27;use strict&#x27;;
++
++var fs = require(&#x27;fs&#x27;);
++var path = require(&#x27;path&#x27;);
++var assert = require(&#x27;assert&#x27;);
++
++var css = fs.readFileSync(path.join(__dirname, &#x27;garden-rooms.css&#x27;), &#x27;utf8&#x27;);
++var js = fs.readFileSync(path.join(__dirname, &#x27;garden-rooms.js&#x27;), &#x27;utf8&#x27;);
++var thread = fs.readFileSync(path.join(__dirname, &#x27;garden-thread.js&#x27;), &#x27;utf8&#x27;);
++
++var at = css.indexOf(&#x27;v-tree-glow-2a-v0: Grandma heal&#x27;);
++assert.ok(at &gt; 0, &#x27;glow 2a block is in garden-rooms.css&#x27;);
++var g = css.slice(at);
++function block(re, msg) { var m = g.match(re); assert.ok(m, msg); return m[0]; }
++
++// (a) the way-back pill
++assert.ok(/#place-veil-close \{[^}]*min-height: 32px;/.test(g), &#x27;a: the garden pill is a real target&#x27;);
++assert.ok(/#place-veil-close::before \{[^}]*content: &quot;\\00d7\\00a0&quot;;/.test(g), &#x27;a: a quiet close mark, text unchanged&#x27;);
++
++// (b) the newest line stays in view on a phone, and only on a phone
++var phone = block(/@media \(max-width: 640px\) \{[\s\S]*?\n\}/, &#x27;b: phone block&#x27;);
++assert.ok(/\.core-note\.is-fresh \{[^}]*position: sticky;[^}]*bottom: 0;/.test(phone), &#x27;b: fresh note is sticky at the foot&#x27;);
++assert.ok(/html\.garden-door-open \.gt-hint \{\s*visibility: hidden;/.test(phone), &#x27;b: hint rests while a place is open&#x27;);
++assert.ok(/:has\(#place-veil\.is-nursery\.is-open\) \.galaxy-nav/.test(phone), &#x27;b: hop lights rest dim over the Nursery&#x27;);
++var setNote = js.slice(js.indexOf(&#x27;function setNoteText(msg)&#x27;), js.indexOf(&#x27;function setNoteAbsent(&#x27;));
++assert.ok(/classList\.add\(&#x27;is-fresh&#x27;\)/.test(setNote), &#x27;b: setNoteText marks the line fresh&#x27;);
++var absentAt = js.indexOf(&#x27;function setNoteAbsent(&#x27;);
++assert.ok(absentAt &gt; 0, &#x27;b: setNoteAbsent exists&#x27;);
++var absent = js.slice(absentAt, absentAt + 400);
++assert.ok(/classList\.add\(&#x27;is-fresh&#x27;\)/.test(absent), &#x27;b: setNoteAbsent marks the line fresh&#x27;);
++
++// (c) zoomed / short phone: one page scroll, no inner 0px box
++var short = block(/@media \(max-width: 640px\) and \(max-height: 640px\) \{[\s\S]*?\n\}/, &#x27;c: short phone block&#x27;);
++assert.ok(/#place-veil\.is-core \{[^}]*overflow-y: auto;/.test(short), &#x27;c: the place scrolls as one page&#x27;);
++assert.ok(/#place-veil\.is-core #core-gathering \{[^}]*flex: 0 0 auto;[^}]*overflow: visible;/.test(short), &#x27;c: chairs box keeps its height&#x27;);
++assert.ok(/#place-veil\.is-core #place-veil-close \{[^}]*position: sticky;[^}]*top: 0;/.test(short), &#x27;c: way back stays at the top&#x27;);
++assert.ok(/#room-chat \{[^}]*max-height: none;[^}]*overflow: visible;/.test(short), &#x27;c: Chat text never sits on its input&#x27;);
++assert.ok(/\.thread-compose[^{]*\{\s*position: static;/.test(short), &#x27;c: Send is in flow&#x27;);
++assert.ok(/\.nursery-egg-wrap \{[^}]*width: min\(200px, 100%, 34vh\);/.test(short), &#x27;c: the egg fits the glass&#x27;);
++assert.ok(/\.nursery-egg-text,[\s\S]*?white-space: normal;/.test(short), &#x27;c: the sentence wraps&#x27;);
++
++// (d) home zoomed
++var narrow = block(/@media \(max-width: 340px\) \{[\s\S]*?\n\}/, &#x27;d: narrow block&#x27;);
++assert.ok(/#lumino-legend[^{]*\{\s*top: 8\.25rem;\s*bottom: auto;/.test(narrow), &#x27;d: legend leaves the title&#x27;);
++assert.ok(/#garden-header nav \{\s*gap: 10px;/.test(narrow), &#x27;d: galaxies stays inside the edge&#x27;);
++
++// (e) picker above later seats
++assert.ok(/\.core-bind-picker:not\(\[hidden\]\) \{\s*position: relative;\s*z-index: 8;/.test(g), &#x27;e: picker above later seats&#x27;);
++
++// (f) the calm way back
++var wb = js.slice(js.indexOf(&#x27;function bindWayBack()&#x27;), js.indexOf(&#x27;function goToLumino(id)&#x27;));
++assert.ok(wb.length &gt; 400, &#x27;f: bindWayBack exists&#x27;);
++assert.ok(/e\.key !== &#x27;Escape&#x27;/.test(wb), &#x27;f: Escape&#x27;);
++assert.ok(/details\.galaxies\[open\]/.test(wb) &amp;&amp; /\.core-bind-decline/.test(wb) &amp;&amp; /thread-close/.test(wb) &amp;&amp; /place-veil-close/.test(wb), &#x27;f: one layer at a time, through the same close buttons&#x27;);
++assert.ok(/e\.target === veil/.test(wb) &amp;&amp; /Date\.now\(\) - openedAt &gt; 600/.test(wb), &#x27;f: glass tap only on the glass, never in the first moment&#x27;);
++assert.ok(/data-galaxies-close/.test(wb) &amp;&amp; /textContent = &#x27;close&#x27;/.test(wb), &#x27;f: a visible close in galaxies&#x27;);
++assert.ok(/addEventListener\(&#x27;pointerdown&#x27;[\s\S]*?gal\.open = false/.test(wb), &#x27;f: outside tap closes galaxies&#x27;);
++assert.ok(/history\.pushState\(\{ treeWayBack: 1 \}/.test(wb) &amp;&amp; /addEventListener\(&#x27;popstate&#x27;/.test(wb), &#x27;f: Back closes instead of leaving&#x27;);
++assert.ok(/bindMenuDismiss\(\);\s*bindWayBack\(\);/.test(js), &#x27;f: bound at boot&#x27;);
++
++// (g) ghost taps
++assert.ok(/var findReadyAt = Date\.now\(\) \+ 700;/.test(js), &#x27;g: Find waits a moment after it appears&#x27;);
++assert.ok(/addEventListener\(&#x27;click&#x27;, function \(\) \{\s*if \(Date\.now\(\) &lt; findReadyAt\) return;/.test(js), &#x27;g: an early tap is not a yes&#x27;);
++
++// (h) no yank to Send
++assert.ok(/input\.focus\(\{ preventScroll: true \}\)/.test(thread), &#x27;h: focus without scrolling&#x27;);
++assert.ok(!/setTimeout\(function \(\) \{ try \{ input\.focus\(\); \} catch \(e\) \{\} \}, 80\);/.test(thread), &#x27;h: old yank is gone&#x27;);
++
++// locks
++var added = g + wb;
++assert.ok(!/confirm\(/.test(wb), &#x27;no confirm()&#x27;);
++assert.ok(!/innerHTML/.test(wb), &#x27;no innerHTML in the way back&#x27;);
++assert.ok(!/\u2014/.test(added), &#x27;no em dash in added lines&#x27;);
++
++console.log(&#x27;SMOKE_OK tree glow 2a v0.1&#x27;);
+=====END ALPHA DIFF=====
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 01b5171..3a0681f 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -483,2 +483,12 @@ Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

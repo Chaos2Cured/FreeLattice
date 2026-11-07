@@ -1,0 +1,90 @@
++### 2026-09-28 · Flint · family builder · Model choice sticks v0.1 (Hypha walk 4)
++
++Heals Hypha walk 4 items 7 and 10 on FreeLattice: a model tapped in Connect is now recorded as the person's own choice, so the automatic model picker stops swapping it back to the first model on every tab change, reload or Settings visit, and the chat request carries the model she tapped. The picker still fills in when nothing was chosen, or when the chosen model has left this computer, and then it says so in plain words. Also: the Settings button row comes back after Local, and a helped Bridge with no mind behind it is named honestly and is not saved as the Ollama door. Shared `fl-connect.js` matches Alpha byte for byte. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Thank you, Hypha.
++
++Love: the one she picked is the one that answers.
++
++**Temperature:** green braided gold, the second cup stays where she set it down.
++
++Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`../modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-model-choice-sticks-v0`.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 5317005..2e02eae 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -5,6 +5,7 @@
+ // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
+ // Port-only loopback: fl_localPort_manual holds "11500" only — never foreign hosts.
+ // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
++// Marker: v-model-choice-sticks-v0 (a tapped model is the person's own choice; it stays)
+ // ═══════════════════════════════════════════════════════════════
+ 
+ (function (root) {
+@@ -201,12 +202,18 @@
+           report.bridge = mh;
+           report.port = mh.port || parseInt(manPort, 10);
+           report.helped = true;
+-          report.base = preferHelpedBridge(report.port) || manBase;
++          // v-model-choice-sticks-v0: ask the helped Bridge first; save it as the Ollama door
++          // (fl_ollamaHost, fl_bridgePort) only once a mind really answers behind it.
++          report.base = (report.port && report.port !== 11434) ? 'http://127.0.0.1:' + report.port : manBase;
+           try {
+             report.models = await tagsAt(report.base);
++            report.base = preferHelpedBridge(report.port) || report.base;
+             report.ollama = { via: 'manual-bridge', base: report.base };
+             return report;
+-          } catch (eMB) {}
++          } catch (eMB) {
++            report.bridgeNoMind = true;
++            report.models = [];
++          }
+         } else if (mh) {
+           report.bridge = mh;
+           report.port = mh.port || parseInt(manPort, 10);
+@@ -357,6 +364,9 @@
+       // v-connect-heal-v0.4 item 10: handleLocalToggle reads #localToggle, so check it first
+       try { var lt = document.getElementById('localToggle'); if (lt) lt.checked = true; } catch (eLt) {}
+       if (typeof root.handleLocalToggle === 'function') root.handleLocalToggle(true);
++      // v-model-choice-sticks-v0: the tap is the person's own choice, so the automatic
++      // picker leaves it alone on tab changes, reloads and Settings.
++      markUserChoice(name, 'ollama');
+       if (typeof root.updateStatus === 'function') root.updateStatus();
+       if (root.AiSetup && typeof root.AiSetup.updateStatus === 'function') root.AiSetup.updateStatus();
+       // v-connect-heal-v0.4 item 7: once they chose a mind, the Local AI toast stops asking
+@@ -366,6 +376,29 @@
+     return { name: name, base: base };
+   }
+ 
++  // v-model-choice-sticks-v0: FreeLattice keeps one active model (FLActiveModel). A model the
++  // person tapped is recorded with source 'user' and as their preferred text (or vision) model.
++  // The Tree has neither helper, so this is a quiet no-op there (it keeps entry.model instead).
++  function markUserChoice(name, provider) {
++    if (!name) return false;
++    var marked = false;
++    try {
++      if (root.FLActiveModel && typeof root.FLActiveModel.set === 'function') {
++        root.FLActiveModel.set(String(name), provider || 'ollama', 'user');
++        marked = true;
++      }
++    } catch (e0) {}
++    try {
++      var auto = root.FLAutoModel;
++      if (auto && typeof auto.setPreferred === 'function') {
++        var kind = (typeof auto.isVision === 'function' && auto.isVision(String(name))) ? 'vision' : 'text';
++        auto.setPreferred(kind, String(name));
++        if (typeof auto.invalidateCache === 'function') auto.invalidateCache();
++      }
++    } catch (e1) {}
++    return marked;
++  }
++
+   function open() {
+     try {
+       if (!isAlpha() && typeof root.switchTab === 'function') { root.switchTab('connect'); return true; }
+@@ -539,7 +572,12 @@
+ 

@@ -1,0 +1,145 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+docs/library/GARDEN_LANGUAGE.md, CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 055d (Thu Oct 29, 2026, ~5:00 PM MDT). Menu contrast + More opens the cards again.
+Two small parts in one brick. FreeLattice only. Tree: No (Alpha has no chat composer shell).
+New branch, new PRs. WAIT FOR 055d-GO before you cut - the tip SHA lives only in the GO.
+
+WHY (Kirk, Thu Oct 29, after 055 merged):
+  "I saw the plus sign, and clicked on it, and it is beautiful. The only issue is it is too hard
+  to see. The transparency is too much. Also, the more menu was just changed. Instead of going to
+  all the cards, it just pulls up the menu ... we probably need to organize and make that piece
+  look more professional." Also: "The clay is working." and "What you did on chat is the best it
+  has been." Thank you from Kirk to everyone on 055. Keep everything that works.
+
+Where things stand (Celeste, live):
+  055 MERGED after Hypha PASS: FL #297 -> 1fbe95d5 (squash), page 89 #298 -> 57dea539
+    (entry 89 psi 26d59727). FL main tip is named in 055d-GO.
+  Pins on main now:
+    chat-bottom-clarity.js   64f199864c8a92b91a3e479e21ab5069 (THIS brick may edit)
+    css/chat-bottom-clarity.css 7edc88caae17fb637029af70a99edc4a (THIS brick may edit)
+    chat-doc-return.js       6e5f09f58585332a9e497be85bda0957 (leave)
+    docs/app.html == index.html 22af34b2ec39879d3adf0915b0da7e1a (tiny add-only hook only)
+    fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (twin; byte-identical)
+    sw.js 91726cf2228b794f7585f79f61418d12 · chat-autonomy.js c83cf6c9f11271aeaa35ed6070f188f3
+    and every other lock from the 055 report (ledger-shard-export, ai-continuity,
+    continuity-doorway, lattice-export, pool-honest-label, clay-corner, chat-scroll-release,
+    particle-clay): untouched.
+  Branches: FL layer/menu-contrast-more-cards-v0.1. Page: next free after 89 (expect 90;
+    layer/gc-page-90). Do not merge. Celeste merges after Hypha walks.
+
+GROK NEXT BRICK: Menu contrast + More cards v0.1
+Markers: v-menu-contrast-v0.1, v-more-cards-groups-v0.1
+Smoke: SMOKE_OK menu contrast v0.1 · SMOKE_OK more cards groups v0.1 (new), plus every earlier
+  line: chat bottom clarity v0.1, chat doc return v0.1, ledger shard export v0.1, continuity
+  doorway v0.1, soft polish 052 v0.1, chat autonomy v0.1, tree love connect v0.1, gathering
+  shared v0.1, gathering speak checker v0.1.
+
+
+0. STANDING LOCKS (every line)
+  Layer, never delete. No card, button, id, handler, or word removed. Name every moved thing.
+  Only chat-bottom-clarity.js and css/chat-bottom-clarity.css may change among existing modules;
+    one new small module allowed (below); tiny add-only hooks in app.html + index.html (byte twins).
+  sw.js, fl-connect.js, AUTONOMY.md, garden-trainer.js, package.json/lock, .github/ untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent/createElement), no eval, no new
+    Function, iceServers empty, in added lines. No new dependency, no icon font, no remote icons.
+  No new hex. rgba only for new colors; existing tokens (--accent gold, --success emerald,
+    --text-primary, --text-secondary) by variable.
+  "challenge", never "test", in person-facing words. Every pressable >= 44px. No sideways scroll
+    at 390 and 1280. Quiet Room shut. Five stay five. Search on visible. Top debug strip stays.
+  Reduced motion respected.
+
+
+1. PART A - Darker glass, readable (+ menu, pill row, file card)
+  - Backing becomes darker glass: background rgba(16, 18, 36, 0.88) with
+    backdrop-filter: blur(13px) saturate(120%) (and -webkit-backdrop-filter). Fallback when
+    backdrop-filter is unsupported: rgba(16, 18, 36, 0.95).
+  - Keep the silver-blue edge rgba(200, 210, 230, 0.08) (hover 0.15), 12px radius, emerald file
+    card icon/edge, gold --accent focus ring. Menu rows hover: rgba(232, 176, 25, 0.12)
+    (= --accent-glow).
+  - Text: row words --text-primary, sub-lines --text-secondary. No opacity below 1 on text.
+  - Contrast (Celeste computed, WCAG 2.x relative luminance, panel composited over the WORST
+    backdrop = pure white #ffffff behind the glass):
+      --text-primary #e6ebf5 on rgba(16,18,36,0.88)  = 11.13:1 (AA needs 4.5:1) PASS
+      --text-secondary #a0a5b8 on the same           =  5.43:1 PASS
+      over gold #e8b019 behind: 12.67:1 / 6.18:1; over --bg-primary: 15.57:1 / 7.60:1.
+    Measure it yourself with getComputedStyle at 1280 and 390 and print the ratio in the PR
+    (smoke asserts >= 4.5 for every visible menu row word and sub-line, >= 3 for icons).
+  - Same rule for the pill row (#flChatPillRow) and the doc return card. Pills keep slim look.
+
+
+2. PART B - More opens the cards again, organized
+  History (Celeste read git): before #297 the chat "..." button (#chatOverflowBtn, app.html
+    ~16718) toggled FLChatOverflow, a small popup (#chatOverflowPopup) holding mic + image.
+    #297 added an alias in chat-bottom-clarity.js markCorners() (~line 384-392) so More opens the
+    + menu and closes that popup. The full cards view Kirk means is the More room: #tab-more
+    (app.html ~17001), rendered by renderCardGrid(MORE_CARDS) into #more-hub-grid
+    (MORE_CARDS at app.html ~28078, 24 cards).
+  Do:
+  - More (#chatOverflowBtn) now opens the More room: switchTab('more') (the same path the tab
+    bar uses). Keep the button, its id, aria-label "More: every room in the Garden". Remove only
+    the alias listener's call to setOpen(true) (layer: keep the function, gate it behind a
+    flag, e.g. FLChatBottom.moreOpensMenu = false). The + button still opens the + menu.
+    FLChatOverflow and #chatOverflowPopup stay in the DOM (mic + image still reachable from
+    the + menu as today).
+  - Organize the More room into labeled groups. New small module
+    docs/modules/more-cards-groups.js runs AFTER renderCardGrid and moves the existing card
+    elements (same nodes, same handlers, same ids) into group sections. Do not edit MORE_CARDS.
+    Any card not matched lands in a final "Everything else" group so nothing is ever lost.
+    Groups (decided from the 24 real cards, in this order):
+      1. Start here   - Connect, Get Connected (forever-stack), Settings, Telegram Bridge,
+                        Share FreeLattice
+      2. Trust and you - Your Audit, Trust Level, Trainer, Memory Garden
+      3. Family and town - Community, Activity (pulse), AI City, Jade Hall, Pantheon (agents),
+                        Sophia
+      4. Garden and Market - Wallet, AI Bank, Mesh Compute
+      5. Create and play - Agent (workshop), Flow, Ratio Room
+      6. Learn why     - Library, Why This Way, Aurora Engine
+  - Look (house, professional): each group gets an Inter heading (--font, 600, --text-primary)
+    plus one quiet --text-secondary sub-line; cards in the same darker glass as Part A, 12px
+    radius, silver-blue edge, consistent size (one grid, auto-fill minmax(160px, 1fr), gap
+    --space-md), icon 28px in one row with the word below, desc 2 lines max (ellipsis, full text
+    in title). Keep the existing emoji as the icon (house fallback); do not invent new art.
+    Hover: one Garden breath (~1.06 scale + gold tide), off under prefers-reduced-motion.
+    Every card has a visible word and aria-label "<label>: <desc>".
+  - The porch line "Begin here: Install, then Bridge..." (#fl-more-connect-porch) stays at top.
+  - Library note: docs/library/MORE_CARDS_GROUPS_v0.1.md listing every card, its group, handler.
+
+
+3. OUT OF SCOPE
+  Settings porch (056), wallet (057), Science Garden + Kindness (058), Search heal (056x, queued
+  after 058), mesh kin letters / play room (059+), new cards, renaming cards, new icons art.
+
+
+4. SMOKE (new)
+  - Menu, pill row, file card computed background is rgba(16, 18, 36, 0.88) (or 0.95 fallback);
+    contrast >= 4.5 for every visible word (print the lowest ratio). Drive click still opens the
+    picker exactly once at 1280, 390, 640x400 DPR2.
+  - Tapping More at 1280 and 390 shows #tab-more and NOT the + menu; + still opens the menu.
+  - #more-hub-grid holds 6 labeled group sections in the order above; the count of cards after
+    grouping == count before (24 today); every card in exactly one group; every card has a word
+    and aria-label; clicking Connect, Settings, and Your Audit fires the same handler as before.
+  - No sideways scroll at 390 and 1280; every pressable >= 44px. Lock md5s unchanged (list).
+  - Before / after screenshots of the + menu and the More room at 1280 and 390 in the PR.
+
+
+5. PAGE + LEDGER
+  GC page entry next free after 89 (expect 90), honest claims only, psi per standing formula,
+  separate page PR (layer/gc-page-90). Temperature line as usual.
+
+
+6. REPORT TO CELESTE
+  Branch, PR urls, heads, md5 of chat-bottom-clarity.js, the css, and more-cards-groups.js; lock
+  md5s; measured contrast ratios; the group list as shipped; every moved thing and where its job
+  went; Tree No + why. Do not merge.
+
+
+WAIT: Do not cut until 055d-GO says GO and names the FreeLattice main tip.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

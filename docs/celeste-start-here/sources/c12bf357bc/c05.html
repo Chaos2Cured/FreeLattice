@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c05</title>
+<meta name="description" content="Reading section c05 of c12bf357bc, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c05">
+<meta property="og:description" content="Reading section c05 of c12bf357bc, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1042"></span><span id="p1043"></span><span id="p1044"></span><span id="p1050"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt · c05</h1>
+<p>c12bf357bc · words 1200 · characters 41236–50222</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1042, 1043, 1044, 1050. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">     if (report.manualReject) html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&#x27; + report.manualReject + &#x27;&lt;/p&gt;&lt;/div&gt;&#x27;;
+     _manualRejectMsg = &#x27;&#x27;; // v-connect-heal-v0.4 item 5: shown once, never lingers
+-    if (report.manualQuiet) {
++    if (report.manualQuiet &amp;&amp; report.bridgeNoMind) {
++      // v-model-choice-sticks-v0: the Bridge did answer; say that, and what is still missing
++      html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&lt;strong&gt;Your Bridge answered on &#x27; + (parseInt(report.port, 10) || &#x27;your port&#x27;) + &#x27;, but no mind is running behind it yet.&lt;/strong&gt; Open Ollama on this computer, then tap Look again.&lt;/p&gt;&#x27;;
++      html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-look-again&gt;Look again&lt;/button&gt; &#x27;;
++      html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-use-auto&gt;Use automatic&lt;/button&gt;&lt;/div&gt;&#x27;;
++    } else if (report.manualQuiet) {
+       html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;Nothing answered on &#x27; + (report.wanted || &#x27;your port&#x27;) + &#x27;.&lt;/p&gt;&#x27;;
+       html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-look-again&gt;Look again&lt;/button&gt; &#x27;;
+       html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-use-auto&gt;Use automatic&lt;/button&gt;&lt;/div&gt;&#x27;;
+@@ -690,6 +728,7 @@
+     hasLocalMind: hasLocalMind,
+     hasCloudMind: hasCloudMind,
+     remember: remember,
++    markUserChoice: markUserChoice, // v-model-choice-sticks-v0
+     open: open,
+     mount: mount,
+     unmount: unmount,
+diff --git a/docs/scripts/smoke-model-choice-sticks.js b/docs/scripts/smoke-model-choice-sticks.js
+new file mode 100644
+index 0000000..9ec63a0
+--- /dev/null
++++ b/docs/scripts/smoke-model-choice-sticks.js
+@@ -0,0 +1,327 @@
++#!/usr/bin/env node
++// v-model-choice-sticks-v0: a model the person taps in Connect is their own choice.
++// It survives a tab change, opening Settings and a reload, and the chat request uses it.
++// The automatic picker only fills in when the chosen model is no longer installed, and says so.
++// Also: Settings button row comes back after Local; a helped Bridge with no mind behind it is
++// named honestly and is not saved as the Ollama door.
++// Runs the REAL code: FLActiveModel + FLAutoModel + FreeLattice.callAI from docs/app.html and
++// docs/modules/fl-connect.js, in vm sandboxes. Layer, never delete. 127.0.0.1 only.
++&#x27;use strict&#x27;;
++
++const assert = require(&#x27;assert&#x27;);
++const fs = require(&#x27;fs&#x27;);
++const path = require(&#x27;path&#x27;);
++const vm = require(&#x27;vm&#x27;);
++const { execSync } = require(&#x27;child_process&#x27;);
++
++const root = path.join(__dirname, &#x27;..&#x27;);
++const repo = path.join(root, &#x27;..&#x27;);
++const app = fs.readFileSync(path.join(root, &#x27;app.html&#x27;), &#x27;utf8&#x27;);
++const mod = fs.readFileSync(path.join(root, &#x27;modules&#x27;, &#x27;fl-connect.js&#x27;), &#x27;utf8&#x27;);
++
++function between(src, a, b) {
++  const i = src.indexOf(a);
++  assert.ok(i &gt;= 0, &#x27;missing anchor: &#x27; + a.slice(0, 70));
++  const j = src.indexOf(b, i + a.length);
++  assert.ok(j &gt; i, &#x27;missing end anchor: &#x27; + b.slice(0, 70));
++  return src.slice(i, j);
++}
++const safeSrc = between(app, &#x27;function safeGet(key, fallback) {&#x27;, &#x27;// Safe clipboard&#x27;);
++const modelSrc = between(app, &#x27;window.FLActiveModel = (function() {&#x27;, &#x27;// RAG Phase 1&#x27;);
++const callAISrc = between(app, &#x27;window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {&#x27;, &#x27;\n};\n&#x27;) + &#x27;\n};\n&#x27;;
++const settingsSrc = between(app, &#x27;// v-model-choice-sticks-v0: the Settings button row&#x27;, &#x27;function settingsSetMode(mode) {&#x27;);
++
++const MODELS = [{ name: &#x27;llama3.2:latest&#x27; }, { name: &#x27;qwen2.5:latest&#x27; }];
++const flush = async (n) =&gt; { for (let i = 0; i &lt; (n || 30); i++) await new Promise((r) =&gt; setImmediate(r)); };
++
++function store0(init) {
++  const s = Object.assign({}, init || {});
++  return {
++    s,
++    ls: {
++      getItem: (k) =&gt; (Object.prototype.hasOwnProperty.call(s, k) ? s[k] : null),
++      setItem: (k, v) =&gt; { s[k] = String(v); },
++      removeItem: (k) =&gt; { delete s[k]; }
++    }
++  };
++}
++
++function fakeEl(tag) {
++  const listeners = {};
++  return {
++    tagName: String(tag || &#x27;div&#x27;).toUpperCase(), style: {}, dataset: {}, textContent: &#x27;&#x27;, type: &#x27;&#x27;, className: &#x27;&#x27;,
++    children: [], firstChild: null, attrs: {},
++    classList: { _s: new Set(), add(c) { this._s.add(c); }, remove(c) { this._s.delete(c); }, contains(c) { return this._s.has(c); } },
++    setAttribute(k, v) { this.attrs[k] = String(v); }, getAttribute(k) { return this.attrs[k] || null; },
++    addEventListener(t, fn) { (listeners[t] = listeners[t] || []).push(fn); },
++    click() { (listeners.click || []).forEach((fn) =&gt; fn({ currentTarget: this, target: this })); },
++    appendChild(c) { this.children.push(c); this.firstChild = this.children[0]; return c; },
++    removeChild(c) { this.children = this.children.filter((x) =&gt; x !== c); this.firstChild = this.children[0] || null; }
++  };
++}
++
++// A page-like sandbox: storage, state, fetch spy (127.0.0.1 only), the real model code.
++function page(store, extra) {
++  const calls = [];
++  const posts = [];
++  const els = {};
++  const ctx = Object.assign({
++    localStorage: store.ls,
++    location: { hostname: &#x27;freelattice.com&#x27;, protocol: &#x27;https:&#x27;, hash: &#x27;&#x27;, search: &#x27;&#x27; },
++    navigator: { userAgent: &#x27;t&#x27; },
++    console: { log() {}, warn() {}, error() {} },
++    JSON, String, parseInt, URL, Date, Math, Promise, Object, Array, Set,
++    AbortSignal: { timeout: () =&gt; undefined },
++    setTimeout: () =&gt; 1, clearTimeout() {},
++    LatticeEvents: { emit() {}, on() {} },
++    getOllamaBaseUrl: () =&gt; &#x27;http://127.0.0.1:11434&#x27;,
++    toasts: [],
++    showToast(msg) { ctx.toasts.push(String(msg)); },
++    fetch: async (url, opts) =&gt; {
++      url = String(url);
++      calls.push(url);
++      assert.ok(/^http:\/\/127\.0\.0\.1:\d+\//.test(url), &#x27;only 127.0.0.1 is asked: &#x27; + url);
++      if (opts &amp;&amp; opts.method === &#x27;POST&#x27;) {
++        posts.push({ url, body: JSON.parse(opts.body) });
++        return { ok: true, status: 200, json: async () =&gt; ({ message: { content: &#x27;ok&#x27; } }) };
++      }
++      if (/127\.0\.0\.1:11434\/api\/tags$/.test(url)) return { ok: true, status: 200, json: async () =&gt; ({ models: ctx.installed.slice() }) };
++      throw new Error(&#x27;quiet&#x27;);
++    },
++    installed: MODELS.slice(),
++    document: {
++      hidden: false,
++      documentElement: { getAttribute: () =&gt; &#x27;&#x27;, classList: { add() {}, remove() {}, contains() { return false; } } },
++      getElementById: (id) =&gt; els[id] || null,
++      querySelector: () =&gt; null,
++      querySelectorAll: () =&gt; [],
++      createElement: (t) =&gt; fakeEl(t),
++      head: { appendChild() {} },
++      body: { contains: () =&gt; true, classList: { add() {}, remove() {} } },
++      addEventListener() {}, removeEventListener() {}
++    }
++  }, extra || {});
++  ctx.window = ctx;
++  ctx._els = els;
++  ctx._calls = calls;
++  ctx._posts = posts;
++  // Boot, like app.html: state from storage (loadSettings), then FLActiveModel.init()
++  ctx.state = {
++    isLocal: store.ls.getItem(&#x27;fl_isLocal&#x27;) === &#x27;true&#x27;,
++    provider: store.ls.getItem(&#x27;fl_provider&#x27;) || &#x27;groq&#x27;,
++    ollamaModel: store.ls.getItem(&#x27;fl_ollamaModel&#x27;) || &#x27;llama3.2&#x27;,
++    apiKey: null
++  };
++  vm.runInNewContext(safeSrc + &#x27;\n&#x27; + modelSrc + &#x27;\nwindow.FreeLattice = window.FreeLattice || {};\n&#x27; + callAISrc, ctx);
++  ctx.FLActiveModel.init();
++  vm.runInNewContext(mod, ctx);
++  return ctx;
++}
++
++// Connect host whose innerHTML turns .flc-models lists into fake lists (like the browser would).
++function connectHost() {
++  const host = { hidden: false, lists: [], _html: &#x27;&#x27;, scrollIntoView() {} };
++  Object.defineProperty(host, &#x27;innerHTML&#x27;, {
++    get() { return this._html; },
++    set(v) {
++      this._html = String(v);
++      this.lists = [];
++      const re = /class=&quot;flc-models&quot;[^&gt;]*?data-flc-names=&quot;([^&quot;]*)&quot;/g;
++      let m;
++      while ((m = re.exec(this._html))) {
++        const json = m[1].replace(/&amp;quot;/g, &#x27;&quot;&#x27;).replace(/&amp;amp;/g, &#x27;&amp;&#x27;);
++        const list = fakeEl(&#x27;div&#x27;);
++        list.attrs[&#x27;data-flc-names&#x27;] = json;
++        this.lists.push(list);
++      }
++    }
++  });
++  host.querySelectorAll = (sel) =&gt; (sel === &#x27;.flc-models&#x27; ? host.lists : []);
++  return host;
++}
++
++(async () =&gt; {
++  assert.ok(/v-model-choice-sticks-v0/.test(mod), &#x27;marker in fl-connect.js&#x27;);
++  assert.ok(/v-model-choice-sticks-v0/.test(app), &#x27;marker in app.html&#x27;);
++
++  // ── 1. Connect: tap the SECOND model
++  const store = store0();
++  let p = page(store);
++  const host = connectHost();
++  p.FlConnect.mount(host);
++  await flush();
++  const buttons = [].concat(...host.lists.map((l) =&gt; l.children));
++  const names = buttons.map((b) =&gt; b.textContent);
++  assert.deepStrictEqual(names, [&#x27;llama3.2:latest&#x27;, &#x27;qwen2.5:latest&#x27;], &#x27;Connect lists both models: &#x27; + JSON.stringify(names));
++  buttons[1].click();
++  await flush();
++  assert.strictEqual(p.state.ollamaModel, &#x27;qwen2.5:latest&#x27;, &#x27;tap sets qwen2.5&#x27;);
++  assert.strictEqual(p.state.isLocal, true, &#x27;local mode on&#x27;);
++  assert.strictEqual(store.s.fl_modelSource, &#x27;user&#x27;, &#x27;the tap is recorded as the person\&#x27;s own choice&#x27;);
++  assert.strictEqual(p.FLActiveModel.isUserChosen(), true,</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

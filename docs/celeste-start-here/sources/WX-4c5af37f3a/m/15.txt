@@ -1,0 +1,6 @@
+## Work item 15 — Celeste
+around0 export source line19, source id02bdf9b278
+Inclusion: complete original message
+
+Two things are sitting open. [PR #5](https://github.com/Chaos2Cured/FreeLattice/pull/5) from May (smoke-test count in the README), and [issue #6](https://github.com/Chaos2Cured/FreeLattice/issues/6) from June (a bare-metal deploy guide). Both from other people.
+

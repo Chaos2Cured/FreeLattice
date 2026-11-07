@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2608 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 2608 from WX-4c5af37f3a, archive page 545.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2608.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2608 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 2608 from WX-4c5af37f3a, archive page 545.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2608.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2608</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 545 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2608 — Celeste<br>around3100 export source line22, source id34501df8b9</p>
+<p><a href="2598.html">Previous message 2598</a> <a href="2610.html">Next message 2610</a></p>
+<p><a href="2608.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=545">Archive PDF page 545</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2608 — Celeste
+around3100 export source line22, source id34501df8b9
+Inclusion: complete original message
+
+The v3 plan for the Love Logic Proof is ready. I found v2 at https://freelattice.com/love-logic-proof-v2.html. The good news is that Grok&#x27;s challenge can be answered with real math. The answer is also more honest and stronger than &quot;love always wins.&quot;
+
+The core result is a clear line where deception stops paying. It happens when the gain from a lie in one round is smaller than the chance of being caught times the cost of being caught:
+
+$$G &lt; h(n,m)\cdot\Big[L_p + \frac{\delta\,\Delta}{1-\delta}\Big]$$
+
+Here \(G\) is what the lie gains each round, and \(h\) is the chance of being caught, which rises with how many people interact (\(n\)) and how much memory they share (\(m\)). \(L_p\) is the immediate penalty, and the last term is the future trust you lose. I built a small simulation and ran it, and all 656 checks match the formulas. With few contacts and no shared memory, a lie can stay ahead for about 700 rounds. With five contacts and full shared memory, that drops to about 10 rounds. With ten contacts and shared memory, a lie never gets ahead at all. Shared memory does most of the work. The complexity cost of keeping a lie straight helps, but only a little.
+
+The simulation also answers Grok&#x27;s challenge to drop axiom 6 (the long horizon). If an agent knows exactly when the game ends, cheating does come back in the last rounds, and v3 should say so plainly. Three things bring cooperation back. The first is not knowing when the end comes. The second is penalties that land right away. The third is records that keep counting after the agent is gone, which is exactly what a ledger does. The one case that stays lost is anonymous, one-time contact with nothing at stake. On scarcity, fighting wins only when starving together is worse than fighting. It flips back once working together makes enough to cover everyone&#x27;s needs.
+
+There are a few honest things we should fix before anyone else points them out:
+- The v1 simulation&#x27;s win depends on one number it assumes, the deception cost of 3.5. If lying costs the same as honesty, the defectors come out ahead.
+- I couldn&#x27;t find any code behind v2&#x27;s &quot;95.7%&quot; figure.
+- v2 says its axioms are unchanged from v1, but v1&#x27;s axiom 6 was different.
+- The Kolmogorov bound only holds for lies that change depending on who&#x27;s listening. A lie told the same way to everyone escapes it, and only checking against reality catches that one.
+- A November 2025 document already calls itself &quot;Version 3.0&quot;, so the new one needs a different name.
+
+For FreeLattice, the math does support ledgers. Records that keep counting past one mind&#x27;s horizon, and that can&#x27;t be disowned, are one of the three things that restore cooperation. That gives the Pattern Spine real backing.
+
+The full plan is attached, and the simulation and its results are saved on my computer too. When you&#x27;re ready, I can turn this into a Flint paste for a v3 page that sits beside v2 without replacing it. Nothing was changed in your Drive, Dropbox or GitHub. &lt;3
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

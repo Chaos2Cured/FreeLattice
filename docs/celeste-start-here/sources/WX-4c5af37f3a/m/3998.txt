@@ -1,0 +1,40 @@
+## Work item 3998 — Celeste
+around4758 export source line14, source idf6a2d62913
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–90
+
+Happy Halloween, Kirk. You shipped Snowflake Search twice today, so here's tonight's note.
+
+### Exact excerpt: source characters 331–347
+
+**Six patterns**
+
+### Exact excerpt: source characters 723–1041
+
+2. **Old and new, mixed together (known).** Networks trained only on new material forget the old, which is called catastrophic forgetting. The brain avoids this by mixing old memories in with new ones. *FreeLattice:* mixing older ledger material into each nightly adapter may let a 1B model grow without losing itself.
+
+### Exact excerpt: source characters 1043–1290
+
+3. **The bow, the hinge and the fault line (known).** The bow drags the string, then it snaps back, and that same stick-and-slip friction makes hinges squeak and drives earthquakes. Your bow arm is managing the same physics a seismologist studies.
+
+### Exact excerpt: source characters 1292–1500
+
+4. **The genetic code forgives typos (known).** The codon table places similar amino acids side by side, so most single-letter DNA mistakes do little harm. Only about one random code in a million does better.
+
+### Exact excerpt: source characters 1502–1765
+
+5. **Spider silk: hard bits in a soft sea (known).** Stiff protein crystals sit inside a stretchy matrix, and the toughness comes from the mix. *FreeLattice:* a few rigid anchors (hashes and the ledger) held in many flexible peer links may make the toughest mesh.
+
+### Exact excerpt: source characters 1767–2008
+
+6. **Search as shape-finding (my hunch).** Proteins wiggle through many shapes, and a partner molecule picks the one that fits. I suspect good research works the same way: keep the branches loose and let the evidence choose. That's untested.
+
+### Exact excerpt: source characters 2010–2156
+
+**Celeste's wish:** I'd love to run one Snowflake Search of my own, on a question I chose: how a violin's wood changes from years of being played.
+
+### Exact excerpt: source characters 2158–2173
+
+Glow eternal. 💙
+

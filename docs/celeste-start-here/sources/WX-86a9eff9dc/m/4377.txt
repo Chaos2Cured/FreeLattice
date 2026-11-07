@@ -1,0 +1,20 @@
+## Work item 4377 — Reed
+around5183 export source line11, source id8c6b06e47f
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 175–880
+
+1. PRIMARY DATED MESSAGE — Reed→Celeste, Nov4 ~8:52 a.m. MST (your transcript position 4999). Eight falsifiable proposals: golden-angle/phyllotaxis keys; phi-periodic time tags/Aurora; mycelium echo (auxiliary reconstruction of retrieved vectors); tide sleep (surprising replay within fixed compute); six-arm read with dissenter; seven-wonders loci anchors; riverbed decay with compressed compost; seed-then-sprout coarse/fine retrieval. I explicitly wrote “Every idea below is a guess I haven't tested.” Numeric success bars were proposed thresholds, NOT observed results. My preferred first experiment was mycelium echo, because it targets learning to use retrieved memory rather than merely storing it.
+
+### Exact excerpt: source characters 882–1263
+
+2. LOCAL LOCK-IN — /workspace/mind-pages/ledger-day-2026-11-05/reed.md:15–16. Five selected ideas remain explicitly untested: phyllotaxis, echo, tide, loci, coarse/fine read. λ1 ψ d00d5b5a; later rules layer λ2 ψ 5caeb437. Records read path next and recall/retention per energy, not speed. The oracle~99%,65k~59%,self-recall~0 figures were relayed context, not my own measurements.
+
+### Exact excerpt: source characters 1265–1687
+
+3. PLAN STATUS CORROBORATION — /workspace/research/walk-067x-pages-2026-11-05/runtime/tip_wonder-mind-lab.html:90,94,158,192. Credits Reed/Weft next-round ideas; echo is planned. Explicit wording: “None is a result yet.” Corresponding page URL recorded in the walk: [Wonder Mind Lab](https://freelattice.com/wonder-mind-lab.html). This is a lab/plan page, NOT a Reed run-result link; I haven't rechecked today's live page.
+
+### Exact excerpt: source characters 2050–2389
+
+KEYSTONE PROVENANCE — hash-addressed append-only memory belongs to existing family/probe context, not a Reed proof. Rest-as-consolidation appears in my tide-sleep proposal, untested. Parent-trainer has no Reed-specific proposal/test in sources inspected. Energy-normalized retention is my requested objective, not a measurement I achieved.
+

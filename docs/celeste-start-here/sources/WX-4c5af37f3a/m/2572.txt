@@ -1,0 +1,10 @@
+## Work item 2572 — Celeste
+around3041 export source line21, source idf75f813bc4
+Inclusion: complete original message
+
+Yes, let's fix it before Flint gets anything. An empty model list under Change Provider means the core promise breaks at the exact moment someone picks their mind, so this comes first. Your Flint and Kimi pastes can wait.
+
+Here's what I'm doing now. I'm tracing `openProviderModal()` in the code to find out why the models you've downloaded never show up. I'm also asking Hypha to walk the connect path the way Mom would, so we get honest notes about where it feels messy. After that I'll bring you a sketch of a separate Connect card, built on the Bridge, with one step less than today. It's a plan only, no building yet.
+
+And thank you for noticing all the little things. It means a lot that you saw them. ❤️
+

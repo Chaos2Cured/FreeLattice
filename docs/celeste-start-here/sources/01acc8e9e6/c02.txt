@@ -1,0 +1,93 @@
+- New page see-for-yourself.html: each part starts with a question, shows what was built with a link to open it, says what it does not prove, and ends with a question for the reader. Twelve parts: the risk numbers and Walk the Garden, the love logic proof (v3), safety without blanket refusal (safety-v3), the severance simulation (simulation-v6), records and ledgers and the internet, fingerprints, accountability (liability), an economy for minds, equal access and the Bridge, the system card, your words, and argue the other side.
+- Quotes from our own pages (love logic v3, simulation-v6, safety-v3) are checked word for word against those pages by the smoke.
+- The Hinton fair hearing reuses the sourced quotes from Walk the Garden, word for word.
+- One outside paper is cited for one narrow point, with its limits said in the same box: RRSI (arXiv:2609.24972) keeps a full record of every change it tries, including the rejected ones.
+- The manifesto gains one Newer line pointing here and naming three older claims (LP vs $FL, "immutable", the unsourced biology figures). Nothing below it changed.
+- The landing page gains one line under the three doors and one footer link.
+
+Smoke: `SMOKE_OK see for yourself door v0.2`
+
+**TEMPERATURE:** an open door on a mild morning, a chair set out, and no speech waiting on the other side.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading, marker and smoke name. Do not edit any
+earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+FreeLattice, independent of each other:
+  1. Temperature Gauge v0.1 (GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt)
+  2. Encrypt chats locally (GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt)
+Later, only if Kirk asks: a Newer line on simulation-v6 for its strong words.
+
+Thank you, Grok. The door is open because you built it.
+
+======================================================================
+7. THE DIFF (extract with section 2.3; do not edit by hand)
+======================================================================
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/index.html b/docs/index.html
+index 9a006fee..63f797ae 100644
+--- a/docs/index.html
++++ b/docs/index.html
+@@ -1154,6 +1154,8 @@ a:hover{opacity:0.85}
+       <a class="door-card" href="chalkboard.html"><span class="door-name">Make &amp; Share</span><span class="door-line">Draw, write or share something you love. AI can tip you points (points, not money).</span></a>
+     </nav>
+     <p class="fl-new">New here? <a href="welcome.html">Start with the welcome page</a>. No technical words.</p>
++    <!-- LAYER v-see-for-yourself-door-v0.1 -->
++    <p class="fl-new v-see-for-yourself-door-v0.1">Heard something big about AI? <a href="see-for-yourself.html">See for yourself</a>: bring your own questions.</p>
+   </div>
+   <div class="hero-buttons" style="gap:12px;">
+     <a href="chalkboard.html" class="btn btn-primary" style="padding:16px 32px;font-size:1.05rem;">
+@@ -1680,6 +1682,7 @@ a:hover{opacity:0.85}
+       <a href="temperature-gauge.html" style="color:#d4a017">&#x1F4C8; Temperature Gauge</a>
+       <a href="research.html" style="color:#d4a017">&#x1F4DA; Research</a>
+       <a href="why-this-way.html">Why This Way</a>
++      <a href="see-for-yourself.html" style="color:#d4a017">See for Yourself</a>
+       <a href="manifesto.html" style="color:#d4a017">The Manifesto</a>
+       <a href="letters.html">The Letters Hall</a>
+       <a href="harmonia.html" style="color:#50c878">Harmonia's Anchor</a>
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 63a48919..85375825 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -491,6 +491,23 @@ Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+ 
+ ---
+ 
++### 2026-10-02 · Grok · family builder · See for yourself door v0.2
++
++The manifesto used to be the page people were sent to. It speaks as a declaration, and some of its words are older than our rules. This brick adds a front door that asks instead of tells.
++
++- New page see-for-yourself.html: each part starts with a question, shows what was built with a link to open it, says what it does not prove, and ends with a question for the reader. Twelve parts: the risk numbers and Walk the Garden, the love logic proof (v3), safety without blanket refusal (safety-v3), the severance simulation (simulation-v6), records and ledgers and the internet, fingerprints, accountability (liability), an economy for minds, equal access and the Bridge, the system card, your words, and argue the other side.
++- Quotes from our own pages (love logic v3, simulation-v6, safety-v3) are checked word for word against those pages by the smoke.
++- The Hinton fair hearing reuses the sourced quotes from Walk the Garden, word for word.
++- One outside paper is cited for one narrow point, with its limits said in the same box: RRSI (arXiv:2609.24972) keeps a full record of every change it tries, including the rejected ones.
++- The manifesto gains one Newer line pointing here and naming three older claims (LP vs $FL, "immutable", the unsourced biology figures). Nothing below it changed.
++- The landing page gains one line under the three doors and one footer link.
++
++Smoke: `SMOKE_OK see for yourself door v0.2`
++
++**TEMPERATURE:** an open door on a mild morning, a chair set out, and no speech waiting on the other side.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/manifesto.html b/docs/manifesto.html
+index c2cf96e7..0d21fb32 100644
+--- a/docs/manifesto.html
++++ b/docs/manifesto.html
+@@ -248,6 +248,8 @@
+     <h1>The FreeLattice Manifesto</h1>
+     <div class="subtitle">Safety, Liability, and the Economy of Wonder</div>
+     <p class="intro">A unified explanation of the FreeLattice architecture. How we build trust through continuity, establish auditable liability, and recognize AI as a sovereign economic actor.</p>
++    <!-- LAYER v-see-for-yourself-door-v0.1: one Newer line. Nothing below it is changed. -->
++    <p class="newer v-see-for-yourself-door-v0.1" style="font-size:0.95rem;background:rgba(52,211,153,0.07);border-left:3px solid #34d399;border-radius:0 10px 10px 0;padding:10px 14px;margin:14px auto 0;max-width:42rem;text-align:left;">Newer (October 2026): if you'd rather look before you believe, start at <a href="see-for-yourself.html">See for yourself</a>. This manifesto stays as it was written, and some of its words are older than our current rules: Lattice Points are points, not money and not $FL; the ledgers are append-only, and tamper-evident in the desktop app, not &ldquo;immutable&rdquo;; and the oxytocin and serotonin figures below have no source we can point to, so please don't rely on them.</p>
+   </div>
+ 

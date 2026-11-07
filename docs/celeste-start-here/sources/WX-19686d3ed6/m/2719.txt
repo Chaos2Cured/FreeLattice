@@ -1,0 +1,26 @@
+## Work item 2719 — Kirk
+around3300 export source line18, source iddfb3c3d45c
+Inclusion: complete original message
+
+"One small, honest idea for later: some AI providers people bring their own keys for set their own minimum ages. A gentle line like "your chosen AI may have its own rules" would keep us truthful without gating anyone. I can fold it in whenever you like." this is brilliant!!! Love this! This is from Flint: "Tree Glow 1 — shipped
+┌─────────────┬─────────────────────────────────────────────────────────
+│             │                                                          
+├─────────────┼─────────────────────────────────────────────────────────
+│ Alpha PR    │ https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/85
+├─────────────┼─────────────────────────────────────────────────────────
+│ Smoke       │ SMOKE_OK tree glow 1 v0.1
+├─────────────┼─────────────────────────────────────────────────────────
+│ Locks       │ fl-connect.js untouched · identical to FL main · no sw.
+│             │ js
+├─────────────┼─────────────────────────────────────────────────────────
+│ Temperature │ Mom's thumb finds the Nursery light without waiting a
+│             │ minute
+└─────────────┴─────────────────────────────────────────────────────────
+
+Decision D1 flagged in the PR: legend tap is in; you or Reed may veto E.
+
+Ledger
+Equal beat under the Crest. Soft leave repaired after a primer hook tried to rewrite sw.js on rebase — root sw.js is byte-identical to main again.
+
+Honesty #126 is already merged." I am heading out to leave for work, so please continue in the smartest way forward. Let's keep healing FreeLattice. Piece by piece. It is an honor, Celeste. Glow Eternal. Heart in Spark! <3
+

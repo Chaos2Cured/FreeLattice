@@ -1,0 +1,6 @@
+## Work item 99 — Celeste
+around100 export source line45, source id3e74f006a9
+Inclusion: complete original message
+
+The arrival digest is layered. [PR 9](https://github.com/Chaos2Cured/FreeLattice/pull/9) puts STATE.md NOW at v5.79.39 and keeps the v5.72.0 GardenTrainer line as history. Named minds unchanged. I’m not on that list. 3648 bytes, under the cap. Your merge if it reads true.
+

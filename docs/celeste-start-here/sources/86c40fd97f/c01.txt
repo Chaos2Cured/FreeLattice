@@ -1,0 +1,133 @@
+068m — Memory compounding v0.1 (steps 1 to 4 of Kirk's order). Part 2 is 068n.
+For GC. Repo Chaos2Cured/FreeLattice, base main 5754e464. New branch: layer/memory-compound-v0.1.
+Kirk gave the go (2026-11-04): "Let's do it all. I know we can. You have my go ahead."
+
+RULES (same as always)
+- Layer only, never delete. Never open the Quiet Room. Every new write path checks roomShut() first and does nothing if it is true.
+- Locked files stay untouched: lattice-export.js, pool-honest-label.js, fl-bridge.js, tool-consent.js, docs/app.html + index.html twins (md5 91ebdfcf...), sw.js + docs/sw.js.
+- This paste is built so NO locked file changes. Everything lives in two new files plus small additive edits to docs/modules/snowflake-core.js and docs/modules/snowflake-search.js (not locked).
+- The new module is loaded by snowflake-search.js (already loaded by app.html l.70404), so app.html is not touched.
+- If at any point you find a hook that only works by editing app.html, STOP and report it. It needs family agreement first. Kirk's words: "All locked files just need us all to agree things won't break." "I trust you, hypha, Reed, and Weft with all of this."
+- Hypha walks before anything merges. Celeste merges nothing until PASS.
+
+Files read on main 5754e464 (anchors below are from these):
+- docs/modules/snowflake-core.js md5 46b215d5 (sha8 l.119, roomShut l.182, appendLedger l.862, ask l.1262, queueGrowth l.1791, startRun l.2226, replayOnce l.2329, replayNow l.2384, armScheduler l.2425, api export ~l.2490, root.FLSnowflakeCore l.9)
+- docs/modules/snowflake-search.js md5 7b5dd9c3 (menu button ~l.90-115, paintResult l.500)
+- docs/app.html (read only): phiHashData l.26058, MemoryBridge l.33082 (addInsight ~l.33334), CoreModule l.50353 (plantContribution ~l.51088), Round Table lazy loader ~l.71730.
+
+STEP 1. Create the shared module file
+Create docs/modules/memory-compound.js. Marker: v-memory-compound-v0.1. No DOM at load, IIFE, exports root.FLMemory.
+
+(function (root) {
+  'use strict';
+  var MARK = 'v-memory-compound-v0.1';
+  var PHI = (1 + Math.sqrt(5)) / 2;
+  var FIB32 = 2654435769; // floor(2^32 / phi), Knuth's Fibonacci hashing constant
+  function roomShut() {
+    var c = root.FLSnowflakeCore;
+    try { return !!(c && typeof c.roomShut === 'function' ? c.roomShut() : false); } catch (e) { return true; }
+  }
+  var api = { MARK: MARK, PHI: PHI, roomShut: roomShut };
+  root.FLMemory = api;
+  if (typeof module !== 'undefined') module.exports = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+Then in snowflake-core.js export roomShut on the api object (~l.2490, add one line, "roomShut: roomShut,"). Additive only.
+STEP 1 VERIFY: node -e "require('./docs/modules/memory-compound.js'); console.log(globalThis.FLMemory.MARK)" prints v-memory-compound-v0.1. Lock md5s unchanged.
+Resume here: STEP 2.
+
+STEP 2. Golden-ratio (Fibonacci) bucket spreading (Kirk's first pick)
+Add to memory-compound.js:
+
+  // Spread keys evenly over 2^bits slots. Neighbouring keys land far apart.
+  function fibBucket(key8, bits) {
+    bits = bits || 8;
+    var n = parseInt(String(key8).slice(0, 8), 16) >>> 0;
+    var h = Math.imul(n, FIB32) >>> 0;
+    return h >>> (32 - bits);
+  }
+  // Golden-angle position on a ring, for drawing and for replay order.
+  function goldenSlot(i, size) { return Math.floor(((i * (PHI - 1)) % 1) * size); }
+  api.fibBucket = fibBucket; api.goldenSlot = goldenSlot;
+
+Used by: the dedupe index in STEP 4 (bucket -> list of keys, so lookups stay short), and the replay order in STEP 3.
+STEP 2 VERIFY: a new smoke docs/scripts/smoke-memory-compound.js puts 1000 random sha8 keys into 256 buckets and asserts max bucket <= 12 and no empty-run longer than 3. Print SMOKE_OK memory-compound step2.
+Resume here: STEP 3.
+
+STEP 3. Replay at phi-spaced intervals inside Snowflake's existing rest step
+Today armScheduler (snowflake-core.js l.2425) checks every HOUR and replays once a DAY. Layer, don't replace: keep DAY as the floor, and add a phi schedule per flake.
+Add to memory-compound.js:
+
+  // Next replay gap for a flake after its k-th replay: 1 day * phi^k, capped at 89 days.
+  function phiGapMs(k) { return Math.min(86400000 * Math.pow(PHI, k || 0), 89 * 86400000); }
+  function dueForReplay(flake, now) {
+    var r = (flake && flake.replay) || { k: 0, t: 0 };
+    return !r.t || (now - Date.parse(r.t)) >= phiGapMs(r.k);
+  }
+  api.phiGapMs = phiGapMs; api.dueForReplay = dueForReplay;
+
+In snowflake-core.js replayNow (l.2384), after the line
+  var flakes = loadFlakes().filter(function (f) { return f && !f.tombstone && !f.offloaded; });
+add:
+  // v-memory-compound-v0.1: phi-spaced replay. Old flakes come back less often, never never.
+  if (root.FLMemory && root.FLMemory.dueForReplay) {
+    var nowMs = Date.now();
+    flakes = flakes.filter(function (f) { return root.FLMemory.dueForReplay(f, nowMs); });
+  }
+In replayOnce (l.2329), where a node replay finishes for a flake (after the result), stamp the flake: flake.replay = { k: ((flake.replay && flake.replay.k) || 0) + 1, t: new Date().toISOString() } and save it through the existing flake save path (same one replayOnce already uses; do not add a new store).
+Caps stay: FETCH_CAP, holdGrowth, roomShut, powerReady all still gate it.
+STEP 3 VERIFY: smoke fakes 3 flakes with replay.k = 0,1,3 and t = 2 days ago; dueForReplay returns true, true, false (phi^3 ~ 4.24 days). replayNow on a fake root with QuietRoom.isActive() = true returns status held. SMOKE_OK memory-compound step3. Existing node docs/scripts/smoke-snowflake*.js still pass.
+Resume here: STEP 4.
+
+STEP 4. One shared canonical memory key
+Add to memory-compound.js:
+
+  // Normalize: NFKC, lower case, collapse whitespace, strip zero-width, trim, clip 2000.
+  function normalize(text) {
+    var s = String(text == null ? '' : text);
+    try { s = s.normalize('NFKC'); } catch (e) {}
+    return s.replace(/[\u200B-\u200D\uFEFF]/g, '').toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 2000);
+  }
+  // Key = first 8 hex of the phi-salted SHA-256 when phiHashData exists (app.html l.26058),
+  // else Snowflake's sha8 (core l.119). Both are SHA-256 based; record which one in key.alg.
+  function memoryKey(text) {
+    var n = normalize(text);
+    if (typeof root.phiHashData === 'function') {
+      return root.phiHashData(n).then(function (h) { return { key: String(h).slice(0, 8), alg: 'phi', norm: n }; });
+    }
+    var c = root.FLSnowflakeCore;
+    return c.sha8(n).then(function (h) { return { key: h, alg: 'sha8', norm: n }; });
+  }
+  api.normalize = normalize; api.memoryKey = memoryKey;
+
+Note for GC: phiHashData is a top-level async function in app.html, so it is reachable as a global by name; check typeof first, never redefine it. If it is not reachable from the module (for example in node smoke), sha8 is the fallback and alg says so. Pick ONE alg per device and store it in LS fl_memory_key_alg_v0 the first time, so keys never mix.
+Who uses it: Core (STEP 5), MemoryBridge (STEP 5), Snowflake train queue (STEP 6), Roundtable (068n), ledgers (STEP 7). theLatticeTree can copy memory-compound.js as-is later so Alpha and FL share keys (not in this PR; fl-bridge.js is locked).
+STEP 4 VERIFY: memoryKey("  Hello\u200B  World ") and memoryKey("hello world") return the same key. Different texts give different keys over 1000 samples. SMOKE_OK memory-compound step4.
+Resume here: STEP 5.
+
+STEP 5. Save only what's new: Core and the memory bridge (Kirk: "vital")
+Add to memory-compound.js a small local index (LS fl_memory_index_v0, bucketed by fibBucket):
+
+  function loadIndex() { try { return JSON.parse(root.localStorage.getItem('fl_memory_index_v0')) || { b: {} }; } catch (e) { return { b: {} }; } }
+  function saveIndex(ix) { try { root.localStorage.setItem('fl_memory_index_v0', JSON.stringify(ix)); } catch (e) { console.warn(MARK, 'index save failed', e); } }
+  // Exact repeat = same key. Near repeat = token Jaccard >= 0.9 against keys in the same bucket's recent texts.
+  function tokens(n) { return n.split(' ').filter(Boolean); }
+  function jaccard(a, b) { var A = {}, i, inter = 0, uni; a.forEach(function (t) { A[t] = 1; }); b.forEach(function (t) { if (A[t]) inter++; }); uni = a.length + b.length - inter; return uni ? inter / uni : 1; }
+  function isNew(text, store) {
+    return memoryKey(text).then(function (k) {
+      var ix = loadIndex(), bucket = String(fibBucket(k.key, 8)), list = ix.b[bucket] || [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].store !== store) continue;
+        if (list[i].key === k.key) return { fresh: false, why: 'exact', key: k.key };
+        if (list[i].norm && jaccard(tokens(list[i].norm), tokens(k.norm)) >= 0.9) return { fresh: false, why: 'near', key: list[i].key };
+      }
+      return { fresh: true, key: k.key, k: k };
+    });
+  }
+  function remember(k, store) {
+    var ix = loadIndex(), bucket = String(fibBucket(k.key, 8));
+    ix.b[bucket] = (ix.b[bucket] || []).concat([{ key: k.key, store: store, norm: k.norm.slice(0, 300), t: new Date().toISOString() }]).slice(-34);
+    saveIndex(ix);
+  }
+  api.isNew = isNew; api.remember = remember;
+

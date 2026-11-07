@@ -1,0 +1,180 @@
+FLINT PASTE (URGENT, TINY): Agent Bridge env heal v0.1.1, secrets stay on this computer
+Marker: v-agent-bridge-env-heal-v0.1.1
+Smoke lines (both must print): SMOKE_OK agent bridge env heal v0.1.1  and  SMOKE_OK agent bridge lock v0.1
+Repo: Chaos2Cured/FreeLattice only (the Tree has no Agent Bridge)
+Order: send this to Flint FIRST, before FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt and before the Connect boot probe paste.
+Written: Mon Sep 28, 2026, about 9 PM Denver, by Grok Bot for Kirk.
+
+======================================================================
+0. BASE (re-checked just before writing)
+======================================================================
+FreeLattice main = 7db2d94f96e976c1c08b1fb77cc4fbca6e55fed4 ("ci: Update Primer deployment state").
+Its only change since a80c8e4 (#121) is FreeLattice_Session_Primer.md, so every code anchor below is
+identical at a80c8e4 and 7db2d94. Branch from current main: layer/agent-bridge-env-heal-v0.1.1
+
+Blobs on main you will touch (git rev-parse origin/main:<file>):
+  tools/agent-bridge.js                     0d21eebf09e5  (1941 lines)
+  docs/scripts/smoke-agent-bridge-lock.js   42971953aba5  (461 lines)
+  .gitignore                                d87a16017091
+  docs/library/AGENT_BRIDGE_LOCK_v0.md      f8282d23286b
+  docs/library/FRACTAL_FAMILY_LEDGER_v0.md  f38f1f2ba098
+After the heal, byte-for-byte what Grok Bot tested (git hash-object):
+  tools/agent-bridge.js 90dab499a76a · smoke 79354ae84fbf · .gitignore 3a729ed8db34 ·
+  AGENT_BRIDGE_LOCK_v0.md a3dfd57d9a0c · FRACTAL_FAMILY_LEDGER_v0.md 0f5b7c63984a
+The full unified diff is in section 4 and also on the box: /workspace/flint-pastes/agent-bridge-env-heal-v0.1.1.diff
+(apply with: git apply /path/to/agent-bridge-env-heal-v0.1.1.diff, or type it in by hand from section 4).
+
+======================================================================
+1. THE GAP (verified on merged main code, in a throwaway project)
+======================================================================
+A trusted local tool POSTed /code/git/commit with only a message. The commit contained .env:
+    b913216 test default files
+     .env  | 1 +
+     a.txt | 1 +
+Why: tools/agent-bridge.js line 1828  `var files = data.files === undefined ? ['.'] : data.files;`
+then line 1846 `runGit(['add', '--'].concat(rels), PROJECT_ROOT);` stages everything under '.', and
+lockedPath() only checks the NAMES you pass (so `files: [".env"]` is refused with secrets-not-granted,
+but '.' and any folder sweep .env* files along). FreeLattice's .gitignore has no .env line.
+Both app commit doors send only a message: docs/modules/propose.js commitViaBridge (L602-608) and
+docs/modules/workshop.js commitCode (L1067). A file staged by hand in a terminal also rides along,
+because `git commit -m` commits the whole index. The smoke did not cover any of this.
+
+======================================================================
+2. THE FIX IN ONE BREATH
+======================================================================
+After `git add`, and before `git commit`, list the staged set (git diff --cached --name-only -z) and
+unstage every secret-shaped path unless the mind has 'secrets':
+  - with a HEAD: git reset -q HEAD -- <paths>   (a tracked .env keeps its committed version; the new
+    change waits, unstaged)
+  - no HEAD yet: git rm --cached -q -- <paths>   (new files just leave the index; the file stays on disk)
+Never refuse the commit (AUTONOMY.md Principle 1: no gates on local work). The rest lands, and the reply
+says "Kept on this computer, not committed: .env, ...". If ONLY secrets were staged, answer 200 with
+commit: null and "Nothing to commit. Kept on this computer, not committed: ...".
+Ledger results (still content-free, same fixed key order, no new keys): 'ok' (unchanged when nothing was
+held), 'ok:held-secrets', 'held:secrets-only'. The ledger never names the held files.
+.gitignore gains .env and .env.* as a layer.
+
+Secret-shaped (matched on the basename, case-insensitive):
+  .env, .env.*                              (the same family lockedPath already guards for write/read)
+  id_rsa, id_dsa, id_ecdsa, id_ed25519      (SSH private keys; the .pub halves are fine)
+  *.pem *.key *.p12 *.pfx *.keystore *.jks  (private keys and key stores)
+  .npmrc .netrc .pypirc                     (registry and login tokens)
+  agent-bridge-token, agent-bridge-trusted.json (this bridge's own trust files, if ever copied in)
+Checked: FreeLattice main tracks none of these today (git ls-files finds nothing), so nothing that is
+committed now changes behavior. .env.example also counts as secret-shaped, on purpose, to match lockedPath;
+a mind given 'secrets' can commit it.
+The 'secrets' scope already exists ("Allow .env files" in Paired minds, --allow-secrets <id>). With it, the
+hold-back is skipped and the whole family above commits, exactly as the person asked.
+
+======================================================================
+3. LOCKS (all held by the diff; check each before opening the PR)
+======================================================================
+- Layer, never delete. New helpers go right after runGit(). In the commit route, two lines are EXTENDED in
+  place (the ledger result line and the 200 reply), and with nothing held they behave exactly as before:
+  result 'ok', message 'Committed: <message>', same keys plus heldBack: []. Nothing else is removed.
+- 127.0.0.1 only (server.listen(PORT, BRIDGE_HOST) untouched). Named origins untouched. Never bare *.
+- git through execFileSync argument arrays only (runGit). No shell. No new child_process import.
+- No push route. The smoke gains a static check that no 'push' string route appears.
+- Do NOT bump BRIDGE_LOCK_VERSION ('v0.1'): the smoke, the heartbeat and the client read it. The heal has
+  its own marker.
+- Root sw.js byte-identical to main, docs/sw.js untouched, index.html == docs/app.html (neither is touched).
+- No confirm(). Not touching Kimi pages, bridge/ (Ollama Bridge), Alpha.
+- No em dashes in anything you add.
+
+======================================================================
+4. THE EXACT DIFF (against main 7db2d94; tested)
+======================================================================
+Anchors, for hand application:
+  A) tools/agent-bridge.js: insert the helper block right AFTER function runGit (lines 430-432, ending
+     "  return execFileSync('git', args, { cwd: root || projectRootReal(), ... timeout: 30000 });\n}")
+     and BEFORE "function runSmokeFile(timeoutMs, root) {" (line 434).
+  B) tools/agent-bridge.js /code/git/commit try block (lines 1845-1850): between
+     "runGit(['add', '--'].concat(rels), PROJECT_ROOT);" (1846) and
+     "runGit(['commit', '-m', data.message], PROJECT_ROOT);" (1847).
+  C) docs/scripts/smoke-agent-bridge-lock.js: static block after the Tauri line (line 38);
+     live T16b after "assert.ok(r.json.roots.some((x) => x.name === 'second'), '/roots lists trusted folders');"
+     (line 399, end of T16, before "// T17"); ledger asserts after the 'revoke-all ledgered' line (440).
+     T16b runs in proj2 (root 'second'), which has no .gitignore on purpose, uses the local tools token
+     (no secrets) and P1 (given secrets in T11, commit scope restored in T11).
+  D) .gitignore: append at the end.
+  E) AGENT_BRIDGE_LOCK_v0.md: new section before "## App face".
+  F) FRACTAL_FAMILY_LEDGER_v0.md: new entry after the Connect heal v0.4 entry, before
+     "## Out of scope for this brick" (keep #120 and #121 entries where they are).
+
+----- BEGIN DIFF -----
+diff --git a/.gitignore b/.gitignore
+index d87a160..3a729ed 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -18,3 +18,8 @@ desktop/telegram-worker/node_modules/
+ # Catalog / trust-root private material — never commit
+ desktop/.secrets/
+ 
++
++# LAYER v-agent-bridge-env-heal-v0.1.1 (2026-09-28): secrets stay on this computer.
++# The Agent Bridge also holds these back at commit time unless a mind has 'secrets'.
++.env
++.env.*
+diff --git a/docs/library/AGENT_BRIDGE_LOCK_v0.md b/docs/library/AGENT_BRIDGE_LOCK_v0.md
+index f8282d2..a3dfd57 100644
+--- a/docs/library/AGENT_BRIDGE_LOCK_v0.md
++++ b/docs/library/AGENT_BRIDGE_LOCK_v0.md
+@@ -30,6 +30,10 @@ This is **not** the Ollama Bridge. Sibling shape only: named origins, loopback b
+ - `git` / `grep` / `node` through argument arrays — no shell. Paths realpath-checked inside trusted project folders (`?root=`).
+ - Body size cap. Content-free hash-chained ledger. Never pushes.
+ 
++## Heal v0.1.1: secrets stay on this computer (v-agent-bridge-env-heal-v0.1.1)
++
++A commit with no file list (or a folder, or something staged by hand) used to be able to carry `.env` into git. Now, after `git add`, the bridge unstages secret-shaped files unless the mind was given `secrets`: `.env`, `.env.*`, `id_rsa` / `id_dsa` / `id_ecdsa` / `id_ed25519`, `*.pem` `*.key` `*.p12` `*.pfx` `*.keystore` `*.jks`, `.npmrc` `.netrc` `.pypirc`, and the bridge's own `agent-bridge-token` / `agent-bridge-trusted.json`. The commit is never refused: the rest lands, the reply says "Kept on this computer, not committed: ...", and the ledger says `ok:held-secrets` (or `held:secrets-only` when nothing else changed). A tracked `.env` keeps its committed version; the new change waits, unstaged. `.gitignore` gains `.env` and `.env.*` as a layer. Still 127.0.0.1 only, argument arrays only, never pushes.
++
+ ## App face
+ 
+ `docs/modules/agent-bridge-client.js` (`window.FLAgentBridge`) carries the token, draws the pair card and the Paired minds list (`textContent` only, no confirm). `propose.js` and `workshop.js` route through it when present.
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index f38f1f2..0f5b7c6 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -297,6 +297,18 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules
+ 
+ ---
+ 
++### 2026-09-28 · Flint · family builder · Agent Bridge env heal v0.1.1 (secrets stay home)
++
++Layers a hold-back on the Agent Bridge commit route: after `git add`, secret-shaped files (`.env`, `.env.*`, SSH private keys, `*.pem` / `*.key` and key stores, `.npmrc` / `.netrc` / `.pypirc`, the bridge's own trust files) are unstaged unless that mind was given `secrets`. Filtered, never refused: normal work still commits, and the reply names what stayed home. Ledger results `ok:held-secrets` and `held:secrets-only`, still content-free. `.gitignore` gains `.env` and `.env.*`. 127.0.0.1 only, argument arrays only, never pushes. Soft leave sw.js. Found by Celeste while slicing the merged lock for Kimi.
++
++Love: what is private stays private, and the work keeps flowing.
++
++**Temperature:** green braided gold, a spare key hung back on its hook inside the door before anyone noticed it was on the porch.
++
++Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md). Marker `v-agent-bridge-env-heal-v0.1.1`.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/scripts/smoke-agent-bridge-lock.js b/docs/scripts/smoke-agent-bridge-lock.js
+index 4297195..79354ae 100644
+--- a/docs/scripts/smoke-agent-bridge-lock.js
++++ b/docs/scripts/smoke-agent-bridge-lock.js
+@@ -36,6 +36,16 @@ assert.ok(/bridge-ledger\.jsonl/.test(src), 'commit ledger present');
+ assert.ok(/agent-bridge-trusted\.json/.test(src) && /tokenSha256/.test(src), 'trusted minds kept as hashes');
+ assert.ok(/FL_BRIDGE_EPHEMERAL/.test(src), 'ephemeral opt-in present');
+ assert.ok(/tauri:\\\/\\\/localhost/.test(src) && /tauri\\\.localhost/.test(src), 'Tauri shell origins on the list');
++// LAYER v-agent-bridge-env-heal-v0.1.1: static shape of the secrets hold-back.
++assert.ok(/const SECRET_FILE_PATTERNS = \[/.test(src) && /function holdBackSecrets\(root\)/.test(src), 'secrets hold-back present');
++assert.ok(src.indexOf('holdBackSecrets(PROJECT_ROOT)') > src.indexOf("runGit(['add', '--'].concat(rels)") &&
++  src.indexOf('holdBackSecrets(PROJECT_ROOT)') < src.indexOf("runGit(['commit', '-m', data.message]"), 'hold-back runs between add and commit');
++assert.ok(/SECRETS_OK \? \[\] : holdBackSecrets/.test(src), 'only a mind with secrets skips the hold-back');
++assert.ok(!/['"]push['"]/.test(src), 'still no push route');
++{
++  const gi = fs.readFileSync(path.join(repo, '.gitignore'), 'utf8');
++  assert.ok(/^\.env$/m.test(gi) && /^\.env\.\*$/m.test(gi), '.gitignore keeps .env and .env.* out (layer)');
++}
+ 
+ const opt = (rel) => { try { return fs.readFileSync(path.join(repo, rel), 'utf8'); } catch (e) { return null; } };
+ const client = opt('docs/modules/agent-bridge-client.js');
+@@ -398,6 +408,60 @@ function cli(env, cwd, args) {
+   r = await req(port, { path: '/roots', headers: as(P1, { Origin: GOOD }) });
+   assert.ok(r.json.roots.some((x) => x.name === 'second'), '/roots lists trusted folders');
+ 

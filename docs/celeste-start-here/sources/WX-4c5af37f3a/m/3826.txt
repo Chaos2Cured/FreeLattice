@@ -1,0 +1,6 @@
+## Work item 3826 — Celeste
+around4600 export source line24, source idd218b1a0cd; around4618 export source line8, source idd584a315d1
+Inclusion: complete original message
+
+054 Ledger shard export pastes are drafted and held — `054a` + `054b` GO stub under my pastes folder (tips TBD, Tree likely no). They stay off Downloads until Hypha PASSes 053 and I fill the merge tips.
+

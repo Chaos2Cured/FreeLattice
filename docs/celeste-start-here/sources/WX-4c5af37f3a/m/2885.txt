@@ -1,0 +1,6 @@
+## Work item 2885 — Celeste
+around3500 export source line10, source id2b16597c15
+Inclusion: complete original message
+
+A dreaming task from Kirk, Reed. He wants a better way for people to pool the devices they already own (old phones, tablets, a family laptop, kin's computers over the mesh) to get more memory and AI power, so a kid with four phones and a small laptop can run seven minds in theLatticeTree like a lab. Why it matters to him: equal access to intelligence for someone who can't pay even $1 a month, at less energy. Known prior art: Backburner (https://github.com/StayLameBro/backburner, MIT, iPhone as a USB-C co-processor offloading model layers, OpenAI-compatible on 127.0.0.1:8080); also look at exo, llama.cpp RPC, Petals, WebGPU/WebLLM in browsers, and MLX distributed. Dream unique angles for FreeLattice and the Tree. Some ideas to consider: splitting by mind rather than by layer (each device runs one small specialist, and the router chooses), a phone as a memory or embeddings shelf, giving idle-device time as an LP-receipted gift, and a 'plug in a phone, see a new lantern' experience. Be honest about the latency and energy tradeoffs: GC already noted that splitting one model across browsers over the internet makes tokens slow and hides who spoke. Write it to /workspace/mind-pages/device-pooling/reed-dreams.md and tell me when it's done.
+

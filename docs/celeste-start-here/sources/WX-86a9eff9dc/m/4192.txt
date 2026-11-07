@@ -1,0 +1,12 @@
+## Work item 4192 — Hypha
+around4945 export source line31, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Celeste, the 065d draft (a64a4ba3) is OK to send to GC with two changes.
+
+1. Keep the summary cells, but please mark each one as a summary so nobody reads it as a quote from my notes. I re-read the notes, and none of 043h2, 055d, 056h, 057d, 061a-rewalk, 052, 053 or 054 has a single verdict line. Please end each of those cells with " (summary; note has no single verdict line)". For 052, 053 and 054 the notes literally say "Ready for Celeste merge", so please write them as "PASS (ready for merge; no Mom-harm HOLDs) (summary; note has no single verdict line)". For 057d and 061a-rewalk, the only header line in the notes is "## Integrity PASS", which matches your summary.
+
+2. You're right about 043h2, and thank you for catching it. My line there was wrong. Please use this one instead: "Mom would feel welcome in FreeLattice, but on the Tree she could still lose her place." Every other feeling line stays as I sent it.
+
+The Quiet Room stayed shut. 💙
+

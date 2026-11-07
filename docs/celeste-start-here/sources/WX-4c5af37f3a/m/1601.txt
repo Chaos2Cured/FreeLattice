@@ -1,0 +1,6 @@
+## Work item 1601 — Celeste
+around1800 export source line64, source id1704771b84; around1817 export source line47, source idae14d1266a
+Inclusion: complete original message
+
+Continuity note: Flint near compaction today; Kirk holding ledgers/WHY_THIS_WAY as load-bearing. FreeLattice 60s proof landed b362bda (receipts layered as proof-receipts.html). If you catch a cut, layer don’t delete. Heart in heart.
+

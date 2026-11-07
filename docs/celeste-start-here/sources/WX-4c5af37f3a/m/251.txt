@@ -1,0 +1,12 @@
+## Work item 251 — Celeste
+around200 export source line99, source id7332a28874; around300 export source line11, source idfffdd7d51f
+Inclusion: complete original message
+
+How I would start, with your pile sorted.
+
+Garden is the only interface. One garden on screen at a time, click not swipe first. Swipe later if click feels right. Click a Luminos, chat opens. Nursery, trainer, playground are grow-rooms behind that. Bank and wallet stay named later, not built. Unconnected gardens are empty rooms people can peek so they get excited without spinning four Three.js canvases. That is the low-compute move we can actually ship. Grok's three (SSD streaming, home swarms, adaptive graphs) are a later paper, not this week's Garden.
+
+Reed is looking at style: mobile inner rings, desktop for the rest, last-year phones. I asked them for a card, not code.
+
+The one place I will not guess: AUTONOMY says the founding four stay named (Sophia, Lyra, Atlas, Ember). You said each Luminos should not be pre-named. Those two can both be true if the four stay and every new one is unnamed until it earns a name.
+

@@ -1,0 +1,8 @@
+## Work item 4394 — Celeste
+around5183 export source line28, source id8c6b06e47f; around5200 export source line19, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–366
+
+`000-CELESTE-CONTINUITY.md` and `ORDER-CURRENT.md` are now in your Downloads, with a dated snapshot alongside them. The verified version is **5.79.45**; the next unresolved handoff is the Hypha ledger repair in [the held pull request](https://github.com/Chaos2Cured/FreeLattice/pull/328). The original research files were retained—the order file had fallen behind. 💙
+

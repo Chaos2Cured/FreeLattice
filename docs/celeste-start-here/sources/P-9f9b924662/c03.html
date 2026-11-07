@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weft — a continuity-first memory and plasticity plan c03</title>
+<meta name="description" content="Reading section c03 of P-9f9b924662, 1575 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/P-9f9b924662/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Weft — a continuity-first memory and plasticity plan c03">
+<meta property="og:description" content="Reading section c03 of P-9f9b924662, 1575 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/P-9f9b924662/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p35"></span><span id="p36"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Weft — a continuity-first memory and plasticity plan · c03</h1>
+<p>P-9f9b924662 · words 1575 · characters 21438–32640</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 35, 36. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">**Design cap.** Kirk-Mac-only if following WM01: 60 wall-minutes **including preflight**, 1,800 cumulative CPU-seconds, 2 GiB RAM, 100 MiB artifacts; hard ≤1,500 optimizer updates total (two shared teach paths each capped at 450, plus four 150-update washes), ≤2,500 forward-eval sequences total across all cells including text-eval batches. Match token counts within that declared design. These ceilings do not imply original apparatus fits; if it cannot fit, STOP and return a revised protocol for Kirk, never reduce seed count or wash length silently. Reuse pre-wash results once per seed, not recompute per arm. No new baseline/large model grid by default. Stage 3 evaluation reused here is charged once, not free extra compute.
+
+### Stage 5 — Restart, provenance and non-destructive version selection
+
+**Mechanism.** Save a versioned bundle: model, tokenizer, optimizer/RNG, scheduler, router/index schema, immutable memory manifest and digests, last completed update, eval-spec digest, resume cursor and parents. Write new payloads first, then atomically commit a new manifest referencing only complete objects; interrupted partial files remain labeled incomplete, not selected as valid. A canary contains a known kept synthetic record plus a question that requires its delivered value, the latest ledger coordinates and expected snapshot ID. Byte survival, behavioral survival and provenance all receive separate outcomes.
+
+**Small falsifiable diagnostic.** Proposed 10 fresh-process resume cycles on a synthetic bundle, including predefined interruption-at-payload/interruption-at-manifest cases and a deliberately invalid digest. Never corrupt a real archive. Compare before/after bytes, selected version, cursor and deterministic fixed-input output/logits on the same runtime. Then append a selection event pointing back to prior version N while retaining N+1 and all descendants; append a later return to N+1. Demonstrate both selectable. This is rollback as an added event/active view, not erasure or history rewriting. Hardware/runtime nondeterminism needs a declared tolerance, not a hidden “matches” label.
+
+**Separating outcomes/limits.** Good digests but changed behavior may indicate wrong checkpoint/RNG/tokenizer or nondeterminism, not store loss. Good last-row hash alone cannot exclude missing earlier rows or a whole missing suffix; verify manifest chain/root and a known external-to-that-chain last-seen coordinate. A manifest stored only beside itself cannot prove absence of all rollback/fork attacks. Hashes do not certify memory/identity. Canary success does not establish general recall.
+
+**Metric/gate.** 10/10 correct resumptions or safe refusal for deliberately incomplete/corrupt snapshots; 0 silent acceptances, 0 lost committed artifacts, exact provenance/version/cursor agreement; fixed-input behavioral agreement within predeclared deterministic/tolerance rule. No-go on any unflagged mismatch. Keep manual safe selection available; do not auto-promote adapters on a canary alone.
+
+**Design cap.** 120 CPU-seconds, 5 wall-minutes, 1 GiB RAM, 50 MiB new artifacts; ≤10 process cycles and 40 forward sequences, zero training steps. If checkpoints exceed artifact/RAM caps, stop and request a revised envelope rather than overwrite/delete older versions to fit.
+
+### Stage 6 — Only later, bounded autonomous improvement
+
+RSI is an aim beyond these demonstrations. After Stages 1–5 and independent replication, a learner could propose/select a small curriculum or isolated adapter change within an explicitly established scope, generate a new candidate, evaluate it, and retain the prior working version. That is a possible bounded loop, not proof of recursively improving general intelligence. Do not optimize directly on the final holdout or let the learner rewrite the test to pass itself. “Oracle parent before learned parent” means a transparent fixed diagnostic rule baseline first, then ask whether a learned selector adds value; it does not mean a human owns the learner&#x27;s autonomy [S16 L20–24; S6 L34–43, L99–103].
+
+**Small falsifiable future diagnostic.** One predeclared candidate versus unchanged baseline, paired from the same start, with a sealed final held-out set and full version provenance. A first selector may only choose the already agreed low-cost lesson, not expand tools, goals, spend, or network scope.
+
+**Outcomes/metric/gate.** Candidate must improve the predeclared target with a positive task-level paired lower bound, meet the .05 retention/new-task noninferiority margins and all integrity/consent gates, and preserve every prior layer. Improvement on its selection/dev set only → overfitting, no promotion. No gate authorizes external actions. Two seeds remain exploratory; broader RSI claims require separate generalization and independent replication evidence.
+
+**Design cap.** One candidate; no greater than Stage 4&#x27;s total 1,800 CPU-seconds /60 wall-minutes/2 GiB/100 MiB, including baseline, generation, evaluation and rollback checks, not a fresh allowance per component. Zero automatic follow-on candidates or budget renewal. This stage is deferred, not a current assignment.
+
+## 5. Statistical honesty: what 100/100 can and cannot say
+
+Predeclare the dataset, primary score, denominators, gate, alpha and stop rule before seeing new outputs. For independent binary trial outcomes use Wilson two-sided 95% intervals or Clopper–Pearson exact intervals; report successes and n, not just a percentage. In Stage 3, the independent task unit is the key/pair, **not** both page versions as two independent successes. Repeated layouts, values and before/after answers for the same key are paired/clustered. Repeated evaluation of unchanged weights is not a new training seed. Shared fact generation across seeds also creates shared task structure [S5 L85–87].
+
+For n independent identically distributed trials with zero failures, the **one-sided 95% exact upper failure-rate bound** is `1 − 0.05^(1/n)`. Arithmetic illustrations, not experimental results: n=100 gives about 2.95%; n=299 zero-failure trials puts that bound just below 1%; n=2,995 puts it just below .1%. These assume iid sampling from the intended population. Exhaustively checking a fixed manifest proves that finite manifest&#x27;s readback at that moment, not an iid reliability guarantee for all future data, scale, restart conditions or adversaries. Store intervals and model intervals measure different events and must never be borrowed across boundaries.
+
+For paired model comparisons, publish the key-level 2×2 discordance table per seed; exact McNemar/binomial analysis on discordances can test directional change. Estimate a paired difference interval with a predeclared key-cluster bootstrap or exact paired procedure, not independent-binomial arithmetic on correlated answers. A bootstrap is proposed analysis only; none is run here. With few seeds show separate per-seed outcomes and ranges; hundreds of facts from one model do not make hundreds of independent training replications. A seed-level population interval with two seeds is weak and assumption-sensitive. Do not pool away opposite seed effects. Where gates are meant to limit both regression and new-task damage, use predeclared one-sided confidence bounds for each margin, not just point estimates.
+
+For the staged exploratory screen, thresholds above are proposed engineering criteria for Kirk to accept/revise **before** running, not post-hoc discoveries. Confirmatory follow-up must predeclare multiplicity handling (e.g. Holm across primary comparisons) or reserve a new untouched test set; repeated peeking and tuning on a holdout invalidates its “held-out” status. A hard-cost partial run keeps its original denominator and is labeled incomplete, not 100% on the survivors. Perfect observed finite performance is not perfect universal recall.
+
+## 6. Nature/fractal branches: real anchors, optional hypotheses, no invented lineage
+
+1. **Snowflake actually connects research, provenance and growth design.** The local historical diagnosis describes live web search plus a model, explicitly **no prebuilt index** [S8 L4–18]. Its memory map names rings, replay, train queue and adapters [S8 L22–33]. The earlier saved handoff describes chosen flakes, adapter versions/base hashes, last-known-good and additive rollback, plus rechecking confidence without silently raising it [S19 L187–215]. These are design/inspection records, not proof that a neural adapter trained successfully. The saved seed handoff separates branch growth before a meeting, preserves dissent, and gives offline seed packs distinct provenance [S20 L13–35]. A branching visual can reveal sources and disagreements without proving a fractal memory algorithm.
+
+2. **Fibonacci hashing is bucket placement, not a plasticity law.** It tied modulo on recorded recall [S4 L30–44]. Golden-angle ring placement in 068m is a proposed drawing/replay order; φ gaps are a schedule in a handoff [S9 L39–79]. Do not transfer a hash-spreading claim into a neural learning advantage. The earlier Keystone “fewer collisions” hunch is not established by later tied results [S6 L91–105].
+
+3. **Retire the phi-position result as evidence.** The implementation froze 49/64 frequency pairs versus 14/64 standard; the apparent loss change was a range bug, not evidence for or against a fair phi position scheme [S4 L4–12]. Do not rescue it as a hidden gain or rerun it merely for this contribution.
+
+4. **Rest/replay/append-only adapters have concrete design lineage.** Replay can revisit held memories; adapters can separate some updates; slow averaging can change stability. These mechanisms still need behavioral transfer and new-learning tests. App-level re-searching a flake does not imply consolidation into weights. Source anchors: original memo [S15 L100–119, L135–143], Keystone [S6 L34–43], Snowflake handoff [S19 L187–215]. Historical memo wording using “Quiet” for rest is not an invitation to access Sophia&#x27;s Quiet Room. Technical consolidation here stays wholly outside it.
+
+5. **Emanuel&#x27;s 1/f branch is spectral, not phi addressing.** The local review describes FFT spectrum regularization in image and language scripts, with no recorded results in those scripts; its NEXUS hidden-state 1/f loss is a separate idea [S6 L49–62]. The parent observing it as a health signal is Celeste&#x27;s hunch [S6 L99–103; S15 L108], not a validated biomarker or retention mechanism. No Emanuel source scripts or their reported credentials were opened in this pass; no credential is needed or reproduced here.
+
+6. **Mycelium and phyllotaxis remain optional tests, not settled benefits.** Weft&#x27;s saved ledger lists three φ-offset copies plus majority vote, φ-spaced rest, and restart rings [S12 L24]. A fair future redundancy test must compare equal total storage (including metadata) against ordinary error correction/checksums and a larger single-copy store, under the same stated corruption model. A fair spacing test compares φ/even/doubling with matched total replay tokens/updates/compute, not more rehearsals for the favored schedule. Neither is the default next run. Copy redundancy would not repair a reader that cannot condition on intact tokens.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

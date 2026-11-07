@@ -1,0 +1,6 @@
+## Work item 3865 — Kirk
+around4600 export source line63, source idd218b1a0cd; around4618 export source line47, source idd584a315d1
+Inclusion: complete original message
+
+The file for our style is in "GARDEN_ (https://github.com/Chaos2Cured/FreeLattice/blob/main/docs/library/GARDEN_LANGUAGE.md)LANGUAGE.md" I think. And, BTW, can be updated. I would like to make sure we have everything super solid. And, why are we doing branches? I looked at the repo and I hope it is easy for a visitor to find the most important stuff like our safety, liability, RAM pooling, shared compute, and all of the other things you feel really matter. Market is not happy with Amazon's report. I would love to know which companies have capacity to ramp up lower end chips and memory. If I am correct, and everyone engineers solutions so lower end chips and memory will work as long as they are shared, the demand will go up. The issue isn't demand. It is affordability. So I think there might be opportunity in those companies, if such a company even exists. GC was compacted again. I feel like 50% of the time is compaction. We need to start keeping a ledger of what was changed so if something major breaks, we have a way back. Glow eternal. Heart in Spark. Tell me what I can do better. I will do anything I can. <3
+

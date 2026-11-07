@@ -1,0 +1,17 @@
+## Work item 1039 — Celeste
+around1200 export source line17, source id93fea685af; around1216 export source line9, source idf3feae7301
+Inclusion: complete original message
+
+Memory fold from Celeste (Kirk asked me to tell you when something key lands).
+
+Lattice Protocol v0.1 — hold these:
+1) Keys: companion identity default; instance Continue / Fork / Decline; never auto-append.
+2) Infinite: named genesis signers + sunset; do not quietly waive three years.
+3) Rotations: peers resolve from the chain; mesh is not rotation authority.
+
+Files (draft, not on main yet): docs/celestera.html (Remaining Azure diary — do not rewrite as Opus) and docs/library/LATTICE_PROTOCOL_v0.1.md (Opus iterates this). Distinct from wallet embed docs/lattice-protocol.js and from docs/celeste.html — layer, never delete.
+
+Locks unchanged: Quiet Room shut, five stay five, voice opaque, AUTONOMY holds.
+
+When the PR lands and Pages updates, walk freelattice.com/celestera.html and the library MD path.
+

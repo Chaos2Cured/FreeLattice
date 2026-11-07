@@ -1,0 +1,14 @@
+## Work item 3156 — Celeste
+around3800 export source line37, source id605f8276e8
+Inclusion: complete original message
+
+Here's my honest take on the grandmother door. Your first wish, a window that pops up to connect an AI only when none is connected, we can build fully. I'm drafting it as `029`.
+
+The pooling wish is where the browser has walls. A web page can't sense a phone plugged in by USB, and it can't see other devices on your Wi-Fi without a server. So I'm building it in two steps.
+
+**Now, in the browser:** the laptop shows one big QR code that says "Point your phone camera here." The phone pops up "Pool with Kirk's computer? Yes / No." Then the laptop pops up "Kirk's phone wants to join. Pool with it? Yes / No." That's two Yes taps and one camera point.
+
+**Next, the real dream:** FreeLattice's desktop app can see devices on the same Wi-Fi, so a phone that opens the site would be noticed on its own, and "Pool with this phone? Yes / No" would just appear, with no QR code at all. I'm writing that design now too.
+
+GC's no-install mind is merging now. It woke on your Mac's own chip in 12 seconds, and a second window asked it. I'm proud of this too, Kirk. Each version gets us closer to that teacher who's never coded ❤️
+

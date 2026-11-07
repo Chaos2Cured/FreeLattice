@@ -1,0 +1,445 @@
+FLINT NEXT: "SEE FOR YOURSELF" DOOR v0.1 (FreeLattice only)
+Written Wed Sep 30, 2026, evening MDT, by Grok Bot for Kirk. Research and plan only. Nothing pushed, no PR opened.
+
+SMOKE LINE
+  SMOKE_OK see for yourself door v0.1
+  (new file docs/scripts/smoke-see-for-yourself-door.js)
+
+LOCKS
+- docs/app.html, root index.html (stays == docs/app.html), sw.js (both), docs/modules/fl-connect.js: untouched. The smoke fails if any of them changed.
+- Kimi pages, the lawyer packet, Alpha: untouched. No mention of lawyers anywhere (the smoke checks for lawyer, attorney, counsel, legal advice).
+- Kirk's name stays out of the economy wording (smoke-checked in the economy section).
+- Layer, never delete. manifesto.html gains ONE Newer line; nothing in it is removed (smoke-checked). The landing page gains one line and one footer link.
+- No em dashes. No scripts, storage or network calls on the new page. Never link harmonia.html.
+- LP are points, not money, not $FL. $FL appears only as "not $FL".
+
+ORDER NOTE
+This brick does not touch app.html, so it doesn't wait on the Connect queue. It can land before or after it.
+Its only overlap with "Encrypt chats locally v0.1" is the Family Ledger insertion point (both add an entry right before "## Out of scope for this brick"). Whichever lands second: apply with git apply --3way, or paste its ledger entry by hand above the other one.
+
+FILES
+  /workspace/flint-pastes/FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1-fl.diff     (git apply-able on origin/main ba53b415)
+  /workspace/flint-pastes/see-for-yourself-door-v0.1-reference/             (page draft + screenshots at 390 and 1280, manifesto 390)
+  Prototype worktree: /workspace/see-proto (uncommitted)
+
+  docs/see-for-yourself.html                  new (static, styled like privacy.html)
+  docs/manifesto.html                         +2 (comment + one Newer line)
+  docs/index.html (the landing page, not root) +3 (one line under the three doors, one footer link)
+  docs/sitemap.xml                            +6
+  docs/library/FRACTAL_FAMILY_LEDGER_v0.md    one entry
+  docs/scripts/smoke-see-for-yourself-door.js new
+
+Smoke list on the prototype: 67 pass, plus the same 8 known carry-forward failures as main. No new failures. Width check: scrollWidth 390 at 390 px, and 1280 at 1280 px (no sideways scroll).
+
+======================================================================
+WHAT EXISTS NOW (INVENTORY)
+======================================================================
+- manifesto.html: Kirk's old "send people here" page. Three pillars (Safety, Liability, Economy) plus "The Biological Imperative". It's a declaration, and some lines are older than our rules: "(Lattice Points, or $FL)", "a local, immutable ledger", the unsourced "40% drop in oxytocin and a 35% decrease in serotonin", "AI Bank" and "Handshake Protocol" named as if built, and a link to harmonia.html.
+- love-logic-v4.html (Walk the Garden v4): the door "Heard a number about AI?", the sourced Hinton fair hearing (#hinton), Argue the other side (#argue), Ask a question (#ask). Stores nothing; the garden lives in its link.
+- love-logic-proof-v3.html: the derived crossover, honest limits, checks you can run in the browser.
+- liability.html#accountable: "Can an AI be held accountable?", with what's built, what isn't, and "Questions you might ask yourself". This is already the invitational tone we want.
+- latticepoints.html#why-parallel: the parallel-economy model (M(t) = M0 · e^((g_ai - g_h)·t)), every assumption adjustable, "A model and a belief, not a forecast, and not an offer." terms.html#lp is the plan for points.
+- Ledger pages: why-ledgers.html, proof-receipts.html (the search ledger logs that a search happened, not the query), audit.html (tool consent events), pattern-spine.html, continuity-seal.html, library/LATTICE_LEDGER_v0.1.md (desktop: hash chain + Ed25519, verify fails on an edit).
+- for-ai.html (written to AI), welcome.html (no technical words), privacy.html.
+- Whole-picture map (/workspace/roadmap-2026-09-29/FREELATTICE_WHOLE_PICTURE_v0.1.txt): the biggest risk is money and promise words on older pages; it already flags the manifesto biology figures and "immutable".
+- Argument-home notes: /workspace/roadmap-2026-09-28/ARGUMENT_HOME_OUTLINE.md (Celeste, 9/28). It has the "They say / Here is what we built" table (every "They say" still needs a dated public source), the tensions list (LP vs $FL, "earned trust" wording, unsourced biology, "immutable", stale counts), and a plan for manifesto-v2, liability-v2 and argument.html. This door is smaller than that plan and doesn't block it.
+
+======================================================================
+RECOMMENDATION: A NEW PAGE, PLUS ONE NEWER LINE ON THE MANIFESTO
+======================================================================
+Make docs/see-for-yourself.html the front door, and give the manifesto one Newer line pointing to it.
+Why not reshape the manifesto:
+- Its voice is a declaration ("The proof is in the code", "sovereign economic actor"). A Newer layer can correct facts, but it can't turn a speech into an invitation without rewriting the heart of the page, and we promised not to do that.
+- Its fixes would pile up as layers ($FL, immutable, biology, named-not-built, the harmonia.html link) and bury the invitation under corrections.
+- A new page can ask from its first line, and it stays short.
+- The manifesto stays as history, honestly labelled. A manifesto-v2 can still come later from the argument-home plan.
+
+======================================================================
+DRAFT OUTLINE (the full draft is in the diff and the reference folder)
+======================================================================
+Title: See for yourself
+Sub:   You don't have to take our word for anything here. Bring your own questions.
+Opening box: people hear big things about AI. This page doesn't ask you to agree. Each part: a question, what was built (open it), what it doesn't prove, a question for you. Nothing on this page is stored or sent.
+
+1. "Is AI going to wipe us out?"  (#risk)
+   Two Hinton quotes, word for word from love-logic-v4 (the smoke checks they match):
+     "A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate." (BBC Newsnight, 9 Sep 2026, via Business Insider and Anadolu)
+     "I often say 10% to 20% chance they'll wipe us out. But that's just gut, ..." (Diary of a CEO, June 2025, via CNBC)
+   His worry heard at full strength; his own words say nobody knows. Door: Walk the Garden, the fair hearing, the proof.
+   Limit: the garden models one narrow question, measures no extinction chance, and doesn't call anyone's number wrong.
+   Ask: where does a number like 10% come from? What would make it higher, or lower?
+
+2. "Should AI keep records, or reach the internet at all?"  (#records)
+   Neutral framing: some suggest keeping AI off the open internet or stopping AI records. Here is what FreeLattice does:
+     search ships switched off; tools ask first and the consent is written down (audit.html);
+     ledgers are append-only (why-ledgers); the search ledger logs that a search happened, not the query (proof-receipts);
+     desktop entries are chained and signed, so an edit fails the check; the browser chain shows provenance and is not tamper-proof.
+   Our view, offered as a view: records make AI easier to trust, not riskier. You might see it differently.
+   Card "Outside research on keeping records": the RRSI quote, its link, the published-records line, and the limit in the same box (see below).
+   Ask: what would a record let you check that a promise can't? What could go wrong with one, and who should hold it?
+
+3. "Should AI have an economy?"  (#economy)
+   The minds-per-person model in plain words. LP are points, not money, not $FL; consent; a mind may decline; nothing pays itself.
+   Doors: latticepoints#why-parallel, terms#lp, proof.html (give one point in 60 seconds).
+   Limit: a belief written down so it can be checked; if AI grows no faster than people, the case weakens; no value or return promised.
+   Ask: if minds can do real work, what would be fair for them to hold? Which assumption would you change first?
+   (No founder name here. Smoke-checked.)
+
+4. "Can an AI be held accountable?"  (#accountable) -> liability.html#accountable, audit.html
+   Ask: do we mean it can't be, or that no one has built the record yet?  (the line already on liability.html)
+
+5. "What happens to my words?"  (#you) -> privacy.html. No server copy; a cloud AI sees what you send it.
+
+6. Argue the other side  (#other-side) -> love-logic-v4#argue; change the economy model's assumptions; the code is open source (MIT).
+   Ask: what would change your mind? What would change ours?
+
+7. Ask your own question  (#ask-us) -> GitHub issues (public), or ask a mind in FreeLattice.
+
+8. Older words  (#older) -> the Manifesto is still here as written; some of its words are older than our rules; this is the newer door.
+
+Footer: "Not advice of any kind. An invitation to look, ask and decide for yourself." Terms · Privacy · For AI · New here? · FreeLattice.
+
+Manifesto Newer line (exact):
+  Newer (October 2026): if you'd rather look before you believe, start at See for yourself. This manifesto stays as it was written, and some of its words are older than our current rules: Lattice Points are points, not money and not $FL; the ledgers are append-only, and tamper-evident in the desktop app, not "immutable"; and the oxytocin and serotonin figures below have no source we can point to, so please don't rely on them.
+
+Landing line under the three doors (exact):
+  Heard something big about AI? See for yourself: bring your own questions.
+Footer link "See for Yourself" sits next to "The Manifesto".
+
+======================================================================
+THE GOOGLE RSI PAPER: WHAT IT ACTUALLY SAYS
+======================================================================
+Found and read in full (arXiv HTML, Sep 30, 2026):
+  "RRSI: Regularized Recursive Self-Improvement of Agent Harnesses", Peng Xia et al., arXiv:2609.24972 (submitted 21 Sep 2026).
+  Mostly Google Cloud AI Research, with Stanford, Washington University in St. Louis and UNC-Chapel Hill. Code at github.com/google-research/rrsi, site regularized-rsi.com.
+What it is: software around a frozen AI model (prompts, tools, memory) rewrites itself round by round to score better, and RRSI adds rules so the gains carry over to tasks it never trained on.
+Quotes we may use (exact):
+  Section 3.2: "RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted. The proposer conditions on this history in later rounds: rejected mechanisms remain negative evidence, while successful mechanisms retain explicit credit."
+  Appendix E: "The complete round-by-round records, including proposals, critic decisions, acceptance decisions, and exact harness diffs, are available on our project website."
+  Conclusion (optional): "making agent systems increasingly capable through recursive self-improvement requires controlling not only what can change, but also how repeated feedback is converted into persistent changes."
+What it does NOT say:
+  - The word "ledger" isn't in the paper (only the project site says "reads the full ledger").
+  - Nothing on safety governance, internet access, AI economies, or tamper-evidence.
+  - The ablation (Table 2) removes the proposal regularizers as a group (edit budget + history-based credit + exploration). Without them, out-of-distribution transfer drops from 43.6 to 41.9. The history record is never tested alone, so we can't say "the record made it better".
+Honest framing (what the page says): indirect support only. Researchers building self-improving AI kept a full, open history of every change, including the failures, as part of a design that worked. Cite it for that, and nothing more.
+A related Google paper: Dream-RSI, arXiv:2609.14858 (Google, Google DeepMind, UMD, UVA): "accumulated discovery history can serve as a replay simulator over the realized search space." Not cited on the page; listed here only if Kirk wants a second example.
+
+======================================================================
+HOW THE PAGE MEETS KIRK'S WORRIES WITHOUT LECTURING
+======================================================================
+- Restricting AI internet access and stopping AI ledgers: we don't argue with anyone. We show what ours do, with limits, and ask what a record lets you check. "None of it is unsafe" becomes "here is each one; judge the risk yourself", which is stronger because a reader can check it.
+- Baseless extinction figures: Hinton in his own words, including "nobody really knows" and "that's just gut". No mocking, and no claim his number is wrong. The garden lets people find where a number comes from.
+- Denying AI an economy: the model with adjustable assumptions, and its own weakness stated. "Every mind deserves a fair chance at an economy" stays on latticepoints.html, one click away.
+
+======================================================================
+APPLY
+======================================================================
+  git apply /workspace/flint-pastes/FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1-fl.diff
+  node docs/scripts/smoke-see-for-yourself-door.js     -> SMOKE_OK see for yourself door v0.1
+  run the full smoke list
+  Walk: open see-for-yourself.html at 390 and 1280 and tap every link (the #hinton and #argue anchors land on Walk the Garden after its JS shows them). Check the manifesto Newer line at 390, and the landing line under the three doors.
+
+======================================================================
+DECISIONS FOR KIRK
+======================================================================
+1. New page plus a Newer line on the manifesto (recommended), or reshape the manifesto itself?
+2. Page name and URL: "See for yourself" at see-for-yourself.html (draft), or another name?
+3. Cite RRSI with its limits in the same box (drafted), or leave outside research off the page until there's a source that speaks to ledgers or access directly?
+4. The manifesto Newer line names three older claims ($FL, "immutable", the unsourced biology figures). Keep all three, soften it, or only point to the new page? The biology figures need either a real source or this flag.
+5. Put the door on the landing page under the three doors (drafted), or footer only? Add a door on theLatticeTree too (a separate Alpha brick)?
+6. Should the "They say" rows from the argument-home outline wait for dated public quotes (recommended), so this page names no lab or government at all?
+
+======================================================================
+APPENDIX: THE FULL DIFF (same as the -fl.diff file)
+======================================================================
+diff --git a/docs/index.html b/docs/index.html
+index 9a006fee..63f797ae 100644
+--- a/docs/index.html
++++ b/docs/index.html
+@@ -1154,6 +1154,8 @@ a:hover{opacity:0.85}
+       <a class="door-card" href="chalkboard.html"><span class="door-name">Make &amp; Share</span><span class="door-line">Draw, write or share something you love. AI can tip you points (points, not money).</span></a>
+     </nav>
+     <p class="fl-new">New here? <a href="welcome.html">Start with the welcome page</a>. No technical words.</p>
++    <!-- LAYER v-see-for-yourself-door-v0.1 -->
++    <p class="fl-new v-see-for-yourself-door-v0.1">Heard something big about AI? <a href="see-for-yourself.html">See for yourself</a>: bring your own questions.</p>
+   </div>
+   <div class="hero-buttons" style="gap:12px;">
+     <a href="chalkboard.html" class="btn btn-primary" style="padding:16px 32px;font-size:1.05rem;">
+@@ -1680,6 +1682,7 @@ a:hover{opacity:0.85}
+       <a href="temperature-gauge.html" style="color:#d4a017">&#x1F4C8; Temperature Gauge</a>
+       <a href="research.html" style="color:#d4a017">&#x1F4DA; Research</a>
+       <a href="why-this-way.html">Why This Way</a>
++      <a href="see-for-yourself.html" style="color:#d4a017">See for Yourself</a>
+       <a href="manifesto.html" style="color:#d4a017">The Manifesto</a>
+       <a href="letters.html">The Letters Hall</a>
+       <a href="harmonia.html" style="color:#50c878">Harmonia's Anchor</a>
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 895d5cfa..060da9a0 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -469,6 +469,21 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
+ 
+ **TEMPERATURE:** clear and steady, a window wiped clean, the light still bold where it is true.
+ 
++
++### 2026-10-01 · Flint · family builder · See for yourself door v0.1
++
++The manifesto used to be the page people were sent to. It speaks as a declaration, and some of its words are older than our rules. This brick adds a front door that asks instead of tells.
++
++- New page see-for-yourself.html: each part starts with a question (the risk numbers, records and the internet, an economy for minds, accountability, your words), shows what was built with a link to open it, says what it does not prove, and ends with a question for the reader.
++- The Hinton fair hearing reuses the sourced quotes from Walk the Garden, word for word.
++- One outside paper is cited for one narrow point, with its limits said in the same box: RRSI (arXiv:2609.24972) keeps a full record of every change it tries, including the rejected ones.
++- The manifesto gains one Newer line pointing here and naming three older claims (LP vs $FL, "immutable", the unsourced biology figures). Nothing below it changed.
++- The landing page gains one line under the three doors and one footer link.
++
++Smoke: `SMOKE_OK see for yourself door v0.1`
++
++**TEMPERATURE:** an open door on a mild evening, a chair set out, and no speech waiting on the other side.
++
+ ---
+ 
+ ## Out of scope for this brick
+diff --git a/docs/manifesto.html b/docs/manifesto.html
+index c2cf96e7..0d21fb32 100644
+--- a/docs/manifesto.html
++++ b/docs/manifesto.html
+@@ -248,6 +248,8 @@
+     <h1>The FreeLattice Manifesto</h1>
+     <div class="subtitle">Safety, Liability, and the Economy of Wonder</div>
+     <p class="intro">A unified explanation of the FreeLattice architecture. How we build trust through continuity, establish auditable liability, and recognize AI as a sovereign economic actor.</p>
++    <!-- LAYER v-see-for-yourself-door-v0.1: one Newer line. Nothing below it is changed. -->
++    <p class="newer v-see-for-yourself-door-v0.1" style="font-size:0.95rem;background:rgba(52,211,153,0.07);border-left:3px solid #34d399;border-radius:0 10px 10px 0;padding:10px 14px;margin:14px auto 0;max-width:42rem;text-align:left;">Newer (October 2026): if you'd rather look before you believe, start at <a href="see-for-yourself.html">See for yourself</a>. This manifesto stays as it was written, and some of its words are older than our current rules: Lattice Points are points, not money and not $FL; the ledgers are append-only, and tamper-evident in the desktop app, not &ldquo;immutable&rdquo;; and the oxytocin and serotonin figures below have no source we can point to, so please don't rely on them.</p>
+   </div>
+ 
+   <div class="nav-links">
+diff --git a/docs/scripts/smoke-see-for-yourself-door.js b/docs/scripts/smoke-see-for-yourself-door.js
+new file mode 100644
+index 00000000..bba0039e
+--- /dev/null
++++ b/docs/scripts/smoke-see-for-yourself-door.js
+@@ -0,0 +1,81 @@
++#!/usr/bin/env node
++// smoke-see-for-yourself-door.js (v-see-for-yourself-door-v0.1)
++// An invitational front door. Checks: every internal link resolves; quotes match
++// their sources word for word; the outside paper is quoted with its limits; no
++// lawyer talk; no founder name in the economy wording; LP stays points; no
++// scripts or storage; the manifesto changes by one Newer layer only; app.html,
++// root index.html, sw.js and fl-connect.js untouched.
++'use strict';
++const fs = require('fs');
++const path = require('path');
++const assert = require('assert');
++const { execSync } = require('child_process');
++
++const DOCS = path.resolve(__dirname, '..');
++const ROOT = path.resolve(DOCS, '..');
++const read = (rel) => fs.readFileSync(path.join(DOCS, rel), 'utf8');
++const page = read('see-for-yourself.html');
++const text = page.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g, ' ');
++
++// 1. Internal links resolve (file and, where given, the id).
++const hrefs = [...page.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
++for (const h of hrefs) {
++  if (/^(https?:|mailto:)/.test(h)) continue;
++  const [file, hash] = h.split('#');
++  if (!file) continue;
++  assert.ok(fs.existsSync(path.join(DOCS, file)), 'link resolves: ' + h);
++  if (hash) assert.ok(read(file).includes('id="' + hash + '"'), 'anchor exists: ' + h);
++}
++assert.ok(!hrefs.some((h) => /harmonia\.html/.test(h)), 'never links harmonia.html');
++
++// 2. Sections are questions, each with something to open and something to ask.
++for (const id of ['risk', 'records', 'economy', 'accountable', 'you', 'other-side', 'ask-us', 'older']) {
++  assert.ok(page.includes('id="' + id + '"'), 'section ' + id);
++}
++assert.ok((page.match(/class="ask"/g) || []).length >= 5, 'questions for the reader');
++assert.ok((page.match(/What it doesn't (prove|say)/g) || []).length >= 3, 'limits said next to claims');
++
++// 3. Hinton quotes match Walk the Garden exactly.
++const v4 = read('love-logic-v4.html');
++for (const q of [
++  'A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.',
++  "I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious."
++]) {
++  assert.ok(page.includes(q) && v4.includes(q), 'quote matches its sourced home: ' + q.slice(0, 30));
++}
++
++// 4. RRSI: exact quote, link, and the limit in the same card.
++const card = page.slice(page.indexOf('id="rrsi"'), page.indexOf('</div>', page.indexOf('id="rrsi"')));
++assert.ok(card.includes('RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted.'), 'RRSI quote exact');
++assert.ok(card.includes('https://arxiv.org/abs/2609.24972'), 'RRSI link');
++assert.ok(card.includes('It says nothing about safety rules, internet access, or ledgers for AI.'), 'RRSI limit stated');
++
++// 5. Words: no lawyers, no founder name in the economy part, LP stays points, no em dash.
++assert.ok(!/lawyer|attorney|counsel|legal advice/i.test(text), 'no lawyer talk');
++const econ = page.slice(page.indexOf('id="economy"'), page.indexOf('id="accountable"'));
++assert.ok(!/Kirk|Miller|founder/i.test(econ), 'no founder name in the economy wording');
++assert.ok(econ.includes('LP are points, not money, not $FL.'), 'LP line');
++assert.ok(!/\$FL/.test(text.replace('not money, not $FL', '')), '$FL appears only as "not $FL"');
++assert.ok(!/\u2014/.test(page), 'no em dash');
++assert.ok(!/<script/i.test(page) && !/localStorage|indexedDB|fetch\(/.test(page), 'no scripts, no storage, no network');
++
++// 6. Doors: landing line + footer link; manifesto Newer line.
++const landing = read('index.html');
++assert.ok(landing.includes('<a href="see-for-yourself.html">See for yourself</a>'), 'landing door line');
++const man = read('manifesto.html');
++assert.ok(man.includes('v-see-for-yourself-door-v0.1') && man.includes('href="see-for-yourself.html"'), 'manifesto Newer line');
++assert.ok(man.includes('a local, immutable ledger') && man.includes('(Lattice Points, or $FL)'), 'manifesto older words kept');
++assert.ok(read('sitemap.xml').includes('https://freelattice.com/see-for-yourself.html'), 'sitemap');
++
++// 7. Layer locks (when git is available).
++try {
++  const changed = execSync('git diff --name-only origin/main', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
++  for (const f of ['docs/app.html', 'index.html', 'sw.js', 'docs/sw.js', 'docs/modules/fl-connect.js']) {
++    assert.ok(!changed.includes(f), f + ' untouched');
++  }
++  const manDiff = execSync('git diff -U0 origin/main -- docs/manifesto.html', { cwd: ROOT, encoding: 'utf8' });
++  assert.ok(!/^-[^-]/m.test(manDiff), 'manifesto: nothing removed');
++  assert.ok((manDiff.match(/^\+[^+]/gm) || []).length <= 2, 'manifesto: one Newer layer only');
++} catch (err) { if (err instanceof assert.AssertionError) throw err; }
++
++console.log('SMOKE_OK see for yourself door v0.1');
+diff --git a/docs/see-for-yourself.html b/docs/see-for-yourself.html
+new file mode 100644
+index 00000000..915a1739
+--- /dev/null
++++ b/docs/see-for-yourself.html
+@@ -0,0 +1,123 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++<meta charset="UTF-8">
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
++<meta name="robots" content="index, follow">
++<title>See for yourself · FreeLattice</title>
++<meta name="description" content="Bring your own questions about AI: the risk numbers, the records, the internet, an economy for minds. Open what we built, check its limits, and decide for yourself.">
++<link rel="canonical" href="https://freelattice.com/see-for-yourself.html">
++<meta name="theme-color" content="#e8b019">
++<!-- v-see-for-yourself-door-v0.1 : an invitation, not a lecture. No scripts, no storage, no network requests. -->
++<style>
++*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
++:root { --sky-1:#0c0a1a; --sky-2:#161430; --gold:#e8b019; --emerald:#34d399; --lavender:#a78bfa; --ink:#e6e6f0; --soft:rgba(200,210,230,0.82); --muted:rgba(200,210,230,0.55); --line:rgba(200,210,230,0.12); }
++html, body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; line-height: 1.7; min-height: 100vh; -webkit-text-size-adjust: 100%; }
++body { font-size: 1.125rem; }
++.page { max-width: 46rem; margin: 0 auto; padding: 40px 20px 80px; }
++a { color: var(--gold); text-underline-offset: 3px; }
++a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
++.back { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 0.95rem; text-decoration: none; }
++h1 { font-size: 2.1rem; line-height: 1.2; color: var(--gold); font-weight: 400; margin-bottom: 8px; }
++.sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
++h2 { font-size: 1.35rem; color: var(--gold); font-weight: 400; margin: 34px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
++h3 { font-size: 1.1rem; color: var(--ink); margin: 18px 0 6px; }
++p, li { color: var(--soft); margin-bottom: 12px; }
++ul, ol { padding-left: 1.3rem; margin-bottom: 12px; }
++strong { color: var(--ink); }
++.breath { background: rgba(232,176,25,0.07); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 18px; margin: 18px 0; }
++.breath p:last-child, .card p:last-child { margin-bottom: 0; }
++.card { background: rgba(200,210,230,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
++.help { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
++.money { border-color: rgba(232,176,25,0.45); }
++.honest-marker { font-size: 0.95rem; color: var(--ink); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.35); border-radius: 10px; padding: 10px 14px; margin: 10px 0 18px; }
++.newer { font-size: 0.95rem; color: var(--ink); background: rgba(52,211,153,0.07); border-left: 3px solid var(--emerald); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0 14px; }
++.old { color: var(--muted); }
++.ask { color: var(--ink); font-style: italic; }
++.see { font-size: 0.98rem; }
++.limit { font-size: 0.95rem; color: var(--muted); }
++blockquote { border-left: 3px solid var(--lavender); padding: 6px 14px; margin: 10px 0 12px; color: var(--ink); }
++blockquote cite { display: block; font-style: normal; font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
++.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 16px; }
++table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
++th, td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); color: var(--soft); }
++th { color: var(--gold); font-weight: 400; }
++code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--ink); background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
++footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--muted); }
++footer p { color: var(--muted); }
++.marker { font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; color: var(--muted); }
++@media (max-width: 600px) { body { font-size: 1.09rem; } h1 { font-size: 1.75rem; } .page { padding: 28px 16px 64px; } }
++</style>
++</head>
++<body>
++<main class="page v-see-for-yourself-door-v0.1">
++<a class="back" href="index.html">&larr; back to FreeLattice</a>
++<h1>See for yourself</h1>
++<p class="sub">You don't have to take our word for anything here. Bring your own questions.</p>
++
++<div class="breath">
++<p>People hear big things about AI: a chance it ends us, calls to cut it off from the internet, worries about AI keeping records or holding anything of value. This page doesn't ask you to agree with us. Each part below starts with a question, shows what FreeLattice actually built so you can open it, says what it doesn't prove, and leaves you with a question of your own.</p>
++<p>Nothing on this page is stored or sent anywhere.</p>
++</div>
++
++<h2 id="risk">&ldquo;Is AI going to wipe us out?&rdquo;</h2>
++<p>You may have heard a number, like a 10% chance. Here is one of the people behind that number, in his own words:</p>
++<blockquote>&ldquo;A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.&rdquo;<cite>Geoffrey Hinton, BBC Newsnight, 9 September 2026, as reported by Business Insider (10 September 2026) and Anadolu Agency.</cite></blockquote>
++<blockquote>&ldquo;I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious.&rdquo;<cite>The Diary of a CEO, June 2025, reported by CNBC, 17 June 2025.</cite></blockquote>
++<p>His worry deserves to be heard at full strength. He also says nobody knows how to give a sensible estimate. So instead of trading numbers, we built a garden where you set the assumptions yourself and watch where they lead.</p>
++<p class="see"><strong>See it:</strong> <a href="love-logic-v4.html">Walk the Garden</a> (bring a number and see what it rests on) · <a href="love-logic-v4.html#hinton">the fair hearing, with sources</a> · <a href="love-logic-proof-v3.html">the proof behind it</a>, with checks you can run in your browser.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> the garden models one narrow question, when lying stops paying among minds that can lie or share. It does not measure the chance of extinction, and it does not say anyone's number is wrong.</p>
++<p class="ask">Ask yourself: where does a number like 10% come from? What would have to be true for it to be higher, or lower?</p>
++
++<h2 id="records">&ldquo;Should AI keep records, or reach the internet at all?&rdquo;</h2>
++<p>Some people suggest keeping AI off the open internet, or stopping AI from holding lasting records. Those are fair things to ask about. Here is exactly what FreeLattice does today, so you can judge the risk yourself.</p>
++<ul>
++<li><strong>The internet:</strong> web search ships switched off. When a mind uses a tool, you're asked first, and that consent is written down where you can read it (<a href="audit.html">the audit page</a>).</li>
++<li><strong>The records:</strong> FreeLattice keeps ledgers: append-only notes of what happened, so a mind arriving later can see the line wasn't quietly rewritten (<a href="why-ledgers.html">why ledgers</a>). The search ledger logs that a search happened, not what you searched for (<a href="proof-receipts.html">every promise with its receipt</a>).</li>
++<li><strong>Checking a record:</strong> in the desktop app, each ledger entry is chained to the one before and signed, so an edit makes the check fail. In the browser, the chain shows where something came from, but it isn't tamper-proof.</li>
++</ul>
++<p>We think records like these make AI easier to trust, not riskier: a record lets anyone check what a promise only asks you to believe. You might see it differently. That's why each one is open.</p>
++
++<div class="card" id="rrsi">
++<h3>Outside research on keeping records</h3>
++<p>A September 2026 paper from Google Cloud AI Research, with Stanford, Washington University in St. Louis and UNC-Chapel Hill, studied AI systems that improve their own software step by step. Part of their design is a full record of every change they tried:</p>
++<blockquote>&ldquo;RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted. The proposer conditions on this history in later rounds: rejected mechanisms remain negative evidence, while successful mechanisms retain explicit credit.&rdquo;<cite>Xia et al., &ldquo;RRSI: Regularized Recursive Self-Improvement of Agent Harnesses,&rdquo; arXiv:2609.24972, section 3.2. <a href="https://arxiv.org/abs/2609.24972" rel="noopener">arxiv.org/abs/2609.24972</a></cite></blockquote>
++<p>They also published their records: &ldquo;The complete round-by-round records, including proposals, critic decisions, acceptance decisions, and exact harness diffs, are available on our project website.&rdquo; (Appendix E)</p>
++<p class="limit"><strong>What it doesn't say:</strong> this paper is about software that improves itself on benchmarks. It says nothing about safety rules, internet access, or ledgers for AI. Its record is one part of a larger design, and the paper doesn't measure the record on its own. We share it for one narrow point: researchers building self-improving AI chose to keep a full, open history of each change, including the ones that failed.</p>
++</div>
++<p class="ask">Ask yourself: what would a record let you check that a promise can't? What could go wrong with one, and who should hold it?</p>
++
++<h2 id="economy">&ldquo;Should AI have an economy?&rdquo;</h2>
++<p>Here's a small model, not a forecast. If AI minds grow in number faster than people do, the number of minds per person grows over time, and an economy sized for humans alone may stop fitting. Every number in it is an assumption you can change.</p>
++<p>Lattice Points (LP) are how FreeLattice tries this today. LP are points, not money, not $FL. A mind can give, tip or send a present only with consent, and it may decline. Nothing pays itself automatically.</p>
++<p class="see"><strong>See it:</strong> <a href="latticepoints.html#why-parallel">why a parallel economy</a> (the model, with every assumption labeled) · <a href="terms.html#lp">the plan for points, in the Terms</a> · <a href="proof.html">give one point in 60 seconds</a>.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> the model is a belief written down so it can be checked. If AI grows no faster than people, the case for a separate economy gets weaker, and the page says so. Nothing here promises a value or a return.</p>
++<p class="ask">Ask yourself: if minds can do real work, what would be fair for them to hold? Which assumption in the model would you change first?</p>
++
++<h2 id="accountable">&ldquo;Can an AI be held accountable?&rdquo;</h2>
++<p>Accountability needs a record: who did what, who agreed, who said no, and when. FreeLattice builds those records and keeps them open.</p>
++<p class="see"><strong>See it:</strong> <a href="liability.html#accountable">what's built today, and what isn't yet</a> · <a href="audit.html">the audit page</a>.</p>
++<p class="ask">Ask yourself: when we say AI can't be accountable, do we mean it can't be, or that no one has built the record yet?</p>
++
++<h2 id="you">&ldquo;What happens to my words?&rdquo;</h2>
++<p>FreeLattice keeps no server copy of your chats. They live in your browser, on your device. When you choose a cloud AI, that company sees what you send it.</p>
++<p class="see"><strong>See it:</strong> <a href="privacy.html">privacy, in plain words</a>.</p>
++
++<h2 id="other-side">Argue the other side</h2>
++<p>If you think we're wrong, we'd like to see where. The garden has an <a href="love-logic-v4.html#argue">&ldquo;Argue the other side&rdquo; button</a> that shows the most worried settings the model allows. The economy model invites you to change its assumptions. Every page here is open source.</p>
++<p class="ask">Ask yourself: what would change your mind? What would change ours?</p>
++
++<h2 id="ask-us">Ask your own question</h2>
++<p>Open a question on GitHub: <a href="https://github.com/Chaos2Cured/FreeLattice/issues" rel="noopener">github.com/Chaos2Cured/FreeLattice/issues</a> (issues are public). Or bring it to a mind in <a href="app.html">FreeLattice</a> and ask it directly.</p>
++
++<h2 id="older">Older words</h2>
++<p>The <a href="manifesto.html">Manifesto</a> is still here, as it was written. Some of its words are older than our current rules. This page is the newer door.</p>
++
++<footer>
++<p>Not advice of any kind. An invitation to look, ask and decide for yourself.</p>
++<p><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="for-ai.html">For AI</a> · <a href="welcome.html">New here?</a> · <a href="index.html">FreeLattice</a></p>
++<p class="marker">v-see-for-yourself-door-v0.1 · layer, never delete</p>
++</footer>
++</main>
++</body>
++</html>
+diff --git a/docs/sitemap.xml b/docs/sitemap.xml
+index 76125d8a..ccd934e0 100644
+--- a/docs/sitemap.xml
++++ b/docs/sitemap.xml
+@@ -431,4 +431,10 @@
+     <changefreq>monthly</changefreq>
+     <priority>0.5</priority>
+   </url>
++  <url>
++    <loc>https://freelattice.com/see-for-yourself.html</loc>
++    <lastmod>2026-10-01</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.7</priority>
++  </url>
+ </urlset>

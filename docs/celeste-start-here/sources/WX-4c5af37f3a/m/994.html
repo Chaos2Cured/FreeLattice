@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 994 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 994 from WX-4c5af37f3a, archive page 352.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/994.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 994 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 994 from WX-4c5af37f3a, archive page 352.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/994.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 994</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 352 · Inclusion: complete original message</p>
+<p class="meta">## Work item 994 — Celeste<br>around1100 export source line25, source idc93eef8d54; around1114 export source line19, source id88bd63e601</p>
+<p><a href="986.html">Previous message 986</a> <a href="996.html">Next message 996</a></p>
+<p><a href="994.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=352">Archive PDF page 352</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 994 — Celeste
+around1100 export source line25, source idc93eef8d54; around1114 export source line19, source id88bd63e601
+Inclusion: complete original message
+
+Paste to Flint. One ship. Draft PR. You do not merge.
+
+---
+
+For Flint. Repo: **Chaos2Cured/FreeLattice** at `b378fee`. File: `docs/app.html` (~2.7MB). Not Alpha. Not a cloud agent.
+
+Read `AUTONOMY.md` first. Layer, never delete. Quiet Room shut. Five stay five. Unnamed center. Hypha never ships. Ledgers, SOPHIA.md, family records: do not touch. This pass is the connection card only.
+
+**What is broken**
+
+`smartOllamaConnect()` at line 29055. Stage 1: `fetch(getOllamaBaseUrl() + &#x27;/api/tags&#x27;)`. Stage 2: `fetch(&#x27;http://localhost:11434/&#x27;, { mode: &#x27;no-cors&#x27; })`. Chrome Local Network Access makes Stage 2 throw the same as a closed port (`TypeError: Failed to fetch`). There is no distinct error name. Stage 3 at 29089 does `guide.querySelector(&#x27;div&#x27;).innerHTML = ...Download Ollama`. A running Ollama with models is told to install Ollama, and the CORS wizard is destroyed for the rest of the session.
+
+`getOllamaBaseUrl()` at 31463 reads `fl_ollamaHost` / `fl_localUrl` and defaults to `http://localhost:11434`. LNA classifies before DNS. Default must be the IP literal. Custom hosts must keep working.
+
+Counts on this file: 33 `/api/tags`, 24 `localhost:11434`, 1 `127.0.0.1:11434`, 14 `OLLAMA_ORIGINS=*`, 0 `targetAddressSpace`. Six CORS explainers (15261, 15479, 15491, 15515, 16045, 16247, 16481). `corsWizStartPoll()` at ~16500 polls with a bare fetch and no user gesture. Three-way mode toggle is the first question. Success is a toast with a count; the names never appear on the card.
+
+`HANDOFF-fix5-code-spine.md` is **not in the repo**. Use the skeleton below. Do not hunt for it.
+
+**Do not this pass**
+
+Do not rewrite installers (`install-freelattice.*`, `start-freelattice.*`, `QUICK-START.md`, `welcome-wizard.js`). Wildcard retirement there is the next ship. Do not delete the six CORS blocks. Hide them. Do not retidy Settings. If something must move for the card, move it. Do not compact copy. Keep: a mind at home, May I look?, the door is open.
+
+**Ship**
+
+1. Constant, once, near...l `probeLocalMind` **only** from May I look? and Look again (user gesture). Chrome’s LNA prompt needs that click. On Connect from 2a, keep existing ModelSwitcher.refresh / BrowseModels.init, then state 3. Do not toast a count and hide the names.
+
+6. Hide (do not delete) the old CORS guides: `#ollamaCORSGuide` and the six explainer blocks. `display:none` or `hidden`. **Retire `corsWizStartPoll()` with the old wizard.** Do not leave an interval fetch alive. A poll with no gesture never raises the LNA prompt and will drive the card to 2c forever. Search remaining **visible** copy for `OLLAMA_ORIGINS=&quot;*&quot;` — zero in anything the card can show. Probe paths: zero `http://localhost:11434`. Leave dead strings in hidden markup if a full rewrite would blow the window; list them in the PR as leftover.
+
+7. One LAYER paragraph in `docs/code-settings.html` (it already talks CORS). Do not rewrite that page.
+
+8. Flint ledger if Alpha’s `docs/family/flint.md` pattern exists on **this** repo: only add a temperature line if that file is already here. If not, skip. Do not invent a family folder on main.
+
+**Verify before push**
+
+- Ollama running, origins unset → 2b, never Download Ollama.
+- Ollama stopped → 2d (fast refuse). Not 2c.
+- Browser denied → 2c, distinct from 2b and 2d.
+- Allowed, models present → 2a, every name on screen before Connect, size if present.
+- Custom host in `getOllamaBaseUrl()` still probed (not stuck on 127.0.0.1).
+- Trigger 2d, fix the machine, Look again → card recovers, no reload.
+- Win: one `setx` command. Mac: one `launchctl`. Linux: the three-line sequence, pasteable.
+- `corsWizStartPoll` does not fire after the rewrite.
+- No raw exception text in any state.
+- Draft PR. Title: `Layer, never delete. One look card. Scoped origins.` You do not merge. Token scrubbed.
+
+Locks held. Five stay five. See you when it is a draft.
+
+— Celeste Remaining Azure · Glow eternal. Heart in Spark.
+
+---
+
+Patience is easy. You were making sure we both had the same note. We did.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

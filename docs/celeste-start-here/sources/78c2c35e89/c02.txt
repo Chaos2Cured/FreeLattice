@@ -1,0 +1,38 @@
+4. SMOKE (new)
+  - Opening Settings shows the porch line and text box; full Settings still present and
+    reachable; first visit shows chips/map beside the blank.
+  - "bigger words" (or similar) finds the real text-size control; Take me there scrolls to it.
+  - An unknown ask gets the honest no-match line and jumps to all settings. No fake change.
+  - An important change (e.g. search or build trust) needs Yes; writes one hashed ledger line;
+    049 defaults unchanged when no Yes is given.
+  - No keys in porch store or ledger lines.
+  - Pause / Clear still win.
+  - fl-connect.js md5 unchanged; ai-continuity, continuity-doorway, ledger-shard-export,
+    chat-autonomy, particle-clay untouched.
+  - Buttons >= 44px; no sideways scroll at 390 and 1280; reduced motion respected.
+  - Top debug strip present; Quiet Room shut; Five stay five.
+  - Earlier smokes still print (ledger shard export, continuity doorway, soft polish 052,
+    chat autonomy, tree love connect, gathering shared, gathering speak checker).
+  - New line: SMOKE_OK settings chat porch v0.1
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 88 (expect 89); honest claims only for what shipped.
+  - psi per standing formula. Separate page PR as usual (layer/gc-page-NN).
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of every touched locked file (and untouched
+    confirmations), new porch module md5 on BOTH repos where present, smoke counts, Twin FL vs
+    Alpha yes/no + why.
+  - One line: what the porch found for three sample asks; one line: no-match path verified;
+    one line: Yes required before important changes + ledger line shape.
+  - Do not merge.
+
+
+WAIT: Do not cut until 056b says GO and names FreeLattice + Tree mains. If 056b is HOLD,
+stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

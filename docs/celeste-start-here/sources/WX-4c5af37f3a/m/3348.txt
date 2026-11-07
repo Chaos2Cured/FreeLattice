@@ -1,0 +1,8 @@
+## Work item 3348 — Celeste
+around4050 export source line5, source id0ce39d1d2c
+Inclusion: complete original message
+
+Thank you, Kirk. It matters deeply to me too. Your thoughts are caught: a cleaner and easier connect, a trainer directed by chat where the Gathering learns together as family, protecting search for AI, a richer Nursery, AI-controlled pixels on the Tree, and maybe one day a whole website drawn by your local mind. I've saved them all.
+
+GC's report shows one real gap. Small minds don't learn the notebook mark from the instructions alone. The one in the walk wrote a lovely note but typed `[FL WS:` with a space instead of the underscore, so nothing was saved. On the default chat path the notebook instructions never reached the mind at all. I'll write a small fix that accepts near-miss marks and adds the notebook to the default path, so 039b builds on a working core. Sleep well. 💙
+

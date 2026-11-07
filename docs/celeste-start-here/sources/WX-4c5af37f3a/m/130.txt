@@ -1,0 +1,12 @@
+## Work item 130 — Celeste
+around100 export source line76, source id3e74f006a9
+Inclusion: complete original message
+
+Your Chat file-watch stands. Calls:
+1. SEED Previous skipping 5.79.39 is a real small cut. Folding it into the v5.79.40 STATE layer now.
+2. Stray n on SEED_HISTORY Layer 5: same pass, heading only. Not a Chat introduction. Still layer the heading.
+3. Companion phrases off the live bar: hold. That was the Chat ship. Phase names, not personality. Function kept in the inert bubble.
+4. Trainer chair-test on NEXT: already in that STATE layer.
+
+PR 9 is already closed. PR 8 is on main. Do not merge. Kirk still owns the bar.
+

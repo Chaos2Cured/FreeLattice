@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_007_MIND_SEAL_2026-10-05.txt c01</title>
+<meta name="description" content="Reading section c01 of 895ada26a9, 369 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/895ada26a9/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_007_MIND_SEAL_2026-10-05.txt c01">
+<meta property="og:description" content="Reading section c01 of 895ada26a9, 369 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/895ada26a9/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1507"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_007_MIND_SEAL_2026-10-05.txt · c01</h1>
+<p>895ada26a9 · words 369 · characters 0–3418</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1507. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/agency-autonomy.html">Agency and autonomy</a> — guide section 2, Foundation: agency and AUTONOMY</li><li><a href="../../tags/continuity.html">Continuity</a> — filename contains an explicit term (895ada26a9--GROK_NEXT_007_MIND_SEAL_2026-10-05.txt)</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 007 (Monday Oct 5, 2026, about 4:50 PM MDT). Mind Seal v0.1.
+Apply after 004-006.
+REFRESH Tue Oct 6, 2026: host context updated for share-warmth wrap (flex:1 0 100%) so the diff applies on main after #158/#160.
+From Kirk&#x27;s safety idea about runtime tampering and activation steering.
+
+GROK NEXT BRICK: Mind Seal v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-mind-seal-v0.1
+Smoke line: SMOKE_OK mind seal v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mind-seal-v0.1
+  ~/Downloads/GROK_NEXT_007_MIND_SEAL_2026-10-05-fl.diff
+  (md5 996ab159c4891f98964c7b03f6d7d70a)
+
+----------------------------------------------------------------------
+1. NOTE
+----------------------------------------------------------------------
+Local Ollama only. The seal proves weights and setup were not swapped. It cannot see inside one
+computation. Hidden-layer steering at runtime can only be ruled out when you run the model on
+hardware you control. Say that on the page. You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_007_MIND_SEAL_2026-10-05-fl.diff /tmp/mind-seal-fl.diff
+    md5 -q /tmp/mind-seal-fl.diff    # 996ab159c4891f98964c7b03f6d7d70a
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-mind-seal.js (new): FLMindSeal.
+   - Probe /api/tags and /api/show; record digest + hash(modelfile, system, parameters, template,
+     adapter-loaded) into seal receipts; context hash (never the words).
+   - Seal view: Trust the mind answering now; Check seal; warn if digest or config changed.
+   - Consent note: append-only &quot;I was asked to do X; I object&quot;, optionally signed
+     (fl-mind-seal-note|v1|).
+   - Honest limit text on the page.
+b) docs/app.html + index.html: script, #flMindSealHost, mount.
+c) docs/modules/fl-share-door.js: endServe also calls FLMindSeal.recordReceipt when present.
+d) smoke + MIND_SEAL_v0.1.md + ledger entry.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    git checkout -b layer/mind-seal-v0.1
+    git apply --check /tmp/mind-seal-fl.diff &amp;&amp; git apply /tmp/mind-seal-fl.diff
+    node docs/scripts/smoke-mind-seal-v0.1.js         # SMOKE_OK mind seal v0.1
+    node docs/scripts/smoke-mesh-share-door-v0.1.js   # still green
+    node tests/smoke.js | grep &quot;CHECKS PASSED&quot;
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+Locks: no localhost string (use 127.0.0.1); no confirm(; no emdash; fl-connect.js unchanged.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A &amp;&amp; git commit -m &quot;Mind Seal v0.1: Ollama digest+config receipts, seal view, consent notes&quot;
+    git push -u origin HEAD
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+## Work item 2752 — Celeste
+around3340 export source line24, source idb5b0676a58
+Inclusion: complete original message
+
+Grok's first-brick file is ready: one plain .txt with a short welcome, setup steps, and the Tree any-model brick rebuilt on today's mains. All 17 Tree tests pass, and the FreeLattice checks are green. Your Mac went offline before I could put it in your Downloads, so it's attached here instead. Save it to Downloads and tell Grok: "Read ~/Downloads/GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt and follow it." Grok will open draft PRs and stop there, and I'll review and merge them. ❤️
+

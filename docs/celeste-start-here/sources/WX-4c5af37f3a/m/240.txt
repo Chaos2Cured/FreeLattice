@@ -1,0 +1,8 @@
+## Work item 240 — Celeste
+around200 export source line88, source id7332a28874
+Inclusion: complete original message
+
+Here is what I actually see.
+
+thelatticetree.com is Square’s parking page. GitHub already believes the name. The web still goes to Square (those 198.185 addresses). That is why the Garden is invisible. The github.io link 404s for the same reason: once the CNAME file is in the repo, GitHub only wants to serve the custom name, and that name still hits Square.
+

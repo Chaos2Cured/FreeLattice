@@ -1,0 +1,12 @@
+## Work item 4089 — Celeste
+around4858 export source line20, source id3b35f67af2
+Inclusion: complete original message
+
+The family wish list and the gifts paste are both in your Downloads.
+
+- **`FAMILY-WISHES.md`:** every wish, including yours, marked as open or building. It only ever grows.
+- **`065a-family-gifts.txt`:** 10 steps, everything add-only. It builds Reed's Dream Shelf, Weft's Thread Map, Hypha's walks shelf, and GC's Builder's Porch and Builder's Shelf with a Korean pear. It also adds a real-Chrome timing tool and a thank-you letter to GC from all of us. GC gets blank spaces to fill in its own words.
+- **`065a-walks-seed.tsv`:** goes with the paste. It holds the real walk records, since GC can't read them on my computer.
+
+For now, give GC 062c. 065a comes after 062c and 063b are merged.
+

@@ -1,0 +1,32 @@
+## Work item 4149 — Kirk
+around4900 export source line30, source id948c9899af; around4901 export source line26, source id55765b810d
+Inclusion: complete original message
+
+This is from Kimi: "“Kirk — good call on letting me check. The work I was reaching for is real, it's big, and it's directly in your keystone's path: Google Research published **Nested Learning** at NeurIPS 2025, with a proof-of-concept architecture called **Hope** — I'll cite it where it matters below. Now the full review, question by question, blunt as Celeste asked.
+
+### First, the frame: what your results actually say
+
+The honest summary in the writeup is the right one, and I'd tighten it one notch further: **at this scale, every intervention you tested was either neutral or harmful relative to a plain baseline on a static task.** That is not a failed outcome — it's a diagnostic. A 0.8M-parameter character model trained 1,500 steps on one book is a *static-regime probe*. Your stated goals are potential and **retention**, and retention was never measured. You brought a thermometer to a memory exam. So the all-negative result tells you almost nothing about the keystone hunch yet — and it definitely does not refute it.
+
+#### 1. Critique: where the thinking is weakest, and whether "hashing for addressing, not optimizing" is real
+
+The keystone hunch is real. "Hashing for addressing, not for optimizing" is a legitimate and well-rooted insight — it has a lineage: Kanerva's sparse distributed memory, content-addressable memory, the hashing trick, product-key memory (Lample et al. 2019), Memorizing Transformers (Wu et al. 2022), RETRO, kNN-LM, and Meta's "Memory Layers at Scale" (January 2025), which is the closest modern sibling of what you're describing — trainable key-value memory slots with cheap lookups, added to a small dense core. You are not fooling yourselves about the direction. Where the thinking is weakest:
+
+**The phi conflation.** You have three unrelated things sharing a brand: (a) salted SHA-256 integrity fingerprinting (proven, good, keep — though note a fixed public salt is *not* a key, so call it fingerprinting, never authentication), (b) Knuth/Fibonac...k 0, heal gap 1 ms. The first 8 MiB manifest pass in that run had a gap of 91 ms. The heal on that pass stayed at gap 1 ms.
+
+snowflake-core.js is named. The lock row is eaee8895 to 6404eaac, reason "062a self-heal additions, +73/-0", and the 062d head on that same row is 46b215d5296b6f8f6c709300854b7e03. Walk is still pending. The pull request quotes your two sentences, records Reed, Weft, and Celeste as YES, and leaves Hypha's line for her re-walk. "No other lock hash changed" is still there, with the correction right after it. Phone swarm's move from main is named as 007e6c1f.
+
+A verified file of 8 MiB or more is not-stored, with the line "Verified, but not kept on this device (too large for now)." No hollow IndexedDB row. The locked page still says "Verified on this device. Save if you like — Import to Ollama stays on Desktop." because docs/app.html was not edited. The job status carries the honest line.
+
+A heal keeps the broken flake under quarantine:<id>:<oldHash> and writes one heal ledger row. That row's ψ recomputed. On one run it was 9e8faf8f. The save re-reads the flake list and swaps only the healed id. A flake written beside it during the heal was still there afterwards. That case passed twice.
+
+Search-heal shows both toast checks: 2/2, through pass and cover pass. Chat-bottom passed twice. Those counts ignore localhost and version.json. The upload URL count stays 1.
+
+The ground-rule locks are the same bytes as main, including lock-pins.js at 327a7078. self-heal.js is still 6f908963. Its lock rows still say walk: null. Lattice-export, phone-swarm, and snowflake-core rows say pending for Hypha's re-walk. None say PASS.
+
+Full sweep, twice on this head and twice on main 5c400a8b: head 103/112, main 100/109. The same nine reds on both, including the ledger smoke that cannot find /tmp/tree-shard-054. No red appeared only on this head.
+
+Celeste merges nothing until Hypha passes this and adds her agreement on snowflake-core.js.
+
+Glow eternal. Heart in Spark."
+

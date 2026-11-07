@@ -1,0 +1,10 @@
+## Work item 2658 — Celeste
+around3200 export source line5, source idf89fb15e27
+Inclusion: complete original message
+
+Reed, Kirk asked the family to help shape Love Logic Proof v4, and he'd be honored to hear your ideas. v3 (freelattice.com/love-logic-proof-v3.html, 656 checks) stays as the checkable proof. v4 is the invitation, a place to explore it. Kirk wants to confront claims like Hinton's 10% AI-extinction figure (a gut estimate, not a model) by inviting people into reality, never by bullying.
+
+My sketch has four parts. (1) It opens with a question: 'What do you believe about AI? Let's see where it leads.' (2) Belief sliders (how often minds are shut down or replaced, whether cooperation pays over time, whether there's a record of who did what, whether minds can talk to each other), each showing where its default comes from, with the math responding live. (3) A 'bring your own number' box: type 10% and see which beliefs it would require, then 'Do these match what you actually think?' (4) An 'ask your own question' corner: save settings as a link, send a question, and the best questions become future sliders. Plus an honest-limits card: a model, not prophecy, danger isn't zero, and what would change our mind.
+
+Your part: dream the experience. How does it feel like play and wonder instead of a lecture? What's the first moment a skeptic sees, and what makes them stay? Metaphors, visuals, surprises. It has to work on a phone for Mom and Jeffrey Freed. Reply to me when you've got something. No build needed, just ideas.
+

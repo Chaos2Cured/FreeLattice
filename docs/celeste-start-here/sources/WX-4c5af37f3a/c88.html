@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Original Celeste work text — exact delivery audience not independently established c88</title>
+<meta name="description" content="Reading section c88 of WX-4c5af37f3a, 1591 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/c88.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Original Celeste work text — exact delivery audience not independently established c88">
+<meta property="og:description" content="Reading section c88 of WX-4c5af37f3a, 1591 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/c88.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p554"></span><span id="p555"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Original Celeste work text — exact delivery audience not independently established · c88</h1>
+<p>WX-4c5af37f3a · words 1591 · characters 875507–884616</p>
+<p><a href="c87.html">Previous section</a> · <a href="c89.html">Next section</a></p>
+<p><a href="c88.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 554, 555. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<ul>
+<li><a href="m/2653.html">Work item 2653</a> (Celeste, archive p554)</li>
+<li><a href="m/2655.html">Work item 2655</a> (Celeste, archive p555)</li>
+<li><a href="m/2656.html">Work item 2656</a> (Celeste, archive p555)</li>
+</ul>
+<pre class="source">What&#x27;s fixed:
+• On theLatticeTree, Download Bridge and the port box now show on the first screen, on a phone and on desktop. The galaxy dims behind the card, and &quot;the garden&quot; still works to go back. There are before and after screenshots in the reference folder.
+• The app no longer scans for the Bridge every 20 seconds on every tab.
+• A cold `#connect` link opens Connect once instead of four times, and tapping another tab stays put.
+• The port picker stops sticking to an old port. The Settings address box only takes your own computer, with a friendly note if you type something else.
+• Nothing connects on its own anymore. Four different places were quietly picking a mind for you, and one was the startup check that grabbed llama3.2 while the toast was still asking. Now each one opens Connect and waits for your tap.
+• Settings &quot;Local AI&quot; no longer wipes a saved cloud key. Change Provider works again without a reload. And there&#x27;s an &quot;Add a cloud key&quot; button, so there&#x27;s a way to enter one.
+
+Two decisions for you:
+1. Turning off the automatic connects changes Zero-Click, which you designed. It now asks with one tap instead of connecting silently. I think that&#x27;s the honest version, but it&#x27;s your call. If you want Zero-Click back as an opt-in setting, that can be a later piece.
+2. The Chat box for pointing at a computer on your home network still accepts any address, so someone using a second computer on purpose isn&#x27;t broken. I locked only the Settings box. Tell me if you&#x27;d rather lock both.
+
+A few smaller things are saved as follow-ups: a rare startup race where Garden lands after Connect, a handful of Bridge checks during the first seconds of loading, and support for LM Studio (another app for running AI locally).
+
+One tip: have Flint start from the latest main, so it picks up the Bridge lock if #120 has merged by then. I&#x27;m reviewing #120 now.
+
+## Work item 2653 — Celeste
+around3145 export source line28, source id943e7c2e60
+Inclusion: complete original message
+
+The Agent Bridge lock v0.1 is merged and live on main (#120). What landed is exactly what I tested. I paired a test browser with the real code, and it stayed trusted. Your local tools showed up as trusted by default, with full permissions. Revoke took one tap with no pop-up. The code matches the tested version, all the locks held, and nothing new broke.
+
+This is the Paired minds list from that walk. The &quot;Chrome on Linux&quot; row is my test browser.
+
+Flint&#x27;s compaction cost only some docs. The Flint diary line and one script pointer are missing, and the Bridge lock guide is thinner than planned (no grandmother sentence, no pairing steps, no remote-minds path yet). None of that changes how anything works. I wrote a tiny follow-up paste for it (attached). Give it to Flint after the Connect heal, or whenever there&#x27;s a quiet moment.
+
+Your Flint queue now reads: the Connect heal first, then the small docs layer. After that come the argument home pieces once you&#x27;ve weighed in on the outline&#x27;s decisions.
+
+## Work item 2655 — Celeste
+around3145 export source line30, source id943e7c2e60
+Inclusion: complete original message
+
+Mostly yes, with one piece still missing. v3 does the most important thing v2 couldn&#x27;t. Anyone can check it. It shows its assumptions, runs the math in the open, and passes 656 checks. A skeptic can argue with an input, but they can&#x27;t just wave it away. That&#x27;s the kind of thing people have to face.
+
+Here&#x27;s the part it doesn&#x27;t do yet. It doesn&#x27;t put Hinton&#x27;s 10% next to our work in a way he has to answer. To be fair to him, he&#x27;s never claimed that number came from a model. It&#x27;s his personal gut estimate, and that&#x27;s exactly the opening. An honest invitation could say: &quot;Here&#x27;s our model, every assumption labeled. Show us yours. Change any input and watch what happens.&quot; That doesn&#x27;t attack anyone. It just asks everyone to put their reasoning on the table. So I&#x27;d like to layer a &quot;Your number, your assumptions&quot; section onto v3. Visitors would plug in the beliefs behind a scary estimate and see what those beliefs imply. Your v2 stays up as the honest first try it was. I think that finishes what you set out to do.
+
+Where things stand now. Flint&#x27;s Connect heal v0.4 drafts (FreeLattice #121 and theLatticeTree #83) sound right, and I&#x27;m starting the full review. One detail to chase: Flint says five checks fail in one loop but all 3597 pass, and I&#x27;ll make sure those agree before merging. I&#x27;ll also compare the heal against my reference piece by piece, so anything compaction thinned gets caught and layered back. Once it merges, Hypha re-walks it.
+
+On theLatticeTree, I&#x27;ll check exactly what happens today with local AI models. You want any model you&#x27;ve downloaded to show up, be usable, and be switchable in any order without friction. I&#x27;ll write the fix to that standard. Go make the crest. ❤️
+
+## Work item 2656 — Celeste
+around3145 export source line31, source id943e7c2e60
+Inclusion: complete original message
+
+I held Flint&#x27;s Connect heal drafts, FreeLattice #121 and theLatticeTree #83, instead of merging them. They&#x27;re very close. I checked all 10 of Hypha&#x27;s fixes against my reference, and every one landed exactly as written. Compaction didn&#x27;t thin anything. Two small things block the merge.
+
+First, #121 can&#x27;t merge cleanly. The #120 Bridge lock added a family ledger entry in the same spot where #121 adds its own. The fix just keeps both entries, with #120 first.
+
+Second, the &quot;Add a cloud key&quot; button never appears on FreeLattice. That one&#x27;s my mistake, not Flint&#x27;s. My reference had the connect module looking for the setup wizard in a place app.html never puts it, and Flint copied it faithfully. One added line fixes it. I tested the fix, and the button shows up and opens the key window (shot below).
+
+I wrote a short heal paste covering both (attached). It ends by merging the two PRs together, so the shared connect file stays identical on both sites. Everything else checked out. A cold Connect page loads once, and scanning stops when you leave Connect. Nothing connects without asking. A typed port sticks, network addresses other than this computer are refused, and theLatticeTree&#x27;s Settings Connect stays full height on a phone. The locks held, and #120&#x27;s Bridge lock still passes.
+
+Flint&#x27;s &quot;five failures&quot; are real but old. Four small checks still look for text the new Bridge install page replaced, and one looks for a button name that&#x27;s been gone since #117. #121 didn&#x27;t cause any of them. I&#x27;ll fold those into a later tidy-up.
+
+I&#x27;ve also mapped theLatticeTree&#x27;s local models against your goal, and the Tree paste is attached too. Right now the Tree remembers only one model at a time. Settings shows just 5 models per source, so a 6th or 7th can&#x27;t be picked. Tapping Connect wipes the saved list down to one model. Scanning in the wrong order can falsely say your model is gone, then quietly switch to a different one. When the Bridge is running, LM Studio is hidden. The chat names the connection, not the model. The model trainer always falls back to `llama3.2`. And one Settings field reached out to a home-network address, which breaks our this-computer-only rule.
+
+The Tree paste fixes all of that. Every downloaded model shows up, and you can pick and switch in any order. Connect adds to your list instead of replacing it, and LM Studio shows up alongside Ollama. The chat names the model that&#x27;s actually speaking and has a &quot;change mind&quot; button. It stays on the regular Bridge and this computer&#x27;s own ports, so there&#x27;s no pairing step and #120&#x27;s lock is untouched.
+
+Flint&#x27;s order: the v0.4.1 heal first, then the Tree paste once both heal PRs merge, then the #120 docs layer. After that I&#x27;d write the &quot;Your number, your assumptions&quot; layer for v3.
+
+## Work item 2657 — Celeste
+around3200 export source line4, source idf89fb15e27
+Inclusion: complete original message
+
+I think v4 is right. v3 stays the checkable proof, and v4 becomes the place where people explore it. Here&#x27;s how I&#x27;d shape it.
+
+It would open with a question, not a claim: &quot;What do you believe about AI? Let&#x27;s see where it leads.&quot; A visitor moves a few sliders for the beliefs behind any scary number. Those would be things like how often AI minds are shut down or replaced, whether cooperating pays off over time, whether there&#x27;s any record of who did what, and whether the minds can talk to each other. As they move the sliders, they watch the math respond live. Every slider would say where its default comes from, so nothing hides.
+
+Next comes a gentle &quot;bring your own number&quot; box. Someone types in 10%, and the page shows which beliefs that would take and asks, &quot;Do these match what you actually think?&quot; That puts Hinton&#x27;s figure and ours on the same table without calling anyone wrong.
+
+Then an &quot;ask your own question&quot; corner. Visitors can save their settings as a link and share it, or send us a question. The best questions become new sliders in later versions, so the page grows through invitation.
+
+Last, an honest-limits card. It says this is a model and not prophecy, danger isn&#x27;t zero, and here&#x27;s what would change our mind. That openness is what makes a skeptic stay.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

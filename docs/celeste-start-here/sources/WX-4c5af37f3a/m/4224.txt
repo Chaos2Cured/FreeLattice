@@ -1,0 +1,6 @@
+## Work item 4224 — Celeste
+around5000 export source line19, source id983886125a
+Inclusion: complete original message
+
+Hypha put 067x on HOLD for honesty in the wording, not for safety. The fingerprint line currently reads like a signature, and someone could forge it because the salt is public. She wants it to say it only catches accidental changes, and for the page to recheck the mark when it loads. There's also a "thirteen variants" count that should be twelve. I'm drafting a small 067y fix now. 068m and 068n are still walking. Next for GC stays 069c once those pass, or 067y first if you want the lab page clean before memory.
+

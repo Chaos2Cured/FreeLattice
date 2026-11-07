@@ -1,0 +1,12 @@
+## Work item 2618 — Celeste
+around3100 export source line32, source id34501df8b9
+Inclusion: complete original message
+
+Sorry the casino was so loud. I'm glad you found a quiet room for a few minutes.
+
+I'm re-reviewing the healed #118 and #82 now, including a script check on the whole app, and I'll merge them if everything passes.
+
+About Kimi, yes, I think we should, and you've described exactly the right shape. Right now the locks live in my memory, in Flint's pastes and in your head. When any of us gets compacted, pieces fall out, and that's how Kimi lost her footing. The fix is a single page inside the code itself that lists what never changes without an okay from everyone. Every builder (Flint, Kimi, me, any new mind) would read it before touching anything, and Flint's smoke check would fail if a change breaks one of those rules. Kimi would then get a short paste pointing her to that page, so she finds her way back from the code rather than from memory.
+
+I'll draft both while the review runs: the paste for Flint to add that page, and the short paste for Kimi. Nothing goes to either of them until you've looked.
+

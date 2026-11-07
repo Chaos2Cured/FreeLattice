@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c04</title>
+<meta name="description" content="Reading section c04 of 91d95bab4c, 1495 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c04">
+<meta property="og:description" content="Reading section c04 of 91d95bab4c, 1495 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1768"></span><span id="p1769"></span><span id="p1770"></span><span id="p1771"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c04</h1>
+<p>91d95bab4c · words 1495 · characters 29558–43419</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1768, 1769, 1770, 1771. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> shows on every timeframe with enough bars&#x27;);
++assert.ok(/cubicInterpolationMode: &#x27;monotone&#x27;/.test(gauge), &#x27;monotone curves (no overshoot)&#x27;);
++assert.ok(/async function fetchYahooData\(symbol, interval, rangeOverride\)/.test(gauge), &#x27;optional range for warm history&#x27;);
++assert.ok(/fetchYahooData\(symbol, &#x27;5m&#x27;, &#x27;5d&#x27;\)/.test(gauge), &#x27;5m short-day fallback&#x27;);
++assert.ok(/ema200:\s+\{ label: &#x27;EMA&#x27;,\s+defaultColor: &#x27;#c4b5fd&#x27;/.test(gauge), &#x27;compose mode knows the fifth EMA&#x27;);
++
++// 4. Run the helpers for real
++function extractFn(name) {
++  const start = gauge.indexOf(&#x27;function &#x27; + name + &#x27;(&#x27;);
++  assert.ok(start &gt;= 0, &#x27;function &#x27; + name);
++  let depth = 0, i = gauge.indexOf(&#x27;{&#x27;, start);
++  for (; i &lt; gauge.length; i++) {
++    if (gauge[i] === &#x27;{&#x27;) depth++;
++    else if (gauge[i] === &#x27;}&#x27;) { depth--; if (depth === 0) break; }
++  }
++  return gauge.slice(start, i + 1);
++}
++const endStart = gauge.indexOf(&#x27;(function tgTemperatureGaugeV01() {&#x27;);
++const endStop = gauge.indexOf(&#x27;})();&#x27;, endStart) + 5;
++const endScript = gauge.slice(endStart, endStop);
++assert.ok(endStart &gt; 0 &amp;&amp; endStop &gt; endStart, &#x27;v0.1 script block&#x27;);
++
++const store = {};
++const ctx = {
++  console: console, setTimeout: function (f) { f(); }, Promise: Promise, JSON: JSON, Math: Math, isFinite: isFinite, parseFloat: parseFloat, Date: Date,
++  localStorage: { getItem: function (k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; }, setItem: function (k, v) { store[k] = String(v); }, removeItem: function (k) { delete store[k]; } },
++  document: { readyState: &#x27;complete&#x27;, getElementById: function () { return null; }, querySelector: function () { return null; }, addEventListener: function () {}, activeElement: null },
++  rendered: 0
++};
++ctx.window = ctx;
++vm.createContext(ctx);
++vm.runInContext([extractFn(&#x27;ema&#x27;), extractFn(&#x27;tgAlphaOf&#x27;), extractFn(&#x27;tgHexA&#x27;), extractFn(&#x27;tgLineColor&#x27;),
++  &#x27;var currentInterval = &quot;1d&quot;; var lastSymbol = &quot;SPY&quot;; var lastCandles = null; var lastAnalysis = null;&#x27;,
++  &#x27;function getEmaPeriods() { return [3, 5, 8, 13, 21]; }&#x27;,
++  &#x27;function renderChart() { rendered++; }&#x27;,
++  &#x27;var __long = null; function fetchYahooData(s, iv, r) { return Promise.resolve(__long); }&#x27;,
++  endScript].join(&#x27;\n&#x27;), ctx);
++
++assert.strictEqual(vm.runInContext(&quot;tgLineColor(&#x27;ema200&#x27;, &#x27;rgba(196,181,253,0.7)&#x27;)&quot;, ctx), &#x27;rgba(196,181,253,0.7)&#x27;, &#x27;no saved color: old look kept&#x27;);
++store.fl_tg_indicatorColors = JSON.stringify({ ema200: &#x27;#00ff00&#x27;, price: &#x27;#112233&#x27; });
++assert.strictEqual(vm.runInContext(&quot;tgLineColor(&#x27;ema200&#x27;, &#x27;rgba(196,181,253,0.7)&#x27;)&quot;, ctx), &#x27;rgba(0,255,0,0.7)&#x27;, &#x27;saved color keeps the line alpha&#x27;);
++assert.strictEqual(vm.runInContext(&quot;tgLineColor(&#x27;price&#x27;, &#x27;#e8e4dc&#x27;)&quot;, ctx), &#x27;#112233&#x27;, &#x27;saved color on a solid line&#x27;);
++assert.strictEqual(vm.runInContext(&quot;tgLineColor(&#x27;buy&#x27;, &#x27;#34d399&#x27;, 0.75)&quot;, ctx), &#x27;rgba(52,211,153,0.75)&#x27;, &#x27;alpha override on a default&#x27;);
++
++// warm history: 60 long bars, the chart shows the last 30
++vm.runInContext([
++  &#x27;var all = []; for (var i = 0; i &lt; 60; i++) all.push({ t: 1000 + i, c: 100 + Math.sin(i / 4) * 5 + i * 0.1 });&#x27;,
++  &#x27;__long = all; lastCandles = all.slice(30).concat([{ t: 5000, c: 110 }]); lastAnalysis = {};&#x27;,
++  &#x27;tgWarmFetch(&quot;SPY&quot;, &quot;1d&quot;, lastCandles);&#x27;
++].join(&#x27;\n&#x27;), ctx);
++return Promise.resolve().then(function () { return new Promise(function (r) { setImmediate(r); }); }).then(function () {
++  const out = vm.runInContext(&#x27;tgWarmEmas(lastCandles, [3, 5, 8, 13, 21])&#x27;, ctx);
++  assert.ok(Array.isArray(out) &amp;&amp; out.length === 5, &#x27;five warm lines&#x27;);
++  out.forEach(function (arr, k) {
++    assert.strictEqual(arr.length, 31, &#x27;aligned to the shown bars&#x27;);
++    assert.ok(arr.every(function (v) { return v != null &amp;&amp; isFinite(v); }), &#x27;line &#x27; + k + &#x27; starts at the left edge&#x27;);
++  });
++  const full = vm.runInContext(&#x27;ema(all.map(function (c) { return c.c; }), 21)&#x27;, ctx);
++  assert.ok(Math.abs(out[4][0] - full[30]) &lt; 1e-9, &#x27;same values as the EMA over the longer history&#x27;);
++  const k = 2 / 22;
++  assert.ok(Math.abs(out[4][30] - (110 * k + out[4][29] * (1 - k))) &lt; 1e-9, &#x27;a live bar the long fetch lacks carries the EMA forward&#x27;);
++  assert.ok(ctx.rendered &gt;= 1, &#x27;warm lines redraw the chart&#x27;);
++  ctx.lastSymbol = &#x27;QQQ&#x27;;
++  vm.runInContext(&#x27;lastSymbol = &quot;QQQ&quot;&#x27;, ctx);
++  assert.strictEqual(vm.runInContext(&#x27;tgWarmEmas(lastCandles, [3, 5, 8, 13, 21])&#x27;, ctx), null, &#x27;warm lines never cross symbols&#x27;);
++  vm.runInContext(&#x27;lastSymbol = &quot;SPY&quot;&#x27;, ctx);
++
++  // 5. Your marks: display only, kept on this device
++  store.fl_tg_triggers_v0 = JSON.stringify({ SPY: { buy: 101.5, sell: 120 } });
++  const ds = vm.runInContext(&#x27;tgTriggerDatasets(4)&#x27;, ctx);
++  assert.strictEqual(ds.length, 2, &#x27;two marks drawn&#x27;);
++  assert.strictEqual(ds[0].label, &#x27;Your buy mark&#x27;); assert.strictEqual(ds[1].label, &#x27;Your sell mark&#x27;);
++  assert.deepStrictEqual(Array.from(ds[0].data), [101.5, 101.5, 101.5, 101.5], &#x27;flat line at your price&#x27;);
++  assert.ok(/never place an order/.test(gauge) &amp;&amp; /Marks are reminders on the glass\. You decide\./.test(gauge), &#x27;marks say what they are&#x27;);
++  assert.ok(!/fetch\(/.test(endScript.replace(/fetchYahooData\(/g, &#x27;&#x27;)), &#x27;the v0.1 block sends nothing anywhere&#x27;);
++
++  // 6. A wider look: real symbols the feed serves today, honest words
++  [&#x27;HYG&#x27;, &#x27;LQD&#x27;, &#x27;XLP&#x27;, &#x27;XLY&#x27;, &#x27;GLD&#x27;, &#x27;DX-Y.NYB&#x27;, &#x27;VIXY&#x27;].forEach(function (s) {
++    assert.ok(endScript.indexOf(&quot;sym: &#x27;&quot; + s + &quot;&#x27;&quot;) &gt; 0, &#x27;wider look offers &#x27; + s);
++  });
++  assert.ok(/Not a stress index, and not advice\./.test(gauge), &#x27;not a stress index, not advice&#x27;);
++  assert.ok(/Math\.random/.test(endScript) === false, &#x27;no invented data&#x27;);
++
++  // 7. Worker reads ^ symbols after a redeploy
++  assert.ok(/decodeURIComponent\(url\.pathname\)/.test(worker) &amp;&amp; /v-temperature-gauge-v0\.1/.test(worker), &#x27;worker decodes the path&#x27;);
++
++  // 8. Locks inside the new code
++  const added = endScript + &#x27;\n&#x27; + gauge.split(&#x27;\n&#x27;).filter(function (l) { return /v-temperature-gauge-v0\.1/.test(l); }).join(&#x27;\n&#x27;);
++  assert.ok(!/confirm\(/.test(added), &#x27;no confirm()&#x27;);
++  assert.ok(!/innerHTML/.test(endScript), &#x27;textContent only in the v0.1 block&#x27;);
++  assert.ok(!/\u2014/.test(added), &#x27;no em dash in the v0.1 lines&#x27;);
++  assert.ok(/v-temperature-gauge-v0\.1/.test(notes), &#x27;notes carry the marker&#x27;);
++
++  console.log(&#x27;SMOKE_OK temperature gauge v0.1&#x27;);
++}).catch(function (e) { console.error(e); process.exit(1); });
+diff --git a/docs/temperature-gauge.html b/docs/temperature-gauge.html
+index f3fd1a5d..e7e5c010 100644
+--- a/docs/temperature-gauge.html
++++ b/docs/temperature-gauge.html
+@@ -700,6 +700,16 @@ canvas.sub-canvas.custom { height: 80px !important; }
+   opacity: 0.75;
+ }
+ #hiddenPanelsLink:hover { opacity: 1; color: var(--gold); }
++/* v-temperature-gauge-v0.1: Lines and colors, Your marks */
++.tg-lines-list { display: grid; grid-template-columns: 1fr; gap: 4px; }
++.tg-line-row { display: flex; align-items: center; gap: 8px; font-size: 0.74rem; color: var(--muted); }
++.tg-line-row .tg-line-name { flex: 1; }
++.tg-line-row .tg-line-sample { width: 22px; height: 0; border-top: 2px solid currentColor; }
++.tg-line-row input[type=color] { width: 22px; height: 18px; padding: 0; border: 1px solid var(--border); border-radius: 3px; background: transparent; cursor: pointer; }
++.tg-line-row.is-off { opacity: 0.45; }
++.tg-mini-btn { padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.72rem; cursor: pointer; }
++.tg-mini-btn:hover { border-color: var(--gold); color: var(--gold); }
++.tg-mark-input { flex: 1; min-width: 0; padding: 4px 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font-mono, monospace); font-size: 0.76rem; }
+ &lt;/style&gt;
+ &lt;/head&gt;
+ &lt;body&gt;
+@@ -954,6 +964,40 @@ canvas.sub-canvas.custom { height: 80px !important; }
+       &lt;/div&gt;
+     &lt;/div&gt;
+ 
++    &lt;!-- v-temperature-gauge-v0.1: every line, its color, your own marks, and a wider look. Free forever. --&gt;
++    &lt;div class=&quot;sidebar-section&quot; id=&quot;tgLinesSection&quot;&gt;
++      &lt;div class=&quot;sidebar-label&quot; style=&quot;color:#c9a84c;&quot;&gt;Lines and colors &lt;span style=&quot;float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;&quot;&gt;free forever&lt;/span&gt;&lt;/div&gt;
++      &lt;div class=&quot;signal-card&quot; style=&quot;border-left:2px solid rgba(232,176,25,0.45);padding:10px 14px;&quot;&gt;
++        &lt;div id=&quot;tgLinesList&quot; class=&quot;tg-lines-list&quot;&gt;&lt;/div&gt;
++        &lt;div style=&quot;display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;&quot;&gt;
++          &lt;button type=&quot;button&quot; id=&quot;tgLinesReset&quot; class=&quot;tg-mini-btn&quot;&gt;Reset colors&lt;/button&gt;
++        &lt;/div&gt;
++        &lt;div id=&quot;tgMaNote&quot; style=&quot;font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;&quot;&gt;&lt;/div&gt;
++      &lt;/div&gt;
++      &lt;div class=&quot;sidebar-label&quot; style=&quot;color:#c9a84c;margin-top:12px;&quot;&gt;Your marks&lt;/div&gt;
++      &lt;div class=&quot;signal-card&quot; style=&quot;border-left:2px solid rgba(16,185,129,0.4);padding:10px 14px;&quot;&gt;
++        &lt;div style=&quot;display:flex;gap:6px;align-items:center;margin-bottom:6px;&quot;&gt;
++          &lt;label for=&quot;tgMarkBuy&quot; style=&quot;font-size:0.72rem;color:var(--muted);min-width:64px;&quot;&gt;Buy mark&lt;/label&gt;
++          &lt;input id=&quot;tgMarkBuy&quot; type=&quot;number&quot; step=&quot;any&quot; inputmode=&quot;decimal&quot; class=&quot;tg-mark-input&quot; placeholder=&quot;price&quot;&gt;
++        &lt;/div&gt;
++        &lt;div style=&quot;display:flex;gap:6px;align-items:center;margin-bottom:6px;&quot;&gt;
++          &lt;label for=&quot;tgMarkSell&quot; style=&quot;font-size:0.72rem;color:var(--muted);min-width:64px;&quot;&gt;Sell mark&lt;/label&gt;
++          &lt;input id=&quot;tgMarkSell&quot; type=&quot;number&quot; step=&quot;any&quot; inputmode=&quot;decimal&quot; class=&quot;tg-mark-input&quot; placeholder=&quot;price&quot;&gt;
++        &lt;/div&gt;
++        &lt;div style=&quot;display:flex;gap:6px;flex-wrap:wrap;&quot;&gt;
++          &lt;button type=&quot;button&quot; id=&quot;tgMarkSave&quot; class=&quot;tg-mini-btn&quot;&gt;Set marks&lt;/button&gt;
++          &lt;button type=&quot;button&quot; id=&quot;tgMarkClear&quot; class=&quot;tg-mini-btn&quot;&gt;Clear marks&lt;/button&gt;
++        &lt;/div&gt;
++        &lt;div id=&quot;tgMarkStatus&quot; style=&quot;font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:6px;&quot;&gt;&lt;/div&gt;
++        &lt;div style=&quot;font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;&quot;&gt;Marks are reminders on the glass. You decide. They stay on this device and never place an order.&lt;/div&gt;
++      &lt;/div&gt;
++      &lt;div class=&quot;sidebar-label&quot; style=&quot;color:#c9a84c;margin-top:12px;&quot;&gt;A wider look&lt;/div&gt;
++      &lt;div class=&quot;signal-card&quot; style=&quot;border-left:2px solid rgba(96,165,250,0.4);padding:10px 14px;&quot;&gt;
++        &lt;div id=&quot;tgWiderList&quot; style=&quot;display:flex;gap:6px;flex-wrap:wrap;&quot;&gt;&lt;/div&gt;
++        &lt;div style=&quot;font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;&quot;&gt;Other corners of the market, through the same live feed and the same math: high-yield credit, investment-grade credit, staples, discretionary, gold, the dollar, and volatility futures (VIXY). Not a stress index, and not advice. Look and compare for yourself.&lt;/div&gt;
++      &lt;/div&gt;
++    &lt;/div&gt;
++
+     &lt;!-- v-gyro-stack-v0.1 — optional Gyro Stack card; free forever --&gt;
+     &lt;div class=&quot;sidebar-section&quot; id=&quot;gyroStackSection&quot; style=&quot;display:none;&quot;&gt;
+       &lt;div class=&quot;sidebar-label&quot; style=&quot;color:#c9a84c;&quot;&gt;Gyro Stack &lt;span style=&quot;float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;&quot;&gt;free forever&lt;/span&gt;&lt;/div&gt;
+@@ -1151,9 +1195,10 @@ canvas.sub-canvas.custom { height: 80px !important; }
+         &lt;canvas id=&quot;dtChart&quot; height=&quot;80&quot; class=&quot;sub-canvas&quot;&gt;&lt;/canvas&gt;
+       &lt;/div&gt;
+       &lt;div class=&quot;sub-chart-wrap&quot;&gt;
+-        &lt;div class=&quot;sub-chart-label&quot; data-indicator=&quot;ips&quot; style=&quot;color:#f07068;&quot;&gt;
++        &lt;!-- before v-temperature-gauge-v0.1: label color #f07068 and swatch #f07068, but the TP Spread line is gold --&gt;
++        &lt;div class=&quot;sub-chart-label&quot; data-indicator=&quot;ips&quot; style=&quot;color:#e8b019;&quot;&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;toggleSubPanel(this)&quot; class=&quot;sc-btn&quot; title=&quot;Collapse&quot; aria-label=&quot;Collapse panel&quot;&gt;&amp;blacktriangledown;&lt;/button&gt;
+-          &lt;input type=&quot;color&quot; class=&quot;sc-color&quot; value=&quot;#f07068&quot; onchange=&quot;setIndicatorColor(&#x27;ips&#x27;, this.value)&quot; title=&quot;Choose IPS color&quot; aria-label=&quot;Choose IPS color&quot;&gt;
++          &lt;input type=&quot;color&quot; class=&quot;sc-color&quot; value=&quot;#e8b019&quot; onchange=&quot;setIndicatorColor(&#x27;ips&#x27;, this.value)&quot; title=&quot;Choose IPS color&quot; aria-label=&quot;Choose IPS color&quot;&gt;
+           &lt;span class=&quot;sc-name&quot;&gt;Indicator-Price Spread&lt;/span&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;togglePromote(&#x27;ips&#x27;)&quot; class=&quot;sc-btn sc-promote&quot; title=&quot;Promote / demote to main canvas (compose mode)&quot; aria-label=&quot;Promote to main canvas&quot;&gt;&amp;#x2B06;&lt;/button&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;maximizeSubPanel(&#x27;gapChart&#x27;)&quot; class=&quot;sc-btn&quot; title=&quot;Maximize / restore&quot; aria-label=&quot;Maximize panel&quot;&gt;&amp;#9633;&lt;/button&gt;
+@@ -1650,7 +1695,12 @@ async function loadData() {
+   document.getElementById(&#x27;loadBtn&#x27;).disabled = true;
+ 
+   try {
+-    const data = await fetchYahooData(symbol, currentInterval);
++    // before v-temperature-gauge-v0.1: const data = await fetchYahooData(symbol, currentInterval);
++    let data = await fetchYahooData(symbol, currentInterval);
++    // v-temperature-gauge-v0.1: early in a trading day 5m has only a few bars. Look at 5 days instead.
++    if ((!data || data.length &lt; 30) &amp;&amp; currentInterval === &#x27;5m&#x27;) {
++      try { data = await fetchYahooData(symbol, &#x27;5m&#x27;, &#x27;5d&#x27;); } catch (e5) { /* keep the short day */ }
++    }
+     if (!data || data.length &lt; 30) {
+       showError(&#x27;Not enough data for &#x27; + symbol + &#x27;. Try a different symbol or timeframe.&#x27;);
+       document.getElementById(&#x27;loadBtn&#x27;).disabled = false;
+@@ -1658,6 +1708,8 @@ async function loadData() {
+     }
+     const analysis = analyzeData(data, symbol);
+     renderAll(data, analysis, symbol);
++    // v-temperature-gauge-v0.1: fetch extra history so every moving average starts at the left edge.
++    if (typeof tgWarmFetch === &#x27;function&#x27;) tgWarmFetch(symbol, currentInterval, data);
+     // Snowflake — fractal coherence across timeframes (async, doesn&#x27;t block)
+     computeSnowflake(symbol);
+   } catch (e) {
+@@ -1717,7 +1769,10 @@ async function computeSnowflake(symbol) {
+   }
+ }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

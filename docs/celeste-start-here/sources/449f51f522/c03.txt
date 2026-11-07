@@ -1,0 +1,174 @@
++  // v-tree-honest-reasons-v0: when every door was quiet, a quiet knock tells "nothing is
++  // running" apart from "a mind answered but keeps its door shut to this page". A no-cors
++  // knock reads nothing from the mind; it only learns whether anything answered at that
++  // door. It runs only after a tap (Find, May I look?, Send), never on its own.
++  function knock(url, ms) {
++    if (typeof fetch !== 'function' || !url) return Promise.resolve('unknown');
++    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
++    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms || 2000);
++    var opts = { method: 'GET', mode: 'no-cors', cache: 'no-store' };
++    if (ctrl) opts.signal = ctrl.signal;
++    return fetch(url, opts).then(function () {
++      clearTimeout(timer);
++      return 'up';
++    }, function (err) {
++      clearTimeout(timer);
++      return err && err.name === 'AbortError' ? 'slow' : 'down';
++    });
++  }
++
++  // After a look with no mind found: 'shut' (something answered at a door, its door is
++  // closed to this page, with that door's name), 'stopped' (nothing answered anywhere),
++  // or 'none' (nothing to knock).
++  function whyQuiet(report) {
++    var quiet = ((report && report.results) || []).filter(function (r) {
++      return r && !r.ok && (r.blocked || r.status === 0) && r.url;
++    });
++    if (!quiet.length) return Promise.resolve({ kind: 'none' });
++    return Promise.all(quiet.map(function (r) {
++      return knock(r.url).then(function (k) { return { name: r.name || 'a mind', state: k }; });
++    })).then(function (ks) {
++      var up = ks.filter(function (k) { return k.state === 'up' || k.state === 'slow'; });
++      if (up.length) return { kind: 'shut', name: up[0].name };
++      return { kind: 'stopped' };
++    });
++  }
++
++  function speakShut(name) {
++    return 'Something answered at the ' + (name || 'mind') + ' door, but it has not opened that door to this garden yet. ' +
++      'This garden is a secure page, and the mind lives at a quieter door. ' +
++      'That is why we cannot see in from here.';
++  }
++
++  function speakStopped() {
++    return 'Nothing answered at the usual doors on this machine. If Ollama (or your local app) is stopped, ' +
++      'start it, then look again. If it is running, let this page look at local devices when the browser asks.';
++  }
++
+   function speakBlocked() {
+     return 'The mind is there, but it has not opened the door to this garden yet. ' +
+       'This garden is a secure page, and the mind lives at a quieter door. ' +
+@@ -856,8 +903,13 @@
+         showNext();
+         // HTTPS pages often cannot see http://127.0.0.1 (mixed content / PNA).
+         // Speak that honestly. On a quiet local http page, no-answer is simply none.
++        // v-tree-honest-reasons-v0: knock first, so a stopped mind is not called "there".
+         if (report.https && report.blocked > 0) {
+-          setStatus(root, speakBlocked(), 'warn');
++          whyQuiet(report).then(function (why) {
++            if (why.kind === 'shut') setStatus(root, speakShut(why.name), 'warn');
++            else if (why.kind === 'stopped') setStatus(root, speakStopped(), 'warn');
++            else setStatus(root, speakBlocked(), 'warn');
++          });
+           return;
+         }
+         setStatus(root, speakNoneHtml(), '', true);
+@@ -912,6 +964,10 @@
+     ROSTER_TAGS: ROSTER_TAGS,
+     ROSTER_CAP: ROSTER_CAP,
+     look: look,
++    knock: knock,
++    whyQuiet: whyQuiet,
++    speakShut: speakShut,
++    speakStopped: speakStopped,
+     tryAddress: tryAddress,
+     getRemembered: getRemembered,
+     getRememberedMinds: getRememberedMinds,
+diff --git a/docs/modules/tree-honest-reasons.test.js b/docs/modules/tree-honest-reasons.test.js
+new file mode 100644
+index 0000000..ecd5522
+--- /dev/null
++++ b/docs/modules/tree-honest-reasons.test.js
+@@ -0,0 +1,92 @@
++#!/usr/bin/env node
++// v-tree-honest-reasons-v0: say the right one. Ollama stopped (nothing answers), a mind
++// that answers but keeps its door shut to this secure page, and a seated model that is
++// gone (404 "model not found") each get their own honest line. The knock is no-cors, only
++// after a tap, and reads nothing. Stubbed fetch only. No network.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var vm = require('vm');
++var assert = require('assert');
++
++var src = fs.readFileSync(path.join(__dirname, 'local-mind-probe.js'), 'utf8');
++var rooms = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
++var thread = fs.readFileSync(path.join(__dirname, 'garden-thread.js'), 'utf8');
++
++var calls = [];
++var mode = 'stopped';
++function fakeFetch(url, opts) {
++  calls.push({ url: url, mode: opts && opts.mode });
++  if (mode === 'stopped') return Promise.reject(new TypeError('Failed to fetch'));
++  if (mode === 'shut') {
++    if (opts && opts.mode === 'no-cors') return Promise.resolve({ ok: false, status: 0, type: 'opaque' });
++    return Promise.reject(new TypeError('Failed to fetch'));
++  }
++  return Promise.reject(new Error('unexpected'));
++}
++var store = {};
++var ctx = {
++  window: {}, console: console, setTimeout: setTimeout, clearTimeout: clearTimeout,
++  location: { protocol: 'https:', hostname: 'thelatticetree.com' },
++  localStorage: { getItem: function (k) { return store[k] || null; }, setItem: function (k, v) { store[k] = String(v); }, removeItem: function (k) { delete store[k]; } },
++  document: { addEventListener: function () {}, querySelector: function () { return null; }, querySelectorAll: function () { return []; }, getElementById: function () { return null; } },
++  fetch: fakeFetch, AbortController: function () { this.signal = {}; this.abort = function () {}; }
++};
++ctx.window = ctx; ctx.self = ctx;
++vm.createContext(ctx);
++vm.runInContext(src, ctx);
++var P = ctx.LocalMindProbe;
++assert.ok(P && typeof P.knock === 'function' && typeof P.whyQuiet === 'function', 'knock and whyQuiet are exported');
++
++var quietReport = { found: null, https: true, blocked: 2, results: [
++  { ok: false, status: 0, blocked: true, name: 'Ollama', url: 'http://127.0.0.1:11434/api/tags' },
++  { ok: false, status: 0, blocked: true, name: 'LM Studio', url: 'http://127.0.0.1:1234/v1/models' }
++] };
++
++(async function () {
++  mode = 'stopped'; calls = [];
++  var why = await P.whyQuiet(quietReport);
++  assert.strictEqual(why.kind, 'stopped', 'nothing answered: stopped');
++  assert.ok(calls.length === 2 && calls.every(function (c) { return c.mode === 'no-cors'; }), 'knocks are no-cors, one per quiet door');
++  assert.ok(/Nothing answered at the usual doors/.test(P.speakStopped()) && /start it/.test(P.speakStopped()), 'stopped line says start it');
++  assert.ok(!/The mind is there/.test(P.speakStopped()), 'stopped never says the mind is there');
++
++  mode = 'shut'; calls = [];
++  why = await P.whyQuiet(quietReport);
++  assert.strictEqual(why.kind, 'shut', 'answered with a shut door: shut');
++  assert.strictEqual(why.name, 'Ollama', 'names the door that answered');
++  assert.ok(/Something answered at the Ollama door/.test(P.speakShut('Ollama')), 'shut line names the door');
++
++  why = await P.whyQuiet({ results: [{ ok: true, url: 'x' }] });
++  assert.strictEqual(why.kind, 'none', 'nothing quiet: nothing to knock');
++
++  // look() itself never knocks (Settings may look on its own; the knock is only after a tap)
++  var lookSrc = src.slice(src.indexOf('function look()'), src.indexOf('function look()') + 2600);
++  assert.ok(!/knock\(/.test(lookSrc.slice(0, lookSrc.indexOf('function ', 20))), 'look() does not knock');
++
++  // Find (Gathering) and May I look? (Settings) knock only in the quiet secure-page case
++  assert.ok(/LocalMindProbe\.whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === 'stopped'\) setNoteAbsent\('stopped'\);/.test(rooms), 'Find says stopped');
++  assert.ok(/kind === 'stopped'\) \{\s*n\.appendChild\(document\.createTextNode\(\s*'Nothing answered at the usual doors on this machine\./.test(rooms), 'Find stopped line');
++  assert.ok(/whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === 'shut'\) setStatus\(root, speakShut\(why\.name\), 'warn'\);/.test(src), 'Settings says shut or stopped');
++
++  // Chat: model missing is named; a quiet door is knocked once after this Send
++  assert.ok(/res\.status === 404 && \/model/.test(thread) && /err\.reason = 'model-missing';/.test(thread), '404 model not found is read');
++  assert.ok(/err\.reason === 'model-missing'\) \{ say\(heartModelMissing\(err\.model\)\); return; \}/.test(thread), 'model missing is said');
++  assert.ok(/does not have ' \+ \(model \|\| 'that model'\) \+ ' now\. ' \+\s*'Pick another in Settings, or Change this chair\./.test(thread), 'model missing line names it and says what to do');
++  assert.ok(/if \(k === 'down'\) say\(HEART_STOPPED\);/.test(thread), 'Chat says stopped when nothing answers');
++  assert.ok(/err\.reason === 'model-missing'\)\) throw err;/.test(thread), 'model missing is not swallowed by the url chain');
++  assert.ok(/\\bis-garden\\b/.test(thread) && /list\.scrollTop = Math\.max\(0, list\.scrollTop \+ dy\)/.test(thread), 'a long garden line shows where it begins');
++
++  // locks
++  var added = [src, rooms, thread].map(function (s) {
++    var out = ''; var re = /v-tree-honest-reasons-v0[\s\S]{0,900}/g; var m;
++    while ((m = re.exec(s))) out += m[0];
++    return out;
++  }).join('\n');
++  assert.ok(!/confirm\(/.test(added), 'no confirm()');
++  assert.ok(!/innerHTML\s*\+?=(?!\s*'';)/.test(added), 'no innerHTML for outside text (clearing with an empty string only)');
++  assert.ok(!/\u2014/.test(added), 'no em dash in added lines');
++
++  console.log('SMOKE_OK tree honest reasons v0.1');
++})().catch(function (e) { console.error(e); process.exit(1); });

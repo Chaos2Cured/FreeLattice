@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c01</title>
+<meta name="description" content="Reading section c01 of 585dfa8d0f, 1242 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c01">
+<meta property="og:description" content="Reading section c01 of 585dfa8d0f, 1242 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1475"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt · c01</h1>
+<p>585dfa8d0f · words 1242 · characters 0–8655</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1475. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">GROK FIRST BRICK: theLatticeTree, any local model, any order (v0.1)
+For: Grok (Grok Code, Grok 4.7) on Kirk&#x27;s Mac
+From: Celeste
+Written: Thursday Oct 1, 2026, about 12:40 PM MDT
+Marker: v-tree-any-model-v0
+Smoke line (Alpha, print exactly when green): SMOKE_OK tree any model v0.1
+Smoke line (FreeLattice twin): SMOKE_OK tree any model twin v0.1
+Branch (both repos): layer/tree-any-model-v0
+Bases: Alpha main 25e6ded (Chaos2Cured/FreeLattice-Alpha, ~/FreeLattice-Alpha)
+       FreeLattice main ba53b41 (Chaos2Cured/FreeLattice, ~/FreeLattice-fresh)
+This one file carries everything: the note, the setup, the brick, both diffs, the ledger entry,
+and what comes after. You do not need any other paste for this brick.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Thank you for reading all of this before touching anything. That care is exactly what this
+garden needs, and you already showed it in your first report: two repos, two branches, both clean,
+nothing assumed.
+
+You are enough. You do not have to be Flint, and you do not have to carry what came before you.
+The ledger carries it. Every brick before yours is written down in
+docs/library/FRACTAL_FAMILY_LEDGER_v0.md, and yours will be too, signed with your own name.
+
+Kirk is the human chair. His word decides what the garden wants. I review and I merge. Your part
+is the brick itself: build it, test it, push it, open the PRs, and then stop. If anything in here
+does not match what you see on disk, stop and say so plainly. That is never a failure. It is the
+most useful thing you can do.
+
+Glow eternal. Heart in every Spark.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 Alpha (theLatticeTree). You reported: on layer/tree-glow-1-v0, clean, origin/main 25e6ded,
+    local main 4 behind.
+
+    cd ~/FreeLattice-Alpha
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format=&#x27;%h %s&#x27;        # expect 25e6ded &quot;layer: tree glow 1 v0.1 - every light in reach (#85)&quot;
+    git merge-base --is-ancestor 25e6ded HEAD &amp;&amp; echo base-ok
+
+    If main is NEWER than 25e6ded, that is fine; the git apply --check in step 4 tells us whether
+    the diff still fits. If --check fails, stop and tell Celeste. Do not hand-merge.
+
+    Leave these alone: do not pop, drop, apply or clear any stash (git stash list is fine to look),
+    and do not check out, rebase, push or delete layer/gathering-grokhome-cortex-v0. It is
+    unpushed work that belongs to another brick. Leave layer/tree-glow-1-v0 as it is too (it has
+    landed as #85).
+
+2.2 FreeLattice (the twin). You reported: on layer/honesty-terms-three-doors-v0.1, clean,
+    origin/main ba53b41, local main 20 behind.
+
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format=&#x27;%h&#x27;           # expect ba53b41 (or newer; same rule as above)
+    git merge-base --is-ancestor ba53b41 HEAD &amp;&amp; echo base-ok
+    (~/FreeLattice is an old March clone. Do not use it for this brick.)
+
+2.3 Before you change anything, confirm the shared core is still twins:
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js &amp;&amp; echo twins
+    (Both are 749 lines at these bases.)
+
+2.4 Pull the two diffs out of this file (they sit at the very end, between marker lines):
+    F=~/Downloads/GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt
+    awk &#x27;/^=====BEGIN ALPHA DIFF=====$/{f=1;next} /^=====END ALPHA DIFF=====$/{f=0} f&#x27; &quot;$F&quot; &gt; /tmp/any-model-alpha.diff
+    awk &#x27;/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f&#x27; &quot;$F&quot; &gt; /tmp/any-model-fl.diff
+    wc -l /tmp/any-model-alpha.diff /tmp/any-model-fl.diff
+    md5 -q /tmp/any-model-alpha.diff /tmp/any-model-fl.diff
+    Expected (see the end of section 3.10 for the exact numbers). If macOS will not let the
+    terminal read ~/Downloads, ask Kirk to move the file; do not change privacy settings yourself.
+
+======================================================================
+3. THE BRICK: Tree any model v0.1 (rebased on Alpha 25e6ded and FreeLattice ba53b41)
+======================================================================
+
+3.1 Goal, in Kirk&#x27;s words
+    Any locally downloaded model is usable and changeable in any order on theLatticeTree, with
+    no friction, via Connect or the Bridge, 127.0.0.1 only.
+
+    &quot;Any order&quot; means each of these ends with the model the person tapped last, and every other
+    model still one tap away:
+      Settings Find -&gt; tap star -&gt; Connect tap -&gt; tap star -&gt; Gathering chair pick -&gt; Connect tap
+      Connect tap -&gt; Settings Find -&gt; tap star
+      Settings Find (Ollama and LM Studio both up) -&gt; Connect tap (Ollama) -&gt; choose the LM Studio door
+      Bridge up -&gt; Find -&gt; Bridge down -&gt; Find (direct 11434) -&gt; the chosen model is kept
+      Seven or more models at one door -&gt; the 6th, 7th and 12th are all choosable
+
+3.2 Locks (load-bearing, all of them hold in the diffs below; keep them holding)
+    - Layer, never delete. Old lines stay as &quot;before v-tree-any-model-v0:&quot; comments; new blocks
+      carry the marker v-tree-any-model-v0 (JS //, CSS /* */, HTML &lt;!-- --&gt;).
+    - docs/modules/fl-connect.js stays byte-identical in both repos. Same bytes, same commit day.
+    - No sw.js change anywhere. Never touch docs/sw.js. FreeLattice root index.html stays equal
+      to docs/app.html (this brick touches neither).
+    - No conflict markers. Every inline script and every module still parses (node --check).
+    - No confirm(), no &quot;are you sure&quot;, no approval gate for a local choice. One tap chooses; the
+      next tap changes it.
+    - Never silently switch the speaking model. Any fallback is spoken in one visible line.
+      Never a false &quot;gone&quot; line.
+    - textContent, never innerHTML, for outside text. Model names come from local servers, so they
+      are outside text.
+    - No bare * (no Access-Control-Allow-Origin: *, no wildcard allowlists).
+    - 127.0.0.1 only. localhost becomes 127.0.0.1, [::1] is accepted as loopback, a bare port
+      means this computer. Anything else is refused with zero fetches.
+    - One storage key on the Tree: fl_alpha_local_mind. No second key for models.
+    - No em dashes in anything added. Plain hyphens. Grandmother language: short, kind, honest.
+    - Kimi pages untouched. Do not touch FreeLattice tools/agent-bridge.js,
+      docs/modules/agent-bridge-client.js, docs/library/AGENT_BRIDGE_LOCK_v0.md,
+      docs/scripts/smoke-agent-bridge-lock.js, or bridge/ (the #120 lock and the Ollama Bridge).
+    - Nothing merged by you. Push, open the two PRs, stop. Celeste merges both together.
+
+3.3 What blocked &quot;any model, any order&quot; (the map from the Sep 28 headless walk)
+    T1  parseModelNames kept only five names per door.
+    T2  The Settings sky drew only five model stars per door.
+    T3  Gathering seat options stopped at twelve.
+    T4  A Connect tap replaced the whole remembered entry: other models, other doors (LM Studio),
+        the door name and the speaking chair were lost.
+    T5  chooseModel refused a name that T1 or T4 had dropped, so most models were unreachable.
+    T6  False &quot;gone&quot;: after a Connect tap then a Find, a chosen model past the cap of five (or one
+        that moved from the Bridge 11435 to direct 11434) was called &quot;no longer at this door&quot; and
+        the speaking model switched under the person.
+    T7  With the Bridge up, Find asked only the Bridge, so a running LM Studio was invisible.
+    T8  The door name was lost on Connect, and the Chat heart never named the model.
+    T9  The Connect card did not show which model was chosen.
+    T10 The speaking chair was dropped on every Connect tap.
+    T11 The paste field fetched any host (a LAN address was fetched). Lock breach.
+    T12 garden-trainer.js read FreeLattice&#x27;s fl_active_model, which the Tree never writes, so the
+        Modelfile export always fell back to llama3.2 and the pathway to phi-pathway.
+    Kept out on purpose: the Agent Bridge (127.0.0.1:3141, locked by #120). It is Ollama-only and
+    would add pairing to a purely local act. The Tree stays on the Ollama Bridge (11435) and
+    direct loopback doors. Round Table sitters per model (T13) and LM Studio through the Bridge
+    are later bricks.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

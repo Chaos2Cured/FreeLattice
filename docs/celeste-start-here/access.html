@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Access notes — Celeste reading home</title>
+<meta name="description" content="Observed public HTTP headers for freelattice.com and the documented GitHub raw limitation. Not a diagnosis of every failed fetch.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/access.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Access notes — Celeste reading home">
+<meta property="og:description" content="Observed public HTTP headers for freelattice.com and the documented GitHub raw limitation. Not a diagnosis of every failed fetch.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/access.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="index.html">Start</a>
+<a href="guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="source-index.html">Sources</a>
+<a href="tags/index.html">Topics</a>
+<a href="evidence/training/index.html">Training evidence</a>
+<a href="archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Access notes from one public probe</h1>
+<p>These notes record what a single anonymous fetch observed on 2026-11-07. They do not explain every report that an AI could not view FreeLattice. This edition does not change private pages, does not add a bypass, and does not ask a provider to allowlist the site.</p>
+<ul>
+<li>GET https://freelattice.com/ , /for-ai.html , /robots.txt , /library/AUTONOMY.md , /beacon.json , and one existing PDF returned HTTP 200. A second GET of /for-ai.html with a GPTBot user-agent also returned HTTP 200 on this path.</li>
+<li>Those responses showed server GitHub.com, via Fastly/varnish, Access-Control-Allow-Origin: *, Accept-Ranges: bytes, and no WWW-Authenticate challenge. No X-Robots-Tag header was present on the sampled responses. www.freelattice.com returned 301 to the apex host.</li>
+<li>Observed content types on existing files: HTML as text/html, Markdown as text/markdown, JSON as application/json, PDF as application/pdf. This repository cannot set a different per-file header on GitHub Pages.</li>
+<li>The site's own robots.txt already says Fastly may rate-limit some fetcher addresses and that the limit is outside the site's control. That sentence is the project's existing statement. This page does not treat it as the verified cause of any particular failure.</li>
+<li>GitHub's robots.txt, fetched the same day, lists Disallow: /*/raw/ for named agents including GPTBot and ClaudeBot. A raw.githubusercontent.com copy is therefore a weak fallback for those agents. The same bytes on freelattice.com are the ordinary public HTTP copy. This repo cannot change GitHub's robots or an outside provider's allowlist.</li>
+<li>The browser service worker is unchanged. A plain HTTP GET does not execute it.</li>
+<li>Existing noindex pages were left as they were. robots.txt Allow rules were not narrowed.</li>
+</ul>
+<p>Primary URL, after deploy: <a href="https://freelattice.com/celeste-start-here/">https://freelattice.com/celeste-start-here/</a>. Raw fallback, only after this edition is on the default branch, and subject to GitHub's own robots: <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/docs/celeste-start-here/START-HERE.txt">https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/docs/celeste-start-here/START-HERE.txt</a>. Blob view: <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/docs/celeste-start-here">https://github.com/Chaos2Cured/FreeLattice/blob/main/docs/celeste-start-here</a>.</p>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="sources/bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

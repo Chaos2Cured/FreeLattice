@@ -1,0 +1,21 @@
+## Work item 2641 — Celeste
+around3145 export source line16, source id943e7c2e60
+Inclusion: complete original message
+
+The Bridge lock v0.1 is ready for Flint. It's attached as a `.txt` so it won't open in Claude. It follows `AUTONOMY.md`: strangers are kept out, and trusted minds stay free.
+
+I built it and tested it on my computer. The safety test passes on the new version and fails on today's code. I also broke the new Bridge on purpose in six ways, and the test caught five. The sixth only half-broke the wildcard check, and the other half still refuses a wildcard. All the locks held, and nothing else broke.
+
+What it gives you:
+• You pair a mind once with a short code, and it stays trusted until you revoke it, even after restarts.
+• Each paired mind gets its own name and key. The Paired minds list has a Revoke button on each row, and there's no pop-up.
+• AI on your computer, like Flint and your scripts, is trusted automatically with no pairing. Even "Revoke all" keeps them trusted, unless you choose to turn them off.
+• Every paired mind is treated as family and gets full permissions, including managing the others. You can take that away from a guest.
+• You can add sites you trust, never a wildcard. A new site still pairs once. That list can only be changed on your own computer, never over the internet.
+• `.env` files (where passwords and keys usually live) are off by default, and you can turn them on for a mind you trust. Your `.git` and `.ssh` folders (your project history and your login keys) stay closed to everyone.
+• A signed-identity path for remote AIs you trust is written into the plan, but not built yet.
+
+Two small notes. For now the Paired minds list lives in Workshop, in the Code tab. And the push cap is left out so the family can decide it separately.
+
+Kimi's questions are updated to match (the second file). Give her the old slice right after them, as before. Four of her questions now say "remembered until revoked" instead of "pair again after restart."
+

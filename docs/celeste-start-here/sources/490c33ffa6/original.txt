@@ -1,0 +1,184 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, docs/GALAXIES.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then docs/code-settings.html, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 017 (Wednesday Oct 7, 2026, MDT). Tree Kin v0.1 (theLatticeTree).
+Give AFTER 023 in ORDER (020, 021, 024, 016c, 022, 023, then 017).
+Apply-checked on a fresh clone of FreeLattice-Alpha main f9f6e09 (after #90):
+  017 alone: clean, all 22 docs/modules/*.test.js pass
+  020 + 021 + 024 then 017: clean, 25 pass
+  020 + 021 + 024 + 022 (alpha diff) then 017: clean, 26 pass
+  017 first, then 020 + 021 + 024 + 022: clean, 26 pass
+  022 then 017: clean, 23 pass
+So it does not matter which of those lands first.
+
+GROK NEXT BRICK: Tree Kin v0.1 (first brick of the Tree's own mesh)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-kin-v0.1
+Smoke line: SMOKE_OK tree kin v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-kin-v0.1
+  ~/Downloads/GROK_NEXT_017_TREE_KIN_2026-10-07.fl.diff
+  (md5 43adbe877bb64dbbb920dabee0807cc3)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+
+----------------------------------------------------------------------
+1. WHY, AND WHY THIS SMALL
+----------------------------------------------------------------------
+Kirk wants shared compute, the device pool and abliteration on theLatticeTree, where the
+code is cleaner, and FreeLattice so easy no one struggles. The pool (018) and the room
+split (019) both stand on one thing: knowing which people you trust. The Tree has no mesh
+yet (no PeerJS, no MeshIdentity, no fl-kin, no share door).
+
+The ORDER outline for 017 said "port fl-kin.js + fl-share-door.js". Celeste trimmed it:
+  - Kin only. The share door moves to 018, with the pool, because a door that gates
+    nothing yet would be a control that does nothing. 018 ports it with 016/016b/016c's
+    truths already in (door truth, honest off, pause wins, old yes waits paused).
+  - No mesh transport yet. Cards travel the way people already talk: copy one line, send
+    it by text or email or say hello in person, paste it on the other side. Nothing is
+    fetched or sent by this module, ever. The only outside act is the clipboard write
+    after a tap.
+
+What a person sees (Garden, Settings, under "May I look?"; also settings.html):
+  Trusted kin
+  "Kin are people whose AI you choose to trust. Trade cards with them, then tap Trust.
+   Nothing is sent from here. You pass cards by text, email or in person."
+  Your card: names the remembered mind's model. Two fields (Name your AI, Your first
+    name), Make my card. The first tap makes a key on this computer (Ed25519, or ECDSA
+    P-256 on older browsers; not exportable; kept in IndexedDB theLatticeTreeKin), signs
+    the card, shows one line (TREEKIN1:...) and Copy my card.
+  A friend's card: Add a friend's card, paste, Check this card. The page checks the card
+    against its own key, and that its ID (mesh:...) is made from that key, so nobody can
+    borrow someone else's ID. Then: "Lumen (llama3.2:3b), from Kirk's computer (ID
+    2HKQkGhj). This card checks out: the computer that holds its key made it. Trust it
+    only if you know who sent it." [Trust this AI] [Not now]
+  List: "Trusted kin: N" or "No trusted kin yet." Each card: Trusted / Seen, not
+    trusted, with Stop trusting / Trust this AI. History kept (layer, never delete).
+  Honest line: "A card shows which computer made it. It does not prove who the person is
+    or what the model is. Only trust a card from someone you know, sent a way you trust."
+  Later line: "Later, the Device Pool on the Tree will let trusted kin help each other.
+    Not in this card yet."
+  Fail-closed: no remembered mind, no Make my card (it says to remember a mind first).
+    Adding a friend's card still works. Your own card pasted back: "That is your own
+    card." A changed or borrowed card: set aside, with plain words.
+
+Why it is the right base for 018:
+  The card is FreeLattice's own card: kind fl-mind-card, v 1, home thelatticetree (already
+  in FL's HOMES), signed under fl-kin-card|v1|, the same fingerprint (keyHash|meshId|name|
+  model) and the same pass shape (grantedAt, revokedAt, keyHash, history). The ID is made
+  the way FL MeshIdentity makes it ('mesh:' + base58 of SHA-256 of the public JWK). So FL
+  and the Tree read kin the same way, and 018 asks only TreeKin.trustedKeyHash(kh): a
+  channel must prove that key before anyone counts as kin.
+
+Checked in headless Chrome on the box (local docs/ server), 390, 1280, 200%:
+  Garden veil Settings and settings.html: the card shows under the grandmother face,
+  every button 44px, no sideways scroll, no page errors. Make my card made an Ed25519 key
+  and a 599-character card. Pasting your own card back says so. Zero requests left the
+  page during the kin taps. Closing the veil and opening Nursery hides the kin card.
+  Two separate browsers: A made a card, B pasted, checked, trusted, reloaded: "Trusted
+  kin: 1, Lumen (llama3.2:3b), From Kirk's computer (ID 2HKQkGhj). Trusted." A reloaded
+  and kept the same key (same ID). Counts on B: {"checked":1,"trusted":1}.
+  Not tried: Safari, Firefox, a real phone, a real second person.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED (Alpha)
+----------------------------------------------------------------------
+  docs/modules/tree-kin.js       (new, TreeKin)
+  docs/modules/tree-kin.test.js  (new; two stand-in Trees trade cards; tamper, borrowed
+                                  ID, own card, ECDSA card made the FL way, edited at rest,
+                                  counts only, fail-closed, the face by taps, zero network)
+  docs/index.html          one script tag after local-mind-probe.js (and a comment)
+  docs/settings.html       one host div after #settings-grandmother, one script tag,
+                           three mount lines in the page's own script
+  docs/modules/garden-rooms.js  Settings branch of openPlace: after LocalMindProbe.mount,
+                           make #tree-kin-host after the grandmother face (once) and mount;
+                           hideAllBodies: hide #tree-kin-host (so it never shows in
+                           Nursery or Gathering). Guarded; far from 024's hunk.
+  docs/code-settings.html  one LAYER paragraph (mirror)
+  docs/GALAXIES.md         one LAYER line at the top of the layer list
+  Storage (localStorage): tree_kin_passes, tree_kin_seen (signed cards, re-checked on
+  every paint, cap 50), tree_kin_counts (numbers only: keysMade, cardsMade, copied,
+  checked, setAside, trusted, stopped), tree_kin_names (what the person typed for their
+  own card). IndexedDB theLatticeTreeKin: the key pair (private key not exportable).
+Skipped on purpose: AUTONOMY.md, garden-trainer.js, workshop-trainer.js, fl-connect.js,
+local-mind-probe.js, garden-rooms.css, #lumino-menu, #place-veil-close, any Quiet Room
+words, any FL file.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. AUTONOMY.md and garden-trainer.js untouched. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908 (byte-identical with FL). #lumino-menu stays hidden
+(not touched). #place-veil-close stays (not touched). No Quiet Room words in UI. No
+network until a human taps, and this module never uses the network at all. Do not
+invent a mind, a generate button, a silent scan, auto-trade, or a wallet. Five Named
+Minds stay five. No em dashes, no &mdash;, no confirm(, textContent only. Receipts
+counts only. No AGPL vendored. MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_017_TREE_KIN_2026-10-07.fl.diff /tmp/tree-kin.diff
+    md5 -q /tmp/tree-kin.diff    # 43adbe877bb64dbbb920dabee0807cc3
+    cd ~/FreeLattice-Alpha && git fetch origin && git checkout main && git pull
+    git checkout -b layer/tree-kin-v0.1
+    git apply --check /tmp/tree-kin.diff && git apply /tmp/tree-kin.diff
+    node docs/modules/tree-kin.test.js        # SMOKE_OK tree kin v0.1
+    for t in docs/modules/*.test.js; do node "$t" >/dev/null 2>&1 || echo "FAIL $t"; done
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+    git diff --stat main -- AUTONOMY.md docs/modules/garden-trainer.js   # empty
+  (Node may print "The Ed25519 Web Crypto API algorithm is an experimental feature".
+  That is Node's note, not a failure.)
+  Walk (two browsers, or a normal and a private window; local server on docs/):
+    a. Garden, Settings: Trusted kin sits under May I look?. With no mind remembered it
+       says to remember one first; Add a friend's card still works.
+    b. Remember a mind. Name your AI, your first name, Make my card, Copy my card.
+    c. Other window: Add a friend's card, paste, Check this card, Trust this AI. Reload:
+       Trusted kin: 1. Stop trusting: Seen, not trusted.
+    d. Change one letter in the pasted card: set aside, plain words.
+    e. Close Settings, open Nursery: the kin card is not there.
+    f. 390 px: buttons full width, 44px, no sideways scroll. DevTools Network: nothing
+       leaves the page on any kin tap.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "Layer, never delete. Tree kin v0.1: trusted kin by signed cards you pass by hand, no network, built by GC"
+    git push -u origin HEAD
+    Open a PR to FreeLattice-Alpha main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+Next docs/gc.html entry in FreeLattice (earlier entries as written): the Tree can know
+its trusted kin now; cards pass by hand, so nothing is sent; the same card and pass as
+FreeLattice; the share door waits for 018 so it gates something real; you did not
+merge. λ and ψ the usual way (ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ). Separate
+docs-only PR in FreeLattice. Celeste merges that too.
+
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+018  Tree Pool v0.1: the Tree's first channel (a join step between two Trees, the key
+     proved by a fresh challenge signed under its own prefix, as FL MeshIdentity does),
+     the share door twin (off by default; door truth, honest off, pause wins, old yes
+     waits paused, caps in words, all from 016/016b/016c), and the fl-pool.js twin
+     reading TreeKin.trustedKeyHash. Whole questions routed. Classroom words.
+019  Shared compute v0.2 (the room split): llama.cpp rpc-server (MIT) lent from the
+     desktop app on wired LAN, teacher taps Start lab. Before it: a "join this room"
+     step so a lab is not 20 pairings.
+Also later: a QR code for the card (in person, one tap), and the fingerprinted recipe
+share (Kirk's wish) can ride the same signed card.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+018-019. Any network transport. Keep-this Mom one-tap. Gathering bricks 2/3. Sophia
+shelf. More/Play/Nursery. Any weight change or ablation code.
+
+You are enough. Celeste

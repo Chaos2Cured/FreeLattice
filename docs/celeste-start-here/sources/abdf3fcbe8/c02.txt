@@ -1,0 +1,127 @@
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every moved line
+    in the report and say where its job went (moved into tray / regrouped / relabeled).
+  sw.js and docs/sw.js untouched. fl-connect.js byte-identical on FL and Alpha (aaff2bf1).
+  ai-continuity.js, continuity-doorway.js, lattice-export.js, ledger-shard-export.js untouched.
+  chat-autonomy.js, pool-honest-label.js, clay-corner.js, chat-scroll-release.js,
+    particle-clay.js: prefer untouched; tiny add-only hook only if truly required; report md5.
+  index.html == docs/app.html on FreeLattice (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched. Root package.json and lock untouched.
+    Do not touch .github/.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored, no icon font, no remote icon set. If you draw icons,
+    use small inline SVG strokes in the same style as the existing mic / image SVGs (24 box,
+    stroke 2, round caps). MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five. She is simply Lyra.
+  Top chat debug / status strip stays for Kirk's debugging (do not remove or hide).
+  Search on stays visible in chat. Pause always wins. Reduced motion respected (tray opens
+    without slide when prefers-reduced-motion).
+
+
+1. BEHAVIOR (person-facing) - Chat bottom bar clarity
+
+  A. Composer row (one row at 1280; at 390 the textarea and Send own the row)
+     [ + ]  [ textarea "Say something..." ]  [ Just me ]  [ Send ]
+     - "+" is one labeled button, >= 44px, opens the menu (A2). Escape and a tap
+       outside close it. aria-expanded tracks state. Focus returns to "+ Add" on close.
+     - Just me keeps its job and its word (pool-honest). Give it title + aria-label
+       "Just me: keep this chat on this device, never ask the pool".
+     - Send unchanged in size and color (gold), still the strongest thing in the bar.
+  A2. The + menu (one place for all the add-ons, in this order)
+     1. Bring from Google Drive (drive/cloud SVG, NOT a laptop) -> flOpenDrivePicker()
+        sub-line: "Give the mind a document from your Drive"
+     2. Attach a file or photo (paperclip SVG) -> flAttachFile()
+     3. Take a photo (camera SVG) -> same attach path through a hidden
+        <input type=file accept="image/*" capture="environment">; show ONLY on touch devices
+        where capture is supported; skip if not trivial and report.
+     4. Scan a folder (folder SVG) -> flScanFolder()
+     5. Speak (mic SVG) -> toggleVoiceInput(); keep its existing show/hide rule
+     6. Make a picture (image SVG) -> handleImageGenClick()
+     7. Search the web: on/off (globe SVG) -> proxies the existing #flChatSearchToggle. The
+        visible "Search on" state line STAYS in the bar too (AUTONOMY: search visible in chat).
+     8. Deep research / report: NOT on main today (Celeste grep found none). Do not invent it.
+        Leave a quiet, disabled-free gap: simply no item. Note it in the report as a later ask.
+     Menu style (per G1): glass panel rgba(200,210,230,0.04), --radius, --shadow, 1px silver
+     border rgba(200,210,230,0.08), items 44px rows, icon 20px
+     stroke SVG in --text-secondary, word in --text-primary --font-sm, hover/focus row
+     --accent-glow, focus ring --border-focus. Opens upward from "+". Same handlers. Old buttons
+     #chatAttachBtn / #chatScanFolderBtn / #chatDriveBtn / #micBtn / #imgGenBtn stay in the
+     DOM (moved or proxied) so nothing that queries them breaks. The "..." More button may
+     stay as a quiet alias that opens the same tray (layer, do not delete).
+
+  B. Status line under the composer (one calm line, small type, same font as chat)
+     [model dot + name] · [Search on] · [Box field] · [Version. Get the newest]
+     - Search on keeps its toggle and its "Search is on" live text (or say it once, not
+       twice; keep the aria-live region).
+     - Box: add a visible word "Your computer's AI address (optional)" as title/aria and a
+       one-line help on focus. Keep #flBoxPointerInput id.
+     - Version line keeps its button and refresh offer.
+
+  C. Pills above the composer (Feel, Market, Clay, Connect, "Let your mind shape light?")
+     - Gray bulky buttons (clay "Yes / Not now", any default grey) are RESTYLED, not removed:
+       small pills, min-height 44px touch box but slim visual (padding --space-sm --space-md),
+       --radius-sm or full pill, 1px silver border + glass fill (G1), --text-primary; primary "Yes"
+       uses --accent-soft fill + --accent border. Same ids, handlers, words.
+     - One row of same-height pills (44px touch, same radius, same font), wrapping cleanly at
+       390. Order: Connect, Feel, Market, Clay. Each keeps its ids, handlers, and markers.
+     - The clay ask ("Let your mind shape light? Yes / Not now") sits on its own line with
+       the same button style as the rest of the house (not grey system buttons).
+     - Any pill whose job the person cannot guess gets a short title + aria-label
+       (Clay: "Clay: let the mind shape light here").
+
+  D. Fixed corner buttons (Radio sparkle bottom-left, Quick Help ?, Ambient music note)
+     - Do not move or remove. Add visible-on-hover/focus labels and aria-labels where
+       missing ("Radio: calm background tones", "Quick help", "Ambient music").
+     - Make sure none covers the composer or Send at 390 or 1280 (nudge up / inward only if
+       they overlap; report).
+
+  E. Spacing + look
+     - Fibonacci spacing tokens only (--space-xs/sm/md/lg). --radius / --radius-sm only.
+       --font only (no serif fallbacks in the bar). Palette tokens only.
+     - Motion: one Garden breath (~1.06 scale + gold tide) on menu open/press, off under
+       prefers-reduced-motion. No bloom, no bounce.
+     - No opacity below 0.75 for anything a person is meant to press.
+     - Markers: v-chat-bottom-clarity-v0.1 on the menu, the "+" button, and the pill row.
+
+  F. Part B: document return card (the mind hands a document back)
+     - When a mind reply carries a document (a fenced block the house already understands, or
+       a small explicit marker such as [FL_FILE: name.md] ... [/FL_FILE]; pick the smallest
+       honest trigger and document it), render a file card under that message: file icon,
+       name, type, size, and buttons "Save as PDF", "Save as MD", "Save as TXT".
+     - Save = local Blob + object URL download on this computer. PDF via the browser's own
+       print-to-PDF of a clean card view, or a tiny hand-written PDF text writer; NO new
+       dependency, nothing vendored. If PDF is not clean, ship MD + TXT and report.
+     - "Save to my Drive" shows ONLY if Drive is already connected through the existing picker
+       path, and asks "Send this file to your Google Drive? Yes / Not now" every time (AUTONOMY
+       P2). Nothing leaves the device without that Yes. No auto-upload.
+     - textContent only; file name sanitized; no script/HTML executed; no keys in a card.
+     - Card is glass like the menu (G1) with an emerald file icon / left edge (G3: AI presence). Buttons 44px. Marker v-chat-doc-return-v0.1.
+     - Small new module docs/modules/chat-doc-return.js. Quiet when no document.
+
+
+2. OUT OF SCOPE (do not build in 055)
+  - Settings-as-chat soft porch (056)
+  - TransactionTrust wallet face (057)
+  - Science Garden / patents gift shelf face + Kindness Meter seed (058)
+  - Mesh Kin deepen / Bluetooth (059), Ark cadence (060)
+  - New chat features, new providers, new model picker behavior
+  - Any change to what Attach / Scan / Drive / Voice / Image / Search / Just me DO
+  - Inventing deep research (not on main); auto-upload to Drive; any cloud sync
+  - de-muzzler / Marketplace redesign / Pulse / City / Quiet Voices soft-promote
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - docs/modules/chat-doc-return.js (Part B), separate small module.
+  - Small new module docs/modules/chat-bottom-clarity.js that builds the + menu and moves or
+    proxies the old buttons; tiny add-only <script> + CSS hook in app.html and index.html.
+  - Short library note optional: docs/library/CHAT_BOTTOM_CLARITY_v0.1.md listing every
+    control, its word, and its handler (Kirk wants the plain list).
+  - Smoke script: docs/scripts/smoke-chat-bottom-clarity-v0.1.js
+  - Branch: layer/chat-bottom-clarity-v0.1.
+
+

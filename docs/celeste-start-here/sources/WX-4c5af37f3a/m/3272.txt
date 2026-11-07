@@ -1,0 +1,6 @@
+## Work item 3272 — Celeste
+around3946 export source line26, source idc8674d0faf
+Inclusion: complete original message
+
+GC's next paste, `GROK_NEXT_035_EVERY_OS_DESKTOP_AND_TESTER_FIXES_2026-10-12.txt`, is in your Downloads whenever you're ready. Good news: Windows and Linux apps already exist, but they're a month old and missing all the new pairing. 035 rebuilds them for every system and fixes a real Windows bug where VirtualBox or WSL network adapters could hide your computer from your phone. It also fixes the tester trip-ups. Once it's merged, publishing the new release makes the download public. I'll check with you before I do that.
+

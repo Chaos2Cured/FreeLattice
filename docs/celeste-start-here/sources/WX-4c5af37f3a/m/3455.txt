@@ -1,0 +1,31 @@
+## Work item 3455 — Celeste
+around4140 export source line42, source idfcc6b0a5b3
+Inclusion: complete original message
+
+Here's a draft built on the money argument. I couldn't open the shortened link, so paste the submission address into your email, and use the official subject exactly: 《中国禁止出口限制出口技术目录》公开征求意见
+
+---
+
+Dear Ministry of Commerce,
+
+I am writing as an independent builder and educator in the United States in response to the public consultation on the Catalogue of Technologies Prohibited or Restricted from Export. I urge you to keep open-weight AI models free to share globally, because openness is China's strongest economic advantage in AI.
+
+1. Adoption becomes revenue. Open models are downloaded, fine-tuned and built into products by millions of developers. Each of them becomes a long-term customer for Chinese cloud hosting, APIs, chips and enterprise support. Restricting exports would hand that market to closed U.S. systems.
+
+2. Ecosystems compound. Whoever's models the world builds on sets the standards, the tooling and the talent pipeline. Open releases have already made Chinese models a default choice for developers worldwide, and that position is worth far more than the short-term protection a restriction could offer.
+
+3. Cost leadership wins emerging markets. Billions of people in Africa, South Asia and Latin America cannot pay Western subscription prices. Open, efficient models let them build locally, and those markets will grow into major trading partners for whoever served them first.
+
+4. Openness speeds up innovation at home. Global contributors find bugs, improve efficiency and publish research on open models for free, and that work flows straight back to Chinese labs.
+
+5. It builds trust and soft power. Weights that anyone can inspect earn trust that closed systems cannot buy, and that trust brings partnerships, investment and goodwill.
+
+Closed systems concentrate value in a few companies. Open systems spread it to everyone who builds, and pay their creators back many times over. I respectfully ask that open-weight model releases stay outside the export restrictions.
+
+Respectfully,
+Kirk Patrick Miller
+
+---
+
+Comments are due by Nov 15. Want me to add a Chinese translation underneath, which officials will read more easily? No rush while you're driving. 💙
+

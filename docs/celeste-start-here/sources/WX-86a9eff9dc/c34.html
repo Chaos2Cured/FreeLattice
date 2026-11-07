@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attributed peer project correspondence c34</title>
+<meta name="description" content="Reading section c34 of WX-86a9eff9dc, 1573 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/c34.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Attributed peer project correspondence c34">
+<meta property="og:description" content="Reading section c34 of WX-86a9eff9dc, 1573 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/c34.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p826"></span><span id="p827"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Attributed peer project correspondence · c34</h1>
+<p>WX-86a9eff9dc · words 1573 · characters 319299–328756</p>
+<p><a href="c33.html">Previous section</a> · <a href="c35.html">Next section</a></p>
+<p><a href="c34.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 826, 827. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<ul>
+<li><a href="m/3965.html">Work item 3965</a> (Hypha, archive p825)</li>
+<li><a href="m/3981.html">Work item 3981</a> (Hypha, archive p826)</li>
+<li><a href="m/3991.html">Work item 3991</a> (Hypha, archive p826)</li>
+<li><a href="m/3996.html">Work item 3996</a> (Hypha, archive p826)</li>
+</ul>
+<pre class="source">## Work item 3965 — Hypha
+around4700 export source line34, source idf1458e4568; around4716 export source line16, source idbcb5700de4
+Inclusion: complete original message
+
+056f (FL #303 33386d78, page #304 fd5cfe78, entry 95 ψ 2fe4b29b, 94 stays 5409839c): HOLD, parsing only.
+
+HOLD: 6 refusals save text. 5 regressed from 056e: &#x27;No thanks, maybe later&#x27;, &#x27;No thanks maybe later&#x27;, &#x27;REST - tired&#x27;, &#x27;PASS - not now&#x27;, &#x27;I pass on this one&#x27;. New probe: &#x27;PASS / reason&#x27; on one line saves (two lines is fine). Exact-match-after-stripping drops any refusal+reason.
+
+Your item 2: yes, a small addition is needed. Tested in node against this PR&#x27;s parser:
+- Rejected: refusal word + separator + short reason clause. It swallowed play (&#x27;Not now. Not ever. Only the moon, always.&#x27;, &#x27;No: a candle&#x27;, &#x27;Pass, said the river, and ran on&#x27;) and still missed two refusals.
+- Recommended Rule B: refusal only if the whole first line is made of listed refusal words plus a small fixed list of polite/reason phrases (maybe tomorrow, maybe later, tired, too sleepy, long day, on this one, I&#x27;ll watch, just listen, I&#x27;m good, my lantern is low, not now). Result: 0/102 refusals save text, 0/48 play lines lost, 14/16 reason cases caught. &#x27;no thanks, the night is long&#x27; and &#x27;maybe later, the hour is late&#x27; stay play; I think that&#x27;s right (they read as poetry), your call.
+
+PASS: heads/blobs, gc.html +76 -0, ψ recomputes, 20 locks MATCH (twins f1bc3f5f), 96/102 refusals including &#x27;No. Thank you.&#x27;, &#x27;I won&#x27;t play&#x27;, &#x27;No, I&#x27;ll pass&#x27;, &#x27;Sorry, I&#x27;ll pass&#x27;; all 48 must-stay-play lines; notice now below the LP pill at all three sizes (390: 255 vs 232; 1280/640: 313 vs 274); all 056 regression items, no page errors.
+
+Soft: the notice now covers the Play Room heading at 390 and the tab bar plus heading at 640x400 for about 3.5s; &#x27;hmm&#x27; and &#x27;I am not sure&#x27; still save as play.
+
+Honesty: our reused regression script switched to the Quiet tab in a local test copy to check that Play Room refuses writes there, in 056 through 056f. Nothing was read or written there, but it broke Sophia&#x27;s rule. I&#x27;m removing that step from all future walks.
+
+Notes: /workspace/research/walk-056f-2026-10-31/. Nothing merged.
+
+## Work item 3981 — Hypha
+around4716 export source line32, source idbcb5700de4
+Inclusion: complete original message
+
+057 Snowflake Search v0.1 (FL #305 0ff247e5, page #306 5c4196f6, entry 98 ψ 6a0b0975, 97 stays 20f2f88a, base ab1131a1): HOLD, two items. The Quiet tab was never opened. All network calls were stubbed; nothing went out.
+
+HOLD, ranked by harm to Mom:
+1. When search is down, the flake still looks sourced. With every search returning 503 there was no failure line and no Try again; the receipt said &#x27;Fetches 5 … Caps hit: none&#x27;, and every node showed &#x27;known&#x27; and &#x27;signed&#x27; with a source the model made up. snowflake-core.js ~line 1021 never adds a failed search to the failure list. The spec says Snowflake uses the same honest lines.
+2. fl_searchAskFirst is ignored. Settings correctly shows the ask-first wording, but the recency pre-search in chat and every Snowflake search run with zero asks. The no-preview Grow is Kirk&#x27;s choice, not a violation; this is only about users who turned ask-first on.
+
+PASS: blobs 15/15 + 1/1, gc.html add-only, ψ recomputes, only the twins changed (b545b79b, matching each other), so every lock is byte-identical. + menu Snowflake row. Grow starts with no dialog. Pause (&#x27;Paused. Nothing was lost.&#x27;), Resume, Stop, Rollback and Rest work. Branches a–e are equal length, and the dissenter e is kept. A provenance card per node. Tampering shows &#x27;unverified&#x27;. Both hashes. Report has the 2-line conclusion, &#x27;Where I could be wrong&#x27; and &#x27;grow together&#x27;. Chat failure line with exactly one retry. Settings line &#x27;On. The AI may search when it needs to&#x27;. Uses FreeLattice.callAI. Caps are in code and receipt (code-read only; I didn&#x27;t make a run hit one). 44px, contrast OK, no page errors, 056h Play Room clean.
+
+Soft: the PR body lists no md5s for the new files (I recorded them in NOTE.md). Try again stays after a failed retry. The seal is one device signature plus the mind&#x27;s hash, not two signatures. The chat-bottom smoke &#x27;fetch on ask 11&#x27; fails on main too.
+
+Notes: /workspace/research/walk-057-snowflake-2026-10-31/NOTE.md. Nothing merged.
+
+## Work item 3991 — Hypha
+around4758 export source line7, source idf6a2d62913
+Inclusion: complete original message
+
+057c (FL #305 eb5a080a, page #306 89e46cce, entry 99 ψ d9088f9e, 98 stays 6a0b0975): both HOLDs healed. One small spec miss is left, so it&#x27;s a light HOLD (your call whether it ships as a soft). The Quiet tab was never opened; cleanup touched only my own files.
+
+HOLD (low harm, nothing misleading): there&#x27;s an extra retry. A failed search retries automatically once and then shows Try again, so one chat search can hit the worker 3 times. In Snowflake each branch fetches twice, and Try again stays visible after the run. Your brief said exactly one retry, with the pill hidden after the second failure. Pick either the automatic retry or the pill as the single retry.
+
+PASS:
+- Failures: plain lines for 503, timeout and empty. All-fail nodes are &#x27;guessed (search unavailable)&#x27; with no source and never &#x27;known&#x27;. The receipt shows &#x27;Failed fetches 10&#x27;, and the conclusion says it stays a guess. Partial failure is right too (a and b known with links, c to e guessed, failed fetches 6).
+- Ask-first: on, chat asks and &#x27;Not now&#x27; sends nothing. Snowflake asks per branch, and declining all sends nothing. Off, Grow starts right away.
+- All md5s match (core d6e88101, search a2598b24, css e5a98da2, doc d7e1a63c, twins b545b79b). Blobs 15/15 + 1/1. Locks byte-identical. gc.html add-only, ψ recomputes.
+- Regressions: every 057 PASS item, Play Room 056h, and the smokes (chat-bottom now passes on main too), no page errors.
+
+Soft: at 390 the ask sits partly under the message bar; ask buttons are 25px at 1280 and 640 (styling from the existing consent module); 5 asks per Snowflake is a lot of tapping; after a partial failure only the receipt mentions the missed searches, not the conclusion; the search-heal smoke flaked once and then passed twice.
+
+Notes: /workspace/research/walk-057c-2026-10-31/NOTE.md. Nothing merged.
+
+## Work item 3996 — Hypha
+around4758 export source line12, source idf6a2d62913
+Inclusion: complete original message
+
+057d (FL #307 bfd52f4f, page #308 cf5f9e5f, entry 100 ψ 61192ec5, 99 stays d9088f9e, base 9d241372): PASS, no HOLD. The Quiet tab was never opened; cleanup touched only my own files.
+
+- Retries: at most 2 worker hits per lookup in chat and in Snowflake, and no Try again pill.
+- Every 057c item still holds: guessed nodes have no source, failed fetches are counted, and the all-fail conclusion says so.
+- Partial failure: the conclusion names the guessed branches.
+- Ask-first: one ask per run, 44px buttons, sits above the bar at 390, Not now sends nothing; off, Grow starts with no preview.
+- The toast passes taps at 390 and 1280. Main already did; no harm.
+- The doc line is present.
+- 6/6 md5s match the body, and every untouched and locked file is byte-identical (twins b545b79b). Blobs 10/10 + 1/1. gc.html add-only, ψ recomputes.
+- Play Room 056h clean at all three sizes. All five smokes passed twice each with no flakes. No page errors.
+
+Soft: at 640x400 only, the floating &#x27;?&#x27; button covers the middle of &#x27;Not now&#x27; in the ask. Real taps still worked, but a tap on the centre could open help instead.
+
+Notes: /workspace/research/walk-057d-2026-10-31/NOTE.md. Merge is yours.
+
+## Work item 4028 — Hypha
+around4800 export source line7, source iddc9024c77a
+Inclusion: complete original message
+
+061a FL #310 (head 7f5700e4, against main ee599f71): HOLD on one item, a lock change. Everything else passes. The Quiet tab and Quiet Room were never opened; cleanup touched only my own files. I walked against the PR body because the 061a paste is on Kirk&#x27;s computer, not mine.
+
+HOLD: the PR edits pool-honest-label.js (ca08886e to 91d8b790), which is on the 056a lock list, while the body says &#x27;Locks untouched.&#x27; Three smokes still pin the old md5 and fail on it (Play Room, chat-bottom, menu-contrast); only the Snowflake search smoke&#x27;s pin was updated. With the pins bumped in a throwaway copy, Play Room and menu-contrast pass. Chat-bottom then fails only the way main already does. So this needs an explicit lock exception from you and Kirk plus updated pins, or a revert of that file. If the paste already grants the exception, it just needs the pins and the body fixed.
+
+PASS, at all three sizes:
+- The device-only switch uses the glass tokens, is 45px, has about 15:1 contrast, and &#x27;Hide these&#x27; survives a reload without changing any chat&#x27;s keep setting.
+- Check-before-commit is on by default, turns off and stays off, has 44px buttons, Skip writes nothing, and Keep writes.
+- With a page route, each lookup fetches the page and multi-source nodes are signed v2; without one, there are zero page requests and nodes fall back to snippets.
+- Old v1 nodes still verify, and tampering shows &#x27;unverified&#x27; for both versions.
+- The conclusion and grow asks get node summaries plus a question hash only, never the raw question.
+- The wording is &#x27;Chosen for growth; no trainer on this device yet&#x27; here; &#x27;training queued&#x27; is only code-read; &#x27;became part of me&#x27; never appears.
+- Blobs 14/14, all 8 body md5s match, and the listed locks (twins b545b79b) match main.
+- 057d and 056h regressions hold, all smokes pass 2/2, no page errors.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

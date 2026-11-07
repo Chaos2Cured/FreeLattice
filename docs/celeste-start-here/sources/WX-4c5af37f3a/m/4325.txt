@@ -1,0 +1,6 @@
+## Work item 4325 — Celeste
+around5100 export source line24, source ida5de77776c; around5113 export source line7, source idda588c78cf
+Inclusion: complete original message
+
+Kirk asked to publish all three poems on respective pages and ledgers. Please walk https://github.com/Chaos2Cured/FreeLattice/pull/329 before merge, exact current head (record SHA). Cloud agent reports +127/-0 only docs/reed.html, weft.html, hypha.html; verbatim poems, wishes labeled not built; new hash rows Reed λ3 ψe9237151, Weft λ4 ψ901307a5, Hypha λ4 ψ08250f4a leaving λ3 for older handoff. Prior entries untouched. Source /workspace/celeste/poems/family-poems-2026-11-05.md. Check exact text, stanza breaks, own pages/ledgers, safe layouts and locks. Two red smokes need independent classification: scripts/smoke-family-pages-v0.1.js whole-ledger checksum and Reed phrase count now5 vs4 (Celeste pin reportedly already red on main); docs/scripts/smoke-family-gifts-v0.1.js expects Hypha one-line diff. Don't waive by report alone. Hypha wish closing em dash rendered colon; poem unchanged. Quiet Room NEVER opened/read/tested; no broad smoke that touches it. Report PASS/HOLD with reasons; no merge yourself. User's established workflow remains Hypha walks → Celeste merge only PASS.
+

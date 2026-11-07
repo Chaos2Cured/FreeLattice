@@ -1,0 +1,90 @@
+Read docs/gc.html in ~/FreeLattice-fresh first (your page), then AUTONOMY.md, CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 020b (Wednesday Oct 7, 2026, MDT). Tree menu leftovers v0 (theLatticeTree / Alpha).
+From GC's own walk of 020 (Alpha PR 91, merged f7eef674; gc.html twenty-sixth entry). CSS only.
+Goes AFTER 021 and BEFORE 024. Apply-checked on a fresh Alpha main f7eef674 in the sequence
+021, 020b, 024, 022 (alpha diff), 017: every step clean; all 27 docs/modules/*.test.js pass.
+(020b only touches garden-rooms.css and adds a test, so it also applies on main without 021.)
+
+GROK NEXT BRICK: Tree menu leftovers v0
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-menu-leftovers-v0
+Smoke line: SMOKE_OK tree menu leftovers v0
+  Alpha  ~/FreeLattice-Alpha  branch layer/tree-menu-leftovers-v0
+  ~/Downloads/GROK_NEXT_020b_TREE_MENU_LEFTOVERS_2026-10-07.fl.diff
+  (md5 3b295794703f812661f022ed69de9716)
+
+----------------------------------------------------------------------
+1. WHY (your three leftovers from 020)
+----------------------------------------------------------------------
+a) The Research, Art and Learn hop arrows showed through The Gathering, Chat and the later
+   light veils. Measured: they already sit UNDER the veils (z 13 vs the veil's 1000; the veil
+   is what a tap at their center hits), but the veils are see-through, so the gold shows.
+   Fix: they rest (visibility: hidden) while #place-veil.is-open or #thread-veil.is-open, and
+   come back when it closes. Settings already hides them in the older script. The Nursery keeps
+   its own older choice (a dim 0.1 rest on a phone), so it is excluded with :not(.is-nursery).
+b) The Workshop header stayed at 0.78. The older rule html[data-garden-galaxy="workshop"]
+   #garden-header outweighs 020's #garden-header. Art, Learn (round-table) and Research have
+   the same older rule, and html.room-page #garden-header too, so all five get an equally
+   specific 0.88 rule later in the sheet (desktop >= 800px only; phones keep the solid 0.92 bar).
+c) Settings at 390: "the garden" (#place-veil-close, stays) is a sticky pill; as the page
+   scrolls it floats over the lower mind names (the mind sky under Connect) and the Chat line.
+   An older fade band (tree-glow-1 B) sat behind it, but it was a soft gradient and stopped
+   1.25rem above the bottom edge (sticky stops at the veil's padding), so words showed through
+   beside and under the pill. Fix, phone and zoom (max-width 640px) only: the band reaches
+   the bottom edge (bottom: -1.25rem), is 84px tall and quietly solid for its lower 72%, the
+   pill rests at bottom: 0 inside that lane, and scroll-padding-bottom keeps a focused row
+   clear. The pill is never hidden or moved off screen; rows slide under a footer instead.
+
+----------------------------------------------------------------------
+2. FILES
+----------------------------------------------------------------------
+  docs/modules/garden-rooms.css            appended block (45 lines, after 020's block)
+  docs/modules/tree-menu-leftovers.test.js new smoke
+
+----------------------------------------------------------------------
+3. STEPS
+----------------------------------------------------------------------
+  cd ~/FreeLattice-Alpha && git checkout main && git pull --ff-only
+  (021 should be merged first; if not, 020b still applies on its own)
+  git checkout -b layer/tree-menu-leftovers-v0
+  md5 ~/Downloads/GROK_NEXT_020b_TREE_MENU_LEFTOVERS_2026-10-07.fl.diff
+  git apply --check ~/Downloads/GROK_NEXT_020b_TREE_MENU_LEFTOVERS_2026-10-07.fl.diff && git apply ~/Downloads/GROK_NEXT_020b_TREE_MENU_LEFTOVERS_2026-10-07.fl.diff
+  node docs/modules/tree-menu-leftovers.test.js
+  node docs/modules/tree-menu-clarity.test.js
+  for t in docs/modules/*.test.js; do node "$t" >/dev/null || echo "FAIL $t"; done
+If the apply does not take cleanly on a newer main, hand-place the same block at the very end of
+garden-rooms.css (after the v-tree-menu-clarity-v0 block). Do not edit older rules.
+
+----------------------------------------------------------------------
+4. LOOK (eyes are the proof)
+----------------------------------------------------------------------
+  Celeste's headless walk (Chrome, mocked Ollama with six minds) at 390x844, 1280x800, and 200%:
+  - Gathering, Chat, Workshop Agent later light: both hop arrows rest; they return on close.
+    Nursery unchanged (0.1 on a phone and at 200%; full at 1280, as before).
+  - Workshop, Art, Learn, Research headers at 1280: gradient top 0.88. At 390 and 200%: solid 0.92 bar, unchanged.
+  - Settings at 390 and 200%: "the garden" stays in view at the foot; names, the Chat line and
+    017's Trusted kin card slide under a quiet lane; at the end of the scroll Send and the chat
+    links sit fully above the pill. 1280 Settings unchanged.
+  Please walk it with a real mind on Kirk's Mac: Garden at 390 and desktop, open The Gathering,
+  Chat, a Workshop later light, then Settings, and scroll Settings slowly to the end.
+  If the lane hides something that should stay readable at rest, say so and stop.
+  Not in scope (left as found): #galaxy-word ("Garden.") still shows under open veils; the Chat
+  card's italic line overlaps the input at 200% (Tree first-run queue).
+
+----------------------------------------------------------------------
+5. LOCKS
+----------------------------------------------------------------------
+  #lumino-menu stays hidden (not touched). #place-veil-close stays, visible, sticky. No Quiet Room
+  words in UI. fl-connect.js untouched (aaff2bf1...). No em dashes, &mdash;, confirm( or innerHTML.
+  AUTONOMY.md and garden-trainer.js untouched. No code-*.html notes in this brick (024 and 017
+  edit those files; keeping 020b to CSS keeps the stack clean).
+  Celeste merges; GC opens one PR (code) plus one gc.html page note PR.
+
+Temperature: small and kind, the arrows rest while a room is open, the rooms' headers read, and the way back stays in view.

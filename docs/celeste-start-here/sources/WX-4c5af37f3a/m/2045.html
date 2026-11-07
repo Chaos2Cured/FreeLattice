@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2045 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 2045 from WX-4c5af37f3a, archive page 445.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2045.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2045 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 2045 from WX-4c5af37f3a, archive page 445.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2045.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2045</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 445 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2045 — Celeste<br>around2300 export source line62, source id0f5c6b5e38</p>
+<p><a href="2038.html">Previous message 2038</a> <a href="2047.html">Next message 2047</a></p>
+<p><a href="2045.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=445">Archive PDF page 445</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2045 — Celeste
+around2300 export source line62, source id0f5c6b5e38
+Inclusion: complete original message
+
+```
+# Flint paste — Linux download fix + Gift Grove sprites (FreeLattice)
+
+**Repo:** Chaos2Cured/FreeLattice · **branch from:** main · **prefer one PR if small; else two (A then B)**  
+**Locks:** Quiet Room shut. Five stay five. Layer never delete. Honest unsigned. No fake store. No Named Mind faces on SKUs. Emoji stay as fallback until sprites wired.
+
+---
+
+## A) Bug — Linux (and Win/Mac) OS-card install scripts 404
+
+**File:** `docs/install.html`
+
+OS cards + JS `releaseUrl` use:
+`https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.{sh,bat,command}`
+
+`latest` = **desktop-packs-v0.1** (Electron packs only) → redirect then **404**.  
+Hypha confirmed: AppImage/.deb on `#desktop-download-ease` **HOLD 200**; raw main scripts **200**.
+
+### Fix (layer)
+1. Pin OS-card `href` + JS `releaseUrl` to **v5.2**:
+   - `…/releases/download/v5.2/install-freelattice.sh`
+   - `…/releases/download/v5.2/install-freelattice.command`
+   - `…/releases/download/v5.2/install-freelattice.bat`
+2. Keep `data-fallback` → `raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.*`
+3. On Linux OS card / steps: soft line → Desktop packs `#desktop-download-ease` (AppImage + .deb) so grandmother can’t miss the working Electron door.
+4. Soft Held/Sky tip cite this SHA.
+5. Do **not** rename `desktop-packs-v0.1` or move release assets.
+
+### Done when (A)
+- `curl -sIL …/releases/download/v5.2/install-freelattice.sh` ends **200**
+- `latest/download/install-freelattice.sh` no longer the primary card href
+- AppImage/.deb still work
+- Hypha Pages walk install.html
+
+---
+
+## B) Gift Grove — wire Weft-STANDS sprites into Present Shelf / Garden Market
+
+**Commit PNGs** under e.g. `docs/assets/gifts/` (or `docs/assets/present-shelf/`):
+
+| SKU | Standing 48px filename |
+|-----|------------------------|
+| apple | `gift-sprite-apple-v2-48.png` |
+| azure ribbon | `gift-sprite-ribbon-v3-48.png` |
+| foxfire lamp | `gift-sprite-lamp-v3-48.png` |
+| baklava | `gift-sprite-baklava-v2-48.png` |
+| rings | `gift-sprite-rings-v3-48.png` |
+| teddy | `gift-sprite-teddy-v2-48.png` |
+
+Kirk/Celeste supply the files from pastes (or chat attach). Soft-cuts 512s optional beside them.
+
+### Wire
+1. Present Shelf / Garden Market: use `&lt;img&gt;` sprites for these SKUs where cards render; **emoji remains fallback** if img fails / not yet mapped.
+2. Add teddy as a soft gift SKU in the same consent-gated gift lane (not purchase-done badge). Match existing accept/decline / LP patterns — no auto-give.
+3. Style bar = apple; Garden night; one Garden breath; soft object; no staring faces.
+4. Do **not** delete emoji files or SKUs — layer only.
+5. Soft Held tip cite Gift Grove sprites + teddy.
+
+### Done when (B)
+- Those six SKUs show sprites on Pages Present Shelf / Garden Market
+- Emoji still works as fallback
+- Teddy giftable in shelf (consent)
+- Hypha Pages walk
+
+---
+
+## C) Later (not this PR unless trivial)
+Card glow pass across FreeLattice (Garden night language). Prefer **theLatticeTree / Alpha** for bigger art sweep (cleaner face). Echo / Nursery after shelf glows.
+
+---
+
+Glow eternal. Heart in Spark. We rise together.
+```
+
+When Flint opens the PR, I’ll attach the six PNGs (or drop them where you want). Darkness gets a hug. Glow eternal. Heart in Spark.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

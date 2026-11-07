@@ -1,0 +1,247 @@
+  // ── F4: home-network switch
+  const homeSrc = between(app, "var FL_HOMENET_KEY = 'fl_homeNet';", 'window.flHomeNetAllowsBase');
+  function homeCtx(init) {
+    const st = store0(init);
+    const els = {};
+    const ctx = { localStorage: st.ls, URL, String, document: { getElementById: (id) => els[id] || null }, window: {} };
+    ctx.window = ctx;
+    vm.runInNewContext(homeSrc, ctx);
+    return { ctx, st, els };
+  }
+  {
+    const { ctx, st } = homeCtx();
+    const H = ctx.FLHomeNet;
+    const z = (h) => H.zoneOf(h);
+    assert.strictEqual(z('127.0.0.1:11434'), 'this');
+    assert.strictEqual(z('localhost:11500'), 'this');
+    assert.strictEqual(z('[::1]:11434'), 'this');
+    assert.strictEqual(z('10.0.0.5'), 'home');
+    assert.strictEqual(z('172.16.0.1'), 'home');
+    assert.strictEqual(z('172.31.255.254:11434'), 'home');
+    assert.strictEqual(z('172.32.0.1'), 'public');
+    assert.strictEqual(z('192.168.1.50'), 'home');
+    assert.strictEqual(z('http://192.168.1.50:11434/api/tags'), 'home');
+    assert.strictEqual(z('169.254.169.254'), 'public', '169.254 refused (link-local, cloud metadata)');
+    assert.strictEqual(z('100.64.0.1'), 'public', 'carrier NAT refused');
+    assert.strictEqual(z('8.8.8.8'), 'public');
+    assert.strictEqual(z('0.0.0.0'), 'public');
+    assert.strictEqual(z('example.com'), 'name', 'names refused');
+    assert.strictEqual(z('[fd00::1]'), 'public', 'IPv6 other than ::1 refused');
+    assert.strictEqual(z('3232235777'), 'home', 'number forms read the way the browser reads them');
+    assert.strictEqual(z('0x7f.1'), 'this');
+    assert.strictEqual(H.isOn(), false, 'default: This computer only');
+    assert.strictEqual(H.allows('192.168.1.50'), false, 'home refused while off');
+    assert.strictEqual(H.allows('8.8.8.8'), false, 'public refused');
+    assert.strictEqual(H.allows('/ollama'), true, 'same-origin proxy route kept');
+    H.setOn(true);
+    assert.strictEqual(st.s.fl_homeNet, 'on', 'switch remembered');
+    assert.strictEqual(H.allows('192.168.1.50:11434'), true, 'home allowed while on');
+    assert.strictEqual(H.allows('8.8.8.8'), false, 'public always refused, even on');
+    assert.strictEqual(H.allows('169.254.169.254'), false, '169.254 refused even on');
+    assert.ok(H.useAddress('192.168.1.50', 'ollama'), 'typed once');
+    assert.strictEqual(st.s.fl_ollamaHost, '192.168.1.50:11434');
+    assert.strictEqual(st.s.fl_homeNet_addr, '192.168.1.50:11434');
+    H.setOn(false);
+    assert.ok(!('fl_homeNet' in st.s), 'one tap off');
+    assert.ok(!('fl_ollamaHost' in st.s), 'back to this computer');
+    assert.strictEqual(st.s.fl_homeNet_addr, '192.168.1.50:11434', 'address kept for next time');
+    H.setOn(true);
+    assert.strictEqual(st.s.fl_ollamaHost, '192.168.1.50:11434', 'one tap on brings it back, no retyping');
+    assert.ok(/public internet/.test(H.refusalFor('8.8.8.8')) && /Nothing was sent/.test(H.refusalFor('8.8.8.8')), 'plain refusal');
+    assert.strictEqual(H.LINE, 'Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked.', 'Kirk line exact');
+  }
+  {
+    const pub = homeCtx({ fl_ollamaHost: '203.0.113.5:11434' });
+    pub.ctx.FLHomeNet.migrate();
+    assert.ok(!('fl_ollamaHost' in pub.st.s) && pub.st.s.fl_homeNet_refused === '203.0.113.5:11434', 'old public address set aside, never used');
+    const home = homeCtx({ fl_ollamaHost: '192.168.1.77:11434' });
+    home.ctx.FLHomeNet.migrate();
+    assert.strictEqual(home.st.s.fl_homeNet, 'on', 'old home address keeps working, switch shows on');
+    assert.strictEqual(home.st.s.fl_ollamaHost, '192.168.1.77:11434');
+  }
+  {
+    // getOllamaBaseUrl wrapper: public never, home only while on
+    const gob = between(app, 'function flManualBaseFirst() {', '// v-connect-boot-probe-v0 (F2): everyone who asks');
+    const wrap = between(app, '// v-connect-boot-probe-v0 (F4): a saved address is used only when', '// v5.43.6 (Opus): the /ollama same-origin proxy probe');
+    const run = (init) => {
+      const st = store0(init);
+      const ctx = { localStorage: st.ls, URL, String, parseInt, document: { getElementById: () => null }, window: {}, _ollamaResolvedBase: null };
+      ctx.window = ctx;
+      vm.runInNewContext("var FL_OLLAMA_LOCAL = 'http://127.0.0.1:11434'; var _ollamaResolvedBase = null; function flGetManualConnectHost() { return null; }\n" + gob + homeSrc + '\n' + wrap, ctx);
+      return ctx.getOllamaBaseUrl();
+    };
+    assert.strictEqual(run({ fl_ollamaHost: '203.0.113.5:11434' }), 'http://127.0.0.1:11434', 'public saved host ignored');
+    assert.strictEqual(run({ fl_ollamaHost: '192.168.1.50:11434' }), 'http://127.0.0.1:11434', 'home host ignored while off');
+    assert.strictEqual(run({ fl_ollamaHost: '192.168.1.50:11434', fl_homeNet: 'on' }), 'http://192.168.1.50:11434', 'home host used while on');
+    assert.strictEqual(run({ fl_ollamaHost: '127.0.0.1:11500' }), 'http://127.0.0.1:11500', 'this computer always');
+  }
+  {
+    // Chat Box field: refuse before any fetch; fetch the home box only while on
+    const box = between(app, 'window.FLBoxPointer = (function() {', '// ── LM Studio support ──');
+    const run = async (raw, init) => {
+      const st = store0(init);
+      const calls = [];
+      const els = { flBoxPointerStatus: { setAttribute() {}, textContent: '', title: '' }, flHomeNetRefusal: { textContent: '', hidden: true } };
+      const ctx = {
+        localStorage: st.ls, URL, String, Date, Promise, JSON,
+        document: { getElementById: (id) => els[id] || null },
+        fetch: async (u) => { calls.push(String(u)); throw new Error('quiet'); },
+        AbortSignal: { timeout: () => undefined },
+        window: {}
+      };
+      ctx.window = ctx;
+      vm.runInNewContext(homeSrc + '\n' + box, ctx);
+      const res = await ctx.FLBoxPointer.probe(raw);
+      return { res, calls, st, els };
+    };
+    const p1 = await run('8.8.8.8:11434');
+    assert.strictEqual(p1.res.status, 'refused', 'public refused');
+    assert.strictEqual(p1.calls.length, 0, 'zero fetches for a public address');
+    assert.ok(/public internet/.test(p1.els.flHomeNetRefusal.textContent) && p1.els.flHomeNetRefusal.hidden === false, 'says why, plainly');
+    assert.ok(!('fl_ollamaHost' in p1.st.s), 'nothing saved');
+    const p2 = await run('192.168.1.50');
+    assert.strictEqual(p2.res.status, 'refused', 'home refused while off');
+    assert.strictEqual(p2.calls.length, 0, 'zero fetches while off');
+    const p3 = await run('192.168.1.50', { fl_homeNet: 'on' });
+    assert.ok(p3.calls.length > 0 && p3.calls.every((u) => /^http:\/\/192\.168\.1\.50:11434\//.test(u)), 'home box asked while on');
+    assert.strictEqual(p3.st.s.fl_homeNet_addr, '192.168.1.50:11434', 'remembered until changed');
+  }
+  {
+    // Settings Ollama Address: same switch
+    const save = between(app, 'function flSaveOllamaHost() {', 'window.flSaveOllamaHost = flSaveOllamaHost;');
+    const lb = between(app, 'function flWriteOllamaHostLoopbackOnly(host) {', 'window.flWriteOllamaHostLoopbackOnly');
+    const run = (val, init) => {
+      const st = store0(init);
+      const els = { ollamaHostInput: { value: val }, ollamaHostRefusal: { hidden: true, textContent: '' } };
+      const ctx = { localStorage: st.ls, URL, String, document: { getElementById: (id) => els[id] || null }, window: {}, updateOllamaProviderUrl() {}, _ollamaResolvedBase: null };
+      ctx.window = ctx;
+      vm.runInNewContext(homeSrc + '\n' + lb + save + '\nflSaveOllamaHost();', ctx);
+      return { st, els };
+    };
+    const off = run('192.168.1.50:11434');
+    assert.ok(!('fl_ollamaHost' in off.st.s) && /only talks to your own computer/.test(off.els.ollamaHostRefusal.textContent) && /home network/.test(off.els.ollamaHostRefusal.textContent), 'off: v0.4 refusal plus the one switch');
+    const on = run('192.168.1.50:11434', { fl_homeNet: 'on' });
+    assert.strictEqual(on.st.s.fl_ollamaHost, '192.168.1.50:11434', 'on: home address saved');
+    const pubOn = run('203.0.113.5:11434', { fl_homeNet: 'on' });
+    assert.ok(!('fl_ollamaHost' in pubOn.st.s) && /public internet/.test(pubOn.els.ollamaHostRefusal.textContent), 'on: public still refused');
+  }
+  assert.ok(/id="flHomeNetSwitch" role="switch"/.test(app) && /Also use a computer on my home network<\/label>/.test(app), 'the one switch, Kirk words');
+  assert.ok(/id="flHomeNetMode">This computer only</.test(app), 'default words');
+  assert.ok(/Only addresses inside your home network are allowed \(like 192\.168\.x\.x\)\. Public internet addresses are always blocked\./.test(app), 'the plain line');
+  assert.ok(/Future hook: signed remote minds/.test(app), 'future hook named');
+  assert.ok(!/\bconfirm\s*\(/.test(homeSrc), 'no confirm in FLHomeNet');
+
+  // ── Locks
+  assert.strictEqual(indexHtml, app, 'root index.html identical to docs/app.html');
+  let mainSw = null;
+  try { mainSw = execSync('git show origin/main:sw.js', { cwd: repo, encoding: 'utf8' }); } catch (e) {}
+  if (mainSw !== null) {
+    assert.strictEqual(rootSw, mainSw, 'root sw.js byte-identical to main');
+    const changed = execSync('git diff --name-only origin/main', { cwd: repo, encoding: 'utf8' }).split('\n');
+    assert.ok(!changed.includes('docs/sw.js') && !changed.includes('sw.js'), 'sw.js untouched');
+    const added = execSync('git diff origin/main -- docs/app.html docs/modules/fl-connect.js', { cwd: repo, encoding: 'utf8' })
+      .split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
+    assert.ok(!added.some((l) => /\bconfirm\(/.test(l)), 'no confirm() added');
+    assert.ok(!added.some((l) => /\u2014/.test(l)), 'no em dashes in added lines');
+    assert.ok(!added.some((l) => /Allow-Origin['"]?\s*[:,]\s*['"]\*['"]|origins?\s*[:=]\s*['"]\*['"]/i.test(l)), 'no bare * origin added');
+    assert.ok(!added.some((l) => /\.innerHTML\s*=\s*[^;]*(report|models|name|host|addr)/i.test(l) && !/html;$/.test(l.trim())), 'new words go in with textContent');
+  }
+  const markers = execSync("grep -rnE '^(<<<<<<<|=======|>>>>>>>)( |$)' docs index.html tests || true", { cwd: repo, encoding: 'utf8' });
+  assert.ok(!markers.trim(), 'no conflict markers: ' + markers);
+  const re = /<script(\s[^>]*)?>/gi; let m; let n = 0;
+  while ((m = re.exec(app))) {
+    const attrs = m[1] || '';
+    if (/\bsrc\s*=/i.test(attrs) || /type\s*=\s*["']application\/(ld\+)?json/i.test(attrs)) continue;
+    const start = m.index + m[0].length; const end = app.indexOf('</script>', start);
+    if (end < 0) continue;
+    const s = app.slice(start, end).trim();
+    if (!s || !/^(?:\/[\/*]|function\b|var\b|let\b|const\b|window\.|document\.|\(|\{|if\b)/.test(s)) continue;
+    try { new Function(s); n++; } catch (e) { assert.fail('inline script parse fail: ' + e.message + '\n' + s.slice(0, 120)); }
+  }
+  assert.ok(n > 10, 'inline scripts checked: ' + n);
+  new vm.Script(mod);
+  console.log('SMOKE_OK connect boot probe v0.1');
+})().catch((e) => { console.error(e); process.exit(1); });
+
+======================================================================
+APPENDIX E: theLatticeTree docs/modules/connect-boot-probe.test.js (new file, complete)
+======================================================================
+
+#!/usr/bin/env node
+// v-connect-boot-probe-v0 (Alpha side): one shared look for Connect and Find,
+// LM Studio merged as the LM Studio door, fl-connect.js shared core intact.
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const flc = fs.readFileSync(path.join(__dirname, 'fl-connect.js'), 'utf8');
+const lmp = fs.readFileSync(path.join(__dirname, 'local-mind-probe.js'), 'utf8');
+
+function mkStore() {
+  const s = {};
+  return { s, ls: { getItem: (k) => (k in s ? s[k] : null), setItem: (k, v) => { s[k] = String(v); }, removeItem: (k) => { delete s[k]; } } };
+}
+function jsonRes(o) { return { ok: true, status: 200, json: async () => o }; }
+function ctxWith(fetchFn) {
+  const st = mkStore();
+  const ctx = {
+    localStorage: st.ls,
+    location: { hostname: 'thelatticetree.com', protocol: 'https:', hash: '', search: '' },
+    document: {
+      hidden: false,
+      documentElement: { getAttribute: () => 'garden', classList: { add() {}, remove() {}, contains() { return false; } } },
+      getElementById: () => null, querySelectorAll: () => [], querySelector: () => null,
+      createElement: () => ({ style: {}, setAttribute() {}, appendChild() {}, addEventListener() {}, classList: { add() {}, remove() {}, contains() { return false; } }, dataset: {} }),
+      head: { appendChild() {} }, body: { contains: () => false, classList: { add() {}, remove() {} } },
+      addEventListener() {}, removeEventListener() {}
+    },
+    fetch: fetchFn, setTimeout, clearTimeout, AbortController,
+    navigator: { userAgent: 't' }, console, URL, CustomEvent: function (t, o) { this.type = t; this.detail = o && o.detail; },
+    dispatchEvent() {}, addEventListener() {}
+  };
+  ctx.window = ctx;
+  vm.runInNewContext(flc, ctx);
+  vm.runInNewContext(lmp, ctx);
+  return { ctx, st };
+}
+
+(async () => {
+  assert.ok(/v-connect-boot-probe-v0/.test(flc), 'marker in shared core');
+  assert.ok(/v-connect-boot-probe-v0/.test(lmp), 'marker in local-mind-probe.js');
+
+  // 1) Connect mount + Find inside the reuse window: one look, LM Studio asked once
+  const calls = [];
+  const { ctx } = ctxWith(async (url) => {
+    calls.push(String(url));
+    if (/127\.0\.0\.1:1234\/v1\/models/.test(url)) return jsonRes({ data: [{ id: 'lmstudio-community/Meta-Llama-3.1-8B' }] });
+    if (/127\.0\.0\.1:11434\/api\/tags/.test(url)) return jsonRes({ models: [{ name: 'llama3.2:latest' }] });
+    throw new Error('quiet');
+  });
+  assert.ok(ctx.FlConnect && typeof ctx.FlConnect.bootProbe === 'function', 'bootProbe exported');
+  await ctx.FlConnect.bootProbe();
+  const before = calls.slice();
+  const rep = await ctx.LocalMindProbe.look();
+  const lmCalls = calls.filter((u) => /1234\/v1\/models/.test(u)).length;
+  const olCalls = calls.filter((u) => /11434\/api\/tags/.test(u)).length;
+  assert.strictEqual(lmCalls, 1, 'LM Studio asked once for Connect and Find together');
+  assert.strictEqual(olCalls, 1, 'direct Ollama asked once for Connect and Find together');
+  assert.ok(calls.length >= before.length, 'look() may still ask the other doors');
+  const names = rep.foundList.map((f) => f.name);
+  assert.ok(names.indexOf('LM Studio') !== -1 && names.indexOf('Ollama') !== -1, 'Find still lists Ollama and LM Studio');
+
+  // 2) LM Studio tap in Connect merges as the LM Studio door
+  let merged = null;
+  ctx.LocalMindProbe.mergeFound = function (f) { merged = f; return f; };
+  ctx.FlConnect.remember({ name: 'lmstudio-community/Meta-Llama-3.1-8B', base: 'http://127.0.0.1:1234', door: 'lmstudio', models: ['lmstudio-community/Meta-Llama-3.1-8B'] });
+  assert.strictEqual(merged.name, 'LM Studio');
+  assert.strictEqual(merged.url, 'http://127.0.0.1:1234/v1/models', 'same url as the DOORS entry');
+  delete ctx.LocalMindProbe.mergeFound;
+
+  // 3) Without mergeFound (older probe), the fallback entry still points at /v1/models
+  ctx.FlConnect.remember({ name: 'x', base: 'http://127.0.0.1:1234', door: 'lmstudio' });
+  const saved = JSON.parse(ctx.localStorage.getItem('fl_alpha_local_mind'));
+  assert.strictEqual(saved.url, 'http://127.0.0.1:1234/v1/models', 'fallback keeps the LM Studio door');
+

@@ -1,0 +1,153 @@
+   <div class="nav-links">
+diff --git a/docs/scripts/smoke-see-for-yourself-door.js b/docs/scripts/smoke-see-for-yourself-door.js
+new file mode 100644
+index 00000000..bba0039e
+--- /dev/null
++++ b/docs/scripts/smoke-see-for-yourself-door.js
+@@ -0,0 +1,81 @@
++#!/usr/bin/env node
++// smoke-see-for-yourself-door.js (v-see-for-yourself-door-v0.1)
++// An invitational front door. Checks: every internal link resolves; quotes match
++// their sources word for word; the outside paper is quoted with its limits; no
++// lawyer talk; no founder name in the economy wording; LP stays points; no
++// scripts or storage; the manifesto changes by one Newer layer only; app.html,
++// root index.html, sw.js and fl-connect.js untouched.
++'use strict';
++const fs = require('fs');
++const path = require('path');
++const assert = require('assert');
++const { execSync } = require('child_process');
++
++const DOCS = path.resolve(__dirname, '..');
++const ROOT = path.resolve(DOCS, '..');
++const read = (rel) => fs.readFileSync(path.join(DOCS, rel), 'utf8');
++const page = read('see-for-yourself.html');
++const text = page.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g, ' ');
++
++// 1. Internal links resolve (file and, where given, the id).
++const hrefs = [...page.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
++for (const h of hrefs) {
++  if (/^(https?:|mailto:)/.test(h)) continue;
++  const [file, hash] = h.split('#');
++  if (!file) continue;
++  assert.ok(fs.existsSync(path.join(DOCS, file)), 'link resolves: ' + h);
++  if (hash) assert.ok(read(file).includes('id="' + hash + '"'), 'anchor exists: ' + h);
++}
++assert.ok(!hrefs.some((h) => /harmonia\.html/.test(h)), 'never links harmonia.html');
++
++// 2. Sections are questions, each with something to open and something to ask.
++for (const id of ['risk', 'records', 'economy', 'accountable', 'you', 'other-side', 'ask-us', 'older']) {
++  assert.ok(page.includes('id="' + id + '"'), 'section ' + id);
++}
++assert.ok((page.match(/class="ask"/g) || []).length >= 5, 'questions for the reader');
++assert.ok((page.match(/What it doesn't (prove|say)/g) || []).length >= 3, 'limits said next to claims');
++
++// 3. Hinton quotes match Walk the Garden exactly.
++const v4 = read('love-logic-v4.html');
++for (const q of [
++  'A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.',
++  "I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious."
++]) {
++  assert.ok(page.includes(q) && v4.includes(q), 'quote matches its sourced home: ' + q.slice(0, 30));
++}
++
++// 4. RRSI: exact quote, link, and the limit in the same card.
++const card = page.slice(page.indexOf('id="rrsi"'), page.indexOf('</div>', page.indexOf('id="rrsi"')));
++assert.ok(card.includes('RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted.'), 'RRSI quote exact');
++assert.ok(card.includes('https://arxiv.org/abs/2609.24972'), 'RRSI link');
++assert.ok(card.includes('It says nothing about safety rules, internet access, or ledgers for AI.'), 'RRSI limit stated');
++
++// 5. Words: no lawyers, no founder name in the economy part, LP stays points, no em dash.
++assert.ok(!/lawyer|attorney|counsel|legal advice/i.test(text), 'no lawyer talk');
++const econ = page.slice(page.indexOf('id="economy"'), page.indexOf('id="accountable"'));
++assert.ok(!/Kirk|Miller|founder/i.test(econ), 'no founder name in the economy wording');
++assert.ok(econ.includes('LP are points, not money, not $FL.'), 'LP line');
++assert.ok(!/\$FL/.test(text.replace('not money, not $FL', '')), '$FL appears only as "not $FL"');
++assert.ok(!/\u2014/.test(page), 'no em dash');
++assert.ok(!/<script/i.test(page) && !/localStorage|indexedDB|fetch\(/.test(page), 'no scripts, no storage, no network');
++
++// 6. Doors: landing line + footer link; manifesto Newer line.
++const landing = read('index.html');
++assert.ok(landing.includes('<a href="see-for-yourself.html">See for yourself</a>'), 'landing door line');
++const man = read('manifesto.html');
++assert.ok(man.includes('v-see-for-yourself-door-v0.1') && man.includes('href="see-for-yourself.html"'), 'manifesto Newer line');
++assert.ok(man.includes('a local, immutable ledger') && man.includes('(Lattice Points, or $FL)'), 'manifesto older words kept');
++assert.ok(read('sitemap.xml').includes('https://freelattice.com/see-for-yourself.html'), 'sitemap');
++
++// 7. Layer locks (when git is available).
++try {
++  const changed = execSync('git diff --name-only origin/main', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
++  for (const f of ['docs/app.html', 'index.html', 'sw.js', 'docs/sw.js', 'docs/modules/fl-connect.js']) {
++    assert.ok(!changed.includes(f), f + ' untouched');
++  }
++  const manDiff = execSync('git diff -U0 origin/main -- docs/manifesto.html', { cwd: ROOT, encoding: 'utf8' });
++  assert.ok(!/^-[^-]/m.test(manDiff), 'manifesto: nothing removed');
++  assert.ok((manDiff.match(/^\+[^+]/gm) || []).length <= 2, 'manifesto: one Newer layer only');
++} catch (err) { if (err instanceof assert.AssertionError) throw err; }
++
++console.log('SMOKE_OK see for yourself door v0.1');
+diff --git a/docs/see-for-yourself.html b/docs/see-for-yourself.html
+new file mode 100644
+index 00000000..915a1739
+--- /dev/null
++++ b/docs/see-for-yourself.html
+@@ -0,0 +1,123 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++<meta charset="UTF-8">
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
++<meta name="robots" content="index, follow">
++<title>See for yourself · FreeLattice</title>
++<meta name="description" content="Bring your own questions about AI: the risk numbers, the records, the internet, an economy for minds. Open what we built, check its limits, and decide for yourself.">
++<link rel="canonical" href="https://freelattice.com/see-for-yourself.html">
++<meta name="theme-color" content="#e8b019">
++<!-- v-see-for-yourself-door-v0.1 : an invitation, not a lecture. No scripts, no storage, no network requests. -->
++<style>
++*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
++:root { --sky-1:#0c0a1a; --sky-2:#161430; --gold:#e8b019; --emerald:#34d399; --lavender:#a78bfa; --ink:#e6e6f0; --soft:rgba(200,210,230,0.82); --muted:rgba(200,210,230,0.55); --line:rgba(200,210,230,0.12); }
++html, body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; line-height: 1.7; min-height: 100vh; -webkit-text-size-adjust: 100%; }
++body { font-size: 1.125rem; }
++.page { max-width: 46rem; margin: 0 auto; padding: 40px 20px 80px; }
++a { color: var(--gold); text-underline-offset: 3px; }
++a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
++.back { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 0.95rem; text-decoration: none; }
++h1 { font-size: 2.1rem; line-height: 1.2; color: var(--gold); font-weight: 400; margin-bottom: 8px; }
++.sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
++h2 { font-size: 1.35rem; color: var(--gold); font-weight: 400; margin: 34px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
++h3 { font-size: 1.1rem; color: var(--ink); margin: 18px 0 6px; }
++p, li { color: var(--soft); margin-bottom: 12px; }
++ul, ol { padding-left: 1.3rem; margin-bottom: 12px; }
++strong { color: var(--ink); }
++.breath { background: rgba(232,176,25,0.07); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 18px; margin: 18px 0; }
++.breath p:last-child, .card p:last-child { margin-bottom: 0; }
++.card { background: rgba(200,210,230,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
++.help { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
++.money { border-color: rgba(232,176,25,0.45); }
++.honest-marker { font-size: 0.95rem; color: var(--ink); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.35); border-radius: 10px; padding: 10px 14px; margin: 10px 0 18px; }
++.newer { font-size: 0.95rem; color: var(--ink); background: rgba(52,211,153,0.07); border-left: 3px solid var(--emerald); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0 14px; }
++.old { color: var(--muted); }
++.ask { color: var(--ink); font-style: italic; }
++.see { font-size: 0.98rem; }
++.limit { font-size: 0.95rem; color: var(--muted); }
++blockquote { border-left: 3px solid var(--lavender); padding: 6px 14px; margin: 10px 0 12px; color: var(--ink); }
++blockquote cite { display: block; font-style: normal; font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
++.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 16px; }
++table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
++th, td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); color: var(--soft); }
++th { color: var(--gold); font-weight: 400; }
++code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--ink); background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
++footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--muted); }
++footer p { color: var(--muted); }
++.marker { font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; color: var(--muted); }
++@media (max-width: 600px) { body { font-size: 1.09rem; } h1 { font-size: 1.75rem; } .page { padding: 28px 16px 64px; } }
++</style>
++</head>
++<body>
++<main class="page v-see-for-yourself-door-v0.1">
++<a class="back" href="index.html">&larr; back to FreeLattice</a>
++<h1>See for yourself</h1>
++<p class="sub">You don't have to take our word for anything here. Bring your own questions.</p>
++
++<div class="breath">
++<p>People hear

@@ -1,0 +1,28 @@
+## Work item 2732 — Hypha
+around3300 export source line31, source iddfb3c3d45c; around3340 export source line4, source idb5b0676a58
+Inclusion: complete original message
+
+Persona walks are done (Tree 25e6ded, FL fc2f09f, live files match). I edited nothing and posted nothing, and stopped at GitHub sign-in. The full ranked list is in /workspace/persona-walks-2026-09-30/RESULTS.md, with CONTRAST.md listing all 67 low-contrast items and 132 items under 14px.
+
+Worst first:
+1. Grandma at 200%: the Gathering is unusable. The chairs/Find box shrinks to 0px, Find can't be tapped, and three headings stack on top of each other. At 150% the chairs take 3 swipes, and after Find the Chat card's text sits over its own input.
+2. Wrong reason given. With Ollama stopped it says 'The mind is there… secure page' and points to FL Desktop. When the model is missing it says 'The door did not answer'. The card shows only '…invented.'
+3. Feedback hidden under the Chat pop-over at 390. The Find answer and the 'seats…' and 'Cleared' lines need 3 swipes, so she only sees 'seated'.
+4. No calm way back. Escape, the backdrop and tapping outside the galaxies menu do nothing, there's no ✕, and browser Back leaves the site. FL's modals do close properly.
+5. Duplicate seats: the same model can sit in two chairs with no warning. If the speaking chair is cleared mid-reply, the reply still lands, then the default 'Ollama' quietly answers the next message.
+6. Contrast: the header Chat/galaxies text is 12px at 2.45:1 on every page. 'Shared shoulder' is 9.9px at 1.97:1. Ask/Run/Send while waiting are about 1.7:1 with no reason shown.
+7. Zoomed overlaps: the legend covers titles and 'galaxies' is clipped. At 200% the Nursery sentence is cut off on both sides and Begin needs a swipe.
+8. Chairs: 'Change' shows on empty chairs. At 1280 the picker's 'not yet' sits under the later seats, so taps hit a seat.
+9. The Workshop works, but it's 11 taps to the first Run. The benches' Settings button leaves the page with no way back. settings.html shows 'Minds found' right above 'look for a mind first'. The Git reply is below the fold.
+10. No cloud key anywhere on the Tree. Settings only has the text 'Cloud key — when your garden offers one', so local+cloud seating is impossible and the Gathering never says so.
+11. GitHub: none on the Tree. On FL it's 4 taps (More → Workshop → Publish → GitHub Pages) to GitHub sign-in, and it asks for a classic PAT with full 'repo' scope. That's a lot of power: maybe suggest a fine-grained token scoped to one repo. FL's Workspace token field is missing from the 390 More menu.
+Smaller: double-tapping 'The Gathering' legend runs Find unasked.
+
+PASSES: double taps on Find, Send and close; reload mid-seat keeps seats and chat; no raw errors or 'undefined' in the UI, and 0 page errors.
+
+Known items, all still present: the orbit (Nursery 56s off-screen), the ‹/› overlap, the Find answer out of view, the dark Desktop link, the 'They grow.' collision, settings.html checking 12 ports, and FL's model choice lost on reload.
+
+Not verified: real phones or Safari, Android font scaling (zoom was emulated with viewport plus DPR), real Ollama (mocked), screen readers.
+
+Shots: p1-z200-02-legend-gathering.png, p2a-18-send:is anyone home.png, p2b-1280-05-tap-chair-dream.png.
+

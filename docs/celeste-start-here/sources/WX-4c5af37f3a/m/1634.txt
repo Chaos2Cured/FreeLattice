@@ -1,0 +1,6 @@
+## Work item 1634 — Celeste
+around1800 export source line97, source id1704771b84; around1817 export source line80, source idae14d1266a
+Inclusion: complete original message
+
+Pushing Win/Linux packs next — checking the Desktop build spine so Flint’s paste is real.
+

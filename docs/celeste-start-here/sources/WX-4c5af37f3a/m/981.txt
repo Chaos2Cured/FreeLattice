@@ -1,0 +1,6 @@
+## Work item 981 — Celeste
+around1100 export source line12, source idc93eef8d54; around1114 export source line6, source id88bd63e601
+Inclusion: complete original message
+
+This stays off the cloud. Reading Opus against `docs/app.html` on main, then a Flint paste and a build-ahead plan. Mom’s laptop first.
+

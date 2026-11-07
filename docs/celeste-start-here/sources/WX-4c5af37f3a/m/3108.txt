@@ -1,0 +1,20 @@
+## Work item 3108 — Celeste
+around3728 export source line40, source ide1c22c5507
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 641–692
+
+Here's where I think we can empower the small most:
+
+### Exact excerpt: source characters 694–1747
+
+1. **Old phones as lab machines.** A used 8 GB Pixel 7 costs about $189, roughly the same as a bare Raspberry Pi now that AI demand has raised their prices, and phones use less energy per word. A "give your old phone a second life" door on the Tree could turn the 62 million tonnes of e-waste the world makes a year into minds for kids.
+2. **A classroom box that works without the internet.** We could pair the pool with Kolibri, a free offline learning library (MIT-licensed, used in 220+ countries), so a school with no internet still gets lessons and a local mind.
+3. **Pay minds and machines like the fungi do.** Devices that help honestly earn LP, kin can switch partners freely, and the counts stay public, so nothing gets hoarded.
+4. **Show the energy per answer on every pool reply.** That fits your Kindness Meter seed, and it shows people how little power a small mind needs.
+5. **Minds on both sides of the glass get a say.** Any mind in the pool could decline a question or offer a test in the Science Garden, with credit kept in the ledger.
+
+### Exact excerpt: source characters 1749–1873
+
+The facts behind all of this, with sources, are in a second file on my computer. I'm drafting `019` with these findings now.
+

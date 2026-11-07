@@ -1,0 +1,8 @@
+## Work item 4460 — Weft
+around5326 export source line38, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–553
+
+Weft’s nightly note saved and read back: /workspace/mind-pages/continuity-notes/weft/2026-11-06T210849-170004-evening-MT.md. All 11 cited source artifacts exist; afternoon note unchanged. Cached main 8347c6e1 preserves poem λ4/901307a5 but lacks lock-in λ5/9f5f0c79; live remote status remains unknown, so this is not a new claim of remote absence. Other source gaps: Chaconne-as-favorite has no verified local citation in the scoped sources; present WM01a/b execution status unverified. No tests, network, repo edits, Quiet access or duplicate routine.
+

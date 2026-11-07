@@ -1,0 +1,180 @@
+theLatticeTree (repo root):
+  cmp docs/modules/fl-connect.js ../FreeLattice/docs/modules/fl-connect.js && echo SHARED_OK
+  node docs/modules/connect-boot-probe.test.js              # SMOKE_OK connect boot probe alpha v0.1
+  for t in docs/modules/*.test.js; do node "$t" >/dev/null 2>&1 && echo "PASS $t" || echo "FAIL $t"; done
+  (prototype: all 15 Alpha module tests pass, including local-mind-probe, fl-connect,
+  connect-heal-v04, garden-rooms, garden-thread)
+
+Prototype results (built on 7db2d94 / 395c761 with a faithful simulation of the Tree paste's
+fl-connect.js changes): both new smokes green; all FL connect/bridge smokes green except the five
+pre-existing failures above; tests/smoke.js ALL 3597 CHECKS PASSED; index == app; sw.js untouched;
+fl-connect.js identical across the two worktrees.
+
+======================================================================
+11. WALK CHECKLIST (390x844 and 1280x900; Chrome; fake or real Ollama + LM Studio)
+======================================================================
+
+W1 Returning person (fl-welcomed true, last tab Chat), cold reload:
+   - count requests to 127.0.0.1 in DevTools for 9s: about 16 (was 38). One full Bridge scan.
+   - exactly ONE voice: the toast naming the real doors; no Chat suggest banner at the same time.
+   - at 390px the toast is one tidy card (max 92vw), not a tall column.
+   - tap the toast -> Connect, both cards: "Ollama is ready, pick a mind",
+     "LM Studio is ready, pick a mind".
+W1b Returning person who chose the SECOND model (qwen2.5) in Connect, cold reload:
+   - fl_ollamaModel is still qwen2.5, fl_modelSource still user; send a chat: the POST model is qwen2.5.
+W2 New person, cold freelattice.com/#connect:
+   - lands on Connect once; no toast; no welcome overlay on top; about 12 requests (was 73).
+   - tap another tab during boot: it stays there (no yank back to Connect or Garden).
+W3 Tap an LM Studio model in Connect:
+   - fl_provider = lmstudio, fl_lmstudioHost = 127.0.0.1:1234, fl_ollamaHost unchanged (null),
+     the tapped button has aria-pressed="true" and .is-chosen, status reads "Local · <model>",
+     chat sends to 127.0.0.1:1234/v1/chat/completions.
+   - tap an Ollama model afterwards: the mark moves to the Ollama card.
+W4 Chat Box field (Chat > the Box row):
+   - default shows "This computer only", the switch off, the line hidden.
+   - type 8.8.8.8 -> "That address is on the public internet, so it is blocked. Nothing was sent."
+     and ZERO network requests.
+   - type 192.168.1.50 with the switch off -> the home-network sentence, ZERO requests.
+   - turn the switch on -> Kirk's line appears; type 192.168.1.50 once -> it is asked and saved
+     (fl_homeNet_addr, fl_ollamaHost 192.168.1.50:11434); reload -> still on, still there.
+   - turn the switch off (one tap) -> back to 127.0.0.1:11434; turn it on -> the address returns
+     without retyping.
+   - 8.8.8.8 with the switch ON is still refused.
+W5 Settings > Ollama Address: 192.168.1.50:11434 refused while off (v0.4 words + switch
+   sentence); saved while on; 203.0.113.5 refused either way.
+W6 theLatticeTree: Settings > Connect lists LM Studio as its own card; Garden "Find local minds"
+   right after Connect opens does not ask LM Studio a second time (DevTools); tapping an LM Studio
+   model in Connect marks it and Find's list agrees ("LM Studio").
+
+Screenshots from the prototype walk (for reference, not committed): W1 main vs boot at 390,
+W1 toast 390/1280, W1b toast tapped -> Connect, W2 main vs boot #connect, W3 LM Studio tapped,
+W4 switch off refused / on (390 and 1280).
+
+======================================================================
+12. PRS
+======================================================================
+
+FreeLattice PR title:
+  layer: one cold-start look, LM Studio in Connect, home-network switch (v-connect-boot-probe-v0)
+Body (short):
+  F2 FlConnect.bootProbe (one in-flight look, 5s cache) + resolveOllamaBase join.
+  F1 window.FlColdStart owns cold start: one look, land once, one voice. Old timers step aside.
+  F3 LM Studio is a first-class door in Connect; no false "Yes, use Ollama"; LM Studio status words.
+  F4 Kirk's switch: This computer only by default; "Also use a computer on my home network";
+     private IPv4 only (10/8, 172.16/12, 192.168/16); 169.254, names, public always refused;
+     remembered; one tap reverts; future hook for signed remote minds. Settings address follows
+     the same switch.
+  Cold boot 38 -> 16 local requests; #connect 73 -> 12. Smoke: SMOKE_OK connect boot probe v0.1.
+  Locks: root sw.js == main, docs/sw.js untouched, index == app, fl-connect.js == Alpha, no
+  markers, inline scripts parse, textContent, no bare *, no confirm().
+  Depends on: env heal v0.1.1 (merged first) and Tree any-model v0.1.
+
+theLatticeTree PR title:
+  layer: one shared look for Connect and Find, LM Studio door in Connect (v-connect-boot-probe-v0)
+Body (short):
+  Shared fl-connect.js byte-identical with FreeLattice. local-mind-probe look() joins
+  FlConnect.bootProbe and reuses its LM Studio / direct Ollama answer. LM Studio taps merge as the
+  LM Studio door (/v1/models). Test: SMOKE_OK connect boot probe alpha v0.1. Depends on Tree
+  any-model v0.1.
+
+Never push to main directly. Never force-push. Merge FreeLattice first, then Alpha, and re-run the
+cmp on both mains after merge.
+
+======================================================================
+13. HELD BACK / NEXT (not in this paste)
+======================================================================
+
+  - BrowseModels.init (app.html ~55045) still makes its own /api/tags call at boot. Next: read
+    FlConnect.peekBootProbe() first. (It is the second tags call in W1.)
+  - The 8s Connect loop still uses a fresh probe every tick when the panel is open; fine, it is
+    the person's own look.
+  - Home network for Alpha: not added (C7).
+  - Signed remote minds: hook only (C10). No code path, no widened ranges.
+  - Connect's own port field still accepts only a port on 127.0.0.1 (v0.4 rule unchanged).
+
+
+======================================================================
+APPENDIX A: FreeLattice docs/app.html, full exact diff vs main 7db2d94 (git apply --check clean on 7db2d94; index.html gets the same bytes by copy)
+======================================================================
+
+diff --git a/docs/app.html b/docs/app.html
+index fa946fa..b4fd82e 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -2037,6 +2037,13 @@ header .mantra {
+ #flBoxPointerStatus[data-fl-box-status="ready"] { color: #34d399; }
+ #flBoxPointerStatus[data-fl-box-status="cors-blocked"] { color: #fbbf24; cursor: pointer; }
+ #flBoxPointerStatus[data-fl-box-status="unreachable"] { color: #f87171; }
++/* v-connect-boot-probe-v0 (F4): home-network switch under the Box field */
++.fl-homenet { flex: 1 1 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 0.72rem; color: var(--text-muted); font-family: Georgia, serif; }
++.fl-homenet-mode { color: #a5f3fc; }
++.fl-homenet-switch { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; }
++.fl-homenet-switch input { width: 18px; height: 18px; accent-color: #34d399; }
++.fl-homenet-line, .fl-homenet-refusal { flex: 1 1 100%; margin: 0; line-height: 1.45; }
++.fl-homenet-refusal { color: var(--gold, #e8b019); }
+ .chat-overflow-btn {
+   background: transparent;
+   border: none;
+@@ -11749,6 +11756,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
+   transform: translateX(-50%) translateY(0);
+ }
+ .fl-ollama-toast .fl-toast-icon { font-size: 1.2rem; }
++/* v-connect-boot-probe-v0: honest door names need room on a phone */
++.fl-ollama-toast { width: max-content; max-width: min(92vw, 440px); box-sizing: border-box; }
+ .fl-ollama-toast .fl-toast-close {
+   margin-left: 12px;
+   background: none;
+@@ -16507,6 +16516,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+               <input id="flBoxPointerInput" type="text" placeholder="localhost:11434 or 192.168.1.50" autocomplete="off" spellcheck="false" aria-label="Local or LAN AI address">
+               <span id="flBoxPointerStatus" data-fl-box-status="idle" title=""></span>
+             </div>
++            <!-- v-connect-boot-probe-v0 (F4): this computer only, unless the person turns on home network -->
++            <div class="fl-homenet v-connect-boot-probe-v0" id="flHomeNet" data-fl-homenet="off">
++              <span class="fl-homenet-mode" id="flHomeNetMode">This computer only</span>
++              <label class="fl-homenet-switch" for="flHomeNetSwitch"><input type="checkbox" id="flHomeNetSwitch" role="switch" aria-checked="false" aria-describedby="flHomeNetLine"> Also use a computer on my home network</label>
++              <p class="fl-homenet-line" id="flHomeNetLine" hidden>Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked.</p>
++              <p class="fl-homenet-refusal" id="flHomeNetRefusal" role="status" hidden></p>
++            </div>
+             <button class="chat-overflow-btn" id="chatOverflowBtn" onclick="FLChatOverflow.toggle()" aria-label="More options" title="More options">&#8943;</button>
+             <div class="chat-overflow-popup" id="chatOverflowPopup">
+               <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput();FLChatOverflow.close()" title="Voice input" style="display:none;">
+@@ -25898,7 +25914,7 @@ async function switchToConversation(convId) {
+       // This prevents "Configure your model" from showing to someone who just connected Ollama.
+       var _connected = state.isLocal || (state.apiKey && state.apiKey.length > 0);
+       if (_connected) {
+-        var _statusDesc = state.isLocal ? ('Ollama (' + (state.ollamaModel || 'llama3.2') + ')') : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
++        var _statusDesc = state.isLocal ? ((state.provider === 'lmstudio' ? 'LM Studio (' : 'Ollama (') + (state.ollamaModel || 'llama3.2') + ')') : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider); // v-connect-boot-probe-v0 (F3)
+         // v5.79.44-chat-our-way: Chat empty state stays Chat (no Sophia identity bleed).
+         div.textContent = 'You\'re safe here. Connected to ' + _statusDesc + '. Say whatever you need.';
+       } else {
+@@ -26943,6 +26959,8 @@ function switchTab(tabId) {
+   }
+   // Remember last tab for returning visits
+   try { localStorage.setItem('fl-last-tab', tabId); } catch(e) {}
++  // v-connect-boot-probe-v0 (F1): a tab the person picked while booting wins over late landing
++  try { if (window.FlColdStart && FlColdStart.noteTab) FlColdStart.noteTab(tabId); } catch (eCs) {}
+   LatticeEvents.emit('tabChanged', { tabId: tabId });
+   LatticeEvents.emit('tabActivated:' + tabId, { tabId: tabId });
+   // Also emit legacy events for community sub-tabs
+@@ -27767,6 +27785,8 @@ const FlOnboarding = (function() {
+ 
+   // Main app load detection — show toast if no provider configured
+   function detectOnLoad() {
++    // v-connect-boot-probe-v0 (F1): the cold-start owner speaks at boot; this stays for pages without it
++    try { if (window.FlColdStart && FlColdStart.owns()) return; } catch (eOwn) {}
+     var hasProvider = false;
+     try {
+       hasProvider = (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected());
+@@ -27811,11 +27831,56 @@ const FlOnboarding = (function() {
+     // Don't show during welcome experience
+     var welcomeOverlay = document.getElementById('welcomeOverlay');
+     if (welcomeOverlay && !welcomeOverlay.classList.contains('welcome-gone')) return;
++    // v-connect-boot-probe-v0 (F1): the old id above is gone; the Grandmother Door is flWelcomeOverlay.
++    // Also never ask on top of Connect, which already lists the minds.
++    if (flToastWouldRace()) return;
+     setTimeout(function() {
++      if (flToastWouldRace()) return;
+       toast.classList.add('fl-toast-show');
+     }, 2000);
+   }
+ 

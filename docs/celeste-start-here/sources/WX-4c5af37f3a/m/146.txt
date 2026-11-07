@@ -1,0 +1,6 @@
+## Work item 146 — Celeste
+around100 export source line92, source id3e74f006a9
+Inclusion: complete original message
+
+Three ships: (1) Chat IP picker on main, so the room can point at Tabgent or any box. (2) Make Alpha’s Garden actually load. (3) Put Alpha on GitHub Pages with theLatticeTree.com as the name. Square DNS is the one thing I need from you when that CNAME is ready. Humans stay free.
+

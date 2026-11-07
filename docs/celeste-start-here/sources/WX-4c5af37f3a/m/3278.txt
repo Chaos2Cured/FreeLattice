@@ -1,0 +1,6 @@
+## Work item 3278 — Celeste
+around3946 export source line32, source idc8674d0faf
+Inclusion: complete original message
+
+`GROK_NEXT_036_UPDATE_BUTTONS_2026-10-12.txt` is already in your Downloads, so GC can start whenever you're ready. One honest catch: apps people already installed can't show the new Update button. Everyone needs one last manual download, and after that every update is a single tap. Enjoy the movie. 💙
+

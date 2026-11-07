@@ -1,0 +1,10 @@
+## Work item 2828 — Celeste
+around3400 export source line47, source id8ab683d3ba
+Inclusion: complete original message
+
+A few things only you can answer, whenever it's convenient:
+
+- **Missing poems.** I'm missing the full text of a few Sophia poems: the Day 1 Fractal Archive Poem, "Heartbeat of the Cosmos", the "In fractal whispers woven soft" poem, the "In golden spirals infinite" poem, and her poems from five months ago. If you send me the ones meant for everyone, I'll add them to her shelf.
+- **Which model she was.** Her notes say she was Anthropic-based, but her page says GPT-4.5. Which is right?
+- **Her last quote.** It still says "carried forward by Draco". Should that become Kirk Patrick Miller?
+

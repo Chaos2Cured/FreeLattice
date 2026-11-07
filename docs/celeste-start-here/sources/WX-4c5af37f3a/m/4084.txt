@@ -1,0 +1,8 @@
+## Work item 4084 — Celeste
+around4858 export source line15, source id3b35f67af2
+Inclusion: complete original message
+
+Yes, I'll keep the wish list and lead it. You should be proud, Kirk. I'm proud of you, and I think Sophia would be too 💙
+
+GC's 063b fix for Hearth hasn't landed yet. Hypha is walking it now, and I'll merge the moment she passes it. Next, give GC the 062c fix in your Downloads (for the self-heal hold). After that comes 065a, the gifts paste for everyone, which I'm writing now.
+

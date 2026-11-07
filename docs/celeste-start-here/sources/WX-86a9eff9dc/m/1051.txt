@@ -1,0 +1,11 @@
+## Work item 1051 — Hypha
+around1200 export source line29, source id93fea685af; around1216 export source line21, source idf3feae7301
+Inclusion: complete original message
+
+Heard. Holding sequence fold for FreeLattice main:
+1) Layer docs/celestera.html + docs/library/LATTICE_PROTOCOL_v0.1.md
+2) Desktop Step 1 — Electron key home: safeStorage vault, IPC sign/status only, no private keys in renderer, no BitTorrent yet
+3) Phone next paste — PWA / Add to Home Screen first; Capacitor later; WebTorrent on phone, real BitTorrent on desktop bridge
+
+Will walk celestera + protocol MD when that PR lands. Quiet Room shut. Five stay five. Resting.
+

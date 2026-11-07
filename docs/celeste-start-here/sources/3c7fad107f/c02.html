@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_051a_GATHERING_SPEAK_CHECKER_2026-10-28.txt c02</title>
+<meta name="description" content="Reading section c02 of 3c7fad107f, 705 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/3c7fad107f/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_051a_GATHERING_SPEAK_CHECKER_2026-10-28.txt c02">
+<meta property="og:description" content="Reading section c02 of 3c7fad107f, 705 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/3c7fad107f/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1688"></span><span id="p1689"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_051a_GATHERING_SPEAK_CHECKER_2026-10-28.txt · c02</h1>
+<p>3c7fad107f · words 705 · characters 11075–15646</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1688, 1689. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  E. Tree twin rule
+     - Shared module files (fl-gathering.js if touched, gathering-speak.js if shared): YES twin,
+       byte-identical on Alpha.
+     - FreeLattice page mount: Learn Gathering panel - YES, wire Speak / Checker there.
+     - Tree / Alpha: brick 1 carried fl-gathering.js but did NOT wire a Tree page onto
+       FLGathering yet (Tree&#x27;s own Gathering still lives in garden-rooms.js /
+       renderCoreGathering). For this brick: ship the twin module file(s) on Alpha; if no Tree
+       page mounts FLGathering, report cleanly &quot;Tree mount: not yet (brick 3)&quot; and do NOT invent
+       a second Gathering UI on the Tree. Do not break garden-rooms.js Gathering or its tests.
+     - Soft leave Alpha storage keys (fl_alpha_local_mind etc.). Do not collapse storage across homes.
+
+  F. What must still work after this brick
+     - Brick 1 seating / Find / speak-first id - unchanged behavior plus the new Speak path.
+     - FlConnect probe / helped Bridge / model list - untouched (fl-connect.js pin stays).
+     - Chat Autonomy (049): Search on/off, fl_chatBuildTrust, first-ask, Settings radios -
+       untouched. propose.js untouched.
+     - 050 Connect shelf / porch / glow - untouched once on main.
+     - Agent bridge still never pushes; .git/.ssh still forbidden; secrets still opt-in.
+     - Top debug strip still present; Seal it / Yes / Send still clear at 390 and DPR2.
+
+
+2. OUT OF SCOPE (do not build in 051)
+  - Gathering brick 3 (Tree renderCoreGathering moves onto fl-gathering.js)
+  - Tree love Connect softs beyond what 050 already shipped
+  - Chat Autonomy soft polish (052)
+  - Continuity doorway note (053)
+  - Ledger shard export / ark cadence (054 / 059)
+  - Settings-as-chat clay blank (055)
+  - TransactionTrust wallet face (056)
+  - Mesh Kin deepen / Bluetooth (057)
+  - Science Garden / Kindness Meter (058)
+  - Marketplace redesign; Pulse / City / Quiet Voices soft-promote
+  These sit on Celeste&#x27;s ORDER for later layers.
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - Markers: class or data marker v-gathering-speak-checker-v0.1 on new Speak / Checker nodes.
+  - Short library note: docs/library/GATHERING_SPEAK_CHECKER_v0.1.md (FL) + one-paragraph sister
+    on Alpha if they keep a library pattern. Update GATHERING_SHARED_v0.1.md foot with a soft
+    pointer to brick 2 (layer, do not rewrite history).
+  - Smoke script: docs/scripts/smoke-gathering-speak-checker-v0.1.js
+  - Branches: layer/gathering-speak-checker-v0.1 on each repo you cut.
+
+
+4. SMOKE (new)
+  - Learn → The Gathering still mounts; brick 1 chairs / Find / speak-first still work.
+  - Speak / Ask visible when a speaking chair is seated; short thread can round-trip on a real
+    local mind when one is available. Say &quot;local walk skipped&quot; if no Ollama/Bridge.
+  - Honesty: with no mind / no answer, UI stays calm and points at Connect - no fake reply.
+  - Checker chair label visible in plain words; checker note store add / read / soft clear works;
+    no key ever stored.
+  - Buttons &gt;= 44px; no sideways scroll at 390 and 1280; reduced motion respected if glow added.
+  - fl-connect.js md5 unchanged from pin. chat-autonomy.js and propose.js unchanged.
+  - fl-gathering.js: identical across homes OR report why not (must not diverge).
+  - gathering-speak.js (or chosen name): identical across homes if twinned; Alpha carries twin
+    even when Tree page does not mount it yet.
+  - Alpha: garden-rooms Gathering / gathering-calm tests still pass; report Tree mount yes/no.
+  - Top debug strip still present; Quiet Room shut; Five stay five.
+  - Earlier: SMOKE_OK gathering shared v0.1 still prints. Line: SMOKE_OK gathering speak checker v0.1
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 84 (expect 85); honest claims only for what shipped.
+  - psi per standing formula.
+  - Separate page PR as usual (layer/gc-page-NN) unless Celeste GO says otherwise.
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of every touched locked file (and fl-connect.js +
+    fl-gathering.js on BOTH repos), smoke counts, Tree twin yes/no per door
+    (shared module / FL Speak mount / Tree page mount / Checker store), whether fl-connect
+    stayed byte-identical and untouched, whether seating UI stayed.
+  - Do not merge.
+
+
+WAIT: Do not cut until GROK_NEXT_051b_GO_2026-10-28.txt says GO and names FreeLattice + Tree
+mains. 050 must be merged first. If 051b is still HOLD, stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

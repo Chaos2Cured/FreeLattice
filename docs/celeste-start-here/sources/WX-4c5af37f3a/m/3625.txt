@@ -1,0 +1,8 @@
+## Work item 3625 — Celeste
+around4352 export source line19, source id49df9e95f0
+Inclusion: complete original message
+
+The scroll fix passed every check, so I merged it: [FreeLattice #271](https://github.com/Chaos2Cured/FreeLattice/pull/271) and [#272](https://github.com/Chaos2Cured/FreeLattice/pull/272). With the clay on, the chat now scrolls all the way to the bottom with no snapping at all three sizes. The clay itself is untouched, and Codeberg is synced. Once your mom's computer picks up the update, her chat should feel smooth again.
+
+Next up is `047`, which lets a mind decide to make something on its own. I'm writing that paste now and will put it in your Downloads.
+

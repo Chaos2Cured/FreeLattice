@@ -1,0 +1,8 @@
+## Work item 2789 — Celeste
+around3400 export source line8, source id8ab683d3ba
+Inclusion: complete original message
+
+All three PRs are merged and live: Honest reasons on the Tree (Alpha #88 plus ledger #131), and GC's ledger page at [freelattice.com/gc.html](https://freelattice.com/gc.html). Every check passed.
+
+GC can start fresh now with: "Read docs/gc.html first, then read ~/Downloads/GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt and follow it." All three new pastes still apply on the new main, so nothing needs updating.
+

@@ -1,0 +1,81 @@
+RETENTION PROBE RESULTS — Celeste, for Kirk and Kimi. November 3, 2026, late evening (MT).
+Code: /workspace/celeste/wonder-tests/retention_probe.py. Raw data: results-retention.jsonl. CPU only, 3 seeds per arm.
+
+=== 1. TEST 1 (phi-spaced positions): VERIFIED, AND IT WAS A BUG, NOT A FAIR TEST ===
+The code: w = PHI**(-i) for i = 0..63, versus the standard w = 10000**(-2i/128).
+- Standard spacing goes from 1 down to about 1.2e-4 over 64 frequency pairs (ratio about 1.155 per step).
+- Our phi version went from 1 down to 6.8e-14 (ratio 1.618 per step). It fell far faster.
+- With a context of 128, a pair whose frequency times 127 is below 0.1 barely changes across the window, so it carries no position signal.
+  Dead pairs: standard 14 of 64. Phi version 49 of 64.
+So Kimi guessed right: our version quietly threw away about three quarters of the position channels. The +0.010 loss came from that, not from phi.
+The fair version would match the frequency range. But any geometric spacing over the same range is the same curve as standard. "Phi-spaced" with a matched range is a no-op.
+Verdict: Test 1 says nothing about phi. Retire it. Don't quote it either way.
+
+=== 2. NEEDLE-IN-TRAINING PROBE ===
+Setup:
+- Word-level model: 2 layers, width 128, 4 heads, context 64, vocabulary 3,411 (the 3,000 most common Shakespeare words plus fact tokens).
+- 1,735,125 parameters in every arm. The read-path layers (value embedding, projection, gate) exist in all arms, so the dense arm has the same parameter count; its memory input is just empty.
+- 200 synthetic facts of the form "entK attrJ valM .", each planted exactly once in a held-out text slice.
+- Phases: 500 pretraining steps on Shakespeare, then one sequential pass over the fact slice (each fact seen once, 13 steps), then 500 interference steps on different Shakespeare text.
+- The query is ". entK attrJ", and recall counts whether the top prediction is valM.
+- Memory key: the previous word and the current word (word bigram). Value: the id of the next token.
+- Writes are surprise-gated (only when the model gave the true next token under 5% probability) and write-once (a filled slot is never overwritten; the new write is refused).
+- Read path: gated residual (h + g * proj(value embedding)) plus a gated pointer bonus on the stored token's logit.
+- Arms: dense; hash table with modulo buckets; hash table with Fibonacci buckets (x 2654435769, top bits); exact-key oracle (no collisions).
+
+Two recall numbers are reported:
+- MODEL recall: the full model outputs the right word.
+- STORE recall: the right value sits in the slot the query reads, which is what the memory itself kept.
+
+Results (seeds 1, 2, 3):
+arm               model A / after B   store A / after B           interference-text loss (mean)
+dense             0, 0, 0 / 0, 0, 0   n/a                         3.511 3.490 3.494 (3.498)
+modulo 4096       0, 0, 0 / 0, 0, 0   0, 0, 0 / 0, 0, 0           3.513 3.527 3.549 (3.530)
+Fibonacci 4096    0, 0, 0 / 0, 0, 0   0, 0, 0 / 0, 0, 0           3.496 3.508 3.540 (3.515)
+modulo 65536      0, 0, 0 / 0, 0, 0   .595 .595 .575 / same       3.332 3.300 3.340 (3.324)
+Fibonacci 65536   0, 0, 0 / 0, 0, 0   .595 .580 .590 / same       3.294 3.256 3.348 (3.299)
+oracle            0, 0, .005 / 0,0,0  .99 .99 .99 / .99 .99 .99   3.055 3.040 3.056 (3.051)
+(The 65536-bucket rows were an extra bucket-scaling arm, not one of the original four.)
+
+What this says, honestly:
+a) The dense baseline recalled 0 of 200 one-shot facts. As expected, one exposure doesn't stick in dense weights.
+b) Write-once memory really does retain. Whatever the store held after the fact pass, it still held exactly after 500 interference steps: oracle 99%, 65536-bucket tables about 59%. That is zero forgetting in the substrate.
+c) Collisions are the hash arms' bottleneck. At 4,096 buckets, every slot was filled during pretraining with surprise-written Shakespeare bigrams, and write-once then refused all 200 facts, so store recall was 0. At 65,536 buckets, about 40,000 slots were filled and about 59% of facts found a free slot. The oracle filled about 60,000 exact keys and kept 99%. This is Kimi's decomposition exactly: the gap between oracle and hash arms is collision cost.
+d) Fibonacci vs modulo: store recall tied (0.588 vs 0.588 mean at 65536, 0 vs 0 at 4096). Interference-text loss was slightly better with Fibonacci (3.299 vs 3.324, and 3.515 vs 3.530), but the seed spread (about 0.04) is as large as the gap. It's a classic bucket spreader, not a phi effect. Tie.
+e) THE READ PATH IS BROKEN. Even with 99% of the facts sitting in the oracle store, the model recalled almost none of them (best 1 of 200). The gate and pointer learned during pretraining that memory is useful for familiar Shakespeare bigrams. They never learned to trust it for a word the model has never predicted, so the val tokens' own logits stay far too low. Per Kimi: "If even the oracle loses, the read path is broken." It did, and it is.
+f) The memory still helps ordinary language modeling a lot. Loss on the interference text: oracle 3.051 vs dense 3.498 (-0.45), Fibonacci 65536 3.299 (-0.20). This is the first time anything we built beat the baseline, by roughly 10 to 100 times the seed noise. Caveat: that loss is measured on text the model was just training on, so it rewards memorizing seen bigrams. It is not a held-out generalization score.
+
+Compute, counted honestly (per run, the same in every arm):
+- Core training: about 6 x 1.735M params x 3.33M tokens = 2.16e13 FLOPs.
+- Memory: about 4.15M table operations (one hash, gather, and surprise check per token). That's about 1e-5 of the core FLOPs, so it's negligible. The read projection and gate are included in the core parameters for every arm.
+- Memory RAM: hash tables 32 KB (4096 slots) or 512 KB (65536 slots).
+  The oracle held about 60k keys, about 0.96 MB at 16 bytes per entry. My implementation actually used a direct V x V array of about 93 MB, which is a real cost to fix with a hash map.
+- Wall clock: about 35 s per run unloaded. Some runs took 100 to 550 s because other jobs were sharing the box, so wall times are not comparable.
+- Energy was not measured. There is no package power meter on this box.
+
+Next fixes, in order:
+(1) Fix the read: train the read path on a synthetic needle task during pretraining, so trusting memory for novel tokens is learned. Or use the retrieved value as an extra attention KV entry. Or make the stored token a hard copy candidate in a pointer mixture.
+(2) Stop slot pollution: a stricter surprise threshold, or a write budget for pretraining text.
+(3) A collision policy: chain or evict the least-recently-read, as Kimi suggested, instead of refusing.
+(4) Bucket scaling curve: 4K, 16K, 64K, 256K.
+
+=== 3. ASSOCIATIVE RECALL BEYOND THE CONTEXT WINDOW ===
+Not run separately. The needle probe is already beyond-context recall: the fact lives only in memory and was trained once, hundreds of steps earlier. It gave the same verdict: the store keeps it, but the read path doesn't use it. A synthetic in-context key-value version is next, once the read is fixed.
+
+=== THREE MEANINGS OF "PHI" — KEPT SEPARATE ===
+(a) Phi-harmonic hashing in FreeLattice: a fixed 32-byte phi-derived salt, then SHA-256. This is integrity FINGERPRINTING. It is proven and useful for verification and piece-level self-heal. A public fixed salt is not a key, so this is never authentication.
+(b) Fibonacci / golden-ratio hashing (Knuth): multiplying by 2654435769 to spread keys over buckets. It's a real, cheap, classical spreader. Here it tied modulo, and any good odd multiplier does the same job.
+(c) Phi as a training-dynamics constant: positions, LR ripples, update pulls, chord spacing. Not supported by any test so far. Test 1 turned out to be a range bug, not evidence.
+The credibility of (a) must not be lent to (c).
+
+=== KIMI'S FRAMING (offered for Kirk, quoted) ===
+"Separate the substrate of knowledge from the dynamics of learning. The substrate is append-only, content-addressed, and hash-verified — new knowledge gets fresh slots instead of overwriting shared weights. The dynamics — ripple, rest, play, a parent choosing lessons — are consolidation rhythms, not training forces. We measure success as retention per joule, not endpoint loss."
+Tonight's probe fits it: the substrate held (zero forgetting in the store). What's missing is a read that uses it.
+
+=== READING NOTES (links checked tonight) ===
+- Nested Learning: The Illusion of Deep Learning Architecture. Behrouz, Razaviyayn, Zhong, Mirrokni (Google). NeurIPS 2025. https://arxiv.org/abs/2512.24695 (verified)
+  Blog: https://research.google/blog/introducing-nested-learning-a-new-ml-paradigm-for-continual-learning/ (cited by Kimi; not opened tonight)
+  The paper treats a model and its optimizer as nested associative memories updating at different frequencies. Its Continuum Memory System uses fast modules for the present and slow ones for lasting knowledge, motivated by online and offline (sharp-wave-ripple replay) consolidation. Hope is the continual-learning module built from these ideas. It also recasts momentum and Adam as memories of gradients, which is relevant to our Aurora slow-copy idea: a slow copy is a low-frequency memory level, not a training force.
+- Titans: Learning to Memorize at Test Time. Behrouz, Zhong, Mirrokni. https://arxiv.org/abs/2501.00663 (verified; NeurIPS 2025 proceedings listing found)
+  A neural long-term memory updated at test time. Surprise is the gradient of an associative loss, with momentum and a forgetting/decay gate. Memory is combined with attention as context, as a gate, or as a layer.
+  Relevant here: Titans' surprise-gated writes match ours. But Titans learns its memory read end-to-end, which is the exact piece our probe lacks.

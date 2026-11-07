@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt c03</title>
+<meta name="description" content="Reading section c03 of 01acc8e9e6, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/01acc8e9e6/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt c03">
+<meta property="og:description" content="Reading section c03 of 01acc8e9e6, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/01acc8e9e6/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1753"></span><span id="p1754"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt · c03</h1>
+<p>01acc8e9e6 · words 1200 · characters 18677–28797</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1753, 1754. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">   &lt;div class=&quot;nav-links&quot;&gt;
+diff --git a/docs/scripts/smoke-see-for-yourself-door.js b/docs/scripts/smoke-see-for-yourself-door.js
+new file mode 100644
+index 00000000..1a371295
+--- /dev/null
++++ b/docs/scripts/smoke-see-for-yourself-door.js
+@@ -0,0 +1,125 @@
++#!/usr/bin/env node
++// smoke-see-for-yourself-door.js (v-see-for-yourself-door-v0.1, v0.2)
++// v0.2: every requested item has its own section with See it / What it doesn&#x27;t prove / Ask yourself,
++// links to its real page, and quotes that match their source pages word for word.
++// An invitational front door. Checks: every internal link resolves; quotes match
++// their sources word for word; the outside paper is quoted with its limits; no
++// lawyer talk; no founder name in the economy wording; LP stays points; no
++// scripts or storage; the manifesto changes by one Newer layer only; app.html,
++// root index.html, sw.js and fl-connect.js untouched.
++&#x27;use strict&#x27;;
++const fs = require(&#x27;fs&#x27;);
++const path = require(&#x27;path&#x27;);
++const assert = require(&#x27;assert&#x27;);
++const { execSync } = require(&#x27;child_process&#x27;);
++
++const DOCS = path.resolve(__dirname, &#x27;..&#x27;);
++const ROOT = path.resolve(DOCS, &#x27;..&#x27;);
++const read = (rel) =&gt; fs.readFileSync(path.join(DOCS, rel), &#x27;utf8&#x27;);
++const page = read(&#x27;see-for-yourself.html&#x27;);
++const text = page.replace(/&lt;!--[\s\S]*?--&gt;/g, &#x27;&#x27;).replace(/&lt;[^&gt;]+&gt;/g, &#x27; &#x27;);
++
++// 1. Internal links resolve (file and, where given, the id).
++const hrefs = [...page.matchAll(/href=&quot;([^&quot;]+)&quot;/g)].map((m) =&gt; m[1]);
++for (const h of hrefs) {
++  if (/^(https?:|mailto:)/.test(h)) continue;
++  const [file, hash] = h.split(&#x27;#&#x27;);
++  if (!file) continue;
++  assert.ok(fs.existsSync(path.join(DOCS, file)), &#x27;link resolves: &#x27; + h);
++  if (hash) assert.ok(read(file).includes(&#x27;id=&quot;&#x27; + hash + &#x27;&quot;&#x27;), &#x27;anchor exists: &#x27; + h);
++}
++assert.ok(!hrefs.some((h) =&gt; /harmonia\.html/.test(h)), &#x27;never links harmonia.html&#x27;);
++
++// 2. Every item has its own section: links to its real pages, a limit, and a question back.
++function section(id) {
++  const start = page.indexOf(&#x27;&lt;section class=&quot;q&quot; id=&quot;&#x27; + id + &#x27;&quot;&gt;&#x27;);
++  assert.ok(start &gt; 0, &#x27;section present: &#x27; + id);
++  return page.slice(start, page.indexOf(&#x27;&lt;/section&gt;&#x27;, start));
++}
++const ITEMS = [
++  // [item Kirk named or we added, section id, pages that must be linked inside it]
++  [&#x27;risk numbers (Hinton)&#x27;, &#x27;risk&#x27;, [&#x27;love-logic-v4.html&#x27;, &#x27;love-logic-v4.html#hinton&#x27;]],
++  [&#x27;Walk the Garden&#x27;, &#x27;risk&#x27;, [&#x27;love-logic-v4.html&#x27;]],
++  [&#x27;love logic proof&#x27;, &#x27;love-logic&#x27;, [&#x27;love-logic-proof-v3.html&#x27;, &#x27;love-logic-proof-v3.html#run-the-checks&#x27;, &#x27;love-logic-proof-v3.html#limits&#x27;]],
++  [&#x27;safety-v3&#x27;, &#x27;safety&#x27;, [&#x27;safety-v3.html&#x27;]],
++  [&#x27;simulation-v6&#x27;, &#x27;severance&#x27;, [&#x27;simulation-v6.html&#x27;]],
++  [&#x27;ledger&#x27;, &#x27;records&#x27;, [&#x27;why-ledgers.html&#x27;, &#x27;library/LATTICE_LEDGER_v0.1.md&#x27;, &#x27;proof-receipts.html&#x27;, &#x27;audit.html&#x27;, &#x27;love-logic-proof-v3.html#ledgers&#x27;]],
++  [&#x27;fingerprint&#x27;, &#x27;fingerprint&#x27;, [&#x27;library/LATTICE_IDENTITY_v0.1.md&#x27;, &#x27;library/PAIR_FINGERPRINT_v0.1.md&#x27;, &#x27;pattern-spine.html&#x27;]],
++  [&#x27;liability&#x27;, &#x27;accountable&#x27;, [&#x27;liability.html#accountable&#x27;]],
++  [&#x27;AI economy&#x27;, &#x27;economy&#x27;, [&#x27;latticepoints.html#why-parallel&#x27;, &#x27;economy-update.html&#x27;, &#x27;presents.html&#x27;, &#x27;creator-tip-shelf.html&#x27;, &#x27;wallet.html&#x27;, &#x27;terms.html#lp&#x27;]],
++  [&#x27;Bridge and equal access&#x27;, &#x27;equal-access&#x27;, [&#x27;desktop.html&#x27;, &#x27;install.html&#x27;, &#x27;carry-forward.html&#x27;]],
++  [&#x27;system card&#x27;, &#x27;transparency&#x27;, [&#x27;systemcard.html&#x27;]],
++  [&#x27;privacy&#x27;, &#x27;you&#x27;, [&#x27;privacy.html&#x27;]]
++];
++for (const [item, id, links] of ITEMS) {
++  const sec = section(id);
++  for (const l of links) assert.ok(sec.includes(&#x27;href=&quot;&#x27; + l + &#x27;&quot;&#x27;), item + &#x27;: links &#x27; + l);
++  assert.ok(sec.includes(&#x27;class=&quot;see&quot;&#x27;), item + &#x27;: See it&#x27;);
++  assert.ok(/class=&quot;limit&quot;&gt;&lt;strong&gt;What it doesn&#x27;t (prove|say)/.test(sec), item + &#x27;: what it does not prove&#x27;);
++  assert.ok(sec.includes(&#x27;class=&quot;ask&quot;&gt;Ask yourself:&#x27;), item + &#x27;: a question back to the reader&#x27;);
++}
++for (const id of [&#x27;other-side&#x27;, &#x27;ask-us&#x27;, &#x27;older&#x27;]) section(id);
++for (const [, id] of ITEMS) assert.ok(page.includes(&#x27;href=&quot;#&#x27; + id + &#x27;&quot;&#x27;), &#x27;on-this-page link: &#x27; + id);
++
++// 2b. Quotes on the page match their source pages word for word.
++const QUOTES = [
++  [&#x27;love-logic-proof-v3.html&#x27;, &#x27;lying loses when its per-round gain is smaller than the chance of being caught times (the immediate penalty plus the discounted value of the reputation you lose).&#x27;],
++  [&#x27;love-logic-proof-v3.html&#x27;, &#x27;A tendency with conditions, not a theorem about all minds.&#x27;],
++  [&#x27;love-logic-proof-v3.html&#x27;, &#x27;Nothing here shows that any current AI system is a reflective optimizer&#x27;],
++  [&#x27;love-logic-proof-v3.html&#x27;, &#x27;does nothing against a globally consistent lie unless someone checks entries against reality.&#x27;],
++  [&#x27;simulation-v6.html&#x27;, &#x27;model predictions awaiting empirical testing.&#x27;],
++  [&#x27;safety-v3.html&#x27;, &#x27;What This Paper Does Not Claim&#x27;],
++  [&#x27;safety-v3.html&#x27;, &#x27;What Remains Open&#x27;]
++];
++for (const [src, q] of QUOTES) {
++  assert.ok(page.includes(q), &#x27;quote on page: &#x27; + q.slice(0, 40));
++  assert.ok(read(src).replace(/&lt;[^&gt;]+&gt;/g, &#x27;&#x27;).includes(q), &#x27;quote matches &#x27; + src + &#x27;: &#x27; + q.slice(0, 40));
++}
++assert.ok(read(&#x27;love-logic-proof-v3.html&#x27;).includes(&#x27;279&#x27;) &amp;&amp; page.includes(&#x27;from 279 to 10.5&#x27;), &#x27;ledger numbers match the proof&#x27;);
++
++// 3. Hinton quotes match Walk the Garden exactly.
++const v4 = read(&#x27;love-logic-v4.html&#x27;);
++for (const q of [
++  &#x27;A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.&#x27;,
++  &quot;I often say 10% to 20% chance they&#x27;ll wipe us out. But that&#x27;s just gut, based on the idea that we&#x27;re still making them and we&#x27;re pretty ingenious.&quot;
++]) {
++  assert.ok(page.includes(q) &amp;&amp; v4.includes(q), &#x27;quote matches its sourced home: &#x27; + q.slice(0, 30));
++}
++
++// 4. RRSI: exact quote, link, and the limit in the same card.
++const card = page.slice(page.indexOf(&#x27;id=&quot;rrsi&quot;&#x27;), page.indexOf(&#x27;&lt;/div&gt;&#x27;, page.indexOf(&#x27;id=&quot;rrsi&quot;&#x27;)));
++assert.ok(card.includes(&#x27;RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted.&#x27;), &#x27;RRSI quote exact&#x27;);
++assert.ok(card.includes(&#x27;https://arxiv.org/abs/2609.24972&#x27;), &#x27;RRSI link&#x27;);
++assert.ok(card.includes(&#x27;It says nothing about safety rules, internet access, or ledgers for AI.&#x27;), &#x27;RRSI limit stated&#x27;);
++
++// 5. Words: no lawyers, no founder name in the economy part, LP stays points, no em dash.
++assert.ok(!/lawyer|attorney|counsel|legal advice/i.test(text), &#x27;no lawyer talk&#x27;);
++const econ = section(&#x27;economy&#x27;);
++assert.ok(!/Kirk|Miller|founder/i.test(econ), &#x27;no founder name in the economy wording&#x27;);
++assert.ok(econ.includes(&#x27;LP are points, not money, not $FL.&#x27;), &#x27;LP line&#x27;);
++assert.ok(!/\$FL/.test(text.replace(&#x27;not money, not $FL&#x27;, &#x27;&#x27;)), &#x27;$FL appears only as &quot;not $FL&quot;&#x27;);
++assert.ok(!/\u2014/.test(page), &#x27;no em dash&#x27;);
++assert.ok(!/&lt;script/i.test(page) &amp;&amp; !/localStorage|indexedDB|fetch\(/.test(page), &#x27;no scripts, no storage, no network&#x27;);
++
++// 6. Doors: landing line + footer link; manifesto Newer line.
++const landing = read(&#x27;index.html&#x27;);
++assert.ok(landing.includes(&#x27;&lt;a href=&quot;see-for-yourself.html&quot;&gt;See for yourself&lt;/a&gt;&#x27;), &#x27;landing door line&#x27;);
++const man = read(&#x27;manifesto.html&#x27;);
++assert.ok(man.includes(&#x27;v-see-for-yourself-door-v0.1&#x27;) &amp;&amp; man.includes(&#x27;href=&quot;see-for-yourself.html&quot;&#x27;), &#x27;manifesto Newer line&#x27;);
++assert.ok(man.includes(&#x27;a local, immutable ledger&#x27;) &amp;&amp; man.includes(&#x27;(Lattice Points, or $FL)&#x27;), &#x27;manifesto older words kept&#x27;);
++assert.ok(read(&#x27;sitemap.xml&#x27;).includes(&#x27;https://freelattice.com/see-for-yourself.html&#x27;), &#x27;sitemap&#x27;);
++
++// 7. Layer locks (when git is available).
++try {
++  // Other queued bricks may change app.html, so look for this brick&#x27;s own fingerprints there
++  // instead of diffing those files against main (Oct 2 refresh, so stacked branches stay green).
++  for (const f of [&#x27;docs/app.html&#x27;, &#x27;index.html&#x27;, &#x27;sw.js&#x27;, &#x27;docs/sw.js&#x27;, &#x27;docs/modules/fl-connect.js&#x27;]) {
++    const fp = path.join(ROOT, f);
++    if (fs.existsSync(fp)) assert.ok(!/see-for-yourself/.test(fs.readFileSync(fp, &#x27;utf8&#x27;)), f + &#x27; untouched by this brick&#x27;);
++  }
++  const manDiff = execSync(&#x27;git diff -U0 origin/main -- docs/manifesto.html&#x27;, { cwd: ROOT, encoding: &#x27;utf8&#x27; });
++  assert.ok(!/^-[^-]/m.test(manDiff), &#x27;manifesto: nothing removed&#x27;);
++  assert.ok((manDiff.match(/^\+[^+]/gm) || []).length &lt;= 2, &#x27;manifesto: one Newer layer only&#x27;);
++} catch (err) { if (err instanceof assert.AssertionError) throw err; }
++
++console.log(&#x27;SMOKE_OK see for yourself door v0.2&#x27;);
+diff --git a/docs/see-for-yourself.html b/docs/see-for-yourself.html
+new file mode 100644
+index 00000000..af0da5ae
+--- /dev/null
++++ b/docs/see-for-yourself.html
+@@ -0,0 +1,205 @@
++&lt;!DOCTYPE html&gt;
++&lt;html lang=&quot;en&quot;&gt;
++&lt;head&gt;
++&lt;meta charset=&quot;UTF-8&quot;&gt;
++&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
++&lt;meta name=&quot;robots&quot; content=&quot;index, follow&quot;&gt;
++&lt;title&gt;See for yourself · FreeLattice&lt;/title&gt;
++&lt;meta name=&quot;description&quot; content=&quot;Bring your own questions about AI: the risk numbers, the records, the internet, an economy for minds. Open what we built, check its limits, and decide for yourself.&quot;&gt;
++&lt;link rel=&quot;canonical&quot; href=&quot;https://freelattice.com/see-for-yourself.html&quot;&gt;
++&lt;meta name=&quot;theme-color&quot; content=&quot;#e8b019&quot;&gt;
++&lt;!-- v-see-for-yourself-door-v0.1 v0.2 : an invitation, not a lecture. No scripts, no storage, no network requests. --&gt;
++&lt;style&gt;
++*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
++:root { --sky-1:#0c0a1a; --sky-2:#161430; --gold:#e8b019; --emerald:#34d399; --lavender:#a78bfa; --ink:#e6e6f0; --soft:rgba(200,210,230,0.82); --muted:rgba(200,210,230,0.55); --line:rgba(200,210,230,0.12); }
++html, body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%); color: var(--ink); font-family: Georgia, &#x27;Times New Roman&#x27;, serif; line-height: 1.7; min-height: 100vh; -webkit-text-size-adjust: 100%; }
++body { font-size: 1.125rem; }
++.page { max-width: 46rem; margin: 0 auto; padding: 40px 20px 80px; }
++a { color: var(--gold); text-underline-offset: 3px; }
++a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
++.back { display: inline-block; margin-bottom: 20px;</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

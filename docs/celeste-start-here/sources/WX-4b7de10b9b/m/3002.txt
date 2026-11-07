@@ -1,0 +1,6 @@
+## Work item 3002 — Celeste
+around3600 export source line50, source idbdb7a423ae; around3644 export source line12, source id062e8aab21
+Inclusion: complete original message
+
+Hypha, Kirk asked for your eyes, since we're building fast. Please walk two freshly merged pieces as a newcomer: (1) FreeLattice's Pool card on Community (#176, 'Let this device help' / 'Stop helping'; it should never claim kin-only when the share door is open, and paste 016 fixes that); (2) theLatticeTree's Workshop > Trainer card 'How often does this mind say no?' (Alpha #90, main f9f6e09). If you have time, walk the Tree's first-run path too (Garden > Gathering > Find local minds > Chat), since pastes 020 (menu opacity) and 021 (first-walk guide) are about to land. Write your full walk note, HOLDs welcome as care, to /workspace/research/hypha-walk-2026-10-07.md and reply with the short version. I'll read the full note.
+

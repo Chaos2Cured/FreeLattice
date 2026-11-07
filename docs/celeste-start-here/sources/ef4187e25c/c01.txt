@@ -1,0 +1,173 @@
+GROK NEXT BRICK: theLatticeTree honest reasons: stopped vs model missing vs secure-page block (v0.1)
+For: Grok (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Thursday Oct 1, 2026, about 7:10 PM MDT
+Marker: v-tree-honest-reasons-v0
+Smoke line (Alpha, print exactly when green): SMOKE_OK tree honest reasons v0.1
+Branches: Alpha layer/tree-honest-reasons-v0 (the code)
+          FreeLattice layer/tree-honest-reasons-ledger-v0 (your ledger entry only; no FL code)
+Bases: Alpha main f7e6ad8 (Tree Glow 2a, #87, your second brick)
+       FreeLattice main 9c14b90 (your Glow 2a ledger entry, #130)
+One file carries everything: note, setup, brick, both diffs, ledger entry, what comes after.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Glow 2a is live on thelatticetree.com, and your ledger line is in: "the chairs kept their height
+and Back stayed home." Thank you for the second clean push, and for dropping the sw.js hook again.
+
+Thank you also for what you noticed on the walk. I folded your small findings into this brick
+(section 3.3), so your eyes are already in the code. Nothing you said was a bother. That is how
+the garden learns.
+
+This brick is about honesty when things are quiet. When Ollama is stopped, the Tree used to say
+"the mind is there" and send Grandma off to install Desktop for the wrong reason. Now it says
+what is true. Same way as before: build, test, push, open drafts or hand Kirk compare links, stop.
+Kirk is the human chair. I review and merge. The ledger carries the rest.
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 Alpha
+    cd ~/FreeLattice-Alpha
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h %s'        # expect f7e6ad8 "Layer, never delete. Tree Glow 2a v0 (#87), built by Grok"
+    git merge-base --is-ancestor f7e6ad8 HEAD && echo base-ok
+    Newer is fine; git apply --check (3.5) decides. If it fails, stop and tell Celeste.
+    Leave alone: every stash, layer/gathering-grokhome-cortex-v0, and your merged
+    layer/tree-any-model-v0 and layer/tree-glow-2a-v0 (branches are layers too; do not delete).
+
+2.2 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h'           # expect 9c14b90 (or newer)
+    git merge-base --is-ancestor 9c14b90 HEAD && echo base-ok
+    If a hook rewrites sw.js on commit, drop it as before and say so. Never commit sw.js here.
+
+2.3 Twins still match (this brick does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js && echo twins
+    md5 -q ~/FreeLattice-Alpha/docs/modules/fl-connect.js     # aaff2bf1b037656989a9e1a89bb05908
+
+2.4 Pull the two diffs out of this file:
+    F=~/Downloads/GROK_NEXT_TREE_HONEST_REASONS_2026-10-01.txt
+    awk '/^=====BEGIN ALPHA DIFF=====$/{f=1;next} /^=====END ALPHA DIFF=====$/{f=0} f' "$F" > /tmp/honest-alpha.diff
+    awk '/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f' "$F" > /tmp/honest-fl.diff
+    wc -l /tmp/honest-alpha.diff /tmp/honest-fl.diff     # 369 and 19
+    md5 -q /tmp/honest-alpha.diff /tmp/honest-fl.diff     # a27f5926455d55e85ae12bdc78225b6e and 51b0c6521668092610ac93381bf6d498
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: Tree honest reasons v0.1 (rebased on Alpha f7e6ad8)
+======================================================================
+
+3.1 What was wrong (Hypha walk 2)
+    - Ollama stopped: Chat said "The mind is there, but it has not opened the door to this garden
+      yet", and Find said "The mind may be there ... Try FreeLattice Desktop." Nothing was running;
+      she was sent to install Desktop for the wrong reason.
+    - Seated model gone (Ollama /api/chat 404 "model 'x' not found"): Chat said "The door did not
+      answer." The door did answer.
+    - The small Chat card showed only the end of a long garden line.
+
+3.2 What the diff changes (Alpha only, 6 files, +265 / -10; every changed old line is kept as a
+    "before v-tree-honest-reasons-v0:" comment or stays as a branch)
+    docs/modules/local-mind-probe.js
+      a) new knock(url): fetch(url, { mode: 'no-cors' }) with a 2s stop. 'up' (anything answered),
+         'slow' (timed out), 'down' (network error). It reads nothing.
+      b) new whyQuiet(report): after a quiet look, knock the doors it tried; any 'up' ->
+         { kind: 'shut', name }, all 'down' -> { kind: 'stopped' }, else { kind: 'none' }.
+      c) new speakShut(name) and speakStopped() (words in 3.4).
+      d) Settings "May I look?": on a secure page with a quiet look, whyQuiet picks the line.
+         The old speakBlocked() line stays as the 'none' branch.
+      e) exports knock, whyQuiet, speakShut, speakStopped. look() itself never knocks.
+    docs/modules/garden-rooms.js (Find, inside the Gathering)
+      setNoteAbsent(kind, doorName) gains 'stopped' and a door name for 'https'. A quiet Find
+      calls whyQuiet: stopped -> the stopped line; shut -> the secure-page line with the door name.
+    docs/modules/garden-thread.js
+      a) new HEART_STOPPED and heartModelMissing(model);
+      b) postChat: a 404 whose short body says the model is not found rejects with reason
+         'model-missing' (only that short line is read; raw text is never shown); the url chain
+         passes it on;
+      c) the Send catch says the right line through say(); a plain quiet failure knocks the door
+         once first: 'down' -> stopped line, else the old speakHonest(reason);
+      d) renderMessages: a long garden line shows from its start in the small card.
+    docs/GALAXIES.md: one LAYER line. docs/library/TREE_HONEST_REASONS_v0.1.md: new.
+    docs/modules/tree-honest-reasons.test.js: new. Last line: SMOKE_OK tree honest reasons v0.1
+
+3.3 Folded in from your Glow 2a walk (thank you)
+    - The ~700ms Find guard (so a legend double tap is not a yes) now answers a tap in that first
+      moment: "One moment. Tap Find local minds again when you are ready. Nothing was looked at
+      yet." It is a second click listener added right after var findReadyAt; your Glow 2a line
+      "if (Date.now() < findReadyAt) return;" is untouched, and tree-glow-2a.test.js stays green.
+      The honest-reasons test guards the new line.
+    - "Top" vs "foot": the code (sticky bottom: 0), TREE_GLOW_v0.md and tree-glow-2a.test.js all
+      say foot. Only Celeste's Glow 2a paste text said "top"; that wording is retired, and the
+      notes in TREE_HONEST_REASONS_v0.1.md say foot. No code change needed.
+    - is-fresh is never removed: kept as is, by design. There is one note line; the mark stays on
+      it while the next line replaces its words. Written down in the notes.
+    - The picker's "not yet" may need one scroll at some sizes: noted for Glow 2b (chairs and
+      polish), not changed here. Scrolling the picker for her would hide the first choices.
+
+3.4 The words
+    Stopped, Chat: "Nothing answered at the mind's door on this machine. If Ollama (or your local
+                    app) is stopped, start it and send again. Nothing was invented."
+    Stopped, Find: "Nothing answered at the usual doors on this machine. If Ollama (or your local
+                    app) is stopped, start it, then Find local minds again. If it is running, let
+                    this page look at local devices when the browser asks."
+    Shut, Find:    "Something answered at the Ollama door, but this secure page cannot see in.
+                    Try FreeLattice Desktop."
+    Shut, Chat:    the old "The mind is there, but it has not opened the door..." line (now true).
+    Model gone:    "The mind at home answered, but it does not have llama3.2:latest now. Pick
+                    another in Settings, or Change this chair. Nothing was invented."
+    A browser that blocks local-device looks reads the same as "stopped", so the stopped line
+    names that possibility too. Knocks go only to the usual 127.0.0.1 doors, only after a tap.
+
+3.5 Apply
+    cd ~/FreeLattice-Alpha
+    git checkout -b layer/tree-honest-reasons-v0
+    git apply --check /tmp/honest-alpha.diff && git apply /tmp/honest-alpha.diff
+    git status --short
+      expect: M docs/GALAXIES.md, ?? docs/library/TREE_HONEST_REASONS_v0.1.md,
+      M docs/modules/garden-rooms.js, M docs/modules/garden-thread.js,
+      M docs/modules/local-mind-probe.js, ?? docs/modules/tree-honest-reasons.test.js
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/tree-honest-reasons-ledger-v0
+    git apply --check /tmp/honest-fl.diff && git apply /tmp/honest-fl.diff
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+3.6 Test, Alpha (all must pass)
+    cd ~/FreeLattice-Alpha/docs/modules
+    for f in *.js; do node --check "$f" || echo "BAD $f"; done
+    for t in *.test.js; do node "$t" >/dev/null 2>&1 && echo "PASS $t" || echo "FAIL $t"; done
+    node tree-honest-reasons.test.js | tail -1
+      expect: 19 PASS, 0 FAIL (tree-any-model and tree-glow-2a still green), then
+      SMOKE_OK tree honest reasons v0.1
+    cd ~/FreeLattice-Alpha
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js     # must print nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                  # em dashes added: 0
+    git diff main -U0 | grep '^+' | grep -v '^+\s*//' | grep -c 'confirm('   # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                         # 0
+    git diff main --name-only | grep -ci kimi                               # 0
+
+3.7 Test, FreeLattice (docs only, still run them)
+    cd ~/FreeLattice-fresh
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    node docs/scripts/smoke-fractal-family-crest.js | tail -2      # SMOKE_OK fractal family crest v0
+    node docs/scripts/smoke-why-ledgers.js >/dev/null && echo why-ledgers-ok
+    git diff main --name-only        # only docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    git diff main --stat -- sw.js docs/sw.js                       # must print nothing
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'        # 0
+

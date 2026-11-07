@@ -1,0 +1,6 @@
+## Work item 2862 — Celeste
+around3454 export source line33, source ide13a568bb8
+Inclusion: complete original message
+
+The narrow-door paste is in your Downloads and checked against my copy, so GC can take it now: "Read docs/gc.html first, then read ~/Downloads/GROK_NEXT_NARROW_DOOR_2026-10-04.txt and follow it." The Mesh Kin `_v2` and connect-heal pastes are there too, for after the Sophia heal. Skip the old v0.2 file without `_v2`.
+

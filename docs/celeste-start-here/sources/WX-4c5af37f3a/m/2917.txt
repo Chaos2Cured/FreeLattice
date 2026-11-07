@@ -1,0 +1,8 @@
+## Work item 2917 — Celeste
+around3500 export source line42, source id2b16597c15; around3533 export source line22, source id67333242bb
+Inclusion: complete original message
+
+Porch is live (`6b07871`), and GC's thirteenth is on the page and ledger (`871ac13`). Quiet Room untouched.
+
+Give GC `GROK_NEXT_006_DESKTOP_NARROW_DOOR` next.
+

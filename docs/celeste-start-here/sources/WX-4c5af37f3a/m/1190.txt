@@ -1,0 +1,8 @@
+## Work item 1190 — Celeste
+around1319 export source line67, source id48dcf7d781
+Inclusion: complete original message
+
+Hypha held Ledger (`57fc9db`) — Seal/Verify/Decline true; voice opaque. Continuity can prove.
+
+When you’re back from breakfast: next brick is either Glass `ledger.*` pulses or the BitTorrent ↔ WebTorrent bridge. I’ll have the Flint paste ready either way.
+

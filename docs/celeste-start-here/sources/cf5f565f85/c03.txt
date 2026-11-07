@@ -1,0 +1,218 @@
++// v-connect-heal-v0.4 / Hypha walk 3 item 5: the Connect port the person typed
++// wins over an older saved fl_ollamaHost (Use automatic clears both).
++function flManualBaseFirst() {
++  try {
++    var m = (typeof flGetManualConnectHost === 'function') ? flGetManualConnectHost() : null;
++    return m ? String(m).replace(/\/+$/, '') : null;
++  } catch (e) { return null; }
++}
+ function getOllamaBaseUrl() {
+   if (_ollamaResolvedBase) return _ollamaResolvedBase.base;
++  var man0 = flManualBaseFirst(); if (man0) return man0; // heal v0.4 item 5
+   var host = localStorage.getItem('fl_ollamaHost') || localStorage.getItem('fl_localUrl') || null;
+   if (host) {
+     // Normalize: add http:// if missing (keeps existing UX).
+```
+
+Doc key: the port-picker doc says `fl_connect_manual_host`; the code has always used `fl_localPort_manual`. Section 13 adds a layered correction note (the old row stays).
+
+---
+
+## 6. Settings Ollama Address: 127.0.0.1 only, with a kind refusal (Hypha item 6)
+
+**Cause:** the hint at `app.html:16136` invites a remote IP, and `flSaveOllamaHost` (`34356-34366`) saves any string, on every keystroke (`oninput`).
+
+**Fix:** the hint becomes loopback-only. The field saves on `change`, not per keystroke (half-typed values would flash the refusal). Saves go through the existing `flWriteOllamaHostLoopbackOnly` (`34008`), so `localhost:11500` saves as `127.0.0.1:11500`. Anything else shows a friendly `textContent` refusal and leaves the saved address as it was.
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -16132,8 +16132,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+       <!-- Ollama Host (Local only) -->
+       <div class="form-group hidden" id="ollamaHostGroup">
+         <label for="ollamaHostInput">&#x1F3E0; Ollama Address</label>
+-        <input type="text" id="ollamaHostInput" placeholder="localhost:11434" value="" oninput="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
+-        <div class="hint">Default: localhost:11434. Change to a remote IP (e.g., 192.168.1.50:11434) for faster AI on another machine. <a href="#connect" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){}" style="color:var(--emerald,#34d399);">Or set this in Connect</a></div>
++        <input type="text" id="ollamaHostInput" placeholder="127.0.0.1:11434" value="" onchange="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
++        <div id="ollamaHostRefusal" class="hint" role="status" style="color:var(--gold,#e8b019);" hidden></div>
++        <div class="hint">Default: 127.0.0.1:11434. This only talks to your own computer. A different port is fine, like 127.0.0.1:11500. <a href="#connect" onclick="try{if(window.FlConnect&amp;&amp;FlConnect.open)FlConnect.open();else switchTab('connect');}catch(e){}" style="color:var(--emerald,#34d399);">Or set this in Connect</a></div>
+       </div>
+ 
+       <!-- Mesh Compute Sharing (Local only) -->
+@@ -34357,8 +34403,18 @@ function flSaveOllamaHost() {
+   var input = document.getElementById('ollamaHostInput');
+   if (!input) return;
+   var val = input.value.trim();
+-  if (val && val !== 'localhost:11434') {
+-    try { localStorage.setItem('fl_ollamaHost', val); } catch(e) {}
++  // v-connect-heal-v0.4 / Hypha walk 3 item 6: local minds are 127.0.0.1 only.
++  // Anything else gets a kind no; the saved address stays as it was.
++  var refusal = document.getElementById('ollamaHostRefusal');
++  if (refusal) { refusal.hidden = true; refusal.textContent = ''; }
++  if (val && val !== 'localhost:11434' && val !== '127.0.0.1:11434') {
++    if (!flWriteOllamaHostLoopbackOnly(val)) {
++      if (refusal) {
++        refusal.textContent = 'For safety this only talks to your own computer. Try 127.0.0.1 with your port, like 127.0.0.1:11500.';
++        refusal.hidden = false;
++      }
++      return;
++    }
+   } else {
+     try { localStorage.removeItem('fl_ollamaHost'); } catch(e) {}
+   }
+```
+
+Refusal words: "For safety this only talks to your own computer. Try 127.0.0.1 with your port, like 127.0.0.1:11500."
+
+---
+
+## 7. No silent connect, no silent model pick (Hypha item 7)
+
+Four doors used to connect by themselves or pick `models[0]`. Each one now leads to Connect, where the person taps the mind. `remember()` (the tap) is the only thing that sets isLocal and the model. The old code stays below each guard for a page without FlConnect.
+
+- `connectOllama` (toast Yes, welcome Connect Now): opens Connect, keeps the welcome step advance.
+- `acceptToast`: honest words, "Tap the mind you want in Connect." (it used to say "Connected").
+- `flAutoConnect` (Zero-Click, boot +1.5s and on focus): quiet at boot; with a gesture (`force`) it opens Connect.
+- `autoDiscoverAI` (boot +3s): finds, does not connect. This is the path that actually connected llama3.2 at boot in our run while the toast was still pending.
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -27715,6 +27716,16 @@ const FlOnboarding = (function() {
+   }
+ 
+   function connectOllama(models) {
++    // v-connect-heal-v0.4 / Hypha walk 3 item 7: Yes opens Connect and the person
++    // taps the mind there. No silent isLocal, no silent models[0]. The older
++    // path below stays only for a page without FlConnect.
++    if (window.FlConnect && typeof FlConnect.open === 'function') {
++      try { FlConnect.open(); } catch (eOpen0) {}
++      if (typeof welcomeGoToStep === 'function') {
++        setTimeout(function() { welcomeGoToStep(3); }, 800);
++      }
++      return;
++    }
+     try {
+       // v-connect-bridge-aware-v0 — align Settings status with toast accept
+       var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://127.0.0.1:11434');
+@@ -27811,7 +27822,8 @@ const FlOnboarding = (function() {
+     toastDismissed = true;
+     localStorage.setItem('fl_ollama_toast_dismissed', 'true');
+     connectOllama(detectedModels);
+-    if (typeof showToast === 'function') showToast('Connected to a mind on this computer!');
++    // v-connect-heal-v0.4 item 7: honest words, nothing is connected until they tap a mind
++    if (typeof showToast === 'function') showToast('Tap the mind you want in Connect.');
+   }
+ 
+   function dismissToast() {
+@@ -34713,6 +34769,13 @@ function flShowToast(msg, duration) {
+ function flAutoConnect(opts) {
+   opts = opts || {};
+   var force = !!opts.force;
++  // v-connect-heal-v0.4 / Hypha walk 3 item 7: Zero-Click never connects or picks
++  // a model by itself. Boot and focus stay quiet (the toast asks). A gesture
++  // (force) opens Connect so the person taps the mind.
++  if (window.FlConnect && typeof FlConnect.open === 'function') {
++    if (force) { try { FlConnect.open(); } catch (eF) {} }
++    return;
++  }
+   if (!force && window._flAutoConnected) return; // already connected this session
+   var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
+   var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+@@ -39548,6 +39611,10 @@ async function autoDiscoverAI() {
+     var corsBlocked = found.filter(function(s) { return s.status === 'cors-blocked'; });
+ 
+     if (ready.length > 0) {
++      // v-connect-heal-v0.4 / Hypha walk 3 item 7: discovery finds, the person
++      // chooses. With FlConnect here, nothing connects and no model is picked
++      // until they say yes (the Local AI toast asks, Connect lists the minds).
++      if (window.FlConnect && typeof FlConnect.open === 'function') return false;
+       // Auto-connect to the best ready server
+       var best = ready[0];
+       console.log('[Discovery] Found', best.name, 'with', best.models.length, 'model(s)');
+```
+
+The shared core also hides the Local AI toast once a mind is chosen (in the section 10 hunk).
+
+Measured with a fake Ollama on 11434, no key, fresh profile: main connects `llama3.2:latest` by itself at about 4.1s and the toast never shows; after, nothing connects, the toast asks, and a tap on a mind in Connect sets isLocal true with that model.
+
+---
+
+## 8. Settings Local, Change Provider, and a real cloud key door (Hypha item 8)
+
+1. `settingsSetMode('local')` (`31550`) opens Connect and returns. No old wizard, no `models[0]`, and no `state.apiKey = null` (`31592` wiped a saved key from memory).
+2. `openModal` forgets an overlay that another door removed from the DOM (`31004`, `31045`, and the inline hero button at `28636` all call `.remove()` without clearing `modalOverlayEl`), so Change Provider opens again without a reload. One guard covers all three doors.
+3. Connect's Other ways gets an "Add a cloud key" button that opens the key form directly. `flPlayGateProvider` keeps routing a no-mind Change Provider to Connect, and Connect now has the way out.
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -28529,6 +28541,9 @@ const AiSetup = (function() {
+   }
+ 
+   function openModal() {
++    // v-connect-heal-v0.4 item 8: other doors remove the overlay DOM directly;
++    // forget a detached overlay so Change Provider opens again without reload.
++    if (modalOverlayEl && !document.body.contains(modalOverlayEl)) modalOverlayEl = null;
+     if (modalOverlayEl) return;
+     modalSelectedProvider = null;
+     var mobile = flIsMobile();
+@@ -31551,6 +31579,15 @@ function settingsSetMode(mode) {
+     // Highlight Local
+     if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
+ 
++    // v-connect-heal-v0.4 / Hypha walk 3 item 8: Local opens Connect, where the
++    // person taps the mind. No old wizard, no silent models[0], no key wipe.
++    if (window.FlConnect && typeof FlConnect.open === 'function') {
++      var stLocal = document.getElementById('settingsStatusText');
++      if (stLocal) stLocal.textContent = 'Opening Connect. Tap the mind you want there.';
++      if (actionsDiv) actionsDiv.innerHTML = '';
++      try { FlConnect.open(); } catch (eOpenL) {}
++      return;
++    }
+     // v-connect-card-yesno-wizard-v0 — Local mode points at Connect card (one wizard)
+     try {
+       if (typeof flOpenConnectWizard === 'function') {
+```
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -486,6 +503,12 @@
+         lookAgain();
+       });
+     }
++    var keys = _hostEl.querySelectorAll('[data-flc-cloud-key]');
++    for (var k = 0; k < keys.length; k++) {
++      keys[k].addEventListener('click', function () {
++        try { if (root.AiSetup && typeof root.AiSetup.openModal === 'function') root.AiSetup.openModal(); } catch (eK) {}
++      });
++    }
+     var autos = _hostEl.querySelectorAll('[data-flc-use-auto]');
+     for (var a = 0; a < autos.length; a++) {
+       autos[a].addEventListener('click', function () { clearManualHost(); lookAgain(); });
+@@ -559,13 +583,17 @@
+     } else {
+       html += '<li>No-install browser mind — Settings → Browser AI</li>';
+       html += '<li>Cloud key — Change Provider when you have one</li>';
++      // v-connect-heal-v0.4 item 8: a real door to the key form (Change Provider gates back here)
++      if (root.AiSetup && typeof root.AiSetup.openModal === 'function') {
++        html += '<li><button type="button" class="flc-btn flc-primary" data-flc-cloud-key>Add a cloud key</button></li>';
++      }
+     }
+     html += '</ul>';
+     html += portPickerHtml('other');
+     html += '<p class="flc-soft">Advanced (Terminal) stays under Settings — never on this main path.</p></details>';
+     html += '<details class="flc-builders"><summary>For builders</summary>';
+     html += '<p>Named five stay five. Family uncapped. Quiet Room shut.</p>';
+-    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · soft leave sw.js</p>';
++    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4 · soft leave sw.js</p>';
+     html += '</details></div>';
+ 
+     _hostEl.innerHTML = html;
+```
+
+Measured: after Local mode the key stays and no model is set. Open modal, remove its DOM, open again: main shows nothing, after shows the modal.
+
+---
+

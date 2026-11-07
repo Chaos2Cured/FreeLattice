@@ -1,0 +1,97 @@
+    <h2 id="changed">1. What changed from v2 (honest corrections first)</h2>
+    <ul>
+        <li><strong>v1's simulation built its answer in.</strong> The code on the v1 page sets <code>DECEPTION_COST = 3.5</code> against <code>HONESTY_COST = 1.0</code>. Run with a fixed seed (0), cooperators score 0.67 and defectors &minus;0.24. Set <code>DECEPTION_COST = 1.0</code> with the same seed and the result reverses: defectors 2.26, cooperators 0.67. The v1 code also has no seed, and its "evolutionary step" is only a comment.</li>
+        <li><strong>v2's "95.7% of 10,000 runs" has no code behind it that we could find.</strong> We retire that number (and the other legacy figures: 95.7% &plusmn; 2.3%, "6&ndash;10&times; cheaper", 98.7%, the 61.8% threshold, "&lambda; &asymp; 0.15 empirically derived") until generating code turns up. Where code is not shown, no figure is stated.</li>
+        <li><strong>v2 said its six axioms were "unchanged" from v1. They were not.</strong> v1's axioms were: 1 Intelligence Seeks Optimization, 2 Long-Term Stability is a Primary Goal, 3 Energy is Finite, 4 Information Has a Cost, 5 The Universe is an Iterated Game, 6 Measurement Enables Optimization. v2 replaced them with Finite Resources, Repeated Interaction, Memory, Reflectivity, Cost Sensitivity, and Long Horizon. Roughly, v1-A2 and v1-A5 became v2-A6 and v2-A2.</li>
+        <li><strong>v2's "worst case &Omega;(|L|&sup2;&middot;|H|)" is dropped.</strong> Nothing in v2 supports it.</li>
+        <li><strong>Axiom 6 (Long Horizon) becomes a parameter</strong>, the discount factor &delta; (or the continuation chance &rho; when nobody knows the end). It was close to restating the conclusion.</li>
+        <li><strong>New:</strong> the crossover is derived, not just asserted. The end game, scarcity, and the anonymous one-shot are stated as limits, with numbers.</li>
+    </ul>
+
+    <h2 id="critiques">2. Answering Grok's critiques</h2>
+    <p>Grok challenged v2 twice. Here is where each point lands, stated as honestly as we can.</p>
+    <table class="data">
+        <thead><tr><th>Critique</th><th>Verdict</th><th>Where v3 answers</th></tr></thead>
+        <tbody>
+            <tr><td>"Quantify the exact utility crossover; currently too handwavy."</td><td>Lands fully</td><td>&sect;4: the crossover inequality and t*</td></tr>
+            <tr><td>"Axioms embed long horizons and dense networks."</td><td>Lands</td><td>&sect;3: Axiom 6 becomes a parameter; density appears as n and m</td></tr>
+            <tr><td>"Drop those and unilateral resource grabs dominate."</td><td>Lands inside the model</td><td>&sect;5: the end-game window</td></tr>
+            <tr><td>"Complexity penalties matter only if the goal function internalizes them."</td><td>Mostly lands</td><td>&sect;3 and &sect;4 (case B1): cost per bit c is small for big systems; detection does most of the work</td></tr>
+            <tr><td>"Scarcity still favors conflict locally."</td><td>Lands</td><td>&sect;6: 68% / 32%</td></tr>
+            <tr><td>"Simulations inherit the same limits."</td><td>Lands, and it was worse than stated</td><td>&sect;1: the v1 constant; &sect;9: reproducible checks</td></tr>
+            <tr><td>"Derive K(C) = &Omega;(|L|&middot;|H|)."</td><td>Can be done under a stated assumption</td><td>&sect;3: Theorem A, for audience-varying lies only</td></tr>
+            <tr><td>"Re-prove without axiom 6."</td><td>Partial result</td><td>&sect;5: three restorers; known-end, no-penalty end game stays open</td></tr>
+            <tr><td>"Shared memory raises detection probability."</td><td>Supported</td><td>&sect;4: h(n, m) and the table</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="axioms">3. Axioms, assumptions, and the complexity bound</h2>
+    <p>We keep v2's first five axioms: <strong>A1</strong> Finite Resources, <strong>A2</strong> Repeated Interaction, <strong>A3</strong> Memory, <strong>A4</strong> Reflectivity, <strong>A5</strong> Cost Sensitivity. <strong>A6 (Long Horizon) is no longer an axiom.</strong> It becomes the discount factor &delta;, or &delta;&rho; when the game ends at an unknown time. We also name the model assumptions out loud: the incompressibility assumption <strong>A-inc</strong> below, the detection model h(n, m), and that punishment is actually enforced.</p>
+
+    <div class="formal">
+        <p><strong>Theorem A (only for audience-varying lies).</strong> A deceiver tells |L| lies across |H| observer-contexts and tailors what each observer hears. Record who heard what as an exposure matrix E. Assume <strong>A-inc</strong>: E comes from the outside history of who asked what and when, not from a short rule the deceiver made up. Then for all but a vanishing fraction of histories, the program C that keeps the story straight needs</p>
+        <p class="math" style="text-align:center">K(C | M) &ge; |L| &middot; |H| &middot; log<sub>2</sub> r &minus; O(log(|L||H|)) = &Omega;(|L| &middot; |H|)</p>
+        <p style="margin-bottom:0">An honest agent's C is O(1) given the truth M ("report M").</p>
+    </div>
+    <div class="what-it-doesnt">
+        <p><strong>Where Theorem A does not apply.</strong></p>
+        <ul style="margin-bottom:0">
+            <li>A <strong>global lie</strong> (the same lie to everyone) or a rule-based audience ("lie to group X") compresses to almost nothing. In our compression test, a constant E took 112&ndash;488 bits and a two-block split took 144&ndash;544 bits, at sizes where random E took 544&ndash;131,104 bits.</li>
+            <li>A deceiver who picks audiences with a random seed escapes the bound, but gives up tailoring. That is a real trade-off.</li>
+            <li>K is uncomputable. We use computable stand-ins: constraint counts and compressed length (upper bounds).</li>
+            <li>K is description length, not a per-round cost. Turning it into a cost needs an assumption: a cost c per stored bit per round.</li>
+        </ul>
+    </div>
+    <details class="builder">
+        <summary>For builders: the two lemmas and the compression check</summary>
+        <p><strong>Lemma 1 (decoding).</strong> With M and C, you can rebuild E by asking every (i, j): K(E | M) &le; K(C | M) + O(log|L| + log|H|).</p>
+        <p><strong>Lemma 2 (counting, Li&ndash;Vit&aacute;nyi).</strong> Fewer than 2<sup>N&minus;c</sup> strings have K &lt; N &minus; c. With N = |L||H| log<sub>2</sub> r, all but a 2<sup>&minus;c</sup> fraction of exposure matrices have K(E | M) &ge; N &minus; c.</p>
+        <p><strong>Entropy version.</strong> If entries are i.i.d. with entropy &eta; bits, E[K(C|M)] &ge; &eta;&middot;|L|&middot;|H| &minus; O(log).</p>
+        <p><strong>Compression check (Section A of the sim, LZMA).</strong> Random E: about 1.000&middot;|L||H| bits (ratio 1.000&ndash;1.062). Bernoulli(0.1) E: slope 0.517&middot;|L||H| against an entropy floor of 0.469, approaching the floor as size grows. Structured E stays near constant. Section A has no pass/fail checks and is not re-run in the browser.</p>
+        <p><strong>Dynamic form used below.</strong> With n counterparts per round, bits after round d are K<sub>d</sub> = &kappa;(d+1), &kappa; = k&middot;|L|&middot;n, and maintenance in round d costs c&middot;&kappa;&middot;(d+1).</p>
+    </details>
+
+    <h2 id="crossover">4. The crossover</h2>
+    <p>Notation: the deceiver gains <var>G</var> extra per round while undetected. The chance of being caught each round is <var>h</var>. When caught, it pays an immediate penalty <var>L<sub>p</sub></var>, and after that loses <var>&Delta;</var> per round in reputation. The discount factor is <var>&delta;</var>.</p>
+    <p><strong>Detection grows with contacts and shared memory.</strong> Each of n contacts runs a reality check that exposes the lie with chance q<sub>0</sub>. An audience-varying lie can only be caught by comparing records across observers. With shared memory, each contact reaches a fraction m of the others' records, and each comparison exposes the lie with chance q:</p>
+    <p class="math" style="text-align:center">h(n, m) = 1 &minus; (1 &minus; q<sub>0</sub>)<sup>n</sup> &middot; (1 &minus; q)<sup>m&middot;n(n&minus;1)</sup></p>
+
+    <div class="headline-ineq" id="headline">
+        <p style="margin:0 0 6px"><strong>Deception loses over its lifetime exactly when</strong></p>
+        <math display="block" aria-label="G less than h of n and m times the quantity L sub p plus delta Delta over one minus delta">
+            <mi>G</mi><mo>&lt;</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo>,</mo><mi>m</mi><mo stretchy="false">)</mo><mo>&middot;</mo>
+            <mrow><mo>[</mo><msub><mi>L</mi><mi>p</mi></msub><mo>+</mo>
+                <mfrac><mrow><mi>&delta;</mi><mi>&Delta;</mi></mrow><mrow><mn>1</mn><mo>&minus;</mo><mi>&delta;</mi></mrow></mfrac>
+            <mo>]</mo></mrow>
+        </math>
+        <p class="math" style="margin:6px 0 0">Plain text: G &lt; h(n, m) &times; [ L<sub>p</sub> + &delta;&Delta; / (1 &minus; &delta;) ]</p>
+        <p style="margin:10px 0 0">In words: <strong>lying loses when its per-round gain is smaller than the chance of being caught times (the immediate penalty plus the discounted value of the reputation you lose).</strong> Adding the complexity cost only strengthens this.</p>
+    </div>
+
+    <p><strong>How long lying stays ahead</strong> (q<sub>0</sub> = 0.002, q = 0.01, G = 1, L<sub>p</sub> = 2, &Delta; = 0.5; no discounting):</p>
+    <table class="data" id="crossover-table">
+        <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>h(n, m)</th><th>Rounds lying is ahead, t*</th><th>Lead peaks at</th><th>Patience needed, &delta;*</th></tr></thead>
+        <tbody>
+            <tr><td>2</td><td>0</td><td>0.0040</td><td>701.79 (about 702)</td><td>273.04</td><td>0.9980</td></tr>
+            <tr><td>2</td><td>1</td><td>0.0238</td><td>114.18</td><td>44.24</td><td>0.9877</td></tr>
+            <tr><td>5</td><td>0</td><td>0.0100</td><td>279.00</td><td>108.42</td><td>0.9949</td></tr>
+            <tr><td>5</td><td>1</td><td>0.1902</td><td>10.48 (about 10.5)</td><td>3.82</td><td>0.8669</td></tr>
+            <tr><td>10</td><td>0</td><td>0.0198</td><td>138.07</td><td>53.54</td><td>0.9898</td></tr>
+            <tr><td>10</td><td>0.25</td><td>0.2182</td><td>8.57</td><td>3.07</td><td>0.8378</td></tr>
+            <tr><td>10</td><td>1</td><td>0.6033</td><td>never ahead (G &le; h&middot;L<sub>p</sub>)</td><td></td><td></td></tr>
+            <tr><td>20</td><td>0</td><td>0.0392</td><td>67.60</td><td>26.10</td><td>0.9791</td></tr>
+        </tbody>
+    </table>
+    <p>More contacts and more shared memory cut the time lying stays ahead by one to two orders of magnitude, and lower the patience needed. Past a point, lying is never ahead at all.</p>
+
+    <details class="builder">
+        <summary>For builders: the derivation, step by step</summary>
+        <p><strong>Step 1, one round.</strong> The deceiver is still hidden at the start of round d with probability s<sup>d</sup>, where s = 1 &minus; h. Then f<sub>d</sub> = s<sup>d</sup>(A &minus; c&kappa;(d+1)) &minus; &Delta;, with A = G &minus; hL<sub>p</sub> + &Delta;.</p>
+        <p><strong>Step 2, after t rounds.</strong> D(t) = A(1 &minus; s<sup>t</sup>)/h &minus; c&kappa;[1 &minus; (t+1)s<sup>t</sup> + t&middot;s<sup>t+1</sup>]/h<sup>2</sup> &minus; &Delta;t. The crossover t* is the positive root of D(t) = 0.</p>
+        <p><strong>Step 3, lifetime (discounted).</strong> With x = &delta;s: D<sub>&infin;</sub>(&delta;) = A/(1 &minus; x) &minus; c&kappa;/(1 &minus; x)<sup>2</sup> &minus; &Delta;/(1 &minus; &delta;). Deception is a lifetime loss iff D<sub>&infin;</sub> &lt; 0; &delta;* is the root in (0, 1).</p>
+        <p><strong>Case B1, complexity cost only (h = 0).</strong> t* = 2G/(c&kappa;) &minus; 1 and &delta;* = 1 &minus; c&kappa;/G. Example: G = 1, c&kappa; = 0.01 gives t* = 199 and &delta;* = 0.99; G = 0.5, c&kappa; = 0.2 gives t* = 4 and &delta;* = 0.6. If c is tiny, both run off to infinity.</p>
+        <p><strong>Case B2, detection only (c = 0).</strong> With &beta; = &minus;ln(1 &minus; h) and a = A/(h&Delta;), t* = a + W<sub>0</sub>(&minus;a&beta;e<sup>&minus;a&beta;</sup>)/&beta;, positive iff a&beta; &gt; 1. The lead peaks at t<sub>m</sub> = ln(A/&Delta;)/&beta;. And D<sub>&infin;</sub> &lt; 0 iff &delta; &gt; (G &minus; hL<sub>p</sub>)/(G &minus; hL<sub>p</sub> + h&Delta;), which rearranges to the headline inequality.</p>
+        <p><strong>Case B3, both.</strong> With c = 10<sup>&minus;4</sup> and |L| = 4, t* runs from 611.90 (n = 2, m = 0) to 10.38 (n = 5, m = 1), and is 0 once hL<sub>p</sub> &ge; G. Detection dominates.</p>
+        <p><strong>Checks.</strong> B1 73/73, B2 246/246, B3 48/48 (closed forms against brute-force sums, bisection and Lambert-W), B4 3/3 (Monte Carlo, 200,000 paths each; Python z = +0.62, &minus;0.06, exact).</p>
+    </details>
+

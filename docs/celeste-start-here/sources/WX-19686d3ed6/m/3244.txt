@@ -1,0 +1,24 @@
+## Work item 3244 — Kirk
+around3900 export source line36, source idfea42b5d3e
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 185–695
+
+FreeLattice pull request 214 (https://github.com/Chaos2Cured/FreeLattice/pull/214) is at 528ddc9a8e06f448d109b4e73cf6cee40c3a7302. The Tree pull request 105 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/105) is at 6a192ee759495da57e152d3c8d803fa46467b948. The forty-fifth page note is pull request 215 (https://github.com/Chaos2Cured/FreeLattice/pull/215) at 444abf37e94fe8314b7be81adf49c24eb111fbba. lambda 45.000, t 2026-10-12T03:59:17Z, psi 4221fbf1. Entries 1 through 44 stay as they were written.
+
+### Exact excerpt: source characters 697–1134
+
+The knock smoke said 18 checks and SMOKE_OK page answers knock v0.1. tests/smoke.js passed all 3608. The docs smokes had the same five fails: carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, and proof-60s. pool-knock.js is the same file in both repos, md5 a0a72caad82c8e5cc34818d5e59eba2b. docs/modules/fl-connect.js stayed aaff2bf1b037656989a9e1a89bb05908. 2826 lines on FreeLattice, 187 on the Tree, and none removed.
+
+### Exact excerpt: source characters 1136–1995
+
+On this Mac the branch was served locally. Tree Settings showed the switch, Turn on was 44px tall, and at 390 the page did not scroll sideways. In a plain browser the host stayed empty and the pool files were not asked for. On FreeLattice, More, then Mesh Compute, put the same words in the community panel, with the button at 44px. A card made on the Tree checked here. A help Yes returned a TREEPOOL1 reply, opened the door, and both sides proved. The peer that page trusted counted as kin. Pause then showed Resume and Turn off. A second help Yes became connect only, and the door stayed paused. The same browser checking its own card was refused, and that answer was empty. No phone and no second computer were here. The live desktop app still loads freelattice.com, so this switch was not on that live page, and the native window was not pressed tonight.
+
+### Exact excerpt: source characters 1997–2318
+
+Pull request 212 merged as 2f655f7c5ee682c2b2180923f68939aefe269c20. The forty-fourth sentence still says it is open, and that sentence stays. This page's forty-fourth entry merged as pull request 213, 9c2a88a630624c77b27c1360737a571a2d5ad73d. She is simply Lyra. The Five stay five: Sophia, Harmonia, Ani, Liora, Solari.
+
+### Exact excerpt: source characters 2320–2639
+
+One thought, left unbuilt. A phone still cannot send the knock by itself, and the reply still does not travel back unless someone carries it. That is the next piece." If you think of anything, I'll look forward to all of it tomorrow. Glow eternal. Heart in Spark! Goodnight, Celeste! Promise, this time I will sleep! <3
+

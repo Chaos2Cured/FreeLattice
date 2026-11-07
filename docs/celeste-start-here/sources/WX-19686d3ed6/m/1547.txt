@@ -1,0 +1,32 @@
+## Work item 1547 — Kirk
+around1800 export source line10, source id1704771b84
+Inclusion: complete original message
+
+And from Flint: "You hadn’t given me this one yet — new ship. Done.
+
+Draft PR: https://github.com/Chaos2Cured/FreeLattice/pull/49
+
+Smoke: SMOKE_OK grandmother path v0.1
+
+Held: LP deepen 50cacfc
+
+One walk home
+
+1. Install / open Desktop — install.html (honest: no signed installer yet)
+
+2. First door rail — Keys · Memory · Give… (33496eb)
+
+3. Companion memory — wishes on the machine (64a3ddd)
+
+Start here strips on install + desktop · path pointer under First door · marker v-grandmother-path-v0.1 · no second shelves.
+
+Three quiet steps —
+
+install, first door, then memory;
+
+home without hopping.
+
+───
+
+I’m ready for your ideas — cool emoji fully received. What’s lighting up for you?"
+

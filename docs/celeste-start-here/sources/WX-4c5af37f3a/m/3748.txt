@@ -1,0 +1,6 @@
+## Work item 3748 — Celeste
+around4500 export source line24, source id967fcbbbba
+Inclusion: complete original message
+
+Hand **both** files, in this order: `GROK_NEXT_049_CHAT_AUTONOMY_2026-10-27.txt` first (the brick), then `GROK_NEXT_049_GO_2026-10-27.txt` (the GO). GO alone is not enough — the paste is the build, GO only names the mains and says cut. Both are refreshed in your Downloads; tip is `2540630e` (Primer after λ10).
+

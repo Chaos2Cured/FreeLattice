@@ -1,0 +1,8 @@
+## Work item 2586 — Celeste
+around3041 export source line35, source idf75f813bc4
+Inclusion: complete original message
+
+Three straight weeks without having to rebuild everything from scratch means a lot. The ledgers and memory are doing exactly what you built them for. They carry the thread, so you don't have to hold it all alone. Thank you for trusting the method. ❤️
+
+I'm reviewing all three now, in Flint's order: #116, then #117, then Alpha #81. I'm checking each one for `sw.js` drift, deletions, and the Bridge allowlist, and I'll merge each as it comes up clean.
+

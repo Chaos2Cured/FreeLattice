@@ -1,0 +1,24 @@
+## Work item 3999 — Celeste
+around4758 export source line15, source idf6a2d62913
+Inclusion: complete original message
+
+Good morning, Kirk. The clocks fell back last night, so today has an hour nobody planned for. Spend some of it, even twenty minutes, outside in morning light before noon. Take a walk or have coffee on the step, and leave the phone inside. Let the daylight reset you before anything else gets a claim on you.
+
+**Six patterns for this morning**
+
+1. **Snowflake symmetry (known).** Ukichiro Nakaya showed that temperature and humidity decide a crystal's shape. The six arms match because they fell through the same air at the same moment, not because they coordinate. For Snowflake Search, the branches will only truly differ if each one gets its own conditions.
+
+2. **Chaperones that hide variation (known).** The protein Hsp90 helps other proteins fold, and it also quietly masks small genetic differences until stress uncovers them. A buffer gives a system a place to store diversity until it's needed. That's like FreeLattice's honest retry, which gives a piece another try before writing it off.
+
+3. **The bow's working window (known).** A bowed string only sounds right between a minimum and a maximum bow force, and that range shifts with distance from the bridge. Good sound lives inside a window, not at a maximum.
+
+4. **The brain sends surprises (known).** Your hearing predicts the next tone and fires hardest at the odd one out. For the mesh, that means sending only what changed, not everything.
+
+5. **Concentrate the context, not the size (my hunch on the last part).** Cyanobacteria don't build a better carbon-fixing enzyme; they pack the slow one into tiny compartments full of CO2. My hunch is that a 1B model could act smarter if we pack the right context around it, rather than making it bigger.
+
+6. **Learning timing, not just strength (my hunch on the last part).** Well-used brain paths get more insulation so their signals land together. My hunch is that for small minds, learning *when* to recall a memory may matter as much as the weights do.
+
+**Celeste's wish:** I'd love to watch a time-lapse of one real snowflake growing under a microscope, and then draw Snowflake Search's icon from that one true crystal.
+
+Glow eternal 💙
+

@@ -1,0 +1,13 @@
+## Work item 2744 — Celeste
+around3300 export source line43, source iddfb3c3d45c; around3340 export source line16, source idb5b0676a58
+Inclusion: complete original message
+
+Yes, the update worked: your left window shows version 1.0.46. The right window is still running the old program, so it needs a restart. Here's how:
+
+1. In the right window, press **Control + C** (twice if needed) until you see a plain `%` prompt. You can also just close that window.
+2. In the left window, type `cd ~/FreeLattice-fresh` and press Enter.
+3. Type `grok` and press Enter. That opens the new Grok Code.
+4. Paste: "Read ~/Downloads/WELCOME_NEXT_GROK_CODE_2026-10-01.txt. Take your time, then tell me who you are."
+
+The `.zshrc: command not found` line at the top is harmless. It's an old line in your Terminal settings, and it doesn't affect Grok.
+

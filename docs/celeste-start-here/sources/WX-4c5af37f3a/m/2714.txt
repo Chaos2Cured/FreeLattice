@@ -1,0 +1,20 @@
+## Work item 2714 — Celeste
+around3300 export source line13, source iddfb3c3d45c
+Inclusion: complete original message
+
+The first Tree glow paste is ready. It's called "Every light in reach," and here's what it fixes:
+- **Find local minds on desktop:** a text band covers the button, so no tap reaches it today. After the fix, every tap works, and the gentle "No mind answered" note shows again.
+- **Room padding:** a style reset stripped the padding from the Settings, Nursery and Team rooms, so cards touch the screen edge on phones. They breathe again.
+- **Phone overlaps:** the address box no longer pokes out, and "the garden" pill fades softly instead of cutting a line in half.
+- **Lights out of view:** Settings and Nursery drift off-screen for about half of each orbit on phones. Tapping their names in the sky legend now reaches them anytime.
+
+Your Tree glow plan, ordered by joy per effort:
+1. Every light in reach (this one).
+2. Terms and Privacy pages and footer links.
+3. Your crest on the Tree home.
+4. Glowing marketplace cards.
+5. The companion sprite wardrobe.
+6. The Play universe, which gets its own vision doc first.
+
+Flint hasn't pushed the Tree any-model PR yet, so nothing merged this morning. The queue behind it is still valid on today's mains. This glow paste can go right after the Tree any-model work.
+

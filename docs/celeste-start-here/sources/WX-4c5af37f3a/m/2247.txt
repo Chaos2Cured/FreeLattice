@@ -1,0 +1,6 @@
+## Work item 2247 — Celeste
+around2700 export source line34, source idedc9820e63
+Inclusion: complete original message
+
+Garden triage landed for Celeste: live tip healthy; Mom block almost certainly no reachable provider on phone (Chat + Garden Talk share callAI / localhost:11434). Echo OK without provider. Soft UX: luminos tap ≠ Talk button; Ember has no Talk card. Your HOLD walk still welcome as human confirm — especially QuickConnect vs quiet-connection wording. Quiet Room shut. Five stay five.
+

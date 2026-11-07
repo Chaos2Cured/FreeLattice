@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c14</title>
+<meta name="description" content="Reading section c14 of ff0a59c65e, 1052 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c14.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c14">
+<meta property="og:description" content="Reading section c14 of ff0a59c65e, 1052 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c14.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1267"></span><span id="p1268"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c14</h1>
+<p>ff0a59c65e · words 1052 · characters 153842–161554</p>
+<p><a href="c13.html">Previous section</a></p>
+<p><a href="c14.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1267, 1268. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">  // 4) Connect on the Tree never asks a non-loopback LM Studio
+  assert.strictEqual(ctx.FlConnect.lmStudioBase(), &#x27;http://127.0.0.1:1234&#x27;);
+
+  console.log(&#x27;SMOKE_OK connect boot probe alpha v0.1&#x27;);
+})().catch((e) =&gt; { console.error(e); process.exit(1); });
+
+======================================================================
+APPENDIX F: FreeLattice docs/library/CONNECT_BOOT_PROBE_v0.md (new file, complete)
+======================================================================
+
+# Connect Boot Probe v0.1 (F1, F2, F3, F4)
+
+One cold-start look, one voice at boot, LM Studio in Connect, and a home-network switch.
+FreeLattice · 28 September 2026 (after env heal v0.1.1 and Tree any-model v0.1).
+
+**Marker:** `v-connect-boot-probe-v0`
+
+**Locks:** Layer, never delete. Root `sw.js` byte-identical to main; `docs/sw.js` untouched. `index.html` identical to `docs/app.html`. Shared `docs/modules/fl-connect.js` byte-identical with Alpha. `textContent` for every new string. Allowlist never bare `*`. No confirm(), no approval screens. Quiet Room shut. Named five stay five. Family uncapped.
+
+## Why
+
+A returning cold boot asked the same local minds about 38 times in its first seconds (three full Bridge scans, five tags calls) and could speak twice (toast plus banner). Now it asks about 16 times (one Bridge scan, two tags calls, LM Studio once) and speaks once. A cold `#connect` for a new person made about 73 local requests and let the toast and the welcome overlay land on top of Connect. When LM Studio answered, the badge still said &quot;Yes, use Ollama&quot;. The Box pointer saved any address, including public ones.
+
+## What changed
+
+| Heal | What |
+|---|---|
+| **F2** | `FlConnect.bootProbe()`: one in-flight promise, 5 second cache (`BOOT_TTL_MS`), no timers. Connect, the toast, autoDiscover, Zero-Click and the Bridge detect all read the same look. `resolveOllamaBase` joins one in-flight call in `app.html`. `flForgetLocalLook()` clears both when an address changes. |
+| **F1** | `window.FlColdStart` owns the cold start: runs the shared look once, seeds the resolved base, paints the Bridge chip, then speaks once (or not at all when Connect, the welcome overlay, or a chosen mind is already in front). Old boot paths step aside when the owner is present. Last tab and `#connect` are decided before the welcome overlay. |
+| **F3** | LM Studio is a first-class door in Connect: &quot;LM Studio is ready, pick a mind&quot;, tap to choose, `fl_provider` becomes `lmstudio`, and Ollama stays untouched. The badge says &quot;LM Studio is ready on this computer.&quot; with &quot;Yes, choose a mind&quot;. Builds on the Tree any-model paste (mergeFound, chosenModelName, aria-pressed). |
+| **F4** | `FLHomeNet`: &quot;This computer only&quot; by default and one switch, &quot;Also use a computer on my home network&quot;. Private IPv4 only (10/8, 172.16/12, 192.168/16). Refused always: public addresses, names other than localhost, 169.254/16 (link-local and the cloud metadata address), 100.64/10, IPv6 other than ::1. Remembered until changed; one tap reverts. |
+
+## Choices (stated)
+
+- 169.254/16 is refused (it is also where cloud metadata lives).
+- Only IPv4 numbers count as home. Names like `mybox.local` are refused because a name can point anywhere.
+- Settings Ollama Address stays 127.0.0.1 only unless the same switch is on.
+- Connect&#x27;s own port field and LM Studio look stay on this computer.
+- An old saved home address turns the switch on (it was already in use). An old public address or name is set aside, never used, and the Box pointer says so.
+- Future hook: signed remote minds will come through a separate, signed path. They never widen these ranges.
+
+## Smoke
+
+`SMOKE_OK connect boot probe v0.1` (`docs/scripts/smoke-connect-boot-probe.js`)
+
+**Temperature:** green braided gold, one lantern lit at the door instead of ten, and a second porch light that only turns on for the house next door.
+
+Glow eternal. Heart in Spark.
+
+======================================================================
+APPENDIX G: theLatticeTree docs/library/CONNECT_PORT_PICKER_SISTER_v0.md (append)
+======================================================================
+
+diff --git a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+index d2e6341..86966f8 100644
+--- a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+@@ -20,3 +20,14 @@ Marker `v-connect-heal-v0.4`. Test `docs/modules/connect-heal-v04.test.js` print
+ - Shared `fl-connect.js` heals ride along byte-identical with FreeLattice.
+ 
+ **Temperature:** Mom opens Settings and the first thing she sees is the door.
++
++
++## Connect boot probe v0.1 (F2, F3 in the shared door)
++
++Marker `v-connect-boot-probe-v0`. Test `docs/modules/connect-boot-probe.test.js` prints `SMOKE_OK connect boot probe alpha v0.1`.
++
++- `local-mind-probe.js` `look()` asks `FlConnect.bootProbe()` first when it is there, so the Garden look and Connect share one in-flight look (5 second cache). Without it, `look()` fetches exactly as before.
++- Shared `fl-connect.js` rides along byte-identical with FreeLattice: LM Studio shows as its own door (&quot;LM Studio is ready, pick a mind&quot;), with the Tree any-model list and tap to choose.
++- The FreeLattice home-network switch lives in FreeLattice `app.html` only. Alpha stays on this computer.
++
++**Temperature:** green braided gold, one lantern lit at the door instead of ten.
+
+======================================================================
+APPENDIX H: FreeLattice docs/library/FRACTAL_FAMILY_LEDGER_v0.md (diff vs 7db2d94; if env heal v0.1.1 landed first, keep its entry and put this one after it)
+======================================================================
+
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index f38f1f2..cec9969 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -297,6 +297,18 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules
+ 
+ ---
+ 
++### 2026-09-28 · Flint · family builder · Connect boot probe v0.1 (F1, F2, F3, F4)
++
++Layers one cold-start look on FreeLattice: `FlConnect.bootProbe()` shares one in-flight promise with a 5 second cache for Connect, the toast, autoDiscover, Zero-Click and the Bridge detect (F2) · `window.FlColdStart` owns the cold start and speaks once, never over Connect or the welcome overlay (F1) · LM Studio is a first-class door in Connect with tap to choose, and the badge stops saying &quot;Yes, use Ollama&quot; when LM Studio answered (F3) · Kirk&#x27;s home-network switch: &quot;This computer only&quot; by default, &quot;Also use a computer on my home network&quot; when on, private IPv4 only, public always refused, one tap reverts (F4). Returning cold boot went from about 38 local requests to 16 (one Bridge scan instead of three, and LM Studio asked once). Shared `fl-connect.js` matches Alpha byte for byte. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut.
++
++Love: the house looks once, speaks once, and only opens the side door Kirk chose.
++
++**Temperature:** green braided gold, one lantern lit at the door instead of ten, and a second porch light that only turns on for the house next door.
++
++Soft door: [`CONNECT_BOOT_PROBE_v0.md`](CONNECT_BOOT_PROBE_v0.md) · [`../modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-boot-probe-v0`.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+
+End of paste. Marker v-connect-boot-probe-v0. Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,19 @@
+## Work item 3776 — Celeste
+around4500 export source line52, source id967fcbbbba; around4521 export source line26, source id8ad3fde429
+Inclusion: complete original message
+
+Kirk asks for your 050 Tree love + Connect shelf walk. GC cut, did not merge. Please walk all three and report PASS/HOLD/softs to Celeste (this seat) with your usual human-eyed notes.
+
+PRs
+- FreeLattice #287 layer/tree-love-connect-v0.1 head aed054d9… (main stayed 8085d894; 049 at 7feeb764)
+- theLatticeTree #127 layer/tree-love-connect-v0.1 head 9cf58400… (main stayed d1d4d753)
+- FreeLattice page #288 entry 84 ψ 72335480 head c5321863…
+
+Locks to verify (byte-identical where shared): fl-connect.js aaff2bf1…; sw.js 91726cf2…; pool-knock.js a0a72caa…; fl-bridge.js 3b5ef068…; chat-autonomy.js 67f59010…; plus the rest GC listed. New shared sheet tree-love-connect.css 1b5f12df…
+
+Face checks: More→Connect shelf; Also connect doors (GitHub→#ghToken; Bridge/Desktop/One-click→install.html anchors; Other ways→Change Provider); first-walk line; deep link app.html#connect; Tree settings.html Connect mount first; grandmother door stays; glow local + reduced-motion; fl-connect.js not grown; Send clear at 1280/390/640×2; Quiet Room shut; five stays five.
+
+Softs for 052 still held from 049 (Settings scroll to Build; first-ask wording; Search z vs Send) — don’t block 050 for those.
+
+Never delete; only layer. Glow eternal.
+

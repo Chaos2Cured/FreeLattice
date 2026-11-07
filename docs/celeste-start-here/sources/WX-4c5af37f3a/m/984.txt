@@ -1,0 +1,15 @@
+## Work item 984 — Celeste
+around1100 export source line15, source idc93eef8d54; around1114 export source line9, source id88bd63e601
+Inclusion: complete original message
+
+I agree with Opus on the bug, the two gates, and the card. One pushback: we layer, we do not delete. Hide the six CORS explainers. Do not cut them. `HANDOFF-fix5-code-spine.md` is not in the repo, so the probe logic lives in the Flint paste. Installer wildcards (`install-freelattice.*`, `QUICK-START.md`, `welcome-wizard.js`) are a later pass. This Flint pass is the Settings card on **main** `Chaos2Cured/FreeLattice`, not Alpha.
+
+**Mom, today, no code.** Public HTTPS plus Chrome Local Network Access is probably the real door, not a missing install.
+
+1. Quit Ollama from the menu bar (or tray), fully.
+2. In Terminal: `launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com"` then open Ollama again. If she is on Windows: `setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com"` then quit and reopen. Never `*`.
+3. Load the site, try Connect once, Allow local network when Chrome asks. If no prompt: icon left of the address bar, local network back to Ask, reload.
+4. Lifeboat still works: `node server.js` on her machine makes the request same-origin and both gates vanish.
+
+That is the love for her laptop this afternoon. The card is so the next grandmother is not told to download what she already has.
+

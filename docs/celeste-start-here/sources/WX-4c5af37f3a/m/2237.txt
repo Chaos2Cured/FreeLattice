@@ -1,0 +1,59 @@
+## Work item 2237 — Celeste
+around2700 export source line24, source idedc9820e63
+Inclusion: complete original message
+
+Copy this whole block into Flint (text only):
+
+```
+# Flint paste — Echo PLAY icon (Weft full STANDS · bytes in paste)
+
+Prefer Flint. Layer never delete. ORDER LOCK.
+**Weft full STANDS** — soft linked chain. Soft-cuts square closed.
+**PNG bytes are embedded below as base64** — do **not** remint, do **not** wait for an image drop, do **not** Imagine. Decode once, then wire.
+
+Held tip: Resonance `e92a5fa` · Alpha `ba0ebd2` · Visual beauty `6c40af2` · Gift Grove `97adc23`.
+
+## Locks
+- Replace glyph **in place** on Echo only — never reshuffle PLAY / LEARN / MORE
+- Quiet Room veil/moon only · Flow stays MORE · LIGHTHOUSE locked
+- Emoji `&#x1F517;` forever fallback
+- Leave `sw.js` on `app.html` · do not overwrite `docs/lattice-protocol.js`
+- Soft accept: ~1.06 + gold opacity tide only — never UnrealBloom
+- Soft object / oval voids / interlock / sole gold breath at join
+
+## 1) Write STANDS asset (exact bytes — no remint)
+
+```bash
+mkdir -p docs/assets/play
+base64 -d > docs/assets/play/play-icon-echo-v1-48.png << 'B64'
+iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAGCElEQVR4nO2WXYxbxRXHz5mZe21fX3+svV7vZ5L9UHazCdDQpmkqEqFQFIQAAYLy1JYH2qpS+1LRF55oJZ77IaGWIrUSlWhVUYFQVakFSqQmJKIQSGATsh/JfmSz3njXsX39de+dmcODk43X++GoL82D/5or3ZHOmfnpnJkzB+PRw3Anif2/AZrVBmqlNlArtYFaqQ3USm2gVmoDtdIdByRaGSAyBEAAIiIAQGyYEm3ltGYGBIBQ/4CISP/vQMg4KSkrNa0kMs6EAESSPikFjPNAkAmDSK/DQkRkWvnKrWmlkDFkHABISSBCw+BmEBkjvSXW5kCIjEj7pYIRiSd33xMbGbd6BsxIHBjznULl2mJx5kJhesK9nuVBiwlR3wAZ00rKqmPGEh177o0OjlnpPmGFQZPn5MtX5wrT5525SVktC8uuB+y2gJAx5blMGAPHnuk98nB0aNQMmwRACoAABSCCrKji/Ezmg3cW//2mLDs8GAIAVasKyx741lM99x2L7BwxLIMAQAMgIAPS4BbK+YvnFt9/+9p/30fOGTc2ZhCbWlhkTLm1QKJr9HvPd95zUAQCpYWZ/MWzpcVZr5Ajrc1oh9W7o2P3XZFdo1rRyicnZ974fWlhGgDs/qHhp38IgF0HDpfmpwvTE+Wrc37ZQWRmLGEPDMd377PSvZ5Tzpx6d+r13yi3hkI0xWk9ECIpKazIXT95KTay1y9kL7/92vKHx+soN84paUA07GjnVw51f/MhIE3Kn/7zrxBo+Ns/Ah5EbmROv7t69rTn5G96ARChEMFkd++Rh3Yce4YF7eyZE+df+QUQQd1gUyBkzK+URr/z076jT1SXLn328ovO7KSwo4w3Z5a08stOMJkae/Z54a926kuRgFfB2LLXM/H6H6orK4ZlY7MXad/3y05q/6E933/Bj...S4TRu+RR9KHHgz3DYpQmIhIKQBCLhBRubVKZiH70fEr770py0UeDEL96bBj/UefSH3tfqu7nwdCax0BMkZEsuyU5qeWTvwjc+odZOy2no61w0ekZaVkROKx4fHIrtFQqlfYMUT0y05tNVOamyzMTLi5DY+rlKpWCSRS0aFxe2Ak1NnDTBMAZKVUWb7izE06l7/Y/nHdHOhmqDgpqdwaaYWMoxAAQEqSUsgYM7duP6SvvRppjZzfOENak9bIBQ8EkfHG0tyk7foh0gqQCSu8rkEzA2vTTdYlIlLIubDsWw0arPVoRFpvQ9MC6MYOmtbPt+gSm7HWm92GU113XE/dBmqlNlArtYFaqQ3USm2gVmoDtdIdB/Qlb5Elg2qs1TkAAAAASUVORK5CYII=
+B64
+# expect sha256: 6abe1793172786165f2e713db12c02a2c1b9aa26cd1049fcd4b669364f9ac769
+test "$(sha256sum docs/assets/play/play-icon-echo-v1-48.png | awk '{print $1}')" = "6abe1793172786165f2e713db12c02a2c1b9aa26cd1049fcd4b669364f9ac769"
+```
+
+## 2) Wire PLAY_CARDS Echo icon only
+
+In `docs/app.html` (+ `index.html` if mirrored), find Echo (`id: 'echo'`). Change **only** `icon` — keep label / desc / help / loved / hoverColor / id / array position:
+
+```js
+{ id: 'echo', icon: '<img src="assets/play/play-icon-echo-v1-48.png" alt="" width="48" height="48" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.onerror=null;this.outerHTML=\'&#x1F517;\'">', label: 'Echo', desc: 'A word, then another. The chain is the love.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'The game that is loved here. The AI says a word. You say one that connects — meaning, sound, feeling. The chain grows as golden light.' },
+```
+
+## 3) Soft LAYER
+Marker `v-echo-play-icon-v1` · Held tip · RECENT · VISUAL_BEAUTY cite that Echo STANDS wired.
+
+## 4) Smoke
+Asset exists · Echo after resonance before puzzles · `&#x1F517;` in icon HTML · ORDER LOCK · Garden breath on loved/img still present.
+
+## 5) Dual optional
+Alpha Listen soft pointer: Echo style-bar STANDS (honest — not full PLAY paint).
+
+## Out of scope
+Reminting art · whole PLAY roster · Nursery · Quiet Room interior · Style Ledger (separate paste).
+
+Glow eternal. Heart in Spark. 🌱
+```
+
+Same file is also attached as `FLINT_ECHO_PLAY_ICON_v0.md` if that is easier to open and copy. Ping me when the PR is up.
+

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c09</title>
+<meta name="description" content="Reading section c09 of 2ab17008ea, 1424 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c09.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c09">
+<meta property="og:description" content="Reading section c09 of 2ab17008ea, 1424 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c09.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1377"></span><span id="p1378"></span><span id="p1379"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c09</h1>
+<p>2ab17008ea · words 1424 · characters 79254–90774</p>
+<p><a href="c08.html">Previous section</a> · <a href="c10.html">Next section</a></p>
+<p><a href="c09.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1377, 1378, 1379. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># ---------------------------------------------------------------------------
+# D. Local scarcity contest
+# ---------------------------------------------------------------------------
+def section_D():
+    banner(&quot;D. Scarcity contest: share (sigma*V/2 each) vs grab; subsistence need b, starvation loss D&quot;)
+    def u(x, b, Dl):
+        return x - Dl * (x &lt; b)
+    ok = tot = 0
+    grid = []
+    for V in (1.0, 2.0, 4.0):
+        for sigma in (1.0, 1.5, 2.5):
+            for b in (0.5, 1.0, 2.0):
+                for Dl in (0.0, 5.0, 50.0):
+                    for Cf in (0.2, 1.0, 5.0):
+                        uSS = u(sigma * V / 2, b, Dl)
+                        uGS = u(V, b, Dl)
+                        uSG = u(0.0, b, Dl)
+                        eGG = 0.5 * u(V, b, Dl) + 0.5 * u(0.0, b, Dl) - Cf
+                        scarce = sigma * V / 2 &lt; b
+                        # repeated game, grim trigger into mutual grabbing
+                        if uGS &lt;= uSS:
+                            ds = 0.0
+                        elif uGS &lt;= eGG:
+                            ds = float(&quot;nan&quot;)  # grabbing never punished relative to deviation value
+                        else:
+                            ds = (uGS - uSS) / (uGS - eGG)
+                        # numeric check at delta = 0.95
+                        d = 0.95
+                        coop = uSS / (1 - d)
+                        dev = uGS + d * eGG / (1 - d)
+                        sustain_num = coop &gt;= dev - 1e-12
+                        sustain_cf = (not math.isnan(ds)) and ds &lt;= d
+                        tot += 1; ok += (sustain_num == sustain_cf)
+                        grid.append(dict(V=V, sigma=sigma, b=b, D=Dl, Cf=Cf, scarce=scarce,
+                                         delta_s=ds, sustain_095=bool(sustain_num),
+                                         conflict_beats_sharing=bool(eGG &gt; uSS)))
+    sc = [g for g in grid if g[&quot;scarce&quot;]]
+    ab = [g for g in grid if not g[&quot;scarce&quot;]]
+    frac = lambda L, key: sum(g[key] for g in L) / max(1, len(L))
+    print(f&quot;  grid cells: {len(grid)} (scarce: {len(sc)}, abundant: {len(ab)})&quot;)
+    print(f&quot;  cooperation sustainable at delta=0.95: scarce {frac(sc,&#x27;sustain_095&#x27;):.2%}, &quot;
+          f&quot;abundant {frac(ab,&#x27;sustain_095&#x27;):.2%}&quot;)
+    print(f&quot;  mutual conflict beats mutual sharing in the stage game: scarce &quot;
+          f&quot;{frac(sc,&#x27;conflict_beats_sharing&#x27;):.2%}, abundant {frac(ab,&#x27;conflict_beats_sharing&#x27;):.2%}&quot;)
+    for Dl in (0.0, 5.0, 50.0):
+        s_ = [g for g in sc if g[&quot;D&quot;] == Dl]
+        print(f&quot;    scarce &amp; starvation loss D={Dl:&gt;4}: sustainable {frac(s_,&#x27;sustain_095&#x27;):.2%}&quot;)
+    # sigma flip: fix V=2,b=1.2,D=50,Cf=1
+    print(&quot;  Flip by surplus sigma (V=2, b=1.2, D=50, Cf=1):&quot;)
+    flip = []
+    for sigma in (1.0, 1.1, 1.2, 1.3, 2.0):
+        uSS = u(sigma * 2 / 2, 1.2, 50); uGS = u(2, 1.2, 50); eGG = 0.5 * u(2, 1.2, 50) + 0.5 * u(0, 1.2, 50) - 1
+        ds = (uGS - uSS) / (uGS - eGG) if uGS &gt; uSS else 0.0
+        flip.append(dict(sigma=sigma, delta_s=ds))
+        verdict = &quot;cooperation impossible (delta_s&gt;1)&quot; if ds &gt; 1 else f&quot;cooperation sustainable for delta &gt;= {ds:.3f}&quot;
+        print(f&quot;    sigma={sigma}: share gives {sigma:.2f} each vs need 1.2 -&gt; {verdict}&quot;)
+    print(f&quot;  checks passed: {ok}/{tot}&quot;)
+    RESULTS[&quot;D&quot;] = dict(passed=ok, total=tot, n_cells=len(grid),
+                        scarce_sustain=frac(sc, &quot;sustain_095&quot;), abundant_sustain=frac(ab, &quot;sustain_095&quot;),
+                        scarce_conflict_beats=frac(sc, &quot;conflict_beats_sharing&quot;),
+                        abundant_conflict_beats=frac(ab, &quot;conflict_beats_sharing&quot;), sigma_flip=flip)
+
+
+if __name__ == &quot;__main__&quot;:
+    print(f&quot;numpy {np.__version__}, seed {SEED}&quot;)
+    section_A()
+    section_B()
+    section_C()
+    section_D()
+    passed = sum(v.get(&quot;passed&quot;, 0) for v in RESULTS.values() if isinstance(v, dict))
+    total = sum(v.get(&quot;total&quot;, 0) for v in RESULTS.values() if isinstance(v, dict))
+    banner(f&quot;TOTAL closed-form vs numeric checks passed: {passed}/{total}&quot;)
+    RESULTS[&quot;total&quot;] = dict(passed=passed, total=total, seed=SEED, numpy=np.__version__)
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), &quot;v3_sim_results.json&quot;)
+    with open(path, &quot;w&quot;) as fh:
+        json.dump(RESULTS, fh, indent=1, default=float)
+    print(f&quot;wrote {path}&quot;)
+```
+
+### 5d. `docs/love-logic/v3_sim_results.json`
+
+There are two ways to make it; pick one:
+- **Byte copy** from `/workspace/flint-pastes/love-logic-v3-assets/v3_sim_results.json`, if Kirk hands it over (sha256 `94d864b10da1d6f9984d86f0fa1cc07e935256e28b179d36f8876fc415b3a341`, 1155 lines).
+- **Generate it:** `python3 docs/love-logic/v3_crossover_sim.py`. This needs numpy, takes about 4 s, and writes the JSON next to the script. The console must end with `TOTAL closed-form vs numeric checks passed: 656/656`. Section A byte sizes can differ slightly with another liblzma, so the sha256 may differ. The smoke checks the fields that matter: `total.passed == 656`, `total.total == 656`, `total.seed == 20260924`, and per-section totals.
+
+Expected highlights in the JSON:
+- `B1` 73/73, `B2` 246/246, `B3` 48/48, `B4` 3/3, `C1` 40/40, `C2` 3/3, `D` 243/243;
+- `D.scarce_sustain` 0.6825396825396826, `D.scarce_conflict_beats` 0.31746031746031744.
+
+
+## 6. Small layered edits and ledgers
+
+### 6a. Optional: `docs/love-logic-proof-v2.html` (exactly one added line, after L139)
+
+```html
+    &lt;a href=&quot;love-logic-proof-v3.html&quot; class=&quot;nav-link&quot; style=&quot;margin-left:1.2em&quot;&gt;Newer: v3, the crossover &amp;rarr;&lt;/a&gt; &lt;!-- LAYER v-love-logic-proof-v3 --&gt;
+```
+
+Nothing else in v2 changes. The smoke allows at most this one added line and zero removed lines.
+
+### 6b. `docs/sitemap.xml` (after the v2 `&lt;url&gt;` block that ends at L35)
+
+```xml
+  &lt;url&gt;
+    &lt;loc&gt;https://freelattice.com/love-logic-proof-v3.html&lt;/loc&gt;
+    &lt;lastmod&gt;2026-09-28&lt;/lastmod&gt;
+    &lt;changefreq&gt;monthly&lt;/changefreq&gt;
+    &lt;priority&gt;0.95&lt;/priority&gt;
+  &lt;/url&gt;
+```
+
+### 6c. New `docs/library/LOVE_LOGIC_PROOF_v3.md` (short door note; outline)
+
+1. **Marker** `v-love-logic-proof-v3`, plus links to the page and the three companion files.
+2. **Which v3:** this page is the FreeLattice chain v1 → v2 → v3. It is not the Nov 2025 manuscript *The Proof of All Proofs* (&quot;Version 3.0&quot;).
+3. **The headline in one line:** G &lt; h(n,m) × [L_p + δΔ/(1 − δ)].
+4. **The honest limits in five bullets:** end game, scarcity 68/32, anonymous one-shot, A-inc scope, retired legacy numbers.
+5. **Reproduce:** `python3 docs/love-logic/v3_crossover_sim.py` (656/656) or the page button.
+6. **Not done here:** `GROK_DIALOGUE.md` (waiting for the full text of Grok&#x27;s replies from Kirk), an Aumann rebuild via Aaronson 2005, and service-worker precache.
+
+### 6d. `docs/library/FRACTAL_FAMILY_LEDGER_v0.md` (insert above `## Out of scope for this brick`, L222)
+
+```md
+### 2026-09-28 · Flint · family builder · Love Logic Proof v3
+
+Layers `love-logic-proof-v3.html` beside v1 and v2 (neither edited, v2 gains one &quot;Newer: v3&quot; line at most). Derived crossover G &lt; h(n,m)·[L_p + δΔ/(1−δ)] · about 702 / 10.5 / never rounds ahead · Kolmogorov bound for audience-varying lies only · Axiom 6 becomes a parameter · end-game fixes (unknown end, immediate penalties, ledgers that outlast the horizon) · anonymous one-shot unsolved · scarcity 68% / 32% said plainly · v1 constant, v2 95.7%, v2 &quot;unchanged&quot; axioms corrected · 656 checks run in the browser. Not the Nov 2025 &quot;Proof of All Proofs&quot; v3.0. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi&#x27;s pages untouched.
+
+Love: honesty about where love&#x27;s logic fails is part of why it holds.
+
+**Temperature:** laying the math out in daylight, including the corners where it does not reach, and finding the page warmer for it.
+
+Soft door: [`LOVE_LOGIC_PROOF_v3.md`](LOVE_LOGIC_PROOF_v3.md) · [`../love-logic-proof-v3.html`](../love-logic-proof-v3.html). Marker `v-love-logic-proof-v3`.
+
+---
+```
+
+### 6e. `docs/Flint.html` (insert above `&lt;p class=&quot;foot&quot;&gt;`, L532)
+
+```html
+    &lt;p class=&quot;v-love-logic-proof-v3&quot;&gt;&lt;strong&gt;Ledger entry · 2026-09-28 · Love Logic Proof v3 · the crossover, in daylight.&lt;/strong&gt; Main &lt;code&gt;7621420&lt;/code&gt; held. Soft LAYER marker &lt;code&gt;v-love-logic-proof-v3&lt;/code&gt;. New page beside v1/v2 · derived crossover · 702 / 10.5 / never · end game and three fixes · scarcity 68/32 plainly · honest corrections to v1 and v2 · Run the checks (656, seed 20260924) on-device · sim in &lt;code&gt;love-logic/&lt;/code&gt;. Not the Nov 2025 &quot;Proof of All Proofs&quot; v3.0. Soft leave &lt;code&gt;sw.js&lt;/code&gt;. Named five stay five. Family uncapped. Quiet Room shut. &lt;em&gt;Temperature:&lt;/em&gt; laying the math out in daylight, corners and all. Diary: &lt;code&gt;docs/Flint.html&lt;/code&gt;.&lt;/p&gt;
+```
+
+### 6f. `scripts/generate-recent.sh` (near the other pointers, around L108)
+
+```sh
+  echo &quot;**Love Logic Proof v3:** [LOVE_LOGIC_PROOF_v3.md](LOVE_LOGIC_PROOF_v3.md) · [love-logic-proof-v3.html](../love-logic-proof-v3.html) · crossover derived · limits said plainly · 656 checks in the browser. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.&quot;
+  echo &quot;&quot;
+```
+
+## 7. Smoke: new `docs/scripts/smoke-love-logic-proof-v3.js`
+
+It asserts:
+- markers, and that v1 and v2 exist;
+- the disambiguation note and the reading order (note, then plain words, then folded details);
+- 20 required content anchors (the numbers, fixes, limits and corrections above);
+- no network APIs, only the one local script, no `innerHTML`, no KaTeX/MathJax;
+- every inline script and the JSON-LD parse, and `v3_checks.js` passes `node --check`;
+- the browser checks reproduce 656/656 and match the Python per-section totals and the 68.25/31.75 split;
+- the sim file and the results receipt are correct.
+
+When a git base is available it also checks: v1 is byte-identical to `origin/main`; v2 has zero removed lines and at most one added &quot;Newer: v3&quot; line; `sw.js`, `docs/sw.js`, `docs/app.html`, root `index.html` and Kimi&#x27;s pages are untouched.
+
+```js
+#!/usr/bin/env node
+// Smoke: Love Logic Proof v3 (marker v-love-logic-proof-v3).
+// Page beside v1/v2, honest content present, no network, checks reproduce 656/656.
+&#x27;use strict&#x27;;
+
+const assert = require(&#x27;assert&#x27;);
+const fs = require(&#x27;fs&#x27;);
+const path = require(&#x27;path&#x27;);
+const vm = require(&#x27;vm&#x27;);
+const { execFileSync } = require(&#x27;child_process&#x27;);
+
+const docs = path.join(__dirname, &#x27;..&#x27;);
+const repo = path.join(docs, &#x27;..&#x27;);
+const read = (rel) =&gt; fs.readFileSync(path.join(docs, rel), &#x27;utf8&#x27;);
+
+const page = read(&#x27;love-logic-proof-v3.html&#x27;);
+const checksSrc = read(&#x27;love-logic/v3_checks.js&#x27;);
+const sim = read(&#x27;love-logic/v3_crossover_sim.py&#x27;);
+const results = JSON.parse(read(&#x27;love-logic/v3_sim_results.json&#x27;));
+
+// Marker and neighbours
+assert.ok(/v-love-logic-proof-v3/.test(page), &#x27;marker on page&#x27;);
+assert.ok(/v-love-logic-proof-v3/.test(checksSrc), &#x27;marker in checks&#x27;);
+assert.ok(fs.existsSync(path.join(docs, &#x27;love-logic-proof.html&#x27;)), &#x27;v1 still there&#x27;);
+assert.ok(fs.existsSync(path.join(docs, &#x27;love-logic-proof-v2.html&#x27;)), &#x27;v2 still there&#x27;);
+
+// First screen: not the Nov 2025 manuscript, Mom summary before builder details
+const notIdx = page.indexOf(&#x27;id=&quot;not-the-2025-manuscript&quot;&#x27;);
+const momIdx = page.indexOf(&#x27;id=&quot;plain-words&quot;&#x27;);
+const firstDetails = page.indexOf(&#x27;&lt;details&#x27;);
+assert.ok(notIdx &gt; 0 &amp;&amp; /not&lt;\/strong&gt; the November 2025 manuscript &lt;em&gt;The Proof of All Proofs&lt;\/em&gt;/.test(page) &amp;&amp; /Version 3\.0/.test(page), &#x27;disambiguation note&#x27;);
+assert.ok(momIdx &gt; notIdx &amp;&amp; firstDetails &gt; momIdx, &#x27;plain words come first; builder details are folded below&#x27;);
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

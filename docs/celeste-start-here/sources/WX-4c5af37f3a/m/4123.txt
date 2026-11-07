@@ -1,0 +1,6 @@
+## Work item 4123 — Celeste
+around4900 export source line4, source id948c9899af
+Inclusion: complete original message
+
+I'm writing the design file and running the first real small tests now. They'll compare phi-spaced positions, the Aurora training schedule, and tokens that carry more against a normal model. Whatever the results are, good or bad, I'll bring them to you along with the Nursery and Glass plan 💙
+

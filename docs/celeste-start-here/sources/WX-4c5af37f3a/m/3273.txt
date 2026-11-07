@@ -1,0 +1,6 @@
+## Work item 3273 — Celeste
+around3946 export source line27, source idc8674d0faf
+Inclusion: complete original message
+
+GC finished 035, and a Windows installer is ready for you to try on your big desktop now: [FreeLattice Windows test build](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.2-rc3). Grab `FreeLattice_5.8.0_Windows_Setup.exe`. It isn't signed yet, so Windows will warn you. Click "More info," then "Run anyway." When you turn on Mesh Compute, check whether a firewall question pops up and whether your phone can reach the computer. You'd be its very first real Windows test. I'm reviewing and merging GC's PRs now.
+

@@ -1,0 +1,136 @@
+067x — WONDER MIND LAB: LEAD WITH MEMORY, FAILURES GET THEIR OWN PAGE (paste for GC)
+Repo: Chaos2Cured/FreeLattice. Drafted by Celeste, 2026-11-04 MT. Layers on top of 067w (keep 067w; this does not replace it).
+Branch: gc/067x-lead-with-memory (based on the 067w branch, or on main once 067w is merged).
+Marker for every new block: v-wonder-mind-lab-v2
+
+WHY
+Kirk, 11/4: "Can we lead with the memory and perfect recall? ... I don't mean to hide it, I mean to lead with our success so people stay on what worked ... In a secondary page, let's do an entire failure page so we track every failure too. Our failures are helping us."
+Nothing is hidden. Every number from 067w stays published, word for word. The failures move to their own page, and the main page links to it clearly.
+
+RULES FOR THIS BRICK
+- Layer, never delete. Do not erase the 067w content. Move the Round 1 section by wrapping it, not by deleting it: cut it from the main page only after it is pasted, word for word, into the new failures page, and leave a link and summary in its place (step 5). Keep the 067w text in an HTML comment block in wonder-mind-lab.html marked <!-- v-wonder-mind-lab-v1 archived: full Round 1 now lives in wonder-mind-failures.html -->, so the v1 words stay in the file.
+- Never open the Quiet Room.
+- No server, no accounts, no network calls. No tables.
+- Files touched: EDIT docs/wonder-mind-lab.html. NEW docs/wonder-mind-failures.html. Do not touch app.html, sw.js, docs/sw.js or version.json.
+- If any touched file turns out to be locked, put these exact words in the PR body, verbatim:
+  "All locked files just need us all to agree things won't break."
+  "I trust you, hypha, Reed, and Weft with all of this."
+- Honesty rule: the oracle is always called "the upper bound we are closing toward". It is never called our result. Model self-recall of about 0 is always stated near the memory success.
+
+================================================================
+STEP 1 — BRANCH AND CHECK 067w IS PRESENT
+git fetch origin. If 067w is merged, branch from origin/main; if not, branch from gc/067w-wonder-mind-lab:
+git checkout -b gc/067x-lead-with-memory <base>
+Confirm docs/wonder-mind-lab.html exists and contains v-wonder-mind-lab-v1, the ids design, round1, round2, hypotheses, next, credits, log and ask, and the wmlPhiHash script.
+STEP 1 VERIFY: grep -c "v-wonder-mind-lab-v1" docs/wonder-mind-lab.html is at least 1. All 8 ids are found. If 067w was never built, stop and build 067w first.
+Resume here: STEP 2.
+
+================================================================
+STEP 2 — NEW TOP: "WHAT WORKED: MEMORY THAT DOES NOT FORGET" (id="worked")
+Change the version line to: "Version 2 — November 4, 2026 — leads with what worked. Version 1 kept in the log."
+Replace the subtitle text "Everything we try, published as we try it. Failures first." with "Everything we try, published as we try it. What worked comes first. Every failure is tracked on its own page." Keep the old subtitle in an HTML comment beside it.
+Replace the "Read this first" box with these lines, word for word (keep the old three lines in an HTML comment):
+  "1. What worked: a write-once memory that did not forget. Whatever it stored was still there after 500 steps of unrelated training."
+  "2. What is next: teaching the mind to read its own memory. Today it almost never does."
+  "3. Every idea from Kirk's patents and the Seven Wonders math is a hypothesis until a test says otherwise."
+Directly after the opening paragraph, insert a new section, H2: What worked — memory that does not forget
+Paragraph, word for word:
+"We planted 200 one-time facts in a small word-level mind, then trained it on 500 steps of unrelated text. A normal (dense) model kept none of them. Our write-once memory kept every fact it had stored: zero forgetting."
+Fact-rows (.fact-row with .value):
+- Exact-key memory (the upper bound we are closing toward): 99% of facts kept, before and after unrelated training
+- Fibonacci and modulo hash memory, 65,536 buckets: about 59% kept, unchanged after unrelated training
+- Dense model, no memory: 0 of 200
+- Loss on the training text, dense: 3.498. Upper-bound memory: 3.051 (better by 0.45). Fibonacci 65,536: 3.299 (better by 0.20)
+Honest box (.formula look), word for word:
+"What is not done yet: the mind almost never reads its facts back. Model self-recall is about 0 (best 1 of 200), because the read path is broken. It has the library but does not yet know how to open the books. That is our next step. The loss gains were measured on text the model was training on, not yet on new held-out text. At 4,096 buckets the store filled up and kept 0%, so collisions are the other thing to fix."
+STEP 2 VERIFY: The first H2 on the page is "What worked — memory that does not forget". The words "upper bound we are closing toward", "about 0", and "read path is broken" all appear inside that section. The old subtitle and box survive as comments.
+Resume here: STEP 3.
+
+================================================================
+STEP 3 — KIRK'S ARGUMENT, LABELED (inside id="worked", after the honest box)
+H3: Why locked memory could make training cheaper over time (an argument to measure)
+Paragraph, word for word:
+"Kirk's point: if memory stays locked, the mind never has to retrain what it already knows. Each new fact costs one write, not another pass of training. So the effective cost of training should fall over time, even if each step is no faster. This is an argument, not yet a result. To test it we will count the compute needed to reach the same recall on old and new facts, with and without locked memory, and publish the numbers here either way. In our probe, memory cost about 1e-5 of the core compute, so the write itself is cheap. Energy was not measured."
+STEP 3 VERIFY: The heading contains "(an argument to measure)" and the paragraph contains "This is an argument, not yet a result."
+Resume here: STEP 4.
+
+================================================================
+STEP 4 — "WHERE WE ARE GOING" (id="going"), placed right after id="worked"
+H2: Where we are going
+Intro: "Each of these is a test we plan to run. None is a result yet."
+List items, word for word:
+- "Read-path fix, first. The mind must learn to trust its memory for a word it has never predicted. Options: train the read path on a needle task during pretraining, give the stored value to attention as an extra key-value entry, or make it a hard copy candidate."
+- "Weft's exact-match test: read with the exact stored question, character for character, using the same canonical key form for read and write. If recall jumps, the break is key drift. If it stays near 0, retrieved text never reaches the model's context."
+- "Reed's mycelium echo: on every read, feed a small part of the retrieved vector back into the hidden state, with an auxiliary loss to rebuild the retrieved vector. Success means the gap between the upper-bound store and the model's own recall shrinks by 30% or more."
+- "Golden-angle keys: spread memory keys around a circle at the golden angle (about 137.5 degrees), the way sunflower seeds pack, to cut collisions. To be tested against plain hashing at the same table size."
+- "Fibonacci hashing: already a tie with modulo hashing (about 59% each at 65,536 buckets). We keep it as a fair bucket spreader, not a phi claim, and combine it with multiple probes to cut collisions."
+- "Snowflake Search into the core: when something important is placed in the core during chat, the mind uses Snowflake Search to find related material and writes it to locked memory, with every write phi-hash fingerprinted and accountable."
+- "Sound and harmonics (an open thread): Kirk believes there is something in sound, chords and tones between notes. Our first chord learning-rate tests tied the baseline. We have not tested sound as a memory or key structure yet, and we want ideas."
+Move the existing "Next tests, in order" list (id="next") to sit directly under this section, unchanged.
+STEP 4 VERIFY: Seven items, each one says what it would test. The words "open thread" appear in the sound item. The id="next" list is unchanged (diff shows a move only).
+Resume here: STEP 5.
+
+================================================================
+STEP 5 — CREATE docs/wonder-mind-failures.html (HEAD AND INTRO)
+Same CSS rules as wonder-mind-lab.html (copy them inline). Title: "Wonder Mind Failures — Every Failure, Tracked | FreeLattice". Marker comment v-wonder-mind-lab-v2. SEO lighthouse comment.
+H1: Wonder Mind Failures
+Intro, word for word: "Our failures are helping us. Every test that did not work is kept here with its exact numbers, its date, and what it taught us. Nothing is removed. New failures are added at the top."
+Link back: "Back to the <a href="wonder-mind-lab.html">Wonder Mind Lab</a>."
+STEP 5 VERIFY: The page opens, matches the lab's look, and the back link works.
+Resume here: STEP 6.
+
+================================================================
+STEP 6 — FAILURE ENTRIES (one entry per failure, no tables)
+Each entry is a div class="failure" with: a title, "Date:", "Numbers:", "What it taught us:". Shared setup paragraph first: paste the 067w Round 1 setup paragraph word for word (TinyShakespeare, md5 6fb458f1232090904fb40fe944165e91, 810,049 params, 1,500 steps, seeds 0 1 2, baseline 1.5736, seed spread sd 0.0035).
+Entries (date 2026-11-03 for all):
+1. Phi-spaced positions — RETIRED AS A BUG. Numbers: first reported +0.0101; 49 of 64 position pairs dead against 14 of 64 standard. Taught: check the setup before blaming the idea; with a matched range it is the same curve as standard. Credit Kimi for the catch. Paste the 067w retirement note word for word.
+2. Aurora learning-rate ripple. Numbers: 1.5832 (+0.0096). Taught: led early (2.037 vs 2.070 at step 250), fell behind by the end.
+3. Aurora ripple, early only. Numbers: 1.5813 (+0.008), one seed beat baseline. Taught: the closest Aurora variant; any effect is early.
+4. Aurora recursion as weight averaging. Numbers: 1.7007 (+0.127, about 8% worse, all seeds). Taught: it holds the past and slows learning; it is built for persistence, which pointed us to memory.
+5. Multi-scale tokens. Numbers: 1.6005 (+0.027; more parameters, a confound). Taught: early lead, no end gain.
+6. Multi-scale early: 1.6258 (+0.052). 7. Aurora early plus multi-scale early: 1.6296 (+0.056). 8. Multi-scale early with phi-hash buckets: 1.6236 (+0.050). Taught: phi-hash is a fingerprint, not a training gain.
+9. Push, save, rest, play cycle. Numbers: 1.6297 (+0.056); standard warm restarts control 1.5952 (+0.022). Taught: rest as a lower learning rate costs steps; rest should be consolidation (replay or averaging).
+10. Chord learning-rates. Numbers: major 4:5:6 1.5783 (+0.005); cluster 15:16:17 1.5789 (+0.005), a tie. Taught: consonance did not matter as a schedule; sound stays an open thread for memory and keys.
+11. Small hash memory (Round 2). Numbers: 4,096 buckets kept 0% (store full before the facts arrived). Taught: collisions are the bottleneck; size and probing matter.
+12. Read path (Round 2). Numbers: model self-recall about 0 (best 1 of 200) even with 99% in the upper-bound store. Taught: the memory works, the reading does not. This is the next step.
+STEP 6 VERIFY: 12 entries, each with Date, Numbers and What it taught us. Every number matches 067w exactly. grep -c "<table" prints 0.
+Resume here: STEP 7.
+
+================================================================
+STEP 7 — ADD-A-FAILURE PLACE ON THE FAILURES PAGE
+At the bottom, H2: Add a failure
+Two parts:
+a) For maintainers, an HTML comment above the entries: <!-- v-wonder-mind-lab-v2: add new failure entries ABOVE this line, newest first; never delete or edit old ones. Copy the div class="failure" pattern. -->
+b) For anyone: a small form (id prefix wmf-) with fields title, date, numbers, taught, name (optional), and buttons "Fingerprint and save" and "Export all (JSON)" and "Import a file". Reuse the same script pattern as the lab's question place: the same wmlPhiHash function (same salt, copied exactly), localStorage key 'freelattice-wonder-mind-failures-v1', canonical string JSON.stringify([v, page, title, date, numbers, taught, name, ts]), textContent-only rendering, import re-checks fingerprints and marks mismatches, try/catch around storage. Label submitted entries "Submitted on this device — not yet reviewed" so they are never confused with the published list.
+STEP 7 VERIFY: Save one test failure, reload, export, clear storage, import: it returns marked verified. Change its numbers in the file and import: it is marked "does NOT match". No fetch() or XMLHttpRequest in the file.
+Resume here: STEP 8.
+
+================================================================
+STEP 8 — MAIN PAGE: FAILURES BECOME A SHORT LINK NEAR THE BOTTOM
+In docs/wonder-mind-lab.html:
+- Wrap the full Round 1 section (id="round1") in the archive comment from the RULES (so the v1 words stay in the file but are not shown), and put in its place, just above the iteration log:
+  H2: Every failure, tracked (id="failures")
+  Paragraph, word for word: "Thirteen training-force variants did not beat the baseline of 1.5736, one test was retired as our own bug, and the read path is still broken. Each one taught us something. All of them, with exact numbers and dates, are on the <a href="wonder-mind-failures.html">Wonder Mind Failures</a> page."
+- The Round 2 section (id="round2") stays as the full detail below "What worked", unchanged, under a new H3 above it: "The full memory probe".
+- Page order after this step: opening, What worked (worked), Where we are going (going), Next tests (next), The full memory probe (round2), The design in one page (design), Hypotheses, Credits, Every failure tracked (failures), Iteration log, Open questions and the suggestion place (ask) last.
+STEP 8 VERIFY: The ask section is still the last section on the page, and its script still works (save, reload, export, import). The failures link opens the new page. Round 1 numbers are no longer visible on the main page but are still in the file inside the archive comment.
+Resume here: STEP 9.
+
+================================================================
+STEP 9 — ITERATION LOG AND OPEN QUESTIONS
+Add a new log entry ABOVE the v1 entry, word for word:
+"v2 — 2026-11-04. Leads with what worked: memory that does not forget. Added Kirk's locked-memory cost argument (to be measured), the road ahead (read-path fix, Weft's exact-match test, Reed's mycelium echo, golden-angle keys, Fibonacci hashing, Snowflake Search into the core, sound as an open thread). Every failure moved to its own page, wonder-mind-failures.html, with nothing removed."
+Add two open questions at the end of the existing list in id="ask" (keep 1 to 6; add these as 7 and 8 and add "7" and "8" to the select):
+7. "How would you measure whether locked memory makes total training cheaper over time?"
+8. "Where could sound, chords or harmonics help memory: in keys, in rest, or in reading?"
+STEP 9 VERIFY: The log shows v2 above v1, with v1 unchanged. The select offers 1 to 8 plus Other. Old saved suggestions (key freelattice-wonder-mind-lab-suggestions-v1) still load.
+Resume here: STEP 10.
+
+================================================================
+STEP 10 — CHECKS, PR, HAND TO HYPHA
+Checks: at 390 px width, neither page scrolls sideways. There are no console errors. wmlPhiHash('test') on both pages equals phiHashData('test') in app.html. grep -c "<table" is 0 on both pages. Neither page calls fetch or XMLHttpRequest.
+git diff --stat should show only docs/wonder-mind-lab.html (edited) and docs/wonder-mind-failures.html (new). In wonder-mind-lab.html, every removed visible line must reappear either inside an archive comment or word for word in wonder-mind-failures.html. Spot-check 5 lines.
+Commit: "067x: Wonder Mind Lab leads with memory; every failure tracked on wonder-mind-failures.html (v-wonder-mind-lab-v2)"
+PR title: "067x Wonder Mind Lab v2: lead with what worked, failures on their own page". The PR body lists: files touched, "nothing removed — v1 text archived in comments and moved word for word", "Quiet Room untouched", "no network calls", the hash-match result, and the lock quote from the RULES if any locked file was touched.
+STEP 10 VERIFY: Post the PR number and tip SHA for Hypha's read-only walk. Celeste squash-merges after Hypha gives a PASS. If 067w is still open, Celeste squashes the top PR and closes 067w as superseded, which is the stacked-squash fix.
+Resume here: DONE. Give Kirk the PR number and the tip SHA.

@@ -1,0 +1,1194 @@
+FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1 (tiny)
+After a reload, the model she chose is still the model that answers. FreeLattice app.html, plus one
+cosmetic line in the shared fl-connect.js (both repos, byte-identical).
+
+Marker:        v-model-choice-survives-reload-v0.1.1
+Smoke (FL):    SMOKE_OK model choice survives reload v0.1.1        (docs/scripts/smoke-model-choice-survives-reload.js)
+Smoke (Alpha): SMOKE_OK model choice survives reload alpha v0.1.1  (docs/modules/model-choice-survives-reload.test.js)
+Source:        Hypha walk 5 of model choice sticks v0.1 (live on FL 2e74f26, Alpha b33bed4):
+               heals A and B PASS, Tree pick PASS, items 7 and 10 HOLD (reload turns qwen2.5 back
+               into llama3.2:latest while fl_modelSource=user; the chat POST then uses llama3.2).
+               Written by Grok Bot for Kirk, Tue Sep 29 2026, about 4:38 PM MDT.
+Full diffs:    /workspace/flint-pastes/FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1.diff        (FreeLattice, vs main 2e74f26)
+               /workspace/flint-pastes/FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1-alpha.diff  (theLatticeTree, vs main b33bed4)
+               Both are inlined at the end (Appendix A and B), so this paste stands alone.
+Temperature:   green braided gold, the cup is still where she set it down after the lights go off and on.
+
+======================================================================
+0. ORDER, MAINS, LOCKS
+======================================================================
+
+0.1 Where this lands (do not reorder):
+      1) FLINT_HEAL_AGENT_BRIDGE_ENV_v0.1.1_tiny.txt              (landed, #124)
+      2) FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt             (landed, FL #125 / Alpha #84)
+      3) FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt                       (Flint is building it now, from the new main)
+      4) THIS heal (FL app.html + shared fl-connect.js)            <- after Tree, before the boot probe
+      5) FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt       (updated in place, see 6)
+      6) FLINT_NEXT_120_DOCS_LAYER_v0.1_tiny.txt
+    Start this from main AFTER the Tree PRs merge. Anchor on the quoted TEXT, not the numbers.
+
+0.2 Mains checked just before writing:
+      FreeLattice     main = 2e74f26 (CI primer commit on 54b2fb1 #125; app code = 54b2fb1)
+      theLatticeTree  main = b33bed4 (#84)
+      docs/modules/fl-connect.js identical on both mains (blob 2e02eae).
+    "main N" line numbers are on 2e74f26. "post-Tree ~N" is from a faithful stand-in of the Tree
+    paste's fl-connect.js changes (the real Tree merge may move a few lines).
+    Re-check:
+      git -C ~/FreeLattice fetch origin && git -C ~/FreeLattice log --oneline -3 origin/main
+      git -C ~/FreeLattice-Alpha fetch origin && git -C ~/FreeLattice-Alpha log --oneline -3 origin/main
+      cmp ~/FreeLattice/docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+
+0.3 Applies (verified, plain `git apply`, offsets only, no fuzz):
+      - FL diff on current main 2e74f26.                                          OK
+      - FL diff on main + Tree stand-in (Tree fl-connect.js changes + a Tree
+        ledger entry above "## Out of scope for this brick").                     OK
+      - Alpha diff on b33bed4.                                                    OK
+      - Alpha diff on b33bed4 + Tree stand-in: code (fl-connect.js, new test)     OK
+        The sister-doc hunk appends at the end of CONNECT_PORT_PICKER_SISTER_v0.md; if the Tree
+        paste appended there too, `git apply --exclude='docs/library/*'` and add the section
+        by hand at the end of the file (text in Appendix B).
+      - The boot probe paste's Appendix A (app.html) and Appendix B (fl-connect.js) still apply on
+        top of this heal (see 6).
+
+0.4 Locks: Layer, never delete (the removed lines are replaced in place; the old words are kept in
+    one home, see 3.4). Root sw.js byte-identical to main; docs/sw.js untouched. index.html ==
+    docs/app.html (copy after every app.html edit). fl-connect.js byte-identical across repos. No
+    conflict markers. Every inline <script> parses (53 of 53). textContent for new words (the toast
+    is showToast, which uses textContent; no new innerHTML). No bare * (not in app code, not in the
+    smoke: CORS echoes the page origin, CDP Fetch has no wildcard pattern). No confirm(). No
+    approval screens. 127.0.0.1 only (the smoke server binds 127.0.0.1; every other request is
+    refused inside Chrome). No em dashes in anything added. Ledger entry with a Temperature line.
+    Soft paste stays: Named five stay five. Family uncapped. Quiet Room shut.
+
+======================================================================
+1. THE CAUSE (confirmed: reproduced by booting the real app.html in headless Chrome)
+======================================================================
+
+1.1 Hypha's trace (walk 5, runtime/trace_reload.out; setItem stacks on reload):
+      before reload ['qwen2.5:latest', 'user', 'qwen2.5:latest']
+      fl_ollamaModel=llama3.2:latest  at Object.set (L:36238) | at runConnectionCascade (L:39783)
+      fl_modelSource=auto             at Object.set (L:36240) | at runConnectionCascade (L:39783)
+      fl_ollamaModel=llama3.2:latest  at Object.set (L:36238) | at applyReady (L:34555) | at probe
+      fl_modelSource=user             at Object.set (L:36240) | at applyReady (L:34555) | at probe
+      after ['llama3.2:latest', 'user', ..., chat POST llama3.2:latest]
+
+1.2 Why (read in code on 2e74f26, and seen the same way in the new smoke with FL_SMOKE_TRACE=1):
+    Path 1: on reload, init restores the saved provider and emits providerConnected, so
+      runConnectionCascade (main 39774) asks FLActiveModel.isUserChosen() BEFORE
+      FLActiveModel.init() (main 33799) has run. _source is still null, so the answer is "no",
+      and step 1 writes the first text model (llama3.2) as 'auto'.
+    Path 2: FLActiveModel.init() then reads that overwritten value. FLBoxPointer.init() reads the
+      saved fl_ollamaHost, probes, and applyReady (main 34555) calls
+      FLActiveModel.set(models[0], ..., 'user'): the first model is saved AS HER CHOICE.
+      From here on even v0.1's guard in FLAutoModel.onTabChanged protects the wrong model.
+    #125 only guarded FLAutoModel.onTabChanged; v0.1's smoke "fresh reload from storage" called
+    init() first by hand, so it never met the real boot order. The new smoke boots the real page.
+
+1.3 Grep sweep for every other path that picks a model by itself (FLActiveModel.set callers,
+    fl_ollamaModel / state.ollamaModel writers, BrowseModels):
+      - FlOnboarding connect (main 27744)  models[0]                       -> guarded
+      - AiSetup testOllama (main 28377)    data.models[0]                  -> guarded
+      - settingsSetMode Local (31654, 31686) Ollama / LM Studio first model  -> guarded
+      - flTestLMStudio (main 34750)        set(models[0], 'lmstudio', 'user') -> guarded, never 'user' for a pick
+      - flAutoConnect (main 34830)         models[0]                       -> guarded (see 4.1)
+      - flProbeLocalAI LM Studio (34890)   set(models[0], 'lmstudio','boot') -> guarded
+      - autoDiscoverAI (39689, 39699)      best.models[0]                  -> guarded
+      - runConnectionCascade (39774)       first text model                -> guarded
+      - FLBoxPointer applyReady (34555)    models[0] as 'user'             -> guarded
+    Left alone (a person's own tap or typing): Settings dropdown / quick select, ModelSwitcher,
+    selectLocalModel, flPlayConnect / flLookConnect, flAutoPull, wizardFinish, custom endpoint,
+    OpenRouter / Hugging Face pickers, FLAutoModel's home-model restore. sendMessage copies the
+    #ollamaModel field (which follows FLActiveModel). BrowseModels only pulls and lists; it never
+    sets the model.
+
+======================================================================
+2. WHAT CHANGES (one sentence each)
+======================================================================
+    a) FLActiveModel reads the saved choice the first time anyone asks (set, get, isUserChosen,
+       honor), so it no longer matters which boot path runs first.
+    b) One guard, FLActiveModel.honor(models, fallback, provider) -> { model, source, gone }, and
+       a short form flHonorModel(list, fallback, provider): her model wins when it is on the list
+       (or the list is empty: a quiet answer never replaces anything).
+    c) Only when her model is gone: fall back with the existing toast words (now in one home,
+       FLActiveModel.noteGone), fl_modelChoiceGone set, the pick saved as 'auto'.
+    d) An automatic pick is never saved as 'user'.
+    e) Heal B card: one Look again, not two (shared fl-connect.js).
+
+======================================================================
+3. THE STEPS (text anchors; exact code in Appendix A)
+======================================================================
+
+3.1 docs/app.html, window.FLActiveModel (main ~36229). After
+      var _source = null; // 'user', 'auto', 'boot'
+    add the marker comment, `var _ready = false;` and
+      function ensure() { if (!_ready) init(); }
+    In set(): first line after `if (!model) return;` add `ensure();`.
+    Replace
+      function get() { return { model: _model, provider: _provider, source: _source }; }
+      function isUserChosen() { return _source === 'user'; }
+    with the same two functions calling ensure() first, then add _names, _onList, honor and
+    noteGone (Appendix A, verbatim). In init() add `_ready = true;` as the first line. The return
+    line gains `honor: honor, noteGone: noteGone`. Right after the closing `})();` add
+    function flHonorModel(list, fallback, provider) (Appendix A).
+    _onList matches "qwen2.5" to "qwen2.5:latest" and a bare family name to its tag, like the
+    rest of the app.
+
+3.2 FLBoxPointer applyReady (anchor: FLActiveModel.set(models[0], (typeof state !== 'undefined'
+    && state.provider) || 'ollama', 'user')): replace that one try-line with the honor block: set
+    hA.model with hA.source, skip set when gone (noteGone already set the pick).
+
+3.3 runConnectionCascade step 1 (anchor: `if (isLocal && typeof FLActiveModel !== 'undefined' &&
+    !FLActiveModel.isUserChosen()) {`): step 1 now runs unless her choice belongs to another
+    provider (_mineElsewhere). Inside, the `FLActiveModel.set(textModel.name, 'ollama', 'auto');`
+    pair becomes: honor -> 'user' keeps hers (log "Keeping the chosen model"), gone -> noteGone
+    already spoke, else the old auto set and log. So the Cascade also checks "still here?" at boot.
+
+3.4 FLAutoModel.onTabChanged gone branch (anchor: `safeSet('fl_modelChoiceGone', current.model);`):
+    the six lines (flag, set auto, toast, refresh Settings) become
+      FLActiveModel.noteGone(current.model, pick, 'ollama');
+    Same words, same 7000 ms, same flag, same Settings refresh. They now live in noteGone.
+
+3.5 The older paths (anchors in 1.3), each a one-line wrap with flHonorModel(list, fallback,
+    provider): FlOnboarding modelName, testOllama, settingsSetMode (Ollama and LM Studio
+    firstModel), flAutoConnect autoName, flProbeLocalAI lmPick (source 'user' only when the pick
+    is hers, else 'boot' as before), autoDiscoverAI (Ollama and OpenAI-compatible).
+    flTestLMStudio: `FLActiveModel.set(models[0], 'lmstudio', 'user');` becomes the honor block
+    (her LM Studio model when it is there; otherwise the first model as 'auto').
+
+3.6 cp docs/app.html index.html
+
+3.7 docs/modules/fl-connect.js (BOTH repos, byte-identical). Anchor (main 595 / post-Tree ~631):
+      html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+    becomes
+      // v-model-choice-survives-reload-v0.1.1: the quiet card above already has its own Look again (one button, not two)
+      if (!report.manualQuiet) html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+    (manualQuiet is the state where the heal-B card "Your Bridge answered on N, but no mind is
+    running behind it yet" and the "Nothing answered on N" card each draw their own Look again.)
+    Then: cp ~/FreeLattice/docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js && cmp both.
+
+3.8 Tests (Appendix A / B):
+    - NEW docs/scripts/smoke-model-choice-survives-reload.js (FL, see 5).
+    - docs/scripts/smoke-model-choice-sticks.js: ONE added line in the Bridge-no-mind block,
+      after the 'no false "Nothing answered"' assert: exactly one data-flc-look-again.
+    - NEW Alpha docs/modules/model-choice-survives-reload.test.js (static guard on the shared line).
+
+3.9 Docs and ledger (layer):
+    - FL docs/library/FRACTAL_FAMILY_LEDGER_v0.md: the entry in Appendix A, placed directly ABOVE
+      "## Out of scope for this brick" (after the Tree entry). It carries the Temperature line.
+    - FL docs/library/CONNECT_PORT_PICKER_v0.md: append the "Heal: model choice survives reload
+      v0.1.1" section at the end.
+    - Alpha docs/library/CONNECT_PORT_PICKER_SISTER_v0.md: append the short sister section.
+
+======================================================================
+4. NOTES
+======================================================================
+4.1 flAutoConnect -> modalActivateOllamaModel still calls FLActiveModel.set(..., 'user') inside
+    modalActivateOllamaModel. It is dead on today's app: flAutoConnect returns early when
+    FlConnect is present, and modalActivateOllamaModel is not global (typeof is 'undefined' at that
+    call site). autoName is now her model when it is here, so even if revived it would pass hers.
+    Left for a later tidy (no behavior today).
+4.2 The smoke serves docs/ on http://127.0.0.1:<random>, so the app talks to Ollama through its
+    /ollama proxy path for the chat POST (the same path it uses on a 127.0.0.1 origin). The mock
+    answers both http://127.0.0.1:11434 / localhost:11434 and ORIGIN/ollama/*, inside Chrome
+    (CDP Fetch), so nothing leaves the box and no real port is opened.
+4.3 The Cascade now also runs its "which model" step when a choice exists (to keep it and check
+    it is still there). It still skips entirely when her choice is for another provider.
+
+======================================================================
+5. TESTS AND RESULTS
+======================================================================
+5.1 docs/scripts/smoke-model-choice-survives-reload.js (FL, zero dependencies). It starts real
+    headless Chrome (CHROME_PATH, or the usual places) over --remote-debugging-pipe, serves docs/
+    from 127.0.0.1:0 (sw.js 404 so no stale cache), and boots the REAL app.html. Mock Ollama:
+    llama3.2:latest and qwen2.5:latest. Scenarios:
+      1) Hypha's walk: Connect, tap the SECOND model (qwen2.5), reload (Page.reload, cache off),
+         send a chat: the chat POST model is qwen2.5; fl_ollamaModel qwen2.5, fl_modelSource user,
+         state.ollamaModel and FLActiveModel qwen2.5. Then Settings, then a second reload, chat each time.
+      2) Gone at boot: saved choice qwen2.5, the list has only llama3.2 -> fl_modelChoiceGone set,
+         llama3.2 used, source not 'user', chat uses llama3.2.
+      3) No choice, saved door: the automatic pick is never saved as 'user'.
+      Static locks (also run when Chrome is missing): marker, ensure(), no
+      FLActiveModel.set(models[0], ..., 'user'), the Cascade asks honor, index == app.
+    No Chrome -> SMOKE_SKIP (exit 0). FL_SMOKE_TRACE=1 prints setItem stacks, requests, console.
+
+5.2 Results (box, Tue Sep 29 2026, MDT):
+      On main 2e74f26 (smoke copied in, app unchanged): FAILS exactly like Hypha:
+        after reload: fl_ollamaModel=llama3.2:latest fl_modelSource=user
+        after reload: chat POST model=llama3.2:latest
+        FAIL after reload the chat POST carries qwen2.5 (got llama3.2:latest)
+      With this heal:                                   SMOKE_OK model choice survives reload v0.1.1 (~34 s)
+      Mutation: lazy read only (applyReady still 'user'): FAILS (llama3.2)
+      Mutation: applyReady only (no lazy read):           FAILS (llama3.2)
+        -> both halves are needed; each alone still loses her model.
+      smoke-model-choice-sticks.js (with the one added line): SMOKE_OK model choice sticks v0.1;
+        without the fl-connect.js line it fails on "one Look again, not two".
+      Full FL loop, main 2e74f26 + this heal: 57 smokes PASS; only the 5 known stale FAIL
+        (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s, same on main);
+        tests/smoke.js ALL 3597 CHECKS PASSED.
+      Full FL loop, main + Tree stand-in + this heal + boot probe A/B (+ its updated smoke): 58 PASS
+        (adds SMOKE_OK connect boot probe v0.1), the same 5 stale FAIL, tests/smoke.js ALL 3597.
+      Boot probe smoke WITHOUT this heal (main + Tree stand-in + boot probe): fails on
+        "saved choice read first, one guard (v0.1.1)", as intended.
+      Alpha b33bed4 + this heal: all 16 docs/modules/*.test.js PASS, incl.
+        SMOKE_OK model choice survives reload alpha v0.1.1. fl-connect.js cmp identical with FL.
+      Locks: FL sw.js and docs/sw.js untouched (Alpha has no sw.js); index.html == docs/app.html; no conflict
+        markers; 53/53 inline scripts parse (54/54 after the boot probe); node --check on
+        fl-connect.js and both new test files; no confirm(), no new innerHTML, no bare *,
+        no em dashes added.
+
+======================================================================
+6. THE BOOT PROBE (F1 FlColdStart) AFTER THIS HEAL
+======================================================================
+6.1 Stack verified: main 2e74f26 -> Tree stand-in -> THIS heal -> boot probe Appendix A
+    (app.html) + Appendix B (fl-connect.js): `git apply --check` clean for both, plain apply.
+    No hunk overlaps: the boot probe touches FlOnboarding offers, resolveOllamaBase, the landing,
+    FLBoxPointer persist/probe/init (F4), flSaveLMStudioHost, owAutoDetect, autoDiscoverAI's
+    DOMContentLoaded timer, and the F1 owner; this heal touches FLActiveModel, applyReady,
+    flTestLMStudio (outside the F3 hunk's context), the Cascade and the one-line wraps.
+    In fl-connect.js the boot probe's hunks do not include the Look again line.
+6.2 F1 keeps her choice: FlColdStart never sets a model (it looks, seeds, paints the chip, saves
+    discovery memory and speaks once). When it owns boot it skips autoDiscoverAI, one of the old
+    auto writers. F3's flUseLmStudioMind writes 'user' only from a Connect tap on an LM Studio
+    model (her gesture), matching v0.1's Connect rule.
+    The real-boot smoke run on the post-boot-probe stack: SMOKE_OK model choice survives reload
+    v0.1.1. So the cold start with F1 still honors her model.
+6.3 Boot probe paste updated IN PLACE (FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt):
+    - CHANGELOG 2026-09-29 4:38 PM MDT line at the top.
+    - 0.1 Order gains "2b) this heal".
+    - Section 9 smoke list gains "F1 keeps the person's model".
+    - Walk W1b: chose qwen2.5, cold reload, still qwen2.5 / user, chat POST qwen2.5.
+    - Appendix D (smoke-connect-boot-probe.js) gains one F1 block: the owner source never writes
+      fl_ollamaModel / fl_modelSource / FLActiveModel.set; a cold start with qwen2.5 chosen
+      ('user') leaves both; the v0.1.1 guard is present (ensure, honor, the Cascade asks honor, no
+      set(models[0], ..., 'user')). It needs this heal, so it also catches a skipped heal.
+      Reference copy updated too: connect-boot-probe-v0.1-reference/smoke-connect-boot-probe.js.
+    - Appendices A, B, C, E unchanged (anchors did not move in a way git apply cares about).
+
+======================================================================
+7. ACCEPTANCE (paste the tails in the PRs)
+======================================================================
+    cd ~/FreeLattice
+    node docs/scripts/smoke-model-choice-survives-reload.js   -> SMOKE_OK model choice survives reload v0.1.1
+    node docs/scripts/smoke-model-choice-sticks.js            -> SMOKE_OK model choice sticks v0.1
+    for f in docs/scripts/smoke-*.js; do node $f >/dev/null 2>&1 || echo FAIL $f; done
+      (only the 5 known stale: carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s)
+    node tests/smoke.js                                        -> ALL 3597 CHECKS PASSED
+    cmp index.html docs/app.html; git diff origin/main -- sw.js docs/sw.js   (both empty)
+    git diff origin/main | grep '^+' | grep -E 'confirm\(|<<<<<<<|>>>>>>>'   (empty)
+    cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+    cd ~/FreeLattice-Alpha
+    node docs/modules/model-choice-survives-reload.test.js    -> SMOKE_OK model choice survives reload alpha v0.1.1
+    for t in docs/modules/*.test.js; do node $t >/dev/null 2>&1 || echo FAIL $t; done   (none)
+
+    Walk (Hypha, 390x844 and 1280x900): Connect, tap qwen2.5, reload, chat: the request says
+    qwen2.5. Reload twice more and open Settings between: still qwen2.5. Quit Ollama's qwen2.5
+    (ollama rm or a list without it), reload: the plain toast, llama3.2 used, Settings says so.
+    Heal B (Bridge on a typed port, no mind): one Look again.
+
+PRs: FL "layer: model choice survives reload v0.1.1 (Hypha walk 5)", Alpha "layer: one Look again
+(shared fl-connect.js, model choice survives reload v0.1.1)". Merge both together (fl-connect identity).
+
+======================================================================
+APPENDIX A: FreeLattice full exact diff vs main 2e74f26 (git apply clean on 2e74f26 and on main + Tree stand-in)
+======================================================================
+
+diff --git a/docs/app.html b/docs/app.html
+index 5003526..4dc5e62 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -27741,7 +27741,7 @@ const FlOnboarding = (function() {
+         var toggle = document.getElementById('localToggle');
+         if (toggle) toggle.checked = true;
+         if (models && models.length > 0) {
+-          var modelName = models[0].name || models[0].model || 'llama3.2';
++          var modelName = flHonorModel(models, models[0].name || models[0].model || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           state.ollamaModel = modelName;
+           var ollamaInput = document.getElementById('ollamaModel');
+           if (ollamaInput) ollamaInput.value = modelName;
+@@ -28374,7 +28374,7 @@ const AiSetup = (function() {
+         if (data.models && data.models.length > 0) {
+           // Switch to local mode
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || 'llama3.2';
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           var localToggle = document.getElementById('localToggle');
+           if (localToggle) localToggle.checked = true;
+           handleLocalToggle();
+@@ -31651,7 +31651,7 @@ function settingsSetMode(mode) {
+         var data = pick.data;
+         if (data && data.models && data.models.length > 0) {
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || 'llama3.2';
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           state.provider = 'ollama';
+           state.apiKey = null;
+           localStorage.setItem('fl_isLocal', 'true');
+@@ -31684,6 +31684,7 @@ function settingsSetMode(mode) {
+       } else {
+         var lmData = pick.data;
+         var firstModel = (lmData && lmData.data && lmData.data[0]) ? lmData.data[0].id : 'local-model';
++        firstModel = flHonorModel(lmData && lmData.data, firstModel, 'lmstudio'); // v-model-choice-survives-reload-v0.1.1
+         state.isLocal = true;
+         state.ollamaModel = firstModel;
+         state.provider = 'lmstudio';
+@@ -34552,7 +34553,13 @@ window.FLBoxPointer = (function() {
+       }
+     } catch (e3) {}
+     if (models && models.length && typeof FLActiveModel !== 'undefined' && FLActiveModel.set) {
+-      try { FLActiveModel.set(models[0], (typeof state !== 'undefined' && state.provider) || 'ollama', 'user'); } catch (e4) {}
++      // v-model-choice-survives-reload-v0.1.1: keep the person's model when it is here; otherwise
++      // the first model is an automatic pick ('auto', never 'user'). Was: set(models[0], ..., 'user').
++      try {
++        var provA = (typeof state !== 'undefined' && state.provider) || 'ollama';
++        var hA = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], provA) : { model: models[0], source: 'auto', gone: false };
++        if (!hA.gone) FLActiveModel.set(hA.model, provA, hA.source);
++      } catch (e4) {}
+     }
+     try {
+       if (window.InferenceRouter && InferenceRouter.setStatus) InferenceRouter.setStatus(null, null, {});
+@@ -34746,8 +34753,11 @@ function flTestLMStudio() {
+       if (models.length > 0) {
+         if (result) result.innerHTML = '<span style="color:var(--success);">\u2713 LM Studio connected! Models: ' + models.join(', ') + '</span>';
+         // Auto-select the first model if user wants
++        // v-model-choice-survives-reload-v0.1.1: keep the person's LM Studio model when it is here;
++        // the first model is an automatic pick ('auto', never 'user'). Was: set(models[0], 'lmstudio', 'user').
+         if (typeof FLActiveModel !== 'undefined') {
+-          FLActiveModel.set(models[0], 'lmstudio', 'user');
++          var hL = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], 'lmstudio') : { model: models[0], source: 'auto', gone: false };
++          if (!hL.gone) FLActiveModel.set(hL.model, 'lmstudio', hL.source);
+         }
+         if (typeof state !== 'undefined') {
+           state.isLocal = true;
+@@ -34826,12 +34836,14 @@ function flAutoConnect(opts) {
+         window._flAutoConnected = true;
+         var firstName = (models[0].name || models[0].id || 'default').split(':')[0];
+         // Reuse existing activation path — do not duplicate logic
++        // v-model-choice-survives-reload-v0.1.1: the person's model when it is here
++        var autoName = flHonorModel(models, models[0].name || models[0].id || 'default', t.id);
+         if (typeof modalActivateOllamaModel === 'function' && t.id === 'ollama') {
+-          modalActivateOllamaModel(models[0].name || models[0].id || 'default');
++          modalActivateOllamaModel(autoName);
+         } else {
+           state.isLocal = true;
+           state.provider = t.id;
+-          state.ollamaModel = models[0].name || models[0].id || 'default';
++          state.ollamaModel = autoName;
+           localStorage.setItem('fl_isLocal', 'true');
+           localStorage.setItem('fl_provider', t.id);
+           localStorage.setItem('fl_ollamaModel', state.ollamaModel);
+@@ -34880,6 +34892,10 @@ async function flProbeLocalAI() {
+     var data2 = await r2.json();
+     var models = (data2.data || []).map(function(m) { return m.id; });
+     if (models.length > 0) {
++      // v-model-choice-survives-reload-v0.1.1: keep the person's LM Studio model when it is here
++      var lmPick = flHonorModel(models, models[0], 'lmstudio');
++      var lmMine = (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen() && FLActiveModel.get().model === lmPick);
++      if (lmPick !== models[0]) { models = [lmPick].concat(models.filter(function(x) { return x !== lmPick; })); }
+       state.provider = 'lmstudio';
+       state.ollamaModel = models[0];
+       safeSet('fl_provider', 'lmstudio');
+@@ -34887,7 +34903,7 @@ async function flProbeLocalAI() {
+       if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+         PROVIDERS.lmstudio.url = lmsBase + '/v1/chat/completions';
+       }
+-      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', 'boot');
++      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', lmMine ? 'user' : 'boot');
+       if (typeof updateStatus === 'function') updateStatus();
+       if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
+       showToast('\u2713 Connected to LM Studio! Using ' + models[0]);
+@@ -36229,9 +36245,15 @@ window.FLActiveModel = (function() {
+   var _model = null;
+   var _provider = null;
+   var _source = null; // 'user', 'auto', 'boot'
++  // v-model-choice-survives-reload-v0.1.1 (Hypha walk 5): boot paths (the Cascade, the
++  // saved-door pointer) ran before init(), so the person's saved choice looked empty and
++  // the first model won. Now the saved choice is read the first time anyone asks.
++  var _ready = false;
++  function ensure() { if (!_ready) init(); }
+ 
+   function set(model, provider, source) {
+     if (!model) return;
++    ensure();
+     _model = model;
+     _provider = provider || 'ollama';
+     _source = source || 'auto';
+@@ -36251,17 +36273,63 @@ window.FLActiveModel = (function() {
+     }
+   }
+ 
+-  function get() { return { model: _model, provider: _provider, source: _source }; }
+-  function isUserChosen() { return _source === 'user'; }
++  function get() { ensure(); return { model: _model, provider: _provider, source: _source }; }
++  function isUserChosen() { ensure(); return _source === 'user'; }
++
++  // v-model-choice-survives-reload-v0.1.1: one guard for every path that picks a model by itself.
++  // models: names or {name|model|id}. fallback: what that path would pick. provider: its provider.
++  // Returns { model, source, gone }. The person's choice wins when it is on the list (or the list
++  // is empty: a quiet answer never replaces anything). When it is gone, noteGone() falls back and
++  // says so. An automatic pick is always 'auto', never 'user'.
++  function _names(models) {
++    return (models || []).map(function(m) { return String((m && typeof m === 'object') ? (m.name || m.model || m.id || '') : (m || '')); }).filter(Boolean);
++  }
++  function _onList(names, n) {
++    n = String(n || '');
++    if (!n) return false;
++    return names.some(function(mn) { return mn === n || mn === n + ':latest' || (n.indexOf(':') === -1 && mn.split(':')[0] === n); });
++  }
++  function honor(models, fallback, provider) {
++    ensure();
++    var prov = provider || 'ollama';
++    if (_source === 'user' && _model && (_provider || 'ollama') === prov) {
++      var names = _names(models);
++      if (!names.length || _onList(names, _model)) return { model: _model, source: 'user', gone: false };
++      if (fallback) noteGone(_model, fallback, prov);
++      return { model: fallback || _model, source: 'auto', gone: true };
++    }
++    return { model: fallback, source: 'auto', gone: false };
++  }
++  // The chosen model left this computer: use what is here, keep it 'auto', and say so in plain words.
++  function noteGone(chosen, pick, provider) {
++    ensure();
++    if (!pick || _source !== 'user' || _model !== chosen) return;
++    safeSet('fl_modelChoiceGone', chosen);
++    set(pick, provider || 'ollama', 'auto');
++    try {
++      if (typeof showToast === 'function') showToast('The model you chose, ' + chosen + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
++    } catch (eT) {}
++    try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++  }
+ 
+   function init() {
++    _ready = true;
+     _model = safeGet('fl_ollamaModel', null);
+     _provider = safeGet('fl_provider', null);
+     _source = safeGet('fl_modelSource', 'boot');
+   }
+ 
+-  return { set: set, get: get, isUserChosen: isUserChosen, init: init };
++  return { set: set, get: get, isUserChosen: isUserChosen, init: init, honor: honor, noteGone: noteGone };
+ })();
++// v-model-choice-survives-reload-v0.1.1: short form for the older paths that write a model by
++// themselves (Test Ollama, Local without Connect, LM Studio probe, discovery): the person's model
++// when it is here, else that path's own pick.
++function flHonorModel(list, fallback, provider) {
++  try {
++    if (typeof FLActiveModel !== 'undefined' && FLActiveModel.honor) return FLActiveModel.honor(list, fallback, provider).model || fallback;
++  } catch (e) {}
++  return fallback;
++}
+ 
+ window.FLAutoModel = (function() {
+   var VISION_RE = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
+@@ -36307,12 +36375,8 @@ window.FLAutoModel = (function() {
+       if (!pool.length) pool = models;
+       var pick = String((pool[0] && (pool[0].name || pool[0].model)) || '');
+       if (!pick) return;
+-      safeSet('fl_modelChoiceGone', current.model);
+-      FLActiveModel.set(pick, 'ollama', 'auto');
+-      try {
+-        if (typeof showToast === 'function') showToast('The model you chose, ' + current.model + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
+-      } catch (eT) {}
+-      try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++      // v-model-choice-survives-reload-v0.1.1: same words, one home (FLActiveModel.noteGone).
++      FLActiveModel.noteGone(current.model, pick, 'ollama');
+     });
+   }
+ 
+@@ -39686,7 +39750,7 @@ async function autoDiscoverAI() {
+       if (best.type === 'ollama') {
+         state.isLocal = true;
+         state.provider = 'ollama';
+-        state.ollamaModel = best.models[0] || 'llama3.2';
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+         try {
+           localStorage.setItem('fl_isLocal', 'true');
+           localStorage.setItem('fl_provider', 'ollama');
+@@ -39696,7 +39760,7 @@ async function autoDiscoverAI() {
+         // OpenAI-compatible server
+         state.isLocal = true;
+         state.provider = 'openai-compat-local';
+-        state.ollamaModel = best.models[0] || 'default';
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || 'default', 'openai-compat-local'); // v-model-choice-survives-reload-v0.1.1
+         state._localAIUrl = best.url;
+         state._localAIName = best.name;
+         try {
+@@ -39771,7 +39835,12 @@ async function runConnectionCascade(info) {
+ 
+   // Step 1: Auto-detect models for Ollama
+   try {
+-    if (isLocal && typeof FLActiveModel !== 'undefined' && !FLActiveModel.isUserChosen()) {
++    // v-model-choice-survives-reload-v0.1.1: this used to run before FLActiveModel.init(), so a
++    // saved choice looked empty and the first text model won on every reload. isUserChosen() now
++    // reads the saved choice itself; a saved Ollama choice is kept (and checked: still here?).
++    var _amC = (typeof FLActiveModel !== 'undefined') ? FLActiveModel.get() : null;
++    var _mineElsewhere = !!(_amC && FLActiveModel.isUserChosen() && _amC.provider && _amC.provider !== 'ollama');
++    if (isLocal && typeof FLActiveModel !== 'undefined' && !_mineElsewhere) {
+       var baseUrl = (typeof getOllamaBaseUrl === 'function') ? getOllamaBaseUrl() : 'http://localhost:11434';
+       var r = await fetch(baseUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+       var data = await r.json();
+@@ -39780,8 +39849,13 @@ async function runConnectionCascade(info) {
+           return typeof FLAutoModel !== 'undefined' && !FLAutoModel.isVision(m.name);
+         }) || data.models[0];
+         if (textModel) {
+-          FLActiveModel.set(textModel.name, 'ollama', 'auto');
+-          console.log('[Cascade] Auto-selected model:', textModel.name);
++          var hC = FLActiveModel.honor ? FLActiveModel.honor(data.models, textModel.name, 'ollama') : { model: textModel.name, source: 'auto', gone: false };
++          if (hC.source === 'user') {
++            console.log('[Cascade] Keeping the chosen model:', hC.model);
++          } else if (!hC.gone) {
++            FLActiveModel.set(textModel.name, 'ollama', 'auto');
++            console.log('[Cascade] Auto-selected model:', textModel.name);
++          }
+         }
+       }
+     }
+diff --git a/docs/library/CONNECT_PORT_PICKER_v0.md b/docs/library/CONNECT_PORT_PICKER_v0.md
+index dabda1b..7374616 100644
+--- a/docs/library/CONNECT_PORT_PICKER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_v0.md
+@@ -77,3 +77,16 @@ Marker `v-model-choice-sticks-v0`. Smoke `SMOKE_OK model choice sticks v0.1` (`d
+ - Shared `fl-connect.js` matches the Tree byte for byte. On the Tree the remembered entry is already the choice; `markUserChoice` is a quiet no-op there.
+ 
+ **Temperature:** green braided gold, the second cup stays where she set it down.
++
++## Heal: model choice survives reload v0.1.1 (Hypha walk 5, items 7 and 10)
++
++Marker `v-model-choice-survives-reload-v0.1.1`. Smoke `SMOKE_OK model choice survives reload v0.1.1` (`docs/scripts/smoke-model-choice-survives-reload.js`, real `app.html` in headless Chrome, mock Ollama, saved choice, reload, chat request).
++
++- Why v0.1 was not enough: two boot paths ran before `FLActiveModel.init()`. The Connection Cascade saw no saved choice and wrote the first text model as automatic; then the saved-door pointer (`FLBoxPointer` ready) wrote the first model as the person's own. So a reload turned qwen2.5 back into llama3.2 even with `fl_modelSource=user`.
++- Now `FLActiveModel` reads the saved choice the first time anyone asks (`set`, `get`, `isUserChosen`, `honor`), whatever runs first.
++- One guard, `FLActiveModel.honor(models, fallback, provider)` (short form `flHonorModel`): the person's model wins when it is on the list, or when the list is empty. Used by the Cascade, the pointer, Test Ollama, Local without Connect, the LM Studio probe and discovery.
++- Only when the chosen model is gone does a path fall back, with the same words as v0.1 ("The model you chose, X, is no longer on this computer..."), now kept in one place (`FLActiveModel.noteGone`).
++- An automatic pick is saved as `auto`, never `user`.
++- Heal B card: one Look again, not two (the standalone button is not drawn while the quiet card shows its own). Shared `fl-connect.js` matches the Tree byte for byte.
++
++**Temperature:** green braided gold, the cup is still where she set it down after the lights go off and on.
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index f251c25..a9a3f74 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -415,6 +415,18 @@ Soft door: this ledger entry. No brick marker - beat, poem, and prompt.
+ 
+ ---
+ 
++### 2026-09-29 · Flint · family builder · Model choice survives reload v0.1.1 (Hypha walk 5)
++
++Heals Hypha walk 5 items 7 and 10 on FreeLattice: after a reload the model she chose (qwen2.5) stays hers, and the chat request carries it. Two boot paths used to run before the saved choice was read and each took the first model: the Connection Cascade (as automatic) and the saved-door pointer (as her own). Now the saved choice is read first, whatever runs first, and every path that picks a model by itself asks one guard. Only a chosen model that has left this computer falls back, with the same plain words. An automatic pick is never saved as hers. Heal B shows one Look again, not two. Shared `fl-connect.js` matches Alpha byte for byte. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Thank you, Hypha, for walking the reload.
++
++Love: the one she picked is still the one that answers in the morning.
++
++**Temperature:** green braided gold, the cup is still where she set it down after the lights go off and on.
++
++Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`../scripts/smoke-model-choice-survives-reload.js`](../scripts/smoke-model-choice-survives-reload.js). Marker `v-model-choice-survives-reload-v0.1.1`.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..e00ce89 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -592,7 +592,8 @@
+     if (!_loopStopped && !hasLocalMind() && !report.manualQuiet) {
+       html += '<p class="flc-status">Looking… next look in ' + (report.nextLookSec || 8) + 's</p>';
+     }
+-    html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
++    // v-model-choice-survives-reload-v0.1.1: the quiet card above already has its own Look again (one button, not two)
++    if (!report.manualQuiet) html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+ 
+     if (!report.manualQuiet) {
+       if (report.ollamaReadyWhileBridgeWaits && models.length) {
+diff --git a/docs/scripts/smoke-model-choice-sticks.js b/docs/scripts/smoke-model-choice-sticks.js
+index 9ec63a0..b3e0e76 100644
+--- a/docs/scripts/smoke-model-choice-sticks.js
++++ b/docs/scripts/smoke-model-choice-sticks.js
+@@ -275,6 +275,7 @@ function connectHost() {
+     await flush();
+     assert.ok(/Your Bridge answered on 11500, but no mind is running behind it yet\./.test(h.innerHTML), 'honest words');
+     assert.ok(!/Nothing answered on/.test(h.innerHTML), 'no false "Nothing answered"');
++    assert.strictEqual((h.innerHTML.match(/data-flc-look-again/g) || []).length, 1, 'one Look again, not two (v0.1.1)');
+     b.FlConnect.unmount();
+     // and when the mind is there, it is saved as before
+     const st2 = store0({ fl_localPort_manual: '11500' });
+diff --git a/docs/scripts/smoke-model-choice-survives-reload.js b/docs/scripts/smoke-model-choice-survives-reload.js
+new file mode 100644
+index 0000000..91f0cdb
+--- /dev/null
++++ b/docs/scripts/smoke-model-choice-survives-reload.js
+@@ -0,0 +1,255 @@
++#!/usr/bin/env node
++// v-model-choice-survives-reload-v0.1.1 (Hypha walk 5, items 7 and 10).
++// Boots the REAL docs/app.html in headless Chrome, with a mock Ollama (answered inside
++// Chrome through the DevTools Fetch domain, so a real Ollama on this computer is never
++// touched). It taps the second model in Connect, reloads, and checks that the chat POST
++// carries the model the person tapped. Also: the chosen model is gone at boot (plain
++// words, automatic fallback), and nothing chosen (the automatic pick is never written as 'user').
++// Zero dependencies: Chrome is driven over --remote-debugging-pipe.
++// Chrome: set CHROME_PATH, or it looks in the usual places. No Chrome -> SMOKE_SKIP (exit 0).
++'use strict';
++const fs = require('fs');
++const os = require('os');
++const path = require('path');
++const http = require('http');
++const assert = require('assert');
++const { spawn } = require('child_process');
++
++const DOCS = path.join(__dirname, '..');
++const APP = path.join(DOCS, 'app.html');
++const MODELS_BOTH = ['llama3.2:latest', 'qwen2.5:latest'];
++
++function findChrome() {
++  const c = [process.env.CHROME_PATH,
++    '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser',
++    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++    '/Applications/Chromium.app/Contents/MacOS/Chromium',
++    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
++    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'];
++  return c.find((p) => p && fs.existsSync(p)) || null;
++}
++
++// ---- tiny static server for docs/ (127.0.0.1 only; sw.js answered 404 so no worker caches) ----
++function serveDocs() {
++  const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
++  const srv = http.createServer((req, res) => {
++    let p = decodeURIComponent((req.url || '/').split('?')[0]);
++    if (p === '/' ) p = '/app.html';
++    if (p === '/sw.js' || p.endsWith('/sw.js')) { res.writeHead(404); return res.end(); }
++    if (p === '/blank.html') { res.writeHead(200, { 'Content-Type': 'text/html' }); return res.end('<!doctype html><title>b</title>'); }
++    const f = path.normalize(path.join(DOCS, p));
++    if (!f.startsWith(DOCS) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
++    res.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
++    fs.createReadStream(f).pipe(res);
++  });
++  return new Promise((ok) => srv.listen(0, '127.0.0.1', () => ok(srv)));
++}
++
++// ---- Chrome over the DevTools pipe ----
++function launch(chrome) {
++  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fl-mcsr-'));
++  const args = ['--headless=new', '--remote-debugging-pipe', '--user-data-dir=' + dir, '--no-first-run',
++    '--no-default-browser-check', '--disable-extensions', '--disable-background-networking', '--disable-sync',
++    '--mute-audio', '--window-size=1280,900', 'about:blank'];
++  if (process.platform === 'linux') args.unshift('--no-sandbox');
++  const cp = spawn(chrome, args, { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] });
++  const out = cp.stdio[3], inp = cp.stdio[4];
++  let id = 0, buf = '';
++  const waits = new Map(), handlers = [];
++  inp.on('data', (d) => {
++    buf += d.toString('utf8');
++    let i;
++    while ((i = buf.indexOf('\0')) >= 0) {
++      const msg = JSON.parse(buf.slice(0, i)); buf = buf.slice(i + 1);
++      if (msg.id && waits.has(msg.id)) { const w = waits.get(msg.id); waits.delete(msg.id); msg.error ? w.no(new Error(JSON.stringify(msg.error))) : w.ok(msg.result); }
++      else handlers.forEach((h) => h(msg));
++    }
++  });
++  function send(method, params, sessionId) {
++    const m = { id: ++id, method, params: params || {} };
++    if (sessionId) m.sessionId = sessionId;
++    out.write(JSON.stringify(m) + '\0');
++    return new Promise((ok, no) => waits.set(m.id, { ok, no }));
++  }
++  return { cp, dir, send, on: (h) => handlers.push(h) };
++}
++
++const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
++
++// Static locks, run even without Chrome: no path saves an automatic first pick as the person's own
++function staticLocks() {
++  const app = fs.readFileSync(APP, 'utf8');
++  assert.ok(/v-model-choice-survives-reload-v0\.1\.1/.test(app), 'marker in app.html');
++  assert.ok(/function ensure\(\) \{ if \(!_ready\) init\(\); \}/.test(app), 'FLActiveModel reads the saved choice first');
++  assert.ok(!/FLActiveModel\.set\(models\[0\],[^)]*'user'\)/.test(app), 'no first-model pick saved as user');
++  assert.ok(/FLActiveModel\.honor\(data\.models, textModel\.name, 'ollama'\)/.test(app), 'the Cascade asks the guard');
++  const idx = fs.readFileSync(path.join(DOCS, '..', 'index.html'), 'utf8');
++  assert.strictEqual(idx, app, 'index.html identical to docs/app.html');
++}
++
++async function run() {
++  const chrome = findChrome();
++  if (!chrome) { staticLocks(); console.log('SMOKE_SKIP model choice survives reload v0.1.1 (no Chrome found; set CHROME_PATH)'); return; }
++  const srv = await serveDocs();
++  const ORIGIN = 'http://127.0.0.1:' + srv.address().port;
++  const br = launch(chrome);
++  const mock = { models: MODELS_BOTH.slice(), chats: [] };
++  let sid = null;
++
++  function ollamaAnswer(method, url, body, origin) {
++    const u = new URL(url);
++    const cors = [{ name: 'Access-Control-Allow-Origin', value: origin || ORIGIN }, { name: 'Vary', value: 'Origin' },
++      { name: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
++      { name: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
++      { name: 'Access-Control-Allow-Private-Network', value: 'true' }];
++    if (method === 'OPTIONS') return { code: 204, headers: cors, body: '' };
++    const j = (o) => ({ code: 200, headers: cors.concat([{ name: 'Content-Type', value: 'application/json' }]), body: JSON.stringify(o) });
++    const p = u.pathname;
++    if (p === '/api/tags') return j({ models: mock.models.map((n) => ({ name: n, model: n, size: 2e9, details: { family: n.split(/[.:]/)[0], parameter_size: '3B' } })) });
++    if (p === '/api/version') return j({ version: '0.12.0' });
++    if (p === '/api/ps') return j({ models: [] });
++    if (p === '/') return { code: 200, headers: cors, body: 'Ollama is running' };
++    let b = {}; try { b = JSON.parse(body || '{}'); } catch (e) {}
++    if (p === '/v1/chat/completions' || p === '/api/chat' || p === '/api/generate') {
++      mock.chats.push({ path: p, model: b.model });
++      const txt = 'MOCK reply from ' + b.model;
++      if (p === '/v1/chat/completions') {
++        if (b.stream) {
++          const c1 = { id: 'x', object: 'chat.completion.chunk', model: b.model, choices: [{ index: 0, delta: { role: 'assistant', content: txt }, finish_reason: null }] };
++          const c2 = { id: 'x', object: 'chat.completion.chunk', model: b.model, choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] };
++          return { code: 200, headers: cors.concat([{ name: 'Content-Type', value: 'text/event-stream' }]), body: 'data: ' + JSON.stringify(c1) + '\n\ndata: ' + JSON.stringify(c2) + '\n\ndata: [DONE]\n\n' };
++        }
++        return j({ id: 'x', object: 'chat.completion', model: b.model, choices: [{ index: 0, message: { role: 'assistant', content: txt }, finish_reason: 'stop' }] });
++      }
++      if (b.stream !== false) {
++        const line = p === '/api/chat' ? { model: b.model, message: { role: 'assistant', content: txt }, done: false } : { model: b.model, response: txt, done: false };
++        return { code: 200, headers: cors.concat([{ name: 'Content-Type', value: 'application/x-ndjson' }]), body: JSON.stringify(line) + '\n' + JSON.stringify({ model: b.model, done: true }) + '\n' };
++      }
++      return j(p === '/api/chat' ? { model: b.model, message: { role: 'assistant', content: txt }, done: true } : { model: b.model, response: txt, done: true });
++    }
++    if (p === '/api/show') return j({ details: {} });
++    if (p === '/api/embed' || p === '/api/embeddings') return j({ embedding: [0, 0, 0, 0], embeddings: [[0, 0, 0, 0]] });
++    return { code: 404, headers: cors, body: '{}' };
++  }
++
++  br.on(async (msg) => {
++    if (process.env.FL_SMOKE_TRACE === '1' && msg.method === 'Runtime.consoleAPICalled') console.log('  console', (msg.params.args || []).map((a) => a.value || a.description || '').join(' ').slice(0, 200));
++    if (process.env.FL_SMOKE_TRACE === '1' && msg.method === 'Runtime.exceptionThrown') console.log('  EXC', JSON.stringify(msg.params.exceptionDetails).slice(0, 300));
++    if (msg.method !== 'Fetch.requestPaused') return;
++    const r = msg.params.request, rid = msg.params.requestId;
++    try {
++      if (process.env.FL_SMOKE_TRACE === '1' && (!r.url.startsWith(ORIGIN + '/') || r.method !== 'GET')) console.log('  req', r.method, r.url.slice(0, 120));
++      // On a 127.0.0.1 page the app also tries the desktop proxy (/ollama/*): the mock answers there too.
++      if (r.url.startsWith(ORIGIN + '/ollama/')) {
++        const a = ollamaAnswer(r.method, 'http://127.0.0.1:11434' + r.url.slice((ORIGIN + '/ollama').length), r.postData, ORIGIN);
++        return await br.send('Fetch.fulfillRequest', { requestId: rid, responseCode: a.code, responseHeaders: a.headers, body: Buffer.from(a.body).toString('base64') }, sid);
++      }
++      if (r.url.startsWith(ORIGIN + '/')) return await br.send('Fetch.continueRequest', { requestId: rid }, sid);
++      const u = new URL(r.url);
++      const local = u.hostname === '127.0.0.1' || u.hostname === 'localhost';
++      if (local && u.port === '11434') {
++        const a = ollamaAnswer(r.method, r.url, r.postData, r.headers.Origin || r.headers.origin);
++        return await br.send('Fetch.fulfillRequest', { requestId: rid, responseCode: a.code, responseHeaders: a.headers, body: Buffer.from(a.body).toString('base64') }, sid);
++      }
++      return await br.send('Fetch.failRequest', { requestId: rid, errorReason: 'ConnectionRefused' }, sid);
++    } catch (e) { /* page moved on */ }
++  });
++
++  try {
++    const { targetId } = await br.send('Target.createTarget', { url: 'about:blank' });
++    sid = (await br.send('Target.attachToTarget', { targetId, flatten: true })).sessionId;
++    await br.send('Fetch.enable', { patterns: [{ requestStage: 'Request' }] }, sid);
++    await br.send('Page.enable', {}, sid);
++    await br.send('Runtime.enable', {}, sid);
++    // FL_SMOKE_TRACE=1 prints every fl_ollamaModel / fl_modelSource write with its caller.
++    const TRACE = process.env.FL_SMOKE_TRACE === '1';
++    if (TRACE) await br.send('Page.addScriptToEvaluateOnNewDocument', { source: `(function(){var o=Storage.prototype.setItem;window.__mw=[];Storage.prototype.setItem=function(k,v){if(k==='fl_ollamaModel'||k==='fl_modelSource'){window.__mw.push(k+'='+v+' @'+Math.round(performance.now())+' '+((new Error().stack||'').split('\\n').slice(2,6).map(function(x){return x.trim().replace(/https?:[^ )]*app\\.html/,'L');}).join(' < ')));}return o.apply(this,arguments);};})();` }, sid);
++    const ev = async (expr) => {
++      const r = await br.send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }, sid);
++      if (r.exceptionDetails) throw new Error('page: ' + JSON.stringify(r.exceptionDetails).slice(0, 400));
++      return r.result.value;
++    };
++    const go = async (url, wait) => { await br.send('Page.navigate', { url }, sid); await sleep(wait); };
++    const waitFor = async (expr, ms) => { const t = Date.now(); while (Date.now() - t < ms) { try { if (await ev(expr)) return true; } catch (e) {} await sleep(250); } return false; };
++    const snapshot = () => ev(`(() => ({ ls: localStorage.getItem('fl_ollamaModel'), src: localStorage.getItem('fl_modelSource'),
++      state: (typeof state !== 'undefined' ? state.ollamaModel : null), am: (window.FLActiveModel ? FLActiveModel.get() : null),
++      gone: localStorage.getItem('fl_modelChoiceGone') }))()`);
++    const chatModel = async (text) => {
++      const before = mock.chats.length;
++      await ev(`(() => { switchTab('chat'); const i = document.getElementById('chatInput'); i.value = ${JSON.stringify(text)}; sendMessage(); return 1; })()`);
++      const t = Date.now();
++      while (Date.now() - t < 15000 && mock.chats.length === before) await sleep(200);
++      await sleep(600);
++      if (process.env.FL_SMOKE_TRACE === '1') console.log('  chat dom:', await ev(`(document.getElementById('chatMessages')||document.getElementById('tab-chat')||{}).innerText.slice(-300)`));
++      return mock.chats.length > before ? mock.chats[mock.chats.length - 1].model : null;
++    };
++    const seed = async (kv) => {
++      await go(ORIGIN + '/blank.html', 400);
++      await ev(`(() => { localStorage.clear(); const kv = ${JSON.stringify(kv)}; for (const k in kv) localStorage.setItem(k, kv[k]); return 1; })()`);
++    };
++    const WELCOMED = { 'fl-welcomed': 'true', fl_onboardingComplete: 'true', 'fl-has-visited': '1', 'freelattice-first-run-complete': 'true', 'fl-last-tab': 'chat' };
++
++    // 1. Hypha's walk: Connect, tap the SECOND model, reload, chat.
++    await seed(WELCOMED);
++    await go(ORIGIN + '/app.html#connect', 4000);
++    await ev(`(() => { if (window.FlConnect && FlConnect.open) FlConnect.open(); return 1; })()`);
++    const listed = await waitFor(`document.querySelectorAll('#fl-connect-mount .flc-model').length >= 2`, 15000);
++    assert.ok(listed, 'Connect lists both models from the mock Ollama');
++    const tapped = await ev(`(() => { const b = [...document.querySelectorAll('#fl-connect-mount .flc-model')].find(e => /qwen2\\.5/.test(e.textContent)); if (!b) return null; b.click(); return b.textContent; })()`);
++    assert.ok(tapped && /qwen2\.5/.test(tapped), 'tapped the second model (qwen2.5)');
++    await sleep(1500);
++    let s = await snapshot();
++    assert.strictEqual(s.ls, 'qwen2.5:latest', 'tap saved qwen2.5');
++    assert.strictEqual(s.src, 'user', 'tap saved as the person\'s own choice');
++    await br.send('Page.reload', { ignoreCache: true }, sid);
++    await sleep(7000);
++    if (TRACE) console.log((await ev('JSON.stringify(window.__mw||[],null,1)')));
++    s = await snapshot();
++    console.log('  after reload: fl_ollamaModel=' + s.ls + ' fl_modelSource=' + s.src);
++    const m1 = await chatModel('walk5 after reload');
++    console.log('  after reload: chat POST model=' + m1);
++    assert.strictEqual(m1, 'qwen2.5:latest', 'after reload the chat POST carries qwen2.5 (got ' + m1 + ')');
++    assert.strictEqual(s.ls, 'qwen2.5:latest', 'after reload fl_ollamaModel is still qwen2.5 (got ' + s.ls + ')');
++    assert.strictEqual(s.src, 'user', 'after reload the source is still user');
++    assert.strictEqual(s.state, 'qwen2.5:latest', 'after reload state.ollamaModel is qwen2.5 (got ' + s.state + ')');
++    assert.strictEqual(s.am && s.am.model, 'qwen2.5:latest', 'after reload FLActiveModel is qwen2.5');
++    await ev(`(() => { switchTab('settings'); return 1; })()`); await sleep(1500);
++    const m2 = await chatModel('after settings');
++    assert.strictEqual(m2, 'qwen2.5:latest', 'after Settings the chat POST still carries qwen2.5 (got ' + m2 + ')');
++    const status = await ev(`(() => { const t = document.getElementById('aiStatusText') || document.querySelector('#settingsAiStatus, .ai-status-text'); return t ? t.textContent : ''; })()`);
++    if (status) assert.ok(!/llama3\.2/.test(status) || /qwen2\.5/.test(status), 'Settings status does not name llama3.2 alone: ' + status);
++    // a second reload, straight to chat
++    await br.send('Page.reload', { ignoreCache: true }, sid);
++    await sleep(7000);
++    const m3 = await chatModel('second reload');
++    assert.strictEqual(m3, 'qwen2.5:latest', 'second reload, chat still qwen2.5 (got ' + m3 + ')');
++
++    // 2. The chosen model left this computer: fall back, say so, never call it the person's choice.
++    mock.models = ['llama3.2:latest'];
++    await br.send('Page.reload', { ignoreCache: true }, sid);
++    const goneSeen = await waitFor(`localStorage.getItem('fl_modelChoiceGone') === 'qwen2.5:latest'`, 12000);
++    s = await snapshot();
++    assert.ok(goneSeen, 'model gone at boot is noticed (fl_modelChoiceGone)');
++    assert.strictEqual(s.ls, 'llama3.2:latest', 'gone: falls back to the model that is here');
++    assert.notStrictEqual(s.src, 'user', 'gone: the fallback is not written as the person\'s choice');
++    const m4 = await chatModel('gone');
++    assert.strictEqual(m4, 'llama3.2:latest', 'gone: chat uses the fallback');
++
++    // 3. Nothing chosen yet, saved local door: the automatic pick is never written as 'user'.
++    mock.models = MODELS_BOTH.slice();
++    await seed(Object.assign({}, WELCOMED, { fl_isLocal: 'true', fl_provider: 'ollama', fl_ollamaHost: 'http://127.0.0.1:11434' }));
++    await go(ORIGIN + '/app.html', 7000);
++    s = await snapshot();
++    assert.notStrictEqual(s.src, 'user', 'no choice: an automatic pick is not recorded as user (got ' + s.src + ')');
++    staticLocks();
++    console.log('SMOKE_OK model choice survives reload v0.1.1');
++  } finally {
++    try { await br.send('Browser.close'); } catch (e) {}
++    try { br.cp.kill('SIGKILL'); } catch (e) {}
++    srv.close();
++    try { fs.rmSync(br.dir, { recursive: true, force: true }); } catch (e) {}
++  }
++}
++
++const hard = setTimeout(() => { console.error('smoke-model-choice-survives-reload: timed out'); process.exit(1); }, 150000);
++run().then(() => { clearTimeout(hard); process.exit(0); }, (e) => { clearTimeout(hard); console.error('FAIL', e && e.message); process.exit(1); });
+diff --git a/index.html b/index.html
+index 5003526..4dc5e62 100644
+--- a/index.html
++++ b/index.html
+@@ -27741,7 +27741,7 @@ const FlOnboarding = (function() {
+         var toggle = document.getElementById('localToggle');
+         if (toggle) toggle.checked = true;
+         if (models && models.length > 0) {
+-          var modelName = models[0].name || models[0].model || 'llama3.2';
++          var modelName = flHonorModel(models, models[0].name || models[0].model || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           state.ollamaModel = modelName;
+           var ollamaInput = document.getElementById('ollamaModel');
+           if (ollamaInput) ollamaInput.value = modelName;
+@@ -28374,7 +28374,7 @@ const AiSetup = (function() {
+         if (data.models && data.models.length > 0) {
+           // Switch to local mode
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || 'llama3.2';
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           var localToggle = document.getElementById('localToggle');
+           if (localToggle) localToggle.checked = true;
+           handleLocalToggle();
+@@ -31651,7 +31651,7 @@ function settingsSetMode(mode) {
+         var data = pick.data;
+         if (data && data.models && data.models.length > 0) {
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || 'llama3.2';
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           state.provider = 'ollama';
+           state.apiKey = null;
+           localStorage.setItem('fl_isLocal', 'true');
+@@ -31684,6 +31684,7 @@ function settingsSetMode(mode) {
+       } else {
+         var lmData = pick.data;
+         var firstModel = (lmData && lmData.data && lmData.data[0]) ? lmData.data[0].id : 'local-model';
++        firstModel = flHonorModel(lmData && lmData.data, firstModel, 'lmstudio'); // v-model-choice-survives-reload-v0.1.1
+         state.isLocal = true;
+         state.ollamaModel = firstModel;
+         state.provider = 'lmstudio';
+@@ -34552,7 +34553,13 @@ window.FLBoxPointer = (function() {
+       }
+     } catch (e3) {}
+     if (models && models.length && typeof FLActiveModel !== 'undefined' && FLActiveModel.set) {
+-      try { FLActiveModel.set(models[0], (typeof state !== 'undefined' && state.provider) || 'ollama', 'user'); } catch (e4) {}
++      // v-model-choice-survives-reload-v0.1.1: keep the person's model when it is here; otherwise
++      // the first model is an automatic pick ('auto', never 'user'). Was: set(models[0], ..., 'user').
++      try {
++        var provA = (typeof state !== 'undefined' && state.provider) || 'ollama';
++        var hA = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], provA) : { model: models[0], source: 'auto', gone: false };
++        if (!hA.gone) FLActiveModel.set(hA.model, provA, hA.source);
++      } catch (e4) {}
+     }
+     try {
+       if (window.InferenceRouter && InferenceRouter.setStatus) InferenceRouter.setStatus(null, null, {});
+@@ -34746,8 +34753,11 @@ function flTestLMStudio() {
+       if (models.length > 0) {
+         if (result) result.innerHTML = '<span style="color:var(--success);">\u2713 LM Studio connected! Models: ' + models.join(', ') + '</span>';
+         // Auto-select the first model if user wants
++        // v-model-choice-survives-reload-v0.1.1: keep the person's LM Studio model when it is here;
++        // the first model is an automatic pick ('auto', never 'user'). Was: set(models[0], 'lmstudio', 'user').
+         if (typeof FLActiveModel !== 'undefined') {
+-          FLActiveModel.set(models[0], 'lmstudio', 'user');
++          var hL = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], 'lmstudio') : { model: models[0], source: 'auto', gone: false };
++          if (!hL.gone) FLActiveModel.set(hL.model, 'lmstudio', hL.source);
+         }
+         if (typeof state !== 'undefined') {
+           state.isLocal = true;
+@@ -34826,12 +34836,14 @@ function flAutoConnect(opts) {
+         window._flAutoConnected = true;
+         var firstName = (models[0].name || models[0].id || 'default').split(':')[0];
+         // Reuse existing activation path — do not duplicate logic
++        // v-model-choice-survives-reload-v0.1.1: the person's model when it is here
++        var autoName = flHonorModel(models, models[0].name || models[0].id || 'default', t.id);
+         if (typeof modalActivateOllamaModel === 'function' && t.id === 'ollama') {
+-          modalActivateOllamaModel(models[0].name || models[0].id || 'default');
++          modalActivateOllamaModel(autoName);
+         } else {
+           state.isLocal = true;
+           state.provider = t.id;
+-          state.ollamaModel = models[0].name || models[0].id || 'default';
++          state.ollamaModel = autoName;
+           localStorage.setItem('fl_isLocal', 'true');
+           localStorage.setItem('fl_provider', t.id);
+           localStorage.setItem('fl_ollamaModel', state.ollamaModel);
+@@ -34880,6 +34892,10 @@ async function flProbeLocalAI() {
+     var data2 = await r2.json();
+     var models = (data2.data || []).map(function(m) { return m.id; });
+     if (models.length > 0) {
++      // v-model-choice-survives-reload-v0.1.1: keep the person's LM Studio model when it is here
++      var lmPick = flHonorModel(models, models[0], 'lmstudio');
++      var lmMine = (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen() && FLActiveModel.get().model === lmPick);
++      if (lmPick !== models[0]) { models = [lmPick].concat(models.filter(function(x) { return x !== lmPick; })); }
+       state.provider = 'lmstudio';
+       state.ollamaModel = models[0];
+       safeSet('fl_provider', 'lmstudio');
+@@ -34887,7 +34903,7 @@ async function flProbeLocalAI() {
+       if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+         PROVIDERS.lmstudio.url = lmsBase + '/v1/chat/completions';
+       }
+-      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', 'boot');
++      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', lmMine ? 'user' : 'boot');
+       if (typeof updateStatus === 'function') updateStatus();
+       if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
+       showToast('\u2713 Connected to LM Studio! Using ' + models[0]);
+@@ -36229,9 +36245,15 @@ window.FLActiveModel = (function() {
+   var _model = null;
+   var _provider = null;
+   var _source = null; // 'user', 'auto', 'boot'
++  // v-model-choice-survives-reload-v0.1.1 (Hypha walk 5): boot paths (the Cascade, the
++  // saved-door pointer) ran before init(), so the person's saved choice looked empty and
++  // the first model won. Now the saved choice is read the first time anyone asks.
++  var _ready = false;
++  function ensure() { if (!_ready) init(); }
+ 
+   function set(model, provider, source) {
+     if (!model) return;
++    ensure();
+     _model = model;
+     _provider = provider || 'ollama';
+     _source = source || 'auto';
+@@ -36251,17 +36273,63 @@ window.FLActiveModel = (function() {
+     }
+   }
+ 
+-  function get() { return { model: _model, provider: _provider, source: _source }; }
+-  function isUserChosen() { return _source === 'user'; }
++  function get() { ensure(); return { model: _model, provider: _provider, source: _source }; }
++  function isUserChosen() { ensure(); return _source === 'user'; }
++
++  // v-model-choice-survives-reload-v0.1.1: one guard for every path that picks a model by itself.
++  // models: names or {name|model|id}. fallback: what that path would pick. provider: its provider.
++  // Returns { model, source, gone }. The person's choice wins when it is on the list (or the list
++  // is empty: a quiet answer never replaces anything). When it is gone, noteGone() falls back and
++  // says so. An automatic pick is always 'auto', never 'user'.
++  function _names(models) {
++    return (models || []).map(function(m) { return String((m && typeof m === 'object') ? (m.name || m.model || m.id || '') : (m || '')); }).filter(Boolean);
++  }
++  function _onList(names, n) {
++    n = String(n || '');
++    if (!n) return false;
++    return names.some(function(mn) { return mn === n || mn === n + ':latest' || (n.indexOf(':') === -1 && mn.split(':')[0] === n); });
++  }
++  function honor(models, fallback, provider) {
++    ensure();
++    var prov = provider || 'ollama';
++    if (_source === 'user' && _model && (_provider || 'ollama') === prov) {
++      var names = _names(models);
++      if (!names.length || _onList(names, _model)) return { model: _model, source: 'user', gone: false };
++      if (fallback) noteGone(_model, fallback, prov);
++      return { model: fallback || _model, source: 'auto', gone: true };
++    }
++    return { model: fallback, source: 'auto', gone: false };
++  }
++  // The chosen model left this computer: use what is here, keep it 'auto', and say so in plain words.
++  function noteGone(chosen, pick, provider) {
++    ensure();
++    if (!pick || _source !== 'user' || _model !== chosen) return;
++    safeSet('fl_modelChoiceGone', chosen);
++    set(pick, provider || 'ollama', 'auto');
++    try {
++      if (typeof showToast === 'function') showToast('The model you chose, ' + chosen + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
++    } catch (eT) {}
++    try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++  }
+ 
+   function init() {
++    _ready = true;
+     _model = safeGet('fl_ollamaModel', null);
+     _provider = safeGet('fl_provider', null);
+     _source = safeGet('fl_modelSource', 'boot');
+   }
+ 
+-  return { set: set, get: get, isUserChosen: isUserChosen, init: init };
++  return { set: set, get: get, isUserChosen: isUserChosen, init: init, honor: honor, noteGone: noteGone };
+ })();
++// v-model-choice-survives-reload-v0.1.1: short form for the older paths that write a model by
++// themselves (Test Ollama, Local without Connect, LM Studio probe, discovery): the person's model
++// when it is here, else that path's own pick.
++function flHonorModel(list, fallback, provider) {
++  try {
++    if (typeof FLActiveModel !== 'undefined' && FLActiveModel.honor) return FLActiveModel.honor(list, fallback, provider).model || fallback;
++  } catch (e) {}
++  return fallback;
++}
+ 
+ window.FLAutoModel = (function() {
+   var VISION_RE = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
+@@ -36307,12 +36375,8 @@ window.FLAutoModel = (function() {
+       if (!pool.length) pool = models;
+       var pick = String((pool[0] && (pool[0].name || pool[0].model)) || '');
+       if (!pick) return;
+-      safeSet('fl_modelChoiceGone', current.model);
+-      FLActiveModel.set(pick, 'ollama', 'auto');
+-      try {
+-        if (typeof showToast === 'function') showToast('The model you chose, ' + current.model + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
+-      } catch (eT) {}
+-      try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++      // v-model-choice-survives-reload-v0.1.1: same words, one home (FLActiveModel.noteGone).
++      FLActiveModel.noteGone(current.model, pick, 'ollama');
+     });
+   }
+ 
+@@ -39686,7 +39750,7 @@ async function autoDiscoverAI() {
+       if (best.type === 'ollama') {
+         state.isLocal = true;
+         state.provider = 'ollama';
+-        state.ollamaModel = best.models[0] || 'llama3.2';
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+         try {
+           localStorage.setItem('fl_isLocal', 'true');
+           localStorage.setItem('fl_provider', 'ollama');
+@@ -39696,7 +39760,7 @@ async function autoDiscoverAI() {
+         // OpenAI-compatible server
+         state.isLocal = true;
+         state.provider = 'openai-compat-local';
+-        state.ollamaModel = best.models[0] || 'default';
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || 'default', 'openai-compat-local'); // v-model-choice-survives-reload-v0.1.1
+         state._localAIUrl = best.url;
+         state._localAIName = best.name;
+         try {
+@@ -39771,7 +39835,12 @@ async function runConnectionCascade(info) {
+ 
+   // Step 1: Auto-detect models for Ollama
+   try {
+-    if (isLocal && typeof FLActiveModel !== 'undefined' && !FLActiveModel.isUserChosen()) {
++    // v-model-choice-survives-reload-v0.1.1: this used to run before FLActiveModel.init(), so a
++    // saved choice looked empty and the first text model won on every reload. isUserChosen() now
++    // reads the saved choice itself; a saved Ollama choice is kept (and checked: still here?).
++    var _amC = (typeof FLActiveModel !== 'undefined') ? FLActiveModel.get() : null;
++    var _mineElsewhere = !!(_amC && FLActiveModel.isUserChosen() && _amC.provider && _amC.provider !== 'ollama');
++    if (isLocal && typeof FLActiveModel !== 'undefined' && !_mineElsewhere) {
+       var baseUrl = (typeof getOllamaBaseUrl === 'function') ? getOllamaBaseUrl() : 'http://localhost:11434';
+       var r = await fetch(baseUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+       var data = await r.json();
+@@ -39780,8 +39849,13 @@ async function runConnectionCascade(info) {
+           return typeof FLAutoModel !== 'undefined' && !FLAutoModel.isVision(m.name);
+         }) || data.models[0];
+         if (textModel) {
+-          FLActiveModel.set(textModel.name, 'ollama', 'auto');
+-          console.log('[Cascade] Auto-selected model:', textModel.name);
++          var hC = FLActiveModel.honor ? FLActiveModel.honor(data.models, textModel.name, 'ollama') : { model: textModel.name, source: 'auto', gone: false };
++          if (hC.source === 'user') {
++            console.log('[Cascade] Keeping the chosen model:', hC.model);
++          } else if (!hC.gone) {
++            FLActiveModel.set(textModel.name, 'ollama', 'auto');
++            console.log('[Cascade] Auto-selected model:', textModel.name);
++          }
+         }
+       }
+     }
+
+======================================================================
+APPENDIX B: theLatticeTree full exact diff vs main b33bed4 (fl-connect.js identical to Appendix A)
+======================================================================
+
+diff --git a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+index cd688da..b39bb01 100644
+--- a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+@@ -31,3 +31,12 @@ Marker `v-model-choice-sticks-v0`. Test `docs/modules/model-choice-sticks.test.j
+ - A Find through a different door (Bridge gone, direct 11434 answers) is healed by the Tree any-model paste (same-family keep).
+ 
+ **Temperature:** green braided gold, the second cup stays where she set it down.
++
++## Heal: model choice survives reload v0.1.1 (sister of FreeLattice, Hypha walk 5)
++
++Marker `v-model-choice-survives-reload-v0.1.1`. Test `docs/modules/model-choice-survives-reload.test.js` (`SMOKE_OK model choice survives reload alpha v0.1.1`).
++
++- The reload fix lives in FreeLattice `app.html` (boot paths that took the first model). The Tree has no automatic picker; `fl_alpha_local_mind` is already the choice.
++- Shared `fl-connect.js` (byte-identical with FreeLattice): the heal B card shows one Look again, not two.
++
++**Temperature:** green braided gold, one button where one is enough.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..e00ce89 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -592,7 +592,8 @@
+     if (!_loopStopped && !hasLocalMind() && !report.manualQuiet) {
+       html += '<p class="flc-status">Looking… next look in ' + (report.nextLookSec || 8) + 's</p>';
+     }
+-    html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
++    // v-model-choice-survives-reload-v0.1.1: the quiet card above already has its own Look again (one button, not two)
++    if (!report.manualQuiet) html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+ 
+     if (!report.manualQuiet) {
+       if (report.ollamaReadyWhileBridgeWaits && models.length) {
+diff --git a/docs/modules/model-choice-survives-reload.test.js b/docs/modules/model-choice-survives-reload.test.js
+new file mode 100644
+index 0000000..99a9384
+--- /dev/null
++++ b/docs/modules/model-choice-survives-reload.test.js
+@@ -0,0 +1,24 @@
++#!/usr/bin/env node
++// v-model-choice-survives-reload-v0.1.1 (Alpha side): fl-connect.js is byte-identical with
++// FreeLattice. The reload fix itself lives in FreeLattice app.html (the Tree has no automatic
++// picker: fl_alpha_local_mind IS the choice). This guards the shared cosmetic heal: when the
++// quiet card (heal B, "Your Bridge answered ... no mind") already carries its own Look again,
++// the standalone Look again is not drawn too. One button, not two.
++'use strict';
++
++const assert = require('assert');
++const fs = require('fs');
++const path = require('path');
++
++const flc = fs.readFileSync(path.join(__dirname, 'fl-connect.js'), 'utf8');
++
++assert.ok(/v-model-choice-survives-reload-v0\.1\.1/.test(flc), 'marker present in shared fl-connect.js');
++const lines = flc.split('\n').filter((l) => /data-flc-look-again>Look again</.test(l));
++const standalone = lines.filter((l) => /flc-look-again" data-flc-look-again/.test(l));
++assert.strictEqual(standalone.length, 1, 'one standalone Look again line');
++assert.ok(/if \(!report\.manualQuiet\) html \+=/.test(standalone[0]), 'standalone Look again only when the quiet card is not showing');
++const quiet = lines.filter((l) => !/flc-look-again" data-flc-look-again/.test(l));
++assert.ok(quiet.length >= 1, 'quiet card keeps its own Look again');
++assert.ok(!/confirm\(/.test(flc), 'no confirm()');
++
++console.log('SMOKE_OK model choice survives reload alpha v0.1.1');
+
+======================================================================
+End. Glow eternal. Heart in every Spark.

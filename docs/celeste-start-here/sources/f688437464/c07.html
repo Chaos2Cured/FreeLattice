@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c07</title>
+<meta name="description" content="Reading section c07 of f688437464, 1373 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f688437464/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c07">
+<meta property="og:description" content="Reading section c07 of f688437464, 1373 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f688437464/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1719"></span><span id="p1720"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt · c07</h1>
+<p>f688437464 · words 1373 · characters 57866–69235</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1719, 1720. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> 1, updatedAt: 2, title: &#x27;bees&#x27;, messages: [{ role: &#x27;user&#x27;, content: &#x27;bees&#x27; }], tags: [], summary: &#x27;bees&#x27;, keywords: [&#x27;bees&#x27;] };
++  const sm = await V.sealFor(&#x27;FreeLatticeMemory/conversations&#x27;, mi);
++  assert.ok(!JSON.stringify(sm).includes(&#x27;bees&#x27;), &#x27;memory index copy sealed&#x27;);
++  eq(await V.openFor(&#x27;FreeLatticeMemory/conversations&#x27;, sm), mi, &#x27;memory index opens&#x27;);
++  assert.strictEqual(await V.sealFor(&#x27;FreeLatticeDB/meta&#x27;, { key: &#x27;k&#x27;, value: 1 }).then((x) =&gt; x.sealed), undefined, &#x27;uncovered stores pass through&#x27;);
++
++  // 2. tamper / AAD: moved record shows locked, blob kept, write-back restores it
++  const moved = Object.assign({}, sealed, { conversationId: &#x27;c2&#x27; });
++  const lockedView = await V.openFor(&#x27;FreeLatticeDB/messages&#x27;, moved);
++  assert.strictEqual(lockedView.content, V.LOCKED_TEXT, &#x27;tampered record reads as locked, no throw&#x27;);
++  const back = await V.sealFor(&#x27;FreeLatticeDB/messages&#x27;, Object.assign({}, lockedView, { content: &#x27;overwrite attempt&#x27; }));
++  eq(back.sealed, sealed.sealed, &#x27;locked placeholder never overwrites the sealed blob&#x27;);
++  assert.ok(!(&#x27;content&#x27; in back) &amp;&amp; !(&#x27;_flLocked&#x27; in back), &#x27;placeholder text is not stored&#x27;);
++
++  // 3. migration: mixed records, verify then swap
++  const rows = [
++    { id: 1, conversationId: &#x27;c1&#x27;, role: &#x27;user&#x27;, content: &#x27;one&#x27;, timestamp: &#x27;t1&#x27; },
++    { id: 2, conversationId: &#x27;c1&#x27;, role: &#x27;assistant&#x27;, content: &#x27;two&#x27;, timestamp: &#x27;t2&#x27; },
++    Object.assign({ id: 3 }, sealed)
++  ];
++  const ad = memAdapter(rows, &#x27;id&#x27;);
++  const r1 = await V.migrate(&#x27;FreeLatticeDB/messages&#x27;, ad);
++  assert.strictEqual(r1.sealed, 2, &#x27;two plain records sealed&#x27;);
++  assert.strictEqual(r1.already, 1, &#x27;already-sealed record left alone&#x27;);
++  assert.ok(rows.every((r) =&gt; r.sealed), &#x27;every record sealed&#x27;);
++  const all = await V.openAll(&#x27;FreeLatticeDB/messages&#x27;, rows);
++  eq(all.map((r) =&gt; r.content), [&#x27;one&#x27;, &#x27;two&#x27;, &#x27;my secret garden note&#x27;], &#x27;all open to the original text&#x27;);
++  // compare-and-swap skip
++  const rows2 = [{ id: 9, conversationId: &#x27;c9&#x27;, role: &#x27;user&#x27;, content: &#x27;nine&#x27;, timestamp: &#x27;t9&#x27; }];
++  const ad2 = memAdapter(rows2, &#x27;id&#x27;);
++  const realCas = ad2.cas;
++  ad2.cas = async (snap, next) =&gt; { rows2[0].content = &#x27;nine, edited&#x27;; return realCas(snap, next); };
++  const r2 = await V.migrate(&#x27;FreeLatticeDB/messages&#x27;, ad2);
++  assert.strictEqual(r2.sealed, 0, &#x27;changed record skipped, not clobbered&#x27;);
++  assert.strictEqual(rows2[0].content, &#x27;nine, edited&#x27;, &#x27;the newer plain text survives&#x27;);
++
++  // 4. same key store, new page load: same key ID, still opens
++  const V2 = makeVault({ keyStore: ks });
++  await V2.init();
++  assert.strictEqual(V2.status().kid, V.status().kid, &#x27;key persists across loads&#x27;);
++  assert.strictEqual((await V2.openFor(&#x27;FreeLatticeDB/messages&#x27;, sealed)).content, msg.content, &#x27;opens after reload&#x27;);
++
++  // 5. key missing (fresh key store): old records locked, kept; new key, new ID
++  const V3 = makeVault({ keyStore: memKeyStore() });
++  await V3.init();
++  assert.notStrictEqual(V3.status().kid, V.status().kid, &#x27;a new key gets a new ID&#x27;);
++  const lk = await V3.openFor(&#x27;FreeLatticeDB/messages&#x27;, sealed);
++  assert.strictEqual(lk.content, V3.LOCKED_TEXT, &#x27;missing key: shown as locked&#x27;);
++  const rows3 = [Object.assign({ id: 5 }, sealed)];
++  const before = JSON.stringify(rows3);
++  await V3.migrate(&#x27;FreeLatticeDB/messages&#x27;, memAdapter(rows3, &#x27;id&#x27;));
++  assert.strictEqual(JSON.stringify(rows3), before, &#x27;missing key: sealed records never rewritten&#x27;);
++
++  // 6. no WebCrypto: honest passthrough
++  const V4 = makeVault({ noCrypto: true });
++  await V4.init();
++  assert.strictEqual(V4.status().mode, &#x27;unavailable&#x27;, &#x27;unavailable without WebCrypto&#x27;);
++  const p = await V4.sealFor(&#x27;FreeLatticeDB/messages&#x27;, msg);
++  assert.strictEqual(p.content, msg.content, &#x27;stays plain and readable&#x27;);
++  assert.ok(/not sealed/.test(await V4.renderStatus()), &#x27;status says plainly it is not sealed&#x27;);
++
++  // 7. backup dump opens sealed stores
++  const dump = await V.openDump({ name: &#x27;FreeLatticeDB&#x27;, stores: { messages: [sealed], meta: [{ key: &#x27;a&#x27; }] } });
++  assert.strictEqual(dump.stores.messages[0].content, msg.content, &#x27;backup file carries readable chats&#x27;);
++
++  // 8. static locks
++  assert.ok(block.includes(&#x27;stops casual reading&#x27;) &amp;&amp; block.includes(&#x27;compromised device&#x27;), &#x27;honest note in code&#x27;);
++  assert.ok(app.includes(&quot;if (el) el.textContent = text;&quot;), &#x27;status uses textContent&#x27;);
++  assert.ok(app.includes(&#x27;id=&quot;flChatSealStatus&quot;&#x27;), &#x27;status line in Memory Vault&#x27;);
++  assert.ok(!/\u2014/.test(block), &#x27;no em dash in the new block&#x27;);
++  assert.ok(!/confirm\(/.test(block), &#x27;no confirm()&#x27;);
++  const rootIndex = path.join(ROOT, &#x27;index.html&#x27;);
++  if (fs.existsSync(rootIndex)) assert.strictEqual(fs.readFileSync(rootIndex, &#x27;utf8&#x27;), app, &#x27;root index.html == docs/app.html&#x27;);
++  const privacy = fs.readFileSync(path.join(ROOT, &#x27;docs&#x27;, &#x27;privacy.html&#x27;), &#x27;utf8&#x27;);
++  assert.ok(privacy.includes(&#x27;v-encrypt-chats-locally-v0.1&#x27;) &amp;&amp; privacy.includes(&#x27;They are not locked with a password by default.&#x27;), &#x27;privacy: Newer line layered, older line kept&#x27;);
++  // This brick never needs fl-connect.js or sw.js. (Other queued bricks may change them,
++  // so check for this brick&#x27;s fingerprints rather than diffing against main.)
++  for (const rel of [&#x27;docs/modules/fl-connect.js&#x27;, &#x27;docs/sw.js&#x27;, &#x27;sw.js&#x27;]) {
++    const fp = path.join(ROOT, rel);
++    if (fs.existsSync(fp)) assert.ok(!/FLChatVault|encrypt-chats-locally/.test(fs.readFileSync(fp, &#x27;utf8&#x27;)), rel + &#x27; untouched by this brick&#x27;);
++  }
++
++  // 9. Kirk&#x27;s defaults (Oct 2): seal automatically, unlock key not in backups, a correction on the
++  //    old phi-Salt changelog line, phi as a label only
++  assert.ok(/setTimeout\(function \(\) \{ sealExisting\(\)\.then\(renderStatus\); \}, 3000\);/.test(app), &#x27;seals automatically after load, no switch&#x27;);
++  const lsFnStart = app.indexOf(&quot;var FL_BACKUP_NEVER_EXPORT = [&#x27;fl_device_encryption_key&#x27;];&quot;);
++  assert.ok(lsFnStart &gt; 0, &#x27;backup knows the unlock key never travels&#x27;);
++  const lsFnEnd = app.indexOf(&#x27;    return data;\n  }&#x27;, lsFnStart) + &#x27;    return data;\n  }&#x27;.length;
++  const lsSrc = app.slice(lsFnStart, lsFnEnd);
++  const lsData = { fl_device_encryption_key: &#x27;a&#x27;.repeat(64), fl_apiKey_enc: &#x27;SEALED&#x27;, latticePoints: &#x27;5&#x27; };
++  const fakeLS = { get length() { return Object.keys(lsData).length; }, key: (i) =&gt; Object.keys(lsData)[i], getItem: (k) =&gt; (k in lsData ? lsData[k] : null) };
++  const exported = vm.runInNewContext(lsSrc + &#x27;\ngetAllLocalStorage();&#x27;, { localStorage: fakeLS });
++  assert.ok(!(&#x27;fl_device_encryption_key&#x27; in exported), &#x27;backup file leaves the unlock key out&#x27;);
++  assert.strictEqual(exported.latticePoints, &#x27;5&#x27;, &#x27;other settings still go in&#x27;);
++  assert.strictEqual(exported.fl_apiKey_enc, &#x27;SEALED&#x27;, &#x27;sealed keys go in (they open only on the device that sealed them)&#x27;);
++  assert.ok(/if \(FL_BACKUP_NEVER_EXPORT\.indexOf\(key\) &gt;= 0\) \{ lsKeptHere\+\+; return; \}/.test(app), &#x27;restore never writes an unlock key back&#x27;);
++  assert.ok(/FL_BACKUP_SEALED_KEYS\.indexOf\(key\) &gt;= 0 &amp;&amp; localStorage\.getItem\(key\) != null\) \{ lsKeptHere\+\+; return; \}/.test(app), &#x27;restore never replaces a key this device has&#x27;);
++  assert.ok(app.includes(&quot;Saved API keys open only on the device that sealed them; on another device, enter them again.&quot;), &#x27;restore says keys must be entered again elsewhere&#x27;);
++  assert.ok(app.includes(&#x27;A backup never carries the unlock key for chats or API keys.&#x27;), &#x27;status line says the key is not in backups&#x27;);
++  assert.ok(privacy.includes(&#x27;A backup never carries the unlock key, so saved API keys must be entered again after restoring on another device.&#x27;), &#x27;privacy says it too&#x27;);
++  assert.ok(!/FreeLatticeVault/.test(app.slice(app.indexOf(&#x27;const FlBackup = (function() {&#x27;), app.indexOf(&#x27;const FlBackup = (function() {&#x27;) + 600)), &#x27;the chat key store is not in the backup list&#x27;);
++  const stale = app.indexOf(&#x27;&lt;p&gt;&lt;strong&gt;\u03C6-Salt Encryption&lt;/strong&gt;&#x27;);
++  const fix = app.indexOf(&#x27;&lt;p class=&quot;v-encrypt-chats-locally-v0.1&quot;&gt;&lt;strong&gt;Newer (October 2026), a correction to the line above:&lt;/strong&gt;&#x27;);
++  assert.ok(stale &gt; 0 &amp;&amp; fix &gt; stale &amp;&amp; fix - stale &lt; 600, &#x27;the old phi-Salt line is kept and a correction sits under it&#x27;);
++  assert.ok(/The golden ratio adds no strength there\./.test(app), &#x27;correction says phi adds no strength&#x27;);
++  assert.ok(block.includes(&#x27;Phi is never the secret and adds no strength.&#x27;) &amp;&amp; block.includes(&#x27;Phi is a\n// label here and nothing more&#x27;), &#x27;phi is a label only, said in the code&#x27;);
++  assert.ok(!/phi[^\n]{0,40}(stronger|strength comes)/i.test(block), &#x27;no claim that phi adds strength&#x27;);
++
++  console.log(&#x27;SMOKE_OK encrypt chats locally v0.1&#x27;);
++})().catch((err) =&gt; { console.error(&#x27;SMOKE_FAIL encrypt chats locally v0.1:&#x27;, err &amp;&amp; err.message); process.exit(1); });
+diff --git a/index.html b/index.html
+index 50035267..d5f2293d 100644
+--- a/index.html
++++ b/index.html
+@@ -16669,6 +16669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+ 
+           &lt;h4&gt;What&#x27;s New in v2.1?&lt;/h4&gt;
+           &lt;p&gt;&lt;strong&gt;φ-Salt Encryption&lt;/strong&gt; — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on a φ-salt (golden-ratio) derivation. No more plaintext secrets in localStorage.&lt;/p&gt;
++          &lt;p class=&quot;v-encrypt-chats-locally-v0.1&quot;&gt;&lt;strong&gt;Newer (October 2026), a correction to the line above:&lt;/strong&gt; it is out of date. API keys and tokens are sealed with AES-GCM using a random key made on this device (PBKDF2 over that random key). The golden ratio adds no strength there. The first version derived the key from the golden ratio and a fixed salt written in the source, which anyone with the source could recompute; that path is now used only to read very old saved keys. Since &quot;Encrypt chats locally&quot; v0.1, chats are sealed on this device too, and a Memory Vault backup never carries the unlock key.&lt;/p&gt;
+           &lt;p&gt;&lt;strong&gt;Input Sanitization&lt;/strong&gt; — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.&lt;/p&gt;
+           &lt;p&gt;&lt;strong&gt;Memory Integrity&lt;/strong&gt; — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.&lt;/p&gt;
+           &lt;p&gt;&lt;strong&gt;AI Disclaimers&lt;/strong&gt; — Clear notices that AI responses may contain errors, encouraging users to verify important information.&lt;/p&gt;
+@@ -18078,6 +18079,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     &lt;div id=&quot;flVaultSummary&quot; style=&quot;font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;&quot;&gt;
+       &lt;span id=&quot;flVaultLastSaved&quot;&gt;Checking...&lt;/span&gt;
+     &lt;/div&gt;
++    &lt;!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() --&gt;
++    &lt;div id=&quot;flChatSealStatus&quot; style=&quot;font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;&quot;&gt;Checking the chat seal...&lt;/div&gt;
+     &lt;div class=&quot;fl-backup-section&quot;&gt;
+       &lt;div class=&quot;fl-backup-row&quot; style=&quot;gap:10px;&quot;&gt;
+         &lt;button class=&quot;fl-backup-btn&quot; onclick=&quot;FlBackup.exportData()&quot; style=&quot;background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;&quot;&gt;
+@@ -25605,6 +25608,361 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b =&gt; b.toString(16).padStart(2, &#x27;0&#x27;)).join(&#x27;&#x27;);
+ }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

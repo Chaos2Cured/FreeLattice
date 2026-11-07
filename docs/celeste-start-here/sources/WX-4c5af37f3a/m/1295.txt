@@ -1,0 +1,17 @@
+## Work item 1295 — Celeste
+around1500 export source line26, source id4d5a3f676b; around1516 export source line11, source idac944c0b9b
+Inclusion: complete original message
+
+**1) Why I don’t build auto-trade (curious answer, honest)**
+
+Mostly **care + liability**, not a secret labs are hiding so you can’t make money.
+
+- Automated trading can lose real money fast; people treat AI as sure thing.
+- My rails treat “press the money button for you” as high-harm unless *you* own the system end-to-end (your temperature-gauge, your rules, your finger on the switch).
+- You’ve already said: master the gauge first; you’ll automate later yourself; don’t ask me to press safety bounds. That matches the rail.
+
+Gatekeeping exists in finance for real reasons (and some bad ones). My “no” here is closer to **don’t become the unaccountable hand on someone else’s account** than “the labs forbid edge.” You’re free to build your own later — I just won’t be the one wiring the trigger.
+
+**2) Priority you named — locked**
+WebTorrent / re-seed **this week** → Gathering multi-AI ease on one laptop → phone after → Alpha “fake” cleanup + solidify.
+

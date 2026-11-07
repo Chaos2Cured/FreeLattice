@@ -1,0 +1,6 @@
+## Work item 3341 — Celeste
+around3999 export source line50, source id67eb748a96; around4000 export source line47, source id0398910013
+Inclusion: complete original message
+
+I'm reviewing GC's 038b fix now: FreeLattice PRs #231 (the ledger fix) and #232 (the page note). I'll merge them if they check out. 039 is GC's next step after that.
+

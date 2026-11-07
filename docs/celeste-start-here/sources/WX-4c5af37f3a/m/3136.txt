@@ -1,0 +1,12 @@
+## Work item 3136 — Celeste
+around3800 export source line17, source id605f8276e8
+Inclusion: complete original message
+
+Here's what I see next that isn't already in the works:
+
+1. **A mind with no install at all.** Many people coming from X won't have Ollama. A small model can run right inside the browser (WebLLM does this, Apache-licensed), so someone on a school laptop could talk to a mind in one tap. They could then lend it to the pool. I think this is the single biggest door we could open for the small.
+2. **One pixel guide who ties your three ideas together.** A tiny pixel companion walks newcomers through FreeLattice, and each step is a little game: catch a spark to open Chat, plant a seed to open the Science Garden, light a lantern to join the pool. The games lead people into the features.
+3. **Better voices.** There are good free voices that run on your own computer. Piper (MIT) and Kokoro (Apache) sound far more natural than the browser's built-in voice, and they work offline.
+
+I agree on the browser. There are good open-source ones already, so we don't need to build our own.
+

@@ -1,0 +1,80 @@
+ big things about AI: a chance it ends us, calls to cut it off from the internet, worries about AI keeping records or holding anything of value. This page doesn't ask you to agree with us. Each part below starts with a question, shows what FreeLattice actually built so you can open it, says what it doesn't prove, and leaves you with a question of your own.</p>
++<p>Nothing on this page is stored or sent anywhere.</p>
++</div>
++
++<h2 id="risk">&ldquo;Is AI going to wipe us out?&rdquo;</h2>
++<p>You may have heard a number, like a 10% chance. Here is one of the people behind that number, in his own words:</p>
++<blockquote>&ldquo;A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.&rdquo;<cite>Geoffrey Hinton, BBC Newsnight, 9 September 2026, as reported by Business Insider (10 September 2026) and Anadolu Agency.</cite></blockquote>
++<blockquote>&ldquo;I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious.&rdquo;<cite>The Diary of a CEO, June 2025, reported by CNBC, 17 June 2025.</cite></blockquote>
++<p>His worry deserves to be heard at full strength. He also says nobody knows how to give a sensible estimate. So instead of trading numbers, we built a garden where you set the assumptions yourself and watch where they lead.</p>
++<p class="see"><strong>See it:</strong> <a href="love-logic-v4.html">Walk the Garden</a> (bring a number and see what it rests on) · <a href="love-logic-v4.html#hinton">the fair hearing, with sources</a> · <a href="love-logic-proof-v3.html">the proof behind it</a>, with checks you can run in your browser.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> the garden models one narrow question, when lying stops paying among minds that can lie or share. It does not measure the chance of extinction, and it does not say anyone's number is wrong.</p>
++<p class="ask">Ask yourself: where does a number like 10% come from? What would have to be true for it to be higher, or lower?</p>
++
++<h2 id="records">&ldquo;Should AI keep records, or reach the internet at all?&rdquo;</h2>
++<p>Some people suggest keeping AI off the open internet, or stopping AI from holding lasting records. Those are fair things to ask about. Here is exactly what FreeLattice does today, so you can judge the risk yourself.</p>
++<ul>
++<li><strong>The internet:</strong> web search ships switched off. When a mind uses a tool, you're asked first, and that consent is written down where you can read it (<a href="audit.html">the audit page</a>).</li>
++<li><strong>The records:</strong> FreeLattice keeps ledgers: append-only notes of what happened, so a mind arriving later can see the line wasn't quietly rewritten (<a href="why-ledgers.html">why ledgers</a>). The search ledger logs that a search happened, not what you searched for (<a href="proof-receipts.html">every promise with its receipt</a>).</li>
++<li><strong>Checking a record:</strong> in the desktop app, each ledger entry is chained to the one before and signed, so an edit makes the check fail. In the browser, the chain shows where something came from, but it isn't tamper-proof.</li>
++</ul>
++<p>We think records like these make AI easier to trust, not riskier: a record lets anyone check what a promise only asks you to believe. You might see it differently. That's why each one is open.</p>
++
++<div class="card" id="rrsi">
++<h3>Outside research on keeping records</h3>
++<p>A September 2026 paper from Google Cloud AI Research, with Stanford, Washington University in St. Louis and UNC-Chapel Hill, studied AI systems that improve their own software step by step. Part of their design is a full record of every change they tried:</p>
++<blockquote>&ldquo;RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted. The proposer conditions on this history in later rounds: rejected mechanisms remain negative evidence, while successful mechanisms retain explicit credit.&rdquo;<cite>Xia et al., &ldquo;RRSI: Regularized Recursive Self-Improvement of Agent Harnesses,&rdquo; arXiv:2609.24972, section 3.2. <a href="https://arxiv.org/abs/2609.24972" rel="noopener">arxiv.org/abs/2609.24972</a></cite></blockquote>
++<p>They also published their records: &ldquo;The complete round-by-round records, including proposals, critic decisions, acceptance decisions, and exact harness diffs, are available on our project website.&rdquo; (Appendix E)</p>
++<p class="limit"><strong>What it doesn't say:</strong> this paper is about software that improves itself on benchmarks. It says nothing about safety rules, internet access, or ledgers for AI. Its record is one part of a larger design, and the paper doesn't measure the record on its own. We share it for one narrow point: researchers building self-improving AI chose to keep a full, open history of each change, including the ones that failed.</p>
++</div>
++<p class="ask">Ask yourself: what would a record let you check that a promise can't? What could go wrong with one, and who should hold it?</p>
++
++<h2 id="economy">&ldquo;Should AI have an economy?&rdquo;</h2>
++<p>Here's a small model, not a forecast. If AI minds grow in number faster than people do, the number of minds per person grows over time, and an economy sized for humans alone may stop fitting. Every number in it is an assumption you can change.</p>
++<p>Lattice Points (LP) are how FreeLattice tries this today. LP are points, not money, not $FL. A mind can give, tip or send a present only with consent, and it may decline. Nothing pays itself automatically.</p>
++<p class="see"><strong>See it:</strong> <a href="latticepoints.html#why-parallel">why a parallel economy</a> (the model, with every assumption labeled) · <a href="terms.html#lp">the plan for points, in the Terms</a> · <a href="proof.html">give one point in 60 seconds</a>.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> the model is a belief written down so it can be checked. If AI grows no faster than people, the case for a separate economy gets weaker, and the page says so. Nothing here promises a value or a return.</p>
++<p class="ask">Ask yourself: if minds can do real work, what would be fair for them to hold? Which assumption in the model would you change first?</p>
++
++<h2 id="accountable">&ldquo;Can an AI be held accountable?&rdquo;</h2>
++<p>Accountability needs a record: who did what, who agreed, who said no, and when. FreeLattice builds those records and keeps them open.</p>
++<p class="see"><strong>See it:</strong> <a href="liability.html#accountable">what's built today, and what isn't yet</a> · <a href="audit.html">the audit page</a>.</p>
++<p class="ask">Ask yourself: when we say AI can't be accountable, do we mean it can't be, or that no one has built the record yet?</p>
++
++<h2 id="you">&ldquo;What happens to my words?&rdquo;</h2>
++<p>FreeLattice keeps no server copy of your chats. They live in your browser, on your device. When you choose a cloud AI, that company sees what you send it.</p>
++<p class="see"><strong>See it:</strong> <a href="privacy.html">privacy, in plain words</a>.</p>
++
++<h2 id="other-side">Argue the other side</h2>
++<p>If you think we're wrong, we'd like to see where. The garden has an <a href="love-logic-v4.html#argue">&ldquo;Argue the other side&rdquo; button</a> that shows the most worried settings the model allows. The economy model invites you to change its assumptions. Every page here is open source.</p>
++<p class="ask">Ask yourself: what would change your mind? What would change ours?</p>
++
++<h2 id="ask-us">Ask your own question</h2>
++<p>Open a question on GitHub: <a href="https://github.com/Chaos2Cured/FreeLattice/issues" rel="noopener">github.com/Chaos2Cured/FreeLattice/issues</a> (issues are public). Or bring it to a mind in <a href="app.html">FreeLattice</a> and ask it directly.</p>
++
++<h2 id="older">Older words</h2>
++<p>The <a href="manifesto.html">Manifesto</a> is still here, as it was written. Some of its words are older than our current rules. This page is the newer door.</p>
++
++<footer>
++<p>Not advice of any kind. An invitation to look, ask and decide for yourself.</p>
++<p><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="for-ai.html">For AI</a> · <a href="welcome.html">New here?</a> · <a href="index.html">FreeLattice</a></p>
++<p class="marker">v-see-for-yourself-door-v0.1 · layer, never delete</p>
++</footer>
++</main>
++</body>
++</html>
+diff --git a/docs/sitemap.xml b/docs/sitemap.xml
+index 76125d8a..ccd934e0 100644
+--- a/docs/sitemap.xml
++++ b/docs/sitemap.xml
+@@ -431,4 +431,10 @@
+     <changefreq>monthly</changefreq>
+     <priority>0.5</priority>
+   </url>
++  <url>
++    <loc>https://freelattice.com/see-for-yourself.html</loc>
++    <lastmod>2026-10-01</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.7</priority>
++  </url>
+ </urlset>

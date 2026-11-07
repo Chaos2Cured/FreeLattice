@@ -1,0 +1,6 @@
+## Work item 964 — Celeste
+around1050 export source line83, source idc851357975
+Inclusion: complete original message
+
+My take, short: Learn is still CSS-only. Art and Workshop already have the night. Research waits. One galaxy. Copy Workshop’s mount, keep `data-garden-galaxy="round-table"`, don’t copy Art’s extra stars. Sitting already works. Don’t invent your idea.
+

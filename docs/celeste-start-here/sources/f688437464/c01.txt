@@ -1,0 +1,156 @@
+GROK NEXT BRICK: Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
+For: Grok (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Friday Oct 2, 2026, about 8:15 AM MDT
+Marker: v-encrypt-chats-locally-v0.1
+Smoke line (FreeLattice, print exactly when green): SMOKE_OK encrypt chats locally v0.1
+Branch: FreeLattice layer/encrypt-chats-locally-v0 (code, privacy note, smoke and your ledger entry)
+Base: FreeLattice main 0218d570 (rebased from ba53b415; Kirk's defaults added)
+One file carries everything: note, setup, brick, the diff, ledger entry, what comes after.
+This replaces FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt. Apply this one only.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not. They fingerprint,
+check exports and name things, and chats sat in IndexedDB as plain text. This brick seals them, and
+Kirk chose its defaults himself:
+  - seal automatically (no switch, no clicks);
+  - the unlock key never goes into a backup;
+  - a correction note under the old "phi-Salt Encryption" changelog line;
+  - phi used honestly, as a label only.
+While checking the backup default I found a real hole: Memory Vault backups copied all of
+localStorage, the API-key unlock key too, even though the code comment says "NOT exportable in
+backups". Anyone holding a backup file could open the saved API keys. This brick closes it.
+It touches app.html, so it goes after the Connect queue if those land first (3.5 says how).
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h %s'        # expect 0218d570 "ci: Update Primer deployment state [2026-10-02]"
+    git merge-base --is-ancestor 0218d570 HEAD && echo base-ok
+    Newer is fine; git apply --check (3.5) decides. If it fails, stop and tell Celeste.
+    If a hook rewrites sw.js on commit, drop it as before and say so. Never commit sw.js here.
+
+2.2 Twins still match (this brick does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js && echo twins
+
+2.3 Pull the diff out of this file:
+    F=~/Downloads/GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt
+    awk '/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f' "$F" > /tmp/encrypt-fl.diff
+    wc -l /tmp/encrypt-fl.diff         # 1291
+    md5 -q /tmp/encrypt-fl.diff        # d3d2c5285b96a40eb303b6480c6abe51
+    The same diff also sits next to this file as GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02-fl.diff.
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: Encrypt chats locally v0.1 (on FreeLattice 0218d570)
+======================================================================
+
+3.1 What the diff changes (FreeLattice only, 6 files, +1032 / -5; every changed old line is kept
+    as a "before v-encrypt-chats-locally-v0.1:" comment)
+    docs/app.html (and index.html, a byte copy)
+      a) FLChatVault, inline right after phiHashData: AES-GCM 256 via WebCrypto. A random 256-bit root,
+         imported as a non-extractable HKDF CryptoKey, lives in IndexedDB "FreeLatticeVault" (store
+         "keys") with a random salt. Raw key bytes are never stored. Each record gets a fresh IV; the
+         AAD ties a message to its conversationId, role and timestamp, and a conversation to its id.
+      b) Sealed: FreeLatticeDB messages.content; conversations name, title, lastMessage, contextNote;
+         FreeLatticeMemory conversations title, messages, tags, summary, keywords. Ids, roles and
+         times stay readable (the app sorts by them), and the page says so.
+      c) Wrappers after dbCount (dbGet, dbPut, dbGetAll, dbGetAllByIndex) and inside MemoryIndex
+         (miGet, miPut, miGetAll); the plain helpers stay as written. Four direct readers open sealed
+         records first: FLSearch, the soul export, the Memory Vault backup, mirror.js.
+      d) Seal automatically: new writes are sealed; older plain records are sealed 3 s and 20 s after
+         load, only after a verified round trip, by compare-and-swap. A record whose key is missing
+         shows as locked and is never rewritten or deleted. No WebCrypto (file://, plain http):
+         chats stay plain and the Memory Vault says so.
+      e) Kirk's default, the unlock key never in backups: FlBackup leaves fl_device_encryption_key out
+         of the file. A restore never writes an old one back, never replaces a sealed API key this
+         device already has, and says "Saved API keys open only on the device that sealed them; on
+         another device, enter them again." The vault's own key store was never in the backup list.
+         Chats still go into backups as readable text so they restore anywhere, and the status line
+         says so.
+      f) Kirk's default, a correction under the v2.1 changelog line "phi-Salt Encryption" (the old line
+         is kept): the golden ratio adds no strength to API-key sealing, and the first golden-ratio
+         derivation (fixed salt in the source) is now used only to read very old saved keys.
+      g) Kirk's default, phi as a label only: phi is written into the two HKDF label strings and names
+         the key ID ("phi-" plus 16 hex). The code says the labels differ by purpose (chats,
+         keycheck), that this difference is what keeps the keys apart, and that phi is never the
+         secret and adds no strength.
+      h) Memory Vault status line (#flChatSealStatus, textContent).
+    docs/modules/mirror.js: +2 (opens sealed conversation names before the Mirror reads them)
+    docs/privacy.html: a Newer line (sealed on your device, the honest limit, backups never carry the
+      unlock key) and a Newer note on the "encrypted locally" row; the older lines stay.
+    docs/library/FRACTAL_FAMILY_LEDGER_v0.md: your entry (section 5)
+    docs/scripts/smoke-encrypt-chats-locally.js: new (Node vm with real WebCrypto). Last line:
+      SMOKE_OK encrypt chats locally v0.1
+
+3.2 The honest note (say it wherever this is mentioned)
+    The key lives in the same browser as the chats. That stops casual reading: someone copying the
+    browser's storage folder, a sync tool grabbing the database files, a glance at DevTools. It does
+    not stop someone who can open this browser profile, harmful code running on the page, or a
+    compromised device. It is still not a password lock. Never write "encrypted" without "on this
+    device, key in the same browser" next to it.
+
+3.3 The words (on the page)
+    Status:  "Chats sealed on this device with AES-GCM: N records sealed, N still plain (they seal on
+              the next pass). Key ID phi-.... The key lives in this same browser, so this stops casual
+              reading of the storage files, not someone using this browser or a compromised device.
+              Saved backups carry your chats as readable files, so keep them somewhere safe. A backup
+              never carries the unlock key for chats or API keys."
+    Restore: "... Saved API keys open only on the device that sealed them; on another device, enter
+              them again."
+    Locked:  "Locked on this device. This was sealed with a key this browser no longer has. It has
+              not been deleted."
+
+3.4 Not here (named, not hidden)
+    Still plain: the companion chat store, the Memory Vault module, Memory Garden, Living Context, the
+    memorySummary and memoryIndex meta, Round Table memory, Quiet Room. GitHub sync still pushes
+    readable conversation data to the person's own repo. Alpha garden-thread chats stay plain. The
+    legacy API-key fallback stays (a real re-encrypt is a later brick). No passphrase mode yet.
+
+3.5 Apply
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/encrypt-chats-locally-v0
+    git apply --check /tmp/encrypt-fl.diff && git apply /tmp/encrypt-fl.diff
+    cp docs/app.html index.html        # root index.html must equal docs/app.html
+      If the Connect queue (model choice survives reload v0.1.1, connect boot probe, scan only when
+      asked) has landed on main first: checked today, the three apply on 0218d570 in that order and
+      this diff still applies clean after them. If only the ledger hunk fails, use
+      git apply --3way /tmp/encrypt-fl.diff and keep both entries, newest last, before
+      "## Out of scope for this brick".
+    git status --short
+      expect: M docs/app.html, M docs/library/FRACTAL_FAMILY_LEDGER_v0.md, M docs/modules/mirror.js,
+      M docs/privacy.html, M index.html, ?? docs/scripts/smoke-encrypt-chats-locally.js
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+3.6 Test (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-encrypt-chats-locally.js | tail -1     # SMOKE_OK encrypt chats locally v0.1
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect: 68 PASS, 8 FAIL (the 8 fail on main too: carry-forward, connect-card-yesno-wizard,
+      fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm)
+    Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js     # nothing
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                       # 0
+    git diff main -U0 | grep '^+' | grep -v '^+\s*//' | grep -v assert | grep -c 'confirm('   # 0
+    git diff main -U0 | grep '^+' | grep -v assert | grep -c 'innerHTML'            # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                                 # 0
+    git diff main --name-only | grep -ci kimi                                        # 0
+

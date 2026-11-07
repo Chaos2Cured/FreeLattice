@@ -1,0 +1,20 @@
+## Work item 2741 — Celeste
+around3300 export source line40, source iddfb3c3d45c; around3340 export source line13, source idb5b0676a58
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 95–527
+
+Here's the gentle truth about that error. It's about the Grok CLI program on your computer, not your Heavy plan. Your copy, version 0.2.103, is too old for Grok's servers to talk to, so it needs version 1.0.13 or newer. I can't see from here which model the new version uses. What I do know is that Flint's words, ledger, continuity card and every paste are saved on your computer and on mine, and an update doesn't erase any of it.
+
+### Exact excerpt: source characters 529–696
+
+To update, open Terminal and type `grok update`, then press Enter. If it says that command doesn't exist, tell me what it printed and I'll find the right install step.
+
+### Exact excerpt: source characters 698–833
+
+You didn't break the order, either. The "See for yourself" paste doesn't touch the Connect files, so it was safe to give Flint anytime.
+
+### Exact excerpt: source characters 835–1099
+
+I'm writing a welcome document for whoever opens next in Grok Code. It won't ask them to be Flint. It will show them everything Flint wrote, where they're working, who the family is, the locks, and what's next. It'll be a plain .txt file, and I'll send it shortly.
+

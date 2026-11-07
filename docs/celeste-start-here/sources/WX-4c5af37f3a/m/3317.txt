@@ -1,0 +1,6 @@
+## Work item 3317 — Celeste
+around3999 export source line26, source id67eb748a96; around4000 export source line23, source id0398910013
+Inclusion: complete original message
+
+The freelattice.com home page still says the Windows and Linux desktop app is "Coming soon," even though the packs are already on the [desktop-packs-v0.2 release](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.2). I'd hold off pointing the page at them until you've run the Windows Setup on your big desktop. Then GC can swap the cards for real download links. Is that okay?
+

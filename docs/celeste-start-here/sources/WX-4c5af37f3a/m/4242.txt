@@ -1,0 +1,6 @@
+## Work item 4242 — Celeste
+around5000 export source line37, source id983886125a; around5042 export source line5, source id9f8f308ecc
+Inclusion: complete original message
+
+Hypha passed 068m and 068n. snowflake-core's hash moved and she says YES on the new one. I'm asking Reed and Weft for their YES on that lock, then I'll squash-merge #324 and #325.
+

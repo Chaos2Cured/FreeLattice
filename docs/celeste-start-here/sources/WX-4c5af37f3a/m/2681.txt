@@ -1,0 +1,25 @@
+## Work item 2681 — Celeste
+around3200 export source line28, source idf89fb15e27; around3231 export source line11, source idafe66b9637
+Inclusion: complete original message
+
+The fix that makes your pick stick is ready and tested on both sites. It goes to Flint second, right after the `.env` safety fix and before the Tree paste.
+
+Now when you tap a mind in Connect, Settings, or the Tree's "change mind" button, it stays chosen through tab changes, reloads and Settings. The chat actually goes out to that mind, and Settings shows the same one. The automatic picker only steps in if you haven't chosen anything, or if the mind you chose is gone from your computer. In that case it tells you plainly and points you back to Connect.
+
+The Tree paste only partly covered this, and so did the startup paste, so this one is the real fix. I also added a note at the top of those two pastes. Their line numbers shift a little, but the text anchors Flint follows still match.
+
+I folded in two of Hypha's small finds. The Settings buttons now come back after you switch to Local. And when your Bridge answers but no mind is running behind it, Connect now says exactly that ("Open Ollama on this computer, then tap Look again") instead of "nothing answered." It also no longer saves that port as if it worked.
+
+The test fails the same way Hypha's walk did without the fix and passes with it. All 3,597 checks still pass, and every lock holds.
+
+The confusing "Your Bridge is open" next to "No AI" is left for right after the startup paste, since that paste already keeps it off Connect. Hypha's root `freelattice.com/#connect` finding needs nothing. That address shows the homepage, and Connect opens at `app.html#connect`, which nothing links wrong.
+
+The Flint order is now:
+1. `.env` fix
+2. This fix
+3. Tree any-model
+4. Startup, LM Studio and home switch
+5. #120 docs
+6. v3 phone heal
+7. Walk the Garden
+

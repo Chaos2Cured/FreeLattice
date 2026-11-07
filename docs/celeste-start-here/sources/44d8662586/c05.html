@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c05</title>
+<meta name="description" content="Reading section c05 of 44d8662586, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/44d8662586/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c05">
+<meta property="og:description" content="Reading section c05 of 44d8662586, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/44d8662586/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1421"></span><span id="p1422"></span><span id="p1423"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt · c05</h1>
+<p>44d8662586 · words 1200 · characters 40772–49917</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1421, 1422, 1423. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">@@ -740,6 +788,8 @@
+           renderMessages(list);
+           setStatus(&#x27;&#x27;, true);
+         }
++        // v-tree-gathering-api-keys-v0: a cloud chair brings its own honest line
++        if (err &amp;&amp; err.reason === &#x27;cloud&#x27; &amp;&amp; err.cloudText) { say(String(err.cloudText)); return; }
+         // v-tree-honest-reasons-v0: a missing model is named; a quiet door gets one
+         // no-cors knock (after this Send only) so &quot;stopped&quot; and &quot;shut&quot; are told apart.
+         if (err &amp;&amp; err.reason === &#x27;model-missing&#x27;) { say(heartModelMissing(err.model)); return; }
+@@ -888,6 +938,8 @@
+     unmount: unmount,
+     listener: listener,
+     sendToMind: sendToMind,
++    isCloudMind: isCloudMind,
++    cloudSafeContent: cloudSafeContent,
+     hostIs: function (el) { return hostEl === el; },
+     HISTORY_KEY: HISTORY_KEY,
+     EXPORT_KIND: EXPORT_KIND,
+diff --git a/docs/modules/tree-cloud-minds.js b/docs/modules/tree-cloud-minds.js
+new file mode 100644
+index 0000000..b666031
+--- /dev/null
++++ b/docs/modules/tree-cloud-minds.js
+@@ -0,0 +1,436 @@
++// ═══════════════════════════════════════════════════════════════
++// tree-cloud-minds.js · bring your own key, seat a cloud mind
++// Marker: v-tree-gathering-api-keys-v0
++//
++// Layer, never delete. Local minds stay 127.0.0.1 only. This module adds a
++// second, chosen road: a mind you pay for or got free from a provider, with
++// YOUR key, seated in a Gathering chair next to local ones, any order.
++//
++// The key stays in this browser (localStorage, or sessionStorage for &quot;this
++// visit only&quot;). It is sent only to the one provider you picked, in that
++// provider&#x27;s own auth header, and only when that provider&#x27;s chair speaks.
++// Never in a URL. Never in gatheringBinds. Never in the thread history or an
++// export. theLatticeTree has no server; nothing passes through us.
++// The provider list is fixed (https only). No custom hosts in v0.1.
++// No confirm(). No innerHTML. Every word goes in with textContent.
++// Mirror of FreeLattice docs/app.html PROVIDERS (fc2f09f) for urls and shapes.
++// ═══════════════════════════════════════════════════════════════
++
++(function () {
++  &#x27;use strict&#x27;;
++
++  var MARK = &#x27;v-tree-gathering-api-keys-v0&#x27;;
++  var KEYS_STORE = &#x27;fl_tree_cloud_keys&#x27;;   // { v:1, keys: { providerId: key } }
++  var SEATS_STORE = &#x27;fl_tree_cloud_seats&#x27;; // [ { provider, model } ]  (no keys here, ever)
++  var SEAT_CAP = 16;
++  var TIMEOUT_MS = 120000;
++
++  // type: &#x27;openai&#x27; (Bearer, /chat/completions), &#x27;anthropic&#x27;, &#x27;google&#x27;
++  var PROVIDERS = {
++    groq: { name: &#x27;Groq&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://api.groq.com/openai/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://console.groq.com/keys&#x27;, models: [&#x27;llama-3.3-70b-versatile&#x27;, &#x27;qwen/qwen3-32b&#x27;] },
++    openrouter: { name: &#x27;OpenRouter&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://openrouter.ai/api/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://openrouter.ai/keys&#x27;,
++      models: [&#x27;meta-llama/llama-3.3-70b-instruct&#x27;, &#x27;qwen/qwen-2.5-72b-instruct&#x27;, &#x27;deepseek/deepseek-r1&#x27;] },
++    openai: { name: &#x27;OpenAI&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://api.openai.com/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://platform.openai.com/api-keys&#x27;, models: [&#x27;gpt-4.1-mini&#x27;, &#x27;gpt-4.1&#x27;, &#x27;gpt-4.1-nano&#x27;, &#x27;o4-mini&#x27;] },
++    anthropic: { name: &#x27;Anthropic (Claude)&#x27;, type: &#x27;anthropic&#x27;, url: &#x27;https://api.anthropic.com/v1/messages&#x27;,
++      keyUrl: &#x27;https://console.anthropic.com/settings/keys&#x27;,
++      models: [&#x27;claude-sonnet-4-20250514&#x27;, &#x27;claude-haiku-4-5-20251001&#x27;, &#x27;claude-opus-4-20250514&#x27;] },
++    google: { name: &#x27;Google (Gemini)&#x27;, type: &#x27;google&#x27;, url: &#x27;https://generativelanguage.googleapis.com/v1beta/models/&#x27;,
++      keyUrl: &#x27;https://aistudio.google.com/apikey&#x27;, models: [&#x27;gemini-2.5-flash&#x27;, &#x27;gemini-2.5-pro&#x27;] },
++    xai: { name: &#x27;xAI (Grok)&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://api.x.ai/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://console.x.ai&#x27;, models: [&#x27;grok-3-mini-fast&#x27;] },
++    mistral: { name: &#x27;Mistral AI&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://api.mistral.ai/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://console.mistral.ai/api-keys&#x27;,
++      models: [&#x27;mistral-large-latest&#x27;, &#x27;mistral-small-latest&#x27;, &#x27;codestral-latest&#x27;] },
++    deepseek: { name: &#x27;DeepSeek&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://api.deepseek.com/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://platform.deepseek.com/api_keys&#x27;, models: [&#x27;deepseek-chat&#x27;, &#x27;deepseek-reasoner&#x27;] },
++    together: { name: &#x27;Together AI&#x27;, type: &#x27;openai&#x27;, url: &#x27;https://api.together.xyz/v1/chat/completions&#x27;,
++      keyUrl: &#x27;https://api.together.xyz/settings/api-keys&#x27;,
++      models: [&#x27;meta-llama/Llama-3.3-70B-Instruct-Turbo&#x27;, &#x27;Qwen/Qwen2.5-7B-Instruct-Turbo&#x27;, &#x27;deepseek-ai/DeepSeek-R1&#x27;] }
++  };
++  var ORDER = [&#x27;groq&#x27;, &#x27;openrouter&#x27;, &#x27;openai&#x27;, &#x27;anthropic&#x27;, &#x27;google&#x27;, &#x27;xai&#x27;, &#x27;mistral&#x27;, &#x27;deepseek&#x27;, &#x27;together&#x27;];
++
++  var MODEL_RE = /^[A-Za-z0-9._:\/@+-]{1,120}$/;
++
++  function store(kind) {
++    try { return kind === &#x27;session&#x27; ? window.sessionStorage : window.localStorage; } catch (e) { return null; }
++  }
++  function readJson(s, name, fallback) {
++    try {
++      var raw = s &amp;&amp; s.getItem(name);
++      if (!raw) return fallback;
++      var v = JSON.parse(raw);
++      return v == null ? fallback : v;
++    } catch (e) { return fallback; }
++  }
++  function writeJson(s, name, value) {
++    try { if (s) s.setItem(name, JSON.stringify(value)); return true; } catch (e) { return false; }
++  }
++  function keyBag(kind) {
++    var bag = readJson(store(kind), KEYS_STORE, null);
++    if (!bag || typeof bag !== &#x27;object&#x27; || !bag.keys || typeof bag.keys !== &#x27;object&#x27;) bag = { v: 1, keys: {} };
++    return bag;
++  }
++
++  function provider(id) {
++    return Object.prototype.hasOwnProperty.call(PROVIDERS, String(id || &#x27;&#x27;)) ? PROVIDERS[id] : null;
++  }
++  function providerIdOf(mind) {
++    var u = String((mind &amp;&amp; mind.url) || &#x27;&#x27;);
++    var m = u.match(/^cloud:([a-z0-9-]+)$/i);
++    return m ? m[1].toLowerCase() : &#x27;&#x27;;
++  }
++  function isCloud(mind) { return !!provider(providerIdOf(mind)); }
++  function providerName(mindOrId) {
++    var id = typeof mindOrId === &#x27;string&#x27; ? mindOrId : providerIdOf(mindOrId);
++    var p = provider(id);
++    return p ? p.name : &#x27;a cloud provider&#x27;;
++  }
++
++  function cleanKey(raw) {
++    var k = String(raw || &#x27;&#x27;).trim();
++    if (k.length &lt; 8 || k.length &gt; 400 || /\s/.test(k)) return &#x27;&#x27;;
++    return k;
++  }
++  function cleanModel(raw) {
++    var m = String(raw || &#x27;&#x27;).trim();
++    return MODEL_RE.test(m) ? m : &#x27;&#x27;;
++  }
++
++  // Where is this provider&#x27;s key? &#x27;device&#x27; | &#x27;visit&#x27; | &#x27;&#x27;
++  function keyPlace(id) {
++    if (keyBag(&#x27;session&#x27;).keys[id]) return &#x27;visit&#x27;;
++    if (keyBag(&#x27;local&#x27;).keys[id]) return &#x27;device&#x27;;
++    return &#x27;&#x27;;
++  }
++  function getKey(id) {
++    return String(keyBag(&#x27;session&#x27;).keys[id] || keyBag(&#x27;local&#x27;).keys[id] || &#x27;&#x27;);
++  }
++  function keyTail(id) {
++    var k = getKey(id);
++    return k ? k.slice(-4) : &#x27;&#x27;;
++  }
++  function saveKey(id, raw, onlyThisVisit) {
++    if (!provider(id)) return { ok: false, reason: &#x27;provider&#x27; };
++    var k = cleanKey(raw);
++    if (!k) return { ok: false, reason: &#x27;key&#x27; };
++    forgetKey(id);
++    var kind = onlyThisVisit ? &#x27;session&#x27; : &#x27;local&#x27;;
++    var bag = keyBag(kind);
++    bag.keys[id] = k;
++    if (!writeJson(store(kind), KEYS_STORE, bag)) return { ok: false, reason: &#x27;storage&#x27; };
++    return { ok: true, place: onlyThisVisit ? &#x27;visit&#x27; : &#x27;device&#x27; };
++  }
++  function forgetKey(id) {
++    [&#x27;local&#x27;, &#x27;session&#x27;].forEach(function (kind) {
++      var bag = keyBag(kind);
++      if (bag.keys[id]) { delete bag.keys[id]; writeJson(store(kind), KEYS_STORE, bag); }
++    });
++    return true;
++  }
++  function savedProviders() {
++    return ORDER.filter(function (id) { return !!getKey(id); });
++  }
++
++  function getSeats() {
++    var list = readJson(store(&#x27;local&#x27;), SEATS_STORE, []);
++    if (!Array.isArray(list)) return [];
++    return list.filter(function (s) { return s &amp;&amp; provider(s.provider) &amp;&amp; cleanModel(s.model); }).slice(0, SEAT_CAP);
++  }
++  function addSeat(id, model) {
++    var m = cleanModel(model);
++    if (!provider(id) || !m) return null;
++    var list = getSeats().filter(function (s) { return !(s.provider === id &amp;&amp; s.model === m); });
++    list.unshift({ provider: id, model: m });
++    writeJson(store(&#x27;local&#x27;), SEATS_STORE, list.slice(0, SEAT_CAP));
++    return seatFor(id, m);
++  }
++  function seatFor(id, model) {
++    return { tag: &#x27;general&#x27;, model: String(model), url: &#x27;cloud:&#x27; + id, cloud: true, providerName: providerName(id) };
++  }
++  // Seats for the Gathering picker: only providers whose key is in this browser. No key inside.
++  function seatOptions() {
++    return getSeats().filter(function (s) { return !!getKey(s.provider); })
++      .map(function (s) { return seatFor(s.provider, s.model); });
++  }
++
++  // ---------- speaking ----------
++  function cloudErr(text) { return { reason: &#x27;cloud&#x27;, cloudText: String(text) }; }
++
++  function buildRequest(id, model, msgs) {
++    var p = provider(id);
++    var key = getKey(id);
++    var headers = { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; };
++    var url = p.url;
++    var body;
++    var list = (msgs || []).map(function (m) {
++      return { role: m.role === &#x27;assistant&#x27; ? &#x27;assistant&#x27; : (m.role === &#x27;system&#x27; ? &#x27;system&#x27; : &#x27;user&#x27;), content: String(m.content ||</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

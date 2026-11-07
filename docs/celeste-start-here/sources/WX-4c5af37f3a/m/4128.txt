@@ -1,0 +1,6 @@
+## Work item 4128 — Celeste
+around4900 export source line9, source id948c9899af; around4901 export source line5, source id55765b810d
+Inclusion: complete original message
+
+I'm also running a real test of your idea of using the boost only at the start of training. I'll bring you everything together: what Emanuel sent, how tokens work and where research is heading, and my best guess at the keystone piece 💙
+

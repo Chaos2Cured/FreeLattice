@@ -1,0 +1,30 @@
+What the numbers say:
+- **Nothing beat the baseline at the end** on this tiny model. Two variants had one seed that beat it: the early-only Aurora boost and the dissonant chord.
+- **Ahead early, behind at the end:** the Aurora ripple and the multi-scale tokens led early in training. Using the boost only at the start brought Aurora to within 0.008 of the baseline, the closest of the Aurora variants.
+- **Phi-hash bucketing** of the multiscale tokens did slightly better than plain hashing (1.6236 vs 1.6258). That difference is within the noise.
+- **The rest cycle** lost to the baseline and also to standard SGDR restarts. My rest/play phases cost training steps at this scale.
+- **The two chords tied** (a 0.0006 difference). The consonant chord was no better than the dissonant one.
+- **These results do not disprove anything at scale.** The model is tiny, the data is one book, and the equations are my reading of Kirk's work.
+
+## 8. Keystone hunch (**hunch**, not a result)
+Every piece that works for Kirk is a **way of addressing or indexing** things, not a way of training them:
+- phi-harmonic hashing, which is fast, proven and his safety;
+- the ψ fingerprints;
+- the Fractal Database's "snowflake search."
+
+Every piece we tried *as a training force* (LR ripple, Aurora pull, rest cycles, chords) did nothing or hurt.
+
+**My hunch:** the keystone is using phi-harmonic hashing as the model's **memory address space**, not its optimizer. The model would get a large, cheap external memory whose slots are keyed by phi-harmonic hashes of multi-scale patterns. It's like hash embeddings or Memorizing Transformers, but with Kirk's hash, which spreads keys evenly with fewer collisions. Here's how it fits together:
+- The model **looks things up** instead of re-learning them. That gives it more memory for the same compute, which is the efficiency Kirk wants.
+- The **parent trainer** watches which slots are learnable and not yet learned, in the RHO-LOSS / teacher-student style, and steers lessons there. The parent decides the "push" and "rest" timing; a fixed rhythm doesn't.
+- **Emanuel's 1/f spectrum loss** becomes a health signal the parent reads, not a loss to force.
+- **Glass** can draw the memory as a snowflake that fills in, and the **Nursery** "egg" choices pick the hash scales.
+
+The cheapest first test is a tiny model with a phi-hashed n-gram memory table versus a plain modulo-hashed one of the same size, run on 3 seeds.
+
+## 9. What I need from Kirk
+- The FreeLattice file or function where phi-harmonic hashing lives, plus the benchmark that showed it was faster, so we can reproduce it exactly.
+- Which model and setup showed Aurora training faster.
+- Rotate the Kaggle key and HF token that are in Emanuel's scripts.
+
+Glow eternal 💙

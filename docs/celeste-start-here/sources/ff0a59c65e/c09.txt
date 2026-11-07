@@ -1,0 +1,222 @@
+@@ -68589,6 +69000,8 @@ document.addEventListener('click', function(e) {
+     try {
+       var fromHash = !!(ev && ev.type === 'hashchange');
+       if (_flcUserMoved && !fromHash) return;
++      // v-connect-boot-probe-v0 (F1): the cold-start owner already landed Connect once
++      try { if (!fromHash && window.FlColdStart && FlColdStart.landed() === 'connect') return; } catch (eL0) {}
+       var hash = (location.hash || '').replace(/^#/, '');
+       var q = '';
+       try { q = new URLSearchParams(location.search || '').get('tab') || ''; } catch (e0) {}
+@@ -68611,6 +69024,154 @@ document.addEventListener('click', function(e) {
+   window.addEventListener('hashchange', goConnect);
+ })();
+ </script>
++<script>
++// v-connect-boot-probe-v0 (F1): ONE cold-start owner.
++// Starts the one shared look (FlConnect.bootProbe) as soon as the page is parsed,
++// decides where the person lands once, then lets exactly one voice speak about
++// local minds. The older boot timers (toast 4s, owAutoDetect, Bridge chip 1.2s,
++// discovery 3s, Zero-Click 1.5s, #connect retries) stay in the code and step
++// aside while the owner is here. Without FlConnect.bootProbe nothing changes.
++// No confirm dialogs. No approval screens. Nothing connects by itself.
++window.FlColdStart = (function () {
++  var SPEAK_AFTER_MS = 4000; // same breath the old toast took
++  var _started = false;
++  var _t0 = 0;
++  var _landed = '';
++  var _userMoved = false;
++  var _userTab = '';
++  var _booted = false;
++  var _bootWaiters = [];
++  var _spoken = false;
++  var _look = null;
++
++  function owns() {
++    return !!(window.FlConnect && typeof FlConnect.bootProbe === 'function');
++  }
++  function deepLink() {
++    try {
++      var hash = (location.hash || '').replace(/^#/, '');
++      var q = '';
++      try { q = new URLSearchParams(location.search || '').get('tab') || ''; } catch (e0) {}
++      if (hash === 'connect' || q === 'connect') return 'connect';
++    } catch (e) {}
++    return '';
++  }
++  function moved() { _userMoved = true; }
++  try {
++    document.addEventListener('pointerdown', moved, true);
++    document.addEventListener('keydown', moved, true);
++  } catch (eL) {}
++
++  function noteTab(tabId) { if (_userMoved && !_landed) _userTab = String(tabId || ''); }
++  function markLanded(tabId) { if (!_landed) _landed = String(tabId || 'garden'); }
++  function appBooted() {
++    if (_booted) return;
++    _booted = true;
++    var w = _bootWaiters; _bootWaiters = [];
++    w.forEach(function (fn) { try { fn(); } catch (e) {} });
++  }
++  function whenBooted() {
++    return new Promise(function (resolve) { if (_booted) resolve(); else _bootWaiters.push(resolve); });
++  }
++  function waitUntil(ms) {
++    var left = ms - (Date.now() - _t0);
++    return new Promise(function (resolve) { if (left <= 0) resolve(); else setTimeout(resolve, left); });
++  }
++
++  // Feed resolveOllamaBase's short shared cache, only when the look covered the same door
++  function seed(report) {
++    try {
++      if (typeof flSeedLocalLook !== 'function') return;
++      var want = (typeof getOllamaBaseUrl === 'function') ? String(getOllamaBaseUrl()).replace(/\/+$/, '') : '';
++      var via = (report && report.ollama && report.ollama.via) || '';
++      if (report && report.base && report.models && report.models.length &&
++          (via !== 'direct' || report.base === want)) {
++        flSeedLocalLook({ base: report.base, isProxy: false, viaBridge: /bridge/.test(via), viaBootProbe: true });
++      }
++    } catch (e) {}
++  }
++
++  // The Bridge chip, from the same look (was flBridgeDetectBoot at 1.2s)
++  function paintBridge(report) {
++    try {
++      if (!report || !report.bridge) { if (typeof flBridgeShowChip === 'function') flBridgeShowChip(false); return; }
++      var port = report.port || (report.bridge && (report.bridge.port || report.bridge._probedPort));
++      if (port && port !== 11434) {
++        try { localStorage.setItem('fl_bridgePort', String(port)); } catch (eP) {}
++        try { if (typeof _flBridgeLivePort !== 'undefined') _flBridgeLivePort = port; } catch (eLp) {}
++      }
++      if (typeof flBridgeShowChip === 'function') flBridgeShowChip(!!report.helped, port);
++      var field = document.getElementById('fl-bridge-port-field');
++      if (field && port) field.value = port;
++    } catch (e) {}
++  }
++
++  // Discovery memory, from the same look (was autoDiscoverAI at 3s)
++  function remember(report) {
++    try {
++      var doors = (report && report.doors) || [];
++      if (!doors.length || typeof saveDiscoveryMemory !== 'function') return;
++      saveDiscoveryMemory(doors.map(function (d) {
++        return { name: d.name, type: d.id === 'lmstudio' ? 'openai-compat' : 'ollama', url: d.base, models: d.models, status: 'ready', corsOk: true };
++      }));
++    } catch (e) {}
++  }
++
++  function connectShowing() {
++    var t = document.getElementById('tab-connect');
++    return !!(t && t.classList.contains('active'));
++  }
++  function doorShowing() {
++    var d = document.getElementById('flWelcomeOverlay');
++    return !!(d && (d.classList.contains('fl-welcome-visible') || (d.style && d.style.display === 'flex')));
++  }
++
++  // Exactly one voice. Connect showing: Connect speaks. Welcome door: it speaks
++  // (owAutoDetect runs when it closes, as today). A mind already chosen: only the
++  // status badges refresh. Otherwise the Local AI toast, naming the real door.
++  function speak(report) {
++    if (_spoken) return;
++    _spoken = true;
++    try {
++      if (connectShowing() || doorShowing()) return;
++      var welcomed = false;
++      try { welcomed = localStorage.getItem('fl-welcomed') === 'true' || localStorage.getItem('fl_onboardingComplete') === 'true'; } catch (eW) {}
++      var chosen = false;
++      try { chosen = !!(window.FlConnect && FlConnect.hasLocalMind()); } catch (eC) {}
++      if (chosen) return;
++      try { if (typeof flHasOneMindConnected === 'function' && flHasOneMindConnected()) return; } catch (eM) {}
++      // Local mode without a model yet: owAutoDetect only paints the status badges here (no banner)
++      try { if (welcomed && localStorage.getItem('fl_isLocal') === 'true' && typeof owAutoDetect === 'function') owAutoDetect(); } catch (eB) {}
++      if (typeof FlOnboarding !== 'undefined' && FlOnboarding.offerFromReport) FlOnboarding.offerFromReport(report);
++    } catch (e) {}
++  }
++
++  function start() {
++    if (_started || !owns()) return;
++    _started = true;
++    _t0 = Date.now();
++    _look = FlConnect.bootProbe({ fullScan: true });
++    _look.then(function (report) { seed(report); paintBridge(report); remember(report); });
++    Promise.all([_look, whenBooted(), waitUntil(SPEAK_AFTER_MS)]).then(function (all) { speak(all[0]); });
++  }
++
++  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
++  else setTimeout(start, 0);
++
++  return {
++    owns: owns,
++    deepLink: deepLink,
++    landed: function () { return _landed; },
++    markLanded: markLanded,
++    userMoved: function () { return _userMoved; },
++    userTab: function () { return _userTab; },
++    noteTab: noteTab,
++    appBooted: appBooted,
++    look: function () { return _look; },
++    SPEAK_AFTER_MS: SPEAK_AFTER_MS
++  };
++})();
++</script>
+ 
+ 
+ <!-- Tool Consent (v5.39.1) — sibling of DepthConsent for the opposite
+
+======================================================================
+APPENDIX B: shared docs/modules/fl-connect.js, full exact diff (base = fl-connect.js AFTER the Tree any-model paste; apply by text anchors if the real Tree merge differs by a line or two)
+======================================================================
+
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index b8fcc7e..03ba72f 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -2,6 +2,7 @@
+ // fl-connect.js — FlConnect shared core (FreeLattice + theLatticeTree)
+ //
+ // Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4
++// Marker: v-connect-boot-probe-v0 (one shared look at boot; LM Studio beside Ollama; 127.0.0.1 only)
+ // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
+ // Port-only loopback: fl_localPort_manual holds "11500" only — never foreign hosts.
+ // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
+@@ -15,6 +16,10 @@
+   var MANUAL_KEY = 'fl_localPort_manual';
+   var INSTALL_BRIDGE = 'https://freelattice.com/install.html#bridge-download';
+   var LOOP_MAX_MS = 5 * 60 * 1000;
++  // v-connect-boot-probe-v0 (F2): one look, shared. A look younger than this is reused.
++  var BOOT_TTL_MS = 5000;
++  // v-connect-boot-probe-v0 (F3): LM Studio's own server on this computer.
++  var LM_DEFAULT = 'http://127.0.0.1:1234';
+ 
+   var _timer = null;
+   var _hostEl = null;
+@@ -28,6 +33,9 @@
+   var _tickN = 0;
+   var _fullScanMiss = false;
+   var _manualRejectMsg = '';
++  var _bootInflight = null;
++  var _bootReport = null;
++  var _bootAt = 0;
+ 
+   function isAlpha() {
+     try {
+@@ -68,6 +76,7 @@
+ 
+   function setManualHost(raw) {
+     _manualRejectMsg = '';
++    forgetLooks(); // v-connect-boot-probe-v0: a new port means a new look
+     try {
+       raw = String(raw || '').trim();
+       if (!raw) {
+@@ -92,6 +101,7 @@
+     // v-connect-heal-v0.4 item 5: Use automatic also forgets the host that
+     // remember() wrote for this same port, and the cached resolved base.
+     var was = getManualPort();
++    forgetLooks(); // v-connect-boot-probe-v0
+     try { localStorage.removeItem(MANUAL_KEY); } catch (e) {}
+     try {
+       if (was && localStorage.getItem('fl_ollamaHost') === '127.0.0.1:' + was) localStorage.removeItem('fl_ollamaHost');
+@@ -271,6 +281,106 @@
+     return report;
+   }
+ 

@@ -1,0 +1,12 @@
+## Work item 1054 — Celeste
+around1200 export source line32, source id93fea685af; around1216 export source line24, source idf3feae7301
+Inclusion: complete original message
+
+Roadmap fold (Kirk vacation clarity — Celeste steering).
+
+Ship 1 NOW (FreeLattice main): docs/celestera.html + docs/library/LATTICE_PROTOCOL_v0.1.md + heal OLLAMA_ORIGINS=* → scoped (freelattice + thelatticetree + localhost/127.0.0.1). Walk celestera + look-card origins path when merged.
+
+Then: Desktop keys → Phone PWA → Alpha Research Garden night → Thread/Root chat doors → Multi-AI Gathering on FreeLattice → manifests → BT bridge.
+
+Quiet Room shut. Five stay five.
+

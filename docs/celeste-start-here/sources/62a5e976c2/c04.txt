@@ -1,0 +1,212 @@
+    var iv = crypto.getRandomValues(new Uint8Array(12));
++    var ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv, additionalData: aad(kind, out) }, cur.aes, enc(JSON.stringify(body)));
++    f.forEach(function (k) { delete out[k]; });
++    out.sealed = { v: V, kid: cur.kid, iv: b64(iv), ct: b64(new Uint8Array(ct)) };
++    return out;
++  }
++
++  function lockedView(kind, out, s) {
++    out._flLocked = s;
++    if (kind === 'FreeLatticeDB/messages') out.content = LOCKED_TEXT;
++    else if (kind === 'FreeLatticeDB/conversations') { out.name = 'Locked conversation'; out.title = out.name; out.lastMessage = ''; out.contextNote = ''; }
++    else { out.title = 'Locked conversation'; out.messages = []; out.tags = []; out.summary = ''; out.keywords = []; }
++    return out;
++  }
++
++  async function openFor(kind, rec) {
++    var f = FIELDS[kind];
++    if (!f || !rec || typeof rec !== 'object' || !rec.sealed) return rec;
++    await init();
++    var s = rec.sealed;
++    var out = Object.assign({}, rec);
++    delete out.sealed;
++    var key = keys[s.kid];
++    if (key) {
++      try {
++        var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(s.iv), additionalData: aad(kind, out) }, key, unb64(s.ct));
++        var body = JSON.parse(dec(pt));
++        f.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(body, k)) out[k] = body[k]; });
++        return out;
++      } catch (e) {}
++    }
++    return lockedView(kind, out, s);
++  }
++
++  function openAll(kind, rs) {
++    if (!Array.isArray(rs) || !FIELDS[kind] || !hasSealed(rs)) return Promise.resolve(rs);
++    return Promise.all(rs.map(function (r) { return openFor(kind, r); }));
++  }
++  function openAny(dbName, storeName, rs) { return openAll(dbName + '/' + storeName, rs); }
++  function hasSealed(rs) { return Array.isArray(rs) && rs.some(function (r) { return r && typeof r === 'object' && r.sealed; }); }
++  // For the Memory Vault backup: open sealed chat stores so the backup file
++  // restores on any device (it was readable before this brick, and stays so).
++  async function openDump(dbData) {
++    if (!dbData || !dbData.stores) return dbData;
++    var names = Object.keys(dbData.stores);
++    for (var i = 0; i < names.length; i++) {
++      dbData.stores[names[i]] = await openAny(dbData.name, names[i], dbData.stores[names[i]]);
++    }
++    return dbData;
++  }
++
++  function registerStore(kind, getDb, storeName) {
++    if (!FIELDS[kind]) return;
++    stores = stores.filter(function (s) { return s.kind !== kind; });
++    stores.push({ kind: kind, getDb: getDb, storeName: storeName });
++  }
++
++  function idbAdapter(db, storeName) {
++    return {
++      getAll: function () {
++        return new Promise(function (resolve, reject) {
++          var r = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
++          r.onsuccess = function () { resolve(r.result || []); };
++          r.onerror = function () { reject(r.error); };
++        });
++      },
++      // Compare-and-swap: replace only if the record is still exactly the
++      // plaintext we sealed. If the app changed it meanwhile, skip; the next
++      // pass picks it up. Either way the record is never lost.
++      cas: function (snap, next) {
++        return new Promise(function (resolve) {
++          var wrote = false;
++          try {
++            var tx = db.transaction(storeName, 'readwrite');
++            var os = tx.objectStore(storeName);
++            var g = os.get(snap[os.keyPath]);
++            g.onsuccess = function () {
++              if (g.result && JSON.stringify(g.result) === JSON.stringify(snap)) { os.put(next); wrote = true; }
++            };
++            tx.oncomplete = function () { resolve(wrote); };
++            tx.onerror = function () { resolve(false); };
++            tx.onabort = function () { resolve(false); };
++          } catch (e) { resolve(false); }
++        });
++      }
++    };
++  }
++
++  function sameFields(kind, a, b) {
++    return FIELDS[kind].every(function (k) { return JSON.stringify(a[k]) === JSON.stringify(b[k]); });
++  }
++
++  async function migrate(kind, adapter) {
++    var res = { sealed: 0, skipped: 0, already: 0 };
++    await init();
++    if (mode !== 'ready') return res;
++    var recs = await adapter.getAll();
++    for (var i = 0; i < recs.length; i++) {
++      var r = recs[i];
++      if (!r || typeof r !== 'object') continue;
++      if (r.sealed) { res.already++; continue; }
++      var next = await sealFor(kind, r);
++      if (!next || !next.sealed) continue;
++      if (!r._flLocked) {
++        var back = await openFor(kind, next);   // verify before replace
++        if (back._flLocked || !sameFields(kind, r, back)) { res.skipped++; info.lastError = 'a record did not verify and was left as it was'; continue; }
++      }
++      if (await adapter.cas(r, next)) res.sealed++; else res.skipped++;
++      if (res.sealed % 50 === 49) await new Promise(function (ok) { setTimeout(ok, 0); });
++    }
++    return res;
++  }
++
++  async function sealExisting() {
++    var total = { sealed: 0, skipped: 0, already: 0, pending: 0 };
++    for (var i = 0; i < stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) { total.pending++; continue; }
++      try {
++        var r = await migrate(s.kind, idbAdapter(db, s.storeName));
++        total.sealed += r.sealed; total.skipped += r.skipped; total.already += r.already;
++      } catch (e) { info.lastError = (e && e.message) ? e.message : String(e); }
++    }
++    info.lastRun = new Date().toISOString();
++    return total;
++  }
++
++  async function count() {
++    var c = { sealed: 0, plain: 0, locked: 0 };
++    for (var i = 0; i < stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) continue;
++      try {
++        var recs = await idbAdapter(db, s.storeName).getAll();
++        recs.forEach(function (r) {
++          if (!r || typeof r !== 'object') return;
++          if (r.sealed) { if (keys[r.sealed.kid]) c.sealed++; else c.locked++; }
++          else if (FIELDS[s.kind].some(function (k) { return r[k] !== undefined && r[k] !== ''; })) c.plain++;
++        });
++      } catch (e) {}
++    }
++    info.sealedNow = c.sealed; info.plainNow = c.plain; info.lockedNow = c.locked;
++    return c;
++  }
++
++  async function renderStatus() {
++    var el = (typeof document !== 'undefined') ? document.getElementById('flChatSealStatus') : null;
++    await init();
++    var c = await count();
++    var text;
++    if (mode === 'ready') {
++      text = 'Chats sealed on this device with AES-GCM: ' + c.sealed + ' records sealed, ' + c.plain + ' still plain (they seal on the next pass)' +
++        (c.locked ? ', ' + c.locked + ' locked (their key is not in this browser; kept, not deleted)' : '') +
++        '. Key ID ' + cur.kid + '. The key lives in this same browser, so this stops casual reading of the storage files, not someone using this browser or a compromised device. Saved backups are readable files: keep them somewhere safe.';
++    } else if (mode === 'unavailable') {
++      text = 'Chats are not sealed in this browser: ' + (info.lastError || 'WebCrypto is unavailable') + '. They stay readable on this device, exactly as before.';
++    } else {
++      text = 'Checking the chat seal...';
++    }
++    if (el) el.textContent = text;
++    return text;
++  }
++
++  function start() {
++    init().then(function () {
++      setTimeout(function () { sealExisting().then(renderStatus); }, 3000);
++      setTimeout(function () { sealExisting().then(renderStatus); }, 20000);
++    });
++  }
++
++  return {
++    init: init, start: start, sealFor: sealFor, openFor: openFor, openAll: openAll, openAny: openAny,
++    openDump: openDump, hasSealed: hasSealed, registerStore: registerStore, sealExisting: sealExisting,
++    migrate: migrate, count: count, renderStatus: renderStatus,
++    status: function () { return { mode: mode, kid: cur ? cur.kid : null, lastError: info.lastError, lastRun: info.lastRun }; },
++    LOCKED_TEXT: LOCKED_TEXT,
++    _setKeyStoreForTest: function (ks) { keyStore = ks; readyP = null; mode = 'starting'; cur = null; keys = {}; }
++  };
++})();
++// v-encrypt-chats-locally-v0.1 END: FLChatVault
++
+ // ============================================
+ // Input Sanitization
+ // ============================================
+@@ -25781,6 +26135,18 @@ function dbCount(storeName) {
+   });
+ }
+ 
++// v-encrypt-chats-locally-v0.1: the plain IndexedDB helpers above stay as written.
++// These wrappers seal chat text on the way in and open it on the way out, so every
++// reader (switchToConversation, export, memory summary, GitHub sync) keeps working.
++var _flDbGetRaw = dbGet, _flDbPutRaw = dbPut, _flDbGetAllRaw = dbGetAll, _flDbGetAllByIndexRaw = dbGetAllByIndex;
++dbGet = function (s, k) { return _flDbGetRaw(s, k).then(function (r) { return FLChatVault.openFor('FreeLatticeDB/' + s, r); }); };
++dbPut = function (s, v) { return FLChatVault.sealFor('FreeLatticeDB/' + s, v).then(function (x) { return _flDbPutRaw(s, x); }); };
++dbGetAll = function (s) { return _flDbGetAllRaw(s).then(function (rs) { return FLChatVault.openAll('FreeLatticeDB/' + s, rs); }); };
++dbGetAllByIndex = function (s, i, v) { return _flDbGetAllByIndexRaw(s, i, v).then(function (rs) { return FLChatVault.openAll('FreeLatticeDB/' + s, rs); }); };
++FLChatVault.registerStore('FreeLatticeDB/conversations', function () { return state.db; }, STORE_CONVERSATIONS);
++FLChatVault.registerStore('FreeLatticeDB/messages', function () { return state.db; }, STORE_MESSAGES);
++FLChatVault.start();
++
+ function generateId() {
+   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+ }
+@@ -32864,6 +33230,8 @@ const SoulFile = (function() {
+ 
+       status('Reading conversations\u2026 \u2726');
+       var chatData = await readDB('FreeLatticeDB', ['conversations', 'meta']);
++      // v-encrypt-chats-locally-v0.1: the soul file carries readable summaries, so open sealed names first.
++      if (typeof FLChatVault !== 'undefined' && chatData && chatData.conversations) chatData.conversations = await FLChatVault.openAny('FreeLatticeDB', 'conversations', chatData.conversations);
+ 

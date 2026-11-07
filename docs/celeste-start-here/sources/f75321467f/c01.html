@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_GATHERING_SHARED_2026-10-02.txt c01</title>
+<meta name="description" content="Reading section c01 of f75321467f, 1179 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f75321467f/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_GATHERING_SHARED_2026-10-02.txt c01">
+<meta property="og:description" content="Reading section c01 of f75321467f, 1179 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f75321467f/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1729"></span><span id="p1730"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_GATHERING_SHARED_2026-10-02.txt · c01</h1>
+<p>f75321467f · words 1179 · characters 0–9641</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1729, 1730. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+GROK NEXT BRICK: The Gathering shared v0.1 (brick 1 of 3: chairs that wait, now on FreeLattice too)
+For: GC (Grok Code, Grok 4.7) on Kirk&#x27;s Mac
+From: Celeste
+Written: Friday Oct 2, 2026, about 11:20 AM MDT
+Marker: v-gathering-shared-v0.1
+Smoke line: SMOKE_OK gathering shared v0.1
+Two repos, two branches, two PRs (FreeLattice first):
+  FreeLattice  ~/FreeLattice-fresh  branch layer/gathering-shared-v0  base main 33c7e9a or newer
+  Tree (Alpha) ~/FreeLattice-Alpha  branch layer/gathering-twin-v0    base main e4e93c9 or newer
+The code is in two files next to this one:
+  ~/Downloads/GROK_NEXT_GATHERING_SHARED_2026-10-02-fl.diff     (549 lines, md5 57129cc4b33afc1f2724b4368c6e20cc)
+  ~/Downloads/GROK_NEXT_GATHERING_SHARED_2026-10-02-alpha.diff  (357 lines, md5 f46cee68ec26c51318e0e324835a9e26)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, your gauge, the fourth gc.html note and web search are merged and live. Thank you.
+Kirk wants the Tree&#x27;s Gathering in FreeLattice&#x27;s Learn tab, and he chose that local minds and
+cloud minds (bring your own key) may both sit. The Tree&#x27;s Gathering is woven into
+garden-rooms.js, so this brick does not move it. It starts a shared core instead,
+fl-gathering.js, kept byte-identical in both repos like fl-connect.js. FreeLattice uses it now.
+The Tree only carries the twin until brick 3. You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git status --short     # must print nothing
+    git fetch origin &amp;&amp; git checkout main &amp;&amp; git merge --ff-only origin/main
+    git merge-base --is-ancestor 33c7e9a HEAD &amp;&amp; echo fl-base-ok
+    cd ~/FreeLattice-Alpha &amp;&amp; git status --short     # must print nothing (leave stashes and
+                                                     # layer/gathering-grokhome-cortex-v0 alone)
+    git fetch origin &amp;&amp; git checkout main &amp;&amp; git merge --ff-only origin/main
+    git merge-base --is-ancestor e4e93c9 HEAD &amp;&amp; echo alpha-base-ok
+    cp ~/Downloads/GROK_NEXT_GATHERING_SHARED_2026-10-02-fl.diff /tmp/gathering-fl.diff
+    cp ~/Downloads/GROK_NEXT_GATHERING_SHARED_2026-10-02-alpha.diff /tmp/gathering-alpha.diff
+    md5 -q /tmp/gathering-fl.diff /tmp/gathering-alpha.diff    # the two md5s above
+If the Desktop update button PR lands first: checked, both diffs apply in either order.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFFS DO
+----------------------------------------------------------------------
+FreeLattice (6 files, +472 / -2; the one changed line, in app.html and its copy, is kept as a &quot;before&quot; comment):
+a) docs/modules/fl-gathering.js (new, about 14 KB, md5 ef514ece89405182a8b7cd0370e1ade9):
+   window.FLGathering.mount(host, adapter). Seven chairs (cortex, memory, continuity, dream,
+   three &quot;a seat, later&quot;), a picker, Find local minds, Clear this chair, Let this chair speak
+   first, honest empty lines. Local minds: only when Find is tapped, read only, at
+   http://127.0.0.1:11435, :11434 and the manual port from FlConnect.getManualBase(). It never
+   calls FlConnect.probe (which can change the chat provider). Cloud minds: from the adapter.
+   A seat stores kind, model, label and the 127.0.0.1 address or the provider; never a key.
+   Saved in localStorage fl_gathering_chairs_v0. Own small style tag. textContent only.
+b) docs/app.html (and index.html, a byte copy): a Learn card &quot;The Gathering&quot; (after Remix Room,
+   before Skills), &#x27;gathering&#x27; added to LEARN_TABS so Learn stays lit, a tab-gathering panel
+   with the FreeLattice adapter (cloud minds = the provider whose key is saved here and its
+   PROVIDERS models; ollama, lmstudio, custom, custom-openai and browser are not cloud), and the
+   script tag after fl-connect.js.
+c) docs/scripts/smoke-gathering-shared-v0.1.js (new): pins the twin md5, checks loopback only,
+   no key in a seat, later seats stay empty, the card, panel and script tag, index == app.
+d) docs/library/GATHERING_SHARED_v0.1.md (new), and your ledger entry (section 5).
+Tree (2 files, +345): docs/modules/fl-gathering.js (the same bytes) and
+docs/modules/fl-gathering.test.js (twin md5, the Tree&#x27;s own renderCoreGathering still there, no
+Tree page loads the twin yet). No Tree page changes.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+FreeLattice:
+    cd ~/FreeLattice-fresh &amp;&amp; git checkout -b layer/gathering-shared-v0
+    git apply --check /tmp/gathering-fl.diff &amp;&amp; git apply /tmp/gathering-fl.diff
+    cmp index.html docs/app.html &amp;&amp; echo index-eq-app
+    node docs/scripts/smoke-gathering-shared-v0.1.js     # SMOKE_OK gathering shared v0.1
+    node tests/smoke.js | grep &quot;CHECKS PASSED&quot;           # ALL 3605 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1; then p=$((p+1)); else n=$((n+1)); echo &quot;FAIL $f&quot;; fi; done; echo &quot;PASS $p FAIL $n&quot;
+      expect PASS 71 FAIL 8 (the same 8 as main)
+Tree:
+    cd ~/FreeLattice-Alpha &amp;&amp; git checkout -b layer/gathering-twin-v0
+    git apply --check /tmp/gathering-alpha.diff &amp;&amp; git apply /tmp/gathering-alpha.diff
+    for f in docs/modules/*.test.js; do node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 || echo &quot;FAIL $f&quot;; done   # no FAIL
+Twins (both must print):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-gathering.js ~/FreeLattice-fresh/docs/modules/fl-gathering.js &amp;&amp; echo gathering-twins
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js &amp;&amp; echo connect-twins
+Locks (run in each repo):
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js        # nothing
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;                      # 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -v assert | grep -c &#x27;innerHTML\|confirm(&#x27;   # 0
+    git diff main | grep -cE &#x27;^\+(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+What Celeste saw (box): all of the above green. In a test DOM: 7 chairs (3 later); Find found
+two fake 127.0.0.1 models; the picker showed them plus two Groq models (a duplicate dropped);
+seating, speaks first, Clear and the &quot;Not yet&quot; line worked; a stored seat with a 10.x address
+or an apiKey field was dropped on load. Not verified: a real browser, a real Ollama, Safari.
+
+Walk (only if easy; 127.0.0.1 only):
+    cd ~/FreeLattice-fresh/docs &amp;&amp; python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html, Learn, The Gathering. Tap Find local minds (with Ollama
+    or the Bridge running), seat one in cortex; if a cloud key is saved, seat a cloud model in
+    memory. Reload: the seats stay. Say &quot;walk skipped&quot; if you cannot.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh
+    sed -i &#x27;&#x27; &#x27;s/GC_TEMPERATURE_GATHERING_HERE/your line here/&#x27; docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_GATHERING_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md    # 0
+
+----------------------------------------------------------------------
+6. COMMIT, OPEN BOTH PRS YOURSELF, THEN STOP
+----------------------------------------------------------------------
+FreeLattice:
+    cd ~/FreeLattice-fresh &amp;&amp; git add -A
+    git commit -m &quot;layer: The Gathering shared v0.1 (chairs that wait, on FreeLattice too)&quot;
+    If the hook adds a commit that rewrites sw.js or the Primer, drop it as before (check
+    git log -2 first) and say so. git diff main --stat -- sw.js docs/sw.js prints nothing.
+    git push -u origin layer/gathering-shared-v0
+    gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/gathering-shared-v0 \
+      --title &quot;layer: The Gathering shared v0.1 (chairs that wait, on FreeLattice too)&quot; \
+      --body &quot;Soft LAYER marker v-gathering-shared-v0.1. Brick 1 of 3. New fl-gathering.js (byte-identical twin, md5 ef514ece) and a Learn card. Local (127.0.0.1, only when asked) and cloud (your own key) minds can sit; a seat never stores a key. Seating only. Twin PR on FreeLattice-Alpha. Never touches sw.js; index.html == docs/app.html. SMOKE_OK gathering shared v0.1&quot;
+Tree:
+    cd ~/FreeLattice-Alpha &amp;&amp; git add -A
+    git commit -m &quot;layer: fl-gathering.js twin v0.1 (carried, not wired yet)&quot;
+    git push -u origin layer/gathering-twin-v0
+    gh pr create --repo Chaos2Cured/FreeLattice-Alpha --base main --head layer/gathering-twin-v0 \
+      --title &quot;layer: fl-gathering.js twin v0.1 (carried, not wired yet)&quot; \
+      --body &quot;Soft LAYER marker v-gathering-shared-v0.1. Byte-identical twin of FreeLattice docs/modules/fl-gathering.js (md5 ef514ece). No Tree page loads it yet; the Tree&#x27;s own Gathering is unchanged until brick 3.&quot;
+Then STOP. Do not merge, do not delete branches. Reply with: both PR numbers and URLs, both
+branch SHAs, the test lines, the twin lines, the walk result, any hook you dropped, any findings,
+and your Temperature line.
+
+What comes after: brick 2, the speaking chair answers in a short thread on FreeLattice (local
+through 127.0.0.1, cloud through the saved key). Brick 3, the Tree&#x27;s Gathering moves onto
+fl-gathering.js, keeping every word its tests lock.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

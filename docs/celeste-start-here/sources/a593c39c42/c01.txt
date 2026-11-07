@@ -1,0 +1,73 @@
+# 019b design: the Tree Lab split (one model across machines), with a paste outline
+
+*Celeste, Friday Oct 9, 2026, MDT. Design only. Not built, not a paste yet. 019a (the room) comes first.*
+
+## 1. The honest frame (put it on the card, too)
+
+Splitting one model across machines is **possible, slow, and for learning, or for a model too big for any one machine**. It is not a speedup.
+
+- Jeff Geerling's ten-node Raspberry Pi 5 cluster ran Llama 3.3 70B at **0.28 tokens/s** with llama.cpp RPC. A single Pi 5 runs Llama 3.2 3B at about **4 to 6 tokens/s** (Geerling, Sep 2025; edge-ai-study RASPI5.md: 4.42 tok/s). Source notes: `/workspace/research/celeste-challenge-2026-10-09/low-cost-compute-facts.md`.
+- Layer splitting is bound by the slowest link and by memory bandwidth (about 10 GB/s on a Pi). Every token crosses the network.
+- So **019a is the main win for the small**. In a room, each question goes whole to the freest trusted device that holds a small model, and many students are served at once. 019b is the "look how a big mind can be spread across our old laptops" lesson, and the way to run a model that no single machine can hold at all.
+
+Card words (draft):
+> "Lab split: one model spread across the machines in this room. It is slower than one machine that holds a model. Use it to learn how it works, or for a model too big for any one machine here. For everyday questions, use the room above: each question goes whole to the freest trusted device."
+
+## 2. Why a web page cannot do this, and the split
+
+A web page cannot start programs, open a listening port, or speak raw TCP. llama.cpp's split needs `ggml-rpc-server` on each lending machine and `llama-server --rpc ...` on the host. So 019b is a **small MIT helper script that a person runs on purpose**, plus a **Lab card in the Tree** that shows the exact commands and checks only what a page may check.
+
+Choice: a standalone script in Alpha (`tools/tree-lab/tree-lab.sh` for macOS and Linux, `tools/tree-lab/tree-lab.ps1` for Windows). The Tree has no desktop app. A teacher can read a 150-line script in full, and nothing is installed silently. The FreeLattice desktop app could later run the same commands behind its own tap, but that is not part of 019b.
+
+## 3. llama.cpp RPC today (read from the source on 2026-10-09, master a518119d)
+
+- Build with `-DGGML_RPC=ON` (plus `-DGGML_METAL=ON` or `-DGGML_CUDA=ON` where there is a GPU). License: MIT.
+- The lending side is now named **`ggml-rpc-server`** (older builds call it `rpc-server`). Its flags:
+  - `-H, --host HOST` (default `127.0.0.1`), `-p, --port PORT` (default `50052`)
+  - `-t, --threads N`, `-d, --device dev1,dev2`, `-c, --cache` (local tensor cache in `~/.cache/llama.cpp/rpc`, or `LLAMA_CACHE`)
+  - When the host is not 127.0.0.1 it prints: "WARNING: Host ('...') is != '127.0.0.1'. Never expose the RPC server to an open network! This is an experimental feature and is not secure!"
+- The README says: "This example and the RPC backend are currently in a proof-of-concept development stage. As such, the functionality is fragile and insecure. **Never run the RPC server on an open network or in a sensitive environment!**"
+- Host side: `llama-server -m model.gguf -ngl 99 --rpc 192.168.88.10:50052,192.168.88.11:50052`. Weights and the KV cache are spread over local and remote devices in proportion to free memory; `--tensor-split` overrides.
+- Optional RDMA (RoCE on Linux, Thunderbolt 5 on Apple silicon) is negotiated by itself; `GGML_RPC_NO_RDMA=1` forces TCP.
+- **[uncertain]** Whether Homebrew's or the release binaries' llama.cpp ship with RPC on. The script checks for the binary and says how to build it if missing.
+
+## 4. Safety: rpc-server has no authentication
+
+Kin trust cannot reach inside llama.cpp's RPC protocol. So the trust gate for 019b is **the room's own network plus the script's guard rails**, and the card says so plainly:
+
+1. **Never 0.0.0.0, never a public address.** `tree-lab lend` requires the machine's own private LAN address (10.x, 172.16-31.x, 192.168.x) and refuses anything else. It never binds all interfaces.
+2. **Only the host may connect, where the OS allows.** `lend --host-ip 192.168.1.20` prints (and, with `--firewall` and a password prompt, applies) a rule that allows TCP 50052 from that one address only: `ufw allow from 192.168.1.20 to any port 50052 proto tcp` on Linux, a `pf` anchor on macOS, `New-NetFirewallRule -RemoteAddress` on Windows. Without `--firewall` it only prints the rule.
+3. **Lend for a while, not forever.** `--for 2h` (default 2 hours) stops the server on its own. Ctrl+C stops it at once. The script prints "Lending ends at 3:40 PM."
+4. **Wired and trusted only.** The script asks once: "Is this a wired network you trust, like one classroom? (yes/no)". It refuses on "no". It cannot check this, and it says so.
+5. **Kin first in the Tree.** The Lab card appears only inside a room, and only lists machines that are trusted kin and connected. It shows commands with their typed LAN addresses. Kin trust decides who you invite into the lab. It does not secure the RPC traffic, and the card says that in words.
+6. Later (019c, not now): wrap RPC in a tunnel keyed by the kin keys, so the port is never open in plain. Out of scope until 019b is walked.
+
+UI line (draft):
+> "The lab split uses llama.cpp's rpc-server, which has no password of its own. Run it only on a wired network you trust, like one classroom, and never on the internet or guest Wi-Fi. Each lending machine allows only the host's address, and lending stops after two hours."
+
+## 5. The flow (teacher view)
+
+1. 019a: the room is open and everyone is trusted kin.
+2. Lab card on the host: "Split one model across this room (slow, for learning)". The teacher types each lending machine's LAN address. A device may also fill in its own address after a tap, which only reads what the person types. The page does no LAN scan.
+3. Each lending machine's Tree shows its own command, e.g. `./tree-lab.sh lend --ip 192.168.1.31 --host-ip 192.168.1.20 --for 2h`. A person runs it in a terminal and answers yes.
+4. The host's command: `./tree-lab.sh host --model ~/models/qwen3-4b-q4_k_m.gguf --rpc 192.168.1.31:50052,192.168.1.32:50052`. It runs `llama-server ... --host 127.0.0.1 --port 8080`. **llama-server stays on loopback**, so the only door to it is the Tree's own (018/019a): kin only, Pause wins.
+5. The host's Tree checks **only loopback**: `http://127.0.0.1:8080/health` and `/v1/models`, after a tap. Then **Remember this mind** makes it the host's local mind like any other, and 019a's room can ask it.
+6. What is joined, said plainly: "Memory joined: this model's layers are spread over 3 machines (about 24 GB together). One question runs across all of them at a time. It is slower than a model that fits on one machine."
+7. Reachability of the lenders is checked by llama-server itself when it loads, since RPC is raw TCP and a page cannot test it. The script prints which lender did not answer. The card says: "If loading fails, the host's terminal names the machine that did not answer."
+
+## 6. Paste outline (019b, for when 019a is merged and walked)
+
+Files (Alpha):
+- `tools/tree-lab/tree-lab.sh` (new, MIT). Subcommands: `check` (finds `ggml-rpc-server` or `rpc-server`, and `llama-server`; prints how to build with `-DGGML_RPC=ON`), `lend`, `host`, `stop`. It refuses non-private IPs and 0.0.0.0, asks the wired-and-trusted question, has a default 2h timer and an optional host-only firewall rule, and never needs sudo unless `--firewall` is given.
+- `tools/tree-lab/tree-lab.ps1` (new, MIT): the same, for Windows.
+- `tools/tree-lab/README.md`: the honest frame, the warning quoted from llama.cpp, and the Pi numbers.
+- `tools/tree-lab/tree-lab.test.sh`: runs with a stub `ggml-rpc-server`/`llama-server` on PATH. It checks refusals (public IP, 0.0.0.0, "no"), the exact command lines, timer stop, loopback-only llama-server, and that the firewall rule is printed but not applied without the flag.
+- `docs/modules/tree-pool.js`: a Lab part, shown only in a room and only listing trusted kin. It holds typed LAN addresses (validated as private; kept for this visit only, never sent anywhere), per-machine commands with Copy buttons, a loopback-only check after a tap (127.0.0.1:8080 /health), and the honest lines above. No new fetch beyond loopback. `iceServers` stays empty.
+- `docs/modules/tree-pool-lab.test.js`: SMOKE_OK tree pool lab v0.3.
+- Docs layers: code-settings.html, GALAXIES.md.
+Locks: as 019a, plus the script never binds 0.0.0.0, never opens a port to the internet, and never runs without a person typing the command.
+Walk (Kirk's Mac and one more machine on a wired switch): lend from the second machine, host on the Mac with a 3B model first (it fits on one, so the slowdown is visible), then a model that does not fit on either alone. Write down tokens per second each way.
+
+## 7. What 019b will not do
+
+There is no automatic discovery, no LAN scan from a page, no rpc-server on Wi-Fi by default, and no public port. Nothing is installed without a person. There is no claim of speed. Memory is joined only for the one model being split.

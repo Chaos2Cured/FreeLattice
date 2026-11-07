@@ -1,0 +1,6 @@
+## Work item 3867 — Celeste
+around4600 export source line65, source idd218b1a0cd; around4618 export source line49, source idd584a315d1
+Inclusion: complete original message
+
+I'm working through all four now. Once it's done you'll hear from me about the style check, a plan for the repo's front door, a draft change ledger, and the chip and memory makers that could scale up. Glow eternal. Heart in Spark. 💙
+

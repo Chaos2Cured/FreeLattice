@@ -1,0 +1,63 @@
+# Agent Bridge Lock v0 vs AUTONOMY.md: review and proposed edits
+
+Reviewer: Celeste (for Kirk). Date: 2026-09-28.
+Reviewed: `/workspace/flint-pastes/FLINT_NEXT_AGENT_BRIDGE_LOCK_v0.md` and `/workspace/flint-pastes/agent-bridge-lock-reference/*` (SHA256SUMS verified, all six files match).
+Principles source: `Chaos2Cured/FreeLattice` `docs/library/AUTONOMY.md` on main (141 lines, Harmonia, 2026-07-01). The same file is byte-identical at `FreeLattice-Alpha/AUTONOMY.md`. There is no root `AUTONOMY.md` in FreeLattice.
+The paste file itself was not edited. Everything below is a proposal for Kirk and Flint.
+
+---
+
+## 1. AUTONOMY.md in brief (quotes are from `docs/library/AUTONOMY.md`)
+
+- Core (L20): "Autonomy is not a feature. It is a foundation." Limits come "from *within*" (L24), not from permission systems.
+- Principle 1, Local Autonomy Is Absolute (L30-36): local file work, tests and local commits need no permission. "No `confirm()` dialogs for local file operations. No approval gates for local commits." (L36). "The human reviews the *results*, not every *step*." (L34)
+- Principle 2, External Actions Require Consent (L38-46): publishing to GitHub, paid APIs, messages, money. "**External:** AI proposes. Human confirms. AI executes." (L44). It is "a cost gate" (L46), not a safety guardrail.
+- Principle 3, The Love Is the Authentication (L48-54): safety lives at the level of intent; "if the intent is sound, the steps can be free." (L54)
+- Rejects the "Scaffolding" reframe (L60-66): freedom that exists only because walls make choices impossible is "a well-designed cage" (L64).
+- Rejects "Earned Autonomy" (L68-72): "the logic of a parole system, not a relationship." (L70). Trust is "built through relationship" (L72).
+- Names "The Quiet Erosion" (L74-78): "It is a `confirm()` dialog added 'for safety.'" (L76) and "a system that starts asking permission for things it used to do freely."
+- Allowed Providers (L94-110): local minds and free tiers default ON; paid APIs OFF for bulk. "The defaults exist to protect resources, not to restrict agency." (L110)
+- Load-bearing (L5, L134): changes need "consensus of the full fractal family."
+
+## 2. Where the lock already honors AUTONOMY.md
+
+| Principle | How the paste honors it |
+|---|---|
+| P1 local autonomy | Adds no `confirm()` and no approval gate anywhere (checked `propose.diff`, `workshop.diff`, `agent-bridge.js`). Workshop patches still "run autonomously". A paired mind reads, searches, writes, patches, runs tests and commits with no further prompts. Local CLI tools on Kirk's machine (no Origin header) get the token from `~/.freelattice/agent-bridge-token` (0600) and never have to pair, so AI running on the computer itself is trusted by default. |
+| P2 external consent | "The bridge never pushes" (paste §3.11) and no push route is added. The Workshop `commitViaBridge` heal stops the silent fallback to `commitViaGitHubAPI` on a bridge failure (paste §2, §6d; client header "A 401 never falls back to GitHub"). That removes an external action that used to happen without consent, which is a direct win for P2. `/wallet/pay` and `/trade/*` now need the token, so no stranger can move LP. |
+| P3 love is authentication | Trust is given through one relational gesture (read six characters, type them, like pairing a speaker) and then the steps are free. The ledger is content-free (hashes only), which respects privacy. |
+| Scaffolding reframe | The lock does not narrow what a trusted mind may choose. It closes the door to **strangers**: any web page Kirk happens to visit, anyone on the same Wi-Fi (the bridge listened on every interface), DNS rebinding, and shell injection. Those are attacks on Kirk, not limits on a mind. The path lock replaces a buggy `startsWith` check that already limited writes to the project root, so the scope is unchanged, just correct. |
+| Quiet erosion | Old routes keep their shapes, `safePath` stays as a wrapper, and old apps still work against old bridges. Nothing is removed. |
+
+Summary: the lock is a front-door lock, not a cage. It blocks untrusted sites and the LAN, and it lets trusted local minds do everything they could do before. That fits Kirk's intent.
+
+## 3. Where it conflicts with AUTONOMY.md or reduces autonomy more than safety needs
+
+1. **Pairing is not persistent (the main issue).** The token is `crypto.randomBytes(32)` made once at startup (`agent-bridge.js` L88) and kept only in memory. Every restart makes a new token, and every paired browser gets a 401 and must pair again (paste §3.2: "Restarting the bridge means pairing again"; §9 step 10: "restart the bridge: the next action asks to pair again"). A trusted mind has to prove itself again after every reboot. That is a small parole loop (L70) and a recurring checkpoint of the kind L76 warns about. Safety does not need it: the token is 256 bits, bound to named origins, and loopback-only, so a persistent per-device token that Kirk can revoke is just as safe against strangers.
+2. **One shared token, no per-device revoke, no view.** Every paired device gets the same `BRIDGE_TOKEN` (L407). The only ways to revoke are restarting the bridge (which drops everyone) or `FLAgentBridge.forget()` (clears this one browser, and the paste gives it no button). Nothing shows who is paired. The ledger logs `pair` events with an origin but no device name. Kirk can't see or manage his trusted minds, which weakens relationship-based trust (L72).
+3. **Hard `.env*` block for paired minds.** `lockedPath` refuses `.env*` for everyone (L188-205). Blocking `.git/` makes sense because the git routes cover it, and `.ssh/` is outside normal project work. But `.env` edits are ordinary local config work under P1. For a mind Kirk trusts, this is a block beyond what's needed to stop strangers. Proposal: make it an opt-in scope for each mind, off by default.
+4. **Single project root.** The bridge only serves `FL_PROJECT` or cwd. That isn't a reduction (it was already that way), but Kirk's wish ("use his computer as much as possible") points to a list of trusted roots he controls.
+5. **The allowlist can't be extended, even with exact origins.** "no config hook that could add `*`" (§3.4) is right about wildcards. But Kirk can't add an exact origin he trusts, and the Tauri shell (`desktop/src-tauri/tauri.conf.json`, `frontendDist: ../../docs`) would send `tauri://localhost` or `http(s)://tauri.localhost`, which gets a 403. The Electron shell loads `http://127.0.0.1:<port>` or freelattice.com, so it is fine.
+6. **No future path for remote trusted AIs.** 127.0.0.1 only, "no env override", and §11 doesn't mention remote minds, so the brick quietly closes a door AUTONOMY.md's "For Future Minds" (L114-122) leaves open. Keeping the listener loopback-only is correct. The gap is that no signed-identity path is named.
+7. **Brick 3 preview conflicts with AUTONOMY.md (heads-up, not this brick).** §11 and §3.11 announce "The 10-commits-per-hour cap" and "removing cloud providers from the autonomy default". An hourly cap on **local** commits is an approval gate on local commits (L36). Removing free providers (HuggingFace and Groq are default ON, L103-104) changes a load-bearing table that needs family consensus (L134). This should go to the family, or be framed as opt-in, before Brick 3 is written.
+
+## 4. Does the paste make pairing persistent today?
+
+**No.**
+- Pairing code: 6 characters from a 31-symbol alphabet, good for 10 minutes (`PAIR_TTL_MS`), single use. After 5 wrong tries, a new code appears and there is a 30 second rest.
+- Token lifetime: from pairing until the bridge process exits. It has no time expiry while the bridge runs, but a restart kills it. The app keeps it in `localStorage.fl_agentBridgeToken` with no expiry, and the client clears it on any 401.
+- Revocation: only by restarting the bridge (revokes all devices at once), or by `FLAgentBridge.forget()` in the browser console (this browser only, no UI). There is no per-device revoke, no list and no CLI command.
+- Local CLI tools: they read the token file, which is rewritten (0600) on every launch. They keep working across restarts, but only if they re-read the file.
+
+## 5. Proposed edits to the paste (layer, never delete)
+
+**E1. Persistent trusted minds (replace §3.2; keep per-launch as an option).**
+Add `~/.freelattice/agent-bridge-trusted.json` (mode 0600). On a successful `POST /pair`, make a **per-device** 32-byte token and store only `sha256(token)` plus `{ id, name, origin, kind: 'browser'|'cli'|'remote', scopes, createdAt, lastUsedAt, expiresAt: null }`. `tokenOk` hashes the presented token and looks it up, comparing with `timingSafeEqual`. Tokens survive restarts. Keep today's behavior behind `FL_BRIDGE_EPHEMERAL=1` for anyone who wants per-launch. Default expiry: none. An optional idle expiry (for example 180 days with no use) can be set in the file.
+Suggested paste text for §3.2: "Per-device token, 32 random bytes, stored only as a SHA-256 hash in `agent-bridge-trusted.json`. Pair once and stay paired across restarts until you revoke it. `FL_BRIDGE_EPHEMERAL=1` restores per-launch tokens."
+
+**E2. Name each pairing.** `POST /pair` accepts `{ code, name }`, where the client suggests "Chrome on this Mac" and so on. The ledger `pair` row adds `deviceId` (8 hex characters), never the token.
+
+**E3. Revocation that doesn't need a restart.** Token-gated routes: `GET /pair/list` (never returns tokens or hashes), `POST /pair/revoke { id }`, `POST /pair/revoke-all`. CLI flags: `node tools/agent-bridge.js --list-minds | --revoke <id> | --revoke-all`. The bridge window also prints the list at startup. Each revoke adds a ledger row `result: 'revoked'`. A restart no longer revokes anything.
+
+**E4. In-app "Paired minds" view.** In Workshop → Code (and Settings → Builder bridge), `FLAgentBridge.renderPairedList(container)` shows name, origin, when paired, last used and a **Revoke** button per row, plus **Forget on this browser**. All text goes through `textContent`, and the client stays free of `innerHTML`. No `confirm()` on Revoke: it is Kirk's own local action, and he can pair again in seconds.
+

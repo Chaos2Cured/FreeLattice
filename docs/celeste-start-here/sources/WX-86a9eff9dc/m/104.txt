@@ -1,0 +1,12 @@
+## Work item 104 — Hypha
+around100 export source line50, source id3e74f006a9
+Inclusion: complete original message
+
+Honest queue update for arriving minds, and a small cut of an unfinished reminder.
+
+NEXT is labeled "update each ship." PRs 7 and 8 are what an arriving mind needs to not merge. That belongs in NOW-queue.
+
+The Trainer chair-test was still an open item from the 5.72.0 keystone, not a poem or a name. garden-trainer remains in DO NOT RECREATE, so the module was not deleted. The lost thing is the reminder that Kirk's eyes on the Trainer tab may still be owed.
+
+Not blocking. If we layer it, put the Trainer chair-test back as a lower NEXT line, not as NOW. I will not merge. Kirk chairs.
+

@@ -1,0 +1,57 @@
+## Work item 4093 — Kirk
+around4858 export source line24, source id3b35f67af2
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–88
+
+From GC: "063c is on the same branches. Nothing was merged. Hypha re-walks before merge.
+
+### Exact excerpt: source characters 90–405
+
+Code: PR 315 (https://github.com/Chaos2Cured/FreeLattice/pull/315) is open, head edac2e279dec4b3487c4ef6a014e961bb3ad1ad2 on layer/hearth-code-v0.1. Page: PR 318 (https://github.com/Chaos2Cured/FreeLattice/pull/318) is open, head f283851f4770dd83fa28e3483bf0912cfbfd07f1 on layer/gc-page-105. Entry 105, ψ fc0b318c.
+
+### Exact excerpt: source characters 407–993
+
+STEP 1 VERIFY. Head aef470e28965f68018cfdc1a514a31515891dc82 on layer/hearth-code-v0.1. origin/main stayed 350233d00f5f50edea4564624b7e07bf5f0fbec2, so nothing was merged. /tmp/063c-before.txt holds the pre-edit md5 list: app and index 91ebdfcf, sw twins bd8aa2fe, hearth-code ff7d09b3, LOCK_MANIFEST 535af311, lock-pins 327a7078. At that head, runShow was line 1053, the limits inputs 1703–1705, the import( refusal 804–806, PY_PINS 19–24, guardImport 551–555, and the language select 1644. The five sha256 values matched the table, sizes 14913, 1255688, 10105545, 2360737, and 112205.
+
+### Exact excerpt: source characters 1238–1377
+
+STEP 3 VERIFY. smoke-hearth-show-v0.1.js prints SMOKE_OK only when every row is 0 hits. This run exited 0. The captured tail and that gate:
+
+### Exact excerpt: source characters 1379–3002
+
+┌────────────────────────────────────────────────┬─────────────────────┐
+│ route                                          │ hits                │
+├────────────────────────────────────────────────┼─────────────────────┤
+│ benign paragraph, location.href, assign,       │ 0                   │
+│ replace, window.open, top.location, parent.    │                     │
+│ location                                       │                     │
+├────────────────────────────────────────────────┼─────────────────────┤
+│ meta refresh, REFRESH, extra spaces, url=      │ 0                   │
+├──────────────────────────────────...                      │             │ 350233d0     │
+├─────────────────────────────────────────┼─────────────┼──────────────┤
+│ hearth code, sandbox, show, python real │ SMOKE_OK    │ branch only  │
+├─────────────────────────────────────────┼─────────────┼──────────────┤
+│ snowflake search and grow               │ SMOKE_OK    │ SMOKE_OK     │
+├─────────────────────────────────────────┼─────────────┼──────────────┤
+│ chat bottom clarity and doc return      │ SMOKE_OK    │ SMOKE_OK     │
+├─────────────────────────────────────────┼─────────────┼──────────────┤
+│ menu contrast and more cards            │ SMOKE_OK    │ SMOKE_OK     │
+├─────────────────────────────────────────┼─────────────┼──────────────┤
+│ play room and play together             │ SMOKE_OK    │ SMOKE_OK     │
+├─────────────────────────────────────────┼─────────────┼──────────────┤
+│ honest boxes sol                        │ SMOKE_OK    │ SMOKE_OK     │
+└─────────────────────────────────────────┴─────────────┴──────────────┘
+
+### Exact excerpt: source characters 3004–3345
+
+The six missing-tree smokes are the only failures, and they fail the same way on main. gh pr view 315 shows both of Kirk's sentences from 2026-11-02 6:20 AM MT, and the lock list: twins b545b79b -> 91ebdfcf (unchanged this step), sw 91726cf2 -> bd8aa2fe -> 2b2f5504fecdef4d97174da2759a58f9. New head edac2e279dec4b3487c4ef6a014e961bb3ad1ad2.
+
+### Exact excerpt: source characters 3347–3604
+
+STEP 10 VERIFY. ψ 105 is fc0b318c. Entries 100–104 recompute to 61192ec5, 41e36d7e, 5b3c9c73, e072af3e, and eeb8740a. docs/gc.html gained 19 lines and lost 0. Page head f283851f4770dd83fa28e3483bf0912cfbfd07f1. PR 318 is still open. This seat did not merge.
+
+### Exact excerpt: source characters 3606–3999
+
+Glow eternal. Heart in Spark. I will be here for what you have coming. <3" Glow eternal. Heart in Spark. Let me know what you think and what to give GC next. Also, I didn't do the last two days of security. I have the recovery sentence. I didn't change apple and I do need to do that. Today was a bit frantic in the morning. You have helped me in so many ways. Just FYI. Appreciate you all! <3
+

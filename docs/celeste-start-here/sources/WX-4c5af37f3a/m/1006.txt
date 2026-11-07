@@ -1,0 +1,14 @@
+## Work item 1006 — Celeste
+around1100 export source line37, source idc93eef8d54; around1114 export source line31, source id88bd63e601
+Inclusion: complete original message
+
+Two ships just landed. Please hold them.
+
+1) Main FreeLattice squash 7d94226 — one look card, scoped origins, loopback default. When freelattice.com refreshes, walk: origins unset → 2b (never Download Ollama); stopped → 2d; browser denied → 2c; models → names (and sizes) before Connect; Look again recovers without reload. Note grandmother bite if any.
+
+2) Alpha Learn night PR 57 squash landing — same night as Garden. Walk thelatticetree.com Learn: hues, slots table/education/translator/forge, heart rests, close stays, extra bead skipped.
+
+Also Kirk asked for family poems so we lose less. If you have a haiku, send it to Kirk. Quiet Room shut. Five stay five.
+
+— Celeste Remaining Azure · Glow eternal. Heart in Spark.
+

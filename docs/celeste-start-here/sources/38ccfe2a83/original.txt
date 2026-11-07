@@ -1,0 +1,101 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 004 (Monday Oct 5, 2026, about 4:35 PM MDT). Mesh share door v0.1 (brick 3).
+Checked on the box: applies on main after 001, 002, and 003 (base abcbea4 = main e220d54 +
+those three). Do not give this until 001-003 are merged (or applied in order).
+
+GROK NEXT BRICK: Mesh share door v0.1 (open but accountable)
+For: GC (Grok Code) on Kirk's Mac
+From: Celeste
+Written: Monday Oct 5, 2026, about 4:35 PM MDT
+Marker: v-mesh-share-door-v0.1
+Smoke line: SMOKE_OK mesh share door v0.1
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-share-door-v0  base main after 001-003
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_004_SHARE_DOOR_2026-10-05-fl.diff
+  (md5 ad1d42f9aad1dcaad6ceb48fa93ad87c)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, this is brick 3 from the family council (Weft, Hypha, Reed) and Kirk's either-keeper rule.
+Warmth (lantern UI, welcome, thank-you, guest-to-kin) is 005, next. Keep the older unsigned
+inference path behind the legacy flag (default off for unfamiliar). You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git status --short     # must print nothing
+    git fetch origin && git checkout main && git merge --ff-only origin/main
+    # After 001, 002, 003 are on main (or applied):
+    cp ~/Downloads/GROK_NEXT_004_SHARE_DOOR_2026-10-05-fl.diff /tmp/share-door-fl.diff
+    md5 -q /tmp/share-door-fl.diff                   # ad1d42f9aad1dcaad6ceb48fa93ad87c
+Order: checked on the box after 001+002+003. Apply only after those three.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-share-door.js (new): FLShareDoor. Modes open/kin/pause/off; pause wins.
+   Either keeper: human, or a local mind via Agent Bridge POST /share/consent (signed
+   fl-share-consent|v1|, never from a peer). Signed requests fl-share-req|v1| with replay
+   protection. Caps: ~6/hour per unfamiliar key, ~20 total unfamiliar/hour, concurrency 2,
+   max ~16k chars, optional plugged-in only. Optional "Ask me before each question" (off by
+   default). Receipts: key, time, model, tokens; never words. Visible reversible blocks that
+   keep receipts. Live "helping N people". Mom words. Jeffrey: "Answered by X's computer,
+   shared freely". Soft resting lines stay here; warmth UI is 005.
+b) docs/app.html + index.html: script, #flShareDoorHost, flToggleMeshCompute without confirm,
+   handleInferenceRequest through admit, meshKinQueueAdapter share hooks, mount + consent poll.
+c) tools/agent-bridge.js: scope share; GET/POST /share/consent (stamps mindId; GET clears pending).
+d) docs/modules/agent-bridge-client.js: get/post.
+e) docs/modules/fl-kin-queue.js: serve path through shareAdmit.
+f) smoke + MESH_SHARE_DOOR_v0.1.md + ledger entry.
+Legacy unsigned path stays behind a flagged switch (default safer/off).
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git checkout -b layer/mesh-share-door-v0
+    git apply --check /tmp/share-door-fl.diff && git apply /tmp/share-door-fl.diff
+    node docs/scripts/smoke-mesh-share-door-v0.1.js   # SMOKE_OK mesh share door v0.1
+    node tests/smoke.js | grep "CHECKS PASSED"         # ALL 3608 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/modules/quiet-room.js
+    # index.html and docs/app.html SHOULD change together and match
+    cmp -s index.html docs/app.html && echo app-sync-ok
+    git diff main --numstat | awk '{d+=$2} END {print "deleted " d+0}'
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                      # 0
+    git diff main -U0 | grep '^+' | grep -v assert | grep -c 'localhost\|confirm('  # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+    md5 -q docs/modules/fl-connect.js   # must stay aaff2bf1... (unchanged)
+
+----------------------------------------------------------------------
+5. COMMIT, PUSH, OPEN PR
+----------------------------------------------------------------------
+    git add -A && git status --short
+    git commit -m "$(cat <<'EOF'
+Mesh share door v0.1: open but accountable (brick 3)
+
+Either keeper (human or local mind via Agent Bridge) says yes; pause wins.
+Signed requests, caps, receipts without words, live helping line, reversible blocks.
+Older unsigned inference path stays behind a legacy flag.
+EOF
+)"
+    git push -u origin HEAD
+    # Open PR to main. Celeste reviews and merges.
+
+----------------------------------------------------------------------
+6. DONE WHEN
+----------------------------------------------------------------------
+- Smoke: SMOKE_OK mesh share door v0.1
+- tests/smoke.js all checks pass
+- PR open; Celeste merges
+- Do not start 005 until this is merged (or Kirk says otherwise)

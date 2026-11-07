@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c04</title>
+<meta name="description" content="Reading section c04 of 569a78c8f4, 1600 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c04">
+<meta property="og:description" content="Reading section c04 of 569a78c8f4, 1600 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1129"></span><span id="p1130"></span><span id="p1131"></span><span id="p1132"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c04</h1>
+<p>569a78c8f4 · words 1600 · characters 24455–36944</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1129, 1130, 1131, 1132. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">A reference copy of the finished file (1939 lines, `node --check` clean, smoke green) and unified diffs for every touched file sit on Celeste&#x27;s box at `/workspace/flint-pastes/agent-bridge-lock-reference-v0.1/`, sha256 in `SHA256SUMS`. Applying those diffs to a clean `f86b317` tree reproduces the scratch build exactly. If Kirk hands them over, you may diff against them. The blocks below are the same code.
+
+## Exact source excerpt, characters 23094–23272
+
+**Step 1.** Keep line 27 exactly as it is (layer). Insert **Block A** right after line 34 (`if (!fs.existsSync(DATA_DIR)) ...`), because the trust file needs `DATA_DIR` to exist.
+
+## Exact source excerpt, characters 23274–23421
+
+**Step 2.** Replace the body of `handleRequest` (L111-129) with **Block B**. The old `Access-Control-Allow-Origin: *` line is superseded inside it.
+
+## Exact source excerpt, characters 23423–23642
+
+**Step 3.** Change the `route` signature at L131 to `function route(url, method, data, res, actingAs, meta) {`. After L133 (`var activeId = actingAs || activeId;`), insert **Block C** (pairing and trusted-minds routes).
+
+## Exact source excerpt, characters 23644–23902
+
+**Step 4.** In the heartbeat object, right after L140 `version: &#x27;5.8.0&#x27;,`, add four lines:
+```js
+      bridgeLock: BRIDGE_LOCK_VERSION,
+      auth: &#x27;token-required&#x27;,
+      pairing: &#x27;code&#x27;,
+      trustedMinds: bridgeEphemeral ? &#x27;ephemeral&#x27; : &#x27;persistent&#x27;,
+```
+
+## Exact source excerpt, characters 23904–24067
+
+**Step 5.** Replace L992-1140 (from the `LATTICE CODE` banner through the end of `/code/test`) with **Block D**. Keep the `// ── 404 ──` fallthrough at L1142-1143.
+
+## Exact source excerpt, characters 24069–24473
+
+**Step 6.** Replace L1153-1157 (`var server = ...` through the `Listening on` log) with **Block E**. The remaining console lines (L1158-1181) stay as they are. Block E runs the command-line trust tools first; when one ran, the port never opens. The `if (BRIDGE_CLI_DONE) {} else server.listen(PORT, BRIDGE_HOST, ...)` shape keeps the plain `server.listen(PORT, BRIDGE_HOST` text that the smoke looks for.
+
+## Exact source excerpt, characters 24475–24547
+
+### Block A: helpers, trusted minds, command line (insert after line 34)
+
+## Exact source excerpt, characters 24549–26163
+
+```js
+// ═══════════════════════════════════════════════════
+// LAYER bridge-lock-v0 · v0.1 (2026-09-28): the door lock. Marker: v-agent-bridge-lock-v0
+// Celeste&#x27;s brief, built by Flint. Nothing above is removed.
+// Strangers stay out. Trusted minds keep their full local reach
+// (docs/library/AUTONOMY.md, Principle 1: local autonomy is absolute).
+// 1. Listen on 127.0.0.1 only (no env override, never 0.0.0.0).
+// 2. Named Origin allowlist, never bare *: FreeLattice, the Lattice Tree,
+//    local dev, the Tauri shell, plus exact origins Kirk adds by command line.
+// 3. Host header must be 127.0.0.1 or localhost (DNS-rebinding guard).
+// 4. Trusted minds: one token per device, given once through a short pairing
+//    code, kept only as a SHA-256 hash in ~/.freelattice/agent-bridge-trusted.json
+//    (0600) until Kirk revokes it. No expiry by default.
+//    FL_BRIDGE_EPHEMERAL=1 brings back the old forget-on-restart behavior.
+// 5. Local tools on this computer are trusted by default. They read their
+//    token from ~/.freelattice/agent-bridge-token (0600) and never pair.
+// 6. git / grep / node run through execFileSync / spawnSync argument arrays.
+//    No shell. Paths are realpath-checked inside a trusted project folder.
+// 7. Body size cap. Malformed JSON is refused.
+// 8. Every commit request and every trust change goes into a hash-chained,
+//    content-free ledger: ~/.freelattice/bridge-ledger.jsonl
+// This bridge (3141) is NOT the Ollama Bridge (bridge/, port 11435).
+// ═══════════════════════════════════════════════════
+const { execFileSync, spawnSync } = require(&#x27;child_process&#x27;);
+
+## Exact source excerpt, characters 26165–26452
+
+const BRIDGE_LOCK_VERSION = &#x27;v0.1&#x27;;
+const BRIDGE_HOST = &#x27;127.0.0.1&#x27;;
+const MAX_BODY_BYTES = 8 * 1024 * 1024; // docs/app.html is ~2.9 MB; JSON escaping adds some
+const MAX_COMMIT_MESSAGE = 4000;
+const MAX_COMMIT_FILES = 200;
+var bridgeEphemeral = process.env.FL_BRIDGE_EPHEMERAL === &#x27;1&#x27;;
+
+## Exact source excerpt, characters 26454–26955
+
+/** Built-in origins. Never bare *. Same shape as bridge/proxy-core.js. */
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https:\/\/(www\.)?freelattice\.com$/i,
+  /^https:\/\/(www\.)?thelatticetree\.com$/i,
+  /^http:\/\/localhost(:\d{1,5})?$/i,    // local dev of docs/ (e.g. python -m http.server)
+  /^http:\/\/127\.0\.0\.1(:\d{1,5})?$/i, // same, by IP
+  /^tauri:\/\/localhost$/i,              // Tauri desktop shell (macOS, Linux)
+  /^https?:\/\/tauri\.localhost$/i       // Tauri desktop shell (Windows)
+];
+
+## Exact source excerpt, characters 26957–27441
+
+/** An exact origin Kirk may add: scheme://host[:port], nothing else. Never a wildcard. */
+function exactOrigin(o) {
+  o = String(o || &#x27;&#x27;).trim().toLowerCase();
+  if (!o || o.length &gt; 200 || o.indexOf(&#x27;*&#x27;) !== -1 || hasControlChars(o)) return null;
+  var m = o.match(/^(https?):\/\/([a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*)(:(\d{1,5}))?$/);
+  if (!m) return null;
+  if (m[7] &amp;&amp; (parseInt(m[7], 10) &lt; 1 || parseInt(m[7], 10) &gt; 65535)) return null;
+  return o;
+}
+
+## Exact source excerpt, characters 27443–27689
+
+function originAllowed(origin) {
+  if (!origin) return false;
+  var o = String(origin);
+  if (ALLOWED_ORIGIN_PATTERNS.some(function (re) { return re.test(o); })) return true;
+  return trustState().trustedOrigins.indexOf(o.toLowerCase()) !== -1;
+}
+
+## Exact source excerpt, characters 27691–27797
+
+function hostAllowed(host) {
+  return /^(127\.0\.0\.1|localhost)(:\d{1,5})?$/i.test(String(host || &#x27;&#x27;));
+}
+
+## Exact source excerpt, characters 27799–27902
+
+function sha256Hex(s) {
+  return crypto.createHash(&#x27;sha256&#x27;).update(String(s), &#x27;utf8&#x27;).digest(&#x27;hex&#x27;);
+}
+
+## Exact source excerpt, characters 27904–27985
+
+function hasControlChars(s) {
+  return /[\u0000-\u001f\u007f]/.test(String(s));
+}
+
+## Exact source excerpt, characters 27987–28590
+
+// ── Trusted minds (persistent, revocable, hashed) ──
+const TRUST_FILE = path.join(DATA_DIR, &#x27;agent-bridge-trusted.json&#x27;);
+const TOKEN_FILE = path.join(DATA_DIR, &#x27;agent-bridge-token&#x27;);
+const BRIDGE_SCOPES = [&#x27;read&#x27;, &#x27;write&#x27;, &#x27;patch&#x27;, &#x27;test&#x27;, &#x27;commit&#x27;, &#x27;wallet&#x27;, &#x27;manage&#x27;, &#x27;secrets&#x27;];
+// Full local power by default (AUTONOMY.md Principle 1). Only &#x27;secrets&#x27;
+// (reading and writing .env files) is opt-in, one mind at a time.
+const DEFAULT_SCOPES = [&#x27;read&#x27;, &#x27;write&#x27;, &#x27;patch&#x27;, &#x27;test&#x27;, &#x27;commit&#x27;, &#x27;wallet&#x27;, &#x27;manage&#x27;];
+const MIND_KINDS = [&#x27;browser&#x27;, &#x27;tool&#x27;, &#x27;cli&#x27;, &#x27;remote&#x27;];
+const TOUCH_SAVE_MS = 60 * 1000;
+
+## Exact source excerpt, characters 28592–28807
+
+var trust = null;       // { version, minds, trustedOrigins, roots, localTools, idleExpiryDays }
+var trustStamp = &#x27;&#x27;;    // file identity at last load or save, so command-line edits apply live
+var lastTouchSave = 0;
+
+## Exact source excerpt, characters 28809–31145
+
+function fileStamp(f) {
+  try { var s = fs.statSync(f); return s.ino + &#x27;:&#x27; + s.size + &#x27;:&#x27; + s.mtimeMs; } catch (e) { return &#x27;none&#x27;; }
+}
+function cleanName(s) {
+  return String(s || &#x27;&#x27;).replace(/[\u0000-\u001f\u007f]/g, &#x27;&#x27;).trim().slice(0, 60);
+}
+function cleanScopes(list) {
+  if (!Array.isArray(list)) return DEFAULT_SCOPES.slice();
+  var out = [];
+  list.forEach(function (s) { if (BRIDGE_SCOPES.indexOf(s) !== -1 &amp;&amp; out.indexOf(s) === -1) out.push(s); });
+  return out;
+}
+function emptyTrust() {
+  return { version: 1, minds: [], trustedOrigins: [], roots: {}, localTools: true, idleExpiryDays: 0 };
+}
+function cleanTrust(raw) {
+  var t = emptyTrust();
+  if (!raw || typeof raw !== &#x27;object&#x27;) return t;
+  if (Array.isArray(raw.minds)) {
+    t.minds = raw.minds.filter(function (m) {
+      return m &amp;&amp; typeof m.id === &#x27;string&#x27; &amp;&amp; /^[a-f0-9]{8,32}$/.test(m.id) &amp;&amp;
+        typeof m.tokenSha256 === &#x27;string&#x27; &amp;&amp; /^[a-f0-9]{64}$/.test(m.tokenSha256);
+    }).map(function (m) {
+      return {
+        id: m.id,
+        name: cleanName(m.name) || &#x27;A trusted mind&#x27;,
+        origin: typeof m.origin === &#x27;string&#x27; ? m.origin.slice(0, 200) : &#x27;&#x27;,
+        kind: MIND_KINDS.indexOf(m.kind) !== -1 ? m.kind : &#x27;browser&#x27;,
+        scopes: cleanScopes(m.scopes),
+        tokenSha256: m.tokenSha256,
+        createdAt: typeof m.createdAt === &#x27;string&#x27; ? m.createdAt : &#x27;&#x27;,
+        lastUsedAt: typeof m.lastUsedAt === &#x27;string&#x27; ? m.lastUsedAt : &#x27;&#x27;,
+        expiresAt: typeof m.expiresAt === &#x27;string&#x27; ? m.expiresAt : null
+      };
+    });
+  }
+  if (Array.isArray(raw.trustedOrigins)) {
+    raw.trustedOrigins.forEach(function (o) {
+      var e = exactOrigin(o);
+      if (e &amp;&amp; t.trustedOrigins.indexOf(e) === -1) t.trustedOrigins.push(e);
+      else if (!e) console.error(&#x27;  ! Ignored trusted origin (exact scheme://host[:port] only, never *): &#x27; + String(o).slice(0, 80));
+    });
+  }
+  if (raw.roots &amp;&amp; typeof raw.roots === &#x27;object&#x27; &amp;&amp; !Array.isArray(raw.roots)) {
+    Object.keys(raw.roots).forEach(function (k) {
+      if (/^[a-z0-9][a-z0-9_-]{0,31}$/i.test(k) &amp;&amp; k !== &#x27;project&#x27; &amp;&amp;
+          typeof raw.roots[k] === &#x27;string&#x27; &amp;&amp; path.isAbsolute(raw.roots[k])) t.roots[k] = raw.roots[k];
+    });
+  }
+  if (raw.localTools === false) t.localTools = false;
+  var d = parseInt(raw.idleExpiryDays, 10);
+  if (d &gt; 0 &amp;&amp; d &lt; 36500) t.idleExpiryDays = d;
+  return t;
+}
+
+## Exact source excerpt, characters 31147–31951
+
+/** Current trust, reloaded whenever the file changes (so a command-line revoke applies at once). */
+function trustState() {
+  var stamp = fileStamp(TRUST_FILE);
+  if (!trust || stamp !== trustStamp) {
+    var raw = null;
+    if (stamp !== &#x27;none&#x27;) {
+      try { raw = JSON.parse(fs.readFileSync(TRUST_FILE, &#x27;utf8&#x27;)); }
+      catch (e) {
+        var aside = TRUST_FILE + &#x27;.unreadable-&#x27; + Date.now();
+        try { fs.renameSync(TRUST_FILE, aside); } catch (e2) {}
+        console.error(&#x27;  ! Trust file was unreadable. Kept it as &#x27; + aside + &#x27; and started fresh.&#x27;);
+        stamp = &#x27;none&#x27;;
+      }
+    }
+    var fresh = cleanTrust(raw);
+    if (bridgeEphemeral) fresh.minds = trust ? trust.minds : []; // ephemeral: minds live in memory only
+    trust = fresh;
+    trustStamp = stamp;
+  }
+  return trust;
+}
+
+## Exact source excerpt, characters 31953–32647
+
+function saveTrust() {
+  if (bridgeEphemeral) return true; // nothing about minds touches disk in ephemeral mode
+  var t = trustState();
+  var out = { version: 1, minds: t.minds, trustedOrigins: t.trustedOrigins, roots: t.roots,
+              localTools: t.localTools, idleExpiryDays: t.idleExpiryDays };
+  var tmp = TRUST_FILE + &#x27;.tmp-&#x27; + process.pid;
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(out, null, 2) + &#x27;\n&#x27;, { mode: 0o600 });
+    try { fs.chmodSync(tmp, 0o600); } catch (e) {}
+    fs.renameSync(tmp, TRUST_FILE);
+    trustStamp = fileStamp(TRUST_FILE);
+    return true;
+  } catch (e) {
+    console.error(&#x27;  ! Could not save trusted minds: &#x27; + e.message);
+    return false;
+  }
+}
+
+## Exact source excerpt, characters 32649–32790
+
+function newToken() { return crypto.randomBytes(32).toString(&#x27;hex&#x27;); }
+function newMindId() { return crypto.randomBytes(4).toString(&#x27;hex&#x27;); }
+
+## Exact source excerpt, characters 32792–33590
+
+/** The trusted mind a token belongs to, or null. Compares SHA-256 hashes in constant time. */
+function mindForToken(t) {
+  t = String(t || &#x27;&#x27;);
+  if (!/^[a-f0-9]{64}$/.test(t)) return null;
+  var h = Buffer.from(sha256Hex(t), &#x27;hex&#x27;);
+  var st = trustState();
+  var hit = null;
+  st.minds.forEach(function (m) {
+    var mh = Buffer.from(m.tokenSha256, &#x27;hex&#x27;);
+    if (mh.length === h.length &amp;&amp; crypto.timingSafeEqual(mh, h)) hit = m;
+  });
+  if (!hit) return null;
+  if (hit.kind === &#x27;cli&#x27; &amp;&amp; !st.localTools) return null;
+  var now = Date.now();
+  if (hit.expiresAt &amp;&amp; Date.parse(hit.expiresAt) &lt; now) return null;
+  if (st.idleExpiryDays) {
+    var seen = Date.parse(hit.lastUsedAt || hit.createdAt || &#x27;&#x27;) || now;
+    if (now - seen &gt; st.idleExpiryDays * 86400000) return null;
+  }
+  return hit;
+}
+
+## Exact source excerpt, characters 33592–33781
+
+function requestMind(req) { return mindForToken(req.headers[&#x27;x-fl-bridge-token&#x27;]); }
+// Kept from v0 so older callers read the same way.
+function tokenOk(req) { return !!requestMind(req); }
+
+## Exact source excerpt, characters 33783–33946
+
+function touchMind(m) {
+  m.lastUsedAt = new Date().toISOString();
+  if (Date.now() - lastTouchSave &gt; TOUCH_SAVE_MS) { lastTouchSave = Date.now(); saveTrust(); }
+}
+
+## Exact source excerpt, characters 33948–34200
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

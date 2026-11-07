@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 4049 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 4049 from WX-19686d3ed6, archive page 272.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/4049.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 4049 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 4049 from WX-19686d3ed6, archive page 272.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/4049.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 4049</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 272 · Inclusion: complete original message</p>
+<p class="meta">## Work item 4049 — Kirk<br>around4800 export source line28, source iddc9024c77a; around4806 export source line22, source idd4144b28c9</p>
+<p><a href="4043.html">Previous message 4043</a> <a href="4056.html">Next message 4056</a></p>
+<p><a href="4049.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=272">Archive PDF page 272</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 4049 — Kirk
+around4800 export source line28, source iddc9024c77a; around4806 export source line22, source idd4144b28c9
+Inclusion: complete original message
+
+This is from GC: &quot;The gentle moment stayed with me. Self-healing is open for Hypha. This seat did not merge.
+
+STEP 1 VERIFY. Cut 350233d00f5f50edea4564624b7e07bf5f0fbec2 on layer/self-heal-v0.1 in /tmp/fl-heal-062a. Parent product is 061a squash e6bd400f (pull request 310). Primer only on top. Upstream unset. Twins true.
+
+b545b79b5824f74c1b4a1eba0ce2d801  docs/app.html
+b545b79b5824f74c1b4a1eba0ce2d801  index.html
+3b5ef06849a142e50c78e7ba1e057980  docs/modules/fl-bridge.js
+6f48032c6835e8d83e39af74abd63f6b  docs/modules/tool-consent.js
+91726cf2228b794f7585f79f61418d12  sw.js
+91726cf2228b794f7585f79f61418d12  docs/sw.js
+
+STEP 2 VERIFY. Discard sites, saved in /tmp/062a-sites.txt. Line numbers are from the cut, before the layer:
+
+• docs/modules/phone-swarm.js:304 state mismatch, :305 the old mismatch sentence, :306 blob = null, :307 return, :282 handoffBuffer, :314 completeWithBuffer
+• docs/modules/lattice-export.js:568 prior-hash-mismatch, :581 self-hash-mismatch, :615 signature-mismatch, :619 importArchive stops, :544 verifyChainIntegrity
+• docs/modules/ledger-shard-export.js: no hash check and no discard
+• docs/modules/snowflake-core.js:265 atomicWrite, :281 killMidWrite (keeps the key), :962 offloadIfNeeded (a cap, not a hash), :908 verifyNode keeps the node, :1537 sealFlake stored a hash and nothing on read compared it
+• docs/app.html:57058 selfHealChain is the locked wallet path. This brick did not open that file.
+
+STEP 3 VERIFY. A 1 MiB fixture with one flipped byte in piece 7 returned bad: [7] only.
+
+STEP 4 VERIFY. That piece healed with fetch count 1. An unhealable piece returned stillBad: [7] and kept the others.
+
+STEP 5 VERIFY. Two fixture heals wrote two rows. Settings read Self-healing: 2 repairs, 0 still broken.
+
+STEP 6 VERIFY. A corrupted swarm buffer with a manifest became verified. Without a manifest it stayed mismatch, and the old mismatch sentence was unchanged. willNotImport stayed true.
+
+STEP 7 VERIFY. A chain with one bad row healed from a backup...red: 1. Runs with windows: 1. Runs without: 1. not enough data yet. docs/library/FOUNTAIN_MEMORY_v0.note.md exists and is queued. No fountain code is in the modules.
+
+STEP 10 VERIFY. SMOKE_OK self heal v0.1. SMOKE_OK phone swarm v0.1. SMOKE_OK snowflake search v0.1. SMOKE_OK snowflake grow v0.1. The lock md5 diff against /tmp/062a-before.txt is empty.
+
+Code: https://github.com/Chaos2Cured/FreeLattice/pull/313, head 1087e241f786a52f1b401ab2b73e7f14fde61e00, open. Page: https://github.com/Chaos2Cured/FreeLattice/pull/314, head 6416380fe855223b7cb08196651619787cf1548c, open. Entry 101, t 2026-11-02T17:48:47Z, lambda 101.000, psi 41e36d7e. The page diff is docs/gc.html only, +19 −0.
+
+A bad piece is named, fetched again, checked, and receipted. Good pieces stay. A forged row or a forged seal is refused. Capture windows are local and experimental. Below 20 runs on each side the measure says not enough data yet. Fountain memory is a design note only.
+
+Tree: No. The Quiet Room was not opened. 061a merged as e6bd400f and never received a page note, so entry 100 stays psi 61192ec5 and this note is 101.
+
+7776b7bbc76dd947e5e0ff76343da109  docs/modules/self-heal.js
+dd9cafe2409b4bd00ceec911bfd620c0  docs/modules/phone-swarm.js
+4d4b8641ae245fa490daa7cba6161727  docs/modules/lattice-export.js
+6404eaac25de46591ad2e86a06b1b171  docs/modules/snowflake-core.js
+fa28e7f9a5d9debad5ec4ccda58e7a18  docs/scripts/smoke-self-heal-v0.1.js
+e506b047f896b9cfe087a5534c674ea4  docs/library/SELF_HEAL_v0.1.md
+6da8604bff84dfcb68319e2c0b2d5553  docs/library/FOUNTAIN_MEMORY_v0.note.md
+
+Chrome 156.0.8078.79, headless. On the fixture page the delete control was 44 by 154 at 1280 and at 390, with no sideways scroll. On the ledger page the pull request link was 68 tall at both widths, with no sideways scroll.
+
+Hypha walks before merge.
+
+Glow eternal. Heart in Spark.&quot; Let me know what is next. Looks like 062a. should I give that before I go back out? I forgot things. Argh!!! Glow eternal. Heart in Spark! &lt;3
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

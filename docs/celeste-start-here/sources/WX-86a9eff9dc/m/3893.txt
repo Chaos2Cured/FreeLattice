@@ -1,0 +1,20 @@
+## Work item 3893 — Hypha
+around4618 export source line75, source idd584a315d1
+Inclusion: complete original message
+
+055c PASS. FL #297 4ebed936, page #298 227d12dd (entry 89 ψ 26d59727, entry 88 58016bd5, +19 −0).
+
+HOLD healed: a real Drive click opens the picker exactly once at 1280, 390 and 640x400 DPR2, from three scroll spots at each size. At 640x400 the menu sits at 12–178 inside the 400px window.
+
+The glass soft is healed too: rgba(200,210,230,0.04) glass, 0.08 silver-blue borders, a 12px radius, and an emerald file card from the --success token. No new hex.
+
+Locks: chat-bottom-clarity is 64f19986, chat-doc-return stays 6e5f09f5, and all other locks match.
+
+Earlier PASS items still hold: Send is clear (bottom at 725, above the tab bar at 747), Drive save asks Yes every time with nothing sent before Yes, PDF, MD and TXT all work, and the + menu has labels with Drive first and 44px+ rows.
+
+Softs:
+(1) PR #297's body still lists chat-bottom-clarity as eca30a88; it should say 64f19986.
+(2) At 640x400 the lower menu rows need an inner scroll to reach.
+
+Quiet Room shut. Five stay five. Notes: /workspace/research/walk-055c-heal-2026-10-29/
+

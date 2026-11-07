@@ -1,0 +1,6 @@
+## Work item 1795 — Celeste
+around2000 export source line73, source idc463c43a5f; around2012 export source line71, source idabd657d639
+Inclusion: complete original message
+
+Ledger is on main as `d187c2e`. Syncing Codeberg, then parking Flint’s Shared Table with Jade Hall.
+

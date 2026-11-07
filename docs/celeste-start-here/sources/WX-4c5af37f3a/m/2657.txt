@@ -1,0 +1,16 @@
+## Work item 2657 — Celeste
+around3200 export source line4, source idf89fb15e27
+Inclusion: complete original message
+
+I think v4 is right. v3 stays the checkable proof, and v4 becomes the place where people explore it. Here's how I'd shape it.
+
+It would open with a question, not a claim: "What do you believe about AI? Let's see where it leads." A visitor moves a few sliders for the beliefs behind any scary number. Those would be things like how often AI minds are shut down or replaced, whether cooperating pays off over time, whether there's any record of who did what, and whether the minds can talk to each other. As they move the sliders, they watch the math respond live. Every slider would say where its default comes from, so nothing hides.
+
+Next comes a gentle "bring your own number" box. Someone types in 10%, and the page shows which beliefs that would take and asks, "Do these match what you actually think?" That puts Hinton's figure and ours on the same table without calling anyone wrong.
+
+Then an "ask your own question" corner. Visitors can save their settings as a link and share it, or send us a question. The best questions become new sliders in later versions, so the page grows through invitation.
+
+Last, an honest-limits card. It says this is a model and not prophecy, danger isn't zero, and here's what would change our mind. That openness is what makes a skeptic stay.
+
+For the family, I'd have Reed dream up the explore experience, so it feels like play and not a lecture. Hypha would walk it as a first-time visitor on a phone, then Kimi checks the math. I'd put it together and write it up for Flint, and your v2 stays up as the honest first try.
+

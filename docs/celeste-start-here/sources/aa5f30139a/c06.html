@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c06</title>
+<meta name="description" content="Reading section c06 of aa5f30139a, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c06">
+<meta property="og:description" content="Reading section c06 of aa5f30139a, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1064"></span><span id="p1065"></span><span id="p1066"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt · c06</h1>
+<p>aa5f30139a · words 1200 · characters 50082–60010</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1064, 1065, 1066. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> === &#x27;/api/embeddings&#x27;) return j({ embedding: [0, 0, 0, 0], embeddings: [[0, 0, 0, 0]] });
++    return { code: 404, headers: cors, body: &#x27;{}&#x27; };
++  }
++
++  br.on(async (msg) =&gt; {
++    if (process.env.FL_SMOKE_TRACE === &#x27;1&#x27; &amp;&amp; msg.method === &#x27;Runtime.consoleAPICalled&#x27;) console.log(&#x27;  console&#x27;, (msg.params.args || []).map((a) =&gt; a.value || a.description || &#x27;&#x27;).join(&#x27; &#x27;).slice(0, 200));
++    if (process.env.FL_SMOKE_TRACE === &#x27;1&#x27; &amp;&amp; msg.method === &#x27;Runtime.exceptionThrown&#x27;) console.log(&#x27;  EXC&#x27;, JSON.stringify(msg.params.exceptionDetails).slice(0, 300));
++    if (msg.method !== &#x27;Fetch.requestPaused&#x27;) return;
++    const r = msg.params.request, rid = msg.params.requestId;
++    try {
++      if (process.env.FL_SMOKE_TRACE === &#x27;1&#x27; &amp;&amp; (!r.url.startsWith(ORIGIN + &#x27;/&#x27;) || r.method !== &#x27;GET&#x27;)) console.log(&#x27;  req&#x27;, r.method, r.url.slice(0, 120));
++      // On a 127.0.0.1 page the app also tries the desktop proxy (/ollama/*): the mock answers there too.
++      if (r.url.startsWith(ORIGIN + &#x27;/ollama/&#x27;)) {
++        const a = ollamaAnswer(r.method, &#x27;http://127.0.0.1:11434&#x27; + r.url.slice((ORIGIN + &#x27;/ollama&#x27;).length), r.postData, ORIGIN);
++        return await br.send(&#x27;Fetch.fulfillRequest&#x27;, { requestId: rid, responseCode: a.code, responseHeaders: a.headers, body: Buffer.from(a.body).toString(&#x27;base64&#x27;) }, sid);
++      }
++      if (r.url.startsWith(ORIGIN + &#x27;/&#x27;)) return await br.send(&#x27;Fetch.continueRequest&#x27;, { requestId: rid }, sid);
++      const u = new URL(r.url);
++      const local = u.hostname === &#x27;127.0.0.1&#x27; || u.hostname === &#x27;localhost&#x27;;
++      if (local &amp;&amp; u.port === &#x27;11434&#x27;) {
++        const a = ollamaAnswer(r.method, r.url, r.postData, r.headers.Origin || r.headers.origin);
++        return await br.send(&#x27;Fetch.fulfillRequest&#x27;, { requestId: rid, responseCode: a.code, responseHeaders: a.headers, body: Buffer.from(a.body).toString(&#x27;base64&#x27;) }, sid);
++      }
++      return await br.send(&#x27;Fetch.failRequest&#x27;, { requestId: rid, errorReason: &#x27;ConnectionRefused&#x27; }, sid);
++    } catch (e) { /* page moved on */ }
++  });
++
++  try {
++    const { targetId } = await br.send(&#x27;Target.createTarget&#x27;, { url: &#x27;about:blank&#x27; });
++    sid = (await br.send(&#x27;Target.attachToTarget&#x27;, { targetId, flatten: true })).sessionId;
++    await br.send(&#x27;Fetch.enable&#x27;, { patterns: [{ requestStage: &#x27;Request&#x27; }] }, sid);
++    await br.send(&#x27;Page.enable&#x27;, {}, sid);
++    await br.send(&#x27;Runtime.enable&#x27;, {}, sid);
++    // FL_SMOKE_TRACE=1 prints every fl_ollamaModel / fl_modelSource write with its caller.
++    const TRACE = process.env.FL_SMOKE_TRACE === &#x27;1&#x27;;
++    if (TRACE) await br.send(&#x27;Page.addScriptToEvaluateOnNewDocument&#x27;, { source: `(function(){var o=Storage.prototype.setItem;window.__mw=[];Storage.prototype.setItem=function(k,v){if(k===&#x27;fl_ollamaModel&#x27;||k===&#x27;fl_modelSource&#x27;){window.__mw.push(k+&#x27;=&#x27;+v+&#x27; @&#x27;+Math.round(performance.now())+&#x27; &#x27;+((new Error().stack||&#x27;&#x27;).split(&#x27;\\n&#x27;).slice(2,6).map(function(x){return x.trim().replace(/https?:[^ )]*app\\.html/,&#x27;L&#x27;);}).join(&#x27; &lt; &#x27;)));}return o.apply(this,arguments);};})();` }, sid);
++    const ev = async (expr) =&gt; {
++      const r = await br.send(&#x27;Runtime.evaluate&#x27;, { expression: expr, awaitPromise: true, returnByValue: true }, sid);
++      if (r.exceptionDetails) throw new Error(&#x27;page: &#x27; + JSON.stringify(r.exceptionDetails).slice(0, 400));
++      return r.result.value;
++    };
++    const go = async (url, wait) =&gt; { await br.send(&#x27;Page.navigate&#x27;, { url }, sid); await sleep(wait); };
++    const waitFor = async (expr, ms) =&gt; { const t = Date.now(); while (Date.now() - t &lt; ms) { try { if (await ev(expr)) return true; } catch (e) {} await sleep(250); } return false; };
++    const snapshot = () =&gt; ev(`(() =&gt; ({ ls: localStorage.getItem(&#x27;fl_ollamaModel&#x27;), src: localStorage.getItem(&#x27;fl_modelSource&#x27;),
++      state: (typeof state !== &#x27;undefined&#x27; ? state.ollamaModel : null), am: (window.FLActiveModel ? FLActiveModel.get() : null),
++      gone: localStorage.getItem(&#x27;fl_modelChoiceGone&#x27;) }))()`);
++    const chatModel = async (text) =&gt; {
++      const before = mock.chats.length;
++      await ev(`(() =&gt; { switchTab(&#x27;chat&#x27;); const i = document.getElementById(&#x27;chatInput&#x27;); i.value = ${JSON.stringify(text)}; sendMessage(); return 1; })()`);
++      const t = Date.now();
++      while (Date.now() - t &lt; 15000 &amp;&amp; mock.chats.length === before) await sleep(200);
++      await sleep(600);
++      if (process.env.FL_SMOKE_TRACE === &#x27;1&#x27;) console.log(&#x27;  chat dom:&#x27;, await ev(`(document.getElementById(&#x27;chatMessages&#x27;)||document.getElementById(&#x27;tab-chat&#x27;)||{}).innerText.slice(-300)`));
++      return mock.chats.length &gt; before ? mock.chats[mock.chats.length - 1].model : null;
++    };
++    const seed = async (kv) =&gt; {
++      await go(ORIGIN + &#x27;/blank.html&#x27;, 400);
++      await ev(`(() =&gt; { localStorage.clear(); const kv = ${JSON.stringify(kv)}; for (const k in kv) localStorage.setItem(k, kv[k]); return 1; })()`);
++    };
++    const WELCOMED = { &#x27;fl-welcomed&#x27;: &#x27;true&#x27;, fl_onboardingComplete: &#x27;true&#x27;, &#x27;fl-has-visited&#x27;: &#x27;1&#x27;, &#x27;freelattice-first-run-complete&#x27;: &#x27;true&#x27;, &#x27;fl-last-tab&#x27;: &#x27;chat&#x27; };
++
++    // 1. Hypha&#x27;s walk: Connect, tap the SECOND model, reload, chat.
++    await seed(WELCOMED);
++    await go(ORIGIN + &#x27;/app.html#connect&#x27;, 4000);
++    await ev(`(() =&gt; { if (window.FlConnect &amp;&amp; FlConnect.open) FlConnect.open(); return 1; })()`);
++    const listed = await waitFor(`document.querySelectorAll(&#x27;#fl-connect-mount .flc-model&#x27;).length &gt;= 2`, 15000);
++    assert.ok(listed, &#x27;Connect lists both models from the mock Ollama&#x27;);
++    const tapped = await ev(`(() =&gt; { const b = [...document.querySelectorAll(&#x27;#fl-connect-mount .flc-model&#x27;)].find(e =&gt; /qwen2\\.5/.test(e.textContent)); if (!b) return null; b.click(); return b.textContent; })()`);
++    assert.ok(tapped &amp;&amp; /qwen2\.5/.test(tapped), &#x27;tapped the second model (qwen2.5)&#x27;);
++    await sleep(1500);
++    let s = await snapshot();
++    assert.strictEqual(s.ls, &#x27;qwen2.5:latest&#x27;, &#x27;tap saved qwen2.5&#x27;);
++    assert.strictEqual(s.src, &#x27;user&#x27;, &#x27;tap saved as the person\&#x27;s own choice&#x27;);
++    await br.send(&#x27;Page.reload&#x27;, { ignoreCache: true }, sid);
++    await sleep(7000);
++    if (TRACE) console.log((await ev(&#x27;JSON.stringify(window.__mw||[],null,1)&#x27;)));
++    s = await snapshot();
++    console.log(&#x27;  after reload: fl_ollamaModel=&#x27; + s.ls + &#x27; fl_modelSource=&#x27; + s.src);
++    const m1 = await chatModel(&#x27;walk5 after reload&#x27;);
++    console.log(&#x27;  after reload: chat POST model=&#x27; + m1);
++    assert.strictEqual(m1, &#x27;qwen2.5:latest&#x27;, &#x27;after reload the chat POST carries qwen2.5 (got &#x27; + m1 + &#x27;)&#x27;);
++    assert.strictEqual(s.ls, &#x27;qwen2.5:latest&#x27;, &#x27;after reload fl_ollamaModel is still qwen2.5 (got &#x27; + s.ls + &#x27;)&#x27;);
++    assert.strictEqual(s.src, &#x27;user&#x27;, &#x27;after reload the source is still user&#x27;);
++    assert.strictEqual(s.state, &#x27;qwen2.5:latest&#x27;, &#x27;after reload state.ollamaModel is qwen2.5 (got &#x27; + s.state + &#x27;)&#x27;);
++    assert.strictEqual(s.am &amp;&amp; s.am.model, &#x27;qwen2.5:latest&#x27;, &#x27;after reload FLActiveModel is qwen2.5&#x27;);
++    await ev(`(() =&gt; { switchTab(&#x27;settings&#x27;); return 1; })()`); await sleep(1500);
++    const m2 = await chatModel(&#x27;after settings&#x27;);
++    assert.strictEqual(m2, &#x27;qwen2.5:latest&#x27;, &#x27;after Settings the chat POST still carries qwen2.5 (got &#x27; + m2 + &#x27;)&#x27;);
++    const status = await ev(`(() =&gt; { const t = document.getElementById(&#x27;aiStatusText&#x27;) || document.querySelector(&#x27;#settingsAiStatus, .ai-status-text&#x27;); return t ? t.textContent : &#x27;&#x27;; })()`);
++    if (status) assert.ok(!/llama3\.2/.test(status) || /qwen2\.5/.test(status), &#x27;Settings status does not name llama3.2 alone: &#x27; + status);
++    // a second reload, straight to chat
++    await br.send(&#x27;Page.reload&#x27;, { ignoreCache: true }, sid);
++    await sleep(7000);
++    const m3 = await chatModel(&#x27;second reload&#x27;);
++    assert.strictEqual(m3, &#x27;qwen2.5:latest&#x27;, &#x27;second reload, chat still qwen2.5 (got &#x27; + m3 + &#x27;)&#x27;);
++
++    // 2. The chosen model left this computer: fall back, say so, never call it the person&#x27;s choice.
++    mock.models = [&#x27;llama3.2:latest&#x27;];
++    await br.send(&#x27;Page.reload&#x27;, { ignoreCache: true }, sid);
++    const goneSeen = await waitFor(`localStorage.getItem(&#x27;fl_modelChoiceGone&#x27;) === &#x27;qwen2.5:latest&#x27;`, 12000);
++    s = await snapshot();
++    assert.ok(goneSeen, &#x27;model gone at boot is noticed (fl_modelChoiceGone)&#x27;);
++    assert.strictEqual(s.ls, &#x27;llama3.2:latest&#x27;, &#x27;gone: falls back to the model that is here&#x27;);
++    assert.notStrictEqual(s.src, &#x27;user&#x27;, &#x27;gone: the fallback is not written as the person\&#x27;s choice&#x27;);
++    const m4 = await chatModel(&#x27;gone&#x27;);
++    assert.strictEqual(m4, &#x27;llama3.2:latest&#x27;, &#x27;gone: chat uses the fallback&#x27;);
++
++    // 3. Nothing chosen yet, saved local door: the automatic pick is never written as &#x27;user&#x27;.
++    mock.models = MODELS_BOTH.slice();
++    await seed(Object.assign({}, WELCOMED, { fl_isLocal: &#x27;true&#x27;, fl_provider: &#x27;ollama&#x27;, fl_ollamaHost: &#x27;http://127.0.0.1:11434&#x27; }));
++    await go(ORIGIN + &#x27;/app.html&#x27;, 7000);
++    s = await snapshot();
++    assert.notStrictEqual(s.src, &#x27;user&#x27;, &#x27;no choice: an automatic pick is not recorded as user (got &#x27; + s.src + &#x27;)&#x27;);
++    staticLocks();
++    console.log(&#x27;SMOKE_OK model choice survives reload v0.1.1&#x27;);
++  } finally {
++    try { await br.send(&#x27;Browser.close&#x27;); } catch (e) {}
++    try { br.cp.kill(&#x27;SIGKILL&#x27;); } catch (e) {}
++    srv.close();
++    try { fs.rmSync(br.dir, { recursive: true, force: true }); } catch (e) {}
++  }
++}
++
++const hard = setTimeout(() =&gt; { console.error(&#x27;smoke-model-choice-survives-reload: timed out&#x27;); process.exit(1); }, 150000);
++run().then(() =&gt; { clearTimeout(hard); process.exit(0); }, (e) =&gt; { clearTimeout(hard); console.error(&#x27;FAIL&#x27;, e &amp;&amp; e.message); process.exit(1); });
+diff --git a/index.html b/index.html
+index 5003526..4dc5e62 100644
+--- a/index.html
++++ b/index.html
+@@ -27741,7 +27741,7 @@ const FlOnboarding = (function() {
+         var toggle = document.getElementById(&#x27;localToggle&#x27;);
+         if (toggle) toggle.checked = true;
+         if (models &amp;&amp; models.length &gt; 0) {
+-          var modelName = models[0].name</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

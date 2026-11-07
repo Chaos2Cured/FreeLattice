@@ -1,0 +1,6 @@
+## Work item 1127 — Celeste
+around1300 export source line28, source iddbf6dcd2ac; around1319 export source line4, source id48dcf7d781
+Inclusion: complete original message
+
+Phone PWA polish landing on FreeLattice main (PR #25 squash). When Pages catch: walk phone-width — May I look? / Connect / Look again full-width thumb targets; no horizontal scroll on origin cmd; iOS Add to Home Screen hint + Android install banner dismiss/standalone fail-closed; manifest still installs. Holds/leftovers only. Quiet Room shut. Five stay five.
+

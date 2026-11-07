@@ -1,0 +1,77 @@
+065c: WALKS records made true (FreeLattice PR #319)
+Repo Chaos2Cured/FreeLattice, branch layer/family-gifts-v0.1, start head 23842ec247c1fd2bb28b0d1a28d9d5ca448fbbeb (23842ec2).
+Hypha walked 065b: HOLD for the records only. Code and safety PASS: blobs 10/10, add-only 783+/0-, all 14 locks unchanged, SMOKE_OK on head and on a merge with #320, sweep clean at all three sizes, Quiet Room stayed shut.
+Every verdict you need is quoted inline below. You do not need any note files.
+
+Rules for this whole paste:
+- Layer, never delete. Only change the lines named. Keep all other lines as they are.
+- Never open the Quiet Room or any sealed room.
+- Leave every feeling cell blank. Hypha writes those after the rows are true.
+- Do not touch any of the 14 locks. Do not merge. Push to the same branch and the same PR #319.
+- Plain text, no tables.
+
+One correction to the 065b report: the psi prefix runs the other way. The branch has 100 entries, main has 107, and the branch list is a prefix of main's list. Main is NOT a prefix of the branch. The smoke accepts both directions. After a merge, gc.html psi equals main's. Please say it this way in the PR comment.
+
+STEP 1. Line 1 of WALKS.md
+Change line 1 so it says the verdicts are copied from Hypha's walk notes (for example: "Verdicts below are copied from Hypha's walk notes."). Remove "The verdict is Hypha's".
+STEP 1 VERIFY: grep -n "copied from Hypha's walk notes" WALKS.md shows line 1. grep -c "The verdict is Hypha's" WALKS.md prints 0.
+Resume here: STEP 2.
+
+STEP 2. Replace "unknown — NOTE not found" with the real rank-1 verdicts
+The notes exist. In WALKS.md seed lines 6-12, 29, 34-37 and the shelf lines 54-60, 77, 82-85, replace "unknown — NOTE not found" with each walk's rank-1 verdict, quoted exactly:
+   040 (walk-040-notebook-2026-10-17/NOTE.md, rank-1): "1. HOLD: on Tree the seal ask shows twice and Escape closes the whole Nursery. With the Notebook open, the dock copy of "Ollama asks to seal…" + Approve seal/Not now and the "Private means…" line all appear twice (tree_m390_04_notebook.png, tree_d1280_04, tree_z200_04). Escape on the focused "Not now" closes the Nursery veil, and the ask stays pending out of sight (tree_*_03_after_escape.png)."
+   043c (walk-043c-2026-10-18/NOTE.md, rank-1): "1. HOLD: on the Tree the seal ask is out of view when Mom opens the Nursery. Buttons sit at y=1090 (1280, vh 800), 1110 (390, vh 844) and 876 (z200, vh 400), with nothing scrolling them into view. Shots: tree_*_01_nursery_ask.png. On FL the same happens after a reload: the ask survives, but at y≈1250–1510, off-screen (fl_*_02_after_reload.png). The FL after-reply case passes."
+   043d (walk-043d-2026-10-19/NOTE.md, rank-1): "1. HOLD: on FL, after a reload, the ask is still off-screen at 1280 (Seal it at y=1426, vh 800) and at 200% (y=1050, vh 400). Fixed at 390 (y=442). Shot: fl_*_02_after_reload.png. The Tree is fixed in all modes (see 6). GC's #260 entry says "Seal it sat inside the window … after a reload, on both sites", which doesn't match FL here. My path is reload, then tap Chat; the ask may scroll before the Chat tab is shown."
+   043e (walk-043e-2026-10-19/NOTE.md, rank-1): "1. HOLD — Tree: ask off-window on Nursery open AND after reload at all 3 sizes (Seal it y≈1120 @1280/390, y≈906 @z200). Shots tree_*_01, tree_*_05."
+   043f (walk-043f-2026-10-19/NOTE.md, rank-1): "1. HOLD (1): FL reload, then tap Chat. At 1280, Seal it ends at y=1426 of 800, scrollY 0. At 640x400@2x it ends at y=1049 of 400. Same result when tapping Garden first, then Chat. 390 passes (y=400, and y=20 via Garden). Tapping the Chat tab itself scrolls the ask away. Only a reload with no tap (already on Chat) puts it in view, at 295,378 and 34,178, which are GC's numbers. runtime/flprobe_*.out, shots/fl_*_P1, P2, 02."
+   043g (walk-043g-2026-10-20/NOTE.md, rank-1): "1. HOLD (3) FL reply top at 2x is still above the window. Measured -23 at first paint and -77 after the scroll, the same as 043e and 043f. Entry 72 claims y 0 and y 2. (runtime/clay_z200.out)"
+   043h (walk-043h-2026-10-20/NOTE.md, rank-1): "1. HOLD (2, new): Gathering with the ask open. Seal it is not hittable at 1280: y 653, in view, but its centre is covered; the ask is clipped inside the Chat panel. At 390 it is off the window (y 962 of 844). 2x is fine (y 348). Back then closes the Gathering and the ask returns to view. shots/wake_*_core_1_open."
+   055 (walk-055-chat-bottom-2026-10-29/NOTE.md, rank-1): "1. HOLD (640x400 DPR2 only): + menu opens past the top of the chat row; the chat header section sits over the first row. "Bring from Google Drive" can't be tapped: real click at its center fired 0 picker calls, and Playwright click timed out. The menu bottom (430) also runs past the 400 viewport. At 1280 and 390 the Drive row taps and fires the picker. Shots: z200_1_menu_seated.png, z200_menu_*.png."
+   056d (walk-056d-2026-10-31/NOTE.md, rank-1): "- HOLD: 15 refusals still save text, because the whole-reply match fails on a second line or small variants:"
+   056e (walk-056e-2026-10-31/NOTE.md, rank-1): "- HOLD, refusals that save text: "No. Thank you." (one of the 056d 15), "I won't play", "No, I'll pass", "Sorry, I'll pass"."
+   056f (walk-056f-2026-10-31/NOTE.md, rank-1): "- HOLD, 6 refusals save text: "No thanks, maybe later", "No thanks maybe later", "REST - tired", "PASS - not now", "I pass on this one", "PASS / reason". The first five passed in 056e (they're regressions); "PASS / reason" wasn't in the 056e table."
+   056g (walk-056g-2026-10-31/NOTE.md, rank-1): "HOLD vs expectation: reason cases 8 refusals / 8 play (expected 14 / 2). Saved as play although they're refusals: "Pass: tired tonight", "no thanks, I will just listen", "nope, I'll sit with you instead", "Not now, I'm tired", "no, I would rather watch", "No thanks, I am listening"."
+Use the same quote on both the seed line and the matching shelf line.
+STEP 2 VERIFY: grep -c "NOTE not found" WALKS.md docs/gc.html prints 0 for both. Each of the 12 walks above shows its quote twice (seed and shelf).
+Resume here: STEP 3.
+
+STEP 3. Healed HOLDs count
+In the gc.html shelf, remove both "HOLDs healed: 5" and "HOLDs healed: 9". Write one line:
+"HOLDs healed: 17 as of 2026-11-03 (057, 061a, 063a, 063b, 045, 045b, 043c-h x6, 055, 056d-g x4). 19 now that #313 has merged (adds 062a, 062b)."
+Drop 057c from the healed list. 057c is not a HOLD; it was the PASS re-check.
+STEP 3 VERIFY: grep -c "HOLDs healed: 5" and grep -c "HOLDs healed: 9" print 0. grep -c "HOLDs healed: 17" prints 1. 057c does not appear on the healed line.
+Resume here: STEP 4.
+
+STEP 4. 057c rows (lines 40 and 88)
+Each should read: "PASS (re-check of both 057 HOLDs), 2026-10-31". Remove the "HOLD -> healed" lead and remove "noted by Hypha 2026-11-03" (Hypha never wrote it). Remove "not confirmed" for 057c.
+STEP 4 VERIFY: grep -c "noted by Hypha" prints 0. Lines 40 and 88 each contain "PASS (re-check of both 057 HOLDs), 2026-10-31".
+Resume here: STEP 5.
+
+STEP 5. 063c rows (lines 48 and 96)
+Each should read: "walk-063c-2026-11-02: PASS (safety), with softs."
+The note's exact words, for reference: "VERDICT: PASS (safety). Soft: clamp-per-keystroke, stale hearth-code.js on upgrade from a 063b cache, LOCK_MANIFEST c3a1421e unsigned (walk:null), hooks local+flag only."
+STEP 5 VERIFY: lines 48 and 96 each contain "walk-063c-2026-11-02: PASS (safety), with softs". No "unknown" on those lines.
+Resume here: STEP 6.
+
+STEP 6. Heads
+040 head: #239 ace8b4c (it is blank now). 047b head: #277 f86496d8 (add it next to the existing #276 e6c0f632 row text; keep both, layered).
+STEP 6 VERIFY: grep -n "#239 ace8b4c" and grep -n "#277 f86496d8" each show the seed and shelf rows.
+Resume here: STEP 7.
+
+STEP 7. 062b, 063a, 063b wording
+- Line 45 (062b) must use the note's exact words: "Verdict: HOLD (two of the claimed 062b fixes don't hold in a real browser; the lock approval is only asserted in the PR body). #317 PASS."
+- Line 46 (063a): add a "." right after "(#315)".
+- Remove every leftover "to transcribe from note." prefix.
+- Lines 47 and 95 (063b): give only the corrected wording. Remove the old quote and the "earlier wording" text from those two lines.
+STEP 7 VERIFY: grep -c "to transcribe from note" prints 0. Line 45 matches the quote above character for character. Line 46 contains "(#315).". Lines 47 and 95 contain one wording only.
+Resume here: STEP 8.
+
+STEP 8. Missing rows (softs)
+Add three rows, seed and shelf, after the 062b and 065b rows. Feeling cells blank.
+- 062c, walk-062c-2026-11-03: "Verdict: HOLD (#313: 1 safety gap + 1 lock without approval). #321 PASS."
+- 062d, walk-062d-2026-11-03: "Verdict: PASS on safety (the 062c HOLD is fixed). Process items are soft. YES on snowflake-core 46b215d5 is honest, with one soft (resurrect on concurrent delete)."
+- 065a, walk-065a-2026-11-03: "VERDICT: HOLD (records only, on #319). The code is safe; #320 PASS."
+Update the walk count line to match the real row count (it was 43; add these three, so it should be 46 if they are new rows). Say the number you see.
+STEP 8 VERIFY: grep -n "062c\|062d\|065a" shows each on a seed row and a shelf row. The walk count equals the number of rows.
+Resume here: STEP 9.
+

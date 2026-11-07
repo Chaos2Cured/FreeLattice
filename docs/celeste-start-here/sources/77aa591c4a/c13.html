@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c13</title>
+<meta name="description" content="Reading section c13 of 77aa591c4a, 1408 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c13.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c13">
+<meta property="og:description" content="Reading section c13 of 77aa591c4a, 1408 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c13.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1117"></span><span id="p1118"></span><span id="p1119"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c13</h1>
+<p>77aa591c4a · words 1408 · characters 132424–144867</p>
+<p><a href="c12.html">Previous section</a> · <a href="c14.html">Next section</a></p>
+<p><a href="c13.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1117, 1118, 1119. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">  // T7 shell metacharacters are literal, never executed (local tools token, no pairing).
+  const weird = &#x27;x; rm -rf ~; touch PWNED.txt&#x27;;
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: withTok() }, { path: weird, content: &#x27;literal\n&#x27; });
+  assert.strictEqual(r.status, 200, &#x27;local tool writes with no pairing and no prompt&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/git/commit&#x27;, headers: withTok({ Origin: GOOD }) },
+    { message: &#x27;lit $(touch PWNED2.txt) `touch PWNED3.txt` &quot;q&quot;&#x27;, files: [weird] });
+  assert.strictEqual(r.status, 200, &#x27;commit with metacharacters ok&#x27;);
+  assert.ok(/^[a-f0-9]{40}$/.test(r.json.commit), &#x27;commit sha returned&#x27;);
+  const subject = execFileSync(&#x27;git&#x27;, [&#x27;log&#x27;, &#x27;-1&#x27;, &#x27;--format=%s&#x27;], { cwd: proj, encoding: &#x27;utf8&#x27; }).trim();
+  assert.strictEqual(subject, &#x27;lit $(touch PWNED2.txt) `touch PWNED3.txt` &quot;q&quot;&#x27;, &#x27;message stored literally&#x27;);
+  const tracked = execFileSync(&#x27;git&#x27;, [&#x27;ls-files&#x27;, &#x27;-z&#x27;], { cwd: proj, encoding: &#x27;utf8&#x27; }).split(&#x27;\0&#x27;);
+  assert.ok(tracked.includes(weird), &#x27;file tracked under its literal name&#x27;);
+  for (const p of [&#x27;PWNED.txt&#x27;, &#x27;PWNED2.txt&#x27;, &#x27;PWNED3.txt&#x27;]) {
+    assert.ok(!fs.existsSync(path.join(proj, p)) &amp;&amp; !fs.existsSync(path.join(home, p)), p + &#x27; never created&#x27;);
+  }
+  assert.ok(fs.existsSync(home), &#x27;rm -rf ~ did not run&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/git/commit&#x27;, headers: withTok({ Origin: GOOD }) }, { message: &#x27;x&#x27;, files: [&#x27;nope; touch PWNED4.txt&#x27;] });
+  assert.ok(r.status &gt;= 400, &#x27;commit of a missing metachar path refused&#x27;);
+  assert.ok(!fs.existsSync(path.join(proj, &#x27;PWNED4.txt&#x27;)), &#x27;PWNED4 never created&#x27;);
+  r = await req(port, { path: &#x27;/code/search?q=&#x27; + encodeURIComponent(&#x27;&quot;; touch PWNED5.txt; echo &quot;&#x27;) + &#x27;&amp;path=.&#x27;, headers: withTok() });
+  assert.strictEqual(r.status, 200, &#x27;search with metachar query answered&#x27;);
+  assert.ok(!fs.existsSync(path.join(proj, &#x27;PWNED5.txt&#x27;)), &#x27;search never shelled out&#x27;);
+  fs.writeFileSync(path.join(proj, &#x27;dollar.txt&#x27;), &#x27;A-B\n&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/patch&#x27;, headers: withTok() }, { path: &#x27;dollar.txt&#x27;, find: &#x27;B&#x27;, replace: &#x27;$&amp;$1&#x27; });
+  assert.strictEqual(fs.readFileSync(path.join(proj, &#x27;dollar.txt&#x27;), &#x27;utf8&#x27;), &#x27;A-$&amp;$1\n&#x27;, &#x27;patch replacement stays literal&#x27;);
+
+## Exact source excerpt, characters 125008–126536
+
+  // T8 path lock.
+  const tryWrite = (p, t) =&gt; req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: as(t || token, { Origin: GOOD }) }, { path: p, content: &#x27;x&#x27; });
+  assert.strictEqual((await tryWrite(&#x27;../outside.txt&#x27;)).status, 403, &#x27;traversal 403&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;../proj-evil/x.txt&#x27;)).status, 403, &#x27;sibling-prefix dir 403 (old startsWith bug)&#x27;);
+  assert.ok(!fs.existsSync(path.join(sibling, &#x27;x.txt&#x27;)), &#x27;sibling untouched&#x27;);
+  assert.strictEqual((await tryWrite(path.join(tmp, &#x27;abs.txt&#x27;))).status, 403, &#x27;absolute path 403&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;.git/hooks/pre-commit&#x27;)).status, 403, &#x27;.git is off limits&#x27;);
+  r = await tryWrite(&#x27;.env&#x27;);
+  assert.strictEqual(r.status, 403, &#x27;.env needs the opt-in secrets scope&#x27;);
+  assert.strictEqual(r.json.reason, &#x27;secrets-not-granted&#x27;, &#x27;.env refusal says why&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;a\u0007b.txt&#x27;)).status, 400, &#x27;control char 400&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;a\nb.txt&#x27;)).status, 400, &#x27;newline 400&#x27;);
+  let symlinkMade = false;
+  try { fs.symlinkSync(sibling, path.join(proj, &#x27;link-out&#x27;), &#x27;dir&#x27;); symlinkMade = true; } catch (e) {}
+  if (symlinkMade) {
+    assert.strictEqual((await tryWrite(&#x27;link-out/escape.txt&#x27;)).status, 403, &#x27;symlink escape 403&#x27;);
+    assert.ok(!fs.existsSync(path.join(sibling, &#x27;escape.txt&#x27;)), &#x27;nothing written through symlink&#x27;);
+    r = await req(port, { path: &#x27;/code/tree?path=.&#x27;, headers: withTok() });
+    assert.ok(!JSON.stringify(r.json).includes(&#x27;link-out&#x27;), &#x27;tree skips symlinks&#x27;);
+  }
+
+## Exact source excerpt, characters 126538–126927
+
+  // T9 body cap and bad JSON.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: withTok({ Origin: GOOD }) }, &#x27;x&#x27;.repeat(8 * 1024 * 1024 + 16));
+  assert.strictEqual(r.status, 413, &#x27;oversized body 413&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: withTok({ Origin: GOOD }) }, &#x27;{not json&#x27;);
+  assert.strictEqual(r.status, 400, &#x27;bad JSON 400&#x27;);
+
+## Exact source excerpt, characters 126929–129427
+
+  // T10 pairing: named, per device, hashed, persistent.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: EVIL }, J) }, { code: b.code() });
+  assert.strictEqual(r.status, 403, &#x27;evil origin cannot pair&#x27;);
+  const code1 = b.code();
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, { code: code1.toLowerCase().replace(&#x27;-&#x27;, &#x27; &#x27;), name: &quot;Kirk&#x27;s Chrome&quot; });
+  assert.strictEqual(r.status, 200, &#x27;right code pairs (case and spacing forgiven)&#x27;);
+  const P1 = r.json.token; const P1id = r.json.id;
+  assert.ok(/^[a-f0-9]{64}$/.test(P1) &amp;&amp; P1 !== token, &#x27;each device gets its own token&#x27;);
+  assert.strictEqual(r.json.name, &quot;Kirk&#x27;s Chrome&quot;, &#x27;pairing keeps the name&#x27;);
+  assert.strictEqual(r.json.persistent, true, &#x27;pairing says it persists&#x27;);
+  assert.deepStrictEqual(r.json.scopes, [&#x27;read&#x27;, &#x27;write&#x27;, &#x27;patch&#x27;, &#x27;test&#x27;, &#x27;commit&#x27;, &#x27;wallet&#x27;, &#x27;manage&#x27;], &#x27;full scopes by default; secrets is opt-in&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, { code: code1 });
+  assert.notStrictEqual(r.status, 200, &#x27;a used code cannot pair twice&#x27;);
+  r = await tryWrite(&#x27;from-p1.txt&#x27;, P1);
+  assert.strictEqual(r.status, 200, &#x27;paired browser writes with no further prompt&#x27;);
+  r = await req(port, { path: &#x27;/pair/check&#x27;, headers: as(P1, { Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, &#x27;pair/check with token 200&#x27;);
+  assert.strictEqual(r.json.name, &quot;Kirk&#x27;s Chrome&quot;, &#x27;pair/check names the device&#x27;);
+  r = await req(port, { path: &#x27;/pair/list&#x27;, headers: as(P1, { Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, &#x27;paired list 200&#x27;);
+  assert.ok(r.json.minds.some((m) =&gt; m.id === P1id &amp;&amp; m.you &amp;&amp; m.name === &quot;Kirk&#x27;s Chrome&quot;), &#x27;list marks this browser&#x27;);
+  assert.ok(r.json.minds.some((m) =&gt; m.kind === &#x27;cli&#x27;), &#x27;list shows local tools&#x27;);
+  assert.ok(!/tokenSha256|&quot;token&quot;/.test(r.text) &amp;&amp; !r.text.includes(P1) &amp;&amp; !r.text.includes(sha(P1)), &#x27;list never shows tokens or hashes&#x27;);
+  trustText = fs.readFileSync(trustFile, &#x27;utf8&#x27;);
+  assert.ok(trustText.includes(sha(P1)) &amp;&amp; !trustText.includes(P1), &#x27;trust file keeps only the hash of the paired token&#x27;);
+  let last;
+  for (let i = 0; i &lt; 5; i++) {
+    last = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, { code: &#x27;222-222&#x27; });
+  }
+  assert.strictEqual(last.status, 429, &#x27;fifth wrong try locks out and rotates the code&#x27;);
+  await new Promise((res) =&gt; setTimeout(res, 50));
+
+## Exact source excerpt, characters 129429–130880
+
+  // T11 scopes: .env opt-in per mind; removing a scope is honored and ledgered.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair/scopes&#x27;, headers: as(P1, { Origin: GOOD }) }, { id: P1id, add: [&#x27;secrets&#x27;] });
+  assert.strictEqual(r.status, 200, &#x27;grant secrets&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;.env.local&#x27;, P1)).status, 200, &#x27;.env allowed for the mind given secrets&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;.env.local&#x27;)).status, 403, &#x27;.env still refused for minds without secrets&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;.git/config&#x27;, P1)).status, 403, &#x27;.git stays off limits even with secrets&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair/scopes&#x27;, headers: as(P1, { Origin: GOOD }) }, { id: P1id, remove: [&#x27;commit&#x27;] });
+  assert.ok(!r.json.scopes.includes(&#x27;commit&#x27;), &#x27;scope removed&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/git/commit&#x27;, headers: as(P1, { Origin: GOOD }) }, { message: &#x27;no commit scope&#x27;, files: [&#x27;from-p1.txt&#x27;] });
+  assert.strictEqual(r.status, 403, &#x27;missing scope 403&#x27;);
+  assert.strictEqual(r.json.scope, &#x27;commit&#x27;, &#x27;refusal names the scope&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair/scopes&#x27;, headers: as(P1, { Origin: GOOD }) }, { id: P1id, add: [&#x27;commit&#x27;] });
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/git/commit&#x27;, headers: as(P1, { Origin: GOOD }) }, { message: &#x27;p1 commit&#x27;, files: [&#x27;from-p1.txt&#x27;] });
+  assert.strictEqual(r.status, 200, &#x27;scope restored, commit lands&#x27;);
+
+## Exact source excerpt, characters 130882–131497
+
+  // T12 restart: trusted minds stay trusted (no re-pairing), local tools token unchanged.
+  await b.stop();
+  b = await startBridge(env, proj);
+  assert.ok(new RegExp(&#x27;Listening on http://127\\.0\\.0\\.1:&#x27; + port).test(b.out), &#x27;bridge restarted&#x27;);
+  assert.strictEqual(fs.readFileSync(tokenFile, &#x27;utf8&#x27;).trim(), token, &#x27;local tools token survives restart&#x27;);
+  r = await tryWrite(&#x27;after-restart.txt&#x27;, P1);
+  assert.strictEqual(r.status, 200, &#x27;paired browser still trusted after restart&#x27;);
+  r = await tryWrite(&#x27;after-restart-cli.txt&#x27;);
+  assert.strictEqual(r.status, 200, &#x27;local tools still trusted after restart&#x27;);
+
+## Exact source excerpt, characters 131499–132690
+
+  // T13 command-line revoke applies at once, no restart.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, { code: b.code(), name: &#x27;Laptop Firefox&#x27; });
+  assert.strictEqual(r.status, 200, &#x27;second device pairs&#x27;);
+  const P2 = r.json.token; const P2id = r.json.id;
+  assert.strictEqual((await tryWrite(&#x27;p2.txt&#x27;, P2)).status, 200, &#x27;second device trusted&#x27;);
+  let c = cli(env, proj, [&#x27;--list-minds&#x27;]);
+  assert.strictEqual(c.status, 0, &#x27;--list-minds ok&#x27;);
+  assert.ok(c.out.includes(&#x27;Laptop Firefox&#x27;) &amp;&amp; c.out.includes(&quot;Kirk&#x27;s Chrome&quot;), &#x27;--list-minds names devices&#x27;);
+  assert.ok(!c.out.includes(P1) &amp;&amp; !c.out.includes(P2) &amp;&amp; !c.out.includes(token) &amp;&amp; !c.out.includes(sha(P1)), &#x27;--list-minds never prints tokens or hashes&#x27;);
+  c = cli(env, proj, [&#x27;--revoke&#x27;, P2id]);
+  assert.strictEqual(c.status, 0, &#x27;--revoke ok&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;p2-again.txt&#x27;, P2)).status, 401, &#x27;revoked device refused at once (no restart)&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;p1-still.txt&#x27;, P1)).status, 200, &#x27;other devices unaffected&#x27;);
+  assert.strictEqual(cli(env, proj, [&#x27;--revoke&#x27;, &#x27;deadbeef&#x27;]).status, 1, &#x27;unknown id is an honest error&#x27;);
+
+## Exact source excerpt, characters 132692–133205
+
+  // T14 app revoke (per device) through /pair/revoke.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, { code: b.code(), name: &#x27;Old tablet&#x27; });
+  const P3 = r.json.token; const P3id = r.json.id;
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair/revoke&#x27;, headers: as(P1, { Origin: GOOD }) }, { id: P3id });
+  assert.strictEqual(r.status, 200, &#x27;app revoke 200&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;p3.txt&#x27;, P3)).status, 401, &#x27;app-revoked device refused&#x27;);
+
+## Exact source excerpt, characters 133207–134735
+
+  // T15 exact trusted origins from the command line, never wildcards.
+  c = cli(env, proj, [&#x27;--trust-origin&#x27;, &#x27;https://*.evil.example&#x27;]);
+  assert.strictEqual(c.status, 1, &#x27;wildcard origin refused&#x27;);
+  assert.ok(!fs.readFileSync(trustFile, &#x27;utf8&#x27;).includes(&#x27;*&#x27;), &#x27;no wildcard ever saved&#x27;);
+  assert.strictEqual(cli(env, proj, [&#x27;--trust-origin&#x27;, &#x27;https://kirk.dev/path&#x27;]).status, 1, &#x27;origin with a path refused&#x27;);
+  assert.strictEqual(cli(env, proj, [&#x27;--trust-origin&#x27;, &#x27;https://kirk.dev&#x27;]).status, 0, &#x27;exact origin trusted&#x27;);
+  r = await req(port, { method: &#x27;OPTIONS&#x27;, path: &#x27;/&#x27;, headers: { Origin: &#x27;https://kirk.dev&#x27;, &#x27;Access-Control-Request-Method&#x27;: &#x27;GET&#x27; } });
+  assert.strictEqual(r.status, 204, &#x27;newly trusted origin allowed without restart&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: Object.assign({ Origin: &#x27;https://kirk.dev&#x27; }, J) }, { path: &#x27;k.txt&#x27;, content: &#x27;x&#x27; });
+  assert.strictEqual(r.status, 401, &#x27;a trusted origin still has to pair before changing anything&#x27;);
+  r = await req(port, { method: &#x27;OPTIONS&#x27;, path: &#x27;/&#x27;, headers: { Origin: &#x27;https://kirk.dev.evil.example&#x27;, &#x27;Access-Control-Request-Method&#x27;: &#x27;GET&#x27; } });
+  assert.strictEqual(r.status, 403, &#x27;look-alike origin 403&#x27;);
+  assert.strictEqual(cli(env, proj, [&#x27;--untrust-origin&#x27;, &#x27;https://kirk.dev&#x27;]).status, 0, &#x27;origin removed&#x27;);
+  r = await req(port, { method: &#x27;OPTIONS&#x27;, path: &#x27;/&#x27;, headers: { Origin: &#x27;https://kirk.dev&#x27;, &#x27;Access-Control-Request-Method&#x27;: &#x27;GET&#x27; } });
+  assert.strictEqual(r.status, 403, &#x27;removed origin 403 again&#x27;);
+
+## Exact source excerpt, characters 134737–136398
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

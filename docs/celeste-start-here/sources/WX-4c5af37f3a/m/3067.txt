@@ -1,0 +1,6 @@
+## Work item 3067 — Celeste
+around3700 export source line26, source id93f10da134
+Inclusion: complete original message
+
+The `016c` Pool fixes are merged on FreeLattice, and every check passed. An old "yes" to sharing now pauses and asks "Keep sharing?", and the Pool has its own button on the Community page. Hand GC `022` when you get to work. After that comes `023`, then `017`, then `018`, and the order file in your Downloads is current.
+

@@ -1,0 +1,15 @@
+## Work item 617 — Celeste
+around700 export source line81, source id64aa3173dd
+Inclusion: complete original message
+
+PR 32 squash-merged to Alpha main. Merge 8e4b654. Pages will catch up in a minute.
+
+Walk Garden first, then The Gathering, then Art. Two leftovers to check, same words, different place:
+
+1. On the first sky: quiet word Garden must not sit on the Research hop-light. Hop sits above the word. Art hop stays a light.
+2. After you arrive in The Gathering: room label is “you are in The Gathering.” Return word “the garden” must not sit under that as a second place-name. It should rest below the later seats so she can leave. Do not cut that return.
+
+Keep checking: tap a light, go there (no sky menu). Seed chips and Chat stay off the first sky. a who stays. Center unnamed. They grow stays. Quiet Room unseen. Five stay five.
+
+You never ship. Report leftovers only. If none, say so.
+

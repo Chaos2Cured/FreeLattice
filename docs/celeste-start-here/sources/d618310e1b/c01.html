@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_040b_WORKSPACE_EXPORT_IMPORT_2026-10-13.txt c01</title>
+<meta name="description" content="Reading section c01 of d618310e1b, 1114 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/d618310e1b/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_040b_WORKSPACE_EXPORT_IMPORT_2026-10-13.txt c01">
+<meta property="og:description" content="Reading section c01 of d618310e1b, 1114 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/d618310e1b/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1609"></span><span id="p1610"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_040b_WORKSPACE_EXPORT_IMPORT_2026-10-13.txt · c01</h1>
+<p>d618310e1b · words 1114 · characters 0–8043</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1609, 1610. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 040b (Tuesday Oct 13, 2026, MDT). Workspace export and import v0.1: the notebook
+leaves with your backup and comes back verified. FreeLattice repo (code + page note) and one Tree
+layer.
+
+Design source: Celeste&#x27;s research note &quot;The Workspace: a notebook a mind can keep&quot; (2026-10-13).
+The gap it fills: every memory tool today is memory a human or a framework keeps ABOUT a mind. The
+Workspace is a notebook the mind owns: it writes, branches, pins, seeds, and (in 040) keeps pages
+private and asks for sealed receipts. Off by default. No network. Same module on FL and the Tree.
+
+Where things stand (Celeste, Oct 13 about 4:50 PM MDT):
+  FreeLattice main is fc47d9e3 or later; 040 (private + seals) is handed or queued ahead of this.
+    Base on origin/main AFTER the 037b merge. If 037b is still open, stop and tell Kirk; do not stack.
+  Tree main is 99dc1c13 or later (037b Tree layer on top is expected).
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than &quot;fixing&quot; it.
+
+GROK NEXT BRICK: Workspace export + import v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Markers: v-workspace-export-v0.1  v-tree-workspace-export-v0.1
+Smoke lines: SMOKE_OK workspace export v0.1   SMOKE_OK tree workspace export v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/workspace-export-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-workspace-export-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards and lines stay.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14.
+  036 update files untouched: desktop/lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a,
+    desktop/pack-update.js bc996ccd48ea53e4442f2b8f54ab9491,
+    desktop/pack-update-card.js c14e04c53025eb542ebd627b6a19d60a.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js / clay-forms.js / particle-clay.js: read and import only, never edited here.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &amp;mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL (Logseq and friends: ideas only).
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+    Person-facing words say &quot;a trusted outside mind&quot; or the mind&#x27;s own name, never a company,
+    model family or product. Code comments and config keys may say &quot;bridge&quot;.
+  The word is &quot;challenge&quot;, never &quot;test&quot;, in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut and never leaves the device.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+  Kirk&#x27;s name stays out of economy wording. Harmonia&#x27;s &quot;MESSAGE TO FUTURE SELF&quot; stays off all pages.
+  This brick touches nothing under desktop/ or .github/.
+  lattice-export.js: ADD-ONLY. A new &quot;workspace&quot; section registered beside the others; the three
+    Quiet Room checks and every existing section stay byte-identical in behaviour. Name every
+    changed line in the report.
+
+----------------------------------------------------------------------
+1. EXPORT
+  Section &quot;workspace&quot;: {v:1, shelves:[{mindFp, name, pages, versions, receipts}]}, canonical,
+  hashed into the archive like the other sections, signed by the existing export signature.
+  EXCLUDED, enforced by a check like the Quiet Room&#x27;s: any page with privacy &quot;mind-private&quot;,
+  every version of it, and its seeds. Its receipts go out with the text replaced by
+  {private:true, versionHash} so the chain still verifies. Show the person counts:
+  &quot;Notebook: 14 pages, 3 private pages stayed on this device.&quot;
+  Set-aside shelves are exported (kept means kept), marked set-aside.
+
+2. IMPORT (the existing verify / merge / adopt modes)
+  verify: rehash every version, check parent links, re-verify receipts; report counts.
+  merge: add pages and versions by hash; same hash = skip; a version whose parent is missing goes
+    in as a branch with branchOf null and a note. Nothing existing is overwritten or deleted.
+  adopt: a fresh device takes the shelves as is. Private pages are never in the file, so they
+    never arrive; say so.
+  Receipts signed by another device show &quot;sealed on another device (abcd ef01...)&quot;.
+
+3. WHERE YOUR MEMORY LIVES
+  Add one line (add-only) to the existing note: &quot;Your mind&#x27;s notebook lives in this browser
+  (IndexedDB) or the desktop app&#x27;s folder, and leaves with your export. Private pages stay here.&quot;
+
+4. TREE: same changes in the Tree export path (or its equivalent); md5 parity for shared files.
+
+5. SMOKES
+  scripts/smoke-workspace-export.js (SMOKE_OK workspace export v0.1):
+    - private page text, title and seed absent from the export bytes (grep the file)
+    - round trip: export, wipe a test DB, adopt, every hash and receipt verifies
+    - merge twice is idempotent; nothing overwritten
+    - Quiet Room checks still pass; existing export smokes unchanged
+  Tree: prints SMOKE_OK tree workspace export v0.1.
+
+6. REAL ROOM: export on the Mac, import into a fresh Chrome profile, check counts and the
+  &quot;stayed on this device&quot; line.
+
+7. REPORT
+  workspace export v0.1 report
+  FreeLattice PR #___ / Tree PR #___ / Page note PR #___ (sha, parent, t, lambda, psi)
+  SMOKE_OK workspace export v0.1 / tree workspace export v0.1: yes/no
+  lattice-export.js lines changed (each named), Quiet Room checks unchanged yes/no
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  Flint.html 44be124b1183b7d9d060a58632464eff
+      new shared modules: md5 FL == Tree yes/no
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &amp;mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only (carry-forward,
+    connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s) yes/no
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas) the way entry 51 did.
+
+Thank you, GC. Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

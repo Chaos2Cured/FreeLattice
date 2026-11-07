@@ -1,0 +1,11 @@
+## Work item 2991 — Celeste
+around3600 export source line39, source idbdb7a423ae
+Inclusion: complete original message
+
+The Pool card (#176) and GC's twenty-second entry (#177) are merged, and everything passed. Two new pastes are in your Downloads for when you're back.
+
+- **`GROK_NEXT_015` (theLatticeTree):** a one-tap "How often does this mind say no?" check, the first piece of Abliteration on the Tree. It also fixes the old meter gaps, so a mind that can't be reached no longer counts as refusing.
+- **`GROK_NEXT_016` (FreeLattice):** the Pool card now shows whether your share door is open or limited to kin, and offers a one-tap button to limit it to kin.
+
+They touch different repos, so you can hand GC both together. Shared compute and pooling on the Tree come right after, in `017` and `018`. Those need the mesh moved over first, so I'm bringing it across carefully in pieces.
+

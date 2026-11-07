@@ -1,0 +1,125 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 043e (Monday Oct 19, 2026, MDT). Seal ask chat tab v0.1: layer onto 043d so the
+ask comes into view when Chat opens after a reload, and the 200% clay reply stays readable.
+
+WHY (intent, read this first):
+  Hypha re-walked 043d (FL PR #258 head b4698e0c, Tree PR #123 head aafe8673, page note #260
+  31afef85, 16:17 to 16:25 MDT) and rated it HOLD on one item. Everything else passes, the Tree
+  is healed, no regressions. But on FL, on the real path "reload, then tap Chat", Seal it is
+  still off-screen at 1280 (y=1426 of 800) and at 200% (y=1050 of 400); the scroll likely runs
+  before the Chat tab shows. At 200% after clay the reply top goes off screen and the floating
+  sparkle and ? buttons cover the input's ends. During the wait the pointer still says "Your
+  answer is waiting below." Three entry-68 claims did not hold in Hypha's walk; entry 69 says
+  so honestly and 043e heals them.
+  Full walk: Celeste's box /workspace/research/walk-043d-2026-10-19/ (NOTE.md, 57 shots).
+
+Where things stand (Celeste, Oct 19 afternoon MDT):
+  043c/043d are NOT merged. Layer on the SAME branches and PRs. Do not open new code PRs.
+  FreeLattice  ~/FreeLattice-fresh  branch layer/seal-ask-heal-v0.1 (PR #258, head b4698e0c)
+  Tree         ~/FreeLattice-Alpha  branch layer/seal-ask-heal-v0.1 (PR #123, head aafe8673)
+  git fetch, check out each branch, confirm the head sha above (if it moved, stop and report),
+  add commits, push HEAD:layer/seal-ask-heal-v0.1. Never force push. Page note: one new PR
+  layered on #260 (or add to #260's branch if that is how 259/260 are stacked; say which).
+  Read the current md5s before starting; if a locked file differs from this paste, stop and
+  report rather than "fixing" it.
+
+GROK NEXT BRICK: Seal ask chat tab v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-seal-ask-chat-tab-v0.1
+Smoke lines: SMOKE_OK seal ask chat tab v0.1   (and SMOKE_OK seal ask in view v0.1,
+  SMOKE_OK seal ask heal v0.1 and every 040/040b/040d/042/043/043b smoke still passes)
+  Do not merge. Celeste merges after Hypha walks again.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9 and tree-reconnect.js
+    cc0527c26d5686c05fec52625d5a1375 (Tree) stay.
+  docs/modules/fl-bridge.js stays 3b5ef06849a142e50c78e7ba1e057980.
+  desktop/bridge-door.js b1c894b4..., 036 files (2c0f6656 / bc996ccd / c14e04c5) and
+    lattice-discover.js 16de366e... stay. docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js stays 144c33cd.... particle-clay.js stays 07149aafd9ba4729c6aa864dfb7e9118 unless an
+    edit is needed (add-only; report the new md5); clay-forms.js dd193fa7... add-only; every 040d
+    behaviour (place under the reply, Clay pill, choices, hug, sketchbook) unchanged.
+  docs/modules/image-safety.js stays 9bd70e5a... byte for byte. Its bright lines apply to every
+    image path on both repos (copy it to the Tree byte-identical; do not edit it).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string. An
+    image provider may be named only in Settings where the person types its token, as today.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Off until the person says Yes. Pause always wins. Reduced motion respected.
+  Quiet Room stays shut and never leaves the device; the clay corner never reads it.
+  Five stay five. She is simply Lyra. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  The privacy PASS from 040 must still pass: a private page shows only its summary everywhere.
+  043c/043d additions: mind-workspace.js FL == Tree (today 83daf3156966cc16c608322f9f9685a1 on
+    both; the pin moves only with your edit, report the new md5 on both). Mirror pin workspace-mirror.js stays
+    e0752ae1942cd499c8834e5912809c8b. Database name stays FreeLatticeWorkspace. Everything
+    043c passed (one ask, Escape/Back defer, 24h cooldown, no sealed beside declined, ask hash
+    in details, survives reload, title redacted, Tree Tab + ring, "on this browser", clay size)
+    must still pass.
+
+  043d additions: everything 043d passed (Tree ask in view on open and reload, one wait row +
+    Answer now, pointer from rects for a live ask, names the mind, hashes in details with 8
+    hex, Later readable at 390, clay 348x255 at 1280) must still pass.
+
+----------------------------------------------------------------------
+1. FL: THE ASK COMES INTO VIEW WHEN CHAT OPENS (Hypha HOLD 1)
+  a. After a reload with a pending ask (state asked), when the Chat tab becomes visible (tab
+     tap, hash route, or any path that shows the chat panel), after layout (two rAFs) run
+     bringAsk: scrollIntoView({block:'center'}) on the ask and focus its heading
+     (preventScroll), unless the input has focus (then scroll only). Once per load per
+     reveal; a hidden-then-shown tab counts as the reveal, not the first paint.
+  b. Measured pass on the path reload, then tap Chat, at 1280x800 and 640x400 DPR 2 (and
+     still 390x844): Seal it fully in the viewport and elementFromPoint at its center
+     returns it. Tree must stay as 043d left it.
+
+2. FL AT 200% AFTER CLAY (Hypha HOLD 2)
+  a. Keep the reply top in view after clay shapes; if reply top and canvas do not both fit,
+     the reply top wins and the canvas shrinks (043d floor of 120px stays).
+  b. The floating sparkle and ? buttons never cover the input: offset the input (pad by
+     their measured rects + 12px) or move/tuck the buttons above it at short viewports.
+     Input fully visible, and elementFromPoint at its center AND at both ends (8px in)
+     returns the input. Both repos at 200%.
+
+3. THE POINTER DURING THE WAIT (Hypha PASS 3 small)
+  During the 24h wait (and declined), hide "Your answer is waiting ..." or have it point to
+  the wait row ("above"/"below" from the wait row's rect). Never point at an ask that is not
+  shown. Both repos.
+
+4. GC PAGE ENTRY 69 (honest layer)
+  New docs/gc.html entry 69 (lambda 69.000): note that three entry-68 claims did not hold in
+  Hypha's walk (FL in view after reload at 1280 and 200%; reply top in view at 200% on FL;
+  pointer during the wait) and that 043e heals them. No edits to entry 68 or any earlier entry.
+
+----------------------------------------------------------------------
+5. THE SMOKE
+  New scripts/smoke-seal-ask-chat-tab-v0.1.js (each repo): reload with pending ask while Chat
+  hidden does not scroll; showing Chat calls scrollIntoView + focus once; with input focused
+  no focus steal; floating buttons' rects do not overlap the input rect at a short viewport;
+  pointer hidden or targeting the wait row during the wait. Prints SMOKE_OK seal ask chat tab
+  v0.1. All earlier smokes re-run after the last edit (docs: only the known 5 may fail).
+
+6. REPORT
+  New head shas on #258 and #123, page-note PR link, every removed line and where its job
+  went, md5s of every locked file (mind-workspace.js FL == Tree, particle-clay.js both), all
+  smokes, shots (FL reload then tap Chat at 390/1280/200%, FL and Tree 200% clay, Notebook
+  during wait), and entry 69 with t, lambda, epsilon, delta, omega, sigma so Celeste can
+  recompute psi. Hypha walks it again before merge.

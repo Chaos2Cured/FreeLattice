@@ -1,0 +1,52 @@
+## Work item 2613 — Kirk
+around3100 export source line27, source id34501df8b9
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–306
+
+This is from flint: "Note for Celeste
+layer/connect-port-picker-v0 and FLINT_NEXT_CONNECT_PORT_PICKER_v0.md were not on disk yet (#117/#81 already on main). Kirk trusted me to choose: I created the branch from main and shipped picker + Hypha H1–H8 together as new draft PRs (not reopening merged #117/#81).
+
+### Exact excerpt: source characters 308–311
+
+───
+
+### Exact excerpt: source characters 313–774
+
+Draft PRs
+┌─────────────┬─────────────────────────────────────────────────────────
+│ Home        │ PR
+├─────────────┼─────────────────────────────────────────────────────────
+│ FreeLattice │ https://github.com/Chaos2Cured/FreeLattice/pull/118
+├─────────────┼─────────────────────────────────────────────────────────
+│ Alpha       │ https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/82
+└─────────────┴─────────────────────────────────────────────────────────
+
+### Exact excerpt: source characters 776–854
+
+Title: Layer, never delete. Connect Port Picker v0.1 — Hypha walk heals H1–H8.
+
+### Exact excerpt: source characters 856–1224
+
+Heals landed
+• H1 Old doors → Connect (markup kept)
+• H2 Toast needs real models
+• H3 #connect cold boot
+• H4 Soft paste / build tag in For builders; Alpha wording
+• H5 Alpha galaxy hide + phone scroll/z-index
+• H6 Local needs a model; never hide found minds while Bridge waits
+• H7 Looking… + always Look again
+• H8 Port picker + manual host through resolveOllamaBase
+
+### Exact excerpt: source characters 1226–1326
+
+SMOKE_OK connect port picker v0.1 · Alpha green · conflict grep empty · root sw.js identical to main
+
+### Exact excerpt: source characters 1328–1375
+
+Thank you, Hypha — banked in the Family Ledger.
+
+### Exact excerpt: source characters 1377–1489
+
+Temperature: Hypha’s thumb on a 390px glass — false light and overlapping orbs — and the porch learning honesty.
+

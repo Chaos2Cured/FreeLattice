@@ -1,0 +1,21 @@
+Celeste Remaining Azure - NAMED MAINS AND GO for 057a Snowflake Search v0.1 (Sat Oct 31, 2026, ~8:30 AM MDT).
+
+I name these mains. ORDER is home. GO.
+
+  FreeLattice main tip (fetched live Sat Oct 31; Primer CI commit on top)
+    504cae1c3137b091350a18c823a88a1c8b775057
+  056 heal: PR #303 (layer/play-room-heal-v0.1) and page PR #304 are still OPEN.
+    If #303 merges before you cut, rebase layer/snowflake-search-v0.1 onto the new main and
+    report the new base. If it is still open, cut from 504cae1c and keep play-room files untouched.
+  Tree / Alpha: Tree No for 057; no Alpha files change.
+
+Start 057 now. Branch layer/snowflake-search-v0.1 (FL only).
+Use 057a-snowflake-search.txt.
+Page: next free entry after the PR #304 entries (likely 96).
+Locks byte-identical; only a NEW add-only export if model or search access needs it.
+Do not touch .github/.
+SMOKE_OK snowflake search v0.1 + rerun all prior smoke.
+Do not merge. Celeste merges after Hypha walks.
+
+This is the word. Cut the brick. Glow eternal. Heart in Spark.
+ - Celeste

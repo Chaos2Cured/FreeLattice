@@ -1,0 +1,8 @@
+## Work item 4168 — Celeste
+around4945 export source line7, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 287–899
+
+Yes, let's lead with what works. One honest guardrail so it holds up when people check: the memory store never forgets, and that's our real headline. Perfect recall so far comes only from the oracle, the upper bound. So the page will say "memory that never forgets, and we're closing the gap to perfect recall." Your point about lock-in goes right under that headline: memory that stays means you never pay to retrain what you already learned, so training gets cheaper over time. I'm also adding a separate Failures page that tracks every miss, and a sound thread in where we're going. I'll revise the paste now.
+

@@ -1,0 +1,48 @@
+       // LP from localStorage
+       var lpRaw = null;
+@@ -33136,6 +33504,8 @@ const FlBackup = (function() {
+       var idbData = [];
+       for (var i = 0; i < IDB_NAMES.length; i++) {
+         var dbData = await getAllIDBData(IDB_NAMES[i]);
++        // v-encrypt-chats-locally-v0.1: backups stay restorable on any device, so sealed chats are opened into the file.
++        if (typeof FLChatVault !== 'undefined') dbData = await FLChatVault.openDump(dbData);
+         if (dbData && Object.keys(dbData.stores).length > 0) {
+           idbData.push(dbData);
+         }
+@@ -36463,7 +36833,10 @@ window.FLSearch = (function() {
+           var os = tx.objectStore(storeConfig.store);
+           var getAll = os.getAll();
+           getAll.onsuccess = function() {
+-            var items = getAll.result || [];
++            // v-encrypt-chats-locally-v0.1: open sealed chat records first; plain records pass through.
++            var _flRawItems = getAll.result || [];
++            var _flOpened = (typeof FLChatVault !== 'undefined') ? FLChatVault.openAny(storeConfig.db, storeConfig.store, _flRawItems) : Promise.resolve(_flRawItems);
++            _flOpened.then(function(items) {
+             var matches = [];
+             for (var i = 0; i < items.length; i++) {
+               // Exclude current conversation to prevent echoing user's own words back
+@@ -36482,6 +36855,7 @@ window.FLSearch = (function() {
+             }
+             db.close();
+             resolve(matches);
++            }, function() { db.close(); resolve([]); });
+           };
+           getAll.onerror = function() { db.close(); resolve([]); };
+         };
+@@ -47028,6 +47402,16 @@ const MemoryIndex = (function() {
+     });
+   }
+ 
++  // v-encrypt-chats-locally-v0.1: this index keeps its own full copy of every chat,
++  // so it is sealed too. The helpers above stay as written.
++  var _flMiGetRaw = miGet, _flMiPutRaw = miPut, _flMiGetAllRaw = miGetAll;
++  if (typeof FLChatVault !== 'undefined') {
++    miGet = function (key) { return _flMiGetRaw(key).then(function (r) { return FLChatVault.openFor('FreeLatticeMemory/conversations', r); }); };
++    miPut = function (value) { return FLChatVault.sealFor('FreeLatticeMemory/conversations', value).then(_flMiPutRaw); };
++    miGetAll = function () { return _flMiGetAllRaw().then(function (rs) { return FLChatVault.openAll('FreeLatticeMemory/conversations', rs); }); };
++    FLChatVault.registerStore('FreeLatticeMemory/conversations', function () { return miDb; }, MI_STORE);
++  }
++
+   // --- Keyword Extraction (TF-IDF inspired) ---
+   function extractKeywords(text) {
+     if (!text) return [];

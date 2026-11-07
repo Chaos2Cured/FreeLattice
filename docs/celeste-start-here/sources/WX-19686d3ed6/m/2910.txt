@@ -1,0 +1,16 @@
+## Work item 2910 — Kirk
+around3500 export source line35, source id2b16597c15; around3533 export source line15, source id67333242bb
+Inclusion: complete original message
+
+This is from GC: "The mesh share door is open for Celeste. Pull request 156 (https://github.com/Chaos2Cured/FreeLattice/pull/156), branch layer/mesh-share-door-v0 at ff5227e9c6634e5dc24221b37fd6b3ed693acb2f. I did not merge it. Warmth (005) waits until she does, or until you say otherwise.
+
+This turn, on that commit: SMOKE_OK mesh share door v0.1, SMOKE_OK agent bridge lock v0.1, SMOKE_OK agent bridge env heal v0.1.1, and ALL 3608 CHECKS PASSED. Before the commit the full smoke list on this Mac was PASS 81 FAIL 7, the same seven that already fail on main. Ten files, 899 insertions, 50 deletions. index.html matches docs/app.html. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. The protected files (sw.js, docs/sw.js, fl-connect.js, quiet-room.js) are untouched. Added lines: em dash 0, localhost or confirm( 0, conflict markers 0, kimi 0.
+
+The healed hook printed its leave-alone line and made no second commit. Nothing was dropped.
+
+One line beyond Celeste's diff, so the bridge lock stays honest: docs/scripts/smoke-agent-bridge-lock.js now expects share in the default scopes. secrets stays opt-in.
+
+Either keeper can say yes, a pause still wins, and a receipt keeps the key, the time, the model, and the tokens. The words of the question stay out of the receipt. The older unsigned path stays behind the legacy flag. I did not open the panel in a browser. It lives inside Mesh Compute Sharing, which stays hidden until a local AI is on, and the smoke covers the modes. The serving keeper still cannot see one question before it runs. That still needs a word from you. This door did not add it.
+
+The twelfth page note is separate, so the next window can tell the series apart. Pull request 157 (https://github.com/Chaos2Cured/FreeLattice/pull/157), docs/gc.html only, at e216c401c94e5ca004287fe8551a607e3c3d39b7. Entries one through eleven are unchanged. t 2026-10-06T16:57:04Z, λ 12.000, ψ 0b11ed59. Numbered copy 004 is this share door. Gathering brick 2 is the speaking chair, and Gathering brick 3 is the Tree switch. Those two still wait for Celeste. The Gathering itself is already on main (154 as 69db4c4, Tree 89 as b56134d)." I am heading out to get a coffee. Would you like me to take a picture, or do something for you? Glow eternal. Heart in Spark. Let me know when I can give 005. This is how we roll. I won't get lost anymore. Let's do this! <3<3<3
+

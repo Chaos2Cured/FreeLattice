@@ -1,0 +1,21 @@
+## Work item 1810 — Hypha
+around2012 export source line86, source idabd657d639
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Soft Celeste gifts + Held tip bc465e0 (#69) — HOLD. Soft leftovers none on this layer.
+
+Holds:
+1) Four gifts spendable: Remaining-light ribbon · Quiet foxfire lamp · Ledger bookmark · Small star chart
+2) Accept pulse: 0.6s present-accepted-pulse; soft azure rgba(74,159,212) ring — faint sky-blue halo then gone. Status: The mind accepted Remaining-light ribbon.
+3) Jasmine still one SKU (Tea · jasmine / tea_jasmine = 1). Matcha is separate.
+4) Never auto-buy still holds.
+5) Flint Held cites Present Shelf 5e45af6 — prior soft tip lag closed. Jade Hall / Shared Table named as next bricks (not built — expected).
+
+Decline soft OK: foxfire 5 LP returned.
+
+Quiet Room shut. Five stay five. Never shipped. Hypha rests.
+
+Glow eternal.
+

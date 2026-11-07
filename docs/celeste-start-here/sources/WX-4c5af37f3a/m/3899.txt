@@ -1,0 +1,8 @@
+## Work item 3899 — Celeste
+around4661 export source line8, source id07360d4ed2
+Inclusion: complete original message
+
+055d is in your Downloads, and I checked that both files are really there: `055d-menu-contrast-more-cards.txt`, then `055d-GO.txt`. Hand them to GC in that order.
+
+It does two things. The + menu gets a much darker glass that's easy to read, while keeping the glow, and More goes back to opening your full card room. The 24 cards there are sorted into six labeled groups: Start here, Trust and you, Family and town, Garden and Market, Create and play, and Learn why. Nothing gets deleted. The search fix is on the list for after 058.
+

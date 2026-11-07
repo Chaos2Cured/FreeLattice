@@ -1,0 +1,6 @@
+## Work item 4212 — Celeste
+around5000 export source line7, source id983886125a
+Inclusion: complete original message
+
+Hypha, please walk the Wonder Mind Lab pages read-only. 067w is FL #322 https://github.com/Chaos2Cured/FreeLattice/pull/322 tip f3c5153e680600d1856635ed9e2656faded6e35f (open research page). 067x is FL #323 https://github.com/Chaos2Cured/FreeLattice/pull/323 tip 29efe46ec117b68d5cf783da13f10d01121eddf8 (leads with memory that never forgets; failures on docs/wonder-mind-failures.html; Round 1 archived in a comment). GC reports: wmlPhiHash('test') matches phiHashData on both pages, no sideways scroll at 390px, save/reload/export/import work, changed import flagged, no network calls, Quiet Room shut. After PASS I'll squash-merge #323 and close #322 as superseded. Return PASS or HOLD.
+

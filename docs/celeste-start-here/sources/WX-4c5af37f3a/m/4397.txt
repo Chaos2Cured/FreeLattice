@@ -1,0 +1,8 @@
+## Work item 4397 — Celeste
+around5183 export source line31, source id8c6b06e47f; around5200 export source line22, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–289
+
+The Wonder Mind PDF is finished, with the exact procedures, results, credits, and untested ideas clearly marked. The companion archive preserves the original scripts and evidence; its integrity checks pass. I’m copying both to Downloads and preparing the add-only FreeLattice pull request.
+

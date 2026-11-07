@@ -1,0 +1,97 @@
+5. v0.2 LINKS AND VERIFY LINES (marker v-packs-v02-links-v0.1)
+  At GC's 035 hidden markers (docs/install.html ~763 and docs/desktop.html ~85:
+  "v-every-os-desktop-v0.1: links move to desktop-packs-v0.2 after the release exists") and in
+  README.md (~27, ~30, ~32):
+  a. Layer new v0.2 links beside/over the v0.1 ones: Windows Setup (primary on Windows),
+     Windows Portable, Linux AppImage, Linux .deb, Mac dmg, Mac zip, and the release tag link
+     desktop-packs-v0.2. Keep the v0.1 lines in the file but not as the first thing a person sees
+     (e.g. a quiet "Older pack: desktop-packs-v0.1" line). Explain the layering in the PR.
+  b. SHA-256 verify lines: the trust-root block (install.html ~785, v-trust-root-v0.1) and
+     #bridge-pack-shas (~740) carry v0.1 hashes. Add v0.2 lines for all six assets using YOUR
+     re-hashed values (must equal the list at the top), with the per-OS commands:
+       Windows: certutil -hashfile FreeLattice_5.8.0_Windows_Setup.exe SHA256
+       Mac:     shasum -a 256 FreeLattice_5.8.0_macOS.dmg
+       Linux:   sha256sum FreeLattice_5.8.0_Linux.AppImage
+     Label the old ones "desktop-packs-v0.1".
+  c. Add the one honest sentence from 1 NOTE about people who installed before October 2026.
+
+6. DEAD "(also on GitHub)" LINK
+  docs/index.html ~1660 still has <a href=".../blob/main/QUICK-START.md">(also on GitHub)</a>.
+  Layer: hide it from people (e.g. a v-tester-fixes-v0.2 class with display:none, or wrap so only
+  quick-start.html shows) rather than deleting the line. If the same link is in index.html /
+  app.html, keep index.html == docs/app.html. QUICK-START.md stays unchanged.
+
+7. TREE: WINDOWS SETUP PRIMARY (marker v-tree-win-setup-primary-v0.1), FreeLattice-Alpha
+  fl-connect.js is locked. Add a small new module (e.g. docs/modules/connect-win-primary.js) that
+  runs after the connect card renders and, ONLY when the browser is Windows, makes
+  "Download Bridge · Windows Setup" the primary link and Portable the second. Reorder existing
+  nodes; textContent only; no new URLs. Mac and Linux unchanged. Load it with one script line.
+  Also report: should the Tree's Settings say "desktop app" (desktop-packs) or "Bridge"
+  (bridge-v0.1)? Do not change which product is linked; just list what a Windows person sees.
+
+8. SMOKES
+  Extend desktop/scripts/smoke-update.js (keep its old checks; prints old line too, plus
+  SMOKE_OK desktop update buttons v0.1):
+    - pickLatestPack: [v0.1, v0.2, v0.3-rc1(prerelease), draft v0.4, v5.8.0, bridge-v0.1] picks
+      v0.2; with channel rc picks v0.3-rc1.
+    - no build-info + 5.8.0 -> "unknown which" wording; build-info v0.2 vs latest v0.2 -> not newer;
+      v0.2 vs v0.3 -> newer.
+    - platform routing with faked env: win32+NSIS -> updater; win32+PORTABLE_EXECUTABLE_DIR ->
+      download; linux+APPIMAGE -> updater; linux no APPIMAGE -> deb download; darwin -> dmg open.
+    - a stubbed updater: no download and no install happen without the tap events; autoDownload
+      and autoInstallOnAppQuit are false.
+    - SHA mismatch -> file removed, nothing opened. Non-GitHub host -> refused.
+    - card strings contain "not signed" and no em dash; buttons have min-height 44px.
+  scripts/smoke-packs-v02-links.js (SMOKE_OK packs v02 links v0.1): install.html, desktop.html and
+    README name desktop-packs-v0.2 for all six assets; each v0.2 hash equals the top list; v0.1
+    still present; the GitHub QUICK-START link is hidden; old workflow push tag no longer matches
+    "desktop-packs-v0.3"; every-os still does.
+  Tree: module check (SMOKE_OK tree win setup primary v0.1): Windows UA -> Setup first; Mac and
+    Linux UA -> order unchanged; fl-connect.js md5 unchanged. Tree module tests 36 plus new.
+  Still passing: reconnect 95 (both lines), phone knocks 17, discover 86, every-os 82, tester
+  fixes 46, import, reseed, swarm (expected later, saw available, file untouched), tests/smoke.js
+  all 3608, docs smokes same five fails only.
+
+9. REAL ROOM (if Kirk's Windows desk is there; never required)
+  Install v0.2 Setup, then install an rc1 pack built by this brick with a lower tag faked via
+  fl_update_channel, and say whether the card appeared, Update downloaded, Restart now swapped,
+  SmartScreen showed, and the app came back on the same pairing. Mac: dmg opened, Replace worked.
+
+10. REPORT (same shape as 035)
+  desktop update buttons v0.1 report
+  FreeLattice PR #___ at <sha>, parent <sha>
+  Tree PR #___ at <sha>, parent ee617c44
+  Page note PR #___ at <sha>, t <UTC>, lambda 50.000, psi <8 hex>
+  smoke-update: checks passed __, old line yes/no, SMOKE_OK desktop update buttons v0.1 yes/no
+  smoke-packs-v02-links: checks passed __, SMOKE_OK packs v02 links v0.1 yes/no
+  Tree: SMOKE_OK tree win setup primary v0.1 yes/no; module tests __ of __
+  reconnect 95 / phone-knocks 17 / discover 86 / every-os 82 / tester-fixes 46 / import / reseed
+    / swarm: __
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only  yes/no
+  Workflow run (rc1 prerelease): <link>; windows / ubuntu / macos smokes and build; only every-os
+    ran yes/no
+  Assets seen: names and bytes, including latest.yml, latest-linux.yml, blockmaps
+  latest.yml sha512 matches Setup: yes/no
+  v0.2 hashes re-checked by you equal the top list: yes/no (list any that differ)
+  New deps and licenses: __ (no AGPL)
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  lattice-update.js <new>
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock, QUICK-START.md
+    untouched: yes/no.  desktop/package.json lines changed: __
+  grep em dash / &mdash; / confirm( / innerHTML / non-empty iceServers in added lines: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  Never installs without a tap (show the code lines): yes/no
+  Real room: Windows walked yes/no, card seen, Update downloaded, Restart swapped, SmartScreen
+    seen; Mac dmg opened; Linux walked yes/no
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the fiftieth entry on docs/gc.html as its own PR, t, lambda 50.000, psi.
+  Entries 1 through 49 stay as they were written.
+
+Thank you, GC. One tap, honestly labelled, and the home stays current on every computer.
+Glow eternal. Heart in Spark.

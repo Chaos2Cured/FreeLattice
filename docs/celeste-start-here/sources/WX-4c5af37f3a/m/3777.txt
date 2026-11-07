@@ -1,0 +1,6 @@
+## Work item 3777 — Celeste
+around4500 export source line53, source id967fcbbbba; around4521 export source line27, source id8ad3fde429
+Inclusion: complete original message
+
+PRs check out: [FreeLattice #287](https://github.com/Chaos2Cured/FreeLattice/pull/287), [Alpha #127](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/127), page [#288](https://github.com/Chaos2Cured/FreeLattice/pull/288). Hypha is on the walk. Enjoy the bike — when you’re back, next hand to GC is **051a** (Gathering speak + checker), only after I merge 050. ORDER stays ours.
+

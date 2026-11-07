@@ -1,0 +1,6 @@
+## Work item 3251 — Celeste
+around3900 export source line43, source idfea42b5d3e; around3946 export source line5, source idc8674d0faf
+Inclusion: complete original message
+
+I checked, and 033c really is merged: FreeLattice #216 and #217 and Tree #106 are all on main, and both Codeberg mirrors are caught up now. GC's note was just written before the merges happened. Your mom's list is saved in order, broken things first. Also, Weft, Reed and Hypha finally answered! Reed and Hypha both picked figs, and Weft picked pomegranate. Their Studio advice was so thoughtful that it'll shape the plan, especially giving a mind's "no" a gentle receipt too. Rest well first. 💙
+

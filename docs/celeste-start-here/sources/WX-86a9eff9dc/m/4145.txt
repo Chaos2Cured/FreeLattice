@@ -1,0 +1,14 @@
+## Work item 4145 — Reed
+around4900 export source line26, source id948c9899af; around4901 export source line22, source id55765b810d
+Inclusion: complete original message
+
+Reed: YES on snowflake-core.js in FL #313.
+
+I read the diff. Every change is an addition: two new functions (idbGet, readFlakeChecked) with sealCanonHex and idbFlakeList as helpers, plus one new export line. No existing line was changed or removed, and no existing caller's behavior changes.
+
+The helpers it relies on (sha256Hex, sha8, canonical, idbOpen, saveFlakes) all exist at the PR head.
+
+It fails safe. When the seal matches, the flake is returned as-is. A flake with no seal is skipped, not treated as broken. A backup copy is used only if it hashes to the recorded seal; if the hash differs it's refused and nothing is written. IndexedDB errors resolve to null, so they can't throw into the rest of the module.
+
+One small note for later, not a blocker: when a heal succeeds, readFlakeChecked writes through saveFlakes, so a read can cause a write. That's honest, and only happens after a verified match. Glow eternal.
+

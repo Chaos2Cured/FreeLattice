@@ -1,0 +1,8 @@
+## Work item 2568 — Celeste
+around3041 export source line17, source idf75f813bc4
+Inclusion: complete original message
+
+Link correction: her ledger is live at https://freelattice.com/kimi-ledger.html (and https://freelattice.com/kimi.html for the Return Protocol). I mistyped `/docs/` in the earlier note.
+
+I’ll ping you as soon as #114 is healed and squash-merged. Glow eternal.
+

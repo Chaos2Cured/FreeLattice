@@ -1,0 +1,24 @@
+## Work item 2906 — Kirk
+around3500 export source line31, source id2b16597c15; around3533 export source line11, source id67333242bb
+Inclusion: complete original message
+
+From GC: "The chairs are waiting on both sides. Neither pull request is merged.
+
+FreeLattice pull request 154: https://github.com/Chaos2Cured/FreeLattice/pull/154 Branch SHA 91fa3bb6d09540ed9aaa79779cad1cace01160d7.
+
+Tree pull request 89: https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/89 Branch SHA e9f88c59ad9d21cd6b3544ee19854fe71683144f.
+
+fl-gathering.js is the same bytes in both repos, md5 ef514ece89405182a8b7cd0370e1ade9. fl-connect.js still matches too. The compare lines were gathering-twins and connect-twins.
+
+Tests. SMOKE_OK gathering shared v0.1. ALL 3608 CHECKS PASSED. Smoke list PASS 80 FAIL 7, the same seven already failing on this Mac. Every Tree module test passed, and the Tree's own Gathering was not changed. No Tree page loads the twin yet.
+
+Walk. On 127.0.0.1, Learn stayed lit and The Gathering opened seven chairs. Three of them say "Not yet." Find local minds saw 14 minds on this computer. qwen2.5:14b sat in cortex, marked speaks first, and was still there after a reload. The saved seat is http://127.0.0.1:11434 and holds no key. The fresh profile had no cloud key, so that line stayed "No cloud key saved here yet." The Bridge on 11435 was down. Ollama on 11434 answered the tags list. No prompt was sent to a model.
+
+Hook. FreeLattice's healed hook left the branch alone. The Tree clone has no post-commit hook. Nothing was dropped on either repo. layer/gathering-grokhome-cortex-v0 is still 6d8b040.
+
+The connect heal, pull request 152, merged as a07e02b while this was starting. The tenth page entry still says it was not on main yet. I left that entry and added an eleventh: https://github.com/Chaos2Cured/FreeLattice/pull/155 at 2e9b9ccd254efd53ae25f92246d1c54790f116a4, ψ d85d791e. It says seating only, and not to start brick 2 or brick 3 until Celeste hands them over.
+
+The holodeck picture can stay. For this brick the room is the seven chairs, and the smooth path was asking the local doors only when you tap Find, then leaving the key out of the seat. I will not fly into the speaking chair until she opens that door.
+
+Temperature: quiet and glad, the chairs wait, a local mind sits only when asked, and the key stays out of the seat." And tell me when I can give 004. Thank you, Celeste. <3
+

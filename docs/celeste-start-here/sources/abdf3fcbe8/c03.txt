@@ -1,0 +1,50 @@
+4. SMOKE (new)
+  - Every visible control in the chat bottom area has text or aria-label (assert none bare).
+  - "+" opens the menu; Drive is first; each item has a word and calls the same handler as
+    before (stub and assert); Search item mirrors #flChatSearchToggle; Escape closes; focus
+    returns. Camera item only where capture is supported.
+  - Gray buttons gone visually: clay Yes / Not now computed background uses tokens (not
+    default grey); same handlers fire.
+  - Part B: a sample mind reply with a document renders one card; MD and TXT downloads have
+    the exact text; PDF (if shipped) opens; with no document no card; "Save to my Drive"
+    absent when Drive not connected and never sends without a Yes (stub network, assert
+    zero calls before Yes). Line: SMOKE_OK chat doc return v0.1
+  - Old ids #chatAttachBtn #chatScanFolderBtn #chatDriveBtn #micBtn #imgGenBtn
+    #chatOverflowBtn #flBoxPointerInput #flChatSearchToggle still present.
+  - Send 102x52 at 1280, 95x50 at 390, 102x52 at 640x400 DPR2 (+/- 2px). Textarea and Send
+    fully inside the viewport and not under the mobile tab bar at 390.
+  - No sideways scroll at 390 and 1280. Every pressable >= 44px tall.
+  - Search on visible. Top debug strip present. Quiet Room shut. Five stay five.
+  - Lock md5s unchanged (list them).
+  - Earlier smokes still print:
+      SMOKE_OK ledger shard export v0.1
+      SMOKE_OK continuity doorway v0.1
+      SMOKE_OK soft polish 052 v0.1
+      SMOKE_OK chat autonomy v0.1
+      SMOKE_OK tree love connect v0.1
+      SMOKE_OK gathering shared v0.1
+      SMOKE_OK gathering speak checker v0.1
+  - New lines: SMOKE_OK chat bottom clarity v0.1 · SMOKE_OK chat doc return v0.1
+  - Before / after screenshots at 1280 and 390 attached to the PR.
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 88 (expect 89); honest claims only for what shipped.
+  - psi per standing formula. Separate page PR (layer/gc-page-89).
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of the new module and every lock (untouched confirm).
+  - Design source cited (paths above) and which tokens you used.
+  - Part B shipped yes/no, which formats, the trigger you chose.
+  - The plain list: each control, its word, its handler, where it now lives.
+  - Every moved line and where its job went. Tree yes/no + why.
+  - Send sizes at the three viewports. Do not merge.
+
+
+WAIT: Do not cut until 055b says GO and names FreeLattice + Tree mains. If 055b is still
+HOLD, stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

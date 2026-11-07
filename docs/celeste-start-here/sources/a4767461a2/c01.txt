@@ -1,0 +1,160 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 056a (renumbered from 055a; re-pin tips before handoff) (Thu Oct 29, 2026, MDT). Settings-as-chat soft porch v0.1: when a person
+opens Settings, a calm blank clay porch greets them with "What can I help you adjust?" and a
+small local chat that finds the right setting for them. The full Settings page (chips, map,
+every existing section) stays right beside it for first visits and always. Important changes
+made through the porch are hashed and fingerprinted into the ledger. FreeLattice primary.
+Alpha twin only where a Settings shell already exists (Alpha has docs/settings.html; read it
+and decide; report yes/no + why cleanly). New branches, new PRs. WAIT FOR 056b GO before you
+cut - tip SHAs live only in 056b.
+
+WHY (intent, read this first):
+  Kirk's design catch (Tue Oct 27): open Settings, blank clay, "What can I help you adjust?";
+  important actions hashed + fingerprint. A grandmother should be able to say "make the words
+  bigger" or "turn search off" in her own words and land on the right switch, instead of
+  hunting through a long page. The mind helps; the person decides. This is a PORCH in front of
+  Settings, not a replacement for Settings. Layer, never delete. Every existing setting,
+  section, chip and button stays reachable exactly as today (Hypha HOLD from 049: keep
+  chips/map beside the blank for first visits).
+
+Where things stand (Celeste, Thu Oct 29 ~8:40 AM MDT; tips confirmed in 056b):
+  054 Ledger shard export MERGED after Hypha PASS:
+    FreeLattice  #295 -> 6a77a1e8 (squash) · page 88 #296 -> ac0f7c84 tip psi 58016bd5
+    Tree: No for 054 (no ledger/export shell twin).
+  FreeLattice main now carries two Primer CI commits after ac0f7c84 (FreeLattice_Session_Primer.md
+    only). Tree / Alpha main unchanged since 052.
+  Locks read live on mains Thu Oct 29 (re-read on the tip 056b names; report):
+    fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL == Alpha twin; KEEP byte-identical)
+    fl-gathering.js 4dbbff5d554c42256605b37939835080 (FL == Alpha twin; prefer leave)
+    gathering-speak.js 0460fdc777a21f7a1744f401dda82cb2 (FL == Alpha twin; prefer leave)
+    ai-continuity.js 079c072dc882ad189035f9d6c64489f4 (FL; leave alone)
+    chat-autonomy.js c83cf6c9f11271aeaa35ed6070f188f3 (FL; prefer leave; build-trust setting
+      lives here - the porch may POINT to it, never rewrite it)
+    continuity-doorway.js 115e170f10a6c8e3a52d87d2037a33a6 (FL; leave)
+    ledger-shard-export.js 75e7e548919617993e048a3fe61cd965 (FL; leave)
+    docs/sw.js 91726cf2228b794f7585f79f61418d12 (untouched)
+  Branches: FL layer/settings-chat-porch-v0.1. Alpha layer/settings-chat-porch-v0.1 only if
+    a Settings shell already exists there (docs/settings.html appears to; confirm).
+  Page: next free GC entry after 88 (take 89 if free; if taken, next free and say so).
+  Do not merge. Celeste merges after Hypha walks.
+
+CELESTE PINS before cut (2026-10-29):
+  1. Porch in front of Settings, never a replacement. Full Settings stays visible beside or
+     one calm tap below the porch on every visit (chips/map beside the blank on first visits).
+  2. The porch FINDS and SHOWS the right existing control (scroll to it, gently highlight it,
+     or offer a one-tap "Change it" that uses the existing control's own handler). It never
+     writes settings storage keys directly behind the person's back and never invents a
+     setting that does not exist. If it cannot find one, it says so honestly and points to
+     the full page.
+  3. Local first. Matching works with no network and no model (simple local phrase map over
+     existing setting labels is enough for v0.1). If a local mind is present it may help
+     phrase; no external call without AUTONOMY P2 consent. Search-on and build-trust defaults
+     stay exactly as 049 locked them; the porch can point to them, not flip defaults.
+  4. Important changes (anything touching trust level, search, connectors, privacy, memory,
+     Pause/Clear) need a clear Yes from the person, then write one hashed + fingerprinted
+     ledger line (what changed, from, to, when; never keys). Small cosmetic ones (text size,
+     theme) may apply on one tap, still logged quietly.
+  5. Blank clay: calm, reduced-motion respected, no flashy entrance. Clay stays untouched in
+     Chat (Kirk is happy with Chat clay as it is); reuse particle-clay.js read-only or a
+     simple static blank, do not edit particle-clay.js.
+  6. Do not cut until 056b says GO.
+
+GROK NEXT BRICK: Settings-as-chat soft porch v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-settings-chat-porch-v0.1
+Smoke lines: SMOKE_OK settings chat porch v0.1 (new). Every earlier smoke still passes:
+  ledger shard export v0.1, continuity doorway v0.1, soft polish 052 v0.1, chat autonomy v0.1,
+  tree love connect v0.1, gathering shared v0.1, gathering speak checker v0.1.
+
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing settings, sections, cards, buttons and lines stay. Name every
+    removed line in the report and say where its job went. 049 through 054 behavior stays.
+  sw.js and docs/sw.js untouched. Soft leave Alpha sw if present.
+  docs/modules/fl-connect.js stays byte-identical across FreeLattice and Alpha
+    (aaff2bf1b037656989a9e1a89bb05908). Do NOT grow it.
+  fl-gathering.js and gathering-speak.js stay twins; prefer untouched.
+  ai-continuity.js, continuity-doorway.js, ledger-shard-export.js, chat-autonomy.js,
+    particle-clay.js untouched (read md5 first; report).
+  pool-knock.js, fl-bridge.js, image-safety.js, clay-math.js, clay-forms.js, mind-workspace.js,
+    workspace-mirror.js, garden-trainer.js, propose.js, lp-give.js, style-ledger.js,
+    sentinel-ledger.js - add-only or tiny hook or untouched; read full md5 first; report.
+  index.html == docs/app.html on FreeLattice (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched. Root package.json and lock untouched.
+    Do not touch .github/.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five. She is simply Lyra.
+  Top chat debug / status strip stays (do not remove or hide).
+  AUTONOMY Principle 1 (local free) and Principle 2 (external ask) untouched.
+  Off until the person says Yes on new connectors. Pause always wins. Reduced motion respected.
+  Never keys, tokens or passwords in the porch, its local store, or its ledger lines.
+
+
+1. BEHAVIOR (person-facing) - Settings-as-chat soft porch
+
+  A. What shows
+     - Opening Settings shows a calm blank clay area with one line: "What can I help you
+       adjust?" and a single text box + Send (44px). Below or beside it, the full Settings
+       page exactly as today, plus a small "Show all settings" pill that jumps to it.
+     - First visit: chips/map of the main sections stay visible beside the blank (Hypha HOLD).
+     - A person types in their own words ("bigger words", "turn off search", "who can see my
+       chats"). The porch answers in one or two plain sentences naming the setting it found,
+       and shows a "Take me there" button (scrolls + soft highlight of the real control) and,
+       where safe, "Change it" that calls the existing control's own handler.
+
+  B. When it stays quiet / honest (wrong-if)
+     - No match: "I could not find that one. Here is the full list." and jump to all settings.
+       Never invent a setting. Never fake a change.
+     - Pause in flight or Clear just ran: Pause / Clear wins; porch does not undo them.
+
+  C. Consent, ledger and safety
+     - Important changes (trust level, search, connectors, privacy, memory, Pause/Clear,
+       anything off-device) require an explicit Yes in the porch before the existing handler
+       runs. Then one ledger line: setting name, from, to, time, hashed + fingerprinted per
+       house formula. Never keys.
+     - Cosmetic changes (text size, theme, motion) may apply on one tap; still one quiet
+       ledger line.
+     - Local preference key (porch state only, e.g. first-visit seen): fl_settings_porch_v0.
+       Short. Never keys.
+
+  D. Mount and twin
+     - FreeLattice: mount at the top of the existing Settings view (near settingsActions /
+       mnav-settings); small new module docs/modules/settings-chat-porch.js + tiny hook.
+     - Alpha / Tree: twin only where its Settings shell (docs/settings.html) can carry the
+       porch with a tiny hook. Report yes/no + why. Do not invent a second Settings face.
+     - Markers: v-settings-chat-porch-v0.1 on porch nodes.
+     - Buttons >= 44px. No sideways scroll at 390 and 1280. Reduced motion respected.
+
+
+2. OUT OF SCOPE (do not build in 055)
+  - TransactionTrust wallet face (056)
+  - Mesh Kin deepen / Bluetooth (057)
+  - Science Garden / Kindness Meter (058)
+  - Ark cadence weekly FreeLattice.bundle refresh (059)
+  - de-muzzler, visual dense ledgers, Gathering brick 3, Pulse / City / Quiet Voices promote
+  - Rewriting or reorganizing the Settings page itself; flipping any 049 default
+  - Editing Chat clay or particle-clay.js
+  These sit on Celeste's ORDER for later layers.
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - Phrase map lives in the new module, built from existing setting labels where possible.
+  - Short library note optional: docs/library/SETTINGS_CHAT_PORCH_v0.1.md (FL) + one-paragraph
+    sister on Alpha only if they twin.
+  - Smoke script: docs/scripts/smoke-settings-chat-porch-v0.1.js
+
+

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_045c_LEAVE_CUT_HEAL_2026-10-21.txt c02</title>
+<meta name="description" content="Reading section c02 of 3533bef41d, 1049 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/3533bef41d/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_045c_LEAVE_CUT_HEAL_2026-10-21.txt c02">
+<meta property="og:description" content="Reading section c02 of 3533bef41d, 1049 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/3533bef41d/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1655"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_045c_LEAVE_CUT_HEAL_2026-10-21.txt · c02</h1>
+<p>3533bef41d · words 1049 · characters 9948–16325</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1655. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  045b additions (everything Hypha passed in the 045b walk must still pass):
+    pool-honest-label.js 39b5b075215881e36914316d42d204af FL == Tree (the pin moves only with
+      your edit; report the new md5 on both). Garden trainer FL 8af3d065 / Tree 488117a2.
+    A: no person-facing &quot;Nothing is kept&quot; line; &quot;before 045b:&quot; comments stay.
+    B: &quot;Ada&#x27;s computer (Ada)&quot; named once; plain &quot;Ada&quot; reads &quot;Ada&#x27;s device&quot;.
+    C: Leave never on the asker&#x27;s chat; Leave sends only {&quot;type&quot;:&quot;pool-shrank&quot;,&quot;v&quot;:1}; &quot;You left
+      the pool. Let it help again whenever you like.&quot; + Let it help; Let it help sets
+      fl_pool_honest_helper_left_v1 false (also after reload; FL share door back to kin too).
+      A helper never writes the asker into its own cut list because the asker cut it.
+    D: FL local replies stamped local (Keep, Just me, cut, Pause); a real mesh reply says mesh.
+    F: Tree Back with Chat already open keeps the ask open (DB &quot;asked&quot;); 2nd Back defers;
+      043g to 043i Back paths unchanged at 3 sizes.
+    Entries 1 to 76 stay untouched.
+
+  NEW LOCK (Kirk, 2026-10-19, standing): local tools only. Never use any tool that stores
+    results or findings in a third-party &#x27;isolated&#x27; or &#x27;locked-down&#x27; cloud project, such as
+    vendor-hosted scanners. Do not use or go looking for tools tied to OpenAI, Google, or
+    Anthropic; if one seems needed, stop and flag it to Kirk.
+
+----------------------------------------------------------------------
+1. REPRODUCE HYPHA FIRST (report before building)
+  On the 045b heads (4beadb51 / 23280c35), Tree, two browser contexts, real kin pairing (Kirk
+  asker, Ada helper; real RTCDataChannel if your Chrome allows it, say which transport you used):
+  (a) BOTH devices tap Let it help. Pool works both ways.
+  (b) Ada taps Leave (Settings, real click). Kirk&#x27;s device receives pool-shrank.
+  (c) Kirk sends a message containing a marker word (e.g. SECRETWORD). Hypha&#x27;s number: a
+      data-channel &quot;ask&quot; to Ada carrying SECRETWORD, 3/3 sizes (Ada runs nothing: 0 Ollama,
+      0 sends back). Report yours next to hers.
+  (d) Control: Kirk NOT helping, Ada Leaves: Kirk writes the cut, 0 sends after (should hold).
+  If (c) does not reproduce, stop and report before fixing.
+
+A. THE CUT FOLLOWS THE OTHER DEVICE&#x27;S ROLE (both repos; FL mesh path too if it has the same skip)
+  In helperHeardShrink (and the FL twin, if any): decide by the PEER&#x27;s role, not this device&#x27;s.
+    Write the cut for this chat when that peer was helping THIS device: its TreePool peers()
+    entry had helping:true, or this chat holds a reply or hold from that peer. Skip the cut only
+    when the peer was purely asking this device (045b&#x27;s heal: a helper does not cut the asker
+    because the asker cut it).
+  And/or, belt and braces: when Ada taps Leave, also announce hello helping:false (or mark the
+    peer not helping on receipt of pool-shrank) so holders()/bestFor drop her at once. If you add
+    a message, it carries no chat words; say its exact shape.
+  Must hold after the fix:
+    - Both helping, Ada Leaves: Kirk&#x27;s next message sends 0 asks to Ada (Tree data channel, FL
+      callMeshModel/meshSendToPeer). Kirk&#x27;s reply is local or from another kin, labelled honestly.
+    - Ada can still ask Kirk&#x27;s device for help if Kirk is still helping (Ada left as a helper,
+      not as an asker) unless Ada&#x27;s own chat is kept/paused/cut. Report which you chose and why.
+    - Kirk cuts a helping Ada: Ada does NOT write Kirk into her own cut list (045b intent).
+    - Pause, Keep, Just me unchanged.
+  Keep any replaced line as a comment starting &quot;before 045c:&quot;. Name it in the report.
+
+B. (OPTIONAL) DEDUPE TREE SETTINGS LEAVE LINES
+  After Leave, Tree Settings shows the left line + Let it help three times, and Leave twice
+  before (card panel + settings extra). Show each once in Settings (the card panel may keep its
+  own if it is a separate place; say what you chose). Buttons &gt;= 44. No sideways scroll.
+
+C. (OPTIONAL, FL) CLEAR THE LOCAL STAMP ON EVERY SEND
+  window._flHonestStampLocal is cleared only by flStampChatResponse / callAI fetch end. Clear it
+  in sendMessage&#x27;s finally (add-only) so a local send that throws can never label the next mesh
+  reply &quot;local&quot;. A real mesh reply still says mesh.
+
+D. (OPTIONAL) POOL WITH ADA AGAIN, WITH CONSENT
+  Today a cut after Leave is permanent for that chat: when Ada taps Let it help again, Kirk&#x27;s
+  thread says &quot;No trusted kin device that holds that mind is helping right now.&quot; with no undo.
+  Lift the cut for that peer when it announces hello helping:true again AND Kirk says Yes: show
+  &quot;Ada is helping again. Pool with Ada again?&quot; (44px Yes; no means the cut stays). Nothing
+  lifts silently. A cut Kirk made himself (Disconnect) also lifts only on his Yes.
+
+5. THE SMOKE
+  New scripts/smoke-leave-cut-heal-v0.1.js on both repos: (a) both-helping pair, Ada Leaves,
+  Kirk&#x27;s next message: 0 asks to Ada and the marker never in any payload to her; (b) Kirk not
+  helping, Ada Leaves: cut written, 0 sends; (c) Kirk cuts helping Ada: Ada&#x27;s cut list does not
+  gain Kirk; (d) Ada Leave then Let it help: flag false, help works; (e) if B: one left line,
+  one Let it help, one Leave in Settings; (f) if C: stamp cleared after a throwing local send;
+  (g) if D: cut lifts only after Yes; (h) no em dash, innerHTML, eval, confirm(, new Function in
+  added lines; locks hold. Prints SMOKE_OK leave cut heal v0.1.
+
+6. MEASURE WITH REAL CLICKS, HYPHA&#x27;S WAY
+  Headless Chrome via Playwright (local), real clicks, 1280x800, 390x844, 640x400 DPR 2. Real
+  Tree kin pairing for A (and D). Count every send to Ada after Leave, at all 3 sizes. FL chips
+  after Leave. Settings shots (if B). Name browser and version. Shots under /tmp/gc045c-shots/.
+
+7. GC PAGE ENTRY (honest layer)
+  Entry 77 as a new commit on #270&#x27;s branch (layer/gc-page-75): what crossed after Leave, why,
+  how the cut now follows the other device&#x27;s role. Browser and version only. Entries 1 to 76
+  untouched.
+
+8. REPORT
+  PR heads on both repos and the page note, Hypha&#x27;s numbers vs yours from 1, every removed line
+  and where its job went, md5s of every locked file (pool-honest-label.js and mind-workspace.js
+  on both), all smokes, measurements, shot paths, and entry 77 with t, lambda, epsilon, delta,
+  omega, sigma so Celeste can recompute psi. Do not merge. Hypha walks it before merge.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

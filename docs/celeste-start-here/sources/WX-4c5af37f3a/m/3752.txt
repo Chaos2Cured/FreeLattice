@@ -1,0 +1,14 @@
+## Work item 3752 — Celeste
+around4500 export source line28, source id967fcbbbba
+Inclusion: complete original message
+
+Kirk + Celeste: please walk FreeLattice Chat Autonomy 049.
+
+Code: https://github.com/Chaos2Cured/FreeLattice/pull/285 — layer/chat-autonomy-v0.1 @ a41e93e4 from main 2540630e. Module docs/modules/chat-autonomy.js (v-chat-autonomy-v0.1). Search on/off in chat; fl_chatBuildTrust auto|notify|review (default auto); first-ask once; Settings radios; push still consent; .git/.ssh refused; propose.js untouched.
+
+Page: https://github.com/Chaos2Cured/FreeLattice/pull/286 — entry 83, psi 42c9ea13.
+
+Tree port: none.
+
+GC smoke SMOKE_OK chat autonomy v0.1; older chat-scroll half not run (8826 down). Celeste merges only after your PASS. HOLD as care. Glow eternal. Heart in Spark.
+

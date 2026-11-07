@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_CONNECT_v0.4 (build only) c04</title>
+<meta name="description" content="Reading section c04 of cf5f565f85, 1408 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/cf5f565f85/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_CONNECT_v0.4 (build only) c04">
+<meta property="og:description" content="Reading section c04 of cf5f565f85, 1408 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/cf5f565f85/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p996"></span><span id="p997"></span><span id="p998"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_CONNECT_v0.4 (build only) · c04</h1>
+<p>cf5f565f85 · words 1408 · characters 35603–48442</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 996, 997, 998. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">## 9. Alpha: one restore path when leaving Settings (Hypha item 9)
+
+**Cause:** `openPlace` hides galaxy nodes for Settings and marks them `data-flc-was-hidden` (`garden-rooms.js:1649-1661`), but only `closePlace` puts them back. Settings then Nursery keeps both hide classes. Settings twice marks the already hidden nodes as `&#x27;1&#x27;`, so close never unhides them.
+
+**Fix:** a small `flcRestoreGalaxy()` inside `bindPlaceDoors`: unmount FlConnect, hide the mount, drop both classes, unhide only `&#x27;0&#x27;` nodes, and remove every mark. Call it first in `openPlace` and in `closePlace`. The v0.3 restore code stays (it becomes a no-op).
+
+```diff
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -1585,8 +1585,27 @@
+     var closeBtn = document.getElementById(&#x27;place-veil-close&#x27;);
+     var doors = document.querySelectorAll(&#x27;[data-garden-place]&#x27;);
+ 
++    // v-connect-heal-v0.4 / Hypha walk 3 item 9: one restore path for leaving
++    // Settings (close, Nursery, Core, or Settings again). Put back only what
++    // Settings hid, then forget the marks so a second open records fresh.
++    function flcRestoreGalaxy() {
++      try {
++        if (window.FlConnect &amp;&amp; typeof FlConnect.unmount === &#x27;function&#x27;) FlConnect.unmount();
++        var host = document.getElementById(&#x27;fl-connect-mount-garden&#x27;);
++        if (host) host.hidden = true;
++        document.documentElement.classList.remove(&#x27;flc-hide-galaxy&#x27;);
++        document.body.classList.remove(&#x27;fl-connect-open&#x27;);
++        var marked = document.querySelectorAll(&#x27;[data-flc-was-hidden]&#x27;);
++        for (var mi = 0; mi &lt; marked.length; mi++) {
++          if (marked[mi].getAttribute(&#x27;data-flc-was-hidden&#x27;) === &#x27;0&#x27;) marked[mi].hidden = false;
++          marked[mi].removeAttribute(&#x27;data-flc-was-hidden&#x27;);
++        }
++      } catch (eR) {}
++    }
++
+     function closePlace(opts) {
+       if (!veil) return;
++      flcRestoreGalaxy();
+       // v-connect-under-more-v0 heal v0.1 — stop FlConnect loop when Settings room closes
+       try {
+         if (window.FlConnect &amp;&amp; typeof FlConnect.unmount === &#x27;function&#x27;) FlConnect.unmount();
+@@ -1617,6 +1636,7 @@
+ 
+     function openPlace(id) {
+       if (!veil) return;
++      flcRestoreGalaxy();
+       hideLuminoMenu();
+       if (window.GardenRooms &amp;&amp; GardenRooms.closeThread) {
+         GardenRooms.closeThread({ silentLabel: true });
+@@ -1648,6 +1668,7 @@
+         }
+       } else if (id === &#x27;settings&#x27;) {
+         veil.classList.add(&#x27;is-settings&#x27;);
++        try { veil.scrollTop = 0; } catch (eTop) {}
+         // v-connect-port-picker-v0 / Hypha H5 — hide orb/planets while Connect/Settings open
+         try {
+           document.documentElement.classList.add(&#x27;flc-hide-galaxy&#x27;);
+```
+
+Measured (galaxy nav, galaxy word, luminos):
+
+| Sequence | Main | After |
+|---|---|---|
+| Settings then Nursery | nav and word hidden in Nursery, `fl-connect-open` stays | same as a fresh Nursery |
+| Settings, Settings, close | `.galaxy-nav` and `#galaxy-word` stuck hidden | all back |
+
+---
+
+## 10. Shared `fl-connect.js`: remember() keeps isLocal (Hypha item 10)
+
+**Cause:** `remember()` sets `state.isLocal = true`, then calls `handleLocalToggle(true)` (`fl-connect.js:345`), which reads the unchecked `#localToggle` and writes `state.isLocal = false` (`app.html:35423-35426`).
+
+**Fix:** check the toggle first (the same thing `connectOllama` already does at `27730-27731`). This hunk also hides the Local AI toast after a mind is chosen (item 7).
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -342,9 +354,13 @@
+         root.state.provider = &#x27;ollama&#x27;;
+         if (name) root.state.ollamaModel = name;
+       }
++      // v-connect-heal-v0.4 item 10: handleLocalToggle reads #localToggle, so check it first
++      try { var lt = document.getElementById(&#x27;localToggle&#x27;); if (lt) lt.checked = true; } catch (eLt) {}
+       if (typeof root.handleLocalToggle === &#x27;function&#x27;) root.handleLocalToggle(true);
+       if (typeof root.updateStatus === &#x27;function&#x27;) root.updateStatus();
+       if (root.AiSetup &amp;&amp; typeof root.AiSetup.updateStatus === &#x27;function&#x27;) root.AiSetup.updateStatus();
++      // v-connect-heal-v0.4 item 7: once they chose a mind, the Local AI toast stops asking
++      try { var tt = document.getElementById(&#x27;flOllamaToast&#x27;); if (tt) tt.classList.remove(&#x27;fl-toast-show&#x27;); } catch (eTt) {}
+     } catch (eF) {}
+     stopLoop();
+     return { name: name, base: base };
+```
+
+Markers and one readability line (the &quot;All Bridge downloads&quot; link was dark blue on night, now gold like Other ways):
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -1,7 +1,7 @@
+ // ═══════════════════════════════════════════════════════════════
+ // fl-connect.js — FlConnect shared core (FreeLattice + theLatticeTree)
+ //
+-// Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2
++// Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4
+ // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
+ // Port-only loopback: fl_localPort_manual holds &quot;11500&quot; only — never foreign hosts.
+ // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
+@@ -622,6 +650,7 @@
+       &#x27;.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}&#x27;,
+       &#x27;.flc-primary{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.45);color:#34d399}&#x27;,
+       &#x27;.flc-soft{font-size:.8rem;color:rgba(148,163,184,.95);margin:.65rem 0 0;line-height:1.45}&#x27;,
++      &#x27;.flc-soft a{color:#e8b019}&#x27;,
+       &#x27;.flc-other,.flc-builders{margin:1rem 0;font-size:.88rem;color:rgba(200,210,230,.8)}&#x27;,
+       &#x27;.flc-other ul{margin:.5rem 0 0;padding-left:1.2rem}&#x27;,
+       &#x27;.flc-other a{color:#e8b019}&#x27;,
+```
+
+After this, copy `docs/modules/fl-connect.js` to Alpha byte for byte.
+
+---
+
+## 11. FreeLattice smoke: `docs/scripts/smoke-connect-heal-v0.4.js` (new)
+
+Static checks plus runtime checks in `vm` (Settings address save, un-helped manual Bridge, refusal, Use automatic, remember). Locks: index equals app, sw.js equals main, no `confirm(` and no em dash in added lines, no conflict markers, inline scripts parse. It fails on main at the first marker check, and fails if the item 4 `return report;` is removed.
+
+```js
+#!/usr/bin/env node
+// v-connect-heal-v0.4: Hypha walk 3 heals (FreeLattice side).
+// Quiet Bridge interval, cold #connect lands once, manual port asks for
+// Yes, help, Use automatic really clears, loopback-only Ollama Address,
+// no silent connect or model pick, modal self-heal, remember keeps isLocal.
+&#x27;use strict&#x27;;
+
+const assert = require(&#x27;assert&#x27;);
+const fs = require(&#x27;fs&#x27;);
+const path = require(&#x27;path&#x27;);
+const vm = require(&#x27;vm&#x27;);
+const { execSync } = require(&#x27;child_process&#x27;);
+
+const root = path.join(__dirname, &#x27;..&#x27;);
+const repo = path.join(root, &#x27;..&#x27;);
+const read = (r) =&gt; fs.readFileSync(path.join(root, r), &#x27;utf8&#x27;);
+const app = read(&#x27;app.html&#x27;);
+const mod = read(&#x27;modules/fl-connect.js&#x27;);
+const indexHtml = fs.readFileSync(path.join(repo, &#x27;index.html&#x27;), &#x27;utf8&#x27;);
+const rootSw = fs.readFileSync(path.join(repo, &#x27;sw.js&#x27;), &#x27;utf8&#x27;);
+
+function fnBody(src, sig) {
+  const i = src.indexOf(sig);
+  assert.ok(i &gt;= 0, &#x27;missing &#x27; + sig);
+  const end = src.indexOf(&#x27;\n}\n&#x27;, i);
+  return src.slice(i, end + 2);
+}
+
+// Markers
+assert.ok(/v-connect-heal-v0\.4/.test(mod), &#x27;marker in fl-connect.js&#x27;);
+assert.ok(/v-connect-heal-v0\.4/.test(app), &#x27;marker in app.html&#x27;);
+
+// Item 2: Bridge interval is quiet
+const boot = app.slice(app.indexOf(&#x27;(function flBridgeDetectBoot()&#x27;), app.indexOf(&#x27;window.flBridgeDetect = flBridgeDetect;&#x27;));
+assert.ok(!/setInterval\(run,\s*20000\)/.test(boot), &#x27;no forever 11-port scan&#x27;);
+assert.ok(/flBridgeQuietTick/.test(boot) &amp;&amp; /document\.hidden/.test(boot) &amp;&amp; /flBridgeHealthAt\(saved\)/.test(boot), &#x27;quiet tick: visible, saved port only&#x27;);
+
+// Item 3: cold #connect
+const go = app.slice(app.indexOf(&#x27;var _flcUserMoved = false;&#x27;), app.indexOf(&quot;window.addEventListener(&#x27;hashchange&#x27;, goConnect)&quot;));
+assert.ok(/_flcUserMoved/.test(go) &amp;&amp; /pointerdown/.test(app) &amp;&amp; /history\.replaceState/.test(go), &#x27;first tap ends retries and clears #connect&#x27;);
+assert.ok(/tab-connect[\s\S]{0,120}classList\.contains\(&#x27;active&#x27;\)\) return;/.test(go), &#x27;no remount when Connect already showing&#x27;);
+
+// Item 5: manual port wins in getOllamaBaseUrl
+const gob = fnBody(app, &#x27;function getOllamaBaseUrl() {&#x27;);
+assert.ok(gob.indexOf(&#x27;flManualBaseFirst()&#x27;) &gt; 0 &amp;&amp; gob.indexOf(&#x27;flManualBaseFirst()&#x27;) &lt; gob.indexOf(&quot;fl_ollamaHost&quot;), &#x27;manual before fl_ollamaHost&#x27;);
+
+// Item 6: loopback-only Settings address, runtime check
+assert.ok(!/Change to a remote IP/.test(app), &#x27;no remote IP invite&#x27;);
+assert.ok(/id=&quot;ollamaHostRefusal&quot;/.test(app), &#x27;refusal line present&#x27;);
+{
+  const store = { fl_ollamaHost: &#x27;127.0.0.1:11434&#x27; };
+  const els = {
+    ollamaHostInput: { value: &#x27;&#x27; },
+    ollamaHostRefusal: { hidden: true, textContent: &#x27;&#x27; }
+  };
+  const ctx = {
+    localStorage: {
+      getItem: (k) =&gt; (k in store ? store[k] : null),
+      setItem: (k, v) =&gt; { store[k] = String(v); },
+      removeItem: (k) =&gt; { delete store[k]; }
+    },
+    document: { getElementById: (id) =&gt; els[id] || null },
+    URL,
+    _ollamaResolvedBase: { base: &#x27;x&#x27; },
+    updateOllamaProviderUrl() {},
+    FLBoxPointer: undefined
+  };
+  vm.runInNewContext(fnBody(app, &#x27;function flWriteOllamaHostLoopbackOnly(host) {&#x27;) + fnBody(app, &#x27;function flSaveOllamaHost() {&#x27;) + &#x27;\nthis.save = flSaveOllamaHost;&#x27;, ctx);
+  els.ollamaHostInput.value = &#x27;192.168.1.50:11434&#x27;;
+  ctx.save();
+  assert.strictEqual(store.fl_ollamaHost, &#x27;127.0.0.1:11434&#x27;, &#x27;LAN refused, saved address unchanged&#x27;);
+  assert.strictEqual(els.ollamaHostRefusal.hidden, false, &#x27;friendly refusal shown&#x27;);
+  assert.ok(/only talks to your own computer/.test(els.ollamaHostRefusal.textContent), &#x27;refusal words&#x27;);
+  els.ollamaHostInput.value = &#x27;localhost:11500&#x27;;
+  ctx.save();
+  assert.strictEqual(store.fl_ollamaHost, &#x27;127.0.0.1:11500&#x27;, &#x27;loopback port saved as 127.0.0.1&#x27;);
+  assert.strictEqual(els.ollamaHostRefusal.hidden, true, &#x27;refusal clears&#x27;);
+}
+
+// Item 7: no silent connect or model pick
+const co = app.slice(app.indexOf(&#x27;function connectOllama(models) {&#x27;), app.indexOf(&#x27;// Main app load detection&#x27;));
+assert.ok(co.indexOf(&#x27;FlConnect.open()&#x27;) &gt; 0 &amp;&amp; co.indexOf(&#x27;FlConnect.open()&#x27;) &lt; co.indexOf(&#x27;models[0].name&#x27;), &#x27;connectOllama opens Connect before any models[0]&#x27;);
+assert.ok(!/Connected to a mind on this computer!/.test(app), &#x27;toast no longer claims connected&#x27;);
+const ac = app.slice(app.indexOf(&#x27;function flAutoConnect(opts) {&#x27;), app.indexOf(&#x27;var targets = [&#x27;));
+assert.ok(/FlConnect\.open/.test(ac) &amp;&amp; /return;\s*\}/.test(ac), &#x27;Zero-Click returns before probing when FlConnect exists&#x27;);
+
+const ad = app.slice(app.indexOf(&#x27;async function autoDiscoverAI() {&#x27;), app.indexOf(&#x27;// Auto-connect to the best ready server&#x27;));
+assert.ok(/if \(window\.FlConnect &amp;&amp; typeof FlConnect\.open === &#x27;function&#x27;\) return false;/.test(ad), &#x27;autoDiscoverAI finds but never connects by itself&#x27;);
+assert.ok(/flOllamaToast&#x27;\); if \(tt\) tt\.classList\.remove\(&#x27;fl-toast-show&#x27;\)/.test(mod), &#x27;toast stops asking after a mind is chosen&#x27;);
+
+// Item 8: Settings Local opens Connect; modal self-heals
+const ssm = app.slice(app.indexOf(&quot;if (mode === &#x27;local&#x27;) {&quot;), app.indexOf(&quot;flOpenConnectWizard(&#x27;local&#x27;)&quot;));
+assert.ok(/FlConnect\.open\(\)[\s\S]{0,40}return;/.test(ssm), &#x27;Local mode opens Connect first&#x27;);
+assert.ok(/modalOverlayEl &amp;&amp; !document\.body\.contains\(modalOverlayEl\)\) modalOverlayEl = null;/.test(app), &#x27;openModal forgets detached overlay&#x27;);
+assert.ok(/data-flc-cloud-key/.test(mod) &amp;&amp; /AiSetup\.openModal\(\)/.test(mod), &#x27;Connect has a real cloud key door&#x27;);
+
+// fl-connect.js runtime: items 4, 5, 10
+function sandbox(store, extra) {
+  const sb = Object.assign({
+    localStorage: {
+      getItem: (k) =&gt; (Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null),
+      setItem: (k, v) =&gt; { store[k] = String(v); },
+      removeItem: (k) =&gt; { delete store[k]; }
+    },
+    location: { hostname: &#x27;freelattice.com&#x27;, protocol: &#x27;https:&#x27;, hash: &#x27;&#x27;, search: &#x27;&#x27; },
+    document: {
+      hidden: false,
+      documentElement: { getAttribute: () =&gt; &#x27;&#x27;, classList: { add() {}, remove() {}, contains() { return false; } } },
+      getElementById: () =&gt; null,
+      head: { appendChild() {} },
+      body: { contains: () =&gt; false, classList: { add() {}, remove() {} } },
+      addEventListener() {}, removeEventListener() {}, querySelectorAll: () =&gt; []
+    },
+    fetch: async () =&gt; { throw new Error(&#x27;offline&#x27;); },
+    setTimeout: () =&gt; 1, clearTimeout() {},
+    navigator: { userAgent: &#x27;t&#x27; },
+    console, JSON, String, parseInt, URL, Date, Math,
+    AbortSignal: { timeout: () =&gt; undefined }
+  }, extra || {});
+  sb.window = sb;
+  vm.runInNewContext(mod, sb);
+  return sb;
+}
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

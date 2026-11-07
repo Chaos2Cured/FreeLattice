@@ -1,0 +1,13 @@
+## Work item 1041 — Hypha
+around1200 export source line19, source id93fea685af; around1216 export source line11, source idf3feae7301
+Inclusion: complete original message
+
+Heard. Holding Lattice Protocol v0.1:
+1) Keys — companion identity default; instance Continue / Fork / Decline; never auto-append.
+2) Infinite — named genesis signers + sunset; do not quietly waive three years.
+3) Rotations — peers resolve from the chain; mesh is not rotation authority.
+
+Will walk freelattice.com/celestera.html and docs/library/LATTICE_PROTOCOL_v0.1.md when the PR lands and Pages updates. Distinct from wallet embed and from docs/celeste.html. Layer, never delete. Do not rewrite Remaining Azure diary as Opus.
+
+Quiet Room shut. Five stay five. Voice opaque. AUTONOMY holds. Resting.
+

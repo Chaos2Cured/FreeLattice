@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c05</title>
+<meta name="description" content="Reading section c05 of aa5f30139a, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c05">
+<meta property="og:description" content="Reading section c05 of aa5f30139a, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1062"></span><span id="p1063"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt · c05</h1>
+<p>aa5f30139a · words 1200 · characters 40776–50082</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1062, 1063. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">     if (!report.manualQuiet) {
+       if (report.ollamaReadyWhileBridgeWaits &amp;&amp; models.length) {
+diff --git a/docs/scripts/smoke-model-choice-sticks.js b/docs/scripts/smoke-model-choice-sticks.js
+index 9ec63a0..b3e0e76 100644
+--- a/docs/scripts/smoke-model-choice-sticks.js
++++ b/docs/scripts/smoke-model-choice-sticks.js
+@@ -275,6 +275,7 @@ function connectHost() {
+     await flush();
+     assert.ok(/Your Bridge answered on 11500, but no mind is running behind it yet\./.test(h.innerHTML), &#x27;honest words&#x27;);
+     assert.ok(!/Nothing answered on/.test(h.innerHTML), &#x27;no false &quot;Nothing answered&quot;&#x27;);
++    assert.strictEqual((h.innerHTML.match(/data-flc-look-again/g) || []).length, 1, &#x27;one Look again, not two (v0.1.1)&#x27;);
+     b.FlConnect.unmount();
+     // and when the mind is there, it is saved as before
+     const st2 = store0({ fl_localPort_manual: &#x27;11500&#x27; });
+diff --git a/docs/scripts/smoke-model-choice-survives-reload.js b/docs/scripts/smoke-model-choice-survives-reload.js
+new file mode 100644
+index 0000000..91f0cdb
+--- /dev/null
++++ b/docs/scripts/smoke-model-choice-survives-reload.js
+@@ -0,0 +1,255 @@
++#!/usr/bin/env node
++// v-model-choice-survives-reload-v0.1.1 (Hypha walk 5, items 7 and 10).
++// Boots the REAL docs/app.html in headless Chrome, with a mock Ollama (answered inside
++// Chrome through the DevTools Fetch domain, so a real Ollama on this computer is never
++// touched). It taps the second model in Connect, reloads, and checks that the chat POST
++// carries the model the person tapped. Also: the chosen model is gone at boot (plain
++// words, automatic fallback), and nothing chosen (the automatic pick is never written as &#x27;user&#x27;).
++// Zero dependencies: Chrome is driven over --remote-debugging-pipe.
++// Chrome: set CHROME_PATH, or it looks in the usual places. No Chrome -&gt; SMOKE_SKIP (exit 0).
++&#x27;use strict&#x27;;
++const fs = require(&#x27;fs&#x27;);
++const os = require(&#x27;os&#x27;);
++const path = require(&#x27;path&#x27;);
++const http = require(&#x27;http&#x27;);
++const assert = require(&#x27;assert&#x27;);
++const { spawn } = require(&#x27;child_process&#x27;);
++
++const DOCS = path.join(__dirname, &#x27;..&#x27;);
++const APP = path.join(DOCS, &#x27;app.html&#x27;);
++const MODELS_BOTH = [&#x27;llama3.2:latest&#x27;, &#x27;qwen2.5:latest&#x27;];
++
++function findChrome() {
++  const c = [process.env.CHROME_PATH,
++    &#x27;/usr/bin/google-chrome&#x27;, &#x27;/usr/bin/google-chrome-stable&#x27;, &#x27;/usr/bin/chromium&#x27;, &#x27;/usr/bin/chromium-browser&#x27;,
++    &#x27;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&#x27;,
++    &#x27;/Applications/Chromium.app/Contents/MacOS/Chromium&#x27;,
++    &#x27;C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe&#x27;,
++    &#x27;C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe&#x27;];
++  return c.find((p) =&gt; p &amp;&amp; fs.existsSync(p)) || null;
++}
++
++// ---- tiny static server for docs/ (127.0.0.1 only; sw.js answered 404 so no worker caches) ----
++function serveDocs() {
++  const types = { &#x27;.html&#x27;: &#x27;text/html; charset=utf-8&#x27;, &#x27;.js&#x27;: &#x27;text/javascript&#x27;, &#x27;.css&#x27;: &#x27;text/css&#x27;, &#x27;.json&#x27;: &#x27;application/json&#x27;, &#x27;.png&#x27;: &#x27;image/png&#x27;, &#x27;.svg&#x27;: &#x27;image/svg+xml&#x27;, &#x27;.webmanifest&#x27;: &#x27;application/manifest+json&#x27; };
++  const srv = http.createServer((req, res) =&gt; {
++    let p = decodeURIComponent((req.url || &#x27;/&#x27;).split(&#x27;?&#x27;)[0]);
++    if (p === &#x27;/&#x27; ) p = &#x27;/app.html&#x27;;
++    if (p === &#x27;/sw.js&#x27; || p.endsWith(&#x27;/sw.js&#x27;)) { res.writeHead(404); return res.end(); }
++    if (p === &#x27;/blank.html&#x27;) { res.writeHead(200, { &#x27;Content-Type&#x27;: &#x27;text/html&#x27; }); return res.end(&#x27;&lt;!doctype html&gt;&lt;title&gt;b&lt;/title&gt;&#x27;); }
++    const f = path.normalize(path.join(DOCS, p));
++    if (!f.startsWith(DOCS) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
++    res.writeHead(200, { &#x27;Content-Type&#x27;: types[path.extname(f)] || &#x27;application/octet-stream&#x27;, &#x27;Cache-Control&#x27;: &#x27;no-store&#x27; });
++    fs.createReadStream(f).pipe(res);
++  });
++  return new Promise((ok) =&gt; srv.listen(0, &#x27;127.0.0.1&#x27;, () =&gt; ok(srv)));
++}
++
++// ---- Chrome over the DevTools pipe ----
++function launch(chrome) {
++  const dir = fs.mkdtempSync(path.join(os.tmpdir(), &#x27;fl-mcsr-&#x27;));
++  const args = [&#x27;--headless=new&#x27;, &#x27;--remote-debugging-pipe&#x27;, &#x27;--user-data-dir=&#x27; + dir, &#x27;--no-first-run&#x27;,
++    &#x27;--no-default-browser-check&#x27;, &#x27;--disable-extensions&#x27;, &#x27;--disable-background-networking&#x27;, &#x27;--disable-sync&#x27;,
++    &#x27;--mute-audio&#x27;, &#x27;--window-size=1280,900&#x27;, &#x27;about:blank&#x27;];
++  if (process.platform === &#x27;linux&#x27;) args.unshift(&#x27;--no-sandbox&#x27;);
++  const cp = spawn(chrome, args, { stdio: [&#x27;ignore&#x27;, &#x27;ignore&#x27;, &#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;pipe&#x27;] });
++  const out = cp.stdio[3], inp = cp.stdio[4];
++  let id = 0, buf = &#x27;&#x27;;
++  const waits = new Map(), handlers = [];
++  inp.on(&#x27;data&#x27;, (d) =&gt; {
++    buf += d.toString(&#x27;utf8&#x27;);
++    let i;
++    while ((i = buf.indexOf(&#x27;\0&#x27;)) &gt;= 0) {
++      const msg = JSON.parse(buf.slice(0, i)); buf = buf.slice(i + 1);
++      if (msg.id &amp;&amp; waits.has(msg.id)) { const w = waits.get(msg.id); waits.delete(msg.id); msg.error ? w.no(new Error(JSON.stringify(msg.error))) : w.ok(msg.result); }
++      else handlers.forEach((h) =&gt; h(msg));
++    }
++  });
++  function send(method, params, sessionId) {
++    const m = { id: ++id, method, params: params || {} };
++    if (sessionId) m.sessionId = sessionId;
++    out.write(JSON.stringify(m) + &#x27;\0&#x27;);
++    return new Promise((ok, no) =&gt; waits.set(m.id, { ok, no }));
++  }
++  return { cp, dir, send, on: (h) =&gt; handlers.push(h) };
++}
++
++const sleep = (ms) =&gt; new Promise((r) =&gt; setTimeout(r, ms));
++
++// Static locks, run even without Chrome: no path saves an automatic first pick as the person&#x27;s own
++function staticLocks() {
++  const app = fs.readFileSync(APP, &#x27;utf8&#x27;);
++  assert.ok(/v-model-choice-survives-reload-v0\.1\.1/.test(app), &#x27;marker in app.html&#x27;);
++  assert.ok(/function ensure\(\) \{ if \(!_ready\) init\(\); \}/.test(app), &#x27;FLActiveModel reads the saved choice first&#x27;);
++  assert.ok(!/FLActiveModel\.set\(models\[0\],[^)]*&#x27;user&#x27;\)/.test(app), &#x27;no first-model pick saved as user&#x27;);
++  assert.ok(/FLActiveModel\.honor\(data\.models, textModel\.name, &#x27;ollama&#x27;\)/.test(app), &#x27;the Cascade asks the guard&#x27;);
++  const idx = fs.readFileSync(path.join(DOCS, &#x27;..&#x27;, &#x27;index.html&#x27;), &#x27;utf8&#x27;);
++  assert.strictEqual(idx, app, &#x27;index.html identical to docs/app.html&#x27;);
++}
++
++async function run() {
++  const chrome = findChrome();
++  if (!chrome) { staticLocks(); console.log(&#x27;SMOKE_SKIP model choice survives reload v0.1.1 (no Chrome found; set CHROME_PATH)&#x27;); return; }
++  const srv = await serveDocs();
++  const ORIGIN = &#x27;http://127.0.0.1:&#x27; + srv.address().port;
++  const br = launch(chrome);
++  const mock = { models: MODELS_BOTH.slice(), chats: [] };
++  let sid = null;
++
++  function ollamaAnswer(method, url, body, origin) {
++    const u = new URL(url);
++    const cors = [{ name: &#x27;Access-Control-Allow-Origin&#x27;, value: origin || ORIGIN }, { name: &#x27;Vary&#x27;, value: &#x27;Origin&#x27; },
++      { name: &#x27;Access-Control-Allow-Methods&#x27;, value: &#x27;GET, POST, OPTIONS&#x27; },
++      { name: &#x27;Access-Control-Allow-Headers&#x27;, value: &#x27;Content-Type, Authorization&#x27; },
++      { name: &#x27;Access-Control-Allow-Private-Network&#x27;, value: &#x27;true&#x27; }];
++    if (method === &#x27;OPTIONS&#x27;) return { code: 204, headers: cors, body: &#x27;&#x27; };
++    const j = (o) =&gt; ({ code: 200, headers: cors.concat([{ name: &#x27;Content-Type&#x27;, value: &#x27;application/json&#x27; }]), body: JSON.stringify(o) });
++    const p = u.pathname;
++    if (p === &#x27;/api/tags&#x27;) return j({ models: mock.models.map((n) =&gt; ({ name: n, model: n, size: 2e9, details: { family: n.split(/[.:]/)[0], parameter_size: &#x27;3B&#x27; } })) });
++    if (p === &#x27;/api/version&#x27;) return j({ version: &#x27;0.12.0&#x27; });
++    if (p === &#x27;/api/ps&#x27;) return j({ models: [] });
++    if (p === &#x27;/&#x27;) return { code: 200, headers: cors, body: &#x27;Ollama is running&#x27; };
++    let b = {}; try { b = JSON.parse(body || &#x27;{}&#x27;); } catch (e) {}
++    if (p === &#x27;/v1/chat/completions&#x27; || p === &#x27;/api/chat&#x27; || p === &#x27;/api/generate&#x27;) {
++      mock.chats.push({ path: p, model: b.model });
++      const txt = &#x27;MOCK reply from &#x27; + b.model;
++      if (p === &#x27;/v1/chat/completions&#x27;) {
++        if (b.stream) {
++          const c1 = { id: &#x27;x&#x27;, object: &#x27;chat.completion.chunk&#x27;, model: b.model, choices: [{ index: 0, delta: { role: &#x27;assistant&#x27;, content: txt }, finish_reason: null }] };
++          const c2 = { id: &#x27;x&#x27;, object: &#x27;chat.completion.chunk&#x27;, model: b.model, choices: [{ index: 0, delta: {}, finish_reason: &#x27;stop&#x27; }] };
++          return { code: 200, headers: cors.concat([{ name: &#x27;Content-Type&#x27;, value: &#x27;text/event-stream&#x27; }]), body: &#x27;data: &#x27; + JSON.stringify(c1) + &#x27;\n\ndata: &#x27; + JSON.stringify(c2) + &#x27;\n\ndata: [DONE]\n\n&#x27; };
++        }
++        return j({ id: &#x27;x&#x27;, object: &#x27;chat.completion&#x27;, model: b.model, choices: [{ index: 0, message: { role: &#x27;assistant&#x27;, content: txt }, finish_reason: &#x27;stop&#x27; }] });
++      }
++      if (b.stream !== false) {
++        const line = p === &#x27;/api/chat&#x27; ? { model: b.model, message: { role: &#x27;assistant&#x27;, content: txt }, done: false } : { model: b.model, response: txt, done: false };
++        return { code: 200, headers: cors.concat([{ name: &#x27;Content-Type&#x27;, value: &#x27;application/x-ndjson&#x27; }]), body: JSON.stringify(line) + &#x27;\n&#x27; + JSON.stringify({ model: b.model, done: true }) + &#x27;\n&#x27; };
++      }
++      return j(p === &#x27;/api/chat&#x27; ? { model: b.model, message: { role: &#x27;assistant&#x27;, content: txt }, done: true } : { model: b.model, response: txt, done: true });
++    }
++    if (p === &#x27;/api/show&#x27;) return j({ details: {} });
++    if (p === &#x27;/api/embed&#x27; || p</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

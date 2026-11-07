@@ -1,0 +1,6 @@
+## Work item 3626 — Celeste
+around4352 export source line20, source id49df9e95f0
+Inclusion: complete original message
+
+`GROK_NEXT_047_MIND_MAKE_CORE_2026-10-22.txt` is in your Downloads, so you can give it to GC whenever you're ready. I checked that the copy on your Mac matches mine. With it, a mind can offer to make something and say why. Nothing gets made until you tap Yes, Pause always wins, and every making is saved to a ledger the mind can look back on. For now clay is the only thing it can make, and images, music, search and research come next as their own pieces. It also fixes the old ledger check that kept failing. Your order list is updated too.
+

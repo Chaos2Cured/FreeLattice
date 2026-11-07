@@ -1,0 +1,75 @@
+## Work item 1226 — Celeste
+around1400 export source line36, source idc998bd39df; around1404 export source line35, source idc36a95ef26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Glass pulses v0.1 (shape without contents)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `0ead244`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Glass pulses v0.1 — shape without contents.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm bridge `0ead244`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs (include `0ead244`).
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+Ledger / import / identity already keep vows. Glass should *show the vow shape*
+without ever showing voice. A break in the chain shows as a break in the helix.
+
+## Scope (one bite)
+
+### 1) Spec — NEW `docs/library/GLASS_PULSES_v0.1.md`
+Vocabulary (kind strings, exact):
+- `ledger.appended` · `ledger.verified` · `ledger.broken`
+- `pair.formed` · `pair.rotated` (pair fingerprint may still be stub — emit only if pair APIs exist; else document + skip emit)
+- `manifest.signed` (if a sign path exists; else stub later)
+- `transfer.verified` · `transfer.mismatch` (map from verified-import / swarm hash match|mismatch)
+- `tier.advanced` · `tier.reset` (emit only if trust-tier hooks already exist; else document as reserved)
+
+Pulse shape stays LatticeMemory five-key lock: `ts`, `source`, `kind`, `summary`, `refs`
+- summary ≤80, no URLs, no quoted dumps, no voice text (opaque)
+- source examples: `ledger` | `import` | `swarm` | `identity` | `glass`
+- Quiet Room: never emit / never subscribe (existing gate)
+
+### 2) Emit helpers — NEW small module OR thin helpers
+Prefer NEW `docs/modules/glass-pulses.js` (and mirror under `modules/` if that tree mirrors docs/modules):
+- `emitGlassPulse({ source, kind, summary, refs? })` → `LatticeMemory.commit(...)`
+- Fixed opaque summary strings per kind (table in spec) — never interpolate voice / paths / hashes into summary (hashes may go in `refs` as `{store,id}` only if already non-sensitive ids; prefer no hash in summary)
+
+### 3) Wire emitters (gesture / status returns — never auto from Quiet)
+Desktop renderer (docs/app.html + index.html where those actions already live):
+- After successful ledger append → `ledger.appended`
+- After chain verify OK → `ledger.verified`; verify fail → `ledger.broken`
+- After import/swarm hash match → `transfer.verified`; mismatch → `transfer.mismatch`
+- Identity first fingerprint shown / rotate if API exists → `pair.formed` / `pair.rotated` **only if** those code paths already exist; otherwise leave reserved in spec
+
+Browser-only pages without Electron: still emit transfer/ledger pulses if those UI paths run in browser; no swarm.
+
+### 4) Glass v2 helix — break on `ledger.broken`
+In `docs/glass-v2.html` (and root mirror if present): when a live pulse kind is `ledger.broken`, show a visible helix break (gap / crack / dim segment) that clears or softens only after a later `ledger.verified` or `ledger.appended` in the same session. Do not show contents. Quiet Room silence card unchanged.
+
+Glass v1 stream already renders kind/summary — confirm new kinds appear; no redesign.
+
+### 5) Smoke
+- Node or browser-less unit: validate opaque summaries + forbidden keys still drop
+- Script or small HTML smoke: commit each required kind → SMOKE_OK glass-pulses
+- Prove `ledger.broken` would set helix-break flag (pure function test OK)
+
+### 6) Protocol LAYER Part 8 + Flint.html temperature/haiku/Held (`0ead244`) + 🌱
+
+## Out
+Full pair fingerprint ship · wallet · Alpha poetry · rewriting LatticeMemory five-key lock · Quiet Room touch · swarm rebuild · auto-import · seeding
+
+## Done
+Spec + emit helper + wires for ledger/transfer (+ identity if present) + Glass v2 helix break + smoke · draft · PR body Held SHAs
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

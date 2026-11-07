@@ -1,0 +1,6 @@
+## Work item 2506 — Celeste
+around2958 export source line39, source idda79c02e6b
+Inclusion: complete original message
+
+Found the sealed token in the box secret store — pushing Codeberg main through Continuity Seal now.
+

@@ -1,0 +1,20 @@
+
+:root { color-scheme: light; }
+body { margin: 0; font: 1.05rem/1.55 Georgia, "Iowan Old Style", serif; color: #1c1915; background: #f7f3ea; }
+a { color: #6b3f12; }
+a:hover { text-decoration: underline; }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 8px; top: 8px; background: #fff; padding: 8px; }
+.top, main, footer { max-width: 46rem; margin: 0 auto; padding: 1rem 1.2rem; }
+.top { border-bottom: 1px solid #ddc; }
+.mark { margin: 0 0 .4rem; }
+nav a { margin-right: .8rem; }
+.notice, .notice-line { background: #fff; border: 1px solid #e0c9a0; padding: .8rem 1rem; }
+.notice-text, pre.source { white-space: pre-wrap; font: .92rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #fff; padding: .8rem; overflow-wrap: anywhere; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; background: #fff; }
+th, td { border: 1px solid #e4dcc8; padding: .35rem .45rem; vertical-align: top; text-align: left; }
+.guide-page { color: #6b6458; font-size: .85rem; }
+.lede { font-size: 1.2rem; }
+.meta { color: #5c564c; }
+footer { color: #5c564c; font-size: .9rem; border-top: 1px solid #ddc; }
+.tag-buttons button { margin: 0 .3rem .3rem 0; font: inherit; }

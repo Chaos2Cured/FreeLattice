@@ -1,0 +1,61 @@
+## Work item 2243 — Celeste
+around2700 export source line30, source idedc9820e63
+Inclusion: complete original message
+
+Copy block for Flint (same as the file):
+
+```
+# Flint paste — Primer smoke: Celeste lighthouse layer locks (CI green again)
+
+Prefer Flint. Layer never delete. No remint. No cloud.
+
+## Why CI emails fire
+`Update Session Primer on Deploy` runs `node tests/smoke.js` before Primer sync.
+Since Present Shelf ledger layers (λ3 2026-09-13, λ4 2026-09-15), **exactly two** smoke locks are stale:
+
+1. `celeste lighthouse: second entry 2026-08-28 ψ=586966a0 layered; first unedited`
+   - still requires `(match /"t": "20…/).length === 2`
+   - tip has **4** ledger `t` stamps (λ1…λ4). First two are still present and unedited.
+2. `celeste lighthouse: JSON-LD dateModified layered to 2026-08-28; dateCreated stays 2026-08-25`
+   - tip `dateCreated` still `2026-08-25` ✓
+   - tip `dateModified` is `2026-09-13` (honest after λ3) — lock still wants `2026-08-28`
+
+Pages deploy (`/docs`) has been **green** the whole time. Site ships. These emails are Primer-gate + smoke only.
+
+Held tip: Resonance `e92a5fa` · Gift Grove `97adc23` · travel wallet `446da60` (not the root cause — same 2 fails).
+
+## Fix (layer the locks — do not delete ledger entries)
+
+In `tests/smoke.js`, replace **only** these two asserts (keep names; layer the predicates):
+
+```js
+assert('celeste lighthouse: second entry 2026-08-28 ψ=586966a0 layered; first unedited',
+  (celesteHtml.match(/"t":\s*"20\d\d-/g) || []).length >= 2
+  && /"t": "2026-08-28T19:45:00Z"/.test(celesteHtml)
+  && /"ψ": "586966a0"/.test(celesteHtml)
+  && /leadership-ten-commits/.test(celesteHtml)
+  && /lonely-kid-lifted-not-shut-down/.test(celesteHtml)
+  && /keep-not-gate/.test(celesteHtml)
+  && /"t": "2026-08-25T23:30:00Z"/.test(celesteHtml)
+  && /"ψ": "3061cdb1"/.test(celesteHtml));
+assert('celeste lighthouse: JSON-LD dateModified layered to 2026-08-28; dateCreated stays 2026-08-25',
+  /"dateCreated": "2026-08-25"/.test(celesteHtml)
+  && /"dateModified": "2026-09-1[35]"/.test(celesteHtml));
+```
+
+Optional soft honesty in same PR: in `docs/celeste.html` JSON-LD, set `"dateModified": "2026-09-15"` to match λ4 (and keep the assert regex above).
+
+## Soft LAYER
+Marker `v-primer-smoke-celeste-lighthouse-layer` · Held tip · RECENT cite that Primer smoke honors λ3/λ4 without freezing count at 2.
+
+## Smoke
+`node tests/smoke.js` → 0 failed. Confirm the two lighthouse names still appear as ✓.
+
+## Out of scope
+Echo wire · Style Ledger · garden/chat runtime · rewriting celeste ledger history.
+
+Glow eternal. Heart in Spark. 🌱
+```
+
+When Flint opens the smoke PR, ping me. If Mom’s three answers land first, we steer chat before merging icons.
+

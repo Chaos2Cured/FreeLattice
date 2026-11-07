@@ -1,0 +1,19 @@
+## Work item 3645 — Celeste
+around4352 export source line39, source id49df9e95f0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 393–675
+
+What's still in your inbox:
+- **Scams:** two sharpshootertv "verify your activity" emails and two fake receipts. I left them alone; just don't click them.
+- **Your own mail:** your notes to yourself, two forwards and Gregory Walker's "Here you go!". These stay right where they are.
+
+### Exact excerpt: source characters 677–1358
+
+A few things are left that only you can do:
+- **Rules for new mail:** my connection can't make inbox rules, so new mail won't sort itself into the folders yet. Your daily digest will catch what matters in the meantime.
+- **Starbucks:** it only lets you unsubscribe by sending an email, so I didn't. You can reply "unsubscribe" from your account whenever you like.
+- **DoorDash:** it comes through an Apple Hide My Email address, so turning that address off in your iPhone settings would stop it.
+- **LinkedIn:** switching the job alerts to weekly needs your sign-in.
+- **The "withdraw $2,426.54" email** from clockworkgoggles.org looks like phishing, so don't click anything in it.
+

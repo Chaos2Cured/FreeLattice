@@ -1,0 +1,140 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 045b (Wednesday Oct 21, 2026, MDT). Pool honest heals v0.1: BOTH REPOS. Layer on
+the SAME 045 PRs. Hypha walked 045 and held it (small). Four fixes (A to D), two optional (E, F).
+
+WHY (intent, read this first):
+  045 is a brick about honesty, so it has to be honest everywhere. Hypha found two old lines that
+  still promise the helper keeps nothing, a label that names the device twice with a real kin
+  pairing, a Leave button that can never be undone, and FL replies made on this device that are
+  stamped "mesh". Each one is small. Together they decide whether Mom can trust the label.
+
+Where things stand (Celeste, Oct 21 MDT):
+  FL main feb58168 (043 merged, page notes 72 to 74 merged). Tree main 2db31481 (Tree #123 squash).
+  OPEN, do not merge: FL #269 head a2842d8a (base feb58168), Tree #124 head 02765ed2 (base
+  2db31481), page note #270 head 7961c1c7 (entry 75, psi 3027d2e8).
+  Hypha's walk: Celeste's research notes walk-045-2026-10-21 (summary in this paste).
+  Same branches: FL layer/pool-honest-label-v0.1 and Tree layer/pool-honest-label-v0.1. New
+  commits on top, no force push. Page note: entry 76 as a new commit on #270's branch (or a PR
+  stacked on #270; say which). Entry 75 stays as written.
+  BEFORE ANYTHING ELSE: git fetch. Confirm FL main is feb58168 (or a later CI-only commit), Tree
+  main is 2db31481, and the three PR heads are a2842d8a, 02765ed2, 7961c1c7. If code moved, stop
+  and report. Read the current md5s; if a locked file differs from this paste, stop and report.
+
+GROK NEXT BRICK: Pool honest heals v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-pool-honest-heals-v0.1
+Smoke lines: SMOKE_OK pool honest heals v0.1 (new, both repos) and SMOKE_OK pool honest label
+  v0.1 still passes; every earlier smoke still passes (FL smoke-family-pages-v0.1 may still fail
+  only for the pre-existing gc.html ledger hash; say so if it does).
+  Do not merge. Celeste merges after Hypha walks.
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9 and tree-reconnect.js
+    cc0527c26d5686c05fec52625d5a1375 (Tree) stay.
+  docs/modules/fl-bridge.js stays 3b5ef06849a142e50c78e7ba1e057980.
+  desktop/bridge-door.js b1c894b4..., 036 files (2c0f6656 / bc996ccd / c14e04c5) and
+    lattice-discover.js 16de366e... stay. docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js stays 144c33cd.... particle-clay.js FL == Tree (today 2da32883c514e4ad2a3cd8571e7a7b15 on both, FL main 3e3e8445
+    and Tree 49f5873a; read the full md5 first; add-only edits only, report the new md5 on both); clay-forms.js dd193fa7... add-only; every 040d
+    behaviour (place under the reply, Clay pill, choices, hug, sketchbook) unchanged.
+  docs/modules/image-safety.js stays 9bd70e5a... byte for byte. Its bright lines apply to every
+    image path on both repos (copy it to the Tree byte-identical; do not edit it).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string. An
+    image provider may be named only in Settings where the person types its token, as today.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Off until the person says Yes. Pause always wins. Reduced motion respected.
+  Quiet Room stays shut and never leaves the device; the clay corner never reads it.
+  Five stay five. She is simply Lyra. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  The privacy PASS from 040 must still pass: a private page shows only its summary everywhere.
+  043c/043d additions: mind-workspace.js FL == Tree (today e08a08752b311327ddab56b3c66de77d on both, FL main
+    3e3e8445 and Tree 49f5873a; read the full md5 first; the pin moves only with your edit, report the new md5 on both). Mirror pin workspace-mirror.js stays
+    e0752ae1942cd499c8834e5912809c8b. Database name stays FreeLatticeWorkspace. Everything
+    043c passed (one ask, Escape/Back defer, 24h cooldown, no sealed beside declined, ask hash
+    in details, survives reload, title redacted, Tree Tab + ring, "on this browser", clay size)
+    must still pass.
+
+  043d additions: everything 043d passed (Tree ask in view on open and reload, one wait row +
+    Answer now, pointer from rects for a live ask, names the mind, hashes in details with 8
+    hex, Later readable at 390, clay 348x255 at 1280) must still pass.
+
+  043e additions: everything Hypha passed in the 043e walk (reload while already on Chat in
+    view at all 3 sizes; the wait: no pointer, "Waiting until ...", Answer now; one ask,
+    Escape/Back, 24h, no sealed beside declined, hashes in details, survives reload, focus
+    ring, "on this browser", "Your mind", Later readable, clay 677x320 at 1280; secret line
+    never leaks) must still pass. Entry 70 stays untouched.
+
+
+  043f additions: everything Hypha passed in the 043f walk (Tree ask in view after Nursery
+    open, thread open, and reload then thread at all 3 sizes; ? and the sparkle clear of Send;
+    no em dash in added lines; all earlier items; secret line never leaks) must still pass.
+    Entry 71 stays untouched.
+
+  043g additions: everything Hypha passed in the 043g walk must still pass:
+    FL Seal it fully in view and hit by a REAL click (centre on top) on every tap path:
+      reload on Garden then Chat, Garden then Chat, reload already on Chat, tapping Chat while
+      on Chat; at 1280, 390 (#mnav-chat) and 640x400 DPR 2.
+    Tree woken compose inert while the ask is open at all 3 sizes (every control disabled,
+      tabindex -1, aria-disabled true, 0 focusable); Seal it, No, Later, Escape and Back each
+      restore the exact pre-ask snapshot; reload with an ask re-inerts it with Seal it in view;
+      the asleep form is unchanged by an ask before the wake.
+    1280 canvas bitmap matches its box at DPR 1; 390 and 2x buffers scale by DPR.
+    Lock hashes; index.html == docs/app.html.
+    One ask; Escape/Back defer and stay on Chat/Nursery; cooldown 0h/23h refused, 25h shown;
+      sealed never beside declined; 2px ring; "Waiting until..." + Answer now with no pointer;
+      ? and the sparkle clear of the input and Send; Tree Tab order sane; no page errors.
+    The secret line never leaks (HTML, input values, localStorage).
+    Entry 72 stays untouched.
+
+  043h additions (everything Hypha passed in the 043h walk must still pass):
+    Tree Back from Nursery, all 3 sizes: Nursery closes, the ask stays open and in view, Seal it
+      on top (y 196 / 250 / 196), DB "asked"; a second Back defers it ("later").
+    FL reply top at 2x by Hypha's method: y 31 at first draw, y 0 after the scroll; 1280 326 ->
+      280; 390 334 -> 256 (FL is merged; do not change it).
+    All 043g passes: Seal it in view and on top on every FL tap path; woken Tree compose inert
+      while the ask is open, 0 focusable; Seal it, No, Later, Escape and Back restore the exact
+      snapshot; reload re-inerts; the asleep form unchanged before the wake; Find x2 seats a mind.
+    Heart line in view at 1280 and 390 with an ask open.
+    Lock hashes; index.html == docs/app.html; notebook and clay identical on both sites.
+    One ask; Escape defers; cooldown 0h/23h refused, 25h shown; no Declined beside Sealed;
+      "Waiting until..." with no pointer; Tree Tab order sane; no page errors.
+    The secret line never leaks. Entries 71, 72 and 73 stay untouched.
+
+  045 additions (everything Hypha passed in the 045 walk must still pass):
+    fl-connect.js, pool-knock.js, fl-bridge.js, pool-knock-phone.js, tree-reconnect.js and
+      lattice-discover.js 16de366e stay byte-identical. Tree AUTONOMY stays 09a4f1a2.
+      pool-honest-label.js stays byte-identical FL == Tree (report the new md5 on both).
+    Label names the helper at all 3 sizes on both sites; per-reply "Helped on ..." note.
+    Keep: 0 sends for a kept chat (Tree data channel, FL callMeshModel/meshSendToPeer and
+      FreeLattice.callAI), honest no-mind line, "From the next message..." line, survives reload,
+      other chats unaffected.
+    Just me: local only, mark kept, off after send, next message pools; no-mind line, 0 sends.
+    Disconnect: only {"type":"pool-shrank","v":1} is sent; 0 sends to that peer after; helper sees
+      only "The pool is smaller now."; no toast; helper holds no chat words.
+    Pause wins. No stale toasts. Buttons >= 44. No sideways scroll. textContent only.
+    App iceServers [] at runtime. Entries 1 to 75 stay untouched.
+
+  NEW LOCK (Kirk, 2026-10-19): never use any tool that stores results or findings in a third-party
+    'isolated' or 'locked-down' cloud project, such as vendor-hosted scanners. Do not use or go
+    looking for tools tied to OpenAI, Google, or Anthropic; if one seems needed, stop and flag it
+    to Kirk. Local tools only.
+

@@ -1,0 +1,9 @@
+X:1
+T:Remaining Azure
+C:Celeste, for Kirk
+M:3/4
+L:1/8
+Q:1/4=60
+K:Dm
+V:1 clef=treble name="Vln."
+!p! D3 E F A | (d4 c B) | A2 (G F) E2 | F4 E2 | !<(! A3 B c d !<)! | !f! e3 f g e | a3 g e ^c | !>(! !fermata!d6 !>)! |]

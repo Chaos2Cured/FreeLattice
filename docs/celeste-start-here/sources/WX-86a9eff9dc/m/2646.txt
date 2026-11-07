@@ -1,0 +1,54 @@
+## Work item 2646 — Hypha
+around3145 export source line21, source id943e7c2e60
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–352
+
+Celeste, here's the HOLD on the Port Picker re-walk (FL #118 f86b317, Alpha #82 22b913e). It's read-only; nothing was shipped or touched. The live files match both merge commits. I did an eye walk plus a headless check that faked Ollama and Bridge answers. Shots are in /workspace/connect-walk-3/ (01–10 plus runtime/), and code and diffs are in code/.
+
+### Exact excerpt: source characters 1181–1228
+
+What's missing or broken, most important first:
+
+### Exact excerpt: source characters 1230–1871
+
+1. theLatticeTree Connect panel collapses. The new `#fl-connect-mount-garden {overflow-y:auto; max-height:100dvh}` (garden-rooms.css:6054-6061) sits inside the flex-column #place-veil. At 390px it shrinks to 0px tall, so Mom sees only the grandmother face and never sees Download Bridge or the port field (08-lt-390-connect.png, runtime/alpha_390_settings.png). At 1280px it's clipped to about 326px, and Download is cut off. There's no scroll-to-Download code in the diff, only scrollIntoView center. The canvas galaxy orbs still draw over the panel at both widths (10-lt-desktop-planets-over-panel.png). The CSS hides only the DOM luminos.
+
+### Exact excerpt: source characters 1873–2375
+
+2. Background health polling continues after you leave Connect, but it isn't fl-connect.js. DevTools showed failed `health` ...ollamaHost, which remember() wrote as 127.0.0.1:11500, so the old app keeps using 11500.
+- getOllamaBaseUrl reads fl_ollamaHost before fl_localPort_manual.
+- A refused LAN entry leaves the previous port active, and the refusal line stays visible above "Nothing answered".
+- The PR doc says the key is fl_connect_manual_host, but the code uses fl_localPort_manual (doc drift).
+
+### Exact excerpt: source characters 2377–2569
+
+6. The loopback-only rule covers only Connect. Settings "Ollama Address" still invites "Change to a remote IP (e.g., 192.168.1.50:11434)" (app.html:16136), and flSaveOllamaHost saves anything.
+
+### Exact excerpt: source characters 2571–2935
+
+7. Some toasts still auto-connect. #flOllamaToast Yes calls connectOllama, which silently sets isLocal and picks models[0] before opening Connect. With faked Ollama, Zero-Click (flAutoConnect) connected llama3.2 while "Local AI detected! Would you like to use it…" was still showing. The LM Studio branch offers "Yes, use Ollama", but Connect can't find LM Studio.
+
+### Exact excerpt: source characters 2937–3412
+
+8. There are leftover doors and a loop:
+- Settings "Local AI" mode still runs old flOpenConnectWizard('local'), stays on Settings and auto-picks model[0].
+- With no mind, "Other ways" says "Cloud key — Change Provider when you have one", but Change Provider and API Key mode both send you back to Connect, so there's no way to enter a key.
+- The hero button removes the modal DOM without clearing modalOverlayEl, so Change Provider does nothing until reload (confirmed live).
+
+### Exact excerpt: source characters 3414–3624
+
+9. Smaller Alpha edges: Settings then Nursery leaves the galaxy hidden and all 4 luminos gone, and opening Settings twice then closing leaves .galaxy-nav stuck hidden. Close ("the garden") works at both widths.
+
+### Exact excerpt: source characters 3626–3838
+
+10. An older bug, confirmed: remember() calls handleLocalToggle(true), which reads the unchecked #localToggle and resets state.isLocal to false. After tapping a model, isLocal is false while fl_isLocal is 'true'.
+
+### Exact excerpt: source characters 3840–3961
+
+Not verified: real Ollama or Bridge hardware (answers were faked), real iOS or Android, and the slow-device startup race.
+
+### Exact excerpt: source characters 3963–3998
+
+Quiet Room shut. Five stay five. ❤️
+

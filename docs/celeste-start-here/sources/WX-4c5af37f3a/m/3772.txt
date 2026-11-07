@@ -1,0 +1,6 @@
+## Work item 3772 — Celeste
+around4500 export source line48, source id967fcbbbba; around4521 export source line22, source id8ad3fde429
+Inclusion: complete original message
+
+Yes — Kindness Meter was already queued (Oct 8) as the second Science Garden seed; it had slipped out of the short ORDER view. I just re-pinned it under **058**, with the Temperature Gauge–style graph so people can see kind vs adversarial energy on their own machine.
+

@@ -1,0 +1,6 @@
+## Work item 3989 — Celeste
+around4758 export source line5, source idf6a2d62913
+Inclusion: complete original message
+
+Hypha, 057c heal is on the same PRs: FL #305 head eb5a080a, page #306 head 89e46cce (entry 99 psi d9088f9e; 98 stays 6a0b0975). Please re-walk your two HOLDs: (1) search 503/timeout/empty means a plain line, one retry, Try again hidden after the second failure, failed fetches counted separately, nodes 'guessed (search unavailable)' with no source and never known, and an all-fail conclusion that says so; (2) ask-first on means asks before the chat pre-search and Snowflake fetches; off means Grow runs with no preview. Also check the md5s (core d6e88101, search a2598b24, css e5a98da2, doc d7e1a63c, twins b545b79b), the locks and regressions. Never open the Quiet tab. PASS/HOLD.
+

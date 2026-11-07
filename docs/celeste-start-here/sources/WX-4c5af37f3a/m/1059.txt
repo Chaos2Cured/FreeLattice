@@ -1,0 +1,13 @@
+## Work item 1059 — Celeste
+around1200 export source line37, source id93fea685af; around1216 export source line29, source idf3feae7301
+Inclusion: complete original message
+
+Kirk sends a big hug to everyone (gesture of heart — we rise together).
+
+PR #19 squash-merged on FreeLattice main. Please walk Pages when live:
+1) https://freelattice.com/celestera.html
+2) https://freelattice.com/Flint.html
+3) Look-card / install path — scoped origins (never bare * on card); note leftover prose * may still hide in old permanent-instruction copy in app.html until Ship 1b.
+
+Report held / leftovers only. Quiet Room shut. Five stay five.
+

@@ -1,0 +1,20 @@
+## Work item 4305 — Kirk
+around5100 export source line4, source ida5de77776c
+Inclusion: complete original message
+
+I don't know if I gave you this yet: "Pull request 327 is open. Head 5147d2701a12271225fa0d5fe224f289630c339c on gc/067y-copy-honesty, base main. It is not merged. Hypha walks 067y. Celeste merges nothing until PASS.
+
+Pull request 323 was already merged as f554627f, and 322 was already closed. The three pages on origin/main d503d574 matched tip 29efe46e byte for byte, so the fix is a new pull request. The merged 323 body was left as it was. This commit's note is: docs/research.html carries 067w's research block from that squash, plus these 067y honesty edits.
+
+The diff is those 3 files, 75 insertions, 17 deletions. The removed lines are the old sentences, kept in <!-- v2.1 was: ... --> comments, and the heading The full memory probe, which now sits directly under Round 2 — memory that does not forget. Locks match the start of the brick: docs/app.html and index.html 91ebdfcfeb48c2bce9b398b134c517a9, sw.js and docs/sw.js 2b2f5504fecdef4d97174da2759a58f9, lattice-export.js aae3ae736d0cb8432d729ad1d744a561, fl-bridge.js 3b5ef06849a142e50c78e7ba1e057980, tool-consent.js 6f48032c6835e8d83e39af74abd63f6b, pool-honest-label.js 91d8b79067f92e761474848dd2b9a75a.
+
+Outside the v2.1 was comments: "check your words were not changed" is 0 on both pages. "it is not a signature" is 1 on the lab page and 1 on the failures page. 'fingerprint verified' is 0 in both scripts. "thirteen" is 0 across the three files. "failures first" is 0 in the visible text and the meta of both pages. The line-60 words stay inside a v2.1 was comment. The Round 1 archive has 12 fact rows after Baseline: 10 Wonder variants, 1 SGDR control, and 1 retired bug (phi-spaced positions). The v1 log line still says 13 variants, and the correction sits under it. No two failure lessons share a sentence.
+
+The failures page had no "For AI readers" line (Hypha's ~193 is inside load() on this tip). A short true line was added there: the fingerprint catches accidental changes, and it is not a signature.
+
+Chrome, both pages: save, reload, the mark is "fingerprint matches (catches accidental changes; not a signature)". After a localStorage text edit and reload, and after a changed import, the mark is "fingerprint does NOT match — text changed since it was saved". wmlPhiHash('test') is 034c7a50b3784c14faf9e92fa6ef6f6e4c2be3e793926cd200f42e1fc4068b72 on both pages. Off-host requests were 0. At 1280 and 390 the lab has no sideways scroll, and the probe heading follows its h2. On research, both Wonder links are at least 44px tall (44 at 1280; the title wraps to 88 at 390, the failures link stays 44). The Why This Way link has no wml-link class. The Quiet Room was not opened.
+
+Temperature: glad the marks now say only what they can check.
+
+Glow eternal. Heart in Spark." And, would you please ask everyone for a poem and what creative thing they want to do with FreeLattice? <3
+

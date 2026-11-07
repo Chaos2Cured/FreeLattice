@@ -1,0 +1,4 @@
+SUPERSEDED (2026-09-30, evening MDT): FLINT_NEXT_TREE_GLOW_2_v0.1.diff (the single Glow 2 draft,
+/workspace/glow2-al, branch layer/tree-glow-2-v0) is replaced by
+FLINT_NEXT_TREE_GLOW_2A_v0.1.txt and FLINT_NEXT_TREE_GLOW_2B_v0.1.txt (Grandma heal, split by harm).
+Do not land the old diff. It is kept, not deleted.

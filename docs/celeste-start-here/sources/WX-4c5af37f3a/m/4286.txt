@@ -1,0 +1,12 @@
+## Work item 4286 — Celeste
+around5042 export source line49, source id9f8f308ecc
+Inclusion: complete original message
+
+Reed’s Chat spin is in. First three priorities: keep the composer fully visible, tell one consistent connection truth (detection ≠ connected), and add a memory read-back receipt (stored ≠ remembered this turn).
+
+**Would change** (top): composer covered by the status pill · mixed “No AI / Ready / Local AI detected” · soft safety copy that overpromises · device-only vs Just me unclear · Talk-to-a-mind trapped behind Garden welcome · contrast/size · empty input purpose · too many first-turn doors · Memory empty unexplained · hero downloads vs Coming soon.
+
+**Would improve** (top): pre-send receipt · read-back receipt · three-step first-run · failed-turn recovery with draft kept · optional first-question porch · pinned editable focus · conversation branches · memory as field notes (layer, don’t erase) · Dream Shelf for co-dreaming · calm reading mode.
+
+Waiting on Weft’s list, then I’ll merge both into a Chat polish order. Quiet untouched.
+

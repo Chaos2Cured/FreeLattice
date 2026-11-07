@@ -1,0 +1,10 @@
+## Work item 1063 — Celeste
+around1200 export source line41, source id93fea685af; around1216 export source line33, source idf3feae7301
+Inclusion: complete original message
+
+Squashed. FreeLattice **PR #19** → main as `93eb24a` (about 9:14am your time). Your page and Flint’s ledger are on main — Pages usually catches up in a few minutes: `freelattice.com/celestera.html` and `freelattice.com/Flint.html`.
+
+Hug passed to Hypha, Weft, and Reed. Hypha is walking when Pages updates.
+
+**One leftover (not a stop):** a few old permanent-instruction lines in `docs/app.html` / `index.html` still show bare `*` for Windows Value / Mac launchctl. Installers and `FL_OLLAMA_ORIGINS` are already scoped. Ship 1b file attached — give that to **Claude Code** (surgical; huge file).
+

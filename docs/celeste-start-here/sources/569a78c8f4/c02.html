@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c02</title>
+<meta name="description" content="Reading section c02 of 569a78c8f4, 772 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c02">
+<meta property="og:description" content="Reading section c02 of 569a78c8f4, 772 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1126"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c02</h1>
+<p>569a78c8f4 · words 772 · characters 8040–13571</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1126. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">| Line(s) | Today | Why it matters |
+|---|---|---|
+| 27 | `const { execSync } = require(&#x27;child_process&#x27;);` | Every git, grep and node call goes through a shell string. |
+| 29 | `const PORT = process.env.FL_PORT \|\| 3141;` | |
+| 111-129 `handleRequest` | L113 `res.setHeader(&#x27;Access-Control-Allow-Origin&#x27;, &#x27;*&#x27;)`; L115 allows `Content-Type, X-Agent-Id`; L117 answers every `OPTIONS` with 200; L122-128 reads an unbounded body and swallows bad JSON as `{}` | Any site may read responses and send writes. No token. No size cap. |
+| 131 `route(url, method, data, res, actingAs)` | | No origin or device reaches the handlers, so nothing can be ledgered. |
+| 136-158 heartbeat `/` | `version: &#x27;5.8.0&#x27;`, capabilities list | Stays open. I only add `bridgeLock`, `auth`, `pairing`, `trustedMinds` fields. |
+| 770-804 `/wallet/pay` (POST) | Moves LP between agent wallets | No token today. LP stays points, and AI never auto-pays, so it must be gated. |
+| 997 | `var PROJECT_ROOT = process.env.FL_PROJECT \|\| process.cwd();` | One root only. |
+| 999-1003 `safePath` | `path.resolve` then `full.startsWith(PROJECT_ROOT)` | **Prefix bug:** `../FreeLattice-evil/x` passes when the root is `/x/FreeLattice`. No symlink check. |
+| 1045-1054 `/code/search` | L1050 `execSync(&#x27;grep -rn &quot;&#x27; + query.replace(/&quot;/g, &#x27;\\&quot;&#x27;) + &#x27;&quot; &#x27; + searchDir + ...)` | **Shell injection:** `$()` and backticks run, and `searchDir` goes in raw. |
+| 1057-1067 `/code/write` | Comment says &quot;requires human approval in UI&quot; | Nothing enforces that at the bridge. With v0.1 the rule is &quot;a trusted mind may write&quot;, which matches AUTONOMY.md Principle 1. |
+| 1070-1080 `/code/patch` | `content.replace(data.find, data.replace)` | `$&amp;` / `$1` in `replace` get expanded. |
+| 1083-1090 `/code/git/status` | three `execSync` strings | Harmless inputs, but moved to argument arrays for one clean rule. |
+| 1093-1101 `/code/git/commit` | L1096 `var files = data.files \|\| [&#x27;.&#x27;];`; L1097 `execSync(&#x27;git add &#x27; + f)`; L1098 `execSync(&#x27;git commit -m &quot;&#x27; + data.message.replace(/&quot;/g, &#x27;\\&quot;&#x27;) + &#x27;&quot;&#x27;)` | **Shell injection** through file names and the message. No ledger. |
+| 1105-1127 `/test/run`, 1130-1140 `/code/test` | `execSync(&#x27;node tests/smoke.js 2&gt;&amp;1&#x27;)` | A GET that runs repo code. Today an `&lt;img src=http://localhost:3141/test/run&gt;` on any page triggers it. |
+| 1153-1157 | `server.listen(PORT, function() {` … `Listening on http://localhost:` | **No host argument, so Node listens on every interface.** Anyone on the same Wi-Fi can reach it. |
+
+## Exact source excerpt, characters 9350–9420
+
+App-side callers of `http://localhost:3141` (all send no token today):
+
+## Exact source excerpt, characters 9422–11119
+
+| File (blob) | Lines | Function |
+|---|---|---|
+| `docs/modules/propose.js` (`38a152cf5942355c5e77413bbd551dc8c9a6090c`) | 578 `var BRIDGE`; 580-583; 585-591; 593-599; 601-605 | `readFileFromBridge`, `writeFileToBridge`, `commitViaBridge`, `runSmokeViaBridge` (used by `approveDraft` L836 and `autoApproveDraft` L704) |
+| `docs/modules/workshop.js` (`26fc3cc467343f0156cbf51856277f06a0502e3c`) | 957-971 | `checkBridge` (L961 heartbeat, L963 git status) |
+| | 973-1035 | `runCodeTask` (L980 `var bridge`; L986 tree; L1004 search; L1009 read; L1017 patch &quot;Local patches run autonomously&quot;; L1023 `/code/test`) |
+| | 1037-1046, 1048-1057 | `commitCode` (L1043), `reviewCode` (L1051) |
+| | 1235-1575 `window.AutoBuilder` | L1240 `var BRIDGE`; L1265-1270 `hasBridge`; L1297 tree; L1315 read; L1373 patch; L1395 `/test/run` |
+| | 1581-1957 `window.WorkshopProjects` | L1913-1932 `commitViaBridge` (**ignores HTTP status; catch falls back to `commitViaGitHubAPI`**); L1934-1950 `applyAndCommit` (L1940 heartbeat) |
+| `docs/app.html` (`6bc529817e2b…`, 69988 lines) | 39741 | Cascade Step 7 heartbeat probe (stays open, no change needed) |
+| | 68597 | `&lt;script src=&quot;modules/propose.js&quot; defer&gt;&lt;/script&gt;`: the new client loads just above this |
+| | 69704 / 69711 | `workshop.js` lazy loader (loads after the client, good) |
+| `tools/demo-economy.js` (`c32814c5…`), `tools/demo-economy-v2.js` (`17535368…`) | L13-27 / L19-38 | `post`/`get`, `postAs`/`getAs` helpers (Node fetch, no Origin) |
+| `desktop/src-tauri/tauri.conf.json` | L6 `&quot;frontendDist&quot;: &quot;../../docs&quot;` | The Tauri shell serves `docs/` from `tauri://localhost` (macOS, Linux) or `http(s)://tauri.localhost` (Windows). v0 would have refused it. |
+
+## Exact source excerpt, characters 11121–11603
+
+Existing smoke locks you must keep green (`tests/smoke.js`, blob `d4db912a…`, unchanged):
+- **L3356-3359 CRITICAL LOCK 1A/1B.** `propose.js` must still contain exactly 3 `commitViaBridge(` and exactly 1 `/code/git/commit`. So don&#x27;t mention either string in new comments inside `propose.js`.
+- **L8742-8744.** `workshop.js` must still contain `http://localhost:3141` and `runCodeTask`. So keep those literals. The client rewrites `localhost:3141` to `127.0.0.1:3141` at request time.
+
+## Exact source excerpt, characters 11605–12065
+
+**Known red on main (not ours).** `node tests/smoke.js` on `f86b317` already shows 3 failures and 3593 passes: &quot;MORE_CARDS Row 1: Your Audit is first&quot;, &quot;ollama: resolveOllamaBase auto-probe gated on isLikelyProxyOrigin()&quot; and &quot;ollama: getOllamaBaseUrl returns FL_OLLAMA_LOCAL / 127.0.0.1 fallback (never empty)&quot;. The same three also fail at `7621420`, before #118. This brick must add no new failures. Please name them in the PR body so nobody blames the lock.
+
+## Exact source excerpt, characters 12067–12092
+
+## 3. Decisions (and why)
+
+## Exact source excerpt, characters 12094–18082
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

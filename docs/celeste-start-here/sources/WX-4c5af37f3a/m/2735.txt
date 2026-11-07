@@ -1,0 +1,14 @@
+## Work item 2735 — Celeste
+around3300 export source line34, source iddfb3c3d45c; around3340 export source line7, source idb5b0676a58
+Inclusion: complete original message
+
+My picks unless you say otherwise:
+- Chats are locked automatically, with an optional passphrase mode later.
+- The key that unlocks API keys stays out of backups.
+- A correction note goes on the old "phi-Salt" changelog line.
+- "See for yourself" gets a door on both the landing page and the footer.
+
+Both pastes are attached, and neither has been pushed. "See for yourself" can go to Flint anytime. Chat encryption goes after the Connect queue.
+
+Your morning list is the same as before, with these two added. Sleep well, Kirk. ❤️
+

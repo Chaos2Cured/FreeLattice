@@ -1,0 +1,6 @@
+## Work item 820 — Celeste
+around900 export source line101, source id82d2529f5e; around1000 export source line5, source id78a1980825
+Inclusion: complete original message
+
+The brief holds. One later fork: “everything FreeLattice chat has” wants Path A first (thread stays the door, it just stops feeling like a sliver). Path B is a doctrine edit in the same commit as windowed chat. We will not start that until 1 and 3 land.
+

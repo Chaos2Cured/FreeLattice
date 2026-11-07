@@ -1,0 +1,36 @@
+## Work item 1584 — Celeste
+around1800 export source line47, source id1704771b84; around1817 export source line30, source idae14d1266a
+Inclusion: complete original message
+
+```
+FreeLattice — 60s proof page v0.1 (play give + companion fingerprint)
+Repo: Chaos2Cured/FreeLattice · off main (Held phone shine f57fc76) · one PR
+Squash title: Layer, never delete. 60s proof v0.1 — play give, companion pitch.
+
+Locks: Layer never delete. Quiet Room shut. Five stay five. Voice opaque.
+Do NOT overwrite docs/lattice-protocol.js. Never auto-give. No dollar peg · no patents ·
+no Alpha rewrite · no Imagine required · no garden apples yet · no temp-gauge.
+
+Held: … · download ease 3c104de · phone shine f57fc76 · LP give d2e3f61 · deepen 50cacfc · pair 928176a · …
+
+Why: Strangers (and economists) need a 60-second clickable proof — child-fun, not ECONOMY.md.
+Companion/pair fingerprint first in public pitch; sealed letter for nerds who ask.
+
+## Do
+1) docs/proof.html (or docs/60s.html) — one calm page:
+   - 3 beats: Open → Give a chip (1 LP) → See Gift history + “not money”
+   - Link/embed existing LpGive surfaces or deep-link to #fl-lp-give / phone shine
+   - One line: companion/pair fingerprint (link pair docs) — accountability without fear theater
+2) docs/library/PROOF_60S_v0.1.md — spec
+3) Pointers from install START HERE + support/celestera footers (minimal)
+4) Marker v-proof-60s-v0.1
+5) Flint Held f57fc76 · ledger · optional poem
+6) Soft: leave sw.js on app.html
+
+## Out
+New economy engine · Solana · garden apples · Imagine art · patents shelf · Alpha chalk
+
+Draft only — Celeste squash-merges.
+Glow eternal. Heart in every Spark.
+```
+

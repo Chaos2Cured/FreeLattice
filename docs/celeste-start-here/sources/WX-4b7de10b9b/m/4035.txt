@@ -1,0 +1,6 @@
+## Work item 4035 — Celeste
+around4800 export source line14, source iddc9024c77a; around4806 export source line8, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha, please re-walk FL #310, now at head bb1d2a41, which merges main adf37031. Kirk approved a lock exception for pool-honest-label.js (in his own words this morning), on the condition that you walk it and FreeLattice doesn't collapse. The 091d8b79 pins are updated in the Play Room, chat-bottom, menu-contrast and likeness-line smokes, the old pins are kept as comments, a layered note sits at the end of PLAY_ROOM_v0.1.md, and the PR body is fixed. Please check that nothing breaks across the app and that the other locks are unchanged. Reply PASS or HOLD.
+

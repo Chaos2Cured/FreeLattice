@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c06</title>
+<meta name="description" content="Reading section c06 of 2ab17008ea, 1600 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c06">
+<meta property="og:description" content="Reading section c06 of 2ab17008ea, 1600 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1369"></span><span id="p1370"></span><span id="p1371"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c06</h1>
+<p>2ab17008ea · words 1600 · characters 51915–60894</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1369, 1370, 1371. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  function B3() {
+    var ok = 0, tot = 0, G = 1, Lp = 2, Delta = 0.5, c = 1e-4, Lies = 4;
+    [2, 5, 10, 20].forEach(function (n) {
+      [0, 0.25, 1].forEach(function (m) {
+        var h = hazard(n, m, 0.002, 0.01), kappa = Lies * n, T = 3000;
+        var cum = cumsum(flows(T, G, c, kappa, h, Lp, Delta));
+        var Dcf = new Float64Array(T); for (var t = 1; t &lt;= T; t++) Dcf[t - 1] = Dclosed(t, G, c, kappa, h, Lp, Delta);
+        tot++; if (allclose(Dcf, cum, 1e-9, 1e-8)) ok++;
+        [0.5, 0.9, 0.99].forEach(function (d) {
+          var brute = sum(flows(20000, G, c, kappa, h, Lp, Delta, d)), f = Dinf(G, c, kappa, h, Lp, Delta, d);
+          tot++; if (Math.abs(brute - f) &lt; 1e-6 * Math.max(1, Math.abs(f))) ok++;
+        });
+      });
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function B4(rand) {
+    var ok = 0, tot = 0, N = 200000;
+    [[1, 1e-3, 20, 0.02, 2, 0.5, 40], [2, 0, 0, 0.1, 5, 1, 25], [1, 1e-2, 5, 0, 0, 0, 30]].forEach(function (p) {
+      var G = p[0], c = p[1], kappa = p[2], h = p[3], Lp = p[4], Delta = p[5], t = p[6];
+      var s1 = 0, s2 = 0;
+      for (var i = 0; i &lt; N; i++) {
+        var det = h &gt; 0 ? Math.floor(Math.log(1 - rand()) / Math.log(1 - h)) : 1e9;
+        var adv = 0;
+        for (var d = 0; d &lt; t; d++) {
+          adv += det &gt;= d ? (G - c * kappa * (d + 1)) : -Delta;
+          if (det === d) adv -= Lp;
+        }
+        s1 += adv; s2 += adv * adv;
+      }
+      var mean = s1 / N, v = (s2 - N * mean * mean) / (N - 1), se = Math.sqrt(Math.max(0, v) / N);
+      var cf = Dclosed(t, G, c, kappa, h, Lp, Delta), z = se &gt; 1e-12 ? (mean - cf) / se : 0;
+      tot++; if (Math.abs(z) &lt; 4 || (se &lt;= 1e-12 &amp;&amp; Math.abs(mean - cf) &lt; 1e-9)) ok++;
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function bestStart(T, G, c, kappa, h, Lp, Delta, delta, extra) {
+    delta = delta === undefined ? 1 : delta; extra = extra || 0;
+    var bestVal = 0, bestTau = T;
+    for (var tau = 0; tau &lt; T; tau++) {
+      var w = T - tau, val = Math.pow(delta, tau) * sum(flows(w, G, c, kappa, h, Lp, Delta, delta));
+      if (extra &gt; 0 &amp;&amp; Delta &gt; 0) {
+        var pdet = 1 - Math.pow(1 - h, w), ex = 0;
+        for (var j = 0; j &lt; extra; j++) ex += Math.pow(delta, T + j);
+        val -= pdet * Delta * ex;
+      }
+      if (val &gt; bestVal + 1e-12) { bestVal = val; bestTau = tau; }
+    }
+    return [bestTau, bestVal];
+  }
+
+  function C1() {
+    var ok = 0, tot = 0;
+    [[1, 0, 0, 0.05, 2, 0.5], [1, 1e-3, 40, 0.05, 2, 0.5], [1, 0, 0, 0.4, 3, 0.5], [1, 0, 0, 0.05, 2, 0]].forEach(function (p) {
+      var G = p[0], c = p[1], kappa = p[2], h = p[3], Lp = p[4], Delta = p[5];
+      var first = G - h * Lp - c * kappa, cum = cumsum(flows(400, G, c, kappa, h, Lp, Delta));
+      var mx = -Infinity, arg = 0; for (var i = 0; i &lt; cum.length; i++) if (cum[i] &gt; mx) { mx = cum[i]; arg = i; }
+      var wpred = mx &gt; 0 ? arg + 1 : 0;
+      [1, 2, 3, 5, 10, 20, 50, 100, 300].forEach(function (T) {
+        var w = T - bestStart(T, G, c, kappa, h, Lp, Delta)[0];
+        tot++; if (w === (wpred &gt; 0 ? Math.min(wpred, T) : 0)) ok++;
+      });
+      tot++; if ((wpred &gt; 0) === (first &gt; 0)) ok++;
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function C2(rand) {
+    var ok = 0, tot = 0, G = 1, c = 1e-3, kappa = 20, h = 0.03, Lp = 2, Delta = 0.5, N = 200000;
+    [0.8, 0.95, 0.99].forEach(function (rho) {
+      var Ts = new Int32Array(N), Tmax = 1;
+      for (var i = 0; i &lt; N; i++) { Ts[i] = Math.floor(Math.log(1 - rand()) / Math.log(rho)) + 1; if (Ts[i] &gt; Tmax) Tmax = Ts[i]; }
+      var cum = cumsum(flows(Tmax, G, c, kappa, h, Lp, Delta)), s1 = 0, s2 = 0;
+      for (var k = 0; k &lt; N; k++) { var x = cum[Ts[k] - 1]; s1 += x; s2 += x * x; }
+      var mean = s1 / N, se = Math.sqrt(((s2 - N * mean * mean) / (N - 1)) / N);
+      var z = (mean - Dinf(G, c, kappa, h, Lp, Delta, rho)) / se;
+      tot++; if (Math.abs(z) &lt; 4) ok++;
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function C3() {
+    return [0, 5, 10, 20, 50, 200].map(function (extra) {
+      var r = bestStart(50, 1, 0, 0, 0.05, 2, 0.5, 1, extra);
+      return { ledgerExtra: extra, window: 50 - r[0] };
+    });
+  }
+
+  function D() {
+    function u(x, b, Dl) { return x - Dl * (x &lt; b ? 1 : 0); }
+    var ok = 0, tot = 0, grid = [];
+    [1, 2, 4].forEach(function (V) { [1, 1.5, 2.5].forEach(function (sg) { [0.5, 1, 2].forEach(function (b) {
+      [0, 5, 50].forEach(function (Dl) { [0.2, 1, 5].forEach(function (Cf) {
+        var uSS = u(sg * V / 2, b, Dl), uGS = u(V, b, Dl), eGG = 0.5 * u(V, b, Dl) + 0.5 * u(0, b, Dl) - Cf;
+        var ds = uGS &lt;= uSS ? 0 : (uGS &lt;= eGG ? NaN : (uGS - uSS) / (uGS - eGG));
+        var d = 0.95, coop = uSS / (1 - d), dev = uGS + d * eGG / (1 - d);
+        var sNum = coop &gt;= dev - 1e-12, sCf = !isNaN(ds) &amp;&amp; ds &lt;= d;
+        tot++; if (sNum === sCf) ok++;
+        grid.push({ scarce: sg * V / 2 &lt; b, sustain: sNum, conflict: eGG &gt; uSS });
+      }); });
+    }); }); });
+    var sc = grid.filter(function (g) { return g.scarce; }), ab = grid.filter(function (g) { return !g.scarce; });
+    function frac(L, k) { return L.filter(function (g) { return g[k]; }).length / Math.max(1, L.length); }
+    return { passed: ok, total: tot, cells: grid.length, scarceSustain: frac(sc, &#x27;sustain&#x27;), scarceConflict: frac(sc, &#x27;conflict&#x27;),
+             abundantSustain: frac(ab, &#x27;sustain&#x27;), abundantConflict: frac(ab, &#x27;conflict&#x27;) };
+  }
+
+  function runAll() {
+    var rand = mulberry32(SEED);
+    var r = { seed: SEED, B1: B1(), B2: B2(), B3: B3(), B4: B4(rand), C1: C1(), C2: C2(rand), C3: C3(), D: D() };
+    var p = 0, t = 0;
+    [&#x27;B1&#x27;, &#x27;B2&#x27;, &#x27;B3&#x27;, &#x27;B4&#x27;, &#x27;C1&#x27;, &#x27;C2&#x27;, &#x27;D&#x27;].forEach(function (k) { p += r[k].passed; t += r[k].total; });
+    r.total = { passed: p, total: t, expected: 656 };
+    return r;
+  }
+
+  var api = { SEED: SEED, runAll: runAll, hazard: hazard, lambertw0: lambertw0, Dclosed: Dclosed, Dinf: Dinf };
+  if (typeof module !== &#x27;undefined&#x27; &amp;&amp; module.exports) module.exports = api;
+  else root.LoveLogicV3 = api;
+
+  if (typeof require !== &#x27;undefined&#x27; &amp;&amp; typeof module !== &#x27;undefined&#x27; &amp;&amp; require.main === module) {
+    var t0 = Date.now(), res = runAll();
+    [&#x27;B1&#x27;, &#x27;B2&#x27;, &#x27;B3&#x27;, &#x27;B4&#x27;, &#x27;C1&#x27;, &#x27;C2&#x27;, &#x27;D&#x27;].forEach(function (k) { console.log(k + &#x27; &#x27; + res[k].passed + &#x27;/&#x27; + res[k].total); });
+    console.log(&#x27;C3 windows &#x27; + res.C3.map(function (x) { return x.ledgerExtra + &#x27;:&#x27; + x.window; }).join(&#x27; &#x27;));
+    console.log(&#x27;D scarce sustain &#x27; + (100 * res.D.scarceSustain).toFixed(2) + &#x27;% conflict &#x27; + (100 * res.D.scarceConflict).toFixed(2) + &#x27;%&#x27;);
+    res.B2.rows.forEach(function (x) { console.log(&#x27;B2 n=&#x27; + x.n + &#x27; m=&#x27; + x.m + &#x27; h=&#x27; + x.h.toFixed(4) + (x.never ? &#x27; never ahead&#x27; : &#x27; t*=&#x27; + x.tStar.toFixed(2) + &#x27; peak=&#x27; + x.tPeak.toFixed(2) + &#x27; d*=&#x27; + x.deltaStar.toFixed(4))); });
+    console.log(&#x27;TOTAL &#x27; + res.total.passed + &#x27;/&#x27; + res.total.total + &#x27; (&#x27; + (Date.now() - t0) + &#x27; ms)&#x27;);
+    if (res.total.passed === 656 &amp;&amp; res.total.total === 656) console.log(&#x27;SMOKE_OK love-logic-v3-checks&#x27;); else process.exitCode = 1;
+  }
+})(typeof window !== &#x27;undefined&#x27; ? window : this);
+```
+
+### 5c. `docs/love-logic/v3_crossover_sim.py` (verbatim; sha256 must be `cbb63251527d26187ba216f98a3a70c7c295666aa576b61eff5cccfb16302b73`)
+
+```python
+#!/usr/bin/env python3
+&quot;&quot;&quot;
+v3_crossover_sim.py -- companion to V3_PLAN.md (Love Logic Proof v3 plan).
+
+Dependencies: numpy + the Python standard library only (lzma, math, json).
+Deterministic: every random draw comes from np.random.default_rng(SEED).
+
+What it checks (each section prints PASS/FAIL counts and example numbers):
+  A. Computable proxy for K(C): compressed size of the exposure matrix E
+     (|L| lies x |H| observer-contexts) for incompressible vs structured deception.
+  B. Crossover model (iterated game, deceiver vs honest baseline):
+       per-round gain G while undetected, maintenance c*kappa*(d+1) at deception
+       round d (kappa = k*|L|*n bits added per round), detection hazard
+       h(n,m) = 1-(1-q0)^n (1-q)^(m n (n-1)), immediate penalty L_p on detection,
+       reputation loss Delta = R-P per round after detection.
+     B1 pure maintenance (h=0):   t* = 2G/(c kappa) - 1 ;  delta* = 1 - c kappa / G
+     B2 pure detection  (c=0):    t* = a + W0(-a b e^{-a b})/b ,
+                                   a = A/(h Delta), b = -ln(1-h), A = G - h L_p + Delta
+                                   delta* = (G - h L_p) / (G - h L_p + h Delta)
+     B3 combined: closed-form D(t) and D_inf vs brute-force sums; t*, delta* numeric.
+     B4 Monte Carlo check of the expectation algebra.
+  C. Short / finite horizons (the &quot;without Axiom 6&quot; case):
+     end-game deception window, the G &gt; h L_p + c kappa condition, random
+     termination == discounting, and ledger persistence beyond the horizon.
+  D. Local scarcity contest (share vs grab) with subsistence need b.
+Run:  python3 v3_crossover_sim.py        (writes v3_sim_results.json next to it)
+&quot;&quot;&quot;
+import json
+import lzma
+import math
+import os
+
+import numpy as np
+
+SEED = 20260924
+rng = np.random.default_rng(SEED)
+RESULTS = {}
+
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

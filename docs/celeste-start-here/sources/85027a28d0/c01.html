@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>055c-chat-bottom-heal.txt c01</title>
+<meta name="description" content="Reading section c01 of 85027a28d0, 230 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/85027a28d0/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="055c-chat-bottom-heal.txt c01">
+<meta property="og:description" content="Reading section c01 of 85027a28d0, 230 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/85027a28d0/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>055c-chat-bottom-heal.txt · c01</h1>
+<p>85027a28d0 · words 230 · characters 0–1335</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: not separately matched. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">055c — Chat bottom heal (same branch, same PRs)
+Layer on FL #297 (branch layer/chat-bottom-clarity-v0.1) and page #298. Do not open new PRs. Do not merge. Locks untouched (all 13 md5s from the 055 report, except chat-bottom-clarity.js, which this edits).
+
+HOLD fix (must):
+1. At 640x400 DPR2 the + menu opens upward behind the chat header, and a real click on &quot;Bring from Google Drive&quot; opens the picker 0 times. The menu also runs past the bottom (430px in a 400px window).
+   - Give the menu max-height: calc(100dvh - 24px) and overflow-y: auto, and position it inside the viewport (flip down or clamp when there&#x27;s no room above).
+   - Give it a z-index above the chat header so the rows are clickable.
+   - Prove it: a real click on Drive at 640x400 DPR2, 1280, and 390 opens the picker exactly once.
+
+Soft fix (do it now):
+2. Garden glass per docs/library/GARDEN_LANGUAGE.md. The menu, pills, and doc file card become dark glass in rgba over the starfield (no hex background), with silver-blue borders and a 12px radius. The AI-returned file card gets an emerald icon and edge. Keep Inter and gold #e8b019, and add no new hex.
+
+Then push to the same branch, rerun the 055 smoke plus the seven earlier lines, and report the new heads, the md5 of chat-bottom-clarity.js, and the click counts. Hypha walks again before Celeste merges.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

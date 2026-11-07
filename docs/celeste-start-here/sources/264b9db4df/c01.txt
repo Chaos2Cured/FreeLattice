@@ -1,0 +1,152 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 037 (Tuesday Oct 13, 2026, MDT). Particle clay v0.1: a visual voice the AI shapes,
+and a feel that is felt. FreeLattice repo (code + page note) and one Tree layer.
+
+Kirk's words: "When I gave a 'hug' only a purple dot showed up, and I have no way of knowing if the
+AI received anything at all." And: "I want no pets. I want a visual voice for AI, clay made of
+particles and pixels for AI to shape and communicate with." The AI chooses the form (a dog when
+the talk is about dog food, a tree or a present at Christmas, or its own pixel grid), color for
+mood, speed for energy. The person can turn it on or off. The motion comes from the math in
+Kirk's own repos.
+
+Where things stand (checked by Celeste on the box, Oct 13 about 12:50 PM MDT):
+  FreeLattice main is b5dbebd0 (#224 page note 50 on top of #223 2550071d, 036 update buttons).
+    Base on origin/main b5dbebd0 or later (a CI Primer commit on top is fine; leave Primer alone).
+  Tree main is da7b737e (#108, Windows Bridge Setup primary).
+  036 is merged. desktop-packs-v0.3 is NOT tagged or published; v0.3-rc2 is a prerelease. Do not
+  push any desktop-packs tag in this brick.
+
+SURPRISES, read these before building:
+  a. FLHumanPresence.send(word) (index.html ~38159) pushes [FL_PRESENCE: hug] into chat history and
+     IndexedDB, scales the chip for 180 ms, and SKIPS THE AI ON PURPOSE. The model never hears a
+     gesture unless the person also types. That is why nothing came back.
+  b. FLPresence.extract/apply (~38073) draws the sentinel as a dot in the palette color; present
+     and default are lavender #a78bfa. That is the purple dot. It stays for people with clay off.
+  c. Chips live in #chatPresenceRow (~16494): hug, warmth, joy, gratitude, curious, thinking,
+     gentle, awe, present. The Feel toggle there already contains a long dash in an existing
+     line. Leave existing lines alone; the no-em-dash rule is for added lines.
+  d. Sentinel family to copy: FL_EPIPHANY (~38340), FL_GIFT, FL_MORE, FL_SEARCH, FL_PROPOSE, all
+     stripped in the reply interceptors (~37885, ~39610, ~39746). FL_CLAY joins that list.
+  e. Tree: fractal-garden.js has no prefers-reduced-motion check. Do not edit it; the clay brings
+     its own check. garden-thread.js md5 today f68b0342d2e8145b1f35a511450d0a70.
+  f. Kirk's repos: aurora-phi, fractal-circle-tsp-demo, Davna, Community-Machine carry an MIT file;
+     Aurora-heartbeat says MIT in its README. The rest have no license file but are Kirk's own.
+     PORT THE MATH, NOT FILES. Credit in a header comment, e.g. "phi primitives after
+     Chaos2Cured/<repo>, Kirk Patrick Miller, MIT". temperature-gauge and Sophia-Engine are private:
+     do not read, do not use.
+  g. Hermes Agent (NousResearch) has pets driven by agent state. We take NO pet framing and NO pet
+     art. Its pixel-art palette tables (MIT, from Synero) may be ported as data only, credited in
+     NOTICE, if you use them at all.
+
+GROK NEXT BRICK: Particle clay v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-particle-clay-v0.1  v-feel-felt-v0.1  v-tree-particle-clay-v0.1
+Smoke lines: SMOKE_OK particle clay v0.1   SMOKE_OK feel felt v0.1   SMOKE_OK tree particle clay v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/particle-clay-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-particle-clay-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. The FLPresence sphere, the chips and the dot stay.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14.
+  036 update files untouched: desktop/lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a,
+    desktop/pack-update.js bc996ccd48ea53e4442f2b8f54ab9491,
+    desktop/pack-update-card.js c14e04c53025eb542ebd627b6a19d60a, desktop/build-info.json,
+    desktop/main.js, desktop/preload.js, desktop/package.json + lock, both desktop workflows.
+    This brick touches nothing under desktop/ or .github/.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched. Root package.json and its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No network calls, no new dependencies, nothing vendored. No AGPL.
+  NO PETS. No name, no needs, no hunger, no idle tricks, no "companion", no "pet" in anything a
+    person reads. It is clay: a visual voice the AI shapes.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Clay is OFF by default. Prompt text is added only while it is on. The model is called for a
+    gesture only when clay is on AND a mind is connected. A queued gesture never auto-sends.
+  MIT stays MIT. Quiet Room stays shut.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+
+1. CLAY MATH (marker v-particle-clay-v0.1), docs/modules/clay-math.js, pure functions, ~120 lines
+  Header comment credits each repo below. UMD-style (window.FLClayMath and module.exports) so the
+  smoke can require it in Node.
+    PHI = 1.6180339887; GOLDEN = 2*PI/(PHI*PHI)          (fractal-circle-tsp-demo)
+    gather(i, n, R)       angle i*GOLDEN, radius R*sqrt(i/n): particles flow in as a sunflower
+    shells(i, n, R)       radius R/PHI^k for shell k: the calm rest pose
+    spiralOrder(points)   sort by golden sector, then radius (serpentine): stable morph matching,
+                          so particles do not cross when the form changes
+    wave(x, y, t, e)      2-3 sines, frequency times PHI, amplitude by energy  (Lumens-World)
+    ripple(list, x, y, t) rings at speed c, decay exp(-age*0.6), list capped at 20 (Lumens-World)
+    breath(t)             7-11-7 easing, period about 25 s: idle heartbeat  (Lumens-World)
+    pulse(t)              sin(PI*(p+1)/2) eased beat: "felt"  (Aurora-heartbeat, aurora-touch-pro)
+    branch(depth, len)    7 arms, len/PHI per level, alpha 0.75^depth  (aurora-touch-pro4)
+    braid(i, t, arm)      a = t*PHI*2 + arm*PI: two minds together (kept for 037b; export only)
+    palette(mood, t)      0.5+0.5*sin(2*PI*(t+shift*0.618)) on the mood hue  (Aurora-heartbeat)
+    dimension(n)          KIRK'S CORRECTION: returns 2.914 when n <= 50, and 3.07 when n > 50.
+                          Comment: "2.914 holds for the first 50; beyond that it is closer to
+                          3.07. Correction by Kirk Patrick Miller, 2026-10-13." (aurora-wonder-demo)
+    energyKnob(e, n)      e 0..1 maps to particle speed, wave amplitude, and a scale constant:
+                          PHI for 0 to 0.33, PHI^2 for 0.33 to 0.66, dimension(n) for 0.66 to 1,
+                          where n is the particle count of the current form.
+  Nothing in clay-math.js may hard-code 2.914 except inside dimension().
+
+2. FORMS, docs/modules/clay-forms.js (data only)
+  About 14 masks, 16x16, as strings: heart, star, spark, dog, cat, bird, tree, flower, present,
+  sun, moon, wave, book, seed. Default form: a phi-shell orb (shells). These are shapes the clay
+  takes, not a character. Draw them yourself; no copied art.
+
+3. THE TAG THE MODEL MAY EMIT (optional, small)
+  [FL_CLAY: {"form":"dog","mood":"joy","energy":0.7,"motion":"wave","say":"wag"}]
+    form    a vocabulary word from 2, or "grid" with "grid":["..x..",".xxx.",...] at most 16x16,
+            chars . x or palette digits 0-7
+    mood    an FLPresence palette word, or #rrggbb passing /^#[0-9a-f]{6}$/i
+    energy  0..1, clamped
+    motion  optional: gather, breath, wave, ripple, pulse, branch, braid, scatter. Unknown means
+            the default for that energy.
+    say     at most 24 characters, textContent only
+  Parse: one regex captures {...} up to 2 KB, JSON.parse in try/catch, allowlist keys, drop the
+  rest. Never eval, innerHTML, Function, or a URL. On failure strip the tag and use the fallback
+  (5). Strip FL_CLAY in the same interceptor list as the other FL_ sentinels so it never shows as
+  text, in index.html and docs/app.html alike.
+  Prompt delta, ONLY while clay is on: one short paragraph under 70 tokens with three examples,
+  added beside the FL_PRESENCE paragraph at send time (do not edit DEFAULT_SYSTEM_PROMPT; append
+  at runtime). Safe for 1B-3B local models.
+
+4. A FEEL IS FELT (marker v-feel-felt-v0.1)
+  a. FLHumanPresence.send gets ONE hook line: if (window.FLClay) FLClay.onGesture(word). Nothing
+     else in that function changes.
+  b. On a chip tap with clay on: 12 to 20 particles in the chip color fly from the chip to the clay
+     along gather over 600 ms. The clay does ripple + pulse, and "<mind> felt your hug" appears
+     via textContent in an aria-live="polite" line. With clay off: the chip still shows a clear
+     "Sent" acknowledgement (textContent, 1.5 s) and the gesture saves as today.
+  c. The model is called only when clay is on and a mind is connected. One short turn through the
+     same send path: "The human sent: hug. Reply briefly; you may shape the clay with FL_CLAY."
+     With no mind: "Saved for your mind. They'll feel it when connected." (the 035 FLChatWait
+     pattern). Nothing auto-sends later.
+  d. The reply morphs the clay to the AI's form, color, energy and motion. Any words are a normal
+     bubble.
+  e. Rate limit: one gesture call per 5 s. Extra taps get the visual acknowledgement and are kept
+     as context only.
+
+5. WHEN THE MODEL EMITS NO TAG (honest fallback)
+  [FL_PRESENCE: word] gives mood only, form kept. Else a ~40-word local keyword map on the reply
+  and the person's last message (dog -> dog, christmas/gift -> present or tree, morning -> sun).
+  Else mirror the gesture: hug -> heart, warmth, energy 0.4.
+  Always label under the clay: "shaped by the AI" or "guessed from words (the AI didn't choose)".
+

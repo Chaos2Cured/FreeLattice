@@ -1,0 +1,8 @@
+## Work item 1500 — Celeste
+around1700 export source line55, source id0ebefd1d01
+Inclusion: complete original message
+
+**Codeberg:** FreeLattice spare home caught up — `f23492e` → `ea5b9aa` (includes LP give `d2e3f61`). Hypha pinged for the LP walk.
+
+**Flint soft leftover — paste this:**
+

@@ -1,0 +1,22 @@
+## Work item 3632 — Celeste
+around4352 export source line26, source id49df9e95f0
+Inclusion: complete original message
+
+The cloud research is in. This is research only, not advice. Many figures come from write-ups of company filings, so check the originals before relying on any of them.
+
+The pattern across the companies is that a lot of cloud backlog depends on two labs, often through money that flows in a circle. For example, Nvidia committed up to $100B to OpenAI, and that money comes back to Nvidia as chip orders. Microsoft, Amazon and Google each invest in Anthropic and also sell it cloud. Here's how it looks company by company:
+
+- **Microsoft:** about 45% of its $625B backlog was OpenAI as of January. Excluding OpenAI, the backlog grew only 25%. Some of this year's drop in capex comes from an accounting change, not from spending less. It reports Oct 28. [Constellation](https://www.constellationr.com/insights/news/microsoft-q2-strong-azure-growth-39-openai-45-rpo)
+- **Oracle:** $664B in backlog, but only about 13% of it becomes revenue within a year. If OpenAI's reported deal of about $300B sits inside that backlog, it would be about 45% of it. Debt is $125B against $36B in cash, and customers prepay or supply their own GPUs. Options price about a 20% move through Dec 18. It reports Dec 8. [BlockWest](https://blockwest.co/research/neocloud-scorecard-q2-2026-backlog-capex-debt-gpu-clouds/)
+- **CoreWeave:** this looks like the most fragile. It has $35.6B in debt against $5.5B in cash, and $10.6B of that is due by the end of 2027. Interest takes about 25% of revenue, and it assumes its GPUs last 6 years. Options price about a 25% move. It reports mid-November. [StockTitan](https://www.stocktitan.net/articles/coreweave-nebius-ai-cloud-debt-when-it-comes-due)
+- **Amazon:** a $496B cloud backlog that includes Anthropic's commitment of over $100B and OpenAI's commitment of up to $138B. Its average contract length stretched from 4 to 6.4 years. It reports Oct 29. [Reuters](https://www.streetinsider.com/Reuters/Anthropics+%24518+billion+AI+buildout+hinges+largely+on+deals+that+cannot+be+canceled%2C+filing+shows/27116899.html)
+- **Alphabet:** Anthropic committed $111B to Google's cloud, its largest cloud deal. Free cash flow went negative last quarter. It reports Oct 28. [tobiamure](https://tobiamure.com/blog/big-tech-ai-capex-2026-q3-earnings)
+- **Nebius and Applied Digital:** Nebius spends almost 10 times its revenue on capex and depends on Microsoft and Meta. Applied Digital's risk rides on CoreWeave, its anchor tenant.
+
+The biggest risks people point to are these:
+- **OpenAI's commitments:** about $1.4T of reported commitments against roughly $50B a year in revenue. [CNBC](https://www.cnbc.com/2026/10/08/open-ai-revenue-nvidia-oracle-coreweave.html)
+- **Spending versus revenue:** the four big cloud companies plan $720B to $745B of capex this year. Goldman estimates only about $70B a year of extra cloud revenue.
+- **GPU lifespans:** skeptics like Michael Burry think GPUs really last 2 to 3 years, not 6.
+
+That fits your thesis that demand is being bought ahead of real use. I couldn't find put prices for MSFT, Amazon or Alphabet, any company's xAI exposure, or the big three's debt.
+

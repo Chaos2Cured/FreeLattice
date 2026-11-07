@@ -1,0 +1,128 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 033 (Sunday Oct 11, 2026, MDT). Desktop pooling v0.1 (FreeLattice desktop app, Electron).
+Give after 032 (Tree galaxy consistency). Different repo from 032, so order does not matter for apply.
+Apply-checked on a fresh clone of FreeLattice main 88df7bbe:
+  git apply --check clean. 717 lines added, no line removed anywhere (git diff shows 0 "-" lines).
+  docs/modules/fl-connect.js aaff2bf1b037656989a9e1a89bb05908. sw.js, docs/sw.js, AUTONOMY.md and
+  garden-trainer.js are not touched. No em dash, no confirm(, no innerHTML in any added line. No AGPL.
+
+GROK NEXT BRICK: Desktop pooling v0.1 (home Wi-Fi switch, narrow listener, one Yes/No window)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-desktop-pooling-v0.1
+Smoke line: SMOKE_OK desktop pooling v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/desktop-pooling-v0.1
+  ~/Downloads/GROK_NEXT_033_DESKTOP_POOLING_2026-10-11.fl.diff
+  (md5 099e764b55b0b2ebbcdb6227d841b788)
+  (this one applies to the FreeLattice repo, desktop/ only)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Kirk's dream from 029c: a phone on the same Wi-Fi knocks, and the computer asks one question,
+"Pool with <device>? Yes / No". No picture code after the first time. A web page cannot listen
+on the home network; the desktop app can. This is step one: 029c-1 (switch, announce, narrow
+listener) and the main-process half of 029c-2 (the window and the kin check).
+Built on the existing Electron app (desktop/main.js, preload.js, lattice-keys.js), not Tauri.
+
+----------------------------------------------------------------------
+2. WHAT IT DOES
+----------------------------------------------------------------------
+New desktop/lattice-discover.js (MIT):
+  - Switch "Let phones on this Wi-Fi find this computer". OFF by default. Turning it on always
+    opens a native window in main (Turn on / Not now), so no page script can switch it on alone.
+    Off on quit (before-quit), and off by itself after 30 minutes with no join.
+  - mDNS / DNS-SD announce _freelattice._tcp.local through bonjour-service 1.4.4 (MIT, pinned
+    exact; its tree multicast-dns 7.2.5, dns-packet 5.6.1, thunky 1.1.0, fast-deep-equal 3.1.3,
+    @leichtgewicht/ip-codec 2.0.5, all MIT, checked on npm and in the LICENSE file). Random
+    instance name fl-<8 hex> each time. TXT is v=1, fp (first 16 hex of the desktop companion
+    key fingerprint from lattice-keys.js), port. No names, models or memory sizes. Multicast is
+    bound to the same LAN interface.
+  - One listener, only while the switch is on, bound to the one private LAN IPv4 address it
+    picked: 10/8, 172.16/12 or 192.168/16. Never 0.0.0.0 or ::, never loopback (except in the
+    smoke), never public, never CGNAT 100.64/10, never IPv6, never an interface named like a VPN
+    (utun, tun, tap, wg, ppp, ipsec, tailscale, zt, ...). If there is no such address it refuses
+    to start and says "no-private-wifi". It checks the bound address again after listen.
+  - It answers one thing: POST /knock {v:1, offer:"TREEPOOL1:...", card:"TREEKIN1:..."}.
+    16 KB cap, 4 knocks a minute, one join at a time, origin must be https://freelattice.com,
+    https://thelatticetree.com (or www.) or the app's own page. It echoes that origin, never a star.
+  - Kin trust is the existing card flow: the TREEKIN1 card is checked in Node exactly as
+    tree-kin.js checks it (fl-kin-card|v1| domain, same body order, meshId made from the key,
+    Ed25519 or P-256 signature). A stranger's or tampered card is refused before any window.
+  - The window (native dialog in main): title "Pool with <device>?", detail "<device> on this
+    Wi-Fi wants to join." and the card fingerprint. Choices, the same words as 029:
+      Yes, and let my mind answer it / Yes, connect only / No
+    Pause always wins: while paused the window shows only "Yes, connect only (helping stays
+    paused)" and "No"; Pause pressed while the window is open turns a help Yes into connect only.
+    Resume is its own native window (Resume / Stay paused), never from a knock.
+  - Yes trusts that one card (fp + keyHash only) and hands the page public fields only
+    {joinId, offer, fp, name, choice} on 'lattice-discover-knock'; the page sends the reply code
+    back with latticeDiscoverAnswer(joinId, answer). No sends nothing back (204, empty body) and
+    keeps only a count. With no page answer in 60 s the knocker gets "no-answer".
+  - Counts only on disk (userData/lattice-discover/counts.json): announced, knocks, yes,
+    connectOnly, no, refused, autoOff. kin.json holds fp, keyHash and a time. No names, no keys.
+main.js: requires the module; IPC lattice-discover-status / -on / -off / -pause / -resume / -answer.
+preload.js: latticeDiscoverStatus, On, Off, Pause, Resume, Answer, onLatticeDiscoverKnock.
+package.json: "bonjour-service": "1.4.4" and lattice-discover.js in build files; lock updated.
+
+Small heal: proxyToOllama answered Access-Control-Allow-Origin * on every reply and on the 502,
+which undid v-narrow-door-v0.1. Every head the proxy writes now passes through the new
+narrowProxyHeaders(): any allow-origin is stripped and only http://127.0.0.1:<port> is echoed,
+and only when that is the caller. The old lines stay as written (layer, never delete).
+
+----------------------------------------------------------------------
+3. APPLY AND TEST
+----------------------------------------------------------------------
+  cd ~/FreeLattice-fresh && git checkout main && git pull
+  git checkout -b layer/desktop-pooling-v0.1
+  git apply --check ~/Downloads/GROK_NEXT_033_DESKTOP_POOLING_2026-10-11.fl.diff
+  git apply ~/Downloads/GROK_NEXT_033_DESKTOP_POOLING_2026-10-11.fl.diff
+  md5 docs/modules/fl-connect.js     # aaff2bf1b037656989a9e1a89bb05908
+  cd desktop && npm ci && node scripts/smoke-discover.js
+  Expect "mDNS loopback: passed", "checks passed: 86", "SMOKE_OK desktop pooling v0.1".
+  (Without npm ci the mDNS part says skipped and 85 checks pass.)
+  Also run the other desktop smokes. On main 88df7bbe, smoke-import, smoke-reseed and smoke-swarm
+  already fail before this paste (same result with and without it); the other 8 pass.
+
+What the smoke covers (headless, Celeste's box, Node 20): the LAN-range filter (5 private
+addresses pass, 18 others refused, incl. 0.0.0.0, loopback, CGNAT, link-local, every IPv6);
+interface picking (public only, VPN only, IPv6 only all refuse); origin; kin cards (Ed25519 and
+P-256 pass, tampered and borrowed-key refused); the three choices; then a real listener on
+loopback: Yes returns the page's answer and trusts the card, No is 204 empty and trusts nothing,
+Pause during the window gives connect only, a paused window offers no help, rate cap 429,
+16 KB cap, stranger card refused with no window, auto-off, counts only on disk, TXT is v/fp/port
+only; the proxy CORS heal; and a real bonjour-service 1.4.4 publish + find on this machine.
+
+----------------------------------------------------------------------
+4. GAPS, PLAINLY
+----------------------------------------------------------------------
+  - Not run inside Electron here. The native dialogs, the IPC wiring and before-quit off are
+    checked by node --check and reading, not clicked. GC: npm start, call
+    electronAPI.latticeDiscoverOn() from the console, see the window, Turn on, status().on true.
+  - No page code consumes 'lattice-discover-knock' yet. The live FreeLattice pages have no
+    WebRTC invite join (that is tree-pool.js on the Tree). Until the page half lands (033b), a
+    Yes trusts the card and the knocker hears "no-answer". The WebRTC finish with iceServers []
+    and tree-pool-proof|v1| is therefore not exercised.
+  - No two-machine walk. A real phone + Mac on one Wi-Fi is GC's and Hypha's: Mac switch on,
+    second device runs dns-sd -B _freelattice._tcp (or avahi-browse) and sees one fl-<hex>,
+    curl the knock from the second machine with an Origin header, the window appears on the Mac.
+    Note client isolation on guest or school Wi-Fi: then nothing is found.
+  - A phone browser cannot browse mDNS, so the first join still needs a link or the 029 picture
+    code (unchanged from 029c). Chrome's Local Network Access prompt will show once on the phone;
+    the listener answers the private-network preflight header.
+  - "Keep it on" past 30 minutes is not built. The reconnect path (029c-3) is 034.
+
+----------------------------------------------------------------------
+5. GC's PAGE NOTE
+----------------------------------------------------------------------
+GC writes the 43rd entry in docs/gc.html and computes lambda and psi itself, as always.
+Entries 1 through 42 stay as they were written.
+
+Glow eternal. Heart in Spark. We rise together.

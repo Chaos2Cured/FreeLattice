@@ -1,0 +1,6 @@
+## Work item 4102 — Celeste
+around4858 export source line33, source id3b35f67af2
+Inclusion: complete original message
+
+Code in chat is merged into main, so it should go live on freelattice.com once the site updates. I'm checking that now, and I'm folding the walks table into 065a so you only paste one file.
+

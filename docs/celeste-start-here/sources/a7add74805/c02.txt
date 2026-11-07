@@ -1,0 +1,79 @@
+  G. Pause vs already-landed turn race (Hypha 051)
+     - Soft: Pause vs instant local reply can leave a landed turn if Pause taps after
+       completion; abort path already verified with delayed fetch (PASS).
+     - Heal preference in gathering-speak.js (twin both homes):
+         * If nothing is in flight, Pause is a calm no-op (or "Nothing in flight") and does
+           not overwrite a keep receipt with "Paused".
+         * If a turn is in flight, Pause aborts and does not land that answer. Nothing invented.
+         * Do not drop an answer that already fully landed before Pause was tapped.
+     - Keep FL == Alpha twin. Report new shared md5 if touched. Tree page still does not mount
+       Speak (brick 3); the twin file still travels.
+
+
+2. OUT OF SCOPE (do not build in 052)
+  - Gathering brick 3 (Tree renderCoreGathering moves onto fl-gathering.js)
+  - Continuity doorway note (053)
+  - Ledger shard export / ark cadence (054 / 059)
+  - Settings-as-chat clay blank (055)
+  - TransactionTrust wallet face (056)
+  - Mesh Kin deepen / Bluetooth (057)
+  - Science Garden / Kindness Meter (058)
+  - de-muzzler / Marketplace redesign / Pulse / City / Quiet Voices soft-promote
+  These sit on Celeste's ORDER for later layers.
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - Markers: class or data marker v-soft-polish-052-v0.1 on new / healed nodes where natural.
+  - Short library note optional: docs/library/SOFT_POLISH_052_v0.1.md (FL) + one-paragraph
+    sister on Alpha if they keep a library pattern.
+  - Smoke script: docs/scripts/smoke-soft-polish-052-v0.1.js
+  - Branches: layer/soft-polish-052-v0.1 on each repo you cut.
+
+
+4. SMOKE (new)
+  - Settings: Build from chat finds into view without a long hunt (jump / scroll / cue).
+  - First-ask: wording shows review-yourself meaning clearly; Settings radios still match;
+    Escape / once-only behavior from 049 still holds.
+  - z200 (640 by 400 @ DPR2): Search does not cover Send; middle of Send hits Send; strip stays.
+  - More: tap opens a visible menu; Connect reachable from it.
+  - #connect / ?tab=connect: Connect content AND Connect activeTab / nav label.
+  - Tree settings: Also connect follows Connect mount cleanly; grandmother door stays;
+    Bridge still present somewhere honest.
+  - Gathering Ask Pause: in-flight abort drops the answer; after-land Pause does not claim a
+    false pause over a keep; nothing invented. Say "local walk skipped" if no Ollama/Bridge.
+  - Buttons >= 44px; no sideways scroll at 390 and 1280; reduced motion respected if glow touched.
+  - fl-connect.js md5 unchanged from pin (aaff2bf1...) unless you report a required twin edit.
+  - propose.js unchanged. chat-autonomy.js: report md5 (may change for A/B/C).
+  - fl-gathering.js / gathering-speak.js: identical across homes OR report why not (must not
+    diverge). New md5 if Pause heal touched them.
+  - Top debug strip still present; Quiet Room shut; Five stay five.
+  - Earlier smokes still print:
+      SMOKE_OK chat autonomy v0.1
+      SMOKE_OK tree love connect v0.1
+      SMOKE_OK gathering shared v0.1
+      SMOKE_OK gathering speak checker v0.1
+  - New line: SMOKE_OK soft polish 052 v0.1
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 85 (expect 86); honest claims only for what shipped.
+  - psi per standing formula.
+  - Separate page PR as usual (layer/gc-page-NN) unless Celeste GO says otherwise.
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of every touched locked file (and fl-connect.js +
+    fl-gathering.js + gathering-speak.js + chat-autonomy.js + tree-love-connect.css on BOTH
+    repos where present), smoke counts, which of the seven softs landed on FL vs Alpha,
+    whether fl-connect stayed byte-identical and untouched.
+  - Per soft: one line "fixed how" (A through G).
+  - Do not merge.
+
+
+WAIT: Do not cut until GROK_NEXT_052b_GO_2026-10-28.txt says GO and names FreeLattice + Tree
+mains. 051 must be merged first (it is). If 052b is still HOLD, stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

@@ -1,0 +1,27 @@
+## Work item 4174 — Kirk
+around4945 export source line13, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 1851–3397
+
+065b is on the same pull request, #319 (https://github.com/Chaos2Cured/FreeLattice/pull/319). The new head for Hypha is 23842ec247c1fd2bb28b0d1a28d...ough 055 #297 0b7348ce.
+• The rank-1 NOTE.md files for 040, 043c–h, 055, and 056d–g are not on this machine, and they are not in the GitHub repo. Those cells say unknown — NOTE not found. Walks the note did not give a verdict for, including 048, say unknown.
+• 043i names Alpha (theLatticeTree) #123 e0b783a0 once, on the seed row, plus FL #268 aced4f86, and says FL #123 is Walk the Garden. The matching shelf row carries the same facts in plainer words, so that one phrase stays a single hit.
+• The shelf verdicts add #317 PASS., #316 PASS., and Verdict: HOLD. #318 PASS. The old 063b quote is marked as earlier wording.
+• Feeling cells are blank. The 168 shelf lines now say (template line). The sentences under them are still there.
+• Healed HOLDs are 9 as of 2026-11-03: 057, 061a, 063a, 063b, 045, 045b, 043c–h, 055, and 056d–g. 057c is kept and marked not confirmed. 062a and 062b stay off, because #313 is still open.
+• Shelf dates are labeled UTC. The selection line says chosen by hand; incomplete. No rule was stated in this conversation, so none was invented.
+• ad38120f is layered as a mark. The porch line still has sig ad38120f. The timing note records the in-page measure, the worker-route gap, and Chrome 155.0.8059.84. The timing script was left as it is, because that observer pass is already there and those three sentences would have stopped being true if the script changed.
+
+### Exact excerpt: source characters 3399–3913
+
+node docs/scripts/smoke-family-gifts.js printed SMOKE_OK family gifts v0.1 on this head, and again on a local merge with #320 that was not committed or pushed. On that merge the branch ψ list is the main list plus the six page entries, and main's list is the prefix. Lock md5s are unchanged: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, the twins 91ebdfcf, and both service workers 2b2f5504. The ψ count on this branch is still 100. The Quiet Room was not opened.
+
+### Exact excerpt: source characters 3915–3967
+
+Hypha walks 065b. Celeste merges nothing until PASS.
+
+### Exact excerpt: source characters 3969–3999
+
+Glow eternal. Heart in Spark."
+

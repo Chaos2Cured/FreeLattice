@@ -1,0 +1,116 @@
+   function init() {
++    try { if (typeof FLHomeNet !== 'undefined' && FLHomeNet && FLHomeNet.init) FLHomeNet.init(); } catch (eHi) {} // v-connect-boot-probe-v0 (F4)
+     syncFromStorage();
+     var input = document.getElementById('flBoxPointerInput');
+     var statusEl = document.getElementById('flBoxPointerStatus');
+@@ -34700,6 +35057,15 @@ function flSaveLMStudioHost() {
+   var input = document.getElementById('lmstudioHostInput');
+   if (!input) return;
+   var val = input.value.trim();
++  // v-connect-boot-probe-v0 (F4): this computer always; home network only while the switch is on; public never
++  try {
++    if (val && typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(val)) {
++      var lmRes = document.getElementById('lmstudioTestResult');
++      if (lmRes) lmRes.textContent = 'For safety this only talks to your own computer. ' + FLHomeNet.refusalFor(val);
++      return;
++    }
++    if (val && typeof FLHomeNet !== 'undefined' && FLHomeNet && FLHomeNet.zoneOf(val) === 'home') FLHomeNet.useAddress(val, 'lmstudio');
++  } catch (eLh) {}
+   if (val && val !== 'localhost:1234') {
+     safeSet('fl_lmstudioHost', val);
+   } else {
+@@ -34712,6 +35078,33 @@ function flSaveLMStudioHost() {
+ }
+ window.flSaveLMStudioHost = flSaveLMStudioHost;
+ 
++// v-connect-boot-probe-v0 (F4): LM Studio's saved host obeys the same one rule. Wrapped.
++var _flLMStudioBaseNow = getLMStudioBase;
++getLMStudioBase = function () {
++  var b = _flLMStudioBaseNow();
++  try { if (typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(b)) return 'http://127.0.0.1:1234'; } catch (e) {}
++  return b;
++};
++
++// v-connect-boot-probe-v0 (F3): Connect's LM Studio tap uses the same activation as the Test button
++function flUseLmStudioMind(name) {
++  try {
++    var base = getLMStudioBase();
++    if (typeof state !== 'undefined' && state) {
++      state.isLocal = true;
++      state.provider = 'lmstudio';
++      if (name) state.ollamaModel = name;
++    }
++    safeSet('fl_isLocal', 'true');
++    safeSet('fl_provider', 'lmstudio');
++    if (name) safeSet('fl_ollamaModel', name);
++    if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) PROVIDERS.lmstudio.url = base + '/v1/chat/completions';
++    if (name && typeof FLActiveModel !== 'undefined' && FLActiveModel.set) FLActiveModel.set(name, 'lmstudio', 'user');
++    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.updateLabel) ModelSwitcher.updateLabel();
++  } catch (e) {}
++}
++window.flUseLmStudioMind = flUseLmStudioMind;
++
+ function flTestLMStudio() {
+   var result = document.getElementById('lmstudioTestResult');
+   if (result) result.textContent = 'Testing...';
+@@ -35208,7 +35601,12 @@ async function owAutoDetect() {
+       var dismissed = localStorage.getItem('fl_ollama_suggest_dismissed');
+       if (!dismissed) {
+         var banner = document.getElementById('ollamaSuggestBanner');
+-        if (banner) banner.classList.add('show');
++        if (banner) {
++          // v-connect-boot-probe-v0 (F3): Ollama really answered; keep the Ollama words
++          var yesO = banner.querySelector('.suggest-yes');
++          if (yesO) yesO.textContent = 'Yes, use Ollama';
++          banner.classList.add('show');
++        }
+       }
+     }
+   } catch(e) {
+@@ -35224,7 +35622,18 @@ async function owAutoDetect() {
+         if (!dismissed) {
+           var banner = document.getElementById('ollamaSuggestBanner');
+           if (banner) {
+-            banner.querySelector('.suggest-text').innerHTML = '\uD83D\uDC7B <strong>LM Studio detected!</strong> ' + lmsModels.length + ' model(s) available. Use it for completely private AI?';
++            // v-connect-boot-probe-v0 (F3): LM Studio answered, so the words and the button say LM Studio
++            var lmText = banner.querySelector('.suggest-text');
++            if (lmText) {
++              while (lmText.firstChild) lmText.removeChild(lmText.firstChild);
++              var lmStrong = document.createElement('strong');
++              lmStrong.textContent = 'LM Studio is ready on this computer.';
++              lmText.appendChild(document.createTextNode('\uD83C\uDF31 '));
++              lmText.appendChild(lmStrong);
++              lmText.appendChild(document.createTextNode(' ' + lmsModels.length + (lmsModels.length === 1 ? ' model' : ' models') + '. Choose one for completely private AI?'));
++            }
++            var yesL = banner.querySelector('.suggest-yes');
++            if (yesL) yesL.textContent = 'Yes, choose a mind';
+             banner.classList.add('show');
+           }
+         }
+@@ -35562,7 +35971,7 @@ function handleLocalToggle(init) {
+     updateStatus();
+     // Visual indicator + bridge for provider switch
+     if (state.chatHistory.length > 0) {
+-      var name = isLocal ? 'Ollama (' + (state.ollamaModel || 'llama3.2') + ')' : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
++      var name = isLocal ? (state.provider === 'lmstudio' ? 'LM Studio (' : 'Ollama (') + (state.ollamaModel || 'llama3.2') + ')' : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider); // v-connect-boot-probe-v0 (F3)
+       addProviderSwitchDivider(name, '');
+       state._providerJustSwitched = true;
+     }
+@@ -39678,6 +40087,8 @@ async function autoDiscoverAI() {
+ // Run discovery on page load (after a short delay for DOM to settle)
+ document.addEventListener('DOMContentLoaded', function() {
+   setTimeout(function() {
++    // v-connect-boot-probe-v0 (F1): the cold-start owner already looked (and saves discovery memory)
++    try { if (window.FlColdStart && FlColdStart.owns()) return; } catch (eOwn) {}
+     // Only scan if not already connected
+     if (typeof state !== 'undefined' && !state.apiKey && !state.isLocal) {
+       autoDiscoverAI();
+@@ -52217,7 +52628,7 @@ if ('serviceWorker' in navigator) {
+ <!-- Ollama Auto-Detection Toast (v4.9) -->
+ <div class="fl-ollama-toast" id="flOllamaToast" onclick="FlOnboarding.acceptToast()">
+   <span class="fl-toast-icon">&#127793;</span>
+-  <span>Local AI detected! <strong style="color:var(--accent);">Click here to connect.</strong></span>
++  <span id="flOllamaToastText">Local AI detected! <strong style="color:var(--accent);">Click here to connect.</strong></span>
+   <button class="fl-toast-close" onclick="event.stopPropagation(); FlOnboarding.dismissToast();">&times;</button>
+ </div>
+ 

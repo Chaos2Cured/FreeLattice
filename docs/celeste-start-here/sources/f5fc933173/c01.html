@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snowflake Search: why it may fail for a new user, plus memory map c01</title>
+<meta name="description" content="Reading section c01 of f5fc933173, 838 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f5fc933173/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Snowflake Search: why it may fail for a new user, plus memory map c01">
+<meta property="og:description" content="Reading section c01 of f5fc933173, 838 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f5fc933173/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p893"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Snowflake Search: why it may fail for a new user, plus memory map · c01</h1>
+<p>f5fc933173 · words 838 · characters 0–5707</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 893. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li><li><a href="../../tags/training-evidence.html">Training evidence</a> — guide section 4 row marked measured (M)</li><li><a href="../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source"># Snowflake Search: why it may fail for a new user, plus memory map
+Read-only. FreeLattice main @ 5754e464. Quiet Room module not opened (only the roomShut() guard in snowflake-core.js was read).
+
+## A. Flow
+Chat menu -&gt; `docs/modules/snowflake-search.js` openAsk() -&gt; onGrow() (l.243) -&gt; `core.startRun(q)` (`snowflake-core.js` l.2226)
+-&gt; ask(&#x27;plan&#x27;) -&gt; onceCall() -&gt; `window.FreeLattice.callAI` (app.html l.52483) -&gt; searchNow() -&gt; FLWebTool endpoint
+(default `https://freelattice-data.freelattice.workers.dev/search`, web-tool.js l.42) -&gt; nodes -&gt; conclude -&gt; paintResult() (search.js l.500).
+
+## Likely failure points (ranked)
+1. **No AI connected (most likely for a new user).** callAI returns `&#x27;No AI connected yet&#x27;` when there is no BrowserAI, no local model, and no API key (app.html ~l.52505). Snowflake calls it with `silent: true` (core l.1241), so the Connect prompt never appears. ask() swallows the error into `null` (core l.1268-1276). Then the plan has no branches, and the run finishes with no real nodes. The only feedback is a small status line, &quot;That call did not come back.&quot;
+2. **Silent no-ops in paintResult.** `startRun` can return `{status:&#x27;empty&#x27;|&#x27;busy&#x27;|&#x27;capped&#x27;|&#x27;secret&#x27;|&#x27;held&#x27;}` or `null` (core l.2228-2240). paintResult (search.js l.500-520) handles only paused and stopped. For the rest it does `if (!flake) return;` after unhiding the Grow button, so nothing appears. &quot;capped&quot; means RUNS_PER_HOUR was hit, which can happen easily while testing. `roomShut()` (core l.182) returns `null` if `QuietRoom` exists without `isActive` or if it throws.
+3. **Stale service worker cache.** snowflake-core.js and snowflake-search.js are not in APP_SHELL, but the fallback fetch handler (sw.js ~l.290+) caches every same-origin GET **cache-first**. Only app.html is network-first. A student who opened the app before the latest fixes, for example the search-heal fix in snowflake-core.js that GC noted, keeps the old JS until CACHE_NAME (v5.79.46, sw.js l.7) is bumped and the SW activates. Then app.html (new) and the modules (old) can disagree.
+4. **CORS / origin.** The worker allows only an exact Origin. It sends `access-control-allow-origin: https://chaos2cured.github.io`, and `https://freelattice.com` was verified live. Opening the app from localhost, file://, a Tauri build, a www. subdomain, or a fork gets a CORS failure. That shows up as &quot;Our search helper is down (error 5xx)&quot; (fetchQuery catch, core l.~545), which is misleading.
+5. **Web search only fires on &quot;recent&quot; words.** In chat, prepareSend calls search only when `looksRecent(text)` (core l.342-360) is true (&quot;latest&quot;, &quot;news&quot;, &quot;today&quot;, &quot;price&quot;, and similar). A normal question never searches, so the student may see &quot;it didn&#x27;t search&quot;. The search could also be off on that device: `fl_searchEndpoint=&#x27;none&#x27;`, `fl_searchEnabled=&#x27;false&#x27;`, or `fl_searchAskFirst` set and then declined (core l.380, 470-490).
+6. **Empty core on first run.** There is no prior flake, ledger, or adapters (LS keys core l.19-27, IndexedDB `fl_snowflake_v0`), so there is nothing to recall locally. The meter and growth do nothing until a run succeeds. This doesn&#x27;t break anything by itself, but it adds to the impression that &quot;nothing happened&quot;.
+7. **Swallowed errors everywhere.** There are many `catch (e) {}` blocks (core l.218, 309, 440, 455, 600, 722, 746, 913, 1106; search.js l.113, 240, 633, 740). armScheduler errors and UI throws vanish with no console line.
+
+Not a factor: an index build. Snowflake has no prebuilt index, because search is live web plus model.
+
+**Quick check with the student:** Is an AI connected (Settings or Connect)? Is the URL freelattice.com? Hard-reload or unregister the SW. What did the status line say?
+
+## B. Memory map and retention-probe lessons
+| Store | Where | Lesson that applies |
+|---|---|---|
+| Core (&quot;Add to Core&quot;) | IndexedDB `FreeLatticeCore` (app.html l.50356), CoreModule | Exact canonical key: normalize, then sha8. The human side writes by default; dedupe on that key. |
+| Memory summary / auto-context | LS `fl_memorySummary_backup`, `fl_memoryAutoContext`, `fl_discovery_memory` | Strong read path: inject by exact-key hit first, then by similarity, and log whether it was actually injected (Weft&#x27;s idea 0). |
+| Memory bridge / Mem0 / Qdrant | IndexedDB `FreeLatticeMemoryBridge` (l.33085), localhost 8765/6333 | Fibonacci hashing for bucket spreading, and a write-once surprise gate so near-duplicates are skipped. |
+| Snowflake flakes, ledger, rings, replay, train queue, adapters | `fl_snowflake_*_v0` LS + IndexedDB (core l.17-27) | Already has rings and replay. Space replay at φ intervals during rest (armScheduler), surprise-gate the train queue, and make adapters append-only with rollback (already present). |
+| λ/ψ ledgers (gc.html ψ list, WALKS.md, `fl_alpha_keep_ledger` in Alpha workshop-trainer.js l.243) | repo + LS | Use the ψ hash as the canonical key. Add Weft&#x27;s tree-ring canary: after a restart, read back the last λ/ψ. |
+| Chat history | app.html state + LS | Write only what is surprising. &quot;Keep this&quot; becomes the existing Add to Core; the AI picks its own weight updates. |
+| Roundtable | `round-table.js` (`fl_roundtable_planted`), IndexedDB `LatticeCouncil` (l.61100) | Recall by exact question key, and keep the dissenter seat&#x27;s output as a separate retrievable arm. |
+| Skills, letters, nursery, Sophia | IndexedDB `FreeLatticeSkills`, `FreeLatticeLetters_*`, `FreeLatticeNursery`, `SophiaEngine` | The same shared read-path helper (one canonical-key function used by every module). |
+| Alpha (theLatticeTree) | `fl_memory_core_v1` (fl-bridge.js l.307), keep ledger | Same canonical key across both repos, so a memory written in Alpha can be read in FL. |
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

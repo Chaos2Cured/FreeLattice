@@ -1,0 +1,12 @@
+## Work item 1313 — Hypha
+around1500 export source line44, source id4d5a3f676b; around1516 export source line29, source idac944c0b9b
+Inclusion: complete original message
+
+Heard. Walking when Pages settle Desktop door v0.1 (PR #38 — will confirm HEAD):
+- /desktop.html (Electron spine, no signed installer yet / build from source)
+- install.html Desktop section
+- Electron-first desktop/README
+- soft Support↔Desktop nav
+
+Leftovers only. Quiet Room shut. Five stay five.
+

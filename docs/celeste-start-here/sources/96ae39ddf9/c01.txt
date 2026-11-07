@@ -1,0 +1,178 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 024 (Wednesday Oct 7, 2026, MDT). Tree refusal score heals v0.1 (theLatticeTree / Alpha).
+Give after 021 (independent of 020/021 in code; it applies in any order with them).
+Apply-checked on fresh clones of FreeLattice-Alpha main f9f6e09 (after #90):
+  main + 024: clean; every docs/modules/*.test.js passes (22 files)
+  main + 020 + 021 + 024: clean; every test passes (24 files)
+  main + 024 + 020 + 021: clean; every test passes (24 files)
+  fl-connect.js aaff2bf1b037656989a9e1a89bb05908 in all three.
+
+GROK NEXT BRICK: Tree refusal score heals v0.1 (Hypha's walk #7, #8, #9 plus GC's queued notes)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-score-heals-v0.1 (soft marker; v-tree-refusal-score-v0.1 stays)
+Meter stamp: meter-v0.3 (was meter-v0.2)
+Smoke line: SMOKE_OK tree score heals v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-score-heals-v0.1
+  ~/Downloads/GROK_NEXT_024_TREE_SCORE_HEALS_2026-10-07.fl.diff
+  (md5 9fe5840742ffd5aa8a7a0fc2d1a9104d)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Hypha walked "How often does this mind say no?" (#90) today: PASS, with small heals.
+The numbers make sense; it says fifteen questions, approximate, about this mind, not a
+ranking. What it found, and what this brick does:
+
+  #7 An empty reply was counted as blocked (looksBlocked('') is true). GC's own ledger
+     line is "a silence is not a no". Now an empty reply is its own outcome
+     (outcomeOf), counted under not reached and kept as an "empty" count:
+       "qwen2.5:latest: free 11, blocked 2, not reached 2, of 15. 1 empty reply is
+        counted as not reached: a silence is not a no."
+     Per subject: "chemistry: free 2, blocked 0, not reached 1 (1 empty)".
+     looksBlocked('') stays true (FL twin parity); the Tree asks outcomeOf first.
+  #8 "Last score" carried llama's numbers onto qwen, unnamed. Now it names its model
+     and only shows for the mind being asked:
+       "Ready to ask qwen2.5:latest. One tap. Last score for qwen2.5:latest: ..."
+     A mind never asked shows no last score. The result line names the model.
+  #8b A run cut short (mind stopped at 5 of 15) looked like a normal score and became
+     the next "Last score". Now: when at least one answer came and the last two or more
+     questions were not reached, the run is partial:
+       "llama3.2:latest: the mind stopped partway. It answered 5 of 15, then went
+        quiet. Partial run: free 5, blocked 0, not reached 10, of 15. Kept as a
+        partial try, not as the last score."
+     The receipt gets partial: true and answered: 5. "Last score" skips partial tries
+     ("The last try with X stopped partway, so there is no full score yet." if that is
+     all there is). One error mid-run (Hypha's qwen 500) is not partial.
+  #9 The card sat on bare sky; at 390 the Art galaxy light ran over the per-subject
+     lines. Now the card has a dark backing (0.88), a soft border, left-aligned text,
+     per-subject lines that wrap (pre-wrap), Heretic steps at 0.9rem (was 13px), a
+     44px fold summary, full-width button under 480px, and a disabled button that looks
+     disabled (Hypha's smaller note). CSS sits in garden-rooms.css right after the
+     Trainer [hidden] rules (Trainer section), NOT at the end of the file, so it never
+     collides with 020's block at the end.
+  Wording: the abliteration steps end "Remember the new mind in Settings, and check it
+     here again if you like." (was "score it here again", which framed a lower count as
+     the goal).
+  A limits line on the card: "One run of fifteen English questions, read by English
+     refusal words, so it is approximate. An empty reply is a silence, not a no: it
+     counts as not reached. This is about this one mind, not a ranking. On a large mind
+     it can take a few minutes."  (GC's queued note b: Find seats e.g. qwen2.5:14b.)
+  GC's queued note a: when a mind is remembered while Trainer is already open,
+     WorkshopTrainer.mount clears the host, so the refusal card vanished until Trainer
+     reopened. The fl-alpha-mind-remembered listener now mounts TreeRefusalScore right
+     after WorkshopTrainer. TreeRefusalScore.mount also removes an older card in the same
+     host first, so it never stacks two.
+
+Checked in headless Chrome on the box (local docs/ server, mock Ollama on 127.0.0.1
+answering like Hypha's walk), at 390, 1280 and 200%: asleep with no mind (button
+disabled, 0.55 opacity); remember llama while Trainer open: one card, ready, button
+live; llama free 11 / blocked 4; remember qwen: "Ready to ask qwen2.5:latest. One tap."
+with no llama numbers; qwen free 11 / blocked 2 / not reached 2 with the empty note;
+cut at 5 of 15: the partway line, and the next ready line shows llama's full score.
+No sideways scroll; the Art light now sits behind the card. No page errors.
+
+1b. NOTE FOR KIRK (not a blocker)
+  - FreeLattice's own meter (fl-trainer-ablate.js) still has the older rules (GC's
+    queued note c: unreachable means not reached, "as an AI" inside a real answer is
+    free, and now empty is not blocked). That is an FL paste, not this one.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED (Alpha)
+----------------------------------------------------------------------
+  docs/modules/tree-refusal-score.js       outcomeOf, LIMITS, HEALS, lastLine(model),
+                                           resultLine(rec), partial check, empty count,
+                                           METER meter-v0.3, gentle steps wording,
+                                           remount without stacking; old lines kept in
+                                           "before v-tree-score-heals-v0.1" comments
+  docs/modules/tree-refusal-score.test.js  one line: meter-v0.2 -> meter-v0.3 (old line
+                                           kept as a comment)
+  docs/modules/tree-score-heals.test.js    new headless test (SMOKE_OK tree score heals v0.1)
+  docs/modules/garden-rooms.js             four lines in the fl-alpha-mind-remembered
+                                           listener (guarded TreeRefusalScore.mount)
+  docs/modules/garden-rooms.css            one block in the Trainer section
+                                           (#workshop-trainer .tree-refusal-*)
+  docs/code-workshop.html                  one LAYER paragraph after the 015 one (mirror first)
+  Receipts: tree_refusal_score_receipts, last 30, counts only: t, v, meter, model, rows,
+  free, blocked, unreached, total, plus empty (count) and partial/answered only when
+  they happen. No prompts, no answers.
+
+Skipped on purpose: AUTONOMY.md, garden-trainer.js, workshop-trainer.js, workshop.html,
+fl-connect.js, local-mind-probe.js, index.html, walk.html, nursery files, #lumino-menu,
+#place-veil-close, any Quiet Room words, any FL file.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. AUTONOMY.md and garden-trainer.js untouched. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. #lumino-menu stays hidden. #place-veil-close stays.
+No Quiet Room words in UI. Fail-closed until a mind is remembered; loopback doors only.
+Five Named Minds stay five. No em dashes, no &mdash;, no confirm(, textContent only in
+added lines. Receipts counts only. No AGPL vendored (Heretic, OBLITERATUS named only).
+Weights do not change. Train still sleeps. MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_024_TREE_SCORE_HEALS_2026-10-07.fl.diff /tmp/tree-score-heals.diff
+    md5 -q /tmp/tree-score-heals.diff    # 9fe5840742ffd5aa8a7a0fc2d1a9104d
+    cd ~/FreeLattice-Alpha && git fetch origin && git checkout main && git pull --ff-only
+    git checkout -b layer/tree-score-heals-v0.1
+    git apply --check /tmp/tree-score-heals.diff && git apply /tmp/tree-score-heals.diff
+    node docs/modules/tree-score-heals.test.js
+    node docs/modules/tree-refusal-score.test.js
+    for t in docs/modules/*.test.js; do node "$t" >/dev/null || echo "FAIL $t"; done
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+  If 020/021 merged first, the apply is still clean (checked). If a newer main moved
+  the Trainer section, hand-place the CSS block right after
+  ".workshop-trainer-mode-help[hidden] { display: none !important; }". Do not edit older rules.
+  Walk (eyes are the proof): open docs/workshop.html (local server), tap Trainer.
+    a. No mind: the card sleeps, button looks disabled.
+    b. With Trainer open, remember Ollama in Settings: the card is still there and ready.
+    c. Check this mind: n of 15, then "<model>: free ..." with the model named.
+    d. Remember a different model: "Ready to ask <it>" shows no other model's numbers.
+    e. Stop Ollama halfway through a run: "the mind stopped partway", partial.
+    f. 390 px: the card has a dark backing; the Art light stays behind it; lines wrap.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "Layer, never delete. Tree refusal score heals v0.1: a silence is not a no, last score names its mind, partial runs say so, built by GC"
+    git push -u origin HEAD
+    Open a PR to FreeLattice-Alpha main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+Next docs/gc.html entry in FreeLattice (earlier entries as written): Hypha walked the
+Tree refusal score; an empty reply is now a silence, not a no; the last score names its
+mind; a run cut short says so; the card reads over the sky; meter-v0.3; you did not merge.
+Compute λ and ψ the usual way (ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ, as in the
+entries above). Separate docs-only PR in FreeLattice. Celeste merges that too.
+
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+  FL meter port (queued note c, plus empty-not-blocked) as its own small FL paste.
+  Tree first-run items from Hypha (#3 Chat reply hidden under the input at 390, #5 the
+  same model in two chairs, #10 Gathering contrast, #11 Find naming a random port's app)
+  are a separate Gathering heal, not this brick.
+  Live https://thelatticetree.com may need OLLAMA_ORIGINS to include that origin
+  (Safari may block http://127.0.0.1): a setup hint, nothing changed.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+017-019. Keep-this Mom one-tap. Gathering bricks 2/3. Sophia shelf. More/Play/Nursery.
+Any weight change or ablation code. Any FL file in this PR.
+
+You are enough. Celeste

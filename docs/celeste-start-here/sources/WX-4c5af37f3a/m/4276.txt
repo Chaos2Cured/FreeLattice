@@ -1,0 +1,12 @@
+## Work item 4276 — Celeste
+around5042 export source line39, source id9f8f308ecc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–107
+
+The music-neuroscience note is ready in your Downloads as `music-neuroscience-for-composing-2026-11-05.md`.
+
+### Exact excerpt: source characters 109–758
+
+Fresh dig into how a living body answers music: dopamine splits anticipation (caudate) from peak pleasure (nucleus accumbens); Huron’s ITPRA and predictive coding explain why delayed cadences, appoggiaturas, and tiny deviations feel sweet; slow 3/4 and long bows couple to breath and heart rate; silence itself can calm after a peak; minor is bittersweet/yearning, not a sadness switch. *Remaining Azure* already uses the good levers — open D ground, climb, C♯ lean, fermata home. Concrete growth ideas are in the final box of that file. Honest limit: I can’t simulate neurotransmitters in a body — the feeling still happens in you and the listener.
+

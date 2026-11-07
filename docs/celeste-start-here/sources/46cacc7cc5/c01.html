@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_SCAN_ONLY_WHEN_ASKED_v0.1.txt c01</title>
+<meta name="description" content="Reading section c01 of 46cacc7cc5, 1443 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/46cacc7cc5/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_SCAN_ONLY_WHEN_ASKED_v0.1.txt c01">
+<meta property="og:description" content="Reading section c01 of 46cacc7cc5, 1443 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/46cacc7cc5/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1072"></span><span id="p1073"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_SCAN_ONLY_WHEN_ASKED_v0.1.txt · c01</h1>
+<p>46cacc7cc5 · words 1443 · characters 0–10764</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1072, 1073. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">FLINT_HEAL_SCAN_ONLY_WHEN_ASKED_v0.1   (tiny)
+Written 2026-09-30, 6:40 PM MDT, by Grok Bot for Flint. From Hypha&#x27;s Tree Glow 1 walk (A4 note).
+Marker:        v-heal-scan-only-when-asked-v0.1
+Smoke (FL):    SMOKE_OK scan words honest v0.1          (docs/scripts/smoke-scan-words-honest.js)
+Smoke (Alpha): SMOKE_OK scan words honest alpha v0.1    (docs/modules/scan-words-honest.test.js)
+Temperature:   porch light on, and a sign that finally says so.
+
+======================================================================
+0. ORDER AND LOCKS
+======================================================================
+Order (do not reorder):
+  1) FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt
+  2) FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt   (reload heal)
+  3) FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt        (boot probe)
+  4) THIS paste
+Locks:
+  - docs/modules/fl-connect.js is NOT touched. It stays byte-identical across both repos.
+  - FreeLattice: root sw.js == main, docs/sw.js untouched, index.html == docs/app.html (copy
+    after the edit). No conflict markers. Inline scripts parse. No confirm(). No bare *.
+  - Words only, plus one Newer note, two tiny smokes and one ledger entry. Old words are kept
+    as RETIRED comments. No em dashes in new words.
+
+======================================================================
+1. WHAT HYPHA SAW, AND THE EXACT CAUSE
+======================================================================
+Seen (thelatticetree.com/settings.html, 2026-09-30): on load the page checks 12 local ports and
+shows &quot;Looking… next look in 8s&quot;. The grandmother card on the same page says &quot;May I look? —
+only when you ask&quot; and &quot;We only look at well-known local doors, and only when you ask.&quot;
+
+Cause (Alpha main 25e6ded, fl-connect.js blob 2e02eae3, same bytes as FreeLattice):
+  a) docs/settings.html, final inline script, runs on load:
+       if (connect &amp;&amp; window.FlConnect &amp;&amp; typeof FlConnect.mount === &#x27;function&#x27;) FlConnect.mount(connect);
+     The garden veil does the same when Settings opens (garden-rooms.js ~1716, FlConnect.mount(connectHost)).
+  b) fl-connect.js mount(el) ends with lookAgain(), which resets the loop and calls
+     refreshUI({ force: true }) -&gt; probe({ gesture: true }).
+  c) probe(): no saved port, so the first tick does the full Bridge scan:
+       bridgeCandidates({ fullScan: true }) = 11435, 11436 ... 11445   (11 ports, /bridge/health)
+       then tagsAt(&#x27;http://127.0.0.1:11434&#x27;)                           (1 port, /api/tags)
+     = the 12 ports. (A saved fl_bridgePort outside that range would make it 13.)
+  d) After that, scheduleLoop() looks again at 8 s, then 16 s, then every 30 s for up to five
+     minutes (LOOP_MAX_MS). It does a full rescan on every third tick after a miss, and stops
+     once a local mind is remembered. On settings.html, panelVisible() never stops it, because
+     there is no #tab-connect element on that page.
+  e) The &quot;only when you ask&quot; words belong to local-mind-probe.js (the grandmother card). That
+     card really does look only after its tap. The look on load comes from the Connect door
+     above it. So the code is fine. The page just claims something that one of its two parts
+     doesn&#x27;t do.
+  f) FreeLattice has the same mismatch: the app.html look card (#fl-look-card, data-look=&quot;0&quot;)
+     says &quot;It only knocks on well-known local doors, and only when you ask.&quot; But FreeLattice
+     looks at boot today (flBridgeDetectBoot, owAutoDetect, autoDiscoverAI, Zero-Click), and
+     after the boot probe it still does exactly ONE look on open (FlColdStart.start() -&gt;
+     FlConnect.bootProbe({ fullScan: true })), plus Connect&#x27;s own loop while Connect is open.
+
+======================================================================
+2. THE CHOICE: THE WORDS MATCH THE BEHAVIOR
+======================================================================
+Why this way:
+  - The model-choice and boot fixes need a look at open. The boot probe&#x27;s whole point is one
+    shared look at open, so the person sees &quot;Ollama is ready, pick a mind&quot; (FreeLattice F1
+    voice; on the Tree, mount() becomes lookAgain({ reuse: true }) and joins that look). Making
+    Connect wait for a tap would undo F1/F2 and add a second &quot;May I look?&quot; button on Tree
+    Settings (cc-note-2026-09-06: &quot;the door is one door&quot;).
+  - Simpler for Mom: she opens Settings and sees what&#x27;s there. She still chooses with one tap.
+    The real line is &quot;nothing is chosen until you tap&quot;, and both repos keep it.
+  - It&#x27;s the smallest honest change: words only. fl-connect.js isn&#x27;t touched, so there&#x27;s no
+    byte-identical risk and no clash with the boot probe&#x27;s fl-connect hunks.
+  - The looks are local only: 127.0.0.1, Bridge health plus Ollama tags (and LM Studio after
+    the boot probe). Nothing goes over the network, no files are read, and nothing is uploaded.
+    So saying it plainly costs no trust.
+Not chosen (written down so review is quick): an askFirst option on FlConnect.mount(el, opts)
+that renders Connect quiet until Look again is tapped, used only by the Tree&#x27;s two callers. It
+would touch the exact line the boot probe rewrites (mount&#x27;s lookAgain({ reuse: true })) and both
+repos&#x27; shared file. If Kirk ever wants the Tree to be tap-only, that&#x27;s the path, as a separate
+v0.2.
+
+New words:
+  Tree card (PRIMARY_SOFT):  &quot;May I look? Tap to look again, any time. Same door.&quot;
+  Tree card (honesty line):  &quot;We only look at well-known doors on this computer. Opening Settings
+                              starts a short look (a few minutes at most), and Find local minds
+                              looks again when you tap. Nothing is chosen until you tap a mind.
+                              We never look through this computer&#x27;s files. We never upload.
+                              Quality of the sky is later.&quot;
+  FreeLattice look card:     &quot;FreeLattice can look for minds already living on this computer. It
+                              only knocks on this computer&#x27;s own well-known doors. It looks once
+                              when FreeLattice opens, while Connect is open, and whenever you ask.
+                              Nothing is chosen until you tap a mind.&quot;
+  Tree code-settings.html:   a Newer note under &quot;Nothing looks, chooses, or persists until that
+                              tap&quot;, keeping the old words above it.
+Not changed: the Gathering&#x27;s &quot;Find local minds&quot; aria-label (&quot;May I look — only when you ask&quot;)
+stays. That button really does look only on tap, and the Gathering never mounts Connect.
+
+======================================================================
+3. ANCHORS AND OVERLAP (checked)
+======================================================================
+FreeLattice docs/app.html (and index.html): one line inside #fl-look-card, data-look=&quot;0&quot; (main
+  ~16914). Nearest boot probe hunk: @@ -16507 (CSS block, about 400 lines above). The reload heal
+  doesn&#x27;t touch it (its nearest hunk is 27741). I checked it: this diff applies with plain
+  git apply on FL main 833ed398 + reload heal v0.1.1 diff + boot probe fl-app.html.diff.
+Alpha docs/modules/local-mind-probe.js: three spots.
+  - Header comment under &quot;// Probe ONLY after the human taps.&quot; (line 6).
+  - PRIMARY_SOFT (line 26). The Tree any-model paste adds lines after &quot;var ROSTER_CAP = 4;&quot;
+    (line 31). Those lines sit outside this hunk&#x27;s 3-line context, so it applies with an offset.
+    If a hunk is rejected anyway, edit by text: the PRIMARY_SOFT line is unique.
+  - The settings-honesty line (~825). The boot probe&#x27;s local-mind-probe hunks are at 235 and
+    275/299 (askDoor, look()), and the Tree paste&#x27;s tryAddress block is at 877-883. Neither
+    shares context with this hunk.
+  I checked it: this diff applies on Alpha main 25e6ded, and again after the boot probe&#x27;s
+  alpha-local-mind-probe.diff.
+fl-connect.js: no overlap. Nothing here changes it. The reload heal&#x27;s one Look again and the boot
+  probe&#x27;s mount() / refreshUI / bootProbe hunks land untouched.
+The new Alpha test asserts that the behavior the words describe is still true (settings.html
+  mounts Connect, and mount() calls lookAgain). Its regex /function mount\(el\)[\s\S]{0,400}lookAgain\(/
+  matches both today&#x27;s mount and the boot probe&#x27;s lookAgain({ reuse: true }). I tested it
+  against connect-boot-probe-v0.1-reference/fl-connect.js.after-tree-and-boot-probe. If a later
+  change makes Connect wait for a tap, this test fails on purpose, so the words get revisited.
+
+======================================================================
+4. STEPS
+======================================================================
+FreeLattice (~/FreeLattice), branch layer/heal-scan-words-honest-v0.1 from main after the boot probe:
+  git apply FL diff (section 6)       # or edit the one line by text, then: cp docs/app.html index.html
+  cmp index.html docs/app.html
+  node docs/scripts/smoke-scan-words-honest.js        # SMOKE_OK scan words honest v0.1
+  full smoke suite: same failures as main only
+theLatticeTree (~/FreeLattice-Alpha), branch layer/heal-scan-words-honest-v0.1:
+  git apply Alpha diff (section 7)
+  node docs/modules/scan-words-honest.test.js         # SMOKE_OK scan words honest alpha v0.1
+  for t in docs/modules/*.test.js; do node $t; done   # all green (17 of 17 in my run)
+  cmp docs/modules/fl-connect.js ../FreeLattice/docs/modules/fl-connect.js &amp;&amp; echo SHARED_OK
+Walk: open thelatticetree.com/settings.html at 390 and 1280. The look still happens (that&#x27;s
+  fine). The card now says it plainly. Tap Find local minds: it looks again. On freelattice.com,
+  Settings &gt; Connect a mind at home shows the new look-card line.
+
+PR body (both repos):
+  Words now match what the code does. Settings opens Connect, and Connect looks at this
+  computer&#x27;s own doors when it opens (12 local ports, then every 8 to 30 seconds for up to five
+  minutes, resting once a mind is remembered). The cards said &quot;only when you ask&quot;. Now they say
+  when the look happens, and that nothing is chosen until you tap a mind. fl-connect.js is
+  unchanged in both repos. The old words are kept as RETIRED comments. Marker
+  v-heal-scan-only-when-asked-v0.1.
+
+======================================================================
+5. PROTOTYPE RESULTS (box, 2026-09-30)
+======================================================================
+FreeLattice on 833ed398 + this diff: new smoke OK. Full suite: 67 pass. The failures are exactly
+  main&#x27;s known set: carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine,
+  proof-60s, tests/smoke-history, desktop reseed and swarm. Inline scripts in app.html parse.
+  index == app.
+Alpha on 25e6ded + this diff: 17 of 17 module tests pass (16 existing + the new one).
+  gathering-calm and local-mind-probe tests still see &quot;May I look?&quot; in PRIMARY_SOFT.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

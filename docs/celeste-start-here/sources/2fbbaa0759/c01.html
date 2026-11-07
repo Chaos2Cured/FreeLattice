@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>055a-chat-bottom-clarity-rev2.txt c01</title>
+<meta name="description" content="Reading section c01 of 2fbbaa0759, 1325 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2fbbaa0759/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="055a-chat-bottom-clarity-rev2.txt c01">
+<meta property="og:description" content="Reading section c01 of 2fbbaa0759, 1325 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2fbbaa0759/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p935"></span><span id="p936"></span><span id="p939"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>055a-chat-bottom-clarity-rev2.txt · c01</h1>
+<p>2fbbaa0759 · words 1325 · characters 0–9094</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 935, 936, 939. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 055a rev2 (Thu Oct 29, 2026, ~2:35 PM MDT). Chat bottom bar clarity v0.1, two
+small parts in one brick:
+  Part A: the area under the chat gets ONE &quot;+&quot; button that unfolds into a labeled menu holding
+    every add-on (Google Drive first), plain words everywhere, house-style small pills in place
+    of the gray bulky buttons, steady Fibonacci spacing. Nothing is removed. Send stays the
+    biggest thing there.
+  Part B: a return path. When the mind makes a document, it appears in chat as a clickable file
+    card the person can save on this computer (PDF / MD / TXT via Blob). &quot;Save to my Drive&quot; is
+    offered only with an explicit Yes each time (AUTONOMY P2). FreeLattice
+primary. Tree: report yes/no + why (Alpha has no matching chat composer shell; expect No).
+New branches, new PRs. WAIT FOR 055b GO before you cut - tip SHAs live only in 055b.
+Settings-as-chat soft porch moves to 056 (its own brick). Rev2 supersedes rev1 (md5 0a189c57).
+
+WHY (intent, read this first):
+  Kirk (Thu Oct 29): &quot;The bottom of chat looks messy, and I don&#x27;t know what the notebook or
+  spiral are.&quot; If Kirk cannot name a button, Mom cannot. Today the composer row starts with
+  three bare emoji at 45% opacity with no visible words and no aria-label:
+    paperclip  #chatAttachBtn     flAttachFile()       title &quot;Attach a file or image&quot;
+    folder     #chatScanFolderBtn flScanFolder()       title &quot;Scan a folder - load files into context&quot;
+    laptop     #chatDriveBtn      flOpenDrivePicker()  title &quot;Browse Google Drive&quot;
+      (the laptop glyph reads as a &quot;notebook&quot; and is really Google Drive; the faint paperclip
+       reads as a &quot;spiral&quot;)
+  Below the row the person also meets, stacked with uneven sizes and two type faces:
+    &quot;Search on&quot; + &quot;Search is on&quot; (chat-autonomy), &quot;Feel&quot; pill, &quot;Let your mind shape light?
+    Yes / Not now&quot; (clay), &quot;Market&quot; pill, &quot;Clay&quot; pill, &quot;Just me&quot; (pool-honest), &quot;Version.
+    Get the newest&quot; (chat-scroll-release), Box field (flBoxPointer), &quot;...&quot; More (mic + image),
+    Connect pill, plus fixed corner buttons: Radio (sparkle, bottom-left), Quick Help (?),
+    Ambient music (note).
+  Kirk (Thu Oct 29, rev2): &quot;The one that links to Google Drive is meant for people to upload
+  documents to the AI in the chat. Very important. I also want the AI to be able to use this to
+  pass back documents. In ChatGPT the deep research creates a pdf and you can just click on it.
+  All of the features that other AI companies have should be here too. They often use a +
+  button that unfolds into a menu. But I also want to keep the graphics consistent. The gray
+  buttons are a bit bulky.&quot; Answer: restyle the gray buttons, never remove their jobs.
+  At 390 the three icons + Just me take the first row and the textarea and Send wrap under
+  the mobile tab bar (see /workspace/research/chat-bottom-audit-2026-10-29/chat-bottom-390.png
+  on Celeste&#x27;s box; reproduce on your own headless run). Fix the clarity, not the features.
+  Layer, never delete.
+
+Where things stand (Celeste, Thu Oct 29 ~2:00 PM MDT; tips confirmed in 055b):
+  054 Ledger shard export MERGED after Hypha PASS:
+    FreeLattice  #295 -&gt; 6a77a1e8 (squash) · page 88 #296 -&gt; ac0f7c84 tip psi 58016bd5
+    (entry 87 stays psi 1b91a5e9). Tree: No for 054.
+  Orientation pins read live on FL main 9eca02e4 (re-read on the tip 055b names):
+    fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (twin; KEEP byte-identical)
+    ledger-shard-export.js 75e7e548919617993e048a3fe61cd965 (leave)
+    ai-continuity.js 079c072dc882ad189035f9d6c64489f4 (leave)
+    continuity-doorway.js 115e170f10a6c8e3a52d87d2037a33a6 (leave)
+    lattice-export.js 1da1ed29674b89a2fda7f6098deea2d0 (leave)
+    sw.js 91726cf2228b794f7585f79f61418d12 (leave)
+    chat-autonomy.js c83cf6c9f11271aeaa35ed6070f188f3 (prefer leave; Search on stays visible)
+    pool-honest-label.js ca08886e185ffb8721525bb627302d74 (prefer leave)
+    clay-corner.js f8136ec9ef6ed2ffb0f1d36d51f6190c (prefer leave)
+    chat-scroll-release.js 84fed10c603c9e89e9452ada564c8c65 (prefer leave)
+    docs/app.html == index.html (md5 ccebfd6187dd326e88112b3d7f636887 on 9eca02e4)
+  Branches: FL layer/chat-bottom-clarity-v0.1. Alpha only if a matching shell exists (expect No).
+  Page: next free GC entry after 88 (take 89 if free; if taken, next free and say so).
+  Do not merge. Celeste merges after Hypha walks.
+
+DESIGN SOURCE (read before styling; cite in PR):
+  docs/library/VISUAL_BEAUTY_CARD_ICONS_v0.vision.md (style bar: soft object, one Garden breath
+    ~1.06 scale + gold opacity tide, palette Foxfire night / Kirk gold / celestial azure,
+    emoji kept as fallback, replace in place, never reshuffle).
+  :root tokens in docs/app.html (Garden Twilight): --bg-card #1a1830, --bg-input #12101e,
+    --border #2a2840, --border-focus / --accent #e8b019, --accent-soft, --accent-glow,
+    --text-primary #e6ebf5, --text-secondary #a0a5b8, --text-muted #6b7088, --success #34d399,
+    --radius 13px, --radius-sm 8px, --shadow, --font (Inter stack), --font-sm 14px,
+    Fibonacci spacing --space-xs 5 / sm 8 / md 13 / lg 21, transitions --transition 200ms /
+    --transition-md 324ms. Use the variables, not new hex values.
+
+CELESTE PINS before cut (2026-10-29, rev2):
+  1. Every control under the chat has a visible plain word OR a visible label on hover/focus
+     AND an aria-label. No bare emoji buttons. Opacity of tool buttons not below 0.75.
+  2. ONE &quot;+&quot; button (round, 44px, gold ring, aria-label &quot;Add: Drive, files, photo, voice,
+     picture, search&quot;) unfolds a labeled menu. Google Drive is FIRST and visually the lead
+     item. Every add-on other chat apps offer that FreeLattice already has lives here with
+     icon + word. Same handlers as today. Old ids stay in the DOM so every hook keeps working.
+  2b. Part B return file card is small and local-first (section 1F). If it grows past one
+     small module + a tiny hook, STOP, ship Part A, and report Part B as a 055c ask.
+  3. Send stays prominent and unchanged in size: 102x52 at 1280, 95x50 at 390, 102x52 at
+     640x400 DPR2 (Hypha 054 numbers; a pixel or two of rounding is fine). Textarea + Send
+     are always on screen at 390, never under the mobile tab bar.
+  4. Search on stays visible in chat (AUTONOMY). Top debug / status strip stays.
+  5. Prefer a small new module + small CSS (e.g. docs/modules/chat-bottom-clarity.js and
+     docs/css or inline style block) plus tiny add-only hooks in app.html/index.html.
+     Locks above untouched.
+
+GROK NEXT BRICK: Chat bottom bar clarity v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Markers: v-chat-bottom-clarity-v0.1, v-chat-doc-return-v0.1
+Smoke lines: SMOKE_OK chat bottom clarity v0.1 (new). Every earlier smoke still passes:
+  ledger shard export v0.1, continuity doorway v0.1, soft polish 052 v0.1, chat autonomy
+  v0.1, tree love connect v0.1, gathering shared v0.1, gathering speak checker v0.1.
+  Do not merge. Celeste merges after Hypha walks.
+
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every moved line
+    in the report and say where its job went (moved into tray / regrouped / relabeled).
+  sw.js and docs/sw.js untouched. fl-connect.js byte-identical on FL and Alpha (aaff2bf1).
+  ai-continuity.js, continuity-doorway.js, lattice-export.js, ledger-shard-export.js untouched.
+  chat-autonomy.js, pool-honest-label.js, clay-corner.js, chat-scroll-release.js,
+    particle-clay.js: prefer untouched; tiny add-only hook only if truly required; report md5.
+  index.html == docs/app.html on FreeLattice (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched. Root package.json and lock untouched.
+    Do not touch .github/.
+  No em dash, no &amp;mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored, no icon font, no remote icon set. If you draw icons,
+    use small inline SVG strokes in the same style as the existing mic / image SVGs (24 box,
+    stroke 2, round caps). MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is &quot;challenge&quot;, never &quot;test&quot;, in anything a person reads.
+  Every button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five. She is simply Lyra.
+  Top chat debug / status strip stays for Kirk&#x27;s debugging (do not remove or hide).
+  Search on stays visible in chat. Pause always wins. Reduced motion respected (tray opens
+    without slide when prefers-reduced-motion).
+
+
+1. BEHAVIOR (person-facing) - Chat bottom bar clarity
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

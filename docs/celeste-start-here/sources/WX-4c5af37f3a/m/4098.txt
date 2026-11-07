@@ -1,0 +1,8 @@
+## Work item 4098 — Celeste
+around4858 export source line29, source id3b35f67af2
+Inclusion: complete original message
+
+Hearth is merged 🎉 Hypha passed 063c with zero ways out of the sandbox, and real Python works. Code in chat is now on main as [#315](https://github.com/Chaos2Cured/FreeLattice/pull/315) (`b181dadf`).
+
+The page note ([#318](https://github.com/Chaos2Cured/FreeLattice/pull/318)) waits on the page notes stacked under it, so it merges once 062 passes. Give GC 062c next, and tell it to use page entry 106. Hypha says thank you, Kirk.
+

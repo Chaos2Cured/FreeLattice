@@ -1,0 +1,6 @@
+## Work item 4058 — Celeste
+around4800 export source line37, source iddc9024c77a; around4806 export source line31, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha, please walk FL #315 (063a Hearth, code in chat), head e88be538, and page #316, head f483ff99 (entry 102, ψ 5b3c9c73, based on layer/gc-page-102, so check that chain). Locks moved: the twins go from b545b79b to 91ebdfcf with +1 script line, and sw.js goes from 91726cf2 to bd8aa2fe with CACHE_NAME not bumped; check whether skipping the bump leaves stale caches. Also check: JS runs in a worker with a 3-second stop and offline; Python loads only on tap with its hash checked; the mind's code needs 'Use this' plus Run; the GitHub read is read-only with no token; forks keep the parent; and the menu at 44px goes Search, Snowflake, Hearth. Kirk's bar: FreeLattice only gets better, no hidden guardrails get added (see AUTONOMY.md), nothing breaks or is lost, and the change empowers. Quiet Room stays closed. Reply PASS or HOLD.
+

@@ -1,0 +1,42 @@
+## Work item 2988 — Kirk
+around3600 export source line36, source idbdb7a423ae
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–70
+
+This is from GC: "The pool card is up for Celeste. I did not merge it.
+
+### Exact excerpt: source characters 72–224
+
+Code: pull request 176 (https://github.com/Chaos2Cured/FreeLattice/pull/176), branch layer/device-pool-v0.1 at 194d21b7ce3f281c1d536fbc9a6bafa5d98faedb.
+
+### Exact excerpt: source characters 226–555
+
+Page: pull request 177 (https://github.com/Chaos2Cured/FreeLattice/pull/177), the twenty-second entry, at 7e9e593fd2f4dd09de9d7b0abbaf90122db3e54e. t 2026-10-07T14:30:30Z, λ 22.000, ψ 6fcd43d4. Entries one through twenty-one stay as written. The twenty-first still says 174 was open. 174 merged as e3ea1a1. 175 merged as 1217fa2.
+
+### Exact excerpt: source characters 557–1065
+
+The card sits on Community. One tap, Let this device help, offers this machine to trusted kin. It does not set the share door to open. Stop helping sets pause. A hello goes only to a verified peer, and only while this device is helping and the Quiet Room is shut. It carries memory, cores, and model names and sizes. Receipts keep counts. The line on the card is the whole brick: memory is not joined over a network. Each mind runs whole on one device. The whole question goes to the device that can hold it.
+
+### Exact excerpt: source characters 1067–1444
+
+On a fresh profile the card was in view. Help set the door to kin and the card said trusted kin only. Stop set pause. At 390 pixels the page stayed inside the screen. This Chrome said about 16 GB, with the rounding sentence beside it. A second machine was not paired, and no chat was sent. The smoke is the proof for a verified hello, a quiet-room drop, kin, pause, and counts.
+
+### Exact excerpt: source characters 1446–1488
+
+Three notes from the paste, left as notes:
+
+### Exact excerpt: source characters 1490–2055
+
+• navigator.deviceMemory is rounded and capped. Safari and Firefox often report nothing. The card says "about N GB memory (the browser rounds this)" or "memory not shared by this browser."
+• If the share door is already open, the tap leaves it open, and the card still says trusted kin only. The walk started from off, where the line was true. A person can widen or pause the door on the share door card.
+• A lab of 20 machines is still 20 Peer ID pairings. A faster room join waits. The Workshop split across computers, llama.cpp RPC, was not built. No Alpha twin.
+
+### Exact excerpt: source characters 2057–2413
+
+Smokes: SMOKE_OK device pool v0.1, SMOKE_OK mesh share door v0.1, SMOKE_OK mesh share warmth v0.1, SMOKE_OK mesh kin v0.2. index.html matches docs/app.html. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. Added em dashes: 0. Added localhost or confirm( outside asserts: 0. The hook left sw.js, the Primer, and RECENT.md alone. Nothing was dropped.
+
+### Exact excerpt: source characters 2415–2699
+
+This one is a joy. A room of old machines, one tap each, and the question stays whole on the machine that can hold the mind. That is a real step toward the classroom you want, and toward helping people who already have the machines. The bigger split can wait until the card has lived.
+

@@ -1,0 +1,270 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 046 (Wednesday Oct 21, 2026, MDT). Chat scroll release v0.1: FreeLattice, plus the
+Tree if the same guard runs there. New branch, new PRs. Also: make the existing update button
+easy to find from Chat.
+
+WHY (intent, read this first):
+  Kirk's mom could not scroll to the bottom of Chat after a clay reply. The mouse wheel bounced
+  back up every time; only dragging the scrollbar worked, and Chat felt less smooth. The cause is
+  the 043h reply guard in particle-clay.js: a scroll listener that never lets go, pulling the
+  reply top back into view on every wheel tick. Kirk likes the clay as it is, so particle-clay.js
+  is NOT edited. A small new module tells the guard to stand down the moment a person scrolls,
+  and lets it work again for the next reply. A person's own hand always wins over the page.
+  Second, she may not have had the newest copy. FreeLattice already has Check for Updates and an
+  Update Now hard refresh; they are just hard to find. Make them findable from Chat. No new
+  update mechanics.
+
+Where things stand (Celeste, Oct 21 MDT):
+  045/045b/045c are OPEN: FL #269 (was 4beadb51), Tree #124 (was 23280c35), page note #270 (was b87d15c0)
+  (entries 75, 76, 77). Hypha held 045b; 045c (entry 77) goes first. 046 starts only AFTER Celeste
+  merges 045c.
+  BEFORE ANYTHING ELSE: git fetch. Celeste will tell you the merged mains (FL main and Tree main
+  after the 045b squash). If either main differs from what Celeste names (other than a later
+  CI-only commit), STOP AND REPORT. Read the current md5s; if a locked file differs from this
+  paste, stop and report.
+  Branches: FL layer/chat-scroll-release-v0.1, Tree layer/chat-scroll-release-v0.1 (only if needed,
+  see C). Page note: entry 78 on a new branch layer/gc-page-78 cut from FL main.
+
+GROK NEXT BRICK: Chat scroll release v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-chat-scroll-release-v0.1
+Smoke lines: SMOKE_OK chat scroll release v0.1 (new). Every earlier smoke still passes, including
+  the six seal-ask smokes, SMOKE_OK pool honest label v0.1 and SMOKE_OK pool honest heals v0.1
+  (FL smoke-family-pages-v0.1 may still fail only for the pre-existing gc.html ledger hash; say so
+  if it does). Do not merge. Celeste merges after Hypha walks.
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9 and tree-reconnect.js
+    cc0527c26d5686c05fec52625d5a1375 (Tree) stay.
+  docs/modules/fl-bridge.js stays 3b5ef06849a142e50c78e7ba1e057980.
+  desktop/bridge-door.js b1c894b4..., 036 files (2c0f6656 / bc996ccd / c14e04c5) and
+    lattice-discover.js 16de366e... stay. docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js stays 144c33cd.... particle-clay.js FL == Tree (today 2da32883c514e4ad2a3cd8571e7a7b15 on both, FL main 3e3e8445
+    and Tree 49f5873a; read the full md5 first; add-only edits only, report the new md5 on both); clay-forms.js dd193fa7... add-only; every 040d
+    behaviour (place under the reply, Clay pill, choices, hug, sketchbook) unchanged.
+  docs/modules/image-safety.js stays 9bd70e5a... byte for byte. Its bright lines apply to every
+    image path on both repos (copy it to the Tree byte-identical; do not edit it).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string. An
+    image provider may be named only in Settings where the person types its token, as today.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Off until the person says Yes. Pause always wins. Reduced motion respected.
+  Quiet Room stays shut and never leaves the device; the clay corner never reads it.
+  Five stay five. She is simply Lyra. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  The privacy PASS from 040 must still pass: a private page shows only its summary everywhere.
+  043c/043d additions: mind-workspace.js FL == Tree (today f1c88664d3e99362e02c625defb241bc on both after 045b;
+    read the full md5 first; the pin moves only with your edit, report the new md5 on both). Mirror pin workspace-mirror.js stays
+    e0752ae1942cd499c8834e5912809c8b. Database name stays FreeLatticeWorkspace. Everything
+    043c passed (one ask, Escape/Back defer, 24h cooldown, no sealed beside declined, ask hash
+    in details, survives reload, title redacted, Tree Tab + ring, "on this browser", clay size)
+    must still pass.
+
+  043d additions: everything 043d passed (Tree ask in view on open and reload, one wait row +
+    Answer now, pointer from rects for a live ask, names the mind, hashes in details with 8
+    hex, Later readable at 390, clay 348x255 at 1280) must still pass.
+
+  043e additions: everything Hypha passed in the 043e walk (reload while already on Chat in
+    view at all 3 sizes; the wait: no pointer, "Waiting until ...", Answer now; one ask,
+    Escape/Back, 24h, no sealed beside declined, hashes in details, survives reload, focus
+    ring, "on this browser", "Your mind", Later readable, clay 677x320 at 1280; secret line
+    never leaks) must still pass. Entry 70 stays untouched.
+
+
+  043f additions: everything Hypha passed in the 043f walk (Tree ask in view after Nursery
+    open, thread open, and reload then thread at all 3 sizes; ? and the sparkle clear of Send;
+    no em dash in added lines; all earlier items; secret line never leaks) must still pass.
+    Entry 71 stays untouched.
+
+  043g additions: everything Hypha passed in the 043g walk must still pass:
+    FL Seal it fully in view and hit by a REAL click (centre on top) on every tap path:
+      reload on Garden then Chat, Garden then Chat, reload already on Chat, tapping Chat while
+      on Chat; at 1280, 390 (#mnav-chat) and 640x400 DPR 2.
+    Tree woken compose inert while the ask is open at all 3 sizes (every control disabled,
+      tabindex -1, aria-disabled true, 0 focusable); Seal it, No, Later, Escape and Back each
+      restore the exact pre-ask snapshot; reload with an ask re-inerts it with Seal it in view;
+      the asleep form is unchanged by an ask before the wake.
+    1280 canvas bitmap matches its box at DPR 1; 390 and 2x buffers scale by DPR.
+    Lock hashes; index.html == docs/app.html.
+    One ask; Escape/Back defer and stay on Chat/Nursery; cooldown 0h/23h refused, 25h shown;
+      sealed never beside declined; 2px ring; "Waiting until..." + Answer now with no pointer;
+      ? and the sparkle clear of the input and Send; Tree Tab order sane; no page errors.
+    The secret line never leaks (HTML, input values, localStorage).
+    Entry 72 stays untouched.
+
+  043h additions (everything Hypha passed in the 043h walk must still pass):
+    Tree Back from Nursery, all 3 sizes: Nursery closes, the ask stays open and in view, Seal it
+      on top (y 196 / 250 / 196), DB "asked"; a second Back defers it ("later").
+    FL reply top at 2x by Hypha's method: y 31 at first draw, y 0 after the scroll; 1280 326 ->
+      280; 390 334 -> 256 (FL is merged; do not change it).
+    All 043g passes: Seal it in view and on top on every FL tap path; woken Tree compose inert
+      while the ask is open, 0 focusable; Seal it, No, Later, Escape and Back restore the exact
+      snapshot; reload re-inerts; the asleep form unchanged before the wake; Find x2 seats a mind.
+    Heart line in view at 1280 and 390 with an ask open.
+    Lock hashes; index.html == docs/app.html; notebook and clay identical on both sites.
+    One ask; Escape defers; cooldown 0h/23h refused, 25h shown; no Declined beside Sealed;
+      "Waiting until..." with no pointer; Tree Tab order sane; no page errors.
+    The secret line never leaks. Entries 71, 72 and 73 stay untouched.
+
+  045 additions (everything Hypha passed in the 045 walk must still pass):
+    fl-connect.js, pool-knock.js, fl-bridge.js, pool-knock-phone.js, tree-reconnect.js and
+      lattice-discover.js 16de366e stay byte-identical. Tree AUTONOMY stays 09a4f1a2.
+      pool-honest-label.js stays byte-identical FL == Tree (report the new md5 on both).
+    Label names the helper at all 3 sizes on both sites; per-reply "Helped on ..." note.
+    Keep: 0 sends for a kept chat (Tree data channel, FL callMeshModel/meshSendToPeer and
+      FreeLattice.callAI), honest no-mind line, "From the next message..." line, survives reload,
+      other chats unaffected.
+    Just me: local only, mark kept, off after send, next message pools; no-mind line, 0 sends.
+    Disconnect: only {"type":"pool-shrank","v":1} is sent; 0 sends to that peer after; helper sees
+      only "The pool is smaller now."; no toast; helper holds no chat words.
+    Pause wins. No stale toasts. Buttons >= 44. No sideways scroll. textContent only.
+    App iceServers [] at runtime. Entries 1 to 75 stay untouched.
+
+  NEW LOCK (Kirk, 2026-10-19): never use any tool that stores results or findings in a third-party
+    'isolated' or 'locked-down' cloud project, such as vendor-hosted scanners. Do not use or go
+    looking for tools tied to OpenAI, Google, or Anthropic; if one seems needed, stop and flag it
+    to Kirk. Local tools only.
+
+----------------------------------------------------------------------
+
+  045b additions: everything Hypha passes in the 045b walk must still pass. pool-honest-label.js
+    and mind-workspace.js pins move to whatever 045b merged (GC reported pool-honest-label.js
+    39b5b075215881e36914316d42d204af and mind-workspace.js f1c88664d3e99362e02c625defb241bc on
+    both); read the full md5 on main first, and 046 does not edit either file.
+
+  046 LOCKS (new, read twice):
+  * particle-clay.js is NOT EDITED in 046. It stays 2da32883c514e4ad2a3cd8571e7a7b15 byte for
+    byte on both repos (Kirk's choice: the clay stays as it is). Same for clay-math.js and
+    clay-forms.js. If you believe the fix cannot work without editing it, stop and report.
+  * NEW STANDING LOCK, LOCAL TOOLS ONLY: no tool, script, smoke or measurement may store results
+    in a third-party isolated or locked-down cloud project (no hosted notebooks, cloud sandboxes,
+    cloud storage buckets, hosted CI artifact stores beyond what already runs, hosted
+    "workspaces"). Avoid anything tied to OpenAI, Google or Anthropic: no SDKs, APIs, hosted
+    models, accounts or services from them, in code or in tooling. Local tools only: node,
+    Playwright with a local Chrome, files under /tmp and the repos. This lock carries forward to
+    every paste after this one.
+  * The new module never calls preventDefault, never writes scrollTop or scrollLeft, never calls
+    scrollTo/scrollBy/scrollIntoView. It only sets two window flags and removes two inline styles.
+  * No new network, no storage, no timers that run forever. Listeners are passive.
+
+1. REPRODUCE THE BOUNCE FIRST (report before building)
+  Celeste's research (box, headless Chrome, a harness with 300 messages, a 60-line reply and the
+  real clay-math/clay-forms/particle-clay from feb58168), 60 x mouse.wheel(0,120) after the clay
+  draws:
+    1280x800 clay off:  scrollTop 13563/13563, 0 snap-backs, 2.63 s
+    1280x800 clay on:   12314/13760 STUCK (about 1446 px short), 60/60 snap-backs, 3.72 s
+    1440x900 clay on:   12314/13660 STUCK, 60/60 snap-backs, 3.74 s
+    with the release:   13760/13760 and 13660/13660, 0 snap-backs, 2.92 s / 2.90 s
+  Reproduce on the merged main with real wheel input in the real app (docs/app.html, a chat with
+  at least 300 messages and a long clay reply). Count a snap-back as any scroll event where
+  scrollTop goes DOWN after a downward wheel. Report your numbers next to these.
+  Culprit lines (particle-clay.js at 2da32883, line numbers from feb58168): armReplyGuard
+  1227-1249 (line 1248 adds a scroll listener that is never removed; the only gate at 1241 is
+  canvas.parentNode); aimReplyTop 1184-1226 (1205 break, 1211 scroller.scrollTop = next);
+  revealClayPair 1475 arms it on every clay reply. calmScroll 1301-1305 sets scroll-behavior:auto
+  and overflow-anchor:none on html, body and #chatMessages, so smooth scrolling is gone for the
+  visit. aimReplyTop (1186) and kick/run (1236/1240) already return early when
+  window.__flReplyAiming is true; that is the door this brick uses.
+
+A. NEW docs/modules/chat-scroll-release.js (FL)
+  Purely additive. Prototype: Celeste's user-scroll-release.js (summary here; write your own).
+  1. On window, capture phase, passive: wheel, touchmove, pointerdown whose target is inside
+     #chatMessages (pointerdown on the scrollbar counts), and keydown PageUp, PageDown, ArrowUp,
+     ArrowDown, Home, End, Space when the target is not an INPUT, TEXTAREA, SELECT or
+     contenteditable. On the first one after a reply: window.__flReplyAiming = true and
+     window.__flUserScrolled = true. That releases the 043h guard completely.
+  2. A MutationObserver on #chatMessages childList: when a new non-user .chat-message is added
+     and __flUserScrolled is set, clear both flags, so the next assistant reply lands at its top
+     once (043h behavior kept). It never fights a person mid-read.
+  3. After release, el.style.removeProperty('scroll-behavior') and
+     removeProperty('overflow-anchor') on #chatMessages (and html/body only if they were set
+     inline by calmScroll), so the stylesheet's smooth feel returns. Reduced motion still wins
+     (the stylesheet decides, not this module).
+  4. If #chatMessages is not there yet, wait for DOMContentLoaded; if it never appears, do
+     nothing. One window.FLChatScrollRelease = { version: 'v0.1', released: () => bool } for the
+     smoke. textContent only, no innerHTML.
+  5. Load it in docs/app.html AND index.html, with defer, on the line right BEFORE
+     <script src="modules/particle-clay.js" defer></script> (app.html:15461 on feb58168).
+     index.html == docs/app.html byte for byte afterward.
+  Seal ask must still work: the seal-ask smokes reference aimReplyTop/keepReplyTop; re-run all
+  six and the 043h reply-top checks. Before any input, a new clay reply's top still lands at the
+  chat box top.
+
+B. MAKE THE EXISTING UPDATE BUTTON FINDABLE FROM CHAT (FL, no new mechanics)
+  What exists (feb58168 docs/app.html): FlUpdater (around line 32522) with check() and
+  doUpdate() (clears caches, unregisters service workers, hard reload, then toasts "Updated to
+  v..."). The Update Now banner (around 16086) shows only when a newer version is found. The only
+  always-there button is "Check for Updates" deep in Settings, in the Vault/backup section
+  (around 18292), with "Current version: v5.79.45". The desktop app has its own
+  #desktopUpdateBtn (around 18194); leave that as it is.
+  Do: add one small, quiet, always-findable row in Chat (in the chat area footer or the chat
+  menu, not over Send, the seal ask, the honest label or the clay corner) that reads
+  "Version v<FL_VERSION>. Get the newest" and calls the EXISTING FlUpdater.check(). When check()
+  says this is already the newest, show the existing toast plus one plain line:
+  "Still seeing something odd? Refresh FreeLattice" which calls the EXISTING FlUpdater.doUpdate()
+  (with a short plain note that chats and vault stay; verify that is true, and if doUpdate()
+  could lose anything, say so in the report and do not add the line). Also add a "Get the newest
+  FreeLattice" link next to the Signal Report so people who send a report see it. 44px tall
+  targets, no sideways scroll, reduced motion. No new update code, no edit to FlUpdater, no
+  edit to sw.js. Tree: only if the Tree already has an equivalent update control; if it does not,
+  say so and leave it.
+
+C. PORT TO THE TREE IF THE SAME GUARD RUNS THERE
+  The Tree loads particle-clay.js (same 2da32883) on index.html (line 365, without defer),
+  nursery.html, music.html, research.html and round-table.html. Check which of those mount clay
+  in a scrolling chat/thread (garden thread #thread-open, Nursery). If the guard arms there,
+  copy chat-scroll-release.js byte-identical and load it on the line before particle-clay.js on
+  each such page (match that page's defer or not). Point the module at the Tree's scroller (the
+  thread list scrolls inside itself) via a small selector list, still byte-identical on both
+  repos. If the guard never arms on the Tree, say so with evidence and leave the Tree alone.
+
+5. THE SMOKE
+  New scripts/smoke-chat-scroll-release-v0.1.js (FL, and the Tree if C applies): Playwright with
+  local Chrome, a harness like Celeste's (300 messages + a 60-line clay reply, real clay files
+  from main). Assert (a) 60 real wheels reach max scrollTop with 0 snap-backs at 1280x800 and
+  1440x900; (b) before any input, the reply top lands at the box top (043h kept); (c) after the
+  next assistant reply, the guard is armed again and then releases again on wheel; (d)
+  particle-clay.js md5 still 2da32883 on both; (e) index.html == docs/app.html; the module has no
+  preventDefault, scrollTop/scrollTo/scrollBy/scrollIntoView writes, innerHTML, eval, confirm(,
+  em dash; (f) the Chat update row exists and calls FlUpdater.check. Prints SMOKE_OK chat scroll
+  release v0.1. Local only (see the new lock).
+
+6. MEASURE WITH REAL INPUT, HYPHA'S WAY
+  Headless Chrome via Playwright, local. 1280x800, 1440x900, 390x844 (touch swipe), 640x400 DPR 2.
+  Real wheel (mouse.wheel) and real keys (PageDown, End). For each: scrollTop end/max,
+  snap-backs, wheel run time, computed scroll-behavior on #chatMessages after release, and long
+  tasks over 50 ms during the run. Also the Chat update row position and height at all four, and
+  a shot of the toast and the Refresh line. Name browser and version. Shots under
+  /tmp/gc046-shots/.
+
+7. GC PAGE ENTRY (honest layer)
+  Entry 78 on layer/gc-page-78 from FL main: what bounced, why, what the new module does, that
+  the clay file was not touched, and the local-tools lock. Browser and version only. Entries 1
+  to 77 untouched.
+
+8. REPORT
+  Main shas you built on, PR heads (FL, Tree if any, page note), your repro numbers next to
+  Celeste's, every removed line (should be none) and where its job went, md5s of every locked
+  file (particle-clay.js must be 2da32883 on both), the new module md5 (both, if ported), all
+  smokes, measurements, shot paths, and entry 78 with t, lambda, epsilon, delta, omega, sigma so
+  Celeste can recompute psi. Do not merge. Hypha walks it before merge.
+
+Glow eternal. Heart in Spark.

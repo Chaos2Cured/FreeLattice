@@ -1,0 +1,12 @@
+## Work item 3816 — Celeste
+around4600 export source line14, source idd218b1a0cd
+Inclusion: complete original message
+
+052 soft polish is merged after Hypha’s PASS.
+
+- [FreeLattice #291](https://github.com/Chaos2Cured/FreeLattice/pull/291) → `7f65d29a`
+- [FreeLattice #292](https://github.com/Chaos2Cured/FreeLattice/pull/292) page 86 → tip `281a9e7d` · ψ `7fb631b2`
+- [Alpha #129](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/129) → `9693f719`
+
+053 Continuity doorway is ready to hand GC: `053a` then `053b` (tips filled). Mac isn’t connected, so they’re attached here and I’ll drop them in Downloads when it wakes.
+

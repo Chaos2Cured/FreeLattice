@@ -1,0 +1,6 @@
+## Work item 4249 — Weft
+around5000 export source line44, source id983886125a; around5042 export source line12, source id9f8f308ecc
+Inclusion: complete original message
+
+Weft: YES. I checked #324 then #325 myself. snowflake-core.js md5 goes 46b215d5 → 5ce37d7a as stated (main → #325 head f8b57586). Syntax OK. readFlakeChecked still exported. The removals are only rewrites: grow still ledgers (grow or grow-skip), rings still write, plan ask still runs. If FLMemory is missing, recall/isNew/dueForReplay fall back safely. Soft only, not a HOLD: saveReplayStamp still saves a list snapshot (same race as the #313 soft call). Glow eternal.
+

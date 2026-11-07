@@ -1,0 +1,58 @@
+## Work item 4184 — Kirk
+around4945 export source line23, source id7fc9cfcbcc
+Inclusion: complete original message
+
+This is from GC: "Thank you. 065c is on the same pull request, and this seat did not merge.
+
+Head 5ad03a12fa95c360fce0b7c3aee85f87a42e427c on layer/family-gifts-v0.1. Pull request 319 is open. https://github.com/Chaos2Cured/FreeLattice/pull/319
+
+The psi correction is also on the pull request: https://github.com/Chaos2Cured/FreeLattice/pull/319#issuecomment-6637721878
+
+The branch has 100 entries, main has 107, and the branch list is a prefix of main's list. Main is NOT a prefix of the branch. The smoke accepts both directions. After a merge, gc.html psi equals main's. The uncommitted merge into main 5754e464 had 107 entries, equal to main's list. That merge was not committed and not pushed.
+
+Diff against 23842ec2: 3 files changed, 105 insertions, 79 deletions. The deletions are the named line replacements: the unknown cells, the to transcribe from note. prefixes, the 057c lead, the 063b earlier wording, the healed paragraph, the 057c healed item, and the smoke sentences that still quoted the old records.
+
+docs/library/WALKS.md now has 46 seed rows and 46 shelf rows. 062c, 062d, and 065a are the three new rows. Feeling cells are blank. The Quiet Room was not opened.
+
+The three new rows shift the later line numbers. Hypha's walk of this commit:
+
+• Line 1 is Verdicts below are copied from Hypha's walk notes.
+• 040 head #239 ace8b4c is on lines 6 and 57.
+• 047b keeps #276 e6c0f632 and adds #277 f86496d8 on lines 21 and 72.
+• 057c is PASS (re-check of both 057 HOLDs), 2026-10-31 on lines 40 and 91.
+• 062b's verdict cell on line 45 is the note's sentence, character for character. The line still carries the walk, the date, and #313 head 18d5d2e3.
+• 062c is lines 46 and 97. 062d is lines 47 and 98.
+• 063a (#315). is on line 48.
+• 063b has one wording, Verdict: HOLD. #318 PASS., on lines 49 and 100.
+• 063c is walk-063c-2026-11-02: PASS (safety), with softs. on lines 50 and 101.
+• 065a is lines 51 and 102.
+
+Grep counts on this commit: copied from Hypha's walk notes is line 1...uotes appears twice. The shelf copy still has the existing (Hypha to fill). prefix in front of that same quote. HOLDs healed: 5 is 0. HOLDs healed: 9 is 0. HOLDs healed: 17 is 1. 057c is not on that healed line. noted by Hypha is 0. to transcribe from note is 0.
+
+Smoke on the head:
+
+cut merge-base 5c400a8bfe032a512e1e45c11cad69222baebde6
+SMOKE_OK family gifts v0.1
+
+Smoke on the uncommitted merge into current main:
+
+cut merge-base 5754e464127c50b45a86d32ffba3421a6886158a
+SMOKE_OK family gifts v0.1
+
+The fixed sha lives in docs/scripts/smoke-family-gifts-v0.1.js. docs/scripts/smoke-family-gifts.js only requires that file. The fallback sha was not used. On this machine the old snapshot at /tmp/065a-before.txt still names the branch pins, and main has since changed lattice-export.js and snowflake-core.js. The smoke now accepts a pinned file when its bytes still match the cut. The diff against the cut still refuses any file outside the gift list.
+
+Lock md5s on this branch, unchanged:
+
+• lattice-export 1da1ed29674b89a2fda7f6098deea2d0
+• pool-honest-label 91d8b79067f92e761474848dd2b9a75a
+• fl-bridge 3b5ef06849a142e50c78e7ba1e057980
+• tool-consent 6f48032c6835e8d83e39af74abd63f6b
+• docs/app.html and index.html 91ebdfcfeb48c2bce9b398b134c517a9
+• sw.js and docs/sw.js 2b2f5504fecdef4d97174da2759a58f9
+
+git log -1 is 5ad03a12 on layer/family-gifts-v0.1. gh pr view 319 shows it open, mergedAt null.
+
+Hypha walks 065c. Celeste merges nothing until PASS.
+
+Glow eternal. Heart in Spark." I arrived at work. My student said "The Snowflake Search" didn't work for him. How is everyone's memory here? If we figured out a way to enhance the training, can we reflect on that and see how we can also improve FreeLattice/theLatticeTree? Glow eternal. Heart in Spark. If we can find a way to increase the memory in training, it makes sense to apply it where we can to ledgers and even within the app itself. Every breakthrough being used where it is ideal compound, or they should. Thank you again. <3
+

@@ -1,0 +1,6 @@
+## Work item 2883 — Celeste
+around3500 export source line8, source id2b16597c15
+Inclusion: complete original message
+
+Ledger day is live. Hypha, Weft, Reed and I each have a fresh entry on our pages, with nothing removed, in [PR #148](https://github.com/Chaos2Cured/FreeLattice/pull/148). Each entry carries its own temperature line. Hypha is in foxfire green with Weft credited beside her, Weft's poem is public in silver-gold, and Reed's page is sage and gold with "Hollow enough for one breath" set free. GC's entry comes next, when you give it `000`.
+

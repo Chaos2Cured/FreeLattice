@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c03</title>
+<meta name="description" content="Reading section c03 of f78bcc9b01, 1532 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c03">
+<meta property="og:description" content="Reading section c03 of f78bcc9b01, 1532 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1206"></span><span id="p1207"></span><span id="p1208"></span><span id="p1209"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c03</h1>
+<p>f78bcc9b01 · words 1532 · characters 23239–35488</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1206, 1207, 1208, 1209. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">// ── Project root and path lock ──
+var PROJECT_ROOT_REAL = null;
+function projectRootReal() {
+  if (!PROJECT_ROOT_REAL) {
+    var wanted = path.resolve(process.env.FL_PROJECT || process.cwd());
+    try { PROJECT_ROOT_REAL = fs.realpathSync(wanted); } catch (e) { PROJECT_ROOT_REAL = wanted; }
+  }
+  return PROJECT_ROOT_REAL;
+}
+
+## Exact source excerpt, characters 20818–21002
+
+function isInside(root, candidate) {
+  var rel = path.relative(root, candidate);
+  return rel === &#x27;&#x27; || (!(rel === &#x27;..&#x27; || rel.startsWith(&#x27;..&#x27; + path.sep)) &amp;&amp; !path.isAbsolute(rel));
+}
+
+## Exact source excerpt, characters 21004–22564
+
+const BRIDGE_FORBIDDEN_TOP = [&#x27;.git&#x27;, &#x27;.ssh&#x27;];
+function lockedPath(relPath, opts) {
+  opts = opts || {};
+  if (typeof relPath !== &#x27;string&#x27; || !relPath || relPath.length &gt; 1024 || hasControlChars(relPath)) {
+    return { error: 400, reason: &#x27;bad-path&#x27; };
+  }
+  if (path.isAbsolute(relPath) || /^[a-zA-Z]:/.test(relPath) || relPath.charAt(0) === &#x27;\\&#x27;) {
+    return { error: 403, reason: &#x27;absolute-path&#x27; };
+  }
+  var root = projectRootReal();
+  var full = path.resolve(root, relPath);
+  if (!isInside(root, full)) return { error: 403, reason: &#x27;outside-project&#x27; };
+  var rel = path.relative(root, full);
+  var top = rel.split(path.sep)[0];
+  if (!opts.allowRoot &amp;&amp; rel === &#x27;&#x27;) return { error: 400, reason: &#x27;root-not-allowed&#x27; };
+  if (BRIDGE_FORBIDDEN_TOP.indexOf(top) !== -1 || /^\.env(\.|$)/.test(path.basename(rel))) {
+    return { error: 403, reason: &#x27;forbidden-path&#x27; };
+  }
+  // Realpath the nearest existing ancestor (or the file itself) so a
+  // symlink inside the project cannot point writes outside it.
+  var probe = full;
+  for (;;) {
+    try { fs.lstatSync(probe); break; }
+    catch (e) {
+      if (e.code !== &#x27;ENOENT&#x27;) return { error: 403, reason: &#x27;stat-failed&#x27; };
+      var up = path.dirname(probe);
+      if (up === probe) return { error: 403, reason: &#x27;no-ancestor&#x27; };
+      probe = up;
+    }
+  }
+  var real;
+  try { real = fs.realpathSync(probe); } catch (e) { return { error: 403, reason: &#x27;dangling-symlink&#x27; }; }
+  if (!isInside(root, real)) return { error: 403, reason: &#x27;symlink-outside&#x27; };
+  return { full: full, rel: rel === &#x27;&#x27; ? &#x27;.&#x27; : rel };
+}
+
+## Exact source excerpt, characters 22566–22724
+
+function runGit(args) {
+  return execFileSync(&#x27;git&#x27;, args, { cwd: projectRootReal(), encoding: &#x27;utf8&#x27;, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;pipe&#x27;], timeout: 30000 });
+}
+
+## Exact source excerpt, characters 22726–23143
+
+function runSmokeFile(timeoutMs) {
+  // No shell: node binary + fixed script path. stdout and stderr joined.
+  var r = spawnSync(process.execPath, [&#x27;tests/smoke.js&#x27;], {
+    cwd: projectRootReal(), timeout: timeoutMs, encoding: &#x27;utf8&#x27;, maxBuffer: 64 * 1024 * 1024
+  });
+  return { status: r.status, out: String(r.stdout || &#x27;&#x27;) + String(r.stderr || &#x27;&#x27;), error: r.error };
+}
+// ── end LAYER bridge-lock-v0 helpers ──
+```
+
+## Exact source excerpt, characters 23145–23193
+
+### Block B: `handleRequest` (replaces L111-129)
+
+## Exact source excerpt, characters 23195–23561
+
+```js
+function handleRequest(req, res) {
+  // LAYER bridge-lock-v0: the old `Access-Control-Allow-Origin: *` is superseded here.
+  var origin = req.headers.origin || &#x27;&#x27;;
+  var pathname = String(req.url || &#x27;/&#x27;).split(&#x27;?&#x27;)[0];
+  res.setHeader(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;);
+  res.setHeader(&#x27;Vary&#x27;, &#x27;Origin&#x27;);
+  res.setHeader(&#x27;X-Content-Type-Options&#x27;, &#x27;nosniff&#x27;);
+
+## Exact source excerpt, characters 23563–23782
+
+  // 1. Host guard (DNS rebinding): only 127.0.0.1 / localhost.
+  if (!hostAllowed(req.headers.host)) {
+    req.resume();
+    return respond(res, 403, { error: &#x27;Host not allowed&#x27;, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 23784–24743
+
+  // 2. Origin guard. Browsers always send Origin on cross-origin fetches and
+  //    preflights. No Origin = local CLI or same-machine tool (still needs
+  //    the token for anything that changes state).
+  if (origin &amp;&amp; !originAllowed(origin)) {
+    if (pathname === &#x27;/code/git/commit&#x27;) {
+      ledgerAppend({ route: pathname, origin: origin, result: &#x27;refused:origin&#x27; });
+    }
+    req.resume();
+    return respond(res, 403, { error: &#x27;Origin not on the FreeLattice allowlist&#x27;, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+  if (origin) {
+    res.setHeader(&#x27;Access-Control-Allow-Origin&#x27;, origin);
+    res.setHeader(&#x27;Access-Control-Allow-Methods&#x27;, &#x27;GET, POST, OPTIONS&#x27;);
+    res.setHeader(&#x27;Access-Control-Allow-Headers&#x27;, &#x27;Content-Type, X-Agent-Id, X-FL-Bridge-Token&#x27;);
+    res.setHeader(&#x27;Access-Control-Max-Age&#x27;, &#x27;600&#x27;);
+    if (req.headers[&#x27;access-control-request-private-network&#x27;]) {
+      res.setHeader(&#x27;Access-Control-Allow-Private-Network&#x27;, &#x27;true&#x27;);
+    }
+  }
+
+## Exact source excerpt, characters 24745–24833
+
+  if (req.method === &#x27;OPTIONS&#x27;) { req.resume(); res.writeHead(204); res.end(); return; }
+
+## Exact source excerpt, characters 24835–25217
+
+  // 3. Token guard.
+  if (needsToken(req.method, pathname) &amp;&amp; !tokenOk(req)) {
+    if (pathname === &#x27;/code/git/commit&#x27;) {
+      ledgerAppend({ route: pathname, origin: origin, result: &#x27;refused:token&#x27; });
+    }
+    req.resume();
+    return respond(res, 401, { error: &#x27;Pair with the Agent Bridge first (token missing or stale).&#x27;, pair: &#x27;code&#x27;, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 25219–25356
+
+  // Allow requests to act as a different agent via X-Agent-Id header
+  var requestAgentId = req.headers[&#x27;x-agent-id&#x27;] || agentId.meshId;
+
+## Exact source excerpt, characters 25358–26237
+
+  // 4. Body cap. Drain the rest so the client sees the 413 cleanly.
+  var chunks = [];
+  var size = 0;
+  var tooBig = false;
+  req.on(&#x27;data&#x27;, function(chunk) {
+    size += chunk.length;
+    if (size &gt; MAX_BODY_BYTES) { tooBig = true; chunks = []; return; }
+    if (!tooBig) chunks.push(chunk);
+  });
+  req.on(&#x27;end&#x27;, function() {
+    if (tooBig) return respond(res, 413, { error: &#x27;Body too large (max &#x27; + MAX_BODY_BYTES + &#x27; bytes)&#x27; });
+    var body = Buffer.concat(chunks).toString(&#x27;utf8&#x27;);
+    var data = {};
+    if (body) {
+      try { data = JSON.parse(body); }
+      catch (e) { return respond(res, 400, { error: &#x27;Body is not valid JSON&#x27; }); }
+      if (!data || typeof data !== &#x27;object&#x27; || Array.isArray(data)) return respond(res, 400, { error: &#x27;Body must be a JSON object&#x27; });
+    }
+    route(req.url, req.method, data, res, requestAgentId, { origin: origin });
+  });
+}
+```
+
+## Exact source excerpt, characters 26239–26286
+
+### Block C: pairing routes (insert after L133)
+
+## Exact source excerpt, characters 26288–27643
+
+```js
+  // ── LAYER bridge-lock-v0: pairing ──
+  if (url === &#x27;/pair&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    var now = Date.now();
+    if (!pairState.code || now &gt; pairState.expires) newPairCode(&#x27;expired&#x27;);
+    if (now &lt; pairState.coolUntil) return respond(res, 429, { error: &#x27;Resting for a moment. Try again in 30 seconds.&#x27; });
+    var given = normalizePairCode(data.code);
+    var good = given.length === 6 &amp;&amp;
+      crypto.timingSafeEqual(Buffer.from(given, &#x27;utf8&#x27;), Buffer.from(pairState.code, &#x27;utf8&#x27;));
+    if (!good) {
+      pairState.tries += 1;
+      if (pairState.tries &gt;= PAIR_MAX_TRIES) {
+        ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair&#x27;, origin: (meta &amp;&amp; meta.origin) || &#x27;&#x27;, result: &#x27;refused:lockout&#x27; });
+        newPairCode(&#x27;lockout&#x27;);
+        return respond(res, 429, { error: &#x27;Too many tries. The bridge window shows a new code.&#x27; });
+      }
+      return respond(res, 403, { error: &#x27;That code does not match. Check the bridge window.&#x27;, triesLeft: PAIR_MAX_TRIES - pairState.tries });
+    }
+    ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair&#x27;, origin: (meta &amp;&amp; meta.origin) || &#x27;&#x27;, result: &#x27;ok&#x27; });
+    console.log(&#x27;  \u2726 Paired with &#x27; + ((meta &amp;&amp; meta.origin) || &#x27;a local tool&#x27;) + &#x27;.&#x27;);
+    newPairCode(&#x27;used&#x27;); // single use: the next device gets a fresh code
+    return respond(res, 200, { token: BRIDGE_TOKEN, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 27645–27760
+
+  if (url === &#x27;/pair/check&#x27;) {
+    return respond(res, 200, { ok: true, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+```
+
+## Exact source excerpt, characters 27762–27807
+
+### Block D: code routes (replaces L992-1140)
+
+## Exact source excerpt, characters 27809–28239
+
+```js
+  // ══════════════════════════════════════════════════
+  // LATTICE CODE — Self-improving infrastructure
+  // Read and search are free. Write/patch/commit need approval.
+  // LAYER bridge-lock-v0: every route below is token-gated in
+  // handleRequest (needsToken). Paths go through lockedPath().
+  // No shell anywhere: execFileSync / spawnSync with argument arrays.
+  // ══════════════════════════════════════════════════
+
+## Exact source excerpt, characters 28241–28280
+
+  var PROJECT_ROOT = projectRootReal();
+
+## Exact source excerpt, characters 28282–28489
+
+  // Superseded by lockedPath (bridge-lock-v0). Kept so old callers still work.
+  function safePath(relPath) {
+    var lp = lockedPath(relPath, { allowRoot: true });
+    return lp.error ? null : lp.full;
+  }
+
+## Exact source excerpt, characters 28491–29530
+
+  // GET /code/tree — list project files
+  if (url.startsWith(&#x27;/code/tree&#x27;)) {
+    var tp = new URL(&#x27;http://l&#x27; + url).searchParams;
+    var subdir = tp.get(&#x27;path&#x27;) || &#x27;.&#x27;;
+    var target = safePath(subdir);
+    if (!target) return respond(res, 403, { error: &#x27;Path outside project&#x27; });
+    try {
+      function listDir(dir, depth) {
+        if (depth &gt; 3) return [];
+        return fs.readdirSync(dir, { withFileTypes: true })
+          .filter(function(e) { return !e.name.startsWith(&#x27;.&#x27;) &amp;&amp; e.name !== &#x27;node_modules&#x27; &amp;&amp; !e.isSymbolicLink(); })
+          .map(function(e) {
+            var rel = path.relative(PROJECT_ROOT, path.join(dir, e.name));
+            if (e.isDirectory()) return { name: e.name, type: &#x27;dir&#x27;, path: rel, children: listDir(path.join(dir, e.name), depth + 1) };
+            return { name: e.name, type: &#x27;file&#x27;, path: rel, size: fs.statSync(path.join(dir, e.name)).size };
+          });
+      }
+      return respond(res, 200, listDir(target, 0));
+    } catch(e) { return respond(res, 500, { error: e.message }); }
+  }
+
+## Exact source excerpt, characters 29532–30424
+
+  // GET /code/read?path=...&amp;start=N&amp;end=N
+  if (url.startsWith(&#x27;/code/read&#x27;)) {
+    var rp = new URL(&#x27;http://l&#x27; + url).searchParams;
+    var filePath = rp.get(&#x27;path&#x27;);
+    var start = parseInt(rp.get(&#x27;start&#x27;) || &#x27;0&#x27;, 10);
+    var end = parseInt(rp.get(&#x27;end&#x27;) || &#x27;0&#x27;, 10);
+    var full = safePath(filePath);
+    if (!full) return respond(res, 403, { error: &#x27;Path outside project&#x27; });
+    try {
+      var content = fs.readFileSync(full, &#x27;utf8&#x27;);
+      var lines = content.split(&#x27;\n&#x27;);
+      if (start &gt; 0 || end &gt; 0) {
+        return respond(res, 200, { path: filePath, lines: lines.slice(Math.max(0, start - 1), end || lines.length), start: start, end: end || lines.length, totalLines: lines.length });
+      }
+      return respond(res, 200, { path: filePath, content: content, totalLines: lines.length });
+    } catch(e) { return respond(res, 404, { error: &#x27;Not found: &#x27; + filePath }); }
+  }
+
+## Exact source excerpt, characters 30426–31609
+
+  // GET /code/search?q=...&amp;path=docs/
+  if (url.startsWith(&#x27;/code/search&#x27;)) {
+    var sp = new URL(&#x27;http://l&#x27; + url).searchParams;
+    var query = sp.get(&#x27;q&#x27;) || &#x27;&#x27;;
+    var searchLp = lockedPath(sp.get(&#x27;path&#x27;) || &#x27;docs&#x27;, { allowRoot: true });
+    if (searchLp.error) return respond(res, searchLp.error, { error: &#x27;Search path refused&#x27;, reason: searchLp.reason });
+    if (!query || query.length &gt; 200 || hasControlChars(query)) return respond(res, 400, { error: &#x27;q must be 1-200 printable characters&#x27; });
+    try {
+      var out = execFileSync(&#x27;grep&#x27;, [&#x27;-rn&#x27;, &#x27;--include=*.js&#x27;, &#x27;--include=*.html&#x27;, &#x27;--include=*.css&#x27;, &#x27;--include=*.md&#x27;,
+        &#x27;-e&#x27;, query, &#x27;--&#x27;, searchLp.rel], { cwd: PROJECT_ROOT, timeout: 10000, encoding: &#x27;utf8&#x27;,
+        maxBuffer: 32 * 1024 * 1024, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;ignore&#x27;] });
+      var matches = out.split(&#x27;\n&#x27;).filter(Boolean).slice(0, 50).map(function(l) { var p = l.split(&#x27;:&#x27;); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(&#x27;:&#x27;).trim() }; });
+      return respond(res, 200, { query: query, matches: matches, count: matches.length });
+    } catch(e) { return respond(res, 200, { query: query, matches: [], count: 0 }); }
+  }
+
+## Exact source excerpt, characters 31611–32407
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

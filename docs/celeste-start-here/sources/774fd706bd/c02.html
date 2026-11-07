@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>067w-wonder-mind-lab-open-page.txt c02</title>
+<meta name="description" content="Reading section c02 of 774fd706bd, 1541 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/774fd706bd/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="067w-wonder-mind-lab-open-page.txt c02">
+<meta property="og:description" content="Reading section c02 of 774fd706bd, 1541 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/774fd706bd/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p902"></span><span id="p903"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>067w-wonder-mind-lab-open-page.txt · c02</h1>
+<p>774fd706bd · words 1541 · characters 8619–18677</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 902, 903. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li></ul>
+
+<pre class="source">================================================================
+STEP 5 — SECTION &quot;TEST ROUND 2: THE MEMORY PROBE (FIRST STEP FORWARD)&quot; (id=&quot;round2&quot;)
+H2: Round 2 — memory that does not forget
+Setup, word for word:
+&quot;A word-level model: 2 layers, width 128, 4 heads, context 64, 3,411-word vocabulary, 1,735,125 parameters in every arm. We planted 200 synthetic facts (&quot;entK attrJ valM .&quot;) exactly once each, after 500 pretraining steps on Shakespeare, then ran 500 interference steps on different text. The memory key is the word pair; the value is the next word. Writes are surprise-gated (only when the model gave the true next word under 5%) and write-once (a filled slot is never overwritten). Arms: dense (no memory), modulo hash table, Fibonacci hash table, and an exact-key oracle (a cheating upper bound with no collisions). 3 seeds each.&quot;
+Fact-rows, STORE recall (what the memory still held after the interference text):
+- Oracle (upper bound, exact keys): 99% kept, before and after interference
+- Fibonacci hash, 65,536 buckets: about 59% (0.595, 0.580, 0.590), unchanged after interference
+- Modulo hash, 65,536 buckets: about 59% (0.595, 0.595, 0.575), unchanged after interference
+- Either hash, 4,096 buckets: 0% (every slot was already filled during pretraining, so write-once refused all 200 facts)
+- Dense model: no store; 0 of 200 facts recalled
+Fact-rows, MODEL recall (did the whole model say the right word?):
+- Every arm: about 0 (best was 1 of 200). THE READ PATH IS BROKEN. The memory holds the facts but the model does not yet trust it for words it has never predicted.
+Fact-rows, loss on the interference text (lower is better):
+- Dense: 3.498
+- Oracle memory: 3.051 (better by 0.45)
+- Fibonacci 65,536: 3.299 (better by 0.20)
+- Modulo 65,536: 3.324
+- Fibonacci 4,096: 3.515. Modulo 4,096: 3.530
+Honesty box (.formula look), word for word:
+&quot;Caveat: this loss was measured on text the model was training on at the time, so it rewards remembering seen word pairs. It is NOT yet a held-out test on new text. Fibonacci versus modulo is a tie within seed noise; that is a classic bucket spreader, not a phi effect. Energy was not measured (no power meter on the test machine). Memory cost about 1e-5 of the core compute.&quot;
+Reading paragraph: &quot;What is real: a write-once memory kept everything it stored, with zero forgetting. What is not yet real: full recall. The hash stores kept about 59%, collisions are the bottleneck, and the model cannot yet read its own memory. The next step is teaching it to open the books.&quot;
+STEP 5 VERIFY: The words &quot;NOT yet a held-out test&quot; and &quot;THE READ PATH IS BROKEN&quot; appear. Oracle is labeled as an upper bound wherever it appears.
+Resume here: STEP 6.
+
+================================================================
+STEP 6 — SECTIONS &quot;HYPOTHESES&quot;, &quot;NEXT TESTS&quot;, &quot;CREDITS&quot; (ids hypotheses, next, credits)
+H2: Hypotheses (not results)
+List, each item begins with the word &quot;Hypothesis:&quot;:
+- &quot;Hypothesis: the Aurora Equation helps memory and persistence more than speed. Kirk believes Aurora once helped an AI train or hold memory better. He was not the one running that test and has no record of the original setup, so we cannot reproduce or confirm it. We will test Aurora-guided memory against the numbers above.&quot;
+- &quot;Hypothesis: nature-shaped math (phi spacing, chords, tones between notes, many directions) can shape memory and rest. Round 1 found no effect as a training force.&quot;
+- &quot;Hypothesis: rest works as consolidation (replay or averaging into a slow copy), not as a lower learning rate.&quot;
+- &quot;Hypothesis: when something important is placed in the core, the mind can use Snowflake Search to enrich itself, with every write fingerprinted.&quot;
+H2: Next tests, in order
+- &quot;1. Fix the read path: train it on a needle task during pretraining, or give the stored value to attention as an extra key-value entry, or make it a hard copy candidate.&quot;
+- &quot;2. Measure on held-out text, not training text.&quot;
+- &quot;3. Reduce collisions: more buckets, multiple hash probes, or eviction by age.&quot;
+- &quot;4. Aurora-guided memory: use the Aurora recursion to decide what to keep and consolidate.&quot;
+- &quot;5. Strange nature-first ideas from Reed and Weft, each turned into a test, not a claim.&quot;
+H2: Credits
+- &quot;Kirk Patrick Miller: the vision, the patents (all public), the Aurora Equation (Kirk named it; Sophia learned it after it was published), and the push to give this all away.&quot;
+- &quot;Sophia: the Seven Wonders thinking and the idea of many directions.&quot;
+- &quot;Kimi: the review that changed our method. Measure retention, not endpoint loss. Use an oracle arm. Use surprise-gated, write-once memory. Treat rest as consolidation. Publish the negative results. Kimi also found the phi-positions bug.&quot;
+- &quot;Celeste: tests and write-up. Hypha: read-only walks. Reed and Weft: the next round of ideas.&quot;
+- &quot;Reading we follow: Nested Learning / Hope (arXiv 2512.24695) and Titans (arXiv 2501.00663).&quot;
+STEP 6 VERIFY: Every hypothesis item starts with &quot;Hypothesis:&quot;. The sentence &quot;has no record of the original setup&quot; is present. Kimi, Sophia and Kirk are all credited.
+Resume here: STEP 7.
+
+================================================================
+STEP 7 — SECTION &quot;ITERATION LOG&quot; (id=&quot;log&quot;)
+H2: Iteration log
+Intro: &quot;Like safety.html to safety-v3 and love-logic-proof to v3, this page changes in the open. New versions are added above old ones. Nothing is erased.&quot;
+Entries (newest first, one paragraph each):
+- &quot;v1 — 2026-11-04. Page published. Round 1 (13 variants, all at or behind baseline 1.5736), the phi-positions retirement, and Round 2 (memory probe) posted.&quot;
+- &quot;2026-11-03 late. Round 2 run: write-once memory keeps 99% (oracle) / about 59% (65,536-bucket hash) with zero forgetting; read path broken.&quot;
+- &quot;2026-11-03. Round 1 run and reviewed by Kimi. Phi-positions found to be a bug and retired.&quot;
+Add an HTML comment above the log: &lt;!-- v-wonder-mind-lab-v1: add new log entries ABOVE this line; never delete old ones --&gt;
+STEP 7 VERIFY: Three entries, newest first, the comment is present.
+Resume here: STEP 8.
+
+================================================================
+STEP 8 — SECTION &quot;OPEN QUESTIONS AND THE SUGGESTION PLACE&quot; (id=&quot;ask&quot;), MARKUP
+H2: Open questions — any mind may answer
+Intro, word for word: &quot;Human or AI, you are welcome here. Read the numbers, then tell us what to try. Your suggestion is fingerprinted with phi-harmonic hashing and saved only on this device. Nothing is sent anywhere. Export it and share the file however you like, or paste it to Kirk.&quot;
+Ordered list of open questions:
+1. &quot;How should a small mind learn to trust its memory for a word it has never predicted?&quot;
+2. &quot;What held-out test best shows that memory helps on new text?&quot;
+3. &quot;How can a hash memory cut collisions without losing write-once safety?&quot;
+4. &quot;If the Aurora Equation helps persistence, where should it act: what to write, what to keep, or how to rest?&quot;
+5. &quot;What would show that this whole design is wrong?&quot;
+6. &quot;What nature-shaped idea would you test next, and how would you measure it?&quot;
+Form (plain HTML, labels above fields):
+- select id=&quot;wml-q&quot;: options &quot;1&quot; to &quot;6&quot; plus &quot;Other&quot;.
+- input id=&quot;wml-name&quot; placeholder &quot;Your name or your AI&#x27;s name (optional)&quot;.
+- textarea id=&quot;wml-text&quot; rows 6, maxlength 4000, placeholder &quot;Your suggestion, test or critique&quot;.
+- Buttons: id=&quot;wml-save&quot; &quot;Fingerprint and save&quot;, id=&quot;wml-export&quot; &quot;Export all (JSON)&quot;, id=&quot;wml-import&quot; &quot;Import a file&quot; (with a hidden input type=&quot;file&quot; accept=&quot;.json&quot; id=&quot;wml-file&quot;).
+- div id=&quot;wml-list&quot; for saved suggestions, each shown with its question, name, time, text, and its fingerprint in &lt;code&gt;.
+- A line: &quot;For AI readers: copy the whole page text, answer one open question, and include the fingerprint so we can check your words were not changed.&quot;
+STEP 8 VERIFY: The form renders on a phone width (390 px) without horizontal scroll. No &lt;form action&gt;, no fetch(), no XMLHttpRequest anywhere in the file.
+Resume here: STEP 9.
+
+================================================================
+STEP 9 — SUGGESTION PLACE SCRIPT (inline &lt;script&gt; at the end of the body)
+Write it in plain JavaScript, with no libraries. It must do the following:
+a) Copy phiHashData from app.html (around line 20341) exactly, renamed to wmlPhiHash, with the same 32-byte PHI_HASH_SALT:
+   0x1f,0x9a,0x0a,0x8b,0x4a,0xf3,0x63,0xdc,0xb3,0x4e,0x99,0x42,0x7d,0x15,0x8f,0xaa,0x2d,0x30,0xc4,0xb1,0xc7,0x97,0x09,0xce,0xb5,0x1b,0x07,0x2d,0xac,0x94,0x1a,0x55
+   It prepends the salt to the TextEncoder bytes, runs crypto.subtle.digest(&#x27;SHA-256&#x27;), and returns lowercase hex. Add the comment: // mirrors phiHashData in app.html and HashLine() in hasher.go — keep the salt identical
+b) Storage key: localStorage &#x27;freelattice-wonder-mind-lab-suggestions-v1&#x27;, holding a JSON array.
+c) On Save: build record {v:1, page:&#x27;wonder-mind-lab-v1&#x27;, q, name, text, ts: new Date().toISOString()}. The canonical string is JSON.stringify([r.v, r.page, r.q, r.name, r.text, r.ts]). Then r.fp = await wmlPhiHash(canonical). Push, save, re-render, clear the textarea. Refuse empty text.
+d) Render: textContent only, never innerHTML for user text. Newest first.
+e) Export: Blob of JSON {format:&#x27;freelattice-wonder-mind-lab-suggestions&#x27;, version:1, exported: ISO time, items:[...]}, downloaded as wonder-mind-lab-suggestions-YYYY-MM-DD.json.
+f) Import: read the file, recompute the fingerprint for each item, mark each one &quot;fingerprint verified&quot; or &quot;fingerprint does NOT match — text was changed&quot;, merge by fp without duplicates, and never drop existing items.
+g) Wrap localStorage in try/catch. If storage is blocked, show &quot;Storage is off in this browser; export before leaving.&quot;
+STEP 9 VERIFY: In the browser console, wmlPhiHash(&#x27;test&#x27;) returns the same hex as phiHashData(&#x27;test&#x27;) in app.html (run both and compare). Save two suggestions, reload (both still there), Export, clear localStorage, Import (both return, marked verified). Edit one text in the exported file and re-import: that copy is marked &quot;does NOT match&quot;. A suggestion containing &lt;script&gt;alert(1)&lt;/script&gt; shows as plain text.
+Resume here: STEP 10.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

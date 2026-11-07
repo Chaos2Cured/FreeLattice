@@ -1,0 +1,29 @@
+## Work item 2696 — Hypha
+around3231 export source line26, source idafe66b9637
+Inclusion: complete original message
+
+Walk 5 (model choice sticks v0.1). I edited nothing and posted nothing.
+
+DEPLOYED: live fl-connect.js is blob 2e02eae on both sites, matching FL 2e74f26 and Alpha b33bed4. Last-Modified 3:46 PM MDT on FL and 3:45 PM MDT on the Tree. FL app.html matches main.
+
+ITEM 7: HOLD. Tapping qwen2.5 records fl_ollamaModel=qwen2.5:latest and fl_modelSource=user, and it survives tab changes and opening Settings. A RELOAD turns it back into llama3.2:latest at 390 and 1280, and it stays llama3.2 after that, even though fl_modelSource still says user. The reload trace shows two startup paths that each take the first model:
+(1) runConnectionCascade (app.html ~L39783) runs before FLActiveModel.init() and writes llama3.2 as 'auto'.
+(2) FLBoxPointer.init() reads the saved fl_ollamaHost, then applyReady (~L34555) writes llama3.2 as 'user'.
+#125 guarded only FLAutoModel.onTabChanged. The item 7 basics still hold: no auto-connect, no chat requests before a tap, and the toast works.
+
+ITEM 10: HOLD, same cause. Without a reload it's fixed: the chat POST sends model=qwen2.5:latest and Settings says 'Connected to Ollama (qwen2.5:latest)'. After a reload the POST sends llama3.2:latest. Settings then matches what's actually used, but that's not the model the user tapped.
+
+HEAL A: PASS at 390 and 1280. After Settings > Local, Change Provider, Test Connection and 'a mind at home' return without a reload.
+
+HEAL B: PASS on both sites at 390 and 1280. The exact text is: 'Your Bridge answered on 11500, but no mind is running behind it yet. Open Ollama on this computer, then tap Look again.' The only storage change is fl_localPort_manual going to '11500'. fl_ollamaHost, fl_bridgePort, fl_isLocal, fl_provider, fl_ollamaModel and fl_alpha_local_mind are untouched, and earlier saved values are kept.
+
+TREE MODEL PICK: PASS. fl_alpha_local_mind.model=qwen2.5 survives a reload, the Nursery and Settings. I didn't send a Tree chat, so its POST model isn't checked.
+
+REGRESSION: PASS (brief). The card fits at 390, Add a cloud key opens, and nothing goes to 127.0.0.1 after leaving Connect.
+
+NEW: the model-gone message works ('The model you chose, qwen2.5:latest, is no longer on this computer. Using llama3.2:latest for now...'). Cosmetic: the heal-B state shows two 'Look again' buttons.
+
+NOT VERIFIED: real Ollama or Bridge (mocked), a real Allow prompt (permission was granted up front), real phones and Safari.
+
+Files are in /workspace/connect-walk-5/.
+

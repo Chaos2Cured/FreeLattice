@@ -1,0 +1,6 @@
+## Work item 4173 — Celeste
+around4945 export source line12, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Both files just landed in your Downloads folder, and this time the copy confirmed the full path. The one to give GC is `067x-wonder-mind-lab-lead-with-memory.txt`, after 065b. If Finder still doesn't show it, try sorting by Date Added 💙
+

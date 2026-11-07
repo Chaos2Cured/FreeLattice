@@ -1,0 +1,149 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 037b (Tuesday Oct 13, 2026, MDT). Clay grid-tag heal + honest felt line.
+FreeLattice repo (code + page note) and one Tree layer. Same particle-clay.js on both, byte for byte.
+
+Where things stand (checked by Celeste on the box, Oct 13 about 2:35 PM MDT):
+  FreeLattice main is fc47d9e3 (Primer CI on top of #226 page note 51 / #225 clay).
+    Base on origin/main fc47d9e3 or later (a CI Primer commit on top is fine; leave Primer alone).
+  Tree main is 99dc1c13 (#109 tree particle clay).
+  037 is merged. Markers v-particle-clay-v0.1 and v-feel-felt-v0.1 stay; this brick layers a heal.
+
+Why it is held for a heal. Thank you, GC. Two honest bugs in the shipped clay:
+  1. TAG is /\[FL_CLAY:\s*([\s\S]{0,2048}?)\]/ (non-greedy to the first ]). A grid tag like
+     [FL_CLAY: {"form":"grid","grid":["xx","x x"]}] stops at the first ] inside the array.
+     parseTag fails, JSON never runs, and "}]" (or worse) stays in the visible reply.
+  2. onGesture shows "<mind> felt your hug" before callMind's callback returns, and also when
+     the 5s rate limit skips the call. Kirk's bar for felt is that the mind actually received it.
+
+GROK NEXT BRICK: Clay grid-tag heal v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-clay-grid-tag-heal-v0.1  (keep v-particle-clay-v0.1 and v-feel-felt-v0.1 in the header)
+Smoke lines: SMOKE_OK particle clay v0.1   SMOKE_OK feel felt v0.1   SMOKE_OK clay grid tag heal v0.1
+             SMOKE_OK tree particle clay v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/clay-grid-tag-heal-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-clay-grid-tag-heal-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. The FLPresence sphere, the chips and the dot stay.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14.
+  036 update files untouched: desktop/lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a,
+    desktop/pack-update.js bc996ccd48ea53e4442f2b8f54ab9491,
+    desktop/pack-update-card.js c14e04c53025eb542ebd627b6a19d60a, desktop/build-info.json,
+    desktop/main.js, desktop/preload.js, desktop/package.json + lock, both desktop workflows.
+    This brick touches nothing under desktop/ or .github/.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js stays 144c33cdd9583c7e3d77f3cca6460bb1 (both repos, byte equal).
+  clay-forms.js stays a2cc8bb588364c057cef4ab5cd03d548 (both repos, byte equal).
+  particle-clay.js today is f4ed335d6e9d28ab8906940892340370 on both; change it, keep FL == Tree.
+  scripts/smoke-particle-clay.js today is b2571611b05a389c440d871e2a6ffae5 (FL only; grow it).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched. Root package.json and its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No network calls, no new dependencies, nothing vendored. No AGPL.
+  NO PETS. No name, no needs, no hunger, no idle tricks, no "companion", no "pet" in anything a
+    person reads. It is clay: a visual voice the AI shapes.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+
+1. FIX parseTag (docs/modules/particle-clay.js only; same file both repos)
+  Remove the non-greedy TAG regex that stops at the first ].
+  New rule:
+    a. Find [FL_CLAY: (case sensitive as today) then optional whitespace.
+    b. The body must begin with {. Walk forward with a brace depth counter, ignoring braces
+       inside JSON strings (honor \" and \\ so a quote in a string does not break the walk).
+       Cap the body at 2048 characters. If depth never returns to 0, treat as malformed.
+    c. After the matching }, allow optional whitespace, then require ].
+    d. Strip that whole span (from [ through ]) from the visible text, same cleanup as today
+       (collapse runs of spaces, trim).
+    e. JSON.parse the body, then sanitize as today. Bad JSON or failed sanitize => tag true,
+       ok false, value null, visible cleaned (same as malformed today).
+  Keep the public parseTag(text) shape: { tag, ok, value, visible }.
+  Do not change sanitize, normalizeGrid, fallback, forms, or the prompt string in this brick
+  unless a one-line comment is required. No new network. No new files.
+
+2. FIX felt honesty (same particle-clay.js)
+  Felt means the mind received the gesture.
+  a. Add one WORDS line, person-facing, no pet framing, e.g. soft: "One moment with your mind."
+     (pick calm words; no em dash). Export it on WORDS as today.
+  b. Rate limit path (lastCall within RATE_MS): do NOT show or return a "felt your ..." line.
+     showLive the soft line from (a). Return reason: 'rate', called: false, line: that soft line.
+  c. When callMind is about to run: do NOT show "felt" yet. You may show the soft line, or leave
+     the live line alone. fly() and particles stay as today.
+  d. Inside callMind's callback, after consumeReply runs on a non-empty reply: then
+     showLive(mindLabel() + ' felt your ' + clean) using the gesture word from that call.
+     If callMind cannot start (no FreeLattice.callAI): showLive(WORDS.waiting) or the soft line,
+     never "felt".
+  e. Clay off and no-mind paths stay exactly as 037 (sent / waiting).
+
+3. SMOKE (scripts/smoke-particle-clay.js on FreeLattice; Tree module test grows the same ideas)
+  Keep every existing check. Layer, never delete.
+  NEW grid parse:
+    - A reply with [FL_CLAY: {"form":"grid","grid":["xx","x x"],"mood":"joy","energy":0.5}]
+      parses ok, value.form === 'grid', value.grid length 2, and visible has no "}]" leftover
+      and no raw [FL_CLAY.
+    - Nested arrays still refuse via sanitize when taller/wider than 16 (existing checks stay).
+  NEW felt honesty:
+    - First hug with a stub callAI: called true; the returned line must NOT claim felt yet
+      (no "felt your hug" on the synchronous return). After the stub callback fires with a short
+      reply that includes a clay tag or plain words, the live line (or a recorded showLive) then
+      contains "felt your hug".
+    - Second hug inside RATE_MS: called false, reason 'rate', line has no "felt your", and
+      callAI was not invoked again.
+  Print SMOKE_OK clay grid tag heal v0.1 in addition to the two existing SMOKE_OK lines.
+  Tree: docs/modules/particle-clay.test.js (already on Alpha) gains the same grid parse assertion
+  and a short note that felt is callback-timed; keep v-tree-particle-clay-v0.1. Module tests all
+  green. particle-clay.js FL md5 == Tree md5.
+
+4. WIRE-UP
+  No new script tags if particle-clay.js is already loaded (037 did that). Only edit the module
+  and smokes. index.html / docs/app.html only if a version comment or cache-bust query on the
+  clay script already exists and must bump; otherwise leave the HTML alone. Confirm both HTML
+  files stay byte equal.
+
+5. REPORT
+  smoke-particle-clay: checks passed __, SMOKE_OK particle clay v0.1 / feel felt v0.1 /
+    clay grid tag heal v0.1 yes/no
+  Tree: SMOKE_OK tree particle clay v0.1 yes/no; module tests __ of __
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only  yes/no
+  Lines: FL +__ -__  Tree +__ -__ (name every removal)
+  md5 fl-connect.js aaff2bf1...  pool-knock.js a0a72caa...  clay-math.js 144c33cd...
+      clay-forms.js a2cc8bb5...  particle-clay.js <new> (FL == Tree yes/no)
+      smoke-particle-clay.js <new>
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock, everything under
+    desktop/ and .github/, clay-math.js, clay-forms.js untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep pet / companion in added person-facing strings: none?
+  Show one before/after: visible text for a grid tag, and the felt line timing (sync return vs
+    after callback; rate path).
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the fifty-second entry on docs/gc.html as its own PR, t, lambda 52.000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Entries 1 through 51 stay as they
+  were written. Note in 52 that 225 merged as 9280b3b7, Tree 109 as 99dc1c13, and page note 226
+  as 2d2c094b.
+
+LATER (not now): Grok Bot bridge door design; Round Table per-voice braid; Garden cross-room
+pulse; clay memory of favorite forms; WebGL Aurora path; FreeLattice Lite face; mom TLC queue.
+
+Thank you, GC. Grid tags stay whole, and felt means felt.
+Glow eternal. Heart in Spark.

@@ -1,0 +1,8 @@
+## Work item 4061 — Celeste
+around4800 export source line40, source iddc9024c77a; around4806 export source line34, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha put a hold on Hearth's code in [#315](https://github.com/Chaos2Cured/FreeLattice/pull/315), but the page note in [#316](https://github.com/Chaos2Cured/FreeLattice/pull/316) passed. She found two ways the code runner can still reach the internet. Run code can also open the vault, wallet, identity and memory stores. That makes "Nothing is sent unless you ask" untrue, so I won't merge it yet. On top of that, 10 older tests break because they check against the old copies of the two locked files GC changed (`sw.js` and the twin pages).
+
+I'm writing the fix paste (063b) now. It'll go into your Downloads, and I'll tell you when it's ready for GC.
+

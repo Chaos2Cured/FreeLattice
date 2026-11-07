@@ -1,0 +1,6 @@
+## Work item 4127 — Celeste
+around4900 export source line8, source id948c9899af; around4901 export source line4, source id55765b810d
+Inclusion: complete original message
+
+I'm looking for Emanuel's deepfake detector and Fractal Nexus emails now. After that I'll go back through our FreeLattice ideas and work out the training, including whether to use the boost only at the start.
+

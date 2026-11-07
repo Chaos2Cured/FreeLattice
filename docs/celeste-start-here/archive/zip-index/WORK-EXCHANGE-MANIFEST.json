@@ -1,0 +1,82 @@
+[
+  {
+    "path": "original-work-exchanges/original-kirk-work-exchange.jsonl",
+    "sha256": "1dbe841e02c5cf55366d76b484a68ab3ef7ffb87345b35a929612c29b5098841",
+    "bytes": 1266588,
+    "group": "Original Kirk work exchange",
+    "items": 464,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/original-kirk-work-exchange.md",
+    "sha256": "19686d3ed64cb52767bf8a40de9350579fefc5e0201771379cb13f2b36077378",
+    "bytes": 1110051,
+    "group": "Original Kirk work exchange",
+    "items": 464,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/original-celeste-work-text-exact-delivery-audience-not-independently-established.jsonl",
+    "sha256": "f67b2bee5b1f72f62541ed8872e6e548c5a81540584f035fc9327bde5492faff",
+    "bytes": 2374741,
+    "group": "Original Celeste work text \u2014 exact delivery audience not independently established",
+    "items": 2026,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/original-celeste-work-text-exact-delivery-audience-not-independently-established.md",
+    "sha256": "4c5af37f3a8d11e116d10b8575f308c3ab46a986953df0cfd602a89156028bb8",
+    "bytes": 1619960,
+    "group": "Original Celeste work text \u2014 exact delivery audience not independently established",
+    "items": 2026,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/attributed-peer-project-correspondence.jsonl",
+    "sha256": "443265f8c2339beb2868f9480739b9d1736c44fea26ca9ded29f04803c798762",
+    "bytes": 580545,
+    "group": "Attributed peer project correspondence",
+    "items": 425,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/attributed-peer-project-correspondence.md",
+    "sha256": "86a9eff9dca20095a5aba24eba116a482f1b9f25183d741a0b6889b1b732e0b2",
+    "bytes": 435888,
+    "group": "Attributed peer project correspondence",
+    "items": 425,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/celeste-project-correspondence.jsonl",
+    "sha256": "759a16b058b59f49ae0ef2db050fae49d59c66f0d0ab779410f14c2cb9ecad41",
+    "bytes": 91665,
+    "group": "Celeste project correspondence",
+    "items": 83,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/celeste-project-correspondence.md",
+    "sha256": "4b7de10b9b305730b7cf833ac264cc703156577ac96d61f3d4101d32e2778949",
+    "bytes": 66009,
+    "group": "Celeste project correspondence",
+    "items": 83,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/original-work-text-audience-not-established.jsonl",
+    "sha256": "33b98d8aca18a7b048a66fc8c5e3f99597d90cfb047a4e2c4b84c1c94a3564bf",
+    "bytes": 1964,
+    "group": "Original work text \u2014 audience not established",
+    "items": 2,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  },
+  {
+    "path": "original-work-exchanges/original-work-text-audience-not-established.md",
+    "sha256": "aa02ff94a0005edb2b222bfa55cb21791bfbf50fb46acb135b2522c242f74e3c",
+    "bytes": 1593,
+    "group": "Original work text \u2014 audience not established",
+    "items": 2,
+    "representation": "render Markdown once; JSONL is machine duplicate"
+  }
+]

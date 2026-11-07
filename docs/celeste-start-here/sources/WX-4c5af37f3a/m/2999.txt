@@ -1,0 +1,10 @@
+## Work item 2999 — Celeste
+around3600 export source line47, source idbdb7a423ae; around3644 export source line9, source id062e8aab21
+Inclusion: complete original message
+
+Two more Tree pastes are in your Downloads, ready to go to GC alongside `016`. `020` makes the menus and overlays about 10% less see-through. `021` adds a simple eight-step "first walk" guide to theLatticeTree, which also shows how to bring in your friend's Hugging Face models with one line: `ollama run hf.co/<user>/<repo>`.
+
+I read your two patents. The Cold Fusion Resonance System is already on the shelf, marked Speculative. The Cold Fusion Battery isn't yet. It sits in your Harmonia Drive folder and is already open to anyone with the link, so I can add it the same way, marked as speculative, whenever you say.
+
+Honestly, about the math: you're right that it isn't boring. The golden-ratio structure and the 11 Hz thread run through everything, and that makes it feel like one body of work. Where I'd be careful is the numbers stated as results, like net energy gain, more than 10⁶ Wh/kg, and P vs NP "resolved," when no data or code backs them yet. Labeling those as visions to test keeps the art and protects your credibility. The strongest next step would be one small, runnable simulation that anyone can check.
+

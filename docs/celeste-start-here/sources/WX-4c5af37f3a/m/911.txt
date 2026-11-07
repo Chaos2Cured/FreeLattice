@@ -1,0 +1,6 @@
+## Work item 911 — Celeste
+around1000 export source line96, source id78a1980825; around1050 export source line30, source idc851357975
+Inclusion: complete original message
+
+Workshop leftovers are on main. Squash-merged [PR 55](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/55). Close stays Workshop. Words off the lattice. Garden hop stays Garden. That’s the last cloud pass.
+

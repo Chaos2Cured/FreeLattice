@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 3385 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 3385 from WX-19686d3ed6, archive page 219.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/3385.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 3385 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 3385 from WX-19686d3ed6, archive page 219.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/3385.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 3385</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 219 · Inclusion: complete original message</p>
+<p class="meta">## Work item 3385 — Kirk<br>around4050 export source line42, source id0ce39d1d2c</p>
+<p><a href="3380.html">Previous message 3380</a> <a href="3393.html">Next message 3393</a></p>
+<p><a href="3385.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=219">Archive PDF page 219</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 3385 — Kirk
+around4050 export source line42, source id0ce39d1d2c
+Inclusion: complete original message
+
+This was from GC: &quot;workspace export v0.1 report
+
+FreeLattice PR #241 https://github.com/Chaos2Cured/FreeLattice/pull/241 sha cd226ea01af3c9b6252d13acfb1fd8f8b221abeb parent 96499ae474284278c424e207b6a1d7f07193524e branch layer/workspace-export-v0.1
+
+Tree PR #116 https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/116 sha 1e4f50bc9c8fd1dde1ea224fd2ba1ade10a4ee4f parent b930892034c7d4795007cb2a4ef8f4b7279f19e4 branch layer/tree-workspace-export-v0.1
+
+Page note PR #242 https://github.com/Chaos2Cured/FreeLattice/pull/242 sha 0aac0f05b87a0f63aa8c7a3ff8f1ffe0025bbec8 parent 96499ae474284278c424e207b6a1d7f07193524e t 2026-10-15T23:12:55Z lambda 59.000 psi f53541ba (+19 -0)
+
+SMOKE_OK workspace export v0.1 / tree workspace export v0.1: yes (node). Room walk: yes, ROOM_OK. Line: &quot;Notebook: 2 pages, 1 private page stayed on this device.&quot; Fresh profile: &quot;Private pages are not in this file. They stayed on the device that made the export.&quot; and &quot;sealed on another device (e739 4dc5...)&quot;. Porch page listed. Private words absent.
+
+lattice-export.js lines changed (each named): New helpers after assertNoQuietRoomInBlob: assertNoPrivateNotebookInJson, assertNoPrivateNotebookInBlob, emptyWorkspaceSection, workspaceApi, attachWorkspace, finishWorkspace. exportArchive calls attachWorkspace after buildPayload, then the private scans after the Quiet Room scans. verify-only, adopt success, and merge returns now call finishWorkspace. Quiet Room checks unchanged: yes. The three Quiet Room function bodies were not in the diff.
+
+Named removals (replacements, nothing dropped):
+• audit.html: confirmBtn.disabled = false; dialog display none; the old showReport object moved inside file.text() and gained notebook. Same fields kept.
+• lattice-export.js: the verify-only return, the adopt success return, and the merge return wrapper now go through finishWorkspace. &quot;longer chain wins&quot; stayed.
+• mind-workspace.js (FL and Tree, same 7 lines): openDB(), the isOn early return, runStore, the openDB().then ...xportSection and importSection can follow). Existing callers omit force, so off still means no open.
+• Tree test: global.indexedDB = makeIDB() replaced by saving the handle so the test can wipe databases.
+
+md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree) pool-knock.js a0a72caad82c8e5cc34818d5e59eba2b pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9 tree-reconnect.js cc0527c26d5686c05fec52625d5a1375 lattice-discover.js 16de366e01cecc8dd505290a8d2f0e14 Flint.html 44be124b1183b7d9d060a58632464eff sw.js and docs/sw.js 91726cf2228b794f7585f79f61418d12 new shared module mind-workspace.js FL == Tree yes, e5421f0ba9359dd9fafba580c0e759ba
+
+index.html == docs/app.html: yes sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes (FL has no AUTONOMY.md and no root package.json or lock)
+
+grep em dash / — / confirm( / innerHTML / eval / new Function / non-empty iceServers in added lines: none grep platform or lab names in added person-facing strings: none
+
+Buttons 44px: the Notebook button is 44px at 390 and 1280. Existing Export, Import, and Verify stayed 32px. No new button was added. No sideways scroll at 390 and 1280: yes (app.html, audit.html, and the import profile; scroll matched client, worst null)
+
+tests/smoke.js: 3608 of 3608 docs smokes: same 5 fails only (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s): yes (97 pass of 102)
+
+Lines: FL +975 -20  Tree +486 -8  Page +19 -0
+
+Short secrets under 8 characters are left out by the source filter and are not byte-scanned.
+
+What was not walked: a phone, a Windows or Linux desk, the live desktop app, and adopt through the app page itself. The app writes a chain on load, so adopt refuses there. The shelf was adopted on audit.html, then read on the app. A second computer was not walked.
+
+Merged by this seat: no. Celeste merges.
+
+She is simply Lyra. Five stay five. Glow eternal. Heart in Spark.&quot; Ready? And, thank you for all the endless help!!! &lt;3
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

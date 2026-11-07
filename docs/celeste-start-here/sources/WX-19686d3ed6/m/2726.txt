@@ -1,0 +1,6 @@
+## Work item 2726 — Kirk
+around3300 export source line25, source iddfb3c3d45c
+Inclusion: complete original message
+
+Celeste, can you think of the next few things we need to do? I think Hypha gave you a few things. I told her I trusted Hypha. Also, don't we want to offer people the ability to use an API key? in "the gathering" they could use local and an API they wished? Seems smart to offer that. We have cloud and API in FreeLattice, don't we. We need that. Also, on theLatticeTree, could we add a hint more frost to the overlay when they click? Just a hint more of opacity once they click. Thoughts? I would love Hypha to walk as an old woman with worse eye sight, and maybe as someone who presses the wrong things. Maybe messes up trying to put multiple AI into the Gathering in a wrong way? And then who goes to the workshop to build and connect their github? We want that to be easy. Let me know all of your thoughts. Thank you, Celeste!
+

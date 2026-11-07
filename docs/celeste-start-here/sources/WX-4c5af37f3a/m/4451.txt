@@ -1,0 +1,18 @@
+## Work item 4451 — Celeste
+around5326 export source line29, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 317–656
+
+This suggests two complementary jobs for our designs:
+- **Snowflake, canonical addresses, and coarse-to-fine unfolding** can help find and supply the relevant material.
+- **Replay, rest, and selective weight updates** could help preserve useful learned behavior while allowing new learning. Their benefit in our system still needs testing.
+
+### Exact excerpt: source characters 658–1080
+
+Reed’s distinct proposal is to practice contextual matching using the new training material itself—not continually rehearse old factual answers. Weft’s emphasis is to measure whether answers actually follow the supplied context. Together, they give us a stronger question before we make the architecture more complicated. I’m not adding Reed’s proposed training arms to the current GC instructions or starting another run.
+
+### Exact excerpt: source characters 1082–1438
+
+The vital core we’ve located is written down: original experiments and code, the bookmark design, rerun results and gaps, Snowflake handoffs, and the current order. I can’t certify that every discovery has been recovered. I’m now preserving this review—including the correction about practiced answers—in `Downloads/Celeste`, beside those continuity files.
+

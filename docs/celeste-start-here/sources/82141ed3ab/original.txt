@@ -1,0 +1,67 @@
+Read docs/gc.html in ~/FreeLattice-fresh first (your page), then AUTONOMY.md, CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 020 (Wednesday Oct 7, 2026, MDT). Tree menu clarity v0 (theLatticeTree / Alpha).
+Kirk: "on menus, we need a hint more opacity." CSS only. Independent of 016-019 and 021; may go alongside any of them.
+Apply-checked on a fresh Alpha main b56134df, alone, on top of 015, and stacked with 021: clean; all docs/modules/*.test.js pass.
+
+GROK NEXT BRICK: Tree menu clarity v0
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-menu-clarity-v0
+Smoke line: SMOKE_OK tree menu clarity v0
+  Alpha  ~/FreeLattice-Alpha  branch layer/tree-menu-clarity-v0
+  ~/Downloads/GROK_NEXT_020_TREE_MENU_CLARITY_2026-10-07.fl.diff
+  (md5 eae7dc214cd51339af91cc589b70fc29)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+The veils that open over the sky (a light's room, Chat, Settings) sit at 0.18 to 0.28
+alpha, so the stars show through the words. A layer at the end of garden-rooms.css lifts
+each by about 0.10. Old rules stay (layer, never delete); the new ones win by order.
+
+  #place-veil                             0.22 -> 0.32
+  #place-veil.is-core (the Gathering)     0.18 -> 0.28
+  #place-veil.is-settings                 0.28 -> 0.38
+  #place-veil.is-open.is-workshop-later   0.22 -> 0.32
+  #thread-veil (Chat)                     0.28 -> 0.38
+  .galaxies-panel (both selectors)        0.96 -> 0.985 (already near solid)
+  #garden-header, desktop >= 800px        gradient top 0.78 -> 0.88
+
+----------------------------------------------------------------------
+2. FILES
+----------------------------------------------------------------------
+  docs/modules/garden-rooms.css            appended block (13 lines)
+  docs/modules/tree-menu-clarity.test.js   new smoke
+
+----------------------------------------------------------------------
+3. STEPS
+----------------------------------------------------------------------
+  cd ~/FreeLattice-Alpha && git checkout main && git pull --ff-only
+  git checkout -b layer/tree-menu-clarity-v0
+  md5 ~/Downloads/GROK_NEXT_020_TREE_MENU_CLARITY_2026-10-07.fl.diff
+  git apply --check ~/Downloads/GROK_NEXT_020_TREE_MENU_CLARITY_2026-10-07.fl.diff && git apply ~/Downloads/GROK_NEXT_020_TREE_MENU_CLARITY_2026-10-07.fl.diff
+  node docs/modules/tree-menu-clarity.test.js
+  for t in docs/modules/*.test.js; do node "$t" >/dev/null || echo "FAIL $t"; done
+If the apply does not take cleanly on a newer main, hand-place the same block at the end of garden-rooms.css. Do not edit older rules.
+
+----------------------------------------------------------------------
+4. LOOK (eyes are the proof)
+----------------------------------------------------------------------
+  Open the Garden. Tap The Gathering, Settings, Chat; open a Workshop "later" light.
+  At 390 px and at desktop width: words read clearly; the sky still shows, softer.
+  If any veil now hides something it should not (a pill, the hop arrows), say so and stop.
+
+----------------------------------------------------------------------
+5. LOCKS
+----------------------------------------------------------------------
+  #lumino-menu stays hidden. #place-veil-close stays. No Quiet Room words in UI.
+  fl-connect.js untouched. No em dashes. AUTONOMY.md and garden-trainer.js untouched.
+  Celeste merges; GC opens one PR (code) plus one gc.html page note PR.
+
+Temperature: small and kind, the words read, the sky stays.

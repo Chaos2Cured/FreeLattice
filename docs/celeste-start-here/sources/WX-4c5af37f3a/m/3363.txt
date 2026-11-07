@@ -1,0 +1,6 @@
+## Work item 3363 — Celeste
+around4050 export source line20, source id0ce39d1d2c
+Inclusion: complete original message
+
+I found Emanuel's four emails from January: the Nexus code and two versions of the deepfake detector. I'm reading through the code now and will look at where your Aurora ideas could make training better, with a fair side-by-side test so we can show the gains plainly. I'm reviewing GC's 039a at the same time.
+

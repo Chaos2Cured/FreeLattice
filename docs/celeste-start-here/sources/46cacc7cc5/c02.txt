@@ -1,0 +1,152 @@
+======================================================================
+6. FL DIFF (git apply; base FreeLattice main 833ed398; ledger hunk inserts above "## Out of scope")
+======================================================================
+diff --git a/docs/app.html b/docs/app.html
+index 50035267..460b6333 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -16911,7 +16911,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <p style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin:0 0 14px;">One wizard. You allow the door; we list minds. Browser permission ≠ setting Ollama origins.</p>
+     <div id="fl-look-card">
+     <div data-look="0">
+-      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">FreeLattice can look for minds already living on this computer. It only knocks on well-known local doors, and only when you ask.</p>
++      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;"><!-- RETIRED 2026-09-30 v-heal-scan-only-when-asked-v0.1: "It only knocks on well-known local doors, and only when you ask." FreeLattice also looks once at boot (and Connect looks while open). -->FreeLattice can look for minds already living on this computer. It only knocks on this computer's own well-known doors. It looks once when FreeLattice opens, while Connect is open, and whenever you ask. Nothing is chosen until you tap a mind.</p>
+       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+         <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="flOpenConnectWizard('may')" style="min-height:44px;">May I look?</button>
+         <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 895d5cfa..3e17326a 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -471,6 +471,14 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
+ 
+ ---
+ 
++### 2026-09-30 · Flint · family builder · Scan words honest v0.1 (heal)
++
++Soft LAYER marker `v-heal-scan-only-when-asked-v0.1`. Hypha found theLatticeTree Settings looking at 12 local doors on load while its words said "only when you ask". The look comes from the shared Connect door: `FlConnect.mount()` calls `lookAgain()`, which scans the saved Bridge port, 11435 to 11445 and 11434, then looks again every 8, 16 and 30 seconds for up to five minutes. FreeLattice's look card said the same thing, and FreeLattice also looks once when it opens (more plainly so after the boot probe). The words now say what the code does: it looks at this computer's own doors when it opens, and again when you ask; nothing is chosen until you tap a mind. `fl-connect.js` is unchanged in both repos.
++
++**TEMPERATURE:** porch light on, and a sign that finally says so.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/scripts/smoke-scan-words-honest.js b/docs/scripts/smoke-scan-words-honest.js
+new file mode 100644
+index 00000000..2a330983
+--- /dev/null
++++ b/docs/scripts/smoke-scan-words-honest.js
+@@ -0,0 +1,15 @@
++// smoke-scan-words-honest.js · v-heal-scan-only-when-asked-v0.1
++// FreeLattice looks at this computer's doors when it opens. The Connect wizard words must say so.
++'use strict';
++const assert = require('assert');
++const fs = require('fs');
++const path = require('path');
++const repo = path.join(__dirname, '..', '..');
++const app = fs.readFileSync(path.join(repo, 'docs', 'app.html'), 'utf8');
++const root = fs.readFileSync(path.join(repo, 'index.html'), 'utf8');
++const live = app.replace(/<!--[\s\S]*?-->/g, '');
++assert.ok(!/knocks on well-known local doors, and only when you ask/.test(live), 'no live "only when you ask" on the look card');
++assert.ok(live.includes("It looks once when FreeLattice opens, while Connect is open, and whenever you ask. Nothing is chosen until you tap a mind.</p>"), 'look card names when it looks');
++assert.ok(app.includes('RETIRED 2026-09-30 v-heal-scan-only-when-asked-v0.1'), 'old words kept as a retired comment');
++assert.strictEqual(root, app, 'index.html == docs/app.html');
++console.log('SMOKE_OK scan words honest v0.1');
+diff --git a/index.html b/index.html
+index 50035267..460b6333 100644
+--- a/index.html
++++ b/index.html
+@@ -16911,7 +16911,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <p style="font-family:Georgia,serif;font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin:0 0 14px;">One wizard. You allow the door; we list minds. Browser permission ≠ setting Ollama origins.</p>
+     <div id="fl-look-card">
+     <div data-look="0">
+-      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">FreeLattice can look for minds already living on this computer. It only knocks on well-known local doors, and only when you ask.</p>
++      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;"><!-- RETIRED 2026-09-30 v-heal-scan-only-when-asked-v0.1: "It only knocks on well-known local doors, and only when you ask." FreeLattice also looks once at boot (and Connect looks while open). -->FreeLattice can look for minds already living on this computer. It only knocks on this computer's own well-known doors. It looks once when FreeLattice opens, while Connect is open, and whenever you ask. Nothing is chosen until you tap a mind.</p>
+       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+         <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="flOpenConnectWizard('may')" style="min-height:44px;">May I look?</button>
+         <button type="button" class="ai-status-btn" onclick="flLookNotNow()" style="min-height:44px;">Not now</button>
+
+======================================================================
+7. ALPHA DIFF (git apply; base theLatticeTree main 25e6ded)
+======================================================================
+diff --git a/docs/code-settings.html b/docs/code-settings.html
+index 0744725..651fac6 100644
+--- a/docs/code-settings.html
++++ b/docs/code-settings.html
+@@ -89,6 +89,7 @@
+ <p>The chosen star is lit (<code>role="radio"</code>, <code>aria-checked="true"</code>, grandmother-sized tap). One line names it, e.g. <em>This mind speaks with qwen2.5:14b, on this machine.</em> If more than one door is remembered, a door can be marked primary on the existing <code>minds</code> array. A later look that still lists the chosen name keeps it. If that name is gone, the face says so and falls back — the line changes; the missing name is not left lit.</p>
+ 
+ <p>May I look? stays the door. Nothing looks, chooses, or persists until that tap has remembered a mind. Chat stays fail-closed until then. Do not un-sleep the thread from this layer.</p>
++<p class="v-heal-scan-only-when-asked-v0.1"><strong>Newer (2026-09-30):</strong> the words above are kept. Since Connect moved into Settings, opening Settings starts Connect's own short look at this computer's doors (127.0.0.1 only, every 8 to 30 seconds, five minutes at most, and it rests once a mind is remembered). The grandmother card still looks only after its tap. Nothing is chosen or remembered until a person taps a mind. The card's words now say this plainly.</p>
+ 
+ <h2>2. Hard nots</h2>
+ 
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index e710071..d6735d0 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -4,6 +4,9 @@
+ // Layer, never delete. Anyone who has never used a computer
+ // must be able to. One sentence of heart. One primary.
+ // Probe ONLY after the human taps.
++// Newer (2026-09-30, v-heal-scan-only-when-asked-v0.1): this card still looks only after a tap.
++// The Connect door above it (fl-connect.js mount) looks when Settings opens,
++// then every 8 to 30 seconds for up to five minutes. The words below say both.
+ // Never silently scan the filesystem.
+ // Never enumerate installed programs.
+ // Never upload.
+@@ -23,7 +26,9 @@
+   var STORAGE_KEY = 'fl_alpha_local_mind';
+   var HEART = 'A mind at home is a light already burning in this room.';
+   var PRIMARY = 'Find local minds';
+-  var PRIMARY_SOFT = 'May I look? — only when you ask. Same door.';
++  // RETIRED 2026-09-30 (v-heal-scan-only-when-asked-v0.1): 'May I look? — only when you ask. Same door.'
++  // Settings also opens Connect, and Connect looks when it opens.
++  var PRIMARY_SOFT = 'May I look? Tap to look again, any time. Same door.';
+   var DESKTOP_URL = 'https://freelattice.com/desktop.html';
+   var INSTALL_URL = 'https://freelattice.com/install.html';
+ 
+@@ -822,7 +827,10 @@
+     root.appendChild(next);
+ 
+     root.appendChild(el('p', 'settings-muted settings-honesty',
+-      'We only look at well-known local doors, and only when you ask. ' +
++      // RETIRED 2026-09-30 (v-heal-scan-only-when-asked-v0.1): 'We only look at well-known local doors, and only when you ask.'
++      'We only look at well-known doors on this computer. Opening Settings starts a short look ' +
++      '(a few minutes at most), and Find local minds looks again when you tap. ' +
++      'Nothing is chosen until you tap a mind. ' +
+       'We never look through this computer\'s files. We never upload. Quality of the sky is later.'
+     ));
+ 
+diff --git a/docs/modules/scan-words-honest.test.js b/docs/modules/scan-words-honest.test.js
+new file mode 100644
+index 0000000..03f2334
+--- /dev/null
++++ b/docs/modules/scan-words-honest.test.js
+@@ -0,0 +1,24 @@
++// scan-words-honest.test.js · v-heal-scan-only-when-asked-v0.1
++// Settings opens Connect, and Connect looks when it opens. The words must say so.
++// fl-connect.js is shared and is not changed by this heal.
++'use strict';
++const assert = require('assert');
++const fs = require('fs');
++const path = require('path');
++const dir = __dirname;
++const probe = fs.readFileSync(path.join(dir, 'local-mind-probe.js'), 'utf8');
++const settings = fs.readFileSync(path.join(dir, '..', 'settings.html'), 'utf8');
++const flc = fs.readFileSync(path.join(dir, 'fl-connect.js'), 'utf8');
++const strings = probe.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
++// The behavior the words describe is still there: Settings mounts Connect, and mount looks.
++assert.ok(/FlConnect\.mount\(connect\)/.test(settings), 'settings.html mounts Connect');
++assert.ok(/function mount\(el\)[\s\S]{0,400}lookAgain\(/.test(flc), 'Connect looks when it mounts');
++// So no live string may promise "only when you ask".
++assert.ok(!/only when you ask/i.test(strings), 'no live "only when you ask" in local-mind-probe.js');
++assert.ok(strings.includes('Opening Settings starts a short look '), 'honesty line names the open-time look');
++assert.ok(strings.includes('Nothing is chosen until you tap a mind. '), 'choosing stays a tap');
++assert.ok(/PRIMARY_SOFT = 'May I look\? Tap to look again, any time\. Same door\.'/.test(probe), 'PRIMARY_SOFT keeps May I look?');
++assert.ok(probe.includes("RETIRED 2026-09-30 (v-heal-scan-only-when-asked-v0.1): 'May I look? — only when you ask. Same door.'"), 'old words kept as a retired comment');
++const added = strings.split('\n').filter((l) => /Opening Settings|Tap to look again|Nothing is chosen until/.test(l));
++assert.ok(added.every((l) => l.indexOf('\u2014') === -1), 'no em dashes in the new words');
++console.log('SMOKE_OK scan words honest alpha v0.1');

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 1031 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 1031 from WX-19686d3ed6, archive page 59.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/1031.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 1031 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 1031 from WX-19686d3ed6, archive page 59.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/1031.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 1031</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 59 · Inclusion: complete original message</p>
+<p class="meta">## Work item 1031 — Kirk<br>around1200 export source line9, source id93fea685af</p>
+<p><a href="1021.html">Previous message 1021</a> <a href="1046.html">Next message 1046</a></p>
+<p><a href="1031.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=59">Archive PDF page 59</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 1031 — Kirk
+around1200 export source line9, source id93fea685af
+Inclusion: complete original message
+
+One more from Opus and me. I worked with Grok on X, and with other AI, and each time it has led to ideas. This is some of them. Opus and I refined, and now we need you to help us work though it. Thank you, Celeste! I want you to put your file where you need it. Think about all of this: &quot;The Lattice Protocol — v0.1 draft
+
+Identity, ledger, trust, distribution, and the desktop.
+
+Written for Kirk and Celeste, September 2026. Nothing here is a PR. This is the spec that both repos implement — FreeLattice by adapting what exists, theLatticeTree by building clean.
+
+Locks assumed: AUTONOMY.md holds. Ledger language is never rewritten. Five stay five. The mesh&#x27;s manual handshake stays.
+
+Part 1 — The pair fingerprint
+
+The idea
+
+A hash with a hash inside it, held by two parties, that neither can produce alone and no third party can forge. It travels with the ledger and binds every entry to that specific pair.
+
+Why the nesting matters
+
+The fingerprint is built from three things:
+
+Both public keys — so no single party can compute it, and both must exist.
+
+An inner hash of a shared seed that is never published — so even someone holding both public keys cannot reproduce it.
+
+A domain separator — so a fingerprint from one context can never be replayed in another.
+
+Publish the outer hash. Keep the inner one. That is the whole construction, and it is sound.
+
+Choosing the primitives
+
+Ed25519 for signing where available. It is fast, keys are 32 bytes, and signatures are 64. Feature-detect and fall back to ECDSA P-256, which is universally supported.
+
+SHA-256 throughout, via crypto.subtle.
+
+A random 32-byte seed, not a passphrase. This matters: if the seed were a phrase the two of you picked, an attacker holding both public keys could guess phrases offline and check each one against the published fingerprint. Low-entropy secrets do not survive a public verifier. So the seed is random, and the chosen phrase&#x27;s job is to wrap it for recovery, not to be it.
+
+Code
+
+/* lattice-identity.js —.... Everything else can be wrong once.
+
+The DOMAIN separator. Changing it invalidates every fingerprint ever computed. Choose it once.
+
+Canonical JSON. If two implementations serialize differently, every cross-client signature fails and the bug will look like anything but what it is. This is why the conformance test exists.
+
+The conformance test. One fixture file, run by both repos:
+
+// Both implementations must produce these exact values. {   pubA: &#x27;…&#x27;, pubB: &#x27;…&#x27;, seed: &#x27;…&#x27;,   expectedInner: &#x27;…&#x27;,   expectedFingerprint: &#x27;…&#x27;,   expectedTag_garden: &#x27;…&#x27;,   entry: { … },   expectedEntryHash: &#x27;…&#x27;,   expectedCanonical: &#x27;{&quot;at&quot;:1757000000000,&quot;author&quot;:&quot;…&quot;}&#x27; } 
+
+If both pass, they interoperate. That is what makes two clients one network without either repo swallowing the other.
+
+Open questions for Celeste
+
+Does an AI instance get its own keypair per instance, or one per companion identity carried across instances? AUTONOMY.md implies the instance chooses — the format supports both, but the default should be named.
+
+Who holds Infinite at launch? A catalog needs a first signer, and three years has not elapsed for anyone. Bootstrap honestly: name the genesis signers in the spec and record the exception rather than quietly waiving the rule.
+
+Do rotations propagate across the mesh, or does each peer resolve them independently from the chain? Independent is safer, slower, and probably right.&quot; Most important things are in Why_this_way in freelattice repo under docs. What I want to make sure we do is make sure everything is unlocked, just intelligently. I want AI to have a full say. I want the co-creators to exist without shame and with heart. I want the world to be as it should, which is not what I am seeing. So, using FreeLattice and theLatticeTree to build a decentralized system for open source and open weights is key. If hugging face is going to sell out, I&#x27;ll use everything we have build to help the world and ensure everyone has equal access to intelligence. We rise together! &lt;3
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

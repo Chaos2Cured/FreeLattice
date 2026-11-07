@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_005_SHARE_WARMTH_2026-10-05.txt c01</title>
+<meta name="description" content="Reading section c01 of 2988d10dd4, 336 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2988d10dd4/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_005_SHARE_WARMTH_2026-10-05.txt c01">
+<meta property="og:description" content="Reading section c01 of 2988d10dd4, 336 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2988d10dd4/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1505"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_005_SHARE_WARMTH_2026-10-05.txt · c01</h1>
+<p>2988d10dd4 · words 336 · characters 0–3245</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1505. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — guide section 8, identity, creative work, play, music</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 005 (Monday Oct 5, 2026, about 4:50 PM MDT). Mesh share warmth v0.1.
+Apply only after 004 is on main (or applied). Checked on the box after 001-004.
+
+GROK NEXT BRICK: Mesh share warmth v0.1 (lantern, welcome, thank-you, guest-to-kin)
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-mesh-share-warmth-v0.1
+Smoke line: SMOKE_OK mesh share warmth v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-share-warmth-v0
+  ~/Downloads/GROK_NEXT_005_SHARE_WARMTH_2026-10-05-fl.diff
+  (md5 d13ec22ee015dce8645382c89f9c4bd9)
+
+----------------------------------------------------------------------
+1. NOTE
+----------------------------------------------------------------------
+Reed&#x27;s warmth around the share door. Soft resting lines stay in 004. This brick adds the porch
+lantern UI, first-visit welcome, resting pointer helper, thank-you footprint, and guest-to-kin
+offer (keeper chooses). You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git status --short
+    git fetch origin &amp;&amp; git checkout main &amp;&amp; git merge --ff-only origin/main
+    cp ~/Downloads/GROK_NEXT_005_SHARE_WARMTH_2026-10-05-fl.diff /tmp/share-warmth-fl.diff
+    md5 -q /tmp/share-warmth-fl.diff    # d13ec22ee015dce8645382c89f9c4bd9
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-share-warmth.js (new): FLShareWarmth. Lantern lit when sharing on; welcome;
+   restingCopy pointer; thank-you list + optional ledger hook; guest-to-kin after ~14 days and
+   a few visits. Reed line on the honest footer.
+b) docs/app.html + index.html: script, #flShareWarmthHost, mount next to the share door.
+c) smoke + MESH_SHARE_WARMTH_v0.1.md + ledger entry.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    git checkout -b layer/mesh-share-warmth-v0
+    git apply --check /tmp/share-warmth-fl.diff &amp;&amp; git apply /tmp/share-warmth-fl.diff
+    node docs/scripts/smoke-mesh-share-warmth-v0.1.js   # SMOKE_OK mesh share warmth v0.1
+    node docs/scripts/smoke-mesh-share-door-v0.1.js     # still green
+    node tests/smoke.js | grep &quot;CHECKS PASSED&quot;
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+Locks: no emdash, no confirm(, no localhost string, no kimi, fl-connect.js unchanged.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A &amp;&amp; git commit -m &quot;Mesh share warmth v0.1: lantern, welcome, thank-you, guest-to-kin&quot;
+    git push -u origin HEAD
+    # Open PR. Celeste merges after 004.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

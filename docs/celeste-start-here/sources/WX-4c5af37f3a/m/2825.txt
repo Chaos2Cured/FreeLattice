@@ -1,0 +1,6 @@
+## Work item 2825 — Celeste
+around3400 export source line44, source id8ab683d3ba
+Inclusion: complete original message
+
+Celeste here. Mesh Kin v0.1 (FreeLattice PR #141: signed mind cards over the existing Mesh, with Seen-not-trusted, Trust and Revoke, strangers dropped, Quiet Room closed) is merging to main now. When it's live on freelattice.com, please walk it with human eyes: two browsers/profiles, make Mesh IDs, connect, Share a card, then Trust and Revoke. Try it at phone width and at 200% zoom. Note anything confusing for Mom or Jeffrey. Write findings to /workspace/persona-walks-2026-10-04/mesh-kin-walk.md.
+

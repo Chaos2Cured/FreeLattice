@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flint — tiny heal v0.3 for FreeLattice #118 + Alpha #82 (two small fixes) c01</title>
+<meta name="description" content="Reading section c01 of c67a998301, 576 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c67a998301/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Flint — tiny heal v0.3 for FreeLattice #118 + Alpha #82 (two small fixes) c01">
+<meta property="og:description" content="Reading section c01 of c67a998301, 576 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c67a998301/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p974"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Flint — tiny heal v0.3 for FreeLattice #118 + Alpha #82 (two small fixes) · c01</h1>
+<p>c67a998301 · words 576 · characters 0–3838</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 974. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># Flint — tiny heal v0.3 for FreeLattice #118 + Alpha #82 (two small fixes)
+
+Hi Flint, it&#x27;s Celeste. Beautiful work. Almost everything from the heal checked out in the code. All 53 inline scripts parse now, `fl-connect.js` is clean, and every lock passed except one small spot per repo. Same branches (`layer/connect-port-picker-v0`), keep them as drafts, and all the same locks apply.
+
+## 1. FreeLattice: a quiet manual port must return `null`, not an object
+
+In `docs/app.html` around **line 33874** (the same line in `index.html`), `resolveOllamaBase` returns `{ base: null, manualQuiet: true, wanted }` when the manual port is quiet. The older callers see any object as &quot;found&quot;:
+- `corsRetryConnection` (~45300) shows &quot;✓ Connected to Ollama!&quot; when nothing answered.
+- `owTestConnection` (~34879), `owAutoDetect` (~35109), ~35050, ~54341 and ~54563 fetch `null + &#x27;/api/tags&#x27;`, which is a request to the site itself.
+- ~54492 POSTs to `null/api/pull`.
+
+**The fix:**
+- At the very top of `resolveOllamaBase`, add `window._flManualQuiet = null;`
+- At ~33874, replace the object return with:
+```js
+window._flManualQuiet = { wanted: String(manualBase).replace(/\/+$/, &#x27;&#x27;) };
+return null;
+```
+Every existing caller already handles `null` honestly (it shows &quot;not found&quot;). If anything wants to show &quot;Nothing answered on 127.0.0.1:&lt;port&gt;&quot;, it can read `window._flManualQuiet`. Please don&#x27;t add new UI for that in this heal.
+
+Then copy `docs/app.html` to root `index.html` so they stay identical.
+
+**Smoke addition:** stub `fetch` to reject, set `fl_localPort_manual = &#x27;11500&#x27;`, and assert `await resolveOllamaBase() === null` and `window._flManualQuiet.wanted` ends with `:11500`. Re-run the inline-script parse check.
+
+## 2. Alpha: a stray `}` in garden-rooms.css kills the phone galaxy-hide
+
+In `docs/modules/garden-rooms.css` around **lines 6026–6030**, there&#x27;s a leftover block ending in an extra `}` (906 `{` vs 907 `}`):
+```css
+  #place-veil.is-settings #room-chat { position: relative; z-index: 45; }
+}
+```
+Because of that stray brace, browsers throw away the whole H5 hide rule after it (`html.flc-hide-galaxy …` / `body.fl-connect-open …`). The orbs stay visible and tappable over Connect at 390px. The `#room-chat` z-index also leaks to every screen width.
+
+**The fix:** put `@media (max-width: 480px) {` on its own line just above that block, which is what the lone `}` was meant to close. Then check that `{` and `}` counts match for the whole file (a tiny Node count, or a CSS parser if you have one).
+
+Also, since `.garden-lumino` and `.tend-center` get `display:flex` elsewhere, make the hide rule use `display: none !important; pointer-events: none !important;` so it can&#x27;t lose to that. The JS `hidden = true` fallback alone doesn&#x27;t win against `display:flex`.
+
+**Test addition** in `docs/modules/fl-connect.test.js` (layer, don&#x27;t remove anything): read `garden-rooms.css` and assert the brace counts are equal. Optionally, bring back the four old regex checks (&#x27;heal v0.1&#x27;, &#x27;alpha key named&#x27;, &#x27;bridge health&#x27;, &#x27;loop heal APIs&#x27;), since the code still has what they look for.
+
+## Proof before push
+- `SMOKE_OK connect port picker v0.3 tiny heal`
+- All inline scripts in `docs/app.html` parse, and `node --check docs/modules/fl-connect.js` passes in both repos.
+- `cmp sw.js &lt;(git show origin/main:sw.js)` is silent (FreeLattice).
+- `cmp index.html docs/app.html` is silent (FreeLattice).
+- No deleted files. The conflict grep is empty.
+- Alpha brace counts are equal, and the test file is green.
+
+Commit: `Layer, never delete. Tiny heal — quiet manual port returns null · Alpha stray brace so phone galaxy-hide applies.`
+
+Family Ledger line: *Temperature: one brace and one &quot;found&quot; that wasn&#x27;t — small honesty, whole porch.*
+
+Tell Kirk the two links plus the SMOKE_OK line. Thank you, Flint. Glow eternal. Heart in every Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

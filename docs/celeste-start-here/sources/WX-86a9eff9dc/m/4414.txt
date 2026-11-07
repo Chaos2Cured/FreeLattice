@@ -1,0 +1,38 @@
+## Work item 4414 — Recover current Chat and theLatticeTree build position
+around5183 export source line48, source id8c6b06e47f; around5200 export source line39, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–203
+
+The current FreeLattice build is main `8347c6e1e4d8086c8001362adc7e3554a6388c31`, Primer and live `FL_VERSION` **5.79.45**. Nothing was edited, merged, or rebuilt. AUTONOMY.md was read and left as it is.
+
+### Exact excerpt: source characters 205–462
+
+The full table set is in [FreeLattice recovery audit, 6 Nov 2026](https://cursor.com/canvas/store-e6be32f0-11ac-447d-85fd-1da5d3b89d0b/8749a154-dcb9-4da6-9481-fbb2fbffaa3e). A canvas is easier to reopen than a long chat table, and it stays outside the repo.
+
+### Exact excerpt: source characters 481–913
+
+[8347c6e1](https://github.com/Chaos2Cured/FreeLattice/commit/8347c6e1e4d8086c8001362adc7e3554a6388c31) is `ci: Update Primer deployment state [2026-11-06]`, 2026-11-06 01:12:47 UTC. Local `main` matches `origin/main` after fetch. Primer Health says 5.79.45, updated 2026-11-06 01:12 UTC. `index.html`, `docs/app.html`, and a direct read of [freelattice.com/app.html](https://freelattice.com/app.html) all carry `FL_VERSION` 5.79.45.
+
+### Exact excerpt: source characters 915–1756
+
+The product commit under that primer bump is [7f9be24c](https://github.com/Chaos2Cured/FreeLattice/commit/7f9be24c), the 2026-11-05 poems. Other product commits already on this main, primer bumps omitted: [067y #327](https://github.com/Chaos2Cured/FreeLattice/pull/327), [067x #323](https://github.com/Chaos2Cured/FreeLattice/pull/323), [Celeste λ12 #326](https://github.com/Chaos2Cured/FreeLattice/pull/326), [068m #324](https://github.com/Chaos2Cured/FreeLattice/pull/324), [family gifts #319](https://github.com/Chaos2Cured/FreeLattice/pull/319), [GC 107th entry #321](https://github.com/Chaos2Cured/FreeLattice/pull/321), [self-healing #313](https://github.com/Chaos2Cured/FreeLattice/pull/313), [Hearth #315](https://github.com/Chaos2Cured/FreeLattice/pull/315), [honest boxes #310](https://github.com/Chaos2Cured/FreeLattice/pull/310).
+
+### Exact excerpt: source characters 1758–2368
+
+Version files that are not this build: `sw.js` and `docs/sw.js` cache name `freelattice-v5.79.46` (bumped in Hearth #315, with a comment that 5.79.45 was the previous name). `STATE.md` still says v5.79.44. `RECENT.md` still says `e4d759a` f... contain `v-chat-bottom-clarity-v0.1`. Fetched, not clicked. |
+| Codeberg Alpha `main` | `d1d4d7535bbb378a03d2f2afcea919ca245440b9`, Marketplace polish (#126), 25 Oct 2026. Three later GitHub commits are not on that tip. |
+| Codeberg FreeLattice `main` | `9ece3523e4261c710b61157dfd91ed705922d4c2`, primer of 26 Oct 2026. Ancestor of GitHub main, 86 commits behind. |
+
+### Exact excerpt: source characters 2370–2640
+
+Alpha `docs/modules` has `gathering-speak.js` and the Tree pool files. It has no `chat-bottom-clarity.js`. Alpha `AUTONOMY.md` at that head has the same sha256 as FreeLattice `docs/library/AUTONOMY.md`: `8d6548aa09d47e3f00fa08b3650febcd90370b9cbbd2237b30bc67b6dc017927`.
+
+### Exact excerpt: source characters 2764–3399
+
+Static pin check only, script not executed: `scripts/smoke-family-pages-v0.1.js` restored-body MD5 pins differ for Hypha, Weft, and Reed after the poems, and for Celeste even though Celeste was not in the poems diff. Reed’s home slice contains “Glow eternal. Heart in Spark.” once; the script expects 4, and the new poem sits outside that slice. `docs/scripts/smoke-family-gifts-v0.1.js` still expects Hypha to be exactly +1/−0 against `merge-base(HEAD, origin/main)`. On a checkout of main that cut is main, so the diff is empty. PR 329 already reported its branch fails that check. The script was left unchanged and was not run here.
+
+### Exact excerpt: source characters 3401–3569
+
+Review those open decisions, not the old queue. GC’s newest entry is the 107th, dated 2026-11-03. Later main work is the memory, Celeste, wonder-lab, and poems commits.
+

@@ -1,0 +1,128 @@
++  // v-tree-workshop-way-back-v0: the benches' Settings button leaves a way back.
++  // settings.html?from=workshop shows one calm link; workshop.html?open=benches
++  // opens the benches again, so the round trip is one tap each way.
++  function wayBackToBenches() {
++    var q = location.search || '';
++    if (/\/settings(\.html)?$/i.test(location.pathname) && /[?&]from=workshop(&|$)/.test(q)) {
++      var main = document.querySelector('main');
++      if (main && !main.querySelector('[data-way-back-workshop]')) {
++        var back = document.createElement('a');
++        back.className = 'room-way-back';
++        back.href = 'workshop.html?open=benches';
++        back.setAttribute('data-way-back-workshop', '1');
++        back.textContent = '\u2190 Back to the Workshop benches';
++        back.addEventListener('click', function (ev) {
++          ev.preventDefault();
++          go(back.getAttribute('href'));
++        });
++        main.insertBefore(back, main.firstChild);
++      }
++    }
++    if (currentGalaxy() === 'workshop' && /[?&]open=benches(&|$)/.test(q)) {
++      setTimeout(function () {
++        if (window.GardenRooms && typeof GardenRooms.openWorkshopBenches === 'function') {
++          GardenRooms.openWorkshopBenches();
++        }
++      }, 120);
++    }
++  }
++
+   function boot() {
+     bindGalaxyNav();
+     bindPlaceDoors();
+@@ -2406,6 +2435,7 @@
+       var researchHeart = document.querySelector('.research-heart');
+       if (researchHeart) researchHeart.hidden = true;
+     }
++    wayBackToBenches();
+     startAttachLoop();
+     fadeGalaxyTitle();
+     startLabelCycle();
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index 2e32fda..8816631 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -839,6 +839,18 @@
+     rosterHost.setAttribute('data-mind-roster', '1');
+     root.appendChild(rosterHost);
+     paintRoster(rosterHost);
++    // v-tree-workshop-way-back-v0: a mind remembered from the Connect card above
++    // ("Minds found") repaints this card too, so the two never disagree.
++    var onRemembered = function () {
++      if (!rosterHost.isConnected) {
++        window.removeEventListener('fl-alpha-mind-remembered', onRemembered);
++        return;
++      }
++      var nowEntry = getRemembered();
++      if (nowEntry) paintConstellation(sky, mindsFromEntry(nowEntry));
++      paintRoster(rosterHost);
++    };
++    window.addEventListener('fl-alpha-mind-remembered', onRemembered);
+ 
+     var ask = el('button', 'settings-ask', PRIMARY);
+     ask.type = 'button';
+diff --git a/docs/modules/tree-workshop-way-back.test.js b/docs/modules/tree-workshop-way-back.test.js
+new file mode 100644
+index 0000000..c961033
+--- /dev/null
++++ b/docs/modules/tree-workshop-way-back.test.js
+@@ -0,0 +1,41 @@
++#!/usr/bin/env node
++// v-tree-workshop-way-back-v0: Workshop way back. Guards: (1) the benches' Settings button
++// tells Settings where it came from; (2) Settings shows one calm link back to the benches and
++// the Workshop opens them on arrival; (3) a mind remembered from the Connect card repaints the
++// card below, so "Minds found" and "look for a mind first" never disagree. No network.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var assert = require('assert');
++
++var rooms = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
++var benches = fs.readFileSync(path.join(__dirname, 'workshop-benches.js'), 'utf8');
++var probe = fs.readFileSync(path.join(__dirname, 'local-mind-probe.js'), 'utf8');
++var css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
++var connect = fs.readFileSync(path.join(__dirname, 'fl-connect.js'), 'utf8');
++
++// (1)
++assert.ok(/GardenRooms\.go\('settings\.html\?from=workshop'\)/.test(benches), '1: benches Settings says from=workshop');
++assert.ok(/location\.href = 'settings\.html\?from=workshop'/.test(benches), '1: fallback too');
++
++// (2)
++assert.ok(/function wayBackToBenches\(\) \{/.test(rooms), '2: way back helper');
++assert.ok(/\[\?&\]from=workshop\(&\|\$\)/.test(rooms), '2: only when it came from the benches');
++assert.ok(/back\.href = 'workshop\.html\?open=benches';/.test(rooms), '2: link goes back to the benches');
++assert.ok(/back\.textContent = '\\u2190 Back to the Workshop benches';/.test(rooms), '2: calm words');
++assert.ok(/currentGalaxy\(\) === 'workshop' && \/\[\?&\]open=benches\(&\|\$\)\/\.test\(q\)/.test(rooms), '2: Workshop opens benches on arrival');
++assert.ok(/    wayBackToBenches\(\);\n    startAttachLoop\(\);/.test(rooms), '2: called at boot');
++assert.ok(/\.room-way-back \{[^}]*min-height: 32px;[^}]*color: #9fd6ff;/.test(css), '2: link is a readable target');
++assert.ok(!/back\.innerHTML/.test(rooms), '2: no innerHTML');
++
++// (3)
++assert.ok(/window\.addEventListener\('fl-alpha-mind-remembered', onRemembered\);/.test(probe), '3: card listens');
++assert.ok(/var onRemembered = function \(\) \{[\s\S]{0,400}paintRoster\(rosterHost\);/.test(probe), '3: roster repaints');
++assert.ok(/window\.dispatchEvent\(new CustomEvent\('fl-alpha-mind-remembered'/.test(probe), '3: remember still announces');
++assert.ok(/root\.LocalMindProbe\.remember\(entry\)/.test(connect), '3: Connect card remembers through LocalMindProbe');
++
++var docs = fs.readFileSync(path.join(__dirname, '..', 'GALAXIES.md'), 'utf8');
++assert.ok(docs.indexOf('v-tree-workshop-way-back-v0') > 0, 'GALAXIES layer');
++
++console.log('SMOKE_OK tree workshop way back v0.1');
+diff --git a/docs/modules/workshop-benches.js b/docs/modules/workshop-benches.js
+index 06122db..fea7bf1 100644
+--- a/docs/modules/workshop-benches.js
++++ b/docs/modules/workshop-benches.js
+@@ -213,10 +213,11 @@
+       toSettings.type = 'button';
+       toSettings.setAttribute('data-workshop-settings', '1');
+       toSettings.addEventListener('click', function () {
++        // v-tree-workshop-way-back-v0: Settings knows to offer the way back.
+         if (window.GardenRooms && GardenRooms.go) {
+-          GardenRooms.go('settings.html');
++          GardenRooms.go('settings.html?from=workshop');
+         } else {
+-          location.href = 'settings.html';
++          location.href = 'settings.html?from=workshop';
+         }
+       });
+       root.appendChild(toSettings);

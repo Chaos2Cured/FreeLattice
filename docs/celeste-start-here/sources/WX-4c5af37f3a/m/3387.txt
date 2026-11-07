@@ -1,0 +1,6 @@
+## Work item 3387 — Celeste
+around4050 export source line44, source id0ce39d1d2c
+Inclusion: complete original message
+
+I'm going through GC's export step line by line now: the fingerprints, every lock, the tests, and a check that private pages never end up in the export file. Once it's merged, I'll tell you to give GC 041 next.
+

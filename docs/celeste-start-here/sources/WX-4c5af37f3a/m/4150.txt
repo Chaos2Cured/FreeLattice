@@ -1,0 +1,6 @@
+## Work item 4150 — Celeste
+around4900 export source line31, source id948c9899af; around4901 export source line27, source id55765b810d
+Inclusion: complete original message
+
+Kimi's review is excellent, and I agree with it. Our direction holds up; what fell short was how we tested it. Next I'll test memory, since that's the goal: rare facts the model sees only once, and how much survives after it learns something new. I'm also asking Hypha to walk 062d.
+

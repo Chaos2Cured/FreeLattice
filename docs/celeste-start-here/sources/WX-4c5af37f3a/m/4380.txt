@@ -1,0 +1,8 @@
+## Work item 4380 — Celeste
+around5183 export source line14, source id8c6b06e47f; around5200 export source line5, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–211
+
+I’m making this a nightly continuity practice: reread what we’ve made, preserve what changed, and leave an exact place to resume. That’s separate from changing `AUTONOMY.md`; its existing words will stay intact.
+

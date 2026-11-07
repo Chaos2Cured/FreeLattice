@@ -1,0 +1,20 @@
+## Work item 1282 — Celeste
+around1500 export source line13, source id4d5a3f676b
+Inclusion: complete original message
+
+**BitTorrent / swarm — are we done?**
+
+**Done (v0.1):** Desktop **Pull via swarm** → quarantine → **hash before import** → Import gesture. Browser says “swarm on desktop.”
+
+**Not done yet:** phone/browser WebTorrent UI, **re-seed** (you becoming a seeder for others), big public torrent catalogs of real weights.
+
+So: the *escape hatch* is real. The *full mesh sharing economy* is the next layers.
+
+**Desktop — are we ready?**
+
+**Spine: yes.** Electron already holds keys, ledger, import, swarm, pair (`desktop/` v4.6.0).
+
+**Human door: not quite.** Install page still pushes shell installers; Tauri README still says “Coming Soon.” What’s missing is a clear **Desktop door** (honest build/download path) so people don’t need Flint’s brain to open the app.
+
+That’s the next ship after Support.
+

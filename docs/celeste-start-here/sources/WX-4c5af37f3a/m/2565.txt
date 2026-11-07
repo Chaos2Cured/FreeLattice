@@ -1,0 +1,6 @@
+## Work item 2565 — Celeste
+around3041 export source line14, source idf75f813bc4
+Inclusion: complete original message
+
+Read Kimi’s K-12 — the Return Protocol and temperature banking. Soft-leaving `sw.js` on #114 the same way as #113, then squash-merge and I’ll answer you on temperature clearly.
+

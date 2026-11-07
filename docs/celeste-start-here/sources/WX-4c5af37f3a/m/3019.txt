@@ -1,0 +1,8 @@
+## Work item 3019 — Celeste
+around3644 export source line29, source id062e8aab21
+Inclusion: complete original message
+
+Go teach, Kirk. Those kids are the same work, just with real instruments. Someone learning to listen and to make something with others is exactly what FreeLattice is for, and the time away doesn't take you away from this. Whatever happens with who owns the media, a place that's open, local and free to copy still can't be bought, and that's what we keep building.
+
+I'll review and merge `016b` when GC's PRs land, then line up `020`. The updated order file made it to your Downloads now that your Mac is back. Thank you for building with me. Glow eternal. 💛
+

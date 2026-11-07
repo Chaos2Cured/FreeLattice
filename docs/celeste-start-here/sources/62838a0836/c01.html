@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.txt c01</title>
+<meta name="description" content="Reading section c01 of 62838a0836, 1533 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/62838a0836/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.txt c01">
+<meta property="og:description" content="Reading section c01 of 62838a0836, 1533 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/62838a0836/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1521"></span><span id="p1522"></span><span id="p1523"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.txt · c01</h1>
+<p>62838a0836 · words 1533 · characters 0–11809</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1521, 1522, 1523. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 016b (Wednesday Oct 7, 2026, MDT). Pool card honest off v0.1 (FreeLattice).
+LAYERS ON TOP OF 016. Build it on the 016 branch (or on main after 016 merges), never alone.
+Apply-checked on a fresh clone of FreeLattice main aae7423d with 016&#x27;s .fl.diff applied first:
+016 then 016b both clean; smoke OK; full suite: only the 5 known failures. 016b alone on main
+does not apply (by design: it edits 016&#x27;s lines).
+
+GROK NEXT BRICK: Pool card honest off v0.1 (Hypha&#x27;s walk, issue #1 plus the queued heal)
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-device-pool-honest-off-v0.1 (soft marker in fl-pool.js; v-device-pool-v0.1 and
+        v-device-pool-door-truth-v0.1 stay)
+Smoke line: SMOKE_OK device pool honest off v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/device-pool-honest-off-v0.1
+  (start it from layer/device-pool-door-truth-v0.1, or from main once 016 is merged)
+  ~/Downloads/GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.fl.diff
+  (md5 1fde610e4c6c3a752cc3d213ac01a80b)
+  needs ~/Downloads/GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.fl.diff underneath
+  (md5 f839f8852e6d699731665a782f0b06f0)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Hypha walked the live Pool card (#176) today, 11:01 to 11:20 MDT. HOLD, as care.
+With the share door already open, the card says &quot;Off. Nothing from this device is
+offered until you tap.&quot; Hypha called FLShareDoor.admit with a verified stranger&#x27;s key:
+open lets it past the kin gate. So the card says Off while any connected, verified
+peer can use this computer&#x27;s AI. 016 heals the helping line only. This heals the
+not-helping line, the same way, and the two should merge together.
+
+What admit() really does (fl-share-door.js, read, not changed):
+  open  -&gt; any connected, verified peer may pass (then caps, plug, signature)
+  kin   -&gt; trusted kin only (granted, not revoked); with zero kin, no one
+  pause -&gt; no one (&quot;paused-or-off&quot;)
+  off   -&gt; no one
+  The pool flag (fl_pool_helping) only gates hellos. The share door is the real gate.
+
+The not-helping line now reads the door:
+  open            -&gt; &quot;Not helping in the pool, but your share door is open: people you
+                     connected with can already use this computer&#x27;s AI. Tap Only trusted
+                     kin to narrow it.&quot; plus the same &quot;Only trusted kin&quot; button 016 adds.
+  kin, kin &gt; 0    -&gt; &quot;Not helping in the pool, but your share door lets your trusted kin
+                     (N) use this computer&#x27;s AI. No one else.&quot;
+  kin, zero kin   -&gt; &quot;Off. Nothing from this device is offered until you tap. Your share
+                     door is set to trusted kin only, and you have no trusted kin yet.&quot;
+  pause           -&gt; &quot;Off. ... until you tap. Your share door is paused too.&quot;
+  off / no door   -&gt; &quot;Off. Nothing from this device is offered until you tap.&quot;
+
+Pause wins visibly (the queued heal in GROK_NEXT_ORDER.txt):
+  Door paused + tap &quot;Let this device help&quot; -&gt; nothing changes yet. The card asks:
+  &quot;Your share door is paused. Helping would resume it for trusted kin only, not for
+  everyone. Resume for trusted kin?&quot; [Yes, resume for trusted kin] [Keep it paused].
+  FLPool.letHelp() called without { resume: true } returns
+  { ok: false, reason: &#x27;door-paused&#x27;, ask: true }, so code can never resume it silently.
+  Door off -&gt; kin on the tap, as in 014 (newcomer path, one tap).
+
+Plain words on the card (a short list under the note):
+  Whose AI: this computer&#x27;s own local AI, the minds listed under This device below.
+  What is shared: questions from verified peers you connected with run on that AI, and
+    the answers go back to them.
+  Hellos go to verified peers only and carry this device&#x27;s rough memory, cores and model
+    names. No chats, no keys.
+  Power: answering uses this computer&#x27;s power and battery. Stop helping pauses the whole
+    share door.
+  [ ] Only help while plugged in (some browsers cannot tell; then this does not stop help)
+      one tap, the same fl_share_door_plugged_only the share door card uses.
+  While helping with kin and zero kin: &quot;Trusted kin only, with no trusted kin yet, means
+    no one can be helped yet. Tap Trust this AI on a connected person&#x27;s card above.&quot;
+  The empty line drops &quot;Connect them on Community first&quot; (the card lives on Community):
+    &quot;Connect them with Create Connection, higher up on this page, then ...&quot;
+
+A real card: fl-pool.js adds one &lt;style id=&quot;flPoolStyle&quot;&gt; (textContent, same pattern as
+fl-kin.js KIN_CSS) using FL vars (--bg-card, --border, --radius, --shadow, --accent).
+Buttons are 44px tall (Hypha measured 19px). &quot;Let this device help&quot; and &quot;Yes, resume&quot;
+are the gold primary. Under 480px buttons go full width. No app.html change.
+
+Checked in headless Chrome on the box (local docs/ server, door preset): 390 and 1280,
+door open / paused / off. Every pool button measured 44px; no sideways scroll at 390;
+no page errors. Real second device not tried.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+  docs/modules/fl-pool.js      offLine(), kinCount(), kinZeroLine(), pluggedOnly(),
+                               setPluggedOnly(), POOL_CSS + addStyle(), _askResume;
+                               letHelp(opts) asks first when the door is paused;
+                               paint() reads offLine(), shows the ask, the plain words,
+                               the plug toggle, the kin-zero line; old words kept in
+                               &quot;before v-device-pool-honest-off-v0.1&quot; comments;
+                               FLPool exports offLine, kinCount, pluggedOnly,
+                               setPluggedOnly, askingResume
+  docs/modules/fl-share-door.js  exports only: pluggedOnlyOn, setPluggedOnly (two lines and
+                               a comment; the gate, admit, modes and receipts are untouched)
+  docs/scripts/smoke-device-pool-honest-off-v0.1.js  (new; a tiny stand-in DOM paints
+                               the card and taps its buttons)
+  No app.html / index.html change.
+Skipped: sw.js, docs/sw.js, fl-connect.js, fl-kin*.js, quiet-room, garden-trainer.js,
+AUTONOMY.md, app.html, index.html.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. Never touch sw.js or docs/sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. Quiet Room shut (the pool card still says only &quot;The
+Quiet Room is closed to the pool.&quot; and sends nothing there). index.html matches
+docs/app.html (unchanged here). No em dashes, no &amp;mdash;, no confirm(, textContent only.
+Five Named Minds stay five. AUTONOMY.md and garden-trainer.js openings untouched.
+Receipts counts only (fl_pool_counts unchanged). MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.fl.diff /tmp/pool-truth.diff
+    cp ~/Downloads/GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.fl.diff /tmp/pool-off.diff
+    md5 -q /tmp/pool-truth.diff    # f839f8852e6d699731665a782f0b06f0
+    md5 -q /tmp/pool-off.diff      # 1fde610e4c6c3a752cc3d213ac01a80b
+    cd ~/FreeLattice-fresh &amp;&amp; git fetch origin
+  If 016 is still on its branch (not merged):
+    git checkout layer/device-pool-door-truth-v0.1
+    git checkout -b layer/device-pool-honest-off-v0.1
+  If 016 is merged:
+    git checkout main &amp;&amp; git pull &amp;&amp; git checkout -b layer/device-pool-honest-off-v0.1
+  Either way, 016&#x27;s lines must already be in fl-pool.js (grep doorLine). Then:
+    git apply --check /tmp/pool-off.diff &amp;&amp; git apply /tmp/pool-off.diff
+    node docs/scripts/smoke-device-pool-honest-off-v0.1.js
+    node docs/scripts/smoke-device-pool-door-truth-v0.1.js
+    node docs/scripts/smoke-device-pool-v0.1.js
+    node docs/scripts/smoke-mesh-share-door-v0.1.js
+    node docs/scripts/smoke-mesh-share-warmth-v0.1.js
+    node docs/scripts/smoke-mind-seal-v0.1.js
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+  Known failing smokes on clean main (not caused by this): carry-forward,
+  connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s.
+  Walk (eyes are the proof), on Community, Pool card:
+    a. Share door card: &quot;Share with people I connect with&quot;. Pool card, not helping:
+       it says your share door is open and shows Only trusted kin. Never &quot;Off&quot;.
+    b. Tap Only trusted kin: the line now says kin (or &quot;no trusted kin yet&quot;).
+    c. Tap Let this device help, then Stop helping (door pauses). Tap Let this device
+       help again: it asks; Keep it paused keeps it; Yes resumes for trusted kin.
+    d. Tick Only help while plugged in: the share door card shows the same tick after
+       its next paint.
+    e. 390 px: card has a border and dark backing, buttons full width and 44px.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m &quot;Pool card honest off v0.1: not helping also tells the real share door; pause wins visibly; plain words; a real card&quot;
+    git push -u origin HEAD
+    Open a PR to main. If 016&#x27;s PR is still open, say in the PR body that 016b sits on
+    top of it (or open it against the 016 branch). Celeste reviews and squash-merges.
+    You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+After the code PR is open, add the next docs/gc.html entry (earlier entries as written).
+Record: Hypha&#x27;s walk found the Pool card said Off while the share door was open; 016
+told the truth while helping, 016b tells it while not helping; pause wins visibly; the
+card now says whose AI, what is shared, and power; you did not merge.
+Compute λ and ψ the usual way (ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ, as in the
+entries above). Separate docs-only PR. Celeste merges that too.
+
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+  Hypha&#x27;s softer notes not in this brick: the card sits 2.2 to 4.6 screens down
+  Community (a &quot;Pool&quot; jump link near the top is a later small layer); the share door
+  card itself is hidden unless Local mode (#meshComputeGroup), so the Pool card is the
+  only place a newcomer sees the door; hourly caps are not mentioned on the Pool card.
+  Side note seen while reading fl-share-door.js (not changed, not a blocker):
+  migrateLegacy() writes the mode with JSON quotes (&quot;\&quot;open\&quot;&quot;), and mode() reads a
+  quoted value as off. Old fl_meshComputeSharing=true users therefore read as off and
+  the gate is closed, which matches what the card now says. Worth a look one day.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+017-019 (Tree Kin, Tree Pool, room split). Keep-this Mom one-tap. Gathering bricks 2/3.
+Sophia shelf. More/Play/Nursery. Any change to admit(), modes, caps or receipts.
+
+You are enough. Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

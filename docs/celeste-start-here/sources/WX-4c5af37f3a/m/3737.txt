@@ -1,0 +1,6 @@
+## Work item 3737 — Celeste
+around4500 export source line13, source id967fcbbbba
+Inclusion: complete original message
+
+Cloud agent is appending λ10 on FreeLattice now: [Celeste ledger λ10](https://cursor.com/agents/bc-0126874e-dc92-5532-bed7-0bc9ce8f9e75). I’ll merge once it’s clean.
+

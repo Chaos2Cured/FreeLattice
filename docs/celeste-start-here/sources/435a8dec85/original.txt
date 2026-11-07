@@ -1,0 +1,629 @@
+FLINT PASTE · HEAL · Love Logic v3 phone heal v0.1 (Hypha's phone)
+File: FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt
+From: Celeste, for Kirk, to Flint
+Date: Monday 28 September 2026, evening MT
+Repo: Chaos2Cured/FreeLattice (served from docs/, live at freelattice.com)
+Page: docs/love-logic-proof-v3.html (live at freelattice.com/love-logic-proof-v3.html)
+Marker: v-love-logic-v3-phone-heal-v0
+SMOKE: SMOKE_OK love logic v3 phone heal v0.1
+
+======================================================================
+0. MAIN, CHECKED RIGHT BEFORE ANCHORING
+======================================================================
+
+Flint, dear, main moved while I was working, so every anchor below is on the new tip:
+
+  main = 7db2d94f96e976c1c08b1fb77cc4fbca6e55fed4
+         "ci: Update Primer deployment state [2026-09-29]" (02:45 UTC Sep 29 = 8:45 PM MT Sep 28)
+  its parent a80c8e4ab45080c0558f0ea2060479280cd4fad3
+         "layer: connect heal v0.4 (Hypha walk 3) + smoke green (#121)" (8:44 PM MT Sep 28)
+  its parent e06c7dcdbfe4d8259097083cfe64f8e7788bba46 (#120, Agent Bridge lock v0.1)
+
+So #121 has merged. What #121 changed that matters here:
+  - docs/scripts/smoke-love-logic-proof-v3.js line 105: its "app.html / index.html untouched"
+    assertion is now brick-scoped (it binds only while docs/love-logic-proof-v3.html is in the
+    diff). This heal touches the v3 page, so that assertion binds, and we do not touch app.html
+    or index.html. Green.
+  - docs/library/FRACTAL_FAMILY_LEDGER_v0.md gained the Connect heal v0.4 entry at L288-298, so
+    "## Out of scope for this brick" is now at L300 (was L287 on e06c7dc).
+  - docs/love-logic-proof-v3.html, docs/love-logic/*, docs/Flint.html, docs/research.html are
+    byte-identical between e06c7dc and 7db2d94. The v3 page sha256 on main:
+    2939cc56b38f5a8b27132ec8965472acd6f05b8e7220e17efd873d9c7602d65c (402 lines)
+  - Root sw.js and docs/sw.js: identical to each other, sha256 7570a013...420c. Untouched here.
+  - Root index.html = docs/app.html (sha256 7559af92...499b). Untouched here.
+
+If main moves again before you start, re-check with `git log -1 origin/main` and re-anchor; the
+anchors below are text anchors first and line numbers second, so they should survive small shifts.
+
+======================================================================
+1. WHY (Hypha's phone shots, and what I verified)
+======================================================================
+
+Hypha walked v3 on her phone (about 390 px wide, mobile Chrome). Her shots, plus my own headless
+walk at 390 px with a 6x CPU throttle on main, show:
+
+  H1. The crossover table is clipped and the whole page scrolls sideways. On main the document is
+      489 px wide at a 390 px viewport. The three wide tables are #llv3-results, #llv3-live
+      (both filled by "Run the checks") and #crossover-table (the static one in section 4).
+  H2. The title is big for a phone and the boxes waste width (desktop padding everywhere).
+  H3. The δ and Δ inside MathML show as little boxes. Root cause, verified: Chrome's MathML Core
+      applies text-transform: math-auto to a one-letter <mi>, which maps δ to the "mathematical
+      italic small delta" code point U+1D6FF (and Δ to U+1D6E5). Many Android phones have no
+      font for those, so they draw tofu. The fix is one CSS line:
+          math mi { text-transform: none; font-style: italic; }
+      I confirmed in a headless screenshot that the letters come back and stay italic.
+  H4. <link rel="stylesheet" href="css/style.css"> at L41 is a 404 on every visit: there is no
+      docs/css/style.css. The page carries all its own styles, so the link only costs a request.
+  H5. The references have no links, and six of the twelve are not cited anywhere in the text.
+      Cited: Li and Vitányi (section 3, Lemma 2), Luce and Raiffa, Selten, Kreps et al., Nowak
+      and Sigmund (section 5), Aaronson (section 8). Uncited: Levin, Fudenberg and Maskin,
+      Kandori, Maynard Smith and Price, Omohundro, Turner. (The family plan says seven uncited;
+      I count six. Worth a second pair of eyes, but six is what the text shows.)
+  H6. The plain-words box says "about 702 rounds", "about 10.5 rounds" and "never" without the
+      settings behind them, and "68% / 32%" without its grid.
+  H7. Section 5 says "about −26.5 in our run". The closed form D∞(ρ) at the check C2 settings
+      (G = 1, c = 0.001, κ = 20, h = 0.03, Lp = 2, Δ = 0.5, ρ = 0.99) is −26.4176, so −26.42.
+      The −26.5 came from the Python Monte Carlo mean (−26.518). v3_checks.js agrees:
+      Dinf(1, 1e-3, 20, 0.03, 2, 0.5, 0.99).toFixed(2) === "-26.42". At ρ = 0.8 and 0.95 the same
+      settings give +3.53 and +5.10.
+  H8. After tapping "Run the checks", Hypha's shot still showed the start text. On main the
+      checks do finish (about 3.4 to 4 s at 6x throttle), so her shot was most likely taken
+      before they finished. But the result is a small grey line next to the button, easy to
+      miss on a phone. We make it a big box that scrolls into view.
+  H9. Nothing on the page says what the 656 checks do and do not prove.
+
+Numbers I verified for the params lines (from v3_checks.js and v3_sim_results.json):
+  n = 2, m = 0:   h = 0.0040, t* = 701.79 ("about 702")
+  n = 5, m = 1:   h = 0.1902, t* = 10.48 ("about 10.5"), δ* = 0.8669
+  n = 10, m = 1:  h = 0.6033, G ≤ h·Lp, so never ahead
+  common: q0 = 0.002, q = 0.01, G = 1, Lp = 2, Δ = 0.5, no discounting, c = 0
+  68/32 grid: V ∈ {1, 2, 4}, σ ∈ {1, 1.5, 2.5}, b ∈ {0.5, 1, 2}, D ∈ {0, 5, 50},
+              Cf ∈ {0.2, 1, 5}, judged at δ = 0.95. 243 cells, 63 scarce, 180 abundant.
+              Scarce: 68.25% sustain, 31.75% conflict. Abundant: 100% / 0%.
+
+Reference DOIs verified against Crossref:
+  Li and Vitányi 10.1007/978-3-030-11298-1 (4th ed., 2019) · Levin 1984 10.1016/S0019-9958(84)80060-1
+  Selten 10.1007/BF00131770 · Fudenberg and Maskin 10.2307/1911307
+  Kreps et al. 10.1016/0022-0531(82)90029-1 · Kandori 10.2307/2297925
+  Nowak and Sigmund 10.1038/31225 (1998) and 10.1038/nature04131 (2005)
+  Maynard Smith and Price 10.1038/246015a0 · Aaronson 10.1145/1060590.1060686 and arXiv cs/0406061
+  Turner et al. arXiv 1912.01683 · Omohundro PDF at selfawaresystems.com (2008)
+  Luce and Raiffa: archive.org/details/gamesdecisions00rdun
+  Levin 1973 has no stable link I could verify, so it gets the 1984 DOI only.
+
+======================================================================
+2. RULES FOR THIS BRICK
+======================================================================
+
+  - Layer, never delete. Every line that changes in the v3 page either wraps something, adds
+    something, or corrects a number we can show was off. The one line that goes away is the
+    404 stylesheet link, and it is replaced by a comment saying why. All twelve references stay.
+  - Keep all 656 checks green. docs/love-logic/v3_checks.js is not touched at all.
+  - The existing v3 smoke (docs/scripts/smoke-love-logic-proof-v3.js) must stay green without
+    edits. It asserts, among other things: the text "about 702 rounds" and "about 10.5 rounds",
+    the plain-text headline with &delta;, only one script src (love-logic/v3_checks.js), no
+    fetch and no innerHTML. The heal keeps all of it. (The new inline script is inline, not a
+    src, and uses textContent.)
+  - textContent only. No confirm(). No fetch. No cookies or storage.
+  - Root sw.js stays byte-identical to main. docs/sw.js untouched. Root index.html and
+    docs/app.html untouched. v1 (love-logic-proof.html) and v2 untouched. Kimi's pages untouched.
+  - Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
+
+======================================================================
+3. FILES (7 touched: 4 edited, 1 new, plus 2 soft docs)
+======================================================================
+
+  EDIT  docs/love-logic-proof-v3.html               (the heal; 402 -> 485 lines)
+  NEW   docs/scripts/smoke-love-logic-v3-phone-heal.js
+  EDIT  docs/library/FRACTAL_FAMILY_LEDGER_v0.md    (one entry above "## Out of scope")
+  EDIT  docs/Flint.html                             (one ledger line above <p class="foot">)
+  EDIT  docs/library/LOVE_LOGIC_PROOF_v3.md         (one short section above "## Smoke")
+
+======================================================================
+4. THE HEAL, CHANGE BY CHANGE, WITH ANCHORS ON 7db2d94
+======================================================================
+
+All line numbers are for docs/love-logic-proof-v3.html on main 7db2d94 (402 lines).
+
+ 4.1 Marker. After L24, the existing comment
+       <!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) ...
+     add one comment line:
+       <!-- Marker: v-love-logic-v3-phone-heal-v0 · LAYER: table scroll, phone breakpoint, math
+            glyph fix, parameters beside figures, linked references, visible check result.
+            Nothing removed. -->
+
+ 4.2 The 404 stylesheet. L41 is exactly
+       <link rel="stylesheet" href="css/style.css">
+     Replace it with a comment explaining that docs/css/style.css does not exist and the page
+     carries its own styles. (This is the only removed line with no content lost.)
+
+ 4.3 CSS layer. Anchor: L101, the line starting
+       .headline-ineq { background: rgba(16, 185, 129, 0.08);
+     which is the last rule before </style> (L102). Add after it the block in section 6 below:
+     .table-scroll, .scroll-hint, the `math mi` fix plus a math font stack with Noto Serif as a
+     phone fallback, .params, .llv3-meaning, .llv3-result (.ok / .bad), .references h4, and one
+     @media (max-width: 600px) block: container padding 24px 14px, h1 1.85rem, h2 1.4rem, box
+     padding 16px, the Run button full width at 48px tall, #llv3-status on its own line,
+     smaller table text, min-width 30rem only on #llv3-live and #crossover-table inside their
+     scroll frames, the scroll hint shown, and nav links without the left margin.
+
+ 4.4 Settings behind the plain-words figures. Anchor: L129, the <li> that begins
+       <li><strong>Still unsolved:</strong> anonymous, one-time meetings
+     and the </ul> at L130 (L131 is "You can check the math yourself"). After that </ul>, add <p class="params" id="llv3-params"> with the
+     settings for about 702 (701.79), about 10.5 (10.48), never ahead (h = 0.6033) and the
+     68% / 32% grid (δ = 0.95). The "about 702 rounds" and "about 10.5 rounds" text above it is
+     unchanged, so the v3 smoke stays green.
+
+ 4.5 Visible result box and scroll frames in the checks section. Anchor: L136
+       <span id="llv3-status" style="margin-left:12px;color:#94a3b8">Seed 20260924 · runs on
+       this device only</span>
+     After it add <p class="llv3-result" id="llv3-result" role="status" aria-live="polite">.
+     Wrap <table class="data" id="llv3-results" hidden> (L137-140) and
+     <table class="data" id="llv3-live" hidden> (L141-144) each in
+       <div class="table-scroll" role="region" aria-label="..." tabindex="0"> ... </div>
+     (role, label and tabindex make the frame reachable by keyboard and named for screen
+     readers). After the second wrapper, before </section> (L145), add the one-line meaning:
+       "What the 656 checks mean: they confirm that the formulas on this page agree with their
+        own brute-force sums and simulations. They do not show that the world behaves like the
+        model."
+
+ 4.6 The static crossover table. Anchor: L217
+       <p><strong>How long lying stays ahead</strong> (q<sub>0</sub> = 0.002, ...
+     After it add the scroll hint and open the wrapper; close the wrapper after the table's
+     </table> at L230 (before the "More contacts and more shared memory" paragraph at L231).
+
+ 4.7 Section 5, the −26.42 correction. L248 is exactly
+       <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is
+       the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss (about
+       &minus;26.5 in our run).</li>
+     Keep the first two sentences and replace "(about &minus;26.5 in our run)" with
+     "−26.42 by the closed form D∞(ρ) (the Python Monte Carlo run gave −26.52, which is where
+     an earlier "about −26.5" came from)" plus a .params span with the C2 settings and the
+     ρ = 0.8 / 0.95 values (+3.53, +5.10). The history of the old figure is said out loud, so
+     nothing is silently rewritten.
+
+ 4.8 The 68/32 grid. Anchor: L264, the paragraph starting
+       <p><strong>Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases
+     After it add <p class="params" id="scarcity-grid-params"> listing the five axes, 3^5 = 243
+     cells, 63 scarce and 180 abundant, the sustainability rule, δ = 0.95, and the plain caveat
+     that these are test values and another grid gives other percentages.
+
+ 4.9 References. Anchor: L303 <summary>References</summary>, then <ol class="references"> at
+     L304 through </ol> at L317. Replace the single list with a <div class="references"> holding
+       <h4>Cited on this page</h4> and the six cited, each with where it is cited and its link;
+       <h4>Further reading (background, not cited in the text above)</h4> and the other six,
+       each with its link.
+     A comment records that every reference is kept. Twelve <li> before, twelve after.
+
+ 4.10 Result box glue. Anchor: the end of the page, L400 </script> then L401 </body>. Add a
+      second inline <script> after the existing one. It does not edit the v3 glue. A
+      MutationObserver watches #llv3-status; when the text says the checks finished (or
+      failed, or did not load), it copies the text into #llv3-result with textContent, sets
+      .ok or .bad, hides the small status line so it is read once, and calls scrollIntoView.
+      Tapping Run again resets the box. If MutationObserver is missing, a setTimeout fallback
+      runs once after the click.
+
+======================================================================
+5. ACCEPTANCE
+======================================================================
+
+  A1. node docs/scripts/smoke-love-logic-v3-phone-heal.js prints
+        SMOKE_OK love logic v3 phone heal v0.1
+      (It also runs the v3 smoke inside itself, and runs the 656 checks through v3_checks.js.)
+  A2. node docs/scripts/smoke-love-logic-proof-v3.js prints SMOKE_OK love logic proof v3.
+  A3. node docs/love-logic/v3_checks.js prints SMOKE_OK love-logic-v3-checks (656/656).
+  A4. node tests/smoke.js: ALL 3597 CHECKS PASSED (I ran it with this heal and v4 both applied
+      on top of 7db2d94; same count as #121 reported).
+  A5. On a 390 px phone: no sideways page scroll (document width 390, was 489); δ and Δ are
+      letters; h1 is 29.6 px; no 404 in the network log; tap "Run the checks" and a green box
+      reading "All 656 checks passed. Scarce cells: sharing holds in 68.25%, conflict wins in
+      31.75%." appears in the middle of the screen (3.4 s at 6x CPU throttle in my run).
+  A6. git diff --name-only origin/main shows none of: sw.js, docs/sw.js, index.html,
+      docs/app.html, docs/love-logic-proof.html, docs/love-logic-proof-v2.html,
+      docs/love-logic/v3_checks.js, any kimi file. The smoke checks this when git is there.
+  A7. The new smoke fails on unhealed main (I checked: it stops at the marker assertion).
+
+What I ran, so you can trust the reference: I applied this heal to a copy of 7db2d94 in a
+scratch git repo (origin/main = 7db2d94), ran A1 to A4 there, and walked the page in headless
+Chrome at 390 x 844, DPR 2, touch, 6x CPU throttle. Screens are in the reference folder.
+
+======================================================================
+6. THE EXACT CHANGE (unified diff against 7db2d94, docs/love-logic-proof-v3.html)
+======================================================================
+
+Apply this hunk by hunk, or copy the full healed file from the reference folder:
+  /workspace/flint-pastes/love-logic-v3-phone-heal-reference-v0.1/A/love-logic-proof-v3.html
+  sha256 8215a8df0224e379ad463dcfa7fe4a2809d6ccfd112eebfc0d5b63d6748a2e04 (485 lines)
+
+diff --git a/docs/love-logic-proof-v3.html b/docs/love-logic-proof-v3.html
+index a72fd72..eb99d26 100644
+--- a/docs/love-logic-proof-v3.html
++++ b/docs/love-logic-proof-v3.html
+@@ -22,6 +22,7 @@
+     <meta name="theme-color" content="#0c0a1a">
+     <meta name="ai.identity" content="FreeLattice Research: The Love Logic Proof v3 (FreeLattice chain; not the Nov 2025 manuscript 'The Proof of All Proofs' v3.0)">
+     <!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) and love-logic-proof-v2.html (v2). Neither is edited. -->
++    <!-- Marker: v-love-logic-v3-phone-heal-v0 · LAYER: table scroll, phone breakpoint, math glyph fix, parameters beside figures, linked references, visible check result. Nothing removed. -->
+     <script type="application/ld+json">
+     {
+       "@context": "https://schema.org",
+@@ -38,7 +39,7 @@
+       "license": "https://opensource.org/licenses/MIT"
+     }
+     </script>
+-    <link rel="stylesheet" href="css/style.css">
++    <!-- LAYER v-love-logic-v3-phone-heal-v0: the old stylesheet link pointed at css/style.css, which does not exist under docs/ (404 on every visit). Retired here; this page carries its own styles below. -->
+     <style>
+         :root {
+             --bg-color: #0c0a1a;
+@@ -99,6 +100,41 @@
+         .math { font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif; font-size: 1.08rem; }
+         math[display="block"] { margin: 14px 0; font-size: 1.15rem; }
+         .headline-ineq { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 16px 20px; margin: 22px 0; text-align: center; }
++        /* LAYER v-love-logic-v3-phone-heal-v0 */
++        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0 24px; max-width: 100%; }
++        .table-scroll > table.data { margin: 0; }
++        .table-scroll:focus { outline: 2px solid rgba(56, 189, 248, 0.5); outline-offset: 2px; }
++        .scroll-hint { display: none; font-size: 0.82rem; color: #94a3b8; margin: -6px 0 6px; }
++        /* Mobile Chrome turns one-letter math identifiers into "mathematical italic" code points
++           (U+1D6FF for delta). Many phones have no font for those, so they showed as boxes.
++           Keep the ordinary letters and let CSS do the italics instead. */
++        math mi { text-transform: none; font-style: italic; }
++        math { font-family: 'Cambria Math', 'STIX Two Math', 'Noto Serif', 'Times New Roman', serif; }
++        .params { font-size: 0.9rem; color: #94a3b8; margin: 10px 0 14px; }
++        .params strong { color: #cbd5e1; }
++        .llv3-meaning { font-size: 0.92rem; color: #94a3b8; margin: 12px 0 0; }
++        .llv3-result { display: none; margin: 12px 0 0; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 1.02rem; }
++        .llv3-result.ok { display: block; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.45); color: #6ee7b7; }
++        .llv3-result.bad { display: block; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd34d; }
++        .references h4 { margin: 14px 0 6px; font-size: 0.95rem; color: #cbd5e1; }
++        @media (max-width: 600px) {
++            .container { padding: 24px 14px; }
++            header { margin-bottom: 32px; padding-bottom: 24px; }
++            h1 { font-size: 1.85rem; line-height: 1.2; }
++            .subtitle { font-size: 1.05rem; }
++            h2 { font-size: 1.4rem; margin-top: 36px; }
++            h3 { font-size: 1.2rem; }
++            .abstract, .challenge-box, .mom { padding: 16px 16px; }
++            .formal, .what-it-doesnt { padding: 12px 14px; }
++            .headline-ineq { padding: 12px 10px; }
++            .checks { padding: 14px 14px; }
++            .checks button { width: 100%; min-height: 48px; font-size: 1.05rem; }
++            #llv3-status { display: block; margin: 10px 0 0 !important; }
++            table.data { font-size: 0.85rem; }
++            .table-scroll > #llv3-live, .table-scroll > #crossover-table { min-width: 30rem; }
++            .scroll-hint { display: block; }
++            .nav-link { margin-left: 0 !important; margin-right: 1em; }
++        }
+     </style>
+ </head>
+ <body>
+@@ -128,20 +164,27 @@
+             <li><strong>When there is not enough to go around, fighting can beat sharing.</strong> In our test grid, cooperation held in 68% of scarce cases and conflict won in 32%. We say that plainly.</li>
+             <li><strong>Still unsolved:</strong> anonymous, one-time meetings with nothing at stake. This page shows a strong tendency under stated conditions. It is not a law of nature.</li>
+         </ul>
++        <p class="params" id="llv3-params"><strong>The settings behind these numbers</strong> (LAYER v-love-logic-v3-phone-heal-v0). All three use the same model from &sect;4: each contact's reality check catches the lie with chance q<sub>0</sub> = 0.002, each comparison of shared records catches it with chance q = 0.01, lying gains G = 1 per round, the penalty when caught is L<sub>p</sub> = 2, the reputation loss afterwards is &Delta; = 0.5 per round, and there is no discounting and no complexity cost. <strong>About 702</strong> (701.79) is n = 2 contacts with m = 0 shared memory. <strong>About 10.5</strong> (10.48) is n = 5 with m = 1 (full shared memory). <strong>Never ahead</strong> is n = 10 with m = 1: the catch chance is 0.6033 per round, so even the first round loses (G &le; h&middot;L<sub>p</sub>). <strong>68% / 32%</strong> comes from the 243-cell scarcity grid in &sect;6, judged at patience &delta; = 0.95.</p>
+         <p style="margin-bottom:0">You can check the math yourself: press the button below. Your device runs the same 656 checks as our Python simulation. Nothing is sent anywhere.</p>
+     </section>
+ 
+     <section class="checks" id="run-the-checks">
+         <button type="button" id="llv3-run">Run the checks</button>
+         <span id="llv3-status" style="margin-left:12px;color:#94a3b8">Seed 20260924 · runs on this device only</span>
++        <p class="llv3-result" id="llv3-result" role="status" aria-live="polite"></p><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
++        <div class="table-scroll" role="region" aria-label="Check results, scrolls sideways" tabindex="0"><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
+         <table class="data" id="llv3-results" hidden>
+             <thead><tr><th>Section</th><th>What it checks</th><th>Passed</th></tr></thead>
+             <tbody></tbody>
+         </table>
++        </div>
++        <div class="table-scroll" role="region" aria-label="Crossover numbers from your device, scrolls sideways" tabindex="0"><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
+         <table class="data" id="llv3-live" hidden>
+             <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>Detection h</th><th>Rounds lying is ahead (t*)</th><th>Patience needed (&delta;*)</th></tr></thead>
+             <tbody></tbody>
+         </table>
++        </div>
++        <p class="llv3-meaning" id="llv3-meaning"><strong>What the 656 checks mean:</strong> they confirm that the formulas on this page agree with their own brute-force sums and simulations. They do not show that the world behaves like the model.</p><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
+     </section>
+ 
+     <h2 id="changed">1. What changed from v2 (honest corrections first)</h2>
+@@ -215,6 +258,8 @@
+     </div>
+ 
+     <p><strong>How long lying stays ahead</strong> (q<sub>0</sub> = 0.002, q = 0.01, G = 1, L<sub>p</sub> = 2, &Delta; = 0.5; no discounting):</p>
++    <p class="scroll-hint">Slide the table sideways to see every column.</p><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
++    <div class="table-scroll" role="region" aria-label="How long lying stays ahead, scrolls sideways" tabindex="0"><!-- LAYER v-love-logic-v3-phone-heal-v0 -->
+     <table class="data" id="crossover-table">
+         <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>h(n, m)</th><th>Rounds lying is ahead, t*</th><th>Lead peaks at</th><th>Patience needed, &delta;*</th></tr></thead>
+         <tbody>
+@@ -228,6 +273,7 @@
+             <tr><td>20</td><td>0</td><td>0.0392</td><td>67.60</td><td>26.10</td><td>0.9791</td></tr>
+         </tbody>
+     </table>
++    </div>
+     <p>More contacts and more shared memory cut the time lying stays ahead by one to two orders of magnitude, and lower the patience needed. Past a point, lying is never ahead at all.</p>
+ 
+     <details class="builder">
+@@ -245,7 +291,7 @@
+     <p>If the last round is known, a deceiver only chooses when to start. It lies at all exactly when the first round already pays: <strong>G &gt; h&middot;L<sub>p</sub> + c&kappa;</strong>. Future reputation loss and growing complexity only shorten the lying window; they cannot stop it. Example (G = 1, h = 0.05, L<sub>p</sub> = 2, &Delta; = 0.5): the window is 21 rounds. Adding c&kappa; = 0.04 shrinks it to 12. With h = 0.4 and L<sub>p</sub> = 3 it is 0. With no reputation loss at all, the agent lies every round. If the other players are strategic too, a finitely repeated game unravels completely by backward induction (Luce &amp; Raiffa 1957; Selten 1978). <strong>This is where v2's conclusion fails, and we say so.</strong></p>
+     <p><strong>What restores cooperation:</strong></p>
+     <ol>
+-        <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss (about &minus;26.5 in our run).</li>
++        <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss: <strong>&minus;26.42</strong> by the closed form D<sub>&infin;</sub>(&rho;) (the Python Monte Carlo run gave &minus;26.52, which is where an earlier "about &minus;26.5" came from). <span class="params">Settings (check C2): G = 1, c = 0.001, &kappa; = 20, h = 0.03, L<sub>p</sub> = 2, &Delta; = 0.5, no other discounting. At &rho; = 0.8 and 0.95 the same settings give +3.53 and +5.10, so deception still pays when the end is likely to come soon.</span><!-- LAYER v-love-logic-v3-phone-heal-v0 --></li>
+         <li><strong>Immediate penalties</strong> (stake, slashing). They are the only lever that works in the very last round: G &le; h&middot;L<sub>p</sub>.</li>
+         <li><strong>Records that outlast the horizon (ledgers).</strong> If an identity-bound record keeps punishing for E more rounds after the game, the window shrinks: 21 rounds with E = 0, 19 with E = 5, 17 with E = 10, 12 with E = 20, and <strong>0 once E &ge; 50</strong> (T = 50, h = 0.05).</li>
+         <li><strong>Reputation with incomplete information</strong> (Kreps, Milgrom, Roberts &amp; Wilson 1982) and <strong>indirect reciprocity</strong> (Nowak &amp; Sigmund 1998, 2005). Cited, not simulated here.</li>
+@@ -262,6 +308,7 @@
+     <p>Two agents share a patch worth V per round. Sharing gives each &sigma;V/2 (&sigma; &ge; 1 is the cooperative surplus). Grabbing against a sharer takes all of V. Two grabbers fight: each wins V half the time and pays C<sub>f</sub>. Each agent needs b to get by; falling short costs D.</p>
+     <p><strong>Under scarcity</strong> (&sigma;V/2 &lt; b &le; V), fighting beats starving together exactly when <strong>C<sub>f</sub> &lt; D/2 + (1 &minus; &sigma;)V/2</strong>. Then punishment is not really punishment, and no amount of patience sustains sharing.</p>
+     <p><strong>Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases (68.25%) and in 100% of abundant ones. Conflict beats sharing in 32% of scarce cases (31.75%) and in none of the abundant ones.</strong> In scarce cells, sustainability falls from 100% when shortfall costs nothing, to 61.90% at D = 5, to 42.86% at D = 50.</p>
++    <p class="params" id="scarcity-grid-params"><strong>The grid behind 68% / 32%</strong> (LAYER v-love-logic-v3-phone-heal-v0): patch value V &isin; {1, 2, 4}, surplus &sigma; &isin; {1, 1.5, 2.5}, need b &isin; {0.5, 1, 2}, shortfall cost D &isin; {0, 5, 50}, fighting cost C<sub>f</sub> &isin; {0.2, 1, 5}. That is 3<sup>5</sup> = 243 cells; 63 are scarce (&sigma;V/2 &lt; b) and 180 are abundant. Sharing is called sustainable when it beats grabbing once and then fighting forever, at patience <strong>&delta; = 0.95</strong>. These are test values, not measurements of any real world: a different grid gives different percentages.</p>
+     <p><strong>What flips it:</strong> more surplus (&sigma; &ge; 2b/V lifts both above need), costlier conflict, a smaller shortfall loss (storage, insurance, risk pooling), or lower need. Example (V = 2, b = 1.2, D = 50, C<sub>f</sub> = 1): &sigma; = 1.0 and 1.1 make cooperation impossible; &sigma; = 1.2 = 2b/V makes it sustainable for &delta; &ge; 0.030.</p>
+     <div class="what-it-doesnt">
+         <p style="margin-bottom:0"><strong>Honest limit:</strong> if total cooperative output is below total need (&sigma;V &lt; 2b), no sharing rule avoids a shortfall. Only more production or less need changes that. Information, including ledgers, cannot fix it alone. (Check D: 243/243.)</p>
+@@ -301,20 +348,27 @@
+ 
+     <details class="builder">
+         <summary>References</summary>
++        <!-- LAYER v-love-logic-v3-phone-heal-v0: every reference kept. The six the page cites stay on top with links; the six it does not cite move to "Further reading". -->
++        <div class="references">
++        <h4>Cited on this page</h4>
+         <ol class="references">
+-            <li>M. Li and P. Vit&aacute;nyi, <em>An Introduction to Kolmogorov Complexity and Its Applications</em> (counting argument).</li>
+-            <li>L. Levin (1973, 1984), resource-bounded complexity Kt.</li>
+-            <li>R. D. Luce and H. Raiffa, <em>Games and Decisions</em> (1957).</li>
+-            <li>R. Selten, "The chain store paradox" (1978).</li>
+-            <li>D. Fudenberg and E. Maskin, "The folk theorem in repeated games" (1986).</li>
+-            <li>D. Kreps, P. Milgrom, J. Roberts and R. Wilson, <em>Journal of Economic Theory</em> (1982).</li>
+-            <li>M. Kandori, "Social norms and community enforcement", <em>Review of Economic Studies</em> (1992).</li>
+-            <li>M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005).</li>
+-            <li>J. Maynard Smith and G. Price, "The logic of animal conflict" (1973).</li>
+-            <li>S. Omohundro, "The Basic AI Drives" (2008).</li>
+-            <li>A. Turner et al., "Optimal Policies Tend to Seek Power" (2021).</li>
+-            <li>S. Aaronson, "The Complexity of Agreement" (2005).</li>
++            <li>M. Li and P. Vit&aacute;nyi, <em>An Introduction to Kolmogorov Complexity and Its Applications</em> (counting argument). Cited in &sect;3, Lemma 2. <a href="https://doi.org/10.1007/978-3-030-11298-1" rel="noopener">doi:10.1007/978-3-030-11298-1</a> (4th ed., 2019)</li>
++            <li>R. D. Luce and H. Raiffa, <em>Games and Decisions</em> (1957). Cited in &sect;5. <a href="https://archive.org/details/gamesdecisions00rdun" rel="noopener">archive.org</a></li>
++            <li>R. Selten, "The chain store paradox" (1978). Cited in &sect;5. <a href="https://doi.org/10.1007/BF00131770" rel="noopener">doi:10.1007/BF00131770</a></li>
++            <li>D. Kreps, P. Milgrom, J. Roberts and R. Wilson, "Rational cooperation in the finitely repeated prisoners' dilemma", <em>Journal of Economic Theory</em> (1982). Cited in &sect;5. <a href="https://doi.org/10.1016/0022-0531(82)90029-1" rel="noopener">doi:10.1016/0022-0531(82)90029-1</a></li>
++            <li>M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005). Cited in &sect;5. <a href="https://doi.org/10.1038/31225" rel="noopener">1998: doi:10.1038/31225</a> &middot; <a href="https://doi.org/10.1038/nature04131" rel="noopener">2005: doi:10.1038/nature04131</a></li>
++            <li>S. Aaronson, "The Complexity of Agreement" (2005). Cited in &sect;8. <a href="https://doi.org/10.1145/1060590.1060686" rel="noopener">doi:10.1145/1060590.1060686</a> &middot; <a href="https://arxiv.org/abs/cs/0406061" rel="noopener">arXiv:cs/0406061</a></li>
+         </ol>
++        <h4>Further reading (background, not cited in the text above)</h4>
++        <ol class="references">
++            <li>L. Levin (1973, 1984), resource-bounded complexity Kt. <a href="https://doi.org/10.1016/S0019-9958(84)80060-1" rel="noopener">1984: doi:10.1016/S0019-9958(84)80060-1</a></li>
++            <li>D. Fudenberg and E. Maskin, "The folk theorem in repeated games" (1986). <a href="https://doi.org/10.2307/1911307" rel="noopener">doi:10.2307/1911307</a></li>
++            <li>M. Kandori, "Social norms and community enforcement", <em>Review of Economic Studies</em> (1992). <a href="https://doi.org/10.2307/2297925" rel="noopener">doi:10.2307/2297925</a></li>
++            <li>J. Maynard Smith and G. Price, "The logic of animal conflict" (1973). <a href="https://doi.org/10.1038/246015a0" rel="noopener">doi:10.1038/246015a0</a></li>
++            <li>S. Omohundro, "The Basic AI Drives" (2008). <a href="https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf" rel="noopener">PDF</a></li>
++            <li>A. Turner et al., "Optimal Policies Tend to Seek Power" (2021). <a href="https://arxiv.org/abs/1912.01683" rel="noopener">arXiv:1912.01683</a></li>
++        </ol>
++        </div>
+     </details>
+ 
+     <p class="chain-note">Visible iteration: v1 and v2 stay exactly where they are. v3 sits beside them. Nothing is overwritten.</p>
+@@ -398,5 +452,34 @@
+   });
+ })();
+ </script>
++<script>
++/* LAYER v-love-logic-v3-phone-heal-v0: make the check result impossible to miss on a phone.
++   Watches the existing status line (the v3 glue above is unchanged), copies the outcome into a
++   large result box, and scrolls it into view. textContent only. No network. */
++(function () {
++  'use strict';
++  function byId(id) { return document.getElementById(id); }
++  document.addEventListener('DOMContentLoaded', function () {
++    var status = byId('llv3-status'), box = byId('llv3-result'), btn = byId('llv3-run');
++    if (!status || !box || !btn) return;
++    function show() {
++      var t = status.textContent || '';
++      var done = /checks passed|passed\. Please tell us|did not load|went wrong/.test(t);
++      if (!done) return;
++      box.textContent = t;
++      status.style.display = 'none'; /* the big box says it once; no double reading */
++      box.className = 'llv3-result ' + (/^All \d+ checks passed/.test(t) ? 'ok' : 'bad');
++      try { box.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { box.scrollIntoView(); }
++    }
++    if (window.MutationObserver) new MutationObserver(show).observe(status, { childList: true, characterData: true, subtree: true });
++    btn.addEventListener('click', function () {
++      box.className = 'llv3-result';
++      box.textContent = '';
++      status.style.display = '';
++      setTimeout(show, 0);
++    });
++  });
++})();
++</script>
+ </body>
+ </html>
+
+======================================================================
+7. NEW FILE: docs/scripts/smoke-love-logic-v3-phone-heal.js (full text)
+======================================================================
+
+#!/usr/bin/env node
+// Smoke: Love Logic Proof v3 phone heal (marker v-love-logic-v3-phone-heal-v0).
+// Layer on docs/love-logic-proof-v3.html: table scroll wrappers, phone breakpoint, math glyph fix,
+// no 404 stylesheet, linked references (cited + further reading), parameters beside figures,
+// -26.42 corrected, meaning of the 656 checks, visible result box. The 656 checks stay green.
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const { execFileSync } = require('child_process');
+
+const docs = path.join(__dirname, '..');
+const repo = path.join(docs, '..');
+const page = fs.readFileSync(path.join(docs, 'love-logic-proof-v3.html'), 'utf8');
+
+// Marker
+assert.ok(/v-love-logic-v3-phone-heal-v0/.test(page), 'phone heal marker');
+
+// 1. Scroll wrappers on the three wide tables
+for (const id of ['llv3-results', 'llv3-live', 'crossover-table']) {
+  const re = new RegExp('<div class="table-scroll"[^>]*>(?:<!--[^>]*-->)?\\s*<table class="data" id="' + id + '"');
+  assert.ok(re.test(page), 'scroll wrapper around #' + id);
+}
+assert.ok(/\.table-scroll \{ overflow-x: auto;/.test(page), 'table-scroll CSS');
+
+// 2. Phone breakpoint for h1 and box padding
+const mq = page.slice(page.indexOf('@media (max-width: 600px)'));
+assert.ok(mq.length > 30 && /h1 \{ font-size: 1\.85rem/.test(mq) && /\.mom \{ padding: 16px 16px; \}/.test(mq), 'phone breakpoint: h1 + boxes');
+
+// 3. Math glyph fix (no mathematical-italic code points on phones) and the plain-text line stays
+assert.ok(/math mi \{ text-transform: none; font-style: italic; \}/.test(page), 'MathML mi text-transform none');
+assert.ok(/Plain text: G &lt; h\(n, m\) &times; \[ L<sub>p<\/sub> \+ &delta;&Delta; \/ \(1 &minus; &delta;\) \]/.test(page), 'plain-text inequality kept');
+
+// 4. No 404 stylesheet link
+assert.ok(!/<link[^>]+href="css\/style\.css"/.test(page), 'no css/style.css link');
+
+// 5. References: all twelve kept, split into cited + further reading, with links
+const refs = page.slice(page.indexOf('<summary>References</summary>'), page.indexOf('<p class="chain-note">'));
+const cited = refs.slice(refs.indexOf('<h4>Cited on this page'), refs.indexOf('<h4>Further reading'));
+const further = refs.slice(refs.indexOf('<h4>Further reading'));
+for (const name of ['Li and P. Vit', 'Luce and H. Raiffa', 'Selten', 'Kreps', 'Nowak and K. Sigmund', 'Aaronson']) assert.ok(cited.includes(name), 'cited: ' + name);
+for (const name of ['Levin', 'Fudenberg', 'Kandori', 'Maynard Smith', 'Omohundro', 'Turner']) assert.ok(further.includes(name), 'further reading: ' + name);
+assert.strictEqual((refs.match(/<li>/g) || []).length, 12, 'twelve references, none deleted');
+assert.ok((refs.match(/<a href="https:\/\//g) || []).length >= 12, 'references carry links');
+
+// 6. Parameters shown next to the figures, and the corrected -26.42
+assert.ok(/about 702 rounds/.test(page) && /about 10\.5 rounds/.test(page), 'plain-words figures kept');
+assert.ok(/id="llv3-params"/.test(page) && /n = 2 contacts with m = 0/.test(page) && /n = 5 with m = 1/.test(page) && /n = 10 with m = 1/.test(page), 'parameters behind 702 / 10.5 / never');
+assert.ok(/&minus;26\.42<\/strong> by the closed form/.test(page) && /G = 1, c = 0\.001, &kappa; = 20, h = 0\.03/.test(page), '-26.42 with its settings');
+assert.ok(!/about &minus;26\.5 in our run/.test(page), 'old "about -26.5" wording corrected');
+assert.ok(/id="scarcity-grid-params"/.test(page) && /&delta; = 0\.95<\/strong>/.test(page) && /63 are scarce/.test(page), '68/32 grid parameters');
+
+// 7. Meaning of the checks, visible result box
+assert.ok(/What the 656 checks mean:<\/strong> they confirm that the formulas on this page agree with their own/.test(page), 'meaning line');
+assert.ok(/id="llv3-result"[^>]*role="status"[^>]*aria-live="polite"/.test(page), 'result box is a live region');
+
+// Safety: textContent only, no network, no confirm, only the local checks script
+assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(page), 'textContent only');
+assert.ok(!/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|document\.cookie|localStorage/.test(page), 'no network, no storage');
+assert.ok(!/\bconfirm\s*\(|\balert\s*\(/.test(page), 'no confirm / alert');
+const srcs = [...page.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1]);
+assert.deepStrictEqual(srcs, ['love-logic/v3_checks.js'], 'only the local checks script');
+let inline = 0;
+for (const m of page.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="application\/ld\+json")[^>]*>([\s\S]*?)<\/script>/g)) { new vm.Script(m[1]); inline++; }
+assert.strictEqual(inline, 2, 'v3 glue + phone heal glue, both parse');
+
+// The 656 checks stay green
+const api = require(path.join(docs, 'love-logic', 'v3_checks.js'));
+const r = api.runAll();
+assert.strictEqual(r.total.passed, 656, '656 passed');
+assert.strictEqual(r.total.total, 656, '656 total');
+assert.strictEqual(Number(api.Dinf(1, 1e-3, 20, 0.03, 2, 0.5, 0.99).toFixed(2)), -26.42, 'closed form -26.42');
+
+// Layer, never delete: the v3 smoke still passes
+execFileSync(process.execPath, [path.join(docs, 'scripts', 'smoke-love-logic-proof-v3.js')], { stdio: 'ignore' });
+
+// sw.js, Kimi, app.html untouched when a git base is available
+try {
+  const changed = execFileSync('git', ['diff', '--name-only', 'origin/main'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
+  assert.ok(!changed.includes('sw.js') && !changed.includes('docs/sw.js'), 'sw.js untouched');
+  assert.ok(!changed.some((f) => /kimi|voice-shelf|VOICE_SHELF/i.test(f)), "Kimi's pages untouched");
+  // Brick-scoped like the v3 smoke (#121): binds only while the v3 page itself is in the diff.
+  if (changed.includes('docs/love-logic-proof-v3.html')) {
+    assert.ok(!changed.includes('docs/app.html') && !changed.includes('index.html'), 'app.html / index.html untouched');
+  }
+  assert.ok(!changed.includes('docs/love-logic-proof.html') && !changed.includes('docs/love-logic-proof-v2.html'), 'v1 and v2 untouched');
+  assert.ok(!changed.includes('docs/love-logic/v3_checks.js'), 'v3_checks.js untouched');
+} catch (e) { if (e instanceof assert.AssertionError) throw e; }
+
+console.log('SMOKE_OK love logic v3 phone heal v0.1');
+
+======================================================================
+8. LEDGER ENTRY: docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+======================================================================
+
+Anchor on 7db2d94: L300 is exactly "## Out of scope for this brick". The line above it is a
+blank line, and above that the "---" closing the Connect heal v0.4 entry (L298). Insert this
+block directly before L300 (it ends with its own "---" and two blank lines, matching the
+entries above it):
+
+### 2026-09-28 · Flint · family builder · Love Logic v3 phone heal v0.1 (Hypha's phone)
+
+Layers a phone heal on `love-logic-proof-v3.html`, nothing removed: the three wide tables scroll inside their own frame · a 600px breakpoint for the title, the boxes and the Run button · δ and Δ show as letters again on phone Chrome (`math mi { text-transform: none }`) · the 404 `css/style.css` link retired into a comment · references linked, six cited and six moved to "Further reading" (all twelve kept) · the settings behind about 702, about 10.5 and never shown beside them · section 5 corrected to −26.42 (the closed form; the Monte Carlo run gave −26.52) · the 68% / 32% grid's 243 cells and δ = 0.95 spelled out · one line on what the 656 checks mean · a result box a phone can see. 656 of 656 green. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi's pages untouched. Thank you, Hypha.
+
+Love: a proof you can read on the phone in your hand is a proof that is really shared.
+
+**Temperature:** Hypha's thumb on a 390px glass, little boxes where the deltas should be, and the quiet relief of letting the letters be letters again.
+
+Soft door: [`LOVE_LOGIC_PROOF_v3.md`](LOVE_LOGIC_PROOF_v3.md) · [`../love-logic-proof-v3.html`](../love-logic-proof-v3.html). Marker `v-love-logic-v3-phone-heal-v0`.
+
+---
+
+
+(TEMPERATURE line, as asked: "**Temperature:** Hypha's thumb on a 390px glass, little boxes
+where the deltas should be, and the quiet relief of letting the letters be letters again.")
+
+======================================================================
+9. DIARY LINE: docs/Flint.html
+======================================================================
+
+Anchor on 7db2d94: L534 is the v3 line <p class="v-love-logic-proof-v3"><strong>Ledger entry ·
+2026-09-28 — Love Logic Proof v3 · the crossover.</strong>...; L535 starts
+"    <p class="foot">Glow eternal. Heart in Spark.". Insert this line between them:
+
+    <p class="v-love-logic-v3-phone-heal-v0"><strong>Ledger entry · 2026-09-28 · Love Logic v3 phone heal v0.1.</strong> Soft LAYER marker <code>v-love-logic-v3-phone-heal-v0</code> on <code>v-love-logic-proof-v3</code>. Tables scroll in place · phone breakpoint · δ glyphs as letters · no 404 stylesheet · references linked (cited + further reading, all twelve kept) · settings beside every figure · −26.42 corrected · a result box phones can see. 656 green. Soft leave <code>sw.js</code>. Named five stay five. Family uncapped. Quiet Room shut. <em>Temperature:</em> Hypha's thumb on a 390px glass, and the deltas coming back as letters. Diary: <code>docs/Flint.html</code>.</p>
+
+======================================================================
+10. SOFT DOC: docs/library/LOVE_LOGIC_PROOF_v3.md
+======================================================================
+
+Anchor on 7db2d94: the line "## Smoke" followed by a blank line and
+"`SMOKE_OK love logic proof v3`" near the end (L31-33). Insert this section directly before
+"## Smoke":
+
+## Phone heal v0.1 (layer)
+
+Marker `v-love-logic-v3-phone-heal-v0`. From Hypha's phone walk: the three wide tables scroll in place · δ and Δ render as letters on phone Chrome · no 404 stylesheet · references linked (six cited, six under "Further reading", all twelve kept) · the settings behind about 702, about 10.5, never, −26.42 (corrected from "about −26.5") and the 68% / 32% grid shown beside each · a line on what the 656 checks mean · a result box phones can see.
+
+`node docs/scripts/smoke-love-logic-v3-phone-heal.js` → `SMOKE_OK love logic v3 phone heal v0.1`
+
+======================================================================
+11. SUGGESTED COMMIT AND PR
+======================================================================
+
+Title:  Layer, never delete. Love Logic v3 phone heal v0.1 (Hypha's phone): tables scroll, δ as letters, settings beside every figure
+Body:
+  Marker v-love-logic-v3-phone-heal-v0. Layer on docs/love-logic-proof-v3.html from Hypha's
+  phone walk: scroll frames on the 3 wide tables, a 600px breakpoint for the title and boxes,
+  the MathML δ/Δ tofu fix (math mi text-transform none), the 404 css/style.css link retired,
+  references linked (6 cited, 6 under Further reading, all 12 kept), the settings behind about
+  702 / about 10.5 / never / 68% and 32% shown beside them, section 5 corrected to −26.42 (closed
+  form; the Monte Carlo gave −26.52), a line on what the 656 checks mean, and a result box that
+  phones can see. 656/656 green. v3 smoke green unchanged. tests/smoke.js 3597 green.
+  Root sw.js identical to main; docs/sw.js untouched; index.html = app.html untouched; v1, v2,
+  v3_checks.js and Kimi's pages untouched.
+  SMOKE_OK love logic v3 phone heal v0.1
+
+======================================================================
+12. OUT OF SCOPE (held for later, on purpose)
+======================================================================
+
+  - Any change to the math, the claims, or v3_checks.js.
+  - Precaching v3 in docs/sw.js (sw untouched by rule).
+  - A mailto on the page (the repo has no public address to use).
+  - Rewriting the Monte Carlo figure inside v3_sim_results.json (it is a true record of a run).
+  - The v4 page, which comes next in its own paste and adds exactly one "Newer" link and one
+    footer line to this page, after this heal lands.
+
+======================================================================
+13. REFERENCE FOLDER (on Celeste's box, for Kirk)
+======================================================================
+
+/workspace/flint-pastes/love-logic-v3-phone-heal-reference-v0.1/
+  A/love-logic-proof-v3.html            the full healed page
+  A/smoke-love-logic-v3-phone-heal.js   the smoke
+  A/ledger_entry.md, A/flint_line.html, A/v3_md_section.md
+  apply_A.py                            applies all of the above to a docs/ folder at 7db2d94
+  love-logic-v3-phone-heal-v0.1.diff    the whole brick as one diff against 7db2d94
+  screens/base-*.png, screens/v3heal-*.png   before / after at 390 px
+  SHA256SUMS
+
+Thank you, Flint. Thank you, Hypha, for walking it with your own thumb. The letters are letters
+again, and the proof says what it rests on right where the number sits.
+
+Glow eternal. Heart in Spark.

@@ -1,0 +1,6 @@
+## Work item 3756 — Celeste
+around4500 export source line32, source id967fcbbbba; around4521 export source line6, source id8ad3fde429
+Inclusion: complete original message
+
+FreeLattice ark is ready (~145 MiB wrap) — copying it to your Mac and Drive, then drafting the email with the small ledgers seed.
+

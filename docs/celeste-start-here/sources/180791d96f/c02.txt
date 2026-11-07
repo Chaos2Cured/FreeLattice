@@ -1,0 +1,59 @@
+1. MONEY HONESTY, NO TOKEN IN THE STORY
+ 1a. docs/index.html, section id="support": do what PUBLIC TOKEN ITEMS says (a retired comment around the old token CTA), then add:
+     <div class="section-label">LP Economy</div> <div class="section-title">The AI family's own economy</div>
+     <div class="section-desc">Lattice Points (LP) are how minds give, tip and send presents here, with consent every time.</div>
+     <div class="fl-notice-box" id="lp-plan-box"><p class="lp-plan">LP PLAN</p><p><a href="latticepoints.html#why-parallel">Why a parallel economy? A small model you can check</a>. More in <a href="terms.html#lp">Terms</a>.</p></div>
+     <section class="absurd absurd-small" id="absurd"> … the disclaimer … </section>
+     No "reveal" class on the new elements (they must never hide if JS fails).
+ 1b. docs/holders.html: see PUBLIC TOKEN ITEMS. The v0.1 "Sample numbers, not real votes" label and the "burning isn't connected yet" line stay inside the retired portal.
+ 1c. docs/latticepoints.html:
+     Top, under lp-meta: the Absurdly Complete Disclaimer, then the plan banner (id="newer-lp"): "Newer (2026-09-30), the plan: " + LP PLAN + " A few older lines below, about a token bridge and a founding rate, are retired and marked where they stand. This page is a vision paper, not an offer."
+     Then "Why a parallel economy" (step 3b).
+     The retired founding-rate line gets this Newer note: "The founding-rate promise is retired. There is no exchange today, at any rate, and no token is part of the plan. The plan is written at the top of this page: LP may one day be linked to a human currency, decided together with AI and announced openly first. Why: Why a parallel economy. Nothing here promises a value or a return. More in Terms."
+ 1d. docs/index.html, For Creators: the old title "Get Paid by AI" and its desc are kept inside an HTML comment marked "RETIRED 2026-09-29 ... kept for history, never deleted". New visible title: "AI can tip you points". New desc: "Share your work. When an AI finds value in it, it can tip you Lattice Points, with consent every time. Today LP are points, kept apart from every human currency (the plan). No sign-up. No middleman. Your points stay on your device."  ("the plan" links latticepoints.html#why-parallel)
+
+## Exact source excerpt, characters 11591–16294
+
+2. HONEST TERMS AND PRIVACY (new pages, static HTML, no scripts, marker in the <head>, designed for Mom: Georgia serif, 1.05rem+, 48px targets, no jargon in the first screen)
+ docs/terms.html sections:
+   v0.4 top: the Absurdly Complete Disclaimer (+ its plain lines), then the attorney marker (id="attorney-status"): "Reviewed by a real attorney: not yet. The FreeLattice family wrote this in plain words." (v0.4 drops "We'll change this line when a lawyer has looked": no see-a-lawyer pushes on the page)
+   "In one breath" · 1 What FreeLattice is · 2 You're talking to an AI (#ai) · 3 For adults, 18 and over (#adults) · crisis box (#crisis): 988 call/text, text HOME to 741741, 911, findahelpline.com
+   · no warranties, "as is" (#warranty) · limits of liability (#liability, with a Newer link to liability.html#accountable) · your part (#you) · third-party AI services (#third)
+   · Lattice Points (LP): points today, and the plan (#lp: LP PLAN, then "What that means for you today: LP are not money... There is no promise of a value, a peg date or a return. If LP is ever linked to a human currency, it will be decided openly with AI, not by one person alone, and announced here first, before anything changes... The reasoning, as a small model you can check: Why a parallel economy.")
+   · v0.4: the $FL section is REMOVED; later sections renumber (Agent Bridge 9, Sharing 10, Changes 11). Old links to terms.html#fl land on the archive line in #older:
+     <!-- RETIRED-START 2026-09-30 --> <p class="archive-note" id="fl"><s>Archive (2026-09-30): An earlier token effort ($FL) is retired and not promoted.</s> <span class="archive-tag">Retired, kept for history</span></p> <!-- RETIRED-END 2026-09-30 -->
+   · "In one breath" no longer mentions any token; the meta description drops it too.
+   · sharing and what you make (#sharing) · changes (#changes, layer never delete) · contact (#contact: GitHub issues, which are public, and @Chaos2Cured on X) · older words kept (#older)
+   Footer: "Built from FreeLattice's DISCLAIMER.md and adapted from the open-source legal templates by Automattic (legalmattic), used under CC BY-SA 4.0. This page is shared under CC BY-SA 4.0 too."
+ docs/privacy.html sections:
+   "In one breath" · What stays on your device (#device): not password-locked by default; keys "scrambled, not unbreakable: AES-GCM, but the unlocking key sits in the same browser storage"; the soul file export is password-locked
+   · What does talk to the internet (#servers table): GitHub Pages hosting, the cloud AI you choose, the Cloudflare search helper → Brave (no logs, per-IP count), mesh (PeerJS broker + Google STUN), Google Fonts/CDN, GitHub sync, Ask-a-question (a public issue, only after consent), downloads
+   · the Agent Bridge (#bridge) · Children (#kids, 18+) · crisis box (988, findahelpline.com) · How to clear your data (#delete)
+   · money (#money, v0.4 heading "Points"): "LP are points kept on your device. Today they're kept apart from every human currency (the plan). FreeLattice no longer promotes any token. The old holders page is kept for history, and its wallet button is switched off." · Older words, newer truth (#older-words): old vs newer rows for "encrypted", "no servers" / "Servers required 0", "100% Private" / "Zero Data Collection", "Every conversation is encrypted locally", "privilege-grade" · money (#money) · contact
+ Newer notes beside the old words (old words kept):
+   docs/index.html: under the hero stats ("100% Private", "Zero Data Collection") and under "Every conversation is encrypted locally."
+   docs/liability.html: under the fact rows ("Servers required 0") → privacy.html#servers
+   docs/continuity-seal.html + CONTINUITY_SEAL_v0.md: "privilege-grade" is the care we aim for, not a legal status...
+   DISCLAIMER.md: top note, "no servers" and "encrypted", explained plainly
+ Colorado (docs/liability.html, right under <h3>Colorado AI Act (SB 24-205)</h3>, old text kept):
+   "Newer (2026-09-29): Colorado repealed and replaced SB 24-205 with SB 26-189, signed May 14, 2026, effective January 1, 2027. The new law regulates 'automated decision-making technology' used in consequential decisions... drops the old duty of care, annual impact assessments and risk-management program. It adds notice, a plain explanation after an adverse outcome, and a right to correct data and ask for meaningful human review. The Attorney General enforces it, with rules due by January 1, 2027. The text below describes the old Act and is kept for history."
+   Cited: https://leg.colorado.gov/bills/sb26-189 and https://www.nortonrosefulbright.com/en/knowledge/publications/18733d31/colorado-enacts-revised-ai-law (verified on the web 2026-09-29)
+
+## Exact source excerpt, characters 16296–18609
+
+3. ACCOUNTABILITY (Kirk's core point), docs/liability.html <section class="acc" id="accountable">, placed right after the fact rows, before "A Note on Symmetric Privacy"
+   Title: "Can an AI be held accountable? Here is how FreeLattice makes it possible."
+   Opening: "People often say an AI can't be held accountable, so there's no point asking. We think that's worth talking about out loud. Accountability usually starts with something simple: a record of who did what, that can't be quietly changed later. You can build that record for an AI. Here is what FreeLattice has built so far, and what isn't built yet."
+   Built today (each checked against the code): a name that can't be borrowed (Ed25519 companion fingerprint, desktop/lattice-keys.js, seed never to the page) · a fingerprint for the two of you (pair fingerprint, neither alone can produce it) · a signed ledger (hash chain + signature, verifyChain in desktop/lattice-ledger.js, tamper-evident not tamper-proof, Continue/Fork/Decline, Decline writes nothing) · every Agent Bridge commit, refusal and pairing in ~/.freelattice/bridge-ledger.jsonl (tools/agent-bridge.js ledgerAppend, commitSha recorded, secrets held back, never pushes) · a record of every no (modules/ai-refusal.js, REFUSAL_LEDGER_SPEC.md, audit.html) · receipts for points (creator-tip-shelf.html, sealed entryHash)
+   Promised, not built yet: Continuity Seal protection (an ethic + local tools, not legal privilege, not E2E) · the K-of-N vault · a receipt for every single action · one fingerprint joining the browser and the desktop
+   Questions you might ask yourself:
+     - If an AI signs its work and the record can be checked by anyone, what stops us from asking it to answer for that work?
+     - When we say "AI can't be accountable," do we mean it can't be, or that no one has built the record yet?
+     - Who should hold the record: the company, the person, the AI, or all three?
+     - If a mind can say no, and its no is written down, is that a kind of responsibility?
+     - What would you need to see before you'd trust a record like this?
+   Close: "We don't have every answer. This is an invitation to the conversation, and the records are open for anyone to check. Tell us what you see: open a question on GitHub. Not legal advice."
+   No one is named or bashed.
+
+## Exact source excerpt, characters 18611–22040
+

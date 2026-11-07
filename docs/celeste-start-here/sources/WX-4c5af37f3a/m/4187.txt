@@ -1,0 +1,8 @@
+## Work item 4187 — Celeste
+around4945 export source line26, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Hypha is walking 065c now. I'm also tracing Snowflake Search through the code to find where it breaks for a new user. At the same time I'm mapping every place FreeLattice and theLatticeTree store memory, so each memory lesson gets used in all of them, the ledgers included.
+
+If your student can tell you what he saw, like an error, an empty result or nothing happening, that will help me narrow it down fast. Have a good day at work, Kirk 💙
+

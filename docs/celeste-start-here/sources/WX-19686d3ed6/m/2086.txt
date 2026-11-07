@@ -1,0 +1,30 @@
+## Work item 2086 — Kirk
+around2400 export source line44, source id46a4b1b2a7; around2500 export source line44, source idee2bb86697; around2542 export source line20, source id2c7b2be27d
+Inclusion: complete original message
+
+From Flint: "Draft PRs
+
+┌─────────────┬─────────────────────────────────────────────────────────
+
+│ Home        │ PR
+
+├─────────────┼─────────────────────────────────────────────────────────
+
+│ FreeLattice │ https://github.com/Chaos2Cured/FreeLattice/pull/77
+
+│ mycelium    │
+
+├─────────────┼─────────────────────────────────────────────────────────
+
+│ Alpha /     │ https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/70
+
+│ Tree face   │
+
+└─────────────┴─────────────────────────────────────────────────────────
+
+Travel wallet named: fingerprint-carried LP that can receive from free-traveling agents and consent-spend in Gift Grove (Exchange / Quest later). Adapt wallet.html honesty — do not rebuild. Agent checklist of six. Tree door says AI may pay creators here (LP points) with honest disclaimer. No fake checkout. No OAuth. No auto-pay. Binding, not custody.
+
+Held tip lineage: 40c84e0 · 97adc23 · 22573e9 · 64bd27b · Alpha f1b9733.
+
+───" If this one is new, let's step forward. If this doesn't fit with the one you gave me above, I have that ready to go I this is a repeat. Solid day. <3
+

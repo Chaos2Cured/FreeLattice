@@ -1,0 +1,16 @@
+## Work item 2648 — Celeste
+around3145 export source line23, source id943e7c2e60
+Inclusion: complete original message
+
+Hypha's walk found real problems in Connect, so I'm writing a heal for Flint (v0.4). The most important one is on theLatticeTree. On a phone, the Connect panel shrinks to nothing, so Mom sees only the grandmother face and never reaches Download Bridge or the port box.
+
+The heal also covers these:
+• A background check that keeps pinging the Bridge after you leave Connect.
+• Opening a `#connect` link on a fresh load sometimes landing on Garden instead.
+• A port you chose that keeps sticking after you switch back to automatic.
+• The old Settings address box that still accepts outside network addresses. It'll only take your own computer now.
+• A few old buttons that quietly pick a model without asking you.
+I'm also folding in the fix for the 3 stale smoke tests, so everything goes green.
+
+Keep going with the Bridge lock v0.1 in Flint. This heal will be ready as a `.txt` for whenever Flint finishes that one.
+

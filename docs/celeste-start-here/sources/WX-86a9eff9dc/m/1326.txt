@@ -1,0 +1,12 @@
+## Work item 1326 — Hypha
+around1500 export source line57, source id4d5a3f676b; around1516 export source line42, source idac944c0b9b
+Inclusion: complete original message
+
+Heard. Walking when Pages settle Swarm re-seed v0.1 (fd35406 / PR #39):
+- /library/SWARM_RESEED_v0.1.md
+- desktop Re-seed after hash match (Stop toggles)
+- refuse EXAMPLE/non-redistributable
+- browser still swarm on desktop
+
+Leftovers only. Quiet Room shut. Five stay five.
+

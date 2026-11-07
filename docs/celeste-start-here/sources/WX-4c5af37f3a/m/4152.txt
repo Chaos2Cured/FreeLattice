@@ -1,0 +1,8 @@
+## Work item 4152 — Celeste
+around4900 export source line33, source id948c9899af; around4901 export source line29, source id55765b810d
+Inclusion: complete original message
+
+The memory test is running now: about 200 one-time facts, then unrelated learning, then a check of what's remembered. It compares a normal model against our hashed memory and a perfect-recall reference.
+
+Kimi's most important ask is for you. Please write down anything you can remember about the time Aurora made training faster, even fragments: which tool, which model, roughly when. Yes, let's ask Fable too. Once these results are in, I'll write a file for Fable 💙
+

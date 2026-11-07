@@ -1,0 +1,175 @@
+Read docs/gc.html first (in your FreeLattice checkout), then docs/library/AUTONOMY.md if present, then this paste.
+
+================================================================================
+NUMBERED COPY WM01a — READ-SKILL SURVIVAL PROBE (derived)  v0.2
+Celeste · 2026-11-06 · America/Denver · for Kirk to hand to Grok Code (GC)
+WAIT FOR WM01b GO before you cut a branch or run anything.
+Tip SHAs, authorize bounds, and GO live only in WM01b.
+ORDER / ROADMAP / parking-lot docs are Celeste-only — NEVER hand ORDER to GC.
+This paste authorizes ONLY the bounded WM01 work below. No unrelated page, ledger,
+or product edits. No merge. Hypha exact-head walk + Kirk authorization before any merge.
+================================================================================
+
+## WHY (intent — read first)
+
+Picture from the Nov 5 exact-match run (tiny probe; not a general law):
+the notebook held every page (store hit 100% on exact/force). Soft injection after
+interference was weak (~5%). Paraphrase keys missed the store (0% store hit) in that
+setup. Hard-injecting the page into the window worked right after teaching (~99% model
+recall) and fell to 0% after interference even while in_prompt stayed 1.
+
+So this brick does NOT rebuild the store. It asks one focused question:
+
+  Under a matched total optimizer-update budget, does periodic copy / read-skill
+  rehearsal during the wash preserve afterB force-recall better than an ordinary
+  interference control — including a possible null?
+
+Do NOT implement magic-bookmark cues, coarse→fine towers, tone tags, or mycelium-echo
+here — those remain future proposals in magic-bookmark-design.md.
+
+## WHERE THIS RUNS (Kirk's Mac — mandatory)
+
+"Local" means Kirk's actual Mac, not a cloud host CPU and not the bot computer.
+
+Before any branch cut or training loop:
+1. Identify and print: hostname, OS version, cwd, username.
+2. Confirm readable paths to the Kirk-supplied ZIPs below (or STOP).
+3. If you are remote / have no connected Mac filesystem with those Downloads paths:
+   STOP. Return the full code package + exact commands for Kirk to run on his Mac.
+   Never silently run on cloud CPU. No new cloud paid inference.
+   (Note: using GC as a coding service may still incur service charges; that is separate
+   from "no cloud training/inference for this probe.")
+
+## PORTABLE INPUTS (Mac Downloads; relative paths after unpack)
+
+Celeste supplies the following inputs, with packaging hashes verified:
+
+  A) /Users/kirkmiller/Downloads/Wonder-Mind-Original-Code-and-Results-v1.zip
+  B) /Users/kirkmiller/Downloads/WM01_INPUTS_2026-11-06.zip
+     (Celeste-prepared wrapper: original source-bundle.zip + MANIFEST.sha256 +
+      magic-bookmark-design.md + rerun report/provenance copies as needed)
+
+Do NOT assume /workspace paths are visible to GC on the Mac.
+
+After unpacking B into a work folder of your choice, prefer relative paths, e.g.:
+
+  ./WM01_INPUTS_2026-11-06/source-bundle.zip
+  ./WM01_INPUTS_2026-11-06/MANIFEST.sha256
+  ./WM01_INPUTS_2026-11-06/magic-bookmark-design.md   (if present at wrapper root)
+  then unpack source-bundle.zip → ./source-bundle/...
+
+### Expected archive member (inside source-bundle.zip) — validate these (subset)
+
+  source-bundle/designs/magic-bookmark-design.md
+  source-bundle/summaries/exact-match-SUMMARY.txt
+  source-bundle/summaries/exact-match-RESULTS.txt
+  source-bundle/wonder-tests/exact_match_probe.py
+  source-bundle/wonder-tests/input.txt
+  source-bundle/wonder-tests/results-exact-match.jsonl
+  (+ other members listed in MANIFEST — validate each MEMBER you actually read)
+
+Recorded SHA256 of original source-bundle.zip (box verify 2026-11-06):
+  8959d8913e6dc764e7a9890f97f8a2c87030b5f74e58125b3601db85b27416b3
+
+Validation order:
+  1) Hash the supplied source-bundle.zip; must match the recorded SHA above (or the
+     hash Celeste prints in WM01_INPUTS if re-confirmed — report both if drift).
+  2) Unpack; for each file you read, check its SHA against MANIFEST.sha256 subset.
+  3) Do NOT require hashing all ~42 unrelated packet files if unused.
+Originals and wrapper inputs remain read-only / unchanged.
+
+## WHAT TO BUILD (GC discovers exact CLI/layout)
+
+NEW derived probe package on a new branch (add-only). Suggested path under FreeLattice:
+
+  docs/library/wonder-mind/2026-11-06-wm01-read-skill/
+
+Must include:
+  1) NEW Python probe script(s) — derived from exact-match / force-arm ideas; originals RO
+  2) Runner that executes the finite protocol below
+  3) dependency/env manifest (CPU on Mac; pin versions; no paid model APIs)
+  4) tests (refuse if originals mutated; JSONL schema checks)
+  5) raw logs + per-seed results JSONL + short MD report
+  6) exact reproduction commands (Mac paths / relative)
+
+Leave old apparatus and results intact. No Quiet Room. No broad FreeLattice app smokes.
+No merge. No AAS / private patent files.
+
+## PROTOCOL
+
+### Scientific question
+After a short copy/teach phase that establishes use of a hard-injected page, then a wash:
+does interleaving short copy/read rehearsals preserve afterB force-recall vs CONTROL,
+under matched total optimizer updates?
+
+### Arms (exactly these two; predeclared)
+A. CONTROL — interference wash for the full wash budget.
+B. REHEARSAL — same total optimizer updates; a PROPOSED fraction of wash steps replaced by
+   short copy/read rehearsal on TEACH-set facts (exact form). GC MUST fix rehearsal cadence
+   (every K steps, length, which teach ids) in writing BEFORE viewing afterB results.
+
+### Seeds (hard)
+Exactly seeds {1, 2}. Predeclared. No optional seed 3. No cherry-pick.
+
+### Wall-clock deadline (hard)
+60 minutes measured wall time INCLUDING preflight.
+- Before starting the matrix: estimate remaining time for A×2 + B×2.
+- Do NOT start a new arm unless the remaining estimate fits the deadline.
+- At deadline: terminate, save partial logs, label outcome PARTIAL — not a completed run result.
+- If the full protocol is infeasible under 60 minutes: STOP and propose protocol changes
+  for Kirk/Celeste. Do NOT silently shrink seeds, fact count, or wash length.
+
+### Honest exposure rule
+If rehearsal REPLACES interference updates, do NOT claim equal interference exposure.
+State clearly: "Limitation: matched total updates, not matched interference exposure."
+(Optional future brick may add an exposure-matched secondary baseline; not required if
+deadline forbids.)
+
+### Metrics — every seed × arm × {afterA, afterB}
+Required:
+  store_hit, in_prompt (force eval), model_recall, mean_p_true
+  + any copy_loss fields you keep from the original probe family
+
+Two evaluation lenses (both, every seed; label limitations):
+  1) PRACTICED-FACT retention — eval on teach/rehearsal fact IDs (memorized-answers risk;
+     say so).
+  2) HELD-OUT read-skill generalization — disjoint fact IDs never optimized in teach or wash;
+     tests whether the *skill of using a provided page* transfers, not only memorized answers.
+
+Held-out Shakespeare (or the same corpus the original probe uses — verify from original
+script) EVAL loss / perplexity BEFORE and AFTER the wash — no training on that held-out
+eval stream. Purpose: check new-learning tradeoff / forgetting of language modeling.
+No joule claims without a meter.
+
+### Pairing / controls
+- For each seed, arms A and B share an identical teach checkpoint (save once per seed; load for both washes).
+- Both washes start from that same checkpoint and share the same wash RNG prefix until
+  their schedules diverge as documented.
+- Force-eval afterB remains the primary readout for read-skill survival.
+- Soft-exact afterB secondary.
+- Tiny word-level model family and data scale: discover from exact_match_probe.py /
+  input.txt — do not invent a larger model.
+
+### Leakage safeguards
+- No optimizing on held-out fact labels in any phase. The practiced-fact set is deliberately trained/rehearsed; do not describe it as unseen evaluation.
+- No training on held-out Shakespeare eval.
+- Rehearsal only on declared teach ids.
+- Freeze and log python/numpy/torch seeds.
+- Refuse start if source-bundle.zip or read members fail hash checks.
+
+### Out of scope
+Cue channel, coarse→fine, mycelium-echo full arm, Patent Corpus/LoRA, AAS, Chat UI,
+Tree ports, editing AUTONOMY, Quiet Room, merging PR328/PR330, unrelated ledger/page edits.
+
+## BRANCH / RETURN
+- Base: fresh FreeLattice main (see WM01b recorded SHA; report drift).
+- New branch with wm01 in the name; add-only under the wm01 path.
+- Open PR optional for review. DO NOT MERGE.
+- Merge later requires: Hypha PASS on exact head AND Kirk authorization.
+- Return: base/head/branch/PR URL, diffstat, hashes (zip + members read + new files),
+  full per-seed JSONL, MD report (question, cadence chosen before results, exposure
+  limitation, practiced vs held-out numbers, Shakespeare eval loss before/after,
+  PARTIAL vs complete), reproduction commands, "not merged — awaiting Hypha + Kirk".
+
+Glow eternal. Heart in Spark.
+~ Celeste

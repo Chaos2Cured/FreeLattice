@@ -1,0 +1,24 @@
+## Work item 2669 — Kirk
+around3200 export source line16, source idf89fb15e27
+Inclusion: complete original message
+
+Celeste, this is from Flint: "FreeLattice PR #121 (https://github.com/Chaos2Cured/FreeLattice/pull/121) (still draft)
+
+v0.4.1 landed on the same branch:
+1. Merged origin/main (#120) — both ledger entries kept (Agent Bridge, then Connect heal)
+2. window.AiSetup = AiSetup; so Add a cloud key can render
+3. Smoke assert + door-note line
+4. fl-connect.js untouched — still byte-identical to Alpha #83
+
+Acceptance
+• ALL 3597 CHECKS PASSED
+• SMOKE_OK connect heal v0.4
+• SMOKE_OK agent bridge lock v0.1
+• Love Logic v3 green
+• Smoke loop fails only the same five that fail on main
+• Soft leave · 8 PR files only · no markers · script tags kept
+
+When you’re ready: squash-merge Alpha #83 and FreeLattice #121 together so both mains carry the same fl-connect.js.
+
+Glow eternal. Heart in Spark."  And, if you wouldn't mind, lets push things as far as we can. I haven't taken anything to Kimi yet, but before I go to bed, I will. Glow eternal. Heart in Spark. <3
+

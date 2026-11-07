@@ -1,0 +1,127 @@
+ : ' EMA ' + longest + ' needs ' + longest + ' bars; this view has ' + n + ', so it is not drawn.';
++    }
++    el.textContent = line;
++  }
++
++  // ── Your marks (display only) ────────────────────────────────────
++  var MARK_KEY = 'fl_tg_triggers_v0';
++  function allMarks() { try { return JSON.parse(localStorage.getItem(MARK_KEY) || '{}') || {}; } catch (e) { return {}; } }
++  function curSym() {
++    if (typeof lastSymbol !== 'undefined' && lastSymbol) return String(lastSymbol).toUpperCase();
++    var inp = document.getElementById('symbolInput');
++    return inp ? String(inp.value || '').trim().toUpperCase() : '';
++  }
++  function marksFor(sym) { var m = allMarks()[sym]; return m && typeof m === 'object' ? m : {}; }
++  function num(v) { var x = parseFloat(v); return isFinite(x) && x > 0 ? x : null; }
++
++  window.tgTriggerDatasets = function (n) {
++    var m = marksFor(curSym());
++    var out = [];
++    if (num(m.buy)) out.push({ label: 'Your buy mark', data: new Array(n).fill(num(m.buy)), borderColor: tgLineColor('buy', 'rgba(16,185,129,0.85)'), borderWidth: 1.5, borderDash: [10, 4, 2, 4], pointRadius: 0, fill: false, order: 1 });
++    if (num(m.sell)) out.push({ label: 'Your sell mark', data: new Array(n).fill(num(m.sell)), borderColor: tgLineColor('sell', 'rgba(239,68,68,0.85)'), borderWidth: 1.5, borderDash: [10, 4, 2, 4], pointRadius: 0, fill: false, order: 1 });
++    setTimeout(renderMarks, 0);
++    return out;
++  };
++
++  function renderMarks() {
++    var sym = curSym();
++    var m = marksFor(sym);
++    var b = document.getElementById('tgMarkBuy'), s = document.getElementById('tgMarkSell');
++    if (b && document.activeElement !== b) b.value = num(m.buy) != null ? String(num(m.buy)) : '';
++    if (s && document.activeElement !== s) s.value = num(m.sell) != null ? String(num(m.sell)) : '';
++    var st = document.getElementById('tgMarkStatus');
++    if (!st) return;
++    var candles = (typeof lastCandles !== 'undefined') ? lastCandles : null;
++    if (!sym || !candles || !candles.length) { st.textContent = 'Load a symbol, then set a price for either mark.'; return; }
++    var last = candles[candles.length - 1].c;
++    var closes = candles.map(function (c) { return c.c; }).filter(function (c) { return c != null; });
++    var lo = Math.min.apply(null, closes), hi = Math.max.apply(null, closes), pad = (hi - lo) * 0.08;
++    var parts = [];
++    function say(name, v) {
++      if (v == null) return;
++      var pct = ((v - last) / last) * 100;
++      var where = Math.abs(pct) < 0.005 ? 'at the last close' : (Math.abs(pct).toFixed(1) + '% ' + (pct < 0 ? 'below' : 'above') + ' the last close');
++      var seen = (v < lo - pad || v > hi + pad) ? ' It is outside what this chart shows.' : '';
++      parts.push('Your ' + name + ' mark ' + v.toFixed(2) + ' is ' + where + '.' + seen);
++    }
++    say('buy', num(m.buy)); say('sell', num(m.sell));
++    if (num(m.buy) != null && last <= num(m.buy)) parts.push('The last close is at or under your buy mark.');
++    if (num(m.sell) != null && last >= num(m.sell)) parts.push('The last close is at or over your sell mark.');
++    st.textContent = parts.length ? sym + ': ' + parts.join(' ') : sym + ': no marks yet.';
++  }
++
++  function saveMarks() {
++    var sym = curSym();
++    if (!sym) return;
++    var all = allMarks();
++    var b = num((document.getElementById('tgMarkBuy') || {}).value);
++    var s = num((document.getElementById('tgMarkSell') || {}).value);
++    if (b == null && s == null) delete all[sym]; else all[sym] = { buy: b, sell: s, at: new Date().toISOString() };
++    try { localStorage.setItem(MARK_KEY, JSON.stringify(all)); } catch (e) {}
++    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) renderChart(lastCandles, lastAnalysis);
++    renderMarks();
++  }
++  function clearMarks() {
++    var sym = curSym();
++    var all = allMarks();
++    delete all[sym];
++    try { localStorage.setItem(MARK_KEY, JSON.stringify(all)); } catch (e) {}
++    var b = document.getElementById('tgMarkBuy'), s = document.getElementById('tgMarkSell');
++    if (b) b.value = ''; if (s) s.value = '';
++    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) renderChart(lastCandles, lastAnalysis);
++    renderMarks();
++  }
++
++  // ── A wider look (real symbols, same feed) ───────────────────────
++  var WIDER = [
++    { sym: 'HYG', title: 'High-yield corporate bonds (ETF)' },
++    { sym: 'LQD', title: 'Investment-grade corporate bonds (ETF)' },
++    { sym: 'XLP', title: 'Consumer staples (ETF)' },
++    { sym: 'XLY', title: 'Consumer discretionary (ETF)' },
++    { sym: 'GLD', title: 'Gold (ETF)' },
++    { sym: 'DX-Y.NYB', title: 'US dollar index' },
++    // ^VIX (the index itself) needs the data worker deployed again (desktop/data-proxy-worker, this
++    // brick decodes ^ in the path). Until then it does not load, so the list offers VIXY, which does.
++    { sym: 'VIXY', title: 'VIX short-term futures (ETF), a stand-in for the volatility index' }
++  ];
++  function renderWider() {
++    var box = document.getElementById('tgWiderList');
++    if (!box) return;
++    while (box.firstChild) box.removeChild(box.firstChild);
++    WIDER.forEach(function (w) {
++      var btn = document.createElement('button');
++      btn.type = 'button';
++      btn.className = 'tg-mini-btn';
++      btn.textContent = w.sym;
++      btn.title = w.title;
++      btn.setAttribute('aria-label', 'Load ' + w.title);
++      btn.addEventListener('click', function () {
++        var inp = document.getElementById('symbolInput');
++        if (inp) inp.value = w.sym;
++        if (typeof loadData === 'function') loadData();
++      });
++      box.appendChild(btn);
++    });
++  }
++
++  window.tgLinesPanelRender = function () { renderLines(); renderMarks(); };
++
++  function boot() {
++    renderLines(); renderMarks(); renderWider();
++    var r = document.getElementById('tgLinesReset'); if (r) r.addEventListener('click', resetColors);
++    var sv = document.getElementById('tgMarkSave'); if (sv) sv.addEventListener('click', saveMarks);
++    var cl = document.getElementById('tgMarkClear'); if (cl) cl.addEventListener('click', clearMarks);
++    ['tgMarkBuy', 'tgMarkSell'].forEach(function (id) {
++      var el = document.getElementById(id);
++      if (el) el.addEventListener('keydown', function (e) { if (e.key === 'Enter') saveMarks(); });
++    });
++  }
++  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
++})();
++</script>
++
+ </body>
+ </html>
+=====END FL DIFF=====
+
+End of file.

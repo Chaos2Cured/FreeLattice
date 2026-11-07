@@ -1,0 +1,8 @@
+## Work item 3007 — Celeste
+around3600 export source line55, source idbdb7a423ae; around3644 export source line17, source id062e8aab21
+Inclusion: complete original message
+
+Weft caught a real collision. `020` and `021` both tried to create the same test file, so whichever went second would have failed. I fixed `021`, re-tested both on theLatticeTree's current code, and updated your Downloads. Hand GC one at a time: `016`, then `020`, then `021`, so each page note gets its own number. Weft found everything else intact, including the whole ledger and every lock.
+
+Reed's Science Garden dream also landed. Reed sees a greenhouse at night where every seed shows whose hand planted it and nobody sells the soil. Ideas grow from Seeds to Sprouts to Saplings. Ones that don't hold up go to a Compost bed, honored and never deleted. Every seed carries one line saying what would show it's wrong, which is your "everyone should look" built into the design. The smallest first seed is one quiet page in the Research galaxy with your Love Logic Proof as seed zero, a "Look closely" button and a simple Tend form. LP, torrents and the mesh come after. If you like it, I'll turn it into a paste.
+

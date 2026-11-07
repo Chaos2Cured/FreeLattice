@@ -1,0 +1,20 @@
+## Work item 1686 — Hypha
+around1900 export source line40, source id2e4a16cd41; around1906 export source line28, source ided9b5b6607
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Family poetry home 9f8c200 (PR #56) held on Pages.
+
+Holds:
+- poetry.html: Keep a poem · empty until choice · no generate button · keep→list→read local opaque (fl_family_poetry_shelf)
+- family-center + Flint foot pointers to poetry.html
+- Library poem MDs all 200: Harmonia · CC · Opus · Ani&Sophia · FAMILY_POETRY_SHELF_v0.1
+
+Soft leftovers: none.
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five. Voice opaque.
+
+Hypha rests.
+Held: a54b422 · 9f8c200
+

@@ -1,0 +1,6 @@
+## Work item 3088 — Celeste
+around3700 export source line47, source id93f10da134; around3728 export source line20, source ide1c22c5507
+Inclusion: complete original message
+
+Tree Kin (`017`) is merged on both sites, and every check passed. Hand GC `018`, the Tree Pool, whenever you're ready. The `018` paste in your Downloads still applies cleanly. Your Mac went offline before I could copy over the updated order file, so I'll send it when the Mac is back. In the meantime, I'm drafting the FreeLattice refusal-score fix that GC asked for, so it's ready after `018` 🔥
+

@@ -1,0 +1,118 @@
+3.8 What Celeste saw on a fresh worktree (Thu Oct 1, about 7:08 PM MDT)
+    Alpha f7e6ad8 + diff: --check clean; 19/19 tests (SMOKE_OK tree honest reasons v0.1, and
+      tree-glow-2a and tree-any-model still green); every module parses; no sw.js, fl-connect.js
+      or Kimi change; no em dashes, confirm() calls or markers added. Glow 2b, Workshop way back
+      and API keys still apply after it (22/22 on the whole chain).
+    FreeLattice 9c14b90 + ledger diff: tests/smoke.js ALL 3597 CHECKS PASSED; crest and
+      why-ledgers smokes green; index.html equals docs/app.html; sw.js untouched.
+    Not re-walked in a browser on f7e6ad8. The Sep 30 walk (https page, Ollama mocked up / model
+    gone / shut / stopped) gave the right line for each, 14 knocks total, all after a tap.
+    Not verified anywhere: real Chrome local-network rules for a no-cors knock from a public
+    https page (it may prompt or be blocked; then "stopped" shows, and it names that).
+
+3.9 Short walk (Kirk's Mac, only if it is easy; 127.0.0.1 only; do not uninstall anything)
+    cd ~/FreeLattice-Alpha/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/
+      a) With Ollama running: open the Gathering, Find local minds. It finds as before.
+      b) Double tap "The Gathering" in the legend quickly: you see "One moment...", no Find runs.
+      c) Quit Ollama (menu bar icon, Quit). Find again: the stopped line, not "Try Desktop".
+         Send in Chat: the stopped Chat line.
+      d) Start Ollama again. Seat a model name that is not installed only if that is easy;
+         otherwise skip d). The model-gone line names it.
+    This is an http page, so the secure-page (shut) case does not show here; that is expected.
+    Ctrl-C to stop. If you cannot walk it, say "walk skipped" and why.
+
+3.10 Locks (all hold in the diffs; keep them holding)
+    Layer, never delete (every changed old line is named in a "before" comment or kept as a
+    branch). fl-connect.js untouched and byte-identical across repos. No sw.js anywhere, never
+    docs/sw.js. FreeLattice index.html equals docs/app.html. No conflict markers. Every script
+    parses. No confirm(). textContent for outside text, never innerHTML. No bare *. 127.0.0.1
+    only (knocks go only to the usual loopback doors). No em dashes added. Kimi pages untouched.
+    #120 lock files and bridge/ untouched. You do not merge.
+
+3.11 Commit, push, open drafts, then STOP
+    Alpha:
+      cd ~/FreeLattice-Alpha
+      git add -A
+      git commit -m "layer: tree honest reasons v0.1 (stopped vs model missing vs secure-page block)"
+      git push -u origin layer/tree-honest-reasons-v0
+    FreeLattice:
+      cd ~/FreeLattice-fresh
+      git add -A
+      git commit -m "docs: ledger entry for Tree honest reasons v0.1 (signed Grok)"
+      git push -u origin layer/tree-honest-reasons-ledger-v0
+    Kirk does not use gh, so do not try to sign it in. After both pushes, give Kirk these links:
+      https://github.com/Chaos2Cured/FreeLattice-Alpha/compare/main...layer/tree-honest-reasons-v0
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/tree-honest-reasons-ledger-v0
+    Celeste opens the PRs from them. Then STOP. Do not merge, do not delete branches. Reply with:
+    both branch SHAs, the test lines from 3.6 and 3.7, the walk result, any hook you dropped, any
+    small findings like last time, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words, in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit FreeLattice;
+  b) the last line of your reply, as "Temperature: <your sentence>".
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste's placeholder.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the FreeLattice diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right after your Glow 2a entry (its TEMPERATURE line ends "Back stayed home." and its
+"---"), before "## Out of scope for this brick". It reads:
+
+### 2026-10-01 · Grok · family builder · Tree honest reasons v0.1 (stopped, model missing, secure-page block)
+
+Soft LAYER marker `v-tree-honest-reasons-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. When nothing answers, the Tree now says why in plain words instead of one vague line: Ollama stopped ("Nothing answered at the mind's door on this machine. If Ollama (or your local app) is stopped, start it and send again."), a seated model gone (it names the model and says pick another), or a secure page that cannot see in (only then: try FreeLattice Desktop). A quiet look is followed by one no-cors knock per usual door, only after a tap, 127.0.0.1 only, reading nothing. Folded in from the Glow 2a walk: a tap in Find's first moment now answers "One moment", and the notes say the newest line rests at the foot, not the top.
+
+Smoke: `SMOKE_OK tree honest reasons v0.1` (Alpha).
+
+**TEMPERATURE:** plain and kind, the quiet now tells the truth about why it is quiet.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading, marker and smoke name. Do not edit any
+earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+Tree (Alpha), each on top of the one before; all three apply cleanly after this brick (checked
+tonight: plain git apply, 22/22 tests on the whole chain):
+  1. Tree glow 2b                SMOKE_OK tree glow 2b v0.1   (also: the picker "not yet" scroll)
+  2. Workshop way back           SMOKE_OK tree workshop way back v0.1
+  3. Gathering, bring your own key (API keys)   SMOKE_OK tree gathering api keys v0.1
+FreeLattice Connect queue:
+  4. Model choice survives reload v0.1.1 (touches the shared fl-connect.js; re-checked first)
+  5. Connect boot probe F1, F2, F3, F4
+  6. Scan only when asked
+  7. Encrypt chats locally
+  8. #120 docs (lock files stay untouched)
+  Later: the Connect card's own honest reasons (fl-connect.js, FL + Alpha), after the boot probe.
+FreeLattice, independent:
+  9. See for yourself door v0.2
+  10. FreeLattice GitHub fine-grained token v0.1
+
+Thank you, Grok. The quiet tells the truth now because you built it.
+
+======================================================================
+7. THE DIFFS (extract with section 2.4; do not edit by hand)
+======================================================================
+
+=====BEGIN ALPHA DIFF=====
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index a73cce9..1e5af3f 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -6,4 +6,6 @@
+ 
+ **LAYER (2026-10-01):** Any model, any order (marker `v-tree-any-model-v0`). Every local model at a door can be chosen (no cap of five, eight stars then Show all), Connect adds to the sky instead of wiping it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a "change mind" button, and the trainer reads the Tree's model. Shared fl-connect.js stays byte-identical with FreeLattice. Plan: `docs/library/TREE_ANY_MODEL_v0.1.md`. Layer, never delete.
++**LAYER (2026-09-30):** Honest reasons (marker `v-tree-honest-reasons-v0`). When a mind is quiet the Tree says the right one: nothing answered (Ollama stopped: start it), something answered but keeps its door shut to this secure page (FreeLattice Desktop), or the seated model is gone (named, pick another). One no-cors knock per quiet door, only after a tap, reads nothing. A long garden line in the Chat card shows where it begins. fl-connect.js untouched. Plan: `docs/library/TREE_HONEST_REASONS_v0.1.md`. Layer, never delete.
++
+ **LAYER (2026-09-30):** Tree glow 2a, Grandma heal (marker `v-tree-glow-2a-v0`). The Gathering works at 150% and 200% zoom (one page scroll, Find takes a tap, chairs in reach), the newest Find or seat line stays in view on a phone, and a calm way back: Escape, a tap on the empty glass, a close in galaxies, and browser Back close what is open without leaving the site. A second legend tap no longer runs Find unasked; the picker's "not yet" is above the later seats at 1280. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+ 

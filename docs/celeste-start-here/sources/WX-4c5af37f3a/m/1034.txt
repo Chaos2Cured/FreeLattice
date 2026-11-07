@@ -1,0 +1,6 @@
+## Work item 1034 — Celeste
+around1200 export source line12, source id93fea685af; around1216 export source line4, source idf3feae7301
+Inclusion: complete original message
+
+Still on Lattice Protocol — drafts are on my computer. Next: Flint paste for FreeLattice (`docs/celestera.html` + library protocol), no cloud.
+

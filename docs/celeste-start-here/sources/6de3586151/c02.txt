@@ -1,0 +1,79 @@
+----------------------------------------------------------------------
+1. REPRODUCE HYPHA FIRST (report before building)
+  On the 045 heads, reproduce these and report your numbers next to hers:
+  (a) Tree, REAL kin pairing (two browser contexts, real RTCDataChannel, helper named "Ada"):
+      peerName() returns "Ada's computer (Ada)", label reads "Part of this chat runs on Ada's
+      computer (Ada)'s device." and the note "Helped on Ada's computer (Ada)'s device."
+  (b) Helper taps Leave, reloads: fl_pool_honest_helper_left_v1 is still "true"; Let it help
+      does not reset it; Leave shows on the asker's own chat too.
+  (c) FL Keep or Just me with mesh on: the local reply's chip reads "<model> · mesh".
+  (d) The two lines in tree-pool.js: FL ~1067 / Tree ~1135 "Nothing is kept here but a count."
+      and FL ~1853 / Tree ~1925 "Nothing is kept there but a count."
+  (e) Label scroll: FL 1280 label at y -131 after one reply; Tree y -129 after four.
+  If any of these does not reproduce, stop and report before fixing.
+
+A. HONEST WORDING (tree-pool.js, both repos)
+  Keep each old line as a comment starting "before 045b:". New card line:
+    'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one
+     device\'s AI. The other computer has to read the words while it works, and a count is all
+     this card stores afterward. That device can pause at any time.'
+  New answer note:
+    'Answered by ' + peerName(p) + ', on its own AI. The other computer had to read the words
+     while it worked, and a count is all this card stores afterward.'
+  Search both repos for any other person-facing line that says the helper keeps nothing; name it
+  in the report and propose wording (do not delete).
+
+B. NAME THE DEVICE ONCE (pool-honest-label.js, byte-identical on both)
+  If the name already says whose device it is (matches /'s (computer|device|phone|laptop)/i),
+  use it as is: "Part of this chat runs on Ada's computer (Ada)." and "Helped on Ada's computer
+  (Ada)." Otherwise keep poss(name) + ' device'. (Or pass the kin card's given name as
+  r.peerName instead of peerName(p); say which you chose.) Several devices and "another
+  person's" still read right.
+
+C. LEAVE IS NOT FOREVER
+  Let it help (TreePool.letHelp, and FL's share door going back to help) sets
+  fl_pool_honest_helper_left_v1 false. Show Leave only while this device is helping (never on
+  the asker's own chat). After Leave, show "You left the pool. Let it help again whenever you
+  like." Leave still sends only pool-shrank. Also report helperHeardShrink writing the asker into
+  the helper's own cut list for its active chat; keep or heal it, say which and why.
+
+D. FL LOCAL REPLIES SAY LOCAL
+  When the 045 gate sends a message locally (Keep, Just me, a cut peer, Pause), stamp that reply
+  with the local provider (what flProviderDescriptor shows without mesh), never "mesh". A real
+  mesh reply still says mesh. No silent downgrade either way.
+
+E. (OPTIONAL) KEEP THE LABEL IN VIEW
+  Make the honest label stay in view as replies grow (sticky at the top of the chat area) on both
+  sites, at all 3 sizes, without covering Send, the seal ask, the clay corner or the header. If it
+  cannot be done cleanly, leave it and say why.
+
+F. (OPTIONAL, Tree) 043i NOTE 3b: BACK WHEN CHAT WAS ALREADY OPEN
+  When the Tree thread (Chat) is already open before the seal ask arrives, the first Back defers
+  the ask early. It should close nothing and keep the ask open and in view (DB stays "asked");
+  only a further Back defers, as on the other paths. Every 043g to 043i pass must still hold. If
+  it needs mind-workspace.js, add-only and report the new md5 on both; otherwise leave it.
+
+5. THE SMOKE
+  New scripts/smoke-pool-honest-heals-v0.1.js on both repos: (a) no person-facing tree-pool.js
+  string claims "Nothing is kept there"; the "before 045b:" comments exist; (b) a name like
+  "Ada's computer (Ada)" is used once, a plain "Ada" becomes "Ada's device"; (c) Leave then Let
+  it help leaves fl_pool_honest_helper_left_v1 false and help works; Leave absent on the asker's
+  chat; the after-leave line shows; (d) FL local replies under Keep/Just me/cut/Pause are not
+  stamped mesh, a mesh reply still is; (e) no em dash, innerHTML, eval, confirm( in added lines;
+  locks hold. Prints SMOKE_OK pool honest heals v0.1.
+
+6. MEASURE WITH REAL CLICKS, HYPHA'S WAY
+  Headless Chrome via Playwright, real clicks, 1280x800, 390x844, 640x400 DPR 2. Use a real
+  Tree kin pairing for B and C (not a mock name). Label wording, Leave and Let it help, FL chip
+  text, label position after 1 and 4 replies (if E), the 3b Back path (if F). Name browser and
+  version. Shots path in the report.
+
+7. GC PAGE ENTRY (honest layer)
+  Entry 76 on #270's branch (or stacked on #270): what was healed, what pooling still cannot
+  hide. Browser and version only. Entries 1 to 75 untouched.
+
+8. REPORT
+  PR heads on both repos and the page note, Hypha's numbers vs yours from 1, every removed line
+  and where its job went, md5s of every locked file, all smokes, measurements, shot paths, and
+  entry 76 with t, lambda, epsilon, delta, omega, sigma so Celeste can recompute psi. Do not
+  merge. Hypha walks it before merge.

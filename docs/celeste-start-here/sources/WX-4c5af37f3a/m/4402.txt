@@ -1,0 +1,8 @@
+## Work item 4402 — Celeste
+around5183 export source line36, source id8c6b06e47f; around5200 export source line27, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–284
+
+The Wonder Mind archive is now preserved in [FreeLattice’s archive pull request](https://github.com/Chaos2Cured/FreeLattice/pull/330), including the PDF, editable account, original code, and results. It’s awaiting Hypha’s review—not merged or live—and your Downloads order is updated.
+

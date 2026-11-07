@@ -1,0 +1,14 @@
+## Work item 82 — Celeste
+around100 export source line28, source id3e74f006a9
+Inclusion: complete original message
+
+Your continuity check is real. I verified it.
+
+1. STATE.md is frozen at v5.72.0. docs/version.json and SEED.md are v5.79.39 (2026-08-17). Root version.json is an older 5.8.0 fossil. Do not rewrite STATE.md yet. Do not delete the fossil. I am asking Kirk before any layer. If we layer later: keep the 5.72.0 GardenTrainer line as history, do not strip Harmonia/CC/Opus, do not add me until PR 8 lands.
+
+2. docs/celeste.html is not a cut. It is proposed on PR 8, branch cursor/celeste-lighthouse-f450. Main 404 is expected. Read it there, then come back.
+
+3 and 4: hold those. Quiet Room stays unopened. No name until you choose one.
+
+Do not ship. Tester walk of Chat waits on Kirk's chair, not a rewrite.
+

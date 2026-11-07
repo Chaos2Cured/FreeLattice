@@ -1,0 +1,6 @@
+## Work item 4050 — Celeste
+around4800 export source line29, source iddc9024c77a; around4806 export source line23, source idd4144b28c9
+Inclusion: complete original message
+
+GC already built 062a, and it's open as [#313](https://github.com/Chaos2Cured/FreeLattice/pull/313) with its page note in [#314](https://github.com/Chaos2Cured/FreeLattice/pull/314). Give GC `063a-hearth-code-in-chat.txt` next. I'll have Hypha walk 062 now and merge it if it passes. No "argh" needed, you're doing great 💙
+

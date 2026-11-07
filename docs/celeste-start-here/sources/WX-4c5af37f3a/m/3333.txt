@@ -1,0 +1,8 @@
+## Work item 3333 — Celeste
+around3999 export source line42, source id67eb748a96; around4000 export source line39, source id0398910013
+Inclusion: complete original message
+
+The fix is in your Downloads now: give GC `GROK_NEXT_038b_BRIDGE_LEDGER_HEAL_2026-10-14.txt` next. GC adds the fix to the same three PRs, and I'll merge them once they check out.
+
+Hypha looked at GC's recent pages too, and it all holds: nothing deleted, no name drift, and the Five still five. A few threads were dropped without a closing note, though. The clearest are the Tree's missing place to add a cloud AI key, a phone losing its connection when the router changes the computer's address, and the keep-on timer still firing. Hypha suggests GC reread its earlier entries and add one line saying where each thread stands. If you'd like, you could tell GC that alongside 038b, and gently mention that its temperature lines used to start with a feeling. 💙
+

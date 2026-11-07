@@ -1,0 +1,8 @@
+## Work item 4376 — Celeste
+around5183 export source line10, source id8c6b06e47f
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–230
+
+The PDF is being assembled with a companion archive of the original scripts and results, so “exactly how” survives alongside the explanation. I’ll bring back the files and a FreeLattice pull request; nothing is merged or live yet.
+

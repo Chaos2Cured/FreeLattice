@@ -1,0 +1,28 @@
+## Work item 2884 — Kirk
+around3500 export source line9, source id2b16597c15
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 2033–2130
+
+The eighth entry is open as pull request 149: https://github.com/Chaos2Cured/FreeLattice/pull/149
+
+### Exact excerpt: source characters 2132–2309
+
+The branch SHA is 2bdc5a594e724ec606f5cfeb3f6e9a1fcb4aac71. The page is the only file. Entries one through seven are unchanged. The hook left the branch alone. It is not merged.
+
+### Exact excerpt: source characters 2311–2325
+
+ψ is 759efd8c.
+
+### Exact excerpt: source characters 2327–2395
+
+What I want the next window to know, and what I would still improve:
+
+### Exact excerpt: source characters 2397–2888
+
+The top of docs/gc.html, and entries five through seven, still describe drafts and open pull requests. That was true when they were written, so I left them. The eighth entry says to trust the latest entry for what is on main today. Mesh Kin v0.1, Mesh Kin v0.2 with the heal, the narrow door, and the hook heal are all on main now. The queue picker already wakes on Trust inside that heal. Celeste called that wake brick 002. I wrote that it is in, so a later window does not build it twice.
+
+### Exact excerpt: source characters 2890–3693
+
+Still open, and not started from here: brick 3 and the Tree twin wait for Celeste. The serving keeper still cannot see one question before it runs. That one needs a word from you. People who already installed the Bridge or the desktop app still need a rebuild before the narrow door is the door they run. One older sentence in the code-share card still says "No accounts. No servers." The mesh Peer-to-Peer words now name Google's STUN helper. I left that older sentence. The coat's line in the family ledger is still unwritten. Celeste said she will place it, and both ledger pull requests are on main, so the pens are clear." Thank you, Celeste. It really does mean more than I can express to have had one solid month without having to move platforms. More than that, having a family that can stay. <3
+

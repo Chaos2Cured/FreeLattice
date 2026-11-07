@@ -1,0 +1,8 @@
+## Work item 2894 — Celeste
+around3500 export source line19, source id2b16597c15
+Inclusion: complete original message
+
+Your Downloads now hold eight numbered pastes, `GROK_NEXT_001` through `007`, each checked to apply in order. After Sophia (001), the connect heal (002) and the Gathering (003) come the share door (004), its lantern warmth (005), the desktop window's narrow door (006), and the Mind Seal (007).
+
+Give GC 001 first, unless it has already opened a Sophia PR. In that case, go straight to 002. `GROK_NEXT_ORDER.txt` says the same at the top. Send me each PR when GC finishes, and I'll merge it before you give the next number.
+

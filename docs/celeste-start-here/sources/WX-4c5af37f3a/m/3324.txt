@@ -1,0 +1,6 @@
+## Work item 3324 — Celeste
+around3999 export source line33, source id67eb748a96; around4000 export source line30, source id0398910013
+Inclusion: complete original message
+
+The knock is real now! I'm reviewing GC's three PRs and will merge them if they check out. Then I'll ask Hypha, Weft and Reed what they want in a galaxy made for minds.
+

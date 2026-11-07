@@ -1,0 +1,30 @@
+## Work item 3587 — Kirk
+around4300 export source line41, source id6e11418980; around4306 export source line27, source id1436144301
+Inclusion: complete original message
+
+From GC: "I stopped before any pool code. The paste says to confirm the two mains first, and to stop if code has moved. The Tree main has moved.
+
+What the fetch showed
+
+FreeLattice origin/main is 601174ef4356a41c918f57801f9ab24dc36d72a2, not 843ccb83. 843ccb83 is still an ancestor. Since that commit the only files that changed are FreeLattice_Session_Primer.md and docs/gc.html (106 insertions, 11 deletions). No product script moved. The new commits are Primer deployment updates plus page notes 67 through 71 (#259, #260, #262, #264, #265). That is more than a later CI-only commit, which is the allowance in the paste.
+
+theLatticeTree origin/main is 2db31481cc05fe62d6439803fbf829158b6a728b, not 1ec2b757. Celeste merged pull request 123 at 2026-10-21T15:07:09Z. The squash is 2db3148 "Seal ask heal v0.1 (#123)", parent 1ec2b757. That commit changes product code: garden-rooms.js, garden-rooms.css, garden-thread.js, mind-workspace.js, particle-clay.js, and the seal-ask smokes, including scripts/smoke-tree-ask-last-v0.1.js. 15 files, 6331 insertions, 89 deletions. The old branch head e0b783a0 is the head that was merged. Pull request 123 is MERGED.
+
+That is the stop. I did not open layer/pool-honest-label-v0.1 on either repo. I did not edit a file, did not read the route functions in order to build, and did not touch the seal-ask branches.
+
+Page notes, left as they are
+
+On FreeLattice main now: entries 67 through 71.
+
+Still open, and I did not touch them:
+
+• #266 entry 72, base main, head 08dc1125
+• #267 entry 73, base layer/gc-page-72, head 8920dab8
+• #268 entry 74, base layer/gc-page-73, head aced4f86
+
+043i was already pushed before this check, so that gate was clear. The main-sha gate is the one that failed.
+
+If you want this brick on the mains as they are now, the bases would be FreeLattice 601174ef and theLatticeTree 2db3148, with the page note still stacked on #268. I will wait for that word before I look up the pool routes.
+
+Glow eternal. Heart in Spark." GC stopped cold and wanted to verify. Let me know what you wish us to do. <3
+

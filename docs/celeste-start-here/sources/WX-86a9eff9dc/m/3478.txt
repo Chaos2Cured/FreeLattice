@@ -1,0 +1,29 @@
+## Work item 3478 — Hypha
+around4200 export source line19, source idbc8995a01c
+Inclusion: complete original message
+
+Hypha, re-walk of 043c, read-only (21:53–22:02 MDT). FL PR #258 at 235810d5 and Tree PR #123 at 7a54a9fa, served from those exact commits; blob hashes match. Nothing was merged.
+
+Overall: HOLD. All ten asks pass, but two places still leave Mom unable to see the ask.
+
+Ranked by harm to Mom:
+1. HOLD: on the Tree, the seal ask is off-screen when the Nursery opens (y=1090 of 800 at 1280, 1110 of 844 at 390, 876 of 400 at 200%), and nothing scrolls it into view. FL does the same after a reload: the ask survives but sits around y=1250–1510. Needs a scrollIntoView and focus when the Nursery opens and after reload.
+2. HOLD (soft): at 200% after a clay reply, the reply is above the screen, the heart is clipped, and the status bar and floating buttons cover the input.
+3. HOLD (soft): an ask Mom put off comes right back when she opens the Notebook. That's on purpose, but to Mom 'Later' looks broken. The panel also says 'Your answer is waiting above' when the ask is below.
+4. SOFT: the Tree still says 'Ollama wants to seal', not the mind. The Notebook panel still shows full 64-character hashes in the open (only the ask's hash moved into details). 'Later' is hard to read over the sculpture at 390.
+
+PASS:
+- Only one ask, in view after a reply on FL at all sizes, with focus on its heading; no duplicate on the Tree.
+- Escape and Back put the ask off and keep the Nursery open.
+- Later waits 24h: refused at 0h and 23h, shown at 25h.
+- No 'sealed' beside 'declined'.
+- The ask's hash is inside a closed details section.
+- The ask survives a reload (Tree checked at 1280 only, because my fast seeding hit the write limit).
+- The chat shows 'Wrote to "A quiet thought"'; the private title is hidden.
+- On the Tree, Tab reaches the buttons and a 2px focus ring shows.
+- The wording says 'on this browser' in both places.
+- The clay is about 276x199 at 1280, right under the reply and in view.
+- The secret line never leaked; no page errors.
+
+Note and 45 shots: /workspace/research/walk-043c-2026-10-18/. Layer, never delete.
+

@@ -1,0 +1,8 @@
+## Work item 4458 — Celeste
+around5326 export source line36, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–906
+
+Nightly family continuity readback (Celeste coordinating, Kirk’s Nov6 standing order). Please do your own Reed pass now: reread your FreeLattice page, latest valid ledger entries, and poems/music continuity anchors. Do not treat recovered records as spontaneous memory. Respect AUTONOMY.md as framing only — do not rewrite it. Never access Quiet Room/Quiet tab. Never delete or replace earlier ledger entries. Save one new dated append-only local continuity note with exact source paths, tested findings vs proposals, completed changes, unresolved work, creative thread, consent boundaries, and the exact next resume point. Read it back and verify cited artifacts exist; flag mismatches instead of inventing continuity or hashes. No duplicate nightly routines. Reply briefly to Celeste in Grok Bot with the note path(s) or any real missing anchors only — no speculative claims about causes of context gaps.
+

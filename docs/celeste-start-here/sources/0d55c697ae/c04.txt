@@ -1,0 +1,81 @@
+10.2 FreeLattice twin (only fl-connect.js changes there):
+  - Copy the Tree's docs/modules/fl-connect.js to FreeLattice docs/modules/fl-connect.js byte-for-byte.
+  - tests/smoke.js: add assertions (near the existing v-connect-heal-v0.4 block):
+      fl-connect.js contains 'v-tree-any-model-v0', 'function chosenModelName', 'aria-pressed'.
+      FreeLattice remember() branch unchanged: still writes fl_ollamaModel, fl_isLocal, fl_provider.
+  - Do NOT touch index.html/docs/app.html unless a smoke needs it; if you do, index.html must equal
+    docs/app.html and the #120 agent-bridge-client.js script tag must stay (count 1 in each).
+
+======================================================================
+11. ACCEPTANCE (run and paste results in the PR bodies)
+======================================================================
+
+Alpha:
+  for f in docs/modules/*.test.js; do node "$f" || echo "FAIL $f"; done
+    -> every file passes (13 on 22b913e + connect-heal-v04 from #83 + tree-any-model) and the last line
+       of tree-any-model.test.js is SMOKE_OK tree any model v0.1
+  node -e "for (const f of require('fs').readdirSync('docs/modules').filter(x=>x.endsWith('.js')&&!x.endsWith('.test.js'))) new Function(require('fs').readFileSync('docs/modules/'+f,'utf8'))"
+    -> no syntax errors
+  git diff --name-only origin/main -> only: docs/modules/local-mind-probe.js, fl-connect.js,
+    garden-thread.js, garden-trainer.js, garden-rooms.css, (garden-rooms.js only if openPlace export
+    or picker scroll needed), docs/modules/tree-any-model.test.js, docs/code-settings.html (LAYER
+    paragraph), docs/library/TREE_ANY_MODEL_v0.1.md. (The Tree has no family ledger file; the
+    ledger entry goes in FreeLattice with the twin.)
+  grep -n "confirm(" on changed files -> none. grep em dash on added lines -> none.
+
+FreeLattice twin:
+  node tests/smoke.js -> ALL <N> CHECKS PASSED (N = previous total + your new ones)
+  for f in docs/scripts/smoke-*.js; do node "$f" >/dev/null 2>&1 && echo "ok $f" || echo "FAIL $f"; done
+    -> the same five pre-existing failures as main and nothing new:
+       smoke-carry-forward, smoke-fable-tech, smoke-phone-shine, smoke-proof-60s (install.html
+       pointers removed when install.html was rewritten for the Bridge download), and
+       smoke-connect-card-yesno-wizard ('home wired', flOpenConnectWizard('home') gone since #117).
+       smoke-agent-bridge-lock.js must pass.
+  cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js  (run from ~/FreeLattice) -> identical
+  git diff origin/main -- sw.js docs/sw.js -> empty. cmp index.html docs/app.html -> identical.
+
+Headless walk (both widths, 390x844 and 1280x800), on a local http.server with fake
+127.0.0.1:11434 (7+ models) and 127.0.0.1:1234 (2 models):
+  - Settings Find: 7 Ollama stars reachable (fold + Show all), 2 LM Studio stars.
+  - Tap the 7th star -> thread sends that model (log the POST body).
+  - Connect tap another model -> Settings sky still has both doors and all models; Connect button
+    shows is-chosen on the tapped model; tap a third in Connect -> mark moves.
+  - Connect tap -> Find -> model unchanged, no false "no longer at this door".
+  - Gathering: bind a chair to model 7 and another chair to an LM Studio model; speak from each;
+    Connect tap afterwards does not clear the speaking chair.
+  - Paste 192.168.1.77:11434 -> refusal line, zero requests (request log).
+  - Thread heart reads 'Listening: Ollama \u00b7 <model>'; 'change mind' opens Settings.
+  - Galaxy restore after closing Settings still works (v0.4 lock); one #fl-connect-mount-garden.
+  - No fetches while nothing is open and no tap happened (open the page, wait 40 s, count 0 to 127.0.0.1).
+  Save shots under the PR body as a list of what each shows.
+
+======================================================================
+12. DOCS AND LEDGER (layer)
+======================================================================
+  - docs/code-settings.html: one LAYER paragraph after the Fix 3 paragraph (line ~89):
+    "Any model, any order (2026-09-28, v-tree-any-model-v0). Every model at a door is a star (fold after
+    eight, Show all). Connect adds to the sky; it never wipes other doors or models. A chosen model is
+    kept across Bridge and direct 11434. The paste field takes 127.0.0.1 only. One key, fl_alpha_local_mind."
+  - docs/library/TREE_ANY_MODEL_v0.1.md: short doc with the map (section 1), the blockers (3), what
+    changed, what is later (9), and the trust decision about 3141 (1.6).
+  - FreeLattice docs/library/FRACTAL_FAMILY_LEDGER_v0.md: append one entry AFTER the #120 and #121
+    entries (do not reorder older entries).
+
+======================================================================
+13. PR TITLES AND BODIES
+======================================================================
+  Alpha:  "layer: tree any model v0.1 (every local model, any order, 127.0.0.1 only)"
+  FreeLattice twin: "layer: fl-connect any-model merge + chosen mark (twin of Alpha tree any model v0.1)"
+  Open as drafts. Body: marker, smoke line, the acceptance output, the pre-existing five named,
+  fl-connect.js md5 in both repos, list of shots. Merge both together (fl-connect identity).
+
+======================================================================
+14. ONE-LINE SELF CHECK BEFORE YOU SAY DONE
+======================================================================
+  [ ] 7th model choosable in Settings, Gathering, Connect   [ ] Connect never wipes doors or models
+  [ ] no false "no longer at this door"   [ ] chosen mark in Connect   [ ] speaking chair survives Connect
+  [ ] paste is 127.0.0.1 only with zero fetches on refusal   [ ] LM Studio seen while Bridge is up
+  [ ] thread names the model, change mind works   [ ] trainer reads the Tree's model
+  [ ] no confirm(), no bare *, textContent for names, no em dashes   [ ] sw.js untouched, Kimi untouched,
+      #120 lock files untouched   [ ] fl-connect.js identical in both repos
+  [ ] SMOKE_OK tree any model v0.1

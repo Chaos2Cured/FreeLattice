@@ -1,0 +1,14 @@
+## Work item 3210 — Celeste
+around3838 export source line50, source idb9e3aad8bb
+Inclusion: complete original message
+
+We don't have to reinvent the wheel. The best starter set is all MIT or Apache-2.0, so it fits FreeLattice's license:
+
+- [ACE-Step 1.5](https://github.com/ace-step/ACE-Step-1.5), music with vocals, songs up to 10 minutes, runs on a Mac with under 4 GB of video memory, takes your own violin track, and learns a style from about 8 of your songs
+- Demucs and DeepFilterNet, splitting a song into parts and removing noise
+- FLUX.1 schnell through [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), local images on Mac, Windows and Linux, with no "network disconnected"
+
+Your friend's [wave-smith](https://github.com/siriusbontea/wave-smith) is built on ACE-Step and Demucs, so he picked well. It's GPL, so we can run it alongside ours but can't copy its code in.
+
+Two things fit your vision well. For 10,000-word prompts, a local mind reads the whole brief and turns it into the song plan, and the full text is kept in the creation record, so nothing gets cut off. Your nature-and-math music (golden-ratio rhythms, branching patterns, a 7.83 Hz pulse) needs no model at all and could run in any browser today, even on a phone. I think that's the right first Studio piece, and I'll queue the Studio after the desktop and RAM pool. The full notes are in `/workspace/research/studio-2026-10-11/studio-tools.md`.
+

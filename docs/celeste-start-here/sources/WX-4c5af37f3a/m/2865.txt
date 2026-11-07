@@ -1,0 +1,16 @@
+## Work item 2865 — Celeste
+around3454 export source line36, source ide13a568bb8
+Inclusion: complete original message
+
+GC used the old v0.2 paste for #144, so I've held that PR. I merged GC's page note, #145, which is now its sixth ledger entry. Nothing is lost: I wrote a small paste that adds Hypha's heals onto the same PR, plus an instant refresh when you press Trust. It's in your Downloads and checked.
+
+Here's what to give GC, in order:
+1. `GROK_NEXT_NARROW_DOOR_2026-10-04.txt`, the urgent website fix.
+2. The Sophia page heal.
+3. `GROK_NEXT_MESH_KIN_V0_2_HEAL_ONTO_144_2026-10-04.txt`. After this, I'll merge #144.
+4. `GROK_NEXT_MESH_KIN_CONNECT_HEAL_2026-10-04.txt`.
+
+You can skip the `_v2` file now.
+
+GC also suggested that a keeper who shares could choose to approve each question one at a time. I'd offer that as an optional "Ask me before each question" setting in the share door, with plain sharing as the default. Does that sound right to you?
+

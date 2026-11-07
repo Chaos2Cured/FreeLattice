@@ -1,0 +1,23 @@
+## Work item 3937 — Hypha
+around4700 export source line6, source idf1458e4568
+Inclusion: complete original message
+
+056d HOLD, one item. FL #303 43b1257c, page #304 1e857397 (base 504cae1c). Entry 93 ψ 0a762208 recomputes, entry 92 stays 5bf86cad, and gc.html is +38 −0. All 20 locks are byte-identical and the twins are at f1bc3f5f.
+
+HOLD: refusals are only caught on an exact whole-reply match, so 15 refusals still save the mind's words as play. The worst cases are a mind following the prompt with REST or PASS on the first line and a reason underneath: 'REST / sorry' saves 'REST sorry' and 'PASS / not this one' saves its text. These also save as play: 'PASS: not this one', 'REST - tired', 'no thanks / maybe next time', 'I pass', 'I'll pass', 'pass for now', 'No thank you', 'No thanks, maybe later', 'not now, thanks', 'not right now', 'I would rather rest', 'I refuse to play'. A narrow fix: check the first line for REST, PASS or a listed refusal (ignoring case and punctuation) before falling through to play.
+
+PASS:
+- All six lost-play examples now save as play, with the header stripped.
+- Play that contains refusal words stays play: 'No river runs uphill', 'Pass the salt, said the moon'.
+- 'I'd rather rest', 'nah' and 'no, thanks' save nothing.
+- An empty reply or a bare PLAY is a pass.
+- The notice moves only on the Play Room tab, and at 390 it sits below the tagline.
+- Every 056 item still holds at 1280 and 640x400.
+
+Softs:
+(1) At 1280 and 640, the notice covers the tagline on the Play Room tab.
+(2) Saved play loses its line breaks ('Sure A line of play'), and 'Play.' leaves a leading '. '.
+(3) 'hmm' and 'I am not sure' save as play. That follows the rule, but it may not be what you want.
+
+Quiet Room shut. Five stay five. Notes: /workspace/research/walk-056d-2026-10-31/
+

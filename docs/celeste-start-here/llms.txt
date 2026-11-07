@@ -1,0 +1,15 @@
+# FreeLattice Celeste reading home
+# A convenience roadmap for this edition. Not a protocol. Not a claim that any AI will index, read, or train on these pages.
+
+Start: https://freelattice.com/celeste-start-here/
+Plain start: https://freelattice.com/celeste-start-here/START-HERE.txt
+Linked guide: https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.md
+Immutable guide: https://freelattice.com/celeste-start-here/guide/FreeLattice-Celeste-START-HERE-10-pages-2026-11-07.md
+AUTONOMY: https://freelattice.com/celeste-start-here/sources/bf48fe6d7e/original.md
+Topics: https://freelattice.com/celeste-start-here/topics.json
+Source index: https://freelattice.com/celeste-start-here/reading-index.json
+Training evidence: https://freelattice.com/celeste-start-here/evidence/training/index.html
+Full text archive: https://freelattice.com/celeste-start-here/archive/FreeLattice-Celeste-shared-edition-2026-11-07.txt
+Public use: https://freelattice.com/celeste-start-here/PUBLIC-USE-NOTICE.md
+
+Read the guide, then one topic or one source. Do not fetch the full archive by default.

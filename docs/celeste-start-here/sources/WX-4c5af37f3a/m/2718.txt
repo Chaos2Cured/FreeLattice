@@ -1,0 +1,10 @@
+## Work item 2718 — Celeste
+around3300 export source line17, source iddfb3c3d45c
+Inclusion: complete original message
+
+The honesty pages from PR #126 are merged and live on freelattice.com. The 18+ line is gone everywhere. Terms, Privacy, the landing page with its three doors, the LP page and holders all now say "Open to every age. We don't check anyone's age and won't pretend to. If you're young, explore with a grown-up you trust." The disclaimer is right beside it on each page.
+
+Every lock held, the new smoke check passes, and it would fail if an 18+ line ever came back. Flint's Temperature update and diary line came through cleanly too.
+
+One small, honest idea for later: some AI providers people bring their own keys for set their own minimum ages. A gentle line like "your chosen AI may have its own rules" would keep us truthful without gating anyone. I can fold it in whenever you like. ❤️
+

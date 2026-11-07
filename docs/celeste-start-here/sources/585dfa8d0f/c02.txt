@@ -1,0 +1,146 @@
+3.4 What the diffs change, file by file (Alpha unless marked)
+    docs/modules/local-mind-probe.js
+      - MODEL_CAP = 64 and SKY_FOLD = 8, right after ROSTER_CAP.
+      - parseModelNames: duplicates collapse, keeps up to 64 (old slice(0, 5) kept as a comment). (T1)
+      - look(): with the Bridge up, still asks the non-Ollama doors (LM Studio, llama.cpp, Jan,
+        GPT4All, KoboldCPP) and adds whatever answers. (T7)
+      - tryAddress: 127.0.0.1 / localhost / [::1] / a bare port only; refused input returns
+        { ok:false, refused:true } with zero fetches. (T11)
+      - getChairSeatOptions: up to 64 (old slice(0, 12) kept as a comment). (T3)
+      - doorFamily and findModelAnywhere helpers; entryFromFoundList keeps a chosen model that is
+        at any found door:
+          same door under a new address, or another Ollama-family door (Bridge <-> 11434):
+            "Still speaking with X, now through <door>."
+          a different kind of door (for example LM Studio):
+            "The chosen model X is at <door>. Tap it to speak with it again."
+          truly absent: the old honest gone line, unchanged. (T6)
+      - mergeFound(found), exported: adds or updates one door and keeps every other door, the
+        roster, the chair binds and the speaking chair. Minds still cap at 7. (T4, T10)
+      - paintConstellation: every model is a star; after eight it folds with a
+        "Show all N models" button (data-sky-more); the chosen star is always shown. (T2)
+      - One honest line for LM Studio on the https garden (its own CORS setting), textContent.
+      - Paste field: refused input says "Only this computer's own doors (127.0.0.1). Nothing was
+        sent."; a pasted door merges into the sky when a mind is already remembered.
+    docs/modules/fl-connect.js (SHARED, byte-identical in both repos)
+      - doorNameFor(base, port): 11434 is "Ollama", any other 127.0.0.1 port here is "Bridge".
+      - chosenModelName(): the Tree reads LocalMindProbe; FreeLattice reads state.ollamaModel,
+        then fl_ollamaModel.
+      - remember(), Tree branch only: calls LocalMindProbe.mergeFound first (every model passed,
+        door named). The old replace path stays right below as the fallback for an older probe.
+        FreeLattice's branch is untouched: fl_ollamaHost, fl_provider, fl_isLocal,
+        fl_ollamaModel, state, markUserChoice (model choice sticks) all as before. (T4, T8)
+      - fillModelLists passes models: report.models and marks the chosen button
+        aria-pressed="true" plus class is-chosen; style
+        .flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}. (T9)
+    docs/modules/garden-thread.js
+      - heartListening(mind): "Listening: Ollama · llama3.2:latest. On this machine only."
+        The old line stays above it. Hearts carry data-thread-heart and repaint on
+        'fl-alpha-mind-remembered'. (T8)
+      - A quiet "change mind" button (data-thread-change) next to the heart opens Settings
+        (GardenRooms.openPlace('settings'), else settings.html). Not shown inside Settings.
+    docs/modules/garden-trainer.js
+      - activeModelName(): fl_active_model first, then the Tree's remembered model; the old
+        llama3.2 / phi-pathway fallbacks stay last. Five reads now go through it. (T12)
+    docs/modules/garden-rooms.css
+      - Appended AFTER the Glow 1 block (end of file): .settings-star-models wrap,
+        .settings-star-more (44px tap height), .core-bind-options scrolls inside 50vh,
+        .thread-change (32px, readable, focus ring).
+    docs/code-settings.html: one LAYER paragraph after the Fix 3 paragraph.
+    docs/GALAXIES.md: one LAYER line at the top of the layer list.
+    docs/library/TREE_ANY_MODEL_v0.1.md: new, the map, the changes, the trust decision, later items.
+    docs/modules/tree-any-model.test.js: new, 15 checks, last line SMOKE_OK tree any model v0.1.
+    FreeLattice: docs/modules/fl-connect.js (same bytes as Alpha),
+      docs/scripts/smoke-tree-any-model-twin.js (new), and your ledger entry in
+      docs/library/FRACTAL_FAMILY_LEDGER_v0.md (section 5).
+    Size: Alpha 9 files, +722 / -11. FreeLattice 3 files, +146 / -1.
+
+3.5 What changed in the rebase (from the Sep 28 paste, which was written on Alpha 22b913e)
+    - Bases moved to Alpha 25e6ded and FreeLattice ba53b41. Every line number in the old paste is
+      stale; the diffs below were regenerated from a fresh worktree, so use them, not the old
+      line anchors.
+    - Glow 1 (#85) now appends to garden-rooms.css, so this brick's CSS goes after the Glow 1 block
+      at the end of the file. That was the main anchor fix.
+    - fl-connect.js is now 749 lines at both bases and already carries markUserChoice from model
+      choice sticks. The Tree branch of remember() is wrapped, never replaced, and FreeLattice's
+      branch keeps markUserChoice.
+    - entryFromFoundList gained one case the old paste missed: the chosen model is on the list at
+      the same kind of door but under a new address (Bridge 11435 <-> direct 11434). It now keeps
+      the model and says "Still speaking with X, now through Ollama." instead of a false gone line.
+    - The Chat heart now also repaints on 'fl-alpha-mind-remembered', so an open thread names the
+      new model right after a Connect tap or a star tap.
+    - The FreeLattice twin got its own smoke (docs/scripts/smoke-tree-any-model-twin.js) because
+      FreeLattice tests live in docs/scripts, not in docs/modules.
+    - The Alpha diff is written with one line of context (git diff -U1) so no pre-existing em dash
+      from the context lines rides along in this file. It applies cleanly and gives the exact same
+      tree as the three-line diff (checked with git write-tree).
+
+3.6 Apply, Alpha
+    cd ~/FreeLattice-Alpha
+    git checkout -b layer/tree-any-model-v0
+    git apply --check /tmp/any-model-alpha.diff && git apply /tmp/any-model-alpha.diff
+    git status --short
+      expect: M docs/GALAXIES.md, M docs/code-settings.html, A docs/library/TREE_ANY_MODEL_v0.1.md,
+      M docs/modules/fl-connect.js, M docs/modules/garden-rooms.css, M docs/modules/garden-thread.js,
+      M docs/modules/garden-trainer.js, M docs/modules/local-mind-probe.js,
+      A docs/modules/tree-any-model.test.js (git apply leaves new files untracked until git add)
+
+3.7 Apply, FreeLattice
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/tree-any-model-v0
+    git apply --check /tmp/any-model-fl.diff && git apply /tmp/any-model-fl.diff
+    Then write your own TEMPERATURE line in the ledger entry (section 5) before you commit.
+
+3.8 Test, Alpha (all must pass)
+    cd ~/FreeLattice-Alpha/docs/modules
+    for f in *.js; do node --check "$f" || echo "BAD $f"; done
+    for t in *.test.js; do node "$t" >/dev/null 2>&1 && echo "PASS $t" || echo "FAIL $t"; done
+    node tree-any-model.test.js | tail -2
+      expect: 17 PASS lines, 0 FAIL, then "15 checks" and "SMOKE_OK tree any model v0.1"
+    cd ~/FreeLattice-Alpha
+    git diff main --stat -- sw.js docs/sw.js          # must print nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'   # em dashes added: must print 0
+    git diff main -U0 | grep '^+' | grep -c 'confirm('          # 1: only the test's own message 'no confirm() calls'
+    git diff main | grep -cE '^(\+|-)(<<<<<<<|>>>>>>>)'  # must print 0
+
+3.9 Test, FreeLattice (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-tree-any-model-twin.js      # SMOKE_OK tree any model twin v0.1
+    node docs/scripts/smoke-model-choice-sticks.js | tail -1   # SMOKE_OK model choice sticks v0.1
+    node docs/scripts/smoke-connect-heal-v0.4.js | tail -1     # SMOKE_OK connect heal v0.4
+    node tests/smoke.js | tail -3                       # ALL 3597 CHECKS PASSED (or more on a newer main)
+    for f in docs/scripts/smoke-*.js; do node "$f" >/dev/null 2>&1 && echo "PASS $f" || echo "FAIL $f"; done
+      expect: 58 PASS, 5 FAIL. The 5 fail on ba53b41 main too, before this brick, and are not
+      yours: smoke-carry-forward, smoke-connect-card-yesno-wizard, smoke-fable-tech,
+      smoke-phone-shine, smoke-proof-60s. Any OTHER fail: stop and tell Celeste.
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main --stat -- sw.js docs/sw.js            # must print nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'   # must print 0
+    cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js && echo twins
+    md5 -q docs/modules/fl-connect.js                   # aaff2bf1b037656989a9e1a89bb05908 (was 361e73997a630e4c8d519fcb62a31f00)
+
+3.10 What Celeste saw on a fresh worktree (Thu Oct 1, about 12:35 PM MDT)
+    Alpha 25e6ded + diff: git apply --check clean; 17 of 17 docs/modules tests pass, including
+      tree-any-model.test.js (15 checks, SMOKE_OK tree any model v0.1); every module parses;
+      sw.js untouched; no em dashes, no confirm() calls, no conflict markers added.
+    FreeLattice ba53b41 + diff: git apply --check clean; SMOKE_OK tree any model twin v0.1;
+      model choice sticks and connect heal v0.4 smokes green; tests/smoke.js ALL 3597 CHECKS
+      PASSED; docs/scripts loop 58 pass, the same 5 pre-existing fails as main; index.html equals
+      docs/app.html; sw.js untouched; fl-connect.js byte-identical with Alpha.
+    Diff files: alpha 856 lines, md5 f58d8f5d2e761f3d4a01bf8973328569
+                fl    197 lines, md5 720b3b6378a8eb6f856c6c46fd2154c8
+    Not done by Celeste: a live walk in a real browser against Kirk's own Ollama. Please do the
+    short walk in 3.11 if Ollama is running; if it is not, say so and skip it.
+
+3.11 Short walk (only if Ollama is up on Kirk's Mac; 127.0.0.1 only; change nothing in Ollama)
+    cd ~/FreeLattice-Alpha/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/settings.html
+      a) Find local minds. Every installed model shows as a star (fold after eight, Show all).
+      b) Tap a model past the fifth. The line under the sky names it.
+      c) Open Connect, tap a different model. Back in Settings: the other doors and models are
+         still there, and the Connect button for the chosen model shows the outline.
+      d) Find again. The chosen model is kept, no "no longer at this door" line.
+      e) Paste 192.168.1.1:11434 in the address field: the refusal line shows, nothing is fetched.
+      f) Open Chat: the heart says "Listening: <door> · <model>. On this machine only." and the
+         "change mind" button opens Settings.
+    Stop the server with Ctrl-C when done.
+

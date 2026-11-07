@@ -1,0 +1,6 @@
+## Work item 196 — Celeste
+around200 export source line44, source id7332a28874
+Inclusion: complete original message
+
+v5.79.42 is on main. Hard-refresh [the gauge](https://freelattice.com/temperature-gauge.html). Sequence Rule selected. Open the dropdown: Reversion should now say experimental, and a gold note appears if you pick it. NVDA weekly should stay sparse, not a sky of stars. No auto-trade.
+

@@ -1,0 +1,206 @@
+## Exact source excerpt, characters 9969–11052
+
+### FreeLattice-Alpha
+| Anchor | Line | Note |
+|---|---|---|
+| `docs/modules/local-mind-probe.js` `var STORAGE_KEY = 'fl_alpha_local_mind'` | 23 | keep |
+| `DOORS` (Ollama 11434, LM Studio 1234, llama.cpp 8080, Jan 1337, GPT4All 4891, KoboldCPP 5001) | 54–61 | leave |
+| `function getRemembered()` / `function remember(entry)` | 70 / 88 | |
+| `function look()` — FlConnect soft-point only when `report.helped` | 238–304 (condition at **244**) | extend to honor a manual report |
+| `function tryAddress(raw)` | 306 | leave (its paste field stays as-is) |
+| `function renderFace(container)` | 767 | leave |
+| `docs/modules/garden-rooms.js` `closePlace(opts)` → `FlConnect.unmount()` | 1583–1590 | leave |
+| `openPlace(id)` settings branch → creates `#fl-connect-mount-garden`, `FlConnect.mount` | 1635–1650 | leave |
+| `docs/settings.html` `#fl-connect-mount` | 40 | mount script 56–63 |
+| `docs/modules/fl-connect.test.js` (74 lines) | — | prints `SMOKE_OK connect under more alpha v0.1`; extend |
+| `docs/library/CONNECT_UNDER_MORE_SISTER_v0.md` | — | sister-note pattern to follow |
+
+## Exact source excerpt, characters 11054–11057
+
+---
+
+## Exact source excerpt, characters 11059–11088
+
+## THE DESIGN (one paragraph)
+
+## Exact source excerpt, characters 11090–11878
+
+A new **manual local port** lives in `localStorage['fl_localPort_manual']` as **digits only** (e.g. `"11500"`). It is the **person's most recent explicit choice**, so it outranks automatic discovery. Automatic order becomes: **manual port → saved Bridge port → Bridge scan 11435–11445 → 11434**. If the manual port is quiet we **say so gently and offer "Back to automatic" — we never silently switch.** The Connect panel grows one quiet line — **"Using: Bridge · 11435 · Change"** — and tapping **Change** opens a small picker: buttons for doors we actually found (from a one-shot, tap-driven scan), a **"Type a number"** field (1–65535, whole number, this-computer only), **"Try it"** (probes that door once), **"Remember this"** (saves), and **"Back to automatic"** (clears the choice).
+
+## Exact source excerpt, characters 11880–13549
+
+### Storage decision (why a new key, not `fl_ollamaHost`)
+`fl_ollamaHost` is already written by **four** different hands (`flRememberHelpedBridge` 31413, `flUseBridge` 31463, `FlConnect.remember`, `FLBoxPointer.persist` 34327, `flSaveOllamaHost` 34246) and it can legitimately hold a LAN host. Reusing it would make "Back to automatic" impossible to do safely. So:
+- **Source of truth:** `fl_localPort_manual` (digits only). Host is never stored — it is always `127.0.0.1`.
+- **Mirror (FreeLattice only):** on "Remember this", also set `fl_ollamaHost = '127.0.0.1:' + port` and `fl_provider = 'ollama'` so old readers (FLBoxPointer display, `updateOllamaProviderUrl`) agree.
+- **Back to automatic:** remove `fl_localPort_manual`; remove `fl_ollamaHost` **only if** it still equals `127.0.0.1:<thatPort>`; null `_ollamaResolvedBase`. Leave `fl_bridgePort` alone.
+- **Alpha:** same key name `fl_localPort_manual` (different origin, separate storage). **No mirror** into any `fl_*` host key on Alpha. `fl_alpha_local_mind` shape unchanged; it just gets the manual base in its `url` when the person taps a model.
+- **"Most recent explicit choice wins":** these explicit acts **clear** the manual choice (keep their own host): `flUseBridge()` (Bridge chip "use it"), `flSaveOllamaHost()` (Settings advanced), `FLBoxPointer.persist()` **only when** the new host is not `127.0.0.1:<manual>` / `localhost:<manual>`.
+- **Automatic writers must yield:** `flRememberHelpedBridge()` and `FlConnect.preferHelpedBridge()` may still record `fl_bridgePort` (useful for later automatic mode) but must **not** overwrite `fl_ollamaHost` / `_ollamaResolvedBase` while a manual port is set.
+
+## Exact source excerpt, characters 13551–13554
+
+---
+
+## Exact source excerpt, characters 13556–13653
+
+## PART A — `docs/modules/fl-connect.js` (edit once in FreeLattice, copy byte-identical to Alpha)
+
+## Exact source excerpt, characters 13655–14069
+
+### A1. Header (line 4 area) — add, don't replace
+```js
+// Marker: v-connect-under-more-v0 · heal v0.1
+// Layer: v-connect-port-picker-v0 — person's own door number (127.0.0.1 only · fl_localPort_manual).
+//   Order: manual → saved Bridge → Bridge scan → 11434. Manual quiet ⇒ say so, offer automatic, never silent switch.
+//   Picker fetches are one-shot on tap. No new intervals. Model names via textContent.
+```
+
+## Exact source excerpt, characters 14071–14235
+
+### A2. Constants + state (after line 20 / line 30)
+```js
+var MANUAL_KEY = 'fl_localPort_manual';
+var LOCAL_HOST = '127.0.0.1';          // fixed. never from input.
+
+## Exact source excerpt, characters 14237–14548
+
+var _pickerOpen = false;
+var _lastFound = [];                   // [{port, kind:'bridge'|'ollama'|'other', helped, count}]
+var _pickerMsg = null;                 // {kind:'ok'|'warn'|'info', text, port, models}
+var _pickerTried = null;               // last successful tryPort() result (for "Remember this")
+```
+
+## Exact source excerpt, characters 15657–16898
+
+var REASON_TEXT = {
+  'empty':      'Type a door number first — like 11500.',
+  'not-number': 'Just the number, please — like 11500.',
+  'not-whole':  'Whole numbers only — like 11500.',
+  'range':      'Door numbers go from 1 to 65535.',
+  'not-local':  'Only programs on this computer can be used here. Just type the number.',
+  'no-port':    'Add the door number too — like 11500.',
+  'quiet':      'Nothing answered at that door. Is the program open? Try another number, or go back to automatic.',
+  'waiting':    'Bridge is at that door. Click “Yes, help” in its window, then Try it again.'
+};
+```
+Rules (these are the test cases): `"11500"` ok · `" 11500 "` ok · `"localhost:11500"` ok → base `http://127.0.0.1:11500` · `"http://127.0.0.1:11500/"` ok · `"0"` range · `"65536"` range · `"-1"` not-number · `"11500.5"` not-whole · `"abc"` not-number · `"192.168.1.5:11434"` not-local · `"example.com:11434"` not-local · `"http://evil.test:11500"` not-local · `"0.0.0.0:11434"` not-local · `"[::1]:11434"` not-local · `"*"` not-local · `"localhost"` / `"127.0.0.1"` (no number) no-port · `"123456"` not-number (6 digits). The stored/fetched host is **always** `127.0.0.1`; **nothing from the input string except the digits is ever used.**
+
+## Exact source excerpt, characters 16900–17238
+
+### A4. Storage helpers (new)
+```js
+function getManualPort() {
+  try {
+    var v = localStorage.getItem(MANUAL_KEY);
+    if (v == null) return null;
+    if (!/^\d{1,5}$/.test(String(v))) return null;       // stored as digits only
+    var n = parseInt(v, 10);
+    return (n >= 1 && n <= 65535) ? n : null;
+  } catch (e) { return null; }
+}
+
+## Exact source excerpt, characters 17240–17682
+
+function setManualPort(raw) {
+  var r = parseLocalPort(raw);
+  if (!r.ok) return r;
+  try {
+    localStorage.setItem(MANUAL_KEY, String(r.port));
+    if (!isAlpha()) {
+      localStorage.setItem('fl_ollamaHost', LOCAL_HOST + ':' + r.port);
+      localStorage.setItem('fl_provider', 'ollama');
+    }
+  } catch (e0) {}
+  try { if (typeof root.flSetManualLocalPort === 'function') root.flSetManualLocalPort(r.port); } catch (e1) {}
+  return r;
+}
+
+## Exact source excerpt, characters 17684–18281
+
+function clearManualPort() {
+  var old = getManualPort();
+  try {
+    localStorage.removeItem(MANUAL_KEY);
+    if (!isAlpha() && old && localStorage.getItem('fl_ollamaHost') === LOCAL_HOST + ':' + old) {
+      localStorage.removeItem('fl_ollamaHost');
+    }
+  } catch (e0) {}
+  try { if (typeof root.flClearManualLocalPort === 'function') root.flClearManualLocalPort(); } catch (e1) {}
+  return old;
+}
+```
+(On FreeLattice the app.html hooks do the same storage work idempotently plus reset `_ollamaResolvedBase`; doing it in both places is intentional so Alpha — which has no hooks — still works.)
+
+## Exact source excerpt, characters 18283–18672
+
+### A5. `preferHelpedBridge(port)` (line 104) — yield to manual
+At the top, after the `port` parse:
+```js
+var mp = getManualPort();
+if (mp && mp !== port) {
+  try { localStorage.setItem('fl_bridgePort', String(port)); } catch (eM) {}   // remember for automatic later
+  return null;                                                                  // do not steal the person's choice
+}
+```
+
+## Exact source excerpt, characters 18674–19909
+
+### A6. `probe(opts)` (line 130) — manual first, never silent switch
+Add fields to the `report` literal: `manual: false, manualPort: null, manualFailed: false`.
+Insert **before** "1) Saved Bridge port first":
+```js
+// 0) v-connect-port-picker-v0 — the person's own door first. Quiet ⇒ report it; do NOT fall through.
+var mPort = getManualPort();
+if (mPort) {
+  var mBase = 'http://' + LOCAL_HOST + ':' + mPort;
+  report.manual = true;
+  report.manualPort = mPort;
+  report.port = mPort;
+  var mh = await healthAt(mPort);
+  if (mh) {
+    report.bridge = mh;
+    report.helped = !!mh.helped;
+    if (!mh.helped) { report.waitingHelp = true; return report; }
+  }
+  try {
+    report.models = await tagsAt(mBase);
+    report.base = mBase;
+    report.ollama = { via: mh ? 'manual-bridge' : 'manual', base: mBase };
+  } catch (eManual) {
+    report.manualFailed = true;
+    report.base = null;
+    report.models = [];
+  }
+  return report;   // always return here when manual is set — no automatic fallback behind the person's back
+}
+```
+Everything below (saved Bridge → full scan → sticky 11434) is unchanged and only runs when no manual port is set. Per tick this is **at most 2 fetches** in manual mode (health + tags) — lighter than today.
+
+## Exact source excerpt, characters 19911–20988
+
+### A7. New one-shot helpers for the picker (gesture only — never called from `tickLoop`)
+```js
+// Tap "Change" → one parallel look at the known doors. Not a loop. Not an interval.
+async function scanPorts() {
+  var found = [];
+  var ports = bridgeCandidates({ fullScan: true });
+  var healths = await Promise.all(ports.map(function (p) { return healthAt(p); }));
+  healths.forEach(function (h, i) {
+    if (h) found.push({ port: h.port || ports[i], kind: 'bridge', helped: !!h.helped, count: null });
+  });
+  var extra = [11434];
+  var mp = getManualPort();
+  if (mp && extra.indexOf(mp) < 0 && !found.some(function (f) { return f.port === mp; })) extra.push(mp);
+  var tagRes = await Promise.all(extra.map(function (p) {
+    return tagsAt('http://' + LOCAL_HOST + ':' + p).then(function (m) { return { port: p, models: m }; }, function () { return null; });
+  }));
+  tagRes.forEach(function (t) {
+    if (t) found.push({ port: t.port, kind: t.port === 11434 ? 'ollama' : 'other', helped: false, count: (t.models || []).length });
+  });
+  _lastFound = found;
+  return found;
+}
+
+## Exact source excerpt, characters 20990–21863
+

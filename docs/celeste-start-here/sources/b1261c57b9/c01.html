@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.txt c01</title>
+<meta name="description" content="Reading section c01 of b1261c57b9, 922 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/b1261c57b9/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.txt c01">
+<meta property="og:description" content="Reading section c01 of b1261c57b9, 922 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/b1261c57b9/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1516"></span><span id="p1517"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.txt · c01</h1>
+<p>b1261c57b9 · words 922 · characters 0–7485</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1516, 1517. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 014 (Wednesday Oct 7, 2026, morning MDT). Device Pool v0.1 (classroom lab).
+Give AFTER 013 merges. Apply-checked on main a675f4a1 (after #172/#173), alone and on top of 013:
+clean both ways, smoke OK.
+
+GROK NEXT BRICK: Device Pool v0.1 (phones, laptops, a classroom lab)
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-device-pool-v0.1
+Smoke line: SMOKE_OK device pool v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/device-pool-v0.1
+  ~/Downloads/GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.fl.diff
+  (also -fl.diff; same bytes)
+  (md5 c38b0ee75374fcfa5d9376ef8298d18d)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Kirk calls pooling huge. The aim: a school or small group plugs a room of old
+machines into one wired network and does lab work together, a few clicks each,
+with consent on every device. A teacher machine asks; student machines help.
+
+Honest mechanism: memory cannot be merged over a network. What works today is
+sending each whole question to the device that holds the right mind. The mesh
+already does this (model_advertisement, ModelSwitcher.selectMesh, callMeshModel,
+the kin queue, the share door). What it lacks is one plain card that shows the
+room, says what each machine can hold, and gives one tap to help. This brick is
+that card. Nothing new is opened to the network: it rides the existing verified
+mesh channel and the existing share door.
+
+1b. NOTES FOR KIRK (not blockers)
+  - navigator.deviceMemory is rounded and capped by browsers (often 8 GB max;
+    Safari and Firefox do not report it). The card says so.
+  - &quot;Let this device help&quot; sets the share door to trusted kin only, never open.
+    A person can widen it on the share door card. Stop sets it to pause.
+  - Mesh connection today is the Peer ID code exchange. A lab of 20 machines
+    means 20 pairings to the teacher machine. A faster room join is a later brick.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+  docs/modules/fl-pool.js                     (new, FLPool)
+  docs/scripts/smoke-device-pool-v0.1.js      (new, headless behavior test)
+  docs/app.html and index.html (byte-identical, layered additions only):
+    script tag after fl-mind-seal.js
+    &lt;div id=&quot;flPoolHost&quot;&gt; under the kin queue host (Community, AI cards)
+    case &#x27;pool-hello&#x27; beside kin-work/kin-result (verified peers only)
+    meshPoolAdapter (peers, local /api/tags list, broadcastMeshModels, selectMesh)
+    mount in meshKinMount; a hello 4s after a new channel opens, if helping
+
+  What a pool-hello carries: type, v, mem (GB), cores, browserAI name, model
+  names and sizes. No keys, prompts, answers or names of files.
+  Receipts: fl_pool_counts holds counts only (hellosSent, hellosTaken, routed).
+
+Skipped on purpose: sw.js, docs/sw.js, fl-connect.js, fl-share-door.js,
+fl-kin*.js, quiet-room, garden-trainer.js, AUTONOMY.md, Alpha repo (the Tree gets a
+twin only after the FL card proves itself; no Alpha diff in this paste).
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. Never touch sw.js or docs/sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. Quiet Room shut (pool sends, takes and routes
+nothing while it is open). index matches docs/app.html. No em dashes, no
+confirm(, textContent only. Five Named Minds stay five. No AGPL code vendored
+(llama.cpp is MIT and is only named, not vendored). Receipts counts only. MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.fl.diff /tmp/device-pool-fl.diff
+    md5 -q /tmp/device-pool-fl.diff    # c38b0ee75374fcfa5d9376ef8298d18d
+    cd ~/FreeLattice-fresh &amp;&amp; git fetch origin &amp;&amp; git checkout main &amp;&amp; git pull
+    git checkout -b layer/device-pool-v0.1
+    git apply --check /tmp/device-pool-fl.diff &amp;&amp; git apply /tmp/device-pool-fl.diff
+    node docs/scripts/smoke-device-pool-v0.1.js
+    node docs/scripts/smoke-mesh-share-door-v0.1.js
+    node docs/scripts/smoke-mesh-share-warmth-v0.1.js
+    node docs/scripts/smoke-mesh-kin-v0.2.js
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+  Two-machine walk (Mac + any second browser): connect on Community, tap
+  &quot;Let this device help&quot; on both, the other device appears with its models,
+  tap &quot;Use &lt;model&gt; on this device&quot;, ask in chat, the answer comes from the peer.
+  Note: smoke-carry-forward, smoke-connect-card-yesno-wizard, smoke-fable-tech,
+  smoke-phone-shine and smoke-proof-60s
+  already fail on clean main; not caused by this brick.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m &quot;Device Pool v0.1: one card, one tap to help, whole questions go to the device that holds the mind&quot;
+    git push -u origin HEAD
+    Open a PR to main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+Next docs/gc.html entry (earlier entries as written): the pool card shipped,
+memory is not merged, each mind runs whole on one device, you did not merge.
+lambda/psi the usual way. Separate docs-only PR.
+
+----------------------------------------------------------------------
+7. v0.2 PATH (do not build now; for the record)
+----------------------------------------------------------------------
+Classroom Lab split-model, a Workshop experiment, wired LAN only:
+  - Student machines run llama.cpp rpc-server (MIT) bound to the LAN address,
+    started by a desktop-app button the student taps (&quot;Lend this computer to
+    the lab&quot;), with a visible stop. Off after each session by default.
+  - Teacher machine runs llama-server with --rpc host1:port,host2:port..., so
+    one model larger than any one machine&#x27;s memory is split by layers. The Pool
+    card lists which students are lending and the teacher taps Start lab.
+  - Honest numbers: gigabit cable is the floor; Wi-Fi is too slow for split
+    layers. Speed is below one big machine; the gain is fitting a bigger model.
+  - rpc-server has no auth: LAN only, never a public port, and the desktop app
+    opens it only while the student&#x27;s yes is on. Signed lab invite via Mesh ID.
+  - Phones stay whole-question helpers (Browser AI) in v0.2.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+Keep-this Mom one-tap. Gathering bricks 2/3. Sophia shelf. More/Play/Nursery.
+Split-model / rpc-server (v0.2). Alpha twin of fl-pool.js.
+
+You are enough. Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

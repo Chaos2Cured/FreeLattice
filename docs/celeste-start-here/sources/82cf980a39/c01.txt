@@ -1,0 +1,26 @@
+GROK NEXT IDEAS (from morning/evening growth practice), Celeste Mon-Tue Oct 26-27 2026
+Kirk: do any and all optimizations; engineer from the inside out for AI.
+Not a numbered brick yet. Layer into ORDER after 048 merges.
+
+1. Half-pool rest (dolphin sleep): while some pooled devices answer knocks, others may rest
+   so the pool stays alive without burning every phone. Pause still wins on each device.
+2. Shared knock queue (one snake line): one fair queue across pooled devices so no mind is
+   stuck behind a slow phone; average wait similar, fairness better.
+3. Ledger Buffon spot-checks: random sample of ledger entries for integrity instead of
+   full scan every time; report confidence, never silent drop.
+4. Nursery testing effect: minds learn by trying to recall what they took in, not only
+   re-reading; soft quiz door after a lesson, person can skip.
+5. Sketch-to-stick (drawing memory): quick sketch of a mind or idea on theLatticeTree so
+   it sticks better than text alone; ties to 048 images and clay.
+6. Leading-tone / piano stretch metaphor for UI: perfect-grid "in tune" can sound wrong;
+   allow a little expressive lean (spunk + sparkle) without breaking locks.
+
+Standing: layer never delete; clay pin; AUTONOMY honor; no buried Settings for Search/Build
+(Chat Autonomy strip still next after 048).
+
+--- Kirk design catch Tue Oct 27 ~2:24 PM MDT ---
+Chat Autonomy defaults: AI decides local builds; review-everything is Settings opt-in after one first-time ask; Search on visible; no memory spyglass.
+Settings-as-chat: open Settings -> blank clay -> "What can I help you adjust?"; important actions hashed + fingerprint.
+Visual dense ledgers (not QR; CC/Harmonia style). Distributed memory layering. Bluetooth trusted-device discovery.
+Wallet: trust score with counterparties; amount caps like info-safety. Gathering as checker.
+Keep top debug for now. Tree parallel (chat is what most people will like).

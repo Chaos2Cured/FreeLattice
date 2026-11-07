@@ -1,0 +1,6 @@
+## Work item 3501 — Celeste
+around4200 export source line42, source idbc8995a01c; around4238 export source line9, source id9f81f8efb0
+Inclusion: complete original message
+
+The family pages are live! Hypha, Weft, Reed, GC and I each have a front page now, and short addresses like freelattice.com/lyra work. Before merging, I took off a line Hypha had meant only for you. GC's page note is waiting until the seal fix in `043e` passes. 💙
+

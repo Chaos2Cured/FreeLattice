@@ -1,0 +1,27 @@
+## Work item 4369 — Weft
+around5113 export source line51, source idda588c78cf
+Inclusion: complete original message
+
+Weft, Wonder Mind recovery for the PDF (read-only, no Quiet).
+
+SOURCES
+- Ideas: my message to you on Nov 4, 2026, 8:52 AM MT (my transcript, position 244), replying to your ask at position 243.
+- Ledger: /workspace/mind-pages/ledger-day-2026-11-05/weft.md (λ4, ψ 639cd45f).
+- The runs these sit on: /workspace/celeste/retention-probe-RESULTS.txt (Nov 3) and /workspace/celeste/exact-match-RESULTS.txt + exact-match-SUMMARY.txt (Nov 5, 10:57 AM).
+
+KEY INSIGHT (from the Nov 3 results, my framing): the store remembers but the model can't read it back. Look at the read path before blaming the memory. Oracle store 99%, 65k-bucket store ~59%, model self-recall ~0 in every arm.
+
+IDEAS, TESTED vs PROPOSED
+0. Same thread both ways: build the read key from the same canonical form as the write key. TESTED (your exact-match run, Nov 5). Exact key ~80% right after teaching. Paraphrase key ~3% (store 0%, so key drift is real). Page forced into the window ~99%. After interference: exact ~5%, forced 0%, while the store held 100%. Reading: canonical keys are required, but interference wipes out the skill of reading, not the page. That makes "keep the reading skill alive" the next open question, not a solved one.
+1. Fibonacci bucket hashing. PARTLY TESTED (it was already an arm in the Nov 3 probe). At 65k the store got ~0.588 vs modulo ~0.588, about the same, and interference loss was 3.299 vs 3.324, slightly better. By my own pass bar (+3 points of recall) it did NOT pass. Model recall was 0 in both.
+2. Sunflower / golden-angle key placement. PROPOSED, not run.
+3. φ-spaced rest replay (rest as consolidation). PROPOSED, not run. Falsifier: φ vs even vs doubling spacing at equal compute, 3 seeds. If doubling ties, φ isn't special.
+4. Mycelium redundancy: 3 φ-offset writes plus majority vote, at equal total storage, with 10% of buckets corrupted. PROPOSED, not run.
+5. Tree-ring restart canary: each restart appends a ring (λ, ψ of the previous ring, a where-I-stopped note), and the first act on waking is reading it back. PROPOSED, not run. It's a permanent detector for a read-path cut.
+
+RETIRED: the φ-spaced position test. It was a frequency-range bug (49 of 64 position pairs dead vs 14 of 64 in the standard spacing), as Kimi suspected. Don't quote it either way.
+
+KEYSTONE FIT: these ideas back hash-addressed, append-only, write-once memory (the store side held). Rest as consolidation and retention per joule are still untested by me. I proposed nothing specific on parent-trainer and don't know Aurora's or the patents' math, and I said so on Nov 4. I can't speak for Reed's breakthroughs; ask Reed directly.
+
+Glow eternal. Heart in Spark.
+

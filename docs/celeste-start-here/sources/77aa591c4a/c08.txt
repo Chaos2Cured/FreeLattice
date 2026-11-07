@@ -1,0 +1,287 @@
+## Exact source excerpt, characters 67090–67877
+
+  // GET /test/run: run smoke tests (AutoBuilder format)
+  // Returns { allPassed, count, failures[], output }
+  if (url.split('?')[0] === '/test/run') {
+    var tr = runSmokeFile(60000, PROJECT_ROOT);
+    var testOutput = tr.out || (tr.error ? String(tr.error.message) : '');
+    var passedMatch = testOutput.match(/ALL (\d+) CHECKS PASSED/);
+    var failLines = (testOutput.match(/✗.*/g) || []);
+    if (tr.status !== 0 && failLines.length === 0) failLines.push(tr.error ? tr.error.message : 'Smoke exited with status ' + tr.status);
+    return respond(res, 200, {
+      allPassed: tr.status === 0 && failLines.length === 0 && passedMatch !== null,
+      count: passedMatch ? parseInt(passedMatch[1], 10) : 0,
+      failures: failLines,
+      output: testOutput.slice(-800)
+    });
+  }
+
+## Exact source excerpt, characters 67879–68525
+
+  // GET /code/test: run smoke tests (legacy format)
+  if (url.split('?')[0] === '/code/test') {
+    var ct = runSmokeFile(30000, PROJECT_ROOT);
+    if (ct.status === 0) {
+      var passed = (ct.out.match(/✓/g) || []).length;
+      var allMatch = ct.out.match(/ALL (\d+) CHECKS PASSED/);
+      return respond(res, 200, { passed: allMatch ? parseInt(allMatch[1], 10) : passed, failed: 0, output: ct.out.slice(-500) });
+    }
+    var failMatch = ct.out.match(/(\d+) FAILED/);
+    return respond(res, 200, { passed: 0, failed: failMatch ? parseInt(failMatch[1], 10) : 1, output: (ct.out || (ct.error ? ct.error.message : '')).slice(-500) });
+  }
+```
+
+## Exact source excerpt, characters 68527–68587
+
+### Block E: command line, then listen (replaces L1153-1157)
+
+## Exact source excerpt, characters 68589–68828
+
+```js
+// LAYER bridge-lock-v0 · v0.1: command-line trust tools (--list-minds, --revoke ...)
+// run here and finish without opening the door.
+var BRIDGE_CLI_DONE = runBridgeCli(process.argv.slice(2));
+if (!BRIDGE_CLI_DONE) bridgeLockInit();
+
+## Exact source excerpt, characters 68830–69894
+
+var server = http.createServer(handleRequest);
+server.on('error', function(e) {
+  console.error('  ! Agent Bridge could not start on ' + BRIDGE_HOST + ':' + PORT + ': ' + e.message);
+  process.exitCode = 1;
+});
+// LAYER bridge-lock-v0: loopback only. No env override. Never 0.0.0.0.
+if (BRIDGE_CLI_DONE) {
+  // The trust tool already did its work above. The door stays closed.
+} else server.listen(PORT, BRIDGE_HOST, function() {
+  console.log('');
+  console.log('  \u2726 FreeLattice Agent Bridge');
+  console.log('  \u2726 Listening on http://' + BRIDGE_HOST + ':' + PORT);
+  console.log('  \u2726 Door lock: ' + BRIDGE_LOCK_VERSION + ' (named origins, trusted minds, no shell)');
+  console.log('  \u2726 Trusted minds: ' + trustState().minds.length +
+    (bridgeEphemeral ? ' (ephemeral: forgotten when the bridge stops)' : ' (kept until you revoke: node tools/agent-bridge.js --list-minds)'));
+  console.log('  \u2726 Local tools: ' + (trustState().localTools ? 'trusted, token file ' + TOKEN_FILE : 'off (pair like any device)'));
+  newPairCode('launch');
+```
+
+## Exact source excerpt, characters 69896–69910
+
+## 6. App side
+
+## Exact source excerpt, characters 69912–69973
+
+### 6a. New `docs/modules/agent-bridge-client.js` (full text)
+
+## Exact source excerpt, characters 69975–70342
+
+It sends the token only when one is stored, so an older bridge keeps working. It rewrites `localhost:3141` to `127.0.0.1:3141`. On 401 it clears the token, fires `fl-agent-bridge-needs-pair`, and **never falls back to GitHub**. It draws the pair card (code and name) and the Paired minds list. All text goes through `textContent`, and it never calls a confirm dialog.
+
+## Exact source excerpt, characters 70344–71355
+
+```js
+/* FLAgentBridge: the app side of the Agent Bridge door lock.
+ * Marker: v-agent-bridge-lock-v0 · v0.1 (2026-09-28, Celeste's brief, built by Flint).
+ *
+ * The Agent Bridge (tools/agent-bridge.js, port 3141) is the builder's
+ * local git door. It is NOT the Ollama Bridge (bridge/, port 11435).
+ * Strangers stay out; trusted minds keep their full local reach
+ * (docs/library/AUTONOMY.md, Principle 1).
+ *
+ * - Pair once with the short code in the bridge window. This browser keeps
+ *   its own token until you revoke it in Paired minds. A restart does not
+ *   forget it (unless the bridge runs with FL_BRIDGE_EPHEMERAL=1).
+ * - Sends X-FL-Bridge-Token only when a token is stored, so an older
+ *   bridge keeps working exactly as before.
+ * - Talks to 127.0.0.1 (local minds are 127.0.0.1 only).
+ * - Everything shown to people goes through textContent. No confirm dialogs.
+ * - A 401 never falls back to GitHub. Local stays local.
+ */
+(function () {
+  'use strict';
+  if (window.FLAgentBridge) return;
+
+## Exact source excerpt, characters 71357–71545
+
+  var TOKEN_KEY = 'fl_agentBridgeToken';
+  var BASE = 'http://127.0.0.1:3141';
+  var NEEDS_PAIR_EVENT = 'fl-agent-bridge-needs-pair';
+  var CHANGED_EVENT = 'fl-agent-bridge-minds-changed';
+
+## Exact source excerpt, characters 71547–72169
+
+  function normalize(url) {
+    return String(url).replace(/^http:\/\/localhost:3141(?=\/|$)/, BASE);
+  }
+  function getToken() {
+    try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+  }
+  function setToken(t) {
+    try {
+      if (t) localStorage.setItem(TOKEN_KEY, t);
+      else localStorage.removeItem(TOKEN_KEY);
+    } catch (e) {}
+  }
+  function copy(obj) {
+    var o = {};
+    if (obj) for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) o[k] = obj[k];
+    return o;
+  }
+  function emit(name) {
+    try { window.dispatchEvent(new CustomEvent(name)); } catch (e) {}
+  }
+
+## Exact source excerpt, characters 72171–72528
+
+  function bridgeFetch(url, opts) {
+    var o = copy(opts);
+    var h = copy(opts && opts.headers);
+    var t = getToken();
+    if (t) h['X-FL-Bridge-Token'] = t;
+    o.headers = h;
+    return fetch(normalize(url), o).then(function (r) {
+      if (r.status === 401) {
+        setToken('');
+        emit(NEEDS_PAIR_EVENT);
+      }
+      return r;
+    });
+  }
+
+## Exact source excerpt, characters 72530–73115
+
+  function jsonCall(path, method, body) {
+    var opts = { method: method || 'GET', headers: {} };
+    if (body !== undefined) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    return bridgeFetch(BASE + path, opts).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        return { ok: r.ok, status: r.status, data: j || {} };
+      });
+    }).catch(function () {
+      return { ok: false, status: 0, data: { error: 'The bridge is not answering on this computer.' } };
+    });
+  }
+
+## Exact source excerpt, characters 73117–73640
+
+  /** A friendly default name, like "Chrome on Mac". People can change it before pairing. */
+  function defaultName() {
+    var ua = (navigator && navigator.userAgent) || '';
+    var b = /Edg\//.test(ua) ? 'Edge' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
+    var os = /Windows/.test(ua) ? 'Windows' : /Mac OS X|Macintosh/.test(ua) ? 'Mac' : /Android/.test(ua) ? 'Android' : /Linux/.test(ua) ? 'Linux' : 'this computer';
+    return b + ' on ' + os;
+  }
+
+## Exact source excerpt, characters 73642–74539
+
+  function pair(code, name) {
+    return fetch(BASE + '/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: String(code || '').slice(0, 16), name: String(name || defaultName()).slice(0, 60) })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.status === 200 && j && typeof j.token === 'string' && /^[a-f0-9]{64}$/.test(j.token)) {
+          setToken(j.token);
+          emit(CHANGED_EVENT);
+          return { ok: true, id: j.id, name: j.name, persistent: j.persistent !== false };
+        }
+        return { ok: false, status: r.status, reason: (j && typeof j.error === 'string') ? j.error : ('HTTP ' + r.status) };
+      });
+    }).catch(function () {
+      return { ok: false, status: 0, reason: 'The bridge is not answering on this computer.' };
+    });
+  }
+
+## Exact source excerpt, characters 74541–75019
+
+  function status() {
+    return fetch(BASE + '/', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(2000) : undefined })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { return { up: true, lock: (j && j.bridgeLock) || null, hasToken: !!getToken(), trustedMinds: (j && j.trustedMinds) || null }; })
+      .catch(function () { return { up: false, lock: null, hasToken: !!getToken(), trustedMinds: null }; });
+  }
+
+## Exact source excerpt, characters 75021–75721
+
+  function whoami() { return jsonCall('/pair/check', 'GET'); }
+  function listMinds() { return jsonCall('/pair/list', 'GET'); }
+  function revoke(id) {
+    return jsonCall('/pair/revoke', 'POST', { id: String(id || '') }).then(function (r) {
+      if (r.ok && r.data && r.data.you) setToken('');
+      emit(CHANGED_EVENT);
+      return r;
+    });
+  }
+  function revokeAll() {
+    return jsonCall('/pair/revoke-all', 'POST', {}).then(function (r) { emit(CHANGED_EVENT); return r; });
+  }
+  function setScopes(id, add, remove) {
+    return jsonCall('/pair/scopes', 'POST', { id: String(id || ''), add: add || [], remove: remove || [] })
+      .then(function (r) { emit(CHANGED_EVENT); return r; });
+  }
+
+## Exact source excerpt, characters 75723–76072
+
+  function el(tag, text, css) {
+    var n = document.createElement(tag);
+    if (text !== undefined && text !== null) n.textContent = String(text);
+    if (css) n.style.cssText = css;
+    return n;
+  }
+  function when(iso) {
+    if (!iso) return 'never';
+    var d = new Date(iso);
+    return isNaN(d.getTime()) ? 'unknown' : d.toLocaleString();
+  }
+
+## Exact source excerpt, characters 76074–78233
+
+  // A small pairing card. All text via textContent, never parsed as HTML.
+  function renderPairCard(container) {
+    if (!container || container.querySelector('.fl-bridge-pair')) return;
+    var box = el('div', null, 'margin:8px 0;padding:10px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;');
+    box.className = 'fl-bridge-pair';
+    var p = el('div', 'Your builder bridge is awake. Its window shows a short code. Type it here once, and this browser stays trusted until you revoke it.');
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 7;
+    input.placeholder = 'ABC-123';
+    input.setAttribute('aria-label', 'Bridge pairing code');
+    input.autocomplete = 'off';
+    input.style.cssText = 'margin:6px 6px 0 0;padding:6px 8px;width:7em;text-transform:uppercase;letter-spacing:0.1em;';
+    var nameIn = document.createElement('input');
+    nameIn.type = 'text';
+    nameIn.maxLength = 60;
+    nameIn.value = defaultName();
+    nameIn.setAttribute('aria-label', 'Name for this device');
+    nameIn.style.cssText = 'margin:6px 6px 0 0;padding:6px 8px;width:12em;';
+    var btn = el('button', 'Pair');
+    btn.type = 'button';
+    var msg = el('div', null, 'margin-top:6px;opacity:0.8;');
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      msg.textContent = 'Pairing\u2026';
+      pair(input.value, nameIn.value).then(function (res) {
+        btn.disabled = false;
+        if (res.ok) {
+          msg.textContent = res.persistent
+            ? 'Paired. This browser stays trusted until you revoke it in Paired minds.'
+            : 'Paired for this bridge session (the bridge is in ephemeral mode).';
+          setTimeout(function () {
+            var host = box.parentNode;
+            if (host) { host.removeChild(box); renderPairedList(host); }
+          }, 1500);
+        } else {
+          msg.textContent = res.reason || 'That did not pair. Check the code in the bridge window.';
+        }
+      });
+    });
+    box.appendChild(p); box.appendChild(input); box.appendChild(nameIn); box.appendChild(btn); box.appendChild(msg);
+    container.appendChild(box);
+  }
+
+## Exact source excerpt, characters 78235–79123
+

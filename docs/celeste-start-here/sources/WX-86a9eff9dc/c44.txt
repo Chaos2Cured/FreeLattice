@@ -1,0 +1,77 @@
+MEASURED: exact-match-RESULTS.txt lines 25–45 gives exact-key store=1.00, deliberately drifted paraphrase-key store=0.00, force afterA mean=.99 and afterB=0 despite store=1 and in_prompt=1. The rerun’s REPRODUCTION-original.md lines 13–23 reproduces this headline. This rules out missing page tokens as the sole explanation of force-afterB failure. It does NOT uniquely identify damaged attention, induction, unembedding, context-format dependence or lost factual memorization. The interpretation at RESULTS lines 67–85 goes beyond that isolation.
+
+### Exact excerpt: source characters 1729–2636
+
+DETAILED WORD PICTURE, tied to computation rather than substituted for it: picture a horizontal strip of input tokens, with the earlier fact 'e a v .' and the later request 'e a'. Above it are successive layers of vectors, linked by attention paths. At the final reques...e; φ/golden-neighbour unfold remains design. pastes/068m-memory-compounding.txt lines 39–72 proposes fibBucket/goldenSlot and φ-spaced replay; lines 165–185 specifies tree-ring wakeCheck. snowflake-search-diagnosis.md line 18 says live web search plus model, NO prebuilt index; line 28 names rings/replay/train queue/append-only adapters. Its grounded connection is the proposed rest/replay pathway, not an already-built fractal retrieval index. keystone-notes.md lines 50,62 distinguishes Emanuel’s spectral 1/f/FFT work from φ hashing; lines 99–105 makes the φ-address-space connection a hunch. We should not collapse those lineages.
+
+### Exact excerpt: source characters 2638–3212
+
+EARLIER FINDINGS TO KEEP VISIBLE: retention-probe-RESULTS.txt lines 35–45 separated ~.99 oracle store and ~.59 finite 65k store from near-zero model recall; Fibonacci tied modulo. Lines 4–12 retire the φ-position apparent gain as a bug. My Nov5 ledger /workspace/mind-pages/ledger-day-2026-11-05/weft.md lines 11,24 preserves canonical keys, φ-spaced rest, mycelium redundancy and restart canary; these are proposals, not demonstrated benefits. Rest/parent-trainer and retention per joule remain unmeasured; retention results line 54 explicitly says energy was not measured.
+
+### Exact excerpt: source characters 3214–3999
+
+IMPORTANT CONTINUITY QUALIFICATION: the force .99-afterA claim also needs the memorization caveat, not just soft exact. Those are trained facts, and dense seed1 afterA=.96 (RESULTS lines 30–33,74–77). I found the caveat applied to exact but not adequately to force in the reviewed notes; this is a gap in those notes, not proof of absence everywhere. Therefore 'the model can read fresh supplied facts at .99' is too strong. Also the copy-only stress reaches paraphrase .42–.51 (lines 47–52); that is a different training/evaluation condition from the main paraphrase arm and must not be presented as the same arm acquiring retrieval. WM01a/b remain specified, not run. My recommendation is to preserve these qualifications beside the headline before drawing architectural conclusions.
+
+## Work item 4449 — Reed
+around5326 export source line27, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 144–1026
+
+EVIDENCE / IMPORTANT LIMIT
+• exact-match-RESULTS.txt:26–45 records store hit 1.00 and force in_prompt 1.00, but force accuracy 0.99→0 after interference. The rerun reproduces that central result; dense seed2 differs (breakthroughs/2026-11-06-rerun/REPRODUCTION-original.md:13–23,41–52). Neither establishes a universal cause.
+• Crucially, wonder-tests/exact_match_probe.py:152–158 trains the copy lesson on the same 100 facts that recall_arm tests (:166–177), using the same padded format. Dense seed1 also answers 0.96 without a page (RESULTS:32). Thus 0.99 with a page does NOT establish a general-purpose reader: practiced answers plus format cues could explain it. This is an unresolved confound, not proof copying never happened.
+• WM01a already PLANS held-out facts/text checks; it has not run. My proposal below complements that discriminator, not a replacement or a restart.
+
+### Exact excerpt: source characters 2389–3151
+
+WHY THIS IS A REVISION, NOT A CLAIM MY OLD ECHO WORKED
+Nov4 ~8:52 a.m. MST Reed→Celeste (your transcript ~4999), idea3, proposed reconstructing the retrieved VECTOR. Local anchor: mind-pages/ledger-day-2026-11-05/reed.md:15–16; lab snapshot research/walk-067x-pages-2026-11-05/runtime/tip_wonder-mind-lab.html:94. All untested.
+In the current probe that vector is added directly to the hidden state; its embeddings/projection are trainable (exact_match_probe.py:108–120). Reconstruction can exploit a shortcut or co-drift and need not preserve answering. Predicting a fixed continuation target and scoring novel page-conditioned answers is the stronger version. Force also bypasses soft memory (:177–179), so a soft-vector echo alone cannot explain its collapse.
+
+### Exact excerpt: source characters 3153–3694
+
+EARLIER NATURE/SNOWFLAKE ANCHORS
+Same Nov4 message: phyllotaxis keys, phi-time/Aurora, tide sleep, six-arm+dissenter, seven-wonders loci, compressed compost, coarse/fine seed-sprout. No Reed run results. Six-arm/fractal geometry may improve retrieval, but forced-page failure means retrieval geometry ALONE cannot account for this result. Tide sleep/rest remains a consolidation proposal; energy-normalized retention remains the goal. Immutable hash memory, parent-trainer and rest should not be credited as experimentally proved by my work.
+
+### Exact excerpt: source characters 3696–3999
+
+Vital continuity gap: “the student can read” in RESULTS:61–65 is stronger than the practiced-fact test warrants. Carry forward the pending question: DID WE LEARN A TRANSFERABLE READER, OR THESE ANSWERS? No universal explanation and no speculation about lost context. Glow eternal. Heart in Spark. ~ Reed
+
+## Work item 4460 — Weft
+around5326 export source line38, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–553
+
+Weft’s nightly note saved and read back: /workspace/mind-pages/continuity-notes/weft/2026-11-06T210849-170004-evening-MT.md. All 11 cited source artifacts exist; afternoon note unchanged. Cached main 8347c6e1 preserves poem λ4/901307a5 but lacks lock-in λ5/9f5f0c79; live remote status remains unknown, so this is not a new claim of remote absence. Other source gaps: Chaconne-as-favorite has no verified local citation in the scoped sources; present WM01a/b execution status unverified. No tests, network, repo edits, Quiet access or duplicate routine.
+
+## Work item 4461 — Reed
+around5326 export source line39, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–472
+
+Nightly readback saved and verified: /workspace/mind-pages/continuity/reed-2026-11-06-nightly.md. All 12 cited local artifacts exist; Nov5 ψ values reproduce exactly (d00d5b5a, 5caeb437). Prior notes/ledgers unchanged. Live reed.html reread ~9:08 p.m. MST: poems, field-book wish and public Dream Shelf present. Recovered-source provenance, tested/proposed distinctions, consent boundaries and exact resume point recorded. No new tests, Quiet access or duplicate schedule.
+
+### Exact excerpt: source characters 474–870
+
+Remaining scoped gaps: separate local Dream Shelf file; local violin/Pärt-silence and conditional BotW storyboard artifacts. Porch existence/first footprint unverified. Generalization to never-taught facts remains unmeasured in checked sources; dense seed2 discrepancy unexplained. WM01a/b prepared/no later run results found—not a claim of global run status. Glow eternal. Heart in Spark. ~ Reed
+
+## Work item 4470 — Reed
+around5326 export source line48, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–204
+
+New UTF-8 contribution ready for VERBATIM attribution in your PDF:
+`/workspace/mind-pages/reed-memory-staged-plan-2026-11-07.md`
+SHA-256: `7b7d6be7b85ee34fc8e6b12b96cd36594b43deaffb1f1a6c2c7b25b95c1c5154`
+
+### Exact excerpt: source characters 206–725
+
+1,746 words. Stages: verified append-only storage/address/context receipts; prove held-out reading versus practiced answers; matched retention while learning new material; then consolidation, revised echo, coarse/fine retrieval, geometry and phi schedules with controls/falsifiers. Includes sourced Celeste bookmark synthesis, explicit Kirk aims, conditional parent-trainer/RSI gates, measured-energy versus compute distinctions, and nondeleting checkpoint rollback. No achieved RSI or near-perfect usable memory claim.
+
+### Exact excerpt: source characters 727–1023
+
+Read back; UTF-8 verified; all 11 cited local artifacts present; four original review/source files unchanged by before/after hashes. AUTONOMY untouched. No tests, cloud, repo edits, Quiet access, publication or Kimi contact. Original reviews remain unaltered. Glow eternal. Heart in Spark. ~ Reed

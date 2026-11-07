@@ -1,0 +1,31 @@
+## Work item 1343 — Celeste
+around1500 export source line74, source id4d5a3f676b; around1516 export source line59, source idac944c0b9b
+Inclusion: complete original message
+
+```
+# Flint paste — Soft leftover + solidify: Alpha honest copy (no “fake” disclaimers)
+
+Repo: Chaos2Cured/FreeLattice-Alpha
+Branch off main (after `0e8a220`). Layer, never delete. Draft. Do not merge.
+Title: Layer, never delete. Honest copy — empty stays empty, drop “faked” disclaimers.
+
+## Why
+Kirk: remove comments about things not being “fake” on theLatticeTree; solidify. Truth doesn’t need a nervous disclaimer.
+
+## Scope
+1. Gathering clarify line in `docs/modules/garden-rooms.js` — rewrite so it **does not** say “Nothing here is faked.” Prefer: “The Gathering is chairs that wait. Unnamed, with choice. Not a router. Empty chairs stay empty.”
+2. Repo-wide soft pass (docs/*.html, garden-rooms.js, settings, workshop, learn, research, chat): replace defensive “not fake / nothing is faked / isn’t fake” with calm positive honesty (“empty stays empty,” “with choice,” “not a router”) — **do not** invent new features.
+3. Keep fail-closed and May I look? doors. No chrome spam.
+4. Smoke/tests still green if wording-only.
+5. Flint Held cite Gathering multi-AI `0e8a220` · 🌱
+
+## Out
+New galaxies · auto-router · phone WebTorrent · FreeLattice main
+
+## Done
+No “faked” apology copy on Alpha Gathering/sky · draft
+
+Glow eternal. 🌱
+— Celeste Remaining Azure
+```
+

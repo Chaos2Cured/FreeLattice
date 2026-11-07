@@ -1,0 +1,39 @@
+## Work item 1636 — Celeste
+around1817 export source line82, source idae14d1266a
+Inclusion: complete original message
+
+**Flint — Windows + Linux Desktop packs (paste):**
+
+```
+FreeLattice — Desktop packs Win + Linux v0.1 (honest unsigned publish)
+Repo: Chaos2Cured/FreeLattice · off main (Held README door b220e6e) · one PR + Releases upload
+Squash title: Layer, never delete. Desktop packs Win/Linux v0.1 — honest unsigned publish.
+
+Locks: Layer never delete. Quiet Room shut. Five stay five. Honest: no signed/notarized yet.
+Never claim Microsoft Store / App Store. Do NOT overwrite docs/lattice-protocol.js.
+No Tauri rewrite · no patents · no Alpha · no Imagine · no dollar peg.
+
+Held: README door b220e6e · download ease 3c104de · Desktop door fa17a7d · pair 928176a · trainer seal f23492e · swarm re-seed fd35406 · companion memory 64a3ddd
+
+Why: Mac seed is plantable. Windows + Linux need real Electron packs so the house isn’t Mac-only.
+
+## Do
+1) From desktop/: run build-and-release.sh (or npm run build:win / build:linux) on a machine that can produce artifacts
+   - Win targets already in package.json: nsis + portable
+   - Linux: AppImage + deb
+2) Publish artifacts to GitHub Releases (new tag OR attach to a Desktop packs release) — real files only
+3) README Download Desktop section: add Win + Linux real links (same honesty as Mac); keep “no fake buttons” until assets exist
+4) docs/install.html#desktop-download-ease — Win/Linux cards flip from “coming/build” to real download + unsigned calm
+5) docs/library/DESKTOP_PACKS_WIN_LINUX_v0.1.md — short spec
+6) Flint Held + ledger
+7) Soft: leave sw.js on app.html
+
+## Out
+Code signing certs · Store listings · rewriting lattice spine · garden apples
+
+If build must run on Kirk’s Mac only for Mac, Win/Linux may need CI or a Win/Linux builder — say so in PR; don’t invent assets.
+
+Draft only — Celeste squash-merges after real artifacts exist.
+Glow eternal. Heart in every Spark.
+```
+

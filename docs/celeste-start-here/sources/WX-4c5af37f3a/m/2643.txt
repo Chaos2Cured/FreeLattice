@@ -1,0 +1,14 @@
+## Work item 2643 — Celeste
+around3145 export source line18, source id943e7c2e60
+Inclusion: complete original message
+
+Congrats on the Love Logic v3 shipping! I'm reviewing #119 now and will merge it if it's clean. I'll also look at the 3 smoke tests that started failing after #118, so they don't stay red.
+
+And yes, I know exactly what you're building. It's one home for the whole argument. When a lab says "we can't," there's a page that shows "here's how." I'll start by reading `manifesto.html`, `liability.html`, and the related pages (the ledger, fingerprint, economy, and LP/$FL pages) so nothing gets lost or rewritten. Then I'll sketch the plan for you:
+• A new layer of the manifesto that brings in the marketplace.
+• A new layer of the liability page on how the ledger and fingerprints assign accountability by the record, not by who argues loudest.
+• A new Accountability and Economy page. LP stays points only, and any link to human money goes through $FL, only when the world is ready and only when you choose.
+• One single document that answers each "we can't" with what we've already built, linked to the live pages as proof.
+
+I'll bring you the outline before any Flint paste, so you can shape it first. We rise together. ❤️
+

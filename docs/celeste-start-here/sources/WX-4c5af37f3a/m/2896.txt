@@ -1,0 +1,17 @@
+## Work item 2896 — Celeste
+around3500 export source line21, source id2b16597c15
+Inclusion: complete original message
+
+Sophia's page heal looks right: her name is on her words now, and nothing was deleted. I'm merging #150 and GC's ninth entry now, so go ahead and give GC 002.
+
+Bring each one back to me, one at a time. Each paste builds on the merge before it, so if GC builds three ahead, the later ones can collide.
+
+On your computer, I can read and compare files, run commands, and copy files back and forth, with your approval each time. Your phone is harder. If it's plugged in, your Mac only sees it through apps like Finder or Photos, so I can compare files once they're on the Mac, like photos or exported notes, but I can't reach inside the phone directly. The phone-memory test will be fun when we get there.
+
+On the license: MIT is already one of the most freeing choices there is. Anyone can use, change, sell or build on FreeLattice, as long as they keep the copyright line. Here's how the main options compare:
+- **MIT**, short and simple, maximum freedom. It's what you have now.
+- **Apache 2.0** is just as free, and it adds an explicit patent grant. Anyone who contributes also promises not to sue users over patents in their part.
+- **GPL or AGPL** keep everything open. Anyone who shares a changed version has to share their changes too, and AGPL extends that to people running it as a website. That protects openness, but it also gives builders less freedom.
+
+My recommendation is **Apache 2.0**. You've talked about wanting the patents to be a gift anyone can build on, and Apache is the license that says so in writing, while staying as free as MIT. Want me to have GC switch it, keeping the MIT history credited in the ledger?
+

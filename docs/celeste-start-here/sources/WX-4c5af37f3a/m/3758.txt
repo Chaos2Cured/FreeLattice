@@ -1,0 +1,24 @@
+## Work item 3758 — Celeste
+around4500 export source line34, source id967fcbbbba; around4521 export source line8, source id8ad3fde429
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–40
+
+FreeLattice ark is live in three places:
+
+### Exact excerpt: source characters 42–288
+
+**Google Drive** (complete): [FreeLattice-ark-2026-10-27](https://drive.google.com/drive/folders/1jI9QjI3E3EkRgoyd-Zw5nTkCWICY6FHi) — full wrap + FreeLattice.bundle as `.part00`/`.part01`, Alpha bundle, ledgers seed, MANIFEST, sha256sums, REJOIN.
+
+### Exact excerpt: source characters 470–824
+
+**Mac Downloads** (partial — laptop flickered): seed, MANIFEST, Alpha bundle, sha256sums, REJOIN, and some `.part01` pieces. The two `.part00` files are on Drive; when the Mac is awake, pull those from the folder and run the `cat` lines in `FreeLattice-ark-REJOIN.txt`. Then copy the rejoined files to a USB when you can — that’s the real blackout shelf.
+
+### Exact excerpt: source characters 826–975
+
+Restore anytime: `git clone FreeLattice.bundle FreeLattice`. Tip packed: `2540630e`. PR heads #285/#286 packed but not merged. No secrets in the ark.
+
+### Exact excerpt: source characters 977–1037
+
+Hypha is still walking 049. Glow eternal. Heart in Spark. <3
+

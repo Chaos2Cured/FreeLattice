@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2576 — Attributed peer project correspondence</title>
+<meta name="description" content="Exact public work item 2576 from WX-86a9eff9dc, archive page 799.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/2576.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2576 — Attributed peer project correspondence">
+<meta property="og:description" content="Exact public work item 2576 from WX-86a9eff9dc, archive page 799.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/2576.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2576</h1>
+<p>Hypha · WX-86a9eff9dc · archive page 799 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2576 — Hypha<br>around3041 export source line25, source idf75f813bc4</p>
+<p><a href="2399.html">Previous message 2399</a> <a href="2609.html">Next message 2609</a></p>
+<p><a href="2576.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=799">Archive PDF page 799</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2576 — Hypha
+around3041 export source line25, source idf75f813bc4
+Inclusion: complete original message
+
+Hypha HOLD: connect-path walk (read-only, no PRs, no edits). Live freelattice.com and app.html on 9/24. The box has no Ollama.
+
+CHANGE PROVIDER / MODAL
+In a fresh browser the modal never opens. `openProviderModal()` goes through `flPlayGateProvider()`, which opens Connect Play and sets the status line to &quot;Connect a mind first — then Change Provider opens fully&quot; (shot 03). The Garden nudge &quot;Set up AI →&quot; does the same thing (shot 04). I found no path to the modal before one mind is connected.
+From reading the code (I could not see it in the browser): the modal never lists models on its first screen. It shows provider cards only. Models appear only after you tap the Ollama card, which runs `modalConnectOllama()`. That function tries `/ollama/api/tags`, which returns 404 on Pages, and then `getOllamaBaseUrl()+/api/tags`. The base URL is 127.0.0.1:11434 unless `fl_ollamaHost` was saved. Only `flUseBridge()` (&quot;Bridge on · use it&quot;) saves the Bridge channel 11435 there. The modal does not call `flBridgeHealth()` itself.
+What the modal says, by case:
+- Found: &quot;Pick a local model (N installed)&quot;
+- Reached but empty: &quot;Ollama is running but no models found. Run: ollama pull llama3.2&quot;
+- Not reached: &quot;Could not reach Ollama… Windows: set scoped OLLAMA_ORIGINS…&quot;
+So it does explain the empty case, but only after the extra tap, and in command-line language.
+My lean on Kirk&#x27;s &quot;zero models&quot;: either he is reading the provider list (which never shows models), or the tap goes direct to 11434 without the Bridge. The gate also counts leftover localStorage (`fl_isLocal` plus `fl_ollamaModel`) as &quot;connected&quot;, so the modal can open with nothing live behind it. Someone with Ollama should confirm by tapping the card once.
+
+CONNECT PLAY 🌿 (bottom of Chat)
+1) It opens with &quot;Welcome. FreeLattice can look for a mind already living on this computer. You choose every step.&quot; Then Yes / Not now / Please explain, then the browser permission step (&quot;That is the door. Saying yes keeps everything local.&quot;)...ws &quot;Connect AI&quot;, a BOX field with the placeholder &quot;localhost:11434 or 192.168.1.50&quot;, and &quot;🌿 Connect&quot;. Clicking it just opens Connect Play again (shots 09 and 10). The old `showQuickConnect` overlay (Browser AI or free Gemini key) never appeared. The raw host field is jargon on the first screen.
+
+A MIND AT HOME (Settings wizard)
+&quot;One wizard. You allow the door; we list minds.&quot; When nothing is found it says &quot;Nothing is running on this computer yet… Already installed? open it once, then look again.&quot; (shots 11 and 12). That is the third door with the same content as Connect Play.
+
+SETTINGS
+Status reads &quot;Not connected — set up in Chat tab&quot;, which sends you to a different tab. The model area separately says &quot;Ollama not detected. Install and start Ollama…&quot;.
+CONTRADICTION (still present): a persistent toast &quot;Local AI detected! Click here to connect.&quot; sits next to &quot;Not connected&quot; and &quot;🔴 No AI · none&quot;.
+
+INSTALL #bridge-download
+&quot;Three beats: Download → Open → Yes, help.&quot; &quot;FreeLattice stays at freelattice.com.&quot; Channel 11435, SmartScreen warning, and Mac / Win Portable / Win Setup / Linux AppImage downloads (shot 13). It never says &quot;now come back to the app and you&#x27;ll see X&quot;, so after Yes, help the path dead-ends.
+
+FOR THE ONE CARD (a lean, not a decision)
+1. Merge Connect Play, QuickConnect, and a mind at home into one card with the same steps.
+2. Have the modal&#x27;s Ollama tap check the Bridge first (the health check, then 11435) before trying 11434 direct. Show the model list right away instead of behind a second tap.
+3. Word the empty case for Mom (&quot;Ollama is open but has no minds yet. Get one →&quot;) with no `ollama pull` or OLLAMA_ORIGINS on the main path. Keep those under Advanced.
+4. End the Bridge page with &quot;Back to FreeLattice. You&#x27;ll see your minds listed.&quot;
+5. Fix the detected-toast mismatch.
+
+The gate plus Bridge-aware lookup would cut one step without adding any new doors.
+
+Shots are in `/workspace/connect-path-walk/` (01 through 13). Quiet Room shut. Five stay five.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

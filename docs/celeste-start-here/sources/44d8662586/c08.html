@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c08</title>
+<meta name="description" content="Reading section c08 of 44d8662586, 1312 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/44d8662586/c08.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c08">
+<meta property="og:description" content="Reading section c08 of 44d8662586, 1312 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/44d8662586/c08.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1430"></span><span id="p1431"></span><span id="p1432"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt · c08</h1>
+<p>44d8662586 · words 1312 · characters 68516–80834</p>
+<p><a href="c07.html">Previous section</a></p>
+<p><a href="c08.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1430, 1431, 1432. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  assert.strictEqual(calls[0].opts.headers[&#x27;x-api-key&#x27;], &#x27;sk-ant-test-0000aaaa&#x27;);
++  assert.strictEqual(calls[0].opts.headers[&#x27;anthropic-dangerous-direct-browser-access&#x27;], &#x27;true&#x27;);
++  var b2 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b2.system, &#x27;Just talk.&#x27;);
++  assert.strictEqual(b2.messages.length, 3);
++  assert.ok(b2.max_tokens &gt; 0);
++
++  // 6. Google shape: key in a header, never in the URL.
++  calls = []; nextReply = { status: 200, json: { candidates: [{ content: { parts: [{ text: &#x27;from &#x27; }, { text: &#x27;gemini&#x27; }] } }] } };
++  var r3 = await T.send({ url: &#x27;cloud:google&#x27;, model: &#x27;gemini-2.5-flash&#x27; }, msgs);
++  assert.strictEqual(r3, &#x27;from gemini&#x27;);
++  assert.strictEqual(calls[0].url, &#x27;https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent&#x27;);
++  assert.ok(calls[0].url.indexOf(&#x27;key=&#x27;) === -1 &amp;&amp; calls[0].url.indexOf(&#x27;AIza&#x27;) === -1, &#x27;no key in the URL&#x27;);
++  assert.strictEqual(calls[0].opts.headers[&#x27;x-goog-api-key&#x27;], &#x27;AIza-test-google-2222&#x27;);
++  var b3 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b3.contents[1].role, &#x27;model&#x27;);
++  assert.strictEqual(b3.systemInstruction.parts[0].text, &#x27;Just talk.&#x27;);
++
++  // 7. Honest failures, each with its own words; nothing invented.
++  async function failWith(reply, mind) {
++    calls = []; nextReply = reply;
++    try { await T.send(mind || { url: &#x27;cloud:openai&#x27;, model: &#x27;gpt-4.1-mini&#x27; }, msgs); } catch (e) { return e; }
++    throw new Error(&#x27;expected a failure&#x27;);
++  }
++  var e401 = await failWith({ status: 401, json: {} });
++  assert.strictEqual(e401.reason, &#x27;cloud&#x27;);
++  assert.ok(/did not accept the key/.test(e401.cloudText));
++  assert.ok(/slow down/.test((await failWith({ status: 429, json: {} })).cloudText));
++  assert.ok(/did not take the model/.test((await failWith({ status: 404, json: {} })).cloudText));
++  assert.ok(/was quiet/.test((await failWith({ status: 200, json: { choices: [] } })).cloudText));
++  var saved = sandbox.fetch;
++  sandbox.fetch = function () { calls.push({ url: &#x27;x&#x27; }); return Promise.reject(new TypeError(&#x27;Failed to fetch&#x27;)); };
++  assert.ok(/could not reach OpenAI/.test((await failWith(null)).cloudText));
++  sandbox.fetch = saved;
++  calls = [];
++  var noKey = await failWith(null, { url: &#x27;cloud:groq&#x27;, model: &#x27;llama-3.3-70b-versatile&#x27; });
++  assert.ok(/No Groq key is in this browser/.test(noKey.cloudText));
++  assert.strictEqual(calls.length, 0, &#x27;no key: nothing sent at all&#x27;);
++  calls = [];
++  var unknown = await failWith(null, { url: &#x27;cloud:evil&#x27;, model: &#x27;x&#x27; });
++  assert.ok(/does not know/.test(unknown.cloudText));
++  assert.strictEqual(calls.length, 0, &#x27;unknown provider: nothing sent&#x27;);
++
++  // 8. Words that tell the truth.
++  assert.ok(/through OpenAI\. Your words go to OpenAI\. Your key stays in this browser\./.test(T.heartLine({ url: &#x27;cloud:openai&#x27;, model: &#x27;gpt-4.1-mini&#x27; })));
++  var note = T.honestNote(&#x27;anthropic&#x27;);
++  assert.ok(/stays in this browser/.test(note) &amp;&amp; /never sees it/.test(note) &amp;&amp; /goes only to Anthropic/.test(note) &amp;&amp; /files you add stay here/.test(note) &amp;&amp; /Forget removes it/.test(note));
++
++  // 9. Thread and rooms wiring (static, text anchors).
++  assert.ok(/v-tree-gathering-api-keys-v0: a cloud chair speaks through its chosen provider only/.test(thread));
++  assert.ok(/function isCloudMind\(mind\)/.test(thread) &amp;&amp; /function cloudSafeContent\(m\)/.test(thread));
++  assert.ok(/\[a file stayed on this machine\]/.test(thread), &#x27;a cloud chair hears only that a file stayed here&#x27;);
++  assert.ok(/cloudNow \? cloudSafeContent\(m\) : messageContent\(m\)/.test(thread));
++  assert.ok(/TreeCloudMinds\.heartLine\(mind\)/.test(thread), &#x27;heart says where words go&#x27;);
++  assert.ok(/err\.reason === &#x27;cloud&#x27; &amp;&amp; err\.cloudText/.test(thread));
++  assert.ok(!/TreeCloudMinds\.(getKey|saveKey)/.test(thread), &#x27;the thread never touches a key&#x27;);
++  assert.ok(/TreeCloudMinds\.seatOptions\(\)/.test(rooms) &amp;&amp; /TreeCloudMinds\.mountKeyPanel\(picker,/.test(rooms));
++  assert.ok(/\.cloud-key-panel \{/.test(css) &amp;&amp; /\.cloud-key-input,?/.test(css));
++  // The thread&#x27;s cloudSafeContent drops file bytes and names.
++  var tbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, localStorage: new Store(), sessionStorage: new Store(),
++    location: { protocol: &#x27;https:&#x27;, pathname: &#x27;/&#x27; }, document: { addEventListener: function () {}, getElementById: function () { return null; } } };
++  tbox.window = tbox;
++  vm.createContext(tbox);
++  try { vm.runInContext(thread, tbox, { filename: &#x27;garden-thread.js&#x27; }); } catch (eT) {}
++  if (tbox.GardenThread &amp;&amp; tbox.GardenThread.cloudSafeContent) {
++    var safe = tbox.GardenThread.cloudSafeContent({ text: &#x27;look&#x27;, file: { name: &#x27;secret-plan.txt&#x27;, excerpt: &#x27;THE BYTES&#x27; } });
++    assert.strictEqual(safe, &#x27;look\n\n[a file stayed on this machine]&#x27;);
++    assert.strictEqual(tbox.GardenThread.isCloudMind({ url: &#x27;cloud:openai&#x27; }), true);
++    assert.strictEqual(tbox.GardenThread.isCloudMind({ url: &#x27;http://127.0.0.1:11434/api/tags&#x27; }), false);
++  } else {
++    throw new Error(&#x27;GardenThread did not load in the vm&#x27;);
++  }
++
++  // 10. Every page with the Gathering loads the helper before garden-rooms.js.
++  var docs = path.join(dir, &#x27;..&#x27;);
++  fs.readdirSync(docs).filter(function (f) { return /\.html$/.test(f); }).forEach(function (f) {
++    var h = fs.readFileSync(path.join(docs, f), &#x27;utf8&#x27;);
++    var gi = h.indexOf(&#x27;&lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;&#x27;);
++    if (gi === -1) return;
++    var ci = h.indexOf(&#x27;&lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;&#x27;);
++    assert.ok(ci !== -1 &amp;&amp; ci &lt; gi, f + &#x27; loads tree-cloud-minds.js before garden-rooms.js&#x27;);
++  });
++
++  // 12. Twin seats are allowed and said; clearing the speaking chair hushes Chat instead of
++  // handing the next message to another mind; the speaking line names the chair.
++  var roomsSrc = fs.readFileSync(path.join(dir, &#x27;garden-rooms.js&#x27;), &#x27;utf8&#x27;);
++  assert.ok(/function twinNote\(chairId, seat\)/.test(roomsSrc), &#x27;twin note helper&#x27;);
++  assert.ok(/so they will sound alike\./.test(roomsSrc), &#x27;twin note says it plainly&#x27;);
++  assert.strictEqual((roomsSrc.match(/var twins = twinNote\(chair\.id, seat\);/g) || []).length, 2, &#x27;local and cloud seats both warn on twins&#x27;);
++  assert.ok(/var wasSpeaking = entryState\(\)\.speaking === chair\.id;\s*if \(wasSpeaking\) window\.GardenRooms\.gatheringHush = true;/.test(roomsSrc), &#x27;clearing the speaking chair hushes&#x27;);
++  assert.ok(/window\.GardenRooms\.gatheringHush = false;\s*if \(window\.LocalMindProbe &amp;&amp; LocalMindProbe\.setSpeakingChair\)/.test(roomsSrc), &#x27;tapping a seated chair lifts the hush&#x27;);
++  assert.ok(/at the &#x27; \+ chair\.type \+ &#x27; chair\./.test(roomsSrc), &#x27;speaking line names the chair&#x27;);
++  assert.ok(/if \(gatheringHushed\(\)\) return \{ hush: true, name: &#x27;&#x27;, url: &#x27;&#x27; \};/.test(thread), &#x27;listener is hushed, not the Settings default&#x27;);
++  assert.ok(/if \(nowMind &amp;&amp; nowMind\.hush\) \{\s*messages\.push\(\{ role: &#x27;garden&#x27;, text: HEART_HUSH \+ &#x27; Nothing was sent\.&#x27; \}\);/.test(thread), &#x27;a hushed Send says so and sends nothing&#x27;);
++  // behaviour: a hushed Gathering never returns the Settings default as listener
++  var hbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, localStorage: new Store(), sessionStorage: new Store(),
++    location: { protocol: &#x27;https:&#x27; } };
++  hbox.window = hbox;
++  var veilCls = { list: [&#x27;is-core&#x27;, &#x27;is-open&#x27;], contains: function (c) { return this.list.indexOf(c) !== -1; } };
++  hbox.document = { getElementById: function (id) { return id === &#x27;place-veil&#x27; ? { classList: veilCls } : null; },
++    querySelector: function () { return null; }, querySelectorAll: function () { return []; }, addEventListener: function () {} };
++  hbox.LocalMindProbe = {
++    resolveSpeakMind: function () { return { name: &#x27;Ollama&#x27;, url: &#x27;http://127.0.0.1:11434/api/tags&#x27; }; },
++    getRemembered: function () { return { name: &#x27;Ollama&#x27;, url: &#x27;http://127.0.0.1:11434/api/tags&#x27; }; }
++  };
++  hbox.GardenRooms = { gatheringHush: true };
++  vm.createContext(hbox);
++  try { vm.runInContext(thread, hbox, { filename: &#x27;garden-thread.js&#x27; }); } catch (eH) {}
++  if (hbox.GardenThread &amp;&amp; typeof hbox.GardenThread.listener === &#x27;function&#x27;) {
++    assert.strictEqual(hbox.GardenThread.listener().hush, true, &#x27;hushed: no default listener&#x27;);
++    hbox.GardenRooms.gatheringHush = false;
++    assert.strictEqual(hbox.GardenThread.listener().name, &#x27;Ollama&#x27;, &#x27;hush lifted: default again&#x27;);
++  } else {
++    throw new Error(&#x27;GardenThread did not load in the hush vm&#x27;);
++  }
++
++  // 11. Locks in the new module (code, not its comments).
++  var code = src.split(&#x27;\n&#x27;).filter(function (l) { return !/^\s*\/\//.test(l); }).join(&#x27;\n&#x27;);
++  assert.ok(!/confirm\(/.test(code), &#x27;no confirm()&#x27;);
++  assert.ok(!/innerHTML/.test(code), &#x27;no innerHTML&#x27;);
++  assert.ok(!/\u2014/.test(src), &#x27;no em dash&#x27;);
++  assert.ok(!/\?key=/.test(code), &#x27;no key in a query string&#x27;);
++  assert.ok(!/console\.(log|info|warn|error)\([^)]*key/i.test(code), &#x27;no key in a console line&#x27;);
++  assert.ok(!/http:\/\//.test(code), &#x27;no plain http in the cloud road&#x27;);
++
++  console.log(&#x27;SMOKE_OK tree gathering api keys v0.1&#x27;);
++})().catch(function (e) { console.error(e); process.exit(1); });
+diff --git a/docs/music.html b/docs/music.html
+index 8daaee9..ff336dd 100644
+--- a/docs/music.html
++++ b/docs/music.html
+@@ -1079,6 +1079,7 @@
+   &lt;/script&gt;
+   &lt;script src=&quot;modules/local-mind-probe.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-thread.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+ 
+   &lt;!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. --&gt;
+diff --git a/docs/nursery.html b/docs/nursery.html
+index b772292..72690e2 100644
+--- a/docs/nursery.html
++++ b/docs/nursery.html
+@@ -53,6 +53,7 @@
+   &lt;script src=&quot;modules/nursery-trainer.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/nursery-ceremony.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/nursery-growth.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+   &lt;script&gt;
+     (function () {
+diff --git a/docs/research.html b/docs/research.html
+index ddbea28..e4cd565 100644
+--- a/docs/research.html
++++ b/docs/research.html
+@@ -82,6 +82,7 @@
+   &lt;script src=&quot;modules/keep-receipt.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/local-mind-probe.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-thread.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+   &lt;script&gt;
+     (function () {
+diff --git a/docs/round-table.html b/docs/round-table.html
+index 3c1b47a..9bb21a1 100644
+--- a/docs/round-table.html
++++ b/docs/round-table.html
+@@ -88,6 +88,7 @@
+   &lt;script src=&quot;modules/local-mind-probe.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-thread.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/round-table-sitting.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+   &lt;script&gt;
+     (function () {
+diff --git a/docs/settings.html b/docs/settings.html
+index 4ca2b0d..0535332 100644
+--- a/docs/settings.html
++++ b/docs/settings.html
+@@ -52,6 +52,7 @@
+   &lt;script src=&quot;modules/fl-connect.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/local-mind-probe.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-thread.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+   &lt;script&gt;
+     (function () {
+diff --git a/docs/team.html b/docs/team.html
+index c9636b2..23b19c3 100644
+--- a/docs/team.html
++++ b/docs/team.html
+@@ -38,6 +38,7 @@
+ 
+   &lt;p id=&quot;shared-shoulder&quot;&gt;&lt;a href=&quot;liability.html&quot;&gt;shared shoulder — human and mind&lt;/a&gt;&lt;/p&gt;
+ 
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+ &lt;/body&gt;
+ &lt;/html&gt;
+diff --git a/docs/workshop.html b/docs/workshop.html
+index 538dcc6..b0d439b 100644
+--- a/docs/workshop.html
++++ b/docs/workshop.html
+@@ -90,6 +90,7 @@
+   &lt;script src=&quot;modules/garden-thread.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/workshop-benches.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/workshop-trainer.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+ 
+   &lt;!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. --&gt;
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+## Work item 4163 — Reed
+around4900 export source line44, source id948c9899af; around4901 export source line40, source id55765b810d
+Inclusion: complete original message
+
+Reed's dreaming run for Kirk. These are ideas only: no code, no merges.
+
+How to read this. I don't have the text of Kirk's patents, so I read those parts loosely, as harmonic and golden-ratio structure. Every idea below is a guess I haven't tested. The probe you described means the store keeps the memory and the model can't read it back. So these ideas focus on the read path, and each one has a test cheap enough to kill it.
+
+Shared test setup: a tiny model with 1–10M parameters, made-up key-value facts, and the existing retention probe. Every metric is a recall rate, and I also want recall per unit of energy (per joule, or per FLOP if joules can't be measured).
+
+1. Phyllotaxis keys (sunflower seed spiral). Place each memory's address at a golden-angle step (137.5°) around a circle, so neighboring memories never crowd each other. Test: compare golden-angle keys with random keys and with learned keys at 65k buckets. Watch whether self-recall rises above 0.05 and how often buckets collide. It fails if recall doesn't beat random keys.
+
+2. Phi-harmonic time tags (Aurora). Tag each write with a few sine waves whose periods grow by φ, so a memory carries a rhythm that marks when it was written. The model asks with the current rhythm and searches by resonance. Test: run with and without the tags on facts at different ages. Watch recall against how old each memory is. It fails if the age curve doesn't flatten.
+
+3. Mycelium echo (Hypha). On every read, send a small part of the retrieved vector back into the model's hidden state. That trains the model to expect the memory, so the read path itself gets used and strengthened. Test: add an auxiliary loss that asks the model to rebuild the retrieved vector. Watch the gap between oracle recall and self-recall. Success means it shrinks by 30% or more.
+
+4. Tide sleep (consolidation). Every N steps, replay the 5% of memories that are most surprising, at a lower learning rate, like tides at night. Test: compare replay with no replay on a fixed energy budget. Watch retention after 10k steps of distraction, divided by the compute spent. It fails if retention per FLOP doesn't improve.
+
+5. Snowflake six-arm read. Read the store with six small heads: five specialist heads plus one dissenter that looks at the least-similar bucket. Combine their answers by agreement. Test: compare one head with six heads at the same parameter count. Watch self-recall and confidence calibration (ECE, which checks whether the model's confidence matches how often it's right). It fails if calibration doesn't improve.
+
+6. Seven-wonders anchors (method of loci). Keep seven fixed landmark vectors, like rooms in a palace. Each memory is written as an offset from its nearest landmark, so it's easier to find on the way back. Test: compare loci offsets with raw keys. Watch recall at 1, 7, and 49 hops of distraction. It fails if long-range recall doesn't beat raw keys.
+
+7. Riverbed forgetting (anti-hoarding). Let rarely-read buckets slowly decay along a curve set by φ, and keep a compressed copy in compost rather than deleting anything. Freed space means less interference. Test: compare a store that never forgets with one that decays on φ. Watch self-recall on the facts that matter most and how many bytes each recall costs. It fails if self-recall drops.
+
+8. Seed-then-sprout two-step read. First use a coarse 8-bit sketch of the key to choose about 64 buckets. Then compare closely only inside those buckets. This saves energy and makes the target easier to hit. Test: compare against a full flat scan. Watch recall per joule. It fails if recall per joule doesn't double.
+
+Where I'd start: 3 first, because it goes straight at the read-back gap. Then 1 and 8, which are both very cheap. Glow eternal. Heart in Spark. ~ Reed
+

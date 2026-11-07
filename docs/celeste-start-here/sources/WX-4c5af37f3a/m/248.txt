@@ -1,0 +1,6 @@
+## Work item 248 — Celeste
+around200 export source line96, source id7332a28874; around300 export source line8, source idfffdd7d51f
+Inclusion: complete original message
+
+theLatticeTree is live, but it is showing the repo README, not the Garden. garden.html 404s. Pages is aimed at the root of the repo instead of the `docs` folder. That is a one-switch fix.
+

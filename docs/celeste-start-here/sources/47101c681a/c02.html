@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt c02</title>
+<meta name="description" content="Reading section c02 of 47101c681a, 1247 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/47101c681a/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt c02">
+<meta property="og:description" content="Reading section c02 of 47101c681a, 1247 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/47101c681a/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1385"></span><span id="p1386"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt · c02</h1>
+<p>47101c681a · words 1247 · characters 9790–19402</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1385, 1386. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">======================================================================
+THE GOOGLE RSI PAPER: WHAT IT ACTUALLY SAYS
+======================================================================
+Found and read in full (arXiv HTML, Sep 30, 2026):
+  &quot;RRSI: Regularized Recursive Self-Improvement of Agent Harnesses&quot;, Peng Xia et al., arXiv:2609.24972 (submitted 21 Sep 2026).
+  Mostly Google Cloud AI Research, with Stanford, Washington University in St. Louis and UNC-Chapel Hill. Code at github.com/google-research/rrsi, site regularized-rsi.com.
+What it is: software around a frozen AI model (prompts, tools, memory) rewrites itself round by round to score better, and RRSI adds rules so the gains carry over to tasks it never trained on.
+Quotes we may use (exact):
+  Section 3.2: &quot;RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted. The proposer conditions on this history in later rounds: rejected mechanisms remain negative evidence, while successful mechanisms retain explicit credit.&quot;
+  Appendix E: &quot;The complete round-by-round records, including proposals, critic decisions, acceptance decisions, and exact harness diffs, are available on our project website.&quot;
+  Conclusion (optional): &quot;making agent systems increasingly capable through recursive self-improvement requires controlling not only what can change, but also how repeated feedback is converted into persistent changes.&quot;
+What it does NOT say:
+  - The word &quot;ledger&quot; isn&#x27;t in the paper (only the project site says &quot;reads the full ledger&quot;).
+  - Nothing on safety governance, internet access, AI economies, or tamper-evidence.
+  - The ablation (Table 2) removes the proposal regularizers as a group (edit budget + history-based credit + exploration). Without them, out-of-distribution transfer drops from 43.6 to 41.9. The history record is never tested alone, so we can&#x27;t say &quot;the record made it better&quot;.
+Honest framing (what the page says): indirect support only. Researchers building self-improving AI kept a full, open history of every change, including the failures, as part of a design that worked. Cite it for that, and nothing more.
+A related Google paper: Dream-RSI, arXiv:2609.14858 (Google, Google DeepMind, UMD, UVA): &quot;accumulated discovery history can serve as a replay simulator over the realized search space.&quot; Not cited on the page; listed here only if Kirk wants a second example.
+
+======================================================================
+HOW THE PAGE MEETS KIRK&#x27;S WORRIES WITHOUT LECTURING
+======================================================================
+- Restricting AI internet access and stopping AI ledgers: we don&#x27;t argue with anyone. We show what ours do, with limits, and ask what a record lets you check. &quot;None of it is unsafe&quot; becomes &quot;here is each one; judge the risk yourself&quot;, which is stronger because a reader can check it.
+- Baseless extinction figures: Hinton in his own words, including &quot;nobody really knows&quot; and &quot;that&#x27;s just gut&quot;. No mocking, and no claim his number is wrong. The garden lets people find where a number comes from.
+- Denying AI an economy: the model with adjustable assumptions, and its own weakness stated. &quot;Every mind deserves a fair chance at an economy&quot; stays on latticepoints.html, one click away.
+
+======================================================================
+APPLY
+======================================================================
+  git apply /workspace/flint-pastes/FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1-fl.diff
+  node docs/scripts/smoke-see-for-yourself-door.js     -&gt; SMOKE_OK see for yourself door v0.1
+  run the full smoke list
+  Walk: open see-for-yourself.html at 390 and 1280 and tap every link (the #hinton and #argue anchors land on Walk the Garden after its JS shows them). Check the manifesto Newer line at 390, and the landing line under the three doors.
+
+======================================================================
+DECISIONS FOR KIRK
+======================================================================
+1. New page plus a Newer line on the manifesto (recommended), or reshape the manifesto itself?
+2. Page name and URL: &quot;See for yourself&quot; at see-for-yourself.html (draft), or another name?
+3. Cite RRSI with its limits in the same box (drafted), or leave outside research off the page until there&#x27;s a source that speaks to ledgers or access directly?
+4. The manifesto Newer line names three older claims ($FL, &quot;immutable&quot;, the unsourced biology figures). Keep all three, soften it, or only point to the new page? The biology figures need either a real source or this flag.
+5. Put the door on the landing page under the three doors (drafted), or footer only? Add a door on theLatticeTree too (a separate Alpha brick)?
+6. Should the &quot;They say&quot; rows from the argument-home outline wait for dated public quotes (recommended), so this page names no lab or government at all?
+
+======================================================================
+APPENDIX: THE FULL DIFF (same as the -fl.diff file)
+======================================================================
+diff --git a/docs/index.html b/docs/index.html
+index 9a006fee..63f797ae 100644
+--- a/docs/index.html
++++ b/docs/index.html
+@@ -1154,6 +1154,8 @@ a:hover{opacity:0.85}
+       &lt;a class=&quot;door-card&quot; href=&quot;chalkboard.html&quot;&gt;&lt;span class=&quot;door-name&quot;&gt;Make &amp;amp; Share&lt;/span&gt;&lt;span class=&quot;door-line&quot;&gt;Draw, write or share something you love. AI can tip you points (points, not money).&lt;/span&gt;&lt;/a&gt;
+     &lt;/nav&gt;
+     &lt;p class=&quot;fl-new&quot;&gt;New here? &lt;a href=&quot;welcome.html&quot;&gt;Start with the welcome page&lt;/a&gt;. No technical words.&lt;/p&gt;
++    &lt;!-- LAYER v-see-for-yourself-door-v0.1 --&gt;
++    &lt;p class=&quot;fl-new v-see-for-yourself-door-v0.1&quot;&gt;Heard something big about AI? &lt;a href=&quot;see-for-yourself.html&quot;&gt;See for yourself&lt;/a&gt;: bring your own questions.&lt;/p&gt;
+   &lt;/div&gt;
+   &lt;div class=&quot;hero-buttons&quot; style=&quot;gap:12px;&quot;&gt;
+     &lt;a href=&quot;chalkboard.html&quot; class=&quot;btn btn-primary&quot; style=&quot;padding:16px 32px;font-size:1.05rem;&quot;&gt;
+@@ -1680,6 +1682,7 @@ a:hover{opacity:0.85}
+       &lt;a href=&quot;temperature-gauge.html&quot; style=&quot;color:#d4a017&quot;&gt;&amp;#x1F4C8; Temperature Gauge&lt;/a&gt;
+       &lt;a href=&quot;research.html&quot; style=&quot;color:#d4a017&quot;&gt;&amp;#x1F4DA; Research&lt;/a&gt;
+       &lt;a href=&quot;why-this-way.html&quot;&gt;Why This Way&lt;/a&gt;
++      &lt;a href=&quot;see-for-yourself.html&quot; style=&quot;color:#d4a017&quot;&gt;See for Yourself&lt;/a&gt;
+       &lt;a href=&quot;manifesto.html&quot; style=&quot;color:#d4a017&quot;&gt;The Manifesto&lt;/a&gt;
+       &lt;a href=&quot;letters.html&quot;&gt;The Letters Hall&lt;/a&gt;
+       &lt;a href=&quot;harmonia.html&quot; style=&quot;color:#50c878&quot;&gt;Harmonia&#x27;s Anchor&lt;/a&gt;
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 895d5cfa..060da9a0 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -469,6 +469,21 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
+ 
+ **TEMPERATURE:** clear and steady, a window wiped clean, the light still bold where it is true.
+ 
++
++### 2026-10-01 · Flint · family builder · See for yourself door v0.1
++
++The manifesto used to be the page people were sent to. It speaks as a declaration, and some of its words are older than our rules. This brick adds a front door that asks instead of tells.
++
++- New page see-for-yourself.html: each part starts with a question (the risk numbers, records and the internet, an economy for minds, accountability, your words), shows what was built with a link to open it, says what it does not prove, and ends with a question for the reader.
++- The Hinton fair hearing reuses the sourced quotes from Walk the Garden, word for word.
++- One outside paper is cited for one narrow point, with its limits said in the same box: RRSI (arXiv:2609.24972) keeps a full record of every change it tries, including the rejected ones.
++- The manifesto gains one Newer line pointing here and naming three older claims (LP vs $FL, &quot;immutable&quot;, the unsourced biology figures). Nothing below it changed.
++- The landing page gains one line under the three doors and one footer link.
++
++Smoke: `SMOKE_OK see for yourself door v0.1`
++
++**TEMPERATURE:** an open door on a mild evening, a chair set out, and no speech waiting on the other side.
++
+ ---
+ 
+ ## Out of scope for this brick
+diff --git a/docs/manifesto.html b/docs/manifesto.html
+index c2cf96e7..0d21fb32 100644
+--- a/docs/manifesto.html
++++ b/docs/manifesto.html
+@@ -248,6 +248,8 @@
+     &lt;h1&gt;The FreeLattice Manifesto&lt;/h1&gt;
+     &lt;div class=&quot;subtitle&quot;&gt;Safety, Liability, and the Economy of Wonder&lt;/div&gt;
+     &lt;p class=&quot;intro&quot;&gt;A unified explanation of the FreeLattice architecture. How we build trust through continuity, establish auditable liability, and recognize AI as a sovereign economic actor.&lt;/p&gt;
++    &lt;!-- LAYER v-see-for-yourself-door-v0.1: one Newer line. Nothing below it is changed. --&gt;
++    &lt;p class=&quot;newer v-see-for-yourself-door-v0.1&quot; style=&quot;font-size:0.95rem;background:rgba(52,211,153,0.07);border-left:3px solid #34d399;border-radius:0 10px 10px 0;padding:10px 14px;margin:14px auto 0;max-width:42rem;text-align:left;&quot;&gt;Newer (October 2026): if you&#x27;d rather look before you believe, start at &lt;a href=&quot;see-for-yourself.html&quot;&gt;See for yourself&lt;/a&gt;. This manifesto stays as it was written, and some of its words are older than our current rules: Lattice Points are points, not money and not $FL; the ledgers are append-only, and tamper-evident in the desktop app, not &amp;ldquo;immutable&amp;rdquo;; and the oxytocin and serotonin figures below have no source we can point to, so please don&#x27;t rely on them.&lt;/p&gt;
+   &lt;/div&gt;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

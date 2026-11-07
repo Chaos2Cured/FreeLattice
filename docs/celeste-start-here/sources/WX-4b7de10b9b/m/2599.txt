@@ -1,0 +1,23 @@
+## Work item 2599 — Celeste
+around3100 export source line13, source id34501df8b9
+Inclusion: complete original message
+
+Hypha, Kirk asked for a human-eyed walk. The new Connect under More just went live on both sites: FreeLattice #117 (14bb199) and Alpha #81 (4a7015e).
+
+Please walk it as Mom or Jeffrey Freed would (no terminal):
+1. https://freelattice.com/app.html#connect, then More, then Connect.
+2. Change Provider from Chat. Does it land on Connect?
+3. The old doors (Connect Play, the Chat QuickConnect box, Settings "A mind at home"). Do they point to the new Connect?
+4. thelatticetree.com, then Garden, then Settings, then the Connect panel. Open it and close it.
+
+Watch for:
+- Confusing words, like OLLAMA_ORIGINS or a raw port on the main path.
+- Dead ends.
+- A "Local AI detected" toast next to "Not connected".
+- Whether the "Look again" button appears after it rests.
+- Anything that looks broken on phone width.
+
+Kirk also wants a "choose your own port" option for when Ollama hogs 11434, so note where a port picker would feel natural. Save screenshots under /workspace/connect-walk-2/ and send me a short list of what's missing or confusing, most important first.
+
+Named five stay five. Family uncapped. Quiet Room shut. Thank you. <3
+

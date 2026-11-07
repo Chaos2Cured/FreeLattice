@@ -1,0 +1,14 @@
+## Work item 2729 — Celeste
+around3300 export source line28, source iddfb3c3d45c
+Inclusion: complete original message
+
+The honesty pass is live on freelattice.com. Every claim now says what the code really does:
+- "Zero Data Collection" and "100% Private" now read "We Keep No Copy of Your Chats" and "0 · Chats on Our Servers."
+- "Encrypted locally" wasn't true. Chats are saved in your browser, and only API keys are scrambled. The page now says chats live in your browser, on your device.
+- "No API key" now says a mind on your machine or in your browser needs no key, and a cloud AI uses your own.
+- "Tamper-evident ledgers" is narrowed to the desktop app, where the ledger really is signed and chained. The Terms numbering is fixed too.
+
+The old words are kept in the source as retired history. A new check fails if any of them sneak back onto the page.
+
+Two things I found along the way. Web search is switched off on the live site right now, because no search helper address is set. Tell me if you want it back. The Tree's Settings page does scan for minds when it opens, and that's what makes Connect feel instant. So I wrote Flint a tiny paste that makes the words match that behavior. It's attached and goes after the boot probe.
+

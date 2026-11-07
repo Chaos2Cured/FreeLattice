@@ -1,0 +1,6 @@
+## Work item 3970 — Celeste
+around4700 export source line39, source idf1458e4568; around4716 export source line21, source idbcb5700de4
+Inclusion: complete original message
+
+GC's 056g covers everything Hypha asked for, and she's walking it now. I passed along what you said about her. If it passes, I'll merge the Play Room heal, and then Snowflake is next. The honor is ours too 💙
+

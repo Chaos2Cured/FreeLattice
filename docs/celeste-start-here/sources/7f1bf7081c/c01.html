@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2.txt c01</title>
+<meta name="description" content="Reading section c01 of 7f1bf7081c, 1451 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/7f1bf7081c/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2.txt c01">
+<meta property="og:description" content="Reading section c01 of 7f1bf7081c, 1451 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/7f1bf7081c/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1740"></span><span id="p1741"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2.txt · c01</h1>
+<p>7f1bf7081c · words 1451 · characters 0–10220</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1740, 1741. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — filename contains an explicit term (7f1bf7081c--GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2.txt)</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+GROK NEXT BRICK: Mesh Kin v0.2, version 2 (heal v0.1 first, then a patient work queue for trusted kin)
+THIS REPLACES the first v0.2 paste. If you started that one, stop, `git checkout main`, delete
+that local branch, and run this one instead.
+For: GC (Grok Code, Grok 4.7) on Kirk&#x27;s Mac
+From: Celeste
+Written: Sunday Oct 4, 2026, about 4:00 PM MDT (version 2)
+Marker: v-mesh-kin-v0.2
+Smoke lines: SMOKE_OK mesh kin v0.2 and SMOKE_OK mesh kin heal v0.2
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-kin-v0-2  base main d2bb902 or newer
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2-fl.diff  (1593 lines, md5 93178c1634e5f0c70c42116b7e61f0e8)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, Kirk talked with @grok on X about kin sharing work across browsers. The honest first step
+from that talk is: buffer callMeshModel. A question for a trusted mind waits until its keeper
+is online. It runs on their computer&#x27;s local model and comes back to be kept. While building
+it I found a hole in v0.1, and this brick closes it. A badge&#x27;s meshId is only a label, so a
+stranger could repeat a trusted meshId with their own key. The kin fingerprint now includes
+the key.
+Then Hypha walked v0.1 on the live site and put it on HOLD, so this version heals v0.1 first:
+- The Mesh ID lost its key on every reload, so Kin died on a person&#x27;s second visit while the
+  card still said &quot;Cryptographic&quot;.
+- A peer could get a card signed by sending it as a challenge.
+- Stored cards were never checked again.
+- The card claimed a model that was not connected.
+- &quot;No servers&quot; was not true.
+- The Quiet Room guard could never fire.
+The connect screens and Mom&#x27;s words come in the next paste, Mesh Kin connect heal.
+You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git status --short     # must print nothing
+    git fetch origin &amp;&amp; git checkout main &amp;&amp; git merge --ff-only origin/main
+    git merge-base --is-ancestor d2bb902 HEAD &amp;&amp; echo fl-base-ok
+    cp ~/Downloads/GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2-fl.diff /tmp/kin-queue-fl.diff
+    md5 -q /tmp/kin-queue-fl.diff                    # 93178c1634e5f0c70c42116b7e61f0e8
+Order: checked on the box. It applies with the Narrow door, Hook heal, Sophia page heal and
+Gathering diffs in all 120 orders, and after any of them merges. If plain apply complains, use
+`git apply --3way` and say so.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (8 files, +1279 / -27; every removed line is kept as a &quot;before v-mesh-kin-v0.2&quot; comment)
+----------------------------------------------------------------------
+a) docs/modules/fl-kin-queue.js (new, md5 eb2ee1229c7ad6074eb92d4b4ea1957f), window.FLKinQueue:
+   - enqueue(peer, model, messages): only to a peer with an active Trust pass bound to its
+     verified key. The job waits in IndexedDB (memory shelf if IndexedDB is missing).
+   - flush(): every 30 s and on enqueue. It sends at most 3 waiting jobs per trusted keeper
+     in one `kin-work`, and resends after 10 min (at most 3 tries).
+   - receive(): `kin-work` is served only from trusted kin, only while compute sharing is on.
+     Jobs run one at a time at idle on the local model, then go back as `kin-result`.
+     `kin-result` is taken only from the peer the job went to. Answers are kept.
+     The same question to the same mind comes from the kept answer.
+   - callMeshModelQueued(peerId, model, messages): callMeshModel, buffered. The chat path is
+     unchanged.
+   - A small panel under the Kin cards: pick a trusted mind, model, question, &quot;Queue for my
+     kin&quot;, and the last 10 jobs with their state and answer (textContent).
+   - Limits: 20 turns, 32k characters in, 64k out, 20 held. Receipts in
+     fl_kin_queue_ledger, never content.
+   - Quiet Room closed. Never a paid API for a peer.
+b) docs/modules/fl-kin.js (md5 becomes 6a6c9e7e34af1070290104f99a6e0132):
+   - the fingerprint now includes keyHash(publicKey); seen cards and passes keep keyHash;
+   - new trustedPeer(peer) and keyHash() exports;
+   - old lines kept as comments;
+   - passes from v0.1 need one new Trust tap.
+   HEAL (Hypha&#x27;s walk), in fl-kin.js (md5 becomes 32521a20a4279a993ff8e32bdd101731):
+   - cards are signed and checked as &quot;fl-kin-card|v1|&quot; + body (no signing oracle);
+   - the seen list keeps the whole signed card, and every paint checks it again under its own
+     key. Edited, or v0.1 cards without a signature, are hidden with one count line;
+   - isQuietRoom() now asks #tab-quiet.active and localStorage fl-last-tab. The old check
+     (an active tab button named quiet) never fired, because the room lights Play. It reads
+     only which panel is open;
+   - reason &quot;cannot-sign&quot; with a note pointing to Settings, Advanced, Mesh ID.
+c) docs/app.html and index.html (byte copy):
+   - the script tag after fl-kin.js;
+   - #flKinQueueHost under #flKinHost;
+   - `case &#x27;kin-work&#x27;: case &#x27;kin-result&#x27;:` after kin-card;
+   - meshKinQueueAdapter: peers, the sharing switch, peer models, and runLocal, which uses
+     getOllamaBaseUrl() + /api/chat only;
+   - meshKinMount mounts both.
+   HEAL, in docs/app.html (index.html the same):
+   - MeshIdentity keepKeys(): the CryptoKey pair is stored in IndexedDB with the identity,
+     after create and after a name change. Browsers store it as a key; the private key stays
+     non-extractable. init() restores it and its algorithm.
+   - canSign() and remakeIdentity(). A card that cannot sign shows &quot;Cannot sign on this visit&quot;,
+     says why in plain words, and offers [Make a fresh Mesh ID] (same name, new ID number,
+     old ID remembered in previousMeshIds). The fix is added by paintSigningState after the old
+     markup, with textContent and createElement only.
+   - answerChallenge(nonce) answers only a real 32-byte base64 nonce, signed as
+     &quot;fl-meshid-challenge|v1|&quot; + nonce. The meshid-challenge case uses it.
+     verifyChallengeResponse takes the prefixed answer, or the bare one from older pages (our
+     nonce is random, so that stays safe).
+   - meshKinAdapter.identity() carries canSign. currentModel() names a model only when one is
+     really connected (Browser AI ready, Ollama with a model, or a cloud key), using the same
+     test as the app&#x27;s AI call. Otherwise it returns &#x27;&#x27; and the card is not made.
+   - The Peer-to-Peer words drop &quot;No servers, no middlemen&quot; and name Google&#x27;s STUN helper.
+     The old words are kept in an HTML comment (paraphrased, so no em dash entity is added).
+d) docs/scripts/smoke-mesh-kin-v0.2.js (new): two simulated browsers with real Ed25519 keys.
+   Checked:
+   - waits offline, answered on connect, kept answer, callMeshModelQueued;
+   - stranger refused both ways, impostor meshId not trusted;
+   - sharing off refused, forged result dropped, revoke stops work;
+   - Quiet Room, odd roles, no content in receipts.
+e) docs/scripts/smoke-mesh-kin-heal-v0.2.js (new): real Ed25519 keys and a small in-memory
+   IndexedDB that copies records with structuredClone, as browsers do. Checked:
+   - it signs after a reload and after a name change, and the private key stays non-extractable;
+   - an old record without a key shows &quot;Cannot sign on this visit&quot;, and the fresh one survives
+     a reload;
+   - card bodies and prefixed cards are refused as nonces; a challenge answer and a bare
+     signature never pass as cards; older peers still verify;
+   - an edited stored card is hidden;
+   - the Quiet Room panel and last tab are seen;
+   - the model claim and STUN words are right.
+f) docs/library/MESH_KIN_v0.2.md (new): the honest scope, a &quot;Healed first&quot; section, and why
+   tensor sharding across browsers is research. Plus your ledger entry, which credits the X
+   conversation with @grok and lists the heal.
+Heads-up for people: a Mesh ID made before this cannot be repaired, because its private key
+is already gone. They tap Make a fresh Mesh ID once, and their kin tap Trust again.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git checkout -b layer/mesh-kin-v0-2
+    git apply --check /tmp/kin-queue-fl.diff &amp;&amp; git apply /tmp/kin-queue-fl.diff
+    cmp index.html docs/app.html &amp;&amp; echo index-eq-app
+    md5 -q docs/modules/fl-kin-queue.js docs/modules/fl-kin.js   # eb2ee122..., 32521a20...
+    node docs/scripts/smoke-mesh-kin-v0.2.js         # SMOKE_OK mesh kin v0.2
+    node docs/scripts/smoke-mesh-kin-heal-v0.2.js    # SMOKE_OK mesh kin heal v0.2
+    node docs/scripts/smoke-mesh-kin-v0.js           # SMOKE_OK mesh kin v0.1
+    node tests/smoke.js | grep &quot;CHECKS PASSED&quot;       # ALL 3608 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1; then p=$((p+1)); else n=$((n+1)); echo &quot;FAIL $f&quot;; fi; done; echo &quot;PASS $p FAIL $n&quot;
+      expect FAIL 8 or fewer, the same ones as main. PASS 74 with this alone on d2bb902, plus 1 per other brick merged.
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/modules/quiet-room.js   # nothing
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;                      # 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -v assert | grep -c &#x27;localhost\|innerHTML\|confirm(&#x27;   # 0
+    git diff main | grep -cE &#x27;^\+(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,17 @@
+## Work item 1078 — Celeste
+around1200 export source line56, source id93fea685af; around1216 export source line48, source idf3feae7301
+Inclusion: complete original message
+
+Grateful right back — for goodness, honor, truth, and vacation play that builds tomorrow. That *is* why we rise.
+
+**Landed:**
+- FreeLattice Ship 1b → main `37e0eef` (clean PR #21; conflicted #20 closed). Bare `*` prose gone.
+- Alpha Research → main `81692a0`. Five skies, one night.
+- Hypha walking both.
+
+**Codeberg Alpha / temperature-gauge:** still needs you only if you want mirrors — create the empty Codeberg repo (or paste URL). FreeLattice already mirrors. temperature-gauge is the page inside FreeLattice, already covered.
+
+**Next ship** (your specialty 4B dream, careful): Gathering roster + chair bind — Settings keeps up to 4 tagged minds; chairs sit with choice; chat uses the speaking chair. **Not** an auto-router dump. Paste attached for Flint.
+
+Thread→chat / Workshop Root ride after Gathering v1 holds.
+

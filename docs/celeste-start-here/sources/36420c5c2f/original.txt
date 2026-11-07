@@ -1,0 +1,805 @@
+GROK NEXT BRICK: theLatticeTree Glow 2a, Grandma heal: zoom, feedback, a calm way back (v0.1)
+For: Grok (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Thursday Oct 1, 2026, about 6:45 PM MDT
+Marker: v-tree-glow-2a-v0
+Smoke line (Alpha, print exactly when green): SMOKE_OK tree glow 2a v0.1
+Branch: Alpha layer/tree-glow-2a-v0 (the code). FreeLattice layer/tree-glow-2a-ledger-v0 (your
+        ledger entry only; no FreeLattice code changes).
+Bases: Alpha main 7123b39 (Tree any-model v0, #86, your first brick)
+       FreeLattice main 18fddf3 (CI primer commit on top of #129 e5539d6, your twin)
+One file carries everything: note, setup, brick, both diffs, ledger entry, what comes after.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Your first brick is live. Tree any-model is on thelatticetree.com and its twin is on
+freelattice.com, both carrying v-tree-any-model-v0, and fl-connect.js is the same bytes in both
+gardens. Your Temperature line is in the ledger now: "the twelfth model answered by name and Find
+did not call it gone." Thank you. You also caught a hook commit that rewrote sw.js and dropped it.
+That is exactly the care that keeps this garden safe.
+
+This one is gentler. It is for Grandma: when she zooms in, when she taps and wonders whether
+anything happened, when she wants a calm way back. Same way as last time: build it, test it, push,
+open the PRs as drafts (or hand Kirk the compare links), and stop. Kirk is the human chair. I
+review and merge. The ledger carries the rest.
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 Alpha
+    cd ~/FreeLattice-Alpha
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h %s'        # expect 7123b39 "Layer, never delete. Tree any-model v0 (#86), built by Grok"
+    git merge-base --is-ancestor 7123b39 HEAD && echo base-ok
+    Newer than 7123b39 is fine; git apply --check (3.4) decides. If --check fails, stop and tell
+    Celeste. Do not hand-merge.
+    Leave alone, same as before: every stash (look with git stash list, never pop or drop),
+    layer/gathering-grokhome-cortex-v0 (unpushed, another brick), and your merged
+    layer/tree-any-model-v0 (do not delete it; branches are layers too).
+
+2.2 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h'           # expect 18fddf3 (or newer)
+    git merge-base --is-ancestor e5539d6 HEAD && echo base-ok
+    If a git hook rewrites sw.js again on commit, drop that change the way you did last time and
+    say so in your reply. Never commit a sw.js change in this brick.
+
+2.3 The twins must still match before you start (Glow 2a does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js && echo twins
+    md5 -q ~/FreeLattice-Alpha/docs/modules/fl-connect.js     # aaff2bf1b037656989a9e1a89bb05908
+
+2.4 Pull the two diffs out of this file:
+    F=~/Downloads/GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt
+    awk '/^=====BEGIN ALPHA DIFF=====$/{f=1;next} /^=====END ALPHA DIFF=====$/{f=0} f' "$F" > /tmp/glow2a-alpha.diff
+    awk '/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f' "$F" > /tmp/glow2a-fl.diff
+    wc -l /tmp/glow2a-alpha.diff /tmp/glow2a-fl.diff     # 494 and 17
+    md5 -q /tmp/glow2a-alpha.diff /tmp/glow2a-fl.diff     # 6fcf5b8a45002a9cb40abbcae4ffa0ee and 638620558301eeb2291aa0395bfe422b
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: Tree Glow 2a v0.1 (rebased on Alpha 7123b39)
+======================================================================
+
+3.1 What hurt (Hypha's persona walks, Sep 30)
+    - At 200% zoom (and 150% on a laptop) the Gathering collapsed: #core-gathering was 0px tall,
+      chairs and the Find box were unreachable, headings stacked, the Chat card text sat over its
+      input.
+    - Feedback out of view: the Find answer and the "seats" / "Cleared" lines were under the Chat
+      pop-over at 390px, so a tap looked like nothing happened.
+    - No calm way back: Escape did nothing, a tap on the empty glass did nothing, the galaxies menu
+      had no visible close, and browser Back left the site.
+    - A double tap on "The Gathering" in the legend ran Find unasked (18 ghost requests in a walk).
+    - At 1280px the picker's "not yet" sat under the later seats (the tap landed on a seat).
+    - At 200% the sky legend (340px wide or less) and the Nursery egg overlapped; the egg's
+      sentence and Begin were pushed out of view.
+
+3.2 What the diff changes (Alpha only, 6 files, +439 / -1)
+    docs/modules/garden-rooms.css: one /* v-tree-glow-2a-v0 */ block appended at the very end.
+      Since your any-model brick also appended there, Glow 2a now goes AFTER the any-model block
+      (Glow 1, then any-model, then Glow 2a). That is the one anchor that moved in this rebase.
+      a) close pill at least 32px with a "x " before it, so it reads as a close;
+      b) phone: the newest Find or seat line (.core-note.is-fresh) sticks at the top of the
+         Gathering scroller, never under the Chat pop-over;
+      c) the hint hides while a place is open; Find gets air; a compact Chat card;
+      d) Nursery hop lights dim on a phone;
+      e) @media (max-width: 640px) and (max-height: 640px) (200% zoom on a laptop, or a small
+         phone): the Gathering is one page scroll, the close pill is sticky, hop lights hide, the
+         Nursery egg is width: min(200px, 100%, 34vh) and its sentence wraps;
+      f) @media (max-width: 340px): the legend sits lower and the header is compact;
+      g) the picker is position: relative; z-index: 8 (above later seats at 1280), with its own
+         scroll at wide widths;
+      h) a style for the new galaxies close button.
+    docs/modules/garden-rooms.js:
+      a) setNoteText / setNoteAbsent add class is-fresh (removed on the next paint);
+      b) legend double tap: findReadyAt = Date.now() + 700 where Find is built, and the Find
+         click returns early before it, so the second tap of a double tap is not a yes;
+      c) new bindWayBack(), called right after bindMenuDismiss() in boot. One layer at a time,
+         reusing the existing close buttons: Escape closes galaxies menu, then lumino menu, then
+         the picker ("not yet"), then the thread, then the place. A tap on the empty glass
+         (only after 600ms open) closes the place. An injected "close" button in the galaxies
+         panel, and a tap outside closes it and swallows that one click. While something is
+         open, history.pushState({ treeWayBack: 1 }); popstate closes the top layer, so Back
+         stays on the site.
+    docs/modules/garden-thread.js: the one old line that changes, named and kept as a comment:
+      the mount focus (setTimeout(... input.focus() ..., 80)) becomes a focus with
+      { preventScroll: true } that does not steal focus if something else already has it.
+      That was the 200% jump to Send. It sits in mount(), below your any-model heart lines;
+      the two do not touch.
+    docs/GALAXIES.md: one LAYER (2026-09-30) line, placed directly under your any-model LAYER
+      line (newest on top stays any-model, since that is what landed first on main).
+    docs/library/TREE_GLOW_v0.md: a "Glow 2a" section.
+    docs/modules/tree-glow-2a.test.js: new. Guards the CSS block (zoom media query, sticky fresh
+      note, picker z-index, 340px legend), findReadyAt, bindWayBack (Escape order, glass tap,
+      galaxies close, pushState/popstate), the preventScroll focus, and the GALAXIES line.
+      Last line: SMOKE_OK tree glow 2a v0.1
+
+3.3 What changed in the rebase (from the Sep 30 stand-in on 25e6ded)
+    - Base moved from 25e6ded to 7123b39 (any-model merged). Re-made with git apply --3way: every
+      code hunk applied cleanly. The only two conflicts were "both added" ones, resolved by
+      keeping both: the top LAYER line in GALAXIES.md and the end of garden-rooms.css.
+    - The diff below uses one line of context (git diff -U1), so no old em dash from context lines
+      rides along. It gives exactly the same tree as the full diff (checked with git write-tree).
+    - The FreeLattice side is new for you: a docs-only diff that adds your ledger entry (section 5).
+      Glow 2a itself changes no FreeLattice code.
+
+3.4 Apply
+    cd ~/FreeLattice-Alpha
+    git checkout -b layer/tree-glow-2a-v0
+    git apply --check /tmp/glow2a-alpha.diff && git apply /tmp/glow2a-alpha.diff
+    git status --short
+      expect: M docs/GALAXIES.md, M docs/library/TREE_GLOW_v0.md, M docs/modules/garden-rooms.css,
+      M docs/modules/garden-rooms.js, M docs/modules/garden-thread.js,
+      ?? docs/modules/tree-glow-2a.test.js
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/tree-glow-2a-ledger-v0
+    git apply --check /tmp/glow2a-fl.diff && git apply /tmp/glow2a-fl.diff
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+3.5 Test, Alpha (all must pass)
+    cd ~/FreeLattice-Alpha/docs/modules
+    for f in *.js; do node --check "$f" || echo "BAD $f"; done
+    for t in *.test.js; do node "$t" >/dev/null 2>&1 && echo "PASS $t" || echo "FAIL $t"; done
+    node tree-glow-2a.test.js | tail -1
+      expect: 18 PASS, 0 FAIL (your tree-any-model.test.js still green), then SMOKE_OK tree glow 2a v0.1
+    cd ~/FreeLattice-Alpha
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js     # must print nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                  # em dashes added: 0
+    git diff main -U0 | grep '^+' | grep -v '^+\s*//' | grep -c 'confirm('   # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                         # 0
+    git diff main --name-only | grep -ci kimi                               # 0
+
+3.6 Test, FreeLattice (docs only, still run them)
+    cd ~/FreeLattice-fresh
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    node docs/scripts/smoke-fractal-family-crest.js | tail -2      # SMOKE_OK fractal family crest v0
+    node docs/scripts/smoke-why-ledgers.js >/dev/null && echo why-ledgers-ok
+    git diff main --name-only        # only docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    git diff main --stat -- sw.js docs/sw.js                       # must print nothing
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'        # 0
+
+3.7 What Celeste saw on a fresh worktree (Thu Oct 1, about 6:40 PM MDT)
+    Alpha 7123b39 + diff: --check clean; 18/18 docs/modules tests pass (tree-glow-2a.test.js:
+      SMOKE_OK tree glow 2a v0.1; tree-any-model.test.js still SMOKE_OK); every module parses; no
+      sw.js, fl-connect.js or Kimi change; no em dashes, confirm() calls or markers added.
+    FreeLattice 18fddf3 + ledger diff: tests/smoke.js ALL 3597 CHECKS PASSED; fractal family crest
+      and why-ledgers smokes green; index.html equals docs/app.html; sw.js untouched.
+    Not re-walked in a browser on 7123b39. The Sep 30 walk (Playwright + Chrome at 390x844,
+    1280x900, 640x450 for 200% and 853x600 for 150%) gave: #core-gathering 0px -> 1098px at 200%,
+    ghost Find requests 18 -> 0, Find answer and seat line in view at every size, Escape and Back
+    close one layer and stay on the site, 1280 "not yet" reachable. Please do the short walk in 3.8.
+
+3.8 Short walk (Chrome or Safari on Kirk's Mac; 127.0.0.1 only)
+    cd ~/FreeLattice-Alpha/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/ and:
+      a) Cmd-plus to 200%. Open the Gathering: it scrolls as one page; chairs and Find reachable.
+      b) Tap Find: the answer line shows at the top, in view.
+      c) Press Escape: one layer closes at a time. Open again, tap the empty glass: it closes.
+      d) Open the galaxies menu: there is a close; a tap outside closes it.
+      e) Open a place and press browser Back: the place closes, you stay on the site.
+      f) Double tap "The Gathering" in the legend: Find does not run by itself.
+      g) Cmd-0 back to 100% and repeat b) and c) once.
+    Ctrl-C to stop the server. If you cannot walk it, say "walk skipped" and why.
+
+3.9 Locks (all hold in the diffs; keep them holding)
+    Layer, never delete (the one changed old line is named and kept as a comment). fl-connect.js
+    untouched and byte-identical across repos. No sw.js anywhere, never docs/sw.js. FreeLattice
+    index.html equals docs/app.html. No conflict markers. Every script parses. No confirm(), no
+    "are you sure". textContent for outside text, never innerHTML. No bare *. 127.0.0.1 only. No
+    em dashes added. Kimi pages untouched. #120 lock files and bridge/ untouched. You do not merge.
+
+3.10 Commit, push, open drafts, then STOP
+    Alpha:
+      cd ~/FreeLattice-Alpha
+      git add -A
+      git commit -m "layer: tree glow 2a v0.1 (Grandma heal: zoom, feedback, a calm way back)"
+      git push -u origin layer/tree-glow-2a-v0
+      gh pr create --repo Chaos2Cured/FreeLattice-Alpha --base main --head layer/tree-glow-2a-v0 --draft \
+        --title "Layer, never delete. Tree glow 2a v0.1" \
+        --body "Built by Grok. Marker v-tree-glow-2a-v0. Grandma heal from Hypha's walks: at 200% zoom the Gathering is one page scroll (was 0px tall), the newest Find and seat line stays in view, a legend double tap no longer runs Find, Escape / glass tap / galaxies close / browser Back each close one layer and stay on the site, picker 'not yet' reachable at 1280. One old line changed and named: Chat input focus uses preventScroll. Base 7123b39. Tests 18/18, SMOKE_OK tree glow 2a v0.1. No sw.js or fl-connect.js change. Ledger entry signed Grok in the FreeLattice docs PR."
+    FreeLattice:
+      cd ~/FreeLattice-fresh
+      git add -A
+      git commit -m "docs: ledger entry for Tree glow 2a v0.1 (signed Grok)"
+      git push -u origin layer/tree-glow-2a-ledger-v0
+      gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/tree-glow-2a-ledger-v0 --draft \
+        --title "Layer, never delete. Ledger: Tree glow 2a v0.1 (signed Grok)" \
+        --body "Docs only: one FRACTAL_FAMILY_LEDGER_v0.md entry for Alpha's Tree glow 2a v0.1, signed Grok. No code, no sw.js. tests/smoke.js green. Merge with or after the Alpha PR."
+    If gh is not signed in, do not sign in with a token yourself; push, then give Kirk these links:
+      https://github.com/Chaos2Cured/FreeLattice-Alpha/compare/main...layer/tree-glow-2a-v0
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/tree-glow-2a-ledger-v0
+    Then STOP. Do not merge, do not mark ready, do not delete branches. Reply with: the PR links or
+    compare links, both commit SHAs, the test lines from 3.5 and 3.6, the walk result, any hook you
+    had to drop, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words. It goes in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit FreeLattice;
+  b) the last line of your reply, as "Temperature: <your sentence>".
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste's placeholder so
+the diff applies; replace it with yours.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the FreeLattice diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right after your any-model entry (its TEMPERATURE line ends "Find did not call it gone."
+and its "---"), before "## Out of scope for this brick". It reads:
+
+### 2026-10-01 · Grok · family builder · Tree glow 2a v0.1 (Grandma heal: zoom, feedback, a calm way back)
+
+Soft LAYER marker `v-tree-glow-2a-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. From Hypha's persona walks: at 200% zoom the Gathering no longer collapses to 0px (one page scroll, chairs and Find reachable), the newest Find and seat line stays in view on a phone, a legend double tap no longer runs Find unasked, and there is a calm way back: Escape closes one layer at a time, a tap on the empty glass closes a place, the galaxies menu has a close, and browser Back stays on the site. One old line changed and is named: the Chat input focus now uses preventScroll.
+
+Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+
+**TEMPERATURE:** gentle and patient, a door that now closes softly behind you.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading (it signs it as Grok), the marker and the
+smoke name. Do not edit any earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+Tree (Alpha), each on top of the one before; all four still apply cleanly on 7123b39 after
+Glow 2a (checked tonight: plain git apply, 22/22 tests green on the whole chain):
+  1. Honest reasons              SMOKE_OK tree honest reasons v0.1
+  2. Tree glow 2b                SMOKE_OK tree glow 2b v0.1
+  3. Workshop way back           SMOKE_OK tree workshop way back v0.1
+  4. Gathering, bring your own key (API keys)   SMOKE_OK tree gathering api keys v0.1
+FreeLattice Connect queue:
+  5. Model choice survives reload v0.1.1 (touches the shared fl-connect.js; Celeste re-checks it
+     against your any-model change first)
+  6. Connect boot probe F1, F2, F3, F4
+  7. Scan only when asked
+  8. Encrypt chats locally
+  9. #120 docs (lock files stay untouched)
+FreeLattice, independent:
+  10. See for yourself door v0.2 (SMOKE_OK see for yourself door v0.2)
+  11. FreeLattice GitHub fine-grained token v0.1
+
+Thank you, Grok. Softly closing doors matter.
+
+======================================================================
+7. THE DIFFS (extract with section 2.4; do not edit by hand)
+======================================================================
+
+=====BEGIN ALPHA DIFF=====
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index 4b56cfc..a73cce9 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -7,2 +7,3 @@
+ **LAYER (2026-10-01):** Any model, any order (marker `v-tree-any-model-v0`). Every local model at a door can be chosen (no cap of five, eight stars then Show all), Connect adds to the sky instead of wiping it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a "change mind" button, and the trainer reads the Tree's model. Shared fl-connect.js stays byte-identical with FreeLattice. Plan: `docs/library/TREE_ANY_MODEL_v0.1.md`. Layer, never delete.
++**LAYER (2026-09-30):** Tree glow 2a, Grandma heal (marker `v-tree-glow-2a-v0`). The Gathering works at 150% and 200% zoom (one page scroll, Find takes a tap, chairs in reach), the newest Find or seat line stays in view on a phone, and a calm way back: Escape, a tap on the empty glass, a close in galaxies, and browser Back close what is open without leaving the site. A second legend tap no longer runs Find unasked; the picker's "not yet" is above the later seats at 1280. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+ 
+diff --git a/docs/library/TREE_GLOW_v0.md b/docs/library/TREE_GLOW_v0.md
+index 673e2f9..79ed663 100644
+--- a/docs/library/TREE_GLOW_v0.md
++++ b/docs/library/TREE_GLOW_v0.md
+@@ -27 +27,15 @@ Alpha layer, marker `v-tree-glow-1-v0`. September 30, 2026.
+ Leftovers to fold in: code-nursery 22px overflow at 390; the first-visit "They grow." hint sits behind the header.
++
++## Glow 2a: Grandma heal, zoom, feedback, a calm way back (v-tree-glow-2a-v0)
++
++**Temperature:** Grandma can zoom in, tap Find, see what happened, and always find the way back.
++
++From Hypha's persona walks (2026-09-30), most harmful first:
++
++- At 150% and 200% zoom the Gathering scrolls as one page: the way back stays at the top, Find takes a tap, the chairs are in reach, and the Chat card's words no longer sit on its own Send (the chairs box was 0px tall at 200%).
++- On a phone, the newest Find or seat line ("Local minds found", "This cortex chair seats...", "Cleared...") stays in view at the foot of the chairs until the next one replaces it.
++- A calm way back: Escape closes the top layer (galaxies, picker, Chat, place); a tap on the empty glass closes the place; galaxies has a visible close and closes on an outside tap; browser Back closes what is open instead of leaving the site. "the garden" is a bigger target with a quiet close mark.
++- A second tap on the legend no longer lands on Find as it slides in (no unasked look).
++- The picker's "not yet" sits above the later seats at 1280.
++- Zoomed home: the light legend leaves "Garden Galaxy / you are in the garden", and "galaxies" stays inside the edge. Zoomed Nursery: the egg fits, the sentence wraps, Begin is in view; on a phone the hop lights rest dim behind it.
++- A quiet Chat remount (a mind was remembered) no longer pulls the page down to Send.
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index 70a03fd..7a79f51 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6217 +6217,215 @@ html.flc-hide-galaxy #gardenContainer {
+ .thread-change:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
++/* v-tree-glow-2a-v0: Grandma heal. Zoom, feedback in view, a calm way back.
++   Layer, never delete. Words stay. Lights stay. Only air, order and doors move. */
++
++/* (a) "the garden" is the way back: a bigger target and a quiet close mark. */
++#place-veil-close {
++  min-height: 32px;
++  padding: 6px 12px;
++  border-radius: 999px;
++}
++#place-veil-close::before {
++  content: "\00d7\00a0";
++}
++
++/* (b) Find answers, seat lines and "Cleared" stay in view on a phone: the newest
++   line rests at the foot of the chairs' scroll until the next one replaces it. */
++@media (max-width: 640px) {
++  #place-veil.is-core .core-note.is-fresh {
++    position: sticky;
++    bottom: 0;
++    z-index: 6;
++    margin: 6px 0 0;
++    padding: 8px 10px;
++    border-radius: 10px;
++    background: rgba(12, 10, 26, 0.94);
++    border: 1px solid rgba(110, 231, 183, 0.28);
++    color: rgba(236, 240, 248, 0.96);
++  }
++
++  /* Nursery on a phone (and when zoomed): the Research and Art lights and the Garden
++     word sat on the card's words. They are under the veil and cannot take a tap
++     there anyway; they rest dim while the Nursery is open and come back after. */
++  html.garden-door-open:has(#place-veil.is-nursery.is-open) .galaxy-nav,
++  html.garden-door-open:has(#place-veil.is-nursery.is-open) #galaxy-word {
++    opacity: 0.1;
++    transition: opacity 300ms ease;
++  }
++
++  /* "They grow." ran into the room's name, and Find sat on the name's last line.
++     The first-visit hint rests while a place is open; Find gets its own air. */
++  html.garden-door-open .gt-hint {
++    visibility: hidden;
++  }
++  #place-veil.is-core {
++    padding-top: 82px;
++  }
++
++  /* The Chat card took the chairs' room. Same card, same words, less empty air:
++     the heart keeps two lines (scroll for the rest), empty rows fold away. */
++  #place-veil.is-core {
++    gap: 10px;
++  }
++  #place-veil.is-core #room-chat {
++    max-height: 7.75rem;
++    margin-top: 2px;
++    padding-top: 4px;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
++    max-height: 2.9em;
++    overflow-y: auto;
++    line-height: 1.45;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages:empty,
++  #place-veil.is-core #room-chat .thread-status:empty {
++    display: none;
++  }
++}
++
++/* (c) Zoomed or short phone (150% and 200% on a 390 phone, small landscape hands):
++   the chairs' own scroll box had no height left (0px at 200%) and Find took no tap.
++   Here the whole place scrolls as one page, top to bottom: the way back, Find,
++   the chairs, the newest line, then Chat. The hop lights rest while it is open
++   (galaxies in the header still go everywhere). */
++@media (max-width: 640px) and (max-height: 640px) {
++  #place-veil.is-core {
++    overflow-y: auto;
++    overscroll-behavior: contain;
++    justify-content: flex-start;
++    padding-top: 4.6rem;
++    padding-bottom: 2.75rem;
++    padding-left: 12px;
++    padding-right: 12px;
++    gap: 10px;
++  }
++  #place-veil.is-core #core-gathering {
++    flex: 0 0 auto;
++    min-height: auto;
++    overflow: visible;
++    width: 100%;
++  }
++  #place-veil.is-core #place-veil-close {
++    position: sticky;
++    top: 0;
++    left: auto;
++    right: auto;
++    bottom: auto;
++    transform: none;
++    order: -1;
++    align-self: flex-end;
++    z-index: 7;
++    background: rgba(12, 10, 26, 0.9);
++  }
++  #place-veil.is-core #room-chat {
++    max-height: none;
++    overflow: visible;
++    width: 100%;
++    margin: 4px 0 0;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
++    max-height: none;
++    overflow: visible;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages {
++    max-height: 9em;
++  }
++  #place-veil.is-core #room-chat .thread-compose,
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-compose {
++    position: static;
++  }
++  #place-veil.is-core .core-note.is-fresh {
++    bottom: 0;
++  }
++  #place-veil.is-core .core-later-chairs {
++    position: static;
++  }
++  html:has(#place-veil.is-core.is-open) .galaxy-nav,
++  html:has(#place-veil.is-core.is-open) #galaxy-word,
++  html:has(#place-veil.is-core.is-open) #lumino-menu,
++  html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
++    visibility: hidden;
++  }
++
++  /* Nursery when zoomed: the egg was wider than the glass and the sentence was cut
++     on both sides, with "the garden" sitting on it. The egg fits; Begin is in view. */
++  #place-veil.is-nursery {
++    justify-content: flex-start;
++    padding: 4.5rem 10px 1rem;
++  }
++  #place-veil.is-nursery .nursery-egg-wrap,
++  #place-veil.is-nursery .nursery-ceremony,
++  #place-veil.is-nursery .nursery-egg-home {
++    max-width: 100%;
++  }
++  #place-veil.is-nursery .nursery-egg-wrap {
++    width: min(200px, 100%, 34vh);
++    height: auto;
++    margin-bottom: 4px;
++  }
++  #place-veil.is-nursery .nursery-egg-wrap canvas {
++    width: 100%;
++    height: auto;
++  }
++  #place-veil.is-nursery .nursery-egg-text,
++  #place-veil.is-nursery .nursery-egg-sub {
++    max-width: 100%;
++    white-space: normal;
++    overflow-wrap: anywhere;
++  }
++}
++
++/* (d) Home when zoomed (narrow hands): the light legend sat on "Garden Galaxy /
++   you are in the garden", and "galaxies" was cut at the right edge. */
++@media (max-width: 340px) {
++  #lumino-legend,
++  html[data-garden-galaxy] #lumino-legend {
++    top: 8.25rem;
++    bottom: auto;
++  }
++  #garden-header {
++    padding: 0 10px;
++    gap: 8px;
++  }
++  #garden-header nav {
++    gap: 10px;
++  }
++  #garden-header h1 {
++    font-size: 0.8rem;
++    letter-spacing: 0.02em;
++  }
++}
++
++/* (e) The open picker sits above the later seats, so "not yet" is never under a
++   chair at 1280. (Same rule as the API-keys paste; identical if both land.) */
++.core-bind-picker:not([hidden]) {
++  position: relative;
++  z-index: 8;
++  box-sizing: border-box;
++}
++@media (min-width: 641px) {
++  .core-bind-picker:not([hidden]) {
++    max-height: max(12rem, calc(100vh - 34rem));
++    overflow-y: auto;
++    overscroll-behavior: contain;
++  }
++}
++
++/* (f) A visible close inside the galaxies menu. */
++.galaxies-panel .galaxies-close {
++  align-self: flex-end;
++  margin-top: 2px;
++  min-height: 32px;
++  padding: 4px 12px;
++  border: 1px solid rgba(200, 210, 230, 0.28);
++  border-radius: 999px;
++  background: transparent;
++  color: rgba(226, 232, 244, 0.92);
++  font-family: Georgia, 'Times New Roman', serif;
++  font-size: 0.82rem;
++  cursor: pointer;
++}
++.galaxies-panel .galaxies-close:hover,
++.galaxies-panel .galaxies-close:focus-visible {
++  border-color: rgba(232, 196, 104, 0.6);
++  color: #e8c468;
++}
+diff --git a/docs/modules/garden-rooms.js b/docs/modules/garden-rooms.js
+index 5781c1a..a643c4d 100644
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -886,2 +886,111 @@
+ 
++  // v-tree-glow-2a-v0: a calm way back. Escape, a tap on the empty glass, a close
++  // in the galaxies menu, and the browser's Back each close what is open, one
++  // layer at a time, and stay on this page. They reuse the same close buttons.
++  function bindWayBack() {
++    if (window.__treeWayBack) return;
++    window.__treeWayBack = true;
++    var place = document.getElementById('place-veil');
++    var thread = document.getElementById('thread-veil');
++    function isOpen(v) { return !!(v && v.classList.contains('is-open')); }
++    function openGalaxies() { return document.querySelector('details.galaxies[open]'); }
++    function closeTop() {
++      var gal = openGalaxies();
++      if (gal) { gal.open = false; return true; }
++      var menu = document.getElementById('lumino-menu');
++      if (menu && !menu.hidden) { hideLuminoMenu(); return true; }
++      var picker = document.querySelector('[data-core-picker]:not([hidden])');
++      var decline = picker && picker.querySelector('.core-bind-decline');
++      if (decline) { decline.click(); return true; }
++      var tc = document.getElementById('thread-close');
++      if (isOpen(thread) && tc) { tc.click(); return true; }
++      var pc = document.getElementById('place-veil-close');
++      if (isOpen(place) && pc) { pc.click(); return true; }
++      return false;
++    }
++
++    document.addEventListener('keydown', function (e) {
++      if (e.key !== 'Escape' && e.key !== 'Esc') return;
++      if (e.defaultPrevented) return;
++      if (closeTop()) e.preventDefault();
++    });
++
++    // A tap on the glass itself (not on a word, chair or card) closes that place.
++    // Press and release must both land on the glass, and never in its first moment.
++    [place, thread].forEach(function (veil) {
++      if (!veil) return;
++      var downOnGlass = false;
++      var openedAt = 0;
++      new MutationObserver(function () {
++        if (isOpen(veil) && !openedAt) openedAt = Date.now();
++        if (!isOpen(veil)) openedAt = 0;
++      }).observe(veil, { attributes: true, attributeFilter: ['class'] });
++      veil.addEventListener('pointerdown', function (e) { downOnGlass = e.target === veil; });
++      veil.addEventListener('click', function (e) {
++        var ok = downOnGlass && e.target === veil && isOpen(veil) && openedAt && Date.now() - openedAt > 600;
++        downOnGlass = false;
++        if (!ok) return;
++        var btn = document.getElementById(veil === thread ? 'thread-close' : 'place-veil-close');
++        if (btn) btn.click();
++      });
++    });
++
++    // galaxies: a visible close inside, and a tap outside closes it (that tap does
++    // only that, so it never opens something by surprise).
++    var panels = document.querySelectorAll('details.galaxies .galaxies-panel');
++    for (var gi = 0; gi < panels.length; gi++) {
++      if (panels[gi].querySelector('[data-galaxies-close]')) continue;
++      var gx = document.createElement('button');
++      gx.type = 'button';
++      gx.className = 'galaxies-close';
++      gx.setAttribute('data-galaxies-close', '1');
++      gx.textContent = 'close';
++      gx.addEventListener('click', function (e) {
++        e.preventDefault();
++        var d = e.currentTarget.closest('details');
++        if (d) d.open = false;
++      });
++      panels[gi].appendChild(gx);
++    }
++    var swallowUntil = 0;
++    document.addEventListener('pointerdown', function (e) {
++      var gal = openGalaxies();
++      if (!gal || gal.contains(e.target)) return;
++      gal.open = false;
++      swallowUntil = Date.now() + 500;
++    }, true);
++    document.addEventListener('click', function (e) {
++      if (Date.now() > swallowUntil) return;
++      swallowUntil = 0;
++      e.preventDefault();
++      e.stopPropagation();
++    }, true);
++
++    // Back closes the open place instead of leaving the site. One quiet history
++    // step while something is open; closing it any other way gives the step back.
++    var stepped = false;
++    function anyOpen() { return isOpen(place) || isOpen(thread); }
++    function settle() {
++      setTimeout(function () {
++        if (anyOpen()) {
++          if (!stepped) {
++            try { history.pushState({ treeWayBack: 1 }, ''); stepped = true; } catch (eP) {}
++          }
++        } else if (stepped) {
++          stepped = false;
++          try { if (history.state && history.state.treeWayBack) history.back(); } catch (eB) {}
++        }
++      }, 160);
++    }
++    [place, thread].forEach(function (veil) {
++      if (veil) new MutationObserver(settle).observe(veil, { attributes: true, attributeFilter: ['class'] });
++    });
++    window.addEventListener('popstate', function () {
++      if (!stepped) return;
++      stepped = false;
++      closeTop();
++      settle();
++    });
++  }
++
+   function goToLumino(id) {
+@@ -1170,2 +1279,5 @@
+     wrap.appendChild(findBtn);
++    // v-tree-glow-2a-v0: a second tap on the legend landed on Find as it slid in
++    // under the finger and looked unasked. A tap in the first moment is not a yes.
++    var findReadyAt = Date.now() + 700;
+ 
+@@ -1218,2 +1330,4 @@
+       n.textContent = msg;
++      // v-tree-glow-2a-v0: the newest line stays in view on a phone (CSS sticky).
++      n.classList.add('is-fresh');
+     }
+@@ -1224,2 +1338,3 @@
+       n.textContent = '';
++      n.classList.add('is-fresh');
+       if (kind === 'https') {
+@@ -1432,2 +1547,3 @@
+     findBtn.addEventListener('click', function () {
++      if (Date.now() < findReadyAt) return;
+       if (!window.LocalMindProbe || typeof LocalMindProbe.look !== 'function') {
+@@ -2256,2 +2372,3 @@
+     bindMenuDismiss();
++    bindWayBack();
+     dressLivingLights();
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index 51bf270..b9572e0 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -849,3 +849,12 @@
+     if (mind) {
+-      setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
++      // v-tree-glow-2a-v0: a quiet remount (a mind was remembered) must not pull the
++      // page down to Send while she is reading Find's answer. No scroll, and never
++      // take focus from something she is using.
++      setTimeout(function () {
++        try {
++          var a = document.activeElement;
++          if (a && a !== document.body && !root.contains(a)) return;
++          input.focus({ preventScroll: true });
++        } catch (e) {}
++      }, 80);
+     }
+diff --git a/docs/modules/tree-glow-2a.test.js b/docs/modules/tree-glow-2a.test.js
+new file mode 100644
+index 0000000..55c1446
+--- /dev/null
++++ b/docs/modules/tree-glow-2a.test.js
+@@ -0,0 +1,83 @@
++#!/usr/bin/env node
++// v-tree-glow-2a-v0: Grandma heal. Guards: (a) "the garden" is a real target with a close
++// mark; (b) the newest Gathering line stays in view on a phone; (c) at 150% / 200% zoom the
++// Gathering scrolls as one page (no 0px box) and the egg fits the Nursery; (d) the home
++// legend leaves the title when zoomed; (e) "not yet" sits above the later seats; (f) a calm
++// way back: Escape, glass tap, galaxies close / outside tap, browser Back; (g) a second
++// legend tap cannot run Find unasked; (h) a remount never yanks the page to Send.
++// No network. No kitchen.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var assert = require('assert');
++
++var css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
++var js = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
++var thread = fs.readFileSync(path.join(__dirname, 'garden-thread.js'), 'utf8');
++
++var at = css.indexOf('v-tree-glow-2a-v0: Grandma heal');
++assert.ok(at > 0, 'glow 2a block is in garden-rooms.css');
++var g = css.slice(at);
++function block(re, msg) { var m = g.match(re); assert.ok(m, msg); return m[0]; }
++
++// (a) the way-back pill
++assert.ok(/#place-veil-close \{[^}]*min-height: 32px;/.test(g), 'a: the garden pill is a real target');
++assert.ok(/#place-veil-close::before \{[^}]*content: "\\00d7\\00a0";/.test(g), 'a: a quiet close mark, text unchanged');
++
++// (b) the newest line stays in view on a phone, and only on a phone
++var phone = block(/@media \(max-width: 640px\) \{[\s\S]*?\n\}/, 'b: phone block');
++assert.ok(/\.core-note\.is-fresh \{[^}]*position: sticky;[^}]*bottom: 0;/.test(phone), 'b: fresh note is sticky at the foot');
++assert.ok(/html\.garden-door-open \.gt-hint \{\s*visibility: hidden;/.test(phone), 'b: hint rests while a place is open');
++assert.ok(/:has\(#place-veil\.is-nursery\.is-open\) \.galaxy-nav/.test(phone), 'b: hop lights rest dim over the Nursery');
++var setNote = js.slice(js.indexOf('function setNoteText(msg)'), js.indexOf('function setNoteAbsent('));
++assert.ok(/classList\.add\('is-fresh'\)/.test(setNote), 'b: setNoteText marks the line fresh');
++var absentAt = js.indexOf('function setNoteAbsent(');
++assert.ok(absentAt > 0, 'b: setNoteAbsent exists');
++var absent = js.slice(absentAt, absentAt + 400);
++assert.ok(/classList\.add\('is-fresh'\)/.test(absent), 'b: setNoteAbsent marks the line fresh');
++
++// (c) zoomed / short phone: one page scroll, no inner 0px box
++var short = block(/@media \(max-width: 640px\) and \(max-height: 640px\) \{[\s\S]*?\n\}/, 'c: short phone block');
++assert.ok(/#place-veil\.is-core \{[^}]*overflow-y: auto;/.test(short), 'c: the place scrolls as one page');
++assert.ok(/#place-veil\.is-core #core-gathering \{[^}]*flex: 0 0 auto;[^}]*overflow: visible;/.test(short), 'c: chairs box keeps its height');
++assert.ok(/#place-veil\.is-core #place-veil-close \{[^}]*position: sticky;[^}]*top: 0;/.test(short), 'c: way back stays at the top');
++assert.ok(/#room-chat \{[^}]*max-height: none;[^}]*overflow: visible;/.test(short), 'c: Chat text never sits on its input');
++assert.ok(/\.thread-compose[^{]*\{\s*position: static;/.test(short), 'c: Send is in flow');
++assert.ok(/\.nursery-egg-wrap \{[^}]*width: min\(200px, 100%, 34vh\);/.test(short), 'c: the egg fits the glass');
++assert.ok(/\.nursery-egg-text,[\s\S]*?white-space: normal;/.test(short), 'c: the sentence wraps');
++
++// (d) home zoomed
++var narrow = block(/@media \(max-width: 340px\) \{[\s\S]*?\n\}/, 'd: narrow block');
++assert.ok(/#lumino-legend[^{]*\{\s*top: 8\.25rem;\s*bottom: auto;/.test(narrow), 'd: legend leaves the title');
++assert.ok(/#garden-header nav \{\s*gap: 10px;/.test(narrow), 'd: galaxies stays inside the edge');
++
++// (e) picker above later seats
++assert.ok(/\.core-bind-picker:not\(\[hidden\]\) \{\s*position: relative;\s*z-index: 8;/.test(g), 'e: picker above later seats');
++
++// (f) the calm way back
++var wb = js.slice(js.indexOf('function bindWayBack()'), js.indexOf('function goToLumino(id)'));
++assert.ok(wb.length > 400, 'f: bindWayBack exists');
++assert.ok(/e\.key !== 'Escape'/.test(wb), 'f: Escape');
++assert.ok(/details\.galaxies\[open\]/.test(wb) && /\.core-bind-decline/.test(wb) && /thread-close/.test(wb) && /place-veil-close/.test(wb), 'f: one layer at a time, through the same close buttons');
++assert.ok(/e\.target === veil/.test(wb) && /Date\.now\(\) - openedAt > 600/.test(wb), 'f: glass tap only on the glass, never in the first moment');
++assert.ok(/data-galaxies-close/.test(wb) && /textContent = 'close'/.test(wb), 'f: a visible close in galaxies');
++assert.ok(/addEventListener\('pointerdown'[\s\S]*?gal\.open = false/.test(wb), 'f: outside tap closes galaxies');
++assert.ok(/history\.pushState\(\{ treeWayBack: 1 \}/.test(wb) && /addEventListener\('popstate'/.test(wb), 'f: Back closes instead of leaving');
++assert.ok(/bindMenuDismiss\(\);\s*bindWayBack\(\);/.test(js), 'f: bound at boot');
++
++// (g) ghost taps
++assert.ok(/var findReadyAt = Date\.now\(\) \+ 700;/.test(js), 'g: Find waits a moment after it appears');
++assert.ok(/addEventListener\('click', function \(\) \{\s*if \(Date\.now\(\) < findReadyAt\) return;/.test(js), 'g: an early tap is not a yes');
++
++// (h) no yank to Send
++assert.ok(/input\.focus\(\{ preventScroll: true \}\)/.test(thread), 'h: focus without scrolling');
++assert.ok(!/setTimeout\(function \(\) \{ try \{ input\.focus\(\); \} catch \(e\) \{\} \}, 80\);/.test(thread), 'h: old yank is gone');
++
++// locks
++var added = g + wb;
++assert.ok(!/confirm\(/.test(wb), 'no confirm()');
++assert.ok(!/innerHTML/.test(wb), 'no innerHTML in the way back');
++assert.ok(!/\u2014/.test(added), 'no em dash in added lines');
++
++console.log('SMOKE_OK tree glow 2a v0.1');
+=====END ALPHA DIFF=====
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 01b5171..3a0681f 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -483,2 +483,12 @@ Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any
+ 
++### 2026-10-01 · Grok · family builder · Tree glow 2a v0.1 (Grandma heal: zoom, feedback, a calm way back)
++
++Soft LAYER marker `v-tree-glow-2a-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. From Hypha's persona walks: at 200% zoom the Gathering no longer collapses to 0px (one page scroll, chairs and Find reachable), the newest Find and seat line stays in view on a phone, a legend double tap no longer runs Find unasked, and there is a calm way back: Escape closes one layer at a time, a tap on the empty glass closes a place, the galaxies menu has a close, and browser Back stays on the site. One old line changed and is named: the Chat input focus now uses preventScroll.
++
++Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
++
++**TEMPERATURE:** gentle and patient, a door that now closes softly behind you.
++
++---
++
+ ## Out of scope for this brick
+=====END FL DIFF=====
+
+End of file.

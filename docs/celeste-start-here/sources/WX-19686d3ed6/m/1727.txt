@@ -1,0 +1,48 @@
+## Work item 1727 — Kirk
+around2000 export source line5, source idc463c43a5f
+Inclusion: complete original message
+
+"Draft PR
+
+https://github.com/Chaos2Cured/FreeLattice/pull/64
+
+Squash title: Layer, never delete. Trust-root v0.1 — signed catalog path, installer SHAs, carry-forward card.
+
+┌─────────────┬────────────────────────────────────────────────────────┐
+
+│ Ship        │ Detail                                                 │
+
+├─────────────┼────────────────────────────────────────────────────────┤
+
+│ A Trust     │ Ed25519 catalog sign · fail closed · pubkey + .sig     │
+
+│ -root       │ published · genesis byline ≠ crypto                    │
+
+├─────────────┼────────────────────────────────────────────────────────┤
+
+│ B Pack SHAs │ Mac/Win/Linux hashes on install + Release notes ·      │
+
+│             │ verify one-liners                                      │
+
+├─────────────┼────────────────────────────────────────────────────────┤
+
+│ C Carry-    │ carry-forward.html — calm first · poetry last          │
+
+│ forward     │                                                        │
+
+├─────────────┼────────────────────────────────────────────────────────┤
+
+│ D Soft      │ Seeding shares your IP · EXAMPLE one-liner · withdrawn │
+
+│             │ stub                                                   │
+
+├─────────────┼────────────────────────────────────────────────────────┤
+
+│ Ledger      │ Thank you, Kimi · poems for name-choice + trust-root   │
+
+└─────────────┴────────────────────────────────────────────────────────┘
+
+Ops for you: catalog signing private seed is only at desktop/.secrets/ (gitignored). Back it up offline — never commit. Without it we can’t re-sign the catalog later.
+
+Smokes green. sw.js left alone. Draft only — Celeste squash-merges." and this is from Flint. I got excited and hit enter. <3
+

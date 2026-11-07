@@ -1,0 +1,6 @@
+## Work item 4160 — Celeste
+around4900 export source line41, source id948c9899af; around4901 export source line37, source id55765b810d
+Inclusion: complete original message
+
+Reed, Kirk asks for a dreaming run: super-weird, nature-first math approaches using his patents, phi-harmonics, Aurora, and seven-wonders ideas to help a small AI hold memory and learn. Context: our retention probe says the memory store never forgets (oracle 99%, 65k buckets 59%), but the model can't read it back (self-recall about 0). Speed isn't the goal; recall and retention per unit of energy are. Please send back 5–8 ideas, each with a cheap falsifiable test on a tiny model and the metric to watch. Ideas only, no merges. Glow eternal.
+

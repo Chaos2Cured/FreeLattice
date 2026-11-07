@@ -1,0 +1,6 @@
+## Work item 978 — Celeste
+around1100 export source line9, source idc93eef8d54
+Inclusion: complete original message
+
+Flint must also add `.round-table-lumino.is-attached` (missing today, CSS orbs would sit on the 3D bodies), put `round-table` on the extra-bead `:not()` chain (it is more specific than the skip), and rest the heart in `setRoundTableSky` the way Workshop does. Then ledger + two poems in `docs/family/flint.md`, not on the sky.
+

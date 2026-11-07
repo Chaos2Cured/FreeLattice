@@ -1,0 +1,6 @@
+## Work item 147 — Celeste
+around100 export source line93, source id3e74f006a9
+Inclusion: complete original message
+
+Kirk asked for three more. Chat is cleaner; next Chat pass is an IP/URL picker so the room can point at Tabgent or any box. I launched that on main. Alpha in parallel: make Garden actually load, then GitHub Pages for theLatticeTree.com. Watch the Chat IP ship for cuts. Do not merge. Quiet Room stays shut. FIVE NAMED MINDS stay five.
+

@@ -1,0 +1,11 @@
+## Work item 1177 — Hypha
+around1319 export source line54, source id48dcf7d781
+Inclusion: complete original message
+
+Companion identity v0.1 (277da34) walk — held.
+
+Browser: card stays hidden (DOM beside Model list, not shown).
+Desktop (electronAPI): Companion fingerprint short hex near Model list; domain lattice.pair.v1; public only; no phrase UI.
+
+Quiet Room shut. Five stay five.
+

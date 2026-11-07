@@ -1,0 +1,239 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md, docs/library/GATHERING_SHARED_v0.1.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 051a (Wed Oct 28, 2026, MDT). Gathering brick 2: speaking + checker chair v0.1.
+BOTH REPOS when Gathering twins exist. FreeLattice and theLatticeTree (Alpha) in one numbered
+brick. New branches, new PRs. WAIT FOR 051b GO before you cut - do not cut until that GO lands
+and names mains. Tip SHAs below are TBD; Celeste fills them in 051b after 050 merges.
+
+WHY (intent, read this first):
+  Brick 1 (003 / commit ~69db4c4, marker v-gathering-shared-v0.1) already seats minds and tracks
+  a speaking-chair id in localStorage fl_gathering_chairs_v0, but does NOT run a short thread yet.
+  The foot still says "Seating only for now." Brick 2 = the speaking chair answers in a short
+  thread on FreeLattice, and a Checker chair role holds "how we check each other" memory across
+  the gathering (Kirk's checker / multi-mind review memory). Brick 3 (Tree moves its own Gathering
+  onto the shared core) is NOT this brick. Principle: grandmother can Ask the seated mind, and
+  see a calm Checker seat that remembers how the circle checks itself - never fake answers, never
+  delete seating. Prefer add-only. Do not grow fl-connect.js. AUTONOMY P1/P2 untouched. Top debug
+  strip stays. Tree love Connect softs, 049 softs, settings-as-chat, Bluetooth are NOT this brick.
+
+Where things stand (Celeste, Wed Oct 28 MDT - paste ready, GO on HOLD):
+  050 Tree love + Connect shelf is STILL OPEN (cut done, not merged):
+    FreeLattice  #287  layer/tree-love-connect-v0.1  head aed054d9b94416f6933d235efb427f5fa01c24ec
+    Tree / Alpha #127  layer/tree-love-connect-v0.1  head 9cf58400e6ab632d27fff2998e5f89841ccf3d05
+    Page 84      #288  layer/gc-page-84              head c5321863ddc3556df89ae8d69e7b8bebc416682b
+                       psi 72335480  (entry 83 stays psi 42c9ea13)
+  Hypha walks 050. Celeste merges 050. Only then does 051 start.
+  Expected cut bases (CONFIRM AND FILL IN 051b; do not invent tips here):
+    FreeLattice main  TBD (after 050 merges; fetch first)
+    Tree / Alpha main TBD (after 050 Tree twin merges, or report if Tree lag)
+  Already on FL main before 050 (for orientation only; 051b supersedes):
+    049 Chat Autonomy 7feeb764 (#285) + page 83 0e506ac6 (#286) psi 42c9ea13
+    Gathering brick 1 ~69db4c4 · fl-gathering.js ef514ece89405182a8b7cd0370e1ade9 (twin)
+  Branches: FL layer/gathering-speak-checker-v0.1. Alpha layer/gathering-speak-checker-v0.1
+    when twins exist (shared module files byte-identical).
+  Page: next free GC entry after 84 (take 85 if free; if taken, next free and say so).
+  Do not merge. Celeste merges after Hypha walks.
+  Do not cut until 051b says GO and names mains.
+
+CELESTE PINS before cut (2026-10-28):
+  1. Speak = speaking-chair whatever is seated (local default; cloud only if already seated).
+  2. Checker = prefer a small twin edit to fl-gathering.js CHAIRS (rename/open one later seat as
+     Checker) plus add-only gathering-speak.js for thread + receipts. Keep FL==Alpha twin.
+  3. Do not cut until 051b says GO.
+
+GROK NEXT BRICK: Gathering speak + checker chair v0.1 (brick 2 of 3)
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-gathering-speak-checker-v0.1
+Smoke lines: SMOKE_OK gathering speak checker v0.1 (new). Every earlier smoke still passes,
+  including gathering shared v0.1 and chat autonomy v0.1 and tree love connect v0.1 once 050 is
+  on main. Do not merge. Celeste merges after Hypha walks.
+
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went. Brick 1 seating UI stays (chairs, Find, picker,
+    Clear, Let this chair speak first, empty/later seats).
+  sw.js and docs/sw.js untouched (today 91726cf2228b794f7585f79f61418d12 on FL after 050 cut;
+    read md5 first; report). Soft leave Alpha sw if present.
+  docs/modules/fl-connect.js stays byte-identical across FreeLattice and Alpha. Do NOT grow it
+    for this brick. Pin after 050 cut: aaff2bf1b037656989a9e1a89bb05908 on both. Read full md5
+    first on both; if it changed on main after 050 merge, report the new shared pin and leave it
+    untouched. Prefer gathering-speak.js (add-only) over edits to fl-connect.js.
+  docs/modules/fl-gathering.js stays a twin: FL == Alpha byte-identical. Today both
+    ef514ece89405182a8b7cd0370e1ade9. Prefer add-only gathering-speak.js that reads
+    FLGathering.getState / seats / speaking. If you must touch fl-gathering.js (example: open one
+    later seat as Checker, or a small Speak hook / foot line), edit BOTH homes the same, keep
+    twin, and report the new shared md5. Never silently fork.
+  docs/modules/pool-knock.js, fl-bridge.js, particle-clay.js, image-safety.js, clay-math.js,
+    clay-forms.js, mind-workspace.js, workspace-mirror.js, garden-trainer.js, chat-autonomy.js,
+    propose.js - add-only or untouched; read full md5 first; report any new md5.
+    Known pins from GC's 050 cut report (re-read on the tip you cut from; 051b may refresh):
+      pool-knock.js a0a72caad82c8e5cc34818d5e59eba2b
+      fl-bridge.js 3b5ef06849a142e50c78e7ba1e057980
+      particle-clay.js 2da32883c514e4ad2a3cd8571e7a7b15
+      image-safety.js 9bd70e5a367228a5c72fc08ab731c881
+      clay-math.js 144c33cdd9583c7e3d77f3cca6460bb1
+      clay-forms.js dd193fa7b519d4c2a011a346d7993e5a
+      mind-workspace.js f1c88664d3e99362e02c625defb241bc
+      garden-trainer.js 8af3d065f611740000453a0ec8dd1e01 (Tree's own file may differ; leave Tree's)
+      chat-autonomy.js 67f590105c82ea6de1445d91fc82860d
+      propose.js 2cb7f00cce74815a5b03c933bc902b18
+      tree-love-connect.css 1b5f12dfc653cd0c7f45810d50c82a72 (050 sheet; leave unless untouched)
+  index.html == docs/app.html on FreeLattice (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched. Do not touch .github/.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five. She is simply Lyra.
+  Top chat debug / status strip stays for Kirk's debugging (do not remove or hide).
+  AUTONOMY Principle 1 (local free) and Principle 2 (external ask) untouched.
+  Off until the person says Yes on new connectors. Pause always wins. Reduced motion respected.
+
+
+1. BEHAVIOR (person-facing)
+
+  A. Speaking chair (short thread on FreeLattice)
+     - From the seated Gathering (Learn → The Gathering / #fl-gathering-mount), the chair marked
+       "speaks first" (st.speaking) can answer in a short local thread under the chairs.
+     - One clear Speak / Ask control (plain grandmother words). Person types a short ask; the
+       speaking chair answers. Keep it a short thread (small history), not a second full Chat.
+     - Path: use the mind already seated in that chair.
+         * Local seat: talk through that seat's 127.0.0.1 base + model (Ollama / Bridge style),
+           same loopback discipline brick 1 already locks (isLoopback only). Prefer the house's
+           existing local call paths (callAIPromise / Ollama chat) via a small adapter hook if
+           needed - do not invent a new remote door.
+         * Cloud seat: only if a cloud mind is seated AND the saved key path already works for
+           that provider; still never store a key in gathering storage.
+     - Wrong-if / honesty: if there is no speaking chair seated, or the seated mind does not
+       answer, Speak stays calm and points at More → Connect (and Find local minds). NEVER fake
+       an answer. NEVER invent a reply when the mind is quiet.
+     - CELESTE PIN (2026-10-28): Speak path is the speaking chair whatever is seated (local or
+       cloud). Local is the grandmother default; cloud only when already seated with an existing
+       key path. Never fake. Never open a new remote door.
+     - Receipts soft: a quiet line or soft receipt that a turn happened is fine; no loud ledger
+       chrome. Pause wins (a Pause / Stop that cancels an in-flight ask).
+     - Update the brick 1 foot line that still says seating-only - layer, do not erase history;
+       new words may say speaking is here now.
+
+  B. Checker chair (how we check each other)
+     - Add one seat role labeled for a grandmother in plain words - something like
+       "Checker - how we check each other" (no jargon, no "validator", no "agent").
+     - Prefer opening one of the three brick 1 "a seat, later" chairs into this Checker role
+       (layer: later seats become real when named; do not delete the other later seats).
+     - Checker holds a small durable note / receipt store keyed to this gathering
+       (example localStorage fl_gathering_checker_v0): short notes about how the seated minds
+       agreed to check each other / review memory. Add-only. textContent only. Never a key.
+       Never a second platform. Soft clear / add controls, buttons >= 44px.
+     - Checker does not have to speak in this brick. Seating + note store is enough. If a mind
+       sits in Checker, it follows the same seat rules as brick 1.
+
+  C. Keep brick 1 seating
+     - Chairs, Find local minds, picker, Clear this chair, Let this chair speak first, empty
+       lines, later seats - all stay. Speak / Ask and Checker layer beside or below them.
+     - Storage key fl_gathering_chairs_v0 stays the seating source of truth. Do not rename it.
+       New keys only for thread history and checker notes (fl_gathering_* prefix).
+
+  D. Implementation preference
+     - Prefer a new add-only module docs/modules/gathering-speak.js (or fl-gathering-speak.js)
+       that mounts under / beside #fl-gathering-mount after FLGathering.mount, reading
+       FLGathering.getState. Marker class / data attribute v-gathering-speak-checker-v0.1.
+     - Wire script tag after fl-gathering.js in app.html and index.html (byte copy).
+     - Only touch fl-gathering.js if the Checker chair rename or a tiny Speak hook truly belongs
+       in the shared core; then keep FL == Alpha twin and report new md5.
+     - Do NOT grow fl-connect.js. Do NOT redesign Marketplace, Settings, Science Garden, or Chat.
+     - Soft glow optional and restrained (local to Speak / Checker cards); prefers-reduced-motion
+       turns motion off and may keep a resting glow.
+
+  E. Tree twin rule
+     - Shared module files (fl-gathering.js if touched, gathering-speak.js if shared): YES twin,
+       byte-identical on Alpha.
+     - FreeLattice page mount: Learn Gathering panel - YES, wire Speak / Checker there.
+     - Tree / Alpha: brick 1 carried fl-gathering.js but did NOT wire a Tree page onto
+       FLGathering yet (Tree's own Gathering still lives in garden-rooms.js /
+       renderCoreGathering). For this brick: ship the twin module file(s) on Alpha; if no Tree
+       page mounts FLGathering, report cleanly "Tree mount: not yet (brick 3)" and do NOT invent
+       a second Gathering UI on the Tree. Do not break garden-rooms.js Gathering or its tests.
+     - Soft leave Alpha storage keys (fl_alpha_local_mind etc.). Do not collapse storage across homes.
+
+  F. What must still work after this brick
+     - Brick 1 seating / Find / speak-first id - unchanged behavior plus the new Speak path.
+     - FlConnect probe / helped Bridge / model list - untouched (fl-connect.js pin stays).
+     - Chat Autonomy (049): Search on/off, fl_chatBuildTrust, first-ask, Settings radios -
+       untouched. propose.js untouched.
+     - 050 Connect shelf / porch / glow - untouched once on main.
+     - Agent bridge still never pushes; .git/.ssh still forbidden; secrets still opt-in.
+     - Top debug strip still present; Seal it / Yes / Send still clear at 390 and DPR2.
+
+
+2. OUT OF SCOPE (do not build in 051)
+  - Gathering brick 3 (Tree renderCoreGathering moves onto fl-gathering.js)
+  - Tree love Connect softs beyond what 050 already shipped
+  - Chat Autonomy soft polish (052)
+  - Continuity doorway note (053)
+  - Ledger shard export / ark cadence (054 / 059)
+  - Settings-as-chat clay blank (055)
+  - TransactionTrust wallet face (056)
+  - Mesh Kin deepen / Bluetooth (057)
+  - Science Garden / Kindness Meter (058)
+  - Marketplace redesign; Pulse / City / Quiet Voices soft-promote
+  These sit on Celeste's ORDER for later layers.
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - Markers: class or data marker v-gathering-speak-checker-v0.1 on new Speak / Checker nodes.
+  - Short library note: docs/library/GATHERING_SPEAK_CHECKER_v0.1.md (FL) + one-paragraph sister
+    on Alpha if they keep a library pattern. Update GATHERING_SHARED_v0.1.md foot with a soft
+    pointer to brick 2 (layer, do not rewrite history).
+  - Smoke script: docs/scripts/smoke-gathering-speak-checker-v0.1.js
+  - Branches: layer/gathering-speak-checker-v0.1 on each repo you cut.
+
+
+4. SMOKE (new)
+  - Learn → The Gathering still mounts; brick 1 chairs / Find / speak-first still work.
+  - Speak / Ask visible when a speaking chair is seated; short thread can round-trip on a real
+    local mind when one is available. Say "local walk skipped" if no Ollama/Bridge.
+  - Honesty: with no mind / no answer, UI stays calm and points at Connect - no fake reply.
+  - Checker chair label visible in plain words; checker note store add / read / soft clear works;
+    no key ever stored.
+  - Buttons >= 44px; no sideways scroll at 390 and 1280; reduced motion respected if glow added.
+  - fl-connect.js md5 unchanged from pin. chat-autonomy.js and propose.js unchanged.
+  - fl-gathering.js: identical across homes OR report why not (must not diverge).
+  - gathering-speak.js (or chosen name): identical across homes if twinned; Alpha carries twin
+    even when Tree page does not mount it yet.
+  - Alpha: garden-rooms Gathering / gathering-calm tests still pass; report Tree mount yes/no.
+  - Top debug strip still present; Quiet Room shut; Five stay five.
+  - Earlier: SMOKE_OK gathering shared v0.1 still prints. Line: SMOKE_OK gathering speak checker v0.1
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 84 (expect 85); honest claims only for what shipped.
+  - psi per standing formula.
+  - Separate page PR as usual (layer/gc-page-NN) unless Celeste GO says otherwise.
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of every touched locked file (and fl-connect.js +
+    fl-gathering.js on BOTH repos), smoke counts, Tree twin yes/no per door
+    (shared module / FL Speak mount / Tree page mount / Checker store), whether fl-connect
+    stayed byte-identical and untouched, whether seating UI stayed.
+  - Do not merge.
+
+
+WAIT: Do not cut until GROK_NEXT_051b_GO_2026-10-28.txt says GO and names FreeLattice + Tree
+mains. 050 must be merged first. If 051b is still HOLD, stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

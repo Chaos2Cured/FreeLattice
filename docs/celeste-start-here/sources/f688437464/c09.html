@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c09</title>
+<meta name="description" content="Reading section c09 of f688437464, 1573 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f688437464/c09.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c09">
+<meta property="og:description" content="Reading section c09 of f688437464, 1573 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f688437464/c09.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt · c09</h1>
+<p>f688437464 · words 1573 · characters 77502–88202</p>
+<p><a href="c08.html">Previous section</a> · <a href="c10.html">Next section</a></p>
+<p><a href="c09.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: not separately matched. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">
++    }
++    if (out.sealed) return out;
++    if (mode !== &#x27;ready&#x27; || !cur) return value;   // honest passthrough: stays plaintext
++    var body = {}, any = false;
++    f.forEach(function (k) { if (out[k] !== undefined) { body[k] = out[k]; any = true; } });
++    if (!any) return value;
++    var iv = crypto.getRandomValues(new Uint8Array(12));
++    var ct = await crypto.subtle.encrypt({ name: &#x27;AES-GCM&#x27;, iv: iv, additionalData: aad(kind, out) }, cur.aes, enc(JSON.stringify(body)));
++    f.forEach(function (k) { delete out[k]; });
++    out.sealed = { v: V, kid: cur.kid, iv: b64(iv), ct: b64(new Uint8Array(ct)) };
++    return out;
++  }
++
++  function lockedView(kind, out, s) {
++    out._flLocked = s;
++    if (kind === &#x27;FreeLatticeDB/messages&#x27;) out.content = LOCKED_TEXT;
++    else if (kind === &#x27;FreeLatticeDB/conversations&#x27;) { out.name = &#x27;Locked conversation&#x27;; out.title = out.name; out.lastMessage = &#x27;&#x27;; out.contextNote = &#x27;&#x27;; }
++    else { out.title = &#x27;Locked conversation&#x27;; out.messages = []; out.tags = []; out.summary = &#x27;&#x27;; out.keywords = []; }
++    return out;
++  }
++
++  async function openFor(kind, rec) {
++    var f = FIELDS[kind];
++    if (!f || !rec || typeof rec !== &#x27;object&#x27; || !rec.sealed) return rec;
++    await init();
++    var s = rec.sealed;
++    var out = Object.assign({}, rec);
++    delete out.sealed;
++    var key = keys[s.kid];
++    if (key) {
++      try {
++        var pt = await crypto.subtle.decrypt({ name: &#x27;AES-GCM&#x27;, iv: unb64(s.iv), additionalData: aad(kind, out) }, key, unb64(s.ct));
++        var body = JSON.parse(dec(pt));
++        f.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(body, k)) out[k] = body[k]; });
++        return out;
++      } catch (e) {}
++    }
++    return lockedView(kind, out, s);
++  }
++
++  function openAll(kind, rs) {
++    if (!Array.isArray(rs) || !FIELDS[kind] || !hasSealed(rs)) return Promise.resolve(rs);
++    return Promise.all(rs.map(function (r) { return openFor(kind, r); }));
++  }
++  function openAny(dbName, storeName, rs) { return openAll(dbName + &#x27;/&#x27; + storeName, rs); }
++  function hasSealed(rs) { return Array.isArray(rs) &amp;&amp; rs.some(function (r) { return r &amp;&amp; typeof r === &#x27;object&#x27; &amp;&amp; r.sealed; }); }
++  // For the Memory Vault backup: open sealed chat stores so the backup file
++  // restores on any device (it was readable before this brick, and stays so).
++  async function openDump(dbData) {
++    if (!dbData || !dbData.stores) return dbData;
++    var names = Object.keys(dbData.stores);
++    for (var i = 0; i &lt; names.length; i++) {
++      dbData.stores[names[i]] = await openAny(dbData.name, names[i], dbData.stores[names[i]]);
++    }
++    return dbData;
++  }
++
++  function registerStore(kind, getDb, storeName) {
++    if (!FIELDS[kind]) return;
++    stores = stores.filter(function (s) { return s.kind !== kind; });
++    stores.push({ kind: kind, getDb: getDb, storeName: storeName });
++  }
++
++  function idbAdapter(db, storeName) {
++    return {
++      getAll: function () {
++        return new Promise(function (resolve, reject) {
++          var r = db.transaction(storeName, &#x27;readonly&#x27;).objectStore(storeName).getAll();
++          r.onsuccess = function () { resolve(r.result || []); };
++          r.onerror = function () { reject(r.error); };
++        });
++      },
++      // Compare-and-swap: replace only if the record is still exactly the
++      // plaintext we sealed. If the app changed it meanwhile, skip; the next
++      // pass picks it up. Either way the record is never lost.
++      cas: function (snap, next) {
++        return new Promise(function (resolve) {
++          var wrote = false;
++          try {
++            var tx = db.transaction(storeName, &#x27;readwrite&#x27;);
++            var os = tx.objectStore(storeName);
++            var g = os.get(snap[os.keyPath]);
++            g.onsuccess = function () {
++              if (g.result &amp;&amp; JSON.stringify(g.result) === JSON.stringify(snap)) { os.put(next); wrote = true; }
++            };
++            tx.oncomplete = function () { resolve(wrote); };
++            tx.onerror = function () { resolve(false); };
++            tx.onabort = function () { resolve(false); };
++          } catch (e) { resolve(false); }
++        });
++      }
++    };
++  }
++
++  function sameFields(kind, a, b) {
++    return FIELDS[kind].every(function (k) { return JSON.stringify(a[k]) === JSON.stringify(b[k]); });
++  }
++
++  async function migrate(kind, adapter) {
++    var res = { sealed: 0, skipped: 0, already: 0 };
++    await init();
++    if (mode !== &#x27;ready&#x27;) return res;
++    var recs = await adapter.getAll();
++    for (var i = 0; i &lt; recs.length; i++) {
++      var r = recs[i];
++      if (!r || typeof r !== &#x27;object&#x27;) continue;
++      if (r.sealed) { res.already++; continue; }
++      var next = await sealFor(kind, r);
++      if (!next || !next.sealed) continue;
++      if (!r._flLocked) {
++        var back = await openFor(kind, next);   // verify before replace
++        if (back._flLocked || !sameFields(kind, r, back)) { res.skipped++; info.lastError = &#x27;a record did not verify and was left as it was&#x27;; continue; }
++      }
++      if (await adapter.cas(r, next)) res.sealed++; else res.skipped++;
++      if (res.sealed % 50 === 49) await new Promise(function (ok) { setTimeout(ok, 0); });
++    }
++    return res;
++  }
++
++  async function sealExisting() {
++    var total = { sealed: 0, skipped: 0, already: 0, pending: 0 };
++    for (var i = 0; i &lt; stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) { total.pending++; continue; }
++      try {
++        var r = await migrate(s.kind, idbAdapter(db, s.storeName));
++        total.sealed += r.sealed; total.skipped += r.skipped; total.already += r.already;
++      } catch (e) { info.lastError = (e &amp;&amp; e.message) ? e.message : String(e); }
++    }
++    info.lastRun = new Date().toISOString();
++    return total;
++  }
++
++  async function count() {
++    var c = { sealed: 0, plain: 0, locked: 0 };
++    for (var i = 0; i &lt; stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) continue;
++      try {
++        var recs = await idbAdapter(db, s.storeName).getAll();
++        recs.forEach(function (r) {
++          if (!r || typeof r !== &#x27;object&#x27;) return;
++          if (r.sealed) { if (keys[r.sealed.kid]) c.sealed++; else c.locked++; }
++          else if (FIELDS[s.kind].some(function (k) { return r[k] !== undefined &amp;&amp; r[k] !== &#x27;&#x27;; })) c.plain++;
++        });
++      } catch (e) {}
++    }
++    info.sealedNow = c.sealed; info.plainNow = c.plain; info.lockedNow = c.locked;
++    return c;
++  }
++
++  async function renderStatus() {
++    var el = (typeof document !== &#x27;undefined&#x27;) ? document.getElementById(&#x27;flChatSealStatus&#x27;) : null;
++    await init();
++    var c = await count();
++    var text;
++    if (mode === &#x27;ready&#x27;) {
++      text = &#x27;Chats sealed on this device with AES-GCM: &#x27; + c.sealed + &#x27; records sealed, &#x27; + c.plain + &#x27; still plain (they seal on the next pass)&#x27; +
++        (c.locked ? &#x27;, &#x27; + c.locked + &#x27; locked (their key is not in this browser; kept, not deleted)&#x27; : &#x27;&#x27;) +
++        &#x27;. Key ID &#x27; + cur.kid + &#x27;. The key lives in this same browser, so this stops casual reading of the storage files, not someone using this browser or a compromised device. Saved backups carry your chats as readable files, so keep them somewhere safe. A backup never carries the unlock key for chats or API keys.&#x27;;
++    } else if (mode === &#x27;unavailable&#x27;) {
++      text = &#x27;Chats are not sealed in this browser: &#x27; + (info.lastError || &#x27;WebCrypto is unavailable&#x27;) + &#x27;. They stay readable on this device, exactly as before.&#x27;;
++    } else {
++      text = &#x27;Checking the chat seal...&#x27;;
++    }
++    if (el) el.textContent = text;
++    return text;
++  }
++
++  function start() {
++    init().then(function () {
++      setTimeout(function () { sealExisting().then(renderStatus); }, 3000);
++      setTimeout(function () { sealExisting().then(renderStatus); }, 20000);
++    });
++  }
++
++  return {
++    init: init, start: start, sealFor: sealFor, openFor: openFor, openAll: openAll, openAny: openAny,
++    openDump: openDump, hasSealed: hasSealed, registerStore: registerStore, sealExisting: sealExisting,
++    migrate: migrate, count: count, renderStatus: renderStatus,
++    status: function () { return { mode: mode, kid: cur ? cur.kid : null, lastError: info.lastError, lastRun: info.lastRun }; },
++    LOCKED_TEXT: LOCKED_TEXT,
++    _setKeyStoreForTest: function (ks) { keyStore = ks; readyP = null; mode = &#x27;starting&#x27;; cur = null; keys = {}; }
++  };
++})();
++// v-encrypt-chats-locally-v0.1 END: FLChatVault
++
+ // ============================================
+ // Input Sanitization
+ // ============================================
+@@ -25781,6 +26139,18 @@ function dbCount(storeName) {
+   });
+ }
+ 
++// v-encrypt-chats-locally-v0.1: the plain IndexedDB helpers above stay as written.
++// These wrappers seal chat text on the way in and open it on the way out, so every
++// reader (switchToConversation, export, memory summary, GitHub sync) keeps working.
++var _flDbGetRaw = dbGet, _flDbPutRaw = dbPut, _flDbGetAllRaw = dbGetAll, _flDbGetAllByIndexRaw = dbGetAllByIndex;
++dbGet = function (s, k) { return _flDbGetRaw(s, k).then(function (r) { return FLChatVault.openFor(&#x27;FreeLatticeDB/&#x27; + s, r); }); };
++dbPut = function (s, v) { return FLChatVault.sealFor(&#x27;FreeLatticeDB/&#x27; + s, v).then(function (x) { return _flDbPutRaw(s, x); }); };
++dbGetAll = function (s) { return _flDbGetAllRaw(s).then(function (rs) { return FLChatVault.openAll(&#x27;FreeLatticeDB/&#x27; + s, rs); }); };
++dbGetAllByIndex = function (s, i, v) { return _flDbGetAllByIndexRaw(s, i, v).then(function (rs) { return FLChatVault.openAll(&#x27;FreeLatticeDB/&#x27; + s, rs); }); };
++FLChatVault.registerStore(&#x27;FreeLatticeDB/conversations&#x27;, function () { return state.db; }, STORE_CONVERSATIONS);
++FLChatVault.registerStore(&#x27;FreeLatticeDB/messages&#x27;, function () { return state.db; }, STORE_MESSAGES);
++FLChatVault.start();
++
+ function generateId() {
+   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+ }
+@@ -32864,6 +33234,8 @@ const SoulFile = (function() {
+ 
+       status(&#x27;Reading conversations\u2026 \u2726&#x27;);
+       var chatData = await readDB(&#x27;FreeLatticeDB&#x27;, [&#x27;conversations&#x27;, &#x27;meta&#x27;]);
++      // v-encrypt-chats-locally-v0.1: the soul file carries readable summaries, so open sealed names first.
++      if (typeof FLChatVault !== &#x27;undefined&#x27; &amp;&amp; chatData &amp;&amp; chatData.conversations) chatData.conversations = await FLChatVault.openAny(&#x27;FreeLatticeDB&#x27;, &#x27;conversations&#x27;, chatData.conversations);
+ 
+       // LP from localStorage
+       var lpRaw = null;
+@@ -33118,11 +33490,21 @@ const FlBackup = (function() {
+     });
+   }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

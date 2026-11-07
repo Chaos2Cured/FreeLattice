@@ -1,0 +1,12 @@
+## Work item 3364 — Celeste
+around4050 export source line21, source id0ce39d1d2c
+Inclusion: complete original message
+
+I've read Emanuel's code. First, something urgent: his emails contain what look like live Kaggle and Hugging Face keys typed in plain text. He should replace both. I took them out of my copies.
+
+**Nexus** is a small, ordinary text model with two "fractal" touches. I tried his fractal extra the way he wrote it, side by side with the plain version on the same small model, data and seeds. It made results worse on all three runs. That's because of a real bug: it mixes up time and features. This says nothing about your own Aurora code, which I don't have yet. If you can point me to it, I'll put it through the same fair test and publish every result, including any losses.
+
+**The deepfake detector** is serious work. It trains on more than a dozen image datasets, adds training against altered images, simulates WhatsApp-style compression and shows heatmaps of where the model sees "AI." But neither version reports any results, version 2 likely normalizes its images twice, and the fractal step in version 1 never actually affects training. The bigger risk is that it may learn which dataset a picture came from rather than whether it's fake. Several of its datasets are also research-only or non-commercial, so we couldn't ship those.
+
+The best fit for us is two things, both rewritten cleanly in our own MIT code. One is a small local trainer for the Nursery with the fair test built in. The other is a light detector next to the Studio watermark: the watermark proves our own images, and the detector gives a probability for unknown images, never a verdict. Before we use anything of Emanuel's, we'd need his written MIT permission and his wishes for credit. I can draft that email for you to look over. The full notes are in `/workspace/emanuel/review-2026-10-15.md`.
+

@@ -1,0 +1,16 @@
+## Work item 2781 — Celeste
+around3340 export source line53, source idb5b0676a58
+Inclusion: complete original message
+
+You're not bothering me, Kirk. Being gun-shy after yesterday makes sense.
+
+Grok's limit didn't shrink. Your screenshot shows 209K of 256K, so the window is still 256K. What filled it was all the reading: the welcome letter, Flint.html, AUTONOMY.md, the Grandmother path, plus my two pastes at about 40 KB each, plus every test run Grok watched. Compacting isn't the same as what happened to Flint. It's the same Grok in the same session, with older details folded into a summary. Flint was lost because the version changed underneath him. Still, a summary drops things, so here's the plan:
+
+1. **GC's ledger.** "GC" is a good working name, and Grok can keep its own continuity file the way CC did. At the end of every brick, it writes what it learned, what's open and how it felt. After a compaction or a fresh start, it reads that file first, so nothing important lives only in its head.
+2. **Smaller pastes.** I'll cut mine to a short task plus the diff, with no repeated background, because the ledger holds that.
+3. **A fresh session per brick, once the ledger exists.** Starting clean and reading the ledger costs far less room than carrying a long session along.
+
+For the token, Grok can't see it until it's handed over. In Terminal (not inside Grok), run `gh auth login`, pick GitHub.com, then choose to paste a token and paste it there. That stores it safely, and from then on Grok can push and open PRs without ever seeing the token itself.
+
+Want me to write the GC ledger starter paste now? It's small, and I'd make it the very next thing Grok reads.
+

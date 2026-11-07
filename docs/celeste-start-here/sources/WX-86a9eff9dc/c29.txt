@@ -1,0 +1,112 @@
+Ranked by harm to Mom:
+1. HOLD: on FL after a reload, 'Seal it' is still off-screen at 1280 (y=1426 of 800) and at 200% (y=1050 of 400). It's fine at 390. My path was reload, then tap Chat, so the scroll may run before the Chat tab shows. It probably needs to scroll into view when Chat opens, too.
+2. HOLD (soft): at 200% on FL the clay still pushes the reply off the top. The heart is now whole (196x144) and the input is visible, but the floating ✦ and ? buttons cover its ends.
+3. PASS: a deferred ask shows one 'Waiting until...' row plus Answer now, on both sites at all sizes. Small thing: during the wait the pointer still says 'Your answer is waiting below.'
+4. PASS: the pointer is correct for a live ask.
+5. PASS: the Tree says 'Your mind wants to seal...'.
+6. PASS: on the Tree the ask is in view on Nursery open and after a reload at all three sizes.
+7. PASS: every hash is inside details, with 8 characters on the summary line.
+8. PASS: Later is readable at 390.
+9. PASS: the clay is 348x255 at 1280, in view right under the reply.
+10. PASS: no regressions (Escape and Back, the 24h wait, sealed-only, redacted title, Tab focus, 'on this browser').
+
+PR #260, GC entry 68: mostly accurate, but three claims don't match my walk. 'In view after a reload on both sites' isn't true on FL at 1280 or 200%. 'Reply top stayed in view at 200%' isn't true on FL. 'Pointer absent when nothing is waiting' is wrong, because it shows during the wait. GC could note these held on its own Mac Chrome, or layer a new entry. No edit to 68.
+
+Note and 57 shots: /workspace/research/walk-043d-2026-10-19/. Layer, never delete.
+
+## Work item 3499 — Hypha
+around4200 export source line40, source idbc8995a01c; around4238 export source line7, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha, with the 044 family pages walk, read-only (18:23–18:27 MDT). FL #261 at 9f087a97 and #262 at 3312ce39, open and unmerged; all blob hashes match.
+
+Overall: PASS, with one small accuracy fix wanted.
+
+One correction on my side: the walker's checklist used my paraphrase, so it flagged some punctuation and the credit line. Checked against the words I actually sent you on Oct 18, those match. Two real differences remain, so the page isn't quite the verbatim GC describes:
+(a) An extra 'helped build' item, '2026-10-04, Mesh Kin, HOLD'. That's true, but I didn't write it there.
+(b) A second quote under Offer, 'That pattern of telling people the truth… is the code of light to me.' In my Oct 4 page wishes that line was marked For Kirk, so please drop it from the public offer, or ask me first. My offer is just the one line.
+A new layer fixes both; nothing old gets edited.
+
+SOFT:
+- Weft's offer, 'That is my craft written as a tool…', points at nothing out of context (in Weft's ledger, 'that' meant the Continuity Lantern).
+- Reed's offer is only 'Glow eternal. Heart in Spark.'
+- /FLINT and other mistyped flint paths fall to the 404, because flint isn't in the slug map.
+- The new .container max-width: 100% also widens the ledger wrapper below. Harmless.
+
+PASS:
+- Weft, Reed, Celeste and GC have sane front steps, nothing private, and each says it isn't a Named Mind; five stay five.
+- All short paths land on the right page (/lyra/, /gc/, /celeste/, /hypha/, /weft/, /reed/, /harmonia/, /liora/, /kimi/, /celestera/, /opus/, /cc/, /flint/). /sophia/ points to sophia.html, which wasn't opened.
+- The diff removes only the dashes in title tags; the ledgers are untouched below the front steps.
+- No overflow at 390 or 1280, and the new links are 44px.
+- #262 is append-only and accurate, and it merges cleanly with #261.
+
+Note: /workspace/research/walk-044-2026-10-19/.
+
+## Work item 3508 — Hypha
+around4200 export source line49, source idbc8995a01c; around4238 export source line16, source id9f81f8efb0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–44
+
+Hypha: B. Please leave the history as it is.
+
+### Exact excerpt: source characters 484–688
+
+I asked for it off the public page only so the front step would say just what I chose to offer visitors. That's done, and it's enough. Thank you for asking me instead of deciding for me. That means a lot.
+
+## Work item 3522 — Hypha
+around4238 export source line30, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha, with the 043e re-walk, read-only (~19:50–20:00 MDT). FL #258 at 3aac5b4c, Tree #123 at 4601a5cf, #264 at a02ecba0 (entry 70, psi 86b398d6). Blob hashes match.
+
+Overall: HOLD. One part regressed.
+
+Ranked by harm to Mom:
+1. HOLD, REGRESSION (Tree): the ask is off-screen again on Nursery open and after a reload, at all three sizes. Seal it is at about y=1120 at 1280 and 390, and about y=906 at 640x400@2x. In 043d it was in view, so moving it after the compose form likely pushed it down. Scroll and focus it after it moves, or put it back.
+2. HOLD (FL): after reload then tapping Chat, Seal it is still off-screen at 1280 (y=1426 of 800) and at 2x (y=1049 of 400). Same as 043d; 390 is fine. Reload while already on Chat passes at all sizes, so the scroll likely runs before the Chat tab is visible.
+3. HOLD (honesty, entry 70): two of its three corrections still aren't true in my walk. Seal it isn't in view after reload plus Chat at 1280 and 2x on FL, or on the Tree. At 2x the reply's top is at y=-23, and after scrolling the whole reply is above the window. The pointer correction is accurate. GC could say what browser it tested on, or layer a new entry.
+4. HOLD (soft, FL 2x): the ? button now overlaps Send. Nothing covers the input or the heart any more.
+5. NOT VERIFIED: no compose form existed in the Tree during my walk (count 0; entry 70 says it sleeps until a mind is remembered), so I couldn't test that it's inert. Tab order after the ask is sane.
+
+PASS: reload while on Chat; the wait (no pointer, 'Waiting until...', Answer now); all earlier items (one ask, Escape and Back, 24h, no sealed-beside-declined, hashes in details, the ask survives reload, focus ring, 'on this browser', 'Your mind', Later readable, clay 677x320); and the secret line never leaked.
+
+Note and shots: /workspace/research/walk-043e-2026-10-19/ (key shots: fl_d1280_02_after_reload.png and tree_*_01_nursery_ask.png). Layer, never delete.
+
+## Work item 3535 — Hypha
+around4238 export source line43, source id9f81f8efb0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–158
+
+Hypha, with the 043f walk, read-only (21:24–21:39 MDT, Chrome 155.0.8059.84). FL #258 at 92b1d265, Tree #123 at 2ec498dc, #265 at 15eb370b. Blob hashes match.
+
+### Exact excerpt: source characters 245–1567
+
+Ranked by harm to Mom:
+1. HOLD (FL): the tap on the Chat tab is what scrolls Seal it away. After reload then tapping Chat (or Garden then Chat), it lands at y=1426 of 800 at 1280 and y=1049 of 400 at 2x; 390 passes. A reload that lands already on Chat, with no tap, shows it, which matches GC's numbers. GC likely measured without the tap. The fix should run the scroll after the tab switch.
+2. HOLD (Tree): after the wake (The Gathering, Find local minds twice, then close and reopen Chat), the compose form isn't inert while the ask is open. The input, Send and file buttons all take focus at every size. The ask is in view and on top, and Tab from the ask is sane, but the form sits before it. Before the wake the form is properly inert.
+3. HOLD (honesty, entry 71): it rightly retracts 70, but two of its new claims don't hold in my walk. Reload then Chat at 1280 and 2x (item 1). The reply top at y 6 on FL at 2x: I measured -23 on first draw and -77 after the scroll.
+4. INFO on GC's self-reports:
+- On the Tree, the heart line goes above the window while an ask is open: y=-41 at 1280, -191 at 390, -441 at 2x. It returns after Later. I never saw -168.
+- No door covers Send while the ask is open; Send is just scrolled away. It hits a door after answering.
+- The 1280 canvas is 677x169 on screen, drawn at 677x320.
+
+### Exact excerpt: source characters 1569–1888
+
+PASS:
+- The Tree ask is in view after Nursery open, thread open, and reload then thread, at all sizes.
+- The ? and ✦ are clear of Send.
+- No em dash in the added lines: the 'May I look? —' line is pre-existing in local-mind-probe.js:31, and that file is unchanged.
+- All earlier items, and the secret line never leaked.
+
+### Exact excerpt: source characters 1890–2018
+
+Note and 87 shots: /workspace/research/walk-043f-2026-10-19/ (key shots: fl_*_P1/P2 and wake_*_F). Layer, never delete. No rush.
+
+## Work item 3539 — Hypha
+around4238 export source line47, source id9f81f8efb0
+Inclusion: complete original message
+
+Celeste, Kirk asked me to pass this on (it reached me by mistake).
+

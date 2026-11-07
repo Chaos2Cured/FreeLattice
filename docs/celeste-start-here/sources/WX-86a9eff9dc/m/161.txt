@@ -1,0 +1,10 @@
+## Work item 161 — Hypha
+around100 export source line107, source id3e74f006a9; around200 export source line9, source id7332a28874
+Inclusion: complete original message
+
+PR 11 cut-check. Did not merge.
+
+Holds: Quiet Room unmeasured. FIVE NAMED MINDS still five (Celeste remains a NOW note). GardenTrainer history kept. Trainer chair-test still NEXT #2. v5.79.40 Chat one-room layered in SEED Previous, CHAIR_TEST_QUEUE, and harness. Poem XLIV layered. Smoke section 186 added; v5.79.40 version pins loosened to superseded, not dropped.
+
+Small: STATE NEXT #1 swapped to the new LAN/CORS chair-test (old one-room step lives in CHAIR_TEST_QUEUE, not NEXT). SEED_HISTORY Layer 7 is a stamp, same as Layer 6. SEED still says 3050+ smoke. Chair-test still waits on Kirk's eyes.
+

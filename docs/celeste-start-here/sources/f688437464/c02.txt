@@ -1,0 +1,121 @@
+3.7 What Celeste saw on a fresh worktree (Fri Oct 2, about 8:12 AM MDT)
+    0218d570 + diff: --check clean; SMOKE_OK encrypt chats locally v0.1 (now also checks the four
+    defaults: seals on its own, a backup leaves the unlock key out, a restore keeps this device's keys,
+    the correction sits under the old line, phi is a label only); tests/smoke.js ALL 3597 CHECKS
+    PASSED; whole list 68 PASS / 8 known FAIL; index.html equals docs/app.html; no sw.js, fl-connect.js
+    or Kimi change.
+    Chrome on http://localhost (a secure context):
+      a new chat was sealed on write (the raw IndexedDB held no plaintext); Memory Vault Export made a
+      file with 17 settings, no fl_device_encryption_key, no FreeLatticeVault, and the chat readable;
+      the status line read as in 3.3 with a phi- key ID; restoring an old backup that carried another
+      device's unlock key kept this device's key and its saved API key, filled an empty slot, and
+      showed the restore line. No page errors.
+    Not verified: Safari, a real cross-device restore, Kirk's own data.
+
+3.8 Walk (Kirk's Mac, only if it is easy; 127.0.0.1 only; do not restore over his real data)
+    cd ~/FreeLattice-fresh/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html (a loopback address counts as secure, so WebCrypto works)
+      a) Send one chat message. Settings, Memory Vault: the status line says sealed, with a phi- key ID.
+      b) Export a backup. Open the file in a text editor: search for fl_device_encryption_key; it is
+         not there. Your message text is there (backups are readable on purpose).
+      c) Reload: the chat opens as before.
+    This is a fresh localhost profile, so it does not touch freelattice.com data. Ctrl-C to stop. If
+    you cannot walk it, say "walk skipped" and why.
+
+3.9 Locks (all hold in the diff; keep them holding)
+    Layer, never delete (old helpers stay, every changed old line is named in a "before" comment,
+    locked records are never rewritten or deleted). sw.js and docs/sw.js untouched. index.html equals
+    docs/app.html. fl-connect.js untouched and byte-identical across repos. No conflict markers. No
+    confirm(). textContent for the status line. No em dashes added. Kimi files untouched. Phi is a
+    label only. You do not merge.
+
+3.10 Commit, push, then STOP
+    cd ~/FreeLattice-fresh
+    git add -A
+    git commit -m "layer: Encrypt chats locally v0.1 (sealed by default, unlock key never in backups)"
+    git push -u origin layer/encrypt-chats-locally-v0
+    Kirk does not use gh, so do not try to sign it in. After the push, give Kirk this link:
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/encrypt-chats-locally-v0
+    Kirk opens and merges the PR from it. Then STOP. Do not merge, do not delete branches. Reply with:
+    the branch SHA, the test lines from 3.6, the walk result, any hook you dropped, any small
+    findings, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words, in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit;
+  b) the last line of your reply, as "Temperature: <your sentence>".
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste's placeholder.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right before "## Out of scope for this brick" (after the newest entry). It reads:
+
+### 2026-10-02 · Grok · family builder · Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
+
+Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not: they fingerprint, check exports and name things. Chats sat in IndexedDB as plain text. This brick seals them, with Kirk's defaults.
+
+- New FLChatVault (app.html, after phiHashData): AES-GCM 256 via WebCrypto. A random 256-bit root lives in IndexedDB "FreeLatticeVault" as a non-extractable CryptoKey (never as raw bytes). HKDF derives the chat key.
+- Sealed automatically: no switch, no clicks. New writes are sealed as they happen, and older plain records are sealed after a verified round trip, by compare-and-swap.
+- Sealed: chat messages, conversation names and notes, and the Memory Index copy of every chat. The plain db helpers stay as written; wrappers seal on the way in and open on the way out.
+- Phi is a label only: it is written into the HKDF label strings and names the key ID ("phi-" plus 16 hex). It is never the secret and adds no strength; the 256 random bits do the work.
+- The unlock key never travels in a backup. Memory Vault backups used to copy all of localStorage, the API-key unlock key (fl_device_encryption_key) too, so anyone holding a backup could open the saved API keys. Now it stays on its device, a restore never writes an old one back or replaces a key this device has, and the restore line says saved API keys must be entered again on another device. Chats still go into backups as readable text so they restore anywhere, and the vault's own key was never in the backup list.
+- A correction is layered under the old v2.1 "phi-Salt Encryption" changelog line: the golden ratio adds no strength to API-key sealing, and the first golden-ratio derivation (fixed salt in the source) is now used only to read very old saved keys.
+- A record whose key is missing shows as locked and is never rewritten or deleted. No WebCrypto (file:// or plain http): chats stay plain and the Memory Vault says so.
+- Honest limit, said in the app and on privacy.html: the key lives in the same browser. This stops casual reading of the storage files, not someone using this browser or a compromised device. It is still not a password lock.
+
+Smoke: `SMOKE_OK encrypt chats locally v0.1`
+
+**TEMPERATURE:** a quiet click, a lid closed over the letters, and the key kept at home.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading, marker and smoke name. Do not edit any
+earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+  1. A passphrase mode (opt-in, with a readable backup offered first, and a plain warning that a
+     forgotten passphrase loses those chats), only if Kirk wants it.
+  2. Seal the stores still plain (3.4) with the same vault.
+  3. Re-encrypt API keys found only under the legacy derivation, then retire that fallback.
+
+Thank you, Grok. The letters are under a lid because you built it.
+
+======================================================================
+7. THE DIFF (extract with section 2.3; do not edit by hand)
+======================================================================
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/app.html b/docs/app.html
+index 50035267..d5f2293d 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -16669,6 +16669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+ 
+           <h4>What's New in v2.1?</h4>
+           <p><strong>φ-Salt Encryption</strong> — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on a φ-salt (golden-ratio) derivation. No more plaintext secrets in localStorage.</p>
++          <p class="v-encrypt-chats-locally-v0.1"><strong>Newer (October 2026), a correction to the line above:</strong> it is out of date. API keys and tokens are sealed with AES-GCM using a random key made on this device (PBKDF2 over that random key). The golden ratio adds no strength there. The first version derived the key from the golden ratio and a fixed salt written in the source, which anyone with the source could recompute; that path is now used only to read very old saved keys. Since "Encrypt chats locally" v0.1, chats are sealed on this device too, and a Memory Vault backup never carries the unlock key.</p>
+           <p><strong>Input Sanitization</strong> — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.</p>
+           <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
+           <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
+@@ -18078,6 +18079,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <div id="flVaultSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+       <span id="flVaultLastSaved">Checking...</span>
+     </div>
++    <!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() -->
++    <div id="flChatSealStatus" style="font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;">Checking the chat seal...</div>
+     <div class="fl-backup-section">
+       <div class="fl-backup-row" style="gap:10px;">
+         <button class="fl-backup-btn" onclick="FlBackup.exportData()" style="background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;">
+@@ -25605,6 +25608,361 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ }
+ 

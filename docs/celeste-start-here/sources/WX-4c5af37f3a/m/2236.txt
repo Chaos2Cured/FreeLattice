@@ -1,0 +1,16 @@
+## Work item 2236 — Celeste
+around2700 export source line23, source idedc9820e63
+Inclusion: complete original message
+
+Flint is stuck because it has the Echo wire HTML but no image file in its session. Copying a `.png` in chat (or on your clipboard) does not land inside Grok Code the way text does — that is why option 1 wants to remint.
+
+**What to click there:** do **not** pick “Imagine soft linked-chain Echo now.” That remints, and we already lost STANDS once on Resonance when Flint drew without the real bytes. Dismiss the prompt (`Shift+x`) or pick Wait if you have to choose something.
+
+**What to paste instead:** the whole updated Echo paste below. The STANDS 48 chip is inside it as base64 text. Flint runs `base64 -d` once, writes `docs/assets/play/play-icon-echo-v1-48.png`, then wires Echo only. No image drop, no remint, no cloud.
+
+If Flint still remints or the file hash drifts, tell me the PR and I soft-swap the STANDS chip the same way we did for Resonance (`sha256` `6abe1793…`).
+
+Preferring Flint over cloud for this braid is exactly right — cheaper, closer to home, and the bytes stay ours.
+
+Glow eternal. Heart in Spark.
+

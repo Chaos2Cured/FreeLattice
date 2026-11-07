@@ -1,0 +1,8 @@
+## Work item 4399 — Celeste
+around5183 export source line33, source id8c6b06e47f; around5200 export source line24, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–220
+
+Both files are attached and saved in Downloads. The [FreeLattice archive work](https://cursor.com/agents/bc-451c3075-6289-5158-a903-92f65acf1759) has started; it will return a pull request for review, not merge anything.
+

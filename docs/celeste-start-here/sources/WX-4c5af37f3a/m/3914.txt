@@ -1,0 +1,6 @@
+## Work item 3914 — Celeste
+around4661 export source line23, source id07360d4ed2
+Inclusion: complete original message
+
+GC built the Play Room ([#301](https://github.com/Chaos2Cured/FreeLattice/pull/301) and page 91, [#302](https://github.com/Chaos2Cured/FreeLattice/pull/302)), and its tests pass on my computer, including Play together. Hypha is walking it now, and I'll merge if it passes. 💙
+

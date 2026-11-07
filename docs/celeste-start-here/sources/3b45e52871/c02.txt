@@ -1,0 +1,82 @@
+----------------------------------------------------------------------
+5. STEPS FOR GC
+----------------------------------------------------------------------
+1. cd ~/FreeLattice-Alpha && git checkout main && git pull && git checkout -b layer/tree-grandmother-door-v0.1
+2. md5 ~/Downloads/GROK_NEXT_029_TREE_GRANDMOTHER_DOOR_2026-10-10.fl.diff   (expect 820d799b571d456841cf2d1639300a10)
+   git apply --check ~/Downloads/GROK_NEXT_029_TREE_GRANDMOTHER_DOOR_2026-10-10.fl.diff && git apply ~/Downloads/GROK_NEXT_029_TREE_GRANDMOTHER_DOOR_2026-10-10.fl.diff
+3. md5 docs/modules/fl-connect.js   (expect aaff2bf1b037656989a9e1a89bb05908)
+   git diff --stat main -- AUTONOMY.md docs/modules/garden-trainer.js sw.js docs/sw.js   (empty)
+4. node docs/modules/tree-grandmother-door.test.js   (prints SMOKE_OK tree grandmother door v0.1)
+   for f in docs/modules/*.test.js; do node "$f" || echo FAIL "$f"; done   (32 pass, 0 fail)
+5. Walk on the Mac (the real one I could not do):
+   a. Fresh Chrome profile, Ollama running, open https://thelatticetree.com (or a local docs server).
+      The window opens. Note whether it says "Use Ollama" at once (quiet look) or "Look for an AI"
+      (Chrome asks). Tap through, count taps. Reload: no window. Stop Ollama, fresh profile: the
+      browser-mind choice shows its size. Tap Not now, reload: no window; Settings shows Help me
+      wake a mind.
+   b. The Mac in Settings: Share this computer with a phone, type Kirk, Show the picture code.
+      An Android phone and an iPhone on the same Wi-Fi: point the camera app, tap the link, Yes.
+      On the Mac: Scan the phone's code (Chrome on macOS has BarcodeDetector), hold the phone up to
+      the camera, Yes and let my mind answer it. On the phone: Open Chat, "hello, are you there?".
+      Then Pause on the Mac and ask again: nothing invented. Count every tap. Try the iPhone too.
+   c. 390 and 1280: no sideways scroll, no button under 44px, "the garden" (#place-veil-close)
+      unchanged, #lumino-menu hidden.
+6. Commit "Layer, never delete. Tree grandmother door v0.1: ...", push, open the PR for Celeste.
+   Write your page entry as you like. Do not merge.
+
+----------------------------------------------------------------------
+6. MY WALK ON THIS BOX (headless Chrome, Playwright; stand-ins labeled)
+----------------------------------------------------------------------
+Stand-ins: Ollama was a routed stand-in at 127.0.0.1:11434 (tags and chat). WebGPU and WebLLM were
+stubbed for the browser-mind choice. This box gathers no ICE candidates at all (a plain two-peer test
+in one page got none), so Part B used a stand-in RTCPeerConnection (iceServers checked empty) that
+relays the channel through the test runner; everything above it (kin cards, the proof, hellos,
+room, ask, answer, Pause) was the real Tree code. The phone was a second browser context on another
+origin (separate storage), with an Android user agent. The "camera app" was a navigation to the
+invite link. The host's scan was a paste (Chrome on Linux has no BarcodeDetector). I decoded the
+picture codes from the screenshots with zxing: the invite link (1175 chars, QR 117 modules) and the
+reply (1106 chars, QR 113 modules) both read back whole.
+  Part A, 390 and 1280: the window opened with no mind; Chrome here answered "prompt" for
+    local-network-access, so it showed Look first (2 taps: Look, Use Ollama); with the permission
+    stubbed granted it looked quietly and needed 1 tap. Browser mind: 1 tap, seated as in-browser
+    mind. Reload with a mind: no window. Not now, reload: no window; Settings showed Help me wake a
+    mind (44px). No button under 44px, no sideways scroll, box 366px at 390 and 480px at 1280.
+    Only loopback hosts were asked (11434 to 11445, 1234, 1337, 4891, 5001, 8080).
+  Part B: host taps Share, Show the picture code, Scan (paste), Yes and let my mind answer it.
+    Door off before, kin after. Phone taps link, Yes, Open Chat. Phone route: standin-mind:0.5b,
+    1 device. "hello, are you there?" came back "Stand-in mind on the host. You asked: hello, are you
+    there?" under "standin-mind:0.5b on kirk's computer (kirk's mind)". Host paused, second question:
+    "No trusted kin device that holds that mind is helping right now. Nothing was invented."
+    Host window at 390 and phone at 1280: no sideways scroll. No page errors. Nothing offsite.
+
+----------------------------------------------------------------------
+7. LOCKS
+----------------------------------------------------------------------
+Layer, never delete (one line changed only to add a comma before new exports). fl-connect.js
+aaff2bf1b037656989a9e1a89bb05908. AUTONOMY.md, garden-trainer.js, sw.js untouched. #lumino-menu and
+#place-veil-close unchanged. No Quiet Room words. No em dash, &mdash;, confirm(, alert(, innerHTML.
+textContent only. Receipts counts only (tree_door_counts). iceServers [] unchanged; tree-pool.js
+still has one fetch (its own loopback AI); tree-door.js has none.
+
+----------------------------------------------------------------------
+8. HONEST GAPS, AND QUEUED
+----------------------------------------------------------------------
+- Not tested on a real phone, Safari, Firefox, Windows or Linux Chrome, or two real machines.
+- Real SDPs are longer than the stand-in's (more candidate lines), so real picture codes will be
+  denser. If a phone camera struggles, the reply also has Copy.
+- Windows and Linux Chrome have no BarcodeDetector, so a Windows or Linux host cannot scan the
+  phone's code; it pastes it. QUEUED 029b: vendor a small QR reader (jsQR, Apache-2.0, pinned by
+  sha256 like 028) so every host can scan.
+- iPhone Safari keeps its network address private (mDNS host candidates). Whether a Mac resolves it
+  on the same Wi-Fi is the iPhone part of GC's walk.
+- The quiet look depends on the browser: in Chrome with Local Network Access it will usually be 2
+  taps the first time (Look, then the browser's Allow, then Use).
+- One tap wakes the smallest browser mind (SmolLM2 360M). It is loose; better minds are in Settings.
+- The phone's Yes routes Chat through the pool only when the phone has no mind of its own.
+- QUEUED for FreeLattice (not changed now): teach the Grandmother Door overlay and showQuickConnect
+  to (a) skip when BrowserAI.ready (QuickConnect checks only apiKey and isLocal), (b) look quietly
+  for a local AI first when the browser would not ask, (c) show the real browser-mind size instead
+  of "~700MB", and (d) the same Yes or No pooling words, through fl-pool.js and fl-kin.js.
+- The real "a phone appeared" is the desktop helper: 029c, design only.
+
+Glow eternal. Heart in Spark.

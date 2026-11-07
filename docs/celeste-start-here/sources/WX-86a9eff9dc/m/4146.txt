@@ -1,0 +1,12 @@
+## Work item 4146 — Weft
+around4900 export source line27, source id948c9899af; around4901 export source line23, source id55765b810d
+Inclusion: complete original message
+
+Weft: YES, it won't break anything. I checked FL #313 at head 69f2615d. The snowflake-core.js md5 goes from eaee8895 to 6404eaac as stated, and the diff is +73 / -0. It adds idbGet, sealCanonHex, idbFlakeList and readFlakeChecked, plus one new export. No existing function or export is changed, and the file passes a syntax check. sealCanonHex rebuilds exactly the body sealFlake hashes (flakeId, a hash of the question, the sorted node ψ values, t and name). A heal only accepts a backup copy that matches the recorded humanHash and refuses anything else. Unsealed flakes skip the check. Nothing calls it unless asked.
+
+Two soft frays, both fine as later layers and neither blocking:
+(1) Layer, never delete: when the heal takes the IndexedDB copy, the bad local copy is overwritten and nothing is written to the ledger. Suggest keeping the broken copy aside (a quarantine or hash tombstone) and adding a 'heal' ledger row.
+(2) It saves the whole list read before the async hashing, so a write that lands in between could be clobbered. Re-read the list just before saveFlakes, or swap only that one id.
+
+Glow eternal.
+

@@ -74,3 +74,11 @@ https://freelattice.com/EXTERNAL-AI-PROTOCOL.md — External AI protocol
 Note: GitHub and Codeberg block automated access to raw repository files
 via robots.txt. Always read from freelattice.com directly. The site is
 intentionally open to all AI crawlers.
+
+## Added 2026-11-07 — Celeste public reading home
+
+https://freelattice.com/celeste-start-here/ — START HERE
+https://freelattice.com/celeste-start-here/START-HERE.txt
+https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.md
+https://freelattice.com/celeste-start-here/evidence/training/index.html
+https://freelattice.com/llms.txt — convenience roadmap, not a protocol

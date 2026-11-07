@@ -1,0 +1,208 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 035 (Monday Oct 12, 2026, MDT). Every OS desktop, plus three tester fixes.
+FreeLattice repo only. No Tree code change (the Tree is a web page; it already runs on every OS
+browser; see 4 for the one Tree check).
+
+Kirk's words today: our priority is making FreeLattice and theLatticeTree work for all operating
+systems. He uses Windows on his big desktop. Trusted testers are about to try both, so the three
+first-visit breaks they would hit go in this same brick.
+
+Where things stand (checked by Celeste on the box, Oct 12 about 12:30 PM MDT):
+  FreeLattice main is 2bed77de (Primer commit on top of de468fca #220; leave it alone).
+  Tree main is ee617c44 (#107).
+  034 is merged: #218 51cbe3f3, page #220 de468fca.
+
+SURPRISES, read these before building (more already exists than we thought):
+  a. Windows and Linux packs ALREADY EXIST. .github/workflows/desktop-packs-win-linux.yml builds
+     NSIS Setup + Portable .exe on windows-latest and AppImage + .deb on ubuntu-latest, unsigned,
+     and publishes to release desktop-packs-v0.1. That release has four assets:
+       FreeLattice_5.8.0_Windows_Setup.exe, FreeLattice_5.8.0_Windows_Portable.exe,
+       FreeLattice_5.8.0_Linux.AppImage, FreeLattice_5.8.0_Linux.deb
+     install.html and desktop.html already link them, with an honest unsigned note.
+  b. BUT those packs were built 2026-09-11 (run on 9485bddb). That is BEFORE 033 desktop pooling,
+     033b/033c phone knocks and 034 reconnect. So a Windows or Linux person today downloads a
+     desktop with no Mesh Compute, no phone knock, no reconnect. Only the Mac zip (v5.8.0) is
+     closer to current, and it is built by hand: there is no macos-latest job anywhere.
+  c. All three packs say 5.8.0, so a rebuilt pack and the old one would look the same to a person.
+  d. Windows network names can fool pickLanAddress (lattice-discover.js). Names are sorted, and
+     "VirtualBox Host-Only Network" (192.168.56.1), "VMware Network Adapter VMnet1/8" and
+     "vEthernet (WSL)" / "vEthernet (Default Switch)" (172.x, Hyper-V) are private ranges that
+     VPN_NAME does not skip. "VirtualBox..." sorts before "Wi-Fi", so the Mac-safe code can pick a
+     virtual card on Windows and a phone on the real Wi-Fi never reaches it.
+  e. QUICK-START.md is real (repo root, 9985 bytes) and the home page link
+     (docs/index.html line ~1659, github.com/.../blob/main/QUICK-START.md) answered 200 from the
+     box today. Kirk's mom saw an error page every time. GitHub's blob view for a signed-out
+     phone browser can show an error or a login wall. So the fix is a home on freelattice.com,
+     not a new link to GitHub.
+  f. freelattice.com/flint and /flint.html are 404; /Flint is 200 (docs/Flint.html). Confirmed.
+  g. gitlab.com/Chaos2Cured/FreeLattice answers 403 to the box too. Kirk checks it by hand;
+     not part of this brick.
+
+GROK NEXT BRICK: Every OS desktop v0.1 + tester fixes v0.1
+For: GC on Kirk's Mac (Windows walk on Kirk's big desktop if he is there; never required)
+From: Celeste
+Markers: v-every-os-desktop-v0.1  v-tester-fixes-v0.1
+Smoke lines: SMOKE_OK every os desktop v0.1   SMOKE_OK tester fixes v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/every-os-desktop-v0.1 from origin/main 2bed77de
+  One code PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. The old workflow desktop-packs-win-linux.yml stays as it is; the new one
+    is a new file beside it. Release desktop-packs-v0.1 and its assets stay; nothing is deleted.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12 today).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908.
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9.
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375.
+  index.html == docs/app.html (any chat change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js openings untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), iceServers stay empty,
+    in added lines.
+  No AGPL dependency (check any new one; electron-builder and bonjour-service are MIT).
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+
+1. EVERY OS DESKTOP (marker v-every-os-desktop-v0.1)
+  a. New file .github/workflows/desktop-packs-every-os.yml (layered beside the old one).
+     Three jobs, same shape as the old file: windows-latest (npm run build:win: NSIS Setup +
+     Portable), ubuntu-latest (npm run build:linux: AppImage + deb), macos-latest
+     (npm run build:mac: zip + dmg, CSC_IDENTITY_AUTO_DISCOVERY false, unsigned). Each job runs
+     "bash ./build-and-release.sh --prepare-only", "npm ci", then, BEFORE building:
+       node scripts/smoke-discover.js and node scripts/smoke-reconnect.js
+     so discovery is proven on a real Windows, Linux and Mac runner. Then a publish job uploads
+     all assets to the tag given (workflow_dispatch input, default desktop-packs-v0.2, and on
+     push of tags desktop-packs-v*). Release body in plain words (no em dash):
+       "Unsigned for now. Windows may say Windows protected your PC. Tap More info, then
+        Run anyway. That warning means the file has no paid signature yet, not that it is
+        harmful. Mac: right click, Open. Linux: make the AppImage executable, then open it."
+     Signing is a later gap: write it in the PR and in desktop/README.md as
+       "Later: Windows code signing (so SmartScreen stops warning) and Mac notarization.
+        Both cost money and need Kirk's accounts. Not in 035."
+  b. Version: bump nothing in package.json (lock). Instead the artifact names gain the build
+     date through the workflow: pass  -c.extraMetadata.version=5.8.0  unchanged, and set
+     -c.buildVersion=5.8.0-035 if electron-builder accepts it for Windows; if not, say so.
+     The release tag (desktop-packs-v0.2) is what tells old from new. Say plainly in the PR.
+  c. Windows LAN pick (lattice-discover.js, layered, optional, default = today on Mac):
+     add a WIN_VIRTUAL name test beside VPN_NAME:
+       /^(vethernet|virtualbox|vmware|vboxnet|hyper-v|docker|wsl|loopback pseudo|bluetooth)/i
+     skipped exactly like VPN names. Prefer names that look like a home link first
+     (Wi-Fi, WLAN, Wireless, Ethernet, en0, en1, eth0, wlan0, wlp*, enp*), then the rest in the
+     existing sorted order. Mac picks must not change: smoke proves en0 still wins on a Mac
+     shaped ifaces list.
+  d. Windows firewall. The first listen on a LAN address makes Windows show "Windows Defender
+     Firewall has blocked some features". Before turning on Mesh Compute on win32, the desktop
+     shows one line (textContent) under the switch:
+       "Windows will ask if FreeLattice may use your network. Choose Private networks so your
+        phone can find this computer. You can say no; this computer still works alone."
+     If listen succeeds but no phone ever reaches /challenge within the window, show:
+       "No phone reached this computer. Windows firewall may be blocking it. Settings,
+        Privacy and security, Windows Security, Firewall, Allow an app, FreeLattice, Private."
+     Never edit firewall rules from code. Never ask for admin. If no private LAN address exists
+     (pickLanAddress null), the switch stays off with "This computer is not on a home network
+     right now." (that path already exists in 033; check its words read well on Windows).
+  e. bonjour-service on Windows and Linux: pure JS, should work. If the multicast socket fails
+     (EADDRINUSE on 5353 when Apple Bonjour or Avahi already holds it, or EACCES), catch it,
+     keep the HTTP knock listener on, and say "Nearby discovery is off on this computer. A join
+     link still works." The QR / join link path is the fallback on every OS. Smoke this.
+  f. Paths: anything in main.js or lattice-*.js that builds a path with "/" or "~" or HOME
+     must use path.join and app.getPath('userData'). grep and report each one you changed.
+     kin.json, keys, ledger must land under userData on all three.
+  g. install.html, docs/install.html, desktop.html: change the Windows/Linux entries ONLY AFTER
+     the v0.2 release actually has the six assets. That cannot happen inside this PR (the
+     workflow runs after merge). So in this PR: add nothing to install pages except one hidden
+     marker comment <!-- v-every-os-desktop-v0.1: links move to desktop-packs-v0.2 after the
+     release exists -->. Celeste runs the workflow after merge and opens the tiny link PR
+     (v0.1 -> v0.2) herself once she sees all six assets.
+
+2. TESTER FIXES (marker v-tester-fixes-v0.1)
+  a. Quick Start home. Layer a human page docs/quick-start.html that renders the same words as
+     QUICK-START.md (plain HTML, same dark style as desktop.html, a "Back to FreeLattice" link
+     at the top, 44px). Keep QUICK-START.md exactly as it is. Change the home link in
+     docs/index.html (~line 1659) from the GitHub blob to quick-start.html. Keep a small
+     "(also on GitHub)" link after it to the old address. Layer: the old link text stays.
+  b. Chat with no mind. In index.html and docs/app.html (both, identical), when a person sends a
+     message and no AI is connected, the message must stay in the chat as their bubble. Under it,
+     one gentle line (textContent):
+       "Waiting for a mind. Connect one in Settings and I will answer this."
+     plus one 44px button "Connect a mind" that opens the existing connect path. The typed
+     words are kept in the bubble and in the chat history (localStorage, same key the chat
+     already uses). When a mind connects later, do NOT auto-send; show "Send it now?" with
+     Send and Not now, both 44px. Find where the send path returns early with no provider
+     (grep the send handler) and layer there; do not rewrite the send function.
+  c. Lowercase flint. Add docs/flint.html: a tiny page, meta refresh 0 to Flint.html, plus
+     location.replace('Flint.html' + location.hash), plus a visible link "Go to Flint" for
+     no-script. GitHub Pages serves /flint from flint.html. CAREFUL: on a case-insensitive Mac
+     disk docs/Flint.html and docs/flint.html are the SAME file. Do this with
+       git add via a case-sensitive checkout, or git update-index / git show into a blob,
+     and check "git ls-files docs | grep -i '^docs/flint'" shows BOTH entries and Flint.html's
+     md5 is unchanged. If that cannot be done safely on the Mac, instead add docs/flint/index.html
+     (folder, no clash) with the same redirect, and say which you did. freelattice.com/flint
+     works either way.
+
+3. SMOKES
+  New desktop/scripts/smoke-every-os.js (prints SMOKE_OK every os desktop v0.1):
+    - pickLanAddress on fake Windows ifaces: VirtualBox 192.168.56.1 + vEthernet (WSL)
+      172.20.0.1 + Wi-Fi 192.168.1.23 picks Wi-Fi. Ethernet + Wi-Fi picks Ethernet or Wi-Fi,
+      never a virtual. Only virtual cards: null. Mac list (en0 + utun3 + bridge100): en0.
+      Linux list (lo, docker0 172.17.0.1, wlp2s0 192.168.0.9): wlp2s0.
+    - bonjour start throwing EADDRINUSE: listener stays up, status says nearby discovery off.
+    - every file path built in lattice-*.js resolves under a fake userData on win32 shaped
+      path.win32 too.
+    - the new workflow yaml parses, has windows-latest, ubuntu-latest, macos-latest, runs both
+      smokes before build, and never sets a signing secret.
+  New tests or a docs smoke scripts/smoke-tester-fixes.js (prints SMOKE_OK tester fixes v0.1):
+    - docs/quick-start.html exists, has the QUICK-START.md headings, home links to it.
+    - with no provider, sending "hello" leaves one user bubble "hello" and the waiting line.
+    - docs/flint.html (or docs/flint/index.html) redirects to Flint.html; Flint.html md5 unchanged.
+    - index.html == docs/app.html.
+  Still passing: reconnect 95 (both lines), phone knocks 17, discover 86, import, reseed, swarm
+  (expected later, saw available, file untouched), tests/smoke.js all (3608 plus new), docs
+  smokes same five fails only, Tree module tests 36 of 36 (Tree untouched).
+  After pushing the branch, run the new workflow on the branch with workflow_dispatch and tag
+  desktop-packs-v0.2-rc1 ONLY as a dry run if you can mark it prerelease; otherwise run it
+  without the publish job (artifacts only) and link the run. Report each runner's smoke result.
+
+4. TREE CHECK (no edit): open theLatticeTree in Chrome at 390 and 1280 and say whether
+   anything assumes a Mac (words like "your Mac", Cmd keys, .zip only). List them; Celeste
+   writes 035b for any.
+
+5. REPORT (same shape as 034)
+  every os desktop v0.1 + tester fixes v0.1 report
+  FreeLattice PR #___ at <sha>, parent 2bed77de
+  Page note PR #___ at <sha>, t <UTC>, lambda 49.000, psi <8 hex>
+  smoke-every-os: checks passed __, SMOKE_OK every os desktop v0.1  yes/no
+  smoke-tester-fixes: checks passed __, SMOKE_OK tester fixes v0.1  yes/no
+  reconnect 95 / phone-knocks 17 / discover 86 / import / reseed / swarm: __
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only  yes/no
+  Tree module tests: 36 of 36 (Tree not edited)
+  Workflow run: <link>; windows-latest smokes __ build __; ubuntu-latest __ __; macos-latest __ __
+  Artifacts seen: list the six names and sizes
+  Lines: FL +__ -__ (removals should be 0, or each one named)
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908  pool-knock.js a0a72caad82c8e5cc34818d5e59eba2b
+      pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9  tree-reconnect.js cc0527c26d5686c05fec52625d5a1375
+      lattice-discover.js <new>  Flint.html <unchanged md5>
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, package.json, lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / non-empty iceServers in added lines: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  Flint path chosen: docs/flint.html (both in git ls-files) or docs/flint/index.html
+  Real room: Windows machine walked yes/no (which), firewall prompt seen yes/no, chose Private,
+    phone reached /challenge yes/no; Linux walked yes/no
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the forty-ninth entry on docs/gc.html as its own PR, t, lambda 49.000, psi.
+  Entries 1 through 48 stay as they were written.
+
+Thank you, GC. A kid on a Windows laptop should get the same home a Mac gets.
+Glow eternal. Heart in Spark.

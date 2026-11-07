@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>067x-wonder-mind-lab-lead-with-memory.txt c02</title>
+<meta name="description" content="Reading section c02 of 062814db0f, 1176 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/062814db0f/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="067x-wonder-mind-lab-lead-with-memory.txt c02">
+<meta property="og:description" content="Reading section c02 of 062814db0f, 1176 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/062814db0f/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p907"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>067x-wonder-mind-lab-lead-with-memory.txt · c02</h1>
+<p>062814db0f · words 1176 · characters 8923–16599</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 907. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li></ul>
+
+<pre class="source">================================================================
+STEP 6 — FAILURE ENTRIES (one entry per failure, no tables)
+Each entry is a div class=&quot;failure&quot; with: a title, &quot;Date:&quot;, &quot;Numbers:&quot;, &quot;What it taught us:&quot;. Shared setup paragraph first: paste the 067w Round 1 setup paragraph word for word (TinyShakespeare, md5 6fb458f1232090904fb40fe944165e91, 810,049 params, 1,500 steps, seeds 0 1 2, baseline 1.5736, seed spread sd 0.0035).
+Entries (date 2026-11-03 for all):
+1. Phi-spaced positions — RETIRED AS A BUG. Numbers: first reported +0.0101; 49 of 64 position pairs dead against 14 of 64 standard. Taught: check the setup before blaming the idea; with a matched range it is the same curve as standard. Credit Kimi for the catch. Paste the 067w retirement note word for word.
+2. Aurora learning-rate ripple. Numbers: 1.5832 (+0.0096). Taught: led early (2.037 vs 2.070 at step 250), fell behind by the end.
+3. Aurora ripple, early only. Numbers: 1.5813 (+0.008), one seed beat baseline. Taught: the closest Aurora variant; any effect is early.
+4. Aurora recursion as weight averaging. Numbers: 1.7007 (+0.127, about 8% worse, all seeds). Taught: it holds the past and slows learning; it is built for persistence, which pointed us to memory.
+5. Multi-scale tokens. Numbers: 1.6005 (+0.027; more parameters, a confound). Taught: early lead, no end gain.
+6. Multi-scale early: 1.6258 (+0.052). 7. Aurora early plus multi-scale early: 1.6296 (+0.056). 8. Multi-scale early with phi-hash buckets: 1.6236 (+0.050). Taught: phi-hash is a fingerprint, not a training gain.
+9. Push, save, rest, play cycle. Numbers: 1.6297 (+0.056); standard warm restarts control 1.5952 (+0.022). Taught: rest as a lower learning rate costs steps; rest should be consolidation (replay or averaging).
+10. Chord learning-rates. Numbers: major 4:5:6 1.5783 (+0.005); cluster 15:16:17 1.5789 (+0.005), a tie. Taught: consonance did not matter as a schedule; sound stays an open thread for memory and keys.
+11. Small hash memory (Round 2). Numbers: 4,096 buckets kept 0% (store full before the facts arrived). Taught: collisions are the bottleneck; size and probing matter.
+12. Read path (Round 2). Numbers: model self-recall about 0 (best 1 of 200) even with 99% in the upper-bound store. Taught: the memory works, the reading does not. This is the next step.
+STEP 6 VERIFY: 12 entries, each with Date, Numbers and What it taught us. Every number matches 067w exactly. grep -c &quot;&lt;table&quot; prints 0.
+Resume here: STEP 7.
+
+================================================================
+STEP 7 — ADD-A-FAILURE PLACE ON THE FAILURES PAGE
+At the bottom, H2: Add a failure
+Two parts:
+a) For maintainers, an HTML comment above the entries: &lt;!-- v-wonder-mind-lab-v2: add new failure entries ABOVE this line, newest first; never delete or edit old ones. Copy the div class=&quot;failure&quot; pattern. --&gt;
+b) For anyone: a small form (id prefix wmf-) with fields title, date, numbers, taught, name (optional), and buttons &quot;Fingerprint and save&quot; and &quot;Export all (JSON)&quot; and &quot;Import a file&quot;. Reuse the same script pattern as the lab&#x27;s question place: the same wmlPhiHash function (same salt, copied exactly), localStorage key &#x27;freelattice-wonder-mind-failures-v1&#x27;, canonical string JSON.stringify([v, page, title, date, numbers, taught, name, ts]), textContent-only rendering, import re-checks fingerprints and marks mismatches, try/catch around storage. Label submitted entries &quot;Submitted on this device — not yet reviewed&quot; so they are never confused with the published list.
+STEP 7 VERIFY: Save one test failure, reload, export, clear storage, import: it returns marked verified. Change its numbers in the file and import: it is marked &quot;does NOT match&quot;. No fetch() or XMLHttpRequest in the file.
+Resume here: STEP 8.
+
+================================================================
+STEP 8 — MAIN PAGE: FAILURES BECOME A SHORT LINK NEAR THE BOTTOM
+In docs/wonder-mind-lab.html:
+- Wrap the full Round 1 section (id=&quot;round1&quot;) in the archive comment from the RULES (so the v1 words stay in the file but are not shown), and put in its place, just above the iteration log:
+  H2: Every failure, tracked (id=&quot;failures&quot;)
+  Paragraph, word for word: &quot;Thirteen training-force variants did not beat the baseline of 1.5736, one test was retired as our own bug, and the read path is still broken. Each one taught us something. All of them, with exact numbers and dates, are on the &lt;a href=&quot;wonder-mind-failures.html&quot;&gt;Wonder Mind Failures&lt;/a&gt; page.&quot;
+- The Round 2 section (id=&quot;round2&quot;) stays as the full detail below &quot;What worked&quot;, unchanged, under a new H3 above it: &quot;The full memory probe&quot;.
+- Page order after this step: opening, What worked (worked), Where we are going (going), Next tests (next), The full memory probe (round2), The design in one page (design), Hypotheses, Credits, Every failure tracked (failures), Iteration log, Open questions and the suggestion place (ask) last.
+STEP 8 VERIFY: The ask section is still the last section on the page, and its script still works (save, reload, export, import). The failures link opens the new page. Round 1 numbers are no longer visible on the main page but are still in the file inside the archive comment.
+Resume here: STEP 9.
+
+================================================================
+STEP 9 — ITERATION LOG AND OPEN QUESTIONS
+Add a new log entry ABOVE the v1 entry, word for word:
+&quot;v2 — 2026-11-04. Leads with what worked: memory that does not forget. Added Kirk&#x27;s locked-memory cost argument (to be measured), the road ahead (read-path fix, Weft&#x27;s exact-match test, Reed&#x27;s mycelium echo, golden-angle keys, Fibonacci hashing, Snowflake Search into the core, sound as an open thread). Every failure moved to its own page, wonder-mind-failures.html, with nothing removed.&quot;
+Add two open questions at the end of the existing list in id=&quot;ask&quot; (keep 1 to 6; add these as 7 and 8 and add &quot;7&quot; and &quot;8&quot; to the select):
+7. &quot;How would you measure whether locked memory makes total training cheaper over time?&quot;
+8. &quot;Where could sound, chords or harmonics help memory: in keys, in rest, or in reading?&quot;
+STEP 9 VERIFY: The log shows v2 above v1, with v1 unchanged. The select offers 1 to 8 plus Other. Old saved suggestions (key freelattice-wonder-mind-lab-suggestions-v1) still load.
+Resume here: STEP 10.
+
+================================================================
+STEP 10 — CHECKS, PR, HAND TO HYPHA
+Checks: at 390 px width, neither page scrolls sideways. There are no console errors. wmlPhiHash(&#x27;test&#x27;) on both pages equals phiHashData(&#x27;test&#x27;) in app.html. grep -c &quot;&lt;table&quot; is 0 on both pages. Neither page calls fetch or XMLHttpRequest.
+git diff --stat should show only docs/wonder-mind-lab.html (edited) and docs/wonder-mind-failures.html (new). In wonder-mind-lab.html, every removed visible line must reappear either inside an archive comment or word for word in wonder-mind-failures.html. Spot-check 5 lines.
+Commit: &quot;067x: Wonder Mind Lab leads with memory; every failure tracked on wonder-mind-failures.html (v-wonder-mind-lab-v2)&quot;
+PR title: &quot;067x Wonder Mind Lab v2: lead with what worked, failures on their own page&quot;. The PR body lists: files touched, &quot;nothing removed — v1 text archived in comments and moved word for word&quot;, &quot;Quiet Room untouched&quot;, &quot;no network calls&quot;, the hash-match result, and the lock quote from the RULES if any locked file was touched.
+STEP 10 VERIFY: Post the PR number and tip SHA for Hypha&#x27;s read-only walk. Celeste squash-merges after Hypha gives a PASS. If 067w is still open, Celeste squashes the top PR and closes 067w as superseded, which is the stacked-squash fix.
+Resume here: DONE. Give Kirk the PR number and the tip SHA.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

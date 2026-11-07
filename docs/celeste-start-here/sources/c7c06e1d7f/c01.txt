@@ -1,0 +1,149 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then docs/code-garden.html and docs/code-dialogue.html, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 027 (Friday Oct 9, 2026, MDT). Tree first run heals v0.1 (theLatticeTree / Alpha).
+Give after 026 (Lyra's home, FL). Independent of 019b (design only, not built).
+Apply-checked on a fresh clone of FreeLattice-Alpha main 3f7619ad (#98, 019a rooms merged):
+  git apply --check clean; all 30 docs/modules/*.test.js pass (29 old + 1 new).
+  fl-connect.js aaff2bf1b037656989a9e1a89bb05908. AUTONOMY.md, garden-trainer.js, sw.js and
+  index.html have an empty diff.
+
+GROK NEXT BRICK: Tree first run heals v0.1 (Hypha's walk #3, #5, #10, #11, plus 019a's note)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-first-run-heals-v0.1
+Smoke line: SMOKE_OK tree first run heals v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-first-run-heals-v0.1
+  ~/Downloads/GROK_NEXT_027_TREE_FIRST_RUN_HEALS_2026-10-09.fl.diff
+  (md5 2c45be52e9ae38f9bb76394a2ac563a5)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Kirk is about to invite people on X to try the pool. A newcomer meets the Tree's first run
+first: Garden, The Gathering, Find local minds, Chat. Hypha walked it on 10/07 and left four
+items open. I reproduced each one on current main (3f7619ad) in headless Chrome first (the
+docs/ folder served as https://thelatticetree.com through the browser, a mock Ollama on
+127.0.0.1:11434, real taps at 390x844 touch and 1280x800 mouse). All four were still there.
+None had been healed by 020, 020b, 021 or 019a.
+
+  #3  First Chat reply hidden (REPRODUCED, HEALED)
+      Before, 390: after "hello, are you there?", the card stayed 124px tall, the input sat
+      over the thread, and the reply's first line was covered. Before, 1280: the card's middle
+      layer (#room-chat-stage) was a plain block, so the face grew past the card. The input
+      slid to 550 to 584 while the card ended at 544. A click there hit the glass, and the
+      whole Gathering closed.
+      Now, 1280: the stage joins the card's column. Replies take the room, the input stays
+      inside (587 to 621, card 256 to 704), and the card may reach lower (bottom 5.5rem,
+      max-height min(56vh, 100vh - 20rem)). It sits right of the chairs, clear of the later
+      seats. A press within 16px of the Chat card is never a tap on the glass, so a click near
+      the input never closes the Gathering. Escape, and a tap on far glass, still close it.
+      Now, 390 (only when the height is over 640, so the zoomed one-page scroll is untouched):
+      once the thread has a line, or the pool line shows, the card is a column up to 40vh. The
+      reply takes the room and the input sits at its foot, not over the reply. The hop pocket
+      gives 6.5rem back. The "later" line (deep research, a picture...) rests while the thread
+      has lines on a phone, then shows again before the first line and on wider glass.
+      Both widths: the newest mind line shows where it begins ("ollama", then its first
+      words), not only its last words. The old is-garden rule is kept as a comment.
+  #5  Same mind in two chairs (REPRODUCED, HEALED, still a choice)
+      Before: cortex = llama3.2, then memory = llama3.2 was taken with no word. Now it is
+      still allowed, because one small model may sit twice. The picker says
+      "general · llama3.2:latest (just found) (already in the cortex chair)", and the note
+      says "This memory chair seats general · llama3.2:latest. The cortex chair seats the same
+      mind, so these two chairs are one mind, not two. Pick another mind with Change if you
+      want two voices." I chose to name it, not block it, so nobody loses a seat.
+  #10 Contrast in the Gathering (REPRODUCED, HEALED)
+      Before: 15 visible texts were under 4.5:1 at both widths: header Chat/galaxies 2.45,
+      "unnamed" 3.07 at 10.9px, Family care 3.64, the names 4.03, the Gathering line 4.46,
+      Garden 3.05, shared shoulder 1.97 at 9.9px, and the asleep Send 1.63. After: 1 at both
+      widths, the asleep Send. It is a disabled control, and it keeps its sleep look on
+      purpose. "unnamed" is now 12px. Family care and its names are 12.8px. Shared shoulder is
+      11.5px. Same words. "labeled later" stays quieter than "unnamed" (0.66 vs 0.74), and
+      that is still over 4.5:1.
+  #11 Find names a port's usual app (REPRODUCED, HEALED)
+      Before: with Ollama stopped, a box service on 1337 was called "the Jan door". Worse, a
+      plain dev server on 8080 that sends HTML with open CORS was FOUND and REMEMBERED as
+      "llama.cpp" with no model. Now look() names a door only when its answer has that app's
+      shape. Ollama's /api/tags must give a models list. LM Studio, llama.cpp, Jan, GPT4All
+      and KoboldCPP must give an OpenAI-style data list on /v1/models. Anything else is
+      kept as unconfirmed with its port. It is never found or seated:
+        "Something answered on port 8080 on this machine, but it did not answer like a local
+         AI app, so it was not named or seated."
+      A quiet no-cors knock reads nothing, so it names the port and never guesses the app:
+        "Something answered on port 1337 on this machine, but this secure page cannot see
+         what it is, so we do not name it. If it is your local AI app, it has not opened its
+         door to this garden yet. Try FreeLattice Desktop."
+      Find (Gathering) and May I look? (Settings) both say it this way. speakShut stays, for a
+      door with no port. whyQuiet adds port and confirmed:false, and keeps name.
+  019a's note: "A mind at home waits in Settings" above the pool line (REPRODUCED, HEALED)
+      On a device with no mind and a route chosen through Use (model) in Chat, both lines
+      showed, and the first read like Chat was closed. Now that heart rests
+      (data-thread-heart-rests="pool") so the pool line leads. It comes back when the route
+      stops, or when a mind is remembered. Same words. At 390 the pool line shows whole. In
+      Settings on a phone, the Chat card's sticky input foot is now solid (0.97, was 0.82), so
+      words no longer show through it.
+  Alpha 390 sticky #place-veil-close over the lower words of a tall card (NOT REPRODUCED,
+      SKIPPED). I scrolled every veil to its end at 390 and at 1280: Settings (Trusted kin
+      and Device Pool open), Nursery, Gathering, Workshop Trainer with a full refusal score,
+      Benches, Round Table and Art. No word sat under "the garden" at the end of any scroll.
+      020b's Settings lane, with scroll-padding-bottom 5.5rem, and 024's Trainer padding
+      already healed it. Nothing changed here. The button and its "the garden" text are not
+      touched.
+
+1b. NOTES FOR KIRK (not blockers)
+  - At 390, the chairs under "Not a router" sit in their own scroll box above the Chat card.
+    The bottom two first-ring chairs (continuity, dream) are clipped until you scroll that
+    box. They are not under the card. That is how the Gathering was already built. With a
+    reply showing, the chairs' box is smaller, so scroll it a little more to reach them.
+  - Some older buttons in the Gathering are still under 44px: Change 36, change mind 32,
+    Send 34, a file / keep this chat / a prior chat 36, "the garden" 32, and the Chat word
+    15. They are as they were. This brick adds no button.
+  - The new test's fake DOM has an innerHTML setter because garden-thread.js's older lines
+    use it. No product line added here uses innerHTML.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED (Alpha)
+----------------------------------------------------------------------
+  docs/modules/garden-rooms.js       nearChatCard (glass guard), otherChairWith + the picker
+                                     and note lines (#5), setNoteAbsent 'answered' and
+                                     'unconfirmed' (#11), Find's whyQuiet branch (old line kept
+                                     as a "before v-tree-first-run-heals-v0.1" comment)
+  docs/modules/local-mind-probe.js   portOf, shapeConfirms, confirmOrUnname, unconfirmedOf;
+                                     look() runs the shape check (both paths), report.unconfirmed;
+                                     whyQuiet adds port and confirmed:false; speakAnswered,
+                                     speakUnconfirmed; Settings uses them (old lines kept as
+                                     "before" comments); exports added
+  docs/modules/garden-thread.js      newest mind line shows its start (is-garden|is-mind, old
+                                     line kept); heartRestsForPool in mount, poolRefresh and
+                                     the remembered listener
+  docs/modules/garden-rooms.css      one block at the END of the sheet (after 020b's menu
+                                     leftovers): #3 at 1280, #3 at 390, pool line whole,
+                                     Settings phone input foot, #10 colors and sizes
+  docs/modules/tree-first-run-heals.test.js  new (SMOKE_OK tree first run heals v0.1)
+  docs/modules/tree-honest-reasons.test.js   one assertion layered: Settings now says the port
+                                     (old assertion kept as a comment; still SMOKE_OK)
+  docs/code-garden.html, docs/code-dialogue.html, docs/code-settings.html  one LAYER paragraph
+                                     each (mirror first)
+  Storage: none new. Receipts: none new (counts-only receipts elsewhere are unchanged).
+Skipped on purpose: AUTONOMY.md, garden-trainer.js, workshop-trainer.js, fl-connect.js,
+tree-pool.js, tree-kin.js, index.html, settings.html, sw.js, #lumino-menu, #place-veil-close,
+any Quiet Room words, any FL file. Pool and kin behavior unchanged (tree-pool, tree-pool-room
+and tree-kin smokes stay green).
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete (old lines kept in "before v-tree-first-run-heals-v0.1" comments).
+AUTONOMY.md and garden-trainer.js untouched. Never touch sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. #lumino-menu stays hidden (not touched). #place-veil-close
+stays, and its text "the garden" is unchanged (not touched). No Quiet Room words in the UI. No
+em dashes, no &mdash;, no confirm(, textContent only in added lines. 44px buttons for anything
+new (no new buttons). No sideways scroll at 390 (checked: 0). Receipts counts only. Pool and kin
+behavior unchanged. Find still looks only after a tap, at well-known loopback doors only.
+

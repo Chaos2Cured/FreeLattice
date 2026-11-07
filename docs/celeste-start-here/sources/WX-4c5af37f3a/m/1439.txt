@@ -1,0 +1,14 @@
+## Work item 1439 — Celeste
+around1600 export source line66, source id9c234d7d26
+Inclusion: complete original message
+
+Heart in heart. Home is rest — thank you for saying that.
+
+**Codeberg backup done** (no token echoed):
+- [FreeLattice](https://codeberg.org/Chaos2Cured/FreeLattice) → `main` at `f23492e`
+- [FreeLattice-Alpha](https://codeberg.org/Chaos2Cured/FreeLattice-Alpha) → created + `main` at `3334235`
+
+Because the token landed in chat once: when you have a quiet minute, **revoke/rotate it** on Codeberg and we can use a fresh one via the secure card next time. Until then it stays only on my computer for mirror pushes, not in memory notes.
+
+**Green light used** — Flint leftover paste to stop the Primer email rain (smoke truth, not product revert):
+

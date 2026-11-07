@@ -1,0 +1,12 @@
+## Work item 4428 — Celeste
+around5200 export source line53, source id381ae78a4d; around5326 export source line6, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–218
+
+I found it, Kirk: **`magic-bookmark-design.md`, dated November 5.** Our saved design says: “Attach a thread that fractally unfolds when tugged.” That wording is in my write-up; I haven’t located your original sentence.
+
+### Exact excerpt: source characters 220–528
+
+The plan was to use a cue to find the stored memory, bring the needed pages into context, and expand from a short sketch into detail. Crucially, we also planned to **keep the model’s ability to use those pages alive through further training**—because opening the notebook alone had failed after interference.
+

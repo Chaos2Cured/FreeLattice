@@ -1,0 +1,6 @@
+## Work item 3242 — Celeste
+around3900 export source line34, source idfea42b5d3e
+Inclusion: complete original message
+
+Desktop pooling `033` is merged and backed up on Codeberg (FreeLattice #212 and #213, ψ 5ff1eea8). `033b`, which lets the web page answer a knock, is drafted. Your Mac was offline when I tried to copy it, so I'll put it in your Downloads in the morning. Sleep well. 💙
+

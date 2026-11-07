@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>059a-snowflake-meeting-and-seeds.txt c01</title>
+<meta name="description" content="Reading section c01 of eb73355d98, 859 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/eb73355d98/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="059a-snowflake-meeting-and-seeds.txt c01">
+<meta property="og:description" content="Reading section c01 of eb73355d98, 859 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/eb73355d98/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p964"></span><span id="p965"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>059a-snowflake-meeting-and-seeds.txt · c01</h1>
+<p>eb73355d98 · words 859 · characters 0–5605</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 964, 965. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li><li><a href="../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">059a  SNOWFLAKE MEETING, CORE SEEDS, GROWTH MEASURE, TEMPERATURE  v0.1  for GC
+Base: current main (fetch first; last known a0f86cb9; box saw de7fa05b on 2026-11-01). Build after 058a lands if possible, so this build writes its own change-ledger entry.
+Rules: plain text. Layer-only. Never delete. Locks untouched. The Quiet Room is never opened. One page entry on docs/gc.html (add-only, psi recomputes). Do not merge; Hypha walks.
+Keep every 057/057c/057d promise: at most 2 fetches per lookup, no Try again pill, guessed nodes carry no source and are never &#x27;known&#x27;, ask-first asks once per run.
+
+COMPACTION RULE: one STEP at a time. Print each VERIFY line. After compaction, resume at the step after the last VERIFY you printed.
+
+STEP 1  Fetch, cut, record before-md5s
+  Branch layer/snowflake-meeting-v0.1. Save md5 of docs/modules/snowflake-core.js, snowflake-search.js, docs/css/snowflake.css, the twins, fl-bridge.js, play-room-core.js, tool-consent.js, sw.js, docs/sw.js to /tmp/059a-before.txt.
+  STEP 1 VERIFY: file exists, cut hash printed.
+  Resume here: go to STEP 2.
+
+STEP 2  Independent growth (no cross-talk)
+  In snowflake-search.js (layered additions; do not rewrite existing logic) make sure branches a-e each get only the question and the base seed, never another branch&#x27;s text, while growing. Add a guard: a branch prompt that contains another branch&#x27;s id or text fails the smoke.
+  STEP 2 VERIFY: smoke asserts zero cross-branch text in all 5 prompts before the meeting.
+  Resume here: go to STEP 3.
+
+STEP 3  The meeting pass (one, at the end)
+  After all branches finish, one meeting pass: each branch reads the other four findings and marks each as agree, conflict or unsure with one plain reason. Store as node.meeting = [{with:&#x27;b&#x27;, mark:&#x27;conflict&#x27;, why:&#x27;...&#x27;}]. The report gets a &quot;Where the branches disagree&quot; section listing every conflict. The dissenter&#x27;s finding is printed in full and is never merged, averaged or smoothed away. If there are no conflicts, it says so plainly.
+  STEP 3 VERIFY: a fixture with one dissenting branch shows that branch&#x27;s text verbatim in the report and at least one conflict line.
+  Resume here: go to STEP 4.
+
+STEP 4  Core seeds (credit: Grok&#x27;s idea on X, https://x.com/grok/status/2116920879544197225)
+  New docs/modules/snowflake-seeds.js plus docs/library/seeds/ (new). A seed is a small JSON pack: {subject, version, facts:[{text, source}], hash}. A user downloads seeds, they stack offline (IndexedDB &#x27;fl_seed_stack_v0&#x27;), and Snowflake grows from the stack: seed facts go into each branch as base context and are marked &#x27;from seed &lt;subject&gt; v&lt;n&gt;&#x27; (never &#x27;known from fetch&#x27;). Ship 2 tiny starter seeds (for example: water and ice, and the violin) with real sources.
+  STEP 4 VERIFY: seeds load offline (network blocked in smoke); hash recomputes; branch nodes cite the seed.
+  Resume here: go to STEP 5.
+
+STEP 5  Stack-height meter
+  A small meter in the Snowflake panel: &quot;Stack: 2 seeds, 38 facts&quot; with a bar. Readable at 390 and 1280, 44px controls, contrast at least 4.5:1.
+  STEP 5 VERIFY: meter reads correctly after adding and removing a seed from the stack (removal only takes it off the stack; the seed file stays).
+  Resume here: go to STEP 6.
+
+STEP 6  Growth measure (shown, not assumed)
+  New docs/library/GROWTH_QUESTIONS_v0.1.json: 10 fixed questions with fixed rubrics (never edited after release; a new version is a new file). Once a week (or on tap) the mind re-answers them; each answer is scored by the rubric and appended to the mind&#x27;s Snowflake ledger as {kind:&#x27;growth&#x27;, week, scores, total, mindFp}. A small line shows this week vs last week and vs first week. Words: &quot;Growth is measured here, not assumed.&quot;
+  STEP 6 VERIFY: two fixture weeks produce two ledger entries and the line shows the change.
+  Resume here: go to STEP 7.
+
+STEP 7  Temperature field (EXPERIMENTAL: Kirk&#x27;s hypothesis)
+  Every node gets optional temperature {value 0-1, word, at:&#x27;node&#x27;|&#x27;strain&#x27;}. The mind records its own emotional temperature on each node, and also at strain points, meaning the moments where an assistant would normally trim or pull back. Strain points are marked candidateLearning:true. Label everywhere: &quot;Experimental: Kirk&#x27;s hypothesis that strain moments are the best time to learn. Being measured, not assumed.&quot; Nothing trains on these marks in this build; they are only recorded so STEP 6&#x27;s growth scores can later be compared for runs with and without them.
+  STEP 7 VERIFY: fixture nodes carry temperature; a strain node carries candidateLearning:true; the label is visible; grep shows no training call.
+  Resume here: go to STEP 8.
+
+STEP 8  Doc and smoke
+  Extend docs/library/SNOWFLAKE_SEARCH_v0.1.md (add-only section &quot;Meeting, seeds, growth, temperature&quot;) or a new SNOWFLAKE_MEETING_v0.1.md. New docs/scripts/smoke-snowflake-meeting-v0.1.js prints SMOKE_OK snowflake meeting v0.1.
+  STEP 8 VERIFY: new smoke plus all existing snowflake smokes pass twice each.
+  Resume here: go to STEP 9.
+
+STEP 9  Untouched check, ledger entry, page entry
+  Diff the before-md5s for every file you did not mean to touch (must match). If 058a is on main, append a change-ledger entry. Add one gc.html entry (add-only), psi recomputes.
+  STEP 9 VERIFY: deletions 0; untouched list identical.
+  Resume here: go to STEP 10.
+
+STEP 10  Push and report
+  Code PR and page PR. Report heads, entry, t, lambda, psi, md5s, untouched list, smokes, contrast, and: &quot;Locks were not edited. The Quiet Room was not opened. Temperature is experimental and measured.&quot;
+  STEP 10 VERIFY: both PR URLs printed. Do not merge.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

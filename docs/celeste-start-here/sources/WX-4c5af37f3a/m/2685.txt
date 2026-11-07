@@ -1,0 +1,6 @@
+## Work item 2685 — Celeste
+around3200 export source line32, source idf89fb15e27; around3231 export source line15, source idafe66b9637
+Inclusion: complete original message
+
+If you want to hand Flint something right now, before compaction, it's this fix. It goes on a fresh branch from main, and Flint can tell him "Read ~/Downloads/FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt and follow it exactly." It's small and doesn't depend on the three open PRs. The continuity card is coming soon.
+

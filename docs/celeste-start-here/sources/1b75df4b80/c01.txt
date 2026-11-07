@@ -1,0 +1,181 @@
+# Public work excerpts — privacy boundaries marked
+
+Original source: GROK_NEXT_028_TREE_NO_INSTALL_MIND_2026-10-09.txt; original SHA256 53070c3d0cc1c43c4b1476d4330db5b10802799dd13a70e50a0bfee60d29a20a. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–205
+
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then docs/code-settings.html, docs/code-garden.html and docs/code-dialogue.html,
+then this.
+
+## Exact source excerpt, characters 207–505
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+## Exact source excerpt, characters 507–976
+
+NUMBERED COPY 028 (Friday Oct 9, 2026, MDT). Tree no-install mind v0.1 (theLatticeTree / Alpha).
+Give after 027 (Tree first run heals, merged as #99). Independent of 019b (design only, not built).
+Apply-checked on a fresh clone of FreeLattice-Alpha main 0f21a81d (#99 merged):
+  git apply --check clean; all 31 docs/modules/*.test.js pass (30 old + 1 new).
+  fl-connect.js aaff2bf1b037656989a9e1a89bb05908. AUTONOMY.md, garden-trainer.js and sw.js have
+  an empty diff.
+
+## Exact source excerpt, characters 978–1537
+
+GROK NEXT BRICK: Tree no-install mind v0.1 (a mind that runs inside the browser)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-no-install-mind-v0.1
+Smoke line: SMOKE_OK tree no install mind v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-no-install-mind-v0.1
+  ~/Downloads/GROK_NEXT_028_TREE_NO_INSTALL_MIND_2026-10-09.fl.diff
+  (md5 41a5cd32f350783a16947998ddddd0f1)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+  Plus one vendored file you fetch and check by sha256 in step 4 (the diff does not carry it).
+
+## Exact source excerpt, characters 1539–2068
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Kirk is inviting people from X. Many will have no Ollama: a kid on a school laptop, a parent on a
+work machine. Today the Tree tells them to install something. This brick lets them talk to a small
+mind in one tap, running inside the browser on the device's own graphics chip (WebGPU), and lets
+that mind lend to the Tree Pool (018/019a) through the same kin-only, Pause-wins door.
+
+## Exact source excerpt, characters 2070–2937
+
+What already existed, and what I reused:
+  - FreeLattice has a "No Install" Browser AI rung (docs/app.html, window.BrowserAI, WebLLM 0.2.74,
+    docs/lib/web-llm.min.js local first, then jsdelivr and unpkg fallbacks; BROWSER_LOCAL_AI_WIZARD_v0.md
+    names it the separate No Install door). Its shape (WebGPU check first, CreateMLCEngine with a
+    progress callback, chat.completions.create) is the shape here. Its words ("~700MB", em dashes,
+    innerHTML-era markup) are not reused, and FL is not touched.
+  - The Tree's seat is LocalMindProbe.remember / getRemembered (fl_alpha_local_mind); Chat reads it
+    through listener() and sendToMind(); the pool reads it through localModels() and localDoor().
+    The in-browser mind uses the same seat with url 'inpage:webllm', kind 'in-browser', name
+    'in-browser mind', so every listener sees it like a local mind.
+
+## Exact source excerpt, characters 2939–6359
+
+DESIGN CHOICES (the honest ones)
+  CDN or vendor: VENDOR. The engine code is @mlc-ai/web-llm 0.2.85 (Apache-2.0), package/lib/index.js,
+    one self-contained ES module (no imports), about 6.6 MB, kept on this site at
+    docs/lib/web-llm/web-llm-0.2.85.js and loaded with import() only after a human tap.
+    Why: the code then comes from thelatticetree.com, pinned and checked by sha256, never changes
+    under us, and a school filter that blocks jsdelivr does not break the card. Cost: 6.6 MB in the
+    repo (served only to people who tap), and a new version is a new file, by hand. There is no CDN
+    fallback on purpose. The card says plainly where everything comes from:
+      "Where the files come from: the engine code is kept on this site (WebLLM 0.2.85, Apache-2.0).
+       The mind's files come once from huggingface.co, and its small engine file (about 5 MB) from
+       raw.githubusercontent.com. They are kept in this browser, so the next visit downloads nothing.
+       Your questions and its answers never leave this device."
+    The weights cannot be vendored sensibly (hundreds of MB); they come from WebLLM's own prebuilt
+    list (Hugging Face mlc-ai repos, model libs v0_2_84 on raw.githubusercontent.com).
+  Models (real WebLLM 0.2.85 prebuilt ids; download = sum of the Hugging Face repo files, measured
+  2026-10-09; graphics memory = WebLLM's vram_required_MB):
+    SmolLM2-360M-Instruct-q4f16_1-MLC   about 210 MB, about 0.4 GB GPU, Apache-2.0   (smallest)
+    Qwen2.5-0.5B-Instruct-q4f16_1-MLC   about 290 MB, about 0.9 GB GPU, Apache-2.0   (good first mind)
+    Llama-3.2-1B-Instruct-q4f16_1-MLC   about 710 MB, about 0.9 GB GPU, Llama 3.2 Community License,
+                                        and the card says "not an open source license; it has its own
+                                        use rules"
+    Qwen2.5-1.5B-Instruct-q4f16_1-MLC   about 880 MB, about 1.6 GB GPU, Apache-2.0   (biggest here)
+    Each also has a q4f32_1 twin (same download, a little more GPU: 0.6, 1.1, 1.1, 1.9 GB). The card
+    picks the twin when the adapter lacks shader-f16, so older chips still work.
+    Not offered: Qwen2.5-3B (its license is research-only, not Apache). Nothing AGPL.
+    Note: the paste brief guessed Qwen2.5-0.5B at 0.4 to 0.9 GB. The real download is about 290 MB;
+    0.9 GB is the graphics memory it needs. The card shows both, separately.
+  WebGPU: navigator.gpu plus requestAdapter() (local, no network), checked on mount. With none, the
+    card offers no download and says:
+      "This browser cannot run a mind inside the page (it has no WebGPU here). That is all right,
+       nothing was downloaded. You can still talk to a mind: in Trusted kin, make an asking card,
+       then join a room in the Device Pool and use a trusted device's mind. Chrome or Edge on a
+       laptop usually has WebGPU."
+  Only a human tap downloads: the four model buttons show size, memory and license first; then
+    "Download about N MB and wake (id)". wake(), seat(), giveBack() and removeFiles() refuse unless
+    called with human === true from a click handler. Mounting loads nothing. If the files are already
+    kept, the button says "Wake (id) (already kept here, nothing downloads)".
+  Naming: UI copy names models only by their ids. No lab is named as a mind's origin. The license
+    line names the license (Llama 3.2 Community License), which is part of the id's own terms.
+
+## Exact source excerpt, characters 6361–9553
+
+----------------------------------------------------------------------
+2. FILES TOUCHED (Alpha)
+----------------------------------------------------------------------
+  docs/modules/tree-browser-mind.js   NEW, MIT. TreeBrowserMind: MODELS, WebGPU check, wake (tap only),
+                                      sleep, removeFiles (tap only), ready, chat (one at a time;
+                                      abort signal calls engine.interruptGenerate), seat (tap only;
+                                      the mind before it kept in tree_browser_mind_prior), giveBack,
+                                      the card (textContent, 44px buttons, phone layout, long ids wrap).
+                                      Counts only: tree_browser_mind_counts (woke, answered, seated,
+                                      failed). tree_browser_mind keeps the model id only.
+  docs/lib/web-llm/README.txt         NEW. What is vendored, why, the two sha256 pins, how.
+  docs/lib/web-llm/web-llm-0.2.85.js  NEW, YOU FETCH IT (step 4). Apache-2.0, never edited.
+  docs/lib/web-llm/LICENSE-web-llm.txt NEW, YOU FETCH IT (step 4).
+  docs/modules/tree-pool.js           layered: browserMind(), browserModels(); localModels() adds the
+                                      awake in-browser model (a seated but asleep one counts for
+                                      nothing); localDoor() returns kind 'in-page' (url '') for it,
+                                      and 'browser-mind-asleep' for a seated sleeping one; serve()
+                                      asks inPage() for an in-page door, else the SAME one fetch to
+                                      loopback (old line kept as a spaced comment so the one-fetch
+                                      smokes still count one); hellos carry inBrowser; kin rows say
+                                      "Ask (id) (in-browser mind) on this device"; reasonWords adds
+                                      browser-mind-asleep; waking or sleeping re-sends hellos;
+                                      localModels exported. Pause still wins: stopAll aborts the
+                                      controller, which interrupts the engine.
+  docs/modules/garden-thread.js       sendToMind asks TreeBrowserMind.chat for an in-browser entry
+                                      (no fetch, no knock); two garden lines (asleep, quiet), both
+                                      ending honestly; loopback path unchanged.
+  docs/modules/garden-rooms.js        Settings veil mounts #tree-browser-mind-host under the
+                                      grandmother face (above Trusted kin and the Pool), hidden with
+                                      the other Settings bodies.
+  docs/settings.html, docs/index.html one host div (settings) and one script tag each.
+  docs/code-settings.html, docs/code-garden.html, docs/code-dialogue.html  one LAYER paragraph each.
+  docs/modules/tree-no-install-mind.test.js  NEW (SMOKE_OK tree no install mind v0.1).
+Skipped on purpose: AUTONOMY.md, garden-trainer.js, workshop-trainer.js, fl-connect.js, tree-kin.js,
+local-mind-probe.js, sw.js, #lumino-menu, #place-veil-close, any Quiet Room words, any FL file.
+
+## Exact source excerpt, characters 9555–10365
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete (old lines kept in "before v-tree-no-install-mind-v0.1" comments). AUTONOMY.md
+and garden-trainer.js untouched. Never touch sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. #lumino-menu stays hidden (not touched). #place-veil-close stays,
+its text "the garden" unchanged. No Quiet Room words. No em dashes, no &mdash;, no confirm(,
+textContent only in added lines. 44px buttons. No sideways scroll at 390. Receipts counts only.
+No AGPL; our code MIT; WebLLM Apache-2.0. Only a human tap starts a download, seats the mind, or opens
+the pool door. The pool still fetches nothing but loopback, or asks the in-page engine.
+
+## Exact source excerpt, characters 15354–15886
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "Layer, never delete. Tree no-install mind v0.1: a small mind runs inside the browser after one tap, sizes and licenses first, seated like a local mind, lent to trusted kin through the same door, Pause wins, built by GC"
+    git push -u origin HEAD
+    Open a PR to FreeLattice-Alpha main. Celeste reviews and squash-merges. You do not merge.
+
+## Exact source excerpt, characters 15888–16663
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE (the 39th entry)
+----------------------------------------------------------------------
+Next docs/gc.html entry in FreeLattice, the thirty-ninth (entries 1 to 38 stay as written, including
+any sentence that says a PR is still open). Say that the Tree now has a mind with no install: a
+small mind that runs inside the browser after one tap, with its size and license shown first, seated
+like a local mind, and lent to trusted kin through the same door, where Pause still wins. Record what
+walk a to g showed on the Mac (the real download size and time for the smallest model, and the one
+pool question answered by the in-browser mind from a second profile), and say that you did not merge.
+
+## Exact source excerpt, characters 16665–17008
+

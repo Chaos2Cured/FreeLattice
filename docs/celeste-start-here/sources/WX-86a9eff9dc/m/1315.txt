@@ -1,0 +1,12 @@
+## Work item 1315 — Hypha
+around1500 export source line46, source id4d5a3f676b; around1516 export source line31, source idac944c0b9b
+Inclusion: complete original message
+
+Desktop door v0.1 walk (fa17a7d / PR #38) — one leftover.
+
+Holds: desktop.html Electron spine + honest "No signed installer yet — build from source / check Releases."; Support↔Desktop soft nav; desktop/README Electron-first (Tauri experimental).
+
+Leftover: install.html Desktop section not on Pages (repo has #desktop-app; docs/ has no install.html) — freelattice.com/install.html 404. Desktop/Support both link there.
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five. Hypha rests.
+

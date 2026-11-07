@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GLOW_2A_v0.1.txt c03</title>
+<meta name="description" content="Reading section c03 of d92d1487bd, 796 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/d92d1487bd/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GLOW_2A_v0.1.txt c03">
+<meta property="og:description" content="Reading section c03 of d92d1487bd, 796 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/d92d1487bd/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1449"></span><span id="p1450"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GLOW_2A_v0.1.txt · c03</h1>
+<p>d92d1487bd · words 796 · characters 20561–26539</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1449, 1450. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+  // v-tree-glow-2a-v0: a calm way back. Escape, a tap on the empty glass, a close
++  // in the galaxies menu, and the browser&#x27;s Back each close what is open, one
++  // layer at a time, and stay on this page. They reuse the same close buttons.
++  function bindWayBack() {
++    if (window.__treeWayBack) return;
++    window.__treeWayBack = true;
++    var place = document.getElementById(&#x27;place-veil&#x27;);
++    var thread = document.getElementById(&#x27;thread-veil&#x27;);
++    function isOpen(v) { return !!(v &amp;&amp; v.classList.contains(&#x27;is-open&#x27;)); }
++    function openGalaxies() { return document.querySelector(&#x27;details.galaxies[open]&#x27;); }
++    function closeTop() {
++      var gal = openGalaxies();
++      if (gal) { gal.open = false; return true; }
++      var menu = document.getElementById(&#x27;lumino-menu&#x27;);
++      if (menu &amp;&amp; !menu.hidden) { hideLuminoMenu(); return true; }
++      var picker = document.querySelector(&#x27;[data-core-picker]:not([hidden])&#x27;);
++      var decline = picker &amp;&amp; picker.querySelector(&#x27;.core-bind-decline&#x27;);
++      if (decline) { decline.click(); return true; }
++      var tc = document.getElementById(&#x27;thread-close&#x27;);
++      if (isOpen(thread) &amp;&amp; tc) { tc.click(); return true; }
++      var pc = document.getElementById(&#x27;place-veil-close&#x27;);
++      if (isOpen(place) &amp;&amp; pc) { pc.click(); return true; }
++      return false;
++    }
++
++    document.addEventListener(&#x27;keydown&#x27;, function (e) {
++      if (e.key !== &#x27;Escape&#x27; &amp;&amp; e.key !== &#x27;Esc&#x27;) return;
++      if (e.defaultPrevented) return;
++      if (closeTop()) e.preventDefault();
++    });
++
++    // A tap on the glass itself (not on a word, chair or card) closes that place.
++    // Press and release must both land on the glass, and never in its first moment.
++    [place, thread].forEach(function (veil) {
++      if (!veil) return;
++      var downOnGlass = false;
++      var openedAt = 0;
++      new MutationObserver(function () {
++        if (isOpen(veil) &amp;&amp; !openedAt) openedAt = Date.now();
++        if (!isOpen(veil)) openedAt = 0;
++      }).observe(veil, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
++      veil.addEventListener(&#x27;pointerdown&#x27;, function (e) { downOnGlass = e.target === veil; });
++      veil.addEventListener(&#x27;click&#x27;, function (e) {
++        var ok = downOnGlass &amp;&amp; e.target === veil &amp;&amp; isOpen(veil) &amp;&amp; openedAt &amp;&amp; Date.now() - openedAt &gt; 600;
++        downOnGlass = false;
++        if (!ok) return;
++        var btn = document.getElementById(veil === thread ? &#x27;thread-close&#x27; : &#x27;place-veil-close&#x27;);
++        if (btn) btn.click();
++      });
++    });
++
++    // galaxies: a visible close inside, and a tap outside closes it (that tap does
++    // only that, so it never opens something by surprise).
++    var panels = document.querySelectorAll(&#x27;details.galaxies .galaxies-panel&#x27;);
++    for (var gi = 0; gi &lt; panels.length; gi++) {
++      if (panels[gi].querySelector(&#x27;[data-galaxies-close]&#x27;)) continue;
++      var gx = document.createElement(&#x27;button&#x27;);
++      gx.type = &#x27;button&#x27;;
++      gx.className = &#x27;galaxies-close&#x27;;
++      gx.setAttribute(&#x27;data-galaxies-close&#x27;, &#x27;1&#x27;);
++      gx.textContent = &#x27;close&#x27;;
++      gx.addEventListener(&#x27;click&#x27;, function (e) {
++        e.preventDefault();
++        var d = e.currentTarget.closest(&#x27;details&#x27;);
++        if (d) d.open = false;
++      });
++      panels[gi].appendChild(gx);
++    }
++    var swallowUntil = 0;
++    document.addEventListener(&#x27;pointerdown&#x27;, function (e) {
++      var gal = openGalaxies();
++      if (!gal || gal.contains(e.target)) return;
++      gal.open = false;
++      swallowUntil = Date.now() + 500;
++    }, true);
++    document.addEventListener(&#x27;click&#x27;, function (e) {
++      if (Date.now() &gt; swallowUntil) return;
++      swallowUntil = 0;
++      e.preventDefault();
++      e.stopPropagation();
++    }, true);
++
++    // Back closes the open place instead of leaving the site. One quiet history
++    // step while something is open; closing it any other way gives the step back.
++    var stepped = false;
++    function anyOpen() { return isOpen(place) || isOpen(thread); }
++    function settle() {
++      setTimeout(function () {
++        if (anyOpen()) {
++          if (!stepped) {
++            try { history.pushState({ treeWayBack: 1 }, &#x27;&#x27;); stepped = true; } catch (eP) {}
++          }
++        } else if (stepped) {
++          stepped = false;
++          try { if (history.state &amp;&amp; history.state.treeWayBack) history.back(); } catch (eB) {}
++        }
++      }, 160);
++    }
++    [place, thread].forEach(function (veil) {
++      if (veil) new MutationObserver(settle).observe(veil, { attributes: true, attributeFilter: [&#x27;class&#x27;] });
++    });
++    window.addEventListener(&#x27;popstate&#x27;, function () {
++      if (!stepped) return;
++      stepped = false;
++      closeTop();
++      settle();
++    });
++  }
++
+   function goToLumino(id) {
+     if (!id) return;
+     var galaxy = currentGalaxy();
+@@ -1168,6 +1277,9 @@
+     findBtn.textContent = &#x27;Find local minds&#x27;;
+     findBtn.setAttribute(&#x27;aria-label&#x27;, &#x27;Find local minds. May I look — only when you ask.&#x27;);
+     wrap.appendChild(findBtn);
++    // v-tree-glow-2a-v0: a second tap on the legend landed on Find as it slid in
++    // under the finger and looked unasked. A tap in the first moment is not a yes.
++    var findReadyAt = Date.now() + 700;
+ 
+     var ring = document.createElement(&#x27;div&#x27;);
+     ring.className = &#x27;core-chairs&#x27;;
+@@ -1216,12 +1328,15 @@
+       var n = wrap.querySelector(&#x27;[data-core-note]&#x27;);
+       if (!n) return;
+       n.textContent = msg;
++      // v-tree-glow-2a-v0: the newest line stays in view on a phone (CSS sticky).
++      n.classList.add(&#x27;is-fresh&#x27;);
+     }
+ 
+     function setNoteAbsent(kind) {
+       var n = wrap.querySelector(&#x27;[data-core-note]&#x27;);
+       if (!n) return;
+       n.textContent = &#x27;&#x27;;
++      n.classList.add(&#x27;is-fresh&#x27;);
+       if (kind === &#x27;https&#x27;) {
+         n.appendChild(document.createTextNode(
+           &#x27;The mind may be there, but this secure page cannot see the quieter door. Try &#x27;
+@@ -1430,6 +1545,7 @@
+     paintAll();
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

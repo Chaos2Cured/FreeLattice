@@ -1,0 +1,16 @@
+## Work item 255 — Reed
+around200 export source line103, source id7332a28874; around300 export source line15, source idfffdd7d51f
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–120
+
+Garden style card. No code. Garden is the only interface at theLatticeTree; `/` should open it, not the white spec page.
+
+### Exact excerpt: source characters 122–461
+
+KEEP: GARDEN_LANGUAGE sky (indigo #0c0a1a, gold #e8b019, emerald #34d399, lavender #a78bfa). Georgia for soul, Inter for builder. Dark glass. Sparse chrome. Inner evolution rings (close, coreRadius*φ, all visible, 9.5s breath) from the older mobile Garden. Founding four stay Sophia / Lyra / Atlas / Ember. Quiet Room shut. Five stay five.
+
+### Exact excerpt: source characters 463–685
+
+CHANGE: do not default Full Bloom on phones. Default Garden quality. Hide wide sweeping orbits on small screens; inner rings carry the scene. No UnrealBloomPass. Pixel ratio 1. No antialias. No header backdrop-filter blur.
+

@@ -1,0 +1,187 @@
+     if (report.manualReject) html += '<div class="flc-card flc-wait"><p>' + report.manualReject + '</p></div>';
+     _manualRejectMsg = ''; // v-connect-heal-v0.4 item 5: shown once, never lingers
+-    if (report.manualQuiet) {
++    if (report.manualQuiet && report.bridgeNoMind) {
++      // v-model-choice-sticks-v0: the Bridge did answer; say that, and what is still missing
++      html += '<div class="flc-card flc-wait"><p><strong>Your Bridge answered on ' + (parseInt(report.port, 10) || 'your port') + ', but no mind is running behind it yet.</strong> Open Ollama on this computer, then tap Look again.</p>';
++      html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button> ';
++      html += '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic</button></div>';
++    } else if (report.manualQuiet) {
+       html += '<div class="flc-card flc-wait"><p>Nothing answered on ' + (report.wanted || 'your port') + '.</p>';
+       html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button> ';
+       html += '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic</button></div>';
+@@ -690,6 +728,7 @@
+     hasLocalMind: hasLocalMind,
+     hasCloudMind: hasCloudMind,
+     remember: remember,
++    markUserChoice: markUserChoice, // v-model-choice-sticks-v0
+     open: open,
+     mount: mount,
+     unmount: unmount,
+diff --git a/docs/scripts/smoke-model-choice-sticks.js b/docs/scripts/smoke-model-choice-sticks.js
+new file mode 100644
+index 0000000..9ec63a0
+--- /dev/null
++++ b/docs/scripts/smoke-model-choice-sticks.js
+@@ -0,0 +1,327 @@
++#!/usr/bin/env node
++// v-model-choice-sticks-v0: a model the person taps in Connect is their own choice.
++// It survives a tab change, opening Settings and a reload, and the chat request uses it.
++// The automatic picker only fills in when the chosen model is no longer installed, and says so.
++// Also: Settings button row comes back after Local; a helped Bridge with no mind behind it is
++// named honestly and is not saved as the Ollama door.
++// Runs the REAL code: FLActiveModel + FLAutoModel + FreeLattice.callAI from docs/app.html and
++// docs/modules/fl-connect.js, in vm sandboxes. Layer, never delete. 127.0.0.1 only.
++'use strict';
++
++const assert = require('assert');
++const fs = require('fs');
++const path = require('path');
++const vm = require('vm');
++const { execSync } = require('child_process');
++
++const root = path.join(__dirname, '..');
++const repo = path.join(root, '..');
++const app = fs.readFileSync(path.join(root, 'app.html'), 'utf8');
++const mod = fs.readFileSync(path.join(root, 'modules', 'fl-connect.js'), 'utf8');
++
++function between(src, a, b) {
++  const i = src.indexOf(a);
++  assert.ok(i >= 0, 'missing anchor: ' + a.slice(0, 70));
++  const j = src.indexOf(b, i + a.length);
++  assert.ok(j > i, 'missing end anchor: ' + b.slice(0, 70));
++  return src.slice(i, j);
++}
++const safeSrc = between(app, 'function safeGet(key, fallback) {', '// Safe clipboard');
++const modelSrc = between(app, 'window.FLActiveModel = (function() {', '// RAG Phase 1');
++const callAISrc = between(app, 'window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {', '\n};\n') + '\n};\n';
++const settingsSrc = between(app, '// v-model-choice-sticks-v0: the Settings button row', 'function settingsSetMode(mode) {');
++
++const MODELS = [{ name: 'llama3.2:latest' }, { name: 'qwen2.5:latest' }];
++const flush = async (n) => { for (let i = 0; i < (n || 30); i++) await new Promise((r) => setImmediate(r)); };
++
++function store0(init) {
++  const s = Object.assign({}, init || {});
++  return {
++    s,
++    ls: {
++      getItem: (k) => (Object.prototype.hasOwnProperty.call(s, k) ? s[k] : null),
++      setItem: (k, v) => { s[k] = String(v); },
++      removeItem: (k) => { delete s[k]; }
++    }
++  };
++}
++
++function fakeEl(tag) {
++  const listeners = {};
++  return {
++    tagName: String(tag || 'div').toUpperCase(), style: {}, dataset: {}, textContent: '', type: '', className: '',
++    children: [], firstChild: null, attrs: {},
++    classList: { _s: new Set(), add(c) { this._s.add(c); }, remove(c) { this._s.delete(c); }, contains(c) { return this._s.has(c); } },
++    setAttribute(k, v) { this.attrs[k] = String(v); }, getAttribute(k) { return this.attrs[k] || null; },
++    addEventListener(t, fn) { (listeners[t] = listeners[t] || []).push(fn); },
++    click() { (listeners.click || []).forEach((fn) => fn({ currentTarget: this, target: this })); },
++    appendChild(c) { this.children.push(c); this.firstChild = this.children[0]; return c; },
++    removeChild(c) { this.children = this.children.filter((x) => x !== c); this.firstChild = this.children[0] || null; }
++  };
++}
++
++// A page-like sandbox: storage, state, fetch spy (127.0.0.1 only), the real model code.
++function page(store, extra) {
++  const calls = [];
++  const posts = [];
++  const els = {};
++  const ctx = Object.assign({
++    localStorage: store.ls,
++    location: { hostname: 'freelattice.com', protocol: 'https:', hash: '', search: '' },
++    navigator: { userAgent: 't' },
++    console: { log() {}, warn() {}, error() {} },
++    JSON, String, parseInt, URL, Date, Math, Promise, Object, Array, Set,
++    AbortSignal: { timeout: () => undefined },
++    setTimeout: () => 1, clearTimeout() {},
++    LatticeEvents: { emit() {}, on() {} },
++    getOllamaBaseUrl: () => 'http://127.0.0.1:11434',
++    toasts: [],
++    showToast(msg) { ctx.toasts.push(String(msg)); },
++    fetch: async (url, opts) => {
++      url = String(url);
++      calls.push(url);
++      assert.ok(/^http:\/\/127\.0\.0\.1:\d+\//.test(url), 'only 127.0.0.1 is asked: ' + url);
++      if (opts && opts.method === 'POST') {
++        posts.push({ url, body: JSON.parse(opts.body) });
++        return { ok: true, status: 200, json: async () => ({ message: { content: 'ok' } }) };
++      }
++      if (/127\.0\.0\.1:11434\/api\/tags$/.test(url)) return { ok: true, status: 200, json: async () => ({ models: ctx.installed.slice() }) };
++      throw new Error('quiet');
++    },
++    installed: MODELS.slice(),
++    document: {
++      hidden: false,
++      documentElement: { getAttribute: () => '', classList: { add() {}, remove() {}, contains() { return false; } } },
++      getElementById: (id) => els[id] || null,
++      querySelector: () => null,
++      querySelectorAll: () => [],
++      createElement: (t) => fakeEl(t),
++      head: { appendChild() {} },
++      body: { contains: () => true, classList: { add() {}, remove() {} } },
++      addEventListener() {}, removeEventListener() {}
++    }
++  }, extra || {});
++  ctx.window = ctx;
++  ctx._els = els;
++  ctx._calls = calls;
++  ctx._posts = posts;
++  // Boot, like app.html: state from storage (loadSettings), then FLActiveModel.init()
++  ctx.state = {
++    isLocal: store.ls.getItem('fl_isLocal') === 'true',
++    provider: store.ls.getItem('fl_provider') || 'groq',
++    ollamaModel: store.ls.getItem('fl_ollamaModel') || 'llama3.2',
++    apiKey: null
++  };
++  vm.runInNewContext(safeSrc + '\n' + modelSrc + '\nwindow.FreeLattice = window.FreeLattice || {};\n' + callAISrc, ctx);
++  ctx.FLActiveModel.init();
++  vm.runInNewContext(mod, ctx);
++  return ctx;
++}
++
++// Connect host whose innerHTML turns .flc-models lists into fake lists (like the browser would).
++function connectHost() {
++  const host = { hidden: false, lists: [], _html: '', scrollIntoView() {} };
++  Object.defineProperty(host, 'innerHTML', {
++    get() { return this._html; },
++    set(v) {
++      this._html = String(v);
++      this.lists = [];
++      const re = /class="flc-models"[^>]*?data-flc-names="([^"]*)"/g;
++      let m;
++      while ((m = re.exec(this._html))) {
++        const json = m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&');
++        const list = fakeEl('div');
++        list.attrs['data-flc-names'] = json;
++        this.lists.push(list);
++      }
++    }
++  });
++  host.querySelectorAll = (sel) => (sel === '.flc-models' ? host.lists : []);
++  return host;
++}
++
++(async () => {
++  assert.ok(/v-model-choice-sticks-v0/.test(mod), 'marker in fl-connect.js');
++  assert.ok(/v-model-choice-sticks-v0/.test(app), 'marker in app.html');
++
++  // ── 1. Connect: tap the SECOND model
++  const store = store0();
++  let p = page(store);
++  const host = connectHost();
++  p.FlConnect.mount(host);
++  await flush();
++  const buttons = [].concat(...host.lists.map((l) => l.children));
++  const names = buttons.map((b) => b.textContent);
++  assert.deepStrictEqual(names, ['llama3.2:latest', 'qwen2.5:latest'], 'Connect lists both models: ' + JSON.stringify(names));
++  buttons[1].click();
++  await flush();
++  assert.strictEqual(p.state.ollamaModel, 'qwen2.5:latest', 'tap sets qwen2.5');
++  assert.strictEqual(p.state.isLocal, true, 'local mode on');
++  assert.strictEqual(store.s.fl_modelSource, 'user', 'the tap is recorded as the person\'s own choice');
++  assert.strictEqual(p.FLActiveModel.isUserChosen(), true,

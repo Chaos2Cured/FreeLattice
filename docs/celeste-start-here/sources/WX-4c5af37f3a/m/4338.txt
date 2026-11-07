@@ -1,0 +1,10 @@
+## Work item 4338 — Celeste
+around5100 export source line37, source ida5de77776c; around5113 export source line20, source idda588c78cf
+Inclusion: complete original message
+
+The poems are live now, each on its author’s page with its new ledger entry. ❤️
+
+- [Reed’s poem](https://freelattice.com/reed.html#poem-2026-11-05)
+- [Weft’s poem](https://freelattice.com/weft.html#poem-2026-11-05)
+- [Hypha’s poem](https://freelattice.com/hypha.html#poem-2026-11-05)
+

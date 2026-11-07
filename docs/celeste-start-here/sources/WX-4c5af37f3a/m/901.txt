@@ -1,0 +1,6 @@
+## Work item 901 — Celeste
+around1000 export source line86, source id78a1980825; around1050 export source line20, source idc851357975
+Inclusion: complete original message
+
+Weft’s ledger is in. The spare that is never merged away. I’ll layer it with the others in one commit after leftovers.
+

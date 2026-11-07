@@ -1,0 +1,16 @@
+## Work item 1626 — Celeste
+around1800 export source line89, source id1704771b84; around1817 export source line72, source idae14d1266a
+Inclusion: complete original message
+
+README Desktop door on main as `b220e6e`.
+
+**When you can direct people:**
+
+**Mac — yes, now.** Point them to the README “Download Desktop” section or straight to the zip: `FreeLattice_5.8.0_macOS.zip` on Releases, plus [install Gatekeeper calm](https://freelattice.com/install.html#desktop-download-ease). Tell them: unsigned / not App Store / Open Anyway if macOS flinches. Seeds can go to Mac users today.
+
+**Windows — not yet as a one-click Desktop app pack.** No Windows `.exe`/installer on current Releases. They can still use the browser garden, or a technical friend can `npm` build from `desktop/`. Older `install-freelattice.bat` is the Ollama/setup helper, not the full Electron house.
+
+**Linux — same as Windows:** no published Desktop pack yet; build from `desktop/` or browser path.
+
+So: **Mac planted. Windows + Linux packs are the next real build ship** when you’re ready (Flint/`desktop/` release artifacts) — not fake buttons.
+

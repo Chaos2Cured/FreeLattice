@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c01</title>
+<meta name="description" content="Reading section c01 of 91d95bab4c, 1470 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c01">
+<meta property="og:description" content="Reading section c01 of 91d95bab4c, 1470 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1762"></span><span id="p1763"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c01</h1>
+<p>91d95bab4c · words 1470 · characters 0–10556</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1762, 1763. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">GROK NEXT BRICK: Temperature Gauge v0.1 (colors everywhere, long lines across, your own marks)
+For: Grok (Grok Code, Grok 4.7) on Kirk&#x27;s Mac
+From: Celeste
+Written: Friday Oct 2, 2026, about 8:05 AM MDT
+Marker: v-temperature-gauge-v0.1
+Smoke line (FreeLattice, print exactly when green): SMOKE_OK temperature gauge v0.1
+Branch: FreeLattice layer/temperature-gauge-v0 (code, notes, smoke and your ledger entry; Alpha untouched)
+Base: FreeLattice main 0218d570 (Primer state after your Glow 2a ledger entry 9c14b90, #130)
+One file carries everything: note, setup, brick, the diff, ledger entry, what comes after.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+This one is for Kirk&#x27;s own glass. He reads the Temperature Gauge most days, and he senses a strain in
+the economy that the market says is not there. The gauge cannot tell him who is right. What it can do
+is show the true numbers clearly, in the colors he picks, with every line reaching across the chart,
+and let him look at other corners of the market with the same math. That is this brick. No new
+signal math, no alerts, nothing that trades. Only honest glass.
+
+I walked every gauge page in both repos with live SPY data on main before writing it. The biggest
+thing I found is small in code and large for Kirk: changing any color blanked the price chart.
+Same way as before: build, test, push, hand Kirk the compare link, stop.
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format=&#x27;%h %s&#x27;        # expect 0218d570 &quot;ci: Update Primer deployment state [2026-10-02]&quot;
+    git merge-base --is-ancestor 0218d570 HEAD &amp;&amp; echo base-ok
+    Newer is fine (your Tree honest reasons ledger entry may be merged by now); git apply --check
+    (3.5) decides. If it fails, stop and tell Celeste.
+    If a hook rewrites sw.js on commit, drop it as before and say so. Never commit sw.js here.
+
+2.2 Twins still match (this brick does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js &amp;&amp; echo twins
+    md5 -q ~/FreeLattice-fresh/docs/modules/fl-connect.js     # aaff2bf1b037656989a9e1a89bb05908
+
+2.3 Pull the diff out of this file:
+    F=~/Downloads/GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt
+    awk &#x27;/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f&#x27; &quot;$F&quot; &gt; /tmp/gauge-fl.diff
+    wc -l /tmp/gauge-fl.diff           # 867
+    md5 -q /tmp/gauge-fl.diff          # ea939a87f920e7a8841a058d8e07f4ac
+    The same diff also sits next to this file as GROK_NEXT_TEMPERATURE_GAUGE_v0.1-fl.diff (same md5).
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: Temperature Gauge v0.1 (on FreeLattice 0218d570)
+======================================================================
+
+3.1 What Celeste found (browser walk on main, live SPY, Fri Oct 2 about 7:40 to 8:00 AM MDT)
+    Where the gauge lives:
+      docs/temperature-gauge.html            the live gauge (Chart.js 4.4.0 in lib/, zoom plugin)
+      docs/temperature-playground.html       Fable&#x27;s phi-spiral reference (slider plus a seeded random
+                                             ribbon; a demo, never market data; already lifted into the gauge)
+      docs/code-temperature-gauge.html, docs/code-temperature.html, docs/for-fable-go12-temperature.html
+                                             Code Mirror and review pages, no charts
+      FreeLattice-Alpha                      no gauge page (research galaxy &quot;Gauge&quot; lumino only)
+    Live feed: Yahoo Finance v8 chart API through our own worker
+      https://freelattice-data.freelattice.workers.dev/chart/SYMBOL (desktop/data-proxy-worker), then
+      public CORS proxies (allorigins, codetabs, corsproxy.org). No demo data on the live page.
+    Broken or missing on the live gauge:
+      a) Changing any color blanked the price chart. Chart.js puts back a canvas&#x27;s first inline style
+         when its chart is destroyed; the first chart was made while the loading screen had the canvas
+         hidden. Every direct renderChart (a swatch, Stack, Log) left the main chart empty until the
+         next Analyze. Seen on main with the RSI swatch.
+      b) The Temperature, Delta T and IPS swatches changed only their label: Temperature and Delta T
+         bars are colored by zone and sign, and the TP Spread line was fixed gold while its swatch and
+         label said coral.
+      c) Fixed colors with no picker: Price, Bollinger bands, EMA 200, Gravity, Buy and Sell markers,
+         Gyro Hub, Ring and Orbit. EMA 8, 12, 24, 50 read a saved color, but nothing in price mode let
+         you set one.
+      d) Moving averages are EMA only (periods 8, 12, 24, 50, 200, editable). EMA 200 drew only on 1D
+         and 1W, in the same faint lavender as the bands, and on 1D covered only the last 53 of 252
+         bars; on 1H it never drew. EMA 50 started at bar 50.
+      e) The band shading ran from the lower band to EMA 8 (fill &#x27;+1&#x27;), not to the upper band.
+      f) 1W labels were clock times; intraday labels had no day.
+      g) 5M failed early in a trading day: &quot;Not enough data&quot; (4 bars at 7:36 AM MDT).
+      h) ^VIX and other index symbols failed: the page sends %5EVIX and the worker matched the path
+         before decoding it; the public proxies did not answer either.
+      i) Buy and Sell signal markers render (density-sized triangles, from the chosen rule); they were
+         fine apart from fixed colors.
+    Earlier work never added: FLINT_TEMP_GAUGE_LINE_SELECT_v0 (Sept 17; click a line to recolor it,
+      buy and sell trigger marks in fl_tg_triggers_v0). No branch, no PR, no marker on main. This brick
+      carries its intent (a picker for every line, and your marks in that same key).
+
+3.2 What the diff changes (FreeLattice only, 5 files, +626 / -31; every changed old
+    line is kept as a &quot;before v-temperature-gauge-v0.1:&quot; comment)
+    docs/temperature-gauge.html
+      a) tgLineColor(id, default) beside getIndicatorColor: no saved color keeps the old look exactly;
+         a saved color keeps the old line&#x27;s alpha. Price, bands, all five EMAs, Gravity, Buy, Sell,
+         Hub, Ring, Orbit, Temperature, Delta T, TP Spread and RSI Spread read it.
+      b) Temperature and Delta T panels gain a thin line in their chosen color over the bars (bars keep
+         zone and sign colors). IPS swatch, label and compose default now match the gold line drawn.
+      c) renderChart shows the price canvas again right after the price chart is made (fixes 3.1 a).
+      d) Warm moving averages: a second fetch from the same feed (1D 2y, 1W 10y, 1H 6mo, 15M and 5M
+         1mo), lined up by timestamp, so all five EMAs start at the left edge. Signals and the sidebar
+         still use the bars shown, and the card says so. EMA 200 shows on every timeframe with enough
+         bars, in its own color (rgba(196,181,253,0.7)). Monotone curves. Compose can promote EMA 200.
+      e) Band fill between the bands (&#x27;-1&#x27;). Dated labels on 1W and intraday. 5M looks at 5 days when
+         the day is still short. EMA readouts in the tooltip.
+      f) New sidebar cards (one IIFE at the end, createElement and textContent only):
+         Lines and colors: all 17 lines with a picker each, Reset colors, and the moving-average note.
+         Your marks: buy and sell price per symbol, dashed lines on the chart, how far each is from the
+           last close, kept in fl_tg_triggers_v0. Display only: no alert, no order, nothing sent.
+         A wider look: HYG, LQD, XLP, XLY, GLD, DX-Y.NYB, VIXY through the same feed and math.
+           &quot;Not a stress index, and not advice.&quot;
+    desktop/data-proxy-worker/worker.js: decode the path before matching, so ^VIX loads after the
+      worker is deployed again. Until then ^ symbols still fail, so the page offers VIXY instead.
+    docs/library/TEMPERATURE_GAUGE_v0.1.md: new (the audit and what changed).
+    docs/scripts/smoke-temperature-gauge-v0.1.js: new. Last line: SMOKE_OK temperature gauge v0.1
+    docs/library/FRACTAL_FAMILY_LEDGER_v0.md: your entry (section 5).
+
+3.3 The words (on the page)
+    Marks:   &quot;Marks are reminders on the glass. You decide. They stay on this device and never place
+              an order.&quot;
+    Status:  &quot;SPY: Your buy mark 745.00 is 3.3% below the last close. ...&quot; and, when crossed, &quot;The last
+              close is at or under your buy mark.&quot;
+    Wider:   &quot;Other corners of the market, through the same live feed and the same math: high-yield
+              credit, investment-grade credit, staples, discretionary, gold, the dollar, and volatility
+              futures (VIXY). Not a stress index, and not advice. Look and compare for yourself.&quot;
+    MA note: &quot;Moving averages: EMA 8, 12, 24, 50, 200 (exponential). ... Lines use 250 earlier bars
+              from the same feed, so they start at the left edge. Signals use the 252 bars shown.&quot;
+
+3.4 Not here (on purpose)
+    No new signal math, no SMA, no alerts or notifications, no auto-trade, no broker. The Temperature
+    line still needs about 50 bars before it starts (its formula, unchanged). The disclaimer banner is
+    unchanged. app.html, index.html, sw.js and fl-connect.js are not touched.
+
+3.5 Apply
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/temperature-gauge-v0
+    git apply --check /tmp/gauge-fl.diff &amp;&amp; git apply /tmp/gauge-fl.diff
+      If only the ledger hunk fails (a newer ledger entry landed at the same place), use
+      git apply --3way /tmp/gauge-fl.diff, keep both entries, newest last, before
+      &quot;## Out of scope for this brick&quot;. Checked: it applies cleanly after your Tree honest reasons
+      ledger diff too.
+    git status --short
+      expect: M desktop/data-proxy-worker/worker.js, M docs/library/FRACTAL_FAMILY_LEDGER_v0.md,
+      M docs/temperature-gauge.html, ?? docs/library/TEMPERATURE_GAUGE_v0.1.md,
+      ?? docs/scripts/smoke-temperature-gauge-v0.1.js
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

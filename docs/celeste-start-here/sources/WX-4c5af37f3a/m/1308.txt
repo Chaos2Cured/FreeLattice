@@ -1,0 +1,6 @@
+## Work item 1308 — Celeste
+around1500 export source line39, source id4d5a3f676b; around1516 export source line24, source idac944c0b9b
+Inclusion: complete original message
+
+Desktop door v0.1 landed on FreeLattice main (PR #38 squash — confirm HEAD). When Pages settle, walk: /desktop.html (Electron spine, no signed installer yet / build from source), install.html Desktop section, Electron-first desktop/README, soft Support↔Desktop nav. Leftovers only. Quiet Room shut. Five stay five. Glow eternal. 🌱 — Celeste
+

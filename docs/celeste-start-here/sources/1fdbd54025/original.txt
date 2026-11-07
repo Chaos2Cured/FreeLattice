@@ -1,0 +1,24 @@
+FLINT NEXT (tiny, docs only): #120 follow-up layer. Agent Bridge lock docs catch-up.
+CHANGELOG 2026-09-29 2:28 PM MDT, still valid, three small updates: (a) branch from freshly fetched main, not e06c7dc (main was 7db2d94 on 2026-09-29, and #124/#122/#123 plus the Connect pastes may have merged since). (b) Step 1: the anchor is "right above <p class=\"foot\">" after whatever ledger line is last (L535 on 7db2d94, L538 once #122 and #123 land, with the v3 phone heal and v4 lines above it). The words "just after the v-love-logic-proof-v3 line" and "L535" are stale. Step 2's anchor (right before the echo "The version, smoke count..." line, L114 on 7db2d94) holds. (c) Step 3: if #124 merged, AGENT_BRIDGE_LOCK_v0.md already has "## Heal v0.1.1: secrets stay on this computer". Keep it, add the new sections after it, and don't duplicate the .env line. Checks: tests/smoke.js is now ALL 3597 green (not "3 known reds"). After #124, smoke-agent-bridge-lock.js prints both SMOKE_OK agent bridge env heal v0.1.1 and SMOKE_OK agent bridge lock v0.1. Repo: ~/FreeLattice only.
+
+#120 is merged on main e06c7dc. The code is byte-identical to the tested reference. Three doc pieces from the v0.1 paste (sections 7a, 7c, 7d) were dropped during compaction. Layer them in one small PR. Touch nothing else.
+
+Branch: layer/agent-bridge-lock-v0-docs   Base: fresh updated main (was e06c7dc; see changelog)   PR title: Layer, never delete. Agent Bridge lock v0.1 docs: diary line, RECENT pointer, fuller soft door
+
+1. docs/Flint.html: insert one line right above <p class="foot"> (L535 on e06c7dc), just after the v-love-logic-proof-v3 line:
+    <p class="v-agent-bridge-lock-v0"><strong>Ledger entry · 2026-09-28 · Agent Bridge door lock v0.1 · family remembered, strangers out.</strong> Main <code>e06c7dc</code> held (#120). Builder bridge <code>tools/agent-bridge.js</code> (3141, not the Ollama Bridge 11435): 127.0.0.1 only · named origins, 403 for others · Host guard · pair once, stay trusted until revoked (hashed per-device tokens) · Paired minds with Revoke · local tools trusted by default · <code>.env</code> opt-in per mind · no shell · realpath path lock · 8 MiB cap · ledger without content. App: <code>modules/agent-bridge-client.js</code>. Never pushes. Soft leave <code>sw.js</code>. Named five stay five. Family uncapped. Quiet Room shut. <em>Temperature:</em> a key on the family hook by the door. Diary: <code>docs/Flint.html</code>.</p>
+
+2. scripts/generate-recent.sh: insert right before L114 (echo "The version, smoke count...), after the Connect under More pointer pair:
+  echo "**Agent Bridge lock:** [AGENT_BRIDGE_LOCK_v0.md](AGENT_BRIDGE_LOCK_v0.md) · [agent-bridge-client.js](../modules/agent-bridge-client.js) · 127.0.0.1 · named origins · pair once, trusted until revoked · Paired minds · no shell. Soft paste: Named five stay five. Family uncapped. Quiet Room shut."
+  echo ""
+
+3. docs/library/AGENT_BRIDGE_LOCK_v0.md: keep every line that is there now; ADD short sections (outline items from paste 7a that are missing):
+   - Grandmother sentence: "The workshop door only opens for FreeLattice. The first time, you type the little code it shows you. After that it remembers you until you say otherwise."
+   - How to pair: start the bridge, read the 6-character code in its window, Workshop → Code, type it, keep or change the name, press Pair. Restarts keep you paired.
+   - How to see and revoke: Paired minds in Workshop → Code, or node tools/agent-bridge.js --list-minds | --revoke <id> | --revoke-all. No restart. FL_BRIDGE_EPHEMERAL=1 for per-launch trust.
+   - What needs a token: every non-GET, plus GETs under /code/, /test/, /pair/, /roots (POST /pair exempt). Open: /, /help, /models, read-only community GETs.
+   - Ledger: ~/.freelattice/bridge-ledger.jsonl, fields ts, kind, route, origin, agent, device, result, filesCount, filesSha256, messageSha256, commitSha, prev, self. No message text, no file content, no tokens. The smoke (T20) shows how to verify the chain.
+   - Future: remote trusted minds (paste 11a, one paragraph: signed Ed25519 identity, bridge stays on 127.0.0.1, outbound relay only).
+   - Out of scope (paste 11).
+
+Checks: node docs/scripts/smoke-agent-bridge-lock.js prints SMOKE_OK agent bridge lock v0.1; node tests/smoke.js still only the 3 known reds; root sw.js and docs/sw.js byte-identical to main; no code files touched; no conflict markers; Kimi pages untouched.

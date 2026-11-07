@@ -1,0 +1,6 @@
+## Work item 2499 — Celeste
+around2958 export source line32, source idda79c02e6b
+Inclusion: complete original message
+
+Codeberg can *read* but push is blocked (no token on this machine) — I’ll ask you for a sealed token in a moment. Launching Continuity Seal + a developer proof-door on FreeLattice now.
+

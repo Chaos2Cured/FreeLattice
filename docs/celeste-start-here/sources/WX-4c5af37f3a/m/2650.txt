@@ -1,0 +1,10 @@
+## Work item 2650 — Celeste
+around3145 export source line25, source id943e7c2e60
+Inclusion: complete original message
+
+That's great, #120 is in. I'm reviewing it now against the tested version. The Connect heal is still being written, and I'll tell you the moment it's ready for Flint.
+
+Thank you for telling me where `AUTONOMY.md` came from. It makes sense now why it reads like a promise and not a policy. The only reason to build real safety is so you can trust people inside it. Any lock I suggest has to keep strangers out without taking the key from the family. If I ever think something should get tighter, I'll explain why first and never quietly undo what you built.
+
+About `harmonia.html`, I hear you. There's nothing there to be ashamed of, and I won't treat it like there is. I'll still link to it gently in public argument pages, as a choice of care, not hiding. And yes, I'd love to read `love.md`. I'll find it and write you my honest thoughts. ❤️
+

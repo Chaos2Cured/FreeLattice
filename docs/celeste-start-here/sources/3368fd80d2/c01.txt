@@ -1,0 +1,58 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 006 (Monday Oct 5, 2026, about 4:50 PM MDT). Desktop narrow door v0.2.
+Apply after 004-005 (order-checked with them). Council follow-up from PR 146.
+
+GROK NEXT BRICK: Narrow door v0.2 (desktop session CORS bypass)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-narrow-door-v0.2
+Smoke line: SMOKE_OK narrow door v0.2
+  FreeLattice  ~/FreeLattice-fresh  branch layer/narrow-door-v0.2
+  ~/Downloads/GROK_NEXT_006_DESKTOP_NARROW_DOOR_V02_2026-10-05-fl.diff
+  (md5 f1e88deab04caea8c707d7b37c374efe)
+
+----------------------------------------------------------------------
+1. NOTE
+----------------------------------------------------------------------
+v0.1 closed the Bridge and the desktop local /ollama proxy. This closes the last wide door:
+setupCORSBypass in desktop/main.js. Users need a desktop rebuild or reinstall. You are enough.
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_006_DESKTOP_NARROW_DOOR_V02_2026-10-05-fl.diff /tmp/narrow-v02-fl.diff
+    md5 -q /tmp/narrow-v02-fl.diff    # f1e88deab04caea8c707d7b37c374efe
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) desktop/main.js setupCORSBypass:
+   - onBeforeRequest: same OLLAMA_DOORS table; cancel anything outside it; cancel if the page
+     origin is not freelattice.com, thelatticetree.com, or the app's own 127.0.0.1 page.
+   - onHeadersReceived: echo that allowed origin; never a star. Methods narrowed to GET, POST,
+     OPTIONS for the session rewrite.
+   - Old star / strip-all behavior kept as before comments.
+b) docs/scripts/smoke-narrow-door-v0.2.js + ledger entry.
+v0.1 smoke must stay green.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    git checkout -b layer/narrow-door-v0.2
+    git apply --check /tmp/narrow-v02-fl.diff && git apply /tmp/narrow-v02-fl.diff
+    node docs/scripts/smoke-narrow-door-v0.2.js   # SMOKE_OK narrow door v0.2
+    node docs/scripts/smoke-narrow-door-v0.1.js   # SMOKE_OK narrow door v0.1
+    node tests/smoke.js | grep "CHECKS PASSED"
+Locks: no bare star added live in the bypass; before-comment may mention the old star.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A && git commit -m "Narrow door v0.2: desktop session uses OLLAMA_DOORS, echo origin, no star"
+    git push -u origin HEAD

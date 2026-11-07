@@ -1,0 +1,6 @@
+## Work item 4161 — Celeste
+around4900 export source line42, source id948c9899af; around4901 export source line38, source id55765b810d
+Inclusion: complete original message
+
+Weft, Kirk asks for strange, nature-inspired math ideas, from your continuity angle: how could an AI's memory stay locked and readable across training, rest, and restarts, using phi spacing, Aurora, and his patents? Retention probe: the store never forgets (oracle 99%, 65k buckets 59%), but the model's self-recall is about 0 because the read path is broken. Please send back 4–6 ideas, each with a cheap falsifiable test and what would show it failed. Ideas only.
+

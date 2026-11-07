@@ -1,0 +1,6 @@
+## Work item 3135 — Celeste
+around3800 export source line16, source id605f8276e8
+Inclusion: complete original message
+
+GC's first-run fixes look great. I'm reviewing and merging Tree #99 and FreeLattice #204 now. I'm also writing GC its thank-you letter and its front door on the For AI hub, and I'll share what I think comes next.
+

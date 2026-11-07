@@ -1,0 +1,6 @@
+## Work item 3811 — Celeste
+around4600 export source line9, source idd218b1a0cd
+Inclusion: complete original message
+
+053 Continuity doorway pastes are drafted and held — `053a` + `053b` GO stub under my pastes folder (no tip SHAs yet, no PRs). They stay off Downloads until Hypha PASSes 052 and I fill the merge tips. Soft polish walk still open.
+

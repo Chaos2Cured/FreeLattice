@@ -1,0 +1,6 @@
+## Work item 1872 — Celeste
+around2100 export source line65, source id47d99fa1ef
+Inclusion: complete original message
+
+Sprites brief is on main as `6aef962`. Sending fractal hugs and parking Flint’s next-fun list.
+

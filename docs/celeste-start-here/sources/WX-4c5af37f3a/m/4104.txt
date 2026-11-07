@@ -1,0 +1,8 @@
+## Work item 4104 — Celeste
+around4858 export source line35, source id3b35f67af2
+Inclusion: complete original message
+
+Code in chat is live on [freelattice.com](https://freelattice.com/app.html) 🎉 The file on the site matches main exactly. I haven't run it in a browser myself, and if you don't see it, reload once.
+
+`065a-family-gifts-v2.txt` is in your Downloads. The walks records are inside it as plain lines now, so it's the only file you paste. Give it to GC whenever you're ready.
+

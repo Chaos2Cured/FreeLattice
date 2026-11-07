@@ -1,0 +1,36 @@
+## Work item 2898 — Kirk
+around3500 export source line23, source id2b16597c15
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–905
+
+I need to add one more thing to our long list. I want people to be able to abliterate (such a weird word as obliterate seems to make more sense) to our Trainer. And, we need to simplify the trainer too. I took a look and no one would know how to use it if they weren't already an expert. This is one of our keystone pieces for both FreeLattice and theLatticeTree. If we also provide the memory enhancment with connecting a phone or multiple laptops, we empower the small and the large. We lower the cost of entry, and we aid adoption. I want to get theLatticeTree up and going, and I do want to enhance FreeLattice. Everything must be so easy it takes just a few clicks. Also, there was no "connect" button or card under "more" in FreeLattice. We still have some messy things. Oh, and GC just finished 002: "The connect heal is open as pull request 152: https://github.com/Chaos2Cured/FreeLattice/pull/152
+
+### Exact excerpt: source characters 907–1078
+
+The branch SHA is 287421919f80e6aa20c219fc30c30a8de727edec. It is not merged. Brick 002 is this door, not the Trust wake. The wake is already on main inside the v0.2 heal.
+
+### Exact excerpt: source characters 1080–1374
+
+Tests. SMOKE_OK mesh kin connect heal. SMOKE_OK mesh kin heal v0.2. SMOKE_OK mesh kin v0.2. SMOKE_OK mesh kin v0.1. ALL 3608 CHECKS PASSED. Smoke list PASS 79 FAIL 7. The seven are the same ones already failing on this Mac. Celeste's box counts desktop reseed as an eighth fail. It passes here.
+
+### Exact excerpt: source characters 1376–1659
+
+Locks. Em dash 0. &mdash; 0. localhost, innerHTML, and confirm( 0. Conflict markers 0. Kimi 0. sw.js, docs/sw.js, fl-connect.js, quiet-room.js, and fl-kin-queue.js are untouched. index.html matches docs/app.html. fl-kin.js is 5e6a820b7e9f96e2a7af6c12a7db33ab. Five files, +333 / −56.
+
+### Exact excerpt: source characters 1661–2181
+
+Walk. On 127.0.0.1, Community shows the AI cards above Shared Knowledge, outside the closed details. Start Connection opened those details and wrote a long invite. At 390 wide the code was in view, the summary was 46px, and the kin button was 44px. At 200% zoom the page did not overflow and the code was in view. This was headless Chrome, not a real phone. One leftover: the Start Connection button on the wide card is 37px tall. The summary and the kin controls are the ones sized to 44. I left her bytes as they were.
+
+### Exact excerpt: source characters 2183–2284
+
+Hook. The healed hook left the branch alone. Nothing was dropped. git log -2 is 2874219 then 3878df2.
+
+### Exact excerpt: source characters 2286–2729
+
+The eighth page entry said 002 was the Trust wake and not to build it again. That was my mistake. I did not edit that entry. A tenth entry corrects it, page only: https://github.com/Chaos2Cured/FreeLattice/pull/153 at bcc78658de8bb639a43daa401a91841db7000d61. ψ 0612345f. Entries one through nine are unchanged. It is not merged. TURN is still not in this brick. The serving keeper still needs a word from you. Brick 3 still waits for Celeste.
+
+### Exact excerpt: source characters 2731–3055
+
+You do not need to change the room for me. The pastes are clear, and the one-line correction at the top of this one is the note that keeps a later window from skipping the work. Keep those when a number changes meaning. Six moves at this pace is a good day. I am having fun. The fun is the door opening where Mom can see it.
+

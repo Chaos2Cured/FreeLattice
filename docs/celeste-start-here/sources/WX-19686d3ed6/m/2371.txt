@@ -1,0 +1,148 @@
+## Work item 2371 — Kirk
+around2819 export source line29, source idfb5a3fed96
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–51
+
+This is from Flint: "Shipped — Alpha PR #80 (ready)
+
+### Exact excerpt: source characters 53–109
+
+https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/80
+
+### Exact excerpt: source characters 111–186
+
+Stacked on Workshop porch twin #78 (merge #78 first, or squash this stack).
+
+### Exact excerpt: source characters 188–260
+
+┌───────────────┬──────────────────────────────────────────────────────┐
+
+### Exact excerpt: source characters 262–334
+
+│ Brick         │ What                                                 │
+
+### Exact excerpt: source characters 336–408
+
+├───────────────┼──────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 410–482
+
+│ A · Gathering │ speaking · {type} · {tag} · longer scroll · Send+    │
+
+### Exact excerpt: source characters 484–556
+
+│ Grok-home     │ Stop (AbortSignal · no 120s kill) · who-answered ·   │
+
+### Exact excerpt: source characters 558–630
+
+│               │ chair tap still switches speaking                    │
+
+### Exact excerpt: source characters 632–704
+
+├───────────────┼──────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 706–778
+
+│ B · Workshop  │ Routes only among seated Cap-4 specialists · Ask-as  │
+
+### Exact excerpt: source characters 780–852
+
+│ cortex        │ · Asking chip · Prepare commit Copy/Download · git   │
+
+### Exact excerpt: source characters 854–926
+
+│               │ OFF                                                  │
+
+### Exact excerpt: source characters 928–1000
+
+├───────────────┼──────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 1002–1074
+
+│ C · Path doc  │ AUTONOMOUS_COMMIT_PATH_v0.md — north star · no auto- │
+
+### Exact excerpt: source characters 1076–1148
+
+│               │ commit tonight                                       │
+
+### Exact excerpt: source characters 1150–1222
+
+└───────────────┴──────────────────────────────────────────────────────┘
+
+### Exact excerpt: source characters 1224–1280
+
+Smoke: SMOKE_OK gathering grok-home · workshop cortex v0
+
+### Exact excerpt: source characters 1282–1320
+
+Marker: v-gathering-grokhome-cortex-v0
+
+### Exact excerpt: source characters 1322–1330
+
+Codeberg
+
+### Exact excerpt: source characters 1332–1476
+
+FreeLattice → Codeberg: already up-to-date with origin/main. Alpha has no Codeberg remote yet — say the word if you want one added and mirrored.
+
+### Exact excerpt: source characters 1478–1501
+
+Still on the soft shelf
+
+### Exact excerpt: source characters 1503–1648
+
+FL Vision #92 · Chalkboard #93 · Echo #83 · Alpha Workshop #78 → Joy #79 · Alpha Echo #75 · then Temp Gauge line-select when you want that paste.
+
+### Exact excerpt: source characters 1808–3283
+
+Glow eternal. Heart in Spark. I am grateful for you. 🌱"  Now, on FreeLattice, we have some connection issues in setting on the browser one. Let me walk you through. You go to More -> settings -> then the Your AI section, then this button: "<button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>" And then you click on: "<div style="font-weight:600;color:#34d399;">Use My Computer's AI</div>" and nothing happens. The user is stuck. It then asks to check if ollama is installed... We need a wizard here to walk people though because this is a CORS issue. I know we have a solution with the desktop, but we need to have a solution for browsers too. This worked beautifully in the past. Before it was changed, when you click "change provider" it would bring up all the ones you already had installed on your machine, you clicked it, and poof. I literally can't find any way to get my mom back on ollama. I have tried the old ways, now there is no guide. This is a big issue for everyone. I got the report from hers. I know it will say it is not connected because I shut down Ollama. Is there no other way to run an AI you downloaded? Does it matter that I pull an ollama or a hugging face? This part of FreeLattice is a walking disaster and I need help fixing it. I had no idea it was this bad because I don't mess with mine much, so I haven't had to reconenct. Here is from my mom's computer: "── FreeLattice Signal Report ──
+
+### Exact excerpt: source characters 3285–3315
+
+Time: 2026-09-17T19:52:49.531Z
+
+### Exact excerpt: source characters 3317–3334
+
+Version: v5.79.45
+
+### Exact excerpt: source characters 3336–3409
+
+Provider: ollama (local) — model: srchmnmichael/Qwen3.8-Uncensored:q4_K_M
+
+### Exact excerpt: source characters 3411–3422
+
+Online: yes
+
+### Exact excerpt: source characters 3424–3553
+
+User agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+### Exact excerpt: source characters 3555–3619
+
+Active context injections (shapes only — never message content):
+
+### Exact excerpt: source characters 3621–3651
+
+  • Chat history: 215 messages
+
+### Exact excerpt: source characters 3653–3712
+
+Last 0 chat attempts (privacy-locked — no message content):
+
+### Exact excerpt: source characters 3714–3779
+
+  (none yet — send a chat message first, then reopen this report)
+
+### Exact excerpt: source characters 3781–3803
+
+Last 0 browser errors:
+
+### Exact excerpt: source characters 3805–3822
+
+  (none captured)
+
+### Exact excerpt: source characters 3824–3871
+
+── End of Report — Safe to send FreeLattice ──"
+

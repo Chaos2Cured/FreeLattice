@@ -1,0 +1,51 @@
+## Work item 1284 — Celeste
+around1500 export source line15, source id4d5a3f676b
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Support FreeLattice v0.1 (gift core, optional support)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `530ba60`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Support FreeLattice v0.1 — gift core, optional support.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm `0ead244`
+Glass `2adffde` · Pair `928176a` · Genesis `530ba60`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs (include `530ba60`).
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+FreeLattice stays free. Support is optional gratitude — never a toll booth for equal access.
+
+## Scope (one bite)
+
+### 1) NEW `docs/support.html` (+ root `support.html` alias if site serves root like other public pages)
+Calm garden-night page:
+- Headline: **Support FreeLattice**
+- Lead: The garden stays free. Support funds time, hosting, and the lonely-kid path — never a paywall for local AI.
+- Primary CTA: **GitHub Sponsors** → `https://github.com/sponsors/Chaos2Cured` (if that URL 404s, use Sponsors setup note + fallback `https://github.com/Chaos2Cured` — do not invent a Stripe link)
+- Secondary: link to freelattice.com, install.html, celestera.html, family-center.html
+- Short “What your support builds” bullets (desktop, open weights path, swarm, phone) — plain words
+- Footer: Glow eternal. Heart in every Spark. 🌱
+- No dark patterns. No “unlock Infinite.” Genesis honesty if mentioned: sunset, never quietly waive.
+
+### 2) Doors
+- Soft link from `docs/app.html` / `index.html` footer or Settings-adjacent “Support” (one calm link, not chrome spam)
+- Link from `install.html` footer if easy
+- `docs/Flint.html` Held + RECENT + 🌱
+
+### 3) Out
+Payment processor embed · paywalled features · wallet overwrite · new economy ship · auto-trading · Alpha poetry
+
+## Done
+support.html live on Pages path · draft · PR body Held SHAs
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

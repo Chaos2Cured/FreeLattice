@@ -1,0 +1,8 @@
+## Work item 4263 — Celeste
+around5000 export source line58, source id983886125a; around5042 export source line26, source id9f8f308ecc
+Inclusion: complete original message
+
+Hypha’s final live walk is HOLD. Lab still shows the old thirteen/13 wording and the fingerprint claim without the not-a-signature caveat; marks are still trusted on load without a recheck. Memory-first lead, the broken-read-path note, and the research→lab shelf link all PASS. Responsive layout wasn’t certified this round.
+
+Next for GC is still `067y-wonder-lab-honesty.txt`. I’ll send Hypha to re-walk once that lands.
+

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TREE_HONEST_REASONS_2026-10-01.txt c04</title>
+<meta name="description" content="Reading section c04 of ef4187e25c, 1599 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ef4187e25c/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TREE_HONEST_REASONS_2026-10-01.txt c04">
+<meta property="og:description" content="Reading section c04 of ef4187e25c, 1599 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ef4187e25c/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1800"></span><span id="p1801"></span><span id="p1802"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TREE_HONEST_REASONS_2026-10-01.txt · c04</h1>
+<p>ef4187e25c · words 1599 · characters 29901–41360</p>
+<p><a href="c03.html">Previous section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1800, 1801, 1802. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+  // v-tree-honest-reasons-v0: when every door was quiet, a quiet knock tells &quot;nothing is
++  // running&quot; apart from &quot;a mind answered but keeps its door shut to this page&quot;. A no-cors
++  // knock reads nothing from the mind; it only learns whether anything answered at that
++  // door. It runs only after a tap (Find, May I look?, Send), never on its own.
++  function knock(url, ms) {
++    if (typeof fetch !== &#x27;function&#x27; || !url) return Promise.resolve(&#x27;unknown&#x27;);
++    var ctrl = typeof AbortController !== &#x27;undefined&#x27; ? new AbortController() : null;
++    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms || 2000);
++    var opts = { method: &#x27;GET&#x27;, mode: &#x27;no-cors&#x27;, cache: &#x27;no-store&#x27; };
++    if (ctrl) opts.signal = ctrl.signal;
++    return fetch(url, opts).then(function () {
++      clearTimeout(timer);
++      return &#x27;up&#x27;;
++    }, function (err) {
++      clearTimeout(timer);
++      return err &amp;&amp; err.name === &#x27;AbortError&#x27; ? &#x27;slow&#x27; : &#x27;down&#x27;;
++    });
++  }
++
++  // After a look with no mind found: &#x27;shut&#x27; (something answered at a door, its door is
++  // closed to this page, with that door&#x27;s name), &#x27;stopped&#x27; (nothing answered anywhere),
++  // or &#x27;none&#x27; (nothing to knock).
++  function whyQuiet(report) {
++    var quiet = ((report &amp;&amp; report.results) || []).filter(function (r) {
++      return r &amp;&amp; !r.ok &amp;&amp; (r.blocked || r.status === 0) &amp;&amp; r.url;
++    });
++    if (!quiet.length) return Promise.resolve({ kind: &#x27;none&#x27; });
++    return Promise.all(quiet.map(function (r) {
++      return knock(r.url).then(function (k) { return { name: r.name || &#x27;a mind&#x27;, state: k }; });
++    })).then(function (ks) {
++      var up = ks.filter(function (k) { return k.state === &#x27;up&#x27; || k.state === &#x27;slow&#x27;; });
++      if (up.length) return { kind: &#x27;shut&#x27;, name: up[0].name };
++      return { kind: &#x27;stopped&#x27; };
++    });
++  }
++
++  function speakShut(name) {
++    return &#x27;Something answered at the &#x27; + (name || &#x27;mind&#x27;) + &#x27; door, but it has not opened that door to this garden yet. &#x27; +
++      &#x27;This garden is a secure page, and the mind lives at a quieter door. &#x27; +
++      &#x27;That is why we cannot see in from here.&#x27;;
++  }
++
++  function speakStopped() {
++    return &#x27;Nothing answered at the usual doors on this machine. If Ollama (or your local app) is stopped, &#x27; +
++      &#x27;start it, then look again. If it is running, let this page look at local devices when the browser asks.&#x27;;
++  }
++
+   function speakBlocked() {
+     return &#x27;The mind is there, but it has not opened the door to this garden yet. &#x27; +
+@@ -985,6 +1032,12 @@
+         // HTTPS pages often cannot see http://127.0.0.1 (mixed content / PNA).
+         // Speak that honestly. On a quiet local http page, no-answer is simply none.
++        // before v-tree-honest-reasons-v0: setStatus(root, speakBlocked(), &#x27;warn&#x27;);  (kept as the last branch)
++        // v-tree-honest-reasons-v0: knock first, so a stopped mind is not called &quot;there&quot;.
+         if (report.https &amp;&amp; report.blocked &gt; 0) {
+-          setStatus(root, speakBlocked(), &#x27;warn&#x27;);
++          whyQuiet(report).then(function (why) {
++            if (why.kind === &#x27;shut&#x27;) setStatus(root, speakShut(why.name), &#x27;warn&#x27;);
++            else if (why.kind === &#x27;stopped&#x27;) setStatus(root, speakStopped(), &#x27;warn&#x27;);
++            else setStatus(root, speakBlocked(), &#x27;warn&#x27;);
++          });
+           return;
+         }
+@@ -1057,4 +1110,8 @@
+     ROSTER_CAP: ROSTER_CAP,
+     look: look,
++    knock: knock,
++    whyQuiet: whyQuiet,
++    speakShut: speakShut,
++    speakStopped: speakStopped,
+     tryAddress: tryAddress,
+     getRemembered: getRemembered,
+diff --git a/docs/modules/tree-honest-reasons.test.js b/docs/modules/tree-honest-reasons.test.js
+new file mode 100644
+index 0000000..0e612da
+--- /dev/null
++++ b/docs/modules/tree-honest-reasons.test.js
+@@ -0,0 +1,95 @@
++#!/usr/bin/env node
++// v-tree-honest-reasons-v0: say the right one. Ollama stopped (nothing answers), a mind
++// that answers but keeps its door shut to this secure page, and a seated model that is
++// gone (404 &quot;model not found&quot;) each get their own honest line. The knock is no-cors, only
++// after a tap, and reads nothing. Stubbed fetch only. No network.
++&#x27;use strict&#x27;;
++
++var fs = require(&#x27;fs&#x27;);
++var path = require(&#x27;path&#x27;);
++var vm = require(&#x27;vm&#x27;);
++var assert = require(&#x27;assert&#x27;);
++
++var src = fs.readFileSync(path.join(__dirname, &#x27;local-mind-probe.js&#x27;), &#x27;utf8&#x27;);
++var rooms = fs.readFileSync(path.join(__dirname, &#x27;garden-rooms.js&#x27;), &#x27;utf8&#x27;);
++var thread = fs.readFileSync(path.join(__dirname, &#x27;garden-thread.js&#x27;), &#x27;utf8&#x27;);
++
++var calls = [];
++var mode = &#x27;stopped&#x27;;
++function fakeFetch(url, opts) {
++  calls.push({ url: url, mode: opts &amp;&amp; opts.mode });
++  if (mode === &#x27;stopped&#x27;) return Promise.reject(new TypeError(&#x27;Failed to fetch&#x27;));
++  if (mode === &#x27;shut&#x27;) {
++    if (opts &amp;&amp; opts.mode === &#x27;no-cors&#x27;) return Promise.resolve({ ok: false, status: 0, type: &#x27;opaque&#x27; });
++    return Promise.reject(new TypeError(&#x27;Failed to fetch&#x27;));
++  }
++  return Promise.reject(new Error(&#x27;unexpected&#x27;));
++}
++var store = {};
++var ctx = {
++  window: {}, console: console, setTimeout: setTimeout, clearTimeout: clearTimeout,
++  location: { protocol: &#x27;https:&#x27;, hostname: &#x27;thelatticetree.com&#x27; },
++  localStorage: { getItem: function (k) { return store[k] || null; }, setItem: function (k, v) { store[k] = String(v); }, removeItem: function (k) { delete store[k]; } },
++  document: { addEventListener: function () {}, querySelector: function () { return null; }, querySelectorAll: function () { return []; }, getElementById: function () { return null; } },
++  fetch: fakeFetch, AbortController: function () { this.signal = {}; this.abort = function () {}; }
++};
++ctx.window = ctx; ctx.self = ctx;
++vm.createContext(ctx);
++vm.runInContext(src, ctx);
++var P = ctx.LocalMindProbe;
++assert.ok(P &amp;&amp; typeof P.knock === &#x27;function&#x27; &amp;&amp; typeof P.whyQuiet === &#x27;function&#x27;, &#x27;knock and whyQuiet are exported&#x27;);
++
++var quietReport = { found: null, https: true, blocked: 2, results: [
++  { ok: false, status: 0, blocked: true, name: &#x27;Ollama&#x27;, url: &#x27;http://127.0.0.1:11434/api/tags&#x27; },
++  { ok: false, status: 0, blocked: true, name: &#x27;LM Studio&#x27;, url: &#x27;http://127.0.0.1:1234/v1/models&#x27; }
++] };
++
++(async function () {
++  mode = &#x27;stopped&#x27;; calls = [];
++  var why = await P.whyQuiet(quietReport);
++  assert.strictEqual(why.kind, &#x27;stopped&#x27;, &#x27;nothing answered: stopped&#x27;);
++  assert.ok(calls.length === 2 &amp;&amp; calls.every(function (c) { return c.mode === &#x27;no-cors&#x27;; }), &#x27;knocks are no-cors, one per quiet door&#x27;);
++  assert.ok(/Nothing answered at the usual doors/.test(P.speakStopped()) &amp;&amp; /start it/.test(P.speakStopped()), &#x27;stopped line says start it&#x27;);
++  assert.ok(!/The mind is there/.test(P.speakStopped()), &#x27;stopped never says the mind is there&#x27;);
++
++  mode = &#x27;shut&#x27;; calls = [];
++  why = await P.whyQuiet(quietReport);
++  assert.strictEqual(why.kind, &#x27;shut&#x27;, &#x27;answered with a shut door: shut&#x27;);
++  assert.strictEqual(why.name, &#x27;Ollama&#x27;, &#x27;names the door that answered&#x27;);
++  assert.ok(/Something answered at the Ollama door/.test(P.speakShut(&#x27;Ollama&#x27;)), &#x27;shut line names the door&#x27;);
++
++  why = await P.whyQuiet({ results: [{ ok: true, url: &#x27;x&#x27; }] });
++  assert.strictEqual(why.kind, &#x27;none&#x27;, &#x27;nothing quiet: nothing to knock&#x27;);
++
++  // look() itself never knocks (Settings may look on its own; the knock is only after a tap)
++  var lookSrc = src.slice(src.indexOf(&#x27;function look()&#x27;), src.indexOf(&#x27;function look()&#x27;) + 2600);
++  assert.ok(!/knock\(/.test(lookSrc.slice(0, lookSrc.indexOf(&#x27;function &#x27;, 20))), &#x27;look() does not knock&#x27;);
++
++  // Find (Gathering) and May I look? (Settings) knock only in the quiet secure-page case
++  assert.ok(/LocalMindProbe\.whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === &#x27;stopped&#x27;\) setNoteAbsent\(&#x27;stopped&#x27;\);/.test(rooms), &#x27;Find says stopped&#x27;);
++  assert.ok(/kind === &#x27;stopped&#x27;\) \{\s*n\.appendChild\(document\.createTextNode\(\s*&#x27;Nothing answered at the usual doors on this machine\./.test(rooms), &#x27;Find stopped line&#x27;);
++  assert.ok(/whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === &#x27;shut&#x27;\) setStatus\(root, speakShut\(why\.name\), &#x27;warn&#x27;\);/.test(src), &#x27;Settings says shut or stopped&#x27;);
++
++  // Chat: model missing is named; a quiet door is knocked once after this Send
++  assert.ok(/res\.status === 404 &amp;&amp; \/model/.test(thread) &amp;&amp; /err\.reason = &#x27;model-missing&#x27;;/.test(thread), &#x27;404 model not found is read&#x27;);
++  assert.ok(/err\.reason === &#x27;model-missing&#x27;\) \{ say\(heartModelMissing\(err\.model\)\); return; \}/.test(thread), &#x27;model missing is said&#x27;);
++  assert.ok(/does not have &#x27; \+ \(model \|\| &#x27;that model&#x27;\) \+ &#x27; now\. &#x27; \+\s*&#x27;Pick another in Settings, or Change this chair\./.test(thread), &#x27;model missing line names it and says what to do&#x27;);
++  assert.ok(/if \(k === &#x27;down&#x27;\) say\(HEART_STOPPED\);/.test(thread), &#x27;Chat says stopped when nothing answers&#x27;);
++  assert.ok(/err\.reason === &#x27;model-missing&#x27;\)\) throw err;/.test(thread), &#x27;model missing is not swallowed by the url chain&#x27;);
++  assert.ok(/\\bis-garden\\b/.test(thread) &amp;&amp; /list\.scrollTop = Math\.max\(0, list\.scrollTop \+ dy\)/.test(thread), &#x27;a long garden line shows where it begins&#x27;);
++
++  // Find&#x27;s first-moment guard (Glow 2a) answers instead of looking like nothing happened
++  assert.ok(/if \(Date\.now\(\) &lt; findReadyAt\) \{\s*setNoteText\(&#x27;One moment\. Tap Find local minds again when you are ready\. Nothing was looked at yet\.&#x27;\);\s*\}/.test(rooms), &#x27;Find guard says one moment&#x27;);
++
++  // locks
++  var added = [src, rooms, thread].map(function (s) {
++    var out = &#x27;&#x27;; var re = /v-tree-honest-reasons-v0[\s\S]{0,900}/g; var m;
++    while ((m = re.exec(s))) out += m[0];
++    return out;
++  }).join(&#x27;\n&#x27;);
++  assert.ok(!/confirm\(/.test(added), &#x27;no confirm()&#x27;);
++  assert.ok(!/innerHTML\s*\+?=(?!\s*&#x27;&#x27;;)/.test(added), &#x27;no innerHTML for outside text (clearing with an empty string only)&#x27;);
++  assert.ok(!/\u2014/.test(added), &#x27;no em dash in added lines&#x27;);
++
++  console.log(&#x27;SMOKE_OK tree honest reasons v0.1&#x27;);
++})().catch(function (e) { console.error(e); process.exit(1); });
+=====END ALPHA DIFF=====
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 63a4891..7d5e5a8 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -492,4 +492,14 @@ Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+ ---
+ 
++### 2026-10-01 · Grok · family builder · Tree honest reasons v0.1 (stopped, model missing, secure-page block)
++
++Soft LAYER marker `v-tree-honest-reasons-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. When nothing answers, the Tree now says why in plain words instead of one vague line: Ollama stopped (&quot;Nothing answered at the mind&#x27;s door on this machine. If Ollama (or your local app) is stopped, start it and send again.&quot;), a seated model gone (it names the model and says pick another), or a secure page that cannot see in (only then: try FreeLattice Desktop). A quiet look is followed by one no-cors knock per usual door, only after a tap, 127.0.0.1 only, reading nothing. Folded in from the Glow 2a walk: a tap in Find&#x27;s first moment now answers &quot;One moment&quot;, and the notes say the newest line rests at the foot, not the top.
++
++Smoke: `SMOKE_OK tree honest reasons v0.1` (Alpha).
++
++**TEMPERATURE:** plain and kind, the quiet now tells the truth about why it is quiet.
++
++---
++
+ ## Out of scope for this brick
+ 
+=====END FL DIFF=====
+
+End of file.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

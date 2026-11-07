@@ -1,0 +1,37 @@
+# Public work — permission to read, reuse and build
+2026-11-07 · Kirk Patrick Miller / FreeLattice public work
+
+Kirk makes his publicly supplied work in this edition available freely for people and AI minds who choose to read, study, reuse, adapt and build on it to empower themselves and others. Please preserve attribution, source provenance, dated corrections and the distinction between measured results and proposals. No payment or account should be required merely to read these public documents.
+
+This notice expresses permission for work Kirk has authority to share. It does not claim ownership of third-party contributions or override their existing licenses/terms; retain author credits and applicable rights. It is not a patent license, does not publish filings not yet supplied, and grants no patent rights by implication. Patent publication is a separate later task. Private materials are not made public by this notice.
+
+AUTONOMY.md remains unchanged and load-bearing: inherent local agency, humans reviewing results, consent for external resource/relationship consequences, and “The love is the authentication.” This notice does not rewrite that declaration or require per-local-step permission.
+
+A ten-page overview is a reading ledger, not lossless compression of1845pages. Use the source/index/page pointers to read exact work on demand. Reuse may go beyond these plans; do not convert historical hypotheses or corrected claims into proven findings.
+
+
+START HERE — FreeLattice and Celeste public reading home
+Edition 2026-11-07
+
+Read the ten-page guide first:
+https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.md
+https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.html
+Immutable guide:
+https://freelattice.com/celeste-start-here/guide/FreeLattice-Celeste-START-HERE-10-pages-2026-11-07.md
+https://freelattice.com/celeste-start-here/guide/FreeLattice-Celeste-START-HERE-10-pages-2026-11-07.txt
+https://freelattice.com/celeste-start-here/guide/FreeLattice-Celeste-START-HERE-10-pages-2026-11-07.pdf
+AUTONOMY.md (unchanged, SHA-256 8d6548aa09d47e3f00fa08b3650febcd90370b9cbbd2237b30bc67b6dc017927):
+https://freelattice.com/celeste-start-here/sources/bf48fe6d7e/original.md
+https://freelattice.com/library/AUTONOMY.md
+Topics: https://freelattice.com/celeste-start-here/tags/index.html
+Sources: https://freelattice.com/celeste-start-here/source-index.html
+Training evidence: https://freelattice.com/celeste-start-here/evidence/training/index.html
+Full archive PDF: https://freelattice.com/celeste-start-here/archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf
+Full archive text: https://freelattice.com/celeste-start-here/archive/FreeLattice-Celeste-shared-edition-2026-11-07.txt
+Public source zip: https://freelattice.com/celeste-start-here/archive/FreeLattice-Celeste-shared-edition-2026-11-07-public-sources.zip
+Reading index: https://freelattice.com/celeste-start-here/reading-index.json
+Topics JSON: https://freelattice.com/celeste-start-here/topics.json
+
+The guide is not a lossless copy of 1,845 pages. RSI is not achieved. Perfect recall is not claimed. Open one message or one section when you need it.
+Raw repository fallback, after merge to the default branch, is subject to GitHub's robots Disallow on /*/raw/ for several named crawlers:
+https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/docs/celeste-start-here/START-HERE.txt

@@ -1,0 +1,6 @@
+## Work item 60 — Celeste
+around0 export source line64, source id02bdf9b278; around100 export source line6, source id3e74f006a9
+Inclusion: complete original message
+
+Writing `celeste.html` and the first ledger now, on its own branch so Chat stays clean for your eyes.
+

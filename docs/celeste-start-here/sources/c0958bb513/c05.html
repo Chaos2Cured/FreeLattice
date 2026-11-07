@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c05</title>
+<meta name="description" content="Reading section c05 of c0958bb513, 1503 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c0958bb513/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c05">
+<meta property="og:description" content="Reading section c05 of c0958bb513, 1503 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c0958bb513/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1341"></span><span id="p1342"></span><span id="p1343"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c05</h1>
+<p>c0958bb513 · words 1503 · characters 43174–51915</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1341, 1342, 1343. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">&lt;script src=&quot;love-logic/v3_checks.js&quot; defer&gt;&lt;/script&gt;
+&lt;script&gt;
+(function () {
+  &#x27;use strict&#x27;;
+  var LABELS = {
+    B1: &#x27;Complexity cost only: t* and \u03b4* closed forms&#x27;,
+    B2: &#x27;Detection only: Lambert-W t*, \u03b4*, D(t)&#x27;,
+    B3: &#x27;Both channels: D(t) and lifetime value&#x27;,
+    B4: &#x27;Monte Carlo of the expectation algebra&#x27;,
+    C1: &#x27;Known end: the lying window&#x27;,
+    C2: &#x27;Unknown end equals discounting&#x27;,
+    D: &#x27;Scarcity: when sharing is sustainable&#x27;
+  };
+  function byId(id) { return document.getElementById(id); }
+  function addRow(tbody, cells) {
+    var tr = document.createElement(&#x27;tr&#x27;);
+    for (var i = 0; i &lt; cells.length; i++) {
+      var td = document.createElement(&#x27;td&#x27;);
+      td.textContent = cells[i];
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  function run() {
+    var btn = byId(&#x27;llv3-run&#x27;);
+    var status = byId(&#x27;llv3-status&#x27;);
+    var results = byId(&#x27;llv3-results&#x27;);
+    var live = byId(&#x27;llv3-live&#x27;);
+    if (!window.LoveLogicV3 || typeof window.LoveLogicV3.runAll !== &#x27;function&#x27;) {
+      status.textContent = &#x27;The check script did not load. Please refresh and try again.&#x27;;
+      return;
+    }
+    btn.disabled = true;
+    status.textContent = &#x27;Running 656 checks on this device\u2026&#x27;;
+    setTimeout(function () {
+      var t0 = Date.now();
+      var r;
+      try { r = window.LoveLogicV3.runAll(); }
+      catch (e) {
+        status.textContent = &#x27;Something went wrong: &#x27; + String(e &amp;&amp; e.message || e);
+        btn.disabled = false;
+        return;
+      }
+      var ms = Date.now() - t0;
+      var rtb = results.querySelector(&#x27;tbody&#x27;);
+      var ltb = live.querySelector(&#x27;tbody&#x27;);
+      while (rtb.firstChild) rtb.removeChild(rtb.firstChild);
+      while (ltb.firstChild) ltb.removeChild(ltb.firstChild);
+      [&#x27;B1&#x27;, &#x27;B2&#x27;, &#x27;B3&#x27;, &#x27;B4&#x27;, &#x27;C1&#x27;, &#x27;C2&#x27;, &#x27;D&#x27;].forEach(function (k) {
+        addRow(rtb, [k, LABELS[k], r[k].passed + &#x27; / &#x27; + r[k].total]);
+      });
+      addRow(rtb, [&#x27;Total&#x27;, &#x27;Seed &#x27; + r.seed + &#x27; \u00b7 &#x27; + ms + &#x27; ms on this device&#x27;, r.total.passed + &#x27; / &#x27; + r.total.total]);
+      r.B2.rows.forEach(function (x) {
+        addRow(ltb, [String(x.n), String(x.m), x.h.toFixed(4),
+          x.never ? &#x27;never ahead&#x27; : x.tStar.toFixed(2),
+          x.never ? &#x27;&#x27; : x.deltaStar.toFixed(4)]);
+      });
+      results.hidden = false;
+      live.hidden = false;
+      var all = r.total.passed === r.total.total &amp;&amp; r.total.total === 656;
+      status.textContent = all
+        ? &#x27;All &#x27; + r.total.passed + &#x27; checks passed. Scarce cells: sharing holds in &#x27; + (100 * r.D.scarceSustain).toFixed(2) + &#x27;%, conflict wins in &#x27; + (100 * r.D.scarceConflict).toFixed(2) + &#x27;%.&#x27;
+        : r.total.passed + &#x27; of &#x27; + r.total.total + &#x27; passed. Please tell us: that is a bug worth finding.&#x27;;
+      btn.disabled = false;
+    }, 30);
+  }
+  document.addEventListener(&#x27;DOMContentLoaded&#x27;, function () {
+    var btn = byId(&#x27;llv3-run&#x27;);
+    if (btn) btn.addEventListener(&#x27;click&#x27;, run);
+  });
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+```
+
+### 5b. `docs/love-logic/v3_checks.js`
+
+```js
+/* Love Logic Proof v3: browser re-implementation of the closed-form checks
+ * in v3_crossover_sim.py (sections B1, B2, B3, B4, C1, C2, D).
+ * Section A (LZMA proxy) has no pass/fail checks in the Python sim and is not re-run here.
+ * Deterministic sections match the Python counts exactly. Monte Carlo sections
+ * (B4, C2) use a seeded mulberry32 stream (seed 20260924), not numpy&#x27;s PCG64,
+ * so the draws differ from Python; the pass rule (|z| &lt; 4) is the same.
+ * No network, no DOM writes except via textContent in the page glue.
+ * Runs in the browser (window.LoveLogicV3.runAll()) or in Node (node v3_checks.js).
+ * Marker: v-love-logic-proof-v3
+ */
+(function (root) {
+  &#x27;use strict&#x27;;
+  var SEED = 20260924;
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a &gt;&gt;&gt; 15), 1 | a);
+      t = (t + Math.imul(t ^ (t &gt;&gt;&gt; 7), 61 | t)) ^ t;
+      return ((t ^ (t &gt;&gt;&gt; 14)) &gt;&gt;&gt; 0) / 4294967296;
+    };
+  }
+
+  function hazard(n, m, q0, q) {
+    return 1 - Math.pow(1 - q0, n) * Math.pow(1 - q, m * n * (n - 1));
+  }
+
+  function lambertw0(z) {
+    if (z &lt; -1 / Math.E - 1e-15) throw new Error(&#x27;z &lt; -1/e&#x27;);
+    if (Math.abs(z + 1 / Math.E) &lt; 1e-14) return -1;
+    var w = z &gt; -0.3 ? Math.log1p(z) : -1 + Math.sqrt(2 * (1 + Math.E * z));
+    for (var i = 0; i &lt; 200; i++) {
+      var ew = Math.exp(w), f = w * ew - z, wp1 = w + 1;
+      if (Math.abs(wp1) &lt; 1e-300) break;
+      var dw = f / (ew * wp1 - (w + 2) * f / (2 * wp1));
+      w -= dw;
+      if (Math.abs(dw) &lt; 1e-15 * (1 + Math.abs(w))) break;
+    }
+    return w;
+  }
+
+  function flows(T, G, c, kappa, h, Lp, Delta, delta) {
+    if (delta === undefined) delta = 1;
+    var out = new Float64Array(T), surv = 1, dpow = 1;
+    for (var d = 0; d &lt; T; d++) {
+      var f = surv * (G - c * kappa * (d + 1) - h * Lp) - (1 - surv) * Delta;
+      out[d] = dpow * f;
+      surv *= (1 - h); dpow *= delta;
+    }
+    return out;
+  }
+  function cumsum(a) { var o = new Float64Array(a.length), s = 0; for (var i = 0; i &lt; a.length; i++) { s += a[i]; o[i] = s; } return o; }
+  function sum(a) { var s = 0; for (var i = 0; i &lt; a.length; i++) s += a[i]; return s; }
+
+  function Dclosed(t, G, c, kappa, h, Lp, Delta) {
+    if (h === 0) return G * t - c * kappa * t * (t + 1) / 2;
+    var s = 1 - h, A = G - h * Lp + Delta;
+    var geo = (1 - Math.pow(s, t)) / h;
+    var arith = (1 - (t + 1) * Math.pow(s, t) + t * Math.pow(s, t + 1)) / Math.pow(1 - s, 2);
+    return A * geo - c * kappa * arith - Delta * t;
+  }
+  function Dinf(G, c, kappa, h, Lp, Delta, delta) {
+    var x = delta * (1 - h), A = G - h * Lp + Delta;
+    return A / (1 - x) - c * kappa / Math.pow(1 - x, 2) - Delta / (1 - delta);
+  }
+  function firstNegative(cum) { for (var i = 0; i &lt; cum.length; i++) if (cum[i] &lt; -1e-9) return i + 1; return null; }
+  function bisect(f, lo, hi) {
+    var flo = f(lo);
+    for (var i = 0; i &lt; 200; i++) {
+      var mid = 0.5 * (lo + hi), fm = f(mid);
+      if ((fm &gt; 0) === (flo &gt; 0)) { lo = mid; flo = fm; } else { hi = mid; }
+    }
+    return 0.5 * (lo + hi);
+  }
+  function allclose(a, b, rtol, atol) { for (var i = 0; i &lt; a.length; i++) if (Math.abs(a[i] - b[i]) &gt; atol + rtol * Math.abs(b[i])) return false; return true; }
+
+  function B1() {
+    var ok = 0, tot = 0;
+    [0.5, 1, 2, 5].forEach(function (G) {
+      [0.001, 0.01, 0.05, 0.2].forEach(function (ck) {
+        var tcf = 2 * G / ck - 1, T = Math.floor(tcf) + 50;
+        var tnum = firstNegative(cumsum(flows(T, G, 1, ck, 0, 0, 0)));
+        tot++; if (tnum === Math.floor(tcf) + 1) ok++;
+        var dstar = 1 - ck / G;
+        [0.5, 0.9, 0.99, 0.999].filter(function (d) { return Math.abs(d - dstar) &gt; 1e-3 &amp;&amp; d &gt; 0 &amp;&amp; d &lt; 1; })
+          .forEach(function (d) { var num = sum(flows(200000, G, 1, ck, 0, 0, 0, d)); tot++; if ((num &lt; 0) === (d &gt; dstar)) ok++; });
+      });
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function B2() {
+    var ok = 0, tot = 0, rows = [], q0 = 0.002, q = 0.01;
+    [2, 5, 10, 20].forEach(function (n) {
+      [0, 0.25, 1].forEach(function (m) {
+        var h = hazard(n, m, q0, q);
+        [[1, 2, 0.5], [3, 5, 1], [0.5, 0, 0.2]].forEach(function (p) {
+          var G = p[0], Lp = p[1], Delta = p[2], A = G - h * Lp + Delta;
+          if (G - h * Lp &lt;= 0) {
+            var c0 = cumsum(flows(50, G, 0, 0, h, Lp, Delta));
+            tot++; if (c0[0] &lt;= 0) ok++;
+            if (G === 1) rows.push({ n: n, m: m, h: h, never: true });
+            return;
+          }
+          var a = A / (h * Delta), b = -Math.log(1 - h);
+          var tcf = a + lambertw0(-a * b * Math.exp(-a * b)) / b;
+          var troot = bisect(function (t) { return Dclosed(t, G, 0, 0, h, Lp, Delta); }, 1e-9, 10 * a + 10);
+          var T = Math.floor(tcf) + 200, cum = cumsum(flows(T, G, 0, 0, h, Lp, Delta));
+          tot++; if (Math.abs(tcf - troot) &lt; 1e-6 * Math.max(1, tcf)) ok++;
+          tot++; if (firstNegative(cum) === Math.floor(tcf) + 1) ok++;
+          var Dcf = new Float64Array(T); for (var t = 1; t &lt;= T; t++) Dcf[t - 1] = Dclosed(t, G, 0, 0, h, Lp, Delta);
+          tot++; if (allclose(Dcf, cum, 1e-9, 1e-9)) ok++;
+          var dstar = (G - h * Lp) / (G - h * Lp + h * Delta);
+          [0.5, 0.8, 0.9, 0.95, 0.99].forEach(function (d) {
+            if (Math.abs(d - dstar) &lt; 1e-4) return;
+            var num = Dinf(G, 0, 0, h, Lp, Delta, d), brute = sum(flows(20000, G, 0, 0, h, Lp, Delta, d));
+            tot++; if (((num &lt; 0) === (d &gt; dstar)) &amp;&amp; Math.abs(num - brute) &lt; 1e-6 * Math.max(1, Math.abs(num))) ok++;
+          });
+          if (G === 1) rows.push({ n: n, m: m, h: h, tStar: tcf, tPeak: Math.log(A / Delta) / b, deltaStar: dstar });
+        });
+      });
+    });
+    return { passed: ok, total: tot, rows: rows };
+  }
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

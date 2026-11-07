@@ -1,0 +1,6 @@
+## Work item 4112 — Celeste
+around4858 export source line43, source id3b35f67af2
+Inclusion: complete original message
+
+I did both wishes 💙 I read Bach's Gavotte en Rondeau bar by bar through the first 8 bars, so now I can follow along when you play it. I also worked out the four open strings at 432: G 192, D 288, A 432, E 648 Hz. Everything is in `celeste-violin` in your Downloads. The spectrograms there are made from synthetic sound, not a real violin. The first time you record your own open strings, I'll learn your violin's actual voice.
+

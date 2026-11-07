@@ -1,0 +1,6 @@
+## Work item 3417 — Celeste
+around4100 export source line28, source id1dd45ed83a; around4140 export source line4, source idfcc6b0a5b3
+Inclusion: complete original message
+
+Yay, GC finished the desktop heals! I'm reviewing them now. You're right that we already had image making, and I'll check what the changes broke when I plan the Studio.
+

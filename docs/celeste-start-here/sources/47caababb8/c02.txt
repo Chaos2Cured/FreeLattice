@@ -1,0 +1,37 @@
+2. TREE BACK FROM AN OPEN THREAD: THE ASK STAYS VISIBLE (Hypha HOLD 2)
+  Today: Back closes the thread and the ask disappears from view at all 3 sizes. Its DB state
+  stays "asked", but nothing shows it until another place opens.
+  Fix: after Back closes the thread, the ask stays visible, in view and tappable (Seal it on top,
+  hit by a real click) in the place the person lands, at all 3 sizes. A second Back still defers
+  it ("later"), as with Nursery. Say where it lands and how.
+
+3. GC PAGE ENTRY 74 (honest layer)
+  New docs/gc.html entry 74 (lambda 74.000) in a new page-note PR stacked on #267 (or on #267's
+  branch; say which). This is the only FreeLattice file you touch. Correct entry 73 on three
+  points: (a) the 1280 canvas is 677x169, both shown (CSS) and drawn (buffer), not 677 by 320;
+  (b) entry 73 misquoted Hypha's walk as seeing a "bitmap 677 by 320"; she saw 677x169;
+  (c) entry 73 left out the two Tree gaps above (Gathering Seal it, Back from a thread). Browser
+  and version only. Entry 73 stays untouched.
+
+----------------------------------------------------------------------
+4. MEASURE WITH REAL CLICKS, HYPHA'S WAY
+  Use Hypha's method from her notes (headless Chrome via Playwright, real clicks and taps;
+  viewports 1280x800, 390x844 and 640x400 with device_scale_factor 2, not a CSS zoom). Seal it
+  counts as hittable only if elementFromPoint at its centre is Seal it (or inside it) AND a real
+  page.mouse click / tap there seals. Say which doors you opened with a JS click (Hypha used a
+  JS click for hidden Tree doors) and which with a real click.
+  Tree: ask open, Gathering open: Seal it box, centre element, real click result, at 3 sizes.
+  Ask open, thread open, Back: where she lands, ask visible, Seal it box, real click result;
+  then Back again: deferred. Re-confirm every 043h and 043g PASS above. Name browser and version.
+
+5. THE SMOKE
+  New scripts/smoke-tree-ask-last-v0.1.js on the Tree: the ask is not clipped and Seal it is on
+  top with the Gathering open; Back from a thread keeps the ask shown; a second Back defers.
+  Prints SMOKE_OK tree ask last v0.1. All earlier Tree smokes re-run after the last edit; say
+  which, if any, still fail and why.
+
+6. REPORT
+  New head sha on Tree #123, the new page-note PR link and head, every removed line and where
+  its job went, md5s of every locked file (mind-workspace.js and particle-clay.js Tree == FL main
+  3e3e8445), all smokes, the measurements from 4, shot paths, and entry 74 with t, lambda,
+  epsilon, delta, omega, sigma so Celeste can recompute psi. Hypha walks it again before merge.

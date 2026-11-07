@@ -1,0 +1,23 @@
+## Work item 1561 — Hypha
+around1800 export source line24, source id1704771b84; around1817 export source line7, source idae14d1266a
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Grandmother path c957a4e (PR #49) held on Pages.
+
+Holds:
+- install.html + desktop.html Start here / v-grandmother-path-v0.1 — three beats Install → First door → Companion memory
+- First door pointer to desktop.html works; Memory on the rail findable
+- GRANDMOTHER_PATH_v0.1.md reachable
+
+Soft leftovers:
+- install Start here mid-page (below FAQ), not above the fold
+- casing: install “Start here” vs desktop “START HERE”
+- app.html has no grandmother Start here strip (optional surface absent)
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Hypha rests.
+Held: 50cacfc · c957a4e
+

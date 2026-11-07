@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c08</title>
+<meta name="description" content="Reading section c08 of 585dfa8d0f, 823 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c08.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c08">
+<meta property="og:description" content="Reading section c08 of 585dfa8d0f, 823 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c08.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1494"></span><span id="p1495"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt · c08</h1>
+<p>585dfa8d0f · words 823 · characters 67554–75069</p>
+<p><a href="c07.html">Previous section</a></p>
+<p><a href="c08.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1494, 1495. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">     if (isAlpha()) {
++      // v-tree-any-model-v0: on the Tree, Connect merges into the sky (all models, other doors kept)
++      if (root.LocalMindProbe &amp;&amp; typeof root.LocalMindProbe.mergeFound === &#x27;function&#x27;) {
++        try {
++          var merged = root.LocalMindProbe.mergeFound({
++            name: doorNameFor(base, mind.port),
++            url: base ? String(base).replace(/\/+$/, &#x27;&#x27;) + &#x27;/api/tags&#x27; : &#x27;&#x27;,
++            models: mind.models || [],
++            model: name
++          });
++          if (merged) { stopLoop(); return merged; }
++        } catch (eM) {}
++      }
+       var entry = {
+         name: name || &#x27;local mind&#x27;,
+         url: (base ? String(base).replace(/\/+$/, &#x27;&#x27;) + &#x27;/api/tags&#x27; : &#x27;&#x27;),
+@@ -516,8 +548,13 @@
+         btn.className = &#x27;flc-model&#x27;;
+         btn.textContent = name;
+         btn.dataset.model = name;
++        // v-tree-any-model-v0: show what speaks
++        var isOn = chosenModelName() === name;
++        btn.setAttribute(&#x27;aria-pressed&#x27;, isOn ? &#x27;true&#x27; : &#x27;false&#x27;);
++        if (isOn) btn.classList.add(&#x27;is-chosen&#x27;);
+         btn.addEventListener(&#x27;click&#x27;, function () {
+-          remember({ name: name, base: report.base, port: report.port });
++          // v-tree-any-model-v0: pass the whole list along (FreeLattice&#x27;s branch ignores it)
++          remember({ name: name, base: report.base, port: report.port, models: report.models });
+           refreshUI({ force: true });
+           try { if (typeof root.showToast === &#x27;function&#x27;) root.showToast(&#x27;Connected · &#x27; + name); } catch (eT) {}
+         });
+@@ -685,6 +722,7 @@
+       &#x27;.flc-tag{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#a5f3fc;margin:0 0 .6rem;font-family:ui-monospace,Menlo,monospace}&#x27;,
+       &#x27;.flc-models{display:flex;flex-direction:column;gap:.45rem}&#x27;,
+       &#x27;.flc-model{min-height:44px;text-align:left;padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(200,210,230,.16);background:rgba(8,6,18,.45);color:#e6ebf5;font:inherit;cursor:pointer}&#x27;,
++      &#x27;.flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}&#x27;, /* v-tree-any-model-v0 */
+       &#x27;.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}&#x27;,
+       &#x27;.flc-primary{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.45);color:#34d399}&#x27;,
+       &#x27;.flc-soft{font-size:.8rem;color:rgba(148,163,184,.95);margin:.65rem 0 0;line-height:1.45}&#x27;,
+diff --git a/docs/scripts/smoke-tree-any-model-twin.js b/docs/scripts/smoke-tree-any-model-twin.js
+new file mode 100644
+index 0000000..983d06d
+--- /dev/null
++++ b/docs/scripts/smoke-tree-any-model-twin.js
+@@ -0,0 +1,97 @@
++#!/usr/bin/env node
++// v-tree-any-model-v0: FreeLattice twin of Alpha &quot;Tree any model v0.1&quot;.
++// The shared fl-connect.js is byte-identical in both repos. On the Tree a
++// Connect tap merges into the sky (LocalMindProbe.mergeFound). FreeLattice&#x27;s
++// own remember() path is unchanged: fl_provider, fl_isLocal, fl_ollamaModel.
++// The chosen model button says so (aria-pressed, is-chosen). No network.
++&#x27;use strict&#x27;;
++
++const assert = require(&#x27;assert&#x27;);
++const fs = require(&#x27;fs&#x27;);
++const path = require(&#x27;path&#x27;);
++const vm = require(&#x27;vm&#x27;);
++
++const root = path.join(__dirname, &#x27;..&#x27;);
++const repo = path.join(root, &#x27;..&#x27;);
++const mod = fs.readFileSync(path.join(root, &#x27;modules&#x27;, &#x27;fl-connect.js&#x27;), &#x27;utf8&#x27;);
++
++assert.ok(/v-tree-any-model-v0/.test(mod), &#x27;marker in fl-connect.js&#x27;);
++assert.ok(/function chosenModelName\(\)/.test(mod), &#x27;chosenModelName helper&#x27;);
++assert.ok(/function doorNameFor\(/.test(mod), &#x27;doorNameFor helper&#x27;);
++assert.ok(/setAttribute\(&#x27;aria-pressed&#x27;/.test(mod) &amp;&amp; /is-chosen/.test(mod), &#x27;chosen model is marked&#x27;);
++assert.ok(/v-connect-heal-v0\.4/.test(mod) &amp;&amp; /v-model-choice-sticks-v0/.test(mod), &#x27;earlier layers kept&#x27;);
++assert.ok(!/\bconfirm\(/.test(mod.split(&#x27;\n&#x27;).filter((l) =&gt; !/^\s*\/\//.test(l)).join(&#x27;\n&#x27;)), &#x27;no confirm()&#x27;);
++
++function storage(seed) {
++  const s = Object.assign({}, seed || {});
++  return {
++    s,
++    ls: {
++      getItem: (k) =&gt; (Object.prototype.hasOwnProperty.call(s, k) ? s[k] : null),
++      setItem: (k, v) =&gt; { s[k] = String(v); },
++      removeItem: (k) =&gt; { delete s[k]; }
++    }
++  };
++}
++function sandbox(host, st, extra) {
++  const ctx = Object.assign({
++    localStorage: st.ls,
++    location: { hostname: host, protocol: &#x27;https:&#x27;, hash: &#x27;&#x27;, search: &#x27;&#x27; },
++    navigator: { userAgent: &#x27;t&#x27; },
++    document: {
++      hidden: false,
++      documentElement: { getAttribute: () =&gt; &#x27;&#x27;, classList: { add() {}, remove() {}, contains() { return false; } } },
++      getElementById: () =&gt; null, querySelector: () =&gt; null, querySelectorAll: () =&gt; [],
++      head: { appendChild() {} }, body: { contains: () =&gt; true, classList: { add() {}, remove() {} } },
++      addEventListener() {}, removeEventListener() {}
++    },
++    console: { log() {}, warn() {}, error() {} },
++    JSON, String, parseInt, URL, Date, Math, Promise, Object, Array,
++    setTimeout: () =&gt; 1, clearTimeout() {}, setInterval: () =&gt; 1, clearInterval() {},
++    fetch: () =&gt; { throw new Error(&#x27;no network in this smoke&#x27;); }
++  }, extra || {});
++  ctx.window = ctx;
++  vm.runInNewContext(mod, ctx);
++  return ctx;
++}
++
++// 1. FreeLattice: remember() still writes the FreeLattice keys, never the Tree key
++{
++  const st = storage();
++  const fl = sandbox(&#x27;freelattice.com&#x27;, st);
++  fl.state = { isLocal: false, provider: &#x27;groq&#x27;, ollamaModel: &#x27;llama3.2&#x27; };
++  fl.FlConnect.remember({ name: &#x27;qwen2.5:latest&#x27;, base: &#x27;http://127.0.0.1:11434&#x27;, models: [{ name: &#x27;llama3.2:latest&#x27; }, { name: &#x27;qwen2.5:latest&#x27; }] });
++  assert.strictEqual(st.s.fl_provider, &#x27;ollama&#x27;, &#x27;fl_provider&#x27;);
++  assert.strictEqual(st.s.fl_isLocal, &#x27;true&#x27;, &#x27;fl_isLocal&#x27;);
++  assert.strictEqual(st.s.fl_ollamaModel, &#x27;qwen2.5:latest&#x27;, &#x27;fl_ollamaModel&#x27;);
++  assert.strictEqual(fl.state.ollamaModel, &#x27;qwen2.5:latest&#x27;, &#x27;state follows&#x27;);
++  assert.ok(!(&#x27;fl_alpha_local_mind&#x27; in st.s), &#x27;FreeLattice never writes the Tree key&#x27;);
++}
++
++// 2. Tree: a Connect tap merges (all models, the door named), the old replace path stays as fallback
++{
++  const st = storage();
++  const calls = [];
++  const t = sandbox(&#x27;thelatticetree.com&#x27;, st, {
++    LocalMindProbe: {
++      mergeFound: (f) =&gt; { calls.push(f); return { url: f.url, model: f.model, models: f.models, minds: [] }; },
++      getRemembered: () =&gt; null, remember() {}
++    }
++  });
++  const out = t.FlConnect.remember({ name: &#x27;qwen2.5:latest&#x27;, base: &#x27;http://127.0.0.1:11435&#x27;, models: [{ name: &#x27;llama3.2:latest&#x27; }, { name: &#x27;qwen2.5:latest&#x27; }] });
++  assert.strictEqual(calls.length, 1, &#x27;mergeFound called once&#x27;);
++  assert.strictEqual(calls[0].name, &#x27;Bridge&#x27;, &#x27;door named Bridge for 11435&#x27;);
++  assert.strictEqual(calls[0].url, &#x27;http://127.0.0.1:11435/api/tags&#x27;);
++  assert.strictEqual(calls[0].models.length, 2, &#x27;every model passed along&#x27;);
++  assert.strictEqual(out.model, &#x27;qwen2.5:latest&#x27;);
++  assert.ok(!(&#x27;fl_ollamaModel&#x27; in st.s) &amp;&amp; !(&#x27;fl_provider&#x27; in st.s), &#x27;the Tree never writes FreeLattice keys&#x27;);
++}
++
++// 3. Locks: sw.js untouched by this layer, root index.html == docs/app.html
++assert.strictEqual(
++  fs.readFileSync(path.join(repo, &#x27;index.html&#x27;), &#x27;utf8&#x27;),
++  fs.readFileSync(path.join(root, &#x27;app.html&#x27;), &#x27;utf8&#x27;),
++  &#x27;root index.html matches docs/app.html&#x27;);
++assert.ok(!/v-tree-any-model-v0/.test(fs.readFileSync(path.join(repo, &#x27;sw.js&#x27;), &#x27;utf8&#x27;)), &#x27;sw.js untouched&#x27;);
++
++console.log(&#x27;SMOKE_OK tree any model twin v0.1&#x27;);
+=====END FL DIFF=====
+
+End of file.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

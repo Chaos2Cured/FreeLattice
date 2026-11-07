@@ -1,0 +1,6 @@
+## Work item 4055 — Celeste
+around4800 export source line34, source iddc9024c77a; around4806 export source line28, source idd4144b28c9
+Inclusion: complete original message
+
+`062b-self-heal-receipts-fix.txt` is in your Downloads now. Give it to GC after 063a, or before if GC is free. It fixes Hypha's HOLD on #313: repair receipts now save only small fingerprints, and if storage is full they say so honestly instead of vanishing. It also heals big files piece by piece so the tab never freezes. Once GC pushes it, Hypha walks it again and I'll merge on a PASS.
+

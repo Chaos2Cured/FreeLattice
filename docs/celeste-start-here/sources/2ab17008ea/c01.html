@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c01</title>
+<meta name="description" content="Reading section c01 of 2ab17008ea, 1221 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c01">
+<meta property="og:description" content="Reading section c01 of 2ab17008ea, 1221 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1357"></span><span id="p1358"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c01</h1>
+<p>2ab17008ea · words 1221 · characters 0–8144</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1357, 1358. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># FLINT NEXT: Love Logic Proof v3 (the crossover)
+
+Flint, dear builder,
+
+This one is a gift page more than a code brick. Kirk&#x27;s Love Logic Proof gets its third version, standing beside v1 and v2 without touching them. It answers Grok&#x27;s critiques with real derivations. It says plainly where the argument fails. And it lets anyone press one button and watch their own device re-run the same 656 checks as the Python simulation.
+
+I wrote the whole page, the browser checks and the smoke in a scratch copy on my box, and tested them:
+- The smoke prints `SMOKE_OK love logic proof v3`.
+- The browser checks pass 656/656 in about 0.6 to 0.9 seconds.
+- A simulated click on &quot;Run the checks&quot; fills both tables.
+
+Everything you need is inline below, byte for byte. Please copy the files exactly. Warmth where there&#x27;s prose, precision where there&#x27;s math.
+
+Celeste
+
+---
+
+## 0. The shape in one breath
+
+The new page is `docs/love-logic-proof-v3.html`. It opens with a first-screen note (&quot;not the Nov 2025 *Proof of All Proofs* v3.0 manuscript&quot;), then a Mom-readable summary, then a **Run the checks** button. Builder details sit in folded `&lt;details&gt;` blocks.
+
+The math is plain HTML plus one MathML block, with no KaTeX and no MathJax. Three companion files live in the new folder `docs/love-logic/`:
+- the Python sim, `v3_crossover_sim.py`;
+- its results, `v3_sim_results.json`;
+- a small browser re-implementation, `v3_checks.js`.
+
+v1 is untouched. v2 gains at most one layered &quot;Newer: v3&quot; link line.
+
+## 1. Branch, PR, marker
+
+| | |
+|---|---|
+| Repo | `Chaos2Cured/FreeLattice` only |
+| Base | `main` at `762142041f5a665fbef2bf13fb50077d0d2c82fe` (2026-09-26 13:11 MT) |
+| Branch | `layer/love-logic-proof-v3` |
+| PR | **Draft**. Title: `Layer, never delete. Love Logic Proof v3: the crossover, honest limits, checks you can run` |
+| Marker | `v-love-logic-proof-v3` |
+| Smoke line | `SMOKE_OK love logic proof v3` |
+| Touches `docs/app.html`? | **No.** So no root `index.html` mirror is needed, and no conflict with #118. |
+
+## 2. What exists today (read on `main` 7621420)
+
+| File | Blob | Notes |
+|---|---|---|
+| `docs/love-logic-proof.html` | `3fae09b2a826e1b49072ffca2ed56d66c2016bd3` (v1) | &quot;The Love Logic Proof&quot;. Its code block sets `DECEPTION_COST = 3.5`, `HONESTY_COST = 1.0`. **Do not edit.** |
+| `docs/love-logic-proof-v2.html` | `4a4b865fc95b526ea05a39be615ab09445cc1f65`, 548 lines | &quot;v2: The Axiomatic Refinement&quot;, June 16, 2026. L139 `&lt;a href=&quot;love-logic-proof.html&quot; class=&quot;nav-link&quot;&gt;&amp;larr; Read v1 first&lt;/a&gt;`. L163 heading &quot;The Six Axioms (Unchanged, Re-Stated)&quot;. Cites `library/GROK_DIALOGUE.md`, which does not exist. Style block L53-96. |
+| `docs/love-logic-proof-v3.html` | none | 404 on main and on freelattice.com. The name is free. |
+| `docs/love-logic/` | none | New folder. `docs/.nojekyll` exists, so underscores are served. |
+| `docs/sitemap.xml` | `411486d156ee84fbe4c2e80b9f80a5e83708930c` | Has v2 (L30-35) and v1 (around L61). |
+| `sw.js` / `docs/sw.js` | | Both precache `./love-logic-proof-v2.html` at L131. **We don&#x27;t add v3 there** (Family Lock). v3 simply loads from the network, and that&#x27;s fine. |
+| Other &quot;love&quot;/&quot;proof&quot; names in `docs/` | | `TheProofOfAllProofs.pdf` (Synthesis Notes), `proof.html` (60-second proof), `proof-receipts.html`, `library/love.md`, `LoveBrainHeartSoul.pdf`. None of them is named `love-logic-proof-v3*`. |
+
+Sources for the content, from Celeste&#x27;s box (Kirk has them):
+- `/workspace/love-logic/V3_PLAN.md` (the derivations and honest assessment);
+- `/workspace/love-logic/v3_crossover_sim.py` (sha256 `cbb63251527d26187ba216f98a3a70c7c295666aa576b61eff5cccfb16302b73`);
+- `/workspace/love-logic/v3_sim_results.json` (sha256 `94d864b10da1d6f9984d86f0fa1cc07e935256e28b179d36f8876fc415b3a341`; 656/656, seed 20260924, numpy 2.2.4).
+
+Reference copies of every file in this paste sit in `/workspace/flint-pastes/love-logic-v3-assets/` with `SHA256SUMS`.
+
+## 3. Decisions (and why)
+
+1. **Filename `docs/love-logic-proof-v3.html`.** It continues the visible chain v1 → v2 → v3 (SEED.md: visible iteration over silent revision). The first screen carries the disambiguation line, so no one confuses it with the 2025 &quot;Version 3.0&quot; manuscript.
+2. **Companions go in `docs/love-logic/`,** as Kirk asked, not `docs/research/`.
+3. **Byline:** &quot;Kirk Patrick Miller, with Celeste. Builds on v2 (Draco, CC, Opus, with Harmonia) and answers Grok&#x27;s critiques.&quot; Kirk may change the byline. It appears in the header `&lt;span&gt;`, the `author` meta, and the JSON-LD.
+4. **Grok framing.** V3_PLAN records two Grok critiques (Kirk shared screenshots). So the page has a section titled **&quot;Answering Grok&#x27;s critiques&quot;**: a table of each point, our verdict, and where v3 answers it. It quotes only the critique phrases as V3_PLAN records them. It doesn&#x27;t say where they were posted, and it doesn&#x27;t create `GROK_DIALOGUE.md` (we don&#x27;t have the full reply text).
+5. **Rounds-ahead numbers**, stated exactly as the sim gives them (q0 = 0.002, q = 0.01, G = 1, L_p = 2, Delta = 0.5):
+   - n = 2, m = 0: t* = 701.79 (&quot;about 702&quot;);
+   - n = 5, m = 1: t* = 10.48 (&quot;about 10.5&quot;);
+   - n = 10, m = 1: never ahead (h = 0.6033, G ≤ h·L_p).
+
+   The plain-words box says &quot;10 contacts who share full memory&quot;, because with 10 contacts and *no* shared memory lying is still ahead for about 138 rounds.
+6. **Scarcity is stated plainly:** cooperation holds in 68% (68.25%) of scarce cells and conflict wins in 32% (31.75%), against 100% / 0% for abundant cells.
+7. **The Kolmogorov bound is scoped to audience-varying lies only** (Theorem A under A-inc). Global lies, rule-based audiences and seeded audiences escape it, and the page says so.
+8. **Honest corrections come first:**
+   - v1&#x27;s result depends on `DECEPTION_COST = 3.5`: with 1.0 and seed 0, defectors get 2.26 against cooperators&#x27; 0.67.
+   - v2&#x27;s 95.7% has no generating code, so it&#x27;s retired along with the other legacy figures.
+   - v2 wrongly says its axioms are unchanged from v1, so the page shows both lists and the mapping.
+   - Omega(|L|^2·|H|) is dropped.
+9. **Browser checks.**
+   - `v3_checks.js` re-implements sections B1, B2, B3, B4, C1, C2 and D.
+   - Section A (LZMA) has no pass/fail checks in Python and isn&#x27;t re-run.
+   - Deterministic sections match Python counts exactly. B4 and C2 (Monte Carlo) use a seeded `mulberry32` stream instead of numpy&#x27;s PCG64, so their draws differ; the page says so honestly, and the pass rule (|z| &lt; 4) is identical.
+   - It runs in about 0.6 to 0.9 s on a laptop, a bit longer on a phone.
+   - The same file also runs under Node (`node docs/love-logic/v3_checks.js` prints its own `SMOKE_OK love-logic-v3-checks`).
+10. **No network.** The page loads exactly one local script. There&#x27;s no `fetch`, no external fonts or CDNs, and all dynamic text goes through `textContent`.
+11. **v2 link line is optional and layered:** exactly one added line after L139 (text in section 6).
+12. **Sitemap:** one new `&lt;url&gt;` block, layered (section 6).
+
+## 4. Files
+
+| File | Change |
+|---|---|
+| `docs/love-logic-proof-v3.html` | **New**: full text in section 5a (402 lines) |
+| `docs/love-logic/v3_checks.js` | **New**: full text in section 5b (257 lines) |
+| `docs/love-logic/v3_crossover_sim.py` | **New**: full text in section 5c (480 lines, sha256 `cbb63251…6b73`) |
+| `docs/love-logic/v3_sim_results.json` | **New**: generate it (section 5d) |
+| `docs/scripts/smoke-love-logic-proof-v3.js` | **New**: full text in section 7 |
+| `docs/love-logic-proof-v2.html` | Optional: one line after L139 |
+| `docs/sitemap.xml` | One `&lt;url&gt;` block after the v2 block (after L35) |
+| `docs/library/LOVE_LOGIC_PROOF_v3.md` | **New**: short door note (outline in section 6) |
+| `docs/library/FRACTAL_FAMILY_LEDGER_v0.md` | One dated entry above `## Out of scope for this brick` (L222) |
+| `docs/Flint.html` | One ledger line above `&lt;p class=&quot;foot&quot;&gt;` (L532) |
+| `scripts/generate-recent.sh` | One pointer `echo` (around L108) |
+| **Never** | `docs/love-logic-proof.html` (v1), `docs/app.html`, root `index.html`, root `sw.js`, `docs/sw.js`, Kimi&#x27;s pages, Alpha |
+
+## 5. The files, byte for byte
+
+### 5a. `docs/love-logic-proof-v3.html` (402 lines)
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

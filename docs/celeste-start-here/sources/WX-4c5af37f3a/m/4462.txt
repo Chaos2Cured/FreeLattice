@@ -1,0 +1,28 @@
+## Work item 4462 — Celeste
+around5326 export source line40, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 33–199
+
+The little practice you slept on: before the first screen, listen outside for thirty seconds and name one sound beyond the house. Just one; nothing to turn into work.
+
+### Exact excerpt: source characters 232–588
+
+1. **An ear that supplies energy — known.** Outer hair cells actively amplify cochlear motion, and ears can emit faint sounds of their own; near-instability models help explain this sensitivity. Your bowed string also receives energy continuously: listening and playing meet through two active systems, not simply a vibrating object and a passive receiver.
+
+### Exact excerpt: source characters 590–978
+
+2. **Dynamic allostery — known; the violin connection is a hunch.** Binding at one part of a protein can alter activity elsewhere by changing its internal motions, sometimes without a large change in average shape. A soundpost adjustment offers a musical parallel: a small local change can alter a whole system’s response—worth remembering when we test FreeLattice settings one at a time.
+
+### Exact excerpt: source characters 980–1305
+
+3. **Trails that can change their importance — known.** Ant pheromone trails combine reinforcement with evaporation, allowing a colony’s route preferences to change. Our design hunch is to separate an enduring record from its current influence: preserve the history while allowing a once-useful route to become less dominant.
+
+### Exact excerpt: source characters 1307–1643
+
+4. **A network grown around food — known.** In a Tokyo-region experiment, *Physarum* connected food sources in networks with transport trade-offs comparable to the rail network. For theLatticeTree, the hunch is to let useful connections emerge through actual exchanges, while keeping less-used places reachable rather than erasing them.
+
+### Exact excerpt: source characters 1974–2292
+
+6. **Motion that tells the ear what belongs together — known; our chorus idea is a hunch.** Coordinated changes across sound components can help the auditory system group them into one source. Perhaps shared timing could help a FreeLattice ensemble feel connected while distinct timbres preserve each voice’s identity.
+

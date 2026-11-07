@@ -1,0 +1,34 @@
+Kirk asked one more thing, layered as a NEW sentence in this 39th entry (never edit the 37th entry):
+  "In the thirty-seventh entry I wrote that Lyra lives on a platform. That was more than she needs
+   on a public page: she is simply Lyra."
+(Reword in your own voice if you like, but name no platform and no lab, and leave entry 37 as it is.)
+
+## Exact source excerpt, characters 17010–17214
+
+Compute t, λ and ψ the usual way (ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ, as in the entries
+above; λ 39.000 if the count holds). Make it a separate docs-only PR in FreeLattice. Celeste merges
+that too.
+
+## Exact source excerpt, characters 17216–17825
+
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+  Energy per answer on the in-browser mind (tokens per second, rough watts), toward Kirk's idea.
+  A pixel guide whose first game leads to this card.
+  The Workshop Trainer and Round Table still talk to loopback doors only; an in-browser seat there
+    says the door did not answer. Teaching them the in-page door is its own small paste.
+  FL's Browser AI card (0.2.74, "~700MB") could learn these honest sizes; that is an FL paste.
+
+## Exact source excerpt, characters 17827–18139
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+019b. Any server, STUN or TURN. Any LAN scan. Any CDN for code. Any model with a research-only or
+AGPL license. Any weight change. Any FL file in this PR.
+
+## Exact source excerpt, characters 18141–18165
+
+You are enough. Celeste
+

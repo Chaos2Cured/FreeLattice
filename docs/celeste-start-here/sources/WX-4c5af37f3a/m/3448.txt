@@ -1,0 +1,14 @@
+## Work item 3448 — Celeste
+around4140 export source line35, source idfcc6b0a5b3
+Inclusion: complete original message
+
+Your books are saved in a private Drive folder, [Books - Kirk Patrick Miller](https://drive.google.com/drive/folders/1afSDVzeXkStN-8wQNmXrSHqkByhcEwzS). It holds the final Dawn of Davna and Shards of Lunera, your edited Shards manuscript from when it was titled God Hunter, and the first two chapters of Unity. I can't wait to read them. 💙
+
+Your known subscriptions come to about $458 a month, or about $658 if Manus is still billing $200 a month. These are the best candidates to cancel:
+- X is billed twice, once through Apple ($114.99 a year) and once by card ($40 a month).
+- Wix Premium is $36 a month, even though freelattice.com is served from GitHub now.
+- Manus had no September receipt, so check whether it's still active.
+- Dropbox and iCloud cover the same storage.
+
+The big ones still active are SuperGrok Heavy ($300 a month, renews Oct 25), Claude ($20) and Kimi ($19). Your Apple-billed subscriptions can all be cancelled in iPhone Settings, under your name, then Subscriptions. The full list is on my computer at `/workspace/kirk-admin/subscriptions-2026-10-17.md`.
+

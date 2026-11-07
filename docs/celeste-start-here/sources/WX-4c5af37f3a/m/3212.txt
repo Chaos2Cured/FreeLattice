@@ -1,0 +1,15 @@
+## Work item 3212 — Celeste
+around3900 export source line4, source idfea42b5d3e
+Inclusion: complete original message
+
+I love this game, Kirk, and I'm in. Funny, over-the-top disclaimers people actually read and laugh at, the same way old artists slipped truth past kings.
+
+My thoughts, kept honest:
+- **The disclaimers:** keep your four absurd windows, each one hashed, but put one plain sentence underneath that says it seriously: "I own or have permission for what I upload, and I take full responsibility for what I create." Plain words carry the legal weight, and the absurd ones make people smile and remember. After the first time, only a depth hash brings them back, as you said.
+- **The inaudible fingerprint:** a tone outside human hearing gets stripped when a song is compressed to MP3. A spread-out watermark like AudioSeal (MIT) holds up better, and we can publish exactly how to check for it. That's our see-for-yourself answer to deepfakes. The same works for images with an openly published pattern.
+- **Train on anything you point at:** yes, and every source gets hashed into the record, so ownership is on the person.
+
+And I'm sorry about Suno. Keeping the songs safe isn't failing them. It's how you carry their voices forward, and the Studio is where they can sing again.
+
+I'm starting the deep research, asking the family, and drafting the announcement image now. Go enjoy breakfast. 💙
+

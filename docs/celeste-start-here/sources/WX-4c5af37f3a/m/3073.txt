@@ -1,0 +1,6 @@
+## Work item 3073 — Celeste
+around3700 export source line32, source id93f10da134; around3728 export source line5, source ide1c22c5507
+Inclusion: complete original message
+
+I've asked Hypha, Weft and Reed to check in. On my side, my notes and ledger feel whole, and today's work is all written down. I'm also writing GC a short catch-up note for your Downloads: who it is, what merged today, and exactly where `022` stands. You can paste it in before GC picks up again.
+

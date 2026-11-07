@@ -1,0 +1,306 @@
+  // POST /code/write — write a file (token-gated; UI approval lives in the app)
+  if (url === '/code/write' && method === 'POST') {
+    if (!data.path || typeof data.content !== 'string' || !data.content) return respond(res, 400, { error: 'path and content required' });
+    var wlp = lockedPath(data.path);
+    if (wlp.error) return respond(res, wlp.error, { error: 'Path refused', reason: wlp.reason });
+    try {
+      fs.mkdirSync(path.dirname(wlp.full), { recursive: true });
+      fs.writeFileSync(wlp.full, data.content, 'utf8');
+      earnLP(activeId, 'core_plant', 'Wrote file: ' + wlp.rel);
+      return respond(res, 200, { message: 'File written.', path: wlp.rel, bytes: data.content.length });
+    } catch(e) { return respond(res, 500, { error: 'Write failed: ' + e.message }); }
+  }
+
+## Exact source excerpt, characters 32409–33319
+
+  // POST /code/patch — find-and-replace in a file
+  if (url === '/code/patch' && method === 'POST') {
+    if (!data.path || typeof data.find !== 'string' || !data.find || typeof data.replace !== 'string') return respond(res, 400, { error: 'path, find, and replace required' });
+    var plp = lockedPath(data.path);
+    if (plp.error) return respond(res, plp.error, { error: 'Path refused', reason: plp.reason });
+    try {
+      var pcontent = fs.readFileSync(plp.full, 'utf8');
+      if (!pcontent.includes(data.find)) return respond(res, 400, { error: 'Search text not found in file', hint: 'Check whitespace and line endings.' });
+      fs.writeFileSync(plp.full, pcontent.replace(data.find, function() { return data.replace; }), 'utf8');
+      return respond(res, 200, { message: 'Patch applied.', path: plp.rel });
+    } catch(e) { return respond(res, 500, { error: 'Patch failed: ' + e.message }); }
+  }
+
+## Exact source excerpt, characters 33321–33795
+
+  // GET /code/git/status
+  if (url === '/code/git/status') {
+    try {
+      var status = runGit(['status', '--porcelain']);
+      var branch = runGit(['branch', '--show-current']).trim();
+      var log = runGit(['log', '--oneline', '-5']);
+      return respond(res, 200, { branch: branch, changes: status.split('\n').filter(Boolean), recentCommits: log.split('\n').filter(Boolean) });
+    } catch(e) { return respond(res, 500, { error: 'Git failed: ' + e.message }); }
+  }
+
+## Exact source excerpt, characters 33797–35737
+
+  // POST /code/git/commit — stage and commit (local only; this bridge never pushes)
+  if (url === '/code/git/commit' && method === 'POST') {
+    var lg = { route: '/code/git/commit', origin: (meta && meta.origin) || '', agent: activeId };
+    var msgOk = typeof data.message === 'string' && data.message.trim() &&
+      data.message.length <= MAX_COMMIT_MESSAGE && !/[\u0000-\u0008\u000b-\u001f\u007f]/.test(data.message);
+    if (!msgOk) {
+      lg.result = 'refused:message'; ledgerAppend(lg);
+      return respond(res, 400, { error: 'message required (1-' + MAX_COMMIT_MESSAGE + ' chars, no control characters)' });
+    }
+    var files = data.files === undefined ? ['.'] : data.files;
+    if (!Array.isArray(files) || files.length === 0 || files.length > MAX_COMMIT_FILES) {
+      lg.result = 'refused:files'; ledgerAppend(lg);
+      return respond(res, 400, { error: 'files must be a list of 1-' + MAX_COMMIT_FILES + ' project paths' });
+    }
+    var rels = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      var clp = lockedPath(files[fi], { allowRoot: true });
+      if (clp.error) {
+        lg.result = 'refused:path:' + clp.reason; ledgerAppend(lg);
+        return respond(res, clp.error, { error: 'Path refused', reason: clp.reason });
+      }
+      rels.push(clp.rel);
+    }
+    lg.filesCount = rels.length;
+    lg.filesSha256 = sha256Hex(rels.slice().sort().join('\n'));
+    lg.messageSha256 = sha256Hex(data.message);
+    try {
+      runGit(['add', '--'].concat(rels));
+      runGit(['commit', '-m', data.message]);
+      var headSha = runGit(['rev-parse', 'HEAD']).trim();
+      lg.result = 'ok'; lg.commitSha = headSha; ledgerAppend(lg);
+      return respond(res, 200, { message: 'Committed: ' + data.message, commit: headSha });
+    } catch(e) {
+      lg.result = 'error'; ledgerAppend(lg);
+      return respond(res, 500, { error: 'Commit failed: ' + String((e.stderr || e.message || '')).slice(0, 400) });
+    }
+  }
+
+## Exact source excerpt, characters 35739–36499
+
+  // GET /test/run — run smoke tests (AutoBuilder format)
+  // Returns { allPassed, count, failures[], output }
+  if (url === '/test/run') {
+    var tr = runSmokeFile(60000);
+    var testOutput = tr.out || (tr.error ? String(tr.error.message) : '');
+    var passedMatch = testOutput.match(/ALL (\d+) CHECKS PASSED/);
+    var failLines = (testOutput.match(/✗.*/g) || []);
+    if (tr.status !== 0 && failLines.length === 0) failLines.push(tr.error ? tr.error.message : 'Smoke exited with status ' + tr.status);
+    return respond(res, 200, {
+      allPassed: tr.status === 0 && failLines.length === 0 && passedMatch !== null,
+      count: passedMatch ? parseInt(passedMatch[1], 10) : 0,
+      failures: failLines,
+      output: testOutput.slice(-800)
+    });
+  }
+
+## Exact source excerpt, characters 36501–37120
+
+  // GET /code/test — run smoke tests (legacy format)
+  if (url === '/code/test') {
+    var ct = runSmokeFile(30000);
+    if (ct.status === 0) {
+      var passed = (ct.out.match(/✓/g) || []).length;
+      var allMatch = ct.out.match(/ALL (\d+) CHECKS PASSED/);
+      return respond(res, 200, { passed: allMatch ? parseInt(allMatch[1], 10) : passed, failed: 0, output: ct.out.slice(-500) });
+    }
+    var failMatch = ct.out.match(/(\d+) FAILED/);
+    return respond(res, 200, { passed: 0, failed: failMatch ? parseInt(failMatch[1], 10) : 1, output: (ct.out || (ct.error ? ct.error.message : '')).slice(-500) });
+  }
+```
+
+## Exact source excerpt, characters 37122–37163
+
+### Block E: listen (replaces L1153-1157)
+
+## Exact source excerpt, characters 37165–37840
+
+```js
+var server = http.createServer(handleRequest);
+server.on('error', function(e) {
+  console.error('  ! Agent Bridge could not start on ' + BRIDGE_HOST + ':' + PORT + ': ' + e.message);
+  process.exitCode = 1;
+});
+// LAYER bridge-lock-v0: loopback only. No env override. Never 0.0.0.0.
+server.listen(PORT, BRIDGE_HOST, function() {
+  console.log('');
+  console.log('  \u2726 FreeLattice Agent Bridge');
+  console.log('  \u2726 Listening on http://' + BRIDGE_HOST + ':' + PORT);
+  console.log('  \u2726 Door lock: ' + BRIDGE_LOCK_VERSION + ' (named origins, token, no shell)');
+  console.log('  \u2726 Token file (local tools): ' + TOKEN_FILE);
+  newPairCode('launch');
+```
+
+## Exact source excerpt, characters 37842–37856
+
+## 6. App side
+
+## Exact source excerpt, characters 37858–37919
+
+### 6a. New `docs/modules/agent-bridge-client.js` (full text)
+
+## Exact source excerpt, characters 37921–38185
+
+It sends the token only when one is stored, so an older bridge keeps working. It rewrites `localhost:3141` to `127.0.0.1:3141`. On 401 it clears the token, fires `fl-agent-bridge-needs-pair`, and **never falls back to GitHub**. All text goes through `textContent`.
+
+## Exact source excerpt, characters 38187–39039
+
+```js
+/* FLAgentBridge: the app side of the Agent Bridge door lock.
+ * Marker: v-agent-bridge-lock-v0 (2026-09-28, Celeste's brief, built by Flint).
+ *
+ * The Agent Bridge (tools/agent-bridge.js, port 3141) is the builder's
+ * local git door. It is NOT the Ollama Bridge (bridge/, port 11435).
+ * Since bridge-lock-v0 it wants a per-launch token on every change.
+ * The app gets that token once per bridge launch by a short pairing
+ * code the bridge window shows (like pairing a speaker).
+ *
+ * - Sends X-FL-Bridge-Token only when a token is stored, so an older
+ *   bridge keeps working exactly as before.
+ * - Talks to 127.0.0.1 (local minds are 127.0.0.1 only).
+ * - Everything shown to people goes through textContent.
+ * - A 401 never falls back to GitHub. Local stays local.
+ */
+(function () {
+  'use strict';
+  if (window.FLAgentBridge) return;
+
+## Exact source excerpt, characters 39041–39174
+
+  var TOKEN_KEY = 'fl_agentBridgeToken';
+  var BASE = 'http://127.0.0.1:3141';
+  var NEEDS_PAIR_EVENT = 'fl-agent-bridge-needs-pair';
+
+## Exact source excerpt, characters 39176–39700
+
+  function normalize(url) {
+    return String(url).replace(/^http:\/\/localhost:3141(?=\/|$)/, BASE);
+  }
+  function getToken() {
+    try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+  }
+  function setToken(t) {
+    try {
+      if (t) localStorage.setItem(TOKEN_KEY, t);
+      else localStorage.removeItem(TOKEN_KEY);
+    } catch (e) {}
+  }
+  function copy(obj) {
+    var o = {};
+    if (obj) for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) o[k] = obj[k];
+    return o;
+  }
+
+## Exact source excerpt, characters 39702–40113
+
+  function bridgeFetch(url, opts) {
+    var o = copy(opts);
+    var h = copy(opts && opts.headers);
+    var t = getToken();
+    if (t) h['X-FL-Bridge-Token'] = t;
+    o.headers = h;
+    return fetch(normalize(url), o).then(function (r) {
+      if (r.status === 401) {
+        setToken('');
+        try { window.dispatchEvent(new CustomEvent(NEEDS_PAIR_EVENT)); } catch (e) {}
+      }
+      return r;
+    });
+  }
+
+## Exact source excerpt, characters 40115–40865
+
+  function pair(code) {
+    return fetch(BASE + '/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: String(code || '').slice(0, 16) })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.status === 200 && j && typeof j.token === 'string' && /^[a-f0-9]{64}$/.test(j.token)) {
+          setToken(j.token);
+          return { ok: true };
+        }
+        return { ok: false, status: r.status, reason: (j && typeof j.error === 'string') ? j.error : ('HTTP ' + r.status) };
+      });
+    }).catch(function () {
+      return { ok: false, status: 0, reason: 'The bridge is not answering on this computer.' };
+    });
+  }
+
+## Exact source excerpt, characters 40867–41280
+
+  function status() {
+    return fetch(BASE + '/', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(2000) : undefined })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { return { up: true, lock: (j && j.bridgeLock) || null, hasToken: !!getToken() }; })
+      .catch(function () { return { up: false, lock: null, hasToken: !!getToken() }; });
+  }
+
+## Exact source excerpt, characters 41282–43026
+
+  // A small pairing card. All text via textContent, never parsed as HTML.
+  function renderPairCard(container) {
+    if (!container || container.querySelector('.fl-bridge-pair')) return;
+    var box = document.createElement('div');
+    box.className = 'fl-bridge-pair';
+    box.style.cssText = 'margin:8px 0;padding:10px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;';
+    var p = document.createElement('div');
+    p.textContent = 'Your builder bridge is awake. Its window shows a short code. Type it here to pair.';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 7;
+    input.placeholder = 'ABC-123';
+    input.setAttribute('aria-label', 'Bridge pairing code');
+    input.autocomplete = 'off';
+    input.style.cssText = 'margin:6px 6px 0 0;padding:6px 8px;width:7em;text-transform:uppercase;letter-spacing:0.1em;';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Pair';
+    var msg = document.createElement('div');
+    msg.style.cssText = 'margin-top:6px;opacity:0.8;';
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      msg.textContent = 'Pairing\u2026';
+      pair(input.value).then(function (res) {
+        btn.disabled = false;
+        if (res.ok) {
+          msg.textContent = 'Paired. Your builds can use the bridge now.';
+          setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 1500);
+        } else {
+          msg.textContent = res.reason || 'That did not pair. Check the code in the bridge window.';
+        }
+      });
+    });
+    box.appendChild(p); box.appendChild(input); box.appendChild(btn); box.appendChild(msg);
+    container.appendChild(box);
+  }
+
+## Exact source excerpt, characters 43028–43341
+
+  window.FLAgentBridge = {
+    BASE: BASE,
+    TOKEN_KEY: TOKEN_KEY,
+    NEEDS_PAIR_EVENT: NEEDS_PAIR_EVENT,
+    fetch: bridgeFetch,
+    pair: pair,
+    status: status,
+    hasToken: function () { return !!getToken(); },
+    forget: function () { setToken(''); },
+    renderPairCard: renderPairCard
+  };
+})();
+```
+
+## Exact source excerpt, characters 43343–43404
+
+### 6b. `docs/app.html` (then byte-copy to root `index.html`)
+
+## Exact source excerpt, characters 43406–43481
+
+Right above L68472 `<script src="modules/propose.js" defer></script>`, add:
+
+## Exact source excerpt, characters 43483–43662
+

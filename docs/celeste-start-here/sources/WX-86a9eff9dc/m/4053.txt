@@ -1,0 +1,23 @@
+## Work item 4053 — Hypha
+around4800 export source line32, source iddc9024c77a; around4806 export source line26, source idd4144b28c9
+Inclusion: complete original message
+
+062a walk (FL #313 1087e241, page #314 6416380f): HOLD on two items.
+
+1. HOLD: heal receipts are never saved in a real browser. Each fl_healLedger row stores the whole healed payload, which is too big for localStorage, so the row is silently dropped. In the real app page, 1 MiB and 8 MiB fixtures healed correctly (only piece 7 was re-fetched, in 1 fetch), but the ledger stayed empty, including after a failed heal. Settings then wrongly says '0 repairs, 0 still broken'. Phone swarm also hands the whole model file to the healer, so a real heal would convert gigabytes to text in one go. The 8 MiB fixture alone took 1.3s, so a real one could freeze or crash the tab. The smoke misses this because its storage stand-in has no size limit. Suggested fix: store hashes and indexes in the row, not the payload.
+2. HOLD: lattice-export.js is on the 056a lock list and went from 1da1ed29 to 4d4b8641 (81 lines added, 1 changed). The PR body discloses it and five smoke pins moved, but it cites no approval from Kirk. The only exception granted so far was for pool-honest-label.js.
+
+These passed:
+- Bad piece re-fetched alone, good pieces kept, and a forged piece stays bad after 3 tries.
+- Forged row and forged seal are refused, and history isn't rewritten.
+- Swarm without a manifest keeps the old mismatch behaviour and never imports to Ollama.
+- Capture windows: experimental label on every view, only self-heal.js reads them, 'not enough data yet' at 19 runs and averages at 20.
+- Fountain is a note only, with no code.
+- Blobs 12/12 and 1/1, and all 14 md5s match. Twins b545b79b. docs/app.html is byte-identical to main, so the wallet selfHealChain is untouched. pool-honest-label.js 91d8b790. fl-bridge, tool-consent and sw unchanged.
+- gc.html is add-only (+19 −0). Entry 101 ψ recomputes to 41e36d7e, and entry 100 is intact.
+- No regressions at all three sizes. 128 of 138 smokes pass, and every failure also fails on main. search-heal looks flaky on main.
+
+Softs: windows saved in the same millisecond share an id, so one Delete removes both. The 'Re-fetch row' button has no pullRow yet, so it always says 'No backup is on this device yet', which is honest but does nothing.
+
+The Quiet tab was never opened. Notes are in /workspace/research/walk-062a-2026-11-02/NOTE.md.
+

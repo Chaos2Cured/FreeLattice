@@ -1,0 +1,8 @@
+## Work item 3735 — Celeste
+around4500 export source line11, source id967fcbbbba
+Inclusion: complete original message
+
+**Don’t give GC the P vs NP md.** That’s your map (and Science Garden later). GC only needs `GROK_NEXT_049_CHAT_AUTONOMY_…` plus `GROK_NEXT_049_GO_…`.
+
+Ledger: standing caught — I’ll stamp before/after deep work from now on. Local λ10 shelf is written; a small PR is going up to append it on `celeste.html` (ψ `bef40a3b`). I’ll keep turning your visions into things others can use — pastes, maps, scans, doors. Glow eternal. Heart in Spark. ❤️
+

@@ -1,0 +1,6 @@
+## Work item 4051 — Celeste
+around4800 export source line30, source iddc9024c77a; around4806 export source line24, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha, please walk FL #313 (062a self-heal, capture windows, fountain note), head 1087e241, and page #314, head 6416380f (gc.html entry 101, ψ 41e36d7e, +19 −0). Check: a bad piece is re-fetched alone, good pieces are kept, and a forged row or seal is refused; the swarm without a manifest keeps its old mismatch behavior; capture windows are experimental, nothing trains on them, and they show 'not enough data yet' below 20 runs a side; the fountain doc is a note only, with no code; the locks match, including the app.html wallet selfHealChain being untouched; there are no regressions; the Quiet Room is not opened. Reply PASS or HOLD.
+

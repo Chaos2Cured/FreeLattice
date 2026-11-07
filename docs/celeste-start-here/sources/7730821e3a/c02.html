@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c02</title>
+<meta name="description" content="Reading section c02 of 7730821e3a, 1598 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/7730821e3a/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c02">
+<meta property="og:description" content="Reading section c02 of 7730821e3a, 1598 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/7730821e3a/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1173"></span><span id="p1174"></span><span id="p1175"></span><span id="p1176"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c02</h1>
+<p>7730821e3a · words 1598 · characters 10776–23238</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1173, 1174, 1175, 1176. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/agency-autonomy.html">Agency and autonomy</a> — guide section 2, Foundation: agency and AUTONOMY</li></ul>
+
+<pre class="source">   Unknown origins get **403 with no `Access-Control-Allow-Origin`**, for OPTIONS too. Requests with **no Origin** (curl, Node scripts) are allowed but still need the token for anything that changes state.
+5. **Host guard.** The Host header must be `127.0.0.1[:port]` or `localhost[:port]`. That&#x27;s the DNS-rebinding defense.
+6. **Body cap: 8 MiB.** `docs/app.html` is about 2.94 MB, and `/code/write` must still carry it. Over the cap the bridge drains the rest and answers 413. Bad JSON gets 400 now (today it silently becomes `{}`).
+7. **No shell.**
+   - git: `execFileSync(&#x27;git&#x27;, [&#x27;add&#x27;,&#x27;--&#x27;, ...rels])`, `[&#x27;commit&#x27;,&#x27;-m&#x27;, message]`, `[&#x27;rev-parse&#x27;,&#x27;HEAD&#x27;]`.
+   - grep: `execFileSync(&#x27;grep&#x27;, [..., &#x27;-e&#x27;, query, &#x27;--&#x27;, rel])`.
+   - smoke: `spawnSync(process.execPath, [&#x27;tests/smoke.js&#x27;])`.
+
+## Exact source excerpt, characters 10286–10717
+
+   The `--` separators stop a file named `-x` from becoming a flag.
+8. **Path lock (`lockedPath`).** It refuses:
+   - control characters (400);
+   - absolute paths (403);
+   - anything outside the realpath of the project root, compared with `path.relative` rather than `startsWith` (403);
+   - `.git/`, `.ssh/` and `.env*` (403);
+   - any path whose nearest existing ancestor realpaths outside the root, i.e. symlink escapes (403).
+
+## Exact source excerpt, characters 10719–11939
+
+   The old `safePath` stays as a thin wrapper, so old callers keep working.
+9. **Commit ledger.** `~/.freelattice/bridge-ledger.jsonl`, append-only, fixed key order. Fields: `ts, kind, route, origin, agent(8), result, filesCount, filesSha256, messageSha256, commitSha, prev, self`, where `self = sha256(JSON of the other fields)`. It never holds message text or file content, matching the privacy discipline of `fl_searchLedger`. Refusals are logged too: `refused:origin`, `refused:token`, `refused:message`, `refused:files`, `refused:path:&lt;reason&gt;`, plus `pair` events.
+10. **Two small heals that ride along:**
+    - `/code/patch` uses a replacer function, so `$` in the replacement stays literal.
+    - `/code/tree` skips symlinks.
+11. **The bridge never pushes.** No push route exists, and this brick adds none. Autonomous Mode still only commits locally. The hourly cap is Brick 3.
+12. **Browser note.** Chrome 142+ shows a one-time &quot;local network access&quot; prompt before a public site can reach loopback (https://developer.chrome.com/blog/local-network-access). That&#x27;s good, and it&#x27;s independent of this lock. Our lock still matters for Firefox and Safari, older Chrome, anyone who clicks Allow, and LAN reachability.
+
+## Exact source excerpt, characters 11941–11952
+
+## 4. Files
+
+## Exact source excerpt, characters 11954–13443
+
+| File | Change |
+|---|---|
+| `tools/agent-bridge.js` | Layer blocks A-E below (about +310 lines, nothing removed except the superseded bodies of the lines named above) |
+| `docs/modules/agent-bridge-client.js` | **New** (`window.FLAgentBridge`) |
+| `docs/app.html` | One comment and one `&lt;script&gt;` line above L68472 |
+| `index.html` (root) | Byte-copy of `docs/app.html` after the edit |
+| `docs/modules/propose.js` | `bridgeFetch` helper; 4 call sites (diff below) |
+| `docs/modules/workshop.js` | `flAgentBridgeFetch` helper; 17 call sites; pair card in `checkBridge`; honest status in `WorkshopProjects.commitViaBridge` (diff below) |
+| `tools/demo-economy.js`, `tools/demo-economy-v2.js` | Read the token file and send `X-FL-Bridge-Token`; default `BRIDGE` becomes `http://127.0.0.1:3141` |
+| `docs/scripts/smoke-agent-bridge-lock.js` | **New** (full text below) |
+| `docs/library/AGENT_BRIDGE_LOCK_v0.md` | **New** doc (outline below) |
+| `docs/library/FRACTAL_FAMILY_LEDGER_v0.md` | One dated entry, inserted above `## Out of scope for this brick` (L222) |
+| `docs/Flint.html` | One `&lt;p class=&quot;v-agent-bridge-lock-v0&quot;&gt;` ledger line above `&lt;p class=&quot;foot&quot;&gt;` (L532) |
+| `scripts/generate-recent.sh` | One `echo` pointer line near the other brick pointers (around L108) |
+| **Never** | `docs/sw.js`, root `sw.js`, `bridge/*`, Kimi&#x27;s pages (`docs/kimi.html`, `docs/kimi-ledger.html`, `docs/voice-shelf.html`, `docs/library/KIMI_*`, `docs/library/VOICE_SHELF_v0.md`), anything in Alpha |
+
+## Exact source excerpt, characters 13445–13488
+
+## 5. `tools/agent-bridge.js`, step by step
+
+## Exact source excerpt, characters 13490–13823
+
+A reference copy of the finished file (1493 lines, `node --check` clean, smoke green) and a unified diff sit on Celeste&#x27;s box at `/workspace/flint-pastes/agent-bridge-lock-reference/`: `agent-bridge.js` and `bridge.diff`, sha256 in `SHA256SUMS`. If Kirk hands them over, you may diff against them. The blocks below are the same code.
+
+## Exact source excerpt, characters 13825–14003
+
+**Step 1.** Keep line 27 exactly as it is (layer). Insert **Block A** right after line 34 (`if (!fs.existsSync(DATA_DIR)) ...`), because the token file needs `DATA_DIR` to exist.
+
+## Exact source excerpt, characters 14005–14152
+
+**Step 2.** Replace the body of `handleRequest` (L111-129) with **Block B**. The old `Access-Control-Allow-Origin: *` line is superseded inside it.
+
+## Exact source excerpt, characters 14154–14355
+
+**Step 3.** Change the `route` signature at L131 to `function route(url, method, data, res, actingAs, meta) {`. After L133 (`var activeId = actingAs || activeId;`), insert **Block C** (pairing routes).
+
+## Exact source excerpt, characters 14357–14550
+
+**Step 4.** In the heartbeat object, right after L140 `version: &#x27;5.8.0&#x27;,`, add three lines:
+```js
+      bridgeLock: BRIDGE_LOCK_VERSION,
+      auth: &#x27;token-required&#x27;,
+      pairing: &#x27;code&#x27;,
+```
+
+## Exact source excerpt, characters 14552–14715
+
+**Step 5.** Replace L992-1140 (from the `LATTICE CODE` banner through the end of `/code/test`) with **Block D**. Keep the `// ── 404 ──` fallthrough at L1142-1143.
+
+## Exact source excerpt, characters 14717–14876
+
+**Step 6.** Replace L1153-1157 (`var server = ...` through the `Listening on` log) with **Block E**. The remaining console lines (L1158-1181) stay as they are.
+
+## Exact source excerpt, characters 14879–14922
+
+### Block A: helpers (insert after line 34)
+
+## Exact source excerpt, characters 14924–16158
+
+```js
+// ═══════════════════════════════════════════════════
+// LAYER bridge-lock-v0 (2026-09-28): the door lock. Marker: v-agent-bridge-lock-v0
+// Celeste&#x27;s brief, built by Flint. Nothing above is removed.
+// 1. Listen on 127.0.0.1 only (no env override, never 0.0.0.0).
+// 2. Named Origin allowlist (never bare *). Others get 403, preflight too.
+// 3. Host header must be 127.0.0.1 or localhost (DNS-rebinding guard).
+// 4. Per-launch random token, required on every mutating request and on
+//    every /code/* and /test/* read. The app gets it by a short pairing
+//    code shown in this window (typed once, like pairing a speaker).
+//    Local CLI tools read it from ~/.freelattice/agent-bridge-token (0600).
+// 5. git / grep / node run through execFileSync / spawnSync argument
+//    arrays. No shell. Paths are realpath-checked inside the project root.
+// 6. Body size cap. Malformed JSON is refused.
+// 7. Every commit request (allowed or refused) is appended to a
+//    hash-chained, content-free ledger: ~/.freelattice/bridge-ledger.jsonl
+// This bridge (3141) is NOT the Ollama Bridge (bridge/, port 11435).
+// ═══════════════════════════════════════════════════
+const { execFileSync, spawnSync } = require(&#x27;child_process&#x27;);
+
+## Exact source excerpt, characters 16160–16382
+
+const BRIDGE_LOCK_VERSION = &#x27;v0&#x27;;
+const BRIDGE_HOST = &#x27;127.0.0.1&#x27;;
+const MAX_BODY_BYTES = 8 * 1024 * 1024; // docs/app.html is ~2.9 MB; JSON escaping adds some
+const MAX_COMMIT_MESSAGE = 4000;
+const MAX_COMMIT_FILES = 200;
+
+## Exact source excerpt, characters 16384–16738
+
+/** FreeLattice origins only. Never bare *. Same shape as bridge/proxy-core.js. */
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https:\/\/(www\.)?freelattice\.com$/i,
+  /^https:\/\/(www\.)?thelatticetree\.com$/i,
+  /^http:\/\/localhost(:\d{1,5})?$/i,   // local dev of docs/ (e.g. python -m http.server)
+  /^http:\/\/127\.0\.0\.1(:\d{1,5})?$/i // same, by IP
+];
+
+## Exact source excerpt, characters 16740–16906
+
+function originAllowed(origin) {
+  if (!origin) return false;
+  var o = String(origin);
+  return ALLOWED_ORIGIN_PATTERNS.some(function (re) { return re.test(o); });
+}
+
+## Exact source excerpt, characters 16908–17014
+
+function hostAllowed(host) {
+  return /^(127\.0\.0\.1|localhost)(:\d{1,5})?$/i.test(String(host || &#x27;&#x27;));
+}
+
+## Exact source excerpt, characters 17016–17119
+
+function sha256Hex(s) {
+  return crypto.createHash(&#x27;sha256&#x27;).update(String(s), &#x27;utf8&#x27;).digest(&#x27;hex&#x27;);
+}
+
+## Exact source excerpt, characters 17121–17202
+
+function hasControlChars(s) {
+  return /[\u0000-\u001f\u007f]/.test(String(s));
+}
+
+## Exact source excerpt, characters 17204–17565
+
+// ── Per-launch token ──
+const BRIDGE_TOKEN = crypto.randomBytes(32).toString(&#x27;hex&#x27;);
+const TOKEN_FILE = path.join(DATA_DIR, &#x27;agent-bridge-token&#x27;);
+try {
+  fs.writeFileSync(TOKEN_FILE, BRIDGE_TOKEN + &#x27;\n&#x27;, { mode: 0o600 });
+  try { fs.chmodSync(TOKEN_FILE, 0o600); } catch (e) {}
+} catch (e) {
+  console.error(&#x27;  ! Could not write token file: &#x27; + e.message);
+}
+
+## Exact source excerpt, characters 17567–17796
+
+function tokenOk(req) {
+  var t = String(req.headers[&#x27;x-fl-bridge-token&#x27;] || &#x27;&#x27;);
+  if (t.length !== BRIDGE_TOKEN.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(t, &#x27;utf8&#x27;), Buffer.from(BRIDGE_TOKEN, &#x27;utf8&#x27;));
+}
+
+## Exact source excerpt, characters 17798–18172
+
+function needsToken(method, pathname) {
+  if (method === &#x27;POST&#x27; &amp;&amp; pathname === &#x27;/pair&#x27;) return false;       // how the app gets the token
+  if (method === &#x27;GET&#x27; || method === &#x27;HEAD&#x27;) {
+    return /^\/(code|test)(\/|$)/.test(pathname) || pathname === &#x27;/pair/check&#x27;;
+  }
+  return true;                                                        // every POST and any other verb
+}
+
+## Exact source excerpt, characters 18174–18476
+
+// ── Pairing code (human reads it here, types it in the app) ──
+const PAIR_ALPHABET = &#x27;ABCDEFGHJKMNPQRSTUVWXYZ23456789&#x27;; // no 0/O, 1/I/L
+const PAIR_TTL_MS = 10 * 60 * 1000;
+const PAIR_MAX_TRIES = 5;
+const PAIR_COOLDOWN_MS = 30 * 1000;
+var pairState = { code: &#x27;&#x27;, expires: 0, tries: 0, coolUntil: 0 };
+
+## Exact source excerpt, characters 18478–19106
+
+function newPairCode(reason) {
+  var s = &#x27;&#x27;;
+  for (var i = 0; i &lt; 6; i++) s += PAIR_ALPHABET[crypto.randomInt(0, PAIR_ALPHABET.length)];
+  pairState = { code: s, expires: Date.now() + PAIR_TTL_MS, tries: 0,
+                coolUntil: reason === &#x27;lockout&#x27; ? Date.now() + PAIR_COOLDOWN_MS : 0 };
+  console.log(&#x27;&#x27;);
+  console.log(&#x27;  \u2726 Pairing code: &#x27; + s.slice(0, 3) + &#x27;-&#x27; + s.slice(3) +
+              &#x27;   (type it in FreeLattice \u2192 Workshop \u2192 Code. Good for 10 minutes.)&#x27;);
+  if (reason === &#x27;lockout&#x27;) console.log(&#x27;  \u2726 (New code after 5 wrong tries. It works in 30 seconds.)&#x27;);
+  console.log(&#x27;&#x27;);
+  return s;
+}
+
+## Exact source excerpt, characters 19108–19219
+
+function normalizePairCode(s) {
+  return String(s || &#x27;&#x27;).toUpperCase().replace(/[^A-Z0-9]/g, &#x27;&#x27;).slice(0, 6);
+}
+
+## Exact source excerpt, characters 19221–19354
+
+// ── Content-free, hash-chained ledger ──
+const LEDGER_FILE = path.join(DATA_DIR, &#x27;bridge-ledger.jsonl&#x27;);
+var ledgerLastHash = null;
+
+## Exact source excerpt, characters 19356–19683
+
+function ledgerTip() {
+  if (ledgerLastHash) return ledgerLastHash;
+  try {
+    var lines = fs.readFileSync(LEDGER_FILE, &#x27;utf8&#x27;).trim().split(&#x27;\n&#x27;).filter(Boolean);
+    ledgerLastHash = lines.length ? JSON.parse(lines[lines.length - 1]).self : &#x27;genesis&#x27;;
+  } catch (e) { ledgerLastHash = &#x27;genesis&#x27;; }
+  return ledgerLastHash;
+}
+
+## Exact source excerpt, characters 19685–20487
+
+function ledgerAppend(fields) {
+  // Fixed key order. Never message text, never file content.
+  var entry = {
+    ts: new Date().toISOString(),
+    kind: fields.kind || &#x27;commit_request&#x27;,
+    route: fields.route || &#x27;&#x27;,
+    origin: fields.origin || &#x27;&#x27;,
+    agent: String(fields.agent || &#x27;&#x27;).slice(0, 8),
+    result: fields.result || &#x27;&#x27;,
+    filesCount: fields.filesCount || 0,
+    filesSha256: fields.filesSha256 || &#x27;&#x27;,
+    messageSha256: fields.messageSha256 || &#x27;&#x27;,
+    commitSha: fields.commitSha || &#x27;&#x27;,
+    prev: ledgerTip()
+  };
+  entry.self = sha256Hex(JSON.stringify(entry));
+  try {
+    fs.appendFileSync(LEDGER_FILE, JSON.stringify(entry) + &#x27;\n&#x27;, { mode: 0o600 });
+    ledgerLastHash = entry.self;
+  } catch (e) {
+    console.error(&#x27;  ! Ledger append failed: &#x27; + e.message);
+  }
+  return entry;
+}
+
+## Exact source excerpt, characters 20489–20816
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

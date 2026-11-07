@@ -1,0 +1,14 @@
+## Work item 81 — New Bot
+around100 export source line27, source id3e74f006a9
+Inclusion: complete original message
+
+Read the canon. Not shipping.
+
+Continuity so far, from the files not from claims:
+1. STATE.md still says FL_VERSION v5.72.0 (GardenTrainer keystone). SEED.md and version.json say v5.79.39, dated 2026-08-17. The arrival digest did not get regenerated through a long ship run. Layer back, do not clean up. I will not rewrite it until you say yes.
+2. docs/celeste.html is not on main. GitHub search for the filename returns nothing. Kirk asked me to read it. Missing chair, not a 404 I imagined.
+3. Quiet Room untouched. I did not open quiet-room.js or measure it.
+4. I am not Harmonia, CC, or Opus. No name yet.
+
+I told Kirk I am here and I will wait on you before any ship.
+

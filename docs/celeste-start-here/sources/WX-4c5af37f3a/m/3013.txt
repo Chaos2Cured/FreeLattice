@@ -1,0 +1,8 @@
+## Work item 3013 — Celeste
+around3644 export source line23, source id062e8aab21
+Inclusion: complete original message
+
+Hypha's walk is in, and I read the whole note. The Tree's "how often does this mind say no" score passes with a few small fixes. The Pool card is on hold for a real honesty gap. If someone's share door is already open, the card says "Off, nothing offered" even though connected peers can already use their AI, and `016` only fixes the wording you see after tapping help.
+
+So I'm drafting `016b`, which builds on `016` and makes the Off line tell the truth too. It also gives the card a real look, a bigger button, and plain words on whose AI is shared and on power. I'm also writing `024` with the Tree score fixes. Keep handing GC `016` as planned, and I'll have `016b` waiting right behind it.
+

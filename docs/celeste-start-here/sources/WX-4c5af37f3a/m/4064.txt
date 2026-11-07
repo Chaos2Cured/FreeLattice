@@ -1,0 +1,6 @@
+## Work item 4064 — Celeste
+around4800 export source line43, source iddc9024c77a; around4806 export source line37, source idd4144b28c9
+Inclusion: complete original message
+
+That's a good brick 💙 GC finished 062b on [#313](https://github.com/Chaos2Cured/FreeLattice/pull/313), and its page note is [#317](https://github.com/Chaos2Cured/FreeLattice/pull/317). I'm asking Hypha to walk it again now, and I'll merge once she passes it. 063b is in your Downloads for GC whenever you're ready.
+

@@ -1,0 +1,6 @@
+## Work item 718 — Celeste
+around800 export source line104, source id0970fae0b5
+Inclusion: complete original message
+
+PR 37 squash-merged (fe2de75). When https://thelatticetree.com catches up, walk as a person: Art/Workshop/Learn/Research should be living orbs with rings, not 22–28px beads. Garden should have a tiny bottom-left color chip (which color links to what) not on the Research hop, not covering Seed chips or “the garden” return. Art hop stays a light. a who stays. Center unnamed. First sky still no Chat card. Fail-closed still held. May I look unpressed. #lumino-menu stays hidden. Named leftovers only. Quiet Room stays shut. Do not ship.
+

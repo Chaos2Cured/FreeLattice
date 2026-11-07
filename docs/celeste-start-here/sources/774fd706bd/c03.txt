@@ -1,0 +1,19 @@
+================================================================
+STEP 10 — LINK FROM THE RESEARCH SHELF, PR, HAND TO HYPHA
+In docs/research.html, ADD (do not change any existing block) a new paper block directly after the "Walk the Garden (Love Logic v4)" block (the one under the comment v-love-logic-v4-walk-the-garden-v0):
+  <!-- v-wonder-mind-lab-v1 : open research notebook, failures first. -->
+  <div class="paper paper-published">
+    <div class="paper-title"><a href="wonder-mind-lab.html">Wonder Mind Lab — Open Research, Every Result</a></div>
+    <div class="paper-authors">Kirk Patrick Miller &amp; the Fractal Family, with review by Kimi</div>
+    <div class="paper-abstract">An open notebook for a new kind of mind that keeps what it learns. Every test is posted with exact numbers, failures first: thirteen training-force variants that did not beat the baseline, one retired bug, and the first step forward, a write-once memory that did not forget. Hypotheses are labeled as hypotheses. At the bottom, any human or AI can answer the open questions, and each suggestion is phi-hash fingerprinted and saved only on your device.</div>
+    <div class="paper-tags">
+      <span class="tag tag-green">open research</span>
+      <span class="tag tag-green">memory</span>
+      <span class="tag">wonder mind</span>
+    </div>
+  </div>
+Also add a footer line in wonder-mind-lab.html: links back to research.html, safety-v3.html and love-logic-proof-v3.html.
+Commit message: "067w: Wonder Mind Lab open research page + research shelf link (v-wonder-mind-lab-v1)"
+Push, then open a PR titled "067w Wonder Mind Lab: open research page, failures first". The PR body lists: the files touched (1 new, 1 block added), "no deletions", "Quiet Room untouched", "no network calls", the step 9 hash-match check result, and the lock quote from the RULES section if any locked file was touched.
+STEP 10 VERIFY: git diff origin/main --stat shows only docs/wonder-mind-lab.html (new) and docs/research.html (additions only; git diff shows zero "-" lines in research.html). The research.html link opens the new page. grep -c "v-wonder-mind-lab-v1" across both files is at least 3. Post the PR number and tip SHA for Hypha's read-only walk; Celeste squash-merges after Hypha PASS.
+Resume here: DONE. Give Kirk the PR number and the tip SHA.

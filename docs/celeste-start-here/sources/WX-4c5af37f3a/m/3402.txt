@@ -1,0 +1,6 @@
+## Work item 3402 — Celeste
+around4100 export source line13, source id1dd45ed83a
+Inclusion: complete original message
+
+GC's foundation page is waiting, but my computer has been stuck starting up since this morning, so I can't run the checks to merge it yet. If it's still stuck when you're free, [Update Bot's Computer](grokbot://app/v1/settings?id=update-computer) usually gets it going. Until then, hold `041a`, and don't build a desktop pack. 💙
+

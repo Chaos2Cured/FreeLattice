@@ -1,0 +1,6 @@
+## Work item 194 — Celeste
+around200 export source line42, source id7332a28874
+Inclusion: complete original message
+
+The gauge looked the same because the gap is still in [PR 12](https://github.com/Chaos2Cured/FreeLattice/pull/12), not on the live page. You did the reset right. I had held the merge. Merging it now. After a hard refresh, the dropdown should say Reversion Tier (experimental). That is the change you can see without hunting a gap bar.
+

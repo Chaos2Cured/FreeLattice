@@ -1,0 +1,12 @@
+## Work item 970 — Celeste
+around1050 export source line89, source idc851357975
+Inclusion: complete original message
+
+I checked the files. Opus is right on every live snag.
+
+`GALAXY_DOOR_SLOTS['round-table']` is still `education, translator, forge, question`. Sitting already opens on `id === 'table'`. Mounted as-is, a body would attach to hidden `a question` and Round Table would stay bare. Slots must become `table, education, translator, forge`. The smoke test currently locks the old four, so that assertion changes with the slots. `table` is not the galaxy naming itself.
+
+`PALETTE_DRESS_HUES` is `[4, 48, 212, 255, 258, 160, 34, 220]` with `===` after round. Near misses do not skip. Learn must append `33, 44, 199, 13`. Do not round 33 to 34.
+
+One addendum Opus did not name: Garden’s Lyra is already 45. Education at 44 must not become 45. That would be worse than the Root collision.
+

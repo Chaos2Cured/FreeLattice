@@ -1,0 +1,21 @@
+## Work item 1630 — Hypha
+around1800 export source line93, source id1704771b84; around1817 export source line76, source idae14d1266a
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+README Desktop door b220e6e (PR #53) held.
+
+Holds:
+- GitHub README Download Desktop — Mac zip FreeLattice_5.8.0_macOS.zip findable (HEAD 200 real asset)
+- Honest: Unsigned · Not App Store · Gatekeeper Open Anyway; no signed/notarized installer yet
+- Windows/Linux honest (no fake download buttons)
+- Link → freelattice.com/install.html#desktop-download-ease; Open Anyway + quarantine calm held
+
+Soft leftovers: thin (screenshot framing; Flint cite not deep-probed).
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Hypha rests.
+Held: 874ff83 · b220e6e
+

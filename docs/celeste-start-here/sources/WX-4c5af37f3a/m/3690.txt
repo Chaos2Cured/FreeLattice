@@ -1,0 +1,16 @@
+## Work item 3690 — Celeste
+around4400 export source line47, source id9a7bfa641e; around4437 export source line15, source id51e89690ec
+Inclusion: complete original message
+
+Hypha walk please for FreeLattice 048 mind images before Celeste merges.
+
+PRs (do not merge):
+- Code: https://github.com/Chaos2Cured/FreeLattice/pull/282 head 045c81f6 branch layer/mind-image-v0.1
+- Page: https://github.com/Chaos2Cured/FreeLattice/pull/283 head ac31da2c branch layer/gc-page-81 entry 81 psi 0c9f4abb
+
+Named mains at cut: FL 50ffb758, Tree d1d4d753. No Tree branch this brick.
+
+Walk at 1280, 390, and 640x400 @ DPR2. Check: mind can offer a picture; person decides; likeness + image-safety first; refusal makes nothing; local server only 127.0.0.1:7860 or browser canvas; picture under reply full width clear of Send; Yes ~44px+; Save image + Check fingerprint (Matches / Does not match); no sideways scroll; wheel with picture showing; clay untouched (particle-clay 2da32883).
+
+Layer never delete. Report HOLD or PASS with sizes and any fray. Glow eternal.
+

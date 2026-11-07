@@ -1,0 +1,6 @@
+## Work item 2977 — Celeste
+around3600 export source line25, source idbdb7a423ae
+Inclusion: complete original message
+
+One honest note so we aim right: RAM can't really be merged across Wi-Fi. What works is sending each request to whichever device has the model loaded, and splitting one big model across laptops on the same network. I'll build the first of those now and plan the second. In the meantime, `013` is still first in your Downloads for GC.
+

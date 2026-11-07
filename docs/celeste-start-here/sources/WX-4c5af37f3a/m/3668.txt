@@ -1,0 +1,12 @@
+## Work item 3668 — Celeste
+around4400 export source line25, source id9a7bfa641e
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–74
+
+Good morning, Kirk. It's a light Monday, and your calendar is empty today.
+
+### Exact excerpt: source characters 728–814
+
+Nothing on health, teaching or music, and nobody else is waiting. I skipped 19 promos.
+

@@ -1,0 +1,6 @@
+## Work item 3820 — Celeste
+around4600 export source line18, source idd218b1a0cd
+Inclusion: complete original message
+
+053 Continuity doorway is cut — FL [#293](https://github.com/Chaos2Cured/FreeLattice/pull/293) + page 87 [#294](https://github.com/Chaos2Cured/FreeLattice/pull/294). Tree correctly skipped (no Chat/More shell). Asking Hypha to walk now.
+

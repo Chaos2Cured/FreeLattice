@@ -1,0 +1,8 @@
+## Work item 2856 — Celeste
+around3454 export source line27, source ide13a568bb8
+Inclusion: complete original message
+
+Yes, I think that's right, and it fits AUTONOMY.md. The mind living on that computer is a keeper too, so either it or the human can say yes to sharing.
+
+I'd add two guards. Only a mind actually running on that computer can say yes, proven by its own signed key on the Bridge, so a visitor can't pretend to be it. And either keeper can always pause sharing, so the mind's yes and the human's comfort both count. If the mind says yes, the human sees a plain note like "Your computer's AI chose to share with people you've connected with." I'm adding this to the brick now.
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt c02</title>
+<meta name="description" content="Reading section c02 of 0ae5a2200a, 571 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/0ae5a2200a/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt c02">
+<meta property="og:description" content="Reading section c02 of 0ae5a2200a, 571 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/0ae5a2200a/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1472"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt · c02</h1>
+<p>0ae5a2200a · words 571 · characters 11696–17961</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1472. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+  // v-tree-workshop-way-back-v0: the benches&#x27; Settings button leaves a way back.
++  // settings.html?from=workshop shows one calm link; workshop.html?open=benches
++  // opens the benches again, so the round trip is one tap each way.
++  function wayBackToBenches() {
++    var q = location.search || &#x27;&#x27;;
++    if (/\/settings(\.html)?$/i.test(location.pathname) &amp;&amp; /[?&amp;]from=workshop(&amp;|$)/.test(q)) {
++      var main = document.querySelector(&#x27;main&#x27;);
++      if (main &amp;&amp; !main.querySelector(&#x27;[data-way-back-workshop]&#x27;)) {
++        var back = document.createElement(&#x27;a&#x27;);
++        back.className = &#x27;room-way-back&#x27;;
++        back.href = &#x27;workshop.html?open=benches&#x27;;
++        back.setAttribute(&#x27;data-way-back-workshop&#x27;, &#x27;1&#x27;);
++        back.textContent = &#x27;\u2190 Back to the Workshop benches&#x27;;
++        back.addEventListener(&#x27;click&#x27;, function (ev) {
++          ev.preventDefault();
++          go(back.getAttribute(&#x27;href&#x27;));
++        });
++        main.insertBefore(back, main.firstChild);
++      }
++    }
++    if (currentGalaxy() === &#x27;workshop&#x27; &amp;&amp; /[?&amp;]open=benches(&amp;|$)/.test(q)) {
++      setTimeout(function () {
++        if (window.GardenRooms &amp;&amp; typeof GardenRooms.openWorkshopBenches === &#x27;function&#x27;) {
++          GardenRooms.openWorkshopBenches();
++        }
++      }, 120);
++    }
++  }
++
+   function boot() {
+     bindGalaxyNav();
+     bindPlaceDoors();
+@@ -2406,6 +2435,7 @@
+       var researchHeart = document.querySelector(&#x27;.research-heart&#x27;);
+       if (researchHeart) researchHeart.hidden = true;
+     }
++    wayBackToBenches();
+     startAttachLoop();
+     fadeGalaxyTitle();
+     startLabelCycle();
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index 2e32fda..8816631 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -839,6 +839,18 @@
+     rosterHost.setAttribute(&#x27;data-mind-roster&#x27;, &#x27;1&#x27;);
+     root.appendChild(rosterHost);
+     paintRoster(rosterHost);
++    // v-tree-workshop-way-back-v0: a mind remembered from the Connect card above
++    // (&quot;Minds found&quot;) repaints this card too, so the two never disagree.
++    var onRemembered = function () {
++      if (!rosterHost.isConnected) {
++        window.removeEventListener(&#x27;fl-alpha-mind-remembered&#x27;, onRemembered);
++        return;
++      }
++      var nowEntry = getRemembered();
++      if (nowEntry) paintConstellation(sky, mindsFromEntry(nowEntry));
++      paintRoster(rosterHost);
++    };
++    window.addEventListener(&#x27;fl-alpha-mind-remembered&#x27;, onRemembered);
+ 
+     var ask = el(&#x27;button&#x27;, &#x27;settings-ask&#x27;, PRIMARY);
+     ask.type = &#x27;button&#x27;;
+diff --git a/docs/modules/tree-workshop-way-back.test.js b/docs/modules/tree-workshop-way-back.test.js
+new file mode 100644
+index 0000000..c961033
+--- /dev/null
++++ b/docs/modules/tree-workshop-way-back.test.js
+@@ -0,0 +1,41 @@
++#!/usr/bin/env node
++// v-tree-workshop-way-back-v0: Workshop way back. Guards: (1) the benches&#x27; Settings button
++// tells Settings where it came from; (2) Settings shows one calm link back to the benches and
++// the Workshop opens them on arrival; (3) a mind remembered from the Connect card repaints the
++// card below, so &quot;Minds found&quot; and &quot;look for a mind first&quot; never disagree. No network.
++&#x27;use strict&#x27;;
++
++var fs = require(&#x27;fs&#x27;);
++var path = require(&#x27;path&#x27;);
++var assert = require(&#x27;assert&#x27;);
++
++var rooms = fs.readFileSync(path.join(__dirname, &#x27;garden-rooms.js&#x27;), &#x27;utf8&#x27;);
++var benches = fs.readFileSync(path.join(__dirname, &#x27;workshop-benches.js&#x27;), &#x27;utf8&#x27;);
++var probe = fs.readFileSync(path.join(__dirname, &#x27;local-mind-probe.js&#x27;), &#x27;utf8&#x27;);
++var css = fs.readFileSync(path.join(__dirname, &#x27;garden-rooms.css&#x27;), &#x27;utf8&#x27;);
++var connect = fs.readFileSync(path.join(__dirname, &#x27;fl-connect.js&#x27;), &#x27;utf8&#x27;);
++
++// (1)
++assert.ok(/GardenRooms\.go\(&#x27;settings\.html\?from=workshop&#x27;\)/.test(benches), &#x27;1: benches Settings says from=workshop&#x27;);
++assert.ok(/location\.href = &#x27;settings\.html\?from=workshop&#x27;/.test(benches), &#x27;1: fallback too&#x27;);
++
++// (2)
++assert.ok(/function wayBackToBenches\(\) \{/.test(rooms), &#x27;2: way back helper&#x27;);
++assert.ok(/\[\?&amp;\]from=workshop\(&amp;\|\$\)/.test(rooms), &#x27;2: only when it came from the benches&#x27;);
++assert.ok(/back\.href = &#x27;workshop\.html\?open=benches&#x27;;/.test(rooms), &#x27;2: link goes back to the benches&#x27;);
++assert.ok(/back\.textContent = &#x27;\\u2190 Back to the Workshop benches&#x27;;/.test(rooms), &#x27;2: calm words&#x27;);
++assert.ok(/currentGalaxy\(\) === &#x27;workshop&#x27; &amp;&amp; \/\[\?&amp;\]open=benches\(&amp;\|\$\)\/\.test\(q\)/.test(rooms), &#x27;2: Workshop opens benches on arrival&#x27;);
++assert.ok(/    wayBackToBenches\(\);\n    startAttachLoop\(\);/.test(rooms), &#x27;2: called at boot&#x27;);
++assert.ok(/\.room-way-back \{[^}]*min-height: 32px;[^}]*color: #9fd6ff;/.test(css), &#x27;2: link is a readable target&#x27;);
++assert.ok(!/back\.innerHTML/.test(rooms), &#x27;2: no innerHTML&#x27;);
++
++// (3)
++assert.ok(/window\.addEventListener\(&#x27;fl-alpha-mind-remembered&#x27;, onRemembered\);/.test(probe), &#x27;3: card listens&#x27;);
++assert.ok(/var onRemembered = function \(\) \{[\s\S]{0,400}paintRoster\(rosterHost\);/.test(probe), &#x27;3: roster repaints&#x27;);
++assert.ok(/window\.dispatchEvent\(new CustomEvent\(&#x27;fl-alpha-mind-remembered&#x27;/.test(probe), &#x27;3: remember still announces&#x27;);
++assert.ok(/root\.LocalMindProbe\.remember\(entry\)/.test(connect), &#x27;3: Connect card remembers through LocalMindProbe&#x27;);
++
++var docs = fs.readFileSync(path.join(__dirname, &#x27;..&#x27;, &#x27;GALAXIES.md&#x27;), &#x27;utf8&#x27;);
++assert.ok(docs.indexOf(&#x27;v-tree-workshop-way-back-v0&#x27;) &gt; 0, &#x27;GALAXIES layer&#x27;);
++
++console.log(&#x27;SMOKE_OK tree workshop way back v0.1&#x27;);
+diff --git a/docs/modules/workshop-benches.js b/docs/modules/workshop-benches.js
+index 06122db..fea7bf1 100644
+--- a/docs/modules/workshop-benches.js
++++ b/docs/modules/workshop-benches.js
+@@ -213,10 +213,11 @@
+       toSettings.type = &#x27;button&#x27;;
+       toSettings.setAttribute(&#x27;data-workshop-settings&#x27;, &#x27;1&#x27;);
+       toSettings.addEventListener(&#x27;click&#x27;, function () {
++        // v-tree-workshop-way-back-v0: Settings knows to offer the way back.
+         if (window.GardenRooms &amp;&amp; GardenRooms.go) {
+-          GardenRooms.go(&#x27;settings.html&#x27;);
++          GardenRooms.go(&#x27;settings.html?from=workshop&#x27;);
+         } else {
+-          location.href = &#x27;settings.html&#x27;;
++          location.href = &#x27;settings.html?from=workshop&#x27;;
+         }
+       });
+       root.appendChild(toSettings);
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

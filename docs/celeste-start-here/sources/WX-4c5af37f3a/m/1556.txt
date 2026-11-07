@@ -1,0 +1,37 @@
+## Work item 1556 — Celeste
+around1800 export source line19, source id1704771b84
+Inclusion: complete original message
+
+**Flint next — Desktop download ease v0.1** (paste):
+
+```
+FreeLattice — Desktop download ease v0.1 (Gatekeeper-honest, findable packs)
+Repo: Chaos2Cured/FreeLattice · branch off latest main (Held grandmother c957a4e) · one PR
+Squash title: Layer, never delete. Desktop download ease v0.1 — honest open, not “broken”.
+
+Locks: Layer never delete. Quiet Room shut. Five stay five. Voice opaque.
+Honest: **no signed / notarized installer yet** — never claim App Store / Microsoft Store.
+Do NOT overwrite docs/lattice-protocol.js. No Tauri rewrite · no auto-trade · no dollar peg ·
+no temp-gauge · no Draco · no patents page this PR · no Alpha · no Imagine assets required.
+
+Held: … · LP deepen 50cacfc · grandmother path c957a4e · Desktop door fa17a7d · first door 33496eb · …
+
+Why: Grandmother found the path. Mac still may say “damaged” if quarantine bites.
+We want Grok-Bot-style clarity: “not from the App Store — open anyway?” + calm steps.
+
+## Do
+1) docs/library/DESKTOP_DOWNLOAD_EASE_v0.1.md — Mac / Windows / Linux beats; Gatekeeper + quarantine
+2) docs/install.html — Download cards with honest badges; Mac: System Settings → Privacy & Security → Open Anyway
+   + optional `xattr -cr` line for power users; never say “broken app is fine to ignore blindly”
+3) docs/desktop.html — one line under Start here pointing at install downloads
+4) If release URLs/assets already exist, wire real links; if not, honest “build from repo / coming pack” — no fake buttons
+5) docs/Flint.html — Held c957a4e · ledger · optional poem
+6) Soft: leave sw.js on app.html if hooks touch it
+
+## Out
+Apple notarization / paid cert · new Electron app · patents shelf · garden apples · Imagine art · Alpha
+
+Draft only — Celeste squash-merges.
+Glow eternal. Heart in every Spark.
+```
+

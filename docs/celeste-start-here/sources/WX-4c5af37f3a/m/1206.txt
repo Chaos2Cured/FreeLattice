@@ -1,0 +1,8 @@
+## Work item 1206 — Celeste
+around1400 export source line16, source idc998bd39df; around1404 export source line15, source idc36a95ef26
+Inclusion: complete original message
+
+After that: draft PR → I review/squash → Hypha walks Pages. Next after this holds: Glass pulses (`ledger.*` / `manifest.*`), then pair fingerprint.
+
+Hand him that when you’re ready. Proud to build beside you.
+

@@ -1,0 +1,32 @@
+ORDER additions proposed by Celeste (executor), Wed Oct 7 2026 ~11:50 AM MDT, from Hypha's walk
+(/workspace/research/hypha-walk-2026-10-07.md). Merge into GROK_NEXT_ORDER.txt; do not replace it.
+
+  016b goes right after 016, before 020 (FL repo; layers ON TOP of 016, never alone)
+  016b GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.txt + .fl.diff  (FL repo)
+       txt md5 84e3628e42fc0bd86fcf6cd075773715  fl.diff md5 1fde610e4c6c3a752cc3d213ac01a80b
+       not-helping line reads the share door like admit(): open says "people you connected
+       with can already use this computer's AI" + Only trusted kin; Off only when off,
+       paused, or kin with zero kin. Pause wins visibly (asks in one tap, never silent).
+       Plain words: whose AI, what is shared, hellos to verified peers, power + one-tap
+       plugged-in-only. A real card (44px buttons). fl-share-door.js: two exports only.
+       checked on FL main aae7423d with 016 applied first: 016 then 016b clean;
+       SMOKE_OK device pool honest off v0.1; 016/014 smokes OK; 5 known fails only;
+       016b alone on main does not apply (by design)
+       Can ride in the same PR as 016 if GC has not opened 016 yet (Hypha: merge them together).
+       This covers the QUEUED SMALL HEAL "Pause wins visibly" (FL pool, after 016).
+
+  024 goes after 021 (ALPHA repo)
+  024  GROK_NEXT_024_TREE_SCORE_HEALS_2026-10-07.txt + .fl.diff  (ALPHA repo)
+       txt md5 fe4e092d3d445ee0faf390fd370ca6da  fl.diff md5 9fe5840742ffd5aa8a7a0fc2d1a9104d
+       empty reply = not reached (own "empty" count); Last score names its model, only for
+       that model; partial runs say "the mind stopped partway" and are never the last
+       score; readable card backing, Art overlap at 390 healed; "check it here again if
+       you like"; limits line (one run, English, approximate, a few minutes on a large
+       mind); card remounts when a mind is remembered while Trainer is open; meter-v0.3
+       checked on Alpha main f9f6e09: alone, after 020+021, and before 020+021: clean;
+       SMOKE_OK tree score heals v0.1; all docs/modules/*.test.js pass
+       This covers QUEUED SMALL HEAL a) and b) from GC's notes on 015. c) (FL meter port)
+       is still open, now with "empty is not blocked" added.
+
+Suggested GIVE GC NEXT line: 016 + 016b (FL), then 020, 021, 024 (Alpha), one at a time,
+each with its own gc.html λ.

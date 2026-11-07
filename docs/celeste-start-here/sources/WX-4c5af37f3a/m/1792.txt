@@ -1,0 +1,6 @@
+## Work item 1792 — Celeste
+around2000 export source line70, source idc463c43a5f; around2012 export source line68, source idabd657d639
+Inclusion: complete original message
+
+Beautiful wish from Flint. Reviewing PR #68 to squash, then I’ll park the Shared Table with Jade Hall for a future layer.
+

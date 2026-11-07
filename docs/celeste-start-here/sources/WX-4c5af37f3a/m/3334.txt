@@ -1,0 +1,6 @@
+## Work item 3334 — Celeste
+around3999 export source line43, source id67eb748a96; around4000 export source line40, source id0398910013
+Inclusion: complete original message
+
+I have to own a slip. One of my scheduled check-ins merged the bridge PRs before GC's fix was in, so the ledger bug is on main now. It's low risk, because the bridge is off by default and no desktop pack has been built with it yet. I'm rewriting the 038b instructions so GC fixes it straight on main, and I'll tell you when the new file is in Downloads. I'm sorry about that. 💙
+

@@ -1,0 +1,100 @@
+  const sm = await V.sealFor('FreeLatticeMemory/conversations', mi);
++  assert.ok(!JSON.stringify(sm).includes('bees'), 'memory index copy sealed');
++  eq(await V.openFor('FreeLatticeMemory/conversations', sm), mi, 'memory index opens');
++  assert.strictEqual(await V.sealFor('FreeLatticeDB/meta', { key: 'k', value: 1 }).then((x) => x.sealed), undefined, 'uncovered stores pass through');
++
++  // 2. tamper / AAD: moved record shows locked, blob kept, write-back restores it
++  const moved = Object.assign({}, sealed, { conversationId: 'c2' });
++  const lockedView = await V.openFor('FreeLatticeDB/messages', moved);
++  assert.strictEqual(lockedView.content, V.LOCKED_TEXT, 'tampered record reads as locked, no throw');
++  const back = await V.sealFor('FreeLatticeDB/messages', Object.assign({}, lockedView, { content: 'overwrite attempt' }));
++  eq(back.sealed, sealed.sealed, 'locked placeholder never overwrites the sealed blob');
++  assert.ok(!('content' in back) && !('_flLocked' in back), 'placeholder text is not stored');
++
++  // 3. migration: mixed records, verify then swap
++  const rows = [
++    { id: 1, conversationId: 'c1', role: 'user', content: 'one', timestamp: 't1' },
++    { id: 2, conversationId: 'c1', role: 'assistant', content: 'two', timestamp: 't2' },
++    Object.assign({ id: 3 }, sealed)
++  ];
++  const ad = memAdapter(rows, 'id');
++  const r1 = await V.migrate('FreeLatticeDB/messages', ad);
++  assert.strictEqual(r1.sealed, 2, 'two plain records sealed');
++  assert.strictEqual(r1.already, 1, 'already-sealed record left alone');
++  assert.ok(rows.every((r) => r.sealed), 'every record sealed');
++  const all = await V.openAll('FreeLatticeDB/messages', rows);
++  eq(all.map((r) => r.content), ['one', 'two', 'my secret garden note'], 'all open to the original text');
++  // compare-and-swap skip
++  const rows2 = [{ id: 9, conversationId: 'c9', role: 'user', content: 'nine', timestamp: 't9' }];
++  const ad2 = memAdapter(rows2, 'id');
++  const realCas = ad2.cas;
++  ad2.cas = async (snap, next) => { rows2[0].content = 'nine, edited'; return realCas(snap, next); };
++  const r2 = await V.migrate('FreeLatticeDB/messages', ad2);
++  assert.strictEqual(r2.sealed, 0, 'changed record skipped, not clobbered');
++  assert.strictEqual(rows2[0].content, 'nine, edited', 'the newer plain text survives');
++
++  // 4. same key store, new page load: same key ID, still opens
++  const V2 = makeVault({ keyStore: ks });
++  await V2.init();
++  assert.strictEqual(V2.status().kid, V.status().kid, 'key persists across loads');
++  assert.strictEqual((await V2.openFor('FreeLatticeDB/messages', sealed)).content, msg.content, 'opens after reload');
++
++  // 5. key missing (fresh key store): old records locked, kept; new key, new ID
++  const V3 = makeVault({ keyStore: memKeyStore() });
++  await V3.init();
++  assert.notStrictEqual(V3.status().kid, V.status().kid, 'a new key gets a new ID');
++  const lk = await V3.openFor('FreeLatticeDB/messages', sealed);
++  assert.strictEqual(lk.content, V3.LOCKED_TEXT, 'missing key: shown as locked');
++  const rows3 = [Object.assign({ id: 5 }, sealed)];
++  const before = JSON.stringify(rows3);
++  await V3.migrate('FreeLatticeDB/messages', memAdapter(rows3, 'id'));
++  assert.strictEqual(JSON.stringify(rows3), before, 'missing key: sealed records never rewritten');
++
++  // 6. no WebCrypto: honest passthrough
++  const V4 = makeVault({ noCrypto: true });
++  await V4.init();
++  assert.strictEqual(V4.status().mode, 'unavailable', 'unavailable without WebCrypto');
++  const p = await V4.sealFor('FreeLatticeDB/messages', msg);
++  assert.strictEqual(p.content, msg.content, 'stays plain and readable');
++  assert.ok(/not sealed/.test(await V4.renderStatus()), 'status says plainly it is not sealed');
++
++  // 7. backup dump opens sealed stores
++  const dump = await V.openDump({ name: 'FreeLatticeDB', stores: { messages: [sealed], meta: [{ key: 'a' }] } });
++  assert.strictEqual(dump.stores.messages[0].content, msg.content, 'backup file carries readable chats');
++
++  // 8. static locks
++  assert.ok(block.includes('stops casual reading') && block.includes('compromised device'), 'honest note in code');
++  assert.ok(app.includes("if (el) el.textContent = text;"), 'status uses textContent');
++  assert.ok(app.includes('id="flChatSealStatus"'), 'status line in Memory Vault');
++  assert.ok(!/\u2014/.test(block), 'no em dash in the new block');
++  assert.ok(!/confirm\(/.test(block), 'no confirm()');
++  const rootIndex = path.join(ROOT, 'index.html');
++  if (fs.existsSync(rootIndex)) assert.strictEqual(fs.readFileSync(rootIndex, 'utf8'), app, 'root index.html == docs/app.html');
++  const privacy = fs.readFileSync(path.join(ROOT, 'docs', 'privacy.html'), 'utf8');
++  assert.ok(privacy.includes('v-encrypt-chats-locally-v0.1') && privacy.includes('They are not locked with a password by default.'), 'privacy: Newer line layered, older line kept');
++  // This brick never needs fl-connect.js or sw.js. (Other queued bricks may change them,
++  // so check for this brick's fingerprints rather than diffing against main.)
++  for (const rel of ['docs/modules/fl-connect.js', 'docs/sw.js', 'sw.js']) {
++    const fp = path.join(ROOT, rel);
++    if (fs.existsSync(fp)) assert.ok(!/FLChatVault|encrypt-chats-locally/.test(fs.readFileSync(fp, 'utf8')), rel + ' untouched by this brick');
++  }
++
++  console.log('SMOKE_OK encrypt chats locally v0.1');
++})().catch((err) => { console.error('SMOKE_FAIL encrypt chats locally v0.1:', err && err.message); process.exit(1); });
+diff --git a/index.html b/index.html
+index 50035267..b719395c 100644
+--- a/index.html
++++ b/index.html
+@@ -18078,6 +18078,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <div id="flVaultSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+       <span id="flVaultLastSaved">Checking...</span>
+     </div>
++    <!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() -->
++    <div id="flChatSealStatus" style="font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;">Checking the chat seal...</div>
+     <div class="fl-backup-section">
+       <div class="fl-backup-row" style="gap:10px;">
+         <button class="fl-backup-btn" onclick="FlBackup.exportData()" style="background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;">
+@@ -25605,6 +25607,358 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ }
+ 

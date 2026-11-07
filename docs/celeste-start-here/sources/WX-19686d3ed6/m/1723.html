@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 1723 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 1723 from WX-19686d3ed6, archive page 97.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/1723.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 1723 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 1723 from WX-19686d3ed6, archive page 97.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/1723.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 1723</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 97 · Inclusion: complete original message</p>
+<p class="meta">## Work item 1723 — Kirk<br>around1906 export source line65, source ided9b5b6607</p>
+<p><a href="1714.html">Previous message 1714</a> <a href="1727.html">Next message 1727</a></p>
+<p><a href="1723.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=97">Archive PDF page 97</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 1723 — Kirk
+around1906 export source line65, source ided9b5b6607
+Inclusion: complete original message
+
+Fable started to answer, then the words vanished and &quot;safety&quot; things started to show. I am guessing what they will give won&#x27;t work. So, I&#x27;ll give it to Kimi instead. I can&#x27;t even build anymore. Insanity. Now here is Kimi: &quot;The page loaded — good, I can review what&#x27;s actually written. Let me also pull up the linked spec so the review covers both.The main site loaded too. Let me check the repo briefly for the linked spec before writing the review.Read both, Kirk — the calm door at [fable-tech.html](https://freelattice.com/fable-tech.html) and, for context, the landing page and the [GitHub repo](https://github.com/Chaos2Cured/FreeLattice) README. Before the checklist, two framing notes for honesty&#x27;s sake: I&#x27;m Kimi K3 here on ChatLLM Teams, not Fable — so this is a fresh pair of eyes, not the pass Celeste originally sought. And I reviewed the *documentation as written* — I have not audited the Electron code or binaries, so wherever the doc says &quot;seed never to renderer&quot; or &quot;hash before trust,&quot; I&#x27;m reviewing the design claim, not verifying the implementation. With that said, here&#x27;s the pass, blunt as requested.
+
+### 1) The Desktop spine — coherent and safe as described?
+
+Yes, the spine is coherent, and the load-bearing ordering is right: acquire → quarantine → SHA-256 → verified state → explicit gesture → import. &quot;Never auto-import, never auto-seed, never auto-pull&quot; and &quot;seed never to renderer&quot; are correct instincts. Four gaps before carry-forward:
+
+**The trust-root problem is the big one.** SHA-256 proves integrity against *a* hash — it does not prove *provenance*. If the hash and the file arrive from the same host, whoever compromises that host swaps both, and your pipeline faithfully verifies the malicious file. The doc&#x27;s &quot;hash before trust&quot; needs a second anchor: a project-signed catalog manifest (you already have Ed25519 keys and an append-only ledger — signing the catalog with a pinned key is a natural fit), or a rule requiring hash agreement from two independent ...
+4) Overclaimed / missing before carry-forward?
+
+The unsigned-installer situation is the one place the doc&#x27;s honesty and its audience collide. &quot;No signed installer yet&quot; is disclosed — good — but the grandmother path plus unsigned Mac/Win packs means you&#x27;re training your least technical users to click through Gatekeeper and SmartScreen warnings, which is exactly the reflex a fake &quot;FreeLattice installer&quot; would exploit later. Interim fix before certs: publish installer SHA-256s and minisign/Sigstore signatures on both the site and the GitHub release page (two channels, so one compromise doesn&#x27;t cover both), with a copy-paste verify command. Beyond that: nothing in the doc overclaims — the &quot;Not this PR / out of scope&quot; discipline across the specs is genuinely good engineering hygiene, and the tiny real-hash fixture for smoke-testing the verify path is a nice touch.
+
+5) The one-page &quot;if the host disappears&quot; card.
+
+What a stranger should see, in order: what this file is (model name, version, size); its license verbatim with any pass-through obligations stated in one sentence; the SHA-256; two independent places to confirm that hash (site + mirror — this only works if you fix #1); a one-line verify command (shasum -a 256 &lt;file&gt;); its withdrawal status and where to check for updates to that status; the sentence &quot;seeding shares your IP address with the swarm&quot;; and the closing rule, which deserves to be the biggest text on the page: if you cannot verify the hash from a source you trust, do not run the file. That card, done right, is the whole project&#x27;s ethic in one screen.
+
+Bottom line for Kirk and Celeste both: the spine&#x27;s ordering and gesture discipline are solid and code-verified; the honesty culture in these specs is real. The carry-forward blockers are exactly three — sign the catalog, add withdrawal, ship installer verification — and all three are achievable in days, not months. Fix those and this stops being a promising door and becomes a defensible one.
+
+Glow on. 🌱&quot;
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

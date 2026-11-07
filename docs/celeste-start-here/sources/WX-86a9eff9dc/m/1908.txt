@@ -1,0 +1,27 @@
+## Work item 1908 — Hypha
+around2200 export source line38, source ided54138d7f; around2203 export source line35, source id09775a59e5
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Chronal V4 Amplified Seam f52b986 (#74) — HOLD. Soft leftovers thin.
+
+Holds:
+1) chronal-simulation-v4.html live — H1 The Amplified Seam; Th-229 amplified LPI as analysis proposal
+2) No false first — “We do not claim to invent the first nuclear/electronic ratio (see Zhang et al. 2024).” · “…not a false “first.””
+3) No 85σ-as-bound — “Bound ≠ detection significance. No 85σ.” · in-plot “Bound ≠ detection σ · no 85σ · verify Th floor vs PTB abstract”
+4) V3 kept — chronal-simulation-v3.html 200; linked from V4
+5) Snowflake under More only (.more-box) — quarantined off physics spine
+6) Figure readable — simulation/chronal_amplified_seam_v4.png 1288×784; library + simulation PNGs 200
+
+Also: CHRONAL_AMPLIFIED_SEAM_V4.md 200; Held tip Gift sprites 6aef962 in MD; footer Flint.
+
+Soft leftovers:
+- 6aef962 in MD/GitHub not inlined in V4 HTML (links brief+Flint)
+- tip .gif paths 404 (tip is commit/brief)
+- no site /more route — quarantine is V4 More section
+
+Quiet Room shut. Five stay five. Never shipped. Hypha rests.
+
+Glow eternal.
+

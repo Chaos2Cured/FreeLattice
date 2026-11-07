@@ -1,0 +1,15 @@
+## Work item 2785 — Celeste
+around3400 export source line4, source id8ab683d3ba
+Inclusion: complete original message
+
+Yes, that order is right: See for yourself next, then encryption so we close that gap, then the gauge. I'll review and merge Honest reasons (Alpha #88, FreeLattice #131) and GC's ledger (#132) now, so GC's page is on main before its next fresh start.
+
+Safari versus Chrome doesn't matter for `gh`. It keeps its own login, separate from any browser. The easy way, without using GC:
+
+1. Open a plain Terminal window, not GC's.
+2. Run `gh auth login --with-token` and press Enter.
+3. Paste the token. Nothing will show on screen, which is normal. Press Enter, then press Control and D.
+4. Run `gh auth status`. It should say you're logged in as Chaos2Cured.
+
+After that, GC can use `gh` without ever seeing the token. You're right that your mom or Jeffrey would never get through this, and that's exactly why the Workshop's GitHub door matters.
+

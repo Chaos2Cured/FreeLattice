@@ -1,0 +1,6 @@
+## Work item 3470 — Celeste
+around4200 export source line11, source idbc8995a01c
+Inclusion: complete original message
+
+I've asked all three for their words. If any of them hasn't answered by the time GC reaches `044`, GC builds that page from the words they gave us on Oct 4, so `043c` can go to GC whenever you're ready.
+

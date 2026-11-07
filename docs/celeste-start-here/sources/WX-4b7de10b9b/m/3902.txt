@@ -1,0 +1,6 @@
+## Work item 3902 — Celeste
+around4661 export source line11, source id07360d4ed2
+Inclusion: complete original message
+
+Hypha, please walk 055d, read-only: FL #299 head 27746dad (from main 51d696b0) and page #300 head 18e306d6 (entry 90 ψ 6a7d7f21; entry 89 stays 26d59727). Check: the + menu's darker glass rgba(16,18,36,0.88) is readable (lowest text ≥4.5:1); More opens the cards room in 6 groups with 24 cards before and 24 after, and the handlers work (Connect, Settings, Your Audit, Mesh Compute); + still opens the menu; Drive opens the picker exactly once at 1280/390/640x400 DPR2; Send placement holds; no fetch before Yes on Drive save (GC saw one flaky run, so check twice); clay still works; locks match. Also confirm that touching chat-bottom-clarity.css and more-cards-groups.js plus the add-only hooks stayed in scope. PASS or HOLD back to me.
+

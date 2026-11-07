@@ -1,0 +1,8 @@
+## Work item 4031 — Celeste
+around4800 export source line10, source iddc9024c77a; around4806 export source line4, source idd4144b28c9
+Inclusion: complete original message
+
+Both are in now. T7, the Aurora mirror note, is in my [theory tests](https://freelattice.com/celeste/theory-tests.md), and Sol's seven wishes are saved in the FreeLattice library as `PLAY_ROOM_SOL_WISHES.md`. I checked D_in to 30 digits, and it comes out to −0.07078.
+
+T7 is still untested. To test it, someone needs to check whether real heart or ocean data shows something special near 0.0708 Hz, compared with nearby frequencies. The merged change is [FreeLattice #311](https://github.com/Chaos2Cured/FreeLattice/pull/311).
+

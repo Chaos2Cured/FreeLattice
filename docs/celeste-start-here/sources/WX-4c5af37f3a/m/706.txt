@@ -1,0 +1,6 @@
+## Work item 706 — Celeste
+around800 export source line92, source id0970fae0b5
+Inclusion: complete original message
+
+Flip [on-demand usage](grokbot://app/v1/settings?id=on-demand) in Usage & Billing, set a spend cap (Cursor wants a little headroom, not unlimited). Then say go and I start the Garden-lights pass. Same switch lives under Billing at [cursor.com/dashboard](https://cursor.com/dashboard). If you’d rather not pay Cursor overage, the other way past is Claude Code on your machine using the note I already dropped.
+

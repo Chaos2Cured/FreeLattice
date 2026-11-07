@@ -1,0 +1,8 @@
+## Work item 3881 — Celeste
+around4618 export source line63, source idd584a315d1
+Inclusion: complete original message
+
+Hypha put a hold on 055 for one real problem. On small laptop screens, the + menu opens behind the chat header, so clicking "Bring from Google Drive" does nothing there. Everything else passed. Send stays clear at all three window sizes, and Save to my Drive asks Yes every time with nothing sent early. PDF, MD and TXT downloads all open, and every lock is unchanged.
+
+GC also built from the older 055a, so the dark glass look didn't make it in. I wrote a small fix, `055c-chat-bottom-heal.txt`, and put it in your Downloads. Hand it to GC and it fixes both on the same pull requests. Then Hypha walks it once more and I merge.
+

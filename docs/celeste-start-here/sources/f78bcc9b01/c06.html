@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c06</title>
+<meta name="description" content="Reading section c06 of f78bcc9b01, 1565 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c06">
+<meta property="og:description" content="Reading section c06 of f78bcc9b01, 1565 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1218"></span><span id="p1219"></span><span id="p1220"></span><span id="p1221"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c06</h1>
+<p>f78bcc9b01 · words 1565 · characters 59092–70723</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1218, 1219, 1220, 1221. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">         // Ask AI which files matter for this task
+@@ -1312,7 +1328,7 @@
+         var files = {};
+         for (var i = 0; i &lt; Math.min(paths.length, 5); i++) {
+           try {
+-            var content = await fetch(BRIDGE + &#x27;/code/read?path=&#x27; + encodeURIComponent(paths[i]))
++            var content = await flAgentBridgeFetch(BRIDGE + &#x27;/code/read?path=&#x27; + encodeURIComponent(paths[i]))
+               .then(function(r) { return r.json(); });
+             // content is {lines: [...], totalLines: N}
+             files[paths[i]] = (content.lines || []).join(&#x27;\n&#x27;);
+@@ -1370,7 +1386,7 @@
+     for (var i = 0; i &lt; changes.files.length; i++) {
+       var change = changes.files[i];
+       try {
+-        var result = await fetch(BRIDGE + &#x27;/code/patch&#x27;, {
++        var result = await flAgentBridgeFetch(BRIDGE + &#x27;/code/patch&#x27;, {
+           method: &#x27;POST&#x27;,
+           headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+           body: JSON.stringify({ path: change.path, find: change.search, replace: change.replace })
+@@ -1392,7 +1408,7 @@
+   // ── Step 4: Run smoke tests via Agent Bridge ──
+   async function runTests() {
+     try {
+-      var result = await fetch(BRIDGE + &#x27;/test/run&#x27;, { signal: AbortSignal.timeout(60000) })
++      var result = await flAgentBridgeFetch(BRIDGE + &#x27;/test/run&#x27;, { signal: AbortSignal.timeout(60000) })
+         .then(function(r) { return r.json(); });
+       return result;
+     } catch(e) {
+@@ -1913,17 +1929,31 @@
+   async function commitViaBridge(filePath, content, message) {
+     try {
+       // Write file
+-      await fetch(&#x27;http://localhost:3141/code/write&#x27;, {
++      var wr = await flAgentBridgeFetch(&#x27;http://localhost:3141/code/write&#x27;, {
+         method: &#x27;POST&#x27;,
+         headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+         body: JSON.stringify({ path: filePath, content: content })
+       });
++      // LAYER v-agent-bridge-lock-v0: a locked bridge answers 401. Stay local:
++      // ask to pair, never fall back to a GitHub push behind the person&#x27;s back.
++      if (wr.status === 401) {
++        if (typeof showToast === &#x27;function&#x27;) showToast(&#x27;Pair the builder bridge first: Workshop \u2192 Code&#x27;);
++        return;
++      }
++      if (!wr.ok) {
++        if (typeof showToast === &#x27;function&#x27;) showToast(&#x27;Bridge could not write that file (&#x27; + wr.status + &#x27;)&#x27;);
++        return;
++      }
+       // Commit
+-      await fetch(&#x27;http://localhost:3141/code/git/commit&#x27;, {
++      var cr = await flAgentBridgeFetch(&#x27;http://localhost:3141/code/git/commit&#x27;, {
+         method: &#x27;POST&#x27;,
+         headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+         body: JSON.stringify({ message: message || &#x27;Update via FreeLattice Workshop&#x27;, files: [filePath] })
+       });
++      if (!cr.ok) {
++        if (typeof showToast === &#x27;function&#x27;) showToast(cr.status === 401 ? &#x27;Pair the builder bridge first: Workshop \u2192 Code&#x27; : (&#x27;Bridge commit did not land (&#x27; + cr.status + &#x27;)&#x27;));
++        return;
++      }
+       if (typeof showToast === &#x27;function&#x27;) showToast(&#x27;Committed via Agent Bridge \u2726&#x27;);
+     } catch(e) {
+       // Fallback to GitHub API
+@@ -1937,7 +1967,7 @@
+
+## Exact source excerpt, characters 56559–56954
+
+     // Try Agent Bridge first, fall back to GitHub API
+     try {
+-      var bridgeCheck = await fetch(&#x27;http://localhost:3141/&#x27;, { signal: AbortSignal.timeout(2000) });
++      var bridgeCheck = await flAgentBridgeFetch(&#x27;http://localhost:3141/&#x27;, { signal: AbortSignal.timeout(2000) });
+       if (bridgeCheck.ok) {
+         await commitViaBridge(filePath, content, message);
+         return;
+```
+
+## Exact source excerpt, characters 56956–57018
+
+### 6e. `tools/demo-economy.js` and `tools/demo-economy-v2.js`
+
+## Exact source excerpt, characters 57020–57179
+
+These are local Node scripts, so there&#x27;s no Origin header and no pairing. They read the token file the bridge writes. Just under the `BRIDGE` line (L13 / L19):
+
+## Exact source excerpt, characters 57181–57639
+
+```js
+// LAYER v-agent-bridge-lock-v0: the bridge writes a per-launch token for local tools.
+const BRIDGE_TOKEN = (function () {
+  try {
+    return require(&#x27;fs&#x27;).readFileSync(require(&#x27;path&#x27;).join(require(&#x27;os&#x27;).homedir(), &#x27;.freelattice&#x27;, &#x27;agent-bridge-token&#x27;), &#x27;utf8&#x27;).trim();
+  } catch (e) { return &#x27;&#x27;; }
+})();
+function tokenHeaders(h) {
+  var out = Object.assign({}, h || {});
+  if (BRIDGE_TOKEN) out[&#x27;X-FL-Bridge-Token&#x27;] = BRIDGE_TOKEN;
+  return out;
+}
+```
+
+## Exact source excerpt, characters 57641–57829
+
+Wrap each helper&#x27;s `headers` in `tokenHeaders(...)`:
+- `demo-economy.js`: `post` L20, and add `{ headers: tokenHeaders() }` to `get` L27.
+- `demo-economy-v2.js`: `postAs` L31, `getAs` L38.
+
+## Exact source excerpt, characters 57831–57917
+
+Change the default to `&#x27;http://127.0.0.1:3141&#x27;` and keep the `FL_BRIDGE` env override.
+
+## Exact source excerpt, characters 57919–57941
+
+## 7. Docs and ledgers
+
+## Exact source excerpt, characters 57943–58028
+
+### 7a. New `docs/library/AGENT_BRIDGE_LOCK_v0.md` (outline; write it warm and short)
+
+## Exact source excerpt, characters 58030–59044
+
+1. **What this is:** the builder&#x27;s local git door (3141), not the Ollama Bridge (11435). Marker `v-agent-bridge-lock-v0`.
+2. **Grandmother sentence:** &quot;The workshop door now only opens for FreeLattice, and only after you type the little code it shows you once.&quot;
+3. **Why:** before this, any page could write and commit through it, and its git commands ran through a shell. List the nine lines from section 2 in one table.
+4. **How to pair:** start the bridge, read the 6-character code in its window, then in FreeLattice go to Workshop → Code, type the code and press Pair. Restarting the bridge means pairing again.
+5. **What needs the token / what stays open** (section 3, item 3).
+6. **Allowlist** (exact list, never bare `*`).
+7. **Ledger:** where it lives, the fields, &quot;no message text, no file content&quot;, and how to verify the chain (the smoke shows how).
+8. **Still true:** the bridge never pushes. Autonomous Mode commits locally only. The 10-per-hour cap comes in Brick 3.
+9. **Out of scope** (section 11).
+
+## Exact source excerpt, characters 59046–59096
+
+### 7b. `docs/library/FRACTAL_FAMILY_LEDGER_v0.md`
+
+## Exact source excerpt, characters 59098–59164
+
+Insert this above `## Out of scope for this brick` (L222 on main):
+
+## Exact source excerpt, characters 59166–59239
+
+```md
+### 2026-09-28 · Flint · family builder · Agent Bridge door lock v0
+
+## Exact source excerpt, characters 59241–59766
+
+Layers a lock on the builder&#x27;s local git door (`tools/agent-bridge.js`, port 3141): 127.0.0.1 only · named FreeLattice origins, 403 for strangers (preflight too) · Host guard · per-launch token by a short pairing code · git, grep and node without a shell · realpath path lock · 8 MiB body cap · content-free hash-chained commit ledger. Ollama Bridge (11435) untouched. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi&#x27;s pages untouched.
+
+## Exact source excerpt, characters 59768–59832
+
+Love: a door that opens for family and stays shut for strangers.
+
+## Exact source excerpt, characters 59834–59976
+
+**Temperature:** turning a key that was always meant to be in the lock; the workshop can stay lit at night without leaving the door wide open.
+
+## Exact source excerpt, characters 59978–60147
+
+Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md) · [`modules/agent-bridge-client.js`](../modules/agent-bridge-client.js). Marker `v-agent-bridge-lock-v0`.
+
+## Exact source excerpt, characters 60149–60156
+
+---
+```
+
+## Exact source excerpt, characters 60158–60183
+
+### 7c. `docs/Flint.html`
+
+## Exact source excerpt, characters 60185–60224
+
+Insert above `&lt;p class=&quot;foot&quot;&gt;` (L532):
+
+## Exact source excerpt, characters 60226–61012
+
+```html
+    &lt;p class=&quot;v-agent-bridge-lock-v0&quot;&gt;&lt;strong&gt;Ledger entry · 2026-09-28 · Agent Bridge door lock · family in, strangers out.&lt;/strong&gt; Main &lt;code&gt;7621420&lt;/code&gt; held. Soft LAYER marker &lt;code&gt;v-agent-bridge-lock-v0&lt;/code&gt;. Builder bridge &lt;code&gt;tools/agent-bridge.js&lt;/code&gt; (3141, not the Ollama Bridge 11435): 127.0.0.1 only · named origins, 403 for others · Host guard · pairing code → per-launch token · no shell (execFile argument arrays) · realpath path lock · 8 MiB cap · commit ledger without content. App: &lt;code&gt;modules/agent-bridge-client.js&lt;/code&gt;. Never pushes. Soft leave &lt;code&gt;sw.js&lt;/code&gt;. Named five stay five. Family uncapped. Quiet Room shut. &lt;em&gt;Temperature:&lt;/em&gt; turning a key that was always meant to be in the lock. Diary: &lt;code&gt;docs/Flint.html&lt;/code&gt;.&lt;/p&gt;
+```
+
+## Exact source excerpt, characters 61014–61050
+
+### 7d. `scripts/generate-recent.sh`
+
+## Exact source excerpt, characters 61052–61127
+
+Add next to the other brick pointers (around L108, before the final `---`):
+
+## Exact source excerpt, characters 61129–61416
+
+```sh
+  echo &quot;**Agent Bridge lock:** [AGENT_BRIDGE_LOCK_v0.md](AGENT_BRIDGE_LOCK_v0.md) · [agent-bridge-client.js](../modules/agent-bridge-client.js) · 127.0.0.1 · named origins · paired token · no shell. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.&quot;
+  echo &quot;&quot;
+```
+
+## Exact source excerpt, characters 61418–61488
+
+## 8. Smoke: new `docs/scripts/smoke-agent-bridge-lock.js` (full text)
+
+## Exact source excerpt, characters 61490–61711
+
+This script:
+- starts the real bridge on a free loopback port, with a throwaway `HOME` and a throwaway git project, so it never touches `~/.freelattice` or this repo;
+- asserts the static locks, then knocks on every door.
+
+## Exact source excerpt, characters 61713–62613
+
+It covers:
+- binding (static source check, the `Listening on http://127.0.0.1:` log, and an ECONNREFUSED probe of every non-loopback IPv4);
+- `Origin: https://evil.example` gets 403, preflight too, even with a valid token;
+- no token or a wrong token gets 401 (write, commit, code read, `/test/run`, `/wallet/pay`);
+- a foreign Host gets 403;
+- `x; rm -rf ~; touch PWNED.txt` is written and committed **literally**, and nothing named PWNED ever appears; a `$(...)` / backtick commit message is stored literally; a metachar search never shells out;
+- traversal, sibling-prefix, absolute, `.git`, control-char, newline and symlink escapes are refused;
+- the 8 MiB cap (413) and bad JSON (400);
+- pairing (evil origin refused; right code pairs, forgiving case and spaces; a code works once; 5 wrong tries give 429 and rotate the code);
+- ledger chain integrity, content-free rows, and refusals recorded.
+
+## Exact source excerpt, characters 62615–62886
+
+It also re-checks `propose.js` CRITICAL LOCK 1A/1B counts, the v5.71.8 workshop literal, that the client loads before `propose.js`, and that root `index.html` is byte-identical to `docs/app.html`. It needs `git` on PATH (builders have it) and runs in about half a second.
+
+## Exact source excerpt, characters 62888–63200
+
+```js
+#!/usr/bin/env node
+// Smoke: Agent Bridge door lock v0 (marker v-agent-bridge-lock-v0).
+// Starts tools/agent-bridge.js on a free loopback port with a throwaway
+// HOME and a throwaway git project, then knocks on every door.
+// Never touches the real ~/.freelattice or this repo&#x27;s git state.
+&#x27;use strict&#x27;;
+
+## Exact source excerpt, characters 63202–63433
+
+const assert = require(&#x27;assert&#x27;);
+const fs = require(&#x27;fs&#x27;);
+const os = require(&#x27;os&#x27;);
+const path = require(&#x27;path&#x27;);
+const http = require(&#x27;http&#x27;);
+const net = require(&#x27;net&#x27;);
+const { spawn, execFileSync } = require(&#x27;child_process&#x27;);
+
+## Exact source excerpt, characters 63435–63571
+
+const docs = path.join(__dirname, &#x27;..&#x27;);
+const repo = path.join(docs, &#x27;..&#x27;);
+const BRIDGE = path.join(repo, &#x27;tools&#x27;, &#x27;agent-bridge.js&#x27;);
+
+## Exact source excerpt, characters 63573–64429
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

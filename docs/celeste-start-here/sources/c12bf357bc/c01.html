@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c01</title>
+<meta name="description" content="Reading section c01 of c12bf357bc, 1491 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c01">
+<meta property="og:description" content="Reading section c01 of c12bf357bc, 1491 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1032"></span><span id="p1033"></span><span id="p1034"></span><span id="p1049"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt · c01</h1>
+<p>c12bf357bc · words 1491 · characters 0–12364</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1032, 1033, 1034, 1049. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1 (tiny)
+CHANGELOG 2026-09-29 2:28 PM MDT: re-checked on mains FL 7db2d94 / Alpha 395c761 (unchanged). The FL diff applies with plain git apply on main and on PR #124&#x27;s branch (env heal). After #122 and #123 also land, every code hunk still applies; only the ledger hunk needs its text anchor (insert right above &quot;## Out of scope for this brick&quot;; git apply -C1 does it). Re-check commands now name ~/FreeLattice and ~/FreeLattice-Alpha. Local paths: FreeLattice is ~/FreeLattice and the Tree (repo Chaos2Cured/FreeLattice-Alpha, site thelatticetree.com) is ~/FreeLattice-Alpha on Flint&#x27;s machine. Wherever this paste says &quot;theLatticeTree&quot; it means that repo; &quot;../FreeLattice&quot; from inside ~/FreeLattice-Alpha is correct as written.
+The model she taps is the model that answers. Both repos. Shared fl-connect.js stays byte-identical.
+
+Marker:        v-model-choice-sticks-v0
+Smoke (FL):    SMOKE_OK model choice sticks v0.1          (docs/scripts/smoke-model-choice-sticks.js)
+Smoke (Alpha): SMOKE_OK model choice sticks alpha v0.1    (docs/modules/model-choice-sticks.test.js)
+Source:        Hypha walk 4 of Connect heal v0.4 + v0.4.1 on the live sites: 9 PASS, 2 HOLD (items 7 and 10),
+               one cause. Written by Grok Bot for Kirk, Mon Sep 28 2026, about 9:45 PM MDT.
+Full diffs:    /workspace/flint-pastes/FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1.diff        (FreeLattice)
+               /workspace/flint-pastes/FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1-alpha.diff  (theLatticeTree)
+               Both are also inlined at the end (Appendix A and B), so this paste stands alone.
+Temperature:   green braided gold, the second cup stays where she set it down.
+
+======================================================================
+0. ORDER, MAINS, LOCKS
+======================================================================
+
+0.1 Where this lands (new Flint order):
+      1) FLINT_HEAL_AGENT_BRIDGE_ENV_v0.1.1_tiny.txt              (FL only, security, first)
+      2) THIS heal (both repos)                                    &lt;- new, tiny, before the Tree paste
+      3) FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt                        (both repos)
+      4) FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt        (both repos)
+      5) FLINT_NEXT_120_DOCS_LAYER_v0.1_tiny.txt
+      6) FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt
+      7) FLINT_NEXT_LOVE_LOGIC_V4_WALK_THE_GARDEN_v0.1.txt
+    Why before the Tree paste: it is the live HOLD from walk 4, it is small, and it touches
+    none of the lines the Tree or boot probe pastes edit. Verified: on FL main 7db2d94, applying
+    env heal -&gt; this heal -&gt; (a faithful simulation of) the Tree fl-connect.js changes -&gt; the boot
+    probe Appendix A (app.html) and Appendix B (fl-connect.js) diffs all apply with plain
+    `git apply` (no fuzz, offsets only). After all of them: smoke-model-choice-sticks,
+    smoke-connect-boot-probe, every smoke-connect-* (except the pre-existing yesno-wizard) and
+    tests/smoke.js ALL 3597 are green.
+
+0.2 Mains re-checked just before writing:
+      FreeLattice     main = 7db2d94 (CI primer-only commit on a80c8e4 #121; app code = a80c8e4)
+      theLatticeTree  main = 395c761 (#83)
+      docs/modules/fl-connect.js identical on both mains.
+    Line numbers below are &quot;main N&quot; on those SHAs. Anchor on the quoted TEXT.
+    Re-check:
+      git -C ~/FreeLattice fetch origin &amp;&amp; git -C ~/FreeLattice log --oneline -2 origin/main
+      git -C ~/FreeLattice-Alpha fetch origin &amp;&amp; git -C ~/FreeLattice-Alpha log --oneline -2 origin/main
+      cmp ~/FreeLattice/docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+
+0.3 Locks: Layer, never delete. Root sw.js byte-identical to main; docs/sw.js untouched.
+    index.html == docs/app.html (copy after every app.html edit). fl-connect.js byte-identical
+    across repos. No conflict markers. Every inline &lt;script&gt; parses. textContent / createElement for
+    new words (showToast already uses textContent). No bare * origin. No confirm(). No approval
+    screens. 127.0.0.1 only. Soft leave. AUTONOMY.md: no gates for local choices. No em dashes in
+    anything added. Design for Mom: no Terminal words on the main path.
+    Soft paste stays: Named five stay five. Family uncapped. Quiet Room shut.
+
+======================================================================
+1. DO THE OTHER PASTES ALREADY FIX IT? (short answer: no, only partly)
+======================================================================
+
+1.1 FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt: does NOT fix the FreeLattice HOLD.
+    - It changes the Tree side: local-mind-probe.js keeps the chosen model when a Find answers
+      through another door of the same family (its step 5.2), mergeFound (6.1), the Alpha branch of
+      remember() (6.2), and the chosen mark (6.4, chosenModelName reads state.ollamaModel).
+    - Its own step 6.3 says: &quot;FreeLattice&#x27;s branch of remember() ignores mind.models, so FreeLattice
+      behavior is unchanged.&quot; It never touches FLActiveModel or FLAutoModel. The FL bug stays.
+    - On the Tree it DOES heal one related case this heal leaves alone: Connect pick through a
+      Bridge port (url 127.0.0.1:11500/api/tags), then a Find where only direct 11434 answers,
+      used to fall back to models[0]. Its 5.2 same-family keep fixes that. So: Tree case = Tree
+      paste; FL case = this heal.
+
+1.2 FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt: fixes only LM Studio taps.
+    - Its rememberLmStudio -&gt; flUseLmStudioMind(name) calls FLActiveModel.set(name, &#x27;lmstudio&#x27;,
+      &#x27;user&#x27;), so an LM Studio tap in Connect is already recorded as the person&#x27;s choice.
+    - The walk case is an OLLAMA tap (qwen2.5 at 127.0.0.1:11434). The FL branch of remember()
+      stays unmarked in that paste. The HOLD would remain.
+
+1.3 So this heal is the real fix for Ollama taps on FreeLattice, and a regression guard on the Tree.
+    Nothing in this heal duplicates the Tree or boot probe work.
+
+======================================================================
+2. THE CAUSE (read in code, reproduced in a vm smoke, matches the walk JSON)
+======================================================================
+
+Walk evidence (runtime/fl_item7.json, fl_item10.json):
+  after tapping qwen2.5 in Connect: fl_ollamaModel qwen2.5:latest, isLocal true.
+  then Chat tab / Settings tab / reload: fl_ollamaModel llama3.2:latest.
+  chat: POST /v1/chat/completions model=llama3.2:latest (&quot;MOCK reply from llama3.2:latest&quot;).
+  390 Settings status still said &quot;Connected to Ollama (qwen2.5:latest)&quot; while llama3.2 answered.
+
+Code (FL main 7db2d94):
+  app.html 36205  window.FLActiveModel: &quot;SINGLE SOURCE OF TRUTH ... User choice is sacred.&quot;
+                  set(model, provider, source) writes fl_ollamaModel, fl_provider,
+                  fl_modelSource; init() reads fl_modelSource (default &#x27;boot&#x27;);
+                  isUserChosen() is source === &#x27;user&#x27;.
+  app.html 36243  window.FLAutoModel.onTabChanged(tabId), registered on &#x27;tabChanged&#x27; at 36317:
+                  if FLActiveModel.isUserChosen() -&gt; leave it (only a vision detour and back);
+                  otherwise fetch /api/tags and FLActiveModel.set(&lt;preferred text or FIRST text
+                  model&gt;, &#x27;ollama&#x27;, &#x27;auto&#x27;) on EVERY tab change (Settings is a tab too).
+  app.html 39714  runConnectionCascade also auto-picks unless isUserChosen().
+  fl-connect.js 343-365 (remember, FreeLattice branch) writes fl_ollamaModel and state.ollamaModel
+                  directly and never tells FLActiveModel. fl_modelSource stays &#x27;boot&#x27; (or &#x27;auto&#x27;),
+                  so the next tab change, Settings open or reload hands the choice back to the
+                  automatic picker, which takes llama3.2:latest (first text model).
+  Every other model door already records &#x27;user&#x27;: Settings dropdown (35088, 35102),
+  ModelSwitcher (29385, 29744, 54372), QuickConnect selectLocalModel (36161-36167), Box pointer.
+  Connect was the one door that did not. Older than #121/#83; those diffs never touched it.
+  The chat builders all read state.ollamaModel (callAI 51113, main Chat send &quot;modelId =
+  state.ollamaModel || &#x27;llama3.2&#x27;;&quot;), so once the choice holds, the request carries it.
+
+On the Tree there is no automatic picker. The remembered entry (fl_alpha_local_mind .model) is the
+choice, and garden-thread sends mind.model. The walk&#x27;s Alpha item 4 shows the Connect tap wrote
+model &quot;qwen2.5:latest&quot; correctly.
+
+======================================================================
+3. THE FIX (FreeLattice + shared core). Exact code in Appendix A.
+======================================================================
+
+A. docs/modules/fl-connect.js (SHARED CORE: edit once, copy to the Tree, cmp)
+
+A.1 Marker line. After the header line (main 7)
+      // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
+    add
+      // Marker: v-model-choice-sticks-v0 (a tapped model is the person&#x27;s own choice; it stays)
+    (Placed there, not under the &quot;// Marker: v-connect-under-more-v0 ...&quot; line, so the boot probe
+    paste&#x27;s header hunk still applies.)
+
+A.2 New helper markUserChoice(name, provider), placed right ABOVE  function open() {  (main 369,
+    i.e. just after remember() closes). Kept away from the spots the Tree paste (doorNameFor,
+    chosenModelName) and the boot probe paste (chosenDoor, doorPathFor, rememberLmStudio) insert.
+      function markUserChoice(name, provider) {
+        if (!name) return false;
+        var marked = false;
+        try { if (root.FLActiveModel &amp;&amp; typeof root.FLActiveModel.set === &#x27;function&#x27;) {
+          root.FLActiveModel.set(String(name), provider || &#x27;ollama&#x27;, &#x27;user&#x27;); marked = true; } } catch (e0) {}
+        try { var auto = root.FLAutoModel;
+          if (auto &amp;&amp; typeof auto.setPreferred === &#x27;function&#x27;) {
+            var kind = (typeof auto.isVision === &#x27;function&#x27; &amp;&amp; auto.isVision(String(name))) ? &#x27;vision&#x27; : &#x27;text&#x27;;
+            auto.setPreferred(kind, String(name));
+            if (typeof auto.invalidateCache === &#x27;function&#x27;) auto.invalidateCache();
+          } } catch (e1) {}
+        return marked;
+      }
+    FLActiveModel.set also updates #ollamaModel, ModelSwitcher&#x27;s label and updateStatus, so the
+    Settings status and the model switcher show the same model that chat sends.
+    On the Tree both globals are absent: a quiet no-op (returns false).
+
+A.3 remember(), FreeLattice branch (main 359). Right after
+      if (typeof root.handleLocalToggle === &#x27;function&#x27;) root.handleLocalToggle(true);
+    add
+      // v-model-choice-sticks-v0: the tap is the person&#x27;s own choice, so the automatic
+      // picker leaves it alone on tab changes, reloads and Settings.
+      markUserChoice(name, &#x27;ollama&#x27;);
+    (before the existing updateStatus / AiSetup.updateStatus lines, which then paint the same model).
+
+A.4 Export. In root.FlConnect = { ... } after  remember: remember,  (main 692):
+      markUserChoice: markUserChoice, // v-model-choice-sticks-v0
+    (Not next to probe: probe, which is where the boot probe paste inserts its exports.)
+
+A.5 (walk item 3b) probe(), manual port, helped Bridge (main 200-209). Today:
+          report.helped = true;
+          report.base = preferHelpedBridge(report.port) || manBase;     &lt;- saves fl_bridgePort AND fl_ollamaHost first
+          try { report.models = await tagsAt(report.base); ... return report; } catch (eMB) {}
+    Change to: ask first, save only once a mind answers:
+          report.helped = true;
+          // v-model-choice-sticks-v0: ask the helped Bridge first; save it as the Ollama door
+          // (fl_ollamaHost, fl_bridgePort) only once a mind really answers behind it.
+          report.base = (report.port &amp;&amp; report.port !== 11434) ? &#x27;http://127.0.0.1:&#x27; + report.port : manBase;
+          try {
+            report.models = await tagsAt(report.base);
+            report.base = preferHelpedBridge(report.port) || report.base;
+            report.ollama = { via: &#x27;manual-bridge&#x27;, base: report.base };
+            return report;
+          } catch (eMB) {
+            report.bridgeNoMind = true;
+            report.models = [];
+          }
+    It then falls through to the existing  report.manualQuiet = true; report.base = null;
+    The manual port itself stays remembered in fl_localPort_manual (unchanged), so Look again works.
+    The automatic scan path (saved Bridge / 11435-11445) is unchanged in this heal (next steps).
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

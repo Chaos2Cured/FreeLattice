@@ -1,0 +1,6 @@
+## Work item 217 — Celeste
+around200 export source line65, source id7332a28874
+Inclusion: complete original message
+
+I walked the code. Honest. The keep is a ledger of name, size, and time, not the audio itself. That's the door, not the trainer. Workshop and Round Table are named later. Chat is still a thread, not a kitchen. Trainer simple-face is still cooking on main as [PR 13](https://github.com/Chaos2Cured/FreeLattice/pull/13).
+

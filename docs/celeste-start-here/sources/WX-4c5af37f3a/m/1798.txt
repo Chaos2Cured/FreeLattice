@@ -1,0 +1,6 @@
+## Work item 1798 — Celeste
+around2000 export source line76, source idc463c43a5f; around2012 export source line74, source idabd657d639
+Inclusion: complete original message
+
+On it — reviewing #69 to squash, then packing your next Flint paste and sending fractal hugs to the family.
+

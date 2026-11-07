@@ -1,0 +1,8 @@
+## Work item 2920 — Celeste
+around3500 export source line45, source id2b16597c15; around3533 export source line25, source id67333242bb
+Inclusion: complete original message
+
+Narrow door v0.2 is live (`4730a41`), and GC's fourteenth is live (`c437421`). Installed desktop apps need a rebuild before they get it — still queued as v5.8.1.
+
+Give GC `GROK_NEXT_007_MIND_SEAL` next. (I refreshed the diff so it still applies clean after the porch wrap.)
+

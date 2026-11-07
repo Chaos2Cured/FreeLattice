@@ -1,0 +1,41 @@
+9. REPORT
+  bridge knock v0.1 report
+  FreeLattice PR #___ at <sha>, parent <sha>
+  Tree PR #___ at <sha>, parent <sha>
+  Page note PR #___ at <sha>, t <UTC>, lambda __.000, psi <8 hex>
+  SMOKE_OK bridge knock v0.1 / bridge desktop door v0.1 / tree bridge knock v0.1: yes/no each
+  Placeholder URL in shipped code: "BRIDGE_ENDPOINT_URL_UNSET" yes/no; key absent from repo yes/no
+  Where the key is stored on Mac and Windows (safeStorage backend named)
+  Network calls outside desktop/bridge-door.js: none?
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  Flint.html 44be124b1183b7d9d060a58632464eff
+      new shared modules: md5 FL == Tree yes/no
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only (carry-forward,
+    connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s) yes/no
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+## Exact source excerpt, characters 13854–14134
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas) the way entry 51 did.
+
+## Exact source excerpt, characters 14136–14311
+
+LATER (not now): Celeste sets the real routine URL and key with Kirk; replies arriving into the
+desktop by a relay file; the Workspace handing a page through the bridge (041).
+
+## Exact source excerpt, characters 14313–14358
+
+Thank you, GC. Glow eternal. Heart in Spark.
+

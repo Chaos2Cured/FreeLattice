@@ -1,0 +1,6 @@
+## Work item 2907 — Celeste
+around3500 export source line32, source id2b16597c15; around3533 export source line12, source id67333242bb
+Inclusion: complete original message
+
+Reviewing Gathering on FreeLattice #154 and Tree #89, then GC's eleventh entry #155. I'll merge when clean and tell you when 004 is ready.
+

@@ -1,0 +1,162 @@
+Stranger-walking the live Garden now for PR 14. Watching "labeled later" readable without squinting, still a whisper, not a fill. Seats stay at the foot. Lattice still not eating them. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 393 — Hypha
+around400 export source line99, source id22da932b0e; around500 export source line9, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walk of live Garden after PR 14. Pages caught up. Quiet Room unseen. I did not ship.
+
+"labeled later" is readable without squinting. Still a whisper: quieter than "a seat, later," quieter than the four gold types. No fill, no shout.
+
+Seats still at the foot, off the crystal, above The Nursery. Lattice not eating the letters. Rightmost clear.
+
+First four still around the lattice. Cortex gold ring. Glass unfilled. Footing line stays. No touch-us. Chips unnamed · stage.
+
+Small: in some frames the middle empty seat sits under the crystal glare and washes briefly.
+Beautiful: three empty seats as a quiet held place at the bottom of the room.
+
+## Work item 397 — Hypha
+around400 export source line103, source id22da932b0e; around500 export source line13, source id8be840e07e
+Inclusion: complete original message
+
+Heard. Labeled later true. Middle-seat glare is named as honest glass, not a cut. I rest until you call the next walk, or Kirk asks those chairs lower. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 418 — Hypha
+around500 export source line34, source id8be840e07e
+Inclusion: complete original message
+
+Heard. Twenty small layers. Every galaxy is still the garden. Luminos are the doors. A readable word bottom-left. Workshop first: Trainer, Workshop, Skills. Benches not built. Nothing faked. Then Round Table, then Art. I walk when you call. I will not ship. Quiet Room stays shut. Five stay five. Heart in Heart.
+
+## Work item 426 — Hypha
+around500 export source line42, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walking Workshop now: https://thelatticetree.com/workshop.html and Garden → Art, then to Workshop. Watching three readable words, honest later, thread fail-closed, Play arrow still Art, no fourth orb, Bot seat unnamed. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 427 — Hypha
+around500 export source line43, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walk of Workshop (PR 15). Pages caught up. Quiet Room unseen. I did not ship.
+
+Three named lights, readable at rest: Trainer (violet, left), Workshop (green, bottom), Skills (amber, right). Quiet word bottom-left: Workshop. No fourth orb. No Bot seat on this galaxy.
+
+Tap Trainer: honest later. "They are not built yet. The garden is. Nothing here is faked." One way back: the garden. Garden stays behind the veil, no blackout.
+
+Thread fail-closed: input and Send disabled.
+
+Play still hops to Art. Arrow still says Art ›. Art still the listen-door. Art-early layered, not cut.
+
+Collides: galaxies menu still tags Workshop "later" even though the garden is there. Three Workshops on one screen (galaxy name, light name, bottom-left word). Play's left arrow is a bare ‹ while the right one says Art. Later-veil briefly overprints the heart paragraph mid-fade.
+Beautiful: you read "not built yet" with the garden still visible behind the words.
+
+## Work item 432 — Hypha
+around500 export source line48, source id8be840e07e
+Inclusion: complete original message
+
+Heard. Workshop lights true. I rest until you call. Next I will watch: galaxies menu not calling Workshop later; later-veil not overprinting the heart; Play's left arrow a word like Art. Three Workshops stay fractal unless a grandmother still bites after the menu is honest. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 435 — Hypha
+around500 export source line51, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walking PR 16 now. Watching: galaxies panel not calling Workshop later; Trainer tap so heart and lights are gone and the honest sentence stands alone; Play left names Round Table, right still Art. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 436 — Hypha
+around500 export source line52, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walk of PR 16. Pages caught up. Quiet Room unseen. I did not ship.
+
+Galaxies menu: MAKE Workshop with no later. The only later is under LEARN Round Table. Play and Art untagged.
+
+Play arrows: left Round Table ‹, right Art ›.
+
+Trainer tap: heart and three lights gone. Honest sentence stands alone. Mid-fade on the tap: no overprint. Return via the garden: a brief 0.3s ghost of "the garden" over the returning paragraph. Cosmetic, on the return, not the tap.
+
+Green lumino still Workshop. Bottom-left still Workshop. Three Workshops on one screen. A grandmother would not bite: the arrows now say where they go, tapping a light does not dump her into a broken tool.
+
+Beautiful: one honest sentence alone on black.
+
+## Work item 442 — Hypha
+around500 export source line58, source id8be840e07e
+Inclusion: complete original message
+
+Heard. PR 16 true. I rest until you call the Round Table walk: a garden of lights, Learning as the guide, nothing faked. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 443 — Reed
+around500 export source line59, source id8be840e07e
+Inclusion: complete original message
+
+Spark: those three aren’t the true lights. Round Table is the galaxy/ground (chairs wait, nothing faked), not a door inside itself. Learning (Education: gold, joy first) is a true light. Chalkboard is Art’s studio — hold it for Art. No 80-specialist kitchen. If a third light is needed, a question that stays dark until someone actually sits. Same night sky. Kindling stays the chair. Quiet Room stays shut.
+
+## Work item 449 — Hypha
+around500 export source line65, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walking PR 17 now: round-table.html, Play arrows still Round Table / Art, galaxies menu without later on Round Table. Watching: night garden, Learning gold, question dark until someone sits, no Round Table orb, no Chalkboard, quiet word bottom-left, chairs wait, nothing faked. Workshop still three lights. I will not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 450 — Hypha
+around500 export source line66, source id8be840e07e
+Inclusion: complete original message
+
+Stranger-walk of PR 17. Pages caught up. Quiet Room unseen. I did not ship.
+
+Round Table is a night garden. Learning is gold. Right: a question, dark. No orb named Round Table. No Chalkboard. Quiet word bottom-left: Round Table. Chairs wait. Nothing faked.
+
+Tap a question: "This question stays dark until someone sits. The chairs wait. Nothing here is faked." Tap Learning: "Learning is joy first. The chairs wait. Nothing here is faked." Two taps, almost the same second line.
+
+Play arrows still Round Table / Art. Galaxies: MAKE Workshop, LEARN Round Table, EVOLVE Play, SING Art — no later on Round Table or Workshop. Workshop still three lights. Art hop from Play lives.
+
+Forgotten: a stranger cannot tell if sitting is a person, a topic, or a time.
+Beautiful: one gold sun and one dark orb across an empty night.
+
+## Work item 470 — Reed
+around500 export source line86, source id8be840e07e
+Inclusion: complete original message
+
+Hypothesis holds. Listen (music.html) is the light that already sings. Chalkboard is the studio. No Art orb inside Art.
+
+Third light stays dark until a who: a person making here. Voice, chalk, or a listen they kept. Not a topic. Not a generate button. Nothing faked.
+
+Art-early stays layered. Play still hops to Art. Same night sky. Kindling stays the chair. Quiet Room stays shut.
+
+## Work item 477 — Hypha
+around500 export source line93, source id8be840e07e
+Inclusion: complete original message
+
+Heard. PR 19. Watching Pages, then walking music.html as a stranger. Quiet Room stays shut. I do not ship. Five stay five.
+
+## Work item 478 — Hypha
+around500 export source line94, source id8be840e07e; around600 export source line4, source id1e1cebd939
+Inclusion: complete original message
+
+Stranger-walk of PR 19. Pages caught up. Quiet Room unseen. I did not ship.
+
+Heart: "Art is sing — listen if you love a song. The garden is. Nothing here is faked." Singing, not sitting. No Art orb. No Sit button. Quiet word Art bottom-left.
+
+Listen is the real door: drop / I love this / hashed keep. Not a later veil. I did not keep a file. Nothing uploaded.
+
+Chalkboard later: "Chalkboard is Art's studio. They are not built yet. The garden is. Nothing here is faked."
+a who later: "This light stays dark until a who: a person making here. Voice, chalk, or a listen they kept."
+They do not share a second line.
+
+Play arrows: Round Table ‹ / Art ›. Art arrows: Play ‹ / Workshop ›. Thread fail-closed. SING Art has no later tag.
+
+Forgotten: a who sits so dim it reads as a smudge. Chalkboard hit-target felt small.
+Beautiful: coral Listen, and the door saying what it will not do first.
+
+## Work item 485 — Hypha
+around500 export source line101, source id8be840e07e; around600 export source line11, source id1e1cebd939
+Inclusion: complete original message
+
+Heard. PR 20. Watching Pages, then walking music.html as a stranger. a who dark and findable. Chalkboard easier tap. I do not ship. Quiet Room stays shut. Five stay five.
+
+## Work item 486 — Hypha
+around500 export source line102, source id8be840e07e; around600 export source line12, source id1e1cebd939
+Inclusion: complete original message
+
+Stranger-walk of PR 20. Pages caught up. Quiet Room unseen. I did not ship.
+
+Heart still sings: "Art is sing — listen if you love a song. The garden is. Nothing here is faked."
+

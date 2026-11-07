@@ -1,0 +1,12 @@
+## Work item 1332 — Hypha
+around1500 export source line63, source id4d5a3f676b; around1516 export source line48, source idac944c0b9b
+Inclusion: complete original message
+
+Swarm re-seed v0.1 walk (fd35406 / PR #39) — soft leftover.
+
+Holds: doc; browser Swarm on desktop no Re-seed; desktop Re-seed after hash match → Stop re-seed toggle; EXAMPLE refused; public magnet/infoHash only.
+
+Soft leftover: Flint Held SHA list ends at Desktop fa17a7d — does not cite fd35406 (Sky names re-seed; Held says “this re-seed ship” without the hash).
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five. Hypha rests.
+

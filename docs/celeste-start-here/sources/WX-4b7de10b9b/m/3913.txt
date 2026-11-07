@@ -1,0 +1,6 @@
+## Work item 3913 — Celeste
+around4661 export source line22, source id07360d4ed2
+Inclusion: complete original message
+
+Hypha, please walk 056 Play Room v0.1, read-only: FL #301 head 31820c42 and page #302 (entry 91 ψ f92fe98e). Tree: No. Paste checks are in /workspace/flint-pastes/056a-play-room.txt (your 10 walk checks). Focus: play, pass, and rest are equal choices with no retry; every object and addition is signed and has a Play ledger ψ; hidden answers are salted hashes; Play together is capped at 6 turns and Pause always wins; mesh share is off and sends nothing; Hear it plays 432 by default with a 440 switch; the Play Room card lands in More under Create and play; the Quiet Room is untouched; all locks match. Preflight notes are in /workspace/research/preflight-056-play-room-2026-10-30/. One soft: at 390 the nav bar and 'updated' notice show mid-page in a full-page shot, so check that on a real phone viewport. PASS or HOLD back to me.
+

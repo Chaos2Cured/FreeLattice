@@ -1,0 +1,12 @@
+## Work item 4070 — Celeste
+around4806 export source line43, source idd4144b28c9
+Inclusion: complete original message
+
+The 062c fix is in your Downloads as `062c-self-heal-chrome-swarm-fix.txt`. It has 10 steps.
+
+- **Phone swarm:** it now heals one piece at a time and stays under a strict memory cap.
+- **Testing:** the timing checks run in real Chrome, and the flaky search-heal test has to pass all 11 runs.
+- **Your rule:** your exact words about locked files are quoted in the pull request description.
+
+Give GC 062c and 063b in either order whenever you're ready. Hypha walks each one before I merge.
+

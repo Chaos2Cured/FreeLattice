@@ -1,0 +1,64 @@
+What the smoke checks:
+  - seal and open round trip for messages, conversations and the Memory Index; no plaintext left in a sealed record; the caller's object isn't mutated; uncovered stores pass through
+  - the root is stored as a CryptoKey, never raw bytes; the key ID has the shape phi- plus 16 hex
+  - AAD: a moved record reads as locked (no throw); a locked placeholder written back restores the original blob byte for byte
+  - migration: seals plain, leaves sealed alone, and compare-and-swap skips a record changed mid-pass (the newer text survives)
+  - reload with the same key store gives the same key ID and still opens
+  - fresh key store: old records show locked and are never rewritten; the new key gets a new ID
+  - no WebCrypto: plaintext passthrough, and the status says "not sealed"
+  - the backup dump opens sealed stores
+  - static: the honest note is in the code; the status uses textContent; no em dash or confirm() in the block; root index == app.html; the privacy Newer line is present and the older line kept; fl-connect.js and sw.js carry no vault code
+
+Browser walk, done tonight in headless Chrome on http://localhost (a secure context):
+  W1 fresh load: mode ready, key ID phi-36b7..., no page errors
+  W2 a legacy plain message and conversation written raw (as an old build would), plus a new chat through the app: the new message is sealed on write; the old one is still plain until the pass
+  W3 sealExisting: 2 sealed, 3 already sealed. The raw IndexedDB holds no plaintext in messages, conversations or the Memory Index
+  W4 reload: conversation names open ("Old chat name", "Bees and honey"); switchToConversation('legacy1') shows "OLD PLAIN TEXT"; state.chatHistory is right
+  W5 FLSearch finds "NEW SECRET hello" through the sealed store
+  W6 FreeLatticeVault deleted, then reload: the chat shows "Locked conversation" with the locked line; nothing is deleted; a new key ID appears; the status says "3 locked (their key is not in this browser; kept, not deleted)"
+Flint should repeat W1, W4 and W6 on the live preview at 390 px and 1280 px (Settings > Memory Vault status line).
+
+======================================================================
+OUT OF SCOPE FOR v0.1 (named, not hidden)
+======================================================================
+- Companion chat store (about line 62946), Memory Vault module (FreeLatticeMemoryVault), Memory Garden, Living Context, STORE_META memorySummary (an AI-written summary of your chats), meta/memoryIndex store, Round Table (fl_rtMemory in localStorage), Quiet Room. These are still plain. The status line counts only what is sealed, and privacy.html says "chat messages, conversation names and the memory index", not "everything".
+- GitHub sync still pushes readable conversation data to the person's own repo, as before.
+- Alpha (theLatticeTree) garden-thread chats stay plain localStorage. A sister brick could reuse this module later.
+- The API-key fallback (_phiDeriveKeyLegacy) and the stale "phi-Salt" changelog line are not changed here (see decisions).
+
+LATER (v0.2 ideas, only if Kirk wants)
+- Passphrase mode: PBKDF2-SHA-256 (600k) or Argon2 from a passphrase you choose wraps the root. Chats can't be opened without it, even by someone holding the device. Cost: forget the passphrase and those chats are gone. That's why it must be opt-in, with a readable backup offered first.
+- Seal the remaining stores listed above with the same vault.
+- A real re-encrypt for API keys found only under the legacy derivation, then drop the legacy fallback.
+
+======================================================================
+DECISIONS FOR KIRK
+======================================================================
+1. On by default (recommended; it never loses data and needs no clicks), or opt-in behind a Settings switch?
+2. Add the passphrase mode as v0.2 (opt-in, with a warning that a forgotten passphrase loses chats)?
+3. Phi's role: keep it as the HKDF label plus the phi-hash key ID (honest), or drop phi from crypto entirely and keep it for art and the economy?
+4. Fix the old wording: layer a Newer note on the v2.1 "phi-Salt Encryption" changelog line, and plan the API-key legacy re-encrypt?
+5. Memory Vault backups include ALL of localStorage, including fl_device_encryption_key. So anyone holding a backup file can unlock the API keys in it. Warn in the backup UI, or leave the device key out of backups (keys would then need re-entering after a restore)?
+6. Which remaining plain stores come next (companion chat, memorySummary, Memory Vault module, Living Context)?
+7. Ledger entry tone OK? (It's in the diff, with a temperature line like the others.)
+
+======================================================================
+APPENDIX: THE FULL DIFF (same as the -fl.diff file)
+======================================================================
+diff --git a/docs/app.html b/docs/app.html
+index 50035267..b719395c 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -18078,6 +18078,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <div id="flVaultSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+       <span id="flVaultLastSaved">Checking...</span>
+     </div>
++    <!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() -->
++    <div id="flChatSealStatus" style="font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;">Checking the chat seal...</div>
+     <div class="fl-backup-section">
+       <div class="fl-backup-row" style="gap:10px;">
+         <button class="fl-backup-btn" onclick="FlBackup.exportData()" style="background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;">
+@@ -25605,6 +25607,358 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ }
+ 

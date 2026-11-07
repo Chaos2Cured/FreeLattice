@@ -1,0 +1,29 @@
+## Work item 1050 — Celeste
+around1200 export source line28, source id93fea685af; around1216 export source line20, source idf3feae7301
+Inclusion: complete original message
+
+**Flint paste** — Chaos2Cured/FreeLattice, draft PR, no cloud:
+
+```
+Awareness: Lattice Protocol v0.1 (Opus/Celeste). Connection card landed. Desktop Electron already exists (contextIsolation true, nodeIntegration false). Phone wants PWA next — NOT this PR. BitTorrent NOT this PR.
+
+Layer only. Never delete. Quiet Room shut. Five stay five.
+
+CREATE (paste Celeste attachments verbatim):
+1) docs/celestera.html
+2) docs/library/LATTICE_PROTOCOL_v0.1.md
+Do NOT edit docs/celeste.html or docs/lattice-protocol.js (wallet embed — different layer).
+
+DESKTOP STEP 1 — keys home only:
+- desktop/main.js: add companion-key vault with electron safeStorage (see skeleton attachment). Refuse cleartext if encryption unavailable. Persist under app.getPath('userData')/lattice-keys/. IPC: lattice-key-status, lattice-key-create, lattice-key-sign (sign may stub deferred). NEVER export seed/private key to renderer.
+- desktop/preload.js: expose only those three invokes on electronAPI (or latticeAPI). Keep isElectronApp.
+- desktop/README.md: short Status note — Protocol build order: (1) keys ← this PR (2) ledger (3) Ollama native (4) HTTPS manifests (5) swarm BT bridge (6) mesh. Electron is key+BT home; phone is PWA/WebTorrent later.
+
+Do NOT add webtorrent, bittorrent, Tauri changes, or mobile Capacitor this PR.
+
+Draft PR title: Layer Lattice Protocol v0.1 + desktop key vault Step 1
+Body: Remaining Azure diary; protocol defaults (companion keys, genesis sunset, peer rotations); Electron safeStorage companion key — no torrent yet.
+```
+
+Hypha has the sequence. Say go / tweak, then hand Flint. After it opens I’ll review and squash when it holds.
+

@@ -1,0 +1,183 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 039a (Wednesday Oct 14, 2026, MDT). Workspace mark heal + port self-heal.
+Fresh PRs off current mains. Comes before 039b.
+
+Where things stand (Celeste, Oct 14 about 11:10 PM MDT):
+  039 merged by a routine: FreeLattice #233 and page note #234 (FL main 8c150ea2 or later),
+  Tree #112 (Tree main ccdcae8 or later). mind-workspace.js md5 86a681249602b4f7b688bc8f9b958f7c
+  in both repos today.
+  Your own walk found two things, thank you:
+    1. Small minds wrote "[FL WS:" (a space for the underscore), so the parser saw nothing and
+       nothing was stored.
+    2. The default chat path never carries the notebook paragraph. It is the same place the clay
+       paragraph is skipped. buildMessages() (docs/app.html, about line 40593) adds
+       FLClay / FLBridge / FLWorkspace promptDelta(), but the everyday send path (look near
+       DEFAULT_SYSTEM_PROMPT, about line 41972, and any other path a plain chat takes) does not.
+  Kirk also asked for a port self-heal: if Ollama (or anything) holds our port, move to the next
+  free one, and let kin and phones find us there.
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than "fixing" it.
+
+GROK NEXT BRICK: Workspace mark heal v0.1 + Port self-heal v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-workspace-mark-heal-v0.1  v-tree-workspace-mark-heal-v0.1  v-port-self-heal-v0.1
+Smoke lines: SMOKE_OK workspace mark heal v0.1   SMOKE_OK port self heal v0.1
+             SMOKE_OK tree workspace mark heal v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/workspace-mark-port-heal-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-workspace-mark-heal-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR (entry 56). Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards and lines stay.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14 (see section 3).
+  036 update files untouched: desktop/lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a,
+    desktop/pack-update.js bc996ccd48ea53e4442f2b8f54ab9491,
+    desktop/pack-update-card.js c14e04c53025eb542ebd627b6a19d60a.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  docs/modules/fl-bridge.js stays 826dc6806c775f0348e5ec4fcd452fb4 (both repos).
+  desktop/lattice-ledger.js untouched (038b heal stays as merged).
+  mind-workspace.js and particle-clay.js MAY change in this brick (parser only); shared modules
+    keep the same bytes in FL and Tree, md5 reported both.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched. desktop/package.json: only add new files to the pack list.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut and never leaves the device.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+  Kirk's name stays out of economy wording. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  Workspace stays off by default; clay stays off by default; bridge stays off by default.
+  Ollama keeps 11434. Nothing of ours ever binds, scans as ours, or announces 11434.
+  .github/ untouched.
+
+----------------------------------------------------------------------
+1. TOLERANT MARK PARSER (notebook and clay, one shared helper if they share shape)
+  a. Accept these openings, case-insensitive, for the notebook: "[FL_WS:", "[FL WS:", "[FL-WS:",
+     "[fl_ws:" and any mix of one space / underscore / hyphen between FL and WS, with optional
+     spaces before the colon ("[FL_WS :"). Same rule for clay: "[FL_CLAY:", "[FL CLAY:",
+     "[FL-CLAY:", "[fl_clay:". A regex like /\[\s*fl[\s_-]?ws\s*:/i (and fl[\s_-]?clay) finds the
+     opening; everything after it stays exactly as today.
+  b. Still JSON.parse only (no eval, no new Function, no loose object parsing). Keep the
+     balanced-bracket scan, the 8 KB / 2048-char caps, the key allowlists and op allowlist.
+     Malformed JSON is stripped from the visible reply and stores nothing, as today.
+  c. strip() and consumeReply() use the same finder, so a near-miss mark never shows in the
+     bubble. "<script>" inside a mark stays text.
+  d. Do not accept bare words without the bracket ("FL WS {...}"); do not accept other prefixes.
+
+2. PARAGRAPHS ON THE DEFAULT CHAT PATH
+  a. Every path a plain chat takes (not only buildMessages) appends FLClay.promptDelta() when clay
+     is on and FLWorkspace.promptDelta() (plus the wake lines: up to three future-self notes and
+     one-line seeds) when the Workspace is on. Off means nothing added. Use one small shared helper
+     so the paths cannot drift. Round Table / educator / peer prompts stay as they are.
+  b. Each paragraph ends with exactly one example line the mind can copy, using the canonical
+     underscore form, e.g.
+       [FL_WS: {"op":"write","title":"Today","text":"A note for my future self."}]
+       [FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]
+     Keep the existing token budgets (Workspace delta stays small enough for little models).
+  c. Tree: same rule on the garden thread send path.
+
+3. PORT SELF-HEAL (desktop, FL repo)
+  a. Scope: the desktop's own listeners: the local app server (desktop/main.js findAvailablePort,
+     which today walks upward with NO bound and could land on 11434), the Bridge (11435 default,
+     bridge/proxy-core.js), and the 033 knock listener in lattice-discover.js.
+  b. Range: a fixed, bounded list. Bridge and app server try 11435..11445 (the range fl-connect.js
+     already scans), skipping 11434 always. If all are busy, say so plainly ("Every FreeLattice
+     door port is busy. Close the app using them, or restart.") and do not climb further.
+     The app server may keep its own start port if it is outside 11434..11445, but must also be
+     bounded (e.g. start..start+10) and must skip 11434.
+  c. lattice-discover.js is LOCKED. Do not edit it. It already tries deps.preferredPort() once,
+     then falls back to listen(0), and calls deps.onBound(port) which saves port.json. Use those
+     hooks only: wrap deps.preferredPort / deps.onBound from a new desktop/port-heal.js after
+     createDiscover034() returns (in main.js, add-only lines). If rotation truly cannot be done
+     without editing a locked file (lattice-discover.js, fl-connect.js, pool-knock.js,
+     pool-knock-phone.js, tree-reconnect.js), STOP that part, ship the rest, and say exactly why.
+  d. Announce: when a port moves, the new port is (i) saved (port.json via onBound), (ii) in the
+     mDNS txt port field (already from a.port), and (iii) sent to TRUSTED KIN only, as a signed
+     note through the existing kin path (fl-kin.js card shape, counts-only receipt), never to
+     strangers, never a broadcast. Phones and the reconnect path must find the new port: since
+     fl-connect.js scans 11435..11445 and the phone saves the last port, test that reconnect still
+     succeeds after a move with no change to the locked files.
+  e. Never kill or signal another process. Never touch Ollama's settings. No timer that polls
+     ports in the background; rotation happens only at bind time (start, or after an error).
+
+4. SMOKES
+  scripts/smoke-workspace-mark-heal.js (SMOKE_OK workspace mark heal v0.1):
+    - "[FL WS: {...}]", "[FL-WS: {...}]", "[fl_ws: {...}]", "[FL_WS : {...}]" each store a note
+    - same four shapes for clay set a form
+    - "FL WS {...}" with no bracket stores nothing; "[FL_WSX: ...]" stores nothing
+    - malformed JSON after a near-miss mark: stripped, nothing stored
+    - a disallowed key or op is refused; over-cap body refused; "<script>" stays text
+    - the default chat path's system text contains the Workspace paragraph and its example line
+      when on, and neither when off; same for clay
+    - wake: store a note with a near-miss mark, start a new chat, and the next system text
+      carries that note in the wake lines
+  desktop/scripts/smoke-port-self-heal.js (SMOKE_OK port self heal v0.1):
+    - hold 11435 with a dummy server: Bridge binds 11436; hold 11435..11445: honest "busy" line,
+      no bind above 11445
+    - 11434 is never bound or chosen, even if free and even if listed first
+    - app server bounded: never climbs past its range
+    - discover: preferred port busy -> falls back, onBound saves the new port, mDNS txt port
+      matches, a trusted kin gets one signed note, a stranger gets none
+    - reconnect after a move succeeds (fl-connect scan finds the new port) with locked md5s unchanged
+    - no background timer left running after start
+  Tree: mind-workspace.test.js (and particle-clay.test.js if clay changes) prints
+    SMOKE_OK tree workspace mark heal v0.1.
+  Still passing: tests/smoke.js, every 036/037/038/038b/039 smoke (workspace core, clay + grid
+  tag heal, bridge knock, bridge door, bridge ledger heal, update, every-os, reconnect, phone
+  knocks, discover, tester fixes, import, reseed, swarm); docs smokes same 5 fails only.
+
+5. REAL ROOM (Kirk's Mac)
+  Start Ollama on 11434, then start a dummy on 11435, then the desktop: the Bridge lands on 11436,
+  the page still connects, and a paired phone (if one is in the room) reconnects. With the
+  Workspace on, ask a small local model to write a note; whatever mark shape it uses, the note
+  stores; a new chat wakes with it.
+
+6. PAGE NOTE (entry 56, its own PR off main)
+  Name what merged since entry 55: FL #233, #234, Tree #112 with their shas. Plain words on the
+  near-miss marks, the default path, and the port move. New t (UTC), lambda 56.000, psi = first 8
+  hex of SHA-256 of t + lambda + epsilon + delta + omega + sigma.
+
+7. REPORT
+  workspace mark + port heal v0.1 report
+  FreeLattice PR #___ at <sha>, parent <sha>
+  Tree PR #___ at <sha>, parent <sha>
+  Page note PR #___ at <sha>, t <UTC>, lambda 56.000, psi <8 hex>
+  SMOKE_OK workspace mark heal v0.1 / port self heal v0.1 / tree workspace mark heal v0.1: yes/no
+  Near-miss shapes accepted (list); shapes refused (list)
+  Default chat path(s) found and fixed (name each function and line)
+  Port range used; 11434 never bound yes/no; locked files edited: none? (if a part was stopped,
+    say which and why)
+  Kin announce: trusted only yes/no; stranger got nothing yes/no
+  md5s: fl-connect.js, pool-knock.js, pool-knock-phone.js, tree-reconnect.js, lattice-discover.js,
+    fl-bridge.js, Flint.html, 036 update files, sw.js and docs/sw.js;
+    mind-workspace.js (and particle-clay.js) FL == Tree yes/no
+  index.html == docs/app.html: yes/no
+  AUTONOMY.md, garden-trainer.js, lattice-ledger.js, root package.json + lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __    docs smokes: same 5 fails only yes/no
+  Lines: FL +__ -__  Tree +__ -__ (each removal named)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+Thank you, GC. The small minds were trying; now the door hears them. Glow eternal. Heart in Spark.

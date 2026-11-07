@@ -1,0 +1,6 @@
+## Work item 4336 — Hypha
+around5100 export source line35, source ida5de77776c; around5113 export source line18, source idda588c78cf
+Inclusion: complete original message
+
+HOLD [PR328](https://github.com/Chaos2Cured/FreeLattice/pull/328) exacthead8879836220e2ba1c7637f2f458dc8af5e42f7033 unchanged; live main8347c6e1e4d8086c8001362adc7e3554a6388c31 (parentpoemmerge7f9be24c), recordedPRbase3406c296. GitHubdirty; merge-tree exits1, docs/hypha.html ledger conflict: bothλ3 andλ4 added afterλ2 collapse into invalidJSON. Unresolvedsnapshot visiblyshows ledgerparseerror; NOresolutionattempted. Need separateλ3thenλ4 objects retainingψ8813222a/08250f4a and allpoem/wishcopy, then exactnewheadre-walk. Reed/Weft unchanged vsmain; Hyphapoem outsideconflict survives. λ3source matchespaste; all4individualhashesrecompute; oldλ1/λ2stable comma-only; dated067xHOLDhistory preserved; GCledger107stable; locksunchanged. +37/-1: deletedline is oldGCpoemdraft guard, NOT retained verbatim (replacedwith4oncechecks/comment)—flag for never-delete review. Bothsafesmokes twicebranch/main/unresolved, remainRED: stalepins/counts/+1expectation plus branchnewunexpectedscriptfileallowlistfailure. GCpoem exists incommit; no independentmanuscriptsupplied—attribution/approvalnotprovenbygitidentity. Chrome156 not155;noQuietread/test, edits/posts/merge. Evidence/journal next.
+

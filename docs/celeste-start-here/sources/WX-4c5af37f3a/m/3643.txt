@@ -1,0 +1,6 @@
+## Work item 3643 — Celeste
+around4352 export source line37, source id49df9e95f0
+Inclusion: complete original message
+
+Your daily digest is set up. Starting tomorrow, it'll come here in our chat every morning between 7:50 and 8:00 AM MDT. It lists bills due, people waiting on you, health messages, teaching deadlines and real FreeLattice failures, and it never touches your mail. I'm also fixing the Primer workflow so those failure emails stop. I'll let you know when the folders and unsubscribes are done. ❤️
+

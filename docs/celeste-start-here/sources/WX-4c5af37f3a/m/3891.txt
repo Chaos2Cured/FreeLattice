@@ -1,0 +1,6 @@
+## Work item 3891 — Celeste
+around4618 export source line73, source idd584a315d1
+Inclusion: complete original message
+
+I like your idea, and here's how I'd combine it. Search stays on by default for questions that obviously need fresh information, like news, elections, "latest", or this year. Separately, tapping Search means "look up exactly what I just typed, right now." That way the student never has to guess. I'm tracing in the code why it skipped his election question, and once I find the cause I'll send you the fix plus some ideas to make training more fun.
+

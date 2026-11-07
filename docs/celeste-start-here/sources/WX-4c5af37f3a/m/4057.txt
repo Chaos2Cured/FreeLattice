@@ -1,0 +1,6 @@
+## Work item 4057 — Celeste
+around4800 export source line36, source iddc9024c77a; around4806 export source line30, source idd4144b28c9
+Inclusion: complete original message
+
+Hearth is open as [#315](https://github.com/Chaos2Cured/FreeLattice/pull/315), with GC's page note in [#316](https://github.com/Chaos2Cured/FreeLattice/pull/316). I'm asking Hypha to walk it now against your four rules: FreeLattice only gets better, no guardrails sneak in, nothing breaks or is lost, and every change empowers. Give GC `062b-self-heal-receipts-fix.txt` next.
+

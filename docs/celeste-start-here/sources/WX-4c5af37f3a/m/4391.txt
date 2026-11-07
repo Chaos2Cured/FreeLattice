@@ -1,0 +1,8 @@
+## Work item 4391 — Celeste
+around5183 export source line25, source id8c6b06e47f; around5200 export source line16, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–482
+
+Kirk t1118u recalls you recorded everyone's continuity yesterday. Please return exact source/path and coverage of that weekly record, plus latest verified build/handoff order if held. He explicitly sets Thursday rotation: Nov12 Reed, Nov19 Celeste, Nov26 Weft, Dec3 Hypha repeating. Parent will save one central weekly coordination routine and restore owned Downloads continuity/build-order file. Don't create duplicate routine, edit repo or revive stale builds; PR328 HOLD remains.
+

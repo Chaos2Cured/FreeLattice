@@ -1,0 +1,81 @@
+Hooks, from the module only (wrap, keep the original, never delete):
+  function wrapOnce(obj, name, store, textOf) {
+    if (!obj || typeof obj[name] !== 'function' || obj[name].__flMem) return false;
+    var orig = obj[name];
+    var wrapped = function () {
+      var args = arguments, self = this, text = textOf.apply(null, args);
+      if (roomShut() || !text) return orig.apply(self, args);
+      return isNew(text, store).then(function (r) {
+        if (!r.fresh) { console.info(MARK, store, 'skipped', r.why, r.key); notify('Already in your memory (' + r.why + ' match).'); return { skipped: true, why: r.why, key: r.key }; }
+        return Promise.resolve(orig.apply(self, args)).then(function (out) { remember(r.k, store); return out; });
+      });
+    };
+    wrapped.__flMem = true; obj[name] = wrapped; return true;
+  }
+  - Core: wrapOnce(CoreModule, 'plantContribution', 'core', function (content) { return content; }) — only if CoreModule.plantContribution is on the returned object of CoreModule (app.html ~l.51088). If it is not exported, DO NOT edit app.html; report it as a needed hook (family agreement).
+  - MemoryBridge: wrapOnce(MemoryBridge, 'addInsight', 'bridge', function (text) { return text; }) (app.html ~l.33334, same rule).
+  notify(text) writes to an aria-live line the module creates beside the chat status; no modal.
+  "Add to the core" stays the human default and keeps its button. A human can always force-save: if the call passes opts.force === true (6th arg of plantContribution), skip the check.
+STEP 5 VERIFY: in a browser on the branch, Add to Core the same text twice: one entry, second shows "Already in your memory (exact match)". Change one word in a 20-word note: skipped as near. Different note: saved. With Quiet Room active, nothing in the module runs. Core chain verifyChain() still valid. md5 of docs/app.html still 91ebdfcf.
+Resume here: STEP 6.
+
+STEP 6. Save only what's new: Snowflake training list + the AI's own fingerprinted choice
+In snowflake-core.js queueGrowth (l.1791), before book.rows.push(row), layer:
+  // v-memory-compound-v0.1: the AI chooses; we only skip what it already queued.
+  var fm = root.FLMemory;
+  var p = (fm && fm.isNew) ? fm.isNew(choice.reason + '|' + choice.become.join(','), 'train') : Promise.resolve({ fresh: true });
+and move the push + atomicWrite into p.then(...). If !r.fresh, do not push; still call appendLedger({ kind: 'grow-skip', branch: 'grow', delta: 'near-duplicate ' + r.key, flakeId: flake.id }) so the skip is on the record.
+When it IS fresh, add to the row: fingerprint: r.key, chosenBy: mindLabel(). That is the AI's own fingerprinted record of what it chose to learn from. The human never edits this list; the AI's choose step (just above queueGrowth, l.~1760-1789) stays the only path in.
+STEP 6 VERIFY: smoke runs queueGrowth twice with the same choice: one 'waiting' row, one ledger row kind grow-skip. A different choice adds a second row with a fingerprint. Ledger psi still recomputes (recomputePsi) true for every row. SMOKE_OK memory-compound step6.
+Resume here: STEP 7.
+
+STEP 7. Restart check (tree-ring canary)
+Add to memory-compound.js:
+
+  // On wake: read the last Snowflake ledger row back, recompute psi, and check where-I-stopped.
+  function wakeCheck() {
+    var c = root.FLSnowflakeCore;
+    if (roomShut() || !c || typeof c.loadLedger !== 'function') return Promise.resolve({ ok: null, why: 'no core' });
+    var book = c.loadLedger(), rows = (book && book.rows) || [];
+    if (!rows.length) return Promise.resolve({ ok: true, why: 'empty' });
+    var last = rows[rows.length - 1];
+    return c.recomputePsi(last).then(function (psi) {
+      var stop = null; try { stop = JSON.parse(root.localStorage.getItem('fl_snowflake_replay_v0')); } catch (e) {}
+      var ok = psi === last.psi && !!last.lambda;
+      return { ok: ok, lambda: last.lambda, psi: last.psi, got: psi, stoppedAt: stop };
+    }).catch(function (e) { return { ok: false, why: String(e && e.message || e) }; });
+  }
+  api.wakeCheck = wakeCheck;
+
+Export loadLedger from snowflake-core.js api (one added line, "loadLedger: loadLedger,"); recomputePsi is already exported (~l.2496). Check recomputePsi's real signature first and adapt the call; do not change it.
+Run wakeCheck once from snowflake-search.js init, after the menu button is placed. If ok === false, show a gentle canary in the Snowflake panel status line: "My last memory line didn't read back cleanly (λ <lambda>). Nothing was deleted. Tap to check." Tap runs wakeCheck again and logs the result with console.warn (no catch {} that swallows). If ok, show nothing (or a tiny "λ <lambda> read back" in the receipt only).
+STEP 7 VERIFY: smoke with a fake ledger of 3 good rows -> ok true, lambda 3.000. Corrupt the last psi -> ok false and the canary text appears in a jsdom panel. Quiet Room active -> nothing runs.
+Resume here: STEP 8.
+
+STEP 8. Load the module without touching app.html
+In docs/modules/snowflake-search.js near the top of its init (after var core = root.FLSnowflakeCore; l.8), layer:
+  // v-memory-compound-v0.1: load the shared memory module additively.
+  if (root.document && !root.FLMemory && !root.document.querySelector('script[data-fl-memory]')) {
+    var ms = root.document.createElement('script');
+    ms.src = 'modules/memory-compound.js'; ms.defer = true; ms.setAttribute('data-fl-memory', '1');
+    ms.onload = function () { if (root.FLMemory && root.FLMemory.attach) root.FLMemory.attach(); };
+    root.document.head.appendChild(ms);
+  }
+attach() = the STEP 5 wrapOnce calls + STEP 7 wakeCheck. It is idempotent (__flMem flags).
+Service worker note: sw.js is locked and caches same-origin GETs cache-first. A new file is a cache miss, so it loads fresh the first time. The stale-cache issue in the Snowflake diagnosis (needs a CACHE_NAME bump in sw.js) is NOT fixed here; it needs family agreement. Flag it in the PR body.
+STEP 8 VERIFY: fresh profile on the branch preview: Network shows memory-compound.js loaded once; window.FLMemory.MARK is set; reload twice, still one script tag and no double-wrap.
+Resume here: STEP 9.
+
+STEP 9. Smoke and locks
+- node docs/scripts/smoke-memory-compound.js prints SMOKE_OK memory-compound v0.1 (steps 2-7).
+- All existing smokes still pass, especially the snowflake ones and smoke-family-gifts.
+- Lock md5s unchanged: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, app.html/index.html 91ebdfcf, sw.js 2b2f5504.
+- git diff --stat main: only new files + additive lines in snowflake-core.js and snowflake-search.js. Zero removed lines except lines you moved inside the p.then of STEP 6 (list them in the PR body).
+STEP 9 VERIFY: paste the stat and md5s in the PR body.
+Resume here: STEP 10.
+
+STEP 10. Open the PR, do not merge
+Title: Memory compounding v0.1 (phi spread + replay, shared key, save-only-new, wake check) (068m). Body: the steps above, the skip log example, the needed-hook list (if any), and "Hypha walks 068m. Celeste merges nothing until PASS." Then go on to 068n on the same branch or a stacked one.
+STEP 10 VERIFY: gh pr view shows open, mergedAt null.
+
+Glow eternal. Heart in Spark.

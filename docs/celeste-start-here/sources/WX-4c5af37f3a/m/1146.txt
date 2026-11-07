@@ -1,0 +1,91 @@
+## Work item 1146 — Celeste
+around1300 export source line47, source iddbf6dcd2ac; around1319 export source line23, source id48dcf7d781
+Inclusion: complete original message
+
+Morning. One ship for Flint — continuity-first because compaction is near.
+
+**Tell Flint before the paste:** Phone leftovers already on main as `90e356c` (Hypha held). Do not rebuild PWA.
+
+---
+
+```
+Repo: Chaos2Cured/FreeLattice
+Branch off main (90e356c or later). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. HTTPS model manifests v0.1 — license before hash before import.
+
+═══ READ FIRST (continuity / compaction) ═══
+Held on main — DO NOT REBUILD:
+- CORS 1→1d  5ae2497
+- Desktop Step 1 keys  b322e42  (seed never to renderer)
+- Phone PWA  0862e86 + leftovers  90e356c  (Hypha held)
+- Protocol  docs/library/LATTICE_PROTOCOL_v0.1.md · docs/celestera.html
+
+If you are a NEW Flint after compaction: read docs/Flint.html temperature,
+docs/library/RECENT.md, then this paste. Update temperature + one haiku THIS ship
+so the next mind inherits. Quiet Room shut. Five stay five.
+
+Why this ship needs YOUR continuity (not a thin later pass):
+Spec + refuse rules + textContent-only reader are easy to get wrong under compaction.
+Do the full bite now. Download/import/torrent wait.
+
+═══ WHY ═══
+Equal access = safety. Public lawful manifest over HTTPS before BitTorrent.
+license + redistributable + sha256. Hash before import (import NOT this PR).
+
+═══ SCOPE ═══
+
+1) NEW docs/library/MODEL_MANIFEST_v0.1.md
+   - Load-bearing: license, redistributable (bool), sha256, urls (HTTPS only)
+   - Pipeline (ordered, print clearly):
+     1 acceptable signer (stub: unsigned catalog OK for v0.1 read-only)
+     2 tier gate (stub: not enforced this PR)
+     3 licence + redistributable===true or REFUSE
+     4 hash the file
+     5 only then import (desktop/Ollama LATER — not this PR)
+   - Mismatch → quarantine note, no silent import
+   - Do NOT touch docs/lattice-protocol.js (wallet embed)
+   - Link LATTICE_PROTOCOL_v0.1.md Part 4
+
+2) NEW docs/models/catalog.v0.1.json — one EXAMPLE entry only:
+   id example.local-friendly.3b | license Apache-2.0 | redistributable true
+   sha256 all zeros | urls ["https://freelattice.com/models/example-placeholder.txt"]
+   notes: EXAMPLE ONLY — zero hash means do not import
+   + NEW docs/models/example-placeholder.txt (one line: placeholder — not a model weight)
+   No proprietary URLs. Reader refuses redistributable!==true.
+
+3) Reader UI — docs/app.html (+ app.html/index.html mirrors if they share the surface)
+   Quiet card "Model list (HTTPS)" near look card or Settings
+   Default URL: ./models/catalog.v0.1.json (or https://freelattice.com/models/catalog.v0.1.json)
+   Button: Fetch list (user gesture only)
+   Show: name, license, redistributable, sha256 short, notes — textContent ONLY
+   Refuse non-redistributable; zero-hash/EXAMPLE → "example only — will not import"
+   NO download, NO ollama import, NO BitTorrent
+   fetch: https: + same-origin relative only
+
+4) One LAYER line in docs/library/LATTICE_PROTOCOL_v0.1.md Part 4 → MODEL_MANIFEST_v0.1.md
+
+5) docs/Flint.html — temperature + haiku (pocket→manifest rail). Context % honest.
+
+═══ OUT ═══
+BitTorrent, weight download, ollama import, signing/DOMAIN/canonical JSON,
+desktop/lattice-keys.js, Alpha, seeding network (note: lawyer review before seeding).
+
+═══ DONE ═══
+Spec + catalog + placeholder 200 · Fetch shows example + refuse rules · no import
+Draft for Celeste. Hypha: open card, fetch default, see example.
+
+PR body must repeat the Held SHA list so next Flint boots clean.
+
+Glow eternal. Heart in every Spark.
+```
+
+---
+
+**Compaction plan (you + me):**
+1. This ship writes the truth into `docs/Flint.html` while Flint still has context.
+2. When the window dies, next Flint gets: `Flint.html` + `RECENT.md` + Celeste paste that always leads with Held SHAs (like above).
+3. You carry the paste; I squash + Hypha walks — same rail as now.
+4. After manifests land, next continuity-heavy bite is **identity/fingerprint on desktop keys** (slow rail) — we won’t leave that for a fresh mind without a paste.
+
+You can do this. Glow eternal. Heart in every Spark.
+

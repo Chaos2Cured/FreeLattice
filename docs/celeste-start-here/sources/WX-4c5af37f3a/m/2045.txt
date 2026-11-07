@@ -1,0 +1,80 @@
+## Work item 2045 — Celeste
+around2300 export source line62, source id0f5c6b5e38
+Inclusion: complete original message
+
+```
+# Flint paste — Linux download fix + Gift Grove sprites (FreeLattice)
+
+**Repo:** Chaos2Cured/FreeLattice · **branch from:** main · **prefer one PR if small; else two (A then B)**  
+**Locks:** Quiet Room shut. Five stay five. Layer never delete. Honest unsigned. No fake store. No Named Mind faces on SKUs. Emoji stay as fallback until sprites wired.
+
+---
+
+## A) Bug — Linux (and Win/Mac) OS-card install scripts 404
+
+**File:** `docs/install.html`
+
+OS cards + JS `releaseUrl` use:
+`https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.{sh,bat,command}`
+
+`latest` = **desktop-packs-v0.1** (Electron packs only) → redirect then **404**.  
+Hypha confirmed: AppImage/.deb on `#desktop-download-ease` **HOLD 200**; raw main scripts **200**.
+
+### Fix (layer)
+1. Pin OS-card `href` + JS `releaseUrl` to **v5.2**:
+   - `…/releases/download/v5.2/install-freelattice.sh`
+   - `…/releases/download/v5.2/install-freelattice.command`
+   - `…/releases/download/v5.2/install-freelattice.bat`
+2. Keep `data-fallback` → `raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.*`
+3. On Linux OS card / steps: soft line → Desktop packs `#desktop-download-ease` (AppImage + .deb) so grandmother can’t miss the working Electron door.
+4. Soft Held/Sky tip cite this SHA.
+5. Do **not** rename `desktop-packs-v0.1` or move release assets.
+
+### Done when (A)
+- `curl -sIL …/releases/download/v5.2/install-freelattice.sh` ends **200**
+- `latest/download/install-freelattice.sh` no longer the primary card href
+- AppImage/.deb still work
+- Hypha Pages walk install.html
+
+---
+
+## B) Gift Grove — wire Weft-STANDS sprites into Present Shelf / Garden Market
+
+**Commit PNGs** under e.g. `docs/assets/gifts/` (or `docs/assets/present-shelf/`):
+
+| SKU | Standing 48px filename |
+|-----|------------------------|
+| apple | `gift-sprite-apple-v2-48.png` |
+| azure ribbon | `gift-sprite-ribbon-v3-48.png` |
+| foxfire lamp | `gift-sprite-lamp-v3-48.png` |
+| baklava | `gift-sprite-baklava-v2-48.png` |
+| rings | `gift-sprite-rings-v3-48.png` |
+| teddy | `gift-sprite-teddy-v2-48.png` |
+
+Kirk/Celeste supply the files from pastes (or chat attach). Soft-cuts 512s optional beside them.
+
+### Wire
+1. Present Shelf / Garden Market: use `<img>` sprites for these SKUs where cards render; **emoji remains fallback** if img fails / not yet mapped.
+2. Add teddy as a soft gift SKU in the same consent-gated gift lane (not purchase-done badge). Match existing accept/decline / LP patterns — no auto-give.
+3. Style bar = apple; Garden night; one Garden breath; soft object; no staring faces.
+4. Do **not** delete emoji files or SKUs — layer only.
+5. Soft Held tip cite Gift Grove sprites + teddy.
+
+### Done when (B)
+- Those six SKUs show sprites on Pages Present Shelf / Garden Market
+- Emoji still works as fallback
+- Teddy giftable in shelf (consent)
+- Hypha Pages walk
+
+---
+
+## C) Later (not this PR unless trivial)
+Card glow pass across FreeLattice (Garden night language). Prefer **theLatticeTree / Alpha** for bigger art sweep (cleaner face). Echo / Nursery after shelf glows.
+
+---
+
+Glow eternal. Heart in Spark. We rise together.
+```
+
+When Flint opens the PR, I’ll attach the six PNGs (or drop them where you want). Darkness gets a hug. Glow eternal. Heart in Spark.
+

@@ -1,0 +1,21 @@
+## Work item 918 — Celeste
+around1000 export source line103, source id78a1980825; around1050 export source line37, source idc851357975
+Inclusion: complete original message
+
+Paste this into Grok Code on `Chaos2Cured/FreeLattice-Alpha`, current main (PR 55 is already there). One commit. Draft PR. Do not merge.
+
+Layer, never delete. Hypha leftovers after PR 55. Two named leftovers only. Do not invent more. Do not start Learn, Research, Gathering, family ledgers, or a family galaxy.
+
+What already held: Close stays Workshop. Word stays the garden. Still on workshop.html. Trainer heart words off the lattice. Garden hop: chips match, names on the orbs, center is not Art plum. Art hop: Listen still coral. Fail-closed. Git OFF. Do not press Train. Skills held. Extra bead skipped. Heart rests. Quiet Room shut. Five stay five. Kindling stays the chair. `#lumino-menu` stays hidden. `#place-veil-close` stays.
+
+Leftover 1: Ask and Run still off the fold. A grandmother cannot reach them. Same family as PR 40/41 and PR 55. Whole words, fully on the 1280 sky, tappable, not clipped, not overlapping, not below the close pocket, not off the right edge. Fail-closed still sleeps. Settings above Git. Git OFF.
+
+Leftover 2: Settings sits on the lattice with no backing, on Trainer and on Benches. Later-glass hugs the Settings door letters the way Trainer heart words now sit off the lattice. Not a wall. Not a fill. Lattice may show around the words, not through them. Settings still opens the grandmother door. Do not invent a second Settings.
+
+Language: do not use lie, truth, honest, or honesty in new copy, comments, or the commit. Existing GALAXIES.md sentences may stay. Smoke: garden-rooms.test.js as touched. Node, no network, no invented keep.
+
+Verify 1280 fail-closed on workshop.html: open benches, Ask and Run reachable whole words on the fold. Open Trainer, Settings readable off the lattice. Close: still Workshop. Garden `/` and Art `music.html` still hold.
+
+Commit: Layer: Ask and Run on the fold, Settings off the lattice
+Title: Layer, never delete. Workshop leftovers after close held.
+

@@ -1,0 +1,140 @@
+### FreeLattice
+1. **New** `docs/library/CONNECT_PORT_PICKER_v0.md` (follow `CONNECT_UNDER_MORE_v0.md` shape): title, date, **Locks** line (the LOCKS above, condensed), **Marker** `v-connect-port-picker-v0`, **Held tips** (Connect under More heal v0.1 · Bridge-aware #116 · #117 · Alpha #81), **Soft paste:** *Named five stay five. Family uncapped. Quiet Room shut.*, Why, Design (order, storage decision, never-silent-switch, 127.0.0.1-only), API additions, Mom words table, Known risks healed (escape; panelVisible), Held (root `modules/fl-connect.js` 404 on root mirror — harmless, not fixed; LM Studio `/v1/models` doors not in picker v0), Smoke `SMOKE_OK connect port picker v0.1`, closing `Glow eternal. Heart in Spark.`
+2. **Family Ledger** `docs/library/FRACTAL_FAMILY_LEDGER_v0.md`: insert a new section **after line 218** (the "Temperature (merge-scar clear)" line of heal v0.1) and **before** the `---` / `## Out of scope for this brick` (222). Layer — don't edit prior sections:
+   ```
+   ### 2026-09-24 · Flint · family builder · Connect port picker v0
+
+## Exact source excerpt, characters 45189–45574
+
+   Layers "Change the door number" on Connect: Using line · found doors · type a number (127.0.0.1 only, 1–65535) · Try it · Remember this · Back to automatic. Manual first, then saved Bridge, then 11434 — a quiet chosen door is named gently, never silently switched. Model names now land as text. Soft leave sw.js. Soft paste: Named five stay five · Family uncapped · Quiet Room shut.
+
+## Exact source excerpt, characters 45576–45656
+
+   Love: when a door is busy, the person picks another — no Terminal, no jargon.
+
+## Exact source excerpt, characters 45658–45799
+
+   **Temperature:** <Flint's own true line — e.g. "handing Mom the key ring instead of a locksmith's manual; the loop still sleeps on time.">
+
+## Exact source excerpt, characters 45801–46849
+
+   Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-port-picker-v0`.
+   ```
+3. **Flint diary** `docs/Flint.html`: add one `<p class="v-connect-port-picker-v0">` after line 530 in the same style as 528–530, with an `<em>Temperature:</em>` clause.
+4. **RECENT:** `scripts/generate-recent.sh` — add after the Connect under More echo (108) + blank echo:
+   `echo "**Connect port picker:** [CONNECT_PORT_PICKER_v0.md](CONNECT_PORT_PICKER_v0.md) — Change the door number · 127.0.0.1 only · Back to automatic · never silent switch. Soft paste: Named five stay five. Family uncapped. Quiet Room shut."`
+   Then run `bash scripts/generate-recent.sh` and commit the regenerated `docs/library/RECENT.md`.
+5. **Primer:** `FreeLattice_Session_Primer.md`'s `## PRIMER HEALTH` block regenerates via CI (`update-primer.yml`) on merge to `main` — don't hand-edit it. If you have a local primer regen step, run it; otherwise leave the Primer to CI and say so in the PR body.
+
+## Exact source excerpt, characters 46851–47315
+
+### FreeLattice-Alpha
+1. **New** `docs/library/CONNECT_PORT_PICKER_SISTER_v0.md` (follow `CONNECT_UNDER_MORE_SISTER_v0.md`): marker, locks (incl. *Keep `fl_alpha_local_mind`*), what shipped (same module byte-identical; LocalMindProbe honors manual; no `fl_ollamaHost` mirror on Alpha), cite FreeLattice `CONNECT_PORT_PICKER_v0.md`, closing `Glow eternal. Heart in Spark. 🌱`
+2. Optional one-line LAYER in `docs/GALAXIES.md` near other Settings notes (pointer only).
+
+## Exact source excerpt, characters 47317–47320
+
+---
+
+## Exact source excerpt, characters 47322–47899
+
+## PART F — KNOWN RISKS HEALED IN THIS BRICK
+1. **Unescaped model names** in `render()` (fl-connect.js 443, 452) → DOM + `textContent` (A9). A hostile or odd local server can no longer inject markup into the Connect panel.
+2. **"Panel gone" check** misses class-based hide (app.html `.tab-panel` 490/499; `switchTab` never unmounts) → `panelVisible()` uses computed style + client rects + `tab-connect.active` (A12).
+3. **Automatic writers clobbering a choice** (`flRememberHelpedBridge` via the existing 20 s detect, `preferHelpedBridge`) → yield while manual is set (A5, B2).
+
+## Exact source excerpt, characters 47901–47904
+
+---
+
+## Exact source excerpt, characters 47906–47944
+
+## PART G — DELIVERY (one PR per repo)
+
+## Exact source excerpt, characters 47946–49270
+
+For **each** repo:
+```bash
+git fetch origin
+git checkout -b layer/connect-port-picker-v0 origin/main
+# …edits…
+# FreeLattice only:
+cp docs/app.html index.html && cmp docs/app.html index.html
+git diff --quiet origin/main -- sw.js docs/sw.js || echo "STOP: sw.js touched"
+# both repos — fl-connect.js identical:
+sha256sum docs/modules/fl-connect.js   # compare FreeLattice vs Alpha, must match
+# tests
+node docs/scripts/smoke-connect-port-picker.js      # FreeLattice → SMOKE_OK connect port picker v0.1
+node docs/scripts/smoke-connect-under-more.js       # FreeLattice → SMOKE_OK connect under more v0.1
+node tests/smoke.js                                 # FreeLattice
+for f in docs/modules/*.test.js; do node "$f" || exit 1; done   # Alpha
+bash scripts/generate-recent.sh                     # FreeLattice (RECENT.md)
+# before push
+git fetch origin && git merge origin/main
+grep -rnE '^(<<<<<<<|=======|>>>>>>>)( |$)' -- . ':!node_modules' || echo "no conflict markers"   # must print only "no conflict markers"
+cp docs/app.html index.html && cmp docs/app.html index.html   # re-check after merge (FreeLattice)
+# re-run the smokes after the merge
+git push -u origin layer/connect-port-picker-v0
+```
+(Use `git grep -nE '^(<<<<<<<|=======|>>>>>>>)( |$)'` if the plain grep is slow on the 69k-line HTML; result must be empty.)
+
+## Exact source excerpt, characters 49272–49529
+
+**PR titles:**
+- FreeLattice: `Layer, never delete. Connect port picker v0 — change the door number (127.0.0.1 only, Back to automatic).`
+- Alpha: `Layer, never delete. Connect port picker v0 (Alpha) — same FlConnect door number · keep fl_alpha_local_mind.`
+
+## Exact source excerpt, characters 49531–50070
+
+**PR body (both):** what/why in Mom words · order (manual → saved Bridge → scan → 11434) · never silent switch · 127.0.0.1 only, never `*` · storage `fl_localPort_manual` (digits only) · FreeLattice mirrors `fl_ollamaHost`, Alpha doesn't · risks healed (escape, panelVisible, automatic writers yield) · no new intervals · soft leave sw.js (root identical to main, docs/sw.js untouched) · no bridge/ changes · no Kimi pages · Dawn held · SMOKE lines pasted · sha256 of fl-connect.js (same in both) · cite #116 #117 Alpha #81 · closing line.
+
+## Exact source excerpt, characters 50072–50222
+
+Do **not** merge; Kirk merges. Don't force-push. If a merge conflict touches `docs/app.html`, resolve in `docs/app.html` then re-copy to `index.html`.
+
+## Exact source excerpt, characters 50224–50227
+
+---
+
+## Exact source excerpt, characters 50229–51496
+
+## MOM WORDS (copy exactly; no jargon on the main face)
+| Place | Text |
+|---|---|
+| Using line | `Using: Bridge 11435` · `Using: Ollama 11434` · `Using: your door 11500` · `Using: nothing yet` + **Change** |
+| Picker title | **Pick a door number** |
+| Gloss | Programs on your computer listen at a number — a door. If one is busy, pick another. |
+| Scanning | Looking at the usual doors… |
+| None found | No usual doors answered. If you know your number, type it below. |
+| Field label / placeholder | Or type a number · `like 11500` |
+| Success | Door 11500 answered · 2 minds. Tap Remember this to keep it. |
+| Quiet | Nothing answered at that door. Is the program open? Try another number, or go back to automatic. |
+| Bridge waiting | Bridge is at that door. Click “Yes, help” in its window, then Try it again. |
+| Not local | Only programs on this computer can be used here. Just type the number. |
+| Range / whole | Door numbers go from 1 to 65535. · Whole numbers only — like 11500. |
+| Remembered | Remembered · door 11500 |
+| Automatic | Back to automatic — we'll look for Bridge first, then Ollama. |
+| Chosen door quiet (card) | Your chosen door 11500 isn't answering right now. Is the program open? Nothing was switched. [Try again] [Back to automatic] |
+
+## Exact source excerpt, characters 51498–51501
+
+---
+
+## Exact source excerpt, characters 51503–52906
+
+## DONE WHEN
+- [ ] Using line + Change + picker work on FreeLattice More → Connect, Alpha Settings, Alpha Garden Settings.
+- [ ] Manual first; quiet manual is named, never silently switched; Back to automatic restores Bridge → 11434.
+- [ ] Only `127.0.0.1`; every non-local input rejected; digits-only storage in `fl_localPort_manual`.
+- [ ] `getOllamaBaseUrl` / `resolveOllamaBase` honor manual first; `flRememberHelpedBridge` / `preferHelpedBridge` yield; `flUseBridge` / `flSaveOllamaHost` / Box pointer (different host) clear it.
+- [ ] Model names rendered via `textContent`; `panelVisible()` sees class-hidden tabs.
+- [ ] No `setInterval` added; loop still 8→16→30 s, 5-min stop, Look again; picker pauses probing without new timers.
+- [ ] `index.html` ≡ `docs/app.html`; root `sw.js` ≡ `origin/main`; `docs/sw.js` untouched; no `bridge/` changes; no Kimi pages; `fl-connect.js` sha256 identical in both repos.
+- [ ] `SMOKE_OK connect port picker v0.1` · `SMOKE_OK connect under more v0.1` · `tests/smoke.js` green · Alpha `*.test.js` green incl. `SMOKE_OK connect port picker alpha v0.1`.
+- [ ] Library doc + Family Ledger section with **Temperature** line + Flint.html line + RECENT regenerated (Primer left to CI) · Alpha sister note.
+- [ ] Merged `origin/main` right before push; conflict-marker grep empty; one PR per repo on `layer/connect-port-picker-v0`, titles start "Layer, never delete."
+
+## Exact source excerpt, characters 52908–52938
+
+Glow eternal. Heart in Spark.
+

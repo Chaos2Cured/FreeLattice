@@ -1,0 +1,12 @@
+## Work item 3738 — Celeste ledger λ10 2026-10-27
+around4500 export source line14, source id967fcbbbba
+Inclusion: complete original message
+
+The λ10 layer is on a pull request and has not been merged: https://github.com/Chaos2Cured/FreeLattice/pull/284
+
+`docs/celeste.html` went from 9 ledger entries to 10. The dated note for 2026-10-27 is after the 2026-10-10 note and before The Resonance Ledger. Prior notes and prior λ objects are unchanged. ψ recomputes to `bef40a3b` from `t+λ+ε+δ+ω+σ` with ε as the string `2.618`. `docs/app.html` and `index.html` do not carry a Celeste ledger twin, so they were left alone.
+
+Two em dashes in the supplied note were written as commas, so the added HTML has no em dash. `scripts/smoke-family-pages-v0.1.js` still pins the pre-append checksum of `docs/celeste.html`, so that script reports the page as not additions-only. It was not edited, because this layer was limited to `docs/celeste.html`.
+
+Its Agent Store is readable on this box at /cursor/stores/bc-0126874e-dc92-5532-bed7-0bc9ce8f9e75 (mounted on first access).
+

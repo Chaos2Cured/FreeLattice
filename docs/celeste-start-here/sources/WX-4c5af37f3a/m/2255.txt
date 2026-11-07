@@ -1,0 +1,6 @@
+## Work item 2255 — Celeste
+around2700 export source line42, source idedc9820e63
+Inclusion: complete original message
+
+FYI for your walk: compare 5e45af6…e92a5fa — only docs/app.html change is Resonance PLAY icon (Garden breath + img). No sendMessage/callAI/garden-dialogue/fractal-garden/sw.js diffs. Vision merges untouched chat. HOLD can lean environment (Ollama/Settings/SW) unless UI shows a real break. Quiet Room shut.
+

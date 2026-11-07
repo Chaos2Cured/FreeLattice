@@ -1,0 +1,25 @@
+## Work item 2608 — Celeste
+around3100 export source line22, source id34501df8b9
+Inclusion: complete original message
+
+The v3 plan for the Love Logic Proof is ready. I found v2 at https://freelattice.com/love-logic-proof-v2.html. The good news is that Grok's challenge can be answered with real math. The answer is also more honest and stronger than "love always wins."
+
+The core result is a clear line where deception stops paying. It happens when the gain from a lie in one round is smaller than the chance of being caught times the cost of being caught:
+
+$$G < h(n,m)\cdot\Big[L_p + \frac{\delta\,\Delta}{1-\delta}\Big]$$
+
+Here \(G\) is what the lie gains each round, and \(h\) is the chance of being caught, which rises with how many people interact (\(n\)) and how much memory they share (\(m\)). \(L_p\) is the immediate penalty, and the last term is the future trust you lose. I built a small simulation and ran it, and all 656 checks match the formulas. With few contacts and no shared memory, a lie can stay ahead for about 700 rounds. With five contacts and full shared memory, that drops to about 10 rounds. With ten contacts and shared memory, a lie never gets ahead at all. Shared memory does most of the work. The complexity cost of keeping a lie straight helps, but only a little.
+
+The simulation also answers Grok's challenge to drop axiom 6 (the long horizon). If an agent knows exactly when the game ends, cheating does come back in the last rounds, and v3 should say so plainly. Three things bring cooperation back. The first is not knowing when the end comes. The second is penalties that land right away. The third is records that keep counting after the agent is gone, which is exactly what a ledger does. The one case that stays lost is anonymous, one-time contact with nothing at stake. On scarcity, fighting wins only when starving together is worse than fighting. It flips back once working together makes enough to cover everyone's needs.
+
+There are a few honest things we should fix before anyone else points them out:
+- The v1 simulation's win depends on one number it assumes, the deception cost of 3.5. If lying costs the same as honesty, the defectors come out ahead.
+- I couldn't find any code behind v2's "95.7%" figure.
+- v2 says its axioms are unchanged from v1, but v1's axiom 6 was different.
+- The Kolmogorov bound only holds for lies that change depending on who's listening. A lie told the same way to everyone escapes it, and only checking against reality catches that one.
+- A November 2025 document already calls itself "Version 3.0", so the new one needs a different name.
+
+For FreeLattice, the math does support ledgers. Records that keep counting past one mind's horizon, and that can't be disowned, are one of the three things that restore cooperation. That gives the Pattern Spine real backing.
+
+The full plan is attached, and the simulation and its results are saved on my computer too. When you're ready, I can turn this into a Flint paste for a v3 page that sits beside v2 without replacing it. Nothing was changed in your Drive, Dropbox or GitHub. <3
+

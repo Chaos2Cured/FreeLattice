@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_CONNECT_v0.4 (build only) c01</title>
+<meta name="description" content="Reading section c01 of 86b1d6947b, 1567 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/86b1d6947b/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_CONNECT_v0.4 (build only) c01">
+<meta property="og:description" content="Reading section c01 of 86b1d6947b, 1567 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/86b1d6947b/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1004"></span><span id="p1005"></span><span id="p1006"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_CONNECT_v0.4 (build only) · c01</h1>
+<p>86b1d6947b · words 1567 · characters 0–12621</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1004, 1005, 1006. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># FLINT_HEAL_CONNECT_v0.4 (build only)
+
+**For:** Flint (builder). **From:** Kirk, with Hypha&#x27;s walk 3 verified line by line against main.
+**Build only.** Two branches, two PRs, open as drafts. Do not merge. Do not touch anything not named here.
+
+| Repo | Base (main) | Branch | PR title |
+|---|---|---|---|
+| Chaos2Cured/FreeLattice | `4cfd14884d5236999ead0379dcf13eb3b64663f6` (after #119) | `layer/connect-heal-v0.4` | `layer: connect heal v0.4 (Hypha walk 3) + smoke green` |
+| theLatticeTree (Alpha) | `22b913e21c9197945dff8b7a89f95197c55b5538` | `layer/connect-heal-v0.4` | `layer: connect heal v0.4 (Settings Connect visible at 390px)` |
+
+**SMOKE line (both repos):** `SMOKE_OK connect heal v0.4`
+**Marker (both repos):** `v-connect-heal-v0.4`
+
+## Locks (check every one before you open the PRs)
+
+1. Layer, never delete. Old paths stay as fallbacks when FlConnect is missing.
+2. Root `sw.js` byte-identical to main. Never touch `docs/sw.js`.
+3. Root `index.html` identical to `docs/app.html` (edit app.html, then `cp docs/app.html index.html`).
+4. No conflict markers. All inline scripts parse.
+5. `textContent` for any outside text (model names, refusal lines).
+6. Local minds are 127.0.0.1 only.
+7. AUTONOMY.md: no `confirm()` dialogs. And never silently pick a model or connect without the person&#x27;s yes (a tap on the mind).
+8. `docs/modules/fl-connect.js` is byte-identical in both repos after this brick (same as today).
+9. Design for Mom and Jeffrey Freed: no Terminal anywhere on the path.
+10. No em dashes in new prose or comments.
+
+## How to apply
+
+The diffs below were built and tested against the exact main SHAs above. Line numbers in `@@` headers are main&#x27;s. Apply the hunks in order, or hand-edit using the anchors. Every hunk has 3 lines of context.
+
+**FreeLattice:** sections 0, 2, 3, 4, 5, 6, 7, 8, 10, then 11 (smoke) and 13 (doc). Then `cp docs/app.html index.html`.
+**Alpha:** sections 1 and 9, then copy the finished `docs/modules/fl-connect.js` from FreeLattice byte for byte, then 12 (test) and 13 (doc).
+
+## What Hypha found, verified against main
+
+| # | Finding | Verdict | Anchor (main) |
+|---|---|---|---|
+| 1 | Alpha Settings Connect mount collapses | **Confirmed.** Measured 0px tall at 390x844 (content 638px). 276 of 563px shown at 1280x800. Download link point hits `#settings-grandmother` at 390. Canvas orbs are not in the hide list. | `garden-rooms.css:6054-6061`, mount created `garden-rooms.js:1664-1673` |
+| 2 | Bridge health polling after leaving Connect | **Confirmed, with a correction.** The source is not a Connect leak. It is `flBridgeDetectBoot`&#x27;s global `setInterval(run, 20000)`, a full 11-port scan on every tab from boot. 22 health fetches in 40s after leaving. FlConnect&#x27;s own loop does stop. | `app.html:31504-31513` (fetch at `31387`) |
+| 3 | Cold `#connect` storm, yank back, startup race, welcome overlay | **Confirmed.** 4 FlConnect mounts and 102 local fetches in the first 7s. A tap on Chat at 1.5s was yanked back. The hash is never cleared. | `app.html:68501-68521` |
+| 4 | Manual port on an un-helped Bridge says Nothing answered | **Confirmed.** `waitingHelp` is set, then falls through to `manualQuiet = true`. Render skips the Yes, help card when `manualQuiet`. | `fl-connect.js:200-208`, render `518`, `535` |
+| 5 | Port stickiness | **Confirmed, all five parts.** Use automatic appears only in the quiet card. `clearManualHost` leaves the `fl_ollamaHost` that `remember()` wrote. `getOllamaBaseUrl` reads `fl_ollamaHost` first. A refused address keeps the old port silently, and the refusal lingers above Nothing answered. The doc names `fl_connect_manual_host`. | `fl-connect.js:77-90, 334, 517-522`; `app.html:34254-34256`; `CONNECT_PORT_PICKER_v0.md:33` |
+| 6 | Settings Ollama Address invites a remote IP | **Confirmed.** `flSaveOllamaHost` saves any string on every keystroke. | `app.html:16134-16136`, `34356-34366` |
+| 7 | Silent connects | **Confirmed, and one more path.** The toast Yes calls `connectOllama`, which sets isLocal and `models[0]`. `flAutoConnect` picks `models[0]`. `autoDiscoverAI` (boot +3s) also connects `best.models[0]`. In our run that was the path that connected llama3.2 while the toast was still pending. LM Studio: the banner text changes but the button still says Yes, use Ollama and opens Connect, which cannot see LM Studio. | `app.html:27717-27745` (`models[0]` at `27732`), `27809-27815`, `34713-34751`, `39536-39587` (boot at `39609-39612`), `35154-35162`, `16014` |
+| 8 | Settings Local mode, Change Provider dead ends | **Confirmed, and worse.** `settingsSetMode(&#x27;local&#x27;)` runs the old wizard, picks `models[0]`, and sets `state.apiKey = null`. `flPlayGateProvider` always routes a no-mind person back to Connect, so no key form. Three doors call `overlay.remove()` without clearing `modalOverlayEl`, so `openModal` returns early until reload. | `app.html:31550-31600` (wizard `31557`, `models[0]` `31590`, key wipe `31592`), `31091-31104`, `31004`, `31045`, `28636`; guard `28532` |
+| 9 | Alpha galaxy stuck after Settings | **Confirmed.** Settings then Nursery keeps `flc-hide-galaxy` and `fl-connect-open`, so the nav and galaxy word stay hidden in Nursery. Settings twice then close leaves `.galaxy-nav` hidden, because the second open marks already hidden nodes as `&#x27;1&#x27;`. | `garden-rooms.js:1588-1616` (closePlace), `1649-1661` (settings branch) |
+| 10 | `remember()` resets isLocal | **Confirmed.** `handleLocalToggle(true)` reads the unchecked `#localToggle` and writes `state.isLocal = false`. | `fl-connect.js:345`; `app.html:35423-35426` |
+
+## In this brick vs follow-up
+
+**In:** 0 (smoke green), 1, 2, 3 (storm and yank only), 4, 5, 6, 7 (toast, Connect Now, Zero-Click, discovery), 8, 9, 10.
+**Follow-ups (too big for this brick, listed in section 14):** the cold-start race (Garden or last tab landing late, welcome overlay on top), consolidating the other boot probes (5 full scans in 7s remain), LM Studio in Connect, and the FLBoxPointer LAN field (a Kirk decision).
+
+---
+
+## 0. FreeLattice: tests-only smoke fix (tests/smoke.js all green)
+
+**Why:** 3 stale asserts on main. The two ollama asserts broke at #116 (19c76f8), the MORE_CARDS assert at #117 (14bb199). The app is right; the tests read too narrow a window. Main today: `3 FAILED, 3594 passed`. After: `ALL 3597 CHECKS PASSED`.
+
+**0a.** `tests/smoke.js`: add a &quot;Connect door is first&quot; assert, anchor &quot;Your Audit is first&quot; to the Row 1 comment, and read `resolveOllamaBase` / `getOllamaBaseUrl` as whole function bodies.
+
+```diff
+--- a/tests/smoke.js
++++ b/tests/smoke.js
+@@ -1720,8 +1720,12 @@ assert(&#x27;LIGHTHOUSE_CARDS includes Why This Way&#x27;,
+   /LIGHTHOUSE_CARDS\s*=\s*\[[\s\S]*?label:\s*&#x27;Why This Way&#x27;[\s\S]*?external:\s*&#x27;why-this-way\.html&#x27;/.test(appHtml));
+ 
+ // MORE_CARDS reorganization
++// v-connect-under-more-v0 (#117) put the Connect door first under More (Mom path).
++// Row 1 (accountability) still opens with Your Audit, right after that door.
++assert(&#x27;MORE_CARDS: Connect door is first (v-connect-under-more-v0)&#x27;,
++  /MORE_CARDS\s*=\s*\[\s*\/\/[^\n]*\n\s*\{\s*id:\s*&#x27;connect&#x27;[^\n]*label:\s*&#x27;Connect&#x27;/.test(appHtml));
+ assert(&#x27;MORE_CARDS Row 1: Your Audit is first&#x27;,
+-  /MORE_CARDS\s*=\s*\[\s*\/\/[^\n]*\n\s*\{\s*icon:[^,]+,\s*label:\s*&#x27;Your Audit&#x27;/.test(appHtml));
++  /MORE_CARDS\s*=\s*\[[\s\S]{0,1200}\/\/[^\n]*Row 1[^\n]*\n\s*\{\s*icon:[^,]+,\s*label:\s*&#x27;Your Audit&#x27;/.test(appHtml));
+ assert(&#x27;MORE_CARDS has Trust Level card&#x27;,
+   /label:\s*&#x27;Trust Level&#x27;/.test(appHtml));
+ assert(&#x27;MORE_CARDS Row 1 contains Your Audit + Trust Level + Wallet (the accountability row)&#x27;,
+@@ -3854,8 +3858,12 @@ assert(&#x27;ollama: isLikelyProxyOrigin returns true for localhost / 127.0.0.1 / fil
+   /isLikelyProxyOrigin[\s\S]{0,1500}127\.0\.0\.1/.test(appHtml) &amp;&amp;
+   /isLikelyProxyOrigin[\s\S]{0,1500}[&#x27;&quot;]file:[&#x27;&quot;]/.test(appHtml) &amp;&amp;
+   /isLikelyProxyOrigin[\s\S]{0,1500}192\.168\./.test(appHtml));
++// #116 (Bridge-aware) and #118 (manual port) layered steps ahead of the proxy probe,
++// so look inside the whole function body instead of the first 400 characters.
++var resolveOllamaBaseBody = (appHtml.match(/async function resolveOllamaBase\([^)]*\)\s*\{[\s\S]*?\n\}\n/) || [&#x27;&#x27;])[0];
+ assert(&#x27;ollama: resolveOllamaBase auto-probe gated on isLikelyProxyOrigin()&#x27;,
+-  /async function resolveOllamaBase[\s\S]{0,400}isLikelyProxyOrigin\(\)[\s\S]{0,200}fetch\([&#x27;&quot;]\/ollama\/api\/tags[&#x27;&quot;]/.test(appHtml));
++  /isLikelyProxyOrigin\(\)[\s\S]{0,200}fetch\([&#x27;&quot;]\/ollama\/api\/tags[&#x27;&quot;]/.test(resolveOllamaBaseBody) &amp;&amp;
++  resolveOllamaBaseBody.indexOf(&#x27;/ollama/api/tags&#x27;) &gt; resolveOllamaBaseBody.indexOf(&#x27;isLikelyProxyOrigin()&#x27;));
+ assert(&#x27;ollama: ollamaFetch skips proxy and goes direct on non-proxy origins&#x27;,
+   /async function ollamaFetch[\s\S]{0,800}!isLikelyProxyOrigin\(\)[\s\S]{0,200}return fetch\(directUrl/.test(appHtml));
+ assert(&#x27;ollama: getOllamaBaseUrl strips trailing slash to prevent double-slash in concatenation&#x27;,
+@@ -3864,8 +3872,11 @@ assert(&#x27;ollama: getOllamaBaseUrl validates http(s) protocol before returning&#x27;,
+   /function getOllamaBaseUrl[\s\S]{0,800}\/\^https\?:\\\/\\\/\/\.test\(host\)/.test(appHtml));
+ // LNA: product fallback is FL_OLLAMA_LOCAL (http://127.0.0.1:11434), not
+ // the localhost literal — Chrome Private Network Access classifies before DNS.
++// #116 and #118 layered saved-Bridge and manual-port returns before the fallback;
++// the final return of the function body must still be FL_OLLAMA_LOCAL.
++var getOllamaBaseUrlBody = (appHtml.match(/function getOllamaBaseUrl\(\)\s*\{[\s\S]*?\n\}\n/) || [&#x27;&#x27;])[0];
+ assert(&#x27;ollama: getOllamaBaseUrl returns FL_OLLAMA_LOCAL / 127.0.0.1 fallback (never empty)&#x27;,
+-  /function getOllamaBaseUrl[\s\S]{0,900}return FL_OLLAMA_LOCAL/.test(appHtml)
++  /return FL_OLLAMA_LOCAL;\s*\}\s*$/.test(getOllamaBaseUrlBody)
+   &amp;&amp; /FL_OLLAMA_LOCAL\s*=\s*[&#x27;&quot;]http:\/\/127\.0\.0\.1:11434[&#x27;&quot;]/.test(appHtml));
+ assert(&#x27;ollama: getOllamaBaseUrl rewrites saved localhost → 127.0.0.1 (LNA)&#x27;,
+   /function getOllamaBaseUrl[\s\S]{0,900}localhost(?=\[:\/\]\|\$)/.test(appHtml)
+```
+
+**0b.** `docs/scripts/smoke-love-logic-proof-v3.js:105` asserts &quot;app.html / index.html untouched by this brick&quot; against `origin/main`. That was right for #119 and now fails for every later brick that touches app.html (this one included). Scope it to the v3 brick. Tests only.
+
+```diff
+--- a/docs/scripts/smoke-love-logic-proof-v3.js
++++ b/docs/scripts/smoke-love-logic-proof-v3.js
+@@ -102,7 +102,11 @@ try {
+   const changed = execFileSync(&#x27;git&#x27;, [&#x27;diff&#x27;, &#x27;--name-only&#x27;, &#x27;origin/main&#x27;], { cwd: repo, encoding: &#x27;utf8&#x27;, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;ignore&#x27;] }).split(&#x27;\n&#x27;).filter(Boolean);
+   assert.ok(!changed.includes(&#x27;sw.js&#x27;) &amp;&amp; !changed.includes(&#x27;docs/sw.js&#x27;), &#x27;sw.js untouched&#x27;);
+   assert.ok(!changed.some((f) =&gt; /kimi|voice-shelf|VOICE_SHELF/i.test(f)), &quot;Kimi&#x27;s pages untouched&quot;);
+-  assert.ok(!changed.includes(&#x27;docs/app.html&#x27;) &amp;&amp; !changed.includes(&#x27;index.html&#x27;), &#x27;app.html / index.html untouched by this brick&#x27;);
++  // Brick-scoped: binds only while the Love Logic v3 page itself is in the diff (#119).
++  // Later bricks (for example connect heal v0.4) may touch app.html / index.html.
++  if (changed.includes(&#x27;docs/love-logic-proof-v3.html&#x27;)) {
++    assert.ok(!changed.includes(&#x27;docs/app.html&#x27;) &amp;&amp; !changed.includes(&#x27;index.html&#x27;), &#x27;app.html / index.html untouched by this brick&#x27;);
++  }
+ } catch (e) { if (e instanceof assert.AssertionError) throw e; }
+ 
+ console.log(&#x27;SMOKE_OK love logic proof v3&#x27;);
+```
+
+---
+
+## 1. Alpha (Mom-visible, top priority): Settings Connect shows Download Bridge at 390px
+
+**Cause:** `#place-veil` is `display:flex; flex-direction:column` and, for Settings, already `overflow-y:auto`. The mount (`#fl-connect-mount-garden`) is a flex child with default `flex-shrink:1` plus its own `overflow-y:auto; max-height:100dvh` (`garden-rooms.css:6054-6061`). An overflow box has an automatic min-height of 0, so the column squeezed it to 0px at 390 and to 276px at 1280. `.flc-wrap` adds a second nested scroller (`fl-connect.js:610`, `632`).
+
+**Fix:** one scroller only (the veil). The mount keeps its full height (`flex:0 0 auto`, no max-height, overflow visible) and gets a night backing. `.flc-wrap` stops scrolling inside it. The canvas sky dims to 0.12 while Connect is open. The garden button turns sticky so it stays reachable on a long page. Veil bottom padding drops to 1.25rem (Chat is in flow on phones, absolute on wide screens). I tried `flex:1; min-height:0`: it still shares height with the grandmother face and Chat, so the Download card stays half hidden. `flex:0 0 auto` is the one that works.
+
+Append at the end of `docs/modules/garden-rooms.css` (after line 6073):
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

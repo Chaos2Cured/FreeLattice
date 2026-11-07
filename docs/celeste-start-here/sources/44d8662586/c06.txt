@@ -1,0 +1,184 @@
+ '') };
++    });
++    var system = list.filter(function (m) { return m.role === 'system'; }).map(function (m) { return m.content; }).join('\n');
++    var talk = list.filter(function (m) { return m.role !== 'system'; });
++    if (p.type === 'anthropic') {
++      headers['x-api-key'] = key;
++      headers['anthropic-version'] = '2023-06-01';
++      headers['anthropic-dangerous-direct-browser-access'] = 'true';
++      body = { model: model, max_tokens: 1024, messages: talk };
++      if (system) body.system = system;
++    } else if (p.type === 'google') {
++      headers['x-goog-api-key'] = key; // a header, never a query string
++      url = p.url + encodeURIComponent(model) + ':generateContent';
++      body = { contents: talk.map(function (m) {
++        return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
++      }) };
++      if (system) body.systemInstruction = { parts: [{ text: system }] };
++    } else {
++      headers['Authorization'] = 'Bearer ' + key;
++      body = { model: model, messages: list, stream: false };
++    }
++    return { url: url, headers: headers, body: body, type: p.type };
++  }
++
++  function parseReply(type, json) {
++    if (!json || typeof json !== 'object') return '';
++    if (type === 'anthropic') {
++      return (json.content || []).map(function (c) { return c && c.type === 'text' ? String(c.text || '') : ''; }).join('').trim();
++    }
++    if (type === 'google') {
++      var c = json.candidates && json.candidates[0];
++      var parts = (c && c.content && c.content.parts) || [];
++      return parts.map(function (x) { return String((x && x.text) || ''); }).join('').trim();
++    }
++    var ch = json.choices && json.choices[0];
++    return ch && ch.message && ch.message.content ? String(ch.message.content).trim() : '';
++  }
++
++  function send(mind, msgs) {
++    var id = providerIdOf(mind);
++    var p = provider(id);
++    if (!p) return Promise.reject(cloudErr('This chair names a cloud provider this garden does not know. Nothing was sent.'));
++    var model = cleanModel(mind.model);
++    if (!model) return Promise.reject(cloudErr('This chair has no model name for ' + p.name + '. Use Change to pick one. Nothing was sent.'));
++    if (!getKey(id)) {
++      return Promise.reject(cloudErr('No ' + p.name + ' key is in this browser now. Add it in the Gathering (Change, then Seat a mind by API key). Nothing was sent.'));
++    }
++    var req = buildRequest(id, model, msgs);
++    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
++    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
++    var opts = { method: 'POST', mode: 'cors', cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer',
++      headers: req.headers, body: JSON.stringify(req.body) };
++    if (ctrl) opts.signal = ctrl.signal;
++    return fetch(req.url, opts).then(function (res) {
++      clearTimeout(timer);
++      if (!res.ok) {
++        var s = res.status;
++        if (s === 401 || s === 403) throw cloudErr(p.name + ' did not accept the key. Check it, or Forget it and paste a new one. Nothing was invented.');
++        if (s === 429) throw cloudErr(p.name + ' asked us to slow down (a rate limit or no credit left). Nothing was invented.');
++        if (s === 400 || s === 404) throw cloudErr(p.name + ' did not take the model ' + model + '. Use Change to pick another. Nothing was invented.');
++        throw cloudErr(p.name + ' answered with an error (' + s + '). Nothing was invented.');
++      }
++      return res.json().then(function (json) {
++        var text = parseReply(req.type, json);
++        if (!text) throw cloudErr(p.name + ' was quiet. Nothing was invented.');
++        return text;
++      }, function () { throw cloudErr(p.name + ' sent something we could not read. Nothing was invented.'); });
++    }, function () {
++      clearTimeout(timer);
++      throw cloudErr('The browser could not reach ' + p.name + ' from here (offline, blocked, or it took too long). Nothing was invented.');
++    });
++  }
++
++  function heartLine(mind) {
++    var n = providerName(mind);
++    return 'Listening: ' + String((mind && mind.model) || 'a cloud mind') + ' through ' + n +
++      '. Your words go to ' + n + '. Your key stays in this browser.';
++  }
++  function honestNote(id) {
++    var n = providerName(id);
++    return 'Your key stays in this browser on this device. theLatticeTree has no server and never sees it. ' +
++      'It goes only to ' + n + ', with each message, when a chair seated through ' + n + ' speaks. Your words go to ' + n +
++      ' too, so they leave this computer; files you add stay here. Anyone using this browser profile could find the key. Forget removes it.';
++  }
++
++  // ---------- the panel (inside the Gathering chair picker) ----------
++  function el(tag, cls, text) {
++    var n = document.createElement(tag);
++    if (cls) n.className = cls;
++    if (text) n.textContent = text;
++    return n;
++  }
++
++  function mountKeyPanel(host, onSeat) {
++    if (!host || typeof document === 'undefined') return null;
++    var box = el('details', 'cloud-key-panel');
++    box.setAttribute('data-cloud-key-panel', '1');
++    box.setAttribute('data-marker', MARK);
++    var sum = el('summary', 'cloud-key-summary', 'Seat a mind by API key');
++    box.appendChild(sum);
++
++    var lead = el('p', 'cloud-key-lead', 'Your own key, your own choice. Local and cloud minds sit side by side; switch chairs in any order.');
++    box.appendChild(lead);
++
++    var pLabel = el('label', 'cloud-key-label', 'Provider');
++    var pSel = el('select', 'cloud-key-provider');
++    pSel.setAttribute('data-cloud-provider', '1');
++    pSel.id = 'cloud-key-provider-' + Math.random().toString(36).slice(2, 8);
++    pLabel.htmlFor = pSel.id;
++    ORDER.forEach(function (id) {
++      var o = el('option', '', PROVIDERS[id].name);
++      o.value = id;
++      pSel.appendChild(o);
++    });
++    box.appendChild(pLabel);
++    box.appendChild(pSel);
++
++    var mLabel = el('label', 'cloud-key-label', 'Model');
++    var mIn = el('input', 'cloud-key-model');
++    mIn.type = 'text';
++    mIn.setAttribute('data-cloud-model', '1');
++    mIn.setAttribute('autocomplete', 'off');
++    mIn.setAttribute('spellcheck', 'false');
++    mIn.id = pSel.id + '-m';
++    mLabel.htmlFor = mIn.id;
++    var dl = el('datalist');
++    dl.id = pSel.id + '-dl';
++    mIn.setAttribute('list', dl.id);
++    box.appendChild(mLabel);
++    box.appendChild(mIn);
++    box.appendChild(dl);
++
++    var kLabel = el('label', 'cloud-key-label', 'API key');
++    var kIn = el('input', 'cloud-key-input');
++    kIn.type = 'password';
++    kIn.setAttribute('data-cloud-key', '1');
++    kIn.setAttribute('autocomplete', 'off');
++    kIn.setAttribute('spellcheck', 'false');
++    kIn.id = pSel.id + '-k';
++    kLabel.htmlFor = kIn.id;
++    box.appendChild(kLabel);
++    box.appendChild(kIn);
++
++    var visitRow = el('label', 'cloud-key-visit');
++    var visit = el('input');
++    visit.type = 'checkbox';
++    visit.setAttribute('data-cloud-visit', '1');
++    visitRow.appendChild(visit);
++    visitRow.appendChild(document.createTextNode(' Only for this visit (forget when this tab closes)'));
++    box.appendChild(visitRow);
++
++    var getLink = el('a', 'cloud-key-get', '');
++    getLink.target = '_blank';
++    getLink.rel = 'noopener noreferrer';
++    box.appendChild(getLink);
++
++    var note = el('p', 'cloud-key-note');
++    note.setAttribute('data-cloud-note', '1');
++    box.appendChild(note);
++
++    var save = el('button', 'cloud-key-save', 'Save and seat');
++    save.type = 'button';
++    save.setAttribute('data-cloud-save', '1');
++    box.appendChild(save);
++
++    var status = el('p', 'cloud-key-status');
++    status.setAttribute('role', 'status');
++    status.setAttribute('data-cloud-status', '1');
++    box.appendChild(status);
++
++    var saved = el('div', 'cloud-key-saved');
++    saved.setAttribute('data-cloud-saved', '1');
++    box.appendChild(saved);
++
++    function paintProvider() {
++      var id = pSel.value;
++      var p = PROVIDERS[id];
++      while (dl.firstChild) dl.removeChild(dl.firstChild);
++      p.models.forEach(function (m) { var o = el('option'); o.value = m; dl.appendChild(o); });
++      if (!mIn.value || !MODEL_RE.test(mIn.value) || mIn.getAttribute('data-from') !== id) {
++        mIn.value = p.models[0] || '';
++        mIn.setAttribute('data-from', id);
++      }
++      var tail =

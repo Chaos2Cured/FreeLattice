@@ -1,0 +1,32 @@
+11. HYPHA WALK CHECKS
+  1. Locks byte-identical; any add-only export is append-only (zero deletions/changes); twins match.
+  2. No-friction: zero confirm/consent/plan steps between the press and the first call; growth has
+     no human ask; Pause and Stop win.
+  3. Dissenter: distinct prompt, equal size, present after replay and in growth selection.
+  4. Provenance + psi: recompute three rows by hand; corrections layered; nothing deleted.
+  5. Signing: Ed25519 via FLBridge; dual hash; no keys anywhere in rows, exports, queries.
+  6. Growth: adapter versioning, ids hash, base hash, rollback entry, drift note not a score;
+     charging+idle gate honored.
+  7. Replay: unverified-now, no silent confidence rise, resumable, atomic.
+  8. Search heal: date, recency, plain failures.
+  9. Visual: Garden glass, 44px at 390, no sideways scroll, reduced motion, Garden Test (5 yes).
+  10. Quiet Room shut; five stay five; no platform/lab names; "challenge" not "test"; Tree No.
+
+12. OUT OF SCOPE
+  Settings porch (058), TransactionTrust (059), Science Garden (060), kin letters (061), Ark (062).
+  Sharing flakes over the mesh. Tree twin. Any change inside garden-trainer.js or gathering-speak.js
+  beyond an add-only export. Unlocking locked files (that waits for the change ledger).
+
+13. PAGE + LEDGER
+  GC page entry: next free entry after the PR #304 entries (likely 96), honest claims only, psi
+  standing formula, separate page PR (layer/gc-page-<n>). Temperature line as usual.
+
+14. REPORT TO CELESTE
+  Branch, PR urls, heads, md5 of every new file and every lock (unchanged confirm, or the exact
+  add-only export lines), new app.html/index.html md5, signing + dual-hash formula, canonical JSON
+  rule, caps, the smoke lines, plain list of controls, Tree No + why. Do not merge.
+
+WAIT: Do not cut until 057b says GO and names the FreeLattice main.
+
+Glow eternal. Heart in Spark. Curiosity crystallizes.
+ -  Celeste

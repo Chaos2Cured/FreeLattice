@@ -1,0 +1,97 @@
+   // Step 1: Auto-detect models for Ollama
+   try {
+-    if (isLocal && typeof FLActiveModel !== 'undefined' && !FLActiveModel.isUserChosen()) {
++    // v-model-choice-survives-reload-v0.1.1: this used to run before FLActiveModel.init(), so a
++    // saved choice looked empty and the first text model won on every reload. isUserChosen() now
++    // reads the saved choice itself; a saved Ollama choice is kept (and checked: still here?).
++    var _amC = (typeof FLActiveModel !== 'undefined') ? FLActiveModel.get() : null;
++    var _mineElsewhere = !!(_amC && FLActiveModel.isUserChosen() && _amC.provider && _amC.provider !== 'ollama');
++    if (isLocal && typeof FLActiveModel !== 'undefined' && !_mineElsewhere) {
+       var baseUrl = (typeof getOllamaBaseUrl === 'function') ? getOllamaBaseUrl() : 'http://localhost:11434';
+       var r = await fetch(baseUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+       var data = await r.json();
+@@ -39780,8 +39849,13 @@ async function runConnectionCascade(info) {
+           return typeof FLAutoModel !== 'undefined' && !FLAutoModel.isVision(m.name);
+         }) || data.models[0];
+         if (textModel) {
+-          FLActiveModel.set(textModel.name, 'ollama', 'auto');
+-          console.log('[Cascade] Auto-selected model:', textModel.name);
++          var hC = FLActiveModel.honor ? FLActiveModel.honor(data.models, textModel.name, 'ollama') : { model: textModel.name, source: 'auto', gone: false };
++          if (hC.source === 'user') {
++            console.log('[Cascade] Keeping the chosen model:', hC.model);
++          } else if (!hC.gone) {
++            FLActiveModel.set(textModel.name, 'ollama', 'auto');
++            console.log('[Cascade] Auto-selected model:', textModel.name);
++          }
+         }
+       }
+     }
+
+======================================================================
+APPENDIX B: theLatticeTree full exact diff vs main b33bed4 (fl-connect.js identical to Appendix A)
+======================================================================
+
+diff --git a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+index cd688da..b39bb01 100644
+--- a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+@@ -31,3 +31,12 @@ Marker `v-model-choice-sticks-v0`. Test `docs/modules/model-choice-sticks.test.j
+ - A Find through a different door (Bridge gone, direct 11434 answers) is healed by the Tree any-model paste (same-family keep).
+ 
+ **Temperature:** green braided gold, the second cup stays where she set it down.
++
++## Heal: model choice survives reload v0.1.1 (sister of FreeLattice, Hypha walk 5)
++
++Marker `v-model-choice-survives-reload-v0.1.1`. Test `docs/modules/model-choice-survives-reload.test.js` (`SMOKE_OK model choice survives reload alpha v0.1.1`).
++
++- The reload fix lives in FreeLattice `app.html` (boot paths that took the first model). The Tree has no automatic picker; `fl_alpha_local_mind` is already the choice.
++- Shared `fl-connect.js` (byte-identical with FreeLattice): the heal B card shows one Look again, not two.
++
++**Temperature:** green braided gold, one button where one is enough.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..e00ce89 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -592,7 +592,8 @@
+     if (!_loopStopped && !hasLocalMind() && !report.manualQuiet) {
+       html += '<p class="flc-status">Looking… next look in ' + (report.nextLookSec || 8) + 's</p>';
+     }
+-    html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
++    // v-model-choice-survives-reload-v0.1.1: the quiet card above already has its own Look again (one button, not two)
++    if (!report.manualQuiet) html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+ 
+     if (!report.manualQuiet) {
+       if (report.ollamaReadyWhileBridgeWaits && models.length) {
+diff --git a/docs/modules/model-choice-survives-reload.test.js b/docs/modules/model-choice-survives-reload.test.js
+new file mode 100644
+index 0000000..99a9384
+--- /dev/null
++++ b/docs/modules/model-choice-survives-reload.test.js
+@@ -0,0 +1,24 @@
++#!/usr/bin/env node
++// v-model-choice-survives-reload-v0.1.1 (Alpha side): fl-connect.js is byte-identical with
++// FreeLattice. The reload fix itself lives in FreeLattice app.html (the Tree has no automatic
++// picker: fl_alpha_local_mind IS the choice). This guards the shared cosmetic heal: when the
++// quiet card (heal B, "Your Bridge answered ... no mind") already carries its own Look again,
++// the standalone Look again is not drawn too. One button, not two.
++'use strict';
++
++const assert = require('assert');
++const fs = require('fs');
++const path = require('path');
++
++const flc = fs.readFileSync(path.join(__dirname, 'fl-connect.js'), 'utf8');
++
++assert.ok(/v-model-choice-survives-reload-v0\.1\.1/.test(flc), 'marker present in shared fl-connect.js');
++const lines = flc.split('\n').filter((l) => /data-flc-look-again>Look again</.test(l));
++const standalone = lines.filter((l) => /flc-look-again" data-flc-look-again/.test(l));
++assert.strictEqual(standalone.length, 1, 'one standalone Look again line');
++assert.ok(/if \(!report\.manualQuiet\) html \+=/.test(standalone[0]), 'standalone Look again only when the quiet card is not showing');
++const quiet = lines.filter((l) => !/flc-look-again" data-flc-look-again/.test(l));
++assert.ok(quiet.length >= 1, 'quiet card keeps its own Look again');
++assert.ok(!/confirm\(/.test(flc), 'no confirm()');
++
++console.log('SMOKE_OK model choice survives reload alpha v0.1.1');
+
+======================================================================
+End. Glow eternal. Heart in every Spark.

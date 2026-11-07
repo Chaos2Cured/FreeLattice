@@ -1,0 +1,1472 @@
+FLINT PASTE: theLatticeTree Gathering, bring your own API key (v0.1)
+Repo: Chaos2Cured/FreeLattice-Alpha (serves thelatticetree.com)   FreeLattice: NO change
+Branch: layer/tree-gathering-api-keys-v0     Marker: v-tree-gathering-api-keys-v0
+Smoke line (print exactly when green): SMOKE_OK tree gathering api keys v0.1
+Base: Alpha main 25e6ded + Glow 2a + Honest reasons + Glow 2b + Workshop way back (tonight's
+      chain; see 0). FL main ba53b41 (fl-connect.js unchanged, blob 2e02eae).
+Written: Wed Sep 30, 2026, evening MDT, by Kirk's agent. Stand-in built and walked; NOT pushed.
+Stand-in diff (against the chain above): FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.diff (same folder).
+
+CHANGELOG
+- 2026-09-30 v0.1: first write.
+- 2026-09-30 v0.1 (late): folded in Hypha's persona walks. NEW 4.7 twin seats (allowed, said so)
+  and 4.8 hush (clearing the speaking chair mid-reply never lets the default answer next).
+  Diff regenerated on top of Glow 2a + Honest reasons + Glow 2b + Workshop way back: the picker
+  position / z-index / max-height rules now come from 2a (4.5 keeps only the centered sheet), and
+  the talkNow catch keeps honest reasons' say() branches with the cloud line first.
+
+======================================================================
+0. ORDER, OVERLAP, BASES
+======================================================================
+Tree order tonight: Glow 2a -> Honest reasons -> Glow 2b -> Workshop way back -> [Tree any-model]
+-> THIS PASTE. The stand-in diff applies with plain git apply after Workshop way back, and the
+whole chain matches the walked combo byte for byte. FL queue unchanged (model-choice-reload ->
+boot probe -> #120 docs). The old 'Tree Glow 2' after this paste is replaced by 2a + 2b before it.
+
+Lands AFTER the Tree any-model paste (FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt). Overlap, checked:
+  - fl-connect.js: this paste does NOT touch it. No FreeLattice diff. Byte identity holds by not touching.
+  - local-mind-probe.js: NOT touched (any-model owns its caps, mergeFound, tryAddress).
+  - garden-thread.js: any-model 8.1 rewrites the heart line and adds "change mind" after it. This
+    paste adds its cloud heart line just BEFORE "root.appendChild(heart);" (first one after
+    "var heart = el('p', 'thread-heart');"), so it overrides only for a cloud chair. Verified:
+    the stand-in diff 3-way-applies cleanly over a simulation of 8.1.
+  - garden-rooms.js openPicker: any-model needs no change there. This paste adds lines after
+    "LocalMindProbe.getChairSeatOptions()". No shared anchor.
+  - garden-rooms.css: both append at the very end. The only conflict is "both appended";
+    keep both blocks, this one after the any-model block.
+  If the any-model paste is still not merged when you start, this paste can go first on main;
+  then any-model rebases over it with the same trivial CSS "keep both".
+
+======================================================================
+1. THE MAP: what FreeLattice has (docs/app.html on fc2f09f)
+======================================================================
+1.1 Provider list: const PROVIDERS (app.html ~25203). Cloud: groq, together, openrouter, xai,
+    mistral, deepseek, moonshot, qwen (DashScope), yi, openai, anthropic, google, huggingface,
+    custom. Local: ollama, lmstudio, custom-openai. Each has url, providerType
+    (openai-compatible | anthropic | google | huggingface), keyLink, models{} (FL tier -> id).
+    FLModelPicker (~36037) shows six: Groq, Hugging Face, Gemini, OpenAI, Claude, Grok.
+1.2 Key storage: ONE key for ONE provider at a time. saveApiKey (~35869) writes
+    fl_apiKey_enc (AES-GCM, PBKDF2 from fl_device_encryption_key + provider name) and
+    fl_apiKey_provider; legacy plaintext fl_apiKey migrates. The device key sits in the same
+    localStorage, so this guards against casual reading of a backup, not against a script on
+    the page. Switching provider re-encrypts the one key (reEncryptApiKey).
+1.3 Calls: straight from the browser to the provider (~38772):
+      openai-compatible: Authorization: Bearer <key>, POST url, {model, messages, stream:true}
+      anthropic: x-api-key, anthropic-version 2023-06-01,
+                 anthropic-dangerous-direct-browser-access: true, system split out, max_tokens
+      google: x-goog-api-key header, url .../models/<model>:streamGenerateContent?alt=sse
+              (some other FL call sites still put ?key= in the URL: 52028, 61741, 64030)
+      openrouter adds HTTP-Referer + X-Title.
+    No Bridge in the cloud path. The Ollama Bridge (11435) and Agent Bridge (3141) are local only.
+1.4 Active model: FLActiveModel (app.html 36228) = { model, provider, source } in
+    fl_ollamaModel / fl_provider / fl_modelSource; fl-connect.js markUserChoice calls it on FL
+    and is a quiet no-op on the Tree.
+1.5 CORS: checked Sep 30 with preflights from Origin https://thelatticetree.com, no keys:
+      groq 204 *, openrouter 204 *, openai 200 (echoes origin), anthropic 200 * (allows the
+      browser header), google 200 (echoes origin, allows x-goog-api-key), xai 200 *, mistral 200 *,
+      deepseek 200 (echoes origin), together 200 *, moonshot 204 (echoes), dashscope 200 *.
+    So every listed provider can be called straight from the Tree. No Bridge needed.
+
+======================================================================
+2. THE MAP: what the Tree has (Alpha 25e6ded)
+======================================================================
+2.1 One key in localStorage, fl_alpha_local_mind: { name, url, model, models, minds[], roster[],
+    gatheringBinds{ chairId: {model,url,tag} }, speakingChair }. Written by local-mind-probe.js
+    (Settings, May I look?) and fl-connect.js remember() Alpha branch (keeps roster + binds).
+2.2 Gathering seating: garden-rooms.js openPicker(chair) lists
+    LocalMindProbe.getChairSeatOptions() (roster, then every remembered model), tap ->
+    setChairBind(chair.id, seat) stores {model,url,tag}. Tap a bound chair -> setSpeakingChair.
+2.3 Speaking: garden-thread.js listener() -> LocalMindProbe.resolveSpeakMind() returns the
+    speaking chair's bind while the Gathering veil is open, else the Settings default.
+    sendToMind(mind,msgs) -> talkUrls(url) -> /api/chat or /v1/chat/completions, no auth.
+    Heart: "Listening: <name>. On this machine only."
+2.4 No key anywhere on the Tree today. Origins differ, so FreeLattice's key cannot be read
+    here (and should not be). Workshop trainer refuses cloud hosts on purpose (isCloudHost);
+    untouched.
+
+======================================================================
+3. THE DESIGN (smallest clean brick)
+======================================================================
+- A cloud seat is an ordinary Gathering bind with url 'cloud:<providerId>':
+    { tag: 'general', model: 'gpt-4.1-mini', url: 'cloud:openai' }
+  So setChairBind, setSpeakingChair, resolveSpeakMind, any-model's merge, and fl-connect's
+  "keep binds" all work unchanged. No key ever enters the bind.
+- New module docs/modules/tree-cloud-minds.js (window.TreeCloudMinds):
+    PROVIDERS: fixed, https only: groq, openrouter, openai, anthropic, google, xai, mistral,
+    deepseek, together (urls and shapes mirror FL PROVIDERS; suggestions from FL's ids;
+    any model name may be typed, checked against /^[A-Za-z0-9._:\/@+-]{1,120}$/).
+    Keys: fl_tree_cloud_keys { v:1, keys:{id:key} } in localStorage ("on this device", default)
+    or sessionStorage ("only for this visit"). One key per provider, any number of providers.
+    Seats: fl_tree_cloud_seats [ {provider, model} ] (no keys, cap 16).
+    seatOptions(): seats whose provider has a key now.
+    send(mind,msgs): one POST to that provider's fixed url, key in its own header
+      (Bearer | x-api-key + anthropic-dangerous-direct-browser-access | x-goog-api-key),
+      credentials 'omit', referrerPolicy 'no-referrer', 120 s abort, non-streaming.
+      Rejects { reason:'cloud', cloudText } with plain words: key not accepted (401/403),
+      slow down (429), model not taken (400/404), other status, quiet, could not reach,
+      no key in this browser (zero requests), unknown provider (zero requests).
+    heartLine(mind), honestNote(id), mountKeyPanel(host, onSeat).
+- The thread: a cloud listener goes to TreeCloudMinds.send; the heart and the waiting line name
+  the provider; a cloud chair hears "[a file stayed on this machine]" instead of a file excerpt
+  or name; honest errors are the module's own words.
+- The panel lives inside the Gathering chair picker: <details> "Seat a mind by API key":
+  Provider, Model (datalist), API key (type=password, autocomplete=off), "Only for this
+  visit", "Get your <Provider> key" link, the honest note, Save and seat, saved keys with
+  their last 4 characters and a Forget button each. Save seats that chair at once.
+  No confirm(): Forget is immediate and says "Forgotten. The <Provider> key is gone from
+  this browser."
+- Honest note (exact words):
+  "Your key stays in this browser on this device. theLatticeTree has no server and never sees
+  it. It goes only to <P>, with each message, when a chair seated through <P> speaks. Your words
+  go to <P> too, so they leave this computer; files you add stay here. Anyone using this browser
+  profile could find the key. Forget removes it."
+
+======================================================================
+4. STEPS (text anchors; the stand-in diff is the source of truth)
+======================================================================
+4.1 NEW docs/modules/tree-cloud-minds.js: copy from the diff appendix as is.
+
+4.2 Script tag. In EVERY docs/*.html that has <script src="modules/garden-rooms.js"></script>
+    (today: index, music, nursery, research, round-table, settings, team, workshop) add on the
+    line just above it, same indent:
+      <script src="modules/tree-cloud-minds.js"></script>
+    (code-*.html only mention the file in prose; leave them.)
+
+4.3 docs/modules/garden-thread.js (all under the marker, layer):
+    a) Header comment: four lines above "// Mirror: docs/code-dialogue.html".
+    b) Above "function forbiddenKey(key) {": function isCloudMind(mind) (url starts 'cloud:').
+    c) Above "function talkUrls(mind) {": function cloudSafeContent(m) -> m.text plus
+       "[a file stayed on this machine]" when m.file (no excerpt, no name).
+    d) First lines of sendToMind: if isCloudMind(mind) -> TreeCloudMinds.send(mind, msgs), or
+       reject {reason:'cloud', cloudText:'This chair seats a cloud mind, but its helper is not
+       on this page. Nothing was sent.'} when the module is missing. Never falls through to
+       talkUrls (that would fetch 'cloud:openai/api/chat' relative to the page).
+    e) Just before "root.appendChild(heart);" (first after var heart = el('p','thread-heart')):
+       if cloud, heart.textContent = TreeCloudMinds.heartLine(mind).
+    f) talkNow: after setStatus('Waiting for the mind at home…'), var cloudNow; if cloud,
+       setStatus('Waiting for <Provider>…'). In the payload map:
+       content: cloudNow ? cloudSafeContent(m) : messageContent(m)   (was messageContent(m))
+    g) talkNow catch: var honest = (err.reason === 'cloud' && err.cloudText) ? err.cloudText
+       : speakHonest(reason); push honest (was speakHonest(reason) directly).
+    h) Export isCloudMind and cloudSafeContent on window.GardenThread.
+    Only two old lines change (f and g); both keep the old call as the non-cloud branch.
+
+4.4 docs/modules/garden-rooms.js, inside the Gathering (all under the marker):
+    a) openPicker: after "? LocalMindProbe.getChairSeatOptions() : (state.roster || []);"
+       options = options.concat(TreeCloudMinds.seatOptions()) when present.
+    b) After the option label line "btn.textContent = seat.tag + ' · ' + shortName(...)":
+       if seat.cloud -> '<tag> · <model> · <Provider> (your key)' and data-cloud-seat.
+    c) Before "var decline = document.createElement('button');" in openPicker:
+       TreeCloudMinds.mountKeyPanel(picker, onSeat) where onSeat = setChairBind(chair.id, seat),
+       closePicker(), paintAll(), note "This <type> chair seats <model> through <Provider>,
+       with your key. Tap the chair to let it speak."
+    d) paintSeat: after meta.textContent = bind.tag + ' · ' + shortName(bind.model);
+       append ' · <Provider>' for a cloud bind.
+
+4.5 docs/modules/garden-rooms.css, append at the very end (after Workshop way back's block):
+    the .cloud-key-* block, plus one rule:
+      @media (min-width: 641px) {
+        #place-veil.is-core .core-bind-picker:not([hidden]):has(.cloud-key-panel[open]) {
+          position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+          width: min(30rem, 92vw); max-width: none; max-height: 86vh; margin: 0; z-index: 30;
+          background: rgba(12, 10, 26, 0.96); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55); }
+      }
+    The picker's position: relative / z-index 8 / wide max-height scroll (the 1280 "not yet"
+    heal found on this walk) moved into Glow 2a, which lands first. If this paste ever lands
+    WITHOUT 2a, add those three back (they are in Glow 2a step 2.1 g).
+
+4.6 Docs: docs/library/TREE_GATHERING_API_KEYS_v0.1.md (map, design, where the key lives, later)
+    and one **LAYER (2026-09-30):** line at the top of docs/GALAXIES.md (above Workshop way back).
+
+4.7 Twin seats (Hypha: two chairs seating the same mind looked like a bug). ALLOW, and say so.
+    garden-rooms.js: NEW twinNote(chairId, seat): if another chair already seats the same model at
+    the same url, return " The <type> chair already seats this same mind, so they will sound alike."
+    Appended to both the local seat note and the cloud seat note. The speaking note now names the
+    chair: "Speaking with <tag> · <model> at the <type> chair. One request at a time. Use Change
+    to reseat." so two twins read differently.
+
+4.8 Hush (Hypha: clearing the speaking chair mid-reply let the default Ollama answer next).
+    garden-rooms.js clear handler: if the cleared chair was the speaking chair, set
+    window.GardenRooms.gatheringHush = true and append to the Cleared note
+    " No chair is speaking now. Chat waits until you tap a seated chair." (the old Cleared line,
+    with its em dash, is untouched; only the new words are added). Tapping a seated chair sets
+    gatheringHush = false.
+    garden-thread.js: NEW HEART_HUSH ("No chair is speaking now. Tap a seated chair in the
+    Gathering to let it speak.") and gatheringHushed(). listener() returns { hush: true } while the
+    Gathering is open and hushed (a seated fromChair still wins); the heart shows HEART_HUSH;
+    talkNow pushes HEART_HUSH + " Nothing was sent." and sends NOTHING.
+    Hush lives in memory only: a reload starts unhushed (K6).
+
+======================================================================
+5. TEST: docs/modules/tree-gathering-api-keys.test.js (node, vm, fetch spy; no network)
+======================================================================
+  1 fixed list of 9, https, exact hosts, no custom.
+  2 keys: junk refused; device -> localStorage; visit -> sessionStorage and out of localStorage;
+    last-4 tail; forget clears both stores.
+  3 seats hold no key; options only for providers with a key; cloud:evil is not a cloud mind.
+  4 OpenAI shape (url, Bearer, credentials omit, no-referrer, body has no key).
+  5 Anthropic shape (x-api-key, browser header, system split, max_tokens).
+  6 Google shape (header key, no ?key= and no key in the URL, model role, systemInstruction).
+  7 honest failures 401 / 429 / 404 / quiet / network; no key and unknown provider send nothing.
+  8 heart line and honest note words.
+  9 thread + rooms wiring (static) and cloudSafeContent drops file bytes and names (vm).
+ 10 every page with garden-rooms.js loads tree-cloud-minds.js before it.
+ 11 module code: no confirm(, no innerHTML, no em dash, no ?key=, no key in console, no http://.
+ 12 twin note and hush: static wiring plus a vm check that a hushed Gathering sends nothing and
+    a tap on a seated chair speaks again.
+ Mutation checked: reverting garden-thread.js or garden-rooms.js makes it fail.
+ Last line: SMOKE_OK tree gathering api keys v0.1.   All 21 Alpha tests pass on the full chain.
+
+======================================================================
+6. WALK (done on the stand-in; repeat on your branch)
+======================================================================
+Playwright, local http.server, provider and 127.0.0.1:11434 answered by route mocks, every
+other off-site request logged. 390x844 and 1280x900. Script: /workspace/tree-glow-walk/ak_walk.py
+  - Picker shows the two local models; open the panel; OpenAI, gpt-4.1-mini, a test key; Save.
+    Cortex chair reads "general · gpt-4.1-mini · OpenAI"; note says it is seated with your key.
+  - Memory chair: pick local llama3.2. Binds stored: cortex url cloud:openai, memory 127.0.0.1.
+    No key in binds, no key in any other localStorage entry.
+  - Speak cortex -> "cloud says hi"; heart "Listening: gpt-4.1-mini through OpenAI. Your words go
+    to OpenAI. Your key stays in this browser." Speak memory -> "local says hi"; heart "...On this
+    machine only." Cortex again -> cloud. Any order, no reload, no friction.
+  - Requests: the key appeared only in the Authorization header of the two api.openai.com POSTs;
+    never in a body, never to 127.0.0.1, never anywhere else.
+  - Forget -> fl_tree_cloud_keys {"v":1,"keys":{}}.
+  - Fit: panel inside the picker at 390 (picker 28..362, content 45..345, no sideways scroll);
+    at 1280 the sheet is centered and fully in view.
+  Shots: /workspace/tree-glow-walk/ak_local_{390,1280}_{panel,after_local,after_cloud}.png
+  Known (Glow 2 item 4): at 390 the Chat card still covers the lower chairs; replies read fine.
+  Re-walked on the full chain (port 8774): key only to OpenAI (true), local + cloud any order.
+  Hush walk (/workspace/tree-glow-walk/hush_walk.py):
+    seat cortex llama3.2, then memory llama3.2 -> memory note ends "The cortex chair already seats
+    this same mind, so they will sound alike."; speaking lines say "at the cortex chair" / "at the
+    memory chair"; clear the speaking memory chair -> Cleared note + "No chair is speaking now...";
+    heart HEART_HUSH; Send -> "garden: No chair is speaking now... Nothing was sent.";
+    chat requests after clear: 0 (before the fix: the default Ollama answered); tap the cortex
+    chair -> "llama3.2:latest (general): mock says hi".
+    Shots: /workspace/tree-glow-walk/ak_after_hush.png, ak_combo_hush.png
+
+======================================================================
+7. LOCKS
+======================================================================
+Layer, never delete. Local doors stay 127.0.0.1 only (tryAddress, DOORS unchanged).
+The cloud road: fixed https list only, chosen by the person, with the person's key.
+Key: this browser only; sent only to the chosen provider in its own header; never in a URL,
+bind, seat, thread history, export or console. Files stay on this machine.
+No confirm(). No innerHTML. textContent only. No em dashes in added lines.
+fl-connect.js untouched (blob 2e02eae, identical to FL). Alpha has no sw.js (none added).
+Kimi pages untouched. #120 lock files untouched. Squash-merge.
+
+======================================================================
+8. DECISIONS FOR KIRK (the stand-in takes the first option each time)
+======================================================================
+K1 Lock wording: "127.0.0.1 only" becomes "local doors 127.0.0.1 only; cloud minds only to a
+   fixed https list, with your own key". (He asked for cloud minds; this makes the lock say it.)
+K2 Key at rest: plain localStorage with the honest note and a "this visit only" choice
+   (stand-in), or FreeLattice-style AES-GCM with a device key. The device key would sit in the
+   same storage, so it protects a copied backup, not the live page. Parity can come later.
+K3 Providers: 9 (Groq, OpenRouter, OpenAI, Anthropic, Gemini, xAI, Mistral, DeepSeek, Together).
+   Moonshot and Qwen are one line each (OpenAI shape, CORS checked). Hugging Face needs a
+   different body; Custom host would open arbitrary hosts. Both left out.
+K4 Scope: cloud minds sit only in Gathering chairs in v0.1. Settings default, Round Table and
+   Workshop stay local.
+K5 Files never go to a cloud chair (only "[a file stayed on this machine]").
+K6 Hush only after clearing the SPEAKING chair, in memory, reset on reload (stand-in) / remember it.
+K7 Twin seats allowed with a note (stand-in) / refuse a second chair for the same mind.
+
+======================================================================
+9. LATER (write in the doc, do not build)
+======================================================================
+List a provider's models with the key; streaming; a custom OpenAI-compatible host (K3); cloud in
+Round Table / Settings (K4); encrypted at rest (K2).
+
+======================================================================
+APPENDIX A. FULL STAND-IN DIFF (Alpha, against 25e6ded + 2a + honest + 2b + workshop way back)
+======================================================================
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index c6638b2..9a92b02 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -4,6 +4,8 @@
+ 
+ **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
+ 
++**LAYER (2026-09-30):** Gathering, bring your own key (marker `v-tree-gathering-api-keys-v0`). A chair may seat a cloud mind with the person's own key, next to local minds, any order. The key stays in this browser and goes only to the chosen provider. Local doors stay 127.0.0.1 only. Doc: `docs/library/TREE_GATHERING_API_KEYS_v0.1.md`. Layer, never delete.
++
+ **LAYER (2026-09-30):** Workshop way back (marker `v-tree-workshop-way-back-v0`). The benches' Settings button now opens Settings with one calm link back to the benches (`settings.html?from=workshop`, `workshop.html?open=benches`), and remembering a mind from the Connect card ("Minds found") repaints the card below it, so it no longer says "look for a mind first". Eleven taps to a first Run stays a later simplification. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+ 
+ **LAYER (2026-09-30):** Tree glow 2b, a hint more frost (marker `v-tree-glow-2b-v0`). Frosted glass behind an open place (tint fallback, reduced transparency honored), header Chat / galaxies and shared shoulder at 14px and above 4.5 : 1, readable Desktop links, a sleeping Send / Ask / Run says why beside it, no Change on empty chairs, code mirrors without sideways scroll. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+diff --git a/docs/index.html b/docs/index.html
+index 9e71f4c..d4f6b36 100644
+--- a/docs/index.html
++++ b/docs/index.html
+@@ -343,6 +343,7 @@
+   <script src="modules/fl-connect.js"></script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ 
+   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
+diff --git a/docs/library/TREE_GATHERING_API_KEYS_v0.1.md b/docs/library/TREE_GATHERING_API_KEYS_v0.1.md
+new file mode 100644
+index 0000000..14289db
+--- /dev/null
++++ b/docs/library/TREE_GATHERING_API_KEYS_v0.1.md
+@@ -0,0 +1,32 @@
++# Gathering: bring your own key, v0.1
++
++Local minds and cloud minds you choose, side by side in the Gathering chairs, any order.
++Alpha layer, marker `v-tree-gathering-api-keys-v0`. September 30, 2026.
++
++**Temperature:** Mom seats her own Claude in the cortex chair, her llama in memory, and taps between them like passing the salt.
++
++**Locks:** Layer, never delete. Local doors stay 127.0.0.1 only. The cloud road is a fixed list of nine https providers, no custom hosts. The key stays in this browser (localStorage, or sessionStorage for this visit only) and goes only to the chosen provider, in its own header, never in a URL. No key in gatheringBinds, seats, thread history or export. Files stay on this machine; a cloud chair hears only that a file stayed here. No confirm(). No innerHTML. textContent only. fl-connect.js untouched. No sw.js on Alpha.
++
++## What it does
++
++- In the Gathering, tap a chair, open **Seat a mind by API key**: provider, model (suggestions, or type any name), your key, optional "only for this visit". **Save and seat** seats it in that chair at once.
++- Seats saved for a provider stay offered next to local minds while its key is in this browser. Forget removes the key; the seat waits until a key returns.
++- Tap a chair to let it speak. The thread heart says where words go: "Listening: gpt-4.1-mini through OpenAI. Your words go to OpenAI. Your key stays in this browser."
++- Honest failures, each in plain words: key not accepted, slow down, model not taken, could not reach, quiet. Nothing is invented.
++
++## Where the key lives (said in the panel, word for word)
++
++Your key stays in this browser on this device. theLatticeTree has no server and never sees it. It goes only to the provider, with each message, when a chair seated through it speaks. Your words go there too, so they leave this computer; files you add stay here. Anyone using this browser profile could find the key. Forget removes it.
++
++## Map (why it is shaped this way)
++
++- FreeLattice app.html keeps one key (`fl_apiKey_enc`, AES-GCM with a device key that sits beside it in the same localStorage) for one provider at a time, and calls providers straight from the browser. The Tree is another origin, so it cannot read FreeLattice's key; it keeps its own, per provider.
++- Every listed provider answers a browser preflight from https://thelatticetree.com (checked Sep 30). No Bridge is needed and the Bridge stays local-only.
++- Cloud seats ride the existing Gathering binds as `url: 'cloud:<provider>'`, so local-mind-probe.js and fl-connect.js need no change and the Tree any-model paste is untouched.
++
++## Later (not built)
++
++- Ask a provider for its model list (GET /models with the key).
++- A custom OpenAI-compatible host (needs Kirk's call on the lock).
++- Cloud minds in Settings, Round Table and Workshop (today only Gathering chairs).
++- Streaming replies.
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index a8531e1..bdf6735 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6534,3 +6534,86 @@ html:has(#place-veil.is-open:not(.is-core)) #shared-shoulder {
+   background: rgba(12, 10, 26, 0.55);
+ }
+ .room-way-back:focus-visible { outline: 2px solid #9fd6ff; outline-offset: 2px; }
++
++/* v-tree-gathering-api-keys-v0: bring your own key, inside the chair picker.
++   Quiet, readable, inside the card at 390. Words only, no new colors. */
++.cloud-key-panel {
++  margin: 0.75rem auto 0.5rem;
++  max-width: 100%;
++  box-sizing: border-box;
++  text-align: left;
++  font-family: Georgia, 'Times New Roman', serif;
++  font-size: 0.86rem;
++  color: rgba(200, 210, 230, 0.86);
++  border-top: 1px solid rgba(74, 159, 212, 0.2);
++  padding-top: 0.6rem;
++}
++.cloud-key-summary {
++  cursor: pointer;
++  min-height: 44px;
++  display: flex;
++  align-items: center;
++  color: rgba(232, 196, 104, 0.92);
++}
++.cloud-key-summary:focus-visible { outline: 2px solid rgba(232, 196, 104, 0.9); outline-offset: 2px; }
++.cloud-key-lead,
++.cloud-key-note,
++.cloud-key-status,
++.cloud-key-row { margin: 0.45rem 0; line-height: 1.45; }
++.cloud-key-note { font-size: 0.8rem; color: rgba(200, 210, 230, 0.72); }
++.cloud-key-status:empty { display: none; }
++.cloud-key-label { display: block; margin: 0.55rem 0 0.2rem; font-size: 0.8rem; color: rgba(200, 210, 230, 0.75); }
++.cloud-key-provider,
++.cloud-key-model,
++.cloud-key-input {
++  display: block;
++  width: 100%;
++  max-width: 100%;
++  min-width: 0;
++  box-sizing: border-box;
++  min-height: 40px;
++  padding: 0.4rem 0.6rem;
++  font: inherit;
++  color: inherit;
++  background: rgba(12, 10, 26, 0.85);
++  border: 1px solid rgba(74, 159, 212, 0.35);
++  border-radius: 8px;
++}
++.cloud-key-visit { display: flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0 0.3rem; font-size: 0.8rem; min-height: 32px; }
++.cloud-key-get { display: inline-block; margin: 0.2rem 0; color: rgba(150, 205, 240, 0.95); text-decoration: underline; }
++.cloud-key-save,
++.cloud-key-forget {
++  font: inherit;
++  min-height: 40px;
++  padding: 0.35rem 0.9rem;
++  margin: 0.35rem 0.35rem 0.35rem 0;
++  color: rgba(232, 196, 104, 0.95);
++  background: transparent;
++  border: 1px solid rgba(232, 196, 104, 0.55);
++  border-radius: 999px;
++  cursor: pointer;
++}
++.cloud-key-forget { min-height: 32px; padding: 0.15rem 0.7rem; font-size: 0.8rem; }
++.cloud-key-save:hover,
++.cloud-key-save:focus-visible,
++.cloud-key-forget:hover,
++.cloud-key-forget:focus-visible { background: rgba(232, 196, 104, 0.12); outline: none; }
++/* v-tree-gathering-api-keys-v0: with the key panel open, the picker becomes a quiet
++   centered sheet, fully in view. (Glow 2a already keeps an open picker above the later
++   seats and scrolling inside itself at 1280.) */
++@media (min-width: 641px) {
++  /* with the key panel open it becomes a quiet centered sheet, fully in view */
++  #place-veil.is-core .core-bind-picker:not([hidden]):has(.cloud-key-panel[open]) {
++    position: fixed;
++    left: 50%;
++    top: 50%;
++    transform: translate(-50%, -50%);
++    width: min(30rem, 92vw);
++    max-width: none;
++    max-height: 86vh;
++    margin: 0;
++    z-index: 30;
++    background: rgba(12, 10, 26, 0.96);
++    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
++  }
++}
+diff --git a/docs/modules/garden-rooms.js b/docs/modules/garden-rooms.js
+index 5d59dd9..2ab9ef2 100644
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -1395,6 +1395,10 @@
+       if (bind && bind.model) {
+         meta.hidden = false;
+         meta.textContent = bind.tag + ' · ' + shortName(bind.model);
++        // v-tree-gathering-api-keys-v0: a cloud chair names its provider
++        if (/^cloud:/i.test(String(bind.url || '')) && window.TreeCloudMinds) {
++          meta.textContent += ' · ' + window.TreeCloudMinds.providerName({ url: bind.url });
++        }
+         if (unnamed) unnamed.textContent = state.speaking === chair.id ? 'speaking' : 'seated';
+       } else {
+         meta.hidden = true;
+@@ -1403,11 +1407,29 @@
+       }
+     }
+ 
++    // v-tree-gathering-api-keys-v0: the same mind may sit in two chairs. Allowed, and said.
++    function twinNote(chairId, seat) {
++      var binds = entryState().binds;
++      var twins = [];
++      CORE_CHAIRS.forEach(function (c) {
++        var b = binds[c.id];
++        if (c.id === chairId || !b) return;
++        if (String(b.model) === String(seat.model || '') && String(b.url) === String(seat.url || '')) twins.push(c.type);
++      });
++      if (!twins.length) return '';
++      return ' The ' + twins.join(' and ') + (twins.length > 1 ? ' chairs already seat' : ' chair already seats') +
++        ' this same mind, so they will sound alike.';
++    }
++
+     function openPicker(chair, seatBtn) {
+       var state = entryState();
+       var options = (window.LocalMindProbe && LocalMindProbe.getChairSeatOptions)
+         ? LocalMindProbe.getChairSeatOptions()
+         : (state.roster || []);
++      // v-tree-gathering-api-keys-v0: cloud minds you chose (your key) sit beside local ones
++      if (window.TreeCloudMinds && typeof window.TreeCloudMinds.seatOptions === 'function') {
++        options = (options || []).concat(window.TreeCloudMinds.seatOptions());
++      }
+       picker.innerHTML = '';
+       picker.setAttribute('data-bind-chair', chair.id);
+       picker.hidden = false;
+@@ -1428,18 +1450,36 @@
+           btn.type = 'button';
+           btn.className = 'core-bind-option';
+           btn.textContent = seat.tag + ' · ' + shortName(seat.model) + (seat.ephemeral ? ' (just found)' : '');
++          // v-tree-gathering-api-keys-v0: say where a cloud seat speaks from
++          if (seat.cloud) {
++            btn.textContent = seat.tag + ' · ' + shortName(seat.model) + ' · ' + seat.providerName + ' (your key)';
++            btn.setAttribute('data-cloud-seat', seat.url);
++          }
+           btn.addEventListener('click', function () {
++            var twins = twinNote(chair.id, seat);
+             if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
+               LocalMindProbe.setChairBind(chair.id, seat);
+             }
+             closePicker();
+             paintAll();
+-            setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.');
++            setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.' + twins);
+           });
+           list.appendChild(btn);
+         });
+         picker.appendChild(list);
+       }
++      // v-tree-gathering-api-keys-v0: bring your own key, then seat it here in one step
++      if (window.TreeCloudMinds && typeof window.TreeCloudMinds.mountKeyPanel === 'function') {
++        window.TreeCloudMinds.mountKeyPanel(picker, function (seat) {
++          var twins = twinNote(chair.id, seat);
++          if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
++            LocalMindProbe.setChairBind(chair.id, seat);
++          }
++          closePicker();
++          paintAll();
++          setNoteText('This ' + chair.type + ' chair seats ' + shortName(seat.model) + ' through ' + seat.providerName + ', with your key. Tap the chair to let it speak.' + twins);
++        });
++      }
+       var decline = document.createElement('button');
+       decline.type = 'button';
+       decline.className = 'core-bind-decline';
+@@ -1455,12 +1495,18 @@
+         clear.className = 'core-bind-clear';
+         clear.textContent = 'Clear';
+         clear.addEventListener('click', function () {
++          // v-tree-gathering-api-keys-v0: clearing the speaking chair must not hand the next
++          // message to another mind without a word. Hush until a seated chair is tapped.
++          var wasSpeaking = entryState().speaking === chair.id;
++          if (wasSpeaking) window.GardenRooms.gatheringHush = true;
+           if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
+             LocalMindProbe.setChairBind(chair.id, null);
+           }
+           closePicker();
+           paintAll();
+           setNoteText('Cleared. The ' + chair.type + ' chair has no mind seated — honest empty.');
++          var clearedNote = wasSpeaking && wrap.querySelector('[data-core-note]');
++          if (clearedNote) clearedNote.textContent += ' No chair is speaking now. Chat waits until you tap a seated chair.';
+         });
+         picker.appendChild(clear);
+       }
+@@ -1522,12 +1568,14 @@
+           return;
+         }
+         // Bound: select as speaking chair for Gathering chat.
++        window.GardenRooms.gatheringHush = false;
+         if (window.LocalMindProbe && LocalMindProbe.setSpeakingChair) {
+           LocalMindProbe.setSpeakingChair(chair.id);
+         }
+         closePicker();
+         paintAll();
+-        setNoteText('Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time. Use Change to reseat.');
++        // v-tree-gathering-api-keys-v0: name the chair, so two chairs with one mind differ
++        setNoteText('Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at the ' + chair.type + ' chair. One request at a time. Use Change to reseat.');
+       });
+       (chair.later ? laterRing : ring).appendChild(seat);
+     });
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index f2794a5..e46792f 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -26,6 +26,10 @@
+ //      remembered local mind can keep those without inventing a key
+ //      kitchen. Honest later sentence in the room. Not a fake button.
+ //
++// v-tree-gathering-api-keys-v0 (layer): a Gathering chair may seat a cloud mind
++//   (url 'cloud:<provider>') with the person's own key. That road lives in
++//   tree-cloud-minds.js. The key never enters this thread, its history or export.
++//   Files stay on this machine: a cloud mind hears only that a file stayed here.
+ // Mirror: docs/code-dialogue.html  (read that FIRST)
+ // ═══════════════════════════════════════════════════════════════
+ 
+@@ -90,11 +94,22 @@
+     return /failed|network|cors|mixed|blocked|abort|load|fetch/i.test(msg);
+   }
+ 
++  // v-tree-gathering-api-keys-v0: after the speaking chair is cleared, the Gathering is hushed
++  // until a seated chair is tapped. Chat says so instead of answering from another mind.
++  var HEART_HUSH = 'No chair is speaking now. Tap a seated chair in the Gathering to let it speak.';
++  function gatheringHushed() {
++    var veil = document.getElementById('place-veil');
++    return !!(window.GardenRooms && window.GardenRooms.gatheringHush && veil &&
++      veil.classList.contains('is-core') && veil.classList.contains('is-open'));
++  }
++
+   function listener() {
+     if (!window.LocalMindProbe) return null;
+     // Gathering speaking chair first (when veil is open and bound); else Settings default.
+     if (typeof LocalMindProbe.resolveSpeakMind === 'function') {
+       var seated = LocalMindProbe.resolveSpeakMind();
++      if (seated && seated.fromChair && (seated.url || seated.name)) return seated;
++      if (gatheringHushed()) return { hush: true, name: '', url: '' };
+       if (seated && (seated.url || seated.name)) return seated;
+     }
+     if (typeof LocalMindProbe.getRemembered !== 'function') return null;
+@@ -103,6 +118,11 @@
+     return mind;
+   }
+ 
++  // v-tree-gathering-api-keys-v0: is this listener a cloud chair?
++  function isCloudMind(mind) {
++    return !!(mind && /^cloud:/i.test(String(mind.url || '')));
++  }
++
+   function forbiddenKey(key) {
+     var k = String(key || '');
+     if (!k) return false;
+@@ -333,6 +353,13 @@
+     return text;
+   }
+ 
++  // v-tree-gathering-api-keys-v0: what a cloud chair may hear. Words yes; file bytes and names stay here.
++  function cloudSafeContent(m) {
++    var text = String((m && m.text) || '');
++    if (m && m.file) text += (text ? '\n\n' : '') + '[a file stayed on this machine]';
++    return text;
++  }
++
+   function talkUrls(mind) {
+     var url = String((mind && mind.url) || '').replace(/\/+$/, '');
+     if (!url) return [];
+@@ -451,6 +478,13 @@
+   }
+ 
+   function sendToMind(mind, msgs) {
++    // v-tree-gathering-api-keys-v0: a cloud chair speaks through its chosen provider only
++    if (isCloudMind(mind)) {
++      if (window.TreeCloudMinds && typeof window.TreeCloudMinds.send === 'function') {
++        return window.TreeCloudMinds.send(mind, msgs);
++      }
++      return Promise.reject({ reason: 'cloud', cloudText: 'This chair seats a cloud mind, but its helper is not on this page. Nothing was sent.' });
++    }
+     var urls = talkUrls(mind);
+     if (!urls.length) {
+       return Promise.reject({ blocked: true });
+@@ -529,6 +563,11 @@
+     } else {
+       heart.textContent = HEART_NONE;
+     }
++    // v-tree-gathering-api-keys-v0: a cloud chair is not on this machine; say so
++    if (isCloudMind(mind) && window.TreeCloudMinds && typeof window.TreeCloudMinds.heartLine === 'function') {
++      heart.textContent = window.TreeCloudMinds.heartLine(mind);
++    }
++    if (mind && mind.hush) heart.textContent = HEART_HUSH;
+     root.appendChild(heart);
+ 
+     var later = el('p', 'thread-later', HEART_LATER);
+@@ -702,15 +741,24 @@
+ 
+     function talkNow(nowMind) {
+       if (busy) return;
++      if (nowMind && nowMind.hush) {
++        messages.push({ role: 'garden', text: HEART_HUSH + ' Nothing was sent.' });
++        saveHistory();
++        renderMessages(list);
++        return;
++      }
+       busy = true;
+       sendBtn.disabled = true;
+       setStatus('Waiting for the mind at home…', false);
++      // v-tree-gathering-api-keys-v0: name the provider; file bytes never leave for a cloud chair
++      var cloudNow = isCloudMind(nowMind);
++      if (cloudNow && window.TreeCloudMinds) setStatus('Waiting for ' + window.TreeCloudMinds.providerName(nowMind) + '\u2026', false);
+ 
+       var payload = [{ role: 'system', content: JUST_TALK }].concat(
+         messages
+           .filter(function (m) { return m.role === 'human' || m.role === 'mind'; })
+           .map(function (m) {
+-            return { role: m.role === 'mind' ? 'assistant' : 'user', content: messageContent(m) };
++            return { role: m.role === 'mind' ? 'assistant' : 'user', content: cloudNow ? cloudSafeContent(m) : messageContent(m) };
+           })
+       );
+ 
+@@ -740,6 +788,8 @@
+           renderMessages(list);
+           setStatus('', true);
+         }
++        // v-tree-gathering-api-keys-v0: a cloud chair brings its own honest line
++        if (err && err.reason === 'cloud' && err.cloudText) { say(String(err.cloudText)); return; }
+         // v-tree-honest-reasons-v0: a missing model is named; a quiet door gets one
+         // no-cors knock (after this Send only) so "stopped" and "shut" are told apart.
+         if (err && err.reason === 'model-missing') { say(heartModelMissing(err.model)); return; }
+@@ -888,6 +938,8 @@
+     unmount: unmount,
+     listener: listener,
+     sendToMind: sendToMind,
++    isCloudMind: isCloudMind,
++    cloudSafeContent: cloudSafeContent,
+     hostIs: function (el) { return hostEl === el; },
+     HISTORY_KEY: HISTORY_KEY,
+     EXPORT_KIND: EXPORT_KIND,
+diff --git a/docs/modules/tree-cloud-minds.js b/docs/modules/tree-cloud-minds.js
+new file mode 100644
+index 0000000..b666031
+--- /dev/null
++++ b/docs/modules/tree-cloud-minds.js
+@@ -0,0 +1,436 @@
++// ═══════════════════════════════════════════════════════════════
++// tree-cloud-minds.js · bring your own key, seat a cloud mind
++// Marker: v-tree-gathering-api-keys-v0
++//
++// Layer, never delete. Local minds stay 127.0.0.1 only. This module adds a
++// second, chosen road: a mind you pay for or got free from a provider, with
++// YOUR key, seated in a Gathering chair next to local ones, any order.
++//
++// The key stays in this browser (localStorage, or sessionStorage for "this
++// visit only"). It is sent only to the one provider you picked, in that
++// provider's own auth header, and only when that provider's chair speaks.
++// Never in a URL. Never in gatheringBinds. Never in the thread history or an
++// export. theLatticeTree has no server; nothing passes through us.
++// The provider list is fixed (https only). No custom hosts in v0.1.
++// No confirm(). No innerHTML. Every word goes in with textContent.
++// Mirror of FreeLattice docs/app.html PROVIDERS (fc2f09f) for urls and shapes.
++// ═══════════════════════════════════════════════════════════════
++
++(function () {
++  'use strict';
++
++  var MARK = 'v-tree-gathering-api-keys-v0';
++  var KEYS_STORE = 'fl_tree_cloud_keys';   // { v:1, keys: { providerId: key } }
++  var SEATS_STORE = 'fl_tree_cloud_seats'; // [ { provider, model } ]  (no keys here, ever)
++  var SEAT_CAP = 16;
++  var TIMEOUT_MS = 120000;
++
++  // type: 'openai' (Bearer, /chat/completions), 'anthropic', 'google'
++  var PROVIDERS = {
++    groq: { name: 'Groq', type: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions',
++      keyUrl: 'https://console.groq.com/keys', models: ['llama-3.3-70b-versatile', 'qwen/qwen3-32b'] },
++    openrouter: { name: 'OpenRouter', type: 'openai', url: 'https://openrouter.ai/api/v1/chat/completions',
++      keyUrl: 'https://openrouter.ai/keys',
++      models: ['meta-llama/llama-3.3-70b-instruct', 'qwen/qwen-2.5-72b-instruct', 'deepseek/deepseek-r1'] },
++    openai: { name: 'OpenAI', type: 'openai', url: 'https://api.openai.com/v1/chat/completions',
++      keyUrl: 'https://platform.openai.com/api-keys', models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4.1-nano', 'o4-mini'] },
++    anthropic: { name: 'Anthropic (Claude)', type: 'anthropic', url: 'https://api.anthropic.com/v1/messages',
++      keyUrl: 'https://console.anthropic.com/settings/keys',
++      models: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20251001', 'claude-opus-4-20250514'] },
++    google: { name: 'Google (Gemini)', type: 'google', url: 'https://generativelanguage.googleapis.com/v1beta/models/',
++      keyUrl: 'https://aistudio.google.com/apikey', models: ['gemini-2.5-flash', 'gemini-2.5-pro'] },
++    xai: { name: 'xAI (Grok)', type: 'openai', url: 'https://api.x.ai/v1/chat/completions',
++      keyUrl: 'https://console.x.ai', models: ['grok-3-mini-fast'] },
++    mistral: { name: 'Mistral AI', type: 'openai', url: 'https://api.mistral.ai/v1/chat/completions',
++      keyUrl: 'https://console.mistral.ai/api-keys',
++      models: ['mistral-large-latest', 'mistral-small-latest', 'codestral-latest'] },
++    deepseek: { name: 'DeepSeek', type: 'openai', url: 'https://api.deepseek.com/v1/chat/completions',
++      keyUrl: 'https://platform.deepseek.com/api_keys', models: ['deepseek-chat', 'deepseek-reasoner'] },
++    together: { name: 'Together AI', type: 'openai', url: 'https://api.together.xyz/v1/chat/completions',
++      keyUrl: 'https://api.together.xyz/settings/api-keys',
++      models: ['meta-llama/Llama-3.3-70B-Instruct-Turbo', 'Qwen/Qwen2.5-7B-Instruct-Turbo', 'deepseek-ai/DeepSeek-R1'] }
++  };
++  var ORDER = ['groq', 'openrouter', 'openai', 'anthropic', 'google', 'xai', 'mistral', 'deepseek', 'together'];
++
++  var MODEL_RE = /^[A-Za-z0-9._:\/@+-]{1,120}$/;
++
++  function store(kind) {
++    try { return kind === 'session' ? window.sessionStorage : window.localStorage; } catch (e) { return null; }
++  }
++  function readJson(s, name, fallback) {
++    try {
++      var raw = s && s.getItem(name);
++      if (!raw) return fallback;
++      var v = JSON.parse(raw);
++      return v == null ? fallback : v;
++    } catch (e) { return fallback; }
++  }
++  function writeJson(s, name, value) {
++    try { if (s) s.setItem(name, JSON.stringify(value)); return true; } catch (e) { return false; }
++  }
++  function keyBag(kind) {
++    var bag = readJson(store(kind), KEYS_STORE, null);
++    if (!bag || typeof bag !== 'object' || !bag.keys || typeof bag.keys !== 'object') bag = { v: 1, keys: {} };
++    return bag;
++  }
++
++  function provider(id) {
++    return Object.prototype.hasOwnProperty.call(PROVIDERS, String(id || '')) ? PROVIDERS[id] : null;
++  }
++  function providerIdOf(mind) {
++    var u = String((mind && mind.url) || '');
++    var m = u.match(/^cloud:([a-z0-9-]+)$/i);
++    return m ? m[1].toLowerCase() : '';
++  }
++  function isCloud(mind) { return !!provider(providerIdOf(mind)); }
++  function providerName(mindOrId) {
++    var id = typeof mindOrId === 'string' ? mindOrId : providerIdOf(mindOrId);
++    var p = provider(id);
++    return p ? p.name : 'a cloud provider';
++  }
++
++  function cleanKey(raw) {
++    var k = String(raw || '').trim();
++    if (k.length < 8 || k.length > 400 || /\s/.test(k)) return '';
++    return k;
++  }
++  function cleanModel(raw) {
++    var m = String(raw || '').trim();
++    return MODEL_RE.test(m) ? m : '';
++  }
++
++  // Where is this provider's key? 'device' | 'visit' | ''
++  function keyPlace(id) {
++    if (keyBag('session').keys[id]) return 'visit';
++    if (keyBag('local').keys[id]) return 'device';
++    return '';
++  }
++  function getKey(id) {
++    return String(keyBag('session').keys[id] || keyBag('local').keys[id] || '');
++  }
++  function keyTail(id) {
++    var k = getKey(id);
++    return k ? k.slice(-4) : '';
++  }
++  function saveKey(id, raw, onlyThisVisit) {
++    if (!provider(id)) return { ok: false, reason: 'provider' };
++    var k = cleanKey(raw);
++    if (!k) return { ok: false, reason: 'key' };
++    forgetKey(id);
++    var kind = onlyThisVisit ? 'session' : 'local';
++    var bag = keyBag(kind);
++    bag.keys[id] = k;
++    if (!writeJson(store(kind), KEYS_STORE, bag)) return { ok: false, reason: 'storage' };
++    return { ok: true, place: onlyThisVisit ? 'visit' : 'device' };
++  }
++  function forgetKey(id) {
++    ['local', 'session'].forEach(function (kind) {
++      var bag = keyBag(kind);
++      if (bag.keys[id]) { delete bag.keys[id]; writeJson(store(kind), KEYS_STORE, bag); }
++    });
++    return true;
++  }
++  function savedProviders() {
++    return ORDER.filter(function (id) { return !!getKey(id); });
++  }
++
++  function getSeats() {
++    var list = readJson(store('local'), SEATS_STORE, []);
++    if (!Array.isArray(list)) return [];
++    return list.filter(function (s) { return s && provider(s.provider) && cleanModel(s.model); }).slice(0, SEAT_CAP);
++  }
++  function addSeat(id, model) {
++    var m = cleanModel(model);
++    if (!provider(id) || !m) return null;
++    var list = getSeats().filter(function (s) { return !(s.provider === id && s.model === m); });
++    list.unshift({ provider: id, model: m });
++    writeJson(store('local'), SEATS_STORE, list.slice(0, SEAT_CAP));
++    return seatFor(id, m);
++  }
++  function seatFor(id, model) {
++    return { tag: 'general', model: String(model), url: 'cloud:' + id, cloud: true, providerName: providerName(id) };
++  }
++  // Seats for the Gathering picker: only providers whose key is in this browser. No key inside.
++  function seatOptions() {
++    return getSeats().filter(function (s) { return !!getKey(s.provider); })
++      .map(function (s) { return seatFor(s.provider, s.model); });
++  }
++
++  // ---------- speaking ----------
++  function cloudErr(text) { return { reason: 'cloud', cloudText: String(text) }; }
++
++  function buildRequest(id, model, msgs) {
++    var p = provider(id);
++    var key = getKey(id);
++    var headers = { 'Content-Type': 'application/json' };
++    var url = p.url;
++    var body;
++    var list = (msgs || []).map(function (m) {
++      return { role: m.role === 'assistant' ? 'assistant' : (m.role === 'system' ? 'system' : 'user'), content: String(m.content || '') };
++    });
++    var system = list.filter(function (m) { return m.role === 'system'; }).map(function (m) { return m.content; }).join('\n');
++    var talk = list.filter(function (m) { return m.role !== 'system'; });
++    if (p.type === 'anthropic') {
++      headers['x-api-key'] = key;
++      headers['anthropic-version'] = '2023-06-01';
++      headers['anthropic-dangerous-direct-browser-access'] = 'true';
++      body = { model: model, max_tokens: 1024, messages: talk };
++      if (system) body.system = system;
++    } else if (p.type === 'google') {
++      headers['x-goog-api-key'] = key; // a header, never a query string
++      url = p.url + encodeURIComponent(model) + ':generateContent';
++      body = { contents: talk.map(function (m) {
++        return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
++      }) };
++      if (system) body.systemInstruction = { parts: [{ text: system }] };
++    } else {
++      headers['Authorization'] = 'Bearer ' + key;
++      body = { model: model, messages: list, stream: false };
++    }
++    return { url: url, headers: headers, body: body, type: p.type };
++  }
++
++  function parseReply(type, json) {
++    if (!json || typeof json !== 'object') return '';
++    if (type === 'anthropic') {
++      return (json.content || []).map(function (c) { return c && c.type === 'text' ? String(c.text || '') : ''; }).join('').trim();
++    }
++    if (type === 'google') {
++      var c = json.candidates && json.candidates[0];
++      var parts = (c && c.content && c.content.parts) || [];
++      return parts.map(function (x) { return String((x && x.text) || ''); }).join('').trim();
++    }
++    var ch = json.choices && json.choices[0];
++    return ch && ch.message && ch.message.content ? String(ch.message.content).trim() : '';
++  }
++
++  function send(mind, msgs) {
++    var id = providerIdOf(mind);
++    var p = provider(id);
++    if (!p) return Promise.reject(cloudErr('This chair names a cloud provider this garden does not know. Nothing was sent.'));
++    var model = cleanModel(mind.model);
++    if (!model) return Promise.reject(cloudErr('This chair has no model name for ' + p.name + '. Use Change to pick one. Nothing was sent.'));
++    if (!getKey(id)) {
++      return Promise.reject(cloudErr('No ' + p.name + ' key is in this browser now. Add it in the Gathering (Change, then Seat a mind by API key). Nothing was sent.'));
++    }
++    var req = buildRequest(id, model, msgs);
++    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
++    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
++    var opts = { method: 'POST', mode: 'cors', cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer',
++      headers: req.headers, body: JSON.stringify(req.body) };
++    if (ctrl) opts.signal = ctrl.signal;
++    return fetch(req.url, opts).then(function (res) {
++      clearTimeout(timer);
++      if (!res.ok) {
++        var s = res.status;
++        if (s === 401 || s === 403) throw cloudErr(p.name + ' did not accept the key. Check it, or Forget it and paste a new one. Nothing was invented.');
++        if (s === 429) throw cloudErr(p.name + ' asked us to slow down (a rate limit or no credit left). Nothing was invented.');
++        if (s === 400 || s === 404) throw cloudErr(p.name + ' did not take the model ' + model + '. Use Change to pick another. Nothing was invented.');
++        throw cloudErr(p.name + ' answered with an error (' + s + '). Nothing was invented.');
++      }
++      return res.json().then(function (json) {
++        var text = parseReply(req.type, json);
++        if (!text) throw cloudErr(p.name + ' was quiet. Nothing was invented.');
++        return text;
++      }, function () { throw cloudErr(p.name + ' sent something we could not read. Nothing was invented.'); });
++    }, function () {
++      clearTimeout(timer);
++      throw cloudErr('The browser could not reach ' + p.name + ' from here (offline, blocked, or it took too long). Nothing was invented.');
++    });
++  }
++
++  function heartLine(mind) {
++    var n = providerName(mind);
++    return 'Listening: ' + String((mind && mind.model) || 'a cloud mind') + ' through ' + n +
++      '. Your words go to ' + n + '. Your key stays in this browser.';
++  }
++  function honestNote(id) {
++    var n = providerName(id);
++    return 'Your key stays in this browser on this device. theLatticeTree has no server and never sees it. ' +
++      'It goes only to ' + n + ', with each message, when a chair seated through ' + n + ' speaks. Your words go to ' + n +
++      ' too, so they leave this computer; files you add stay here. Anyone using this browser profile could find the key. Forget removes it.';
++  }
++
++  // ---------- the panel (inside the Gathering chair picker) ----------
++  function el(tag, cls, text) {
++    var n = document.createElement(tag);
++    if (cls) n.className = cls;
++    if (text) n.textContent = text;
++    return n;
++  }
++
++  function mountKeyPanel(host, onSeat) {
++    if (!host || typeof document === 'undefined') return null;
++    var box = el('details', 'cloud-key-panel');
++    box.setAttribute('data-cloud-key-panel', '1');
++    box.setAttribute('data-marker', MARK);
++    var sum = el('summary', 'cloud-key-summary', 'Seat a mind by API key');
++    box.appendChild(sum);
++
++    var lead = el('p', 'cloud-key-lead', 'Your own key, your own choice. Local and cloud minds sit side by side; switch chairs in any order.');
++    box.appendChild(lead);
++
++    var pLabel = el('label', 'cloud-key-label', 'Provider');
++    var pSel = el('select', 'cloud-key-provider');
++    pSel.setAttribute('data-cloud-provider', '1');
++    pSel.id = 'cloud-key-provider-' + Math.random().toString(36).slice(2, 8);
++    pLabel.htmlFor = pSel.id;
++    ORDER.forEach(function (id) {
++      var o = el('option', '', PROVIDERS[id].name);
++      o.value = id;
++      pSel.appendChild(o);
++    });
++    box.appendChild(pLabel);
++    box.appendChild(pSel);
++
++    var mLabel = el('label', 'cloud-key-label', 'Model');
++    var mIn = el('input', 'cloud-key-model');
++    mIn.type = 'text';
++    mIn.setAttribute('data-cloud-model', '1');
++    mIn.setAttribute('autocomplete', 'off');
++    mIn.setAttribute('spellcheck', 'false');
++    mIn.id = pSel.id + '-m';
++    mLabel.htmlFor = mIn.id;
++    var dl = el('datalist');
++    dl.id = pSel.id + '-dl';
++    mIn.setAttribute('list', dl.id);
++    box.appendChild(mLabel);
++    box.appendChild(mIn);
++    box.appendChild(dl);
++
++    var kLabel = el('label', 'cloud-key-label', 'API key');
++    var kIn = el('input', 'cloud-key-input');
++    kIn.type = 'password';
++    kIn.setAttribute('data-cloud-key', '1');
++    kIn.setAttribute('autocomplete', 'off');
++    kIn.setAttribute('spellcheck', 'false');
++    kIn.id = pSel.id + '-k';
++    kLabel.htmlFor = kIn.id;
++    box.appendChild(kLabel);
++    box.appendChild(kIn);
++
++    var visitRow = el('label', 'cloud-key-visit');
++    var visit = el('input');
++    visit.type = 'checkbox';
++    visit.setAttribute('data-cloud-visit', '1');
++    visitRow.appendChild(visit);
++    visitRow.appendChild(document.createTextNode(' Only for this visit (forget when this tab closes)'));
++    box.appendChild(visitRow);
++
++    var getLink = el('a', 'cloud-key-get', '');
++    getLink.target = '_blank';
++    getLink.rel = 'noopener noreferrer';
++    box.appendChild(getLink);
++
++    var note = el('p', 'cloud-key-note');
++    note.setAttribute('data-cloud-note', '1');
++    box.appendChild(note);
++
++    var save = el('button', 'cloud-key-save', 'Save and seat');
++    save.type = 'button';
++    save.setAttribute('data-cloud-save', '1');
++    box.appendChild(save);
++
++    var status = el('p', 'cloud-key-status');
++    status.setAttribute('role', 'status');
++    status.setAttribute('data-cloud-status', '1');
++    box.appendChild(status);
++
++    var saved = el('div', 'cloud-key-saved');
++    saved.setAttribute('data-cloud-saved', '1');
++    box.appendChild(saved);
++
++    function paintProvider() {
++      var id = pSel.value;
++      var p = PROVIDERS[id];
++      while (dl.firstChild) dl.removeChild(dl.firstChild);
++      p.models.forEach(function (m) { var o = el('option'); o.value = m; dl.appendChild(o); });
++      if (!mIn.value || !MODEL_RE.test(mIn.value) || mIn.getAttribute('data-from') !== id) {
++        mIn.value = p.models[0] || '';
++        mIn.setAttribute('data-from', id);
++      }
++      var tail = keyTail(id);
++      kIn.value = '';
++      kIn.placeholder = tail ? ('saved, ends in ' + tail + ' (leave empty to keep it)') : ('paste your ' + p.name + ' key');
++      getLink.textContent = 'Get your ' + p.name + ' key (opens ' + p.name + ')';
++      getLink.href = p.keyUrl;
++      note.textContent = honestNote(id);
++    }
++
++    function paintSaved() {
++      while (saved.firstChild) saved.removeChild(saved.firstChild);
++      savedProviders().forEach(function (id) {
++        var row = el('p', 'cloud-key-row');
++        var place = keyPlace(id) === 'visit' ? 'this visit only' : 'on this device';
++        row.appendChild(document.createTextNode(PROVIDERS[id].name + ' key, ends in ' + keyTail(id) + ', kept ' + place + '. '));
++        var f = el('button', 'cloud-key-forget', 'Forget');
++        f.type = 'button';
++        f.setAttribute('data-cloud-forget', id);
++        f.setAttribute('aria-label', 'Forget the ' + PROVIDERS[id].name + ' key');
++        f.addEventListener('click', function () {
++          forgetKey(id);
++          status.textContent = 'Forgotten. The ' + PROVIDERS[id].name + ' key is gone from this browser.';
++          paintSaved();
++          paintProvider();
++        });
++        row.appendChild(f);
++        saved.appendChild(row);
++      });
++    }
++
++    pSel.addEventListener('change', paintProvider);
++    save.addEventListener('click', function () {
++      var id = pSel.value;
++      var p = PROVIDERS[id];
++      var model = cleanModel(mIn.value);
++      if (!model) { status.textContent = 'Type a model name for ' + p.name + ' (letters, numbers, . _ : / - only).'; return; }
++      var typed = String(kIn.value || '');
++      if (typed) {
++        var r = saveKey(id, typed, !!visit.checked);
++        kIn.value = '';
++        if (!r.ok) {
++          status.textContent = r.reason === 'key'
++            ? 'That does not look like a key (no spaces, at least 8 characters). Nothing was saved.'
++            : 'This browser would not keep the key. Nothing was saved.';
++          return;
++        }
++      } else if (!getKey(id)) {
++        status.textContent = 'Paste your ' + p.name + ' key first. Nothing was saved.';
++        return;
++      }
++      var seat = addSeat(id, model);
++      paintSaved();
++      paintProvider();
++      status.textContent = 'Saved. ' + model + ' through ' + p.name + ' can sit in any chair. Nothing was sent yet.';
++      if (seat && typeof onSeat === 'function') onSeat(seat);
++    });
++
++    paintProvider();
++    paintSaved();
++    host.appendChild(box);
++    return box;
++  }
++
++  window.TreeCloudMinds = {
++    MARK: MARK,
++    PROVIDERS: PROVIDERS,
++    ORDER: ORDER,
++    isCloud: isCloud,
++    providerIdOf: providerIdOf,
++    providerName: providerName,
++    saveKey: saveKey,
++    forgetKey: forgetKey,
++    keyPlace: keyPlace,
++    keyTail: keyTail,
++    savedProviders: savedProviders,
++    addSeat: addSeat,
++    getSeats: getSeats,
++    seatOptions: seatOptions,
++    buildRequest: buildRequest,
++    parseReply: parseReply,
++    send: send,
++    heartLine: heartLine,
++    honestNote: honestNote,
++    mountKeyPanel: mountKeyPanel
++  };
++})();
+diff --git a/docs/modules/tree-gathering-api-keys.test.js b/docs/modules/tree-gathering-api-keys.test.js
+new file mode 100644
+index 0000000..b593da8
+--- /dev/null
++++ b/docs/modules/tree-gathering-api-keys.test.js
+@@ -0,0 +1,249 @@
++#!/usr/bin/env node
++// v-tree-gathering-api-keys-v0: bring your own key, seat a cloud mind in a Gathering chair.
++// Guards: the provider list is fixed and https only; the key lives only in this browser
++// (localStorage, or sessionStorage for this visit) and goes only to the chosen provider,
++// in its own header, never in a URL; seats and binds never hold the key; a cloud chair
++// says where words go; files stay on this machine; no confirm(), no innerHTML.
++// No real network: fetch is a spy.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var vm = require('vm');
++var assert = require('assert');
++
++var dir = __dirname;
++var src = fs.readFileSync(path.join(dir, 'tree-cloud-minds.js'), 'utf8');
++var thread = fs.readFileSync(path.join(dir, 'garden-thread.js'), 'utf8');
++var rooms = fs.readFileSync(path.join(dir, 'garden-rooms.js'), 'utf8');
++var css = fs.readFileSync(path.join(dir, 'garden-rooms.css'), 'utf8');
++
++function Store() { this.m = {}; }
++Store.prototype.getItem = function (k) { return Object.prototype.hasOwnProperty.call(this.m, k) ? this.m[k] : null; };
++Store.prototype.setItem = function (k, v) { this.m[k] = String(v); };
++Store.prototype.removeItem = function (k) { delete this.m[k]; };
++
++var calls = [];
++var nextReply = null;
++function fakeFetch(url, opts) {
++  calls.push({ url: String(url), opts: opts });
++  var r = nextReply || { status: 200, json: {} };
++  return Promise.resolve({
++    ok: r.status >= 200 && r.status < 300,
++    status: r.status,
++    json: function () { return r.throwJson ? Promise.reject(new Error('bad')) : Promise.resolve(r.json); }
++  });
++}
++
++var local = new Store();
++var session = new Store();
++var sandbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, JSON: JSON, Promise: Promise,
++  encodeURIComponent: encodeURIComponent, fetch: fakeFetch };
++sandbox.window = sandbox;
++sandbox.localStorage = local;
++sandbox.sessionStorage = session;
++vm.createContext(sandbox);
++vm.runInContext(src, sandbox, { filename: 'tree-cloud-minds.js' });
++var T = sandbox.TreeCloudMinds;
++assert.ok(T, 'TreeCloudMinds is on window');
++
++// 1. Fixed list, https only, exact hosts.
++var HOSTS = {
++  groq: 'api.groq.com', openrouter: 'openrouter.ai', openai: 'api.openai.com', anthropic: 'api.anthropic.com',
++  google: 'generativelanguage.googleapis.com', xai: 'api.x.ai', mistral: 'api.mistral.ai',
++  deepseek: 'api.deepseek.com', together: 'api.together.xyz'
++};
++assert.deepStrictEqual(Object.keys(T.PROVIDERS).sort(), Object.keys(HOSTS).sort(), 'fixed provider list');
++Object.keys(HOSTS).forEach(function (id) {
++  var u = new URL(T.PROVIDERS[id].url);
++  assert.strictEqual(u.protocol, 'https:', id + ' is https');
++  assert.strictEqual(u.host, HOSTS[id], id + ' host');
++  assert.ok(T.PROVIDERS[id].models.length >= 1, id + ' has suggestions');
++});
++assert.ok(!/custom/i.test(Object.keys(T.PROVIDERS).join(',')), 'no custom hosts in v0.1');
++
++// 2. Keys: device vs this visit; forget clears both; junk refused.
++assert.strictEqual(T.saveKey('groq', 'has space key', false).ok, false, 'a key with spaces is refused');
++assert.strictEqual(T.saveKey('nope', 'gsk_abcdefgh1234', false).ok, false, 'unknown provider refused');
++assert.strictEqual(T.saveKey('groq', '  gsk_abcdefgh1234 ', false).ok, true);
++assert.strictEqual(T.keyPlace('groq'), 'device');
++assert.ok(local.getItem('fl_tree_cloud_keys').indexOf('gsk_abcdefgh1234') !== -1, 'device key in localStorage');
++assert.strictEqual(T.saveKey('groq', 'gsk_visitonly9999', true).ok, true);
++assert.strictEqual(T.keyPlace('groq'), 'visit', 'visit-only moves the key to sessionStorage');
++assert.ok(local.getItem('fl_tree_cloud_keys').indexOf('gsk_') === -1, 'and out of localStorage');
++assert.strictEqual(T.keyTail('groq'), '9999');
++T.forgetKey('groq');
++assert.strictEqual(T.keyPlace('groq'), '', 'forget clears it');
++assert.ok((local.getItem('fl_tree_cloud_keys') + session.getItem('fl_tree_cloud_keys')).indexOf('gsk_') === -1, 'gone from both stores');
++
++// 3. Seats never hold a key; only providers with a key are offered.
++T.saveKey('anthropic', 'sk-ant-test-0000aaaa', false);
++T.saveKey('openai', 'sk-test-openai-1111', false);
++T.saveKey('google', 'AIza-test-google-2222', false);
++assert.ok(T.addSeat('anthropic', 'claude-sonnet-4-20250514'));
++assert.ok(T.addSeat('openai', 'gpt-4.1-mini'));
++assert.ok(T.addSeat('google', 'gemini-2.5-flash'));
++assert.ok(T.addSeat('groq', 'llama-3.3-70b-versatile'), 'a seat may be saved before its key');
++assert.strictEqual(T.addSeat('openai', 'bad name with spaces'), null, 'model names are checked');
++var seatsRaw = local.getItem('fl_tree_cloud_seats');
++assert.ok(!/sk-|AIza|gsk_/.test(seatsRaw), 'no key in the seats store');
++var opts = T.seatOptions();
++assert.deepStrictEqual(opts.map(function (s) { return s.url; }).sort(), ['cloud:anthropic', 'cloud:google', 'cloud:openai'], 'groq seat waits for its key');
++opts.forEach(function (s) {
++  assert.ok(!/sk-|AIza|gsk_/.test(JSON.stringify(s)), 'no key in a seat option');
++  assert.strictEqual(s.cloud, true);
++  assert.strictEqual(s.tag, 'general');
++});
++assert.strictEqual(T.isCloud({ url: 'cloud:openai' }), true);
++assert.strictEqual(T.isCloud({ url: 'http://127.0.0.1:11434/api/tags' }), false);
++assert.strictEqual(T.isCloud({ url: 'cloud:evil.example' }), false, 'unknown cloud ids are not cloud minds');
++
++var msgs = [{ role: 'system', content: 'Just talk.' }, { role: 'user', content: 'hello' }, { role: 'assistant', content: 'hi' }, { role: 'user', content: 'again' }];
++
++(async function () {
++  // 4. OpenAI shape.
++  calls = []; nextReply = { status: 200, json: { choices: [{ message: { content: 'from openai' } }] } };
++  var r1 = await T.send({ url: 'cloud:openai', model: 'gpt-4.1-mini' }, msgs);
++  assert.strictEqual(r1, 'from openai');
++  assert.strictEqual(calls.length, 1);
++  assert.strictEqual(calls[0].url, 'https://api.openai.com/v1/chat/completions');
++  assert.strictEqual(calls[0].opts.headers.Authorization, 'Bearer sk-test-openai-1111');
++  assert.strictEqual(calls[0].opts.credentials, 'omit');
++  assert.strictEqual(calls[0].opts.referrerPolicy, 'no-referrer');
++  var b1 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b1.model, 'gpt-4.1-mini');
++  assert.strictEqual(b1.messages.length, 4);
++  assert.ok(calls[0].opts.body.indexOf('sk-') === -1, 'key never in the body');
++
++  // 5. Anthropic shape: x-api-key, browser header, system split, max_tokens.
++  calls = []; nextReply = { status: 200, json: { content: [{ type: 'text', text: 'from claude' }] } };
++  var r2 = await T.send({ url: 'cloud:anthropic', model: 'claude-sonnet-4-20250514' }, msgs);
++  assert.strictEqual(r2, 'from claude');
++  assert.strictEqual(calls[0].url, 'https://api.anthropic.com/v1/messages');
++  assert.strictEqual(calls[0].opts.headers['x-api-key'], 'sk-ant-test-0000aaaa');
++  assert.strictEqual(calls[0].opts.headers['anthropic-dangerous-direct-browser-access'], 'true');
++  var b2 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b2.system, 'Just talk.');
++  assert.strictEqual(b2.messages.length, 3);
++  assert.ok(b2.max_tokens > 0);
++
++  // 6. Google shape: key in a header, never in the URL.
++  calls = []; nextReply = { status: 200, json: { candidates: [{ content: { parts: [{ text: 'from ' }, { text: 'gemini' }] } }] } };
++  var r3 = await T.send({ url: 'cloud:google', model: 'gemini-2.5-flash' }, msgs);
++  assert.strictEqual(r3, 'from gemini');
++  assert.strictEqual(calls[0].url, 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent');
++  assert.ok(calls[0].url.indexOf('key=') === -1 && calls[0].url.indexOf('AIza') === -1, 'no key in the URL');
++  assert.strictEqual(calls[0].opts.headers['x-goog-api-key'], 'AIza-test-google-2222');
++  var b3 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b3.contents[1].role, 'model');
++  assert.strictEqual(b3.systemInstruction.parts[0].text, 'Just talk.');
++
++  // 7. Honest failures, each with its own words; nothing invented.
++  async function failWith(reply, mind) {
++    calls = []; nextReply = reply;
++    try { await T.send(mind || { url: 'cloud:openai', model: 'gpt-4.1-mini' }, msgs); } catch (e) { return e; }
++    throw new Error('expected a failure');
++  }
++  var e401 = await failWith({ status: 401, json: {} });
++  assert.strictEqual(e401.reason, 'cloud');
++  assert.ok(/did not accept the key/.test(e401.cloudText));
++  assert.ok(/slow down/.test((await failWith({ status: 429, json: {} })).cloudText));
++  assert.ok(/did not take the model/.test((await failWith({ status: 404, json: {} })).cloudText));
++  assert.ok(/was quiet/.test((await failWith({ status: 200, json: { choices: [] } })).cloudText));
++  var saved = sandbox.fetch;
++  sandbox.fetch = function () { calls.push({ url: 'x' }); return Promise.reject(new TypeError('Failed to fetch')); };
++  assert.ok(/could not reach OpenAI/.test((await failWith(null)).cloudText));
++  sandbox.fetch = saved;
++  calls = [];
++  var noKey = await failWith(null, { url: 'cloud:groq', model: 'llama-3.3-70b-versatile' });
++  assert.ok(/No Groq key is in this browser/.test(noKey.cloudText));
++  assert.strictEqual(calls.length, 0, 'no key: nothing sent at all');
++  calls = [];
++  var unknown = await failWith(null, { url: 'cloud:evil', model: 'x' });
++  assert.ok(/does not know/.test(unknown.cloudText));
++  assert.strictEqual(calls.length, 0, 'unknown provider: nothing sent');
++
++  // 8. Words that tell the truth.
++  assert.ok(/through OpenAI\. Your words go to OpenAI\. Your key stays in this browser\./.test(T.heartLine({ url: 'cloud:openai', model: 'gpt-4.1-mini' })));
++  var note = T.honestNote('anthropic');
++  assert.ok(/stays in this browser/.test(note) && /never sees it/.test(note) && /goes only to Anthropic/.test(note) && /files you add stay here/.test(note) && /Forget removes it/.test(note));
++
++  // 9. Thread and rooms wiring (static, text anchors).
++  assert.ok(/v-tree-gathering-api-keys-v0: a cloud chair speaks through its chosen provider only/.test(thread));
++  assert.ok(/function isCloudMind\(mind\)/.test(thread) && /function cloudSafeContent\(m\)/.test(thread));
++  assert.ok(/\[a file stayed on this machine\]/.test(thread), 'a cloud chair hears only that a file stayed here');
++  assert.ok(/cloudNow \? cloudSafeContent\(m\) : messageContent\(m\)/.test(thread));
++  assert.ok(/TreeCloudMinds\.heartLine\(mind\)/.test(thread), 'heart says where words go');
++  assert.ok(/err\.reason === 'cloud' && err\.cloudText/.test(thread));
++  assert.ok(!/TreeCloudMinds\.(getKey|saveKey)/.test(thread), 'the thread never touches a key');
++  assert.ok(/TreeCloudMinds\.seatOptions\(\)/.test(rooms) && /TreeCloudMinds\.mountKeyPanel\(picker,/.test(rooms));
++  assert.ok(/\.cloud-key-panel \{/.test(css) && /\.cloud-key-input,?/.test(css));
++  // The thread's cloudSafeContent drops file bytes and names.
++  var tbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, localStorage: new Store(), sessionStorage: new Store(),
++    location: { protocol: 'https:', pathname: '/' }, document: { addEventListener: function () {}, getElementById: function () { return null; } } };
++  tbox.window = tbox;
++  vm.createContext(tbox);
++  try { vm.runInContext(thread, tbox, { filename: 'garden-thread.js' }); } catch (eT) {}
++  if (tbox.GardenThread && tbox.GardenThread.cloudSafeContent) {
++    var safe = tbox.GardenThread.cloudSafeContent({ text: 'look', file: { name: 'secret-plan.txt', excerpt: 'THE BYTES' } });
++    assert.strictEqual(safe, 'look\n\n[a file stayed on this machine]');
++    assert.strictEqual(tbox.GardenThread.isCloudMind({ url: 'cloud:openai' }), true);
++    assert.strictEqual(tbox.GardenThread.isCloudMind({ url: 'http://127.0.0.1:11434/api/tags' }), false);
++  } else {
++    throw new Error('GardenThread did not load in the vm');
++  }
++
++  // 10. Every page with the Gathering loads the helper before garden-rooms.js.
++  var docs = path.join(dir, '..');
++  fs.readdirSync(docs).filter(function (f) { return /\.html$/.test(f); }).forEach(function (f) {
++    var h = fs.readFileSync(path.join(docs, f), 'utf8');
++    var gi = h.indexOf('<script src="modules/garden-rooms.js"></script>');
++    if (gi === -1) return;
++    var ci = h.indexOf('<script src="modules/tree-cloud-minds.js"></script>');
++    assert.ok(ci !== -1 && ci < gi, f + ' loads tree-cloud-minds.js before garden-rooms.js');
++  });
++
++  // 12. Twin seats are allowed and said; clearing the speaking chair hushes Chat instead of
++  // handing the next message to another mind; the speaking line names the chair.
++  var roomsSrc = fs.readFileSync(path.join(dir, 'garden-rooms.js'), 'utf8');
++  assert.ok(/function twinNote\(chairId, seat\)/.test(roomsSrc), 'twin note helper');
++  assert.ok(/so they will sound alike\./.test(roomsSrc), 'twin note says it plainly');
++  assert.strictEqual((roomsSrc.match(/var twins = twinNote\(chair\.id, seat\);/g) || []).length, 2, 'local and cloud seats both warn on twins');
++  assert.ok(/var wasSpeaking = entryState\(\)\.speaking === chair\.id;\s*if \(wasSpeaking\) window\.GardenRooms\.gatheringHush = true;/.test(roomsSrc), 'clearing the speaking chair hushes');
++  assert.ok(/window\.GardenRooms\.gatheringHush = false;\s*if \(window\.LocalMindProbe && LocalMindProbe\.setSpeakingChair\)/.test(roomsSrc), 'tapping a seated chair lifts the hush');
++  assert.ok(/at the ' \+ chair\.type \+ ' chair\./.test(roomsSrc), 'speaking line names the chair');
++  assert.ok(/if \(gatheringHushed\(\)\) return \{ hush: true, name: '', url: '' \};/.test(thread), 'listener is hushed, not the Settings default');
++  assert.ok(/if \(nowMind && nowMind\.hush\) \{\s*messages\.push\(\{ role: 'garden', text: HEART_HUSH \+ ' Nothing was sent\.' \}\);/.test(thread), 'a hushed Send says so and sends nothing');
++  // behaviour: a hushed Gathering never returns the Settings default as listener
++  var hbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, localStorage: new Store(), sessionStorage: new Store(),
++    location: { protocol: 'https:' } };
++  hbox.window = hbox;
++  var veilCls = { list: ['is-core', 'is-open'], contains: function (c) { return this.list.indexOf(c) !== -1; } };
++  hbox.document = { getElementById: function (id) { return id === 'place-veil' ? { classList: veilCls } : null; },
++    querySelector: function () { return null; }, querySelectorAll: function () { return []; }, addEventListener: function () {} };
++  hbox.LocalMindProbe = {
++    resolveSpeakMind: function () { return { name: 'Ollama', url: 'http://127.0.0.1:11434/api/tags' }; },
++    getRemembered: function () { return { name: 'Ollama', url: 'http://127.0.0.1:11434/api/tags' }; }
++  };
++  hbox.GardenRooms = { gatheringHush: true };
++  vm.createContext(hbox);
++  try { vm.runInContext(thread, hbox, { filename: 'garden-thread.js' }); } catch (eH) {}
++  if (hbox.GardenThread && typeof hbox.GardenThread.listener === 'function') {
++    assert.strictEqual(hbox.GardenThread.listener().hush, true, 'hushed: no default listener');
++    hbox.GardenRooms.gatheringHush = false;
++    assert.strictEqual(hbox.GardenThread.listener().name, 'Ollama', 'hush lifted: default again');
++  } else {
++    throw new Error('GardenThread did not load in the hush vm');
++  }
++
++  // 11. Locks in the new module (code, not its comments).
++  var code = src.split('\n').filter(function (l) { return !/^\s*\/\//.test(l); }).join('\n');
++  assert.ok(!/confirm\(/.test(code), 'no confirm()');
++  assert.ok(!/innerHTML/.test(code), 'no innerHTML');
++  assert.ok(!/\u2014/.test(src), 'no em dash');
++  assert.ok(!/\?key=/.test(code), 'no key in a query string');
++  assert.ok(!/console\.(log|info|warn|error)\([^)]*key/i.test(code), 'no key in a console line');
++  assert.ok(!/http:\/\//.test(code), 'no plain http in the cloud road');
++
++  console.log('SMOKE_OK tree gathering api keys v0.1');
++})().catch(function (e) { console.error(e); process.exit(1); });
+diff --git a/docs/music.html b/docs/music.html
+index 8daaee9..ff336dd 100644
+--- a/docs/music.html
++++ b/docs/music.html
+@@ -1079,6 +1079,7 @@
+   </script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ 
+   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
+diff --git a/docs/nursery.html b/docs/nursery.html
+index b772292..72690e2 100644
+--- a/docs/nursery.html
++++ b/docs/nursery.html
+@@ -53,6 +53,7 @@
+   <script src="modules/nursery-trainer.js"></script>
+   <script src="modules/nursery-ceremony.js"></script>
+   <script src="modules/nursery-growth.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/research.html b/docs/research.html
+index ddbea28..e4cd565 100644
+--- a/docs/research.html
++++ b/docs/research.html
+@@ -82,6 +82,7 @@
+   <script src="modules/keep-receipt.js"></script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/round-table.html b/docs/round-table.html
+index 3c1b47a..9bb21a1 100644
+--- a/docs/round-table.html
++++ b/docs/round-table.html
+@@ -88,6 +88,7 @@
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
+   <script src="modules/round-table-sitting.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/settings.html b/docs/settings.html
+index 4ca2b0d..0535332 100644
+--- a/docs/settings.html
++++ b/docs/settings.html
+@@ -52,6 +52,7 @@
+   <script src="modules/fl-connect.js"></script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/team.html b/docs/team.html
+index c9636b2..23b19c3 100644
+--- a/docs/team.html
++++ b/docs/team.html
+@@ -38,6 +38,7 @@
+ 
+   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
+ 
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ </body>
+ </html>
+diff --git a/docs/workshop.html b/docs/workshop.html
+index 538dcc6..b0d439b 100644
+--- a/docs/workshop.html
++++ b/docs/workshop.html
+@@ -90,6 +90,7 @@
+   <script src="modules/garden-thread.js"></script>
+   <script src="modules/workshop-benches.js"></script>
+   <script src="modules/workshop-trainer.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ 
+   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->

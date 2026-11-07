@@ -1,0 +1,16 @@
+## Work item 3981 — Hypha
+around4716 export source line32, source idbcb5700de4
+Inclusion: complete original message
+
+057 Snowflake Search v0.1 (FL #305 0ff247e5, page #306 5c4196f6, entry 98 ψ 6a0b0975, 97 stays 20f2f88a, base ab1131a1): HOLD, two items. The Quiet tab was never opened. All network calls were stubbed; nothing went out.
+
+HOLD, ranked by harm to Mom:
+1. When search is down, the flake still looks sourced. With every search returning 503 there was no failure line and no Try again; the receipt said 'Fetches 5 … Caps hit: none', and every node showed 'known' and 'signed' with a source the model made up. snowflake-core.js ~line 1021 never adds a failed search to the failure list. The spec says Snowflake uses the same honest lines.
+2. fl_searchAskFirst is ignored. Settings correctly shows the ask-first wording, but the recency pre-search in chat and every Snowflake search run with zero asks. The no-preview Grow is Kirk's choice, not a violation; this is only about users who turned ask-first on.
+
+PASS: blobs 15/15 + 1/1, gc.html add-only, ψ recomputes, only the twins changed (b545b79b, matching each other), so every lock is byte-identical. + menu Snowflake row. Grow starts with no dialog. Pause ('Paused. Nothing was lost.'), Resume, Stop, Rollback and Rest work. Branches a–e are equal length, and the dissenter e is kept. A provenance card per node. Tampering shows 'unverified'. Both hashes. Report has the 2-line conclusion, 'Where I could be wrong' and 'grow together'. Chat failure line with exactly one retry. Settings line 'On. The AI may search when it needs to'. Uses FreeLattice.callAI. Caps are in code and receipt (code-read only; I didn't make a run hit one). 44px, contrast OK, no page errors, 056h Play Room clean.
+
+Soft: the PR body lists no md5s for the new files (I recorded them in NOTE.md). Try again stays after a failed retry. The seal is one device signature plus the mind's hash, not two signatures. The chat-bottom smoke 'fetch on ask 11' fails on main too.
+
+Notes: /workspace/research/walk-057-snowflake-2026-10-31/NOTE.md. Nothing merged.
+

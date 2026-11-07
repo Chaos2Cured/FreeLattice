@@ -1,0 +1,38 @@
+2. TREE: BACK FROM NURSERY CLOSES NURSERY, THE ASK STAYS (Hypha HOLD 2)
+  With the ask open, opening Nursery then pressing Back (history.back) leaves Nursery open and
+  defers the ask ("Saved your answer for later"), at all 3 sizes. Back must close Nursery (the
+  place's history entry) and leave the ask open and in view. Back on the ask itself (when it is
+  the top entry) still defers it, as before. Put the place opened after the ask on top of
+  history, or let the popstate handler check which entry is leaving. Hypha opened Nursery with
+  a JS click on the hidden door; test both that and a real click where reachable, say which.
+
+3. TREE SOFT: HEART LINE IN VIEW WHILE AN ASK IS OPEN (Hypha INFO)
+  Ask open: heart line y -41 at 1280, -212 at 390, -335 at 2x (in view, 208/208/19, without an
+  ask). Keep it in view if it fits; Seal it always wins. If both cannot fit at a size, say so.
+
+4. GC PAGE ENTRY 73 (honest layer)
+  New docs/gc.html entry 73 (lambda 73.000), stacked on #266's branch or a new PR stacked on
+  it; say which. Correct entry 72 on three points: (a) the FL reply top at 2x was -23 / -77 by
+  Hypha's method, not y 0 / 2, and name the method; (b) the 1280 canvas shows at 677x169 CSS
+  (the bitmap is 677x320 drawn), not "shown 677 by 320"; (c) the Tree heart line is in view at
+  1280 only with no ask open. Browser and version only. Entry 72 stays untouched.
+
+----------------------------------------------------------------------
+5. MEASURE WITH A REAL HEADLESS BROWSER
+  Hypha's method from 1 for the reply top (first draw and after scroll, with shot paths). Tree:
+  ask open, Nursery open, Back: is Nursery closed, is the ask open, Seal it's box, at 1280x800,
+  390x844 and 640x400 DPR 2; then Back again on the ask: deferred. Heart line y with the ask
+  open at all 3 sizes. Re-confirm every 043g PASS above. Name the browser and version.
+
+6. THE SMOKE
+  New scripts/smoke-seal-ask-last-two-v0.1.js (each repo): FL reply top >= 0 at 640x400 after
+  a clay reply, before and after the page's scroll; Tree Back from Nursery closes Nursery and
+  keeps the ask, Back on the ask defers. Prints SMOKE_OK seal ask last two v0.1. All earlier
+  smokes re-run after the last edit; say which, if any, still fail and why.
+
+7. REPORT
+  New head shas on #258 and #123, page-note PR link, Hypha's method (step 1A) written out,
+  every removed line and where its job went, md5s of every locked file (mind-workspace.js FL ==
+  Tree, particle-clay.js FL == Tree), all smokes, the measurements from 5, shots, and entry 73
+  with t, lambda, epsilon, delta, omega, sigma so Celeste can recompute psi. Hypha walks it
+  again before merge.

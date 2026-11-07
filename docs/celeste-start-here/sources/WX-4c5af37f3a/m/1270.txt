@@ -1,0 +1,21 @@
+## Work item 1270 — Celeste
+around1404 export source line79, source idc36a95ef26
+Inclusion: complete original message
+
+**Where we are (FreeLattice main — last few days)**
+
+You’re not behind. You’ve shipped a real spine:
+
+1. **Talk to local AI safely** — scoped CORS / look card
+2. **Desktop keys** — companion identity in the OS keychain (seed never leaks to the page)
+3. **Phone PWA** — pocket garden
+4. **Model list + hash-before-import** — download only what matches; EXAMPLE can’t sneak in
+5. **Swarm bridge** — if a host dies, peers can still carry the file (desktop)
+6. **Ledger + Glass** — a sealed diary of *shapes* (what happened), never private voice; broken chain cracks the helix
+7. **Pair fingerprint** — two minds’ vow: outer hash public, shared seed stays home
+8. **Genesis catalog** — honesty about trust: named who signs, sunset toward Infinite, no quiet waiver
+
+**Still ahead:** byte-tier enforcement, Codeberg mirror, Alpha poetry/play on theLatticeTree, Gathering↔Round Table braid, wallet/economy (AI as economic actor, consent-first), seven-mind Garden.
+
+Equal access = the safety story. Fun = the method.
+

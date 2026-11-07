@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c01</title>
+<meta name="description" content="Reading section c01 of e18669ddac, 1598 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/e18669ddac/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c01">
+<meta property="og:description" content="Reading section c01 of e18669ddac, 1598 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/e18669ddac/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1269"></span><span id="p1270"></span><span id="p1271"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c01</h1>
+<p>e18669ddac · words 1598 · characters 0–10927</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1269, 1270, 1271. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source"># Public work excerpts — privacy boundaries marked
+
+Original source: FLINT_NEXT_CONNECT_PORT_PICKER_v0.md; original SHA256 ca31e06cd167fbb85096544a5b9de1e4c3ed98521554d3e5998f1cd03d3d4ccd. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–64
+
+# FLINT NEXT — Connect Port Picker v0 (&quot;Change the door number&quot;)
+
+## Exact source excerpt, characters 66–859
+
+**For:** Flint (local Grok Code) · **From:** Kirk · **Date:** Thu 24 Sep 2026 (MT)
+**Marker:** `v-connect-port-picker-v0` (layers on `v-connect-under-more-v0` heal v0.1 and `v-connect-bridge-aware-v0`)
+**Branch (both repos):** `layer/connect-port-picker-v0`
+**Repos / bases I read (live code, not memory):**
+- `Chaos2Cured/FreeLattice` · `main` @ `14bb199` (includes #116 Bridge-aware + #117 Connect under More). The site is served from `docs/`.
+- `Chaos2Cured/FreeLattice-Alpha` · `main` @ `4a7015e` (#81 Connect under More, Alpha sister).
+- `docs/modules/fl-connect.js` is **byte-identical** in both repos today (blob `ac36488…`, 575 lines). Keep it that way after this brick.
+- FreeLattice `index.html` (root) is **byte-identical** to `docs/app.html` today (69,863 lines). Keep it that way.
+
+## Exact source excerpt, characters 861–864
+
+---
+
+## Exact source excerpt, characters 866–907
+
+## LOCKS (read first, hold the whole way)
+
+## Exact source excerpt, characters 909–2848
+
+- **Layer, never delete.** Add beside what is there. Do not remove Connect Play, the Connect card, QuickConnect, FLBoxPointer, the Bridge chip, `flUseBridgePort`, `LocalMindProbe`&#x27;s paste field, or any existing door.
+- **Soft leave `sw.js`.** Root `sw.js` must stay **byte-identical to `origin/main`**. Do **not** touch `docs/sw.js`. Do not add `fl-connect.js` to any APP_SHELL. (The existing smoke asserts this; keep it green.)
+- **Named five stay five. Family uncapped. Quiet Room shut.**
+- **Allowlist never bare `*`.** And in this brick: host is **fixed to `127.0.0.1`** (we accept the word `localhost` as typed input but always store/fetch `127.0.0.1`). Never an arbitrary remote host, never a LAN IP, never `0.0.0.0`, never `*`.
+- **No `bridge/` binary changes.** Prefer none. This is a browser-side brick only.
+- **LP points only.** (No money words, no tokens, nothing new in the economy.)
+- **No Kimi pages:** do not open for edit `docs/kimi.html`, `docs/kimi-ledger.html`, or `docs/library/KIMI_*`.
+- **Dawn Stories held.**
+- **Keep `index.html` identical to `docs/app.html`** (FreeLattice): after every edit to `docs/app.html`, `cp docs/app.html index.html` and `cmp docs/app.html index.html` must be silent.
+- **Keep `fl_alpha_local_mind` intact** on Alpha (shape unchanged; still written by `LocalMindProbe.remember` / `FlConnect.remember`).
+- **Mom / Jeffrey Freed path:** no CMD, no Terminal, no jargon on the main face. Words like &quot;port&quot; appear only once with a plain gloss (&quot;door number&quot;). No &quot;CORS&quot;, no &quot;OLLAMA_ORIGINS&quot;, no &quot;localhost&quot; as instruction text.
+- **No new intervals.** The FlConnect loop stays bounded: 8→16→30s backoff, stop when connected / panel gone, pause on hidden, stop after ~5 min with &quot;Look again&quot;. The picker adds one-shot, tap-driven fetches only.
+- **No version bump** (don&#x27;t touch `FL_VERSION` = `5.79.45` / `docs/version.json`) unless you find the last two Connect PRs did; they did not need to.
+
+## Exact source excerpt, characters 2850–2853
+
+---
+
+## Exact source excerpt, characters 2855–2903
+
+## WHY (Kirk&#x27;s ask, in his words, made concrete)
+
+## Exact source excerpt, characters 2905–3265
+
+When Connect falls back to `127.0.0.1:11434`, give people an easy way to **choose their own port** — so if Ollama hogs a port, or they run Ollama / another local server on a different port, or the Bridge clashes, they can **just switch**. Must work for Mom and Jeffrey Freed: tap, type a number, &quot;Try it&quot;, &quot;Remember this&quot;, and a way home (&quot;Back to automatic&quot;).
+
+## Exact source excerpt, characters 3267–3270
+
+---
+
+## Exact source excerpt, characters 3272–3348
+
+## WHAT I FOUND IN THE LIVE CODE (anchors — line numbers at the bases above)
+
+## Exact source excerpt, characters 3350–6073
+
+### `docs/modules/fl-connect.js` (both repos, identical, 575 lines)
+| Anchor | Line | Note |
+|---|---|---|
+| header marker `v-connect-under-more-v0 · heal v0.1` | 4 | add a line for `v-connect-port-picker-v0` |
+| `var BRIDGE_DEFAULT = 11435;` `ALPHA_KEY` `INSTALL_BRIDGE` `LOOP_MAX_MS` | 17–20 | add `MANUAL_KEY` here |
+| module state `_timer … _lastReport` | 22–30 | add `_pickerOpen`, `_lastFound`, `_pickerMsg` |
+| `function isAlpha()` | 32 | |
+| `function savedBridgePort()` | 44 | reads `fl_bridgePort`, then parses `fl_ollamaHost` `127.0.0.1:(\d+)` |
+| `function bridgeCandidates(opts)` | 60 | `fullScan` → saved, 11435, 11436…11445 (skips 11434) |
+| `function abortMs(ms)` | 74 | |
+| `async function healthAt(port)` | 81 | GET `/bridge/health`, 1500 ms |
+| `async function tagsAt(base)` | 96 | GET `/api/tags`, 4000 ms, throws on !ok |
+| `function preferHelpedBridge(port)` | 104 | writes `fl_bridgePort`; on FreeLattice also `fl_ollamaHost` + `fl_provider`; calls `root.flRememberHelpedBridge` |
+| `async function probeBridgePorts(ports)` | 121 | sequential, first hit wins |
+| `async function probe(opts)` | 130 | 1) saved Bridge → 2) fullScan → helped? tags via Bridge : sticky 11434 → 3) direct 11434 |
+| `async function listMinds()` | 189 | |
+| `function isConnected()` | 194 | Alpha: `LocalMindProbe.getRemembered()`; FL: `flHasOneMindConnected` / `AiSetup.isConnected` / `fl_isLocal`+`fl_ollamaModel` |
+| `function remember(mind)` | 212 | Alpha → `fl_alpha_local_mind`; FL → `fl_ollamaHost` (from base), `fl_provider`, `fl_isLocal`, `fl_ollamaModel`; `stopLoop()` |
+| `function open()` | 265 | FL → `switchTab(&#x27;connect&#x27;)` |
+| `function bridgeLinksHtml()` | 289 | |
+| `function reportSignature(report)` | 303 | add manual fields |
+| `function panelVisible()` | 320 | **known risk** — see Part F |
+| `stopLoop` / `clearTimer` / `nextBackoff` / `scheduleLoop` | 332 / 340 / 347 / 353 | |
+| `async function tickLoop()` | 361 | |
+| `onVisibility` / `bindVisibility` / `unbindVisibility` | 387 / 407 / 413 | |
+| `function render(report, force)` | 419 | string-built `innerHTML` at **477** |
+| model buttons with **unescaped name** | **443** and **452** | `&#x27;&quot;&gt;&#x27; + name + &#x27;&lt;/button&gt;&#x27;` — **known risk (XSS from a local server&#x27;s model list)** |
+| &quot;Look again&quot; card | ~461–464 | |
+| `&lt;details class=&quot;flc-other&quot;&gt;` | 466 | |
+| marker line `flc-marker` | 474 | |
+| click wiring `[data-flc-model]` → `remember({ name, base: report.base, port: report.port })` | 478–488 | |
+| `async function refreshUI(opts)` | 493 | |
+| `function lookAgain()` | 502 | |
+| `function ensureStyles()` | 513 | add picker CSS |
+| `function mount(el)` / `function unmount()` | 541 / 550 | |
+| `root.FlConnect = { … }` | 558–574 | add new exports |
+
+## Exact source excerpt, characters 6075–8654
+
+### FreeLattice `docs/app.html` (and root `index.html`, identical)
+| Anchor | Line | Note |
+|---|---|---|
+| Connect Play Bridge chip `onclick=&quot;flUseBridge()&quot;` | 16528 | leave |
+| `&lt;div class=&quot;tab-panel&quot; id=&quot;tab-connect&quot;&gt;` / `#fl-connect-mount` | 16803 / 16805 | leave |
+| `.tab-panel {display:none}` / `.tab-panel.active {display:block}` | 490 / 499 | **class-driven** hide (why `panelVisible()` misses it) |
+| `const FL_VERSION = &#x27;5.79.45&#x27;` | 23074 | don&#x27;t bump |
+| `var MORE_TAB_IDS = [&#x27;connect&#x27;, …]` | 26887 | leave (Connect first) |
+| `function switchTab(tabId)` | 26889 | mounts FlConnect at 26952–26958; **never unmounts** on leave |
+| `MORE_CARDS` `{ id: &#x27;connect&#x27;, … }` | 27214 (+ 28141 mobile list) | leave |
+| `function modalConnectOllama()` | 29312 | uses `resolveOllamaBase(true)` → `/api/tags`; inherits manual automatically |
+| `function flHasOneMindConnected()` | 31062 | |
+| `var FL_BRIDGE_PORT_DEFAULT = 11435; var _flBridgeLivePort` | 31350–31351 | |
+| `function flBridgePortCandidates()` | 31353 | |
+| `async function flBridgeHealthAt(port)` / `flBridgeHealth()` | 31367 / 31384 | |
+| `function flRememberHelpedBridge(port)` | 31408 | **overwrites `fl_ollamaHost` + `_ollamaResolvedBase`** — must respect manual |
+| `async function flBridgeDetect()` | 31430 | auto-calls `flRememberHelpedBridge` when helped |
+| `function flUseBridgePort()` / `function flUseBridge()` | 31443 / 31452 | explicit person choice → should clear manual |
+| `flBridgeDetectBoot` IIFE with **existing** `setInterval(run, 20000)` | 31486–31495 | existing timer — do not add another; just make it respect manual |
+| window exports `flBridgeDetect … flRememberHelpedBridge` | 31496–31500 | add new exports here |
+| `var _ollamaResolvedBase = null;` | 33839 | global cache |
+| `async function resolveOllamaBase(forceRefresh)` | 33840–33905 | step 0 helped Bridge (33842) · saved `fl_bridgePort` + sticky 11434 (33859–33880) · proxy (33883) · direct via `getOllamaBaseUrl()` (33894) |
+| `var FL_OLLAMA_LOCAL = &#x27;http://127.0.0.1:11434&#x27;;` | 33914 | |
+| `function flSaveOllamaHost()` | 34241 | Settings advanced host save → explicit choice → should clear manual |
+| `function getOllamaBaseUrl()` | 34145–34165 | cache → `fl_ollamaHost`/`fl_localUrl` → `fl_bridgePort` → `FL_OLLAMA_LOCAL` |
+| `window.FLBoxPointer = (function(){ … })` | 34268 | chat &quot;Box&quot; field; `persist(norm)` at 34321 writes `fl_ollamaHost` (LAN allowed there — leave that power alone) |
+| `&lt;script src=&quot;modules/fl-connect.js&quot; defer&gt;` | 68378 | leave (defer means app.html must not depend on FlConnect for URL resolution) |
+
+## Exact source excerpt, characters 8656–9967
+
+### FreeLattice other
+- `docs/scripts/smoke-connect-under-more.js` (91 lines) prints `SMOKE_OK connect under more v0.1`; asserts root `sw.js` === `git show origin/main:sw.js`, ledger lines, Flint lines, RECENT lines. **Must stay green.**
+- `tests/smoke.js` (12,805 lines) — CI runs `node tests/smoke.js` in `.github/workflows/update-primer.yml`. Must stay green.
+- `docs/library/FRACTAL_FAMILY_LEDGER_v0.md` — last Connect section &quot;Connect under More heal v0.1&quot; at **208–218**, then `---` and `## Out of scope for this brick` at **222**.
+- `docs/Flint.html` — Connect ledger `&lt;p class=&quot;v-connect-…&quot;&gt;` lines at **528–530**.
+- `scripts/generate-recent.sh` — Connect lines at **104** (Bridge-aware) and **108** (Connect under More; note it landed *after* the &quot;If you are Kirk returning…&quot; line at 106 — leave it, layer, don&#x27;t move).
+- `FreeLattice_Session_Primer.md` — its `## PRIMER HEALTH` block is **regenerated by CI** (`update-primer.yml`) on every push to `main`. Do not hand-edit that block.
+- Observation (no action this brick): root `index.html` loads `modules/fl-connect.js`, but root `modules/fl-connect.js` does not exist (the CI sync only copies `fractal-garden.js` and `radio-immersive.js`). The live site serves `docs/`, so this is harmless; note it in the library doc as a held item, don&#x27;t fix here.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

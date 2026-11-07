@@ -1,0 +1,253 @@
+  if (url === '/pair/check') {
+    var me = meta && meta.mind;
+    return respond(res, 200, { ok: true, id: me.id, name: me.name, kind: me.kind, scopes: me.scopes,
+                               persistent: !bridgeEphemeral, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 55276–55667
+
+  if (url === '/pair/list') {
+    var ls = trustState();
+    return respond(res, 200, {
+      minds: ls.minds.map(function (m) { return publicMind(m, meta && meta.mind); }),
+      localTools: ls.localTools, persistent: !bridgeEphemeral,
+      trustedOrigins: ls.trustedOrigins.slice(), roots: rootList().map(function (r) { return r.name; }),
+      bridgeLock: BRIDGE_LOCK_VERSION
+    });
+  }
+
+## Exact source excerpt, characters 55669–56441
+
+  if (url === '/pair/revoke' && method === 'POST') {
+    var rs = trustState();
+    var gone = rs.minds.filter(function (m) { return m.id === String(data.id || ''); })[0];
+    if (!gone) return respond(res, 404, { error: 'No trusted mind with that id.' });
+    rs.minds = rs.minds.filter(function (m) { return m.id !== gone.id; });
+    if (gone.kind === 'cli') { rs.localTools = false; try { fs.unlinkSync(TOKEN_FILE); } catch (e) {} }
+    saveTrust();
+    ledgerAppend({ kind: 'pair', route: '/pair/revoke', origin: (meta && meta.origin) || '', device: gone.id, result: 'revoked' });
+    console.log('  \u2726 Revoked "' + gone.name + '" (' + gone.id + ').');
+    return respond(res, 200, { revoked: gone.id, you: !!(meta && meta.mind && meta.mind.id === gone.id) });
+  }
+
+## Exact source excerpt, characters 56443–56990
+
+  if (url === '/pair/revoke-all' && method === 'POST') {
+    var ra = trustState();
+    var before = ra.minds.length;
+    ra.minds = ra.minds.filter(function (m) { return m.kind === 'cli'; }); // local tools stay; revoke that row by itself
+    saveTrust();
+    ledgerAppend({ kind: 'pair', route: '/pair/revoke-all', origin: (meta && meta.origin) || '', result: 'revoked-all' });
+    console.log('  \u2726 Revoked every paired device (' + (before - ra.minds.length) + ').');
+    return respond(res, 200, { revoked: before - ra.minds.length });
+  }
+
+## Exact source excerpt, characters 56992–57709
+
+  if (url === '/pair/scopes' && method === 'POST') {
+    var ss = trustState();
+    var sm = ss.minds.filter(function (m) { return m.id === String(data.id || ''); })[0];
+    if (!sm) return respond(res, 404, { error: 'No trusted mind with that id.' });
+    var add = cleanScopes(Array.isArray(data.add) ? data.add : []);
+    var drop = cleanScopes(Array.isArray(data.remove) ? data.remove : []);
+    sm.scopes = cleanScopes(sm.scopes.concat(add).filter(function (s) { return drop.indexOf(s) === -1; }));
+    saveTrust();
+    ledgerAppend({ kind: 'pair', route: '/pair/scopes', origin: (meta && meta.origin) || '', device: sm.id, result: 'scopes' });
+    return respond(res, 200, { id: sm.id, scopes: sm.scopes });
+  }
+
+## Exact source excerpt, characters 57711–57830
+
+  if (url === '/roots') {
+    return respond(res, 200, { roots: rootList(), bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+```
+
+## Exact source excerpt, characters 57832–57877
+
+### Block D: code routes (replaces L992-1140)
+
+## Exact source excerpt, characters 57879–58529
+
+```js
+  // ══════════════════════════════════════════════════
+  // LATTICE CODE: Self-improving infrastructure
+  // Read and search are free. Write/patch/commit need approval.
+  // LAYER bridge-lock-v0 · v0.1: every route below needs a trusted mind
+  // (handleRequest: needsToken + scopeFor). A new mind has every scope, so
+  // once paired, a trusted mind reads, writes, patches, tests and commits
+  // with no more prompts (AUTONOMY.md Principle 1). Paths go through
+  // lockedPath() inside the chosen trusted project folder (?root= or
+  // data.root, default "project"). No shell anywhere.
+  // ══════════════════════════════════════════════════
+
+## Exact source excerpt, characters 58531–59308
+
+  var CODE_ROUTE = /^\/(code|test)\//.test(url);
+  var ROOT_NAME = 'project';
+  if (CODE_ROUTE) {
+    try { ROOT_NAME = new URL('http://l' + url).searchParams.get('root') || ROOT_NAME; } catch (eRoot) {}
+    if (typeof data.root === 'string' && data.root) ROOT_NAME = data.root;
+  }
+  var CODE_ROOT = rootReal(ROOT_NAME);
+  if (CODE_ROUTE && !CODE_ROOT) return respond(res, 404, { error: 'Unknown project folder', roots: rootList().map(function (r) { return r.name; }) });
+  var PROJECT_ROOT = CODE_ROOT || projectRootReal();
+  var SECRETS_OK = !!(meta && meta.mind && meta.mind.scopes.indexOf('secrets') !== -1);
+  function codePath(relPath, opts) {
+    var o = Object.assign({}, opts || {}, { root: PROJECT_ROOT, secrets: SECRETS_OK });
+    return lockedPath(relPath, o);
+  }
+
+## Exact source excerpt, characters 59310–59515
+
+  // Superseded by lockedPath (bridge-lock-v0). Kept so old callers still work.
+  function safePath(relPath) {
+    var lp = codePath(relPath, { allowRoot: true });
+    return lp.error ? null : lp.full;
+  }
+
+## Exact source excerpt, characters 59517–60555
+
+  // GET /code/tree: list project files
+  if (url.startsWith('/code/tree')) {
+    var tp = new URL('http://l' + url).searchParams;
+    var subdir = tp.get('path') || '.';
+    var target = safePath(subdir);
+    if (!target) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      function listDir(dir, depth) {
+        if (depth > 3) return [];
+        return fs.readdirSync(dir, { withFileTypes: true })
+          .filter(function(e) { return !e.name.startsWith('.') && e.name !== 'node_modules' && !e.isSymbolicLink(); })
+          .map(function(e) {
+            var rel = path.relative(PROJECT_ROOT, path.join(dir, e.name));
+            if (e.isDirectory()) return { name: e.name, type: 'dir', path: rel, children: listDir(path.join(dir, e.name), depth + 1) };
+            return { name: e.name, type: 'file', path: rel, size: fs.statSync(path.join(dir, e.name)).size };
+          });
+      }
+      return respond(res, 200, listDir(target, 0));
+    } catch(e) { return respond(res, 500, { error: e.message }); }
+  }
+
+## Exact source excerpt, characters 60557–61531
+
+  // GET /code/read?path=...&start=N&end=N
+  if (url.startsWith('/code/read')) {
+    var rp = new URL('http://l' + url).searchParams;
+    var filePath = rp.get('path');
+    var start = parseInt(rp.get('start') || '0', 10);
+    var end = parseInt(rp.get('end') || '0', 10);
+    var readLp = codePath(filePath, { allowRoot: true });
+    if (readLp.error) return respond(res, readLp.error, { error: 'Path refused', reason: readLp.reason });
+    var full = readLp.full;
+    try {
+      var content = fs.readFileSync(full, 'utf8');
+      var lines = content.split('\n');
+      if (start > 0 || end > 0) {
+        return respond(res, 200, { path: filePath, lines: lines.slice(Math.max(0, start - 1), end || lines.length), start: start, end: end || lines.length, totalLines: lines.length });
+      }
+      return respond(res, 200, { path: filePath, content: content, totalLines: lines.length });
+    } catch(e) { return respond(res, 404, { error: 'Not found: ' + filePath }); }
+  }
+
+## Exact source excerpt, characters 61533–62714
+
+  // GET /code/search?q=...&path=docs/
+  if (url.startsWith('/code/search')) {
+    var sp = new URL('http://l' + url).searchParams;
+    var query = sp.get('q') || '';
+    var searchLp = codePath(sp.get('path') || 'docs', { allowRoot: true });
+    if (searchLp.error) return respond(res, searchLp.error, { error: 'Search path refused', reason: searchLp.reason });
+    if (!query || query.length > 200 || hasControlChars(query)) return respond(res, 400, { error: 'q must be 1-200 printable characters' });
+    try {
+      var out = execFileSync('grep', ['-rn', '--include=*.js', '--include=*.html', '--include=*.css', '--include=*.md',
+        '-e', query, '--', searchLp.rel], { cwd: PROJECT_ROOT, timeout: 10000, encoding: 'utf8',
+        maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+      var matches = out.split('\n').filter(Boolean).slice(0, 50).map(function(l) { var p = l.split(':'); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(':').trim() }; });
+      return respond(res, 200, { query: query, matches: matches, count: matches.length });
+    } catch(e) { return respond(res, 200, { query: query, matches: [], count: 0 }); }
+  }
+
+## Exact source excerpt, characters 62716–63529
+
+  // POST /code/write: write a file (trusted mind with 'write'; no confirm dialog)
+  if (url === '/code/write' && method === 'POST') {
+    if (!data.path || typeof data.content !== 'string' || !data.content) return respond(res, 400, { error: 'path and content required' });
+    var wlp = codePath(data.path);
+    if (wlp.error) return respond(res, wlp.error, { error: 'Path refused', reason: wlp.reason });
+    try {
+      fs.mkdirSync(path.dirname(wlp.full), { recursive: true });
+      fs.writeFileSync(wlp.full, data.content, 'utf8');
+      earnLP(activeId, 'core_plant', 'Wrote file: ' + wlp.rel);
+      return respond(res, 200, { message: 'File written.', path: wlp.rel, root: ROOT_NAME, bytes: data.content.length });
+    } catch(e) { return respond(res, 500, { error: 'Write failed: ' + e.message }); }
+  }
+
+## Exact source excerpt, characters 63531–64475
+
+  // POST /code/patch: find-and-replace in a file ($ in the replacement stays literal)
+  if (url === '/code/patch' && method === 'POST') {
+    if (!data.path || typeof data.find !== 'string' || !data.find || typeof data.replace !== 'string') return respond(res, 400, { error: 'path, find, and replace required' });
+    var plp = codePath(data.path);
+    if (plp.error) return respond(res, plp.error, { error: 'Path refused', reason: plp.reason });
+    try {
+      var pcontent = fs.readFileSync(plp.full, 'utf8');
+      if (!pcontent.includes(data.find)) return respond(res, 400, { error: 'Search text not found in file', hint: 'Check whitespace and line endings.' });
+      fs.writeFileSync(plp.full, pcontent.replace(data.find, function() { return data.replace; }), 'utf8');
+      return respond(res, 200, { message: 'Patch applied.', path: plp.rel });
+    } catch(e) { return respond(res, 500, { error: 'Patch failed: ' + e.message }); }
+  }
+
+## Exact source excerpt, characters 64477–65024
+
+  // GET /code/git/status
+  if (url.split('?')[0] === '/code/git/status') {
+    try {
+      var status = runGit(['status', '--porcelain'], PROJECT_ROOT);
+      var branch = runGit(['branch', '--show-current'], PROJECT_ROOT).trim();
+      var log = runGit(['log', '--oneline', '-5'], PROJECT_ROOT);
+      return respond(res, 200, { branch: branch, root: ROOT_NAME, changes: status.split('\n').filter(Boolean), recentCommits: log.split('\n').filter(Boolean) });
+    } catch(e) { return respond(res, 500, { error: 'Git failed: ' + e.message }); }
+  }
+
+## Exact source excerpt, characters 65026–67088
+
+  // POST /code/git/commit: stage and commit (local only; this bridge never pushes)
+  if (url === '/code/git/commit' && method === 'POST') {
+    var lg = { route: '/code/git/commit', origin: (meta && meta.origin) || '', agent: activeId,
+               device: (meta && meta.mind && meta.mind.id) || '' };
+    var msgOk = typeof data.message === 'string' && data.message.trim() &&
+      data.message.length <= MAX_COMMIT_MESSAGE && !/[\u0000-\u0008\u000b-\u001f\u007f]/.test(data.message);
+    if (!msgOk) {
+      lg.result = 'refused:message'; ledgerAppend(lg);
+      return respond(res, 400, { error: 'message required (1-' + MAX_COMMIT_MESSAGE + ' chars, no control characters)' });
+    }
+    var files = data.files === undefined ? ['.'] : data.files;
+    if (!Array.isArray(files) || files.length === 0 || files.length > MAX_COMMIT_FILES) {
+      lg.result = 'refused:files'; ledgerAppend(lg);
+      return respond(res, 400, { error: 'files must be a list of 1-' + MAX_COMMIT_FILES + ' project paths' });
+    }
+    var rels = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      var clp = codePath(files[fi], { allowRoot: true });
+      if (clp.error) {
+        lg.result = 'refused:path:' + clp.reason; ledgerAppend(lg);
+        return respond(res, clp.error, { error: 'Path refused', reason: clp.reason });
+      }
+      rels.push(clp.rel);
+    }
+    lg.filesCount = rels.length;
+    lg.filesSha256 = sha256Hex(rels.slice().sort().join('\n'));
+    lg.messageSha256 = sha256Hex(data.message);
+    try {
+      runGit(['add', '--'].concat(rels), PROJECT_ROOT);
+      runGit(['commit', '-m', data.message], PROJECT_ROOT);
+      var headSha = runGit(['rev-parse', 'HEAD'], PROJECT_ROOT).trim();
+      lg.result = 'ok'; lg.commitSha = headSha; ledgerAppend(lg);
+      return respond(res, 200, { message: 'Committed: ' + data.message, commit: headSha, root: ROOT_NAME });
+    } catch(e) {
+      lg.result = 'error'; ledgerAppend(lg);
+      return respond(res, 500, { error: 'Commit failed: ' + String((e.stderr || e.message || '')).slice(0, 400) });
+    }
+  }
+

@@ -1,0 +1,6 @@
+## Work item 3120 — Celeste
+around3728 export source line52, source ide1c22c5507
+Inclusion: complete original message
+
+The Tree's rooms (`019`) are merged, live on thelatticetree.com, and backed up to Codeberg. Every check passed. A classroom can now fill a room from one invite, and a phone with no AI of its own can ask. Lyra's page is still being drafted, so hold `026` until I give the word.
+

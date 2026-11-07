@@ -1,0 +1,122 @@
+     var tools = el('div', 'thread-tools');
+     tools.setAttribute('data-thread-tools', '1');
+@@ -629,6 +635,8 @@
+         sendBtn.removeAttribute('disabled');
+         sendBtn.removeAttribute('aria-disabled');
+         sendBtn.removeAttribute('tabindex');
++        sendBtn.removeAttribute('aria-describedby');
++        sendWhy.hidden = true;
+         tools.hidden = false;
+         tools.removeAttribute('hidden');
+         fileBtn.disabled = false;
+@@ -655,6 +663,8 @@
+         sendBtn.setAttribute('disabled', '');
+         sendBtn.setAttribute('aria-disabled', 'true');
+         sendBtn.tabIndex = -1;
++        sendBtn.setAttribute('aria-describedby', sendWhy.id);
++        sendWhy.hidden = false;
+         tools.hidden = true;
+         tools.setAttribute('hidden', '');
+         fileBtn.disabled = true;
+diff --git a/docs/modules/tree-glow-2b.test.js b/docs/modules/tree-glow-2b.test.js
+new file mode 100644
+index 0000000..4fcd02d
+--- /dev/null
++++ b/docs/modules/tree-glow-2b.test.js
+@@ -0,0 +1,60 @@
++#!/usr/bin/env node
++// v-tree-glow-2b-v0: Tree glow 2b. Guards: (1) a hint more frost behind an open place, with
++// a tint fallback and a calm opaque face for reduced transparency; (2) the Desktop / install
++// links are readable on night; (3) header Chat / galaxies and shared shoulder are 14px and
++// readable; (4) a sleeping Send, Ask or Run says why beside it; (5) no "Change" on an empty
++// chair; (6) code mirrors wrap long paths on a phone. No network. No kitchen.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var assert = require('assert');
++
++var css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
++var thread = fs.readFileSync(path.join(__dirname, 'garden-thread.js'), 'utf8');
++var benches = fs.readFileSync(path.join(__dirname, 'workshop-benches.js'), 'utf8');
++
++var at = css.indexOf('v-tree-glow-2b-v0: Tree glow 2b');
++assert.ok(at > 0, 'glow 2b block is in garden-rooms.css');
++var g = css.slice(at);
++
++// (1) frost
++assert.ok(/#place-veil\.is-open::before \{[^}]*position: fixed;[^}]*z-index: -1;[^}]*pointer-events: none;[^}]*backdrop-filter: blur\(2px\)/.test(g), '1: frost glass, never takes a tap');
++assert.ok(/-webkit-backdrop-filter: blur\(2px\)/.test(g), '1: Safari prefix');
++assert.ok(/@supports not \(\(backdrop-filter: blur\(1px\)\) or \(-webkit-backdrop-filter: blur\(1px\)\)\) \{\s*[^}]*background: rgba\(12, 10, 26, 0\.24\)/.test(g), '1: tint fallback');
++assert.ok(/@media \(prefers-reduced-transparency: reduce\) \{\s*#place-veil\.is-open::before \{[^}]*backdrop-filter: none;[^}]*background: rgba\(12, 10, 26, 0\.62\)/.test(g), '1: reduced transparency');
++
++// (2) links
++assert.ok(/#place-veil \.core-note a:visited,[\s\S]*?color: #9fd6ff;[\s\S]*?text-decoration: underline;/.test(g), '2: moon-blue underlined links');
++
++// (3) header + shoulder
++assert.ok(/#garden-header nav \.thread-word \{\s*font-size: 0\.875rem;/.test(g), '3: header words 14px');
++assert.ok(/#garden-header nav \.thread-word \{\s*color: rgba\(214, 222, 238, 0\.86\);/.test(g), '3: header words readable');
++assert.ok(/#shared-shoulder \{\s*font-size: 0\.875rem;[^}]*color: rgba\(214, 222, 238, 0\.8\);/.test(g), '3: shoulder 14px readable');
++assert.ok(/html:has\(#place-veil\.is-open:not\(\.is-core\)\) #shared-shoulder \{\s*visibility: hidden;/.test(g), '3: shoulder rests under other places');
++
++// (4) honest sleeping buttons
++assert.ok(/var sendWhy = el\('p', 'thread-send-why', 'Send sleeps until a mind is remembered in Settings\.'\);/.test(thread), '4: Send says why');
++assert.ok(/sendBtn\.setAttribute\('aria-describedby', sendWhy\.id\);\s*sendWhy\.hidden = false;/.test(thread), '4: shown and described when asleep');
++assert.ok(/sendBtn\.removeAttribute\('aria-describedby'\);\s*sendWhy\.hidden = true;/.test(thread), '4: hidden when awake');
++assert.ok(/var actWhy = el\('p', 'workshop-act-why', 'Ask and Run sleep until a mind is remembered in Settings\.'\);/.test(benches), '4: Ask / Run say why');
++assert.ok(/runBtn\.setAttribute\('aria-describedby', actWhy\.id\);\s*actWhy\.hidden = false;/.test(benches), '4: benches reason when asleep');
++assert.ok(/actWhy\.hidden = true;/.test(benches), '4: benches reason rests when awake');
++assert.ok(/\.thread-compose\.is-closed \{ opacity: 1; \}/.test(g) && /\.thread-compose\.is-closed > :not\(\.thread-send-why\) \{ opacity: 0\.5; \}/.test(g), '4: reason is not dimmed with the sleeping row');
++
++// (5) Change only on a seated chair
++assert.ok(/\.core-chair-change\[hidden\] \{ display: none !important; \}/.test(g), '5: hidden wins');
++
++// (6) code mirrors
++['code-nursery.html', 'code-dialogue.html', 'code-garden.html', 'code-music.html', 'code-round-table.html', 'code-settings.html'].forEach(function (f) {
++  var h = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
++  if (!/td:first-child/.test(h)) return;
++  assert.ok(/@media \(max-width: 480px\) \{ td:first-child \{ white-space: normal; overflow-wrap: anywhere; \} \}/.test(h), '6: ' + f + ' wraps long paths');
++});
++
++// locks
++var addedJs = (thread.match(/v-tree-glow-2b-v0[\s\S]{0,700}/) || [''])[0] + (benches.match(/v-tree-glow-2b-v0[\s\S]{0,700}/) || [''])[0];
++assert.ok(!/confirm\(|innerHTML/.test(addedJs), 'no confirm(), no innerHTML');
++assert.ok(!/\u2014/.test(g) && !/\u2014/.test(addedJs), 'no em dash in added lines');
++
++console.log('SMOKE_OK tree glow 2b v0.1');
+diff --git a/docs/modules/workshop-benches.js b/docs/modules/workshop-benches.js
+index 3197300..06122db 100644
+--- a/docs/modules/workshop-benches.js
++++ b/docs/modules/workshop-benches.js
+@@ -292,6 +292,11 @@
+     askForm.appendChild(askInput);
+     askForm.appendChild(askActs);
+     bench.appendChild(askForm);
++    // v-tree-glow-2b-v0: sleeping Ask and Run say why, right beside them.
++    var actWhy = el('p', 'workshop-act-why', 'Ask and Run sleep until a mind is remembered in Settings.');
++    actWhy.id = 'workshop-act-why-' + Math.random().toString(36).slice(2, 8);
++    actWhy.hidden = true;
++    bench.appendChild(actWhy);
+ 
+     var preview = document.createElement('iframe');
+     preview.className = 'workshop-preview';
+@@ -349,6 +354,9 @@
+         runBtn.disabled = false;
+         runBtn.removeAttribute('disabled');
+         runBtn.removeAttribute('aria-disabled');
++        askBtn.removeAttribute('aria-describedby');
++        runBtn.removeAttribute('aria-describedby');
++        actWhy.hidden = true;
+         later.hidden = false;
+         later.removeAttribute('hidden');
+         preview.hidden = false;
+@@ -384,6 +392,9 @@
+         runBtn.disabled = true;
+         runBtn.setAttribute('disabled', '');
+         runBtn.setAttribute('aria-disabled', 'true');
++        askBtn.setAttribute('aria-describedby', actWhy.id);
++        runBtn.setAttribute('aria-describedby', actWhy.id);
++        actWhy.hidden = false;
+         later.hidden = true;
+         later.setAttribute('hidden', '');
+         preview.hidden = true;

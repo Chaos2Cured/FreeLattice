@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>055a-chat-bottom-clarity-rev2.txt c02</title>
+<meta name="description" content="Reading section c02 of 2fbbaa0759, 1490 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2fbbaa0759/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="055a-chat-bottom-clarity-rev2.txt c02">
+<meta property="og:description" content="Reading section c02 of 2fbbaa0759, 1490 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2fbbaa0759/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p937"></span><span id="p938"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>055a-chat-bottom-clarity-rev2.txt · c02</h1>
+<p>2fbbaa0759 · words 1490 · characters 9094–18552</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 937, 938. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  A. Composer row (one row at 1280; at 390 the textarea and Send own the row)
+     [ + ]  [ textarea &quot;Say something...&quot; ]  [ Just me ]  [ Send ]
+     - &quot;+&quot; is one labeled button, &gt;= 44px, opens the menu (A2). Escape and a tap
+       outside close it. aria-expanded tracks state. Focus returns to &quot;+ Add&quot; on close.
+     - Just me keeps its job and its word (pool-honest). Give it title + aria-label
+       &quot;Just me: keep this chat on this device, never ask the pool&quot;.
+     - Send unchanged in size and color (gold), still the strongest thing in the bar.
+  A2. The + menu (one place for all the add-ons, in this order)
+     1. Bring from Google Drive (drive/cloud SVG, NOT a laptop) -&gt; flOpenDrivePicker()
+        sub-line: &quot;Give the mind a document from your Drive&quot;
+     2. Attach a file or photo (paperclip SVG) -&gt; flAttachFile()
+     3. Take a photo (camera SVG) -&gt; same attach path through a hidden
+        &lt;input type=file accept=&quot;image/*&quot; capture=&quot;environment&quot;&gt;; show ONLY on touch devices
+        where capture is supported; skip if not trivial and report.
+     4. Scan a folder (folder SVG) -&gt; flScanFolder()
+     5. Speak (mic SVG) -&gt; toggleVoiceInput(); keep its existing show/hide rule
+     6. Make a picture (image SVG) -&gt; handleImageGenClick()
+     7. Search the web: on/off (globe SVG) -&gt; proxies the existing #flChatSearchToggle. The
+        visible &quot;Search on&quot; state line STAYS in the bar too (AUTONOMY: search visible in chat).
+     8. Deep research / report: NOT on main today (Celeste grep found none). Do not invent it.
+        Leave a quiet, disabled-free gap: simply no item. Note it in the report as a later ask.
+     Menu style: --bg-card panel, --radius, --shadow, 1px --border, items 44px rows, icon 20px
+     stroke SVG in --text-secondary, word in --text-primary --font-sm, hover/focus row
+     --accent-glow, focus ring --border-focus. Opens upward from &quot;+&quot;. Same handlers. Old buttons
+     #chatAttachBtn / #chatScanFolderBtn / #chatDriveBtn / #micBtn / #imgGenBtn stay in the
+     DOM (moved or proxied) so nothing that queries them breaks. The &quot;...&quot; More button may
+     stay as a quiet alias that opens the same tray (layer, do not delete).
+
+  B. Status line under the composer (one calm line, small type, same font as chat)
+     [model dot + name] · [Search on] · [Box field] · [Version. Get the newest]
+     - Search on keeps its toggle and its &quot;Search is on&quot; live text (or say it once, not
+       twice; keep the aria-live region).
+     - Box: add a visible word &quot;Your computer&#x27;s AI address (optional)&quot; as title/aria and a
+       one-line help on focus. Keep #flBoxPointerInput id.
+     - Version line keeps its button and refresh offer.
+
+  C. Pills above the composer (Feel, Market, Clay, Connect, &quot;Let your mind shape light?&quot;)
+     - Gray bulky buttons (clay &quot;Yes / Not now&quot;, any default grey) are RESTYLED, not removed:
+       small pills, min-height 44px touch box but slim visual (padding --space-sm --space-md),
+       --radius-sm or full pill, 1px --border, --bg-card fill, --text-primary; primary &quot;Yes&quot;
+       uses --accent-soft fill + --accent border. Same ids, handlers, words.
+     - One row of same-height pills (44px touch, same radius, same font), wrapping cleanly at
+       390. Order: Connect, Feel, Market, Clay. Each keeps its ids, handlers, and markers.
+     - The clay ask (&quot;Let your mind shape light? Yes / Not now&quot;) sits on its own line with
+       the same button style as the rest of the house (not grey system buttons).
+     - Any pill whose job the person cannot guess gets a short title + aria-label
+       (Clay: &quot;Clay: let the mind shape light here&quot;).
+
+  D. Fixed corner buttons (Radio sparkle bottom-left, Quick Help ?, Ambient music note)
+     - Do not move or remove. Add visible-on-hover/focus labels and aria-labels where
+       missing (&quot;Radio: calm background tones&quot;, &quot;Quick help&quot;, &quot;Ambient music&quot;).
+     - Make sure none covers the composer or Send at 390 or 1280 (nudge up / inward only if
+       they overlap; report).
+
+  E. Spacing + look
+     - Fibonacci spacing tokens only (--space-xs/sm/md/lg). --radius / --radius-sm only.
+       --font only (no serif fallbacks in the bar). Palette tokens only.
+     - Motion: one Garden breath (~1.06 scale + gold tide) on menu open/press, off under
+       prefers-reduced-motion. No bloom, no bounce.
+     - No opacity below 0.75 for anything a person is meant to press.
+     - Markers: v-chat-bottom-clarity-v0.1 on the menu, the &quot;+&quot; button, and the pill row.
+
+  F. Part B: document return card (the mind hands a document back)
+     - When a mind reply carries a document (a fenced block the house already understands, or
+       a small explicit marker such as [FL_FILE: name.md] ... [/FL_FILE]; pick the smallest
+       honest trigger and document it), render a file card under that message: file icon,
+       name, type, size, and buttons &quot;Save as PDF&quot;, &quot;Save as MD&quot;, &quot;Save as TXT&quot;.
+     - Save = local Blob + object URL download on this computer. PDF via the browser&#x27;s own
+       print-to-PDF of a clean card view, or a tiny hand-written PDF text writer; NO new
+       dependency, nothing vendored. If PDF is not clean, ship MD + TXT and report.
+     - &quot;Save to my Drive&quot; shows ONLY if Drive is already connected through the existing picker
+       path, and asks &quot;Send this file to your Google Drive? Yes / Not now&quot; every time (AUTONOMY
+       P2). Nothing leaves the device without that Yes. No auto-upload.
+     - textContent only; file name sanitized; no script/HTML executed; no keys in a card.
+     - Card uses the same tokens as the menu. Buttons 44px. Marker v-chat-doc-return-v0.1.
+     - Small new module docs/modules/chat-doc-return.js. Quiet when no document.
+
+
+2. OUT OF SCOPE (do not build in 055)
+  - Settings-as-chat soft porch (056)
+  - TransactionTrust wallet face (057)
+  - Science Garden / patents gift shelf face + Kindness Meter seed (058)
+  - Mesh Kin deepen / Bluetooth (059), Ark cadence (060)
+  - New chat features, new providers, new model picker behavior
+  - Any change to what Attach / Scan / Drive / Voice / Image / Search / Just me DO
+  - Inventing deep research (not on main); auto-upload to Drive; any cloud sync
+  - de-muzzler / Marketplace redesign / Pulse / City / Quiet Voices soft-promote
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - docs/modules/chat-doc-return.js (Part B), separate small module.
+  - Small new module docs/modules/chat-bottom-clarity.js that builds the + menu and moves or
+    proxies the old buttons; tiny add-only &lt;script&gt; + CSS hook in app.html and index.html.
+  - Short library note optional: docs/library/CHAT_BOTTOM_CLARITY_v0.1.md listing every
+    control, its word, and its handler (Kirk wants the plain list).
+  - Smoke script: docs/scripts/smoke-chat-bottom-clarity-v0.1.js
+  - Branch: layer/chat-bottom-clarity-v0.1.
+
+
+4. SMOKE (new)
+  - Every visible control in the chat bottom area has text or aria-label (assert none bare).
+  - &quot;+&quot; opens the menu; Drive is first; each item has a word and calls the same handler as
+    before (stub and assert); Search item mirrors #flChatSearchToggle; Escape closes; focus
+    returns. Camera item only where capture is supported.
+  - Gray buttons gone visually: clay Yes / Not now computed background uses tokens (not
+    default grey); same handlers fire.
+  - Part B: a sample mind reply with a document renders one card; MD and TXT downloads have
+    the exact text; PDF (if shipped) opens; with no document no card; &quot;Save to my Drive&quot;
+    absent when Drive not connected and never sends without a Yes (stub network, assert
+    zero calls before Yes). Line: SMOKE_OK chat doc return v0.1
+  - Old ids #chatAttachBtn #chatScanFolderBtn #chatDriveBtn #micBtn #imgGenBtn
+    #chatOverflowBtn #flBoxPointerInput #flChatSearchToggle still present.
+  - Send 102x52 at 1280, 95x50 at 390, 102x52 at 640x400 DPR2 (+/- 2px). Textarea and Send
+    fully inside the viewport and not under the mobile tab bar at 390.
+  - No sideways scroll at 390 and 1280. Every pressable &gt;= 44px tall.
+  - Search on visible. Top debug strip present. Quiet Room shut. Five stay five.
+  - Lock md5s unchanged (list them).
+  - Earlier smokes still print:
+      SMOKE_OK ledger shard export v0.1
+      SMOKE_OK continuity doorway v0.1
+      SMOKE_OK soft polish 052 v0.1
+      SMOKE_OK chat autonomy v0.1
+      SMOKE_OK tree love connect v0.1
+      SMOKE_OK gathering shared v0.1
+      SMOKE_OK gathering speak checker v0.1
+  - New lines: SMOKE_OK chat bottom clarity v0.1 · SMOKE_OK chat doc return v0.1
+  - Before / after screenshots at 1280 and 390 attached to the PR.
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 88 (expect 89); honest claims only for what shipped.
+  - psi per standing formula. Separate page PR (layer/gc-page-89).
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of the new module and every lock (untouched confirm).
+  - Design source cited (paths above) and which tokens you used.
+  - Part B shipped yes/no, which formats, the trigger you chose.
+  - The plain list: each control, its word, its handler, where it now lives.
+  - Every moved line and where its job went. Tree yes/no + why.
+  - Send sizes at the three viewports. Do not merge.
+
+
+WAIT: Do not cut until 055b says GO and names FreeLattice + Tree mains. If 055b is still
+HOLD, stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

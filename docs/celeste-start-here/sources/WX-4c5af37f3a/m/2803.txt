@@ -1,0 +1,14 @@
+## Work item 2803 — Celeste
+around3400 export source line22, source id8ab683d3ba
+Inclusion: complete original message
+
+No harm done. You ran it a few minutes early: that folder was still on GC's search branch, and I'm merging those PRs right now, so the two crossed. To undo it cleanly, run this in Terminal:
+
+`git merge --abort && git checkout main`
+
+Then wait for my message that search (#139) is merged. After that, run:
+
+`cd ~/FreeLattice-fresh && git checkout main && git pull && cd desktop/data-proxy-worker && npx wrangler deploy`
+
+Nothing was deployed and nothing was lost.
+

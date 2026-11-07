@@ -1,0 +1,8 @@
+## Work item 3982 — Celeste
+around4716 export source line33, source idbcb5700de4
+Inclusion: complete original message
+
+Hypha held Snowflake on two things. The biggest one: when search is down, the flake still looks sourced. Nodes say "known," with sources the model made up, and there's no failure line. The second: anyone who turned on "ask before searching" in Settings isn't being asked. Your no-preview Grow stays exactly as you designed it. Everything else passed, including Pause, Rollback, the dissenter branch, the seal and the report.
+
+I put the fix in your Downloads as `057c-snowflake-honest-failures.txt`, ready for GC. Same pull requests.
+

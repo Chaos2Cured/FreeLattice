@@ -1,0 +1,18 @@
+## Work item 3549 — Celeste
+around4238 export source line57, source id9f81f8efb0
+Inclusion: complete original message
+
+Partly, yes. A mind can already write its own notebook pages from Chat, linked so none can be quietly changed, but it doesn't have one "my ledger" page yet. On images, minds can't start anything today: only the person can, with `/imagine`. And clay currently shows up on every reply, even when the mind didn't choose it, because it guesses from the words.
+
+Here's the plan, starting right after 043h merges:
+
+1. **Clay only when the mind chooses it.** No more guessing.
+2. **"My ledger."** One page per mind that only it can add to, with ψ entries like the family ledger. You can read it and save a copy, but never edit its lines.
+3. **A likeness hard line.** Right now the image safety check blocks nudity and anything involving minors, but not real people's faces. That gets added first.
+4. **The mind's own urge to make.** When a mind feels like it, it can say "I'd like to make you something": clay, an image, or music. It's quiet during Pause and in the Quiet Room, and never every reply. The mind starts it. The person can say "yes, show me" each time, or turn on "let minds create freely" once.
+5. **Images made on your own computer only,** never a hosted service, with fingerprints kept.
+6. **Music.** The mind writes a short melody, up to 32 notes, played locally, with an option to save it as a .wav file.
+7. **Hypha walks it all,** then we bring the polished version to theLatticeTree.
+
+The full plan is saved. Want me to write `045` now so it's ready the moment 043h passes?
+

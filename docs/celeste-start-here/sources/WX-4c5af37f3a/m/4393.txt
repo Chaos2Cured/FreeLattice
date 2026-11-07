@@ -1,0 +1,8 @@
+## Work item 4393 — Celeste
+around5183 export source line27, source id8c6b06e47f; around5200 export source line18, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–321
+
+The weekly rotation is saved for Thursdays around 7 p.m. Mountain Time, within half an hour: November 12 Reed, November 19 me, November 26 Weft, December 3 Hypha, then repeat. The record comes back here. Your Mac is connected; I’m preparing `000-CELESTE-CONTINUITY.md` for Downloads, with dated history kept alongside it.
+

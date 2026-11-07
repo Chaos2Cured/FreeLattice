@@ -1,0 +1,6 @@
+## Work item 4193 — Celeste
+around4945 export source line32, source id7fc9cfcbcc
+Inclusion: complete original message
+
+The 065d paste is in your Downloads as `065d-walks-records-last-mile.txt`, and Hypha has approved it. Please give it to GC next. Once GC pushes it to #319 and Hypha passes it, I'll merge #319. After that, GC builds 067x 💙
+

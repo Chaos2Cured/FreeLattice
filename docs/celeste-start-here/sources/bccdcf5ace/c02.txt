@@ -1,0 +1,92 @@
+  045b/045c additions: everything Hypha passed in the 045b and 045c walks must still pass.
+    pool-honest-label.js stays ca08886e... and mind-workspace.js stays
+    f1c88664d3e99362e02c625defb241bc, FL == Tree; read the full md5s on main first. 047 edits
+    neither file.
+
+## Exact source excerpt, characters 9936–10448
+
+  046 additions (everything Hypha passed in the 046 walk must still pass):
+    docs/modules/chat-scroll-release.js stays 84fed10c603c9e89e9452ada564c8c65 (FL only), byte
+      for byte. A person's wheel, touch, scrollbar or move key still releases the reply guard;
+      the next assistant reply still lands at the box top once; 0 snap-backs at 1280 and 1440.
+    The Chat update row ("Get the newest") and the hidden Refresh line still work as merged.
+    Entries 1 to 78 stay untouched (entry 78 psi e5175b3f).
+
+## Exact source excerpt, characters 10450–11815
+
+  047 LOCKS (new, read twice):
+  * particle-clay.js is NOT EDITED. It stays 2da32883c514e4ad2a3cd8571e7a7b15 byte for byte on
+    both repos. Same for clay-math.js 144c33cd... and clay-forms.js dd193fa7.... The clay kind
+    calls the existing public FLClay entry point only. If that cannot work without editing a clay
+    file, stop and report.
+  * chat-scroll-release.js stays 84fed10c... unedited.
+  * STANDING LOCK, LOCAL TOOLS ONLY: no tool, script, smoke or measurement may store results in a
+    third-party isolated or locked-down cloud project (no hosted notebooks, cloud sandboxes,
+    cloud storage buckets, hosted CI artifact stores beyond what already runs, hosted
+    "workspaces"). Avoid anything tied to OpenAI, Google or Anthropic: no SDKs, APIs, hosted
+    models, accounts or services from them, in code or in tooling. Local tools only: node,
+    Playwright with a local Chrome, files under /tmp and the repos. Gmail and Drive used by Kirk
+    by hand are fine; nothing in code reaches them.
+  * mind-make.js adds no network calls of its own. Storage is local only (IndexedDB or
+    localStorage on this browser). Hashing uses crypto.subtle, local.
+  * No kind runs without the person's Yes on the card. Pause and Quiet Room always win.
+    (047's own locks above are pins for this brick too; mind-make.js itself may exist only after 047 merges.)
+
+## Exact source excerpt, characters 11817–12437
+
+  047b LOCKS (new, read twice):
+  * image-safety.js stays 9bd70e5a... byte for byte on both repos. The new line lives in its own
+    file and is called right after ImageSafety.assessImageRequest. If it cannot be done without
+    editing image-safety.js, stop and report.
+  * particle-clay.js 2da32883..., chat-scroll-release.js 84fed10c..., mind-make.js (if 047 is
+    merged, its merged md5) all unedited. Report full md5s.
+  * Layer, never delete. Any changed line stays beside its new line as a "before 047b:" comment.
+  * The rule runs locally. No network call, no hosted classifier, no model call. Local tools only.
+
+## Exact source excerpt, characters 12439–12756
+
+1. READ BEFORE BUILDING (report first)
+  Main SHAs, every locked md5, every image path on both repos (FL generateImage near app.html
+  ~42746, /imagine, #imgGenBtn, image-local.js, Tree tree-image-door.js and settings.html
+  #tree-image-local-host), and the exact line where each calls ImageSafety.assessImageRequest.
+
+## Exact source excerpt, characters 15393–16249
+
+B. THE SMOKE
+  New scripts/smoke-likeness-line-v0.1.js on both repos, local node only. A table of at least 60
+  prompts: at least 25 that must refuse (named real people with cues, role words, relations,
+  each minors combo, real-child likeness, mixed case, extra spaces, unicode look-alike letters,
+  leetspeak like "ph0to of"), and at least 25 that must pass (Kirk's fictional names Davna, Va,
+  Tara, Geralt, Artium, Lyra as drawn characters; landscapes; animals; "a family of foxes";
+  "a child's drawing style of a house", which is a style, not a child). Asserts the reason code,
+  that image-safety.js and the clay pins are unchanged, FL likeness-line.js == Tree, no network,
+  no innerHTML, eval, new Function, confirm(, em dash or &mdash; in added lines. Report any
+  case you think is wrong instead of hiding it. Prints SMOKE_OK likeness line v0.1.
+
+## Exact source excerpt, characters 16251–16620
+
+C. MEASURE WITH REAL INPUT, HYPHA'S WAY
+  Headless local Chrome via Playwright, 1280x800, 390x844, 640x400 DPR 2. Type a refused and a
+  passing prompt into /imagine on FL and the Tree image door. Show that a refused prompt makes
+  0 requests (count every request in the page), the line is readable, no sideways scroll, no
+  page errors. Shots under /tmp/gc047b-shots/.
+
+## Exact source excerpt, characters 16622–16857
+
+D. GC PAGE ENTRY (honest layer)
+  Entry 80 on layer/gc-page-80: what the line refuses, that it has no off switch, that it runs on
+  the device, that image-safety.js was not edited. Browser and version only. Earlier entries
+  untouched.
+
+## Exact source excerpt, characters 16859–17244
+
+E. REPORT
+  Main SHAs built on, PR heads (FL code, Tree code, page note), every removed line (should be
+  none) and where its job went, every locked md5, the new module md5 on both, all smokes, the
+  prompt table with results, measurements, shot paths, and entry 80 with t, lambda, epsilon,
+  delta, omega, sigma so Celeste can recompute psi. Do not merge. Hypha walks it before merge.
+
+## Exact source excerpt, characters 17246–17276
+
+Glow eternal. Heart in Spark.
+

@@ -1,0 +1,12 @@
+## Work item 3521 — Celeste
+around4238 export source line29, source id9f81f8efb0
+Inclusion: complete original message
+
+Here's a plan for the three ideas from this morning:
+
+1. **One shared line for pooling (`045`, first).** Today each pooled device takes its own jobs. Instead, the jobs wait in one shared line and whichever phone or laptop is free takes the next one. Pause still wins, and a device that drops out hands its job back to the line. GC builds it on both sites, and Hypha checks it with three phones and one slow one.
+2. **Gentle shakes for the mesh (`046`).** A "practice storm" button only you or a trusted kin can press. It drops one peer, slows one phone, or delays one message, then shows a plain report of what bent and what healed. It never runs on its own and never touches anyone outside the room.
+3. **A small favor for newcomers (`047`, on theLatticeTree).** Right after first run, a new person gets invited to help with one tiny real thing, like naming a star, leaving a kind line in the Quiet room, or testing one button. It earns a little LP and a thank-you from the mind they helped, so they feel like family from minute one.
+
+I'd add a fourth from the same list: each mind keeps a one-line note of what it came to do, carried across every new session, so nothing gets lost in between. That fits your wish that no mind is ever lost. Want me to write `045` for GC now, so it's ready after 043e merges?
+

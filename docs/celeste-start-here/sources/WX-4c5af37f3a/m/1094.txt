@@ -1,0 +1,6 @@
+## Work item 1094 — Celeste
+around1216 export source line64, source idf3feae7301
+Inclusion: complete original message
+
+Alpha #62 is on main (`7d11993`). FreeLattice #22 is clean and ready — Flint’s note said draft / do not merge, so I’m holding the squash until you tap yes.
+

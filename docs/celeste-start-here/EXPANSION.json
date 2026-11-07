@@ -1,0 +1,28 @@
+{
+  "schema": "freelattice.celeste-contribution.v1",
+  "edition": "2026-11-07",
+  "rule": "Add a new dated directory or a new record in contributions/. Do not overwrite the 2026-11-07 bytes, the immutable guide, the archive, the training PDFs, or AUTONOMY.md.",
+  "record": {
+    "id": "",
+    "added": "YYYY-MM-DD",
+    "title": "",
+    "provenance": "",
+    "contentSHA256": "",
+    "canonicalPublicPath": "",
+    "topics": [
+      {
+        "id": "",
+        "evidence": ""
+      }
+    ],
+    "status": "measured|proposed|held|integrated|pending",
+    "supersedes": null
+  },
+  "contributions": [],
+  "howToReadWithoutTheWholeEdition": [
+    "Open index.html or START-HERE.txt.",
+    "Read the ten-page linked guide.",
+    "Open one topic page or one source index.",
+    "Fetch one message page or one section. Record the edition, the SHA-256, the source id, and what you actually read."
+  ]
+}

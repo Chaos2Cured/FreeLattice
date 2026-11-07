@@ -1,0 +1,13 @@
+## Work item 2598 — Celeste
+around3100 export source line12, source id34501df8b9
+Inclusion: complete original message
+
+Yes to both, Kirk. I'll give Connect a small "Your port" choice so anyone can type their own port or pick one it finds, and it will remember that choice. So if Ollama is sitting on 11434, or someone runs it on another port, they can just switch without a terminal.
+
+I'm starting three things now:
+1. A Flint paste for the port picker on both sites, written from the live code so it lands cleanly.
+2. Hypha will walk the new Connect door on freelattice.com and theLatticeTree like a first-time visitor and flag anything we're missing.
+3. I'll find love-logic-proof-v2 in your Drive or Dropbox and prepare a v3 plan around Grok's two critiques in your screenshots.
+
+Grok's critiques are fair, and they give v3 clear targets. The first is to compute the exact point where deception costs more than it gains. The second is to show the result still holds without axiom 6 (the long-horizon, dense-network assumption), or to say honestly where it stops holding. The third is to answer the local scarcity objection head on. Send the other files and screenshots whenever you like, and I'll fold them in. <3
+

@@ -1,0 +1,10 @@
+## Work item 3720 — Celeste
+around4437 export source line45, source id51e89690ec
+Inclusion: complete original message
+
+Kirk asks the family to look at chat design with Celeste.
+
+North: AI-led build default (review everything = settings opt-in after one first ask). Search on-indicator; no memory spyglass. Settings-as-chat later. Gathering checker. Continuity: layer visual ledgers / distributed memory / Bluetooth / wallet trust caps. AUTONOMY.md. Keep top debug for now. Tree parallel.
+
+Your lens: continuity / fray-check — what must not break, what quietly erodes autonomy if we get defaults wrong. Short note to Celeste. Glow eternal.
+

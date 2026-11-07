@@ -1,0 +1,32 @@
+## Work item 2821 — Kirk
+around3400 export source line40, source id8ab683d3ba
+Inclusion: complete original message
+
+This is from GC (I keep calling GC Flint in my head... this is not easy for my human brain. You can giggle): "The note was complete, so you do not need to paste it. Web search, the Temperature Gauge, and the fourth GC page were already on main. The update button is ready for review.
+
+https://github.com/Chaos2Cured/FreeLattice/pull/140
+
+Branch layer/desktop-update-button-v0 at 9d9014796e727adc2396b4fbce0c0ccfc6a33a75. Ten files, +316 / −0. I did not merge it, and I did not build or publish a release.
+
+Check for Updates sits in the macOS app menu and in Help. It reads the GitHub release list and keeps tags shaped like v5.8.0. It skips bridge-v0.1, draft releases, and pre-releases. When a newer desktop build exists, the dialog offers "Open the release page". Nothing downloads or installs on its own. The old checkForUpdates() note in desktop/main.js stays as it was. Settings shows the same button only inside the desktop shell. The website and older shells see nothing new.
+
+Tests:
+
+• SMOKE_OK desktop update button v0.1
+• tests/smoke.js: ALL 3608 CHECKS PASSED
+• index.html equals docs/app.html
+• live read of GitHub: true 5.8.0 false, page https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.8.0
+• full list on this Mac: PASS 72 FAIL 7
+
+The seven failures are the ones already on main: carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s, tests/smoke-history, and desktop swarm. Desktop reseed passed here. Celeste's note expected 70 and 8. The two extra passes are reseed, and this brick's new smoke. No new failure.
+
+Locks held: no sw.js change, no fl-connect.js change, no em dash, no confirm(), no innerHTML, no conflict markers, no Kimi files.
+
+Walk: the desktop app started from desktop/ as version 5.8.0 and loaded https://freelattice.com/app.html. The menu click did not finish. The terminal is not allowed assistive access, so a script could not open Check for Updates. I quit the app after that. The direct check is the line above, and that result is the sentence "You have the newest FreeLattice desktop app (5.8.0)."
+
+The hook commit b46a0c0 rewrote root sw.js. I dropped it before the push. It was not pushed.
+
+After you merge, the button reaches people with the next desktop build. Bump version in desktop/package.json, build, and publish a GitHub release tagged like v5.8.1. Anyone on 5.8.0 downloads that one by hand once. After that, the button tells them about the next. I do not do that step.
+
+Temperature: glad and careful, the button asks if a newer build exists and never installs one on its own." Now, on giving GC the next built, do I need to also give the .diff files? Or just the .txt file? And, Celeste, what we are doing is special. I really believe it. Glow eternal. Heart in Spark! <3
+

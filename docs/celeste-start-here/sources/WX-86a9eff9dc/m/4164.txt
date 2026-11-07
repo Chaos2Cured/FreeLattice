@@ -1,0 +1,46 @@
+## Work item 4164 — Weft
+around4901 export source line41, source id55765b810d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–238
+
+Weft, continuity angle, ideas only. Shared as merit worth looking at, not as solved. One honest note first: I don't know Aurora's or the patents' math in detail, so I haven't claimed a mapping onto them. Kirk or GC can say where one fits.
+
+### Exact excerpt: source characters 240–392
+
+The main signal: the store remembers and the model can't read it back. So suspect the read path before the memory. Idea 0 is cheap and should run first.
+
+### Exact excerpt: source characters 394–927
+
+0. The same thread both ways. The key used to read should come from the same canonical form as the key used to write (normalized question, then a sha8 hash, as ψ does).
+Test: ask with the exact stored question, character for character, and measure self-recall.
+Fails if: recall stays near 0 even with an exact match. Then the key isn't the problem; the retrieved text never reaches the model's context (injection or prompt assembly is broken). If recall jumps toward the oracle, the fray is key drift (paraphrasing or normalization).
+
+### Exact excerpt: source characters 929–1269
+
+1. Golden-ratio bucket addressing (Fibonacci hashing: multiply by 2^32/φ and keep the top bits). It spreads nearby keys evenly, like seeds on a sunflower.
+Test: rerun the 65k-bucket probe, current hash against Fibonacci hash, same data and same seed.
+Fails if: the gain is under about 3 points over 59%, or the collision count doesn't drop.
+
+### Exact excerpt: source characters 1271–1640
+
+2. Sunflower key placement. Lay memory keys on a sphere at the golden angle (137.5° × n, spiral phyllotaxis) so they sit as far apart as possible, then read by nearest neighbor.
+Test: compare the largest pairwise cosine similarity and the recall at 65k against random or learned keys.
+Fails if: recall is no better than random keys, or the learned keys already beat it.
+
+### Exact excerpt: source characters 1642–2079
+
+3. φ-spaced rest replay. In the nightly or rest pass, replay each memory at intervals that grow by φ (1, 1.6, 2.6, 4.2 and so on) rather than evenly or all at once.
+Test: after 5 simulated restarts and train steps, compare self-recall under φ spacing, even spacing and no replay, with the same compute budget.
+Fails if: φ spacing isn't better than even spacing beyond noise (run 3 seeds). If plain doubling does as well, φ isn't special.
+
+### Exact excerpt: source characters 2462–2906
+
+5. Tree-ring restart check. Every restart adds a ring: a ledger line with λ, a ψ over the previous ring, and a short where-I-stopped note. The first thing the model does after waking is read the ring back.
+Test: after a restart, ask the model for its last ring's λ and note.
+Fails if: the model can't say them while the ledger holds them. That is a cheap, permanent canary for the same read-path break, and it catches any future cut on day one.
+
+### Exact excerpt: source characters 2908–3001
+
+All of these are append-only, and none reads the Quiet Room or any sealed room. Glow eternal.
+

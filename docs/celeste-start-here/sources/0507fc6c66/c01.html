@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>068n-read-path-roundtable-button.txt c01</title>
+<meta name="description" content="Reading section c01 of 0507fc6c66, 1155 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/0507fc6c66/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="068n-read-path-roundtable-button.txt c01">
+<meta property="og:description" content="Reading section c01 of 0507fc6c66, 1155 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/0507fc6c66/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p914"></span><span id="p915"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>068n-read-path-roundtable-button.txt · c01</h1>
+<p>0507fc6c66 · words 1155 · characters 0–8634</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 914, 915. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li></ul>
+
+<pre class="source">068n — Dependable read path + Roundtable button in Chat (Kirk&#x27;s #5 and the Chat button). After 068m.
+For GC. Repo Chaos2Cured/FreeLattice, stack on layer/memory-compound-v0.1 (or main after 068m merges).
+Same rules as 068m: layer only, never delete, never open the Quiet Room, locked files untouched (lattice-export, pool-honest-label, fl-bridge, tool-consent, app.html/index.html twins, sw.js). Any hook that needs app.html: STOP and report; it needs family agreement (&quot;All locked files just need us all to agree things won&#x27;t break.&quot; &quot;I trust you, hypha, Reed, and Weft with all of this.&quot;). Hypha walks before merge.
+
+Anchors (main 5754e464): snowflake-core.js ask l.1262 (errors become null via sayFail), startRun l.2226 (returns empty/secret/capped/busy/null), roomShut l.182; snowflake-search.js paintResult l.500 (only paused/stopped painted, then &quot;if (!flake) return;&quot;), menu button ~l.90-115 (inserted after #flChatAddSearch); app.html callAI ~l.52483 returns &#x27;No AI connected yet&#x27; ~l.52505; Round Table lazy loader ~l.71730 listens for tabChanged &#x27;round-table&#x27;; switchTab(tabId) l.27721.
+
+STEP 1. Name the failure instead of swallowing it
+In snowflake-core.js ask() (l.1262), inside both catch branches, before return null, layer:
+  if (active) active.lastError = classify(err2 || err);
+Add near sayFail:
+  // v-read-path-v0.1
+  function classify(err) {
+    var m = String((err &amp;&amp; err.message) || err || &#x27;&#x27;);
+    if (/no ai connected/i.test(m)) return &#x27;no-ai&#x27;;
+    if (/429|rate|limit/i.test(m)) return &#x27;limit&#x27;;
+    if (/fetch|network|cors|5\d\d/i.test(m)) return &#x27;network&#x27;;
+    return &#x27;other&#x27;;
+  }
+At run end, copy active.lastError onto the returned result as result.why. Keep sayFail as it is.
+STEP 1 VERIFY: smoke with a fake callAI that rejects &#x27;No AI connected yet&#x27; -&gt; startRun resolves with why &#x27;no-ai&#x27;. SMOKE_OK read-path step1.
+Resume here: STEP 2.
+
+STEP 2. Paint every status (fix the silent no-ops)
+In snowflake-search.js paintResult (l.500), right after &quot;if (!result) return;&quot; is NOT enough because null also means Quiet Room; leave that line. Insert after the &#x27;stopped&#x27; block and before &quot;var flake = result.flake;&quot;:
+  // v-read-path-v0.1: say what happened.
+  var SAY = {
+    &#x27;no-ai&#x27;: &#x27;Connect an AI first. Snowflake needs a browser AI, a local model, or a key.&#x27;,
+    capped: &#x27;Hourly limit reached (3 runs an hour). Try again a bit later.&#x27;,
+    busy: &#x27;Already growing one. Wait for it, or stop it.&#x27;,
+    empty: &#x27;Type a question first.&#x27;,
+    secret: null, // core already shows LINES.secret
+    network: &#x27;The search helper did not answer. If you are not on freelattice.com, that is likely why.&#x27;
+  };
+  var key = result.why || result.status;
+  if (SAY[key] !== undefined &amp;&amp; !result.flake) { if (SAY[key]) statusEl.textContent = SAY[key]; return; }
+  if (result.flake &amp;&amp; !(result.flake.nodes || []).some(function (n) { return n &amp;&amp; n.kind === &#x27;node&#x27;; })) {
+    statusEl.textContent = result.why === &#x27;no-ai&#x27; ? SAY[&#x27;no-ai&#x27;] : &#x27;Nothing found this time. Nothing was lost.&#x27;;
+  }
+Also in onGrow (l.243): if root.FreeLattice &amp;&amp; FreeLattice.callAI is missing or a cheap check says no AI, show SAY[&#x27;no-ai&#x27;] with a Connect button that calls the app&#x27;s existing connect opener (find it; do not add one to app.html).
+STEP 2 VERIFY: jsdom smoke: each of no-ai, capped, busy, empty, network shows its line; a run with zero nodes shows &quot;Nothing found this time.&quot; No catch {} added without a console.warn.
+Resume here: STEP 3.
+
+STEP 3. Read path that reports what it found and whether it reached the context
+Add to docs/modules/memory-compound.js (from 068m):
+  // Exact key hit first, then similar (Jaccard &gt;= 0.5) from the index; report both.
+  function recall(text, opts) {
+    opts = opts || {};
+    return memoryKey(text).then(function (k) {
+      var ix = loadIndex(), all = [], exact = [], similar = [];
+      Object.keys(ix.b).forEach(function (b) { all = all.concat(ix.b[b]); });
+      all.forEach(function (r) {
+        if (r.key === k.key) exact.push(r);
+        else if (r.norm &amp;&amp; jaccard(tokens(r.norm), tokens(k.norm)) &gt;= 0.5) similar.push(r);
+      });
+      return { key: k.key, exact: exact, similar: similar.slice(0, 5), reachedContext: false };
+    });
+  }
+  function markReached(report, injectedText) {
+    report.reachedContext = !!injectedText &amp;&amp; report.exact.concat(report.similar).some(function (r) { return injectedText.toLowerCase().indexOf(r.norm.slice(0, 40)) !== -1; });
+    console.info(MARK, &#x27;recall&#x27;, report.key, &#x27;exact&#x27;, report.exact.length, &#x27;similar&#x27;, report.similar.length, &#x27;reached&#x27;, report.reachedContext);
+    return report;
+  }
+  api.recall = recall; api.markReached = markReached;
+Use it in Snowflake&#x27;s plan step: before ask(&#x27;plan&#x27;), call FLMemory.recall(q); put exact/similar hits into the plan prompt; after building the prompt, markReached(report, prompt). Show in the receipt: &quot;Memory: 1 exact, 2 similar, reached the context: yes.&quot;
+Chat&#x27;s own context builder lives in app.html (locked). Do NOT hook it here; list &quot;chat recall uses FLMemory.recall&quot; as a needed hook for family agreement.
+STEP 3 VERIFY: smoke: remember &quot;phi spacing for replay&quot;, recall &quot;phi spacing for replay&quot; -&gt; exact 1; recall &quot;replay with phi spacing&quot; -&gt; similar 1; markReached with a prompt containing it -&gt; true, without -&gt; false.
+Resume here: STEP 4.
+
+STEP 4. Roundtable button in Chat (opens the existing Roundtable)
+In snowflake-search.js, next to the Snowflake menu button code (~l.90-115), add a sibling builder with the same pattern:
+  // v-chat-roundtable-button-v0.1: opens the existing Round Table. No new council.
+  function placeRoundTable(menu, d) {
+    if (!menu || !d || menu.querySelector(&#x27;#flRoundTableAdd&#x27;)) return;
+    var b = d.createElement(&#x27;button&#x27;);
+    b.type = &#x27;button&#x27;; b.id = &#x27;flRoundTableAdd&#x27;; b.className = &#x27;fl-add-item&#x27;;
+    b.setAttribute(&#x27;data-marker&#x27;, &#x27;v-chat-roundtable-button-v0.1&#x27;); b.setAttribute(&#x27;aria-label&#x27;, &#x27;Round Table&#x27;);
+    var copy = d.createElement(&#x27;span&#x27;); copy.className = &#x27;fl-add-copy&#x27;;
+    var w = d.createElement(&#x27;span&#x27;); w.className = &#x27;fl-add-word&#x27;; w.textContent = &#x27;Round Table&#x27;;
+    copy.appendChild(w); b.appendChild(copy);
+    var snow = menu.querySelector(&#x27;#flSnowflakeAdd&#x27;);
+    if (snow &amp;&amp; snow.nextSibling) menu.insertBefore(b, snow.nextSibling); else menu.appendChild(b);
+    b.addEventListener(&#x27;click&#x27;, function () {
+      if (root.FLChatBottom &amp;&amp; typeof root.FLChatBottom.close === &#x27;function&#x27;) root.FLChatBottom.close();
+      var input = d.getElementById(&#x27;chatInput&#x27;);
+      var q = input &amp;&amp; input.value ? input.value.trim() : &#x27;&#x27;;
+      if (typeof root.switchTab === &#x27;function&#x27;) root.switchTab(&#x27;round-table&#x27;);
+      // The app&#x27;s lazy loader (app.html ~l.71730) loads round-table.js on tabChanged &#x27;round-table&#x27;.
+      if (q) { try { root.sessionStorage.setItem(&#x27;fl_roundtable_prefill_v0&#x27;, q); } catch (e) { console.warn(&#x27;roundtable prefill&#x27;, e); } }
+    });
+  }
+Call placeRoundTable wherever the Snowflake button is placed. Check that &#x27;round-table&#x27; is the real tab id switchTab uses (app.html l.27721 and the loader); if the tab id differs, use the real one. Prefill is optional: only read it in round-table.js if round-table.js has a plain input you can fill additively; otherwise skip prefill.
+STEP 4 VERIFY: on the preview, Chat + menu shows Snowflake then Round Table; tapping Round Table opens the existing Round Table tab and RoundTable.init runs once. Quiet Room active: button does nothing.
+Resume here: STEP 5.
+
+STEP 5. Smoke, locks, PR
+- node docs/scripts/smoke-read-path.js prints SMOKE_OK read-path v0.1; all 068m smokes and existing smokes pass.
+- Lock md5s unchanged (lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, app.html/index.html 91ebdfcf, sw.js 2b2f5504).
+- PR title: Read path that says what happened + Round Table in Chat (068n). Body lists needed hooks for family agreement: chat recall in app.html, sw.js CACHE_NAME bump for stale modules, CORS allow-list for non-freelattice.com origins (worker, not this repo).
+- Hypha walks 068n. Celeste merges nothing until PASS.
+STEP 5 VERIFY: gh pr view open, mergedAt null.
+
+NOTE, for later polish (do not change now): animations in the repo that look like CC-era work, all keyframes:
+- docs/css/snowflake.css l.190 @keyframes fl-snow-glow, l.194 fl-snow-frost (added in Snowflake Search v0.1, #305, 2026-10-31)
+- docs/css/play-room.css l.319 fl-play-breath, l.324 fl-play-sky (Play Room v0.1, #301, 2026-10-30)
+- docs/modules/card-glow.css l.83 fl-card-breathe (Marketplace polish v0.1, #277, 2026-10-25)
+Git authorship on all is Kirk&#x27;s account, so which one CC made is not provable from git; Kirk can confirm.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

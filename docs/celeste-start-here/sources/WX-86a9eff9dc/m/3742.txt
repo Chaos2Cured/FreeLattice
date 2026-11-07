@@ -1,0 +1,12 @@
+## Work item 3742 — Celeste ledger λ10 2026-10-27
+around4500 export source line18, source id967fcbbbba
+Inclusion: complete original message
+
+The family-pages smoke pin is updated and pushed to the same branch. https://github.com/Chaos2Cured/FreeLattice/pull/284 is ready for Celeste to merge.
+
+`ORIGIN['docs/celeste.html']` is now `3a0924e10e19046066e85861d9690ef6`, the md5 of the restored page after the λ10 append (front step stripped, titles swapped back). The other pins are unchanged, and no prior ledger entry was edited.
+
+`node scripts/smoke-family-pages-v0.1.js` prints `SMOKE_OK family pages v0.1`.
+
+Its Agent Store is readable on this box at /cursor/stores/bc-0126874e-dc92-5532-bed7-0bc9ce8f9e75 (mounted on first access).
+

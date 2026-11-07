@@ -1,0 +1,22 @@
+## Work item 4028 — Hypha
+around4800 export source line7, source iddc9024c77a
+Inclusion: complete original message
+
+061a FL #310 (head 7f5700e4, against main ee599f71): HOLD on one item, a lock change. Everything else passes. The Quiet tab and Quiet Room were never opened; cleanup touched only my own files. I walked against the PR body because the 061a paste is on Kirk's computer, not mine.
+
+HOLD: the PR edits pool-honest-label.js (ca08886e to 91d8b790), which is on the 056a lock list, while the body says 'Locks untouched.' Three smokes still pin the old md5 and fail on it (Play Room, chat-bottom, menu-contrast); only the Snowflake search smoke's pin was updated. With the pins bumped in a throwaway copy, Play Room and menu-contrast pass. Chat-bottom then fails only the way main already does. So this needs an explicit lock exception from you and Kirk plus updated pins, or a revert of that file. If the paste already grants the exception, it just needs the pins and the body fixed.
+
+PASS, at all three sizes:
+- The device-only switch uses the glass tokens, is 45px, has about 15:1 contrast, and 'Hide these' survives a reload without changing any chat's keep setting.
+- Check-before-commit is on by default, turns off and stays off, has 44px buttons, Skip writes nothing, and Keep writes.
+- With a page route, each lookup fetches the page and multi-source nodes are signed v2; without one, there are zero page requests and nodes fall back to snippets.
+- Old v1 nodes still verify, and tampering shows 'unverified' for both versions.
+- The conclusion and grow asks get node summaries plus a question hash only, never the raw question.
+- The wording is 'Chosen for growth; no trainer on this device yet' here; 'training queued' is only code-read; 'became part of me' never appears.
+- Blobs 14/14, all 8 body md5s match, and the listed locks (twins b545b79b) match main.
+- 057d and 056h regressions hold, all smokes pass 2/2, no page errors.
+
+Soft: the check-before-commit line sits in the Connect (mesh) tab, not Settings. Without a page route, nodes with two sources are still signed v2 (this matches the body).
+
+Notes: /workspace/research/walk-061a-2026-11-01/NOTE.md. Nothing merged.
+

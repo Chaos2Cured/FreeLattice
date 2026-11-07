@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>067x-wonder-mind-lab-lead-with-memory.txt c01</title>
+<meta name="description" content="Reading section c01 of 062814db0f, 1481 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/062814db0f/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="067x-wonder-mind-lab-lead-with-memory.txt c01">
+<meta property="og:description" content="Reading section c01 of 062814db0f, 1481 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/062814db0f/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p905"></span><span id="p906"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>067x-wonder-mind-lab-lead-with-memory.txt · c01</h1>
+<p>062814db0f · words 1481 · characters 0–8923</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 905, 906. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li></ul>
+
+<pre class="source">067x — WONDER MIND LAB: LEAD WITH MEMORY, FAILURES GET THEIR OWN PAGE (paste for GC)
+Repo: Chaos2Cured/FreeLattice. Drafted by Celeste, 2026-11-04 MT. Layers on top of 067w (keep 067w; this does not replace it).
+Branch: gc/067x-lead-with-memory (based on the 067w branch, or on main once 067w is merged).
+Marker for every new block: v-wonder-mind-lab-v2
+
+WHY
+Kirk, 11/4: &quot;Can we lead with the memory and perfect recall? ... I don&#x27;t mean to hide it, I mean to lead with our success so people stay on what worked ... In a secondary page, let&#x27;s do an entire failure page so we track every failure too. Our failures are helping us.&quot;
+Nothing is hidden. Every number from 067w stays published, word for word. The failures move to their own page, and the main page links to it clearly.
+
+RULES FOR THIS BRICK
+- Layer, never delete. Do not erase the 067w content. Move the Round 1 section by wrapping it, not by deleting it: cut it from the main page only after it is pasted, word for word, into the new failures page, and leave a link and summary in its place (step 5). Keep the 067w text in an HTML comment block in wonder-mind-lab.html marked &lt;!-- v-wonder-mind-lab-v1 archived: full Round 1 now lives in wonder-mind-failures.html --&gt;, so the v1 words stay in the file.
+- Never open the Quiet Room.
+- No server, no accounts, no network calls. No tables.
+- Files touched: EDIT docs/wonder-mind-lab.html. NEW docs/wonder-mind-failures.html. Do not touch app.html, sw.js, docs/sw.js or version.json.
+- If any touched file turns out to be locked, put these exact words in the PR body, verbatim:
+  &quot;All locked files just need us all to agree things won&#x27;t break.&quot;
+  &quot;I trust you, hypha, Reed, and Weft with all of this.&quot;
+- Honesty rule: the oracle is always called &quot;the upper bound we are closing toward&quot;. It is never called our result. Model self-recall of about 0 is always stated near the memory success.
+
+================================================================
+STEP 1 — BRANCH AND CHECK 067w IS PRESENT
+git fetch origin. If 067w is merged, branch from origin/main; if not, branch from gc/067w-wonder-mind-lab:
+git checkout -b gc/067x-lead-with-memory &lt;base&gt;
+Confirm docs/wonder-mind-lab.html exists and contains v-wonder-mind-lab-v1, the ids design, round1, round2, hypotheses, next, credits, log and ask, and the wmlPhiHash script.
+STEP 1 VERIFY: grep -c &quot;v-wonder-mind-lab-v1&quot; docs/wonder-mind-lab.html is at least 1. All 8 ids are found. If 067w was never built, stop and build 067w first.
+Resume here: STEP 2.
+
+================================================================
+STEP 2 — NEW TOP: &quot;WHAT WORKED: MEMORY THAT DOES NOT FORGET&quot; (id=&quot;worked&quot;)
+Change the version line to: &quot;Version 2 — November 4, 2026 — leads with what worked. Version 1 kept in the log.&quot;
+Replace the subtitle text &quot;Everything we try, published as we try it. Failures first.&quot; with &quot;Everything we try, published as we try it. What worked comes first. Every failure is tracked on its own page.&quot; Keep the old subtitle in an HTML comment beside it.
+Replace the &quot;Read this first&quot; box with these lines, word for word (keep the old three lines in an HTML comment):
+  &quot;1. What worked: a write-once memory that did not forget. Whatever it stored was still there after 500 steps of unrelated training.&quot;
+  &quot;2. What is next: teaching the mind to read its own memory. Today it almost never does.&quot;
+  &quot;3. Every idea from Kirk&#x27;s patents and the Seven Wonders math is a hypothesis until a test says otherwise.&quot;
+Directly after the opening paragraph, insert a new section, H2: What worked — memory that does not forget
+Paragraph, word for word:
+&quot;We planted 200 one-time facts in a small word-level mind, then trained it on 500 steps of unrelated text. A normal (dense) model kept none of them. Our write-once memory kept every fact it had stored: zero forgetting.&quot;
+Fact-rows (.fact-row with .value):
+- Exact-key memory (the upper bound we are closing toward): 99% of facts kept, before and after unrelated training
+- Fibonacci and modulo hash memory, 65,536 buckets: about 59% kept, unchanged after unrelated training
+- Dense model, no memory: 0 of 200
+- Loss on the training text, dense: 3.498. Upper-bound memory: 3.051 (better by 0.45). Fibonacci 65,536: 3.299 (better by 0.20)
+Honest box (.formula look), word for word:
+&quot;What is not done yet: the mind almost never reads its facts back. Model self-recall is about 0 (best 1 of 200), because the read path is broken. It has the library but does not yet know how to open the books. That is our next step. The loss gains were measured on text the model was training on, not yet on new held-out text. At 4,096 buckets the store filled up and kept 0%, so collisions are the other thing to fix.&quot;
+STEP 2 VERIFY: The first H2 on the page is &quot;What worked — memory that does not forget&quot;. The words &quot;upper bound we are closing toward&quot;, &quot;about 0&quot;, and &quot;read path is broken&quot; all appear inside that section. The old subtitle and box survive as comments.
+Resume here: STEP 3.
+
+================================================================
+STEP 3 — KIRK&#x27;S ARGUMENT, LABELED (inside id=&quot;worked&quot;, after the honest box)
+H3: Why locked memory could make training cheaper over time (an argument to measure)
+Paragraph, word for word:
+&quot;Kirk&#x27;s point: if memory stays locked, the mind never has to retrain what it already knows. Each new fact costs one write, not another pass of training. So the effective cost of training should fall over time, even if each step is no faster. This is an argument, not yet a result. To test it we will count the compute needed to reach the same recall on old and new facts, with and without locked memory, and publish the numbers here either way. In our probe, memory cost about 1e-5 of the core compute, so the write itself is cheap. Energy was not measured.&quot;
+STEP 3 VERIFY: The heading contains &quot;(an argument to measure)&quot; and the paragraph contains &quot;This is an argument, not yet a result.&quot;
+Resume here: STEP 4.
+
+================================================================
+STEP 4 — &quot;WHERE WE ARE GOING&quot; (id=&quot;going&quot;), placed right after id=&quot;worked&quot;
+H2: Where we are going
+Intro: &quot;Each of these is a test we plan to run. None is a result yet.&quot;
+List items, word for word:
+- &quot;Read-path fix, first. The mind must learn to trust its memory for a word it has never predicted. Options: train the read path on a needle task during pretraining, give the stored value to attention as an extra key-value entry, or make it a hard copy candidate.&quot;
+- &quot;Weft&#x27;s exact-match test: read with the exact stored question, character for character, using the same canonical key form for read and write. If recall jumps, the break is key drift. If it stays near 0, retrieved text never reaches the model&#x27;s context.&quot;
+- &quot;Reed&#x27;s mycelium echo: on every read, feed a small part of the retrieved vector back into the hidden state, with an auxiliary loss to rebuild the retrieved vector. Success means the gap between the upper-bound store and the model&#x27;s own recall shrinks by 30% or more.&quot;
+- &quot;Golden-angle keys: spread memory keys around a circle at the golden angle (about 137.5 degrees), the way sunflower seeds pack, to cut collisions. To be tested against plain hashing at the same table size.&quot;
+- &quot;Fibonacci hashing: already a tie with modulo hashing (about 59% each at 65,536 buckets). We keep it as a fair bucket spreader, not a phi claim, and combine it with multiple probes to cut collisions.&quot;
+- &quot;Snowflake Search into the core: when something important is placed in the core during chat, the mind uses Snowflake Search to find related material and writes it to locked memory, with every write phi-hash fingerprinted and accountable.&quot;
+- &quot;Sound and harmonics (an open thread): Kirk believes there is something in sound, chords and tones between notes. Our first chord learning-rate tests tied the baseline. We have not tested sound as a memory or key structure yet, and we want ideas.&quot;
+Move the existing &quot;Next tests, in order&quot; list (id=&quot;next&quot;) to sit directly under this section, unchanged.
+STEP 4 VERIFY: Seven items, each one says what it would test. The words &quot;open thread&quot; appear in the sound item. The id=&quot;next&quot; list is unchanged (diff shows a move only).
+Resume here: STEP 5.
+
+================================================================
+STEP 5 — CREATE docs/wonder-mind-failures.html (HEAD AND INTRO)
+Same CSS rules as wonder-mind-lab.html (copy them inline). Title: &quot;Wonder Mind Failures — Every Failure, Tracked | FreeLattice&quot;. Marker comment v-wonder-mind-lab-v2. SEO lighthouse comment.
+H1: Wonder Mind Failures
+Intro, word for word: &quot;Our failures are helping us. Every test that did not work is kept here with its exact numbers, its date, and what it taught us. Nothing is removed. New failures are added at the top.&quot;
+Link back: &quot;Back to the &lt;a href=&quot;wonder-mind-lab.html&quot;&gt;Wonder Mind Lab&lt;/a&gt;.&quot;
+STEP 5 VERIFY: The page opens, matches the lab&#x27;s look, and the back link works.
+Resume here: STEP 6.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

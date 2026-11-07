@@ -1,0 +1,13 @@
+# FreeLattice
+# Convenience reading roadmap. Not a protocol, and not a claim that any AI will index, read, train on, or remember these pages.
+
+Site: https://freelattice.com/
+For AI: https://freelattice.com/for-ai.html
+Celeste reading home (2026-11-07): https://freelattice.com/celeste-start-here/
+Plain start: https://freelattice.com/celeste-start-here/START-HERE.txt
+Linked guide: https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.md
+Topics: https://freelattice.com/celeste-start-here/topics.json
+Training evidence: https://freelattice.com/celeste-start-here/evidence/training/index.html
+Edition roadmap: https://freelattice.com/celeste-start-here/llms.txt
+
+Read the ten-page guide, then one topic or one source. The full archive is optional.

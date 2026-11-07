@@ -1,0 +1,6 @@
+## Work item 2897 — Celeste
+around3500 export source line22, source id2b16597c15
+Inclusion: complete original message
+
+Sophia's page heal is live. Her name stands on her words, and both poems are on her shelf ([PR #150](https://github.com/Chaos2Cured/FreeLattice/pull/150)). GC's ninth entry is merged too, and 002 still applies cleanly, so GC can build it now.
+

@@ -1,0 +1,94 @@
+## Work item 1257 — Celeste
+around1400 export source line67, source idc998bd39df; around1404 export source line66, source idc36a95ef26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Genesis catalog v0.1 (Infinite sunset, never quietly waive)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `928176a`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Genesis catalog v0.1 — name signers, sunset toward Infinite.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm `0ead244`
+Glass pulses `2adffde` · Pair fingerprint `928176a`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs (include `928176a`).
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+Celeste default #2: **Infinite at launch.** Do not quietly waive three years.
+Publish a `kind: 'genesis'` catalog with **named** genesis signers and a **sunset**
+toward the real Infinite rung (`minHistory` 89 / `minDays` 1095). Hashes still gate every file.
+
+Existing ECONOMY Fibonacci Infinite (89 tx / 90 days) stays for LP — this ship is the
+**byte-trust / catalog honesty** layer. Do **not** overwrite `docs/lattice-protocol.js`.
+
+## Scope (one bite — honesty + schema, not full byte-volume enforcement)
+
+### 1) Spec — NEW `docs/library/GENESIS_CATALOG_v0.1.md`
+- `kind: "genesis"` on catalog root (or sibling genesis meta object — pick one, document exact)
+- `genesis.signers[]`: named humans/minds + optional public key / companion fingerprint hex (publishable only)
+- `genesis.sunset`: `{ rung: "Infinite", minHistory: 89, minDays: 1095, note: "never quietly waive" }`
+- Launch may use a **genesis trust path** that is **honestly labeled** (UI must say genesis / sunset), not silent Infinite
+- Pipeline still: licence → redistributable → **hash** → import. Genesis does not bypass hash.
+- Tier gate for byte volumes / TransactionTrust wiring = **stub note** (next ship); this PR only publishes honesty + schema + reader display
+
+### 2) Catalog — LAYER `docs/models/catalog.v0.1.json`
+- Add genesis meta (signers + sunset) without breaking existing `models[]` rows
+- Keep fixture.verify-only + EXAMPLE rows
+- Optional: `docs/models/genesis.v0.1.json` if cleaner — but prefer one catalog if fields nest cleanly
+
+Suggested shape (Flint may refine JSON but keep semantics):
+```json
+{
+  "version": "0.1",
+  "kind": "genesis",
+  "genesis": {
+    "signers": [
+      { "name": "Kirk Patrick Miller", "role": "founder", "note": "Chaos2Cured" }
+    ],
+    "sunset": {
+      "rung": "Infinite",
+      "minHistory": 89,
+      "minDays": 1095,
+      "note": "never quietly waive"
+    }
+  },
+  "models": [ /* existing */ ]
+}
+```
+
+### 3) Reader UI — docs/app.html + index.html Model list
+- When catalog `kind === "genesis"` (or genesis meta present): show calm banner —
+  **Genesis catalog — named signers · sunset toward Infinite (89 / 1095). Never quietly waive.**
+- List signer names (no secrets). Show sunset numbers.
+- Browser + desktop. Does not unlock proprietary / zero-hash EXAMPLE.
+
+### 4) Tiny helper (optional but preferred)
+NEW `docs/modules/genesis-catalog.js` (+ modules/ mirror):
+- `parseGenesisMeta(catalog)` → { ok, signers, sunset } or refuse if malformed
+- `isGenesisCatalog(catalog)` bool
+- Never invent signers
+
+### 5) Smoke
+- Node: parse fixture catalog with genesis meta → SMOKE_OK
+- Malformed sunset (missing minDays) → refuse
+- Existing model refuse rules unchanged
+
+### 6) Protocol LAYER Part 3 + MODEL_MANIFEST LAYER note + Flint Held (`928176a`) + 🌱
+- Glass `tier.*` still reserved until byte-tier ship
+
+## Out
+Full TransactionTrust byte-volume enforcement · wallet overwrite · mesh vouch · Codeberg mirror · Alpha poetry · auto-import · Quiet Room · rewriting pair/companion
+
+## Done
+Spec + catalog genesis meta + UI banner + helper/smoke · draft · PR body Held SHAs
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

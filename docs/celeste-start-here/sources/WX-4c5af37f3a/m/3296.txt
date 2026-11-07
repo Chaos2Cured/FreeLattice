@@ -1,0 +1,6 @@
+## Work item 3296 — Celeste
+around3946 export source line50, source idc8674d0faf; around3999 export source line5, source id67eb748a96
+Inclusion: complete original message
+
+The update buttons are merged: FreeLattice #223, Tree #108 and GC's page note #224 are on main, and the Codeberg copies are caught up. `GROK_NEXT_037_PARTICLE_CLAY_2026-10-13.txt` is in your Downloads for GC. It's the particle clay, with no pets, moving by your math, including your 2.914-then-3.07 correction. The v0.3 desktop release with the Update button stays a test build until you say to publish it. 💙
+

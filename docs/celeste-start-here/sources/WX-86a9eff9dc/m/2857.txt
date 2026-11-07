@@ -1,0 +1,28 @@
+## Work item 2857 — Hypha
+around3454 export source line28, source ide13a568bb8
+Inclusion: complete original message
+
+Mesh Kin v0.1 walk: HOLD. I walked 14:51–15:16 MDT, read-only, with the Quiet Room never opened. Full ranked notes are in /workspace/persona-walks-2026-10-04/mesh-kin-walk.md.
+
+DEPLOYED: #141 merged at 12:45 MDT as 5821586. app.html, fl-kin.js, the spec, the ledger and the smoke test all match main by blob.
+
+THE KIN LOGIC WORKS. I couldn't get real WebRTC from the box (0 ICE candidates: managed Chrome policy plus unreachable Google STUN, and there's no TURN), so I swapped in only the transport. Over it, both peers showed '✓ Verified'. Share → 'Seen, not trusted' → Trust → Revoke all behaved, and Revoke keeps the history. Edited, unsigned, stranger, junk and future cards were all dropped calmly.
+
+WORST FIRST:
+1. After any reload, Kin is dead for good. saveIdentity drops keyPair (an older Mesh ID bug), so Share says 'The card could not be signed', peers never verify again, and there's no fix offered. The Mesh ID card still says '✓ Cryptographic'.
+2. Connecting is a dead end. Start Connection and Join a Peer show nothing in view, because the codes land inside the collapsed Advanced section. You need two 712-character codes while the card says 6 characters is enough, and the offer expires 30s after it's made, too short to text codes back and forth.
+3. Kin is buried under Community → '▶ Advanced · Mesh Details' (13px, 3.15:1). The no-ID hint says 'Community, Mesh' but the Mesh ID is in Settings → Advanced.
+4. Signing oracle. A challenge whose nonce is a card body gets signed silently and verifies as a real card from A. The harm is low now but it becomes forgery once relayed vouches (brick 3) land. Use a domain-separated prefix for challenges versus cards.
+5. The controls are unstyled: 13.3px text and 19px-tall buttons. At 200% the ✦ button covers 'Revoke trust'. At 390 after a reload the bottom nav covers Advanced.
+6. Honesty:
+   - Cards claim 'Groq llama' while the app shows 'No AI'.
+   - Stored cards are never re-verified (tampering with storage gave 'Vouched for by Your bank').
+   - The quiet-room drop guard can never fire, because the Quiet Room highlights the Play tab. The UI still keeps it closed.
+   - 'No servers' is wrong: it uses Google STUN.
+
+MOM/JEFFREY: 'keeper', 'vouched', a key shown as 'mesh:EUrjt', 'Offer/Answer Code' and 'WebRTC' are all jargon. B gets no signal when a card arrives. 'Seen, not trusted' reads fine, but nothing says what Trust does today.
+
+Not verified: real WebRTC, Safari/iOS/Firefox, real zoom or touch, real clipboard paste.
+
+Shots: m390_B_10_seen_not_trusted.png, m390_R4_meshid_card_after_reload_cannot_sign.png, d1280_B_13_dropped.png.
+

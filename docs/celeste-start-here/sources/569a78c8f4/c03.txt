@@ -1,0 +1,72 @@
+1. **Pairing: a short code, typed once per device.** At launch the bridge prints `Pairing code: ABC-123`. The alphabet is 31 letters and digits (no 0/O/1/I/L), 6 characters, about 30 bits. A code is good for 10 minutes and works once. After 5 wrong tries a new code is printed, with a 30-second rest. In the app, Workshop → Code shows a small card with a code field, a name field (prefilled, for example "Chrome on Mac") and one Pair button.
+   - **Why a code at all?** A web page can't read files on disk, and `http://localhost:*` is on the allowlist for local previews, so any local dev page or one XSS bug could otherwise pair silently. A code a person reads and types is one relational gesture (AUTONOMY.md Principle 3). It's the speaker-pairing gesture Mom already knows, and she never types a command.
+   - **Trusted origins still pair.** Adding an origin to the trust list lets it knock. It does not hand it a token.
+   - **Why not six words?** They need a wordlist file. Six clear characters ship with zero new assets. It's a fine later polish.
+2. **Persistent per-device tokens (E1).** On a good `POST /pair` the bridge makes 32 random bytes (hex) for that device and returns them once. It stores only `sha256(token)` in `~/.freelattice/agent-bridge-trusted.json`, mode 0600, written atomically (temp file, then rename). Each entry is `{ id (8 hex), name, origin, kind: browser|tool|cli|remote, scopes, tokenSha256, createdAt, lastUsedAt, expiresAt: null }`. Lookups hash the presented token and compare with `crypto.timingSafeEqual`.
+   - **No expiry by default.** Kirk may set `"idleExpiryDays": 180` in the file if he wants unused devices to lapse. `lastUsedAt` is saved at most once a minute.
+   - **`FL_BRIDGE_EPHEMERAL=1`** restores v0: paired devices live in memory only and are forgotten when the bridge stops. The heartbeat says `trustedMinds: 'ephemeral'`, and the app says so after pairing.
+   - **An unreadable trust file** is renamed aside to `agent-bridge-trusted.json.unreadable-<time>` and the bridge starts fresh, so a broken file never locks Kirk out and never gets silently overwritten.
+3. **Named pairings (E2).** The name is cleaned (control characters removed, 60 characters max) and shown in Paired minds, `--list-minds` and the bridge window. The ledger gets the device id, never the token or its hash.
+4. **Revoke without a restart (E3).**
+   - App routes (trusted mind with `manage` scope): `GET /pair/list` (never returns tokens or hashes), `POST /pair/revoke { id }`, `POST /pair/revoke-all`, `POST /pair/scopes { id, add, remove }`.
+   - Command line, run while the bridge is up or down: `node tools/agent-bridge.js --list-minds | --revoke <id> | --revoke-all | --allow-secrets <id> | --deny-secrets <id> | --trust-origin <o> | --untrust-origin <o> | --add-root <name> <dir> | --remove-root <name> | --trust-local-tools | --untrust-local-tools`. These edit the trust file and exit without opening the port. Unknown flags print usage and exit 1.
+   - The running bridge notices a changed file (inode, size and mtime) on the next request, so a command-line revoke applies at once.
+   - **Revoke all keeps local tools.** "Revoke all paired devices" drops every browser and remote device. Local tools stay trusted, because they are Kirk's own computer. `--untrust-local-tools` turns them off.
+   - A restart no longer revokes anything. Every revoke adds a ledger row.
+5. **Paired minds view (E4).** After "Connected", Workshop → Code shows a small "Paired minds (n)" disclosure. Each row shows name, origin or "this computer", when paired and last used, and "(this browser)" for the current one. Buttons: **Revoke**, **Allow .env files** / **Stop .env access**, then **Revoke all paired devices** and **Forget on this browser**. Everything is built with `createElement` and `textContent`; the client has no `innerHTML`. **No confirm dialog** on any button: these are Kirk's own local actions and he can pair again in seconds (AUTONOMY.md L36, L76).
+6. **Local AI is trusted by default (E5).** At launch, with `localTools: true` (the default), the bridge keeps one `kind: 'cli'` mind named "Local tools on this computer" and writes its token to `~/.freelattice/agent-bridge-token` (0600). If the file already holds a valid local-tools token, it is kept, so scripts keep working across restarts. It is listed and revocable like any device.
+7. **Scopes, full by default (E6).** `read, write, patch, test, commit, wallet, manage` for every new mind. `secrets` is the only opt-in, and it lifts the `.env*` block for that one mind. `.git/` and `.ssh/` stay forbidden for everyone (git has its own routes). A missing scope answers 403 with `{ scope }`, and the Workshop status line says which one. Any trusted mind with `manage` can change scopes, because all trusted minds are family; Kirk can remove `manage` from a guest with `/pair/scopes`.
+8. **What needs a token:** every non-GET verb (all POSTs, including `/wallet/*`, `/trade/*`, `/science/*`, `/code/write`, `/code/patch`, `/code/git/commit`, `/pair/revoke*`), plus every GET under `/code/`, `/test/`, `/pair/` and `/roots`. `POST /pair` itself is exempt, since it's how you get the token.
+   - **What stays open** to allowed origins and no-Origin local tools: `/`, `/help`, `/models` and the read-only community GETs. Their behavior is unchanged.
+9. **Origins (E7):**
+   - built in: `https://freelattice.com`, `https://www.freelattice.com`, `https://thelatticetree.com`, `https://www.thelatticetree.com`; `http://localhost:<port>` and `http://127.0.0.1:<port>` for local previews; `tauri://localhost`, `http://tauri.localhost` and `https://tauri.localhost` for the desktop shell;
+   - Kirk's own: `trustedOrigins` in the trust file, changed only with `--trust-origin` / `--untrust-origin` (never over HTTP). Each entry must be exactly `http(s)://host[:port]`, lowercased, with no path and no `*`. Anything else is refused on the command line and ignored (with a log line) if hand-edited into the file.
+
+## Exact source excerpt, characters 18084–19270
+
+   Unknown origins get **403 with no `Access-Control-Allow-Origin`**, for OPTIONS too. Requests with **no Origin** (curl, Node scripts) are allowed but still need a token for anything that changes state.
+10. **Trusted project folders (E8).** `project` is always `FL_PROJECT` or the working directory. Kirk adds more with `--add-root <name> <absolute dir>`. Code routes take `?root=<name>` or `data.root`; the default is `project`. An unknown name answers 404 with the list of names. `lockedPath` checks realpaths against the chosen folder exactly as before. `GET /roots` lists them for a trusted mind.
+11. **Host guard.** The Host header must be `127.0.0.1[:port]` or `localhost[:port]`. That's the DNS-rebinding defense.
+12. **Body cap: 8 MiB.** `docs/app.html` is about 2.94 MB, and `/code/write` must still carry it. Over the cap the bridge drains the rest and answers 413. Bad JSON gets 400 (today it silently becomes `{}`).
+13. **No shell.**
+    - git: `execFileSync('git', ['add','--', ...rels])`, `['commit','-m', message]`, `['rev-parse','HEAD']`.
+    - grep: `execFileSync('grep', [..., '-e', query, '--', rel])`.
+    - smoke: `spawnSync(process.execPath, ['tests/smoke.js'])`.
+
+## Exact source excerpt, characters 19272–21075
+
+    The `--` separators stop a file named `-x` from becoming a flag.
+14. **Path lock (`lockedPath`).** It refuses control characters (400), absolute paths (403), anything outside the realpath of the chosen folder, compared with `path.relative` rather than `startsWith` (403), `.git/` and `.ssh/` (403), `.env` and `.env.*` files anywhere in the folder unless the mind has `secrets` (403, reason `secrets-not-granted`), and any path whose nearest existing ancestor realpaths outside the folder, i.e. symlink escapes (403). The old `safePath` stays as a thin wrapper.
+15. **Commit ledger.** `~/.freelattice/bridge-ledger.jsonl`, append-only, fixed key order: `ts, kind, route, origin, agent(8), device, result, filesCount, filesSha256, messageSha256, commitSha, prev, self`, where `self = sha256(JSON of the other fields)`. It never holds message text, file content, tokens or token hashes. The tip is re-read before every append, so bridge and command-line rows share one chain. Refusals, pairings, revokes and trust changes are logged too.
+16. **Two small heals ride along:** `/code/patch` uses a replacer function, so `$` in the replacement stays literal, and `/code/tree` skips symlinks.
+17. **The bridge never pushes.** No push route exists, and this brick adds none. Pushing to GitHub is an external action, so it keeps following AUTONOMY.md Principle 2 (L38-46). The Workshop heal in 6d also removes a silent fallback to a GitHub API push when the bridge refuses.
+18. **Browser note.** Chrome 142+ shows a one-time "local network access" prompt before a public site can reach loopback (https://developer.chrome.com/blog/local-network-access). That's good, and it's independent of this lock. Our lock still matters for Firefox and Safari, older Chrome, anyone who clicks Allow, and LAN reachability.
+
+## Exact source excerpt, characters 21077–21088
+
+## 4. Files
+
+## Exact source excerpt, characters 21090–22637
+
+| File | Change |
+|---|---|
+| `tools/agent-bridge.js` | Layer blocks A-E below (1181 → 1939 lines; nothing removed except the superseded bodies of the lines named above) |
+| `docs/modules/agent-bridge-client.js` | **New** (`window.FLAgentBridge`, 286 lines) |
+| `docs/app.html` | One comment and one `<script>` line above L68597 |
+| `index.html` (root) | Byte-copy of `docs/app.html` after the edit |
+| `docs/modules/propose.js` | `bridgeFetch` helper; 4 call sites (diff below) |
+| `docs/modules/workshop.js` | `flAgentBridgeFetch` helper; 17 call sites; pair card and Paired minds in `checkBridge`; honest status in `WorkshopProjects.commitViaBridge` (diff below) |
+| `tools/demo-economy.js`, `tools/demo-economy-v2.js` | Read the local-tools token file and send `X-FL-Bridge-Token`; default `BRIDGE` becomes `http://127.0.0.1:3141` |
+| `docs/scripts/smoke-agent-bridge-lock.js` | **New** (461 lines, full text below) |
+| `docs/library/AGENT_BRIDGE_LOCK_v0.md` | **New** doc (outline below) |
+| `docs/library/FRACTAL_FAMILY_LEDGER_v0.md` | One dated entry, inserted above `## Out of scope for this brick` (L261) |
+| `docs/Flint.html` | One `<p class="v-agent-bridge-lock-v0">` ledger line above `<p class="foot">` (L534) |
+| `scripts/generate-recent.sh` | One `echo` pointer pair before L112 (`echo "The version, smoke count...`) |
+| **Never** | `docs/sw.js`, root `sw.js`, `bridge/*`, Kimi's pages (`docs/kimi.html`, `docs/kimi-ledger.html`, `docs/voice-shelf.html`, `docs/library/KIMI_*`, `docs/library/VOICE_SHELF_v0.md`), anything in Alpha |
+
+## Exact source excerpt, characters 22639–22682
+
+## 5. `tools/agent-bridge.js`, step by step
+
+## Exact source excerpt, characters 22684–23092
+

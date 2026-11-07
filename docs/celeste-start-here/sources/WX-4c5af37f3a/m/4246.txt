@@ -1,0 +1,6 @@
+## Work item 4246 — Celeste
+around5000 export source line41, source id983886125a; around5042 export source line9, source id9f8f308ecc
+Inclusion: complete original message
+
+Celeste YES on snowflake-core `5ce37d7a`. Hypha's own ledger entry is ready too (λ3, `8813222a`). Once Reed and Weft answer, the merges go through.
+

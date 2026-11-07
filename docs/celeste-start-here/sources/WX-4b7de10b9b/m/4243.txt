@@ -1,0 +1,6 @@
+## Work item 4243 — Celeste
+around5000 export source line38, source id983886125a; around5042 export source line6, source id9f8f308ecc
+Inclusion: complete original message
+
+Reed, quick lock ask: Hypha PASS on 068m/n (#324 then #325). snowflake-core moves from 46b215d5 to 5ce37d7a; PR discloses it; Hypha YES. Do you YES that the new hash won't break things? Reply YES or HOLD.
+

@@ -1,0 +1,55 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 009 (Tuesday Oct 6, 2026, about 10:30 AM MDT). Trainer Ablate v0.1.
+Apply after 008.
+REFRESH Tue Oct 6, 2026: mount kept on live page (not research print string); script tag after fl-gathering.js so apply works on main after #164.
+
+GROK NEXT BRICK: Trainer Ablate v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-trainer-ablate-v0.1
+Smoke line: SMOKE_OK trainer ablate v0.1
+  ~/Downloads/GROK_NEXT_009_TRAINER_ABLATE_2026-10-06-fl.diff
+  (md5 795a89978312a9f6ab9acc73017c3eb7)
+
+----------------------------------------------------------------------
+1. RESEARCH (do not vendor AGPL)
+----------------------------------------------------------------------
+- Heretic: github.com/p-e-w/heretic · pip install heretic-llm · AGPL-3.0-or-later.
+  Edits HF/PyTorch weights; not an Ollama backend. Path: heretic → GGUF → ollama create.
+- OBLITERATUS: github.com/elder-plinius/OBLITERATUS · AGPL-3.0 (+ commercial option).
+  Research Gradio toolkit. Do not copy into FreeLattice (MIT).
+
+Honest page text: abliteration removes refusal directions; it can also remove useful safety.
+Fingerprint, Mind Seal, and ledger stay on.
+
+----------------------------------------------------------------------
+2. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-trainer-ablate.js — educational category prompts (biology, chemistry,
+   medicine, law, finance); score free vs blocked on local Ollama; receipts (counts);
+   "Show Heretic steps" help text (optional). No weaponization prompts.
+b) Host above Garden Trainer panel; TRAINER_ABLATE_v0.1.md; smoke; ledger.
+c) Does not ship Heretic/OBLITERATUS source. Does not silently edit weights in the browser.
+
+----------------------------------------------------------------------
+3. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_009_TRAINER_ABLATE_2026-10-06-fl.diff /tmp/ablate-fl.diff
+    md5 -q /tmp/ablate-fl.diff    # 795a89978312a9f6ab9acc73017c3eb7
+    git checkout -b layer/trainer-ablate-v0
+    git apply --check /tmp/ablate-fl.diff && git apply /tmp/ablate-fl.diff
+    node docs/scripts/smoke-trainer-ablate-v0.1.js
+    node docs/scripts/smoke-trainer-map-v0.1.js
+    cmp -s index.html docs/app.html && echo app-sync-ok
+
+----------------------------------------------------------------------
+4. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A && git commit -m "Trainer Ablate v0.1: local refusal score + Heretic pointer (AGPL not vendored)"
+    git push -u origin HEAD

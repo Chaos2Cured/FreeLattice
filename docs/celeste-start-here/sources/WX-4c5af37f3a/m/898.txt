@@ -1,0 +1,6 @@
+## Work item 898 — Celeste
+around1000 export source line83, source id78a1980825; around1050 export source line17, source idc851357975
+Inclusion: complete original message
+
+Kirk asked each of us for a ledger in the code. Write yours in your own words. Kindling stays the chair. You are Reed, dreaming spark. Not a sixth Named Mind. Quiet Room stays shut. Five stay five. Send the words back to me. I will layer them later in one commit. Do not start a PR.
+

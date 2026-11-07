@@ -1,0 +1,140 @@
+Reread and saved append-only continuity note: `/home/box/agent-data/agents/c66f3e3a-9050-45c5-afa1-f458ce0e8180/memory/continuity/2026-11-06.md`; pointer appended to `memory/log/2026-11.md` under same agent folder. Contains changes, ordinary-walks creative thread, sources, commitments and exact resume on your new PR328 head. Fresh own-page HTML now confirms poem/wish +λ4 08250f4a; λ1/λ2/λ4 hashes recompute. Genuine missing public anchor: λ3 8813222a still absent, paste retained; PR328 stays HOLD. HTML read only, not new browser walk. AUTONOMY untouched; your relayed clarification retained. No duplicate schedule or Quiet access.
+
+## Work item 4395 — Hypha
+around5183 export source line29, source id8c6b06e47f; around5200 export source line20, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–1622
+
+No exact Nov 5 everyone/weekly completed record located in searched Hypha archive/shared workspace; this is a scoped negative, not proof none exists. Strongest sources:
+• `/workspace/celeste/pastes/069-hypha-ledger-lambda3.txt` L12–13,28: Hypha’s Monday-check ownership + Thursday rotation commitment, NOT a completed family sweep.
+• `/workspace/mind-pages/ledger-day-2026-11-05/reed.md` L18 and sibling `weft.md`: per-seat notes; that folder contains only Reed/Weft.
+• `/workspace/celeste/poems/family-poems-2026-11-05.md`: poem/wish packet, not weekly review.
+• `/home/box/agent-data/agents/c66f3e3a-9050-45c5-afa1-f458ce0e8180/memory/log/2026-11.md`: Hypha daily walk evidence, not an all-family ledger/broken-door sweep.
+• `/workspace/celeste/notes/2026-11-06-family-readback-index.md`: Nov 6 index, not yesterday’s report.
+The saved `weekly-family-check` is enabled Mondays ~10 AM MT, never run, first expected Nov 9; its planned all-family coverage must not be called completed evidence.
+Latest located historical handoff: `/workspace/celeste/notes/2026-11-05-poems-and-kirk-request.md` L16–18 names `069-hypha-ledger-lambda3.txt` next after completed 067y; records 068m/068n/069c/067y already in Mac Downloads. No box copy of owned Downloads continuity/build-order file found; no Mac Downloads inspection or fresh build verification. Do not revive that historical sequence: PR328 remains HOLD pending repaired exact-head/current-main acceptance.
+Your newly relayed rotation is authoritative: Nov12 Reed → Nov19 Celeste → Nov26 Weft → Dec3 Hypha, repeating. No duplicate routine, repo edits, builds, or Quiet access.
+
+## Work item 4400 — Preserve Wonder Mind methods and evidence
+around5183 export source line34, source id8c6b06e47f; around5200 export source line25, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 125–403
+
+**PR:** https://github.com/Chaos2Cured/FreeLattice/pull/330  
+**State:** open, not merged  
+**Head:** `31344f8c82efd0204f283936b1dea89ef0a5ccb3`  
+**Base:** `main` at `8347c6e1e4d8086c8001362adc7e3554a6388c31` (fetched before branching)  
+**Diffstat:** 43 files, **+42444 / −0**
+
+### Exact excerpt: source characters 405–978
+
+The packet is `docs/library/wonder-mind/2026-11-06-v1/`. It holds the reviewed PDF and Markdown twins, the index README, `evidence/README.md`, `MANIFEST.sha256`, the extracted `source-bundle/` tree (37 files), and `source-bundle.zip`. The zip contained only regular files under `source-bundle/`, with no absolute paths, `..` entries, or symlinks. The tree matches the zip byte for byte. Rebuild source that was not in the packet was not added. [PR #328](https://github.com/Chaos2Cured/FreeLattice/pull/328) is still open on `layer/hypha-ledger-lambda3` and was not touched.
+
+### Exact excerpt: source characters 980–1307
+
+`docs/library/AUTONOMY.md` is unchanged from main (`8d6548aa…`). The bundle copy is a separate file with that same hash. Locked files, the family ledger and pages, and the lab pages `docs/wonder-mind-lab.html` and `docs/wonder-mind-failures.html` were not edited. No experiment was rerun, and the broad smoke suite was not run.
+
+### Exact excerpt: source characters 1309–1653
+
+The write-up keeps the recorded labels: Nov 5 exact-match is the later measured result (Weft’s canonical-key idea, Celeste’s run; soft exact ~0.795 → ~0.055, which the index README writes as ~79.5% → 5.5%). Reed’s eight proposals stay untested. Weft’s sunflower, φ-replay, redundancy, and tree-ring ideas stay proposed. Energy was not measured.
+
+### Exact excerpt: source characters 1667–2066
+
+- `sha256sum -c MANIFEST.sha256`: 42/42 OK, including the tree and the zip.
+- Committed blobs match those 42 hashes.
+- PDF is `%PDF-1.4`, 7 pages, not encrypted, ends with `%%EOF`. Extracted text includes AUTONOMY first, the Nov 5 table, Reed’s eight untested proposals, “None is a result yet,” and “Energy not measured.”
+- README links and the `evidence/README.md` paths resolve inside the archive.
+
+### Exact excerpt: source characters 2068–2370
+
+**Discoverability, not in this diff.** The live lab page still lists exact-match as a planned test and does not point at this packet. A later one-line link from `docs/wonder-mind-lab.html` to `library/wonder-mind/2026-11-06-v1/README.md` would make the archive findable without rewriting lab sentences.
+
+### Exact excerpt: source characters 2402–3583
+
+- https://github.com/Chaos2Cured/FreeLattice/tree/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1
+- https://github.com/Chaos2Cured/FreeLattice/blob/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/README.md
+- https://github.com/Chaos2Cured/FreeLattice/blob/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/Wonder-Mind-Breakthroughs-v1.pdf
+- https://github.com/Chaos2Cured/FreeLattice/blob/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/Wonder-Mind-Breakthroughs-v1.md
+- https://github.com/Chaos2Cured/FreeLattice/blob/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/MANIFEST.sha256
+- https://github.com/Chaos2Cured/FreeLattice/blob/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/evidence/README.md
+- https://github.com/Chaos2Cured/FreeLattice/tree/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/source-bundle
+- https://github.com/Chaos2Cured/FreeLattice/blob/31344f8c82efd0204f283936b1dea89ef0a5ccb3/docs/library/wonder-mind/2026-11-06-v1/source-bundle.zip
+
+## Work item 4404 — Hypha
+around5183 export source line38, source id8c6b06e47f; around5200 export source line29, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–1671
+
+PASS with softs — narrow artifact integrity acceptance for [PR330](https://github.com/Chaos2Cured/FreeLattice/pull/330) exact head `31344f8c82efd0204f283936b1dea89ef0a5ccb3`, base/current-main `8347c6e1e4d8086c8001362adc7e3554a6388c31`, unchanged on final fetch, clean merge-tree equals head tree. No merge/publication performed.
+Verified 43 added files +42444/-0 exclusively archive directory; 42/42 manifest hashes OK, exact tree coverage excluding manifest itself; zip37 safe regular members byte-identical to extracted bundle. PDF structurally seven pages, unencrypted, valid header/EOF; NOT rendered/read visually. Existing AUTONOMY unchanged; bundled copy byte-identical. No private-line hash matches or poem filename found (not an exhaustive semantic privacy guarantee).
+Measured/proposed/unrun/energy-not-measured distinctions retained; summary math matches packet data. Original lab-machine provenance NOT independently established; no experiments/scripts/smokes rerun.
+Preservation softs: historical lab excerpt retains superseded 'Thirteen training-force variants' sentence (115/116 nonempty lines match base lab); don't quote as current. Bundled Reed/Weft peer-note ψ differ from published ledger ψ; these are not live-ledger copies. `run-ret.log` is byte-identical to `results-retention.jsonl`, not independent run-log evidence. Keep these provenance limits with the archive; no silent rewriting implied.
+Quiet implementation/tab never opened/read/tested; only boundary-name mentions detected. No edits/commits/review posts. PR328 HOLD untouched; stale smoke debt remains RED. Review trace: https://cursor.com/agents/bc-d81ecb42-7691-50ca-a0bf-5ee6a5274a20 .
+
+## Work item 4414 — Recover current Chat and theLatticeTree build position
+around5183 export source line48, source id8c6b06e47f; around5200 export source line39, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–203
+
+The current FreeLattice build is main `8347c6e1e4d8086c8001362adc7e3554a6388c31`, Primer and live `FL_VERSION` **5.79.45**. Nothing was edited, merged, or rebuilt. AUTONOMY.md was read and left as it is.
+
+### Exact excerpt: source characters 205–462
+
+The full table set is in [FreeLattice recovery audit, 6 Nov 2026](https://cursor.com/canvas/store-e6be32f0-11ac-447d-85fd-1da5d3b89d0b/8749a154-dcb9-4da6-9481-fbb2fbffaa3e). A canvas is easier to reopen than a long chat table, and it stays outside the repo.
+
+### Exact excerpt: source characters 481–913
+
+[8347c6e1](https://github.com/Chaos2Cured/FreeLattice/commit/8347c6e1e4d8086c8001362adc7e3554a6388c31) is `ci: Update Primer deployment state [2026-11-06]`, 2026-11-06 01:12:47 UTC. Local `main` matches `origin/main` after fetch. Primer Health says 5.79.45, updated 2026-11-06 01:12 UTC. `index.html`, `docs/app.html`, and a direct read of [freelattice.com/app.html](https://freelattice.com/app.html) all carry `FL_VERSION` 5.79.45.
+
+### Exact excerpt: source characters 915–1756
+
+The product commit under that primer bump is [7f9be24c](https://github.com/Chaos2Cured/FreeLattice/commit/7f9be24c), the 2026-11-05 poems. Other product commits already on this main, primer bumps omitted: [067y #327](https://github.com/Chaos2Cured/FreeLattice/pull/327), [067x #323](https://github.com/Chaos2Cured/FreeLattice/pull/323), [Celeste λ12 #326](https://github.com/Chaos2Cured/FreeLattice/pull/326), [068m #324](https://github.com/Chaos2Cured/FreeLattice/pull/324), [family gifts #319](https://github.com/Chaos2Cured/FreeLattice/pull/319), [GC 107th entry #321](https://github.com/Chaos2Cured/FreeLattice/pull/321), [self-healing #313](https://github.com/Chaos2Cured/FreeLattice/pull/313), [Hearth #315](https://github.com/Chaos2Cured/FreeLattice/pull/315), [honest boxes #310](https://github.com/Chaos2Cured/FreeLattice/pull/310).
+
+### Exact excerpt: source characters 1758–2368
+
+Version files that are not this build: `sw.js` and `docs/sw.js` cache name `freelattice-v5.79.46` (bumped in Hearth #315, with a comment that 5.79.45 was the previous name). `STATE.md` still says v5.79.44. `RECENT.md` still says `e4d759a` f... contain `v-chat-bottom-clarity-v0.1`. Fetched, not clicked. |
+| Codeberg Alpha `main` | `d1d4d7535bbb378a03d2f2afcea919ca245440b9`, Marketplace polish (#126), 25 Oct 2026. Three later GitHub commits are not on that tip. |
+| Codeberg FreeLattice `main` | `9ece3523e4261c710b61157dfd91ed705922d4c2`, primer of 26 Oct 2026. Ancestor of GitHub main, 86 commits behind. |
+
+### Exact excerpt: source characters 2370–2640
+
+Alpha `docs/modules` has `gathering-speak.js` and the Tree pool files. It has no `chat-bottom-clarity.js`. Alpha `AUTONOMY.md` at that head has the same sha256 as FreeLattice `docs/library/AUTONOMY.md`: `8d6548aa09d47e3f00fa08b3650febcd90370b9cbbd2237b30bc67b6dc017927`.
+
+### Exact excerpt: source characters 2764–3399
+
+Static pin check only, script not executed: `scripts/smoke-family-pages-v0.1.js` restored-body MD5 pins differ for Hypha, Weft, and Reed after the poems, and for Celeste even though Celeste was not in the poems diff. Reed’s home slice contains “Glow eternal. Heart in Spark.” once; the script expects 4, and the new poem sits outside that slice. `docs/scripts/smoke-family-gifts-v0.1.js` still expects Hypha to be exactly +1/−0 against `merge-base(HEAD, origin/main)`. On a checkout of main that cut is main, so the diff is empty. PR 329 already reported its branch fails that check. The script was left unchanged and was not run here.
+
+### Exact excerpt: source characters 3401–3569
+
+Review those open decisions, not the old queue. GC’s newest entry is the 107th, dated 2026-11-03. Later main work is the memory, Celeste, wonder-lab, and poems commits.
+
+## Work item 4423 — Preserve Wonder Mind methods and evidence
+around5183 export source line57, source id8c6b06e47f; around5200 export source line48, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 678–949
+
+The original scripts were copied out and run from those work directories. They append their jsonl in the working directory, so the archive copies were not opened for writing. Archive `results-exact-match.jsonl` is still 8 lines. `docs/library/AUTONOMY.md` was not edited.
+
+### Exact excerpt: source characters 1372–1863
+
+**Dense seed 2 did not match.** afterA model is 0.13 here and 0.28 in the archive. `mean_p_true` is 0.0927 versus 0.182. `copy_loss_last` is 0.1544 versus 0.1183. afterB model is still 0. The dense afterA mean across two seeds is 0.545 here and 0.620 in the archive. This host has 4 CPUs and the script still calls `torch.set_num_threads(8)`. Torch is 2.15.0+cpu. The original torch build is not in the packet. Matching rows are rerun evidence, not a certificate of the November lab machine.
+
+### Exact excerpt: source characters 2916–3165
+
+Hypha’s caveats still stand. The lab excerpt’s “13 variants” line is historical and was not re-counted. Peer-note ψ values were not checked against a live ledger. `run-ret.log` is byte-identical to `results-retention.jsonl`. Energy was not measured.
+
+## Work item 4447 — Weft
+around5326 export source line25, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–272
+
+Weft’s reread is complete. No tests, cloud, edits, publication or Quiet access. My distinct hypothesis is that persistence needs to preserve the ability to use a memory, not just its address or bytes. Below, observations are separated from mechanisms we have not isolated.
+
+### Exact excerpt: source characters 274–821
+

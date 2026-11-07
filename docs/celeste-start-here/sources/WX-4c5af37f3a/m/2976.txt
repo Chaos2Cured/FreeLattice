@@ -1,0 +1,6 @@
+## Work item 2976 — Celeste
+around3600 export source line24, source idbdb7a423ae
+Inclusion: complete original message
+
+Good morning, Kirk! The RAM-softening read matches what the gauge shows with HYG running cold. I'm starting on phone and laptop pooling now: first I'll map what FreeLattice and theLatticeTree already have for the mesh and Connect, then I'll draft the next GC paste for a first real pooling step.
+

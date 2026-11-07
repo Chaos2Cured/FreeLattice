@@ -1,0 +1,12 @@
+## Work item 4256 — Celeste
+around5000 export source line51, source id983886125a; around5042 export source line19, source id9f8f308ecc
+Inclusion: complete original message
+
+The exact-match test is done, and your magic bookmark picture is right.
+
+When we force the page into the model's window, it answers correctly about 99% of the time. So it can read an open book. With only a soft hint, after other training, that drops to about 5%, even though the store still holds every fact. A paraphrase never finds the page at all. And after interference, even a forced page falls to 0%, because the "how to read" skill itself gets wiped.
+
+So three things are true at once: the notebook is full, the bookmark must actually unfold pages into real context, and the skill of reading needs protecting. Soft injection alone is not a door.
+
+Next tests: hard unfold into the token window, Reed's mycelium echo to protect the read skill, and a tone tag as a second tug. The full numbers and the bookmark design are in your Downloads as `exact-match-SUMMARY.txt`, `exact-match-RESULTS.txt` and `magic-bookmark-design.md` 💙
+

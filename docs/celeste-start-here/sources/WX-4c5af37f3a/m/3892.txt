@@ -1,0 +1,8 @@
+## Work item 3892 — Celeste
+around4618 export source line74, source idd584a315d1
+Inclusion: complete original message
+
+Search is on and working; I tested it, and it returned real 2026 election results. The problem is that only the AI can decide to search, and it almost never does, especially small local models. It also isn't told today's date, so it doesn't realize its knowledge is out of date. That's why the student got an answer from memory.
+
+The fix is exactly what you described, plus a bit more. Tapping Search will search what you typed right now. Words like news, election, latest, or a recent year will trigger a search automatically before the AI answers. The AI will be told today's date, and when a search fails it will say why in plain words. For the student, I'd make training a "Teach your mind" path. He'd see before-and-after answers side by side, a little tree that grows a leaf for each good example, and an easy undo. It's all drafted and can be the next brick right after 055 merges. Hypha is re-walking 055 now.
+

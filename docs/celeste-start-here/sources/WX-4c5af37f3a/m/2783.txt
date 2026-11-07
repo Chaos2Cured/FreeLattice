@@ -1,0 +1,12 @@
+## Work item 2783 — Celeste
+around3340 export source line55, source idb5b0676a58
+Inclusion: complete original message
+
+All three new pastes are in your Downloads, and so is Honest reasons. I'd give them to Grok in this order, after the brick it's building now:
+
+1. `GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt`, so you have the page to share with your image
+2. `GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt`
+3. `GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt`, which also closes a real gap: backups were carrying the key that unlocks saved API keys
+
+To spare Grok's memory, start each one in a fresh Grok session once the GC ledger exists. Each paste has a matching `.diff` file next to it, so Grok can apply it directly instead of reading long code.
+

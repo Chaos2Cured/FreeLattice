@@ -1,0 +1,141 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then docs/code-settings.html and docs/code-garden.html, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 029 (Saturday Oct 10, 2026, MDT). Tree grandmother door v0.1 (theLatticeTree / Alpha).
+Give after 028 (Tree no-install mind, merged as #100, bb339da). Independent of 019b (not built).
+Apply-checked on a fresh clone of FreeLattice-Alpha main bb339da (#100 merged):
+  git apply --check clean; all 32 docs/modules/*.test.js pass (31 old + 1 new).
+  fl-connect.js aaff2bf1b037656989a9e1a89bb05908. AUTONOMY.md, garden-trainer.js and sw.js have
+  an empty diff.
+
+GROK NEXT BRICK: Tree grandmother door v0.1 (a welcome window, and Yes or No pooling)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-grandmother-door-v0.1
+Smoke line: SMOKE_OK tree grandmother door v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-grandmother-door-v0.1
+  ~/Downloads/GROK_NEXT_029_TREE_GRANDMOTHER_DOOR_2026-10-10.fl.diff
+  (md5 820d799b571d456841cf2d1639300a10)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+  Design only, not code: ~/Downloads/GROK_NEXT_029c_DESKTOP_DISCOVERY_DESIGN_2026-10-10.md
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Kirk's dream (Oct 10): a school teacher who never coded, or a grandmother, should be able to do this.
+  (1) Open FreeLattice or theLatticeTree, and a window comes up to help connect an AI, and does not
+      come up when an AI is already connected.
+  (2) Another device joins, and a window asks "Would you like to pool resources with (device)?"
+      Yes or No. Yes means done.
+
+The honest line. A web page cannot notice a phone plugged in by cable. Browsers cannot find devices
+on the Wi-Fi (no mDNS for pages). The Tree has no server. So the closest true version is: one big
+picture code on the computer, one Yes on the phone, one picture code back, one Yes on the computer.
+The real "it just knows a phone appeared" needs the desktop app (029c, design only). USB is not
+that path; the same Wi-Fi or a wired network is.
+
+----------------------------------------------------------------------
+2. WHAT ALREADY EXISTED (checked, reused, not changed)
+----------------------------------------------------------------------
+On the Tree:
+  - LocalMindProbe.look(): the loopback-only look at the usual doors (Ollama 11434, LM Studio 1234,
+    llama.cpp 8080, Jan 1337, GPT4All 4891, KoboldCPP 5001, and FlConnect's Bridge on 127.0.0.1).
+    remember() and entryFromFoundList() seat a found mind, the same as the grandmother face.
+  - TreeBrowserMind (028): checkGpu(), MODELS (sizes), wake(id, true), seat(true).
+  - TreePool (018/019a): invite/readInvite/join/readReply/finish, startRoom, picture codes
+    (qrcodegen, Nayuki, MIT), BarcodeDetector scanning, trustCarried, useInChat, letHelp, Pause.
+  - TreeKin: asking cards (makeAskerCard) through tree_kin_names { ai, keeper, asks }.
+On FreeLattice (checked, NOT changed; see QUEUED in section 8):
+  - The "Grandmother Door" first-visit overlay (docs/app.html, #flWelcomeOverlay, flMaybeShowWelcome):
+    opens on its own after 1 second unless fl-welcomed, an API key, or fl_isLocal is set.
+  - showQuickConnect() (#flQuickConnect): opens when someone tries Chat with no AI ("Don't show if
+    already connected"), offers Open Connect, Browser AI (WebGPU), or a free cloud key.
+  - FLWizard (docs/modules/welcome-wizard.js): the guided Ollama setup.
+  How the Tree's window matches it: the same rule (never when a mind is already connected), the same
+  "remembered once" idea (fl-welcomed there, tree_door_not_now here), the same three kinds of door
+  (a local AI, a mind in the browser, another way). Where the Tree's differs on purpose: no cloud key
+  (the Tree has no cloud minds), it looks for a local AI before it opens (quietly, loopback only, and
+  only when the browser would not ask), it shows the real download size, and it is built with
+  textContent (FL's QuickConnect uses innerHTML, onclick strings and em dashes; left as it is).
+
+----------------------------------------------------------------------
+3. THE DESIGN
+----------------------------------------------------------------------
+New module docs/modules/tree-door.js (window.TreeDoor, MIT). It fetches and connects nothing itself:
+every look goes through LocalMindProbe.look(), every connection through TreePool.
+
+PART A: "Let's wake a mind for you" (index.html and settings.html)
+  Opens on its own, 0.9 s after load, only when ALL are true: no mind remembered
+  (fl_alpha_local_mind), no pool route chosen, no in-browser mind awake, no Not now
+  (tree_door_not_now = '1'), and not closed earlier this visit (sessionStorage).
+  Never opens when an invite arrived in the link (Part B takes over).
+  The quiet look: before opening, it asks navigator.permissions about 'local-network-access' and
+  'loopback-network'. Granted, or the browser has no such question: it looks quietly (loopback only)
+  and the window shows what it found. Prompt or denied: no quiet look, so Chrome's own permission box
+  never appears out of nowhere; the window offers "Look for an AI on this computer" as one tap.
+  Choices (each a big button, 52px, Georgia, the grandmother face colors):
+    "Use (app) on this computer"            seats it (remember), closes. Shows the model name.
+    "Look for an AI on this computer"       only when the quiet look was not allowed.
+    "Wake a small mind in this browser"     only with WebGPU. Shows "About 210 MB to download once
+                                            (SmolLM2-360M-Instruct-q4f16_1-MLC, Apache-2.0)" first.
+                                            One tap downloads, wakes and seats. Other sizes: Settings.
+    "I only want to ask. Another device will answer."  explains Share on the other computer, and
+                                            offers "Scan the picture code with this page" where
+                                            BarcodeDetector exists.
+    "Not now"                               remembered; Settings keeps "Help me wake a mind".
+  Escape closes it for this visit only. A click on the dark glass does nothing (no surprise closes).
+  A mind seated anywhere (Gathering, Settings, the in-browser card, a pool route) closes it.
+
+PART B: Yes or No pooling, by two picture codes
+  Host: "Share this computer with a phone" (new, top of the Device Pool card, Settings and the
+    garden veil). First time only: "Your first name" and "Show the picture code" (makes the kin card
+    names: ai "(name)'s mind", keeper (name)). Then one window: "Point your phone camera here", one
+    big picture code (scaled to about 320 px) of settings.html#treepool=(invite). It starts a room
+    if none, so the next phone gets a fresh code on its own.
+  Phone: the camera app opens the link. The page pops "Pool with Kirk's computer?", "Its mind:
+    (model).", what Yes means, and "This device's name" filled in (iPhone, Android phone, Mac...).
+    "Yes, pool with Kirk's computer": trusts that one card, writes an asking card name if this device
+    has none (asks: true), joins, and shows "Now hold this up to Kirk's computer" with the reply
+    picture code (and "Copy instead"). "No": nothing is trusted or joined.
+    An invite with no card that checks out offers no Yes at all; own code says so.
+  Host: "Scan the phone's code" (BarcodeDetector) or paste it. Then "(device) wants to join. Pool
+    resources with it?":
+      "Yes, and let my mind answer it"   trusts that one card, finishes, and taps Let this device help
+      "Yes, connect only"                trusts and finishes; the door stays as it was
+      "No"                               nothing; back to the picture code
+    When the door is already kin: one "Yes". When paused: "Yes, connect only (helping stays paused)"
+    and "Yes, and resume helping trusted kin". A card that does not check out: "Connect without
+    trusting" or No.
+  Then both windows say "Pooled with (name)". Once the host's hello says it helps, a phone with no
+  mind of its own routes Chat through the pool (the Yes said so), and offers "Open Chat".
+  Kin only, the proof, Pause wins, the door off until a human tap: unchanged in tree-pool.js.
+
+Small doors added to tree-pool.js (layered; each called from a human tap in the window):
+  takeArrived() (the arrived invite, once; the Join box is still filled too), doorJoin(sdp, room),
+  doorFinish(sdp), currentInvite(), doorInvite (= rollInvite), peerState(id), canScan, scanInto
+  (= startScan), stopScan. The "Share this computer with a phone" button and one line in Connect.
+garden-rooms.js: the "Help me wake a mind" host in the Settings veil, hidden in other rooms.
+
+----------------------------------------------------------------------
+4. TAP COUNTS (measured in the walk; "open Settings" counted as 1 where needed)
+----------------------------------------------------------------------
+Part A, connect a mind
+  Before (main bb339da): no window. Find Settings yourself (1), May I look? (1) = 2, if you know where.
+    In-browser mind: Settings (1), pick a size (1), Download and wake (1), Seat it in Chat (1) = 4.
+  After: a local AI and the quiet look allowed: 1 tap ("Use Ollama on this computer").
+    A local AI and the browser would ask: 2 taps (Look, Use), plus the browser's own Allow box once.
+    In-browser mind: 1 tap ("Wake a small mind in this browser"), then the download time.
+Part B, pool a phone with a computer
+  Before: host 6 (Settings, Make my card, Let this device help, Start a room, Scan their reply,
+    Trust this AI and finish) + phone 6 (camera link, Make an asking card, Join, Trust this AI and
+    join, Use (model) in Chat, Chat) = 12 taps, and 3 typed names.
+  After: host 4 (Settings, Share this computer with a phone, Scan the phone's code, Yes and let my
+    mind answer it), plus 1 the first time (Show the picture code after typing a first name)
+    + phone 3 (camera link, Yes pool with Kirk's computer, Open Chat) = 7 taps (8 the first time),
+    and 1 typed name, once, on the host. The phone's name is filled in for it.
+

@@ -1,0 +1,120 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, docs/GALAXIES.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then docs/code-settings.html, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 018 (Thursday Oct 8, 2026, MDT). Tree Pool v0.1 (theLatticeTree).
+Give AFTER 017 in ORDER (024, 016c, 022, 023, 017, then 018). It rides on 017 (Tree Kin):
+018 does not apply without 017, by design.
+Apply-checked on fresh clones of FreeLattice-Alpha:
+  main 00d0323 + 021 + 024 + 022 (alpha diff) + 017, then 018: clean, all 28 docs/modules/*.test.js pass
+  main 9cd1a13 (021 merged as #93) + 024 + 022 alpha + 017, then 018: clean, 28 pass
+  main 9cd1a13 + 017, then 018 (no 024 or 022): clean, 26 pass; 024 and 022 after it: clean, 28 pass
+So 024 and 022 can land before or after; only 017 must come first.
+
+GROK NEXT BRICK: Tree Pool v0.1 (the Device Pool and a real share door, on the Tree)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-pool-v0.1
+Smoke line: SMOKE_OK tree pool v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-pool-v0.1
+  ~/Downloads/GROK_NEXT_018_TREE_POOL_2026-10-08.fl.diff
+  (md5 ed5bfd3ba6beb70822914c34fca2a859)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+
+----------------------------------------------------------------------
+1. WHY, AND WHAT IT IS
+----------------------------------------------------------------------
+Kirk wants the Device Pool on theLatticeTree, where the code is cleaner, so easy that a
+classroom on one wired network can use it without help. 017 gave the Tree its trusted kin.
+017 kept the share door back because a door must gate something real. Now it does:
+
+THE DOOR GATES THIS: a question from another device reaches this computer's own local AI
+only if (1) the door is on, (2) that device proved, on this very connection, the key on a
+card you trusted (TreeKin.trustedKeyHash from 017, checked again on every question), and
+(3) the limits allow it. Everything else is turned away with a plain reason.
+
+Truths carried over from FreeLattice 016, 016b and 016c, made Tree-native and simpler:
+  - Off until a human taps. The door starts off. Only a human tap opens it (code and a mind
+    cannot), and it opens to trusted kin only. The Tree has no wider door.
+  - One state, so the card cannot contradict itself. On FreeLattice the pool's "helping"
+    flag and the share door are two settings, which is why 016/016b had to teach the card to
+    read the door. On the Tree, Let this device help IS the door: off, helping (kin), paused.
+  - Pause wins, visibly. Pause helping stops new questions AND the ones already running
+    (they are told "paused"; no answer slips out afterward). While paused, the gold button
+    reads "Resume for trusted kin": the one tap names exactly what it will do. Nothing but
+    that human tap leaves pause.
+  - The card always tells the truth (its first line, white and bold):
+      off:   "Off. This computer's AI answers no one else until you tap Let this device help."
+      on, kin:   "Helping. Your trusted kin (N) can ask this computer's AI while their device
+                 is connected. No one else."
+      on, no kin: "Helping, but you have no trusted kin yet, so no one can ask this computer's
+                 AI. Trade cards in Trusted kin above."
+      paused: "Paused. No one can ask this computer's AI until you tap Resume for trusted kin."
+    plus "Connected now: N devices, K of them trusted kin." or "No devices connected right now."
+    plus "Your AI is answering N questions right now." while it is.
+  - Only help while plugged in (where the browser can tell; same wording as FreeLattice).
+  - Limits like FreeLattice: 2 questions at a time, 16000 characters each. FreeLattice lets
+    trusted kin skip its hourly caps (6 / 20); the Tree lets no one but kin ask at all, so
+    those caps never apply. The card says this in words.
+  - Receipts are counts only: tree_pool_counts (invites, joins, connected, proved, setAside,
+    hellosSent, hellosTaken, asked, answersTaken, answered, turnedAway, helpOn, paused,
+    resumed, turnedOff). No words, names, keys, models or times.
+  - Old yes waits paused (016c): the Tree never had an older sharing setting, so there is
+    nothing to migrate. Said here so no one goes looking for it.
+
+THE FIRST TREE CHANNEL (no server, nothing vendored):
+  WebRTC data channel with iceServers: [] (no STUN, no TURN, no PeerJS, no signaling
+  server). No outside service is asked anything, so both devices must be on the same
+  network, which is the classroom lab case. Codes pass by hand, like 017's cards:
+    1. Device A taps Invite a device: one line TREEPOOL1:... and Copy invite.
+    2. Device B taps Join with an invite, pastes, taps Join. It gets a reply line to send back.
+    3. A pastes the reply and taps Finish joining. They connect.
+  The invite and the reply each carry that person's kin card when they have made one in
+  Trusted kin (017 checks it, never trusts it by itself). So B sees "Lumen (llama3.2:3b),
+  from Kirk's computer. This card checks out. Trust it only if you know who sent it."
+  [Trust this AI and join] [Join without trusting] [Cancel], and A sees the same for B's
+  card on Finish. One invite and one reply make two devices kin AND connected.
+  When the channel opens, each side signs a fresh challenge under tree-pool-proof|v1|,
+  bound to BOTH DTLS fingerprints of this connection, with its kin key; the ID must be made
+  from that key. A relayed or borrowed connection does not prove; it is set aside. The same
+  key on both ends (two tabs of one browser) is set aside with its own plain line. Because
+  the channel itself is proved and encrypted, questions are not signed one by one (FL signs
+  envelopes because PeerJS goes through a broker).
+  Connections last while the page stays open (closing the Settings veil keeps them; a
+  reload ends them: "After a reload, invite again."). If a join has not opened in 30
+  seconds, the row says so plainly instead of waiting forever.
+
+ASKING (the asker side):
+  Each connected trusted-kin device that is helping shows its rough memory and cores and
+  one button per model: "Ask qwen2.5:7b on this device". Tap, type, Ask. The question goes
+  WHOLE to that device; it runs on that device's own loopback AI (the remembered mind,
+  /api/chat or /v1/chat/completions, only models it holds); the answer comes back as plain
+  text: "Answered by Ben's computer (Wren), on its own AI. Nothing is kept here but a count."
+  Nothing is sent to a device you have not trusted. Hellos (rough memory, cores, model
+  names while helping; nothing while not) go to connected trusted kin only.
+
+V0.1 HONESTY, said on the card:
+  "Memory is not joined across machines. Each question goes whole to one device that holds
+   the model, and the answer comes back. Splitting one big model across machines is a later
+   step."   and   "Side by side: about 32 GB across 2 devices. Not one memory."
+  "Later (019): one tap to join a whole classroom lab, and one big model split across
+   machines on a wired network (llama.cpp, MIT). Not in this card."
+
+WHAT WORKS NOW vs WHAT WAITS FOR 019:
+  Works: door (off / helping for kin / paused) gating real questions; pairing two devices
+  on one network by invite + reply with kin cards riding along; key proof per connection;
+  whole questions to a helper's local AI and the answer back; pause stopping running work;
+  plugged-in only; limits; counts. Any number of pairs (up to 24 connections a page).
+  Waits for 019: a whole lab in one step (today a teacher pairs each student machine with
+  its own invite and reply; 20 machines is 20 pairings, which is why 019 starts with "join
+  this room"); one model split across machines (llama.cpp rpc-server, MIT, lent from the
+  desktop app on wired LAN, teacher taps Start lab); routing the Tree's own Chat room
+  through the pool (today asking lives in the pool card); reconnect after reload; a QR code.
+
+Where it lives: Garden, Settings veil, just under Trusted kin; also settings.html. Hidden in
+every other room (hiding closes nothing).
+

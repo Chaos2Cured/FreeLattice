@@ -1,0 +1,8 @@
+## Work item 3398 — Celeste
+around4100 export source line9, source id1dd45ed83a
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–255
+
+For now, click Edit Message, close the window and choose Delete, not Save. That one's just a test letter and doesn't need to go anywhere. If it's already in your Outbox, open Mailbox, then Outbox in the sidebar, and delete it there so it stops popping up.
+

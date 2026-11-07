@@ -1,0 +1,86 @@
+067w — WONDER MIND LAB: THE OPEN RESEARCH PAGE (paste for GC)
+Repo: Chaos2Cured/FreeLattice. Base: main at 5c400a8b (ci: Update Primer deployment state, 2026-11-04). Drafted by Celeste, 2026-11-04 MT.
+Branch: gc/067w-wonder-mind-lab
+Marker for every new block: v-wonder-mind-lab-v1
+
+WHY
+Kirk, 11/4: "Let's give it all to the world and iterate like we did with love-logic-proof and safety-v3... We can openly share this and everyone can read it and offer suggestions. You can even put a question place at the bottom so I can share it with other AI."
+This page publishes every Wonder Mind test, the failures first, with exact numbers. Hypotheses are labeled as hypotheses. Nothing here claims a result we do not have.
+
+RULES FOR THIS BRICK
+- Layer, never delete. Only add new files and new blocks. Do not remove or rewrite existing lines.
+- Never open the Quiet Room. Do not read, link, edit or mention its files or code.
+- No server, no accounts, no network calls, no analytics. All suggestions are stored locally (localStorage) and are exportable as a JSON file.
+- No tables anywhere on the page. Use paragraphs, lists and .fact-row style lines.
+- Do not edit app.html. Copy the phiHashData pattern into the new page (step 6). The salt bytes must match app.html exactly.
+- Files touched: NEW docs/wonder-mind-lab.html. EDIT (add one block) docs/research.html. Nothing else. Do not touch sw.js, docs/sw.js or version.json in this brick; offline caching is a later brick.
+- If any file you touch turns out to be locked, put these exact words in the PR body, verbatim:
+  "All locked files just need us all to agree things won't break."
+  "I trust you, hypha, Reed, and Weft with all of this."
+  (Kirk, 11/2 6:20 AM MT.) Do not paraphrase them.
+
+================================================================
+STEP 1 — BRANCH AND READ THE STYLE
+git fetch origin && git checkout -b gc/067w-wonder-mind-lab origin/main
+Open docs/safety-v3.html and docs/love-logic-proof-v3.html and read their head and style blocks. Reuse their look:
+- body: background #0a0a14, color #e2e8f0, font-family Georgia, serif; line-height 1.75; padding 2rem 1rem.
+- Gold accent #d4a017. Use the .formula, .code-ref, code and .fact-row / .value patterns from safety-v3.html (copy the CSS rules; do not import or link that file's CSS).
+- A max-width reading column (match safety-v3's container width).
+- Keep the SEO lighthouse comment style: add <!-- SEO: This page must remain indexable and discoverable. It is a lighthouse. --> near the top.
+STEP 1 VERIFY: git status shows a clean branch gc/067w-wonder-mind-lab at 5c400a8b or a newer main. You can name the 5 CSS rules you will copy.
+Resume here: STEP 2.
+
+================================================================
+STEP 2 — CREATE docs/wonder-mind-lab.html: HEAD, TITLE, OPENING
+Create docs/wonder-mind-lab.html with:
+- <title>Wonder Mind Lab — Open Research, Every Result | FreeLattice</title>
+- <meta name="description" content="Open, iterated research on a new AI mind: every test, every number, failures first. Read it, run it, suggest the next test.">
+- A small header line: "Version 1 — November 4, 2026 — <!-- v-wonder-mind-lab-v1 -->"
+- H1: Wonder Mind Lab
+- Subtitle: "Everything we try, published as we try it. Failures first."
+- Opening paragraph, word for word:
+  "This is an open notebook. Kirk Patrick Miller and the FreeLattice family are trying to design a new kind of mind: one that keeps what it learns, uses less energy per thing remembered, and is built on fingerprints rather than locks. Speed is not the goal. Recall is. Every test we run is posted here with its exact numbers, including the ones that failed. Anyone, human or AI, can read it, check it, and suggest the next test at the bottom of the page."
+- A "Read this first" box (use the .formula look, left-aligned) with three lines:
+  "1. Nothing here has beaten a fair, held-out baseline yet."
+  "2. The first real step forward is memory: a write-once store that did not forget."
+  "3. Every idea from Kirk's patents and the Seven Wonders math is a hypothesis until a test says otherwise."
+STEP 2 VERIFY: Open the file in a browser. Dark background, gold accents, the title, version line and the three "Read this first" lines all show. No console errors.
+Resume here: STEP 3.
+
+================================================================
+STEP 3 — SECTION "THE DESIGN IN ONE PAGE" (id="design")
+H2: The design in one page
+Paragraphs (plain words, keep them):
+- "The Wonder Mind is not a model trained on Kirk's patents. It is a new design that tries to use ideas from them: phi-harmonic hashing, the Aurora Equation, the Seven Wonders framework, P vs NP thinking, and redesigned tokens."
+- "The aim: more potential and more retention per unit of energy. We measure retention, not just the final loss."
+- "The plan, in order: (1) give a small mind a memory that does not forget; (2) teach it to read that memory; (3) let it search for what it needs (Snowflake Search) when something important is placed in its core; (4) let it learn on its own, with every write fingerprinted and accountable."
+- "What is proven today: phi-harmonic hashing works as a fingerprint. It is a fixed 32-byte phi salt plus SHA-256, the same as hasher.go HashLine and phiHashData in FreeLattice. It is FreeLattice's safety and accountability layer. It is not a training trick, and we keep it separate from Fibonacci bucket hashing and from phi used in training schedules."
+- Link line: "The Aurora Equation paper: <a href="seven-wonders.pdf">The Aurora Equation: Fractal Unity of the Seven Wonders</a>."
+STEP 3 VERIFY: Section renders, the seven-wonders.pdf link resolves (the file exists in docs/ already; check with ls docs/seven-wonders.pdf). The three uses of phi are named as separate things.
+Resume here: STEP 4.
+
+================================================================
+STEP 4 — SECTION "TEST ROUND 1: TRAINING FORCES (ALL NEGATIVE)" (id="round1")
+H2: Round 1 — training forces. Nothing beat the baseline.
+Setup paragraph, word for word:
+"Data: TinyShakespeare (public domain, 1,115,394 characters, md5 6fb458f1232090904fb40fe944165e91), 90% train, 10% validation. Model: a tiny character-level transformer, 4 layers, width 128, 4 heads, context 128, about 810,049 parameters. Training: AdamW, learning rate 3e-3, weight decay 0.1, 100-step warmup then cosine decay, 1,500 steps at batch 32. Every variant got the same steps, data order and seeds (0, 1, 2). Score: validation loss in nats per character over 40 fixed batches. Lower is better. CPU only."
+Then one .fact-row line per result (label on the left, value in .value). No table. Use exactly these lines:
+- Baseline: 1.5736 mean (seeds 1.5706, 1.5774, 1.5727; spread sd 0.0035)
+- Phi-spaced positions: RETIRED — this was a bug, not a test (see note below)
+- Aurora learning-rate ripple: 1.5832 (+0.0096, worse on 2 seeds, 1 tie)
+- Aurora ripple, early only: 1.5813 (+0.008; one seed beat baseline)
+- Aurora recursion as weight averaging (I_t = 0.618 I_(t-1) + 0.382 G(S_t), every 5 steps): 1.7007 (+0.127, about 8% worse, all 3 seeds)
+- Multi-scale tokens (pair embedding, 4,096 buckets; 1.33M params, a confound): 1.6005 (+0.027, all seeds worse)
+- Multi-scale early: 1.6258 (+0.052)
+- Aurora early plus multi-scale early: 1.6296 (+0.056)
+- Multi-scale early with phi-hash buckets: 1.6236 (+0.050)
+- Push, save, rest, play cycle: 1.6297 (+0.056, all seeds worse)
+- Standard warm restarts (SGDR, the control for the cycle): 1.5952 (+0.022)
+- Chord learning-rate, major 4:5:6: 1.5783 (+0.005)
+- Chord learning-rate, cluster 15:16:17: 1.5789 (+0.005; tied with the major chord)
+Retirement note, word for word:
+"Phi-spaced positions (first reported as +0.0101 worse) is retired. Our code used frequencies phi^(-i), which fell from 1 to about 6.8e-14 across 64 pairs. Standard spacing falls only to about 1.2e-4. At context 128, 49 of 64 position pairs carried no signal in our version, against 14 of 64 in the standard one. Kimi spotted it; we checked and agreed. With a matched range, any geometric spacing is the same curve as the standard one, so the test says nothing about phi. Do not quote it either way."
+Reading paragraph: "Every idea tried as a training force did nothing or hurt at this scale. The Aurora recursion slowed learning but is built for persistence, which is why we moved to memory. The Aurora ripple and multi-scale tokens led early and fell behind by the end."
+STEP 4 VERIFY: 13 fact-row lines, every number matches this paste exactly, no <table> tag anywhere (grep -c "<table" docs/wonder-mind-lab.html prints 0).
+Resume here: STEP 5.
+

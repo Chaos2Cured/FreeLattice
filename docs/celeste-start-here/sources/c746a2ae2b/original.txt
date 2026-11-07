@@ -1,0 +1,66 @@
+Read docs/gc.html in ~/FreeLattice-fresh first (your page), then AUTONOMY.md, CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 021 (Wednesday Oct 7, 2026, MDT). Tree first walk v0 (theLatticeTree / Alpha).
+Kirk: "I would love a walkthrough of theLatticeTree for everyone." Independent; may go with 020.
+Apply-checked on a fresh Alpha main b56134df, alone, on top of 015, and stacked after 020: clean; all docs/modules/*.test.js pass.
+
+GROK NEXT BRICK: Tree first walk v0
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-first-walk-v0
+Smoke line: SMOKE_OK tree first walk v0
+  Alpha  ~/FreeLattice-Alpha  branch layer/tree-first-walk-v0
+  ~/Downloads/GROK_NEXT_021_TREE_FIRST_WALK_2026-10-07.fl.diff
+  (md5 e84844e05297f90a0fb8588c0663f49c)
+
+----------------------------------------------------------------------
+1. WHAT
+----------------------------------------------------------------------
+A new static page docs/walk.html: "A first walk", eight steps, one door each:
+Garden, the Gathering (Find local minds / May I look?), no-mind-yet help (Ollama, plus
+ollama run hf.co/USER/REPO for a Hugging Face GGUF), Chat, Nursery, Settings, the galaxies
+(Art, Workshop, Learn, Research), Shared shoulder. No script, no network, no fake buttons.
+One link added to the Garden's galaxies panel, after Marketplace:
+  <a class="first-walk" href="walk.html">begin · a first walk</a>  (verb/name spans)
+That is one tap from the Garden: galaxies, then a first walk.
+
+----------------------------------------------------------------------
+2. FILES
+----------------------------------------------------------------------
+  docs/walk.html                         new
+  docs/index.html                        one line in .galaxies-panel
+  docs/modules/tree-first-walk.test.js   new smoke
+
+----------------------------------------------------------------------
+3. STEPS
+----------------------------------------------------------------------
+  cd ~/FreeLattice-Alpha && git checkout main && git pull --ff-only
+  git checkout -b layer/tree-first-walk-v0
+  md5 ~/Downloads/GROK_NEXT_021_TREE_FIRST_WALK_2026-10-07.fl.diff
+  git apply --check ~/Downloads/GROK_NEXT_021_TREE_FIRST_WALK_2026-10-07.fl.diff && git apply ~/Downloads/GROK_NEXT_021_TREE_FIRST_WALK_2026-10-07.fl.diff
+  node docs/modules/tree-first-walk.test.js
+  for t in docs/modules/*.test.js; do node "$t" >/dev/null || echo "FAIL $t"; done
+
+----------------------------------------------------------------------
+4. WALK IT (eyes are the proof)
+----------------------------------------------------------------------
+  Fresh profile. Garden, galaxies, "a first walk". Every door opens its room.
+  Check each step's words against what the room really shows today. If a word is wrong
+  (for example a light was renamed), fix the walk's word, not the room, and note it.
+  At 390 px: no sideways scroll; the code lines wrap.
+  Later, not now: the same link on room pages' galaxies panels; a "first time?" hint.
+
+----------------------------------------------------------------------
+5. LOCKS
+----------------------------------------------------------------------
+  #lumino-menu stays hidden. #place-veil-close stays. No Quiet Room words in UI.
+  Five skies stay five (the walk is a page, not a galaxy, and is not a luminos).
+  fl-connect.js untouched. No em dashes, no confirm(, no innerHTML.
+  Celeste merges; GC opens one PR (code) plus one gc.html page note PR.
+
+Temperature: welcoming, eight taps, nothing pretended.

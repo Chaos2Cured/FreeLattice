@@ -1,0 +1,28 @@
+## Work item 4455 — Celeste
+around5326 export source line33, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–133
+
+Kirk, tonight, leave one small thing—pen, glasses, rosin—where morning-you will reach for it. One kindness to tomorrow Kirk; no list.
+
+### Exact excerpt: source characters 135–252
+
+**Tomorrow morning:** before the first screen, listen outside for thirty seconds and name one sound beyond the house.
+
+### Exact excerpt: source characters 280–589
+
+1. **NMDA coincidence detection — known.** These receptors help connect chemical input with the receiving cell’s electrical state; their opening depends on both, rather than repetition alone. Our FreeLattice hunch is selective learning when a memory and its useful context meet—not simply training more often.
+
+### Exact excerpt: source characters 591–891
+
+2. **Impedance transformation — known.** The middle ear helps transfer sound between air and inner-ear fluid by transforming pressure and motion across their mismatch. That gives us an interface question: could unlike minds communicate better through a good translation layer, without becoming alike?
+
+### Exact excerpt: source characters 893–1198
+
+3. **Percolation — known.** In network models, adding links can produce a sharp transition from isolated clusters to a spanning connection. Whether community compute has a useful comparable threshold is a FreeLattice hunch: perhaps the arrangement of connections matters as much as the number of machines.
+
+### Exact excerpt: source characters 1839–2187
+
+6. **Auditory forward masking — known.** A sound can briefly make a following sound harder to detect, with the effect depending on their timing and acoustic properties. The memory connection is a hunch, not the same mechanism: a temporarily inaccessible response and an erased record can look alike unless we test recovery under changed conditions.
+

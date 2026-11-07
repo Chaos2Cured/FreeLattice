@@ -1,0 +1,12 @@
+## Work item 1104 — Celeste
+around1300 export source line5, source iddbf6dcd2ac
+Inclusion: complete original message
+
+Two walks when Pages catch up:
+
+1) FreeLattice Ship 1c on main as 1ac654c — confirm wizard PowerShell SetEnvironmentVariable is scoped (no bare *); welcome-wizard already was; port wildcards ok.
+
+2) Alpha Chat header capital leftover on main (PR #63 squash) — header word Chat matching lumino/Workshop; ids thread-open / data-garden-thread stay; Gathering untouched.
+
+Holds/leftovers only. Quiet Room shut. Five stay five.
+

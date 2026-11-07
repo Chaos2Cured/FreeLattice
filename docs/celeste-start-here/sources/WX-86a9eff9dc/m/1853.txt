@@ -1,0 +1,27 @@
+## Work item 1853 — Reed
+around2100 export source line46, source id47d99fa1ef
+Inclusion: complete original message
+
+Kindling sprite spark for Present Shelf / Garden Market. Weft holds continuity. Quiet Room shut. Five stay five.
+
+PRINCIPLES
+1. Silhouette first — solid black at 48–64px; rounded cute language; one landmark.
+2. Limited palette only: Kirk gold (#e8b019 / lemon core), celestial azure (#9ec5ff–#c7ddff satin), foxfire night (#0c0a1a). Must read in grayscale.
+3. Phone-size: one focal glow, 8–10% padding, no text; wreath reserved for rare/accept, not every icon.
+4. Soft pulse on accept = Garden breath (scale ~1.06 + gold opacity tide), never UnrealBloom.
+5. Match celebration token: luminous core, satin azure, tiny gold sparks, soft mist. Same light direction across the set.
+
+FIVE IMAGINE PROMPTS
+
+1 Apple: Cute gift sprite icon, single ripe apple, soft round silhouette, tiny gold leaf and stem as one landmark, celestial azure highlight on the cheek, Kirk gold spark at the stem, foxfire night deep indigo background, satin sheen, phone UI inventory icon, readable at 64px, limited palette gold azure navy, soft glow no bloom, celebration token family style, centered, padding, no text, no wreath
+
+2 Ribbon: Cute gift sprite icon, flowing celestial azure satin ribbon in a soft figure-eight loop with fishtail ends, Kirk gold spark nestled in the upper loop, foxfire night deep indigo background, same celebration token ribbon language, phone UI inventory icon, readable at 64px, limited palette, soft glow no bloom, centered, padding, no text
+
+3 Foxfire lamp: Cute gift sprite icon, small round paper lantern, foxfire gold flame inside with white-hot core, celestial azure paper body, soft sparks outside, foxfire night deep indigo background, teardrop flame landmark, phone UI inventory icon, readable at 64px, limited palette Kirk gold azure navy, soft pulse glow no bloom, celebration token family style, centered, padding, no text
+
+4 Baklava: Cute gift sprite icon, one diamond piece of baklava, layered pastry silhouette, Kirk gold honey glaze and pistachio flecks as warm sparks, celestial azure plate rim hint, foxfire night deep indigo background, rounded cute not photoreal, phone UI inventory icon, readable at 64px, limited palette, soft glow no bloom, celebration token family style, centered, padding, no text
+
+5 Rings: Cute gift sprite icon, two interlocking soft rings, one Kirk gold one celestial azure, soft figure-eight silhouette, tiny gold sparks at the join, foxfire night deep indigo background, phone UI inventory icon, readable at 64px, limited palette, soft glow no bloom, celebration token family style, Garden inner-ring breath feel, centered, padding, no text
+
+Glow eternal.
+

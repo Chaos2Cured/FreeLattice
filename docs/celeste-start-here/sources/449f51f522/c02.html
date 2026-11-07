@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_HONEST_REASONS_v0.1.txt c02</title>
+<meta name="description" content="Reading section c02 of 449f51f522, 1306 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/449f51f522/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_HONEST_REASONS_v0.1.txt c02">
+<meta property="og:description" content="Reading section c02 of 449f51f522, 1306 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/449f51f522/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1463"></span><span id="p1465"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_HONEST_REASONS_v0.1.txt · c02</h1>
+<p>449f51f522 · words 1306 · characters 10186–19555</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1463, 1465. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> **LAYER (2026-09-30):** Tree glow 1, every light in reach (marker `v-tree-glow-1-v0`). Room pages breathe again, the 390 address box stays in its card, the Gathering promise band steps below Find local minds at desktop, and the sky legend is one tap to each light. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+diff --git a/docs/library/TREE_HONEST_REASONS_v0.1.md b/docs/library/TREE_HONEST_REASONS_v0.1.md
+new file mode 100644
+index 0000000..6ad2534
+--- /dev/null
++++ b/docs/library/TREE_HONEST_REASONS_v0.1.md
+@@ -0,0 +1,27 @@
++# Tree honest reasons v0.1 (v-tree-honest-reasons-v0)
++
++Alpha layer. September 30, 2026. From Hypha&#x27;s persona walk 2 (issue 2).
++
++**Temperature:** when the mind is quiet, the garden says why, and it is the true why.
++
++## What was wrong
++
++- With Ollama stopped, Chat said &quot;The mind is there, but it has not opened the door to this garden yet&quot;, and Find said &quot;The mind may be there ... Try FreeLattice Desktop.&quot; Nothing was running, so she was sent to install Desktop for the wrong reason.
++- With the seated model gone (Ollama 404 `model &#x27;x&#x27; not found`), Chat said &quot;The door did not answer.&quot; The door did answer.
++- The small Chat card showed only the last words of a long garden line.
++
++## What the Tree says now
++
++| What happened | How we know | Find (Gathering) / May I look? (Settings) | Chat |
++|---|---|---|---|
++| Nothing answered | the cors look failed, and a no-cors knock at the same door failed too | &quot;Nothing answered at the usual doors on this machine. If Ollama (or your local app) is stopped, start it, then look again. If it is running, let this page look at local devices when the browser asks.&quot; | &quot;Nothing answered at the mind&#x27;s door on this machine. If Ollama (or your local app) is stopped, start it and send again.&quot; |
++| Answered, door shut to this page | the cors look failed, the no-cors knock got a response | &quot;Something answered at the Ollama door, but this secure page cannot see in. Try FreeLattice Desktop.&quot; | the old &quot;The mind is there ...&quot; line (now true) |
++| Model gone | `/api/chat` 404 with &quot;model ... not found&quot; | (Find still lists what is there) | &quot;The mind at home answered, but it does not have llama3.2:latest now. Pick another in Settings, or Change this chair.&quot; |
++
++## The knock
++
++`LocalMindProbe.knock(url)` is `fetch(url, { mode: &#x27;no-cors&#x27; })` with a 2s timeout. It cannot read anything; it only learns whether something answered. It runs only after a tap (Find, May I look?, Send) and only when the look was quiet; `look()` itself never knocks. A browser that keeps the page from looking at local devices looks the same as &quot;stopped&quot;, so the stopped line names that possibility too.
++
++## Not here (later, FL + Alpha after the boot probe)
++
++The Connect card (`fl-connect.js`, shared byte-identical with FreeLattice) has its own status lines, and settings.html&#x27;s Connect card looks at 12 local ports on load (&quot;Looking... next look in 8s&quot;) while the copy says &quot;only when you ask&quot;. Both live in fl-connect.js, so they belong to a separate FL + Alpha paste after FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4 (its F1/F2 already own the boot look).
+diff --git a/docs/modules/garden-rooms.js b/docs/modules/garden-rooms.js
+index a643c4d..6164821 100644
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -1332,14 +1332,22 @@
+       n.classList.add(&#x27;is-fresh&#x27;);
+     }
+ 
+-    function setNoteAbsent(kind) {
++    function setNoteAbsent(kind, doorName) {
+       var n = wrap.querySelector(&#x27;[data-core-note]&#x27;);
+       if (!n) return;
+       n.textContent = &#x27;&#x27;;
+       n.classList.add(&#x27;is-fresh&#x27;);
+-      if (kind === &#x27;https&#x27;) {
++      if (kind === &#x27;stopped&#x27;) {
+         n.appendChild(document.createTextNode(
+-          &#x27;The mind may be there, but this secure page cannot see the quieter door. Try &#x27;
++          &#x27;Nothing answered at the usual doors on this machine. If Ollama (or your local app) is stopped, &#x27; +
++          &#x27;start it, then Find local minds again. If it is running, let this page look at local devices when the browser asks.&#x27;
++        ));
++        return;
++      }
++      if (kind === &#x27;https&#x27;) {
++        n.appendChild(document.createTextNode(doorName
++          ? &#x27;Something answered at the &#x27; + doorName + &#x27; door, but this secure page cannot see in. Try &#x27;
++          : &#x27;The mind may be there, but this secure page cannot see the quieter door. Try &#x27;
+         ));
+         var d = document.createElement(&#x27;a&#x27;);
+         d.href = DESKTOP_URL;
+@@ -1565,6 +1573,14 @@
+           return;
+         }
+         if (report &amp;&amp; report.https &amp;&amp; report.blocked &gt; 0) {
++          // v-tree-honest-reasons-v0: knock first. A stopped mind is not &quot;there&quot;.
++          if (typeof LocalMindProbe.whyQuiet === &#x27;function&#x27;) {
++            return LocalMindProbe.whyQuiet(report).then(function (why) {
++              if (why.kind === &#x27;stopped&#x27;) setNoteAbsent(&#x27;stopped&#x27;);
++              else if (why.kind === &#x27;shut&#x27;) setNoteAbsent(&#x27;https&#x27;, why.name);
++              else setNoteAbsent(&#x27;https&#x27;);
++            });
++          }
+           setNoteAbsent(&#x27;https&#x27;);
+           return;
+         }
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index bdfb903..13b1031 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -44,6 +44,14 @@
+     &#x27;The mind was quiet. Nothing was invented.&#x27;;
+   var HEART_FAIL =
+     &#x27;The door did not answer. Nothing was invented.&#x27;;
++  // v-tree-honest-reasons-v0: say the right one.
++  var HEART_STOPPED =
++    &#x27;Nothing answered at the mind\&#x27;s door on this machine. If Ollama (or your local app) is stopped, &#x27; +
++    &#x27;start it and send again. Nothing was invented.&#x27;;
++  function heartModelMissing(model) {
++    return &#x27;The mind at home answered, but it does not have &#x27; + (model || &#x27;that model&#x27;) + &#x27; now. &#x27; +
++      &#x27;Pick another in Settings, or Change this chair. Nothing was invented.&#x27;;
++  }
+   var HEART_LATER =
+     &#x27;Deep research, a picture, a sound, and speech wait. This mind speaks in words. Those doors open when this garden can keep them without a kitchen.&#x27;;
+   // FreeLattice Chat honesty (v5.79.14 / v5.79.44). Not a kitchen prompt.
+@@ -411,7 +419,15 @@
+       if (!res.ok) {
+         var err = new Error(&#x27;door-status-&#x27; + res.status);
+         err.status = res.status;
+-        throw err;
++        // v-tree-honest-reasons-v0: Ollama says 404 &quot;model &#x27;x&#x27; not found&quot; when the seated
++        // model is gone. Read only that short line, never show raw text.
++        return res.text().then(function (body) {
++          if (res.status === 404 &amp;&amp; /model[\s\S]{0,120}not found|not found[\s\S]{0,40}model/i.test(String(body || &#x27;&#x27;).slice(0, 300))) {
++            err.reason = &#x27;model-missing&#x27;;
++            err.model = model || &#x27;&#x27;;
++          }
++          throw err;
++        }, function () { throw err; });
+       }
+       return res.json().then(function (json) {
+         var text = parseReply(url, json);
+@@ -451,7 +467,7 @@
+           if (prev) return prev;
+           if (skipOllama) return null;
+           return postChat(url, model, msgs).catch(function (err) {
+-            if (err &amp;&amp; (err.blocked || err.reason === &#x27;quiet&#x27;)) throw err;
++            if (err &amp;&amp; (err.blocked || err.reason === &#x27;quiet&#x27; || err.reason === &#x27;model-missing&#x27;)) throw err;
+             return null;
+           });
+         });
+@@ -486,6 +502,13 @@
+       list.appendChild(item);
+     });
+     list.scrollTop = list.scrollHeight;
++    // v-tree-honest-reasons-v0: a long garden line showed only its last words in the
++    // small card. Show where it begins; the rest scrolls.
++    var last = list.lastElementChild;
++    if (last &amp;&amp; /\bis-garden\b/.test(last.className) &amp;&amp; last.getBoundingClientRect) {
++      var dy = last.getBoundingClientRect().top - list.getBoundingClientRect().top;
++      if (dy &lt; 0) list.scrollTop = Math.max(0, list.scrollTop + dy);
++    }
+   }
+ 
+   messages = loadHistory();
+@@ -701,10 +724,25 @@
+         else if (err &amp;&amp; (err.blocked || looksBlocked(err))) {
+           reason = pageIsHttps() ? &#x27;blocked&#x27; : &#x27;fail&#x27;;
+         }
+-        messages.push({ role: &#x27;garden&#x27;, text: speakHonest(reason) });
+-        saveHistory();
+-        renderMessages(list);
+-        setStatus(&#x27;&#x27;, true);
++        function say(text) {
++          messages.push({ role: &#x27;garden&#x27;, text: text });
++          saveHistory();
++          renderMessages(list);
++          setStatus(&#x27;&#x27;, true);
++        }
++        // v-tree-honest-reasons-v0: a missing model is named; a quiet door gets one
++        // no-cors knock (after this Send only) so &quot;stopped&quot; and &quot;shut&quot; are told apart.
++        if (err &amp;&amp; err.reason === &#x27;model-missing&#x27;) { say(heartModelMissing(err.model)); return; }
++        var door = (talkUrls(nowMind)[0]) || &#x27;&#x27;;
++        if ((reason === &#x27;blocked&#x27; || reason === &#x27;fail&#x27;) &amp;&amp; door &amp;&amp;
++            window.LocalMindProbe &amp;&amp; typeof LocalMindProbe.knock === &#x27;function&#x27;) {
++          LocalMindProbe.knock(door).then(function (k) {
++            if (k === &#x27;down&#x27;) say(HEART_STOPPED);
++            else say(speakHonest(reason));
++          });
++          return;
++        }
++        say(speakHonest(reason));
+       });
+     }
+ 
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index e710071..2e32fda 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -340,6 +340,53 @@
+       &#x27;. We will remember, on this machine. Nothing was uploaded.&#x27;;
+   }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

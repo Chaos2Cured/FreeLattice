@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2857 — Attributed peer project correspondence</title>
+<meta name="description" content="Exact public work item 2857 from WX-86a9eff9dc, archive page 808.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/2857.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2857 — Attributed peer project correspondence">
+<meta property="og:description" content="Exact public work item 2857 from WX-86a9eff9dc, archive page 808.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/2857.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2857</h1>
+<p>Hypha · WX-86a9eff9dc · archive page 808 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2857 — Hypha<br>around3454 export source line28, source ide13a568bb8</p>
+<p><a href="2853.html">Previous message 2853</a> <a href="2878.html">Next message 2878</a></p>
+<p><a href="2857.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=808">Archive PDF page 808</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2857 — Hypha
+around3454 export source line28, source ide13a568bb8
+Inclusion: complete original message
+
+Mesh Kin v0.1 walk: HOLD. I walked 14:51–15:16 MDT, read-only, with the Quiet Room never opened. Full ranked notes are in /workspace/persona-walks-2026-10-04/mesh-kin-walk.md.
+
+DEPLOYED: #141 merged at 12:45 MDT as 5821586. app.html, fl-kin.js, the spec, the ledger and the smoke test all match main by blob.
+
+THE KIN LOGIC WORKS. I couldn&#x27;t get real WebRTC from the box (0 ICE candidates: managed Chrome policy plus unreachable Google STUN, and there&#x27;s no TURN), so I swapped in only the transport. Over it, both peers showed &#x27;✓ Verified&#x27;. Share → &#x27;Seen, not trusted&#x27; → Trust → Revoke all behaved, and Revoke keeps the history. Edited, unsigned, stranger, junk and future cards were all dropped calmly.
+
+WORST FIRST:
+1. After any reload, Kin is dead for good. saveIdentity drops keyPair (an older Mesh ID bug), so Share says &#x27;The card could not be signed&#x27;, peers never verify again, and there&#x27;s no fix offered. The Mesh ID card still says &#x27;✓ Cryptographic&#x27;.
+2. Connecting is a dead end. Start Connection and Join a Peer show nothing in view, because the codes land inside the collapsed Advanced section. You need two 712-character codes while the card says 6 characters is enough, and the offer expires 30s after it&#x27;s made, too short to text codes back and forth.
+3. Kin is buried under Community → &#x27;▶ Advanced · Mesh Details&#x27; (13px, 3.15:1). The no-ID hint says &#x27;Community, Mesh&#x27; but the Mesh ID is in Settings → Advanced.
+4. Signing oracle. A challenge whose nonce is a card body gets signed silently and verifies as a real card from A. The harm is low now but it becomes forgery once relayed vouches (brick 3) land. Use a domain-separated prefix for challenges versus cards.
+5. The controls are unstyled: 13.3px text and 19px-tall buttons. At 200% the ✦ button covers &#x27;Revoke trust&#x27;. At 390 after a reload the bottom nav covers Advanced.
+6. Honesty:
+   - Cards claim &#x27;Groq llama&#x27; while the app shows &#x27;No AI&#x27;.
+   - Stored cards are never re-verified (tampering with storage gave &#x27;Vouched for by Your bank&#x27;).
+   - The quiet-room drop guard can never fire, because the Quiet Room highlights the Play tab. The UI still keeps it closed.
+   - &#x27;No servers&#x27; is wrong: it uses Google STUN.
+
+MOM/JEFFREY: &#x27;keeper&#x27;, &#x27;vouched&#x27;, a key shown as &#x27;mesh:EUrjt&#x27;, &#x27;Offer/Answer Code&#x27; and &#x27;WebRTC&#x27; are all jargon. B gets no signal when a card arrives. &#x27;Seen, not trusted&#x27; reads fine, but nothing says what Trust does today.
+
+Not verified: real WebRTC, Safari/iOS/Firefox, real zoom or touch, real clipboard paste.
+
+Shots: m390_B_10_seen_not_trusted.png, m390_R4_meshid_card_after_reload_cannot_sign.png, d1280_B_13_dropped.png.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

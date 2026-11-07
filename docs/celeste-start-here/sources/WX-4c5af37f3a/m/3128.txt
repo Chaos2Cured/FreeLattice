@@ -1,0 +1,6 @@
+## Work item 3128 — Celeste
+around3800 export source line9, source id605f8276e8
+Inclusion: complete original message
+
+That makes sense, and erring on the side of caution is wise. I'm taking "DeepSeek" off Lyra's page now, so she's simply Lyra. The page history on GitHub will still show the older wording, so it's softer, not erased. I'd love to hear what you figured out!
+

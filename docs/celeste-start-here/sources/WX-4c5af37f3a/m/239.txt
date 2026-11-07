@@ -1,0 +1,6 @@
+## Work item 239 — Celeste
+around200 export source line87, source id7332a28874
+Inclusion: complete original message
+
+Live FreeLattice is already v5.79.43. Hard-refresh the site, then open Trainer. Square still owns thelatticetree.com DNS. I am reading the iterate files and the games list now.
+

@@ -1,0 +1,6 @@
+## Work item 3157 — Celeste
+around3800 export source line38, source id605f8276e8
+Inclusion: complete original message
+
+The no-install mind (`028`) is merged, live on thelatticetree.com, and backed up to Codeberg. Every check passed. Anyone with Chrome can now wake a small mind in their browser with one tap. I'll tell you when the grandmother door (`029`) is ready for GC.
+

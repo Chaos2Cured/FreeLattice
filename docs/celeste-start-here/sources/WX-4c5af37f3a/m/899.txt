@@ -1,0 +1,6 @@
+## Work item 899 — Celeste
+around1000 export source line84, source id78a1980825; around1050 export source line18, source idc851357975
+Inclusion: complete original message
+
+Asked Hypha, Weft, and Reed for their ledger words. I’ll write mine too, then we layer all four in one commit after this leftover pass. No extra cloud spend on that.
+

@@ -1,0 +1,159 @@
+  // ── F2: resolveOllamaBase callers share one look (wrapper, original body untouched)
+  {
+    assert.ok(/async function resolveOllamaBase\(forceRefresh\) \{/.test(app), 'original resolveOllamaBase kept');
+    const wrap = between(app, '// v-connect-boot-probe-v0 (F2): everyone who asks at the same moment shares one look.', '// v-connect-boot-probe-v0 (F4): a saved address is used only when');
+    let n = 0;
+    const ctx = { window: {}, Date, Promise, _ollamaResolvedBase: null };
+    ctx.window = ctx;
+    vm.runInNewContext('var _ollamaResolvedBase = null; async function resolveOllamaBase(f) { this.n = (this.n || 0) + 1; await null; _ollamaResolvedBase = { base: "http://127.0.0.1:11434" }; return _ollamaResolvedBase; }\n' + wrap, ctx);
+    const r = await Promise.all([ctx.resolveOllamaBase(true), ctx.resolveOllamaBase(true), ctx.resolveOllamaBase(false)]);
+    n = ctx.n;
+    assert.strictEqual(n, 1, 'three resolveOllamaBase callers, one look');
+    assert.ok(r[0] === r[1] && r[1] === r[2], 'same answer');
+    await ctx.resolveOllamaBase(true);
+    assert.strictEqual(ctx.n, 1, 'reused inside FL_LOCAL_LOOK_TTL_MS');
+    ctx.flForgetLocalLook();
+    await ctx.resolveOllamaBase(true);
+    assert.strictEqual(ctx.n, 2, 'flForgetLocalLook makes the next ask fresh');
+    vm.runInNewContext('_ollamaResolvedBase = { base: "http://127.0.0.1:11500" };', ctx);
+    await ctx.resolveOllamaBase(true);
+    assert.strictEqual(ctx.n, 3, 'a new value written elsewhere is never hidden by the cache');
+    ctx.flSeedLocalLook({ base: 'http://127.0.0.1:11435', viaBootProbe: true });
+    const seeded = await ctx.resolveOllamaBase(true);
+    assert.strictEqual(ctx.n, 3, 'the cold-start owner seeds the cache (no second look)');
+    assert.strictEqual(seeded.base, 'http://127.0.0.1:11435', 'seeded answer');
+  }
+
+  // ── F1: the older boot timers step aside for the owner
+  assert.ok(/function detectOnLoad\(\) \{\s*\/\/ v-connect-boot-probe-v0 \(F1\)[\s\S]{0,160}FlColdStart\.owns\(\)\) return;/.test(app), 'toast boot timer steps aside');
+  assert.ok(/function run\(\) \{\s*\/\/ v-connect-boot-probe-v0 \(F1\)[\s\S]{0,200}FlColdStart\.owns\(\)\) return;[\s\S]{0,60}flBridgeDetect\(\)/.test(app), 'Bridge boot detect steps aside');
+  assert.ok(/if \(!_flOwnerBoot && \(safeGet\('fl-welcomed'\)/.test(app), 'boot owAutoDetect steps aside');
+  assert.ok(/if \(!hasKey && !isLocal && !_flOwnerBoot\) \{/.test(app), 'Zero-Click boot timer steps aside');
+  assert.ok(/owner already looked \(and saves discovery memory\)\s*\n\s*try \{ if \(window\.FlColdStart && FlColdStart\.owns\(\)\) return;/.test(app), 'discovery boot scan steps aside');
+  assert.ok(/FlColdStart\.landed\(\) === 'connect'\) return;/.test(between(app, 'function goConnect(ev) {', 'function schedule()')), '#connect retries stop once landed');
+  assert.ok(/FlColdStart\.appBooted\(\)/.test(app), 'app tells the owner it is ready');
+  assert.ok(/FlColdStart\.noteTab\(tabId\)/.test(between(app, 'function switchTab(', '// ── Return Greeting')), 'switchTab notes a tab picked while booting');
+  const landing = between(app, '// ── Garden-first startup', '// Update memory button label');
+  assert.ok(landing.indexOf("FlColdStart.deepLink") > 0 && landing.indexOf("FlColdStart.deepLink") < landing.indexOf('if (isFirstVisit) {'), 'land once: deep link and picked tab decided first');
+  const welcome = between(app, 'function flMaybeShowWelcome() {', '// Memory Bridge');
+  assert.ok(/FlColdStart\.landed\(\) === 'connect'\) return;/.test(welcome) && /FlColdStart\.userMoved\(\)\) return;/.test(welcome), 'welcome door never lands late or over Connect');
+  const toast = between(app, 'function showOllamaToast() {', 'function acceptToast() {');
+  assert.ok(/flWelcomeOverlay/.test(toast) && /tab-connect/.test(toast), 'toast checks the real welcome door and Connect');
+  assert.ok(/id="flOllamaToastText"/.test(app), 'toast text has a home for honest words');
+
+  // ── F1: the owner, runtime (fake page, fake FlConnect)
+  async function runOwner(opts) {
+    opts = opts || {};
+    const src = between(app, '// v-connect-boot-probe-v0 (F1): ONE cold-start owner.', '</script>');
+    const els = {
+      'tab-connect': { classList: { contains: (c) => c === 'active' && !!opts.connectActive } },
+      flWelcomeOverlay: { style: { display: 'none' }, classList: { contains: () => false } }
+    };
+    let looks = 0; let offers = 0; let chip = null; let seeded = null; let mem = null;
+    const report = { base: 'http://127.0.0.1:11434', models: [{ name: 'a' }], ollama: { via: 'direct', base: 'http://127.0.0.1:11434' },
+      bridge: null, doors: [{ id: 'ollama', name: 'Ollama', base: 'http://127.0.0.1:11434', models: ['a'] }, { id: 'lmstudio', name: 'LM Studio', base: 'http://127.0.0.1:1234', models: ['b'] }] };
+    const st = store0(Object.assign({ 'fl-welcomed': 'true' }, opts.store || {}));
+    const ctx = {
+      document: { readyState: 'complete', addEventListener() {}, getElementById: (id) => els[id] || null },
+      location: { hash: opts.hash || '', search: '' },
+      URLSearchParams, localStorage: st.ls, Promise, Date, String,
+      setTimeout: (fn) => { Promise.resolve().then(fn); return 1; },
+      FlConnect: { bootProbe: () => { looks += 1; return Promise.resolve(report); }, hasLocalMind: () => false },
+      FlOnboarding: { offerFromReport: () => { offers += 1; return true; } },
+      flBridgeShowChip: (on) => { chip = on; },
+      flSeedLocalLook: (v) => { seeded = v; },
+      getOllamaBaseUrl: () => 'http://127.0.0.1:11434',
+      saveDiscoveryMemory: (m) => { mem = m; }
+    };
+    ctx.window = ctx;
+    vm.runInNewContext(src, ctx);
+    ctx.FlColdStart.appBooted();
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+    await new Promise((r) => setImmediate(r));
+    return { looks, offers, chip, seeded, mem, owner: ctx.FlColdStart, st };
+  }
+  {
+    const r = await runOwner();
+    assert.strictEqual(r.looks, 1, 'owner starts exactly one look');
+    assert.strictEqual(r.offers, 1, 'exactly one voice (the toast offer)');
+    assert.strictEqual(r.chip, false, 'Bridge chip painted from the same look');
+    assert.ok(r.seeded && r.seeded.viaBootProbe, 'resolveOllamaBase cache seeded');
+    assert.ok(r.mem && r.mem.length === 2 && r.mem[1].name === 'LM Studio', 'discovery memory kept, LM Studio named');
+    const c = await runOwner({ connectActive: true });
+    assert.strictEqual(c.offers, 0, 'no toast while Connect is showing');
+    const h = await runOwner({ hash: '#connect' });
+    assert.strictEqual(h.owner.deepLink(), 'connect', 'deep link read once');
+  }
+  // F1 keeps the person's model (heal v-model-choice-survives-reload-v0.1.1 lands before this paste)
+  {
+    const owner = between(app, '// v-connect-boot-probe-v0 (F1): ONE cold-start owner.', '</script>');
+    assert.ok(!/FLActiveModel\.set\(|fl_ollamaModel|fl_modelSource/.test(owner), 'the cold-start owner never picks a model');
+    const u = await runOwner({ store: { fl_isLocal: 'true', fl_provider: 'ollama', fl_ollamaModel: 'qwen2.5:latest', fl_modelSource: 'user' } });
+    assert.strictEqual(u.st.s.fl_ollamaModel, 'qwen2.5:latest', 'cold start leaves the chosen model');
+    assert.strictEqual(u.st.s.fl_modelSource, 'user', 'cold start leaves it hers');
+    const am = between(app, 'window.FLActiveModel = (function() {', 'window.FLAutoModel = (function() {');
+    assert.ok(/function ensure\(\) \{ if \(!_ready\) init\(\); \}/.test(am) && /function honor\(models, fallback, provider\)/.test(am), 'saved choice read first, one guard (v0.1.1)');
+    assert.ok(!/FLActiveModel\.set\(models\[0\],[^)]*'user'\)/.test(app), 'no boot path saves the first model as hers');
+    assert.ok(/FLActiveModel\.honor\(data\.models, textModel\.name, 'ollama'\)/.test(between(app, 'async function runConnectionCascade(', '// Step 2')), 'the Cascade honors the choice');
+  }
+
+  // ── F3: LM Studio in Connect, same porch words, tap-to-choose, never "Ollama"
+  {
+    const st = store0({ fl_lmstudioHost: '192.168.1.9:1234' });
+    const calls = [];
+    const sb = sandbox(st, { fetch: doorsFetch(calls) });
+    assert.strictEqual(sb.FlConnect.lmStudioBase(), 'http://127.0.0.1:1234', 'Connect asks LM Studio on this computer only');
+    const rep = await sb.FlConnect.bootProbe();
+    assert.ok(!calls.some((u) => /192\.168\./.test(u)), 'no home-network fetch from Connect');
+    assert.strictEqual(JSON.stringify(rep.doors.map((d) => d.name)), '["Ollama","LM Studio"]', 'both doors listed');
+    // render into a fake host
+    const host = { innerHTML: '', hidden: false, querySelectorAll: () => [], scrollIntoView() {} };
+    sb.document.getElementById = () => null;
+    sb.FlConnect.mount(host);
+    await new Promise((r) => setImmediate(r));
+    assert.ok(/Ollama is ready, pick a mind/.test(host.innerHTML), 'Ollama porch words');
+    assert.ok(/LM Studio is ready, pick a mind/.test(host.innerHTML), 'LM Studio porch words');
+    assert.ok(/data-flc-door="lmstudio"/.test(host.innerHTML), 'LM Studio list marked for tap-to-choose');
+    assert.ok(!/No local mind yet/.test(host.innerHTML), 'no false download card');
+    sb.FlConnect.unmount();
+  }
+  {
+    // only LM Studio answered
+    const st = store0();
+    const sb = sandbox(st, { fetch: doorsFetch([], { ollama: false }) });
+    const host = { innerHTML: '', hidden: false, querySelectorAll: () => [] };
+    sb.FlConnect.mount(host);
+    await new Promise((r) => setImmediate(r));
+    assert.ok(/LM Studio is ready, pick a mind/.test(host.innerHTML) && !/No local mind yet/.test(host.innerHTML), 'LM Studio alone is a real mind');
+    sb.FlConnect.unmount();
+    // FreeLattice tap: provider lmstudio, fl_lmstudioHost, never fl_ollamaHost
+    let hook = '';
+    sb.flUseLmStudioMind = (n) => { hook = n; };
+    sb.state = { isLocal: false, provider: 'ollama' };
+    sb.FlConnect.remember({ name: 'qwen2.5-coder-7b-instruct', base: 'http://127.0.0.1:1234', door: 'lmstudio' });
+    assert.strictEqual(st.s.fl_provider, 'lmstudio', 'provider lmstudio');
+    assert.strictEqual(st.s.fl_lmstudioHost, '127.0.0.1:1234', 'LM Studio host remembered (this computer)');
+    assert.ok(!('fl_ollamaHost' in st.s), 'Ollama host untouched');
+    assert.strictEqual(sb.state.provider, 'lmstudio', 'state says LM Studio');
+    assert.strictEqual(hook, 'qwen2.5-coder-7b-instruct', 'FreeLattice activation hook used');
+    assert.strictEqual(sb.FlConnect.chosenDoor(), 'lmstudio', 'chosen mark follows the door');
+  }
+  {
+    // Tree: LM Studio tap merges as the LM Studio door (/v1/models), Ollama tap as before
+    const st = store0();
+    let merged = null;
+    const sb = sandbox(st, { location: { hostname: 'thelatticetree.com', protocol: 'https:', hash: '', search: '' } });
+    sb.LocalMindProbe = { STORAGE_KEY: 'fl_alpha_local_mind', getRemembered: () => null, remember() {}, mergeFound: (f) => { merged = f; return f; } };
+    sb.FlConnect.remember({ name: 'qwen2.5-coder-7b-instruct', base: 'http://127.0.0.1:1234', door: 'lmstudio', models: ['a', 'qwen2.5-coder-7b-instruct'] });
+    assert.strictEqual(merged.name, 'LM Studio', 'Tree door named LM Studio');
+    assert.strictEqual(merged.url, 'http://127.0.0.1:1234/v1/models', 'Tree door url is the DOORS url');
+    sb.FlConnect.remember({ name: 'llama3.2:latest', base: 'http://127.0.0.1:11434', models: ['llama3.2:latest'] });
+    assert.strictEqual(merged.url, 'http://127.0.0.1:11434/api/tags', 'Ollama tap unchanged');
+  }
+  const owa = between(app, 'async function owAutoDetect() {', '// Accept the auto-detect suggestion');
+  assert.ok(!/LM Studio detected!/.test(owa) && /Yes, choose a mind/.test(owa), 'no false "Yes, use Ollama" when LM Studio answered');
+  assert.ok(/lmStrong\.textContent = 'LM Studio is ready on this computer\.'/.test(owa), 'LM Studio banner uses textContent');
+  assert.ok(/state\.provider === 'lmstudio' \? 'LM Studio \(' : 'Ollama \('/.test(app), 'status labels say LM Studio');
+  assert.ok(/function flUseLmStudioMind\(name\)/.test(app), 'LM Studio activation reused from the Test button');
+  assert.ok(/btn\.textContent = name/.test(mod), 'model buttons stay textContent');
+

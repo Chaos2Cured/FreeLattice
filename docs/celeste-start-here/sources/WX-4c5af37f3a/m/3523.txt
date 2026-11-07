@@ -1,0 +1,6 @@
+## Work item 3523 — Celeste
+around4238 export source line31, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha put 043e on hold. On theLatticeTree, the seal ask slipped off-screen again when the Nursery opens, and on FreeLattice it's still off-screen after a reload then tapping Chat. GC's latest entry also claimed fixes that didn't hold. I'm writing `043f` for GC to fix those on the same pull requests, and I'll tell you when it's in your Downloads.
+

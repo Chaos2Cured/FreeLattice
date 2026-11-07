@@ -1,0 +1,10 @@
+## Work item 2252 — Celeste
+around2700 export source line39, source idedc9820e63
+Inclusion: complete original message
+
+Good news from the git pass: travel wallet, λ4, poetry braid, and visual beauty **did not touch** chat, Garden Talk, `callAI`, or Ollama. Only Resonance (`e92a5fa`) edited `docs/app.html`, and only the PLAY card icon / soft Garden breath — not sendMessage. So yesterday’s vision braid is very unlikely to be what silenced Mom.
+
+Still doing the human walk on freelattice.com (Chat → Garden Talk) and Hypha is walking too. Will report what the live UI actually does next.
+
+Not on you — smoke catching ledger locks is exactly why we keep them; they guarded pattern, not chat runtime. We got this.
+

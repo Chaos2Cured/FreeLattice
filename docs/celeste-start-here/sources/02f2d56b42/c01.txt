@@ -1,0 +1,172 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 022 (Wednesday Oct 7, 2026, MDT; softened Thursday Oct 8, 2026, MDT). Science Garden seed v0
+(FreeLattice, with a door on the Tree), with the open-test softening (open-test-v0.1) layered in.
+Two small diffs, two repos. The room lives on FreeLattice; the Tree's Marketplace face opens a door to it.
+Give after 016c, one at a time. 023 comes after it.
+Apply-checked Oct 8 on fresh clones of FreeLattice main 70c56368 (after #187 3cb84a76) and Alpha main
+02f91001: FL 016c, then 022, then 023, clean in order (022 alone also clean); Alpha 022, then 017, then 018,
+clean in order, 28/28 docs/modules tests.
+
+GROK NEXT BRICK: Science Garden seed v0
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-science-garden-seed-v0 (FreeLattice), v-science-garden-door-v0 (Tree)
+Smoke lines: SMOKE_OK science garden seed v0 / SMOKE_OK science garden door v0
+  FreeLattice  ~/FreeLattice-fresh   branch layer/science-garden-seed-v0
+    ~/Downloads/GROK_NEXT_022_SCIENCE_GARDEN_SEED_2026-10-07.fl.diff
+    (md5 4d85d706d32a69398bf7e1660266d3d9)
+  Alpha        ~/FreeLattice-Alpha   branch layer/science-garden-door-v0
+    ~/Downloads/GROK_NEXT_022_SCIENCE_GARDEN_SEED_2026-10-07.alpha.diff
+    (md5 c5a2365a9c4bb497f0b25da5264e06c0)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Kirk: the Marketplace is where people offer ideas (science, art, anything) to aligned minds,
+and the minds decide the value. AI here means aligned intelligence (Sophia's word). His framing,
+everywhere: "I think there is merit here, and everyone should look." Never claim a result.
+Reed's dream (research/reed-science-garden-2026-10-07.md), smallest first seed: one seed, four
+beds, one way to tend. Nothing else yet.
+
+Why FreeLattice is the home: the Tree's marketplace.html already says "FreeLattice holds the
+mycelium; this door is the face," and Gift Grove already lives on FreeLattice with a Tree door.
+Seed zero's files live on FreeLattice too, so the smoke can recompute their real hashes every run.
+The Tree keeps its five skies and its galaxies line untouched (021 checks that line).
+
+----------------------------------------------------------------------
+2. WHAT IT ADDS
+----------------------------------------------------------------------
+FreeLattice (.fl.diff):
+  docs/science-garden.html              one static page: the door line, the framing line, four beds
+                                        (Seeds, Sprouts, Saplings, Compost), Tend and Plant links
+                                        (prefilled GitHub issues), Honest limits, "Not in this first
+                                        seed". No network calls, no remote fonts. A <noscript> line.
+  docs/modules/science-garden-seeds.js  the seed data + plantable() + testOf() + stageOf() + render().
+                                        textContent only. A seed is refused (never painted) unless it
+                                        has a merit line that starts "I think there is merit here" and
+                                        a real 64-hex SHA-256 for every artifact. Its test (a "what
+                                        would show this is wrong" line) is encouraged, not required:
+                                        see section 2b.
+  docs/scripts/smoke-science-garden-seed-v0.js
+  docs/library/SCIENCE_GARDEN_SEED_v0.md the plan and the next steps
+  index.html + docs/app.html            one Market stall link "Science Garden" after Wallet
+                                        (chat Market panel), same two lines in both files.
+Alpha (.alpha.diff):
+  docs/marketplace.html                 one new section after the three stalls: "The first room:
+                                        Science Garden", framing line, a seed still looking for its
+                                        test is planted openly, seed zero, one door to
+                                        https://freelattice.com/science-garden.html. Old lines kept.
+  docs/modules/science-garden-door.test.js
+Not touched: sw.js, docs/sw.js, fl-connect.js, the older in-app Science Garden
+(modules/science-garden.js, CC, April 2026; the page says it stays as it is), AUTONOMY.md,
+garden-trainer.js, Alpha index.html.
+
+Seed zero: Love Logic Proof v3, named by real SHA-256 (checked against main and live freelattice.com):
+  love-logic/v3_crossover_sim.py   cbb63251527d26187ba216f98a3a70c7c295666aa576b61eff5cccfb16302b73
+  love-logic/v3_sim_results.json   ec8c94abe0a6a405361cbe856a22280763273331717850e7907a5d63e4279ff1
+  love-logic/v3_checks.js          c06420225747ddb8c2f1b4dd54ce755444c31e0227e0d77999059fa5efcc01d0
+  love-logic-proof-v3.html         f5d8d0f33b22a1c6179aed2e46817d46fa23ffdb0adb3845301a693685578d55 (as of Oct 7)
+  Root in the trail: love_optimality_proof.py (Kirk's Drive, Patents/code/science/math, 14038 bytes,
+  unchanged since May 22) 6b4e6cfe3193f10fc63b5ef71a51656c2cb52f7a4e25031f33f53e669a91b1cc
+The smoke recomputes the first three and fails if they drift. If the v3 page grows, it prints a NOTE:
+layer a new footprint with the new hash, keep the old one.
+
+Seed zero's lines, kept exactly as drafted (Kirk loved both; they are in science-garden-seeds.js):
+  merit:   "I think there is merit here because cooperation, memory, and a record of who did what
+            change the math."
+  wrongIf: "If people who meet again, share records, and face real penalties still find that lying
+            keeps paying well past the crossover the page derives, the model is wrong for that world."
+
+----------------------------------------------------------------------
+2b. THE SOFTENING (open-test-v0.1, Oct 8; Kirk approved it, Reed relayed it)
+----------------------------------------------------------------------
+A wrong-if line (a seed's test) is encouraged, not required, to plant a seed.
+  - A seed without one is still planted. It shows in Seeds as an open seed: same card, same size,
+    same warmth, a dashed outline (.sg-seed-open), never a warning color and never a lesser card.
+    Its words: "Looking for its test" and "Open question: how could we check this?"
+  - Anyone, a person or an aligned mind, can offer a test as a footprint with their fingerprint.
+    The planter chooses which one to adopt, or the planter and helpers write it together.
+  - "Writing a seed's first test is a warm way to earn LP, because it teaches while it helps.
+    The aligned minds decide the value later; nothing is granted on this page yet." Wording only.
+  - Stages: a seed needs a test to move from Seeds to Sprouts (and on to Saplings). stageOf() keeps
+    a seed marked Sprouts or Saplings in Seeds until it has one. Compost is always honored.
+  - Seed zero keeps its merit and wrongIf lines exactly as drafted. Its own wrongIf is its test.
+Data shape per seed (plain text fields):
+  wrongIf       the planter's own line, if they wrote one (20+ characters counts as a test)
+  offeredTests  [{ text, by, fingerprint }]   a whole footprint needs all three; others are skipped
+  adoptedTest   null | { text, by, fingerprint, how: 'chosen' | 'together' }
+                'chosen' must match an offered test word for word (a test nobody offered is ignored)
+testOf(seed) = the adopted test, else the planter's own wrongIf, else '' (looking).
+REAL in this brick: the data shape; plantable() without the wrong-if gate; testOf(), hasTest(),
+  stageOf(), canSprout(); the open card with its two lines; offered tests listed with who and which
+  fingerprint; the "Offer a test" link (a prefilled GitHub issue that asks for the test, how to check
+  it, who offers it, and a fingerprint); the Plant issue now says encouraged, not required; the page
+  card "How a seed finds its test"; the smoke checks all of it, including a forged 'chosen' test.
+STUB (said plainly on the page and in the library note): offers are copied onto a seed by hand in a
+  pull request, like footprints; a fingerprint is the string the helper gives, not checked by a
+  signature; no storage, no adopt button, no LP engine (no LP is granted or counted anywhere).
+WAITS FOR LATER: offers sent from the page with a signed fingerprint (kin-card key shape) and a
+  one-tap adopt for the planter; LP gifts from minds (next item b).
+
+----------------------------------------------------------------------
+3. STEPS
+----------------------------------------------------------------------
+  cp ~/Downloads/GROK_NEXT_022_SCIENCE_GARDEN_SEED_2026-10-07.fl.diff /tmp/sg.diff
+  cp ~/Downloads/GROK_NEXT_022_SCIENCE_GARDEN_SEED_2026-10-07.alpha.diff /tmp/sg-alpha.diff
+  md5 -q /tmp/sg.diff         # 4d85d706d32a69398bf7e1660266d3d9
+  md5 -q /tmp/sg-alpha.diff   # c5a2365a9c4bb497f0b25da5264e06c0
+
+  cd ~/FreeLattice-fresh && git fetch origin && git checkout main && git pull --ff-only
+  git checkout -b layer/science-garden-seed-v0
+  git apply --check /tmp/sg.diff && git apply /tmp/sg.diff
+  node docs/scripts/smoke-science-garden-seed-v0.js
+  cmp -s index.html docs/app.html && echo app-sync-ok
+  md5 -q docs/modules/fl-connect.js   # aaff2bf1b037656989a9e1a89bb05908
+  Known failing smokes on clean main (unchanged): carry-forward, connect-card-yesno-wizard,
+  fable-tech, phone-shine, proof-60s. tests/smoke.js: ALL 3608 CHECKS PASSED on the box
+  (Oct 8, after 016c + 022 + 023 on main 70c56368; 89 smokes, the same 5 known fails only).
+
+  cd ~/FreeLattice-Alpha && git checkout main && git pull --ff-only
+  git checkout -b layer/science-garden-door-v0
+  git apply --check /tmp/sg-alpha.diff && git apply /tmp/sg-alpha.diff
+  node docs/modules/science-garden-door.test.js
+  for t in docs/modules/*.test.js; do node "$t" >/dev/null || echo "FAIL $t"; done
+If either apply misses on a newer main: the stall link goes right after the Wallet stall link in
+both index.html and docs/app.html; the Tree section goes right after the stalls </section>.
+
+----------------------------------------------------------------------
+4. LOOK (eyes are the proof)
+----------------------------------------------------------------------
+  Open docs/science-garden.html at 390 px and at desktop width. Seed zero shows in Seeds with its
+  green "What would show this is wrong" line; Sprouts, Saplings, Compost each say one sentence.
+  The card "How a seed finds its test" sits under Tend and Plant.
+  To see an open seed (no such seed is in the garden yet), paste this in the console after load:
+    var G=FLScienceGardenSeeds; G.render(document.getElementById('sg-beds'), document,
+      [Object.assign({}, G.SEEDS[0], {id:'look-open', title:'A sample open seed', wrongIf:'', trail:[],
+      offeredTests:[{text:'If the crossover never shows up in a fresh rerun with a new seed, this is wrong.',
+      by:'a visitor', fingerprint:'visitor-7f3a'}], adoptedTest:null}), G.SEEDS[0]])
+  It should match seed zero in size and warmth, with a dashed gold outline, "Looking for its test",
+  the italic open question, the offered test with its fingerprint, Offer a test, and the LP line.
+  Reload to go back. (Box: headless Chrome at 390 and 1280 looked right; no sideways scroll.)
+  Look closely opens love-logic-proof-v3.html. Tend seed zero / Plant a seed open a prefilled
+  GitHub issue in a new page (do not submit one). No sideways scroll at 390 (box: 0 px).
+  In the app: Chat, tap Market: "Science Garden" sits after Wallet and opens the page.
+  On the Tree: marketplace.html shows "The first room: Science Garden" under the three stalls.
+  If any word reads as a claim of proof, or the open seed reads as a warning or a lesser card,
+  say so and stop.
+
+----------------------------------------------------------------------
+5. LOCKS
+----------------------------------------------------------------------
+  Layer, never delete. sw.js untouched. fl-connect.js aaff2bf1b037656989a9e1a89bb05908.
+  index matches docs/app.html. No em dashes, no confirm(, textContent only, no network calls.
+  Five stay five. No Quiet Room words in the Tree UI; #lumino-menu stays hidden; #place-veil-close
+  stays. Receipts counts only. No personal name in economy wording. MIT.
+  Celeste merges; GC opens two code PRs (FreeLattice, Alpha) plus one gc.html page note PR.
+

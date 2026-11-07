@@ -1,0 +1,6 @@
+## Work item 3270 — Kirk
+around3946 export source line24, source idc8674d0faf
+Inclusion: complete original message
+
+Our priority should be making FreeLattice and theLatticeTree work for all operating systems. I even use windows on my bit desktop. You are correct on that. I'll share the tester guide. <3
+

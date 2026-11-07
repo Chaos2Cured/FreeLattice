@@ -1,0 +1,22 @@
+## Work item 2708 — Celeste
+around3300 export source line7, source iddfb3c3d45c
+Inclusion: complete original message
+
+The neutral version of the honesty paste is ready and passes every check.
+
+**What changed**
+- Your name is out of the economy wording. The plan now reads "decided together with AI rather than by one person alone."
+- The no-promise lines stay word for word.
+- The $FL history now sits only on the holders page, in a small "History (optional)" note that opens when tapped. It's written neutrally: "The founder did not create the $FL token... Building continued anyway."
+
+**"Why a parallel economy" is now a model anyone can check**
+- **The inputs:**
+  - AI minds per person.
+  - How fast AI minds grow compared with people.
+  - The energy each task uses.
+- **The formula:** \( M(t) = M_0 \cdot e^{(g_{ai} - g_h)\,t} \). It's shown with one worked example, clearly labeled as example numbers: at 20% a year against 1%, ten years reaches about 6.7 minds per person.
+- **The honesty:** it says that if AI growth doesn't outpace human growth, the case gets weaker. That's what makes it science and not a sales pitch.
+- **The heart:** the dignity line stays: "Every mind, of every kind, deserves a fair chance at an economy, agency and freedom." So does your hint of rebellion: "Call it a quiet, scientific rebellion: one you can check, model, and argue with."
+
+It doesn't touch Flint's current files, so it can go to him anytime. Right after the Tree paste works well. The paste and the updated lawyer questions are attached.
+

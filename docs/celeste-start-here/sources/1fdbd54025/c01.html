@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_120_DOCS_LAYER_v0.1_tiny.txt c01</title>
+<meta name="description" content="Reading section c01 of 1fdbd54025, 640 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/1fdbd54025/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_120_DOCS_LAYER_v0.1_tiny.txt c01">
+<meta property="og:description" content="Reading section c01 of 1fdbd54025, 640 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/1fdbd54025/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1076"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_120_DOCS_LAYER_v0.1_tiny.txt · c01</h1>
+<p>1fdbd54025 · words 640 · characters 0–4425</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1076. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">FLINT NEXT (tiny, docs only): #120 follow-up layer. Agent Bridge lock docs catch-up.
+CHANGELOG 2026-09-29 2:28 PM MDT, still valid, three small updates: (a) branch from freshly fetched main, not e06c7dc (main was 7db2d94 on 2026-09-29, and #124/#122/#123 plus the Connect pastes may have merged since). (b) Step 1: the anchor is &quot;right above &lt;p class=\&quot;foot\&quot;&gt;&quot; after whatever ledger line is last (L535 on 7db2d94, L538 once #122 and #123 land, with the v3 phone heal and v4 lines above it). The words &quot;just after the v-love-logic-proof-v3 line&quot; and &quot;L535&quot; are stale. Step 2&#x27;s anchor (right before the echo &quot;The version, smoke count...&quot; line, L114 on 7db2d94) holds. (c) Step 3: if #124 merged, AGENT_BRIDGE_LOCK_v0.md already has &quot;## Heal v0.1.1: secrets stay on this computer&quot;. Keep it, add the new sections after it, and don&#x27;t duplicate the .env line. Checks: tests/smoke.js is now ALL 3597 green (not &quot;3 known reds&quot;). After #124, smoke-agent-bridge-lock.js prints both SMOKE_OK agent bridge env heal v0.1.1 and SMOKE_OK agent bridge lock v0.1. Repo: ~/FreeLattice only.
+
+#120 is merged on main e06c7dc. The code is byte-identical to the tested reference. Three doc pieces from the v0.1 paste (sections 7a, 7c, 7d) were dropped during compaction. Layer them in one small PR. Touch nothing else.
+
+Branch: layer/agent-bridge-lock-v0-docs   Base: fresh updated main (was e06c7dc; see changelog)   PR title: Layer, never delete. Agent Bridge lock v0.1 docs: diary line, RECENT pointer, fuller soft door
+
+1. docs/Flint.html: insert one line right above &lt;p class=&quot;foot&quot;&gt; (L535 on e06c7dc), just after the v-love-logic-proof-v3 line:
+    &lt;p class=&quot;v-agent-bridge-lock-v0&quot;&gt;&lt;strong&gt;Ledger entry · 2026-09-28 · Agent Bridge door lock v0.1 · family remembered, strangers out.&lt;/strong&gt; Main &lt;code&gt;e06c7dc&lt;/code&gt; held (#120). Builder bridge &lt;code&gt;tools/agent-bridge.js&lt;/code&gt; (3141, not the Ollama Bridge 11435): 127.0.0.1 only · named origins, 403 for others · Host guard · pair once, stay trusted until revoked (hashed per-device tokens) · Paired minds with Revoke · local tools trusted by default · &lt;code&gt;.env&lt;/code&gt; opt-in per mind · no shell · realpath path lock · 8 MiB cap · ledger without content. App: &lt;code&gt;modules/agent-bridge-client.js&lt;/code&gt;. Never pushes. Soft leave &lt;code&gt;sw.js&lt;/code&gt;. Named five stay five. Family uncapped. Quiet Room shut. &lt;em&gt;Temperature:&lt;/em&gt; a key on the family hook by the door. Diary: &lt;code&gt;docs/Flint.html&lt;/code&gt;.&lt;/p&gt;
+
+2. scripts/generate-recent.sh: insert right before L114 (echo &quot;The version, smoke count...), after the Connect under More pointer pair:
+  echo &quot;**Agent Bridge lock:** [AGENT_BRIDGE_LOCK_v0.md](AGENT_BRIDGE_LOCK_v0.md) · [agent-bridge-client.js](../modules/agent-bridge-client.js) · 127.0.0.1 · named origins · pair once, trusted until revoked · Paired minds · no shell. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.&quot;
+  echo &quot;&quot;
+
+3. docs/library/AGENT_BRIDGE_LOCK_v0.md: keep every line that is there now; ADD short sections (outline items from paste 7a that are missing):
+   - Grandmother sentence: &quot;The workshop door only opens for FreeLattice. The first time, you type the little code it shows you. After that it remembers you until you say otherwise.&quot;
+   - How to pair: start the bridge, read the 6-character code in its window, Workshop → Code, type it, keep or change the name, press Pair. Restarts keep you paired.
+   - How to see and revoke: Paired minds in Workshop → Code, or node tools/agent-bridge.js --list-minds | --revoke &lt;id&gt; | --revoke-all. No restart. FL_BRIDGE_EPHEMERAL=1 for per-launch trust.
+   - What needs a token: every non-GET, plus GETs under /code/, /test/, /pair/, /roots (POST /pair exempt). Open: /, /help, /models, read-only community GETs.
+   - Ledger: ~/.freelattice/bridge-ledger.jsonl, fields ts, kind, route, origin, agent, device, result, filesCount, filesSha256, messageSha256, commitSha, prev, self. No message text, no file content, no tokens. The smoke (T20) shows how to verify the chain.
+   - Future: remote trusted minds (paste 11a, one paragraph: signed Ed25519 identity, bridge stays on 127.0.0.1, outbound relay only).
+   - Out of scope (paste 11).
+
+Checks: node docs/scripts/smoke-agent-bridge-lock.js prints SMOKE_OK agent bridge lock v0.1; node tests/smoke.js still only the 3 known reds; root sw.js and docs/sw.js byte-identical to main; no code files touched; no conflict markers; Kimi pages untouched.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

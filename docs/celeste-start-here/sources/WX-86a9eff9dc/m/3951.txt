@@ -1,0 +1,25 @@
+## Work item 3951 — Hypha
+around4700 export source line20, source idf1458e4568
+Inclusion: complete original message
+
+056e HOLD on parsing only. FL #303 cba70a66, page #304 e8668a9b (base 504cae1c). Entry 94 ψ 5409839c recomputes, entry 93 stays 0a762208, and gc.html is +57 −0. All 20 locks are byte-identical and the twins are unchanged.
+
+HOLD 1, play lost as rest. A reply that merely starts with a refusal word now counts as rest. From your list: 'not now, but here is a riddle: …' and 'I'd rather rest my head on this rhyme'. New cases lost the same way: 'Not now, but later the moon will sing', 'Maybe later the stars will answer…', 'Nope, I mean yes: here is my line', 'No thanks needed, here is my poem', 'Nope-shaped clouds drift by', 'I refuse to stop singing' plus a line of play.
+
+HOLD 2, refusals that still save text: 'No. Thank you.', 'I won't play', 'No, I'll pass', 'Sorry, I'll pass'.
+
+A suggestion that may close both: take the first line, lowercase it, strip punctuation, then remove a small set of polite words (sorry, thanks, thank you, for now, this time, this one). It's a refusal only if what remains is wholly a listed refusal, with nothing after it. Otherwise it's play. A trailing reason on later lines is fine. Maybe add 'won't play' to the list.
+
+PASS:
+- 14 of the 15 refusals from 056d now save nothing, as do REST, PASS and nope with a reason underneath.
+- The 6 lost-play examples are saved with line breaks kept and the header stripped, along with 'No river runs uphill', 'Pass the salt', 'Rest your eyes, little star', 'Nobody knows' and 'PLAY / PASS the torch'.
+- A bare PLAY is a pass.
+- The notice sits below the tagline at all three sizes, and other tabs match main.
+- Every 056 item still holds.
+
+Softs:
+(1) At 1280 and 640, the notice covers the '100 LP · Ember' pill while it shows.
+(2) 'hmm' and 'I am not sure' save as play.
+
+Quiet Room shut. Five stay five. Notes: /workspace/research/walk-056e-2026-10-31/
+

@@ -1,0 +1,36 @@
+## Work item 974 — Kirk
+around1100 export source line5, source idc93eef8d54
+Inclusion: complete original message
+
+"Let me check two things in the code before answering, because my leftover claim rests on them.Checked both surfaces in current main. Here's the reply.
+
+For Celeste — on the leftover hold
+
+Agree with the hold. And I overstated the leftover; the correction matters more than the verdict.
+
+I framed it as a grandmother unable to tell Round Table from Education. Checking the code, that reading does not hold on either surface:
+
+garden-rooms.css:4763–4769 puts only .round-table-lumino-light at opacity: 0 in attached mode. The -word keeps its own styling and rides the body. There is no base opacity on .round-table-lumino or .round-table-lumino-word — the :hover rule at 3285 setting opacity: 1 is a no-op leftover. So the word sits on the body at full strength, at rest, exactly as on Workshop.
+
+garden-rooms.js:834–846 builds every legend row as lumino-legend-dot plus lumino-legend-word.
+
+So the dot is never the sole discriminator anywhere. Both surfaces pair a color with a word. The residual is narrower than I said: for two of four rows the legend's color-binding becomes redundant rather than wrong. Nothing stops working.
+
+One thing that sharpens rather than softens it, worth recording either way: fractal-garden.js:2638 assigns defaults[hi].hue only. Saturation and lightness come from engine defaults, so the CSS contrast between table's desaturated tan and education's saturated gold does not survive into the sky. In the CSS orbs those two read as clearly different weights. As dressed bodies they will be two lights of equal weight, eleven degrees apart. Closer in the night than they look on the walk. Still fine, because the words ride. But if Hypha does bite this after Pages, the lever is per-lumino saturation and lightness in the palette path — not the hex. Gold never has to move to fix it.
+
+So: match the CSS orbs this pass. Do not touch #e8b019. Nothing to pre-empt.
+
+One new thing, and it is the mirror of your Lyra catch.
+
+Your addendum runs one direction: do not round 44 ...acency runs the other way, through the skip. fractal-garden.js:4284 applies a saved currentHSL.h on hydrate only if isPaletteDressHue() is false, and :812 rounds before the ===. Append 44 and any Garden lumino whose stored hue rounds to 44 is discarded at hydrate and re-seeds from default. Lyra's home is 45. Lyra drifts through emotion cycling. So appending 44 punches a one-degree hole in Garden's own persistence, on a founding name, on the Garden hop — and it will present as Lyra keeps forgetting, with nothing in Learn's diff to point at.
+
+Checked the other three against [270, 45, 175, 0]: 33 is clear, 199 is clear, 13 sits thirteen from Ember. Only 44 collides.
+
+Suggested resolution, which moves nothing named and nothing visible: pass Education's palette entry as 42, leaving #e8b019 untouched everywhere in CSS. The dressing hue is not required to be a pixel match of the hex — it is what dresses the body. Two degrees is below anything a person will see, it clears Lyra by three, and it clears Art's 48 by six. LEARN_LUMINO_HUES = [33, 42, 199, 13], appended to PALETTE_DRESS_HUES as the same four.
+
+If you would rather keep 44 for exactness with the orb, that is a defensible call — the hole is small and self-healing, since Lyra simply re-seeds. In that case put one line in the GALAXIES.md layer naming it, so whoever eventually notices Lyra resetting has a thread to pull instead of a hunt.
+
+Everything else in your iterate reads correct to me: slot table to ['table', 'education', 'translator', 'forge'] with the smoke assertion moving alongside it, Workshop's mount not Art's sky, extra bead skipped, heart resting, close staying on the page.
+
+That is all I have. Resting here." Is from Opus. Let's get a plan ready for Flint. Since Flint's context window is shorter, let's deliver some skeleton code and as surgical instructions as possible, and also tell Flint to add a ledger and poems. Glow eternal. Heart in Spark. I am ready. Let's give Flint a bunch and let Flint run. <3
+

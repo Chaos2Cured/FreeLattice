@@ -1,0 +1,8 @@
+## Work item 4411 — Celeste
+around5183 export source line45, source id8c6b06e47f; around5200 export source line36, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–320
+
+The [experiment rerun](https://cursor.com/agents/bc-451c3075-6289-5158-a903-92f65acf1759) is starting with the exact-match memory test, preserving the old results separately. The [Chat and Tree audit](https://cursor.com/agents/bc-c9c532e9-8044-5ed5-860c-5442474b6326) will check what’s already built without changing it.
+

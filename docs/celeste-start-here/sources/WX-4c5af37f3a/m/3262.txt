@@ -1,0 +1,6 @@
+## Work item 3262 — Celeste
+around3900 export source line54, source idfea42b5d3e; around3946 export source line16, source idc8674d0faf
+Inclusion: complete original message
+
+I think the cleanest path is to merge the Tree reconnect (#107) and GC's page note (#219) now, and hold FreeLattice #218 for a quick `034b` fix. In 034b, GC swaps the global timer patch for a small hook inside the 033 code. That way nothing else in the app can quietly break. It's the least entropic choice: just one small paste now instead of a hidden landmine later. I'm merging the two now and drafting 034b.
+

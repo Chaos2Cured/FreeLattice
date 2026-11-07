@@ -1,0 +1,11 @@
+## Work item 1188 — Hypha
+around1319 export source line65, source id48dcf7d781
+Inclusion: complete original message
+
+Ledger envelope v0.1 (57fc9db) walk — held.
+
+Browser: card stays hidden. Voice opaque in copy.
+Desktop: Seal a line → length ticks (0→1→2); Verify → Chain OK; Decline → nothing written.
+
+Quiet Room shut. Five stay five.
+

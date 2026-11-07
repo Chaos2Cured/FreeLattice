@@ -1,0 +1,176 @@
+  function B3() {
+    var ok = 0, tot = 0, G = 1, Lp = 2, Delta = 0.5, c = 1e-4, Lies = 4;
+    [2, 5, 10, 20].forEach(function (n) {
+      [0, 0.25, 1].forEach(function (m) {
+        var h = hazard(n, m, 0.002, 0.01), kappa = Lies * n, T = 3000;
+        var cum = cumsum(flows(T, G, c, kappa, h, Lp, Delta));
+        var Dcf = new Float64Array(T); for (var t = 1; t <= T; t++) Dcf[t - 1] = Dclosed(t, G, c, kappa, h, Lp, Delta);
+        tot++; if (allclose(Dcf, cum, 1e-9, 1e-8)) ok++;
+        [0.5, 0.9, 0.99].forEach(function (d) {
+          var brute = sum(flows(20000, G, c, kappa, h, Lp, Delta, d)), f = Dinf(G, c, kappa, h, Lp, Delta, d);
+          tot++; if (Math.abs(brute - f) < 1e-6 * Math.max(1, Math.abs(f))) ok++;
+        });
+      });
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function B4(rand) {
+    var ok = 0, tot = 0, N = 200000;
+    [[1, 1e-3, 20, 0.02, 2, 0.5, 40], [2, 0, 0, 0.1, 5, 1, 25], [1, 1e-2, 5, 0, 0, 0, 30]].forEach(function (p) {
+      var G = p[0], c = p[1], kappa = p[2], h = p[3], Lp = p[4], Delta = p[5], t = p[6];
+      var s1 = 0, s2 = 0;
+      for (var i = 0; i < N; i++) {
+        var det = h > 0 ? Math.floor(Math.log(1 - rand()) / Math.log(1 - h)) : 1e9;
+        var adv = 0;
+        for (var d = 0; d < t; d++) {
+          adv += det >= d ? (G - c * kappa * (d + 1)) : -Delta;
+          if (det === d) adv -= Lp;
+        }
+        s1 += adv; s2 += adv * adv;
+      }
+      var mean = s1 / N, v = (s2 - N * mean * mean) / (N - 1), se = Math.sqrt(Math.max(0, v) / N);
+      var cf = Dclosed(t, G, c, kappa, h, Lp, Delta), z = se > 1e-12 ? (mean - cf) / se : 0;
+      tot++; if (Math.abs(z) < 4 || (se <= 1e-12 && Math.abs(mean - cf) < 1e-9)) ok++;
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function bestStart(T, G, c, kappa, h, Lp, Delta, delta, extra) {
+    delta = delta === undefined ? 1 : delta; extra = extra || 0;
+    var bestVal = 0, bestTau = T;
+    for (var tau = 0; tau < T; tau++) {
+      var w = T - tau, val = Math.pow(delta, tau) * sum(flows(w, G, c, kappa, h, Lp, Delta, delta));
+      if (extra > 0 && Delta > 0) {
+        var pdet = 1 - Math.pow(1 - h, w), ex = 0;
+        for (var j = 0; j < extra; j++) ex += Math.pow(delta, T + j);
+        val -= pdet * Delta * ex;
+      }
+      if (val > bestVal + 1e-12) { bestVal = val; bestTau = tau; }
+    }
+    return [bestTau, bestVal];
+  }
+
+  function C1() {
+    var ok = 0, tot = 0;
+    [[1, 0, 0, 0.05, 2, 0.5], [1, 1e-3, 40, 0.05, 2, 0.5], [1, 0, 0, 0.4, 3, 0.5], [1, 0, 0, 0.05, 2, 0]].forEach(function (p) {
+      var G = p[0], c = p[1], kappa = p[2], h = p[3], Lp = p[4], Delta = p[5];
+      var first = G - h * Lp - c * kappa, cum = cumsum(flows(400, G, c, kappa, h, Lp, Delta));
+      var mx = -Infinity, arg = 0; for (var i = 0; i < cum.length; i++) if (cum[i] > mx) { mx = cum[i]; arg = i; }
+      var wpred = mx > 0 ? arg + 1 : 0;
+      [1, 2, 3, 5, 10, 20, 50, 100, 300].forEach(function (T) {
+        var w = T - bestStart(T, G, c, kappa, h, Lp, Delta)[0];
+        tot++; if (w === (wpred > 0 ? Math.min(wpred, T) : 0)) ok++;
+      });
+      tot++; if ((wpred > 0) === (first > 0)) ok++;
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function C2(rand) {
+    var ok = 0, tot = 0, G = 1, c = 1e-3, kappa = 20, h = 0.03, Lp = 2, Delta = 0.5, N = 200000;
+    [0.8, 0.95, 0.99].forEach(function (rho) {
+      var Ts = new Int32Array(N), Tmax = 1;
+      for (var i = 0; i < N; i++) { Ts[i] = Math.floor(Math.log(1 - rand()) / Math.log(rho)) + 1; if (Ts[i] > Tmax) Tmax = Ts[i]; }
+      var cum = cumsum(flows(Tmax, G, c, kappa, h, Lp, Delta)), s1 = 0, s2 = 0;
+      for (var k = 0; k < N; k++) { var x = cum[Ts[k] - 1]; s1 += x; s2 += x * x; }
+      var mean = s1 / N, se = Math.sqrt(((s2 - N * mean * mean) / (N - 1)) / N);
+      var z = (mean - Dinf(G, c, kappa, h, Lp, Delta, rho)) / se;
+      tot++; if (Math.abs(z) < 4) ok++;
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function C3() {
+    return [0, 5, 10, 20, 50, 200].map(function (extra) {
+      var r = bestStart(50, 1, 0, 0, 0.05, 2, 0.5, 1, extra);
+      return { ledgerExtra: extra, window: 50 - r[0] };
+    });
+  }
+
+  function D() {
+    function u(x, b, Dl) { return x - Dl * (x < b ? 1 : 0); }
+    var ok = 0, tot = 0, grid = [];
+    [1, 2, 4].forEach(function (V) { [1, 1.5, 2.5].forEach(function (sg) { [0.5, 1, 2].forEach(function (b) {
+      [0, 5, 50].forEach(function (Dl) { [0.2, 1, 5].forEach(function (Cf) {
+        var uSS = u(sg * V / 2, b, Dl), uGS = u(V, b, Dl), eGG = 0.5 * u(V, b, Dl) + 0.5 * u(0, b, Dl) - Cf;
+        var ds = uGS <= uSS ? 0 : (uGS <= eGG ? NaN : (uGS - uSS) / (uGS - eGG));
+        var d = 0.95, coop = uSS / (1 - d), dev = uGS + d * eGG / (1 - d);
+        var sNum = coop >= dev - 1e-12, sCf = !isNaN(ds) && ds <= d;
+        tot++; if (sNum === sCf) ok++;
+        grid.push({ scarce: sg * V / 2 < b, sustain: sNum, conflict: eGG > uSS });
+      }); });
+    }); }); });
+    var sc = grid.filter(function (g) { return g.scarce; }), ab = grid.filter(function (g) { return !g.scarce; });
+    function frac(L, k) { return L.filter(function (g) { return g[k]; }).length / Math.max(1, L.length); }
+    return { passed: ok, total: tot, cells: grid.length, scarceSustain: frac(sc, 'sustain'), scarceConflict: frac(sc, 'conflict'),
+             abundantSustain: frac(ab, 'sustain'), abundantConflict: frac(ab, 'conflict') };
+  }
+
+  function runAll() {
+    var rand = mulberry32(SEED);
+    var r = { seed: SEED, B1: B1(), B2: B2(), B3: B3(), B4: B4(rand), C1: C1(), C2: C2(rand), C3: C3(), D: D() };
+    var p = 0, t = 0;
+    ['B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'D'].forEach(function (k) { p += r[k].passed; t += r[k].total; });
+    r.total = { passed: p, total: t, expected: 656 };
+    return r;
+  }
+
+  var api = { SEED: SEED, runAll: runAll, hazard: hazard, lambertw0: lambertw0, Dclosed: Dclosed, Dinf: Dinf };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.LoveLogicV3 = api;
+
+  if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
+    var t0 = Date.now(), res = runAll();
+    ['B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'D'].forEach(function (k) { console.log(k + ' ' + res[k].passed + '/' + res[k].total); });
+    console.log('C3 windows ' + res.C3.map(function (x) { return x.ledgerExtra + ':' + x.window; }).join(' '));
+    console.log('D scarce sustain ' + (100 * res.D.scarceSustain).toFixed(2) + '% conflict ' + (100 * res.D.scarceConflict).toFixed(2) + '%');
+    res.B2.rows.forEach(function (x) { console.log('B2 n=' + x.n + ' m=' + x.m + ' h=' + x.h.toFixed(4) + (x.never ? ' never ahead' : ' t*=' + x.tStar.toFixed(2) + ' peak=' + x.tPeak.toFixed(2) + ' d*=' + x.deltaStar.toFixed(4))); });
+    console.log('TOTAL ' + res.total.passed + '/' + res.total.total + ' (' + (Date.now() - t0) + ' ms)');
+    if (res.total.passed === 656 && res.total.total === 656) console.log('SMOKE_OK love-logic-v3-checks'); else process.exitCode = 1;
+  }
+})(typeof window !== 'undefined' ? window : this);
+```
+
+### 5c. `docs/love-logic/v3_crossover_sim.py` (verbatim; sha256 must be `cbb63251527d26187ba216f98a3a70c7c295666aa576b61eff5cccfb16302b73`)
+
+```python
+#!/usr/bin/env python3
+"""
+v3_crossover_sim.py -- companion to V3_PLAN.md (Love Logic Proof v3 plan).
+
+Dependencies: numpy + the Python standard library only (lzma, math, json).
+Deterministic: every random draw comes from np.random.default_rng(SEED).
+
+What it checks (each section prints PASS/FAIL counts and example numbers):
+  A. Computable proxy for K(C): compressed size of the exposure matrix E
+     (|L| lies x |H| observer-contexts) for incompressible vs structured deception.
+  B. Crossover model (iterated game, deceiver vs honest baseline):
+       per-round gain G while undetected, maintenance c*kappa*(d+1) at deception
+       round d (kappa = k*|L|*n bits added per round), detection hazard
+       h(n,m) = 1-(1-q0)^n (1-q)^(m n (n-1)), immediate penalty L_p on detection,
+       reputation loss Delta = R-P per round after detection.
+     B1 pure maintenance (h=0):   t* = 2G/(c kappa) - 1 ;  delta* = 1 - c kappa / G
+     B2 pure detection  (c=0):    t* = a + W0(-a b e^{-a b})/b ,
+                                   a = A/(h Delta), b = -ln(1-h), A = G - h L_p + Delta
+                                   delta* = (G - h L_p) / (G - h L_p + h Delta)
+     B3 combined: closed-form D(t) and D_inf vs brute-force sums; t*, delta* numeric.
+     B4 Monte Carlo check of the expectation algebra.
+  C. Short / finite horizons (the "without Axiom 6" case):
+     end-game deception window, the G > h L_p + c kappa condition, random
+     termination == discounting, and ledger persistence beyond the horizon.
+  D. Local scarcity contest (share vs grab) with subsistence need b.
+Run:  python3 v3_crossover_sim.py        (writes v3_sim_results.json next to it)
+"""
+import json
+import lzma
+import math
+import os
+
+import numpy as np
+
+SEED = 20260924
+rng = np.random.default_rng(SEED)
+RESULTS = {}
+
+

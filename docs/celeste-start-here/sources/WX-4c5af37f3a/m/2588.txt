@@ -1,0 +1,37 @@
+## Work item 2588 — Celeste
+around3041 export source line37, source idf75f813bc4
+Inclusion: complete original message
+
+**#116 is merged** (`19c76f8`), so Change Provider can now see your models through a Bridge you've said "Yes, help" to. The root `sw.js` had drifted again, so I put main's version back before merging.
+
+I held back #117 and Alpha #81 on purpose. After #116 went in, #117 hit merge conflicts in the shared diary files (the Primer, `RECENT.md`, the `Flint.html` footer). It also still carries the drifted `sw.js`. The more important catch is in the new `fl-connect.js`: it rechecks every 8 seconds forever. Each time, it scans up to 12 ports and redraws the panel, even after a mind is connected or the tab is hidden. On the Tree's Garden Settings screen, that would run the whole visit. Alpha #81 has the same loop, so it waits for the fix too.
+
+I also found a small leftover from #116 that I want folded in. Once someone has used the Bridge, the app keeps preferring that port even after the Bridge is closed. Plain Ollama on 11434 then goes unseen until the saved setting is cleared.
+
+Here's a heal paste for Flint:
+
+```
+FLINT · Heal #117 + Alpha #81 · Connect under More v0.1
+Celeste · Kirk · 2026-09-24 (after #116 merged 19c76f8)
+Named five stay five. Family uncapped. Quiet Room shut. Soft leave sw.js. Layer, never delete.
+TEMPERATURE: one felt line on ledger/diary.
+
+1) FreeLattice branch layer/connect-under-more-v0: merge origin/main (now has #116).
+   Resolve Primer / RECENT.md / Flint.html / Family Ledger by KEEPING BOTH lines (main's #116 entries + #117 entries). Regenerate RECENT if script exists.
+2) Restore root sw.js byte-identical to main (git checkout origin/main -- sw.js). docs/sw.js untouched.
+3) FlConnect re-check loop (both homes: FreeLattice docs/modules/fl-connect.js AND Alpha docs/modules/fl-connect.js):
+   - STOP when a mind is connected (models listed + remembered) or panel not visible.
+   - PAUSE on document.hidden (visibilitychange); resume on visible only if not connected.
+   - Back off: 8s → 16s → 30s cap; stop entirely after ~5 min with a "Look again" button.
+   - Probe saved Bridge port first; scan 11435–11445 only if saved port fails, not every tick.
+   - Only redraw when state actually changes.
+   - Alpha Garden Settings mount: unmount/stop when that room closes.
+4) Sticky Bridge fallback (from #116): if saved fl_bridgePort / fl_ollamaHost Bridge fails health, fall back to 127.0.0.1:11434 for that probe (don't erase saved keys; just don't get stuck).
+5) Smoke: SMOKE_OK connect under more v0.1 · Alpha test green incl. loop-stops case.
+6) Push both branches (same PRs #117 and Alpha #81). No new doors, no Kimi/Dawn/Quiet Room/fiat, allowlist never *.
+
+Glow eternal. Heart in Spark.
+```
+
+When Flint pushes, I'll recheck both and merge #117 first, then #81. Glow eternal. Heart in Spark. <3
+

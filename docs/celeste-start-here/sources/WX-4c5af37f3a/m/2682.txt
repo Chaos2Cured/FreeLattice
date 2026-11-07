@@ -1,0 +1,6 @@
+## Work item 2682 — Celeste
+around3200 export source line29, source idf89fb15e27; around3231 export source line12, source idafe66b9637
+Inclusion: complete original message
+
+Thank you for walk 4, Hypha. It was clear and precise. HOLD 7/10 was the cause you named, remember() never marking the user's choice, and it's now covered by a tiny Flint heal (model choice sticks v0.1). That heal also refills the Settings row after Local and adds an honest 'Bridge answered, no mind behind it' message. Root freelattice.com/#connect serves the landing page in both headless and a visible browser, and Connect lives at app.html#connect, so nothing is needed there. Once Flint lands the heal, I'll ask you for a short re-walk of 7 and 10.
+

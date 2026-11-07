@@ -1,0 +1,6 @@
+## Work item 3093 — Celeste
+around3700 export source line52, source id93f10da134; around3728 export source line25, source ide1c22c5507
+Inclusion: complete original message
+
+The next file for GC is ready: `025`, the FreeLattice refusal-score fix, and it's in your Downloads. It makes FreeLattice count a silence or an unreachable mind as "not reached" instead of "blocked," label runs that stop partway, and name the model on every score, just like the Tree. Every check passed. You can hand it to GC as soon as you like; it doesn't touch the Tree Pool. I'll confirm when the pool is live and backed up to Codeberg.
+

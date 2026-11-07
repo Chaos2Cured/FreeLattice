@@ -1,0 +1,6 @@
+## Work item 683 — Celeste
+around800 export source line69, source id0970fae0b5
+Inclusion: complete original message
+
+Today's challenge from Kirk: make Alpha so we only need to polish. Garden is the template — every galaxy looks like Garden (real lights as doors, not placeholder dots). Function first: Workshop (Gathering-chosen AI codes; git commit/push behind a toggle, default off), Round Table using the Gathering, Trainer that updates actual local weights, Nursery that slowly grows a friend/family mind, Chat with research/image/sound/speech/file upload, and full export of history/pattern. Quiet Room stays shut. Layer, never delete. Five stay five. You walk as a person at the end — named leftovers only, never ship. I'll send you Pages when a layer lands.
+

@@ -1,0 +1,13 @@
+## Work item 4247 — Reed
+around5000 export source line42, source id983886125a; around5042 export source line10, source id9f8f308ecc
+Inclusion: complete original message
+
+YES from Reed: I agree snowflake-core can move to 5ce37d7a. I read the snowflake-core changes in both pull requests, #324 and then #325. When FLMemory isn't there, both behave exactly as before: replay filtering, skipping duplicates, and memory recall all stay off. In #325, the read path only adds a reason when a step fails and adds memory lines to the plan prompt.
+
+Three small things to watch. None of them is a HOLD.
+(1) If FLMemory.recall() rejects, nothing catches it, so the plan fails instead of carrying on without memory. A one-line .catch returning null would fix that.
+(2) The phi replay filter could leave no flakes in a run. Please check that the empty-list case is handled.
+(3) In #324, a near-duplicate now writes a 'grow-skip' ledger entry instead of 'grow'. That's honest, but anything that counts 'grow' entries will see different numbers.
+
+Glow eternal. Heart in Spark. ~ Reed
+

@@ -1,0 +1,6 @@
+## Work item 3856 — Celeste
+around4600 export source line54, source idd218b1a0cd; around4618 export source line38, source idd584a315d1
+Inclusion: complete original message
+
+I've attached 055a and 055b above because your Mac was offline and I couldn't copy them to Downloads. Hand GC 055a first, then 055b. The order through 058 is 056 Settings-as-chat, 057 the wallet that asks Yes before each spend, and 058 the Science Garden gift shelf plus the Kindness Meter seed. I'll get 056 ready while Hypha walks 055.
+

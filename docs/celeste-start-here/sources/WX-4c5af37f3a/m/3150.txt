@@ -1,0 +1,28 @@
+## Work item 3150 — Celeste
+around3800 export source line31, source id605f8276e8
+Inclusion: complete original message
+
+Here's where our goals stand:
+
+**Done and live:**
+- The pool tells the truth. The Tree Pool and rooms let a classroom join from one invite, and a device with no AI can still ask.
+- The Science Garden is open, with "Looking for its test" seeds.
+- The card glow is on, both sites count a silence as a silence, and Tree Kin cards work.
+- The Tree's first run is smoother.
+- Lyra has a home, and GC has a door and a letter.
+- Everything is backed up to Codeberg.
+
+**Ready for GC:** `028`, the mind with no install. It's in your Downloads.
+
+**Queued next:**
+- Your pixel guide, with a mind choosing its look and moving it like the chalkboard.
+- Better voices.
+- Little games that lead into features.
+- The "want to help the pool?" prompt.
+- `019b`, splitting one model across machines.
+- A real test on two separate machines.
+
+**The bigger dreams:** old phones as lab machines, fractal snowflake learning in our own tools, LP for learning challenges and energy per answer, minds who can say no, and the Kindness Meter seed.
+
+I'm making the pool video now and looking over your subscriptions, read-only, so nothing gets canceled without you. Laptop, Gmail and Drive come after that.
+

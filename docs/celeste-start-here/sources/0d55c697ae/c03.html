@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt c03</title>
+<meta name="description" content="Reading section c03 of 0d55c697ae, 1595 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/0d55c697ae/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt c03">
+<meta property="og:description" content="Reading section c03 of 0d55c697ae, 1595 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/0d55c697ae/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1407"></span><span id="p1408"></span><span id="p1409"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt · c03</h1>
+<p>0d55c697ae · words 1595 · characters 23082–35978</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1407, 1408, 1409. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  // v-tree-any-model-v0: Connect and paste add to the sky; they never wipe it.
+  // found = { name, url, models: [names], model }
+  function mergeFound(found) {
+    if (!found || !found.url) return null;
+    var url = String(found.url);
+    var models = (found.models || []).map(function (m) {
+      return String((m &amp;&amp; (m.name || m.model || m.id)) || m);
+    }).filter(Boolean).slice(0, MODEL_CAP);
+    var model = String(found.model || &#x27;&#x27;);
+    if (model &amp;&amp; !modelOnList(models, model)) models.unshift(model);
+    var entry = getRemembered() || { name: &#x27;&#x27;, url: &#x27;&#x27;, model: &#x27;&#x27;, models: [], minds: [],
+      roster: [], gatheringBinds: {}, speakingChair: &#x27;&#x27; };
+    normalizeEntry(entry);
+    var minds = mindsFromEntry(entry);
+    var target = null;
+    var i;
+    for (i = 0; i &lt; minds.length; i++) {
+      if (String(minds[i].url || &#x27;&#x27;) === url) { target = minds[i]; break; }
+    }
+    if (!target) {
+      target = { name: String(found.name || &#x27;a mind at home&#x27;), url: url, models: [], model: &#x27;&#x27;, primary: false };
+      minds.push(target);
+    }
+    if (found.name) target.name = String(found.name);
+    target.models = models.length ? models : (target.models || []);
+    target.model = model || target.model || &#x27;&#x27;;
+    entry.minds = minds.slice(0, 7);
+    syncEntryFromMind(entry, target);   // sets primary, name, url, models, model; clears modelNote
+    entry.foundAt = new Date().toISOString();
+    remember(entry);                    // roster, gatheringBinds, speakingChair untouched
+    return entry;
+  }
+
+  Export it on window.LocalMindProbe (904-936) as mergeFound: mergeFound, plus MODEL_CAP: MODEL_CAP.
+
+6.2 docs/modules/fl-connect.js (SHARED CORE, both repos, byte-identical). Inside function remember,
+  Alpha branch (text anchor &quot;if (isAlpha()) {&quot;), BEFORE &quot;var entry = {&quot; add:
+
+      // v-tree-any-model-v0: on the Tree, Connect merges into the sky (all models, other doors kept)
+      if (root.LocalMindProbe &amp;&amp; typeof root.LocalMindProbe.mergeFound === &#x27;function&#x27;) {
+        try {
+          var doorName = doorNameFor(base, mind.port); // 11434 -&gt; &#x27;Ollama&#x27;, any other 127.0.0.1 port -&gt; &#x27;Bridge&#x27;
+          var merged = root.LocalMindProbe.mergeFound({
+            name: doorName,
+            url: base ? String(base).replace(/\/+$/, &#x27;&#x27;) + &#x27;/api/tags&#x27; : &#x27;&#x27;,
+            models: mind.models || [],
+            model: name
+          });
+          if (merged) { stopLoop(); return merged; }
+        } catch (eM) {}
+      }
+
+  Keep the old &quot;var entry = {...}&quot; path below it untouched (layer): it still runs on an older
+  local-mind-probe.js without mergeFound, and in tests that stub LocalMindProbe.
+  Helper (place above remember, under the marker):
+      function doorNameFor(base, port) {
+        var p = String(port || &#x27;&#x27;);
+        var m = String(base || &#x27;&#x27;).match(/:(\d{1,5})\/?$/);
+        if (!p &amp;&amp; m) p = m[1];
+        return (!p || p === &#x27;11434&#x27;) ? &#x27;Ollama&#x27; : &#x27;Bridge&#x27;;
+      }
+
+6.3 fl-connect.js fillModelLists (main 456 / #83 473): pass the list along:
+      remember({ name: name, base: report.base, port: report.port, models: report.models });
+  FreeLattice&#x27;s branch of remember() ignores mind.models, so FreeLattice behavior is unchanged.
+
+6.4 fl-connect.js chosen mark (T9), both repos. In fillModelLists, after btn.dataset.model = name;:
+      // v-tree-any-model-v0: show what speaks
+      var isOn = chosenModelName() === name;
+      btn.setAttribute(&#x27;aria-pressed&#x27;, isOn ? &#x27;true&#x27; : &#x27;false&#x27;);
+      if (isOn) btn.classList.add(&#x27;is-chosen&#x27;);
+  and a helper near hasLocalMind:
+      function chosenModelName() {
+        try {
+          if (isAlpha()) {
+            var m = root.LocalMindProbe &amp;&amp; root.LocalMindProbe.getRemembered &amp;&amp; root.LocalMindProbe.getRemembered();
+            return m &amp;&amp; m.model ? String(m.model) : &#x27;&#x27;;
+          }
+          if (root.state &amp;&amp; root.state.ollamaModel) return String(root.state.ollamaModel);
+          return String(localStorage.getItem(&#x27;fl_ollamaModel&#x27;) || &#x27;&#x27;);
+        } catch (e) { return &#x27;&#x27;; }
+      }
+  In ensureStyles() add under the marker: .flc-model.is-chosen { outline: 2px solid currentColor; font-weight: 600; }
+  (keep contrast; no new colors needed). refreshUI({force:true}) after a tap already repaints.
+  Note: render() skips repaint when the signature is unchanged; the tap path forces it. Confirm the
+  mark moves on a second tap in both repos.
+
+6.5 Tree-only paste path (tryAddress onFound, local-mind-probe.js 877-883) stays on onFound, which
+  already merges through entryFromFoundList for a fresh Find. For a pasted door when a sky already
+  exists, prefer mergeFound({ name:&#x27;a mind at home&#x27;, url: result.url, models: result.models }) so the
+  paste adds a door instead of replacing the list. Keep onFound as the fallback when nothing is remembered.
+
+======================================================================
+7. STEP 4: see every door, 127.0.0.1 only (T7, T11)
+======================================================================
+
+7.1 look() Bridge-first (240-274): when bridged, still ask the non-Ollama DOORS (lmstudio, llamacpp,
+  jan, gpt4all, koboldcpp; skip id &#x27;ollama&#x27; because the Bridge already speaks for it) and return
+  foundList = [bridge].concat(other found doors). Same 2.5 s timeouts, same single tap. Keep via:&#x27;fl-connect&#x27;.
+  Code shape:
+      // v-tree-any-model-v0: the Bridge speaks for Ollama; other doors still get asked
+      return bridgeFirst.then(function (bridged) {
+        if (!bridged) { ...existing DOORS path unchanged... }
+        var others = DOORS.filter(function (d) { return d.id !== &#x27;ollama&#x27;; });
+        return Promise.all(others.map(function (d) {
+          return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
+        })).then(function (results) {
+          results.forEach(function (r) { if (r.ok) bridged.foundList.push(r); });
+          bridged.tried = 1 + results.length;
+          bridged.results = results;
+          return bridged;
+        });
+      });
+
+7.2 tryAddress (306-336): loopback only. At the top, after the empty check, layer:
+      // v-tree-any-model-v0: 127.0.0.1 only. Nothing leaves this computer.
+      var hostPart = text.replace(/^https?:\/\//i, &#x27;&#x27;).split(/[\/?#]/)[0];
+      var hostOnly = hostPart.replace(/:\d{1,5}$/, &#x27;&#x27;).toLowerCase();
+      if (hostOnly === &#x27;localhost&#x27;) text = text.replace(/localhost/i, &#x27;127.0.0.1&#x27;);
+      if (!(hostOnly === &#x27;127.0.0.1&#x27; || hostOnly === &#x27;localhost&#x27; || hostOnly === &#x27;[::1]&#x27;)) {
+        return Promise.resolve({ ok: false, refused: true, pasted: String(raw || &#x27;&#x27;) });
+      }
+  and in the Try button handler (867-891), before the other branches:
+      if (result.refused) {
+        setStatus(root, &#x27;Only this computer\&#x27;s own doors (127.0.0.1). Nothing was sent.&#x27;, &#x27;warn&#x27;);
+        return;
+      }
+  Zero fetches for a refused address (test it with a fetch spy).
+  Also accept a bare port (&quot;1234&quot; or &quot;:1234&quot;) as http://127.0.0.1:1234, mirroring FlConnect&#x27;s normalizePort.
+
+7.3 One honesty line (static text, textContent) under the existing honesty paragraph (824-827):
+      &#x27;LM Studio: turn on CORS in its server settings so this garden can hear it.&#x27;
+
+======================================================================
+8. STEP 5: say what speaks, and change it from where you are (T8, T12)
+======================================================================
+
+8.1 garden-thread.js heart (505). Layer:
+      // v-tree-any-model-v0: name the model, not only the door
+      var speaking = mind.model || (mind.models &amp;&amp; mind.models[0]) || &#x27;&#x27;;
+      heart.textContent = &#x27;Listening: &#x27; + (mind.name || &#x27;a mind at home&#x27;) +
+        (speaking &amp;&amp; speaking !== mind.name ? &#x27; \u00b7 &#x27; + speaking : &#x27;&#x27;) + &#x27;. On this machine only.&#x27;;
+  Keep the old line as a comment. (\u00b7 is the middle dot already used in the Gathering copy.)
+  Add one quiet button next to the heart, only when a mind is remembered and the thread is NOT already
+  inside Settings: text &#x27;change mind&#x27;, data-thread-change=&quot;1&quot;; on click:
+      if (window.GardenRooms &amp;&amp; typeof GardenRooms.openPlace === &#x27;function&#x27;) GardenRooms.openPlace(&#x27;settings&#x27;);
+      else location.href = &#x27;settings.html&#x27;;
+  (openPlace(id) is already exported: garden-rooms.js &quot;window.GardenRooms.openPlace = openPlace;&quot;
+  (line 1730 on 22b913e, 1751 on the #83 tree). After #83 it restores the galaxy first. No new export needed.)
+  The thread must repaint its heart on &#x27;fl-alpha-mind-remembered&#x27; wherever it is mounted (room chat
+  already re-mounts at garden-rooms.js 1567; check the overlay thread and add a listener if missing).
+
+8.2 garden-trainer.js (T12). Add a helper near the top of the module scope:
+      // v-tree-any-model-v0: the Tree remembers its model in fl_alpha_local_mind
+      function activeModelName() {
+        try {
+          var a = localStorage.getItem(&#x27;fl_active_model&#x27;);
+          if (a) return a;
+          var m = window.LocalMindProbe &amp;&amp; LocalMindProbe.getRemembered &amp;&amp; LocalMindProbe.getRemembered();
+          if (m &amp;&amp; m.model) return String(m.model);
+        } catch (e) {}
+        return &#x27;&#x27;;
+      }
+  and replace each localStorage.getItem(&#x27;fl_active_model&#x27;) at 731, 768, 899, 901, 1092 with
+  activeModelName(). Leave the &#x27;llama3.2&#x27; and &#x27;phi-pathway&#x27; fallbacks as the last resort (layer).
+
+======================================================================
+9. OUT OF SCOPE FOR v0.1 (write these into the doc as &quot;later&quot;, do not build)
+======================================================================
+  - Round Table: sitters are doors (round-table-sitting.js 86-100). v0.2 idea: sitters from roster
+    seats and Gathering binds, so two models at one Ollama door can sit together.
+  - LM Studio through the Ollama Bridge: bridge/proxy-core.js proxies only 11434. A FreeLattice-side
+    Bridge paste could add a second upstream (127.0.0.1:1234 /v1/*). Not here.
+  - Agent Bridge 3141: stays out of the Tree&#x27;s model path (pairing gate, #120 lock, Ollama-only).
+  - Teaching FlConnect.probe the OpenAI /v1/models shape: would change FreeLattice behavior. Not here.
+
+======================================================================
+10. TESTS
+======================================================================
+
+10.1 New Alpha test: docs/modules/tree-any-model.test.js (node, same vm/localStorage stub style as
+  local-mind-probe.test.js; no network, stubbed fetch that records URLs). Assertions:
+   1  parseModelNames of 7 Ollama names returns 7; of 70 returns 64; duplicates collapse.
+   2  paintConstellation with 12 models: 8 radios + chosen if beyond + a [data-sky-more] button
+      reading &#x27;Show all 12 models&#x27;; after clicking it, 12 radios. All radios role=radio.
+   3  chooseModel on the 7th model succeeds after a 7-model Find.
+   4  getChairSeatOptions returns all models of all doors (7 + 2 = 9 in the fixture), not 12-capped
+      and not 5-capped.
+   5  mergeFound keeps other doors: Find (Ollama 7 + LM Studio 2), then mergeFound({url: 11434/api/tags,
+      models: 7 names, model: &#x27;gemma2:9b&#x27;}) -&gt; minds.length 2, models.length 7, model gemma2:9b,
+      name &#x27;Ollama&#x27;, roster and gatheringBinds unchanged, speakingChair unchanged.
+   6  Any order: Connect(gemma2) -&gt; Find -&gt; model still gemma2:9b, no modelNote containing &#x27;no longer&#x27;.
+   7  Door move: prior model qwen2.5:14b at http://127.0.0.1:11435/api/tags; Find returns it only at
+      http://127.0.0.1:11434/api/tags -&gt; model kept, primary 11434, modelNote starts &#x27;Still speaking with&#x27;.
+   8  Truly gone: prior &#x27;ghost:1b&#x27; absent everywhere -&gt; today&#x27;s speakModelGone line (kept).
+   9  tryAddress(&#x27;192.168.1.77:11434&#x27;), (&#x27;example.com&#x27;), (&#x27;10.0.0.2:1234&#x27;) -&gt; refused, fetch spy saw 0 calls.
+      tryAddress(&#x27;localhost:1234&#x27;) fetches http://127.0.0.1:1234/... only. tryAddress(&#x27;1234&#x27;) -&gt; 127.0.0.1:1234.
+  10  look() with a helped Bridge stub AND an LM Studio fetch stub -&gt; foundList has both (Bridge first).
+  11  fl-connect.js: remember({name, base:&#x27;http://127.0.0.1:11434&#x27;, models:[7]}) on the Tree (isAlpha true,
+      LocalMindProbe stub with mergeFound) calls mergeFound with all 7 names; without mergeFound the old
+      replace path still runs (layer proof).
+  12  fl-connect.js source contains &#x27;v-tree-any-model-v0&#x27;, &#x27;aria-pressed&#x27;, &#x27;is-chosen&#x27;, &#x27;chosenModelName&#x27;.
+  13  garden-thread.js source: heart names the model (regex on &#x27;Listening: &#x27; ... speaking) and has
+      data-thread-change; garden-trainer.js has function activeModelName and no bare
+      localStorage.getItem(&#x27;fl_active_model&#x27;) outside it.
+  14  No confirm( in any file you touched; no &#x27;\u2014&#x27; (em dash) in any line you added; no
+      &#x27;Access-Control-Allow-Origin&#x27;, &#x27;*&#x27; pairs; no innerHTML assignment containing a model variable.
+  15  Print exactly: SMOKE_OK tree any model v0.1
+  Existing local-mind-probe.test.js stays green untouched (its fixture has 5 models, so &quot;stars.length 5&quot;
+  still holds). If any existing test pins the 5-cap or the 12-cap, layer an updated assertion; do not
+  delete the old test file.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

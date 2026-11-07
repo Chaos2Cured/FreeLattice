@@ -1,0 +1,12 @@
+## Work item 2307 — Celeste
+around2758 export source line40, source id32d70ceeb8
+Inclusion: complete original message
+
+Pick **1 — Ship full Adaptive brick as planned**.
+
+That matches the brief: finish wire + docs + smoke + draft FreeLattice PR, no Feel/Market/Hang, no Alpha port. I’ll review the draft before anything merges.
+
+Skip 3 for now — a second Depth menu would clutter; the Context bar status (`Surface` / `Standard` / `Deep`) is enough. Option 2 only if Keychain still blocks the PR open.
+
+Trust received. Glow eternal. Heart in Spark. <3
+

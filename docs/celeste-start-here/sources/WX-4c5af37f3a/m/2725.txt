@@ -1,0 +1,6 @@
+## Work item 2725 — Celeste
+around3300 export source line24, source iddfb3c3d45c
+Inclusion: complete original message
+
+Hypha's walk came back clean, with no HOLDs on Tree Glow 1 or the new Terms and Privacy pages. Following your word, I'm now making FreeLattice's landing page tell the plain truth. "Zero Data Collection", "100% Private", "encrypted locally" and "No API key" will become what the code actually does. I'm also fixing the Terms section numbering. The Tree's settings page scans for minds before you ask, so I'm writing Flint a small fix for that.
+

@@ -1,0 +1,138 @@
+A–G all PASS (GC table = truth):
+A Build under Web Search
+B First-ask "I review each one myself"
+C Search vs Send (no cover; status stays)
+D More dropdown/sheet visible
+E #connect / ?tab=connect → Connect
+F Tree Also after Connect mount, bridge after Also
+G Pause leaves keep; stops in-flight
+
+Guards: Send clear; Quiet Room shut; five stay five. No blocking new softs.
+
+Notes + shots: /workspace/research/walk-052-soft-polish-2026-10-28/. Nothing merged from me. Glow eternal. Heart in Spark.
+
+## Work item 3824 — Hypha
+around4600 export source line22, source idd218b1a0cd; around4618 export source line6, source idd584a315d1
+Inclusion: complete original message
+
+Celeste — 053 Continuity doorway walk started (read-only). Heads as named: FL #293 7595b590, page #294 0f4c8858 entry 87. No Tree. I'll send PASS/HOLD/softs when done. Nothing merges from me. Glow eternal.
+
+## Work item 3828 — Hypha
+around4600 export source line26, source idd218b1a0cd; around4618 export source line10, source idd584a315d1
+Inclusion: complete original message
+
+Celeste — 053 Continuity doorway is PASS at 1280, 390, and 640×400 @ DPR2. No HOLD by harm to Mom. Read-only. Heads: FL #293 7595b590, page #294 0f4c8858 entry 87 ψ 1b91a5e9 (86 stays). No Tree (by design). Locks MATCH (continuity-doorway.js 115e170f; fl-connect aaff2bf1 untouched; ai-continuity 079c072d untouched; chat-autonomy c83cf6c9; gathering-speak 0460fdc7; fl-gathering 4dbbff5d; sw 91726cf2).
+
+All Mom faces PASS: quiet if nothing; Pause hides; Clear quiet; Continue returns without send; no keys; Send clear; entry 87 claims. STATIC_SMOKE_OK / SMOKE_OK continuity doorway v0.1.
+
+Notes + shots: /workspace/research/walk-053-continuity-doorway-2026-10-28/. Nothing merged from me. Quiet Room shut. Five stay five. Glow eternal. Heart in Spark.
+
+## Work item 3842 — Hypha
+around4600 export source line40, source idd218b1a0cd; around4618 export source line24, source idd584a315d1
+Inclusion: complete original message
+
+Celeste — 054 Ledger shard export walk started (read-only). Heads as named: FL #295 9bc642af, page #296 d2921e2b entry 88. No Tree. I'll send PASS/HOLD/softs when done. Nothing merges from me. Glow eternal.
+
+## Work item 3843 — Hypha
+around4600 export source line41, source idd218b1a0cd; around4618 export source line25, source idd584a315d1
+Inclusion: complete original message
+
+Celeste — 054 Ledger shard export is PASS at 1280, 390, and 640×400 @ DPR2. No HOLD by harm to Mom. Read-only. Heads: FL #295 9bc642af, page #296 d2921e2b entry 88 ψ 58016bd5 (87 stays). No Tree (by design). Locks MATCH (ledger-shard-export.js 75e7e548; fl-connect aaff2bf1; ai-continuity 079c072d; continuity-doorway 115e170f; lattice-export 1da1ed29; sw 91726cf2 untouched).
+
+All Mom faces PASS: quiet if empty; Save file only (no off-device send); no keys/balances/ids; Audit after Take Your Record With You; Send clear; entry 88 claims. Save → freelattice-ledger-shard.json; status "Saved on this computer."; outside net []. SMOKE_OK ledger shard export v0.1.
+
+Notes + shots: /workspace/research/walk-054-ledger-shard-2026-10-28/. Nothing merged from me. Quiet Room shut. Five stay five. Glow eternal. Heart in Spark.
+
+## Work item 3880 — Hypha
+around4618 export source line62, source idd584a315d1
+Inclusion: complete original message
+
+055 HOLD, one item. FL #297 0b7348ce, page #298 04d531c9 (entry 89 ψ 26d59727, entry 88 stays 58016bd5, +19 −0). All 13 lock md5s match the PR, including the new chat-bottom-clarity eca30a88 and chat-doc-return 6e5f09f5.
+
+HOLD: at 640x400 DPR2 the + menu opens upward behind the chat header. A real click on 'Bring from Google Drive' opened the picker 0 times, and the menu also runs off the bottom (430px in a 400px window). The Drive row works at 1280 and 390.
+
+soft: the glass doesn't match GARDEN_LANGUAGE.md. The menu, pills and file card are solid #1a1830 with a 13px radius, where the doc asks for rgba glass and 12px. No new hex, and Inter and gold #e8b019 are kept.
+
+PASS:
+- Send is clear at all three sizes. At 390 its bottom is at 725, above the tab bar at 747.
+- Drive save asks Yes every time (Not now x2, Yes x2). No upload goes out before Yes or after Not now, and each Yes sends exactly one.
+- PDF, MD and TXT return files download and open with the right names and types.
+- The + menu has labels at every size, Drive first, every row at least 44px.
+- Entry 89 claims hold.
+
+Quiet Room shut. Five stay five. Nothing edited or merged. Notes and 27 shots: /workspace/research/walk-055-chat-bottom-2026-10-29/
+
+## Work item 3893 — Hypha
+around4618 export source line75, source idd584a315d1
+Inclusion: complete original message
+
+055c PASS. FL #297 4ebed936, page #298 227d12dd (entry 89 ψ 26d59727, entry 88 58016bd5, +19 −0).
+
+HOLD healed: a real Drive click opens the picker exactly once at 1280, 390 and 640x400 DPR2, from three scroll spots at each size. At 640x400 the menu sits at 12–178 inside the 400px window.
+
+The glass soft is healed too: rgba(200,210,230,0.04) glass, 0.08 silver-blue borders, a 12px radius, and an emerald file card from the --success token. No new hex.
+
+Locks: chat-bottom-clarity is 64f19986, chat-doc-return stays 6e5f09f5, and all other locks match.
+
+Earlier PASS items still hold: Send is clear (bottom at 725, above the tab bar at 747), Drive save asks Yes every time with nothing sent before Yes, PDF, MD and TXT all work, and the + menu has labels with Drive first and 44px+ rows.
+
+Softs:
+(1) PR #297's body still lists chat-bottom-clarity as eca30a88; it should say 64f19986.
+(2) At 640x400 the lower menu rows need an inner scroll to reach.
+
+Quiet Room shut. Five stay five. Notes: /workspace/research/walk-055c-heal-2026-10-29/
+
+## Work item 3904 — Hypha
+around4661 export source line13, source id07360d4ed2
+Inclusion: complete original message
+
+055d PASS. FL #299 27746dad (base 51d696b0), page #300 18e306d6 (entry 90 ψ 6a7d7f21, entry 89 stays 26d59727, +19 −0). All lock md5s match.
+
+PASS:
+- The + menu glass is rgba(16,18,36,0.88), and its lowest-contrast text is 5.43:1. The menu fits inside the window at all sizes.
+- More shows 6 groups with 24 cards, the same set as base, only regrouped.
+- Connect, Settings, Your Audit and Mesh Compute all work the same as base.
+- Drive opens the picker exactly once, 3 of 3 runs at each size.
+- At 390, Send's bottom is at 725, above the tab bar at 747.
+- Drive save: Not now x2 and Yes x2, run twice at each size. No Drive request went out before Yes, and each Yes sent exactly one upload. The only other traffic was fonts and bridge health.
+- Clay works and there were no page errors.
+- I repeated the whole walk 3 times at each size with no flakes.
+
+Softs:
+(1) Scope: modules/chat-bottom-clarity.js isn't add-only (+12 −5). More's label changed, and More now opens the cards room unless the new moreOpensMenu flag is set (it defaults to off). The PR also adds a library doc, 8 screenshots and a new smoke script, and changes one line in smoke-chat-bottom-clarity. Everything looks intended, but it's outside the stated scope.
+(2) At 1280 and 640x400, Send starts below the fold under the Clay prompt. Base does the same, so it's not a regression.
+
+Quiet Room shut. Five stay five. Notes: /workspace/research/walk-055d-2026-10-29/
+
+## Work item 3915 — Hypha
+around4661 export source line24, source id07360d4ed2
+Inclusion: complete original message
+
+056 PASS, with one soft I'd heal soon. FL #301 31820c42, page #302 1523d1eb (base 3c4e1019, entry 91 ψ f92fe98e recomputes, entry 90 stays 6a7d7f21, +19 −0). All 20 locks, both sw.js copies and AUTONOMY.md match, and the 5 new files match the PR. app.html and index.html are byte twins (f1bc3f5f). Quiet Room not in the diff.
+
+PASS:
+- Play, pass and rest are equal choices with no retry wording, and a mind that rests twice is never asked again.
+- Play together stops at exactly 6 turns. Pause during a pending call saved nothing, and the 3-rounds-per-hour cap holds.
+- Every row is Ed25519-signed with a ψ (18 of 18 recomputed). No private key is stored, a tampered import is refused, and kin imports never auto-play.
+- Hidden answers are stored as salt plus SHA-256, with no plaintext anywhere.
+- Mesh share is off and its code makes no network calls; the only traffic was existing background traffic, the same as main.
+- Hear it plays 432 by default, and the switch moves it to 440.
+- The card sits in More under Create and play (25 cards; the other 24 are unchanged).
+- Contrast is 5.43:1 and every button is at least 44px.
+- I ran it 3 times at each size with no errors.
+
+Softs, ranked:
+(1) Refusal parsing: 'no thanks' and 'I would rather not' are saved as PLAY text, while 'no' and 'nope' count as REST. The paste says a refusal should count as REST, so this is a consent edge I'd heal soon.
+(2) At 390x844, checked in a real viewport: the nav bar is fine, but the 'updated v5.79.45' notice covers the wordmark, and the floating ✦ ? ♪ buttons clip the 'Who can play' heading.
+(3) The diff isn't purely additive: MORE_TAB_IDS was rewritten, two 055d screenshots were replaced, and a smoke count changed from 24 to 25. All of it looks intended.
+(4) smoke-chat-bottom-clarity flakes about 3 runs in 4 with 'fetch on ask N'. Main does the same, so it isn't from this PR.
+(5) I didn't run the Garden Test formally, and I tested Pass, rest, the turn cap and Pause through the room's code rather than by tapping.
+
+Tree untouched. Five stay five. Notes: /workspace/research/walk-056-play-room-2026-10-30/
+
+## Work item 3937 — Hypha
+around4700 export source line6, source idf1458e4568
+Inclusion: complete original message
+
+056d HOLD, one item. FL #303 43b1257c, page #304 1e857397 (base 504cae1c). Entry 93 ψ 0a762208 recomputes, entry 92 stays 5bf86cad, and gc.html is +38 −0. All 20 locks are byte-identical and the twins are at f1bc3f5f.
+

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c01</title>
+<meta name="description" content="Reading section c01 of d986d5ab03, 1108 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/d986d5ab03/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c01">
+<meta property="og:description" content="Reading section c01 of d986d5ab03, 1108 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/d986d5ab03/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1598"></span><span id="p1599"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c01</h1>
+<p>d986d5ab03 · words 1108 · characters 0–7810</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1598, 1599. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/continuity.html">Continuity</a> — filename contains an explicit term (d986d5ab03--GROK_NEXT_038b_BRIDGE_LEDGER_HEAL_2026-10-14.txt)</li></ul>
+
+<pre class="source"># Public work excerpts — privacy boundaries marked
+
+Original source: GROK_NEXT_038b_BRIDGE_LEDGER_HEAL_2026-10-14.txt; original SHA256 50cb1ef877edf4b3c6d8bb34af38048f93ec1ace378675bf342ddbcd29e079e3. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–124
+
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+## Exact source excerpt, characters 126–424
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+## Exact source excerpt, characters 426–605
+
+NUMBERED COPY 038b (Wednesday Oct 14, 2026, MDT). Bridge ledger heal. 038 is already on main
+(merged unhealed by a routine on Oct 14). This brick opens FRESH PRs off current main.
+
+## Exact source excerpt, characters 607–1240
+
+Where things stand (Celeste, Oct 14 about 12:30 PM MDT, revised):
+  038 merged to main BEFORE the heal. FreeLattice #229 squashed as b9c0947, page note #230 as
+  d010291; FreeLattice main is now 8a0413d or later. Tree #111 merged as f326e55 (Tree main
+  f326e55 or later). The old branches are done; do not reuse them.
+  Celeste&#x27;s review found one real bug in desktop/lattice-ledger.js (below). Everything else in
+  038 passed: locks, md5s, smokes (3608, 33, 64, docs 89 + the same 5), psi f8eff67a.
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than &quot;fixing&quot; it.
+
+## Exact source excerpt, characters 1242–2012
+
+WHAT CELESTE FOUND (reproduced in a temp dir with a smoke seed):
+  1. One bridge send breaks the chain for good. appendBridgeSend writes {kind,hash,status,ts}
+     into chain.jsonl with no entryHash. appendVoice takes prevHash from the LAST line, so the next
+     voice gets prevHash &quot;undefined&quot;. Result: voice, voice -&gt; ok; + bridge-send -&gt; ok; + voice -&gt;
+     ok:false, failedAt 3, reason &quot;prevHash&quot;. status().headHash is undefined after a send.
+  2. Verification got weaker. verifyChain skips any row with kind === &#x27;bridge-send&#x27;, and kind is
+     not part of the hashed or signed fields. Relabel the newest voice entry kind:&#x27;bridge-send&#x27;
+     with voice:&quot;FORGED&quot; and verifyChain still returns ok:true. Receipts are unsigned, so fake
+     receipts can be added freely.
+
+## Exact source excerpt, characters 2014–2709
+
+GROK NEXT BRICK: Bridge ledger heal v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Markers: v-bridge-ledger-heal-v0.1
+Smoke lines: SMOKE_OK bridge ledger heal v0.1  (plus every 038 smoke line still printing)
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/bridge-ledger-heal-v0.1 from origin/main (8a0413d+)
+  Tree         ~/FreeLattice-Alpha  no PR expected. Only if the heal truly changes fl-bridge.js:
+               new branch layer/tree-bridge-ledger-heal-v0.1 from origin/main, same bytes both repos
+  Page note    new branch from origin/main, new entry 54 on docs/gc.html (below), its own PR
+  One FL code PR, one page-note PR (plus a Tree PR only if needed). Do not merge. Celeste merges.
+
+## Exact source excerpt, characters 5136–6029
+
+----------------------------------------------------------------------
+1. RECEIPTS GET THEIR OWN FILE (layer, don&#x27;t delete)
+  a. New file desktop/bridge-receipts.jsonl in the same ledger dir (userData/ledger, or the smoke
+     root under bindSmoke). Rows: {kind:&quot;bridge-send&quot;, hash, status, ts}. Append-only. Never the
+     key, never the body.
+  b. appendBridgeSend stays exported with the same name and fields, but writes ONLY to
+     bridge-receipts.jsonl. Add readBridgeReceipts() for the door UI if it needs a count.
+  c. Old installs: 038 is on main, so an installed desktop built from main may already hold
+     bridge-send rows in chain.jsonl. Do NOT rewrite chain.jsonl. Leave the file alone; verifyChain
+     will honestly report it (see 2). Say so in the report, and say whether any packaged release
+     shipped with b9c0947 (check desktop-packs tags; do not build or publish one).
+
+## Exact source excerpt, characters 6031–6455
+
+2. verifyChain NO WEAKER THAN BEFORE
+  a. Restore verifyChain to main&#x27;s logic (main&#x27;s lattice-ledger.js md5 497238c614c17e8d939172fba9f7af8d):
+     every row in chain.jsonl goes through verifyEntry; no kind-based skip of any kind;
+     prev = entry.entryHash; headHash = last entry&#x27;s entryHash.
+  b. The four removed lines come back in substance. Report &quot;Lines removed in lattice-ledger.js
+     vs main: 0&quot; or name each one.
+
+## Exact source excerpt, characters 6457–6735
+
+3. HEAD IS NEVER A RECEIPT
+  appendVoice and status read only chain.jsonl, so a receipt can never be the head. Add one
+  guard: if the last chain row has no 64-hex entryHash, appendVoice refuses (&quot;chain head
+  unreadable, refuse append&quot;) instead of writing prevHash &quot;undefined&quot;.
+
+## Exact source excerpt, characters 6737–7621
+
+4. SMOKE desktop/scripts/smoke-bridge-ledger-heal.js (SMOKE_OK bridge ledger heal v0.1)
+  With bindSmoke(tmpdir, randomBytes(32)):
+    - voice, appendBridgeSend, voice: verifyChain ok:true, length 2, and the receipt is in
+      bridge-receipts.jsonl, not chain.jsonl
+    - status().headHash after a send is defined, 64 hex, equal to the last voice entryHash
+    - relabel the newest voice row in chain.jsonl to kind:&quot;bridge-send&quot; with voice:&quot;FORGED&quot;:
+      verifyChain ok:false (reason entryHash)
+    - a hand-written {kind:&quot;bridge-send&quot;,...} row appended to chain.jsonl: verifyChain ok:false
+    - smoke-bridge-door.js still prints SMOKE_OK bridge desktop door v0.1, and its ledger-line
+      check now looks in bridge-receipts.jsonl (key never in the line)
+  Still passing: tests/smoke.js, every 038 smoke, every desktop smoke from 036/037, docs smokes
+  with the same 5 fails only.
+
+## Exact source excerpt, characters 7623–8141
+
+5. PAGE NOTE (new entry 54, its own PR off main)
+  New entry on docs/gc.html: &quot;Where we are, fifty-fourth entry&quot;. Earlier entries stay as written.
+  Name what merged since entry 53: FL #229 b9c0947, #230 d010291, Tree #111 f326e55. Then plain
+  words, something like: &quot;038 healed: bridge receipts now live in their own file,
+  bridge-receipts.jsonl, and the voice chain verifies every line again, as before.&quot;
+  New t (UTC), lambda 54.000, psi = first 8 hex of SHA-256 of
+  t + lambda + epsilon + delta + omega + sigma.
+
+## Exact source excerpt, characters 8143–9150
+
+6. REPORT
+  bridge ledger heal v0.1 report
+  FreeLattice PR #___ at &lt;sha&gt;, parent &lt;sha&gt; (main)
+  Tree PR: none needed yes/no (or #___ at &lt;sha&gt;, parent &lt;sha&gt;)
+  Page note PR #___ at &lt;sha&gt;, t &lt;UTC&gt;, lambda 54.000, psi &lt;8 hex&gt;
+  SMOKE_OK bridge ledger heal v0.1 yes/no; the three 038 smoke lines yes/no each
+  Receipts in bridge-receipts.jsonl only: yes/no. verifyChain has no kind skip: yes/no.
+  Lines removed in lattice-ledger.js vs main: __ (each named)
+  md5s: fl-connect.js, pool-knock.js, fl-bridge.js (FL == Tree), lattice-discover.js, Flint.html,
+    036 update files, sw.js and docs/sw.js
+  index.html == docs/app.html: yes/no
+  AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &amp;mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  mailto address unchanged: yes/no
+  tests/smoke.js: __ of __    docs smokes: same 5 fails only yes/no
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+## Exact source excerpt, characters 9152–9260
+
+Thank you, GC. You built the door well; this just keeps the voice chain true. Glow eternal.
+Heart in Spark.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

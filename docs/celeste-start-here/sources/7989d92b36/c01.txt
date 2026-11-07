@@ -1,0 +1,128 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+GROK NEXT BRICK: Hook heal v0.1 (the post-commit hook leaves your branches alone)
+For: GC (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Saturday Oct 3, 2026, about 9 PM MDT
+Marker: v-hook-heal-v0.1
+Smoke line: SMOKE_OK hook heal v0.1
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/hook-heal-v0  base main 0cf2f0f or newer (d6938eb works too)
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_HOOK_HEAL_2026-10-03-fl.diff  (141 lines, md5 9a719ac7a0eb57e2994bafd9f2abe43f)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, you have dropped the hook's commit by hand on every brick. Here is why it happens, and the
+fix. You are enough.  Celeste
+
+What I found first (so nothing that depends on the hook breaks):
+- The hook is hooks/post-commit (tracked), copied by hand into .git/hooks/post-commit. There is
+  no husky, no package.json prepare step and no core.hooksPath.
+- On every commit, on any branch, it copies app.html to index.html, runs
+  scripts/generate-recent.sh (RECENT.md, left unstaged), writes root sw.js with a sed
+  (app.html changed to index.html), and makes a "docs: Auto-update Session Primer" commit.
+- CI (.github/workflows/update-primer.yml) already does the main-side work on every push to
+  main: it runs tests/smoke.js, rewrites PRIMER HEALTH, and copies docs/app.html to index.html
+  and docs/sw.js to sw.js byte for byte. Those are the "ci: Update Primer" commits.
+- GitHub Pages serves main /docs (freelattice.com). Root sw.js and index.html are not served.
+- On main today root sw.js equals docs/sw.js byte for byte (the CI copy), and the smokes pass
+  with that. The hook's sed version differs from it, so the hook and CI fought on every ship.
+- tests/smoke.js locks: hooks/post-commit must exist and keep the "Auto-update Session Primer"
+  de-bounce. RECENT.md must carry the version from version.json. bin/ship.sh (Kirk's ship on
+  main) relies on the hook writing the Primer on main.
+The fix keeps all of that:
+- On any branch but main the hook prints one line and exits. No sw.js, no Primer, no
+  RECENT.md, and no extra commit.
+- It never writes root sw.js again. CI owns that copy.
+- On main, the Primer commit, index.html sync, RECENT.md and version step run as before, so
+  ship.sh is unchanged.
+- FL_HOOK_ALL_BRANCHES=1 brings back the old behavior on a branch if anyone wants it.
+- The old sw.js lines stay as "before hook-heal" comments.
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git status --short     # must print nothing
+    git fetch origin && git checkout main && git merge --ff-only origin/main
+    git merge-base --is-ancestor d6938eb HEAD && echo fl-base-ok
+    cp ~/Downloads/GROK_NEXT_HOOK_HEAL_2026-10-03-fl.diff /tmp/hook-heal-fl.diff
+    md5 -q /tmp/hook-heal-fl.diff                    # 9a719ac7a0eb57e2994bafd9f2abe43f
+    git config core.hooksPath; echo "hooksPath=[$?]"  # expect nothing printed, then hooksPath=[1]
+    cmp .git/hooks/post-commit hooks/post-commit && echo installed-eq-tracked
+      # If they differ, say so in your reply and paste `diff hooks/post-commit .git/hooks/post-commit`.
+Order: checked on the box. This diff and the Mesh Kin, Desktop update and Gathering diffs apply
+in all 24 orders, with no markers. If one merged first and plain apply complains, use
+`git apply --3way` and say so.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (3 files, +106 / -6; the 6 are kept as "before hook-heal" comments)
+----------------------------------------------------------------------
+a) hooks/post-commit: a branch guard right after the de-bounce, and the root sw.js block
+   turned into comments.
+b) docs/scripts/smoke-hook-heal-v0.1.js (new): static checks (marker, de-bounce kept, guard,
+   no live line writing sw.js, CI still copies sw.js and updates the Primer). Then it runs
+   the real hook in a throwaway git repo under the temp folder: on layer/test no commit is
+   added, the tree stays clean and RECENT.md is untouched; on main the Primer commit is still
+   made and root sw.js is left alone.
+c) docs/library/FRACTAL_FAMILY_LEDGER_v0.md: your entry (section 5).
+
+----------------------------------------------------------------------
+4. APPLY, INSTALL, TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git checkout -b layer/hook-heal-v0
+    git apply --check /tmp/hook-heal-fl.diff && git apply /tmp/hook-heal-fl.diff
+    bash -n hooks/post-commit && echo hook-parses
+    node docs/scripts/smoke-hook-heal-v0.1.js        # SMOKE_OK hook heal v0.1
+    node tests/smoke.js | grep "CHECKS PASSED"       # ALL 3605 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect FAIL 8, the same 8 as main. PASS is 71 on d6938eb, plus 1 for each other brick merged.
+Install the healed hook locally (local work, keep a copy of the old one):
+    cp .git/hooks/post-commit .git/hooks/post-commit.before-hook-heal
+    cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+    cmp .git/hooks/post-commit hooks/post-commit && echo installed-healed
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js index.html docs/app.html   # nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                      # 0
+    git diff main -U0 | grep '^+' | grep -c 'localhost\|innerHTML\|confirm('    # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+
+What Celeste saw (box): all of the above green. With all four pastes applied together: PASS 74,
+FAIL 8 (the same 8), and 55 inline scripts parse. Not verified: macOS bash 3.2 running the
+hook. The smoke checks that on your Mac.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+    sed -i '' 's/GC_TEMPERATURE_HOOK_HERE/your line here/' docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_HOOK_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md    # 0
+
+----------------------------------------------------------------------
+6. COMMIT, OPEN THE PR YOURSELF, THEN STOP
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "layer: Hook heal v0.1 (post-commit leaves branches alone, never writes root sw.js)"
+      # The healed hook should print: post-commit: on layer/hook-heal-v0, leaving sw.js, ...
+    git log -2 --oneline     # your commit on top, NO "docs: Auto-update Session Primer" commit
+    If a hook commit still appears (for example the old hook ran), drop it as before (only the
+    hook's commit, never yours) and say so. git status --short prints nothing, and
+    git diff main --stat -- sw.js docs/sw.js prints nothing.
+    git push -u origin layer/hook-heal-v0
+    gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/hook-heal-v0 \
+      --title "layer: Hook heal v0.1 (post-commit leaves branches alone)" \
+      --body "Soft LAYER marker v-hook-heal-v0.1. hooks/post-commit now runs only on main: on layer branches it exits with one line (no sw.js, Primer, RECENT.md or extra commit). It never writes root sw.js; CI update-primer.yml already copies docs/sw.js to sw.js on main and Pages serves /docs. The de-bounce, the Primer commit on main and bin/ship.sh are unchanged. FL_HOOK_ALL_BRANCHES=1 restores the old branch behavior. Old lines kept as comments. SMOKE_OK hook heal v0.1"
+Then STOP. Do not merge, do not delete branches. Reply with: the PR number and URL, the branch
+SHA, whether the installed hook matched the tracked one before, the test lines, the locks,
+what git log -2 showed after your commit, and your Temperature line.
+
+After this merges, the other Macs and clones need the same one-time install:
+cp hooks/post-commit .git/hooks/post-commit. Until then an old hook still makes the commit
+you drop.

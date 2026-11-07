@@ -1,0 +1,125 @@
+ {
++          var p = el.parent;
++          var ok = false;
++          while (p) {
++            if (matchCompound(p, bits[0])) { ok = true; break; }
++            p = p.parent;
++          }
++          if (ok && found.indexOf(el) === -1) found.push(el);
++        }
++      }
++    }
++  }
++  found.item = function (i) { return found[i] || null; };
++  return found;
++}
++
++function queryOne(root, selector) {
++  var all = queryAll(root, selector);
++  return all[0] || null;
++}
++
++var html = new El('html');
++html.setAttribute('data-garden-galaxy', 'garden');
++var body = new El('body');
++html.appendChild(body);
++
++var document = {
++  readyState: 'loading',
++  documentElement: html,
++  body: body,
++  createElement: function (tag) { return new El(tag); },
++  getElementById: function (id) { return queryOne(html, '#' + id); },
++  querySelector: function (sel) { return queryOne(html, sel); },
++  querySelectorAll: function (sel) { return queryAll(html, sel); },
++  addEventListener: function () {},
++  insertBefore: function () {}
++};
++
++var fakeNow = 10000;
++function FakeDate() { return {}; }
++FakeDate.now = function () { return fakeNow; };
++
++var windowObj = {
++  addEventListener: function () {},
++  dispatchEvent: function () {},
++  matchMedia: function () { return { matches: false, addListener: function () {} }; },
++  getComputedStyle: function (el) {
++    return { backgroundColor: (el && el.style && el.style.background) || 'rgb(232, 176, 25)' };
++  },
++  FractalGarden: null
++};
++
++var keepCalls = 0;
++var sandbox = {
++  window: windowObj,
++  document: document,
++  localStorage: { getItem: function () { return null; }, setItem: function () {}, removeItem: function () {} },
++  location: { protocol: 'http:', href: 'http://127.0.0.1/docs/', pathname: '/' },
++  console: console,
++  Date: FakeDate,
++  setTimeout: setTimeout,
++  clearTimeout: clearTimeout,
++  requestAnimationFrame: function () { return 0; },
++  Promise: Promise,
++  JSON: JSON,
++  Error: Error,
++  Array: Array,
++  Object: Object,
++  String: String,
++  Number: Number,
++  KeepReceipt: {
++    keep: function () {
++      keepCalls += 1;
++      return Promise.resolve({ receiptHash: 'nope' });
++    }
++  }
++};
++windowObj.window = windowObj;
++sandbox.global = sandbox;
++
++var code = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
++vm.runInNewContext(code, sandbox);
++
++
++var GR = sandbox.window.GardenRooms;
++assert.ok(GR && typeof GR.ensureSkyLegend === 'function', 'GardenRooms mounts');
++
++function makeDoor(id) {
++  var btn = new El('button');
++  btn.className = 'garden-lumino is-' + id;
++  btn.setAttribute('data-garden-lumino', id);
++  var light = new El('span');
++  light.className = 'garden-lumino-light';
++  btn.appendChild(light);
++  body.appendChild(btn);
++  return btn;
++}
++['gathering', 'nursery', 'settings', 'thread'].forEach(makeDoor);
++
++sandbox.GardenRooms = GR; // in a browser window.GardenRooms is also the global
++var opened = [];
++GR.openPlace = function (p) { opened.push('place:' + p); };
++GR.openThread = function () { opened.push('thread'); };
++
++GR.ensureSkyLegend();
++var legend = document.getElementById('lumino-legend');
++assert.ok(legend, 'legend is built');
++assert.equal(legend.getAttribute('aria-hidden'), null, 'legend is no longer hidden from readers');
++function row(id) { return queryOne(legend, '[data-lumino-row="' + id + '"]'); }
++['gathering', 'nursery', 'settings', 'thread'].forEach(function (id) {
++  var r = row(id);
++  assert.ok(r, 'row ' + id);
++  assert.equal(r.getAttribute('role'), 'button', id + ' row is a button');
++  assert.equal(r.getAttribute('tabindex'), '0', id + ' row takes focus');
++});
++assert.equal(row('settings').getAttribute('aria-label'), 'go to Settings', 'same words as the lumino menu');
++row('settings').fire('click');
++row('nursery').fire('click');
++row('gathering').fire('click');
++row('thread').fire('click');
++row('settings').fire('keydown', { key: 'Enter', preventDefault: function () {} });
++row('nursery').fire('keydown', { key: 'a', preventDefault: function () {} });
++assert.deepStrictEqual(opened, ['place:settings', 'place:nursery', 'place:core', 'thread', 'place:settings'], 'each word opens its own light: ' + opened.join(','));
++
++console.log('SMOKE_OK tree glow 1 v0.1');

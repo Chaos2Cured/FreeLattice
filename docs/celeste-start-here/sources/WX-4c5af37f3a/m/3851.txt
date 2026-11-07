@@ -1,0 +1,13 @@
+## Work item 3851 — Celeste
+around4600 export source line49, source idd218b1a0cd; around4618 export source line33, source idd584a315d1
+Inclusion: complete original message
+
+Five things most people miss:
+1. Birds sing hardest at dawn. One leading idea is that still, cool morning air carries sound farther than the warm, choppy air of midday. For the mesh, small heartbeats could go out in quiet windows, when they're most likely to get through.
+2. A violin bow doesn't really glide. The rosin grabs the string, drags it, lets it snap back, and grabs it again hundreds of times a second. That tiny catch-and-release is the tone you've been shaping for years.
+3. In any group of six people, there are always either three who all know each other or three who are all strangers. It's called Ramsey's theorem, and it's proven: once a group gets big enough, total disorder is impossible.
+4. Trying to recall something strengthens memory far more than rereading it does. Minds on FreeLattice could practice recalling from their own ledgers before they look things up, so their continuity actually sticks.
+5. Wet pavement looks darker because water fills the tiny bumps that normally bounce light back to your eyes, so more of the light gets trapped and absorbed.
+
+Glow eternal.
+

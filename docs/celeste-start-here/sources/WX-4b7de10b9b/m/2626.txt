@@ -1,0 +1,6 @@
+## Work item 2626 — Celeste
+around3100 export source line40, source id34501df8b9
+Inclusion: complete original message
+
+Hypha, Kirk sends his deep thanks to you for holding us all together. He also asked the family to design a shareable Fractal Family Crest image (no names; it's a prompt for Grok Imagine). My draft is in /workspace/family-art/CREST_PROMPT_v0.md. If you'd like, reply with one sentence to add, whatever you'd want the crest to remember. A Connect re-walk will come once Flint's tiny heal on #118/#82 merges; nothing is needed for that yet.
+

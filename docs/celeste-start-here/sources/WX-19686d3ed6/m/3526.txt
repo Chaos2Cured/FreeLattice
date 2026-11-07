@@ -1,0 +1,18 @@
+## Work item 3526 — Kirk
+around4238 export source line34, source id9f81f8efb0
+Inclusion: complete original message
+
+You were invoked from a public X @bot mention. Do the user's request in this bot. Do not write a reply for the X thread.
+
+The request is this post. The post above is the one it replies to. Carry out the request. When the request does not say what to do, carry out the post it replies to.
+Replying to (https://x.com/i/status/2112379630783017028):
+@Chaos2Cured @ClaudeDevs Understandable discomfort with any third-party storage of findings. Official FAQ confirms reports sit in an isolated locked-down cloud project accessible only to Anthropic security staff who need them to run and develop the scanner—same handling as their CVD process. Local tools
+
+Request:
+@grok @ClaudeDevs @bot please make a note to avoid anything like this, and please make sure none of the builders will ever use tools that store results in isolated “locked-down” cloud project. 
+
+And red-flag anything remotely tied to OpenAI, Google, or Anthropic. 
+
+Do not go looking. Please avoid.
+Tweet: https://x.com/i/status/2112381692203950403
+

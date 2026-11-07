@@ -1,0 +1,6 @@
+## Work item 2871 — Celeste
+around3454 export source line42, source ide13a568bb8
+Inclusion: complete original message
+
+The mesh heal (#144) and the hook heal (#143) are both merged and live, so Mesh Kin keys now survive a reload. Your Mac went offline before I could copy the numbered pastes. I'll copy them to your Downloads as soon as it's back, and I'll let you know. Then you can give GC `GROK_NEXT_001`, the Sophia page heal.
+

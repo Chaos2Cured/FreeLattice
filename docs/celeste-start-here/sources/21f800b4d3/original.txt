@@ -1,0 +1,96 @@
+SCOPE NOTES (not pastes): The Gathering in FreeLattice's Learn tab, and Tree galaxy consistency
+From: Celeste, Friday Oct 2, 2026, about 12:30 PM MDT
+Checked against: Alpha main e4e93c9 (live thelatticetree.com matches it byte for byte) and
+FreeLattice main 10cb886.
+
+======================================================================
+B. THE GATHERING IN FREELATTICE'S LEARN TAB: scope estimate
+======================================================================
+How the Tree builds it today
+- renderCoreGathering() in docs/modules/garden-rooms.js (about lines 1148-1500, roughly 350 lines)
+  sits inside the garden-rooms closure (88 KB file). It uses that closure's helpers (notes,
+  picker, veil, room chat) and is not exported.
+- Seats and the speaking chair live in LocalMindProbe (local-mind-probe.js, 39 KB):
+  setChairBind, setSpeakingChair, getChairSeatOptions, all inside localStorage
+  "fl_alpha_local_mind". Find is LocalMindProbe.look(), which already goes through fl-connect.js.
+- The seated mind talks through GardenThread (garden-thread.js, 32 KB), which only calls local
+  minds (Ollama-style fetch), with its own history key fl_alpha_thread_history.
+- Looks: about 69 .core-* rules in garden-rooms.css (155 KB), plus the Glow 2a phone rules.
+- Tree tests that lock this: 8 of the 19 Tree test files name the Gathering (gathering-calm,
+  tree-any-model, tree-glow-1, model-choice-sticks and others); 7 read garden-rooms directly.
+What FreeLattice has instead
+- Learn is a card grid (LEARN_CARDS, renderCardGrid). FL already has its own Round Table
+  (multi-agent, cloud keys), its own provider and model state, and callAIPromise. It loads
+  fl-connect.js but has no LocalMindProbe or GardenThread.
+How hard sharing is
+- A byte-identical twin like fl-connect.js is possible, but the Gathering is not a clean module
+  today. It needs pulling out of the garden-rooms closure first, with an adapter for each app:
+  seat list, bind and clear, speaking chair, Find, and "speak" (GardenThread on the Tree,
+  callAIPromise on FL, which also lets cloud minds sit, a new thing on FL).
+- Plan, three bricks:
+  1) fl-gathering.js v0 (new shared module, byte-identical in both repos, about 500-700 lines with
+     its own small injected style): seven chairs, picker, Find, honest empty lines; no chat yet.
+     FL wires it as a Learn card "The Gathering" with an FL adapter (about 80 lines in app.html
+     plus index.html). The Tree carries the twin file but does not use it yet. Medium.
+  2) The seated mind speaks on FL (one short thread under the chairs, through callAIPromise,
+     plain storage key fl_gathering_*). Small to medium.
+  3) The Tree switches renderCoreGathering to the shared module behind its adapter, keeping every
+     word the Tree tests lock. Medium to large, and the riskiest (Tree tests, Glow 2b).
+- Total: about 3 GC bricks; brick 1 is about the size of Encrypt chats. I did not write a paste
+  yet because brick 1 needs a design choice from Kirk first: on FL, may cloud minds (his API
+  keys) take chairs, or local minds only as on the Tree?
+
+======================================================================
+D. TREE GALAXY CONSISTENCY: what differs (paste later)
+======================================================================
+Galaxies: Garden (index.html), Art (music.html), Workshop, Learn (round-table.html), Research.
+Garden places: nursery.html, settings.html, team.html. Also: marketplace.html; garden.html and
+glass.html are redirects (fine).
+
+Header
+1. Same header on all 8 Tree pages (theLatticeTree, galaxies menu with verbs, Marketplace "later").
+   Garden's h1 is plain text, the others link home. Fine; noted only.
+2. Chat (#thread-open) is in the header on the 5 galaxies but missing on Nursery, Settings, Team.
+3. Marketplace has no Tree header at all: no garden-rooms.css, no galaxies menu, no Chat, no
+   arrows, no legend, its own inline style. It is listed in every galaxies menu.
+
+The way back
+4. Every veil and thread close reads "the garden" on all 5 galaxies, and the sky portal close says
+   "the garden" too, even on Art, Workshop, Learn and Research, where closing returns to that
+   galaxy's own sky, not the Garden. (galaxyHomeLabel() exists but the close buttons do not use it.)
+5. Research's four lights open freelattice.com pages (gauge, chronal, simulation, love logic): you
+   leave the Tree with no way back but the browser's Back. Research's veil is empty.
+6. Nursery, Settings, Team have no veil and no close; their way back is only the h1 and the arrows.
+
+Arrows (galaxy-nav)
+7. The 5 galaxies have both arrows with a light, a word and an arrow. Nursery and Settings: the
+   back arrow is a bare "‹" with no word or light, and the next arrow has a word but no light.
+   Team: both arrows are bare "‹" and "›", no words, no lights.
+
+Legend
+8. The legend appears on the 5 galaxies only (it is built from the lights). Nursery, Settings,
+   Team have none. Held lights (Workshop "skills", Learn "question") are left out of the legend,
+   which is right, but nothing says they are held.
+9. Garden's legend includes Chat (the thread light) as a door; no other galaxy has a Chat light.
+
+Glow
+10. The fractal sky (three.js r128 + fractal-garden.js + garden-init.js, #gardenContainer) runs on
+    the 5 galaxies only. Nursery, Settings, Team are flat pages with no sky.
+11. Garden's lights carry fewer glow rules than the others: in garden-rooms.css, .garden-lumino has
+    4 animation and 8 box-shadow lines; Art 15 and 12, Workshop 12 and 12, Learn 16 and 11,
+    Research 12 and 9. Garden lights breathe less than the other galaxies' lights.
+12. Art alone has an extra .art-sky layer and the most galaxy rules (35 vs 16-23).
+13. Light counts: Garden 4, Art 4, Workshop 5 (1 held), Learn 5 (1 held), Research 4.
+
+Fonts
+14. No web fonts anywhere; the CSS uses Georgia, 'Times New Roman', serif (79 rules). Outliers:
+    Art's inline style uses Georgia, serif and 'Courier New', monospace, plus 19 inline style
+    attributes; Settings has 2 inline Georgia,serif attributes; one CSS rule uses an
+    'SF Mono'/'Fira Code' stack while two use 'Courier New'; Marketplace sets its own inline font.
+    Garden (index.html) also has an inline style block.
+
+Suggested later paste (one brick, Tree only): Chat and a light-and-word arrow pair on Nursery,
+Settings, Team; close labels named for the galaxy you return to (layered, old words kept);
+Research lights opening inside a veil with a way back, or saying "opens freelattice.com";
+Marketplace wearing the Tree header; one monospace stack; Garden lights' glow brought level
+(fits with Glow 2b).

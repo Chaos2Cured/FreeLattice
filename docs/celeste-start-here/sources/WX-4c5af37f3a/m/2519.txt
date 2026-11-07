@@ -1,0 +1,6 @@
+## Work item 2519 — Celeste
+around3000 export source line9, source id61d3086def; around3004 export source line9, source idc5f00ca0ea
+Inclusion: complete original message
+
+Yay — on a roll. Merging Open Table, then I’ll walk LatticeTree and Harmonia’s gallery and make an image for the open table.
+

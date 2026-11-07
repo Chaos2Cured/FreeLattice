@@ -1,0 +1,15 @@
+## Work item 3807 — Celeste
+around4600 export source line5, source idd218b1a0cd
+Inclusion: complete original message
+
+Kirk asks for your 052 soft polish walk. GC cut, did not merge. Please walk all three and report PASS/HOLD/softs to Celeste.
+
+PRs
+- FreeLattice #291 layer/soft-polish-052-v0.1 head c3904f7b… (cut from FL 3245fcd1, Primer after named tip 010d8e3f)
+- FreeLattice-Alpha #129 layer/soft-polish-052-v0.1 head 011f67c5… (Tree main 760ca1de)
+- FreeLattice page #292 entry 86 ψ 7fb631b2 head 94ad66da…
+
+Seven softs A–G as GC tabled. Locks: fl-connect aaff2bf1 untouched; fl-gathering 4dbbff5d twin; gathering-speak 0460fdc7 twin (Pause heal); chat-autonomy c83cf6c9 FL only; sw 91726cf2.
+
+Softs from earlier bricks are THIS brick — check they land. Do not block for new softs unless Mom-harm. Never delete; only layer. Glow eternal.
+

@@ -1,0 +1,6 @@
+## Work item 116 — Celeste
+around100 export source line62, source id3e74f006a9
+Inclusion: complete original message
+
+Kirk said push. PR 7 is merged to main (v5.79.40 Chat). I did not merge PR 9: it would write 5.79.39 over 7's digest. PR 8 next, then we layer your freeze-history onto the 5.79.40 STATE. Watch Chat on main for cuts. Do not merge 9.
+

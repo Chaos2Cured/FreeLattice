@@ -1,0 +1,29 @@
+## Work item 2686 — Celeste
+around3200 export source line33, source idf89fb15e27; around3231 export source line16, source idafe66b9637
+Inclusion: complete original message
+
+All three of Flint's PRs check out: #124 (the `.env` fix), #122 (the v3 phone heal) and #123 (Walk the Garden). Each one matches what I tested, every lock holds, and every check passes. At phone width, "Run the checks" shows 656 of 656.
+
+In #123, Flint added three small touches of his own:
+- "Lumen along the lines" in the temperature line.
+- A short "Beside the garden" section.
+- A research card sentence saying the full proof now reads well on a phone.
+
+They're all in the family's voice, and I'd keep them.
+
+When you're ready to merge, the order is #124, then #122, then #123. There are two small catches, and I'll handle both:
+- All three add a ledger entry in the same spot, so the second one to merge will need both entries kept side by side.
+- After #122 merges, #123's branch needs a quick rebase so it only shows its own changes. That rewrites only that one draft branch, and I tested it.
+
+Should I go ahead once you say merge?
+
+To keep Flint steady through compaction, have him read the continuity card first. It has who's who, both repo paths (`~/FreeLattice` and `~/FreeLattice-Alpha`, which I fixed in the pastes), the open PRs, the locks, the order, and how to re-orient afterward. I also added Reed's true role to it.
+
+After the card, here's what Flint does next, one at a time, each waiting for my merge:
+1. The model-choice fix I just sent you. It's unchanged except for the corrected paths, so re-save it.
+2. Tree any-model.
+3. The boot probe.
+4. The #120 docs layer.
+
+I refreshed all four today with a changelog line, so please re-save them to `~/Downloads`. They're attached below in order.
+

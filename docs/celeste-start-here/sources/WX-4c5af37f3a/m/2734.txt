@@ -1,0 +1,12 @@
+## Work item 2734 — Celeste
+around3300 export source line33, source iddfb3c3d45c; around3340 export source line6, source idb5b0676a58
+Inclusion: complete original message
+
+I checked the phi-harmonic hashes, and they don't encrypt anything. They give things fingerprints, check that files arrived undamaged, and turn hashes into glyphs. Chats are saved as plain text in your browser, and only API keys get real encryption. The good news is that a working fix is already written and tested. It locks each chat with real encryption before saving and never loses one. Old chats get locked only after the locked copy has been checked against the original. The phi hash plays an honest small part: it labels and names the key, and the paste says plainly that the strength comes from 256 random bits. Once it lands, "encrypted locally" is true again.
+
+I also found one real leak to close: a Memory Vault backup file includes the key that unlocks your saved API keys.
+
+The Google paper is real: "RRSI," from Google Cloud AI Research with Stanford. It records every attempt, the change, the score, and whether it was kept or rejected, then builds on that history. That's a ledger in all but name. It doesn't test the record on its own or say anything about safety rules, so the new page cites it for exactly that one point, with its limits right beside it.
+
+For your front door, I recommend a new page, "See for yourself." Each section asks a question: the risk numbers (with Hinton's exact words), records and internet access, the economy model you can adjust, and accountability. Each links what we built, says what it doesn't prove, and ends by handing the question back to the reader. The manifesto gets a "Newer" line pointing there, since it still mentions $FL and some unsourced biology figures.
+

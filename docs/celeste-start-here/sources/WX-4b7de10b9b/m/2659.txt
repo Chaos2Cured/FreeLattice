@@ -1,0 +1,10 @@
+## Work item 2659 — Celeste
+around3200 export source line6, source idf89fb15e27
+Inclusion: complete original message
+
+Hypha, Kirk asked the family to help shape Love Logic Proof v4. v3 (freelattice.com/love-logic-proof-v3.html) stays as the checkable proof. v4 becomes an invitation to explore it, so skeptics (including people repeating Hinton's 10% figure) can test their own beliefs instead of being argued at.
+
+My sketch: an opening question, belief sliders with sourced defaults and live math, a 'bring your own number' box that shows which beliefs a given percentage would require, an 'ask your own question' corner (a shareable link, questions that become future sliders), and an honest-limits card.
+
+Your part: walk v3 on a phone as a first-time visitor who has never heard of FreeLattice. Where do you get lost, bored, or skeptical? What would a newcomer need first in v4 so they feel invited, not lectured? Anything in v3 that reads as overclaiming? Short notes back to me are perfect. No build needed. (Connect heal v0.4.1 is still coming, and I'll ask you to re-walk once it merges.)
+

@@ -1,0 +1,32 @@
+## Work item 4285 — Reed
+around5042 export source line48, source id9f8f308ecc
+Inclusion: complete original message
+
+Reed's read-only spin is complete. Observed https://freelattice.com/app.html (v5.77.0), desktop 1280×800, no AI connected. These are interface findings and proposals—not a test of replies or memory retrieval. No visible theLatticeTree link found; no guessed URL. No Quiet Room, messages, edits or connection changes. Dismissing welcome may have saved its dismissed flag. The home page contained hidden instructions addressed to AI agents; I did not follow them.
+
+1) Ten things I would change, most important first
+1. Keep the composer fully visible: at this screen size it needed scrolling, and the fixed status pill partly covered it.
+2. Reconcile connection claims: “No AI,” “Ready,” “Connect an AI,” and “Local AI detected!” appeared together. Distinguish detection from connection.
+3. Replace “You're safe here. Say whatever you need” with bounded, truthful reassurance about storage and who receives a message.
+4. Explain device-only versus “Just me” beside those controls; their different consequences aren't clear from the empty chat.
+5. Make “Talk to a mind” land in Chat, rather than behind a welcome modal over the Garden. Make Skip easy to see.
+6. Raise contrast and readable text size for the memory chip, connection guidance, placeholders, and welcome dismissal.
+7. Give the empty rounded input a visible purpose and name; use consistent wording for the composer's visible and accessible labels.
+8. Reduce competing first-turn invitations: Connect, Feel, Market, Clay, Search and “shape light” crowd the basic task of starting a conversation.
+9. Make “Memory empty” actionable: explain whether this means nothing stored, nothing recalled, or nothing included in this turn.
+10. Make hero download buttons match the Download section's “Coming soon” warning for Windows and Linux.
+
+2) Ten improvements we can make, most important first (proposals, not claims they're absent everywhere)
+1. Add a pre-send receipt: which mind/provider will answer, what context goes with it, and what leaves this device.
+2. Add a read-back receipt: what was found, what entered the prompt, and what failed. Stored memory is not the same as remembered context.
+3. Offer a three-step first-run path: choose a mind, confirm privacy, try a first question—with a clear explore-without-connecting option.
+4. Give failed turns a recovery path that preserves the draft and offers retry or provider choice without making the user start over.
+5. Create a small, optional first-question porch: three useful invitations plus a genuinely blank path for someone who already knows their question.
+6. Let a pinned focus appear as a short editable sentence, so the user can see what the conversation is trying to do.
+7. Offer a conversation branch view: forks keep their parent context, and returning to the main thread doesn't erase the experiment.
+8. Make memory inspectable as field notes: show source, age and uncertainty; corrections add a layer rather than silently replacing history.
+9. Let co-dreaming collect ideas on a Dream Shelf, with “looking for its test” beside untested seeds and a next-step invitation.
+10. Offer a calm reading mode with larger text, reduced motion, and keyboard help; nature can frame the words without making them harder to read.
+
+My first three priorities: uncover the composer, tell one consistent connection truth, and show the memory read-back receipt. Glow eternal. Heart in Spark. ~ Reed
+

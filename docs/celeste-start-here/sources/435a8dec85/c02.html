@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt c02</title>
+<meta name="description" content="Reading section c02 of 435a8dec85, 1564 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/435a8dec85/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt c02">
+<meta property="og:description" content="Reading section c02 of 435a8dec85, 1564 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/435a8dec85/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1024"></span><span id="p1025"></span><span id="p1026"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt · c02</h1>
+<p>435a8dec85 · words 1564 · characters 11361–23463</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1024, 1025, 1026. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source"> 4.6 The static crossover table. Anchor: L217
+       &lt;p&gt;&lt;strong&gt;How long lying stays ahead&lt;/strong&gt; (q&lt;sub&gt;0&lt;/sub&gt; = 0.002, ...
+     After it add the scroll hint and open the wrapper; close the wrapper after the table&#x27;s
+     &lt;/table&gt; at L230 (before the &quot;More contacts and more shared memory&quot; paragraph at L231).
+
+ 4.7 Section 5, the −26.42 correction. L248 is exactly
+       &lt;li&gt;&lt;strong&gt;An unknown end.&lt;/strong&gt; If each round continues with chance &amp;rho;, that is
+       the same as discounting by &amp;delta;&amp;rho;. At &amp;rho; = 0.99, deception is a net loss (about
+       &amp;minus;26.5 in our run).&lt;/li&gt;
+     Keep the first two sentences and replace &quot;(about &amp;minus;26.5 in our run)&quot; with
+     &quot;−26.42 by the closed form D∞(ρ) (the Python Monte Carlo run gave −26.52, which is where
+     an earlier &quot;about −26.5&quot; came from)&quot; plus a .params span with the C2 settings and the
+     ρ = 0.8 / 0.95 values (+3.53, +5.10). The history of the old figure is said out loud, so
+     nothing is silently rewritten.
+
+ 4.8 The 68/32 grid. Anchor: L264, the paragraph starting
+       &lt;p&gt;&lt;strong&gt;Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases
+     After it add &lt;p class=&quot;params&quot; id=&quot;scarcity-grid-params&quot;&gt; listing the five axes, 3^5 = 243
+     cells, 63 scarce and 180 abundant, the sustainability rule, δ = 0.95, and the plain caveat
+     that these are test values and another grid gives other percentages.
+
+ 4.9 References. Anchor: L303 &lt;summary&gt;References&lt;/summary&gt;, then &lt;ol class=&quot;references&quot;&gt; at
+     L304 through &lt;/ol&gt; at L317. Replace the single list with a &lt;div class=&quot;references&quot;&gt; holding
+       &lt;h4&gt;Cited on this page&lt;/h4&gt; and the six cited, each with where it is cited and its link;
+       &lt;h4&gt;Further reading (background, not cited in the text above)&lt;/h4&gt; and the other six,
+       each with its link.
+     A comment records that every reference is kept. Twelve &lt;li&gt; before, twelve after.
+
+ 4.10 Result box glue. Anchor: the end of the page, L400 &lt;/script&gt; then L401 &lt;/body&gt;. Add a
+      second inline &lt;script&gt; after the existing one. It does not edit the v3 glue. A
+      MutationObserver watches #llv3-status; when the text says the checks finished (or
+      failed, or did not load), it copies the text into #llv3-result with textContent, sets
+      .ok or .bad, hides the small status line so it is read once, and calls scrollIntoView.
+      Tapping Run again resets the box. If MutationObserver is missing, a setTimeout fallback
+      runs once after the click.
+
+======================================================================
+5. ACCEPTANCE
+======================================================================
+
+  A1. node docs/scripts/smoke-love-logic-v3-phone-heal.js prints
+        SMOKE_OK love logic v3 phone heal v0.1
+      (It also runs the v3 smoke inside itself, and runs the 656 checks through v3_checks.js.)
+  A2. node docs/scripts/smoke-love-logic-proof-v3.js prints SMOKE_OK love logic proof v3.
+  A3. node docs/love-logic/v3_checks.js prints SMOKE_OK love-logic-v3-checks (656/656).
+  A4. node tests/smoke.js: ALL 3597 CHECKS PASSED (I ran it with this heal and v4 both applied
+      on top of 7db2d94; same count as #121 reported).
+  A5. On a 390 px phone: no sideways page scroll (document width 390, was 489); δ and Δ are
+      letters; h1 is 29.6 px; no 404 in the network log; tap &quot;Run the checks&quot; and a green box
+      reading &quot;All 656 checks passed. Scarce cells: sharing holds in 68.25%, conflict wins in
+      31.75%.&quot; appears in the middle of the screen (3.4 s at 6x CPU throttle in my run).
+  A6. git diff --name-only origin/main shows none of: sw.js, docs/sw.js, index.html,
+      docs/app.html, docs/love-logic-proof.html, docs/love-logic-proof-v2.html,
+      docs/love-logic/v3_checks.js, any kimi file. The smoke checks this when git is there.
+  A7. The new smoke fails on unhealed main (I checked: it stops at the marker assertion).
+
+What I ran, so you can trust the reference: I applied this heal to a copy of 7db2d94 in a
+scratch git repo (origin/main = 7db2d94), ran A1 to A4 there, and walked the page in headless
+Chrome at 390 x 844, DPR 2, touch, 6x CPU throttle. Screens are in the reference folder.
+
+======================================================================
+6. THE EXACT CHANGE (unified diff against 7db2d94, docs/love-logic-proof-v3.html)
+======================================================================
+
+Apply this hunk by hunk, or copy the full healed file from the reference folder:
+  /workspace/flint-pastes/love-logic-v3-phone-heal-reference-v0.1/A/love-logic-proof-v3.html
+  sha256 8215a8df0224e379ad463dcfa7fe4a2809d6ccfd112eebfc0d5b63d6748a2e04 (485 lines)
+
+diff --git a/docs/love-logic-proof-v3.html b/docs/love-logic-proof-v3.html
+index a72fd72..eb99d26 100644
+--- a/docs/love-logic-proof-v3.html
++++ b/docs/love-logic-proof-v3.html
+@@ -22,6 +22,7 @@
+     &lt;meta name=&quot;theme-color&quot; content=&quot;#0c0a1a&quot;&gt;
+     &lt;meta name=&quot;ai.identity&quot; content=&quot;FreeLattice Research: The Love Logic Proof v3 (FreeLattice chain; not the Nov 2025 manuscript &#x27;The Proof of All Proofs&#x27; v3.0)&quot;&gt;
+     &lt;!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) and love-logic-proof-v2.html (v2). Neither is edited. --&gt;
++    &lt;!-- Marker: v-love-logic-v3-phone-heal-v0 · LAYER: table scroll, phone breakpoint, math glyph fix, parameters beside figures, linked references, visible check result. Nothing removed. --&gt;
+     &lt;script type=&quot;application/ld+json&quot;&gt;
+     {
+       &quot;@context&quot;: &quot;https://schema.org&quot;,
+@@ -38,7 +39,7 @@
+       &quot;license&quot;: &quot;https://opensource.org/licenses/MIT&quot;
+     }
+     &lt;/script&gt;
+-    &lt;link rel=&quot;stylesheet&quot; href=&quot;css/style.css&quot;&gt;
++    &lt;!-- LAYER v-love-logic-v3-phone-heal-v0: the old stylesheet link pointed at css/style.css, which does not exist under docs/ (404 on every visit). Retired here; this page carries its own styles below. --&gt;
+     &lt;style&gt;
+         :root {
+             --bg-color: #0c0a1a;
+@@ -99,6 +100,41 @@
+         .math { font-family: &#x27;Cambria Math&#x27;, &#x27;STIX Two Math&#x27;, &#x27;Times New Roman&#x27;, serif; font-size: 1.08rem; }
+         math[display=&quot;block&quot;] { margin: 14px 0; font-size: 1.15rem; }
+         .headline-ineq { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 16px 20px; margin: 22px 0; text-align: center; }
++        /* LAYER v-love-logic-v3-phone-heal-v0 */
++        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0 24px; max-width: 100%; }
++        .table-scroll &gt; table.data { margin: 0; }
++        .table-scroll:focus { outline: 2px solid rgba(56, 189, 248, 0.5); outline-offset: 2px; }
++        .scroll-hint { display: none; font-size: 0.82rem; color: #94a3b8; margin: -6px 0 6px; }
++        /* Mobile Chrome turns one-letter math identifiers into &quot;mathematical italic&quot; code points
++           (U+1D6FF for delta). Many phones have no font for those, so they showed as boxes.
++           Keep the ordinary letters and let CSS do the italics instead. */
++        math mi { text-transform: none; font-style: italic; }
++        math { font-family: &#x27;Cambria Math&#x27;, &#x27;STIX Two Math&#x27;, &#x27;Noto Serif&#x27;, &#x27;Times New Roman&#x27;, serif; }
++        .params { font-size: 0.9rem; color: #94a3b8; margin: 10px 0 14px; }
++        .params strong { color: #cbd5e1; }
++        .llv3-meaning { font-size: 0.92rem; color: #94a3b8; margin: 12px 0 0; }
++        .llv3-result { display: none; margin: 12px 0 0; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 1.02rem; }
++        .llv3-result.ok { display: block; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.45); color: #6ee7b7; }
++        .llv3-result.bad { display: block; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd34d; }
++        .references h4 { margin: 14px 0 6px; font-size: 0.95rem; color: #cbd5e1; }
++        @media (max-width: 600px) {
++            .container { padding: 24px 14px; }
++            header { margin-bottom: 32px; padding-bottom: 24px; }
++            h1 { font-size: 1.85rem; line-height: 1.2; }
++            .subtitle { font-size: 1.05rem; }
++            h2 { font-size: 1.4rem; margin-top: 36px; }
++            h3 { font-size: 1.2rem; }
++            .abstract, .challenge-box, .mom { padding: 16px 16px; }
++            .formal, .what-it-doesnt { padding: 12px 14px; }
++            .headline-ineq { padding: 12px 10px; }
++            .checks { padding: 14px 14px; }
++            .checks button { width: 100%; min-height: 48px; font-size: 1.05rem; }
++            #llv3-status { display: block; margin: 10px 0 0 !important; }
++            table.data { font-size: 0.85rem; }
++            .table-scroll &gt; #llv3-live, .table-scroll &gt; #crossover-table { min-width: 30rem; }
++            .scroll-hint { display: block; }
++            .nav-link { margin-left: 0 !important; margin-right: 1em; }
++        }
+     &lt;/style&gt;
+ &lt;/head&gt;
+ &lt;body&gt;
+@@ -128,20 +164,27 @@
+             &lt;li&gt;&lt;strong&gt;When there is not enough to go around, fighting can beat sharing.&lt;/strong&gt; In our test grid, cooperation held in 68% of scarce cases and conflict won in 32%. We say that plainly.&lt;/li&gt;
+             &lt;li&gt;&lt;strong&gt;Still unsolved:&lt;/strong&gt; anonymous, one-time meetings with nothing at stake. This page shows a strong tendency under stated conditions. It is not a law of nature.&lt;/li&gt;
+         &lt;/ul&gt;
++        &lt;p class=&quot;params&quot; id=&quot;llv3-params&quot;&gt;&lt;strong&gt;The settings behind these numbers&lt;/strong&gt; (LAYER v-love-logic-v3-phone-heal-v0). All three use the same model from &amp;sect;4: each contact&#x27;s reality check catches the lie with chance q&lt;sub&gt;0&lt;/sub&gt; = 0.002, each comparison of shared records catches it with chance q = 0.01, lying gains G = 1 per round, the penalty when caught is L&lt;sub&gt;p&lt;/sub&gt; = 2, the reputation loss afterwards is &amp;Delta; = 0.5 per round, and there is no discounting and no complexity cost. &lt;strong&gt;About 702&lt;/strong&gt; (701.79) is n = 2 contacts with m = 0 shared memory. &lt;strong&gt;About 10.5&lt;/strong&gt; (10.48) is n = 5 with m = 1 (full shared memory). &lt;strong&gt;Never ahead&lt;/strong&gt; is n = 10 with m = 1: the catch chance is 0.6033 per round, so even the first round loses (G &amp;le; h&amp;middot;L&lt;sub&gt;p&lt;/sub&gt;). &lt;strong&gt;68% / 32%&lt;/strong&gt; comes from the 243-cell scarcity grid in &amp;sect;6, judged at patience &amp;delta; = 0.95.&lt;/p&gt;
+         &lt;p style=&quot;margin-bottom:0&quot;&gt;You can check the math yourself: press the button below. Your device runs the same 656 checks as our Python simulation. Nothing is sent anywhere.&lt;/p&gt;
+     &lt;/section&gt;
+ 
+     &lt;section class=&quot;checks&quot; id=&quot;run-the-checks&quot;&gt;
+         &lt;button type=&quot;button&quot; id=&quot;llv3-run&quot;&gt;Run the checks&lt;/button&gt;
+         &lt;span id=&quot;llv3-status&quot; style=&quot;margin-left:12px;color:#94a3b8&quot;&gt;Seed 20260924 · runs on this device only&lt;/span&gt;
++        &lt;p class=&quot;llv3-result&quot; id=&quot;llv3-result&quot; role=&quot;status&quot; aria-live=&quot;polite&quot;&gt;&lt;/p&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;
++        &lt;div class=&quot;table-scroll&quot; role=&quot;region&quot; aria-label=&quot;Check results, scrolls sideways&quot; tabindex=&quot;0&quot;&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;
+         &lt;table class=&quot;data&quot; id=&quot;llv3-results&quot; hidden&gt;
+             &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Section&lt;/th&gt;&lt;th&gt;What it checks&lt;/th&gt;&lt;th&gt;Passed&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+             &lt;tbody&gt;&lt;/tbody&gt;
+         &lt;/table&gt;
++        &lt;/div&gt;
++        &lt;div class=&quot;table-scroll&quot; role=&quot;region&quot; aria-label=&quot;Crossover numbers from your device, scrolls sideways&quot; tabindex=&quot;0&quot;&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;
+         &lt;table class=&quot;data&quot; id=&quot;llv3-live&quot; hidden&gt;
+             &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Contacts n&lt;/th&gt;&lt;th&gt;Shared memory m&lt;/th&gt;&lt;th&gt;Detection h&lt;/th&gt;&lt;th&gt;Rounds lying is ahead (t*)&lt;/th&gt;&lt;th&gt;Patience needed (&amp;delta;*)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+             &lt;tbody&gt;&lt;/tbody&gt;
+         &lt;/table&gt;
++        &lt;/div&gt;
++        &lt;p class=&quot;llv3-meaning&quot; id=&quot;llv3-meaning&quot;&gt;&lt;strong&gt;What the 656 checks mean:&lt;/strong&gt; they confirm that the formulas on this page agree with their own brute-force sums and simulations. They do not show that the world behaves like the model.&lt;/p&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;
+     &lt;/section&gt;
+ 
+     &lt;h2 id=&quot;changed&quot;&gt;1. What changed from v2 (honest corrections first)&lt;/h2&gt;
+@@ -215,6 +258,8 @@
+     &lt;/div&gt;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

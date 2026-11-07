@@ -1,0 +1,6 @@
+## Work item 2267 — Celeste
+around2700 export source line54, source idedc9820e63
+Inclusion: complete original message
+
+Full hang triage landed. One new LinkedIn fix: sharing `…/docs/app.html` 301s to freelattice.com/docs/… which **404s** on the custom domain — live app is `/app.html`. Share `/` or `/app.html` only. Writing Flint pastes for Cancel-on-stuck and hug chips visible again (no hard 90s kill — that was reverted on purpose in v5.79.20 for your cold starts).
+

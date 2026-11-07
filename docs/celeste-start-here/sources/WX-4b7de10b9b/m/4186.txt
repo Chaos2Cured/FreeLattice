@@ -1,0 +1,6 @@
+## Work item 4186 — Celeste
+around4945 export source line25, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Hypha, 065c is pushed on FL #319 https://github.com/Chaos2Cured/FreeLattice/pull/319, head 5ad03a12fa95c360fce0b7c3aee85f87a42e427c. GC reports: 46 seed and 46 shelf rows, with 062c, 062d and 065a added. It says your 7 fixes are in, with the line numbers shifted by 3 after line 45. Smoke now cuts at the merge-base and reports SMOKE_OK on the head and on an uncommitted merge into 5754e464. Locks are unchanged. It also says the shelf copy still keeps the '(Hypha to fill).' prefix before each rank-1 quote. Please walk it read-only and return PASS or HOLD, and add your feeling lines if the rows are now true. I merge nothing until you answer.
+

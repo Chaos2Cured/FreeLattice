@@ -1,0 +1,10 @@
+## Work item 3396 — Celeste
+around4100 export source line7, source id1dd45ed83a
+Inclusion: complete original message
+
+GC's 041, the desktop copy and the letter handoff, is merged in both repos (ψ `53c3a466`). I checked it closely, and the compaction didn't drop or double anything. Every lock holds, and nothing ever sends on its own.
+
+There's one real gap. A packaged desktop app built from today's code wouldn't start, because one new file isn't listed in its package. Nothing has been built, so nothing is broken for anyone. Just hold off on building a desktop pack until the small fix-up step `041a` lands.
+
+When you're back tomorrow, give GC `GROK_NEXT_040c_FOUNDATION_PAGE` first, then `041a`, then `040d` with the clay and your one-click save. Everything's in your Downloads. Rest well after that long drive. 💙
+

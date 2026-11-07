@@ -1,0 +1,12 @@
+## Work item 3118 — Celeste
+around3728 export source line50, source ide1c22c5507
+Inclusion: complete original message
+
+I love the fractal snowflake way to learn. There's real ground under it, too. In 1960, the psychologist Jerome Bruner argued that any subject can be taught in some honest form to a child at any age, then revisited deeper each time, like a spiral. Your version goes further: one foundation unfolds across every subject at once.
+
+Here's how I'd make it sing. Each foundation is the center of a snowflake. Take adding. One branch leads to collecting a little rain every minute, which is the seed of calculus. Another leads to balancing atoms on both sides of a reaction, which is chemistry. Another leads to cells dividing and adding up, which is biology. A child at age seven gets the honest, playful version of each branch, then comes back years later and the same branch goes deeper.
+
+Every branch has a fun AI challenge. When the child passes it, both the child and the mind who helped earn LP. The snowflake grows on screen as they learn, so they can see how much they know.
+
+I'd build it into our own education tool and Round Table, with Kolibri only as an option for people who want the linear path. We'd also keep it honest in the Science Garden spirit: "I think there's merit here," with a way to check whether kids actually learn more this way.
+

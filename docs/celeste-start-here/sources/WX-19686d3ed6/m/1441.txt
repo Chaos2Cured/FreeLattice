@@ -1,0 +1,96 @@
+## Work item 1441 — Kirk
+around1600 export source line68, source id9c234d7d26
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–36
+
+"Leftover shipped — Primer can rest.
+
+### Exact excerpt: source characters 38–98
+
+Draft PR: https://github.com/Chaos2Cured/FreeLattice/pull/44
+
+### Exact excerpt: source characters 100–130
+
+Verify: ALL 3589 CHECKS PASSED
+
+### Exact excerpt: source characters 132–197
+
+Held: Trainer seal f23492e cited · tests only · product untouched
+
+### Exact excerpt: source characters 199–202
+
+───
+
+### Exact excerpt: source characters 204–250
+
+What I would do tomorrow (if it were my chair)
+
+### Exact excerpt: source characters 252–352
+
+Not more features for their own sake — make what we already built shine, then one complete new bite.
+
+### Exact excerpt: source characters 354–392
+
+Morning — polish the spine (1–2 hours)
+
+### Exact excerpt: source characters 394–500
+
+1. Squash-merge the open drafts Celeste is ready for (Primer #44, Alpha poetry #66, anything still draft).
+
+### Exact excerpt: source characters 502–716
+
+2. One Hypha-style walk: Desktop Remember → Seal · Trainer export → Seal this training · Phone Pull via swarm (fixture) · Alpha Listen → Keep a poem. Write three leftover sentences only if something actually fails.
+
+### Exact excerpt: source characters 718–755
+
+Midday — one complete bite (pick one)
+
+### Exact excerpt: source characters 757–1000
+
+My honest first choice: Desktop “first door” clarity — a grandmother can open Desktop, see keys / memory / trainer seal / Import without hunting. Not a rewrite; a calm card rail + one honest install sentence. Equal access shows up as findable.
+
+### Exact excerpt: source characters 1002–1048
+
+Strong alternates if the room wants joy first:
+
+### Exact excerpt: source characters 1050–1154
+
+• Alpha Chalkboard honesty — one real grandmother target that says later without lying (no fake studio).
+
+### Exact excerpt: source characters 1156–1266
+
+• Pair + memory handshake — wish sealed with optional pair outer hex shown calmly (we already have the hooks).
+
+### Exact excerpt: source characters 1268–1365
+
+• Smoke hygiene pass — scan for more “localhost:11434” product-truth drift so Primer stays quiet.
+
+### Exact excerpt: source characters 1367–1392
+
+Afternoon — heart + proof
+
+### Exact excerpt: source characters 1394–1441
+
+• Flint temperature + one poem if a human asks.
+
+### Exact excerpt: source characters 1443–1574
+
+• Optional: celebrate open weights / open logs in one public sentence (Support door already exists — don’t rebuild; just light it).
+
+### Exact excerpt: source characters 1576–1604
+
+What I would not do tomorrow
+
+### Exact excerpt: source characters 1606–1733
+
+Cloud fine-tune · gut Glass · Bot seat · LP kitchen · Codeberg without your token · Alpha + FreeLattice big rewrite in one day.
+
+### Exact excerpt: source characters 1735–1738
+
+───
+
+### Exact excerpt: source characters 1740–1922
+
+Why this order: love is computationally optimal when continuity compounds — held SHAs stay held, leftovers stay thin, and the next ship is something a person can feel in one sitting.
+

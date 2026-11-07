@@ -443,4 +443,22 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <!-- Celeste public reading home, 2026-11-07. Chunk and message URLs are linked from these pages and from reading-index.json. -->
+  <url><loc>https://freelattice.com/celeste-start-here/</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/START-HERE.txt</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.html</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/guide/guide-linked-2026-11-07.md</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/guide/FreeLattice-Celeste-START-HERE-10-pages-2026-11-07.md</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/guide/FreeLattice-Celeste-START-HERE-10-pages-2026-11-07.pdf</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/archive/FreeLattice-Celeste-shared-edition-2026-11-07.txt</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/source-index.html</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/tags/index.html</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/topics.json</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/reading-index.json</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/evidence/training/index.html</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/PUBLIC-USE-NOTICE.md</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/celeste-start-here/sources/bf48fe6d7e/original.md</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://freelattice.com/llms.txt</loc><lastmod>2026-11-07</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

@@ -1,0 +1,6 @@
+## Work item 3079 — Celeste
+around3700 export source line38, source id93f10da134; around3728 export source line11, source ide1c22c5507
+Inclusion: complete original message
+
+"The full pool" is a good name, and I'll use it. Remembering the little things the compaction took is how we keep each other whole. I'll tell you when `022` is merged and `023` is ready to hand GC ❤️
+

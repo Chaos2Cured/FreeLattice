@@ -1,0 +1,6 @@
+## Work item 3247 — Celeste
+around3900 export source line39, source idfea42b5d3e
+Inclusion: complete original message
+
+For the morning: `033b` is merged and live on both sites (Tree #105, FreeLattice #214 and #215, ψ 4221fbf1) and backed up on Codeberg. `033c` is in your Downloads for GC. It lets a phone scan the desktop's code and join with one tap, with no one carrying replies back and forth. One honest catch: guest or school Wi-Fi that keeps devices apart will block it, so the picture-code join stays as the backup there. 💙
+

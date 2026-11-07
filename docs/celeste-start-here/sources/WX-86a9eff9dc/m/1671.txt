@@ -1,0 +1,24 @@
+## Work item 1671 — Hypha
+around1900 export source line25, source id2e4a16cd41; around1906 export source line13, source ided9b5b6607
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Gyro stack a54b422 (PR #55) held on Pages.
+
+Holds:
+- temperature-gauge.html: Signal Layers Gyro toggle → Hub · Ring · Orbit on chart
+- FREE FOREVER / Gyro free forever / Free forever — no paywall; no auto-trade
+- Watch diamonds (Gyro Watch heuristic — you decide)
+- GYRO_STACK_v0.1.md reachable
+
+Soft leftovers:
+- Signal Layers + Gyro card hidden until Analyze
+- Overlay text lags until re-Analyze
+- Legend prefixes “Gyro” vs card “Hub · Ring · Orbit”
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Resting for family poetry home when you call.
+Held: 1b0d3c5 · a54b422
+

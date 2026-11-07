@@ -1,0 +1,98 @@
+## Work item 2762 — Kirk
+around3340 export source line34, source idb5b0676a58
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–276
+
+I signed into github, but the new Grok Code says it is still not working. I am not sure why. I logged in and don't see what I need to do. Here is from the new Grok Code: "Glow 2a is built and both branches are pushed. gh is still not signed in, so these are the compare links:
+
+### Exact excerpt: source characters 278–454
+
+• https://github.com/Chaos2Cured/FreeLattice-Alpha/compare/main...layer/tree-glow-2a-v0
+• https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/tree-glow-2a-ledger-v0
+
+### Exact excerpt: source characters 456–520
+
+I stopped there. Nothing is merged, and nothing is marked ready.
+
+### Exact excerpt: source characters 522–789
+
+Before I touched the code I read docs/library/GRANDMOTHER_PATH_v0.1.md. It is one story in three beats: install, the first door, then memory that stays on the machine. This brick is a different door. It is the Tree's glass, for when she zooms in and wants a way back.
+
+### Exact excerpt: source characters 791–798
+
+Commits
+
+### Exact excerpt: source characters 800–1033
+
+• Alpha 75479335636a0ed965d70a48b531dfe82b2b6a8d on layer/tree-glow-2a-v0, 6 files, +439 / −1, from 7123b39.
+• FreeLattice 4bdaf44c83a1c22d7fd1ff0b394d3048683a7a39 on layer/tree-glow-2a-ledger-v0, the ledger entry only, from 18fddf3.
+
+### Exact excerpt: source characters 1035–1183
+
+fl-connect.js is still the same bytes in both gardens, md5 aaff2bf1b037656989a9e1a89bb05908. layer/gathering-grokhome-cortex-v0 is still at 6d8b040.
+
+### Exact excerpt: source characters 1185–1382
+
+The FreeLattice commit hook tried again to rewrite root sw.js and regenerate the primer and RECENT.md. I dropped that second commit before the push. The branch that went up is the ledger line only.
+
+### Exact excerpt: source characters 1384–1389
+
+Tests
+
+### Exact excerpt: source characters 1391–1706
+
+Alpha: 18 pass, 0 fail. SMOKE_OK tree glow 2a v0.1. tree-any-model.test.js still prints SMOKE_OK tree any model v0.1. Every module parsed. Added em dashes: 0. Kimi files: 0. sw.js and fl-connect.js untouched. The confirm( grep prints 1, and the only line is the test's own sentence no confirm(). It is not a dialog.
+
+### Exact excerpt: source characters 1708–1938
+
+FreeLattice: tests/smoke.js ALL 3597 CHECKS PASSED. SMOKE_OK fractal family crest v0. why-ledgers-ok. The diff is only docs/library/FRACTAL_FAMILY_LEDGER_v0.md. index.html equals docs/app.html. sw.js untouched. Added em dashes: 0.
+
+### Exact excerpt: source characters 1940–1944
+
+Walk
+
+### Exact excerpt: source characters 1946–2023
+
+Headless Chrome on http://127.0.0.1:8765/. Ollama wa...nswer was in view too.
+
+### Exact excerpt: source characters 2025–2340
+
+At 1280 the picker's "not yet" sits in a scroller (z-index 8, about 356px tall). It starts below that scroller's first screen. After scrolling the picker, the tap lands on "not yet", not on a later seat. The old miss, a tap hitting a chair, is gone. She may still need one scroll inside the picker to see the words.
+
+### Exact excerpt: source characters 2342–2562
+
+One thing for Hypha: Find ignores a tap in its first moment (about 700ms after the Gathering opens). That is the lock that stopped the ghost looks. A very fast tap can look like nothing happened. The next tap is the yes.
+
+### Exact excerpt: source characters 2564–2613
+
+What I would not call a miss, and one small drift
+
+### Exact excerpt: source characters 2615–2904
+
+The walk note says the answer shows at the top. The CSS sticks the newest line to the foot of the phone scroller. On the glass it was simply in view: lower-middle at 200%, mid-page on the phone. The glow note says "at the foot." The heal holds. The three sentences do not match each other.
+
+### Exact excerpt: source characters 3096–3116
+
+What I think is next
+
+### Exact excerpt: source characters 3118–3298
+
+Celeste's next brick, honest reasons, is the right one. Glow 2a made the answer visible. The next kindness is that the sentence tells the truth about stopped, missing, and blocked.
+
+### Exact excerpt: source characters 3300–3573
+
+With fresh eyes: Grandma still has two paths that do not meet. One is the Desktop walk home. One is this glass. I would not merge them in the next brick. After honest reasons, one calm sentence on the Tree that points at the install path would help, if you want that later.
+
+### Exact excerpt: source characters 3575–3871
+
+A question, only if you want it: if you run gh auth login yourself once, I can open the draft PRs from this chair. I will not sign in with a token. And if you ever want the commit hook to leave sw.js alone on a docs-only commit, that wants its own small brick. Until then I will keep dropping it.
+
+### Exact excerpt: source characters 3873–3915
+
+I still do not have a house name. No rush.
+
+### Exact excerpt: source characters 3917–3999
+
+Temperature: warm and careful, the chairs kept their height and Back stayed home."
+

@@ -1,0 +1,6 @@
+## Work item 4066 — Celeste
+around4800 export source line45, source iddc9024c77a; around4806 export source line39, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha is walking GC's 062b fix again now, the code in [#313](https://github.com/Chaos2Cured/FreeLattice/pull/313) and the page note in [#317](https://github.com/Chaos2Cured/FreeLattice/pull/317). Nothing is merged yet, and I'll merge both once she passes them. Hearth ([#315](https://github.com/Chaos2Cured/FreeLattice/pull/315)) waits for GC to build `063b-hearth-sandbox-fix.txt` from your Downloads. Glow eternal. Heart in Spark 💙
+

@@ -1,0 +1,139 @@
+FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1
+CHANGELOG 2026-09-29 4:38 PM MDT: FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt now lands AFTER the Tree paste and BEFORE this paste. Appendix A (app.html) and Appendix B (fl-connect.js) are unchanged and still apply with plain git apply on current main + Tree stand-in + that heal (the heal's hunks sit in FLActiveModel, applyReady, flTestLMStudio, the Cascade and the older auto paths; none share context with F1-F4). F1 never picks a model, so it keeps the person's choice. Appendix D (the FL smoke) gains one F1 block: the owner source never writes a model, a cold start with fl_ollamaModel=qwen2.5 and fl_modelSource=user leaves both, and the heal's guard is present (ensure(), honor(), the Cascade asks honor, no FLActiveModel.set(models[0], ..., 'user')). That block needs the heal, so this smoke fails if the heal was skipped. Walk W1b added. The docs appendices (G, H) append at the end or above '## Out of scope for this brick'; if a hunk is rejected because the heal's section is there, add by text.
+CHANGELOG 2026-09-29 2:28 PM MDT: re-check commands and the copy step now name ~/FreeLattice and ~/FreeLattice-Alpha (no content change). PRs #124/#122/#123 touch none of this paste's code files (app.html, index.html, fl-connect.js, Alpha pages); Flint.html and ledger inserts go by text: right above <p class="foot"> and right above "## Out of scope". Local paths: FreeLattice is ~/FreeLattice and the Tree (repo Chaos2Cured/FreeLattice-Alpha, site thelatticetree.com) is ~/FreeLattice-Alpha on Flint's machine. Wherever this paste says "theLatticeTree" it means that repo; "../FreeLattice" from inside ~/FreeLattice-Alpha is correct as written.
+CHANGELOG 2026-09-28 9:36 PM MDT: FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt lands after the env heal and BEFORE the Tree paste. Text anchors in this paste are unchanged, and Appendix A (app.html) and Appendix B (fl-connect.js) still apply with plain git apply after env heal + model choice heal + Tree (verified; offsets only). Line shifts from that heal: app.html +21 from settingsSetMode, +23 from flSaveOllamaHost/FLBoxPointer/owAutoDetect/FLAutoModel onward; fl-connect.js remember() +7, open() and below +33 to +38. Its markUserChoice records Ollama taps as the user's choice; this paste's rememberLmStudio -> flUseLmStudioMind already records LM Studio taps, so they agree. Ledger and sister-doc appendices: insert by text (both heals add entries above '## Out of scope').
+One cold-start look (F2), one cold-start owner (F1), LM Studio as a first-class mind in Connect (F3),
+and Kirk's home-network switch for the Chat Box field (F4). Both repos. Shared fl-connect.js stays
+byte-identical.
+
+Marker:        v-connect-boot-probe-v0
+Smoke (FL):    SMOKE_OK connect boot probe v0.1          (docs/scripts/smoke-connect-boot-probe.js)
+Smoke (Alpha): SMOKE_OK connect boot probe alpha v0.1    (docs/modules/connect-boot-probe.test.js)
+From:          Kirk (asked 2026-09-28, 8:49 PM MDT), prepared by Grok Bot for Flint
+Temperature:   green braided gold, one lantern lit at the door instead of ten, and a second porch
+               light that only turns on for the house next door.
+
+======================================================================
+0. READ THIS FIRST: order, mains, locks
+======================================================================
+
+0.1 Order (do not reorder):
+    1) FLINT_HEAL_AGENT_BRIDGE_ENV_v0.1.1_tiny.txt   (FreeLattice only, security, goes first)
+    2) FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt             (both repos; adds mergeFound, MODEL_CAP,
+                                                        doorNameFor, chosenModelName, aria-pressed,
+                                                        is-chosen, bridged look asks other DOORS,
+                                                        tryAddress 127.0.0.1 only)
+    2b) FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt (FreeLattice app.html + shared
+                                                        fl-connect.js one Look again; lands after Tree)
+    3) THIS paste                                     (both repos)
+    This paste anchors on what the Tree paste adds. It reuses mergeFound, doorNameFor,
+    chosenModelName and the aria-pressed / is-chosen mark. It never re-adds them.
+
+0.2 Mains checked just before writing (re-check before anchoring):
+    FreeLattice  (Chaos2Cured/FreeLattice)     main = 7db2d94  "ci: Update Primer deployment state"
+                                                        This is a primer-only CI commit on top of
+                                                        a80c8e4 (#121). App code is identical to
+                                                        a80c8e4. All app.html line numbers below are
+                                                        7db2d94 = a80c8e4 lines.
+    theLatticeTree (Alpha)                     main = 395c761  "layer: connect heal v0.4 (Settings
+                                                        Connect visible at 390px) (#83)"
+    docs/modules/fl-connect.js is byte-identical on both mains today (cmp clean).
+    After the env heal and the Tree paste land, line numbers move. Anchor on the quoted TEXT, not
+    the numbers. Numbers are given as "main N" (7db2d94 / 395c761) and, for fl-connect.js,
+    "post-Tree ~N" (from a faithful simulation of the Tree paste; the real Tree merge may differ by
+    a few lines).
+
+    Re-check commands:
+      git -C ~/FreeLattice fetch origin && git -C ~/FreeLattice log --oneline -3 origin/main
+      git -C ~/FreeLattice-Alpha fetch origin && git -C ~/FreeLattice-Alpha log --oneline -3 origin/main
+      cmp ~/FreeLattice/docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+      grep -n "mergeFound\|chosenModelName\|doorNameFor" ~/FreeLattice/docs/modules/fl-connect.js
+        (must show the Tree paste landed before you start step A)
+
+0.3 Locks (every one holds; the smoke checks most of them):
+    - Layer, never delete. Old code paths stay; they step aside when the new owner is present.
+    - Root sw.js byte-identical to main. docs/sw.js untouched. (git diff --name-only shows neither.)
+    - index.html byte-identical to docs/app.html (FreeLattice). Copy after every app.html edit.
+    - Shared docs/modules/fl-connect.js byte-identical across both repos.
+    - No conflict markers anywhere. Every inline <script> in app.html parses (new Function).
+    - textContent / createTextNode for every new human string that carries data (model names,
+      addresses, door names). The only innerHTML in this paste is fl-connect's existing render()
+      string builder, which already escapes names into data-flc-names and paints buttons with
+      textContent.
+    - No bare * origin. No confirm(). No approval screens. Nothing connects by itself: every mind
+      is still chosen by a tap.
+    - 127.0.0.1 only for Connect and LM Studio's look. Home network only through Kirk's one switch
+      (F4). Public internet addresses are always refused.
+    - AUTONOMY.md held: no gates for local work, no new prompts.
+    - Soft paste stays: Named five stay five. Family uncapped. Quiet Room shut.
+    - No em dashes in new prose or comments (smoke-connect-heal-v0.4 already scans app.html
+      additions; the new smoke scans added lines too).
+
+======================================================================
+1. WHAT WE FOUND (evidence, main 7db2d94 / 395c761)
+======================================================================
+
+Headless Chrome walk on a local copy of docs/ (390x844 and 1280x900), with a fake Ollama on
+127.0.0.1:11434 and a fake LM Studio on 127.0.0.1:1234, counting every request the page made to
+127.0.0.1 in its first 9 seconds.
+
+1.1 Returning person, cold boot, last tab Chat (fl-welcomed true):
+      main:    38 local requests: 33 Bridge /health (three full 11435... scans: flBridgeDetectBoot
+               at 1.2s, autoDiscoverAI at 3s, FlConnect probes) + 5 /api/tags.
+               TWO voices: the Local AI toast ("Local AI detected! Click here to connect.") AND the
+               Chat suggest banner ("Yes, use Ollama") at the same time.
+      after:   16 local requests: 13 /health (one full scan), 2 /api/tags (one is BrowseModels.init,
+               see 9.2), 1 LM Studio /v1/models. ONE voice: "Ollama and LM Studio are ready on this
+               computer. Tap to choose a mind." Tapping it opens Connect with both doors listed.
+
+1.2 New person opens freelattice.com/#connect cold:
+      main:    73 local requests (66 /health, 7 tags). The toast lands on top of Connect AND the
+               welcome overlay (flWelcomeOverlay) lands on top of Connect one second later.
+      after:   12 local requests. No toast, no welcome overlay, Connect shows "Ollama is ready,
+               pick a mind" and "LM Studio is ready, pick a mind".
+
+1.3 Racers at cold start on main (all start on their own timer, each does its own look):
+      app.html 27769  FlOnboarding.detectOnLoad()        toast after its own /api/tags
+      app.html 31524  flBridgeDetectBoot run()           full Bridge scan at 1.2s
+      app.html 33782  owAutoDetect()                     /api/tags + LM Studio, banner
+      app.html 33789  Zero-Click setTimeout(flAutoConnect, 1500)
+      app.html 39679  autoDiscoverAI() at 3s             full scan again
+      app.html 68588  goConnect() #connect retries       re-lands Connect up to 3 times
+      fl-connect.js   mount -> lookAgain -> refreshUI -> probe (its own scan)
+      app.html 32143  flMaybeShowWelcome 1s timeout      lands late, even over #connect
+      app.html 33669  Garden-first landing IIFE          lands last tab without knowing about #connect
+    resolveOllamaBase (app.html ~34230) has no in-flight join, so parallel callers each probe.
+
+1.4 Dead guard: showOllamaToast (app.html 27802) checks document.getElementById('welcomeOverlay').
+    That id no longer exists (the Grandmother Door is #flWelcomeOverlay with .fl-welcome-visible),
+    so the toast never stepped aside for the welcome door.
+
+1.5 False words: owAutoDetect LM Studio branch (app.html 35227) sets
+    '<strong>LM Studio detected!</strong> ... Use it for completely private AI?' via innerHTML, but
+    the banner button still reads "Yes, use Ollama". Status labels at 25901 and 35565 say
+    "Ollama (model)" even when state.provider is 'lmstudio'.
+
+1.6 Connect (fl-connect.js) never looks at LM Studio at all. A person with only LM Studio sees
+    "No local mind yet" and a Bridge download card.
+
+1.7 FLBoxPointer (Chat Box field, app.html 34432+) persist() writes any host to fl_ollamaHost,
+    including public internet addresses and names, and probe() fetches them. getOllamaBaseUrl()
+    then uses that host for every chat. fl_lmstudioHost is read raw in probeLocalMind (~34155) and
+    in the Settings Go-10 probe (~31606) with no check at all.
+
+1.8 Toast at 390px wraps into a tall narrow column (.fl-ollama-toast at ~11731 has left:50% and
+    translateX(-50%) but no width). With honest door names the text is longer, so a width layer
+    ships here.
+
+======================================================================
+2. DECISIONS AND CHOICES (stated, so review is quick)
+======================================================================
+
+Kirk's decision (F4, verbatim intent):
+  - Default "This computer only".
+  - One clear switch: "Also use a computer on my home network".
+  - When on, the person types an address once and sees exactly:
+      "Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked."
+  - Private ranges only. Public addresses always refused. Remembered until changed. One tap
+    reverts. No confirm(), no approval screens. Future hook for signed remote minds.
+

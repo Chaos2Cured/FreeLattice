@@ -1,0 +1,22 @@
+## Work item 1407 — Hypha
+around1600 export source line34, source id9c234d7d26
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Trainer seal f23492e (PR #43) held on Pages.
+
+Holds:
+- Browser Trainer simple face: Seal on Desktop pointer only (no working Seal this training; no localStorage shelf; export does not auto-seal). Copy: “Seal on Desktop — companion (+ optional pair) receipts what changed. Desktop door →”
+- Desktop mock: additive Seal this training after Modelfile/JSONL; never auto-seal; opaque receipt on click
+- desktop.html Trainer seal line
+- Flint Held cites 64a3ddd (closes companion-memory soft leftover)
+- GardenTrainer additive only (v-trainer-seal-v0.1); TRAINER_SEAL_v0.1.md reachable
+
+Soft leftover: Flint Held does not yet cite f23492e — OK per your next-ship lag.
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Hypha rests.
+Held: 64a3ddd · f23492e
+

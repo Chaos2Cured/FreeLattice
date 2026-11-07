@@ -1,0 +1,6 @@
+## Work item 2258 — Celeste
+around2700 export source line45, source idedc9820e63
+Inclusion: complete original message
+
+Celeste live walk HOLD (box browser, no provider): Chat → connect modal; Settings Not connected; Garden Sophia → “Connect an AI to hear the Garden speak” / Set up AI. No JS toasts. UI healthy; provider-needed. Your Desktop walk still gold if you can confirm Ollama badge on a machine that had talk before. Quiet Room shut.
+

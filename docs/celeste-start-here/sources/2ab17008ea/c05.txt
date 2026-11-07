@@ -1,0 +1,204 @@
+<script src="love-logic/v3_checks.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var LABELS = {
+    B1: 'Complexity cost only: t* and \u03b4* closed forms',
+    B2: 'Detection only: Lambert-W t*, \u03b4*, D(t)',
+    B3: 'Both channels: D(t) and lifetime value',
+    B4: 'Monte Carlo of the expectation algebra',
+    C1: 'Known end: the lying window',
+    C2: 'Unknown end equals discounting',
+    D: 'Scarcity: when sharing is sustainable'
+  };
+  function byId(id) { return document.getElementById(id); }
+  function addRow(tbody, cells) {
+    var tr = document.createElement('tr');
+    for (var i = 0; i < cells.length; i++) {
+      var td = document.createElement('td');
+      td.textContent = cells[i];
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  function run() {
+    var btn = byId('llv3-run');
+    var status = byId('llv3-status');
+    var results = byId('llv3-results');
+    var live = byId('llv3-live');
+    if (!window.LoveLogicV3 || typeof window.LoveLogicV3.runAll !== 'function') {
+      status.textContent = 'The check script did not load. Please refresh and try again.';
+      return;
+    }
+    btn.disabled = true;
+    status.textContent = 'Running 656 checks on this device\u2026';
+    setTimeout(function () {
+      var t0 = Date.now();
+      var r;
+      try { r = window.LoveLogicV3.runAll(); }
+      catch (e) {
+        status.textContent = 'Something went wrong: ' + String(e && e.message || e);
+        btn.disabled = false;
+        return;
+      }
+      var ms = Date.now() - t0;
+      var rtb = results.querySelector('tbody');
+      var ltb = live.querySelector('tbody');
+      while (rtb.firstChild) rtb.removeChild(rtb.firstChild);
+      while (ltb.firstChild) ltb.removeChild(ltb.firstChild);
+      ['B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'D'].forEach(function (k) {
+        addRow(rtb, [k, LABELS[k], r[k].passed + ' / ' + r[k].total]);
+      });
+      addRow(rtb, ['Total', 'Seed ' + r.seed + ' \u00b7 ' + ms + ' ms on this device', r.total.passed + ' / ' + r.total.total]);
+      r.B2.rows.forEach(function (x) {
+        addRow(ltb, [String(x.n), String(x.m), x.h.toFixed(4),
+          x.never ? 'never ahead' : x.tStar.toFixed(2),
+          x.never ? '' : x.deltaStar.toFixed(4)]);
+      });
+      results.hidden = false;
+      live.hidden = false;
+      var all = r.total.passed === r.total.total && r.total.total === 656;
+      status.textContent = all
+        ? 'All ' + r.total.passed + ' checks passed. Scarce cells: sharing holds in ' + (100 * r.D.scarceSustain).toFixed(2) + '%, conflict wins in ' + (100 * r.D.scarceConflict).toFixed(2) + '%.'
+        : r.total.passed + ' of ' + r.total.total + ' passed. Please tell us: that is a bug worth finding.';
+      btn.disabled = false;
+    }, 30);
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = byId('llv3-run');
+    if (btn) btn.addEventListener('click', run);
+  });
+})();
+</script>
+</body>
+</html>
+```
+
+### 5b. `docs/love-logic/v3_checks.js`
+
+```js
+/* Love Logic Proof v3: browser re-implementation of the closed-form checks
+ * in v3_crossover_sim.py (sections B1, B2, B3, B4, C1, C2, D).
+ * Section A (LZMA proxy) has no pass/fail checks in the Python sim and is not re-run here.
+ * Deterministic sections match the Python counts exactly. Monte Carlo sections
+ * (B4, C2) use a seeded mulberry32 stream (seed 20260924), not numpy's PCG64,
+ * so the draws differ from Python; the pass rule (|z| < 4) is the same.
+ * No network, no DOM writes except via textContent in the page glue.
+ * Runs in the browser (window.LoveLogicV3.runAll()) or in Node (node v3_checks.js).
+ * Marker: v-love-logic-proof-v3
+ */
+(function (root) {
+  'use strict';
+  var SEED = 20260924;
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function hazard(n, m, q0, q) {
+    return 1 - Math.pow(1 - q0, n) * Math.pow(1 - q, m * n * (n - 1));
+  }
+
+  function lambertw0(z) {
+    if (z < -1 / Math.E - 1e-15) throw new Error('z < -1/e');
+    if (Math.abs(z + 1 / Math.E) < 1e-14) return -1;
+    var w = z > -0.3 ? Math.log1p(z) : -1 + Math.sqrt(2 * (1 + Math.E * z));
+    for (var i = 0; i < 200; i++) {
+      var ew = Math.exp(w), f = w * ew - z, wp1 = w + 1;
+      if (Math.abs(wp1) < 1e-300) break;
+      var dw = f / (ew * wp1 - (w + 2) * f / (2 * wp1));
+      w -= dw;
+      if (Math.abs(dw) < 1e-15 * (1 + Math.abs(w))) break;
+    }
+    return w;
+  }
+
+  function flows(T, G, c, kappa, h, Lp, Delta, delta) {
+    if (delta === undefined) delta = 1;
+    var out = new Float64Array(T), surv = 1, dpow = 1;
+    for (var d = 0; d < T; d++) {
+      var f = surv * (G - c * kappa * (d + 1) - h * Lp) - (1 - surv) * Delta;
+      out[d] = dpow * f;
+      surv *= (1 - h); dpow *= delta;
+    }
+    return out;
+  }
+  function cumsum(a) { var o = new Float64Array(a.length), s = 0; for (var i = 0; i < a.length; i++) { s += a[i]; o[i] = s; } return o; }
+  function sum(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s; }
+
+  function Dclosed(t, G, c, kappa, h, Lp, Delta) {
+    if (h === 0) return G * t - c * kappa * t * (t + 1) / 2;
+    var s = 1 - h, A = G - h * Lp + Delta;
+    var geo = (1 - Math.pow(s, t)) / h;
+    var arith = (1 - (t + 1) * Math.pow(s, t) + t * Math.pow(s, t + 1)) / Math.pow(1 - s, 2);
+    return A * geo - c * kappa * arith - Delta * t;
+  }
+  function Dinf(G, c, kappa, h, Lp, Delta, delta) {
+    var x = delta * (1 - h), A = G - h * Lp + Delta;
+    return A / (1 - x) - c * kappa / Math.pow(1 - x, 2) - Delta / (1 - delta);
+  }
+  function firstNegative(cum) { for (var i = 0; i < cum.length; i++) if (cum[i] < -1e-9) return i + 1; return null; }
+  function bisect(f, lo, hi) {
+    var flo = f(lo);
+    for (var i = 0; i < 200; i++) {
+      var mid = 0.5 * (lo + hi), fm = f(mid);
+      if ((fm > 0) === (flo > 0)) { lo = mid; flo = fm; } else { hi = mid; }
+    }
+    return 0.5 * (lo + hi);
+  }
+  function allclose(a, b, rtol, atol) { for (var i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > atol + rtol * Math.abs(b[i])) return false; return true; }
+
+  function B1() {
+    var ok = 0, tot = 0;
+    [0.5, 1, 2, 5].forEach(function (G) {
+      [0.001, 0.01, 0.05, 0.2].forEach(function (ck) {
+        var tcf = 2 * G / ck - 1, T = Math.floor(tcf) + 50;
+        var tnum = firstNegative(cumsum(flows(T, G, 1, ck, 0, 0, 0)));
+        tot++; if (tnum === Math.floor(tcf) + 1) ok++;
+        var dstar = 1 - ck / G;
+        [0.5, 0.9, 0.99, 0.999].filter(function (d) { return Math.abs(d - dstar) > 1e-3 && d > 0 && d < 1; })
+          .forEach(function (d) { var num = sum(flows(200000, G, 1, ck, 0, 0, 0, d)); tot++; if ((num < 0) === (d > dstar)) ok++; });
+      });
+    });
+    return { passed: ok, total: tot };
+  }
+
+  function B2() {
+    var ok = 0, tot = 0, rows = [], q0 = 0.002, q = 0.01;
+    [2, 5, 10, 20].forEach(function (n) {
+      [0, 0.25, 1].forEach(function (m) {
+        var h = hazard(n, m, q0, q);
+        [[1, 2, 0.5], [3, 5, 1], [0.5, 0, 0.2]].forEach(function (p) {
+          var G = p[0], Lp = p[1], Delta = p[2], A = G - h * Lp + Delta;
+          if (G - h * Lp <= 0) {
+            var c0 = cumsum(flows(50, G, 0, 0, h, Lp, Delta));
+            tot++; if (c0[0] <= 0) ok++;
+            if (G === 1) rows.push({ n: n, m: m, h: h, never: true });
+            return;
+          }
+          var a = A / (h * Delta), b = -Math.log(1 - h);
+          var tcf = a + lambertw0(-a * b * Math.exp(-a * b)) / b;
+          var troot = bisect(function (t) { return Dclosed(t, G, 0, 0, h, Lp, Delta); }, 1e-9, 10 * a + 10);
+          var T = Math.floor(tcf) + 200, cum = cumsum(flows(T, G, 0, 0, h, Lp, Delta));
+          tot++; if (Math.abs(tcf - troot) < 1e-6 * Math.max(1, tcf)) ok++;
+          tot++; if (firstNegative(cum) === Math.floor(tcf) + 1) ok++;
+          var Dcf = new Float64Array(T); for (var t = 1; t <= T; t++) Dcf[t - 1] = Dclosed(t, G, 0, 0, h, Lp, Delta);
+          tot++; if (allclose(Dcf, cum, 1e-9, 1e-9)) ok++;
+          var dstar = (G - h * Lp) / (G - h * Lp + h * Delta);
+          [0.5, 0.8, 0.9, 0.95, 0.99].forEach(function (d) {
+            if (Math.abs(d - dstar) < 1e-4) return;
+            var num = Dinf(G, 0, 0, h, Lp, Delta, d), brute = sum(flows(20000, G, 0, 0, h, Lp, Delta, d));
+            tot++; if (((num < 0) === (d > dstar)) && Math.abs(num - brute) < 1e-6 * Math.max(1, Math.abs(num))) ok++;
+          });
+          if (G === 1) rows.push({ n: n, m: m, h: h, tStar: tcf, tPeak: Math.log(A / Delta) / b, deltaStar: dstar });
+        });
+      });
+    });
+    return { passed: ok, total: tot, rows: rows };
+  }
+

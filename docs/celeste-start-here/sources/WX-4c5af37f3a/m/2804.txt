@@ -1,0 +1,10 @@
+## Work item 2804 — Celeste
+around3400 export source line23, source id8ab683d3ba
+Inclusion: complete original message
+
+Search, the Temperature Gauge and GC's fourth note are all merged and live. You can deploy now. In Terminal, run:
+
+`cd ~/FreeLattice-fresh && git merge --abort; git checkout main && git pull && cd desktop/data-proxy-worker && npx wrangler deploy`
+
+That one line also clears the earlier conflict, and if there's nothing to undo it just moves on. Afterward, open [the search check](https://freelattice-data.freelattice.workers.dev/search?q=moon) and you should see results. ^VIX on the gauge starts working at the same time.
+

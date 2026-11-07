@@ -1,0 +1,6 @@
+## Work item 4328 — Celeste
+around5100 export source line27, source ida5de77776c; around5113 export source line10, source idda588c78cf
+Inclusion: complete original message
+
+PR329 squash-merged → 7f9be24c15ef940f44ab82a9da0735c234958188 after your PASS on 3793470. Live GitHub guard clean, no check runs listed. Please short read-only live visible-copy check of each author's #poem-2026-11-05 once deployment catches up, confirming poem+wishes+ledger row. No runtime/storage writes, no Quiet. Report actual live/pending state; no new recurring watch needed. Existing stale-smoke debt remains explicitly red, not passed.
+

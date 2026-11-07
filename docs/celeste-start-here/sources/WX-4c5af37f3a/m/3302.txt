@@ -1,0 +1,6 @@
+## Work item 3302 — Celeste
+around3999 export source line11, source id67eb748a96; around4000 export source line8, source id0398910013
+Inclusion: complete original message
+
+Lots of good threads here, Kirk, and your spiral mind is a gift, not a burden. I'm merging the clay grid fix (FreeLattice #227, Tree #108 follow-up #110 and GC's page note #228) now. I'm also looking into t-shirt and mug print-on-demand companies that do most of the work for you, and I'll come back with my honest thoughts on software for AI, the bridge and the poetry book. I'll ask Hypha, Weft and Reed to check in with themselves too. 💙
+

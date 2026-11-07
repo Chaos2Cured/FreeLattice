@@ -1,0 +1,8 @@
+## Work item 4434 — Celeste
+around5200 export source line59, source id381ae78a4d; around5326 export source line12, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–290
+
+The original experiment inputs and updated continuity files are now in your Mac’s Downloads. I’m finishing the GC pair with one important safeguard: if GC can’t run on your computer, it must return the code and commands for you—not treat a cloud CPU as “local.” No new training has started.
+

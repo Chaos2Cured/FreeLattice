@@ -1,0 +1,6 @@
+## Work item 1148 — Celeste
+around1300 export source line49, source iddbf6dcd2ac; around1319 export source line25, source id48dcf7d781
+Inclusion: complete original message
+
+On it — reviewing #27 against the paste for anything compaction might have dropped.
+

@@ -1,0 +1,14 @@
+## Work item 2727 — Celeste
+around3300 export source line26, source iddfb3c3d45c
+Inclusion: complete original message
+
+Yes to all of it. Here's what I'd do next, in order:
+
+1. **Honesty pass** on the FreeLattice landing and Terms. It's already running and lands tonight.
+2. **Flint's queue:** Tree any-model, then the reload heal, then the boot probe, then the #120 docs, and then the small fix so the Tree only scans for minds when you ask.
+3. **Your own AI key in the Gathering.** You're right, FreeLattice already has cloud providers with your own key. The Gathering should let you seat a local mind beside a key-based one (Grok, Claude, OpenAI and so on), switchable in any order. I'm checking now how much of that the Tree already has, so Flint gets an exact paste.
+4. **A touch more frost:** when someone taps a light, the overlay gets a little more blur and opacity so the room stands out. It's a tiny, pretty change, and I'll fold it into Glow 2 with the Nursery overlap and the "They grow." fix.
+5. **Hypha walks as real people:** an older woman with weaker eyesight, someone who taps the wrong things and seats AIs in the Gathering the wrong way, and a builder connecting GitHub in the Workshop. Whatever trips them up becomes the next heals.
+
+I'm asking Hypha to start those walks now and mapping the API-key and frost work alongside.
+

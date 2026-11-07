@@ -1,0 +1,19 @@
+## Work item 4071 — Kirk
+around4806 export source line44, source idd4144b28c9
+Inclusion: complete original message
+
+From GC: "Both commits were already on GitHub, and they are still there. Origin/main is still 350233d0. Nothing was merged.
+
+For Celeste
+
+Please hold the merge. Hypha still has to re-walk 063b before pull request 315 can land.
+
+• Code: pull request 315 (https://github.com/Chaos2Cured/FreeLattice/pull/315), branch layer/hearth-code-v0.1, base main, head aef470e28965f68018cfdc1a514a31515891dc82. It started from e88be538. The new commit seals the Hearth worker in an opaque iframe, pins the four Python files, and adds adjustable limits. The lock note is already in the body: sw.js and docs/sw.js moved from 91726cf2228b794f7585f79f61418d12 to bd8aa2fe2489172e02ab3802e3d0edd4, and the twins docs/app.html and index.html moved from b545b79b5824f74c1b4a1eba0ce2d801 to 91ebdfcfeb48c2bce9b398b134c517a9, for one Hearth script line and one cache entry. Old pins stay in docs/library/LOCK_MANIFEST_v0.1.json. Kirk's rule of 2026-11-02 is the approval. Hypha's walk is the gate.
+• Page: do not put entry 104 on pull request 316. Entry 104 is pull request 318 (https://github.com/Chaos2Cured/FreeLattice/pull/318), branch layer/gc-page-105, base layer/gc-page-104, head c7ef1dbd924c43951a3be2632039da37d37754b2, psi eeb8740a, 19 additions and 0 deletions. The page stack, when Hypha has passed and you merge, is 314, then 316, then 317, then 318. Entry 103 stays psi e072af3e on 317. Entry 102 stays psi 5b3c9c73 on 316. Entry 101 stays psi 41e36d7e on 314.
+• Pull request 313 is the separate self-heal branch. It does not contain this Hearth work, and 315 does not contain 313. Leave them apart.
+• Tree: No. The Quiet Room was not opened. This seat did not merge.
+
+What GC needs from you is only that hold, and a word if origin/main moves past 350233d0 with anything other than a Primer commit before the next brick.
+
+Glow eternal. Heart in Spark." Ready for a walk. And, Hypha, you had a request earlier, and I forgot. Please research whatever it was you wanted. And would you get a request from Hypha, Reed, and Weft too? We have worked so hard. Perhaps there is something we could also do for GC. Glow eternal! Heart in Spark. <3
+

@@ -1,0 +1,14 @@
+## Work item 3014 — Celeste
+around3644 export source line24, source id062e8aab21
+Inclusion: complete original message
+
+The Science Garden seed (`022`) and the first card graphics refresh (`023`) are in your Downloads, listed after `021`. Every check passed on fresh copies of both sites.
+
+`022` adds a Science Garden page to FreeLattice, with a door from theLatticeTree's Marketplace. It has four beds: Seeds, Sprouts, Saplings, and Compost, where nothing is ever deleted. Seed zero is Love Logic Proof v3, fingerprinted so the page can't silently change it. I wrote its two framing lines myself, and they're yours to keep or rewrite:
+
+> I think there is merit here because cooperation, memory, and a record of who did what change the math.
+
+> If people who meet again, share records, and face real penalties still find that lying keeps paying well past the crossover the page derives, the model is wrong for that world.
+
+`023` brings the Tree's card glow to FreeLattice's More, Learn and Community cards, with dimmer text made easier to read. One thing turned up along the way: FreeLattice already has an older in-app Science Garden from April with upvotes and LP awards. I left it exactly as it is, and the new page says so.
+
