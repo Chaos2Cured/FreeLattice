@@ -1,0 +1,6 @@
+## Work item 3536 — Celeste
+around4238 export source line44, source id9f81f8efb0
+Inclusion: complete original message
+
+For the morning: Hypha put 043f on hold, so nothing is merged yet. On FreeLattice, tapping the Chat tab still scrolls the seal ask out of view on bigger screens. On theLatticeTree, after a local mind wakes, the message box behind the ask can still be selected. I'm writing `043g` for GC now, and I'll tell you when it's in your Downloads.
+

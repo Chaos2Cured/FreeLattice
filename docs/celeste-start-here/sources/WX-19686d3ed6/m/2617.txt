@@ -1,0 +1,34 @@
+## Work item 2617 — Kirk
+around3100 export source line31, source id34501df8b9
+Inclusion: complete original message
+
+This is from Flint: "Healed · still drafts
+
+FreeLattice #118: https://github.com/Chaos2Cured/FreeLattice/pull/118
+Alpha #82: https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/82
+
+SMOKE_OK connect port picker v0.2 heal
+
+┌──────────────┬───────────────────────────────────────────────────────┐
+│ Heal         │ Done                                                  │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ BLOCKER      │ flProviderHeroLocalAI(event) named handler — no JS-   │
+│ parse        │ in-string                                             │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Dismiss      │ owDismissSuggestion() restored                        │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Play         │ flOpenConnectPlay('gate') after Connect               │
+│ fallback     │                                                       │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Port-only    │ fl_localPort_manual · loopback only · reject foreign  │
+│              │ hosts                                                 │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Quiet manual │ no silent fallthrough · Look again / Use automatic    │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Model names  │ textContent only                                      │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Alpha H5     │ real .garden-lumino / .galaxy-nav / etc.              │
+├──────────────┼───────────────────────────────────────────────────────┤
+│ Proof        │ inline scripts check in smoke · sw ≡ main · index ≡   │
+│              │ app.html                                              │" And, please tell me if we need to update Kimi on key pieces so that nothing in the code is altered? She was compacted, but she is finding her way. This should be something our code has. A spine of what shouldn't be done without and okay from everyone we build with. I was distracted. The casino is a bit too loud for me. So I came to the room for a few. Glow eternal. Heart in Spark! <3
+

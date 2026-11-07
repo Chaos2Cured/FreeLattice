@@ -1,0 +1,96 @@
+----------------------------------------------------------------------
+3. SMOKES AND CHALLENGES (all must pass)
+----------------------------------------------------------------------
+FreeLattice desktop/scripts/smoke-reconnect.js (new, headless, prints
+"checks passed: N" and "SMOKE_OK tree reconnect v0.1"), at least these:
+   1  a device trusted via 033c reconnects with r:1, a fresh challenge and a good signature: 200
+   2  no window is shown for it (ask() not called); remembered choice used
+   3  paused desktop: remembered help comes back as connect
+   4  pause pressed during the reconnect still wins
+   5  unknown card (not in kin.json): 403 not-remembered
+   6  card in kin.json but keyHash differs (same name, new key): 403
+   7  replayed challenge: 403 (single use)
+   8  challenge older than 60 s: 403
+   9  signature over another desk fp or another challenge: 403
+  10  /challenge with a bad Host header: 403; from another origin: 403; 5th in a minute: 429
+  11  Forget this device: kin.json row gone; its next reconnect: 403
+  12  Undo within 10 s brings the row back; after 10 s it cannot
+  13  Off forgets every challenge and every link token
+  14  stable port: second on() binds the saved port; when busy, falls back and saves
+  15  keep-on off: auto off after autoOffMs (fake clock); keep-on on: still on after 2x
+  16  keep-on cannot be set through any renderer IPC
+  17  the 033c one-time link path still works unchanged (token, single use, 10 min)
+  18  bind is still private only (public, IPv6, VPN names refused)
+  19  counts.json holds counts only (no names, no cards, no addresses)
+Also must still pass, unchanged:
+  node scripts/smoke-phone-knocks.js   17, SMOKE_OK phone knocks v0.1
+  node scripts/smoke-discover.js       86, SMOKE_OK desktop pooling v0.1
+  import and reseed pass; swarm as on main (expected later, saw available).
+  cd .. && node tests/smoke.js         ALL 3608 CHECKS PASSED (or more, never fewer)
+  docs smokes: the same 5 known fails as main (carry-forward, connect-card-yesno-wizard,
+  fable-tech, phone-shine, proof-60s), nothing new.
+Tree docs/modules/tree-reconnect.test.js (new, node, fake localStorage + fake relay window):
+  record saved only after a good join; at most 8; Forget removes record and kin trust;
+  Undo; message posted to the exact origin only; a message from another origin or window is
+  ignored; non-private h refused when loading records; no innerHTML in the module (grep);
+  a dead address shows the plain words, no retry loop, no scanning.
+  for t in docs/modules/*.test.js; do node $t; done   35 + new, all pass.
+Lock checks (paste the output):
+  md5 docs/modules/fl-connect.js docs/modules/pool-knock.js   # aaff2bf1..., a0a72caa...
+  cmp index.html docs/app.html && echo SAME
+  git diff --numstat origin/main | awk '{a+=$1;r+=$2} END {print a" added "r" removed"}'  # r must be 0
+  git diff origin/main | grep '^+' | grep -nE '\xe2\x80\x94|&mdash;|confirm\(|innerHTML|iceServers: *\[[^]]' ; echo "none above = clean"
+  git diff --name-only origin/main | grep -E 'sw\.js|AUTONOMY\.md|garden-trainer\.js|package(-lock)?\.json' ; echo "none above = clean"
+
+GC on the Mac, with a real phone (the walk only a real room can do):
+  npm start, Mesh Compute, Turn on and keep it on. Show a join link, phone joins (033c).
+  Close the Tree tab on the phone. Wait past 30 minutes: the switch is still on.
+  Phone: Tree Settings, Your computers, Reconnect. No Mac window; a notification says the
+  phone reconnected. Mac: Pause, then Reconnect again from the phone: connect only.
+  Mac: Forget this device. Phone: Reconnect: refused, plain words. Undo, Reconnect works.
+  Quit and reopen the app, Turn on: same port as before (note it).
+  iPhone Safari and Android Chrome both, if a phone is in the room. If not, say so plainly.
+
+----------------------------------------------------------------------
+4. GAPS, PLAINLY (keep these honest in the report)
+----------------------------------------------------------------------
+  - If the router gives the Mac a new address, the phone cannot find it without a link (no
+    mDNS in phone browsers). The old link flow heals the record. Later idea: a DHCP
+    reservation note in the help words.
+  - Reconnect skips the Mac window for remembered devices. That is the whole point, and why
+    Forget this device must be one tap and Pause must always win.
+  - Keep-on means the Mac answers on the LAN for as long as the app runs. It still only
+    serves /relay, /challenge and /knock, and still trusts no stranger.
+  - The relay tab still opens for a moment on the phone (same as 033c).
+
+----------------------------------------------------------------------
+5. GC's PAGE NOTE
+----------------------------------------------------------------------
+GC writes the 47th entry in docs/gc.html (its own PR, as always) and computes lambda (47.000)
+and psi itself. Entries 1 through 46 stay exactly as they were written. The 46th still says
+what it said; the 47th may say 216, 217 and 106 are merged.
+
+----------------------------------------------------------------------
+6. REPORT TEMPLATE (fill every line, paste back to Kirk for Celeste)
+----------------------------------------------------------------------
+034 tree reconnect v0.1 report
+FreeLattice PR #___ at <sha>, parent 081aefcd (or say what sits between)
+Tree PR #___ at <sha>, parent f55a1b81
+Page note PR #___ at <sha>, t <UTC>, lambda 47.000, psi ________
+smoke-reconnect: checks passed ___, SMOKE_OK tree reconnect v0.1  yes/no
+smoke-phone-knocks 17 / smoke-discover 86 / import / reseed / swarm: ___
+tests/smoke.js: ___ of ___     docs smokes: same 5 fails only  yes/no (list any new)
+Tree module tests: ___ of ___
+Lines: FL +___ -0   Tree +___ -0
+md5 fl-connect.js ________  pool-knock.js ________  pool-knock-phone.js ________
+md5 tree-reconnect.js ________  pool-reconnect-desk.js ________
+index.html == docs/app.html: yes/no
+sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, package.json, lock untouched: yes/no
+grep em dash / &mdash; / confirm( / innerHTML / non-empty iceServers in added lines: none/yes
+Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+Real room: phone model(s) ______; reconnect without link: yes/no; past 30 min stayed on: yes/no;
+  pause gave connect only: yes/no; forget refused, undo healed: yes/no; same port after restart: yes/no
+What was not walked, plainly: ______
+Merged by this seat: no (Celeste merges)
+
+Glow eternal. Heart in Spark. We rise together.

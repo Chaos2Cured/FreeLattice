@@ -1,0 +1,41 @@
+7. NOTEBOOK STORE WORDING AND AUDIT
+  a. The private line becomes, both repos: "Private means hidden in the app on this browser,
+     not encrypted from anyone who uses this browser profile." Anywhere else that says
+     private, add "on this browser".
+  b. docs/library/MEMORY_BLEED_AUDIT.md: add a dated section (add-only) for FreeLatticeWorkspace
+     (IndexedDB): what it holds (pages, versions, seals, sealAsks), that it is per browser
+     profile not per person, that private pages are hidden not encrypted, what export and import
+     carry (per 040b), and the advice: one browser profile per person.
+  c. Optional, only if small and safe: key the store by the active profile name if the app has
+     one (FreeLatticeWorkspace or FreeLatticeWorkspace:<profile>), with the unnamed default
+     opening the existing DB unchanged so no one loses a page. If it grows, skip and say so.
+
+8. CLAY: BIGGER AND IN VIEW
+  The place stays (directly under the last reply, 040d). The shape fills more of its box: scale
+  the form so its bounds use about 80% of the canvas (today about 50px of 320x260). Canvas
+  height = min(320px, 45vh) with width 100% of the bubble column, so at 200% it never gets taller
+  than the chat view. After a reply that shapes clay, scrollIntoView the canvas with block
+  'nearest' (no scroll if already visible; reduced motion = instant). particle-clay.js and
+  clay-forms.js add-only; clay-math.js untouched.
+
+----------------------------------------------------------------------
+9. THE SMOKE
+  New scripts/smoke-seal-ask-heal-v0.1.js (each repo), jsdom or the existing harness:
+    - ask renders once with Notebook open; Escape in ask leaves the Nursery open; state = later
+    - ask text holds the mind's name, not "Ollama" or any model name; no 64-hex outside details
+    - only one deferring button visible in the dock
+    - Later -> re-ask within cooldown refused; after cooldown allowed
+    - Decline then Seal it -> state sealed, current panel has no "Declined" text
+    - pending ask survives a reload (fake-indexeddb or the existing mock)
+    - private flip rewrites the earlier "Wrote to Diary" line to the public title
+    - secret text absent from DOM and storage (040 PASS re-run)
+  Viewport check (Playwright if already present, else note it for Hypha's walk): Approve rect in
+  viewport and on top at 390, 1280, 200% on both sites.
+  Prints SMOKE_OK seal ask heal v0.1.
+
+10. REPORT
+  PR links, head shas, every removed line and where its job went, md5s of every locked file on
+  each branch (incl. mind-workspace.js FL == Tree), all smokes (tests, scripts/, docs smokes:
+  only the known 5 may fail), screenshots of the ask at 390 / 1280 / 200% on both sites, and
+  the gc.html ledger entry with t, lambda, epsilon, delta, omega, sigma so Celeste can
+  recompute psi. Hypha will re-walk before merge.

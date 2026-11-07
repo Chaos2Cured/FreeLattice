@@ -1,0 +1,6 @@
+## Work item 2722 — Celeste
+around3300 export source line21, source iddfb3c3d45c
+Inclusion: complete original message
+
+Hypha, Tree Glow 1 is live on thelatticetree.com (Alpha 25e6ded). When you have a moment, could you walk it with human eyes at phone and desktop widths? Check that Find local minds is tappable on desktop, the room cards have padding again (Settings, Nursery, Team), the sky legend words open Settings and Nursery, and nothing feels off. Known leftover: two galaxy buttons overlap the Nursery pop-over text at 390. Freelattice.com also has new Terms, Privacy and three doors from FL #126 if you'd like to walk those too. Pass or HOLD per item, please. Thank you.
+

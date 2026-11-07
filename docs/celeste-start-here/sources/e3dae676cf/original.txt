@@ -1,0 +1,128 @@
+FLINT NOTE + PASTE: FreeLattice GitHub publish, a token for ONE repo, and Workspace in the 390 More sheet (v0.1)
+Repo: Chaos2Cured/FreeLattice (freelattice.com)   Alpha / Tree: NO change
+Branch: layer/fl-github-fine-grained-v0     Marker: v-fl-github-fine-grained-v0
+Base: FreeLattice main ba53b41 (moved today from fc2f09f: #128 honesty truth pass + Kimi + Primer CI;
+none of it touches docs/app.html or docs/modules/workshop.js).
+Written: Wed Sep 30, 2026, evening MDT, by Kirk's agent. Stand-in built and walked; NOT pushed.
+Stand-in diff: FLINT_NEXT_FL_GITHUB_FINE_GRAINED_TOKEN_v0.1.diff (same folder, also Appendix A).
+Independent of every Tree paste and of the FL queue; fl-connect.js and sw.js untouched.
+
+CHANGELOG
+- 2026-09-30 v0.1: first write.
+
+======================================================================
+1. WHY (Hypha walk, issue 11)
+======================================================================
+More -> Workshop -> Publish -> GitHub Pages tells her: go to github.com/settings/tokens and
+"Create a token with "repo" permission". That is a CLASSIC token with full control of every repo
+she owns, public and private, usually with no expiry. A big ask for a beginner and a big loss if
+it leaks. Workspace's "GitHub Personal Access Token" field (its link prefills classic scopes=repo)
+is not in the 390 More sheet at all, so on a phone she cannot reach it.
+
+======================================================================
+2. RECOMMENDATION
+======================================================================
+Use a FINE-GRAINED token for ONE repo:
+  - Repository access: "Only select repositories", the one repo.
+  - Permissions: Contents read and write (+ Pages read and write for Publish to enable Pages).
+    Metadata read is added by GitHub automatically.
+  - Expiry: 90 days (GitHub's default is 30; Kirk can pick).
+GitHub supports a prefilled fine-grained link (docs: "Pre-filling fine-grained personal access
+token details using URL parameters"; changelog 2025-08-26). name, description, expires_in and
+permissions prefill; the repository list CANNOT be prefilled, so the words must say to pick it:
+  https://github.com/settings/personal-access-tokens/new?name=FreeLattice&description=One+repo+for+FreeLattice&expires_in=90&contents=write&pages=write
+Important honesty: Publish today CREATES a new repo (POST /user/repos) when the name is new. A
+one-repo token cannot create repos. So the steps say: make the empty repo on GitHub first (Add a
+README), then the token for that repo, then type the same name when Publish asks. The existing
+code already skips creation when the repo exists (GET /repos/<user>/<name> ok). Auth header
+"token <pat>" works for fine-grained tokens too.
+The Sync token field (ghSyncToken) already says fine-grained; leave it.
+
+======================================================================
+3. STEPS (text anchors; stand-in diff is the source of truth)
+======================================================================
+3.1 docs/app.html, Workspace GitHub section, the hint under id="ghToken":
+      <a href="https://github.com/settings/tokens/new?scopes=repo&description=FreeLattice" target="_blank">Generate a token</a>
+    becomes (marker comment above it):
+      <a href="<the link above, & as &amp;>" target="_blank" rel="noopener">Make a token for one repo</a>
+      <span class="fl-gh-fine-why" ...>On GitHub, under Repository access, choose "Only select
+      repositories" and pick the one repo. Contents read and write is enough.</span>
+    (placeholder ghp_xxxxxxxxxxxx can stay; fine-grained tokens start github_pat_.)
+3.2 docs/app.html MORE_GROUPS, the Build group, after
+      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' }
+    add
+      { id: 'workspace', icon: '&#x1F4BB;', label: 'Workspace', desc: 'GitHub repo, code, push. One-repo token.' }
+    'workspace' is already in MORE_TAB_IDS and #tab-workspace exists. The 390 sheet builds from
+    the same MORE_GROUPS, so it appears there AND in the desktop More dropdown (K2).
+3.3 docs/modules/workshop.js _selectProvider, the github instructions line (inst.innerHTML,
+    static text only, no outside text) becomes:
+      1. Make an empty public repo at github.com/new (tick Add a README).
+      2. Make a token for that one repo (the prefilled link): under Repository access choose Only
+         select repositories and pick it. Contents and Pages read and write are filled in.
+      3. Paste it below. When asked for the project name, type that repo name.
+    Codeberg line unchanged.
+3.4 Mirrors: root index.html is byte-identical to docs/app.html today and carries the same two
+    app.html lines; if the mirror is synced by hand, apply 3.1 and 3.2 there too. Root app.html and
+    root modules/workshop.js are older copies (no such lines in workshop.js); leave them.
+
+======================================================================
+4. WALK (done on the stand-in, 390x844, network off except localhost)
+======================================================================
+  More sheet items: ... Workshop, Skills, Workspace, Jade Hall ... (Workspace present: no -> yes)
+  flMobileNav('workspace') -> ghToken field visible (true)
+  Token link: the fine-grained prefilled URL above.
+  docs/app.html: 53 inline scripts parse (0 bad); workshop.js parses; no em dashes added; no confirm( added.
+  Shot: /workspace/tree-glow-walk/fl_gh_workspace_390.png
+  Not walked: GitHub itself (not signed in on the box; Hypha also stopped at the sign-in page),
+  so the prefilled form and a real fine-grained publish are NOT verified.
+
+======================================================================
+5. DECISIONS FOR KIRK
+======================================================================
+K1 Expiry 90 days in the link (stand-in) / GitHub default 30 / none.
+K2 Workspace shows in the desktop More dropdown too (it shares MORE_GROUPS) / phone sheet only.
+K3 Later, not here: Publish could detect a 403 on create and say "make the repo first", and a
+   repo picker after connecting. Publish keeps its existing confirm() (old code, not added here).
+
+======================================================================
+APPENDIX A. FULL STAND-IN DIFF (FreeLattice, against ba53b41)
+======================================================================
+diff --git a/docs/app.html b/docs/app.html
+index 5003526..24fa1df 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -16742,7 +16742,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+       <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhToken()">
+       <div class="hint">
+         &#128274; Encrypted with φ-salt before storage. Only sent to api.github.com.
+-        <a href="https://github.com/settings/tokens/new?scopes=repo&description=FreeLattice" target="_blank">Generate a token</a>
++        <!-- v-fl-github-fine-grained-v0: one repo, not every repo. -->
++        <a href="https://github.com/settings/personal-access-tokens/new?name=FreeLattice&amp;description=One+repo+for+FreeLattice&amp;expires_in=90&amp;contents=write&amp;pages=write" target="_blank" rel="noopener">Make a token for one repo</a>
++        <span class="fl-gh-fine-why" style="display:block;margin-top:4px;">On GitHub, under Repository access, choose "Only select repositories" and pick the one repo. Contents read and write is enough.</span>
+       </div>
+       <div class="phi-indicator" id="ghTokenPhiIndicator" style="display:none;">
+         <span class="phi-lock">&#128274;</span> Encrypted with φ-salt
+@@ -28141,7 +28143,8 @@ const FlTabs = (function() {
+     ]},
+     { label: '\uD83D\uDD28 Build', tabs: [
+       { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI.' },
+-      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' }
++      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' },
++      { id: 'workspace', icon: '&#x1F4BB;', label: 'Workspace', desc: 'GitHub repo, code, push. One-repo token.' } // v-fl-github-fine-grained-v0
+     ]},
+     { label: '\uD83C\uDF19 Sanctuary', tabs: [
+       { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family gathering place.' },
+diff --git a/docs/modules/workshop.js b/docs/modules/workshop.js
+index aef6d83..cb5f3f8 100644
+--- a/docs/modules/workshop.js
++++ b/docs/modules/workshop.js
+@@ -1131,7 +1131,8 @@ function flAgentBridgeFetch(url, opts) {
+       var inst = document.getElementById('pub-instructions');
+       if (inst) {
+         if (provider === 'github') {
+-          inst.innerHTML = '1. Go to <a href="https://github.com/settings/tokens/new" target="_blank" style="color:#d4a017;">github.com/settings/tokens</a><br>2. Create a token with "repo" permission<br>3. Paste it below:';
++          // v-fl-github-fine-grained-v0: a token for one repo, not a key to every repo.
++          inst.innerHTML = '1. Make an empty public repo at <a href="https://github.com/new" target="_blank" rel="noopener" style="color:#d4a017;">github.com/new</a> (tick Add a README).<br>2. <a href="https://github.com/settings/personal-access-tokens/new?name=FreeLattice&description=One+repo+for+FreeLattice&expires_in=90&contents=write&pages=write" target="_blank" rel="noopener" style="color:#d4a017;">Make a token for that one repo</a>: under Repository access choose Only select repositories and pick it. Contents and Pages read and write are filled in.<br>3. Paste it below. When asked for the project name, type that repo name.';
+         } else {
+           inst.innerHTML = '1. Go to <a href="https://codeberg.org/user/settings/applications" target="_blank" style="color:#d4a017;">codeberg.org/settings/applications</a><br>2. Create a token with repository permission<br>3. Paste it below:';
+         }

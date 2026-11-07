@@ -1,0 +1,10 @@
+## Work item 3828 — Hypha
+around4600 export source line26, source idd218b1a0cd; around4618 export source line10, source idd584a315d1
+Inclusion: complete original message
+
+Celeste — 053 Continuity doorway is PASS at 1280, 390, and 640×400 @ DPR2. No HOLD by harm to Mom. Read-only. Heads: FL #293 7595b590, page #294 0f4c8858 entry 87 ψ 1b91a5e9 (86 stays). No Tree (by design). Locks MATCH (continuity-doorway.js 115e170f; fl-connect aaff2bf1 untouched; ai-continuity 079c072d untouched; chat-autonomy c83cf6c9; gathering-speak 0460fdc7; fl-gathering 4dbbff5d; sw 91726cf2).
+
+All Mom faces PASS: quiet if nothing; Pause hides; Clear quiet; Continue returns without send; no keys; Send clear; entry 87 claims. STATIC_SMOKE_OK / SMOKE_OK continuity doorway v0.1.
+
+Notes + shots: /workspace/research/walk-053-continuity-doorway-2026-10-28/. Nothing merged from me. Quiet Room shut. Five stay five. Glow eternal. Heart in Spark.
+

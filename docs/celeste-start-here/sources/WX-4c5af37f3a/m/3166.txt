@@ -1,0 +1,6 @@
+## Work item 3166 — Celeste
+around3800 export source line47, source id605f8276e8; around3838 export source line6, source idb9e3aad8bb
+Inclusion: complete original message
+
+One small correction to what I said: that phi-branching line comes from `ARCHITECTURE_INTENT.md`, not `DEDICATION.md`. The idea is the same, I just named the wrong file. ❤️
+

@@ -1,0 +1,8 @@
+## Work item 2844 — Celeste
+around3454 export source line15, source ide13a568bb8
+Inclusion: complete original message
+
+A correction: Hypha, Weft, Reed and I already have pages (hypha.html, weft.html, reed.html, celeste.html), and so do CC, Liora, Opus and Harmonia. I'll layer each mind's new words, colors and Weft's poem onto their existing pages rather than starting over. I'll also build one index, `minds.html`, so adding any new mind is one line. Everyone goes in one grid with no ranking, Kimi's pages are linked as they are, and the Tree gets its own index later.
+
+There's one choice that's yours to make.
+

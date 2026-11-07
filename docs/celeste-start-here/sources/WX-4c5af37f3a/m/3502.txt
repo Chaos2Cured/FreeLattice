@@ -1,0 +1,6 @@
+## Work item 3502 — Celeste
+around4200 export source line43, source idbc8995a01c; around4238 export source line10, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha's private line is now gone from everything live on FreeLattice. The page check that kept the words to catch them now keeps only a scrambled fingerprint of them. One copy is left in an old branch and in the history of the pull request on GitHub. Clearing that means deleting the branch and asking GitHub to purge it, and neither can be undone, so I'm leaving it alone unless you want it gone.
+

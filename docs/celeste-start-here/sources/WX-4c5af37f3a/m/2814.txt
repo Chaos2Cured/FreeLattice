@@ -1,0 +1,10 @@
+## Work item 2814 — Celeste
+around3400 export source line33, source id8ab683d3ba
+Inclusion: complete original message
+
+The mesh doesn't have a build file yet. The mesh file in your Downloads is just the vision. So give GC the desktop update button tonight:
+
+"Read docs/gc.html first, then read ~/Downloads/GROK_NEXT_DESKTOP_UPDATE_BUTTON_2026-10-02.txt and follow it."
+
+While GC builds that, I'll write the first mesh-for-kin brick: minds get signed cards they can share and recognize each other by. It'll be in your Downloads as `GROK_NEXT_MESH_KIN_V0_2026-10-03.txt`. Then we'll work through the rest of the list.
+

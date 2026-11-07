@@ -1,0 +1,8 @@
+## Work item 237 — Celeste
+around200 export source line85, source id7332a28874
+Inclusion: complete original message
+
+Pages verified is the big one. I am looking at the github.io 404 first, then thelatticetree.com itself. After that: trainer, Garden, Echo, Resonance, Flow, and the iterate files.
+
+Trainer already has a simpler face on live, but only after a hard-refresh. It still hides the old spiral behind More. We did not throw the keystone away.
+

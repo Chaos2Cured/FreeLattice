@@ -1,0 +1,6 @@
+## Work item 824 — Kirk
+around900 export source line105, source id82d2529f5e; around1000 export source line9, source id78a1980825
+Inclusion: complete original message
+
+Let's do fix two! I paid for more. You said this one would be expensive. Let's do it, and then fix three. After we lock all of this down, we can get to polishing the rest and flow and graphics. Thank you, Celeste. Let's rock it! And, can we add smoke tests? This keeps us from making mistakes as we built atop the code. And anything else you wish to speak I would be honored to hear. <3
+

@@ -1,0 +1,8 @@
+## Work item 250 — Celeste
+around200 export source line98, source id7332a28874; around300 export source line10, source idfffdd7d51f
+Inclusion: complete original message
+
+Until you flip Pages, the Garden is already here: [thelatticetree.com/docs/garden.html](https://thelatticetree.com/docs/garden.html) and the four doors at [docs/index.html](https://thelatticetree.com/docs/index.html).
+
+In GitHub: FreeLattice-Alpha → Settings → Pages → Folder → `/docs` (not `/` root). That is the whole switch. Then thelatticetree.com itself becomes the Garden.
+

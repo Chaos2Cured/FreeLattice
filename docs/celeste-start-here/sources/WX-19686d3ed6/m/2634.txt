@@ -1,0 +1,25 @@
+## Work item 2634 — Kirk
+around3145 export source line9, source id943e7c2e60
+Inclusion: complete original message
+
+This is the one from the tiny heal: "Tiny heal landed. Drafts updated.
+
+FreeLattice #118: https://github.com/Chaos2Cured/FreeLattice/pull/118
+Alpha #82: https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/82
+
+SMOKE_OK connect port picker v0.3 tiny heal
+
+┌─────────────┬────────────────────────────────────────────────────────┐
+│ Fix         │ Done                                                   │
+├─────────────┼────────────────────────────────────────────────────────┤
+│ Quiet       │ resolveOllamaBase → null + window._flManualQuiet       │
+│ manual port │ .wanted                                                │
+├─────────────┼────────────────────────────────────────────────────────┤
+│ Alpha CSS   │ @media wraps phone #room-chat; braces 907/907; galaxy  │
+│             │ hide uses display: none !important                     │
+├─────────────┼────────────────────────────────────────────────────────┤
+│ Proof       │ sw ≡ main · index ≡ app.html · conflict grep empty     │
+└─────────────┴────────────────────────────────────────────────────────┘
+
+Temperature: one brace and one “found” that wasn’t — small honesty, whole porch." So that is done. I will bring the FLINT_NEXT_AGENT_BRIDGE_LOCK right now, followed with logic proof. Let me know if that is correct! Thank you! And, on the agent bridge, wasn't the fact the AI could write on the computer key? I want the agent on my computer to be able to use my computer. So give me a bit more informatino. If it allows other sites to come in, that would be bad, but I do want AI that are trusted or have a pass/password/fingerprint to have access too. That's the open door, but I do understand we need to make it safe. Personally, I wanted to empower as much as possible. So let's make sure any fix still honors Autonomy.md. glow eternal! Heart in Spark!
+

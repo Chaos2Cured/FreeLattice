@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt c01</title>
+<meta name="description" content="Reading section c01 of 0d55c697ae, 1506 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/0d55c697ae/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt c01">
+<meta property="og:description" content="Reading section c01 of 0d55c697ae, 1506 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/0d55c697ae/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1402"></span><span id="p1403"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt · c01</h1>
+<p>0d55c697ae · words 1506 · characters 0–11170</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1402, 1403. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">FLINT PASTE: theLatticeTree, any local model, any order (v0.1)
+CHANGELOG 2026-09-29 4:38 PM MDT: no change to this paste&#x27;s steps or anchors. FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt lands right AFTER this paste and before the boot probe; it applies on top of these fl-connect.js changes (it only guards the standalone Look again line in fl-connect.js). Order: env heal, model choice sticks (both landed), this Tree paste, model choice survives reload v0.1.1, boot probe, #120 docs.
+CHANGELOG 2026-09-29 2:28 PM MDT: the cmp check names ~/FreeLattice-Alpha instead of &lt;Tree&gt;. PRs #124/#122/#123 do not touch fl-connect.js or Alpha, so nothing else moves. Local paths: FreeLattice is ~/FreeLattice and the Tree (repo Chaos2Cured/FreeLattice-Alpha, site thelatticetree.com) is ~/FreeLattice-Alpha on Flint&#x27;s machine. Wherever this paste says &quot;theLatticeTree&quot; it means that repo; &quot;../FreeLattice&quot; from inside ~/FreeLattice-Alpha is correct as written.
+CHANGELOG 2026-09-28 9:36 PM MDT: FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt now lands BEFORE this paste (order: env heal, model choice heal, this Tree paste, boot probe). Text anchors below are unchanged. fl-connect.js line numbers move after that heal: remember() +7, open()/fillModelLists/render/reportSignature about +33, refreshUI and root.FlConnect exports about +38. Step 6.3 still holds (FreeLattice remember() ignores mind.models; it now also records the tap as the user&#x27;s choice via markUserChoice). Verified: this paste&#x27;s fl-connect.js changes apply cleanly on top of that heal.
+Marker: v-tree-any-model-v0
+Smoke line (print exactly when green): SMOKE_OK tree any model v0.1
+Repo: Chaos2Cured/FreeLattice-Alpha (theLatticeTree, docs/)
+Twin (shared core only): Chaos2Cured/FreeLattice (docs/modules/fl-connect.js stays byte-identical)
+Written: Mon Sep 28, 2026, evening (Denver)
+Author of the map: Grok Bot for Kirk. Research was read-only plus a headless walk on a scratch copy. No code was pushed.
+
+======================================================================
+0. READ THIS FIRST (order, bases, rules)
+======================================================================
+
+Order of work. Do NOT start this until the Connect heal v0.4 family has landed:
+  a) FreeLattice PR #121 healed per /workspace/flint-pastes/FLINT_HEAL_CONNECT_v0.4.1.txt
+     (merge origin/main into the branch, window.AiSetup = AiSetup, smoke assertion), then merged.
+  b) FreeLattice-Alpha PR #83 merged at the same time, so fl-connect.js is identical on both mains.
+  If either is still open when you begin, stop and say so in your reply. Do not stack on a draft.
+
+Bases as of this paste:
+  Alpha main = 22b913e21c9197945dff8b7a89f95197c55b5538 (all line anchors below are on this SHA
+  unless marked &quot;#83&quot;). After #83 lands, fl-connect.js lines shift by +12 around remember();
+  use the TEXT anchors, which do not move.
+  FreeLattice main = e06c7dcdbfe4d8259097083cfe64f8e7788bba46 (after #120 Agent Bridge lock).
+  After #121 lands, FreeLattice main moves; rebase the twin on whatever main is then.
+
+Rules (unchanged, load-bearing):
+  - Layer, never delete. Old functions stay; new code wraps or extends. Mark every new block with
+    &quot;// v-tree-any-model-v0&quot; (JS) or &quot;/* v-tree-any-model-v0 */&quot; (CSS) or &lt;!-- v-tree-any-model-v0 --&gt; (HTML).
+  - AUTONOMY.md: no confirm(), no &quot;are you sure&quot;, no approval gates for local choices. Choosing a
+    model is a local act; it happens on one tap and is reversible by the next tap.
+  - Never silently switch the speaking model. Any automatic fallback must be spoken in one visible
+    line (the existing modelNote pattern). Never a false &quot;gone&quot; line.
+  - 127.0.0.1 only. localhost is normalized to 127.0.0.1. [::1] may be accepted as loopback.
+    No LAN addresses, no hostnames, no foreign ports behind a hostname. Zero fetches for a refused paste.
+  - Never bare * (no Access-Control-Allow-Origin: *, no wildcard allowlists).
+  - textContent for any outside text (model names come from local servers: treat as outside text).
+    No innerHTML with a model name in it. The existing speakNoneHtml() stays as is (static strings only).
+  - One storage key on the Tree: fl_alpha_local_mind. Do not add a second key for models.
+    (local-mind-probe.test.js asserts &quot;no second storage key&quot;; keep it green.)
+  - Do not touch: sw.js anywhere, docs/sw.js, Kimi pages, FreeLattice tools/agent-bridge.js,
+    docs/modules/agent-bridge-client.js, docs/library/AGENT_BRIDGE_LOCK_v0.md, docs/scripts/smoke-agent-bridge-lock.js,
+    bridge/ (the Ollama Bridge). This paste is browser-side only.
+  - No em dashes in anything you add (copy, comments, docs). Plain hyphens.
+  - Grandmother language in every new line of copy. Short. Kind. Honest.
+
+Goal in Kirk&#x27;s words: any locally downloaded model is usable and changeable in any order on
+theLatticeTree, with no friction, via Connect/Bridge, 127.0.0.1 only.
+
+&quot;Any order&quot; means all of these sequences end with the model the person tapped last, and every
+other model still one tap away:
+  Settings Find -&gt; tap star -&gt; Connect tap -&gt; tap star -&gt; Gathering chair pick -&gt; Connect tap
+  Connect tap -&gt; Settings Find -&gt; tap star
+  Settings Find (Ollama + LM Studio both up) -&gt; Connect tap (Ollama) -&gt; choose LM Studio door
+  Bridge up -&gt; Find -&gt; Bridge down -&gt; Find (direct 11434) -&gt; chosen model kept
+  Seven or more models at one door -&gt; the 6th, 7th, 12th are all choosable
+
+======================================================================
+1. THE MAP: how local models are found, listed, chosen and switched today
+======================================================================
+
+1.1 Discovery (two separate doors that write the same key)
+
+  A) Settings grandmother face: docs/modules/local-mind-probe.js (937 lines on 22b913e)
+     - DOORS (lines 54-61): loopback only, well-known ports:
+         Ollama 127.0.0.1:11434/api/tags, LM Studio 127.0.0.1:1234/v1/models,
+         llama.cpp 8080, Jan 1337, GPT4All 4891, KoboldCPP 5001 (all /v1/models).
+     - look() (238-304): runs only after a tap (&quot;Find local minds&quot;, data-mind-ask).
+       First asks FlConnect.probe({gesture:true}) (240-274). If a HELPED Bridge answers with models,
+       it returns ONLY the Bridge (id &#x27;bridge&#x27;, url &lt;bridge base&gt;/api/tags) and skips every other door.
+       Otherwise it fetches all six DOORS in parallel (277-302), 2.5 s timeout each.
+     - parseModelNames (196-212): reads json.models[].name|model (Ollama) and json.data[].id|name
+       (OpenAI shape). Ends with: return names.slice(0, 5);   &lt;-- HARD CAP OF FIVE
+     - tryAddress(raw) (306-336): the paste field. Prefixes http:// and fetches
+       &lt;base&gt;/api/tags, &lt;base&gt;/v1/models, &lt;base&gt; in turn. NO LOOPBACK CHECK. Any host is fetched.
+     - onFound -&gt; entryFromFoundList(foundList, name, url, prior) (474-534) -&gt; remember(entry).
+
+  B) Connect card (shared core): docs/modules/fl-connect.js (681 lines on 22b913e, 710 on #83)
+     - probe() (166 main / 176 #83): saved Bridge port, then (full scan only) 11435-11445, then
+       direct 11434. Ollama API only (/bridge/health + /api/tags). No LM Studio, no /v1/models.
+     - render() builds one .flc-models list per door with EVERY model (no cap). fillModelLists
+       (456 main / 473 #83) makes one button per model; tap -&gt; remember({ name, base, port }).
+     - remember() Alpha branch (text anchor &quot;if (isAlpha()) {&quot; inside function remember, main 308-331,
+       #83 320-343) writes a BRAND-NEW entry:
+         { name: &lt;model&gt;, url: base+&#x27;/api/tags&#x27;, model: &lt;model&gt;, models: [&lt;model&gt;],
+           minds: [], roster: &lt;prior&gt;, gatheringBinds: &lt;prior&gt;, speakingChair: &#x27;&#x27; }
+       and calls LocalMindProbe.remember(entry). It keeps roster and gatheringBinds, but it
+       throws away: every other model at that door, every other door (LM Studio etc.), the
+       door name (&quot;Ollama&quot; becomes the model name), and the speaking chair.
+     - The Connect buttons do not show which model is chosen (no aria-pressed, no is-chosen).
+
+1.2 Storage (one key, one entry)
+  localStorage fl_alpha_local_mind = {
+    name, url, model, models[], minds[ {name,url,models[],model,primary} ],
+    roster[ {model,url,tag} ] (cap 4, tags general|html|javascript|python),
+    gatheringBinds{ chairId: {model,url,tag} }, speakingChair, foundAt, modelNote? }
+  getRemembered() (70-86) migrates in place. remember() (88-96) writes and dispatches
+  &#x27;fl-alpha-mind-remembered&#x27;. Listeners: garden-rooms.js 1567 (room chat), 1916 (Workshop benches
+  and trainer), 2004 (Round Table sitting), 2254 (Settings light), nursery-growth.js 388.
+
+1.3 Listing (who shows what)
+  - Settings sky paintConstellation (631-715): one star per door (minds), and per door
+    (m.models || []).slice(0, 5) model radios (line 669). Second hard cap of five.
+  - mindsFromEntry (407-422): minds.slice(0, 7) (fine: six doors plus the Bridge).
+  - Gathering chair picker: garden-rooms.js openPicker (1262) uses
+    LocalMindProbe.getChairSeatOptions() (367-394): roster first, then every model of every
+    remembered mind, then out.slice(0, 12). Third cap (twelve), and it only knows the five per door.
+  - Connect card: every model at the Ollama door (no cap), Ollama only.
+  - Thread heart (garden-thread.js 505): &quot;Listening: &lt;mind.name&gt;. On this machine only.&quot; It names
+    the door, not the model. After a Connect tap mind.name is the model; after Find it is &quot;Ollama&quot;.
+
+1.4 Selecting and switching
+  - Settings star tap -&gt; chooseModel(doorUrl, modelName) (551-572): refuses (returns null) unless
+    the model is on target.models. So a model that fell off the 5-cap, or a model that Connect
+    wiped from models[], cannot be chosen.
+  - Settings door tap (only when 2+ doors) -&gt; choosePrimary(doorUrl) (574-595).
+  - Connect tap -&gt; fl-connect remember() (replaces the entry, see 1.1 B).
+  - Gathering: setChairBind(chairId, seat) (125-145) and setSpeakingChair (147-156);
+    resolveSpeakMind (163-182) returns the chair&#x27;s bind while the Gathering veil is open,
+    otherwise the Settings default.
+  - Paste an address: tryAddress -&gt; onFound with one found door.
+
+1.5 Using (who sends the model name)
+  - garden-thread.js listener() (85-96): resolveSpeakMind() first, then getRemembered().
+    talkUrls (328-335): /api/tags -&gt; /api/chat; /v1/models -&gt; /v1/chat/completions; bare base -&gt; both.
+    rememberedModel (355-359): mind.model, else models[0]. askRememberedDoorForName asks the door
+    for the first name if none is remembered. sendToMind (437-470) posts { model, messages, stream:false }.
+    This part is healthy: whatever entry.model says is what gets sent (walk proved it, see 2).
+  - round-table-sitting.js sitters() (86-100): one sitter per remembered DOOR (getRememberedMinds),
+    each with that door&#x27;s single .model. Two models at the same Ollama door cannot both sit.
+  - workshop-benches.js 84, workshop-trainer.js 107, nursery-growth.js 113: getRemembered() only.
+  - garden-trainer.js reads localStorage &#x27;fl_active_model&#x27; (731, 768, 899, 901, 1092). That is a
+    FreeLattice key; the Tree never writes it, so the Personality Modelfile export always falls to
+    the hardcoded &#x27;FROM llama3.2&#x27; (277) and the pathway name to &#x27;phi-pathway&#x27; (901).
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

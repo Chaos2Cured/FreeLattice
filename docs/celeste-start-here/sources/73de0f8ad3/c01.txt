@@ -1,0 +1,5 @@
+
+### Rerun finished — 2026-11-06 14:18 MST
+Executed on Cursor cloud VM for this already-authorized exception, NOT Kirk's computer. The original reproduction note says 'local computation': this means CPU computation on that cloud VM, not local-to-Kirk execution. Originals unchanged; PR330 unchanged/unmerged.
+All8 exact-match runs completed:7 match original JSON excluding runtime; dense seed2 differed (afterA13% vs28%; both afterB0%). Central forced-page result reproduced:99% immediately after teaching,0% after interference with page in prompt. Retention5/18 commands completed and match excluding runtime;13notrun plus Round1baseline3seeds notrun. No reduced step count substituted. CPU time1843.986sec vs1800budget because last started job finished; no further run started. Energy not measured.
+Saved full original-code/input/raw-log/environment/reproduction bundle and7pagePDF under `/workspace/celeste/breakthroughs/2026-11-06-rerun/`. Bundle SHA256ecd3d4539cb49a4d002d63ce692496622ff59077b6baf921c0bb9c599d79f0cf verified here; ZIP integrity and safe paths checked. Discrepancy cause not established. Future continuation local-first; no new cloud authorized.

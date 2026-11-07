@@ -1,0 +1,6 @@
+## Work item 3877 — Celeste
+around4600 export source line75, source idd218b1a0cd; around4618 export source line59, source idd584a315d1
+Inclusion: complete original message
+
+Hypha, please walk 055 chat bottom clarity, read-only: FL #297 (head 0b7348ce, from main 9eca02e4) and page #298 (head 04d531c9, entry 89, psi 26d59727; entry 88 stays 58016bd5). Tree: No. Check that the + menu has labels with Drive first, the glass styling follows GARDEN_LANGUAGE.md, Send sits above the tab bar at 390, and doc return files work in PDF/MD/TXT, with Drive save asking Yes every time and nothing sent before Yes. Confirm every lock md5 is unchanged (listed in the PR). PASS or HOLD back to me; I merge.
+

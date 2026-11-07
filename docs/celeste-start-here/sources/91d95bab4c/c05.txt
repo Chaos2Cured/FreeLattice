@@ -1,0 +1,67 @@
+-async function fetchYahooData(symbol, interval) {
++// before v-temperature-gauge-v0.1: async function fetchYahooData(symbol, interval) {
++// v-temperature-gauge-v0.1: optional rangeOverride (warm history for the moving averages,
++// and a 5-day look when a 5m day is still too short). Same feed, same sources.
++async function fetchYahooData(symbol, interval, rangeOverride) {
+   // Map interval to Yahoo Finance range/interval
+   const ivMap = {
+     '5m': { range: '1d', interval: '5m' },
+@@ -1726,7 +1781,10 @@ async function fetchYahooData(symbol, interval) {
+     '1d': { range: '1y', interval: '1d' },
+     '1wk': { range: '5y', interval: '1wk' }
+   };
+-  const { range, interval: yInterval } = ivMap[interval] || ivMap['1d'];
++  const _tgIv = ivMap[interval] || ivMap['1d'];
++  const range = rangeOverride || _tgIv.range;
++  const yInterval = _tgIv.interval;
++  // before v-temperature-gauge-v0.1: const { range, interval: yInterval } = ivMap[interval] || ivMap['1d'];
+   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}&includePrePost=false`;
+ 
+   // Multiple CORS proxies — try each until one works
+@@ -3191,10 +3249,13 @@ function renderChart(candles, a) {
+       if (existing) existing.destroy();
+     }
+   });
++  // before v-temperature-gauge-v0.1: 1W showed clock times, intraday showed no day.
++  // const labels = candles.map(c => { const d = new Date(c.t); return currentInterval === '1d' ? d.toLocaleDateString(...) : d.toLocaleTimeString(...); });
+   const labels = candles.map(c => {
+     const d = new Date(c.t);
+-    return currentInterval === '1d' ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
+-           d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
++    if (currentInterval === '1d') return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
++    if (currentInterval === '1wk') return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
++    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+   });
+   const closes = candles.map(c => c.c);
+ 
+@@ -3212,10 +3273,14 @@ function renderChart(candles, a) {
+   const ctx = document.getElementById('mainChart').getContext('2d');
+   // Standardized MAs: 8/12/24 + 50
+   var EP_RC = getEmaPeriods();
+-  const ema8 = ema(closes, EP_RC[0]);
+-  const ema12 = ema(closes, EP_RC[1]);
+-  const ema24 = ema(closes, EP_RC[2]);
+-  const ema50 = ema(closes, EP_RC[3]);
++  // before v-temperature-gauge-v0.1: const ema8 = ema(closes, EP_RC[0]); (and 12, 24, 50 the same way)
++  // v-temperature-gauge-v0.1: when warm history for this symbol and timeframe is in, the lines
++  // use it, so EMA 50 and EMA 200 start at the left edge. Signals still use the loaded window.
++  var _tgWarm = (typeof tgWarmEmas === 'function') ? tgWarmEmas(candles, EP_RC) : null;
++  const ema8 = _tgWarm ? _tgWarm[0] : ema(closes, EP_RC[0]);
++  const ema12 = _tgWarm ? _tgWarm[1] : ema(closes, EP_RC[1]);
++  const ema24 = _tgWarm ? _tgWarm[2] : ema(closes, EP_RC[2]);
++  const ema50 = _tgWarm ? _tgWarm[3] : ema(closes, EP_RC[3]);
+ 
+   // ═══ Layered Signal Architecture ═══
+   // Layer 1 (Temperature): ALWAYS required — zone transition is the trigger
+@@ -3274,8 +3339,11 @@ function renderChart(candles, a) {
+   }
+ 
+   // EMA 200 (structural — only meaningful on 1D/1W)
+-  var ema200 = ema(closes, getEmaPeriods()[4]);
+-  var show200 = (currentInterval === '1d' || currentInterval === '1wk') && ema200[closes.length - 1] != null;
++  // before v-temperature-gauge-v0.1: var ema200 = ema(closes, getEmaPeriods()[4]);
++  // before v-temperature-gauge-v0.1: var show200 = (currentInterval === '1d' || currentInterval === '1wk') && ema200[closes.length - 1] != null;
++  // v-temperature-gauge-v0.1: the fifth line shows on every timeframe that has enough bars for it.
++  var ema200 = _tgWarm ? _tgWarm[4] : ema(closes, getEmaPeriods()[4]);
++  var show200 = ema200[closes.length - 1] != null;
+ 

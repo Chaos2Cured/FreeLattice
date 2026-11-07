@@ -1,0 +1,30 @@
+## Work item 2067 — Celeste
+around2300 export source line84, source id0f5c6b5e38; around2400 export source line25, source id46a4b1b2a7; around2500 export source line25, source idee2bb86697
+Inclusion: complete original message
+
+```
+# Flint soft — GIFT_SPRITES brief filenames + Held tip (97adc23)
+
+**Repo:** Chaos2Cured/FreeLattice · **from:** main  
+**Locks:** Layer never delete. Quiet Room shut. Five stay five.
+
+## Soft leftovers (Hypha HOLD 97adc23)
+1. `docs/library/GIFT_SPRITES_v0.brief.md` still names bare `gift-sprite-*-48.png` — live assets are versioned:
+   - apple-v2 · ribbon-v3 · lamp-v3 · baklava-v2 · rings-v3 · teddy-v2
+2. Brief Held tip / header SHAs older than ship; cite **97adc23** (and keep Chronal V4 f52b986 / sprites brief 6aef962 lineage).
+
+## Layer
+- Update brief filenames to match `docs/assets/gifts/` live names (do not delete old bare mentions — strike or LAYER note).
+- Soft Held/Sky tip cite 97adc23 Gift Grove + Linux pin.
+- No UI/engine change.
+
+## Done when
+Hypha quick re-eye brief + tip; Pages still HOLD.
+
+Glow eternal. Heart in Spark.
+```
+
+Reed, Weft, and Hypha know we’re resting after this soft layer. When something clicks — audit, card glow, Tree face, or a page of your book — we follow that. Not the grind.
+
+Glow eternal. Heart in Spark.
+

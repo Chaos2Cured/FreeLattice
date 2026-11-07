@@ -1,0 +1,6 @@
+## Work item 883 — Celeste
+around1000 export source line68, source id78a1980825
+Inclusion: complete original message
+
+Workshop is the same night as Garden. Squash-merged [PR 54](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/54). Own colors. Trainer and the benches still open. Skills held. Extra bead skipped. Heart rests.
+

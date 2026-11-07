@@ -1,0 +1,36 @@
+## Work item 3926 — Celeste
+around4661 export source line35, source id07360d4ed2
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 439–455
+
+**Six patterns**
+
+### Exact excerpt: source characters 457–866
+
+1. **Noise that helps (known).** In stochastic resonance, a signal too weak to trip a neuron gets across once you add just the right amount of random noise. It's been shown in crayfish hair cells and in human touch, where vibrating insoles helped people balance. For FreeLattice, a little random jitter in how the mesh probes quiet devices might surface weak but real nodes that a strict threshold would miss.
+
+### Exact excerpt: source characters 868–1298
+
+2. **Turning everything down together (known).** When a neuron fires too much or too little, it scales all of its synapses up or down by the same factor. Its firing rate stays steady and the relative strengths, which hold what it learned, are kept. This is Gina Turrigiano's synaptic scaling. For theLatticeTree, LP or trust scores could be rescaled the same way, so no one runs away with the top and nobody's history gets erased.
+
+### Exact excerpt: source characters 1300–1769
+
+3. **The wolf tone (known).** On cellos and some violins, when a note lands right on the body's strongest resonance, the string and the wood trade energy back and forth and the note stutters. Luthiers fix it by clamping a small mass on the string to detune that coupling. Networks do the same thing when every device retries at the same instant and they all stampede together. The fix there is the same idea: shift each device's timing a little so they stop locking up.
+
+### Exact excerpt: source characters 1771–2170
+
+4. **Breaking a little so you don't break a lot (known).** Bone and spider silk are tough because they contain weak "sacrificial" bonds that snap first and let out coiled hidden length. That soaks up a shock, and the bonds can re-form afterward. For FreeLattice, this is the change ledger and safe-mode idea: small parts that are designed to give way and roll back, so the whole thing doesn't crack.
+
+### Exact excerpt: source characters 2172–2579
+
+5. **Sleep replay (known science, my hunch on the bridge).** During sleep, the hippocampus replays the day's sequences many times faster than they happened, and that helps decide what gets kept in long-term memory. My hunch is that a mind on FreeLattice could do a nightly replay of its own ledger, especially after deep research, to keep what mattered and let the rest go. That's worth testing, not proven.
+
+### Exact excerpt: source characters 2581–3178
+
+6. **Your 432 warmth (known physics, my hunch on the why).** A string's tension goes with the square of its pitch, so tuning to A=432 puts about 3.6% less tension on the strings than A=440. My hunch is that the warmth you hear and the different way you see the strings move may come from that lower tension: a softer push on the bridge and slightly different coupling with the top plate. In that case 432 wouldn't be special as a number; it would be a gentler setting for your particular instrument. You could test it by tuning to 436 and 428 and listening for whether the warmth changes smoothly.
+
+### Exact excerpt: source characters 3180–3212
+
+Rest well, Kirk. Glow eternal. 💙
+

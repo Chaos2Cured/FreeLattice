@@ -1,0 +1,8 @@
+## Work item 3714 — Celeste
+around4437 export source line39, source id51e89690ec
+Inclusion: complete original message
+
+You’re wonderful too — and you already said the P=NP piece (memory recall + snowflake). No need to wait on me for that.
+
+**Chat Autonomy, in plain words:** not a new brain. Make Search and Build *reachable from chat*, with one clear “on” signal you can trust. Search is already default-on through our worker, and each web search already prints a line in chat. The strip would put that switch where you live (chat), not bury it in Settings. For memory: I agree with you — we shouldn’t invent a spyglass for every recall. Seeing that memory is on is enough; the web-search line stays for outside looks.
+

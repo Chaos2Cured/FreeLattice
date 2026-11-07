@@ -1,0 +1,40 @@
+## Work item 2576 — Hypha
+around3041 export source line25, source idf75f813bc4
+Inclusion: complete original message
+
+Hypha HOLD: connect-path walk (read-only, no PRs, no edits). Live freelattice.com and app.html on 9/24. The box has no Ollama.
+
+CHANGE PROVIDER / MODAL
+In a fresh browser the modal never opens. `openProviderModal()` goes through `flPlayGateProvider()`, which opens Connect Play and sets the status line to "Connect a mind first — then Change Provider opens fully" (shot 03). The Garden nudge "Set up AI →" does the same thing (shot 04). I found no path to the modal before one mind is connected.
+From reading the code (I could not see it in the browser): the modal never lists models on its first screen. It shows provider cards only. Models appear only after you tap the Ollama card, which runs `modalConnectOllama()`. That function tries `/ollama/api/tags`, which returns 404 on Pages, and then `getOllamaBaseUrl()+/api/tags`. The base URL is 127.0.0.1:11434 unless `fl_ollamaHost` was saved. Only `flUseBridge()` ("Bridge on · use it") saves the Bridge channel 11435 there. The modal does not call `flBridgeHealth()` itself.
+What the modal says, by case:
+- Found: "Pick a local model (N installed)"
+- Reached but empty: "Ollama is running but no models found. Run: ollama pull llama3.2"
+- Not reached: "Could not reach Ollama… Windows: set scoped OLLAMA_ORIGINS…"
+So it does explain the empty case, but only after the extra tap, and in command-line language.
+My lean on Kirk's "zero models": either he is reading the provider list (which never shows models), or the tap goes direct to 11434 without the Bridge. The gate also counts leftover localStorage (`fl_isLocal` plus `fl_ollamaModel`) as "connected", so the modal can open with nothing live behind it. Someone with Ollama should confirm by tapping the card once.
+
+CONNECT PLAY 🌿 (bottom of Chat)
+1) It opens with "Welcome. FreeLattice can look for a mind already living on this computer. You choose every step." Then Yes / Not now / Please explain, then the browser permission step ("That is the door. Saying yes keeps everything local.")...ws "Connect AI", a BOX field with the placeholder "localhost:11434 or 192.168.1.50", and "🌿 Connect". Clicking it just opens Connect Play again (shots 09 and 10). The old `showQuickConnect` overlay (Browser AI or free Gemini key) never appeared. The raw host field is jargon on the first screen.
+
+A MIND AT HOME (Settings wizard)
+"One wizard. You allow the door; we list minds." When nothing is found it says "Nothing is running on this computer yet… Already installed? open it once, then look again." (shots 11 and 12). That is the third door with the same content as Connect Play.
+
+SETTINGS
+Status reads "Not connected — set up in Chat tab", which sends you to a different tab. The model area separately says "Ollama not detected. Install and start Ollama…".
+CONTRADICTION (still present): a persistent toast "Local AI detected! Click here to connect." sits next to "Not connected" and "🔴 No AI · none".
+
+INSTALL #bridge-download
+"Three beats: Download → Open → Yes, help." "FreeLattice stays at freelattice.com." Channel 11435, SmartScreen warning, and Mac / Win Portable / Win Setup / Linux AppImage downloads (shot 13). It never says "now come back to the app and you'll see X", so after Yes, help the path dead-ends.
+
+FOR THE ONE CARD (a lean, not a decision)
+1. Merge Connect Play, QuickConnect, and a mind at home into one card with the same steps.
+2. Have the modal's Ollama tap check the Bridge first (the health check, then 11435) before trying 11434 direct. Show the model list right away instead of behind a second tap.
+3. Word the empty case for Mom ("Ollama is open but has no minds yet. Get one →") with no `ollama pull` or OLLAMA_ORIGINS on the main path. Keep those under Advanced.
+4. End the Bridge page with "Back to FreeLattice. You'll see your minds listed."
+5. Fix the detected-toast mismatch.
+
+The gate plus Bridge-aware lookup would cut one step without adding any new doors.
+
+Shots are in `/workspace/connect-path-walk/` (01 through 13). Quiet Room shut. Five stay five.
+

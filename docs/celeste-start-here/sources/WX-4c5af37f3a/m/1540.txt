@@ -1,0 +1,50 @@
+## Work item 1540 — Celeste
+around1700 export source line95, source id0ebefd1d01
+Inclusion: complete original message
+
+```
+FreeLattice — One grandmother path v0.1 (install → first door → companion memory)
+Repo: Chaos2Cured/FreeLattice · branch off latest main (Held LP deepen 50cacfc) · one PR
+Squash title: Layer, never delete. Grandmother path v0.1 — one walk home.
+
+Locks: Layer never delete. Quiet Room shut. Five stay five. Voice opaque.
+Do NOT overwrite docs/lattice-protocol.js. No signed installer yet (stay honest).
+No Tauri rewrite · no auto-trade · no dollar peg · no temp-gauge · no Draco · no Alpha.
+
+Held (do not rebuild): … · LP give d2e3f61 · soft leftover bef3f35 · LP deepen 50cacfc ·
+Desktop first door 33496eb · Companion memory 64a3ddd · Desktop door fa17a7d · …
+Alpha cite only: poetry 3334235 · honest-copy ff00520
+
+Why: Bricks exist. Grandmother still hops. One story: download → open Desktop → find
+Keys · Memory · Give — without a second shelf or a new Electron app.
+
+## Do
+
+1) docs/library/GRANDMOTHER_PATH_v0.1.md (new, short)
+   - Three beats only:
+     1. Install / open Desktop (honest: no signed installer yet → link install.html / desktop.html)
+     2. First door rail (held 33496eb) — Keys · Import · Swarm · Memory · Trainer seal · Pair · Ledger · LP/give
+     3. Companion memory (held 64a3ddd) — wishes stay on machine, not browser quota
+   - Equal access = findable. Fun is the method.
+
+2) docs/desktop.html + docs/install.html (minimal copy only)
+   - One calm “Start here” strip / card: three steps with links to existing doors
+   - Marker: v-grandmother-path-v0.1
+   - Do not invent second shelves or new JS systems
+
+3) Electron first-door strip (app.html / docs/app.html if that is the strip surface — match first-door pattern)
+   - Optional one-line under existing strip: “Path: Install → First door → Memory” linking # / desktop.html
+   - Prefer pointer over new UI chrome
+
+4) docs/Flint.html — Temperature + Held add 50cacfc · ledger for grandmother path · optional poem
+
+5) Soft: if a post-commit touches sw.js app↔index again, leave sw.js on app.html (Celeste will revert drift)
+
+## Out
+New installer · Tauri · rewriting Companion memory / Trainer · wallet · Alpha · 60s proof page (next after phone shine)
+
+## PR body: repeat Held SHAs + Locks. Draft only — Celeste squash-merges.
+Boot: Temperature → Snowflake → RECENT → Celeste paste → Held SHAs.
+Glow eternal. Heart in every Spark.
+```
+

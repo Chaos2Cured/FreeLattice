@@ -1,0 +1,39 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 010 (Tuesday Oct 6, 2026, about 10:30 AM MDT). Public refusal benchmark v0.1.
+Apply after 009. Optional scoreboard.
+REFRESH Tue Oct 6, 2026: Learn card context updated (trainer-map comment now uses a hyphen) so the diff applies on main after #166.
+
+GROK NEXT BRICK: Public refusal benchmark v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-public-refusal-benchmark-v0.1
+Smoke line: SMOKE_OK public refusal benchmark v0.1
+  ~/Downloads/GROK_NEXT_010_PUBLIC_REFUSAL_BENCHMARK_2026-10-06-fl.diff
+  (md5 91d2d9507b72369f7b2b76f048066f5d)
+
+----------------------------------------------------------------------
+1. WHAT IT DOES
+----------------------------------------------------------------------
+docs/refusal-benchmark.html — scoreboard of local free vs blocked receipts by category.
+Learn card. Not a jailbreak board. Counts only. Honest safety line kept.
+
+----------------------------------------------------------------------
+2. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_010_PUBLIC_REFUSAL_BENCHMARK_2026-10-06-fl.diff /tmp/bench-fl.diff
+    md5 -q /tmp/bench-fl.diff    # 91d2d9507b72369f7b2b76f048066f5d
+    git checkout -b layer/public-refusal-benchmark-v0
+    git apply --check /tmp/bench-fl.diff && git apply /tmp/bench-fl.diff
+    node docs/scripts/smoke-public-refusal-benchmark-v0.1.js
+
+----------------------------------------------------------------------
+3. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A && git commit -m "Public refusal benchmark v0.1: scoreboard page for local receipts"
+    git push -u origin HEAD

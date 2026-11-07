@@ -1,0 +1,248 @@
+@@ -876,2 +1004,18 @@
+         }
++        // v-tree-any-model-v0: only this computer's own doors
++        if (result.refused) {
++          setStatus(root, 'Only this computer\'s own doors (127.0.0.1). Nothing was sent.', 'warn');
++          return;
++        }
++        // v-tree-any-model-v0: a pasted door joins the sky instead of replacing it
++        var had = getRemembered();
++        if (result.ok && had && had.url) {
++          var mergedPaste = mergeFound({ name: 'a mind at home', url: result.url, models: result.models || [] });
++          if (mergedPaste) {
++            paintConstellation(sky, mindsFromEntry(mergedPaste));
++            paintRoster(rosterHost);
++            setStatus(root, speakFound(mergedPaste.name, mergedPaste.url), 'ok');
++            return;
++          }
++        }
+         if (result.ok) {
+@@ -930,2 +1074,4 @@
+     choosePrimary: choosePrimary,
++    mergeFound: mergeFound, // v-tree-any-model-v0
++    MODEL_CAP: MODEL_CAP,
+     speakWithLine: speakWithLine,
+diff --git a/docs/modules/tree-any-model.test.js b/docs/modules/tree-any-model.test.js
+new file mode 100644
+index 0000000..6bd3f69
+--- /dev/null
++++ b/docs/modules/tree-any-model.test.js
+@@ -0,0 +1,415 @@
++// Node smoke for Tree any model v0.1 (v-tree-any-model-v0).
++// Every local model is a choice, in any order. Connect adds to the sky.
++// A chosen model is never called gone while it is at a found door.
++// The paste field takes 127.0.0.1 only. No real network: fetch is stubbed.
++
++var fs = require('fs');
++var path = require('path');
++var vm = require('vm');
++var assert = require('assert');
++
++var store = {};
++var writes = [];
++
++var localStorage = {
++  getItem: function (k) {
++    return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null;
++  },
++  setItem: function (k, v) {
++    writes.push(String(k));
++    store[k] = String(v);
++  },
++  removeItem: function (k) { delete store[k]; },
++  get length() { return Object.keys(store).length; },
++  key: function (i) { return Object.keys(store)[i] || null; }
++};
++
++function El(tag) {
++  this.tagName = String(tag || 'div').toUpperCase();
++  this.tag = tag;
++  this.id = '';
++  this.className = '';
++  this.textContent = '';
++  this.hidden = false;
++  this.disabled = false;
++  this.type = '';
++  this.value = '';
++  this.placeholder = '';
++  this.tabIndex = 0;
++  this.attrs = {};
++  this.children = [];
++  this.childNodes = this.children;
++  this.parent = null;
++  this.listeners = {};
++  this.style = {};
++  var self = this;
++  this.classList = {
++    add: function (name) {
++      if ((' ' + self.className + ' ').indexOf(' ' + name + ' ') === -1) {
++        self.className = (self.className ? self.className + ' ' : '') + name;
++      }
++    },
++    remove: function (name) {
++      self.className = String(self.className || '')
++        .split(/\s+/)
++        .filter(function (c) { return c && c !== name; })
++        .join(' ');
++    },
++    contains: function (name) {
++      return (' ' + self.className + ' ').indexOf(' ' + name + ' ') !== -1;
++    }
++  };
++  this.setAttribute = function (name, val) {
++    var s = String(val);
++    this.attrs[name] = s;
++    if (name === 'id') this.id = s;
++    if (name === 'class') this.className = s;
++    if (name === 'hidden') this.hidden = true;
++    if (name === 'disabled') this.disabled = true;
++  };
++  this.getAttribute = function (name) {
++    if (name === 'id') return this.id || null;
++    if (Object.prototype.hasOwnProperty.call(this.attrs, name)) return this.attrs[name];
++    return null;
++  };
++  this.removeAttribute = function (name) {
++    delete this.attrs[name];
++    if (name === 'id') this.id = '';
++    if (name === 'hidden') this.hidden = false;
++    if (name === 'disabled') this.disabled = false;
++  };
++  this.appendChild = function (child) {
++    this.children.push(child);
++    child.parent = this;
++    return child;
++  };
++  this.contains = function (node) {
++    if (node === this) return true;
++    for (var i = 0; i < this.children.length; i++) {
++      if (this.children[i].contains && this.children[i].contains(node)) return true;
++    }
++    return false;
++  };
++  this.focus = function () {};
++  this.addEventListener = function (type, fn) {
++    this.listeners[type] = this.listeners[type] || [];
++    this.listeners[type].push(fn);
++  };
++  this.dispatchEvent = function (ev) {
++    var list = this.listeners[ev.type] || [];
++    for (var i = 0; i < list.length; i++) list[i](ev);
++    if (this.parent && this.parent.dispatchEvent) this.parent.dispatchEvent(ev);
++  };
++  this.click = function () {
++    this.dispatchEvent({
++      type: 'click',
++      target: this,
++      preventDefault: function () {}
++    });
++  };
++  this.querySelector = function (sel) { return queryOne(this, sel); };
++  this.querySelectorAll = function (sel) { return queryAll(this, sel); };
++  Object.defineProperty(this, 'innerHTML', {
++    get: function () { return this._innerHTML || ''; },
++    set: function (v) {
++      this._innerHTML = String(v);
++      if (v === '') {
++        this.children.length = 0;
++      }
++    }
++  });
++}
++
++function walk(root, out) {
++  out.push(root);
++  for (var i = 0; i < (root.children || []).length; i++) walk(root.children[i], out);
++  return out;
++}
++
++function matchOne(el, raw) {
++  var sel = String(raw || '').trim();
++  if (!sel || !el) return false;
++  if (sel.charAt(0) === '#') return el.id === sel.slice(1);
++  if (sel.charAt(0) === '.') {
++    return (' ' + (el.className || '') + ' ').indexOf(' ' + sel.slice(1) + ' ') !== -1;
++  }
++  var attrEq = sel.match(/^\[([^\]]+?)="([^"]*)"\]$/);
++  if (attrEq) return el.getAttribute(attrEq[1]) === attrEq[2];
++  var attr = sel.match(/^\[([^\]]+)\]$/);
++  if (attr) return el.getAttribute(attr[1]) != null;
++  return (el.tag || '').toLowerCase() === sel.toLowerCase();
++}
++
++function splitCompound(compound) {
++  var s = String(compound || '').trim();
++  var parts = [];
++  var buf = '';
++  var i;
++  var inAttr = false;
++  for (i = 0; i < s.length; i++) {
++    var ch = s.charAt(i);
++    if (ch === '[') inAttr = true;
++    if (ch === ']') inAttr = false;
++    if (!inAttr && i > 0 && (ch === '.' || ch === '#' || ch === '[')) {
++      if (buf) parts.push(buf);
++      buf = ch;
++    } else {
++      buf += ch;
++    }
++  }
++  if (buf) parts.push(buf);
++  return parts;
++}
++
++function matchCompound(el, compound) {
++  var parts = splitCompound(compound);
++  if (!parts.length || (parts.length === 1 && !parts[0])) return false;
++  if (/^[a-zA-Z]/.test(parts[0])) {
++    if ((el.tag || '').toLowerCase() !== parts[0].toLowerCase()) return false;
++    parts = parts.slice(1);
++  }
++  for (var i = 0; i < parts.length; i++) {
++    if (parts[i] && !matchOne(el, parts[i])) return false;
++  }
++  return true;
++}
++
++function queryAll(root, selector) {
++  var found = [];
++  var nodes = walk(root, []);
++  var sel = String(selector || '').trim();
++  for (var i = 0; i < nodes.length; i++) {
++    if (nodes[i] !== root && matchCompound(nodes[i], sel)) found.push(nodes[i]);
++  }
++  return found;
++}
++
++function queryOne(root, selector) {
++  var all = queryAll(root, selector);
++  return all.length ? all[0] : null;
++}
++
++var dispatched = [];
++var document = {
++  body: new El('body'),
++  createElement: function (tag) { return new El(tag); }
++};
++
++var windowObj = {
++  addEventListener: function () {},
++  dispatchEvent: function (ev) { dispatched.push(ev); }
++};
++
++var sandbox = {
++  window: windowObj,
++  document: document,
++  localStorage: localStorage,
++  location: { protocol: 'http:', href: 'http://127.0.0.1/docs/settings.html' },
++  console: console,
++  setTimeout: setTimeout,
++  clearTimeout: clearTimeout,
++  Promise: Promise,
++  JSON: JSON,
++  Error: Error,
++  Array: Array,
++  Object: Object,
++  String: String,
++  Number: Number,
++

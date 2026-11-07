@@ -1,0 +1,113 @@
+======================================================================
+4. NOTES
+======================================================================
+4.1 flAutoConnect -> modalActivateOllamaModel still calls FLActiveModel.set(..., 'user') inside
+    modalActivateOllamaModel. It is dead on today's app: flAutoConnect returns early when
+    FlConnect is present, and modalActivateOllamaModel is not global (typeof is 'undefined' at that
+    call site). autoName is now her model when it is here, so even if revived it would pass hers.
+    Left for a later tidy (no behavior today).
+4.2 The smoke serves docs/ on http://127.0.0.1:<random>, so the app talks to Ollama through its
+    /ollama proxy path for the chat POST (the same path it uses on a 127.0.0.1 origin). The mock
+    answers both http://127.0.0.1:11434 / localhost:11434 and ORIGIN/ollama/*, inside Chrome
+    (CDP Fetch), so nothing leaves the box and no real port is opened.
+4.3 The Cascade now also runs its "which model" step when a choice exists (to keep it and check
+    it is still there). It still skips entirely when her choice is for another provider.
+
+======================================================================
+5. TESTS AND RESULTS
+======================================================================
+5.1 docs/scripts/smoke-model-choice-survives-reload.js (FL, zero dependencies). It starts real
+    headless Chrome (CHROME_PATH, or the usual places) over --remote-debugging-pipe, serves docs/
+    from 127.0.0.1:0 (sw.js 404 so no stale cache), and boots the REAL app.html. Mock Ollama:
+    llama3.2:latest and qwen2.5:latest. Scenarios:
+      1) Hypha's walk: Connect, tap the SECOND model (qwen2.5), reload (Page.reload, cache off),
+         send a chat: the chat POST model is qwen2.5; fl_ollamaModel qwen2.5, fl_modelSource user,
+         state.ollamaModel and FLActiveModel qwen2.5. Then Settings, then a second reload, chat each time.
+      2) Gone at boot: saved choice qwen2.5, the list has only llama3.2 -> fl_modelChoiceGone set,
+         llama3.2 used, source not 'user', chat uses llama3.2.
+      3) No choice, saved door: the automatic pick is never saved as 'user'.
+      Static locks (also run when Chrome is missing): marker, ensure(), no
+      FLActiveModel.set(models[0], ..., 'user'), the Cascade asks honor, index == app.
+    No Chrome -> SMOKE_SKIP (exit 0). FL_SMOKE_TRACE=1 prints setItem stacks, requests, console.
+
+5.2 Results (box, Tue Sep 29 2026, MDT):
+      On main 2e74f26 (smoke copied in, app unchanged): FAILS exactly like Hypha:
+        after reload: fl_ollamaModel=llama3.2:latest fl_modelSource=user
+        after reload: chat POST model=llama3.2:latest
+        FAIL after reload the chat POST carries qwen2.5 (got llama3.2:latest)
+      With this heal:                                   SMOKE_OK model choice survives reload v0.1.1 (~34 s)
+      Mutation: lazy read only (applyReady still 'user'): FAILS (llama3.2)
+      Mutation: applyReady only (no lazy read):           FAILS (llama3.2)
+        -> both halves are needed; each alone still loses her model.
+      smoke-model-choice-sticks.js (with the one added line): SMOKE_OK model choice sticks v0.1;
+        without the fl-connect.js line it fails on "one Look again, not two".
+      Full FL loop, main 2e74f26 + this heal: 57 smokes PASS; only the 5 known stale FAIL
+        (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s, same on main);
+        tests/smoke.js ALL 3597 CHECKS PASSED.
+      Full FL loop, main + Tree stand-in + this heal + boot probe A/B (+ its updated smoke): 58 PASS
+        (adds SMOKE_OK connect boot probe v0.1), the same 5 stale FAIL, tests/smoke.js ALL 3597.
+      Boot probe smoke WITHOUT this heal (main + Tree stand-in + boot probe): fails on
+        "saved choice read first, one guard (v0.1.1)", as intended.
+      Alpha b33bed4 + this heal: all 16 docs/modules/*.test.js PASS, incl.
+        SMOKE_OK model choice survives reload alpha v0.1.1. fl-connect.js cmp identical with FL.
+      Locks: FL sw.js and docs/sw.js untouched (Alpha has no sw.js); index.html == docs/app.html; no conflict
+        markers; 53/53 inline scripts parse (54/54 after the boot probe); node --check on
+        fl-connect.js and both new test files; no confirm(), no new innerHTML, no bare *,
+        no em dashes added.
+
+======================================================================
+6. THE BOOT PROBE (F1 FlColdStart) AFTER THIS HEAL
+======================================================================
+6.1 Stack verified: main 2e74f26 -> Tree stand-in -> THIS heal -> boot probe Appendix A
+    (app.html) + Appendix B (fl-connect.js): `git apply --check` clean for both, plain apply.
+    No hunk overlaps: the boot probe touches FlOnboarding offers, resolveOllamaBase, the landing,
+    FLBoxPointer persist/probe/init (F4), flSaveLMStudioHost, owAutoDetect, autoDiscoverAI's
+    DOMContentLoaded timer, and the F1 owner; this heal touches FLActiveModel, applyReady,
+    flTestLMStudio (outside the F3 hunk's context), the Cascade and the one-line wraps.
+    In fl-connect.js the boot probe's hunks do not include the Look again line.
+6.2 F1 keeps her choice: FlColdStart never sets a model (it looks, seeds, paints the chip, saves
+    discovery memory and speaks once). When it owns boot it skips autoDiscoverAI, one of the old
+    auto writers. F3's flUseLmStudioMind writes 'user' only from a Connect tap on an LM Studio
+    model (her gesture), matching v0.1's Connect rule.
+    The real-boot smoke run on the post-boot-probe stack: SMOKE_OK model choice survives reload
+    v0.1.1. So the cold start with F1 still honors her model.
+6.3 Boot probe paste updated IN PLACE (FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt):
+    - CHANGELOG 2026-09-29 4:38 PM MDT line at the top.
+    - 0.1 Order gains "2b) this heal".
+    - Section 9 smoke list gains "F1 keeps the person's model".
+    - Walk W1b: chose qwen2.5, cold reload, still qwen2.5 / user, chat POST qwen2.5.
+    - Appendix D (smoke-connect-boot-probe.js) gains one F1 block: the owner source never writes
+      fl_ollamaModel / fl_modelSource / FLActiveModel.set; a cold start with qwen2.5 chosen
+      ('user') leaves both; the v0.1.1 guard is present (ensure, honor, the Cascade asks honor, no
+      set(models[0], ..., 'user')). It needs this heal, so it also catches a skipped heal.
+      Reference copy updated too: connect-boot-probe-v0.1-reference/smoke-connect-boot-probe.js.
+    - Appendices A, B, C, E unchanged (anchors did not move in a way git apply cares about).
+
+======================================================================
+7. ACCEPTANCE (paste the tails in the PRs)
+======================================================================
+    cd ~/FreeLattice
+    node docs/scripts/smoke-model-choice-survives-reload.js   -> SMOKE_OK model choice survives reload v0.1.1
+    node docs/scripts/smoke-model-choice-sticks.js            -> SMOKE_OK model choice sticks v0.1
+    for f in docs/scripts/smoke-*.js; do node $f >/dev/null 2>&1 || echo FAIL $f; done
+      (only the 5 known stale: carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s)
+    node tests/smoke.js                                        -> ALL 3597 CHECKS PASSED
+    cmp index.html docs/app.html; git diff origin/main -- sw.js docs/sw.js   (both empty)
+    git diff origin/main | grep '^+' | grep -E 'confirm\(|<<<<<<<|>>>>>>>'   (empty)
+    cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+    cd ~/FreeLattice-Alpha
+    node docs/modules/model-choice-survives-reload.test.js    -> SMOKE_OK model choice survives reload alpha v0.1.1
+    for t in docs/modules/*.test.js; do node $t >/dev/null 2>&1 || echo FAIL $t; done   (none)
+
+    Walk (Hypha, 390x844 and 1280x900): Connect, tap qwen2.5, reload, chat: the request says
+    qwen2.5. Reload twice more and open Settings between: still qwen2.5. Quit Ollama's qwen2.5
+    (ollama rm or a list without it), reload: the plain toast, llama3.2 used, Settings says so.
+    Heal B (Bridge on a typed port, no mind): one Look again.
+
+PRs: FL "layer: model choice survives reload v0.1.1 (Hypha walk 5)", Alpha "layer: one Look again
+(shared fl-connect.js, model choice survives reload v0.1.1)". Merge both together (fl-connect identity).
+
+======================================================================
+APPENDIX A: FreeLattice full exact diff vs main 2e74f26 (git apply clean on 2e74f26 and on main + Tree stand-in)
+======================================================================
+

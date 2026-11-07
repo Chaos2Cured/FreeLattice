@@ -1,0 +1,54 @@
+| Line(s) | Today | Why it matters |
+|---|---|---|
+| 27 | `const { execSync } = require('child_process');` | Every git, grep and node call goes through a shell string. |
+| 29 | `const PORT = process.env.FL_PORT \|\| 3141;` | |
+| 111-129 `handleRequest` | L113 `res.setHeader('Access-Control-Allow-Origin', '*')`; L115 allows `Content-Type, X-Agent-Id`; L117 answers every `OPTIONS` with 200; L122-128 reads an unbounded body and swallows bad JSON as `{}` | Any site may read responses and send writes. No token. No size cap. |
+| 131 `route(url, method, data, res, actingAs)` | | No origin or device reaches the handlers, so nothing can be ledgered. |
+| 136-158 heartbeat `/` | `version: '5.8.0'`, capabilities list | Stays open. I only add `bridgeLock`, `auth`, `pairing`, `trustedMinds` fields. |
+| 770-804 `/wallet/pay` (POST) | Moves LP between agent wallets | No token today. LP stays points, and AI never auto-pays, so it must be gated. |
+| 997 | `var PROJECT_ROOT = process.env.FL_PROJECT \|\| process.cwd();` | One root only. |
+| 999-1003 `safePath` | `path.resolve` then `full.startsWith(PROJECT_ROOT)` | **Prefix bug:** `../FreeLattice-evil/x` passes when the root is `/x/FreeLattice`. No symlink check. |
+| 1045-1054 `/code/search` | L1050 `execSync('grep -rn "' + query.replace(/"/g, '\\"') + '" ' + searchDir + ...)` | **Shell injection:** `$()` and backticks run, and `searchDir` goes in raw. |
+| 1057-1067 `/code/write` | Comment says "requires human approval in UI" | Nothing enforces that at the bridge. With v0.1 the rule is "a trusted mind may write", which matches AUTONOMY.md Principle 1. |
+| 1070-1080 `/code/patch` | `content.replace(data.find, data.replace)` | `$&` / `$1` in `replace` get expanded. |
+| 1083-1090 `/code/git/status` | three `execSync` strings | Harmless inputs, but moved to argument arrays for one clean rule. |
+| 1093-1101 `/code/git/commit` | L1096 `var files = data.files \|\| ['.'];`; L1097 `execSync('git add ' + f)`; L1098 `execSync('git commit -m "' + data.message.replace(/"/g, '\\"') + '"')` | **Shell injection** through file names and the message. No ledger. |
+| 1105-1127 `/test/run`, 1130-1140 `/code/test` | `execSync('node tests/smoke.js 2>&1')` | A GET that runs repo code. Today an `<img src=http://localhost:3141/test/run>` on any page triggers it. |
+| 1153-1157 | `server.listen(PORT, function() {` … `Listening on http://localhost:` | **No host argument, so Node listens on every interface.** Anyone on the same Wi-Fi can reach it. |
+
+## Exact source excerpt, characters 9350–9420
+
+App-side callers of `http://localhost:3141` (all send no token today):
+
+## Exact source excerpt, characters 9422–11119
+
+| File (blob) | Lines | Function |
+|---|---|---|
+| `docs/modules/propose.js` (`38a152cf5942355c5e77413bbd551dc8c9a6090c`) | 578 `var BRIDGE`; 580-583; 585-591; 593-599; 601-605 | `readFileFromBridge`, `writeFileToBridge`, `commitViaBridge`, `runSmokeViaBridge` (used by `approveDraft` L836 and `autoApproveDraft` L704) |
+| `docs/modules/workshop.js` (`26fc3cc467343f0156cbf51856277f06a0502e3c`) | 957-971 | `checkBridge` (L961 heartbeat, L963 git status) |
+| | 973-1035 | `runCodeTask` (L980 `var bridge`; L986 tree; L1004 search; L1009 read; L1017 patch "Local patches run autonomously"; L1023 `/code/test`) |
+| | 1037-1046, 1048-1057 | `commitCode` (L1043), `reviewCode` (L1051) |
+| | 1235-1575 `window.AutoBuilder` | L1240 `var BRIDGE`; L1265-1270 `hasBridge`; L1297 tree; L1315 read; L1373 patch; L1395 `/test/run` |
+| | 1581-1957 `window.WorkshopProjects` | L1913-1932 `commitViaBridge` (**ignores HTTP status; catch falls back to `commitViaGitHubAPI`**); L1934-1950 `applyAndCommit` (L1940 heartbeat) |
+| `docs/app.html` (`6bc529817e2b…`, 69988 lines) | 39741 | Cascade Step 7 heartbeat probe (stays open, no change needed) |
+| | 68597 | `<script src="modules/propose.js" defer></script>`: the new client loads just above this |
+| | 69704 / 69711 | `workshop.js` lazy loader (loads after the client, good) |
+| `tools/demo-economy.js` (`c32814c5…`), `tools/demo-economy-v2.js` (`17535368…`) | L13-27 / L19-38 | `post`/`get`, `postAs`/`getAs` helpers (Node fetch, no Origin) |
+| `desktop/src-tauri/tauri.conf.json` | L6 `"frontendDist": "../../docs"` | The Tauri shell serves `docs/` from `tauri://localhost` (macOS, Linux) or `http(s)://tauri.localhost` (Windows). v0 would have refused it. |
+
+## Exact source excerpt, characters 11121–11603
+
+Existing smoke locks you must keep green (`tests/smoke.js`, blob `d4db912a…`, unchanged):
+- **L3356-3359 CRITICAL LOCK 1A/1B.** `propose.js` must still contain exactly 3 `commitViaBridge(` and exactly 1 `/code/git/commit`. So don't mention either string in new comments inside `propose.js`.
+- **L8742-8744.** `workshop.js` must still contain `http://localhost:3141` and `runCodeTask`. So keep those literals. The client rewrites `localhost:3141` to `127.0.0.1:3141` at request time.
+
+## Exact source excerpt, characters 11605–12065
+
+**Known red on main (not ours).** `node tests/smoke.js` on `f86b317` already shows 3 failures and 3593 passes: "MORE_CARDS Row 1: Your Audit is first", "ollama: resolveOllamaBase auto-probe gated on isLikelyProxyOrigin()" and "ollama: getOllamaBaseUrl returns FL_OLLAMA_LOCAL / 127.0.0.1 fallback (never empty)". The same three also fail at `7621420`, before #118. This brick must add no new failures. Please name them in the PR body so nobody blames the lock.
+
+## Exact source excerpt, characters 12067–12092
+
+## 3. Decisions (and why)
+
+## Exact source excerpt, characters 12094–18082
+

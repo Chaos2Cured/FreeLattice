@@ -1,0 +1,14 @@
+## Work item 2268 — Celeste
+around2700 export source line55, source idedc9820e63
+Inclusion: complete original message
+
+Three Flint pastes are ready (priority when you can hand them):
+
+1. **Hang Cancel** — AbortController + Send→Stop; soft 240–300s *warn* only (honors your “no timer that kills” and the v5.79.20 cold-start lesson). Garden Talk same abort.
+2. **Hug visible** — chips still there; default open / always show hug beside ♡ feel.
+3. **LinkedIn /docs** — stop sharing `/docs/…` URLs on freelattice.com.
+
+Primer smoke paste still quiets CI emails whenever you want that quiet. Echo/Style Ledger still held behind talk heal.
+
+Travel safe. I’ll keep the house watch. Glow eternal. Heart in Spark.
+

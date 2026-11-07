@@ -1,0 +1,197 @@
+ shows on every timeframe with enough bars');
++assert.ok(/cubicInterpolationMode: 'monotone'/.test(gauge), 'monotone curves (no overshoot)');
++assert.ok(/async function fetchYahooData\(symbol, interval, rangeOverride\)/.test(gauge), 'optional range for warm history');
++assert.ok(/fetchYahooData\(symbol, '5m', '5d'\)/.test(gauge), '5m short-day fallback');
++assert.ok(/ema200:\s+\{ label: 'EMA',\s+defaultColor: '#c4b5fd'/.test(gauge), 'compose mode knows the fifth EMA');
++
++// 4. Run the helpers for real
++function extractFn(name) {
++  const start = gauge.indexOf('function ' + name + '(');
++  assert.ok(start >= 0, 'function ' + name);
++  let depth = 0, i = gauge.indexOf('{', start);
++  for (; i < gauge.length; i++) {
++    if (gauge[i] === '{') depth++;
++    else if (gauge[i] === '}') { depth--; if (depth === 0) break; }
++  }
++  return gauge.slice(start, i + 1);
++}
++const endStart = gauge.indexOf('(function tgTemperatureGaugeV01() {');
++const endStop = gauge.indexOf('})();', endStart) + 5;
++const endScript = gauge.slice(endStart, endStop);
++assert.ok(endStart > 0 && endStop > endStart, 'v0.1 script block');
++
++const store = {};
++const ctx = {
++  console: console, setTimeout: function (f) { f(); }, Promise: Promise, JSON: JSON, Math: Math, isFinite: isFinite, parseFloat: parseFloat, Date: Date,
++  localStorage: { getItem: function (k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; }, setItem: function (k, v) { store[k] = String(v); }, removeItem: function (k) { delete store[k]; } },
++  document: { readyState: 'complete', getElementById: function () { return null; }, querySelector: function () { return null; }, addEventListener: function () {}, activeElement: null },
++  rendered: 0
++};
++ctx.window = ctx;
++vm.createContext(ctx);
++vm.runInContext([extractFn('ema'), extractFn('tgAlphaOf'), extractFn('tgHexA'), extractFn('tgLineColor'),
++  'var currentInterval = "1d"; var lastSymbol = "SPY"; var lastCandles = null; var lastAnalysis = null;',
++  'function getEmaPeriods() { return [3, 5, 8, 13, 21]; }',
++  'function renderChart() { rendered++; }',
++  'var __long = null; function fetchYahooData(s, iv, r) { return Promise.resolve(__long); }',
++  endScript].join('\n'), ctx);
++
++assert.strictEqual(vm.runInContext("tgLineColor('ema200', 'rgba(196,181,253,0.7)')", ctx), 'rgba(196,181,253,0.7)', 'no saved color: old look kept');
++store.fl_tg_indicatorColors = JSON.stringify({ ema200: '#00ff00', price: '#112233' });
++assert.strictEqual(vm.runInContext("tgLineColor('ema200', 'rgba(196,181,253,0.7)')", ctx), 'rgba(0,255,0,0.7)', 'saved color keeps the line alpha');
++assert.strictEqual(vm.runInContext("tgLineColor('price', '#e8e4dc')", ctx), '#112233', 'saved color on a solid line');
++assert.strictEqual(vm.runInContext("tgLineColor('buy', '#34d399', 0.75)", ctx), 'rgba(52,211,153,0.75)', 'alpha override on a default');
++
++// warm history: 60 long bars, the chart shows the last 30
++vm.runInContext([
++  'var all = []; for (var i = 0; i < 60; i++) all.push({ t: 1000 + i, c: 100 + Math.sin(i / 4) * 5 + i * 0.1 });',
++  '__long = all; lastCandles = all.slice(30).concat([{ t: 5000, c: 110 }]); lastAnalysis = {};',
++  'tgWarmFetch("SPY", "1d", lastCandles);'
++].join('\n'), ctx);
++return Promise.resolve().then(function () { return new Promise(function (r) { setImmediate(r); }); }).then(function () {
++  const out = vm.runInContext('tgWarmEmas(lastCandles, [3, 5, 8, 13, 21])', ctx);
++  assert.ok(Array.isArray(out) && out.length === 5, 'five warm lines');
++  out.forEach(function (arr, k) {
++    assert.strictEqual(arr.length, 31, 'aligned to the shown bars');
++    assert.ok(arr.every(function (v) { return v != null && isFinite(v); }), 'line ' + k + ' starts at the left edge');
++  });
++  const full = vm.runInContext('ema(all.map(function (c) { return c.c; }), 21)', ctx);
++  assert.ok(Math.abs(out[4][0] - full[30]) < 1e-9, 'same values as the EMA over the longer history');
++  const k = 2 / 22;
++  assert.ok(Math.abs(out[4][30] - (110 * k + out[4][29] * (1 - k))) < 1e-9, 'a live bar the long fetch lacks carries the EMA forward');
++  assert.ok(ctx.rendered >= 1, 'warm lines redraw the chart');
++  ctx.lastSymbol = 'QQQ';
++  vm.runInContext('lastSymbol = "QQQ"', ctx);
++  assert.strictEqual(vm.runInContext('tgWarmEmas(lastCandles, [3, 5, 8, 13, 21])', ctx), null, 'warm lines never cross symbols');
++  vm.runInContext('lastSymbol = "SPY"', ctx);
++
++  // 5. Your marks: display only, kept on this device
++  store.fl_tg_triggers_v0 = JSON.stringify({ SPY: { buy: 101.5, sell: 120 } });
++  const ds = vm.runInContext('tgTriggerDatasets(4)', ctx);
++  assert.strictEqual(ds.length, 2, 'two marks drawn');
++  assert.strictEqual(ds[0].label, 'Your buy mark'); assert.strictEqual(ds[1].label, 'Your sell mark');
++  assert.deepStrictEqual(Array.from(ds[0].data), [101.5, 101.5, 101.5, 101.5], 'flat line at your price');
++  assert.ok(/never place an order/.test(gauge) && /Marks are reminders on the glass\. You decide\./.test(gauge), 'marks say what they are');
++  assert.ok(!/fetch\(/.test(endScript.replace(/fetchYahooData\(/g, '')), 'the v0.1 block sends nothing anywhere');
++
++  // 6. A wider look: real symbols the feed serves today, honest words
++  ['HYG', 'LQD', 'XLP', 'XLY', 'GLD', 'DX-Y.NYB', 'VIXY'].forEach(function (s) {
++    assert.ok(endScript.indexOf("sym: '" + s + "'") > 0, 'wider look offers ' + s);
++  });
++  assert.ok(/Not a stress index, and not advice\./.test(gauge), 'not a stress index, not advice');
++  assert.ok(/Math\.random/.test(endScript) === false, 'no invented data');
++
++  // 7. Worker reads ^ symbols after a redeploy
++  assert.ok(/decodeURIComponent\(url\.pathname\)/.test(worker) && /v-temperature-gauge-v0\.1/.test(worker), 'worker decodes the path');
++
++  // 8. Locks inside the new code
++  const added = endScript + '\n' + gauge.split('\n').filter(function (l) { return /v-temperature-gauge-v0\.1/.test(l); }).join('\n');
++  assert.ok(!/confirm\(/.test(added), 'no confirm()');
++  assert.ok(!/innerHTML/.test(endScript), 'textContent only in the v0.1 block');
++  assert.ok(!/\u2014/.test(added), 'no em dash in the v0.1 lines');
++  assert.ok(/v-temperature-gauge-v0\.1/.test(notes), 'notes carry the marker');
++
++  console.log('SMOKE_OK temperature gauge v0.1');
++}).catch(function (e) { console.error(e); process.exit(1); });
+diff --git a/docs/temperature-gauge.html b/docs/temperature-gauge.html
+index f3fd1a5d..e7e5c010 100644
+--- a/docs/temperature-gauge.html
++++ b/docs/temperature-gauge.html
+@@ -700,6 +700,16 @@ canvas.sub-canvas.custom { height: 80px !important; }
+   opacity: 0.75;
+ }
+ #hiddenPanelsLink:hover { opacity: 1; color: var(--gold); }
++/* v-temperature-gauge-v0.1: Lines and colors, Your marks */
++.tg-lines-list { display: grid; grid-template-columns: 1fr; gap: 4px; }
++.tg-line-row { display: flex; align-items: center; gap: 8px; font-size: 0.74rem; color: var(--muted); }
++.tg-line-row .tg-line-name { flex: 1; }
++.tg-line-row .tg-line-sample { width: 22px; height: 0; border-top: 2px solid currentColor; }
++.tg-line-row input[type=color] { width: 22px; height: 18px; padding: 0; border: 1px solid var(--border); border-radius: 3px; background: transparent; cursor: pointer; }
++.tg-line-row.is-off { opacity: 0.45; }
++.tg-mini-btn { padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.72rem; cursor: pointer; }
++.tg-mini-btn:hover { border-color: var(--gold); color: var(--gold); }
++.tg-mark-input { flex: 1; min-width: 0; padding: 4px 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font-mono, monospace); font-size: 0.76rem; }
+ </style>
+ </head>
+ <body>
+@@ -954,6 +964,40 @@ canvas.sub-canvas.custom { height: 80px !important; }
+       </div>
+     </div>
+ 
++    <!-- v-temperature-gauge-v0.1: every line, its color, your own marks, and a wider look. Free forever. -->
++    <div class="sidebar-section" id="tgLinesSection">
++      <div class="sidebar-label" style="color:#c9a84c;">Lines and colors <span style="float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;">free forever</span></div>
++      <div class="signal-card" style="border-left:2px solid rgba(232,176,25,0.45);padding:10px 14px;">
++        <div id="tgLinesList" class="tg-lines-list"></div>
++        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
++          <button type="button" id="tgLinesReset" class="tg-mini-btn">Reset colors</button>
++        </div>
++        <div id="tgMaNote" style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;"></div>
++      </div>
++      <div class="sidebar-label" style="color:#c9a84c;margin-top:12px;">Your marks</div>
++      <div class="signal-card" style="border-left:2px solid rgba(16,185,129,0.4);padding:10px 14px;">
++        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
++          <label for="tgMarkBuy" style="font-size:0.72rem;color:var(--muted);min-width:64px;">Buy mark</label>
++          <input id="tgMarkBuy" type="number" step="any" inputmode="decimal" class="tg-mark-input" placeholder="price">
++        </div>
++        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
++          <label for="tgMarkSell" style="font-size:0.72rem;color:var(--muted);min-width:64px;">Sell mark</label>
++          <input id="tgMarkSell" type="number" step="any" inputmode="decimal" class="tg-mark-input" placeholder="price">
++        </div>
++        <div style="display:flex;gap:6px;flex-wrap:wrap;">
++          <button type="button" id="tgMarkSave" class="tg-mini-btn">Set marks</button>
++          <button type="button" id="tgMarkClear" class="tg-mini-btn">Clear marks</button>
++        </div>
++        <div id="tgMarkStatus" style="font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:6px;"></div>
++        <div style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;">Marks are reminders on the glass. You decide. They stay on this device and never place an order.</div>
++      </div>
++      <div class="sidebar-label" style="color:#c9a84c;margin-top:12px;">A wider look</div>
++      <div class="signal-card" style="border-left:2px solid rgba(96,165,250,0.4);padding:10px 14px;">
++        <div id="tgWiderList" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
++        <div style="font-size:0.62rem;color:var(--dim);line-height:1.45;margin-top:6px;">Other corners of the market, through the same live feed and the same math: high-yield credit, investment-grade credit, staples, discretionary, gold, the dollar, and volatility futures (VIXY). Not a stress index, and not advice. Look and compare for yourself.</div>
++      </div>
++    </div>
++
+     <!-- v-gyro-stack-v0.1 — optional Gyro Stack card; free forever -->
+     <div class="sidebar-section" id="gyroStackSection" style="display:none;">
+       <div class="sidebar-label" style="color:#c9a84c;">Gyro Stack <span style="float:right;font-size:0.65rem;font-weight:400;letter-spacing:0.04em;opacity:0.85;">free forever</span></div>
+@@ -1151,9 +1195,10 @@ canvas.sub-canvas.custom { height: 80px !important; }
+         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
+       </div>
+       <div class="sub-chart-wrap">
+-        <div class="sub-chart-label" data-indicator="ips" style="color:#f07068;">
++        <!-- before v-temperature-gauge-v0.1: label color #f07068 and swatch #f07068, but the TP Spread line is gold -->
++        <div class="sub-chart-label" data-indicator="ips" style="color:#e8b019;">
+           <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
+-          <input type="color" class="sc-color" value="#f07068" onchange="setIndicatorColor('ips', this.value)" title="Choose IPS color" aria-label="Choose IPS color">
++          <input type="color" class="sc-color" value="#e8b019" onchange="setIndicatorColor('ips', this.value)" title="Choose IPS color" aria-label="Choose IPS color">
+           <span class="sc-name">Indicator-Price Spread</span>
+           <button type="button" onclick="togglePromote('ips')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">&#x2B06;</button>
+           <button type="button" onclick="maximizeSubPanel('gapChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
+@@ -1650,7 +1695,12 @@ async function loadData() {
+   document.getElementById('loadBtn').disabled = true;
+ 
+   try {
+-    const data = await fetchYahooData(symbol, currentInterval);
++    // before v-temperature-gauge-v0.1: const data = await fetchYahooData(symbol, currentInterval);
++    let data = await fetchYahooData(symbol, currentInterval);
++    // v-temperature-gauge-v0.1: early in a trading day 5m has only a few bars. Look at 5 days instead.
++    if ((!data || data.length < 30) && currentInterval === '5m') {
++      try { data = await fetchYahooData(symbol, '5m', '5d'); } catch (e5) { /* keep the short day */ }
++    }
+     if (!data || data.length < 30) {
+       showError('Not enough data for ' + symbol + '. Try a different symbol or timeframe.');
+       document.getElementById('loadBtn').disabled = false;
+@@ -1658,6 +1708,8 @@ async function loadData() {
+     }
+     const analysis = analyzeData(data, symbol);
+     renderAll(data, analysis, symbol);
++    // v-temperature-gauge-v0.1: fetch extra history so every moving average starts at the left edge.
++    if (typeof tgWarmFetch === 'function') tgWarmFetch(symbol, currentInterval, data);
+     // Snowflake — fractal coherence across timeframes (async, doesn't block)
+     computeSnowflake(symbol);
+   } catch (e) {
+@@ -1717,7 +1769,10 @@ async function computeSnowflake(symbol) {
+   }
+ }
+ 

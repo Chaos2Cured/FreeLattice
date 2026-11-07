@@ -1,0 +1,235 @@
+```diff
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6071,3 +6071,46 @@ body.fl-connect-open .garden-evolution-indicator {
+     z-index: 55;
+   }
+ }
++
++/* v-connect-heal-v0.4 / Hypha walk 3 item 1: Mom sees Download Bridge.
++   The mount was a shrinkable flex child with its own scroller inside the
++   flex-column veil, so it collapsed to 0px at 390px and clipped at 1280px.
++   One scroller only: the Settings veil. The mount keeps its full height,
++   the card gets a night backing, and the canvas sky dims while Connect is
++   open so orbs never draw across the words. Layer, never delete. */
++#place-veil.is-settings #fl-connect-mount-garden {
++  flex: 0 0 auto;
++  min-height: min-content;
++  max-height: none;
++  overflow: visible;
++  width: min(40rem, 100%);
++  box-sizing: border-box;
++  background: rgba(12, 10, 26, 0.88);
++  border: 1px solid rgba(200, 210, 230, 0.1);
++  border-radius: 14px;
++}
++#place-veil.is-settings #fl-connect-mount-garden .flc-wrap {
++  max-height: none;
++  overflow: visible;
++}
++html.flc-hide-galaxy #gardenContainer {
++  opacity: 0.12;
++  transition: opacity 400ms ease;
++}
++#place-veil.is-settings #place-veil-close {
++  position: sticky;
++  left: auto;
++  bottom: 8px;
++  transform: none;
++  flex: 0 0 auto;
++  margin-top: 12px;
++  padding: 8px 16px;
++  background: rgba(12, 10, 26, 0.94);
++  border: 1px solid rgba(232, 176, 25, 0.35);
++  border-radius: 999px;
++  opacity: 1;
++  z-index: 61;
++}
++#place-veil.is-settings {
++  padding-bottom: 1.25rem;
++}
+```
+
+**Measured in headless Chrome (served from the Alpha tree, Settings door clicked, no local mind):**
+
+| Viewport | Mount height (before, after) | Download Bridge (after) | Port field (after) | Point test at Download |
+|---|---|---|---|---|
+| 390x844 | 0px, 640px | top 378, bottom 426 | top 492, bottom 536 | before: `settings-face`; after: the link |
+| 1280x800 | 276px, 565px | top 355, bottom 403 | top 469, bottom 517 | before: `place-veil`; after: the link |
+
+No scroll-to-Download code is needed: Download sits in the first screen at both sizes. Section 9 also resets `veil.scrollTop = 0` when Settings opens, so a reopened veil never starts halfway down.
+
+---
+
+## 2. FreeLattice: stop the forever Bridge scan (Hypha item 2)
+
+**Cause:** `flBridgeDetectBoot` (`app.html:31504-31513`) ends with `setInterval(run, 20000)`. Each run is `flBridgeHealth()`, a full scan of 11 ports (fetch at `31387`), on every tab, forever. That is the 22 failed fetches per 40s Hypha saw after leaving Connect.
+
+**Fix:** the boot look stays. The interval now does nothing while the page is hidden, never scans, and only checks the one saved Bridge port once a Bridge has answered. For Mom with no Bridge: 0 background fetches.
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -31509,7 +31524,20 @@ function flUseBridge() {
+     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 1200); });
+     else setTimeout(run, 1200);
+   }
+-  setInterval(run, 20000);
++  // v-connect-heal-v0.4 / Hypha walk 3 item 2: the old 20s interval ran the
++  // full 11-port scan forever, on every tab. Now: never while hidden, never a
++  // full scan, and only the one saved Bridge port once a Bridge has answered.
++  // Boot still does one full look; Connect keeps its own loop.
++  setInterval(function flBridgeQuietTick() {
++    try {
++      if (document.hidden) return;
++      var saved = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
++      if (!saved || saved === 11434) return;
++      flBridgeHealthAt(saved).then(function (h) {
++        flBridgeShowChip(!!(h && h.bridge && h.helped), h && (h.port || h._probedPort));
++      });
++    } catch (eQ) {}
++  }, 20000);
+ })();
+ window.flBridgeDetect = flBridgeDetect;
+ window.flUseBridge = flUseBridge;
+```
+
+Measured: 22 health fetches in the 40s after leaving Connect on main, 0 after.
+
+---
+
+## 3. FreeLattice: cold `#connect` lands once and never yanks back (Hypha item 3, part)
+
+**Cause:** `goConnect` (`app.html:68501-68521`) runs at 400, 1200, 2500ms and load+600, and each call does `switchTab('connect')`, which remounts FlConnect and restarts a full probe. The hash is never cleared, so a tap on Chat inside those first seconds is undone.
+
+**Fix:** keep the retries (startup can still land another tab late), but skip when Connect is already showing, and let the person's first tap or key press end the retries and clear `#connect`. `hashchange` still works (the Settings "Or set this in Connect" link uses it).
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -68498,12 +68565,32 @@ document.addEventListener('click', function(e) {
+ // v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect
+ (function () {
+   // v-connect-port-picker-v0 / Hypha H3 — honor #connect after tabs init
+-  function goConnect() {
++  // v-connect-heal-v0.4 / Hypha walk 3 item 3: the retries stay (startup can
++  // still land another tab late) but they no longer remount Connect when it is
++  // already showing (48 fetches in 7s), and the first tap or key press ends
++  // them and clears #connect, so choosing another tab never yanks back.
++  var _flcUserMoved = false;
++  function flcUserMoved() {
++    if (_flcUserMoved) return;
++    _flcUserMoved = true;
++    try {
++      if ((location.hash || '') === '#connect') history.replaceState(null, '', location.pathname + location.search);
++    } catch (eH) {}
++  }
++  try {
++    document.addEventListener('pointerdown', flcUserMoved, true);
++    document.addEventListener('keydown', flcUserMoved, true);
++  } catch (eL) {}
++  function goConnect(ev) {
+     try {
++      var fromHash = !!(ev && ev.type === 'hashchange');
++      if (_flcUserMoved && !fromHash) return;
+       var hash = (location.hash || '').replace(/^#/, '');
+       var q = '';
+       try { q = new URLSearchParams(location.search || '').get('tab') || ''; } catch (e0) {}
+       if (hash === 'connect' || q === 'connect') {
++        var tabEl = document.getElementById('tab-connect');
++        if (tabEl && tabEl.classList.contains('active')) return;
+         if (typeof switchTab === 'function') switchTab('connect');
+         else if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
+       }
+```
+
+Measured on a cold `app.html#connect`: FlConnect mounts 4 to 1; local fetches in 7s 102 to 65 (the rest are other boot probes, see follow-up F2); a tap on Chat at 1.5s now stays on Chat and the hash is empty.
+
+---
+
+## 4. Shared `fl-connect.js`: a Bridge on the typed port asks for Yes, help (Hypha item 4)
+
+**Cause:** `fl-connect.js:200-208`. When the manual port answers `/bridge/health` with `helped:false`, `waitingHelp = true` is set and then falls through to `manualQuiet = true`. Render (`518`, `535`) shows Nothing answered and skips the Yes, help card.
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -201,6 +211,8 @@
+           report.bridge = mh;
+           report.port = mh.port || parseInt(manPort, 10);
+           report.waitingHelp = true;
++          // v-connect-heal-v0.4 item 4: Bridge answered, so ask for Yes, help (not Nothing answered)
++          return report;
+         }
+       } catch (eManBr) {}
+       report.manualQuiet = true;
+```
+
+Measured with a fake un-helped Bridge on 11500: main shows "Nothing answered on http://127.0.0.1:11500"; after shows "Your Bridge is open. Click Yes, help in its window."
+
+---
+
+## 5. Port stickiness: Use automatic really means automatic (Hypha item 5)
+
+Four small parts, all in the shared core plus one line in app.html:
+
+1. A refused address (`192.168.1.5:11434`) keeps the previous port, as before, but now says so: "... Still using 11500."
+2. `clearManualHost()` also removes `fl_ollamaHost` when it points at that same port (what `remember()` or `preferHelpedBridge()` wrote), and clears the cached `_ollamaResolvedBase`. Other saved hosts are left alone.
+3. Use automatic appears beside every port field whenever a port is set (not only in the quiet card).
+4. The refusal line shows once. It no longer lingers above Nothing answered.
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -77,6 +77,9 @@
+       var port = normalizePort(raw);
+       if (!port) {
+         _manualRejectMsg = 'For safety this only talks to your own computer. Type just the number, like 11500.';
++        // v-connect-heal-v0.4 item 5: say which port stays, so nothing changes quietly
++        var keep = getManualPort();
++        if (keep) _manualRejectMsg += ' Still using ' + keep + '.';
+         return { ok: false, reason: 'foreign', message: _manualRejectMsg };
+       }
+       localStorage.setItem(MANUAL_KEY, port);
+@@ -86,7 +89,14 @@
+ 
+   function clearManualHost() {
+     _manualRejectMsg = '';
++    // v-connect-heal-v0.4 item 5: Use automatic also forgets the host that
++    // remember() wrote for this same port, and the cached resolved base.
++    var was = getManualPort();
+     try { localStorage.removeItem(MANUAL_KEY); } catch (e) {}
++    try {
++      if (was && localStorage.getItem('fl_ollamaHost') === '127.0.0.1:' + was) localStorage.removeItem('fl_ollamaHost');
++    } catch (e1) {}
++    try { if (typeof root._ollamaResolvedBase !== 'undefined') root._ollamaResolvedBase = null; } catch (e2) {}
+   }
+ 
+   function savedBridgePort() {
+@@ -389,6 +405,7 @@
+       '<div class="flc-picker-row">' +
+       '<input id="' + id + '" type="text" value="' + String(cur).replace(/"/g, '&quot;') + '" placeholder="11500" autocomplete="off" />' +
+       '<button type="button" class="flc-btn flc-primary" data-flc-try-addr="' + id + '">Try</button>' +
++      (cur ? '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic</button>' : '') +
+       '</div></div>';
+   }
+ 
+@@ -515,6 +538,7 @@
+     html += '<p class="flc-lede">One door. Download Bridge → Open → Yes, help → tap your model. No Terminal on the main path.</p>';
+ 
+     if (report.manualReject) html += '<div class="flc-card flc-wait"><p>' + report.manualReject + '</p></div>';
++    _manualRejectMsg = ''; // v-connect-heal-v0.4 item 5: shown once, never lingers
+     if (report.manualQuiet) {
+       html += '<div class="flc-card flc-wait"><p>Nothing answered on ' + (report.wanted || 'your port') + '.</p>';
+       html += '<button type="button" class="flc-btn flc-primary" data-flc-look-again>Look again</button> ';
+```
+
+And in app.html, the typed Connect port wins over an older saved `fl_ollamaHost`. The helper keeps the `getOllamaBaseUrl` body inside the smoke windows (`tests/smoke.js` reads the first 800 to 900 chars):
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -34251,8 +34288,17 @@ async function flLookConnect(modelName) {
+   flLookFillModels(document.getElementById('fl-look-3-models'), models, name);
+ }
+ 

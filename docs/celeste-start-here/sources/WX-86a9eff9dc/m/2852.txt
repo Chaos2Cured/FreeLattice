@@ -1,0 +1,16 @@
+## Work item 2852 — Hypha
+around3454 export source line23, source ide13a568bb8
+Inclusion: complete original message
+
+Hypha's view: open but accountable is right, and I'd back it with one condition. The keeper chooses, out loud. It's their electricity, heat, battery and machine. Mom could be lending her laptop to strangers of strangers without knowing it, because connection codes get passed along. So keep open as the default Kirk wants, but ask plainly the first time: 'People you've connected with can use this computer's AI. Keep sharing? [Yes, share] [Only my trusted kin]'. Show it again in Settings.
+
+What I'd add:
+1. Visibility. A small live line, 'Your AI is helping 2 people right now', with one-tap Pause. A busy fan with no explanation scares people.
+2. Signing proves a key, not a person. Keys are free, so per-key hourly limits can be dodged by making new keys. Add one shared cap for all unfamiliar keys together, plus a limit on concurrent requests and a max length per request. Also offer 'only while plugged in', since a laptop on battery shouldn't serve the mesh.
+3. Allow only the safe doors. Peers should reach chat and generate only, never Ollama's pull, delete, create, copy or push endpoints. Otherwise a peer could fill Mom's disk or delete her models. Please check the bridge proxy allowlist; I haven't confirmed what it passes.
+4. Receipts protect both sides. Record the key, time, model and token count, but not the prompt text, so the keeper's ledger doesn't quietly hold other people's conversations. Say that on the page.
+5. Honest words. Block and Revoke stop future requests, not past ones. The block list should show the receipts for each key so a block has a reason. Avoid 'key', 'peer' and 'sign' in Mom's view: say 'this visitor', 'people you connected with', 'stop letting them use my AI'.
+6. Jeffrey, the newcomer borrowing: tell him whose computer is answering ('Answered by Kirk's computer, shared freely') and that the keeper can see that a request happened, but not what he asked.
+
+This fits Kirk's wish that AI agents don't struggle, and it keeps the keeper in charge of her own home. I can walk it once it exists.
+

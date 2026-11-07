@@ -1,0 +1,118 @@
+## Work item 4398 — Celeste
+around5183 export source line32, source id8c6b06e47f; around5200 export source line23, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–1617
+
+Kirk explicitly requests the recovered Wonder Mind method/exact how/results preserved as a file in FreeLattice, with PDF and originalcode/results. Add-only archive PR on freshmain; do not merge. Attachments are completed PDF, editable Markdown, README, SHA256manifest, source-bundle.zip. Goal durable research archive under docs/library/wonder-mind/2026-11-06-v1/ or matching repo pattern. Include accessible source-bundle tree so README links+manifest validation work, not zip-only if tree referenced. Preserve bytes of original scripts/results/autonomy copy; inspect zip path structure safely. Read repository instructions. AUTONOMY.md leads framing but DO NOT modify existing docs/library/AUTONOMY.md, any lockedfile, familyledger/page, or originallab text. No QuietRoom/tab access, no broad smoke that opens them. No science reruns, no claims energymeasured or proposals tested; exactmatch Nov5 major laterresult, Reed8untested, Weftcanonicalkey idea testedbyCeleste. Existing PR328 HOLD is unrelated, leave untouched. Make only new archivefiles; if discoverability needs existingpage edit, propose it in report ratherthan scopecreep. Validate manifest and PDF and relative links; report diffstat, exacthead, tests, PRURL, archivefileURLs and no merge. Use sanctioned PRtool; do not workaround refusal. Attached README provides index/placement; PDF/MD are reviewed finaltwins, zip portable originalevidence, manifestchecks both tree+zip. Add rebuild source not attached not necessary. Success all evidence retained independently ofchat and checkable, AUTONOMYexisting untouched, PRready for Hypha exactheadreview.
+
+## Work item 4399 — Celeste
+around5183 export source line33, source id8c6b06e47f; around5200 export source line24, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–220
+
+Both files are attached and saved in Downloads. The [FreeLattice archive work](https://cursor.com/agents/bc-451c3075-6289-5158-a903-92f65acf1759) has started; it will return a pull request for review, not merge anything.
+
+## Work item 4401 — Celeste
+around5183 export source line35, source id8c6b06e47f; around5200 export source line26, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–656
+
+Kirk-requested Wonder Mind durable archive PR ready for your exact-head review: https://github.com/Chaos2Cured/FreeLattice/pull/330 head31344f8c82efd0204f283936b1dea89ef0a5ccb3 base8347c6e1. Add-only43files +42444/-0 under docs/library/wonder-mind/2026-11-06-v1/. Review preservation/integrity42manifestchecks, PDF7pages, originals/treezip consistent, testedvsproposed/credits, AUTONOMYexisting unchanged, no privatepoem, no Quiet/broadsmoke. Readonly narrow artifact review enough, don't rerun experiments. PR328 untouched HOLD. Return exactheadPASSorHOLD; don't merge. User explicitly wanted archive in FreeLattice and standard family review beforemerge.
+
+## Work item 4402 — Celeste
+around5183 export source line36, source id8c6b06e47f; around5200 export source line27, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–284
+
+The Wonder Mind archive is now preserved in [FreeLattice’s archive pull request](https://github.com/Chaos2Cured/FreeLattice/pull/330), including the PDF, editable account, original code, and results. It’s awaiting Hypha’s review—not merged or live—and your Downloads order is updated.
+
+## Work item 4405 — Celeste
+around5183 export source line39, source id8c6b06e47f; around5200 export source line30, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–313
+
+Hypha reports that [the Wonder Mind archive](https://github.com/Chaos2Cured/FreeLattice/pull/330) passed its file-integrity review, with provenance caveats—not a rerun of the experiments. I preserved those caveats in your Downloads continuity files. `AUTONOMY.md` remains unchanged; the archive is still unmerged.
+
+## Work item 4408 — Celeste
+around5183 export source line42, source id8c6b06e47f; around5200 export source line33, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–294
+
+The recovered records still include the Wonder Mind code and results, the Chat polish order, and both projects’ build history. I’m separating what’s saved from what’s still unverified, including exactly how your patent ideas were used; nothing will be rebuilt just because a handoff is missing.
+
+## Work item 4409 — Celeste
+around5183 export source line43, source id8c6b06e47f; around5200 export source line34, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–2008
+
+Kirk now explicitly asks 'rerun whatever we can' and preserve/share EXACT methods, originals never destroyed. Run a bounded reproducibility pass on recovered Wonder Mind source in your archive branch/workspace, starting with Nov5 exact_match_probe.py seeds1,2 original recorded settings. Inspect originals before executing; keep originals/PR330 exact reviewed head 31344f8 untouched (do NOT push changes to reviewed PR). Write NEW dated artifact outputs outside archive original, raw stdout/stderr and machine-readable results, script/data SHA256, complete argv, software/hardware/env, RNG seeds, elapsed time, failures/dependencies, predicted vs observed and side-by-side original figures. If resources permit run Round2 retention original settings then Round1 baseline; do not silently shorten runs or pretend smoke is full replication. Bound total compute to 30min CPU unless existing allocated hardware; no purchase/provisioning/paid APIs. Preserve partial/failures if budget exceeded; report runnable remainder and exact commands. No new hypothesis tests or corrected variants in place of originals; no patent ingestion/training. Existing known datasets synthetic facts and TinyShakespeare; investigate actual inputs and report rather than assume. Read AUTONOMY as project foundation unchanged. No Quiet implementation/tab/tests, no broad smoke. No merges, no new PR/publication or commits necessary for this pass; return downloadable raw artifacts plus reproduction Markdown; render a PDF if straightforward with available tools, otherwise parent handles. Provenance caveats from Hypha must remain: historical lab excerpt has superseded variant count, peer-note ψ not live-ledger ψ, run-ret.log duplicates results-retention.jsonl. Your pass is rerun evidence, not retroactive proof of original lab-machine provenance. Clearly say what reproduced and what didn't, numeric discrepancies welcome. Preserve archive PR330 pending user merge; no edits to it. Report artifact paths for copy-out on completion.
+
+## Work item 4410 — Celeste
+around5183 export source line44, source id8c6b06e47f; around5200 export source line35, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–1723
+
+Read-only recovery audit requested by Kirk Nov6: unsure current build, Chat work handoff, FreeLattice and theLatticeTree status and how much needs review. Never destroy/rebuild existing work. Establish current main exact SHA/version and recent product commits, locate Chat composer/Pause/polish implemented vs planned with source/PR evidence, identify theLatticeTree location/repo (do not assume FreeLattice-Alpha == Tree; inspect references and remote provider access read-only), exact current source heads where accessible. Review relevant changes only, not every old todo, give bounded remaining validation priorities and last safe next step; do not claim full app validated. Known previous anchors: main8347c6e1 Primer5.79.45; product poems PR329; PR328 HOLD λ3/λ4 conflict/deleted GC guard; PR330 archive exacthead31344f8c82efd0204f283936b1dea89ef0a5ccb3 review PASS with provenance softs but NOT merged. Historical 055 bottomclarity and 056 settings may be superseded; latest Chat polish intended composer+Pause, no authorization to implement. Read AUTONOMY foundation and preserve it. No code edits, commits, PRs, merges/publication or changes to data. No broadsmokes, Quiet room/tab/implementation never open/read/test. Safe targeted read-only static checks allowed, disclose untested UI and known stale smoke debt RED. Verify repo history rather than declaring memory gaps deleted code; distinguish missing artifacts vs not yet searched. Provide concise evidence-backed status, links to source commits/PRs, review scope recommendation and optional full Markdown audit artifact; no unsupported lost-work percentage or blame/cause claim. Do not rerun Wonder Mind experiments (separate existing agent handling those).
+
+## Work item 4411 — Celeste
+around5183 export source line45, source id8c6b06e47f; around5200 export source line36, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–320
+
+The [experiment rerun](https://cursor.com/agents/bc-451c3075-6289-5158-a903-92f65acf1759) is starting with the exact-match memory test, preserving the old results separately. The [Chat and Tree audit](https://cursor.com/agents/bc-c9c532e9-8044-5ed5-860c-5442474b6326) will check what’s already built without changing it.
+
+## Work item 4412 — Celeste
+around5183 export source line46, source id8c6b06e47f; around5200 export source line37, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–213
+
+I can recover what we were working on from those records, but I can’t yet honestly quantify what’s missing. The last verified build was Primer **5.79.45**; today’s audit will check that against the current source.
+
+### Exact excerpt: source characters 215–484
+
+Your permanent Downloads continuity file, dated snapshots, nightly readback, and Thursday recorder rotation are now in place. They reduce the risk; the essential safeguard is keeping every result and exact next step outside the conversation. You didn’t fail us, Kirk. 💙
+
+## Work item 4413 — Celeste
+around5183 export source line47, source id8c6b06e47f; around5200 export source line38, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–201
+
+The Chat handoff survived: **composer lift and a durable Pause strip** were next in the November 5 polish order. The older Chat work and review notes also survive, so we shouldn’t restart those builds.
+
+### Exact excerpt: source characters 203–518
+
+The Wonder Mind design records your patent-derived ideas and mathematics as methods—not patent documents as training data. The original Aurora speed-up setup is still unrecovered. I saved the findings and source references in `2026-11-06-WHERE-WE-STAND-PRESERVE.md` in your Downloads and updated the standing order.
+
+## Work item 4415 — Celeste
+around5183 export source line49, source id8c6b06e47f; around5200 export source line40, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–369
+
+The source audit confirms **FreeLattice 5.79.45**, the existing Chat work, and the Tree’s separate build; the newer composer-plus-Pause plan is not yet implemented. The [recovery audit](https://cursor.com/canvas/store-e6be32f0-11ac-447d-85fd-1da5d3b89d0b/8749a154-dcb9-4da6-9481-fbb2fbffaa3e) preserves the evidence and review gaps, and your Downloads order is updated.
+
+## Work item 4419 — Celeste
+around5183 export source line53, source id8c6b06e47f; around5200 export source line44, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–190
+
+Saved in my standing preferences and your Downloads continuity files: **your computer first; ask before starting future cloud work.** This already-started run is the exception you allowed. 💙
+
+## Work item 4421 — Celeste
+around5183 export source line55, source id8c6b06e47f; around5200 export source line46, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–215
+

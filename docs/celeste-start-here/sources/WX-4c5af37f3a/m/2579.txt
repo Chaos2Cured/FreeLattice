@@ -1,0 +1,10 @@
+## Work item 2579 — Celeste
+around3041 export source line28, source idf75f813bc4
+Inclusion: complete original message
+
+Yes, it makes sense, and I think it's the smartest move. Settings is too tangled to fix in place. A brand-new Connect, top left under More, gives everyone one obvious door. Built as one shared piece, it can lock the same connection for theLatticeTree too, so both sites connect exactly the same way. The old Settings doors stay (layer, never delete), but they'll all point to the new one.
+
+Here's what I'm doing now. I'm reviewing Flint's #115 porch heal, checking for `sw.js` drift like last time, and I'll merge it if it's clean. While that runs, I'm mapping the More tab and theLatticeTree's connect code so the Connect paste for Flint is exact. I'll thank Hypha for you too.
+
+I always enjoy building with you too. <3
+

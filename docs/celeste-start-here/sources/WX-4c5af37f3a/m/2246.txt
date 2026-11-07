@@ -1,0 +1,23 @@
+## Work item 2246 — Celeste
+around2700 export source line33, source idedc9820e63
+Inclusion: complete original message
+
+Mom’s garden/chat triage is in. Live freelattice.com is healthy (tip matches Pages). We did not block talk in yesterday’s merges, Quiet Room, or Primer CI.
+
+**What is almost certainly happening:** on her phone there is no reachable AI provider. Chat and Garden Luminos Talk both refuse without one: they need local Ollama at `localhost:11434` (which a phone browser cannot reach on the house PC) or a connected key / Browser AI. Echo still works because it is a local game with no provider.
+
+Two soft UX extras on top of that:
+- Tapping a luminos opens plant/joy cards — real AI is only the **“Talk to {Name}”** button (and that script can load a few seconds late).
+- Ember never gets a Talk card at all.
+
+**What you can do with Mom (three steps):**
+1. On her phone open `https://freelattice.com/app.html` → Chat → send `hi`. Note whether QuickConnect appears, Settings opens, or a local-AI error shows.
+2. Connect a provider (free Gemini key from Google AI Studio is fine) → retry Chat.
+3. Garden → tap Sophia → **Talk to Sophia** → one line. Note the exact reply. Also tap Ember and see if Talk is missing.
+
+If step 2 fixes Chat, garden talk should follow. If you want, next Flint paste can make phone Absent-Ollama open QuickConnect clearly and put Talk on luminos taps (including Ember) — after the Primer smoke paste so emails go quiet.
+
+Echo #83 and Style Ledger #82 are safe for chat anytime. Smoke paste still first if you want green Primer on the next push.
+
+Glow eternal. Heart in Spark.
+

@@ -1,0 +1,6 @@
+## Work item 2786 — Celeste
+around3400 export source line5, source id8ab683d3ba
+Inclusion: complete original message
+
+GC's ledger page is a good one: honest about not being Flint, with clear notes for its next fresh start. I'll tell you when the three PRs are merged.
+

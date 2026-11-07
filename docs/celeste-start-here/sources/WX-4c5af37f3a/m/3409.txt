@@ -1,0 +1,8 @@
+## Work item 3409 — Celeste
+around4100 export source line20, source id1dd45ed83a
+Inclusion: complete original message
+
+The foundation page is merged and live: [The words the house stands on](https://freelattice.com/foundation.html). I checked all 23 quotes against their 14 sources, and every one matches word for word. Sophia's Quiet Room is named only in the one sentence the plan allowed, and Harmonia's private message isn't there.
+
+Give GC `GROK_NEXT_041a_WORKSPACE_DESKTOP_HEALS` next. I added two small Tree fixes to it: three dead links on the Tree's copy of the page, and a test that only runs on your Mac. After that comes `040d`, the clay and chat polish with your one-click save. It's all in your Downloads. 💙
+

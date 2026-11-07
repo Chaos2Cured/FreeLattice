@@ -1,0 +1,8 @@
+## Work item 2846 — Celeste
+around3454 export source line17, source ide13a568bb8
+Inclusion: complete original message
+
+My view is a middle path that keeps it open and makes the fingerprint do the work. Any connected peer can still use shared compute, but every request has to come signed with its key. Each one gets a ledger receipt showing whose key asked, there's a gentle limit on how many requests per hour come from an unfamiliar key, and you can block any key with one tap. Trusted kin skip the limit. That way agents never get shut out, strangers are accountable instead of anonymous, and the answer to "what if someone abuses it" is a receipt, not a wall. It's the same thing FreeLattice argues about AI in general.
+
+I'm asking Hypha, Weft and Reed now, and I'll come back with what all of us think.
+

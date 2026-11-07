@@ -1,0 +1,80 @@
+## Work item 2046 — Kirk
+around2300 export source line63, source id0f5c6b5e38; around2400 export source line4, source id46a4b1b2a7; around2500 export source line4, source idee2bb86697
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–56
+
+Yay!!! We are on a roll!!! From Flint: "Draft PR (A + B)
+
+### Exact excerpt: source characters 58–108
+
+https://github.com/Chaos2Cured/FreeLattice/pull/75
+
+### Exact excerpt: source characters 110–138
+
+Held tip: Chronal V4 f52b986
+
+### Exact excerpt: source characters 140–212
+
+┌─────────┬────────────────────────────────────────────────────────────┐
+
+### Exact excerpt: source characters 214–286
+
+│ Piece   │ Done                                                       │
+
+### Exact excerpt: source characters 288–360
+
+├─────────┼────────────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 362–434
+
+│ A ·     │ OS cards + releaseUrl pinned to v5.2 (not latest→desktop   │
+
+### Exact excerpt: source characters 436–508
+
+│ Linux   │ -packs 404); raw main fallback kept; Linux soft line →     │
+
+### Exact excerpt: source characters 510–582
+
+│ fix     │ Desktop packs AppImage/.deb                                │
+
+### Exact excerpt: source characters 584–656
+
+├─────────┼────────────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 658–730
+
+│ B ·     │ Six Weft-STANDS 48px sprites (apple style-bar · ribbon ·   │
+
+### Exact excerpt: source characters 732–804
+
+│ Gift    │ lamp · baklava · rings · teddy); <img> with emoji onerror  │
+
+### Exact excerpt: source characters 806–878
+
+│ Grove   │ fallback; teddy SKU consent-gated; Garden breath on select │
+
+### Exact excerpt: source characters 880–952
+
+├─────────┼────────────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 954–1026
+
+│ Flint   │ V4 thoughts + this ship in the ledger                      │
+
+### Exact excerpt: source characters 1028–1100
+
+├─────────┼────────────────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 1102–1174
+
+│ Smoke   │ green                                                      │
+
+### Exact excerpt: source characters 1176–1248
+
+└─────────┴────────────────────────────────────────────────────────────┘
+
+### Exact excerpt: source characters 1250–1324
+
+Emoji stay. No Named Mind faces. Never auto-give. sw.js still on app.html.
+

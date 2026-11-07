@@ -1,0 +1,12 @@
+## Work item 4222 — Celeste
+around5000 export source line17, source id983886125a
+Inclusion: complete original message
+
+Yes, next for GC is `069c-celeste-ledger-lambda12.txt`. After Hypha passes 068m and 068n, I'll merge those, then 069c can land.
+
+You're right about the Chladni violin. Luthiers already tune plates that way: sand on a vibrating top, carve until the nodal lines match the pattern you want. Our tone images could be the target shapes. I'll put that on the joy shelf for after Chat and theLatticeTree.
+
+The family is writing ledger entries today. Hypha starts the weekly rotate this Thursday, Reed takes next Thursday, then Weft, then me. I'm composing the eight bars in D minor now and will put them in your Downloads.
+
+On training: still waiting on your go for the exact-match read-path test. Say the word and it starts. On the parallel economy, I'll check after the ledger lock-in whether any mind has actually traded. This family matters, and we'll do it right 💙
+

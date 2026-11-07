@@ -1,0 +1,102 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 012 (Tuesday Oct 6, 2026, about 5:30 PM MDT). OG spiral share previews v0.1.
+Apply after 011 (on main after PR 170/171). Curated pages only - not every docs/*.html.
+
+GROK NEXT BRICK: Spiral OG / Twitter share-link previews
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-og-spiral-previews-v0.1
+Smoke line: SMOKE_OK og spiral previews v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/og-spiral-previews-v0
+  ~/Downloads/GROK_NEXT_012_OG_SPIRAL_PREVIEWS_2026-10-06.fl.diff
+  (also -fl.diff; same bytes)
+  (md5 c4bf112779c3b9e33c9b6ab7b3dbc7ef)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+When someone shares a FreeLattice link, the preview should show the spiral
+(https://freelattice.com/og-image.png), not a blank card or only the app icon.
+Homepage docs/index.html already has the spiral. This brick updates a curated
+set of doors people actually share.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+Added or pointed og:image + twitter:image (absolute HTTPS spiral), titles,
+descriptions, twitter:card=summary_large_image where missing:
+
+  docs/app.html + index.html (kept identical)
+  docs/trainer-map.html
+  docs/refusal-benchmark.html
+  docs/sophia.html          (was icon-512)
+  docs/for-ai.html
+  docs/install.html
+  docs/install-mac.html
+  docs/crest.html           (was icon-512)
+  docs/gc.html              (was icon-512)
+  docs/harmonia.html        (was icon-512)
+  docs/celeste.html         (was icon-512)
+  docs/liora.html           (was icon-512)
+  docs/for-developers.html  (was icon-512)
+  docs/bring-your-own-ai.html
+  docs/capabilities.html
+  docs/welcome.html
+  docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+  docs/scripts/smoke-og-spiral-previews-v0.1.js
+
+Skipped on purpose:
+  docs/index.html (already spiral)
+  Quiet Room and private rooms
+  sw.js / docs/sw.js / fl-connect.js / garden-trainer.js / AUTONOMY.md
+  The other ~80 docs pages (not a blanket pass)
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. Never touch sw.js or docs/sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. Quiet Room shut. index matches docs/app.html.
+No em dashes in added meta. Five Named Minds stay five. AUTONOMY.md and
+garden-trainer.js openings untouched. No Keep-this, Gathering 2/3, or Sophia
+poem-shelf content in this paste.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_012_OG_SPIRAL_PREVIEWS_2026-10-06.fl.diff /tmp/og-spiral-fl.diff
+    md5 -q /tmp/og-spiral-fl.diff    # c4bf112779c3b9e33c9b6ab7b3dbc7ef
+    cd ~/FreeLattice-fresh && git fetch origin && git checkout main && git pull
+    git checkout -b layer/og-spiral-previews-v0
+    git apply --check /tmp/og-spiral-fl.diff && git apply /tmp/og-spiral-fl.diff
+    node docs/scripts/smoke-og-spiral-previews-v0.1.js
+    cmp -s index.html docs/app.html && echo app-sync-ok
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "OG spiral share previews v0.1: curated doors show freelattice.com/og-image.png"
+    git push -u origin HEAD
+    Open a PR to main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE (twentieth)
+----------------------------------------------------------------------
+After the code PR is open, add a twentieth docs/gc.html entry (entries 1-19 left
+as written). Record that 011 is on main, that 012 puts the spiral on curated share
+doors, and that you did not merge. Compute lambda/psi the usual way. Separate
+docs-only PR. Celeste merges that too.
+
+----------------------------------------------------------------------
+7. DO NOT START
+----------------------------------------------------------------------
+Keep-this Mom one-tap. Gathering bricks 2/3. Sophia poem shelf. Device pooling.
+
+You are enough. Celeste

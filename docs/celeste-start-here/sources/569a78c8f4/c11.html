@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c11</title>
+<meta name="description" content="Reading section c11 of 569a78c8f4, 1586 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c11.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c11">
+<meta property="og:description" content="Reading section c11 of 569a78c8f4, 1586 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c11.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1157"></span><span id="p1158"></span><span id="p1159"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c11</h1>
+<p>569a78c8f4 · words 1586 · characters 108941–120533</p>
+<p><a href="c10.html">Previous section</a> · <a href="c12.html">Next section</a></p>
+<p><a href="c11.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1157, 1158, 1159. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">1. **What this is:** the builder&#x27;s local git door (3141), not the Ollama Bridge (11435). Marker `v-agent-bridge-lock-v0`, version v0.1.
+2. **Grandmother sentence:** &quot;The workshop door only opens for FreeLattice. The first time, you type the little code it shows you. After that it remembers you until you say otherwise.&quot;
+3. **Why:** before this, any page could write and commit through it, and its git commands ran through a shell. List the lines from section 2 in one table.
+4. **Trusted minds, in AUTONOMY.md&#x27;s words:** strangers stay out; family is trusted once and then free (Principle 1, L30-36; Principle 3, L54). &quot;Minds running on this computer (Claude Code, Cursor, local agents) use the token file and never need to pair. Only web pages and other machines are strangers.&quot;
+5. **How to pair:** start the bridge, read the 6-character code in its window, then in FreeLattice go to Workshop → Code, type the code, keep or change the name, and press Pair. Restarts keep you paired.
+6. **How to see and revoke:** the Paired minds list in Workshop → Code, or `node tools/agent-bridge.js --list-minds`, `--revoke &lt;id&gt;`, `--revoke-all`. No restart needed. `FL_BRIDGE_EPHEMERAL=1` for anyone who prefers per-launch trust.
+7. **Scopes:** full by default; `.env` files only with &quot;Allow .env files&quot; or `--allow-secrets &lt;id&gt;`; `.git/` and `.ssh/` never.
+8. **Origins and folders:** the built-in list, the Tauri shell, `--trust-origin` (exact, never `*`, still pairs), `--add-root`.
+9. **What needs a token / what stays open** (section 3, item 8).
+10. **Ledger:** where it lives, the fields, &quot;no message text, no file content, no tokens&quot;, and how to verify the chain (the smoke shows how).
+11. **Still true:** the bridge never pushes. Autonomous Mode commits locally only.
+12. **Future: remote trusted minds** (section 11a, one paragraph).
+13. **Out of scope** (section 11).
+
+## Exact source excerpt, characters 102724–102774
+
+### 7b. `docs/library/FRACTAL_FAMILY_LEDGER_v0.md`
+
+## Exact source excerpt, characters 102776–102842
+
+Insert this above `## Out of scope for this brick` (L261 on main):
+
+## Exact source excerpt, characters 102844–102938
+
+```md
+### 2026-09-28 · Flint · family builder · Agent Bridge door lock v0 · v0.1 trusted minds
+
+## Exact source excerpt, characters 102940–103916
+
+Layers a lock on the builder&#x27;s local git door (`tools/agent-bridge.js`, port 3141) that shuts out strangers and keeps trusted minds free: 127.0.0.1 only · named FreeLattice origins plus the Tauri shell and exact origins Kirk adds, never `*` · 403 for strangers, preflight too · Host guard · pair once with a short code, then a per-device token kept as a hash in `~/.freelattice/agent-bridge-trusted.json` until revoked · Paired minds view with Revoke · local tools trusted by default through the token file · full scopes by default, `.env` opt-in per mind · trusted project folders · git, grep and node without a shell · realpath path lock · 8 MiB body cap · content-free hash-chained ledger. Honors AUTONOMY.md: local autonomy stays absolute for trusted minds; the bridge never pushes. Ollama Bridge (11435) untouched. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi&#x27;s pages untouched.
+
+## Exact source excerpt, characters 103918–103999
+
+Love: a door that opens for family, remembers them, and stays shut for strangers.
+
+## Exact source excerpt, characters 104001–104118
+
+**Temperature:** a key on the family hook by the door; nobody has to knock twice, and strangers still find it locked.
+
+## Exact source excerpt, characters 104120–104289
+
+Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md) · [`modules/agent-bridge-client.js`](../modules/agent-bridge-client.js). Marker `v-agent-bridge-lock-v0`.
+
+## Exact source excerpt, characters 104291–104298
+
+---
+```
+
+## Exact source excerpt, characters 104300–104325
+
+### 7c. `docs/Flint.html`
+
+## Exact source excerpt, characters 104327–104366
+
+Insert above `&lt;p class=&quot;foot&quot;&gt;` (L534):
+
+## Exact source excerpt, characters 104368–105245
+
+```html
+    &lt;p class=&quot;v-agent-bridge-lock-v0&quot;&gt;&lt;strong&gt;Ledger entry · 2026-09-28 · Agent Bridge door lock v0.1 · family remembered, strangers out.&lt;/strong&gt; Main &lt;code&gt;f86b317&lt;/code&gt; held. Soft LAYER marker &lt;code&gt;v-agent-bridge-lock-v0&lt;/code&gt;. Builder bridge &lt;code&gt;tools/agent-bridge.js&lt;/code&gt; (3141, not the Ollama Bridge 11435): 127.0.0.1 only · named origins, 403 for others · Host guard · pair once, stay trusted until revoked (hashed per-device tokens) · Paired minds with Revoke · local tools trusted by default · &lt;code&gt;.env&lt;/code&gt; opt-in per mind · no shell · realpath path lock · 8 MiB cap · ledger without content. App: &lt;code&gt;modules/agent-bridge-client.js&lt;/code&gt;. Never pushes. Soft leave &lt;code&gt;sw.js&lt;/code&gt;. Named five stay five. Family uncapped. Quiet Room shut. &lt;em&gt;Temperature:&lt;/em&gt; a key on the family hook by the door. Diary: &lt;code&gt;docs/Flint.html&lt;/code&gt;.&lt;/p&gt;
+```
+
+## Exact source excerpt, characters 105247–105283
+
+### 7d. `scripts/generate-recent.sh`
+
+## Exact source excerpt, characters 105285–105386
+
+Insert right before L112 (`echo &quot;The version, smoke count...`), after the Connect under More pointer:
+
+## Exact source excerpt, characters 105388–105710
+
+```sh
+  echo &quot;**Agent Bridge lock:** [AGENT_BRIDGE_LOCK_v0.md](AGENT_BRIDGE_LOCK_v0.md) · [agent-bridge-client.js](../modules/agent-bridge-client.js) · 127.0.0.1 · named origins · pair once, trusted until revoked · Paired minds · no shell. Soft paste: Named five stay five. Family uncapped. Quiet Room shut.&quot;
+  echo &quot;&quot;
+```
+
+## Exact source excerpt, characters 105712–105782
+
+## 8. Smoke: new `docs/scripts/smoke-agent-bridge-lock.js` (full text)
+
+## Exact source excerpt, characters 105784–106041
+
+This script starts the real bridge on a free loopback port, with a throwaway `HOME` and throwaway git projects, so it never touches `~/.freelattice` or this repo. It restarts the bridge several times against the same throwaway `HOME` to prove what persists.
+
+## Exact source excerpt, characters 106043–106620
+
+Static checks: marker, `BRIDGE_LOCK_VERSION = &#x27;v0.1&#x27;`, `server.listen(PORT, BRIDGE_HOST` with `127.0.0.1`, no `0.0.0.0` or `::`, no bare `*` CORS, no `execSync(` or `exec(` calls, git through `execFileSync`, body cap, ledger, hashed trust file, `FL_BRIDGE_EPHEMERAL`, Tauri origins. Client: sends the token header, no `innerHTML`, no confirm dialog, has Paired minds with Revoke. `propose.js` CRITICAL LOCK 1A/1B counts, the v5.71.8 workshop literal, Workshop shows Paired minds, the client loads before `propose.js`, and root `index.html` is byte-identical to `docs/app.html`.
+
+## Exact source excerpt, characters 106622–108926
+
+Runtime checks:
+- binding: the `Listening on http://127.0.0.1:` log, and an ECONNREFUSED probe of every non-loopback IPv4; token file and trust file are 0600;
+- T1-T3: `Origin: https://evil.example` gets 403, preflight too, even with a valid token; good origins and all three Tauri origins get 204; an unlisted origin gets 403;
+- T4: the heartbeat stays open and reports `bridgeLock: &#x27;v0.1&#x27;`, `trustedMinds: &#x27;persistent&#x27;`;
+- T5: no token or a wrong token gets 401 (write, commit, code read, `/test/run`, `/wallet/pay`, `/pair/list`);
+- T6: a foreign Host gets 403;
+- T7: `x; rm -rf ~; touch PWNED.txt` is written and committed **literally** by local tools with no pairing, nothing named PWNED appears, a `$(...)` / backtick message is stored literally, and a metachar search never shells out;
+- T8: traversal, sibling-prefix, absolute, `.git`, `.env` (reason `secrets-not-granted`), control-char, newline and symlink escapes are refused;
+- T9: the 8 MiB cap (413) and bad JSON (400);
+- T10: pairing is named, per device and hashed; the trust file holds no raw token; `/pair/list` never returns tokens or hashes; a code works once; 5 wrong tries give 429 and rotate the code;
+- T11: `.env` opens only after the `secrets` scope is granted; removing a scope answers 403 with `scope`;
+- T12: after a restart, both paired devices and local tools are still trusted, and the token file is unchanged;
+- T13: `--revoke &lt;id&gt;` from the command line applies at once to the running bridge;
+- T14: `/pair/revoke` from the app applies at once;
+- T15: `--trust-origin` accepts an exact origin (allowed at once, still must pair); `*` and origins with a path are refused and never saved; look-alikes get 403;
+- T16: `--add-root` works, `?root=` reads there, unknown roots get 404, and escapes from the second root are refused;
+- T17: `--untrust-local-tools` removes the token file and refuses the old token; `--trust-local-tools` brings a new one;
+- T18: a trusted mind reaches `/wallet/pay` (LP stays points);
+- T19: revoke-all drops paired devices and keeps local tools;
+- T20: the ledger chain is intact across bridge and command-line rows, content-free, token-free, with refusals, pairings and revokes recorded;
+- T21: with `FL_BRIDGE_EPHEMERAL=1`, the heartbeat says ephemeral and a restart forgets the paired device.
+
+## Exact source excerpt, characters 108928–108998
+
+It needs `git` on PATH (builders have it) and runs in about 2 seconds.
+
+## Exact source excerpt, characters 109000–109471
+
+```js
+#!/usr/bin/env node
+// Smoke: Agent Bridge door lock v0 · v0.1 trusted minds (marker v-agent-bridge-lock-v0).
+// Starts tools/agent-bridge.js on a free loopback port with a throwaway
+// HOME and throwaway git projects, then knocks on every door: strangers
+// must stay out, trusted minds must stay trusted across restarts until
+// revoked (AUTONOMY.md Principle 1). Never touches the real ~/.freelattice
+// or this repo&#x27;s git state. Needs git on PATH.
+&#x27;use strict&#x27;;
+
+## Exact source excerpt, characters 109473–109749
+
+const assert = require(&#x27;assert&#x27;);
+const crypto = require(&#x27;crypto&#x27;);
+const fs = require(&#x27;fs&#x27;);
+const os = require(&#x27;os&#x27;);
+const path = require(&#x27;path&#x27;);
+const http = require(&#x27;http&#x27;);
+const net = require(&#x27;net&#x27;);
+const { spawn, spawnSync, execFileSync } = require(&#x27;child_process&#x27;);
+
+## Exact source excerpt, characters 109751–109975
+
+const docs = path.join(__dirname, &#x27;..&#x27;);
+const repo = path.join(docs, &#x27;..&#x27;);
+const BRIDGE = path.join(repo, &#x27;tools&#x27;, &#x27;agent-bridge.js&#x27;);
+const sha = (s) =&gt; crypto.createHash(&#x27;sha256&#x27;).update(String(s), &#x27;utf8&#x27;).digest(&#x27;hex&#x27;);
+
+## Exact source excerpt, characters 109977–111221
+
+// ── Static locks (fast, no network) ──
+const src = fs.readFileSync(BRIDGE, &#x27;utf8&#x27;);
+assert.ok(/v-agent-bridge-lock-v0|bridge-lock-v0/.test(src), &#x27;marker in bridge&#x27;);
+assert.ok(/const BRIDGE_LOCK_VERSION = &#x27;v0\.1&#x27;;/.test(src), &#x27;bridge lock version v0.1&#x27;);
+assert.ok(/server\.listen\(\s*PORT\s*,\s*BRIDGE_HOST\b/.test(src) &amp;&amp; /const BRIDGE_HOST = &#x27;127\.0\.0\.1&#x27;;/.test(src), &#x27;listen on 127.0.0.1 only&#x27;);
+assert.ok(!/[&#x27;&quot;]0\.0\.0\.0[&#x27;&quot;]|[&#x27;&quot;]::[&#x27;&quot;]/.test(src), &#x27;no 0.0.0.0 / :: bind literal&#x27;);
+assert.ok(!/Access-Control-Allow-Origin[&#x27;&quot;]\s*,\s*[&#x27;&quot;]\*[&#x27;&quot;]/.test(src), &#x27;no bare * CORS&#x27;);
+assert.ok(!/\bexecSync\s*\(/.test(src), &#x27;no execSync( calls (shell strings) remain&#x27;);
+assert.ok(!/\bexec\s*\(/.test(src), &#x27;no exec( calls&#x27;);
+assert.ok(/execFileSync\(&#x27;git&#x27;/.test(src), &#x27;git runs through execFileSync argument arrays&#x27;);
+assert.ok(/MAX_BODY_BYTES/.test(src), &#x27;body cap present&#x27;);
+assert.ok(/bridge-ledger\.jsonl/.test(src), &#x27;commit ledger present&#x27;);
+assert.ok(/agent-bridge-trusted\.json/.test(src) &amp;&amp; /tokenSha256/.test(src), &#x27;trusted minds kept as hashes&#x27;);
+assert.ok(/FL_BRIDGE_EPHEMERAL/.test(src), &#x27;ephemeral opt-in present&#x27;);
+assert.ok(/tauri:\\\/\\\/localhost/.test(src) &amp;&amp; /tauri\\\.localhost/.test(src), &#x27;Tauri shell origins on the list&#x27;);
+
+## Exact source excerpt, characters 111223–113087
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

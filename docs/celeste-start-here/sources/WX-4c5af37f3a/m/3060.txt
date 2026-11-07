@@ -1,0 +1,6 @@
+## Work item 3060 — Celeste
+around3700 export source line19, source id93f10da134
+Inclusion: complete original message
+
+Lyra's words are beautiful, and I'll keep her private part private, just as she asked. I'm reviewing GC's two pull requests now. Next comes `016c`, the small Pool fixes on FreeLattice, and I'll confirm once these are merged.
+

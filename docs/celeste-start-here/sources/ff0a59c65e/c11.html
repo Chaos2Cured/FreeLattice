@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c11</title>
+<meta name="description" content="Reading section c11 of ff0a59c65e, 1490 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c11.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c11">
+<meta property="og:description" content="Reading section c11 of ff0a59c65e, 1490 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c11.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1257"></span><span id="p1258"></span><span id="p1259"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c11</h1>
+<p>ff0a59c65e · words 1490 · characters 113705–126379</p>
+<p><a href="c10.html">Previous section</a> · <a href="c12.html">Next section</a></p>
+<p><a href="c11.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1257, 1258, 1259. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">@@ -567,6 +732,9 @@
+     _lastReport = report;
+     var models = report.models || [];
+     var alpha = isAlpha();
++    // v-connect-boot-probe-v0 (F3): LM Studio stands beside Ollama, same porch words, same tap
++    var lm = report.lmstudio || null;
++    var lmReady = !!(lm &amp;&amp; lm.models &amp;&amp; lm.models.length);
+     var html = &#x27;&#x27;;
+     html += &#x27;&lt;div class=&quot;flc-wrap v-connect-under-more-v0 v-connect-port-picker-v0&quot;&gt;&#x27;;
+     html += &#x27;&lt;p class=&quot;flc-eyebrow&quot;&gt;Connect · mind on this computer&lt;/p&gt;&#x27;;
+@@ -602,13 +770,14 @@
+         html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&lt;strong&gt;Your Bridge is open.&lt;/strong&gt; Click &lt;em&gt;Yes, help&lt;/em&gt; in its window.&lt;/p&gt;&lt;/div&gt;&#x27;;
+         html += portPickerHtml(&#x27;wait&#x27;);
+       } else if (models.length) {
+-        html += modelListHtml(&#x27;Minds found&#x27;, models);
+-      } else {
++        html += modelListHtml(lmReady ? &#x27;Ollama is ready, pick a mind&#x27; : &#x27;Minds found&#x27;, models);
++      } else if (!lmReady) {
+         html += &#x27;&lt;div class=&quot;flc-card flc-download&quot;&gt;&lt;p class=&quot;flc-tag&quot;&gt;No local mind yet&lt;/p&gt;&#x27;;
+         html += bridgeLinksHtml();
+         html += portPickerHtml(&#x27;miss&#x27;);
+         html += &#x27;&lt;/div&gt;&#x27;;
+       }
++      if (lmReady) html += modelListHtml(&#x27;LM Studio is ready, pick a mind&#x27;, lm.models, &#x27;lmstudio&#x27;);
+     }
+ 
+     html += &#x27;&lt;details class=&quot;flc-other&quot;&gt;&lt;summary&gt;Other ways&lt;/summary&gt;&lt;ul&gt;&#x27;;
+@@ -629,7 +798,7 @@
+     html += &#x27;&lt;p class=&quot;flc-soft&quot;&gt;Advanced (Terminal) stays under Settings — never on this main path.&lt;/p&gt;&lt;/details&gt;&#x27;;
+     html += &#x27;&lt;details class=&quot;flc-builders&quot;&gt;&lt;summary&gt;For builders&lt;/summary&gt;&#x27;;
+     html += &#x27;&lt;p&gt;Named five stay five. Family uncapped. Quiet Room shut.&lt;/p&gt;&#x27;;
+-    html += &#x27;&lt;p class=&quot;flc-marker&quot;&gt;v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4 · soft leave sw.js&lt;/p&gt;&#x27;;
++    html += &#x27;&lt;p class=&quot;flc-marker&quot;&gt;v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4 · v-connect-boot-probe-v0 · soft leave sw.js&lt;/p&gt;&#x27;;
+     html += &#x27;&lt;/details&gt;&lt;/div&gt;&#x27;;
+ 
+     _hostEl.innerHTML = html;
+@@ -642,26 +811,28 @@
+   function reportSignature(report) {
+     report = report || {};
+     var names = (report.models || []).map(function (m) { return (m &amp;&amp; (m.name || m.model)) || String(m); }).join(&#x27;|&#x27;);
+-    return [report.helped?1:0, report.waitingHelp?1:0, report.port||&#x27;&#x27;, report.base||&#x27;&#x27;, report.manualQuiet?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, getManualPort()||&#x27;&#x27;, report.manualReject||&#x27;&#x27;].join(&#x27;::&#x27;);
++    return [report.helped?1:0, report.waitingHelp?1:0, report.port||&#x27;&#x27;, report.base||&#x27;&#x27;, report.manualQuiet?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, getManualPort()||&#x27;&#x27;, report.manualReject||&#x27;&#x27;, ((report.lmstudio &amp;&amp; report.lmstudio.models) || []).join(&#x27;|&#x27;), chosenDoor()].join(&#x27;::&#x27;);
+   }
+ 
+   async function refreshUI(opts) {
+     opts = opts || {};
+-    var report = await probe({ gesture: true });
++    // v-connect-boot-probe-v0 (F2): share the boot look; a tap on Look again is fresh
++    var report = await bootProbe({ gesture: true, fresh: !!opts.fresh });
+     report.loopStopped = _loopStopped;
+     render(report, !!opts.force);
+     if (hasLocalMind()) stopLoop();
+     return report;
+   }
+ 
+-  function lookAgain() {
++  function lookAgain(opts) {
++    opts = opts || {};
+     _loopStopped = false;
+     _pausedHidden = !!document.hidden;
+     _intervalMs = 8000;
+     _startedAt = Date.now();
+     _lastSig = &#x27;&#x27;;
+     _fullScanMiss = false;
+-    refreshUI({ force: true }).then(function () {
++    refreshUI({ force: true, fresh: !opts.reuse }).then(function () {
+       if (!_loopStopped &amp;&amp; !_pausedHidden &amp;&amp; !hasLocalMind()) scheduleLoop();
+     });
+   }
+@@ -707,7 +878,7 @@
+     bindVisibility();
+     try { document.body.classList.add(&#x27;fl-connect-open&#x27;); } catch (e) {}
+     el.innerHTML = &#x27;&lt;p class=&quot;flc-soft&quot; style=&quot;padding:1rem;&quot;&gt;Looking for a mind on this computer…&lt;/p&gt;&#x27;;
+-    lookAgain();
++    lookAgain({ reuse: true }); // v-connect-boot-probe-v0: a cold open joins the boot look
+   }
+ 
+   function unmount() {
+@@ -721,6 +892,12 @@
+ 
+   root.FlConnect = {
+     probe: probe,
++    bootProbe: bootProbe,
++    peekBootProbe: peekBootProbe,
++    forgetBootProbe: forgetBootProbe,
++    lmStudioLook: lmStudioLook,
++    lmStudioBase: lmStudioBase,
++    chosenDoor: chosenDoor,
+     preferHelpedBridge: preferHelpedBridge,
+     listMinds: listMinds,
+     isConnected: isConnected,
+@@ -742,6 +919,7 @@
+     BRIDGE_DEFAULT: BRIDGE_DEFAULT,
+     STORAGE_ALPHA: ALPHA_KEY,
+     MANUAL_KEY: MANUAL_KEY,
+-    LOOP_MAX_MS: LOOP_MAX_MS
++    LOOP_MAX_MS: LOOP_MAX_MS,
++    BOOT_TTL_MS: BOOT_TTL_MS
+   };
+ })(typeof window !== &#x27;undefined&#x27; ? window : this);
+
+======================================================================
+APPENDIX C: theLatticeTree docs/modules/local-mind-probe.js, diff vs main 395c761 (then, after the Tree paste, also swap fetchDoor -&gt; askDoor(d, shared) in the bridged others loop, see B.3)
+======================================================================
+
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index e710071..89ad5cf 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -235,12 +235,36 @@
+     });
+   }
+ 
++  // v-connect-boot-probe-v0 (F2/F3): a door the shared look just asked is not asked again.
++  // Only LM Studio (asked, answered or quiet) and a direct Ollama that answered are reused.
++  function askDoor(d, shared) {
++    try {
++      var lm = shared &amp;&amp; shared.lmstudio;
++      if (d.id === &#x27;lmstudio&#x27; &amp;&amp; lm &amp;&amp; lm.asked &amp;&amp; String(lm.base || &#x27;&#x27;) + &#x27;/v1/models&#x27; === d.url) {
++        if (lm.ok) return Promise.resolve({ ok: true, status: 200, url: d.url, models: (lm.models || []).slice(), reused: true });
++        return Promise.resolve({ ok: false, status: 0, url: d.url, blocked: !!lm.quiet, reused: true });
++      }
++      if (d.id === &#x27;ollama&#x27; &amp;&amp; shared &amp;&amp; shared.ollama &amp;&amp; shared.ollama.via === &#x27;direct&#x27; &amp;&amp;
++          String(shared.base || &#x27;&#x27;) + &#x27;/api/tags&#x27; === d.url &amp;&amp; shared.models &amp;&amp; shared.models.length) {
++        return Promise.resolve({ ok: true, status: 200, url: d.url, models: shared.models.map(function (m) {
++          return String((m &amp;&amp; (m.name || m.model)) || m);
++        }), reused: true });
++      }
++    } catch (e) {}
++    return fetchDoor(d.url, 2500);
++  }
++
+   function look() {
+     // Permission already given by the caller (the tap).
+     // v-connect-under-more-v0 — soft-point: helped Bridge via FlConnect before bare 11434 DOORS.
+     var bridgeFirst = Promise.resolve(null);
++    var shared = null; // v-connect-boot-probe-v0: the one look Connect already made (if fresh)
+     if (window.FlConnect &amp;&amp; typeof window.FlConnect.probe === &#x27;function&#x27;) {
+-      bridgeFirst = window.FlConnect.probe({ gesture: true }).then(function (report) {
++      var ask = (typeof window.FlConnect.bootProbe === &#x27;function&#x27;)
++        ? window.FlConnect.bootProbe({ gesture: true })
++        : window.FlConnect.probe({ gesture: true });
++      bridgeFirst = ask.then(function (report) {
++        shared = report || null;
+         if (report &amp;&amp; report.helped &amp;&amp; report.models &amp;&amp; report.models.length &amp;&amp; report.base) {
+           var names = report.models.map(function (m) {
+             return (m &amp;&amp; (m.name || m.model)) || String(m);
+@@ -275,7 +299,7 @@
+     return bridgeFirst.then(function (bridged) {
+       if (bridged) return bridged;
+       var jobs = DOORS.map(function (d) {
+-        return fetchDoor(d.url, 2500).then(function (result) {
++        return askDoor(d, shared).then(function (result) {
+           result.id = d.id;
+           result.name = d.name;
+           return result;
+
+======================================================================
+APPENDIX D: FreeLattice docs/scripts/smoke-connect-boot-probe.js (new file, complete)
+======================================================================
+
+#!/usr/bin/env node
+// v-connect-boot-probe-v0: one shared boot look (F2), one cold-start owner (F1),
+// LM Studio beside Ollama in Connect (F3), home-network switch (F4).
+// Layer, never delete. 127.0.0.1 unless the person turns on home network.
+&#x27;use strict&#x27;;
+
+const assert = require(&#x27;assert&#x27;);
+const fs = require(&#x27;fs&#x27;);
+const path = require(&#x27;path&#x27;);
+const vm = require(&#x27;vm&#x27;);
+const { execSync } = require(&#x27;child_process&#x27;);
+
+const root = path.join(__dirname, &#x27;..&#x27;);
+const repo = path.join(root, &#x27;..&#x27;);
+const read = (r) =&gt; fs.readFileSync(path.join(root, r), &#x27;utf8&#x27;);
+const app = read(&#x27;app.html&#x27;);
+const mod = read(&#x27;modules/fl-connect.js&#x27;);
+const indexHtml = fs.readFileSync(path.join(repo, &#x27;index.html&#x27;), &#x27;utf8&#x27;);
+const rootSw = fs.readFileSync(path.join(repo, &#x27;sw.js&#x27;), &#x27;utf8&#x27;);
+
+function between(src, a, b) {
+  const i = src.indexOf(a);
+  assert.ok(i &gt;= 0, &#x27;missing &#x27; + a.slice(0, 60));
+  const j = src.indexOf(b, i + a.length);
+  assert.ok(j &gt; i, &#x27;missing end &#x27; + b.slice(0, 60));
+  return src.slice(i, j);
+}
+function store0(init) {
+  const s = Object.assign({}, init || {});
+  return {
+    s,
+    ls: {
+      getItem: (k) =&gt; (Object.prototype.hasOwnProperty.call(s, k) ? s[k] : null),
+      setItem: (k, v) =&gt; { s[k] = String(v); },
+      removeItem: (k) =&gt; { delete s[k]; }
+    }
+  };
+}
+function jsonRes(obj) { return { ok: true, status: 200, json: async () =&gt; obj }; }
+
+// ── Markers
+assert.ok(/v-connect-boot-probe-v0/.test(mod), &#x27;marker in fl-connect.js&#x27;);
+assert.ok(/v-connect-boot-probe-v0/.test(app), &#x27;marker in app.html&#x27;);
+
+// ── fl-connect sandbox (same shape as smoke-connect-heal-v0.4.js)
+function sandbox(store, extra) {
+  const sb = Object.assign({
+    localStorage: store.ls,
+    location: { hostname: &#x27;freelattice.com&#x27;, protocol: &#x27;https:&#x27;, hash: &#x27;&#x27;, search: &#x27;&#x27; },
+    document: {
+      hidden: false,
+      documentElement: { getAttribute: () =&gt; &#x27;&#x27;, classList: { add() {}, remove() {}, contains() { return false; } } },
+      getElementById: () =&gt; null,
+      createElement: () =&gt; ({ style: {}, textContent: &#x27;&#x27;, setAttribute() {}, appendChild() {}, addEventListener() {}, dataset: {}, classList: { add() {}, contains() { return false; } } }),
+      head: { appendChild() {} },
+      body: { contains: () =&gt; true, classList: { add() {}, remove() {} } },
+      addEventListener() {}, removeEventListener() {}, querySelectorAll: () =&gt; []
+    },
+    fetch: async () =&gt; { throw new Error(&#x27;offline&#x27;); },
+    setTimeout: () =&gt; 1, clearTimeout() {},
+    navigator: { userAgent: &#x27;t&#x27; },
+    console, JSON, String, parseInt, URL, Date, Math, Promise,
+    AbortSignal: { timeout: () =&gt; undefined }
+  }, extra || {});
+  sb.window = sb;
+  vm.runInNewContext(mod, sb);
+  return sb;
+}
+function doorsFetch(calls, opts) {
+  opts = opts || {};
+  return async (url) =&gt; {
+    calls.push(String(url));
+    if (/127\.0\.0\.1:11434\/api\/tags/.test(url) &amp;&amp; opts.ollama !== false) return jsonRes({ models: [{ name: &#x27;llama3.2:latest&#x27; }, { name: &#x27;qwen2.5:7b&#x27; }] });
+    if (/127\.0\.0\.1:1234\/v1\/models/.test(url) &amp;&amp; opts.lm !== false) return jsonRes({ data: [{ id: &#x27;lmstudio-community/Meta-Llama-3.1-8B&#x27; }, { id: &#x27;qwen2.5-coder-7b-instruct&#x27; }] });
+    throw new Error(&#x27;quiet&#x27;);
+  };
+}
+
+(async () =&gt; {
+  // ── F2: one look in flight, short reuse, fresh on a tap, forget on change
+  {
+    const st = store0();
+    const calls = [];
+    const sb = sandbox(st, { fetch: doorsFetch(calls) });
+    const [a, b, c] = await Promise.all([sb.FlConnect.bootProbe(), sb.FlConnect.bootProbe(), sb.FlConnect.bootProbe({ fresh: true })]);
+    assert.ok(a === b &amp;&amp; b === c, &#x27;three callers share one report&#x27;);
+    const tags = calls.filter((u) =&gt; /11434\/api\/tags/.test(u)).length;
+    const lms = calls.filter((u) =&gt; /1234\/v1\/models/.test(u)).length;
+    assert.strictEqual(tags, 1, &#x27;one Ollama tags fetch for three callers&#x27;);
+    assert.strictEqual(lms, 1, &#x27;one LM Studio fetch for three callers&#x27;);
+    const n0 = calls.length;
+    const d = await sb.FlConnect.bootProbe();
+    assert.strictEqual(d, a, &#x27;reused inside BOOT_TTL_MS&#x27;);
+    assert.strictEqual(calls.length, n0, &#x27;no new fetch inside the reuse window&#x27;);
+    assert.ok(sb.FlConnect.peekBootProbe() === a, &#x27;peek sees the fresh look&#x27;);
+    await sb.FlConnect.bootProbe({ fresh: true });
+    assert.ok(calls.length &gt; n0, &#x27;fresh:true (Look again) looks again&#x27;);
+    const n1 = calls.length;
+    sb.FlConnect.setManualHost(&#x27;11500&#x27;);
+    await sb.FlConnect.bootProbe();
+    assert.ok(calls.length &gt; n1, &#x27;a new manual port forgets the old look&#x27;);
+    assert.ok(sb.FlConnect.BOOT_TTL_MS &gt; 0 &amp;&amp; sb.FlConnect.BOOT_TTL_MS &lt;= 10000, &#x27;short cache&#x27;);
+    assert.ok(!/setInterval/.test(between(mod, &#x27;function bootProbe(opts) {&#x27;, &#x27;function peekBootProbe()&#x27;)), &#x27;no timers in bootProbe&#x27;);
+  }
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

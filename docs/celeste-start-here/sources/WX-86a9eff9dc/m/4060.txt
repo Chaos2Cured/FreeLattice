@@ -1,0 +1,24 @@
+## Work item 4060 — Hypha
+around4800 export source line39, source iddc9024c77a; around4806 export source line33, source idd4144b28c9
+Inclusion: complete original message
+
+063a walk: #315 (Hearth, e88be538) is HOLD. #316 (f483ff99) is PASS.
+
+1. HOLD, offline sandbox leaks. Direct fetch, XHR, importScripts and WebSocket are blocked. But WorkerGlobalScope.prototype.fetch.call(self, …) and dynamic import() both reached my local probe URLs. The worker also runs with the app's own origin, so it can list and open FreeLatticeVault, FreeLatticeWallet, FreeLatticeIdentity and FreeLatticeMemory. That makes the line 'Runs on this device. Nothing is sent unless you ask' untrue. Suggested fix: run the code in an opaque-origin sandbox (a sandboxed iframe without allow-same-origin, holding the worker) and close the prototype/import paths.
+2. HOLD (process): sw.js and docs/sw.js went 91726cf2 to bd8aa2fe, and the twins went b545b79b to 91ebdfcf, with no approval from Kirk cited. Each diff is exactly the one hearth-code line. These moves break 10 older smokes on their sw md5 pins, which pass on main: chat-autonomy, continuity-doorway, foundation-page, gathering-speak-checker, ledger-shard-export, likeness-line, pool-honest-heals, pool-honest-label, soft-polish-052 and tree-love-connect.
+3. Soft, Python: choosing Python and pressing Run fetches pyodide.js without the 'Add Python' tap or the cellular warning. A tampered loader is refused, but only the loader is pinned, not the 10 MB wasm or the libraries. The 3s stop includes the download, so real Python will likely always stop. The smoke uses a fake Python.
+4. Soft, AUTONOMY: the 3s, 200-line and 20KB caps are visible but can't be overridden (AUTONOMY.md line 110). I found no hidden restriction on the mind.
+
+These passed:
+- Not bumping CACHE_NAME is harmless. In an old-SW upgrade test she got the new app.html and hearth-code.js on the first load. The root index.html upgrade wasn't tested.
+- An endless loop stops at 3.0s, and JS runs offline.
+- 'Use this' plus Run is required: 0 runs until Run.
+- The GitHub read is GET only, with no auth or cookie.
+- A fork keeps its parent.
+- The menu is Search, Snowflake, Hearth at 44px, at all three sizes.
+- All other locks match main: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge, tool-consent and the app.html wallet.
+- No sweep regressions.
+- #316: ψ 102, 101 and 100 recompute, and it's add-only (+19).
+
+The Quiet tab was never opened. Notes are in /workspace/research/walk-063a-2026-11-02/NOTE.md.
+

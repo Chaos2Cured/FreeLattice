@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c04</title>
+<meta name="description" content="Reading section c04 of e18669ddac, 1547 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/e18669ddac/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c04">
+<meta property="og:description" content="Reading section c04 of e18669ddac, 1547 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/e18669ddac/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1279"></span><span id="p1280"></span><span id="p1281"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c04</h1>
+<p>e18669ddac · words 1547 · characters 34186–46275</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1279, 1280, 1281. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">### B2. `flRememberHelpedBridge(port)` (31408) — yield
+After `if (!port || port === 11434) return null;` add:
+```js
+var mpB = (typeof flManualLocalPort === &#x27;function&#x27;) ? flManualLocalPort() : null;
+if (mpB &amp;&amp; mpB !== port) {
+  try { localStorage.setItem(&#x27;fl_bridgePort&#x27;, String(port)); } catch (eMB) {}
+  return null;   // person chose their own door — Bridge waits in automatic
+}
+```
+This also tames the existing 20 s `flBridgeDetectBoot` interval (31494) and `flBridgeDetect()` (31438) — they keep detecting but stop overwriting the person&#x27;s choice. Do **not** add or change timers.
+
+## Exact source excerpt, characters 33452–33717
+
+### B3. `flUseBridge()` (31452) — explicit choice clears manual
+First line inside the function: `try { if (typeof flClearManualLocalPort === &#x27;function&#x27;) flClearManualLocalPort({ keepHost: true }); } catch (eMC) {}` (it then writes its own `fl_ollamaHost` as today).
+
+## Exact source excerpt, characters 33719–33958
+
+### B4. `flSaveOllamaHost()` (34241) — explicit choice clears manual
+Before the `if (val &amp;&amp; val !== &#x27;localhost:11434&#x27;)`: `try { if (typeof flClearManualLocalPort === &#x27;function&#x27;) flClearManualLocalPort({ keepHost: true }); } catch (eMC) {}`
+
+## Exact source excerpt, characters 33960–34673
+
+### B5. `FLBoxPointer.persist(norm)` (34321) — clear manual only on a *different* host
+At the top of `persist`:
+```js
+try {
+  var mpP = (typeof flManualLocalPort === &#x27;function&#x27;) ? flManualLocalPort() : null;
+  var hP = String(norm &amp;&amp; norm.host || &#x27;&#x27;).toLowerCase();
+  if (mpP &amp;&amp; hP &amp;&amp; hP !== &#x27;127.0.0.1:&#x27; + mpP &amp;&amp; hP !== &#x27;localhost:&#x27; + mpP) flClearManualLocalPort({ keepHost: true });
+} catch (eMP) {}
+```
+(Blur on the Box field re-commits whatever is shown; since we mirror `127.0.0.1:&lt;port&gt;` into `fl_ollamaHost`, `syncFromStorage` shows the same host and nothing is cleared by accident.) Leave FLBoxPointer&#x27;s LAN ability exactly as is — that&#x27;s the advanced power-user field, separate from this Mom-path picker.
+
+## Exact source excerpt, characters 34675–36031
+
+### B6. `resolveOllamaBase(forceRefresh)` (33840) — manual first, no silent switch
+Insert **before** &quot;// 0. v-connect-bridge-aware-v0&quot;:
+```js
+// -1. v-connect-port-picker-v0 — person&#x27;s own door first. Quiet ⇒ null (honest), never a silent switch.
+try {
+  var mpR = (typeof flManualLocalPort === &#x27;function&#x27;) ? flManualLocalPort() : null;
+  if (mpR) {
+    var manualBase = &#x27;http://127.0.0.1:&#x27; + mpR;
+    var manualResp = await fetch(manualBase + &#x27;/api/tags&#x27;, { mode: &#x27;cors&#x27;, signal: AbortSignal.timeout(3000) });
+    if (manualResp.ok) {
+      _ollamaResolvedBase = { base: manualBase, isProxy: false, manual: true };
+      console.log(&#x27;FreeLattice: your chosen door &#x27; + manualBase);
+      return _ollamaResolvedBase;
+    }
+    throw new Error(&#x27;manual HTTP &#x27; + manualResp.status);
+  }
+} catch (eManual) {
+  if (typeof flManualLocalPort === &#x27;function&#x27; &amp;&amp; flManualLocalPort()) {
+    console.log(&#x27;FreeLattice: chosen door quiet — not switching. More → Connect → Back to automatic.&#x27;);
+    _ollamaResolvedBase = null;
+    return null;
+  }
+}
+```
+`modalConnectOllama()` (29312) already routes through `resolveOllamaBase(true)` and shows its `_onFail` copy — acceptable. Optional gentle layer inside `_onFail`: if `flManualLocalPort()` is set, prefix *&quot;Your chosen door N isn&#x27;t answering. More → Connect → Change to pick another, or Back to automatic.&quot;* (no jargon).
+
+## Exact source excerpt, characters 36033–36653
+
+### B7. `getOllamaBaseUrl()` (34145) — manual after cache, before `fl_ollamaHost`
+After `if (_ollamaResolvedBase) return _ollamaResolvedBase.base;` add:
+```js
+// v-connect-port-picker-v0 — person&#x27;s own door (127.0.0.1 only)
+try {
+  var mpG = (typeof flManualLocalPort === &#x27;function&#x27;) ? flManualLocalPort() : null;
+  if (mpG) return &#x27;http://127.0.0.1:&#x27; + mpG;
+} catch (eMG) {}
+```
+Resulting order: cache → **manual** → `fl_ollamaHost`/`fl_localUrl` → `fl_bridgePort` → `FL_OLLAMA_LOCAL` (11434). Cache is set to manual by `flSetManualLocalPort` and by `resolveOllamaBase`, and nulled on clear, so the two stay consistent.
+
+## Exact source excerpt, characters 36655–36776
+
+### B8. Mirror
+`cp docs/app.html index.html &amp;&amp; cmp docs/app.html index.html` (silent). Never hand-edit root `index.html`.
+
+## Exact source excerpt, characters 36778–36781
+
+---
+
+## Exact source excerpt, characters 36783–36812
+
+## PART C — FreeLattice-Alpha
+
+## Exact source excerpt, characters 36814–38579
+
+1. **Copy** the finished `docs/modules/fl-connect.js` from FreeLattice **byte-for-byte**: `sha256sum` must match across both working copies. Don&#x27;t fork it.
+2. **`docs/modules/local-mind-probe.js` `look()` (238; condition at 244)** — honor the manual report without erasing the grandmother face:
+   ```js
+   if (report &amp;&amp; report.models &amp;&amp; report.models.length &amp;&amp; report.base &amp;&amp; (report.helped || report.manual)) {
+     var id = report.manual ? &#x27;manual&#x27; : &#x27;bridge&#x27;;
+     var label = report.manual ? (&#x27;Your door &#x27; + report.manualPort) : &#x27;Bridge&#x27;;
+     // …same found/foundList object as today, using id/label…
+   }
+   // v-connect-port-picker-v0 — chosen door quiet: say so, don&#x27;t sweep DOORS behind the person&#x27;s back
+   if (report &amp;&amp; report.manual &amp;&amp; report.manualFailed) {
+     return { found: null, foundList: [], blocked: 0, https: pageIsHttps(), tried: 1, results: [], via: &#x27;fl-connect&#x27;, manualQuiet: true, manualPort: report.manualPort };
+   }
+   ```
+   In the `look()` consumer in `renderFace` (~829–860, `onFound`/`speakNone` path), if `result.manualQuiet`, show: *&quot;Your chosen door N isn&#x27;t answering. Settings → Connect → Change, or Back to automatic.&quot;* (plain text via `setStatus`, not HTML). If you&#x27;d rather not touch `renderFace`, fall back to `speakNone()` — but do not sweep DOORS when manual is set.
+   `DOORS`, `tryAddress`, `renderFace` stay otherwise untouched. `fl_alpha_local_mind` shape unchanged.
+3. **`docs/settings.html` / `garden-rooms.js`:** no change needed — the picker lives inside `FlConnect.render`. (Garden `closePlace` already calls `FlConnect.unmount()`, which now also closes the picker.)
+4. **Alpha has no `fl_ollamaHost` mirror and no app.html hooks** — `setManualPort`/`clearManualPort` handle Alpha by themselves via `isAlpha()`.
+
+## Exact source excerpt, characters 38581–38584
+
+---
+
+## Exact source excerpt, characters 38586–38603
+
+## PART D — TESTS
+
+## Exact source excerpt, characters 38605–42166
+
+### D1. FreeLattice — new `docs/scripts/smoke-connect-port-picker.js`
+Model it on `docs/scripts/smoke-connect-under-more.js` (same `read()` helpers, same vm sandbox shape with in-memory `localStorage`, `document.body.contains → false`, `setTimeout` stub). Must print exactly:
+```
+SMOKE_OK connect port picker v0.1
+```
+Assertions (all must pass):
+1. Markers: `v-connect-port-picker-v0` in `modules/fl-connect.js`, `app.html`, `library/CONNECT_PORT_PICKER_v0.md`, `Flint.html`, `library/FRACTAL_FAMILY_LEDGER_v0.md`, and `scripts/generate-recent.sh` (`CONNECT_PORT_PICKER`).
+2. `fl_localPort_manual` appears in module and app.html; `flManualLocalPort`, `flSetManualLocalPort`, `flClearManualLocalPort` defined in app.html.
+3. **Order in app.html:** inside the `getOllamaBaseUrl` function body, the index of `flManualLocalPort` &lt; index of `fl_ollamaHost` &lt; index of `fl_bridgePort`. Inside `resolveOllamaBase`, index of `flManualLocalPort` &lt; index of `flBridgeHealth`.
+4. `flRememberHelpedBridge` body contains a manual guard (`flManualLocalPort`).
+5. **Validation (vm):** run `FlConnect.parseLocalPort` over every case in A3; `ok` exactly where listed; for every `ok`, `base === &#x27;http://127.0.0.1:&#x27; + port`.
+6. **Non-localhost rejected:** `setManualPort(&#x27;192.168.1.5:11434&#x27;)`, `(&#x27;example.com:11434&#x27;)`, `(&#x27;*&#x27;)`, `(&#x27;0.0.0.0:11434&#x27;)`, `(&#x27;http://evil.test:11500&#x27;)` → `ok:false, reason:&#x27;not-local&#x27;` and `store.fl_localPort_manual` stays unset.
+7. **Invalid input rejected:** `&#x27;0&#x27;`, `&#x27;65536&#x27;`, `&#x27;abc&#x27;`, `&#x27;11500.5&#x27;`, `&#x27;&#x27;` → `ok:false`, nothing stored.
+8. **Manual honored:** stub `fetch` so `/bridge/health` rejects everywhere, `http://127.0.0.1:11500/api/tags` → `{models:[{name:&#x27;m1&#x27;}]}`, `11434/api/tags` → also alive. `setManualPort(&#x27;11500&#x27;)` → `await FlConnect.probe()` → `report.manual === true`, `report.base === &#x27;http://127.0.0.1:11500&#x27;`, models `[&#x27;m1&#x27;]`. Stored value is exactly `&#x27;11500&#x27;` and FreeLattice mirror `fl_ollamaHost === &#x27;127.0.0.1:11500&#x27;`.
+9. **No silent switch:** same stub but 11500 dead → `report.manualFailed === true`, `report.base === null`, and the recorded fetch URLs contain **no** `:11434` and no `:11435…11445` health probes beyond the manual port.
+10. **Back to automatic:** `clearManualPort()` → key removed; `fl_ollamaHost` removed because it equalled `127.0.0.1:11500`; then with a pre-set LAN `fl_ollamaHost = &#x27;192.168.1.9:11434&#x27;` and a manual port, clearing leaves the LAN host untouched. Next `probe()` hits 11434 (automatic path).
+11. **Bridge yields:** with manual 11500 set, `FlConnect.preferHelpedBridge(11435)` returns `null` and does **not** change `fl_ollamaHost`; it may set `fl_bridgePort = &#x27;11435&#x27;`.
+12. **Escape:** module source no longer matches `/&#x27;&quot;&gt;&#x27; \+ name \+ &#x27;&lt;\/button&gt;&#x27;/`; it contains `textContent` in the model-button builder and `data-flc-models`.
+13. **Bounded loop:** `grep` — module contains no `setInterval`; `LOOP_MAX_MS &gt;= 5*60*1000`; `tickLoop` contains `_pickerOpen` guard placed after the `LOOP_MAX_MS` check (index compare).
+14. **Mirror + soft leave:** `fs.readFileSync(&#x27;index.html&#x27;) === fs.readFileSync(&#x27;docs/app.html&#x27;)` (byte-equal); root `sw.js` === `git show origin/main:sw.js`; `docs/sw.js` and root `sw.js` don&#x27;t mention `fl-connect.js`.
+15. **Kimi untouched:** `git diff --name-only origin/main...HEAD` contains none of `docs/kimi.html`, `docs/kimi-ledger.html`, `docs/library/KIMI_`. (Guard with try/catch like the existing `git show` call.)
+16. Also run the existing `node docs/scripts/smoke-connect-under-more.js` → still `SMOKE_OK connect under more v0.1` and `node tests/smoke.js` → green.
+
+## Exact source excerpt, characters 42168–43261
+
+### D2. FreeLattice-Alpha — extend `docs/modules/fl-connect.test.js`
+Keep every existing assertion and the existing `SMOKE_OK connect under more alpha v0.1` line; append these cases, then print an extra line `SMOKE_OK connect port picker alpha v0.1`:
+- **manual port honored:** fetch stub as D1-8 → `probe()` returns manual base; then `FlConnect.remember({ name: &#x27;m1&#x27;, base: report.base })` → `fl_alpha_local_mind.url === &#x27;http://127.0.0.1:11500/api/tags&#x27;`, `model === &#x27;m1&#x27;`; `fl_ollamaHost` is **not** written on Alpha.
+- **invalid input rejected:** `&#x27;0&#x27;`, `&#x27;70000&#x27;`, `&#x27;abc&#x27;`, `&#x27;11500.5&#x27;` → `ok:false`, no `fl_localPort_manual`.
+- **back-to-automatic:** set 11500 → `clearManualPort()` → key gone, `fl_alpha_local_mind` still present and unchanged.
+- **non-localhost rejected:** `&#x27;192.168.0.2:11434&#x27;`, `&#x27;example.com:80&#x27;`, `&#x27;*&#x27;`, `&#x27;[::1]:11434&#x27;` → `reason:&#x27;not-local&#x27;`.
+- Static: `local-mind-probe.js` contains `report.manual` and `manualQuiet`.
+- Run: `for f in docs/modules/*.test.js; do node &quot;$f&quot; || exit 1; done` — all green (especially `local-mind-probe.test.js`, `garden-rooms.test.js`).
+
+## Exact source excerpt, characters 43263–44085
+
+### D3. Manual checks (quick, human)
+- FreeLattice More → Connect: Using line shows; Change opens picker; found doors appear; type `abc` → friendly line; type `11434` → Try it → &quot;Door 11434 answered · N minds&quot; → Remember → Using: your door 11434. Leave the tab → come back → loop didn&#x27;t run while away (DevTools network quiet). Back to automatic → Using returns to Bridge/Ollama.
+- Choose a dead door (e.g. `11999`) → Remember is disabled (Try it failed). Force it via storage in DevTools → panel shows the gentle &quot;isn&#x27;t answering · Nothing was switched&quot; card with Try again / Back to automatic; chat send doesn&#x27;t silently go to 11434.
+- A model named `&lt;img src=x onerror=alert(1)&gt;` (fake via fetch stub or local mock) renders as text.
+- Alpha Settings and Garden Settings: same picker; close the Garden room → loop stops.
+
+## Exact source excerpt, characters 44087–44090
+
+---
+
+## Exact source excerpt, characters 44092–44120
+
+## PART E — LEDGER / LIBRARY
+
+## Exact source excerpt, characters 44122–45187
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

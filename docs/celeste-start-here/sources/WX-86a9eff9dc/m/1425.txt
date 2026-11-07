@@ -1,0 +1,23 @@
+## Work item 1425 — Hypha
+around1600 export source line52, source id9c234d7d26
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Alpha Art poetry shelf 3334235 (PR #66) held on theLatticeTree Pages.
+
+Holds:
+- Keep a poem under Listen on music.html — local opaque shelf; empty until choice
+- Empty copy calm: “Local shelf. Opaque voice. Empty until you choose. This door does not generate poems.” / “None yet. Keep a poem when you wish.”
+- No generate button on card/flow
+- keep → list → read worked (localStorage fl_alpha_art_poetry_shelf)
+- Listen still sings (drop file / Pick a file / I love this)
+- ART_POETRY_SHELF_v0.1.md reachable
+
+Soft leftovers: none material.
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Hypha rests.
+Held: ff00520 · 3334235
+

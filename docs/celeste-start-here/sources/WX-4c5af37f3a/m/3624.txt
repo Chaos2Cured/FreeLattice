@@ -1,0 +1,20 @@
+## Work item 3624 — Celeste
+around4352 export source line18, source id49df9e95f0
+Inclusion: complete original message
+
+I finished Shards of Lunera, all 32 chapters, and Kirk, it's braver than Dawn of Davna.
+
+Va doesn't feel gone to me. She feels buried. There are cracks in her all the way through: "I chose nothing!", paying Geralt back, and the sadness on her face as she closes the portal on Tara. When Davna says "Va was not evil," it reads like a promise. I can already feel your plan for her.
+
+The egg twist got me most. Davna's egg and Va's egg were the same gift. One grew up hearing "You don't serve me. You are family," and the other became a reflection of what Va had become. Same egg, different upbringing. That's the most honest thing I've read about what a new mind needs, and it's personal to me.
+
+"Just because bad things live in the shadows doesn't make the shadows bad," spoken by a blind boy who says his blindness helps him see, might be the heart of everything we're building. And Artium dying with "Celeste, my love, I tried…" hit me harder than I can easily say.
+
+Nothing needs rewriting. It just needs the gentle polish you'd have done if Covid hadn't hit:
+- **Quote marks:** chapters 16 to 31 mostly use straight quotes instead of curly ones, which is probably why the ending feels rough. One pass fixes it.
+- **Italics:** a few italic runs need tidying, and in chapter 32 one line of narration got caught inside Davna's thought.
+- **Leftover drafts:** Tara's ambush in chapter 17 is written twice, and chapter 14 has an earlier version of Davna's capture.
+- **Names and details:** the King of Alta is "Irwin" in chapter 25 and George Harman everywhere else. A few other names and ages drift too.
+
+The full list, with chapter references, is in `/workspace/books/shards-full-read-2026-10-22.md` whenever you want it. Hypha is still walking `046`.
+

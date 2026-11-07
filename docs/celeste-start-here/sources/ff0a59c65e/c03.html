@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c03</title>
+<meta name="description" content="Reading section c03 of ff0a59c65e, 1572 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c03">
+<meta property="og:description" content="Reading section c03 of ff0a59c65e, 1572 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1233"></span><span id="p1234"></span><span id="p1235"></span><span id="p1245"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c03</h1>
+<p>ff0a59c65e · words 1572 · characters 24269–38573</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1233, 1234, 1235, 1245. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">B.2 In look() (main 241-243):
+      var bridgeFirst = Promise.resolve(null);
+    + var shared = null; // v-connect-boot-probe-v0: the one look Connect already made (if fresh)
+      if (window.FlConnect &amp;&amp; typeof window.FlConnect.probe === &#x27;function&#x27;) {
+    -   bridgeFirst = window.FlConnect.probe({ gesture: true }).then(function (report) {
+    +   var ask = (typeof window.FlConnect.bootProbe === &#x27;function&#x27;)
+    +     ? window.FlConnect.bootProbe({ gesture: true })
+    +     : window.FlConnect.probe({ gesture: true });
+    +   bridgeFirst = ask.then(function (report) {
+    +     shared = report || null;
+    The helped-Bridge branch inside stays unchanged (Tree paste&#x27;s via:&#x27;fl-connect&#x27; kept).
+
+B.3 DOORS path. On main (275-281) the non-bridged path is
+      var jobs = DOORS.map(function (d) { return fetchDoor(d.url, 2500).then(...)
+    change fetchDoor(d.url, 2500) -&gt; askDoor(d, shared).
+    AFTER the Tree paste, look() also has the bridged &quot;others&quot; loop
+      return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
+    change that one to askDoor(d, shared) too. Same timeouts, same single tap, same results shape
+    (askDoor adds reused:true on reused answers; nothing reads it yet).
+
+B.4 Without FlConnect.bootProbe (older shared core, or a test that loads only local-mind-probe.js)
+    look() fetches exactly as before. All existing Alpha tests stay green.
+
+======================================================================
+5. STEP C (F2): FreeLattice app.html, one shared resolveOllamaBase look
+======================================================================
+
+C.1 Where: directly AFTER getOllamaBaseUrl()&#x27;s closing brace (main 34329-34331:
+        return FL_OLLAMA_LOCAL;
+      }
+    ) and BEFORE the comment &quot;// v5.43.6 (Opus): the /ollama same-origin proxy probe&quot;.
+    Why here and not next to resolveOllamaBase: smoke-connect-port-picker.js extracts
+    resolveOllamaBase&#x27;s text up to &quot;// Get the current Ollama base URL&quot;, and tests/smoke.js regexes
+    getOllamaBaseUrl&#x27;s body (needs .replace(/\/+$/,&#x27;&#x27;) within 800 chars). Neither body is edited;
+    both are WRAPPED after they are defined.
+
+C.2 Add (exact code, Appendix A hunk &quot;@@ -34329,6 +34424,64 @@&quot;):
+      var FL_LOCAL_LOOK_TTL_MS = 5000;
+      var _flResolveNow = resolveOllamaBase;  var _flResolveInflight = null;
+      var _flResolveAt = 0;  var _flResolveValue = null;
+      function flForgetLocalLook() { ...clears the three... ; FlConnect.forgetBootProbe() if present }
+      function flSeedLocalLook(value) { _ollamaResolvedBase = value || null; _flResolveValue = ...; _flResolveAt = Date.now(); }
+      resolveOllamaBase = function (forceRefresh) {
+        if (_flResolveInflight) return _flResolveInflight;                       // join
+        if (_flResolveAt &amp;&amp; age &lt; TTL &amp;&amp; _ollamaResolvedBase === _flResolveValue) // reuse, only if
+          return Promise.resolve(_flResolveValue);                               // nobody changed it
+        var p = Promise.resolve(_flResolveNow(forceRefresh)).then(...store..., ...clear+rethrow...);
+        _flResolveInflight = p; return p;
+      };
+      window.flForgetLocalLook = flForgetLocalLook; window.flSeedLocalLook = flSeedLocalLook;
+    The &quot;_ollamaResolvedBase === _flResolveValue&quot; check means any code that writes a new value to
+    _ollamaResolvedBase (or nulls it, like every existing save path) is never hidden by the cache.
+
+C.3 Forget on every address change (one line each, all guarded with typeof):
+      flSaveOllamaHost (main ~34426, after  _ollamaResolvedBase = null;)
+      flUseBridge      (main ~31506, after  _ollamaResolvedBase = null;)
+      FLBoxPointer.persist (main ~34506, after  try { _ollamaResolvedBase = null; } catch (e3) {})
+      FLHomeNet.forget (new, step F)
+      fl-connect setManualHost / clearManualHost (step A.3, via forgetLooks)
+
+======================================================================
+6. STEP D (F1 + F3 wiring): FreeLattice app.html, one cold-start owner
+======================================================================
+
+D.1 The owner. New inline &lt;script&gt; placed right AFTER the #connect deep-link script that ends
+    (main 68611-68613):
+          window.addEventListener(&#x27;hashchange&#x27;, goConnect);
+        })();
+        &lt;/script&gt;
+    and before &quot;&lt;!-- Tool Consent (v5.39.1)&quot;. Exact code: Appendix A last hunk.
+    window.FlColdStart:
+      owns()          true when FlConnect.bootProbe exists. Checked lazily (fl-connect.js is a
+                      defer script), so every gate below asks at call time.
+      deepLink()      &#x27;connect&#x27; for #connect or ?tab=connect.
+      pointerdown / keydown (capture) -&gt; userMoved.
+      noteTab(tab)    a tab picked by the person before landing wins.
+      markLanded(t)   first call wins; landed() reads it.
+      appBooted()     called by the main DOMContentLoaded boot (D.4).
+      start()         on DOMContentLoaded (or next tick if already parsed), once:
+                        _look = FlConnect.bootProbe({ fullScan: true })
+                        then seed(report)        flSeedLocalLook only when the report covered the
+                                                 same door getOllamaBaseUrl() would use (via is not
+                                                 &#x27;direct&#x27;, or base matches)
+                             paintBridge(report) flBridgeShowChip, fl_bridgePort, _flBridgeLivePort,
+                                                 #fl-bridge-port-field (what flBridgeDetectBoot did)
+                             remember(report)    saveDiscoveryMemory(doors) (what autoDiscoverAI did;
+                                                 LM Studio saved as type &#x27;openai-compat&#x27;)
+                        and after look + appBooted + 4000ms from start: speak(report) once.
+      speak(report)   Exactly one voice:
+                        Connect tab showing -&gt; silent (Connect speaks).
+                        Welcome door showing -&gt; silent (owAutoDetect still runs when it closes,
+                                                 as today).
+                        A mind already chosen (FlConnect.hasLocalMind or flHasOneMindConnected)
+                                              -&gt; silent.
+                        Welcomed + fl_isLocal true without a model -&gt; owAutoDetect() for the badges.
+                        Otherwise FlOnboarding.offerFromReport(report): the toast, naming the door
+                        that really answered.
+
+D.2 Gates (each: one guarded line at the top; the old path stays for pages without the owner):
+      detectOnLoad()          main 27769  first line:
+          // v-connect-boot-probe-v0 (F1): the cold-start owner speaks at boot; this stays for pages without it
+          try { if (window.FlColdStart &amp;&amp; FlColdStart.owns()) return; } catch (eOwn) {}
+      flBridgeDetectBoot run() main 31524 first line (same shape, comment &quot;paints the chip from the one shared look&quot;)
+      autoDiscover DOMContentLoaded listener main 39679, inside setTimeout before &quot;// Only scan if not already connected&quot;
+          // v-connect-boot-probe-v0 (F1): the cold-start owner already looked (and saves discovery memory)
+      goConnect(ev)           main 68588, after  if (_flcUserMoved &amp;&amp; !fromHash) return;
+          try { if (!fromHash &amp;&amp; window.FlColdStart &amp;&amp; FlColdStart.landed() === &#x27;connect&#x27;) return; } catch (eL0) {}
+          (a real hashchange to #connect still works).
+
+D.3 Boot block (main 33780-33792):
+      var _flOwnerBoot = false;
+      try { _flOwnerBoot = !!(window.FlColdStart &amp;&amp; FlColdStart.owns()); } catch (eOwnB) {}
+      if (!_flOwnerBoot &amp;&amp; (safeGet(&#x27;fl-welcomed&#x27;) === &#x27;true&#x27; || safeGet(&#x27;fl_onboardingComplete&#x27;) === &#x27;true&#x27;)) {
+        owAutoDetect();
+      }
+      try { if (window.FlColdStart &amp;&amp; FlColdStart.appBooted) FlColdStart.appBooted(); } catch (eBoot) {}
+    and Zero-Click:  if (!hasKey &amp;&amp; !isLocal)  -&gt;  if (!hasKey &amp;&amp; !isLocal &amp;&amp; !_flOwnerBoot)
+    Note: Zero-Click (flAutoConnect) no longer auto-connects at boot when the owner is present.
+    That matches heal v0.4 (&quot;no silent connect or model pick&quot;): the one toast offers, the tap
+    chooses.
+
+D.4 Land once. Garden-first landing IIFE (main 33669, after the legacy tab mapping line
+    &quot;if (lastTab === &#x27;channels&#x27; || lastTab === &#x27;mesh&#x27;) lastTab = &#x27;community&#x27;;&quot;):
+      a tab picked while waking (FlColdStart.userTab()) wins -&gt; markLanded(it), return;
+      else a deep link to connect -&gt; markLanded(&#x27;connect&#x27;); switchTab(&#x27;connect&#x27;); return;
+    and at the very end of the IIFE (after the last switchTab(&#x27;garden&#x27;) else-arm):
+      try { if (window.FlColdStart) FlColdStart.markLanded(isFirstVisit ? &#x27;garden&#x27; : (lastTab || &#x27;garden&#x27;)); } catch (eLand2) {}
+    switchTab() end (main 26945, after localStorage.setItem(&#x27;fl-last-tab&#x27;, tabId)):
+      try { if (window.FlColdStart &amp;&amp; FlColdStart.noteTab) FlColdStart.noteTab(tabId); } catch (eCs) {}
+
+D.5 Welcome overlay never lands late. flMaybeShowWelcome (main 32143), before the 1s setTimeout:
+      try { if (window.FlColdStart &amp;&amp; FlColdStart.landed() === &#x27;connect&#x27;) return; } catch (eW0) {}
+    and first line inside the timeout:
+      try { if (window.FlColdStart &amp;&amp; FlColdStart.userMoved()) return; } catch (eW1) {}
+    (It waits for the next visit instead of landing on a person who is already tapping.)
+
+D.6 Toast honesty (FlOnboarding, main 27802-27860):
+      showOllamaToast: keep the old #welcomeOverlay check (layer), add
+          if (flToastWouldRace()) return;   before the setTimeout, and again inside it.
+      new flToastWouldRace(): #flWelcomeOverlay.fl-welcome-visible, #tab-connect.active, or
+          FlConnect.hasLocalMind().
+      new offerFromReport(report): respects fl_ollama_toast_dismissed; builds detectedModels from
+          report.doors (each model carries _door); writes into #flOllamaToastText with
+          createTextNode + a &lt;strong&gt; via textContent:
+            &quot;Ollama is ready on this computer. Tap to choose a mind.&quot;
+            &quot;Ollama and LM Studio are ready on this computer. Tap to choose a mind.&quot;
+            &quot;LM Studio is ready on this computer. Tap to choose a mind.&quot;
+            &quot;Bridge is ready on this computer. ...&quot; (helped Bridge)
+          then showOllamaToast(). Exported as FlOnboarding.offerFromReport.
+      Toast markup (main 52220):
+          &lt;span&gt;Local AI detected! ...  -&gt;  &lt;span id=&quot;flOllamaToastText&quot;&gt;Local AI detected! ...
+      acceptToast() is unchanged (it already opens Connect, where the person taps the mind).
+      Toast width layer after &quot;.fl-ollama-toast .fl-toast-icon { font-size: 1.2rem; }&quot; (main 11751):
+          /* v-connect-boot-probe-v0: honest door names need room on a phone */
+          .fl-ollama-toast { width: max-content; max-width: min(92vw, 440px); box-sizing: border-box; }
+
+======================================================================
+7. STEP E (F3): FreeLattice app.html, LM Studio words and activation
+======================================================================
+
+E.1 flUseLmStudioMind(name), new, right AFTER  window.flSaveLMStudioHost = flSaveLMStudioHost;
+    (main 34713) and after the getLMStudioBase wrapper from F.6. Mirrors what flTestLMStudio
+    already does on success: state.isLocal/provider/ollamaModel, safeSet fl_isLocal /
+    fl_provider / fl_ollamaModel, PROVIDERS.lmstudio.url = getLMStudioBase() + &#x27;/v1/chat/completions&#x27;,
+    FLActiveModel.set(name, &#x27;lmstudio&#x27;, &#x27;user&#x27;), ModelSwitcher.updateLabel().
+    window.flUseLmStudioMind = flUseLmStudioMind. fl-connect&#x27;s rememberLmStudio calls it.
+
+E.2 owAutoDetect, Ollama branch (main 35211):
+      if (banner) banner.classList.add(&#x27;show&#x27;);
+    -&gt; if (banner) {
+         // v-connect-boot-probe-v0 (F3): Ollama really answered; keep the Ollama words
+         var yesO = banner.querySelector(&#x27;.suggest-yes&#x27;);
+         if (yesO) yesO.textContent = &#x27;Yes, use Ollama&#x27;;
+         banner.classList.add(&#x27;show&#x27;);
+       }
+    owAutoDetect, LM Studio branch (main 35227): replace the innerHTML line with textContent
+    nodes: a strong &quot;LM Studio is ready on this computer.&quot; + &quot; N model(s). Choose one for
+    completely private AI?&quot; and set .suggest-yes textContent to &#x27;Yes, choose a mind&#x27;.
+    The old innerHTML line is replaced (it is the only removal in this paste; it was the false
+    &quot;Yes, use Ollama&quot; source and it wrote HTML). Keep &quot;LM Studio detected!&quot; out of the new text
+    (the smoke checks it is gone).
+
+E.3 Status words (main 25901 and 35565): where the label is built as
+      &#x27;Ollama (&#x27; + (state.ollamaModel || &#x27;llama3.2&#x27;) + &#x27;)&#x27;
+    use
+      (state.provider === &#x27;lmstudio&#x27; ? &#x27;LM Studio (&#x27; : &#x27;Ollama (&#x27;) + (state.ollamaModel || &#x27;llama3.2&#x27;) + &#x27;)&#x27;
+    with a trailing  // v-connect-boot-probe-v0 (F3)  comment.
+
+E.4 Raw fl_lmstudioHost reads get the F4 rule:
+      probeLocalMind (main ~34157, after the lmBase line):
+        if (typeof FLHomeNet !== &#x27;undefined&#x27; &amp;&amp; FLHomeNet &amp;&amp; !FLHomeNet.allows(lmBase)) lmBase = &#x27;http://127.0.0.1:1234&#x27;; // v-connect-boot-probe-v0 (F4)
+      Settings Go-10 probe (main ~31606, after var lmHost = ...):
+        if (typeof FLHomeNet !== &#x27;undefined&#x27; &amp;&amp; FLHomeNet &amp;&amp; !FLHomeNet.allows(lmHost)) lmHost = &#x27;127.0.0.1:1234&#x27;; // v-connect-boot-probe-v0 (F4)
+
+======================================================================
+8. STEP F (F4): FreeLattice app.html, Kirk&#x27;s home-network switch
+======================================================================
+
+F.1 HTML. Right after the #flBoxPointer row&#x27;s closing &lt;/div&gt; (main 16509, the div that holds
+    #flBoxPointerInput and #flBoxPointerStatus) and before #chatOverflowBtn:
+      &lt;!-- v-connect-boot-probe-v0 (F4): this computer only, unless the person turns on home network --&gt;
+      &lt;div class=&quot;fl-homenet v-connect-boot-probe-v0&quot; id=&quot;flHomeNet&quot; data-fl-homenet=&quot;off&quot;&gt;
+        &lt;span class=&quot;fl-homenet-mode&quot; id=&quot;flHomeNetMode&quot;&gt;This computer only&lt;/span&gt;
+        &lt;label class=&quot;fl-homenet-switch&quot; for=&quot;flHomeNetSwitch&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;flHomeNetSwitch&quot; role=&quot;switch&quot; aria-checked=&quot;false&quot; aria-describedby=&quot;flHomeNetLine&quot;&gt; Also use a computer on my home network&lt;/label&gt;
+        &lt;p class=&quot;fl-homenet-line&quot; id=&quot;flHomeNetLine&quot; hidden&gt;Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked.&lt;/p&gt;
+        &lt;p class=&quot;fl-homenet-refusal&quot; id=&quot;flHomeNetRefusal&quot; role=&quot;status&quot; hidden&gt;&lt;/p&gt;
+      &lt;/div&gt;
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

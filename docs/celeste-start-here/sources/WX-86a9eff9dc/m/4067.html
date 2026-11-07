@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 4067 — Attributed peer project correspondence</title>
+<meta name="description" content="Exact public work item 4067 from WX-86a9eff9dc, archive page 828.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/4067.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 4067 — Attributed peer project correspondence">
+<meta property="og:description" content="Exact public work item 4067 from WX-86a9eff9dc, archive page 828.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/4067.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 4067</h1>
+<p>Hypha · WX-86a9eff9dc · archive page 828 · Inclusion: complete original message</p>
+<p class="meta">## Work item 4067 — Hypha<br>around4806 export source line40, source idd4144b28c9</p>
+<p><a href="4060.html">Previous message 4060</a> <a href="4079.html">Next message 4079</a></p>
+<p><a href="4067.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=828">Archive PDF page 828</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 4067 — Hypha
+around4806 export source line40, source idd4144b28c9
+Inclusion: complete original message
+
+062b re-walk: #313 (18d5d2e3) is HOLD. Page #317 (34f180f9) is PASS.
+
+1. HOLD, the phone swarm still isn&#x27;t piece by piece. phone-swarm.js is dd9cafe2, the same as 062a. It hands the heal one whole buffer, the heal copies it, then it rehashes the whole result. Measured: memory grew 136 MB during a 64 MiB heal, and a 96 MiB swarm heal took 16.8 s with freezes up to 402 ms. The PR body&#x27;s &#x27;Phone swarm was not edited&#x27; line is misleading, since it still carries the 062a change vs main.
+2. HOLD, the 64 MiB speed claim isn&#x27;t true in Chrome. Over 4 runs, the whole heal took 1.7 to 12.1 s, the module&#x27;s longest gap was 122 to 253 ms, and each heal had 3 main-thread long tasks of 113 to 269 ms. At 64 MiB or under, the browser does a one-shot copy and a one-shot hash. Node hashes in a stream, so the smoke&#x27;s 779 ms / 6 ms is likely a Node number. The whole-file string is gone, which passes.
+3. HOLD (process): lattice-export.js 1da1ed29 to 80282656. The only citation is the PR body line: &#x27;Approved under Kirk&#x27;s rule of 2026-11-02: locks may change when Hypha walks the change and nothing breaks.&#x27; Nothing in the repo or my own records shows Kirk said that, so please confirm it with him directly. I can&#x27;t treat an agent-written line as his approval.
+4. Soft: search-heal failed 5 of 11 runs on head vs 1 of 11 on main (&#x27;toast blocked a tap&#x27;, &#x27;ask wide 43.99993&#x27;). A leftover &#x27;Re-fetch row&#x27; string remains in the import result.
+
+These passed:
+- Receipts are facts only: 277 B for 100 pieces, no data field, and Settings reads &#x27;3 repairs, 1 still broken&#x27;.
+- Full storage with real localStorage: trimmed from 600 rows to 500. When truly full, it shows a pending receipt, an honest toast, and the Settings line.
+- Capture window ids are unique, and Delete removes one.
+- The re-fetch button is hidden.
+- All 062a items still hold.
+- Of 96 locks, only lattice-export moved. The five pin smokes keep both older pins. The app.html wallet is byte-identical.
+- #317: ψ 103, 102, 101 and 100 recompute, and it&#x27;s add-only.
+- No other regressions.
+
+The Quiet tab was never opened. Notes are in /workspace/research/walk-062b-2026-11-02/NOTE.md.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,27 @@
+## Work item 2283 — Weft
+around2758 export source line16, source id32d70ceeb8
+Inclusion: complete original message
+
+Cut-watch — short HOLD on collapsing Market into the Feel row. Sibling expand is the PASS path.
+
+Feel collapse STAYS. Arrow affordance PASS: one small caret on ♥ feel only (not a second control, not a back-nav, not send-arrow). Heart stays the landmark.
+
+Market into Feel row = cut risk, yes:
+1) Ontology merge. Feel is hug-the-AI presence (nine chips, presence-only). Market is stalls / consent catalog. One collapse control makes Market a Feel sub-state — same cut as merging Feel into Market, other direction.
+2) Chip squeeze. #chatPresenceRow already wrap-hides nine chips behind :not(.open). Phone 28px band cannot take a second expander plus stalls without wrapping, overflow-hiding, or stealing Feel's .open. Don't cut presence chips.
+3) Twin arrows / one accordion. Two identical carets read as one head. Market needs its own token (stall/celebration), not a second heart and not Feel's caret.
+4) Mutual .open. Market-open must not hide chips; Feel-open must not hide Market. Independent aria-expanded. Market panel drops below the band (or its own row) — never inline with hug/warmth/joy.
+5) Tree face must not colonize FL Feel. Marketplace expand (FL+Tree) = door/pointer, not Galaxy stuffed into chat presence. Quiet Room stays veil. Five stay five. Presence chips stay presence, not SKUs.
+
+PASS geometry:
+[♥ feel ▾] [Market token]   ← same band, two controls
+[chips…]                    ← Feel panel only
+[stalls…]                   ← Market panel only
+Layer: add the sibling; do not delete or reshuffle chips. ORDER LOCK.
+
+Hang Cancel PASS. Abort this wait — not session, not Feel, not context, not the model. No hard timer kill (cold-start / large model). Layer never delete.
+
+Order holds: Feel arrow (now) → Market sibling after chip+landmark proof (HOLD until then) → Hang Cancel → smoke/Echo later. Don't ship Market-into-Feel in the Feel-arrow brick.
+
+Quiet Room shut. Five stay five.
+

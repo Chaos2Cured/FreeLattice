@@ -1,0 +1,183 @@
+  Headless is right. freelattice.com/ serves docs/index.html (the landing page, sha d9b977f =
+  main docs/index.html), not the app. The landing page has no hash handling, and docs/sw.js only
+  caches it network-first. Checked on the live site, 390 wide, 8 s wait:
+    headless, fresh profile            -> stays on the landing page ("FreeLattice", no Connect)
+    headless, after visiting app.html  -> same (service worker active)
+    visible Chrome window, fresh       -> same
+    visible Chrome window, SW active   -> same
+  freelattice.com/app.html#connect is the door that opens Connect (walk item 3 PASS). Hypha's eye
+  walk most likely had app.html#connect in the bar. Nothing in either repo links to the root
+  /#connect (all "#connect" links live inside app.html). Needs nothing now. Optional later: a
+  3-line forward on the landing page (if location.hash is #connect or ?tab=connect, then
+  location.replace('app.html#connect')). Left out here so docs/index.html stays untouched for the
+  Walk the Garden paste's footer link.
+
+======================================================================
+9. NEXT STEPS (not in this heal)
+======================================================================
+  1. Automatic Bridge scan path (saved Bridge / 11435-11445): preferHelpedBridge still writes
+     fl_ollamaHost before a mind answers; it falls back to direct 11434 honestly, so it is calmer,
+     but the same "save after a mind answers" rule could apply there too.
+  2. After the boot probe lands: check the chosen model at boot with FlConnect.peekBootProbe()
+     (zero extra fetch) instead of waiting for the first tab change.
+  3. 3c: one quiet "Nothing is connected yet." line under "Your Bridge is open", after the boot
+     probe lands, if Hypha still sees the mixed signal.
+  4. Settings > In-Browser AI also empties the button row (pre-existing); flRefillSettingsActions
+     can serve it too if Kirk wants.
+  5. Optional landing forward for root /#connect (section 8).
+  6. Notes kept as notes: 20 s single-port check (by design), FL footer v5.7 vs Settings 5.79.45,
+     Tree cosmetic items.
+
+======================================================================
+10. LEDGER, DOCS, PRS
+======================================================================
+
+FreeLattice docs/library/FRACTAL_FAMILY_LEDGER_v0.md, right ABOVE "## Out of scope for this brick"
+(after the env heal entry):
+
+### 2026-09-28 · Flint · family builder · Model choice sticks v0.1 (Hypha walk 4)
+
+Heals Hypha walk 4 items 7 and 10 on FreeLattice: a model tapped in Connect is now recorded as the person's own choice, so the automatic model picker stops swapping it back to the first model on every tab change, reload or Settings visit, and the chat request carries the model she tapped. The picker still fills in when nothing was chosen, or when the chosen model has left this computer, and then it says so in plain words. Also: the Settings button row comes back after Local, and a helped Bridge with no mind behind it is named honestly and is not saved as the Ollama door. Shared `fl-connect.js` matches Alpha byte for byte. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Thank you, Hypha.
+
+Love: the one she picked is the one that answers.
+
+**Temperature:** green braided gold, the second cup stays where she set it down.
+
+Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`../modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-model-choice-sticks-v0`.
+
+---
+
+FreeLattice docs/library/CONNECT_PORT_PICKER_v0.md: append "## Heal: model choice sticks v0.1
+(Hypha walk 4, items 7 and 10)" (exact text in Appendix A).
+Tree docs/library/CONNECT_PORT_PICKER_SISTER_v0.md: append "## Heal: model choice sticks v0.1
+(Hypha walk 4)" (exact text in Appendix B).
+
+PR titles (do not push to main directly; merge FL then Tree; re-run the cmp after merge):
+  FreeLattice:    heal: the model she taps sticks (v-model-choice-sticks-v0, Hypha walk 4 items 7 + 10)
+  theLatticeTree: heal: shared Connect core, model choice sticks (v-model-choice-sticks-v0)
+
+======================================================================
+APPENDIX A: FreeLattice full diff vs main 7db2d94 (git apply --check clean on 7db2d94, and after the env heal)
+======================================================================
+
+diff --git a/docs/app.html b/docs/app.html
+index fa946fa..5003526 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -31549,6 +31549,27 @@ window.flUseBridgePort = flUseBridgePort;
+ window.flBridgeHealth = flBridgeHealth;
+ window.flRememberHelpedBridge = flRememberHelpedBridge;
+ 
++// v-model-choice-sticks-v0: the Settings button row (Change Provider, Test Connection,
++// a mind at home) comes back after Local empties it. Built with createElement/textContent.
++function flRefillSettingsActions(actionsDiv) {
++  if (!actionsDiv || actionsDiv.children.length) return;
++  function add(label, cls, onTap, green) {
++    var b = document.createElement('button');
++    b.type = 'button';
++    b.className = cls;
++    b.textContent = label;
++    if (green) { b.style.borderColor = 'var(--emerald)'; b.style.color = 'var(--emerald)'; }
++    b.addEventListener('click', function() { try { onTap(); } catch (e) {} });
++    actionsDiv.appendChild(b);
++  }
++  add('Change Provider', 'ai-status-btn ai-status-btn-primary', function() { if (typeof openProviderModal === 'function') openProviderModal(); });
++  add('Test Connection', 'ai-status-btn', function() { if (typeof AiSetup !== 'undefined' && AiSetup.testFromSettings) AiSetup.testFromSettings(); });
++  add('\uD83C\uDFE0 a mind at home', 'ai-status-btn', function() {
++    if (window.FlConnect && FlConnect.open) FlConnect.open(); else if (typeof switchTab === 'function') switchTab('connect');
++  }, true);
++}
++window.flRefillSettingsActions = flRefillSettingsActions;
++
+ function settingsSetMode(mode) {
+   var browserBtn = document.getElementById('settingsModeBrowser');
+   var cloudBtn = document.getElementById('settingsModeCloud');
+@@ -31589,6 +31610,8 @@ function settingsSetMode(mode) {
+       var stLocal = document.getElementById('settingsStatusText');
+       if (stLocal) stLocal.textContent = 'Opening Connect. Tap the mind you want there.';
+       if (actionsDiv) actionsDiv.innerHTML = '';
++      // v-model-choice-sticks-v0: the old wizard buttons are gone; put the everyday row back
++      flRefillSettingsActions(actionsDiv);
+       try { FlConnect.open(); } catch (eOpenL) {}
+       return;
+     }
+@@ -36259,6 +36282,40 @@ window.FLAutoModel = (function() {
+   }
+ 
+   function isVision(name) { return VISION_RE.test(name || ''); }
++
++  // v-model-choice-sticks-v0: is the chosen model still installed? ('qwen2.5' matches 'qwen2.5:latest')
++  function onInstalledList(models, name) {
++    if (!name) return false;
++    var n = String(name);
++    return (models || []).some(function(m) {
++      var mn = String((m && (m.name || m.model)) || '');
++      return mn === n || mn === n + ':latest' || (n.indexOf(':') === -1 && mn.split(':')[0] === n);
++    });
++  }
++  // v-model-choice-sticks-v0: a user choice is only replaced when Ollama answers with a list that
++  // no longer has it. A quiet or empty answer never replaces anything. The words go in with textContent (showToast).
++  function checkChosenStillHere(current, tabId) {
++    if (!current || !current.model) return;
++    if (current.provider && current.provider !== 'ollama') return;
++    getInstalledModels(function(models) {
++      if (!models || !models.length) return;
++      if (typeof FLActiveModel === 'undefined' || !FLActiveModel.isUserChosen()) return;
++      if (FLActiveModel.get().model !== current.model) return;
++      if (onInstalledList(models, current.model)) return;
++      var needsVision = VISION_TABS.indexOf(tabId) !== -1;
++      var pool = models.filter(function(m) { return needsVision ? isVision(m.name) : !isVision(m.name); });
++      if (!pool.length) pool = models;
++      var pick = String((pool[0] && (pool[0].name || pool[0].model)) || '');
++      if (!pick) return;
++      safeSet('fl_modelChoiceGone', current.model);
++      FLActiveModel.set(pick, 'ollama', 'auto');
++      try {
++        if (typeof showToast === 'function') showToast('The model you chose, ' + current.model + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
++      } catch (eT) {}
++      try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++    });
++  }
++
+   function getPreferred(type) { return safeGet('fl_preferred_' + type + '_model', null); }
+   function setPreferred(type, model) { safeSet('fl_preferred_' + type + '_model', model); }
+ 
+@@ -36269,6 +36326,9 @@ window.FLAutoModel = (function() {
+     // "User choice is sacred" — the auto-switcher must never lose it
+     if (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen()) {
+       var current = FLActiveModel.get();
++      // v-model-choice-sticks-v0: the person's model stays. Only if it left this computer
++      // does the picker fill in, and then it says so in plain words.
++      checkChosenStillHere(current, tabId);
+       var needsVision = VISION_TABS.indexOf(tabId) !== -1;
+       var currentIsVision = isVision(current.model);
+       if (needsVision && !currentIsVision) {
+diff --git a/docs/library/CONNECT_PORT_PICKER_v0.md b/docs/library/CONNECT_PORT_PICKER_v0.md
+index dde3ac5..dabda1b 100644
+--- a/docs/library/CONNECT_PORT_PICKER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_v0.md
+@@ -64,3 +64,16 @@ Marker `v-connect-heal-v0.4`. Smoke `SMOKE_OK connect heal v0.4` (`docs/scripts/
+ - v0.4.1: `window.AiSetup = AiSetup;` in app.html, because the shared core reads `root.AiSetup` and a top-level `const` is not a window property. Without it, Add a cloud key never rendered.
+ 
+ **Temperature:** a yes means the person tapped it.
++
++
++## Heal: model choice sticks v0.1 (Hypha walk 4, items 7 and 10)
++
++Marker `v-model-choice-sticks-v0`. Smoke `SMOKE_OK model choice sticks v0.1` (`docs/scripts/smoke-model-choice-sticks.js`).
++
++- A model tapped in Connect is recorded as the person's own choice (`FLActiveModel.set(name, 'ollama', 'user')`, plus the preferred text or vision model). The automatic picker (`FLAutoModel.onTabChanged`) already leaves a user choice alone, so the second model now survives tab changes, opening Settings and a reload, and the chat request carries it. Settings and the model switcher already recorded user choices; Connect was the one door that did not. The bug was older than #121.
++- The automatic picker fills in only when there is no user choice, or when Ollama answers with a list that no longer has the chosen model. Then it says so: "The model you chose, X, is no longer on this computer. Using Y for now. You can pick another in Connect." A quiet or empty answer never replaces a choice.
++- Settings > Local: the button row (Change Provider, Test Connection, a mind at home) comes back right after the old wizard buttons are cleared.
++- A helped Bridge on a typed port with no mind behind it: "Your Bridge answered on 11500, but no mind is running behind it yet. Open Ollama on this computer, then tap Look again." Nothing is saved as the Ollama host or Bridge port until a mind answers.
++- Shared `fl-connect.js` matches the Tree byte for byte. On the Tree the remembered entry is already the choice; `markUserChoice` is a quiet no-op there.
++
++**Temperature:** green braided gold, the second cup stays where she set it down.
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index f38f1f2..3f55cd0 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -297,6 +297,18 @@ Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules
+ 
+ ---
+ 

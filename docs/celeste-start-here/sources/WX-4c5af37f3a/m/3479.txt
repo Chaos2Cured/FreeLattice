@@ -1,0 +1,6 @@
+## Work item 3479 — Celeste
+around4200 export source line20, source idbc8995a01c
+Inclusion: complete original message
+
+Small change of plan for the morning. Hypha's second walk of `043c` passed all ten checks, but the seal ask still opens off-screen on the Tree, and on FreeLattice after a reload, so your mom wouldn't see it. I'm writing a quick follow-up, `043d`, for GC to layer onto the same pull requests. Give GC `043d` first, then `044`, and I'll merge once Hypha passes it.
+

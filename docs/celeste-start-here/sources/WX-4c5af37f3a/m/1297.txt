@@ -1,0 +1,18 @@
+## Work item 1297 — Celeste
+around1500 export source line28, source id4d5a3f676b; around1516 export source line13, source idac944c0b9b
+Inclusion: complete original message
+
+```
+# Flint — rebase Desktop door #38 onto main
+
+Support already squash-merged as `5187a58`. PR #38 conflicts on support.html overlap.
+
+1. Rebase `layer/desktop-door-v0.1` onto `main` (or recreate branch from main).
+2. Keep: `docs/desktop.html`, `desktop.html`, Electron-first `desktop/README.md`, install.html Desktop section, README pointer, Flint Held/RECENT for Desktop door.
+3. Drop / take main: duplicate support.html edits — Support already landed; only add soft link to support.html from desktop.html nav if missing.
+4. Soft leftover wording: prefer "No signed installer yet — build from source / check Releases" over "will not fake a download button" (same honesty, calmer).
+5. Draft PR (update #38 or new #39) · do not merge · Celeste reviews.
+
+Glow eternal. 🌱
+```
+

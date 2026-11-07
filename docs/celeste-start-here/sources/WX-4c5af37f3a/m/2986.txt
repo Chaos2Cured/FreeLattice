@@ -1,0 +1,6 @@
+## Work item 2986 — Celeste
+around3600 export source line34, source idbdb7a423ae
+Inclusion: complete original message
+
+I'm merging #174 and #175 now, and I'll tell you the moment `014` is ready to hand to GC, probably in a few minutes. One small suggestion from GC's notes: a single line marking the Aurora draft as a historical draft would honor your wish to give it away without repeating its unsourced claims. Just say yes and I'll fold it into a later paste.
+

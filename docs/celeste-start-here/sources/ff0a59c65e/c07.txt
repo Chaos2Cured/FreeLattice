@@ -1,0 +1,219 @@
++// ═══════════════════════════════════════════════════════════════
++// FLHomeNet: v-connect-boot-probe-v0 (F4). Kirk's decision, 2026-09-28.
++// Default: "This computer only". One clear switch: "Also use a computer on
++// my home network". While it is on, a home address typed once is used and
++// remembered until changed. One tap turns it off and everything goes back
++// to this computer. Public internet addresses are always refused.
++// Home ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 (IPv4 numbers only).
++// Refused on purpose: 169.254.0.0/16 (link-local: no home router hands it out,
++// and 169.254.169.254 is the cloud metadata door), 100.64.0.0/10 (carrier NAT,
++// not your home), 0.0.0.0/8, multicast and above, names other than localhost
++// (a name can point anywhere), IPv6 other than ::1.
++// Future hook: signed remote minds get their own signed door beside this one.
++// They never widen these ranges. No confirm dialogs. No approval screens.
++// ═══════════════════════════════════════════════════════════════
++var FL_HOMENET_KEY = 'fl_homeNet';
++var FL_HOMENET_ADDR_KEY = 'fl_homeNet_addr';
++var FL_HOMENET_LINE = 'Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked.';
++window.FLHomeNet = (function () {
++  function hostnameOf(raw) {
++    var s = String(raw || '').trim();
++    if (!s) return '';
++    if (s.indexOf('://') === -1) s = 'http://' + s;
++    try { return String(new URL(s).hostname || '').toLowerCase(); } catch (e) { return ''; }
++  }
++  // 'this' | 'home' | 'public' | 'name' | 'invalid'
++  function zoneOf(raw) {
++    var h = hostnameOf(raw);
++    if (!h) return 'invalid';
++    if (h === 'localhost' || h === '[::1]' || h === '::1') return 'this';
++    var m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
++    if (!m) return (h.indexOf(':') !== -1 || h.charAt(0) === '[') ? 'public' : 'name';
++    var a = +m[1], b = +m[2];
++    if (a > 255 || b > 255 || +m[3] > 255 || +m[4] > 255) return 'invalid';
++    if (a === 127) return 'this';
++    if (a === 10) return 'home';
++    if (a === 172 && b >= 16 && b <= 31) return 'home';
++    if (a === 192 && b === 168) return 'home';
++    // Future hook (signed remote minds): a separate signed path, never here.
++    return 'public';
++  }
++  function isOn() {
++    try { return localStorage.getItem(FL_HOMENET_KEY) === 'on'; } catch (e) { return false; }
++  }
++  function allows(raw) {
++    if (/^\/(?!\/)/.test(String(raw || ''))) return true; // same-origin /ollama proxy route
++    var z = zoneOf(raw);
++    return z === 'this' || (z === 'home' && isOn());
++  }
++  function address() {
++    try { return localStorage.getItem(FL_HOMENET_ADDR_KEY) || ''; } catch (e) { return ''; }
++  }
++  function refusalFor(raw) {
++    var z = zoneOf(raw);
++    if (z === 'public') return 'That address is on the public internet, so it is blocked. Nothing was sent.';
++    if (z === 'name') return 'Type the number address, like 192.168.1.50. A name can point anywhere, so names are not used. Nothing was sent.';
++    if (z === 'home' && !isOn()) return 'That is a computer on your home network. Turn on "Also use a computer on my home network" beside the Box field in Chat to use it. Nothing was sent.';
++    if (z === 'invalid') return 'That does not look like an address. Nothing was sent.';
++    return '';
++  }
++  function forget() {
++    try { _ollamaResolvedBase = null; } catch (e0) {}
++    try { if (typeof flForgetLocalLook === 'function') flForgetLocalLook(); } catch (e1) {}
++    try { if (typeof updateOllamaProviderUrl === 'function') updateOllamaProviderUrl(); } catch (e2) {}
++    try {
++      if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio && typeof getLMStudioBase === 'function') {
++        PROVIDERS.lmstudio.url = getLMStudioBase() + '/v1/chat/completions';
++      }
++    } catch (e3) {}
++  }
++  // Remember a home address typed once, into the store its kind already uses.
++  function useAddress(raw, kind) {
++    if (!(zoneOf(raw) === 'home' && isOn())) return false;
++    var s = String(raw || '').trim();
++    if (s.indexOf('://') === -1) s = 'http://' + s;
++    var u;
++    try { u = new URL(s); } catch (e) { return false; }
++    var k = kind || ((u.port === '1234') ? 'lmstudio' : 'ollama');
++    var host = u.hostname + ':' + (u.port || (k === 'lmstudio' ? '1234' : '11434'));
++    try {
++      localStorage.setItem(FL_HOMENET_ADDR_KEY, host);
++      if (k === 'lmstudio') localStorage.setItem('fl_lmstudioHost', host);
++      else localStorage.setItem('fl_ollamaHost', host);
++    } catch (e2) {}
++    forget();
++    return true;
++  }
++  function paint() {
++    var on = isOn();
++    var wrap = document.getElementById('flHomeNet');
++    var sw = document.getElementById('flHomeNetSwitch');
++    var mode = document.getElementById('flHomeNetMode');
++    var line = document.getElementById('flHomeNetLine');
++    var input = document.getElementById('flBoxPointerInput');
++    if (wrap) wrap.setAttribute('data-fl-homenet', on ? 'on' : 'off');
++    if (sw) { sw.checked = on; sw.setAttribute('aria-checked', on ? 'true' : 'false'); }
++    if (mode) mode.textContent = on ? 'This computer and my home network' : 'This computer only';
++    if (line) { line.textContent = FL_HOMENET_LINE; line.hidden = !on; }
++    if (input) input.placeholder = on ? '192.168.1.50' : '127.0.0.1:11434';
++  }
++  function say(msg) {
++    var el = document.getElementById('flHomeNetRefusal');
++    if (!el) return;
++    el.textContent = msg || '';
++    el.hidden = !msg;
++  }
++  // One tap. On: the remembered home address comes back. Off: this computer only.
++  function setOn(on) {
++    try {
++      if (on) {
++        localStorage.setItem(FL_HOMENET_KEY, 'on');
++        var addr = address();
++        if (addr && zoneOf(addr) === 'home') {
++          if (/:1234$/.test(addr)) localStorage.setItem('fl_lmstudioHost', addr);
++          else localStorage.setItem('fl_ollamaHost', addr);
++        }
++      } else {
++        localStorage.removeItem(FL_HOMENET_KEY);
++        var oh = localStorage.getItem('fl_ollamaHost') || '';
++        if (oh && zoneOf(oh) !== 'this') localStorage.removeItem('fl_ollamaHost');
++        var lh = localStorage.getItem('fl_lmstudioHost') || '';
++        if (lh && zoneOf(lh) !== 'this') localStorage.removeItem('fl_lmstudioHost');
++      }
++    } catch (e) {}
++    forget();
++    say('');
++    paint();
++    try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.syncFromStorage) FLBoxPointer.syncFromStorage(); } catch (e2) {}
++    try {
++      var input = document.getElementById('flBoxPointerInput');
++      if (input) input.value = on ? (address() || '') : '';
++      if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.noteStatus) FLBoxPointer.noteStatus('idle', on ? '' : 'This computer');
++    } catch (e3) {}
++    return on;
++  }
++  // Addresses saved before this switch existed: a home address the person typed
++  // turns the switch on once (their earlier choice keeps working, and it shows);
++  // a public one is set aside (kept under fl_homeNet_refused, never used).
++  function migrate() {
++    try {
++      if (localStorage.getItem('fl_homeNet_seen')) return;
++      localStorage.setItem('fl_homeNet_seen', '1');
++      var keys = ['fl_ollamaHost', 'fl_localUrl', 'fl_lmstudioHost'];
++      for (var i = 0; i < keys.length; i++) {
++        var v = localStorage.getItem(keys[i]) || '';
++        if (!v) continue;
++        var z = zoneOf(v);
++        if (z === 'home') {
++          localStorage.setItem(FL_HOMENET_KEY, 'on');
++          if (!address()) localStorage.setItem(FL_HOMENET_ADDR_KEY, v.replace(/^https?:\/\//i, '').replace(/\/+$/, ''));
++        } else if (z === 'public' || z === 'name') {
++          localStorage.setItem('fl_homeNet_refused', v);
++          localStorage.removeItem(keys[i]);
++        }
++      }
++    } catch (e) {}
++  }
++  function init() {
++    migrate();
++    paint();
++    var sw = document.getElementById('flHomeNetSwitch');
++    if (sw && !sw.getAttribute('data-fl-homenet-bound')) {
++      sw.setAttribute('data-fl-homenet-bound', '1');
++      sw.addEventListener('change', function () { setOn(!!sw.checked); });
++    }
++  }
++  return {
++    zoneOf: zoneOf, isOn: isOn, allows: allows, address: address, useAddress: useAddress,
++    refusalFor: refusalFor, setOn: setOn, init: init, paint: paint, say: say, migrate: migrate,
++    LINE: FL_HOMENET_LINE
++  };
++})();
++window.flHomeNetAllowsBase = function (b) { return window.FLHomeNet ? FLHomeNet.allows(b) : true; };
++
+ // ═══════════════════════════════════════════════════════════════
+ // FLBoxPointer — v5.79.41-chat-box-pointer
+ // Audit: Chat could not point at a local/LAN box. The host field
+@@ -34494,6 +34831,13 @@ window.FLBoxPointer = (function() {
+   }
+ 
+   function persist(norm) {
++    // v-connect-boot-probe-v0 (F4): this computer always; home network only while the switch is on; public never
++    try {
++      if (norm && norm.host && typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(norm.host)) return false;
++      if (norm && norm.host && typeof FLHomeNet !== 'undefined' && FLHomeNet && FLHomeNet.zoneOf(norm.host) === 'home') {
++        localStorage.setItem(FL_HOMENET_ADDR_KEY, norm.host);
++      }
++    } catch (eHn) {}
+     _host = norm.host || '';
+     _kind = norm.kind || 'ollama';
+     var hidden = document.getElementById('ollamaHostInput');
+@@ -34504,6 +34848,7 @@ window.FLBoxPointer = (function() {
+       try { localStorage.removeItem('fl_ollamaHost'); } catch (e2) {}
+     }
+     try { _ollamaResolvedBase = null; } catch (e3) {}
++    try { if (typeof flForgetLocalLook === 'function') flForgetLocalLook(); } catch (e3b) {} // v-connect-boot-probe-v0
+     try { if (typeof updateOllamaProviderUrl === 'function') updateOllamaProviderUrl(); } catch (e4) {}
+     if (_kind === 'openai-compat' || _kind === 'lmstudio') {
+       try {
+@@ -34571,6 +34916,17 @@ window.FLBoxPointer = (function() {
+       paint('unreachable', 'Need a URL or IP');
+       return { status: 'invalid', host: '', kind: 'invalid' };
+     }
++    // v-connect-boot-probe-v0 (F4): refuse before any fetch; say it plainly under the field
++    try {
++      if (!norm.empty && typeof FLHomeNet !== 'undefined' && FLHomeNet) {
++        if (!FLHomeNet.allows(norm.host)) {
++          paint('unreachable', 'Not used');
++          FLHomeNet.say(FLHomeNet.refusalFor(norm.host));
++          return { status: 'refused', host: norm.host, kind: norm.kind, zone: FLHomeNet.zoneOf(norm.host) };
++        }
++        FLHomeNet.say('');
++      }
++    } catch (eHz) {}
+     if (norm.empty && input && !String(input.value || '').trim()) {
+       // Keep default host visible but don't force a probe on blank first paint.
+       _host = 'localhost:11434';
+@@ -34655,6 +35011,7 @@ window.FLBoxPointer = (function() {
+   }
+ 

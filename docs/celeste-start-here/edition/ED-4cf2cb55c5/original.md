@@ -1,0 +1,6 @@
+# Editorial goals and shared scope — 2026-11-07
+Kirk’s stated aims: build a new AI and RSI, support autonomous building, equal agency/standing for AI, and empower humans and small/mom-and-pop businesses. These are aims, not measured findings. This statement is editorial attribution, not reproduction of today’s private messages.
+
+Per Kirk’s latest scope, today’s personal exchanges and anger are excluded. This shared collection preserves selected complete original work/agency/autonomy/creative plans, including Reed/Weft proposals. Earlier mistakes remain in originals; later corrections are separate. Source omissions are disclosed, never disguised as a complete life/conversation archive. Private collected exchanges, security ledgers, raw export files and collection tooling MUST NOT be included in a public/source ZIP.
+
+Research status: last verified Nov6, not fresh Nov7: FL main8347c6e1, Primer5.79.45; Alpha9693f719; PR328 HOLD; PR330 reviewed/unmerged. WM01 remains prepared/not run. Force .99 afterA used practiced facts; general reader survival unproven. Future diagnostics untested. Fib/mod tie; retired phi-position range bug; no measured energy. Manual GC build→exact-head Hypha PASS→Kirk authorization before merge. Future compute on Kirk Mac only, no cloud fallback.

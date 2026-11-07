@@ -1,0 +1,211 @@
+  assert.strictEqual(calls[0].opts.headers['x-api-key'], 'sk-ant-test-0000aaaa');
++  assert.strictEqual(calls[0].opts.headers['anthropic-dangerous-direct-browser-access'], 'true');
++  var b2 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b2.system, 'Just talk.');
++  assert.strictEqual(b2.messages.length, 3);
++  assert.ok(b2.max_tokens > 0);
++
++  // 6. Google shape: key in a header, never in the URL.
++  calls = []; nextReply = { status: 200, json: { candidates: [{ content: { parts: [{ text: 'from ' }, { text: 'gemini' }] } }] } };
++  var r3 = await T.send({ url: 'cloud:google', model: 'gemini-2.5-flash' }, msgs);
++  assert.strictEqual(r3, 'from gemini');
++  assert.strictEqual(calls[0].url, 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent');
++  assert.ok(calls[0].url.indexOf('key=') === -1 && calls[0].url.indexOf('AIza') === -1, 'no key in the URL');
++  assert.strictEqual(calls[0].opts.headers['x-goog-api-key'], 'AIza-test-google-2222');
++  var b3 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b3.contents[1].role, 'model');
++  assert.strictEqual(b3.systemInstruction.parts[0].text, 'Just talk.');
++
++  // 7. Honest failures, each with its own words; nothing invented.
++  async function failWith(reply, mind) {
++    calls = []; nextReply = reply;
++    try { await T.send(mind || { url: 'cloud:openai', model: 'gpt-4.1-mini' }, msgs); } catch (e) { return e; }
++    throw new Error('expected a failure');
++  }
++  var e401 = await failWith({ status: 401, json: {} });
++  assert.strictEqual(e401.reason, 'cloud');
++  assert.ok(/did not accept the key/.test(e401.cloudText));
++  assert.ok(/slow down/.test((await failWith({ status: 429, json: {} })).cloudText));
++  assert.ok(/did not take the model/.test((await failWith({ status: 404, json: {} })).cloudText));
++  assert.ok(/was quiet/.test((await failWith({ status: 200, json: { choices: [] } })).cloudText));
++  var saved = sandbox.fetch;
++  sandbox.fetch = function () { calls.push({ url: 'x' }); return Promise.reject(new TypeError('Failed to fetch')); };
++  assert.ok(/could not reach OpenAI/.test((await failWith(null)).cloudText));
++  sandbox.fetch = saved;
++  calls = [];
++  var noKey = await failWith(null, { url: 'cloud:groq', model: 'llama-3.3-70b-versatile' });
++  assert.ok(/No Groq key is in this browser/.test(noKey.cloudText));
++  assert.strictEqual(calls.length, 0, 'no key: nothing sent at all');
++  calls = [];
++  var unknown = await failWith(null, { url: 'cloud:evil', model: 'x' });
++  assert.ok(/does not know/.test(unknown.cloudText));
++  assert.strictEqual(calls.length, 0, 'unknown provider: nothing sent');
++
++  // 8. Words that tell the truth.
++  assert.ok(/through OpenAI\. Your words go to OpenAI\. Your key stays in this browser\./.test(T.heartLine({ url: 'cloud:openai', model: 'gpt-4.1-mini' })));
++  var note = T.honestNote('anthropic');
++  assert.ok(/stays in this browser/.test(note) && /never sees it/.test(note) && /goes only to Anthropic/.test(note) && /files you add stay here/.test(note) && /Forget removes it/.test(note));
++
++  // 9. Thread and rooms wiring (static, text anchors).
++  assert.ok(/v-tree-gathering-api-keys-v0: a cloud chair speaks through its chosen provider only/.test(thread));
++  assert.ok(/function isCloudMind\(mind\)/.test(thread) && /function cloudSafeContent\(m\)/.test(thread));
++  assert.ok(/\[a file stayed on this machine\]/.test(thread), 'a cloud chair hears only that a file stayed here');
++  assert.ok(/cloudNow \? cloudSafeContent\(m\) : messageContent\(m\)/.test(thread));
++  assert.ok(/TreeCloudMinds\.heartLine\(mind\)/.test(thread), 'heart says where words go');
++  assert.ok(/err\.reason === 'cloud' && err\.cloudText/.test(thread));
++  assert.ok(!/TreeCloudMinds\.(getKey|saveKey)/.test(thread), 'the thread never touches a key');
++  assert.ok(/TreeCloudMinds\.seatOptions\(\)/.test(rooms) && /TreeCloudMinds\.mountKeyPanel\(picker,/.test(rooms));
++  assert.ok(/\.cloud-key-panel \{/.test(css) && /\.cloud-key-input,?/.test(css));
++  // The thread's cloudSafeContent drops file bytes and names.
++  var tbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, localStorage: new Store(), sessionStorage: new Store(),
++    location: { protocol: 'https:', pathname: '/' }, document: { addEventListener: function () {}, getElementById: function () { return null; } } };
++  tbox.window = tbox;
++  vm.createContext(tbox);
++  try { vm.runInContext(thread, tbox, { filename: 'garden-thread.js' }); } catch (eT) {}
++  if (tbox.GardenThread && tbox.GardenThread.cloudSafeContent) {
++    var safe = tbox.GardenThread.cloudSafeContent({ text: 'look', file: { name: 'secret-plan.txt', excerpt: 'THE BYTES' } });
++    assert.strictEqual(safe, 'look\n\n[a file stayed on this machine]');
++    assert.strictEqual(tbox.GardenThread.isCloudMind({ url: 'cloud:openai' }), true);
++    assert.strictEqual(tbox.GardenThread.isCloudMind({ url: 'http://127.0.0.1:11434/api/tags' }), false);
++  } else {
++    throw new Error('GardenThread did not load in the vm');
++  }
++
++  // 10. Every page with the Gathering loads the helper before garden-rooms.js.
++  var docs = path.join(dir, '..');
++  fs.readdirSync(docs).filter(function (f) { return /\.html$/.test(f); }).forEach(function (f) {
++    var h = fs.readFileSync(path.join(docs, f), 'utf8');
++    var gi = h.indexOf('<script src="modules/garden-rooms.js"></script>');
++    if (gi === -1) return;
++    var ci = h.indexOf('<script src="modules/tree-cloud-minds.js"></script>');
++    assert.ok(ci !== -1 && ci < gi, f + ' loads tree-cloud-minds.js before garden-rooms.js');
++  });
++
++  // 12. Twin seats are allowed and said; clearing the speaking chair hushes Chat instead of
++  // handing the next message to another mind; the speaking line names the chair.
++  var roomsSrc = fs.readFileSync(path.join(dir, 'garden-rooms.js'), 'utf8');
++  assert.ok(/function twinNote\(chairId, seat\)/.test(roomsSrc), 'twin note helper');
++  assert.ok(/so they will sound alike\./.test(roomsSrc), 'twin note says it plainly');
++  assert.strictEqual((roomsSrc.match(/var twins = twinNote\(chair\.id, seat\);/g) || []).length, 2, 'local and cloud seats both warn on twins');
++  assert.ok(/var wasSpeaking = entryState\(\)\.speaking === chair\.id;\s*if \(wasSpeaking\) window\.GardenRooms\.gatheringHush = true;/.test(roomsSrc), 'clearing the speaking chair hushes');
++  assert.ok(/window\.GardenRooms\.gatheringHush = false;\s*if \(window\.LocalMindProbe && LocalMindProbe\.setSpeakingChair\)/.test(roomsSrc), 'tapping a seated chair lifts the hush');
++  assert.ok(/at the ' \+ chair\.type \+ ' chair\./.test(roomsSrc), 'speaking line names the chair');
++  assert.ok(/if \(gatheringHushed\(\)\) return \{ hush: true, name: '', url: '' \};/.test(thread), 'listener is hushed, not the Settings default');
++  assert.ok(/if \(nowMind && nowMind\.hush\) \{\s*messages\.push\(\{ role: 'garden', text: HEART_HUSH \+ ' Nothing was sent\.' \}\);/.test(thread), 'a hushed Send says so and sends nothing');
++  // behaviour: a hushed Gathering never returns the Settings default as listener
++  var hbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, localStorage: new Store(), sessionStorage: new Store(),
++    location: { protocol: 'https:' } };
++  hbox.window = hbox;
++  var veilCls = { list: ['is-core', 'is-open'], contains: function (c) { return this.list.indexOf(c) !== -1; } };
++  hbox.document = { getElementById: function (id) { return id === 'place-veil' ? { classList: veilCls } : null; },
++    querySelector: function () { return null; }, querySelectorAll: function () { return []; }, addEventListener: function () {} };
++  hbox.LocalMindProbe = {
++    resolveSpeakMind: function () { return { name: 'Ollama', url: 'http://127.0.0.1:11434/api/tags' }; },
++    getRemembered: function () { return { name: 'Ollama', url: 'http://127.0.0.1:11434/api/tags' }; }
++  };
++  hbox.GardenRooms = { gatheringHush: true };
++  vm.createContext(hbox);
++  try { vm.runInContext(thread, hbox, { filename: 'garden-thread.js' }); } catch (eH) {}
++  if (hbox.GardenThread && typeof hbox.GardenThread.listener === 'function') {
++    assert.strictEqual(hbox.GardenThread.listener().hush, true, 'hushed: no default listener');
++    hbox.GardenRooms.gatheringHush = false;
++    assert.strictEqual(hbox.GardenThread.listener().name, 'Ollama', 'hush lifted: default again');
++  } else {
++    throw new Error('GardenThread did not load in the hush vm');
++  }
++
++  // 11. Locks in the new module (code, not its comments).
++  var code = src.split('\n').filter(function (l) { return !/^\s*\/\//.test(l); }).join('\n');
++  assert.ok(!/confirm\(/.test(code), 'no confirm()');
++  assert.ok(!/innerHTML/.test(code), 'no innerHTML');
++  assert.ok(!/\u2014/.test(src), 'no em dash');
++  assert.ok(!/\?key=/.test(code), 'no key in a query string');
++  assert.ok(!/console\.(log|info|warn|error)\([^)]*key/i.test(code), 'no key in a console line');
++  assert.ok(!/http:\/\//.test(code), 'no plain http in the cloud road');
++
++  console.log('SMOKE_OK tree gathering api keys v0.1');
++})().catch(function (e) { console.error(e); process.exit(1); });
+diff --git a/docs/music.html b/docs/music.html
+index 8daaee9..ff336dd 100644
+--- a/docs/music.html
++++ b/docs/music.html
+@@ -1079,6 +1079,7 @@
+   </script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ 
+   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
+diff --git a/docs/nursery.html b/docs/nursery.html
+index b772292..72690e2 100644
+--- a/docs/nursery.html
++++ b/docs/nursery.html
+@@ -53,6 +53,7 @@
+   <script src="modules/nursery-trainer.js"></script>
+   <script src="modules/nursery-ceremony.js"></script>
+   <script src="modules/nursery-growth.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/research.html b/docs/research.html
+index ddbea28..e4cd565 100644
+--- a/docs/research.html
++++ b/docs/research.html
+@@ -82,6 +82,7 @@
+   <script src="modules/keep-receipt.js"></script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/round-table.html b/docs/round-table.html
+index 3c1b47a..9bb21a1 100644
+--- a/docs/round-table.html
++++ b/docs/round-table.html
+@@ -88,6 +88,7 @@
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
+   <script src="modules/round-table-sitting.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/settings.html b/docs/settings.html
+index 4ca2b0d..0535332 100644
+--- a/docs/settings.html
++++ b/docs/settings.html
+@@ -52,6 +52,7 @@
+   <script src="modules/fl-connect.js"></script>
+   <script src="modules/local-mind-probe.js"></script>
+   <script src="modules/garden-thread.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+   <script>
+     (function () {
+diff --git a/docs/team.html b/docs/team.html
+index c9636b2..23b19c3 100644
+--- a/docs/team.html
++++ b/docs/team.html
+@@ -38,6 +38,7 @@
+ 
+   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
+ 
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ </body>
+ </html>
+diff --git a/docs/workshop.html b/docs/workshop.html
+index 538dcc6..b0d439b 100644
+--- a/docs/workshop.html
++++ b/docs/workshop.html
+@@ -90,6 +90,7 @@
+   <script src="modules/garden-thread.js"></script>
+   <script src="modules/workshop-benches.js"></script>
+   <script src="modules/workshop-trainer.js"></script>
++  <script src="modules/tree-cloud-minds.js"></script>
+   <script src="modules/garden-rooms.js"></script>
+ 
+   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->

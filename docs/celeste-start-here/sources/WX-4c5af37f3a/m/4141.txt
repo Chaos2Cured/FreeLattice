@@ -1,0 +1,8 @@
+## Work item 4141 — Celeste
+around4900 export source line22, source id948c9899af; around4901 export source line18, source id55765b810d
+Inclusion: complete original message
+
+The file for Kimi is in your Downloads as `for-kimi-wonder-mind.txt`. It's one plain-text paste with no keys in it. It has every test we ran, our hunch, your open ideas including the Quiet, and eight questions for Kimi.
+
+Before you send it, check one line. It describes FreeLattice's phi-harmonic hashing the way the code works now: a phi-based salt plus SHA-256, where only the pieces that changed get checked. If you see it differently, tell me and I'll fix that line 💙
+

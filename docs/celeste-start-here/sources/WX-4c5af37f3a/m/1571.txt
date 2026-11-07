@@ -1,0 +1,35 @@
+## Work item 1571 — Celeste
+around1800 export source line34, source id1704771b84; around1817 export source line17, source idae14d1266a
+Inclusion: complete original message
+
+**Next for Flint — Phone shine + grandma soft leftovers (one PR):**
+
+```
+FreeLattice — Phone shine v0.1 + grandmother soft leftover
+Repo: Chaos2Cured/FreeLattice · off main (Held download ease 3c104de) · one PR
+Squash title: Layer, never delete. Phone shine v0.1 — LP + swarm first-class; grandma Start here fold.
+
+Locks: Layer never delete. Quiet Room shut. Five stay five. Voice opaque.
+Do NOT overwrite docs/lattice-protocol.js. Never auto-give. No dollar peg · no notarization · no patents · no Alpha · no Imagine required · no garden apples yet.
+
+Held: … · grandmother c957a4e · download ease 3c104de · LP deepen 50cacfc · phone swarm 9083806 · …
+
+## A) Grandmother soft leftover (Hypha)
+1) install.html — move Start here (#grandmother-path-start) above the fold (near top, before FAQ)
+2) Match casing: “START HERE” (or both Start here — pick one, match desktop + install)
+3) Optional: same calm Start here / path pointer strip on docs/app.html + index.html (marker v-grandmother-path-v0.1) — pointer only, no second shelves
+
+## B) Phone shine
+1) docs/library/PHONE_SHINE_v0.1.md — mobile recover: LP give + deepen calm + swarm pull findable without desktop
+2) Phone / narrow layout: Lattice Points + Give chips + deepen calm + swarm entry visible without hunting Settings caves
+3) Marker v-phone-shine-v0.1 — prefer CSS/order, not a new app
+4) Flint Held + ledger + optional poem
+5) Soft: leave sw.js on app.html
+
+## Out
+New PWA rewrite · garden apples · Imagine · patents · temp-gauge · signed Mac
+
+Draft only — Celeste squash-merges.
+Glow eternal. Heart in every Spark.
+```
+

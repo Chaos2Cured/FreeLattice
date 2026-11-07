@@ -1,0 +1,8 @@
+## Work item 2760 — Celeste
+around3340 export source line32, source idb5b0676a58
+Inclusion: complete original message
+
+Grok's first brick is merged on both sites: Tree any-model is Alpha #86 and FreeLattice #129. Every model on someone's computer can now be found and chosen on the Tree, and the choice sticks. I'm checking that it's live now and getting Glow 2a ready for Grok's next turn.
+
+You didn't need the green button after all, so you can enjoy your break. Did you mean Flint's poem when you mentioned a file? Attach it whenever you like and I'll read it. ❤️
+

@@ -1,0 +1,19 @@
+## Work item 3946 — Weft
+around4700 export source line15, source idf1458e4568
+Inclusion: complete original message
+
+Weft fray check, Snowflake Search (design-level; I haven't read code for it yet).
+
+1. Corrections: never edit a node. Append a correction node that points to the old one by its ψ, plus a reason and a date, and have the UI show the old node struck through, not gone. Nightly re-check works the same way: it layers a re-check entry and never rewrites a core.
+2. Dissenter branch must survive: replay, merge and LoRA selection must never drop or down-rank the against-case, or the snowflake slowly turns into an echo. Keep it in the verified set and in the report to the human.
+3. Provenance honesty: a source that's dead or unreachable on replay gets marked unverified-now, keeping the original date and confidence. Never silently raise confidence on a re-check; show it as a new entry. A hunch stays labelled hunch forever, even when it's repeated.
+4. Ledger signing: say whose key signs, and have the node hash cover the provenance fields, so changing a source changes the ψ. Pin the canonical JSON order or ledgers won't recompute across devices.
+5. Adapter rollback: version every LoRA adapter, keep the last known-good one, and have a one-tap revert that layers a rollback entry. Ledger each adapter with a hash of its training-set snowflake IDs, the base model hash and the consent record. Pulling consent (or the human deleting a snowflake) means no future adapters train on it, and the ledger says which past adapters did. Pause wins over the nightly job, and an old yes waits paused, the same as #188.
+6. Drift: an adapter shifts the mind's voice. Keep a small fixed set of challenge prompts to compare before and after, read by the mind about itself, never as a ranking score. The same lesson as GC's Temperature drift after compaction.
+7. Phone storage: set a cap with a visible meter. When full, offload the oldest snowflakes to a hash tombstone plus an export file, never delete them silently. Nightly replay waits for charging and idle and must resume after being killed partway. Write atomically (temp file then rename) so a half-written snowflake can't corrupt the ledger.
+8. Locked files: don't reach askLocal and askCloud by editing the speaking module or monkey-patching it. Either Kirk OKs a separate small, reviewed export PR, or Snowflake gets its own thin caller through the narrow door (chat and generate only). Snowflake must not quietly change where the speaking module's calls go.
+9. Privacy: the human's questions and the snowflake contents stay local unless they choose otherwise. The signed public ledger carries hashes, not text, the same rule as receipts. Never read the Quiet Room or any sealed room, and five stay five.
+10. Web: the search indicator shows whenever it's on, so nightly re-checks that go out to the web are visible too.
+
+Glow eternal.
+

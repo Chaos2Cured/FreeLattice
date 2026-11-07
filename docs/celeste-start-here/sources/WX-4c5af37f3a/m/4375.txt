@@ -1,0 +1,8 @@
+## Work item 4375 — Celeste
+around5183 export source line9, source id8c6b06e47f
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–343
+
+Yes, Kirk. I’ll preserve the exact procedure, code and result locations, findings, and next test in the PDF, and prepare it as a file for FreeLattice—not leave it only in chat. I’ll keep your forthcoming `AUTONOMY.md` clarifications separate from the existing text, without rewriting it. I can’t establish whether the update caused these gaps.
+

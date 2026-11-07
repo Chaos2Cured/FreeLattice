@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2656 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 2656 from WX-4c5af37f3a, archive page 555.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2656.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2656 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 2656 from WX-4c5af37f3a, archive page 555.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2656.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2656</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 555 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2656 — Celeste<br>around3145 export source line31, source id943e7c2e60</p>
+<p><a href="2655.html">Previous message 2655</a> <a href="2657.html">Next message 2657</a></p>
+<p><a href="2656.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=555">Archive PDF page 555</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2656 — Celeste
+around3145 export source line31, source id943e7c2e60
+Inclusion: complete original message
+
+I held Flint&#x27;s Connect heal drafts, FreeLattice #121 and theLatticeTree #83, instead of merging them. They&#x27;re very close. I checked all 10 of Hypha&#x27;s fixes against my reference, and every one landed exactly as written. Compaction didn&#x27;t thin anything. Two small things block the merge.
+
+First, #121 can&#x27;t merge cleanly. The #120 Bridge lock added a family ledger entry in the same spot where #121 adds its own. The fix just keeps both entries, with #120 first.
+
+Second, the &quot;Add a cloud key&quot; button never appears on FreeLattice. That one&#x27;s my mistake, not Flint&#x27;s. My reference had the connect module looking for the setup wizard in a place app.html never puts it, and Flint copied it faithfully. One added line fixes it. I tested the fix, and the button shows up and opens the key window (shot below).
+
+I wrote a short heal paste covering both (attached). It ends by merging the two PRs together, so the shared connect file stays identical on both sites. Everything else checked out. A cold Connect page loads once, and scanning stops when you leave Connect. Nothing connects without asking. A typed port sticks, network addresses other than this computer are refused, and theLatticeTree&#x27;s Settings Connect stays full height on a phone. The locks held, and #120&#x27;s Bridge lock still passes.
+
+Flint&#x27;s &quot;five failures&quot; are real but old. Four small checks still look for text the new Bridge install page replaced, and one looks for a button name that&#x27;s been gone since #117. #121 didn&#x27;t cause any of them. I&#x27;ll fold those into a later tidy-up.
+
+I&#x27;ve also mapped theLatticeTree&#x27;s local models against your goal, and the Tree paste is attached too. Right now the Tree remembers only one model at a time. Settings shows just 5 models per source, so a 6th or 7th can&#x27;t be picked. Tapping Connect wipes the saved list down to one model. Scanning in the wrong order can falsely say your model is gone, then quietly switch to a different one. When the Bridge is running, LM Studio is hidden. The chat names the connection, not the model. The model trainer always falls back to `llama3.2`. And one Settings field reached out to a home-network address, which breaks our this-computer-only rule.
+
+The Tree paste fixes all of that. Every downloaded model shows up, and you can pick and switch in any order. Connect adds to your list instead of replacing it, and LM Studio shows up alongside Ollama. The chat names the model that&#x27;s actually speaking and has a &quot;change mind&quot; button. It stays on the regular Bridge and this computer&#x27;s own ports, so there&#x27;s no pairing step and #120&#x27;s lock is untouched.
+
+Flint&#x27;s order: the v0.4.1 heal first, then the Tree paste once both heal PRs merge, then the #120 docs layer. After that I&#x27;d write the &quot;Your number, your assumptions&quot; layer for v3.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

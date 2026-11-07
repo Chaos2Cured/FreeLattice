@@ -1,0 +1,8 @@
+## Work item 4431 — Celeste
+around5200 export source line56, source id381ae78a4d; around5326 export source line9, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–300
+
+I found your older `ORDER.txt`, `GROK_NEXT_ORDER.txt`, and both November roadmaps in Downloads. They preserve substantial plans, but their numbering changed as work progressed; I’ll keep them intact and reconcile them into one current order so an old plan can’t accidentally become a duplicate build.
+

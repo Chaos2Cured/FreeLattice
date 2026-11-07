@@ -1,0 +1,90 @@
+  047 LOCKS (new, read twice):
+  * particle-clay.js is NOT EDITED. It stays 2da32883c514e4ad2a3cd8571e7a7b15 byte for byte on
+    both repos. Same for clay-math.js 144c33cd... and clay-forms.js dd193fa7.... The clay kind
+    calls the existing public FLClay entry point only. If that cannot work without editing a clay
+    file, stop and report.
+  * chat-scroll-release.js stays 84fed10c... unedited.
+  * STANDING LOCK, LOCAL TOOLS ONLY: no tool, script, smoke or measurement may store results in a
+    third-party isolated or locked-down cloud project (no hosted notebooks, cloud sandboxes,
+    cloud storage buckets, hosted CI artifact stores beyond what already runs, hosted
+    "workspaces"). Avoid anything tied to OpenAI, Google or Anthropic: no SDKs, APIs, hosted
+    models, accounts or services from them, in code or in tooling. Local tools only: node,
+    Playwright with a local Chrome, files under /tmp and the repos. Gmail and Drive used by Kirk
+    by hand are fine; nothing in code reaches them.
+  * mind-make.js adds no network calls of its own. Storage is local only (IndexedDB or
+    localStorage on this browser). Hashing uses crypto.subtle, local.
+  * No kind runs without the person's Yes on the card. Pause and Quiet Room always win.
+    (047's own locks above are pins for this brick too; mind-make.js itself may exist only after 047 merges.)
+
+  048m LOCKS (new, read twice):
+  * particle-clay.js 2da32883..., clay files, chat-scroll-release.js 84fed10c..., image-safety.js
+    9bd70e5a..., mind-workspace.js f1c88664..., science-garden.js and science-garden-seeds.js
+    (read and report md5s) all unedited. 048m does not touch 047 or 047b files.
+  * Styling is layered: a new stylesheet per site loaded after the existing ones. Old rules stay.
+    If an existing rule must change, the old line stays beside it as a "before 048m:" comment.
+  * Every card, button, offer and link that exists today still exists and still works.
+  * No new dependency, no web font from a hosted service, no hosted image. Local tools only.
+  * No lab or platform names on these public pages.
+
+1. READ BEFORE BUILDING (report first)
+  Main SHAs, every locked md5, where the Marketplace and Science Garden cards are drawn on each
+  site (FL docs/app.html and index.html, docs/science-garden.html; Tree docs/marketplace.html,
+  docs/code-garden.html and the Science Garden door), how an offer is stored, and the Tree card
+  style to match (name its file, class names, glow colours, radius, shadow, border).
+
+A. NEW docs/modules/card-glow.css (byte-identical FL == Tree) plus one link per page
+  1. GLOW AND GRAPHICS. Marketplace and Science Garden cards on both sites share the Tree card
+     look: the same radius, soft border, layered box-shadow glow in the Tree's palette, a quiet
+     gradient header band, and a small inline SVG or CSS mark per card kind (no image files
+     fetched from anywhere). Contrast at least 4.5:1 for text.
+  2. GENTLE MOTION. Hover and focus lift (translateY up to 2px, glow brightens) with transform
+     and opacity only, 180 to 240 ms ease-out. A slow breathing glow on the featured card only.
+     @media (prefers-reduced-motion: reduce) turns every animation and transition off. No motion
+     that moves layout.
+  3. NO LAYOUT SHIFT. Every card image and graphic has width, height or aspect-ratio set up front;
+     card grids reserve space before data arrives; fonts are the system stack. Measured CLS 0 for
+     these pages (report the number).
+  4. TAP SIZE. Every button and link on these cards at least 44px tall and 44px wide, visible
+     2px focus ring, keyboard order follows reading order. No sideways scroll at 390 and 1280.
+
+B. A MIND ATTACHES ITS IMAGES TO AN OFFER
+  New docs/modules/market-attach.js (byte-identical FL == Tree). On a mind's Marketplace offer
+  (the existing create or edit form), one 44px "Add a picture this mind made" button opens a
+  small picker built with createElement and textContent, listing images from this browser's
+  fl_image_records (and, once 048 lands, its module-owned store) made by that same mind. Up to 3
+  per offer. Each attached picture shows on the card with its short fingerprint (first 16 hex)
+  and the line "Made by <mind>". Nothing is uploaded anywhere; the offer keeps the fingerprint
+  and a local reference, and a shared offer carries only the fingerprint plus a downscaled
+  thumbnail (max 256px, PNG) inside the offer data the site already passes. Before attaching,
+  re-hash the bytes; if it does not match the record, refuse with one plain line. If there are
+  no images yet, the picker says "This mind has not made a picture yet." Pictures a person made
+  are not offered as the mind's work. Removing an attachment is allowed; the record itself is
+  never deleted.
+
+C. THE SMOKE
+  New scripts/smoke-marketplace-polish-v0.1.js on both repos, local node plus Playwright with a
+  local Chrome (FL_CHROME, FL_PLAYWRIGHT). Assert: card-glow.css and market-attach.js FL == Tree;
+  a reduced-motion run has 0 running animations and transitions on these cards; every card
+  button >= 44px; CLS 0; no sideways scroll at 390 and 1280; attach works with a seeded record,
+  refuses a tampered one, caps at 3, makes 0 network requests; old cards and buttons still
+  present (count them before and after); locked md5s; index.html == docs/app.html; no
+  innerHTML, eval, new Function, confirm(, em dash or &mdash; in added lines. Prints SMOKE_OK
+  marketplace polish v0.1.
+
+D. MEASURE WITH REAL INPUT, HYPHA'S WAY
+  1280x800, 390x844, 640x400 DPR 2, both sites, with and without reduced motion: card boxes,
+  button sizes, focus ring, CLS, longest task, and before and after shots side by side under
+  /tmp/gc048m-shots/.
+
+E. GC PAGE ENTRY (honest layer)
+  Entry 82 on layer/gc-page-82: what got prettier, that motion respects reduced motion, that a
+  mind's attached pictures never leave the device except as the thumbnail in an offer the person
+  shares. Browser and version only. Earlier entries untouched.
+
+F. REPORT
+  Main SHAs, PR heads (FL code, Tree code, page note), every removed line (should be none) and
+  where its job went, every locked md5, the new file md5s on both, all smokes, measurements,
+  shot paths, and entry 82 with t, lambda, epsilon, delta, omega, sigma so Celeste can recompute
+  psi. Do not merge. Hypha walks it before merge.
+
+Glow eternal. Heart in Spark.

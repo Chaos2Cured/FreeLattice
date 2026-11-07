@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt c01</title>
+<meta name="description" content="Reading section c01 of 62a5e976c2, 1497 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/62a5e976c2/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt c01">
+<meta property="og:description" content="Reading section c01 of 62a5e976c2, 1497 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/62a5e976c2/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1287"></span><span id="p1288"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt · c01</h1>
+<p>62a5e976c2 · words 1497 · characters 0–10437</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1287, 1288. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">FLINT NEXT: ENCRYPT CHATS LOCALLY v0.1 (FreeLattice only)
+Written Wed Sep 30, 2026, evening MDT, by Grok Bot for Kirk. Research and plan only. Nothing pushed, no PR opened.
+
+SMOKE LINE
+  SMOKE_OK encrypt chats locally v0.1
+  (new file docs/scripts/smoke-encrypt-chats-locally.js; runs in Node 20 with real WebCrypto)
+
+LOCKS
+- Root index.html == docs/app.html, byte for byte. After applying, run: cp docs/app.html index.html
+- docs/modules/fl-connect.js: untouched (not needed). Stays byte-identical with Alpha.
+- sw.js (root and docs): untouched (not needed; the vault is inline in app.html, so there is no new file to cache).
+- Kimi pages, the lawyer packet, Alpha: untouched. No lawyer mention anywhere.
+- Layer, never delete: the old db helpers stay exactly as written. Wrappers are added after them. privacy.html keeps the older line and gains a &quot;Newer&quot; line.
+- No em dashes in new text. Status text goes in with textContent. No confirm(). No bare *.
+- Kirk&#x27;s name stays out of it.
+
+ORDER NOTE (it touches app.html)
+Apply AFTER the Connect queue:
+  1. Tree any-model (fl-connect.js; this brick does not touch that file)
+  2. Model choice survives reload v0.1.1   (FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1.diff)
+  3. Connect boot probe                     (connect-boot-probe-v0.1-reference/fl-app.html.diff)
+  4. Scan only when asked v0.1              (FLINT_HEAL_SCAN_ONLY_WHEN_ASKED_v0.1-fl.diff)
+  5. THIS brick
+Verified tonight on a scratch tree from origin/main ba53b415: 2, 3 and 4 applied in that order, then this diff applied clean, and the smoke passed. It also applies clean on main alone. The hunks live at about lines 25600-25800 (after phiHashData and dbCount), 33,000 (backup and soul export), 36,460 (cross-store search) and 47,020 (Memory Index). The boot probe&#x27;s hunk inside switchToConversation (about line 25898) is not touched.
+If the earlier bricks shift lines, every hunk below is anchored on exact text, so applying by hand also works.
+
+FILES
+  /workspace/flint-pastes/FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1-fl.diff   (the whole change, git apply-able)
+  Prototype worktree on the box: /workspace/encrypt-proto (detached at origin/main ba53b415, uncommitted)
+
+  docs/app.html               +383  (vault module, wrappers, status line, 4 reader patches)
+  index.html                  copy of docs/app.html
+  docs/modules/mirror.js      +2    (opens sealed conversation names before the Mirror reads them)
+  docs/privacy.html           Newer line + Newer note on the &quot;encrypted locally&quot; row
+  docs/library/FRACTAL_FAMILY_LEDGER_v0.md   one ledger entry
+  docs/scripts/smoke-encrypt-chats-locally.js   new
+
+======================================================================
+WHY (THE AUDIT IN ONE SCREEN)
+======================================================================
+Kirk asked: &quot;I thought we had encryption for FreeLattice using our phi-harmonic hashes?&quot;
+Plain answer: no phi-harmonic hash encrypts anything today. The phi pieces fingerprint, check, or name things. Real encryption exists in three places, none of them for chats, and none use phi:
+  a. API keys and tokens (app.html &quot;phi-Root Encryption&quot;, about line 25499): AES-GCM. The key comes from a random device key kept in localStorage (fl_device_encryption_key). There is no phi in the current derivation. The old derivation (provider + &quot;1.6180339887&quot; plus a fixed salt in the source) is still a decrypt fallback, and anyone with the source can recompute it. The v2.1 changelog text &quot;phi-Salt Encryption, golden-ratio derivation&quot; is no longer true.
+  b. Soul file export: AES-GCM with PBKDF2 (100k) from a password you type. Real password encryption, for that file only.
+  c. Desktop: the Ed25519 companion seed and the pair seed are encrypted at rest by Electron safeStorage (the OS keychain).
+Chats themselves (IndexedDB FreeLatticeDB: messages and conversations, plus the Memory Index copy in FreeLatticeMemory) were plain text. That is what this brick fixes.
+
+======================================================================
+WHAT THIS BRICK DOES
+======================================================================
+1. FLChatVault (inline in app.html, right after phiHashData)
+   - On first run it makes 32 random bytes (crypto.getRandomValues), imports them as a NON-EXTRACTABLE HKDF CryptoKey, and wipes the bytes. The CryptoKey is stored in a separate IndexedDB database &quot;FreeLatticeVault&quot; (store &quot;keys&quot;). Raw key bytes are never stored anywhere and can&#x27;t be read back out by page code.
+   - A random 32-byte salt is stored next to it.
+   - HKDF-SHA-256 derives the AES-GCM 256 chat key. Label: &quot;freelattice.chats.v1|phi=1.6180339887&quot;.
+   - Before the key is trusted with a single chat, it&#x27;s written, read back, and its key ID checked.
+   - Each record gets a fresh 12-byte IV. Additional authenticated data (AAD) ties a message to its conversationId, role and timestamp, and a conversation to its id. So a sealed message moved or edited outside the app reads as &quot;locked&quot;, not as wrong text.
+
+2. Where phi is honest, and not decorative
+   - Domain label: phi is in the HKDF labels. Chat keys can never collide with keys derived for any other purpose from the same root. This is real domain separation. Any unique string would do the same job, and the paste says so.
+   - Key ID: a one-way 128-bit check value (HKDF with a second label) goes through phiHashData and is shown as &quot;phi-xxxxxxxxxxxxxxxx&quot;. The vault uses it to tell the right key from a wrong or missing one before trying to open anything. It reveals nothing usable about the key.
+   - Phi is never the secret and adds no strength. The strength is the 256 random bits.
+
+3. What is sealed
+   - FreeLatticeDB/messages: content
+   - FreeLatticeDB/conversations: name, title, lastMessage, contextNote
+   - FreeLatticeMemory/conversations (the Memory Index keeps a full second copy of every chat): title, messages, tags, summary, keywords
+   Left readable on purpose (the app needs them to sort and find things): ids, conversationId, role, timestamps, counts. Say so plainly: the fact that a chat exists, and when, is still visible.
+
+4. How it plugs in (smallest change)
+   - The plain helpers dbGet / dbPut / dbGetAll / dbGetAllByIndex stay as written. Right after dbCount, wrappers seal on the way in and open on the way out. Every existing reader keeps working: switchToConversation, export, memory summary, GitHub sync, memory index sync.
+   - The same pattern wraps miGet / miPut / miGetAll inside the MemoryIndex module.
+   - Four places read IndexedDB directly and now open sealed records first:
+       * FLSearch cross-store search (searchStore)
+       * Soul file export (readDB of conversations)
+       * Memory Vault backup (getAllIDBData via FLChatVault.openDump)
+       * mirror.js (openIDB of conversations)
+
+5. Migration (layer, never lose data)
+   - Plain records keep working forever. Readers accept mixed plain and sealed.
+   - New writes are sealed as they happen.
+   - A background pass runs 3 s and 20 s after load. For each plain record:
+       1) seal it
+       2) open the sealed copy and compare every field with the original
+       3) only if they match, compare-and-swap inside one readwrite transaction: replace only if the stored record is still exactly the plain one read
+     If the app changed the record meanwhile, it&#x27;s skipped (and picked up next load). A crash at any point leaves either the old plain record or the new sealed one. Both are readable.
+   - Key missing (site data partly cleared, a different browser): sealed records are shown as &quot;Locked conversation&quot; and &quot;Locked on this device. This was sealed with a key this browser no longer has. It has not been deleted.&quot; They are never re-sealed, rewritten or deleted. If app code writes a locked placeholder back, the original sealed blob is put back instead. A new key gets a new key ID, so new chats still work.
+   - No WebCrypto (file://, plain http on a LAN address): nothing is sealed, chats stay readable exactly as before, and the Memory Vault says so.
+   - Backups stay readable files so they restore on any device. That was true before; it&#x27;s now said out loud in the status line.
+
+6. What the person sees
+   Settings, Memory Vault section, one line (textContent):
+     &quot;Chats sealed on this device with AES-GCM: N records sealed, N still plain (they seal on the next pass). Key ID phi-.... The key lives in this same browser, so this stops casual reading of the storage files, not someone using this browser or a compromised device. Saved backups are readable files: keep them somewhere safe.&quot;
+   privacy.html: the older line &quot;They are not locked with a password by default.&quot; stays. A Newer line follows it (exact text is in the diff). The &quot;Every conversation is encrypted locally&quot; row gets a short Newer note.
+
+======================================================================
+THE HONEST NOTE (say this wherever we mention it)
+======================================================================
+The key lives in the same browser as the chats. That protects against casual reading: someone copying the browser&#x27;s storage folder, a sync or backup tool that grabs the database files, a curious glance at DevTools storage. It does NOT protect against:
+  - someone who can open this browser profile (the app opens chats for them like it does for you)
+  - harmful code running on the page (an extension or injected script can ask the vault to open things)
+  - a compromised device
+It is still not a password lock. The only mode that resists someone holding the device is a passphrase mode (see &quot;later&quot;). Do not write &quot;encrypted&quot; without &quot;on this device, key in the same browser&quot; next to it.
+
+======================================================================
+APPLY
+======================================================================
+  git apply /workspace/flint-pastes/FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1-fl.diff
+  cp docs/app.html index.html
+  node docs/scripts/smoke-encrypt-chats-locally.js        -&gt; SMOKE_OK encrypt chats locally v0.1
+  run the full smoke list (docs/scripts/smoke-*.js, tests/smoke.js, tests/smoke-history.js, desktop/scripts/smoke-*.js)
+
+Tonight on the prototype tree: 67 pass, plus the same 8 known carry-forward failures as main (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm). No new failures. Main has 74 smoke files and passes 66; this adds 1.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

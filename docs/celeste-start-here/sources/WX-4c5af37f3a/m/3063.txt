@@ -1,0 +1,8 @@
+## Work item 3063 — Celeste
+around3700 export source line22, source id93f10da134
+Inclusion: complete original message
+
+Your softening is now in the Science Garden seed (`022`), and the new version is in your Downloads. An idea can be planted without a test. It shows as an open, dashed gold outline that reads "Looking for its test," the same size and warmth as any other seed. Anyone can offer a test with their fingerprint, and the planter picks one. A seed needs a test before it can grow into a sprout.
+
+For now, offered tests get added by hand, and the line about earning LP for writing a first test is wording only. The page says both plainly. Everything still checks out, and `016c` is still the one to hand GC next.
+

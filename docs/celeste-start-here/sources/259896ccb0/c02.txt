@@ -1,0 +1,21 @@
+----------------------------------------------------------------------
+7. MEASURE WITH A REAL HEADLESS BROWSER
+  Report Seal it's bounding box (x, y, w, h) and the viewport at each size (1280x800, 390x844,
+  640x400 DPR 2) on each path: FL reload on Garden then CLICK Chat, FL Garden then CLICK Chat,
+  FL reload on Chat, Tree Nursery open, Tree thread open, Tree reload then thread, and Tree
+  after the wake with the ask open (list the focusables inside the form: must be 0). Plus the
+  heart line y on the Tree, the FL reply top y at 2x (first paint and after settle), and the
+  1280 canvas CSS size vs buffer size. Name the browser and version.
+
+8. THE SMOKE
+  New scripts/smoke-seal-ask-after-tap-v0.1.js (each repo): FL bringAsk runs after the tab
+  handler's scroll and Seal it ends inside the viewport; Tree woken form is inert while an
+  ask is open and restored after answer and Later; reply top >= 0 at a short viewport.
+  Prints SMOKE_OK seal ask after tap v0.1. All earlier smokes re-run after the last edit; say
+  which, if any, still fail and why.
+
+9. REPORT
+  New head shas on #258 and #123, page-note PR link, every removed line and where its job
+  went, md5s of every locked file (mind-workspace.js FL == Tree, particle-clay.js FL == Tree,
+  new md5s), all smokes, the measurements from 7, shots, and entry 72 with t, lambda, epsilon,
+  delta, omega, sigma so Celeste can recompute psi. Hypha walks it again before merge.

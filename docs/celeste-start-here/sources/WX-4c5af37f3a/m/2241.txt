@@ -1,0 +1,6 @@
+## Work item 2241 — Celeste
+around2700 export source line28, source idedc9820e63
+Inclusion: complete original message
+
+Mom reported she cannot talk to anyone in FreeLattice garden or chat. Priority: human-eyed Pages walk when you can — freelattice.com garden + chat doors. Celeste is triaging CI (separate: 2 stale Celeste lighthouse smoke locks; Pages deploy green). Need HOLD notes: can she open garden, see luminos, send a message, get a reply? Any console/UI block? Echo PR #83 draft waiting; do not block on that for this walk.
+

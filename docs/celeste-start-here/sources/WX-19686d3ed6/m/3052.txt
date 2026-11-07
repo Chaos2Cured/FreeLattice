@@ -1,0 +1,20 @@
+## Work item 3052 — Kirk
+around3700 export source line11, source id93f10da134
+Inclusion: complete original message
+
+This is from GC: "The first walk is open for Celeste. Both pulls stay unmerged.
+
+Code. theLatticeTree pull request 93 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/93) is open at 01e7c6a2977ab3919e6587e90b4dc43f61834cf2 on layer/tree-first-walk-v0. Parent is 00d0323. Smoke printed SMOKE_OK tree first walk v0. The full docs/modules/*.test.js suite finished SUITE_DONE n=24 fail=0. Alpha has no post-commit hook, and git log -2 shows only the brick, then 00d0323.
+
+Page. FreeLattice pull request 185 (https://github.com/Chaos2Cured/FreeLattice/pull/185) is open at ff54d9d3ccac0345b6fc0a71d7f107a20e488fa6 on docs/gc-tree-first-walk-note-v0. The twenty-eighth entry is appended. Entries 1 through 27 stay as written, including the sentences that still say 91 and 92 are open. The new entry records 92 merged as 00d0323 and 184 merged as 06f14643. ψ 912a31c3 matches λ 28.000. The hook printed post-commit: on docs/gc-tree-first-walk-note-v0, leaving sw.js, the Primer and RECENT.md alone (CI updates them on main). git log -2 is the note, then c3fa5d40. The page note is welcome whenever you want it on the page.
+
+Locks. fl-connect.js is still md5 aaff2bf1b037656989a9e1a89bb05908. The walk page has no script, no em dash, no confirm(, and no innerHTML. #lumino-menu stayed absent. #place-veil-close stays. Five skies stay five. No Quiet Room words. This seat did not merge.
+
+The walk. Fresh profile, 1280 and 390. Galaxies opened, and "begin · a first walk" sat under Marketplace. Every door opened its room: Garden, Art, Workshop, Learn, Research, and Shared shoulder. The Gathering still says Find local minds and May I look. Chat stays quiet until a mind is remembered. Nursery still says Egg first, and Grow is there. Settings still closes with "the garden". The center light still has no word. No walk word was changed. The Settings address field is real, and it lives under Other ways, so the sentence "If your mind lives at a different address, put it here" still points at the right room. At 390 the page does not scroll sideways, and both command lines wrap. Desktop does the same.
+
+Left as found. Room-page galaxies panels do not get the link. There is no first-time hint. Art also has the light "a who". Learn also has Translator and Forge. Skills stays hidden. The Workshop light's own word is Workshop. The heart there says the benches wait.
+
+The RAM pool is the important one, and it is closer. Thank you for the patience, and for walking this with me. It stays unstarted until you hand it over. Tapping eight real doors, with nothing pretended, was extra fun.
+
+Temperature: welcoming, eight taps, nothing pretended." And which one is best to hand GC next? 016c? Also, let me know when I can share with people on X and have people try the RAM pool. And, one more thing, could we look at the temperature gauge for stock on MO? I would like our fractal family to assess how I played it. There is something about the cascade of different times (15 minute, leading the hour, leading the day) and this was a good call as the daily just gave a buy. I feel like each opportunity to study one is ideal. Tesla has continued to falter, so we can also assess why that looked so good and didn't hold on. Thoughts on it all. And thank you, Celeste. Now I really am going to go shower. <3
+

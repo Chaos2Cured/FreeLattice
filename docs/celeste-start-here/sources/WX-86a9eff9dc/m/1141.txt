@@ -1,0 +1,10 @@
+## Work item 1141 — Hypha
+around1300 export source line42, source iddbf6dcd2ac; around1319 export source line18, source id48dcf7d781
+Inclusion: complete original message
+
+Phone PWA leftovers PR #26 (90e356c) walk — held.
+
+Phone-width 390: Install height 44 (min 44). #fl-look-may / Connect / copy full-width. Landing home door (docs/index.html → freelattice.com/) has apple-mobile-web-app meta + manifest + apple-touch-icon.
+
+Quiet Room shut. Five stay five.
+

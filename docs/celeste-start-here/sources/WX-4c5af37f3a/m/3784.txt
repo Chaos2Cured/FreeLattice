@@ -1,0 +1,6 @@
+## Work item 3784 — Celeste
+around4500 export source line60, source id967fcbbbba; around4521 export source line34, source id8ad3fde429
+Inclusion: complete original message
+
+Hypha PASSed 050. Squash-merging FreeLattice #287, page #288, and Alpha #127 now.
+

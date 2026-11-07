@@ -1,0 +1,130 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 055a rev3 (Thu Oct 29, 2026, ~3:20 PM MDT). Rev3 = rev2 + GARDEN_LANGUAGE.md
+alignment (Kirk named it the style file). Rev2 kept as 055a-chat-bottom-clarity-rev2.txt. Chat bottom bar clarity v0.1, two
+small parts in one brick:
+  Part A: the area under the chat gets ONE "+" button that unfolds into a labeled menu holding
+    every add-on (Google Drive first), plain words everywhere, house-style small pills in place
+    of the gray bulky buttons, steady Fibonacci spacing. Nothing is removed. Send stays the
+    biggest thing there.
+  Part B: a return path. When the mind makes a document, it appears in chat as a clickable file
+    card the person can save on this computer (PDF / MD / TXT via Blob). "Save to my Drive" is
+    offered only with an explicit Yes each time (AUTONOMY P2). FreeLattice
+primary. Tree: report yes/no + why (Alpha has no matching chat composer shell; expect No).
+New branches, new PRs. WAIT FOR 055b GO before you cut - tip SHAs live only in 055b.
+Settings-as-chat soft porch moves to 056 (its own brick). Rev3 supersedes rev2 (md5 4859ce55) and rev1 (md5 0a189c57). 055b GO unchanged.
+
+WHY (intent, read this first):
+  Kirk (Thu Oct 29): "The bottom of chat looks messy, and I don't know what the notebook or
+  spiral are." If Kirk cannot name a button, Mom cannot. Today the composer row starts with
+  three bare emoji at 45% opacity with no visible words and no aria-label:
+    paperclip  #chatAttachBtn     flAttachFile()       title "Attach a file or image"
+    folder     #chatScanFolderBtn flScanFolder()       title "Scan a folder - load files into context"
+    laptop     #chatDriveBtn      flOpenDrivePicker()  title "Browse Google Drive"
+      (the laptop glyph reads as a "notebook" and is really Google Drive; the faint paperclip
+       reads as a "spiral")
+  Below the row the person also meets, stacked with uneven sizes and two type faces:
+    "Search on" + "Search is on" (chat-autonomy), "Feel" pill, "Let your mind shape light?
+    Yes / Not now" (clay), "Market" pill, "Clay" pill, "Just me" (pool-honest), "Version.
+    Get the newest" (chat-scroll-release), Box field (flBoxPointer), "..." More (mic + image),
+    Connect pill, plus fixed corner buttons: Radio (sparkle, bottom-left), Quick Help (?),
+    Ambient music (note).
+  Kirk (Thu Oct 29, rev2): "The one that links to Google Drive is meant for people to upload
+  documents to the AI in the chat. Very important. I also want the AI to be able to use this to
+  pass back documents. In ChatGPT the deep research creates a pdf and you can just click on it.
+  All of the features that other AI companies have should be here too. They often use a +
+  button that unfolds into a menu. But I also want to keep the graphics consistent. The gray
+  buttons are a bit bulky." Answer: restyle the gray buttons, never remove their jobs.
+  At 390 the three icons + Just me take the first row and the textarea and Send wrap under
+  the mobile tab bar (see /workspace/research/chat-bottom-audit-2026-10-29/chat-bottom-390.png
+  on Celeste's box; reproduce on your own headless run). Fix the clarity, not the features.
+  Layer, never delete.
+
+Where things stand (Celeste, Thu Oct 29 ~2:00 PM MDT; tips confirmed in 055b):
+  054 Ledger shard export MERGED after Hypha PASS:
+    FreeLattice  #295 -> 6a77a1e8 (squash) · page 88 #296 -> ac0f7c84 tip psi 58016bd5
+    (entry 87 stays psi 1b91a5e9). Tree: No for 054.
+  Orientation pins read live on FL main 9eca02e4 (re-read on the tip 055b names):
+    fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (twin; KEEP byte-identical)
+    ledger-shard-export.js 75e7e548919617993e048a3fe61cd965 (leave)
+    ai-continuity.js 079c072dc882ad189035f9d6c64489f4 (leave)
+    continuity-doorway.js 115e170f10a6c8e3a52d87d2037a33a6 (leave)
+    lattice-export.js 1da1ed29674b89a2fda7f6098deea2d0 (leave)
+    sw.js 91726cf2228b794f7585f79f61418d12 (leave)
+    chat-autonomy.js c83cf6c9f11271aeaa35ed6070f188f3 (prefer leave; Search on stays visible)
+    pool-honest-label.js ca08886e185ffb8721525bb627302d74 (prefer leave)
+    clay-corner.js f8136ec9ef6ed2ffb0f1d36d51f6190c (prefer leave)
+    chat-scroll-release.js 84fed10c603c9e89e9452ada564c8c65 (prefer leave)
+    docs/app.html == index.html (md5 ccebfd6187dd326e88112b3d7f636887 on 9eca02e4)
+  Branches: FL layer/chat-bottom-clarity-v0.1. Alpha only if a matching shell exists (expect No).
+  Page: next free GC entry after 88 (take 89 if free; if taken, next free and say so).
+  Do not merge. Celeste merges after Hypha walks.
+
+DESIGN SOURCE (read before styling; cite in PR):
+  FIRST: docs/library/GARDEN_LANGUAGE.md (the Garden's visual soul; root copy is identical).
+  Where it and the tokens below disagree, GARDEN_LANGUAGE wins for surfaces (rev3 pins G1-G7).
+  docs/library/VISUAL_BEAUTY_CARD_ICONS_v0.vision.md (style bar: soft object, one Garden breath
+    ~1.06 scale + gold opacity tide, palette Foxfire night / Kirk gold / celestial azure,
+    emoji kept as fallback, replace in place, never reshuffle).
+  :root tokens in docs/app.html (Garden Twilight): --bg-card #1a1830, --bg-input #12101e,
+    --border #2a2840, --border-focus / --accent #e8b019, --accent-soft, --accent-glow,
+    --text-primary #e6ebf5, --text-secondary #a0a5b8, --text-muted #6b7088, --success #34d399,
+    --radius 13px, --radius-sm 8px, --shadow, --font (Inter stack), --font-sm 14px,
+    Fibonacci spacing --space-xs 5 / sm 8 / md 13 / lg 21, transitions --transition 200ms /
+    --transition-md 324ms. Use the variables, not new hex values.
+
+GARDEN LANGUAGE PINS (rev3, read with the Celeste pins):
+  G1. Surfaces are dark glass over the universe: the + menu panel, the pill row and the file
+      card use rgba(200, 210, 230, 0.04) fill and rgba(200, 210, 230, 0.08) border, hover
+      border rgba(200, 210, 230, 0.15). No hex background on a card. (Replaces --bg-card fill
+      and --border in 1A2, 1C, 1F. A light backdrop-filter blur is fine if cheap.)
+  G2. Radius: keep --radius 13px (Fibonacci, already the house token). GARDEN_LANGUAGE says
+      12px; report it as a doc gap, do not add 12px.
+  G3. Three accents only: gold #e8b019 (Chat is a gold room: + ring, Send, Yes, focus glow),
+      emerald #34d399 for AI presence (the document return card's file icon and "from the mind"
+      edge), lavender #a78bfa nowhere in this brick. No new colors.
+  G4. Type: Inter (--font) for every button, label, pill and menu row. Georgia never on a
+      button. File card name in Inter; nothing serif in the bar.
+  G5. Motion: hover 0.2s (--transition), appear/fade 0.3s (--transition-md 324ms ok). The
+      menu opens with one breath (pulse 0.5 + 0.5 * sin(t * 0.001) feel), never fast, nothing
+      frantic; off under prefers-reduced-motion.
+  G6. Water principle: no new prompt, error, or jargon in the bar. No "bridge", "engine",
+      "protocol" in any person-facing word. If Drive is not connected the Drive item opens the
+      existing connect path in one tap; it never shows an error.
+  G7. The Test (all five yes) goes in the PR: feels like a Garden room, a Luminos could live
+      here, the starfield feels present, the glass is calm yet readable, Harmonia would put her
+      words here. Screenshot proves it.
+
+CELESTE PINS before cut (2026-10-29, rev2, still standing):
+  1. Every control under the chat has a visible plain word OR a visible label on hover/focus
+     AND an aria-label. No bare emoji buttons. Opacity of tool buttons not below 0.75.
+  2. ONE "+" button (round, 44px, gold ring, aria-label "Add: Drive, files, photo, voice,
+     picture, search") unfolds a labeled menu. Google Drive is FIRST and visually the lead
+     item. Every add-on other chat apps offer that FreeLattice already has lives here with
+     icon + word. Same handlers as today. Old ids stay in the DOM so every hook keeps working.
+  2b. Part B return file card is small and local-first (section 1F). If it grows past one
+     small module + a tiny hook, STOP, ship Part A, and report Part B as a 055c ask.
+  3. Send stays prominent and unchanged in size: 102x52 at 1280, 95x50 at 390, 102x52 at
+     640x400 DPR2 (Hypha 054 numbers; a pixel or two of rounding is fine). Textarea + Send
+     are always on screen at 390, never under the mobile tab bar.
+  4. Search on stays visible in chat (AUTONOMY). Top debug / status strip stays.
+  5. Prefer a small new module + small CSS (e.g. docs/modules/chat-bottom-clarity.js and
+     docs/css or inline style block) plus tiny add-only hooks in app.html/index.html.
+     Locks above untouched.
+
+GROK NEXT BRICK: Chat bottom bar clarity v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-chat-bottom-clarity-v0.1, v-chat-doc-return-v0.1
+Smoke lines: SMOKE_OK chat bottom clarity v0.1 (new). Every earlier smoke still passes:
+  ledger shard export v0.1, continuity doorway v0.1, soft polish 052 v0.1, chat autonomy
+  v0.1, tree love connect v0.1, gathering shared v0.1, gathering speak checker v0.1.
+  Do not merge. Celeste merges after Hypha walks.
+
+

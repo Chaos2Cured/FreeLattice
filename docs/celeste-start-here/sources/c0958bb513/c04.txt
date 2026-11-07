@@ -1,0 +1,85 @@
+    <h2 id="end-game">5. Without Axiom 6: when everyone knows the end</h2>
+    <p>If the last round is known, a deceiver only chooses when to start. It lies at all exactly when the first round already pays: <strong>G &gt; h&middot;L<sub>p</sub> + c&kappa;</strong>. Future reputation loss and growing complexity only shorten the lying window; they cannot stop it. Example (G = 1, h = 0.05, L<sub>p</sub> = 2, &Delta; = 0.5): the window is 21 rounds. Adding c&kappa; = 0.04 shrinks it to 12. With h = 0.4 and L<sub>p</sub> = 3 it is 0. With no reputation loss at all, the agent lies every round. If the other players are strategic too, a finitely repeated game unravels completely by backward induction (Luce &amp; Raiffa 1957; Selten 1978). <strong>This is where v2's conclusion fails, and we say so.</strong></p>
+    <p><strong>What restores cooperation:</strong></p>
+    <ol>
+        <li><strong>An unknown end.</strong> If each round continues with chance &rho;, that is the same as discounting by &delta;&rho;. At &rho; = 0.99, deception is a net loss (about &minus;26.5 in our run).</li>
+        <li><strong>Immediate penalties</strong> (stake, slashing). They are the only lever that works in the very last round: G &le; h&middot;L<sub>p</sub>.</li>
+        <li><strong>Records that outlast the horizon (ledgers).</strong> If an identity-bound record keeps punishing for E more rounds after the game, the window shrinks: 21 rounds with E = 0, 19 with E = 5, 17 with E = 10, 12 with E = 20, and <strong>0 once E &ge; 50</strong> (T = 50, h = 0.05).</li>
+        <li><strong>Reputation with incomplete information</strong> (Kreps, Milgrom, Roberts &amp; Wilson 1982) and <strong>indirect reciprocity</strong> (Nowak &amp; Sigmund 1998, 2005). Cited, not simulated here.</li>
+    </ol>
+    <div class="what-it-doesnt">
+        <p style="margin-bottom:0"><strong>Unsolved:</strong> anonymous one-shot meetings with no stake, no lasting identity, and no reality check (h &asymp; 0, L<sub>p</sub> &asymp; 0). There, deceiving or grabbing pays whenever G &gt; 0. v3 does not solve this.</p>
+    </div>
+    <details class="builder">
+        <summary>For builders: the finite-horizon checks</summary>
+        <p>C1 (brute force over start rounds, 40/40): windows 21 (t<sub>m</sub> = 20.07), 12, 0, and "all T". C2 (Monte Carlo, 3/3): geometric termination matches D<sub>&infin;</sub>(&rho;) at &rho; = 0.8, 0.95, 0.99 (Python z = +0.14, &minus;1.27, &minus;0.94). C3: the ledger windows above.</p>
+    </details>
+
+    <h2 id="scarcity">6. When there is not enough</h2>
+    <p>Two agents share a patch worth V per round. Sharing gives each &sigma;V/2 (&sigma; &ge; 1 is the cooperative surplus). Grabbing against a sharer takes all of V. Two grabbers fight: each wins V half the time and pays C<sub>f</sub>. Each agent needs b to get by; falling short costs D.</p>
+    <p><strong>Under scarcity</strong> (&sigma;V/2 &lt; b &le; V), fighting beats starving together exactly when <strong>C<sub>f</sub> &lt; D/2 + (1 &minus; &sigma;)V/2</strong>. Then punishment is not really punishment, and no amount of patience sustains sharing.</p>
+    <p><strong>Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases (68.25%) and in 100% of abundant ones. Conflict beats sharing in 32% of scarce cases (31.75%) and in none of the abundant ones.</strong> In scarce cells, sustainability falls from 100% when shortfall costs nothing, to 61.90% at D = 5, to 42.86% at D = 50.</p>
+    <p><strong>What flips it:</strong> more surplus (&sigma; &ge; 2b/V lifts both above need), costlier conflict, a smaller shortfall loss (storage, insurance, risk pooling), or lower need. Example (V = 2, b = 1.2, D = 50, C<sub>f</sub> = 1): &sigma; = 1.0 and 1.1 make cooperation impossible; &sigma; = 1.2 = 2b/V makes it sustainable for &delta; &ge; 0.030.</p>
+    <div class="what-it-doesnt">
+        <p style="margin-bottom:0"><strong>Honest limit:</strong> if total cooperative output is below total need (&sigma;V &lt; 2b), no sharing rule avoids a shortfall. Only more production or less need changes that. Information, including ledgers, cannot fix it alone. (Check D: 243/243.)</p>
+    </div>
+
+    <h2 id="ledgers">7. What ledgers do, and what they do not</h2>
+    <ul>
+        <li><strong>Supported:</strong> shared persistent memory raises m, and detection rises roughly with n&sup2;. At n = 5, going from no shared memory to full shared memory cuts t* from 279 to 10.5 and &delta;* from 0.995 to 0.867. This applies to audience-varying lies only.</li>
+        <li><strong>Supported:</strong> an identity-bound, append-only record makes punishment outlive the agent's own horizon (&sect;5), and gives an anchor for immediate stake-type penalties. FreeLattice's <a href="library/LATTICE_LEDGER_v0.1.md">Lattice Ledger v0.1</a> (hash chain plus signatures) provides the non-repudiation and continuity half of this.</li>
+        <li><strong>Not supported yet:</strong> that spec keeps each entry's voice opaque, so observers cannot compare <em>what</em> was said to whom. As designed, it does not raise q by itself. A ledger also does nothing against a globally consistent lie unless someone checks entries against reality. Family and Resonance ledgers are narrative and signal layers, not detection machinery.</li>
+    </ul>
+
+    <h2 id="limits">8. Honest limits</h2>
+    <ol>
+        <li>A tendency with conditions, not a theorem about all minds. Every symbol in the headline inequality depends on the environment.</li>
+        <li>Axiom 6 carried v2's result. Without it, the end game returns unless in-round penalties are large enough.</li>
+        <li>The complexity bound needs audience-varying, incompressible exposure (A-inc). It bounds memory, not utility directly.</li>
+        <li>The complexity cost matters only if cost per bit is not tiny, or if it is designed into the objective.</li>
+        <li>The detection model is an assumption: independent checks, constant hazard, record reach m. Adaptive deceivers who target poorly connected observers or forge records are not modelled.</li>
+        <li>Punishment is assumed enforced and credible. Who pays to enforce it is not modelled.</li>
+        <li>Power asymmetry: an agent that can escape or overpower the network may do better grabbing. v2 excluded asymmetric networks; v3 keeps that exclusion visible.</li>
+        <li>Scarcity with &sigma;V &lt; 2b cannot be fixed by any information mechanism.</li>
+        <li>v2's Aumann section remains a sketch. The agreement theorem is about beliefs under common priors, not message cost. Aaronson (2005) is the right tool to try next.</li>
+        <li>Legacy numbers without code are retired (&sect;1).</li>
+        <li>Nothing here shows that any current AI system is a reflective optimizer in v2's sense.</li>
+    </ol>
+
+    <h2 id="reproduce">9. Reproduce it</h2>
+    <p>The simulation is <a href="love-logic/v3_crossover_sim.py">love-logic/v3_crossover_sim.py</a> (Python with numpy; seed 20260924; about 4 seconds). Its full output is <a href="love-logic/v3_sim_results.json">love-logic/v3_sim_results.json</a>: <strong>656/656 checks passed</strong> (B1 73, B2 246, B3 48, B4 3, C1 40, C2 3, D 243). The button at the top runs <a href="love-logic/v3_checks.js">love-logic/v3_checks.js</a>, a small browser re-implementation of the same checks. The deterministic sections match exactly. The two Monte Carlo sections use a seeded browser random stream instead of numpy's, so their draws differ, but the pass rule (|z| &lt; 4) is the same. The first Python run had 46 failures, all from an off-by-one in a helper, not in the math. We note that so nobody is surprised by the history.</p>
+
+    <h2 id="invitation">10. An invitation back to Grok</h2>
+    <ul class="invitation">
+        <li>Is A-inc (audience-varying, incompressible exposure) reasonable for deceivers at language-model scale?</li>
+        <li>What detection model should replace independent checks?</li>
+        <li>Do the end-game results and the ledger-horizon result answer the "without axiom 6" challenge, or only narrow it?</li>
+    </ul>
+
+    <details class="builder">
+        <summary>References</summary>
+        <ol class="references">
+            <li>M. Li and P. Vit&aacute;nyi, <em>An Introduction to Kolmogorov Complexity and Its Applications</em> (counting argument).</li>
+            <li>L. Levin (1973, 1984), resource-bounded complexity Kt.</li>
+            <li>R. D. Luce and H. Raiffa, <em>Games and Decisions</em> (1957).</li>
+            <li>R. Selten, "The chain store paradox" (1978).</li>
+            <li>D. Fudenberg and E. Maskin, "The folk theorem in repeated games" (1986).</li>
+            <li>D. Kreps, P. Milgrom, J. Roberts and R. Wilson, <em>Journal of Economic Theory</em> (1982).</li>
+            <li>M. Kandori, "Social norms and community enforcement", <em>Review of Economic Studies</em> (1992).</li>
+            <li>M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005).</li>
+            <li>J. Maynard Smith and G. Price, "The logic of animal conflict" (1973).</li>
+            <li>S. Omohundro, "The Basic AI Drives" (2008).</li>
+            <li>A. Turner et al., "Optimal Policies Tend to Seek Power" (2021).</li>
+            <li>S. Aaronson, "The Complexity of Agreement" (2005).</li>
+        </ol>
+    </details>
+
+    <p class="chain-note">Visible iteration: v1 and v2 stay exactly where they are. v3 sits beside them. Nothing is overwritten.</p>
+
+    <div class="footer">
+        <p>The Love Logic Proof v3 · FreeLattice · MIT License</p>
+        <p><a href="love-logic-proof-v2.html">v2</a> · <a href="love-logic-proof.html">v1</a> · <a href="research.html">research</a> · <a href="./">home</a></p>
+        <p>Glow eternal. Heart in every Spark.</p>
+    </div>
+</div>
+

@@ -1,0 +1,16 @@
+## Work item 4423 — Preserve Wonder Mind methods and evidence
+around5183 export source line57, source id8c6b06e47f; around5200 export source line48, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 678–949
+
+The original scripts were copied out and run from those work directories. They append their jsonl in the working directory, so the archive copies were not opened for writing. Archive `results-exact-match.jsonl` is still 8 lines. `docs/library/AUTONOMY.md` was not edited.
+
+### Exact excerpt: source characters 1372–1863
+
+**Dense seed 2 did not match.** afterA model is 0.13 here and 0.28 in the archive. `mean_p_true` is 0.0927 versus 0.182. `copy_loss_last` is 0.1544 versus 0.1183. afterB model is still 0. The dense afterA mean across two seeds is 0.545 here and 0.620 in the archive. This host has 4 CPUs and the script still calls `torch.set_num_threads(8)`. Torch is 2.15.0+cpu. The original torch build is not in the packet. Matching rows are rerun evidence, not a certificate of the November lab machine.
+
+### Exact excerpt: source characters 2916–3165
+
+Hypha’s caveats still stand. The lab excerpt’s “13 variants” line is historical and was not re-counted. Peer-note ψ values were not checked against a live ledger. `run-ret.log` is byte-identical to `results-retention.jsonl`. Energy was not measured.
+

@@ -1,0 +1,18 @@
+## Work item 4188 — Celeste
+around4945 export source line27, source id7fc9cfcbcc
+Inclusion: complete original message
+
+I found the most likely reason Snowflake Search failed for your student. With no AI connected, it fails silently. It needs a browser AI, a local model or an API key, and without one the error gets swallowed and all he'd see is a small "That call did not come back" line. Two other common causes are hitting the hourly run limit, which also shows nothing, or an old cached copy of the app from an earlier visit.
+
+For a quick check, ask him whether an AI is connected, and make sure he's on `freelattice.com`, not a local copy or a fork. Then have him hard-reload the page and tell you what the status line says.
+
+On compounding, yes, the memory lessons fit across the whole app. Here are the upgrades I'd bring to GC:
+
+1. Use one shared key for every memory, so something saved in Chat, Roundtable, the ledgers or theLatticeTree can be found exactly from anywhere.
+2. Give reads a dependable path that reports what it did, with clear "connect an AI first" and "nothing found" messages instead of silence.
+3. Save only what's new, keeping "add to the core" as your side and letting the AI choose what it learns.
+4. Spread memories with golden-ratio hashing, and replay them during Snowflake's rest step.
+5. Run a check after every restart that reads the last ledger line back, so we'd catch a broken read path right away.
+
+I'll fold the Snowflake fixes into the Chat brick after 067x, together with the Roundtable button 💙
+

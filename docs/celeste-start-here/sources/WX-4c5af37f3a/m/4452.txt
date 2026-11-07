@@ -1,0 +1,8 @@
+## Work item 4452 — Celeste
+around5326 export source line30, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–310
+
+Reed and Weft’s review is saved and verified in `Downloads/Celeste/2026-11-06-memory-reading-review-reed-weft.md`, with the source index, proposed checks, and the practiced-answer qualification. Our continuity and order files now carry that correction too; the original results and GC handoff remain unchanged.
+

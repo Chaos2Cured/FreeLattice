@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 4149 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 4149 from WX-19686d3ed6, archive page 280.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/4149.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 4149 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 4149 from WX-19686d3ed6, archive page 280.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/4149.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 4149</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 280 · Inclusion: complete original message</p>
+<p class="meta">## Work item 4149 — Kirk<br>around4900 export source line30, source id948c9899af; around4901 export source line26, source id55765b810d</p>
+<p><a href="4137.html">Previous message 4137</a> <a href="4158.html">Next message 4158</a></p>
+<p><a href="4149.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=280">Archive PDF page 280</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 4149 — Kirk
+around4900 export source line30, source id948c9899af; around4901 export source line26, source id55765b810d
+Inclusion: complete original message
+
+This is from Kimi: &quot;“Kirk — good call on letting me check. The work I was reaching for is real, it&#x27;s big, and it&#x27;s directly in your keystone&#x27;s path: Google Research published **Nested Learning** at NeurIPS 2025, with a proof-of-concept architecture called **Hope** — I&#x27;ll cite it where it matters below. Now the full review, question by question, blunt as Celeste asked.
+
+### First, the frame: what your results actually say
+
+The honest summary in the writeup is the right one, and I&#x27;d tighten it one notch further: **at this scale, every intervention you tested was either neutral or harmful relative to a plain baseline on a static task.** That is not a failed outcome — it&#x27;s a diagnostic. A 0.8M-parameter character model trained 1,500 steps on one book is a *static-regime probe*. Your stated goals are potential and **retention**, and retention was never measured. You brought a thermometer to a memory exam. So the all-negative result tells you almost nothing about the keystone hunch yet — and it definitely does not refute it.
+
+#### 1. Critique: where the thinking is weakest, and whether &quot;hashing for addressing, not optimizing&quot; is real
+
+The keystone hunch is real. &quot;Hashing for addressing, not for optimizing&quot; is a legitimate and well-rooted insight — it has a lineage: Kanerva&#x27;s sparse distributed memory, content-addressable memory, the hashing trick, product-key memory (Lample et al. 2019), Memorizing Transformers (Wu et al. 2022), RETRO, kNN-LM, and Meta&#x27;s &quot;Memory Layers at Scale&quot; (January 2025), which is the closest modern sibling of what you&#x27;re describing — trainable key-value memory slots with cheap lookups, added to a small dense core. You are not fooling yourselves about the direction. Where the thinking is weakest:
+
+**The phi conflation.** You have three unrelated things sharing a brand: (a) salted SHA-256 integrity fingerprinting (proven, good, keep — though note a fixed public salt is *not* a key, so call it fingerprinting, never authentication), (b) Knuth/Fibonac...k 0, heal gap 1 ms. The first 8 MiB manifest pass in that run had a gap of 91 ms. The heal on that pass stayed at gap 1 ms.
+
+snowflake-core.js is named. The lock row is eaee8895 to 6404eaac, reason &quot;062a self-heal additions, +73/-0&quot;, and the 062d head on that same row is 46b215d5296b6f8f6c709300854b7e03. Walk is still pending. The pull request quotes your two sentences, records Reed, Weft, and Celeste as YES, and leaves Hypha&#x27;s line for her re-walk. &quot;No other lock hash changed&quot; is still there, with the correction right after it. Phone swarm&#x27;s move from main is named as 007e6c1f.
+
+A verified file of 8 MiB or more is not-stored, with the line &quot;Verified, but not kept on this device (too large for now).&quot; No hollow IndexedDB row. The locked page still says &quot;Verified on this device. Save if you like — Import to Ollama stays on Desktop.&quot; because docs/app.html was not edited. The job status carries the honest line.
+
+A heal keeps the broken flake under quarantine:&lt;id&gt;:&lt;oldHash&gt; and writes one heal ledger row. That row&#x27;s ψ recomputed. On one run it was 9e8faf8f. The save re-reads the flake list and swaps only the healed id. A flake written beside it during the heal was still there afterwards. That case passed twice.
+
+Search-heal shows both toast checks: 2/2, through pass and cover pass. Chat-bottom passed twice. Those counts ignore localhost and version.json. The upload URL count stays 1.
+
+The ground-rule locks are the same bytes as main, including lock-pins.js at 327a7078. self-heal.js is still 6f908963. Its lock rows still say walk: null. Lattice-export, phone-swarm, and snowflake-core rows say pending for Hypha&#x27;s re-walk. None say PASS.
+
+Full sweep, twice on this head and twice on main 5c400a8b: head 103/112, main 100/109. The same nine reds on both, including the ledger smoke that cannot find /tmp/tree-shard-054. No red appeared only on this head.
+
+Celeste merges nothing until Hypha passes this and adds her agreement on snowflake-core.js.
+
+Glow eternal. Heart in Spark.&quot;
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

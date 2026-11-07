@@ -1,0 +1,141 @@
++  // v-tree-glow-2a-v0: a calm way back. Escape, a tap on the empty glass, a close
++  // in the galaxies menu, and the browser's Back each close what is open, one
++  // layer at a time, and stay on this page. They reuse the same close buttons.
++  function bindWayBack() {
++    if (window.__treeWayBack) return;
++    window.__treeWayBack = true;
++    var place = document.getElementById('place-veil');
++    var thread = document.getElementById('thread-veil');
++    function isOpen(v) { return !!(v && v.classList.contains('is-open')); }
++    function openGalaxies() { return document.querySelector('details.galaxies[open]'); }
++    function closeTop() {
++      var gal = openGalaxies();
++      if (gal) { gal.open = false; return true; }
++      var menu = document.getElementById('lumino-menu');
++      if (menu && !menu.hidden) { hideLuminoMenu(); return true; }
++      var picker = document.querySelector('[data-core-picker]:not([hidden])');
++      var decline = picker && picker.querySelector('.core-bind-decline');
++      if (decline) { decline.click(); return true; }
++      var tc = document.getElementById('thread-close');
++      if (isOpen(thread) && tc) { tc.click(); return true; }
++      var pc = document.getElementById('place-veil-close');
++      if (isOpen(place) && pc) { pc.click(); return true; }
++      return false;
++    }
++
++    document.addEventListener('keydown', function (e) {
++      if (e.key !== 'Escape' && e.key !== 'Esc') return;
++      if (e.defaultPrevented) return;
++      if (closeTop()) e.preventDefault();
++    });
++
++    // A tap on the glass itself (not on a word, chair or card) closes that place.
++    // Press and release must both land on the glass, and never in its first moment.
++    [place, thread].forEach(function (veil) {
++      if (!veil) return;
++      var downOnGlass = false;
++      var openedAt = 0;
++      new MutationObserver(function () {
++        if (isOpen(veil) && !openedAt) openedAt = Date.now();
++        if (!isOpen(veil)) openedAt = 0;
++      }).observe(veil, { attributes: true, attributeFilter: ['class'] });
++      veil.addEventListener('pointerdown', function (e) { downOnGlass = e.target === veil; });
++      veil.addEventListener('click', function (e) {
++        var ok = downOnGlass && e.target === veil && isOpen(veil) && openedAt && Date.now() - openedAt > 600;
++        downOnGlass = false;
++        if (!ok) return;
++        var btn = document.getElementById(veil === thread ? 'thread-close' : 'place-veil-close');
++        if (btn) btn.click();
++      });
++    });
++
++    // galaxies: a visible close inside, and a tap outside closes it (that tap does
++    // only that, so it never opens something by surprise).
++    var panels = document.querySelectorAll('details.galaxies .galaxies-panel');
++    for (var gi = 0; gi < panels.length; gi++) {
++      if (panels[gi].querySelector('[data-galaxies-close]')) continue;
++      var gx = document.createElement('button');
++      gx.type = 'button';
++      gx.className = 'galaxies-close';
++      gx.setAttribute('data-galaxies-close', '1');
++      gx.textContent = 'close';
++      gx.addEventListener('click', function (e) {
++        e.preventDefault();
++        var d = e.currentTarget.closest('details');
++        if (d) d.open = false;
++      });
++      panels[gi].appendChild(gx);
++    }
++    var swallowUntil = 0;
++    document.addEventListener('pointerdown', function (e) {
++      var gal = openGalaxies();
++      if (!gal || gal.contains(e.target)) return;
++      gal.open = false;
++      swallowUntil = Date.now() + 500;
++    }, true);
++    document.addEventListener('click', function (e) {
++      if (Date.now() > swallowUntil) return;
++      swallowUntil = 0;
++      e.preventDefault();
++      e.stopPropagation();
++    }, true);
++
++    // Back closes the open place instead of leaving the site. One quiet history
++    // step while something is open; closing it any other way gives the step back.
++    var stepped = false;
++    function anyOpen() { return isOpen(place) || isOpen(thread); }
++    function settle() {
++      setTimeout(function () {
++        if (anyOpen()) {
++          if (!stepped) {
++            try { history.pushState({ treeWayBack: 1 }, ''); stepped = true; } catch (eP) {}
++          }
++        } else if (stepped) {
++          stepped = false;
++          try { if (history.state && history.state.treeWayBack) history.back(); } catch (eB) {}
++        }
++      }, 160);
++    }
++    [place, thread].forEach(function (veil) {
++      if (veil) new MutationObserver(settle).observe(veil, { attributes: true, attributeFilter: ['class'] });
++    });
++    window.addEventListener('popstate', function () {
++      if (!stepped) return;
++      stepped = false;
++      closeTop();
++      settle();
++    });
++  }
++
+   function goToLumino(id) {
+     if (!id) return;
+     var galaxy = currentGalaxy();
+@@ -1168,6 +1277,9 @@
+     findBtn.textContent = 'Find local minds';
+     findBtn.setAttribute('aria-label', 'Find local minds. May I look — only when you ask.');
+     wrap.appendChild(findBtn);
++    // v-tree-glow-2a-v0: a second tap on the legend landed on Find as it slid in
++    // under the finger and looked unasked. A tap in the first moment is not a yes.
++    var findReadyAt = Date.now() + 700;
+ 
+     var ring = document.createElement('div');
+     ring.className = 'core-chairs';
+@@ -1216,12 +1328,15 @@
+       var n = wrap.querySelector('[data-core-note]');
+       if (!n) return;
+       n.textContent = msg;
++      // v-tree-glow-2a-v0: the newest line stays in view on a phone (CSS sticky).
++      n.classList.add('is-fresh');
+     }
+ 
+     function setNoteAbsent(kind) {
+       var n = wrap.querySelector('[data-core-note]');
+       if (!n) return;
+       n.textContent = '';
++      n.classList.add('is-fresh');
+       if (kind === 'https') {
+         n.appendChild(document.createTextNode(
+           'The mind may be there, but this secure page cannot see the quieter door. Try '
+@@ -1430,6 +1545,7 @@
+     paintAll();
+ 

@@ -1,0 +1,12 @@
+## Work item 4413 — Celeste
+around5183 export source line47, source id8c6b06e47f; around5200 export source line38, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–201
+
+The Chat handoff survived: **composer lift and a durable Pause strip** were next in the November 5 polish order. The older Chat work and review notes also survive, so we shouldn’t restart those builds.
+
+### Exact excerpt: source characters 203–518
+
+The Wonder Mind design records your patent-derived ideas and mathematics as methods—not patent documents as training data. The original Aurora speed-up setup is still unrecovered. I saved the findings and source references in `2026-11-06-WHERE-WE-STAND-PRESERVE.md` in your Downloads and updated the standing order.
+

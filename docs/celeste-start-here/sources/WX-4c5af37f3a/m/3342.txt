@@ -1,0 +1,6 @@
+## Work item 3342 — Celeste
+around3999 export source line51, source id67eb748a96; around4000 export source line48, source id0398910013
+Inclusion: complete original message
+
+The 038b ledger fix is merged, and the voice chain verifies every line again. A faked entry now gets caught. Next, give GC `GROK_NEXT_039_WORKSPACE_CORE_2026-10-13.txt`, the first piece of the Workspace notebook. It's already in your Downloads. 💙
+

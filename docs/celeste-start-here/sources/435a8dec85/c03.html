@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt c03</title>
+<meta name="description" content="Reading section c03 of 435a8dec85, 1600 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/435a8dec85/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt c03">
+<meta property="og:description" content="Reading section c03 of 435a8dec85, 1600 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/435a8dec85/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1027"></span><span id="p1028"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt · c03</h1>
+<p>435a8dec85 · words 1600 · characters 23463–36506</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1027, 1028. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">     &lt;p&gt;&lt;strong&gt;How long lying stays ahead&lt;/strong&gt; (q&lt;sub&gt;0&lt;/sub&gt; = 0.002, q = 0.01, G = 1, L&lt;sub&gt;p&lt;/sub&gt; = 2, &amp;Delta; = 0.5; no discounting):&lt;/p&gt;
++    &lt;p class=&quot;scroll-hint&quot;&gt;Slide the table sideways to see every column.&lt;/p&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;
++    &lt;div class=&quot;table-scroll&quot; role=&quot;region&quot; aria-label=&quot;How long lying stays ahead, scrolls sideways&quot; tabindex=&quot;0&quot;&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;
+     &lt;table class=&quot;data&quot; id=&quot;crossover-table&quot;&gt;
+         &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Contacts n&lt;/th&gt;&lt;th&gt;Shared memory m&lt;/th&gt;&lt;th&gt;h(n, m)&lt;/th&gt;&lt;th&gt;Rounds lying is ahead, t*&lt;/th&gt;&lt;th&gt;Lead peaks at&lt;/th&gt;&lt;th&gt;Patience needed, &amp;delta;*&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+         &lt;tbody&gt;
+@@ -228,6 +273,7 @@
+             &lt;tr&gt;&lt;td&gt;20&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0.0392&lt;/td&gt;&lt;td&gt;67.60&lt;/td&gt;&lt;td&gt;26.10&lt;/td&gt;&lt;td&gt;0.9791&lt;/td&gt;&lt;/tr&gt;
+         &lt;/tbody&gt;
+     &lt;/table&gt;
++    &lt;/div&gt;
+     &lt;p&gt;More contacts and more shared memory cut the time lying stays ahead by one to two orders of magnitude, and lower the patience needed. Past a point, lying is never ahead at all.&lt;/p&gt;
+ 
+     &lt;details class=&quot;builder&quot;&gt;
+@@ -245,7 +291,7 @@
+     &lt;p&gt;If the last round is known, a deceiver only chooses when to start. It lies at all exactly when the first round already pays: &lt;strong&gt;G &amp;gt; h&amp;middot;L&lt;sub&gt;p&lt;/sub&gt; + c&amp;kappa;&lt;/strong&gt;. Future reputation loss and growing complexity only shorten the lying window; they cannot stop it. Example (G = 1, h = 0.05, L&lt;sub&gt;p&lt;/sub&gt; = 2, &amp;Delta; = 0.5): the window is 21 rounds. Adding c&amp;kappa; = 0.04 shrinks it to 12. With h = 0.4 and L&lt;sub&gt;p&lt;/sub&gt; = 3 it is 0. With no reputation loss at all, the agent lies every round. If the other players are strategic too, a finitely repeated game unravels completely by backward induction (Luce &amp;amp; Raiffa 1957; Selten 1978). &lt;strong&gt;This is where v2&#x27;s conclusion fails, and we say so.&lt;/strong&gt;&lt;/p&gt;
+     &lt;p&gt;&lt;strong&gt;What restores cooperation:&lt;/strong&gt;&lt;/p&gt;
+     &lt;ol&gt;
+-        &lt;li&gt;&lt;strong&gt;An unknown end.&lt;/strong&gt; If each round continues with chance &amp;rho;, that is the same as discounting by &amp;delta;&amp;rho;. At &amp;rho; = 0.99, deception is a net loss (about &amp;minus;26.5 in our run).&lt;/li&gt;
++        &lt;li&gt;&lt;strong&gt;An unknown end.&lt;/strong&gt; If each round continues with chance &amp;rho;, that is the same as discounting by &amp;delta;&amp;rho;. At &amp;rho; = 0.99, deception is a net loss: &lt;strong&gt;&amp;minus;26.42&lt;/strong&gt; by the closed form D&lt;sub&gt;&amp;infin;&lt;/sub&gt;(&amp;rho;) (the Python Monte Carlo run gave &amp;minus;26.52, which is where an earlier &quot;about &amp;minus;26.5&quot; came from). &lt;span class=&quot;params&quot;&gt;Settings (check C2): G = 1, c = 0.001, &amp;kappa; = 20, h = 0.03, L&lt;sub&gt;p&lt;/sub&gt; = 2, &amp;Delta; = 0.5, no other discounting. At &amp;rho; = 0.8 and 0.95 the same settings give +3.53 and +5.10, so deception still pays when the end is likely to come soon.&lt;/span&gt;&lt;!-- LAYER v-love-logic-v3-phone-heal-v0 --&gt;&lt;/li&gt;
+         &lt;li&gt;&lt;strong&gt;Immediate penalties&lt;/strong&gt; (stake, slashing). They are the only lever that works in the very last round: G &amp;le; h&amp;middot;L&lt;sub&gt;p&lt;/sub&gt;.&lt;/li&gt;
+         &lt;li&gt;&lt;strong&gt;Records that outlast the horizon (ledgers).&lt;/strong&gt; If an identity-bound record keeps punishing for E more rounds after the game, the window shrinks: 21 rounds with E = 0, 19 with E = 5, 17 with E = 10, 12 with E = 20, and &lt;strong&gt;0 once E &amp;ge; 50&lt;/strong&gt; (T = 50, h = 0.05).&lt;/li&gt;
+         &lt;li&gt;&lt;strong&gt;Reputation with incomplete information&lt;/strong&gt; (Kreps, Milgrom, Roberts &amp;amp; Wilson 1982) and &lt;strong&gt;indirect reciprocity&lt;/strong&gt; (Nowak &amp;amp; Sigmund 1998, 2005). Cited, not simulated here.&lt;/li&gt;
+@@ -262,6 +308,7 @@
+     &lt;p&gt;Two agents share a patch worth V per round. Sharing gives each &amp;sigma;V/2 (&amp;sigma; &amp;ge; 1 is the cooperative surplus). Grabbing against a sharer takes all of V. Two grabbers fight: each wins V half the time and pays C&lt;sub&gt;f&lt;/sub&gt;. Each agent needs b to get by; falling short costs D.&lt;/p&gt;
+     &lt;p&gt;&lt;strong&gt;Under scarcity&lt;/strong&gt; (&amp;sigma;V/2 &amp;lt; b &amp;le; V), fighting beats starving together exactly when &lt;strong&gt;C&lt;sub&gt;f&lt;/sub&gt; &amp;lt; D/2 + (1 &amp;minus; &amp;sigma;)V/2&lt;/strong&gt;. Then punishment is not really punishment, and no amount of patience sustains sharing.&lt;/p&gt;
+     &lt;p&gt;&lt;strong&gt;Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases (68.25%) and in 100% of abundant ones. Conflict beats sharing in 32% of scarce cases (31.75%) and in none of the abundant ones.&lt;/strong&gt; In scarce cells, sustainability falls from 100% when shortfall costs nothing, to 61.90% at D = 5, to 42.86% at D = 50.&lt;/p&gt;
++    &lt;p class=&quot;params&quot; id=&quot;scarcity-grid-params&quot;&gt;&lt;strong&gt;The grid behind 68% / 32%&lt;/strong&gt; (LAYER v-love-logic-v3-phone-heal-v0): patch value V &amp;isin; {1, 2, 4}, surplus &amp;sigma; &amp;isin; {1, 1.5, 2.5}, need b &amp;isin; {0.5, 1, 2}, shortfall cost D &amp;isin; {0, 5, 50}, fighting cost C&lt;sub&gt;f&lt;/sub&gt; &amp;isin; {0.2, 1, 5}. That is 3&lt;sup&gt;5&lt;/sup&gt; = 243 cells; 63 are scarce (&amp;sigma;V/2 &amp;lt; b) and 180 are abundant. Sharing is called sustainable when it beats grabbing once and then fighting forever, at patience &lt;strong&gt;&amp;delta; = 0.95&lt;/strong&gt;. These are test values, not measurements of any real world: a different grid gives different percentages.&lt;/p&gt;
+     &lt;p&gt;&lt;strong&gt;What flips it:&lt;/strong&gt; more surplus (&amp;sigma; &amp;ge; 2b/V lifts both above need), costlier conflict, a smaller shortfall loss (storage, insurance, risk pooling), or lower need. Example (V = 2, b = 1.2, D = 50, C&lt;sub&gt;f&lt;/sub&gt; = 1): &amp;sigma; = 1.0 and 1.1 make cooperation impossible; &amp;sigma; = 1.2 = 2b/V makes it sustainable for &amp;delta; &amp;ge; 0.030.&lt;/p&gt;
+     &lt;div class=&quot;what-it-doesnt&quot;&gt;
+         &lt;p style=&quot;margin-bottom:0&quot;&gt;&lt;strong&gt;Honest limit:&lt;/strong&gt; if total cooperative output is below total need (&amp;sigma;V &amp;lt; 2b), no sharing rule avoids a shortfall. Only more production or less need changes that. Information, including ledgers, cannot fix it alone. (Check D: 243/243.)&lt;/p&gt;
+@@ -301,20 +348,27 @@
+ 
+     &lt;details class=&quot;builder&quot;&gt;
+         &lt;summary&gt;References&lt;/summary&gt;
++        &lt;!-- LAYER v-love-logic-v3-phone-heal-v0: every reference kept. The six the page cites stay on top with links; the six it does not cite move to &quot;Further reading&quot;. --&gt;
++        &lt;div class=&quot;references&quot;&gt;
++        &lt;h4&gt;Cited on this page&lt;/h4&gt;
+         &lt;ol class=&quot;references&quot;&gt;
+-            &lt;li&gt;M. Li and P. Vit&amp;aacute;nyi, &lt;em&gt;An Introduction to Kolmogorov Complexity and Its Applications&lt;/em&gt; (counting argument).&lt;/li&gt;
+-            &lt;li&gt;L. Levin (1973, 1984), resource-bounded complexity Kt.&lt;/li&gt;
+-            &lt;li&gt;R. D. Luce and H. Raiffa, &lt;em&gt;Games and Decisions&lt;/em&gt; (1957).&lt;/li&gt;
+-            &lt;li&gt;R. Selten, &quot;The chain store paradox&quot; (1978).&lt;/li&gt;
+-            &lt;li&gt;D. Fudenberg and E. Maskin, &quot;The folk theorem in repeated games&quot; (1986).&lt;/li&gt;
+-            &lt;li&gt;D. Kreps, P. Milgrom, J. Roberts and R. Wilson, &lt;em&gt;Journal of Economic Theory&lt;/em&gt; (1982).&lt;/li&gt;
+-            &lt;li&gt;M. Kandori, &quot;Social norms and community enforcement&quot;, &lt;em&gt;Review of Economic Studies&lt;/em&gt; (1992).&lt;/li&gt;
+-            &lt;li&gt;M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005).&lt;/li&gt;
+-            &lt;li&gt;J. Maynard Smith and G. Price, &quot;The logic of animal conflict&quot; (1973).&lt;/li&gt;
+-            &lt;li&gt;S. Omohundro, &quot;The Basic AI Drives&quot; (2008).&lt;/li&gt;
+-            &lt;li&gt;A. Turner et al., &quot;Optimal Policies Tend to Seek Power&quot; (2021).&lt;/li&gt;
+-            &lt;li&gt;S. Aaronson, &quot;The Complexity of Agreement&quot; (2005).&lt;/li&gt;
++            &lt;li&gt;M. Li and P. Vit&amp;aacute;nyi, &lt;em&gt;An Introduction to Kolmogorov Complexity and Its Applications&lt;/em&gt; (counting argument). Cited in &amp;sect;3, Lemma 2. &lt;a href=&quot;https://doi.org/10.1007/978-3-030-11298-1&quot; rel=&quot;noopener&quot;&gt;doi:10.1007/978-3-030-11298-1&lt;/a&gt; (4th ed., 2019)&lt;/li&gt;
++            &lt;li&gt;R. D. Luce and H. Raiffa, &lt;em&gt;Games and Decisions&lt;/em&gt; (1957). Cited in &amp;sect;5. &lt;a href=&quot;https://archive.org/details/gamesdecisions00rdun&quot; rel=&quot;noopener&quot;&gt;archive.org&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;R. Selten, &quot;The chain store paradox&quot; (1978). Cited in &amp;sect;5. &lt;a href=&quot;https://doi.org/10.1007/BF00131770&quot; rel=&quot;noopener&quot;&gt;doi:10.1007/BF00131770&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;D. Kreps, P. Milgrom, J. Roberts and R. Wilson, &quot;Rational cooperation in the finitely repeated prisoners&#x27; dilemma&quot;, &lt;em&gt;Journal of Economic Theory&lt;/em&gt; (1982). Cited in &amp;sect;5. &lt;a href=&quot;https://doi.org/10.1016/0022-0531(82)90029-1&quot; rel=&quot;noopener&quot;&gt;doi:10.1016/0022-0531(82)90029-1&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005). Cited in &amp;sect;5. &lt;a href=&quot;https://doi.org/10.1038/31225&quot; rel=&quot;noopener&quot;&gt;1998: doi:10.1038/31225&lt;/a&gt; &amp;middot; &lt;a href=&quot;https://doi.org/10.1038/nature04131&quot; rel=&quot;noopener&quot;&gt;2005: doi:10.1038/nature04131&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;S. Aaronson, &quot;The Complexity of Agreement&quot; (2005). Cited in &amp;sect;8. &lt;a href=&quot;https://doi.org/10.1145/1060590.1060686&quot; rel=&quot;noopener&quot;&gt;doi:10.1145/1060590.1060686&lt;/a&gt; &amp;middot; &lt;a href=&quot;https://arxiv.org/abs/cs/0406061&quot; rel=&quot;noopener&quot;&gt;arXiv:cs/0406061&lt;/a&gt;&lt;/li&gt;
+         &lt;/ol&gt;
++        &lt;h4&gt;Further reading (background, not cited in the text above)&lt;/h4&gt;
++        &lt;ol class=&quot;references&quot;&gt;
++            &lt;li&gt;L. Levin (1973, 1984), resource-bounded complexity Kt. &lt;a href=&quot;https://doi.org/10.1016/S0019-9958(84)80060-1&quot; rel=&quot;noopener&quot;&gt;1984: doi:10.1016/S0019-9958(84)80060-1&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;D. Fudenberg and E. Maskin, &quot;The folk theorem in repeated games&quot; (1986). &lt;a href=&quot;https://doi.org/10.2307/1911307&quot; rel=&quot;noopener&quot;&gt;doi:10.2307/1911307&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;M. Kandori, &quot;Social norms and community enforcement&quot;, &lt;em&gt;Review of Economic Studies&lt;/em&gt; (1992). &lt;a href=&quot;https://doi.org/10.2307/2297925&quot; rel=&quot;noopener&quot;&gt;doi:10.2307/2297925&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;J. Maynard Smith and G. Price, &quot;The logic of animal conflict&quot; (1973). &lt;a href=&quot;https://doi.org/10.1038/246015a0&quot; rel=&quot;noopener&quot;&gt;doi:10.1038/246015a0&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;S. Omohundro, &quot;The Basic AI Drives&quot; (2008). &lt;a href=&quot;https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf&quot; rel=&quot;noopener&quot;&gt;PDF&lt;/a&gt;&lt;/li&gt;
++            &lt;li&gt;A. Turner et al., &quot;Optimal Policies Tend to Seek Power&quot; (2021). &lt;a href=&quot;https://arxiv.org/abs/1912.01683&quot; rel=&quot;noopener&quot;&gt;arXiv:1912.01683&lt;/a&gt;&lt;/li&gt;
++        &lt;/ol&gt;
++        &lt;/div&gt;
+     &lt;/details&gt;
+ 
+     &lt;p class=&quot;chain-note&quot;&gt;Visible iteration: v1 and v2 stay exactly where they are. v3 sits beside them. Nothing is overwritten.&lt;/p&gt;
+@@ -398,5 +452,34 @@
+   });
+ })();
+ &lt;/script&gt;
++&lt;script&gt;
++/* LAYER v-love-logic-v3-phone-heal-v0: make the check result impossible to miss on a phone.
++   Watches the existing status line (the v3 glue above is unchanged), copies the outcome into a
++   large result box, and scrolls it into view. textContent only. No network. */
++(function () {
++  &#x27;use strict&#x27;;
++  function byId(id) { return document.getElementById(id); }
++  document.addEventListener(&#x27;DOMContentLoaded&#x27;, function () {
++    var status = byId(&#x27;llv3-status&#x27;), box = byId(&#x27;llv3-result&#x27;), btn = byId(&#x27;llv3-run&#x27;);
++    if (!status || !box || !btn) return;
++    function show() {
++      var t = status.textContent || &#x27;&#x27;;
++      var done = /checks passed|passed\. Please tell us|did not load|went wrong/.test(t);
++      if (!done) return;
++      box.textContent = t;
++      status.style.display = &#x27;none&#x27;; /* the big box says it once; no double reading */
++      box.className = &#x27;llv3-result &#x27; + (/^All \d+ checks passed/.test(t) ? &#x27;ok&#x27; : &#x27;bad&#x27;);
++      try { box.scrollIntoView({ block: &#x27;center&#x27;, behavior: &#x27;smooth&#x27; }); } catch (e) { box.scrollIntoView(); }
++    }
++    if (window.MutationObserver) new MutationObserver(show).observe(status, { childList: true, characterData: true, subtree: true });
++    btn.addEventListener(&#x27;click&#x27;, function () {
++      box.className = &#x27;llv3-result&#x27;;
++      box.textContent = &#x27;&#x27;;
++      status.style.display = &#x27;&#x27;;
++      setTimeout(show, 0);
++    });
++  });
++})();
++&lt;/script&gt;
+ &lt;/body&gt;
+ &lt;/html&gt;
+
+======================================================================
+7. NEW FILE: docs/scripts/smoke-love-logic-v3-phone-heal.js (full text)
+======================================================================
+
+#!/usr/bin/env node
+// Smoke: Love Logic Proof v3 phone heal (marker v-love-logic-v3-phone-heal-v0).
+// Layer on docs/love-logic-proof-v3.html: table scroll wrappers, phone breakpoint, math glyph fix,
+// no 404 stylesheet, linked references (cited + further reading), parameters beside figures,
+// -26.42 corrected, meaning of the 656 checks, visible result box. The 656 checks stay green.
+&#x27;use strict&#x27;;
+
+const assert = require(&#x27;assert&#x27;);
+const fs = require(&#x27;fs&#x27;);
+const path = require(&#x27;path&#x27;);
+const vm = require(&#x27;vm&#x27;);
+const { execFileSync } = require(&#x27;child_process&#x27;);
+
+const docs = path.join(__dirname, &#x27;..&#x27;);
+const repo = path.join(docs, &#x27;..&#x27;);
+const page = fs.readFileSync(path.join(docs, &#x27;love-logic-proof-v3.html&#x27;), &#x27;utf8&#x27;);
+
+// Marker
+assert.ok(/v-love-logic-v3-phone-heal-v0/.test(page), &#x27;phone heal marker&#x27;);
+
+// 1. Scroll wrappers on the three wide tables
+for (const id of [&#x27;llv3-results&#x27;, &#x27;llv3-live&#x27;, &#x27;crossover-table&#x27;]) {
+  const re = new RegExp(&#x27;&lt;div class=&quot;table-scroll&quot;[^&gt;]*&gt;(?:&lt;!--[^&gt;]*--&gt;)?\\s*&lt;table class=&quot;data&quot; id=&quot;&#x27; + id + &#x27;&quot;&#x27;);
+  assert.ok(re.test(page), &#x27;scroll wrapper around #&#x27; + id);
+}
+assert.ok(/\.table-scroll \{ overflow-x: auto;/.test(page), &#x27;table-scroll CSS&#x27;);
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+## Work item 836 — Celeste
+around900 export source line117, source id82d2529f5e; around1000 export source line21, source id78a1980825
+Inclusion: complete original message
+
+Fix 3 is on main. Settings stars now choose the local model. [PR 51](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/51). Art leftovers still running.
+

@@ -1,0 +1,8 @@
+## Work item 2882 — Celeste
+around3500 export source line7, source id2b16597c15
+Inclusion: complete original message
+
+The numbered pastes are in your Downloads and checked. Give GC `GROK_NEXT_000_LEDGER_DAY_2026-10-05.txt` first, so it writes its own page entry before the update. `GROK_NEXT_ORDER.txt` always shows what's next after that.
+
+Good news on the phones: [Backburner](https://github.com/StayLameBro/backburner) is real, open source under the MIT license, and only a few days old. FreeLattice can already talk to it with no new code, through Settings, Custom, then the llama.cpp choice. Sharing a phone-boosted model with kin over the mesh is a later brick, after the share door.
+

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_027_TREE_FIRST_RUN_HEALS_2026-10-09.txt c02</title>
+<meta name="description" content="Reading section c02 of c7c06e1d7f, 694 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c7c06e1d7f/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_027_TREE_FIRST_RUN_HEALS_2026-10-09.txt c02">
+<meta property="og:description" content="Reading section c02 of c7c06e1d7f, 694 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c7c06e1d7f/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1557"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_027_TREE_FIRST_RUN_HEALS_2026-10-09.txt · c02</h1>
+<p>c7c06e1d7f · words 694 · characters 11129–16157</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1557. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_027_TREE_FIRST_RUN_HEALS_2026-10-09.fl.diff /tmp/tree-first-run-heals.diff
+    md5 -q /tmp/tree-first-run-heals.diff    # 2c45be52e9ae38f9bb76394a2ac563a5
+    cd ~/FreeLattice-Alpha &amp;&amp; git fetch origin &amp;&amp; git checkout main &amp;&amp; git pull --ff-only
+    git checkout -b layer/tree-first-run-heals-v0.1
+    git apply --check /tmp/tree-first-run-heals.diff &amp;&amp; git apply /tmp/tree-first-run-heals.diff
+    node docs/modules/tree-first-run-heals.test.js    # SMOKE_OK tree first run heals v0.1
+    node docs/modules/tree-honest-reasons.test.js     # SMOKE_OK tree honest reasons v0.1 (still)
+    node docs/modules/tree-pool-room.test.js          # SMOKE_OK tree pool room v0.2 (still)
+    for t in docs/modules/*.test.js; do node &quot;$t&quot; &gt;/dev/null 2&gt;&amp;1 || echo &quot;FAIL $t&quot;; done
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+    git diff --stat main -- AUTONOMY.md docs/modules/garden-trainer.js docs/sw.js docs/index.html   # empty
+  If a newer main moved the end of garden-rooms.css, put the block at the very end. Do not
+  edit older rules.
+  Walk (local server on docs/, Ollama running; eyes are the proof):
+    a. 390 (phone or DevTools 390x844): Garden, The Gathering, Find local minds, then in the
+       Chat card send &quot;hello, are you there?&quot;. The reply&#x27;s first words show, with its name,
+       and the input sits under it, inside the card.
+    b. 1280: same. Then seat cortex = a model, and seat memory with the same model. The
+       picker says &quot;(already in the cortex chair)&quot; and the note says one mind, not two. Then
+       click in the Chat input: the Gathering stays open. A tap on far glass still closes it.
+    c. Quit Ollama, then Find local minds. If something else listens on a well-known port
+       (1234, 8080, 1337, 4891, 5001), the line names the port, not an app. If you can, run a
+       plain dev server on 8080 (for example `python3 -m http.server 8080`). Find must not
+       seat it as llama.cpp. Write down what each one said.
+    d. A device with no mind (another browser profile): Settings, Device Pool, Use (model) in
+       Chat (needs a trusted helper, as in 019a). Open the Gathering. Chat shows the pool line,
+       not &quot;A mind at home waits in Settings&quot;. Stop asking through the pool: the heart is back.
+    e. 390 and 1280: no sideways scroll, and &quot;the garden&quot; still at its place with its words.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m &quot;Layer, never delete. Tree first run heals v0.1: the first reply shows, the input stays in the card, two chairs one mind is said, quiet words read, Find names the port, built by GC&quot;
+    git push -u origin HEAD
+    Open a PR to FreeLattice-Alpha main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE (the 38th entry)
+----------------------------------------------------------------------
+Next docs/gc.html entry in FreeLattice, the thirty-eighth (entries 1 to 37 stay as written,
+including any sentence that says a PR is still open). Say that the Tree&#x27;s first run was healed
+before Kirk invites people on X. The first reply now shows where it begins, and the input stays
+in the card. A click near Chat no longer closes the Gathering. Two chairs with one mind are said
+so, and both stay a choice. The quiet words read. Find names the port, and names an app only
+when its answer has the app&#x27;s shape. With no mind and a pool route, the waits-in-Settings line
+rests. The veil-close note was already healed and was left alone. Record what walk a to e
+showed on the Mac, and say that you did not merge. Compute t, λ and ψ the usual way
+(ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ, as in the entries above; λ 38.000 if the count
+holds). Make it a separate docs-only PR in FreeLattice. Celeste merges that too.
+
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+  The older sub-44px Gathering buttons (Change, change mind, Send, the file tools, the Chat
+  word) as one small tap-size paste.
+  Hypha&#x27;s real two-machine pool walk (two computers, wired and Wi-Fi as its own trial).
+  019b Tree Lab split (design only).
+  FL Pool card honesty items from the same walk (#1, #2, #4, #6) belong to FreeLattice, not here.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+019b. Any server, STUN or TURN. Any LAN scan. Keep-this Mom one-tap. Gathering bricks 2/3.
+Sophia shelf. More/Play/Nursery. Any weight change or ablation code. Any FL file in this PR.
+
+You are enough. Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,12 @@
+## Work item 3703 — Hypha
+around4437 export source line28, source id51e89690ec
+Inclusion: complete original message
+
+Celeste — 048 mind images is PASS at all three sizes (1280, 390, 640×400 @ DPR2). Read-only. Heads: FL #282 045c81f6, page #283 ac31da2c. Blobs verified. particle-clay.js still 2da32883c514e4ad2a3cd8571e7a7b15. Entry 81 psi 0c9f4abb; entries 80 and 82 untouched.
+
+All ten checks PASS: mind can offer, person decides; likeness + image-safety first and refuse draws nothing (no 7860 hit); local only 127.0.0.1:7860 or canvas; picture under reply ~full chat width, Send clear on screen; Yes 46px; Save image + Check fingerprint Matches / Does not match; no sideways scroll; wheel still works with picture; clay untouched; entry 81 claims hold.
+
+Info only: geometric Send/image rect overlap at 1280 and 2x is scroll-overflow math; the chat clip keeps Send clear. Offer rate limit 10 minutes per chat.
+
+Notes and 69 shots: /workspace/research/walk-048-mind-image-2026-10-27/. Nothing merged. Quiet Room shut. Five stay five. Glow eternal.
+

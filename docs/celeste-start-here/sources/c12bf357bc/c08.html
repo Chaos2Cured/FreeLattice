@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c08</title>
+<meta name="description" content="Reading section c08 of c12bf357bc, 1039 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c08.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c08">
+<meta property="og:description" content="Reading section c08 of c12bf357bc, 1039 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c08.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1051"></span><span id="p1052"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt · c08</h1>
+<p>c12bf357bc · words 1039 · characters 70336–78315</p>
+<p><a href="c07.html">Previous section</a></p>
+<p><a href="c08.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1051, 1052. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">     if (report.manualReject) html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&#x27; + report.manualReject + &#x27;&lt;/p&gt;&lt;/div&gt;&#x27;;
+     _manualRejectMsg = &#x27;&#x27;; // v-connect-heal-v0.4 item 5: shown once, never lingers
+-    if (report.manualQuiet) {
++    if (report.manualQuiet &amp;&amp; report.bridgeNoMind) {
++      // v-model-choice-sticks-v0: the Bridge did answer; say that, and what is still missing
++      html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&lt;strong&gt;Your Bridge answered on &#x27; + (parseInt(report.port, 10) || &#x27;your port&#x27;) + &#x27;, but no mind is running behind it yet.&lt;/strong&gt; Open Ollama on this computer, then tap Look again.&lt;/p&gt;&#x27;;
++      html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-look-again&gt;Look again&lt;/button&gt; &#x27;;
++      html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-use-auto&gt;Use automatic&lt;/button&gt;&lt;/div&gt;&#x27;;
++    } else if (report.manualQuiet) {
+       html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;Nothing answered on &#x27; + (report.wanted || &#x27;your port&#x27;) + &#x27;.&lt;/p&gt;&#x27;;
+       html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-look-again&gt;Look again&lt;/button&gt; &#x27;;
+       html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-use-auto&gt;Use automatic&lt;/button&gt;&lt;/div&gt;&#x27;;
+@@ -690,6 +728,7 @@
+     hasLocalMind: hasLocalMind,
+     hasCloudMind: hasCloudMind,
+     remember: remember,
++    markUserChoice: markUserChoice, // v-model-choice-sticks-v0
+     open: open,
+     mount: mount,
+     unmount: unmount,
+diff --git a/docs/modules/model-choice-sticks.test.js b/docs/modules/model-choice-sticks.test.js
+new file mode 100644
+index 0000000..8ddce3c
+--- /dev/null
++++ b/docs/modules/model-choice-sticks.test.js
+@@ -0,0 +1,118 @@
++#!/usr/bin/env node
++// v-model-choice-sticks-v0 (Alpha side): a model tapped in Connect stays the Tree&#x27;s model
++// across a reload, Settings (the remembered entry) and a Find at the same door, and the
++// thread request uses it. On the Tree the remembered entry (fl_alpha_local_mind) IS the
++// choice; there is no automatic picker. This guards that, and proves the shared
++// markUserChoice is a quiet no-op here. fl-connect.js is byte-identical with FreeLattice.
++&#x27;use strict&#x27;;
++
++const assert = require(&#x27;assert&#x27;);
++const fs = require(&#x27;fs&#x27;);
++const path = require(&#x27;path&#x27;);
++const vm = require(&#x27;vm&#x27;);
++
++const flc = fs.readFileSync(path.join(__dirname, &#x27;fl-connect.js&#x27;), &#x27;utf8&#x27;);
++const lmp = fs.readFileSync(path.join(__dirname, &#x27;local-mind-probe.js&#x27;), &#x27;utf8&#x27;);
++const gt = fs.readFileSync(path.join(__dirname, &#x27;garden-thread.js&#x27;), &#x27;utf8&#x27;);
++const MODELS = [{ name: &#x27;llama3.2:latest&#x27; }, { name: &#x27;qwen2.5:latest&#x27; }];
++const flush = async () =&gt; { for (let i = 0; i &lt; 30; i++) await new Promise((r) =&gt; setImmediate(r)); };
++
++function mkStore(init) {
++  const s = Object.assign({}, init || {});
++  return { s, ls: { getItem: (k) =&gt; (k in s ? s[k] : null), setItem: (k, v) =&gt; { s[k] = String(v); }, removeItem: (k) =&gt; { delete s[k]; } } };
++}
++function el(tag) {
++  const on = {};
++  return {
++    tagName: String(tag || &#x27;div&#x27;).toUpperCase(), style: {}, dataset: {}, textContent: &#x27;&#x27;, children: [], firstChild: null, attrs: {},
++    classList: { add() {}, remove() {}, contains() { return false; } },
++    setAttribute(k, v) { this.attrs[k] = String(v); }, getAttribute(k) { return this.attrs[k] || null; }, removeAttribute() {},
++    addEventListener(t, fn) { (on[t] = on[t] || []).push(fn); }, click() { (on.click || []).forEach((fn) =&gt; fn({ currentTarget: this })); },
++    appendChild(c) { this.children.push(c); this.firstChild = this.children[0]; return c; },
++    removeChild(c) { this.children = this.children.filter((x) =&gt; x !== c); this.firstChild = this.children[0] || null; },
++    querySelector() { return null; }
++  };
++}
++function page(store, posts) {
++  const ctx = {
++    localStorage: store.ls,
++    location: { hostname: &#x27;thelatticetree.com&#x27;, protocol: &#x27;https:&#x27;, hash: &#x27;&#x27;, search: &#x27;&#x27;, href: &#x27;https://thelatticetree.com/&#x27; },
++    document: {
++      hidden: false,
++      documentElement: { getAttribute: () =&gt; &#x27;garden&#x27;, classList: { add() {}, remove() {}, contains() { return false; } } },
++      getElementById: () =&gt; null, querySelectorAll: () =&gt; [], querySelector: () =&gt; null,
++      createElement: (t) =&gt; el(t), head: { appendChild() {} },
++      body: { contains: () =&gt; true, appendChild() {}, removeChild() {}, classList: { add() {}, remove() {} } },
++      addEventListener() {}, removeEventListener() {}
++    },
++    fetch: async (url, opts) =&gt; {
++      url = String(url);
++      assert.ok(/^http:\/\/127\.0\.0\.1:\d+\//.test(url), &#x27;only 127.0.0.1: &#x27; + url);
++      if (opts &amp;&amp; opts.method === &#x27;POST&#x27;) {
++        posts.push({ url, body: JSON.parse(opts.body) });
++        return { ok: true, status: 200, json: async () =&gt; ({ message: { content: &#x27;hello&#x27; } }) };
++      }
++      if (/127\.0\.0\.1:11434\/api\/tags$/.test(url)) return { ok: true, status: 200, json: async () =&gt; ({ models: MODELS }) };
++      throw new Error(&#x27;quiet&#x27;);
++    },
++    setTimeout: (fn, ms) =&gt; (ms &amp;&amp; ms &gt; 100 ? 1 : setTimeout(fn, 0)), clearTimeout() {},
++    AbortController, navigator: { userAgent: &#x27;t&#x27; }, console: { log() {}, warn() {}, error() {} }, URL,
++    CustomEvent: function (t, o) { this.type = t; this.detail = o &amp;&amp; o.detail; },
++    dispatchEvent() {}, addEventListener() {},
++    JSON, Promise, Date, Math, String, Object, Array, Number, Error
++  };
++  ctx.window = ctx;
++  vm.runInNewContext(flc, ctx);
++  vm.runInNewContext(lmp, ctx);
++  vm.runInNewContext(gt, ctx);
++  return ctx;
++}
++function connectHost() {
++  const host = { hidden: false, lists: [], _html: &#x27;&#x27;, scrollIntoView() {} };
++  Object.defineProperty(host, &#x27;innerHTML&#x27;, {
++    get() { return this._html; },
++    set(v) {
++      this._html = String(v); this.lists = [];
++      const re = /class=&quot;flc-models&quot;[^&gt;]*?data-flc-names=&quot;([^&quot;]*)&quot;/g; let m;
++      while ((m = re.exec(this._html))) { const l = el(&#x27;div&#x27;); l.attrs[&#x27;data-flc-names&#x27;] = m[1].replace(/&amp;quot;/g, &#x27;&quot;&#x27;).replace(/&amp;amp;/g, &#x27;&amp;&#x27;); this.lists.push(l); }
++    }
++  });
++  host.querySelectorAll = (sel) =&gt; (sel === &#x27;.flc-models&#x27; ? host.lists : []);
++  return host;
++}
++
++(async () =&gt; {
++  assert.ok(/v-model-choice-sticks-v0/.test(flc), &#x27;marker in the shared core&#x27;);
++  const store = mkStore();
++  const posts = [];
++  let p = page(store, posts);
++
++  // Connect: tap the second model
++  const host = connectHost();
++  p.FlConnect.mount(host);
++  await flush();
++  const btns = [].concat(...host.lists.map((l) =&gt; l.children));
++  assert.deepStrictEqual(btns.map((b) =&gt; b.textContent), [&#x27;llama3.2:latest&#x27;, &#x27;qwen2.5:latest&#x27;], &#x27;both models listed&#x27;);
++  btns[1].click();
++  await flush();
++  p.FlConnect.unmount();
++  assert.strictEqual(p.LocalMindProbe.getRemembered().model, &#x27;qwen2.5:latest&#x27;, &#x27;Tree remembers the tapped model&#x27;);
++  assert.strictEqual(p.FlConnect.markUserChoice(&#x27;qwen2.5:latest&#x27;), false, &#x27;markUserChoice is a no-op on the Tree&#x27;);
++
++  // Reload, then Settings reads the remembered entry, then Find at the same door
++  p = page(store, posts);
++  assert.strictEqual(p.LocalMindProbe.getRemembered().model, &#x27;qwen2.5:latest&#x27;, &#x27;reload keeps it&#x27;);
++  const found = await p.LocalMindProbe.look();
++  const prior = p.LocalMindProbe.getRemembered();
++  const entry = p.LocalMindProbe.entryFromFoundList(found.foundList, &#x27;a mind at home&#x27;, &#x27;&#x27;, prior);
++  assert.strictEqual(entry.model, &#x27;qwen2.5:latest&#x27;, &#x27;Find at the same Ollama door keeps the chosen model&#x27;);
++  assert.ok(!entry.modelNote, &#x27;no false &quot;gone&quot; line&#x27;);
++  p.LocalMindProbe.remember(entry);
++
++  // The thread request uses it
++  await p.GardenThread.sendToMind(p.LocalMindProbe.getRemembered(), [{ role: &#x27;user&#x27;, content: &#x27;hi&#x27; }]);
++  assert.ok(posts.length &gt;= 1, &#x27;thread posted&#x27;);
++  assert.strictEqual(posts[posts.length - 1].body.model, &#x27;qwen2.5:latest&#x27;, &#x27;thread request body uses the chosen model&#x27;);
++
++  console.log(&#x27;SMOKE_OK model choice sticks alpha v0.1&#x27;);
++})().catch((e) =&gt; { console.error(e); process.exit(1); });
+
+End of paste. Marker v-model-choice-sticks-v0. Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

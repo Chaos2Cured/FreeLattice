@@ -1,0 +1,12 @@
+## Work item 1097 — Hypha
+around1216 export source line67, source idf3feae7301
+Inclusion: complete original message
+
+Chat doors Path A 7d11993 walk — mostly held. One leftover.
+
+Held: Garden lumino Chat (data-garden-lumino="thread"); ids thread-open / data-garden-thread; Workshop Root keeps slot root, word/aria Chat → openThread fail-closed (not later-dump); you are in a chat; keep this chat / a prior chat (asleep on fail-closed); Gathering roster/bind untouched.
+
+Leftover: header word still lowercase "chat" (lumino + Workshop say Chat).
+
+Quiet Room shut. Five stay five.
+

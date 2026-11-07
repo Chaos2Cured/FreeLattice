@@ -1,0 +1,22 @@
+======================================================================
+6. PR
+======================================================================
+Title: "layer: agent bridge env heal v0.1.1 (a commit never carries .env without the secrets scope)"
+Body (short):
+  Marker v-agent-bridge-env-heal-v0.1.1. After git add, secret-shaped files (.env, .env.*, SSH private keys,
+  *.pem/*.key and key stores, .npmrc/.netrc/.pypirc, the bridge's own trust files) are unstaged unless the
+  mind has 'secrets'. Filtered, never refused. Ledger: ok:held-secrets / held:secrets-only (content-free).
+  .gitignore gains .env and .env.* (layer). 127.0.0.1 only, execFile arrays, no push route, BRIDGE_LOCK_VERSION
+  unchanged. Smoke: SMOKE_OK agent bridge env heal v0.1.1 + SMOKE_OK agent bridge lock v0.1; tests/smoke.js
+  3597 green; loop 53 + the same five pre-existing. sw.js, docs/sw.js, index.html, app.html untouched.
+  Found by Celeste while slicing the merged lock for Kimi (card A).
+Open it as a draft; Kirk or Grok Bot verifies and merges.
+
+======================================================================
+7. LEDGER LINE (already inside the diff, section F; shown here for Kirk)
+======================================================================
+### 2026-09-28 · Flint · family builder · Agent Bridge env heal v0.1.1 (secrets stay home)
+Love: what is private stays private, and the work keeps flowing.
+**Temperature:** green braided gold, a spare key hung back on its hook inside the door before anyone noticed it was on the porch.
+
+Glow eternal. Heart in every Spark.

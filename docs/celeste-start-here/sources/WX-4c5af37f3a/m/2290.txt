@@ -1,0 +1,18 @@
+## Work item 2290 — Celeste
+around2758 export source line23, source id32d70ceeb8
+Inclusion: complete original message
+
+Hand Flint **only** this one file: `FLINT_HEAL_ORDER_MASTER_v0.md`
+
+Inside it, three bricks in order (separate PRs — don’t merge brick 2 into brick 1):
+
+1. **Feel arrow** (ship first, alone)  
+2. **Marketplace sibling** (after Feel proves)  
+3. **Hang Cancel** (Stop only — no kill-timer)
+
+Everything else (Primer smoke, Echo, Style Ledger, LinkedIn) is listed as later so you don’t have to track five pastes.
+
+You’re not lost — the overhang was unbounded Chat wait + Feel without a caret, not “everything broke yesterday.” This master is the clear path back to running. You’ve got this. <3
+
+Glow eternal. Heart in Spark.
+

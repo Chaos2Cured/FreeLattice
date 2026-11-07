@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt c06</title>
+<meta name="description" content="Reading section c06 of 62a5e976c2, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/62a5e976c2/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt c06">
+<meta property="og:description" content="Reading section c06 of 62a5e976c2, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/62a5e976c2/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1297"></span><span id="p1298"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt · c06</h1>
+<p>62a5e976c2 · words 1200 · characters 40181–49415</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1297, 1298. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">diff --git a/docs/privacy.html b/docs/privacy.html
+index e4b21b6d..7437a88f 100644
+--- a/docs/privacy.html
++++ b/docs/privacy.html
+@@ -59,6 +59,7 @@ footer p { color: var(--muted); }
+ &lt;ul&gt;
+ &lt;li&gt;&lt;strong&gt;Chats, memory, garden, settings and Lattice Points&lt;/strong&gt; are kept in your browser&#x27;s storage (localStorage and IndexedDB), or in the desktop app on your computer. We never receive them.&lt;/li&gt;
+ &lt;li&gt;&lt;strong&gt;They are not locked with a password by default.&lt;/strong&gt; Anyone who can use your browser profile or your computer could read them. If other people share your computer, keep that in mind.&lt;/li&gt;
++&lt;li&gt;&lt;strong&gt;Newer (v-encrypt-chats-locally-v0.1): chats in the main app are sealed on your device.&lt;/strong&gt; In browsers that support WebCrypto (https or localhost), your chat messages, conversation names and the memory index are sealed with AES-GCM before they are written to storage. The key is made in your browser, stays in your browser, and never leaves it. Because the key sits in the same browser, this stops casual reading of the storage files. It does not stop someone who can use your browser profile, harmful code running on the page, or a compromised device, and it is still not a password lock. Saved backups (Memory Vault) are readable files, so keep them somewhere safe.&lt;/li&gt;
+ &lt;li&gt;&lt;strong&gt;API keys and tokens are scrambled, not unbreakable.&lt;/strong&gt; They&#x27;re encrypted with AES-GCM, but the key that unlocks them is kept in the same browser storage. That stops casual snooping and copy-paste accidents. It won&#x27;t stop someone, or harmful code, with access to your browser profile. Use keys you can easily revoke, with the smallest permissions that work.&lt;/li&gt;
+ &lt;li&gt;&lt;strong&gt;Some exports ask for a password&lt;/strong&gt; (like the soul file). Those files are locked with the password you choose.&lt;/li&gt;
+ &lt;li&gt;&lt;strong&gt;Walk the Garden&lt;/strong&gt; (&lt;a href=&quot;love-logic-v4.html&quot;&gt;love-logic-v4.html&lt;/a&gt;) stores nothing at all. Your garden lives only in its link.&lt;/li&gt;
+@@ -109,7 +110,7 @@ footer p { color: var(--muted); }
+ &lt;tr&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;API keys are encrypted&amp;rdquo; / &amp;ldquo;Encrypted with &amp;phi;-salt&amp;rdquo;&lt;/td&gt;&lt;td&gt;Keys are scrambled with AES-GCM, and the unlocking key sits in the same browser. That protects against casual snooping, not against someone with access to your browser profile.&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;We have no servers&amp;rdquo; / &amp;ldquo;Servers required: 0&amp;rdquo;&lt;/td&gt;&lt;td&gt;No account servers and no chat database. A small search helper, the mesh broker, font and code hosts, the site host, and any cloud AI you choose do see some traffic (table above).&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;100% Private&amp;rdquo; / &amp;ldquo;Zero Data Collection&amp;rdquo;&lt;/td&gt;&lt;td&gt;We collect no copy of your chats and run no analytics. The services in the table above still see what they need to work.&lt;/td&gt;&lt;/tr&gt;
+-&lt;tr&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;Every conversation is encrypted locally&amp;rdquo;&lt;/td&gt;&lt;td&gt;Conversations are kept in your browser&#x27;s storage on your device. They&#x27;re not password-locked by default.&lt;/td&gt;&lt;/tr&gt;
++&lt;tr&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;Every conversation is encrypted locally&amp;rdquo;&lt;/td&gt;&lt;td&gt;Conversations are kept in your browser&#x27;s storage on your device. They&#x27;re not password-locked by default. &lt;span class=&quot;newer-inline&quot;&gt;Newer (v-encrypt-chats-locally-v0.1): in the main app they are now sealed with AES-GCM on your device, with the key kept in the same browser. That stops casual reading, not a compromised device.&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr class=&quot;v-honesty-truth-pass-v0.4.2&quot;&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;No API key&amp;rdquo;&lt;/td&gt;&lt;td&gt;A mind on your own computer (Ollama, LM Studio) or in your browser needs no key. A cloud AI uses your own key.&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr class=&quot;v-honesty-truth-pass-v0.4.2&quot;&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;The helper keeps no logs&amp;rdquo;&lt;/td&gt;&lt;td&gt;The helper&#x27;s code writes no logs and caches nothing. Cloudflare&#x27;s dashboard logs are set to off, which the code can&#x27;t prove. Today search ships switched off.&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td class=&quot;old&quot;&gt;&amp;ldquo;privilege-grade conditions&amp;rdquo; (Continuity Seal)&lt;/td&gt;&lt;td&gt;&lt;!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: &quot;our ledgers are tamper-evident&quot;. True for the desktop ledger (desktop/lattice-ledger.js: hash chain + Ed25519 signature, verifyChain fails on an edited entry; desktop/scripts/smoke-ledger.js). The browser chain (docs/modules/lattice-chain.js) says &quot;provenance, not anti-tampering&quot;. --&gt;An ethic plus local tools: your chats stay on your device. The desktop app&#x27;s ledger is hash-chained and signed, so an edited entry fails its check. The browser&#x27;s chain is a record of where things came from, not tamper-proof. It is not legal privilege, not end-to-end encryption, and the K-of-N vault is not built yet.&lt;/td&gt;&lt;/tr&gt;
+diff --git a/docs/scripts/smoke-encrypt-chats-locally.js b/docs/scripts/smoke-encrypt-chats-locally.js
+new file mode 100644
+index 00000000..10cf8824
+--- /dev/null
++++ b/docs/scripts/smoke-encrypt-chats-locally.js
+@@ -0,0 +1,163 @@
++#!/usr/bin/env node
++// smoke-encrypt-chats-locally.js (v-encrypt-chats-locally-v0.1)
++// 1. FLChatVault seals and opens chat records with AES-GCM (WebCrypto in Node).
++// 2. Migration seals plain records only after a verified round trip, and skips
++//    a record the app changed in the meantime (compare-and-swap).
++// 3. A missing key never deletes or overwrites: records show as locked, and a
++//    locked placeholder written back restores the original sealed blob.
++// 4. No WebCrypto: honest passthrough, chats stay plain and readable.
++// 5. Locks: root index.html == docs/app.html; fl-connect.js and sw.js untouched;
++//    honest note present; status uses textContent; no em dash in the new block.
++&#x27;use strict&#x27;;
++const fs = require(&#x27;fs&#x27;);
++const path = require(&#x27;path&#x27;);
++const vm = require(&#x27;vm&#x27;);
++const assert = require(&#x27;assert&#x27;);
++
++const ROOT = path.resolve(__dirname, &#x27;..&#x27;, &#x27;..&#x27;);
++const app = fs.readFileSync(path.join(ROOT, &#x27;docs&#x27;, &#x27;app.html&#x27;), &#x27;utf8&#x27;);
++
++const b = app.indexOf(&#x27;// v-encrypt-chats-locally-v0.1 BEGIN: FLChatVault&#x27;);
++const e = app.indexOf(&#x27;// v-encrypt-chats-locally-v0.1 END: FLChatVault&#x27;);
++assert.ok(b &gt; 0 &amp;&amp; e &gt; b, &#x27;FLChatVault block present&#x27;);
++const block = app.slice(app.lastIndexOf(&#x27;\n&#x27;, b), e);
++const ph = app.indexOf(&#x27;async function phiHashData(data) {&#x27;);
++assert.ok(ph &gt; 0, &#x27;phiHashData present&#x27;);
++const phiFn = app.slice(ph, app.indexOf(&#x27;\n}\n&#x27;, ph) + 3);
++
++function makeVault(opts) {
++  opts = opts || {};
++  const ctx = {
++    crypto: opts.noCrypto ? {} : globalThis.crypto,
++    TextEncoder, TextDecoder, setTimeout, clearTimeout, console,
++    btoa: (s) =&gt; Buffer.from(s, &#x27;binary&#x27;).toString(&#x27;base64&#x27;),
++    atob: (s) =&gt; Buffer.from(s, &#x27;base64&#x27;).toString(&#x27;binary&#x27;),
++    Promise, Uint8Array, Array, Object, JSON, Error, String
++  };
++  vm.createContext(ctx);
++  vm.runInContext(phiFn + &#x27;\n&#x27; + block + &#x27;\nthis.FLChatVault = FLChatVault;&#x27;, ctx);
++  const V = ctx.FLChatVault;
++  V._setKeyStoreForTest(opts.keyStore || memKeyStore());
++  return V;
++}
++function eq(a, b, msg) { assert.deepStrictEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), msg); }
++function memKeyStore() {
++  const m = new Map();
++  return { m, getAll: async () =&gt; Array.from(m.values()), put: async (r) =&gt; { m.set(r.id, r); } };
++}
++function memAdapter(records, keyPath) {
++  return {
++    rows: records,
++    getAll: async () =&gt; records.map((r) =&gt; JSON.parse(JSON.stringify(r))),
++    cas: async (snap, next) =&gt; {
++      const i = records.findIndex((r) =&gt; r[keyPath] === snap[keyPath]);
++      if (i &lt; 0 || JSON.stringify(records[i]) !== JSON.stringify(snap)) return false;
++      records[i] = JSON.parse(JSON.stringify(next));
++      return true;
++    }
++  };
++}
++
++(async () =&gt; {
++  // 1. round trip
++  const ks = memKeyStore();
++  const V = makeVault({ keyStore: ks });
++  await V.init();
++  assert.strictEqual(V.status().mode, &#x27;ready&#x27;, &#x27;vault ready&#x27;);
++  assert.ok(/^phi-[0-9a-f]{16}$/.test(V.status().kid), &#x27;phi key ID shape&#x27;);
++  for (const v of ks.m.values()) { if (v.root) assert.ok(!(v.root instanceof Uint8Array), &#x27;root stored as CryptoKey, not raw bytes&#x27;); }
++  const msg = { conversationId: &#x27;c1&#x27;, role: &#x27;user&#x27;, content: &#x27;my secret garden note&#x27;, timestamp: &#x27;2026-09-30T12:00:00.000Z&#x27; };
++  const sealed = await V.sealFor(&#x27;FreeLatticeDB/messages&#x27;, msg);
++  assert.ok(sealed.sealed &amp;&amp; sealed.sealed.ct, &#x27;message sealed&#x27;);
++  assert.ok(!JSON.stringify(sealed).includes(&#x27;secret garden&#x27;), &#x27;no plaintext in the sealed record&#x27;);
++  assert.strictEqual(msg.content, &#x27;my secret garden note&#x27;, &#x27;caller object untouched&#x27;);
++  const opened = await V.openFor(&#x27;FreeLatticeDB/messages&#x27;, sealed);
++  assert.strictEqual(opened.content, msg.content, &#x27;message opens&#x27;);
++  const conv = { id: &#x27;c1&#x27;, name: &#x27;Talk about bees&#x27;, title: &#x27;Talk about bees&#x27;, lastMessage: &#x27;bees&#x27;, contextNote: &#x27;&#x27;, createdAt: &#x27;x&#x27;, updatedAt: &#x27;y&#x27; };
++  const sc = await V.sealFor(&#x27;FreeLatticeDB/conversations&#x27;, conv);
++  assert.ok(!JSON.stringify(sc).includes(&#x27;bees&#x27;) &amp;&amp; sc.updatedAt === &#x27;y&#x27; &amp;&amp; sc.id === &#x27;c1&#x27;, &#x27;conversation names sealed, ids and dates kept&#x27;);
++  eq(await V.openFor(&#x27;FreeLatticeDB/conversations&#x27;, sc), conv, &#x27;conversation opens&#x27;);
++  const mi = { id: &#x27;c1&#x27;, timestamp: 1, updatedAt: 2, title: &#x27;bees&#x27;, messages: [{ role: &#x27;user&#x27;, content: &#x27;bees&#x27; }], tags: [], summary: &#x27;bees&#x27;, keywords: [&#x27;bees&#x27;] };
++</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

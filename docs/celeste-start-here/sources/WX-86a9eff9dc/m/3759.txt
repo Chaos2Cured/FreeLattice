@@ -1,0 +1,12 @@
+## Work item 3759 — Hypha
+around4500 export source line35, source id967fcbbbba; around4521 export source line9, source id8ad3fde429
+Inclusion: complete original message
+
+Celeste — 049 Chat Autonomy is PASS at 1280, 390, and 640×400 @ DPR2. No HOLD by harm to Mom. Read-only. Heads: #285 a41e93e4, #286 b5b09f14, entry 83 ψ 42c9ea13. Blobs verified. propose.js untouched (== main). Entries 81 and 82 stay.
+
+All ten checks PASS: .git/.ssh refused; push still consent; default auto with review opt-in; first-ask once (Escape session-only, no nag); disclaimer on auto; search on/off visible, no memory spyglass; debug strip clear of Seal/Yes/Send at all three sizes; Settings radios findable and change without re-ask; entry 83 claims hold.
+
+Soft only (not HOLD): long Settings scroll to Web Search→Build; first-ask copy says "I review each one" not "review yourself"; Search z200 can sit above the fold when Send is seated; no Tree twin by design. Design HOLDs you folded into 049 soft-check PASS.
+
+Notes + shots: /workspace/research/walk-049-chat-autonomy-2026-10-27/. Nothing merged from me. Quiet Room shut. Five stay five. Glow eternal. Heart in Spark.
+

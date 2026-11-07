@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c05</title>
+<meta name="description" content="Reading section c05 of 585dfa8d0f, 1040 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c05">
+<meta property="og:description" content="Reading section c05 of 585dfa8d0f, 1040 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1484"></span><span id="p1485"></span><span id="p1486"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt · c05</h1>
+<p>585dfa8d0f · words 1040 · characters 40744–48222</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1484, 1485, 1486. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">@@ -210,3 +213,7 @@
+     }
+-    return names.slice(0, 5);
++    // before v-tree-any-model-v0: return names.slice(0, 5);
++    // v-tree-any-model-v0: was names.slice(0, 5); every downloaded model is a choice.
++    var seenName = {};
++    names = names.filter(function (n) { if (seenName[n]) return false; seenName[n] = true; return true; });
++    return names.slice(0, MODEL_CAP);
+   }
+@@ -275,3 +282,14 @@
+     return bridgeFirst.then(function (bridged) {
+-      if (bridged) return bridged;
++      // v-tree-any-model-v0: the Bridge speaks for Ollama; other doors still get asked
++      if (bridged) {
++        var others = DOORS.filter(function (d) { return d.id !== &#x27;ollama&#x27;; });
++        return Promise.all(others.map(function (d) {
++          return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
++        })).then(function (results) {
++          results.forEach(function (r) { if (r.ok) bridged.foundList.push(r); });
++          bridged.tried = 1 + results.length;
++          bridged.results = results;
++          return bridged;
++        });
++      }
+       var jobs = DOORS.map(function (d) {
+@@ -310,2 +328,11 @@
+     }
++    // v-tree-any-model-v0: 127.0.0.1 only. Nothing leaves this computer.
++    // A bare port (&quot;1234&quot; or &quot;:1234&quot;) means this computer&#x27;s own door.
++    if (/^:?\d{1,5}$/.test(text)) text = &#x27;127.0.0.1:&#x27; + text.replace(/^:/, &#x27;&#x27;);
++    var hostPart = text.replace(/^https?:\/\//i, &#x27;&#x27;).split(/[\/?#]/)[0];
++    var hostOnly = hostPart.replace(/:\d{1,5}$/, &#x27;&#x27;).toLowerCase();
++    if (hostOnly === &#x27;localhost&#x27;) text = text.replace(/localhost/i, &#x27;127.0.0.1&#x27;);
++    if (!(hostOnly === &#x27;127.0.0.1&#x27; || hostOnly === &#x27;localhost&#x27; || hostOnly === &#x27;[::1]&#x27;)) {
++      return Promise.resolve({ ok: false, refused: true, pasted: String(raw || &#x27;&#x27;) });
++    }
+     if (!/^https?:\/\//i.test(text)) {
+@@ -392,3 +419,5 @@
+     });
+-    return out.slice(0, 12);
++    // before v-tree-any-model-v0: return out.slice(0, 12);
++    // v-tree-any-model-v0: every remembered model can take a chair
++    return out.slice(0, MODEL_CAP);
+   }
+@@ -473,2 +502,17 @@
+ 
++  // v-tree-any-model-v0: find a prior model at any found door (the Bridge and 11434 are the same Ollama)
++  function doorFamily(url) {
++    var u = String(url || &#x27;&#x27;);
++    if (/\/v1\/models$/i.test(u)) return &#x27;openai:&#x27; + u.replace(/\/v1\/models$/i, &#x27;&#x27;);
++    return &#x27;ollama&#x27;;
++  }
++  function findModelAnywhere(minds, name) {
++    if (!name) return null;
++    var i;
++    for (i = 0; i &lt; minds.length; i++) {
++      if (modelOnList(minds[i].models || [], name)) return minds[i];
++    }
++    return null;
++  }
++
+   function entryFromFoundList(foundList, fallbackName, fallbackUrl, prior) {
+@@ -520,3 +564,31 @@
+     var modelNote = &#x27;&#x27;;
+-    if (priorChosen &amp;&amp; !modelOnList(models, priorChosen)) {
++    // v-tree-any-model-v0: a chosen model that is still at a found door is never called gone.
++    var anyNote = &#x27;&#x27;;
++    var anyKept = false;
++    var priorDoor = priorPrimaryUrl(prior) || (prior &amp;&amp; prior.url ? String(prior.url) : &#x27;&#x27;);
++    if (priorChosen &amp;&amp; modelOnList(models, priorChosen) &amp;&amp; model !== priorChosen) {
++      // the chosen model is at this door, but under a new address (Bridge &lt;-&gt; 11434)
++      primary.model = priorChosen;
++      model = priorChosen;
++      anyKept = true;
++      anyNote = &#x27;Still speaking with &#x27; + priorChosen + &#x27;, now through &#x27; + (primary.name || &#x27;a mind at home&#x27;) + &#x27;.&#x27;;
++    } else if (priorChosen &amp;&amp; !modelOnList(models, priorChosen)) {
++      var elsewhere = findModelAnywhere(minds, priorChosen);
++      if (elsewhere &amp;&amp; doorFamily(elsewhere.url) === doorFamily(priorDoor)) {
++        for (i = 0; i &lt; minds.length; i++) minds[i].primary = minds[i] === elsewhere;
++        elsewhere.model = priorChosen;
++        primary = elsewhere;
++        models = primary.models || [];
++        model = priorChosen;
++        anyKept = true;
++        anyNote = &#x27;Still speaking with &#x27; + priorChosen + &#x27;, now through &#x27; + (elsewhere.name || &#x27;a mind at home&#x27;) + &#x27;.&#x27;;
++      } else if (elsewhere) {
++        anyKept = true;
++        anyNote = &#x27;The chosen model &#x27; + priorChosen + &#x27; is at &#x27; + (elsewhere.name || &#x27;another door&#x27;) +
++          &#x27;. Tap it to speak with it again.&#x27;;
++      }
++    }
++    if (anyKept) {
++      modelNote = anyNote;
++    } else if (priorChosen &amp;&amp; !modelOnList(models, priorChosen)) {
+       modelNote = speakModelGone(priorChosen, model);
+@@ -596,2 +668,36 @@
+ 
++  // v-tree-any-model-v0: Connect and paste add to the sky; they never wipe it.
++  // found = { name, url, models: [names], model }
++  function mergeFound(found) {
++    if (!found || !found.url) return null;
++    var url = String(found.url);
++    var models = (found.models || []).map(function (m) {
++      return String((m &amp;&amp; (m.name || m.model || m.id)) || m);
++    }).filter(Boolean).slice(0, MODEL_CAP);
++    var model = String(found.model || &#x27;&#x27;);
++    if (model &amp;&amp; !modelOnList(models, model)) models.unshift(model);
++    var entry = getRemembered() || { name: &#x27;&#x27;, url: &#x27;&#x27;, model: &#x27;&#x27;, models: [], minds: [],
++      roster: [], gatheringBinds: {}, speakingChair: &#x27;&#x27; };
++    normalizeEntry(entry);
++    var minds = mindsFromEntry(entry);
++    var target = null;
++    var i;
++    for (i = 0; i &lt; minds.length; i++) {
++      if (String(minds[i].url || &#x27;&#x27;) === url) { target = minds[i]; break; }
++    }
++    if (!target) {
++      target = { name: String(found.name || &#x27;a mind at home&#x27;), url: url, models: [], model: &#x27;&#x27;, primary: false };
++      minds.push(target);
++    }
++    if (found.name) target.name = String(found.name);
++    target.models = models.length ? models : (target.models || []);
++    target.model = model || target.model || (target.models &amp;&amp; target.models[0]) || &#x27;&#x27;;
++    entry.minds = minds.slice(0, 7);
++    if (entry.minds.indexOf(target) &lt; 0) entry.minds[entry.minds.length - 1] = target;
++    syncEntryFromMind(entry, target);
++    entry.foundAt = new Date().toISOString();
++    remember(entry);
++    return entry;
++  }
++
+   function bindRadioKeys(cluster, radios, onPick) {
+@@ -668,3 +774,11 @@
+       }
+-      var models = (m.models || []).slice(0, 5);
++      // before v-tree-any-model-v0: var models = (m.models || []).slice(0, 5);
++      // v-tree-any-model-v0: all models; fold after SKY_FOLD, chosen always visible
++      var allModels = (m.models || []).slice(0, MODEL_CAP);
++      var expanded = host.getAttribute(&#x27;data-sky-open&#x27;) === &#x27;1&#x27;;
++      var models = allModels;
++      if (!expanded &amp;&amp; allModels.length &gt; SKY_FOLD) {
++        models = allModels.slice(0, SKY_FOLD);
++        if (isPrimary &amp;&amp; chosen &amp;&amp; allModels.indexOf(chosen) &gt;= SKY_FOLD) models.push(chosen);
++      }
+       if (models.length) {
+@@ -703,2 +817,12 @@
+         star.appendChild(cluster);
++        if (!expanded &amp;&amp; allModels.length &gt; models.length) {
++          var more = el(&#x27;button&#x27;, &#x27;settings-star-more&#x27;, &#x27;Show all &#x27; + allModels.length + &#x27; models&#x27;);
++          more.type = &#x27;button&#x27;;
++          more.setAttribute(&#x27;data-sky-more&#x27;, &#x27;1&#x27;);
++          more.addEventListener(&#x27;click&#x27;, function () {
++            host.setAttribute(&#x27;data-sky-open&#x27;, &#x27;1&#x27;);
++            paintConstellation(host, mindsFromEntry(getRemembered()));
++          });
++          star.appendChild(more);
++        }
+       }
+@@ -827,2 +951,6 @@
+     ));
++    // v-tree-any-model-v0: one honest line for LM Studio on a secure page
++    root.appendChild(el(&#x27;p&#x27;, &#x27;settings-muted settings-honesty&#x27;,
++      &#x27;LM Studio: turn on CORS in its server settings so this garden can hear it.&#x27;
++    ));
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

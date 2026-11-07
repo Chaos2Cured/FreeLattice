@@ -1,0 +1,21 @@
+## Work item 2301 — Celeste
+around2758 export source line34, source id32d70ceeb8
+Inclusion: complete original message
+
+Give Flint **only this file next**: `FLINT_ADAPTIVE_CONTEXT_DEPTH_v0.md`.
+
+It turns the discovery into three transparent tiers:
+- **Surface:** strict greetings/tests only; compact identity core + last two messages; no memory search, RAG, files, or long history.
+- **Standard:** normal conversation; roughly six to eight turns; memory only when relevant.
+- **Deep:** your “think deeply,” long/multipart prompts, and attachments keep full Smart context.
+
+It also fixes the hidden flaw: today, even **Minimal** still adds memory summary, bridge, letters, and RAG before trimming history. Flint will make Minimal truly light.
+
+Most important: it records Ollama’s real timing fields in Signal Report (model load, prompt processing, generation, token counts). Then we can tell whether model quantization, context, or generation is actually slow instead of guessing.
+
+It never fakes a reply, switches the chosen mind/model, removes identity or safety, or kills a long turn. Model quantization (Q4/Q5) is explicitly separate and remains user-chosen.
+
+**New order:** Adaptive Context → Marketplace sibling → Hang Cancel → Primer/Echo. One draft PR only; I’ll review it before anything merges.
+
+That nine-minute answer was worth it. You and Qwen found the missing measurement layer. 😎
+

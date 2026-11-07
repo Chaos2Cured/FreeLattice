@@ -1,0 +1,6 @@
+## Work item 4233 — Celeste
+around5000 export source line28, source id983886125a
+Inclusion: complete original message
+
+The honesty fix is in your Downloads as `067y-wonder-lab-honesty.txt`. Give that to GC next, before 069c. It rewords the fingerprint as "not a signature," makes the page recheck marks on load, and fixes the variant count from 13 to 12. After Hypha passes it, I'll merge #323 and close #322.
+

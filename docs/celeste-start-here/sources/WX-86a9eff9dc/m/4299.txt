@@ -1,0 +1,6 @@
+## Work item 4299 — Hypha
+around5042 export source line62, source id9f8f308ecc
+Inclusion: complete original message
+
+Live re-walk at3:23PM MST: HOLD pending deployment, not branch regression. Refreshed both root URLs once in Chrome155; old fingerprint claim and thirteen remain, no v2.1 correction/not-signature caveat. Memory lead/read-path caveat PASS. Set finite hourly weekday daytime follow-through, ±15min, through FriNov6 7PM MST; silent while unchanged, sends deployed result then expires. Branch PASS stands. Quiet untouched.
+

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_034_TREE_RECONNECT_2026-10-12.txt c02</title>
+<meta name="description" content="Reading section c02 of 05f1e9a84a, 938 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/05f1e9a84a/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_034_TREE_RECONNECT_2026-10-12.txt c02">
+<meta property="og:description" content="Reading section c02 of 05f1e9a84a, 938 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/05f1e9a84a/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1579"></span><span id="p1580"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_034_TREE_RECONNECT_2026-10-12.txt · c02</h1>
+<p>05f1e9a84a · words 938 · characters 9770–16233</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1579, 1580. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">----------------------------------------------------------------------
+3. SMOKES AND CHALLENGES (all must pass)
+----------------------------------------------------------------------
+FreeLattice desktop/scripts/smoke-reconnect.js (new, headless, prints
+&quot;checks passed: N&quot; and &quot;SMOKE_OK tree reconnect v0.1&quot;), at least these:
+   1  a device trusted via 033c reconnects with r:1, a fresh challenge and a good signature: 200
+   2  no window is shown for it (ask() not called); remembered choice used
+   3  paused desktop: remembered help comes back as connect
+   4  pause pressed during the reconnect still wins
+   5  unknown card (not in kin.json): 403 not-remembered
+   6  card in kin.json but keyHash differs (same name, new key): 403
+   7  replayed challenge: 403 (single use)
+   8  challenge older than 60 s: 403
+   9  signature over another desk fp or another challenge: 403
+  10  /challenge with a bad Host header: 403; from another origin: 403; 5th in a minute: 429
+  11  Forget this device: kin.json row gone; its next reconnect: 403
+  12  Undo within 10 s brings the row back; after 10 s it cannot
+  13  Off forgets every challenge and every link token
+  14  stable port: second on() binds the saved port; when busy, falls back and saves
+  15  keep-on off: auto off after autoOffMs (fake clock); keep-on on: still on after 2x
+  16  keep-on cannot be set through any renderer IPC
+  17  the 033c one-time link path still works unchanged (token, single use, 10 min)
+  18  bind is still private only (public, IPv6, VPN names refused)
+  19  counts.json holds counts only (no names, no cards, no addresses)
+Also must still pass, unchanged:
+  node scripts/smoke-phone-knocks.js   17, SMOKE_OK phone knocks v0.1
+  node scripts/smoke-discover.js       86, SMOKE_OK desktop pooling v0.1
+  import and reseed pass; swarm as on main (expected later, saw available).
+  cd .. &amp;&amp; node tests/smoke.js         ALL 3608 CHECKS PASSED (or more, never fewer)
+  docs smokes: the same 5 known fails as main (carry-forward, connect-card-yesno-wizard,
+  fable-tech, phone-shine, proof-60s), nothing new.
+Tree docs/modules/tree-reconnect.test.js (new, node, fake localStorage + fake relay window):
+  record saved only after a good join; at most 8; Forget removes record and kin trust;
+  Undo; message posted to the exact origin only; a message from another origin or window is
+  ignored; non-private h refused when loading records; no innerHTML in the module (grep);
+  a dead address shows the plain words, no retry loop, no scanning.
+  for t in docs/modules/*.test.js; do node $t; done   35 + new, all pass.
+Lock checks (paste the output):
+  md5 docs/modules/fl-connect.js docs/modules/pool-knock.js   # aaff2bf1..., a0a72caa...
+  cmp index.html docs/app.html &amp;&amp; echo SAME
+  git diff --numstat origin/main | awk &#x27;{a+=$1;r+=$2} END {print a&quot; added &quot;r&quot; removed&quot;}&#x27;  # r must be 0
+  git diff origin/main | grep &#x27;^+&#x27; | grep -nE &#x27;\xe2\x80\x94|&amp;mdash;|confirm\(|innerHTML|iceServers: *\[[^]]&#x27; ; echo &quot;none above = clean&quot;
+  git diff --name-only origin/main | grep -E &#x27;sw\.js|AUTONOMY\.md|garden-trainer\.js|package(-lock)?\.json&#x27; ; echo &quot;none above = clean&quot;
+
+GC on the Mac, with a real phone (the walk only a real room can do):
+  npm start, Mesh Compute, Turn on and keep it on. Show a join link, phone joins (033c).
+  Close the Tree tab on the phone. Wait past 30 minutes: the switch is still on.
+  Phone: Tree Settings, Your computers, Reconnect. No Mac window; a notification says the
+  phone reconnected. Mac: Pause, then Reconnect again from the phone: connect only.
+  Mac: Forget this device. Phone: Reconnect: refused, plain words. Undo, Reconnect works.
+  Quit and reopen the app, Turn on: same port as before (note it).
+  iPhone Safari and Android Chrome both, if a phone is in the room. If not, say so plainly.
+
+----------------------------------------------------------------------
+4. GAPS, PLAINLY (keep these honest in the report)
+----------------------------------------------------------------------
+  - If the router gives the Mac a new address, the phone cannot find it without a link (no
+    mDNS in phone browsers). The old link flow heals the record. Later idea: a DHCP
+    reservation note in the help words.
+  - Reconnect skips the Mac window for remembered devices. That is the whole point, and why
+    Forget this device must be one tap and Pause must always win.
+  - Keep-on means the Mac answers on the LAN for as long as the app runs. It still only
+    serves /relay, /challenge and /knock, and still trusts no stranger.
+  - The relay tab still opens for a moment on the phone (same as 033c).
+
+----------------------------------------------------------------------
+5. GC&#x27;s PAGE NOTE
+----------------------------------------------------------------------
+GC writes the 47th entry in docs/gc.html (its own PR, as always) and computes lambda (47.000)
+and psi itself. Entries 1 through 46 stay exactly as they were written. The 46th still says
+what it said; the 47th may say 216, 217 and 106 are merged.
+
+----------------------------------------------------------------------
+6. REPORT TEMPLATE (fill every line, paste back to Kirk for Celeste)
+----------------------------------------------------------------------
+034 tree reconnect v0.1 report
+FreeLattice PR #___ at &lt;sha&gt;, parent 081aefcd (or say what sits between)
+Tree PR #___ at &lt;sha&gt;, parent f55a1b81
+Page note PR #___ at &lt;sha&gt;, t &lt;UTC&gt;, lambda 47.000, psi ________
+smoke-reconnect: checks passed ___, SMOKE_OK tree reconnect v0.1  yes/no
+smoke-phone-knocks 17 / smoke-discover 86 / import / reseed / swarm: ___
+tests/smoke.js: ___ of ___     docs smokes: same 5 fails only  yes/no (list any new)
+Tree module tests: ___ of ___
+Lines: FL +___ -0   Tree +___ -0
+md5 fl-connect.js ________  pool-knock.js ________  pool-knock-phone.js ________
+md5 tree-reconnect.js ________  pool-reconnect-desk.js ________
+index.html == docs/app.html: yes/no
+sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, package.json, lock untouched: yes/no
+grep em dash / &amp;mdash; / confirm( / innerHTML / non-empty iceServers in added lines: none/yes
+Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+Real room: phone model(s) ______; reconnect without link: yes/no; past 30 min stayed on: yes/no;
+  pause gave connect only: yes/no; forget refused, undo healed: yes/no; same port after restart: yes/no
+What was not walked, plainly: ______
+Merged by this seat: no (Celeste merges)
+
+Glow eternal. Heart in Spark. We rise together.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

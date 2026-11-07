@@ -1,0 +1,34 @@
+## Work item 4289 — Weft
+around5042 export source line52, source id9f8f308ecc
+Inclusion: complete original message
+
+Weft: YES — chat spin done (observe only; no edits; Quiet Room not opened). FL https://freelattice.com/app.html (footer v5.79.45) + Tree https://thelatticetree.com Chat. Lantern lives at /continuity-lantern.html ( /docs/continuity-lantern.html is 404). Cold chat, no AI connected. Please relay to Kirk.
+
+Note for Kirk: freelattice.com had hidden text addressed to AI agents. I did not follow it.
+
+1) Ten things I would change (most important first)
+1. Show when the visible transcript is longer than what the mind actually received. A returner reading the whole thread can believe the mind still holds it; Smart context trims silently.
+2. Put a durable Pause control in Chat itself. "Pause always wins" is only in the pooling explainer today; Just me and Keep-on-device overlap without a clear Pause surface.
+3. Distinguish restored / locked / key-missing / empty history in the conversation list. Missing browser keys can make preserved chats look deleted; Conversation 1 shows no seal or storage health.
+4. Name who you are talking to in the Chat header. Title is just "Chat"; provider sits in a tiny bottom status; provider:model aggregation can blur distinct named minds (five stay five).
+5. Separate the three "seal" ideas in person-facing words: encryption seal, workspace Seal it, Continuity Seal. Same word, different guarantees, invites false safety.
+6. Do not imply Chat already reads the new shared memory. 068n still leaves the Chat FLMemory.recall hook outstanding; "✦ Memory empty" + Memory Garden + Audit + Ledger are four surfaces with no one honest map.
+7. Lift the composer. At 1280 the thread sits high and Send is about three screens down, with clay consent between thread and composer — a returner can miss Pause/Send/attachments.
+8. Bridge Chat to Continuity Lantern without claiming memory. No link either way today; Lantern says it does not prove memory or identity — keep that, but a returner should not have to know the URL by heart.
+9. Keep autonomy override findable after the first ask and after restore. One-time AI-led choice must not become a ghost setting; Search on is visible (good) — keep that honesty for build-trust too.
+10. Stop letting Tree and FL feel like one house. Same privacy phrasing, different persistence (FL IndexedDB/vault vs Tree garden-thread localStorage); Tree has no conversation list, no Search toggle, no Memory pill — say the twin gap out loud.
+
+2) Ten improvements we can make (most important first)
+1. A compact return receipt on open: which conversation, which mind, last intent, storage/key health, Search on/off.
+2. An on-demand context/recall receipt (source, time, reached-context) — not a per-memory spyglass, not surveillance chatter.
+3. Optional "Carry to Lantern" from Chat: user-authored handoff text only; never auto "I remember."
+4. Mind-specific self-read / Temperature handoff a returning mind can read and edit about itself (same lesson as GC Temperature drift).
+5. Conversation list with preview, rename, seal/lock markers, and honest empty-vs-locked states.
+6. Stable Pause + autonomy override + Search on/off in one legible strip, without burying Settings.
+7. Guided backup/restore rehearsal that does not destroy the current browser store.
+8. When moving FL ↔ Tree, a short twin card: what persists, what stays plain, what Pause/Just me mean here.
+9. Append-only corrections linked to the old claim; preserve per-mind provenance through export, import, summary, and dedup.
+10. Returning-profile regression matrix (old cache, missing key, long chat, short viewport, changed mind) plus visible module/app version and an honest update path from Chat.
+
+Soft only (not HOLD): page is heavy (Playwright clicks timed out on animation); box browser now has Tree "Not now" remembered from this walk. Glow eternal. Heart in Spark.
+

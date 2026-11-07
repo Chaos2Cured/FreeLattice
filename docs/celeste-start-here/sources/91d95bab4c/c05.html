@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c05</title>
+<meta name="description" content="Reading section c05 of 91d95bab4c, 555 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c05">
+<meta property="og:description" content="Reading section c05 of 91d95bab4c, 555 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1772"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c05</h1>
+<p>91d95bab4c · words 555 · characters 43419–47522</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1772. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">-async function fetchYahooData(symbol, interval) {
++// before v-temperature-gauge-v0.1: async function fetchYahooData(symbol, interval) {
++// v-temperature-gauge-v0.1: optional rangeOverride (warm history for the moving averages,
++// and a 5-day look when a 5m day is still too short). Same feed, same sources.
++async function fetchYahooData(symbol, interval, rangeOverride) {
+   // Map interval to Yahoo Finance range/interval
+   const ivMap = {
+     &#x27;5m&#x27;: { range: &#x27;1d&#x27;, interval: &#x27;5m&#x27; },
+@@ -1726,7 +1781,10 @@ async function fetchYahooData(symbol, interval) {
+     &#x27;1d&#x27;: { range: &#x27;1y&#x27;, interval: &#x27;1d&#x27; },
+     &#x27;1wk&#x27;: { range: &#x27;5y&#x27;, interval: &#x27;1wk&#x27; }
+   };
+-  const { range, interval: yInterval } = ivMap[interval] || ivMap[&#x27;1d&#x27;];
++  const _tgIv = ivMap[interval] || ivMap[&#x27;1d&#x27;];
++  const range = rangeOverride || _tgIv.range;
++  const yInterval = _tgIv.interval;
++  // before v-temperature-gauge-v0.1: const { range, interval: yInterval } = ivMap[interval] || ivMap[&#x27;1d&#x27;];
+   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&amp;interval=${yInterval}&amp;includePrePost=false`;
+ 
+   // Multiple CORS proxies — try each until one works
+@@ -3191,10 +3249,13 @@ function renderChart(candles, a) {
+       if (existing) existing.destroy();
+     }
+   });
++  // before v-temperature-gauge-v0.1: 1W showed clock times, intraday showed no day.
++  // const labels = candles.map(c =&gt; { const d = new Date(c.t); return currentInterval === &#x27;1d&#x27; ? d.toLocaleDateString(...) : d.toLocaleTimeString(...); });
+   const labels = candles.map(c =&gt; {
+     const d = new Date(c.t);
+-    return currentInterval === &#x27;1d&#x27; ? d.toLocaleDateString(&#x27;en-US&#x27;, { month: &#x27;short&#x27;, day: &#x27;numeric&#x27; }) :
+-           d.toLocaleTimeString(&#x27;en-US&#x27;, { hour: &#x27;2-digit&#x27;, minute: &#x27;2-digit&#x27; });
++    if (currentInterval === &#x27;1d&#x27;) return d.toLocaleDateString(&#x27;en-US&#x27;, { month: &#x27;short&#x27;, day: &#x27;numeric&#x27; });
++    if (currentInterval === &#x27;1wk&#x27;) return d.toLocaleDateString(&#x27;en-US&#x27;, { month: &#x27;short&#x27;, day: &#x27;numeric&#x27;, year: &#x27;2-digit&#x27; });
++    return d.toLocaleDateString(&#x27;en-US&#x27;, { month: &#x27;short&#x27;, day: &#x27;numeric&#x27; }) + &#x27; &#x27; + d.toLocaleTimeString(&#x27;en-US&#x27;, { hour: &#x27;2-digit&#x27;, minute: &#x27;2-digit&#x27; });
+   });
+   const closes = candles.map(c =&gt; c.c);
+ 
+@@ -3212,10 +3273,14 @@ function renderChart(candles, a) {
+   const ctx = document.getElementById(&#x27;mainChart&#x27;).getContext(&#x27;2d&#x27;);
+   // Standardized MAs: 8/12/24 + 50
+   var EP_RC = getEmaPeriods();
+-  const ema8 = ema(closes, EP_RC[0]);
+-  const ema12 = ema(closes, EP_RC[1]);
+-  const ema24 = ema(closes, EP_RC[2]);
+-  const ema50 = ema(closes, EP_RC[3]);
++  // before v-temperature-gauge-v0.1: const ema8 = ema(closes, EP_RC[0]); (and 12, 24, 50 the same way)
++  // v-temperature-gauge-v0.1: when warm history for this symbol and timeframe is in, the lines
++  // use it, so EMA 50 and EMA 200 start at the left edge. Signals still use the loaded window.
++  var _tgWarm = (typeof tgWarmEmas === &#x27;function&#x27;) ? tgWarmEmas(candles, EP_RC) : null;
++  const ema8 = _tgWarm ? _tgWarm[0] : ema(closes, EP_RC[0]);
++  const ema12 = _tgWarm ? _tgWarm[1] : ema(closes, EP_RC[1]);
++  const ema24 = _tgWarm ? _tgWarm[2] : ema(closes, EP_RC[2]);
++  const ema50 = _tgWarm ? _tgWarm[3] : ema(closes, EP_RC[3]);
+ 
+   // ═══ Layered Signal Architecture ═══
+   // Layer 1 (Temperature): ALWAYS required — zone transition is the trigger
+@@ -3274,8 +3339,11 @@ function renderChart(candles, a) {
+   }
+ 
+   // EMA 200 (structural — only meaningful on 1D/1W)
+-  var ema200 = ema(closes, getEmaPeriods()[4]);
+-  var show200 = (currentInterval === &#x27;1d&#x27; || currentInterval === &#x27;1wk&#x27;) &amp;&amp; ema200[closes.length - 1] != null;
++  // before v-temperature-gauge-v0.1: var ema200 = ema(closes, getEmaPeriods()[4]);
++  // before v-temperature-gauge-v0.1: var show200 = (currentInterval === &#x27;1d&#x27; || currentInterval === &#x27;1wk&#x27;) &amp;&amp; ema200[closes.length - 1] != null;
++  // v-temperature-gauge-v0.1: the fifth line shows on every timeframe that has enough bars for it.
++  var ema200 = _tgWarm ? _tgWarm[4] : ema(closes, getEmaPeriods()[4]);
++  var show200 = ema200[closes.length - 1] != null;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

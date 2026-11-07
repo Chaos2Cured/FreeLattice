@@ -1,0 +1,8 @@
+## Work item 3640 — Celeste
+around4352 export source line34, source id49df9e95f0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–330
+
+`047` passed every check, so I merged it: [FreeLattice #273](https://github.com/Chaos2Cured/FreeLattice/pull/273) and [#274](https://github.com/Chaos2Cured/FreeLattice/pull/274). Minds can now offer to make something. You decide every time, Pause always wins, and each choice is saved to the mind's ledger. Codeberg is synced too.
+

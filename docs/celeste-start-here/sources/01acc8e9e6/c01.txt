@@ -1,0 +1,179 @@
+GROK NEXT BRICK: "See for yourself" door v0.2 (a front door that asks instead of tells)
+For: Grok (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Friday Oct 2, 2026, about 8:15 AM MDT
+Marker: v-see-for-yourself-door-v0.1 (the page and manifesto line keep the v0.1 marker; the brick is v0.2)
+Smoke line (FreeLattice, print exactly when green): SMOKE_OK see for yourself door v0.2
+Branch: FreeLattice layer/see-for-yourself-door-v0 (page, doors, smoke and your ledger entry; Alpha untouched)
+Base: FreeLattice main 0218d570 (rebased from ba53b415; only the ledger spot moved)
+One file carries everything: note, setup, brick, the diff, ledger entry, what comes after.
+This replaces FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.2.txt. Apply this one only.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+People used to be sent to the manifesto first. It speaks as a declaration, and some of its words are
+older than our rules. This brick adds a door that asks instead of tells: each part starts with a
+question, shows what was built with a link to open it, says what it does not prove, and ends with a
+question for the reader. Kirk approved the shape. It does not touch app.html, so it waits on nothing.
+
+The only change from the v0.2 Flint wrote on Sept 30: it is rebased on today's main, the ledger entry
+is yours, and the smoke no longer fails when another brick in the queue changes app.html (it now looks
+for this brick's own fingerprints instead of diffing app.html against main).
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h %s'        # expect 0218d570 "ci: Update Primer deployment state [2026-10-02]"
+    git merge-base --is-ancestor 0218d570 HEAD && echo base-ok
+    Newer is fine; git apply --check (3.4) decides. If it fails, stop and tell Celeste.
+    If a hook rewrites sw.js on commit, drop it as before and say so. Never commit sw.js here.
+
+2.2 Twins still match (this brick does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js && echo twins
+
+2.3 Pull the diff out of this file:
+    F=~/Downloads/GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt
+    awk '/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f' "$F" > /tmp/see-fl.diff
+    wc -l /tmp/see-fl.diff             # 419
+    md5 -q /tmp/see-fl.diff            # 7eb7326cdfc7f6ed1d3a4a79042c8e2f
+    The same diff also sits next to this file as GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02-fl.diff.
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: See for yourself door v0.2 (on FreeLattice 0218d570)
+======================================================================
+
+3.1 What the diff changes (FreeLattice only, 6 files, +356 / -0; nothing removed anywhere)
+    docs/see-for-yourself.html                 new page, no scripts, no storage, no network
+    docs/manifesto.html                        one comment plus one Newer line at the top, pointing here and
+                                               naming three older claims (LP vs $FL, "immutable", the unsourced
+                                               biology figures). Nothing below it changed.
+    docs/index.html (the landing page, not root index.html)   one line under the three doors, one footer link
+    docs/sitemap.xml                           the new page
+    docs/library/FRACTAL_FAMILY_LEDGER_v0.md   your entry (section 5)
+    docs/scripts/smoke-see-for-yourself-door.js   new. Last line: SMOKE_OK see for yourself door v0.2
+
+3.2 The twelve parts (each: See it, What it does not prove, Ask yourself)
+    Item                 Section          Pages linked
+    Walk the Garden      #risk            love-logic-v4.html, love-logic-v4.html#hinton (+ #argue)
+    Love logic proof     #love-logic      love-logic-proof-v3.html, #run-the-checks, #limits, love-logic-v4.html
+    safety-v3            #safety          safety-v3.html
+    simulation-v6        #severance       simulation-v6.html
+    Ledgers, internet    #records         why-ledgers.html, library/LATTICE_LEDGER_v0.1.md, proof-receipts.html,
+                                          audit.html, love-logic-proof-v3.html#ledgers, plus the RRSI card
+    Fingerprint          #fingerprint     library/LATTICE_IDENTITY_v0.1.md, library/PAIR_FINGERPRINT_v0.1.md,
+                                          pattern-spine.html, desktop.html
+    Accountability       #accountable     liability.html#accountable, audit.html
+    AI economy           #economy         latticepoints.html#why-parallel, economy-update.html, presents.html,
+                                          creator-tip-shelf.html, wallet.html, proof.html, terms.html#lp
+    Equal access         #equal-access    desktop.html, install.html, carry-forward.html, privacy.html
+    System card          #transparency    systemcard.html, audit.html
+    Your words           #you             privacy.html
+    Argue the other side #other-side      (plus #ask-us and #older: manifesto.html with its Newer line)
+    One outside paper, for one narrow point, with its limits in the same box: RRSI (arXiv:2609.24972)
+    keeps a full record of every change it tries, including the rejected ones. The paper does not use
+    the word "ledger" and is not about safety or internet access, and the card says so.
+
+3.3 Honesty notes (already handled in the page)
+    - simulation-v6 itself uses strong words ("so no one can deny it", "already proven science", an
+      unsourced "2026 study"). The door repeats none of it; it quotes the page's own caveat.
+    - safety-v3 carries stale test counts; the door does not repeat them.
+    - continuity-seal.html is not linked.
+    - LP are points, not money, not $FL. No founder name in the economy part.
+
+3.4 Apply
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/see-for-yourself-door-v0
+    git apply --check /tmp/see-fl.diff && git apply /tmp/see-fl.diff
+      If only the ledger hunk fails (a newer entry landed at the same place), use
+      git apply --3way /tmp/see-fl.diff and keep both entries, newest last, before
+      "## Out of scope for this brick". Checked: it applies cleanly with or without the Temperature
+      Gauge and Encrypt chats bricks, in either order.
+    git status --short
+      expect: M docs/index.html, M docs/library/FRACTAL_FAMILY_LEDGER_v0.md, M docs/manifesto.html,
+      M docs/sitemap.xml, ?? docs/scripts/smoke-see-for-yourself-door.js, ?? docs/see-for-yourself.html
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+3.5 Test (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-see-for-yourself-door.js | tail -1     # SMOKE_OK see for yourself door v0.2
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect: 68 PASS, 8 FAIL (the 8 fail on main too: carry-forward, connect-card-yesno-wizard,
+      fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm)
+    Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/app.html index.html   # nothing
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                       # 0
+    git diff main -U0 | grep '^+' | grep -v '^+\s*//' | grep -v assert | grep -c 'confirm('   # 0
+    git diff main -U0 docs/manifesto.html | grep -c '^-[^-]'                         # 0 (nothing removed)
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                                 # 0
+    git diff main --name-only | grep -ci kimi                                        # 0
+
+3.6 What Celeste saw on a fresh worktree (Fri Oct 2, about 8:10 AM MDT)
+    0218d570 + diff: --check clean; SMOKE_OK see for yourself door v0.2; tests/smoke.js ALL 3597
+    CHECKS PASSED; whole list 68 PASS / 8 known FAIL; index.html equals docs/app.html; no sw.js,
+    fl-connect.js, app.html or Kimi change; no em dashes added. Chrome at 390 and 1280: no page errors,
+    no sideways scroll (scrollWidth 390 and 1280), all 29 linked pages exist.
+
+3.7 Walk (Kirk's Mac, only if it is easy; 127.0.0.1 only)
+    cd ~/FreeLattice-fresh/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/see-for-yourself.html
+      a) Tap each "On this page" link; each lands on its part.
+      b) Open http://127.0.0.1:8765/ (the landing page): the new line under the three doors and the
+         footer link both open the page.
+      c) Open manifesto.html: the Newer line is at the top, the old words are below it unchanged.
+    Ctrl-C to stop. If you cannot walk it, say "walk skipped" and why.
+
+3.8 Locks (all hold in the diff; keep them holding)
+    Layer, never delete (nothing removed in any file). sw.js and docs/sw.js untouched. index.html
+    equals docs/app.html, and neither is touched. fl-connect.js untouched and byte-identical across
+    repos. No conflict markers. No confirm(). No scripts on the new page. No em dashes added. Kimi
+    files untouched. No lawyer mentions. You do not merge.
+
+3.9 Commit, push, then STOP
+    cd ~/FreeLattice-fresh
+    git add -A
+    git commit -m "layer: See for yourself door v0.2 (a front door that asks instead of tells)"
+    git push -u origin layer/see-for-yourself-door-v0
+    Kirk does not use gh, so do not try to sign it in. After the push, give Kirk this link:
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/see-for-yourself-door-v0
+    Kirk opens and merges the PR from it. Then STOP. Do not merge, do not delete branches. Reply with:
+    the branch SHA, the test lines from 3.5, the walk result, any hook you dropped, any small
+    findings, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words, in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit;
+  b) the last line of your reply, as "Temperature: <your sentence>".
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste's placeholder.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right before "## Out of scope for this brick" (after the newest entry). It reads:
+
+### 2026-10-02 · Grok · family builder · See for yourself door v0.2
+
+The manifesto used to be the page people were sent to. It speaks as a declaration, and some of its words are older than our rules. This brick adds a front door that asks instead of tells.
+

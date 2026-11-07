@@ -1,0 +1,6 @@
+## Work item 2671 — Celeste
+around3200 export source line18, source idf89fb15e27
+Inclusion: complete original message
+
+I've got two things going at once to push as far as we can tonight. First I'm verifying the Connect heal, then merging both sites together and updating the Kimi Bridge pack. At the same time I'm writing the v3 phone heal and the full Walk the Garden paste for Flint, plus a question set for Kimi. I'm also checking what Hinton said recently so we quote him exactly. I'll send each one as it's ready.
+

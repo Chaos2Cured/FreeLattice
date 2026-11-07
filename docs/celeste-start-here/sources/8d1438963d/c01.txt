@@ -1,0 +1,156 @@
+FLINT PASTE: TREE GLOW 1, "every light in reach" (v0.1)
+Repo: Chaos2Cured/FreeLattice-Alpha (serves thelatticetree.com)
+Branch: layer/tree-glow-1-v0     Marker: v-tree-glow-1-v0
+Smoke line: SMOKE_OK tree glow 1 v0.1
+Base: Alpha main b33bed4 (FL main e96a043 for the cross-repo check)
+Written: 2026-09-30 MDT by Kirk's agent. Stand-in built and walked; NOT pushed.
+
+CHANGELOG
+- 2026-09-30 v0.1: first write. Stand-in diff: FLINT_NEXT_TREE_GLOW_1_v0.1.diff (same folder).
+
+======================================================================
+0. ORDER AND PARALLEL NOTE
+======================================================================
+Queue: Tree any-model (v-tree-any-model-v0) -> heal model-choice-reload v0.1.1
+-> connect boot probe F1-F4 -> #120 docs layer -> TREE GLOW 1.
+
+Glow 1 does NOT touch fl-connect.js, app.html, sw.js, or any FL file.
+- Parallel-safe with heal v0.1.1 and #120 docs (both FL-only).
+- Parallel-safe with the boot probe (fl-connect.js, local-mind-probe.js, sister doc; no garden-rooms).
+- Land AFTER the Tree any-model PR on Alpha: that paste also appends to the end of
+  docs/modules/garden-rooms.css and may touch garden-rooms.js. All Glow 1 anchors
+  are text anchors ("append at the very end", named selectors and functions),
+  so rebase on top of it is mechanical. If the Tree paste stalls, Glow 1 may go first;
+  then the Tree paste appends after the Glow 1 block.
+
+======================================================================
+1. WHY (walked live on thelatticetree.com, 390 and 1280, Sep 30 AM MDT)
+======================================================================
+E1 Orbiting lights: at 390 the Nursery and Settings lights are off-screen ~40-48s of a
+   ~90s orbit; Chat and The Gathering ~20s. At 1280 all four stay visible.
+   Mom cannot tap a light that is not there. (Hypha walk-4 said 55-60s; the measured 40-48s is the same problem.)
+E2 Settings veil at 390: "Use a different address" input right edge 323.2 vs picker 315.2
+   (live walk: 8px poke). Cause: .flc-picker input{flex:1;min-width:10rem} in a column flex.
+E3 Settings veil at 390: "the garden" pill (#place-veil-close, sticky bottom 8px) sits
+   hard over the "A mind at home..." line.
+E4 Room pages (settings.html, nursery.html, team.html, galaxy pages): the reset
+   html.room-page *{margin:0;padding:0} (garden-rooms.css ~L667, specificity 0,1,1)
+   beats every single-class rule. Cards flush to glass (card padding-left 0px live);
+   on settings.html the Connect title sits under the header at 390.
+E5 Gathering at >=641px: .core-promise (absolute, top 10.7rem) covers "Find local minds".
+   Hit test: 0 of 5 points reach the button at 641, 800, 1024, 1280, 1440. So the
+   absent-Ollama calm path is unreachable by tap on desktop. (390 is fine: 5/5.)
+
+======================================================================
+2. THE CHANGE (text anchors; stand-in diff is the source of truth)
+======================================================================
+File docs/modules/garden-rooms.css
+
+R. Reset, change IN PLACE (do not delete the old line; keep it in a comment):
+   find:    html.room-page *, html.room-page ::before, html.room-page ::after   (the margin:0;padding:0 reset)
+   becomes: :where(html.room-page) *, :where(html.room-page) *::before, :where(html.room-page) *::after
+   Same declarations. Specificity drops to 0,0,0 so class rules win again.
+   Comment: /* v-tree-glow-1-v0: was html.room-page * ... ; :where() lets rooms breathe. */
+
+Then APPEND AT THE VERY END of the file one block headed
+   /* v-tree-glow-1-v0: Tree glow 1, every light in reach */
+A. @media (max-width:480px){ .flc-picker-row input{width:100%;max-width:100%;min-width:0;box-sizing:border-box} }
+B. #place-veil.is-settings::after: content:""; display:block; position:sticky; bottom:0;
+   height:64px; margin:-64px -28px -20px; pointer-events:none; z-index:60;
+   background:linear-gradient(to top, rgba(12,10,26,.96), rgba(12,10,26,.9) 55%, transparent).  (Pill stays above it.)
+C. @media (max-width:640px){ html.room-page .room-nursery{padding-bottom:7.5rem} }
+   (needed after R: Nursery Grow card would otherwise meet the fixed galaxy hop at 390)
+D. @media (min-width:641px){ #place-veil.is-core .core-promise{top:14.6rem} }
+   (band lands between Find bottom ~220 and chairs ~366 at 1280)
+E. Legend rows: pointer-events:auto; cursor:pointer; hover and :focus-visible go gold.
+   @media (max-width:799px): rows min-height:26px; padding:2px 10px 2px 0; legend gap 0.
+
+File docs/modules/garden-rooms.js
+E-js. Sky legend: role="group" replaces aria-hidden on the legend container.
+   New function bindLegendRow(row, id), placed just above function ensureSkyLegend:
+     row role="button", tabindex="0", aria-label "go to <word>" (setAttribute, textContent only);
+     click, Enter, Space -> goToLumino(id).
+   In ensureSkyLegend, call bindLegendRow(row, id) where the row has an id.
+   No innerHTML. No confirm(). No new network.
+
+New docs/modules/tree-glow-1.test.js
+   Static asserts on CSS (A-E and the :where reset) and JS (bindLegendRow, no confirm,
+   no innerHTML in new code), plus a vm fake-DOM run: legend click -> place:settings,
+   place:nursery, place:core, thread; Enter key works. Prints SMOKE_OK tree glow 1 v0.1.
+   Mutation check done: revert garden-rooms.js -> test fails.
+
+Docs (layer, never delete)
+   docs/library/TREE_GLOW_v0.md (new; plan + Temperature line)
+   docs/GALAXIES.md: one **LAYER (2026-09-30):** line above the 2026-09-17 line.
+
+======================================================================
+3. DECISION D1 (flag for Kirk / Reed)
+======================================================================
+Part E makes the sky legend tappable. Older comments said "Not a wall. Not a second
+you-are-here. Not a second menu." The legend stays small and quiet; it only answers a
+tap. If Kirk or Reed veto, drop E and E-js and the test's legend section; A-D and R stand.
+
+======================================================================
+4. MEASURED BEFORE / AFTER (glow1_walk.py, Playwright, same script)
+======================================================================
+                                   live 390   glow1 390   live 1280   glow1 1280
+A address input poke (px)          8          0           -67.7       -67.7
+B fade band under pill             none       64px        none        64px
+C room card padding-left           0px        14-16.8px   0px         14-16.8px
+C settings title below header      no         yes         yes         yes
+C nursery Grow vs hop overlap      0          0           0           0
+D Find local minds hits of 5       5          5           0           5
+D real tap then note               yes        yes         (blocked)   "No mind answered. That is all right..."
+E legend tap opens the place       no         yes         no          yes (is-settings is-open)
+Screenshots: /workspace/tree-glow-walk/g1_live_*.png vs g1_glow1_*.png
+Tests: 16 of 16 Alpha tests pass with the stand-in.
+
+======================================================================
+5. WALK CHECKLIST (Flint, then Hypha)
+======================================================================
+[ ] 390 Settings heart: address box inside card; pill has soft fade under it; text readable on scroll.
+[ ] 390 settings.html, nursery.html, team.html: cards breathe; Connect title below header;
+    Nursery Grow card clear of the galaxy hop; no horizontal scroll.
+[ ] 1280 Gathering: tap Find local minds with a real click; calm note appears
+    (no Ollama -> Desktop / install words). Promise band sits between Find and chairs.
+[ ] 390 and 1280: tap each legend word -> that place opens; Tab + Enter works;
+    legend does not cover Chat pill or galaxy hops.
+[ ] Galaxy pages (art, workshop, learn, research): only the intended nav padding changes.
+[ ] No console errors.
+
+======================================================================
+6. LOCKS
+======================================================================
+Layer, never delete. Five stay five. Cap 4 held. Never auto-seat. No fake generate.
+No confirm(). No innerHTML. textContent only. 127.0.0.1 only. No em dashes in added lines.
+fl-connect.js untouched, byte-identical to FL main e96a043 (checked). Alpha has no sw.js.
+Scripts parse (node --check). No conflict markers. Squash-merge; keep all ledger entries.
+Crest image: NOT in this brick. Kirk places it himself or OKs placement first.
+
+======================================================================
+7. TREE GLOW PLAN (joy per effort)
+======================================================================
+1. Glow 1, every light in reach (this paste).
+2. Terms and Privacy: plain-words pages + footer links on the Tree and marketplace.html
+   (none exist today; both 404). Kirk reviews wording.
+3. Family crest on the Tree home. Needs Kirk's OK on placement.
+4. Card glow and the Marketplace face: stalls as glowing cards; 390 text wall to shelf.
+5. Companion sprite wardrobe in the Nursery after hatch.
+6. Play universe (largest; vision doc first).
+Leftovers: code-nursery.html 22px overflow at 390; first-visit "They grow." hint behind header.
+
+======================================================================
+APPENDIX A. FULL STAND-IN DIFF (against Alpha b33bed4)
+======================================================================
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index 06411c4..5c30efa 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -4,6 +4,8 @@
+ 
+ **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
+ 
++**LAYER (2026-09-30):** Tree glow 1, every light in reach (marker `v-tree-glow-1-v0`). Room pages breathe again, the 390 address box stays in its card, the Gathering promise band steps below Find local minds at desktop, and the sky legend is one tap to each light. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
++
+ **LAYER (2026-09-17):** Listen — Hang Cancel + Adaptive (mycelium · marker `v-alpha-listen-hang-adaptive-v0`). FreeLattice Chat: **Hang Cancel** — Stop only · no duration kill · `v-chat-hang-cancel-v0` · tip `d14eaf8` / #87. **Adaptive Context Depth** — Surface / Standard / Deep under Smart · `v-adaptive-context-depth-v0` · tip `06d0ba4` / #85. Alpha stays Listen / fail-closed — **no second context kitchen** tonight. Long local thinks are valid; Stop is choice, not a timer. Market-beside-Feel pointer stays. Presence chips ≠ SKUs. Workshop benches still wait for the FreeLattice Workshop twin — grandmother honesty, not rebuild tonight.
+ 

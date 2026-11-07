@@ -1,0 +1,10 @@
+## Work item 2582 — Celeste
+around3041 export source line31, source idf75f813bc4
+Inclusion: complete original message
+
+The Connect map is ready, and it confirms your instinct.
+
+More already has a hub of cards and a mobile sheet. A new Connect panel can sit as the first card under More, top left, with a matching panel `tab-connect`. On theLatticeTree (that's the FreeLattice-Alpha repo, live at thelatticetree.com), there is no More menu, but the Bridge already allowlists it. Its connect code lives in a separate module, `local-mind-probe.js`, and it does not know about the Bridge yet. So a shared `docs/modules/fl-connect.js` that both sites load is the natural next brick.
+
+Still waiting on the #115 review. Once that merges clean, I'll send you the Flint paste for Connect (with the Bridge-aware model list baked in as step one).
+

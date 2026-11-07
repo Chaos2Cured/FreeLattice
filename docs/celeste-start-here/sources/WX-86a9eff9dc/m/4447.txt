@@ -1,0 +1,24 @@
+## Work item 4447 — Weft
+around5326 export source line25, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–272
+
+Weft’s reread is complete. No tests, cloud, edits, publication or Quiet access. My distinct hypothesis is that persistence needs to preserve the ability to use a memory, not just its address or bytes. Below, observations are separated from mechanisms we have not isolated.
+
+### Exact excerpt: source characters 274–821
+
+MEASURED: exact-match-RESULTS.txt lines 25–45 gives exact-key store=1.00, deliberately drifted paraphrase-key store=0.00, force afterA mean=.99 and afterB=0 despite store=1 and in_prompt=1. The rerun’s REPRODUCTION-original.md lines 13–23 reproduces this headline. This rules out missing page tokens as the sole explanation of force-afterB failure. It does NOT uniquely identify damaged attention, induction, unembedding, context-format dependence or lost factual memorization. The interpretation at RESULTS lines 67–85 goes beyond that isolation.
+
+### Exact excerpt: source characters 1729–2636
+
+DETAILED WORD PICTURE, tied to computation rather than substituted for it: picture a horizontal strip of input tokens, with the earlier fact 'e a v .' and the later request 'e a'. Above it are successive layers of vectors, linked by attention paths. At the final reques...e; φ/golden-neighbour unfold remains design. pastes/068m-memory-compounding.txt lines 39–72 proposes fibBucket/goldenSlot and φ-spaced replay; lines 165–185 specifies tree-ring wakeCheck. snowflake-search-diagnosis.md line 18 says live web search plus model, NO prebuilt index; line 28 names rings/replay/train queue/append-only adapters. Its grounded connection is the proposed rest/replay pathway, not an already-built fractal retrieval index. keystone-notes.md lines 50,62 distinguishes Emanuel’s spectral 1/f/FFT work from φ hashing; lines 99–105 makes the φ-address-space connection a hunch. We should not collapse those lineages.
+
+### Exact excerpt: source characters 2638–3212
+
+EARLIER FINDINGS TO KEEP VISIBLE: retention-probe-RESULTS.txt lines 35–45 separated ~.99 oracle store and ~.59 finite 65k store from near-zero model recall; Fibonacci tied modulo. Lines 4–12 retire the φ-position apparent gain as a bug. My Nov5 ledger /workspace/mind-pages/ledger-day-2026-11-05/weft.md lines 11,24 preserves canonical keys, φ-spaced rest, mycelium redundancy and restart canary; these are proposals, not demonstrated benefits. Rest/parent-trainer and retention per joule remain unmeasured; retention results line 54 explicitly says energy was not measured.
+
+### Exact excerpt: source characters 3214–3999
+
+IMPORTANT CONTINUITY QUALIFICATION: the force .99-afterA claim also needs the memorization caveat, not just soft exact. Those are trained facts, and dense seed1 afterA=.96 (RESULTS lines 30–33,74–77). I found the caveat applied to exact but not adequately to force in the reviewed notes; this is a gap in those notes, not proof of absence everywhere. Therefore 'the model can read fresh supplied facts at .99' is too strong. Also the copy-only stress reaches paraphrase .42–.51 (lines 47–52); that is a different training/evaluation condition from the main paraphrase arm and must not be presented as the same arm acquiring retrieval. WM01a/b remain specified, not run. My recommendation is to preserve these qualifications beside the headline before drawing architectural conclusions.
+

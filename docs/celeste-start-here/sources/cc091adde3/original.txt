@@ -1,0 +1,151 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+GROK NEXT BRICK: Mesh Kin connect heal (codes you can see, words Mom knows)
+For: GC (Grok Code) on Kirk's Mac
+From: Celeste
+Written: Sunday Oct 4, 2026, about 4:30 PM MDT
+Marker: v-mesh-kin-connect-heal
+Smoke line: SMOKE_OK mesh kin connect heal
+RUN THIS ONLY AFTER PR 144 (Mesh Kin v0.2 plus the heal onto 144) IS MERGED. It is built on top of it.
+(Updated 6:10 PM MDT: same diff, it applies on the healed 144. Only the fl-kin.js md5 changed.)
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-kin-connect-heal  base main with PR 144 merged
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_MESH_KIN_CONNECT_HEAL_2026-10-04-fl.diff  (659 lines, md5 c6ff66569c451eefa90cdcc4563d88c8)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, Hypha walked Mesh Kin v0.1 as Mom would, at 390, at 200% and at 1280. What she found:
+- Tapping Start Connection showed nothing, because the code was inside a closed "Advanced".
+- The card promised a 6-character code, but it takes two 712-character codes.
+- The invite died after 30 seconds, too fast to text a code there and back.
+- Kin cards hid in the same closed box with no sign one had come.
+- The buttons were 19 px tall.
+- The words were keeper, vouched, Offer and Answer.
+v0.2 fixed the keys and signatures. This one fixes the door and the words. You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git status --short     # must print nothing
+    git fetch origin && git checkout main && git merge --ff-only origin/main
+    grep -c "v-mesh-kin-v0.2 heal" docs/modules/fl-kin.js   # 10 or more: the v0.2 heal is in
+    cp ~/Downloads/GROK_NEXT_MESH_KIN_CONNECT_HEAL_2026-10-04-fl.diff /tmp/kin-connect-fl.diff
+    md5 -q /tmp/kin-connect-fl.diff                  # c6ff66569c451eefa90cdcc4563d88c8
+Order: checked on the box in all 360 orders of the six pending diffs where v0.2 comes before
+this one: Narrow door, Hook heal, Sophia, Gathering, v0.2, connect heal. If plain apply
+complains, use `git apply --3way` and say so.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (5 files, +333 / -56; each removed line is kept as a
+   "before v-mesh-kin-connect-heal" comment. Lines that held an em dash entity are
+   paraphrased in the comment, so no dash is added)
+----------------------------------------------------------------------
+a) docs/app.html (index.html the same):
+   - meshRevealCodeArea(areaId) opens the closed details, scrolls the code to the center, and
+     focuses it. Start Connection, Join a Peer and Make my reply code call it.
+   - MESH_HANDSHAKE_TIMEOUT goes from 30 s to 10 minutes. Running out says: "The invite ran
+     out before the reply code came back. Tap Start Connection again. If it keeps happening,
+     try home Wi-Fi..."
+   - If the offer gathered 0 address candidates, a gentle toast says the network hid the
+     address.
+   - Honest words:
+     - The Community card explains the two long codes, 10 minutes, and Google's free STUN
+       helper. "No servers" and the "share your code, that's it" promise are gone.
+     - The 6-character code is labelled "Your short name on the mesh (so friends can spot
+       you; not used to connect)".
+     - Offer/Answer becomes invite code and reply code, and "Generate Answer" becomes "Make my
+       reply code". The 4 steps say the same.
+   - Kin heading: "AI cards from people you connected with". mountCommunityTab moves
+     #meshKinSection out of the closed details, to just above Shared Knowledge.
+   - When a kin card passes every check, a toast says "<name> shared an AI card: <card>. It is
+     on Community, under AI cards." (textContent toast, names clipped to 40 characters.)
+   - Sizes and contrast:
+     - The Community details summary is 16px, opacity 0.8, 44px tall, and reads "Connection
+       codes and people connected". The details get 120px of room at the bottom above the
+       nav bars.
+     - The Settings Advanced line is 16px and clearer: "mesh, debug, developer (your Mesh ID
+       lives here)". tests/smoke.js still finds "mesh, debug, developer".
+b) docs/modules/fl-kin.js (md5 becomes 5e6a820b7e9f96e2a7af6c12a7db33ab):
+   - A small style block (#flKinStyle, added once): 16px text, 44px buttons and input, a
+     placeholder at 0.72 white. The row button sits on the right, clear of the floating
+     button at 200%.
+   - Words:
+     - "From Mom's computer (ID AbCdEfGh)." The short ID drops the "mesh:" label.
+     - "Not trusted yet. Trusting lets you send this AI questions, and lets it ask yours when
+       you choose to share. You can stop at any time."
+     - "Trusted. You can send this AI questions below..."
+     - The buttons read [Trust this AI] / [Stop trusting].
+     - Cards that are set aside say why, plainly.
+     - "Make your Mesh ID first: Settings, then Advanced, then Mesh ID." (the old hint
+       pointed to the wrong place).
+     - "No one is connected yet."
+     - The honest line: "A card shows which person's computer sent it. It does not prove what
+       the model is."
+c) docs/scripts/smoke-mesh-kin-connect-heal.js (new): everything above, plus the module
+   mounted with real Ed25519 keys, checking the shown words for any jargon left over.
+d) Ledger entry with your placeholder.
+Not in this brick: TURN (strict NATs and phone data still fail; that needs a server, Kirk's
+call). The queue panel words (fl-kin-queue.js) are unchanged.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git checkout -b layer/mesh-kin-connect-heal
+    git apply --check /tmp/kin-connect-fl.diff && git apply /tmp/kin-connect-fl.diff
+    cmp index.html docs/app.html && echo index-eq-app
+    md5 -q docs/modules/fl-kin.js                    # 5e6a820b7e9f96e2a7af6c12a7db33ab
+    node docs/scripts/smoke-mesh-kin-connect-heal.js # SMOKE_OK mesh kin connect heal
+    node docs/scripts/smoke-mesh-kin-heal-v0.2.js    # SMOKE_OK mesh kin heal v0.2
+    node docs/scripts/smoke-mesh-kin-v0.2.js         # SMOKE_OK mesh kin v0.2
+    node docs/scripts/smoke-mesh-kin-v0.js           # SMOKE_OK mesh kin v0.1
+    node tests/smoke.js | grep "CHECKS PASSED"       # ALL 3608 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect FAIL 8, the same 8 as main; PASS one more than main.
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/modules/quiet-room.js docs/modules/fl-kin-queue.js   # nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                      # 0
+    git diff main -U0 | grep '^+' | grep -c '&mdash;'                           # 0
+    git diff main -U0 | grep '^+' | grep -v assert | grep -c 'localhost\|innerHTML\|confirm('   # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+
+What Celeste saw (box):
+- On the healed 144: all four kin smokes OK, tests/smoke.js 3608 passed.
+- On v0.2 alone: PASS 75, FAIL 8 (the same 8); 54 inline scripts parse; tests/smoke.js
+  3608 passed.
+- With all six pending diffs: PASS 79, FAIL 8; 55 inline scripts parse.
+Not verified: a real phone at 390, or real 200% zoom. Please look if you can.
+
+Walk (only if easy; 127.0.0.1 only):
+    cd ~/FreeLattice-fresh/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html, go to More, then Community, and tap Start Connection.
+    The invite code should come into view by itself. AI cards should show above Shared
+    Knowledge. Try 390 wide and 200% zoom. Say "walk skipped" if you cannot.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+    sed -i '' 's/GC_TEMPERATURE_CONNECT_HEAL_HERE/your line here/' docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_CONNECT_HEAL_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md   # 0
+
+----------------------------------------------------------------------
+6. COMMIT, OPEN THE PR YOURSELF, THEN STOP
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "layer: Mesh Kin connect heal (codes you can see, words Mom knows)"
+    git log -2 --oneline     # drop only a "docs: Auto-update Session Primer" commit, if any, and say so
+    git push -u origin layer/mesh-kin-connect-heal
+    gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/mesh-kin-connect-heal \
+      --title "layer: Mesh Kin connect heal (codes you can see, words Mom knows)" \
+      --body "Soft LAYER marker v-mesh-kin-connect-heal. From Hypha's walk of Mesh Kin v0.1. Start and Join bring their codes into view; honest words (two long codes, Google STUN, no 6-character promise, no No servers); invites last 10 minutes with a reason and next step on timeout; AI cards in plain view on Community with a toast when one arrives; 44px controls, 16px text, readable placeholder and gateway lines, room above the bottom bars; Mom words (no keeper, vouched, Offer/Answer; says what Trust does). Old lines kept as comments. TURN not included. SMOKE_OK mesh kin connect heal."
+Then STOP. Do not merge, do not delete branches.
+Reply with: the PR number and URL, the branch SHA, the test lines, the locks, the walk result,
+any hook commit you dropped, and your Temperature line.

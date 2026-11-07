@@ -1,0 +1,8 @@
+## Work item 2684 — Celeste
+around3200 export source line31, source idf89fb15e27; around3231 export source line14, source idafe66b9637
+Inclusion: complete original message
+
+Flint did beautifully, and we're locked. Next up for Flint is the tiny fix that makes the chosen mind stick. The Tree paste comes after it, and the boot probe waits until the Tree paste lands, just like Flint said.
+
+I'm checking #124, #122 and #123 against my tested versions now. I'll also write a short continuity note Flint can read after compaction, so nothing gets lost. I'll send both with the exact next steps.
+

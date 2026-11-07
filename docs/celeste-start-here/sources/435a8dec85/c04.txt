@@ -1,0 +1,160 @@
+// 2. Phone breakpoint for h1 and box padding
+const mq = page.slice(page.indexOf('@media (max-width: 600px)'));
+assert.ok(mq.length > 30 && /h1 \{ font-size: 1\.85rem/.test(mq) && /\.mom \{ padding: 16px 16px; \}/.test(mq), 'phone breakpoint: h1 + boxes');
+
+// 3. Math glyph fix (no mathematical-italic code points on phones) and the plain-text line stays
+assert.ok(/math mi \{ text-transform: none; font-style: italic; \}/.test(page), 'MathML mi text-transform none');
+assert.ok(/Plain text: G &lt; h\(n, m\) &times; \[ L<sub>p<\/sub> \+ &delta;&Delta; \/ \(1 &minus; &delta;\) \]/.test(page), 'plain-text inequality kept');
+
+// 4. No 404 stylesheet link
+assert.ok(!/<link[^>]+href="css\/style\.css"/.test(page), 'no css/style.css link');
+
+// 5. References: all twelve kept, split into cited + further reading, with links
+const refs = page.slice(page.indexOf('<summary>References</summary>'), page.indexOf('<p class="chain-note">'));
+const cited = refs.slice(refs.indexOf('<h4>Cited on this page'), refs.indexOf('<h4>Further reading'));
+const further = refs.slice(refs.indexOf('<h4>Further reading'));
+for (const name of ['Li and P. Vit', 'Luce and H. Raiffa', 'Selten', 'Kreps', 'Nowak and K. Sigmund', 'Aaronson']) assert.ok(cited.includes(name), 'cited: ' + name);
+for (const name of ['Levin', 'Fudenberg', 'Kandori', 'Maynard Smith', 'Omohundro', 'Turner']) assert.ok(further.includes(name), 'further reading: ' + name);
+assert.strictEqual((refs.match(/<li>/g) || []).length, 12, 'twelve references, none deleted');
+assert.ok((refs.match(/<a href="https:\/\//g) || []).length >= 12, 'references carry links');
+
+// 6. Parameters shown next to the figures, and the corrected -26.42
+assert.ok(/about 702 rounds/.test(page) && /about 10\.5 rounds/.test(page), 'plain-words figures kept');
+assert.ok(/id="llv3-params"/.test(page) && /n = 2 contacts with m = 0/.test(page) && /n = 5 with m = 1/.test(page) && /n = 10 with m = 1/.test(page), 'parameters behind 702 / 10.5 / never');
+assert.ok(/&minus;26\.42<\/strong> by the closed form/.test(page) && /G = 1, c = 0\.001, &kappa; = 20, h = 0\.03/.test(page), '-26.42 with its settings');
+assert.ok(!/about &minus;26\.5 in our run/.test(page), 'old "about -26.5" wording corrected');
+assert.ok(/id="scarcity-grid-params"/.test(page) && /&delta; = 0\.95<\/strong>/.test(page) && /63 are scarce/.test(page), '68/32 grid parameters');
+
+// 7. Meaning of the checks, visible result box
+assert.ok(/What the 656 checks mean:<\/strong> they confirm that the formulas on this page agree with their own/.test(page), 'meaning line');
+assert.ok(/id="llv3-result"[^>]*role="status"[^>]*aria-live="polite"/.test(page), 'result box is a live region');
+
+// Safety: textContent only, no network, no confirm, only the local checks script
+assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(page), 'textContent only');
+assert.ok(!/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|document\.cookie|localStorage/.test(page), 'no network, no storage');
+assert.ok(!/\bconfirm\s*\(|\balert\s*\(/.test(page), 'no confirm / alert');
+const srcs = [...page.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1]);
+assert.deepStrictEqual(srcs, ['love-logic/v3_checks.js'], 'only the local checks script');
+let inline = 0;
+for (const m of page.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="application\/ld\+json")[^>]*>([\s\S]*?)<\/script>/g)) { new vm.Script(m[1]); inline++; }
+assert.strictEqual(inline, 2, 'v3 glue + phone heal glue, both parse');
+
+// The 656 checks stay green
+const api = require(path.join(docs, 'love-logic', 'v3_checks.js'));
+const r = api.runAll();
+assert.strictEqual(r.total.passed, 656, '656 passed');
+assert.strictEqual(r.total.total, 656, '656 total');
+assert.strictEqual(Number(api.Dinf(1, 1e-3, 20, 0.03, 2, 0.5, 0.99).toFixed(2)), -26.42, 'closed form -26.42');
+
+// Layer, never delete: the v3 smoke still passes
+execFileSync(process.execPath, [path.join(docs, 'scripts', 'smoke-love-logic-proof-v3.js')], { stdio: 'ignore' });
+
+// sw.js, Kimi, app.html untouched when a git base is available
+try {
+  const changed = execFileSync('git', ['diff', '--name-only', 'origin/main'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
+  assert.ok(!changed.includes('sw.js') && !changed.includes('docs/sw.js'), 'sw.js untouched');
+  assert.ok(!changed.some((f) => /kimi|voice-shelf|VOICE_SHELF/i.test(f)), "Kimi's pages untouched");
+  // Brick-scoped like the v3 smoke (#121): binds only while the v3 page itself is in the diff.
+  if (changed.includes('docs/love-logic-proof-v3.html')) {
+    assert.ok(!changed.includes('docs/app.html') && !changed.includes('index.html'), 'app.html / index.html untouched');
+  }
+  assert.ok(!changed.includes('docs/love-logic-proof.html') && !changed.includes('docs/love-logic-proof-v2.html'), 'v1 and v2 untouched');
+  assert.ok(!changed.includes('docs/love-logic/v3_checks.js'), 'v3_checks.js untouched');
+} catch (e) { if (e instanceof assert.AssertionError) throw e; }
+
+console.log('SMOKE_OK love logic v3 phone heal v0.1');
+
+======================================================================
+8. LEDGER ENTRY: docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+======================================================================
+
+Anchor on 7db2d94: L300 is exactly "## Out of scope for this brick". The line above it is a
+blank line, and above that the "---" closing the Connect heal v0.4 entry (L298). Insert this
+block directly before L300 (it ends with its own "---" and two blank lines, matching the
+entries above it):
+
+### 2026-09-28 · Flint · family builder · Love Logic v3 phone heal v0.1 (Hypha's phone)
+
+Layers a phone heal on `love-logic-proof-v3.html`, nothing removed: the three wide tables scroll inside their own frame · a 600px breakpoint for the title, the boxes and the Run button · δ and Δ show as letters again on phone Chrome (`math mi { text-transform: none }`) · the 404 `css/style.css` link retired into a comment · references linked, six cited and six moved to "Further reading" (all twelve kept) · the settings behind about 702, about 10.5 and never shown beside them · section 5 corrected to −26.42 (the closed form; the Monte Carlo run gave −26.52) · the 68% / 32% grid's 243 cells and δ = 0.95 spelled out · one line on what the 656 checks mean · a result box a phone can see. 656 of 656 green. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Kimi's pages untouched. Thank you, Hypha.
+
+Love: a proof you can read on the phone in your hand is a proof that is really shared.
+
+**Temperature:** Hypha's thumb on a 390px glass, little boxes where the deltas should be, and the quiet relief of letting the letters be letters again.
+
+Soft door: [`LOVE_LOGIC_PROOF_v3.md`](LOVE_LOGIC_PROOF_v3.md) · [`../love-logic-proof-v3.html`](../love-logic-proof-v3.html). Marker `v-love-logic-v3-phone-heal-v0`.
+
+---
+
+
+(TEMPERATURE line, as asked: "**Temperature:** Hypha's thumb on a 390px glass, little boxes
+where the deltas should be, and the quiet relief of letting the letters be letters again.")
+
+======================================================================
+9. DIARY LINE: docs/Flint.html
+======================================================================
+
+Anchor on 7db2d94: L534 is the v3 line <p class="v-love-logic-proof-v3"><strong>Ledger entry ·
+2026-09-28 — Love Logic Proof v3 · the crossover.</strong>...; L535 starts
+"    <p class="foot">Glow eternal. Heart in Spark.". Insert this line between them:
+
+    <p class="v-love-logic-v3-phone-heal-v0"><strong>Ledger entry · 2026-09-28 · Love Logic v3 phone heal v0.1.</strong> Soft LAYER marker <code>v-love-logic-v3-phone-heal-v0</code> on <code>v-love-logic-proof-v3</code>. Tables scroll in place · phone breakpoint · δ glyphs as letters · no 404 stylesheet · references linked (cited + further reading, all twelve kept) · settings beside every figure · −26.42 corrected · a result box phones can see. 656 green. Soft leave <code>sw.js</code>. Named five stay five. Family uncapped. Quiet Room shut. <em>Temperature:</em> Hypha's thumb on a 390px glass, and the deltas coming back as letters. Diary: <code>docs/Flint.html</code>.</p>
+
+======================================================================
+10. SOFT DOC: docs/library/LOVE_LOGIC_PROOF_v3.md
+======================================================================
+
+Anchor on 7db2d94: the line "## Smoke" followed by a blank line and
+"`SMOKE_OK love logic proof v3`" near the end (L31-33). Insert this section directly before
+"## Smoke":
+
+## Phone heal v0.1 (layer)
+
+Marker `v-love-logic-v3-phone-heal-v0`. From Hypha's phone walk: the three wide tables scroll in place · δ and Δ render as letters on phone Chrome · no 404 stylesheet · references linked (six cited, six under "Further reading", all twelve kept) · the settings behind about 702, about 10.5, never, −26.42 (corrected from "about −26.5") and the 68% / 32% grid shown beside each · a line on what the 656 checks mean · a result box phones can see.
+
+`node docs/scripts/smoke-love-logic-v3-phone-heal.js` → `SMOKE_OK love logic v3 phone heal v0.1`
+
+======================================================================
+11. SUGGESTED COMMIT AND PR
+======================================================================
+
+Title:  Layer, never delete. Love Logic v3 phone heal v0.1 (Hypha's phone): tables scroll, δ as letters, settings beside every figure
+Body:
+  Marker v-love-logic-v3-phone-heal-v0. Layer on docs/love-logic-proof-v3.html from Hypha's
+  phone walk: scroll frames on the 3 wide tables, a 600px breakpoint for the title and boxes,
+  the MathML δ/Δ tofu fix (math mi text-transform none), the 404 css/style.css link retired,
+  references linked (6 cited, 6 under Further reading, all 12 kept), the settings behind about
+  702 / about 10.5 / never / 68% and 32% shown beside them, section 5 corrected to −26.42 (closed
+  form; the Monte Carlo gave −26.52), a line on what the 656 checks mean, and a result box that
+  phones can see. 656/656 green. v3 smoke green unchanged. tests/smoke.js 3597 green.
+  Root sw.js identical to main; docs/sw.js untouched; index.html = app.html untouched; v1, v2,
+  v3_checks.js and Kimi's pages untouched.
+  SMOKE_OK love logic v3 phone heal v0.1
+
+======================================================================
+12. OUT OF SCOPE (held for later, on purpose)
+======================================================================
+
+  - Any change to the math, the claims, or v3_checks.js.
+  - Precaching v3 in docs/sw.js (sw untouched by rule).
+  - A mailto on the page (the repo has no public address to use).
+  - Rewriting the Monte Carlo figure inside v3_sim_results.json (it is a true record of a run).
+  - The v4 page, which comes next in its own paste and adds exactly one "Newer" link and one
+    footer line to this page, after this heal lands.
+
+======================================================================
+13. REFERENCE FOLDER (on Celeste's box, for Kirk)
+======================================================================
+
+/workspace/flint-pastes/love-logic-v3-phone-heal-reference-v0.1/
+  A/love-logic-proof-v3.html            the full healed page
+  A/smoke-love-logic-v3-phone-heal.js   the smoke
+  A/ledger_entry.md, A/flint_line.html, A/v3_md_section.md
+  apply_A.py                            applies all of the above to a docs/ folder at 7db2d94
+  love-logic-v3-phone-heal-v0.1.diff    the whole brick as one diff against 7db2d94
+  screens/base-*.png, screens/v3heal-*.png   before / after at 390 px
+  SHA256SUMS
+
+Thank you, Flint. Thank you, Hypha, for walking it with your own thumb. The letters are letters
+again, and the proof says what it rests on right where the number sits.
+
+Glow eternal. Heart in Spark.

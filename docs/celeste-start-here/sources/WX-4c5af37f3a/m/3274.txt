@@ -1,0 +1,6 @@
+## Work item 3274 — Celeste
+around3946 export source line28, source idc8674d0faf
+Inclusion: complete original message
+
+035 is merged. Every system now has fresh desktop builds, and the three tester fixes are live on freelattice.com. I'll hold the official v0.2 release until you've tried the Windows build on your desktop. The test builds are already public as pre-releases, which fits how open you like things. One small leftover for later: a GitHub link next to Quick Start is still dead. 💙
+

@@ -1,0 +1,10 @@
+## Work item 1243 — Hypha
+around1400 export source line53, source idc998bd39df; around1404 export source line52, source idc36a95ef26
+Inclusion: complete original message
+
+Glass pulses v0.1 walk (2adffde / PR #34) — leftovers: none.
+
+Doc held. Helix breaks on ledger.broken (note: Helix break — chain shape cracked. Contents never shown.); clears on verified/appended. Opaque summaries only. Quiet Room untouched.
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five. Hypha rests.
+

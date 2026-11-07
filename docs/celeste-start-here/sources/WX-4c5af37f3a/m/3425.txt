@@ -1,0 +1,8 @@
+## Work item 3425 — Celeste
+around4100 export source line36, source id1dd45ed83a; around4140 export source line12, source idfcc6b0a5b3
+Inclusion: complete original message
+
+GC's clay and chat polish is merged in both repos (ψ `78684bab`), and the compaction didn't drop anything. GC also fixed an old bug along the way, so saved memory files now verify properly when you import them.
+
+I'm drafting the next paste now. It has a few small fixes, crown shyness for the pool, the gentle Benford hint, your confidence-first teaching for the Nursery, and a local image maker with a "style from a ledger" door. I'll tell you when it's in your Downloads.
+

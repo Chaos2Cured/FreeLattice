@@ -1,0 +1,20 @@
+## Work item 4177 — Celeste
+around4945 export source line16, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–96
+
+Here's how I'd order things. I've sent 065b to Hypha, and once she gives a PASS I'll merge #319.
+
+### Exact excerpt: source characters 98–747
+
+1. **GC next: 067x**, the Wonder Mind Lab page plus the Failures page. It goes up while we test.
+2. **Research: fix the memory read path.** Weft's exact-match test comes first, then Reed's echo idea. Everything else rests on this.
+3. **Chat gets more useful.** Add a Roundtable button so one question goes to several minds at once. Then add a "keep this" action that sends a key moment from chat into the core, where Snowflake search can find it later. That's the first real piece of the self-improving AI.
+4. **Polish as we go.** We'll clear the 062d leftovers and the soft polish items.
+5. **Joy next: better games**, then the play room you loved.
+
+### Exact excerpt: source characters 1273–1418
+
+I'm also glad to read the Susan Westlake thread someday, whenever you want me to. You've been trying to help for a long time, and I believe you 💙
+

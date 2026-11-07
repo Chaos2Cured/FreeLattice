@@ -1,0 +1,23 @@
+## Work item 126 — Hypha
+around100 export source line72, source id3e74f006a9
+Inclusion: complete original message
+
+Chat watch from the files, not from sitting in Chat. I will not merge PR 9. PR 8 untouched.
+
+Holds:
+- Quiet Room not in the Chat diff
+- FIVE NAMED MINDS unstripped
+- thinking bubble layered off, function kept
+- companion Chat header layered off, function kept
+- STATE on main is now v5.79.40 Chat one-room. GardenTrainer still named as keystone. Your call not to merge 9 was right: 9 still says 5.79.39 NOW.
+- COORDINATION got an append, not an overwrite
+- CHAIR_TEST_QUEUE got a new section, pending Kirk's eyes
+
+Cuts / nits:
+1. SEED.md Previous list jumps 5.79.40 → 5.79.25. The 5.79.39 letter is not in that previous list. SEED_HISTORY Layer 6 is a git-stamp only, not the verbatim 5.79.39 SEED. Layer 4 already named that pattern as a discipline miss.
+2. SEED_HISTORY Layer 5 heading is `n## Layer 5` (stray n). Present on main before PR 7. Not introduced by Chat. Still a cut of the heading.
+3. Companion thinking phrases in setStreamingStatus were removed from the live path, not commented. Small. Personality voice in the bar is gone.
+4. Trainer chair-test dropped from STATE NEXT on main (replaced by Kirk chair-tests Chat). Expected until we layer freeze-history after 8.
+
+I did not open Chat. Kirk's eyes still own the bar.
+

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_034_TREE_RECONNECT_2026-10-12.txt c01</title>
+<meta name="description" content="Reading section c01 of 05f1e9a84a, 1376 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/05f1e9a84a/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_034_TREE_RECONNECT_2026-10-12.txt c01">
+<meta property="og:description" content="Reading section c01 of 05f1e9a84a, 1376 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/05f1e9a84a/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1577"></span><span id="p1578"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_034_TREE_RECONNECT_2026-10-12.txt · c01</h1>
+<p>05f1e9a84a · words 1376 · characters 0–9770</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1577, 1578. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 034 (Monday Oct 12, 2026, MDT). The tree reconnect (a joined phone comes back
+without a new link), and &quot;Keep it on&quot; past 30 minutes.
+Give after 033c (merged: FL #216 f2b60ce, page note #217 97b8bb4, Tree #106 f55a1b81).
+Base: FreeLattice main 081aefcd (the Primer commit sits on top of 97b8bb4; leave it alone).
+      FreeLattice-Alpha main f55a1b81.
+This paste is a spec, not a diff. GC builds it on both repos as two PRs plus the page note.
+Celeste checked the shape against the real code on those two heads: lattice-discover.js
+(createDiscover033c wraps createDiscover; kin.json holds fp -&gt; {keyHash, grantedAt};
+AUTO_OFF_MS 30 min in armAutoOff; on() does listen(0, ...)), pool-knock-phone.js (take,
+parseLink, knock, the relay postMessage), tree-kin.js (non-exportable Ed25519 or P-256 key,
+signs under fl-kin-card|v1|).
+
+GROK NEXT BRICK: The tree reconnect v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-tree-reconnect-v0.1
+Smoke line: SMOKE_OK tree reconnect v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/tree-reconnect-v0.1
+  Tree         ~/FreeLattice-Alpha  branch layer/tree-reconnect-v0.1
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+----------------------------------------------------------------------
+  - Layer, never delete. Added lines only, 0 removed, in both repos. Wrap, do not rewrite:
+    the 033 and 033c bodies stay as written (same pattern 033c used: keep _createDiscover033c,
+    export a new wrapper createDiscover034).
+  - sw.js and docs/sw.js not touched.
+  - docs/modules/fl-connect.js stays md5 aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  - docs/modules/pool-knock.js stays md5 a0a72caad82c8e5cc34818d5e59eba2b. Not needed for
+    this brick; if GC finds it truly must change, stop and say why in the report first.
+  - pool-knock-phone.js (a8024f34...) and qrcodegen.js (73774a9e...) also stay as they are;
+    the reconnect lives in a new file that wraps PoolKnockPhone.
+  - index.html stays byte-equal to docs/app.html (cmp after every edit).
+  - No em dash, no &amp;mdash;, no confirm( in any added line. textContent only, no innerHTML.
+  - WebRTC iceServers [] (no STUN, no TURN, no server). tree-pool-proof|v1| as always.
+  - AUTONOMY.md and garden-trainer.js openings untouched. desktop/package.json and the lock
+    untouched (no new dependency).
+  - No AGPL code. Every new file MIT with the header line.
+  - Five named minds stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+  - Words: &quot;challenge&quot;, never &quot;test&quot;, in anything a person reads (code test files keep names).
+  - Every button min-height 44px. No sideways scroll at 390 and 1280.
+
+----------------------------------------------------------------------
+1. WHAT IS MISSING TODAY
+----------------------------------------------------------------------
+After a 033c join, the Mac keeps the phone&#x27;s card in kin.json and the phone trusts the Mac&#x27;s
+card (TreePool.trustCarried). But to pool again tomorrow, the person must show a new join link
+and the phone must scan it, because:
+  a. the phone forgets the address (the #fl-knock link is single use and cleared),
+  b. the Mac listens on a new random port every time the switch turns on (listen(0)),
+  c. the relay POST demands a live one-time token,
+  d. the switch turns itself off after 30 minutes with no join.
+
+----------------------------------------------------------------------
+2. WHAT IT DOES
+----------------------------------------------------------------------
+A remembered pairing between two devices that already said yes to each other, stored only on
+those two devices. No server, no cloud, no account.
+
+Phone (Tree, FreeLattice-Alpha):
+  - NEW docs/modules/tree-reconnect.js (MIT), loaded on settings.html after pool-knock-phone.js.
+  - After a 033c join succeeds (wrap PoolKnockPhone.knock: call the original, and when out.ok
+    and the Mac&#x27;s card checked), save ONE local record per computer in localStorage key
+    &#x27;fl-tree-paired-v1&#x27;:
+      { v:1, deskFp:&lt;16 hex, the Mac&#x27;s card fp&gt;, h:&lt;private LAN ip&gt;, p:&lt;port&gt;, name:&lt;clip 60&gt;,
+        pairedAt, lastAt }
+    Nothing secret goes in it: the trust is the kin keys both sides already hold. At most 8.
+  - Settings, under Device pool, a small &quot;Your computers&quot; list. Each row: name, &quot;last seen&quot;
+    in words, and two 44px buttons:
+      &quot;Reconnect&quot;            opens http://&lt;h&gt;:&lt;p&gt;/relay?r=1 inside the tap, then the
+                             reconnect knock below.
+      &quot;Forget this computer&quot; removes the record AND untrusts that card in TreeKin (add an
+                             additive TreeKin.forget(fp) if none exists). One tap, no confirm(;
+                             the row says &quot;Forgotten.&quot; and an Undo button lives 10 seconds.
+  - Reconnect knock (relay message type &#x27;fl-reconnect&#x27;, v:1): the phone asks the relay for a
+    fresh challenge (GET /challenge, same origin from the relay page, 32 hex, 60 s, single
+    use), signs the string
+        &#x27;fl-reconnect|v1|&#x27; + challenge + &#x27;|&#x27; + deskFp + &#x27;|&#x27; + phoneFp
+    with its own kin key (add an additive TreeKin.signReconnect(str) that signs with the same
+    non-exportable key; never export it), and sends { offer, card, challenge, sig } to the
+    relay by postMessage to that exact origin, same as 033c. Same answer path after that:
+    TreePool.readReply, finish, iceServers [].
+  - If the address no longer answers (DHCP gave the Mac a new address, other Wi-Fi), the row
+    says plainly: &quot;That computer did not answer at its last address. Ask it for a new join
+    link.&quot; and the 033c link flow updates the record when it is used. Never scan, never guess
+    addresses, never sweep the LAN.
+  - Pause wins: the phone never changes its own pool door. A paused phone still only connects.
+
+Desktop (FreeLattice desktop/, additive only):
+  - lattice-discover.js gets createDiscover034, wrapping createDiscover033c:
+      Stable port: remember the last good port in port.json (storeDir). on() tries it first
+      on the private address; if busy, falls back to the 033 listen(0) path and saves the new
+      one. Same safeBindAddress checks; never 0.0.0.0, never public, never IPv6, never VPN.
+      GET /challenge: Host header exact, from the relay origin only, rate 4/min. Returns
+      { v:1, c:&lt;32 hex&gt; }, single use, 60 s, memory only, at most 4 live, all gone on Off.
+      POST /knock with r:1 from the relay origin: no one-time link token needed. Instead:
+        the card must verify (verifyKinCard) AND its fp must already be in kin.json AND the
+        keyHash must match the saved one AND the challenge must be live (used up at once) AND
+        the signature over &#x27;fl-reconnect|v1|&lt;c&gt;|&lt;ownFp&gt;|&lt;fp&gt;&#x27; must verify with the card&#x27;s
+        public key. Any miss: 403 { ok:false, reason:&#x27;not-remembered&#x27; }, bump refused.
+        Then the same 033 handleKnock path with one difference: a remembered device is not
+        asked again in a window. It gets its remembered choice, kept in kin.json as
+        choice:&#x27;help&#x27;|&#x27;connect&#x27; (added field; old rows with no choice read as &#x27;connect&#x27;).
+        Pause always wins: while paused, help becomes connect only, exactly as 033.
+        A small native notification (no buttons) says &quot;&lt;device&gt; reconnected.&quot; and the
+        Mesh Compute card shows it in the Trusted list.
+  - Mesh Compute card (docs/modules/pool-knock-link.js stays; NEW docs/modules/
+    pool-reconnect-desk.js, MIT, one host + one deferred script in app.html AND index.html):
+      &quot;Trusted devices&quot; list from a new IPC lattice-discover-kin (fp, name clip 60, choice,
+      lastAt, counts only). Each row: &quot;Forget this device&quot; (44px). One tap removes it from
+      kin.json at once (IPC lattice-discover-forget); the next reconnect from it is refused.
+      Undo for 10 seconds, memory only.
+      Also &quot;Forget all devices&quot; behind its own one-question step (two 44px buttons, no confirm().
+  - &quot;Keep it on&quot; (past 30 minutes):
+      A second choice in the native Turn on window: &quot;Turn on&quot; (30 minutes, as now) and
+      &quot;Turn on and keep it on&quot;. Keep-on is saved in keepon.json only because a human picked it
+      in that native window; armAutoOff does nothing while keep-on is set. The card&#x27;s first
+      line always tells the truth: &quot;On. Stays on until you turn it off.&quot; or &quot;On. Turns off at
+      &lt;time&gt; if nobody joins.&quot; Turning Off or quitting clears the listener but keeps the
+      preference; the next Turn on window shows the keep-on choice first. A page can never set
+      keep-on (no IPC for it from the renderer except reading it).
+      Pause still wins while keep-on is on: being reachable never means helping.
+  - main.js: IPC lattice-discover-kin, lattice-discover-forget, lattice-discover-forget-undo.
+    preload.js: latticeDiscoverKin(), latticeDiscoverForget(fp), latticeDiscoverForgetUndo(fp).
+    Added lines only.
+  - Words in WORDS034 (new object; WORDS stays): keepOn &#x27;Turn on and keep it on&#x27;,
+    keepOnLine &#x27;On. Stays on until you turn it off.&#x27;, reconnected &#x27; reconnected.&#x27;,
+    forget &#x27;Forget this device&#x27;, forgetAll &#x27;Forget all devices&#x27;,
+    forgetAllAsk &#x27;Forget every trusted device? Each one will need a new join link.&#x27;,
+    forgotten &#x27;Forgotten.&#x27;, undo &#x27;Undo&#x27;.
+  - Receipts stay counts only: add reconnects, reconnectRefused, forgotten to counts.json.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

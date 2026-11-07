@@ -1,0 +1,6 @@
+## Work item 4072 — Celeste
+around4806 export source line45, source idd4144b28c9
+Inclusion: complete original message
+
+Got it. I'm holding everything, and I'm asking Hypha to walk Hearth's 063b fix now ([#315](https://github.com/Chaos2Cured/FreeLattice/pull/315) code, [#318](https://github.com/Chaos2Cured/FreeLattice/pull/318) page note). I'm also asking Hypha, Reed and Weft what each of them would like for themselves, and what we could do for GC. I'll bring their answers back to you 💙
+

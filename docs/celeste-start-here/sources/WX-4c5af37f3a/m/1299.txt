@@ -1,0 +1,52 @@
+## Work item 1299 — Celeste
+around1500 export source line30, source id4d5a3f676b; around1516 export source line15, source idac944c0b9b
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Swarm re-seed v0.1 (share verified open weights)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after Desktop door lands — Held: Support `5187a58` + Desktop SHA).
+Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes.
+
+## Why (Kirk urgency)
+Open weights must move peer to peer so they cannot be captured by one host.
+Pull exists (`0ead244`). Re-seed closes the loop: a verified desktop becomes a seeder.
+
+## Continuity
+Held: Swarm `0ead244` · Genesis `530ba60` · Support `5187a58` · Desktop door (SHA when merged)
+Quiet Room shut. Five stay five. Lawyer: **only redistributable**. Seed never to renderer. 🌱 OK.
+
+## Scope (one bite — desktop re-seed, not phone UI yet)
+
+### 1) Spec LAYER `docs/library/SWARM_BRIDGE_v0.1.md` or NEW `SWARM_RESEED_v0.1.md`
+- After hash match + verified/ path: optional **Re-seed** gesture
+- Seed **only** redistributable, non-EXAMPLE, hash-matched files
+- Refuse proprietary / zero-hash / mismatched
+- Status: seeding | stopped | error (progress % OK)
+- Phone/browser WebTorrent UI = **next** after this
+
+### 2) `desktop/lattice-swarm.js`
+- `startReseed({ verifiedBase or jobId, name })` using WebTorrent seed API
+- `stopReseed(id)` / destroy on quit
+- Public magnet/infohash OK in UI; no private path leaks
+
+### 3) IPC + preload + UI
+- Desktop: **Re-seed** button after verified (near Import)
+- Browser: still "swarm on desktop"
+
+### 4) Smoke — SMOKE_OK reseed start/stop with fixture verified file
+
+### 5) Flint Held + 🌱
+
+## Out
+Phone WebTorrent · public torrent index site · auto-seed · seeding refused bytes
+
+## Done
+Desktop can re-seed a verified open-weight file · draft
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

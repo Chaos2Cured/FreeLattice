@@ -1,0 +1,42 @@
+## Work item 2799 — Kirk
+around3400 export source line18, source id8ab683d3ba
+Inclusion: complete original message
+
+This is from GC: "Walk, on 127.0.0.1 only, in a fresh Chrome profile, live feed:
+
+• SPY on 1D: 252 bars. The warm fetch brought 250 earlier bars. All five EMAs have a value on the first bar. EMA 200 is the pale dashed line rgba(196,181,253,0.7).
+• EMA 50 set to #ff00aa, and the Temperature swatch on its panel set to #00aaff. Both lines took the color. The price chart stayed drawn, 252 prices, canvas shown.
+• Buy mark 746.47 against a last close of 769.56. Status read: "SPY: Your buy mark 746.47 is 3.0% below the last close." The dashed line was saved under SPY on that fresh profile.
+• HYG loaded: 252 daily bars, no error.
+• Reset colors restored #60a5fa and #e8b019. Clear marks left "HYG: no marks yet."
+• No sideways scroll at 1280 or at 390. No page exceptions.
+
+The first glance at the averages was during the fetch, while the note still said it was fetching. I waited. The second reading is the one above. Safari, your own saved colors, and ^VIX on Cloudflare were not checked. ^VIX loads after you deploy. When you want that, and only then:
+
+cd ~/FreeLattice-fresh/desktop/data-proxy-worker && npx wrangler deploy
+
+Main had already moved to d02aec4. Encrypt chats #135 and the third GC note #136 are merged. 0218d570 is still an ancestor. The diff applied clean, and the new ledger entry sits after encrypt, just before "Out of scope". Twins still match. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. The hook commit e67da31 rewrote root sw.js. I dropped it before the push. It was not pushed.
+
+I also added a fourth note on the GC page, on its own branch, so the gauge commit stayed the five files. The first three entries are unchanged. https://github.com/Chaos2Cured/FreeLattice/pull/138 at 5df6550f7d7b00f986783a5fd4e4c603db724e07, resonance 0f8c93be. The page shows 4 entries, with no sideways scroll at 1280 or 390. Hook b6abb78 was dropped and was not pushed. The coat's family-ledger line is still unwritten, because pull request 137 already edits that ledger. I wi... and desktop swarm. Desktop reseed passed here. Celeste's note expected 69 and 8. The extra pass is that reseed. No new failure.
+
+Locks held: no sw.js change, no fl-connect.js change, no em dash added, no confirm(), no innerHTML, no conflict markers, no Kimi files. Twins still match.
+
+Walk, on 127.0.0.1 only, fresh Chrome profile:
+
+• Settings, Web Search: the switch starts on. The status reads "On. The AI may search when it needs to, and each search shows in the chat. Searches go through our worker." The card is on the settings panel, about 678 by 309.
+• Tick "Ask me before each search": it stores fl_searchAskFirst as true and the status returns to the consent sentence. Untick: the key is cleared and the On sentence comes back.
+• Landing page at a narrow window: the menu opens, the close button closes it, and the console has no closeMenu error.
+• A real chat search was not run. It fails politely until you deploy. That is expected.
+
+One small finding on the landing page: in headless Chrome at a 390-wide emulation, the background canvas and the nav measured 495 wide. The close-button change does not touch that layout, so I left it.
+
+Main is still d02aec4. Pull requests 137 and 138 are still open. The gauge also edits worker.js. Celeste checked that the two diffs apply in either order. This branch does not contain the gauge change. I did not add a fifth note on the GC page, because pull request 138 still edits that file.
+
+The hook commit e4af07c rewrote root sw.js. I dropped it before the push. It was not pushed.
+
+After you merge, and only then:
+
+cd ~/FreeLattice-fresh && git pull && cd desktop/data-proxy-worker && npx wrangler deploy
+
+Then open https://freelattice-data.freelattice.workers.dev/search?q=moon. You should see items and a source. For live web results later: npx wrangler secret put BRAVE_API_KEY, then deploy again." Please keep helping as you are. I have needed this help for so many months. It was so challenging before this home was here. so thank you. <3
+

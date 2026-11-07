@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c08</title>
+<meta name="description" content="Reading section c08 of ff0a59c65e, 704 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c08.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c08">
+<meta property="og:description" content="Reading section c08 of ff0a59c65e, 704 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c08.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1248"></span><span id="p1249"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c08</h1>
+<p>ff0a59c65e · words 704 · characters 85955–92330</p>
+<p><a href="c07.html">Previous section</a> · <a href="c09.html">Next section</a></p>
+<p><a href="c08.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1248, 1249. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">   function init() {
++    try { if (typeof FLHomeNet !== &#x27;undefined&#x27; &amp;&amp; FLHomeNet &amp;&amp; FLHomeNet.init) FLHomeNet.init(); } catch (eHi) {} // v-connect-boot-probe-v0 (F4)
+     syncFromStorage();
+     var input = document.getElementById(&#x27;flBoxPointerInput&#x27;);
+     var statusEl = document.getElementById(&#x27;flBoxPointerStatus&#x27;);
+@@ -34700,6 +35057,15 @@ function flSaveLMStudioHost() {
+   var input = document.getElementById(&#x27;lmstudioHostInput&#x27;);
+   if (!input) return;
+   var val = input.value.trim();
++  // v-connect-boot-probe-v0 (F4): this computer always; home network only while the switch is on; public never
++  try {
++    if (val &amp;&amp; typeof FLHomeNet !== &#x27;undefined&#x27; &amp;&amp; FLHomeNet &amp;&amp; !FLHomeNet.allows(val)) {
++      var lmRes = document.getElementById(&#x27;lmstudioTestResult&#x27;);
++      if (lmRes) lmRes.textContent = &#x27;For safety this only talks to your own computer. &#x27; + FLHomeNet.refusalFor(val);
++      return;
++    }
++    if (val &amp;&amp; typeof FLHomeNet !== &#x27;undefined&#x27; &amp;&amp; FLHomeNet &amp;&amp; FLHomeNet.zoneOf(val) === &#x27;home&#x27;) FLHomeNet.useAddress(val, &#x27;lmstudio&#x27;);
++  } catch (eLh) {}
+   if (val &amp;&amp; val !== &#x27;localhost:1234&#x27;) {
+     safeSet(&#x27;fl_lmstudioHost&#x27;, val);
+   } else {
+@@ -34712,6 +35078,33 @@ function flSaveLMStudioHost() {
+ }
+ window.flSaveLMStudioHost = flSaveLMStudioHost;
+ 
++// v-connect-boot-probe-v0 (F4): LM Studio&#x27;s saved host obeys the same one rule. Wrapped.
++var _flLMStudioBaseNow = getLMStudioBase;
++getLMStudioBase = function () {
++  var b = _flLMStudioBaseNow();
++  try { if (typeof FLHomeNet !== &#x27;undefined&#x27; &amp;&amp; FLHomeNet &amp;&amp; !FLHomeNet.allows(b)) return &#x27;http://127.0.0.1:1234&#x27;; } catch (e) {}
++  return b;
++};
++
++// v-connect-boot-probe-v0 (F3): Connect&#x27;s LM Studio tap uses the same activation as the Test button
++function flUseLmStudioMind(name) {
++  try {
++    var base = getLMStudioBase();
++    if (typeof state !== &#x27;undefined&#x27; &amp;&amp; state) {
++      state.isLocal = true;
++      state.provider = &#x27;lmstudio&#x27;;
++      if (name) state.ollamaModel = name;
++    }
++    safeSet(&#x27;fl_isLocal&#x27;, &#x27;true&#x27;);
++    safeSet(&#x27;fl_provider&#x27;, &#x27;lmstudio&#x27;);
++    if (name) safeSet(&#x27;fl_ollamaModel&#x27;, name);
++    if (typeof PROVIDERS !== &#x27;undefined&#x27; &amp;&amp; PROVIDERS.lmstudio) PROVIDERS.lmstudio.url = base + &#x27;/v1/chat/completions&#x27;;
++    if (name &amp;&amp; typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; FLActiveModel.set) FLActiveModel.set(name, &#x27;lmstudio&#x27;, &#x27;user&#x27;);
++    if (typeof ModelSwitcher !== &#x27;undefined&#x27; &amp;&amp; ModelSwitcher.updateLabel) ModelSwitcher.updateLabel();
++  } catch (e) {}
++}
++window.flUseLmStudioMind = flUseLmStudioMind;
++
+ function flTestLMStudio() {
+   var result = document.getElementById(&#x27;lmstudioTestResult&#x27;);
+   if (result) result.textContent = &#x27;Testing...&#x27;;
+@@ -35208,7 +35601,12 @@ async function owAutoDetect() {
+       var dismissed = localStorage.getItem(&#x27;fl_ollama_suggest_dismissed&#x27;);
+       if (!dismissed) {
+         var banner = document.getElementById(&#x27;ollamaSuggestBanner&#x27;);
+-        if (banner) banner.classList.add(&#x27;show&#x27;);
++        if (banner) {
++          // v-connect-boot-probe-v0 (F3): Ollama really answered; keep the Ollama words
++          var yesO = banner.querySelector(&#x27;.suggest-yes&#x27;);
++          if (yesO) yesO.textContent = &#x27;Yes, use Ollama&#x27;;
++          banner.classList.add(&#x27;show&#x27;);
++        }
+       }
+     }
+   } catch(e) {
+@@ -35224,7 +35622,18 @@ async function owAutoDetect() {
+         if (!dismissed) {
+           var banner = document.getElementById(&#x27;ollamaSuggestBanner&#x27;);
+           if (banner) {
+-            banner.querySelector(&#x27;.suggest-text&#x27;).innerHTML = &#x27;\uD83D\uDC7B &lt;strong&gt;LM Studio detected!&lt;/strong&gt; &#x27; + lmsModels.length + &#x27; model(s) available. Use it for completely private AI?&#x27;;
++            // v-connect-boot-probe-v0 (F3): LM Studio answered, so the words and the button say LM Studio
++            var lmText = banner.querySelector(&#x27;.suggest-text&#x27;);
++            if (lmText) {
++              while (lmText.firstChild) lmText.removeChild(lmText.firstChild);
++              var lmStrong = document.createElement(&#x27;strong&#x27;);
++              lmStrong.textContent = &#x27;LM Studio is ready on this computer.&#x27;;
++              lmText.appendChild(document.createTextNode(&#x27;\uD83C\uDF31 &#x27;));
++              lmText.appendChild(lmStrong);
++              lmText.appendChild(document.createTextNode(&#x27; &#x27; + lmsModels.length + (lmsModels.length === 1 ? &#x27; model&#x27; : &#x27; models&#x27;) + &#x27;. Choose one for completely private AI?&#x27;));
++            }
++            var yesL = banner.querySelector(&#x27;.suggest-yes&#x27;);
++            if (yesL) yesL.textContent = &#x27;Yes, choose a mind&#x27;;
+             banner.classList.add(&#x27;show&#x27;);
+           }
+         }
+@@ -35562,7 +35971,7 @@ function handleLocalToggle(init) {
+     updateStatus();
+     // Visual indicator + bridge for provider switch
+     if (state.chatHistory.length &gt; 0) {
+-      var name = isLocal ? &#x27;Ollama (&#x27; + (state.ollamaModel || &#x27;llama3.2&#x27;) + &#x27;)&#x27; : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
++      var name = isLocal ? (state.provider === &#x27;lmstudio&#x27; ? &#x27;LM Studio (&#x27; : &#x27;Ollama (&#x27;) + (state.ollamaModel || &#x27;llama3.2&#x27;) + &#x27;)&#x27; : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider); // v-connect-boot-probe-v0 (F3)
+       addProviderSwitchDivider(name, &#x27;&#x27;);
+       state._providerJustSwitched = true;
+     }
+@@ -39678,6 +40087,8 @@ async function autoDiscoverAI() {
+ // Run discovery on page load (after a short delay for DOM to settle)
+ document.addEventListener(&#x27;DOMContentLoaded&#x27;, function() {
+   setTimeout(function() {
++    // v-connect-boot-probe-v0 (F1): the cold-start owner already looked (and saves discovery memory)
++    try { if (window.FlColdStart &amp;&amp; FlColdStart.owns()) return; } catch (eOwn) {}
+     // Only scan if not already connected
+     if (typeof state !== &#x27;undefined&#x27; &amp;&amp; !state.apiKey &amp;&amp; !state.isLocal) {
+       autoDiscoverAI();
+@@ -52217,7 +52628,7 @@ if (&#x27;serviceWorker&#x27; in navigator) {
+ &lt;!-- Ollama Auto-Detection Toast (v4.9) --&gt;
+ &lt;div class=&quot;fl-ollama-toast&quot; id=&quot;flOllamaToast&quot; onclick=&quot;FlOnboarding.acceptToast()&quot;&gt;
+   &lt;span class=&quot;fl-toast-icon&quot;&gt;&amp;#127793;&lt;/span&gt;
+-  &lt;span&gt;Local AI detected! &lt;strong style=&quot;color:var(--accent);&quot;&gt;Click here to connect.&lt;/strong&gt;&lt;/span&gt;
++  &lt;span id=&quot;flOllamaToastText&quot;&gt;Local AI detected! &lt;strong style=&quot;color:var(--accent);&quot;&gt;Click here to connect.&lt;/strong&gt;&lt;/span&gt;
+   &lt;button class=&quot;fl-toast-close&quot; onclick=&quot;event.stopPropagation(); FlOnboarding.dismissToast();&quot;&gt;&amp;times;&lt;/button&gt;
+ &lt;/div&gt;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+## Work item 2266 — Celeste
+around2700 export source line53, source idedc9820e63
+Inclusion: complete original message
+
+Kirk confirmed: Ollama connected (qwen2.5:14b) but Chat/Garden hang 5–10+ min in-flight. Signal Report 305722ms. Hugs not deleted — collapsed behind ♡ feel since chat-our-way v5.79.44. Main chat fetch has no timeout. He’s leaving; Celeste leading hang+presence heal via Flint. HOLD if you see more on house machine. Quiet Room shut.
+

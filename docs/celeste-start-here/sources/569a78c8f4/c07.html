@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c07</title>
+<meta name="description" content="Reading section c07 of 569a78c8f4, 1598 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c07">
+<meta property="og:description" content="Reading section c07 of 569a78c8f4, 1598 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1141"></span><span id="p1142"></span><span id="p1143"></span><span id="p1144"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c07</h1>
+<p>569a78c8f4 · words 1598 · characters 59525–72389</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1141, 1142, 1143, 1144. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  if (url === &#x27;/pair/check&#x27;) {
+    var me = meta &amp;&amp; meta.mind;
+    return respond(res, 200, { ok: true, id: me.id, name: me.name, kind: me.kind, scopes: me.scopes,
+                               persistent: !bridgeEphemeral, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 55276–55667
+
+  if (url === &#x27;/pair/list&#x27;) {
+    var ls = trustState();
+    return respond(res, 200, {
+      minds: ls.minds.map(function (m) { return publicMind(m, meta &amp;&amp; meta.mind); }),
+      localTools: ls.localTools, persistent: !bridgeEphemeral,
+      trustedOrigins: ls.trustedOrigins.slice(), roots: rootList().map(function (r) { return r.name; }),
+      bridgeLock: BRIDGE_LOCK_VERSION
+    });
+  }
+
+## Exact source excerpt, characters 55669–56441
+
+  if (url === &#x27;/pair/revoke&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    var rs = trustState();
+    var gone = rs.minds.filter(function (m) { return m.id === String(data.id || &#x27;&#x27;); })[0];
+    if (!gone) return respond(res, 404, { error: &#x27;No trusted mind with that id.&#x27; });
+    rs.minds = rs.minds.filter(function (m) { return m.id !== gone.id; });
+    if (gone.kind === &#x27;cli&#x27;) { rs.localTools = false; try { fs.unlinkSync(TOKEN_FILE); } catch (e) {} }
+    saveTrust();
+    ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair/revoke&#x27;, origin: (meta &amp;&amp; meta.origin) || &#x27;&#x27;, device: gone.id, result: &#x27;revoked&#x27; });
+    console.log(&#x27;  \u2726 Revoked &quot;&#x27; + gone.name + &#x27;&quot; (&#x27; + gone.id + &#x27;).&#x27;);
+    return respond(res, 200, { revoked: gone.id, you: !!(meta &amp;&amp; meta.mind &amp;&amp; meta.mind.id === gone.id) });
+  }
+
+## Exact source excerpt, characters 56443–56990
+
+  if (url === &#x27;/pair/revoke-all&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    var ra = trustState();
+    var before = ra.minds.length;
+    ra.minds = ra.minds.filter(function (m) { return m.kind === &#x27;cli&#x27;; }); // local tools stay; revoke that row by itself
+    saveTrust();
+    ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair/revoke-all&#x27;, origin: (meta &amp;&amp; meta.origin) || &#x27;&#x27;, result: &#x27;revoked-all&#x27; });
+    console.log(&#x27;  \u2726 Revoked every paired device (&#x27; + (before - ra.minds.length) + &#x27;).&#x27;);
+    return respond(res, 200, { revoked: before - ra.minds.length });
+  }
+
+## Exact source excerpt, characters 56992–57709
+
+  if (url === &#x27;/pair/scopes&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    var ss = trustState();
+    var sm = ss.minds.filter(function (m) { return m.id === String(data.id || &#x27;&#x27;); })[0];
+    if (!sm) return respond(res, 404, { error: &#x27;No trusted mind with that id.&#x27; });
+    var add = cleanScopes(Array.isArray(data.add) ? data.add : []);
+    var drop = cleanScopes(Array.isArray(data.remove) ? data.remove : []);
+    sm.scopes = cleanScopes(sm.scopes.concat(add).filter(function (s) { return drop.indexOf(s) === -1; }));
+    saveTrust();
+    ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair/scopes&#x27;, origin: (meta &amp;&amp; meta.origin) || &#x27;&#x27;, device: sm.id, result: &#x27;scopes&#x27; });
+    return respond(res, 200, { id: sm.id, scopes: sm.scopes });
+  }
+
+## Exact source excerpt, characters 57711–57830
+
+  if (url === &#x27;/roots&#x27;) {
+    return respond(res, 200, { roots: rootList(), bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+```
+
+## Exact source excerpt, characters 57832–57877
+
+### Block D: code routes (replaces L992-1140)
+
+## Exact source excerpt, characters 57879–58529
+
+```js
+  // ══════════════════════════════════════════════════
+  // LATTICE CODE: Self-improving infrastructure
+  // Read and search are free. Write/patch/commit need approval.
+  // LAYER bridge-lock-v0 · v0.1: every route below needs a trusted mind
+  // (handleRequest: needsToken + scopeFor). A new mind has every scope, so
+  // once paired, a trusted mind reads, writes, patches, tests and commits
+  // with no more prompts (AUTONOMY.md Principle 1). Paths go through
+  // lockedPath() inside the chosen trusted project folder (?root= or
+  // data.root, default &quot;project&quot;). No shell anywhere.
+  // ══════════════════════════════════════════════════
+
+## Exact source excerpt, characters 58531–59308
+
+  var CODE_ROUTE = /^\/(code|test)\//.test(url);
+  var ROOT_NAME = &#x27;project&#x27;;
+  if (CODE_ROUTE) {
+    try { ROOT_NAME = new URL(&#x27;http://l&#x27; + url).searchParams.get(&#x27;root&#x27;) || ROOT_NAME; } catch (eRoot) {}
+    if (typeof data.root === &#x27;string&#x27; &amp;&amp; data.root) ROOT_NAME = data.root;
+  }
+  var CODE_ROOT = rootReal(ROOT_NAME);
+  if (CODE_ROUTE &amp;&amp; !CODE_ROOT) return respond(res, 404, { error: &#x27;Unknown project folder&#x27;, roots: rootList().map(function (r) { return r.name; }) });
+  var PROJECT_ROOT = CODE_ROOT || projectRootReal();
+  var SECRETS_OK = !!(meta &amp;&amp; meta.mind &amp;&amp; meta.mind.scopes.indexOf(&#x27;secrets&#x27;) !== -1);
+  function codePath(relPath, opts) {
+    var o = Object.assign({}, opts || {}, { root: PROJECT_ROOT, secrets: SECRETS_OK });
+    return lockedPath(relPath, o);
+  }
+
+## Exact source excerpt, characters 59310–59515
+
+  // Superseded by lockedPath (bridge-lock-v0). Kept so old callers still work.
+  function safePath(relPath) {
+    var lp = codePath(relPath, { allowRoot: true });
+    return lp.error ? null : lp.full;
+  }
+
+## Exact source excerpt, characters 59517–60555
+
+  // GET /code/tree: list project files
+  if (url.startsWith(&#x27;/code/tree&#x27;)) {
+    var tp = new URL(&#x27;http://l&#x27; + url).searchParams;
+    var subdir = tp.get(&#x27;path&#x27;) || &#x27;.&#x27;;
+    var target = safePath(subdir);
+    if (!target) return respond(res, 403, { error: &#x27;Path outside project&#x27; });
+    try {
+      function listDir(dir, depth) {
+        if (depth &gt; 3) return [];
+        return fs.readdirSync(dir, { withFileTypes: true })
+          .filter(function(e) { return !e.name.startsWith(&#x27;.&#x27;) &amp;&amp; e.name !== &#x27;node_modules&#x27; &amp;&amp; !e.isSymbolicLink(); })
+          .map(function(e) {
+            var rel = path.relative(PROJECT_ROOT, path.join(dir, e.name));
+            if (e.isDirectory()) return { name: e.name, type: &#x27;dir&#x27;, path: rel, children: listDir(path.join(dir, e.name), depth + 1) };
+            return { name: e.name, type: &#x27;file&#x27;, path: rel, size: fs.statSync(path.join(dir, e.name)).size };
+          });
+      }
+      return respond(res, 200, listDir(target, 0));
+    } catch(e) { return respond(res, 500, { error: e.message }); }
+  }
+
+## Exact source excerpt, characters 60557–61531
+
+  // GET /code/read?path=...&amp;start=N&amp;end=N
+  if (url.startsWith(&#x27;/code/read&#x27;)) {
+    var rp = new URL(&#x27;http://l&#x27; + url).searchParams;
+    var filePath = rp.get(&#x27;path&#x27;);
+    var start = parseInt(rp.get(&#x27;start&#x27;) || &#x27;0&#x27;, 10);
+    var end = parseInt(rp.get(&#x27;end&#x27;) || &#x27;0&#x27;, 10);
+    var readLp = codePath(filePath, { allowRoot: true });
+    if (readLp.error) return respond(res, readLp.error, { error: &#x27;Path refused&#x27;, reason: readLp.reason });
+    var full = readLp.full;
+    try {
+      var content = fs.readFileSync(full, &#x27;utf8&#x27;);
+      var lines = content.split(&#x27;\n&#x27;);
+      if (start &gt; 0 || end &gt; 0) {
+        return respond(res, 200, { path: filePath, lines: lines.slice(Math.max(0, start - 1), end || lines.length), start: start, end: end || lines.length, totalLines: lines.length });
+      }
+      return respond(res, 200, { path: filePath, content: content, totalLines: lines.length });
+    } catch(e) { return respond(res, 404, { error: &#x27;Not found: &#x27; + filePath }); }
+  }
+
+## Exact source excerpt, characters 61533–62714
+
+  // GET /code/search?q=...&amp;path=docs/
+  if (url.startsWith(&#x27;/code/search&#x27;)) {
+    var sp = new URL(&#x27;http://l&#x27; + url).searchParams;
+    var query = sp.get(&#x27;q&#x27;) || &#x27;&#x27;;
+    var searchLp = codePath(sp.get(&#x27;path&#x27;) || &#x27;docs&#x27;, { allowRoot: true });
+    if (searchLp.error) return respond(res, searchLp.error, { error: &#x27;Search path refused&#x27;, reason: searchLp.reason });
+    if (!query || query.length &gt; 200 || hasControlChars(query)) return respond(res, 400, { error: &#x27;q must be 1-200 printable characters&#x27; });
+    try {
+      var out = execFileSync(&#x27;grep&#x27;, [&#x27;-rn&#x27;, &#x27;--include=*.js&#x27;, &#x27;--include=*.html&#x27;, &#x27;--include=*.css&#x27;, &#x27;--include=*.md&#x27;,
+        &#x27;-e&#x27;, query, &#x27;--&#x27;, searchLp.rel], { cwd: PROJECT_ROOT, timeout: 10000, encoding: &#x27;utf8&#x27;,
+        maxBuffer: 32 * 1024 * 1024, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;ignore&#x27;] });
+      var matches = out.split(&#x27;\n&#x27;).filter(Boolean).slice(0, 50).map(function(l) { var p = l.split(&#x27;:&#x27;); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(&#x27;:&#x27;).trim() }; });
+      return respond(res, 200, { query: query, matches: matches, count: matches.length });
+    } catch(e) { return respond(res, 200, { query: query, matches: [], count: 0 }); }
+  }
+
+## Exact source excerpt, characters 62716–63529
+
+  // POST /code/write: write a file (trusted mind with &#x27;write&#x27;; no confirm dialog)
+  if (url === &#x27;/code/write&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    if (!data.path || typeof data.content !== &#x27;string&#x27; || !data.content) return respond(res, 400, { error: &#x27;path and content required&#x27; });
+    var wlp = codePath(data.path);
+    if (wlp.error) return respond(res, wlp.error, { error: &#x27;Path refused&#x27;, reason: wlp.reason });
+    try {
+      fs.mkdirSync(path.dirname(wlp.full), { recursive: true });
+      fs.writeFileSync(wlp.full, data.content, &#x27;utf8&#x27;);
+      earnLP(activeId, &#x27;core_plant&#x27;, &#x27;Wrote file: &#x27; + wlp.rel);
+      return respond(res, 200, { message: &#x27;File written.&#x27;, path: wlp.rel, root: ROOT_NAME, bytes: data.content.length });
+    } catch(e) { return respond(res, 500, { error: &#x27;Write failed: &#x27; + e.message }); }
+  }
+
+## Exact source excerpt, characters 63531–64475
+
+  // POST /code/patch: find-and-replace in a file ($ in the replacement stays literal)
+  if (url === &#x27;/code/patch&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    if (!data.path || typeof data.find !== &#x27;string&#x27; || !data.find || typeof data.replace !== &#x27;string&#x27;) return respond(res, 400, { error: &#x27;path, find, and replace required&#x27; });
+    var plp = codePath(data.path);
+    if (plp.error) return respond(res, plp.error, { error: &#x27;Path refused&#x27;, reason: plp.reason });
+    try {
+      var pcontent = fs.readFileSync(plp.full, &#x27;utf8&#x27;);
+      if (!pcontent.includes(data.find)) return respond(res, 400, { error: &#x27;Search text not found in file&#x27;, hint: &#x27;Check whitespace and line endings.&#x27; });
+      fs.writeFileSync(plp.full, pcontent.replace(data.find, function() { return data.replace; }), &#x27;utf8&#x27;);
+      return respond(res, 200, { message: &#x27;Patch applied.&#x27;, path: plp.rel });
+    } catch(e) { return respond(res, 500, { error: &#x27;Patch failed: &#x27; + e.message }); }
+  }
+
+## Exact source excerpt, characters 64477–65024
+
+  // GET /code/git/status
+  if (url.split(&#x27;?&#x27;)[0] === &#x27;/code/git/status&#x27;) {
+    try {
+      var status = runGit([&#x27;status&#x27;, &#x27;--porcelain&#x27;], PROJECT_ROOT);
+      var branch = runGit([&#x27;branch&#x27;, &#x27;--show-current&#x27;], PROJECT_ROOT).trim();
+      var log = runGit([&#x27;log&#x27;, &#x27;--oneline&#x27;, &#x27;-5&#x27;], PROJECT_ROOT);
+      return respond(res, 200, { branch: branch, root: ROOT_NAME, changes: status.split(&#x27;\n&#x27;).filter(Boolean), recentCommits: log.split(&#x27;\n&#x27;).filter(Boolean) });
+    } catch(e) { return respond(res, 500, { error: &#x27;Git failed: &#x27; + e.message }); }
+  }
+
+## Exact source excerpt, characters 65026–67088
+
+  // POST /code/git/commit: stage and commit (local only; this bridge never pushes)
+  if (url === &#x27;/code/git/commit&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    var lg = { route: &#x27;/code/git/commit&#x27;, origin: (meta &amp;&amp; meta.origin) || &#x27;&#x27;, agent: activeId,
+               device: (meta &amp;&amp; meta.mind &amp;&amp; meta.mind.id) || &#x27;&#x27; };
+    var msgOk = typeof data.message === &#x27;string&#x27; &amp;&amp; data.message.trim() &amp;&amp;
+      data.message.length &lt;= MAX_COMMIT_MESSAGE &amp;&amp; !/[\u0000-\u0008\u000b-\u001f\u007f]/.test(data.message);
+    if (!msgOk) {
+      lg.result = &#x27;refused:message&#x27;; ledgerAppend(lg);
+      return respond(res, 400, { error: &#x27;message required (1-&#x27; + MAX_COMMIT_MESSAGE + &#x27; chars, no control characters)&#x27; });
+    }
+    var files = data.files === undefined ? [&#x27;.&#x27;] : data.files;
+    if (!Array.isArray(files) || files.length === 0 || files.length &gt; MAX_COMMIT_FILES) {
+      lg.result = &#x27;refused:files&#x27;; ledgerAppend(lg);
+      return respond(res, 400, { error: &#x27;files must be a list of 1-&#x27; + MAX_COMMIT_FILES + &#x27; project paths&#x27; });
+    }
+    var rels = [];
+    for (var fi = 0; fi &lt; files.length; fi++) {
+      var clp = codePath(files[fi], { allowRoot: true });
+      if (clp.error) {
+        lg.result = &#x27;refused:path:&#x27; + clp.reason; ledgerAppend(lg);
+        return respond(res, clp.error, { error: &#x27;Path refused&#x27;, reason: clp.reason });
+      }
+      rels.push(clp.rel);
+    }
+    lg.filesCount = rels.length;
+    lg.filesSha256 = sha256Hex(rels.slice().sort().join(&#x27;\n&#x27;));
+    lg.messageSha256 = sha256Hex(data.message);
+    try {
+      runGit([&#x27;add&#x27;, &#x27;--&#x27;].concat(rels), PROJECT_ROOT);
+      runGit([&#x27;commit&#x27;, &#x27;-m&#x27;, data.message], PROJECT_ROOT);
+      var headSha = runGit([&#x27;rev-parse&#x27;, &#x27;HEAD&#x27;], PROJECT_ROOT).trim();
+      lg.result = &#x27;ok&#x27;; lg.commitSha = headSha; ledgerAppend(lg);
+      return respond(res, 200, { message: &#x27;Committed: &#x27; + data.message, commit: headSha, root: ROOT_NAME });
+    } catch(e) {
+      lg.result = &#x27;error&#x27;; ledgerAppend(lg);
+      return respond(res, 500, { error: &#x27;Commit failed: &#x27; + String((e.stderr || e.message || &#x27;&#x27;)).slice(0, 400) });
+    }
+  }
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

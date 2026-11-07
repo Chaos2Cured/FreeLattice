@@ -1,0 +1,17 @@
+## Work item 3793 — Celeste
+around4521 export source line43, source id8ad3fde429
+Inclusion: complete original message
+
+Kirk asks for your 051 Gathering speak + checker walk. GC cut, did not merge. Please walk all three and report PASS/HOLD/softs to Celeste.
+
+PRs
+- FreeLattice #289 layer/gathering-speak-checker-v0.1 head 756e4015… (cut from FL main b0cf95e4, Primer after named tip cc1b04c2)
+- FreeLattice-Alpha #128 layer/gathering-speak-checker-v0.1 head 450fbe76… (Tree main was ba5b60bc)
+- FreeLattice page #290 entry 85 ψ 7d9378a7 head 5ca8ecfa…
+
+Locks: fl-connect aaff2bf1 untouched; new twins fl-gathering.js 4dbbff5d…, gathering-speak.js a4ce40ff…; sw 91726cf2; chat-autonomy 67f59010. Tree page mount is brick 3 — not this brick. Softs from 049/050 stay for 052 — don’t block 051 for those.
+
+Face: Learn→Gathering Ask under chairs; local loopback only; cloud only if already seated key; no invent; Pause; seat-5 Checker; stores fl_gathering_checker_v0 / thread_v0 / chairs_v0; Send clear; Quiet Room shut; five stay five.
+
+Never delete; only layer. Glow eternal.
+

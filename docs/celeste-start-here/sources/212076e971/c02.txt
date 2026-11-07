@@ -1,0 +1,83 @@
+	   s2 e4 s4 | % 10
+	   a4 r4 gis4 r4 | % 11
+	   fis2 e4 r4 | % 12
+	   fis4 r4 s2 | % 13
+	   s1*4 | % 17
+	   s2 e4 s4 | % 18
+	   a4 s2. | % 19
+	   b2 s2 | % 20
+	   s1*3 | % 23
+	   b2 e,4 s4 | % 24
+	   a4 s4 b,4 s4 | % 25
+	   e2 s2 | % 26
+	   r4 e8 [ (fis) ] gis [ (fis) gis (fis) ] | % 27
+	   gis8 [ (fis gis e)] s2 | % 28
+	   s1*2 | % 30
+	   r4 b'8 [ (cis) ] dis [ (cis) dis (cis) ] | % 31
+	   dis8 [ (cis dis b)] s2 | % 32
+	   s1 | % 33
+	   s2 cis8 [ (dis) e (dis) ] | % 34
+	   cis8 [ (b ais b) ] cis [ (dis) e (cis) ] | % 35
+	   e,2 s2 | % 36
+	   s1 | % 37
+	   fis2 b,4 s4 | % 38
+	   e4 s2. | % 39
+	   fis4 s2. | % 40
+	   s2 fis2 | % 41
+	   <b, fis'>2 e4 s4 | % 42
+	   a4 s2. | % 43
+	   b2 s2 | % 44
+	   s1*3 | % 47
+	   b2 e,4 s4 | % 48
+	   a4 s4 b,4 s4 | % 49
+	   e2 s2 | % 50
+	   s1*14 | % 64
+	   s2 cis'2 | % 65
+	   <fis, cis'>2 <gis b>4 s4 | % 66
+	   a4 s2. | % 67
+	   b2 s2 | % 68
+	   s1*3 | % 71
+	   b2 e,4 s4 | % 72
+	   <a cis>4 s4  b,4 s4 | % 73
+	   e2 e'8 [ dis ] e4 | % 74
+	   a,8 [ gis ] a4 dis8 [ cis ] dis4 | % 75
+	   gis,2 s2| % 76
+	   s1 | % 77
+	   a2 ais8 s4. | % 78
+	   s4 gis4 e <fis cis'>| % 79
+	   <b, fis' b>4 s4 <b fis'>8 s4. | % 80
+	   <e d'>8 s4. e8 s4. | % 81
+	   <d cis'>2 b'8 s4. | % 82
+	   cis8 s4. dis8 s4. | % 83
+	   e8 [ (cis) e (cis) ] gis [ (cis) e (cis) ] | % 84
+	   dis8 [ (b) dis (b) ] gis [ (b) dis (b) ] | % 85
+	   e8 [ (cis) e (cis) ] gis [ (cis) e (cis) ] | % 86
+	   dis8 [ (b) dis (b) ] gis [ (b) dis (b) ] | % 87
+	   dis8 [ (b) dis (b) ] cis [ (b) cis (b) ] | % 88
+	   ais8 [ (cis ais cis) ] fisis, [ (ais fisis ais) ] | % 89
+	   s1*4 | % 93
+	   s2 e4 s4 | % 94
+	   a4 s2. | % 95
+	   b2 s2 | % 96
+	   s1*3 | % 99
+	   b2 e,4 s4 | % 100
+	   a4 s4 b,4 s4 | % 101
+	   e2 s2 \bar "|." % 102
+	
+}
+
+
+melody = << \melodyOne \\ \melodyTwo  >>
+
+
+% The score definition
+
+\score {
+	\context Staff << 
+        \set Staff.instrumentName = "Violine"
+		\set Staff.midiInstrument = "violin"
+        { \clef treble \key e \major \time 4/4 \melody  }
+    >>
+	\layout { }
+ 	 \midi { }
+}

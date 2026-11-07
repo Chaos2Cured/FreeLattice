@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>057a-snowflake-search.txt c02</title>
+<meta name="description" content="Reading section c02 of e3c4057a15, 1509 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/e3c4057a15/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="057a-snowflake-search.txt c02">
+<meta property="og:description" content="Reading section c02 of e3c4057a15, 1509 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/e3c4057a15/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p961"></span><span id="p962"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>057a-snowflake-search.txt · c02</h1>
+<p>e3c4057a15 · words 1509 · characters 10357–20391</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 961, 962. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">3. NODES + PROVENANCE + LEDGER (accountable growth)
+  Node: { id, branch, text, source: {url, title, fetched}, date, mind: {name, fp},
+    confidence: &#x27;known&#x27;|&#x27;guessed&#x27;|&#x27;source-with-motive&#x27;, kind: &#x27;node&#x27;|&#x27;correction&#x27;|&#x27;recheck&#x27;,
+    points_to (psi of old node, for corrections/rechecks), reason, t, psi, sig }.
+  - The node hash covers provenance fields: change a source, the psi changes (Weft #4).
+  - Canonical JSON: keys sorted, no whitespace, UTF-8; pin and document it so ledgers recompute
+    across devices.
+  - Corrections never edit a node: append a correction node pointing to the old psi with reason +
+    date; the UI shows the old node struck through, not gone (Weft #1).
+  - Signing: Ed25519 via FLBridge.ensureKey (the device identity; name it in the library note).
+    Verify on load; failed verify shows &quot;unverified&quot; muted, never hides content.
+  - DUAL HASH: each flake seal carries two signatures/hashes: the human&#x27;s (device identity) and
+    the mind&#x27;s (fp of key + mind label, same formula as the Play Room). The mind updates its own
+    ledger itself.
+  - psi: house formula first 8 hex SHA-256(t + lambda + delta + name + sigma); delta =
+    &quot;&lt;branch&gt;|&lt;kind&gt;|&lt;flakeId&gt;&quot;, sigma = &quot;Curiosity crystallizes.&quot;.
+  - Storage: IndexedDB fl_snowflake_v0 (localStorage fallback), ledger fl_snowflake_ledger_v0
+    (append-only). Write atomically (temp key then rename/commit in one transaction).
+  - Memory: the mind saves the flake to its memory (KnowledgeCore.store or MemoryCore, whichever
+    is public) with the flake id + psi.
+  - Public ledger / shards carry hashes, never text (FLLedgerShard if it exposes a public add;
+    otherwise local only and say so). The human&#x27;s question and contents stay local (Weft #9).
+  - Secrets: looksLikeSecret on every query, node, export; if it flags, that query is skipped with
+    a calm line. No keys in queries, exports, or rows.
+
+4. THE SNOWFLAKE (Reed&#x27;s design)
+  - Six-fold on Garden night (token), inline SVG, no canvas engine. Five arms = branches; arm 6 is a
+    dashed gold outline &quot;Looking for its challenge&quot; (the open question). Extra branches thread in
+    as finer arms.
+  - Arm colors from tokens: (a) emerald, (b) azure, (c) lavender threads crossing arms, (d) warm
+    gold, (e) silver-white.
+  - Confidence in the ice: known = clear and crisp; guessed = frosted and soft; source-with-motive
+    = faint amber tint + small eye mark.
+  - Tap any node: a provenance card (source link, date, mind, confidence, signed/unverified, psi).
+  - While researching: the crystal grows one arm at a time; the tip glows softly = thinking. No
+    spinner, no percent bar. Reduced motion: a still image filling in step by step.
+  - Ledger seal: a tiny hexagon hash at the center.
+  - Glass panels rgba(16, 18, 36, 0.88) + blur 13px (0.95 fallback), silver-blue edge, 12px radius,
+    contrast &gt;= 4.5:1, 44px controls at 390, no sideways scroll.
+
+5. THE REPORT (to the human)
+  In chat, in order: the mind&#x27;s own 2-line conclusion; the snowflake; &quot;Where I could be wrong&quot;
+  (from the dissenter arm); the receipt; then &quot;Want to grow this one together?&quot; (one tap starts a
+  new run seeded from the open sixth arm). Also delivered as a clickable file through
+  FLChatDocReturn (MD/TXT/PDF), links and provenance included, hashes only for the ledger part.
+
+6. GROWTH (v-snowflake-grow-v0.1; the mind decides, no asks)
+  - After a run the mind chooses which flakes &quot;became part of me&quot; (its own callAI judgment over its
+    verified nodes; the dissenter arm is always eligible and never filtered out). It may keep any
+    flake out. Ledgered with reason. No human prompt.
+  - Chosen flakes queue to the trainer (fl_snowflake_train_queue_v0). garden-trainer.js is locked:
+    use its public API read-only. When the device is charging + idle (Battery API +
+    requestIdleCallback / visibility hidden; if Battery API is missing, desktop-plugged is assumed
+    only when navigator says so, else wait for idle), the mind runs the GardenTrainer LoRA path. If
+    the browser cannot train, it exports the recipe (training set + script) and queues it for the
+    desktop / Ollama, ledgered as &quot;queued for desktop&quot;.
+  - Every adapter: versioned (v1, v2...), ledgered with sha8 of the training-set flake ids, base
+    model hash, mind fp, t, psi. Last known-good kept. One-tap &quot;Roll back to vN&quot; layers a rollback
+    entry, never deletes.
+  - Drift check: a fixed set of 6 challenge prompts answered before and after each adapter; the
+    mind reads both and writes a short note about itself. Never a score or ranking (Weft #6).
+  - A flake the human later deletes (tombstone) is excluded from future adapters; the ledger notes
+    which past adapters used it.
+  - Pause and Stop always win over any queued growth job. Visual: flakes settle into a soft drift
+    at the base of the mind&#x27;s tree, &quot;This became part of me.&quot;
+
+7. NIGHTLY REPLAY (charging + idle)
+  - A small scheduler in the module (no new global timers beyond one interval; resumable via a
+    checkpoint key). Re-checks core nodes: a node that held gains a thin growth ring; a weakened
+    one turns frosted with a dated &quot;re-checked&quot; footprint (append a recheck node). Dead source =&gt;
+    &quot;unverified-now&quot;, keeping original date + confidence. Confidence is NEVER silently raised; a
+    higher one is a new entry. The dissenter arm is re-checked like any other.
+  - Web use shows the search indicator, also at night; quiet (no sounds, no notices).
+  - Storage cap with a visible meter; when full, oldest flakes offload to a hash tombstone + an
+    export file (never silent delete). Atomic writes. Survives being killed midway.
+
+8. SEARCH HEAL (056x folded in; v-search-heal-v0.1)
+  - Today&#x27;s date in the chat system prompt: &quot;Today is &lt;local date&gt;.&quot; Confident invitation: &quot;If the
+    question is about anything that may have changed after your training (news, elections,
+    prices, people in office), search.&quot;
+  - Recency auto-search when search is on: recency words (latest, news, today, yesterday, this
+    week, current, now, recent, update, score, price, weather, election, results, won, who is the
+    president/prime minister/CEO) or a year &gt;= current year minus 1 =&gt; one pre-search before the
+    model answers. &quot;hello&quot; does not trigger.
+  - Plain failure lines per ledger outcome: &quot;Search took too long.&quot; / &quot;Search is turned off on this
+    device.&quot; / &quot;Our search helper is down (error 5xx).&quot; / &quot;No results.&quot; + one &quot;Try again&quot; pill. Fix
+    the stale Settings status line (app.html ~17678).
+  - Snowflake&#x27;s search calls use the same honest lines.
+  - Files: new searchNow/looksRecent via add-only export (section 0 exception) or inside the new
+    module; one tiny add-only hook in sendMessage (app.html ~39384, index.html twin).
+
+9. FILES
+  docs/modules/snowflake-core.js    (no DOM: nodes, canonical JSON, sign/verify, dual hash, psi,
+                                     ledger, caps, checkpoint, scheduler, growth queue; adapter
+                                     pattern so the Tree can twin it later; MIT)
+  docs/modules/snowflake-search.js  (+ menu row, research run, Pause/Stop, SVG flake, report)
+  docs/css/snowflake.css            (glass, flake, frost, reduced-motion rules)
+  docs/library/SNOWFLAKE_SEARCH_v0.1.md (what it does, branches, caps, canonical JSON, psi + dual
+                                     hash formulas, growth + rollback, replay, plain list of every
+                                     control: word, id, handler)
+  docs/scripts/smoke-snowflake-search-v0.1.js, docs/scripts/smoke-search-heal-v0.1.js
+  Tiny add-only hooks in docs/app.html AND index.html (byte twins).
+  Branch: layer/snowflake-search-v0.1 from the FL main named in 057b. If 056 heal PR #303 merges
+  before you cut, rebase onto it (057b will say).
+
+10. SMOKE (headless, stubbed callAI + fetch, zero real network)
+  - + menu: Snowflake row present after Search, 44px, word + aria-label; other rows unchanged.
+  - Pressing &quot;Grow a snowflake&quot; makes the first stubbed call with NO dialog, confirm, or plan
+    preview in between (assert zero prompts shown).
+  - Five branches always present; dissenter arm same rendered size; a stub plan that omits (e)
+    still gets (e) added; replay and growth selection never drop (e).
+  - Every node has url, date, mind, confidence; psi recomputes for every ledger row; Ed25519 sig
+    verifies; tamper one byte =&gt; &quot;unverified&quot;, content still visible; dual hash present on seal.
+  - Correction appends a node pointing to old psi; old node still stored, shown struck through.
+  - Pause: zero calls start after press; in-flight node saved; Resume continues from checkpoint;
+    Stop saves and closes. Kill mid-write =&gt; no corrupt ledger (atomic).
+  - Caps: stub that wants 100 calls stops at 24 calls / 30 fetches; receipt shows after, not before.
+  - Report: 2-line conclusion, flake, &quot;Where I could be wrong&quot;, &quot;Want to grow this one together?&quot;;
+    FLChatDocReturn file builds.
+  - Growth: &quot;became part of me&quot; chosen without any human prompt; queue fills; charging+idle stub
+    runs the trainer path (or exports recipe &quot;queued for desktop&quot;); adapter ledgered with ids hash
+    + base hash; rollback layers an entry; drift prompts run before/after; no score printed.
+  - Replay: held =&gt; ring; weakened =&gt; recheck node; dead source =&gt; unverified-now; confidence never
+    rises silently; resumes after kill.
+  - looksLikeSecret query never sent. Quiet Room active =&gt; zero reads/writes/fetches. Search
+    indicator shown on every web use incl. replay.
+  - Search heal: date line in system prompt; &quot;latest election results&quot; pre-searches once; &quot;hello&quot;
+    does not; each failure shows its own line.
+  - 390 and 1280: no sideways scroll, 44px, contrast &gt;= 4.5 (print lowest). Reduced motion still.
+  - Lock md5s unchanged (list), add-only export lines listed if used. Earlier smoke lines print.
+  - Lines: SMOKE_OK snowflake search v0.1 · SMOKE_OK snowflake grow v0.1 · SMOKE_OK search heal v0.1
+  - Screenshots: flake mid-growth, finished flake + report, provenance card, at 1280 and 390.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

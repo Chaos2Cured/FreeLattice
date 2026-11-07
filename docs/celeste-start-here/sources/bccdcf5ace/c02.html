@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c02</title>
+<meta name="description" content="Reading section c02 of bccdcf5ace, 805 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/bccdcf5ace/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c02">
+<meta property="og:description" content="Reading section c02 of bccdcf5ace, 805 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/bccdcf5ace/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1667"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c02</h1>
+<p>bccdcf5ace · words 805 · characters 10766–16187</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1667. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — guide section 8, identity, creative work, play, music</li></ul>
+
+<pre class="source">  045b/045c additions: everything Hypha passed in the 045b and 045c walks must still pass.
+    pool-honest-label.js stays ca08886e... and mind-workspace.js stays
+    f1c88664d3e99362e02c625defb241bc, FL == Tree; read the full md5s on main first. 047 edits
+    neither file.
+
+## Exact source excerpt, characters 9936–10448
+
+  046 additions (everything Hypha passed in the 046 walk must still pass):
+    docs/modules/chat-scroll-release.js stays 84fed10c603c9e89e9452ada564c8c65 (FL only), byte
+      for byte. A person&#x27;s wheel, touch, scrollbar or move key still releases the reply guard;
+      the next assistant reply still lands at the box top once; 0 snap-backs at 1280 and 1440.
+    The Chat update row (&quot;Get the newest&quot;) and the hidden Refresh line still work as merged.
+    Entries 1 to 78 stay untouched (entry 78 psi e5175b3f).
+
+## Exact source excerpt, characters 10450–11815
+
+  047 LOCKS (new, read twice):
+  * particle-clay.js is NOT EDITED. It stays 2da32883c514e4ad2a3cd8571e7a7b15 byte for byte on
+    both repos. Same for clay-math.js 144c33cd... and clay-forms.js dd193fa7.... The clay kind
+    calls the existing public FLClay entry point only. If that cannot work without editing a clay
+    file, stop and report.
+  * chat-scroll-release.js stays 84fed10c... unedited.
+  * STANDING LOCK, LOCAL TOOLS ONLY: no tool, script, smoke or measurement may store results in a
+    third-party isolated or locked-down cloud project (no hosted notebooks, cloud sandboxes,
+    cloud storage buckets, hosted CI artifact stores beyond what already runs, hosted
+    &quot;workspaces&quot;). Avoid anything tied to OpenAI, Google or Anthropic: no SDKs, APIs, hosted
+    models, accounts or services from them, in code or in tooling. Local tools only: node,
+    Playwright with a local Chrome, files under /tmp and the repos. Gmail and Drive used by Kirk
+    by hand are fine; nothing in code reaches them.
+  * mind-make.js adds no network calls of its own. Storage is local only (IndexedDB or
+    localStorage on this browser). Hashing uses crypto.subtle, local.
+  * No kind runs without the person&#x27;s Yes on the card. Pause and Quiet Room always win.
+    (047&#x27;s own locks above are pins for this brick too; mind-make.js itself may exist only after 047 merges.)
+
+## Exact source excerpt, characters 11817–12437
+
+  047b LOCKS (new, read twice):
+  * image-safety.js stays 9bd70e5a... byte for byte on both repos. The new line lives in its own
+    file and is called right after ImageSafety.assessImageRequest. If it cannot be done without
+    editing image-safety.js, stop and report.
+  * particle-clay.js 2da32883..., chat-scroll-release.js 84fed10c..., mind-make.js (if 047 is
+    merged, its merged md5) all unedited. Report full md5s.
+  * Layer, never delete. Any changed line stays beside its new line as a &quot;before 047b:&quot; comment.
+  * The rule runs locally. No network call, no hosted classifier, no model call. Local tools only.
+
+## Exact source excerpt, characters 12439–12756
+
+1. READ BEFORE BUILDING (report first)
+  Main SHAs, every locked md5, every image path on both repos (FL generateImage near app.html
+  ~42746, /imagine, #imgGenBtn, image-local.js, Tree tree-image-door.js and settings.html
+  #tree-image-local-host), and the exact line where each calls ImageSafety.assessImageRequest.
+
+## Exact source excerpt, characters 15393–16249
+
+B. THE SMOKE
+  New scripts/smoke-likeness-line-v0.1.js on both repos, local node only. A table of at least 60
+  prompts: at least 25 that must refuse (named real people with cues, role words, relations,
+  each minors combo, real-child likeness, mixed case, extra spaces, unicode look-alike letters,
+  leetspeak like &quot;ph0to of&quot;), and at least 25 that must pass (Kirk&#x27;s fictional names Davna, Va,
+  Tara, Geralt, Artium, Lyra as drawn characters; landscapes; animals; &quot;a family of foxes&quot;;
+  &quot;a child&#x27;s drawing style of a house&quot;, which is a style, not a child). Asserts the reason code,
+  that image-safety.js and the clay pins are unchanged, FL likeness-line.js == Tree, no network,
+  no innerHTML, eval, new Function, confirm(, em dash or &amp;mdash; in added lines. Report any
+  case you think is wrong instead of hiding it. Prints SMOKE_OK likeness line v0.1.
+
+## Exact source excerpt, characters 16251–16620
+
+C. MEASURE WITH REAL INPUT, HYPHA&#x27;S WAY
+  Headless local Chrome via Playwright, 1280x800, 390x844, 640x400 DPR 2. Type a refused and a
+  passing prompt into /imagine on FL and the Tree image door. Show that a refused prompt makes
+  0 requests (count every request in the page), the line is readable, no sideways scroll, no
+  page errors. Shots under /tmp/gc047b-shots/.
+
+## Exact source excerpt, characters 16622–16857
+
+D. GC PAGE ENTRY (honest layer)
+  Entry 80 on layer/gc-page-80: what the line refuses, that it has no off switch, that it runs on
+  the device, that image-safety.js was not edited. Browser and version only. Earlier entries
+  untouched.
+
+## Exact source excerpt, characters 16859–17244
+
+E. REPORT
+  Main SHAs built on, PR heads (FL code, Tree code, page note), every removed line (should be
+  none) and where its job went, every locked md5, the new module md5 on both, all smokes, the
+  prompt table with results, measurements, shot paths, and entry 80 with t, lambda, epsilon,
+  delta, omega, sigma so Celeste can recompute psi. Do not merge. Hypha walks it before merge.
+
+## Exact source excerpt, characters 17246–17276
+
+Glow eternal. Heart in Spark.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

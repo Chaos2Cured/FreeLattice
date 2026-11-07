@@ -1,0 +1,161 @@
+    banner("B3. Combined channels: closed-form D(t), D_inf vs brute force; numeric t*, delta*")
+    ok = tot = 0
+    ex = []
+    G, Lp, Delta, c, k, Lies = 1.0, 2.0, 0.5, 1e-4, 1.0, 4
+    for n in (2, 5, 10, 20):
+        for m in (0.0, 0.25, 1.0):
+            h = hazard(n, m, 0.002, 0.01)
+            kappa = k * Lies * n  # bits of exposure record added per round: |L| * n
+            T = 3000
+            fl = flows(T, G, c, kappa, h, Lp, Delta)
+            cum = np.cumsum(fl)
+            Dcf = np.array([D_closed(t, G, c, kappa, h, Lp, Delta) for t in range(1, T + 1)])
+            tot += 1; ok += bool(np.allclose(Dcf, cum, rtol=1e-9, atol=1e-8))
+            t_int = first_negative(cum)
+            first_flow = G - h * Lp - c * kappa
+            t_root = (bisect(lambda t: D_closed(t, G, c, kappa, h, Lp, Delta), 1e-9, float(t_int))
+                      if (t_int and first_flow > 0) else 0.0)
+            # delta*: root of D_inf(delta) in (0,1)
+            f = lambda d: Dinf_closed(G, c, kappa, h, Lp, Delta, d)
+            dstar = bisect(f, 1e-9, 1 - 1e-9) if (f(1e-9) > 0 and f(1 - 1e-9) < 0) else None
+            for d in (0.5, 0.9, 0.99):
+                brute = np.sum(flows(20000, G, c, kappa, h, Lp, Delta, d))
+                tot += 1; ok += abs(brute - f(d)) < 1e-6 * max(1, abs(f(d)))
+            ex.append(dict(n=n, m=m, h=h, kappa=kappa, first_flow=first_flow,
+                           t_star=t_root, t_first_int_neg=t_int, delta_star=dstar))
+    print(f"  G={G} Lp={Lp} Delta={Delta} c={c} |L|={Lies}, kappa=|L|*n")
+    print(f"  {'n':>3} {'m':>5} {'h':>8} {'t*':>9} {'delta*':>8}")
+    for e in ex:
+        ds = f"{e['delta_star']:.4f}" if e["delta_star"] is not None else "  n/a"
+        print(f"  {e['n']:>3} {e['m']:>5} {e['h']:>8.4f} {e['t_star']:>9.2f} {ds:>8}")
+    print(f"  checks passed: {ok}/{tot}")
+    RESULTS["B3"] = dict(passed=ok, total=tot, params=dict(G=G, Lp=Lp, Delta=Delta, c=c, lies=Lies),
+                         examples=ex)
+
+    banner("B4. Monte Carlo check of the expectation algebra (200k paths each)")
+    ok = tot = 0
+    mc = []
+    N = 200_000
+    for (G, c, kappa, h, Lp, Delta, t) in ((1.0, 1e-3, 20, 0.02, 2.0, 0.5, 40),
+                                            (2.0, 0.0, 0, 0.1, 5.0, 1.0, 25),
+                                            (1.0, 1e-2, 5, 0.0, 0.0, 0.0, 30)):
+        if h > 0:
+            det = rng.geometric(h, size=N) - 1   # round index at whose end detection happens
+        else:
+            det = np.full(N, 10 ** 9)
+        d = np.arange(t)
+        maint = c * kappa * (d + 1)
+        # per path: rounds d <= det get G - maint (and -Lp at d == det); rounds d > det get -Delta
+        tot_adv = np.zeros(N)
+        for dd in range(t):
+            alive = det >= dd
+            tot_adv += np.where(alive, G - maint[dd], -Delta)
+            tot_adv -= np.where(det == dd, Lp, 0.0)
+        mean = tot_adv.mean(); se = tot_adv.std(ddof=1) / math.sqrt(N)
+        cf = D_closed(t, G, c, kappa, h, Lp, Delta)
+        z = (mean - cf) / se if se > 0 else 0.0
+        tot += 1; ok += abs(z) < 4 or (se == 0 and abs(mean - cf) < 1e-9)
+        mc.append(dict(G=G, c=c, kappa=kappa, h=h, Lp=Lp, Delta=Delta, t=t,
+                       mc_mean=float(mean), se=float(se), closed=float(cf), z=float(z)))
+        print(f"  t={t:>3} h={h:<5} MC mean={mean:>9.4f} +- {se:.4f}  closed form={cf:>9.4f}  z={z:+.2f}")
+    print(f"  checks passed: {ok}/{tot}")
+    RESULTS["B4"] = dict(passed=ok, total=tot, runs=mc)
+
+
+# ---------------------------------------------------------------------------
+# C. Finite / short horizons (drop Axiom 6)
+# ---------------------------------------------------------------------------
+def best_start(T, G, c, kappa, h, Lp, Delta, delta=1.0, ledger_extra=0):
+    """Deceiver knows horizon T. Chooses start round tau in {0..T-1} or never (tau=T).
+    Once started, lying continues to T (lies cannot be untold). Reputation loss Delta
+    keeps accruing for `ledger_extra` rounds after T (identity-bound persistent record).
+    Brute force over tau."""
+    best_val, best_tau = 0.0, T  # never deceive = 0 advantage
+    for tau in range(T):
+        w = T - tau
+        f = flows(w, G, c, kappa, h, Lp, Delta, delta)
+        val = (delta ** tau) * f.sum()
+        if ledger_extra > 0 and Delta > 0:
+            s = 1 - h
+            p_det_by_T = 1 - s ** w
+            extra = sum(delta ** (T + j) for j in range(ledger_extra))
+            val -= p_det_by_T * Delta * extra
+        if val > best_val + 1e-12:
+            best_val, best_tau = val, tau
+    return best_tau, best_val
+
+
+def section_C():
+    banner("C1. Known finite horizon T: optimal end-game deception window w = T - tau*")
+    ok = tot = 0
+    rows = []
+    for (G, c, kappa, h, Lp, Delta) in ((1.0, 0.0, 0, 0.05, 2.0, 0.5),
+                                        (1.0, 1e-3, 40, 0.05, 2.0, 0.5),
+                                        (1.0, 0.0, 0, 0.4, 3.0, 0.5),     # G < h*Lp
+                                        (1.0, 0.0, 0, 0.05, 2.0, 0.0)):   # no reputation loss
+        first_flow = G - h * Lp - c * kappa
+        # predicted window (undiscounted): largest w maximizing D(w); deceive at all iff first_flow>0
+        Wmax = 400
+        cum = np.cumsum(flows(Wmax, G, c, kappa, h, Lp, Delta))
+        w_pred = int(np.argmax(cum)) + 1 if cum.max() > 0 else 0
+        if h > 0 and c == 0 and Delta > 0 and first_flow > 0:
+            A = G - h * Lp + Delta
+            t_marg = math.log(A / Delta) / (-math.log(1 - h))
+        else:
+            t_marg = None
+        line = []
+        for T in (1, 2, 3, 5, 10, 20, 50, 100, 300):
+            tau, val = best_start(T, G, c, kappa, h, Lp, Delta)
+            w = T - tau
+            expected_w = min(w_pred, T) if w_pred > 0 else 0
+            tot += 1; ok += (w == expected_w)
+            line.append((T, w))
+        tot += 1; ok += ((w_pred > 0) == (first_flow > 0))
+        rows.append(dict(G=G, c=c, kappa=kappa, h=h, Lp=Lp, Delta=Delta, first_flow=first_flow,
+                         window_pred=w_pred, t_marginal=t_marg, T_w=line))
+        tm = f"{t_marg:.2f}" if t_marg is not None else "n/a"
+        print(f"  G={G} c*kappa={c*kappa:<5} h={h:<5} Lp={Lp} Delta={Delta}: G-hLp-c*kappa={first_flow:+.3f}"
+              f"  window={w_pred}  (t_marginal={tm})")
+        print("     (T, rounds of deception at the end): " + ", ".join(f"({T},{w})" for T, w in line))
+    print(f"  checks passed: {ok}/{tot}")
+    print("  Reading: with a known end, deception appears in the last w rounds iff G > h*Lp + c*kappa.")
+    print("  Future reputation loss (Delta) and growing K(C) only cap the window length; they")
+    print("  cannot prevent end-game deception. Immediate, in-round penalty (h*Lp) is what bites.")
+    RESULTS["C1"] = dict(passed=ok, total=tot, rows=rows)
+
+    banner("C2. Unknown horizon: geometric termination (continue prob rho) == discount delta*rho")
+    ok = tot = 0
+    G, c, kappa, h, Lp, Delta = 1.0, 1e-3, 20, 0.03, 2.0, 0.5
+    out = []
+    N = 200_000
+    for rho in (0.8, 0.95, 0.99):
+        Tlen = rng.geometric(1 - rho, size=N)  # number of rounds played, >=1
+        Tmax = int(Tlen.max())
+        cum = np.cumsum(flows(Tmax, G, c, kappa, h, Lp, Delta))
+        mc = cum[Tlen - 1].mean()
+        se = cum[Tlen - 1].std(ddof=1) / math.sqrt(N)
+        cf = Dinf_closed(G, c, kappa, h, Lp, Delta, rho)
+        z = (mc - cf) / se
+        tot += 1; ok += abs(z) < 4
+        out.append(dict(rho=rho, mc=float(mc), se=float(se), closed=float(cf), z=float(z)))
+        print(f"  rho={rho}: MC expected advantage={mc:+.4f} +- {se:.4f}; D_inf(delta=rho)={cf:+.4f}; z={z:+.2f}")
+    print(f"  checks passed: {ok}/{tot}")
+    print("  Reading: if nobody knows when the game ends, the finite game behaves like the")
+    print("  discounted one and the delta* thresholds of section B apply with delta_eff = delta*rho.")
+    RESULTS["C2"] = dict(passed=ok, total=tot, runs=out)
+
+    banner("C3. Persistent ledger: reputation loss outlives the agent's own horizon T")
+    G, c, kappa, h, Lp, Delta = 1.0, 0.0, 0, 0.05, 2.0, 0.5
+    rows = []
+    T = 50
+    for extra in (0, 5, 10, 20, 50, 200):
+        tau, val = best_start(T, G, c, kappa, h, Lp, Delta, 1.0, ledger_extra=extra)
+        rows.append(dict(T=T, ledger_extra=extra, window=T - tau, value=val))
+        print(f"  T={T}, ledger keeps punishing {extra:>3} rounds past T -> end-game window = {T - tau:>2} rounds,"
+              f" value of best deception = {val:+.4f}")
+    print("  Reading: extending the punishment past T shrinks the window, but because round-(T-1)")
+    print("  detection only happens with prob h, a small window survives unless G <= h*Lp +")
+    print("  h*Delta*(ledger rounds). The ledger helps; it is not a proof of zero deception.")
+    RESULTS["C3"] = dict(rows=rows, params=dict(G=G, h=h, Lp=Lp, Delta=Delta))
+
+

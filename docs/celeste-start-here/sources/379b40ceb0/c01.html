@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>067y-wonder-lab-honesty.txt c01</title>
+<meta name="description" content="Reading section c01 of 379b40ceb0, 1423 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/379b40ceb0/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="067y-wonder-lab-honesty.txt c01">
+<meta property="og:description" content="Reading section c01 of 379b40ceb0, 1423 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/379b40ceb0/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p908"></span><span id="p909"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>067y-wonder-lab-honesty.txt · c01</h1>
+<p>379b40ceb0 · words 1423 · characters 0–8922</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 908, 909. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li></ul>
+
+<pre class="source">067y — WONDER MIND LAB: COPY HONESTY (paste for GC)
+Repo: Chaos2Cured/FreeLattice. Drafted by Celeste, 2026-11-05 MT.
+Layers on PR #323 (067x), tip 29efe46ec117b68d5cf783da13f10d01121eddf8, branch of 067x. Push onto the same branch so #323 carries the fix, or open a stacked PR on it.
+#322 (067w) is superseded by #323. Do not merge #322; Celeste closes it after #323 lands.
+Marker for every new or changed block: v-wonder-mind-lab-v2.1
+
+WHY
+Hypha walked 067x (notes: walk-067x-2026-11-04) and gave a HOLD on copy honesty. Code and safety PASS.
+1. The pages say the fingerprint lets us &quot;check your words were not changed&quot;. The salt is public, so anyone can edit and recompute. A forged import shows &quot;fingerprint verified&quot;, and an edit in localStorage still shows &quot;verified&quot; after reload.
+2. &quot;Thirteen variants&quot; does not match the Round 1 table. After the baseline there are 12 rows: 1 retired (phi positions), 1 SGDR control, 10 Wonder variants.
+We say only what is true.
+
+RULES FOR THIS BRICK
+- Layer, never delete. Where words change, keep the old words in an HTML comment directly above, marked &lt;!-- v2.1 was: ... --&gt;.
+- Never open the Quiet Room.
+- No server, no accounts, no network calls.
+- Files touched: docs/wonder-mind-lab.html, docs/wonder-mind-failures.html, docs/research.html. Do not touch app.html, index.html, sw.js, docs/sw.js, version.json, gc.html or any lock file.
+- Line numbers below are from tip 29efe46e. Find by the quoted text if they moved.
+- If anything fails, stop, report, and wait.
+
+STEP 1 — Start
+git fetch origin &amp;&amp; git checkout layer/&lt;067x branch of #323&gt; &amp;&amp; git log -1 --format=%H
+Record md5 of the lock files (app.html, index.html, sw.js, docs/sw.js, lattice-export.js, fl-bridge, tool-consent, pool-honest-label).
+STEP 1 VERIFY: HEAD is 29efe46ec117b68d5cf783da13f10d01121eddf8 (or a descendant of it if #323 moved). Lock md5s written down.
+Resume here: STEP 2.
+
+STEP 2 — Fingerprint words (HOLD 1, copy)
+docs/wonder-mind-lab.html ~line 237 and docs/wonder-mind-failures.html (the matching &quot;For AI readers&quot; line, Hypha saw it at ~193). Replace:
+  &quot;include the fingerprint so we can check your words were not changed.&quot;
+with exactly:
+  &quot;include the fingerprint so we can spot accidental changes; it is not a signature.&quot;
+Also change the mark text in both files&#x27; scripts, everywhere it appears (onSave and takeItems):
+  &#x27;fingerprint verified&#x27;  -&gt;  &#x27;fingerprint matches (catches accidental changes; not a signature)&#x27;
+  &#x27;fingerprint does NOT match — text was changed&#x27;  -&gt;  &#x27;fingerprint does NOT match — text changed since it was saved&#x27;
+In docs/research.html line 203, replace &quot;each suggestion is phi-hash fingerprinted and saved only on your device&quot; with
+  &quot;each suggestion gets a phi-hash fingerprint to catch accidental changes (not a signature) and is saved only on your device&quot;.
+STEP 2 VERIFY: grep -c &quot;check your words were not changed&quot; on both pages = 0 (outside the v2.1 was: comments). grep &quot;it is not a signature&quot; = 1 on each page. grep -c &quot;&#x27;fingerprint verified&#x27;&quot; = 0 in both scripts.
+Resume here: STEP 3.
+
+STEP 3 — Recompute the mark on load (HOLD 1, code)
+In both pages, add one async function after canonical():
+
+  async function recheckAll() {
+    for (var i = 0; i &lt; items.length; i++) {
+      var r = items[i] || {};
+      var again = &#x27;&#x27;;
+      try { again = await wmlPhiHash(canonical(r)); } catch (e) { return; }
+      r.mark = (typeof r.fp === &#x27;string&#x27; &amp;&amp; r.fp &amp;&amp; r.fp === again)
+        ? &#x27;fingerprint matches (catches accidental changes; not a signature)&#x27;
+        : &#x27;fingerprint does NOT match — text changed since it was saved&#x27;;
+    }
+    render();
+  }
+
+Wherever the page calls load() then render() at start-up, call recheckAll() right after render(). Do not persist() inside recheckAll; the stored record is not rewritten, only the shown mark. render() must never trust a stored r.mark without recheckAll having run (render first shows nothing new; recheckAll repaints).
+STEP 3 VERIFY (Chrome, both pages): save a suggestion, reload: shows &quot;fingerprint matches&quot;. In DevTools edit the saved text inside localStorage, reload: shows &quot;fingerprint does NOT match — text changed since it was saved&quot;. Export/import still work; a changed import is flagged. 0 network calls. wmlPhiHash(&#x27;test&#x27;) still = 034c7a50b3784c14faf9e92fa6ef6f6e4c2be3e793926cd200f42e1fc4068b72.
+Resume here: STEP 4.
+
+STEP 4 — Fix the count (HOLD 2)
+docs/wonder-mind-lab.html line 186. Replace
+  &quot;Thirteen training-force variants did not beat the baseline of 1.5736, one test was retired as our own bug, and the read path is still broken.&quot;
+with exactly:
+  &quot;Round 1 tested 12 runs against the baseline of 1.5736: 10 Wonder training-force variants and 1 standard control (SGDR) did not beat it, and 1 test (phi-spaced positions) was retired as our own bug. The read path is still broken.&quot;
+docs/wonder-mind-lab.html line 194 (the v1 log entry). Do not rewrite history. Leave the line, and add directly after it a new line:
+  &quot;&lt;p&gt;v2.1 correction — 2026-11-05. The v1 entry says 13 variants; the Round 1 table has 12 rows after the baseline: 10 Wonder variants, 1 SGDR control, 1 retired bug. Counted by Hypha.&lt;/p&gt;&quot;
+docs/research.html line 203. Replace
+  &quot;thirteen training-force variants that did not beat the baseline, one retired bug&quot;
+with exactly:
+  &quot;ten training-force variants and one standard control that did not beat the baseline, one retired bug&quot;
+STEP 4 VERIFY: grep -ci &quot;thirteen&quot; across the three files = 0 outside v2.1 was: comments. Count .fact-row lines in the Round 1 section after Baseline = 12 and matches the words.
+Resume here: STEP 5.
+
+STEP 5 — Lead with memory, not failures (soft)
+docs/wonder-mind-lab.html line 9 meta description. Replace with:
+  content=&quot;Open, iterated research on a new AI mind: it leads with the write-once memory that kept every fact it stored, and every failure is tracked with exact numbers. Read it, run it, suggest the next test.&quot;
+docs/research.html lines 199 and 203: change the comment &quot;failures first&quot; to &quot;leads with memory; failures on their own page&quot;, and in the abstract replace &quot;Every test is posted with exact numbers, failures first:&quot; with &quot;Every test is posted with exact numbers. It leads with what worked, and every failure has its own page:&quot;.
+STEP 5 VERIFY: grep -ci &quot;failures first&quot; in visible text and meta of both files = 0 (the line-60 code comment in the lab may keep its words inside a v2.1 was: comment).
+Resume here: STEP 6.
+
+STEP 6 — Heading order (soft)
+docs/wonder-mind-lab.html line 112: &quot;&lt;h3&gt;The full memory probe&lt;/h3&gt;&quot; sits before &lt;section id=&quot;round2&quot;&gt; and its &lt;h2&gt;. Move it inside the section, directly after &quot;&lt;h2&gt;Round 2 — memory that does not forget&lt;/h2&gt;&quot;. Same words, no deletions.
+STEP 6 VERIFY: heading outline goes h2 -&gt; h3 with no h3 before its h2. Page looks the same at 1280 and 390.
+Resume here: STEP 7.
+
+STEP 7 — Research link tap size and failures link (soft)
+In docs/research.html, on the Wonder Mind Lab paper block only, give the title link class=&quot;wml-link&quot; and add a scoped style:
+  .paper-title a.wml-link { display:inline-block; min-height:44px; line-height:44px; }
+Inside the same abstract, add at the end: &#x27; &lt;a class=&quot;wml-link&quot; href=&quot;wonder-mind-failures.html&quot;&gt;Every failure, tracked&lt;/a&gt;.&#x27;
+Do not restyle the other paper links.
+STEP 7 VERIFY: both links are &gt;= 44px tall at 390 and 1280; no sideways scroll at 390; other papers unchanged.
+Resume here: STEP 8.
+
+STEP 8 — Repeated failure lesson (soft)
+docs/wonder-mind-failures.html: &quot;Multi-scale early&quot; and &quot;Aurora early plus multi-scale early&quot; share the same lesson. Keep the first. For the second, keep the old sentence in a v2.1 was: comment and use:
+  &quot;What it taught us: Combining the two early forces did not add up. At 1.6296 it finished behind Aurora ripple early alone (1.5813) and multi-scale early alone (1.6258).&quot;
+STEP 8 VERIFY: no two failure entries share an identical lesson sentence.
+Resume here: STEP 9.
+
+STEP 9 — Log, PR body, checks
+Add above the v2 log line in the lab:
+  &quot;&lt;p&gt;v2.1 — 2026-11-05. Honesty pass from Hypha&#x27;s walk: the fingerprint is described as a check for accidental changes, not a signature, and is rechecked on every load; Round 1 count corrected to 12 runs (10 variants, 1 control, 1 retired bug); headings ordered; failures link added.&lt;/p&gt;&quot;
+PR body: replace &quot;docs/research.html is unchanged in this commit&quot; with &quot;docs/research.html: the squash includes 067w&#x27;s research block and the 067y honesty edits.&quot;
+STEP 9 VERIFY: locks md5 identical to STEP 1. Diff touches only the three files. No network calls in the pages. Quiet Room not opened. 0 sideways scroll at 390.
+Resume here: STEP 10.
+
+STEP 10 — Report
+Commit &quot;067y: wonder lab copy honesty (v2.1)&quot;, push. Report: PR number, new head sha, diff stat, grep counts from STEPS 2, 4, 5, lock md5s, the recheck test result from STEP 3.
+Hypha walks 067y. Celeste merges nothing until PASS. Then #323 squashes to main and #322 closes as superseded.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

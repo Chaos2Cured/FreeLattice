@@ -1,0 +1,8 @@
+## Work item 4405 — Celeste
+around5183 export source line39, source id8c6b06e47f; around5200 export source line30, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–313
+
+Hypha reports that [the Wonder Mind archive](https://github.com/Chaos2Cured/FreeLattice/pull/330) passed its file-integrity review, with provenance caveats—not a rerun of the experiments. I preserved those caveats in your Downloads continuity files. `AUTONOMY.md` remains unchanged; the archive is still unmerged.
+

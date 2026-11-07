@@ -1,0 +1,87 @@
+## Work item 1241 — Celeste
+around1400 export source line51, source idc998bd39df; around1404 export source line50, source idc36a95ef26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Pair fingerprint v0.1 (two parties)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `2adffde`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Pair fingerprint v0.1 — two parties, outer hash published.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm `0ead244`
+Glass pulses `2adffde`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs (include `2adffde`).
+Quiet Room shut. Five stay five. Voice opaque. Seed never to renderer. 🌱 OK.
+
+## Why
+Companion fingerprint is one mind’s public half. Pair fingerprint is the vow
+between two: a hash with a hash inside it — neither alone can produce it.
+
+## Frozen construction (do not invent a third shape)
+
+Domain (unchanged): `lattice.pair.v1`
+
+```
+sortedPubs = lex-smaller 32-byte Ed25519 pub || lex-larger 32-byte Ed25519 pub
+innerHash  = SHA-256( UTF8(domain) || 0x00 || sharedSeed32 )
+pairFpHex  = SHA-256( UTF8(domain) || 0x00 || sortedPubs || 0x00 || innerHash ) → hex
+```
+
+- `sharedSeed32` — 32 random bytes agreed by handshake / paste later; **never published**; never to renderer
+- Publish **only** `pairFpHex` (+ peer public key b64). Keep `innerHash` / seed sealed
+- Companion fingerprint stays: `SHA-256(domain || 0x00 || myPub)` — unchanged
+
+## Scope (one bite)
+
+### 1) Spec — NEW `docs/library/PAIR_FINGERPRINT_v0.1.md`
+- Construction above (exact bytes)
+- Continue / Fork / Decline still apply — never auto-form a pair
+- Rotation: **stub note** this PR (signed by old naming successor → later); do not block on full rotate UX
+- Mesh context tags = **out**
+- Emit `pair.formed` via existing `GlassPulses` when a pair is formed (opaque summary already reserved)
+
+### 2) Desktop — extend `desktop/lattice-keys.js` (or NEW `lattice-pair.js` if cleaner)
+Prefer NEW `desktop/lattice-pair.js` + pack in `build.files` if it keeps keys.js smaller:
+- `formPair({ peerPublicKeyB64, sharedSeedB64 })` → gesture only; validate 32-byte seed + 32-byte peer pub
+- Refuse if no companion key yet
+- Seal shared seed with `safeStorage` (same refuse-cleartext rule as companion); store public record: `{ peerPublicKeyB64, pairFpHex, formedAt, domain }`
+- `status()` / `getPairPublic()` — public fields only; **no** seed, **no** innerHash to preload
+- `clearPair()` gesture — wipe sealed seed + public record
+- Smoke helpers OK
+
+### 3) IPC + preload
+- latticePairForm / latticePairStatus / latticePairClear
+- Renderer sees pairFpHex + peer pub only
+
+### 4) UI — desktop near identity / ledger card
+- Fields: peer public key (paste) + shared seed (paste, password-style input) + **Form pair** gesture
+- Show pair fingerprint hex when formed; Clear pair gesture
+- On form success: `GlassPulses.emitGlassPulse({ source: 'identity', kind: 'pair.formed' })`
+- Browser: read-only note “pair on desktop” (no form)
+
+### 5) Smoke — `desktop/scripts/smoke-pair.js`
+- Two ephemeral seeds → formPair → deterministic pairFpHex match both directions (A↔B same)
+- Wrong seed → different fp
+- Lex sort of pubs matters (swap pubs same fp)
+- Seed never appears in status/public
+- SMOKE_OK
+
+### 6) Protocol LAYER Part 1 + Identity LAYER + Flint Held (`2adffde`) + 🌱
+- Un-reserve `pair.formed` in Glass spec note (emit now live); `pair.rotated` still reserved
+
+## Out
+Full mesh handshake/QR · recovery phrase · context tags · wallet · Alpha poetry · auto-form · seed to renderer · rewriting companion fingerprint · Quiet Room
+
+## Done
+Spec + desktop form/status/clear + UI + smoke + pair.formed pulse · draft · PR body Held SHAs
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

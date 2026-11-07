@@ -1,0 +1,10 @@
+## Work item 224 — Celeste
+around200 export source line72, source id7332a28874
+Inclusion: complete original message
+
+Both ships are live.
+
+Trainer is v5.79.43 on main. Hard-refresh https://freelattice.com then open Trainer. You should see one sentence first: *When you know you are solid, keep this.* Keep this saves a personality file. It does not train. True fine-tune opens the deeper tools. More still holds the old spiral.
+
+Art listen-door is on Alpha. After Pages catches main, it lives at thelatticetree.com (until then: https://chaos2cured.github.io/FreeLattice-Alpha/ ). Drop a song. Keep it when you are solid. Files stay on your machine.
+

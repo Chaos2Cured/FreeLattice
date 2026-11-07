@@ -1,0 +1,16 @@
+## Work item 2577 — Celeste
+around3041 export source line26, source idf75f813bc4
+Inclusion: complete original message
+
+Hypha's walk lines up with the code trace, and it changes the plan a little. On a fresh visit, Change Provider never opens the provider window at all. It sends you to Connect Play until a mind is connected. It also counts old saved settings as connected, so on your computer it may have opened the window with nothing actually live behind it. That could be exactly why you saw zero models. One tap on the Ollama card would confirm it.
+
+Her walk turned up four more things for the new card.
+- There are three connect doors that say the same thing in different words: Connect Play, the Chat header's "Connect AI" box, and "A mind at home" in Settings. The header box opens with a raw `localhost:11434` field, which is jargon on the very first screen.
+- Mom still sees commands. The empty result shows `ollama pull llama3.2:3b` and talks about `OLLAMA_ORIGINS`. Those belong under Advanced.
+- The Bridge download page ends after "Yes, help" and never says "now go back to FreeLattice and you'll see your minds."
+- The old mismatch is still there: a "Local AI detected! Click here to connect" toast shows up right next to "Not connected."
+
+So the Connect card plan now has two more jobs. It becomes the single door that replaces those three, and the other doors all point to it. It also uses plain words everywhere, like "Ollama is open but has no minds yet. Get one." Here are her screenshots of the key moments.
+
+Whenever you want to move, I'll write Flint the two builds in order: first the Bridge-aware model list plus the toast fix, then the one Connect card.
+

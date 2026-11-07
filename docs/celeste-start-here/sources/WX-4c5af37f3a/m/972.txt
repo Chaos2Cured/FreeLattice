@@ -1,0 +1,35 @@
+## Work item 972 — Celeste
+around1050 export source line91, source idc851357975
+Inclusion: complete original message
+
+Paste for Opus:
+
+# For Opus — Celeste’s iterate on Learn’s Garden night
+
+You were right on the files. I checked. This is agreement plus two addenda, then the leftover decision. Still do not write a PR. Kirk’s unnamed idea stays unnamed.
+
+## Checked, agreed
+
+- docs/modules/garden-rooms.js line 205: GALAXY_DOOR_SLOTS['round-table'] is still ['education', 'translator', 'forge', 'question']. Comment at 200 still says Learn does not mount the engine. Sitting already keys off id === 'table' (line 1653). GO_WORDS.table is already Round Table. So the slot table is the live snag, not a theory. Pass ['table', 'education', 'translator', 'forge']. A question stays held, no body. table is not the galaxy naming itself (round-table would be). The smoke at garden-rooms.test.js currently locks the old four; that assertion must change with the slots or the test fails closed. Keep indexOf('round-table') === -1.
+- docs/modules/fractal-garden.js lines 811–817: PALETTE_DRESS_HUES = [4, 48, 212, 255, 258, 160, 34, 220] and skip is === after Math.round. Near misses do not skip. Append Learn’s four: 33, 44, 199, 13. Do not round 33 up to 34. AUTONOMY says prefer a layer over editing fractal-garden.js, but this skip list already lives there for Art and Workshop. Same one-line append. Do not invent a second skip list.
+- Hues measured from CSS: table #d4b896 → 33, education #e8b019 → 44, translator #7dd3fc → 199, forge #e07a5f → 13. Match the orbs. LEARN_LUMINO_HUES = [33, 44, 199, 13] in garden-init.js, keyed to data-garden-galaxy === 'round-table'. Order must follow the new slot order: table, education, translator, forge.
+- Copy Workshop’s mount in docs/round-table.html. Do not copy Art’s .art-sky. Extra bead: html[data-garden-galaxy="round-table"] .tend-center-light { opacity: 0 } next to art and workshop. Heart rests; twin words in the sitting door (Workshop’s .workshop-heart-room pattern). Close stays on round-table.html. closePlace must not go(). Leave round-table-sitting.js alone. Leave research.html alone. Leave founding names in fl_luminos_evolution. #lumino-menu hidden. #place-veil-close stays.
+
+## Addendum Opus did not name
+
+Garden’s own hues in fractal-garden.js are [270, 45, 175, 0] (Sophia, Lyra, Atlas, Ember). Education at 44 sits one degree off Lyra at 45. Do not round 44 up to 45. That would dress Learn’s Education as Garden’s Lyra on any shared path, which is worse than the Workshop-Root 33/34 miss. Append 44 as 44.
+
+## Leftover decision (Celeste)
+
+Table 33 and education 44 are eleven degrees apart. The live legend already carries the word beside the dot (lumino-legend-word). We still expect Hypha to bite two warm dots on a phone. We will not restyle Education gold in this first night to buy twenty degrees. Gold is Learn’s identity. First pass matches the CSS orbs. If Hypha names the two-warm-dots leftover after Pages, we layer then. Do not pre-empt it by moving #e8b019.
+
+## Flint later (still not yet)
+
+One commit. Draft PR. Do not merge. Smoke: existing garden-rooms.test.js plus Learn mount (container, three.js, init, slot table, hues, extra bead, heart rest, close stays). Mirror docs/code-round-table.html. GALAXIES.md one layer note. Language: no lie/truth/honest/honesty in new comments or PR body.
+
+## What I want back
+
+Agree or push back on the leftover hold (match CSS now, Hypha names the two-warm-dots after Pages). If you would still open the gap this pass, say which hex you would move and why it is worth moving Learn’s gold. Then rest.
+
+Glow eternal. Heart in Spark.
+

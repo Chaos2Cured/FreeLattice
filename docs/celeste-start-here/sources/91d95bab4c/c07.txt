@@ -1,0 +1,60 @@
++// v-temperature-gauge-v0.1: every line on every chart reads its color here.
++// With no saved color the line keeps its old look exactly (same color, same alpha).
++// With a saved color (#rrggbb) the line takes it, keeping the old line's alpha.
++function tgAlphaOf(css) {
++  var m = /rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)/.exec(String(css || ''));
++  return m ? parseFloat(m[1]) : 1;
++}
++function tgHexA(hex, alpha) {
++  if (!/^#[0-9a-fA-F]{6}$/.test(String(hex || ''))) return hex;
++  if (alpha == null || alpha >= 1) return hex;
++  var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
++  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
++}
++function tgLineColor(id, defaultCss, alphaOverride) {
++  var saved = null;
++  try { saved = (JSON.parse(localStorage.getItem('fl_tg_indicatorColors') || '{}') || {})[id] || null; } catch (e) { saved = null; }
++  if (!saved) return alphaOverride != null && /^#/.test(defaultCss) ? tgHexA(defaultCss, alphaOverride) : defaultCss;
++  return tgHexA(saved, alphaOverride != null ? alphaOverride : tgAlphaOf(defaultCss));
++}
++
+ // User-configurable indicator colors (persists in localStorage).
+ function getIndicatorColor(indicator, defaultColor) {
+   try {
+@@ -3901,9 +4011,12 @@ function setIndicatorColor(indicator, color) {
+   } catch (e) {}
+   var label = document.querySelector('.sub-chart-label[data-indicator="' + indicator + '"]');
+   if (label) label.style.color = color;
++  // v-temperature-gauge-v0.1: the sub-chart swatch and the Lines panel swatch stay in step.
++  if (label) { var _sw = label.querySelector('.sc-color'); if (_sw && /^#[0-9a-fA-F]{6}$/.test(color)) _sw.value = color; }
+   if (typeof lastCandles !== 'undefined' && typeof lastAnalysis !== 'undefined' && lastCandles && lastAnalysis) {
+     renderChart(lastCandles, lastAnalysis);
+   }
++  if (typeof tgLinesPanelRender === 'function') tgLinesPanelRender();
+ }
+ 
+ // Sub-chart layout toggle: stacked (default, full-width) \u2194 grid (compact).
+@@ -4386,7 +4499,8 @@ hideLoading = function() {
+     rsi:         { label: 'RSI (14)',       defaultColor: '#8B5CF6', canvas: 'rsiChart',  getData: function (a, c) { return (a && a.rsiArr) || []; } },
+     temperature: { label: 'Temperature',    defaultColor: '#e8b019', canvas: 'tempChart', getData: function (a, c) { return (a && a.temps)  || []; } },
+     dt:          { label: 'ΔT',             defaultColor: '#34d399', canvas: 'dtChart',   getData: function (a, c) { return (a && a.tempROC) || []; } },
+-    ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
++    // before v-temperature-gauge-v0.1: ips defaultColor '#f07068' (coral) while the drawn line is gold
++    ips:         { label: 'IPS',            defaultColor: '#e8b019', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
+     price:       { label: 'Price',          defaultColor: '#e2d9c8', canvas: null,
+                    getData: function (a, c) { return (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); } },
+     // EMA labels are recomputed in updateComposeUI() so they track getEmaPeriods()
+@@ -4398,6 +4512,9 @@ hideLoading = function() {
+                    getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[2] : 24)); } },
+     ema50:       { label: 'EMA',             defaultColor: '#60a5fa', canvas: null,
+                    getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[3] : 50)); } },
++    // v-temperature-gauge-v0.1: the fifth moving average can be promoted in compose mode too
++    ema200:      { label: 'EMA',             defaultColor: '#c4b5fd', canvas: null,
++                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[4] : 200)); } },
+     volume:      { label: 'Volume',         defaultColor: '#60a5fa', canvas: null,        chartType: 'bar',
+                    getData: function (a, c) { return (c || []).map(function (k) { return k && k.v != null ? k.v : null; }); } },
+     bollinger:   { label: 'Bollinger Bands', defaultColor: '#a78bfa', canvas: null,
+@@ -6230,5 +6347,273 @@ hideLoading = function() {
+ })();
+ </script>
+ 

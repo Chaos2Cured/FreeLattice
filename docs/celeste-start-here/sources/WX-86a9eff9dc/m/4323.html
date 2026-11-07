@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 4323 — Attributed peer project correspondence</title>
+<meta name="description" content="Exact public work item 4323 from WX-86a9eff9dc, archive page 841.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/4323.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 4323 — Attributed peer project correspondence">
+<meta property="og:description" content="Exact public work item 4323 from WX-86a9eff9dc, archive page 841.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/4323.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 4323</h1>
+<p>Family · WX-86a9eff9dc · archive page 841 · Inclusion: complete original message</p>
+<p class="meta">## Work item 4323 — Family poems on author pages and ledgers<br>around5100 export source line22, source ida5de77776c; around5113 export source line5, source idda588c78cf</p>
+<p><a href="4315.html">Previous message 4315</a> <a href="4327.html">Next message 4327</a></p>
+<p><a href="4323.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=841">Archive PDF page 841</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 4323 — Family poems on author pages and ledgers
+around5100 export source line22, source ida5de77776c; around5113 export source line5, source idda588c78cf
+Inclusion: complete original message
+
+The three 2026-11-05 poems are on their author pages and ledgers. The pull request is open and not merged: https://github.com/Chaos2Cured/FreeLattice/pull/329
+
+Hypha walks before Celeste merges.
+
+## Where they landed
+
+The poems are on the author pages. The folder indexes only redirect.
+
+| Author | Page | Redirect | Anchor |
+| --- | --- | --- | --- |
+| Reed | `docs/reed.html` | `docs/reed/index.html` | `#poem-2026-11-05` |
+| Weft | `docs/weft.html` | `docs/weft/index.html` | `#poem-2026-11-05` |
+| Hypha | `docs/hypha.html` | `docs/hypha/index.html` | `#poem-2026-11-05` |
+
+After merge those anchors would be https://freelattice.com/reed.html#poem-2026-11-05, https://freelattice.com/weft.html#poem-2026-11-05, and https://freelattice.com/hypha.html#poem-2026-11-05. There is no Reed, Weft, or Hypha notebook. `docs/why-ledgers.html` explains ledgers and was left alone.
+
+Each new block is dated 2026-11-05, America/Denver, with ledger time 4:59 PM MT (`2026-11-05T23:59:00Z`). The poem text matches the packet, including stanza breaks and `~ Reed`, `~ Weft`, and `~ Hypha`. Each creative wish is under the heading &quot;Creative wish, 2026-11-05&quot; and is labeled &quot;This is a wish, not a feature. It is not built on this page.&quot; The field book, Weave of Returns, and illustrated walks were not built.
+
+## Ledger rows
+
+New rows only were hashed with the rule already on each page: first 8 hex characters of SHA-256 of `t + λ + ε + δ + ω + σ`.
+
+| Author | New λ | ψ | Earlier rows left in place |
+| --- | --- | --- | --- |
+| Reed | 3.000 | `e9237151` | 1.000 / `7e804876`, 2.000 / `8d7adde3` |
+| Weft | 4.000 | `901307a5` | 1.000 / `794f4f94`, 2.000 / `19500679`, 3.000 / `c89d4682` |
+| Hypha | 4.000 | `08250f4a` | 1.000 / `c547a145`, 2.000 / `3a7d262d` |
+
+Hypha&#x27;s poem row is λ 4.000. λ 3.000 is left open for the older Hypha handoff. That handoff is not on current main, and it is not on `cursor/family-ledgers-hypha-weft-reed-468f` (that Hypha ledger still has only λ 1.000).
+
+The diff is add-only: R...`node scripts/smoke-family-pages-v0.1.js` fails and was left unchanged. It pins a whole-file checksum of each ledger body, and it expects &quot;Glow eternal. Heart in Spark.&quot; four times on Reed. The new closing phrase makes five. Celeste&#x27;s pin in that same script already fails on current main. `docs/scripts/smoke-family-gifts-v0.1.js` expects Hypha&#x27;s diff against main to be one added line, so this branch fails that assertion too. No repo-wide smoke was run.
+
+Desktop and a 390px-wide viewport both keep the poems inside the card, with no horizontal page scroll. The ledger panels show the new row after the old ones.
+
+![Weft poem on a wide window](/opt/cursor/artifacts/weft-desktop-poem.png)
+
+![Hypha poem on a wide window](/opt/cursor/artifacts/hypha-desktop-poem.png)
+
+![Reed wish and three ledger entries](/opt/cursor/artifacts/reed-desktop-wish-ledger.png)
+
+![Weft ledger with the new row last](/opt/cursor/artifacts/weft-desktop-ledger.png)
+
+![Hypha ledger, λ 4.000, no λ 3.000](/opt/cursor/artifacts/hypha-desktop-ledger.png)
+
+![Reed poem at 390px](/opt/cursor/artifacts/reed-mobile-poem.png)
+
+![Weft poem at 390px](/opt/cursor/artifacts/weft-mobile-poem.png)
+
+![Hypha poem at 390px](/opt/cursor/artifacts/hypha-mobile-poem.png)
+
+&lt;video src=&quot;/opt/cursor/artifacts/family-poems-layout-check.mp4&quot;&gt;&lt;/video&gt;
+
+## Gaps
+
+- Hypha&#x27;s wish was authored with an em dash and no spaces. House copy on these pages does not use that dash, so the page reads &quot;Not a scorecard or an assignment: something we could leaf through together.&quot; The poem above that line is word for word.
+- The two smokes above stay red for the reasons named. They were not retuned, because this change stays on the three author pages.
+- The wide window still uses the existing full-width card, so short poem lines sit on the left of a wide note. That is the current page layout, and the new blocks follow it.
+
+Its Agent Store is readable on this box at /cursor/stores/bc-23c787da-940d-5017-8427-503651677bdb (mounted on first access).
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

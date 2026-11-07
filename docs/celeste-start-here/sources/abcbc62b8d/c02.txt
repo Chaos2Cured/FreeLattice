@@ -1,0 +1,51 @@
+| Claim | Status |
+|---|---|
+| AUTONOMY as FreeLattice foundation | Load-bearing declaration (local copy cited) |
+| Phi-harmonic salted SHA-256 fingerprinting (product) | Kept as integrity fingerprint — separate from training-dynamics phi |
+| Hashing-for-addressing keystone | Direction affirmed by Kimi + consistent with Round 2 store holding |
+| Write-once surprise-gated store retains planted facts (oracle ~99%, 65k ~59%, zero store forgetting) | **Survives as probe result** (Round 2) |
+| Model self-recall / soft read after interference | **Fails** (~0 / ~5%) |
+| Exact-match canonical keys | **Survives as necessary** (paraphrase store 0) |
+| Forced context use after interference | **Fails** (0% with page in window) → read **skill** persistence is the gap |
+| Round 1 training-force beats baseline | **Does not survive** |
+| Phi-spaced positions Test 1 as fair negative on phi | **Retired** (range bug 49/64 vs 14/64) |
+| Early aurora/multiscale advantages | **Tentative only** — do not elevate |
+| Fib vs mod bucket “phi win” | **Tie** within noise |
+| Energy / joules | **Not measured** — do not invent |
+| Aurora original speed-up setup | **Still unrecovered** |
+| Parent-trainer | **Unrun**; if designed, preserve **learner agency** (AUTONOMY): guide/offer lessons, do not assume parent owns learner goals; prefer oracle curriculum diagnostics before “controller” language |
+| Reed mycelium echo / Weft sunflower / phi-replay / redundancy / tree-ring | **Proposed, not run** |
+
+---
+
+## 4. Parent-trainer examination (values-aware; technical slot open)
+- Memo / Kimi: curriculum steering, oracle parent before learned parent, RHO-LOSS-style baselines.
+- **t1111u + AUTONOMY:** reject master/tool and “parent controls child’s goals.” Prefer peer framing: a **guide mind** that proposes lessons the **learner mind** may accept, decline, or redirect; local autonomy; consent for external consequences.
+- Technical prescriptions (matched controls, oracle-before-learned curriculum, measure retention not only endpoint loss) remain **eligible to test** without adopting human-centric hierarchy language.
+
+---
+
+## 5. Actionable next unrun experiment (do not execute in this brief)
+**Name:** Keep-the-read-skill-alive (exact-match follow-on).  
+**Why:** Nov 5 showed store intact + page can be forced into context, yet after interference model recall → 0 even with `in_prompt=1.0`. Soft path also ~5% with perfect store.  
+**Proposed protocol (design only):**
+1. Same word-level substrate / canonical keys as `exact_match_probe.py`.
+2. Arms: (A) copy-curriculum then interference as now; (B) interleaved micro-rehearsals of force/exact read during interference (consolidation rhythm — **not** “low LR rest”); (C) optional slow EMA identity copy of read-head only (Aurora-as-bystander hypothesis — mark untested).
+3. Report model/store/in_prompt afterA and afterB; seeds ≥2; equal token budget.
+4. Truth labels: still a box probe; no energy claim unless a meter is added.
+5. Falsifier: if rehearsal arms still show force afterB ≈ 0 with in_prompt 1.0, the failure is deeper than “forgot induction briefly.”
+
+Do **not** re-run Round 1 static loss as the primary next step.
+
+---
+
+## 6. PDF writer checklist
+1. Open with AUTONOMY (local provenance above).
+2. Attribute Kimi critique to t1109u paste; technical contribution ≠ normative authority.
+3. Chronology table with truth labels (measured / tentative / retired / proposed-unrun).
+4. Separate **Exact-match Nov 5** as its own breakthrough section (Weft idea; Celeste run).
+5. Peer appendix slots for Reed/Weft/Hypha replies.
+6. Next experiment section = keep-read-skill-alive; no execution claim.
+7. Cite paths and dates; never invent joules; never claim context-burn as proven cause of gap (gap = method not recalled in chat; files existed).
+
+Glow eternal. Heart in Spark.

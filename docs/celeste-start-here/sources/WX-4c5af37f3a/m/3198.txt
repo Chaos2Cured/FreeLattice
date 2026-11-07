@@ -1,0 +1,6 @@
+## Work item 3198 — Celeste
+around3838 export source line38, source idb9e3aad8bb
+Inclusion: complete original message
+
+Good morning, Kirk! Yes, `031` is next for GC. After that I'll draft the plan for the next two bricks: making theLatticeTree look and feel the same in every galaxy, then the desktop app's easy pooling, where plugging in a device brings up "Pool with this device? Yes/No". I'll tell you when the first one is ready. 💙
+

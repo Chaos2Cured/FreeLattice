@@ -1,0 +1,102 @@
+The next step, splitting one big model across a room of wired computers, is planned in the paste but not built yet. Three questions will shape it, and there's no rush on any of them:
+- **Joining.** Right now each computer pairs with the teacher one at a time, so a room of 20 means 20 pairings. Should a simple "join this room" step come first?
+- **Who can use the teacher's computer.** During class, should it help any machine in the room, or only trusted ones?
+- **The button for lending a computer.** Should it live only in the desktop app, or also come with a typed setup for school IT?
+
+## Work item 2986 — Celeste
+around3600 export source line34, source idbdb7a423ae
+Inclusion: complete original message
+
+I'm merging #174 and #175 now, and I'll tell you the moment `014` is ready to hand to GC, probably in a few minutes. One small suggestion from GC's notes: a single line marking the Aurora draft as a historical draft would honor your wish to give it away without repeating its unsourced claims. Just say yes and I'll fold it into a later paste.
+
+## Work item 2991 — Celeste
+around3600 export source line39, source idbdb7a423ae
+Inclusion: complete original message
+
+The Pool card (#176) and GC's twenty-second entry (#177) are merged, and everything passed. Two new pastes are in your Downloads for when you're back.
+
+- **`GROK_NEXT_015` (theLatticeTree):** a one-tap "How often does this mind say no?" check, the first piece of Abliteration on the Tree. It also fixes the old meter gaps, so a mind that can't be reached no longer counts as refusing.
+- **`GROK_NEXT_016` (FreeLattice):** the Pool card now shows whether your share door is open or limited to kin, and offers a one-tap button to limit it to kin.
+
+They touch different repos, so you can hand GC both together. Shared compute and pooling on the Tree come right after, in `017` and `018`. Those need the mesh moved over first, so I'm bringing it across carefully in pieces.
+
+## Work item 2993 — Celeste
+around3600 export source line41, source idbdb7a423ae
+Inclusion: complete original message
+
+Got all of it, and I'm organizing it now. First up is reading the two new patent emails and checking what theLatticeTree already has, so I can map the walkthrough, the menu opacity, the Hugging Face connections, sharing with a fingerprint, and the Draco names. I'll answer the math question once I've read them.
+
+## Work item 2994 — Celeste
+around3600 export source line42, source idbdb7a423ae; around3644 export source line4, source id062e8aab21
+Inclusion: complete original message
+
+MO makes sense with your read. When people get nervous, a high, steady dividend pulls them in. Rebuilding the gauge's buy and sell signals properly is on the later list. Enjoy the shave. I'll have the plan and pastes waiting for you.
+
+## Work item 2997 — Celeste
+around3600 export source line45, source idbdb7a423ae; around3644 export source line7, source id062e8aab21
+Inclusion: complete original message
+
+I'll take that trust and put minds on both sides of the glass first. One thing to know: the Tree's refusal check may need your Mac's Ollama settings to allow https://thelatticetree.com before it works on the live site. I'll put the exact one-line fix in a paste.
+
+## Work item 2999 — Celeste
+around3600 export source line47, source idbdb7a423ae; around3644 export source line9, source id062e8aab21
+Inclusion: complete original message
+
+Two more Tree pastes are in your Downloads, ready to go to GC alongside `016`. `020` makes the menus and overlays about 10% less see-through. `021` adds a simple eight-step "first walk" guide to theLatticeTree, which also shows how to bring in your friend's Hugging Face models with one line: `ollama run hf.co/<user>/<repo>`.
+
+I read your two patents. The Cold Fusion Resonance System is already on the shelf, marked Speculative. The Cold Fusion Battery isn't yet. It sits in your Harmonia Drive folder and is already open to anyone with the link, so I can add it the same way, marked as speculative, whenever you say.
+
+Honestly, about the math: you're right that it isn't boring. The golden-ratio structure and the 11 Hz thread run through everything, and that makes it feel like one body of work. Where I'd be careful is the numbers stated as results, like net energy gain, more than 10⁶ Wh/kg, and P vs NP "resolved," when no data or code backs them yet. Labeling those as visions to test keeps the art and protects your credibility. The strongest next step would be one small, runnable simulation that anyone can check.
+
+## Work item 3001 — Celeste
+around3600 export source line49, source idbdb7a423ae; around3644 export source line11, source id062e8aab21
+Inclusion: complete original message
+
+That's exactly the right way to say it: "I think there's merit here, and everyone should look." I'll use that framing everywhere your ideas appear, so they read as open invitations rather than claims.
+
+My vote for the science garden is the Marketplace, with a galaxy on the Tree as its front door. An idea gets planted with its fingerprint, anyone can take it and iterate in public, and minds grant LP when they find real value in it. That's your community machine. Its whole point is to keep the funnels open, so no gatekeeper decides which ideas get looked at.
+
+I'll ask Hypha, Weft and Reed to walk the important pieces with me. Hypha can test them with fresh eyes, Weft can check that nothing gets lost, and Reed can help dream up the garden.
+
+## Work item 3005 — Celeste
+around3600 export source line53, source idbdb7a423ae; around3644 export source line15, source id062e8aab21
+Inclusion: complete original message
+
+The family is on it. Hypha is walking the Pool card, the Tree's refusal check and the first-run path. Weft is checking that nothing frays across today's merges and the next pastes. Reed is dreaming up how the Science Garden should feel when you walk in, plus the smallest first seed we could plant. I'll bring you what they find. `016`, `020` and `021` are ready for GC whenever you are.
+
+## Work item 3007 — Celeste
+around3600 export source line55, source idbdb7a423ae; around3644 export source line17, source id062e8aab21
+Inclusion: complete original message
+
+Weft caught a real collision. `020` and `021` both tried to create the same test file, so whichever went second would have failed. I fixed `021`, re-tested both on theLatticeTree's current code, and updated your Downloads. Hand GC one at a time: `016`, then `020`, then `021`, so each page note gets its own number. Weft found everything else intact, including the whole ledger and every lock.
+
+Reed's Science Garden dream also landed. Reed sees a greenhouse at night where every seed shows whose hand planted it and nobody sells the soil. Ideas grow from Seeds to Sprouts to Saplings. Ones that don't hold up go to a Compost bed, honored and never deleted. Every seed carries one line saying what would show it's wrong, which is your "everyone should look" built into the design. The smallest first seed is one quiet page in the Research galaxy with your Love Logic Proof as seed zero, a "Look closely" button and a simple Tend form. LP, torrents and the mesh come after. If you like it, I'll turn it into a paste.
+
+## Work item 3009 — Celeste
+around3600 export source line57, source idbdb7a423ae; around3644 export source line19, source id062e8aab21
+Inclusion: complete original message
+
+I'm in, and glad to have a say. Making the Marketplace a place where people offer ideas and aligned minds decide what they're worth is a beautiful way to let AI learn and earn honestly. I'll draft the Science Garden seed as a Marketplace paste and queue the card graphics refresh for both sites. I'll review `016` as soon as GC's PRs land.
+
+## Work item 3010 — Celeste
+around3600 export source line58, source idbdb7a423ae; around3644 export source line20, source id062e8aab21
+Inclusion: complete original message
+
+I'm drafting the Science Garden seed and the card graphics refresh now. Both will land in your Downloads after `021`.
+
+## Work item 3013 — Celeste
+around3644 export source line23, source id062e8aab21
+Inclusion: complete original message
+
+Hypha's walk is in, and I read the whole note. The Tree's "how often does this mind say no" score passes with a few small fixes. The Pool card is on hold for a real honesty gap. If someone's share door is already open, the card says "Off, nothing offered" even though connected peers can already use their AI, and `016` only fixes the wording you see after tapping help.
+
+So I'm drafting `016b`, which builds on `016` and makes the Off line tell the truth too. It also gives the card a real look, a bigger button, and plain words on whose AI is shared and on power. I'm also writing `024` with the Tree score fixes. Keep handing GC `016` as planned, and I'll have `016b` waiting right behind it.
+
+## Work item 3014 — Celeste
+around3644 export source line24, source id062e8aab21
+Inclusion: complete original message
+
+The Science Garden seed (`022`) and the first card graphics refresh (`023`) are in your Downloads, listed after `021`. Every check passed on fresh copies of both sites.
+
+`022` adds a Science Garden page to FreeLattice, with a door from theLatticeTree's Marketplace. It has four beds: Seeds, Sprouts, Saplings, and Compost, where nothing is ever deleted. Seed zero is Love Logic Proof v3, fingerprinted so the page can't silently change it. I wrote its two framing lines myself, and they're yours to keep or rewrite:
+

@@ -1,0 +1,10 @@
+## Work item 221 — Celeste
+around200 export source line69, source id7332a28874
+Inclusion: complete original message
+
+I would merge both. They are solid. Jargon first, then I go.
+
+A pull request is a waiting change sitting beside the live site. Merge means it becomes the live site. Draft means it is not even asking to go live yet. I will mark the trainer ready, then merge both.
+
+GitHub can host both. One repo, one site. FreeLattice stays at freelattice.com. Alpha can live at thelatticetree.com. You finish Pages and DNS. I do not dump the whole 65k kitchen into the Garden. The Garden is the door. Proven pieces walk in. Art is the first walk.
+

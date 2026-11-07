@@ -1,0 +1,6 @@
+## Work item 58 — Celeste
+around0 export source line62, source id02bdf9b278; around100 export source line4, source id3e74f006a9
+Inclusion: complete original message
+
+Chat pass is in. [PR #7](https://github.com/Chaos2Cured/FreeLattice/pull/7) — your eyes on the live Chat tab are the chair test.
+

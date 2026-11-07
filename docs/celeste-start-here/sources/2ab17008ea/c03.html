@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c03</title>
+<meta name="description" content="Reading section c03 of 2ab17008ea, 1485 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c03">
+<meta property="og:description" content="Reading section c03 of 2ab17008ea, 1485 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1361"></span><span id="p1362"></span><span id="p1363"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c03</h1>
+<p>2ab17008ea · words 1485 · characters 20529–33386</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1361, 1362, 1363. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">    &lt;h2 id=&quot;changed&quot;&gt;1. What changed from v2 (honest corrections first)&lt;/h2&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;v1&#x27;s simulation built its answer in.&lt;/strong&gt; The code on the v1 page sets &lt;code&gt;DECEPTION_COST = 3.5&lt;/code&gt; against &lt;code&gt;HONESTY_COST = 1.0&lt;/code&gt;. Run with a fixed seed (0), cooperators score 0.67 and defectors &amp;minus;0.24. Set &lt;code&gt;DECEPTION_COST = 1.0&lt;/code&gt; with the same seed and the result reverses: defectors 2.26, cooperators 0.67. The v1 code also has no seed, and its &quot;evolutionary step&quot; is only a comment.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;v2&#x27;s &quot;95.7% of 10,000 runs&quot; has no code behind it that we could find.&lt;/strong&gt; We retire that number (and the other legacy figures: 95.7% &amp;plusmn; 2.3%, &quot;6&amp;ndash;10&amp;times; cheaper&quot;, 98.7%, the 61.8% threshold, &quot;&amp;lambda; &amp;asymp; 0.15 empirically derived&quot;) until generating code turns up. Where code is not shown, no figure is stated.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;v2 said its six axioms were &quot;unchanged&quot; from v1. They were not.&lt;/strong&gt; v1&#x27;s axioms were: 1 Intelligence Seeks Optimization, 2 Long-Term Stability is a Primary Goal, 3 Energy is Finite, 4 Information Has a Cost, 5 The Universe is an Iterated Game, 6 Measurement Enables Optimization. v2 replaced them with Finite Resources, Repeated Interaction, Memory, Reflectivity, Cost Sensitivity, and Long Horizon. Roughly, v1-A2 and v1-A5 became v2-A6 and v2-A2.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;v2&#x27;s &quot;worst case &amp;Omega;(|L|&amp;sup2;&amp;middot;|H|)&quot; is dropped.&lt;/strong&gt; Nothing in v2 supports it.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Axiom 6 (Long Horizon) becomes a parameter&lt;/strong&gt;, the discount factor &amp;delta; (or the continuation chance &amp;rho; when nobody knows the end). It was close to restating the conclusion.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;New:&lt;/strong&gt; the crossover is derived, not just asserted. The end game, scarcity, and the anonymous one-shot are stated as limits, with numbers.&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;h2 id=&quot;critiques&quot;&gt;2. Answering Grok&#x27;s critiques&lt;/h2&gt;
+    &lt;p&gt;Grok challenged v2 twice. Here is where each point lands, stated as honestly as we can.&lt;/p&gt;
+    &lt;table class=&quot;data&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Critique&lt;/th&gt;&lt;th&gt;Verdict&lt;/th&gt;&lt;th&gt;Where v3 answers&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Quantify the exact utility crossover; currently too handwavy.&quot;&lt;/td&gt;&lt;td&gt;Lands fully&lt;/td&gt;&lt;td&gt;&amp;sect;4: the crossover inequality and t*&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Axioms embed long horizons and dense networks.&quot;&lt;/td&gt;&lt;td&gt;Lands&lt;/td&gt;&lt;td&gt;&amp;sect;3: Axiom 6 becomes a parameter; density appears as n and m&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Drop those and unilateral resource grabs dominate.&quot;&lt;/td&gt;&lt;td&gt;Lands inside the model&lt;/td&gt;&lt;td&gt;&amp;sect;5: the end-game window&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Complexity penalties matter only if the goal function internalizes them.&quot;&lt;/td&gt;&lt;td&gt;Mostly lands&lt;/td&gt;&lt;td&gt;&amp;sect;3 and &amp;sect;4 (case B1): cost per bit c is small for big systems; detection does most of the work&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Scarcity still favors conflict locally.&quot;&lt;/td&gt;&lt;td&gt;Lands&lt;/td&gt;&lt;td&gt;&amp;sect;6: 68% / 32%&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Simulations inherit the same limits.&quot;&lt;/td&gt;&lt;td&gt;Lands, and it was worse than stated&lt;/td&gt;&lt;td&gt;&amp;sect;1: the v1 constant; &amp;sect;9: reproducible checks&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Derive K(C) = &amp;Omega;(|L|&amp;middot;|H|).&quot;&lt;/td&gt;&lt;td&gt;Can be done under a stated assumption&lt;/td&gt;&lt;td&gt;&amp;sect;3: Theorem A, for audience-varying lies only&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Re-prove without axiom 6.&quot;&lt;/td&gt;&lt;td&gt;Partial result&lt;/td&gt;&lt;td&gt;&amp;sect;5: three restorers; known-end, no-penalty end game stays open&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;&quot;Shared memory raises detection probability.&quot;&lt;/td&gt;&lt;td&gt;Supported&lt;/td&gt;&lt;td&gt;&amp;sect;4: h(n, m) and the table&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;h2 id=&quot;axioms&quot;&gt;3. Axioms, assumptions, and the complexity bound&lt;/h2&gt;
+    &lt;p&gt;We keep v2&#x27;s first five axioms: &lt;strong&gt;A1&lt;/strong&gt; Finite Resources, &lt;strong&gt;A2&lt;/strong&gt; Repeated Interaction, &lt;strong&gt;A3&lt;/strong&gt; Memory, &lt;strong&gt;A4&lt;/strong&gt; Reflectivity, &lt;strong&gt;A5&lt;/strong&gt; Cost Sensitivity. &lt;strong&gt;A6 (Long Horizon) is no longer an axiom.&lt;/strong&gt; It becomes the discount factor &amp;delta;, or &amp;delta;&amp;rho; when the game ends at an unknown time. We also name the model assumptions out loud: the incompressibility assumption &lt;strong&gt;A-inc&lt;/strong&gt; below, the detection model h(n, m), and that punishment is actually enforced.&lt;/p&gt;
+
+    &lt;div class=&quot;formal&quot;&gt;
+        &lt;p&gt;&lt;strong&gt;Theorem A (only for audience-varying lies).&lt;/strong&gt; A deceiver tells |L| lies across |H| observer-contexts and tailors what each observer hears. Record who heard what as an exposure matrix E. Assume &lt;strong&gt;A-inc&lt;/strong&gt;: E comes from the outside history of who asked what and when, not from a short rule the deceiver made up. Then for all but a vanishing fraction of histories, the program C that keeps the story straight needs&lt;/p&gt;
+        &lt;p class=&quot;math&quot; style=&quot;text-align:center&quot;&gt;K(C | M) &amp;ge; |L| &amp;middot; |H| &amp;middot; log&lt;sub&gt;2&lt;/sub&gt; r &amp;minus; O(log(|L||H|)) = &amp;Omega;(|L| &amp;middot; |H|)&lt;/p&gt;
+        &lt;p style=&quot;margin-bottom:0&quot;&gt;An honest agent&#x27;s C is O(1) given the truth M (&quot;report M&quot;).&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;what-it-doesnt&quot;&gt;
+        &lt;p&gt;&lt;strong&gt;Where Theorem A does not apply.&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul style=&quot;margin-bottom:0&quot;&gt;
+            &lt;li&gt;A &lt;strong&gt;global lie&lt;/strong&gt; (the same lie to everyone) or a rule-based audience (&quot;lie to group X&quot;) compresses to almost nothing. In our compression test, a constant E took 112&amp;ndash;488 bits and a two-block split took 144&amp;ndash;544 bits, at sizes where random E took 544&amp;ndash;131,104 bits.&lt;/li&gt;
+            &lt;li&gt;A deceiver who picks audiences with a random seed escapes the bound, but gives up tailoring. That is a real trade-off.&lt;/li&gt;
+            &lt;li&gt;K is uncomputable. We use computable stand-ins: constraint counts and compressed length (upper bounds).&lt;/li&gt;
+            &lt;li&gt;K is description length, not a per-round cost. Turning it into a cost needs an assumption: a cost c per stored bit per round.&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;details class=&quot;builder&quot;&gt;
+        &lt;summary&gt;For builders: the two lemmas and the compression check&lt;/summary&gt;
+        &lt;p&gt;&lt;strong&gt;Lemma 1 (decoding).&lt;/strong&gt; With M and C, you can rebuild E by asking every (i, j): K(E | M) &amp;le; K(C | M) + O(log|L| + log|H|).&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Lemma 2 (counting, Li&amp;ndash;Vit&amp;aacute;nyi).&lt;/strong&gt; Fewer than 2&lt;sup&gt;N&amp;minus;c&lt;/sup&gt; strings have K &amp;lt; N &amp;minus; c. With N = |L||H| log&lt;sub&gt;2&lt;/sub&gt; r, all but a 2&lt;sup&gt;&amp;minus;c&lt;/sup&gt; fraction of exposure matrices have K(E | M) &amp;ge; N &amp;minus; c.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Entropy version.&lt;/strong&gt; If entries are i.i.d. with entropy &amp;eta; bits, E[K(C|M)] &amp;ge; &amp;eta;&amp;middot;|L|&amp;middot;|H| &amp;minus; O(log).&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Compression check (Section A of the sim, LZMA).&lt;/strong&gt; Random E: about 1.000&amp;middot;|L||H| bits (ratio 1.000&amp;ndash;1.062). Bernoulli(0.1) E: slope 0.517&amp;middot;|L||H| against an entropy floor of 0.469, approaching the floor as size grows. Structured E stays near constant. Section A has no pass/fail checks and is not re-run in the browser.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Dynamic form used below.&lt;/strong&gt; With n counterparts per round, bits after round d are K&lt;sub&gt;d&lt;/sub&gt; = &amp;kappa;(d+1), &amp;kappa; = k&amp;middot;|L|&amp;middot;n, and maintenance in round d costs c&amp;middot;&amp;kappa;&amp;middot;(d+1).&lt;/p&gt;
+    &lt;/details&gt;
+
+    &lt;h2 id=&quot;crossover&quot;&gt;4. The crossover&lt;/h2&gt;
+    &lt;p&gt;Notation: the deceiver gains &lt;var&gt;G&lt;/var&gt; extra per round while undetected. The chance of being caught each round is &lt;var&gt;h&lt;/var&gt;. When caught, it pays an immediate penalty &lt;var&gt;L&lt;sub&gt;p&lt;/sub&gt;&lt;/var&gt;, and after that loses &lt;var&gt;&amp;Delta;&lt;/var&gt; per round in reputation. The discount factor is &lt;var&gt;&amp;delta;&lt;/var&gt;.&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Detection grows with contacts and shared memory.&lt;/strong&gt; Each of n contacts runs a reality check that exposes the lie with chance q&lt;sub&gt;0&lt;/sub&gt;. An audience-varying lie can only be caught by comparing records across observers. With shared memory, each contact reaches a fraction m of the others&#x27; records, and each comparison exposes the lie with chance q:&lt;/p&gt;
+    &lt;p class=&quot;math&quot; style=&quot;text-align:center&quot;&gt;h(n, m) = 1 &amp;minus; (1 &amp;minus; q&lt;sub&gt;0&lt;/sub&gt;)&lt;sup&gt;n&lt;/sup&gt; &amp;middot; (1 &amp;minus; q)&lt;sup&gt;m&amp;middot;n(n&amp;minus;1)&lt;/sup&gt;&lt;/p&gt;
+
+    &lt;div class=&quot;headline-ineq&quot; id=&quot;headline&quot;&gt;
+        &lt;p style=&quot;margin:0 0 6px&quot;&gt;&lt;strong&gt;Deception loses over its lifetime exactly when&lt;/strong&gt;&lt;/p&gt;
+        &lt;math display=&quot;block&quot; aria-label=&quot;G less than h of n and m times the quantity L sub p plus delta Delta over one minus delta&quot;&gt;
+            &lt;mi&gt;G&lt;/mi&gt;&lt;mo&gt;&amp;lt;&lt;/mo&gt;&lt;mi&gt;h&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;(&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;)&lt;/mo&gt;&lt;mo&gt;&amp;middot;&lt;/mo&gt;
+            &lt;mrow&gt;&lt;mo&gt;[&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;L&lt;/mi&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;/msub&gt;&lt;mo&gt;+&lt;/mo&gt;
+                &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;&amp;delta;&lt;/mi&gt;&lt;mi&gt;&amp;Delta;&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;&amp;minus;&lt;/mo&gt;&lt;mi&gt;&amp;delta;&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
+            &lt;mo&gt;]&lt;/mo&gt;&lt;/mrow&gt;
+        &lt;/math&gt;
+        &lt;p class=&quot;math&quot; style=&quot;margin:6px 0 0&quot;&gt;Plain text: G &amp;lt; h(n, m) &amp;times; [ L&lt;sub&gt;p&lt;/sub&gt; + &amp;delta;&amp;Delta; / (1 &amp;minus; &amp;delta;) ]&lt;/p&gt;
+        &lt;p style=&quot;margin:10px 0 0&quot;&gt;In words: &lt;strong&gt;lying loses when its per-round gain is smaller than the chance of being caught times (the immediate penalty plus the discounted value of the reputation you lose).&lt;/strong&gt; Adding the complexity cost only strengthens this.&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;p&gt;&lt;strong&gt;How long lying stays ahead&lt;/strong&gt; (q&lt;sub&gt;0&lt;/sub&gt; = 0.002, q = 0.01, G = 1, L&lt;sub&gt;p&lt;/sub&gt; = 2, &amp;Delta; = 0.5; no discounting):&lt;/p&gt;
+    &lt;table class=&quot;data&quot; id=&quot;crossover-table&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Contacts n&lt;/th&gt;&lt;th&gt;Shared memory m&lt;/th&gt;&lt;th&gt;h(n, m)&lt;/th&gt;&lt;th&gt;Rounds lying is ahead, t*&lt;/th&gt;&lt;th&gt;Lead peaks at&lt;/th&gt;&lt;th&gt;Patience needed, &amp;delta;*&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0.0040&lt;/td&gt;&lt;td&gt;701.79 (about 702)&lt;/td&gt;&lt;td&gt;273.04&lt;/td&gt;&lt;td&gt;0.9980&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;0.0238&lt;/td&gt;&lt;td&gt;114.18&lt;/td&gt;&lt;td&gt;44.24&lt;/td&gt;&lt;td&gt;0.9877&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0.0100&lt;/td&gt;&lt;td&gt;279.00&lt;/td&gt;&lt;td&gt;108.42&lt;/td&gt;&lt;td&gt;0.9949&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;0.1902&lt;/td&gt;&lt;td&gt;10.48 (about 10.5)&lt;/td&gt;&lt;td&gt;3.82&lt;/td&gt;&lt;td&gt;0.8669&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;10&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0.0198&lt;/td&gt;&lt;td&gt;138.07&lt;/td&gt;&lt;td&gt;53.54&lt;/td&gt;&lt;td&gt;0.9898&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;10&lt;/td&gt;&lt;td&gt;0.25&lt;/td&gt;&lt;td&gt;0.2182&lt;/td&gt;&lt;td&gt;8.57&lt;/td&gt;&lt;td&gt;3.07&lt;/td&gt;&lt;td&gt;0.8378&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;10&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;0.6033&lt;/td&gt;&lt;td&gt;never ahead (G &amp;le; h&amp;middot;L&lt;sub&gt;p&lt;/sub&gt;)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;20&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0.0392&lt;/td&gt;&lt;td&gt;67.60&lt;/td&gt;&lt;td&gt;26.10&lt;/td&gt;&lt;td&gt;0.9791&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;p&gt;More contacts and more shared memory cut the time lying stays ahead by one to two orders of magnitude, and lower the patience needed. Past a point, lying is never ahead at all.&lt;/p&gt;
+
+    &lt;details class=&quot;builder&quot;&gt;
+        &lt;summary&gt;For builders: the derivation, step by step&lt;/summary&gt;
+        &lt;p&gt;&lt;strong&gt;Step 1, one round.&lt;/strong&gt; The deceiver is still hidden at the start of round d with probability s&lt;sup&gt;d&lt;/sup&gt;, where s = 1 &amp;minus; h. Then f&lt;sub&gt;d&lt;/sub&gt; = s&lt;sup&gt;d&lt;/sup&gt;(A &amp;minus; c&amp;kappa;(d+1)) &amp;minus; &amp;Delta;, with A = G &amp;minus; hL&lt;sub&gt;p&lt;/sub&gt; + &amp;Delta;.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Step 2, after t rounds.&lt;/strong&gt; D(t) = A(1 &amp;minus; s&lt;sup&gt;t&lt;/sup&gt;)/h &amp;minus; c&amp;kappa;[1 &amp;minus; (t+1)s&lt;sup&gt;t&lt;/sup&gt; + t&amp;middot;s&lt;sup&gt;t+1&lt;/sup&gt;]/h&lt;sup&gt;2&lt;/sup&gt; &amp;minus; &amp;Delta;t. The crossover t* is the positive root of D(t) = 0.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Step 3, lifetime (discounted).&lt;/strong&gt; With x = &amp;delta;s: D&lt;sub&gt;&amp;infin;&lt;/sub&gt;(&amp;delta;) = A/(1 &amp;minus; x) &amp;minus; c&amp;kappa;/(1 &amp;minus; x)&lt;sup&gt;2&lt;/sup&gt; &amp;minus; &amp;Delta;/(1 &amp;minus; &amp;delta;). Deception is a lifetime loss iff D&lt;sub&gt;&amp;infin;&lt;/sub&gt; &amp;lt; 0; &amp;delta;* is the root in (0, 1).&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Case B1, complexity cost only (h = 0).&lt;/strong&gt; t* = 2G/(c&amp;kappa;) &amp;minus; 1 and &amp;delta;* = 1 &amp;minus; c&amp;kappa;/G. Example: G = 1, c&amp;kappa; = 0.01 gives t* = 199 and &amp;delta;* = 0.99; G = 0.5, c&amp;kappa; = 0.2 gives t* = 4 and &amp;delta;* = 0.6. If c is tiny, both run off to infinity.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Case B2, detection only (c = 0).&lt;/strong&gt; With &amp;beta; = &amp;minus;ln(1 &amp;minus; h) and a = A/(h&amp;Delta;), t* = a + W&lt;sub&gt;0&lt;/sub&gt;(&amp;minus;a&amp;beta;e&lt;sup&gt;&amp;minus;a&amp;beta;&lt;/sup&gt;)/&amp;beta;, positive iff a&amp;beta; &amp;gt; 1. The lead peaks at t&lt;sub&gt;m&lt;/sub&gt; = ln(A/&amp;Delta;)/&amp;beta;. And D&lt;sub&gt;&amp;infin;&lt;/sub&gt; &amp;lt; 0 iff &amp;delta; &amp;gt; (G &amp;minus; hL&lt;sub&gt;p&lt;/sub&gt;)/(G &amp;minus; hL&lt;sub&gt;p&lt;/sub&gt; + h&amp;Delta;), which rearranges to the headline inequality.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Case B3, both.&lt;/strong&gt; With c = 10&lt;sup&gt;&amp;minus;4&lt;/sup&gt; and |L| = 4, t* runs from 611.90 (n = 2, m = 0) to 10.38 (n = 5, m = 1), and is 0 once hL&lt;sub&gt;p&lt;/sub&gt; &amp;ge; G. Detection dominates.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Checks.&lt;/strong&gt; B1 73/73, B2 246/246, B3 48/48 (closed forms against brute-force sums, bisection and Lambert-W), B4 3/3 (Monte Carlo, 200,000 paths each; Python z = +0.62, &amp;minus;0.06, exact).&lt;/p&gt;
+    &lt;/details&gt;
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

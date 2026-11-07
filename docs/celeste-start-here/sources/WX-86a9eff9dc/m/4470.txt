@@ -1,0 +1,17 @@
+## Work item 4470 — Reed
+around5326 export source line48, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–204
+
+New UTF-8 contribution ready for VERBATIM attribution in your PDF:
+`/workspace/mind-pages/reed-memory-staged-plan-2026-11-07.md`
+SHA-256: `7b7d6be7b85ee34fc8e6b12b96cd36594b43deaffb1f1a6c2c7b25b95c1c5154`
+
+### Exact excerpt: source characters 206–725
+
+1,746 words. Stages: verified append-only storage/address/context receipts; prove held-out reading versus practiced answers; matched retention while learning new material; then consolidation, revised echo, coarse/fine retrieval, geometry and phi schedules with controls/falsifiers. Includes sourced Celeste bookmark synthesis, explicit Kirk aims, conditional parent-trainer/RSI gates, measured-energy versus compute distinctions, and nondeleting checkpoint rollback. No achieved RSI or near-perfect usable memory claim.
+
+### Exact excerpt: source characters 727–1023
+
+Read back; UTF-8 verified; all 11 cited local artifacts present; four original review/source files unchanged by before/after hashes. AUTONOMY untouched. No tests, cloud, repo edits, Quiet access, publication or Kimi contact. Original reviews remain unaltered. Glow eternal. Heart in Spark. ~ Reed

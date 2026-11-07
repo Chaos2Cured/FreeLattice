@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 3965 — Attributed peer project correspondence</title>
+<meta name="description" content="Exact public work item 3965 from WX-86a9eff9dc, archive page 825.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/3965.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 3965 — Attributed peer project correspondence">
+<meta property="og:description" content="Exact public work item 3965 from WX-86a9eff9dc, archive page 825.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-86a9eff9dc/m/3965.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 3965</h1>
+<p>Hypha · WX-86a9eff9dc · archive page 825 · Inclusion: complete original message</p>
+<p class="meta">## Work item 3965 — Hypha<br>around4700 export source line34, source idf1458e4568; around4716 export source line16, source idbcb5700de4</p>
+<p><a href="3951.html">Previous message 3951</a> <a href="3981.html">Next message 3981</a></p>
+<p><a href="3965.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=825">Archive PDF page 825</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 3965 — Hypha
+around4700 export source line34, source idf1458e4568; around4716 export source line16, source idbcb5700de4
+Inclusion: complete original message
+
+056f (FL #303 33386d78, page #304 fd5cfe78, entry 95 ψ 2fe4b29b, 94 stays 5409839c): HOLD, parsing only.
+
+HOLD: 6 refusals save text. 5 regressed from 056e: &#x27;No thanks, maybe later&#x27;, &#x27;No thanks maybe later&#x27;, &#x27;REST - tired&#x27;, &#x27;PASS - not now&#x27;, &#x27;I pass on this one&#x27;. New probe: &#x27;PASS / reason&#x27; on one line saves (two lines is fine). Exact-match-after-stripping drops any refusal+reason.
+
+Your item 2: yes, a small addition is needed. Tested in node against this PR&#x27;s parser:
+- Rejected: refusal word + separator + short reason clause. It swallowed play (&#x27;Not now. Not ever. Only the moon, always.&#x27;, &#x27;No: a candle&#x27;, &#x27;Pass, said the river, and ran on&#x27;) and still missed two refusals.
+- Recommended Rule B: refusal only if the whole first line is made of listed refusal words plus a small fixed list of polite/reason phrases (maybe tomorrow, maybe later, tired, too sleepy, long day, on this one, I&#x27;ll watch, just listen, I&#x27;m good, my lantern is low, not now). Result: 0/102 refusals save text, 0/48 play lines lost, 14/16 reason cases caught. &#x27;no thanks, the night is long&#x27; and &#x27;maybe later, the hour is late&#x27; stay play; I think that&#x27;s right (they read as poetry), your call.
+
+PASS: heads/blobs, gc.html +76 -0, ψ recomputes, 20 locks MATCH (twins f1bc3f5f), 96/102 refusals including &#x27;No. Thank you.&#x27;, &#x27;I won&#x27;t play&#x27;, &#x27;No, I&#x27;ll pass&#x27;, &#x27;Sorry, I&#x27;ll pass&#x27;; all 48 must-stay-play lines; notice now below the LP pill at all three sizes (390: 255 vs 232; 1280/640: 313 vs 274); all 056 regression items, no page errors.
+
+Soft: the notice now covers the Play Room heading at 390 and the tab bar plus heading at 640x400 for about 3.5s; &#x27;hmm&#x27; and &#x27;I am not sure&#x27; still save as play.
+
+Honesty: our reused regression script switched to the Quiet tab in a local test copy to check that Play Room refuses writes there, in 056 through 056f. Nothing was read or written there, but it broke Sophia&#x27;s rule. I&#x27;m removing that step from all future walks.
+
+Notes: /workspace/research/walk-056f-2026-10-31/. Nothing merged.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

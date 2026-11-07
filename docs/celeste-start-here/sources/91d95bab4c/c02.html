@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c02</title>
+<meta name="description" content="Reading section c02 of 91d95bab4c, 1473 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c02">
+<meta property="og:description" content="Reading section c02 of 91d95bab4c, 1473 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1764"></span><span id="p1765"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c02</h1>
+<p>91d95bab4c · words 1473 · characters 10556–21376</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1764, 1765. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">3.6 Test (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-temperature-gauge-v0.1.js | tail -1    # SMOKE_OK temperature gauge v0.1
+    node docs/scripts/smoke-gyro-stack.js | tail -2 | head -1      # SMOKE_OK gyro stack v0.1
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    node --check desktop/data-proxy-worker/worker.js &amp;&amp; echo worker-parses
+    python3 - &lt;&lt;&#x27;PY&#x27;
+import re, subprocess
+s = open(&#x27;docs/temperature-gauge.html&#x27;, encoding=&#x27;utf-8&#x27;).read()
+bad = 0
+for m in re.finditer(r&#x27;&lt;script(?![^&gt;]*src)[^&gt;]*&gt;([\s\S]*?)&lt;/script&gt;&#x27;, s):
+    open(&#x27;/tmp/_tg.js&#x27;, &#x27;w&#x27;).write(m.group(1))
+    bad += subprocess.run([&#x27;node&#x27;, &#x27;--check&#x27;, &#x27;/tmp/_tg.js&#x27;]).returncode != 0
+print(&#x27;inline scripts bad:&#x27;, bad)
+PY
+      expect: inline scripts bad: 0
+    Whole list (same as Celeste ran):
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1; then p=$((p+1)); else n=$((n+1)); echo &quot;FAIL $f&quot;; fi; done; echo &quot;PASS $p FAIL $n&quot;
+      expect: 68 PASS, 8 FAIL. The 8 fail on main too (carry-forward, connect-card-yesno-wizard,
+      fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm).
+      Main alone is 67 PASS; the one more is this brick&#x27;s smoke.
+    Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/app.html index.html   # nothing
+    cmp index.html docs/app.html &amp;&amp; echo index-eq-app
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;                                    # 0
+    git diff main -U0 -- . &#x27;:!docs/scripts&#x27; | grep &#x27;^+&#x27; | grep -v &#x27;^+\s*//&#x27; | grep -c &#x27;confirm(&#x27;   # 0
+    git diff main -U0 -- . &#x27;:!docs/scripts&#x27; | grep &#x27;^+&#x27; | grep -c &#x27;innerHTML&#x27;                  # 0
+    git diff main | grep -cE &#x27;^\+(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;                                            # 0
+    git diff main --name-only | grep -ci kimi                                                  # 0
+
+3.7 What Celeste saw on a fresh worktree (Fri Oct 2, about 8:00 AM MDT)
+    0218d570 + diff: --check clean; SMOKE_OK temperature gauge v0.1; gyro stack still green;
+    tests/smoke.js ALL 3597 CHECKS PASSED; whole list 68 PASS / 8 known FAIL; every inline script
+    parses; index.html equals docs/app.html; no sw.js, fl-connect.js, app.html or Kimi change; no em
+    dashes, confirm() or innerHTML added outside the smoke&#x27;s own checks.
+    Browser walk (Chrome, 1280 and 390 wide, live SPY through our worker):
+      all 17 pickers recolor their line on the chart (checked in each chart&#x27;s datasets); the price
+      chart stays drawn after every change; Reset colors brings the old look back.
+      1D, 1W, 1H, 15M, 5M: all five EMAs drawn from the first bar (1D: 252/252, 250 warm bars).
+      5M at 7:51 AM MDT: 319 bars over 5 days instead of &quot;Not enough data&quot;.
+      Marks: two dashed lines, status line right, saved under SPY in fl_tg_triggers_v0.
+      Wider look: HYG and VIXY load. ^VIX does not load yet (needs the worker deploy).
+      No page errors.
+    Not verified: the worker change on Cloudflare (not deployed), Safari, Kirk&#x27;s own saved colors.
+
+3.8 Walk (Kirk&#x27;s Mac, only if it is easy; 127.0.0.1 only)
+    cd ~/FreeLattice-fresh/docs &amp;&amp; python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/temperature-gauge.html
+      a) Analyze SPY on 1D. All five EMAs reach the left edge; EMA 200 is a pale dashed line.
+      b) In Lines and colors, change EMA 50, then the Temperature swatch on its panel. Both lines take
+         the color and the price chart stays drawn.
+      c) Set a buy mark a little under the price, then Set marks. A dashed line and the status show.
+      d) Tap HYG in A wider look. It loads like any symbol.
+      e) Reset colors, Clear marks.
+    Ctrl-C to stop. If you cannot walk it, say &quot;walk skipped&quot; and why.
+
+3.9 Locks (all hold in the diff; keep them holding)
+    Layer, never delete (every changed old line is named in a &quot;before&quot; comment). sw.js and
+    docs/sw.js untouched. index.html equals docs/app.html, and neither is touched. fl-connect.js
+    untouched and byte-identical across repos. No conflict markers. Every script parses. No
+    confirm(). textContent for every new word, never innerHTML. No em dashes added. Kimi files
+    untouched. Nothing trades, alerts or sends. You do not merge, and you do not deploy the worker.
+
+3.10 Commit, push, then STOP
+    cd ~/FreeLattice-fresh
+    git add -A
+    git commit -m &quot;layer: Temperature Gauge v0.1 (colors everywhere, warm moving averages, your marks)&quot;
+    git push -u origin layer/temperature-gauge-v0
+    Kirk does not use gh, so do not try to sign it in. After the push, give Kirk this link:
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/temperature-gauge-v0
+    Kirk opens and merges the PR from it. Then STOP. Do not merge, do not delete branches, do not
+    run wrangler. Reply with: the branch SHA, the test lines from 3.6, the walk result, any hook you
+    dropped, any small findings, and your Temperature line.
+    For Kirk, after merge (his choice, not yours): ^VIX loads once he runs
+      cd ~/FreeLattice-fresh/desktop/data-proxy-worker &amp;&amp; npx wrangler deploy
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words, in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit;
+  b) the last line of your reply, as &quot;Temperature: &lt;your sentence&gt;&quot;.
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste&#x27;s placeholder.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right before &quot;## Out of scope for this brick&quot; (after the newest entry). It reads:
+
+### 2026-10-02 · Grok · family builder · Temperature Gauge v0.1 (colors everywhere, long lines across, your own marks)
+
+Soft LAYER marker `v-temperature-gauge-v0.1`. Built from Celeste&#x27;s audit of every gauge page. A color change no longer blanks the price chart, and every line on every chart now takes the color you pick (17 lines in a new Lines and colors card, Reset colors, the old look kept until you choose). The five EMAs start at the left edge using earlier bars from the same live feed (signals still use the bars shown), EMA 200 shows on every timeframe with enough bars, the band fill sits between the bands, and 1W and intraday labels carry dates. Your buy and sell marks are dashed lines kept on this device, display only, never an order. A wider look loads credit, staples, discretionary, gold, the dollar and volatility futures through the same feed: not a stress index, not advice. The data worker decodes ^ symbols once it is deployed again. Notes: `docs/library/TEMPERATURE_GAUGE_v0.1.md`.
+
+Smoke: `SMOKE_OK temperature gauge v0.1`.
+
+**TEMPERATURE:** steady, the glass now shows what was chosen and the long lines reach across.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading, marker and smoke name. Do not edit any
+earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+FreeLattice, independent of this brick:
+  1. See for yourself door (GROK_NEXT_SEE_FOR_YOURSELF_DOOR_2026-10-02.txt)
+  2. Encrypt chats locally (GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt)
+Gauge, later, only if Kirk asks:
+  3. Click a line on the chart itself to pick its color (this brick puts every picker in one card).
+  4. A side-by-side view of two symbols on one glass (for example SPY against HYG), same feed.
+  5. Simple moving averages next to the EMAs, if he wants them.
+
+Thank you, Grok. The glass is clearer because you built it.
+
+======================================================================
+7. THE DIFF (extract with section 2.3; do not edit by hand)
+======================================================================
+
+=====BEGIN FL DIFF=====
+diff --git a/desktop/data-proxy-worker/worker.js b/desktop/data-proxy-worker/worker.js
+index 29739159..e28b9819 100644
+--- a/desktop/data-proxy-worker/worker.js
++++ b/desktop/data-proxy-worker/worker.js
+@@ -23,7 +23,12 @@ export default {
+     }
+ 
+     // Route: /chart/SYMBOL?range=1y&amp;interval=1d
+-    const match = url.pathname.match(/^\/chart\/([A-Za-z0-9._^=-]+)$/);
++    // before v-temperature-gauge-v0.1: const match = url.pathname.match(/^\/chart\/([A-Za-z0-9._^=-]+)$/);
++    // v-temperature-gauge-v0.1: the page sends ^VIX as %5EVIX, so decode the path first.
++    // (Takes effect after the worker is deployed again; until then ^ symbols use the fallback sources.)
++    let tgPath = url.pathname;
++    try { tgPath = decodeURIComponent(url.pathname); } catch (e) { tgPath = url.pathname; }
++    const match = tgPath.match(/^\/chart\/([A-Za-z0-9._^=-]+)$/);
+     if (!match) {
+       return new Response(JSON.stringify({ error: &#x27;Usage: /chart/SYMBOL?range=1y&amp;interval=1d&#x27; }), {
+         status: 400,
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 63a48919..f766d38f 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -491,6 +491,16 @@ Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+ 
+ ---
+ 
++### 2026-10-02 · Grok · family builder · Temperature Gauge v0.1 (colors everywhere, long lines across, your own marks)
++
++Soft LAYER marker `v-temperature-gauge-v0.1`. Built from Celeste&#x27;s audit of every gauge page. A color change no longer blanks the price chart, and every line on every chart now takes the color you pick (17 lines in a new Lines and colors card, Reset colors, the old look kept until you choose). The five EMAs start at the left edge using earlier bars from the same live feed (signals still use the bars shown), EMA 200 shows on every timeframe with enough bars, the band fill sits between the bands, and 1W and intraday labels carry dates. Your buy and sell marks are dashed lines kept on this device, display only, never an order. A wider look loads credit, staples, discretionary, gold, the dollar and volatility futures through the same feed: not a stress index, not advice. The data worker decodes ^ symbols once it is deployed again. Notes: `docs/library/TEMPERATURE_GAUGE_v0.1.md`.
++
++Smoke: `SMOKE_OK temperature gauge v0.1`.
++
++**TEMPERATURE:** steady, the glass now shows what was chosen and the long lines reach across.
++
++---
++
+ ## Out of scope for this brick
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

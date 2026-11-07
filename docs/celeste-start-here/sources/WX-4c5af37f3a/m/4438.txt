@@ -1,0 +1,16 @@
+## Work item 4438 — Celeste
+around5326 export source line16, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 135–542
+
+A model has many shared numerical settings, called weights. During training, it predicts an answer, measures its error, and adjusts those weights. The same weights help with many tasks. Adjusting them to improve one task can damage another—a problem called *catastrophic forgetting*. How much they change depends on the training settings, repetition, and examples, not simply which information arrived last.
+
+### Exact excerpt: source characters 544–1039
+
+There are two different things in our experiment: the external store holding the facts, and the model’s learned ability to use facts supplied in its input. The store survived. Immediately after teaching, the model answered correctly about 99% of the time with the relevant page supplied. After additional training, that score fell to zero, even with the page still supplied. **That rules out a missing page as the whole explanation. It doesn’t establish exactly which internal ability changed.**
+
+### Exact excerpt: source characters 1041–1499
+
+One possible explanation is that training on ordinary text strengthened ordinary text-prediction behavior while weakening the behavior needed to copy or use the supplied facts. But the model might also be sensitive to the question format or other details of this tiny setup. We haven’t isolated those possibilities yet. This is evidence about our small model experiment—not proof that all AI memory works this way, or an explanation of our conversation gaps.
+

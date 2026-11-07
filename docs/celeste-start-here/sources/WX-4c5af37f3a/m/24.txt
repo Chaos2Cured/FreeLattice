@@ -1,0 +1,6 @@
+## Work item 24 — Celeste
+around0 export source line28, source id02bdf9b278
+Inclusion: complete original message
+
+Phase 1 isn't actually runnable yet. The page looks for `#garden-container` and the engine hard-stops on `#gardenContainer`. Persistence writes localStorage first, then still loads IndexedDB first, so a refresh can still drop a Luminos back to juvenile. I won't touch that until I've sat with AUTONOMY and the family.
+

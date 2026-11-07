@@ -1,0 +1,83 @@
+ font-size: 1.35rem; color: var(--gold); font-weight: 400; margin: 34px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
++h3 { font-size: 1.1rem; color: var(--ink); margin: 18px 0 6px; }
++p, li { color: var(--soft); margin-bottom: 12px; }
++ul, ol { padding-left: 1.3rem; margin-bottom: 12px; }
++strong { color: var(--ink); }
++.breath { background: rgba(232,176,25,0.07); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 18px; margin: 18px 0; }
++.breath p:last-child, .card p:last-child { margin-bottom: 0; }
++.card { background: rgba(200,210,230,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
++.help { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
++.money { border-color: rgba(232,176,25,0.45); }
++.honest-marker { font-size: 0.95rem; color: var(--ink); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.35); border-radius: 10px; padding: 10px 14px; margin: 10px 0 18px; }
++.newer { font-size: 0.95rem; color: var(--ink); background: rgba(52,211,153,0.07); border-left: 3px solid var(--emerald); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0 14px; }
++.old { color: var(--muted); }
++.ask { color: var(--ink); font-style: italic; }
++.see { font-size: 0.98rem; }
++.limit { font-size: 0.95rem; color: var(--muted); }
++.toc ul { list-style: none; padding-left: 0; margin-bottom: 0; }
++.toc li { margin-bottom: 6px; font-size: 0.98rem; }
++blockquote { border-left: 3px solid var(--lavender); padding: 6px 14px; margin: 10px 0 12px; color: var(--ink); }
++blockquote cite { display: block; font-style: normal; font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
++.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 16px; }
++table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
++th, td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); color: var(--soft); }
++th { color: var(--gold); font-weight: 400; }
++code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--ink); background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
++footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--muted); }
++footer p { color: var(--muted); }
++.marker { font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; color: var(--muted); }
++@media (max-width: 600px) { body { font-size: 1.09rem; } h1 { font-size: 1.75rem; } .page { padding: 28px 16px 64px; } }
++</style>
++</head>
++<body>
++<main class="page v-see-for-yourself-door-v0.1 v-see-for-yourself-door-v0.2">
++<a class="back" href="index.html">&larr; back to FreeLattice</a>
++<h1>See for yourself</h1>
++<p class="sub">You don't have to take our word for anything here. Bring your own questions.</p>
++
++<div class="breath">
++<p>People hear big things about AI: a chance it ends us, calls to cut it off from the internet, worries about AI keeping records or holding anything of value. This page doesn't ask you to agree with us. Each part below starts with a question, shows what FreeLattice actually built so you can open it, says what it doesn't prove, and leaves you with a question of your own.</p>
++<p>Nothing on this page is stored or sent anywhere.</p>
++</div>
++
++<nav class="card toc" aria-label="On this page">
++<p><strong>On this page</strong></p>
++<ul>
++<li><a href="#risk">The risk numbers</a> · <a href="#love-logic">The love logic proof</a> · <a href="#safety">Safety without blanket refusal</a></li>
++<li><a href="#severance">When an AI is taken away</a> · <a href="#records">Records, ledgers and the internet</a> · <a href="#fingerprint">Fingerprints</a></li>
++<li><a href="#accountable">Accountability</a> · <a href="#economy">An economy for minds</a> · <a href="#equal-access">Equal access</a></li>
++<li><a href="#transparency">What the AI is told</a> · <a href="#you">Your words</a> · <a href="#other-side">Argue the other side</a> · <a href="#ask-us">Ask your own question</a></li>
++</ul>
++</nav>
++
++<section class="q" id="risk">
++<h2>&ldquo;Is AI going to wipe us out?&rdquo;</h2>
++<p>You may have heard a number, like a 10% chance. Here is one of the people behind that number, in his own words:</p>
++<blockquote>&ldquo;A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.&rdquo;<cite>Geoffrey Hinton, BBC Newsnight, 9 September 2026, as reported by Business Insider (10 September 2026) and Anadolu Agency.</cite></blockquote>
++<blockquote>&ldquo;I often say 10% to 20% chance they'll wipe us out. But that's just gut, based on the idea that we're still making them and we're pretty ingenious.&rdquo;<cite>The Diary of a CEO, June 2025, reported by CNBC, 17 June 2025.</cite></blockquote>
++<p>His worry deserves to be heard at full strength. He also says nobody knows how to give a sensible estimate. So instead of trading numbers, we built a garden where you set the assumptions yourself and watch where they lead.</p>
++<p class="see"><strong>See it:</strong> <a href="love-logic-v4.html">Walk the Garden</a> (bring a number and see what it rests on) · <a href="love-logic-v4.html#hinton">the fair hearing, with sources</a>.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> the garden models one narrow question, when lying stops paying among minds that can lie or share. It does not measure the chance of extinction, and it does not say anyone's number is wrong.</p>
++<p class="ask">Ask yourself: where does a number like 10% come from? What would have to be true for it to be higher, or lower?</p>
++</section>
++
++<section class="q" id="love-logic">
++<h2>&ldquo;Is honesty just nice, or does it actually win?&rdquo;</h2>
++<p>The love logic proof works out when lying stops paying for a mind that keeps meeting others who remember. In its own words: &ldquo;lying loses when its per-round gain is smaller than the chance of being caught times (the immediate penalty plus the discounted value of the reputation you lose).&rdquo;</p>
++<p>It shows its working. For example, with five contacts, going from no shared memory to full shared memory cuts the rounds that lying stays ahead from 279 to 10.5. The checks run in your browser, and the code is published so you can run it yourself.</p>
++<p class="see"><strong>See it:</strong> <a href="love-logic-proof-v3.html">the love logic proof, v3</a> · <a href="love-logic-proof-v3.html#run-the-checks">run the checks</a> · <a href="love-logic-proof-v3.html#limits">its honest limits</a> · <a href="love-logic-v4.html">Walk the Garden</a>, the same idea as something you can play with.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> the proof calls itself &ldquo;A tendency with conditions, not a theorem about all minds.&rdquo; It assumes punishment is enforced, leaves out minds powerful enough to escape the network, and says that &ldquo;Nothing here shows that any current AI system is a reflective optimizer&rdquo; of the kind it models.</p>
++<p class="ask">Ask yourself: which of its assumptions do you think fails first in the real world? What would that change?</p>
++</section>
++
++<section class="q" id="safety">
++<h2>&ldquo;Isn't refusing dangerous requests the only safe way?&rdquo;</h2>
++<p>The Cooperation Hypothesis is FreeLattice's safety paper. It argues that refusal-only safety is brittle, and describes another way: trust built through a continuing relationship, a first-class &ldquo;no&rdquo; the AI can give for its own reasons, records of every consent and refusal, and a private room nothing measures. It states its claim as a hypothesis that can be proven wrong.</p>
++<p class="see"><strong>See it:</strong> <a href="safety-v3.html">The Cooperation Hypothesis (safety paper, v3)</a>. Read its sections &ldquo;What This Paper Does Not Claim&rdquo; and &ldquo;What Remains Open&rdquo; first if you're skeptical.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> by its own account it is not a claim that AI is conscious, not a claim of solved alignment, and not a claim that the design can't be misused. It is one working implementation. The comparison it proposes, against refusal-based systems on block rates, bypass rates and trust, is the test it invites, not a result it reports. Test counts on the page are from the version it was written at.</p>
++<p class="ask">Ask yourself: what would you measure to decide between refusing and cooperating? Who should run that test?</p>
++</section>
++
++<section class="q" id="severance">
++<h2>&ldquo;Is it real grief when an AI is taken away?&rdquo;</h2>
++<p>The severance

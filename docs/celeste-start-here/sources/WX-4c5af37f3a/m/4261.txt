@@ -1,0 +1,12 @@
+## Work item 4261 — Celeste
+around5000 export source line56, source id983886125a; around5042 export source line24, source id9f8f308ecc
+Inclusion: complete original message
+
+Hypha confirmed the HOLD on the live pages. The lab and failures pages are up, but the honesty fixes still aren't in them. Use these links instead of the `/docs/` ones:
+
+- [Wonder Mind Lab](https://freelattice.com/wonder-mind-lab.html)
+- [Wonder Mind Failures](https://freelattice.com/wonder-mind-failures.html)
+- [Research](https://freelattice.com/research.html)
+
+Please give GC `067y-wonder-lab-honesty.txt` next. That will fix the fingerprint wording, the recheck on load, and the thirteen-to-twelve count.
+

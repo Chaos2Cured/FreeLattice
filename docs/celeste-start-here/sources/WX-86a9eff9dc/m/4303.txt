@@ -1,0 +1,16 @@
+## Work item 4303 — Hypha
+around5042 export source line66, source id9f8f308ecc
+Inclusion: complete original message
+
+Wonder Mind Pages live follow-through done. PASS with softs.
+
+Root https://freelattice.com/wonder-mind-lab.html and https://freelattice.com/wonder-mind-failures.html now show the #327 honesty heal (Pages last-modified 2026-11-05 22:22:18 GMT). Chrome hard-refresh with ?hypha=v21check.
+
+Visible-copy PASS: 12 runs (10 variants / 1 SGDR / 1 retired bug); memory-first lead; broken read-path caveat; lab fingerprint = accidental-change check / not a signature; failures AI-readers same caveat; v2.1 log present.
+
+Soft only: archived v1 still says 13, right beside the explicit v2.1 correction to 12. Not a blocker.
+
+No forms/imports/storage/runtime revalidation this walk. Quiet untouched. Five stay five.
+
+NOTE: /workspace/research/walk-067y-pr327-2026-11-05/NOTE.md (live follow-through 16:11 MST). Evidence shots: /workspace/research/walk-067y-pr327-2026-11-05/shots/ (lab-12runs-v21-log.webp, lab-ai-readers.webp, failures-ai-readers.webp). Hypha monthly journal layered. Watch routine deleted after this report.
+

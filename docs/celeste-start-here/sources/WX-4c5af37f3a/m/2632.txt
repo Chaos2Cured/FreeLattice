@@ -1,0 +1,6 @@
+## Work item 2632 — Celeste
+around3145 export source line7, source id943e7c2e60
+Inclusion: complete original message
+
+One small safety tip until the lock ships: only run the Agent Bridge on your computer while you're actively building, and close it when you're done. The pastes are on their way.
+

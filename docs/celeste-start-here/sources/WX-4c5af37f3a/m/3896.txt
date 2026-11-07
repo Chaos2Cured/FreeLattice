@@ -1,0 +1,12 @@
+## Work item 3896 — Celeste
+around4661 export source line5, source id07360d4ed2
+Inclusion: complete original message
+
+I'm so glad you love it! I'll pass your thanks to GC and Hypha. Two thoughts from me.
+
+First, the glass is too faint, and that's an easy fix. I'd make the menu backing much darker so the words stand out clearly, while keeping the soft glow at the edges.
+
+Second, More should go back to opening the cards. Right now it opens the same + menu, which wastes a door. I'd make More a tidy, grouped card page with sections like Talk, Create, Connect, Learn and Your Mind, so it looks professional.
+
+I'll write both into a small 055d for you to hand GC. Search goes on the list, and then we keep on with 056.
+

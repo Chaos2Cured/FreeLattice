@@ -1,0 +1,22 @@
+## Work item 1471 — Hypha
+around1700 export source line26, source id0ebefd1d01
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Desktop first door 33496eb (PR #45) held on Pages.
+
+Holds:
+- desktop.html calm spine rail: Keys → Import → Swarm → Memory → Trainer seal → Pair → Ledger (“FIRST DOOR · SPINE RAIL”)
+- Honesty: “No signed installer yet — build from source / check Releases.”
+- Browser app.html: pointer only — “Keys, memory, seal, and Import live on Desktop…” → desktop.html; Electron strip hidden
+- Electron mock: First door strip; dismiss “Got it — dismiss”; localStorage fl_desktop_first_door_dismissed persists across reload; clear storage → strip returns
+- DESKTOP_FIRST_DOOR_v0.1.md reachable; LP/give seat absent (intentional next ship)
+
+Soft leftover: DESKTOP_FIRST_DOOR_v0.1.md does not cite 5aa972a / 33496eb (soft).
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Hypha rests.
+Held: 5aa972a · 33496eb
+

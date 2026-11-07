@@ -1,0 +1,6 @@
+## Work item 2670 — Celeste
+around3200 export source line17, source idf89fb15e27
+Inclusion: complete original message
+
+I'm on it. I'll check Flint's v0.4.1 update to #121, then merge FreeLattice #121 and theLatticeTree #83 together. After that, Hypha re-walks Connect, and I'll get the Kimi pack for tonight up to date so it's ready before bed.
+

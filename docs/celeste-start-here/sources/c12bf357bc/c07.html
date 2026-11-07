@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c07</title>
+<meta name="description" content="Reading section c07 of c12bf357bc, 1025 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c07">
+<meta property="og:description" content="Reading section c07 of c12bf357bc, 1025 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt · c07</h1>
+<p>c12bf357bc · words 1025 · characters 62276–70336</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: not separately matched. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">   function isVision(name) { return VISION_RE.test(name || &#x27;&#x27;); }
++
++  // v-model-choice-sticks-v0: is the chosen model still installed? (&#x27;qwen2.5&#x27; matches &#x27;qwen2.5:latest&#x27;)
++  function onInstalledList(models, name) {
++    if (!name) return false;
++    var n = String(name);
++    return (models || []).some(function(m) {
++      var mn = String((m &amp;&amp; (m.name || m.model)) || &#x27;&#x27;);
++      return mn === n || mn === n + &#x27;:latest&#x27; || (n.indexOf(&#x27;:&#x27;) === -1 &amp;&amp; mn.split(&#x27;:&#x27;)[0] === n);
++    });
++  }
++  // v-model-choice-sticks-v0: a user choice is only replaced when Ollama answers with a list that
++  // no longer has it. A quiet or empty answer never replaces anything. The words go in with textContent (showToast).
++  function checkChosenStillHere(current, tabId) {
++    if (!current || !current.model) return;
++    if (current.provider &amp;&amp; current.provider !== &#x27;ollama&#x27;) return;
++    getInstalledModels(function(models) {
++      if (!models || !models.length) return;
++      if (typeof FLActiveModel === &#x27;undefined&#x27; || !FLActiveModel.isUserChosen()) return;
++      if (FLActiveModel.get().model !== current.model) return;
++      if (onInstalledList(models, current.model)) return;
++      var needsVision = VISION_TABS.indexOf(tabId) !== -1;
++      var pool = models.filter(function(m) { return needsVision ? isVision(m.name) : !isVision(m.name); });
++      if (!pool.length) pool = models;
++      var pick = String((pool[0] &amp;&amp; (pool[0].name || pool[0].model)) || &#x27;&#x27;);
++      if (!pick) return;
++      safeSet(&#x27;fl_modelChoiceGone&#x27;, current.model);
++      FLActiveModel.set(pick, &#x27;ollama&#x27;, &#x27;auto&#x27;);
++      try {
++        if (typeof showToast === &#x27;function&#x27;) showToast(&#x27;The model you chose, &#x27; + current.model + &#x27;, is no longer on this computer. Using &#x27; + pick + &#x27; for now. You can pick another in Connect.&#x27;, 7000);
++      } catch (eT) {}
++      try { if (typeof AiSetup !== &#x27;undefined&#x27; &amp;&amp; AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++    });
++  }
++
+   function getPreferred(type) { return safeGet(&#x27;fl_preferred_&#x27; + type + &#x27;_model&#x27;, null); }
+   function setPreferred(type, model) { safeSet(&#x27;fl_preferred_&#x27; + type + &#x27;_model&#x27;, model); }
+ 
+@@ -36269,6 +36326,9 @@ window.FLAutoModel = (function() {
+     // &quot;User choice is sacred&quot; — the auto-switcher must never lose it
+     if (typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; FLActiveModel.isUserChosen()) {
+       var current = FLActiveModel.get();
++      // v-model-choice-sticks-v0: the person&#x27;s model stays. Only if it left this computer
++      // does the picker fill in, and then it says so in plain words.
++      checkChosenStillHere(current, tabId);
+       var needsVision = VISION_TABS.indexOf(tabId) !== -1;
+       var currentIsVision = isVision(current.model);
+       if (needsVision &amp;&amp; !currentIsVision) {
+
+======================================================================
+APPENDIX B: theLatticeTree full diff vs main 395c761 (git apply --check clean)
+======================================================================
+
+diff --git a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+index d2e6341..cd688da 100644
+--- a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+@@ -20,3 +20,14 @@ Marker `v-connect-heal-v0.4`. Test `docs/modules/connect-heal-v04.test.js` print
+ - Shared `fl-connect.js` heals ride along byte-identical with FreeLattice.
+ 
+ **Temperature:** Mom opens Settings and the first thing she sees is the door.
++
++
++## Heal: model choice sticks v0.1 (Hypha walk 4)
++
++Marker `v-model-choice-sticks-v0`. Test `docs/modules/model-choice-sticks.test.js` prints `SMOKE_OK model choice sticks alpha v0.1`.
++
++- FreeLattice&#x27;s Connect now records a tapped model as the person&#x27;s own choice, so FreeLattice&#x27;s automatic picker leaves it alone. The Tree has no automatic picker: the remembered entry (`fl_alpha_local_mind`) is the choice, and the test proves it survives a reload, Settings and a Find at the same door, and that the thread request uses it.
++- Shared `fl-connect.js` rides along byte-identical: `markUserChoice` (a quiet no-op on the Tree), and a helped Bridge with no mind behind it is named honestly and not saved.
++- A Find through a different door (Bridge gone, direct 11434 answers) is healed by the Tree any-model paste (same-family keep).
++
++**Temperature:** green braided gold, the second cup stays where she set it down.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 5317005..2e02eae 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -5,6 +5,7 @@
+ // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
+ // Port-only loopback: fl_localPort_manual holds &quot;11500&quot; only — never foreign hosts.
+ // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
++// Marker: v-model-choice-sticks-v0 (a tapped model is the person&#x27;s own choice; it stays)
+ // ═══════════════════════════════════════════════════════════════
+ 
+ (function (root) {
+@@ -201,12 +202,18 @@
+           report.bridge = mh;
+           report.port = mh.port || parseInt(manPort, 10);
+           report.helped = true;
+-          report.base = preferHelpedBridge(report.port) || manBase;
++          // v-model-choice-sticks-v0: ask the helped Bridge first; save it as the Ollama door
++          // (fl_ollamaHost, fl_bridgePort) only once a mind really answers behind it.
++          report.base = (report.port &amp;&amp; report.port !== 11434) ? &#x27;http://127.0.0.1:&#x27; + report.port : manBase;
+           try {
+             report.models = await tagsAt(report.base);
++            report.base = preferHelpedBridge(report.port) || report.base;
+             report.ollama = { via: &#x27;manual-bridge&#x27;, base: report.base };
+             return report;
+-          } catch (eMB) {}
++          } catch (eMB) {
++            report.bridgeNoMind = true;
++            report.models = [];
++          }
+         } else if (mh) {
+           report.bridge = mh;
+           report.port = mh.port || parseInt(manPort, 10);
+@@ -357,6 +364,9 @@
+       // v-connect-heal-v0.4 item 10: handleLocalToggle reads #localToggle, so check it first
+       try { var lt = document.getElementById(&#x27;localToggle&#x27;); if (lt) lt.checked = true; } catch (eLt) {}
+       if (typeof root.handleLocalToggle === &#x27;function&#x27;) root.handleLocalToggle(true);
++      // v-model-choice-sticks-v0: the tap is the person&#x27;s own choice, so the automatic
++      // picker leaves it alone on tab changes, reloads and Settings.
++      markUserChoice(name, &#x27;ollama&#x27;);
+       if (typeof root.updateStatus === &#x27;function&#x27;) root.updateStatus();
+       if (root.AiSetup &amp;&amp; typeof root.AiSetup.updateStatus === &#x27;function&#x27;) root.AiSetup.updateStatus();
+       // v-connect-heal-v0.4 item 7: once they chose a mind, the Local AI toast stops asking
+@@ -366,6 +376,29 @@
+     return { name: name, base: base };
+   }
+ 
++  // v-model-choice-sticks-v0: FreeLattice keeps one active model (FLActiveModel). A model the
++  // person tapped is recorded with source &#x27;user&#x27; and as their preferred text (or vision) model.
++  // The Tree has neither helper, so this is a quiet no-op there (it keeps entry.model instead).
++  function markUserChoice(name, provider) {
++    if (!name) return false;
++    var marked = false;
++    try {
++      if (root.FLActiveModel &amp;&amp; typeof root.FLActiveModel.set === &#x27;function&#x27;) {
++        root.FLActiveModel.set(String(name), provider || &#x27;ollama&#x27;, &#x27;user&#x27;);
++        marked = true;
++      }
++    } catch (e0) {}
++    try {
++      var auto = root.FLAutoModel;
++      if (auto &amp;&amp; typeof auto.setPreferred === &#x27;function&#x27;) {
++        var kind = (typeof auto.isVision === &#x27;function&#x27; &amp;&amp; auto.isVision(String(name))) ? &#x27;vision&#x27; : &#x27;text&#x27;;
++        auto.setPreferred(kind, String(name));
++        if (typeof auto.invalidateCache === &#x27;function&#x27;) auto.invalidateCache();
++      }
++    } catch (e1) {}
++    return marked;
++  }
++
+   function open() {
+     try {
+       if (!isAlpha() &amp;&amp; typeof root.switchTab === &#x27;function&#x27;) { root.switchTab(&#x27;connect&#x27;); return true; }
+@@ -539,7 +572,12 @@
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

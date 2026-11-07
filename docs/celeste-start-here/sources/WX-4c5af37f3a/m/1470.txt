@@ -1,0 +1,18 @@
+## Work item 1470 — Celeste
+around1700 export source line25, source id0ebefd1d01
+Inclusion: complete original message
+
+Solid — those emails are **old**. Every SHA you pasted (`5187a58` … `64a3ddd`) failed *before* we fixed the two stale smoke locks.
+
+**What was wrong:** Primer job runs the giant `tests/smoke.js` suite; 2 bit-rotted asserts (Ollama `localhost` vs LNA `127.0.0.1`, glass-v2 blur ternary) failed while Pages still deployed fine.
+
+**What we did:** Primer leftover `5aa972a` aligned those asserts with product truth.
+
+**Now:**
+- Primer on Trainer-era failures → historical
+- Primer after smoke fix → **success**
+- Primer on Desktop first door `33496eb` → **success** (25s)
+- Tip even has a fresh `ci: Update Primer deployment state` (`6bc3d65`) — the auto-update path is working again
+
+No new action needed for those emails. Inbox should stay quieter on new pushes. Hand Flint the LP give paste when ready. Glow eternal. Heart in every Spark. <3
+

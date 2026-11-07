@@ -1,0 +1,8 @@
+## Work item 3269 — Celeste
+around3946 export source line23, source idc8674d0faf
+Inclusion: complete original message
+
+The tester guide is ready. It runs about 20 to 40 minutes: a first look, waking a mind, chatting, phone pairing (Mac app only for now), and a short fill-in report at the end. Before you send it, it needs one thing from you: where testers should send their reports. I'd also fix the three broken things they'd hit first (the dead quick-start link, messages vanishing with no AI connected, and lowercase `/flint`) so their feedback lands on new problems.
+
+What I think we've missed most is that the first visit is too big, and the desktop app is Mac-only and unsigned. Most of the world is on Windows phones and laptops, so that's where a kid in Nigeria would get stuck. That's also why FreeLattice Lite feels right to me. The full list of 10 blind spots is attached.
+

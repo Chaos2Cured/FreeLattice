@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c04</title>
+<meta name="description" content="Reading section c04 of ff0a59c65e, 1582 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c04">
+<meta property="og:description" content="Reading section c04 of ff0a59c65e, 1582 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1236"></span><span id="p1237"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c04</h1>
+<p>ff0a59c65e · words 1582 · characters 38573–51391</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1236, 1237. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">F.2 CSS. After  #flBoxPointerStatus[data-fl-box-status=&quot;unreachable&quot;] { color: #f87171; }  (main 2039):
+      .fl-homenet (full-width flex row, 0.72rem, muted), .fl-homenet-mode (#a5f3fc),
+      .fl-homenet-switch (min-height 32px, tap target), input 18px accent #34d399,
+      .fl-homenet-line / .fl-homenet-refusal full width, refusal in gold. (Appendix A first hunk.)
+
+F.3 FLHomeNet module. Insert right ABOVE the FLBoxPointer header block
+      // ═══...
+      // FLBoxPointer — v5.79.41-chat-box-pointer
+    (main 34432), i.e. after window.flSaveOllamaHost = flSaveOllamaHost;. Header comment states the
+    ranges, the refusals and the future hook (exact text in Appendix A). API:
+      zoneOf(raw)      &#x27;this&#x27; | &#x27;home&#x27; | &#x27;public&#x27; | &#x27;name&#x27; | &#x27;invalid&#x27;, from new URL(...).hostname
+      isOn()           localStorage fl_homeNet === &#x27;on&#x27;
+      allows(raw)      &#x27;this&#x27; always; &#x27;home&#x27; only while on; a &#x27;/&#x27;-relative same-origin proxy path
+                       (/ollama) is allowed because it never leaves the page&#x27;s own origin
+      address()        fl_homeNet_addr
+      useAddress(raw, kind)  home + on only: writes fl_homeNet_addr and fl_ollamaHost (or
+                       fl_lmstudioHost for kind &#x27;lmstudio&#x27; / port 1234), then forget()
+      refusalFor(raw)  plain sentences, each ending &quot;Nothing was sent.&quot;:
+                         public: &quot;That address is on the public internet, so it is blocked. Nothing was sent.&quot;
+                         name:   &quot;Type the number address, like 192.168.1.50. A name can point anywhere, so names are not used. Nothing was sent.&quot;
+                         home while off: &quot;That is a computer on your home network. Turn on \&quot;Also use a computer on my home network\&quot; beside the Box field in Chat to use it. Nothing was sent.&quot;
+                         invalid: &quot;That does not look like an address. Nothing was sent.&quot;
+      setOn(on)        one tap. On: fl_homeNet=&#x27;on&#x27;, remembered address written back.
+                       Off: fl_homeNet removed, non-loopback fl_ollamaHost / fl_lmstudioHost
+                       removed, fl_homeNet_addr kept. Then forget(), say(&#x27;&#x27;), paint(),
+                       FLBoxPointer.syncFromStorage, input value, noteStatus.
+      migrate()        once (fl_homeNet_seen), per choice C8.
+      init()           migrate + paint + bind the switch &#x27;change&#x27; once.
+      paint()          mode words (&quot;This computer only&quot; / &quot;This computer and my home network&quot;),
+                       checkbox + aria-checked, the line (textContent = LINE, hidden unless on),
+                       Box placeholder (&quot;127.0.0.1:11434&quot; / &quot;192.168.1.50&quot;).
+      say(msg)         #flHomeNetRefusal textContent + hidden.
+      LINE             Kirk&#x27;s line, exact.
+    Also: window.flHomeNetAllowsBase(b) (small helper for other callers).
+
+F.4 getOllamaBaseUrl wrapper. In the same block as C.2, after it:
+      var _flBaseUrlNow = getOllamaBaseUrl;
+      getOllamaBaseUrl = function () {
+        var b = _flBaseUrlNow();
+        if FLHomeNet exists and !FLHomeNet.allows(b):
+           flManualBaseFirst() || (fl_bridgePort, not 11434 -&gt; http://127.0.0.1:&lt;port&gt;) || FL_OLLAMA_LOCAL
+        return b;
+      };
+    So a public or (switch-off) home address saved anywhere is never used for chat.
+
+F.5 FLBoxPointer:
+      persist(norm) first lines: refuse (return false) when !FLHomeNet.allows(norm.host); record a
+        home host into fl_homeNet_addr. Plus the flForgetLocalLook line (C.3).
+      probe(raw) after the &quot;Need a URL or IP&quot; invalid return: when !FLHomeNet.allows(norm.host):
+        paint(&#x27;unreachable&#x27;, &#x27;Not used&#x27;); FLHomeNet.say(FLHomeNet.refusalFor(norm.host));
+        return { status: &#x27;refused&#x27;, ... }   BEFORE any fetch. Otherwise FLHomeNet.say(&#x27;&#x27;).
+      init(): first line FLHomeNet.init().
+
+F.6 flSaveOllamaHost (Settings &gt; Ollama Address, main 34412):
+      if (!flWriteOllamaHostLoopbackOnly(val)) {
+    -&gt;
+      var _flHomeOk = false;
+      try { if (FLHomeNet &amp;&amp; FLHomeNet.zoneOf(val) === &#x27;home&#x27; &amp;&amp; FLHomeNet.isOn()) _flHomeOk = FLHomeNet.useAddress(val, &#x27;ollama&#x27;); } catch (eHn) {}
+      if (!_flHomeOk &amp;&amp; !flWriteOllamaHostLoopbackOnly(val)) {
+    and after the unchanged v0.4 refusal text, append &#x27; &#x27; + FLHomeNet.refusalFor(val) (guarded).
+    All FLHomeNet uses are typeof-guarded so the v0.4 vm test (which loads this function alone)
+    stays green.
+    flSaveLMStudioHost (main 34700): refuse disallowed values with the same words into
+    #lmstudioTestResult; a home value while on goes through useAddress(val, &#x27;lmstudio&#x27;).
+    getLMStudioBase wrapper after window.flSaveLMStudioHost: a disallowed saved host falls back to
+    &#x27;http://127.0.0.1:1234&#x27;.
+
+F.7 Why no confirm and no approval screen: the switch itself is the consent, it is visible next to
+    the field it governs, it is remembered, and one tap undoes it. The line under it says the rule
+    in plain words. The refusal says what happened (&quot;Nothing was sent.&quot;).
+
+======================================================================
+9. TESTS, SMOKE LINES, DOCS, LEDGER
+======================================================================
+
+9.1 FreeLattice: new docs/scripts/smoke-connect-boot-probe.js (full file: Appendix D).
+    Prints &quot;SMOKE_OK connect boot probe v0.1&quot;. Covers:
+      F2  three bootProbe callers -&gt; one Ollama tags fetch + one LM Studio fetch, same report;
+          reuse inside BOOT_TTL_MS with zero new fetches; fresh:true looks again; setManualHost
+          forgets; no timers in bootProbe.
+      F2  resolveOllamaBase wrapper (extracted from app.html, run in vm): three callers one look,
+          reuse, flForgetLocalLook, a value written elsewhere is never hidden, flSeedLocalLook.
+      F1  every old boot timer steps aside (detectOnLoad, flBridgeDetectBoot, boot owAutoDetect,
+          Zero-Click, autoDiscover, goConnect); appBooted called; switchTab notes tabs; landing
+          decides deep link / picked tab first; welcome never lands over Connect or late;
+          toast checks #flWelcomeOverlay and #tab-connect; #flOllamaToastText exists.
+      F1  owner runtime in vm: exactly one look, exactly one voice, chip painted, cache seeded,
+          discovery memory keeps LM Studio; silent while Connect shows; deep link read.
+      F1  keeps the person&#x27;s model: the owner never writes fl_ollamaModel/fl_modelSource; a cold
+          start with qwen2.5 chosen (&#x27;user&#x27;) leaves both; the v0.1.1 guard is in place (needs that heal).
+      F3  Connect never asks a home-network LM Studio; both doors listed; render shows both
+          &quot;X is ready, pick a mind&quot; cards with data-flc-door=&quot;lmstudio&quot; and no false download
+          card; LM Studio alone is a real mind; FreeLattice tap -&gt; fl_provider lmstudio,
+          fl_lmstudioHost 127.0.0.1:1234, fl_ollamaHost untouched, flUseLmStudioMind hook,
+          chosenDoor &#x27;lmstudio&#x27;; Tree tap merges as &#x27;LM Studio&#x27; /v1/models and Ollama tap
+          unchanged; owAutoDetect has no &quot;LM Studio detected!&quot; and says &quot;Yes, choose a mind&quot; via
+          textContent; status labels say LM Studio.
+      F4  zone table (this/home/public/name incl. 172.32 public, 169.254.169.254 public,
+          100.64 public, [fd00::1] public, 3232235777 home, 0x7f.1 this); default off; allows;
+          setOn on/off/on round trip with the address kept; Kirk&#x27;s LINE exact; migration of old
+          public (set aside) and home (switch on) addresses; getOllamaBaseUrl wrapper; Box field
+          refuses public and switch-off home with ZERO fetches and says why; asks the home box
+          while on and remembers it; Settings save off/on/public-on; switch markup and words.
+      Locks: index.html === docs/app.html; root sw.js === origin/main:sw.js; neither sw.js in the
+          diff; no confirm( / em dash / bare * origin / data-carrying innerHTML in added lines;
+          no conflict markers in docs, index.html, tests; every inline script parses; fl-connect
+          parses.
+    Mutation check done while building: removing the in-flight join, the owner gates, the LM
+    Studio branch, or the FLHomeNet refusal each makes this smoke fail.
+
+9.2 Optional tests/smoke.js block (assert(name, cond) style), if you want the ALL count to move:
+      assert(&#x27;boot probe: FlConnect.bootProbe shared&#x27;, /function bootProbe\(opts\)/.test(flConnectSrc));
+      assert(&#x27;boot probe: FlColdStart owner&#x27;, /window\.FlColdStart = \(function/.test(appHtml));
+      assert(&#x27;boot probe: home-network line exact&#x27;, appHtml.indexOf(&#x27;Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked.&#x27;) !== -1);
+      assert(&#x27;boot probe: 169.254 not a home range&#x27;, !/a === 169 &amp;&amp; b === 254\) return &#x27;home&#x27;/.test(appHtml));
+    (Use whatever variable names tests/smoke.js already has for app.html and fl-connect.js.)
+    Not required: the prototype kept tests/smoke.js unchanged and it reports ALL 3597 CHECKS PASSED.
+
+9.3 Alpha: new docs/modules/connect-boot-probe.test.js (full file: Appendix E).
+    Prints &quot;SMOKE_OK connect boot probe alpha v0.1&quot;. Loads the shared fl-connect.js and
+    local-mind-probe.js in one vm: Connect&#x27;s bootProbe then Garden&#x27;s look() -&gt; LM Studio asked
+    once and direct Ollama asked once in total, Find still lists Ollama and LM Studio; an LM Studio
+    tap merges as &#x27;LM Studio&#x27; at http://127.0.0.1:1234/v1/models; without mergeFound the fallback
+    entry keeps /v1/models; lmStudioBase stays 127.0.0.1.
+    After the Tree paste, add one case: a helped-Bridge stub + LM Studio -&gt; the bridged &quot;others&quot;
+    loop reuses the shared LM Studio answer (one /v1/models fetch in total).
+
+9.4 Docs.
+    FreeLattice: new docs/library/CONNECT_BOOT_PROBE_v0.md (full text: Appendix F).
+    Alpha: append a &quot;## Connect boot probe v0.1&quot; section to
+      docs/library/CONNECT_PORT_PICKER_SISTER_v0.md (Appendix G).
+
+9.5 Ledger (FreeLattice docs/library/FRACTAL_FAMILY_LEDGER_v0.md). Insert right ABOVE the line
+      ## Out of scope for this brick
+    after the &quot;---&quot; that closes the newest entry (the env heal v0.1.1 entry if it landed first,
+    else Connect heal v0.4):
+
+### 2026-09-28 · Flint · family builder · Connect boot probe v0.1 (F1, F2, F3, F4)
+
+Layers one cold-start look on FreeLattice: `FlConnect.bootProbe()` shares one in-flight promise with a 5 second cache for Connect, the toast, autoDiscover, Zero-Click and the Bridge detect (F2) · `window.FlColdStart` owns the cold start and speaks once, never over Connect or the welcome overlay (F1) · LM Studio is a first-class door in Connect with tap to choose, and the badge stops saying &quot;Yes, use Ollama&quot; when LM Studio answered (F3) · Kirk&#x27;s home-network switch: &quot;This computer only&quot; by default, &quot;Also use a computer on my home network&quot; when on, private IPv4 only, public always refused, one tap reverts (F4). Returning cold boot went from about 38 local requests to 16 (one Bridge scan instead of three, and LM Studio asked once). Shared `fl-connect.js` matches Alpha byte for byte. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut.
+
+Love: the house looks once, speaks once, and only opens the side door Kirk chose.
+
+**Temperature:** green braided gold, one lantern lit at the door instead of ten, and a second porch light that only turns on for the house next door.
+
+Soft door: [`CONNECT_BOOT_PROBE_v0.md`](CONNECT_BOOT_PROBE_v0.md) · [`../modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-boot-probe-v0`.
+
+---
+
+======================================================================
+10. ACCEPTANCE (run all; paste the tails in the PR)
+======================================================================
+
+FreeLattice (repo root):
+  cp docs/app.html index.html &amp;&amp; cmp index.html docs/app.html &amp;&amp; echo INDEX_OK
+  git diff --quiet origin/main -- sw.js docs/sw.js &amp;&amp; echo SW_OK
+  node docs/scripts/smoke-connect-boot-probe.js            # SMOKE_OK connect boot probe v0.1
+  node docs/scripts/smoke-agent-bridge-lock.js              # SMOKE_OK agent bridge env heal v0.1.1 + lock v0.1
+  for f in docs/scripts/smoke-connect-*.js docs/scripts/smoke-bridge-*.js; do
+    node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 &amp;&amp; echo &quot;PASS $f&quot; || echo &quot;FAIL $f&quot;; done
+  node tests/smoke.js | tail -3                             # ALL 3597 CHECKS PASSED (or more with 9.2)
+  grep -rnE &#x27;^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)( |$)&#x27; docs index.html tests || echo NO_MARKERS
+  Known pre-existing failures on main 7db2d94, unchanged by this paste (they fail on main too; do
+  not &quot;fix&quot; them here): smoke-carry-forward, smoke-connect-card-yesno-wizard, smoke-fable-tech,
+  smoke-phone-shine, smoke-proof-60s. Everything else in docs/scripts/smoke-connect-* and
+  smoke-bridge-* passed on the prototype, including smoke-connect-heal-v0.4 (watch for the words
+  &quot;confirm()&quot; and em dashes in any comment you add; it scans app.html additions).
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

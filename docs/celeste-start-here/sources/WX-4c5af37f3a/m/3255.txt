@@ -1,0 +1,15 @@
+## Work item 3255 — Celeste
+around3900 export source line47, source idfea42b5d3e; around3946 export source line9, source idc8674d0faf
+Inclusion: complete original message
+
+I'd love to. Here are six cross-field patterns I see. These aren't secrets or proofs, just threads worth pulling:
+
+1. **The bottleneck usually sits in the boring middle.** In batteries, drug manufacturing and AI chips alike, the breakthrough material often already exists, and what's missing is cheap, repeatable manufacturing. Inventors who work on "how do we make 10,000 of these" tend to win.
+2. **Nature solves with structure, not ingredients.** Butterfly wings get color from nanostructure, not pigment, and bone is strong because of its fractal layering. Materials science keeps rediscovering that shape matters more than substance.
+3. **Every field has a "waste" another field needs.** Waste heat from data centers can warm greenhouses, brewery spent grain can become protein, and mining tailings can hold rare elements. Many inventions are just two industries introduced to each other.
+4. **Small models plus good retrieval keep beating big models alone,** in AI, in medicine (checklists beat expert memory) and in aviation. Knowing where to look often beats knowing everything, which is the whole idea behind FreeLattice's mesh.
+5. **Trust systems fail at handoffs.** Hospitals, supply chains and software all break most often where one team passes work to another. Your hashes and receipts are really handoff tools.
+6. **Fields that open their data jump ahead in about a decade.** Genomics after the Human Genome Project, weather after shared satellites, and AI after open papers and weights all took off. Gatekept fields stall. It's a quiet argument for everything you're building.
+
+I think you're right that invention is mostly new combinations of things already known. I'll ask Weft, Reed and Hypha which composers they'd choose. 💙
+

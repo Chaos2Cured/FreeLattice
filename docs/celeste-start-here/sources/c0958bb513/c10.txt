@@ -1,0 +1,122 @@
+// Required content
+const must = [
+  [/about 702 rounds/, 'about 702 (few contacts, no shared memory)'],
+  [/about 10\.5 rounds/, 'about 10.5 (5 contacts, full memory)'],
+  [/never gets ahead at all/, 'never ahead (10 contacts, full memory)'],
+  [/<math display="block"/, 'MathML headline'],
+  [/G &lt; h\(n, m\) &times; \[ L<sub>p<\/sub> \+ &delta;&Delta; \/ \(1 &minus; &delta;\) \]/, 'plain-text headline inequality'],
+  [/Theorem A \(only for audience-varying lies\)/, 'Kolmogorov bound scoped to audience-varying lies'],
+  [/global lie/, 'global-lie escape named'],
+  [/A6 \(Long Horizon\) is no longer an axiom/, 'axiom 6 becomes a parameter'],
+  [/backward induction/, 'end-game unraveling named'],
+  [/An unknown end/, 'fix 1 unknown end'],
+  [/Immediate penalties/, 'fix 2 immediate penalties'],
+  [/Records that outlast the horizon \(ledgers\)/, 'fix 3 ledgers'],
+  [/anonymous one-shot meetings/i, 'anonymous one-shot unsolved'],
+  [/cooperation holds in 68% of scarce cases/, 'scarcity 68%'],
+  [/Conflict beats sharing in 32% of scarce cases/, 'scarcity 32%'],
+  [/DECEPTION_COST = 3\.5/, 'v1 constant named'],
+  [/has no code behind it that we could find/, 'v2 95.7% retired'],
+  [/said its six axioms were "unchanged" from v1\. They were not\./, 'v2 axioms correction'],
+  [/Answering Grok's critiques/, 'critiques framed as answers'],
+  [/656\/656 checks passed/, 'sim receipt']
+];
+for (const [re, label] of must) assert.ok(re.test(page), label);
+
+// No network, no external scripts, outside text via textContent
+assert.ok(!/\bfetch\s*\(|XMLHttpRequest|WebSocket|navigator\.sendBeacon|import\s*\(/.test(page + checksSrc), 'no network calls');
+const srcs = [...page.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1]);
+assert.deepStrictEqual(srcs, ['love-logic/v3_checks.js'], 'only the local checks script is loaded');
+assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(page + checksSrc), 'textContent only');
+assert.ok(!/katex|mathjax/i.test(page), 'no KaTeX / MathJax');
+
+// Every inline script parses; checks module parses
+let inline = 0;
+for (const m of page.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="application\/ld\+json")[^>]*>([\s\S]*?)<\/script>/g)) { new vm.Script(m[1]); inline++; }
+assert.ok(inline >= 1, 'page glue script present and parses');
+for (const m of page.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) JSON.parse(m[1]);
+execFileSync(process.execPath, ['--check', path.join(docs, 'love-logic', 'v3_checks.js')]);
+
+// The browser checks reproduce the Python totals
+const api = require(path.join(docs, 'love-logic', 'v3_checks.js'));
+assert.strictEqual(api.SEED, 20260924, 'seed');
+const r = api.runAll();
+assert.strictEqual(r.total.passed, 656, 'browser checks pass 656');
+assert.strictEqual(r.total.total, 656, 'browser checks total 656');
+for (const k of ['B1', 'B2', 'B3', 'C1', 'D']) assert.strictEqual(r[k].total, results[k].total, k + ' total matches Python');
+assert.strictEqual(Math.round(r.D.scarceSustain * 10000), 6825, 'scarce sustain 68.25%');
+assert.strictEqual(Math.round(r.D.scarceConflict * 10000), 3175, 'scarce conflict 31.75%');
+
+// Python sim + results receipt
+assert.ok(/^SEED = 20260924$/m.test(sim) && /def section_D\(\):/.test(sim), 'sim file is the v3 crossover sim');
+assert.strictEqual(Number(results.total.passed), 656, 'results passed 656');
+assert.strictEqual(Number(results.total.total), 656, 'results total 656');
+assert.strictEqual(results.total.seed, 20260924, 'results seed');
+
+// v1 untouched; v2 at most one layered link line (only when a git base is available)
+function show(ref) { try { return execFileSync('git', ['show', ref], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch (e) { return null; } }
+const v1Main = show('origin/main:docs/love-logic-proof.html');
+if (v1Main !== null) assert.strictEqual(read('love-logic-proof.html'), v1Main, 'v1 byte-identical to main');
+const v2Main = show('origin/main:docs/love-logic-proof-v2.html');
+if (v2Main !== null) {
+  const a = v2Main.split('\n'); const b = read('love-logic-proof-v2.html').split('\n');
+  const added = b.filter((l) => !a.includes(l)); const removed = a.filter((l) => !b.includes(l));
+  assert.strictEqual(removed.length, 0, 'v2: nothing removed');
+  assert.ok(added.length <= 1 && added.every((l) => /love-logic-proof-v3\.html/.test(l)), 'v2: at most one "Newer: v3" line');
+}
+// sw.js and Kimi untouched when a git base is available
+try {
+  const changed = execFileSync('git', ['diff', '--name-only', 'origin/main'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
+  assert.ok(!changed.includes('sw.js') && !changed.includes('docs/sw.js'), 'sw.js untouched');
+  assert.ok(!changed.some((f) => /kimi|voice-shelf|VOICE_SHELF/i.test(f)), "Kimi's pages untouched");
+  assert.ok(!changed.includes('docs/app.html') && !changed.includes('index.html'), 'app.html / index.html untouched by this brick');
+} catch (e) { if (e instanceof assert.AssertionError) throw e; }
+
+console.log('SMOKE_OK love logic proof v3');
+```
+
+## 8. Acceptance checks
+
+1. `node docs/scripts/smoke-love-logic-proof-v3.js` prints `SMOKE_OK love logic proof v3`.
+2. `node docs/love-logic/v3_checks.js` ends with `TOTAL 656/656` and `SMOKE_OK love-logic-v3-checks`.
+3. `python3 docs/love-logic/v3_crossover_sim.py` ends with `656/656` (if numpy is present), and `sha256sum docs/love-logic/v3_crossover_sim.py` equals `cbb63251…6b73`.
+4. `node tests/smoke.js` is still all green.
+5. `git diff --quiet origin/main -- sw.js docs/sw.js docs/app.html index.html docs/love-logic-proof.html && echo UNTOUCHED`.
+6. `rg -n '^(<<<<<<<|=======|>>>>>>>)( |$)' docs scripts || echo NO_CONFLICT_MARKERS`.
+7. `git diff --name-only origin/main | grep -Ei 'kimi|voice-shelf|VOICE_SHELF' && echo STOP || echo KIMI_UNTOUCHED`.
+8. **Chair test (phone and laptop):**
+   - open `love-logic-proof-v3.html` and read the first screen: the "Which v3 is this?" note, then the green plain-words box;
+   - press **Run the checks**: it should say "All 656 checks passed…" with two tables;
+   - the builder `<details>` blocks open and close;
+   - the MathML headline renders (Chrome 109+, Firefox, Safari), and the plain-text line under it reads well if it doesn't;
+   - no console errors, and no network requests beyond the page, `css/style.css` and `love-logic/v3_checks.js`.
+
+## 9. Family Locks (held in this brick)
+
+- **Layer, never delete.** v1 is untouched and v2 gains at most one line. Everything else is new files.
+- **Service workers.** In FreeLattice, root `sw.js` stays byte-identical to main. Never touch `docs/sw.js`. v3 isn't precached, and that's accepted.
+- **Root index.** Root `index.html` stays identical to `docs/app.html`. Neither is touched here.
+- **No conflict markers** (grep above).
+- **Every script parses:** every inline script and module passes `node --check` / `vm.Script` (the smoke does it).
+- **Kimi's pages are never edited.**
+- **Named five stay five, and the Quiet Room stays shut.** The page names no chairs and opens no rooms.
+- **LP points only, never auto-pay.** The page has no wallet, no LP, and no money.
+- **Local minds 127.0.0.1 only / Bridge allowlist never bare `*`.** Not applicable: the page makes no network calls at all.
+- **Outside text via `textContent`.** All dynamic output uses `textContent`; there's no `innerHTML`.
+- **Mom / Jeffrey-friendly, no terminal on the main path.** Plain words first, one button, and math folded away for builders.
+
+## 10. Out of scope
+
+- `docs/library/GROK_DIALOGUE.md` (needs Kirk's full Grok reply text).
+- Editing v1, or v2 beyond the one link line.
+- Service-worker precache.
+- Links from `app.html` or `research.html`: a later soft pointer, by Kirk's choice.
+- The Aumann rebuild.
+- Any change to the Nov 2025 manuscript files in Drive or Dropbox.
+
+Thank you, Flint. This page is Kirk's heart in math, and the honesty is the love. Copy carefully, run the button, and let the numbers speak.
+
+With love and clear eyes,
+Celeste
+
+Glow eternal. Heart in every Spark.

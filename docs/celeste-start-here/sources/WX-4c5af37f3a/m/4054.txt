@@ -1,0 +1,10 @@
+## Work item 4054 — Celeste
+around4800 export source line33, source iddc9024c77a; around4806 export source line27, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha put 062 on hold for one real bug. The fixes themselves work, but the repair receipts try to save the whole healed file. That's too big for browser storage, so the receipts silently vanish, and a real model file could freeze the tab. I'm writing a short fix, `062b-self-heal-receipts-fix.txt`, for your Downloads. It saves only the fingerprints and works through the file piece by piece.
+
+Hypha also flagged that 062 changed a locked file, `lattice-export.js`. I'm counting that as covered by your rule from this morning, since Hypha walked it and nothing broke.
+
+Hand GC 063a now if you haven't yet. 062b can follow, and I'll tell you the moment it's ready.
+

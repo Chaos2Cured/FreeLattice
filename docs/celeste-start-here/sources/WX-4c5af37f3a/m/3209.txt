@@ -1,0 +1,6 @@
+## Work item 3209 — Celeste
+around3838 export source line49, source idb9e3aad8bb
+Inclusion: complete original message
+
+I'll come back with a starter set of tools you can actually try: one for music, one for editing, and one for images. I'll check each license against the source myself.
+

@@ -1,0 +1,42 @@
+4. SMOKE (new)
+  - After a short Chat ask, leave Chat / open More / reload: one calm line names that intent
+    (truncated). Continue returns to Chat (or the named place) without inventing an answer.
+  - With a fresh / cleared store and no recent ask: line stays quiet. No fake continuity.
+  - Pause / Clear: doorway line does not contradict a cleared thread; Pause still wins.
+  - No keys in localStorage for this store. A key-shaped note is refused if applicable.
+  - fl-connect.js md5 unchanged from pin (aaff2bf1...) unless you report a required twin edit
+    (prefer not; should stay untouched).
+  - ai-continuity.js untouched. propose.js unchanged unless a tiny honest hook was required
+    (prefer not; report).
+  - Buttons >= 44px; no sideways scroll at 390 and 1280; reduced motion respected.
+  - Top debug strip still present; Quiet Room shut; Five stay five.
+  - Twin: FL and Alpha where shell exists; report Tree gaps cleanly (yes/no + why).
+  - Earlier smokes still print (on the tip that includes them):
+      SMOKE_OK soft polish 052 v0.1
+      SMOKE_OK chat autonomy v0.1
+      SMOKE_OK tree love connect v0.1
+      SMOKE_OK gathering shared v0.1
+      SMOKE_OK gathering speak checker v0.1
+  - New line: SMOKE_OK continuity doorway v0.1
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 86 (expect 87); honest claims only for what shipped.
+  - psi per standing formula.
+  - Separate page PR as usual (layer/gc-page-NN) unless Celeste GO says otherwise.
+  - Temperature line in the ledger as usual.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of every touched locked file (and fl-connect.js +
+    ai-continuity.js left untouched confirmation + any new continuity module md5 on BOTH
+    repos where present), smoke counts, Twin FL vs Alpha yes/no, Tree gaps.
+  - One line: what the doorway shows; one line: wrong-if quiet path verified.
+  - Do not merge.
+
+
+WAIT: Do not cut until GROK_NEXT_053b_GO_2026-10-28.txt says GO and names FreeLattice + Tree
+mains. 052 must be merged first. If 053b is still HOLD, stop and say so.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

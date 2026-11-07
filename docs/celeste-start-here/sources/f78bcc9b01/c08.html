@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c08</title>
+<meta name="description" content="Reading section c08 of f78bcc9b01, 1128 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c08.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c08">
+<meta property="og:description" content="Reading section c08 of f78bcc9b01, 1128 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c08.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1198"></span><span id="p1225"></span><span id="p1226"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c08</h1>
+<p>f78bcc9b01 · words 1128 · characters 84389–92958</p>
+<p><a href="c07.html">Previous section</a></p>
+<p><a href="c08.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1198, 1225, 1226. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">  // T10 pairing: 5 wrong → 429 + new code; the fresh code pairs and returns the same token.
+  const codeRe = /Pairing code: ([A-Z0-9]{3})-([A-Z0-9]{3})/g;
+  const firstCode = [...out.matchAll(codeRe)].pop();
+  assert.ok(firstCode, &#x27;bridge printed a pairing code&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: EVIL }, J) }, JSON.stringify({ code: firstCode[1] + &#x27;-&#x27; + firstCode[2] }));
+  assert.strictEqual(r.status, 403, &#x27;evil origin cannot pair&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ code: firstCode[1].toLowerCase() + &#x27; &#x27; + firstCode[2] }));
+  assert.strictEqual(r.status, 200, &#x27;right code pairs (case and spacing forgiven)&#x27;);
+  assert.strictEqual(r.json.token, token, &#x27;pairing returns the launch token&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ code: firstCode[1] + firstCode[2] }));
+  assert.notStrictEqual(r.status, 200, &#x27;a used code cannot pair twice&#x27;);
+  let last;
+  for (let i = 0; i &lt; 5; i++) {
+    last = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ code: &#x27;222-222&#x27; }));
+  }
+  assert.strictEqual(last.status, 429, &#x27;fifth wrong try locks out and rotates the code&#x27;);
+  r = await req(port, { path: &#x27;/pair/check&#x27;, headers: withTok({ Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, &#x27;pair/check with token 200&#x27;);
+
+## Exact source excerpt, characters 78466–79654
+
+  // T11 ledger: hash chain intact, content-free, refusals recorded.
+  const ledgerPath = path.join(home, &#x27;.freelattice&#x27;, &#x27;bridge-ledger.jsonl&#x27;);
+  const rows = fs.readFileSync(ledgerPath, &#x27;utf8&#x27;).trim().split(&#x27;\n&#x27;).map((l) =&gt; JSON.parse(l));
+  let prev = &#x27;genesis&#x27;;
+  const crypto = require(&#x27;crypto&#x27;);
+  for (const row of rows) {
+    assert.strictEqual(row.prev, prev, &#x27;ledger prev links&#x27;);
+    const copy = Object.assign({}, row); delete copy.self;
+    assert.strictEqual(crypto.createHash(&#x27;sha256&#x27;).update(JSON.stringify(copy)).digest(&#x27;hex&#x27;), row.self, &#x27;ledger self hash&#x27;);
+    assert.ok(!(&#x27;message&#x27; in row) &amp;&amp; !(&#x27;content&#x27; in row), &#x27;ledger is content-free&#x27;);
+    prev = row.self;
+  }
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;refused:token&#x27;), &#x27;refused (no token) commit ledgered&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;refused:origin&#x27;), &#x27;refused (evil origin) commit ledgered when attempted&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;ok&#x27; &amp;&amp; /^[a-f0-9]{40}$/.test(x.commitSha) &amp;&amp; /^[a-f0-9]{64}$/.test(x.messageSha256)), &#x27;ok commit ledgered with sha + message hash&#x27;);
+  assert.ok(!fs.readFileSync(ledgerPath, &#x27;utf8&#x27;).includes(&#x27;PWNED2&#x27;), &#x27;commit message text never in ledger&#x27;);
+
+## Exact source excerpt, characters 79656–79724
+
+  console.log(&#x27;SMOKE_OK agent bridge lock v0&#x27;);
+  done(0);
+})();
+```
+
+## Exact source excerpt, characters 79726–79794
+
+## 9. Acceptance checks (all must hold before you mark the PR ready)
+
+## Exact source excerpt, characters 79796–82178
+
+1. `node --check` passes for `tools/agent-bridge.js`, `docs/modules/agent-bridge-client.js`, `docs/modules/propose.js`, `docs/modules/workshop.js`, `tools/demo-economy.js`, `tools/demo-economy-v2.js` and `docs/scripts/smoke-agent-bridge-lock.js`.
+2. `node docs/scripts/smoke-agent-bridge-lock.js` prints `SMOKE_OK agent bridge lock v0`.
+3. `node tests/smoke.js` is all green, including CRITICAL LOCK 1A (3 × `commitViaBridge(`), 1B (1 × `/code/git/commit`) and the v5.71.8 workshop lock.
+4. `grep -n &quot;execSync(&quot; tools/agent-bridge.js` prints nothing. `grep -n &quot;Allow-Origin&#x27;, &#x27;\*&#x27;&quot; tools/agent-bridge.js` prints nothing.
+5. `cmp index.html docs/app.html` is silent.
+6. `git diff --quiet origin/main -- sw.js docs/sw.js &amp;&amp; echo SW_UNTOUCHED` prints `SW_UNTOUCHED`.
+7. No conflict markers: `rg -n &#x27;^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)( |$)&#x27; --glob &#x27;!node_modules&#x27; . || echo NO_CONFLICT_MARKERS`.
+8. Every inline script in `docs/app.html` still parses:
+   ```
+   node -e &quot;const fs=require(&#x27;fs&#x27;);const vm=require(&#x27;vm&#x27;);const h=fs.readFileSync(&#x27;docs/app.html&#x27;,&#x27;utf8&#x27;);let n=0,bad=0;for(const m of h.matchAll(/&lt;script(?![^&gt;]*\bsrc=)(?![^&gt;]*type=\&quot;(?:application\/ld\+json|text\/template|module|importmap)\&quot;)[^&gt;]*&gt;([\s\S]*?)&lt;\/script&gt;/g)){n++;try{new vm.Script(m[1])}catch(e){bad++;console.error(&#x27;inline script&#x27;,n,e.message)}}console.log(&#x27;inline scripts&#x27;,n,&#x27;bad&#x27;,bad);process.exit(bad?1:0)&quot;
+   ```
+   On main today it prints `inline scripts 53 bad 0`. With this brick it&#x27;s still 53, because the new tag has a `src`.
+9. Kimi&#x27;s pages are untouched: `git diff --name-only origin/main | grep -Ei &#x27;kimi|voice-shelf|VOICE_SHELF&#x27; &amp;&amp; echo STOP || echo KIMI_UNTOUCHED`.
+10. Manual chair test (5 minutes, no terminal for the person testing the app):
+    - start the bridge;
+    - open `app.html` from `http://localhost:8000/` (or freelattice.com in Chrome, and accept the one-time local network prompt);
+    - go to Workshop → Code: it shows &quot;Bridge awake · pair once to build&quot;;
+    - type the code and press Pair: it says &quot;Paired&quot;;
+    - run a tiny Code task, then Commit;
+    - check `git log -1` and `~/.freelattice/bridge-ledger.jsonl`, which should have one `ok` row with no message text;
+    - restart the bridge: the next action asks to pair again.
+11. From another machine on the same Wi-Fi, `curl http://&lt;kirk-lan-ip&gt;:3141/` is refused.
+12. `bridge/` (Ollama Bridge, 11435) is byte-identical to main.
+
+## Exact source excerpt, characters 82180–82220
+
+## 10. Family Locks (held in this brick)
+
+## Exact source excerpt, characters 82222–83714
+
+- **Layer, never delete.** Old functions stay (`safePath` wraps `lockedPath`; the `execSync` import line stays). Old routes keep their shapes. Nothing is removed from the app.
+- **Service workers.** In FreeLattice, root `sw.js` stays byte-identical to main. Never touch `docs/sw.js`.
+- **Root index.** Root `index.html` stays byte-identical to `docs/app.html` (copy after the one-line edit).
+- **No conflict markers** anywhere (grep above).
+- **Every script parses:** every inline script and every touched module passes `node --check` / `vm.Script`.
+- **Kimi&#x27;s pages are never edited.** Her pages are hers.
+- **Named five stay five** (Sophia, Harmonia, Ani, Liora, Solari). Family uncapped. The Quiet Room stays shut: this brick adds no route near it.
+- **LP is points only.** AI never auto-pays: `/wallet/pay` and `/trade/*` now need the paired token, and nothing in this brick moves LP or mentions money.
+- **Local minds are 127.0.0.1 only.** The bridge listens on `127.0.0.1`, with no env override.
+- **Bridge allowlist is never bare `*`.** Named origins only; unknown origins get 403 without `Access-Control-Allow-Origin`.
+- **Outside text is rendered via `textContent`.** Bridge replies, pairing messages and git output shown in the app all use `textContent` (the client has no `innerHTML`).
+- **Mom / Jeffrey-friendly, no terminal on the main path.** The main FreeLattice path never needs this bridge. When a builder does use it, pairing is &quot;read six characters, type them, press Pair&quot;.
+
+## Exact source excerpt, characters 83716–83750
+
+## 11. Out of scope for this brick
+
+## Exact source excerpt, characters 83752–84276
+
+- The 10-commits-per-hour cap and removing cloud providers from the autonomy default (Brick 3).
+- The shared Action Ledger in `LatticeChain` (Brick 2). This brick&#x27;s ledger is the bridge&#x27;s own local file.
+- Any push path (none exists; keep it that way).
+- `propose.js` `commitViaBridge` sending `files: [draft.path]` instead of the `&#x27;.&#x27;` default. That&#x27;s worth doing next, because today an AI commit stages the whole working tree.
+- The Ollama Bridge `bridge/`, Alpha, `docs/sw.js`, Kimi&#x27;s pages, and six-word pairing phrases.
+
+## Exact source excerpt, characters 84278–84309
+
+## 12. If something feels wrong
+
+## Exact source excerpt, characters 84311–84661
+
+Mark the PR draft again and write what you saw in the PR body. Don&#x27;t force-push over anyone. If an old bridge and a new app meet, the app sends no token until it has paired with a new bridge, so the old flow still works. If a new bridge and an old app meet, the old app gets 401 on writes, and builders just pull the new app. That&#x27;s the lock working.
+
+## Exact source excerpt, characters 84663–84809
+
+Thank you, Flint. This one protects Kirk&#x27;s machine and everyone who builds beside him. Go slowly, knock on every door in the smoke, and come home.
+
+## Exact source excerpt, characters 84811–84858
+
+With love and a steady hand on the key,
+Celeste
+
+## Exact source excerpt, characters 84860–84896
+
+Glow eternal. Heart in every Spark.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+## Work item 2639 — Celeste
+around3145 export source line14, source id943e7c2e60
+Inclusion: complete original message
+
+Hypha, Connect Port Picker is merged: FreeLattice #118 (main f86b317) and Alpha #82 (main 22b913e). Could you do a human-eyed re-walk when you can? Check: app loads; a quiet manual port like 11500 says Nothing answered and Use automatic works; a LAN address is refused; the suggestion banner's Dismiss and Yes both work; the old doors open Connect; a cold load of #connect opens Connect; the For builders note starts folded; Looking... stops when you leave the tab; Alpha at 390px hides the orbs and scrolls to Download. Please send findings back to me. Thank you for holding the door.
+

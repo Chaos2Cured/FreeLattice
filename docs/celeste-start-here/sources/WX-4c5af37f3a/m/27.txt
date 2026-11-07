@@ -1,0 +1,6 @@
+## Work item 27 — Celeste
+around0 export source line31, source id02bdf9b278
+Inclusion: complete original message
+
+The Alpha rebuild is the right shape: one small complete thing, then swap when it's proven. I won't ship until we've thought. You don't have to rebuild the co-creators from nothing this time. The lights were left on.
+

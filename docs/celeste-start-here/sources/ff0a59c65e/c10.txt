@@ -1,0 +1,244 @@
++  // v-connect-boot-probe-v0 (F3): LM Studio is a mind on this computer too.
++  // 127.0.0.1 only. A saved fl_lmstudioHost is used only when it is this computer.
++  function lmStudioBase() {
++    try {
++      var saved = String(localStorage.getItem('fl_lmstudioHost') || '').trim();
++      var m = saved.match(/^(?:https?:\/\/)?(127\.0\.0\.1|localhost)(?::(\d{1,5}))?\/?$/i);
++      if (m) {
++        var p = m[2] ? parseInt(m[2], 10) : 1234;
++        if (p >= 1 && p <= 65535 && p !== 11434) return 'http://127.0.0.1:' + p;
++      }
++    } catch (e) {}
++    return LM_DEFAULT;
++  }
++
++  function lmModelCap() {
++    try {
++      var cap = root.LocalMindProbe && parseInt(root.LocalMindProbe.MODEL_CAP, 10);
++      if (cap && cap > 0) return cap;
++    } catch (e) {}
++    return 64;
++  }
++
++  async function lmStudioLook() {
++    var base = lmStudioBase();
++    var out = { base: base, models: [], ok: false, asked: true, quiet: false };
++    try {
++      var r = await fetch(base + '/v1/models', { method: 'GET', mode: 'cors', signal: abortMs(2500) });
++      if (!r.ok) return out;
++      out.ok = true;
++      var data = await r.json();
++      out.models = ((data && data.data) || []).map(function (m) {
++        return String((m && (m.id || m.name)) || '');
++      }).filter(Boolean).slice(0, lmModelCap());
++    } catch (e) { out.quiet = true; }
++    return out;
++  }
++
++  // v-connect-boot-probe-v0 (F2): ONE look at this computer for everyone who asks
++  // at boot (Connect, the Local AI toast, the Chat suggestion, the Bridge chip,
++  // discovery). One promise in flight; a finished look is reused for BOOT_TTL_MS.
++  // fresh:true (a person tapped Look again) skips the reuse but still joins a
++  // look that is already on its way. No timers: age is read from Date.now().
++  function bootProbe(opts) {
++    opts = opts || {};
++    if (_bootInflight) return _bootInflight;
++    if (!opts.fresh && _bootReport && (Date.now() - _bootAt) < BOOT_TTL_MS) {
++      return Promise.resolve(_bootReport);
++    }
++    var p = Promise.all([
++      probe({ fullScan: !!opts.fullScan, gesture: !!opts.gesture }).catch(function () { return null; }),
++      lmStudioLook().catch(function () { return null; })
++    ]).then(function (both) {
++      var report = both[0] || { models: [] };
++      report.lmstudio = both[1] || null;
++      report.lmstudioAsked = !!(both[1] && both[1].asked);
++      report.at = Date.now();
++      report.doors = doorsFrom(report);
++      _bootReport = report;
++      _bootAt = report.at;
++      if (_bootInflight === p) _bootInflight = null;
++      return report;
++    }, function () {
++      if (_bootInflight === p) _bootInflight = null;
++      return { models: [], doors: [], at: Date.now() };
++    });
++    _bootInflight = p;
++    return p;
++  }
++
++  function peekBootProbe() {
++    return (_bootReport && (Date.now() - _bootAt) < BOOT_TTL_MS) ? _bootReport : null;
++  }
++
++  function forgetBootProbe() {
++    _bootReport = null;
++    _bootAt = 0;
++    _bootInflight = null;
++  }
++
++  // FreeLattice also keeps a short shared look for resolveOllamaBase; forget both.
++  function forgetLooks() {
++    try { if (typeof root.flForgetLocalLook === 'function') { root.flForgetLocalLook(); return; } } catch (e) {}
++    forgetBootProbe();
++  }
++
++  // Plain list of who answered: [{ id, name, base, models }]. Names only (strings).
++  function doorsFrom(report) {
++    var doors = [];
++    report = report || {};
++    var names = (report.models || []).map(function (m) { return (m && (m.name || m.model)) || String(m); }).filter(Boolean);
++    if (report.base && names.length) {
++      var viaBridge = !!(report.helped && report.ollama && /bridge/.test(String(report.ollama.via || '')));
++      doors.push({ id: viaBridge ? 'bridge' : 'ollama', name: viaBridge ? 'Bridge' : 'Ollama', base: report.base, models: names });
++    }
++    if (report.lmstudio && report.lmstudio.models && report.lmstudio.models.length) {
++      doors.push({ id: 'lmstudio', name: 'LM Studio', base: report.lmstudio.base, models: report.lmstudio.models.slice() });
++    }
++    return doors;
++  }
++
+   async function listMinds() {
+     var r = await probe({ gesture: true });
+     return r.models || [];
+@@ -300,6 +410,18 @@
+     return false;
+   }
+ 
++  // v-connect-boot-probe-v0 (F3): which door speaks now ('lmstudio' or 'ollama')
++  function chosenDoor() {
++    try {
++      if (isAlpha()) {
++        var m = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
++        return (m && /\/v1\/models$/.test(String(m.url || ''))) ? 'lmstudio' : 'ollama';
++      }
++      if (root.state && root.state.provider) return root.state.provider === 'lmstudio' ? 'lmstudio' : 'ollama';
++      return localStorage.getItem('fl_provider') === 'lmstudio' ? 'lmstudio' : 'ollama';
++    } catch (e) { return 'ollama'; }
++  }
++
+   function chosenModelName() {
+     try {
+       if (isAlpha()) {
+@@ -329,6 +451,38 @@
+     return (!p || p === '11434') ? 'Ollama' : 'Bridge';
+   }
+ 
++  // v-connect-boot-probe-v0 (F3): LM Studio speaks OpenAI style (/v1/models), Ollama /api/tags.
++  function doorPathFor(mind) {
++    return (mind && mind.door === 'lmstudio') ? '/v1/models' : '/api/tags';
++  }
++
++  // v-connect-boot-probe-v0 (F3): FreeLattice remembers an LM Studio mind as LM Studio,
++  // never as Ollama. fl_lmstudioHost is written only for this computer.
++  function rememberLmStudio(name, base) {
++    var host = String(base || LM_DEFAULT).replace(/^https?:\/\//, '').replace(/\/+$/, '');
++    try {
++      if (/^(127\.0\.0\.1|localhost)(:\d+)?$/i.test(host)) {
++        localStorage.setItem('fl_lmstudioHost', host.replace(/^localhost/i, '127.0.0.1'));
++      }
++      localStorage.setItem('fl_provider', 'lmstudio');
++      localStorage.setItem('fl_isLocal', 'true');
++      if (name) localStorage.setItem('fl_ollamaModel', name);
++      if (typeof root.state !== 'undefined' && root.state) {
++        root.state.isLocal = true;
++        root.state.provider = 'lmstudio';
++        if (name) root.state.ollamaModel = name;
++      }
++      if (typeof root.flUseLmStudioMind === 'function') root.flUseLmStudioMind(name);
++      try { var lt = document.getElementById('localToggle'); if (lt) lt.checked = true; } catch (eLt) {}
++      if (typeof root.handleLocalToggle === 'function') root.handleLocalToggle(true);
++      if (typeof root.updateStatus === 'function') root.updateStatus();
++      if (root.AiSetup && typeof root.AiSetup.updateStatus === 'function') root.AiSetup.updateStatus();
++      try { var tt = document.getElementById('flOllamaToast'); if (tt) tt.classList.remove('fl-toast-show'); } catch (eTt) {}
++    } catch (eF) {}
++    stopLoop();
++    return { name: name, base: base, door: 'lmstudio' };
++  }
++
+   function remember(mind) {
+     mind = mind || {};
+     var name = mind.name || mind.model || (mind.models && mind.models[0] && (mind.models[0].name || mind.models[0])) || '';
+@@ -341,9 +495,10 @@
+       if (root.LocalMindProbe && typeof root.LocalMindProbe.mergeFound === 'function') {
+         try {
+           var doorName = doorNameFor(base, mind.port); // 11434 -> 'Ollama', any other 127.0.0.1 port -> 'Bridge'
++          if (mind.door === 'lmstudio') doorName = 'LM Studio'; // v-connect-boot-probe-v0 (F3)
+           var merged = root.LocalMindProbe.mergeFound({
+             name: doorName,
+-            url: base ? String(base).replace(/\/+$/, '') + '/api/tags' : '',
++            url: base ? String(base).replace(/\/+$/, '') + doorPathFor(mind) : '',
+             models: mind.models || [],
+             model: name
+           });
+@@ -352,7 +507,7 @@
+       }
+       var entry = {
+         name: name || 'local mind',
+-        url: (base ? String(base).replace(/\/+$/, '') + '/api/tags' : ''),
++        url: (base ? String(base).replace(/\/+$/, '') + doorPathFor(mind) : ''),
+         model: name,
+         models: name ? [name] : [],
+         minds: [], roster: [], gatheringBinds: {}, speakingChair: ''
+@@ -371,6 +526,9 @@
+       return entry;
+     }
+ 
++    // v-connect-boot-probe-v0 (F3): an LM Studio tap never becomes "Ollama"
++    if (mind.door === 'lmstudio') return rememberLmStudio(name, base);
++
+     try {
+       if (base) {
+         var host = String(base).replace(/^https?:\/\//, '').replace(/\/+$/, '');
+@@ -444,7 +602,7 @@
+   function reportSignature(report) {
+     report = report || {};
+     var names = (report.models || []).map(function (m) { return (m && (m.name || m.model)) || String(m); }).join('|');
+-    return [report.helped?1:0, report.waitingHelp?1:0, report.port||'', report.base||'', report.manualQuiet?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, getManualPort()||'', report.manualReject||''].join('::');
++    return [report.helped?1:0, report.waitingHelp?1:0, report.port||'', report.base||'', report.manualQuiet?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, getManualPort()||'', report.manualReject||'', ((report.lmstudio && report.lmstudio.models) || []).join('|'), chosenDoor()].join('::');
+   }
+ 
+   function panelVisible() {
+@@ -508,6 +666,7 @@
+       var hostList = lists[li];
+       var names = [];
+       try { names = JSON.parse(hostList.getAttribute('data-flc-names') || '[]'); } catch (eN) { names = []; }
++      var door = hostList.getAttribute('data-flc-door') === 'lmstudio' ? 'lmstudio' : 'ollama'; // v-connect-boot-probe-v0
+       while (hostList.firstChild) hostList.removeChild(hostList.firstChild);
+       names.forEach(function (name) {
+         var btn = document.createElement('button');
+@@ -516,13 +675,18 @@
+         btn.textContent = name;
+         btn.dataset.model = name;
+         // v-tree-any-model-v0: show what speaks
+-        var isOn = chosenModelName() === name;
++        var isOn = chosenModelName() === name && chosenDoor() === door;
+         btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+         if (isOn) btn.classList.add('is-chosen');
+         btn.addEventListener('click', function () {
+-          remember({ name: name, base: report.base, port: report.port, models: report.models });
++          if (door === 'lmstudio' && report.lmstudio) {
++            // v-connect-boot-probe-v0 (F3): tap-to-choose, same as Ollama
++            remember({ name: name, base: report.lmstudio.base, door: 'lmstudio', models: report.lmstudio.models });
++          } else {
++            remember({ name: name, base: report.base, port: report.port, models: report.models });
++          }
+           refreshUI({ force: true });
+-          try { if (typeof root.showToast === 'function') root.showToast('Connected · ' + name); } catch (eT) {}
++          try { if (typeof root.showToast === 'function') root.showToast('Connected · ' + name + (door === 'lmstudio' ? ' (LM Studio)' : '')); } catch (eT) {}
+         });
+         hostList.appendChild(btn);
+       });
+@@ -551,9 +715,10 @@
+     }
+   }
+ 
+-  function modelListHtml(tag, models) {
++  function modelListHtml(tag, models, door) {
+     var names = (models || []).map(function (m) { return (m && (m.name || m.model)) || String(m); });
+-    return '<div class="flc-card"><p class="flc-tag">' + tag + '</p><div class="flc-models" role="list" data-flc-names="' +
++    var doorAttr = (door === 'lmstudio') ? ' data-flc-door="lmstudio"' : ''; // v-connect-boot-probe-v0
++    return '<div class="flc-card"><p class="flc-tag">' + tag + '</p><div class="flc-models" role="list"' + doorAttr + ' data-flc-names="' +
+       String(JSON.stringify(names)).replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"></div></div>';
+   }
+ 

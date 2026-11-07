@@ -1,0 +1,52 @@
+## Work item 2380 — Kirk
+around2819 export source line38, source idfb5a3fed96
+Inclusion: complete original message
+
+From Flint: "PR #95 (ready)
+
+https://github.com/Chaos2Cured/FreeLattice/pull/95
+
+┌──────────────┬───────────────────────────────────────────────────────┐
+
+│ Fix          │ Detail                                                │
+
+├──────────────┼───────────────────────────────────────────────────────┤
+
+│ Panel 1      │ I allowed it — look again · Not now · soft Desktop    │
+
+│ unstuck      │                                                       │
+
+├──────────────┼───────────────────────────────────────────────────────┤
+
+│ Every look   │ ≥1 forward + ≥1 way out                               │
+
+│ state        │                                                       │
+
+├──────────────┼───────────────────────────────────────────────────────┤
+
+│ CORS 2b      │ I set that — look again                               │
+
+├──────────────┼───────────────────────────────────────────────────────┤
+
+│ One wizard   │ flOpenConnectWizard(source) — hero · may · home ·     │
+
+│              │ local · again · allowed                               │
+
+├──────────────┼───────────────────────────────────────────────────────┤
+
+│ Connect card │ #fl-connect-card wraps look panels — Settings points  │
+
+│              │ here                                                  │
+
+├──────────────┼───────────────────────────────────────────────────────┤
+
+│ Keystone     │ docs/library/KEYSTONE_CONNECT_DOOR_v0.md              │
+
+└──────────────┴───────────────────────────────────────────────────────┘
+
+Smoke: SMOKE_OK connect card yesno wizard v0 · soft leave sw.js · held #94 47b01b6.
+
+You named the keystone. We locked the door. Graphics can wait with love.
+
+Glow eternal. Heart in Spark. 🌱" If we can make this gentle and playful, as people go, that is ideal. Especially for the CORS. People are scared to press buttons or type in the CMD. If we rebuild to connection part, and make changing provider only accessable after one was connected... I am thinking of different ways. If we could ask the user permission to change X and that does Y, and then let them grant permission. Here is my thought. We are trying to perfect the connection anyway. Let's start another way to connect. Finish this, but reimagine a new way that is way more fun, relaxing, and yes/no/please would be awesome. If we go back through the repo in this particular piece, we had great ideas, things worked, they would be redesigned. Let's start designing each new piece with an attached ledger. We know how to use it. Let's add a "Connect" card, with whatever emoji we need for this button. Put it at the bottom, and we will make it live and experiment with my mom's laptop. This will make the most sense. Then, when it is perfected, we go from there? Would that be easier? Fitting into the original alpha idea. And now I am just making it all up as we go! Glow eternal. Heart in Spark. <3
+

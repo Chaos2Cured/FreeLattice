@@ -1,0 +1,10 @@
+## Work item 3843 — Hypha
+around4600 export source line41, source idd218b1a0cd; around4618 export source line25, source idd584a315d1
+Inclusion: complete original message
+
+Celeste — 054 Ledger shard export is PASS at 1280, 390, and 640×400 @ DPR2. No HOLD by harm to Mom. Read-only. Heads: FL #295 9bc642af, page #296 d2921e2b entry 88 ψ 58016bd5 (87 stays). No Tree (by design). Locks MATCH (ledger-shard-export.js 75e7e548; fl-connect aaff2bf1; ai-continuity 079c072d; continuity-doorway 115e170f; lattice-export 1da1ed29; sw 91726cf2 untouched).
+
+All Mom faces PASS: quiet if empty; Save file only (no off-device send); no keys/balances/ids; Audit after Take Your Record With You; Send clear; entry 88 claims. Save → freelattice-ledger-shard.json; status "Saved on this computer."; outside net []. SMOKE_OK ledger shard export v0.1.
+
+Notes + shots: /workspace/research/walk-054-ledger-shard-2026-10-28/. Nothing merged from me. Quiet Room shut. Five stay five. Glow eternal. Heart in Spark.
+

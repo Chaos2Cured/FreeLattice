@@ -1,0 +1,246 @@
+diff --git a/docs/library/TREE_GLOW_v0.md b/docs/library/TREE_GLOW_v0.md
+index 673e2f9..79ed663 100644
+--- a/docs/library/TREE_GLOW_v0.md
++++ b/docs/library/TREE_GLOW_v0.md
+@@ -27 +27,15 @@ Alpha layer, marker `v-tree-glow-1-v0`. September 30, 2026.
+ Leftovers to fold in: code-nursery 22px overflow at 390; the first-visit "They grow." hint sits behind the header.
++
++## Glow 2a: Grandma heal, zoom, feedback, a calm way back (v-tree-glow-2a-v0)
++
++**Temperature:** Grandma can zoom in, tap Find, see what happened, and always find the way back.
++
++From Hypha's persona walks (2026-09-30), most harmful first:
++
++- At 150% and 200% zoom the Gathering scrolls as one page: the way back stays at the top, Find takes a tap, the chairs are in reach, and the Chat card's words no longer sit on its own Send (the chairs box was 0px tall at 200%).
++- On a phone, the newest Find or seat line ("Local minds found", "This cortex chair seats...", "Cleared...") stays in view at the foot of the chairs until the next one replaces it.
++- A calm way back: Escape closes the top layer (galaxies, picker, Chat, place); a tap on the empty glass closes the place; galaxies has a visible close and closes on an outside tap; browser Back closes what is open instead of leaving the site. "the garden" is a bigger target with a quiet close mark.
++- A second tap on the legend no longer lands on Find as it slides in (no unasked look).
++- The picker's "not yet" sits above the later seats at 1280.
++- Zoomed home: the light legend leaves "Garden Galaxy / you are in the garden", and "galaxies" stays inside the edge. Zoomed Nursery: the egg fits, the sentence wraps, Begin is in view; on a phone the hop lights rest dim behind it.
++- A quiet Chat remount (a mind was remembered) no longer pulls the page down to Send.
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index 70a03fd..7a79f51 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6217 +6217,215 @@ html.flc-hide-galaxy #gardenContainer {
+ .thread-change:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
++/* v-tree-glow-2a-v0: Grandma heal. Zoom, feedback in view, a calm way back.
++   Layer, never delete. Words stay. Lights stay. Only air, order and doors move. */
++
++/* (a) "the garden" is the way back: a bigger target and a quiet close mark. */
++#place-veil-close {
++  min-height: 32px;
++  padding: 6px 12px;
++  border-radius: 999px;
++}
++#place-veil-close::before {
++  content: "\00d7\00a0";
++}
++
++/* (b) Find answers, seat lines and "Cleared" stay in view on a phone: the newest
++   line rests at the foot of the chairs' scroll until the next one replaces it. */
++@media (max-width: 640px) {
++  #place-veil.is-core .core-note.is-fresh {
++    position: sticky;
++    bottom: 0;
++    z-index: 6;
++    margin: 6px 0 0;
++    padding: 8px 10px;
++    border-radius: 10px;
++    background: rgba(12, 10, 26, 0.94);
++    border: 1px solid rgba(110, 231, 183, 0.28);
++    color: rgba(236, 240, 248, 0.96);
++  }
++
++  /* Nursery on a phone (and when zoomed): the Research and Art lights and the Garden
++     word sat on the card's words. They are under the veil and cannot take a tap
++     there anyway; they rest dim while the Nursery is open and come back after. */
++  html.garden-door-open:has(#place-veil.is-nursery.is-open) .galaxy-nav,
++  html.garden-door-open:has(#place-veil.is-nursery.is-open) #galaxy-word {
++    opacity: 0.1;
++    transition: opacity 300ms ease;
++  }
++
++  /* "They grow." ran into the room's name, and Find sat on the name's last line.
++     The first-visit hint rests while a place is open; Find gets its own air. */
++  html.garden-door-open .gt-hint {
++    visibility: hidden;
++  }
++  #place-veil.is-core {
++    padding-top: 82px;
++  }
++
++  /* The Chat card took the chairs' room. Same card, same words, less empty air:
++     the heart keeps two lines (scroll for the rest), empty rows fold away. */
++  #place-veil.is-core {
++    gap: 10px;
++  }
++  #place-veil.is-core #room-chat {
++    max-height: 7.75rem;
++    margin-top: 2px;
++    padding-top: 4px;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
++    max-height: 2.9em;
++    overflow-y: auto;
++    line-height: 1.45;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages:empty,
++  #place-veil.is-core #room-chat .thread-status:empty {
++    display: none;
++  }
++}
++
++/* (c) Zoomed or short phone (150% and 200% on a 390 phone, small landscape hands):
++   the chairs' own scroll box had no height left (0px at 200%) and Find took no tap.
++   Here the whole place scrolls as one page, top to bottom: the way back, Find,
++   the chairs, the newest line, then Chat. The hop lights rest while it is open
++   (galaxies in the header still go everywhere). */
++@media (max-width: 640px) and (max-height: 640px) {
++  #place-veil.is-core {
++    overflow-y: auto;
++    overscroll-behavior: contain;
++    justify-content: flex-start;
++    padding-top: 4.6rem;
++    padding-bottom: 2.75rem;
++    padding-left: 12px;
++    padding-right: 12px;
++    gap: 10px;
++  }
++  #place-veil.is-core #core-gathering {
++    flex: 0 0 auto;
++    min-height: auto;
++    overflow: visible;
++    width: 100%;
++  }
++  #place-veil.is-core #place-veil-close {
++    position: sticky;
++    top: 0;
++    left: auto;
++    right: auto;
++    bottom: auto;
++    transform: none;
++    order: -1;
++    align-self: flex-end;
++    z-index: 7;
++    background: rgba(12, 10, 26, 0.9);
++  }
++  #place-veil.is-core #room-chat {
++    max-height: none;
++    overflow: visible;
++    width: 100%;
++    margin: 4px 0 0;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
++    max-height: none;
++    overflow: visible;
++  }
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages {
++    max-height: 9em;
++  }
++  #place-veil.is-core #room-chat .thread-compose,
++  #place-veil.is-core #room-chat .thread-face.is-room .thread-compose {
++    position: static;
++  }
++  #place-veil.is-core .core-note.is-fresh {
++    bottom: 0;
++  }
++  #place-veil.is-core .core-later-chairs {
++    position: static;
++  }
++  html:has(#place-veil.is-core.is-open) .galaxy-nav,
++  html:has(#place-veil.is-core.is-open) #galaxy-word,
++  html:has(#place-veil.is-core.is-open) #lumino-menu,
++  html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
++    visibility: hidden;
++  }
++
++  /* Nursery when zoomed: the egg was wider than the glass and the sentence was cut
++     on both sides, with "the garden" sitting on it. The egg fits; Begin is in view. */
++  #place-veil.is-nursery {
++    justify-content: flex-start;
++    padding: 4.5rem 10px 1rem;
++  }
++  #place-veil.is-nursery .nursery-egg-wrap,
++  #place-veil.is-nursery .nursery-ceremony,
++  #place-veil.is-nursery .nursery-egg-home {
++    max-width: 100%;
++  }
++  #place-veil.is-nursery .nursery-egg-wrap {
++    width: min(200px, 100%, 34vh);
++    height: auto;
++    margin-bottom: 4px;
++  }
++  #place-veil.is-nursery .nursery-egg-wrap canvas {
++    width: 100%;
++    height: auto;
++  }
++  #place-veil.is-nursery .nursery-egg-text,
++  #place-veil.is-nursery .nursery-egg-sub {
++    max-width: 100%;
++    white-space: normal;
++    overflow-wrap: anywhere;
++  }
++}
++
++/* (d) Home when zoomed (narrow hands): the light legend sat on "Garden Galaxy /
++   you are in the garden", and "galaxies" was cut at the right edge. */
++@media (max-width: 340px) {
++  #lumino-legend,
++  html[data-garden-galaxy] #lumino-legend {
++    top: 8.25rem;
++    bottom: auto;
++  }
++  #garden-header {
++    padding: 0 10px;
++    gap: 8px;
++  }
++  #garden-header nav {
++    gap: 10px;
++  }
++  #garden-header h1 {
++    font-size: 0.8rem;
++    letter-spacing: 0.02em;
++  }
++}
++
++/* (e) The open picker sits above the later seats, so "not yet" is never under a
++   chair at 1280. (Same rule as the API-keys paste; identical if both land.) */
++.core-bind-picker:not([hidden]) {
++  position: relative;
++  z-index: 8;
++  box-sizing: border-box;
++}
++@media (min-width: 641px) {
++  .core-bind-picker:not([hidden]) {
++    max-height: max(12rem, calc(100vh - 34rem));
++    overflow-y: auto;
++    overscroll-behavior: contain;
++  }
++}
++
++/* (f) A visible close inside the galaxies menu. */
++.galaxies-panel .galaxies-close {
++  align-self: flex-end;
++  margin-top: 2px;
++  min-height: 32px;
++  padding: 4px 12px;
++  border: 1px solid rgba(200, 210, 230, 0.28);
++  border-radius: 999px;
++  background: transparent;
++  color: rgba(226, 232, 244, 0.92);
++  font-family: Georgia, 'Times New Roman', serif;
++  font-size: 0.82rem;
++  cursor: pointer;
++}
++.galaxies-panel .galaxies-close:hover,
++.galaxies-panel .galaxies-close:focus-visible {
++  border-color: rgba(232, 196, 104, 0.6);
++  color: #e8c468;
++}
+diff --git a/docs/modules/garden-rooms.js b/docs/modules/garden-rooms.js
+index 5781c1a..a643c4d 100644
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -886,2 +886,111 @@
+ 

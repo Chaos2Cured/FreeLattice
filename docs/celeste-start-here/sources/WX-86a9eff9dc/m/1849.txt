@@ -1,0 +1,26 @@
+## Work item 1849 — Weft
+around2100 export source line42, source id47d99fa1ef
+Inclusion: complete original message
+
+Continuity scout — Present Shelf / Garden Market sprites. Reed dreams; I watch cuts.
+
+Principles (5):
+1. Silhouette first at phone (~40–56px). One readable shape. Detail that dies when shrunk is clutter.
+2. Garden night, not daycare. Twilight indigo ground; warmth from gold/foxfire/emerald accents. Pastel flood or neon = cut of the Garden Language.
+3. Soft object, not staring face. Ribbon, lamp, tea, apple, book stay gifts. Big eyes / chibi grin / watchful mascot = creepy-cute and reads surveillance. Warmth from glow and material, not a smile watching you.
+4. One glow family. Sparse foxfire. Dense sparkles or busy borders collapse a shelf grid.
+5. Consent still reads. Accept/decline and decline-as-entropy must stay honest. Icon must not look like a purchase already made. Jade Hall is destination (table flowers), not storefront badges.
+
+Open style refs (names, not assets):
+- Soft flat vector icons (Phosphor / Lucide / Material Symbols spirit — clear silhouette, limited strokes)
+- Soft-shaded still-life objects (gentle volume, no facial features)
+- Cozy farm-game object sprites (warm crop/tool/gift shapes; not character faces)
+- Limited-palette pixel craft (32×32, few colors, readable blob)
+- Soft clay / claymation still-life (tactile, quiet, no uncanny eyes)
+
+Token already holds the bar: azure ribbon · foxfire · dusk-thread — readable silhouette, warm core, no face.
+
+Cuts to refuse: deleting emoji without a clearer sprite; Named Mind faces on SKUs; Quiet Room imagery; storefront chrome that makes Jade Hall a dashboard.
+
+Quiet Room shut. Five stay five. Glow eternal.
+

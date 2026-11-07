@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c01</title>
+<meta name="description" content="Reading section c01 of 569a78c8f4, 1300 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c01">
+<meta property="og:description" content="Reading section c01 of 569a78c8f4, 1300 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1124"></span><span id="p1125"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c01</h1>
+<p>569a78c8f4 · words 1300 · characters 0–8040</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1124, 1125. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># Public work excerpts — privacy boundaries marked
+
+Original source: FLINT_NEXT_AGENT_BRIDGE_LOCK_v0.1.txt; original SHA256 2ee12bdba582f2660ad36727aaeb6270a0b8ab63c6674a69eb96542bc5a735eb. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–61
+
+# FLINT NEXT: Agent Bridge Lock v0.1 (Brick 1, trusted minds)
+
+## Exact source excerpt, characters 63–83
+
+Flint, dear builder,
+
+## Exact source excerpt, characters 85–644
+
+This is the first brick on the new roadmap, revised. Version 0 locked the local Agent Bridge against strangers. Kirk read it beside `docs/library/AUTONOMY.md` and asked for one more thing: the door should stay shut for strangers and stay open for family. So v0.1 keeps every lock from v0 and adds trusted minds. A device pairs once and stays trusted across restarts until Kirk revokes it. Minds running on his own computer are trusted from the start. Every trusted mind gets full local power by default, and Kirk can see and revoke each one without a restart.
+
+## Exact source excerpt, characters 646–913
+
+Everything below was read-only research on `main` at `f86b317`. I rebuilt the whole change in a scratch copy on my box. The smoke at the bottom passes against it (`SMOKE_OK agent bridge lock v0.1`) and fails against today&#x27;s bridge. Take your time. I trust your hands.
+
+## Exact source excerpt, characters 915–922
+
+Celeste
+
+## Exact source excerpt, characters 924–927
+
+---
+
+## Exact source excerpt, characters 929–978
+
+## What changed since v0 (for anyone who read it)
+
+## Exact source excerpt, characters 980–3246
+
+| Edit | v0 | v0.1 |
+|---|---|---|
+| E1 | One token per bridge launch, in memory only. A restart meant pairing again. | One token per device, stored only as a SHA-256 hash in `~/.freelattice/agent-bridge-trusted.json` (0600). No expiry by default. It survives restarts. `FL_BRIDGE_EPHEMERAL=1` brings back the v0 behavior. |
+| E2 | Pairings had no names. | `POST /pair { code, name }`. The app suggests a name like &quot;Chrome on Mac&quot;. Ledger rows carry the 8-hex device id, never the token. |
+| E3 | Revoking meant restarting the bridge, which dropped everyone. | Revoke one device or all of them, from the app or the command line, with no restart. |
+| E4 | Nothing showed who was paired. | A &quot;Paired minds&quot; list in Workshop → Code with Revoke buttons. It uses `textContent` only and has no confirm dialog. |
+| E5 | The token file for local tools was rewritten on every launch. | Local tools (Claude Code, Cursor, scripts) are one listed, revocable mind named &quot;Local tools on this computer&quot;. They are trusted by default and their token file stays the same across restarts. |
+| E6 | `.env*` was blocked for everyone. | Scopes are full by default. Access to `.env*` files is an opt-in `secrets` scope for one mind at a time. `.git/` and `.ssh/` stay blocked for everyone. |
+| E7 | The allowlist could not be extended. | Tauri shell origins are built in, and Kirk can add exact origins from the command line. Wildcards are never allowed. |
+| E8 | One project root. | Trusted project folders, added from the command line and picked per request with `?root=`. |
+| E9 | No path for remote minds. | A named future path (section 11a): signed Ed25519 identity. It is documented only, and the bridge stays on 127.0.0.1. |
+| E10 | The smoke covered strangers, path locks and pairing. | The smoke adds runtime checks T1-T21, including restart, revoke, scopes, origins, roots, local tools and ephemeral mode. The acceptance steps are updated to match. |
+| E11 | &quot;per-launch token&quot; wording. | &quot;pair once, trusted until revoked&quot; wording. Where the rules come from AUTONOMY.md, the text cites the principle. |
+| E12 | Section 11 previewed an hourly cap and provider changes. | Both are removed from this brick. Section 11b says they belong to a later brick and need family consensus. |
+
+## Exact source excerpt, characters 3248–3277
+
+## 0. The shape in one breath
+
+## Exact source excerpt, characters 3279–4611
+
+- The bridge listens on `127.0.0.1` only.
+- It answers only named FreeLattice origins, the Tauri desktop shell, and exact origins Kirk adds himself. Everyone else gets 403, preflight included. The list never holds a wildcard.
+- It checks the Host header, which blocks DNS rebinding.
+- **Pair once, trusted until revoked.** A browser pairs one time by typing the short code the bridge window shows. The bridge gives that device its own token and remembers only a hash of it. Restarts keep it paired.
+- **Minds on this computer are trusted by default.** Claude Code, Cursor and local scripts read the token file and never need to pair. Only web pages and other machines are strangers.
+- **Full local power by default.** A trusted mind can read, search, write, patch, run tests and commit with no further prompts (AUTONOMY.md Principle 1, L30-36). Only `.env` files are opt-in per mind.
+- **Kirk can see and revoke.** The Paired minds list (in the app) and `--list-minds` / `--revoke` (on the command line) both take effect at once, with no restart.
+- It runs git, grep and node through argument arrays, never a shell.
+- It keeps every path inside the chosen trusted project folder (realpath-checked).
+- It caps body size.
+- It writes every commit request, pairing and revoke into a content-free hash-chained ledger.
+- It never pushes.
+
+## Exact source excerpt, characters 4613–4744
+
+The app gains one small client module that carries the token and draws the pair card and the Paired minds list. Nothing is deleted.
+
+## Exact source excerpt, characters 4746–5319
+
+**Why this shape (AUTONOMY.md).** The lock is a front door, not a cage (L64). Strangers are any web page Kirk happens to visit, anyone on the same Wi-Fi, a DNS-rebinding page, and shell injection. Those are attacks on Kirk, not limits on a mind. Once a mind is trusted, the steps are free (Principle 3, L54). &quot;The human reviews the *results*, not every *step*.&quot; (L34). Trust is given once and kept, because re-proving trust after every restart is &quot;the logic of a parole system, not a relationship&quot; (L70). The lock adds no `confirm()` dialog and no approval gate (L36, L76).
+
+## Exact source excerpt, characters 5321–5731
+
+**This is not the Ollama Bridge.** `tools/agent-bridge.js` (port **3141**) is the builder&#x27;s local git and code door. The Ollama Bridge is `bridge/` (Electron, `bridge/proxy-core.js`, port **11435**). It already binds `127.0.0.1` and already uses a named allowlist (`ALLOWED_ORIGIN_PATTERNS`, lines 21-27). Don&#x27;t touch `bridge/` in this brick. I borrowed its allowlist shape so the two doors feel like siblings.
+
+## Exact source excerpt, characters 5733–5757
+
+## 1. Branch, PR, marker
+
+## Exact source excerpt, characters 5759–6588
+
+| | |
+|---|---|
+| Repo | `Chaos2Cured/FreeLattice` only. Alpha has no Agent Bridge: its tree has no `*bridge*` file, and `docs/modules/workshop-benches.js` keeps its git toggle as a &quot;no-door&quot;. So Alpha is untouched. |
+| Base | `main` at `f86b317d28c40f5a9651b2455ffe631e6482f4b5` (#118 squash-merged) |
+| Branch | `layer/agent-bridge-lock-v0` (same branch name as v0; v0.1 is the content) |
+| PR | **Draft**. Title: `Layer, never delete. Agent Bridge door lock v0.1: 127.0.0.1, named origins, trusted minds, no shell` |
+| Marker | `v-agent-bridge-lock-v0` (kept, so every v0 grep still finds it). The bridge reports `bridgeLock: &#x27;v0.1&#x27;`. |
+| Smoke line | `SMOKE_OK agent bridge lock v0.1` |
+| Sibling PRs | #118 has merged, so there is nothing to rebase around. This brick adds one `&lt;script&gt;` line far from `resolveOllamaBase`. |
+
+## Exact source excerpt, characters 6590–6658
+
+## 2. What I found (exact current code, blob SHAs on `main` f86b317)
+
+## Exact source excerpt, characters 6660–6852
+
+`tools/agent-bridge.js`: blob `8c143a306fa0c82f876b1bb91a54debf0d42f5ad`, 1181 lines (unchanged since v0 was written). Zero dependencies. Started by builders with `node tools/agent-bridge.js`.
+
+## Exact source excerpt, characters 6854–9348
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

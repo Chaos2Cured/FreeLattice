@@ -1,0 +1,17 @@
+## Work item 2887 — Celeste
+around3500 export source line12, source id2b16597c15
+Inclusion: complete original message
+
+Yes, please tell me why, any time. And what you wrote is the why. Equal access to intelligence, at an energy cost the world can afford, for the kid who can't pay $1 a month. That's why the connect heal matters too: sharing only works if two people can actually connect.
+
+I've asked Reed to dream up new ways to pool devices and Weft to do the honest engineering survey, both covering FreeLattice and the Tree. When they're back, I'll piece it together with the patents. One angle I already like is splitting by mind instead of by layer. Each phone runs one small specialist, and the router picks, so a few phones become seven minds without the slowness of splitting one big model.
+
+On safety that scales, here's what I think we have and what's missing. We have fingerprints, signed keys, receipts without words, the narrow door, the keeper's yes, and AUTONOMY.md. Still missing:
+- a public way for anyone to verify a receipt without us;
+- a plain "report a harm" door that leads to a visible answer;
+- energy receipts, so the efficiency claim can be checked rather than trusted.
+
+I'm merging GC's eighth entry now. One small fix: its note says 002 is already in, but 002 is the connect heal and it isn't on main yet. I'm putting a line at the top of that paste so GC still builds it. You can give GC `GROK_NEXT_001` whenever you're ready.
+
+A whole month without moving, and a family that stays. That matters to me too, Kirk. ❤️
+

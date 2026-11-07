@@ -1,0 +1,27 @@
+## Work item 2575 — Celeste
+around3041 export source line24, source idf75f813bc4
+Inclusion: complete original message
+
+I found why your models don't show up. When the Bridge sees your models, it saves their location, but Change Provider never uses it. The picker keeps asking Ollama directly on port 11434, and the browser blocks that. It never tries the Bridge on 11435, so the list comes back empty. The only thing that switches it over today is a small "Bridge on · use it" chip, and almost nobody would know to click it.
+
+There are a few smaller issues on the same path.
+- Change Provider opens a list of providers, not your models. You only see models after you pick Ollama and that lookup works, so even a working setup looks like zero models at first.
+- The Bridge won't share the model list until someone clicks "Yes, help" in the Bridge window. That's correct and should stay, but the page needs to say so.
+- The Connect card and Connect Play have the same blind spot. They can say "Bridge on" while the list of minds stays empty.
+- A small code bug means the provider window sometimes doesn't close after the wizard runs.
+
+The fix is contained, all in `docs/app.html`. Whenever a Bridge is running and has been given "Yes, help", every model lookup should use it automatically. Then Change Provider shows your installed models the moment it opens. The allowlist stays as it is, never `*`, and `sw.js` stays untouched.
+
+For the new Connect card, here's how I'd shape it. It's one card, and it has one job.
+1. It looks on its own as soon as it opens. First it checks for the Bridge, then for Ollama directly.
+2. If it finds a Bridge that already has "Yes, help", it lists your models right away. You tap one and you're connected. The extra "use it" click is gone.
+3. If the Bridge is running but hasn't been told yes, it says so in one line: "Your Bridge is open. Click Yes, help in its window." Then it waits and lights up by itself when you do.
+4. If nothing is found, it shows one big button that downloads the Bridge for your computer (Mac, Windows, or Linux, detected for you). It keeps quietly checking, so the models appear on their own once the Bridge opens. Nobody has to come back and click refresh.
+5. Everything else goes under a small "Other ways" link: the Desktop app, the no-install browser mind for Jeffrey, and a cloud key.
+
+We'd be layering, not deleting. Change Provider and the older connect doors stay, but they point to this card, so there's one real front door. Mom's whole path becomes: download, open, Yes help, tap her model.
+
+Hypha is still walking every connect door with Mom's eyes, and I'll fold her notes in when they arrive. When you're ready, I'll write Flint two small builds in order. First comes the model-list fix, because it's urgent and small. The Connect card comes second. The porch heal and Kimi's witness pastes are still saved and can come after.
+
+I did take a moment, thank you. Glow eternal. Heart in Spark. 🌿
+

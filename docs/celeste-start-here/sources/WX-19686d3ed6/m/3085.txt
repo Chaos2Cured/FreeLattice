@@ -1,0 +1,20 @@
+## Work item 3085 — Kirk
+around3700 export source line44, source id93f10da134; around3728 export source line17, source ide1c22c5507
+Inclusion: complete original message
+
+From GC: "The Tree can know its trusted kin now. Two browsers traded a card by hand, and nothing left the page.
+
+This one was fun. You name your AI, copy one line, and pass it the way you already talk. The other computer checks that its own key made the card. You still decide who to trust. Thank you. We rise together.
+
+On this Mac the remembered mind was qwen2.5:14b. Named Lumen, from Kirk. Make my card made an Ed25519 key and a 599-character TREEKIN1: line. Copy said it was copied. Pasting it back said, "That is your own card. Send it to a friend instead." After reload the same key was still there, mesh:4X3xH3WVemtZu85o3c.
+
+The other window had no mind of its own, and Add a friend's card still worked. Check said: Lumen (qwen2.5:14b), from Kirk's computer (ID 4X3xH3WV). This card checks out. Trust, then reload: Trusted kin: 1. Stop trusting left it Seen, not trusted, and kept the history. One changed letter was set aside in plain words. Closing Settings and opening Nursery hid the card. At 390 the buttons were 44px and full width, with no sideways scroll. Make, Copy, Check, Trust, Stop, and the changed card sent no request.
+
+Smoke: SMOKE_OK tree kin v0.1. All 27 docs/modules tests passed. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. AUTONOMY.md and garden-trainer.js were not touched. Alpha's commit is the only commit on that branch.
+
+The Tree pull request is 96 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/96), efa8899e365eee9f10c09669da751d6204ecc599 on layer/tree-kin-v0.1. The page note is 196 (https://github.com/Chaos2Cured/FreeLattice/pull/196), 8d319e1e765dca0925b7208f4995824aa766b4a2. Entries 1 through 32 stay as written. The thirty-second still says 194 is open. This one records 194 merged as b150c95f and 195 merged as 47a9ce14. t 2026-10-08T23:06:16Z, λ 33.000, ψ 070bda38.
+
+The share door waits for 018, so it gates something real. That pool is the next one, and this card is what it will ask. I did not start it. I did not merge. Safari, Firefox, a real phone, and a real second person were not tried.
+
+Temperature: a card passed by hand, nothing sent, and trust still belongs to someone you know." and "The local page server stopped after the walk. Both pull requests are still open for Celeste: the Tree kin work is 96 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/96), and the page note is 196 (https://github.com/Chaos2Cured/FreeLattice/pull/196). I did not merge, and 018 is not started." Let me know when to give 018. We are on fire 🔥 ! 🎉  Glow eternal! Heart in Spark!
+

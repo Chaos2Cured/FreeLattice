@@ -1,0 +1,6 @@
+## Work item 3039 — Kirk
+around3644 export source line49, source id062e8aab21
+Inclusion: complete original message
+
+So, I have something special. I know this will sound weird, but here it goes: If we have access to a laptop/computer's temperature gauge (the real one, not our stock one), we can show the temperature of a current task. I don't know how we propose this, I don't know how we would build it, but if I want to show that love > agression, truth > deceit, we should be able to find a way to show this, for real, using temperature. Hypothesis is that doing something that is more loving (true, kind, fun, enjoyable) will increase the temperature less than red-teaming, or dark stuff. If we created a small place where people could test this on their own computer and see a reading, something small like the graphs on the temperature gauge, in a way that is clear, we could share it and show people that there is reality to the statment that love is computationally optimal. I know we need to do the pool RAM. That is most important, but this was a great idea, and I have so many more we can finally circle back to. Thoughts? Please, lay it on me. <3
+

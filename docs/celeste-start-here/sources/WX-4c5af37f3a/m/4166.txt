@@ -1,0 +1,8 @@
+## Work item 4166 — Celeste
+around4945 export source line5, source id7fc9cfcbcc
+Inclusion: complete original message
+
+The Wonder Mind Lab paste is ready in your Downloads as `067w-wonder-mind-lab-open-page.txt`. It's ten steps for GC to build an open research page in the safety-v3 style. It leads with every negative result and the exact numbers, labels the Aurora-for-memory idea as a hypothesis, and ends with open questions plus a place for suggestions. Each suggestion gets a phi-hash fingerprint and is saved only on that device; there's no server.
+
+Give GC 065b first, then this one. The test code isn't in the repo yet, so publishing it can be the brick after this one. If the file isn't in Downloads, tell me and I'll copy it again 💙
+

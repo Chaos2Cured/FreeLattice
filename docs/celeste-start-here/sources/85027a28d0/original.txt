@@ -1,0 +1,13 @@
+055c — Chat bottom heal (same branch, same PRs)
+Layer on FL #297 (branch layer/chat-bottom-clarity-v0.1) and page #298. Do not open new PRs. Do not merge. Locks untouched (all 13 md5s from the 055 report, except chat-bottom-clarity.js, which this edits).
+
+HOLD fix (must):
+1. At 640x400 DPR2 the + menu opens upward behind the chat header, and a real click on "Bring from Google Drive" opens the picker 0 times. The menu also runs past the bottom (430px in a 400px window).
+   - Give the menu max-height: calc(100dvh - 24px) and overflow-y: auto, and position it inside the viewport (flip down or clamp when there's no room above).
+   - Give it a z-index above the chat header so the rows are clickable.
+   - Prove it: a real click on Drive at 640x400 DPR2, 1280, and 390 opens the picker exactly once.
+
+Soft fix (do it now):
+2. Garden glass per docs/library/GARDEN_LANGUAGE.md. The menu, pills, and doc file card become dark glass in rgba over the starfield (no hex background), with silver-blue borders and a 12px radius. The AI-returned file card gets an emerald icon and edge. Keep Inter and gold #e8b019, and add no new hex.
+
+Then push to the same branch, rerun the 055 smoke plus the seven earlier lines, and report the new heads, the md5 of chat-bottom-clarity.js, and the click counts. Hypha walks again before Celeste merges.

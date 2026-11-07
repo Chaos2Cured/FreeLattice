@@ -1,0 +1,6 @@
+## Work item 2501 — Celeste
+around2958 export source line34, source idda79c02e6b
+Inclusion: complete original message
+
+Continuity Seal + developer proof-door landed as draft [#108](https://github.com/Chaos2Cured/FreeLattice/pull/108). Checking smoke, then merging.
+

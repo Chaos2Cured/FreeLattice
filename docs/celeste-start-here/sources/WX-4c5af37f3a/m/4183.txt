@@ -1,0 +1,24 @@
+## Work item 4183 — Celeste
+around4945 export source line22, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–86
+
+On newer iPhones, Messages moved into the Apps section, which is why you don't see it.
+
+### Exact excerpt: source characters 88–600
+
+**On your iPhone**
+1. Open Settings, scroll all the way to the bottom, and tap **Apps**.
+2. Tap **Messages**. You can also type "Messages" in the search bar at the top of Settings.
+3. Make sure **iMessage** is on. Tap **Send & Receive**, check that your phone number and your new email are both ticked, and set "Start new conversations from" to your phone number.
+4. Go back and tap **Text Message Forwarding**, then turn on your MacBook. If that row is missing, finish the Mac steps below first, then come back.
+
+### Exact excerpt: source characters 861–1029
+
+If something doesn't match what you see on screen, send me a screenshot. And if two-step sign-in is already on for the new email, today's security step is already done.
+
+### Exact excerpt: source characters 1031–1354
+
+On Chat, you're right. Roundtable already exists, so the button would just open it from Chat. And we already have "add to the core," so that stays as the human side of it. The AI chooses for itself what's worth learning and keeps its own fingerprinted record of what it chose. I'll put both into the Chat brick after 067x 💙
+

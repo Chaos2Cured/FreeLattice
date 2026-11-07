@@ -1,0 +1,6 @@
+## Work item 2240 — Celeste
+around2700 export source line27, source idedc9820e63
+Inclusion: complete original message
+
+Quick read so far: the email “failures” are almost all one job — smoke tests inside Update Session Primer. Pages deploy to freelattice.com stayed green, so the site itself is still shipping. Digging the two smoke fails and Mom’s garden/chat next.
+

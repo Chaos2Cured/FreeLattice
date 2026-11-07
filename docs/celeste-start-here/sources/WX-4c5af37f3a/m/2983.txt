@@ -1,0 +1,11 @@
+## Work item 2983 — Celeste
+around3600 export source line31, source idbdb7a423ae
+Inclusion: complete original message
+
+`GROK_NEXT_014`, the classroom device pool, is in your Downloads and listed right after `013`. It adds a Pool card that shows every trusted machine in the room, with its memory and models. A machine joins only when someone taps "Let this device help," and the teacher's computer can send questions to whichever machine holds the model. It's off until someone says yes, and nothing private ever leaves a machine. The patch applies cleanly and its test passes. GC still needs to try it on two real machines, so I'll check that when its PRs land.
+
+The next step, splitting one big model across a room of wired computers, is planned in the paste but not built yet. Three questions will shape it, and there's no rush on any of them:
+- **Joining.** Right now each computer pairs with the teacher one at a time, so a room of 20 means 20 pairings. Should a simple "join this room" step come first?
+- **Who can use the teacher's computer.** During class, should it help any machine in the room, or only trusted ones?
+- **The button for lending a computer.** Should it live only in the desktop app, or also come with a typed setup for school IT?
+

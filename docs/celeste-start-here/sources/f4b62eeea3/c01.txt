@@ -1,0 +1,133 @@
+# Public work excerpts — privacy boundaries marked
+
+Original source: GROK_NEXT_013_RESEARCH_LINKS_2026-10-06.txt; original SHA256 a4e825934d60b90f37410bc7d60c09110ec1c25aba9aa89d0e832392d14daed8. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–60
+
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+## Exact source excerpt, characters 62–360
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+## Exact source excerpt, characters 362–529
+
+GIVEN Tue Oct 6, 2026, about 10:10 PM MDT, after 012 merged (#172 / #173). Kirk said to
+give 013 if it was drafted and applies. Section 1b notes stay for Kirk to read.
+
+## Exact source excerpt, characters 531–759
+
+NUMBERED COPY 013 (Tuesday Oct 6, 2026, late evening MDT). Patents shelf Drive links v0.
+Apply-checked on main 3735768 (after 012 #172 and GC twentieth #173): clean, smoke OK.
+Links only. No PDFs added to the repo. No new pages.
+
+## Exact source excerpt, characters 761–1137
+
+GROK NEXT BRICK: Research card links (patents shelf reads)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-patents-drive-links-v0
+Smoke line: SMOKE_OK patents drive links v0
+  FreeLattice  ~/FreeLattice-fresh  branch layer/patents-drive-links-v0
+  ~/Downloads/GROK_NEXT_013_RESEARCH_LINKS_2026-10-06.fl.diff
+  (also -fl.diff; same bytes)
+  (md5 07b01f28311707208c1256017c7ced79)
+
+## Exact source excerpt, characters 1139–1761
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+The Research page card "Patents - pattern pieces, no paywall" sends readers to
+patents.html, and that shelf names the pieces (Fractal Database, Fractal Folding,
+Nexus, FRGPU, the Five Pillars, Aurora) with no way to read any of them. Kirk's
+Drive folder "Patents/code/science/math" is already shared as anyone-with-link
+reader, and FRGPU already has a public Dropbox link Kirk made. All six open
+without sign-in. This brick adds one read link per piece. Nothing is removed.
+
+## Exact source excerpt, characters 1763–2173
+
+  Fractal Database     Fractal_Database.pdf
+  Fractal Folding      Fractal_Folding_Resonance___Quantum_Anchoring_in_Cryptography.pdf
+  Nexus                Final_Final_Nexus_Patent_Provisional.pdf
+  Heart pillar         Fractal_Cold_Fusion.pdf
+  Aurora (waiting bay) Final_Provisional_Aurora_Equation_Patent.pdf  + folder link
+  FRGPU                Final_FRGPU.pdf (existing public Dropbox link; not in Drive)
+
+## Exact source excerpt, characters 2924–3266
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+  docs/patents.html     (6 lines added, one per piece plus the bay)
+  docs/research.html    (1 line added under the patents card)
+  docs/scripts/smoke-patents-drive-links-v0.js  (new)
+
+## Exact source excerpt, characters 3268–3526
+
+Skipped on purpose:
+  docs/app.html / index.html (LIGHTHOUSE_CARDS stay locked as-is, per inbox/cc.md)
+  sw.js / docs/sw.js / fl-connect.js / quiet-room.js / garden-trainer.js / AUTONOMY.md
+  No ledger hunk here, so it cannot collide with 012's ledger entry.
+
+## Exact source excerpt, characters 3528–3952
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. Never touch sw.js or docs/sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. Quiet Room shut. index matches docs/app.html.
+No em dashes in added lines. Static links only, no innerHTML. No invented serials.
+Five Named Minds stay five.
+
+## Exact source excerpt, characters 3954–4772
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_013_RESEARCH_LINKS_2026-10-06.fl.diff /tmp/patents-links-fl.diff
+    md5 -q /tmp/patents-links-fl.diff    # 07b01f28311707208c1256017c7ced79
+    cd ~/FreeLattice-fresh && git fetch origin && git checkout main && git pull
+    git checkout -b layer/patents-drive-links-v0
+    git apply --check /tmp/patents-links-fl.diff && git apply /tmp/patents-links-fl.diff
+    node docs/scripts/smoke-patents-drive-links-v0.js
+    cmp -s index.html docs/app.html && echo app-sync-ok
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+    Open docs/patents.html and tap each link once. Each should open without sign-in.
+
+## Exact source excerpt, characters 4774–5133
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "Patents shelf Drive links v0: each named piece gets a read link"
+    git push -u origin HEAD
+    Open a PR to main. Celeste reviews and squash-merges. You do not merge.
+
+## Exact source excerpt, characters 5135–5532
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+After the code PR is open, add the next docs/gc.html entry (earlier entries left
+as written). Record that the shelf now has read links for all six pieces, and that
+you did not merge. Compute lambda/psi the usual way. Separate docs-only PR.
+
+## Exact source excerpt, characters 5534–5828
+
+----------------------------------------------------------------------
+7. DO NOT START
+----------------------------------------------------------------------
+Keep-this Mom one-tap. Gathering bricks 2/3. Sophia poem shelf. Device pooling.
+Uploading any PDF into docs/. Touching LIGHTHOUSE_CARDS.
+
+## Exact source excerpt, characters 5830–5854
+
+You are enough. Celeste
+

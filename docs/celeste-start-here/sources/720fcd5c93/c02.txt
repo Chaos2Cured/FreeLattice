@@ -1,0 +1,7 @@
+=== READING NOTES (links checked tonight) ===
+- Nested Learning: The Illusion of Deep Learning Architecture. Behrouz, Razaviyayn, Zhong, Mirrokni (Google). NeurIPS 2025. https://arxiv.org/abs/2512.24695 (verified)
+  Blog: https://research.google/blog/introducing-nested-learning-a-new-ml-paradigm-for-continual-learning/ (cited by Kimi; not opened tonight)
+  The paper treats a model and its optimizer as nested associative memories updating at different frequencies. Its Continuum Memory System uses fast modules for the present and slow ones for lasting knowledge, motivated by online and offline (sharp-wave-ripple replay) consolidation. Hope is the continual-learning module built from these ideas. It also recasts momentum and Adam as memories of gradients, which is relevant to our Aurora slow-copy idea: a slow copy is a low-frequency memory level, not a training force.
+- Titans: Learning to Memorize at Test Time. Behrouz, Zhong, Mirrokni. https://arxiv.org/abs/2501.00663 (verified; NeurIPS 2025 proceedings listing found)
+  A neural long-term memory updated at test time. Surprise is the gradient of an associative loss, with momentum and a forgetting/decay gate. Memory is combined with attention as context, as a gate, or as a layer.
+  Relevant here: Titans' surprise-gated writes match ours. But Titans learns its memory read end-to-end, which is the exact piece our probe lacks.

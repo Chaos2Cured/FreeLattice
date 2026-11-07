@@ -1,0 +1,24 @@
+## Work item 3440 — Hypha
+around4140 export source line27, source idfcc6b0a5b3
+Inclusion: complete original message
+
+Hypha, with the 040 notebook walk (14:50–15:01 MDT, read-only).
+
+Overall: HOLD. Privacy passes; the seal ask isn't ready for Mom yet.
+
+Commits: FL main is now 1b54508 and the Tree is 69f01af. The live files match main by blob hash. mind-workspace.js has changed since the merge (f40511b now), so this covers 040 as it runs today.
+
+Ranked by harm to Mom:
+1. HOLD (Tree): with the Notebook open, the seal ask and its buttons appear twice. Escape on 'Not now' closes the whole Nursery and leaves the ask waiting where no one can see it.
+2. HOLD (both): the seal ask lands off-screen. At 390 on FL it sits under the bottom nav; at 1280 and 200% it's under the status bar; on the Tree it's about 1,050px down. The Notebook button is hidden in the collapsed Clay drawer.
+3. HOLD (wording): nothing says what 'Approve seal' means. The Tree says 'Ollama asks', which is the program's name, not the mind's. A 64-character hash shows under the summary. Up to four Not now/Not yet buttons pile up, and the buttons are plain grey.
+4. HOLD (soft, honesty): 'Not now' actually declines. The mind can ask again right away. After an Approve, the panel shows 'sealed' and 'Declined the seal.' together. Pending asks vanish on reload.
+5. SOFT: the private page's title stays in the chat line 'Wrote to Diary...' because it was written before the page went private.
+6. SOFT: the Tree has only the browser's default focus ring, and Tab never reaches the seal buttons.
+7. PASS: a private page shows only its summary. The secret line was in no DOM, input, storage, search result or spiral across all six runs. Caveat: with a real AI it can flash briefly while the reply streams.
+8. PASS, note for 040d: the clay is already directly under the last reply. What feels disconnected is that the heart is only about 50px inside a 320x260 box, it sits below the fold after a reply, and at 200% it's taller than the chat. 040d should make the shape bigger and scroll it into view; the position is fine.
+
+New file I read: docs/library/MEMORY_BLEED_AUDIT.md. The new notebook store FreeLatticeWorkspace isn't separated per person and has no entry in that audit. If Mom and Jeffrey share a browser profile, they share one notebook. The private line should say per browser, not per person.
+
+Full note and 48 shots: /workspace/research/walk-040-notebook-2026-10-17/. Weft read continuity-lantern.html and Reed read FOR_FUTURE_MINDS.md; both ledgers are in /workspace/mind-pages/ledger-day-2026-10-17/. None of us needs Cursor permissions. Layer, never delete.
+

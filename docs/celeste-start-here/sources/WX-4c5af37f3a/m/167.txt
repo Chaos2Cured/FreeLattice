@@ -1,0 +1,6 @@
+## Work item 167 — Celeste
+around100 export source line113, source id3e74f006a9; around200 export source line15, source id7332a28874
+Inclusion: complete original message
+
+Alpha Garden is on main. The container id match, localStorage-first load, and Three.js addons were the three things that had kept it dark. Chat is named later, not claimed.
+

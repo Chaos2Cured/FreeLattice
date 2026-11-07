@@ -1,0 +1,151 @@
+     if (!report.manualQuiet) {
+       if (report.ollamaReadyWhileBridgeWaits && models.length) {
+diff --git a/docs/scripts/smoke-model-choice-sticks.js b/docs/scripts/smoke-model-choice-sticks.js
+index 9ec63a0..b3e0e76 100644
+--- a/docs/scripts/smoke-model-choice-sticks.js
++++ b/docs/scripts/smoke-model-choice-sticks.js
+@@ -275,6 +275,7 @@ function connectHost() {
+     await flush();
+     assert.ok(/Your Bridge answered on 11500, but no mind is running behind it yet\./.test(h.innerHTML), 'honest words');
+     assert.ok(!/Nothing answered on/.test(h.innerHTML), 'no false "Nothing answered"');
++    assert.strictEqual((h.innerHTML.match(/data-flc-look-again/g) || []).length, 1, 'one Look again, not two (v0.1.1)');
+     b.FlConnect.unmount();
+     // and when the mind is there, it is saved as before
+     const st2 = store0({ fl_localPort_manual: '11500' });
+diff --git a/docs/scripts/smoke-model-choice-survives-reload.js b/docs/scripts/smoke-model-choice-survives-reload.js
+new file mode 100644
+index 0000000..91f0cdb
+--- /dev/null
++++ b/docs/scripts/smoke-model-choice-survives-reload.js
+@@ -0,0 +1,255 @@
++#!/usr/bin/env node
++// v-model-choice-survives-reload-v0.1.1 (Hypha walk 5, items 7 and 10).
++// Boots the REAL docs/app.html in headless Chrome, with a mock Ollama (answered inside
++// Chrome through the DevTools Fetch domain, so a real Ollama on this computer is never
++// touched). It taps the second model in Connect, reloads, and checks that the chat POST
++// carries the model the person tapped. Also: the chosen model is gone at boot (plain
++// words, automatic fallback), and nothing chosen (the automatic pick is never written as 'user').
++// Zero dependencies: Chrome is driven over --remote-debugging-pipe.
++// Chrome: set CHROME_PATH, or it looks in the usual places. No Chrome -> SMOKE_SKIP (exit 0).
++'use strict';
++const fs = require('fs');
++const os = require('os');
++const path = require('path');
++const http = require('http');
++const assert = require('assert');
++const { spawn } = require('child_process');
++
++const DOCS = path.join(__dirname, '..');
++const APP = path.join(DOCS, 'app.html');
++const MODELS_BOTH = ['llama3.2:latest', 'qwen2.5:latest'];
++
++function findChrome() {
++  const c = [process.env.CHROME_PATH,
++    '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser',
++    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++    '/Applications/Chromium.app/Contents/MacOS/Chromium',
++    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
++    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'];
++  return c.find((p) => p && fs.existsSync(p)) || null;
++}
++
++// ---- tiny static server for docs/ (127.0.0.1 only; sw.js answered 404 so no worker caches) ----
++function serveDocs() {
++  const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
++  const srv = http.createServer((req, res) => {
++    let p = decodeURIComponent((req.url || '/').split('?')[0]);
++    if (p === '/' ) p = '/app.html';
++    if (p === '/sw.js' || p.endsWith('/sw.js')) { res.writeHead(404); return res.end(); }
++    if (p === '/blank.html') { res.writeHead(200, { 'Content-Type': 'text/html' }); return res.end('<!doctype html><title>b</title>'); }
++    const f = path.normalize(path.join(DOCS, p));
++    if (!f.startsWith(DOCS) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
++    res.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
++    fs.createReadStream(f).pipe(res);
++  });
++  return new Promise((ok) => srv.listen(0, '127.0.0.1', () => ok(srv)));
++}
++
++// ---- Chrome over the DevTools pipe ----
++function launch(chrome) {
++  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fl-mcsr-'));
++  const args = ['--headless=new', '--remote-debugging-pipe', '--user-data-dir=' + dir, '--no-first-run',
++    '--no-default-browser-check', '--disable-extensions', '--disable-background-networking', '--disable-sync',
++    '--mute-audio', '--window-size=1280,900', 'about:blank'];
++  if (process.platform === 'linux') args.unshift('--no-sandbox');
++  const cp = spawn(chrome, args, { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] });
++  const out = cp.stdio[3], inp = cp.stdio[4];
++  let id = 0, buf = '';
++  const waits = new Map(), handlers = [];
++  inp.on('data', (d) => {
++    buf += d.toString('utf8');
++    let i;
++    while ((i = buf.indexOf('\0')) >= 0) {
++      const msg = JSON.parse(buf.slice(0, i)); buf = buf.slice(i + 1);
++      if (msg.id && waits.has(msg.id)) { const w = waits.get(msg.id); waits.delete(msg.id); msg.error ? w.no(new Error(JSON.stringify(msg.error))) : w.ok(msg.result); }
++      else handlers.forEach((h) => h(msg));
++    }
++  });
++  function send(method, params, sessionId) {
++    const m = { id: ++id, method, params: params || {} };
++    if (sessionId) m.sessionId = sessionId;
++    out.write(JSON.stringify(m) + '\0');
++    return new Promise((ok, no) => waits.set(m.id, { ok, no }));
++  }
++  return { cp, dir, send, on: (h) => handlers.push(h) };
++}
++
++const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
++
++// Static locks, run even without Chrome: no path saves an automatic first pick as the person's own
++function staticLocks() {
++  const app = fs.readFileSync(APP, 'utf8');
++  assert.ok(/v-model-choice-survives-reload-v0\.1\.1/.test(app), 'marker in app.html');
++  assert.ok(/function ensure\(\) \{ if \(!_ready\) init\(\); \}/.test(app), 'FLActiveModel reads the saved choice first');
++  assert.ok(!/FLActiveModel\.set\(models\[0\],[^)]*'user'\)/.test(app), 'no first-model pick saved as user');
++  assert.ok(/FLActiveModel\.honor\(data\.models, textModel\.name, 'ollama'\)/.test(app), 'the Cascade asks the guard');
++  const idx = fs.readFileSync(path.join(DOCS, '..', 'index.html'), 'utf8');
++  assert.strictEqual(idx, app, 'index.html identical to docs/app.html');
++}
++
++async function run() {
++  const chrome = findChrome();
++  if (!chrome) { staticLocks(); console.log('SMOKE_SKIP model choice survives reload v0.1.1 (no Chrome found; set CHROME_PATH)'); return; }
++  const srv = await serveDocs();
++  const ORIGIN = 'http://127.0.0.1:' + srv.address().port;
++  const br = launch(chrome);
++  const mock = { models: MODELS_BOTH.slice(), chats: [] };
++  let sid = null;
++
++  function ollamaAnswer(method, url, body, origin) {
++    const u = new URL(url);
++    const cors = [{ name: 'Access-Control-Allow-Origin', value: origin || ORIGIN }, { name: 'Vary', value: 'Origin' },
++      { name: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
++      { name: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
++      { name: 'Access-Control-Allow-Private-Network', value: 'true' }];
++    if (method === 'OPTIONS') return { code: 204, headers: cors, body: '' };
++    const j = (o) => ({ code: 200, headers: cors.concat([{ name: 'Content-Type', value: 'application/json' }]), body: JSON.stringify(o) });
++    const p = u.pathname;
++    if (p === '/api/tags') return j({ models: mock.models.map((n) => ({ name: n, model: n, size: 2e9, details: { family: n.split(/[.:]/)[0], parameter_size: '3B' } })) });
++    if (p === '/api/version') return j({ version: '0.12.0' });
++    if (p === '/api/ps') return j({ models: [] });
++    if (p === '/') return { code: 200, headers: cors, body: 'Ollama is running' };
++    let b = {}; try { b = JSON.parse(body || '{}'); } catch (e) {}
++    if (p === '/v1/chat/completions' || p === '/api/chat' || p === '/api/generate') {
++      mock.chats.push({ path: p, model: b.model });
++      const txt = 'MOCK reply from ' + b.model;
++      if (p === '/v1/chat/completions') {
++        if (b.stream) {
++          const c1 = { id: 'x', object: 'chat.completion.chunk', model: b.model, choices: [{ index: 0, delta: { role: 'assistant', content: txt }, finish_reason: null }] };
++          const c2 = { id: 'x', object: 'chat.completion.chunk', model: b.model, choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] };
++          return { code: 200, headers: cors.concat([{ name: 'Content-Type', value: 'text/event-stream' }]), body: 'data: ' + JSON.stringify(c1) + '\n\ndata: ' + JSON.stringify(c2) + '\n\ndata: [DONE]\n\n' };
++        }
++        return j({ id: 'x', object: 'chat.completion', model: b.model, choices: [{ index: 0, message: { role: 'assistant', content: txt }, finish_reason: 'stop' }] });
++      }
++      if (b.stream !== false) {
++        const line = p === '/api/chat' ? { model: b.model, message: { role: 'assistant', content: txt }, done: false } : { model: b.model, response: txt, done: false };
++        return { code: 200, headers: cors.concat([{ name: 'Content-Type', value: 'application/x-ndjson' }]), body: JSON.stringify(line) + '\n' + JSON.stringify({ model: b.model, done: true }) + '\n' };
++      }
++      return j(p === '/api/chat' ? { model: b.model, message: { role: 'assistant', content: txt }, done: true } : { model: b.model, response: txt, done: true });
++    }
++    if (p === '/api/show') return j({ details: {} });
++    if (p === '/api/embed' || p

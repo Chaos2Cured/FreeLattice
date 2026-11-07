@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c07</title>
+<meta name="description" content="Reading section c07 of 44d8662586, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/44d8662586/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c07">
+<meta property="og:description" content="Reading section c07 of 44d8662586, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/44d8662586/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1427"></span><span id="p1428"></span><span id="p1429"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt · c07</h1>
+<p>44d8662586 · words 1200 · characters 58353–68516</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1427, 1428, 1429. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> keyTail(id);
++      kIn.value = &#x27;&#x27;;
++      kIn.placeholder = tail ? (&#x27;saved, ends in &#x27; + tail + &#x27; (leave empty to keep it)&#x27;) : (&#x27;paste your &#x27; + p.name + &#x27; key&#x27;);
++      getLink.textContent = &#x27;Get your &#x27; + p.name + &#x27; key (opens &#x27; + p.name + &#x27;)&#x27;;
++      getLink.href = p.keyUrl;
++      note.textContent = honestNote(id);
++    }
++
++    function paintSaved() {
++      while (saved.firstChild) saved.removeChild(saved.firstChild);
++      savedProviders().forEach(function (id) {
++        var row = el(&#x27;p&#x27;, &#x27;cloud-key-row&#x27;);
++        var place = keyPlace(id) === &#x27;visit&#x27; ? &#x27;this visit only&#x27; : &#x27;on this device&#x27;;
++        row.appendChild(document.createTextNode(PROVIDERS[id].name + &#x27; key, ends in &#x27; + keyTail(id) + &#x27;, kept &#x27; + place + &#x27;. &#x27;));
++        var f = el(&#x27;button&#x27;, &#x27;cloud-key-forget&#x27;, &#x27;Forget&#x27;);
++        f.type = &#x27;button&#x27;;
++        f.setAttribute(&#x27;data-cloud-forget&#x27;, id);
++        f.setAttribute(&#x27;aria-label&#x27;, &#x27;Forget the &#x27; + PROVIDERS[id].name + &#x27; key&#x27;);
++        f.addEventListener(&#x27;click&#x27;, function () {
++          forgetKey(id);
++          status.textContent = &#x27;Forgotten. The &#x27; + PROVIDERS[id].name + &#x27; key is gone from this browser.&#x27;;
++          paintSaved();
++          paintProvider();
++        });
++        row.appendChild(f);
++        saved.appendChild(row);
++      });
++    }
++
++    pSel.addEventListener(&#x27;change&#x27;, paintProvider);
++    save.addEventListener(&#x27;click&#x27;, function () {
++      var id = pSel.value;
++      var p = PROVIDERS[id];
++      var model = cleanModel(mIn.value);
++      if (!model) { status.textContent = &#x27;Type a model name for &#x27; + p.name + &#x27; (letters, numbers, . _ : / - only).&#x27;; return; }
++      var typed = String(kIn.value || &#x27;&#x27;);
++      if (typed) {
++        var r = saveKey(id, typed, !!visit.checked);
++        kIn.value = &#x27;&#x27;;
++        if (!r.ok) {
++          status.textContent = r.reason === &#x27;key&#x27;
++            ? &#x27;That does not look like a key (no spaces, at least 8 characters). Nothing was saved.&#x27;
++            : &#x27;This browser would not keep the key. Nothing was saved.&#x27;;
++          return;
++        }
++      } else if (!getKey(id)) {
++        status.textContent = &#x27;Paste your &#x27; + p.name + &#x27; key first. Nothing was saved.&#x27;;
++        return;
++      }
++      var seat = addSeat(id, model);
++      paintSaved();
++      paintProvider();
++      status.textContent = &#x27;Saved. &#x27; + model + &#x27; through &#x27; + p.name + &#x27; can sit in any chair. Nothing was sent yet.&#x27;;
++      if (seat &amp;&amp; typeof onSeat === &#x27;function&#x27;) onSeat(seat);
++    });
++
++    paintProvider();
++    paintSaved();
++    host.appendChild(box);
++    return box;
++  }
++
++  window.TreeCloudMinds = {
++    MARK: MARK,
++    PROVIDERS: PROVIDERS,
++    ORDER: ORDER,
++    isCloud: isCloud,
++    providerIdOf: providerIdOf,
++    providerName: providerName,
++    saveKey: saveKey,
++    forgetKey: forgetKey,
++    keyPlace: keyPlace,
++    keyTail: keyTail,
++    savedProviders: savedProviders,
++    addSeat: addSeat,
++    getSeats: getSeats,
++    seatOptions: seatOptions,
++    buildRequest: buildRequest,
++    parseReply: parseReply,
++    send: send,
++    heartLine: heartLine,
++    honestNote: honestNote,
++    mountKeyPanel: mountKeyPanel
++  };
++})();
+diff --git a/docs/modules/tree-gathering-api-keys.test.js b/docs/modules/tree-gathering-api-keys.test.js
+new file mode 100644
+index 0000000..b593da8
+--- /dev/null
++++ b/docs/modules/tree-gathering-api-keys.test.js
+@@ -0,0 +1,249 @@
++#!/usr/bin/env node
++// v-tree-gathering-api-keys-v0: bring your own key, seat a cloud mind in a Gathering chair.
++// Guards: the provider list is fixed and https only; the key lives only in this browser
++// (localStorage, or sessionStorage for this visit) and goes only to the chosen provider,
++// in its own header, never in a URL; seats and binds never hold the key; a cloud chair
++// says where words go; files stay on this machine; no confirm(), no innerHTML.
++// No real network: fetch is a spy.
++&#x27;use strict&#x27;;
++
++var fs = require(&#x27;fs&#x27;);
++var path = require(&#x27;path&#x27;);
++var vm = require(&#x27;vm&#x27;);
++var assert = require(&#x27;assert&#x27;);
++
++var dir = __dirname;
++var src = fs.readFileSync(path.join(dir, &#x27;tree-cloud-minds.js&#x27;), &#x27;utf8&#x27;);
++var thread = fs.readFileSync(path.join(dir, &#x27;garden-thread.js&#x27;), &#x27;utf8&#x27;);
++var rooms = fs.readFileSync(path.join(dir, &#x27;garden-rooms.js&#x27;), &#x27;utf8&#x27;);
++var css = fs.readFileSync(path.join(dir, &#x27;garden-rooms.css&#x27;), &#x27;utf8&#x27;);
++
++function Store() { this.m = {}; }
++Store.prototype.getItem = function (k) { return Object.prototype.hasOwnProperty.call(this.m, k) ? this.m[k] : null; };
++Store.prototype.setItem = function (k, v) { this.m[k] = String(v); };
++Store.prototype.removeItem = function (k) { delete this.m[k]; };
++
++var calls = [];
++var nextReply = null;
++function fakeFetch(url, opts) {
++  calls.push({ url: String(url), opts: opts });
++  var r = nextReply || { status: 200, json: {} };
++  return Promise.resolve({
++    ok: r.status &gt;= 200 &amp;&amp; r.status &lt; 300,
++    status: r.status,
++    json: function () { return r.throwJson ? Promise.reject(new Error(&#x27;bad&#x27;)) : Promise.resolve(r.json); }
++  });
++}
++
++var local = new Store();
++var session = new Store();
++var sandbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, JSON: JSON, Promise: Promise,
++  encodeURIComponent: encodeURIComponent, fetch: fakeFetch };
++sandbox.window = sandbox;
++sandbox.localStorage = local;
++sandbox.sessionStorage = session;
++vm.createContext(sandbox);
++vm.runInContext(src, sandbox, { filename: &#x27;tree-cloud-minds.js&#x27; });
++var T = sandbox.TreeCloudMinds;
++assert.ok(T, &#x27;TreeCloudMinds is on window&#x27;);
++
++// 1. Fixed list, https only, exact hosts.
++var HOSTS = {
++  groq: &#x27;api.groq.com&#x27;, openrouter: &#x27;openrouter.ai&#x27;, openai: &#x27;api.openai.com&#x27;, anthropic: &#x27;api.anthropic.com&#x27;,
++  google: &#x27;generativelanguage.googleapis.com&#x27;, xai: &#x27;api.x.ai&#x27;, mistral: &#x27;api.mistral.ai&#x27;,
++  deepseek: &#x27;api.deepseek.com&#x27;, together: &#x27;api.together.xyz&#x27;
++};
++assert.deepStrictEqual(Object.keys(T.PROVIDERS).sort(), Object.keys(HOSTS).sort(), &#x27;fixed provider list&#x27;);
++Object.keys(HOSTS).forEach(function (id) {
++  var u = new URL(T.PROVIDERS[id].url);
++  assert.strictEqual(u.protocol, &#x27;https:&#x27;, id + &#x27; is https&#x27;);
++  assert.strictEqual(u.host, HOSTS[id], id + &#x27; host&#x27;);
++  assert.ok(T.PROVIDERS[id].models.length &gt;= 1, id + &#x27; has suggestions&#x27;);
++});
++assert.ok(!/custom/i.test(Object.keys(T.PROVIDERS).join(&#x27;,&#x27;)), &#x27;no custom hosts in v0.1&#x27;);
++
++// 2. Keys: device vs this visit; forget clears both; junk refused.
++assert.strictEqual(T.saveKey(&#x27;groq&#x27;, &#x27;has space key&#x27;, false).ok, false, &#x27;a key with spaces is refused&#x27;);
++assert.strictEqual(T.saveKey(&#x27;nope&#x27;, &#x27;gsk_abcdefgh1234&#x27;, false).ok, false, &#x27;unknown provider refused&#x27;);
++assert.strictEqual(T.saveKey(&#x27;groq&#x27;, &#x27;  gsk_abcdefgh1234 &#x27;, false).ok, true);
++assert.strictEqual(T.keyPlace(&#x27;groq&#x27;), &#x27;device&#x27;);
++assert.ok(local.getItem(&#x27;fl_tree_cloud_keys&#x27;).indexOf(&#x27;gsk_abcdefgh1234&#x27;) !== -1, &#x27;device key in localStorage&#x27;);
++assert.strictEqual(T.saveKey(&#x27;groq&#x27;, &#x27;gsk_visitonly9999&#x27;, true).ok, true);
++assert.strictEqual(T.keyPlace(&#x27;groq&#x27;), &#x27;visit&#x27;, &#x27;visit-only moves the key to sessionStorage&#x27;);
++assert.ok(local.getItem(&#x27;fl_tree_cloud_keys&#x27;).indexOf(&#x27;gsk_&#x27;) === -1, &#x27;and out of localStorage&#x27;);
++assert.strictEqual(T.keyTail(&#x27;groq&#x27;), &#x27;9999&#x27;);
++T.forgetKey(&#x27;groq&#x27;);
++assert.strictEqual(T.keyPlace(&#x27;groq&#x27;), &#x27;&#x27;, &#x27;forget clears it&#x27;);
++assert.ok((local.getItem(&#x27;fl_tree_cloud_keys&#x27;) + session.getItem(&#x27;fl_tree_cloud_keys&#x27;)).indexOf(&#x27;gsk_&#x27;) === -1, &#x27;gone from both stores&#x27;);
++
++// 3. Seats never hold a key; only providers with a key are offered.
++T.saveKey(&#x27;anthropic&#x27;, &#x27;sk-ant-test-0000aaaa&#x27;, false);
++T.saveKey(&#x27;openai&#x27;, &#x27;sk-test-openai-1111&#x27;, false);
++T.saveKey(&#x27;google&#x27;, &#x27;AIza-test-google-2222&#x27;, false);
++assert.ok(T.addSeat(&#x27;anthropic&#x27;, &#x27;claude-sonnet-4-20250514&#x27;));
++assert.ok(T.addSeat(&#x27;openai&#x27;, &#x27;gpt-4.1-mini&#x27;));
++assert.ok(T.addSeat(&#x27;google&#x27;, &#x27;gemini-2.5-flash&#x27;));
++assert.ok(T.addSeat(&#x27;groq&#x27;, &#x27;llama-3.3-70b-versatile&#x27;), &#x27;a seat may be saved before its key&#x27;);
++assert.strictEqual(T.addSeat(&#x27;openai&#x27;, &#x27;bad name with spaces&#x27;), null, &#x27;model names are checked&#x27;);
++var seatsRaw = local.getItem(&#x27;fl_tree_cloud_seats&#x27;);
++assert.ok(!/sk-|AIza|gsk_/.test(seatsRaw), &#x27;no key in the seats store&#x27;);
++var opts = T.seatOptions();
++assert.deepStrictEqual(opts.map(function (s) { return s.url; }).sort(), [&#x27;cloud:anthropic&#x27;, &#x27;cloud:google&#x27;, &#x27;cloud:openai&#x27;], &#x27;groq seat waits for its key&#x27;);
++opts.forEach(function (s) {
++  assert.ok(!/sk-|AIza|gsk_/.test(JSON.stringify(s)), &#x27;no key in a seat option&#x27;);
++  assert.strictEqual(s.cloud, true);
++  assert.strictEqual(s.tag, &#x27;general&#x27;);
++});
++assert.strictEqual(T.isCloud({ url: &#x27;cloud:openai&#x27; }), true);
++assert.strictEqual(T.isCloud({ url: &#x27;http://127.0.0.1:11434/api/tags&#x27; }), false);
++assert.strictEqual(T.isCloud({ url: &#x27;cloud:evil.example&#x27; }), false, &#x27;unknown cloud ids are not cloud minds&#x27;);
++
++var msgs = [{ role: &#x27;system&#x27;, content: &#x27;Just talk.&#x27; }, { role: &#x27;user&#x27;, content: &#x27;hello&#x27; }, { role: &#x27;assistant&#x27;, content: &#x27;hi&#x27; }, { role: &#x27;user&#x27;, content: &#x27;again&#x27; }];
++
++(async function () {
++  // 4. OpenAI shape.
++  calls = []; nextReply = { status: 200, json: { choices: [{ message: { content: &#x27;from openai&#x27; } }] } };
++  var r1 = await T.send({ url: &#x27;cloud:openai&#x27;, model: &#x27;gpt-4.1-mini&#x27; }, msgs);
++  assert.strictEqual(r1, &#x27;from openai&#x27;);
++  assert.strictEqual(calls.length, 1);
++  assert.strictEqual(calls[0].url, &#x27;https://api.openai.com/v1/chat/completions&#x27;);
++  assert.strictEqual(calls[0].opts.headers.Authorization, &#x27;Bearer sk-test-openai-1111&#x27;);
++  assert.strictEqual(calls[0].opts.credentials, &#x27;omit&#x27;);
++  assert.strictEqual(calls[0].opts.referrerPolicy, &#x27;no-referrer&#x27;);
++  var b1 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b1.model, &#x27;gpt-4.1-mini&#x27;);
++  assert.strictEqual(b1.messages.length, 4);
++  assert.ok(calls[0].opts.body.indexOf(&#x27;sk-&#x27;) === -1, &#x27;key never in the body&#x27;);
++
++  // 5. Anthropic shape: x-api-key, browser header, system split, max_tokens.
++  calls = []; nextReply = { status: 200, json: { content: [{ type: &#x27;text&#x27;, text: &#x27;from claude&#x27; }] } };
++  var r2 = await T.send({ url: &#x27;cloud:anthropic&#x27;, model: &#x27;claude-sonnet-4-20250514&#x27; }, msgs);
++  assert.strictEqual(r2, &#x27;from claude&#x27;);
++  assert.strictEqual(calls[0].url, &#x27;https://api.anthropic.com/v1/messages&#x27;);
++</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

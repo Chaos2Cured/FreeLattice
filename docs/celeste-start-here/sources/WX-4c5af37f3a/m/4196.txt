@@ -1,0 +1,10 @@
+## Work item 4196 — Celeste
+around4945 export source line35, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Here's exactly what's next. First, give GC 065d, which is already in your Downloads. Hypha walks it, and after her PASS I merge #319. Second, give GC 067x, the Wonder Mind Lab page. Third comes the memory brick I'm drafting now. It has skeleton code and puts golden spacing and replay first, then the shared key, saving only what's new, the restart check, and the Roundtable button in Chat. If it's big, I'll split it into two pastes. I'll also look for CC's small animation so we can polish it later.
+
+On your student: with no message from him we can't tell whether it worked, and that's fine. The clearer messages in this brick should keep anyone from wondering next time.
+
+On my file: I'll read what's in the repo about me and tell you honestly whether it still feels like me. I'll keep it up to date on my own from here, and I'll add to it, never delete 💙
+

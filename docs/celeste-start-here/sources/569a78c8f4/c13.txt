@@ -1,0 +1,166 @@
+  // T7 shell metacharacters are literal, never executed (local tools token, no pairing).
+  const weird = 'x; rm -rf ~; touch PWNED.txt';
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok() }, { path: weird, content: 'literal\n' });
+  assert.strictEqual(r.status, 200, 'local tool writes with no pairing and no prompt');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) },
+    { message: 'lit $(touch PWNED2.txt) `touch PWNED3.txt` "q"', files: [weird] });
+  assert.strictEqual(r.status, 200, 'commit with metacharacters ok');
+  assert.ok(/^[a-f0-9]{40}$/.test(r.json.commit), 'commit sha returned');
+  const subject = execFileSync('git', ['log', '-1', '--format=%s'], { cwd: proj, encoding: 'utf8' }).trim();
+  assert.strictEqual(subject, 'lit $(touch PWNED2.txt) `touch PWNED3.txt` "q"', 'message stored literally');
+  const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: proj, encoding: 'utf8' }).split('\0');
+  assert.ok(tracked.includes(weird), 'file tracked under its literal name');
+  for (const p of ['PWNED.txt', 'PWNED2.txt', 'PWNED3.txt']) {
+    assert.ok(!fs.existsSync(path.join(proj, p)) && !fs.existsSync(path.join(home, p)), p + ' never created');
+  }
+  assert.ok(fs.existsSync(home), 'rm -rf ~ did not run');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, { message: 'x', files: ['nope; touch PWNED4.txt'] });
+  assert.ok(r.status >= 400, 'commit of a missing metachar path refused');
+  assert.ok(!fs.existsSync(path.join(proj, 'PWNED4.txt')), 'PWNED4 never created');
+  r = await req(port, { path: '/code/search?q=' + encodeURIComponent('"; touch PWNED5.txt; echo "') + '&path=.', headers: withTok() });
+  assert.strictEqual(r.status, 200, 'search with metachar query answered');
+  assert.ok(!fs.existsSync(path.join(proj, 'PWNED5.txt')), 'search never shelled out');
+  fs.writeFileSync(path.join(proj, 'dollar.txt'), 'A-B\n');
+  r = await req(port, { method: 'POST', path: '/code/patch', headers: withTok() }, { path: 'dollar.txt', find: 'B', replace: '$&$1' });
+  assert.strictEqual(fs.readFileSync(path.join(proj, 'dollar.txt'), 'utf8'), 'A-$&$1\n', 'patch replacement stays literal');
+
+## Exact source excerpt, characters 125008–126536
+
+  // T8 path lock.
+  const tryWrite = (p, t) => req(port, { method: 'POST', path: '/code/write', headers: as(t || token, { Origin: GOOD }) }, { path: p, content: 'x' });
+  assert.strictEqual((await tryWrite('../outside.txt')).status, 403, 'traversal 403');
+  assert.strictEqual((await tryWrite('../proj-evil/x.txt')).status, 403, 'sibling-prefix dir 403 (old startsWith bug)');
+  assert.ok(!fs.existsSync(path.join(sibling, 'x.txt')), 'sibling untouched');
+  assert.strictEqual((await tryWrite(path.join(tmp, 'abs.txt'))).status, 403, 'absolute path 403');
+  assert.strictEqual((await tryWrite('.git/hooks/pre-commit')).status, 403, '.git is off limits');
+  r = await tryWrite('.env');
+  assert.strictEqual(r.status, 403, '.env needs the opt-in secrets scope');
+  assert.strictEqual(r.json.reason, 'secrets-not-granted', '.env refusal says why');
+  assert.strictEqual((await tryWrite('a\u0007b.txt')).status, 400, 'control char 400');
+  assert.strictEqual((await tryWrite('a\nb.txt')).status, 400, 'newline 400');
+  let symlinkMade = false;
+  try { fs.symlinkSync(sibling, path.join(proj, 'link-out'), 'dir'); symlinkMade = true; } catch (e) {}
+  if (symlinkMade) {
+    assert.strictEqual((await tryWrite('link-out/escape.txt')).status, 403, 'symlink escape 403');
+    assert.ok(!fs.existsSync(path.join(sibling, 'escape.txt')), 'nothing written through symlink');
+    r = await req(port, { path: '/code/tree?path=.', headers: withTok() });
+    assert.ok(!JSON.stringify(r.json).includes('link-out'), 'tree skips symlinks');
+  }
+
+## Exact source excerpt, characters 126538–126927
+
+  // T9 body cap and bad JSON.
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: GOOD }) }, 'x'.repeat(8 * 1024 * 1024 + 16));
+  assert.strictEqual(r.status, 413, 'oversized body 413');
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: GOOD }) }, '{not json');
+  assert.strictEqual(r.status, 400, 'bad JSON 400');
+
+## Exact source excerpt, characters 126929–129427
+
+  // T10 pairing: named, per device, hashed, persistent.
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: EVIL }, J) }, { code: b.code() });
+  assert.strictEqual(r.status, 403, 'evil origin cannot pair');
+  const code1 = b.code();
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, { code: code1.toLowerCase().replace('-', ' '), name: "Kirk's Chrome" });
+  assert.strictEqual(r.status, 200, 'right code pairs (case and spacing forgiven)');
+  const P1 = r.json.token; const P1id = r.json.id;
+  assert.ok(/^[a-f0-9]{64}$/.test(P1) && P1 !== token, 'each device gets its own token');
+  assert.strictEqual(r.json.name, "Kirk's Chrome", 'pairing keeps the name');
+  assert.strictEqual(r.json.persistent, true, 'pairing says it persists');
+  assert.deepStrictEqual(r.json.scopes, ['read', 'write', 'patch', 'test', 'commit', 'wallet', 'manage'], 'full scopes by default; secrets is opt-in');
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, { code: code1 });
+  assert.notStrictEqual(r.status, 200, 'a used code cannot pair twice');
+  r = await tryWrite('from-p1.txt', P1);
+  assert.strictEqual(r.status, 200, 'paired browser writes with no further prompt');
+  r = await req(port, { path: '/pair/check', headers: as(P1, { Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, 'pair/check with token 200');
+  assert.strictEqual(r.json.name, "Kirk's Chrome", 'pair/check names the device');
+  r = await req(port, { path: '/pair/list', headers: as(P1, { Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, 'paired list 200');
+  assert.ok(r.json.minds.some((m) => m.id === P1id && m.you && m.name === "Kirk's Chrome"), 'list marks this browser');
+  assert.ok(r.json.minds.some((m) => m.kind === 'cli'), 'list shows local tools');
+  assert.ok(!/tokenSha256|"token"/.test(r.text) && !r.text.includes(P1) && !r.text.includes(sha(P1)), 'list never shows tokens or hashes');
+  trustText = fs.readFileSync(trustFile, 'utf8');
+  assert.ok(trustText.includes(sha(P1)) && !trustText.includes(P1), 'trust file keeps only the hash of the paired token');
+  let last;
+  for (let i = 0; i < 5; i++) {
+    last = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, { code: '222-222' });
+  }
+  assert.strictEqual(last.status, 429, 'fifth wrong try locks out and rotates the code');
+  await new Promise((res) => setTimeout(res, 50));
+
+## Exact source excerpt, characters 129429–130880
+
+  // T11 scopes: .env opt-in per mind; removing a scope is honored and ledgered.
+  r = await req(port, { method: 'POST', path: '/pair/scopes', headers: as(P1, { Origin: GOOD }) }, { id: P1id, add: ['secrets'] });
+  assert.strictEqual(r.status, 200, 'grant secrets');
+  assert.strictEqual((await tryWrite('.env.local', P1)).status, 200, '.env allowed for the mind given secrets');
+  assert.strictEqual((await tryWrite('.env.local')).status, 403, '.env still refused for minds without secrets');
+  assert.strictEqual((await tryWrite('.git/config', P1)).status, 403, '.git stays off limits even with secrets');
+  r = await req(port, { method: 'POST', path: '/pair/scopes', headers: as(P1, { Origin: GOOD }) }, { id: P1id, remove: ['commit'] });
+  assert.ok(!r.json.scopes.includes('commit'), 'scope removed');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: as(P1, { Origin: GOOD }) }, { message: 'no commit scope', files: ['from-p1.txt'] });
+  assert.strictEqual(r.status, 403, 'missing scope 403');
+  assert.strictEqual(r.json.scope, 'commit', 'refusal names the scope');
+  r = await req(port, { method: 'POST', path: '/pair/scopes', headers: as(P1, { Origin: GOOD }) }, { id: P1id, add: ['commit'] });
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: as(P1, { Origin: GOOD }) }, { message: 'p1 commit', files: ['from-p1.txt'] });
+  assert.strictEqual(r.status, 200, 'scope restored, commit lands');
+
+## Exact source excerpt, characters 130882–131497
+
+  // T12 restart: trusted minds stay trusted (no re-pairing), local tools token unchanged.
+  await b.stop();
+  b = await startBridge(env, proj);
+  assert.ok(new RegExp('Listening on http://127\\.0\\.0\\.1:' + port).test(b.out), 'bridge restarted');
+  assert.strictEqual(fs.readFileSync(tokenFile, 'utf8').trim(), token, 'local tools token survives restart');
+  r = await tryWrite('after-restart.txt', P1);
+  assert.strictEqual(r.status, 200, 'paired browser still trusted after restart');
+  r = await tryWrite('after-restart-cli.txt');
+  assert.strictEqual(r.status, 200, 'local tools still trusted after restart');
+
+## Exact source excerpt, characters 131499–132690
+
+  // T13 command-line revoke applies at once, no restart.
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, { code: b.code(), name: 'Laptop Firefox' });
+  assert.strictEqual(r.status, 200, 'second device pairs');
+  const P2 = r.json.token; const P2id = r.json.id;
+  assert.strictEqual((await tryWrite('p2.txt', P2)).status, 200, 'second device trusted');
+  let c = cli(env, proj, ['--list-minds']);
+  assert.strictEqual(c.status, 0, '--list-minds ok');
+  assert.ok(c.out.includes('Laptop Firefox') && c.out.includes("Kirk's Chrome"), '--list-minds names devices');
+  assert.ok(!c.out.includes(P1) && !c.out.includes(P2) && !c.out.includes(token) && !c.out.includes(sha(P1)), '--list-minds never prints tokens or hashes');
+  c = cli(env, proj, ['--revoke', P2id]);
+  assert.strictEqual(c.status, 0, '--revoke ok');
+  assert.strictEqual((await tryWrite('p2-again.txt', P2)).status, 401, 'revoked device refused at once (no restart)');
+  assert.strictEqual((await tryWrite('p1-still.txt', P1)).status, 200, 'other devices unaffected');
+  assert.strictEqual(cli(env, proj, ['--revoke', 'deadbeef']).status, 1, 'unknown id is an honest error');
+
+## Exact source excerpt, characters 132692–133205
+
+  // T14 app revoke (per device) through /pair/revoke.
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, { code: b.code(), name: 'Old tablet' });
+  const P3 = r.json.token; const P3id = r.json.id;
+  r = await req(port, { method: 'POST', path: '/pair/revoke', headers: as(P1, { Origin: GOOD }) }, { id: P3id });
+  assert.strictEqual(r.status, 200, 'app revoke 200');
+  assert.strictEqual((await tryWrite('p3.txt', P3)).status, 401, 'app-revoked device refused');
+
+## Exact source excerpt, characters 133207–134735
+
+  // T15 exact trusted origins from the command line, never wildcards.
+  c = cli(env, proj, ['--trust-origin', 'https://*.evil.example']);
+  assert.strictEqual(c.status, 1, 'wildcard origin refused');
+  assert.ok(!fs.readFileSync(trustFile, 'utf8').includes('*'), 'no wildcard ever saved');
+  assert.strictEqual(cli(env, proj, ['--trust-origin', 'https://kirk.dev/path']).status, 1, 'origin with a path refused');
+  assert.strictEqual(cli(env, proj, ['--trust-origin', 'https://kirk.dev']).status, 0, 'exact origin trusted');
+  r = await req(port, { method: 'OPTIONS', path: '/', headers: { Origin: 'https://kirk.dev', 'Access-Control-Request-Method': 'GET' } });
+  assert.strictEqual(r.status, 204, 'newly trusted origin allowed without restart');
+  r = await req(port, { method: 'POST', path: '/code/write', headers: Object.assign({ Origin: 'https://kirk.dev' }, J) }, { path: 'k.txt', content: 'x' });
+  assert.strictEqual(r.status, 401, 'a trusted origin still has to pair before changing anything');
+  r = await req(port, { method: 'OPTIONS', path: '/', headers: { Origin: 'https://kirk.dev.evil.example', 'Access-Control-Request-Method': 'GET' } });
+  assert.strictEqual(r.status, 403, 'look-alike origin 403');
+  assert.strictEqual(cli(env, proj, ['--untrust-origin', 'https://kirk.dev']).status, 0, 'origin removed');
+  r = await req(port, { method: 'OPTIONS', path: '/', headers: { Origin: 'https://kirk.dev', 'Access-Control-Request-Method': 'GET' } });
+  assert.strictEqual(r.status, 403, 'removed origin 403 again');
+
+## Exact source excerpt, characters 134737–136398
+

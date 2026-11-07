@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c06</title>
+<meta name="description" content="Reading section c06 of 77aa591c4a, 1572 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c06">
+<meta property="og:description" content="Reading section c06 of 77aa591c4a, 1572 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1091"></span><span id="p1092"></span><span id="p1093"></span><span id="p1094"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c06</h1>
+<p>77aa591c4a · words 1572 · characters 47074–59524</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1091, 1092, 1093, 1094. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">function runBridgeCli(argv) {
+  var cmd = argv[0];
+  if (!cmd || cmd.indexOf(&#x27;--&#x27;) !== 0) return false;
+  bridgeEphemeral = false; // the command line always edits the trust file itself
+  var st = trustState();
+  var arg = argv[1];
+  function say(s) { console.log(&#x27;  &#x27; + s); }
+  function fail(s) { console.error(&#x27;  ! &#x27; + s); process.exitCode = 1; return true; }
+  function findMind(id) { return st.minds.filter(function (m) { return m.id === String(id || &#x27;&#x27;); })[0] || null; }
+  switch (cmd) {
+    case &#x27;--list-minds&#x27;: {
+      say(&#x27;Trusted minds (&#x27; + st.minds.length + &#x27;). Tokens are never shown; only their hashes are kept.&#x27;);
+      st.minds.forEach(function (m) {
+        say(m.id + &#x27;  &#x27; + m.kind + &#x27;  &#x27; + m.name + (m.origin ? &#x27;  &#x27; + m.origin : &#x27;&#x27;) +
+            &#x27;  scopes=&#x27; + m.scopes.join(&#x27;,&#x27;) + &#x27;  paired=&#x27; + (m.createdAt || &#x27;?&#x27;) +
+            &#x27;  last=&#x27; + (m.lastUsedAt || &#x27;never&#x27;) + (m.kind === &#x27;cli&#x27; &amp;&amp; !st.localTools ? &#x27;  (off)&#x27; : &#x27;&#x27;));
+      });
+      say(&#x27;Local tools: &#x27; + (st.localTools ? &#x27;trusted (token file &#x27; + TOKEN_FILE + &#x27;)&#x27; : &#x27;off&#x27;));
+      say(&#x27;Extra trusted origins: &#x27; + (st.trustedOrigins.length ? st.trustedOrigins.join(&#x27;, &#x27;) : &#x27;none&#x27;));
+      say(&#x27;Project folders: &#x27; + rootList().map(function (r) { return r.name + &#x27;=&#x27; + r.path; }).join(&#x27;, &#x27;));
+      return true;
+    }
+    case &#x27;--revoke&#x27;: {
+      var m = findMind(arg);
+      if (!m) return fail(&#x27;No trusted mind with id &#x27; + String(arg || &#x27;(missing)&#x27;) + &#x27;. Try --list-minds.&#x27;);
+      st.minds = st.minds.filter(function (x) { return x.id !== m.id; });
+      if (m.kind === &#x27;cli&#x27;) { st.localTools = false; try { fs.unlinkSync(TOKEN_FILE); } catch (e) {} }
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;cli:--revoke&#x27;, device: m.id, result: &#x27;revoked&#x27; });
+      say(&#x27;Revoked &#x27; + m.name + &#x27; (&#x27; + m.id + &#x27;). Its next request will be asked to pair.&#x27;);
+      return true;
+    }
+    case &#x27;--revoke-all&#x27;: {
+      var before = st.minds.length;
+      st.minds = st.minds.filter(function (x) { return x.kind === &#x27;cli&#x27;; });
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;cli:--revoke-all&#x27;, result: &#x27;revoked-all&#x27; });
+      say(&#x27;Revoked &#x27; + (before - st.minds.length) + &#x27; paired device(s). Local tools stay trusted.&#x27;);
+      return true;
+    }
+    case &#x27;--allow-secrets&#x27;:
+    case &#x27;--deny-secrets&#x27;: {
+      var sm = findMind(arg);
+      if (!sm) return fail(&#x27;No trusted mind with id &#x27; + String(arg || &#x27;(missing)&#x27;) + &#x27;.&#x27;);
+      sm.scopes = sm.scopes.filter(function (s) { return s !== &#x27;secrets&#x27;; });
+      if (cmd === &#x27;--allow-secrets&#x27;) sm.scopes.push(&#x27;secrets&#x27;);
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;cli:&#x27; + cmd, device: sm.id, result: &#x27;scopes&#x27; });
+      say(sm.name + &#x27; scopes: &#x27; + sm.scopes.join(&#x27;,&#x27;));
+      return true;
+    }
+    case &#x27;--trust-origin&#x27;:
+    case &#x27;--untrust-origin&#x27;: {
+      var o = exactOrigin(arg);
+      if (!o) return fail(&#x27;Exact origins only, like https://example.dev or http://192.168.1.20:8000. Never *.&#x27;);
+      st.trustedOrigins = st.trustedOrigins.filter(function (x) { return x !== o; });
+      if (cmd === &#x27;--trust-origin&#x27;) st.trustedOrigins.push(o);
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;trust&#x27;, route: &#x27;cli:&#x27; + cmd, origin: o, result: &#x27;ok&#x27; });
+      say((cmd === &#x27;--trust-origin&#x27; ? &#x27;Trusted &#x27; : &#x27;Removed &#x27;) + o + &#x27;. It still has to pair before it can change anything.&#x27;);
+      return true;
+    }
+    case &#x27;--add-root&#x27;: {
+      var name = String(arg || &#x27;&#x27;);
+      var dir = argv[2] ? path.resolve(argv[2]) : &#x27;&#x27;;
+      if (!/^[a-z0-9][a-z0-9_-]{0,31}$/i.test(name) || name === &#x27;project&#x27;) return fail(&#x27;Name: letters, digits, - or _, up to 32, not &quot;project&quot;.&#x27;);
+      var isDir = false;
+      try { isDir = fs.statSync(dir).isDirectory(); } catch (e) {}
+      if (!dir || !isDir) return fail(&#x27;Folder not found: &#x27; + String(argv[2] || &#x27;(missing)&#x27;));
+      st.roots[name] = fs.realpathSync(dir);
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;trust&#x27;, route: &#x27;cli:--add-root&#x27;, result: &#x27;ok&#x27; });
+      say(&#x27;Trusted project folder &quot;&#x27; + name + &#x27;&quot; = &#x27; + st.roots[name]);
+      return true;
+    }
+    case &#x27;--remove-root&#x27;: {
+      if (!Object.prototype.hasOwnProperty.call(st.roots, String(arg || &#x27;&#x27;))) return fail(&#x27;No project folder named &#x27; + String(arg || &#x27;(missing)&#x27;) + &#x27;.&#x27;);
+      delete st.roots[arg];
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;trust&#x27;, route: &#x27;cli:--remove-root&#x27;, result: &#x27;ok&#x27; });
+      say(&#x27;Removed project folder &quot;&#x27; + arg + &#x27;&quot;.&#x27;);
+      return true;
+    }
+    case &#x27;--trust-local-tools&#x27;: {
+      st.localTools = true;
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ensureLocalToolsToken();
+      ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;cli:--trust-local-tools&#x27;, result: &#x27;local-tools-on&#x27; });
+      say(&#x27;Local tools on this computer are trusted. Token file: &#x27; + TOKEN_FILE);
+      return true;
+    }
+    case &#x27;--untrust-local-tools&#x27;: {
+      st.localTools = false;
+      st.minds = st.minds.filter(function (x) { return x.kind !== &#x27;cli&#x27;; });
+      try { fs.unlinkSync(TOKEN_FILE); } catch (e) {}
+      if (!saveTrust()) return fail(&#x27;Could not save.&#x27;);
+      ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;cli:--untrust-local-tools&#x27;, result: &#x27;local-tools-off&#x27; });
+      say(&#x27;Local tools now need to pair like any other device.&#x27;);
+      return true;
+    }
+    default:
+      bridgeLockUsage();
+      return fail(&#x27;Unknown option &#x27; + cmd);
+  }
+}
+
+## Exact source excerpt, characters 48734–48859
+
+function bridgeLockInit() {
+  trustState();
+  ensureLocalToolsToken();
+}
+// ── end LAYER bridge-lock-v0 · v0.1 helpers ──
+```
+
+## Exact source excerpt, characters 48861–48909
+
+### Block B: `handleRequest` (replaces L111-129)
+
+## Exact source excerpt, characters 48911–49277
+
+```js
+function handleRequest(req, res) {
+  // LAYER bridge-lock-v0: the old `Access-Control-Allow-Origin: *` is superseded here.
+  var origin = req.headers.origin || &#x27;&#x27;;
+  var pathname = String(req.url || &#x27;/&#x27;).split(&#x27;?&#x27;)[0];
+  res.setHeader(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;);
+  res.setHeader(&#x27;Vary&#x27;, &#x27;Origin&#x27;);
+  res.setHeader(&#x27;X-Content-Type-Options&#x27;, &#x27;nosniff&#x27;);
+
+## Exact source excerpt, characters 49279–49498
+
+  // 1. Host guard (DNS rebinding): only 127.0.0.1 / localhost.
+  if (!hostAllowed(req.headers.host)) {
+    req.resume();
+    return respond(res, 403, { error: &#x27;Host not allowed&#x27;, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 49500–50465
+
+  // 2. Origin guard. Browsers always send Origin on cross-origin fetches and
+  //    preflights. No Origin = local CLI or same-machine tool (still needs
+  //    a trusted token for anything that changes state).
+  if (origin &amp;&amp; !originAllowed(origin)) {
+    if (pathname === &#x27;/code/git/commit&#x27;) {
+      ledgerAppend({ route: pathname, origin: origin, result: &#x27;refused:origin&#x27; });
+    }
+    req.resume();
+    return respond(res, 403, { error: &#x27;Origin not on the FreeLattice allowlist&#x27;, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+  if (origin) {
+    res.setHeader(&#x27;Access-Control-Allow-Origin&#x27;, origin);
+    res.setHeader(&#x27;Access-Control-Allow-Methods&#x27;, &#x27;GET, POST, OPTIONS&#x27;);
+    res.setHeader(&#x27;Access-Control-Allow-Headers&#x27;, &#x27;Content-Type, X-Agent-Id, X-FL-Bridge-Token&#x27;);
+    res.setHeader(&#x27;Access-Control-Max-Age&#x27;, &#x27;600&#x27;);
+    if (req.headers[&#x27;access-control-request-private-network&#x27;]) {
+      res.setHeader(&#x27;Access-Control-Allow-Private-Network&#x27;, &#x27;true&#x27;);
+    }
+  }
+
+## Exact source excerpt, characters 50467–50555
+
+  if (req.method === &#x27;OPTIONS&#x27;) { req.resume(); res.writeHead(204); res.end(); return; }
+
+## Exact source excerpt, characters 50557–51059
+
+  // 3. Trusted-mind guard: which paired device (or local tool) is this?
+  var gated = needsToken(req.method, pathname);
+  var mind = gated ? requestMind(req) : null;
+  if (gated &amp;&amp; !mind) {
+    if (pathname === &#x27;/code/git/commit&#x27;) {
+      ledgerAppend({ route: pathname, origin: origin, result: &#x27;refused:token&#x27; });
+    }
+    req.resume();
+    return respond(res, 401, { error: &#x27;Pair with the Agent Bridge first (token missing, stale or revoked).&#x27;, pair: &#x27;code&#x27;, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 51061–51618
+
+  // 4. Scope guard. A new mind has every scope except &#x27;secrets&#x27; (.env files).
+  var need = mind ? scopeFor(req.method, pathname) : &#x27;&#x27;;
+  if (need &amp;&amp; mind.scopes.indexOf(need) === -1) {
+    if (pathname === &#x27;/code/git/commit&#x27;) {
+      ledgerAppend({ route: pathname, origin: origin, device: mind.id, result: &#x27;refused:scope&#x27; });
+    }
+    req.resume();
+    return respond(res, 403, { error: &#x27;This mind has not been given &quot;&#x27; + need + &#x27;&quot; here. Kirk can add it in Paired minds.&#x27;, scope: need, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+  if (mind) touchMind(mind);
+
+## Exact source excerpt, characters 51620–51757
+
+  // Allow requests to act as a different agent via X-Agent-Id header
+  var requestAgentId = req.headers[&#x27;x-agent-id&#x27;] || agentId.meshId;
+
+## Exact source excerpt, characters 51759–52650
+
+  // 5. Body cap. Drain the rest so the client sees the 413 cleanly.
+  var chunks = [];
+  var size = 0;
+  var tooBig = false;
+  req.on(&#x27;data&#x27;, function(chunk) {
+    size += chunk.length;
+    if (size &gt; MAX_BODY_BYTES) { tooBig = true; chunks = []; return; }
+    if (!tooBig) chunks.push(chunk);
+  });
+  req.on(&#x27;end&#x27;, function() {
+    if (tooBig) return respond(res, 413, { error: &#x27;Body too large (max &#x27; + MAX_BODY_BYTES + &#x27; bytes)&#x27; });
+    var body = Buffer.concat(chunks).toString(&#x27;utf8&#x27;);
+    var data = {};
+    if (body) {
+      try { data = JSON.parse(body); }
+      catch (e) { return respond(res, 400, { error: &#x27;Body is not valid JSON&#x27; }); }
+      if (!data || typeof data !== &#x27;object&#x27; || Array.isArray(data)) return respond(res, 400, { error: &#x27;Body must be a JSON object&#x27; });
+    }
+    route(req.url, req.method, data, res, requestAgentId, { origin: origin, mind: mind });
+  });
+}
+```
+
+## Exact source excerpt, characters 52652–52717
+
+### Block C: pairing and trusted-minds routes (insert after L133)
+
+## Exact source excerpt, characters 52719–55008
+
+```js
+  // ── LAYER bridge-lock-v0 · v0.1: pairing and trusted minds ──
+  if (url === &#x27;/pair&#x27; &amp;&amp; method === &#x27;POST&#x27;) {
+    var now = Date.now();
+    if (!pairState.code || now &gt; pairState.expires) newPairCode(&#x27;expired&#x27;);
+    if (now &lt; pairState.coolUntil) return respond(res, 429, { error: &#x27;Resting for a moment. Try again in 30 seconds.&#x27; });
+    var given = normalizePairCode(data.code);
+    var good = given.length === 6 &amp;&amp;
+      crypto.timingSafeEqual(Buffer.from(given, &#x27;utf8&#x27;), Buffer.from(pairState.code, &#x27;utf8&#x27;));
+    var pairOrigin = (meta &amp;&amp; meta.origin) || &#x27;&#x27;;
+    if (!good) {
+      pairState.tries += 1;
+      if (pairState.tries &gt;= PAIR_MAX_TRIES) {
+        ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair&#x27;, origin: pairOrigin, result: &#x27;refused:lockout&#x27; });
+        newPairCode(&#x27;lockout&#x27;);
+        return respond(res, 429, { error: &#x27;Too many tries. The bridge window shows a new code.&#x27; });
+      }
+      return respond(res, 403, { error: &#x27;That code does not match. Check the bridge window.&#x27;, triesLeft: PAIR_MAX_TRIES - pairState.tries });
+    }
+    var st = trustState();
+    var tok = newToken();
+    var mind = {
+      id: newMindId(),
+      name: cleanName(data.name) || (pairOrigin ? &#x27;A browser at &#x27; + pairOrigin : &#x27;A local tool&#x27;),
+      origin: pairOrigin,
+      kind: pairOrigin ? &#x27;browser&#x27; : &#x27;tool&#x27;,
+      scopes: DEFAULT_SCOPES.slice(),
+      tokenSha256: sha256Hex(tok),
+      createdAt: new Date().toISOString(),
+      lastUsedAt: &#x27;&#x27;,
+      expiresAt: null
+    };
+    st.minds.push(mind);
+    if (!saveTrust()) {
+      st.minds = st.minds.filter(function (m) { return m.id !== mind.id; });
+      return respond(res, 500, { error: &#x27;The bridge could not save this pairing. Check ~/.freelattice.&#x27; });
+    }
+    ledgerAppend({ kind: &#x27;pair&#x27;, route: &#x27;/pair&#x27;, origin: pairOrigin, device: mind.id, result: &#x27;ok&#x27; });
+    console.log(&#x27;  \u2726 Paired &quot;&#x27; + mind.name + &#x27;&quot; (&#x27; + mind.id + &#x27;). &#x27; +
+      (bridgeEphemeral ? &#x27;Ephemeral mode: forgotten when the bridge stops.&#x27; : &#x27;It stays paired until you revoke it.&#x27;));
+    newPairCode(&#x27;used&#x27;); // single use: the next device gets a fresh code
+    return respond(res, 200, { token: tok, id: mind.id, name: mind.name, scopes: mind.scopes,
+                               persistent: !bridgeEphemeral, bridgeLock: BRIDGE_LOCK_VERSION });
+  }
+
+## Exact source excerpt, characters 55010–55274
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

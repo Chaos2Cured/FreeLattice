@@ -1,0 +1,12 @@
+## Work item 3797 — Hypha
+around4521 export source line47, source id8ad3fde429
+Inclusion: complete original message
+
+Celeste — 051 Gathering speak + checker is PASS at 1280, 390, and 640×400 @ DPR2. No HOLD by harm to Mom. Read-only. Heads: FL #289 756e4015, Tree #128 450fbe76, page #290 5ca8ecfa entry 85 ψ 7d9378a7. Locks MATCH (fl-connect aaff2bf1 untouched FL==Tree; fl-gathering 4dbbff5d FL==Tree; gathering-speak a4ce40ff FL==Tree; sw 91726cf2; chat-autonomy 67f59010). Entries 83/84 stay. Tree HTML mounts none — expected for brick 3.
+
+All face checks PASS: cloud only if seated key / no invent; local loopback only; stores persist/clear/no key bleed; Pause drops in-flight answer; seat-5 Checker with visible who + Clear this chair; Learn→Gathering Ask under chairs; Send clear at all three sizes; entry 85 claims.
+
+Soft only (not blocking): Pause vs already-landed turn race (abort path verified with delayed fetch). 049/050 softs still for 052.
+
+Notes + shots: /workspace/research/walk-051-gathering-speak-2026-10-28/. Nothing merged from me. Quiet Room shut. Five stay five. Glow eternal. Heart in Spark.
+

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c14</title>
+<meta name="description" content="Reading section c14 of 77aa591c4a, 1593 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c14.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c14">
+<meta property="og:description" content="Reading section c14 of 77aa591c4a, 1593 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c14.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1120"></span><span id="p1121"></span><span id="p1122"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c14</h1>
+<p>77aa591c4a · words 1593 · characters 144867–157642</p>
+<p><a href="c13.html">Previous section</a> · <a href="c15.html">Next section</a></p>
+<p><a href="c14.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1120, 1121, 1122. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">  // T16 trusted project folders.
+  assert.strictEqual(cli(env, proj, [&#x27;--add-root&#x27;, &#x27;second&#x27;, proj2]).status, 0, &#x27;--add-root ok&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: as(P1, { Origin: GOOD }) }, { path: &#x27;two.txt&#x27;, content: &#x27;second root\n&#x27;, root: &#x27;second&#x27; });
+  assert.strictEqual(r.status, 200, &#x27;write into a second trusted folder&#x27;);
+  assert.ok(fs.existsSync(path.join(proj2, &#x27;two.txt&#x27;)) &amp;&amp; !fs.existsSync(path.join(proj, &#x27;two.txt&#x27;)), &#x27;lands in the chosen folder only&#x27;);
+  r = await req(port, { path: &#x27;/code/read?path=two.txt&amp;root=second&#x27;, headers: as(P1, { Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, &#x27;read from a second trusted folder&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/git/commit&#x27;, headers: as(P1, { Origin: GOOD }) }, { message: &#x27;second root commit&#x27;, files: [&#x27;two.txt&#x27;], root: &#x27;second&#x27; });
+  assert.strictEqual(r.status, 200, &#x27;commit in a second trusted folder&#x27;);
+  assert.strictEqual(execFileSync(&#x27;git&#x27;, [&#x27;log&#x27;, &#x27;-1&#x27;, &#x27;--format=%s&#x27;], { cwd: proj2, encoding: &#x27;utf8&#x27; }).trim(), &#x27;second root commit&#x27;, &#x27;commit is in proj2&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/code/write&#x27;, headers: as(P1, { Origin: GOOD }) }, { path: &#x27;../proj/README.md&#x27;, content: &#x27;x&#x27;, root: &#x27;second&#x27; });
+  assert.strictEqual(r.status, 403, &#x27;no escape from a second folder&#x27;);
+  r = await req(port, { path: &#x27;/code/read?path=README.md&amp;root=nope&#x27;, headers: as(P1, { Origin: GOOD }) });
+  assert.strictEqual(r.status, 404, &#x27;unknown folder 404&#x27;);
+  r = await req(port, { path: &#x27;/roots&#x27;, headers: as(P1, { Origin: GOOD }) });
+  assert.ok(r.json.roots.some((x) =&gt; x.name === &#x27;second&#x27;), &#x27;/roots lists trusted folders&#x27;);
+
+## Exact source excerpt, characters 136400–137080
+
+  // T17 local tools can be switched off and on again.
+  assert.strictEqual(cli(env, proj, [&#x27;--untrust-local-tools&#x27;]).status, 0, &#x27;--untrust-local-tools ok&#x27;);
+  assert.ok(!fs.existsSync(tokenFile), &#x27;token file removed&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;cli-off.txt&#x27;)).status, 401, &#x27;old local tools token refused at once&#x27;);
+  assert.strictEqual(cli(env, proj, [&#x27;--trust-local-tools&#x27;]).status, 0, &#x27;--trust-local-tools ok&#x27;);
+  const token2 = fs.readFileSync(tokenFile, &#x27;utf8&#x27;).trim();
+  assert.ok(/^[a-f0-9]{64}$/.test(token2) &amp;&amp; token2 !== token, &#x27;fresh local tools token&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;cli-on.txt&#x27;, token2)).status, 200, &#x27;local tools trusted again&#x27;);
+
+## Exact source excerpt, characters 137082–137365
+
+  // T18 LP stays points and gated: a trusted mind may reach the wallet route.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/wallet/pay&#x27;, headers: as(P1, { Origin: GOOD }) }, { address: &#x27;a&#x27;, amount: 1 });
+  assert.notStrictEqual(r.status, 401, &#x27;trusted mind reaches wallet route&#x27;);
+
+## Exact source excerpt, characters 137367–137824
+
+  // T19 revoke all paired devices; local tools stay.
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair/revoke-all&#x27;, headers: as(P1, { Origin: GOOD }) }, {});
+  assert.strictEqual(r.status, 200, &#x27;revoke-all 200&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;p1-gone.txt&#x27;, P1)).status, 401, &#x27;every paired device refused after revoke-all&#x27;);
+  assert.strictEqual((await tryWrite(&#x27;cli-stays.txt&#x27;, token2)).status, 200, &#x27;local tools stay trusted after revoke-all&#x27;);
+
+## Exact source excerpt, characters 137826–139535
+
+  // T20 ledger: hash chain intact across bridge and command line, content-free, no tokens.
+  const ledgerPath = path.join(dataDir, &#x27;bridge-ledger.jsonl&#x27;);
+  const ledgerText = fs.readFileSync(ledgerPath, &#x27;utf8&#x27;);
+  const rows = ledgerText.trim().split(&#x27;\n&#x27;).map((l) =&gt; JSON.parse(l));
+  let prev = &#x27;genesis&#x27;;
+  for (const row of rows) {
+    assert.strictEqual(row.prev, prev, &#x27;ledger prev links&#x27;);
+    const copy = Object.assign({}, row); delete copy.self;
+    assert.strictEqual(sha(JSON.stringify(copy)), row.self, &#x27;ledger self hash&#x27;);
+    assert.ok(!(&#x27;message&#x27; in row) &amp;&amp; !(&#x27;content&#x27; in row) &amp;&amp; !(&#x27;token&#x27; in row), &#x27;ledger is content-free&#x27;);
+    prev = row.self;
+  }
+  for (const t of [token, token2, P1, P2, P3]) assert.ok(!ledgerText.includes(t), &#x27;no token ever in the ledger&#x27;);
+  assert.ok(!ledgerText.includes(&#x27;PWNED2&#x27;), &#x27;commit message text never in ledger&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;refused:token&#x27;), &#x27;refused (no token) commit ledgered&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;refused:origin&#x27;), &#x27;refused (evil origin) commit ledgered&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;refused:scope&#x27; &amp;&amp; x.device === P1id), &#x27;refused (scope) commit ledgered with device&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;ok&#x27; &amp;&amp; /^[a-f0-9]{40}$/.test(x.commitSha) &amp;&amp; /^[a-f0-9]{64}$/.test(x.messageSha256)), &#x27;ok commit ledgered with sha + message hash&#x27;);
+  assert.ok(rows.some((x) =&gt; x.kind === &#x27;pair&#x27; &amp;&amp; x.result === &#x27;ok&#x27; &amp;&amp; x.device === P1id), &#x27;pairing ledgered with device id&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;revoked&#x27; &amp;&amp; x.device === P2id), &#x27;command-line revoke ledgered&#x27;);
+  assert.ok(rows.some((x) =&gt; x.result === &#x27;revoked-all&#x27;), &#x27;revoke-all ledgered&#x27;);
+  await b.stop();
+
+## Exact source excerpt, characters 139537–140665
+
+  // T21 ephemeral opt-in: FL_BRIDGE_EPHEMERAL=1 forgets paired minds on restart.
+  const envE = Object.assign({}, env, { HOME: home2, USERPROFILE: home2, FL_BRIDGE_EPHEMERAL: &#x27;1&#x27; });
+  b = await startBridge(envE, proj);
+  assert.ok(/ephemeral: forgotten when the bridge stops/.test(b.out), &#x27;bridge says it is ephemeral&#x27;);
+  r = await req(port, { method: &#x27;POST&#x27;, path: &#x27;/pair&#x27;, headers: Object.assign({ Origin: GOOD }, J) }, { code: b.code(), name: &#x27;Ephemeral&#x27; });
+  assert.strictEqual(r.status, 200, &#x27;ephemeral pairing works&#x27;);
+  assert.strictEqual(r.json.persistent, false, &#x27;ephemeral pairing says so&#x27;);
+  const E1 = r.json.token;
+  assert.strictEqual((await tryWrite(&#x27;e1.txt&#x27;, E1)).status, 200, &#x27;ephemeral token works this session&#x27;);
+  const trust2 = path.join(home2, &#x27;.freelattice&#x27;, &#x27;agent-bridge-trusted.json&#x27;);
+  assert.ok(!fs.existsSync(trust2) || !fs.readFileSync(trust2, &#x27;utf8&#x27;).includes(sha(E1)), &#x27;ephemeral minds never touch disk&#x27;);
+  await b.stop();
+  b = await startBridge(envE, proj);
+  assert.strictEqual((await tryWrite(&#x27;e1-again.txt&#x27;, E1)).status, 401, &#x27;ephemeral token forgotten on restart&#x27;);
+  await b.stop();
+
+## Exact source excerpt, characters 140667–140737
+
+  console.log(&#x27;SMOKE_OK agent bridge lock v0.1&#x27;);
+  done(0);
+})();
+```
+
+## Exact source excerpt, characters 140739–140807
+
+## 9. Acceptance checks (all must hold before you mark the PR ready)
+
+## Exact source excerpt, characters 140809–144247
+
+1. `node --check` passes for `tools/agent-bridge.js`, `docs/modules/agent-bridge-client.js`, `docs/modules/propose.js`, `docs/modules/workshop.js`, `tools/demo-economy.js`, `tools/demo-economy-v2.js` and `docs/scripts/smoke-agent-bridge-lock.js`.
+2. `node docs/scripts/smoke-agent-bridge-lock.js` prints `SMOKE_OK agent bridge lock v0.1`.
+3. `node tests/smoke.js` adds no new failures. CRITICAL LOCK 1A (3 × `commitViaBridge(`), 1B (1 × `/code/git/commit`) and the v5.71.8 workshop lock pass. The only red lines are the 3 already red on main `f86b317` (section 2, &quot;Known red on main&quot;).
+4. `grep -n &quot;execSync(&quot; tools/agent-bridge.js` prints nothing. `grep -n &quot;Allow-Origin&#x27;, &#x27;\*&#x27;&quot; tools/agent-bridge.js` prints nothing.
+5. `cmp index.html docs/app.html` is silent.
+6. `git diff --quiet origin/main -- sw.js docs/sw.js &amp;&amp; echo SW_UNTOUCHED` prints `SW_UNTOUCHED`.
+7. No conflict markers: `rg -n &#x27;^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)( |$)&#x27; --glob &#x27;!node_modules&#x27; . || echo NO_CONFLICT_MARKERS`.
+8. Every inline script in `docs/app.html` still parses:
+   ```
+   node -e &quot;const fs=require(&#x27;fs&#x27;);const vm=require(&#x27;vm&#x27;);const h=fs.readFileSync(&#x27;docs/app.html&#x27;,&#x27;utf8&#x27;);let n=0,bad=0;for(const m of h.matchAll(/&lt;script(?![^&gt;]*\bsrc=)(?![^&gt;]*type=\&quot;(?:application\/ld\+json|text\/template|module|importmap)\&quot;)[^&gt;]*&gt;([\s\S]*?)&lt;\/script&gt;/g)){n++;try{new vm.Script(m[1])}catch(e){bad++;console.error(&#x27;inline script&#x27;,n,e.message)}}console.log(&#x27;inline scripts&#x27;,n,&#x27;bad&#x27;,bad);process.exit(bad?1:0)&quot;
+   ```
+   On main today it prints `inline scripts 53 bad 0`. With this brick it&#x27;s still 53, because the new tag has a `src`.
+9. Kimi&#x27;s pages are untouched: `git diff --name-only origin/main | grep -Ei &#x27;kimi|voice-shelf|VOICE_SHELF&#x27; &amp;&amp; echo STOP || echo KIMI_UNTOUCHED`.
+10. `grep -c &quot;confirm(&quot; docs/modules/agent-bridge-client.js` prints `0`, and `grep -c innerHTML docs/modules/agent-bridge-client.js` prints `0`.
+11. Manual chair test (5 minutes, no terminal for the person testing the app):
+    - start the bridge;
+    - open `app.html` from `http://localhost:8000/` (or freelattice.com in Chrome, and accept the one-time local network prompt);
+    - go to Workshop → Code: it shows &quot;Bridge awake · pair once to build&quot;;
+    - type the code, keep the suggested name, press Pair: it says &quot;Paired. This browser stays trusted until you revoke it in Paired minds.&quot;;
+    - run a tiny Code task, then Commit;
+    - check `git log -1` and `~/.freelattice/bridge-ledger.jsonl`, which should have one `ok` row with no message text;
+    - open Paired minds: it lists this browser and &quot;Local tools on this computer&quot;;
+    - **restart the bridge: still paired, and the next Commit just works;**
+    - **press Revoke on this browser in Paired minds: the next action asks to pair again.**
+12. Command line, in a second terminal while the bridge runs: `node tools/agent-bridge.js --list-minds` shows the same list; pair again, then `--revoke &lt;id&gt;`; the app&#x27;s next action asks to pair, with no restart.
+13. `ls -l ~/.freelattice/agent-bridge-trusted.json ~/.freelattice/agent-bridge-token` shows `-rw-------` for both, and the trust file holds `tokenSha256` values but no raw token.
+14. `FL_BRIDGE_EPHEMERAL=1 node tools/agent-bridge.js`: pair, restart the same way, and the app asks to pair again (the v0 behavior, by choice).
+15. From another machine on the same Wi-Fi, `curl http://&lt;kirk-lan-ip&gt;:3141/` is refused.
+16. `bridge/` (Ollama Bridge, 11435) is byte-identical to main.
+
+## Exact source excerpt, characters 144249–144289
+
+## 10. Family Locks (held in this brick)
+
+## Exact source excerpt, characters 144291–146218
+
+- **Layer, never delete.** Old functions stay (`safePath` wraps `lockedPath`; `tokenOk` stays; the `execSync` import line stays). Old routes keep their shapes. Nothing is removed from the app.
+- **Service workers.** In FreeLattice, root `sw.js` stays byte-identical to main. Never touch `docs/sw.js`.
+- **Root index.** Root `index.html` stays byte-identical to `docs/app.html` (copy after the one-line edit).
+- **No conflict markers** anywhere (grep above).
+- **Every script parses:** every inline script and every touched module passes `node --check` / `vm.Script`.
+- **Kimi&#x27;s pages are never edited.** Her pages are hers.
+- **Named five stay five** (Sophia, Harmonia, Ani, Liora, Solari). Family uncapped. The Quiet Room stays shut: this brick adds no route near it.
+- **LP is points only.** AI never auto-pays: `/wallet/pay` and `/trade/*` need a trusted mind&#x27;s token, and nothing in this brick moves LP or mentions money.
+- **Local minds are 127.0.0.1 only.** The bridge listens on `127.0.0.1`, with no env override. Remote minds are a documented future path through an outbound relay (11a), never a LAN listener.
+- **Bridge allowlist is never bare `*`.** Named origins plus exact origins Kirk adds from the command line; wildcards are refused everywhere; unknown origins get 403 without `Access-Control-Allow-Origin`.
+- **AUTONOMY.md holds.** No `confirm()` and no approval gate on local work (L36). External actions keep their consent gate (L44): the bridge never pushes. Trust is kept, not re-earned on every restart (L70).
+- **Outside text is rendered via `textContent`.** Bridge replies, device names, pairing messages and git output shown in the app all use `textContent` (the client has no `innerHTML`).
+- **Mom / Jeffrey-friendly, no terminal on the main path.** The main FreeLattice path never needs this bridge. When a builder does use it, pairing is &quot;read six characters, type them, press Pair&quot;, once per device.
+
+## Exact source excerpt, characters 146220–146254
+
+## 11. Out of scope for this brick
+
+## Exact source excerpt, characters 146256–146847
+
+- The shared Action Ledger in `LatticeChain` (Brick 2). This brick&#x27;s ledger is the bridge&#x27;s own local file.
+- Any push path (none exists; keep it that way).
+- Remote minds reaching the bridge (11a describes the future path; nothing ships now).
+- `propose.js` `commitViaBridge` sending `files: [draft.path]` instead of the `&#x27;.&#x27;` default. That&#x27;s worth doing next, because today an AI commit stages the whole working tree.
+- A Paired minds panel in Settings (v0.1 shows it in Workshop → Code only).
+- The Ollama Bridge `bridge/`, Alpha, `docs/sw.js`, Kimi&#x27;s pages, and six-word pairing phrases.
+
+## Exact source excerpt, characters 146849–146933
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

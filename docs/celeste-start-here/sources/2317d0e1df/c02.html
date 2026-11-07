@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Bridge Lock v0 vs AUTONOMY.md: review and proposed edits c02</title>
+<meta name="description" content="Reading section c02 of 2317d0e1df, 596 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2317d0e1df/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Agent Bridge Lock v0 vs AUTONOMY.md: review and proposed edits c02">
+<meta property="og:description" content="Reading section c02 of 2317d0e1df, 596 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2317d0e1df/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p968"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Agent Bridge Lock v0 vs AUTONOMY.md: review and proposed edits · c02</h1>
+<p>2317d0e1df · words 596 · characters 10112–13920</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 968. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/agency-autonomy.html">Agency and autonomy</a> — guide section 2, Foundation: agency and AUTONOMY</li></ul>
+
+<pre class="source">**E5. AI on this computer is trusted by default (say it out loud).** Make the CLI token file a persistent `kind: &#x27;cli&#x27;` entry named &quot;Local tools on this computer&quot; that is listed and revocable like the others. Add to §0 and the doc outline (§7a): &quot;Minds running on this computer (Claude Code, Cursor, local agents) use the token file and never need to pair. Only web pages and other machines are strangers.&quot;
+
+**E6. Scopes, full by default.** Each trusted entry gets `scopes`, default `[&#x27;read&#x27;,&#x27;write&#x27;,&#x27;patch&#x27;,&#x27;test&#x27;,&#x27;commit&#x27;,&#x27;wallet&#x27;]`, which is full local power with no prompts (P1). Optional extra scopes: `secrets` (lifts the `.env*` block for that mind only) and `roots:&lt;name&gt;` (see E8). Keep `.git/` and `.ssh/` blocked for everyone. Guests can be given narrower scopes.
+
+**E7. Exact-origin trust list, never wildcards.** Allow `trustedOrigins: [&quot;https://example.dev&quot;]` in the trusted file, editable only from the CLI or the bridge window, never over HTTP. Reject any entry that isn&#x27;t a full `scheme://host[:port]` with no `*`. Add the Tauri shell origins (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`) to the built-in list if that shell ships. The smoke should assert that a `*` entry is refused.
+
+**E8. Trusted roots (future-friendly, small).** Allow `roots: { freelattice: &quot;/Users/kirk/FreeLattice&quot;, ... }` in the trusted file. Routes take an optional `root` name, with the default being today&#x27;s `FL_PROJECT`. `lockedPath` checks realpaths against the chosen root exactly as it does now.
+
+**E9. Name the remote path in §11 (new &quot;Future: remote trusted minds&quot;).** &quot;Remote minds will authenticate with signed identity, never a shared secret over the network: the mind&#x27;s Ed25519 companion key from `LATTICE_IDENTITY_v0.1.md` / `PAIR_FINGERPRINT_v0.1.md`. Kirk adds its fingerprint to trusted minds once, checked out of band. Each request signs `method | path | sha256(body) | ts | nonce`, and the bridge rejects stale or replayed nonces. The bridge still listens on 127.0.0.1 only, and remote reach comes through an outbound relay or tunnel the desktop app opens, never a LAN listener. Remote entries appear in Paired minds and revoke the same way. External actions (push, paid APIs, money) still follow AUTONOMY.md Principle 2.&quot;
+
+**E10. Update acceptance checks and smoke (§8, §9).**
+- Replace §9 step 10&#x27;s last bullet with: &quot;restart the bridge: still paired, and the next Commit just works. Revoke this browser in Paired minds: the next action asks to pair.&quot;
+- Add smoke cases: the token survives a bridge restart (same throwaway HOME); a revoked token gets 401; `/pair/list` never returns tokens or hashes; the trusted file is 0600 and stores only hashes; `FL_BRIDGE_EPHEMERAL=1` keeps today&#x27;s behavior; an evil origin is still 403 even with a valid persistent token.
+
+**E11. Soften §3.2 wording and the Family Ledger line.** Change &quot;per-launch token by a short pairing code&quot; to &quot;a per-device token from a short pairing code, kept until you revoke it&quot; in §0, §7b, §7c and §7d.
+
+**E12. Brick 3 heads-up (§11).** Reword to: &quot;Brick 3 ideas (hourly commit cap, provider defaults) touch AUTONOMY.md Principle 1 and the Allowed Providers table. Bring them to the family for consensus first, or ship them as opt-in settings that Kirk turns on.&quot;
+
+## 6. Bottom line
+
+The lock does what Kirk wants for strangers: untrusted sites and the LAN are shut out, and shell injection and path escapes are closed. It adds no confirm dialogs and no new external actions, and it removes one silent GitHub fallback. Its one real departure from AUTONOMY.md is the per-launch token: trusted minds must pair again after every restart, can&#x27;t be seen or revoked individually, and the paste names no future path for remote minds. E1 to E5 plus E9 fix that without weakening anything against strangers.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

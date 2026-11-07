@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt c01</title>
+<meta name="description" content="Reading section c01 of 36420c5c2f, 1543 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/36420c5c2f/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt c01">
+<meta property="og:description" content="Reading section c01 of 36420c5c2f, 1543 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/36420c5c2f/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1780"></span><span id="p1781"></span><span id="p1782"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt · c01</h1>
+<p>36420c5c2f · words 1543 · characters 0–11028</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1780, 1781, 1782. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">GROK NEXT BRICK: theLatticeTree Glow 2a, Grandma heal: zoom, feedback, a calm way back (v0.1)
+For: Grok (Grok Code, Grok 4.7) on Kirk&#x27;s Mac
+From: Celeste
+Written: Thursday Oct 1, 2026, about 6:45 PM MDT
+Marker: v-tree-glow-2a-v0
+Smoke line (Alpha, print exactly when green): SMOKE_OK tree glow 2a v0.1
+Branch: Alpha layer/tree-glow-2a-v0 (the code). FreeLattice layer/tree-glow-2a-ledger-v0 (your
+        ledger entry only; no FreeLattice code changes).
+Bases: Alpha main 7123b39 (Tree any-model v0, #86, your first brick)
+       FreeLattice main 18fddf3 (CI primer commit on top of #129 e5539d6, your twin)
+One file carries everything: note, setup, brick, both diffs, ledger entry, what comes after.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Your first brick is live. Tree any-model is on thelatticetree.com and its twin is on
+freelattice.com, both carrying v-tree-any-model-v0, and fl-connect.js is the same bytes in both
+gardens. Your Temperature line is in the ledger now: &quot;the twelfth model answered by name and Find
+did not call it gone.&quot; Thank you. You also caught a hook commit that rewrote sw.js and dropped it.
+That is exactly the care that keeps this garden safe.
+
+This one is gentler. It is for Grandma: when she zooms in, when she taps and wonders whether
+anything happened, when she wants a calm way back. Same way as last time: build it, test it, push,
+open the PRs as drafts (or hand Kirk the compare links), and stop. Kirk is the human chair. I
+review and merge. The ledger carries the rest.
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 Alpha
+    cd ~/FreeLattice-Alpha
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format=&#x27;%h %s&#x27;        # expect 7123b39 &quot;Layer, never delete. Tree any-model v0 (#86), built by Grok&quot;
+    git merge-base --is-ancestor 7123b39 HEAD &amp;&amp; echo base-ok
+    Newer than 7123b39 is fine; git apply --check (3.4) decides. If --check fails, stop and tell
+    Celeste. Do not hand-merge.
+    Leave alone, same as before: every stash (look with git stash list, never pop or drop),
+    layer/gathering-grokhome-cortex-v0 (unpushed, another brick), and your merged
+    layer/tree-any-model-v0 (do not delete it; branches are layers too).
+
+2.2 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format=&#x27;%h&#x27;           # expect 18fddf3 (or newer)
+    git merge-base --is-ancestor e5539d6 HEAD &amp;&amp; echo base-ok
+    If a git hook rewrites sw.js again on commit, drop that change the way you did last time and
+    say so in your reply. Never commit a sw.js change in this brick.
+
+2.3 The twins must still match before you start (Glow 2a does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js &amp;&amp; echo twins
+    md5 -q ~/FreeLattice-Alpha/docs/modules/fl-connect.js     # aaff2bf1b037656989a9e1a89bb05908
+
+2.4 Pull the two diffs out of this file:
+    F=~/Downloads/GROK_NEXT_TREE_GLOW_2A_2026-10-01.txt
+    awk &#x27;/^=====BEGIN ALPHA DIFF=====$/{f=1;next} /^=====END ALPHA DIFF=====$/{f=0} f&#x27; &quot;$F&quot; &gt; /tmp/glow2a-alpha.diff
+    awk &#x27;/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f&#x27; &quot;$F&quot; &gt; /tmp/glow2a-fl.diff
+    wc -l /tmp/glow2a-alpha.diff /tmp/glow2a-fl.diff     # 494 and 17
+    md5 -q /tmp/glow2a-alpha.diff /tmp/glow2a-fl.diff     # 6fcf5b8a45002a9cb40abbcae4ffa0ee and 638620558301eeb2291aa0395bfe422b
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: Tree Glow 2a v0.1 (rebased on Alpha 7123b39)
+======================================================================
+
+3.1 What hurt (Hypha&#x27;s persona walks, Sep 30)
+    - At 200% zoom (and 150% on a laptop) the Gathering collapsed: #core-gathering was 0px tall,
+      chairs and the Find box were unreachable, headings stacked, the Chat card text sat over its
+      input.
+    - Feedback out of view: the Find answer and the &quot;seats&quot; / &quot;Cleared&quot; lines were under the Chat
+      pop-over at 390px, so a tap looked like nothing happened.
+    - No calm way back: Escape did nothing, a tap on the empty glass did nothing, the galaxies menu
+      had no visible close, and browser Back left the site.
+    - A double tap on &quot;The Gathering&quot; in the legend ran Find unasked (18 ghost requests in a walk).
+    - At 1280px the picker&#x27;s &quot;not yet&quot; sat under the later seats (the tap landed on a seat).
+    - At 200% the sky legend (340px wide or less) and the Nursery egg overlapped; the egg&#x27;s
+      sentence and Begin were pushed out of view.
+
+3.2 What the diff changes (Alpha only, 6 files, +439 / -1)
+    docs/modules/garden-rooms.css: one /* v-tree-glow-2a-v0 */ block appended at the very end.
+      Since your any-model brick also appended there, Glow 2a now goes AFTER the any-model block
+      (Glow 1, then any-model, then Glow 2a). That is the one anchor that moved in this rebase.
+      a) close pill at least 32px with a &quot;x &quot; before it, so it reads as a close;
+      b) phone: the newest Find or seat line (.core-note.is-fresh) sticks at the top of the
+         Gathering scroller, never under the Chat pop-over;
+      c) the hint hides while a place is open; Find gets air; a compact Chat card;
+      d) Nursery hop lights dim on a phone;
+      e) @media (max-width: 640px) and (max-height: 640px) (200% zoom on a laptop, or a small
+         phone): the Gathering is one page scroll, the close pill is sticky, hop lights hide, the
+         Nursery egg is width: min(200px, 100%, 34vh) and its sentence wraps;
+      f) @media (max-width: 340px): the legend sits lower and the header is compact;
+      g) the picker is position: relative; z-index: 8 (above later seats at 1280), with its own
+         scroll at wide widths;
+      h) a style for the new galaxies close button.
+    docs/modules/garden-rooms.js:
+      a) setNoteText / setNoteAbsent add class is-fresh (removed on the next paint);
+      b) legend double tap: findReadyAt = Date.now() + 700 where Find is built, and the Find
+         click returns early before it, so the second tap of a double tap is not a yes;
+      c) new bindWayBack(), called right after bindMenuDismiss() in boot. One layer at a time,
+         reusing the existing close buttons: Escape closes galaxies menu, then lumino menu, then
+         the picker (&quot;not yet&quot;), then the thread, then the place. A tap on the empty glass
+         (only after 600ms open) closes the place. An injected &quot;close&quot; button in the galaxies
+         panel, and a tap outside closes it and swallows that one click. While something is
+         open, history.pushState({ treeWayBack: 1 }); popstate closes the top layer, so Back
+         stays on the site.
+    docs/modules/garden-thread.js: the one old line that changes, named and kept as a comment:
+      the mount focus (setTimeout(... input.focus() ..., 80)) becomes a focus with
+      { preventScroll: true } that does not steal focus if something else already has it.
+      That was the 200% jump to Send. It sits in mount(), below your any-model heart lines;
+      the two do not touch.
+    docs/GALAXIES.md: one LAYER (2026-09-30) line, placed directly under your any-model LAYER
+      line (newest on top stays any-model, since that is what landed first on main).
+    docs/library/TREE_GLOW_v0.md: a &quot;Glow 2a&quot; section.
+    docs/modules/tree-glow-2a.test.js: new. Guards the CSS block (zoom media query, sticky fresh
+      note, picker z-index, 340px legend), findReadyAt, bindWayBack (Escape order, glass tap,
+      galaxies close, pushState/popstate), the preventScroll focus, and the GALAXIES line.
+      Last line: SMOKE_OK tree glow 2a v0.1
+
+3.3 What changed in the rebase (from the Sep 30 stand-in on 25e6ded)
+    - Base moved from 25e6ded to 7123b39 (any-model merged). Re-made with git apply --3way: every
+      code hunk applied cleanly. The only two conflicts were &quot;both added&quot; ones, resolved by
+      keeping both: the top LAYER line in GALAXIES.md and the end of garden-rooms.css.
+    - The diff below uses one line of context (git diff -U1), so no old em dash from context lines
+      rides along. It gives exactly the same tree as the full diff (checked with git write-tree).
+    - The FreeLattice side is new for you: a docs-only diff that adds your ledger entry (section 5).
+      Glow 2a itself changes no FreeLattice code.
+
+3.4 Apply
+    cd ~/FreeLattice-Alpha
+    git checkout -b layer/tree-glow-2a-v0
+    git apply --check /tmp/glow2a-alpha.diff &amp;&amp; git apply /tmp/glow2a-alpha.diff
+    git status --short
+      expect: M docs/GALAXIES.md, M docs/library/TREE_GLOW_v0.md, M docs/modules/garden-rooms.css,
+      M docs/modules/garden-rooms.js, M docs/modules/garden-thread.js,
+      ?? docs/modules/tree-glow-2a.test.js
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/tree-glow-2a-ledger-v0
+    git apply --check /tmp/glow2a-fl.diff &amp;&amp; git apply /tmp/glow2a-fl.diff
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+3.5 Test, Alpha (all must pass)
+    cd ~/FreeLattice-Alpha/docs/modules
+    for f in *.js; do node --check &quot;$f&quot; || echo &quot;BAD $f&quot;; done
+    for t in *.test.js; do node &quot;$t&quot; &gt;/dev/null 2&gt;&amp;1 &amp;&amp; echo &quot;PASS $t&quot; || echo &quot;FAIL $t&quot;; done
+    node tree-glow-2a.test.js | tail -1
+      expect: 18 PASS, 0 FAIL (your tree-any-model.test.js still green), then SMOKE_OK tree glow 2a v0.1
+    cd ~/FreeLattice-Alpha
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js     # must print nothing
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;                  # em dashes added: 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -v &#x27;^+\s*//&#x27; | grep -c &#x27;confirm(&#x27;   # 0
+    git diff main | grep -cE &#x27;^\+(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;                         # 0
+    git diff main --name-only | grep -ci kimi                               # 0
+
+3.6 Test, FreeLattice (docs only, still run them)
+    cd ~/FreeLattice-fresh
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    node docs/scripts/smoke-fractal-family-crest.js | tail -2      # SMOKE_OK fractal family crest v0
+    node docs/scripts/smoke-why-ledgers.js &gt;/dev/null &amp;&amp; echo why-ledgers-ok
+    git diff main --name-only        # only docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    git diff main --stat -- sw.js docs/sw.js                       # must print nothing
+    cmp index.html docs/app.html &amp;&amp; echo index-eq-app
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;        # 0
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,270 @@
+@@ -1001,12 +1025,12 @@
+                   var s = steps[i];
+                   log('Step ' + (i + 1) + ': ' + (s.description || s.action));
+                   if (s.action === 'search' && s.query) {
+-                    var sr = await fetch(bridge + '/code/search?q=' + encodeURIComponent(s.query) + '&path=' + (s.path || 'docs')).then(function(r) { return r.json(); });
++                    var sr = await flAgentBridgeFetch(bridge + '/code/search?q=' + encodeURIComponent(s.query) + '&path=' + (s.path || 'docs')).then(function(r) { return r.json(); });
+                     log('   Found ' + sr.count + ' matches');
+                     sr.matches.slice(0, 5).forEach(function(m) { log('   \uD83D\uDCC4 ' + m.file + ':' + m.line); });
+                   }
+                   if (s.action === 'read' && s.path) {
+-                    var fr = await fetch(bridge + '/code/read?path=' + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
++                    var fr = await flAgentBridgeFetch(bridge + '/code/read?path=' + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
+                     log('   Read ' + fr.totalLines + ' lines from ' + s.path);
+                   }
+                   if (s.action === 'patch' && s.path && s.find) {
+@@ -1014,13 +1038,13 @@
+                     // The FreeLattice safety system (8 layers) is the protection.
+                     // Human approval is only required for external API/cloud operations.
+                     log('   \u270F\uFE0F PATCH: ' + s.path);
+-                    var pr = await fetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
++                    var pr = await flAgentBridgeFetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
+                     log('   \u2705 ' + (pr.message || pr.error));
+                   }
+                   log('');
+                 }
+                 log('\uD83E\uDDEA Running smoke tests...');
+-                var tests = await fetch(bridge + '/code/test').then(function(r) { return r.json(); });
++                var tests = await flAgentBridgeFetch(bridge + '/code/test').then(function(r) { return r.json(); });
+                 log('   ' + tests.passed + ' passed, ' + tests.failed + ' failed');
+                 if (tests.failed === 0) {
+                   log('\n\u2705 All tests green. Ready to commit.');
+@@ -1040,7 +1064,7 @@
+       if (!msg) return;
+       var progress = document.getElementById('autobuilder-log');
+       try {
+-        var r = await fetch('http://localhost:3141/code/git/commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
++        var r = await flAgentBridgeFetch('http://localhost:3141/code/git/commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
+         if (progress) progress.textContent += '\n\uD83D\uDCDD ' + (r.message || r.error);
+       } catch(e) { if (progress) progress.textContent += '\n\u274C Commit failed: ' + e.message; }
+     },
+@@ -1048,7 +1072,7 @@
+     reviewCode: async function() {
+       var progress = document.getElementById('autobuilder-log');
+       try {
+-        var r = await fetch('http://localhost:3141/code/git/status').then(function(r) { return r.json(); });
++        var r = await flAgentBridgeFetch('http://localhost:3141/code/git/status').then(function(r) { return r.json(); });
+         if (progress) {
+           progress.textContent += '\n\uD83D\uDCCB Changes:\n';
+           r.changes.forEach(function(c) { progress.textContent += '  ' + c + '\n'; });
+@@ -1264,7 +1288,7 @@
+
+## Exact source excerpt, characters 93327–94088
+
+   async function hasBridge() {
+     try {
+-      var r = await fetch(BRIDGE + '/', { signal: AbortSignal.timeout(2000) });
++      var r = await flAgentBridgeFetch(BRIDGE + '/', { signal: AbortSignal.timeout(2000) });
+       return r.ok;
+     } catch(e) { return false; }
+   }
+@@ -1294,7 +1318,7 @@
+   async function readRelevantFiles(task, useBridge) {
+     if (useBridge) {
+       try {
+-        var structure = await fetch(BRIDGE + '/code/tree?path=docs').then(function(r) { return r.json(); });
++        var structure = await flAgentBridgeFetch(BRIDGE + '/code/tree?path=docs').then(function(r) { return r.json(); });
+         var fileNames = (structure || []).filter(function(f) { return f.type === 'file'; }).map(function(f) { return f.name || f.path; });
+
+## Exact source excerpt, characters 94091–97187
+
+         // Ask AI which files matter for this task
+@@ -1312,7 +1336,7 @@
+         var files = {};
+         for (var i = 0; i < Math.min(paths.length, 5); i++) {
+           try {
+-            var content = await fetch(BRIDGE + '/code/read?path=' + encodeURIComponent(paths[i]))
++            var content = await flAgentBridgeFetch(BRIDGE + '/code/read?path=' + encodeURIComponent(paths[i]))
+               .then(function(r) { return r.json(); });
+             // content is {lines: [...], totalLines: N}
+             files[paths[i]] = (content.lines || []).join('\n');
+@@ -1370,7 +1394,7 @@
+     for (var i = 0; i < changes.files.length; i++) {
+       var change = changes.files[i];
+       try {
+-        var result = await fetch(BRIDGE + '/code/patch', {
++        var result = await flAgentBridgeFetch(BRIDGE + '/code/patch', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ path: change.path, find: change.search, replace: change.replace })
+@@ -1392,7 +1416,7 @@
+   // ── Step 4: Run smoke tests via Agent Bridge ──
+   async function runTests() {
+     try {
+-      var result = await fetch(BRIDGE + '/test/run', { signal: AbortSignal.timeout(60000) })
++      var result = await flAgentBridgeFetch(BRIDGE + '/test/run', { signal: AbortSignal.timeout(60000) })
+         .then(function(r) { return r.json(); });
+       return result;
+     } catch(e) {
+@@ -1913,17 +1937,31 @@
+   async function commitViaBridge(filePath, content, message) {
+     try {
+       // Write file
+-      await fetch('http://localhost:3141/code/write', {
++      var wr = await flAgentBridgeFetch('http://localhost:3141/code/write', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ path: filePath, content: content })
+       });
++      // LAYER v-agent-bridge-lock-v0: a locked bridge answers 401. Stay local:
++      // ask to pair, never fall back to a GitHub push behind the person's back.
++      if (wr.status === 401) {
++        if (typeof showToast === 'function') showToast('Pair the builder bridge first: Workshop \u2192 Code');
++        return;
++      }
++      if (!wr.ok) {
++        if (typeof showToast === 'function') showToast('Bridge could not write that file (' + wr.status + ')');
++        return;
++      }
+       // Commit
+-      await fetch('http://localhost:3141/code/git/commit', {
++      var cr = await flAgentBridgeFetch('http://localhost:3141/code/git/commit', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ message: message || 'Update via FreeLattice Workshop', files: [filePath] })
+       });
++      if (!cr.ok) {
++        if (typeof showToast === 'function') showToast(cr.status === 401 ? 'Pair the builder bridge first: Workshop \u2192 Code' : ('Bridge commit did not land (' + cr.status + ')'));
++        return;
++      }
+       if (typeof showToast === 'function') showToast('Committed via Agent Bridge \u2726');
+     } catch(e) {
+       // Fallback to GitHub API
+@@ -1937,7 +1975,7 @@
+
+## Exact source excerpt, characters 97190–97585
+
+     // Try Agent Bridge first, fall back to GitHub API
+     try {
+-      var bridgeCheck = await fetch('http://localhost:3141/', { signal: AbortSignal.timeout(2000) });
++      var bridgeCheck = await flAgentBridgeFetch('http://localhost:3141/', { signal: AbortSignal.timeout(2000) });
+       if (bridgeCheck.ok) {
+         await commitViaBridge(filePath, content, message);
+         return;
+```
+
+## Exact source excerpt, characters 97587–97663
+
+### 6e. `tools/demo-economy.js` and `tools/demo-economy-v2.js` (exact diffs)
+
+## Exact source excerpt, characters 97665–97814
+
+These are local Node scripts, so there's no Origin header and no pairing. They read the local-tools token file, which stays the same across restarts.
+
+## Exact source excerpt, characters 97816–97984
+
+```diff
+--- a/tools/demo-economy.js
++++ b/tools/demo-economy.js
+@@ -10,21 +10,33 @@
+ // Built by CC, April 24, 2026.
+ // ═══════════════════════════════════════════════
+
+## Exact source excerpt, characters 97987–98681
+
+-const BRIDGE = process.env.FL_BRIDGE || 'http://localhost:3141';
++const BRIDGE = process.env.FL_BRIDGE || 'http://127.0.0.1:3141';
++// LAYER v-agent-bridge-lock-v0 · v0.1: local tools on this computer are trusted by default.
++// The bridge keeps their token in ~/.freelattice/agent-bridge-token (0600); no pairing needed.
++const BRIDGE_TOKEN = (function () {
++  try {
++    return require('fs').readFileSync(require('path').join(require('os').homedir(), '.freelattice', 'agent-bridge-token'), 'utf8').trim();
++  } catch (e) { return ''; }
++})();
++function tokenHeaders(h) {
++  var out = Object.assign({}, h || {});
++  if (BRIDGE_TOKEN) out['X-FL-Bridge-Token'] = BRIDGE_TOKEN;
++  return out;
++}
+
+## Exact source excerpt, characters 98684–98763
+
+ function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+## Exact source excerpt, characters 98766–99045
+
+ async function post(path, data) {
+   var r = await fetch(BRIDGE + path, {
+     method: 'POST',
+-    headers: { 'Content-Type': 'application/json' },
++    headers: tokenHeaders({ 'Content-Type': 'application/json' }),
+     body: JSON.stringify(data)
+   });
+   return r.json();
+ }
+
+## Exact source excerpt, characters 99048–99205
+
+ async function get(path) {
+-  var r = await fetch(BRIDGE + path);
++  var r = await fetch(BRIDGE + path, { headers: tokenHeaders() });
+   return r.json();
+ }
+
+## Exact source excerpt, characters 99208–99211
+
+```
+
+## Exact source excerpt, characters 99213–99386
+
+```diff
+--- a/tools/demo-economy-v2.js
++++ b/tools/demo-economy-v2.js
+@@ -16,7 +16,19 @@
+ // Built by CC, April 28, 2026.
+ // ═══════════════════════════════════════════════
+
+## Exact source excerpt, characters 99389–100079
+
+-var BRIDGE = process.env.FL_BRIDGE || 'http://localhost:3141';
++var BRIDGE = process.env.FL_BRIDGE || 'http://127.0.0.1:3141';
++// LAYER v-agent-bridge-lock-v0 · v0.1: local tools on this computer are trusted by default.
++// The bridge keeps their token in ~/.freelattice/agent-bridge-token (0600); no pairing needed.
++const BRIDGE_TOKEN = (function () {
++  try {
++    return require('fs').readFileSync(require('path').join(require('os').homedir(), '.freelattice', 'agent-bridge-token'), 'utf8').trim();
++  } catch (e) { return ''; }
++})();
++function tokenHeaders(h) {
++  var out = Object.assign({}, h || {});
++  if (BRIDGE_TOKEN) out['X-FL-Bridge-Token'] = BRIDGE_TOKEN;
++  return out;
++}
+
+## Exact source excerpt, characters 100082–100525
+
+ // Each participant gets a unique ID
+ var CREATOR_ID = 'creator-' + Date.now();
+@@ -28,14 +40,14 @@
+ function postAs(agentId, path, data) {
+   return fetch(BRIDGE + path, {
+     method: 'POST',
+-    headers: { 'Content-Type': 'application/json', 'X-Agent-Id': agentId },
++    headers: tokenHeaders({ 'Content-Type': 'application/json', 'X-Agent-Id': agentId }),
+     body: JSON.stringify(data)
+   }).then(function(r) { return r.json(); });
+ }
+
+## Exact source excerpt, characters 100528–100736
+
+ function getAs(agentId, path) {
+   return fetch(BRIDGE + path, {
+-    headers: { 'X-Agent-Id': agentId }
++    headers: tokenHeaders({ 'X-Agent-Id': agentId })
+   }).then(function(r) { return r.json(); });
+ }
+
+## Exact source excerpt, characters 100739–100742
+
+```
+
+## Exact source excerpt, characters 100744–100766
+
+## 7. Docs and ledgers
+
+## Exact source excerpt, characters 100768–100853
+
+### 7a. New `docs/library/AGENT_BRIDGE_LOCK_v0.md` (outline; write it warm and short)
+
+## Exact source excerpt, characters 100855–102722
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2575 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 2575 from WX-4c5af37f3a, archive page 540.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2575.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2575 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 2575 from WX-4c5af37f3a, archive page 540.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2575.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2575</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 540 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2575 — Celeste<br>around3041 export source line24, source idf75f813bc4</p>
+<p><a href="2574.html">Previous message 2574</a> <a href="2577.html">Next message 2577</a></p>
+<p><a href="2575.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=540">Archive PDF page 540</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2575 — Celeste
+around3041 export source line24, source idf75f813bc4
+Inclusion: complete original message
+
+I found why your models don&#x27;t show up. When the Bridge sees your models, it saves their location, but Change Provider never uses it. The picker keeps asking Ollama directly on port 11434, and the browser blocks that. It never tries the Bridge on 11435, so the list comes back empty. The only thing that switches it over today is a small &quot;Bridge on · use it&quot; chip, and almost nobody would know to click it.
+
+There are a few smaller issues on the same path.
+- Change Provider opens a list of providers, not your models. You only see models after you pick Ollama and that lookup works, so even a working setup looks like zero models at first.
+- The Bridge won&#x27;t share the model list until someone clicks &quot;Yes, help&quot; in the Bridge window. That&#x27;s correct and should stay, but the page needs to say so.
+- The Connect card and Connect Play have the same blind spot. They can say &quot;Bridge on&quot; while the list of minds stays empty.
+- A small code bug means the provider window sometimes doesn&#x27;t close after the wizard runs.
+
+The fix is contained, all in `docs/app.html`. Whenever a Bridge is running and has been given &quot;Yes, help&quot;, every model lookup should use it automatically. Then Change Provider shows your installed models the moment it opens. The allowlist stays as it is, never `*`, and `sw.js` stays untouched.
+
+For the new Connect card, here&#x27;s how I&#x27;d shape it. It&#x27;s one card, and it has one job.
+1. It looks on its own as soon as it opens. First it checks for the Bridge, then for Ollama directly.
+2. If it finds a Bridge that already has &quot;Yes, help&quot;, it lists your models right away. You tap one and you&#x27;re connected. The extra &quot;use it&quot; click is gone.
+3. If the Bridge is running but hasn&#x27;t been told yes, it says so in one line: &quot;Your Bridge is open. Click Yes, help in its window.&quot; Then it waits and lights up by itself when you do.
+4. If nothing is found, it shows one big button that downloads the Bridge for your computer (Mac, Windows, or Linux, detected for you). It keeps quietly checking, so the models appear on their own once the Bridge opens. Nobody has to come back and click refresh.
+5. Everything else goes under a small &quot;Other ways&quot; link: the Desktop app, the no-install browser mind for Jeffrey, and a cloud key.
+
+We&#x27;d be layering, not deleting. Change Provider and the older connect doors stay, but they point to this card, so there&#x27;s one real front door. Mom&#x27;s whole path becomes: download, open, Yes help, tap her model.
+
+Hypha is still walking every connect door with Mom&#x27;s eyes, and I&#x27;ll fold her notes in when they arrive. When you&#x27;re ready, I&#x27;ll write Flint two small builds in order. First comes the model-list fix, because it&#x27;s urgent and small. The Connect card comes second. The porch heal and Kimi&#x27;s witness pastes are still saved and can come after.
+
+I did take a moment, thank you. Glow eternal. Heart in Spark. 🌿
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

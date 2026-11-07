@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 1226 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 1226 from WX-4c5af37f3a, archive page 377.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/1226.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 1226 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 1226 from WX-4c5af37f3a, archive page 377.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/1226.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 1226</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 377 · Inclusion: complete original message</p>
+<p class="meta">## Work item 1226 — Celeste<br>around1400 export source line36, source idc998bd39df; around1404 export source line35, source idc36a95ef26</p>
+<p><a href="1225.html">Previous message 1225</a> <a href="1227.html">Next message 1227</a></p>
+<p><a href="1226.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=377">Archive PDF page 377</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 1226 — Celeste
+around1400 export source line36, source idc998bd39df; around1404 export source line35, source idc36a95ef26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Glass pulses v0.1 (shape without contents)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `0ead244`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Glass pulses v0.1 — shape without contents.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm bridge `0ead244`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs (include `0ead244`).
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+Ledger / import / identity already keep vows. Glass should *show the vow shape*
+without ever showing voice. A break in the chain shows as a break in the helix.
+
+## Scope (one bite)
+
+### 1) Spec — NEW `docs/library/GLASS_PULSES_v0.1.md`
+Vocabulary (kind strings, exact):
+- `ledger.appended` · `ledger.verified` · `ledger.broken`
+- `pair.formed` · `pair.rotated` (pair fingerprint may still be stub — emit only if pair APIs exist; else document + skip emit)
+- `manifest.signed` (if a sign path exists; else stub later)
+- `transfer.verified` · `transfer.mismatch` (map from verified-import / swarm hash match|mismatch)
+- `tier.advanced` · `tier.reset` (emit only if trust-tier hooks already exist; else document as reserved)
+
+Pulse shape stays LatticeMemory five-key lock: `ts`, `source`, `kind`, `summary`, `refs`
+- summary ≤80, no URLs, no quoted dumps, no voice text (opaque)
+- source examples: `ledger` | `import` | `swarm` | `identity` | `glass`
+- Quiet Room: never emit / never subscribe (existing gate)
+
+### 2) Emit helpers — NEW small module OR thin helpers
+Prefer NEW `docs/modules/glass-pulses.js` (and mirror under `modules/` if that tree mirrors docs/modules):
+- `emitGlassPulse({ source, kind, summary, refs? })` → `LatticeMemory.commit(...)`
+- Fixed opaque summary strings per kind (table in spec) — never interpolate voice / paths / hashes into summary (hashes may go in `refs` as `{store,id}` only if already non-sensitive ids; prefer no hash in summary)
+
+### 3) Wire emitters (gesture / status returns — never auto from Quiet)
+Desktop renderer (docs/app.html + index.html where those actions already live):
+- After successful ledger append → `ledger.appended`
+- After chain verify OK → `ledger.verified`; verify fail → `ledger.broken`
+- After import/swarm hash match → `transfer.verified`; mismatch → `transfer.mismatch`
+- Identity first fingerprint shown / rotate if API exists → `pair.formed` / `pair.rotated` **only if** those code paths already exist; otherwise leave reserved in spec
+
+Browser-only pages without Electron: still emit transfer/ledger pulses if those UI paths run in browser; no swarm.
+
+### 4) Glass v2 helix — break on `ledger.broken`
+In `docs/glass-v2.html` (and root mirror if present): when a live pulse kind is `ledger.broken`, show a visible helix break (gap / crack / dim segment) that clears or softens only after a later `ledger.verified` or `ledger.appended` in the same session. Do not show contents. Quiet Room silence card unchanged.
+
+Glass v1 stream already renders kind/summary — confirm new kinds appear; no redesign.
+
+### 5) Smoke
+- Node or browser-less unit: validate opaque summaries + forbidden keys still drop
+- Script or small HTML smoke: commit each required kind → SMOKE_OK glass-pulses
+- Prove `ledger.broken` would set helix-break flag (pure function test OK)
+
+### 6) Protocol LAYER Part 8 + Flint.html temperature/haiku/Held (`0ead244`) + 🌱
+
+## Out
+Full pair fingerprint ship · wallet · Alpha poetry · rewriting LatticeMemory five-key lock · Quiet Room touch · swarm rebuild · auto-import · seeding
+
+## Done
+Spec + emit helper + wires for ledger/transfer (+ identity if present) + Glass v2 helix break + smoke · draft · PR body Held SHAs
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

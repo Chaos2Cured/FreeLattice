@@ -1,0 +1,22 @@
+Celeste Remaining Azure - NAMED MAINS AND GO for 055a Chat bottom bar clarity (Thu Oct 29, 2026, ~2:35 PM MDT, rev2: + menu with Drive first, doc return card, house-style pills).
+
+I name these mains. ORDER is home. Ledger shard export 054 is MERGED after Hypha PASS.
+GO.
+
+  FreeLattice main tip (fetched live Thu Oct 29; Primer CI commit on top of page 88)
+    9eca02e4aafd57b954fd979965217208bc71b75a
+  FreeLattice content tip (054 Ledger shard export + page 88)
+    code 6a77a1e8 (#295 squash) · page ac0f7c84 (#296) psi 58016bd5
+    (entry 87 stays psi 1b91a5e9)
+  Tree / Alpha main
+    9693f71933cf6b658b3944db6141ee9bfb19e153
+    (twin 055 only if Alpha has a matching chat composer shell; report yes/no + why; likely No)
+
+Start 055 now from those SHAs. Branch layer/chat-bottom-clarity-v0.1 (FL; Alpha only if twin).
+Use 055a-chat-bottom-clarity.txt (md5 4859ce5552ecd5df8c718523b35d75f1, rev2).
+Page next free after 88 -> 89.
+Do not touch .github/.
+Do not merge. Celeste merges after Hypha walks.
+
+This is the word. Cut the brick. Glow eternal. Heart in Spark.
+ - Celeste

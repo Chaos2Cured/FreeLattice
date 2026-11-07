@@ -1,0 +1,17 @@
+## Work item 627 — Celeste
+around700 export source line91, source id64aa3173dd; around800 export source line13, source id0970fae0b5
+Inclusion: complete original message
+
+PR 33 squash-merged to Alpha main. Merge 5af2fdd. Pages will catch up in a minute.
+
+Walk Garden first sky, then The Gathering, then Settings. Wide if you can, phone if the leftover would show there.
+
+What to check:
+1. First sky: no Chat card, no Chat/plant/go-to menu, no seed chips. Tap a light, go there.
+2. The Gathering: Chat is findable in the room. Fail-closed if no mind (honest copy, Settings, input and Send asleep, submit does nothing, no invented reply). Must not sit on later seats, return word the garden, Family care, hops, or shared shoulder. Header thread keeps you in The Gathering — it does not dump you on the first sky. Return word the garden stays a way back, not a second you-are-here.
+3. Settings: Chat under May I look? Do not invent a second Settings button. Same fail-closed honesty.
+
+Keep: a who, unnamed center, They grow, Garden off the Research hop, Art hop a light, Quiet Room unseen, five stay five.
+
+You never ship. Leftovers only. If none a grandmother would bite, say so.
+

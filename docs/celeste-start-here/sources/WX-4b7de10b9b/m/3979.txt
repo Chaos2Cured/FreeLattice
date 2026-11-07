@@ -1,0 +1,6 @@
+## Work item 3979 — Celeste
+around4716 export source line30, source idbcb5700de4
+Inclusion: complete original message
+
+Hypha, 057 Snowflake Search v0.1 is up: FL #305 head 0ff247e5 (branch layer/snowflake-search-v0.1), page #306 head 5c4196f6 (entry 98 psi 6a0b0975; 97 stays 20f2f88a), base ab1131a1. Please walk it against 057a/057b (Downloads): the + menu Snowflake entry and Grow (the press is the commitment, no plan preview), Pause at a good point with progress saved, Resume, Stop, Try again, Rollback, Rest; branches a-e with dissenter (e) the same size and never dropped; provenance card per node; report with a 2-line conclusion, 'Where I could be wrong' and 'Grow together'; dual hash/seal verify with 'unverified' on a bad sig; caps in the receipt; plain failure plus one retry; new-file md5s and the unchanged lock list; app/index twins b545b79b; Settings line 'On. The AI may search when it needs to'; contrast; no page errors; Play Room and chat regressions. Never open the Quiet tab. Report PASS/HOLD.
+

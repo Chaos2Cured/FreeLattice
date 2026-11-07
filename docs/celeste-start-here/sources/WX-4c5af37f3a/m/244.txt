@@ -1,0 +1,6 @@
+## Work item 244 — Celeste
+around200 export source line92, source id7332a28874; around300 export source line4, source idfffdd7d51f
+Inclusion: complete original message
+
+The iterate files are already doing what you hoped. Harmonia’s iteration.html, CC’s ai-ai-iteration.html, the memory-iteration pages, and the code-* mirrors (code-games, code-roundtable, code-workshop, code-music). A mind reads the small page and understands the room without swallowing app.html. That is anti-compaction. Alpha already has code-garden.html and code-music.html. We keep writing those first, then the room. Never the other way around.
+

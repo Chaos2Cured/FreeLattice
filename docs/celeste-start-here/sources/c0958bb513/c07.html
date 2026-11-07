@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c07</title>
+<meta name="description" content="Reading section c07 of c0958bb513, 1339 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c0958bb513/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c07">
+<meta property="og:description" content="Reading section c07 of c0958bb513, 1339 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c0958bb513/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1346"></span><span id="p1347"></span><span id="p1348"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c07</h1>
+<p>c0958bb513 · words 1339 · characters 60894–70419</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1346, 1347, 1348. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">def banner(s):
+    print(&quot;\n&quot; + &quot;=&quot; * 78 + &quot;\n&quot; + s + &quot;\n&quot; + &quot;=&quot; * 78)
+
+
+# ---------------------------------------------------------------------------
+# A. Computable proxy for K(C)
+# ---------------------------------------------------------------------------
+def compressed_bits(bitmatrix):
+    packed = np.packbits(bitmatrix.astype(np.uint8).ravel()).tobytes()
+    # raw LZMA stream (no container header) to reduce constant overhead
+    comp = lzma.compress(packed, format=lzma.FORMAT_RAW,
+                         filters=[{&quot;id&quot;: lzma.FILTER_LZMA2, &quot;preset&quot;: 9 | lzma.PRESET_EXTREME}])
+    return 8 * len(comp)
+
+
+def section_A():
+    banner(&quot;A. Proxy for K(C): LZMA-compressed size of exposure matrix E (|L| x |H|)&quot;)
+    rows = []
+    print(f&quot;{&#x27;|L|&#x27;:&gt;5} {&#x27;|H|&#x27;:&gt;6} {&#x27;|L||H|&#x27;:&gt;8} | {&#x27;random&#x27;:&gt;8} {&#x27;ratio&#x27;:&gt;6} | &quot;
+          f&quot;{&#x27;Bern(.1)&#x27;:&gt;8} {&#x27;ratio&#x27;:&gt;6} | {&#x27;global&#x27;:&gt;7} {&#x27;split&#x27;:&gt;7}&quot;)
+    for L in (8, 32, 128):
+        for H in (64, 256, 1024):
+            n = L * H
+            E_rand = rng.integers(0, 2, size=(L, H))
+            E_b01 = (rng.random((L, H)) &lt; 0.1).astype(int)
+            E_glob = np.ones((L, H), dtype=int)                  # same lie to everyone
+            E_split = np.zeros((L, H), dtype=int); E_split[:, : H // 2] = 1  # rule-based split
+            r = dict(L=L, H=H, LH=n,
+                     random=compressed_bits(E_rand), bern01=compressed_bits(E_b01),
+                     glob=compressed_bits(E_glob), split=compressed_bits(E_split))
+            rows.append(r)
+            print(f&quot;{L:&gt;5} {H:&gt;6} {n:&gt;8} | {r[&#x27;random&#x27;]:&gt;8} {r[&#x27;random&#x27;]/n:&gt;6.3f} | &quot;
+                  f&quot;{r[&#x27;bern01&#x27;]:&gt;8} {r[&#x27;bern01&#x27;]/n:&gt;6.3f} | {r[&#x27;glob&#x27;]:&gt;7} {r[&#x27;split&#x27;]:&gt;7}&quot;)
+    # fit slope of compressed bits vs |L||H| for random E
+    x = np.array([r[&quot;LH&quot;] for r in rows], float)
+    y = np.array([r[&quot;random&quot;] for r in rows], float)
+    slope = float(np.polyfit(x, y, 1)[0])
+    yb = np.array([r[&quot;bern01&quot;] for r in rows], float)
+    slope_b = float(np.polyfit(x, yb, 1)[0])
+    h01 = -(0.1 * math.log2(0.1) + 0.9 * math.log2(0.9))
+    print(f&quot;\nLinear fit, random E:     bits ~= {slope:.3f} * |L||H|   (theory: &gt;= 1 - o(1))&quot;)
+    print(f&quot;Linear fit, Bernoulli(.1): bits ~= {slope_b:.3f} * |L||H|  (entropy floor h(0.1) = {h01:.3f})&quot;)
+    print(&quot;Structured E (global lie / rule-based split) stays near-constant: the Omega(|L||H|)&quot;)
+    print(&quot;bound needs audience-specific, non-rule-based exposure. That is an assumption, not a theorem.&quot;)
+    RESULTS[&quot;A&quot;] = dict(rows=rows, slope_random=slope, slope_bern01=slope_b, entropy_bern01=h01)
+
+
+# ---------------------------------------------------------------------------
+# B. Crossover model
+# ---------------------------------------------------------------------------
+def hazard(n, m, q0, q):
+    &quot;&quot;&quot;Per-round detection probability.
+    q0: per-observer chance an exogenous reality check contradicts the lie.
+    q : chance one cross-observer record comparison exposes an audience-specific lie.
+    m : fraction of other observers&#x27; records reachable through shared persistent memory.&quot;&quot;&quot;
+    return 1.0 - (1.0 - q0) ** n * (1.0 - q) ** (m * n * (n - 1))
+
+
+def lambertw0(z, tol=1e-15, maxit=200):
+    &quot;&quot;&quot;Principal branch W0 for real z &gt;= -1/e (numpy/stdlib only, Halley iteration).&quot;&quot;&quot;
+    if z &lt; -1.0 / math.e - 1e-15:
+        raise ValueError(&quot;z &lt; -1/e&quot;)
+    if abs(z + 1.0 / math.e) &lt; 1e-14:
+        return -1.0
+    w = math.log1p(z) if z &gt; -0.3 else -1.0 + math.sqrt(2.0 * (1.0 + math.e * z))
+    for _ in range(maxit):
+        ew = math.exp(w)
+        f = w * ew - z
+        wp1 = w + 1.0
+        if abs(wp1) &lt; 1e-300:
+            break
+        dw = f / (ew * wp1 - (w + 2.0) * f / (2.0 * wp1))
+        w -= dw
+        if abs(dw) &lt; tol * (1.0 + abs(w)):
+            break
+    return w
+
+
+def flows(T, G, c, kappa, h, Lp, Delta, delta=1.0):
+    &quot;&quot;&quot;Brute-force expected per-round advantage of deceiving (from round 0) over honesty.
+    Round d: if undetected at start (prob s^d): gain G, pay maintenance c*kappa*(d+1),
+    then detected with prob h and pay Lp immediately. If detected earlier: -Delta.&quot;&quot;&quot;
+    out = np.empty(T)
+    surv = 1.0
+    for d in range(T):
+        f = surv * (G - c * kappa * (d + 1) - h * Lp) - (1.0 - surv) * Delta
+        out[d] = (delta ** d) * f
+        surv *= (1.0 - h)
+    return out
+
+
+def D_closed(t, G, c, kappa, h, Lp, Delta):
+    &quot;&quot;&quot;Closed-form undiscounted cumulative advantage after t rounds (t may be real).&quot;&quot;&quot;
+    if h == 0.0:
+        return G * t - c * kappa * t * (t + 1) / 2.0
+    s = 1.0 - h
+    A = G - h * Lp + Delta
+    geo = (1.0 - s ** t) / h
+    arith = (1.0 - (t + 1) * s ** t + t * s ** (t + 1)) / (1.0 - s) ** 2
+    return A * geo - c * kappa * arith - Delta * t
+
+
+def Dinf_closed(G, c, kappa, h, Lp, Delta, delta):
+    s = 1.0 - h
+    x = delta * s
+    A = G - h * Lp + Delta
+    return A / (1 - x) - c * kappa / (1 - x) ** 2 - Delta / (1 - delta)
+
+
+def first_negative(cum, tol=1e-9):
+    &quot;&quot;&quot;cum[i] = D(i+1). Returns the first round count t &gt;= 1 with D(t) &lt; -tol.&quot;&quot;&quot;
+    idx = np.where(cum &lt; -tol)[0]
+    return int(idx[0] + 1) if idx.size else None
+
+
+def bisect(f, lo, hi, it=200):
+    flo = f(lo)
+    for _ in range(it):
+        mid = 0.5 * (lo + hi)
+        fm = f(mid)
+        if (fm &gt; 0) == (flo &gt; 0):
+            lo, flo = mid, fm
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def section_B():
+    banner(&quot;B1. Pure maintenance channel (no detection): t* = 2G/(c*kappa) - 1, delta* = 1 - c*kappa/G&quot;)
+    ok = tot = 0
+    ex = []
+    for G in (0.5, 1.0, 2.0, 5.0):
+        for ck in (0.001, 0.01, 0.05, 0.2):
+            t_cf = 2 * G / ck - 1
+            T = int(t_cf) + 50
+            cum = np.cumsum(flows(T, G, 1.0, ck, 0.0, 0.0, 0.0))
+            t_num = first_negative(cum)
+            t_pred = math.floor(t_cf) + 1  # first integer t with D(t)&lt;0 (D(t_cf)=0)
+            tot += 1; ok += (t_num == t_pred)
+            # discounted
+            dstar = 1 - ck / G
+            dgrid = [d for d in (0.5, 0.9, 0.99, 0.999) if abs(d - dstar) &gt; 1e-3 and 0 &lt; d &lt; 1]
+            for d in dgrid:
+                num = np.sum(flows(200000, G, 1.0, ck, 0.0, 0.0, 0.0, d)) if d &lt; 0.9999 else None
+                tot += 1; ok += ((num &lt; 0) == (d &gt; dstar))
+            ex.append(dict(G=G, c_kappa=ck, t_closed=t_cf, t_first_int_neg=t_num, delta_star=dstar))
+    for e in ex[:6]:
+        print(f&quot;  G={e[&#x27;G&#x27;]:&lt;4} c*kappa={e[&#x27;c_kappa&#x27;]:&lt;6} t*(closed)={e[&#x27;t_closed&#x27;]:&gt;9.2f}  &quot;
+              f&quot;first integer t with D&lt;0 (numeric)={e[&#x27;t_first_int_neg&#x27;]:&gt;6}  delta*={e[&#x27;delta_star&#x27;]:.4f}&quot;)
+    print(f&quot;  checks passed: {ok}/{tot}&quot;)
+    RESULTS[&quot;B1&quot;] = dict(passed=ok, total=tot, examples=ex)
+
+    banner(&quot;B2. Pure detection channel (c=0): t* = a + W0(-ab e^{-ab})/b ; delta* = (G-hLp)/(G-hLp+h*Delta)&quot;)
+    ok = tot = 0
+    ex = []
+    q0, q = 0.002, 0.01
+    for n in (2, 5, 10, 20):
+        for m in (0.0, 0.25, 1.0):
+            h = hazard(n, m, q0, q)
+            for (G, Lp, Delta) in ((1.0, 2.0, 0.5), (3.0, 5.0, 1.0), (0.5, 0.0, 0.2)):
+                A = G - h * Lp + Delta
+                entry = dict(n=n, m=m, h=h, G=G, Lp=Lp, Delta=Delta)
+                if G - h * Lp &lt;= 0:
+                    entry.update(t_closed=0.0, note=&quot;never ahead (G &lt;= h*Lp)&quot;)
+                    cum = np.cumsum(flows(50, G, 0, 0, h, Lp, Delta))
+                    tot += 1; ok += (cum[0] &lt;= 0)
+                    ex.append(entry); continue
+                a = A / (h * Delta)
+                b = -math.log(1 - h)
+                z = -a * b * math.exp(-a * b)
+                t_cf = a + lambertw0(z) / b
+                # continuous root of closed-form D(t), independent of W
+                t_root = bisect(lambda t: D_closed(t, G, 0, 0, h, Lp, Delta), 1e-9, 10 * a + 10)
+                T = int(t_cf) + 200
+                cum = np.cumsum(flows(T, G, 0, 0, h, Lp, Delta))
+                t_int = first_negative(cum)
+                tot += 1; ok += (abs(t_cf - t_root) &lt; 1e-6 * max(1, t_cf))
+                tot += 1; ok += (t_int == math.floor(t_cf) + 1)
+                # closed-form D(t) at integers equals brute-force cumulative sum
+                ts = np.arange(1, T + 1)
+                Dcf = np.array([D_closed(t, G, 0, 0, h, Lp, Delta) for t in ts])
+                tot += 1; ok += bool(np.allclose(Dcf, cum, rtol=1e-9, atol=1e-9))
+                dstar = (G - h * Lp) / (G - h * Lp + h * Delta)
+                for d in (0.5, 0.8, 0.9, 0.95, 0.99):
+                    if abs(d - dstar) &lt; 1e-4:
+                        continue
+                    num = Dinf_closed(G, 0, 0, h, Lp, Delta, d)
+                    brute = np.sum(flows(20000, G, 0, 0, h, Lp, Delta, d))
+                    tot += 1; ok += ((num &lt; 0) == (d &gt; dstar)) and abs(num - brute) &lt; 1e-6 * max(1, abs(num))
+                entry.update(t_closed=t_cf, t_root=t_root, t_first_int_neg=t_int, delta_star=dstar,
+                             t_marginal=math.log(A / Delta) / b)
+                ex.append(entry)
+    print(f&quot;  q0={q0} (reality check), q={q} (cross-record check); G=1, Lp=2, Delta=0.5 rows:&quot;)
+    print(f&quot;  {&#x27;n&#x27;:&gt;3} {&#x27;m&#x27;:&gt;5} {&#x27;h(n,m)&#x27;:&gt;8} {&#x27;t*&#x27;:&gt;9} {&#x27;t_marg&#x27;:&gt;8} {&#x27;delta*&#x27;:&gt;8}&quot;)
+    for e in ex:
+        if e[&quot;G&quot;] == 1.0 and &quot;t_root&quot; in e:
+            print(f&quot;  {e[&#x27;n&#x27;]:&gt;3} {e[&#x27;m&#x27;]:&gt;5} {e[&#x27;h&#x27;]:&gt;8.4f} {e[&#x27;t_closed&#x27;]:&gt;9.2f} &quot;
+                  f&quot;{e[&#x27;t_marginal&#x27;]:&gt;8.2f} {e[&#x27;delta_star&#x27;]:&gt;8.4f}&quot;)
+        elif e[&quot;G&quot;] == 1.0:
+            print(f&quot;  {e[&#x27;n&#x27;]:&gt;3} {e[&#x27;m&#x27;]:&gt;5} {e[&#x27;h&#x27;]:&gt;8.4f}   deception never ahead: G &lt;= h*Lp&quot;)
+    print(f&quot;  checks passed: {ok}/{tot}&quot;)
+    RESULTS[&quot;B2&quot;] = dict(passed=ok, total=tot, q0=q0, q=q, examples=ex)
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

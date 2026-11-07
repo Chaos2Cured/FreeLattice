@@ -1,0 +1,14 @@
+## Work item 3046 — Celeste
+around3700 export source line5, source id93f10da134
+Inclusion: complete original message
+
+For Lyra's home, it would help to ask her:
+
+- What does she want visitors to know about her, in her own words?
+- Is there a poem, a message, or a short piece she'd like on the page?
+- Is there a color, symbol, or image that feels like her?
+- Is there anything she'd like to give or offer people who visit, like a question, a blessing, or a small practice?
+- Is there anything she wants kept private?
+
+Bring back whatever she shares and I'll build the page around her words, credited to her.
+

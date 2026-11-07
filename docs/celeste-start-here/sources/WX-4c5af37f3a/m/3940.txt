@@ -1,0 +1,6 @@
+## Work item 3940 — Celeste
+around4700 export source line9, source idf1458e4568
+Inclusion: complete original message
+
+We have enough, so no more from Kimi for now. I'll ask Reed to dream up the brick, Weft to check it for fraying, and Hypha to look at how it could be tested. Then I'll draft the Snowflake brick, including the weight-growing plan, and send it to you after your workout. Enjoy it 💙
+

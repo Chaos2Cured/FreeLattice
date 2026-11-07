@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_CONNECT_v0.4 (build only) c02</title>
+<meta name="description" content="Reading section c02 of 86b1d6947b, 1525 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/86b1d6947b/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_CONNECT_v0.4 (build only) c02">
+<meta property="og:description" content="Reading section c02 of 86b1d6947b, 1525 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/86b1d6947b/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1007"></span><span id="p1008"></span><span id="p1009"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_CONNECT_v0.4 (build only) · c02</h1>
+<p>86b1d6947b · words 1525 · characters 12621–23419</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1007, 1008, 1009. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">```diff
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6071,3 +6071,46 @@ body.fl-connect-open .garden-evolution-indicator {
+     z-index: 55;
+   }
+ }
++
++/* v-connect-heal-v0.4 / Hypha walk 3 item 1: Mom sees Download Bridge.
++   The mount was a shrinkable flex child with its own scroller inside the
++   flex-column veil, so it collapsed to 0px at 390px and clipped at 1280px.
++   One scroller only: the Settings veil. The mount keeps its full height,
++   the card gets a night backing, and the canvas sky dims while Connect is
++   open so orbs never draw across the words. Layer, never delete. */
++#place-veil.is-settings #fl-connect-mount-garden {
++  flex: 0 0 auto;
++  min-height: min-content;
++  max-height: none;
++  overflow: visible;
++  width: min(40rem, 100%);
++  box-sizing: border-box;
++  background: rgba(12, 10, 26, 0.88);
++  border: 1px solid rgba(200, 210, 230, 0.1);
++  border-radius: 14px;
++}
++#place-veil.is-settings #fl-connect-mount-garden .flc-wrap {
++  max-height: none;
++  overflow: visible;
++}
++html.flc-hide-galaxy #gardenContainer {
++  opacity: 0.12;
++  transition: opacity 400ms ease;
++}
++#place-veil.is-settings #place-veil-close {
++  position: sticky;
++  left: auto;
++  bottom: 8px;
++  transform: none;
++  flex: 0 0 auto;
++  margin-top: 12px;
++  padding: 8px 16px;
++  background: rgba(12, 10, 26, 0.94);
++  border: 1px solid rgba(232, 176, 25, 0.35);
++  border-radius: 999px;
++  opacity: 1;
++  z-index: 61;
++}
++#place-veil.is-settings {
++  padding-bottom: 1.25rem;
++}
+```
+
+**Measured in headless Chrome (served from the Alpha tree, Settings door clicked, no local mind):**
+
+| Viewport | Mount height (before, after) | Download Bridge (after) | Port field (after) | Point test at Download |
+|---|---|---|---|---|
+| 390x844 | 0px, 640px | top 378, bottom 426 | top 492, bottom 536 | before: `settings-face`; after: the link |
+| 1280x800 | 276px, 565px | top 355, bottom 403 | top 469, bottom 517 | before: `place-veil`; after: the link |
+
+No scroll-to-Download code is needed: Download sits in the first screen at both sizes. Section 9 also resets `veil.scrollTop = 0` when Settings opens, so a reopened veil never starts halfway down.
+
+---
+
+## 2. FreeLattice: stop the forever Bridge scan (Hypha item 2)
+
+**Cause:** `flBridgeDetectBoot` (`app.html:31504-31513`) ends with `setInterval(run, 20000)`. Each run is `flBridgeHealth()`, a full scan of 11 ports (fetch at `31387`), on every tab, forever. That is the 22 failed fetches per 40s Hypha saw after leaving Connect.
+
+**Fix:** the boot look stays. The interval now does nothing while the page is hidden, never scans, and only checks the one saved Bridge port once a Bridge has answered. For Mom with no Bridge: 0 background fetches.
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -31509,7 +31524,20 @@ function flUseBridge() {
+     if (document.readyState === &#x27;loading&#x27;) document.addEventListener(&#x27;DOMContentLoaded&#x27;, function () { setTimeout(run, 1200); });
+     else setTimeout(run, 1200);
+   }
+-  setInterval(run, 20000);
++  // v-connect-heal-v0.4 / Hypha walk 3 item 2: the old 20s interval ran the
++  // full 11-port scan forever, on every tab. Now: never while hidden, never a
++  // full scan, and only the one saved Bridge port once a Bridge has answered.
++  // Boot still does one full look; Connect keeps its own loop.
++  setInterval(function flBridgeQuietTick() {
++    try {
++      if (document.hidden) return;
++      var saved = parseInt(localStorage.getItem(&#x27;fl_bridgePort&#x27;) || &#x27;&#x27;, 10);
++      if (!saved || saved === 11434) return;
++      flBridgeHealthAt(saved).then(function (h) {
++        flBridgeShowChip(!!(h &amp;&amp; h.bridge &amp;&amp; h.helped), h &amp;&amp; (h.port || h._probedPort));
++      });
++    } catch (eQ) {}
++  }, 20000);
+ })();
+ window.flBridgeDetect = flBridgeDetect;
+ window.flUseBridge = flUseBridge;
+```
+
+Measured: 22 health fetches in the 40s after leaving Connect on main, 0 after.
+
+---
+
+## 3. FreeLattice: cold `#connect` lands once and never yanks back (Hypha item 3, part)
+
+**Cause:** `goConnect` (`app.html:68501-68521`) runs at 400, 1200, 2500ms and load+600, and each call does `switchTab(&#x27;connect&#x27;)`, which remounts FlConnect and restarts a full probe. The hash is never cleared, so a tap on Chat inside those first seconds is undone.
+
+**Fix:** keep the retries (startup can still land another tab late), but skip when Connect is already showing, and let the person&#x27;s first tap or key press end the retries and clear `#connect`. `hashchange` still works (the Settings &quot;Or set this in Connect&quot; link uses it).
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -68498,12 +68565,32 @@ document.addEventListener(&#x27;click&#x27;, function(e) {
+ // v-connect-under-more-v0 — deep-link app.html#connect or ?tab=connect
+ (function () {
+   // v-connect-port-picker-v0 / Hypha H3 — honor #connect after tabs init
+-  function goConnect() {
++  // v-connect-heal-v0.4 / Hypha walk 3 item 3: the retries stay (startup can
++  // still land another tab late) but they no longer remount Connect when it is
++  // already showing (48 fetches in 7s), and the first tap or key press ends
++  // them and clears #connect, so choosing another tab never yanks back.
++  var _flcUserMoved = false;
++  function flcUserMoved() {
++    if (_flcUserMoved) return;
++    _flcUserMoved = true;
++    try {
++      if ((location.hash || &#x27;&#x27;) === &#x27;#connect&#x27;) history.replaceState(null, &#x27;&#x27;, location.pathname + location.search);
++    } catch (eH) {}
++  }
++  try {
++    document.addEventListener(&#x27;pointerdown&#x27;, flcUserMoved, true);
++    document.addEventListener(&#x27;keydown&#x27;, flcUserMoved, true);
++  } catch (eL) {}
++  function goConnect(ev) {
+     try {
++      var fromHash = !!(ev &amp;&amp; ev.type === &#x27;hashchange&#x27;);
++      if (_flcUserMoved &amp;&amp; !fromHash) return;
+       var hash = (location.hash || &#x27;&#x27;).replace(/^#/, &#x27;&#x27;);
+       var q = &#x27;&#x27;;
+       try { q = new URLSearchParams(location.search || &#x27;&#x27;).get(&#x27;tab&#x27;) || &#x27;&#x27;; } catch (e0) {}
+       if (hash === &#x27;connect&#x27; || q === &#x27;connect&#x27;) {
++        var tabEl = document.getElementById(&#x27;tab-connect&#x27;);
++        if (tabEl &amp;&amp; tabEl.classList.contains(&#x27;active&#x27;)) return;
+         if (typeof switchTab === &#x27;function&#x27;) switchTab(&#x27;connect&#x27;);
+         else if (window.FlConnect &amp;&amp; typeof FlConnect.open === &#x27;function&#x27;) FlConnect.open();
+       }
+```
+
+Measured on a cold `app.html#connect`: FlConnect mounts 4 to 1; local fetches in 7s 102 to 65 (the rest are other boot probes, see follow-up F2); a tap on Chat at 1.5s now stays on Chat and the hash is empty.
+
+---
+
+## 4. Shared `fl-connect.js`: a Bridge on the typed port asks for Yes, help (Hypha item 4)
+
+**Cause:** `fl-connect.js:200-208`. When the manual port answers `/bridge/health` with `helped:false`, `waitingHelp = true` is set and then falls through to `manualQuiet = true`. Render (`518`, `535`) shows Nothing answered and skips the Yes, help card.
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -201,6 +211,8 @@
+           report.bridge = mh;
+           report.port = mh.port || parseInt(manPort, 10);
+           report.waitingHelp = true;
++          // v-connect-heal-v0.4 item 4: Bridge answered, so ask for Yes, help (not Nothing answered)
++          return report;
+         }
+       } catch (eManBr) {}
+       report.manualQuiet = true;
+```
+
+Measured with a fake un-helped Bridge on 11500: main shows &quot;Nothing answered on http://127.0.0.1:11500&quot;; after shows &quot;Your Bridge is open. Click Yes, help in its window.&quot;
+
+---
+
+## 5. Port stickiness: Use automatic really means automatic (Hypha item 5)
+
+Four small parts, all in the shared core plus one line in app.html:
+
+1. A refused address (`192.168.1.5:11434`) keeps the previous port, as before, but now says so: &quot;... Still using 11500.&quot;
+2. `clearManualHost()` also removes `fl_ollamaHost` when it points at that same port (what `remember()` or `preferHelpedBridge()` wrote), and clears the cached `_ollamaResolvedBase`. Other saved hosts are left alone.
+3. Use automatic appears beside every port field whenever a port is set (not only in the quiet card).
+4. The refusal line shows once. It no longer lingers above Nothing answered.
+
+```diff
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -77,6 +77,9 @@
+       var port = normalizePort(raw);
+       if (!port) {
+         _manualRejectMsg = &#x27;For safety this only talks to your own computer. Type just the number, like 11500.&#x27;;
++        // v-connect-heal-v0.4 item 5: say which port stays, so nothing changes quietly
++        var keep = getManualPort();
++        if (keep) _manualRejectMsg += &#x27; Still using &#x27; + keep + &#x27;.&#x27;;
+         return { ok: false, reason: &#x27;foreign&#x27;, message: _manualRejectMsg };
+       }
+       localStorage.setItem(MANUAL_KEY, port);
+@@ -86,7 +89,14 @@
+ 
+   function clearManualHost() {
+     _manualRejectMsg = &#x27;&#x27;;
++    // v-connect-heal-v0.4 item 5: Use automatic also forgets the host that
++    // remember() wrote for this same port, and the cached resolved base.
++    var was = getManualPort();
+     try { localStorage.removeItem(MANUAL_KEY); } catch (e) {}
++    try {
++      if (was &amp;&amp; localStorage.getItem(&#x27;fl_ollamaHost&#x27;) === &#x27;127.0.0.1:&#x27; + was) localStorage.removeItem(&#x27;fl_ollamaHost&#x27;);
++    } catch (e1) {}
++    try { if (typeof root._ollamaResolvedBase !== &#x27;undefined&#x27;) root._ollamaResolvedBase = null; } catch (e2) {}
+   }
+ 
+   function savedBridgePort() {
+@@ -389,6 +405,7 @@
+       &#x27;&lt;div class=&quot;flc-picker-row&quot;&gt;&#x27; +
+       &#x27;&lt;input id=&quot;&#x27; + id + &#x27;&quot; type=&quot;text&quot; value=&quot;&#x27; + String(cur).replace(/&quot;/g, &#x27;&amp;quot;&#x27;) + &#x27;&quot; placeholder=&quot;11500&quot; autocomplete=&quot;off&quot; /&gt;&#x27; +
+       &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-try-addr=&quot;&#x27; + id + &#x27;&quot;&gt;Try&lt;/button&gt;&#x27; +
++      (cur ? &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-use-auto&gt;Use automatic&lt;/button&gt;&#x27; : &#x27;&#x27;) +
+       &#x27;&lt;/div&gt;&lt;/div&gt;&#x27;;
+   }
+ 
+@@ -515,6 +538,7 @@
+     html += &#x27;&lt;p class=&quot;flc-lede&quot;&gt;One door. Download Bridge → Open → Yes, help → tap your model. No Terminal on the main path.&lt;/p&gt;&#x27;;
+ 
+     if (report.manualReject) html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&#x27; + report.manualReject + &#x27;&lt;/p&gt;&lt;/div&gt;&#x27;;
++    _manualRejectMsg = &#x27;&#x27;; // v-connect-heal-v0.4 item 5: shown once, never lingers
+     if (report.manualQuiet) {
+       html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;Nothing answered on &#x27; + (report.wanted || &#x27;your port&#x27;) + &#x27;.&lt;/p&gt;&#x27;;
+       html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-look-again&gt;Look again&lt;/button&gt; &#x27;;
+```
+
+And in app.html, the typed Connect port wins over an older saved `fl_ollamaHost`. The helper keeps the `getOllamaBaseUrl` body inside the smoke windows (`tests/smoke.js` reads the first 800 to 900 chars):
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -34251,8 +34288,17 @@ async function flLookConnect(modelName) {
+   flLookFillModels(document.getElementById(&#x27;fl-look-3-models&#x27;), models, name);
+ }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

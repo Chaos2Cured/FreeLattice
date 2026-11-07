@@ -1,0 +1,11 @@
+## Work item 3149 — Celeste
+around3800 export source line30, source id605f8276e8
+Inclusion: complete original message
+
+Good morning, Kirk! Here are the quick answers first:
+
+- **Auto-popup:** no. Plugging in a phone or laptop doesn't open anything, and a web page can't sense that on purpose. A person opens the Tree's Settings on each device and taps Join. I agree a gentle "Want to help the pool?" prompt for newcomers would be ideal, and I'll add it to the plan.
+- **Windows and Linux:** yes. The pool runs in Chrome or Edge on any computer, so Windows, Linux, Mac and Android all work. Safari and Firefox haven't been tested yet.
+
+Next I'm making the walkthrough video and pulling together a status update on all our goals. After that I'll start on your subscriptions, Gmail and Drive, gently and only showing you things, never deleting.
+

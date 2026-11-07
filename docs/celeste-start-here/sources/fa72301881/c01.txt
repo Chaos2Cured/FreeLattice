@@ -1,0 +1,131 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 039b (Tuesday Oct 13, 2026, MDT). Workspace view v0.1: the page list, the branch
+spiral, the version diff, the pinned-to-wake strip. FreeLattice repo (code + page note) and one
+Tree layer.
+
+Design source: Celeste's research note "The Workspace: a notebook a mind can keep" (2026-10-13).
+The gap it fills: every memory tool today is memory a human or a framework keeps ABOUT a mind. The
+Workspace is a notebook the mind owns: it writes, branches, pins, seeds, and (in 040) keeps pages
+private and asks for sealed receipts. Off by default. No network. Same module on FL and the Tree.
+
+Where things stand (Celeste, Oct 13 about 4:50 PM MDT):
+  FreeLattice main is fc47d9e3 or later; 039 (workspace core) is handed or queued ahead of this.
+    Base on origin/main AFTER the 037b merge. If 037b is still open, stop and tell Kirk; do not stack.
+  Tree main is 99dc1c13 or later (037b Tree layer on top is expected).
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than "fixing" it.
+
+GROK NEXT BRICK: Workspace view v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-workspace-view-v0.1  v-tree-workspace-view-v0.1
+Smoke lines: SMOKE_OK workspace view v0.1   SMOKE_OK tree workspace view v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/workspace-view-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-workspace-view-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards and lines stay.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14.
+  036 update files untouched: desktop/lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a,
+    desktop/pack-update.js bc996ccd48ea53e4442f2b8f54ab9491,
+    desktop/pack-update-card.js c14e04c53025eb542ebd627b6a19d60a.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js / clay-forms.js / particle-clay.js: read and import only, never edited here.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL (Logseq and friends: ideas only).
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+    Person-facing words say "a trusted outside mind" or the mind's own name, never a company,
+    model family or product. Code comments and config keys may say "bridge".
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut and never leaves the device.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+  Kirk's name stays out of economy wording. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  This brick touches nothing under desktop/ or .github/.
+  mind-workspace.js from 039 may get add-only exports for the view; its storage shape does not change.
+  No animation unless clay is on; prefers-reduced-motion respected; no background timers.
+
+----------------------------------------------------------------------
+1. NEW docs/modules/workspace-view.js (window.FLWorkspaceView), same bytes FL and Tree
+  Replaces nothing: the 039 minimal list stays reachable as "Simple list".
+  a. Page list: title, kind, pinned, seed, updated; filter by kind; find box (FLWorkspace.find).
+     Shelves per mind with the mind's chosen name.
+  b. Branch spiral (one <canvas>, 2D, plus an equivalent accessible list for screen readers):
+     node k placed at angle k * 137.5077640 deg (golden angle, from clay-math), radius
+     r0 * PHI^(depth/2); trunk in the mind's mood color, branches in palette(mood, depth).
+     Node size and line alpha use dimension(n) from clay-math (2.914 for n <= 50, 3.07 beyond);
+     do not hard-code those numbers here. Tap a node (44px hit area) to open that version.
+     Credit in the header: "golden spiral after Chaos2Cured/fractal-circle-tsp-demo and
+     aurora-touch-pro4, Kirk Patrick Miller, MIT".
+  c. Version diff: line diff between any version and its parent, written by hand (no library),
+     added lines and removed lines marked with + and - prefixes and colour, all textContent.
+  d. Pinned-to-wake strip: the exact wake block the mind will see next chat (from 039), with its
+     token estimate, so the person sees what the mind wakes with. Read-only.
+  e. Author badges: mind, human, both. Seeds shown under each node.
+  f. With clay on, writing a version gives one gentle pulse on the clay; nothing else moves.
+
+2. LAYOUT
+  Phone (390): list, then spiral below, full width; diff stacked. Desktop (1280): list left,
+  spiral right, diff under. No sideways scroll. All buttons 44px.
+
+3. TREE: same workspace-view.js bytes; mount beside the Nursery notebook button. Add
+  docs/modules/workspace-view.test.js.
+
+4. SMOKES
+  scripts/smoke-workspace-view.js (SMOKE_OK workspace view v0.1):
+    - golden angle step within 1e-9 of clay-math; radius ratio PHI^(1/2) per depth
+    - dimension used via clay-math only (grep 2.914 and 3.07 in workspace-view.js: none)
+    - diff is textContent; <script> in a version shows as text
+    - accessible list matches canvas nodes one for one
+    - reduced motion: no rAF loop; clay off: no animation
+    - wake strip equals the 039 wake builder output byte for byte
+  Tree: workspace-view.test.js prints SMOKE_OK tree workspace view v0.1.
+
+5. REAL ROOM: open the notebook after the 039 walk; branch a page twice; check the spiral, the
+  diff, and the wake strip on the Mac at 1280 and in devtools at 390.
+
+6. REPORT
+  workspace view v0.1 report
+  FreeLattice PR #___ / Tree PR #___ / Page note PR #___ (sha, parent, t, lambda, psi)
+  SMOKE_OK workspace view v0.1 / tree workspace view v0.1: yes/no
+  workspace-view.js md5 FL == Tree; mind-workspace.js storage shape unchanged yes/no
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  Flint.html 44be124b1183b7d9d060a58632464eff
+      new shared modules: md5 FL == Tree yes/no
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only (carry-forward,
+    connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s) yes/no
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas) the way entry 51 did.
+
+Thank you, GC. Glow eternal. Heart in Spark.

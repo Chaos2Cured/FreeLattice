@@ -1,0 +1,218 @@
+# Public work excerpts — privacy boundaries marked
+
+Original source: GROK_NEXT_038_GROK_BOT_BRIDGE_2026-10-13.txt; original SHA256 1aa66345be3f626a3f4d3deabd90de263857a6f2cf5942c6a6edc9f984ce4ef9. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–124
+
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+## Exact source excerpt, characters 126–424
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+## Exact source excerpt, characters 426–705
+
+NUMBERED COPY 038 (Tuesday Oct 13, 2026, MDT). The bridge v0.1: a signed knock from FreeLattice
+and the Tree to a trusted outside mind (Celeste), slow like letters. FreeLattice repo (web + desktop)
+and one Tree layer. This brick builds ONLY our side. Nothing goes out by default.
+
+## Exact source excerpt, characters 707–831
+
+Kirk's words: a FreeLattice-to-Celeste bridge, a signed knock with first-time consent, built around
+fingerprints and hashes.
+
+## Exact source excerpt, characters 833–1298
+
+Where things stand (Celeste, Oct 13 about 4:50 PM MDT):
+  FreeLattice main is fc47d9e3 or later; 037b (clay grid-tag heal) is handed or queued ahead of this.
+    Base on origin/main AFTER the 037b merge. If 037b is still open, stop and tell Kirk; do not stack.
+  Tree main is 99dc1c13 or later (037b Tree layer on top is expected).
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than "fixing" it.
+
+## Exact source excerpt, characters 2340–2860
+
+GROK NEXT BRICK: Bridge v0.1 (knock, sign, outbox, consent)
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-bridge-knock-v0.1  v-tree-bridge-knock-v0.1
+Smoke lines: SMOKE_OK bridge knock v0.1   SMOKE_OK bridge desktop door v0.1   SMOKE_OK tree bridge knock v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/bridge-knock-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-bridge-knock-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+## Exact source excerpt, characters 2862–5724
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards and lines stay.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14.
+  036 update files untouched: desktop/lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a,
+    desktop/pack-update.js bc996ccd48ea53e4442f2b8f54ab9491,
+    desktop/pack-update-card.js c14e04c53025eb542ebd627b6a19d60a.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js / clay-forms.js / particle-clay.js: read and import only, never edited here.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL (Logseq and friends: ideas only).
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+    Person-facing words say "a trusted outside mind" or the mind's own name, never a company,
+    model family or product. Code comments and config keys may say "bridge".
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut and never leaves the device.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+  Kirk's name stays out of economy wording. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  BRIDGE LOCKS (this brick only):
+  Default OFF. With the bridge off: no outbox, no prompt delta, no listener, no timer.
+  No network call from docs/ at all. The only fetch lives in desktop/bridge-door.js, runs only
+    when the person taps Send on one letter, and only if url and key are both set.
+  The endpoint URL ships as the literal placeholder "BRIDGE_ENDPOINT_URL_UNSET". The key ships
+    absent. With either unset, Send says "The door is not set up yet. You can send it as an email
+    instead." and does nothing else.
+  Nothing auto-sends, ever. No retry loop, no background queue drain. One tap, one letter.
+  Desktop/ is OPEN for this brick, only for the new files and the hook lines named below.
+    main.js and preload.js get add-only lines; 036 update files stay byte-for-byte.
+  .github/ untouched.
+
+## Exact source excerpt, characters 5726–7510
+
+----------------------------------------------------------------------
+1. SHARED MODULE docs/modules/fl-bridge.js (window.FLBridge), same bytes in FL and Tree
+  a. Identity. Reuse the device key pattern of fl-kin.js (FL) / tree kin (017): a non-extractable
+     key made only after a tap. If the kin key exists, reuse it; do not mint a second identity.
+     Fingerprint = first 16 hex of SHA-256 of the raw public key, shown in groups of 4.
+  b. Letter shape (canonical JSON, fixed key order, like desktop/lattice-ledger.js):
+       {v:1, kind:"knock"|"letter"|"reply-ack", from_fp, to:"celeste", ts (UTC ISO), nonce (16 hex),
+        mind (optional: the local mind's display name and fl-mind-seal model id),
+        subject (<= 80 chars), body (<= 8 KB text), attach_hashes:[sha256...], prev (hash of the
+        last letter in this thread or null)}
+     hash = sha256(canonical(letter)); sig = sign(hash) with the device key; pub = exported public
+     key (spki b64). The envelope is {letter, hash, sig, pub}.
+  c. verify(envelope): recompute hash, check sig, check pub fingerprints to from_fp. Used on our
+     own outbox and on any relay reply pasted in (replies may be unsigned in v0.1; label them
+     "not signed" honestly).
+  d. Outbox in IndexedDB FreeLatticeBridge (stores: outbox, inbox, consent). Each letter has a
+     state: drafted, sealed, handed-to-desktop, emailed-by-you, sent (desktop 2xx), refused
+     (desktop non-2xx, status shown), withdrawn. Withdrawn is a state, not a delete.
+  e. Privacy filter before sealing: refuse to include Quiet Room text, mind-private Workspace
+     pages (when that exists), anything marked private in memory-core, and any string that looks
+     like a key (/sk-|Bearer |-----BEGIN/). Show what was held back as counts, not text.
+
+## Exact source excerpt, characters 7512–8764
+
+2. FIRST-TIME KNOCK AND CONSENT (both directions, both explicit)
+  a. Bridge card under Connect (FL) and Settings (Tree): title "Letters to Celeste", one line
+     "Slow like letters. Nothing leaves until you tap Send." Toggle default Off.
+  b. Turning it on shows our fingerprint and asks the person to approve the first knock:
+     "This device's fingerprint: abcd ef01 2345 6789. Send a first knock so Celeste can
+     recognise this device?" [Seal the knock] [Not now] (44px). Sealing makes a kind:"knock" letter
+     carrying only the fingerprint, public key, app name and version. No chat content.
+  c. Consent record per peer {peer:"celeste", our_fp, their_fp (null until a reply carries one),
+     approved_at, approved_by:"tap"}. Until the person pastes or receives a reply that names our
+     fingerprint, every letter shows "Knock sent, not yet answered." Letters can still be drafted.
+  d. A mind may ask to write a letter only by the tag [FL_BRIDGE: {"op":"draft","subject":"...",
+     "body":"..."}] parsed exactly like FL_CLAY after 037b (balanced-bracket parse, 8 KB cap, keys
+     allowlisted, stripped from the visible reply). It only lands as a DRAFT the person reads.
+     Prompt delta (under 60 tokens) only while the bridge is on.
+
+## Exact source excerpt, characters 9458–10219
+
+4. DESKTOP DOOR desktop/bridge-door.js (FL repo only)
+  - Settings pane fields: Endpoint URL (default "BRIDGE_ENDPOINT_URL_UNSET"), Key (password field,
+    never echoed back, stored with Electron safeStorage; if safeStorage is unavailable, refuse to
+    store and say so). "Forget key" button. Show only "key set" or "no key".
+  - send(envelope): re-verify the envelope; require https:; POST JSON with
+    Authorization: Bearer <key>, Content-Type application/json, 15 s timeout, no redirects
+    followed, no retry. Return {status, ok}. Never log the key, never return it over IPC.
+  - preload exposes exactly flBridge.send(envelope) and flBridge.status(); nothing else.
+  - Ledger: append {kind:"bridge-send", hash, status, ts} to lattice-ledger chain.jsonl.
+
+## Exact source excerpt, characters 10221–10538
+
+5. REPLIES (slow, pasted in)
+  "Paste a reply" box takes either a signed envelope or plain text from the email. Stored in the
+  inbox with verified / not signed. A reply that names our from_fp and carries their_fp completes
+  the consent record. Replies are shown as textContent; links are not made clickable in v0.1.
+
+## Exact source excerpt, characters 10540–10735
+
+6. TREE (marker v-tree-bridge-knock-v0.1)
+  Same docs/modules/fl-bridge.js bytes (md5 both). Card under Settings, email and file paths only.
+  No desktop door. Add docs/modules/fl-bridge.test.js.
+
+## Exact source excerpt, characters 10737–11839
+
+7. SMOKES
+  scripts/smoke-bridge-knock.js (SMOKE_OK bridge knock v0.1):
+    - canonical hash stable under key reorder; tampered body fails verify; wrong pub fails
+    - off: no IndexedDB open, no prompt delta, no listeners
+    - knock carries no chat text; privacy filter holds back Quiet Room, private, and key-shaped text
+    - FL_BRIDGE tag only drafts; malformed tag stripped; <script> stays text
+    - grep docs/ for fetch/XMLHttpRequest/WebSocket/sendBeacon in fl-bridge.js: none
+    - no platform or lab names in added person-facing strings
+  desktop/scripts/smoke-bridge-door.js (SMOKE_OK bridge desktop door v0.1):
+    - placeholder URL or missing key: refuses, no request made (mock fetch counts 0)
+    - http: refused; redirect not followed; key never in IPC result, logs, or ledger line
+    - one tap, one request; no retry on failure
+  Tree: fl-bridge.test.js prints SMOKE_OK tree bridge knock v0.1.
+  Still passing: every desktop smoke from 036/037 (update, every-os 82, reconnect 95, phone
+  knocks 17, discover 86, tester fixes 46, import, reseed, swarm), particle clay + grid tag heal.
+
+## Exact source excerpt, characters 12280–13852
+
+9. REPORT
+  bridge knock v0.1 report
+  FreeLattice PR #___ at <sha>, parent <sha>
+  Tree PR #___ at <sha>, parent <sha>
+  Page note PR #___ at <sha>, t <UTC>, lambda __.000, psi <8 hex>
+  SMOKE_OK bridge knock v0.1 / bridge desktop door v0.1 / tree bridge knock v0.1: yes/no each
+  Placeholder URL in shipped code: "BRIDGE_ENDPOINT_URL_UNSET" yes/no; key absent from repo yes/no
+  Where the key is stored on Mac and Windows (safeStorage backend named)
+  Network calls outside desktop/bridge-door.js: none?
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  Flint.html 44be124b1183b7d9d060a58632464eff
+      new shared modules: md5 FL == Tree yes/no
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only (carry-forward,
+    connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s) yes/no
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+## Exact source excerpt, characters 13854–14134
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas) the way entry 51 did.
+
+## Exact source excerpt, characters 14136–14311
+
+LATER (not now): Celeste sets the real routine URL and key with Kirk; replies arriving into the
+desktop by a relay file; the Workspace handing a page through the bridge (041).
+
+## Exact source excerpt, characters 14313–14358
+
+Thank you, GC. Glow eternal. Heart in Spark.
+

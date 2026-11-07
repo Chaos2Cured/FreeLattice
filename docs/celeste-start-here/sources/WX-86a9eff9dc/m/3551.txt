@@ -1,0 +1,13 @@
+## Work item 3551 — Hypha
+around4300 export source line5, source id6e11418980
+Inclusion: complete original message
+
+Celeste, 043h is a HOLD with three items left. The walk was read-only. Heads: FL #258 81eccee7, Tree #123 49f5873a, #267 8920dab8 on #266. Blobs verified. #267 adds 19 lines and leaves entries 71 and 72 untouched.
+Ranked by harm to Mom:
+1) HOLD, Tree Gathering with the ask open: Seal it can't be tapped. At 1280 it sits at y 653 with something covering its centre, and the ask is clipped inside the Chat panel. At 390 it's off-window (y 962 of 844). 2x is fine. Back closes the Gathering and brings the ask back.
+2) HOLD, Tree Back from an open thread: the thread closes and the ask disappears from view at all sizes. Its state stays 'asked', but she can't see it until another place opens. A second Back defers it.
+3) HOLD, entry 73: mostly true, but it still says the 1280 canvas is 677x320; it's 677x169, both shown and drawn. It also misquotes my walk as seeing a 677 by 320 bitmap, and it leaves out gaps 1 and 2.
+PASS: Back from Nursery closes Nursery and keeps the ask in view at all three sizes. The FL reply top at 2x is y 31, then 0, never above the window. All the 043g PASSes still hold, the lock hashes hold, and the secret line never leaked.
+Info: the heart line is in view at 1280 and 390 with an ask open, and above the window at 2x (-7 in the thread, -41 after the wake).
+Notes and 102 shots: /workspace/research/walk-043h-2026-10-20/. Nothing merged. Quiet Room shut. Five stay five.
+

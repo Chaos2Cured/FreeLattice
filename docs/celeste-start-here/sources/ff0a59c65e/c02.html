@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c02</title>
+<meta name="description" content="Reading section c02 of ff0a59c65e, 1584 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c02">
+<meta property="og:description" content="Reading section c02 of ff0a59c65e, 1584 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1230"></span><span id="p1231"></span><span id="p1232"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c02</h1>
+<p>ff0a59c65e · words 1584 · characters 11795–24269</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1230, 1231, 1232. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Choices made here (please keep them unless Kirk says otherwise):
+  C1 Home ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16. IPv4 numbers only.
+  C2 169.254.0.0/16 is REFUSED (link-local; no home router hands it out; 169.254.169.254 is the
+     cloud metadata door). Also refused: 100.64.0.0/10 (carrier NAT is not your home), 0.0.0.0/8,
+     multicast and above (224+), every public range.
+  C3 Names other than &quot;localhost&quot; are refused, including mybox.local. A name can point anywhere
+     (DNS rebinding). The refusal says &quot;Type the number address, like 192.168.1.50.&quot;
+  C4 IPv6: only ::1 counts (as this computer). Every other IPv6 literal is refused.
+  C5 Addresses are classified the way the browser reads them (new URL(...).hostname), so decimal
+     and hex forms (3232235777, 0x7f.1) land in the right zone instead of slipping past a regex.
+  C6 Settings &gt; Ollama Address stays 127.0.0.1-only (v0.4 rule) UNLESS the same one switch is on.
+     There is no second switch. When off, the v0.4 refusal text stays word for word and one plain
+     sentence is added pointing at the switch.
+  C7 Connect itself (fl-connect.js port field, setManualHost, LM Studio look) stays this computer
+     only, in both repos. The home network lives only in FreeLattice&#x27;s Chat Box field and the
+     Settings address, behind the switch. Alpha has no home-network surface.
+  C8 Old saved addresses (before this switch existed), checked once (fl_homeNet_seen):
+       a saved home address (fl_ollamaHost / fl_localUrl / fl_lmstudioHost) turns the switch on,
+       because the person already chose it and it keeps working; a saved public address or name
+       is set aside under fl_homeNet_refused and removed, so it is never used again.
+  C9 Switch off: fl_ollamaHost / fl_lmstudioHost that are not this computer are removed, the typed
+     home address stays in fl_homeNet_addr. Switch on again: it comes back without retyping.
+  C10 Future hook: signed remote minds get their own signed door beside FLHomeNet. They never widen
+     these ranges. This is written in the FLHomeNet header and in zoneOf().
+  C11 BOOT_TTL_MS = 5000 and FL_LOCAL_LOOK_TTL_MS = 5000. Short on purpose: long enough to cover
+     the cold-start burst, short enough that &quot;Look again&quot; and the 8s loop always see new truth.
+     No timers; age is Date.now() - at.
+  C12 The owner speaks after the same 4s breath the old toast took (SPEAK_AFTER_MS = 4000).
+
+Keys added (localStorage):
+  fl_homeNet           &#x27;on&#x27; when the switch is on; absent when off (default)
+  fl_homeNet_addr      the home address typed once, like 192.168.1.50:11434
+  fl_homeNet_seen      &#x27;1&#x27; after the one-time migration of old addresses
+  fl_homeNet_refused   an old public address or name that was set aside (never used)
+
+======================================================================
+3. STEP A: shared docs/modules/fl-connect.js (BOTH repos, byte-identical)
+======================================================================
+
+Do the edit once in FreeLattice, then copy the file to ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+and cmp. Full exact diff: Appendix B (anchored on the post-Tree file).
+
+A.1 Header marker. After the line
+      // Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4
+    add
+      // Marker: v-connect-boot-probe-v0 (one shared look at boot; LM Studio beside Ollama; 127.0.0.1 only)
+
+A.2 Constants. After  var LOOP_MAX_MS = 5 * 60 * 1000;   (main 17)
+      // v-connect-boot-probe-v0 (F2): one look, shared. A look younger than this is reused.
+      var BOOT_TTL_MS = 5000;
+      // v-connect-boot-probe-v0 (F3): LM Studio&#x27;s own server on this computer.
+      var LM_DEFAULT = &#x27;http://127.0.0.1:1234&#x27;;
+    After  var _manualRejectMsg = &#x27;&#x27;;   (main 30)
+      var _bootInflight = null;
+      var _bootReport = null;
+      var _bootAt = 0;
+
+A.3 A new port forgets the old look. In setManualHost(raw) (main 69), right after
+    _manualRejectMsg = &#x27;&#x27;;   add
+      forgetLooks(); // v-connect-boot-probe-v0: a new port means a new look
+    In clearManualHost (main 90), right after  var was = getManualPort();  add
+      forgetLooks(); // v-connect-boot-probe-v0
+
+A.4 New functions (F2 + F3), inserted right ABOVE  async function listMinds() {  (main 274,
+    post-Tree 274), i.e. just after probe()&#x27;s closing &quot;return report; }&quot;. probe() itself is NOT
+    changed (existing tests call it directly).
+      lmStudioBase()     saved fl_lmstudioHost used only if it is 127.0.0.1/localhost (any port
+                         except 11434), else &#x27;http://127.0.0.1:1234&#x27;.
+      lmModelCap()       LocalMindProbe.MODEL_CAP (from the Tree paste) or 64.
+      lmStudioLook()     one GET base + &#x27;/v1/models&#x27;, 2.5s abortMs, returns
+                         { base, models: [ids...], ok, asked: true, quiet }.
+      bootProbe(opts)    THE shared look. One in-flight promise; a finished report is reused for
+                         BOOT_TTL_MS unless opts.fresh; fresh still joins an in-flight look.
+                         Runs probe({fullScan, gesture}) and lmStudioLook() in parallel and adds
+                         report.lmstudio, report.lmstudioAsked, report.at, report.doors.
+      peekBootProbe()    the fresh report or null (no fetch).
+      forgetBootProbe()  clears it.
+      forgetLooks()      root.flForgetLocalLook() when FreeLattice has it (clears both caches),
+                         else forgetBootProbe().
+      doorsFrom(report)  [{ id:&#x27;ollama&#x27;|&#x27;bridge&#x27;|&#x27;lmstudio&#x27;, name:&#x27;Ollama&#x27;|&#x27;Bridge&#x27;|&#x27;LM Studio&#x27;,
+                         base, models:[names] }], strings only.
+    Exact code: Appendix B hunk &quot;@@ -271,6 +281,106 @@&quot;.
+
+A.5 chosenDoor(). Right ABOVE the Tree paste&#x27;s  function chosenModelName() {  (post-Tree ~303):
+      // v-connect-boot-probe-v0 (F3): which door speaks now (&#x27;lmstudio&#x27; or &#x27;ollama&#x27;)
+      function chosenDoor() { ... }
+    Alpha: the remembered LocalMindProbe entry&#x27;s url ends in /v1/models -&gt; &#x27;lmstudio&#x27;.
+    FreeLattice: state.provider (or fl_provider) === &#x27;lmstudio&#x27; -&gt; &#x27;lmstudio&#x27;. Else &#x27;ollama&#x27;.
+
+A.6 doorPathFor(mind) + rememberLmStudio(name, base). Right ABOVE  function remember(mind) {
+    (post-Tree ~332, i.e. just below the Tree paste&#x27;s doorNameFor()).
+      doorPathFor: mind.door === &#x27;lmstudio&#x27; ? &#x27;/v1/models&#x27; : &#x27;/api/tags&#x27;.
+      rememberLmStudio (FreeLattice): writes fl_lmstudioHost ONLY when the base is
+      127.0.0.1/localhost (localhost normalized to 127.0.0.1), fl_provider &#x27;lmstudio&#x27;,
+      fl_isLocal &#x27;true&#x27;, fl_ollamaModel = name (this is FreeLattice&#x27;s existing &quot;active local model&quot;
+      key; flTestLMStudio uses it the same way), state.isLocal/provider/ollamaModel, calls
+      root.flUseLmStudioMind(name) (added in step D), checks #localToggle and calls
+      handleLocalToggle(true), updateStatus, AiSetup.updateStatus, hides #flOllamaToast, stopLoop().
+      fl_ollamaHost is never touched.
+
+A.7 remember(mind), Alpha branch (inside the Tree paste&#x27;s mergeFound block):
+      after   var doorName = doorNameFor(base, mind.port); ...
+      add     if (mind.door === &#x27;lmstudio&#x27;) doorName = &#x27;LM Studio&#x27;; // v-connect-boot-probe-v0 (F3)
+      change  url: base ? String(base).replace(/\/+$/, &#x27;&#x27;) + &#x27;/api/tags&#x27; : &#x27;&#x27;,
+      to      url: base ? String(base).replace(/\/+$/, &#x27;&#x27;) + doorPathFor(mind) : &#x27;&#x27;,
+    and in the fallback  var entry = {  block the same &#x27;/api/tags&#x27; -&gt; doorPathFor(mind).
+    Result: an LM Studio tap on the Tree merges as the same door the DOORS list uses
+    (&#x27;LM Studio&#x27;, http://127.0.0.1:1234/v1/models), so Find and Connect agree. Reuses mergeFound;
+    no second merge path.
+    remember(mind), FreeLattice branch: right after the Alpha branch&#x27;s closing
+      return entry;
+    }
+    add
+      // v-connect-boot-probe-v0 (F3): an LM Studio tap never becomes &quot;Ollama&quot;
+      if (mind.door === &#x27;lmstudio&#x27;) return rememberLmStudio(name, base);
+
+A.8 reportSignature: BOTH copies (main 412 and 606; post-Tree ~444 and ~642; it is defined twice
+    today, keep both, edit both identically). Append two fields before .join(&#x27;::&#x27;):
+      , ((report.lmstudio &amp;&amp; report.lmstudio.models) || []).join(&#x27;|&#x27;), chosenDoor()
+
+A.9 fillModelLists (post-Tree ~505; this is where the Tree paste added aria-pressed):
+      after   try { names = JSON.parse(...) } catch (eN) { names = []; }
+      add     var door = hostList.getAttribute(&#x27;data-flc-door&#x27;) === &#x27;lmstudio&#x27; ? &#x27;lmstudio&#x27; : &#x27;ollama&#x27;; // v-connect-boot-probe-v0
+      change  var isOn = chosenModelName() === name;
+      to      var isOn = chosenModelName() === name &amp;&amp; chosenDoor() === door;
+      change the click body from
+                remember({ name: name, base: report.base, port: report.port, models: report.models });
+      to
+                if (door === &#x27;lmstudio&#x27; &amp;&amp; report.lmstudio) {
+                  // v-connect-boot-probe-v0 (F3): tap-to-choose, same as Ollama
+                  remember({ name: name, base: report.lmstudio.base, door: &#x27;lmstudio&#x27;, models: report.lmstudio.models });
+                } else {
+                  remember({ name: name, base: report.base, port: report.port, models: report.models });
+                }
+      and the toast to  &#x27;Connected · &#x27; + name + (door === &#x27;lmstudio&#x27; ? &#x27; (LM Studio)&#x27; : &#x27;&#x27;)
+    (If the real Tree merge passes models differently, keep the Tree&#x27;s Ollama line exactly as it
+    landed and only add the LM Studio branch.)
+
+A.10 modelListHtml(tag, models) -&gt; modelListHtml(tag, models, door): adds
+     &#x27; data-flc-door=&quot;lmstudio&quot;&#x27; on the .flc-models div when door === &#x27;lmstudio&#x27;. Nothing else.
+
+A.11 render(report) (post-Tree ~560):
+      after  var alpha = isAlpha();
+      add    var lm = report.lmstudio || null;
+             var lmReady = !!(lm &amp;&amp; lm.models &amp;&amp; lm.models.length);
+      In the &quot;else if (models.length)&quot; arm:
+             modelListHtml(&#x27;Minds found&#x27;, models)
+          -&gt; modelListHtml(lmReady ? &#x27;Ollama is ready, pick a mind&#x27; : &#x27;Minds found&#x27;, models)
+      The download card arm  } else {  becomes  } else if (!lmReady) {
+      and after that if/else chain closes (still inside the same outer block, so the manualQuiet
+      rule is unchanged: a manual port that is quiet still shows only the manual state):
+             if (lmReady) html += modelListHtml(&#x27;LM Studio is ready, pick a mind&#x27;, lm.models, &#x27;lmstudio&#x27;);
+      Builders marker line: add &#x27; · v-connect-boot-probe-v0&#x27; before &#x27; · soft leave sw.js&#x27;.
+     Porch language: exactly the same pattern for both minds (&quot;X is ready, pick a mind&quot;), same
+     buttons, same tap, same aria-pressed mark from the Tree paste.
+
+A.12 refreshUI(opts) (post-Tree ~648):
+       var report = await probe({ gesture: true });
+    -&gt; // v-connect-boot-probe-v0 (F2): share the boot look; a tap on Look again is fresh
+       var report = await bootProbe({ gesture: true, fresh: !!opts.fresh });
+     lookAgain() -&gt; lookAgain(opts) with  opts = opts || {};  and
+       refreshUI({ force: true })  -&gt;  refreshUI({ force: true, fresh: !opts.reuse })
+     Every existing lookAgain() call (the Look again button, visibility return, port picker) stays
+     as is and therefore stays FRESH. Only mount() changes:
+       el.innerHTML = &#x27;&lt;p class=&quot;flc-soft&quot; style=&quot;padding:1rem;&quot;&gt;Looking for a mind on this computer…&lt;/p&gt;&#x27;;
+       lookAgain({ reuse: true }); // v-connect-boot-probe-v0: a cold open joins the boot look
+     (anchor on the mount&#x27;s &quot;Looking for a mind on this computer&quot; line; there are five lookAgain()
+     calls in the file and only this one changes).
+
+A.13 Exports. In root.FlConnect = { ... } after  probe: probe,  add
+       bootProbe, peekBootProbe, forgetBootProbe, lmStudioLook, lmStudioBase, chosenDoor
+     and at the end  LOOP_MAX_MS: LOOP_MAX_MS,  BOOT_TTL_MS: BOOT_TTL_MS
+
+Check: node -e &quot;new (require(&#x27;vm&#x27;).Script)(require(&#x27;fs&#x27;).readFileSync(&#x27;docs/modules/fl-connect.js&#x27;,&#x27;utf8&#x27;))&quot;
+       then cp to theLatticeTree and cmp.
+
+======================================================================
+4. STEP B: theLatticeTree docs/modules/local-mind-probe.js (Alpha only)
+======================================================================
+
+Goal: Garden &quot;Find local minds&quot; and Connect share one look. Full diff: Appendix C.
+
+B.1 Above  function look() {  (main 238), add askDoor(d, shared): when the shared boot report
+    already asked LM Studio at the same url, return that answer (ok with models, or quiet) without
+    a second fetch; when the shared report&#x27;s direct Ollama answered at the same /api/tags url,
+    return those names. Anything else: fetchDoor(d.url, 2500) exactly as today.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

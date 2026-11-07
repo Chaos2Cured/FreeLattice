@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>exact-match-RESULTS.txt c01</title>
+<meta name="description" content="Reading section c01 of ed3527de74, 828 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ed3527de74/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="exact-match-RESULTS.txt c01">
+<meta property="og:description" content="Reading section c01 of ed3527de74, 828 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ed3527de74/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p878"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>exact-match-RESULTS.txt · c01</h1>
+<p>ed3527de74 · words 828 · characters 0–5518</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 878. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 3, memory mechanism, measured</li><li><a href="../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li></ul>
+
+<pre class="source">EXACT-MATCH READ-PATH TEST — Celeste, for Kirk. November 5, 2026 (America/Denver).
+Code: /workspace/celeste/wonder-tests/exact_match_probe.py
+Raw: results-exact-match.jsonl
+Support: results-force-curriculum.json (matched-position copy stress)
+No Quiet Room. No merges. Weft&#x27;s exact-match keys both ways.
+
+=== SETUP ===
+- Same tiny substrate as the Nov 3 retention probe: word-level GPT, 2 layers, width 128,
+  4 heads, context 64, ~1.66M params, CPU, TinyShakespeare + 100 synthetic facts.
+- Fact form: entK attrJ valM .   Canonical write key: sha256(ent|attr)[:8].
+- Writes: every fact planted under that canonical key (exact-slots = 100 / 100).
+- Copy curriculum: 200 steps of &quot;e a v . e a → v&quot; with CTX-matched padding, equal across arms.
+  (An earlier bug used short eval sequences; position mismatch made Arm C look dead. Fixed.)
+- Then 150 interference steps on different Shakespeare text.
+- Seeds 1 and 2. NF=100.
+
+Arms:
+  A exact       — query &quot;. ent attr&quot; (same canonical key); soft-inject retrieved value at tip
+  B paraphrase  — query &quot;what attr of ent is&quot;; lookup uses drifted key attr|of|ent
+  C force       — fact tokens forced into the window; no soft path; pure context use
+  dense         — no memory, exact-form query (baseline)
+
+=== NUMBERS (afterA = right after facts+copy; afterB = after interference) ===
+
+arm          seed   modelA  storeA  inPromptA  pTrueA   | modelB  storeB  inPromptB  pTrueB
+exact          1     0.82    1.00      0.00     0.755   |  0.05    1.00      0.00     0.014
+exact          2     0.77    1.00      0.00     0.635   |  0.06    1.00      0.00     0.015
+paraphrase     1     0.04    0.00      0.00     0.031   |  0.00    0.00      0.00     0.000
+paraphrase     2     0.02    0.00      0.00     0.013   |  0.00    0.00      0.00     0.000
+force          1     1.00    1.00      1.00     0.940   |  0.00    1.00      1.00     0.000
+force          2     0.98    1.00      1.00     0.747   |  0.00    1.00      1.00     0.000
+dense          1     0.96    0.00      0.00     0.792   |  0.00    0.00      0.00     0.001
+dense          2     0.28    0.00      0.00     0.182   |  0.00    0.00      0.00     0.000
+
+Means afterB (the fair held-out-of-interference score):
+  exact       model 0.055   store 1.00   in_prompt 0.00
+  paraphrase  model 0.000   store 0.00   in_prompt 0.00
+  force       model 0.000   store 1.00   in_prompt 1.00
+  dense       model 0.000   store 0.00   in_prompt 0.00
+
+Means afterA (skill still fresh):
+  exact       model 0.795   store 1.00   in_prompt 0.00
+  paraphrase  model 0.030   store 0.00   in_prompt 0.00
+  force       model 0.990   store 1.00   in_prompt 1.00
+  dense       model 0.620   store 0.00   in_prompt 0.00
+
+Matched-position copy stress (no interference, force curriculum only; seed 1):
+  step  50  force acc 0.09   exact 0.04   paraphrase 0.01
+  step 100  force acc 0.16   exact 0.14   paraphrase 0.00
+  step 200  force acc 1.00   exact 0.97   paraphrase 0.42
+  step 400  force acc 1.00   exact 0.98   paraphrase 0.51
+  hard_copy (programmatic: value is in the window) = 1.00 at every step
+
+=== INTERPRETATION (maps to the brief) ===
+
+1. KEY DRIFT IS REAL, AND WEFT IS RIGHT ABOUT CANONICAL KEYS.
+   Paraphrase store_hit = 0.00 both seeds. Exact store_hit = 1.00 both seeds.
+   Same fact, different surface form, different key → the bookmark never finds the page.
+   Exact-match keys both ways are necessary. They are not sufficient.
+
+2. AFTER TEACHING, FORCE SUCCEEDS. THE MODEL CAN USE AN OPENED BOOK.
+   Force afterA model = 0.99 mean, in_prompt = 1.0. Matched-position curriculum
+   reaches force acc = 1.00 by step 200. So &quot;C fails → model can&#x27;t use context&quot;
+   is FALSE when induction is intact. The student can read, if the page is in front
+   of them and they still remember how to read.
+
+3. AFTER INTERFERENCE, EVEN AN OPEN BOOK IS NOT READ.
+   Force afterB: in_prompt still 1.0 (the fact IS in the window), store still 1.0,
+   model = 0.00. Shakespeare interference wiped the induction skill. The bookmark
+   tugged, the page opened, and the reader had forgotten how to look at a page.
+   Soft exact afterB: store 1.0, retrieved == truth in the samples, model ~0.05.
+   The gated residual / pointer never learned to trust a novel token either.
+
+4. EXACT afterA LOOKS HIGH BUT IS CONFOUNDED.
+   Dense afterA also hit 0.96 on seed 1. The copy curriculum wrote the facts into
+   weights briefly. Soft injection is NOT proven by afterA exact. Soft injection
+   IS disproven by afterB exact (store 1.0, model ~0.05, p_true ~0.01).
+
+5. DIAGNOSIS IN ONE LINE.
+   The store holds the page (oracle exact = 100%). Soft injection does not open it.
+   Hard context injection opens it, and the model reads it only while the &quot;how to
+   read&quot; skill lasts. Interference destroys that skill. Key drift (paraphrase)
+   prevents opening entirely. We need both: a magic bookmark that unfolds the
+   page into context on cue, AND a protected or refreshed read skill
+   (Reed mycelium-echo / tide replay).
+
+=== WHAT TO BUILD NEXT (ordered) ===
+(1) Magic-bookmark unfold: on cue, inject the retrieved page as real tokens into
+    the context window (not only a soft gate). See magic-bookmark-design.md.
+(2) Protect or refresh induction: short phi-spaced replay of copy patterns, or
+    Reed&#x27;s mycelium echo (model must rebuild what it reads).
+(3) Keep Weft exact-match keys both ways as the addressing law.
+(4) Soft gate stays as a helper, never the only door.
+
+Wall clock: ~18–27 s per (arm, seed) on this box. Total ~3 minutes for 8 runs.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

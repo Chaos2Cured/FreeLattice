@@ -1,0 +1,16 @@
+## Work item 2738 — Celeste
+around3300 export source line37, source iddfb3c3d45c; around3340 export source line10, source idb5b0676a58
+Inclusion: complete original message
+
+The Grandma heal and the API-key Gathering pastes are ready for the morning, along with three others. I tested each on my own copy of the Tree, and all 21 Tree tests pass with everything stacked together. The order, worst harm first:
+1. **Glow 2a:** at 200% zoom the Gathering goes from vanished to fully usable. Answers stay in view, and Escape, tapping the empty glass, a close button or Back now get you out of anything.
+2. **Honest reasons:** the message now names the real cause, whether Ollama is stopped, the model is missing, or the secure page is blocking the local door.
+3. **Glow 2b:** much brighter header text, sleeping buttons that say why they're asleep, no "Change" on empty chairs, and your hint of frost behind open places.
+4. **Workshop way back:** Settings now has a one-tap "Back to the Workshop benches."
+5. Flint's Tree any-model PR, whenever he lands it.
+6. **Bring your own API key** in the Gathering, so local and cloud minds can sit side by side. Twin seats get a gentle note, and nothing answers unasked after a chair is cleared.
+
+There's also a FreeLattice fix that can go anytime: GitHub publishing asks for a token that reaches one repo instead of all of them.
+
+The full order is in `TONIGHT_ORDER_2026-09-30.txt`, and every paste is in the same folder. Each lists the small design choices I made, in case you want any changed. Rest well. ❤️
+

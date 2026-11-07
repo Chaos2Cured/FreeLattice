@@ -1,0 +1,266 @@
+  // Paired minds: who is trusted, with a Revoke button per row. No confirm dialog:
+  // revoking is Kirk's own local choice, and pairing again takes seconds.
+  function renderPairedList(container) {
+    if (!container) return;
+    var old = container.querySelector('.fl-bridge-minds');
+    var box = el('details', null, 'margin:8px 0;padding:8px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;');
+    box.className = 'fl-bridge-minds';
+    if (old) { box.open = old.open; container.replaceChild(box, old); } else container.appendChild(box);
+    var summary = el('summary', 'Paired minds', 'cursor:pointer;');
+    box.appendChild(summary);
+    var list = el('div', null, 'margin-top:6px;');
+    var msg = el('div', null, 'margin-top:6px;opacity:0.8;');
+    box.appendChild(list);
+    box.appendChild(msg);
+    list.appendChild(el('div', 'Looking\u2026', 'opacity:0.7;'));
+
+## Exact source excerpt, characters 79125–82733
+
+    listMinds().then(function (r) {
+      while (list.firstChild) list.removeChild(list.firstChild);
+      if (!r.ok) {
+        list.appendChild(el('div', (r.data && r.data.error) || ('HTTP ' + r.status)));
+        return;
+      }
+      var minds = (r.data && r.data.minds) || [];
+      summary.textContent = 'Paired minds (' + minds.length + ')' + (r.data.persistent === false ? ' \u00B7 ephemeral' : '');
+      minds.forEach(function (m) {
+        var row = el('div', null, 'padding:6px 0;border-top:1px solid rgba(255,255,255,0.08);');
+        var title = el('div', null);
+        title.appendChild(el('strong', m.name || 'A trusted mind'));
+        if (m.you) title.appendChild(el('span', ' (this browser)', 'opacity:0.7;'));
+        if (m.kind === 'cli') title.appendChild(el('span', ' (trusted by default)', 'opacity:0.7;'));
+        row.appendChild(title);
+        row.appendChild(el('div', (m.origin || 'no web origin') + ' \u00B7 paired ' + when(m.createdAt) + ' \u00B7 last used ' + when(m.lastUsedAt), 'opacity:0.75;font-size:0.9em;'));
+        var hasSecrets = (m.scopes || []).indexOf('secrets') !== -1;
+        row.appendChild(el('div', 'May: ' + (m.scopes || []).join(', '), 'opacity:0.75;font-size:0.9em;'));
+        var revokeBtn = el('button', 'Revoke', 'margin:4px 6px 0 0;');
+        revokeBtn.type = 'button';
+        revokeBtn.addEventListener('click', function () {
+          revokeBtn.disabled = true;
+          revoke(m.id).then(function (res) {
+            msg.textContent = res.ok ? ('Revoked ' + (m.name || m.id) + '.') : ((res.data && res.data.error) || 'Could not revoke.');
+            if (res.ok && res.data && res.data.you) { renderPairCard(container); box.parentNode && box.parentNode.removeChild(box); return; }
+            renderPairedList(container);
+          });
+        });
+        var secretsBtn = el('button', hasSecrets ? 'Stop .env access' : 'Allow .env files', 'margin:4px 6px 0 0;');
+        secretsBtn.type = 'button';
+        secretsBtn.addEventListener('click', function () {
+          secretsBtn.disabled = true;
+          setScopes(m.id, hasSecrets ? [] : ['secrets'], hasSecrets ? ['secrets'] : []).then(function (res) {
+            msg.textContent = res.ok ? ((m.name || m.id) + ' may: ' + ((res.data && res.data.scopes) || []).join(', ')) : ((res.data && res.data.error) || 'Could not change that.');
+            renderPairedList(container);
+          });
+        });
+        row.appendChild(revokeBtn);
+        row.appendChild(secretsBtn);
+        list.appendChild(row);
+      });
+      var foot = el('div', null, 'margin-top:8px;');
+      var allBtn = el('button', 'Revoke all paired devices', 'margin:0 6px 0 0;');
+      allBtn.type = 'button';
+      allBtn.addEventListener('click', function () {
+        allBtn.disabled = true;
+        revokeAll().then(function (res) {
+          msg.textContent = res.ok ? ('Revoked ' + ((res.data && res.data.revoked) || 0) + ' device(s). Local tools stay trusted.') : ((res.data && res.data.error) || 'Could not revoke.');
+          setToken('');
+          renderPairCard(container);
+          if (box.parentNode) box.parentNode.removeChild(box);
+        });
+      });
+      var forgetBtn = el('button', 'Forget on this browser', 'margin:0 6px 0 0;');
+      forgetBtn.type = 'button';
+      forgetBtn.addEventListener('click', function () {
+        setToken('');
+        msg.textContent = 'This browser forgot its token. It stays listed until you revoke it.';
+        renderPairCard(container);
+      });
+      foot.appendChild(allBtn);
+      foot.appendChild(forgetBtn);
+      list.appendChild(foot);
+    });
+  }
+
+## Exact source excerpt, characters 82735–83270
+
+  window.FLAgentBridge = {
+    BASE: BASE,
+    TOKEN_KEY: TOKEN_KEY,
+    NEEDS_PAIR_EVENT: NEEDS_PAIR_EVENT,
+    CHANGED_EVENT: CHANGED_EVENT,
+    fetch: bridgeFetch,
+    pair: pair,
+    status: status,
+    whoami: whoami,
+    listMinds: listMinds,
+    revoke: revoke,
+    revokeAll: revokeAll,
+    setScopes: setScopes,
+    hasToken: function () { return !!getToken(); },
+    forget: function () { setToken(''); },
+    defaultName: defaultName,
+    renderPairCard: renderPairCard,
+    renderPairedList: renderPairedList
+  };
+})();
+```
+
+## Exact source excerpt, characters 83272–83333
+
+### 6b. `docs/app.html` (then byte-copy to root `index.html`)
+
+## Exact source excerpt, characters 83335–83410
+
+Right above L68597 `<script src="modules/propose.js" defer></script>`, add:
+
+## Exact source excerpt, characters 83412–83604
+
+```html
+<!-- LAYER v-agent-bridge-lock-v0 · v0.1: trusted-mind token for the builder bridge (3141), loads before propose.js -->
+<script src="modules/agent-bridge-client.js" defer></script>
+```
+
+## Exact source excerpt, characters 83606–83783
+
+Then `cp docs/app.html index.html` and check with `cmp index.html docs/app.html`. No other app.html change is needed: the Cascade heartbeat at L39741 hits `/`, which stays open.
+
+## Exact source excerpt, characters 83785–83872
+
+### 6c. `docs/modules/propose.js` (exact diff; CRITICAL LOCK 1A/1B counts stay 3 and 1)
+
+## Exact source excerpt, characters 83874–84073
+
+```diff
+--- a/docs/modules/propose.js
++++ b/docs/modules/propose.js
+@@ -577,13 +577,22 @@
+   // on draft state and one (approve) is also gated on smokeStatus.
+   var BRIDGE = 'http://localhost:3141';
+
+## Exact source excerpt, characters 84076–84731
+
++  // LAYER v-agent-bridge-lock-v0: bridge calls carry the paired token
++  // (docs/modules/agent-bridge-client.js). Plain fetch when the client
++  // is absent, so older setups behave exactly as before.
++  function bridgeFetch(url, opts) {
++    return (window.FLAgentBridge && typeof window.FLAgentBridge.fetch === 'function')
++      ? window.FLAgentBridge.fetch(url, opts)
++      : fetch(url, opts);
++  }
++
+   function readFileFromBridge(path) {
+-    return fetch(BRIDGE + '/code/read?path=' + encodeURIComponent(path))
++    return bridgeFetch(BRIDGE + '/code/read?path=' + encodeURIComponent(path))
+       .then(function (r) { return r.json(); });
+   }
+
+## Exact source excerpt, characters 84734–85040
+
+   function writeFileToBridge(path, content) {
+-    return fetch(BRIDGE + '/code/write', {
++    return bridgeFetch(BRIDGE + '/code/write', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ path: path, content: content })
+@@ -591,7 +600,7 @@
+   }
+
+## Exact source excerpt, characters 85043–85339
+
+   function commitViaBridge(message) {
+-    return fetch(BRIDGE + '/code/git/commit', {
++    return bridgeFetch(BRIDGE + '/code/git/commit', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ message: message })
+@@ -599,7 +608,7 @@
+   }
+
+## Exact source excerpt, characters 85342–85638
+
+   function runSmokeViaBridge() {
+-    return fetch(BRIDGE + '/test/run', {
++    return bridgeFetch(BRIDGE + '/test/run', {
+       signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(120000) : undefined
+     }).then(function (r) { return r.json(); });
+   }
+```
+
+## Exact source excerpt, characters 85640–85687
+
+### 6d. `docs/modules/workshop.js` (exact diff)
+
+## Exact source excerpt, characters 85689–86234
+
+- One file-level helper, `flAgentBridgeFetch`, above the first IIFE at L46.
+- All 17 bridge calls route through it.
+- `checkBridge` shows the pair card when the bridge answers `pair: 'code'`, shows which scope is missing when the bridge answers 403 with `scope`, and shows Paired minds after "Connected".
+- `WorkshopProjects.commitViaBridge` now checks `resp.ok`, and on 401 asks to pair instead of silently "succeeding" or falling back to a GitHub push.
+- The `http://localhost:3141` and `runCodeTask` literals stay, for the v5.71.8 smoke lock.
+
+## Exact source excerpt, characters 86236–87019
+
+```diff
+--- a/docs/modules/workshop.js
++++ b/docs/modules/workshop.js
+@@ -43,6 +43,15 @@
+ // 2026-09-23 — Flint: Local Help-on-file v0 (v-workshop-local-help-v0).
+ //   After Preview: Help on this file → consent → connected local mind (prefer Bridge :11435).
+ // ═══════════════════════════════════════════════════════════════
++// LAYER v-agent-bridge-lock-v0: every Agent Bridge (port 3141) call in this
++// file goes through here so it carries the paired token. Falls back to plain
++// fetch when docs/modules/agent-bridge-client.js is not loaded.
++function flAgentBridgeFetch(url, opts) {
++  return (window.FLAgentBridge && typeof window.FLAgentBridge.fetch === 'function')
++    ? window.FLAgentBridge.fetch(url, opts)
++    : fetch(url, opts);
++}
++
+ (function() {
+   'use strict';
+
+## Exact source excerpt, characters 87022–88832
+
+@@ -958,11 +967,26 @@
+       var el = document.getElementById('code-status');
+       if (!el) return;
+       try {
+-        var r = await fetch('http://localhost:3141/');
++        var r = await flAgentBridgeFetch('http://localhost:3141/');
+         var d = await r.json();
+-        var git = await fetch('http://localhost:3141/code/git/status').then(function(r2) { return r2.json(); });
++        var git = await flAgentBridgeFetch('http://localhost:3141/code/git/status').then(function(r2) { return r2.json(); });
++        if (git && git.pair === 'code') {
++          // LAYER v-agent-bridge-lock-v0: bridge is awake and locked. Pair once.
++          el.textContent = '\uD83D\uDFE1 Bridge awake \u00B7 pair once to build';
++          el.style.color = '#e8b019';
++          if (window.FLAgentBridge && el.parentNode) window.FLAgentBridge.renderPairCard(el.parentNode);
++          return;
++        }
++        if (git && git.scope) {
++          // LAYER v-agent-bridge-lock-v0 · v0.1: paired, but this device was not given that scope.
++          el.textContent = '\uD83D\uDFE1 Bridge paired \u00B7 this device may not ' + git.scope + ' here (see Paired minds)';
++          el.style.color = '#e8b019';
++          return;
++        }
+         el.textContent = '\uD83D\uDFE2 Connected \u00B7 ' + git.branch + ' \u00B7 ' + (git.recentCommits[0] || '');
+         el.style.color = '#4aff9f';
++        // LAYER v-agent-bridge-lock-v0 · v0.1: who is trusted, with a Revoke button per row.
++        if (window.FLAgentBridge && el.parentNode && typeof window.FLAgentBridge.renderPairedList === 'function') window.FLAgentBridge.renderPairedList(el.parentNode);
+       } catch(e) {
+         // No scary error. Gentle guidance.
+         el.textContent = 'For local builds, run: node tools/agent-bridge.js';
+@@ -983,7 +1007,7 @@
+
+## Exact source excerpt, characters 88835–89313
+
+       try {
+         log('\uD83D\uDCC1 Reading project structure...');
+-        var tree = await fetch(bridge + '/code/tree?path=docs/modules').then(function(r) { return r.json(); });
++        var tree = await flAgentBridgeFetch(bridge + '/code/tree?path=docs/modules').then(function(r) { return r.json(); });
+         var names = tree.filter(function(f) { return f.type === 'file'; }).map(function(f) { return f.name; });
+         log('   ' + names.length + ' modules found');
+
+## Exact source excerpt, characters 89316–93324
+

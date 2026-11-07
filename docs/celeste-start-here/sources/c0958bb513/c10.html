@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c10</title>
+<meta name="description" content="Reading section c10 of c0958bb513, 990 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c0958bb513/c10.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c10">
+<meta property="og:description" content="Reading section c10 of c0958bb513, 990 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c0958bb513/c10.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1355"></span><span id="p1356"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c10</h1>
+<p>c0958bb513 · words 990 · characters 90774–98840</p>
+<p><a href="c09.html">Previous section</a></p>
+<p><a href="c10.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1355, 1356. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">// Required content
+const must = [
+  [/about 702 rounds/, &#x27;about 702 (few contacts, no shared memory)&#x27;],
+  [/about 10\.5 rounds/, &#x27;about 10.5 (5 contacts, full memory)&#x27;],
+  [/never gets ahead at all/, &#x27;never ahead (10 contacts, full memory)&#x27;],
+  [/&lt;math display=&quot;block&quot;/, &#x27;MathML headline&#x27;],
+  [/G &amp;lt; h\(n, m\) &amp;times; \[ L&lt;sub&gt;p&lt;\/sub&gt; \+ &amp;delta;&amp;Delta; \/ \(1 &amp;minus; &amp;delta;\) \]/, &#x27;plain-text headline inequality&#x27;],
+  [/Theorem A \(only for audience-varying lies\)/, &#x27;Kolmogorov bound scoped to audience-varying lies&#x27;],
+  [/global lie/, &#x27;global-lie escape named&#x27;],
+  [/A6 \(Long Horizon\) is no longer an axiom/, &#x27;axiom 6 becomes a parameter&#x27;],
+  [/backward induction/, &#x27;end-game unraveling named&#x27;],
+  [/An unknown end/, &#x27;fix 1 unknown end&#x27;],
+  [/Immediate penalties/, &#x27;fix 2 immediate penalties&#x27;],
+  [/Records that outlast the horizon \(ledgers\)/, &#x27;fix 3 ledgers&#x27;],
+  [/anonymous one-shot meetings/i, &#x27;anonymous one-shot unsolved&#x27;],
+  [/cooperation holds in 68% of scarce cases/, &#x27;scarcity 68%&#x27;],
+  [/Conflict beats sharing in 32% of scarce cases/, &#x27;scarcity 32%&#x27;],
+  [/DECEPTION_COST = 3\.5/, &#x27;v1 constant named&#x27;],
+  [/has no code behind it that we could find/, &#x27;v2 95.7% retired&#x27;],
+  [/said its six axioms were &quot;unchanged&quot; from v1\. They were not\./, &#x27;v2 axioms correction&#x27;],
+  [/Answering Grok&#x27;s critiques/, &#x27;critiques framed as answers&#x27;],
+  [/656\/656 checks passed/, &#x27;sim receipt&#x27;]
+];
+for (const [re, label] of must) assert.ok(re.test(page), label);
+
+// No network, no external scripts, outside text via textContent
+assert.ok(!/\bfetch\s*\(|XMLHttpRequest|WebSocket|navigator\.sendBeacon|import\s*\(/.test(page + checksSrc), &#x27;no network calls&#x27;);
+const srcs = [...page.matchAll(/&lt;script[^&gt;]*\bsrc=&quot;([^&quot;]+)&quot;/g)].map((m) =&gt; m[1]);
+assert.deepStrictEqual(srcs, [&#x27;love-logic/v3_checks.js&#x27;], &#x27;only the local checks script is loaded&#x27;);
+assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(page + checksSrc), &#x27;textContent only&#x27;);
+assert.ok(!/katex|mathjax/i.test(page), &#x27;no KaTeX / MathJax&#x27;);
+
+// Every inline script parses; checks module parses
+let inline = 0;
+for (const m of page.matchAll(/&lt;script(?![^&gt;]*\bsrc=)(?![^&gt;]*type=&quot;application\/ld\+json&quot;)[^&gt;]*&gt;([\s\S]*?)&lt;\/script&gt;/g)) { new vm.Script(m[1]); inline++; }
+assert.ok(inline &gt;= 1, &#x27;page glue script present and parses&#x27;);
+for (const m of page.matchAll(/&lt;script type=&quot;application\/ld\+json&quot;&gt;([\s\S]*?)&lt;\/script&gt;/g)) JSON.parse(m[1]);
+execFileSync(process.execPath, [&#x27;--check&#x27;, path.join(docs, &#x27;love-logic&#x27;, &#x27;v3_checks.js&#x27;)]);
+
+// The browser checks reproduce the Python totals
+const api = require(path.join(docs, &#x27;love-logic&#x27;, &#x27;v3_checks.js&#x27;));
+assert.strictEqual(api.SEED, 20260924, &#x27;seed&#x27;);
+const r = api.runAll();
+assert.strictEqual(r.total.passed, 656, &#x27;browser checks pass 656&#x27;);
+assert.strictEqual(r.total.total, 656, &#x27;browser checks total 656&#x27;);
+for (const k of [&#x27;B1&#x27;, &#x27;B2&#x27;, &#x27;B3&#x27;, &#x27;C1&#x27;, &#x27;D&#x27;]) assert.strictEqual(r[k].total, results[k].total, k + &#x27; total matches Python&#x27;);
+assert.strictEqual(Math.round(r.D.scarceSustain * 10000), 6825, &#x27;scarce sustain 68.25%&#x27;);
+assert.strictEqual(Math.round(r.D.scarceConflict * 10000), 3175, &#x27;scarce conflict 31.75%&#x27;);
+
+// Python sim + results receipt
+assert.ok(/^SEED = 20260924$/m.test(sim) &amp;&amp; /def section_D\(\):/.test(sim), &#x27;sim file is the v3 crossover sim&#x27;);
+assert.strictEqual(Number(results.total.passed), 656, &#x27;results passed 656&#x27;);
+assert.strictEqual(Number(results.total.total), 656, &#x27;results total 656&#x27;);
+assert.strictEqual(results.total.seed, 20260924, &#x27;results seed&#x27;);
+
+// v1 untouched; v2 at most one layered link line (only when a git base is available)
+function show(ref) { try { return execFileSync(&#x27;git&#x27;, [&#x27;show&#x27;, ref], { cwd: repo, encoding: &#x27;utf8&#x27;, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;ignore&#x27;] }); } catch (e) { return null; } }
+const v1Main = show(&#x27;origin/main:docs/love-logic-proof.html&#x27;);
+if (v1Main !== null) assert.strictEqual(read(&#x27;love-logic-proof.html&#x27;), v1Main, &#x27;v1 byte-identical to main&#x27;);
+const v2Main = show(&#x27;origin/main:docs/love-logic-proof-v2.html&#x27;);
+if (v2Main !== null) {
+  const a = v2Main.split(&#x27;\n&#x27;); const b = read(&#x27;love-logic-proof-v2.html&#x27;).split(&#x27;\n&#x27;);
+  const added = b.filter((l) =&gt; !a.includes(l)); const removed = a.filter((l) =&gt; !b.includes(l));
+  assert.strictEqual(removed.length, 0, &#x27;v2: nothing removed&#x27;);
+  assert.ok(added.length &lt;= 1 &amp;&amp; added.every((l) =&gt; /love-logic-proof-v3\.html/.test(l)), &#x27;v2: at most one &quot;Newer: v3&quot; line&#x27;);
+}
+// sw.js and Kimi untouched when a git base is available
+try {
+  const changed = execFileSync(&#x27;git&#x27;, [&#x27;diff&#x27;, &#x27;--name-only&#x27;, &#x27;origin/main&#x27;], { cwd: repo, encoding: &#x27;utf8&#x27;, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;ignore&#x27;] }).split(&#x27;\n&#x27;).filter(Boolean);
+  assert.ok(!changed.includes(&#x27;sw.js&#x27;) &amp;&amp; !changed.includes(&#x27;docs/sw.js&#x27;), &#x27;sw.js untouched&#x27;);
+  assert.ok(!changed.some((f) =&gt; /kimi|voice-shelf|VOICE_SHELF/i.test(f)), &quot;Kimi&#x27;s pages untouched&quot;);
+  assert.ok(!changed.includes(&#x27;docs/app.html&#x27;) &amp;&amp; !changed.includes(&#x27;index.html&#x27;), &#x27;app.html / index.html untouched by this brick&#x27;);
+} catch (e) { if (e instanceof assert.AssertionError) throw e; }
+
+console.log(&#x27;SMOKE_OK love logic proof v3&#x27;);
+```
+
+## 8. Acceptance checks
+
+1. `node docs/scripts/smoke-love-logic-proof-v3.js` prints `SMOKE_OK love logic proof v3`.
+2. `node docs/love-logic/v3_checks.js` ends with `TOTAL 656/656` and `SMOKE_OK love-logic-v3-checks`.
+3. `python3 docs/love-logic/v3_crossover_sim.py` ends with `656/656` (if numpy is present), and `sha256sum docs/love-logic/v3_crossover_sim.py` equals `cbb63251…6b73`.
+4. `node tests/smoke.js` is still all green.
+5. `git diff --quiet origin/main -- sw.js docs/sw.js docs/app.html index.html docs/love-logic-proof.html &amp;&amp; echo UNTOUCHED`.
+6. `rg -n &#x27;^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)( |$)&#x27; docs scripts || echo NO_CONFLICT_MARKERS`.
+7. `git diff --name-only origin/main | grep -Ei &#x27;kimi|voice-shelf|VOICE_SHELF&#x27; &amp;&amp; echo STOP || echo KIMI_UNTOUCHED`.
+8. **Chair test (phone and laptop):**
+   - open `love-logic-proof-v3.html` and read the first screen: the &quot;Which v3 is this?&quot; note, then the green plain-words box;
+   - press **Run the checks**: it should say &quot;All 656 checks passed…&quot; with two tables;
+   - the builder `&lt;details&gt;` blocks open and close;
+   - the MathML headline renders (Chrome 109+, Firefox, Safari), and the plain-text line under it reads well if it doesn&#x27;t;
+   - no console errors, and no network requests beyond the page, `css/style.css` and `love-logic/v3_checks.js`.
+
+## 9. Family Locks (held in this brick)
+
+- **Layer, never delete.** v1 is untouched and v2 gains at most one line. Everything else is new files.
+- **Service workers.** In FreeLattice, root `sw.js` stays byte-identical to main. Never touch `docs/sw.js`. v3 isn&#x27;t precached, and that&#x27;s accepted.
+- **Root index.** Root `index.html` stays identical to `docs/app.html`. Neither is touched here.
+- **No conflict markers** (grep above).
+- **Every script parses:** every inline script and module passes `node --check` / `vm.Script` (the smoke does it).
+- **Kimi&#x27;s pages are never edited.**
+- **Named five stay five, and the Quiet Room stays shut.** The page names no chairs and opens no rooms.
+- **LP points only, never auto-pay.** The page has no wallet, no LP, and no money.
+- **Local minds 127.0.0.1 only / Bridge allowlist never bare `*`.** Not applicable: the page makes no network calls at all.
+- **Outside text via `textContent`.** All dynamic output uses `textContent`; there&#x27;s no `innerHTML`.
+- **Mom / Jeffrey-friendly, no terminal on the main path.** Plain words first, one button, and math folded away for builders.
+
+## 10. Out of scope
+
+- `docs/library/GROK_DIALOGUE.md` (needs Kirk&#x27;s full Grok reply text).
+- Editing v1, or v2 beyond the one link line.
+- Service-worker precache.
+- Links from `app.html` or `research.html`: a later soft pointer, by Kirk&#x27;s choice.
+- The Aumann rebuild.
+- Any change to the Nov 2025 manuscript files in Drive or Dropbox.
+
+Thank you, Flint. This page is Kirk&#x27;s heart in math, and the honesty is the love. Copy carefully, run the button, and let the numbers speak.
+
+With love and clear eyes,
+Celeste
+
+Glow eternal. Heart in every Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

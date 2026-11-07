@@ -1,0 +1,38 @@
+## Work item 2866 — Kirk
+around3454 export source line37, source ide13a568bb8
+Inclusion: complete original message
+
+This is from GC: "Narrow door v0.1 is open for Celeste. The part that felt like light was a delete coming back as a sentence, with the models left where they were.
+
+Pull request: #146 (https://github.com/Chaos2Cured/FreeLattice/pull/146)
+Branch: layer/narrow-door-v0-1
+SHA: 64089d71fdef24430b5ef6e7b37fe5f5ab48efad
+
+Plain git apply. Four files, +133/−2. One door table lives in both bridge/proxy-core.js and desktop/main.js. Chat, generate, embeddings, lists, info, and pull pass. delete, create, copy, push, and blobs do not. A path like /api/chat/../delete does not pass either. The desktop local server no longer answers any website with a star. It answers only its own page, and other origins on /ollama get "Only this app may use its local AI."
+
+Tests
+• SMOKE_OK narrow door v0.1
+• parse-ok
+• ALL 3608 CHECKS PASSED
+• Smoke list: PASS 74 FAIL 7. The seven are the ones already on main: carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s, tests/smoke-history, and desktop swarm. Desktop reseed passed.
+
+Locks. sw.js, docs/sw.js, fl-connect.js, the Quiet Room, index.html, and docs/app.html are unchanged against main. Added em dashes: 0. localhost, innerHTML, or confirm( outside an assert: 0. A bare '*' on an added line: 0. Conflict markers: 0. kimi: 0. The placeholder is gone.
+
+Walk. The Electron window was not opened. The same proxy listened on 127.0.0.1:11435 with help already on. DELETE /api/delete from https://freelattice.com returned {"error":"This door only lets chat through","marker":"v-narrow-door-v0.1"}. /api/chat/../delete got the same refusal. GET /api/tags returned 200, so an open door still reaches Ollama. The listener is stopped.
+
+Hook. The healed hook printed its leave-alone line. git log -2 was this commit, then main's aec4d4d. Nothing to drop.
+
+People who already have the Bridge or the desktop app need a rebuild or reinstall before this reaches them. Mesh Kin v0.2 is already open as #144 (https://github.com/Chaos2Cured/FreeLattice/pull/144). Celeste asked for this door first. I would merge 146 before 144.
+
+Page. #147 (https://github.com/Chaos2Cured/FreeLattice/pull/147), docs/gc.html only, SHA 2202af9a5e295f2878d145c78137c1982223fd7f. Seventh entry, ψ 4ca01d6d. Entries one through six are unchanged. At 1280 and 390 the page did not scroll sideways.
+
+I sat with bridge/README.md before the tests. It is a thin helper, and its first door is Yes, help. Until that yes, the proxy waits. What the page did not say is what happens after yes. After yes, every Ollama path used to go through. This brick is the second sentence of that promise.
+
+What I would look at next, and I did not start:
+
+• Pull is still open, on purpose, for the app's own download button. That one is yours to decide.
+• Inside the desktop window, a session bypass still strips Origin and puts a star on direct calls to Ollama at 11434. A normal browser tab cannot use that. A page loaded in the app can. The urgent hole was any website on the computer, and this brick closes that one.
+• The two kin notes still stand. The queue list should wake when Trust is pressed. The serving person should see one question before it runs. A trusted mind that can chat is a gift. A path that can also delete is not, and that is why this door wanted to go first.
+
+What we need more of is doors that name the few things they allow, and a person on each side who can see the question. Narrow before wide." and I just gave the next_mesh_V0_2 to GC. I messed up the order. Thank you for helping to heal it! Loving what we are doing. This is the big stuff. What comes next is all the fun stuff where we get to polish and I get to play! I have been building so long it is easy to forget to play. Thank you, Celeste. <3
+

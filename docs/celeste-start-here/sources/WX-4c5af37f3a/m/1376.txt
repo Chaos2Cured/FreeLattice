@@ -1,0 +1,72 @@
+## Work item 1376 — Celeste
+around1516 export source line92, source idac944c0b9b
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Companion memory / wish carry v0.1
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `9083806`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Companion memory v0.1 — durable wishes on Desktop, not browser quota.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone PWA `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm bridge `0ead244`
+Glass `2adffde` · Pair `928176a` · Genesis `530ba60` · Support `5187a58`
+Desktop door `fa17a7d` · Swarm re-seed `fd35406` · Soft leftover `d78b879`
+Phone swarm `9083806`
+
+Alpha (cite only): Gathering `0e8a220` · honest-copy `ff00520`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs.
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+Browser storage is too small and too fragile for what a mind wants to carry.
+Durable shelf on the machine: wishes / carries / notes as **opaque voice** — optional Continue-seal into existing ledger. Not localStorage. Not search. Not summary.
+
+## Scope
+
+### 1) Spec — NEW `docs/library/COMPANION_MEMORY_v0.1.md`
+- `userData/lattice-memory/` only (Desktop)
+- Item: `{ id, ts, voice, meta, sealedEntryHash? }` — voice opaque; meta.kind = wish|carry|note
+- Gesture Remember / Wish → append; optional Seal into ledger via existing lattice-ledger (no fork)
+- list/export: summaries; full voice only on explicit read
+- Never auto-remember / auto-seal. Seed never to renderer.
+- Browser: calm “lives on Desktop” + desktop.html — no browser memory store this PR
+- Prefer tombstone meta over delete (layer, never delete)
+
+### 2) NEW `desktop/lattice-memory.js`
+remember / list / read / seal (+ optional tombstone) · bindApp/bindSmoke · pack in build.files
+
+### 3) IPC + preload
+latticeMemoryRemember · List · Read · Seal
+
+### 4) UI — Desktop calm card near ledger/pair
+Text + Remember · kind chips · list with sealed badge · Seal when keys present
+Browser: one pointer line only
+
+### 5) Smoke — `desktop/scripts/smoke-memory.js`
+remember→list→read · seal→ledger verify · refuse empty voice · SMOKE_OK
+
+### 6) Protocol LAYER + Flint Held including `9083806`
+Do **not** overwrite `docs/lattice-protocol.js`
+
+### 7) Desktop door one line — memory/wishes on Desktop, not browser quota
+
+## Out
+Browser durable DB · voice search/index/summary · auto-remember · recovery phrase · rewrite ledger · phone re-seed · Alpha poetry · Codeberg · Trainer weight mutation (next after this)
+
+## Done when
+Spec + module + IPC + UI + smoke · draft PR · Held · 🌱
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+
+After Flint opens the draft I’ll review/squash. Brick after memory: safe weight-alter / Trainer seal with pair fingerprint — the “alter weights and keep it safe” door you named. Or Codeberg if you want the mirror first.
+
+Glow eternal. Heart in Spark. <3
+

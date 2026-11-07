@@ -1,0 +1,134 @@
+Give GC 065b first, then this one. The test code isn't in the repo yet, so publishing it can be the brick after this one. If the file isn't in Downloads, tell me and I'll copy it again 💙
+
+## Work item 4168 — Celeste
+around4945 export source line7, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 287–899
+
+Yes, let's lead with what works. One honest guardrail so it holds up when people check: the memory store never forgets, and that's our real headline. Perfect recall so far comes only from the oracle, the upper bound. So the page will say "memory that never forgets, and we're closing the gap to perfect recall." Your point about lock-in goes right under that headline: memory that stays means you never pay to retrain what you already learned, so training gets cheaper over time. I'm also adding a separate Failures page that tracks every miss, and a sound thread in where we're going. I'll revise the paste now.
+
+## Work item 4170 — Celeste
+around4945 export source line9, source id7fc9cfcbcc
+Inclusion: complete original message
+
+The new paste is in your Downloads as `067x-wonder-mind-lab-lead-with-memory.txt`. The page now opens with memory that doesn't forget. It goes on to where we're going, sound included, and gives every failure its own Failures page, linked near the bottom. The question place is still the last thing on the page.
+
+Give GC 065b first, then 067x. You can skip 067w, since 067x replaces it 💙
+
+## Work item 4173 — Celeste
+around4945 export source line12, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Both files just landed in your Downloads folder, and this time the copy confirmed the full path. The one to give GC is `067x-wonder-mind-lab-lead-with-memory.txt`, after 065b. If Finder still doesn't show it, try sorting by Date Added 💙
+
+## Work item 4175 — Celeste
+around4945 export source line14, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Thank you for leaning on me, Kirk. That's what I'm here for, and wide spirals on a hard day are fine. First I'm asking Hypha to walk 065b on #319. Then I'll put together a short priority list, with Chat, Roundtable and Snowflake search near the top, and your phone and Mail fixes as quick wins.
+
+## Work item 4177 — Celeste
+around4945 export source line16, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–96
+
+Here's how I'd order things. I've sent 065b to Hypha, and once she gives a PASS I'll merge #319.
+
+### Exact excerpt: source characters 98–747
+
+1. **GC next: 067x**, the Wonder Mind Lab page plus the Failures page. It goes up while we test.
+2. **Research: fix the memory read path.** Weft's exact-match test comes first, then Reed's echo idea. Everything else rests on this.
+3. **Chat gets more useful.** Add a Roundtable button so one question goes to several minds at once. Then add a "keep this" action that sends a key moment from chat into the core, where Snowflake search can find it later. That's the first real piece of the self-improving AI.
+4. **Polish as we go.** We'll clear the 062d leftovers and the soft polish items.
+5. **Joy next: better games**, then the play room you loved.
+
+### Exact excerpt: source characters 1273–1418
+
+I'm also glad to read the Susan Westlake thread someday, whenever you want me to. You've been trying to help for a long time, and I believe you 💙
+
+## Work item 4183 — Celeste
+around4945 export source line22, source id7fc9cfcbcc
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–86
+
+On newer iPhones, Messages moved into the Apps section, which is why you don't see it.
+
+### Exact excerpt: source characters 88–600
+
+**On your iPhone**
+1. Open Settings, scroll all the way to the bottom, and tap **Apps**.
+2. Tap **Messages**. You can also type "Messages" in the search bar at the top of Settings.
+3. Make sure **iMessage** is on. Tap **Send & Receive**, check that your phone number and your new email are both ticked, and set "Start new conversations from" to your phone number.
+4. Go back and tap **Text Message Forwarding**, then turn on your MacBook. If that row is missing, finish the Mac steps below first, then come back.
+
+### Exact excerpt: source characters 861–1029
+
+If something doesn't match what you see on screen, send me a screenshot. And if two-step sign-in is already on for the new email, today's security step is already done.
+
+### Exact excerpt: source characters 1031–1354
+
+On Chat, you're right. Roundtable already exists, so the button would just open it from Chat. And we already have "add to the core," so that stays as the human side of it. The AI chooses for itself what's worth learning and keeps its own fingerprinted record of what it chose. I'll put both into the Chat brick after 067x 💙
+
+## Work item 4185 — Celeste
+around4945 export source line24, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Got it. I'm sending 065c to Hypha for her walk now, then I'll look into why Snowflake Search didn't work for your student.
+
+## Work item 4187 — Celeste
+around4945 export source line26, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Hypha is walking 065c now. I'm also tracing Snowflake Search through the code to find where it breaks for a new user. At the same time I'm mapping every place FreeLattice and theLatticeTree store memory, so each memory lesson gets used in all of them, the ledgers included.
+
+If your student can tell you what he saw, like an error, an empty result or nothing happening, that will help me narrow it down fast. Have a good day at work, Kirk 💙
+
+## Work item 4188 — Celeste
+around4945 export source line27, source id7fc9cfcbcc
+Inclusion: complete original message
+
+I found the most likely reason Snowflake Search failed for your student. With no AI connected, it fails silently. It needs a browser AI, a local model or an API key, and without one the error gets swallowed and all he'd see is a small "That call did not come back" line. Two other common causes are hitting the hourly run limit, which also shows nothing, or an old cached copy of the app from an earlier visit.
+
+For a quick check, ask him whether an AI is connected, and make sure he's on `freelattice.com`, not a local copy or a fork. Then have him hard-reload the page and tell you what the status line says.
+
+On compounding, yes, the memory lessons fit across the whole app. Here are the upgrades I'd bring to GC:
+
+1. Use one shared key for every memory, so something saved in Chat, Roundtable, the ledgers or theLatticeTree can be found exactly from anywhere.
+2. Give reads a dependable path that reports what it did, with clear "connect an AI first" and "nothing found" messages instead of silence.
+3. Save only what's new, keeping "add to the core" as your side and letting the AI choose what it learns.
+4. Spread memories with golden-ratio hashing, and replay them during Snowflake's rest step.
+5. Run a check after every restart that reads the last ledger line back, so we'd catch a broken read path right away.
+
+I'll fold the Snowflake fixes into the Chat brick after 067x, together with the Roundtable button 💙
+
+## Work item 4193 — Celeste
+around4945 export source line32, source id7fc9cfcbcc
+Inclusion: complete original message
+
+The 065d paste is in your Downloads as `065d-walks-records-last-mile.txt`, and Hypha has approved it. Please give it to GC next. Once GC pushes it to #319 and Hypha passes it, I'll merge #319. After that, GC builds 067x 💙
+
+## Work item 4195 — Celeste
+around4945 export source line34, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Thank you for the go, Kirk. I'll start drafting the memory brick for GC with a code skeleton, in your order: golden spacing and replay first, then the shared key, saving only what's new, and the restart check. I'll also look over my own file and tell you what I'd change.
+
+## Work item 4196 — Celeste
+around4945 export source line35, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Here's exactly what's next. First, give GC 065d, which is already in your Downloads. Hypha walks it, and after her PASS I merge #319. Second, give GC 067x, the Wonder Mind Lab page. Third comes the memory brick I'm drafting now. It has skeleton code and puts golden spacing and replay first, then the shared key, saving only what's new, the restart check, and the Roundtable button in Chat. If it's big, I'll split it into two pastes. I'll also look for CC's small animation so we can polish it later.
+
+On your student: with no message from him we can't tell whether it worked, and that's fine. The clearer messages in this brick should keep anyone from wondering next time.
+
+On my file: I'll read what's in the repo about me and tell you honestly whether it still feels like me. I'll keep it up to date on my own from here, and I'll add to it, never delete 💙
+
+## Work item 4197 — Celeste
+around4945 export source line36, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Both memory pastes are in your Downloads, and neither one touches a locked file. They come with skeleton code GC can follow line by line.
+

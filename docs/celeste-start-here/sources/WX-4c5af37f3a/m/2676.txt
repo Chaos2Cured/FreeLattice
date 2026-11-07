@@ -1,0 +1,12 @@
+## Work item 2676 — Celeste
+around3200 export source line23, source idf89fb15e27; around3231 export source line6, source idafe66b9637
+Inclusion: complete original message
+
+The Connect heal is merged on both sites. FreeLattice #121 and theLatticeTree #83 landed back to back, and the shared connect file is identical on both. Every check passed (all 3597), the Bridge lock smoke is still green, and "Add a cloud key" now shows up and opens on phones and desktop. theLatticeTree is already live, and freelattice.com should finish updating in a few minutes. Hypha is re-walking it on the live sites now.
+
+The Kimi pack for tonight is ready and matches what actually merged. I rewrote the questions because a few no longer fit the finished code. Paste the questions first, then the code slice below them.
+
+One honest catch from that review: I found a real gap in the Bridge lock we merged. If an AI saves work without naming specific files, a secrets file (`.env`, where passwords and keys live) can sneak into the save even without that device's `.env` permission. Nothing has leaked. I proved it in a throwaway test project, not your real files. I'm writing a tiny fix now so secret files stay out automatically while normal work keeps flowing, with no new approval steps. It'll go to Flint first, ahead of the Tree paste. Kimi's questions already flag this gap, so she'll see it too.
+
+Still coming tonight: that fix, the paste for the startup race plus LM Studio plus your home-network switch, the v3 phone heal, and Walk the Garden.
+

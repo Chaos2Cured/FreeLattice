@@ -1,0 +1,18 @@
+## Work item 2610 — Celeste
+around3100 export source line24, source id34501df8b9
+Inclusion: complete original message
+
+Hypha's walk turned up eight real gaps, so I wrote a short add-on for Flint to use together with the port-picker paste. It goes on the same branches and doesn't add new PRs.
+
+The new Connect screen itself reads well. The gaps are around it:
+- Most of the old doors still open the old screens instead of the new Connect. That includes the Chat 🌿 button, Settings "A mind at home", and Change Provider once a mind is connected.
+- A "Local AI detected" toast still pops up on a computer with no Ollama at all.
+- Opening `app.html#connect` directly lands on Garden, not Connect.
+- Builder words like "Named five stay five" and a version tag show on Mom's screen. They'll move into a small folded "For builders" note, still kept.
+- theLatticeTree at phone width has the galaxy orbs drawing over the Connect card, with buttons falling off the screen.
+- Connect sometimes says "A mind is connected" when no local model is actually there. It can also hide models Ollama already found if the Bridge is waiting for "Yes, help".
+- Mom gets no sign that it's still looking until five minutes pass. A calm "Looking…" line with an always-visible "Look again" button fixes that.
+- Hypha's suggested spot for the port picker matches the main paste. The four old host fields stay, and they all feed the same choice.
+
+On your laptop, give Flint the port-picker paste first, then this add-on. Hypha's screenshots are saved on my computer if you want to see any of them. That was a great walk.
+

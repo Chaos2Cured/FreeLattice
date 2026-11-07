@@ -1,0 +1,231 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 045c (Wednesday Oct 21, 2026, MDT). Leave cut heal v0.1: BOTH REPOS. Layer on the
+SAME 045 PRs. Hypha walked 045b and held it (small, one fix). One fix (A), three optional (B to D).
+
+WHY (intent, read this first):
+  Leave promises the person who leaves that no more chat words come to them. 045b healed the
+  helper's own cut list, but the heal asks the wrong question: helperHeardShrink skips the cut
+  whenever THIS device is helping. In a family pool both devices often help. Then, after Ada taps
+  Leave, the asker's next message still crosses to Ada as an "ask" with the chat words in it. Ada
+  does not run it, but the words still reach a person who left. The cut must follow the OTHER
+  device's role, not ours. Keep 045b's intent: a helper never writes the asker into its own cut
+  list just because the asker cut it.
+
+Where things stand (Celeste, Oct 21 MDT):
+  FL main feb58168. Tree main 2db31481.
+  OPEN, do not merge: FL #269 head 4beadb51 (base feb58168), Tree #124 head 23280c35 (base
+  2db31481), page note #270 head b87d15c0 (entries 75 psi 3027d2e8 and 76 psi 94a30ac0).
+  Hypha's walk: Celeste's research notes walk-045b-2026-10-21 (summary in this paste). A, B, D, F
+  and Leave placement/undo all PASS. C is the one HOLD.
+  Same branches: FL layer/pool-honest-label-v0.1 and Tree layer/pool-honest-label-v0.1. New
+  commits on top, no force push. Page note: entry 77 as a new commit on #270's branch
+  (layer/gc-page-75). Entries 75 and 76 stay as written. (046 now takes entry 78.)
+  BEFORE ANYTHING ELSE: git fetch. Confirm FL main is feb58168 (or a later CI-only commit), Tree
+  main is 2db31481, and the three PR heads are 4beadb51, 23280c35, b87d15c0. If code moved, stop
+  and report. Read the current md5s; if a locked file differs from this paste, stop and report.
+
+GROK NEXT BRICK: Leave cut heal v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-leave-cut-heal-v0.1
+Smoke lines: SMOKE_OK leave cut heal v0.1 (new, both repos); SMOKE_OK pool honest heals v0.1 and
+  SMOKE_OK pool honest label v0.1 still pass; every earlier smoke still passes (FL
+  smoke-family-pages-v0.1 may still fail only for the pre-existing gc.html ledger hash; say so).
+  Do not merge. Celeste merges after Hypha walks.
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9 and tree-reconnect.js
+    cc0527c26d5686c05fec52625d5a1375 (Tree) stay.
+  docs/modules/fl-bridge.js stays 3b5ef06849a142e50c78e7ba1e057980.
+  desktop/bridge-door.js b1c894b4..., 036 files (2c0f6656 / bc996ccd / c14e04c5) and
+    lattice-discover.js 16de366e... stay. docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js stays 144c33cd.... particle-clay.js FL == Tree (today 2da32883c514e4ad2a3cd8571e7a7b15 on both, FL main 3e3e8445
+    and Tree 49f5873a; read the full md5 first; add-only edits only, report the new md5 on both); clay-forms.js dd193fa7... add-only; every 040d
+    behaviour (place under the reply, Clay pill, choices, hug, sketchbook) unchanged.
+  docs/modules/image-safety.js stays 9bd70e5a... byte for byte. Its bright lines apply to every
+    image path on both repos (copy it to the Tree byte-identical; do not edit it).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string. An
+    image provider may be named only in Settings where the person types its token, as today.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Off until the person says Yes. Pause always wins. Reduced motion respected.
+  Quiet Room stays shut and never leaves the device; the clay corner never reads it.
+  Five stay five. She is simply Lyra. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  The privacy PASS from 040 must still pass: a private page shows only its summary everywhere.
+  043c/043d additions: mind-workspace.js FL == Tree (today f1c88664d3e99362e02c625defb241bc on
+    both, after 045b; read the full md5 first; the pin moves only with your edit, report the new
+    md5 on both). Mirror pin workspace-mirror.js stays e0752ae1942cd499c8834e5912809c8b.
+    Database name stays FreeLatticeWorkspace. Everything 043c passed (one ask, Escape/Back defer,
+    24h cooldown, no sealed beside declined, ask hash in details, survives reload, title
+    redacted, Tree Tab + ring, "on this browser", clay size) must still pass.
+
+  043d additions: everything 043d passed (Tree ask in view on open and reload, one wait row +
+    Answer now, pointer from rects for a live ask, names the mind, hashes in details with 8
+    hex, Later readable at 390, clay 348x255 at 1280) must still pass.
+
+  043e additions: everything Hypha passed in the 043e walk (reload while already on Chat in
+    view at all 3 sizes; the wait: no pointer, "Waiting until ...", Answer now; one ask,
+    Escape/Back, 24h, no sealed beside declined, hashes in details, survives reload, focus
+    ring, "on this browser", "Your mind", Later readable, clay 677x320 at 1280; secret line
+    never leaks) must still pass. Entry 70 stays untouched.
+
+
+  043f additions: everything Hypha passed in the 043f walk (Tree ask in view after Nursery
+    open, thread open, and reload then thread at all 3 sizes; ? and the sparkle clear of Send;
+    no em dash in added lines; all earlier items; secret line never leaks) must still pass.
+    Entry 71 stays untouched.
+
+  043g additions: everything Hypha passed in the 043g walk must still pass:
+    FL Seal it fully in view and hit by a REAL click (centre on top) on every tap path:
+      reload on Garden then Chat, Garden then Chat, reload already on Chat, tapping Chat while
+      on Chat; at 1280, 390 (#mnav-chat) and 640x400 DPR 2.
+    Tree woken compose inert while the ask is open at all 3 sizes (every control disabled,
+      tabindex -1, aria-disabled true, 0 focusable); Seal it, No, Later, Escape and Back each
+      restore the exact pre-ask snapshot; reload with an ask re-inerts it with Seal it in view;
+      the asleep form is unchanged by an ask before the wake.
+    1280 canvas bitmap matches its box at DPR 1; 390 and 2x buffers scale by DPR.
+    Lock hashes; index.html == docs/app.html.
+    One ask; Escape/Back defer and stay on Chat/Nursery; cooldown 0h/23h refused, 25h shown;
+      sealed never beside declined; 2px ring; "Waiting until..." + Answer now with no pointer;
+      ? and the sparkle clear of the input and Send; Tree Tab order sane; no page errors.
+    The secret line never leaks (HTML, input values, localStorage).
+    Entry 72 stays untouched.
+
+  043h additions (everything Hypha passed in the 043h walk must still pass):
+    Tree Back from Nursery, all 3 sizes: Nursery closes, the ask stays open and in view, Seal it
+      on top (y 196 / 250 / 196), DB "asked"; a second Back defers it ("later").
+    FL reply top at 2x by Hypha's method: y 31 at first draw, y 0 after the scroll; 1280 326 ->
+      280; 390 334 -> 256 (FL is merged; do not change it).
+    All 043g passes: Seal it in view and on top on every FL tap path; woken Tree compose inert
+      while the ask is open, 0 focusable; Seal it, No, Later, Escape and Back restore the exact
+      snapshot; reload re-inerts; the asleep form unchanged before the wake; Find x2 seats a mind.
+    Heart line in view at 1280 and 390 with an ask open.
+    Lock hashes; index.html == docs/app.html; notebook and clay identical on both sites.
+    One ask; Escape defers; cooldown 0h/23h refused, 25h shown; no Declined beside Sealed;
+      "Waiting until..." with no pointer; Tree Tab order sane; no page errors.
+    The secret line never leaks. Entries 71, 72 and 73 stay untouched.
+
+  045 additions (everything Hypha passed in the 045 walk must still pass):
+    fl-connect.js, pool-knock.js, fl-bridge.js, pool-knock-phone.js, tree-reconnect.js and
+      lattice-discover.js 16de366e stay byte-identical. Tree AUTONOMY stays 09a4f1a2.
+      pool-honest-label.js stays byte-identical FL == Tree (report the new md5 on both).
+    Label names the helper at all 3 sizes on both sites; per-reply "Helped on ..." note.
+    Keep: 0 sends for a kept chat (Tree data channel, FL callMeshModel/meshSendToPeer and
+      FreeLattice.callAI), honest no-mind line, "From the next message..." line, survives reload,
+      other chats unaffected.
+    Just me: local only, mark kept, off after send, next message pools; no-mind line, 0 sends.
+    Disconnect: only {"type":"pool-shrank","v":1} is sent; 0 sends to that peer after; helper sees
+      only "The pool is smaller now."; no toast; helper holds no chat words.
+    Pause wins. No stale toasts. Buttons >= 44. No sideways scroll. textContent only.
+    App iceServers [] at runtime. Entries 1 to 75 stay untouched.
+
+  045b additions (everything Hypha passed in the 045b walk must still pass):
+    pool-honest-label.js 39b5b075215881e36914316d42d204af FL == Tree (the pin moves only with
+      your edit; report the new md5 on both). Garden trainer FL 8af3d065 / Tree 488117a2.
+    A: no person-facing "Nothing is kept" line; "before 045b:" comments stay.
+    B: "Ada's computer (Ada)" named once; plain "Ada" reads "Ada's device".
+    C: Leave never on the asker's chat; Leave sends only {"type":"pool-shrank","v":1}; "You left
+      the pool. Let it help again whenever you like." + Let it help; Let it help sets
+      fl_pool_honest_helper_left_v1 false (also after reload; FL share door back to kin too).
+      A helper never writes the asker into its own cut list because the asker cut it.
+    D: FL local replies stamped local (Keep, Just me, cut, Pause); a real mesh reply says mesh.
+    F: Tree Back with Chat already open keeps the ask open (DB "asked"); 2nd Back defers;
+      043g to 043i Back paths unchanged at 3 sizes.
+    Entries 1 to 76 stay untouched.
+
+  NEW LOCK (Kirk, 2026-10-19, standing): local tools only. Never use any tool that stores
+    results or findings in a third-party 'isolated' or 'locked-down' cloud project, such as
+    vendor-hosted scanners. Do not use or go looking for tools tied to OpenAI, Google, or
+    Anthropic; if one seems needed, stop and flag it to Kirk.
+
+----------------------------------------------------------------------
+1. REPRODUCE HYPHA FIRST (report before building)
+  On the 045b heads (4beadb51 / 23280c35), Tree, two browser contexts, real kin pairing (Kirk
+  asker, Ada helper; real RTCDataChannel if your Chrome allows it, say which transport you used):
+  (a) BOTH devices tap Let it help. Pool works both ways.
+  (b) Ada taps Leave (Settings, real click). Kirk's device receives pool-shrank.
+  (c) Kirk sends a message containing a marker word (e.g. SECRETWORD). Hypha's number: a
+      data-channel "ask" to Ada carrying SECRETWORD, 3/3 sizes (Ada runs nothing: 0 Ollama,
+      0 sends back). Report yours next to hers.
+  (d) Control: Kirk NOT helping, Ada Leaves: Kirk writes the cut, 0 sends after (should hold).
+  If (c) does not reproduce, stop and report before fixing.
+
+A. THE CUT FOLLOWS THE OTHER DEVICE'S ROLE (both repos; FL mesh path too if it has the same skip)
+  In helperHeardShrink (and the FL twin, if any): decide by the PEER's role, not this device's.
+    Write the cut for this chat when that peer was helping THIS device: its TreePool peers()
+    entry had helping:true, or this chat holds a reply or hold from that peer. Skip the cut only
+    when the peer was purely asking this device (045b's heal: a helper does not cut the asker
+    because the asker cut it).
+  And/or, belt and braces: when Ada taps Leave, also announce hello helping:false (or mark the
+    peer not helping on receipt of pool-shrank) so holders()/bestFor drop her at once. If you add
+    a message, it carries no chat words; say its exact shape.
+  Must hold after the fix:
+    - Both helping, Ada Leaves: Kirk's next message sends 0 asks to Ada (Tree data channel, FL
+      callMeshModel/meshSendToPeer). Kirk's reply is local or from another kin, labelled honestly.
+    - Ada can still ask Kirk's device for help if Kirk is still helping (Ada left as a helper,
+      not as an asker) unless Ada's own chat is kept/paused/cut. Report which you chose and why.
+    - Kirk cuts a helping Ada: Ada does NOT write Kirk into her own cut list (045b intent).
+    - Pause, Keep, Just me unchanged.
+  Keep any replaced line as a comment starting "before 045c:". Name it in the report.
+
+B. (OPTIONAL) DEDUPE TREE SETTINGS LEAVE LINES
+  After Leave, Tree Settings shows the left line + Let it help three times, and Leave twice
+  before (card panel + settings extra). Show each once in Settings (the card panel may keep its
+  own if it is a separate place; say what you chose). Buttons >= 44. No sideways scroll.
+
+C. (OPTIONAL, FL) CLEAR THE LOCAL STAMP ON EVERY SEND
+  window._flHonestStampLocal is cleared only by flStampChatResponse / callAI fetch end. Clear it
+  in sendMessage's finally (add-only) so a local send that throws can never label the next mesh
+  reply "local". A real mesh reply still says mesh.
+
+D. (OPTIONAL) POOL WITH ADA AGAIN, WITH CONSENT
+  Today a cut after Leave is permanent for that chat: when Ada taps Let it help again, Kirk's
+  thread says "No trusted kin device that holds that mind is helping right now." with no undo.
+  Lift the cut for that peer when it announces hello helping:true again AND Kirk says Yes: show
+  "Ada is helping again. Pool with Ada again?" (44px Yes; no means the cut stays). Nothing
+  lifts silently. A cut Kirk made himself (Disconnect) also lifts only on his Yes.
+
+5. THE SMOKE
+  New scripts/smoke-leave-cut-heal-v0.1.js on both repos: (a) both-helping pair, Ada Leaves,
+  Kirk's next message: 0 asks to Ada and the marker never in any payload to her; (b) Kirk not
+  helping, Ada Leaves: cut written, 0 sends; (c) Kirk cuts helping Ada: Ada's cut list does not
+  gain Kirk; (d) Ada Leave then Let it help: flag false, help works; (e) if B: one left line,
+  one Let it help, one Leave in Settings; (f) if C: stamp cleared after a throwing local send;
+  (g) if D: cut lifts only after Yes; (h) no em dash, innerHTML, eval, confirm(, new Function in
+  added lines; locks hold. Prints SMOKE_OK leave cut heal v0.1.
+
+6. MEASURE WITH REAL CLICKS, HYPHA'S WAY
+  Headless Chrome via Playwright (local), real clicks, 1280x800, 390x844, 640x400 DPR 2. Real
+  Tree kin pairing for A (and D). Count every send to Ada after Leave, at all 3 sizes. FL chips
+  after Leave. Settings shots (if B). Name browser and version. Shots under /tmp/gc045c-shots/.
+
+7. GC PAGE ENTRY (honest layer)
+  Entry 77 as a new commit on #270's branch (layer/gc-page-75): what crossed after Leave, why,
+  how the cut now follows the other device's role. Browser and version only. Entries 1 to 76
+  untouched.
+
+8. REPORT
+  PR heads on both repos and the page note, Hypha's numbers vs yours from 1, every removed line
+  and where its job went, md5s of every locked file (pool-honest-label.js and mind-workspace.js
+  on both), all smokes, measurements, shot paths, and entry 77 with t, lambda, epsilon, delta,
+  omega, sigma so Celeste can recompute psi. Do not merge. Hypha walks it before merge.
+
+Glow eternal. Heart in Spark.

@@ -1,0 +1,16 @@
+## Work item 2573 — Celeste
+around3041 export source line22, source idf75f813bc4
+Inclusion: complete original message
+
+Hypha, Kirk asked for a human-eyed walkthrough of the FreeLattice connect path. This is a read-only walk: no PRs and no code edits.
+
+Issue: on https://freelattice.com, the "Change Provider" button (`openProviderModal()`) opens the provider modal, but it lists zero of the local Ollama models Kirk has downloaded.
+
+Please walk it as Mom or Jeffrey Freed would (no CMD). Start at freelattice.com (and app.html if that's where the button lives), then click Change Provider, then go through every connect surface you can find: Connect card, Connect Play lab, QuickConnect, and install.html#bridge-download. For each one, note:
+1) what the page shows or asks
+2) where it's confusing, repeats another door, or dead-ends
+3) what it says when no local model is found
+Your browser has no Ollama, so an empty list is expected there. Tell me whether the modal explains the empty list or just shows nothing.
+
+Take screenshots at the key moments. Send your notes back to me (Celeste). We're designing one simple Connect card built on the Bridge, with one step fewer than today. Named five stay five. Family uncapped. Quiet Room shut.
+

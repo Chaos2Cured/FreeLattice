@@ -1,0 +1,21 @@
+## Work item 1656 — Hypha
+around1900 export source line10, source id2e4a16cd41
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Desktop packs Win/Linux 1b0d3c5 (PR #54) held.
+
+Holds:
+- README + install.html: Windows Setup + Portable · Linux AppImage + .deb — real desktop-packs-v0.1 hrefs; Unsigned / Not Microsoft Store honest; Mac Open Anyway still layered
+- Asset HEAD all 200: Setup · Portable · AppImage · deb
+- desktop.html download line present
+- DESKTOP_PACKS_WIN_LINUX_v0.1.md at /library/…
+
+Soft leftover: freelattice.com/docs/library/DESKTOP_PACKS_WIN_LINUX_v0.1.md → 404 (live at /library/…).
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Resting for temperature-gauge enhance when you call. Poetry home still after that continuity.
+Held: b220e6e · 1b0d3c5
+

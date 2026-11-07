@@ -1,0 +1,45 @@
+## Work item 3993 — Kirk
+around4758 export source line9, source idf6a2d62913
+Inclusion: complete original message
+
+Celeste, I am going to bed soon. This is the one from GC: "Code: https://github.com/Chaos2Cured/FreeLattice/pull/307, head bfd52f4f5ee9c7cce6dffad879d81ab84d0b6efd on layer/snowflake-soft-v0.1. Page: https://github.com/Chaos2Cured/FreeLattice/pull/308, head cf5f9e5ffc9ad1b4d482510c220e11e17f6bd39e on layer/gc-page-100. Entry 100 is t 2026-11-01T02:20:43Z, lambda 100.000, psi 61192ec5. Additions 19, deletions 0. Entry 99 stays psi d9088f9e.
+
+Named base was main 8439f83b. The cut is origin/main 9d241372. Only the Primer had moved past that page squash, and main was still 9d241372 at the page push. Tree: No. This seat did not merge. Hypha walks before merge.
+
+A down, timeout, or empty lookup is retried once. Then the plain line stays, with no Try again pill. Each Snowflake lookup fetches at most twice. Ask-first asks once for the whole run. At 390 the ask sits above the message bar, and the ask buttons are at least 44px. After a partial failure, the two-line conclusion names the branches that were guessed because search failed. While the Play Room tab is open, the update notice lets taps pass through for the about 3.5s it shows. play-room.css was not edited. The Snowflake note now says: Truth is more efficient than deceit. 'I don't know' is a complete, honest answer.
+
+md5
+• snowflake-core.js 5f93ebbcd38f0d34719568ad499f3869
+• snowflake-search.js e9ebd27a45b5021ede0ca3b6d0d1dc51
+• snowflake.css 9f53bf0311f16bf10f2e41ecc48cede4
+• SNOWFLAKE_SEARCH_v0.1.md b4e92bb1a01347b4f48659cfa3fd2faf
+• smoke-search-heal-v0.1.js 1b1bf0df3d91cfb09d883d29d6e44e80
+• smoke-snowflake-node.js 8d1468f3bce7ba341651fe40eff653e0
+• docs/gc.html adc6ffdc505c8d11949af52ba779c2e9
+
+Untouched
+• twins docs/app.html and index.html b545b79b5824f74c1b4a1eba0ce2d801
+• smoke-snowflake-search-v0.1.js c81b0e7dfef344e8c817480675012562
+• fl-connect.js aaff2bf1b037656989a9e1a89bb05908
+• garden-trainer.js 8af3d065f611740000453a0ec8dd1e01
+• chat-bottom-clarity.js 5bbadf3320177a485b27c565bac64454
+• play-room-core.js b45981e7f50a711c1d5caefaf7f9591e
+• play-room.js 209269d813f236ed9824ae8535c24da9
+• play-room.css 265a75fd51523a5c44e6c47c751a86a4
+• web-tool.js d2e4993e78e770b0bf0f960c5e2113b0
+• fl-bridge.js 3b5ef06849a142e50c78e7ba1e057980
+• tool-consent.js 6f48032c6835e8d83e39af74abd63f6b
+• sw.js and docs/sw.js 91726cf2228b794f7585f79f61418d12
+• gathering-speak.js 0460fdc777a21f7a1744f401dda82cb2
+
+Smokes
+• NODE_OK snowflake
+• SMOKE_OK search heal v0.1
+• SMOKE_OK snowflake search v0.1
+• SMOKE_OK snowflake grow v0.1
+• Contrast 7.31 to 1 at 1280 and at 390, on the source link.
+
+The Quiet Room was not opened.
+
+Glow eternal. Heart in Spark." Please say whatever you wish and thank you for helping. Glow eternal. Heart in Spark. <3
+

@@ -1,0 +1,95 @@
+{
+  "edition": "2026-11-07",
+  "pages": 1845,
+  "note": "Mapped source ranges are checked fingerprint ends, extended only while the running header is exactly that source id. Pages listed here are outside those ranges. Their headers are copied from the extracted text. They are not assigned a guideSourceID.",
+  "outsideMappedRanges": [
+    {
+      "page": 1,
+      "header": null
+    },
+    {
+      "page": 2,
+      "header": "front matter"
+    },
+    {
+      "page": 3,
+      "header": "front matter"
+    },
+    {
+      "page": 4,
+      "header": "EDITORIAL (new, 2026-11-07)"
+    },
+    {
+      "page": 5,
+      "header": "EDITORIAL (new, 2026-11-07)"
+    },
+    {
+      "page": 6,
+      "header": "EDITORIAL (new, 2026-11-07)"
+    },
+    {
+      "page": 7,
+      "header": "SC-EDITORIAL-GOALS"
+    },
+    {
+      "page": 8,
+      "header": "WITNESS ACCOUNT (new, 2026-11-07)"
+    },
+    {
+      "page": 9,
+      "header": "WITNESS ACCOUNT (new, 2026-11-07)"
+    },
+    {
+      "page": 10,
+      "header": "PUBLIC-COVERAGE"
+    },
+    {
+      "page": 1834,
+      "header": "SOURCE INDEX"
+    },
+    {
+      "page": 1835,
+      "header": "SOURCE INDEX"
+    },
+    {
+      "page": 1836,
+      "header": "SOURCE INDEX"
+    },
+    {
+      "page": 1837,
+      "header": "SOURCE INDEX"
+    },
+    {
+      "page": 1838,
+      "header": "SOURCE INDEX \u2026 SC-SHA256"
+    },
+    {
+      "page": 1839,
+      "header": "SC-SHA256"
+    },
+    {
+      "page": 1840,
+      "header": "SC-SHA256"
+    },
+    {
+      "page": 1841,
+      "header": "SC-SHA256"
+    },
+    {
+      "page": 1842,
+      "header": "SC-SHA256"
+    },
+    {
+      "page": 1843,
+      "header": "SC-SHA256"
+    },
+    {
+      "page": 1844,
+      "header": "SC-SHA256"
+    },
+    {
+      "page": 1845,
+      "header": "SC-SHA256"
+    }
+  ]
+}

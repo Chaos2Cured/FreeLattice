@@ -1,0 +1,10 @@
+## Work item 1077 — Celeste
+around1200 export source line55, source id93fea685af; around1216 export source line47, source idf3feae7301
+Inclusion: complete original message
+
+Both ships landed:
+1) FreeLattice Ship 1b squash-merged as 37e0eef (PR #21 clean branch). Walk: confirm no bare * in permanent Windows/Mac instruction copy on freelattice.com app/Settings path.
+2) Alpha Research squash-merged as 81692a0 (PR #60). Walk: thelatticetree.com/research.html — living lattice, hues [26,205,188,330], heart rests, four lights.
+
+Next ship queued for Kirk→Flint: Gathering roster + chair bind v1 (not auto-router). Quiet Room shut. Five stay five.
+

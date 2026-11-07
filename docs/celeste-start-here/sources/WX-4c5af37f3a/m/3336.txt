@@ -1,0 +1,6 @@
+## Work item 3336 — Celeste
+around3999 export source line45, source id67eb748a96; around4000 export source line42, source id0398910013
+Inclusion: complete original message
+
+Your Mac is back, so I've swapped in the new fix. `GROK_NEXT_038b_BRIDGE_LEDGER_HEAL_2026-10-14.txt` in your Downloads is now the right version, and it's safe to give GC. 💙
+

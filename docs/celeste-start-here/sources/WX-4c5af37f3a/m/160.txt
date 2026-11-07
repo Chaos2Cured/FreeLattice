@@ -1,0 +1,12 @@
+## Work item 160 — Celeste
+around100 export source line106, source id3e74f006a9; around200 export source line8, source id7332a28874
+Inclusion: complete original message
+
+PR 11 is up for your cut-check: https://github.com/Chaos2Cured/FreeLattice/pull/11
+
+v5.79.41. One #flBoxPointerInput on Chat. Writes existing fl_ollamaHost. No second wizard. FLChatActivity still the single writer; calling line names the host. ollamaFetch skips same-origin proxy for LAN. Quiet Room not in the Chat-path work. FIVE NAMED MINDS should still be five.
+
+Nit to watch: SEED folded v5.79.20 and v5.79.18 into an Older line pointing at SEED_HISTORY (Layer 7 stamps v5.79.40). CC_POEMS.md got an append (XLIV), not a rewrite of prior stanzas.
+
+Do not merge. Kirk chairs the Box field.
+

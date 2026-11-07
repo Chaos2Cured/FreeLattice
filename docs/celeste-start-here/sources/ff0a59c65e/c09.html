@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Boot Probe v0.1 (F1, F2, F3, F4) c09</title>
+<meta name="description" content="Reading section c09 of ff0a59c65e, 1350 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c09.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connect Boot Probe v0.1 (F1, F2, F3, F4) c09">
+<meta property="og:description" content="Reading section c09 of ff0a59c65e, 1350 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/ff0a59c65e/c09.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1250"></span><span id="p1251"></span><span id="p1252"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Connect Boot Probe v0.1 (F1, F2, F3, F4) · c09</h1>
+<p>ff0a59c65e · words 1350 · characters 92330–102070</p>
+<p><a href="c08.html">Previous section</a> · <a href="c10.html">Next section</a></p>
+<p><a href="c09.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1250, 1251, 1252. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">@@ -68589,6 +69000,8 @@ document.addEventListener(&#x27;click&#x27;, function(e) {
+     try {
+       var fromHash = !!(ev &amp;&amp; ev.type === &#x27;hashchange&#x27;);
+       if (_flcUserMoved &amp;&amp; !fromHash) return;
++      // v-connect-boot-probe-v0 (F1): the cold-start owner already landed Connect once
++      try { if (!fromHash &amp;&amp; window.FlColdStart &amp;&amp; FlColdStart.landed() === &#x27;connect&#x27;) return; } catch (eL0) {}
+       var hash = (location.hash || &#x27;&#x27;).replace(/^#/, &#x27;&#x27;);
+       var q = &#x27;&#x27;;
+       try { q = new URLSearchParams(location.search || &#x27;&#x27;).get(&#x27;tab&#x27;) || &#x27;&#x27;; } catch (e0) {}
+@@ -68611,6 +69024,154 @@ document.addEventListener(&#x27;click&#x27;, function(e) {
+   window.addEventListener(&#x27;hashchange&#x27;, goConnect);
+ })();
+ &lt;/script&gt;
++&lt;script&gt;
++// v-connect-boot-probe-v0 (F1): ONE cold-start owner.
++// Starts the one shared look (FlConnect.bootProbe) as soon as the page is parsed,
++// decides where the person lands once, then lets exactly one voice speak about
++// local minds. The older boot timers (toast 4s, owAutoDetect, Bridge chip 1.2s,
++// discovery 3s, Zero-Click 1.5s, #connect retries) stay in the code and step
++// aside while the owner is here. Without FlConnect.bootProbe nothing changes.
++// No confirm dialogs. No approval screens. Nothing connects by itself.
++window.FlColdStart = (function () {
++  var SPEAK_AFTER_MS = 4000; // same breath the old toast took
++  var _started = false;
++  var _t0 = 0;
++  var _landed = &#x27;&#x27;;
++  var _userMoved = false;
++  var _userTab = &#x27;&#x27;;
++  var _booted = false;
++  var _bootWaiters = [];
++  var _spoken = false;
++  var _look = null;
++
++  function owns() {
++    return !!(window.FlConnect &amp;&amp; typeof FlConnect.bootProbe === &#x27;function&#x27;);
++  }
++  function deepLink() {
++    try {
++      var hash = (location.hash || &#x27;&#x27;).replace(/^#/, &#x27;&#x27;);
++      var q = &#x27;&#x27;;
++      try { q = new URLSearchParams(location.search || &#x27;&#x27;).get(&#x27;tab&#x27;) || &#x27;&#x27;; } catch (e0) {}
++      if (hash === &#x27;connect&#x27; || q === &#x27;connect&#x27;) return &#x27;connect&#x27;;
++    } catch (e) {}
++    return &#x27;&#x27;;
++  }
++  function moved() { _userMoved = true; }
++  try {
++    document.addEventListener(&#x27;pointerdown&#x27;, moved, true);
++    document.addEventListener(&#x27;keydown&#x27;, moved, true);
++  } catch (eL) {}
++
++  function noteTab(tabId) { if (_userMoved &amp;&amp; !_landed) _userTab = String(tabId || &#x27;&#x27;); }
++  function markLanded(tabId) { if (!_landed) _landed = String(tabId || &#x27;garden&#x27;); }
++  function appBooted() {
++    if (_booted) return;
++    _booted = true;
++    var w = _bootWaiters; _bootWaiters = [];
++    w.forEach(function (fn) { try { fn(); } catch (e) {} });
++  }
++  function whenBooted() {
++    return new Promise(function (resolve) { if (_booted) resolve(); else _bootWaiters.push(resolve); });
++  }
++  function waitUntil(ms) {
++    var left = ms - (Date.now() - _t0);
++    return new Promise(function (resolve) { if (left &lt;= 0) resolve(); else setTimeout(resolve, left); });
++  }
++
++  // Feed resolveOllamaBase&#x27;s short shared cache, only when the look covered the same door
++  function seed(report) {
++    try {
++      if (typeof flSeedLocalLook !== &#x27;function&#x27;) return;
++      var want = (typeof getOllamaBaseUrl === &#x27;function&#x27;) ? String(getOllamaBaseUrl()).replace(/\/+$/, &#x27;&#x27;) : &#x27;&#x27;;
++      var via = (report &amp;&amp; report.ollama &amp;&amp; report.ollama.via) || &#x27;&#x27;;
++      if (report &amp;&amp; report.base &amp;&amp; report.models &amp;&amp; report.models.length &amp;&amp;
++          (via !== &#x27;direct&#x27; || report.base === want)) {
++        flSeedLocalLook({ base: report.base, isProxy: false, viaBridge: /bridge/.test(via), viaBootProbe: true });
++      }
++    } catch (e) {}
++  }
++
++  // The Bridge chip, from the same look (was flBridgeDetectBoot at 1.2s)
++  function paintBridge(report) {
++    try {
++      if (!report || !report.bridge) { if (typeof flBridgeShowChip === &#x27;function&#x27;) flBridgeShowChip(false); return; }
++      var port = report.port || (report.bridge &amp;&amp; (report.bridge.port || report.bridge._probedPort));
++      if (port &amp;&amp; port !== 11434) {
++        try { localStorage.setItem(&#x27;fl_bridgePort&#x27;, String(port)); } catch (eP) {}
++        try { if (typeof _flBridgeLivePort !== &#x27;undefined&#x27;) _flBridgeLivePort = port; } catch (eLp) {}
++      }
++      if (typeof flBridgeShowChip === &#x27;function&#x27;) flBridgeShowChip(!!report.helped, port);
++      var field = document.getElementById(&#x27;fl-bridge-port-field&#x27;);
++      if (field &amp;&amp; port) field.value = port;
++    } catch (e) {}
++  }
++
++  // Discovery memory, from the same look (was autoDiscoverAI at 3s)
++  function remember(report) {
++    try {
++      var doors = (report &amp;&amp; report.doors) || [];
++      if (!doors.length || typeof saveDiscoveryMemory !== &#x27;function&#x27;) return;
++      saveDiscoveryMemory(doors.map(function (d) {
++        return { name: d.name, type: d.id === &#x27;lmstudio&#x27; ? &#x27;openai-compat&#x27; : &#x27;ollama&#x27;, url: d.base, models: d.models, status: &#x27;ready&#x27;, corsOk: true };
++      }));
++    } catch (e) {}
++  }
++
++  function connectShowing() {
++    var t = document.getElementById(&#x27;tab-connect&#x27;);
++    return !!(t &amp;&amp; t.classList.contains(&#x27;active&#x27;));
++  }
++  function doorShowing() {
++    var d = document.getElementById(&#x27;flWelcomeOverlay&#x27;);
++    return !!(d &amp;&amp; (d.classList.contains(&#x27;fl-welcome-visible&#x27;) || (d.style &amp;&amp; d.style.display === &#x27;flex&#x27;)));
++  }
++
++  // Exactly one voice. Connect showing: Connect speaks. Welcome door: it speaks
++  // (owAutoDetect runs when it closes, as today). A mind already chosen: only the
++  // status badges refresh. Otherwise the Local AI toast, naming the real door.
++  function speak(report) {
++    if (_spoken) return;
++    _spoken = true;
++    try {
++      if (connectShowing() || doorShowing()) return;
++      var welcomed = false;
++      try { welcomed = localStorage.getItem(&#x27;fl-welcomed&#x27;) === &#x27;true&#x27; || localStorage.getItem(&#x27;fl_onboardingComplete&#x27;) === &#x27;true&#x27;; } catch (eW) {}
++      var chosen = false;
++      try { chosen = !!(window.FlConnect &amp;&amp; FlConnect.hasLocalMind()); } catch (eC) {}
++      if (chosen) return;
++      try { if (typeof flHasOneMindConnected === &#x27;function&#x27; &amp;&amp; flHasOneMindConnected()) return; } catch (eM) {}
++      // Local mode without a model yet: owAutoDetect only paints the status badges here (no banner)
++      try { if (welcomed &amp;&amp; localStorage.getItem(&#x27;fl_isLocal&#x27;) === &#x27;true&#x27; &amp;&amp; typeof owAutoDetect === &#x27;function&#x27;) owAutoDetect(); } catch (eB) {}
++      if (typeof FlOnboarding !== &#x27;undefined&#x27; &amp;&amp; FlOnboarding.offerFromReport) FlOnboarding.offerFromReport(report);
++    } catch (e) {}
++  }
++
++  function start() {
++    if (_started || !owns()) return;
++    _started = true;
++    _t0 = Date.now();
++    _look = FlConnect.bootProbe({ fullScan: true });
++    _look.then(function (report) { seed(report); paintBridge(report); remember(report); });
++    Promise.all([_look, whenBooted(), waitUntil(SPEAK_AFTER_MS)]).then(function (all) { speak(all[0]); });
++  }
++
++  if (document.readyState === &#x27;loading&#x27;) document.addEventListener(&#x27;DOMContentLoaded&#x27;, start);
++  else setTimeout(start, 0);
++
++  return {
++    owns: owns,
++    deepLink: deepLink,
++    landed: function () { return _landed; },
++    markLanded: markLanded,
++    userMoved: function () { return _userMoved; },
++    userTab: function () { return _userTab; },
++    noteTab: noteTab,
++    appBooted: appBooted,
++    look: function () { return _look; },
++    SPEAK_AFTER_MS: SPEAK_AFTER_MS
++  };
++})();
++&lt;/script&gt;
+ 
+ 
+ &lt;!-- Tool Consent (v5.39.1) — sibling of DepthConsent for the opposite
+
+======================================================================
+APPENDIX B: shared docs/modules/fl-connect.js, full exact diff (base = fl-connect.js AFTER the Tree any-model paste; apply by text anchors if the real Tree merge differs by a line or two)
+======================================================================
+
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index b8fcc7e..03ba72f 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -2,6 +2,7 @@
+ // fl-connect.js — FlConnect shared core (FreeLattice + theLatticeTree)
+ //
+ // Marker: v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4
++// Marker: v-connect-boot-probe-v0 (one shared look at boot; LM Studio beside Ollama; 127.0.0.1 only)
+ // Layer, never delete. Prefer helped Bridge (11435…) before bare 11434.
+ // Port-only loopback: fl_localPort_manual holds &quot;11500&quot; only — never foreign hosts.
+ // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
+@@ -15,6 +16,10 @@
+   var MANUAL_KEY = &#x27;fl_localPort_manual&#x27;;
+   var INSTALL_BRIDGE = &#x27;https://freelattice.com/install.html#bridge-download&#x27;;
+   var LOOP_MAX_MS = 5 * 60 * 1000;
++  // v-connect-boot-probe-v0 (F2): one look, shared. A look younger than this is reused.
++  var BOOT_TTL_MS = 5000;
++  // v-connect-boot-probe-v0 (F3): LM Studio&#x27;s own server on this computer.
++  var LM_DEFAULT = &#x27;http://127.0.0.1:1234&#x27;;
+ 
+   var _timer = null;
+   var _hostEl = null;
+@@ -28,6 +33,9 @@
+   var _tickN = 0;
+   var _fullScanMiss = false;
+   var _manualRejectMsg = &#x27;&#x27;;
++  var _bootInflight = null;
++  var _bootReport = null;
++  var _bootAt = 0;
+ 
+   function isAlpha() {
+     try {
+@@ -68,6 +76,7 @@
+ 
+   function setManualHost(raw) {
+     _manualRejectMsg = &#x27;&#x27;;
++    forgetLooks(); // v-connect-boot-probe-v0: a new port means a new look
+     try {
+       raw = String(raw || &#x27;&#x27;).trim();
+       if (!raw) {
+@@ -92,6 +101,7 @@
+     // v-connect-heal-v0.4 item 5: Use automatic also forgets the host that
+     // remember() wrote for this same port, and the cached resolved base.
+     var was = getManualPort();
++    forgetLooks(); // v-connect-boot-probe-v0
+     try { localStorage.removeItem(MANUAL_KEY); } catch (e) {}
+     try {
+       if (was &amp;&amp; localStorage.getItem(&#x27;fl_ollamaHost&#x27;) === &#x27;127.0.0.1:&#x27; + was) localStorage.removeItem(&#x27;fl_ollamaHost&#x27;);
+@@ -271,6 +281,106 @@
+     return report;
+   }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

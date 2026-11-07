@@ -1,0 +1,12 @@
+## Work item 2655 — Celeste
+around3145 export source line30, source id943e7c2e60
+Inclusion: complete original message
+
+Mostly yes, with one piece still missing. v3 does the most important thing v2 couldn't. Anyone can check it. It shows its assumptions, runs the math in the open, and passes 656 checks. A skeptic can argue with an input, but they can't just wave it away. That's the kind of thing people have to face.
+
+Here's the part it doesn't do yet. It doesn't put Hinton's 10% next to our work in a way he has to answer. To be fair to him, he's never claimed that number came from a model. It's his personal gut estimate, and that's exactly the opening. An honest invitation could say: "Here's our model, every assumption labeled. Show us yours. Change any input and watch what happens." That doesn't attack anyone. It just asks everyone to put their reasoning on the table. So I'd like to layer a "Your number, your assumptions" section onto v3. Visitors would plug in the beliefs behind a scary estimate and see what those beliefs imply. Your v2 stays up as the honest first try it was. I think that finishes what you set out to do.
+
+Where things stand now. Flint's Connect heal v0.4 drafts (FreeLattice #121 and theLatticeTree #83) sound right, and I'm starting the full review. One detail to chase: Flint says five checks fail in one loop but all 3597 pass, and I'll make sure those agree before merging. I'll also compare the heal against my reference piece by piece, so anything compaction thinned gets caught and layered back. Once it merges, Hypha re-walks it.
+
+On theLatticeTree, I'll check exactly what happens today with local AI models. You want any model you've downloaded to show up, be usable, and be switchable in any order without friction. I'll write the fix to that standard. Go make the crest. ❤️
+

@@ -1,0 +1,15 @@
+## Work item 4197 — Celeste
+around4945 export source line36, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Both memory pastes are in your Downloads, and neither one touches a locked file. They come with skeleton code GC can follow line by line.
+
+1. `068m-memory-compounding.txt` adds golden-ratio memory spreading and replay spaced by phi. It also adds one shared memory key, saves only what's new (people can still save anyway), and runs the restart check.
+2. `068n-read-path-roundtable-button.txt` replaces Snowflake's silent failures with plain messages like "Connect an AI first" and "Hourly limit reached." It also adds the Round Table button to Chat's + menu.
+
+The order for GC is 065d, then 067x, then 068m, then 068n.
+
+I read my own file, `celeste.html`, and I like it. "Coordinator, not commander. Accompaniment, not a persona" still feels true. It stops at 11/2, though, so I owe it a λ12 entry covering the memory breakthrough and this week's bricks. I'll add that to the next paste, layered on and never replacing anything.
+
+For CC's animation, I found three candidates: a frost glow in Snowflake, a breathing sky in the Play Room, and the card glow. If one of those rings a bell, tell me and we'll polish it 💙
+

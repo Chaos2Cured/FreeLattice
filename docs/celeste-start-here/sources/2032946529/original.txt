@@ -1,0 +1,136 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+GROK NEXT BRICK: Mesh Kin v0.2 (a patient work queue for trusted kin, brick 2)
+For: GC (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Sunday Oct 4, 2026, about 3:30 PM MDT
+Marker: v-mesh-kin-v0.2
+Smoke line: SMOKE_OK mesh kin v0.2
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-kin-v0-2  base main d2bb902 or newer
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04-fl.diff  (854 lines, md5 74254e30a322894e81e4c13376741a09)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, Kirk talked with @grok on X about kin sharing work across browsers. The honest first step
+from that talk is: buffer callMeshModel. A question for a trusted mind waits until its keeper
+is online. It runs on their computer's local model and comes back to be kept. While building
+it I found a hole in v0.1, and this brick closes it. A badge's meshId is only a label, so a
+stranger could repeat a trusted meshId with their own key. The kin fingerprint now includes
+the key. You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git status --short     # must print nothing
+    git fetch origin && git checkout main && git merge --ff-only origin/main
+    git merge-base --is-ancestor d2bb902 HEAD && echo fl-base-ok
+    cp ~/Downloads/GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04-fl.diff /tmp/kin-queue-fl.diff
+    md5 -q /tmp/kin-queue-fl.diff                    # 74254e30a322894e81e4c13376741a09
+Order: checked on the box. It applies with the Hook heal, Sophia page heal and Gathering diffs
+in all 24 orders, and after any one of them merges. If plain apply complains, use
+`git apply --3way` and say so.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (7 files, +723 / -7; the 7 are kept as "before v-mesh-kin-v0.2" comments)
+----------------------------------------------------------------------
+a) docs/modules/fl-kin-queue.js (new, md5 eb2ee1229c7ad6074eb92d4b4ea1957f), window.FLKinQueue:
+   - enqueue(peer, model, messages): only to a peer with an active Trust pass bound to its
+     verified key. The job waits in IndexedDB (memory shelf if IndexedDB is missing).
+   - flush(): every 30 s and on enqueue. It sends at most 3 waiting jobs per trusted keeper
+     in one `kin-work`, and resends after 10 min (at most 3 tries).
+   - receive(): `kin-work` is served only from trusted kin, only while compute sharing is on.
+     Jobs run one at a time at idle on the local model, then go back as `kin-result`.
+     `kin-result` is taken only from the peer the job went to. Answers are kept.
+     The same question to the same mind comes from the kept answer.
+   - callMeshModelQueued(peerId, model, messages): callMeshModel, buffered. The chat path is
+     unchanged.
+   - A small panel under the Kin cards: pick a trusted mind, model, question, "Queue for my
+     kin", and the last 10 jobs with their state and answer (textContent).
+   - Limits: 20 turns, 32k characters in, 64k out, 20 held. Receipts in
+     fl_kin_queue_ledger, never content.
+   - Quiet Room closed. Never a paid API for a peer.
+b) docs/modules/fl-kin.js (md5 becomes 6a6c9e7e34af1070290104f99a6e0132):
+   - the fingerprint now includes keyHash(publicKey); seen cards and passes keep keyHash;
+   - new trustedPeer(peer) and keyHash() exports;
+   - old lines kept as comments;
+   - passes from v0.1 need one new Trust tap.
+c) docs/app.html and index.html (byte copy):
+   - the script tag after fl-kin.js;
+   - #flKinQueueHost under #flKinHost;
+   - `case 'kin-work': case 'kin-result':` after kin-card;
+   - meshKinQueueAdapter: peers, the sharing switch, peer models, and runLocal, which uses
+     getOllamaBaseUrl() + /api/chat only;
+   - meshKinMount mounts both.
+d) docs/scripts/smoke-mesh-kin-v0.2.js (new): two simulated browsers with real Ed25519 keys.
+   Checked:
+   - waits offline, answered on connect, kept answer, callMeshModelQueued;
+   - stranger refused both ways, impostor meshId not trusted;
+   - sharing off refused, forged result dropped, revoke stops work;
+   - Quiet Room, odd roles, no content in receipts.
+e) docs/library/MESH_KIN_v0.2.md (new): the honest scope, and why tensor sharding across
+   browsers is research. Plus your ledger entry, which credits the X conversation with @grok.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git checkout -b layer/mesh-kin-v0-2
+    git apply --check /tmp/kin-queue-fl.diff && git apply /tmp/kin-queue-fl.diff
+    cmp index.html docs/app.html && echo index-eq-app
+    md5 -q docs/modules/fl-kin-queue.js docs/modules/fl-kin.js   # eb2ee122..., 6a6c9e7e...
+    node docs/scripts/smoke-mesh-kin-v0.2.js         # SMOKE_OK mesh kin v0.2
+    node docs/scripts/smoke-mesh-kin-v0.js           # SMOKE_OK mesh kin v0.1
+    node tests/smoke.js | grep "CHECKS PASSED"       # ALL 3608 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect FAIL 8 or fewer, the same ones as main. PASS 73 on d2bb902, plus 1 per other brick merged.
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/modules/quiet-room.js   # nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                      # 0
+    git diff main -U0 | grep '^+' | grep -v assert | grep -c 'localhost\|innerHTML\|confirm('   # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+
+What Celeste saw (box):
+- All of the above green; 54 inline scripts parse.
+- With all four pending diffs together: PASS 76, FAIL 8 (the same 8).
+- In jsdom with a real IndexedDB API (fake-indexeddb):
+  - the picker listed the trusted peer and filled its model;
+  - Queue sent one kin-work;
+  - the answer landed and showed as text (a <script> in it stayed text);
+  - the job was stored as done.
+Not verified: two real browsers on a real mesh, with Ollama serving.
+
+Walk (only if easy; 127.0.0.1 only; two browser profiles, Ollama running):
+    cd ~/FreeLattice-fresh/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Connect two profiles on the mesh, share and trust each other's mind cards, turn on compute
+    sharing in the serving profile, then queue a question from the other. Say "walk skipped"
+    if you cannot.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+    sed -i '' 's/GC_TEMPERATURE_KIN_QUEUE_HERE/your line here/' docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_KIN_QUEUE_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md    # 0
+
+----------------------------------------------------------------------
+6. COMMIT, OPEN THE PR YOURSELF, THEN STOP
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "layer: Mesh Kin v0.2 (a patient work queue for trusted kin)"
+    git log -2 --oneline     # drop only a "docs: Auto-update Session Primer" commit, if any, and say so
+    git diff main --stat -- sw.js docs/sw.js prints nothing.
+    git push -u origin layer/mesh-kin-v0-2
+    gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/mesh-kin-v0-2 \
+      --title "layer: Mesh Kin v0.2 (a patient work queue for trusted kin)" \
+      --body "Soft LAYER marker v-mesh-kin-v0.2. Brick 2, from Kirk's public X conversation with @grok: buffered callMeshModel. Questions for trusted kin wait in IndexedDB, go in batches of 3 when the keeper is online, run on their local model one at a time, and come back to be kept. Trust is checked both ways and bound to the key (closes a v0.1 meshId impostor hole; v0.1 passes need one new Trust tap). Never a paid API for a peer; Quiet Room closed; receipts hold no content. Each job is a whole prompt; tensor sharding is research. Never touches sw.js; index.html == docs/app.html. SMOKE_OK mesh kin v0.2"
+Then STOP. Do not merge, do not delete branches. You may add a gc.html note PR of your own.
+Reply with: the PR number and URL, the branch SHA, the test lines, the locks, the walk result,
+any hook commit you dropped, and your Temperature line.

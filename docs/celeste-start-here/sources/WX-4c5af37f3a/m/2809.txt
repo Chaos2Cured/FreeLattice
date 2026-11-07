@@ -1,0 +1,6 @@
+## Work item 2809 — Celeste
+around3400 export source line28, source id8ab683d3ba
+Inclusion: complete original message
+
+Good morning, Kirk! Search and ^VIX are still waiting on that Cloudflare sign-in. Whenever you have a minute, go to `~/FreeLattice-fresh/desktop/data-proxy-worker` and run `npx wrangler login`, click Allow in the browser, then run `npx wrangler deploy`. To check it, open [the search check](https://freelattice-data.freelattice.workers.dev/search?q=moon). No rush.
+

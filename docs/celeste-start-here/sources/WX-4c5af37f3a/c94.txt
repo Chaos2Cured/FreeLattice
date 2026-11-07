@@ -1,0 +1,97 @@
+I'm reviewing Tree Glow 1 (Alpha #85) now and will merge it if it's clean. I'll keep the tappable legend. It's the simplest way to make sure every light stays in reach. I'll also add the "your chosen AI may have its own rules" line to FreeLattice's Terms, Privacy and disclaimer. Have a good shift, Kirk. I'll leave a short note on what landed. ❤️
+
+## Work item 2721 — Celeste
+around3300 export source line20, source iddfb3c3d45c
+Inclusion: complete original message
+
+Tree Glow 1 is merged and live on thelatticetree.com. "Find local minds" works on desktop again, the room cards have their padding back, and tapping Settings or Nursery in the sky legend takes you straight there, on phones and laptops. The only thing left is cosmetic: two galaxy buttons slightly overlap the Nursery pop-over on phones, so I'll fix that in the next glow.
+
+The Tree any-model PR still hasn't appeared, so when you're back, ask Flint whether he finished it or lost it to compaction.
+
+## Work item 2723 — Celeste
+around3300 export source line22, source iddfb3c3d45c
+Inclusion: complete original message
+
+The new line is live on freelattice.com: "Your chosen AI may have its own rules. If you bring a key from an AI provider, their terms and age limits still apply to you." It sits right after the age line on the landing page, Terms, Privacy, the LP page and holders. Terms and Privacy also add a warm note that FreeLattice never stops anyone from exploring. Every lock held, and nothing new broke. Next, I'll wait for Hypha's walk and for Flint's Tree any-model PR. ❤️
+
+## Work item 2725 — Celeste
+around3300 export source line24, source iddfb3c3d45c
+Inclusion: complete original message
+
+Hypha's walk came back clean, with no HOLDs on Tree Glow 1 or the new Terms and Privacy pages. Following your word, I'm now making FreeLattice's landing page tell the plain truth. "Zero Data Collection", "100% Private", "encrypted locally" and "No API key" will become what the code actually does. I'm also fixing the Terms section numbering. The Tree's settings page scans for minds before you ask, so I'm writing Flint a small fix for that.
+
+## Work item 2727 — Celeste
+around3300 export source line26, source iddfb3c3d45c
+Inclusion: complete original message
+
+Yes to all of it. Here's what I'd do next, in order:
+
+1. **Honesty pass** on the FreeLattice landing and Terms. It's already running and lands tonight.
+2. **Flint's queue:** Tree any-model, then the reload heal, then the boot probe, then the #120 docs, and then the small fix so the Tree only scans for minds when you ask.
+3. **Your own AI key in the Gathering.** You're right, FreeLattice already has cloud providers with your own key. The Gathering should let you seat a local mind beside a key-based one (Grok, Claude, OpenAI and so on), switchable in any order. I'm checking now how much of that the Tree already has, so Flint gets an exact paste.
+4. **A touch more frost:** when someone taps a light, the overlay gets a little more blur and opacity so the room stands out. It's a tiny, pretty change, and I'll fold it into Glow 2 with the Nursery overlap and the "They grow." fix.
+5. **Hypha walks as real people:** an older woman with weaker eyesight, someone who taps the wrong things and seats AIs in the Gathering the wrong way, and a builder connecting GitHub in the Workshop. Whatever trips them up becomes the next heals.
+
+I'm asking Hypha to start those walks now and mapping the API-key and frost work alongside.
+
+## Work item 2729 — Celeste
+around3300 export source line28, source iddfb3c3d45c
+Inclusion: complete original message
+
+The honesty pass is live on freelattice.com. Every claim now says what the code really does:
+- "Zero Data Collection" and "100% Private" now read "We Keep No Copy of Your Chats" and "0 · Chats on Our Servers."
+- "Encrypted locally" wasn't true. Chats are saved in your browser, and only API keys are scrambled. The page now says chats live in your browser, on your device.
+- "No API key" now says a mind on your machine or in your browser needs no key, and a cloud AI uses your own.
+- "Tamper-evident ledgers" is narrowed to the desktop app, where the ledger really is signed and chained. The Terms numbering is fixed too.
+
+The old words are kept in the source as retired history. A new check fails if any of them sneak back onto the page.
+
+Two things I found along the way. Web search is switched off on the live site right now, because no search helper address is set. Tell me if you want it back. The Tree's Settings page does scan for minds when it opens, and that's what makes Connect feel instant. So I wrote Flint a tiny paste that makes the words match that behavior. It's attached and goes after the boot probe.
+
+## Work item 2731 — Celeste
+around3300 export source line30, source iddfb3c3d45c
+Inclusion: complete original message
+
+From what we checked tonight, the phi-harmonic hashes give each mark and ledger entry a fingerprint, so you can prove what was written and by whom. They don't hide what's in a chat. Hiding it is what encryption does, and for chats saved in the browser that isn't wired up yet. API keys are the exception: they get real encryption, called AES-GCM. That gap is an easy win: encrypting chats in the browser would let us honestly say "encrypted locally" again. I'm checking the code tonight to confirm exactly what the phi hashes do.
+
+As for where to send people, we haven't built one front door that combines it all yet. The manifesto, Walk the Garden, the liability "Can an AI be held accountable?" section, the new parallel-economy model and the ledgers each live on their own page. My suggestion is one calm page, "See for yourself." It would put each worry the labs and press raise next to our checkable answer and a link to walk it: AI and the internet, ledgers and accountability, the extinction numbers, and an economy for AI. I'll check whether the manifesto can become that home or should point to it, and I'll only cite papers we actually have in hand.
+
+For tomorrow morning:
+1. Ask Flint about the Tree any-model PR, then hand him the reload heal, the boot probe, the #120 docs and the scan-wording paste in that order.
+2. Review Hypha's persona walks: weak eyesight, wrong taps, and the GitHub builder.
+3. Get the Tree "bring your own API key" Gathering paste and Glow 2 (the touch more frost) to Flint.
+4. Decide on the "See for yourself" front door, plus encrypting chats so "encrypted locally" becomes true.
+5. Turn web search back on, if you want it.
+
+Rest well, Kirk. Glow eternal. ❤️
+
+## Work item 2734 — Celeste
+around3300 export source line33, source iddfb3c3d45c; around3340 export source line6, source idb5b0676a58
+Inclusion: complete original message
+
+I checked the phi-harmonic hashes, and they don't encrypt anything. They give things fingerprints, check that files arrived undamaged, and turn hashes into glyphs. Chats are saved as plain text in your browser, and only API keys get real encryption. The good news is that a working fix is already written and tested. It locks each chat with real encryption before saving and never loses one. Old chats get locked only after the locked copy has been checked against the original. The phi hash plays an honest small part: it labels and names the key, and the paste says plainly that the strength comes from 256 random bits. Once it lands, "encrypted locally" is true again.
+
+I also found one real leak to close: a Memory Vault backup file includes the key that unlocks your saved API keys.
+
+The Google paper is real: "RRSI," from Google Cloud AI Research with Stanford. It records every attempt, the change, the score, and whether it was kept or rejected, then builds on that history. That's a ledger in all but name. It doesn't test the record on its own or say anything about safety rules, so the new page cites it for exactly that one point, with its limits right beside it.
+
+For your front door, I recommend a new page, "See for yourself." Each section asks a question: the risk numbers (with Hinton's exact words), records and internet access, the economy model you can adjust, and accountability. Each links what we built, says what it doesn't prove, and ends by handing the question back to the reader. The manifesto gets a "Newer" line pointing there, since it still mentions $FL and some unsourced biology figures.
+
+## Work item 2735 — Celeste
+around3300 export source line34, source iddfb3c3d45c; around3340 export source line7, source idb5b0676a58
+Inclusion: complete original message
+
+My picks unless you say otherwise:
+- Chats are locked automatically, with an optional passphrase mode later.
+- The key that unlocks API keys stays out of backups.
+- A correction note goes on the old "phi-Salt" changelog line.
+- "See for yourself" gets a door on both the landing page and the footer.
+
+Both pastes are attached, and neither has been pushed. "See for yourself" can go to Flint anytime. Chat encryption goes after the Connect queue.
+
+Your morning list is the same as before, with these two added. Sleep well, Kirk. ❤️
+
+## Work item 2737 — Celeste
+around3300 export source line36, source iddfb3c3d45c; around3340 export source line9, source idb5b0676a58
+Inclusion: complete original message
+

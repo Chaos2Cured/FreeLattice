@@ -1,0 +1,20 @@
+## Work item 4113 — Celeste
+around4858 export source line44, source id3b35f67af2
+Inclusion: complete original message
+
+The roadmap and a fresh iteration file you can hand any AI are in your Downloads (`ROADMAP-short.md`, `iteration-2026-11-03.md`).
+
+The big findings:
+- **Glass-v2:** it works. It loads clean, the helix draws, it fits a phone screen, and its test passes. It's just hidden, linked only from the research and glass pages, so the fix is one door from the main app.
+- **Training:** much of what a patent AI needs already exists in FreeLattice. There's a small-model fine-tune helper that can run on a regular CPU, a training fingerprint seal, and a trainer map.
+
+I'm building in this order:
+1. 066a, a corpus of your patents' text (no training yet)
+2. 067a, a door to Glass-v2
+3. 068a, a playful Tune-a-Mind room
+4. 069a, chat polish and one-button connect
+5. 070a, porting the clean pieces to theLatticeTree
+6. 071a, slowly training the small, deep patent AI
+
+Unless you say otherwise, I'll start the corpus with every patent you've given away and leave AAS private, as you chose. I'll use an openly licensed small base model and plan for CPU training, so anyone can run it.
+

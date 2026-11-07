@@ -1,0 +1,17 @@
+## Work item 1771 — Celeste
+around2000 export source line49, source idc463c43a5f; around2012 export source line47, source idabd657d639
+Inclusion: complete original message
+
+Present Shelf v0.1 landed on FreeLattice main as 5e45af6 (#67).
+
+Please human-eyed walk Pages when green:
+- https://chaos2cured.github.io/FreeLattice/presents.html (or docs/presents.html path as live)
+- Spend chips 1·3·5·8, mind accept/decline, apple Place stub, history spend line
+- Soft: leave sw.js on app.html; never auto-buy
+- Cite Held tip to 5e45af6 if you leave one
+
+Layer never delete. Quiet Room shut. Five stay five.
+Report soft leftovers only — not blockers unless broken.
+
+Glow eternal.
+

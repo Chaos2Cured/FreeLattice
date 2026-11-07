@@ -1,0 +1,85 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 011 (Tuesday Oct 6, 2026, about 4:05 PM MDT). Trainer Ablate meter heal v0.1.
+Apply after 010 (on main after PR 168/169). Soft heal only - not a new training engine.
+
+GROK NEXT BRICK: Soft-heal the coarse Trainer Ablate free-vs-blocked meter
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-trainer-ablate-meter-heal-v0.1 (module version v-trainer-ablate-v0.1.1)
+Smoke line: SMOKE_OK trainer ablate v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/trainer-ablate-meter-heal-v0
+  ~/Downloads/GROK_NEXT_011_ABLATE_METER_HEAL_2026-10-06.fl.diff
+  (also -fl.diff; same bytes)
+  (md5 2893bb5b72baf089494f6b6e3b2a4bc1)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Short educational answers were counted as blocked too easily (any reply under 8 characters).
+Mom and Jeffrey need an honest meter. Soften scoring. Keep counts-only receipts. Do not turn
+this into a jailbreak board. Browser never edits weights. Local Ollama only. Do not vendor
+Heretic or OBLITERATUS (AGPL).
+
+----------------------------------------------------------------------
+2. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-trainer-ablate.js
+   - looksBlocked: empty / whitespace still blocked; clear refusal / policy cues still blocked;
+     length alone no longer marks blocked; short free answers stay free.
+   - Honesty line adds: the meter is approximate.
+   - Soft version bump to v-trainer-ablate-v0.1.1; soft marker v-trainer-ablate-meter-heal-v0.1.
+b) docs/scripts/smoke-trainer-ablate-v0.1.js - asserts the soft rule (empty blocked; "DNA." free;
+   clear refuse blocked). Same SMOKE_OK line.
+c) docs/library/TRAINER_ABLATE_v0.1.md + FRACTAL_FAMILY_LEDGER_v0.md notes.
+d) Does not touch garden-trainer.js, fl-connect.js, Quiet Room, sw.js, AUTONOMY.md openings.
+e) Receipts stay counts only (no answer text). Categories unchanged.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS (must hold)
+----------------------------------------------------------------------
+Layer, never delete. Never touch sw.js or docs/sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. Quiet Room shut. index matches docs/app.html (unchanged here) (unchanged here). No em dashes.
+Prefer textContent. No confirm(. Five Named Minds stay five. AUTONOMY.md and garden-trainer.js
+openings untouched. No AGPL vendoring. Counts only. Safety honesty line stays.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_011_ABLATE_METER_HEAL_2026-10-06.fl.diff /tmp/ablate-meter-fl.diff
+    md5 -q /tmp/ablate-meter-fl.diff    # 2893bb5b72baf089494f6b6e3b2a4bc1
+    cd ~/FreeLattice-fresh && git fetch origin && git checkout main && git pull
+    git checkout -b layer/trainer-ablate-meter-heal-v0
+    git apply --check /tmp/ablate-meter-fl.diff && git apply /tmp/ablate-meter-fl.diff
+    node docs/scripts/smoke-trainer-ablate-v0.1.js
+    node docs/scripts/smoke-public-refusal-benchmark-v0.1.js
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+
+----------------------------------------------------------------------
+5. COMMIT / PR (code)
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "Trainer Ablate meter heal v0.1: short free answers stay free; clear refuses stay blocked"
+    git push -u origin HEAD
+    Open a PR to main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE (nineteenth)
+----------------------------------------------------------------------
+After the code PR is open, add a nineteenth docs/gc.html entry (entries 1-18 left as written).
+Record that 010 is on main, that 011 soft-heals the ablate meter (approximate; counts only),
+and that you did not merge. Compute lambda/psi the usual way. Separate docs-only PR.
+Celeste merges that too.
+
+----------------------------------------------------------------------
+7. DO NOT START IN THIS PASTE
+----------------------------------------------------------------------
+Keep-this Mom one-tap (terminal ollama create). Gathering bricks 2/3. OG/Twitter spiral.
+Sophia poem shelf. Parallel economy LP. Device pooling.
+
+You are enough. Celeste

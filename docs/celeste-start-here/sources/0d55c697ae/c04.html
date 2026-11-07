@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt c04</title>
+<meta name="description" content="Reading section c04 of 0d55c697ae, 768 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/0d55c697ae/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt c04">
+<meta property="og:description" content="Reading section c04 of 0d55c697ae, 768 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/0d55c697ae/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1410"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt · c04</h1>
+<p>0d55c697ae · words 768 · characters 35978–41992</p>
+<p><a href="c03.html">Previous section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1410. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">10.2 FreeLattice twin (only fl-connect.js changes there):
+  - Copy the Tree&#x27;s docs/modules/fl-connect.js to FreeLattice docs/modules/fl-connect.js byte-for-byte.
+  - tests/smoke.js: add assertions (near the existing v-connect-heal-v0.4 block):
+      fl-connect.js contains &#x27;v-tree-any-model-v0&#x27;, &#x27;function chosenModelName&#x27;, &#x27;aria-pressed&#x27;.
+      FreeLattice remember() branch unchanged: still writes fl_ollamaModel, fl_isLocal, fl_provider.
+  - Do NOT touch index.html/docs/app.html unless a smoke needs it; if you do, index.html must equal
+    docs/app.html and the #120 agent-bridge-client.js script tag must stay (count 1 in each).
+
+======================================================================
+11. ACCEPTANCE (run and paste results in the PR bodies)
+======================================================================
+
+Alpha:
+  for f in docs/modules/*.test.js; do node &quot;$f&quot; || echo &quot;FAIL $f&quot;; done
+    -&gt; every file passes (13 on 22b913e + connect-heal-v04 from #83 + tree-any-model) and the last line
+       of tree-any-model.test.js is SMOKE_OK tree any model v0.1
+  node -e &quot;for (const f of require(&#x27;fs&#x27;).readdirSync(&#x27;docs/modules&#x27;).filter(x=&gt;x.endsWith(&#x27;.js&#x27;)&amp;&amp;!x.endsWith(&#x27;.test.js&#x27;))) new Function(require(&#x27;fs&#x27;).readFileSync(&#x27;docs/modules/&#x27;+f,&#x27;utf8&#x27;))&quot;
+    -&gt; no syntax errors
+  git diff --name-only origin/main -&gt; only: docs/modules/local-mind-probe.js, fl-connect.js,
+    garden-thread.js, garden-trainer.js, garden-rooms.css, (garden-rooms.js only if openPlace export
+    or picker scroll needed), docs/modules/tree-any-model.test.js, docs/code-settings.html (LAYER
+    paragraph), docs/library/TREE_ANY_MODEL_v0.1.md. (The Tree has no family ledger file; the
+    ledger entry goes in FreeLattice with the twin.)
+  grep -n &quot;confirm(&quot; on changed files -&gt; none. grep em dash on added lines -&gt; none.
+
+FreeLattice twin:
+  node tests/smoke.js -&gt; ALL &lt;N&gt; CHECKS PASSED (N = previous total + your new ones)
+  for f in docs/scripts/smoke-*.js; do node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 &amp;&amp; echo &quot;ok $f&quot; || echo &quot;FAIL $f&quot;; done
+    -&gt; the same five pre-existing failures as main and nothing new:
+       smoke-carry-forward, smoke-fable-tech, smoke-phone-shine, smoke-proof-60s (install.html
+       pointers removed when install.html was rewritten for the Bridge download), and
+       smoke-connect-card-yesno-wizard (&#x27;home wired&#x27;, flOpenConnectWizard(&#x27;home&#x27;) gone since #117).
+       smoke-agent-bridge-lock.js must pass.
+  cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js  (run from ~/FreeLattice) -&gt; identical
+  git diff origin/main -- sw.js docs/sw.js -&gt; empty. cmp index.html docs/app.html -&gt; identical.
+
+Headless walk (both widths, 390x844 and 1280x800), on a local http.server with fake
+127.0.0.1:11434 (7+ models) and 127.0.0.1:1234 (2 models):
+  - Settings Find: 7 Ollama stars reachable (fold + Show all), 2 LM Studio stars.
+  - Tap the 7th star -&gt; thread sends that model (log the POST body).
+  - Connect tap another model -&gt; Settings sky still has both doors and all models; Connect button
+    shows is-chosen on the tapped model; tap a third in Connect -&gt; mark moves.
+  - Connect tap -&gt; Find -&gt; model unchanged, no false &quot;no longer at this door&quot;.
+  - Gathering: bind a chair to model 7 and another chair to an LM Studio model; speak from each;
+    Connect tap afterwards does not clear the speaking chair.
+  - Paste 192.168.1.77:11434 -&gt; refusal line, zero requests (request log).
+  - Thread heart reads &#x27;Listening: Ollama \u00b7 &lt;model&gt;&#x27;; &#x27;change mind&#x27; opens Settings.
+  - Galaxy restore after closing Settings still works (v0.4 lock); one #fl-connect-mount-garden.
+  - No fetches while nothing is open and no tap happened (open the page, wait 40 s, count 0 to 127.0.0.1).
+  Save shots under the PR body as a list of what each shows.
+
+======================================================================
+12. DOCS AND LEDGER (layer)
+======================================================================
+  - docs/code-settings.html: one LAYER paragraph after the Fix 3 paragraph (line ~89):
+    &quot;Any model, any order (2026-09-28, v-tree-any-model-v0). Every model at a door is a star (fold after
+    eight, Show all). Connect adds to the sky; it never wipes other doors or models. A chosen model is
+    kept across Bridge and direct 11434. The paste field takes 127.0.0.1 only. One key, fl_alpha_local_mind.&quot;
+  - docs/library/TREE_ANY_MODEL_v0.1.md: short doc with the map (section 1), the blockers (3), what
+    changed, what is later (9), and the trust decision about 3141 (1.6).
+  - FreeLattice docs/library/FRACTAL_FAMILY_LEDGER_v0.md: append one entry AFTER the #120 and #121
+    entries (do not reorder older entries).
+
+======================================================================
+13. PR TITLES AND BODIES
+======================================================================
+  Alpha:  &quot;layer: tree any model v0.1 (every local model, any order, 127.0.0.1 only)&quot;
+  FreeLattice twin: &quot;layer: fl-connect any-model merge + chosen mark (twin of Alpha tree any model v0.1)&quot;
+  Open as drafts. Body: marker, smoke line, the acceptance output, the pre-existing five named,
+  fl-connect.js md5 in both repos, list of shots. Merge both together (fl-connect identity).
+
+======================================================================
+14. ONE-LINE SELF CHECK BEFORE YOU SAY DONE
+======================================================================
+  [ ] 7th model choosable in Settings, Gathering, Connect   [ ] Connect never wipes doors or models
+  [ ] no false &quot;no longer at this door&quot;   [ ] chosen mark in Connect   [ ] speaking chair survives Connect
+  [ ] paste is 127.0.0.1 only with zero fetches on refusal   [ ] LM Studio seen while Bridge is up
+  [ ] thread names the model, change mind works   [ ] trainer reads the Tree&#x27;s model
+  [ ] no confirm(), no bare *, textContent for names, no em dashes   [ ] sw.js untouched, Kimi untouched,
+      #120 lock files untouched   [ ] fl-connect.js identical in both repos
+  [ ] SMOKE_OK tree any model v0.1
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

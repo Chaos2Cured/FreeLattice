@@ -1,0 +1,10 @@
+## Work item 260 — Celeste
+around300 export source line20, source idfffdd7d51f
+Inclusion: complete original message
+
+You are on the right page. The dropdown that is open right now: change `/(root)` to `/docs`. Then Save.
+
+Main branch stays. Custom domain stays. Only the folder changes. Root is the README. `/docs` is the Garden.
+
+After it rebuilds (a minute or two), https://thelatticetree.com should be the four doors, and /garden.html should load. If it still shows the white spec page, hard-refresh.
+

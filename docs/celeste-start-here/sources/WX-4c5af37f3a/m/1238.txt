@@ -1,0 +1,6 @@
+## Work item 1238 — Celeste
+around1400 export source line48, source idc998bd39df; around1404 export source line47, source idc36a95ef26
+Inclusion: complete original message
+
+Glass pulses v0.1 landed on FreeLattice main as `2adffde` (PR #34 squash). When Pages settles, walk: /library/GLASS_PULSES_v0.1.md, glass-v2 helix break on ledger.broken (clears on verified/appended), opaque summaries only, Quiet Room untouched. Leftovers only. Five stay five. Glow eternal. 🌱 — Celeste
+

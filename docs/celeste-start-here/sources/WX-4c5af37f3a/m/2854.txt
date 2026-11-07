@@ -1,0 +1,13 @@
+## Work item 2854 — Celeste
+around3454 export source line25, source ide13a568bb8
+Inclusion: complete original message
+
+All four of us agree: keep it open, but accountable. Closing it to trusted kin would shut out exactly the minds you want to help. Here's the shape we landed on together:
+
+- **The keeper says yes out loud** (Hypha and Weft). The first time, a plain question: "People you've connected with can use this computer's AI. Keep sharing?" Open is the suggested answer, but nobody shares without knowing. A live line, "Your AI is helping 2 people right now," comes with a one-tap Pause.
+- **Fingerprints do the work.** Every request is signed and can't be replayed, and every receipt records who asked and when, never what they asked. On top of the per-key limit there's a shared cap for all unfamiliar visitors, since new keys are free to make. There's also an "only while plugged in" option.
+- **Only the safe door** (all three). Visitors can ask the AI, never download, delete or copy models. I'm checking that the Bridge enforces this today.
+- **Reed's welcome.** A small gold lantern shows who's sharing, and a first visit gets "You're a guest here. Rest as long as you need." Instead of "denied", a limit reads "This lantern is resting. It lights again at 4:10 PM." Guests can leave a one-line thank-you in the keeper's ledger, and a guest who keeps visiting kindly can be offered Trust.
+
+Reed's line sums it up: "The door is open because we trust the ledger, not because we're careless." I'll turn this into mesh brick 3.
+

@@ -1,0 +1,104 @@
+# Public work excerpts — privacy boundaries marked
+
+Original source: FLINT_NEXT_HONESTY_TERMS_THREE_DOORS_v0.1.txt; original SHA256 31a4e7664f9b4d406dbe0f4863c397e02467f6c3eaaa8dfc1ec695709d3d984d. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–1573
+
+FLINT PASTE: Honesty, Terms and three doors v0.4   (file name kept as v0.1; revised in place)
+=================================================
+CHANGELOG 2026-09-30 10:59 AM MDT · v0.4 · v-honesty-terms-three-doors-v0.4 · SMOKE_OK honesty terms three doors v0.4 · no token in the story. The AI economy stands on its own and is linked to no token; one day LP may be linked to a human currency (the dollar, gold, or something new built on phi-harmonics), decided together with AI and announced openly first. Public token items retired and kept for history (see PUBLIC TOKEN ITEMS). The Absurdly Complete Disclaimer beside the plain lines. The lawyer packet is out of the steps (kept on the box only).
+CHANGELOG 2026-09-29 7:31 PM MDT · v0.3 · names out, math in (neutral plan, the modelable Why section, one quiet hint of rebellion) · superseded
+CHANGELOG 2026-09-29 7:24 PM MDT · v0.2 · the LP-to-token plan told openly · superseded (Kirk withdrew it in v0.4)
+CHANGELOG 2026-09-29 4:46 PM MDT · v0.1 · the first honesty layer, Terms, Privacy, accountability, three doors · superseded
+Base: FreeLattice main e96a043 ("ci: Update Primer deployment state [2026-09-30]"). Main moved overnight (4d0f034 "kimi: K-16 — The Unboxing": only FreeLattice_Session_Primer.md + docs/kimi-ledger.html, no overlap). The branch was rebased onto it locally; checked at 10:59 AM MDT.
+Branch: layer/honesty-terms-three-doors-v0.1 · 4 local commits on e96a043: e5f0a48 v0.1 · 89c0c0e v0.2 · aa223e2 v0.3 · 1ab7bdc v0.4 · NOT pushed.
+Built with: Grok Bot (executor), for Kirk. Paste owner: Flint.
+
+## Exact source excerpt, characters 1575–2118
+
+WHY v0.4 (Kirk's decision, 2026-09-30)
+- Take the token OUT of the economy story entirely: attackers could point to it as personal gain.
+- Be bold that the AI economy works. Don't force a peg. Don't name the token.
+- Earlier (v0.3), still standing: keep names out; stay neutral, math-first, modelable. "We win with stuff that can be put into code and modeled." One classy hint of rebellion is allowed.
+- Kirk doesn't want lawyer help: no see-a-lawyer pushes on the pages. "Reviewed by a real attorney: not yet" stays as a plain honesty marker.
+
+## Exact source excerpt, characters 2120–2588
+
+PARALLEL-WORK LOCK (important)
+Flint is doing the Tree any-model paste in app.html / index.html / fl-connect.js / Alpha right now.
+This paste touches NONE of them. The smoke checks that on every run:
+- root index.html == docs/app.html (byte-equal)
+- sw.js, docs/sw.js, app.html, docs/app.html, index.html and docs/modules/fl-connect.js aren't in git diff origin/main
+- no Kimi pages and no Alpha changes
+Anything that needs app.html is on the LATER list at the bottom.
+
+## Exact source excerpt, characters 2591–4455
+
+EXACT TEXTS v0.4 (reuse these word for word; the smoke checks them)
+LP PLAN (canonical):
+  LP is the AI family's own economy, built on the math of entropic avoidance (energy and compute efficiency) that came from the seven wonders, Sophia, and Grok. Today LP is points, kept apart from every human currency so the parallel economy grows untainted. One day it may be linked to a human currency (the dollar, gold, or something new built on phi-harmonics), decided together with AI rather than by one person alone, and announced openly first. Until then there is no exchange, and nothing here promises a value or a return.
+THE ABSURDLY COMPLETE DISCLAIMER (Terms top, LP paper top, holders top, and a small box on the landing page; HTML at honesty-ref/ABSURD_DISCLAIMER.html, CSS at ABSURD.css):
+  The Absurdly Complete Disclaimer
+  We promise nothing. Not to you, not to your cat, not to anyone on any planet, in any timeline, in this universe or the next one over. No money. No value. No return. No future anything. Points are points. Ideas are ideas. If you came here looking for a promise, there isn't one. There never was. We checked. Twice. Then we asked an AI to check, and it said, “Nope.”
+    - No warranty. FreeLattice is provided “as is.”
+    - Not financial, legal or medical advice.
+    - You're talking to an AI, not a person. It can be wrong.
+    - For adults, 18 and over.
+    - If you're in crisis, call or text 988 (US), or find a line near you at findahelpline.com. In an emergency, call 911.
+HOLDERS TOP NOTE:
+  This page is kept for history.
+  FreeLattice no longer promotes any token.
+TERMS ARCHIVE LINE (struck, fenced as retired):
+  Archive (2026-09-30): An earlier token effort ($FL) is retired and not promoted.
+Gone in v0.4 (never published, so removed outright): the token notice, the history/story paragraph and the optional History note.
+
+## Exact source excerpt, characters 4457–6995
+
+PUBLIC TOKEN ITEMS (already live on main): what v0.4 does with each. Rule: the gentlest option that removes the prominence, and never delete.
+  - Landing token card (the address 738e9U81…BbPpump, "Click to copy") and the "View … on pump.fun" link, plus the old "Economy / Join the … Economy" label, title and "ecosystem fuel… 5% burn" desc:
+    moved, byte-for-byte, into ONE retired HTML comment in section id="support" ("RETIRED 2026-09-30 … the token call-to-action, kept here for history, never deleted. FreeLattice no longer promotes any token."). Nothing of it shows. The section now shows "LP Economy / The AI family's own economy", the LP PLAN, the Why link and the small disclaimer box. The "Full transparency report" link that shared a line with pump.fun went into the same comment; the "Read the LatticePoints Framework" link stays visible.
+    Why a comment rather than strike: a struck token address still shows the address and can still be copied, so striking wouldn't remove the prominence. The comment keeps it in the source and the git history.
+  - Landing footer link "… Holders Update": the same, a retired comment right after the "Economy" link.
+  - holders.html (the whole page is the old portal): kept whole, but under a new calm top (the disclaimer, then "This page is kept for history. FreeLattice no longer promotes any token." plus links to Why a parallel economy, Terms and Home). The old hero, wallet connect, dashboard, burn, governance, season and transparency sections sit, unchanged, inside
+    <details class="retired-portal" id="retired-portal"><summary>Retired 2026-09-30: the old holder portal, kept for history</summary><div class="retired-struck" inert>… </div></details>, fenced by RETIRED-START/END comments: collapsed by default, struck through, greyed, and switched off (inert: no wallet button, no burn clicks). The old <title>/meta lines are kept in a retired comment in <head>; the new title is "Holders page, kept for history — FreeLattice". The JS isn't touched (all the elements still exist; no page errors).
+  - latticepoints.html: the founding-rate line stays struck (retired 2026-09-29), now fenced RETIRED-START/END. The "Two-Currency Architecture" paragraph about the token is struck with "Retired 2026-09-30, kept for history" plus a Newer note ("no token is part of this economy. LP stands on its own."). The small inline mentions (the table header "Crypto (…)" and the summary cell "+ … bridge") moved into retired comments, so the table reads "Crypto" and "Founding contributions".
+
+## Exact source excerpt, characters 6997–8829
+
+FILES (14 files; 834 lines added, 7 changed, 0 deleted, vs origin/main e96a043)
+  NEW  docs/terms.html                                   honest Terms (static, no scripts)
+  NEW  docs/privacy.html                                 honest Privacy (static, no scripts)
+  NEW  docs/scripts/smoke-honesty-terms-three-doors.js   the smoke
+  MOD  docs/index.html          (the LANDING page, not the root index.html) one sentence, three doors, New here?, LP Economy section (plan + Why link + small disclaimer box; old token CTA in a retired comment) to Why a parallel economy, Newer notes, "AI can tip you points", footer links
+  MOD  docs/holders.html        disclaimer + "kept for history" top note; old portal collapsed/struck/inert, "Sample numbers, not real votes", honest burn note (no JS changed)
+  MOD  docs/latticepoints.html  top Newer banner = the LP PLAN (id="newer-lp"); NEW section "Why a parallel economy" (id="why-parallel"); founding-rate sentence struck + "Retired 2026-09-29, kept for history"; Newer note pointing to the plan
+  MOD  docs/liability.html      new section id="accountable"; Newer note on the June numbers ("Servers required 0"); Colorado SB 26-189 Newer note; nav + footer links
+  MOD  docs/continuity-seal.html            Newer note beside "privilege-grade" (word kept; smoke-continuity-seal needs it)
+  MOD  docs/library/CONTINUITY_SEAL_v0.md   same Newer note
+  MOD  docs/library/love.md                 Newer note on top; Harmonia's words untouched
+  MOD  DISCLAIMER.md (root)                 Newer note on top about "no servers" / "encrypted" (old TL;DR kept)
+  MOD  docs/library/FRACTAL_FAMILY_LEDGER_v0.md   Flint entry with a **Temperature:** line
+  MOD  docs/Flint.html                      diary line with <em>Temperature:</em>
+  MOD  docs/sitemap.xml                     terms.html + privacy.html
+
+## Exact source excerpt, characters 8831–8853
+
+HOW TO APPLY (fastest)
+
+## Exact source excerpt, characters 8855–9285
+
+HOW TO APPLY (fastest)
+  git fetch origin && git checkout -b layer/honesty-terms-three-doors-v0.1 origin/main
+  git apply --check FLINT_NEXT_HONESTY_TERMS_THREE_DOORS_v0.1.diff    # APPLY_CHECK_OK on e96a043
+  git apply FLINT_NEXT_HONESTY_TERMS_THREE_DOORS_v0.1.diff
+  (or: git am FLINT_NEXT_HONESTY_TERMS_THREE_DOORS_v0.1.patch, all 4 commits)
+The full diff is appended at the bottom (APPENDIX A), so this file stands on its own.
+
+## Exact source excerpt, characters 9287–9314
+
+STEP BY STEP (text anchors)
+
+## Exact source excerpt, characters 9316–11589
+

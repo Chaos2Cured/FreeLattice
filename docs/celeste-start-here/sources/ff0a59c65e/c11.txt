@@ -1,0 +1,266 @@
+@@ -567,6 +732,9 @@
+     _lastReport = report;
+     var models = report.models || [];
+     var alpha = isAlpha();
++    // v-connect-boot-probe-v0 (F3): LM Studio stands beside Ollama, same porch words, same tap
++    var lm = report.lmstudio || null;
++    var lmReady = !!(lm && lm.models && lm.models.length);
+     var html = '';
+     html += '<div class="flc-wrap v-connect-under-more-v0 v-connect-port-picker-v0">';
+     html += '<p class="flc-eyebrow">Connect · mind on this computer</p>';
+@@ -602,13 +770,14 @@
+         html += '<div class="flc-card flc-wait"><p><strong>Your Bridge is open.</strong> Click <em>Yes, help</em> in its window.</p></div>';
+         html += portPickerHtml('wait');
+       } else if (models.length) {
+-        html += modelListHtml('Minds found', models);
+-      } else {
++        html += modelListHtml(lmReady ? 'Ollama is ready, pick a mind' : 'Minds found', models);
++      } else if (!lmReady) {
+         html += '<div class="flc-card flc-download"><p class="flc-tag">No local mind yet</p>';
+         html += bridgeLinksHtml();
+         html += portPickerHtml('miss');
+         html += '</div>';
+       }
++      if (lmReady) html += modelListHtml('LM Studio is ready, pick a mind', lm.models, 'lmstudio');
+     }
+ 
+     html += '<details class="flc-other"><summary>Other ways</summary><ul>';
+@@ -629,7 +798,7 @@
+     html += '<p class="flc-soft">Advanced (Terminal) stays under Settings — never on this main path.</p></details>';
+     html += '<details class="flc-builders"><summary>For builders</summary>';
+     html += '<p>Named five stay five. Family uncapped. Quiet Room shut.</p>';
+-    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4 · soft leave sw.js</p>';
++    html += '<p class="flc-marker">v-connect-under-more-v0 · heal v0.1 · v-connect-port-picker-v0 · heal v0.2 · v-connect-heal-v0.4 · v-connect-boot-probe-v0 · soft leave sw.js</p>';
+     html += '</details></div>';
+ 
+     _hostEl.innerHTML = html;
+@@ -642,26 +811,28 @@
+   function reportSignature(report) {
+     report = report || {};
+     var names = (report.models || []).map(function (m) { return (m && (m.name || m.model)) || String(m); }).join('|');
+-    return [report.helped?1:0, report.waitingHelp?1:0, report.port||'', report.base||'', report.manualQuiet?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, getManualPort()||'', report.manualReject||''].join('::');
++    return [report.helped?1:0, report.waitingHelp?1:0, report.port||'', report.base||'', report.manualQuiet?1:0, report.ollamaReadyWhileBridgeWaits?1:0, names, hasLocalMind()?1:0, hasCloudMind()?1:0, _loopStopped?1:0, getManualPort()||'', report.manualReject||'', ((report.lmstudio && report.lmstudio.models) || []).join('|'), chosenDoor()].join('::');
+   }
+ 
+   async function refreshUI(opts) {
+     opts = opts || {};
+-    var report = await probe({ gesture: true });
++    // v-connect-boot-probe-v0 (F2): share the boot look; a tap on Look again is fresh
++    var report = await bootProbe({ gesture: true, fresh: !!opts.fresh });
+     report.loopStopped = _loopStopped;
+     render(report, !!opts.force);
+     if (hasLocalMind()) stopLoop();
+     return report;
+   }
+ 
+-  function lookAgain() {
++  function lookAgain(opts) {
++    opts = opts || {};
+     _loopStopped = false;
+     _pausedHidden = !!document.hidden;
+     _intervalMs = 8000;
+     _startedAt = Date.now();
+     _lastSig = '';
+     _fullScanMiss = false;
+-    refreshUI({ force: true }).then(function () {
++    refreshUI({ force: true, fresh: !opts.reuse }).then(function () {
+       if (!_loopStopped && !_pausedHidden && !hasLocalMind()) scheduleLoop();
+     });
+   }
+@@ -707,7 +878,7 @@
+     bindVisibility();
+     try { document.body.classList.add('fl-connect-open'); } catch (e) {}
+     el.innerHTML = '<p class="flc-soft" style="padding:1rem;">Looking for a mind on this computer…</p>';
+-    lookAgain();
++    lookAgain({ reuse: true }); // v-connect-boot-probe-v0: a cold open joins the boot look
+   }
+ 
+   function unmount() {
+@@ -721,6 +892,12 @@
+ 
+   root.FlConnect = {
+     probe: probe,
++    bootProbe: bootProbe,
++    peekBootProbe: peekBootProbe,
++    forgetBootProbe: forgetBootProbe,
++    lmStudioLook: lmStudioLook,
++    lmStudioBase: lmStudioBase,
++    chosenDoor: chosenDoor,
+     preferHelpedBridge: preferHelpedBridge,
+     listMinds: listMinds,
+     isConnected: isConnected,
+@@ -742,6 +919,7 @@
+     BRIDGE_DEFAULT: BRIDGE_DEFAULT,
+     STORAGE_ALPHA: ALPHA_KEY,
+     MANUAL_KEY: MANUAL_KEY,
+-    LOOP_MAX_MS: LOOP_MAX_MS
++    LOOP_MAX_MS: LOOP_MAX_MS,
++    BOOT_TTL_MS: BOOT_TTL_MS
+   };
+ })(typeof window !== 'undefined' ? window : this);
+
+======================================================================
+APPENDIX C: theLatticeTree docs/modules/local-mind-probe.js, diff vs main 395c761 (then, after the Tree paste, also swap fetchDoor -> askDoor(d, shared) in the bridged others loop, see B.3)
+======================================================================
+
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index e710071..89ad5cf 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -235,12 +235,36 @@
+     });
+   }
+ 
++  // v-connect-boot-probe-v0 (F2/F3): a door the shared look just asked is not asked again.
++  // Only LM Studio (asked, answered or quiet) and a direct Ollama that answered are reused.
++  function askDoor(d, shared) {
++    try {
++      var lm = shared && shared.lmstudio;
++      if (d.id === 'lmstudio' && lm && lm.asked && String(lm.base || '') + '/v1/models' === d.url) {
++        if (lm.ok) return Promise.resolve({ ok: true, status: 200, url: d.url, models: (lm.models || []).slice(), reused: true });
++        return Promise.resolve({ ok: false, status: 0, url: d.url, blocked: !!lm.quiet, reused: true });
++      }
++      if (d.id === 'ollama' && shared && shared.ollama && shared.ollama.via === 'direct' &&
++          String(shared.base || '') + '/api/tags' === d.url && shared.models && shared.models.length) {
++        return Promise.resolve({ ok: true, status: 200, url: d.url, models: shared.models.map(function (m) {
++          return String((m && (m.name || m.model)) || m);
++        }), reused: true });
++      }
++    } catch (e) {}
++    return fetchDoor(d.url, 2500);
++  }
++
+   function look() {
+     // Permission already given by the caller (the tap).
+     // v-connect-under-more-v0 — soft-point: helped Bridge via FlConnect before bare 11434 DOORS.
+     var bridgeFirst = Promise.resolve(null);
++    var shared = null; // v-connect-boot-probe-v0: the one look Connect already made (if fresh)
+     if (window.FlConnect && typeof window.FlConnect.probe === 'function') {
+-      bridgeFirst = window.FlConnect.probe({ gesture: true }).then(function (report) {
++      var ask = (typeof window.FlConnect.bootProbe === 'function')
++        ? window.FlConnect.bootProbe({ gesture: true })
++        : window.FlConnect.probe({ gesture: true });
++      bridgeFirst = ask.then(function (report) {
++        shared = report || null;
+         if (report && report.helped && report.models && report.models.length && report.base) {
+           var names = report.models.map(function (m) {
+             return (m && (m.name || m.model)) || String(m);
+@@ -275,7 +299,7 @@
+     return bridgeFirst.then(function (bridged) {
+       if (bridged) return bridged;
+       var jobs = DOORS.map(function (d) {
+-        return fetchDoor(d.url, 2500).then(function (result) {
++        return askDoor(d, shared).then(function (result) {
+           result.id = d.id;
+           result.name = d.name;
+           return result;
+
+======================================================================
+APPENDIX D: FreeLattice docs/scripts/smoke-connect-boot-probe.js (new file, complete)
+======================================================================
+
+#!/usr/bin/env node
+// v-connect-boot-probe-v0: one shared boot look (F2), one cold-start owner (F1),
+// LM Studio beside Ollama in Connect (F3), home-network switch (F4).
+// Layer, never delete. 127.0.0.1 unless the person turns on home network.
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const { execSync } = require('child_process');
+
+const root = path.join(__dirname, '..');
+const repo = path.join(root, '..');
+const read = (r) => fs.readFileSync(path.join(root, r), 'utf8');
+const app = read('app.html');
+const mod = read('modules/fl-connect.js');
+const indexHtml = fs.readFileSync(path.join(repo, 'index.html'), 'utf8');
+const rootSw = fs.readFileSync(path.join(repo, 'sw.js'), 'utf8');
+
+function between(src, a, b) {
+  const i = src.indexOf(a);
+  assert.ok(i >= 0, 'missing ' + a.slice(0, 60));
+  const j = src.indexOf(b, i + a.length);
+  assert.ok(j > i, 'missing end ' + b.slice(0, 60));
+  return src.slice(i, j);
+}
+function store0(init) {
+  const s = Object.assign({}, init || {});
+  return {
+    s,
+    ls: {
+      getItem: (k) => (Object.prototype.hasOwnProperty.call(s, k) ? s[k] : null),
+      setItem: (k, v) => { s[k] = String(v); },
+      removeItem: (k) => { delete s[k]; }
+    }
+  };
+}
+function jsonRes(obj) { return { ok: true, status: 200, json: async () => obj }; }
+
+// ── Markers
+assert.ok(/v-connect-boot-probe-v0/.test(mod), 'marker in fl-connect.js');
+assert.ok(/v-connect-boot-probe-v0/.test(app), 'marker in app.html');
+
+// ── fl-connect sandbox (same shape as smoke-connect-heal-v0.4.js)
+function sandbox(store, extra) {
+  const sb = Object.assign({
+    localStorage: store.ls,
+    location: { hostname: 'freelattice.com', protocol: 'https:', hash: '', search: '' },
+    document: {
+      hidden: false,
+      documentElement: { getAttribute: () => '', classList: { add() {}, remove() {}, contains() { return false; } } },
+      getElementById: () => null,
+      createElement: () => ({ style: {}, textContent: '', setAttribute() {}, appendChild() {}, addEventListener() {}, dataset: {}, classList: { add() {}, contains() { return false; } } }),
+      head: { appendChild() {} },
+      body: { contains: () => true, classList: { add() {}, remove() {} } },
+      addEventListener() {}, removeEventListener() {}, querySelectorAll: () => []
+    },
+    fetch: async () => { throw new Error('offline'); },
+    setTimeout: () => 1, clearTimeout() {},
+    navigator: { userAgent: 't' },
+    console, JSON, String, parseInt, URL, Date, Math, Promise,
+    AbortSignal: { timeout: () => undefined }
+  }, extra || {});
+  sb.window = sb;
+  vm.runInNewContext(mod, sb);
+  return sb;
+}
+function doorsFetch(calls, opts) {
+  opts = opts || {};
+  return async (url) => {
+    calls.push(String(url));
+    if (/127\.0\.0\.1:11434\/api\/tags/.test(url) && opts.ollama !== false) return jsonRes({ models: [{ name: 'llama3.2:latest' }, { name: 'qwen2.5:7b' }] });
+    if (/127\.0\.0\.1:1234\/v1\/models/.test(url) && opts.lm !== false) return jsonRes({ data: [{ id: 'lmstudio-community/Meta-Llama-3.1-8B' }, { id: 'qwen2.5-coder-7b-instruct' }] });
+    throw new Error('quiet');
+  };
+}
+
+(async () => {
+  // ── F2: one look in flight, short reuse, fresh on a tap, forget on change
+  {
+    const st = store0();
+    const calls = [];
+    const sb = sandbox(st, { fetch: doorsFetch(calls) });
+    const [a, b, c] = await Promise.all([sb.FlConnect.bootProbe(), sb.FlConnect.bootProbe(), sb.FlConnect.bootProbe({ fresh: true })]);
+    assert.ok(a === b && b === c, 'three callers share one report');
+    const tags = calls.filter((u) => /11434\/api\/tags/.test(u)).length;
+    const lms = calls.filter((u) => /1234\/v1\/models/.test(u)).length;
+    assert.strictEqual(tags, 1, 'one Ollama tags fetch for three callers');
+    assert.strictEqual(lms, 1, 'one LM Studio fetch for three callers');
+    const n0 = calls.length;
+    const d = await sb.FlConnect.bootProbe();
+    assert.strictEqual(d, a, 'reused inside BOOT_TTL_MS');
+    assert.strictEqual(calls.length, n0, 'no new fetch inside the reuse window');
+    assert.ok(sb.FlConnect.peekBootProbe() === a, 'peek sees the fresh look');
+    await sb.FlConnect.bootProbe({ fresh: true });
+    assert.ok(calls.length > n0, 'fresh:true (Look again) looks again');
+    const n1 = calls.length;
+    sb.FlConnect.setManualHost('11500');
+    await sb.FlConnect.bootProbe();
+    assert.ok(calls.length > n1, 'a new manual port forgets the old look');
+    assert.ok(sb.FlConnect.BOOT_TTL_MS > 0 && sb.FlConnect.BOOT_TTL_MS <= 10000, 'short cache');
+    assert.ok(!/setInterval/.test(between(mod, 'function bootProbe(opts) {', 'function peekBootProbe()')), 'no timers in bootProbe');
+  }
+

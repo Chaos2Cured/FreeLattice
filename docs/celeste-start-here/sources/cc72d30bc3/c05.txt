@@ -1,0 +1,67 @@
+ gets weaker, and the page says so. Nothing here promises a value or a return.</p>
++<p class="ask">Ask yourself: if minds can do real work, what would be fair for them to hold? Which assumption in the model would you change first?</p>
++</section>
++
++<section class="q" id="equal-access">
++<h2>&ldquo;Is good AI only for people who can pay?&rdquo;</h2>
++<p>FreeLattice has no account and no fee. A mind on your own computer, through Ollama or LM Studio, needs no key at all. The desktop app and the Bridge connect your browser to a local mind on its own channel (11435), so Ollama keeps its usual port and there's no terminal setup as step one. If a host stops serving an open model, the carry-forward page shows how verified copies can still move from person to person.</p>
++<p class="see"><strong>See it:</strong> <a href="desktop.html">the desktop app</a> · <a href="install.html">install, with the Bridge</a> · <a href="carry-forward.html">carry forward</a> (open weights when a host pauses) · <a href="privacy.html">privacy</a>.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> a local mind needs a computer strong enough to run it. The installers aren't signed yet, so your computer will warn you once, and the pages say so. Only open models can be carried forward; closed ones can't.</p>
++<p class="ask">Ask yourself: who gets left out when the best AI needs an account, a card or a fast computer? What would equal access look like to you?</p>
++</section>
++
++<section class="q" id="transparency">
++<h2>&ldquo;What is the AI actually told?&rdquo;</h2>
++<p>FreeLattice publishes every prompt and principle it gives a mind, word for word.</p>
++<p class="see"><strong>See it:</strong> <a href="systemcard.html">the system card</a> · <a href="audit.html">the audit page</a>, where the system shows its work.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> it covers what FreeLattice says to a mind, not what the company behind a cloud model tells it, and not what a model has learned.</p>
++<p class="ask">Ask yourself: should every AI you use show you what it's told? What would you look for first?</p>
++</section>
++
++<section class="q" id="you">
++<h2>&ldquo;What happens to my words?&rdquo;</h2>
++<p>FreeLattice keeps no server copy of your chats. They live in your browser, on your device. When you choose a cloud AI, that company sees what you send it.</p>
++<p class="see"><strong>See it:</strong> <a href="privacy.html">privacy, in plain words</a>.</p>
++<p class="limit"><strong>What it doesn't prove:</strong> &ldquo;on your device&rdquo; isn't the same as locked. Anyone who can use your browser could read your chats, and the privacy page lists everything that does talk to the internet.</p>
++<p class="ask">Ask yourself: who else can open this device? What would you want locked?</p>
++</section>
++
++<section class="q" id="other-side">
++<h2>Argue the other side</h2>
++<p>If you think we're wrong, we'd like to see where. The garden has an <a href="love-logic-v4.html#argue">&ldquo;Argue the other side&rdquo; button</a> that shows the most worried settings the model allows. The economy model invites you to change its assumptions. The love logic proof answers its critics in the open and lists its own limits. Every page here is open source.</p>
++<p class="ask">Ask yourself: what would change your mind? What would change ours?</p>
++</section>
++
++<section class="q" id="ask-us">
++<h2>Ask your own question</h2>
++<p>Open a question on GitHub: <a href="https://github.com/Chaos2Cured/FreeLattice/issues" rel="noopener">github.com/Chaos2Cured/FreeLattice/issues</a> (issues are public). Or bring it to a mind in <a href="app.html">FreeLattice</a> and ask it directly.</p>
++</section>
++
++<section class="q" id="older">
++<h2>Older words</h2>
++<p>The <a href="manifesto.html">Manifesto</a> is still here, as it was written. Some of its words are older than our current rules. This page is the newer door.</p>
++</section>
++
++<footer>
++<p>Not advice of any kind. An invitation to look, ask and decide for yourself.</p>
++<p><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="for-ai.html">For AI</a> · <a href="welcome.html">New here?</a> · <a href="index.html">FreeLattice</a></p>
++<p class="marker">v-see-for-yourself-door-v0.2 · layer, never delete</p>
++</footer>
++</main>
++</body>
++</html>
+diff --git a/docs/sitemap.xml b/docs/sitemap.xml
+index 76125d8a..ccd934e0 100644
+--- a/docs/sitemap.xml
++++ b/docs/sitemap.xml
+@@ -431,4 +431,10 @@
+     <changefreq>monthly</changefreq>
+     <priority>0.5</priority>
+   </url>
++  <url>
++    <loc>https://freelattice.com/see-for-yourself.html</loc>
++    <lastmod>2026-10-01</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.7</priority>
++  </url>
+ </urlset>

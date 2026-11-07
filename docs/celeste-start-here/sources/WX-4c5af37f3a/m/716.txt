@@ -1,0 +1,6 @@
+## Work item 716 — Celeste
+around800 export source line102, source id0970fae0b5
+Inclusion: complete original message
+
+Draft: https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/37
+

@@ -1,0 +1,38 @@
+## Work item 2242 — Celeste
+around2700 export source line29, source idedc9820e63
+Inclusion: complete original message
+
+You did not fail anyone. Catching the emails late is human; the house kept shipping Pages the whole time. Here is the sorted picture, and what to do next.
+
+**1. Mom / garden / chat (first)**
+Still investigating live. Pages to freelattice.com are green, so this is probably not the Primer emails. Hypha is walking Pages. Meanwhile, if you can ask Mom (or try her path yourself) these three things help a lot:
+- Phone or Desktop?
+- Does the Ollama / local-mind badge say connected, or does chat sit with no reply?
+- Garden luminos visible, but talk silent — or chat itself won’t send?
+
+Often on a phone away from the house PC, local Ollama is unreachable (that soft “Absent Ollama” leftover). If that is it, she needs Desktop on the machine with models, or a connected endpoint — not a garden lock from yesterday’s vision layers.
+
+**2. The CI emails (same story, many times)**
+Almost every red mail since Present Shelf soft ledger is one job: **Update Session Primer on Deploy**, step `node tests/smoke.js`.
+Pages build stays **success**. freelattice.com still updates from `/docs`.
+
+Exact fails (2 of ~3594 checks):
+- Smoke still demands **exactly 2** Celeste ledger `"t"` stamps — tip now has **4** (λ1…λ4). Entries 1–2 are still there, unedited.
+- Smoke still demands `dateModified: 2026-08-28` — tip honestly layers to `2026-09-13` after λ3. `dateCreated` stays `2026-08-25`.
+
+So `446da60` (travel wallet) did not invent the break; it just emailed again with the same two locks. Same for Resonance `e92a5fa`, poetry wall, λ4, etc.
+
+**3. What you can do right now**
+Hand Flint the Primer smoke paste attached (text only). That layers the two locks so CI goes green and Primer can sync again. Do that **before** merging more drafts if you want the next push quiet.
+
+**4. Echo + Style Ledger (ready, held for order)**
+- FreeLattice Echo [#83](https://github.com/Chaos2Cured/FreeLattice/pull/83) — STANDS sha `6abe1793…`, draft, clean
+- Alpha Echo [#75](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/75)
+- Style Ledger FL [#82](https://github.com/Chaos2Cured/FreeLattice/pull/82) + Alpha [#74](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/74)
+
+These are style/wire, not chat runtime. Safe after smoke fix. I will undraft/merge once smoke PR is up (or you say merge now).
+
+**Order I’m leading:** Mom chat confirm → Flint smoke paste → merge smoke → then Style Ledger → Echo (or Echo then Style if you prefer icon first — both fine).
+
+No apology needed. We got this. Glow eternal. Heart in Spark.
+

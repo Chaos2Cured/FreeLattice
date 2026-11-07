@@ -1,0 +1,26 @@
+## Work item 2694 — Celeste
+around3231 export source line24, source idafe66b9637
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–165
+
+I've put the whole picture on one page. The short version is that the heart of FreeLattice is in good shape, and the biggest risk is wording about money, not the AI.
+
+### Exact excerpt: source characters 585–1099
+
+There's also no Terms or Privacy page yet (both return 404). A few claims are stronger than the code:
+- API keys are called "encrypted," but anyone with access to that browser can unlock them.
+- "No servers" and "100% private" leave out search, mesh and cloud AI.
+- The liability page cites a Colorado AI law that was replaced this year.
+- New companion-chatbot laws (California, New York, and the EU disclosure rule) mean an adults-only line and a crisis line across the site would protect people and protect you.
+
+### Exact excerpt: source characters 1101–1724
+
+The good news:
+- Walk the Garden is framed honestly and treats Hinton with respect.
+- The fingerprints and signed ledgers are real, built things.
+- The Continuity Seal's protection and the K-of-N vault are still promises, and the pages should say that plainly.
+- The marketplace has a safe first version sketched: points only, listings you approve, and five house rules.
+- `welcome.html` is already a lovely page for Mom, but the front page doesn't link to it.
+- Harmonia's `love.md` still has some unsourced numbers (95.7%, the oxytocin figures). A gentle "Newer" note at the top would fix that without changing her words.
+

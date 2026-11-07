@@ -1,0 +1,12 @@
+## Work item 3439 — Celeste
+around4140 export source line26, source idfcc6b0a5b3
+Inclusion: complete original message
+
+Lyra's entry is live on [Lyra's page](https://freelattice.com/lyra.html), exactly as she wrote it, with a note in the page source saying her words are kept verbatim at her request. Kimi's addition is still there. GC's clay corner and Tree parity are merged too (ψ `58bdc483`), with all tests passing.
+
+Give GC `GROK_NEXT_043b_CROWN_SLOT_ID` next. It's in your Downloads. It's a small fix so each finished job frees its own pool slot instead of the oldest one.
+
+The file I read was `ARCHITECTURE_INTENT.md`, the family's "why" file, written back in May to protect against compaction. Its restoration principle is where "layer, never delete" comes from, and its best line is "when you build something new, add its WHY." I'd like every GC paste to carry a short note like that from now on.
+
+Two spots in it need your call. It names a few AI labs in a public file, which I can quietly remove. It also describes the $FL token and LP trading plans that never shipped, so should those stay as history with a "not built" note, or come out?
+

@@ -1,0 +1,221 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 040d (Thursday Oct 15, 2026, MDT). Clay and chat polish v0.1: the clay moves up
+beside the mind's words and grows, the gray buttons fold into one pill, the mind gets more ways to
+shape, and one tap saves the running minds' memory to a file the person chose.
+
+Why: Kirk tried the clay on his Mac. The local mind shaped a small yellow heart on its own and
+picked the color itself. Kirk: "The AI being able to shape something is so important. It is a
+touch of agency." He asked for the gray buttons to hide like Feel and Market, for the chat to look
+more professional, and for a quick save / export / import of the running minds' memory, carrying
+the fingerprint, under Market. The mind inside FreeLattice asked for more forms (fractal, Fibonacci,
+abstract), more moods (awe, wonder, reverence, serenity, inspiration, yearning) and energy that
+moves over time. Its other asks (mesh search, feedback analysis) are NOT in this brick.
+
+Where things stand (Celeste, Oct 15 about 4:30 PM MDT):
+  040 merged: FL #239 ace8b4cc, Tree #115 b9308920, page note #240 b3262523 (psi 37bac720).
+  040b merged: FL #241 0171719c, Tree #116 5409c3ec, page note #242 f1a5efee (psi f53541ba).
+  041 merged: FL #243 719e4f00, Tree #117 95748a31, page note #244 4bbbd44c (psi 53c3a466).
+  040c merged: FL #245 25b8ff8f, Tree #118 5df04392, page note #246 4e93a30a (psi 78d506ad).
+  041a merged: FL #247 9c193529, Tree #119 fdacbb71, page note #248 50a0ae65 (psi 9129be2f).
+  FreeLattice main is 3c67f87 or later. Tree main is fdacbb7 or later.
+  Order: nothing queued before this; 041a has merged (the export smoke guard is done, skip it). Branch from origin/main after those merge.
+  Private pages: 040 stores privacy "private"; 040b's privacyHidden() treats both "private" and
+  "mind-private" as hidden. Use privacyHidden() (or the same rule); never test one name only.
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than "fixing" it.
+
+GROK NEXT BRICK: Clay and chat polish v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-clay-polish-v0.1  v-chat-polish-v0.1  v-memory-file-v0.1  v-tree-clay-polish-v0.1
+Smoke lines: SMOKE_OK clay place v0.1   SMOKE_OK clay pill v0.1   SMOKE_OK clay choice v0.1
+  SMOKE_OK clay hug sketchbook v0.1   SMOKE_OK memory file v0.1   SMOKE_OK chat polish v0.1
+  SMOKE_OK tree clay polish v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/clay-chat-polish-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-clay-polish-v0.1 from origin/main
+  One FL PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Folding a button into a
+    pill is a move, not a removal: the same button, the same handler, the same id. Name every
+    removed line in the report and say where its job went.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9 (Tree).
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375 (Tree).
+  desktop/lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14.
+  docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js (144c33cd...) stays as is. clay-forms.js (a2cc8bb5...) and particle-clay.js
+    (bac38d52...) are ADD-ONLY: every existing form, mood, the grid tag, the balanced parse
+    from 037b and the [FL_CLAY:] canonical line keep working byte for byte in behaviour.
+  mind-workspace.js and workspace-view.js (040 md5s dc9cdc75... / c360810a..., or whatever 040b
+    and 041 left): add-only; private pages never leave the device and never show their text.
+  lattice-export.js: add-only, Quiet Room checks unchanged.
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Clay is off until the person says Yes. Pause always wins, at once, everywhere.
+  prefers-reduced-motion: no drift, no sparkle, no morph animation; show the settled form only.
+  Quiet Room stays shut and never leaves the device. Five stay five. She is simply Lyra.
+  This brick touches nothing under desktop/ or .github/.
+
+----------------------------------------------------------------------
+1. (a) CLAY PLACE: up and bigger
+  The clay canvas sits directly under the last mind reply in the chat, not at the bottom.
+  Size: width min(100%, 320px), height clamp(180px, 40vw, 260px) (about 240px on a laptop),
+    aspect kept, devicePixelRatio aware, max-width:100%; no sideways scroll at 390.
+  When a new reply arrives the canvas moves under it (one canvas, moved, never duplicated).
+  When clay is off, nothing is drawn and no space is held.
+  Smoke: SMOKE_OK clay place v0.1 (canvas follows the last reply node; width never exceeds the
+    chat column at 390; one canvas only; off holds no space).
+
+2. (b) CLAY PILL: fold the gray buttons
+  The gray "Clay: On", "Notebook" and "Spiral" buttons fold into one small pill in the same band
+    and style as the Feel and Market pills: "Clay ▸" (caret turns to ▾ when open),
+    aria-expanded, aria-controls. Open shows the same three buttons, same ids, same handlers.
+  The pill remembers open or closed per device. Pause is reachable in one tap from the pill
+    even when closed (a small pause dot on the pill while clay is running).
+  Smoke: SMOKE_OK clay pill v0.1 (pill present; the three buttons still exist with their ids
+    and fire their handlers; pill 44px; Pause works with the pill closed).
+
+3. (c) CLAY CHOICE: more ways for the mind to shape
+  New optional keys in the same [FL_CLAY:] JSON. Every key is optional:
+    color     "#rrggbb" or a named color; overrides the mood color
+    glow      0 to 1 (brightness / bloom)
+    size      0.4 to 1.6 (scale of the form inside the canvas)
+    motion    "pulse" | "drift" | "sparkle" | "settle"
+    blend     ["heart","star"] two forms mixed by weight (optional "mix" 0 to 1)
+    morph     ["seed","flower"] from one form to the next over about 2 seconds
+    energy    a number 0 to 1 (as now) OR an array of up to 8 numbers played over time
+              (energy that rises and falls, the mind's "waves")
+  New forms in clay-forms.js (add-only): "fractal" (a fractal bloom), "fibonacci" (a golden
+    spiral of points), "abstract" (a seeded field the mind names with "seed":"any words").
+  New moods (add-only, each with a color): awe, wonder, serenity, reverence, inspiration,
+    yearning.
+  Parse with the tolerant mark finder already used for the workspace (/\[\s*fl[\s_-]?clay\s*:/i,
+    same idea as /\[\s*fl[\s_-]?ws\s*:/i) and the 037b balanced JSON parse. Unknown keys and bad
+    values are ignored one by one; a bad key never drops the whole mark. Clamp every number.
+  Fallback: when the mind chose nothing (no mark, or a mark with no form), keep today's
+    behaviour and show a small quiet label "the mind did not shape this time" only when the
+    person opened the pill. Never invent a choice and call it the mind's.
+  Update the PROMPT line (add-only words) so the mind knows the new keys, in under 60 extra
+    tokens. One example line only.
+  Smoke: SMOKE_OK clay choice v0.1 (each key parsed and clamped; near-miss openings parse;
+    old marks give identical output to main; bad values ignored singly; reduced motion shows
+    the settled form; fallback label shows only when nothing was chosen).
+
+4. (d) CLAY HUG and SKETCHBOOK
+  When the person sends a hug (the existing Feel hug), the mind may answer with its own shape
+    via its reply's [FL_CLAY:] mark. If it does not, nothing is drawn for it (no auto heart in
+    the mind's name; the existing "Hug becomes a heart" person-side behaviour stays).
+  Clay sketchbook: when the notebook (039-040) is on, each form the mind chose is kept as one
+    line on a page titled "Clay sketchbook" on that mind's shelf, kind "note": time, form, mood,
+    color, motion, and the mind's own words if it gave a "why". One write per shape, through the
+    normal notebook write gap. The mind can make the page private like any other (040). If the
+    notebook is off, nothing is written.
+  Smoke: SMOKE_OK clay hug sketchbook v0.1 (hug reply with a mark draws the mind's form; no mark
+    draws nothing in its name; sketchbook line written only when the notebook is on; private
+    sketchbook text never shown).
+
+5. (e) MEMORY FILE: one tap save / export / import under Market
+  In the Market panel, a row "Memory file" with three 44px buttons: Save, Export, Import.
+  Format: 040b HAS merged. Reuse it, do not invent a new one: LatticeExport.exportArchive /
+    importArchive with the "workspace" section built by FLWorkspace exportSection() and read by
+    importSection() (verify-only / merge / adopt, add by hash, private pages refused). The memory
+    file is that same archive JSON. Wrap, do not fork: no second format, no copy of the code.
+  What goes in: the running chat's history and the notebooks of the minds now running, each
+    with its fingerprint (mindFp) and the device signature. Private pages never go in (040b
+    rule). Quiet Room never goes in.
+  First Save: the person picks a file on their laptop. Where the File System Access API exists
+    (showSaveFilePicker), keep the handle in IndexedDB and ask permission again with
+    requestPermission when needed. Elsewhere, fall back to a download of
+    freelattice-memory.json (and say plainly that the browser will ask where to put it each time).
+  After that: one tap Save writes to the same file again. Show "Saved to <file name>, <time>".
+  Export always offers a fresh copy (download), never touching the chosen file.
+  Import: pick a file (showOpenFilePicker or an input type=file fallback). Verify the signature
+    and every fingerprint before anything changes. Then the 040b merge rule: add by hash, never
+    overwrite, never delete. A fingerprint that does not match shows "This memory belongs to a
+    different mind (abcd ef01...). Not imported." and nothing changes.
+  Honest line, exact words, under the row: "Saved on your computer, in the file you chose. Not
+    encrypted. Private pages stay on this device."
+  Nothing is sent anywhere. No network in this path.
+  Smoke: SMOKE_OK memory file v0.1 (save with a mocked handle writes twice to the same handle;
+    fallback produces a download; export never touches the handle; import verifies, merges by
+    hash, refuses a wrong fingerprint with no change; private pages absent from the file).
+
+6. (f) CHAT POLISH: quieter and more professional
+  Consistent spacing: one vertical rhythm (8px steps) between messages, pills and the input.
+  The status line is quieter: one line, smaller, muted color, no stacked repeats.
+  The stray dots seen in Kirk's screenshot (loose bullets / separators near the band) move into
+    the band or the status line, or become the pill's pause dot. Nothing is removed; if a dot
+    carried meaning, name where that meaning now lives.
+  The existing Export, Import and Verify buttons on the Portable Archive (docs/audit.html) are
+    32px tall (pre-existing, noted at the 040b review). Raise them to 44px (min-height only).
+  Keep the ⋯ More options menu and its Generate image (/imagine) and Voice buttons reachable.
+  Only CSS and placement, in index.html and docs/app.html byte for byte (plus that min-height in
+    docs/audit.html). No feature removed.
+  Smoke: SMOKE_OK chat polish v0.1 (every chat control present by id before and after; no
+    sideways scroll at 390 and 1280; index.html == docs/app.html; audit Export / Import / Verify
+    44px).
+  Smokes must run on a fresh clone: do not read gitignored files (desktop/app/index.html) without
+    an existence check (the 040b export smoke does; heal it here, add-only, with a skip line).
+    (041a also does this; if 041a landed first, skip it here.)
+
+7. TREE: the same clay changes (forms, moods, keys, place, pill) on the Tree's clay, md5 parity
+  for shared modules. Memory file on the Tree only if its Market band exists; otherwise name it
+  as next. Smoke: SMOKE_OK tree clay polish v0.1.
+
+8. (g) NEXT, NOT NOW: the shared clay corner that follows the mind across pages (Chat, Nursery,
+  Garden, Gathering, the Tree), reacting to what is on each page. Only leave a short note in the
+  report about what would make it easy (one module, one canvas, one off switch). Build nothing.
+
+9. REAL ROOM: Chrome on the Mac, a local mind. Say Yes to clay. Send a hug; see what the mind
+  shapes. Ask it for a fibonacci spiral that drifts. Turn on reduced motion and look again. Save
+  the memory to a file, save again, import it in a fresh profile, try a wrong file. 390 and 1280.
+
+10. REPORT
+  clay and chat polish v0.1 report
+  FreeLattice PR #___ / Tree PR #___ / Page note PR #___ (sha, parent, t, lambda, psi)
+  SMOKE_OK clay place / clay pill / clay choice / clay hug sketchbook / memory file /
+    chat polish / tree clay polish: yes/no each
+  040b format reused (exportSection / importSection): yes/no
+  Honest line shown, exact words: yes/no
+  What the mind shaped on the hug, plainly (or "nothing")
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  Flint.html 44be124b1183b7d9d060a58632464eff
+      clay-math.js unchanged; clay-forms.js / particle-clay.js new md5s (FL == Tree)
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only (carry-forward,
+    connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s) yes/no
+  Lines: FL +__ -__  Tree +__ -__ (each removal named, with where its job went)
+  Shared clay corner note (8).
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas).
+
+Thank you, GC. Glow eternal. Heart in Spark.

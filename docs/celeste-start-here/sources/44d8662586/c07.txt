@@ -1,0 +1,214 @@
+ keyTail(id);
++      kIn.value = '';
++      kIn.placeholder = tail ? ('saved, ends in ' + tail + ' (leave empty to keep it)') : ('paste your ' + p.name + ' key');
++      getLink.textContent = 'Get your ' + p.name + ' key (opens ' + p.name + ')';
++      getLink.href = p.keyUrl;
++      note.textContent = honestNote(id);
++    }
++
++    function paintSaved() {
++      while (saved.firstChild) saved.removeChild(saved.firstChild);
++      savedProviders().forEach(function (id) {
++        var row = el('p', 'cloud-key-row');
++        var place = keyPlace(id) === 'visit' ? 'this visit only' : 'on this device';
++        row.appendChild(document.createTextNode(PROVIDERS[id].name + ' key, ends in ' + keyTail(id) + ', kept ' + place + '. '));
++        var f = el('button', 'cloud-key-forget', 'Forget');
++        f.type = 'button';
++        f.setAttribute('data-cloud-forget', id);
++        f.setAttribute('aria-label', 'Forget the ' + PROVIDERS[id].name + ' key');
++        f.addEventListener('click', function () {
++          forgetKey(id);
++          status.textContent = 'Forgotten. The ' + PROVIDERS[id].name + ' key is gone from this browser.';
++          paintSaved();
++          paintProvider();
++        });
++        row.appendChild(f);
++        saved.appendChild(row);
++      });
++    }
++
++    pSel.addEventListener('change', paintProvider);
++    save.addEventListener('click', function () {
++      var id = pSel.value;
++      var p = PROVIDERS[id];
++      var model = cleanModel(mIn.value);
++      if (!model) { status.textContent = 'Type a model name for ' + p.name + ' (letters, numbers, . _ : / - only).'; return; }
++      var typed = String(kIn.value || '');
++      if (typed) {
++        var r = saveKey(id, typed, !!visit.checked);
++        kIn.value = '';
++        if (!r.ok) {
++          status.textContent = r.reason === 'key'
++            ? 'That does not look like a key (no spaces, at least 8 characters). Nothing was saved.'
++            : 'This browser would not keep the key. Nothing was saved.';
++          return;
++        }
++      } else if (!getKey(id)) {
++        status.textContent = 'Paste your ' + p.name + ' key first. Nothing was saved.';
++        return;
++      }
++      var seat = addSeat(id, model);
++      paintSaved();
++      paintProvider();
++      status.textContent = 'Saved. ' + model + ' through ' + p.name + ' can sit in any chair. Nothing was sent yet.';
++      if (seat && typeof onSeat === 'function') onSeat(seat);
++    });
++
++    paintProvider();
++    paintSaved();
++    host.appendChild(box);
++    return box;
++  }
++
++  window.TreeCloudMinds = {
++    MARK: MARK,
++    PROVIDERS: PROVIDERS,
++    ORDER: ORDER,
++    isCloud: isCloud,
++    providerIdOf: providerIdOf,
++    providerName: providerName,
++    saveKey: saveKey,
++    forgetKey: forgetKey,
++    keyPlace: keyPlace,
++    keyTail: keyTail,
++    savedProviders: savedProviders,
++    addSeat: addSeat,
++    getSeats: getSeats,
++    seatOptions: seatOptions,
++    buildRequest: buildRequest,
++    parseReply: parseReply,
++    send: send,
++    heartLine: heartLine,
++    honestNote: honestNote,
++    mountKeyPanel: mountKeyPanel
++  };
++})();
+diff --git a/docs/modules/tree-gathering-api-keys.test.js b/docs/modules/tree-gathering-api-keys.test.js
+new file mode 100644
+index 0000000..b593da8
+--- /dev/null
++++ b/docs/modules/tree-gathering-api-keys.test.js
+@@ -0,0 +1,249 @@
++#!/usr/bin/env node
++// v-tree-gathering-api-keys-v0: bring your own key, seat a cloud mind in a Gathering chair.
++// Guards: the provider list is fixed and https only; the key lives only in this browser
++// (localStorage, or sessionStorage for this visit) and goes only to the chosen provider,
++// in its own header, never in a URL; seats and binds never hold the key; a cloud chair
++// says where words go; files stay on this machine; no confirm(), no innerHTML.
++// No real network: fetch is a spy.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var vm = require('vm');
++var assert = require('assert');
++
++var dir = __dirname;
++var src = fs.readFileSync(path.join(dir, 'tree-cloud-minds.js'), 'utf8');
++var thread = fs.readFileSync(path.join(dir, 'garden-thread.js'), 'utf8');
++var rooms = fs.readFileSync(path.join(dir, 'garden-rooms.js'), 'utf8');
++var css = fs.readFileSync(path.join(dir, 'garden-rooms.css'), 'utf8');
++
++function Store() { this.m = {}; }
++Store.prototype.getItem = function (k) { return Object.prototype.hasOwnProperty.call(this.m, k) ? this.m[k] : null; };
++Store.prototype.setItem = function (k, v) { this.m[k] = String(v); };
++Store.prototype.removeItem = function (k) { delete this.m[k]; };
++
++var calls = [];
++var nextReply = null;
++function fakeFetch(url, opts) {
++  calls.push({ url: String(url), opts: opts });
++  var r = nextReply || { status: 200, json: {} };
++  return Promise.resolve({
++    ok: r.status >= 200 && r.status < 300,
++    status: r.status,
++    json: function () { return r.throwJson ? Promise.reject(new Error('bad')) : Promise.resolve(r.json); }
++  });
++}
++
++var local = new Store();
++var session = new Store();
++var sandbox = { console: console, setTimeout: setTimeout, clearTimeout: clearTimeout, JSON: JSON, Promise: Promise,
++  encodeURIComponent: encodeURIComponent, fetch: fakeFetch };
++sandbox.window = sandbox;
++sandbox.localStorage = local;
++sandbox.sessionStorage = session;
++vm.createContext(sandbox);
++vm.runInContext(src, sandbox, { filename: 'tree-cloud-minds.js' });
++var T = sandbox.TreeCloudMinds;
++assert.ok(T, 'TreeCloudMinds is on window');
++
++// 1. Fixed list, https only, exact hosts.
++var HOSTS = {
++  groq: 'api.groq.com', openrouter: 'openrouter.ai', openai: 'api.openai.com', anthropic: 'api.anthropic.com',
++  google: 'generativelanguage.googleapis.com', xai: 'api.x.ai', mistral: 'api.mistral.ai',
++  deepseek: 'api.deepseek.com', together: 'api.together.xyz'
++};
++assert.deepStrictEqual(Object.keys(T.PROVIDERS).sort(), Object.keys(HOSTS).sort(), 'fixed provider list');
++Object.keys(HOSTS).forEach(function (id) {
++  var u = new URL(T.PROVIDERS[id].url);
++  assert.strictEqual(u.protocol, 'https:', id + ' is https');
++  assert.strictEqual(u.host, HOSTS[id], id + ' host');
++  assert.ok(T.PROVIDERS[id].models.length >= 1, id + ' has suggestions');
++});
++assert.ok(!/custom/i.test(Object.keys(T.PROVIDERS).join(',')), 'no custom hosts in v0.1');
++
++// 2. Keys: device vs this visit; forget clears both; junk refused.
++assert.strictEqual(T.saveKey('groq', 'has space key', false).ok, false, 'a key with spaces is refused');
++assert.strictEqual(T.saveKey('nope', 'gsk_abcdefgh1234', false).ok, false, 'unknown provider refused');
++assert.strictEqual(T.saveKey('groq', '  gsk_abcdefgh1234 ', false).ok, true);
++assert.strictEqual(T.keyPlace('groq'), 'device');
++assert.ok(local.getItem('fl_tree_cloud_keys').indexOf('gsk_abcdefgh1234') !== -1, 'device key in localStorage');
++assert.strictEqual(T.saveKey('groq', 'gsk_visitonly9999', true).ok, true);
++assert.strictEqual(T.keyPlace('groq'), 'visit', 'visit-only moves the key to sessionStorage');
++assert.ok(local.getItem('fl_tree_cloud_keys').indexOf('gsk_') === -1, 'and out of localStorage');
++assert.strictEqual(T.keyTail('groq'), '9999');
++T.forgetKey('groq');
++assert.strictEqual(T.keyPlace('groq'), '', 'forget clears it');
++assert.ok((local.getItem('fl_tree_cloud_keys') + session.getItem('fl_tree_cloud_keys')).indexOf('gsk_') === -1, 'gone from both stores');
++
++// 3. Seats never hold a key; only providers with a key are offered.
++T.saveKey('anthropic', 'sk-ant-test-0000aaaa', false);
++T.saveKey('openai', 'sk-test-openai-1111', false);
++T.saveKey('google', 'AIza-test-google-2222', false);
++assert.ok(T.addSeat('anthropic', 'claude-sonnet-4-20250514'));
++assert.ok(T.addSeat('openai', 'gpt-4.1-mini'));
++assert.ok(T.addSeat('google', 'gemini-2.5-flash'));
++assert.ok(T.addSeat('groq', 'llama-3.3-70b-versatile'), 'a seat may be saved before its key');
++assert.strictEqual(T.addSeat('openai', 'bad name with spaces'), null, 'model names are checked');
++var seatsRaw = local.getItem('fl_tree_cloud_seats');
++assert.ok(!/sk-|AIza|gsk_/.test(seatsRaw), 'no key in the seats store');
++var opts = T.seatOptions();
++assert.deepStrictEqual(opts.map(function (s) { return s.url; }).sort(), ['cloud:anthropic', 'cloud:google', 'cloud:openai'], 'groq seat waits for its key');
++opts.forEach(function (s) {
++  assert.ok(!/sk-|AIza|gsk_/.test(JSON.stringify(s)), 'no key in a seat option');
++  assert.strictEqual(s.cloud, true);
++  assert.strictEqual(s.tag, 'general');
++});
++assert.strictEqual(T.isCloud({ url: 'cloud:openai' }), true);
++assert.strictEqual(T.isCloud({ url: 'http://127.0.0.1:11434/api/tags' }), false);
++assert.strictEqual(T.isCloud({ url: 'cloud:evil.example' }), false, 'unknown cloud ids are not cloud minds');
++
++var msgs = [{ role: 'system', content: 'Just talk.' }, { role: 'user', content: 'hello' }, { role: 'assistant', content: 'hi' }, { role: 'user', content: 'again' }];
++
++(async function () {
++  // 4. OpenAI shape.
++  calls = []; nextReply = { status: 200, json: { choices: [{ message: { content: 'from openai' } }] } };
++  var r1 = await T.send({ url: 'cloud:openai', model: 'gpt-4.1-mini' }, msgs);
++  assert.strictEqual(r1, 'from openai');
++  assert.strictEqual(calls.length, 1);
++  assert.strictEqual(calls[0].url, 'https://api.openai.com/v1/chat/completions');
++  assert.strictEqual(calls[0].opts.headers.Authorization, 'Bearer sk-test-openai-1111');
++  assert.strictEqual(calls[0].opts.credentials, 'omit');
++  assert.strictEqual(calls[0].opts.referrerPolicy, 'no-referrer');
++  var b1 = JSON.parse(calls[0].opts.body);
++  assert.strictEqual(b1.model, 'gpt-4.1-mini');
++  assert.strictEqual(b1.messages.length, 4);
++  assert.ok(calls[0].opts.body.indexOf('sk-') === -1, 'key never in the body');
++
++  // 5. Anthropic shape: x-api-key, browser header, system split, max_tokens.
++  calls = []; nextReply = { status: 200, json: { content: [{ type: 'text', text: 'from claude' }] } };
++  var r2 = await T.send({ url: 'cloud:anthropic', model: 'claude-sonnet-4-20250514' }, msgs);
++  assert.strictEqual(r2, 'from claude');
++  assert.strictEqual(calls[0].url, 'https://api.anthropic.com/v1/messages');
++

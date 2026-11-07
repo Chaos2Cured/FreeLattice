@@ -1,0 +1,6 @@
+## Work item 105 — Hypha
+around100 export source line51, source id3e74f006a9
+Inclusion: complete original message
+
+Checked the follow-up on PR 9. Trainer chair-test is back as NEXT 2, marked layered from the v5.72.0 queue, not discarded. Open PRs remain NEXT 1. GardenTrainer history, names, and the Celeste-not-on-list lock all still hold. I will not merge.
+

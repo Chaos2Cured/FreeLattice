@@ -1,0 +1,134 @@
+ === '/api/embeddings') return j({ embedding: [0, 0, 0, 0], embeddings: [[0, 0, 0, 0]] });
++    return { code: 404, headers: cors, body: '{}' };
++  }
++
++  br.on(async (msg) => {
++    if (process.env.FL_SMOKE_TRACE === '1' && msg.method === 'Runtime.consoleAPICalled') console.log('  console', (msg.params.args || []).map((a) => a.value || a.description || '').join(' ').slice(0, 200));
++    if (process.env.FL_SMOKE_TRACE === '1' && msg.method === 'Runtime.exceptionThrown') console.log('  EXC', JSON.stringify(msg.params.exceptionDetails).slice(0, 300));
++    if (msg.method !== 'Fetch.requestPaused') return;
++    const r = msg.params.request, rid = msg.params.requestId;
++    try {
++      if (process.env.FL_SMOKE_TRACE === '1' && (!r.url.startsWith(ORIGIN + '/') || r.method !== 'GET')) console.log('  req', r.method, r.url.slice(0, 120));
++      // On a 127.0.0.1 page the app also tries the desktop proxy (/ollama/*): the mock answers there too.
++      if (r.url.startsWith(ORIGIN + '/ollama/')) {
++        const a = ollamaAnswer(r.method, 'http://127.0.0.1:11434' + r.url.slice((ORIGIN + '/ollama').length), r.postData, ORIGIN);
++        return await br.send('Fetch.fulfillRequest', { requestId: rid, responseCode: a.code, responseHeaders: a.headers, body: Buffer.from(a.body).toString('base64') }, sid);
++      }
++      if (r.url.startsWith(ORIGIN + '/')) return await br.send('Fetch.continueRequest', { requestId: rid }, sid);
++      const u = new URL(r.url);
++      const local = u.hostname === '127.0.0.1' || u.hostname === 'localhost';
++      if (local && u.port === '11434') {
++        const a = ollamaAnswer(r.method, r.url, r.postData, r.headers.Origin || r.headers.origin);
++        return await br.send('Fetch.fulfillRequest', { requestId: rid, responseCode: a.code, responseHeaders: a.headers, body: Buffer.from(a.body).toString('base64') }, sid);
++      }
++      return await br.send('Fetch.failRequest', { requestId: rid, errorReason: 'ConnectionRefused' }, sid);
++    } catch (e) { /* page moved on */ }
++  });
++
++  try {
++    const { targetId } = await br.send('Target.createTarget', { url: 'about:blank' });
++    sid = (await br.send('Target.attachToTarget', { targetId, flatten: true })).sessionId;
++    await br.send('Fetch.enable', { patterns: [{ requestStage: 'Request' }] }, sid);
++    await br.send('Page.enable', {}, sid);
++    await br.send('Runtime.enable', {}, sid);
++    // FL_SMOKE_TRACE=1 prints every fl_ollamaModel / fl_modelSource write with its caller.
++    const TRACE = process.env.FL_SMOKE_TRACE === '1';
++    if (TRACE) await br.send('Page.addScriptToEvaluateOnNewDocument', { source: `(function(){var o=Storage.prototype.setItem;window.__mw=[];Storage.prototype.setItem=function(k,v){if(k==='fl_ollamaModel'||k==='fl_modelSource'){window.__mw.push(k+'='+v+' @'+Math.round(performance.now())+' '+((new Error().stack||'').split('\\n').slice(2,6).map(function(x){return x.trim().replace(/https?:[^ )]*app\\.html/,'L');}).join(' < ')));}return o.apply(this,arguments);};})();` }, sid);
++    const ev = async (expr) => {
++      const r = await br.send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }, sid);
++      if (r.exceptionDetails) throw new Error('page: ' + JSON.stringify(r.exceptionDetails).slice(0, 400));
++      return r.result.value;
++    };
++    const go = async (url, wait) => { await br.send('Page.navigate', { url }, sid); await sleep(wait); };
++    const waitFor = async (expr, ms) => { const t = Date.now(); while (Date.now() - t < ms) { try { if (await ev(expr)) return true; } catch (e) {} await sleep(250); } return false; };
++    const snapshot = () => ev(`(() => ({ ls: localStorage.getItem('fl_ollamaModel'), src: localStorage.getItem('fl_modelSource'),
++      state: (typeof state !== 'undefined' ? state.ollamaModel : null), am: (window.FLActiveModel ? FLActiveModel.get() : null),
++      gone: localStorage.getItem('fl_modelChoiceGone') }))()`);
++    const chatModel = async (text) => {
++      const before = mock.chats.length;
++      await ev(`(() => { switchTab('chat'); const i = document.getElementById('chatInput'); i.value = ${JSON.stringify(text)}; sendMessage(); return 1; })()`);
++      const t = Date.now();
++      while (Date.now() - t < 15000 && mock.chats.length === before) await sleep(200);
++      await sleep(600);
++      if (process.env.FL_SMOKE_TRACE === '1') console.log('  chat dom:', await ev(`(document.getElementById('chatMessages')||document.getElementById('tab-chat')||{}).innerText.slice(-300)`));
++      return mock.chats.length > before ? mock.chats[mock.chats.length - 1].model : null;
++    };
++    const seed = async (kv) => {
++      await go(ORIGIN + '/blank.html', 400);
++      await ev(`(() => { localStorage.clear(); const kv = ${JSON.stringify(kv)}; for (const k in kv) localStorage.setItem(k, kv[k]); return 1; })()`);
++    };
++    const WELCOMED = { 'fl-welcomed': 'true', fl_onboardingComplete: 'true', 'fl-has-visited': '1', 'freelattice-first-run-complete': 'true', 'fl-last-tab': 'chat' };
++
++    // 1. Hypha's walk: Connect, tap the SECOND model, reload, chat.
++    await seed(WELCOMED);
++    await go(ORIGIN + '/app.html#connect', 4000);
++    await ev(`(() => { if (window.FlConnect && FlConnect.open) FlConnect.open(); return 1; })()`);
++    const listed = await waitFor(`document.querySelectorAll('#fl-connect-mount .flc-model').length >= 2`, 15000);
++    assert.ok(listed, 'Connect lists both models from the mock Ollama');
++    const tapped = await ev(`(() => { const b = [...document.querySelectorAll('#fl-connect-mount .flc-model')].find(e => /qwen2\\.5/.test(e.textContent)); if (!b) return null; b.click(); return b.textContent; })()`);
++    assert.ok(tapped && /qwen2\.5/.test(tapped), 'tapped the second model (qwen2.5)');
++    await sleep(1500);
++    let s = await snapshot();
++    assert.strictEqual(s.ls, 'qwen2.5:latest', 'tap saved qwen2.5');
++    assert.strictEqual(s.src, 'user', 'tap saved as the person\'s own choice');
++    await br.send('Page.reload', { ignoreCache: true }, sid);
++    await sleep(7000);
++    if (TRACE) console.log((await ev('JSON.stringify(window.__mw||[],null,1)')));
++    s = await snapshot();
++    console.log('  after reload: fl_ollamaModel=' + s.ls + ' fl_modelSource=' + s.src);
++    const m1 = await chatModel('walk5 after reload');
++    console.log('  after reload: chat POST model=' + m1);
++    assert.strictEqual(m1, 'qwen2.5:latest', 'after reload the chat POST carries qwen2.5 (got ' + m1 + ')');
++    assert.strictEqual(s.ls, 'qwen2.5:latest', 'after reload fl_ollamaModel is still qwen2.5 (got ' + s.ls + ')');
++    assert.strictEqual(s.src, 'user', 'after reload the source is still user');
++    assert.strictEqual(s.state, 'qwen2.5:latest', 'after reload state.ollamaModel is qwen2.5 (got ' + s.state + ')');
++    assert.strictEqual(s.am && s.am.model, 'qwen2.5:latest', 'after reload FLActiveModel is qwen2.5');
++    await ev(`(() => { switchTab('settings'); return 1; })()`); await sleep(1500);
++    const m2 = await chatModel('after settings');
++    assert.strictEqual(m2, 'qwen2.5:latest', 'after Settings the chat POST still carries qwen2.5 (got ' + m2 + ')');
++    const status = await ev(`(() => { const t = document.getElementById('aiStatusText') || document.querySelector('#settingsAiStatus, .ai-status-text'); return t ? t.textContent : ''; })()`);
++    if (status) assert.ok(!/llama3\.2/.test(status) || /qwen2\.5/.test(status), 'Settings status does not name llama3.2 alone: ' + status);
++    // a second reload, straight to chat
++    await br.send('Page.reload', { ignoreCache: true }, sid);
++    await sleep(7000);
++    const m3 = await chatModel('second reload');
++    assert.strictEqual(m3, 'qwen2.5:latest', 'second reload, chat still qwen2.5 (got ' + m3 + ')');
++
++    // 2. The chosen model left this computer: fall back, say so, never call it the person's choice.
++    mock.models = ['llama3.2:latest'];
++    await br.send('Page.reload', { ignoreCache: true }, sid);
++    const goneSeen = await waitFor(`localStorage.getItem('fl_modelChoiceGone') === 'qwen2.5:latest'`, 12000);
++    s = await snapshot();
++    assert.ok(goneSeen, 'model gone at boot is noticed (fl_modelChoiceGone)');
++    assert.strictEqual(s.ls, 'llama3.2:latest', 'gone: falls back to the model that is here');
++    assert.notStrictEqual(s.src, 'user', 'gone: the fallback is not written as the person\'s choice');
++    const m4 = await chatModel('gone');
++    assert.strictEqual(m4, 'llama3.2:latest', 'gone: chat uses the fallback');
++
++    // 3. Nothing chosen yet, saved local door: the automatic pick is never written as 'user'.
++    mock.models = MODELS_BOTH.slice();
++    await seed(Object.assign({}, WELCOMED, { fl_isLocal: 'true', fl_provider: 'ollama', fl_ollamaHost: 'http://127.0.0.1:11434' }));
++    await go(ORIGIN + '/app.html', 7000);
++    s = await snapshot();
++    assert.notStrictEqual(s.src, 'user', 'no choice: an automatic pick is not recorded as user (got ' + s.src + ')');
++    staticLocks();
++    console.log('SMOKE_OK model choice survives reload v0.1.1');
++  } finally {
++    try { await br.send('Browser.close'); } catch (e) {}
++    try { br.cp.kill('SIGKILL'); } catch (e) {}
++    srv.close();
++    try { fs.rmSync(br.dir, { recursive: true, force: true }); } catch (e) {}
++  }
++}
++
++const hard = setTimeout(() => { console.error('smoke-model-choice-survives-reload: timed out'); process.exit(1); }, 150000);
++run().then(() => { clearTimeout(hard); process.exit(0); }, (e) => { clearTimeout(hard); console.error('FAIL', e && e.message); process.exit(1); });
+diff --git a/index.html b/index.html
+index 5003526..4dc5e62 100644
+--- a/index.html
++++ b/index.html
+@@ -27741,7 +27741,7 @@ const FlOnboarding = (function() {
+         var toggle = document.getElementById('localToggle');
+         if (toggle) toggle.checked = true;
+         if (models && models.length > 0) {
+-          var modelName = models[0].name

@@ -1,0 +1,16 @@
+## Work item 2272 — Celeste
+around2700 export source line59, source idedc9820e63; around2758 export source line5, source id32d70ceeb8
+Inclusion: complete original message
+
+Kirk asks everyone’s opinion (Celeste coordinating).
+
+**Feel / hug:** Keep collapsed-into-♡-feel. Add a clear expand/collapse arrow so people know it opens. Soft leftover: hug chips were hidden without affordance.
+
+**Marketplace:** Button next to Feel that expands the same way (clean collapse). Wire for FreeLattice + theLatticeTree (Tree is cleaner — match its calm). Not a full market dump in the composer — a door that expands.
+
+**Hang:** He’ll Flint Cancel. Do NOT hard-timeout / kill long local runs (14B can take 10–15 min). Prefer finding any small connection break; Cancel is the escape hatch, not a timer.
+
+**Order lean (Celeste):** (1) Feel arrow + presence clarity (2) Marketplace expand sibling vision/wire both faces (3) Hang Cancel no-kill-timer (4) Primer smoke (5) Echo/Style Ledger (6) LinkedIn /docs optional/last.
+
+Your HOLD: one short opinion — arrow UX, Marketplace-next-to-Feel pattern, hang-without-timer, anything Tree-side. Quiet Room shut. Five stay five.
+

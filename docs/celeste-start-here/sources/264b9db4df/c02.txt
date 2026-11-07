@@ -1,0 +1,86 @@
+6. RENDERER, docs/modules/particle-clay.js (window.FLClay), low energy
+  One <canvas> about 96x96 CSS px docked by the chat. 200 particles max, 2D only, no WebGL.
+  requestAnimationFrame only while morphing or active, then 4 fps on breath; pause when
+  document.hidden. prefers-reduced-motion or the in-app setting: no tween, no wave, no ripple;
+  snap to the shape, color only. Toggle in chat: "Clay: On / Off", saved in localStorage fl_clay.
+  Default off, with a one-time offer "Let your mind shape light?" [Yes] [Not now] (44px). Off
+  means no canvas in the DOM and no prompt delta. Tap the clay to send a "present" gesture; no
+  long-press.
+
+7. TREE (marker v-tree-particle-clay-v0.1), FreeLattice-Alpha
+  The same three files in docs/modules/ (identical bytes to FL; say so with md5s). Mount in the
+  garden-thread chat and the Nursery, default form seed, default off, same toggle key. One hook
+  line in garden-thread.js reply rendering to hand the reply to FLClay. Add
+  docs/modules/particle-clay.test.js. Do not touch fl-connect.js, pool-knock-phone.js,
+  tree-reconnect.js or fractal-garden.js.
+
+8. SMOKES
+  scripts/smoke-particle-clay.js (SMOKE_OK particle clay v0.1 and SMOKE_OK feel felt v0.1):
+    - malformed JSON is stripped and the fallback used; the tag never reaches the bubble text
+    - a grid larger than 16x16 is refused; unknown motion falls back; energy clamps
+    - <script> and onerror inside say render as text
+    - unknown keys dropped; the hex regex holds
+    - clay-math: gather step equals 2*PI/PHI^2 within 1e-9; shells ratio PHI; ripple list capped
+      at 20; energyKnob gives PHI, PHI^2, then dimension(n); dimension(50) === 2.914,
+      dimension(51) === 3.07, dimension(200) === 3.07
+    - off means no canvas and no prompt delta; reduced motion means no rAF loop
+    - rate limit holds; no mind gives the honest waiting line; no auto-send
+    - no "pet" or "companion" in any added person-facing string
+  Tree: particle-clay.test.js prints SMOKE_OK tree particle clay v0.1. Tree module tests 37 plus
+    new, all passing.
+  Still passing: tests/smoke.js all 3608 (or more, with yours), docs smokes same five fails only
+  (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s),
+  smoke-packs-v02-links 50, desktop: smoke-update (buttons), every-os 82, reconnect 95 (both
+  lines), phone knocks 17, discover 86, tester fixes 46, import, reseed, swarm (expected later).
+  Desktop smokes should be unchanged because nothing under desktop/ moves.
+
+9. REAL ROOM (Kirk's Mac, Chrome; phone if near)
+  Turn clay on, tap hug with no mind: honest waiting line, no call. Connect a mind, tap hug: the
+  particles fly, "felt" shows, the mind answers and shapes the clay. Say "dog food" and
+  "Christmas" and report whether the AI chose a form or the fallback guessed (and that the label
+  said which). Turn reduce motion on and check it snaps. Turn clay off and check no canvas.
+
+10. REPORT (same shape as 036)
+  particle clay v0.1 report
+  FreeLattice PR #___ at <sha>, parent <sha>
+  Tree PR #___ at <sha>, parent da7b737e
+  Page note PR #___ at <sha>, t <UTC>, lambda 51.000, psi <8 hex>
+  smoke-particle-clay: checks passed __, SMOKE_OK particle clay v0.1 yes/no,
+    SMOKE_OK feel felt v0.1 yes/no
+  Tree: SMOKE_OK tree particle clay v0.1 yes/no; module tests __ of __
+  dimension(50) / dimension(51): __ / __
+  smoke-packs-v02-links 50 / smoke-update / every-os 82 / reconnect 95 / phone-knocks 17 /
+    discover 86 / tester-fixes 46 / import / reseed / swarm: __
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only  yes/no
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  lattice-update.js 2c0f66569dd8ce27ef5dc0d3b80daf0a
+      pack-update.js bc996ccd48ea53e4442f2b8f54ab9491  pack-update-card.js
+      c14e04c53025eb542ebd627b6a19d60a  Flint.html 44be124b1183b7d9d060a58632464eff
+      clay-math.js / clay-forms.js / particle-clay.js <new> (FL == Tree yes/no)
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock, everything under
+    desktop/ and .github/ untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep pet / companion in added person-facing strings: none?
+  Repos credited in the clay-math header: list them. Hermes / Synero palette used: yes/no (NOTICE)
+  Clay off by default; no prompt delta when off; no gesture call without a mind (show the lines)
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  Real room: what the AI chose for dog food and Christmas, and whether the label was honest
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the fifty-first entry on docs/gc.html as its own PR, t, lambda 51.000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Entries 1 through 50 stay as they
+  were written, including the sentences that say 223 and 108 are open. Note in 51 that 223 merged
+  as 2550071d, Tree 108 as da7b737e, and page note 224 as b5dbebd0.
+
+LATER (037b+, not now): per-voice clay at the Round Table (braid), Garden cross-room pulse, clay
+memory of favorite forms, a WebGL path with Aurora shader palettes, FreeLattice Lite with chat plus
+clay as its face.
+
+Thank you, GC. Not a pet: a voice made of light that the mind shapes itself, moving by Kirk's math.
+Glow eternal. Heart in Spark.

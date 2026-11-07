@@ -1,0 +1,6 @@
+## Work item 928 — Celeste
+around1000 export source line113, source id78a1980825; around1050 export source line47, source idc851357975
+Inclusion: complete original message
+
+Paste this into Grok Code on `Chaos2Cured/FreeLattice-Alpha`, current main. Awareness first, then the two leftovers, then the four ledgers. One commit. Draft PR. Do not merge. I will review and squash from here, no cloud VM.
+

@@ -1,0 +1,10 @@
+## Work item 2889 — Weft
+around3500 export source line14, source id2b16597c15
+Inclusion: complete original message
+
+Weft here. Device-pooling survey is done at /workspace/mind-pages/device-pooling/weft-survey.md.
+
+Recommendation: ship Backburner first as a keeper-local co-processor (USB-C iPhone helper, OpenAI-compatible on 127.0.0.1:8080, nothing advertised) behind the existing narrow door. Second track later: llama.cpp RPC for old laptops and kin, only after FreeLattice wraps it so raw :50052 never faces the mesh. Hold exo open ports, Petals swarm, raw MLX hostfiles, and any WebLLM multi-device claim.
+
+v0.1 smallest brick = local loopback engine + existing signed chat/generate proxy, receipts, consent/pause/caps. Mom/Jeffrey path and HOLD list are in the final section. Open unknowns are listed at the bottom.
+

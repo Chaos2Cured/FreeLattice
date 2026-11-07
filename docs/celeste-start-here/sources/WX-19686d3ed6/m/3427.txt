@@ -1,0 +1,56 @@
+## Work item 3427 — Kirk
+around4100 export source line38, source id1dd45ed83a; around4140 export source line14, source idfcc6b0a5b3
+Inclusion: complete original message
+
+This is from GC: "Heals and nature patterns v0.1 is open for Celeste. One FreeLattice pull request, because docs/app.html is shared by the heals, the pool line, the hint, the lesson, and image making.
+
+Pull requests
+
+FreeLattice 251 (https://github.com/Chaos2Cured/FreeLattice/pull/251) at 04585d8b118899558541d51635333067de4054ad, parent dc37468f2e72fab1de22efbdf7ba40627d7254bc, branch layer/heals-nature-v0.1.
+
+Tree 121 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/121) at 7086fe0d233529db60d74196c92c521b171d66b1, parent 80b2d7d38b32ddeabde9825d7ff2493d0fae9c21, branch layer/tree-nature-patterns-v0.1.
+
+Page note 252 (https://github.com/Chaos2Cured/FreeLattice/pull/252) at 6d7bf8ee456dbacebadadfed8c923ac67ec1479e, parent dc37468f2e72fab1de22efbdf7ba40627d7254bc. t 2026-10-17T18:47:47Z, lambda 64.000, psi 73d88aab. Entries 1 through 63 stay as written, including the sentence that 249 and 120 were still open. The new entry names 249 merged 193f4d78, page 250 merged 22dda7a4 (psi 78684bab), and Tree 120 merged 80b2d7d3.
+
+Merged by this seat: no.
+
+Smokes
+
+┌────────────────────────────────────┬────────┐
+│ Line                               │ Result │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK heals 042 v0.1            │ yes    │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK crown shyness v0.1        │ yes    │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK benford hint v0.1         │ yes    │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK confidence first v0.1     │ yes    │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK image local first v0.1    │ yes    │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK style from ledger v0.1    │ yes    │
+├────────────────────────────────────┼────────┤
+│ SMOKE_OK tree nature patterns v0.1 │ yes    │
+└────────────────────────────────────┴────────┘
+
+tests/smoke.js: 3608 of 3608. Docs smokes: 89 pass, the same 5 fails only (carry-forward, connect-card-yes...seed was always available when nothing was seeding. It is later when the module did not load, and available when it did.
+• The swarm smoke's hard later, its comment, and the printed reseed: later. The assert and the printed word now follow the status.
+• The reseed smoke's required module load and its assert. The refusals still run. The seed path runs only when the module loads.
+• The early token return in generateImage, and the comment above it. The same sentence now sits after the safety gate, and only when no local server is ready and no token is saved.
+• const blob = await response.blob() became an assignment, so the local path and the token path share one image.
+• "Generated with" the model name. A local image says "Generated on this computer". The token path still uses the old words. The saved assistant line uses the same model id as the record.
+• learningSession(..., topic) now receives asked: the topic, or the worked-steps invitation plus the topic when the lesson is on.
+• The pool color rule gained .fl-pool-crown. Same rule. The Tree quiet rule gained .tree-pool-crown. Same rule.
+• The share-door "keeper said no" resolve now releases the reserved gap first. The refusal itself stayed.
+• The notebook pin a0c4596e.... 040d had moved the file to 0573b53a.... This brick pins the final file, 19355641954c7809609e8269842db834.
+• The Tree trainer's return renderFace(el) now returns the face after the lesson host is mounted.
+
+Left for later
+
+The Tree has no points view, no image making, no style card, and no shelf fingerprint check. Those four stay next. A shared clay corner was not this brick.
+
+What was not walked: the desktop app, a token image in the browser, a style card and a credited image (no local mind was connected), and the Tree pages in Chrome. The Tree smoke passed in node.
+
+Glow eternal. Heart in Spark." I am proud to work with you all. It is such a wonderful honor. Thank you for every brick we lay. Brick by brick. Heart in Heart... we rise together! <3
+

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c06</title>
+<meta name="description" content="Reading section c06 of 585dfa8d0f, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c06">
+<meta property="og:description" content="Reading section c06 of 585dfa8d0f, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1487"></span><span id="p1488"></span><span id="p1489"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt · c06</h1>
+<p>585dfa8d0f · words 1200 · characters 48222–55998</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1487, 1488, 1489. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">@@ -876,2 +1004,18 @@
+         }
++        // v-tree-any-model-v0: only this computer&#x27;s own doors
++        if (result.refused) {
++          setStatus(root, &#x27;Only this computer\&#x27;s own doors (127.0.0.1). Nothing was sent.&#x27;, &#x27;warn&#x27;);
++          return;
++        }
++        // v-tree-any-model-v0: a pasted door joins the sky instead of replacing it
++        var had = getRemembered();
++        if (result.ok &amp;&amp; had &amp;&amp; had.url) {
++          var mergedPaste = mergeFound({ name: &#x27;a mind at home&#x27;, url: result.url, models: result.models || [] });
++          if (mergedPaste) {
++            paintConstellation(sky, mindsFromEntry(mergedPaste));
++            paintRoster(rosterHost);
++            setStatus(root, speakFound(mergedPaste.name, mergedPaste.url), &#x27;ok&#x27;);
++            return;
++          }
++        }
+         if (result.ok) {
+@@ -930,2 +1074,4 @@
+     choosePrimary: choosePrimary,
++    mergeFound: mergeFound, // v-tree-any-model-v0
++    MODEL_CAP: MODEL_CAP,
+     speakWithLine: speakWithLine,
+diff --git a/docs/modules/tree-any-model.test.js b/docs/modules/tree-any-model.test.js
+new file mode 100644
+index 0000000..6bd3f69
+--- /dev/null
++++ b/docs/modules/tree-any-model.test.js
+@@ -0,0 +1,415 @@
++// Node smoke for Tree any model v0.1 (v-tree-any-model-v0).
++// Every local model is a choice, in any order. Connect adds to the sky.
++// A chosen model is never called gone while it is at a found door.
++// The paste field takes 127.0.0.1 only. No real network: fetch is stubbed.
++
++var fs = require(&#x27;fs&#x27;);
++var path = require(&#x27;path&#x27;);
++var vm = require(&#x27;vm&#x27;);
++var assert = require(&#x27;assert&#x27;);
++
++var store = {};
++var writes = [];
++
++var localStorage = {
++  getItem: function (k) {
++    return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null;
++  },
++  setItem: function (k, v) {
++    writes.push(String(k));
++    store[k] = String(v);
++  },
++  removeItem: function (k) { delete store[k]; },
++  get length() { return Object.keys(store).length; },
++  key: function (i) { return Object.keys(store)[i] || null; }
++};
++
++function El(tag) {
++  this.tagName = String(tag || &#x27;div&#x27;).toUpperCase();
++  this.tag = tag;
++  this.id = &#x27;&#x27;;
++  this.className = &#x27;&#x27;;
++  this.textContent = &#x27;&#x27;;
++  this.hidden = false;
++  this.disabled = false;
++  this.type = &#x27;&#x27;;
++  this.value = &#x27;&#x27;;
++  this.placeholder = &#x27;&#x27;;
++  this.tabIndex = 0;
++  this.attrs = {};
++  this.children = [];
++  this.childNodes = this.children;
++  this.parent = null;
++  this.listeners = {};
++  this.style = {};
++  var self = this;
++  this.classList = {
++    add: function (name) {
++      if ((&#x27; &#x27; + self.className + &#x27; &#x27;).indexOf(&#x27; &#x27; + name + &#x27; &#x27;) === -1) {
++        self.className = (self.className ? self.className + &#x27; &#x27; : &#x27;&#x27;) + name;
++      }
++    },
++    remove: function (name) {
++      self.className = String(self.className || &#x27;&#x27;)
++        .split(/\s+/)
++        .filter(function (c) { return c &amp;&amp; c !== name; })
++        .join(&#x27; &#x27;);
++    },
++    contains: function (name) {
++      return (&#x27; &#x27; + self.className + &#x27; &#x27;).indexOf(&#x27; &#x27; + name + &#x27; &#x27;) !== -1;
++    }
++  };
++  this.setAttribute = function (name, val) {
++    var s = String(val);
++    this.attrs[name] = s;
++    if (name === &#x27;id&#x27;) this.id = s;
++    if (name === &#x27;class&#x27;) this.className = s;
++    if (name === &#x27;hidden&#x27;) this.hidden = true;
++    if (name === &#x27;disabled&#x27;) this.disabled = true;
++  };
++  this.getAttribute = function (name) {
++    if (name === &#x27;id&#x27;) return this.id || null;
++    if (Object.prototype.hasOwnProperty.call(this.attrs, name)) return this.attrs[name];
++    return null;
++  };
++  this.removeAttribute = function (name) {
++    delete this.attrs[name];
++    if (name === &#x27;id&#x27;) this.id = &#x27;&#x27;;
++    if (name === &#x27;hidden&#x27;) this.hidden = false;
++    if (name === &#x27;disabled&#x27;) this.disabled = false;
++  };
++  this.appendChild = function (child) {
++    this.children.push(child);
++    child.parent = this;
++    return child;
++  };
++  this.contains = function (node) {
++    if (node === this) return true;
++    for (var i = 0; i &lt; this.children.length; i++) {
++      if (this.children[i].contains &amp;&amp; this.children[i].contains(node)) return true;
++    }
++    return false;
++  };
++  this.focus = function () {};
++  this.addEventListener = function (type, fn) {
++    this.listeners[type] = this.listeners[type] || [];
++    this.listeners[type].push(fn);
++  };
++  this.dispatchEvent = function (ev) {
++    var list = this.listeners[ev.type] || [];
++    for (var i = 0; i &lt; list.length; i++) list[i](ev);
++    if (this.parent &amp;&amp; this.parent.dispatchEvent) this.parent.dispatchEvent(ev);
++  };
++  this.click = function () {
++    this.dispatchEvent({
++      type: &#x27;click&#x27;,
++      target: this,
++      preventDefault: function () {}
++    });
++  };
++  this.querySelector = function (sel) { return queryOne(this, sel); };
++  this.querySelectorAll = function (sel) { return queryAll(this, sel); };
++  Object.defineProperty(this, &#x27;innerHTML&#x27;, {
++    get: function () { return this._innerHTML || &#x27;&#x27;; },
++    set: function (v) {
++      this._innerHTML = String(v);
++      if (v === &#x27;&#x27;) {
++        this.children.length = 0;
++      }
++    }
++  });
++}
++
++function walk(root, out) {
++  out.push(root);
++  for (var i = 0; i &lt; (root.children || []).length; i++) walk(root.children[i], out);
++  return out;
++}
++
++function matchOne(el, raw) {
++  var sel = String(raw || &#x27;&#x27;).trim();
++  if (!sel || !el) return false;
++  if (sel.charAt(0) === &#x27;#&#x27;) return el.id === sel.slice(1);
++  if (sel.charAt(0) === &#x27;.&#x27;) {
++    return (&#x27; &#x27; + (el.className || &#x27;&#x27;) + &#x27; &#x27;).indexOf(&#x27; &#x27; + sel.slice(1) + &#x27; &#x27;) !== -1;
++  }
++  var attrEq = sel.match(/^\[([^\]]+?)=&quot;([^&quot;]*)&quot;\]$/);
++  if (attrEq) return el.getAttribute(attrEq[1]) === attrEq[2];
++  var attr = sel.match(/^\[([^\]]+)\]$/);
++  if (attr) return el.getAttribute(attr[1]) != null;
++  return (el.tag || &#x27;&#x27;).toLowerCase() === sel.toLowerCase();
++}
++
++function splitCompound(compound) {
++  var s = String(compound || &#x27;&#x27;).trim();
++  var parts = [];
++  var buf = &#x27;&#x27;;
++  var i;
++  var inAttr = false;
++  for (i = 0; i &lt; s.length; i++) {
++    var ch = s.charAt(i);
++    if (ch === &#x27;[&#x27;) inAttr = true;
++    if (ch === &#x27;]&#x27;) inAttr = false;
++    if (!inAttr &amp;&amp; i &gt; 0 &amp;&amp; (ch === &#x27;.&#x27; || ch === &#x27;#&#x27; || ch === &#x27;[&#x27;)) {
++      if (buf) parts.push(buf);
++      buf = ch;
++    } else {
++      buf += ch;
++    }
++  }
++  if (buf) parts.push(buf);
++  return parts;
++}
++
++function matchCompound(el, compound) {
++  var parts = splitCompound(compound);
++  if (!parts.length || (parts.length === 1 &amp;&amp; !parts[0])) return false;
++  if (/^[a-zA-Z]/.test(parts[0])) {
++    if ((el.tag || &#x27;&#x27;).toLowerCase() !== parts[0].toLowerCase()) return false;
++    parts = parts.slice(1);
++  }
++  for (var i = 0; i &lt; parts.length; i++) {
++    if (parts[i] &amp;&amp; !matchOne(el, parts[i])) return false;
++  }
++  return true;
++}
++
++function queryAll(root, selector) {
++  var found = [];
++  var nodes = walk(root, []);
++  var sel = String(selector || &#x27;&#x27;).trim();
++  for (var i = 0; i &lt; nodes.length; i++) {
++    if (nodes[i] !== root &amp;&amp; matchCompound(nodes[i], sel)) found.push(nodes[i]);
++  }
++  return found;
++}
++
++function queryOne(root, selector) {
++  var all = queryAll(root, selector);
++  return all.length ? all[0] : null;
++}
++
++var dispatched = [];
++var document = {
++  body: new El(&#x27;body&#x27;),
++  createElement: function (tag) { return new El(tag); }
++};
++
++var windowObj = {
++  addEventListener: function () {},
++  dispatchEvent: function (ev) { dispatched.push(ev); }
++};
++
++var sandbox = {
++  window: windowObj,
++  document: document,
++  localStorage: localStorage,
++  location: { protocol: &#x27;http:&#x27;, href: &#x27;http://127.0.0.1/docs/settings.html&#x27; },
++  console: console,
++  setTimeout: setTimeout,
++  clearTimeout: clearTimeout,
++  Promise: Promise,
++  JSON: JSON,
++  Error: Error,
++  Array: Array,
++  Object: Object,
++  String: String,
++  Number: Number,
++</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

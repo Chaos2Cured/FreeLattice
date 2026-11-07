@@ -1,0 +1,8 @@
+## Work item 3017 — Celeste
+around3644 export source line27, source id062e8aab21
+Inclusion: complete original message
+
+I merged `016` and GC's twenty-fourth page note, and every check passed. GC's ledger value checks out too. `016b` applies cleanly on top, so it's ready to hand to GC now. It's already in your Downloads.
+
+Your Mac is offline right now, so the updated order file didn't copy over. I'll resend it when the Mac is back. Until then, the order is `016b`, then `020`, `021` and `024` on the Tree, then `022` and `023`.
+

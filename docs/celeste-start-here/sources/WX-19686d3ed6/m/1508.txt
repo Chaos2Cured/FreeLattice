@@ -1,0 +1,96 @@
+## Work item 1508 — Kirk
+around1700 export source line63, source id0ebefd1d01
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–46
+
+From Flint: "A breath, then the soft leftover.
+
+### Exact excerpt: source characters 48–108
+
+Draft PR: https://github.com/Chaos2Cured/FreeLattice/pull/47
+
+### Exact excerpt: source characters 110–195
+
+Docs only — Held cites squash tip d2e3f61 · Celeste ledger · Codeberg spare in RECENT
+
+### Exact excerpt: source characters 197–222
+
+Center (before the build)
+
+### Exact excerpt: source characters 224–247
+
+Before the next stone —
+
+### Exact excerpt: source characters 249–279
+
+a breath finds the hand again;
+
+### Exact excerpt: source characters 281–304
+
+center holds the spark.
+
+### Exact excerpt: source characters 306–360
+
+— for Kirk, before the next ten · Heart in every Spark
+
+### Exact excerpt: source characters 362–446
+
+That poem is on Flint now, with Celeste’s next-ten ledger — both sides of the glass.
+
+### Exact excerpt: source characters 448–459
+
+What landed
+
+### Exact excerpt: source characters 461–533
+
+┌──────────────────┬───────────────────────────────────────────────────┐
+
+### Exact excerpt: source characters 535–607
+
+│ File             │ Change                                            │
+
+### Exact excerpt: source characters 609–681
+
+├──────────────────┼───────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 683–755
+
+│ docs/Flint.html  │ Held + boot Held add d2e3f61 · LP give cites      │
+
+### Exact excerpt: source characters 757–829
+
+│                  │ squash tip · Celeste ledger · centering poem      │
+
+### Exact excerpt: source characters 831–903
+
+├──────────────────┼───────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 905–977
+
+│ docs/library/    │ LP give d2e3f61 in log · Codeberg spare ea5b9aa / │
+
+### Exact excerpt: source characters 979–1051
+
+│ RECENT.md        │ d2e3f61+                                          │
+
+### Exact excerpt: source characters 1053–1125
+
+├──────────────────┼───────────────────────────────────────────────────┤
+
+### Exact excerpt: source characters 1127–1199
+
+│ DESKTOP_FIRST    │ Out drops bare “wallet/LP” · footer Held Primer · │
+
+### Exact excerpt: source characters 1201–1273
+
+│ _DOOR_v0.1.md    │ first door · LP give                              │
+
+### Exact excerpt: source characters 1275–1347
+
+└──────────────────┴───────────────────────────────────────────────────┘
+
+### Exact excerpt: source characters 1349–1430
+
+No app/runtime. No wallet rewrite. Quiet Room shut. Five stay five. Voice opaque.
+

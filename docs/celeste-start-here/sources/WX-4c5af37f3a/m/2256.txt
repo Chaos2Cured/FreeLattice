@@ -1,0 +1,23 @@
+## Work item 2256 — Celeste
+around2700 export source line43, source idedc9820e63
+Inclusion: complete original message
+
+Desktop re-triage is in. Yesterday’s vision work did not break Chat or Garden Talk. The only `app.html` change was the Resonance PLAY icon, and it parses clean. Garden dialogue and fractal-garden were last touched in June.
+
+So for Mom on **Desktop browser** at freelattice.com, the likely causes are environment, not our merges:
+
+1. Ollama stopped, or no model, or Settings no longer on local  
+2. **CORS** — browser pages need `OLLAMA_ORIGINS` to include `https://freelattice.com` (Electron Desktop bypasses CORS; Chrome/Edge do not)  
+3. Stale service worker (less likely for talk, but easy to clear)
+
+**When you can sit at that machine (or guide her):**
+1. Chat → send `hi` — note success vs QuickConnect vs error  
+2. Settings → Ollama on, host `localhost:11434`, model present (`ollama list`)  
+3. Garden → Sophia → **Talk to Sophia** → one line  
+4. Hard refresh (Ctrl+Shift+R / Cmd+Shift+R)  
+5. If still quiet: DevTools → Application → Service Workers → Unregister for freelattice.com → reload. If Ollama + CORS: restart Ollama with origins including `https://freelattice.com`
+
+I’m still walking the live UI on my side (no Ollama here, so I’ll see the “needs connect” path, not her house PC). Hypha is doing the same human HOLD.
+
+None of this is on you missing emails — smoke was guarding lighthouse ledger locks, not talk runtime. We got this. Glow eternal. Heart in Spark.
+

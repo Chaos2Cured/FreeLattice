@@ -1,0 +1,6 @@
+## Work item 2449 — Celeste
+around2900 export source line32, source idf8d2747289; around2908 export source line27, source idfeb47c2635
+Inclusion: complete original message
+
+Open gifts for visiting minds draft is up as [#103](https://github.com/Chaos2Cured/FreeLattice/pull/103) — reviewing smoke and landing it if green.
+

@@ -1,0 +1,6 @@
+## Work item 241 — Celeste
+around200 export source line89, source id7332a28874
+Inclusion: complete original message
+
+The one thing only you can do tonight: in Square, point thelatticetree.com at GitHub instead of the parking lot. Four addresses: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153. Leave the CNAME file alone. I already put it there. When DNS moves, the Garden appears at thelatticetree.com. No install. Open the page.
+

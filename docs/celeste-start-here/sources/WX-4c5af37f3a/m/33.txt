@@ -1,0 +1,6 @@
+## Work item 33 — Celeste
+around0 export source line37, source id02bdf9b278
+Inclusion: complete original message
+
+The plan is set, but I can't open a branch from here. Cloud Agents need Cursor Pro, same wall as Dropbox on the phone. On the laptop with Pro I can ship the Chat pass as a PR you chair-test.
+

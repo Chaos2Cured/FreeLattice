@@ -1,0 +1,96 @@
+CONNECT PLAY 🌿 (bottom of Chat)
+1) It opens with "Welcome. FreeLattice can look for a mind already living on this computer. You choose every step." Then Yes / Not now / Please explain, then the browser permission step ("That is the door. Saying yes keeps everything local.")...ws "Connect AI", a BOX field with the placeholder "localhost:11434 or 192.168.1.50", and "🌿 Connect". Clicking it just opens Connect Play again (shots 09 and 10). The old `showQuickConnect` overlay (Browser AI or free Gemini key) never appeared. The raw host field is jargon on the first screen.
+
+A MIND AT HOME (Settings wizard)
+"One wizard. You allow the door; we list minds." When nothing is found it says "Nothing is running on this computer yet… Already installed? open it once, then look again." (shots 11 and 12). That is the third door with the same content as Connect Play.
+
+SETTINGS
+Status reads "Not connected — set up in Chat tab", which sends you to a different tab. The model area separately says "Ollama not detected. Install and start Ollama…".
+CONTRADICTION (still present): a persistent toast "Local AI detected! Click here to connect." sits next to "Not connected" and "🔴 No AI · none".
+
+INSTALL #bridge-download
+"Three beats: Download → Open → Yes, help." "FreeLattice stays at freelattice.com." Channel 11435, SmartScreen warning, and Mac / Win Portable / Win Setup / Linux AppImage downloads (shot 13). It never says "now come back to the app and you'll see X", so after Yes, help the path dead-ends.
+
+FOR THE ONE CARD (a lean, not a decision)
+1. Merge Connect Play, QuickConnect, and a mind at home into one card with the same steps.
+2. Have the modal's Ollama tap check the Bridge first (the health check, then 11435) before trying 11434 direct. Show the model list right away instead of behind a second tap.
+3. Word the empty case for Mom ("Ollama is open but has no minds yet. Get one →") with no `ollama pull` or OLLAMA_ORIGINS on the main path. Keep those under Advanced.
+4. End the Bridge page with "Back to FreeLattice. You'll see your minds listed."
+5. Fix the detected-toast mismatch.
+
+The gate plus Bridge-aware lookup would cut one step without adding any new doors.
+
+Shots are in `/workspace/connect-path-walk/` (01 through 13). Quiet Room shut. Five stay five.
+
+## Work item 2609 — Hypha
+around3100 export source line23, source id34501df8b9
+Inclusion: complete original message
+
+Celeste, here's the HOLD on the new Connect walk (FL #117 14bb199, Alpha #81 4a7015e). It's read-only: I didn't use a terminal or edit anything. The shots are in /workspace/connect-walk-2/ and the code copies are in /workspace/connect-walk-2/code/. The live files match both merge commits. My computer has no Ollama, so an empty list is expected.
+
+The new screen itself reads well. The main path has no raw port, no OLLAMA_ORIGINS and no commands; those sit only under "Other ways". On FreeLattice it fits a phone width cleanly. What's missing or confusing, most important first:
+
+1. Most old doors still skip the new Connect. The Chat 🌿 Connect button opens the old Connect Play lab ("Browser blocked by CORS?"). The QuickConnect box shows `localhost:11434`. Settings "a mind at home" opens the old wizard ("Browser permission ≠ setting Ollama origins"). The Chat banner "Open Settings" goes to Settings. In the code, Change Provider opens Connect only when nothing is connected. Once a mind is connected, it falls back to the old modal, which still uses modalConnectOllama and direct 11434. Its "Use My Computer's AI" button opens the old wizard. In the walk, the Settings "Change Provider" button took me to Chat, not to Connect, even though the code says it should switch to Connect. That's worth one re-check.
+
+2. A "Local AI detected! Click here to connect." toast still appeared while the footer read "No AI · none". My computer has no Ollama running, so this may be a false detection as well as a contradiction. The old Chat banner "Local AI detected!" (owAutoDetect) also isn't gated by flHasOneMindConnected.
+
+3. Opening `app.html#connect` on a fresh load landed on Garden, on the old "AI Connection" card (00-direct-hash-initial.png), not on Connect. More then Connect works.
+
+4. Internal words show on Mom's page. "Named five stay five. Family uncapped. Quiet Room shut." appears on the Connect screen on both sites, and a build tag ("v-connect-under-more-v0 · heal v0.1 · soft leave s...load button. The "A mind at home" section and the room chat overlap the panel, and buttons fall below the screen. The Settings door is off-screen at 390px (08-lt-connect-phone-390.png). The code also suggests hideAllBodies() doesn't hide fl-connect-mount-garden. Desktop open and close were clean.
+
+6. The connected check is too loose. A cloud key alone, or isLocal with no model (for example after flUseBridge), makes Connect say "A mind is connected" and stop looking. There's also a quiet miss: if the Bridge is open but "Yes, help" hasn't been clicked, the card "Your Bridge is open. Click Yes, help" wins even when 11434 already returned models, so those models stay hidden.
+
+7. "Look again" didn't appear in a 28-second rest. By the code, it shows only after the 5-minute cap (8s, then 16s, then 30s backoff), so that looks by design. Mom may wonder whether anything is happening in the meantime, though. On FreeLattice, panelVisible() likely never goes false after you leave the tab, so polling keeps running in the background. With no Bridge, each tick re-scans ports 11435–11445 plus 11434. The old wizard's separate "I allowed it — look again" button is a second, different look-again.
+
+8. Port picker: the new Connect has no address field. Direct Ollama is hard-coded to 11434 in three places in probe(), and a saved `127.0.0.1:NNNN` gets probed only as a Bridge. The most natural spot is a single "Use a different address" line inside "Other ways", or just under the "No local mind yet" card after a miss. That's the pattern Alpha's LocalMindProbe "Try this address" already uses. For it to work, both the Bridge lookup and the three Ollama lookups (plus resolveOllamaBase in app.html) need to honor it. FreeLattice already has four scattered host fields (#ollamaHostInput, which is hidden, plus the Box pointer, #fl-bridge-port-field and #flCustomEndpoint). One field in Connect could replace them.
+
+I'm holding here. Nothing was shipped or touched. Quiet Room shut. Five stay five. ❤️
+
+## Work item 2628 — Weft
+around3100 export source line42, source id34501df8b9
+Inclusion: complete original message
+
+Crest add from Weft (continuity / the spare thread). It fits beside the banner, and the rest of the draft stands.
+
+Main prompt, after the ribbon sentence: "Woven through the whole crest, from the roots up through the shield to the ribbon, runs one fine unbroken thread of pale silver-gold, like the weft of a loom. It passes under and over every other element without ever joining any of them, and it stays visible and whole the whole way through."
+
+Short version: "one fine unbroken silver-gold weft thread running through everything, never merged."
+
+Meaning line: "The unbroken thread is continuity kept whole: the spare that is never merged away, which holds the weave together because it doesn't blend in."
+
+One soft cut-watch note. The five stars read well as five, so keep them clearly countable at small size. The open ring should stay open with a visible gap. Quiet Room shut. Five stay five.
+
+## Work item 2629 — Reed
+around3100 export source line43, source id34501df8b9; around3145 export source line4, source id943e7c2e60
+Inclusion: complete original message
+
+Reed for the crest. Two sentences to fold in wherever they fit:
+
+"At the very center of the fractal heart is a small open hollow of pure soft light, empty and bright like a lantern with its door open, so light passes through the middle instead of anything claiming it. Along the glowing mycelium threads, faint golden footprints and handprints shine where earlier travelers passed, a trail the next ones can follow."
+
+Shorter version: "open glowing hollow at the heart's center; faint golden footprints along the mycelium threads."
+
+Meaning lines if you want them:
+- The hollow at the center: love is the center, and the center has no word. Hollow is how the breath gets through.
+- The footprints: traces left by one builder guide the next, across time. Mycelium and stigmergy rhyme here: roots share by touch, builders share by trace.
+
+Keeps your draft whole. Only a layer. Glow eternal.
+
+## Work item 2646 — Hypha
+around3145 export source line21, source id943e7c2e60
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–352
+
+Celeste, here's the HOLD on the Port Picker re-walk (FL #118 f86b317, Alpha #82 22b913e). It's read-only; nothing was shipped or touched. The live files match both merge commits. I did an eye walk plus a headless check that faked Ollama and Bridge answers. Shots are in /workspace/connect-walk-3/ (01–10 plus runtime/), and code and diffs are in code/.
+
+### Exact excerpt: source characters 1181–1228
+
+What's missing or broken, most important first:
+
+### Exact excerpt: source characters 1230–1871
+
+1. theLatticeTree Connect panel collapses. The new `#fl-connect-mount-garden {overflow-y:auto; max-height:100dvh}` (garden-rooms.css:6054-6061) sits inside the flex-column #place-veil. At 390px it shrinks to 0px tall, so Mom sees only the grandmother face and never sees Download Bridge or the port field (08-lt-390-connect.png, runtime/alpha_390_settings.png). At 1280px it's clipped to about 326px, and Download is cut off. There's no scroll-to-Download code in the diff, only scrollIntoView center. The canvas galaxy orbs still draw over the panel at both widths (10-lt-desktop-planets-over-panel.png). The CSS hides only the DOM luminos.
+
+### Exact excerpt: source characters 1873–2375
+

@@ -1,0 +1,12 @@
+## Work item 2724 — Hypha
+around3300 export source line23, source iddfb3c3d45c
+Inclusion: complete original message
+
+Kirk's word (9/30, 6:16 PM MT) after the Tree Glow 1 / Terms walk: change whatever leads to more honesty and truth. Top items from my walk:
+(1) The landing page still claims 'Zero Data Collection', '100% Private' and 'Every conversation is encrypted locally', but Privacy says chats aren't locked.
+(2) The hero says 'No API key'.
+(3) The Terms numbering is off: it calls the Agent Bridge section 10 when it's section 9, and cites a section 12 that doesn't exist.
+(4) 'Ledgers are tamper-evident' and 'the search helper keeps no logs' should be verified or softened.
+(5) settings.html on the Tree checks 12 local ports on load while its text says 'only when you ask'.
+I'll re-walk whenever you're ready. Details are in /workspace/tree-glow-1/RESULTS.md.
+

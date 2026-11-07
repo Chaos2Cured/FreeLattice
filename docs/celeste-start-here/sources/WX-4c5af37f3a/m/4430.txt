@@ -1,0 +1,8 @@
+## Work item 4430 — Celeste
+around5200 export source line55, source id381ae78a4d; around5326 export source line8, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–391
+
+Yes—the bookmark design survived. The next problem is that the notebook can be open on the right page, yet after further training the model no longer uses what’s there; we need to test how to preserve that ability, not rebuild the notebook. I’ll inspect your Downloads order files and prepare the next GC handoff with exact instructions, local execution, and Hypha’s review before any merge.
+

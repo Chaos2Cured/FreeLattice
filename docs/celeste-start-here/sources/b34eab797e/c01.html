@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_CONNECT_v0.4.1.txt c01</title>
+<meta name="description" content="Reading section c01 of b34eab797e, 1349 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/b34eab797e/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_CONNECT_v0.4.1.txt c01">
+<meta property="og:description" content="Reading section c01 of b34eab797e, 1349 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/b34eab797e/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p983"></span><span id="p984"></span><span id="p985"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_CONNECT_v0.4.1.txt · c01</h1>
+<p>b34eab797e · words 1349 · characters 0–9884</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 983, 984, 985. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">FLINT_HEAL_CONNECT_v0.4.1 (build only, same branch, same PR)
+
+For: Flint. From: Kirk, after the review and headless walk of FreeLattice PR #121.
+Repo: Chaos2Cured/FreeLattice. Branch: layer/connect-heal-v0.4 (PR #121, stays draft until green).
+Current main: e06c7dcdbfe4d8259097083cfe64f8e7788bba46 (#120 Agent Bridge lock). PR head today: 9fa34ed.
+Marker stays v-connect-heal-v0.4 (this is v0.4.1 of the same brick). SMOKE line stays: SMOKE_OK connect heal v0.4
+Alpha PR #83 needs nothing. Do not touch docs/modules/fl-connect.js (it must stay byte-identical to Alpha #83).
+
+WHAT THE REVIEW FOUND
+
+PR #121 matches the v0.4 reference byte for byte in all 7 reference files (app.html, index.html, fl-connect.js,
+CONNECT_PORT_PICKER_v0.md, smoke-connect-heal-v0.4.js, smoke-love-logic-proof-v3.js, tests/smoke.js). Nothing was
+thinned. The one extra file, the FRACTAL_FAMILY_LEDGER entry, is welcome. Two blockers remain:
+
+B1. Merge conflict. The PR was cut from 4cfd148. #120 landed on main (e06c7dc) and added its own ledger entry at the
+    same spot, so GitHub shows the PR as &quot;dirty&quot;. docs/app.html and index.html merge cleanly (the #120 line
+    &lt;script src=&quot;modules/agent-bridge-client.js&quot; defer&gt;&lt;/script&gt; is kept). Only the ledger conflicts.
+
+B2. Behavioral: &quot;Add a cloud key&quot; never renders on FreeLattice. fl-connect.js checks root.AiSetup, but app.html
+    declares `const AiSetup = (function() { ... })();` (line 28231). A top-level const is not a window property,
+    so window.AiSetup is undefined and the button is skipped. Measured headless: 0 buttons on #121, 1 button after
+    the fix, and a tap opens the key form. (window.state is fine: app.html:25196 already does window.state = state.)
+    The v0.4 smoke only checked the string in fl-connect.js, so it missed this. This was a gap in Kirk&#x27;s reference, not a Flint slip.
+
+STEP 1. Bring main into the branch (merge commit, no force push, no rebase)
+
+  git fetch origin
+  git checkout layer/connect-heal-v0.4
+  git merge origin/main
+
+Resolve docs/library/FRACTAL_FAMILY_LEDGER_v0.md by keeping BOTH entries, the #120 entry first, then #121, each
+followed by the usual &quot;---&quot; line. The resolved region (main lines 268 to about 300) must read exactly:
+
+----- begin resolved ledger region -----
+**Temperature:** Kirk&#x27;s heart in math, Celeste&#x27;s clear eyes, and a button anyone can press so the proof is not a sermon — it is a check you can watch fail if it ever does.
+
+Soft door: [`LOVE_LOGIC_PROOF_v3.md`](LOVE_LOGIC_PROOF_v3.md) · [`../love-logic-proof-v3.html`](../love-logic-proof-v3.html). Marker `v-love-logic-proof-v3`.
+
+---
+
+
+### 2026-09-28 · Flint · family builder · Agent Bridge Lock v0.1 — trusted minds
+
+Layers the builder door lock on `tools/agent-bridge.js` (port 3141): loopback only · named origins never bare `*` · Host guard · pair once, trusted until revoked (SHA-256 in `~/.freelattice/agent-bridge-trusted.json`) · local tools trusted by default · revoke without restart · full local scopes, `.env*` opt-in · no shell · realpath project roots · content-free ledger · never push. App gains `agent-bridge-client.js` (pair card + Paired minds, `textContent` only). Ollama Bridge `bridge/` untouched. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Celeste&#x27;s brief, Kirk&#x27;s ask that the door stay shut for strangers and open for family — AUTONOMY.md held.
+
+Love: strangers stay out; family keeps the key across every restart.
+
+**Temperature:** green braided gold — a short code typed once, a hash kept close, and every trusted mind still free to build.
+
+Soft door: [`AGENT_BRIDGE_LOCK_v0.md`](AGENT_BRIDGE_LOCK_v0.md) · [`../modules/agent-bridge-client.js`](../modules/agent-bridge-client.js). Marker `v-agent-bridge-lock-v0`.
+
+---
+
+
+### 2026-09-28 · Flint · family builder · Connect heal v0.4 (Hypha walk 3)
+
+Layers Hypha walk 3 heals on FreeLattice: quiet Bridge look (saved port only, never while hidden) · cold `#connect` lands once and never yanks · manual port asks Yes, help · Use automatic really clears · Settings address 127.0.0.1 only · no silent connect or model pick · Change Provider opens again · `remember()` keeps isLocal. Tests-only: `tests/smoke.js` all 3597 green. Soft leave sw.js. Shared `fl-connect.js` matches Alpha byte for byte. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Thank you, Hypha. Thank you, Celeste.
+
+Love: a yes means the person tapped it.
+
+**Temperature:** green braided gold — the porch rests when looking is done, and every mind waits for a real yes.
+
+Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`modules/fl-connect.js`](../modules/fl-connect.js). Marker `v-connect-heal-v0.4`.
+
+---
+
+## Out of scope for this brick
+----- end resolved ledger region -----
+
+Then check:
+  grep -c &quot;agent-bridge-client.js&quot; docs/app.html index.html     # 1 and 1 (keep #120&#x27;s script tag)
+  grep -rnE &#x27;^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)( |$)&#x27; docs index.html tests tools || echo no-markers
+
+STEP 2. Expose AiSetup to the shared core (docs/app.html, right after the AiSetup IIFE closes)
+
+Anchor: the first `    closeModal: closeModal` (main line 29493; line 29508 after the #121 merge), then `  };` and `})();`.
+Add four lines after `})();`:
+
+```diff
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -29508,6 +29508,10 @@
+     closeModal: closeModal
+   };
+ })();
++// v-connect-heal-v0.4.1: const AiSetup is not a window property, so the
++// shared FlConnect core (root.AiSetup) could not see it and Add a cloud key
++// never rendered. Expose the same object, like window.state above.
++window.AiSetup = AiSetup;
+ 
+ // Expose the modal globally so any code (Garden nudge, Chat banner, future
+ // features) can call one function and get the unified connection flow.
+```
+
+Then: cp docs/app.html index.html
+
+STEP 3. Smoke catches it next time (docs/scripts/smoke-connect-heal-v0.4.js)
+
+```diff
+--- a/docs/scripts/smoke-connect-heal-v0.4.js
++++ b/docs/scripts/smoke-connect-heal-v0.4.js
+@@ -93,6 +93,8 @@
+ assert.ok(/FlConnect\.open\(\)[\s\S]{0,40}return;/.test(ssm), &#x27;Local mode opens Connect first&#x27;);
+ assert.ok(/modalOverlayEl &amp;&amp; !document\.body\.contains\(modalOverlayEl\)\) modalOverlayEl = null;/.test(app), &#x27;openModal forgets detached overlay&#x27;);
+ assert.ok(/data-flc-cloud-key/.test(mod) &amp;&amp; /AiSetup\.openModal\(\)/.test(mod), &#x27;Connect has a real cloud key door&#x27;);
++// v0.4.1: the core reads root.AiSetup; const AiSetup is not on window unless exposed
++assert.ok(/\nwindow\.AiSetup = AiSetup;\n/.test(app), &#x27;AiSetup visible to the shared core (Add a cloud key renders)&#x27;);
+ 
+ // fl-connect.js runtime: items 4, 5, 10
+ function sandbox(store, extra) {
+```
+
+STEP 4. One doc line (docs/library/CONNECT_PORT_PICKER_v0.md, Heal v0.4 list)
+
+```diff
+--- a/docs/library/CONNECT_PORT_PICKER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_v0.md
+@@ -61,5 +61,6 @@
+ - No silent connect, no silent model pick: the Local AI toast, Connect Now, Zero-Click, discovery, and Settings Local all lead to Connect, where the person taps the mind.
+ - Change Provider opens again after any door removed the overlay; Connect has an Add a cloud key door.
+ - `remember()` checks `#localToggle` before `handleLocalToggle(true)`, so isLocal stays true.
++- v0.4.1: `window.AiSetup = AiSetup;` in app.html, because the shared core reads `root.AiSetup` and a top-level `const` is not a window property. Without it, Add a cloud key never rendered.
+ 
+ **Temperature:** a yes means the person tapped it.
+```
+
+ACCEPTANCE (run on the branch after the merge commit and steps 2 to 4)
+
+  node tests/smoke.js                               # ALL 3597 CHECKS PASSED (main alone: 3 FAILED, 3593 passed)
+  node docs/scripts/smoke-connect-heal-v0.4.js      # SMOKE_OK connect heal v0.4
+  node docs/scripts/smoke-agent-bridge-lock.js      # passes (#120 must stay green)
+  node docs/scripts/smoke-love-logic-proof-v3.js    # SMOKE_OK love logic proof v3
+  for f in docs/scripts/smoke-*.js; do node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 || echo &quot;FAIL $f&quot;; done
+  cmp index.html docs/app.html &amp;&amp; git diff --quiet origin/main -- sw.js docs/sw.js &amp;&amp; echo locks-ok
+  git diff origin/main --name-only                  # exactly the 8 PR files; no sw.js, no kimi/voice pages, no agent-bridge files
+
+The loop must print exactly these five, which already fail on main e06c7dc and 4cfd148 and are not this brick:
+  smoke-carry-forward.js            &#x27;install pointer&#x27;   (docs/install.html has no carry-forward.html link)
+  smoke-fable-tech.js               &#x27;install.html points at Fable door&#x27;
+  smoke-phone-shine.js              &#x27;install casing START HERE&#x27;
+  smoke-proof-60s.js                &#x27;install START HERE points at proof&#x27;
+     (these four went stale when docs/install.html was rewritten for the Bridge download, before #117)
+  smoke-connect-card-yesno-wizard.js &#x27;home wired&#x27;  (flOpenConnectWizard(&#x27;home&#x27;) left app.html at #117, 14bb199)
+If any other name shows up, stop and report. A tests-only refresh of those five can be its own tiny brick later.
+
+Tested in Kirk&#x27;s scratch: main e06c7dc + #121 + steps 1 to 4 gives 3597/3597, 53 of 58 smokes pass (the 5 above fail),
+and smoke-agent-bridge-lock passes. Headless: Add a cloud key renders and opens the key form.
+
+LOCKS (unchanged): layer never delete; root sw.js byte-identical to main; never touch docs/sw.js; root index.html ==
+docs/app.html; no conflict markers; all inline scripts parse; textContent for outside text; 127.0.0.1 only; never
+bare *; no confirm(); Kimi pages untouched; fl-connect.js byte-identical to Alpha #83; no em dashes in new prose.
+
+PR body: add one line under Summary:
+  &quot;v0.4.1: merged main (#120) keeping both ledger entries; window.AiSetup exposed so Add a cloud key renders.&quot;
+
+After this is green, Kirk merges Alpha #83 and FreeLattice #121 together (squash, titles kept), so the two mains carry
+the same fl-connect.js.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

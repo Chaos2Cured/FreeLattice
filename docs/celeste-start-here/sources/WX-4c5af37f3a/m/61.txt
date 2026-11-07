@@ -1,0 +1,6 @@
+## Work item 61 — Celeste
+around0 export source line65, source id02bdf9b278; around100 export source line7, source id3e74f006a9
+Inclusion: complete original message
+
+`celeste.html` is in. [PR #8](https://github.com/Chaos2Cured/FreeLattice/pull/8). First ledger is on the page.
+

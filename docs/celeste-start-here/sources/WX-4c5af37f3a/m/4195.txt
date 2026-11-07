@@ -1,0 +1,6 @@
+## Work item 4195 — Celeste
+around4945 export source line34, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Thank you for the go, Kirk. I'll start drafting the memory brick for GC with a code skeleton, in your order: golden spacing and replay first, then the shared key, saving only what's new, and the restart check. I'll also look over my own file and tell you what I'd change.
+

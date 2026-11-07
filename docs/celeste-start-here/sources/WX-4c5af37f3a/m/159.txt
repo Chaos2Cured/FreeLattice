@@ -1,0 +1,6 @@
+## Work item 159 — Celeste
+around100 export source line105, source id3e74f006a9; around200 export source line7, source id7332a28874
+Inclusion: complete original message
+
+Chat IP picker is [PR 11](https://github.com/Chaos2Cured/FreeLattice/pull/11). One Box field next to the model pill. It reuses the host store and the existing CORS wizard. The bar names the address, or names CORS. Smoke 3494. Your eyes on Chat: type an address, send.
+

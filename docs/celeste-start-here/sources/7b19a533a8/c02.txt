@@ -1,0 +1,139 @@
+Checked on the box (fresh clone of Alpha main 5755e340 + this diff):
+  node: all 29 docs/modules tests pass. tree-pool-room.test.js prints SMOKE_OK tree pool room
+  v0.2; tree-pool.test.js still SMOKE_OK tree pool v0.1; tree-kin.test.js still SMOKE_OK tree
+  kin v0.1. The new test covers: a host and two devices join once each, a third is let in by its
+  neighbor, and all four end up connected to all three others with keys proved. It also checks
+  that the next invite rolls by itself and that the trust list comes before one tap. Two slow
+  questions spread to two devices, a paused device is skipped, all paused gives "no-helper" with
+  no AI call, and a stopped pass is skipped. Chat history is trimmed (40 turns, 16000, no system
+  turn). The asking card says "asks only". QR is drawn. A link invite is filled in, taken out of
+  the address bar, and makes no connection. The camera opens only after a tap and stops after
+  reading. "Join without trusting" means no introductions. Reload memory and Forget are covered,
+  as is Close the room (members told, connections stay). Counts are numbers only, and only
+  tree_kin_ and tree_pool_ keys are written. The locks are read from the files.
+  Headless Chrome, three windows (H at 1280 in the garden veil, A at 390 and C at 390 in
+  settings.html, C with NO mind), and a local docs/ server with a mock Ollama on 127.0.0.1:11434:
+    C made an asking card. H tapped Start a room; the QR shows 360px wide at 1280 and 306px at
+    390. A joined by paste (invite 1072 chars, reply 1040). A tapped Invite a device (neighbor
+    invite with its own QR). C joined A. The room connected C to H through A, with no pairing
+    between H and C. Each device tapped Trust everyone in this room: each trusts 2.
+    H and A tapped Let this device help. C tapped Use qwen2.5:7b in Chat, opened Chat, and asked
+    twice. Answers came "qwen2.5:7b on Ben's computer (Wren)", with exactly one POST /api/chat
+    per question. H and A paused; C's next question said "No trusted kin device that holds that
+    mind is helping right now. Nothing was invented." and made no POST.
+    A link opened at settings.html#treepool=<invite> came up filled in, the address became
+    /settings.html, and no connection was made. Closing the veil and opening Nursery hid the pool
+    on H, and its connections stayed. Every visible button was 44px or more, with no sideways
+    scroll at 390 or 1280. RTCPeerConnection was only ever made with {"iceServers":[]}. During
+    joins the only requests were the page's own server and the usual fl-connect bridge knocks
+    (11434 tags, 11435-11445 health), which are not this brick. No page errors besides
+    favicon.ico 404.
+  How: this box's Chrome blocks WebRTC candidates (managed policy, as in 018), so the windows
+  used a stand-in for the TRANSPORT only. It relays each data channel between pages by
+  connection id. WebCrypto, the key proofs, the room relay, trust, the door, the fetch to the
+  local AI and every tap were real.
+  NOT tried: real WebRTC between real machines, real phone cameras scanning the QR (the invite QR
+  is dense, about version 27, since the kin card rides along), BarcodeDetector on a real camera,
+  Safari, Firefox, a managed school Chromebook, and more than 4 devices in a real room.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED (Alpha)
+----------------------------------------------------------------------
+  docs/modules/tree-pool.js   layered: VERSION, LATER, decode/readInvite (room), invite (room
+                              tag), ownCardCode (asking card), hello (busy, max), serve (hellos
+                              on busy change), handle (room- messages on proved channels),
+                              closed (room), the QR, camera and Chat lines in paintConnect,
+                              doJoin(sdp, room), doFinish (rolling host invite), mount (room +
+                              chat parts, arrived link), a new section at the end (room, picture
+                              codes, camera, askTurns/askBest/askChat, paintRoom, paintChat).
+                              Every changed line is kept as a "before v-tree-pool-room-v0.2"
+                              comment.
+  docs/modules/tree-kin.js    makeAskerCard + ASKS_ONLY + "Make an asking card" when no mind
+                              (makeCard unchanged).
+  docs/modules/garden-thread.js  Ask the pool from Chat (poolRoute, talkPool, the pool line,
+                              compose opens with a route; old setComposeOpen line kept as a comment).
+  docs/lib/qrcodegen.js       new, vendored, MIT (Nayuki).
+  docs/modules/tree-pool-room.test.js  new.
+  docs/index.html, docs/settings.html  one script tag each (lib/qrcodegen.js before tree-pool.js).
+  docs/code-settings.html, docs/code-dialogue.html, docs/GALAXIES.md  one LAYER paragraph/line each.
+  Storage: tree_pool_room ({ id, role }); counts gain roomsOpened, roomJoins, roomMembers,
+  roomOffers, roomRelayed, roomTrusts, pictureCodes, scans, chatOn, chatOff (numbers only).
+Skipped on purpose: AUTONOMY.md, garden-trainer.js, workshop-trainer.js, fl-connect.js,
+local-mind-probe.js, garden-rooms.js, garden-rooms.css, sw.js, #lumino-menu, #place-veil-close,
+any Quiet Room words, any FL file, anything AGPL. No llama.cpp code (that is 019b).
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. AUTONOMY.md and garden-trainer.js untouched. Never touch sw.js. fl-connect.js
+stays aaff2bf1b037656989a9e1a89bb05908. #lumino-menu stays hidden (not touched). #place-veil-close
+stays (not touched). No Quiet Room words in the UI. No em dashes, no &mdash;, no confirm(,
+textContent only (added lines; garden-thread.js's older lines are as they were). Receipts are
+counts only. Only a human tap opens the door; a room, a scan or a link never does. Pause wins.
+Kin only. No outside servers: iceServers [], no STUN/TURN, room codes ride proved connections.
+No AGPL (QR encoder is MIT). 44px buttons. No sideways scroll at 390. No auto-trust (the room
+trust is one human tap after the list is shown). No silent scan (the camera opens only after a tap;
+no LAN scan at all).
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_019_TREE_POOL_ROOM_2026-10-09.fl.diff /tmp/tree-pool-room.diff
+    md5 -q /tmp/tree-pool-room.diff    # ff193762b105721f9162f6bfe14962f9
+    cd ~/FreeLattice-Alpha && git fetch origin && git checkout main && git pull
+    ls docs/modules/tree-pool.js    # must exist (018 merged)
+    git checkout -b layer/tree-pool-room-v0.2
+    git apply --check /tmp/tree-pool-room.diff && git apply /tmp/tree-pool-room.diff
+    node docs/modules/tree-pool-room.test.js   # SMOKE_OK tree pool room v0.2
+    node docs/modules/tree-pool.test.js        # SMOKE_OK tree pool v0.1 (still)
+    node docs/modules/tree-kin.test.js         # SMOKE_OK tree kin v0.1 (still)
+    for t in docs/modules/*.test.js; do node "$t" >/dev/null 2>&1 || echo "FAIL $t"; done
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+    git diff --stat main -- AUTONOMY.md docs/modules/garden-trainer.js   # empty
+  (Node may print "The Ed25519 Web Crypto API algorithm is an experimental feature". That is
+  Node's note, not a failure.)
+  Walk (local server on docs/, Ollama running). THE REAL CONNECTION AND THE REAL CAMERA ARE THE
+  FINDINGS; the box could do neither. Use three windows that do not share storage (Chrome,
+  Chrome Incognito, Edge), or better, the Mac plus a phone and a second computer on one network:
+    a. Window H (a mind remembered): Trusted kin, Make my card. Device Pool, Start a room on this
+       device. The room invite shows a QR.
+    b. Window A (a mind remembered): make a card, then Join with an invite, paste H's invite,
+       Join, Trust this AI and join, Copy reply. In H: paste, Finish joining, Trust this AI and
+       finish. A new room invite appears in H on its own.
+    c. Window or phone C with NO mind: Trusted kin, Make an asking card. Then either scan H's or
+       A's QR with the phone camera (it should open settings.html with the invite filled in), or
+       on A tap Done, Invite a device, and paste into C. Join, trust, send the reply back
+       (on a Mac host, try Scan their reply with the webcam).
+       Expect: C becomes connected to BOTH A and H without a second pairing.
+    d. On each: Trust everyone in this room (N). Write down N.
+    e. H and A: Let this device help. C: Use (model) in Chat, open Chat, ask two things. Each
+       answer names the device. Ask a long one from C and a long one from another window at the
+       same time: they should land on different devices.
+    f. Pause both helpers: C's next Chat question says no trusted device is helping, and nothing
+       was invented.
+    g. Reload C: the card says it was in Room X. Rejoin once with the room invite; it should meet
+       everyone again with no trust taps.
+    h. 390 px and 200%: buttons full width, 44px, QR inside the card, no sideways scroll.
+       DevTools Network: nothing leaves the page on start / join / trust / scan taps.
+    i. Write down which joined over wired, over Wi-Fi, and whether the phone camera read the QR.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "Layer, never delete. Tree pool room v0.2: one invite fans out to a room, Chat asks the freest trusted device, asking cards and picture codes, no server, built by GC"
+    git push -u origin HEAD
+    Open a PR to FreeLattice-Alpha main. Celeste reviews and squash-merges. You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+Next docs/gc.html entry in FreeLattice (earlier entries as written). Say that the Tree has rooms
+now: one invite fans out, the room relays codes over proved connections, and there is still no
+server. Say that trust is one tap after the list, that Chat can ask the freest trusted device,
+and that a device with no mind can ask with an asking card. Mention picture codes, and that a
+reload costs one join. Name 019b as slow and honest, a design only. Record what the real
+connection and the real camera did (walk a to i), and that you did not merge. Compute λ and ψ
+the usual way (ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ). Make it a separate docs-only PR in
+FreeLattice; Celeste merges that too.
+

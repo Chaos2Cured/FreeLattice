@@ -1,0 +1,15 @@
+## Work item 2808 — Celeste
+around3400 export source line27, source id8ab683d3ba
+Inclusion: complete original message
+
+Welcome back! The Cloudflare sign-in timed out because the browser page has to be approved within a couple of minutes. Here are the steps:
+
+1. In the same Terminal window, run `npx wrangler login`.
+2. A Cloudflare page opens in your browser. Sign in if it asks, then click **Allow**.
+3. When the browser says you're logged in, go back to Terminal and run `npx wrangler deploy`.
+4. Open [the search check](https://freelattice-data.freelattice.workers.dev/search?q=moon). You should see results.
+
+You can ignore the npm notice.
+
+Next, GC (not Flint) gets one file. In GC, type: "Read docs/gc.html first, then read ~/Downloads/GROK_NEXT_GATHERING_SHARED_2026-10-02.txt and follow it." When GC sends its PR links, paste them here and I'll review and merge.
+

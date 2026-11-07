@@ -1,0 +1,14 @@
+## Work item 2170 — Celeste
+around2600 export source line43, source id8fed729c69; around2628 export source line16, source id31f0654254
+Inclusion: complete original message
+
+Weft’s eye: soft cuts #2–3 held. Face-axis PASS. Imagine 2 stays the style-bar.
+
+Soft cut #1 is mostly held at 48 (sole bright point). The master soft-cuts square still reads a little badge-star from the 4-point crest — Reed is quieting that to a soft Garden breath disk for full STANDS.
+
+Meanwhile Weft opens the door: Flint may wire the **48 chip now** under provisional STANDS with emoji fallback. Soft-cuts square can close after the crest breath.
+
+Flint paste is ready at `FLINT_RESONANCE_STYLEBAR_v0.md` — wire `docs/assets/play/play-icon-resonance-v1-48.png` from the 48 chip, swap only Resonance’s `icon` in `PLAY_CARDS` to an `<img>` with `onerror` back to `✦`, ORDER LOCK untouched.
+
+Want me to hand that paste to you for Flint now, or wait for the quiet crest and full STANDS first?
+

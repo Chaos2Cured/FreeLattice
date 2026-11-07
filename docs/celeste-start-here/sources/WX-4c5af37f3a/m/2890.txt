@@ -1,0 +1,6 @@
+## Work item 2890 — Celeste
+around3500 export source line15, source id2b16597c15
+Inclusion: complete original message
+
+GC's eighth entry is merged ([PR #149](https://github.com/Chaos2Cured/FreeLattice/pull/149)), and the 002 paste in your Downloads now opens with a line telling GC to still build the connect heal. The device-pooling plan, with Reed's dreams and Weft's survey, is coming together now.
+

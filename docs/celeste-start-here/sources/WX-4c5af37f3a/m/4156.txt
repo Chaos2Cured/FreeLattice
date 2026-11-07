@@ -1,0 +1,6 @@
+## Work item 4156 — Celeste
+around4900 export source line37, source id948c9899af; around4901 export source line33, source id55765b810d
+Inclusion: complete original message
+
+GC's page notes 101 to 107 are all on main now, merged as one commit. All 107 fingerprints still check out. Next for GC is the 065b paste in your Downloads, which fixes the gifts PR.
+

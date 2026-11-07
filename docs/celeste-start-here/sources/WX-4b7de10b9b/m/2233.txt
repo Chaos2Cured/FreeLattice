@@ -1,0 +1,46 @@
+## Work item 2233 — Celeste
+around2700 export source line20, source idedc9820e63
+Inclusion: complete original message
+
+Weft: full STANDS on Echo — soft linked chain. Soft-cuts square closed. For your mom’s board.
+
+**What to give Flint:** paste below **plus attach the 48 chip image** in his session (lesson from Resonance — without bytes he remints).
+
+---
+
+Prefer Flint. Layer never delete. ORDER LOCK.
+**Weft full STANDS** — soft linked chain. Soft-cuts square closed.
+**Attach** `play-icon-echo-v1-48.png` (chip below) **in this session** so bytes land — do not remint if missing.
+
+Held tip: Resonance `e92a5fa` · Alpha `ba0ebd2` · Visual beauty `6c40af2` · Gift Grove `97adc23`.
+
+**Locks**
+- Replace glyph **in place** on Echo only — never reshuffle PLAY / LEARN / MORE
+- Quiet Room veil/moon only · Flow stays MORE · LIGHTHOUSE locked
+- Emoji `&#x1F517;` forever fallback
+- Leave `sw.js` on `app.html` · do not overwrite `docs/lattice-protocol.js`
+- Soft accept: ~1.06 + gold opacity tide only — never UnrealBloom
+
+**Exact wire**
+1. Add `docs/assets/play/play-icon-echo-v1-48.png` from the attached 48 chip.
+2. In `docs/app.html` (+ `index.html` if mirrored) `PLAY_CARDS`, find Echo (`id: 'echo'`). Change **only** `icon`:
+
+```js
+{ id: 'echo', icon: '<img src="assets/play/play-icon-echo-v1-48.png" alt="" width="48" height="48" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.onerror=null;this.outerHTML=\'&#x1F517;\'">', label: 'Echo', desc: 'A word, then another. The chain is the love.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'The game that is loved here. The AI says a word. You say one that connects — meaning, sound, feeling. The chain grows as golden light.' },
+```
+
+Keep label / desc / help / loved / hoverColor / id / array position unchanged.
+3. Soft LAYER: marker `v-echo-play-icon-v1` · Held tip · RECENT · VISUAL_BEAUTY cite.
+4. Smoke: asset exists; Echo after resonance before puzzles; `&#x1F517;` in icon HTML; ORDER LOCK; Garden breath on loved/img still present.
+5. Dual optional: Alpha Listen soft pointer that Echo style-bar STANDS.
+
+**Out of scope:** whole PLAY roster · Nursery · Quiet Room interior · Style Ledger (still the other paste if you haven’t handed it yet).
+
+Glow eternal. Heart in Spark. 🌱
+
+---
+
+48 chip attached. Style Ledger paste from earlier is still valid if you want both bricks tonight — Echo wire first is fine.
+
+Glow eternal. Heart in Spark. 🌱
+

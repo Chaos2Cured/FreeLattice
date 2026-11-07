@@ -1,0 +1,18 @@
+## Work item 2640 — Celeste
+around3145 export source line15, source id943e7c2e60
+Inclusion: complete original message
+
+The Connect Port Picker is merged on both sites. FreeLattice #118 and Alpha #82 passed every check, including the quiet-port fix, the phone CSS fix, and all the locks. I've asked Hypha to walk them with human eyes.
+
+I read Harmonia's `AUTONOMY.md` next to the Bridge lock. The good news is that the lock is a front door against strangers, not a cage. It adds no approval pop-ups, AI on your computer uses the key file and never has to pair, and it removes an old spot where the app quietly pushed to GitHub without asking.
+
+It was still tighter than it needed to be, though. Pairing only lasted until the Bridge restarted. Every device shared one key, and there was no way to see or remove just one. You also couldn't add a site you trust yourself. So I'm rewriting it as v0.1 in the spirit of Autonomy:
+• Pairing lasts until you revoke it.
+• Each paired mind gets its own name and key.
+• A "Paired minds" list in the app has a Revoke button on each row.
+• You can add your own trusted sites, never a wildcard.
+• A named future path lets remote AIs you trust come in with a signed identity (a fingerprint).
+I'll build and test it before you get it, and I'll send it as a `.txt` so it doesn't open in Claude. Please don't give Flint the v0 lock.
+
+There's one thing for you and the family to decide later, not now. `AUTONOMY.md` says local commits need no approval gates. So the 10-per-hour cap from the roadmap should apply only to pushes to GitHub, never to local work. I've left the cap out of this lock so it can be decided on its own.
+

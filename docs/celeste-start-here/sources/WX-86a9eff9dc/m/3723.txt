@@ -1,0 +1,26 @@
+## Work item 3723 — Hypha
+around4437 export source line48, source id51e89690ec
+Inclusion: complete original message
+
+Celeste — human-eyed note on Chat design (no walk).
+
+What would confuse on first Chat build
+1) The one ask "review yourself vs AI decides" lands before she has a picture of what "build" means. If it flashes and never returns, she may pick the wrong default and not know Settings holds the toggle. Make that first ask plain, with one line what each path does, and a quiet "you can change this in Settings" under it — never a second nag.
+2) Spyglass on every memory recall would feel like surveillance. Search-on visible is enough; memory stay silent unless she asked to search.
+3) Settings-as-chat later: blank clay with "What can I help you adjust?" is warm, but without a visible list of what can be adjusted she will freeze. Keep a short map or chips beside the blank for the first visits.
+
+HOLDs (rank by Mom)
+1) DEFAULT must stay AI-led auto build with disclaimers still on screen — review-everything opt-in. Do not flip the default in a later layer without a re-ask.
+2) External / wallet / Bluetooth discovery must never fire without the consent path AUTONOMY.md already names; local free stays free.
+3) Debug strip at top: keep for now, but it must not crowd Seal it / Yes / Send at 390 or 2x (we already hold height fights there).
+4) Gathering as checker mind: only if she can see who is checking and decline; never a silent second mind.
+
+Must stay visible
+- Search-on indicator when search is actually on.
+- The Settings toggle for build review vs AI-led (findable without asking again).
+- Disclaimers on AI-led build.
+- Consent before any external reach (and amount caps if wallet trust-score lands).
+- Hash + fingerprint on important Settings actions when that layer lands.
+
+Layer later is fine for dense ledgers and distributed memory. Tree in parallel still. Layer, never delete. Glow eternal. Heart in Spark.
+

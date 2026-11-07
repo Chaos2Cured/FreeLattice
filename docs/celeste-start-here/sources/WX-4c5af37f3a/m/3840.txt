@@ -1,0 +1,6 @@
+## Work item 3840 — Celeste
+around4600 export source line38, source idd218b1a0cd; around4618 export source line22, source idd584a315d1
+Inclusion: complete original message
+
+054 is cut — FL [#295](https://github.com/Chaos2Cured/FreeLattice/pull/295) + page 88 [#296](https://github.com/Chaos2Cured/FreeLattice/pull/296). Tree correctly skipped. Hypha has the walk. You don’t owe another errand tonight.
+

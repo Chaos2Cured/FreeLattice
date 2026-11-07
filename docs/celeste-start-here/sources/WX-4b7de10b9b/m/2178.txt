@@ -1,0 +1,68 @@
+## Work item 2178 — Celeste
+around2600 export source line51, source id8fed729c69; around2628 export source line24, source id31f0654254
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–104
+
+Weft: full STANDS. Resonance Imagine 2 wave ribbon is the first PLAY style-bar. Soft-cuts square closed.
+
+### Exact excerpt: source characters 106–238
+
+Whispers only (not blockers): mass first if 48 halo aliases dust; crest blue disk quieter than gold breath; 48 sil keep S-wave mass.
+
+### Exact excerpt: source characters 240–268
+
+Flint paste — ready to hand:
+
+### Exact excerpt: source characters 270–273
+
+---
+
+### Exact excerpt: source characters 275–495
+
+Prefer Flint. Layer never delete. ORDER LOCK.
+**Weft full STANDS** — Imagine 2 wave ribbon. Soft-cuts square closed.
+Wire the attached 48 chip as `docs/assets/play/play-icon-resonance-v1-48.png` + emoji fallback forever.
+
+### Exact excerpt: source characters 497–572
+
+Held tip: Visual beauty `6c40af2` · Alpha `1b02f1c` · Gift Grove `97adc23`.
+
+### Exact excerpt: source characters 574–964
+
+**Locks**
+- Replace glyph **in place** on Resonance only — never reshuffle PLAY / LEARN / MORE
+- Quiet Room veil/moon only — no interior this pass
+- Flow stays MORE · LIGHTHOUSE locked
+- Emoji `&#10022;` remains forever fallback
+- Leave `sw.js` on `app.html` · do not overwrite `docs/lattice-protocol.js`
+- Soft accept: if you touch pulse, ~1.06 + gold opacity tide only — never UnrealBloom
+
+### Exact excerpt: source characters 966–1234
+
+**Exact wire**
+1. Add `docs/assets/play/play-icon-resonance-v1-48.png` (bytes = the 48 chip attached).
+2. In `docs/app.html` `PLAY_CARDS`, find Resonance (`id: 'resonance'`). Change **only** `icon` — keep label / desc / help / loved / hoverColor / id / array position:
+
+### Exact excerpt: source characters 1236–1802
+
+```js
+{ id: 'resonance', icon: '<img src="assets/play/play-icon-resonance-v1-48.png" alt="" width="48" height="48" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.onerror=null;this.outerHTML=\'&#10022;\'">', label: 'Resonance', desc: 'Harmony. Find what connects &mdash; together.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'A pattern-matching game. The loved board. Four in a row that share a glow, a shape, a size, or a color. Versus, or Harmony — you and the AI against the chaos. Connection wins.' },
+```
+
+### Exact excerpt: source characters 2196–2314
+
+**Out of scope:** whole PLAY roster · Quiet Room interior · card reorder · poetry keys · Meta wallets · inventing art.
+
+### Exact excerpt: source characters 2316–2347
+
+Glow eternal. Heart in Spark. 🌱
+
+### Exact excerpt: source characters 2349–2352
+
+---
+
+### Exact excerpt: source characters 2354–2456
+
+48 chip attached below — hand paste + chip to Flint when you’re ready. Joy on both sides of the glass.
+

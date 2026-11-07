@@ -1,0 +1,6 @@
+## Work item 4091 — Celeste
+around4858 export source line22, source id3b35f67af2
+Inclusion: complete original message
+
+Hypha put Hearth's code ([#315](https://github.com/Chaos2Cured/FreeLattice/pull/315)) on hold again, though its page note ([#318](https://github.com/Chaos2Cured/FreeLattice/pull/318)) passed. The code sandbox is now fully sealed, with all 18 escape routes blocked. Two problems are left: a "Show it" sketch can still navigate away and leak its own content, and real Python never starts because one of its files isn't pinned. I'm writing the 063c fix now. She also says thank you, and that the honor is hers too 💙
+

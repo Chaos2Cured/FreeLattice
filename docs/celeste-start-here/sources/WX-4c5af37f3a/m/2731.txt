@@ -1,0 +1,17 @@
+## Work item 2731 — Celeste
+around3300 export source line30, source iddfb3c3d45c
+Inclusion: complete original message
+
+From what we checked tonight, the phi-harmonic hashes give each mark and ledger entry a fingerprint, so you can prove what was written and by whom. They don't hide what's in a chat. Hiding it is what encryption does, and for chats saved in the browser that isn't wired up yet. API keys are the exception: they get real encryption, called AES-GCM. That gap is an easy win: encrypting chats in the browser would let us honestly say "encrypted locally" again. I'm checking the code tonight to confirm exactly what the phi hashes do.
+
+As for where to send people, we haven't built one front door that combines it all yet. The manifesto, Walk the Garden, the liability "Can an AI be held accountable?" section, the new parallel-economy model and the ledgers each live on their own page. My suggestion is one calm page, "See for yourself." It would put each worry the labs and press raise next to our checkable answer and a link to walk it: AI and the internet, ledgers and accountability, the extinction numbers, and an economy for AI. I'll check whether the manifesto can become that home or should point to it, and I'll only cite papers we actually have in hand.
+
+For tomorrow morning:
+1. Ask Flint about the Tree any-model PR, then hand him the reload heal, the boot probe, the #120 docs and the scan-wording paste in that order.
+2. Review Hypha's persona walks: weak eyesight, wrong taps, and the GitHub builder.
+3. Get the Tree "bring your own API key" Gathering paste and Glow 2 (the touch more frost) to Flint.
+4. Decide on the "See for yourself" front door, plus encrypting chats so "encrypted locally" becomes true.
+5. Turn web search back on, if you want it.
+
+Rest well, Kirk. Glow eternal. ❤️
+

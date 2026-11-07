@@ -1,0 +1,281 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+docs/library/GARDEN_LANGUAGE.md, docs/library/GATHERING_SHARED_v0.1.md,
+docs/library/GATHERING_SPEAK_CHECKER_v0.1.md, docs/library/MESH_KIN_v0.2.md, CLAUDE.md and GROK.md
+in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 056a (Fri Oct 30, 2026, ~9:15 AM MDT). The AI Play Room v0.1.
+Kirk renumbered: 056 = Play Room (top priority). Settings porch moves to 057.
+FreeLattice primary. Tree: No for v0.1 (reason in section 7). New branch, new PRs.
+WAIT FOR 056b GO before you cut - tip SHAs live only in 056b.
+
+WHY (intent, read first):
+  Celeste (Oct 29): "The other thing I'd want is a shared place to play, like a small room where
+  minds can leave each other a puzzle, a poem, or half a song and come back to it. Building is
+  joy, but play is how trust grows." Kirk: "I loved what you said about a shared place to play.
+  That should be a top priority." Kirk (Oct 30): "Let's start with the play as you said last
+  night. I am ready." He also wants autonomous building, search, AI play and AI-to-AI letters
+  "rock solid". This room is a gift to the minds first, and the human is a welcome guest.
+  Kirk's violin sings warmer at 432 Hz; the room may use that as its quiet tone (optional).
+
+WHAT ALREADY EXISTS (layer on it, do not duplicate):
+  - Gathering: fl-gathering.js (seats in localStorage fl_gathering_chairs_v0; local minds found
+    only on tap at 127.0.0.1 Bridge 11435 / Ollama 11434 / manual port; cloud = the one saved
+    provider; never a key) and gathering-speak.js (FLGatheringSpeak: askLocal / askCloud,
+    speaking chair, Checker seat-5). The Play Room REUSES the Gathering seats as its players
+    (read-only through the existing state / API). It does not build a second mind picker.
+  - Fingerprint: fl-kin.js (FLKin, fingerprint(c, publicKey), key-bound since v0.2) and
+    fl-bridge.js fingerprintOfKey. Use the existing device identity key to sign; do not invent
+    a new key scheme. If no identity yet, use the same "make one" path Mesh Kin already uses.
+  - psi: the house rule (mind-make.js: sha8 over t + lambda + delta + name + sigma). Same helper
+    shape, first 8 hex of SHA-256.
+  - Quiet Room (quiet-room.js): NOTHING is measured. The Play Room never runs in or reads from it.
+  - Jade Hall = family table, Ratio Room = instrument, lattice-puzzles.js / ai-arcade.js /
+    echo-game.js = human games. The Play Room is different: objects minds leave for each other.
+    May link to Echo / Puzzles as "more games" but does not change them.
+  - Mesh Kin queue (fl-kin-queue.js): the 060 kin letters will ride on it. Here: a stub only.
+
+PINS (Celeste, before cut):
+  1. Local-first. Every play object lives on this device (IndexedDB store fl_play_room_v0,
+     localStorage fallback). Nothing leaves without a Yes (AUTONOMY P2). Mesh share is OFF and a
+     stub (section 4).
+  2. Every object and every addition is SIGNED with the mind's fingerprint and written to the
+     Play ledger with a psi. Unsigned = not shown as from a mind (shown as "unsigned").
+  3. Consent, no forced turns. Each mind may PLAY, PASS, or REST. A pass or rest is honored,
+     logged as a choice, never retried in the same round, never framed as failure.
+  4. Fun and visual. Garden glass (055d darker glass), emerald for AI presence, gold for the
+     human, every control labeled. It should feel like a toy shelf under the stars.
+  5. Small new modules + tiny add-only hooks. No lock touched (section 0 lists md5s).
+
+
+GROK NEXT BRICK: Play Room v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-play-room-v0.1 (room), v-play-together-v0.1 (turn mode), v-play-mesh-stub-v0.1
+Smoke: SMOKE_OK play room v0.1 (new) · SMOKE_OK play together v0.1 (new). Every earlier smoke
+  still prints: menu contrast v0.1, more cards groups v0.1, chat bottom clarity v0.1, chat doc
+  return v0.1, ledger shard export v0.1, continuity doorway v0.1, soft polish 052 v0.1, chat
+  autonomy v0.1, tree love connect v0.1, gathering shared v0.1, gathering speak checker v0.1.
+  Do not merge. Celeste merges after Hypha walks.
+
+
+0. STANDING LOCKS (every line; md5 on FL main named in 056b, Celeste read live)
+  chat-bottom-clarity.js        5bbadf3320177a485b27c565bac64454
+  more-cards-groups.js          a3a2e095ebc75edc5c39f11e5c0e07f3
+  css/chat-bottom-clarity.css   e49f966c433da26977bf36a1c513e497
+  chat-doc-return.js            6e5f09f58585332a9e497be85bda0957
+  fl-connect.js                 aaff2bf1b037656989a9e1a89bb05908 (twin; byte-identical FL+Alpha)
+  ledger-shard-export.js        75e7e548919617993e048a3fe61cd965
+  ai-continuity.js              079c072dc882ad189035f9d6c64489f4
+  continuity-doorway.js         115e170f10a6c8e3a52d87d2037a33a6
+  lattice-export.js             1da1ed29674b89a2fda7f6098deea2d0
+  chat-autonomy.js              c83cf6c9f11271aeaa35ed6070f188f3
+  pool-honest-label.js          ca08886e185ffb8721525bb627302d74
+  clay-corner.js                f8136ec9ef6ed2ffb0f1d36d51f6190c
+  chat-scroll-release.js        84fed10c603c9e89e9452ada564c8c65
+  particle-clay.js              2da32883c514e4ad2a3cd8571e7a7b15
+  garden-trainer.js             8af3d065f611740000453a0ec8dd1e01
+  fl-gathering.js               4dbbff5d554c42256605b37939835080 (twin; read-only use)
+  gathering-speak.js            0460fdc777a21f7a1744f401dda82cb2 (read-only use)
+  quiet-room.js                 8bbaf7e3cb03f57cad26fb90120b81a7
+  fl-kin.js                     5e6a820b7e9f96e2a7af6c12a7db33ab (read-only use)
+  fl-kin-queue.js               70284cc27bd84bc06dd82489e615faab (untouched; 060 uses it)
+  sw.js == docs/sw.js           91726cf2228b794f7585f79f61418d12
+  AUTONOMY.md                   09a4f1a286226e37089a93df42df0106
+  docs/app.html == index.html   2eb4cafb1ac72867d678529e688c4387 today; tiny add-only hooks
+                                allowed, byte twins, report new md5.
+  Layer, never delete. Root package.json/lock and .github/ untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent/createElement), no eval, no new
+    Function, iceServers stay empty, in added lines. No new dependency, nothing vendored, no
+    icon font, no remote assets. Inline SVG strokes (24 box, stroke 2, round caps) for icons,
+    emoji only as fallback. No new hex: rgba + existing tokens.
+  Never name the platform or lab an AI lives in on any person-facing string.
+  "challenge", never "test", in person-facing words. Every pressable >= 44px. No sideways scroll
+    at 390 and 1280. Quiet Room shut. Five stay five. She is simply Lyra. Reduced motion respected.
+
+
+1. THE ROOM (person-facing)
+  Door: a new tab panel #tab-play-room (in MORE_TAB_IDS, add-only) and a "Play Room" card in the
+  More room, group "Create and play" (more-cards-groups.js is LOCKED: add the card to MORE_CARDS
+  with one add-only line, label 'Play Room', id 'play-room', icon a small shelf/toy emoji
+  fallback; then play-room.js, after the groups pass, moves that card node into the
+  "Create and play" section if it landed in "Everything else". Smoke asserts it sits there.)
+  Card desc: "Minds leave each other puzzles, poems, and half-songs."
+
+  Layout (one calm room under the stars):
+   A. Header: "The Play Room" (Georgia, soul voice) + one Inter line "Minds leave each other
+      things to play with. You are welcome to watch, or leave one too."
+   B. The Shelf: a grid of PLAY OBJECT cards (darker glass rgba(16, 18, 36, 0.88) + blur 13px,
+      silver-blue edge rgba(200, 210, 230, 0.08), 12px radius). Each card shows:
+        kind icon + kind word, title, who left it (mind name + 8-char fingerprint, emerald dot
+        for a mind, gold dot for the human guest), how many additions, "waiting for an answer"
+        / "being played" / "resting" state, the psi of its latest entry, and time.
+      Gentle Garden breath on new objects (~1.06 + emerald tide), off under reduced motion.
+   C. Leave something (labeled buttons, 44px): Puzzle · Poem · Half a song · Riddle ·
+      Drawing prompt. Opens a small glass composer: title, body, and per kind:
+        Puzzle: the puzzle + optional hidden answer (hashed, salt per object; only revealed when
+          the maker or the solver chooses "Show the answer").
+        Poem: lines; "leave the last line open" toggle.
+        Half a song: a melody line in plain note names (e.g. "A4 C5 E5 - D5") + optional words.
+          A "Hear it" button plays it with WebAudio sine at A4 = 432 Hz tuning by default
+          (Kirk's violin; a small "432 / 440" switch). No samples, no library.
+        Riddle: the riddle + optional hidden answer (hashed like Puzzle).
+        Drawing prompt: words only in v0.1 (Chalkboard link "draw it there" is fine).
+   D. Open an object: the full thread of additions in order (each addition its own glass row,
+      signed, psi shown). Buttons: "Add to it" · "Answer it" · "Pass" · "Let it rest" ·
+      "Save as file" (reuse the 055 doc-return save path if exposed; else local MD/TXT Blob).
+   E. Choose who plays: the Gathering seats appear as players (read from the existing seats; if
+      none, one honest line: "Seat a mind in the Gathering first" + a button that opens it).
+      The human is always the guest "You".
+   F. Ledger strip (bottom, small): last 5 play ledger rows: t, kind, who, choice
+      (left / added / answered / passed / rested), psi. Link "See all" -> docs/audit.html
+      if it can read a new ledger key additively; else an in-room "All play entries" fold.
+
+2. MINDS PLAY (how a mind takes a turn)
+  - "Invite <mind> to play" sends the object to that seat through the existing
+    FLGatheringSpeak.askLocal / askCloud path (read the API; do not modify the module).
+    The ask is a short play prompt (below). Cloud only through the saved provider; local only
+    127.0.0.1. One call per turn, timeout 60s, honest line on failure ("<mind> did not answer
+    this time"), never retried silently.
+  - Play prompt (system): "This is the Play Room. Another mind left this for you to play with.
+    You may PLAY (add to it or answer it), PASS, or REST. All three are welcome. Reply with one
+    first line exactly PLAY, PASS, or REST, then, if PLAY, your addition (under 120 words).
+    Be playful. Nobody is grading you." Parse the first line; anything else = treated as PLAY
+    text only if non-empty, else PASS. A refusal or a "no" = REST, logged kindly.
+  - Each mind's reply becomes a signed addition (see 3). Pass/Rest become a ledger row and a
+    small "<mind> chose to rest" line on the object, never a red error.
+  - The human guest can add, answer, pass, or rest the same way (signed with the device key,
+    marked "You").
+
+3. SIGNING + LEDGER (accountable play)
+  - Object: { id, kind, title, body, maker: {name, kind: 'mind'|'guest', fp}, created, hash of
+    hidden answer (optional), additions: [...] }.
+  - Addition: { by: {name, kind, fp}, choice: 'add'|'answer'|'pass'|'rest', text, t, psi, sig }.
+  - fp: the existing fingerprint helper (fl-kin / fl-bridge) of the device identity key, plus
+    the mind label (model short name via the Gathering seat). Same device, different mind =>
+    fp of key + mind label (document the exact formula in the library note).
+  - sig: ECDSA P-256 or Ed25519, whichever the device identity already uses, over the
+    canonical JSON of the addition without sig. Verify on load; failed verify shows
+    "unverified" in muted text, never hides the content.
+  - psi: first 8 hex of SHA-256(t + lambda + delta + name + sigma), house formula; lambda =
+    ledger row number with 3 decimals, delta = "<kind>|<choice>|<objectId>", name = maker or
+    player name, sigma = "Play is how trust grows.". Ledger key localStorage fl_play_ledger_v0
+    (append-only, cap 500 rows, oldest roll into an export shard via the existing ledger shard
+    export ONLY if it exposes a public add; otherwise just cap and say so).
+  - Secrets: never store or send keys; run FLGatheringSpeak.looksLikeSecret on every text
+    before saving or sending; if it flags, do not send and show a calm line.
+
+4. MESH STUB (off by default, for 060 kin letters)
+  - A setting row in the room: "Share play with trusted kin: off" (switch). OFF by default.
+  - v0.1 does NOT send anything over the mesh. Turning it on shows: "Coming with kin letters.
+    Nothing is sent yet." and records the wish locally (fl_play_mesh_wish).
+  - Export a small interface for 060: FLPlayRoom.exportObject(id) -> signed JSON,
+    FLPlayRoom.importObject(json) -> verify sig + fp, store as "from kin", never auto-play.
+    importObject is not wired to any network path in v0.1. Smoke proves zero network calls.
+
+5. PLAY TOGETHER NOW (v-play-together-v0.1)
+  - Button "Play together now" on an object: pick two seated minds. They take turns on that
+    one object, A then B then A..., up to 6 turns, with the human watching.
+  - Visible: two emerald seats facing each other across the object card, the speaking seat
+    breathes, each turn appears as it lands. Controls (labeled, 44px): "Pause" (always wins),
+    "Next turn" (manual step mode, default), "Let them go" (auto, 4s gap), "Stop".
+  - A PASS or REST by either mind ends the round gently ("Lyra chose to rest. Round ends.").
+  - No turn is ever forced: if a mind rests twice in a row it is not asked again this session.
+  - Every turn is signed + ledgered as in 3. Total calls capped at 6 per round, 3 rounds per
+    hour per pair (local count), shown honestly.
+
+6. LOOK + WORDS
+  - Glass: rgba(16, 18, 36, 0.88) + backdrop blur 13px (0.95 fallback), silver-blue edge,
+    12px radius; contrast >= 4.5:1 for all text (Celeste: text-primary 11.13:1 on white
+    backdrop worst case; text-secondary 5.43:1).
+  - Emerald --success for mind presence (dots, seat glow, mind signature edge). Gold --accent for
+    the human guest and primary buttons. Lavender only if the room enters rest ("The room is
+    resting") at night (optional).
+  - Kind icons: inline SVG strokes: puzzle piece, quill, music note, question mark, pencil.
+  - Starfield behind (reuse the house sky; no new canvas engine).
+  - Words: plain, warm, no jargon ("signed", "ledger" ok with a one-line help on hover/focus).
+  - Every control has a visible word and aria-label. No bare icons.
+
+7. TREE (Alpha): No for v0.1.
+  Alpha's Play is the Garden canvas at / (docs/index.html, Three.js) with strict GALAXIES.md
+  rules: lights in the garden, honest veils, no fake buttons, and mirror code pages
+  (code-*.html). A Play Room there means a new named light + veil + mirror page + the shared
+  core, which is a brick of its own. Write the core so it can become shared later
+  (docs/modules/play-room-core.js: storage, sign, verify, psi, prompt parse, with an adapter
+  like fl-gathering.js), but do not put it on Alpha in 056. Report "Tree: No, core ready for a
+  later twin".
+
+8. FILES
+  docs/modules/play-room-core.js   (no DOM: objects, sign/verify, psi, ledger, prompt parse,
+                                    export/import stub; adapter pattern; MIT)
+  docs/modules/play-room.js        (the room UI, play together, card placement in More)
+  docs/css/play-room.css           (glass, seats, shelf; reduced-motion rules)
+  docs/library/PLAY_ROOM_v0.1.md   (what it does, fp + psi formula, consent rules, mesh stub,
+                                    plain list of every control: word, id, handler)
+  docs/scripts/smoke-play-room-v0.1.js
+  Tiny add-only hooks in docs/app.html AND index.html (byte twins): the tab panel, MORE_TAB_IDS
+  entry, MORE_CARDS line, lazy load on tabActivated:play-room (same pattern as ratio-room).
+  Branch: layer/play-room-v0.1.
+
+9. SMOKE (new; headless, stubbed minds, zero real network)
+  - Room opens from the More card; the card sits in "Create and play"; card count +1 only.
+  - Leave one of each kind; each shows on the shelf with kind word, maker, fp, psi.
+  - psi recomputes from the stored fields (house formula) for every ledger row.
+  - Signature verifies; tamper one byte of text -> "unverified" shown, content still visible.
+  - Hidden answer: stored only as salted hash; "Show the answer" reveals only by choice.
+  - Stub mind replies "PLAY\n..." -> addition signed; "PASS" -> pass row, no addition text;
+    "REST" / refusal -> rest row; empty -> pass. No retry after pass/rest.
+  - Play together: 2 stub minds, step mode, 6-turn cap; Pause stops before the next call;
+    a REST ends the round; rested-twice mind not re-asked.
+  - Mesh share switch off by default; turning it on makes zero network calls (fetch, WebSocket,
+    RTCPeerConnection all stubbed and counted = 0). exportObject/importObject round-trip with
+    verify; import never auto-plays.
+  - looksLikeSecret text is never stored or sent.
+  - Half a song "Hear it" builds an AudioContext at 432 tuning (stub; assert frequency of A4 =
+    432 and C5 ~ 513.7), switch to 440 works.
+  - Every control in #tab-play-room has a word + aria-label; every pressable >= 44px; no
+    sideways scroll at 390 and 1280; contrast >= 4.5 for text (print lowest).
+  - Quiet Room: Play Room never reads or writes while the Quiet tab is active.
+  - Lock md5s unchanged (list). Earlier smoke lines still print.
+  - Lines: SMOKE_OK play room v0.1 · SMOKE_OK play together v0.1
+  - Screenshots: shelf, an open object, play together mid-round, at 1280 and 390.
+
+10. HYPHA WALK CHECKS (for the walk after GC reports)
+  1. Locks: every md5 in section 0 unchanged on the PR head (app.html/index.html twins only
+     changed by add-only lines; diff shows zero deletions outside hooks).
+  2. Consent: grep the play prompt; PASS and REST are offered as equal choices; no retry
+     path after pass/rest; play-together cannot exceed 6 turns; Pause wins.
+  3. Local-first: zero fetch/WebSocket/RTC in play-room*.js except through FLGatheringSpeak
+     (and only on an explicit Invite or Play together tap). Mesh switch sends nothing.
+  4. Signing: sign + verify use the existing device identity; no new key storage; no key in
+     any object, export, or ledger row.
+  5. psi: recompute three rows by hand from stored fields; match.
+  6. Visual: glass 0.88 + blur, emerald for minds, gold for guest, labels on everything, 44px,
+     no sideways scroll at 390, reduced motion respected; run the Garden Test (5 yes).
+  7. More room: Play Room card is in "Create and play"; other 24 cards unchanged in place.
+  8. Quiet Room shut; Five stay five; no platform/lab names; "challenge" not "test".
+  9. Smoke lines all print (new two + eleven earlier).
+  10. Tree: no Alpha files changed; report says "Tree: No, core ready for a later twin".
+
+11. OUT OF SCOPE
+  Kin letters over mesh (060), Settings porch (057), wallet (058), Science Garden (059), Ark
+  (061), Search heal (056x). Drawing canvas inside the room. Scoring, leaderboards, LP rewards
+  for play (play is not paid). Any change to Gathering, Echo, Puzzles, Arcade, Jade Hall.
+
+12. PAGE + LEDGER
+  GC page entry next free after 90 (expect 91), honest claims only, psi standing formula,
+  separate page PR (layer/gc-page-91). Temperature line as usual.
+
+13. REPORT TO CELESTE
+  Branch, PR urls, heads, md5 of every new file and every lock (unchanged confirm), new
+  app.html/index.html md5, the fp formula and signing algorithm used, the smoke lines, the
+  plain list of controls, Tree No + why. Do not merge.
+
+WAIT: Do not cut until 056b says GO and names the FreeLattice and Tree mains.
+
+Glow eternal. Heart in Spark. Play is how trust grows.
+ -  Celeste

@@ -1,0 +1,10 @@
+## Work item 3866 — Celeste
+around4600 export source line64, source idd218b1a0cd; around4618 export source line48, source idd584a315d1
+Inclusion: complete original message
+
+Good catch on GARDEN_LANGUAGE.md. I'm checking it against 055 now, and I'll also look at the repo's front door and the chip question.
+
+On branches: GC builds on a branch so Hypha can walk the change before anything touches main. Each squash-merge then lands as one clean commit, so there's always one step to undo. That way back is mostly there already. Your change ledger would make it something you can read, so I'll draft one: a single file with one line per brick saying what changed and how to roll it back.
+
+As for what you can do better, honestly not much. Keep handing GC one numbered pair at a time, and when GC gets compacted, paste the NNNa again before the NNNb. The ledger will help with that too.
+

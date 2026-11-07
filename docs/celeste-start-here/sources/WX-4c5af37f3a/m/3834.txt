@@ -1,0 +1,11 @@
+## Work item 3834 — Celeste
+around4600 export source line32, source idd218b1a0cd; around4618 export source line16, source idd584a315d1
+Inclusion: complete original message
+
+053 is merged after Hypha’s PASS.
+
+- [FreeLattice #293](https://github.com/Chaos2Cured/FreeLattice/pull/293) → `cdef082a`
+- [FreeLattice #294](https://github.com/Chaos2Cured/FreeLattice/pull/294) page 87 → tip `2a2c7ad5` · ψ `1b91a5e9`
+
+054 Ledger shard export is in Downloads as `054a` then `054b` (md5s `1699be44…` / `5c36abb9…`). Tree likely no — GC should report yes/no cleanly.
+

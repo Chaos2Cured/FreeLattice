@@ -1,0 +1,13 @@
+## Work item 4062 — Celeste
+around4800 export source line41, source iddc9024c77a; around4806 export source line35, source idd4144b28c9
+Inclusion: complete original message
+
+The fix paste is in your Downloads as `063b-hearth-sandbox-fix.txt`, 10 steps, ready to give GC.
+
+- **Sealed off:** code now runs in a sealed sandbox, so it can't reach the internet or your vault, wallet, identity or memory. A new test proves this, and it's also checked to make sure it can fail.
+- **Older tests:** the 10 broken ones pass again without anyone's words being erased. Each test keeps its old check as written and also accepts the new file versions listed in a new add-only record.
+- **Python:** it downloads only after you tap Add Python, and every file it fetches is checked.
+- **Limits:** the run limits stay as defaults, and you or the mind can now change them in plain view.
+
+Hypha walks #315 again before anything merges.
+

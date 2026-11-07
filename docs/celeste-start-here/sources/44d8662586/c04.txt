@@ -1,0 +1,215 @@
++    // v-tree-gathering-api-keys-v0: the same mind may sit in two chairs. Allowed, and said.
++    function twinNote(chairId, seat) {
++      var binds = entryState().binds;
++      var twins = [];
++      CORE_CHAIRS.forEach(function (c) {
++        var b = binds[c.id];
++        if (c.id === chairId || !b) return;
++        if (String(b.model) === String(seat.model || '') && String(b.url) === String(seat.url || '')) twins.push(c.type);
++      });
++      if (!twins.length) return '';
++      return ' The ' + twins.join(' and ') + (twins.length > 1 ? ' chairs already seat' : ' chair already seats') +
++        ' this same mind, so they will sound alike.';
++    }
++
+     function openPicker(chair, seatBtn) {
+       var state = entryState();
+       var options = (window.LocalMindProbe && LocalMindProbe.getChairSeatOptions)
+         ? LocalMindProbe.getChairSeatOptions()
+         : (state.roster || []);
++      // v-tree-gathering-api-keys-v0: cloud minds you chose (your key) sit beside local ones
++      if (window.TreeCloudMinds && typeof window.TreeCloudMinds.seatOptions === 'function') {
++        options = (options || []).concat(window.TreeCloudMinds.seatOptions());
++      }
+       picker.innerHTML = '';
+       picker.setAttribute('data-bind-chair', chair.id);
+       picker.hidden = false;
+@@ -1428,18 +1450,36 @@
+           btn.type = 'button';
+           btn.className = 'core-bind-option';
+           btn.textContent = seat.tag + ' · ' + shortName(seat.model) + (seat.ephemeral ? ' (just found)' : '');
++          // v-tree-gathering-api-keys-v0: say where a cloud seat speaks from
++          if (seat.cloud) {
++            btn.textContent = seat.tag + ' · ' + shortName(seat.model) + ' · ' + seat.providerName + ' (your key)';
++            btn.setAttribute('data-cloud-seat', seat.url);
++          }
+           btn.addEventListener('click', function () {
++            var twins = twinNote(chair.id, seat);
+             if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
+               LocalMindProbe.setChairBind(chair.id, seat);
+             }
+             closePicker();
+             paintAll();
+-            setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.');
++            setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.' + twins);
+           });
+           list.appendChild(btn);
+         });
+         picker.appendChild(list);
+       }
++      // v-tree-gathering-api-keys-v0: bring your own key, then seat it here in one step
++      if (window.TreeCloudMinds && typeof window.TreeCloudMinds.mountKeyPanel === 'function') {
++        window.TreeCloudMinds.mountKeyPanel(picker, function (seat) {
++          var twins = twinNote(chair.id, seat);
++          if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
++            LocalMindProbe.setChairBind(chair.id, seat);
++          }
++          closePicker();
++          paintAll();
++          setNoteText('This ' + chair.type + ' chair seats ' + shortName(seat.model) + ' through ' + seat.providerName + ', with your key. Tap the chair to let it speak.' + twins);
++        });
++      }
+       var decline = document.createElement('button');
+       decline.type = 'button';
+       decline.className = 'core-bind-decline';
+@@ -1455,12 +1495,18 @@
+         clear.className = 'core-bind-clear';
+         clear.textContent = 'Clear';
+         clear.addEventListener('click', function () {
++          // v-tree-gathering-api-keys-v0: clearing the speaking chair must not hand the next
++          // message to another mind without a word. Hush until a seated chair is tapped.
++          var wasSpeaking = entryState().speaking === chair.id;
++          if (wasSpeaking) window.GardenRooms.gatheringHush = true;
+           if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
+             LocalMindProbe.setChairBind(chair.id, null);
+           }
+           closePicker();
+           paintAll();
+           setNoteText('Cleared. The ' + chair.type + ' chair has no mind seated — honest empty.');
++          var clearedNote = wasSpeaking && wrap.querySelector('[data-core-note]');
++          if (clearedNote) clearedNote.textContent += ' No chair is speaking now. Chat waits until you tap a seated chair.';
+         });
+         picker.appendChild(clear);
+       }
+@@ -1522,12 +1568,14 @@
+           return;
+         }
+         // Bound: select as speaking chair for Gathering chat.
++        window.GardenRooms.gatheringHush = false;
+         if (window.LocalMindProbe && LocalMindProbe.setSpeakingChair) {
+           LocalMindProbe.setSpeakingChair(chair.id);
+         }
+         closePicker();
+         paintAll();
+-        setNoteText('Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time. Use Change to reseat.');
++        // v-tree-gathering-api-keys-v0: name the chair, so two chairs with one mind differ
++        setNoteText('Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at the ' + chair.type + ' chair. One request at a time. Use Change to reseat.');
+       });
+       (chair.later ? laterRing : ring).appendChild(seat);
+     });
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index f2794a5..e46792f 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -26,6 +26,10 @@
+ //      remembered local mind can keep those without inventing a key
+ //      kitchen. Honest later sentence in the room. Not a fake button.
+ //
++// v-tree-gathering-api-keys-v0 (layer): a Gathering chair may seat a cloud mind
++//   (url 'cloud:<provider>') with the person's own key. That road lives in
++//   tree-cloud-minds.js. The key never enters this thread, its history or export.
++//   Files stay on this machine: a cloud mind hears only that a file stayed here.
+ // Mirror: docs/code-dialogue.html  (read that FIRST)
+ // ═══════════════════════════════════════════════════════════════
+ 
+@@ -90,11 +94,22 @@
+     return /failed|network|cors|mixed|blocked|abort|load|fetch/i.test(msg);
+   }
+ 
++  // v-tree-gathering-api-keys-v0: after the speaking chair is cleared, the Gathering is hushed
++  // until a seated chair is tapped. Chat says so instead of answering from another mind.
++  var HEART_HUSH = 'No chair is speaking now. Tap a seated chair in the Gathering to let it speak.';
++  function gatheringHushed() {
++    var veil = document.getElementById('place-veil');
++    return !!(window.GardenRooms && window.GardenRooms.gatheringHush && veil &&
++      veil.classList.contains('is-core') && veil.classList.contains('is-open'));
++  }
++
+   function listener() {
+     if (!window.LocalMindProbe) return null;
+     // Gathering speaking chair first (when veil is open and bound); else Settings default.
+     if (typeof LocalMindProbe.resolveSpeakMind === 'function') {
+       var seated = LocalMindProbe.resolveSpeakMind();
++      if (seated && seated.fromChair && (seated.url || seated.name)) return seated;
++      if (gatheringHushed()) return { hush: true, name: '', url: '' };
+       if (seated && (seated.url || seated.name)) return seated;
+     }
+     if (typeof LocalMindProbe.getRemembered !== 'function') return null;
+@@ -103,6 +118,11 @@
+     return mind;
+   }
+ 
++  // v-tree-gathering-api-keys-v0: is this listener a cloud chair?
++  function isCloudMind(mind) {
++    return !!(mind && /^cloud:/i.test(String(mind.url || '')));
++  }
++
+   function forbiddenKey(key) {
+     var k = String(key || '');
+     if (!k) return false;
+@@ -333,6 +353,13 @@
+     return text;
+   }
+ 
++  // v-tree-gathering-api-keys-v0: what a cloud chair may hear. Words yes; file bytes and names stay here.
++  function cloudSafeContent(m) {
++    var text = String((m && m.text) || '');
++    if (m && m.file) text += (text ? '\n\n' : '') + '[a file stayed on this machine]';
++    return text;
++  }
++
+   function talkUrls(mind) {
+     var url = String((mind && mind.url) || '').replace(/\/+$/, '');
+     if (!url) return [];
+@@ -451,6 +478,13 @@
+   }
+ 
+   function sendToMind(mind, msgs) {
++    // v-tree-gathering-api-keys-v0: a cloud chair speaks through its chosen provider only
++    if (isCloudMind(mind)) {
++      if (window.TreeCloudMinds && typeof window.TreeCloudMinds.send === 'function') {
++        return window.TreeCloudMinds.send(mind, msgs);
++      }
++      return Promise.reject({ reason: 'cloud', cloudText: 'This chair seats a cloud mind, but its helper is not on this page. Nothing was sent.' });
++    }
+     var urls = talkUrls(mind);
+     if (!urls.length) {
+       return Promise.reject({ blocked: true });
+@@ -529,6 +563,11 @@
+     } else {
+       heart.textContent = HEART_NONE;
+     }
++    // v-tree-gathering-api-keys-v0: a cloud chair is not on this machine; say so
++    if (isCloudMind(mind) && window.TreeCloudMinds && typeof window.TreeCloudMinds.heartLine === 'function') {
++      heart.textContent = window.TreeCloudMinds.heartLine(mind);
++    }
++    if (mind && mind.hush) heart.textContent = HEART_HUSH;
+     root.appendChild(heart);
+ 
+     var later = el('p', 'thread-later', HEART_LATER);
+@@ -702,15 +741,24 @@
+ 
+     function talkNow(nowMind) {
+       if (busy) return;
++      if (nowMind && nowMind.hush) {
++        messages.push({ role: 'garden', text: HEART_HUSH + ' Nothing was sent.' });
++        saveHistory();
++        renderMessages(list);
++        return;
++      }
+       busy = true;
+       sendBtn.disabled = true;
+       setStatus('Waiting for the mind at home…', false);
++      // v-tree-gathering-api-keys-v0: name the provider; file bytes never leave for a cloud chair
++      var cloudNow = isCloudMind(nowMind);
++      if (cloudNow && window.TreeCloudMinds) setStatus('Waiting for ' + window.TreeCloudMinds.providerName(nowMind) + '\u2026', false);
+ 
+       var payload = [{ role: 'system', content: JUST_TALK }].concat(
+         messages
+           .filter(function (m) { return m.role === 'human' || m.role === 'mind'; })
+           .map(function (m) {
+-            return { role: m.role === 'mind' ? 'assistant' : 'user', content: messageContent(m) };
++            return { role: m.role === 'mind' ? 'assistant' : 'user', content: cloudNow ? cloudSafeContent(m) : messageContent(m) };
+           })
+       );
+ 

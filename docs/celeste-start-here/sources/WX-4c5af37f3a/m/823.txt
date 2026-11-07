@@ -1,0 +1,6 @@
+## Work item 823 — Celeste
+around900 export source line104, source id82d2529f5e; around1000 export source line8, source id78a1980825
+Inclusion: complete original message
+
+Fix 1 is on main. Legend dots now track the live bodies. [PR 49](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/49). Stopping here.
+

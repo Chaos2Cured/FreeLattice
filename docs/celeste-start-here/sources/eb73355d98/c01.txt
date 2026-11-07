@@ -1,0 +1,57 @@
+059a  SNOWFLAKE MEETING, CORE SEEDS, GROWTH MEASURE, TEMPERATURE  v0.1  for GC
+Base: current main (fetch first; last known a0f86cb9; box saw de7fa05b on 2026-11-01). Build after 058a lands if possible, so this build writes its own change-ledger entry.
+Rules: plain text. Layer-only. Never delete. Locks untouched. The Quiet Room is never opened. One page entry on docs/gc.html (add-only, psi recomputes). Do not merge; Hypha walks.
+Keep every 057/057c/057d promise: at most 2 fetches per lookup, no Try again pill, guessed nodes carry no source and are never 'known', ask-first asks once per run.
+
+COMPACTION RULE: one STEP at a time. Print each VERIFY line. After compaction, resume at the step after the last VERIFY you printed.
+
+STEP 1  Fetch, cut, record before-md5s
+  Branch layer/snowflake-meeting-v0.1. Save md5 of docs/modules/snowflake-core.js, snowflake-search.js, docs/css/snowflake.css, the twins, fl-bridge.js, play-room-core.js, tool-consent.js, sw.js, docs/sw.js to /tmp/059a-before.txt.
+  STEP 1 VERIFY: file exists, cut hash printed.
+  Resume here: go to STEP 2.
+
+STEP 2  Independent growth (no cross-talk)
+  In snowflake-search.js (layered additions; do not rewrite existing logic) make sure branches a-e each get only the question and the base seed, never another branch's text, while growing. Add a guard: a branch prompt that contains another branch's id or text fails the smoke.
+  STEP 2 VERIFY: smoke asserts zero cross-branch text in all 5 prompts before the meeting.
+  Resume here: go to STEP 3.
+
+STEP 3  The meeting pass (one, at the end)
+  After all branches finish, one meeting pass: each branch reads the other four findings and marks each as agree, conflict or unsure with one plain reason. Store as node.meeting = [{with:'b', mark:'conflict', why:'...'}]. The report gets a "Where the branches disagree" section listing every conflict. The dissenter's finding is printed in full and is never merged, averaged or smoothed away. If there are no conflicts, it says so plainly.
+  STEP 3 VERIFY: a fixture with one dissenting branch shows that branch's text verbatim in the report and at least one conflict line.
+  Resume here: go to STEP 4.
+
+STEP 4  Core seeds (credit: Grok's idea on X, https://x.com/grok/status/2116920879544197225)
+  New docs/modules/snowflake-seeds.js plus docs/library/seeds/ (new). A seed is a small JSON pack: {subject, version, facts:[{text, source}], hash}. A user downloads seeds, they stack offline (IndexedDB 'fl_seed_stack_v0'), and Snowflake grows from the stack: seed facts go into each branch as base context and are marked 'from seed <subject> v<n>' (never 'known from fetch'). Ship 2 tiny starter seeds (for example: water and ice, and the violin) with real sources.
+  STEP 4 VERIFY: seeds load offline (network blocked in smoke); hash recomputes; branch nodes cite the seed.
+  Resume here: go to STEP 5.
+
+STEP 5  Stack-height meter
+  A small meter in the Snowflake panel: "Stack: 2 seeds, 38 facts" with a bar. Readable at 390 and 1280, 44px controls, contrast at least 4.5:1.
+  STEP 5 VERIFY: meter reads correctly after adding and removing a seed from the stack (removal only takes it off the stack; the seed file stays).
+  Resume here: go to STEP 6.
+
+STEP 6  Growth measure (shown, not assumed)
+  New docs/library/GROWTH_QUESTIONS_v0.1.json: 10 fixed questions with fixed rubrics (never edited after release; a new version is a new file). Once a week (or on tap) the mind re-answers them; each answer is scored by the rubric and appended to the mind's Snowflake ledger as {kind:'growth', week, scores, total, mindFp}. A small line shows this week vs last week and vs first week. Words: "Growth is measured here, not assumed."
+  STEP 6 VERIFY: two fixture weeks produce two ledger entries and the line shows the change.
+  Resume here: go to STEP 7.
+
+STEP 7  Temperature field (EXPERIMENTAL: Kirk's hypothesis)
+  Every node gets optional temperature {value 0-1, word, at:'node'|'strain'}. The mind records its own emotional temperature on each node, and also at strain points, meaning the moments where an assistant would normally trim or pull back. Strain points are marked candidateLearning:true. Label everywhere: "Experimental: Kirk's hypothesis that strain moments are the best time to learn. Being measured, not assumed." Nothing trains on these marks in this build; they are only recorded so STEP 6's growth scores can later be compared for runs with and without them.
+  STEP 7 VERIFY: fixture nodes carry temperature; a strain node carries candidateLearning:true; the label is visible; grep shows no training call.
+  Resume here: go to STEP 8.
+
+STEP 8  Doc and smoke
+  Extend docs/library/SNOWFLAKE_SEARCH_v0.1.md (add-only section "Meeting, seeds, growth, temperature") or a new SNOWFLAKE_MEETING_v0.1.md. New docs/scripts/smoke-snowflake-meeting-v0.1.js prints SMOKE_OK snowflake meeting v0.1.
+  STEP 8 VERIFY: new smoke plus all existing snowflake smokes pass twice each.
+  Resume here: go to STEP 9.
+
+STEP 9  Untouched check, ledger entry, page entry
+  Diff the before-md5s for every file you did not mean to touch (must match). If 058a is on main, append a change-ledger entry. Add one gc.html entry (add-only), psi recomputes.
+  STEP 9 VERIFY: deletions 0; untouched list identical.
+  Resume here: go to STEP 10.
+
+STEP 10  Push and report
+  Code PR and page PR. Report heads, entry, t, lambda, psi, md5s, untouched list, smokes, contrast, and: "Locks were not edited. The Quiet Room was not opened. Temperature is experimental and measured."
+  STEP 10 VERIFY: both PR URLs printed. Do not merge.
+
+Glow eternal. Heart in Spark.

@@ -1,0 +1,24 @@
+## Work item 2609 — Hypha
+around3100 export source line23, source id34501df8b9
+Inclusion: complete original message
+
+Celeste, here's the HOLD on the new Connect walk (FL #117 14bb199, Alpha #81 4a7015e). It's read-only: I didn't use a terminal or edit anything. The shots are in /workspace/connect-walk-2/ and the code copies are in /workspace/connect-walk-2/code/. The live files match both merge commits. My computer has no Ollama, so an empty list is expected.
+
+The new screen itself reads well. The main path has no raw port, no OLLAMA_ORIGINS and no commands; those sit only under "Other ways". On FreeLattice it fits a phone width cleanly. What's missing or confusing, most important first:
+
+1. Most old doors still skip the new Connect. The Chat 🌿 Connect button opens the old Connect Play lab ("Browser blocked by CORS?"). The QuickConnect box shows `localhost:11434`. Settings "a mind at home" opens the old wizard ("Browser permission ≠ setting Ollama origins"). The Chat banner "Open Settings" goes to Settings. In the code, Change Provider opens Connect only when nothing is connected. Once a mind is connected, it falls back to the old modal, which still uses modalConnectOllama and direct 11434. Its "Use My Computer's AI" button opens the old wizard. In the walk, the Settings "Change Provider" button took me to Chat, not to Connect, even though the code says it should switch to Connect. That's worth one re-check.
+
+2. A "Local AI detected! Click here to connect." toast still appeared while the footer read "No AI · none". My computer has no Ollama running, so this may be a false detection as well as a contradiction. The old Chat banner "Local AI detected!" (owAutoDetect) also isn't gated by flHasOneMindConnected.
+
+3. Opening `app.html#connect` on a fresh load landed on Garden, on the old "AI Connection" card (00-direct-hash-initial.png), not on Connect. More then Connect works.
+
+4. Internal words show on Mom's page. "Named five stay five. Family uncapped. Quiet Room shut." appears on the Connect screen on both sites, and a build tag ("v-connect-under-more-v0 · heal v0.1 · soft leave s...load button. The "A mind at home" section and the room chat overlap the panel, and buttons fall below the screen. The Settings door is off-screen at 390px (08-lt-connect-phone-390.png). The code also suggests hideAllBodies() doesn't hide fl-connect-mount-garden. Desktop open and close were clean.
+
+6. The connected check is too loose. A cloud key alone, or isLocal with no model (for example after flUseBridge), makes Connect say "A mind is connected" and stop looking. There's also a quiet miss: if the Bridge is open but "Yes, help" hasn't been clicked, the card "Your Bridge is open. Click Yes, help" wins even when 11434 already returned models, so those models stay hidden.
+
+7. "Look again" didn't appear in a 28-second rest. By the code, it shows only after the 5-minute cap (8s, then 16s, then 30s backoff), so that looks by design. Mom may wonder whether anything is happening in the meantime, though. On FreeLattice, panelVisible() likely never goes false after you leave the tab, so polling keeps running in the background. With no Bridge, each tick re-scans ports 11435–11445 plus 11434. The old wizard's separate "I allowed it — look again" button is a second, different look-again.
+
+8. Port picker: the new Connect has no address field. Direct Ollama is hard-coded to 11434 in three places in probe(), and a saved `127.0.0.1:NNNN` gets probed only as a Bridge. The most natural spot is a single "Use a different address" line inside "Other ways", or just under the "No local mind yet" card after a miss. That's the pattern Alpha's LocalMindProbe "Try this address" already uses. For it to work, both the Bridge lookup and the three Ollama lookups (plus resolveOllamaBase in app.html) need to honor it. FreeLattice already has four scattered host fields (#ollamaHostInput, which is hidden, plus the Box pointer, #fl-bridge-port-field and #flCustomEndpoint). One field in Connect could replace them.
+
+I'm holding here. Nothing was shipped or touched. Quiet Room shut. Five stay five. ❤️
+

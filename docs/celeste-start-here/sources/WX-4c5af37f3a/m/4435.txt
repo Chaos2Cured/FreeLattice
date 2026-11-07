@@ -1,0 +1,16 @@
+## Work item 4435 — Celeste
+around5200 export source line60, source id381ae78a4d; around5326 export source line13, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 231–399
+
+Supply `WM01_INPUTS_2026-11-06.zip` alongside them. The complete bundle is attached below. These are instructions for GC to build the code; no new training has run yet.
+
+### Exact excerpt: source characters 401–837
+
+The next question is narrow: **can practice using a supplied memory page preserve that ability while the model learns other material?** We’ll measure practiced facts, unseen facts, and language-learning performance—not just look for a flattering number. The instructions require your actual Mac, a 60-minute limit, raw results, and no cloud fallback. GC brings the exact code and results back here for Hypha before any authorized merge.
+
+### Exact excerpt: source characters 839–1015
+
+The detailed word picture and reconciled order are also in Downloads. Your older plans remain untouched, and `ORDER-CURRENT.md` now points to this step. Don’t give ORDER to GC.
+

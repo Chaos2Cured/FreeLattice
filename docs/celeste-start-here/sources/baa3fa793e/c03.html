@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GLOW_2B_v0.1.txt c03</title>
+<meta name="description" content="Reading section c03 of baa3fa793e, 1047 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/baa3fa793e/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GLOW_2B_v0.1.txt c03">
+<meta property="og:description" content="Reading section c03 of baa3fa793e, 1047 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/baa3fa793e/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1457"></span><span id="p1458"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GLOW_2B_v0.1.txt · c03</h1>
+<p>baa3fa793e · words 1047 · characters 17915–25224</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1457, 1458. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/library/TREE_GLOW_v0.md b/docs/library/TREE_GLOW_v0.md
+index 79ed663..1ee345f 100644
+--- a/docs/library/TREE_GLOW_v0.md
++++ b/docs/library/TREE_GLOW_v0.md
+@@ -39,3 +39,16 @@ From Hypha&#x27;s persona walks (2026-09-30), most harmful first:
+ - The picker&#x27;s &quot;not yet&quot; sits above the later seats at 1280.
+ - Zoomed home: the light legend leaves &quot;Garden Galaxy / you are in the garden&quot;, and &quot;galaxies&quot; stays inside the edge. Zoomed Nursery: the egg fits, the sentence wraps, Begin is in view; on a phone the hop lights rest dim behind it.
+ - A quiet Chat remount (a mind was remembered) no longer pulls the page down to Send.
++
++## Glow 2b: a hint more frost, readable doors, honest chairs (v-tree-glow-2b-v0)
++
++**Temperature:** the glass mists a little when a light opens, and every word she needs is big enough and bright enough to read.
++
++- A hint more frost behind an open place (2px blur, a little tint), a stronger tint where frosted glass is missing, and a calm opaque face for reduced transparency.
++- Header &quot;Chat&quot; and &quot;galaxies&quot; (12px, 2.45 : 1) and &quot;shared shoulder&quot; (9.9px, 1.97 : 1) are 14px and about 9 to 10 : 1. The shoulder rests under places other than the Gathering, where it sat on &quot;the garden&quot; and took no tap anyway.
++- &quot;Desktop&quot; / &quot;FreeLattice Desktop&quot; / &quot;install&quot; links are moon-blue on night (12.6 : 1, was 1.83 to 2.08 : 1).
++- A sleeping Send says &quot;Send sleeps until a mind is remembered in Settings.&quot; beside it; sleeping Ask and Run say the same for the benches. The sleeping row dims, the reason does not.
++- &quot;Change&quot; shows only on a seated chair.
++- Code mirrors (code-nursery and five more) wrap long paths on a phone instead of scrolling sideways.
++
++Later (not in 2b): the rest of Hypha&#x27;s contrast list (`CONTRAST.md`, 67 pairs under 4.5 : 1 and 132 under 14px), as one sweep with Kirk&#x27;s eye on the night palette.
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index 7cfa1b8..7cb4d9d 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6399,3 +6399,122 @@ html.flc-hide-galaxy #gardenContainer {
+   border-color: rgba(232, 196, 104, 0.6);
+   color: #e8c468;
+ }
++
++/* v-tree-glow-2b-v0: Tree glow 2b, a hint more frost, readable doors, honest chairs.
++   Layer, never delete. Words stay. Lights stay. Only glass, ink and size move. */
++
++/* (1) A hint more frost when a light is tapped. The glass sits under every place&#x27;s own
++   tint (z-index -1 inside the veil), so each place keeps its gradient. */
++#place-veil.is-open::before {
++  content: &quot;&quot;;
++  position: fixed;
++  inset: 0;
++  z-index: -1;
++  pointer-events: none;
++  background: rgba(12, 10, 26, 0.1);
++  -webkit-backdrop-filter: blur(2px) saturate(1.05);
++  backdrop-filter: blur(2px) saturate(1.05);
++}
++@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
++  /* no frosted glass in this browser: a little more tint instead */
++  #place-veil.is-open::before { background: rgba(12, 10, 26, 0.24); }
++}
++@media (prefers-reduced-transparency: reduce) {
++  #place-veil.is-open::before {
++    -webkit-backdrop-filter: none;
++    backdrop-filter: none;
++    background: rgba(12, 10, 26, 0.62);
++  }
++}
++
++/* (2) &quot;FreeLattice Desktop&quot; and &quot;install&quot; were browser blue on night (1.83 : 1).
++   Moon-blue, underlined, the same before and after a visit. */
++#place-veil .core-note a,
++#place-veil .core-note a:visited,
++#place-veil [data-mind-status] a,
++#place-veil [data-mind-status] a:visited {
++  color: #9fd6ff;
++  text-decoration: underline;
++  text-underline-offset: 2px;
++}
++#place-veil .core-note a:hover,
++#place-veil .core-note a:focus-visible,
++#place-veil [data-mind-status] a:hover,
++#place-veil [data-mind-status] a:focus-visible {
++  color: #e8c468;
++}
++
++/* (3) Header &quot;Chat&quot; and &quot;galaxies&quot; were 12px at 2.45 : 1 on every page, and
++   &quot;shared shoulder&quot; 9.9px at 1.97 : 1. Both are 14px and above 4.5 : 1 now. */
++#garden-header nav,
++#garden-header nav a,
++#garden-header nav summary,
++#garden-header nav .thread-word {
++  font-size: 0.875rem;
++}
++#garden-header nav a,
++#garden-header nav summary,
++#garden-header nav .thread-word {
++  color: rgba(214, 222, 238, 0.86);
++}
++#shared-shoulder {
++  font-size: 0.875rem;
++  letter-spacing: 0.03em;
++  color: rgba(214, 222, 238, 0.8);
++}
++#shared-shoulder a:hover,
++#shared-shoulder a:focus-visible {
++  color: #c4b5fd;
++}
++@media (max-width: 340px) {
++  /* zoomed hands: the words are already large on the glass; keep them inside the edge */
++  #garden-header nav,
++  #garden-header nav a,
++  #garden-header nav summary,
++  #garden-header nav .thread-word {
++    font-size: 0.8rem;
++  }
++  #shared-shoulder { font-size: 0.75rem; }
++}
++
++/* (4) A sleeping Send, Ask or Run says why, right beside it, in readable ink. */
++.thread-send-why,
++.workshop-act-why {
++  margin: 6px 0 0;
++  font-family: Georgia, &#x27;Times New Roman&#x27;, serif;
++  font-size: 0.875rem;
++  line-height: 1.4;
++  color: rgba(226, 232, 244, 0.86);
++}
++.thread-send-why[hidden],
++.workshop-act-why[hidden] { display: none; }
++
++/* (5) &quot;Change&quot; showed on every empty chair: its own display:block won over [hidden]. */
++.core-chair-change[hidden] { display: none !important; }
++/* the sleeping compose dimmed its whole box, so its glass let the words behind show
++   through and the reason would have dimmed too. Dim the sleeping row, keep the glass. */
++.thread-compose.is-closed { opacity: 1; }
++.thread-compose.is-closed &gt; :not(.thread-send-why) { opacity: 0.5; }
++@media (max-width: 640px) {
++  /* phone Gathering card: a sleeping Send row offers nothing to tap and sat on the
++     Settings door; the card says why instead, under the Settings door. */
++  #place-veil.is-core #room-chat .thread-compose.is-closed {
++    position: static;
++  }
++  #place-veil.is-core #room-chat .thread-compose.is-closed .thread-compose-row {
++    display: none;
++  }
++  #place-veil.is-core #room-chat:has(.thread-compose.is-closed) {
++    max-height: 9.25rem;
++  }
++  #place-veil.is-core #room-chat .thread-compose.is-closed .thread-send-why {
++    margin-top: 2px;
++    font-size: 0.875rem;
++  }
++}
++/* the larger shoulder sat on &quot;the garden&quot; over Workshop. Under an open place it was
++   behind the glass and took no tap anyway; it rests there (the Gathering keeps it). */
++html:has(#place-veil.is-open:not(.is-core)) #shared-shoulder {
++  visibility: hidden;
++}
++
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index 13b1031..f2794a5 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -571,6 +571,12 @@
+     row.appendChild(input);
+     row.appendChild(sendBtn);
+     form.appendChild(row);
++    // v-tree-glow-2b-v0: a sleeping Send says why, right under it, where the eye already is.
++    // (The input&#x27;s own label says the same for a screen reader.)
++    var sendWhy = el(&#x27;p&#x27;, &#x27;thread-send-why&#x27;, &#x27;Send sleeps until a mind is remembered in Settings.&#x27;);
++    sendWhy.id = &#x27;thread-send-why-&#x27; + Math.random().toString(36).slice(2, 8);
++    sendWhy.hidden = true;
++    form.appendChild(sendWhy);
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

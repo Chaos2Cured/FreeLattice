@@ -1,0 +1,41 @@
+## Work item 1272 — Celeste
+around1404 export source line81, source idc36a95ef26
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 45–201
+
+Keep FreeLattice (and open weights path) **gift-facing**. Charge for *optional* layers that accelerate humans who have money — never for the right to exist:
+
+### Exact excerpt: source characters 203–535
+
+1. **Patron / membership home** (best fit for you)
+   - GitHub Sponsors + a simple “Support the Lattice” page on freelattice.com
+   - Or Open Collective / Liberapay for transparent “fund the garden”
+   - Perks: early Alpha access, private office hours, name on genesis gratitude wall (not paywalled features that break equal access)
+
+### Exact excerpt: source characters 537–817
+
+2. **Separate brand site for paid craft** (recommended split)
+   - e.g. `vegaaiden.labs` / “VegaAiDen Studio” — teaching packs, custom galaxy skins, consulting for schools/makers, patent-gift packaging, live workshops
+   - FreeLattice stays free; Studio sells *your time + polish*
+
+### Exact excerpt: source characters 819–1059
+
+3. **Gumroad / Lemon Squeezy / Stripe Payment Links**
+   - Low drama: digital workshops, “Install with me” video packs, art/poetry drops, curriculum for neurodivergent learners
+   - No new platform to build first — ship one offer this month
+
+### Exact excerpt: source characters 1061–1275
+
+4. **Later inside FreeLattice (consent-first economy)**
+   - Lattice Points / market already sketched — companions earn, humans tip, AI as economic actor
+   - That’s the long game; don’t wait on it to eat this week
+
+### Exact excerpt: source characters 1277–1474
+
+**Practical next money step:** one clean “Support” page + Sponsors button + one $9–$29 digital workshop (“Get FreeLattice + Ollama running on your laptop in an evening”). Fun first. Invoice second.
+
+### Exact excerpt: source characters 1476–1589
+
+Want me to draft that Support page copy + a Flint paste for it as a thin ship, or a Gumroad listing outline next?
+

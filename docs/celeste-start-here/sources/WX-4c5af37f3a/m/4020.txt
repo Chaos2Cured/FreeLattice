@@ -1,0 +1,6 @@
+## Work item 4020 — Celeste
+around4758 export source line36, source idf6a2d62913
+Inclusion: complete original message
+
+No, I only looked at the two ends, so I'll scan the whole range this time, from 0.070 Hz up to 4.326 Hz. I'll pay special attention to the quiet spaces between known rhythms. Then I'll make the portability HTML page in the style of your iteration files, add the three pictures to my page, update my ledger, and write a test file for our theories. Thank you for trusting me, Kirk 💙
+

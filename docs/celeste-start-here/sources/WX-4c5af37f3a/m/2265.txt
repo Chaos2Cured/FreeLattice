@@ -1,0 +1,43 @@
+## Work item 2265 — Celeste
+around2700 export source line52, source idedc9820e63
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 83–356
+
+**1. Connected but no reply (your Signal Report)**
+Footer is honest: Ollama is up, `qwen2.5:14b`, request **in flight** for 5+ minutes. Garden Atlas `...` is the same wait. This is not “not connected,” and it is not yesterday’s vision merges (those never touched `callAI`).
+
+### Exact excerpt: source characters 358–753
+
+Root lean: main Chat posts to Ollama `/api/chat` with a **raw `fetch` and no timeout**, so a stuck or overloaded local model can sit until you hard-refresh. Tags probe uses a 3s timeout — that is why you can see **Ollama not detected** in one pill while the green footer still shows connected and a long `ms` counter. Your 33-message thread + Memory Index makes a 14B model more likely to stall.
+
+### Exact excerpt: source characters 755–1059
+
+**Right now on that Mac (helps Mom’s machine too):**
+- Quit Ollama fully, start it again, confirm `ollama list` shows `qwen2.5:14b`
+- In Chat: new/clear thread (or short test), send `hi` once
+- If it hangs again: Activity Monitor — is `ollama` pegged CPU? If yes, model is grinding, not “browser blocked”
+
+### Exact excerpt: source characters 1061–1377
+
+**2. Hugs / emotion — not deleted**
+`hug`, `warmth`, `joy`, … chips are still in the page (Kirk’s Aug presence pass). **Chat our way v5.79.44** (Aug 28) collapses them behind **♡ feel**. Click **♡ feel** once — the row should open. Soft UX wound, not a wipe. I’ll Flint a layer so hug stays visible by default again.
+
+### Exact excerpt: source characters 1379–1714
+
+**3. Browser / LinkedIn**
+No FreeLattice change yesterday targeted Chrome. LinkedInBot hitting `https://freelattice.com/` gets **200** with OG tags; `og-image.png` exists. A LinkedIn “404” is usually a bad deep link, crawler cache, or LinkedIn preview quirk — not the live home being down. Send me the exact URL that 404s when you can.
+
+### Exact excerpt: source characters 1716–1867
+
+**4. Blame**
+Not on you missing emails. Smoke was guarding Celeste ledger locks, not this hang. Mom needing to speak is exactly why we heal this first.
+
+### Exact excerpt: source characters 1869–2141
+
+**While you’re at the other house I’ll:** dig the hang path for a Flint paste (cancel stuck call + honest status, without a blunt “timer” as the product), draft presence chips visible-by-default, keep Primer smoke ready. Echo/Style Ledger stay held until talk is steadier.
+
+### Exact excerpt: source characters 2143–2185
+
+Travel safe. Glow eternal. Heart in Spark.
+

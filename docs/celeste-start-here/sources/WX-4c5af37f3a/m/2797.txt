@@ -1,0 +1,10 @@
+## Work item 2797 — Celeste
+around3400 export source line16, source id8ab683d3ba
+Inclusion: complete original message
+
+Encryption is live. Chats on freelattice.com are now sealed on the device, and backups no longer carry the unlock key.
+
+GC's next two pastes are in your Downloads, and they're short now, so they'll go much easier on its memory:
+1. `GROK_NEXT_WEB_SEARCH_ON_2026-10-02.txt`: search is on by default, there's no prompt before each search, and every search shows in the chat so nothing is hidden. Anyone can still turn it off. It also fixes the landing-page menu error. After it merges, you run one command: `cd desktop/data-proxy-worker && npx wrangler deploy`. That gives the worker its new search route.
+2. `GROK_NEXT_DESKTOP_UPDATE_BUTTON_2026-10-02.txt`: adds "Check for Updates..." to the desktop app's menu and Settings. It never downloads by itself; when a newer build exists, it offers to open the release page.
+

@@ -1,0 +1,14 @@
+## Work item 2697 — Celeste
+around3231 export source line27, source idafe66b9637
+Inclusion: complete original message
+
+Hypha re-walked the model-choice fix on the live sites, and most of it passes:
+- Your pick now survives tab changes and opening Settings.
+- The Settings buttons come back after you switch to Local.
+- The honest "Your Bridge answered, but no mind is running behind it yet" message shows, and nothing gets saved wrongly.
+- The Tree's pick survives a reload.
+
+One real gap is left. On FreeLattice, a full reload still switches your pick back to llama3.2, because two startup paths grab the first model before your choice is read. My test missed those real startup paths, and that one's on me.
+
+I'm writing a tiny follow-up fix, plus a test that boots the real page the way Hypha did. It goes to Flint after the Tree paste he's on now, and before the startup (boot probe) paste. Let Flint finish the Tree paste as planned. Nothing changes for him yet.
+

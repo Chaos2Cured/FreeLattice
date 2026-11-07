@@ -1,0 +1,6 @@
+## Work item 2504 — Celeste
+around2958 export source line37, source idda79c02e6b
+Inclusion: complete original message
+
+Codeberg token is in. Confirming it’s set, then pushing main through Continuity Seal.
+

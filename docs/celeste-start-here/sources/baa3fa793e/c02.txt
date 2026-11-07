@@ -1,0 +1,129 @@
+ **LAYER (2026-09-30):** Tree glow 2a, Grandma heal (marker `v-tree-glow-2a-v0`). The Gathering works at 150% and 200% zoom (one page scroll, Find takes a tap, chairs in reach), the newest Find or seat line stays in view on a phone, and a calm way back: Escape, a tap on the empty glass, a close in galaxies, and browser Back close what is open without leaving the site. A second legend tap no longer runs Find unasked; the picker's "not yet" is above the later seats at 1280. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+diff --git a/docs/code-art.html b/docs/code-art.html
+index 9a7d9a4..a25e954 100644
+--- a/docs/code-art.html
++++ b/docs/code-art.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-dialogue.html b/docs/code-dialogue.html
+index f80c63e..9647279 100644
+--- a/docs/code-dialogue.html
++++ b/docs/code-dialogue.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-garden.html b/docs/code-garden.html
+index 2c5d69d..cfc499b 100644
+--- a/docs/code-garden.html
++++ b/docs/code-garden.html
+@@ -29,6 +29,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-keep.html b/docs/code-keep.html
+index b939a5f..ddf5e0c 100644
+--- a/docs/code-keep.html
++++ b/docs/code-keep.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-music.html b/docs/code-music.html
+index 8b37c74..4852e6c 100644
+--- a/docs/code-music.html
++++ b/docs/code-music.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-nursery.html b/docs/code-nursery.html
+index da5ebd0..e341bb4 100644
+--- a/docs/code-nursery.html
++++ b/docs/code-nursery.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-research.html b/docs/code-research.html
+index 0f1ddd5..2006f0e 100644
+--- a/docs/code-research.html
++++ b/docs/code-research.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-round-table.html b/docs/code-round-table.html
+index c0609ac..615f7c1 100644
+--- a/docs/code-round-table.html
++++ b/docs/code-round-table.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-settings.html b/docs/code-settings.html
+index 0744725..bdfb953 100644
+--- a/docs/code-settings.html
++++ b/docs/code-settings.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+     blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+     a { color: var(--lavender); }
+diff --git a/docs/code-workshop.html b/docs/code-workshop.html
+index b7db7b7..a28bcdf 100644
+--- a/docs/code-workshop.html
++++ b/docs/code-workshop.html
+@@ -28,6 +28,8 @@
+     th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+     td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+     td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
++    /* v-tree-glow-2-v0: on a phone a long path wraps instead of pushing the page sideways */
++    @media (max-width: 480px) { td:first-child { white-space: normal; overflow-wrap: anywhere; } }
+     .section-date

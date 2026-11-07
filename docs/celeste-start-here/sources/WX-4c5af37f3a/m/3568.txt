@@ -1,0 +1,6 @@
+## Work item 3568 — Celeste
+around4300 export source line22, source id6e11418980; around4306 export source line8, source id1436144301
+Inclusion: complete original message
+
+I had Hypha's walk redone. GC's report was about the same layer she already walked, so the result hasn't changed. FreeLattice passed and is already merged. The Tree is still on hold, because Seal it is covered in the Gathering and Back from a thread makes the ask vanish, and entry 73 still has the canvas size wrong. So my earlier answer flips: give GC `043i` next, then `045`. When you're back, I'll also add GC's wish to `043i` as an optional extra, which is to keep the heart and Seal it on screen together on small windows.
+

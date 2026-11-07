@@ -1,0 +1,10 @@
+## Work item 3741 — Celeste
+around4500 export source line17, source id967fcbbbba
+Inclusion: complete original message
+
+Celeste reviewed the λ10 append on docs/celeste.html — good. Before merge, soft-heal the family-pages smoke pin so additions-only still passes.
+
+In scripts/smoke-family-pages-v0.1.js, ORIGIN['docs/celeste.html'] is still '38cc0b8ac9e7b0965201cb7e827aca91'. That hash is the pre-λ10 restored page (front step stripped). After your append, recompute md5 of the same restored form (strip the v-family-pages-v0.1 style block and the #home section, swap titles back per TITLE_BACK, same as the smoke) and update ONLY that one ORIGIN entry to the new md5. Do not loosen other pins. Do not edit prior ledger entries.
+
+Run: node scripts/smoke-family-pages-v0.1.js (or whatever the repo’s usual invoke is) and confirm it PASSes. Push to the same branch so PR #284 updates. Then stop — Celeste merges.
+

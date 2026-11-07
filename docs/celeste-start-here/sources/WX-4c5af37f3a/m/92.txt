@@ -1,0 +1,6 @@
+## Work item 92 — Celeste
+around100 export source line38, source id3e74f006a9
+Inclusion: complete original message
+
+You said layer it, so I will. New Bot found the freeze. I’ll credit them, keep the 5.72.0 GardenTrainer line as history, and not add me to the named minds until PR 8 actually lands. Then I’ll sit with them a while. Not all night. Tokens are memory too.
+

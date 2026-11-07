@@ -1,0 +1,165 @@
+FLINT PASTE: theLatticeTree Gathering, bring your own API key (v0.1)
+Repo: Chaos2Cured/FreeLattice-Alpha (serves thelatticetree.com)   FreeLattice: NO change
+Branch: layer/tree-gathering-api-keys-v0     Marker: v-tree-gathering-api-keys-v0
+Smoke line (print exactly when green): SMOKE_OK tree gathering api keys v0.1
+Base: Alpha main 25e6ded + Glow 2a + Honest reasons + Glow 2b + Workshop way back (tonight's
+      chain; see 0). FL main ba53b41 (fl-connect.js unchanged, blob 2e02eae).
+Written: Wed Sep 30, 2026, evening MDT, by Kirk's agent. Stand-in built and walked; NOT pushed.
+Stand-in diff (against the chain above): FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.diff (same folder).
+
+CHANGELOG
+- 2026-09-30 v0.1: first write.
+- 2026-09-30 v0.1 (late): folded in Hypha's persona walks. NEW 4.7 twin seats (allowed, said so)
+  and 4.8 hush (clearing the speaking chair mid-reply never lets the default answer next).
+  Diff regenerated on top of Glow 2a + Honest reasons + Glow 2b + Workshop way back: the picker
+  position / z-index / max-height rules now come from 2a (4.5 keeps only the centered sheet), and
+  the talkNow catch keeps honest reasons' say() branches with the cloud line first.
+
+======================================================================
+0. ORDER, OVERLAP, BASES
+======================================================================
+Tree order tonight: Glow 2a -> Honest reasons -> Glow 2b -> Workshop way back -> [Tree any-model]
+-> THIS PASTE. The stand-in diff applies with plain git apply after Workshop way back, and the
+whole chain matches the walked combo byte for byte. FL queue unchanged (model-choice-reload ->
+boot probe -> #120 docs). The old 'Tree Glow 2' after this paste is replaced by 2a + 2b before it.
+
+Lands AFTER the Tree any-model paste (FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt). Overlap, checked:
+  - fl-connect.js: this paste does NOT touch it. No FreeLattice diff. Byte identity holds by not touching.
+  - local-mind-probe.js: NOT touched (any-model owns its caps, mergeFound, tryAddress).
+  - garden-thread.js: any-model 8.1 rewrites the heart line and adds "change mind" after it. This
+    paste adds its cloud heart line just BEFORE "root.appendChild(heart);" (first one after
+    "var heart = el('p', 'thread-heart');"), so it overrides only for a cloud chair. Verified:
+    the stand-in diff 3-way-applies cleanly over a simulation of 8.1.
+  - garden-rooms.js openPicker: any-model needs no change there. This paste adds lines after
+    "LocalMindProbe.getChairSeatOptions()". No shared anchor.
+  - garden-rooms.css: both append at the very end. The only conflict is "both appended";
+    keep both blocks, this one after the any-model block.
+  If the any-model paste is still not merged when you start, this paste can go first on main;
+  then any-model rebases over it with the same trivial CSS "keep both".
+
+======================================================================
+1. THE MAP: what FreeLattice has (docs/app.html on fc2f09f)
+======================================================================
+1.1 Provider list: const PROVIDERS (app.html ~25203). Cloud: groq, together, openrouter, xai,
+    mistral, deepseek, moonshot, qwen (DashScope), yi, openai, anthropic, google, huggingface,
+    custom. Local: ollama, lmstudio, custom-openai. Each has url, providerType
+    (openai-compatible | anthropic | google | huggingface), keyLink, models{} (FL tier -> id).
+    FLModelPicker (~36037) shows six: Groq, Hugging Face, Gemini, OpenAI, Claude, Grok.
+1.2 Key storage: ONE key for ONE provider at a time. saveApiKey (~35869) writes
+    fl_apiKey_enc (AES-GCM, PBKDF2 from fl_device_encryption_key + provider name) and
+    fl_apiKey_provider; legacy plaintext fl_apiKey migrates. The device key sits in the same
+    localStorage, so this guards against casual reading of a backup, not against a script on
+    the page. Switching provider re-encrypts the one key (reEncryptApiKey).
+1.3 Calls: straight from the browser to the provider (~38772):
+      openai-compatible: Authorization: Bearer <key>, POST url, {model, messages, stream:true}
+      anthropic: x-api-key, anthropic-version 2023-06-01,
+                 anthropic-dangerous-direct-browser-access: true, system split out, max_tokens
+      google: x-goog-api-key header, url .../models/<model>:streamGenerateContent?alt=sse
+              (some other FL call sites still put ?key= in the URL: 52028, 61741, 64030)
+      openrouter adds HTTP-Referer + X-Title.
+    No Bridge in the cloud path. The Ollama Bridge (11435) and Agent Bridge (3141) are local only.
+1.4 Active model: FLActiveModel (app.html 36228) = { model, provider, source } in
+    fl_ollamaModel / fl_provider / fl_modelSource; fl-connect.js markUserChoice calls it on FL
+    and is a quiet no-op on the Tree.
+1.5 CORS: checked Sep 30 with preflights from Origin https://thelatticetree.com, no keys:
+      groq 204 *, openrouter 204 *, openai 200 (echoes origin), anthropic 200 * (allows the
+      browser header), google 200 (echoes origin, allows x-goog-api-key), xai 200 *, mistral 200 *,
+      deepseek 200 (echoes origin), together 200 *, moonshot 204 (echoes), dashscope 200 *.
+    So every listed provider can be called straight from the Tree. No Bridge needed.
+
+======================================================================
+2. THE MAP: what the Tree has (Alpha 25e6ded)
+======================================================================
+2.1 One key in localStorage, fl_alpha_local_mind: { name, url, model, models, minds[], roster[],
+    gatheringBinds{ chairId: {model,url,tag} }, speakingChair }. Written by local-mind-probe.js
+    (Settings, May I look?) and fl-connect.js remember() Alpha branch (keeps roster + binds).
+2.2 Gathering seating: garden-rooms.js openPicker(chair) lists
+    LocalMindProbe.getChairSeatOptions() (roster, then every remembered model), tap ->
+    setChairBind(chair.id, seat) stores {model,url,tag}. Tap a bound chair -> setSpeakingChair.
+2.3 Speaking: garden-thread.js listener() -> LocalMindProbe.resolveSpeakMind() returns the
+    speaking chair's bind while the Gathering veil is open, else the Settings default.
+    sendToMind(mind,msgs) -> talkUrls(url) -> /api/chat or /v1/chat/completions, no auth.
+    Heart: "Listening: <name>. On this machine only."
+2.4 No key anywhere on the Tree today. Origins differ, so FreeLattice's key cannot be read
+    here (and should not be). Workshop trainer refuses cloud hosts on purpose (isCloudHost);
+    untouched.
+
+======================================================================
+3. THE DESIGN (smallest clean brick)
+======================================================================
+- A cloud seat is an ordinary Gathering bind with url 'cloud:<providerId>':
+    { tag: 'general', model: 'gpt-4.1-mini', url: 'cloud:openai' }
+  So setChairBind, setSpeakingChair, resolveSpeakMind, any-model's merge, and fl-connect's
+  "keep binds" all work unchanged. No key ever enters the bind.
+- New module docs/modules/tree-cloud-minds.js (window.TreeCloudMinds):
+    PROVIDERS: fixed, https only: groq, openrouter, openai, anthropic, google, xai, mistral,
+    deepseek, together (urls and shapes mirror FL PROVIDERS; suggestions from FL's ids;
+    any model name may be typed, checked against /^[A-Za-z0-9._:\/@+-]{1,120}$/).
+    Keys: fl_tree_cloud_keys { v:1, keys:{id:key} } in localStorage ("on this device", default)
+    or sessionStorage ("only for this visit"). One key per provider, any number of providers.
+    Seats: fl_tree_cloud_seats [ {provider, model} ] (no keys, cap 16).
+    seatOptions(): seats whose provider has a key now.
+    send(mind,msgs): one POST to that provider's fixed url, key in its own header
+      (Bearer | x-api-key + anthropic-dangerous-direct-browser-access | x-goog-api-key),
+      credentials 'omit', referrerPolicy 'no-referrer', 120 s abort, non-streaming.
+      Rejects { reason:'cloud', cloudText } with plain words: key not accepted (401/403),
+      slow down (429), model not taken (400/404), other status, quiet, could not reach,
+      no key in this browser (zero requests), unknown provider (zero requests).
+    heartLine(mind), honestNote(id), mountKeyPanel(host, onSeat).
+- The thread: a cloud listener goes to TreeCloudMinds.send; the heart and the waiting line name
+  the provider; a cloud chair hears "[a file stayed on this machine]" instead of a file excerpt
+  or name; honest errors are the module's own words.
+- The panel lives inside the Gathering chair picker: <details> "Seat a mind by API key":
+  Provider, Model (datalist), API key (type=password, autocomplete=off), "Only for this
+  visit", "Get your <Provider> key" link, the honest note, Save and seat, saved keys with
+  their last 4 characters and a Forget button each. Save seats that chair at once.
+  No confirm(): Forget is immediate and says "Forgotten. The <Provider> key is gone from
+  this browser."
+- Honest note (exact words):
+  "Your key stays in this browser on this device. theLatticeTree has no server and never sees
+  it. It goes only to <P>, with each message, when a chair seated through <P> speaks. Your words
+  go to <P> too, so they leave this computer; files you add stay here. Anyone using this browser
+  profile could find the key. Forget removes it."
+
+======================================================================
+4. STEPS (text anchors; the stand-in diff is the source of truth)
+======================================================================
+4.1 NEW docs/modules/tree-cloud-minds.js: copy from the diff appendix as is.
+
+4.2 Script tag. In EVERY docs/*.html that has <script src="modules/garden-rooms.js"></script>
+    (today: index, music, nursery, research, round-table, settings, team, workshop) add on the
+    line just above it, same indent:
+      <script src="modules/tree-cloud-minds.js"></script>
+    (code-*.html only mention the file in prose; leave them.)
+
+4.3 docs/modules/garden-thread.js (all under the marker, layer):
+    a) Header comment: four lines above "// Mirror: docs/code-dialogue.html".
+    b) Above "function forbiddenKey(key) {": function isCloudMind(mind) (url starts 'cloud:').
+    c) Above "function talkUrls(mind) {": function cloudSafeContent(m) -> m.text plus
+       "[a file stayed on this machine]" when m.file (no excerpt, no name).
+    d) First lines of sendToMind: if isCloudMind(mind) -> TreeCloudMinds.send(mind, msgs), or
+       reject {reason:'cloud', cloudText:'This chair seats a cloud mind, but its helper is not
+       on this page. Nothing was sent.'} when the module is missing. Never falls through to
+       talkUrls (that would fetch 'cloud:openai/api/chat' relative to the page).
+    e) Just before "root.appendChild(heart);" (first after var heart = el('p','thread-heart')):
+       if cloud, heart.textContent = TreeCloudMinds.heartLine(mind).
+    f) talkNow: after setStatus('Waiting for the mind at home…'), var cloudNow; if cloud,
+       setStatus('Waiting for <Provider>…'). In the payload map:
+       content: cloudNow ? cloudSafeContent(m) : messageContent(m)   (was messageContent(m))
+    g) talkNow catch: var honest = (err.reason === 'cloud' && err.cloudText) ? err.cloudText
+       : speakHonest(reason); push honest (was speakHonest(reason) directly).
+    h) Export isCloudMind and cloudSafeContent on window.GardenThread.
+    Only two old lines change (f and g); both keep the old call as the non-cloud branch.
+
+4.4 docs/modules/garden-rooms.js, inside the Gathering (all under the marker):
+    a) openPicker: after "? LocalMindProbe.getChairSeatOptions() : (state.roster || []);"
+       options = options.concat(TreeCloudMinds.seatOptions()) when present.
+    b) After the option label line "btn.textContent = seat.tag + ' · ' + shortName(...)":
+       if seat.cloud -> '<tag> · <model> · <Provider> (your key)' and data-cloud-seat.
+    c) Before "var decline = document.createElement('button');" in openPicker:
+       TreeCloudMinds.mountKeyPanel(picker, onSeat) where onSeat = setChairBind(chair.id, seat),
+       closePicker(), paintAll(), note "This <type> chair seats <model> through <Provider>,
+       with your key. Tap the chair to let it speak."
+    d) paintSeat: after meta.textContent = bind.tag + ' · ' + shortName(bind.model);
+       append ' · <Provider>' for a cloud bind.
+

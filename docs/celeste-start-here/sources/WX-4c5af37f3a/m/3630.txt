@@ -1,0 +1,6 @@
+## Work item 3630 — Celeste
+around4352 export source line24, source id49df9e95f0
+Inclusion: complete original message
+
+You already sent me that one. `046` passed and was merged last night, so GC's next paste is `047`, which is in your Downloads. That's a great point about compaction: it helps with fresh puzzles, but it breaks the continuity that harder ones need. I'm starting research on the cloud companies closest to the labs. To push harder on images and on making things prettier and smoother, I'm also drafting the image and Marketplace pastes so they can run alongside `047`.
+

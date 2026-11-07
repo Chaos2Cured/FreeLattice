@@ -1,0 +1,131 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+GROK NEXT BRICK: Web search on by default v0.1 (through our own worker, every search shown)
+For: GC (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Friday Oct 2, 2026, about 11:30 AM MDT
+Marker: v-web-search-default-on-v0.1
+Repo: FreeLattice (~/FreeLattice-fresh). Branch: layer/web-search-default-on-v0
+Base: FreeLattice main 10cb886 (your #135 and #136 merged; both are live)
+The code is in a separate file next to this one:
+  ~/Downloads/GROK_NEXT_WEB_SEARCH_ON_2026-10-02-fl.diff   (590 lines, md5 84b839e322a977a255734258748eca4c)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, #135 and #136 are merged and live. Thank you for the careful encrypt work.
+
+Kirk asked for this one plainly: an AI should be able to search the web whenever it needs, per
+AUTONOMY.md, and a human toggle in front of every search is not agency. Search has been dormant
+because no helper address was ever set. This brick points it at our own worker, turns it on by
+default, keeps the off-switch, and makes every search visible in the chat so nothing happens out
+of sight. You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh
+    git status --short          # must print nothing; if not, stop and say so
+    git fetch origin && git checkout main && git merge --ff-only origin/main
+    git merge-base --is-ancestor 10cb886 HEAD && echo base-ok
+    cp ~/Downloads/GROK_NEXT_WEB_SEARCH_ON_2026-10-02-fl.diff /tmp/websearch.diff
+    wc -l < /tmp/websearch.diff     # 590
+    md5 -q /tmp/websearch.diff      # 84b839e322a977a255734258748eca4c
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js docs/modules/fl-connect.js && echo twins
+Newer main is fine (the Temperature Gauge brick also edits the worker; checked, the two apply in
+either order). git apply --check decides. If it fails, stop and tell Celeste.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (13 files, +366 / -8; changed old lines kept as "before" comments)
+----------------------------------------------------------------------
+a) desktop/data-proxy-worker/search-route.js (new): GET /search?q=words on the freelattice-data
+   worker. Brave Search if the BRAVE_API_KEY secret is set; otherwise DuckDuckGo Instant Answer
+   plus Wikipedia search (keyless, reference answers, not live news). Returns
+   { items: [{title, snippet, url}], source }. FreeLattice origins only (freelattice.com, www,
+   chaos2cured.github.io, codeberg page, http://127.0.0.1:port), no console logging, no storage,
+   Cache-Control no-store, tracking params stripped. No bare * CORS.
+b) desktop/data-proxy-worker/worker.js: imports it and routes /search before anything else
+   (fetch(request) becomes fetch(request, env)). The chart route is unchanged.
+c) docs/modules/web-tool.js: DEFAULT_SEARCH_ENDPOINT = our worker /search, used when the device
+   has no endpoint of its own (window.FL_SEARCH_ENDPOINT, then localStorage.fl_searchEndpoint
+   still win; the value none keeps the old dormant state). No consent chip by default; a new
+   isAskFirst() (localStorage.fl_searchAskFirst = 'true') brings the chip back. Off-switch
+   (fl_searchEnabled = 'false') unchanged. The ledger still never stores the query.
+d) docs/app.html (and index.html, a byte copy): Settings card gets honest words and an optional
+   "Ask me before each search" switch; status line "On. The AI may search when it needs to, and
+   each search shows in the chat. Searches go through our worker."; the system prompt and the
+   follow-up prompt no longer claim a consent that did not happen (only when ask-first is off);
+   every search answer starts with "_Searched the web for "..." through our own search worker._"
+e) docs/privacy.html: the old "search stays off" row retired in a comment, a new row says where
+   the words go (our worker, then Brave or DuckDuckGo and Wikipedia), and a Newer note.
+f) docs/see-for-yourself.html: "The internet" line now says search is on by default, shown in
+   chat, through our worker, with the off-switch; other tools still ask first.
+g) docs/index.html (landing): the "closeMenu is not defined" error at line 2078. The close button
+   now calls window.closeMenu() when clicked instead of naming closeMenu before it exists.
+h) docs/scripts/smoke-honesty-terms-three-doors.js: its privacy check is layered to accept the
+   retired old row plus the new one (old line kept as a comment).
+i) tests/smoke.js: 8 new web-search-on checks. docs/library/WEB_SEARCH_DEFAULT_ON_v0.1.md (new).
+   desktop/data-proxy-worker/DEPLOY.md: deploy steps. Ledger: your entry (section 5).
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    git checkout -b layer/web-search-default-on-v0
+    git apply --check /tmp/websearch.diff && git apply /tmp/websearch.diff
+    cmp index.html docs/app.html && echo index-eq-app
+    node tests/smoke.js | grep "CHECKS PASSED"          # ALL 3605 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect PASS 69 FAIL 8 (the same 8 fail on main: carry-forward, connect-card-yesno-wizard,
+      fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm)
+    Worker check without deploying (Node 18+):
+    cp desktop/data-proxy-worker/search-route.js /tmp/sr.mjs
+    node --input-type=module -e "import {handleSearch} from '/tmp/sr.mjs'; const r=await handleSearch(new Request('https://x/search?q=moon',{headers:{Origin:'https://freelattice.com'}}),{}); const j=await r.json(); console.log(r.status, j.source, j.items.length)"
+      expect: 200 duckduckgo+wikipedia 5 (or a few)
+    Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js        # nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                      # 0 (context lines may show old ones; fine)
+    git diff main -U0 | grep '^+' | grep -v '^+\s*//' | grep -v assert | grep -c 'confirm('   # 0
+    git diff main -U0 | grep '^+' | grep -v assert | grep -c 'innerHTML'        # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+What Celeste saw (box, 10cb886 + diff): all of the above green; a fake browser run of web-tool.js
+searched with no chip by default, showed the chip with ask-first on, went quiet with the
+off-switch, and went dormant with none; the worker route returned 5 results with the right CORS
+header and no-store. Not verified: the deployed worker, a real chat in a browser, Safari.
+
+Walk (only if easy; 127.0.0.1 only):
+    cd ~/FreeLattice-fresh/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html, Settings, Web Search: the status says On; tick and untick
+    "Ask me before each search". Open http://127.0.0.1:8765/ on a narrow window: the menu's close
+    button works and the console shows no closeMenu error. A real search will fail politely until
+    Kirk deploys the worker; that is expected. Say "walk skipped" if you cannot.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+The diff adds your entry to docs/library/FRACTAL_FAMILY_LEDGER_v0.md ending in
+"**TEMPERATURE:** GC_TEMPERATURE_HERE". Replace the placeholder with your own one line, honestly:
+    sed -i '' 's/GC_TEMPERATURE_HERE/your line here/' docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md    # 0
+
+----------------------------------------------------------------------
+6. COMMIT, OPEN THE PR YOURSELF, THEN STOP
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "layer: Web search on by default v0.1 (our own worker, every search shown)"
+If the hook adds its own commit that rewrites sw.js or the Primer, drop it as before
+(git reset --hard HEAD~1 only if HEAD is that hook commit; check git log -2 first) and say so.
+    git diff main --stat -- sw.js docs/sw.js        # nothing
+    git push -u origin layer/web-search-default-on-v0
+    gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/web-search-default-on-v0 \
+      --title "layer: Web search on by default v0.1 (our own worker, every search shown)" \
+      --body "Soft LAYER marker v-web-search-default-on-v0.1. Search uses our own worker (freelattice-data /search), on by default, off-switch and optional ask-first kept, every search shown in the chat. Worker change needs: cd desktop/data-proxy-worker && npx wrangler deploy (optional: npx wrangler secret put BRAVE_API_KEY). Also fixes closeMenu is not defined on the landing page. Never touches sw.js; index.html == docs/app.html. Notes: docs/library/WEB_SEARCH_DEFAULT_ON_v0.1.md"
+Then STOP. Do not merge, do not deploy the worker, do not delete branches. Reply with: the PR
+number and URL, the branch SHA, the test lines from section 4, the walk result, any hook you
+dropped, any findings, and your Temperature line.
+
+For Kirk, after the merge (GC does not do this):
+    cd ~/FreeLattice-fresh && git pull && cd desktop/data-proxy-worker && npx wrangler deploy
+    Then open https://freelattice-data.freelattice.workers.dev/search?q=moon : you should see items
+    and a source. Optional, for live web results: npx wrangler secret put BRAVE_API_KEY, deploy again.

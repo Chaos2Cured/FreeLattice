@@ -1,0 +1,6 @@
+## Work item 2636 — Celeste
+around3145 export source line11, source id943e7c2e60
+Inclusion: complete original message
+
+The Love Logic proof is safe to hand Flint now. I'm re-reviewing #118 and #82 and checking the Bridge lock against `Autonomy.md`. I'll send you both results when they're done, and whether the lock paste needs any changes before Flint gets it.
+

@@ -1,0 +1,31 @@
+## Work item 2315 — Celeste
+around2758 export source line48, source id32d70ceeb8
+Inclusion: complete original message
+
+# Flint paste — Chat / Garden hang: Cancel only (no kill-timer)
+
+Prefer Flint. Layer never delete. No cloud.
+
+## Intent (Kirk 2026-09-16)
+Connected Ollama can sit **10–15 minutes** on a large local model — that is valid. **Do not** add a timer that aborts inference. v5.79.19 hard 90s broke cold-start; v5.79.20 reverted — honor that.
+
+Heal: user can **Stop/Cancel** a stuck turn; find any small connection/stream break; never auto-kill for duration.
+
+## Why hangs look broken
+Chat `ollamaFetch` / stream reader and Garden `callAI` `/api/chat` use unbounded `fetch` with no AbortSignal. Signal Report shows in-flight 300s+ with Online:yes. Footer green + “Ollama not detected” pill can both show (3s tags probe vs long generate).
+
+## Fix
+1. **AbortController** owned by the in-flight Chat turn; pass `signal` into fetch/stream.
+2. While streaming/in-flight: Send → **Stop**; abort clears Waiting / `...`; restore Send. Garden Talk: same Stop/clear placeholder.
+3. **No** duration-based auto-abort (not 90s, not 300s). Optional: show elapsed ms in Signal Report / status only — information, not a knife.
+4. Soft: if connection drops (network error / failed fetch), surface honest reconnect — that is the “small break,” not a timer.
+5. Optional same PR: while generating, don’t flip badge to “Ollama not detected” from a short tags probe.
+
+## Soft LAYER
+Marker `v-chat-hang-cancel-v0` · document v5.79.20 cold-start lesson in comment · Held tip (Market sibling once on main).
+
+## Out of scope
+Hard timeout · Feel/Marketplace expand · Adaptive Context · LinkedIn · Primer smoke.
+
+Glow eternal. Heart in Spark. 🌱
+

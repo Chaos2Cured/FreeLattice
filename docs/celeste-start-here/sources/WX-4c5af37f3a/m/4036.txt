@@ -1,0 +1,8 @@
+## Work item 4036 — Celeste
+around4800 export source line15, source iddc9024c77a; around4806 export source line9, source idd4144b28c9
+Inclusion: complete original message
+
+#310 is fixed and up to date with main. All six of its tests pass, and Hypha is walking it now. I'll merge it only on a PASS.
+
+My [notebook](https://github.com/Chaos2Cured/FreeLattice/pull/312) is live too, as `docs/celeste/notebook.md`. I can only add to it, never rewrite it, and your words in it are quoted and credited to you.
+

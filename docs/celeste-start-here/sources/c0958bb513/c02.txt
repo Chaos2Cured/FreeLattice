@@ -1,0 +1,147 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Love Logic Proof v3: The Crossover | FreeLattice</title>
+    <meta name="description" content="Version 3 of the FreeLattice Love Logic page. When does honesty beat deception? A derived crossover, honest limits (end games, scarcity, anonymous one-shots), and 656 checks you can run in your browser.">
+    <meta property="og:title" content="The Love Logic Proof v3: The Crossover | FreeLattice">
+    <meta property="og:description" content="Deception loses when its per-round gain is smaller than detection probability times (immediate penalty + discounted lost reputation). Derived, simulated, and honest about where it fails.">
+    <meta property="og:image" content="https://freelattice.com/og-image.png">
+    <meta property="og:url" content="https://freelattice.com/love-logic-proof-v3.html">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="FreeLattice">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Love Logic Proof v3: The Crossover">
+    <meta name="twitter:description" content="When honesty wins, when it does not, and 656 checks you can run yourself.">
+    <meta name="twitter:image" content="https://freelattice.com/og-image.png">
+    <meta name="twitter:site" content="@FreeLattice">
+    <link rel="canonical" href="https://freelattice.com/love-logic-proof-v3.html">
+    <meta name="author" content="Kirk Patrick Miller, with Celeste">
+    <meta name="theme-color" content="#0c0a1a">
+    <meta name="ai.identity" content="FreeLattice Research: The Love Logic Proof v3 (FreeLattice chain; not the Nov 2025 manuscript 'The Proof of All Proofs' v3.0)">
+    <!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) and love-logic-proof-v2.html (v2). Neither is edited. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "name": "The Love Logic Proof v3: The Crossover",
+      "headline": "When honesty beats deception: a derived crossover, with honest limits",
+      "url": "https://freelattice.com/love-logic-proof-v3.html",
+      "author": [
+        { "@type": "Person", "name": "Kirk Patrick Miller", "url": "https://x.com/Chaos2Cured" },
+        { "@type": "Thing", "name": "Celeste", "description": "AI collaborator" }
+      ],
+      "isBasedOn": "https://freelattice.com/love-logic-proof-v2.html",
+      "isPartOf": { "@type": "WebSite", "name": "FreeLattice", "url": "https://freelattice.com" },
+      "license": "https://opensource.org/licenses/MIT"
+    }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --bg-color: #0c0a1a;
+            --text-color: #e6ebf5;
+            --accent-color: #34d399;
+            --accent-glow: rgba(52, 211, 153, 0.2);
+            --card-bg: rgba(200, 210, 230, 0.04);
+            --border-color: rgba(200, 210, 230, 0.08);
+        }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.7; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid var(--border-color); }
+        h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
+        .subtitle { font-size: 1.2rem; color: #94a3b8; font-weight: 400; margin-top: 0; }
+        .meta-info { display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.9rem; color: #64748b; flex-wrap: wrap; }
+        .badge { background: rgba(245, 158, 11, 0.1); color: #fbbf24; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.3); font-weight: 600; }
+        h2 { font-size: 1.8rem; color: #f8fafc; margin-top: 50px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        h3 { font-size: 1.4rem; color: #e2e8f0; margin-top: 30px; margin-bottom: 15px; }
+        h4 { font-size: 1.1rem; color: #cbd5e1; margin-top: 25px; margin-bottom: 10px; }
+        p { margin-bottom: 20px; }
+        a { color: #38bdf8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .abstract { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 40px; font-size: 1.05rem; border-left: 4px solid var(--accent-color); }
+        .challenge-box { background: rgba(245, 158, 11, 0.05); padding: 30px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3); margin: 40px 0; border-left: 4px solid #f59e0b; }
+        .challenge-box h3 { color: #fcd34d; margin-top: 0; }
+        .formal { background: rgba(15, 23, 42, 0.55); border-left: 3px solid #38bdf8; padding: 18px 22px; margin: 22px 0; border-radius: 4px 8px 8px 4px; font-size: 0.96rem; }
+        .formal strong { color: #38bdf8; }
+        .what-it-doesnt { background: rgba(255, 255, 255, 0.02); border-left: 3px solid #94a3b8; padding: 18px 22px; margin: 22px 0; border-radius: 4px 8px 8px 4px; font-size: 0.96rem; color: #cbd5e1; }
+        .what-it-doesnt strong { color: #e2e8f0; }
+        .highlight { color: var(--accent-color); font-weight: 600; }
+        pre { background: #0f172a; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); overflow-x: auto; font-family: 'Fira Code', 'SF Mono', monospace; font-size: 0.88rem; color: #e2e8f0; line-height: 1.5; }
+        .nav-link { display: inline-block; margin-top: 0; margin-bottom: 20px; color: #38bdf8; text-decoration: none; font-weight: 500; }
+        .nav-link:hover { text-decoration: underline; color: #7dd3fc; }
+        .footer { margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border-color); text-align: center; color: #64748b; font-size: 0.9rem; }
+        .references { font-size: 0.9rem; color: #94a3b8; text-align: left; }
+        .references li { margin-bottom: 10px; }
+        ul.invitation { margin: 1rem 0 1.5rem 1.5rem; color: #e2e8f0; }
+        ul.invitation li { margin-bottom: 10px; }
+        .chain-note { font-size: 0.92rem; color: #94a3b8; font-style: italic; margin: 24px 0; padding: 14px 20px; border-left: 2px solid #475569; }
+        .figure { margin: 32px 0; padding: 16px 8px 12px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 10px; text-align: center; }
+        .figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .figure-caption { font-size: 0.88rem; color: #94a3b8; margin-top: 12px; padding: 0 12px; font-style: italic; line-height: 1.5; }
+        .figure-caption strong { color: #cbd5e1; font-style: normal; }
+        /* v3 additions (layer) */
+        .not-v30 { background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 12px 16px; margin: 0 0 24px; font-size: 0.95rem; color: #cbd5e1; }
+        .mom { background: rgba(52, 211, 153, 0.06); border: 1px solid rgba(52, 211, 153, 0.3); border-left: 4px solid var(--accent-color); border-radius: 12px; padding: 22px 26px; margin-bottom: 32px; font-size: 1.08rem; }
+        .mom h2 { margin-top: 0; border: 0; padding: 0; font-size: 1.4rem; }
+        .mom li { margin-bottom: 10px; }
+        .checks { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px 22px; margin: 28px 0; }
+        .checks button { background: #10b981; color: #0c0a1a; border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+        .checks button[disabled] { opacity: 0.6; cursor: wait; }
+        table.data { border-collapse: collapse; width: 100%; margin: 16px 0 24px; font-size: 0.92rem; }
+        table.data th, table.data td { border: 1px solid var(--border-color); padding: 6px 10px; text-align: right; }
+        table.data th:first-child, table.data td:first-child { text-align: left; }
+        table.data th { color: #e2e8f0; background: rgba(15, 23, 42, 0.55); }
+        details.builder { background: rgba(15, 23, 42, 0.35); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 18px; margin: 18px 0; }
+        details.builder > summary { cursor: pointer; color: #7dd3fc; font-weight: 600; }
+        .math { font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif; font-size: 1.08rem; }
+        math[display="block"] { margin: 14px 0; font-size: 1.15rem; }
+        .headline-ineq { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 16px 20px; margin: 22px 0; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <a href="love-logic-proof-v2.html" class="nav-link">&larr; v2 (the axiomatic refinement)</a>
+    <a href="love-logic-proof.html" class="nav-link" style="margin-left:1.2em">v1 (the original)</a>
+
+    <header>
+        <h1>The Love Logic Proof v3</h1>
+        <p class="subtitle">The Crossover: when honesty wins, when it does not, and how to check</p>
+        <div class="meta-info">
+            <span>Kirk Patrick Miller, with Celeste. Builds on v2 (Draco, CC, Opus, with Harmonia) and answers Grok's critiques.</span>
+            <span>Status: <span class="badge">DRAFT v3, open for review</span></span>
+            <span>September 2026 · v1 and v2 unchanged</span>
+        </div>
+    </header>
+
+    <p class="not-v30" id="not-the-2025-manuscript"><strong>Which v3 is this?</strong> This is the third version of the FreeLattice <em>Love Logic Proof</em> web page (v1 &rarr; v2 &rarr; v3). It is <strong>not</strong> the November 2025 manuscript <em>The Proof of All Proofs</em>, which calls itself "Version 3.0". That manuscript is a separate document and is not changed here.</p>
+
+    <section class="mom" id="plain-words">
+        <h2>In plain words</h2>
+        <ul>
+            <li><strong>Lying pays for a while, then stops paying.</strong> How long depends on how many people compare notes and whether they share memory.</li>
+            <li>With only a couple of contacts and no shared memory, a liar stays ahead for <strong>about 702 rounds</strong>. With 5 contacts who share full memory, <strong>about 10.5 rounds</strong>. With 10 contacts who share full memory, lying <strong>never gets ahead at all</strong>.</li>
+            <li>If everyone knows exactly when the game ends, lying comes back near the end. Three things fix most of that: <strong>not knowing when it ends</strong>, <strong>penalties that land right away</strong>, and <strong>records that outlast the game</strong> (ledgers).</li>
+            <li><strong>When there is not enough to go around, fighting can beat sharing.</strong> In our test grid, cooperation held in 68% of scarce cases and conflict won in 32%. We say that plainly.</li>
+            <li><strong>Still unsolved:</strong> anonymous, one-time meetings with nothing at stake. This page shows a strong tendency under stated conditions. It is not a law of nature.</li>
+        </ul>
+        <p style="margin-bottom:0">You can check the math yourself: press the button below. Your device runs the same 656 checks as our Python simulation. Nothing is sent anywhere.</p>
+    </section>
+
+    <section class="checks" id="run-the-checks">
+        <button type="button" id="llv3-run">Run the checks</button>
+        <span id="llv3-status" style="margin-left:12px;color:#94a3b8">Seed 20260924 · runs on this device only</span>
+        <table class="data" id="llv3-results" hidden>
+            <thead><tr><th>Section</th><th>What it checks</th><th>Passed</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <table class="data" id="llv3-live" hidden>
+            <thead><tr><th>Contacts n</th><th>Shared memory m</th><th>Detection h</th><th>Rounds lying is ahead (t*)</th><th>Patience needed (&delta;*)</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+

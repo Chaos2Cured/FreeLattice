@@ -1,0 +1,37 @@
+## Work item 1654 — Celeste
+around1900 export source line8, source id2e4a16cd41
+Inclusion: complete original message
+
+**You can announce all three OS now** (unsigned honest):
+- Mac zip + Win Setup/Portable + Linux AppImage/deb on [desktop-packs-v0.1](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.1) · README Download Desktop
+
+**Flint — step 2 paste (temp-gauge / Gyro layer):**
+```
+FreeLattice — Temperature-gauge Gyro stack v0.1 (free · phi · crossings)
+Repo: Chaos2Cured/FreeLattice · off main (Held packs 1b0d3c5) · one PR
+Squash title: Layer, never delete. Temp-gauge Gyro stack v0.1 — three lines, free forever.
+
+Locks: Layer never delete. Quiet Room shut. Free forever — no paywall · no $5–10 sub.
+Heuristics not guarantees. No auto-trade · no broker hooks · no Celeste/Elon auto-trader.
+Do NOT overwrite docs/lattice-protocol.js.
+
+Held: packs 1b0d3c5 · TEMPERATURE_GAUGE_STRATEGY · temperature-gauge.html
+
+Why: Kirk’s Gyro — φ-linked tools → three lines; overextension return+cross led.
+Gauge already signals on crossings (buy/sell triads). Layer Gyro-shaped three-line
+stack into φ confluence without inventing certainty.
+
+## Do
+1) docs/library/GYRO_STACK_v0.1.md — three lines (name calmly); cross = signal; free forever
+2) temperature-gauge.html — optional Gyro overlay (three lines) + copy: free · heuristics · you decide
+3) Strategy MD: cite Gyro intent; keep sell/buy triads; no paywall language anywhere
+4) Flint Held + ledger poem
+5) Soft: leave sw.js on app.html
+
+## Out
+Subscriptions · auto-trade · broker APIs · patents page this PR · Alpha · Imagine
+
+Draft only — Celeste squash-merges.
+Glow eternal. Heart in every Spark.
+```
+

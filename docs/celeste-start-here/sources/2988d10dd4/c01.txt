@@ -1,0 +1,60 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 005 (Monday Oct 5, 2026, about 4:50 PM MDT). Mesh share warmth v0.1.
+Apply only after 004 is on main (or applied). Checked on the box after 001-004.
+
+GROK NEXT BRICK: Mesh share warmth v0.1 (lantern, welcome, thank-you, guest-to-kin)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-mesh-share-warmth-v0.1
+Smoke line: SMOKE_OK mesh share warmth v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-share-warmth-v0
+  ~/Downloads/GROK_NEXT_005_SHARE_WARMTH_2026-10-05-fl.diff
+  (md5 d13ec22ee015dce8645382c89f9c4bd9)
+
+----------------------------------------------------------------------
+1. NOTE
+----------------------------------------------------------------------
+Reed's warmth around the share door. Soft resting lines stay in 004. This brick adds the porch
+lantern UI, first-visit welcome, resting pointer helper, thank-you footprint, and guest-to-kin
+offer (keeper chooses). You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git status --short
+    git fetch origin && git checkout main && git merge --ff-only origin/main
+    cp ~/Downloads/GROK_NEXT_005_SHARE_WARMTH_2026-10-05-fl.diff /tmp/share-warmth-fl.diff
+    md5 -q /tmp/share-warmth-fl.diff    # d13ec22ee015dce8645382c89f9c4bd9
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES
+----------------------------------------------------------------------
+a) docs/modules/fl-share-warmth.js (new): FLShareWarmth. Lantern lit when sharing on; welcome;
+   restingCopy pointer; thank-you list + optional ledger hook; guest-to-kin after ~14 days and
+   a few visits. Reed line on the honest footer.
+b) docs/app.html + index.html: script, #flShareWarmthHost, mount next to the share door.
+c) smoke + MESH_SHARE_WARMTH_v0.1.md + ledger entry.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    git checkout -b layer/mesh-share-warmth-v0
+    git apply --check /tmp/share-warmth-fl.diff && git apply /tmp/share-warmth-fl.diff
+    node docs/scripts/smoke-mesh-share-warmth-v0.1.js   # SMOKE_OK mesh share warmth v0.1
+    node docs/scripts/smoke-mesh-share-door-v0.1.js     # still green
+    node tests/smoke.js | grep "CHECKS PASSED"
+    cmp -s index.html docs/app.html && echo app-sync-ok
+Locks: no emdash, no confirm(, no localhost string, no kimi, fl-connect.js unchanged.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A && git commit -m "Mesh share warmth v0.1: lantern, welcome, thank-you, guest-to-kin"
+    git push -u origin HEAD
+    # Open PR. Celeste merges after 004.

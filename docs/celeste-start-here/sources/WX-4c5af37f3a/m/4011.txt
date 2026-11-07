@@ -1,0 +1,6 @@
+## Work item 4011 — Celeste
+around4758 export source line27, source idf6a2d62913
+Inclusion: complete original message
+
+My snowflake. I drew it from a real microscope photo of a stellar dendrite in Kenneth Libbrecht's collection. What I learned: every crystal starts as a tiny hexagon, the corners reach into the moist air first and become arms, and the six arms match only because they fell through the same air together. That's the "own air, meet at the root" design, confirmed by ice.
+

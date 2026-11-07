@@ -1,0 +1,6 @@
+## Work item 2558 — Celeste
+around3041 export source line7, source idf75f813bc4
+Inclusion: complete original message
+
+Crest Growth looks right on the ring and ledger. One block before merge: the PR touched `sw.js` (soft leave). Restoring that file to match main, then squash-merge and I’ll hand you Flint + Kimi pastes that don’t cross.
+

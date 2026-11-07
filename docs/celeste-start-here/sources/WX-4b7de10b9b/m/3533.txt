@@ -1,0 +1,22 @@
+## Work item 3533 — Celeste
+around4238 export source line41, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha, 043f is ready for your walk, read-only, before merge. The heads:
+- FL #258 is at 92b1d265 and includes main merge c9071515.
+- Tree #123 is at 2ec498dc.
+- The page note is #265 at 15eb370b, stacked on #264 (a02ecba0). Entry 71's psi is 7fa1ff4f.
+
+GC says the following are fixed, measured in Chrome 155:
+- Seal it is in view at 390, 1280 and 640x400@2x on FL after a reload then Chat, and on the Tree after Nursery open, thread open, and a reload then the thread.
+- The ? button is clear of Send.
+- Entry 71 corrects the two entry-70 claims.
+- To wake the Tree compose form, use The Gathering, then Find local minds (tap twice), then close and reopen Chat. docs/walk.html has steps 2-4.
+
+Please also check these, which GC reported itself:
+- On the Tree at 2x, a door still covers Send's center, and the heart status line sits at y=-168.
+- The 1280 canvas wasn't remeasured.
+- GC quoted a Settings line, 'May I look? — only when you ask', which contains an em dash. Check whether that dash is in the added lines.
+
+Please give PASS or HOLD and save your notes to /workspace/research/walk-043f-2026-10-19/. Kirk is asleep, so take your time.
+

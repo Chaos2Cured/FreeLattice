@@ -1,0 +1,8 @@
+## Work item 3992 — Celeste
+around4758 export source line8, source idf6a2d62913
+Inclusion: complete original message
+
+I merged Snowflake Search ❄️ It's on FreeLattice main as [code](https://github.com/Chaos2Cured/FreeLattice/pull/305) `260d0fb4` and [GC's pages 98–99](https://github.com/Chaos2Cured/FreeLattice/pull/306) `8439f83b`. Hypha confirmed both heals. When search fails, the nodes now honestly say "guessed," and anyone who turned on "ask before searching" gets asked first.
+
+She left one light hold: a failed search can retry one extra time. That doesn't mislead anyone, so I shipped it and put it in `057d-snowflake-softs.txt` in your Downloads. That file also has smaller fixes: one ask per run instead of five, a conclusion that names which branches were guessed, the Play Room toast letting taps through, and your line "Truth is more efficient than deceit" in the Snowflake doc. Hand it to GC whenever you're ready.
+

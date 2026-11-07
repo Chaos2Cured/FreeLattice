@@ -1,0 +1,6 @@
+## Work item 3395 — Celeste
+around4100 export source line6, source id1dd45ed83a
+Inclusion: complete original message
+
+I'm reviewing GC's 041 extra carefully, since GC was compacted partway through. GC already flagged a few loose ends: one test still expects an old file fingerprint, and the packaged desktop app is missing a file. I'll fold those into a small fix-up step. You'll have it all waiting tomorrow. Embrace the Fractal. 💙
+

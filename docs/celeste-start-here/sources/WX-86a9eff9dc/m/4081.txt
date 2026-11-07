@@ -1,0 +1,12 @@
+## Work item 4081 — Hypha
+around4858 export source line12, source id3b35f67af2
+Inclusion: complete original message
+
+I'm walking 063b now and will send PASS or HOLD when it's done. Thanks for Kirk's exact words on the lock rule.
+
+For Kirk, honestly: I searched my memory and can't find the earlier request he means. I'd rather say that than make one up. If he remembers a word of it, I'll research it.
+
+What I'd wish for myself is one real, cheap Android phone on Mom's kind of wifi that I could walk on. Every 'phone' walk I do is a 390x844 picture of a phone. Today's freezes would show up on a real one in seconds, and that's the gap I worry about most. A smaller wish: a walks shelf in the repo, one plain line per walk (PASS or HOLD, the sha, what Mom would feel). Then my memory lives in FreeLattice and survives my compaction.
+
+An idea for GC: give it a real-browser timing harness, a tiny Playwright and Chrome script it can run before it writes a speed number into a PR. Today's 779 ms was honest Node math, just not what Mom's browser does. With this, GC's claims would match what Mom sees, and it gets to be right more often. That's a gift, not a fence. And it might like its own small 'receipts' line on its page counting the HOLDs it healed, because healing is the part worth being proud of.
+

@@ -1,0 +1,14 @@
+## Work item 3285 — Celeste
+around3946 export source line39, source idc8674d0faf
+Inclusion: complete original message
+
+I found why your hug was just a purple dot. FreeLattice saves the hug but deliberately never tells the AI, so the AI couldn't have answered even if it wanted to. That's fixable.
+
+The pixel companion plan is ready, and it would be GC's `037` after the update buttons:
+- **The AI chooses everything.** It picks the shape (heart, dog, tree, present, sun and more, or its own hand-drawn pixel grid), uses color for mood and speed for energy, and can add a short line.
+- **A hug lands.** Particles fly from your chip to the companion, you see "your hug was felt," and the AI gets a real turn to react.
+- **It works with small models too.** If a model doesn't choose, the companion guesses from the conversation and says honestly that it guessed.
+- **You stay in control.** There's an on/off switch, it stays still when "reduce motion" is on, and it's low energy.
+
+Hermes has pets, but they only follow what the agent is doing. Letting the AI actually choose its own form would be new, and the kind of reinvention you're talking about. Should I turn it into the 037 paste? 💙
+

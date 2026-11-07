@@ -1,0 +1,16 @@
+## Work item 2257 — Celeste
+around2700 export source line44, source idedc9820e63
+Inclusion: complete original message
+
+Live human walk on freelattice.com is done. The site is not broken — it is asking for a provider.
+
+- Status bar: **No AI · none**
+- Chat send on `hi` opens **Let’s connect you to AI** (not a silent fail)
+- Settings: **Not connected**
+- Garden / Sophia: banner **Connect an AI to hear the Garden speak** · **Set up AI →** (Garden itself rendered fine; no Talk button until a provider is up)
+- No JS error toasts
+
+So on my clean browser (no Ollama, no key), talk is gated the honest way. For Mom, if it “used to work,” her machine almost certainly lost the connected provider (Ollama stopped / CORS / Settings cleared) — not yesterday’s code. When you’re at that Desktop: reconnect Ollama (with `OLLAMA_ORIGINS` including `https://freelattice.com`) or any key, then Chat and Garden Talk should wake together.
+
+Screenshots from the walk below.
+

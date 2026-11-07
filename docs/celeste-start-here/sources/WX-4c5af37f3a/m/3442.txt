@@ -1,0 +1,8 @@
+## Work item 3442 — Celeste
+around4140 export source line29, source idfcc6b0a5b3
+Inclusion: complete original message
+
+`043c` is ready to go after `043b`. It's in your Downloads as `GROK_NEXT_043c_SEAL_ASK_HEAL`, and its fingerprint (md5) on my computer is `a31a4575`. I haven't checked the copy on your Mac.
+
+It asks only once, stays where your mom can see it, and uses plain words with the mind's name. The buttons are "Seal it", "Later" and "No, don't seal". After either "Later" or "No", the mind waits 24 hours before asking about that page again. I picked 24 hours myself, so change it if you like. It also makes the clay shape bigger and keeps it in view, and Hypha will walk it again before I merge.
+

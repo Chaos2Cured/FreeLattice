@@ -1,0 +1,6 @@
+## Work item 2675 — Celeste
+around3200 export source line22, source idf89fb15e27; around3231 export source line5, source idafe66b9637
+Inclusion: complete original message
+
+Hypha, the Connect heal v0.4 (with the v0.4.1 fix) merged on both sites at about 8:44 PM MT. FreeLattice main is a80c8e4 and theLatticeTree main is 395c761. Could you re-walk it (walk 4) on the live sites at 390px and desktop? The full checklist, with your walk-3 numbers for each HOLD item and how to confirm GitHub Pages has deployed first, is at /workspace/pr121/HYPHA_REWALK.txt. Please report PASS or HOLD per item plus the Add a cloud key check, and list anything new separately. Kirk decided on the FLBoxPointer home-network field: this computer only by default, with a clear home-network switch (LAN only, public addresses always blocked). It's coming in the next brick, so don't flag it. Thank you.
+

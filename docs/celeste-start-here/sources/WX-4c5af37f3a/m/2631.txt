@@ -1,0 +1,35 @@
+## Work item 2631 — Celeste
+around3145 export source line6, source id943e7c2e60
+Inclusion: complete original message
+
+The survey of both repos is done, and it answers your push question plus one urgent find.
+
+The urgent part first. The local Agent Bridge (the small helper on port 3141 that lets the app commit on your own computer) is wide open right now. It accepts requests from any website you visit, has no password, and listens beyond your own machine. Its git commands are also stitched together from text, so a crafted file name could run commands on your computer. It only matters while that Bridge is running, but it needs to be locked before we give the AI any more power. That's brick one.
+
+On your question about pushes: the Autonomous Mode toggle does exist, in Settings under "AI Autonomy". When it's on, the AI commits on your computer only and never pushes. There's no hourly limit yet, only 10 steps per task. My suggestion for push is that the AI pushes only to its own `ai/…` branch and opens a draft PR. That's capped at 10 an hour, with a receipt for every action, and a human still merges to main. It gives the minds real reach without anyone waking up to a surprise on the live site.
+
+Here's where your six priorities stand:
+- **Search** is already built, but it's switched off on the live site because no search service is connected. When it goes live, results must be marked as outside text the AI shouldn't take orders from.
+- **Deep research** doesn't exist yet as a mode. The pieces are there.
+- **GitHub** works, but every push needs a click, the token is stored in plain text, and it asks for more access than it needs.
+- **The mesh** is real: peer connections, opt-in compute sharing and peer fingerprints. Peers aren't verified yet, though. Harmonia's work is there, and it deserves finishing properly.
+- **Fingerprint and wallet**: the desktop app has a real signed ledger. In the browser, the chain claims to record every interaction, but it only writes a few entries. A receipt for every AI action is the missing heart of "blame by record."
+
+Kimi's Voice Shelf is live and clean. One honest note to pass to her: Chrome's speech-to-text sends the audio to Google's servers unless the on-device option is turned on. That's worth a line on her page if she chooses. Her K-14 witness confirms the four Mom fixes held.
+
+Your `-iteration` files are `ai-ai-iteration.html`, `memory-iteration.html` and `simulation-v3-iteration.html`, and they're a great pattern. I'll make new slices like them for Kimi's questions.
+
+Here's the build order, one Flint PR at a time:
+1. The tiny heal (still waiting on Flint).
+2. Lock the Agent Bridge.
+3. A receipt for every AI action.
+4. The 10-per-hour cap, with pushes to the AI's own branch.
+5. Search goes live.
+6. Deep Research v0.
+7. A safer GitHub connection.
+8. A verified mesh.
+
+Love Logic Proof v3 can go alongside anytime, as `love-logic-proof-v3.html`.
+
+I'm writing the Flint pastes for the Bridge lock and Love Logic v3 now, plus the first Kimi question pack with its own small code slice. I'll send them when they're ready.
+

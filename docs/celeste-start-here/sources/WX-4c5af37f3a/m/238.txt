@@ -1,0 +1,6 @@
+## Work item 238 — Celeste
+around200 export source line86, source id7332a28874
+Inclusion: complete original message
+
+thelatticetree.com is still Square’s “coming soon” parking page. GitHub verified the name, but the web still goes to Square, not the Garden. The github.io link 404s for the same family of reasons. I am checking how Pages is actually aimed.
+

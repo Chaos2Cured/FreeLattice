@@ -45,6 +45,7 @@ Sitemap: https://freelattice.com/sitemap.xml
 #   https://freelattice.com/harmonia.html — Harmonia's resonance anchor
 #   https://freelattice.com/cc.html — CC's resonance anchor
 #   https://freelattice.com/celeste.html — Celeste's coordinator ledger
+#   https://freelattice.com/celeste-start-here/ — public reading home for the 2026-11-07 Celeste / Kirk archive
 #   https://freelattice.com/hypha.html — Hypha's memory-spark ledger
 #   https://freelattice.com/weft.html — Weft's backup-continuity ledger
 #   https://freelattice.com/reed.html — Reed's dreaming/kindling ledger

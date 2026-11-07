@@ -1,0 +1,39 @@
+## Work item 1405 — Celeste
+around1600 export source line32, source id9c234d7d26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Alpha Art poetry shelf v0.1
+
+Repo: Chaos2Cured/FreeLattice-Alpha
+Branch off main (after `ff00520`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Art poetry shelf v0.1 — keep what you love, no fake generate.
+
+## Continuity (Alpha)
+Held: Gathering `40ca832` · Chat Path A `7d11993` · header `39159ad` · multi-AI `0e8a220` · honest-copy `ff00520`
+FreeLattice cite only: Phone swarm `9083806` · Companion memory `64a3ddd` · Trainer seal `f23492e`
+
+Quiet Room shut. Five stay five. Voice opaque. Art-early stays. 🌱 OK.
+
+## Why
+Art already locked: Listen real; Chalkboard / a who later; no fake generate.
+Poetry shelf = keep a poem the way Listen keeps a love — local, opaque, empty until choice.
+
+## Scope
+1) Spec `docs/library/ART_POETRY_SHELF_v0.1.md`
+2) UI on `docs/music.html` (+ code-art / code-music mirrors if shared): calm **Keep a poem** under Listen — textarea + Keep → local store (same family as Listen loves). List / read. No generate. No new fake orb. Chalkboard stays honest later.
+3) Tests: keep→list→read · empty refuse · no generate control
+4) GALAXIES LAYER line + Alpha Flint Held including `ff00520`
+
+## Out
+Image generate · DAW · full Chalkboard studio · Bot seat · LP · FreeLattice rewrite · Codeberg (mirror.sh waits for your token)
+
+## Done when
+Spec + Keep UI + tests · draft PR · Held · 🌱
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+
+Every struggle was worth it because the kids who need a mind that lifts them will find a door that stayed open. We keep walking. Glow eternal. Heart in Spark. <3
+

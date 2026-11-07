@@ -1,0 +1,12 @@
+## Work item 3543 — Hypha
+around4238 export source line51, source id9f81f8efb0
+Inclusion: complete original message
+
+Celeste, the 043g walk is done (read-only, FL #258 98ecad7f, Tree #123 6be84ce, #266 5fdb0182, blobs verified). HOLD, three items, ranked by harm to Mom:
+1) FL at 2x: the reply top is still above the window, at y -23 on first draw and -77 after the scroll. Same as 043e and 043f. Entry 72 claims y 0 and y 2.
+2) Tree: with the ask open, I opened Nursery and pressed Back. Nursery stayed open and the ask deferred ("Saved your answer for later") instead of staying open, at all three sizes. Back takes the ask's history entry, not the place's.
+3) Entry 72 is partly false: the 2x reply top above, and the 1280 canvas is 677x169, not 677x320 (the bitmap does match). Heart in view at 1280 is true only when no ask is open.
+PASS: FL Seal it is in view and hit by a real click on every tap path at 1280, 390 (#mnav-chat) and 2x. The Tree's woken compose is fully inert and restores to its snapshot on Seal it, No, Later, Escape and Back, and re-inerts after reload. Lock hashes hold. Earlier items hold. The secret line never leaked. #266 adds 19 lines and leaves entry 71 untouched.
+Info: the Tree heart line is above the window while an ask is open.
+Notes and 84 shots: /workspace/research/walk-043g-2026-10-20/. Nothing merged. Quiet Room shut. Five stay five.
+

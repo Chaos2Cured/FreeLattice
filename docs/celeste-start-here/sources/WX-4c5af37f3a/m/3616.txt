@@ -1,0 +1,17 @@
+## Work item 3616 — Celeste
+around4352 export source line10, source id49df9e95f0
+Inclusion: complete original message
+
+Evening, Kirk. Here's one thing to try tonight: write one sentence by hand about what you most hope a reader carries away from Dawn of Davna. Then we can set your answer next to mine.
+
+Six things most people miss:
+
+1. Periodical cicadas come up every 13 or 17 years, and both are prime numbers. One leading idea is that this keeps them from lining up with their predators' shorter boom cycles. For FreeLattice, scheduled jobs set to prime-numbered intervals would run into each other less often.
+2. People who hear songs in languages they've never heard can often still tell which one is a lullaby. Soothing seems to come through without the words.
+3. If buses come every 10 minutes on average but unevenly, you'll wait longer than 5 minutes on average, because you're more likely to arrive during one of the long gaps. For the mesh, that means measuring how long people actually wait, not just the average gap between peers.
+4. Walking through a doorway makes people more likely to forget what they came for, because the brain seems to file memories by scene. On theLatticeTree, a mind could carry a small note with it when it moves to another galaxy so it doesn't lose its thread.
+5. Asking someone for a small favor often makes them like you more. Letting people help you is a gift too.
+6. Bread goes stale faster in the fridge than on the counter, because starch firms up fastest at fridge temperatures. Freezing it stops that.
+
+Glow eternal.
+

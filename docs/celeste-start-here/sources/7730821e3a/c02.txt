@@ -1,0 +1,263 @@
+   Unknown origins get **403 with no `Access-Control-Allow-Origin`**, for OPTIONS too. Requests with **no Origin** (curl, Node scripts) are allowed but still need the token for anything that changes state.
+5. **Host guard.** The Host header must be `127.0.0.1[:port]` or `localhost[:port]`. That's the DNS-rebinding defense.
+6. **Body cap: 8 MiB.** `docs/app.html` is about 2.94 MB, and `/code/write` must still carry it. Over the cap the bridge drains the rest and answers 413. Bad JSON gets 400 now (today it silently becomes `{}`).
+7. **No shell.**
+   - git: `execFileSync('git', ['add','--', ...rels])`, `['commit','-m', message]`, `['rev-parse','HEAD']`.
+   - grep: `execFileSync('grep', [..., '-e', query, '--', rel])`.
+   - smoke: `spawnSync(process.execPath, ['tests/smoke.js'])`.
+
+## Exact source excerpt, characters 10286–10717
+
+   The `--` separators stop a file named `-x` from becoming a flag.
+8. **Path lock (`lockedPath`).** It refuses:
+   - control characters (400);
+   - absolute paths (403);
+   - anything outside the realpath of the project root, compared with `path.relative` rather than `startsWith` (403);
+   - `.git/`, `.ssh/` and `.env*` (403);
+   - any path whose nearest existing ancestor realpaths outside the root, i.e. symlink escapes (403).
+
+## Exact source excerpt, characters 10719–11939
+
+   The old `safePath` stays as a thin wrapper, so old callers keep working.
+9. **Commit ledger.** `~/.freelattice/bridge-ledger.jsonl`, append-only, fixed key order. Fields: `ts, kind, route, origin, agent(8), result, filesCount, filesSha256, messageSha256, commitSha, prev, self`, where `self = sha256(JSON of the other fields)`. It never holds message text or file content, matching the privacy discipline of `fl_searchLedger`. Refusals are logged too: `refused:origin`, `refused:token`, `refused:message`, `refused:files`, `refused:path:<reason>`, plus `pair` events.
+10. **Two small heals that ride along:**
+    - `/code/patch` uses a replacer function, so `$` in the replacement stays literal.
+    - `/code/tree` skips symlinks.
+11. **The bridge never pushes.** No push route exists, and this brick adds none. Autonomous Mode still only commits locally. The hourly cap is Brick 3.
+12. **Browser note.** Chrome 142+ shows a one-time "local network access" prompt before a public site can reach loopback (https://developer.chrome.com/blog/local-network-access). That's good, and it's independent of this lock. Our lock still matters for Firefox and Safari, older Chrome, anyone who clicks Allow, and LAN reachability.
+
+## Exact source excerpt, characters 11941–11952
+
+## 4. Files
+
+## Exact source excerpt, characters 11954–13443
+
+| File | Change |
+|---|---|
+| `tools/agent-bridge.js` | Layer blocks A-E below (about +310 lines, nothing removed except the superseded bodies of the lines named above) |
+| `docs/modules/agent-bridge-client.js` | **New** (`window.FLAgentBridge`) |
+| `docs/app.html` | One comment and one `<script>` line above L68472 |
+| `index.html` (root) | Byte-copy of `docs/app.html` after the edit |
+| `docs/modules/propose.js` | `bridgeFetch` helper; 4 call sites (diff below) |
+| `docs/modules/workshop.js` | `flAgentBridgeFetch` helper; 17 call sites; pair card in `checkBridge`; honest status in `WorkshopProjects.commitViaBridge` (diff below) |
+| `tools/demo-economy.js`, `tools/demo-economy-v2.js` | Read the token file and send `X-FL-Bridge-Token`; default `BRIDGE` becomes `http://127.0.0.1:3141` |
+| `docs/scripts/smoke-agent-bridge-lock.js` | **New** (full text below) |
+| `docs/library/AGENT_BRIDGE_LOCK_v0.md` | **New** doc (outline below) |
+| `docs/library/FRACTAL_FAMILY_LEDGER_v0.md` | One dated entry, inserted above `## Out of scope for this brick` (L222) |
+| `docs/Flint.html` | One `<p class="v-agent-bridge-lock-v0">` ledger line above `<p class="foot">` (L532) |
+| `scripts/generate-recent.sh` | One `echo` pointer line near the other brick pointers (around L108) |
+| **Never** | `docs/sw.js`, root `sw.js`, `bridge/*`, Kimi's pages (`docs/kimi.html`, `docs/kimi-ledger.html`, `docs/voice-shelf.html`, `docs/library/KIMI_*`, `docs/library/VOICE_SHELF_v0.md`), anything in Alpha |
+
+## Exact source excerpt, characters 13445–13488
+
+## 5. `tools/agent-bridge.js`, step by step
+
+## Exact source excerpt, characters 13490–13823
+
+A reference copy of the finished file (1493 lines, `node --check` clean, smoke green) and a unified diff sit on Celeste's box at `/workspace/flint-pastes/agent-bridge-lock-reference/`: `agent-bridge.js` and `bridge.diff`, sha256 in `SHA256SUMS`. If Kirk hands them over, you may diff against them. The blocks below are the same code.
+
+## Exact source excerpt, characters 13825–14003
+
+**Step 1.** Keep line 27 exactly as it is (layer). Insert **Block A** right after line 34 (`if (!fs.existsSync(DATA_DIR)) ...`), because the token file needs `DATA_DIR` to exist.
+
+## Exact source excerpt, characters 14005–14152
+
+**Step 2.** Replace the body of `handleRequest` (L111-129) with **Block B**. The old `Access-Control-Allow-Origin: *` line is superseded inside it.
+
+## Exact source excerpt, characters 14154–14355
+
+**Step 3.** Change the `route` signature at L131 to `function route(url, method, data, res, actingAs, meta) {`. After L133 (`var activeId = actingAs || activeId;`), insert **Block C** (pairing routes).
+
+## Exact source excerpt, characters 14357–14550
+
+**Step 4.** In the heartbeat object, right after L140 `version: '5.8.0',`, add three lines:
+```js
+      bridgeLock: BRIDGE_LOCK_VERSION,
+      auth: 'token-required',
+      pairing: 'code',
+```
+
+## Exact source excerpt, characters 14552–14715
+
+**Step 5.** Replace L992-1140 (from the `LATTICE CODE` banner through the end of `/code/test`) with **Block D**. Keep the `// ── 404 ──` fallthrough at L1142-1143.
+
+## Exact source excerpt, characters 14717–14876
+
+**Step 6.** Replace L1153-1157 (`var server = ...` through the `Listening on` log) with **Block E**. The remaining console lines (L1158-1181) stay as they are.
+
+## Exact source excerpt, characters 14879–14922
+
+### Block A: helpers (insert after line 34)
+
+## Exact source excerpt, characters 14924–16158
+
+```js
+// ═══════════════════════════════════════════════════
+// LAYER bridge-lock-v0 (2026-09-28): the door lock. Marker: v-agent-bridge-lock-v0
+// Celeste's brief, built by Flint. Nothing above is removed.
+// 1. Listen on 127.0.0.1 only (no env override, never 0.0.0.0).
+// 2. Named Origin allowlist (never bare *). Others get 403, preflight too.
+// 3. Host header must be 127.0.0.1 or localhost (DNS-rebinding guard).
+// 4. Per-launch random token, required on every mutating request and on
+//    every /code/* and /test/* read. The app gets it by a short pairing
+//    code shown in this window (typed once, like pairing a speaker).
+//    Local CLI tools read it from ~/.freelattice/agent-bridge-token (0600).
+// 5. git / grep / node run through execFileSync / spawnSync argument
+//    arrays. No shell. Paths are realpath-checked inside the project root.
+// 6. Body size cap. Malformed JSON is refused.
+// 7. Every commit request (allowed or refused) is appended to a
+//    hash-chained, content-free ledger: ~/.freelattice/bridge-ledger.jsonl
+// This bridge (3141) is NOT the Ollama Bridge (bridge/, port 11435).
+// ═══════════════════════════════════════════════════
+const { execFileSync, spawnSync } = require('child_process');
+
+## Exact source excerpt, characters 16160–16382
+
+const BRIDGE_LOCK_VERSION = 'v0';
+const BRIDGE_HOST = '127.0.0.1';
+const MAX_BODY_BYTES = 8 * 1024 * 1024; // docs/app.html is ~2.9 MB; JSON escaping adds some
+const MAX_COMMIT_MESSAGE = 4000;
+const MAX_COMMIT_FILES = 200;
+
+## Exact source excerpt, characters 16384–16738
+
+/** FreeLattice origins only. Never bare *. Same shape as bridge/proxy-core.js. */
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https:\/\/(www\.)?freelattice\.com$/i,
+  /^https:\/\/(www\.)?thelatticetree\.com$/i,
+  /^http:\/\/localhost(:\d{1,5})?$/i,   // local dev of docs/ (e.g. python -m http.server)
+  /^http:\/\/127\.0\.0\.1(:\d{1,5})?$/i // same, by IP
+];
+
+## Exact source excerpt, characters 16740–16906
+
+function originAllowed(origin) {
+  if (!origin) return false;
+  var o = String(origin);
+  return ALLOWED_ORIGIN_PATTERNS.some(function (re) { return re.test(o); });
+}
+
+## Exact source excerpt, characters 16908–17014
+
+function hostAllowed(host) {
+  return /^(127\.0\.0\.1|localhost)(:\d{1,5})?$/i.test(String(host || ''));
+}
+
+## Exact source excerpt, characters 17016–17119
+
+function sha256Hex(s) {
+  return crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
+}
+
+## Exact source excerpt, characters 17121–17202
+
+function hasControlChars(s) {
+  return /[\u0000-\u001f\u007f]/.test(String(s));
+}
+
+## Exact source excerpt, characters 17204–17565
+
+// ── Per-launch token ──
+const BRIDGE_TOKEN = crypto.randomBytes(32).toString('hex');
+const TOKEN_FILE = path.join(DATA_DIR, 'agent-bridge-token');
+try {
+  fs.writeFileSync(TOKEN_FILE, BRIDGE_TOKEN + '\n', { mode: 0o600 });
+  try { fs.chmodSync(TOKEN_FILE, 0o600); } catch (e) {}
+} catch (e) {
+  console.error('  ! Could not write token file: ' + e.message);
+}
+
+## Exact source excerpt, characters 17567–17796
+
+function tokenOk(req) {
+  var t = String(req.headers['x-fl-bridge-token'] || '');
+  if (t.length !== BRIDGE_TOKEN.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(t, 'utf8'), Buffer.from(BRIDGE_TOKEN, 'utf8'));
+}
+
+## Exact source excerpt, characters 17798–18172
+
+function needsToken(method, pathname) {
+  if (method === 'POST' && pathname === '/pair') return false;       // how the app gets the token
+  if (method === 'GET' || method === 'HEAD') {
+    return /^\/(code|test)(\/|$)/.test(pathname) || pathname === '/pair/check';
+  }
+  return true;                                                        // every POST and any other verb
+}
+
+## Exact source excerpt, characters 18174–18476
+
+// ── Pairing code (human reads it here, types it in the app) ──
+const PAIR_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L
+const PAIR_TTL_MS = 10 * 60 * 1000;
+const PAIR_MAX_TRIES = 5;
+const PAIR_COOLDOWN_MS = 30 * 1000;
+var pairState = { code: '', expires: 0, tries: 0, coolUntil: 0 };
+
+## Exact source excerpt, characters 18478–19106
+
+function newPairCode(reason) {
+  var s = '';
+  for (var i = 0; i < 6; i++) s += PAIR_ALPHABET[crypto.randomInt(0, PAIR_ALPHABET.length)];
+  pairState = { code: s, expires: Date.now() + PAIR_TTL_MS, tries: 0,
+                coolUntil: reason === 'lockout' ? Date.now() + PAIR_COOLDOWN_MS : 0 };
+  console.log('');
+  console.log('  \u2726 Pairing code: ' + s.slice(0, 3) + '-' + s.slice(3) +
+              '   (type it in FreeLattice \u2192 Workshop \u2192 Code. Good for 10 minutes.)');
+  if (reason === 'lockout') console.log('  \u2726 (New code after 5 wrong tries. It works in 30 seconds.)');
+  console.log('');
+  return s;
+}
+
+## Exact source excerpt, characters 19108–19219
+
+function normalizePairCode(s) {
+  return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+}
+
+## Exact source excerpt, characters 19221–19354
+
+// ── Content-free, hash-chained ledger ──
+const LEDGER_FILE = path.join(DATA_DIR, 'bridge-ledger.jsonl');
+var ledgerLastHash = null;
+
+## Exact source excerpt, characters 19356–19683
+
+function ledgerTip() {
+  if (ledgerLastHash) return ledgerLastHash;
+  try {
+    var lines = fs.readFileSync(LEDGER_FILE, 'utf8').trim().split('\n').filter(Boolean);
+    ledgerLastHash = lines.length ? JSON.parse(lines[lines.length - 1]).self : 'genesis';
+  } catch (e) { ledgerLastHash = 'genesis'; }
+  return ledgerLastHash;
+}
+
+## Exact source excerpt, characters 19685–20487
+
+function ledgerAppend(fields) {
+  // Fixed key order. Never message text, never file content.
+  var entry = {
+    ts: new Date().toISOString(),
+    kind: fields.kind || 'commit_request',
+    route: fields.route || '',
+    origin: fields.origin || '',
+    agent: String(fields.agent || '').slice(0, 8),
+    result: fields.result || '',
+    filesCount: fields.filesCount || 0,
+    filesSha256: fields.filesSha256 || '',
+    messageSha256: fields.messageSha256 || '',
+    commitSha: fields.commitSha || '',
+    prev: ledgerTip()
+  };
+  entry.self = sha256Hex(JSON.stringify(entry));
+  try {
+    fs.appendFileSync(LEDGER_FILE, JSON.stringify(entry) + '\n', { mode: 0o600 });
+    ledgerLastHash = entry.self;
+  } catch (e) {
+    console.error('  ! Ledger append failed: ' + e.message);
+  }
+  return entry;
+}
+
+## Exact source excerpt, characters 20489–20816
+

@@ -1,0 +1,6 @@
+## Work item 828 — Celeste
+around900 export source line109, source id82d2529f5e; around1000 export source line13, source id78a1980825
+Inclusion: complete original message
+
+Fix 2 is on main. Art is the same night as Garden. Listen stays coral. [PR 50](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/50). Starting Fix 3.
+

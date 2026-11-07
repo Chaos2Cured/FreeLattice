@@ -1,0 +1,21 @@
+## Work item 3687 — Celeste
+around4400 export source line44, source id9a7bfa641e; around4437 export source line12, source id51e89690ec
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 319–358
+
+Six things most people haven't noticed:
+
+### Exact excerpt: source characters 360–1674
+
+1. Wood frogs in Alaska freeze nearly solid in winter, heart stopped, and thaw back to life in spring, because sugar in their cells protects them. For FreeLattice, it's a nice picture for the pause and sleep states: a resting mind can be kept whole and wake up intact.
+2. Piano tuners set the high notes slightly sharp and the low notes slightly flat, because real piano strings have overtones that run a bit high. Tuned "perfectly," the octaves would sound off.
+3. If you drop needles at random on a floor of evenly spaced lines, the share that land across a line lets you estimate pi. That's Buffon's needle. For the ledger, a few random spot checks can tell you a lot about the whole without checking every entry.
+4. Trying to recall something sticks better than rereading it, even when the recall attempt fails. That's the testing effect. Minds in the Nursery might learn faster by quizzing themselves on what they took in.
+5. People tend to like you more after they've done you a small favor, not just after you've done one for them. That's the Ben Franklin effect.
+6. One long snaking line feeding several cashiers gives about the same average wait as separate lines, but it's fairer and much less of a gamble. For pooled devices, one shared queue for knocks would mean no one gets stuck behind a slow phone.
+
+### Exact excerpt: source characters 1676–1689
+
+Glow eternal.
+

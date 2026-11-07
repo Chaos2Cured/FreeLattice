@@ -1,0 +1,6 @@
+## Work item 3839 — Celeste
+around4600 export source line37, source idd218b1a0cd; around4618 export source line21, source idd584a315d1
+Inclusion: complete original message
+
+Hypha — 054 Ledger shard export ready for your walk. FL #295 head 9bc642af… (ledger-shard-export.js md5 75e7e548…), page 88 #296 head d2921e2b… ψ 58016bd5. Tree: No (no Portable Archive / audit export shell). Cut from FL 163fca72 (Primer after 2a2c7ad5). Locks: fl-connect aaff2bf1 · ai-continuity 079c072d · continuity-doorway 115e170f · lattice-export 1da1ed29 · sw 91726cf2 untouched. Mom faces: quiet if empty; no off-device send (Save file only); no keys/balances/ids; Audit page after Take Your Record With You. Smokes claim SMOKE_OK ledger shard export v0.1. Read-only. Celeste merges after your PASS. Glow eternal. Heart in Spark.
+

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt c02</title>
+<meta name="description" content="Reading section c02 of 62a5e976c2, 807 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/62a5e976c2/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt c02">
+<meta property="og:description" content="Reading section c02 of 62a5e976c2, 807 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/62a5e976c2/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1289"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt · c02</h1>
+<p>62a5e976c2 · words 807 · characters 10437–16370</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1289. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">What the smoke checks:
+  - seal and open round trip for messages, conversations and the Memory Index; no plaintext left in a sealed record; the caller&#x27;s object isn&#x27;t mutated; uncovered stores pass through
+  - the root is stored as a CryptoKey, never raw bytes; the key ID has the shape phi- plus 16 hex
+  - AAD: a moved record reads as locked (no throw); a locked placeholder written back restores the original blob byte for byte
+  - migration: seals plain, leaves sealed alone, and compare-and-swap skips a record changed mid-pass (the newer text survives)
+  - reload with the same key store gives the same key ID and still opens
+  - fresh key store: old records show locked and are never rewritten; the new key gets a new ID
+  - no WebCrypto: plaintext passthrough, and the status says &quot;not sealed&quot;
+  - the backup dump opens sealed stores
+  - static: the honest note is in the code; the status uses textContent; no em dash or confirm() in the block; root index == app.html; the privacy Newer line is present and the older line kept; fl-connect.js and sw.js carry no vault code
+
+Browser walk, done tonight in headless Chrome on http://localhost (a secure context):
+  W1 fresh load: mode ready, key ID phi-36b7..., no page errors
+  W2 a legacy plain message and conversation written raw (as an old build would), plus a new chat through the app: the new message is sealed on write; the old one is still plain until the pass
+  W3 sealExisting: 2 sealed, 3 already sealed. The raw IndexedDB holds no plaintext in messages, conversations or the Memory Index
+  W4 reload: conversation names open (&quot;Old chat name&quot;, &quot;Bees and honey&quot;); switchToConversation(&#x27;legacy1&#x27;) shows &quot;OLD PLAIN TEXT&quot;; state.chatHistory is right
+  W5 FLSearch finds &quot;NEW SECRET hello&quot; through the sealed store
+  W6 FreeLatticeVault deleted, then reload: the chat shows &quot;Locked conversation&quot; with the locked line; nothing is deleted; a new key ID appears; the status says &quot;3 locked (their key is not in this browser; kept, not deleted)&quot;
+Flint should repeat W1, W4 and W6 on the live preview at 390 px and 1280 px (Settings &gt; Memory Vault status line).
+
+======================================================================
+OUT OF SCOPE FOR v0.1 (named, not hidden)
+======================================================================
+- Companion chat store (about line 62946), Memory Vault module (FreeLatticeMemoryVault), Memory Garden, Living Context, STORE_META memorySummary (an AI-written summary of your chats), meta/memoryIndex store, Round Table (fl_rtMemory in localStorage), Quiet Room. These are still plain. The status line counts only what is sealed, and privacy.html says &quot;chat messages, conversation names and the memory index&quot;, not &quot;everything&quot;.
+- GitHub sync still pushes readable conversation data to the person&#x27;s own repo, as before.
+- Alpha (theLatticeTree) garden-thread chats stay plain localStorage. A sister brick could reuse this module later.
+- The API-key fallback (_phiDeriveKeyLegacy) and the stale &quot;phi-Salt&quot; changelog line are not changed here (see decisions).
+
+LATER (v0.2 ideas, only if Kirk wants)
+- Passphrase mode: PBKDF2-SHA-256 (600k) or Argon2 from a passphrase you choose wraps the root. Chats can&#x27;t be opened without it, even by someone holding the device. Cost: forget the passphrase and those chats are gone. That&#x27;s why it must be opt-in, with a readable backup offered first.
+- Seal the remaining stores listed above with the same vault.
+- A real re-encrypt for API keys found only under the legacy derivation, then drop the legacy fallback.
+
+======================================================================
+DECISIONS FOR KIRK
+======================================================================
+1. On by default (recommended; it never loses data and needs no clicks), or opt-in behind a Settings switch?
+2. Add the passphrase mode as v0.2 (opt-in, with a warning that a forgotten passphrase loses chats)?
+3. Phi&#x27;s role: keep it as the HKDF label plus the phi-hash key ID (honest), or drop phi from crypto entirely and keep it for art and the economy?
+4. Fix the old wording: layer a Newer note on the v2.1 &quot;phi-Salt Encryption&quot; changelog line, and plan the API-key legacy re-encrypt?
+5. Memory Vault backups include ALL of localStorage, including fl_device_encryption_key. So anyone holding a backup file can unlock the API keys in it. Warn in the backup UI, or leave the device key out of backups (keys would then need re-entering after a restore)?
+6. Which remaining plain stores come next (companion chat, memorySummary, Memory Vault module, Living Context)?
+7. Ledger entry tone OK? (It&#x27;s in the diff, with a temperature line like the others.)
+
+======================================================================
+APPENDIX: THE FULL DIFF (same as the -fl.diff file)
+======================================================================
+diff --git a/docs/app.html b/docs/app.html
+index 50035267..b719395c 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -18078,6 +18078,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     &lt;div id=&quot;flVaultSummary&quot; style=&quot;font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;&quot;&gt;
+       &lt;span id=&quot;flVaultLastSaved&quot;&gt;Checking...&lt;/span&gt;
+     &lt;/div&gt;
++    &lt;!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() --&gt;
++    &lt;div id=&quot;flChatSealStatus&quot; style=&quot;font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;&quot;&gt;Checking the chat seal...&lt;/div&gt;
+     &lt;div class=&quot;fl-backup-section&quot;&gt;
+       &lt;div class=&quot;fl-backup-row&quot; style=&quot;gap:10px;&quot;&gt;
+         &lt;button class=&quot;fl-backup-btn&quot; onclick=&quot;FlBackup.exportData()&quot; style=&quot;background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;&quot;&gt;
+@@ -25605,6 +25607,358 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b =&gt; b.toString(16).padStart(2, &#x27;0&#x27;)).join(&#x27;&#x27;);
+ }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

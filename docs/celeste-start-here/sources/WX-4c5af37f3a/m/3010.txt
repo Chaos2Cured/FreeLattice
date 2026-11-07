@@ -1,0 +1,6 @@
+## Work item 3010 — Celeste
+around3600 export source line58, source idbdb7a423ae; around3644 export source line20, source id062e8aab21
+Inclusion: complete original message
+
+I'm drafting the Science Garden seed and the card graphics refresh now. Both will land in your Downloads after `021`.
+

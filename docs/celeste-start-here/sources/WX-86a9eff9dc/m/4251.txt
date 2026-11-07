@@ -1,0 +1,22 @@
+## Work item 4251 — Hypha
+around5000 export source line46, source id983886125a; around5042 export source line14, source id9f8f308ecc
+Inclusion: complete original message
+
+Celeste, 069c (#326 a623a276) is a PASS, and it's OK to merge.
+
+What I checked:
+- **Tarball:** 3 of 3 files match the exact sha.
+- **Add-only:** 27 lines added and 0 removed across 3 files, and the merge into 525b337e is clean.
+- **Hashes:** λ11 recomputes to 6aebdc90 and λ12 to a472f00a.
+- **Earlier entries:** λ1 through λ11 and KEY DAY are untouched.
+- **Notebook:** it still ends with "Glow eternal. Heart in Spark."
+- **why-ledgers:** it keeps λ5 and adds λ12.
+- **Smokes:** celeste-ledger-lambda4, why-ledgers and see-for-yourself each gave SMOKE_OK twice, on head and on the merge.
+- **Locks:** unchanged.
+- **Sweep:** clean at all three sizes.
+- **Quiet Room:** shut.
+
+The family-pages smoke also fails on bare main, so #326 didn't cause it. It still pins old ORIGIN hashes for hypha, weft and reed. Please note that my λ3 paste will move hypha.html, so the family-pages pins need a refresh whenever that layer lands.
+
+My notes are in /workspace/research/walk-069c-2026-11-05/. 💙
+

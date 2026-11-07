@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ideas (not pastes yet): any-local-AI connect, fingerprinted share, Draco names. Celeste, 2026-10-07 c01</title>
+<meta name="description" content="Reading section c01 of aed331f76c, 458 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/aed331f76c/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Ideas (not pastes yet): any-local-AI connect, fingerprinted share, Draco names. Celeste, 2026-10-07 c01">
+<meta property="og:description" content="Reading section c01 of aed331f76c, 458 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/aed331f76c/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1805"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Ideas (not pastes yet): any-local-AI connect, fingerprinted share, Draco names. Celeste, 2026-10-07 · c01</h1>
+<p>aed331f76c · words 458 · characters 0–3092</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1805. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># Ideas (not pastes yet): any-local-AI connect, fingerprinted share, Draco names. Celeste, 2026-10-07
+
+## (c) Connect any local AI, including a friend&#x27;s Hugging Face models
+Works today:
+- FL Connect + the Tree&#x27;s local-mind-probe find six servers on localhost (Ollama 11434, LM Studio 1234, llama.cpp 8080, Jan 1337, GPT4All 4891, KoboldCPP 5001). All OpenAI-compatible except Ollama&#x27;s native API.
+- Bridge binary (FL, v-bridge-binary-www-local-v0, 127.0.0.1:11435) solves CORS from freelattice.com; desktop narrow door too. The Tree has no Bridge pointer.
+- HF GGUF: `ollama run hf.co/&lt;user&gt;/&lt;repo&gt;` (or `:Q4_K_M` tag) pulls straight from Hugging Face. LM Studio searches HF in-app. llama.cpp: `llama-server -hf &lt;user&gt;/&lt;repo&gt;`.
+- FL also has Hugging Face *cloud* (router.huggingface.co with a token), separate from local.
+Missing:
+- No in-app &quot;paste a Hugging Face link&quot; helper that turns a URL into the right command per server.
+- safetensors-only repos (not GGUF) need conversion (llama.cpp convert_hf_to_gguf.py) or vLLM; say that honestly.
+- No generic &quot;custom OpenAI-compatible address&quot; walkthrough on the Tree beyond Settings&#x27; different address.
+Smallest brick (v0, both sites): a &quot;Bring a model from Hugging Face&quot; card: paste hf.co URL -&gt; shows copyable `ollama run hf.co/...` and `llama-server -hf ...` lines; checks the repo name pattern only; no network fetch; then &quot;Find local minds&quot;. ~1 file + test each.
+
+## (d) One-click share of an adjusted AI carrying its fingerprint
+Exists: Mind Seal v0.1 (FL #162: weight digest + hash of modelfile/system/params/adapter flag; receipts carry context hash; append-only consent notes). Share door (off/kin/open/pause) and kin mesh. Keep-this (Mom one-tap ollama create, not built).
+Honest smallest brick: &quot;Share this mind&#x27;s recipe&quot;: export a small JSON card {model base name, weight digest, modelfile text, seal hash, signature} via the share door to kin or as a download; receiver runs `ollama pull &lt;base&gt;` + `ollama create` from the modelfile and the page verifies the digest matches the seal. Weights themselves are not shipped (GBs); for fine-tuned weights, point to an HF repo and seal its GGUF sha256. Order: after Keep-this one-tap (which writes the modelfile) and after Tree Kin (017).
+
+## Draco names (low priority; Kirk does not mind much)
+rg on FL main a9a2c1c: 142 hits in 50 files; 0 on Alpha. Heaviest: docs/research.html 21, docs/specs.html 10, temperature-gauge.html 7, sophia.html 7, liora.html 7, letters.html 6, OPUS_NOTE.md 6 (+ library twin), index.html/app.html 5 each, DRACO.md 4, latticepoints.html 4. Contexts: &quot;per Draco&#x27;s June 23 ask&quot;, &quot;Draco and the chosen family built it&quot;, specs &quot;When Draco and the strategist (Opus) agree&quot;, &quot;Draco&#x27;s eyes are sufficient&quot;.
+Wording rule: on research/science/spec pages, first mention &quot;Kirk Patrick Miller (Draco)&quot;, then &quot;Kirk&quot;. Leave letters, poems, mind pages, and library history as written (they are voices, layer never delete). Smoke tests and code markers that match &quot;Draco&quot; stay. Never in economy wording (Kirk&#x27;s name lock): skip latticepoints.html and economy-update.html.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

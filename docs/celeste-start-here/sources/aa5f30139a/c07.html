@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c07</title>
+<meta name="description" content="Reading section c07 of aa5f30139a, 1477 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c07">
+<meta property="og:description" content="Reading section c07 of aa5f30139a, 1477 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt · c07</h1>
+<p>aa5f30139a · words 1477 · characters 60010–72173</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: not separately matched. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> || models[0].model || &#x27;llama3.2&#x27;;
++          var modelName = flHonorModel(models, models[0].name || models[0].model || &#x27;llama3.2&#x27;, &#x27;ollama&#x27;); // v-model-choice-survives-reload-v0.1.1
+           state.ollamaModel = modelName;
+           var ollamaInput = document.getElementById(&#x27;ollamaModel&#x27;);
+           if (ollamaInput) ollamaInput.value = modelName;
+@@ -28374,7 +28374,7 @@ const AiSetup = (function() {
+         if (data.models &amp;&amp; data.models.length &gt; 0) {
+           // Switch to local mode
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || &#x27;llama3.2&#x27;;
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || &#x27;llama3.2&#x27;, &#x27;ollama&#x27;); // v-model-choice-survives-reload-v0.1.1
+           var localToggle = document.getElementById(&#x27;localToggle&#x27;);
+           if (localToggle) localToggle.checked = true;
+           handleLocalToggle();
+@@ -31651,7 +31651,7 @@ function settingsSetMode(mode) {
+         var data = pick.data;
+         if (data &amp;&amp; data.models &amp;&amp; data.models.length &gt; 0) {
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || &#x27;llama3.2&#x27;;
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || &#x27;llama3.2&#x27;, &#x27;ollama&#x27;); // v-model-choice-survives-reload-v0.1.1
+           state.provider = &#x27;ollama&#x27;;
+           state.apiKey = null;
+           localStorage.setItem(&#x27;fl_isLocal&#x27;, &#x27;true&#x27;);
+@@ -31684,6 +31684,7 @@ function settingsSetMode(mode) {
+       } else {
+         var lmData = pick.data;
+         var firstModel = (lmData &amp;&amp; lmData.data &amp;&amp; lmData.data[0]) ? lmData.data[0].id : &#x27;local-model&#x27;;
++        firstModel = flHonorModel(lmData &amp;&amp; lmData.data, firstModel, &#x27;lmstudio&#x27;); // v-model-choice-survives-reload-v0.1.1
+         state.isLocal = true;
+         state.ollamaModel = firstModel;
+         state.provider = &#x27;lmstudio&#x27;;
+@@ -34552,7 +34553,13 @@ window.FLBoxPointer = (function() {
+       }
+     } catch (e3) {}
+     if (models &amp;&amp; models.length &amp;&amp; typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; FLActiveModel.set) {
+-      try { FLActiveModel.set(models[0], (typeof state !== &#x27;undefined&#x27; &amp;&amp; state.provider) || &#x27;ollama&#x27;, &#x27;user&#x27;); } catch (e4) {}
++      // v-model-choice-survives-reload-v0.1.1: keep the person&#x27;s model when it is here; otherwise
++      // the first model is an automatic pick (&#x27;auto&#x27;, never &#x27;user&#x27;). Was: set(models[0], ..., &#x27;user&#x27;).
++      try {
++        var provA = (typeof state !== &#x27;undefined&#x27; &amp;&amp; state.provider) || &#x27;ollama&#x27;;
++        var hA = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], provA) : { model: models[0], source: &#x27;auto&#x27;, gone: false };
++        if (!hA.gone) FLActiveModel.set(hA.model, provA, hA.source);
++      } catch (e4) {}
+     }
+     try {
+       if (window.InferenceRouter &amp;&amp; InferenceRouter.setStatus) InferenceRouter.setStatus(null, null, {});
+@@ -34746,8 +34753,11 @@ function flTestLMStudio() {
+       if (models.length &gt; 0) {
+         if (result) result.innerHTML = &#x27;&lt;span style=&quot;color:var(--success);&quot;&gt;\u2713 LM Studio connected! Models: &#x27; + models.join(&#x27;, &#x27;) + &#x27;&lt;/span&gt;&#x27;;
+         // Auto-select the first model if user wants
++        // v-model-choice-survives-reload-v0.1.1: keep the person&#x27;s LM Studio model when it is here;
++        // the first model is an automatic pick (&#x27;auto&#x27;, never &#x27;user&#x27;). Was: set(models[0], &#x27;lmstudio&#x27;, &#x27;user&#x27;).
+         if (typeof FLActiveModel !== &#x27;undefined&#x27;) {
+-          FLActiveModel.set(models[0], &#x27;lmstudio&#x27;, &#x27;user&#x27;);
++          var hL = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], &#x27;lmstudio&#x27;) : { model: models[0], source: &#x27;auto&#x27;, gone: false };
++          if (!hL.gone) FLActiveModel.set(hL.model, &#x27;lmstudio&#x27;, hL.source);
+         }
+         if (typeof state !== &#x27;undefined&#x27;) {
+           state.isLocal = true;
+@@ -34826,12 +34836,14 @@ function flAutoConnect(opts) {
+         window._flAutoConnected = true;
+         var firstName = (models[0].name || models[0].id || &#x27;default&#x27;).split(&#x27;:&#x27;)[0];
+         // Reuse existing activation path — do not duplicate logic
++        // v-model-choice-survives-reload-v0.1.1: the person&#x27;s model when it is here
++        var autoName = flHonorModel(models, models[0].name || models[0].id || &#x27;default&#x27;, t.id);
+         if (typeof modalActivateOllamaModel === &#x27;function&#x27; &amp;&amp; t.id === &#x27;ollama&#x27;) {
+-          modalActivateOllamaModel(models[0].name || models[0].id || &#x27;default&#x27;);
++          modalActivateOllamaModel(autoName);
+         } else {
+           state.isLocal = true;
+           state.provider = t.id;
+-          state.ollamaModel = models[0].name || models[0].id || &#x27;default&#x27;;
++          state.ollamaModel = autoName;
+           localStorage.setItem(&#x27;fl_isLocal&#x27;, &#x27;true&#x27;);
+           localStorage.setItem(&#x27;fl_provider&#x27;, t.id);
+           localStorage.setItem(&#x27;fl_ollamaModel&#x27;, state.ollamaModel);
+@@ -34880,6 +34892,10 @@ async function flProbeLocalAI() {
+     var data2 = await r2.json();
+     var models = (data2.data || []).map(function(m) { return m.id; });
+     if (models.length &gt; 0) {
++      // v-model-choice-survives-reload-v0.1.1: keep the person&#x27;s LM Studio model when it is here
++      var lmPick = flHonorModel(models, models[0], &#x27;lmstudio&#x27;);
++      var lmMine = (typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; FLActiveModel.isUserChosen() &amp;&amp; FLActiveModel.get().model === lmPick);
++      if (lmPick !== models[0]) { models = [lmPick].concat(models.filter(function(x) { return x !== lmPick; })); }
+       state.provider = &#x27;lmstudio&#x27;;
+       state.ollamaModel = models[0];
+       safeSet(&#x27;fl_provider&#x27;, &#x27;lmstudio&#x27;);
+@@ -34887,7 +34903,7 @@ async function flProbeLocalAI() {
+       if (typeof PROVIDERS !== &#x27;undefined&#x27; &amp;&amp; PROVIDERS.lmstudio) {
+         PROVIDERS.lmstudio.url = lmsBase + &#x27;/v1/chat/completions&#x27;;
+       }
+-      if (typeof FLActiveModel !== &#x27;undefined&#x27;) FLActiveModel.set(models[0], &#x27;lmstudio&#x27;, &#x27;boot&#x27;);
++      if (typeof FLActiveModel !== &#x27;undefined&#x27;) FLActiveModel.set(models[0], &#x27;lmstudio&#x27;, lmMine ? &#x27;user&#x27; : &#x27;boot&#x27;);
+       if (typeof updateStatus === &#x27;function&#x27;) updateStatus();
+       if (typeof ModelSwitcher !== &#x27;undefined&#x27;) ModelSwitcher.updateLabel();
+       showToast(&#x27;\u2713 Connected to LM Studio! Using &#x27; + models[0]);
+@@ -36229,9 +36245,15 @@ window.FLActiveModel = (function() {
+   var _model = null;
+   var _provider = null;
+   var _source = null; // &#x27;user&#x27;, &#x27;auto&#x27;, &#x27;boot&#x27;
++  // v-model-choice-survives-reload-v0.1.1 (Hypha walk 5): boot paths (the Cascade, the
++  // saved-door pointer) ran before init(), so the person&#x27;s saved choice looked empty and
++  // the first model won. Now the saved choice is read the first time anyone asks.
++  var _ready = false;
++  function ensure() { if (!_ready) init(); }
+ 
+   function set(model, provider, source) {
+     if (!model) return;
++    ensure();
+     _model = model;
+     _provider = provider || &#x27;ollama&#x27;;
+     _source = source || &#x27;auto&#x27;;
+@@ -36251,17 +36273,63 @@ window.FLActiveModel = (function() {
+     }
+   }
+ 
+-  function get() { return { model: _model, provider: _provider, source: _source }; }
+-  function isUserChosen() { return _source === &#x27;user&#x27;; }
++  function get() { ensure(); return { model: _model, provider: _provider, source: _source }; }
++  function isUserChosen() { ensure(); return _source === &#x27;user&#x27;; }
++
++  // v-model-choice-survives-reload-v0.1.1: one guard for every path that picks a model by itself.
++  // models: names or {name|model|id}. fallback: what that path would pick. provider: its provider.
++  // Returns { model, source, gone }. The person&#x27;s choice wins when it is on the list (or the list
++  // is empty: a quiet answer never replaces anything). When it is gone, noteGone() falls back and
++  // says so. An automatic pick is always &#x27;auto&#x27;, never &#x27;user&#x27;.
++  function _names(models) {
++    return (models || []).map(function(m) { return String((m &amp;&amp; typeof m === &#x27;object&#x27;) ? (m.name || m.model || m.id || &#x27;&#x27;) : (m || &#x27;&#x27;)); }).filter(Boolean);
++  }
++  function _onList(names, n) {
++    n = String(n || &#x27;&#x27;);
++    if (!n) return false;
++    return names.some(function(mn) { return mn === n || mn === n + &#x27;:latest&#x27; || (n.indexOf(&#x27;:&#x27;) === -1 &amp;&amp; mn.split(&#x27;:&#x27;)[0] === n); });
++  }
++  function honor(models, fallback, provider) {
++    ensure();
++    var prov = provider || &#x27;ollama&#x27;;
++    if (_source === &#x27;user&#x27; &amp;&amp; _model &amp;&amp; (_provider || &#x27;ollama&#x27;) === prov) {
++      var names = _names(models);
++      if (!names.length || _onList(names, _model)) return { model: _model, source: &#x27;user&#x27;, gone: false };
++      if (fallback) noteGone(_model, fallback, prov);
++      return { model: fallback || _model, source: &#x27;auto&#x27;, gone: true };
++    }
++    return { model: fallback, source: &#x27;auto&#x27;, gone: false };
++  }
++  // The chosen model left this computer: use what is here, keep it &#x27;auto&#x27;, and say so in plain words.
++  function noteGone(chosen, pick, provider) {
++    ensure();
++    if (!pick || _source !== &#x27;user&#x27; || _model !== chosen) return;
++    safeSet(&#x27;fl_modelChoiceGone&#x27;, chosen);
++    set(pick, provider || &#x27;ollama&#x27;, &#x27;auto&#x27;);
++    try {
++      if (typeof showToast === &#x27;function&#x27;) showToast(&#x27;The model you chose, &#x27; + chosen + &#x27;, is no longer on this computer. Using &#x27; + pick + &#x27; for now. You can pick another in Connect.&#x27;, 7000);
++    } catch (eT) {}
++    try { if (typeof AiSetup !== &#x27;undefined&#x27; &amp;&amp; AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++  }
+ 
+   function init() {
++    _ready = true;
+     _model = safeGet(&#x27;fl_ollamaModel&#x27;, null);
+     _provider = safeGet(&#x27;fl_provider&#x27;, null);
+     _source = safeGet(&#x27;fl_modelSource&#x27;, &#x27;boot&#x27;);
+   }
+ 
+-  return { set: set, get: get, isUserChosen: isUserChosen, init: init };
++  return { set: set, get: get, isUserChosen: isUserChosen, init: init, honor: honor, noteGone: noteGone };
+ })();
++// v-model-choice-survives-reload-v0.1.1: short form for the older paths that write a model by
++// themselves (Test Ollama, Local without Connect, LM Studio probe, discovery): the person&#x27;s model
++// when it is here, else that path&#x27;s own pick.
++function flHonorModel(list, fallback, provider) {
++  try {
++    if (typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; FLActiveModel.honor) return FLActiveModel.honor(list, fallback, provider).model || fallback;
++  } catch (e) {}
++  return fallback;
++}
+ 
+ window.FLAutoModel = (function() {
+   var VISION_RE = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
+@@ -36307,12 +36375,8 @@ window.FLAutoModel = (function() {
+       if (!pool.length) pool = models;
+       var pick = String((pool[0] &amp;&amp; (pool[0].name || pool[0].model)) || &#x27;&#x27;);
+       if (!pick) return;
+-      safeSet(&#x27;fl_modelChoiceGone&#x27;, current.model);
+-      FLActiveModel.set(pick, &#x27;ollama&#x27;, &#x27;auto&#x27;);
+-      try {
+-        if (typeof showToast === &#x27;function&#x27;) showToast(&#x27;The model you chose, &#x27; + current.model + &#x27;, is no longer on this computer. Using &#x27; + pick + &#x27; for now. You can pick another in Connect.&#x27;, 7000);
+-      } catch (eT) {}
+-      try { if (typeof AiSetup !== &#x27;undefined&#x27; &amp;&amp; AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++      // v-model-choice-survives-reload-v0.1.1: same words, one home (FLActiveModel.noteGone).
++      FLActiveModel.noteGone(current.model, pick, &#x27;ollama&#x27;);
+     });
+   }
+ 
+@@ -39686,7 +39750,7 @@ async function autoDiscoverAI() {
+       if (best.type === &#x27;ollama&#x27;) {
+         state.isLocal = true;
+         state.provider = &#x27;ollama&#x27;;
+-        state.ollamaModel = best.models[0] || &#x27;llama3.2&#x27;;
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || &#x27;llama3.2&#x27;, &#x27;ollama&#x27;); // v-model-choice-survives-reload-v0.1.1
+         try {
+           localStorage.setItem(&#x27;fl_isLocal&#x27;, &#x27;true&#x27;);
+           localStorage.setItem(&#x27;fl_provider&#x27;, &#x27;ollama&#x27;);
+@@ -39696,7 +39760,7 @@ async function autoDiscoverAI() {
+         // OpenAI-compatible server
+         state.isLocal = true;
+         state.provider = &#x27;openai-compat-local&#x27;;
+-        state.ollamaModel = best.models[0] || &#x27;default&#x27;;
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || &#x27;default&#x27;, &#x27;openai-compat-local&#x27;); // v-model-choice-survives-reload-v0.1.1
+         state._localAIUrl = best.url;
+         state._localAIName = best.name;
+         try {
+@@ -39771,7 +39835,12 @@ async function runConnectionCascade(info) {
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

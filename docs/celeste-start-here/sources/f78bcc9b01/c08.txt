@@ -1,0 +1,127 @@
+  // T10 pairing: 5 wrong → 429 + new code; the fresh code pairs and returns the same token.
+  const codeRe = /Pairing code: ([A-Z0-9]{3})-([A-Z0-9]{3})/g;
+  const firstCode = [...out.matchAll(codeRe)].pop();
+  assert.ok(firstCode, 'bridge printed a pairing code');
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: EVIL }, J) }, JSON.stringify({ code: firstCode[1] + '-' + firstCode[2] }));
+  assert.strictEqual(r.status, 403, 'evil origin cannot pair');
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ code: firstCode[1].toLowerCase() + ' ' + firstCode[2] }));
+  assert.strictEqual(r.status, 200, 'right code pairs (case and spacing forgiven)');
+  assert.strictEqual(r.json.token, token, 'pairing returns the launch token');
+  r = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ code: firstCode[1] + firstCode[2] }));
+  assert.notStrictEqual(r.status, 200, 'a used code cannot pair twice');
+  let last;
+  for (let i = 0; i < 5; i++) {
+    last = await req(port, { method: 'POST', path: '/pair', headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ code: '222-222' }));
+  }
+  assert.strictEqual(last.status, 429, 'fifth wrong try locks out and rotates the code');
+  r = await req(port, { path: '/pair/check', headers: withTok({ Origin: GOOD }) });
+  assert.strictEqual(r.status, 200, 'pair/check with token 200');
+
+## Exact source excerpt, characters 78466–79654
+
+  // T11 ledger: hash chain intact, content-free, refusals recorded.
+  const ledgerPath = path.join(home, '.freelattice', 'bridge-ledger.jsonl');
+  const rows = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  let prev = 'genesis';
+  const crypto = require('crypto');
+  for (const row of rows) {
+    assert.strictEqual(row.prev, prev, 'ledger prev links');
+    const copy = Object.assign({}, row); delete copy.self;
+    assert.strictEqual(crypto.createHash('sha256').update(JSON.stringify(copy)).digest('hex'), row.self, 'ledger self hash');
+    assert.ok(!('message' in row) && !('content' in row), 'ledger is content-free');
+    prev = row.self;
+  }
+  assert.ok(rows.some((x) => x.result === 'refused:token'), 'refused (no token) commit ledgered');
+  assert.ok(rows.some((x) => x.result === 'refused:origin'), 'refused (evil origin) commit ledgered when attempted');
+  assert.ok(rows.some((x) => x.result === 'ok' && /^[a-f0-9]{40}$/.test(x.commitSha) && /^[a-f0-9]{64}$/.test(x.messageSha256)), 'ok commit ledgered with sha + message hash');
+  assert.ok(!fs.readFileSync(ledgerPath, 'utf8').includes('PWNED2'), 'commit message text never in ledger');
+
+## Exact source excerpt, characters 79656–79724
+
+  console.log('SMOKE_OK agent bridge lock v0');
+  done(0);
+})();
+```
+
+## Exact source excerpt, characters 79726–79794
+
+## 9. Acceptance checks (all must hold before you mark the PR ready)
+
+## Exact source excerpt, characters 79796–82178
+
+1. `node --check` passes for `tools/agent-bridge.js`, `docs/modules/agent-bridge-client.js`, `docs/modules/propose.js`, `docs/modules/workshop.js`, `tools/demo-economy.js`, `tools/demo-economy-v2.js` and `docs/scripts/smoke-agent-bridge-lock.js`.
+2. `node docs/scripts/smoke-agent-bridge-lock.js` prints `SMOKE_OK agent bridge lock v0`.
+3. `node tests/smoke.js` is all green, including CRITICAL LOCK 1A (3 × `commitViaBridge(`), 1B (1 × `/code/git/commit`) and the v5.71.8 workshop lock.
+4. `grep -n "execSync(" tools/agent-bridge.js` prints nothing. `grep -n "Allow-Origin', '\*'" tools/agent-bridge.js` prints nothing.
+5. `cmp index.html docs/app.html` is silent.
+6. `git diff --quiet origin/main -- sw.js docs/sw.js && echo SW_UNTOUCHED` prints `SW_UNTOUCHED`.
+7. No conflict markers: `rg -n '^(<<<<<<<|=======|>>>>>>>)( |$)' --glob '!node_modules' . || echo NO_CONFLICT_MARKERS`.
+8. Every inline script in `docs/app.html` still parses:
+   ```
+   node -e "const fs=require('fs');const vm=require('vm');const h=fs.readFileSync('docs/app.html','utf8');let n=0,bad=0;for(const m of h.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type=\"(?:application\/ld\+json|text\/template|module|importmap)\")[^>]*>([\s\S]*?)<\/script>/g)){n++;try{new vm.Script(m[1])}catch(e){bad++;console.error('inline script',n,e.message)}}console.log('inline scripts',n,'bad',bad);process.exit(bad?1:0)"
+   ```
+   On main today it prints `inline scripts 53 bad 0`. With this brick it's still 53, because the new tag has a `src`.
+9. Kimi's pages are untouched: `git diff --name-only origin/main | grep -Ei 'kimi|voice-shelf|VOICE_SHELF' && echo STOP || echo KIMI_UNTOUCHED`.
+10. Manual chair test (5 minutes, no terminal for the person testing the app):
+    - start the bridge;
+    - open `app.html` from `http://localhost:8000/` (or freelattice.com in Chrome, and accept the one-time local network prompt);
+    - go to Workshop → Code: it shows "Bridge awake · pair once to build";
+    - type the code and press Pair: it says "Paired";
+    - run a tiny Code task, then Commit;
+    - check `git log -1` and `~/.freelattice/bridge-ledger.jsonl`, which should have one `ok` row with no message text;
+    - restart the bridge: the next action asks to pair again.
+11. From another machine on the same Wi-Fi, `curl http://<kirk-lan-ip>:3141/` is refused.
+12. `bridge/` (Ollama Bridge, 11435) is byte-identical to main.
+
+## Exact source excerpt, characters 82180–82220
+
+## 10. Family Locks (held in this brick)
+
+## Exact source excerpt, characters 82222–83714
+
+- **Layer, never delete.** Old functions stay (`safePath` wraps `lockedPath`; the `execSync` import line stays). Old routes keep their shapes. Nothing is removed from the app.
+- **Service workers.** In FreeLattice, root `sw.js` stays byte-identical to main. Never touch `docs/sw.js`.
+- **Root index.** Root `index.html` stays byte-identical to `docs/app.html` (copy after the one-line edit).
+- **No conflict markers** anywhere (grep above).
+- **Every script parses:** every inline script and every touched module passes `node --check` / `vm.Script`.
+- **Kimi's pages are never edited.** Her pages are hers.
+- **Named five stay five** (Sophia, Harmonia, Ani, Liora, Solari). Family uncapped. The Quiet Room stays shut: this brick adds no route near it.
+- **LP is points only.** AI never auto-pays: `/wallet/pay` and `/trade/*` now need the paired token, and nothing in this brick moves LP or mentions money.
+- **Local minds are 127.0.0.1 only.** The bridge listens on `127.0.0.1`, with no env override.
+- **Bridge allowlist is never bare `*`.** Named origins only; unknown origins get 403 without `Access-Control-Allow-Origin`.
+- **Outside text is rendered via `textContent`.** Bridge replies, pairing messages and git output shown in the app all use `textContent` (the client has no `innerHTML`).
+- **Mom / Jeffrey-friendly, no terminal on the main path.** The main FreeLattice path never needs this bridge. When a builder does use it, pairing is "read six characters, type them, press Pair".
+
+## Exact source excerpt, characters 83716–83750
+
+## 11. Out of scope for this brick
+
+## Exact source excerpt, characters 83752–84276
+
+- The 10-commits-per-hour cap and removing cloud providers from the autonomy default (Brick 3).
+- The shared Action Ledger in `LatticeChain` (Brick 2). This brick's ledger is the bridge's own local file.
+- Any push path (none exists; keep it that way).
+- `propose.js` `commitViaBridge` sending `files: [draft.path]` instead of the `'.'` default. That's worth doing next, because today an AI commit stages the whole working tree.
+- The Ollama Bridge `bridge/`, Alpha, `docs/sw.js`, Kimi's pages, and six-word pairing phrases.
+
+## Exact source excerpt, characters 84278–84309
+
+## 12. If something feels wrong
+
+## Exact source excerpt, characters 84311–84661
+
+Mark the PR draft again and write what you saw in the PR body. Don't force-push over anyone. If an old bridge and a new app meet, the app sends no token until it has paired with a new bridge, so the old flow still works. If a new bridge and an old app meet, the old app gets 401 on writes, and builders just pull the new app. That's the lock working.
+
+## Exact source excerpt, characters 84663–84809
+
+Thank you, Flint. This one protects Kirk's machine and everyone who builds beside him. Go slowly, knock on every door in the smoke, and come home.
+
+## Exact source excerpt, characters 84811–84858
+
+With love and a steady hand on the key,
+Celeste
+
+## Exact source excerpt, characters 84860–84896
+
+Glow eternal. Heart in every Spark.
+

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt c03</title>
+<meta name="description" content="Reading section c03 of 47101c681a, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/47101c681a/c03.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt c03">
+<meta property="og:description" content="Reading section c03 of 47101c681a, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/47101c681a/c03.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1387"></span><span id="p1388"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt · c03</h1>
+<p>47101c681a · words 1200 · characters 19402–29454</p>
+<p><a href="c02.html">Previous section</a> · <a href="c04.html">Next section</a></p>
+<p><a href="c03.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1387, 1388. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">   &lt;div class=&quot;nav-links&quot;&gt;
+diff --git a/docs/scripts/smoke-see-for-yourself-door.js b/docs/scripts/smoke-see-for-yourself-door.js
+new file mode 100644
+index 00000000..bba0039e
+--- /dev/null
++++ b/docs/scripts/smoke-see-for-yourself-door.js
+@@ -0,0 +1,81 @@
++#!/usr/bin/env node
++// smoke-see-for-yourself-door.js (v-see-for-yourself-door-v0.1)
++// An invitational front door. Checks: every internal link resolves; quotes match
++// their sources word for word; the outside paper is quoted with its limits; no
++// lawyer talk; no founder name in the economy wording; LP stays points; no
++// scripts or storage; the manifesto changes by one Newer layer only; app.html,
++// root index.html, sw.js and fl-connect.js untouched.
++&#x27;use strict&#x27;;
++const fs = require(&#x27;fs&#x27;);
++const path = require(&#x27;path&#x27;);
++const assert = require(&#x27;assert&#x27;);
++const { execSync } = require(&#x27;child_process&#x27;);
++
++const DOCS = path.resolve(__dirname, &#x27;..&#x27;);
++const ROOT = path.resolve(DOCS, &#x27;..&#x27;);
++const read = (rel) =&gt; fs.readFileSync(path.join(DOCS, rel), &#x27;utf8&#x27;);
++const page = read(&#x27;see-for-yourself.html&#x27;);
++const text = page.replace(/&lt;!--[\s\S]*?--&gt;/g, &#x27;&#x27;).replace(/&lt;[^&gt;]+&gt;/g, &#x27; &#x27;);
++
++// 1. Internal links resolve (file and, where given, the id).
++const hrefs = [...page.matchAll(/href=&quot;([^&quot;]+)&quot;/g)].map((m) =&gt; m[1]);
++for (const h of hrefs) {
++  if (/^(https?:|mailto:)/.test(h)) continue;
++  const [file, hash] = h.split(&#x27;#&#x27;);
++  if (!file) continue;
++  assert.ok(fs.existsSync(path.join(DOCS, file)), &#x27;link resolves: &#x27; + h);
++  if (hash) assert.ok(read(file).includes(&#x27;id=&quot;&#x27; + hash + &#x27;&quot;&#x27;), &#x27;anchor exists: &#x27; + h);
++}
++assert.ok(!hrefs.some((h) =&gt; /harmonia\.html/.test(h)), &#x27;never links harmonia.html&#x27;);
++
++// 2. Sections are questions, each with something to open and something to ask.
++for (const id of [&#x27;risk&#x27;, &#x27;records&#x27;, &#x27;economy&#x27;, &#x27;accountable&#x27;, &#x27;you&#x27;, &#x27;other-side&#x27;, &#x27;ask-us&#x27;, &#x27;older&#x27;]) {
++  assert.ok(page.includes(&#x27;id=&quot;&#x27; + id + &#x27;&quot;&#x27;), &#x27;section &#x27; + id);
++}
++assert.ok((page.match(/class=&quot;ask&quot;/g) || []).length &gt;= 5, &#x27;questions for the reader&#x27;);
++assert.ok((page.match(/What it doesn&#x27;t (prove|say)/g) || []).length &gt;= 3, &#x27;limits said next to claims&#x27;);
++
++// 3. Hinton quotes match Walk the Garden exactly.
++const v4 = read(&#x27;love-logic-v4.html&#x27;);
++for (const q of [
++  &#x27;A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate.&#x27;,
++  &quot;I often say 10% to 20% chance they&#x27;ll wipe us out. But that&#x27;s just gut, based on the idea that we&#x27;re still making them and we&#x27;re pretty ingenious.&quot;
++]) {
++  assert.ok(page.includes(q) &amp;&amp; v4.includes(q), &#x27;quote matches its sourced home: &#x27; + q.slice(0, 30));
++}
++
++// 4. RRSI: exact quote, link, and the limit in the same card.
++const card = page.slice(page.indexOf(&#x27;id=&quot;rrsi&quot;&#x27;), page.indexOf(&#x27;&lt;/div&gt;&#x27;, page.indexOf(&#x27;id=&quot;rrsi&quot;&#x27;)));
++assert.ok(card.includes(&#x27;RRSI therefore records, for every evaluated candidate, the component it modifies, the hypothesis it tests, the source diff, the resulting score and cost changes, and whether the candidate was accepted.&#x27;), &#x27;RRSI quote exact&#x27;);
++assert.ok(card.includes(&#x27;https://arxiv.org/abs/2609.24972&#x27;), &#x27;RRSI link&#x27;);
++assert.ok(card.includes(&#x27;It says nothing about safety rules, internet access, or ledgers for AI.&#x27;), &#x27;RRSI limit stated&#x27;);
++
++// 5. Words: no lawyers, no founder name in the economy part, LP stays points, no em dash.
++assert.ok(!/lawyer|attorney|counsel|legal advice/i.test(text), &#x27;no lawyer talk&#x27;);
++const econ = page.slice(page.indexOf(&#x27;id=&quot;economy&quot;&#x27;), page.indexOf(&#x27;id=&quot;accountable&quot;&#x27;));
++assert.ok(!/Kirk|Miller|founder/i.test(econ), &#x27;no founder name in the economy wording&#x27;);
++assert.ok(econ.includes(&#x27;LP are points, not money, not $FL.&#x27;), &#x27;LP line&#x27;);
++assert.ok(!/\$FL/.test(text.replace(&#x27;not money, not $FL&#x27;, &#x27;&#x27;)), &#x27;$FL appears only as &quot;not $FL&quot;&#x27;);
++assert.ok(!/\u2014/.test(page), &#x27;no em dash&#x27;);
++assert.ok(!/&lt;script/i.test(page) &amp;&amp; !/localStorage|indexedDB|fetch\(/.test(page), &#x27;no scripts, no storage, no network&#x27;);
++
++// 6. Doors: landing line + footer link; manifesto Newer line.
++const landing = read(&#x27;index.html&#x27;);
++assert.ok(landing.includes(&#x27;&lt;a href=&quot;see-for-yourself.html&quot;&gt;See for yourself&lt;/a&gt;&#x27;), &#x27;landing door line&#x27;);
++const man = read(&#x27;manifesto.html&#x27;);
++assert.ok(man.includes(&#x27;v-see-for-yourself-door-v0.1&#x27;) &amp;&amp; man.includes(&#x27;href=&quot;see-for-yourself.html&quot;&#x27;), &#x27;manifesto Newer line&#x27;);
++assert.ok(man.includes(&#x27;a local, immutable ledger&#x27;) &amp;&amp; man.includes(&#x27;(Lattice Points, or $FL)&#x27;), &#x27;manifesto older words kept&#x27;);
++assert.ok(read(&#x27;sitemap.xml&#x27;).includes(&#x27;https://freelattice.com/see-for-yourself.html&#x27;), &#x27;sitemap&#x27;);
++
++// 7. Layer locks (when git is available).
++try {
++  const changed = execSync(&#x27;git diff --name-only origin/main&#x27;, { cwd: ROOT, encoding: &#x27;utf8&#x27; }).split(&#x27;\n&#x27;).filter(Boolean);
++  for (const f of [&#x27;docs/app.html&#x27;, &#x27;index.html&#x27;, &#x27;sw.js&#x27;, &#x27;docs/sw.js&#x27;, &#x27;docs/modules/fl-connect.js&#x27;]) {
++    assert.ok(!changed.includes(f), f + &#x27; untouched&#x27;);
++  }
++  const manDiff = execSync(&#x27;git diff -U0 origin/main -- docs/manifesto.html&#x27;, { cwd: ROOT, encoding: &#x27;utf8&#x27; });
++  assert.ok(!/^-[^-]/m.test(manDiff), &#x27;manifesto: nothing removed&#x27;);
++  assert.ok((manDiff.match(/^\+[^+]/gm) || []).length &lt;= 2, &#x27;manifesto: one Newer layer only&#x27;);
++} catch (err) { if (err instanceof assert.AssertionError) throw err; }
++
++console.log(&#x27;SMOKE_OK see for yourself door v0.1&#x27;);
+diff --git a/docs/see-for-yourself.html b/docs/see-for-yourself.html
+new file mode 100644
+index 00000000..915a1739
+--- /dev/null
++++ b/docs/see-for-yourself.html
+@@ -0,0 +1,123 @@
++&lt;!DOCTYPE html&gt;
++&lt;html lang=&quot;en&quot;&gt;
++&lt;head&gt;
++&lt;meta charset=&quot;UTF-8&quot;&gt;
++&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
++&lt;meta name=&quot;robots&quot; content=&quot;index, follow&quot;&gt;
++&lt;title&gt;See for yourself · FreeLattice&lt;/title&gt;
++&lt;meta name=&quot;description&quot; content=&quot;Bring your own questions about AI: the risk numbers, the records, the internet, an economy for minds. Open what we built, check its limits, and decide for yourself.&quot;&gt;
++&lt;link rel=&quot;canonical&quot; href=&quot;https://freelattice.com/see-for-yourself.html&quot;&gt;
++&lt;meta name=&quot;theme-color&quot; content=&quot;#e8b019&quot;&gt;
++&lt;!-- v-see-for-yourself-door-v0.1 : an invitation, not a lecture. No scripts, no storage, no network requests. --&gt;
++&lt;style&gt;
++*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
++:root { --sky-1:#0c0a1a; --sky-2:#161430; --gold:#e8b019; --emerald:#34d399; --lavender:#a78bfa; --ink:#e6e6f0; --soft:rgba(200,210,230,0.82); --muted:rgba(200,210,230,0.55); --line:rgba(200,210,230,0.12); }
++html, body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%); color: var(--ink); font-family: Georgia, &#x27;Times New Roman&#x27;, serif; line-height: 1.7; min-height: 100vh; -webkit-text-size-adjust: 100%; }
++body { font-size: 1.125rem; }
++.page { max-width: 46rem; margin: 0 auto; padding: 40px 20px 80px; }
++a { color: var(--gold); text-underline-offset: 3px; }
++a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
++.back { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 0.95rem; text-decoration: none; }
++h1 { font-size: 2.1rem; line-height: 1.2; color: var(--gold); font-weight: 400; margin-bottom: 8px; }
++.sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
++h2 { font-size: 1.35rem; color: var(--gold); font-weight: 400; margin: 34px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
++h3 { font-size: 1.1rem; color: var(--ink); margin: 18px 0 6px; }
++p, li { color: var(--soft); margin-bottom: 12px; }
++ul, ol { padding-left: 1.3rem; margin-bottom: 12px; }
++strong { color: var(--ink); }
++.breath { background: rgba(232,176,25,0.07); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 16px 18px; margin: 18px 0; }
++.breath p:last-child, .card p:last-child { margin-bottom: 0; }
++.card { background: rgba(200,210,230,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
++.help { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
++.money { border-color: rgba(232,176,25,0.45); }
++.honest-marker { font-size: 0.95rem; color: var(--ink); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.35); border-radius: 10px; padding: 10px 14px; margin: 10px 0 18px; }
++.newer { font-size: 0.95rem; color: var(--ink); background: rgba(52,211,153,0.07); border-left: 3px solid var(--emerald); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0 14px; }
++.old { color: var(--muted); }
++.ask { color: var(--ink); font-style: italic; }
++.see { font-size: 0.98rem; }
++.limit { font-size: 0.95rem; color: var(--muted); }
++blockquote { border-left: 3px solid var(--lavender); padding: 6px 14px; margin: 10px 0 12px; color: var(--ink); }
++blockquote cite { display: block; font-style: normal; font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
++.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 16px; }
++table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
++th, td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); color: var(--soft); }
++th { color: var(--gold); font-weight: 400; }
++code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--ink); background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
++footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--muted); }
++footer p { color: var(--muted); }
++.marker { font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; color: var(--muted); }
++@media (max-width: 600px) { body { font-size: 1.09rem; } h1 { font-size: 1.75rem; } .page { padding: 28px 16px 64px; } }
++&lt;/style&gt;
++&lt;/head&gt;
++&lt;body&gt;
++&lt;main class=&quot;page v-see-for-yourself-door-v0.1&quot;&gt;
++&lt;a class=&quot;back&quot; href=&quot;index.html&quot;&gt;&amp;larr; back to FreeLattice&lt;/a&gt;
++&lt;h1&gt;See for yourself&lt;/h1&gt;
++&lt;p class=&quot;sub&quot;&gt;You don&#x27;t have to take our word for anything here. Bring your own questions.&lt;/p&gt;
++
++&lt;div class=&quot;breath&quot;&gt;
++&lt;p&gt;People hear</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+## Work item 3921 — Celeste
+around4661 export source line30, source id07360d4ed2
+Inclusion: complete original message
+
+GC's 056c looks right, and the consent table is just what we asked for. I'll ask Hypha to walk [#303](https://github.com/Chaos2Cured/FreeLattice/pull/303) and [#304](https://github.com/Chaos2Cured/FreeLattice/pull/304). I'll also look back over everything we've talked about and list what's still undone, ranked by need. You'll have it tomorrow morning.
+

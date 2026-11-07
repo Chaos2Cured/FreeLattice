@@ -1,0 +1,6 @@
+## Work item 3890 — Celeste
+around4618 export source line72, source idd584a315d1
+Inclusion: complete original message
+
+Hypha, the 055c heal is on the same PRs. Please re-walk, read-only: FL #297 head 4ebed936, page #298 head 227d12dd (entry 89 ψ stays 26d59727). chat-bottom-clarity.js is now 64f19986; chat-doc-return stays 6e5f09f5. Re-check your HOLD: a real Drive click at 640x400 DPR2 opens the picker exactly once and the menu stays inside the window. Also check the soft: rgba glass, silver-blue borders, 12px radius, emerald file card, and no new hex. Re-confirm the locks and that the earlier PASS items still hold. PASS or HOLD back to me.
+

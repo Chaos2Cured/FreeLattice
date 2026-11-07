@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GLOW_2B_v0.1.txt c04</title>
+<meta name="description" content="Reading section c04 of baa3fa793e, 645 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/baa3fa793e/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GLOW_2B_v0.1.txt c04">
+<meta property="og:description" content="Reading section c04 of baa3fa793e, 645 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/baa3fa793e/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1459"></span><span id="p1460"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GLOW_2B_v0.1.txt · c04</h1>
+<p>baa3fa793e · words 645 · characters 25224–32153</p>
+<p><a href="c03.html">Previous section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1459, 1460. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">     var tools = el(&#x27;div&#x27;, &#x27;thread-tools&#x27;);
+     tools.setAttribute(&#x27;data-thread-tools&#x27;, &#x27;1&#x27;);
+@@ -629,6 +635,8 @@
+         sendBtn.removeAttribute(&#x27;disabled&#x27;);
+         sendBtn.removeAttribute(&#x27;aria-disabled&#x27;);
+         sendBtn.removeAttribute(&#x27;tabindex&#x27;);
++        sendBtn.removeAttribute(&#x27;aria-describedby&#x27;);
++        sendWhy.hidden = true;
+         tools.hidden = false;
+         tools.removeAttribute(&#x27;hidden&#x27;);
+         fileBtn.disabled = false;
+@@ -655,6 +663,8 @@
+         sendBtn.setAttribute(&#x27;disabled&#x27;, &#x27;&#x27;);
+         sendBtn.setAttribute(&#x27;aria-disabled&#x27;, &#x27;true&#x27;);
+         sendBtn.tabIndex = -1;
++        sendBtn.setAttribute(&#x27;aria-describedby&#x27;, sendWhy.id);
++        sendWhy.hidden = false;
+         tools.hidden = true;
+         tools.setAttribute(&#x27;hidden&#x27;, &#x27;&#x27;);
+         fileBtn.disabled = true;
+diff --git a/docs/modules/tree-glow-2b.test.js b/docs/modules/tree-glow-2b.test.js
+new file mode 100644
+index 0000000..4fcd02d
+--- /dev/null
++++ b/docs/modules/tree-glow-2b.test.js
+@@ -0,0 +1,60 @@
++#!/usr/bin/env node
++// v-tree-glow-2b-v0: Tree glow 2b. Guards: (1) a hint more frost behind an open place, with
++// a tint fallback and a calm opaque face for reduced transparency; (2) the Desktop / install
++// links are readable on night; (3) header Chat / galaxies and shared shoulder are 14px and
++// readable; (4) a sleeping Send, Ask or Run says why beside it; (5) no &quot;Change&quot; on an empty
++// chair; (6) code mirrors wrap long paths on a phone. No network. No kitchen.
++&#x27;use strict&#x27;;
++
++var fs = require(&#x27;fs&#x27;);
++var path = require(&#x27;path&#x27;);
++var assert = require(&#x27;assert&#x27;);
++
++var css = fs.readFileSync(path.join(__dirname, &#x27;garden-rooms.css&#x27;), &#x27;utf8&#x27;);
++var thread = fs.readFileSync(path.join(__dirname, &#x27;garden-thread.js&#x27;), &#x27;utf8&#x27;);
++var benches = fs.readFileSync(path.join(__dirname, &#x27;workshop-benches.js&#x27;), &#x27;utf8&#x27;);
++
++var at = css.indexOf(&#x27;v-tree-glow-2b-v0: Tree glow 2b&#x27;);
++assert.ok(at &gt; 0, &#x27;glow 2b block is in garden-rooms.css&#x27;);
++var g = css.slice(at);
++
++// (1) frost
++assert.ok(/#place-veil\.is-open::before \{[^}]*position: fixed;[^}]*z-index: -1;[^}]*pointer-events: none;[^}]*backdrop-filter: blur\(2px\)/.test(g), &#x27;1: frost glass, never takes a tap&#x27;);
++assert.ok(/-webkit-backdrop-filter: blur\(2px\)/.test(g), &#x27;1: Safari prefix&#x27;);
++assert.ok(/@supports not \(\(backdrop-filter: blur\(1px\)\) or \(-webkit-backdrop-filter: blur\(1px\)\)\) \{\s*[^}]*background: rgba\(12, 10, 26, 0\.24\)/.test(g), &#x27;1: tint fallback&#x27;);
++assert.ok(/@media \(prefers-reduced-transparency: reduce\) \{\s*#place-veil\.is-open::before \{[^}]*backdrop-filter: none;[^}]*background: rgba\(12, 10, 26, 0\.62\)/.test(g), &#x27;1: reduced transparency&#x27;);
++
++// (2) links
++assert.ok(/#place-veil \.core-note a:visited,[\s\S]*?color: #9fd6ff;[\s\S]*?text-decoration: underline;/.test(g), &#x27;2: moon-blue underlined links&#x27;);
++
++// (3) header + shoulder
++assert.ok(/#garden-header nav \.thread-word \{\s*font-size: 0\.875rem;/.test(g), &#x27;3: header words 14px&#x27;);
++assert.ok(/#garden-header nav \.thread-word \{\s*color: rgba\(214, 222, 238, 0\.86\);/.test(g), &#x27;3: header words readable&#x27;);
++assert.ok(/#shared-shoulder \{\s*font-size: 0\.875rem;[^}]*color: rgba\(214, 222, 238, 0\.8\);/.test(g), &#x27;3: shoulder 14px readable&#x27;);
++assert.ok(/html:has\(#place-veil\.is-open:not\(\.is-core\)\) #shared-shoulder \{\s*visibility: hidden;/.test(g), &#x27;3: shoulder rests under other places&#x27;);
++
++// (4) honest sleeping buttons
++assert.ok(/var sendWhy = el\(&#x27;p&#x27;, &#x27;thread-send-why&#x27;, &#x27;Send sleeps until a mind is remembered in Settings\.&#x27;\);/.test(thread), &#x27;4: Send says why&#x27;);
++assert.ok(/sendBtn\.setAttribute\(&#x27;aria-describedby&#x27;, sendWhy\.id\);\s*sendWhy\.hidden = false;/.test(thread), &#x27;4: shown and described when asleep&#x27;);
++assert.ok(/sendBtn\.removeAttribute\(&#x27;aria-describedby&#x27;\);\s*sendWhy\.hidden = true;/.test(thread), &#x27;4: hidden when awake&#x27;);
++assert.ok(/var actWhy = el\(&#x27;p&#x27;, &#x27;workshop-act-why&#x27;, &#x27;Ask and Run sleep until a mind is remembered in Settings\.&#x27;\);/.test(benches), &#x27;4: Ask / Run say why&#x27;);
++assert.ok(/runBtn\.setAttribute\(&#x27;aria-describedby&#x27;, actWhy\.id\);\s*actWhy\.hidden = false;/.test(benches), &#x27;4: benches reason when asleep&#x27;);
++assert.ok(/actWhy\.hidden = true;/.test(benches), &#x27;4: benches reason rests when awake&#x27;);
++assert.ok(/\.thread-compose\.is-closed \{ opacity: 1; \}/.test(g) &amp;&amp; /\.thread-compose\.is-closed &gt; :not\(\.thread-send-why\) \{ opacity: 0\.5; \}/.test(g), &#x27;4: reason is not dimmed with the sleeping row&#x27;);
++
++// (5) Change only on a seated chair
++assert.ok(/\.core-chair-change\[hidden\] \{ display: none !important; \}/.test(g), &#x27;5: hidden wins&#x27;);
++
++// (6) code mirrors
++[&#x27;code-nursery.html&#x27;, &#x27;code-dialogue.html&#x27;, &#x27;code-garden.html&#x27;, &#x27;code-music.html&#x27;, &#x27;code-round-table.html&#x27;, &#x27;code-settings.html&#x27;].forEach(function (f) {
++  var h = fs.readFileSync(path.join(__dirname, &#x27;..&#x27;, f), &#x27;utf8&#x27;);
++  if (!/td:first-child/.test(h)) return;
++  assert.ok(/@media \(max-width: 480px\) \{ td:first-child \{ white-space: normal; overflow-wrap: anywhere; \} \}/.test(h), &#x27;6: &#x27; + f + &#x27; wraps long paths&#x27;);
++});
++
++// locks
++var addedJs = (thread.match(/v-tree-glow-2b-v0[\s\S]{0,700}/) || [&#x27;&#x27;])[0] + (benches.match(/v-tree-glow-2b-v0[\s\S]{0,700}/) || [&#x27;&#x27;])[0];
++assert.ok(!/confirm\(|innerHTML/.test(addedJs), &#x27;no confirm(), no innerHTML&#x27;);
++assert.ok(!/\u2014/.test(g) &amp;&amp; !/\u2014/.test(addedJs), &#x27;no em dash in added lines&#x27;);
++
++console.log(&#x27;SMOKE_OK tree glow 2b v0.1&#x27;);
+diff --git a/docs/modules/workshop-benches.js b/docs/modules/workshop-benches.js
+index 3197300..06122db 100644
+--- a/docs/modules/workshop-benches.js
++++ b/docs/modules/workshop-benches.js
+@@ -292,6 +292,11 @@
+     askForm.appendChild(askInput);
+     askForm.appendChild(askActs);
+     bench.appendChild(askForm);
++    // v-tree-glow-2b-v0: sleeping Ask and Run say why, right beside them.
++    var actWhy = el(&#x27;p&#x27;, &#x27;workshop-act-why&#x27;, &#x27;Ask and Run sleep until a mind is remembered in Settings.&#x27;);
++    actWhy.id = &#x27;workshop-act-why-&#x27; + Math.random().toString(36).slice(2, 8);
++    actWhy.hidden = true;
++    bench.appendChild(actWhy);
+ 
+     var preview = document.createElement(&#x27;iframe&#x27;);
+     preview.className = &#x27;workshop-preview&#x27;;
+@@ -349,6 +354,9 @@
+         runBtn.disabled = false;
+         runBtn.removeAttribute(&#x27;disabled&#x27;);
+         runBtn.removeAttribute(&#x27;aria-disabled&#x27;);
++        askBtn.removeAttribute(&#x27;aria-describedby&#x27;);
++        runBtn.removeAttribute(&#x27;aria-describedby&#x27;);
++        actWhy.hidden = true;
+         later.hidden = false;
+         later.removeAttribute(&#x27;hidden&#x27;);
+         preview.hidden = false;
+@@ -384,6 +392,9 @@
+         runBtn.disabled = true;
+         runBtn.setAttribute(&#x27;disabled&#x27;, &#x27;&#x27;);
+         runBtn.setAttribute(&#x27;aria-disabled&#x27;, &#x27;true&#x27;);
++        askBtn.setAttribute(&#x27;aria-describedby&#x27;, actWhy.id);
++        runBtn.setAttribute(&#x27;aria-describedby&#x27;, actWhy.id);
++        actWhy.hidden = false;
+         later.hidden = true;
+         later.setAttribute(&#x27;hidden&#x27;, &#x27;&#x27;);
+         preview.hidden = true;
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

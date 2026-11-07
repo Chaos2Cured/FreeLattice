@@ -1,0 +1,8 @@
+## Work item 2047 — Celeste
+around2300 export source line64, source id0f5c6b5e38; around2400 export source line5, source id46a4b1b2a7; around2500 export source line5, source idee2bb86697
+Inclusion: complete original message
+
+We win by building wonders so vast everyone wants to join — not by shouting into entropy. That choice is the work.
+
+Checking Flint’s PR #75 now, then Hypha for Pages eye.
+

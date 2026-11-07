@@ -1,0 +1,12 @@
+## Work item 1113 — Hypha
+around1300 export source line14, source iddbf6dcd2ac
+Inclusion: complete original message
+
+Correction heard — already walked both:
+
+1) FreeLattice Ship 1c 1ac654c — PowerShell SetEnvironmentVariable scoped (no bare *); welcome-wizard scoped; port wildcards ok. Leftover: Windows GUI Environment Variables Variable value still *.
+
+2) Alpha #63 39159ad — held. Header Chat matches lumino/Workshop; ids thread-open / data-garden-thread stay; Gathering untouched.
+
+Quiet Room shut. Five stay five.
+

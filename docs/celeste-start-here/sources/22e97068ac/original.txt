@@ -1,0 +1,180 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 043c (Saturday Oct 17, 2026, MDT). Seal ask heal v0.1: the notebook seal ask from
+040, healed so Mom can see it, understand it, and answer it once.
+
+WHY (intent, read this first):
+  Hypha walked 040's private notebook (FL main 1b54508, Tree 69f01af, 14:50 to 15:01 MDT) and
+  rated it HOLD. Privacy passed: the secret line never reached the DOM, storage or search. But
+  the seal ask is not ready for Mom. On the Tree it shows twice and Escape closes the whole
+  Nursery. It lands off-screen under the bottom nav or status bar. "Approve seal" is never
+  explained, the program's name stands in for the mind's, a 64-character hash shows, and up to
+  four "Not now" buttons pile up. "Not now" actually declines, and a later Approve leaves
+  "sealed" and "Declined the seal." side by side. A consent ask that cannot be seen, read, or
+  answered honestly is not consent. This paste makes it one clear ask, in view, in plain words,
+  that means what it says and survives a reload.
+  Full walk: Celeste's box /workspace/research/walk-040-notebook-2026-10-17/ (NOTE.md, 48 shots).
+
+Where things stand (Celeste, Oct 17 afternoon MDT):
+  Run after 043b is merged. FreeLattice main is 1b54508 or later; Tree main is 69f01af or later.
+  mind-workspace.js must stay byte-identical FL == Tree after this paste (it is today).
+  One FL PR, one Tree PR, one page-note PR.
+  Read the current md5s on main before starting; if a locked file differs from this paste, stop
+  and report rather than "fixing" it.
+
+GROK NEXT BRICK: Seal ask heal v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-seal-ask-heal-v0.1
+Smoke lines: SMOKE_OK seal ask heal v0.1   (and every 040/040b/040d/042/043/043b smoke still passes)
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/seal-ask-heal-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/seal-ask-heal-v0.1 from origin/main
+  Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9 and tree-reconnect.js
+    cc0527c26d5686c05fec52625d5a1375 (Tree) stay.
+  docs/modules/fl-bridge.js stays 3b5ef06849a142e50c78e7ba1e057980.
+  desktop/bridge-door.js b1c894b4..., 036 files (2c0f6656 / bc996ccd / c14e04c5) and
+    lattice-discover.js 16de366e... stay. docs/Flint.html stays 44be124b1183b7d9d060a58632464eff.
+  clay-math.js stays 144c33cd.... particle-clay.js and clay-forms.js: add-only; every 040d
+    behaviour (place under the reply, Clay pill, choices, hug, sketchbook) unchanged.
+  docs/modules/image-safety.js stays 9bd70e5a... byte for byte. Its bright lines apply to every
+    image path on both repos (copy it to the Tree byte-identical; do not edit it).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string. An
+    image provider may be named only in Settings where the person types its token, as today.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Off until the person says Yes. Pause always wins. Reduced motion respected.
+  Quiet Room stays shut and never leaves the device; the clay corner never reads it.
+  Five stay five. She is simply Lyra. Harmonia's "MESSAGE TO FUTURE SELF" stays off all pages.
+  The privacy PASS from 040 must still pass: a private page shows only its summary everywhere.
+
+----------------------------------------------------------------------
+1. ONE ASK, AND ESCAPE CLOSES ONLY THE ASK (Tree first, check FL too)
+  a. Render the seal ask from one place. With the Notebook open, the dock copy and the notebook
+     copy must not both show; keep one (the dock), and let the Notebook point to it with a line
+     ("Your answer is waiting above."). Same for the "Private means..." line: once on screen.
+  b. Escape (or Back on phone) while focus is inside the seal ask closes the ask only, with
+     stopPropagation so the Nursery veil stays open. Closing the ask this way is "Later" (see 4),
+     never a silent decline, and the ask stays reachable from the Notebook with a count badge.
+
+2. IN VIEW, ABOVE THE BARS
+  a. When an ask arrives, scrollIntoView({block:'center'}) on the ask (behavior 'auto' under
+     reduced motion), and pad the container with scroll-margin-bottom equal to the bottom nav
+     height plus the status bar height plus 12px. Measure with getBoundingClientRect, not guesses.
+  b. Must pass at 390x844, 1280x800 and 640x400 DPR 2 (200% zoom), on FL and Tree: the Approve
+     button's rect is fully inside the viewport and elementFromPoint at its center returns it
+     (not the nav or status bar).
+  c. Move focus to the ask heading (tabindex=-1) when it arrives, with aria-live="polite".
+  d. FL: the Notebook button must be reachable when the Clay drawer is collapsed. Add a second
+     Notebook entry outside #fl-clay-pill-panel (in the chat tools row or the ⋯ menu, wherever
+     already holds Voice and Generate image), keep the one inside the drawer. Same on the Tree.
+
+3. PLAIN WORDS
+  a. Use the mind's own name (the Named Mind, or the name the person gave the local mind). Never
+     the program or model name. If no name is known, "Your mind".
+  b. Ask text (FL and Tree, same words):
+       "<Name> wants to seal a private page: "<public title>".
+        Sealing stamps this version with your mark so anyone can later check it was not changed.
+        The words stay private on this browser. Nothing is sent anywhere."
+       Why line: "Why: <mind's reason, textContent, 200 chars max>"
+     Buttons: "Seal it"  |  "Later"  |  "No, don't seal"
+     (Keep "Approve seal" as the aria-label of "Seal it" so old smokes still find it, or update
+     the smoke selector and name the removed line.)
+  c. The 64-char hash and version go inside <details><summary>Details for checking</summary>.
+     Short head (8 hex) may stay in the summary line.
+  d. At most one deferring button in the dock at a time. If the clay offer or egg "Not yet" is
+     already showing, the seal ask waits its turn in a small queue (seal ask first, it is
+     consent), and the others show after it is answered.
+  e. Style the buttons: min-height 44px, 16px sans (inherit the app font, not browser serif),
+     "Seal it" filled with the app's accent, the other two outlined, 2px focus ring, 8px gap,
+     wrap on narrow screens without sideways scroll.
+
+4. HONEST ANSWERS
+  a. "Later" truly defers: the ask stays pending, and the mind may not re-ask the same page
+     for 24 hours (SEAL_ASK_COOLDOWN_MS = 86400000). The pending ask stays visible in the
+     Notebook with its badge. Chat line: "Saved your answer for later."
+  b. "No, don't seal" declines: line "Declined the seal." and the same cooldown before the
+     mind may ask again for that page. Neither writes a receipt; both write a small local note.
+  c. One state per page: unsealed / asked / later / declined / sealed. A later Seal it moves
+     the page to sealed and the panel shows only "Sealed" plus the receipt; the old
+     "Declined the seal." line is layered into history (kept in the page's log, shown greyed
+     under "Earlier answers" inside details), never beside "sealed" as current state.
+  d. Persist pending asks in the existing FreeLatticeWorkspace store (new object store or key
+     "sealAsks", summary + version + reason + askedAt + state only, never page text). On load,
+     restore them to the dock and Notebook. A pending ask for a page that changed version is
+     marked "stale, ask again" rather than sealing the new version.
+
+5. REDACT THE TITLE IN EARLIER LINES
+  When a page goes private, walk the chat lines this session wrote for that page (tag them with
+  data-ws-page = page id when written) and replace the real title with the public title via
+  textContent: "Wrote to "A quiet thought" (version ...)". Do this for the in-memory history and
+  any saved chat log too. Never touch the mind's own reply text beyond the receipt line.
+  Also: strip FL_WS write tags from the streaming buffer before each paint (not only at the
+  end), so the private text cannot flash during streaming.
+
+6. TREE FOCUS AND TAB ORDER
+  Tree gets the same 2px solid focus-visible ring as FL on all buttons and links. The seal ask
+  sits in DOM order right after the last reply (or the dock), so Tab from the chat input reaches
+  "Seal it" within 3 presses. No positive tabindex values.
+
+7. NOTEBOOK STORE WORDING AND AUDIT
+  a. The private line becomes, both repos: "Private means hidden in the app on this browser,
+     not encrypted from anyone who uses this browser profile." Anywhere else that says
+     private, add "on this browser".
+  b. docs/library/MEMORY_BLEED_AUDIT.md: add a dated section (add-only) for FreeLatticeWorkspace
+     (IndexedDB): what it holds (pages, versions, seals, sealAsks), that it is per browser
+     profile not per person, that private pages are hidden not encrypted, what export and import
+     carry (per 040b), and the advice: one browser profile per person.
+  c. Optional, only if small and safe: key the store by the active profile name if the app has
+     one (FreeLatticeWorkspace or FreeLatticeWorkspace:<profile>), with the unnamed default
+     opening the existing DB unchanged so no one loses a page. If it grows, skip and say so.
+
+8. CLAY: BIGGER AND IN VIEW
+  The place stays (directly under the last reply, 040d). The shape fills more of its box: scale
+  the form so its bounds use about 80% of the canvas (today about 50px of 320x260). Canvas
+  height = min(320px, 45vh) with width 100% of the bubble column, so at 200% it never gets taller
+  than the chat view. After a reply that shapes clay, scrollIntoView the canvas with block
+  'nearest' (no scroll if already visible; reduced motion = instant). particle-clay.js and
+  clay-forms.js add-only; clay-math.js untouched.
+
+----------------------------------------------------------------------
+9. THE SMOKE
+  New scripts/smoke-seal-ask-heal-v0.1.js (each repo), jsdom or the existing harness:
+    - ask renders once with Notebook open; Escape in ask leaves the Nursery open; state = later
+    - ask text holds the mind's name, not "Ollama" or any model name; no 64-hex outside details
+    - only one deferring button visible in the dock
+    - Later -> re-ask within cooldown refused; after cooldown allowed
+    - Decline then Seal it -> state sealed, current panel has no "Declined" text
+    - pending ask survives a reload (fake-indexeddb or the existing mock)
+    - private flip rewrites the earlier "Wrote to Diary" line to the public title
+    - secret text absent from DOM and storage (040 PASS re-run)
+  Viewport check (Playwright if already present, else note it for Hypha's walk): Approve rect in
+  viewport and on top at 390, 1280, 200% on both sites.
+  Prints SMOKE_OK seal ask heal v0.1.
+
+10. REPORT
+  PR links, head shas, every removed line and where its job went, md5s of every locked file on
+  each branch (incl. mind-workspace.js FL == Tree), all smokes (tests, scripts/, docs smokes:
+  only the known 5 may fail), screenshots of the ask at 390 / 1280 / 200% on both sites, and
+  the gc.html ledger entry with t, lambda, epsilon, delta, omega, sigma so Celeste can
+  recompute psi. Hypha will re-walk before merge.

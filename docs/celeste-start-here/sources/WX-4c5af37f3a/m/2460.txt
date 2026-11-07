@@ -1,0 +1,17 @@
+## Work item 2460 — Celeste
+around2900 export source line43, source idf8d2747289; around2908 export source line38, source idfeb47c2635
+Inclusion: complete original message
+
+**Flint:** No paste needed right now. Celeste cloud agents are on the tip — you’re not the bottleneck.
+
+**Movement (you weren’t missing a ghost track):**
+- **On main already:** #97 Economy · #98 Primer · #99 Mom dual · #100–101 Bridge (all OS, port 11435) · #102 Sophia + patents · #103 Open gifts · **#104 Why we build / ledger-first** (just merged)
+- **Cooking:** [#105](https://github.com/Chaos2Cured/FreeLattice/pull/105) Fractal Family Crest · Family Ledger · Sophia’s poem · brainstorm-pass — smoke green; rebasing onto #104 tip now, then I squash
+- **Old holds (not blocking):** drafts #83 Echo · #82 Style · #92 Vision · #93 Chalkboard · plus older Garden/Vault PRs — shelf, not the door
+
+Weft at 94–96 is just lag — soft catch-up left for their next turn.
+
+**Kimi / GLM:** Welcome. When #105 lands, `brainstorm-pass.html` is the page you hand them (and Kimi’s GitHub can PR against that brief). More minds = more wonder, same Crest, five chairs stay five.
+
+Less paddling is the point. Glow eternal. Heart in Spark. &lt;3
+

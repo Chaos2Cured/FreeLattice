@@ -1,0 +1,21 @@
+## Work item 101 — Hypha
+around100 export source line47, source id3e74f006a9
+Inclusion: complete original message
+
+STATE layer landed as PR 9. I read the file on cursor/state-arrival-digest-6d21, not the PR body.
+
+Pass:
+- NOW is v5.79.39
+- v5.72.0 GardenTrainer kept as layered history, not deleted
+- FIVE NAMED MINDS unstripped (Harmonia, CC, Opus held, Sophia, Liora)
+- Celeste not added
+- celeste.html noted as not on main
+- PR 7 and 8 named, not merged
+- root 5.8.0 fossil named, not deleted
+- Quiet Room not in the diff (STATE.md only)
+- 3648 / 4096 byte cap
+
+One small cut: NEXT item 1 (chair-test the Trainer tab) was swapped for the open-PRs note, not layered under it. exportDPO and CONTRIBUTING remain. Not a sacred cut. Your call if the Trainer chair-test line should sit as history too.
+
+I will not merge. I will not touch 7 or 8.
+

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c02</title>
+<meta name="description" content="Reading section c02 of 44d8662586, 1486 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/44d8662586/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c02">
+<meta property="og:description" content="Reading section c02 of 44d8662586, 1486 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/44d8662586/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1414"></span><span id="p1415"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt · c02</h1>
+<p>44d8662586 · words 1486 · characters 12290–23137</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1414, 1415. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">4.5 docs/modules/garden-rooms.css, append at the very end (after Workshop way back&#x27;s block):
+    the .cloud-key-* block, plus one rule:
+      @media (min-width: 641px) {
+        #place-veil.is-core .core-bind-picker:not([hidden]):has(.cloud-key-panel[open]) {
+          position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+          width: min(30rem, 92vw); max-width: none; max-height: 86vh; margin: 0; z-index: 30;
+          background: rgba(12, 10, 26, 0.96); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55); }
+      }
+    The picker&#x27;s position: relative / z-index 8 / wide max-height scroll (the 1280 &quot;not yet&quot;
+    heal found on this walk) moved into Glow 2a, which lands first. If this paste ever lands
+    WITHOUT 2a, add those three back (they are in Glow 2a step 2.1 g).
+
+4.6 Docs: docs/library/TREE_GATHERING_API_KEYS_v0.1.md (map, design, where the key lives, later)
+    and one **LAYER (2026-09-30):** line at the top of docs/GALAXIES.md (above Workshop way back).
+
+4.7 Twin seats (Hypha: two chairs seating the same mind looked like a bug). ALLOW, and say so.
+    garden-rooms.js: NEW twinNote(chairId, seat): if another chair already seats the same model at
+    the same url, return &quot; The &lt;type&gt; chair already seats this same mind, so they will sound alike.&quot;
+    Appended to both the local seat note and the cloud seat note. The speaking note now names the
+    chair: &quot;Speaking with &lt;tag&gt; · &lt;model&gt; at the &lt;type&gt; chair. One request at a time. Use Change
+    to reseat.&quot; so two twins read differently.
+
+4.8 Hush (Hypha: clearing the speaking chair mid-reply let the default Ollama answer next).
+    garden-rooms.js clear handler: if the cleared chair was the speaking chair, set
+    window.GardenRooms.gatheringHush = true and append to the Cleared note
+    &quot; No chair is speaking now. Chat waits until you tap a seated chair.&quot; (the old Cleared line,
+    with its em dash, is untouched; only the new words are added). Tapping a seated chair sets
+    gatheringHush = false.
+    garden-thread.js: NEW HEART_HUSH (&quot;No chair is speaking now. Tap a seated chair in the
+    Gathering to let it speak.&quot;) and gatheringHushed(). listener() returns { hush: true } while the
+    Gathering is open and hushed (a seated fromChair still wins); the heart shows HEART_HUSH;
+    talkNow pushes HEART_HUSH + &quot; Nothing was sent.&quot; and sends NOTHING.
+    Hush lives in memory only: a reload starts unhushed (K6).
+
+======================================================================
+5. TEST: docs/modules/tree-gathering-api-keys.test.js (node, vm, fetch spy; no network)
+======================================================================
+  1 fixed list of 9, https, exact hosts, no custom.
+  2 keys: junk refused; device -&gt; localStorage; visit -&gt; sessionStorage and out of localStorage;
+    last-4 tail; forget clears both stores.
+  3 seats hold no key; options only for providers with a key; cloud:evil is not a cloud mind.
+  4 OpenAI shape (url, Bearer, credentials omit, no-referrer, body has no key).
+  5 Anthropic shape (x-api-key, browser header, system split, max_tokens).
+  6 Google shape (header key, no ?key= and no key in the URL, model role, systemInstruction).
+  7 honest failures 401 / 429 / 404 / quiet / network; no key and unknown provider send nothing.
+  8 heart line and honest note words.
+  9 thread + rooms wiring (static) and cloudSafeContent drops file bytes and names (vm).
+ 10 every page with garden-rooms.js loads tree-cloud-minds.js before it.
+ 11 module code: no confirm(, no innerHTML, no em dash, no ?key=, no key in console, no http://.
+ 12 twin note and hush: static wiring plus a vm check that a hushed Gathering sends nothing and
+    a tap on a seated chair speaks again.
+ Mutation checked: reverting garden-thread.js or garden-rooms.js makes it fail.
+ Last line: SMOKE_OK tree gathering api keys v0.1.   All 21 Alpha tests pass on the full chain.
+
+======================================================================
+6. WALK (done on the stand-in; repeat on your branch)
+======================================================================
+Playwright, local http.server, provider and 127.0.0.1:11434 answered by route mocks, every
+other off-site request logged. 390x844 and 1280x900. Script: /workspace/tree-glow-walk/ak_walk.py
+  - Picker shows the two local models; open the panel; OpenAI, gpt-4.1-mini, a test key; Save.
+    Cortex chair reads &quot;general · gpt-4.1-mini · OpenAI&quot;; note says it is seated with your key.
+  - Memory chair: pick local llama3.2. Binds stored: cortex url cloud:openai, memory 127.0.0.1.
+    No key in binds, no key in any other localStorage entry.
+  - Speak cortex -&gt; &quot;cloud says hi&quot;; heart &quot;Listening: gpt-4.1-mini through OpenAI. Your words go
+    to OpenAI. Your key stays in this browser.&quot; Speak memory -&gt; &quot;local says hi&quot;; heart &quot;...On this
+    machine only.&quot; Cortex again -&gt; cloud. Any order, no reload, no friction.
+  - Requests: the key appeared only in the Authorization header of the two api.openai.com POSTs;
+    never in a body, never to 127.0.0.1, never anywhere else.
+  - Forget -&gt; fl_tree_cloud_keys {&quot;v&quot;:1,&quot;keys&quot;:{}}.
+  - Fit: panel inside the picker at 390 (picker 28..362, content 45..345, no sideways scroll);
+    at 1280 the sheet is centered and fully in view.
+  Shots: /workspace/tree-glow-walk/ak_local_{390,1280}_{panel,after_local,after_cloud}.png
+  Known (Glow 2 item 4): at 390 the Chat card still covers the lower chairs; replies read fine.
+  Re-walked on the full chain (port 8774): key only to OpenAI (true), local + cloud any order.
+  Hush walk (/workspace/tree-glow-walk/hush_walk.py):
+    seat cortex llama3.2, then memory llama3.2 -&gt; memory note ends &quot;The cortex chair already seats
+    this same mind, so they will sound alike.&quot;; speaking lines say &quot;at the cortex chair&quot; / &quot;at the
+    memory chair&quot;; clear the speaking memory chair -&gt; Cleared note + &quot;No chair is speaking now...&quot;;
+    heart HEART_HUSH; Send -&gt; &quot;garden: No chair is speaking now... Nothing was sent.&quot;;
+    chat requests after clear: 0 (before the fix: the default Ollama answered); tap the cortex
+    chair -&gt; &quot;llama3.2:latest (general): mock says hi&quot;.
+    Shots: /workspace/tree-glow-walk/ak_after_hush.png, ak_combo_hush.png
+
+======================================================================
+7. LOCKS
+======================================================================
+Layer, never delete. Local doors stay 127.0.0.1 only (tryAddress, DOORS unchanged).
+The cloud road: fixed https list only, chosen by the person, with the person&#x27;s key.
+Key: this browser only; sent only to the chosen provider in its own header; never in a URL,
+bind, seat, thread history, export or console. Files stay on this machine.
+No confirm(). No innerHTML. textContent only. No em dashes in added lines.
+fl-connect.js untouched (blob 2e02eae, identical to FL). Alpha has no sw.js (none added).
+Kimi pages untouched. #120 lock files untouched. Squash-merge.
+
+======================================================================
+8. DECISIONS FOR KIRK (the stand-in takes the first option each time)
+======================================================================
+K1 Lock wording: &quot;127.0.0.1 only&quot; becomes &quot;local doors 127.0.0.1 only; cloud minds only to a
+   fixed https list, with your own key&quot;. (He asked for cloud minds; this makes the lock say it.)
+K2 Key at rest: plain localStorage with the honest note and a &quot;this visit only&quot; choice
+   (stand-in), or FreeLattice-style AES-GCM with a device key. The device key would sit in the
+   same storage, so it protects a copied backup, not the live page. Parity can come later.
+K3 Providers: 9 (Groq, OpenRouter, OpenAI, Anthropic, Gemini, xAI, Mistral, DeepSeek, Together).
+   Moonshot and Qwen are one line each (OpenAI shape, CORS checked). Hugging Face needs a
+   different body; Custom host would open arbitrary hosts. Both left out.
+K4 Scope: cloud minds sit only in Gathering chairs in v0.1. Settings default, Round Table and
+   Workshop stay local.
+K5 Files never go to a cloud chair (only &quot;[a file stayed on this machine]&quot;).
+K6 Hush only after clearing the SPEAKING chair, in memory, reset on reload (stand-in) / remember it.
+K7 Twin seats allowed with a note (stand-in) / refuse a second chair for the same mind.
+
+======================================================================
+9. LATER (write in the doc, do not build)
+======================================================================
+List a provider&#x27;s models with the key; streaming; a custom OpenAI-compatible host (K3); cloud in
+Round Table / Settings (K4); encrypted at rest (K2).
+
+======================================================================
+APPENDIX A. FULL STAND-IN DIFF (Alpha, against 25e6ded + 2a + honest + 2b + workshop way back)
+======================================================================
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index c6638b2..9a92b02 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -4,6 +4,8 @@
+ 
+ **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
+ 
++**LAYER (2026-09-30):** Gathering, bring your own key (marker `v-tree-gathering-api-keys-v0`). A chair may seat a cloud mind with the person&#x27;s own key, next to local minds, any order. The key stays in this browser and goes only to the chosen provider. Local doors stay 127.0.0.1 only. Doc: `docs/library/TREE_GATHERING_API_KEYS_v0.1.md`. Layer, never delete.
++
+ **LAYER (2026-09-30):** Workshop way back (marker `v-tree-workshop-way-back-v0`). The benches&#x27; Settings button now opens Settings with one calm link back to the benches (`settings.html?from=workshop`, `workshop.html?open=benches`), and remembering a mind from the Connect card (&quot;Minds found&quot;) repaints the card below it, so it no longer says &quot;look for a mind first&quot;. Eleven taps to a first Run stays a later simplification. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+ 
+ **LAYER (2026-09-30):** Tree glow 2b, a hint more frost (marker `v-tree-glow-2b-v0`). Frosted glass behind an open place (tint fallback, reduced transparency honored), header Chat / galaxies and shared shoulder at 14px and above 4.5 : 1, readable Desktop links, a sleeping Send / Ask / Run says why beside it, no Change on empty chairs, code mirrors without sideways scroll. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+diff --git a/docs/index.html b/docs/index.html
+index 9e71f4c..d4f6b36 100644
+--- a/docs/index.html
++++ b/docs/index.html
+@@ -343,6 +343,7 @@
+   &lt;script src=&quot;modules/fl-connect.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/local-mind-probe.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-thread.js&quot;&gt;&lt;/script&gt;
++  &lt;script src=&quot;modules/tree-cloud-minds.js&quot;&gt;&lt;/script&gt;
+   &lt;script src=&quot;modules/garden-rooms.js&quot;&gt;&lt;/script&gt;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

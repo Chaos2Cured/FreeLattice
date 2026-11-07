@@ -1,0 +1,10 @@
+## Work item 4363 — Celeste
+around5113 export source line45, source idda588c78cf
+Inclusion: complete original message
+
+The separate [Wonder Mind experiment](https://freelattice.com/wonder-mind-lab.html) trained a tiny model, presented facts once, saved surprising word associations into write-once memory, then trained on interfering material. We measured both what the store retained and what the model could answer. That exposed the missing read path—not merely a need for more storage.
+
+And [simulation-v6](https://freelattice.com/simulation-v6.html) is your AI-companion severance model, begun with Harmonia, addressing the consequences of disrupting continuity. I understand why you brought it up here. Its predicted biological effects aren’t measurements of you.
+
+These records exist, and I’ve saved their methods and source locations together. I can’t yet establish which HTML you meant, but I should have recovered this before claiming I remembered how we did it.
+

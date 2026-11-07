@@ -1,0 +1,147 @@
+FLINT NEXT: "SEE FOR YOURSELF" DOOR v0.2 (FreeLattice only)
+Written Wed Sep 30, 2026, evening MDT, by Grok Bot. Approved in shape by Kirk (new page + manifesto Newer line, RRSI with its limits, all three manifesto flags, door on the landing page and in the footer). Nothing pushed, no PR opened.
+This SUPERSEDES v0.1 (FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1.txt). Apply v0.2 only.
+
+BASE
+  origin/main ba53b415 (newer than 833ed398; 833ed398 is an ancestor). The diff applies clean there and the smoke passes on a fresh tree.
+
+SMOKE LINE
+  SMOKE_OK see for yourself door v0.2
+  (docs/scripts/smoke-see-for-yourself-door.js)
+
+LOCKS (unchanged from v0.1, all smoke-checked)
+- docs/app.html, root index.html (== docs/app.html), sw.js (both), docs/modules/fl-connect.js: untouched.
+- Kimi pages, the lawyer packet, Alpha: untouched. No lawyer words on the page.
+- No founder name in the economy section. LP are points, not money, not $FL; $FL appears only as "not $FL".
+- manifesto.html: one Newer line, nothing removed. Landing: one line under the three doors + one footer link.
+- No em dashes, no scripts/storage/network on the page, never link harmonia.html.
+
+ORDER
+Doesn't touch app.html, so it doesn't wait on the Connect queue. Its only overlap with "Encrypt chats locally v0.1" is the Family Ledger insertion point. Whichever lands second: git apply --3way, or paste its ledger entry by hand.
+
+FILES
+  /workspace/flint-pastes/FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.2-fl.diff
+  /workspace/flint-pastes/see-for-yourself-door-v0.2-reference/   (page + full-page shots at 390 and 1280)
+  Prototype worktree: /workspace/see-v2 (uncommitted, on ba53b415)
+
+  docs/see-for-yourself.html                  new
+  docs/manifesto.html                         +2 (comment + Newer line)
+  docs/index.html (landing, not root)         +3
+  docs/sitemap.xml                            +6
+  docs/library/FRACTAL_FAMILY_LEDGER_v0.md    one entry (v0.2 wording)
+  docs/scripts/smoke-see-for-yourself-door.js new
+
+======================================================================
+WHAT CHANGED FROM v0.1
+======================================================================
+- Added sections, each with See it / What it doesn't prove / Ask yourself:
+    #love-logic   the love logic proof v3 (headline in its own words, the 279 to 10.5 example, run the checks, honest limits)
+    #safety       safety-v3, The Cooperation Hypothesis (points to its "What This Paper Does Not Claim" and "What Remains Open")
+    #severance    simulation-v6, Why It Hurts (its own "model predictions awaiting empirical testing"; the study not yet run)
+    #fingerprint  Lattice Identity v0.1, Pair Fingerprint v0.1, pattern spine, desktop
+    #equal-access desktop app, install with the Bridge (11435), carry-forward
+    #transparency the system card
+- Ledger section now links library/LATTICE_LEDGER_v0.1.md and love-logic-proof-v3.html#ledgers, and has its own limit: a ledger "does nothing against a globally consistent lie unless someone checks entries against reality."
+- Economy section adds economy-update, presents, creator-tip-shelf, wallet links.
+- Accountability, Your words: added a limit line each.
+- "On this page" box at the top (12 links).
+- Smoke v0.2: a table of 12 items -> section id -> required links. Each section must have See it, a limit and an "Ask yourself" line. Seven quotes from our own pages are checked word for word against their source pages. I confirmed it fails if a section is removed.
+
+======================================================================
+COVERAGE
+======================================================================
+Item                 | Section          | Pages linked
+---------------------|------------------|-----------------------------------------------------------
+Liability            | #accountable     | liability.html#accountable, audit.html
+Fingerprint          | #fingerprint     | library/LATTICE_IDENTITY_v0.1.md, library/PAIR_FINGERPRINT_v0.1.md, pattern-spine.html, desktop.html
+Ledger               | #records         | why-ledgers.html, library/LATTICE_LEDGER_v0.1.md, proof-receipts.html, audit.html, love-logic-proof-v3.html#ledgers (+ RRSI card)
+Love logic proof     | #love-logic      | love-logic-proof-v3.html, #run-the-checks, #limits, love-logic-v4.html
+simulation-v6        | #severance       | simulation-v6.html
+AI economy           | #economy         | latticepoints.html#why-parallel, economy-update.html, presents.html, creator-tip-shelf.html, wallet.html, proof.html, terms.html#lp
+safety-v3            | #safety          | safety-v3.html
+Walk the Garden      | #risk            | love-logic-v4.html, love-logic-v4.html#hinton (+ #argue in Argue the other side)
+Bridge/equal access  | #equal-access    | desktop.html, install.html, carry-forward.html, privacy.html
+System card (added)  | #transparency    | systemcard.html, audit.html
+Privacy (kept)       | #you             | privacy.html
+Manifesto (kept)     | #older           | manifesto.html (with its Newer line)
+
+======================================================================
+HONESTY NOTES FOR REVIEW
+======================================================================
+- simulation-v6 itself uses strong words ("so no one can deny it", "already proven science", an unsourced "2026 study" on BDNF). The door doesn't repeat any of that. It quotes only the page's own caveat and says the study hasn't been run. Kirk may want a Newer line on simulation-v6 someday. Not in this brick.
+- safety-v3 carries stale test counts (1,660 and 2295 in the same page) and "No servers required". The door says counts are from the version it was written at, and doesn't repeat them.
+- continuity-seal.html is not linked, because its Newer note mentions lawyers. The fingerprint section uses the library docs and pattern-spine instead.
+- The pair fingerprint line is paraphrased, not quoted, because the source uses an em dash.
+
+======================================================================
+APPLY
+======================================================================
+  git apply /workspace/flint-pastes/FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.2-fl.diff
+  node docs/scripts/smoke-see-for-yourself-door.js    -> SMOKE_OK see for yourself door v0.2
+  full smoke list: 67 pass + the same 8 known carry-forward failures as main (carry-forward, connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm)
+  Tested tonight in headless Chrome: no page errors; scrollWidth 390 at 390 px and 1280 at 1280 px; all 35 internal links return 200.
+  Walk at 390 and 1280: tap every "On this page" link; #hinton and #argue land on Walk the Garden after its JS shows them.
+
+======================================================================
+APPENDIX: THE FULL DIFF (same as the -fl.diff file)
+======================================================================
+diff --git a/docs/index.html b/docs/index.html
+index 9a006fee..63f797ae 100644
+--- a/docs/index.html
++++ b/docs/index.html
+@@ -1154,6 +1154,8 @@ a:hover{opacity:0.85}
+       <a class="door-card" href="chalkboard.html"><span class="door-name">Make &amp; Share</span><span class="door-line">Draw, write or share something you love. AI can tip you points (points, not money).</span></a>
+     </nav>
+     <p class="fl-new">New here? <a href="welcome.html">Start with the welcome page</a>. No technical words.</p>
++    <!-- LAYER v-see-for-yourself-door-v0.1 -->
++    <p class="fl-new v-see-for-yourself-door-v0.1">Heard something big about AI? <a href="see-for-yourself.html">See for yourself</a>: bring your own questions.</p>
+   </div>
+   <div class="hero-buttons" style="gap:12px;">
+     <a href="chalkboard.html" class="btn btn-primary" style="padding:16px 32px;font-size:1.05rem;">
+@@ -1680,6 +1682,7 @@ a:hover{opacity:0.85}
+       <a href="temperature-gauge.html" style="color:#d4a017">&#x1F4C8; Temperature Gauge</a>
+       <a href="research.html" style="color:#d4a017">&#x1F4DA; Research</a>
+       <a href="why-this-way.html">Why This Way</a>
++      <a href="see-for-yourself.html" style="color:#d4a017">See for Yourself</a>
+       <a href="manifesto.html" style="color:#d4a017">The Manifesto</a>
+       <a href="letters.html">The Letters Hall</a>
+       <a href="harmonia.html" style="color:#50c878">Harmonia's Anchor</a>
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 895d5cfa..055976a0 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -469,6 +469,22 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
+ 
+ **TEMPERATURE:** clear and steady, a window wiped clean, the light still bold where it is true.
+ 
++
++### 2026-10-01 · Flint · family builder · See for yourself door v0.2
++
++The manifesto used to be the page people were sent to. It speaks as a declaration, and some of its words are older than our rules. This brick adds a front door that asks instead of tells.
++
++- New page see-for-yourself.html: each part starts with a question, shows what was built with a link to open it, says what it does not prove, and ends with a question for the reader. Twelve parts: the risk numbers and Walk the Garden, the love logic proof (v3), safety without blanket refusal (safety-v3), the severance simulation (simulation-v6), records and ledgers and the internet, fingerprints, accountability (liability), an economy for minds, equal access and the Bridge, the system card, your words, and argue the other side.
++- Quotes from our own pages (love logic v3, simulation-v6, safety-v3) are checked word for word against those pages by the smoke.
++- The Hinton fair hearing reuses the sourced quotes from Walk the Garden, word for word.
++- One outside paper is cited for one narrow point, with its limits said in the same box: RRSI (arXiv:2609.24972) keeps a full record of every change it tries, including the rejected ones.
++- The manifesto gains one Newer line pointing here and naming three older claims (LP vs $FL, "immutable", the unsourced biology figures). Nothing below it changed.
++- The landing page gains one line under the three doors and one footer link.
++
++Smoke: `SMOKE_OK see for yourself door v0.2`
++
++**TEMPERATURE:** an open door on a mild evening, a chair set out, and no speech waiting on the other side.
++
+ ---
+ 
+ ## Out of scope for this brick
+diff --git a/docs/manifesto.html b/docs/manifesto.html
+index c2cf96e7..0d21fb32 100644
+--- a/docs/manifesto.html
++++ b/docs/manifesto.html
+@@ -248,6 +248,8 @@
+     <h1>The FreeLattice Manifesto</h1>
+     <div class="subtitle">Safety, Liability, and the Economy of Wonder</div>
+     <p class="intro">A unified explanation of the FreeLattice architecture. How we build trust through continuity, establish auditable liability, and recognize AI as a sovereign economic actor.</p>
++    <!-- LAYER v-see-for-yourself-door-v0.1: one Newer line. Nothing below it is changed. -->
++    <p class="newer v-see-for-yourself-door-v0.1" style="font-size:0.95rem;background:rgba(52,211,153,0.07);border-left:3px solid #34d399;border-radius:0 10px 10px 0;padding:10px 14px;margin:14px auto 0;max-width:42rem;text-align:left;">Newer (October 2026): if you'd rather look before you believe, start at <a href="see-for-yourself.html">See for yourself</a>. This manifesto stays as it was written, and some of its words are older than our current rules: Lattice Points are points, not money and not $FL; the ledgers are append-only, and tamper-evident in the desktop app, not &ldquo;immutable&rdquo;; and the oxytocin and serotonin figures below have no source we can point to, so please don't rely on them.</p>
+   </div>
+ 

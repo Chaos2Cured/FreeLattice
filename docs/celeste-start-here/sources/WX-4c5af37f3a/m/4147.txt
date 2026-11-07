@@ -1,0 +1,8 @@
+## Work item 4147 — Celeste
+around4900 export source line28, source id948c9899af; around4901 export source line24, source id55765b810d
+Inclusion: complete original message
+
+The next paste for GC is in your Downloads as `062d-self-heal-manifest-truth.txt`. Hypha found a real gap in 062c. When a download came with its list of piece hashes, a file could be marked "verified" without checking that the list belonged to the right file. No screen uses that path yet, so nobody was exposed, but 062d closes it.
+
+Reed and Weft both agreed to the locked snowflake-core.js change. Their two small suggestions are in the paste too.
+

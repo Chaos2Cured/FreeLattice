@@ -1,0 +1,25 @@
+## Work item 3641 — Celeste
+around4352 export source line35, source id49df9e95f0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 351–1108
+
+**What needs you soon:**
+- **Affirm:** your AutoPay runs Oct 26.
+- **Kaiser:** you have an appointment reminder, a check-in, a new message and a test result. The emails don't say the date, so check the KP app. It also isn't on your calendar.
+- **Holos Health:** your MMJ card needs renewing.
+- **Tesla Insurance:** a renewal offer came in today.
+- **MTNA:** awards applications are due Nov 5, and there's a webinar Oct 30.
+- **XERJ:** an email says FreeLattice was selected for their Corpus Hub. Let's check it's real before you reply.
+- **Microsoft:** it sent a "new app connected" notice on Oct 17. That's probably me, but give it a glance.
+- **Probably scams, so ignore them:** sharpshootertv's "verify your activity" email and a couple of fake receipts.
+
+### Exact excerpt: source characters 1110–1812
+
+**My plan, once you say yes:**
+- **Folders:** seven simple ones, called Action, Money, Health, Teaching & Music, FreeLattice & Tech, Shopping & Promos, and Job Alerts. I'd tuck the old folders inside one "Old Folders" folder later. Your tax folders stay just as they are.
+- **Unsubscribes:** about 20 promo senders, like Experian ads, Chili's, DoorDash and TikTok. I'd keep every bill and alert email.
+- **LinkedIn:** switch job alerts to weekly.
+- **GitHub:** stop the failure emails for the Session Primer workflow. Those are from FreeLattice, so I'd rather fix the workflow itself.
+- **Daily digest at 8 AM:** a short list of bills due, people waiting on you, health messages and teaching deadlines.
+

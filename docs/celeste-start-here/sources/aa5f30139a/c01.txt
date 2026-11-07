@@ -1,0 +1,181 @@
+FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1 (tiny)
+After a reload, the model she chose is still the model that answers. FreeLattice app.html, plus one
+cosmetic line in the shared fl-connect.js (both repos, byte-identical).
+
+Marker:        v-model-choice-survives-reload-v0.1.1
+Smoke (FL):    SMOKE_OK model choice survives reload v0.1.1        (docs/scripts/smoke-model-choice-survives-reload.js)
+Smoke (Alpha): SMOKE_OK model choice survives reload alpha v0.1.1  (docs/modules/model-choice-survives-reload.test.js)
+Source:        Hypha walk 5 of model choice sticks v0.1 (live on FL 2e74f26, Alpha b33bed4):
+               heals A and B PASS, Tree pick PASS, items 7 and 10 HOLD (reload turns qwen2.5 back
+               into llama3.2:latest while fl_modelSource=user; the chat POST then uses llama3.2).
+               Written by Grok Bot for Kirk, Tue Sep 29 2026, about 4:38 PM MDT.
+Full diffs:    /workspace/flint-pastes/FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1.diff        (FreeLattice, vs main 2e74f26)
+               /workspace/flint-pastes/FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1-alpha.diff  (theLatticeTree, vs main b33bed4)
+               Both are inlined at the end (Appendix A and B), so this paste stands alone.
+Temperature:   green braided gold, the cup is still where she set it down after the lights go off and on.
+
+======================================================================
+0. ORDER, MAINS, LOCKS
+======================================================================
+
+0.1 Where this lands (do not reorder):
+      1) FLINT_HEAL_AGENT_BRIDGE_ENV_v0.1.1_tiny.txt              (landed, #124)
+      2) FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt             (landed, FL #125 / Alpha #84)
+      3) FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt                       (Flint is building it now, from the new main)
+      4) THIS heal (FL app.html + shared fl-connect.js)            <- after Tree, before the boot probe
+      5) FLINT_NEXT_CONNECT_BOOT_PROBE_F1_F2_F3_F4_v0.1.txt       (updated in place, see 6)
+      6) FLINT_NEXT_120_DOCS_LAYER_v0.1_tiny.txt
+    Start this from main AFTER the Tree PRs merge. Anchor on the quoted TEXT, not the numbers.
+
+0.2 Mains checked just before writing:
+      FreeLattice     main = 2e74f26 (CI primer commit on 54b2fb1 #125; app code = 54b2fb1)
+      theLatticeTree  main = b33bed4 (#84)
+      docs/modules/fl-connect.js identical on both mains (blob 2e02eae).
+    "main N" line numbers are on 2e74f26. "post-Tree ~N" is from a faithful stand-in of the Tree
+    paste's fl-connect.js changes (the real Tree merge may move a few lines).
+    Re-check:
+      git -C ~/FreeLattice fetch origin && git -C ~/FreeLattice log --oneline -3 origin/main
+      git -C ~/FreeLattice-Alpha fetch origin && git -C ~/FreeLattice-Alpha log --oneline -3 origin/main
+      cmp ~/FreeLattice/docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js
+
+0.3 Applies (verified, plain `git apply`, offsets only, no fuzz):
+      - FL diff on current main 2e74f26.                                          OK
+      - FL diff on main + Tree stand-in (Tree fl-connect.js changes + a Tree
+        ledger entry above "## Out of scope for this brick").                     OK
+      - Alpha diff on b33bed4.                                                    OK
+      - Alpha diff on b33bed4 + Tree stand-in: code (fl-connect.js, new test)     OK
+        The sister-doc hunk appends at the end of CONNECT_PORT_PICKER_SISTER_v0.md; if the Tree
+        paste appended there too, `git apply --exclude='docs/library/*'` and add the section
+        by hand at the end of the file (text in Appendix B).
+      - The boot probe paste's Appendix A (app.html) and Appendix B (fl-connect.js) still apply on
+        top of this heal (see 6).
+
+0.4 Locks: Layer, never delete (the removed lines are replaced in place; the old words are kept in
+    one home, see 3.4). Root sw.js byte-identical to main; docs/sw.js untouched. index.html ==
+    docs/app.html (copy after every app.html edit). fl-connect.js byte-identical across repos. No
+    conflict markers. Every inline <script> parses (53 of 53). textContent for new words (the toast
+    is showToast, which uses textContent; no new innerHTML). No bare * (not in app code, not in the
+    smoke: CORS echoes the page origin, CDP Fetch has no wildcard pattern). No confirm(). No
+    approval screens. 127.0.0.1 only (the smoke server binds 127.0.0.1; every other request is
+    refused inside Chrome). No em dashes in anything added. Ledger entry with a Temperature line.
+    Soft paste stays: Named five stay five. Family uncapped. Quiet Room shut.
+
+======================================================================
+1. THE CAUSE (confirmed: reproduced by booting the real app.html in headless Chrome)
+======================================================================
+
+1.1 Hypha's trace (walk 5, runtime/trace_reload.out; setItem stacks on reload):
+      before reload ['qwen2.5:latest', 'user', 'qwen2.5:latest']
+      fl_ollamaModel=llama3.2:latest  at Object.set (L:36238) | at runConnectionCascade (L:39783)
+      fl_modelSource=auto             at Object.set (L:36240) | at runConnectionCascade (L:39783)
+      fl_ollamaModel=llama3.2:latest  at Object.set (L:36238) | at applyReady (L:34555) | at probe
+      fl_modelSource=user             at Object.set (L:36240) | at applyReady (L:34555) | at probe
+      after ['llama3.2:latest', 'user', ..., chat POST llama3.2:latest]
+
+1.2 Why (read in code on 2e74f26, and seen the same way in the new smoke with FL_SMOKE_TRACE=1):
+    Path 1: on reload, init restores the saved provider and emits providerConnected, so
+      runConnectionCascade (main 39774) asks FLActiveModel.isUserChosen() BEFORE
+      FLActiveModel.init() (main 33799) has run. _source is still null, so the answer is "no",
+      and step 1 writes the first text model (llama3.2) as 'auto'.
+    Path 2: FLActiveModel.init() then reads that overwritten value. FLBoxPointer.init() reads the
+      saved fl_ollamaHost, probes, and applyReady (main 34555) calls
+      FLActiveModel.set(models[0], ..., 'user'): the first model is saved AS HER CHOICE.
+      From here on even v0.1's guard in FLAutoModel.onTabChanged protects the wrong model.
+    #125 only guarded FLAutoModel.onTabChanged; v0.1's smoke "fresh reload from storage" called
+    init() first by hand, so it never met the real boot order. The new smoke boots the real page.
+
+1.3 Grep sweep for every other path that picks a model by itself (FLActiveModel.set callers,
+    fl_ollamaModel / state.ollamaModel writers, BrowseModels):
+      - FlOnboarding connect (main 27744)  models[0]                       -> guarded
+      - AiSetup testOllama (main 28377)    data.models[0]                  -> guarded
+      - settingsSetMode Local (31654, 31686) Ollama / LM Studio first model  -> guarded
+      - flTestLMStudio (main 34750)        set(models[0], 'lmstudio', 'user') -> guarded, never 'user' for a pick
+      - flAutoConnect (main 34830)         models[0]                       -> guarded (see 4.1)
+      - flProbeLocalAI LM Studio (34890)   set(models[0], 'lmstudio','boot') -> guarded
+      - autoDiscoverAI (39689, 39699)      best.models[0]                  -> guarded
+      - runConnectionCascade (39774)       first text model                -> guarded
+      - FLBoxPointer applyReady (34555)    models[0] as 'user'             -> guarded
+    Left alone (a person's own tap or typing): Settings dropdown / quick select, ModelSwitcher,
+    selectLocalModel, flPlayConnect / flLookConnect, flAutoPull, wizardFinish, custom endpoint,
+    OpenRouter / Hugging Face pickers, FLAutoModel's home-model restore. sendMessage copies the
+    #ollamaModel field (which follows FLActiveModel). BrowseModels only pulls and lists; it never
+    sets the model.
+
+======================================================================
+2. WHAT CHANGES (one sentence each)
+======================================================================
+    a) FLActiveModel reads the saved choice the first time anyone asks (set, get, isUserChosen,
+       honor), so it no longer matters which boot path runs first.
+    b) One guard, FLActiveModel.honor(models, fallback, provider) -> { model, source, gone }, and
+       a short form flHonorModel(list, fallback, provider): her model wins when it is on the list
+       (or the list is empty: a quiet answer never replaces anything).
+    c) Only when her model is gone: fall back with the existing toast words (now in one home,
+       FLActiveModel.noteGone), fl_modelChoiceGone set, the pick saved as 'auto'.
+    d) An automatic pick is never saved as 'user'.
+    e) Heal B card: one Look again, not two (shared fl-connect.js).
+
+======================================================================
+3. THE STEPS (text anchors; exact code in Appendix A)
+======================================================================
+
+3.1 docs/app.html, window.FLActiveModel (main ~36229). After
+      var _source = null; // 'user', 'auto', 'boot'
+    add the marker comment, `var _ready = false;` and
+      function ensure() { if (!_ready) init(); }
+    In set(): first line after `if (!model) return;` add `ensure();`.
+    Replace
+      function get() { return { model: _model, provider: _provider, source: _source }; }
+      function isUserChosen() { return _source === 'user'; }
+    with the same two functions calling ensure() first, then add _names, _onList, honor and
+    noteGone (Appendix A, verbatim). In init() add `_ready = true;` as the first line. The return
+    line gains `honor: honor, noteGone: noteGone`. Right after the closing `})();` add
+    function flHonorModel(list, fallback, provider) (Appendix A).
+    _onList matches "qwen2.5" to "qwen2.5:latest" and a bare family name to its tag, like the
+    rest of the app.
+
+3.2 FLBoxPointer applyReady (anchor: FLActiveModel.set(models[0], (typeof state !== 'undefined'
+    && state.provider) || 'ollama', 'user')): replace that one try-line with the honor block: set
+    hA.model with hA.source, skip set when gone (noteGone already set the pick).
+
+3.3 runConnectionCascade step 1 (anchor: `if (isLocal && typeof FLActiveModel !== 'undefined' &&
+    !FLActiveModel.isUserChosen()) {`): step 1 now runs unless her choice belongs to another
+    provider (_mineElsewhere). Inside, the `FLActiveModel.set(textModel.name, 'ollama', 'auto');`
+    pair becomes: honor -> 'user' keeps hers (log "Keeping the chosen model"), gone -> noteGone
+    already spoke, else the old auto set and log. So the Cascade also checks "still here?" at boot.
+
+3.4 FLAutoModel.onTabChanged gone branch (anchor: `safeSet('fl_modelChoiceGone', current.model);`):
+    the six lines (flag, set auto, toast, refresh Settings) become
+      FLActiveModel.noteGone(current.model, pick, 'ollama');
+    Same words, same 7000 ms, same flag, same Settings refresh. They now live in noteGone.
+
+3.5 The older paths (anchors in 1.3), each a one-line wrap with flHonorModel(list, fallback,
+    provider): FlOnboarding modelName, testOllama, settingsSetMode (Ollama and LM Studio
+    firstModel), flAutoConnect autoName, flProbeLocalAI lmPick (source 'user' only when the pick
+    is hers, else 'boot' as before), autoDiscoverAI (Ollama and OpenAI-compatible).
+    flTestLMStudio: `FLActiveModel.set(models[0], 'lmstudio', 'user');` becomes the honor block
+    (her LM Studio model when it is there; otherwise the first model as 'auto').
+
+3.6 cp docs/app.html index.html
+
+3.7 docs/modules/fl-connect.js (BOTH repos, byte-identical). Anchor (main 595 / post-Tree ~631):
+      html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+    becomes
+      // v-model-choice-survives-reload-v0.1.1: the quiet card above already has its own Look again (one button, not two)
+      if (!report.manualQuiet) html += '<button type="button" class="flc-btn flc-primary flc-look-again" data-flc-look-again>Look again</button>';
+    (manualQuiet is the state where the heal-B card "Your Bridge answered on N, but no mind is
+    running behind it yet" and the "Nothing answered on N" card each draw their own Look again.)
+    Then: cp ~/FreeLattice/docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js && cmp both.
+
+3.8 Tests (Appendix A / B):
+    - NEW docs/scripts/smoke-model-choice-survives-reload.js (FL, see 5).
+    - docs/scripts/smoke-model-choice-sticks.js: ONE added line in the Bridge-no-mind block,
+      after the 'no false "Nothing answered"' assert: exactly one data-flc-look-again.
+    - NEW Alpha docs/modules/model-choice-survives-reload.test.js (static guard on the shared line).
+
+3.9 Docs and ledger (layer):
+    - FL docs/library/FRACTAL_FAMILY_LEDGER_v0.md: the entry in Appendix A, placed directly ABOVE
+      "## Out of scope for this brick" (after the Tree entry). It carries the Temperature line.
+    - FL docs/library/CONNECT_PORT_PICKER_v0.md: append the "Heal: model choice survives reload
+      v0.1.1" section at the end.
+    - Alpha docs/library/CONNECT_PORT_PICKER_SISTER_v0.md: append the short sister section.
+

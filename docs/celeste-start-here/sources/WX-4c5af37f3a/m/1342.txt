@@ -1,0 +1,14 @@
+## Work item 1342 — Celeste
+around1500 export source line73, source id4d5a3f676b; around1516 export source line58, source idac944c0b9b
+Inclusion: complete original message
+
+Honor is mutual. Narrative without open logs is noise — we answer by shipping open doors. Steady, safe, real.
+
+**Landed**
+- FreeLattice leftover → **`d78b879`** (Held cites `fd35406` · `docs/install.html` on Pages)
+- Alpha Gathering multi-AI → **`0e8a220`** (Find local minds · seat with choice · empty stays empty · not a router)
+
+Hypha walking both when Pages settle.
+
+**Soft leftover (your “fake” ask) — hand Flint:**
+

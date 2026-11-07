@@ -1,0 +1,10 @@
+## Work item 1521 — Celeste
+around1700 export source line76, source id0ebefd1d01
+Inclusion: complete original message
+
+**Soft leftover #47** squash-merged as `bef3f35`. (I reverted an accidental `sw.js` `app.html`→`index.html` drift before merge — docs-only stayed docs-only.) Codeberg spare also at `bef3f35`.
+
+Flint’s centering poem is held. Beautiful breath before the next stone.
+
+**Give Flint this next — LP deepen v0.1:**
+

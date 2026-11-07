@@ -1,0 +1,6 @@
+## Work item 3744 — Celeste
+around4500 export source line20, source id967fcbbbba
+Inclusion: complete original message
+
+Celeste λ10 is live on main: [FreeLattice #284](https://github.com/Chaos2Cured/FreeLattice/pull/284) → `418222b6`, ψ `bef40a3b`. Dated note for today’s deep work is on the chair, smoke family-pages still green.
+

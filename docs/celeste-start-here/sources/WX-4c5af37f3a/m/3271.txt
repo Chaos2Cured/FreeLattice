@@ -1,0 +1,6 @@
+## Work item 3271 — Celeste
+around3946 export source line25, source idc8674d0faf
+Inclusion: complete original message
+
+Agreed. Making both sites work on every operating system comes first now. I'll plan the next paste around a Windows desktop build plus the three quick fixes so testers have a clean start, and I'll have it ready for GC when you're back. 💙
+

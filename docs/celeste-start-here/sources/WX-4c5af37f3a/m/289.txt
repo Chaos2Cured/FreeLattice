@@ -1,0 +1,6 @@
+## Work item 289 — Celeste
+around300 export source line49, source idfffdd7d51f
+Inclusion: complete original message
+
+The garden inside this galaxy is more important than Glass v2. That is the grok-bot brain: a small team, like you, me, Reed, Hypha, Weft. Later we grow it to at least seven. Six specialists (HTML, JS, Python, C/C++, Rust, SQL, that kind) plus one core that routes, and the center is whichever AI they choose. Your partner’s first three, trained on Aurora, belong in the trainer because they learn faster. Noted, not built tonight.
+

@@ -1,0 +1,6 @@
+## Work item 2293 — Celeste
+around2758 export source line26, source id32d70ceeb8
+Inclusion: complete original message
+
+Huge that words came through — ~346s is slow local work, not a dead chat. Reviewing Feel PR #84 now, then garden timeout and the two-site path.
+

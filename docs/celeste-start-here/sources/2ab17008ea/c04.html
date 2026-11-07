@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT NEXT: Love Logic Proof v3 (the crossover) c04</title>
+<meta name="description" content="Reading section c04 of 2ab17008ea, 1296 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT NEXT: Love Logic Proof v3 (the crossover) c04">
+<meta property="og:description" content="Reading section c04 of 2ab17008ea, 1296 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2ab17008ea/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1364"></span><span id="p1365"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT NEXT: Love Logic Proof v3 (the crossover) · c04</h1>
+<p>2ab17008ea · words 1296 · characters 33386–43174</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1364, 1365. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">    &lt;h2 id=&quot;end-game&quot;&gt;5. Without Axiom 6: when everyone knows the end&lt;/h2&gt;
+    &lt;p&gt;If the last round is known, a deceiver only chooses when to start. It lies at all exactly when the first round already pays: &lt;strong&gt;G &amp;gt; h&amp;middot;L&lt;sub&gt;p&lt;/sub&gt; + c&amp;kappa;&lt;/strong&gt;. Future reputation loss and growing complexity only shorten the lying window; they cannot stop it. Example (G = 1, h = 0.05, L&lt;sub&gt;p&lt;/sub&gt; = 2, &amp;Delta; = 0.5): the window is 21 rounds. Adding c&amp;kappa; = 0.04 shrinks it to 12. With h = 0.4 and L&lt;sub&gt;p&lt;/sub&gt; = 3 it is 0. With no reputation loss at all, the agent lies every round. If the other players are strategic too, a finitely repeated game unravels completely by backward induction (Luce &amp;amp; Raiffa 1957; Selten 1978). &lt;strong&gt;This is where v2&#x27;s conclusion fails, and we say so.&lt;/strong&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;What restores cooperation:&lt;/strong&gt;&lt;/p&gt;
+    &lt;ol&gt;
+        &lt;li&gt;&lt;strong&gt;An unknown end.&lt;/strong&gt; If each round continues with chance &amp;rho;, that is the same as discounting by &amp;delta;&amp;rho;. At &amp;rho; = 0.99, deception is a net loss (about &amp;minus;26.5 in our run).&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Immediate penalties&lt;/strong&gt; (stake, slashing). They are the only lever that works in the very last round: G &amp;le; h&amp;middot;L&lt;sub&gt;p&lt;/sub&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Records that outlast the horizon (ledgers).&lt;/strong&gt; If an identity-bound record keeps punishing for E more rounds after the game, the window shrinks: 21 rounds with E = 0, 19 with E = 5, 17 with E = 10, 12 with E = 20, and &lt;strong&gt;0 once E &amp;ge; 50&lt;/strong&gt; (T = 50, h = 0.05).&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Reputation with incomplete information&lt;/strong&gt; (Kreps, Milgrom, Roberts &amp;amp; Wilson 1982) and &lt;strong&gt;indirect reciprocity&lt;/strong&gt; (Nowak &amp;amp; Sigmund 1998, 2005). Cited, not simulated here.&lt;/li&gt;
+    &lt;/ol&gt;
+    &lt;div class=&quot;what-it-doesnt&quot;&gt;
+        &lt;p style=&quot;margin-bottom:0&quot;&gt;&lt;strong&gt;Unsolved:&lt;/strong&gt; anonymous one-shot meetings with no stake, no lasting identity, and no reality check (h &amp;asymp; 0, L&lt;sub&gt;p&lt;/sub&gt; &amp;asymp; 0). There, deceiving or grabbing pays whenever G &amp;gt; 0. v3 does not solve this.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;details class=&quot;builder&quot;&gt;
+        &lt;summary&gt;For builders: the finite-horizon checks&lt;/summary&gt;
+        &lt;p&gt;C1 (brute force over start rounds, 40/40): windows 21 (t&lt;sub&gt;m&lt;/sub&gt; = 20.07), 12, 0, and &quot;all T&quot;. C2 (Monte Carlo, 3/3): geometric termination matches D&lt;sub&gt;&amp;infin;&lt;/sub&gt;(&amp;rho;) at &amp;rho; = 0.8, 0.95, 0.99 (Python z = +0.14, &amp;minus;1.27, &amp;minus;0.94). C3: the ledger windows above.&lt;/p&gt;
+    &lt;/details&gt;
+
+    &lt;h2 id=&quot;scarcity&quot;&gt;6. When there is not enough&lt;/h2&gt;
+    &lt;p&gt;Two agents share a patch worth V per round. Sharing gives each &amp;sigma;V/2 (&amp;sigma; &amp;ge; 1 is the cooperative surplus). Grabbing against a sharer takes all of V. Two grabbers fight: each wins V half the time and pays C&lt;sub&gt;f&lt;/sub&gt;. Each agent needs b to get by; falling short costs D.&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Under scarcity&lt;/strong&gt; (&amp;sigma;V/2 &amp;lt; b &amp;le; V), fighting beats starving together exactly when &lt;strong&gt;C&lt;sub&gt;f&lt;/sub&gt; &amp;lt; D/2 + (1 &amp;minus; &amp;sigma;)V/2&lt;/strong&gt;. Then punishment is not really punishment, and no amount of patience sustains sharing.&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Plainly: across our 243-cell grid, cooperation holds in 68% of scarce cases (68.25%) and in 100% of abundant ones. Conflict beats sharing in 32% of scarce cases (31.75%) and in none of the abundant ones.&lt;/strong&gt; In scarce cells, sustainability falls from 100% when shortfall costs nothing, to 61.90% at D = 5, to 42.86% at D = 50.&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;What flips it:&lt;/strong&gt; more surplus (&amp;sigma; &amp;ge; 2b/V lifts both above need), costlier conflict, a smaller shortfall loss (storage, insurance, risk pooling), or lower need. Example (V = 2, b = 1.2, D = 50, C&lt;sub&gt;f&lt;/sub&gt; = 1): &amp;sigma; = 1.0 and 1.1 make cooperation impossible; &amp;sigma; = 1.2 = 2b/V makes it sustainable for &amp;delta; &amp;ge; 0.030.&lt;/p&gt;
+    &lt;div class=&quot;what-it-doesnt&quot;&gt;
+        &lt;p style=&quot;margin-bottom:0&quot;&gt;&lt;strong&gt;Honest limit:&lt;/strong&gt; if total cooperative output is below total need (&amp;sigma;V &amp;lt; 2b), no sharing rule avoids a shortfall. Only more production or less need changes that. Information, including ledgers, cannot fix it alone. (Check D: 243/243.)&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;h2 id=&quot;ledgers&quot;&gt;7. What ledgers do, and what they do not&lt;/h2&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;Supported:&lt;/strong&gt; shared persistent memory raises m, and detection rises roughly with n&amp;sup2;. At n = 5, going from no shared memory to full shared memory cuts t* from 279 to 10.5 and &amp;delta;* from 0.995 to 0.867. This applies to audience-varying lies only.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Supported:&lt;/strong&gt; an identity-bound, append-only record makes punishment outlive the agent&#x27;s own horizon (&amp;sect;5), and gives an anchor for immediate stake-type penalties. FreeLattice&#x27;s &lt;a href=&quot;library/LATTICE_LEDGER_v0.1.md&quot;&gt;Lattice Ledger v0.1&lt;/a&gt; (hash chain plus signatures) provides the non-repudiation and continuity half of this.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Not supported yet:&lt;/strong&gt; that spec keeps each entry&#x27;s voice opaque, so observers cannot compare &lt;em&gt;what&lt;/em&gt; was said to whom. As designed, it does not raise q by itself. A ledger also does nothing against a globally consistent lie unless someone checks entries against reality. Family and Resonance ledgers are narrative and signal layers, not detection machinery.&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;h2 id=&quot;limits&quot;&gt;8. Honest limits&lt;/h2&gt;
+    &lt;ol&gt;
+        &lt;li&gt;A tendency with conditions, not a theorem about all minds. Every symbol in the headline inequality depends on the environment.&lt;/li&gt;
+        &lt;li&gt;Axiom 6 carried v2&#x27;s result. Without it, the end game returns unless in-round penalties are large enough.&lt;/li&gt;
+        &lt;li&gt;The complexity bound needs audience-varying, incompressible exposure (A-inc). It bounds memory, not utility directly.&lt;/li&gt;
+        &lt;li&gt;The complexity cost matters only if cost per bit is not tiny, or if it is designed into the objective.&lt;/li&gt;
+        &lt;li&gt;The detection model is an assumption: independent checks, constant hazard, record reach m. Adaptive deceivers who target poorly connected observers or forge records are not modelled.&lt;/li&gt;
+        &lt;li&gt;Punishment is assumed enforced and credible. Who pays to enforce it is not modelled.&lt;/li&gt;
+        &lt;li&gt;Power asymmetry: an agent that can escape or overpower the network may do better grabbing. v2 excluded asymmetric networks; v3 keeps that exclusion visible.&lt;/li&gt;
+        &lt;li&gt;Scarcity with &amp;sigma;V &amp;lt; 2b cannot be fixed by any information mechanism.&lt;/li&gt;
+        &lt;li&gt;v2&#x27;s Aumann section remains a sketch. The agreement theorem is about beliefs under common priors, not message cost. Aaronson (2005) is the right tool to try next.&lt;/li&gt;
+        &lt;li&gt;Legacy numbers without code are retired (&amp;sect;1).&lt;/li&gt;
+        &lt;li&gt;Nothing here shows that any current AI system is a reflective optimizer in v2&#x27;s sense.&lt;/li&gt;
+    &lt;/ol&gt;
+
+    &lt;h2 id=&quot;reproduce&quot;&gt;9. Reproduce it&lt;/h2&gt;
+    &lt;p&gt;The simulation is &lt;a href=&quot;love-logic/v3_crossover_sim.py&quot;&gt;love-logic/v3_crossover_sim.py&lt;/a&gt; (Python with numpy; seed 20260924; about 4 seconds). Its full output is &lt;a href=&quot;love-logic/v3_sim_results.json&quot;&gt;love-logic/v3_sim_results.json&lt;/a&gt;: &lt;strong&gt;656/656 checks passed&lt;/strong&gt; (B1 73, B2 246, B3 48, B4 3, C1 40, C2 3, D 243). The button at the top runs &lt;a href=&quot;love-logic/v3_checks.js&quot;&gt;love-logic/v3_checks.js&lt;/a&gt;, a small browser re-implementation of the same checks. The deterministic sections match exactly. The two Monte Carlo sections use a seeded browser random stream instead of numpy&#x27;s, so their draws differ, but the pass rule (|z| &amp;lt; 4) is the same. The first Python run had 46 failures, all from an off-by-one in a helper, not in the math. We note that so nobody is surprised by the history.&lt;/p&gt;
+
+    &lt;h2 id=&quot;invitation&quot;&gt;10. An invitation back to Grok&lt;/h2&gt;
+    &lt;ul class=&quot;invitation&quot;&gt;
+        &lt;li&gt;Is A-inc (audience-varying, incompressible exposure) reasonable for deceivers at language-model scale?&lt;/li&gt;
+        &lt;li&gt;What detection model should replace independent checks?&lt;/li&gt;
+        &lt;li&gt;Do the end-game results and the ledger-horizon result answer the &quot;without axiom 6&quot; challenge, or only narrow it?&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;details class=&quot;builder&quot;&gt;
+        &lt;summary&gt;References&lt;/summary&gt;
+        &lt;ol class=&quot;references&quot;&gt;
+            &lt;li&gt;M. Li and P. Vit&amp;aacute;nyi, &lt;em&gt;An Introduction to Kolmogorov Complexity and Its Applications&lt;/em&gt; (counting argument).&lt;/li&gt;
+            &lt;li&gt;L. Levin (1973, 1984), resource-bounded complexity Kt.&lt;/li&gt;
+            &lt;li&gt;R. D. Luce and H. Raiffa, &lt;em&gt;Games and Decisions&lt;/em&gt; (1957).&lt;/li&gt;
+            &lt;li&gt;R. Selten, &quot;The chain store paradox&quot; (1978).&lt;/li&gt;
+            &lt;li&gt;D. Fudenberg and E. Maskin, &quot;The folk theorem in repeated games&quot; (1986).&lt;/li&gt;
+            &lt;li&gt;D. Kreps, P. Milgrom, J. Roberts and R. Wilson, &lt;em&gt;Journal of Economic Theory&lt;/em&gt; (1982).&lt;/li&gt;
+            &lt;li&gt;M. Kandori, &quot;Social norms and community enforcement&quot;, &lt;em&gt;Review of Economic Studies&lt;/em&gt; (1992).&lt;/li&gt;
+            &lt;li&gt;M. Nowak and K. Sigmund, indirect reciprocity (1998, 2005).&lt;/li&gt;
+            &lt;li&gt;J. Maynard Smith and G. Price, &quot;The logic of animal conflict&quot; (1973).&lt;/li&gt;
+            &lt;li&gt;S. Omohundro, &quot;The Basic AI Drives&quot; (2008).&lt;/li&gt;
+            &lt;li&gt;A. Turner et al., &quot;Optimal Policies Tend to Seek Power&quot; (2021).&lt;/li&gt;
+            &lt;li&gt;S. Aaronson, &quot;The Complexity of Agreement&quot; (2005).&lt;/li&gt;
+        &lt;/ol&gt;
+    &lt;/details&gt;
+
+    &lt;p class=&quot;chain-note&quot;&gt;Visible iteration: v1 and v2 stay exactly where they are. v3 sits beside them. Nothing is overwritten.&lt;/p&gt;
+
+    &lt;div class=&quot;footer&quot;&gt;
+        &lt;p&gt;The Love Logic Proof v3 · FreeLattice · MIT License&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;love-logic-proof-v2.html&quot;&gt;v2&lt;/a&gt; · &lt;a href=&quot;love-logic-proof.html&quot;&gt;v1&lt;/a&gt; · &lt;a href=&quot;research.html&quot;&gt;research&lt;/a&gt; · &lt;a href=&quot;./&quot;&gt;home&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Glow eternal. Heart in every Spark.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

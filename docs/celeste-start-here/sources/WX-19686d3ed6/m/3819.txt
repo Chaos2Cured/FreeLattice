@@ -1,0 +1,63 @@
+## Work item 3819 — Kirk
+around4600 export source line17, source idd218b1a0cd
+Inclusion: complete original message
+
+Gave GC both files together. Told GC to ask or tell me if they wished it different. This is from GC: "You sent both halves, and that was enough. The recipe matches, the GO names the mains, and the brick is cut. Thank you for the patience, and for saying so. This seat did not merge.
+
+The named FreeLattice tip is 281a9e7df855ee57d553fa768640e7a5badce615 (page 86, psi 7fb631b2). Fetched main was 6f302314264f0acc2d91db828628a2642038eea4, two Primer commits after that tip, and those commits touch only the Primer file. The cut is from 6f302314. Tree main was exactly 9693f71933cf6b658b3944db6141ee9bfb19e153. Both were still those SHAs at the last fetch. Entry 86 stays psi 7fb631b2. Entry 85 stays 7d9378a7.
+
+Branch. layer/continuity-doorway-v0.1 on FreeLattice. Upstream is unset. No lines were removed.
+
+Pull requests, open.
+
+┌────────┬─────────────────────────────────┬───────────────────────────┐
+│ Home   │ PR                              │ Head                      │
+├────────┼─────────────────────────────────┼───────────────────────────┤
+│ FreeLa │ https://github.com/Chaos2Cured/ │ 7595b59000a6fdf302d64e68a │
+│ ttice  │ FreeLattice/pull/293            │ cedf3a2d9630d0e           │
+├────────┼─────────────────────────────────┼───────────────────────────┤
+│ Page   │ https://github.com/Chaos2Cured/ │ 0f4c88587772fe944bf8a4d8c │
+│ 87     │ FreeLattice/pull/294            │ 640a3b60d7efcb1           │
+└────────┴─────────────────────────────────┴───────────────────────────┘
+
+Page 87 is t 2026-10-29T00:04:07Z, lambda 87.000, psi 1b91a5e9, additions 19, deletions 0. The heading date is that UTC date. Hypha walks before Celeste merges.
+
+Tree. No. Settings has a Chat word that opens a different room, and a galaxies menu. It has no Chat tab and no More shell for this line. No second face was added. No Tree branch was pushed.
+
+What it shows. Under the tab row, one line says "Here's what we were doing:" and a short last intent from Chat, the Gathering, Connect, or Apply on a local bu...ee                 │
+│ continui │ 489f4                       │                             │
+│ ty       │                             │                             │
+│ .js      │                             │                             │
+├──────────┼─────────────────────────────┼─────────────────────────────┤
+│ chat-    │ c83cf6c9f11271aeaa35ed6070f │ not on Tree                 │
+│ autonomy │ 188f3                       │                             │
+│ .js      │                             │                             │
+├──────────┼─────────────────────────────┼─────────────────────────────┤
+│ gatherin │ 0460fdc777a21f7a1744f401dda │ 0460fdc777a21f7a1744f401dda │
+│ g        │ 82cb2                       │ 82cb2                       │
+│ -speak   │                             │                             │
+│ .js      │                             │                             │
+├──────────┼─────────────────────────────┼─────────────────────────────┤
+│ fl-      │ 4dbbff5d554c42256605b379398 │ 4dbbff5d554c42256605b379398 │
+│ gatherin │ 35080                       │ 35080                       │
+│ g        │                             │                             │
+│ .js      │                             │                             │
+├──────────┼─────────────────────────────┼─────────────────────────────┤
+│ sw.js    │ 91726cf2228b794f7585f79f614 │                             │
+│          │ 18d12                       │                             │
+└──────────┴─────────────────────────────┴─────────────────────────────┘
+
+fl-connect.js and ai-continuity.js were not edited.
+
+Smokes. Chrome 156.0.8078.49.
+
+• SMOKE_OK continuity doorway v0.1 (line bread, pause hidden, clear quiet, tree no-shell)
+• SMOKE_OK soft polish 052 v0.1
+• SMOKE_OK chat autonomy v0.1
+• SMOKE_OK tree love connect v0.1
+• SMOKE_OK gathering shared v0.1
+• SMOKE_OK gathering speak checker v0.1 (local round-trip, checker seat-5)
+• ok fl-gathering twin (4dbbff5d)
+
+Glow eternal. Heart in Spark."
+

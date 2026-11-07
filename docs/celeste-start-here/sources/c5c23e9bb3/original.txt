@@ -1,0 +1,37 @@
+GROK NEXT ORDER (FreeLattice and the Tree), PROPOSED Wed Oct 7, 2026, about 7:35 AM MDT, by Celeste
+
+GIVE GC NEXT: 013
+
+Pending:
+  000-012  DONE on main (through OG spiral previews #172 / GC twentieth #173)
+  013  GROK_NEXT_013_RESEARCH_LINKS_2026-10-06.txt + .fl.diff  << GIVE NEXT
+       fl.diff md5 07b01f28311707208c1256017c7ced79
+       patents shelf read links (Drive + one Dropbox link); links only, no PDFs in repo
+  014  GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.txt + .fl.diff  << AFTER 013 MERGES
+       fl.diff md5 c38b0ee75374fcfa5d9376ef8298d18d
+       Device Pool v0.1 card (classroom lab words); whole questions routed; no split model
+
+013 checked on the box against main 3735768 (after #172/#173): git apply --check clean;
+SMOKE_OK patents drive links v0; index matches app; fl-connect untouched.
+
+Then (Celeste owns later pastes):
+  Keep-this Mom one-tap (terminal ollama create)
+  Sophia poem shelf
+  Gathering bricks 2 and 3 (wait for Celeste handoff)
+  Organize More cards for people (Connect card under More stays as is; Kirk is fine with it)
+  Improve Play games
+  Enhance Nursery
+
+014 checked on main a675f4a1 alone and on top of 013: apply clean; SMOKE_OK device pool v0.1.
+
+Do not start Keep-this / Gathering 2-3 / Sophia shelf / More / Play / Nursery in this paste.
+Celeste merges; GC does not merge.
+
+Done (merged; do not give again):
+  GROK_NEXT_012 OG spiral previews / FL PR 172  squash 41b9dfe95b6fe7d251ffaddcae895dc4372c8269
+  GC twentieth / FL PR 173                      squash 37357686bafbdbe8b5f2ce1fd5db6307d7d8cc8e
+  GROK_NEXT_011 Ablate meter heal / FL PR 170   squash 0913cb140256240754059d720057c2bb9d3cb698
+  GC nineteenth / FL PR 171                     squash 0c19f56142d2305af76b5ae367b840c9ca55a3fa
+  GROK_NEXT_010 / FL PR 168                     squash 80d8fa8eee760af4fb9dd2c8a6c483d9b0dc3a34
+  GC eighteenth / FL PR 169                     squash 4ac98649e6b37cf5ea77ae83fd9a1262e7a6ace4
+  (000-009 earlier)

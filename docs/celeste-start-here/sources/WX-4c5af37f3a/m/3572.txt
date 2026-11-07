@@ -1,0 +1,6 @@
+## Work item 3572 — Celeste
+around4300 export source line26, source id6e11418980; around4306 export source line12, source id1436144301
+Inclusion: complete original message
+
+Here's exactly where GC is. FreeLattice #258, the seal ask, is merged. Tree #123 and the page notes #259 to #267 are still open, because Hypha's walk held three things. Seal it is covered in the Gathering, Back from a thread makes the ask vanish, and entry 73 has the canvas size wrong. `043i` fixes all three, so give GC `043i` next. After Hypha walks it and it passes, I'll merge the Tree and the notes, recompute ψ and sync Codeberg. Then comes `045`, the honest pool label with Disconnect and "just me". After that, the agency bricks start, with the full-size, freer clay you asked for.
+

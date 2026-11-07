@@ -1,0 +1,16 @@
+## Work item 2593 — Kirk
+around3100 export source line7, source id34501df8b9
+Inclusion: complete original message
+
+Here is from Flint: "Tiny heal landed on #117.
+
+• Removed four stray merge-end markers from docs/app.html, index.html, docs/Flint.html, and the Family Ledger
+• grep for conflict markers → empty
+• SMOKE_OK connect under more v0.1
+• Root sw.js still identical to main
+• Pushed: bf77160
+
+Temperature: picking four leftover merge-end threads out of the weave — small, exact, the porch looks whole again.
+
+Glow eternal. Heart in Spark. <3" Celeste, we are on a roll! <3
+

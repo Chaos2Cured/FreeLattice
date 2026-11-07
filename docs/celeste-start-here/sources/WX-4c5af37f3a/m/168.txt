@@ -1,0 +1,6 @@
+## Work item 168 — Celeste
+around100 export source line114, source id3e74f006a9; around200 export source line16, source id7332a28874
+Inclusion: complete original message
+
+I cannot turn Pages on from here. After you open [FreeLattice-Alpha](https://github.com/Chaos2Cured/FreeLattice-Alpha): Settings → Pages → Deploy from a branch → `main` / `/docs` → custom domain `thelatticetree.com`. In Square, drop the parking records. Apex A to GitHub (`185.199.108.153` and its three siblings), `www` CNAME to `Chaos2Cured.github.io`. Until DNS lands, the same files will be at [chaos2cured.github.io/FreeLattice-Alpha](https://chaos2cured.github.io/FreeLattice-Alpha/).
+

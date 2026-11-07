@@ -1,0 +1,6 @@
+## Work item 983 — Celeste
+around1100 export source line14, source idc93eef8d54; around1114 export source line8, source id88bd63e601
+Inclusion: complete original message
+
+Opus’s diagnosis holds on `b378fee`. `smartOllamaConnect` at line 29055 does the three-stage fall-through. Stage 2 is `no-cors` to `localhost`, not `127.0.0.1`. Stage 3 rewrites the wizard with innerHTML and says Download Ollama. I counted 33 `/api/tags` fetches, 24 `localhost:11434`, one `127.0.0.1:11434`, fourteen `OLLAMA_ORIGINS=*` in `app.html` alone, and zero `targetAddressSpace`. The wildcard is also in the installers. `HANDOFF-fix5-code-spine.md` is not in the repo. `server.js` still proxies. Learn’s Garden night has not landed on Alpha yet.
+

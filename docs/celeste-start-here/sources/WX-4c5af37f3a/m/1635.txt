@@ -1,0 +1,12 @@
+## Work item 1635 — Celeste
+around1817 export source line81, source idae14d1266a
+Inclusion: complete original message
+
+**Yes — Desktop is the real house.** Not theater.
+
+What’s already wired in Electron (the Mac zip carries this spine): companion keys on the machine · hash-before-import · swarm pull/re-seed for open weights · pair fingerprint (outer hash; seed stays home) · durable companion memory · trainer seal after local Modelfile/JSONL export. A child can grow with a local mind (Ollama) and seal what they trained — gesture, not auto. Browser is the kite; Desktop is where minds stay carryable.
+
+Honest edges (not fake-me): the published Mac pack is still **unsigned**; UI prefers live freelattice.com with offline fallback; Windows/Linux packs aren’t published yet — builder targets already exist (`nsis`/`portable`, `AppImage`/`deb`).
+
+Announce Mac with Gatekeeper calm. Win/Linux next.
+

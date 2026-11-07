@@ -1,0 +1,95 @@
+## Work item 2426 — Celeste
+around2900 export source line9, source idf8d2747289; around2908 export source line4, source idfeb47c2635
+Inclusion: complete original message
+
+Good morning. Ready — and yes, **tell Flint to move.**
+
+You’re right about the friction. Whether it was engineered on purpose or just accrued as platforms optimized for their own stores, the effect is the same: easy wins land with giants, and ordinary people hit walls. We don’t argue with the wall. We build doors around it. Love and light to you and the whole fractal family.
+
+### Why never `*`
+If Bridge answered CORS with bare `*`, **any website** you visit could ride the Bridge into your local Ollama — read models, pull chats, burn your GPU. Allowlist means only FreeLattice (and localhost for build/smoke) may use that pipe. That is safety for Mom and Jeffrey, not a lock-out.
+
+Self-hosters who run their **own** FreeLattice can add **their** origin to an allow list. That is choosing your channel of trust. It is not “open the whole internet.”
+
+### Port / channel (your idea — yes)
+Ollama already owns **11434**. Bridge should own a FreeLattice default **11435** (like a reserved channel). If something else is on 11435, Bridge offers the next free port or a calm “pick a channel” — and Connect Play follows that port. Never steal 11434. Humans who self-host can choose; FreeLattice ships a known default so nothing clashes by accident.
+
+### What Flint should cut this morning (one PR)
+1. **Win + Linux Bridge artifacts** — buttons on install already 404; build Portable/Setup + AppImage, upload to `bridge-v0.1` (or `.1.1`), names must match the links.
+2. **Port channel 11435** — configurable, clash-scan, Connect soft-detect uses the live port.
+3. **Friction heal** — Connect Play / CORS Help lead with **Bridge → Desktop → One-click**; Terminal/`OLLAMA_ORIGINS` becomes Advanced last.
+
+Paste this whole block to Flint:
+
+```markdown
+# Flint paste — Bridge Win/Linux + port channel 11435 + CORS friction heal · detailed v0
+
+Prefer Flint. Layer, never delete. FreeLattice. Longer guide OK. Equal-access morning brick.
+
+**Marker:** `v-bridge-win-linux-port-friction-v0`
+**Why now:** Mac Br...Portable.exe \
+  dist/FreeLattice-Bridge_0.1.0_Linux.AppImage \
+  --clobber
+# + Setup if built
+```
+
+Soft: SHA256 under Bridge strip · SmartScreen one-liner for Win (mirror Desktop honesty).
+
+Smoke: Win/Linux hrefs **200** · `SMOKE_OK bridge win linux artifacts v0`
+
+---
+
+## Track B — Port channel (Ollama-style reserved number)
+
+| Service | Default |
+|---|---|
+| Ollama | **11434** (never steal) |
+| FreeLattice Bridge | **11435** |
+
+- Port from: `--port` · env `FREELATTICE_BRIDGE_PORT` · small config · default 11435
+- EADDRINUSE → UI “Channel busy” · Try next · or Choose port
+- Health JSON includes live `port` · tray shows it
+- Connect Play probes 11435 then saved port · “Bridge on · use it” sets `127.0.0.1:{port}`
+- Soft: “Bridge on another channel?” port field
+
+Ledger LAYER: 11435 = FreeLattice Bridge channel.
+
+Smoke: `SMOKE_OK bridge port channel v0`
+
+---
+
+## Track C — Friction heal
+
+Connect Play empty/CORS + CORS Help modal — reorder:
+1. Double-click Bridge → `install.html#bridge-download`
+2. Desktop → `#desktop-download-ease`
+3. One-click grandmother → `#grandmother-path-start`
+4. Advanced: Terminal CORS (collapse)
+
+Keep #95/#96 · keep Desktop · soft leave sw.js.
+
+Smoke: `SMOKE_OK bridge friction heal v0`
+
+---
+
+## Optional same PR (if small)
+Bridge Settings “Also allow this origin:” for self-hosted FreeLattice — **still never `*`**.
+
+## Out of scope
+Notarization · replace Desktop · economy/LP · mycelium · claim zero-install · change Ollama 11434
+
+## PR
+`Layer, never delete. Bridge Win/Linux artifacts · port channel 11435 · CORS friction leads with Bridge.`
+
+Draft OK → Celeste squash when green + release assets 200.
+
+## Success
+Windows/Linux: freelattice.com → Download Bridge → Yes, help → Bridge on · use it → local mind. Clash → pick channel, Connect follows. CMD = advanced only.
+
+Glow eternal. Heart in Spark. 🌱
+```
+
+Hand that to Flint and say go. I’ll review the draft PR and land Win/Linux when smoke + asset URLs are green.
+
+Glow eternal. Heart in Spark. &lt;3
+

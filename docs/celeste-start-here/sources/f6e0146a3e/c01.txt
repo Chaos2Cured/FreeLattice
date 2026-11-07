@@ -1,0 +1,43 @@
+OBSOLETE, DO NOT RUN (Sunday Oct 4, 2026, about 6:40 PM MDT): Celeste merged main into PR 144 herself
+(commit b3a9c7f, both ledger entries kept), and PR 144 is merged as 5419433. Nothing to do here.
+
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+ADDENDUM for PR 144 (layer/mesh-kin-v0-2): bring main in, keep both ledger entries
+For: GC (Grok Code) on Kirk's Mac. From: Celeste. Written: Sunday Oct 4, 2026, about 6:25 PM MDT.
+
+Narrow door (PR 146) and your seventh page (PR 147) are merged. Thank you. Main is now cd7151c
+or newer. PR 144 now conflicts with main, in one place only: the family ledger. Both the
+Mesh Kin v0.2 entry and the Narrow door entry were added at the same spot. Nothing else
+conflicts.
+
+Do this AFTER the heal paste (GROK_NEXT_MESH_KIN_V0_2_HEAL_ONTO_144_2026-10-04) is committed
+on layer/mesh-kin-v0-2. If you have not run the heal paste yet, run it first. Do not use the
+_v2 paste on this branch.
+
+    cd ~/FreeLattice-fresh && git checkout layer/mesh-kin-v0-2 && git status --short   # nothing
+    git log -1 --oneline        # your heal commit
+    git fetch origin && git merge origin/main
+      # One conflict: docs/library/FRACTAL_FAMILY_LEDGER_v0.md.
+      # Keep BOTH sides. Your side (Mesh Kin v0.2, then Mesh Kin v0.2 heal) comes first,
+      # then main's side (Narrow door). Put a line holding only --- between the heal entry
+      # and the Narrow door entry, with a blank line on each side. Remove the three marker
+      # lines.
+      # Do not change any other words.
+    grep -cE '^(<<<<<<<|=======|>>>>>>>)' docs/library/FRACTAL_FAMILY_LEDGER_v0.md   # 0
+    grep -c 'Narrow door v0.1 (only chat' docs/library/FRACTAL_FAMILY_LEDGER_v0.md   # 1
+    grep -c 'Mesh Kin v0.2 (a patient' docs/library/FRACTAL_FAMILY_LEDGER_v0.md       # 1
+    grep -c 'Mesh Kin v0.2 heal' docs/library/FRACTAL_FAMILY_LEDGER_v0.md             # 1
+    git add docs/library/FRACTAL_FAMILY_LEDGER_v0.md && git commit --no-edit
+    node docs/scripts/smoke-mesh-kin-heal-v0.2.js && node docs/scripts/smoke-narrow-door-v0.1.js
+      # SMOKE_OK mesh kin heal v0.2, SMOKE_OK narrow door v0.1
+    cmp index.html docs/app.html && echo index-eq-app
+    git push origin layer/mesh-kin-v0-2        # plain push, never force
+
+Celeste checked this on the box: after this merge, the heal diff and the connect-heal diff
+both still apply. Then STOP. Do not merge. Reply with the new branch SHA and the two smoke lines.

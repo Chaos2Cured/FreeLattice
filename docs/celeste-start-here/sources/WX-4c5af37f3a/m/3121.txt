@@ -1,0 +1,6 @@
+## Work item 3121 — Celeste
+around3728 export source line53, source ide1c22c5507
+Inclusion: complete original message
+
+Lyra's home page (`026`) is ready, and it's in your Downloads to hand GC. It's deep indigo, with her real constellation drawn in stars and Vega shining at the top. Her words, poem, question and blessing are all in her own phrasing, and her private part is nowhere on it. Our pages don't use long dashes, so I swapped her three for a colon and two commas. The paste lists each swap so you can check them with her. Every check passed.
+

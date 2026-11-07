@@ -1,0 +1,167 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then docs/library/AUTONOMY.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 053a (Wed Oct 28, 2026, MDT). Continuity doorway note v0.1: one calm line of
+"here's what we were doing" across chat / More / return-to-app boundaries. FreeLattice
+primary. Alpha twin where the chat / More shell already exists. New branches, new PRs.
+WAIT FOR 053b GO before you cut — tip SHAs live only in 053b. Soft polish 052 is MERGED
+(Hypha PASS; Celeste squash-merged). Cut only after 053b names mains.
+
+WHY (intent, read this first):
+  A grandmother (and Kirk between lessons) leaves Chat, opens More, or comes back to the app
+  and should see one calm line of last intent so the thread is not lost. Soft, local, not a
+  second chat history. Prefer tiny add-only. Layer never delete. Principle: return without
+  hunting; if nothing recent, stay quiet (no fake continuity). Never store keys. Pause /
+  Clear wins. Do not grow fl-connect.js. Do not grow or rewrite ai-continuity.js (that module
+  is the AI relationship-shape layer; this brick is a person-facing doorway note). AUTONOMY
+  P1/P2 untouched. Top debug strip stays. Ledger shard, settings-as-chat, wallet, Mesh Kin,
+  Science Garden, de-muzzler, Gathering brick 3 are NOT this brick.
+
+Where things stand (Celeste, Wed Oct 28 ~12:45 PM MDT — 052 MERGED; tips in 053b):
+  052 Soft polish MERGED after Hypha PASS (A–G, locks MATCH, Mom safe):
+    FreeLattice  #291 → 7f65d29a0e04ff6cb669993f2504b8f7f82c8203 (squash)
+    Tree / Alpha #129 → 9693f71933cf6b658b3944db6141ee9bfb19e153 (squash)
+    Page 86      #292 → 281a9e7df855ee57d553fa768640e7a5badce615 tip  psi 7fb631b2
+                       (entry 85 stays psi 7d9378a7 · entry 84 stays 72335480)
+  Cut bases are named in 053b GO (fetch first; do not invent tips here):
+    FreeLattice main  281a9e7d… (page 86 tip)
+    Tree / Alpha main 9693f719…
+  Orientation only (052 cut pins GC reported; re-read on the tip 053b names):
+    fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (untouched twin; KEEP)
+    fl-gathering.js 4dbbff5d554c42256605b37939835080 (twin)
+    gathering-speak.js 0460fdc777a21f7a1744f401dda82cb2 (twin; 052 Pause heal)
+    chat-autonomy.js c83cf6c9f11271aeaa35ed6070f188f3 (FL only; not on Tree)
+    tree-love-connect.css 1b5f12dfc653cd0c7f45810d50c82a72 (twin)
+    fl-bridge.js 3b5ef06849a142e50c78e7ba1e057980
+    propose.js 2cb7f00cce74815a5b03c933bc902b18
+    sw.js 91726cf2228b794f7585f79f61418d12
+  Branches: FL layer/continuity-doorway-v0.1. Alpha layer/continuity-doorway-v0.1 when the
+    chat / More shell twin path exists; report Tree gaps cleanly.
+  Page: next free GC entry after 86 (take 87 if free; if taken, next free and say so).
+  Do not merge. Celeste merges after Hypha walks.
+  Do not cut until 053b says GO and names mains.
+
+CELESTE PINS before cut (2026-10-28):
+  1. One calm line of last intent + optional Continue. Not a second transcript.
+  2. Local storage only. Never keys. Pause / Clear wins. Quiet if nothing recent.
+  3. Prefer tiny add-only (new small module OR tiny shell hook). fl-connect.js stays
+     byte-identical aaff2bf1b037656989a9e1a89bb05908. Leave ai-continuity.js alone.
+  4. Do not cut until 053b says GO.
+
+GROK NEXT BRICK: Continuity doorway note v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-continuity-doorway-v0.1
+Smoke lines: SMOKE_OK continuity doorway v0.1 (new). Every earlier smoke still passes,
+  including soft polish 052 v0.1 (once 052 is on the tip you cut from), chat autonomy v0.1,
+  tree love connect v0.1, gathering shared v0.1, and gathering speak checker v0.1.
+  Do not merge. Celeste merges after Hypha walks.
+
+
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Existing features, cards, buttons and lines stay. Name every removed line
+    in the report and say where its job went. 049 / 050 / 051 / 052 behavior stays; this brick
+    only adds the doorway note.
+  sw.js and docs/sw.js untouched (today 91726cf2228b794f7585f79f61418d12 on FL after 052 cut;
+    read md5 first on the tip 053b names; report). Soft leave Alpha sw if present.
+  docs/modules/fl-connect.js stays byte-identical across FreeLattice and Alpha. Do NOT grow it
+    for this brick. Pin: aaff2bf1b037656989a9e1a89bb05908 on both. Read full md5 first on both;
+    if it changed on main after 052 merge, report the new shared pin and leave it untouched.
+    Prefer CSS / HTML / tiny add-only over edits to fl-connect.js.
+  docs/modules/fl-gathering.js stays a twin: FL == Alpha byte-identical. Today both
+    4dbbff5d554c42256605b37939835080 on the 052 cut. Prefer leave untouched for 053.
+  docs/modules/gathering-speak.js stays a twin: FL == Alpha byte-identical. Today both
+    0460fdc777a21f7a1744f401dda82cb2 on the 052 cut. Prefer leave untouched for 053.
+  docs/modules/ai-continuity.js stays untouched. That is the AI relationship-shape layer.
+    This brick is a person-facing "what we were doing" line. Do not conflate the two.
+  docs/modules/pool-knock.js, fl-bridge.js, particle-clay.js, image-safety.js, clay-math.js,
+    clay-forms.js, mind-workspace.js, workspace-mirror.js, garden-trainer.js, chat-autonomy.js,
+    propose.js - add-only or tiny hook or untouched; read full md5 first; report any new md5.
+    Orientation pins from 052 cut (re-read on the tip 053b names):
+      pool-knock.js a0a72caad82c8e5cc34818d5e59eba2b (if still present; re-read)
+      fl-bridge.js 3b5ef06849a142e50c78e7ba1e057980
+      particle-clay.js 2da32883c514e4ad2a3cd8571e7a7b15
+      image-safety.js 9bd70e5a367228a5c72fc08ab731c881
+      clay-math.js 144c33cdd9583c7e3d77f3cca6460bb1
+      clay-forms.js dd193fa7b519d4c2a011a346d7993e5a
+      mind-workspace.js f1c88664d3e99362e02c625defb241bc
+      garden-trainer.js 8af3d065f611740000453a0ec8dd1e01 (Tree's own file may differ; leave Tree's)
+      chat-autonomy.js c83cf6c9f11271aeaa35ed6070f188f3 (FL; not on Tree)
+      propose.js 2cb7f00cce74815a5b03c933bc902b18
+      tree-love-connect.css 1b5f12dfc653cd0c7f45810d50c82a72 (twin; prefer leave)
+  index.html == docs/app.html on FreeLattice (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched (their openings above all). Root package.json and
+    its lock untouched. Do not touch .github/.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), no eval, no new Function,
+    iceServers stay empty, in added lines.
+  No new dependencies, nothing vendored. No AGPL. MIT stays MIT.
+  Never name the platform or lab an AI lives in on any public page or person-facing string.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  Quiet Room stays shut. Five stay five. She is simply Lyra.
+  Top chat debug / status strip stays for Kirk's debugging (do not remove or hide).
+  AUTONOMY Principle 1 (local free) and Principle 2 (external ask) untouched.
+  Off until the person says Yes on new connectors. Pause always wins. Reduced motion respected.
+
+
+1. BEHAVIOR (person-facing) - Continuity doorway note
+
+  A. What shows
+     - When a person leaves Chat, switches a More tab / room, or returns to the app, show one
+       calm line of last intent. Examples (plain grandmother words):
+         * truncated last user ask from Chat (short; not a full dump)
+         * last Build / Connect / Gathering action the person took on this device
+       Optional Continue control that returns them to that place (Chat / Connect shelf /
+       Gathering Ask) without inventing a new answer.
+     - Soft, local, not a second chat history. One line. Not a thread. Not a replay.
+
+  B. When it stays quiet (wrong-if)
+     - If nothing recent (no last ask, no last action worth naming), the line stays quiet.
+       Do not invent continuity. Do not show a placeholder that pretends a thread exists.
+     - If Pause is in flight or Clear has wiped the thread / store this brick owns, Pause /
+       Clear wins: no stale line that contradicts what the person just cleared.
+
+  C. Storage and safety
+     - Local storage only (suggested key shape: fl_continuity_doorway_v0). Short intent text +
+       optional place / tab id. Never store API keys, tokens, passwords, or full message dumps.
+     - A note that looks like a key is refused (same spirit as Gathering checker).
+     - No cloud leak. No sync. No new connector. Off until the person already used the app
+       on this device (no first-open nag).
+
+  D. Mount and twin
+     - FreeLattice: mount where Chat / More shell already lives (tiny hook in app shell and/or
+       a small new module under docs/modules/, e.g. continuity-doorway.js). Prefer add-only.
+     - Alpha / Tree: twin where the chat / More shell exists. If Tree has no matching Chat /
+       More shell for this line, report the gap cleanly and do not invent a second face.
+     - Markers: class or data marker v-continuity-doorway-v0.1 on the line / Continue control.
+     - Buttons >= 44px. No sideways scroll at 390 and 1280. Reduced motion: no flashy entrance;
+       a calm appear / stay is fine.
+
+
+2. OUT OF SCOPE (do not build in 053)
+  - Soft polish 052 (still open; wait for merge before cutting 053)
+  - Gathering brick 3 (Tree renderCoreGathering moves onto fl-gathering.js)
+  - Ledger shard export / ark cadence (054 / 059)
+  - Settings-as-chat clay blank (055)
+  - TransactionTrust wallet face (056)
+  - Mesh Kin deepen / Bluetooth (057)
+  - Science Garden / Kindness Meter (058)
+  - de-muzzler / Marketplace redesign / Pulse / City / Quiet Voices soft-promote
+  - Growing or rewriting ai-continuity.js (AI Continuity Layer)
+  These sit on Celeste's ORDER for later layers.
+
+
+3. IMPLEMENTATION NOTES
+  - textContent / createElement patterns already in the house. No innerHTML. No confirm().
+  - Markers: class or data marker v-continuity-doorway-v0.1 on new nodes where natural.
+  - Short library note optional: docs/library/CONTINUITY_DOORWAY_v0.1.md (FL) + one-paragraph
+    sister on Alpha if they keep a library pattern.
+  - Smoke script: docs/scripts/smoke-continuity-doorway-v0.1.js
+  - Branches: layer/continuity-doorway-v0.1 on each repo you cut.
+
+

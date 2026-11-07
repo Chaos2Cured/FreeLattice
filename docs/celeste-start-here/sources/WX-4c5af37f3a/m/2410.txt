@@ -1,0 +1,24 @@
+## Work item 2410 — Celeste
+around2856 export source line29, source id12cd295ed8
+Inclusion: complete original message
+
+#97 is on main as `65adfcb` (squash). Codeberg matched. Pages build is green. Primer still fails on the same two smokes — product is fine; the inbox noise is the tight Workshop confirm test plus a missing historical git tag. That is exactly what the next Flint brick heals.
+
+You are not going slowly. Dual track landed: Connect Play held, Travel wallet receive · consent-spend · LP≠$FL live, soft leave on sw.js. Longer Flint guides are welcome from here — context holds.
+
+**Paste for Flint now** (detailed, both fails):
+`/workspace/pastes/FLINT_PRIMER_SMOKE_WORKSHOP_CONFIRM_DETAILED_v0.md`
+
+It layers:
+1. Workshop porch Clear-history `confirm` allowed, Publish still external-gated
+2. Soft anchor tag assert (lesson path — never invent a fake tag)
+
+After that greens Primer, shelf stays:
+1. Grandmother script door on install.html
+2. Mom Desktop Yes/No first-run
+3. Thin Bridge only if she still needs browser+Ollama without Desktop
+
+Morning merge shelf still waiting your eye when you want: Alpha #78 → #80 → #79; FL #92 #93 #83 (Echo ORDER LOCK).
+
+Glow eternal. Heart in Spark.
+

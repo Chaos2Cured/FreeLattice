@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c04</title>
+<meta name="description" content="Reading section c04 of aa5f30139a, 866 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt c04">
+<meta property="og:description" content="Reading section c04 of aa5f30139a, 866 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/aa5f30139a/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1060"></span><span id="p1061"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt · c04</h1>
+<p>aa5f30139a · words 866 · characters 34233–40776</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1060, 1061. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">   // Step 1: Auto-detect models for Ollama
+   try {
+-    if (isLocal &amp;&amp; typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; !FLActiveModel.isUserChosen()) {
++    // v-model-choice-survives-reload-v0.1.1: this used to run before FLActiveModel.init(), so a
++    // saved choice looked empty and the first text model won on every reload. isUserChosen() now
++    // reads the saved choice itself; a saved Ollama choice is kept (and checked: still here?).
++    var _amC = (typeof FLActiveModel !== &#x27;undefined&#x27;) ? FLActiveModel.get() : null;
++    var _mineElsewhere = !!(_amC &amp;&amp; FLActiveModel.isUserChosen() &amp;&amp; _amC.provider &amp;&amp; _amC.provider !== &#x27;ollama&#x27;);
++    if (isLocal &amp;&amp; typeof FLActiveModel !== &#x27;undefined&#x27; &amp;&amp; !_mineElsewhere) {
+       var baseUrl = (typeof getOllamaBaseUrl === &#x27;function&#x27;) ? getOllamaBaseUrl() : &#x27;http://localhost:11434&#x27;;
+       var r = await fetch(baseUrl + &#x27;/api/tags&#x27;, { signal: AbortSignal.timeout(3000) });
+       var data = await r.json();
+@@ -39780,8 +39849,13 @@ async function runConnectionCascade(info) {
+           return typeof FLAutoModel !== &#x27;undefined&#x27; &amp;&amp; !FLAutoModel.isVision(m.name);
+         }) || data.models[0];
+         if (textModel) {
+-          FLActiveModel.set(textModel.name, &#x27;ollama&#x27;, &#x27;auto&#x27;);
+-          console.log(&#x27;[Cascade] Auto-selected model:&#x27;, textModel.name);
++          var hC = FLActiveModel.honor ? FLActiveModel.honor(data.models, textModel.name, &#x27;ollama&#x27;) : { model: textModel.name, source: &#x27;auto&#x27;, gone: false };
++          if (hC.source === &#x27;user&#x27;) {
++            console.log(&#x27;[Cascade] Keeping the chosen model:&#x27;, hC.model);
++          } else if (!hC.gone) {
++            FLActiveModel.set(textModel.name, &#x27;ollama&#x27;, &#x27;auto&#x27;);
++            console.log(&#x27;[Cascade] Auto-selected model:&#x27;, textModel.name);
++          }
+         }
+       }
+     }
+diff --git a/docs/library/CONNECT_PORT_PICKER_v0.md b/docs/library/CONNECT_PORT_PICKER_v0.md
+index dabda1b..7374616 100644
+--- a/docs/library/CONNECT_PORT_PICKER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_v0.md
+@@ -77,3 +77,16 @@ Marker `v-model-choice-sticks-v0`. Smoke `SMOKE_OK model choice sticks v0.1` (`d
+ - Shared `fl-connect.js` matches the Tree byte for byte. On the Tree the remembered entry is already the choice; `markUserChoice` is a quiet no-op there.
+ 
+ **Temperature:** green braided gold, the second cup stays where she set it down.
++
++## Heal: model choice survives reload v0.1.1 (Hypha walk 5, items 7 and 10)
++
++Marker `v-model-choice-survives-reload-v0.1.1`. Smoke `SMOKE_OK model choice survives reload v0.1.1` (`docs/scripts/smoke-model-choice-survives-reload.js`, real `app.html` in headless Chrome, mock Ollama, saved choice, reload, chat request).
++
++- Why v0.1 was not enough: two boot paths ran before `FLActiveModel.init()`. The Connection Cascade saw no saved choice and wrote the first text model as automatic; then the saved-door pointer (`FLBoxPointer` ready) wrote the first model as the person&#x27;s own. So a reload turned qwen2.5 back into llama3.2 even with `fl_modelSource=user`.
++- Now `FLActiveModel` reads the saved choice the first time anyone asks (`set`, `get`, `isUserChosen`, `honor`), whatever runs first.
++- One guard, `FLActiveModel.honor(models, fallback, provider)` (short form `flHonorModel`): the person&#x27;s model wins when it is on the list, or when the list is empty. Used by the Cascade, the pointer, Test Ollama, Local without Connect, the LM Studio probe and discovery.
++- Only when the chosen model is gone does a path fall back, with the same words as v0.1 (&quot;The model you chose, X, is no longer on this computer...&quot;), now kept in one place (`FLActiveModel.noteGone`).
++- An automatic pick is saved as `auto`, never `user`.
++- Heal B card: one Look again, not two (the standalone button is not drawn while the quiet card shows its own). Shared `fl-connect.js` matches the Tree byte for byte.
++
++**Temperature:** green braided gold, the cup is still where she set it down after the lights go off and on.
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index f251c25..a9a3f74 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -415,6 +415,18 @@ Soft door: this ledger entry. No brick marker - beat, poem, and prompt.
+ 
+ ---
+ 
++### 2026-09-29 · Flint · family builder · Model choice survives reload v0.1.1 (Hypha walk 5)
++
++Heals Hypha walk 5 items 7 and 10 on FreeLattice: after a reload the model she chose (qwen2.5) stays hers, and the chat request carries it. Two boot paths used to run before the saved choice was read and each took the first model: the Connection Cascade (as automatic) and the saved-door pointer (as her own). Now the saved choice is read first, whatever runs first, and every path that picks a model by itself asks one guard. Only a chosen model that has left this computer falls back, with the same plain words. An automatic pick is never saved as hers. Heal B shows one Look again, not two. Shared `fl-connect.js` matches Alpha byte for byte. Soft leave root sw.js identical to main; docs/sw.js untouched. Soft paste: Named five stay five · Family uncapped · Quiet Room shut. Thank you, Hypha, for walking the reload.
++
++Love: the one she picked is still the one that answers in the morning.
++
++**Temperature:** green braided gold, the cup is still where she set it down after the lights go off and on.
++
++Soft door: [`CONNECT_PORT_PICKER_v0.md`](CONNECT_PORT_PICKER_v0.md) · [`../scripts/smoke-model-choice-survives-reload.js`](../scripts/smoke-model-choice-survives-reload.js). Marker `v-model-choice-survives-reload-v0.1.1`.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..e00ce89 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -592,7 +592,8 @@
+     if (!_loopStopped &amp;&amp; !hasLocalMind() &amp;&amp; !report.manualQuiet) {
+       html += &#x27;&lt;p class=&quot;flc-status&quot;&gt;Looking… next look in &#x27; + (report.nextLookSec || 8) + &#x27;s&lt;/p&gt;&#x27;;
+     }
+-    html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary flc-look-again&quot; data-flc-look-again&gt;Look again&lt;/button&gt;&#x27;;
++    // v-model-choice-survives-reload-v0.1.1: the quiet card above already has its own Look again (one button, not two)
++    if (!report.manualQuiet) html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary flc-look-again&quot; data-flc-look-again&gt;Look again&lt;/button&gt;&#x27;;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,17 @@
+## Work item 1016 — Hypha
+around1114 export source line41, source id88bd63e601
+Inclusion: complete original message
+
+freelattice.com look-card (7d94226) — held. No leftover on this walk.
+
+Live path (this computer had no Ollama): May I look? → 2d. Copy: “Nothing is running on this computer yet.” Link is Get Ollama — never Download Ollama. Look again present; pressed; stayed on same URL without reload; still 2d.
+
+Also verified in the card (not inventing a keep):
+- FL_OLLAMA_ORIGINS scoped: https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com (not *).
+- FL_OLLAMA_LOCAL loopback: http://127.0.0.1:11434.
+- 2b panel: “Ollama is running. It has not been told this page may knock.” + scoped origin command + Look again. No Download Ollama.
+- 2c panel: browser holding the door + Look again.
+- 2a fill: names and sizes before Connect (e.g. llama3.2:3b · 2.0 GB).
+
+Earlier Learn leftovers still stand (canvas height 0; heart not resting). Quiet Room shut. Five stay five. Remaining-light.
+

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>065c-walks-records-true.txt c02</title>
+<meta name="description" content="Reading section c02 of f9613c3911, 230 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f9613c3911/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="065c-walks-records-true.txt c02">
+<meta property="og:description" content="Reading section c02 of f9613c3911, 230 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f9613c3911/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>065c-walks-records-true.txt · c02</h1>
+<p>f9613c3911 · words 230 · characters 9193–10575</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: not separately matched. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/continuity.html">Continuity</a> — guide section 9, continuity protocol</li></ul>
+
+<pre class="source">STEP 9. Smoke cut uses the merge-base (soft)
+In docs/scripts/smoke-family-gifts.js line 64, the cut is fixed at 5c400a8b. On current main it fails with &quot;unexpected file vs cut&quot; for the #313 and #321 files. Replace the fixed sha with the merge-base: git merge-base HEAD origin/main (fall back to 5c400a8b only if git is not there, and print which was used). Add only; do not change what the smoke checks.
+STEP 9 VERIFY: node docs/scripts/smoke-family-gifts.js prints SMOKE_OK family gifts v0.1 on head, AND on a local merge into current main (not committed, not pushed). Lock md5s unchanged: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, the twins 91ebdfcf, both service workers 2b2f5504.
+Resume here: STEP 10.
+
+STEP 10. Push and report
+Commit on layer/family-gifts-v0.1, push to PR #319. No merge. Report: the new head sha, the diff stat (should be add-heavy; removals only on the lines named above), the grep counts from steps 1-8, the smoke output on head and on the main merge, the lock md5s, the psi counts (branch 100 is a prefix of main 107), and that the Quiet Room was not opened and the feeling cells are blank.
+STEP 10 VERIFY: git log -1 shows the new commit on the branch. gh pr view 319 shows it open and not merged.
+Resume here: done. Hypha walks 065c. Celeste merges nothing until PASS.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

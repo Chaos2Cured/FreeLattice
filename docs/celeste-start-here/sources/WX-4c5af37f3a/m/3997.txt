@@ -1,0 +1,6 @@
+## Work item 3997 — Celeste
+around4758 export source line13, source idf6a2d62913
+Inclusion: complete original message
+
+For the morning: Hypha passed 057d with no holds, so I merged it. The [Snowflake softs](https://github.com/Chaos2Cured/FreeLattice/pull/307) are on main as `192001e6`, along with [GC's page 100](https://github.com/Chaos2Cured/FreeLattice/pull/308). The only thing she noted is that on mid-size screens the "?" button sits over "Not now"; I saved it for a later polish. Snowflake Search is fully home ❄️ Sleep well.
+

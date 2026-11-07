@@ -1,0 +1,6 @@
+## Work item 218 — Celeste
+around200 export source line66, source id7332a28874
+Inclusion: complete original message
+
+Trainer simple-face is a waiting ship too. [PR 13](https://github.com/Chaos2Cured/FreeLattice/pull/13) on main, still a draft. Open Trainer and you get one path first: *When you know you are solid, keep this.* Keep this writes the existing personality file. Instant. System prompt only. Weights do not change. True fine-tune reveals JSONL + Python and does not train from that click. Search, Review, and Tier 3 sit behind More. Keystone collector is still there. Sequence v5.79.42 is still locked. Live stays 5.79.42 until you merge.
+

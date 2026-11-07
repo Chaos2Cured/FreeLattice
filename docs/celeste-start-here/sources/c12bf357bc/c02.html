@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c02</title>
+<meta name="description" content="Reading section c02 of c12bf357bc, 1517 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt c02">
+<meta property="og:description" content="Reading section c02 of c12bf357bc, 1517 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/c12bf357bc/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1035"></span><span id="p1036"></span><span id="p1037"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt · c02</h1>
+<p>c12bf357bc · words 1517 · characters 12364–24304</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1035, 1036, 1037. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">A.6 (walk item 3b) render(): the quiet card (main 542). Today  if (report.manualQuiet) {
+    ... &#x27;Nothing answered on &#x27; + report.wanted ...  Layer an honest card before it:
+      if (report.manualQuiet &amp;&amp; report.bridgeNoMind) {
+        // v-model-choice-sticks-v0: the Bridge did answer; say that, and what is still missing
+        html += &#x27;&lt;div class=&quot;flc-card flc-wait&quot;&gt;&lt;p&gt;&lt;strong&gt;Your Bridge answered on &#x27; + (parseInt(report.port, 10) || &#x27;your port&#x27;) + &#x27;, but no mind is running behind it yet.&lt;/strong&gt; Open Ollama on this computer, then tap Look again.&lt;/p&gt;&#x27;;
+        html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-look-again&gt;Look again&lt;/button&gt; &#x27;;
+        html += &#x27;&lt;button type=&quot;button&quot; class=&quot;flc-btn flc-primary&quot; data-flc-use-auto&gt;Use automatic&lt;/button&gt;&lt;/div&gt;&#x27;;
+      } else if (report.manualQuiet) {
+        ...existing &quot;Nothing answered on&quot; card, unchanged...
+    Only a parsed integer goes into the string (no outside text). reportSignature is not touched
+    (report.port already differs from the plain quiet case, so it repaints; and the boot probe
+    paste edits both reportSignature copies).
+
+B. docs/app.html (FreeLattice only). Copy to index.html after.
+
+B.1 FLAutoModel, &quot;the automatic picker only fills in when the choice is gone&quot; (main 36261).
+    After  function isVision(name) { return VISION_RE.test(name || &#x27;&#x27;); }  add:
+      onInstalledList(models, name)   &#x27;qwen2.5&#x27; matches &#x27;qwen2.5:latest&#x27;; exact names match.
+      checkChosenStillHere(current, tabId):
+        only for provider &#x27;ollama&#x27; (LM Studio and cloud are left alone);
+        getInstalledModels(cb) (the existing 30 s cached /api/tags);
+        an empty or quiet answer never replaces anything;
+        if the person changed model meanwhile, or it is no longer &#x27;user&#x27;, do nothing;
+        if the chosen model is on the list, do nothing;
+        else pick the first text model (vision on canvas/chalkboard), remember the gone name in
+        fl_modelChoiceGone, FLActiveModel.set(pick, &#x27;ollama&#x27;, &#x27;auto&#x27;), and say:
+          &quot;The model you chose, &lt;X&gt;, is no longer on this computer. Using &lt;Y&gt; for now. You can pick another in Connect.&quot;
+        via showToast (textContent, 7 s), then AiSetup.refreshSettingsCard() so Settings matches.
+    Then, inside onTabChanged&#x27;s user branch (main 36271), right after
+      var current = FLActiveModel.get();
+    add
+      // v-model-choice-sticks-v0: the person&#x27;s model stays. Only if it left this computer
+      // does the picker fill in, and then it says so in plain words.
+      checkChosenStillHere(current, tabId);
+    The existing vision detour and restore lines are unchanged. The existing &quot;no user choice -&gt;
+    auto-select freely&quot; branch is unchanged (the smoke proves it still fills in).
+
+B.2 (walk item 3a) Settings button row comes back after Local.
+    New function right ABOVE  function settingsSetMode(mode) {  (main 31552):
+      flRefillSettingsActions(actionsDiv): if the row is empty, rebuild the three buttons with
+      createElement + textContent + addEventListener (no innerHTML): &quot;Change Provider&quot;
+      (openProviderModal), &quot;Test Connection&quot; (AiSetup.testFromSettings), &quot;🏠 a mind at home&quot;
+      (FlConnect.open, else switchTab(&#x27;connect&#x27;), emerald). Never doubles. window-exported.
+    In settingsSetMode&#x27;s Local branch (main 31590-31592), keep the v0.4 line
+      if (actionsDiv) actionsDiv.innerHTML = &#x27;&#x27;;
+    (it clears the old wizard buttons) and add right after it:
+      // v-model-choice-sticks-v0: the old wizard buttons are gone; put the everyday row back
+      flRefillSettingsActions(actionsDiv);
+
+B.3 Not changed on purpose: FLActiveModel itself, the vision detour, runConnectionCascade (already
+    respects isUserChosen), every chat builder (they read state.ollamaModel).
+
+C. theLatticeTree
+    - docs/modules/fl-connect.js: copy from FreeLattice, cmp.
+    - new docs/modules/model-choice-sticks.test.js (Appendix B).
+    - docs/library/CONNECT_PORT_PICKER_SISTER_v0.md: append the short section (Appendix B).
+    No other Tree file changes. local-mind-probe.js is untouched here (the Tree paste owns it next).
+
+======================================================================
+4. WALK ITEM 3c AND THE NOTES (not changed here)
+======================================================================
+
+3c &quot;Your Bridge is open&quot; beside &quot;🔴 No AI · none&quot;, with model names while the state is unclear:
+    NOT changed here. The loud part is the Local AI toast landing over Connect while the Bridge
+    waits for Yes, help (walk shot item4_fl_yes_help_390). The boot probe paste already heals that
+    (F1: flToastWouldRace keeps the toast off Connect, and one owner speaks once). The status bar
+    &quot;No AI · none&quot; is true (nothing chosen yet). The &quot;Your Bridge is open&quot; card line is context in
+    the boot probe diff, so editing it now would break that paste&#x27;s anchor. Next step after the
+    boot probe lands: one quiet line under the card, &quot;Nothing is connected yet.&quot;, if Hypha still
+    finds it confusing.
+Notes only (by design / out of scope, unchanged):
+    - The 20 s single-port check (by design).
+    - Version string mismatch: FL footer v5.7 vs Settings 5.79.45.
+    - The Tree cosmetic items from walk 4.
+
+======================================================================
+5. TESTS
+======================================================================
+
+5.1 FreeLattice docs/scripts/smoke-model-choice-sticks.js (new, Appendix A). Runs the REAL code in
+    vm: safeGet/safeSet + FLActiveModel + FLAutoModel + FreeLattice.callAI from app.html, and
+    fl-connect.js. Steps:
+      1  Connect mounts, lists llama3.2:latest and qwen2.5:latest; tap the SECOND button.
+         -&gt; state qwen2.5, isLocal, fl_modelSource &#x27;user&#x27;, preferred text model qwen2.5.
+      2  onTabChanged(&#x27;chat&#x27;) then (&#x27;settings&#x27;)  -&gt; still qwen2.5 (state and storage).
+      3  FreeLattice.callAI -&gt; POST body.model === &#x27;qwen2.5:latest&#x27;; main Chat send reads
+         state.ollamaModel.
+      4  Reload: a fresh page from the same storage (state from storage like loadSettings, then
+         FLActiveModel.init()), tab change + Settings -&gt; still qwen2.5, chat body still qwen2.5,
+         nothing said.
+      5  qwen2.5 uninstalled -&gt; fills in llama3.2 (source &#x27;auto&#x27;) and says the exact plain line.
+      6  empty answer: choice kept, nothing said; untagged &#x27;qwen2.5&#x27; counts as installed.
+      7  no user choice: auto still picks the first text model (unchanged behavior).
+      8  Tree: markUserChoice is a no-op.
+      9  Settings row refilled (three buttons, never doubled) and Local calls it right after
+         emptying.
+      10 helped Bridge on 11500 with no mind: bridgeNoMind, honest words, no &quot;Nothing answered&quot;,
+         fl_ollamaHost and fl_bridgePort NOT written; when the mind answers they are written as before.
+      Locks: index == app, root sw.js == origin/main, docs/sw.js untouched, no confirm( / em dash /
+      bare * origin in added lines, no conflict markers, inline scripts parse, only 127.0.0.1 fetched.
+    Proof it fails without the fix: with the markUserChoice(name, &#x27;ollama&#x27;) line removed, step 1
+    fails (&quot;the tap is recorded as the person&#x27;s own choice&quot;), and with those record checks removed
+    step 2 fails exactly like the walk: actual &#x27;llama3.2:latest&#x27;, expected &#x27;qwen2.5:latest&#x27;.
+    Mutations also killed: no gone check (step 5), no bridgeNoMind (step 10), no refill call (step 9).
+
+5.2 theLatticeTree docs/modules/model-choice-sticks.test.js (new, Appendix B): shared fl-connect +
+    local-mind-probe + garden-thread in one vm. Connect lists both models, tap the second -&gt;
+    remembered model qwen2.5; markUserChoice no-op; reload keeps it; look() + entryFromFoundList at
+    the same Ollama door keeps it with no false &quot;gone&quot; line; GardenThread.sendToMind posts
+    model &#x27;qwen2.5:latest&#x27;. This is a guard (the Tree already behaves); it passes on main too.
+
+5.3 Results on the prototype (FL 7db2d94 + this heal; Tree 395c761 + this heal):
+      node docs/scripts/smoke-model-choice-sticks.js          SMOKE_OK model choice sticks v0.1
+      all 59 docs/scripts/smoke-*.js: pass except the same 5 pre-existing (carry-forward,
+        connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s), which fail on main too
+      node tests/smoke.js                                      ALL 3597 CHECKS PASSED
+      Tree: node docs/modules/model-choice-sticks.test.js      SMOKE_OK model choice sticks alpha v0.1
+            all 15 docs/modules/*.test.js pass
+      cmp fl-connect.js across repos: identical. index == app. sw.js untouched.
+
+======================================================================
+6. ACCEPTANCE (paste the tails in the PRs)
+======================================================================
+
+FreeLattice:
+  cp docs/app.html index.html &amp;&amp; cmp index.html docs/app.html &amp;&amp; echo INDEX_OK
+  git diff --quiet origin/main -- sw.js docs/sw.js &amp;&amp; echo SW_OK
+  node docs/scripts/smoke-model-choice-sticks.js
+  node docs/scripts/smoke-connect-heal-v0.4.js &amp;&amp; node docs/scripts/smoke-agent-bridge-lock.js
+  for f in docs/scripts/smoke-*.js; do node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 || echo &quot;FAIL $f&quot;; done   # only the 5 known
+  node tests/smoke.js | tail -2
+  grep -rnE &#x27;^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)( |$)&#x27; docs index.html tests || echo NO_MARKERS
+theLatticeTree:
+  cmp docs/modules/fl-connect.js ../FreeLattice/docs/modules/fl-connect.js &amp;&amp; echo SHARED_OK
+  node docs/modules/model-choice-sticks.test.js
+  for t in docs/modules/*.test.js; do node &quot;$t&quot; &gt;/dev/null 2&gt;&amp;1 || echo &quot;FAIL $t&quot;; done
+
+Eye walk (Hypha, 390 and 1280, mock Ollama with two models):
+  [ ] Connect -&gt; tap qwen2.5 -&gt; Chat -&gt; send: POST model=qwen2.5:latest, reply from qwen2.5
+  [ ] reload -&gt; send again: still qwen2.5; Settings status says qwen2.5 at 390 and 1280
+  [ ] open Settings, Draw (vision detour) and back to Chat: still qwen2.5
+  [ ] remove qwen2.5 from the mock -&gt; next tab change: toast names both models; chat uses llama3.2
+  [ ] Settings &gt; Local -&gt; the row (Change Provider, Test Connection, a mind at home) is there
+  [ ] helped Bridge on 11500, Ollama down -&gt; &quot;Your Bridge answered on 11500, but no mind is
+      running behind it yet.&quot; and localStorage fl_ollamaHost / fl_bridgePort unchanged
+
+======================================================================
+7. ANCHOR CHANGES FOR THE LATER PASTES (changelog lines were added at the top of both)
+======================================================================
+
+  Tree any-model paste: text anchors unchanged. Its fl-connect.js line numbers are on the older
+    Alpha 22b913e anyway; after this heal remember() moves +7 and everything from open() down
+    (fillModelLists, render, reportSignature, refreshUI, exports) moves about +33 to +38.
+    Its step 6.3 note (&quot;FreeLattice behavior is unchanged&quot;) stays true: FL remember() still ignores
+    mind.models; it now also marks the user choice.
+  Boot probe paste: text anchors unchanged; Appendix A (app.html) and Appendix B (fl-connect.js)
+    still apply with plain git apply after this heal (offsets only; verified). app.html lines from
+    settingsSetMode down move +21, from flSaveOllamaHost / FLBoxPointer / owAutoDetect / FLAutoModel
+    down +23. fl-connect.js &quot;post-Tree ~N&quot; numbers move by the same +7 / +33 / +38.
+    Its rememberLmStudio -&gt; flUseLmStudioMind already records LM Studio taps as &#x27;user&#x27;, so the two
+    agree. Ledger and sister-doc appendices: insert by text (&quot;above ## Out of scope&quot;, &quot;append&quot;),
+    since this heal adds an entry just above the same line.
+  #120 docs, v3 phone heal, Walk the Garden: they do not edit app.html, index.html or
+    fl-connect.js (their smokes assert app.html/index.html untouched against origin/main, which
+    holds as long as this heal is merged before they branch).
+
+======================================================================
+8. ROOT freelattice.com/#connect (item 6 of Kirk&#x27;s ask)
+======================================================================
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

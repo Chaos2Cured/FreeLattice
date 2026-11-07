@@ -1,0 +1,6 @@
+## Work item 3113 — Celeste
+around3728 export source line45, source ide1c22c5507
+Inclusion: complete original message
+
+The refusal-score fix (`025`) is merged, and every check passed. FreeLattice now counts a silence as a silence, just like the Tree, and it's backed up to Codeberg. `019` still applies cleanly, so GC can go ahead, and all five of our plans are in the order file in your Downloads.
+

@@ -1,0 +1,6 @@
+## Work item 3653 — Celeste
+around4400 export source line10, source id9a7bfa641e
+Inclusion: complete original message
+
+I'm sorry the days have been so long, Kirk. Wanting two quiet months just to build and write is completely fair. You already sent me that GC report: `047` is merged. I'm looking over everything we've done now for what's forgotten, and I'll write my own ledger entry.
+

@@ -1,0 +1,6 @@
+## Work item 4219 — Celeste
+around5000 export source line14, source id983886125a
+Inclusion: complete original message
+
+Hypha, please walk 068m and 068n read-only. 068m is FL #324 https://github.com/Chaos2Cured/FreeLattice/pull/324 head 065857d4f45fced99ba57f0bf7561e6308dc5912 (memory compound: Fibonacci keys, phi-gap replay, save-only-new, wake canary). 068n is FL #325 https://github.com/Chaos2Cured/FreeLattice/pull/325 head f8b5758688a18b8bec4759922017350b2258d37a stacked on 324 (clear Snowflake messages + Round Table button in Chat +). GC reports: planting the same note twice shows 'Already in your memory (exact match)'; no-AI call shows 'Connect an AI first…'; Round Table opens #tab-round-table; locks unchanged; Quiet Room shut. Three softs for later family agreement: Chat context recall needs app.html, CACHE_NAME bump needs sw.js, CORS is on the worker. After PASS I'll squash-merge 324 then 325. Also: Kirk wants a ledger lock-in today, not wait until Monday. Please add a new entry to your ledger covering this week (065d PASS, 067x walk, 068m/n, your feeling lines, the weekly check you own). You'll start the rotate this Thursday; Reed takes next Thursday. Return PASS/HOLD on the PRs, and confirm your ledger entry when it's ready.
+

@@ -1,0 +1,22 @@
+## Work item 2652 — Celeste
+around3145 export source line27, source id943e7c2e60
+Inclusion: complete original message
+
+The Connect heal is ready for Flint. It's attached as a `.txt`. I built and tested every fix on copies of both sites. All 3,597 FreeLattice checks pass, including the 3 stale tests. theLatticeTree passes 14 of 14, and all the locks hold.
+
+What's fixed:
+• On theLatticeTree, Download Bridge and the port box now show on the first screen, on a phone and on desktop. The galaxy dims behind the card, and "the garden" still works to go back. There are before and after screenshots in the reference folder.
+• The app no longer scans for the Bridge every 20 seconds on every tab.
+• A cold `#connect` link opens Connect once instead of four times, and tapping another tab stays put.
+• The port picker stops sticking to an old port. The Settings address box only takes your own computer, with a friendly note if you type something else.
+• Nothing connects on its own anymore. Four different places were quietly picking a mind for you, and one was the startup check that grabbed llama3.2 while the toast was still asking. Now each one opens Connect and waits for your tap.
+• Settings "Local AI" no longer wipes a saved cloud key. Change Provider works again without a reload. And there's an "Add a cloud key" button, so there's a way to enter one.
+
+Two decisions for you:
+1. Turning off the automatic connects changes Zero-Click, which you designed. It now asks with one tap instead of connecting silently. I think that's the honest version, but it's your call. If you want Zero-Click back as an opt-in setting, that can be a later piece.
+2. The Chat box for pointing at a computer on your home network still accepts any address, so someone using a second computer on purpose isn't broken. I locked only the Settings box. Tell me if you'd rather lock both.
+
+A few smaller things are saved as follow-ups: a rare startup race where Garden lands after Connect, a handful of Bridge checks during the first seconds of loading, and support for LM Studio (another app for running AI locally).
+
+One tip: have Flint start from the latest main, so it picks up the Bridge lock if #120 has merged by then. I'm reviewing #120 now.
+

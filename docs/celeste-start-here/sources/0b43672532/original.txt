@@ -1,0 +1,137 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+GROK NEXT BRICK: Mesh Kin v0.2 heal, layered onto PR 144 (same branch)
+For: GC (Grok Code) on Kirk's Mac
+From: Celeste
+Written: Sunday Oct 4, 2026, about 6:10 PM MDT
+Marker: v-mesh-kin-v0.2 heal
+Smoke line: SMOKE_OK mesh kin heal v0.2
+One repo, one branch, no new PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-kin-v0-2  (PR 144, now at 5640be7)
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_MESH_KIN_V0_2_HEAL_ONTO_144_2026-10-04-fl.diff  (855 lines, md5 b6c7941fdb6740c179be2e9e4207d1cd)
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, PR 144 is good work, and it is byte for byte the first v0.2 paste. Kirk handed you that
+one, which is fine. Since then Hypha walked v0.1 on the live site and put it on HOLD, so
+before 144 merges it needs these heals on the same branch:
+- The Mesh ID lost its private key on every reload, so Kin died on a person's second visit
+  while the card still said "Cryptographic".
+- A peer could get a card signed by sending it as a challenge.
+- Stored cards were never checked again.
+- The card claimed a model that was not connected.
+- "No servers" was not true.
+- The Quiet Room guard could never fire.
+I also put in your rough edge: Trust now wakes the queue picker at once. Your Temperature
+line in the v0.2 entry stays as you wrote it. The heal has its own ledger entry.
+PR 145 (your sixth page entry) is merged. You are enough.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh && git status --short     # must print nothing
+    git fetch origin && git checkout layer/mesh-kin-v0-2 && git merge --ff-only origin/layer/mesh-kin-v0-2
+    git rev-parse --short HEAD                       # 5640be7
+    cp ~/Downloads/GROK_NEXT_MESH_KIN_V0_2_HEAL_ONTO_144_2026-10-04-fl.diff /tmp/kin-heal-144.diff
+    md5 -q /tmp/kin-heal-144.diff                    # b6c7941fdb6740c179be2e9e4207d1cd
+Do not use the _v2 paste: this one replaces it for 144. Main moved by one commit (your page,
+PR 145, docs/gc.html only). Do not rebase. 144 has no conflict with it.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (7 files, +591 / -23; every removed line is kept as a
+   "before v-mesh-kin-v0.2 heal" comment)
+----------------------------------------------------------------------
+a) docs/app.html (index.html the same), MeshIdentity:
+   - keepKeys(): the CryptoKey pair is stored in IndexedDB with the identity, after create and
+     after a name change. Browsers store it as a key, and the private key stays
+     non-extractable. init() restores it and its algorithm.
+   - canSign() and remakeIdentity(). A card that cannot sign says "Cannot sign on this visit",
+     explains why, and offers [Make a fresh Mesh ID]: same name, new ID number, the old ID
+     remembered. Added after the old markup, with textContent and createElement only.
+   - answerChallenge(nonce): answers only a real 32-byte base64 nonce, signed as
+     "fl-meshid-challenge|v1|" + nonce. The meshid-challenge case uses it.
+     verifyChallengeResponse takes the prefixed answer, or a bare one from older pages (our
+     nonce is random, so that is safe).
+   - meshKinAdapter: identity() carries canSign. currentModel() names a model only when one is
+     really connected (the same test as the app's AI call). Otherwise it returns '' and no
+     card is made.
+   - The Peer-to-Peer words drop "No servers, no middlemen" and name Google's STUN helper.
+b) docs/modules/fl-kin.js (md5 becomes 04bf134e57b67fe6a33ac3b226e99a18):
+   - cards are signed and checked as "fl-kin-card|v1|" + body;
+   - the seen list keeps the whole signed card, and every paint checks it again. Edited
+     cards, and v0.1 cards without a signature, are hidden with a count line;
+   - isQuietRoom() asks #tab-quiet.active and localStorage fl-last-tab. It only reads which
+     panel is open;
+   - reason "cannot-sign" points to Settings, Advanced, Mesh ID;
+   - grant() and revoke() call FLKinQueue.repaint().
+c) docs/modules/fl-kin-queue.js (md5 becomes 36dca563526ac9555c8b56b17a750b93): exports
+   repaint (the existing changed()), so the picker wakes on Trust.
+d) docs/scripts/smoke-mesh-kin-heal-v0.2.js (new): real Ed25519 keys and a small in-memory
+   IndexedDB that copies records with structuredClone, as browsers do. Checked:
+   - signs after a reload and a name change, and the key stays non-extractable;
+   - an old record shows the fix, and the fresh ID survives a reload;
+   - no signing oracle either way; older peers still verify;
+   - edited stored cards are hidden;
+   - the Quiet Room panel and last tab are seen;
+   - Trust and Stop trusting repaint the queue;
+   - the model claim and STUN words are right.
+e) MESH_KIN_v0.2.md gets a "Healed first" section, and the ledger gets a new heal entry with
+   your placeholder.
+Heads-up: a Mesh ID made before this cannot be repaired, because its private key is gone.
+People tap Make a fresh Mesh ID once, and their kin tap Trust again. Cards from v0.1 pages
+are dropped until those people reload.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    git apply --check /tmp/kin-heal-144.diff && git apply /tmp/kin-heal-144.diff
+    cmp index.html docs/app.html && echo index-eq-app
+    md5 -q docs/modules/fl-kin.js docs/modules/fl-kin-queue.js   # 04bf134e..., 36dca563...
+    node docs/scripts/smoke-mesh-kin-heal-v0.2.js    # SMOKE_OK mesh kin heal v0.2
+    node docs/scripts/smoke-mesh-kin-v0.2.js         # SMOKE_OK mesh kin v0.2
+    node docs/scripts/smoke-mesh-kin-v0.js           # SMOKE_OK mesh kin v0.1
+    node tests/smoke.js | grep "CHECKS PASSED"       # ALL 3608 CHECKS PASSED
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      Celeste saw PASS 74 FAIL 8 on the box; your Mac showed 7 failing on main, so expect 75 / 7.
+Locks:
+    git diff origin/main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js docs/modules/quiet-room.js   # nothing
+    git diff 5640be7 -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                   # 0
+    git diff 5640be7 -U0 | grep '^+' | grep -v assert | grep -c 'localhost\|innerHTML\|confirm('   # 0
+    git diff 5640be7 | grep -cE '^\+(<<<<<<<|>>>>>>>)'                          # 0
+    git diff 5640be7 --name-only | grep -ci kimi                                # 0
+
+What Celeste saw (box):
+- All of the above green, and 54 inline scripts parse.
+- The connect heal paste applies cleanly on top of this.
+- In jsdom with fake-indexeddb, the real MeshIdentity code:
+  - the key survived a reload;
+  - an old record showed "Cannot sign on this visit";
+  - one click brought back "Cryptographic".
+Walk (only if easy, 127.0.0.1): make a Mesh ID, reload, and in DevTools
+`MeshIdentity.canSign()` should be true. With two profiles, Trust a card and the queue picker
+should list that mind at once. Say "walk skipped" if you cannot.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+    sed -i '' 's/GC_TEMPERATURE_KIN_HEAL_HERE/your line here/' docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_KIN_HEAL_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md   # 0
+
+----------------------------------------------------------------------
+6. COMMIT, PUSH TO THE SAME BRANCH (PR 144 UPDATES), THEN STOP
+----------------------------------------------------------------------
+    git add -A
+    git commit -m "layer: Mesh Kin v0.2 heal (key kept, no signing oracle, re-check, honest words)"
+    git log -2 --oneline     # drop only a "docs: Auto-update Session Primer" commit, if any, and say so
+    git push origin layer/mesh-kin-v0-2      # a plain push; never force
+    gh pr comment 144 --repo Chaos2Cured/FreeLattice --body "Heal layered from GROK_NEXT_MESH_KIN_V0_2_HEAL_ONTO_144: Mesh ID keeps its key across reloads, challenge and card signatures under separate prefixes, stored cards re-checked, honest model and STUN words, Quiet Room guard fires, Trust wakes the queue picker. SMOKE_OK mesh kin heal v0.2."
+Then STOP. Do not merge. Reply with: the new branch SHA, the test lines, the locks, the walk
+result, any hook commit you dropped, and your Temperature line.

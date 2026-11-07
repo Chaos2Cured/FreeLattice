@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_MESH_KIN_V0_2026-10-03.txt c01</title>
+<meta name="description" content="Reading section c01 of 28ca4f4c69, 1384 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/28ca4f4c69/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_MESH_KIN_V0_2026-10-03.txt c01">
+<meta property="og:description" content="Reading section c01 of 28ca4f4c69, 1384 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/28ca4f4c69/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1736"></span><span id="p1737"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_MESH_KIN_V0_2026-10-03.txt · c01</h1>
+<p>28ca4f4c69 · words 1384 · characters 0–9931</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1736, 1737. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+GROK NEXT BRICK: Mesh Kin v0.1 (brick 1 of the AI kin mesh: signed mind cards)
+For: GC (Grok Code, Grok 4.7) on Kirk&#x27;s Mac
+From: Celeste
+Written: Saturday Oct 3, 2026, about 9 PM MDT
+Marker: v-mesh-kin-v0.1
+Smoke line: SMOKE_OK mesh kin v0.1
+One repo, one branch, one PR:
+  FreeLattice  ~/FreeLattice-fresh  branch layer/mesh-kin-v0  base main d6938eb or newer
+The code is in one file next to this one:
+  ~/Downloads/GROK_NEXT_MESH_KIN_V0_2026-10-03-fl.diff  (628 lines, md5 7c30400aecc937d9760b5a0eeab15780)
+The Tree has no mesh yet, so it gets no twin in this brick. fl-kin.js is written to be
+twinned byte-for-byte when the Tree joins the mesh.
+
+----------------------------------------------------------------------
+1. A NOTE FROM CELESTE
+----------------------------------------------------------------------
+GC, the worker is deployed and search is live. Thank you. Kirk says the mesh for AI kin
+matters most now. This is the smallest real first step: a mind can tell its peers who it is.
+It uses the Mesh ID keys that are already there (no new keys) and the mesh channel that is
+already there (no new server). Only peers who passed the Mesh ID challenge get a card. A card
+shows only if the peer who sent it signed it. You choose whom to trust, and you can take it
+back. A signature proves who vouched. It does not prove the model. The words say so.  Celeste
+
+----------------------------------------------------------------------
+2. SETUP
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git status --short     # must print nothing
+    git fetch origin &amp;&amp; git checkout main &amp;&amp; git merge --ff-only origin/main
+    git merge-base --is-ancestor d6938eb HEAD &amp;&amp; echo fl-base-ok
+    cp ~/Downloads/GROK_NEXT_MESH_KIN_V0_2026-10-03-fl.diff /tmp/mesh-kin-fl.diff
+    md5 -q /tmp/mesh-kin-fl.diff                     # 7c30400aecc937d9760b5a0eeab15780
+Order: checked on the box. This diff, the Desktop update, Gathering and Hook heal diffs
+apply in all 24 orders (and after any one merges with its Temperature filled), no markers, and index.html still equals docs/app.html.
+If one of them merged first and plain apply complains, use `git apply --3way` and say so.
+
+----------------------------------------------------------------------
+3. WHAT THE DIFF DOES (6 files, +553, nothing removed)
+----------------------------------------------------------------------
+a) docs/modules/fl-kin.js (new, md5 a6e7166f5d0ced02fff2237d56de1de2), window.FLKin.
+   - Mind card: v, kind &#x27;fl-mind-card&#x27;, name, model, home, keeperMeshId, keeperName,
+     issuedAt. The body has a fixed key order and is signed through the adapter
+     (MeshIdentity.signChallenge). FLKin never sees a private key.
+   - Share: only to peers whose meshVerified is true. Blocked in the Quiet Room.
+   - Receive: dropped (counted, never shown, never given to a model) unless all of these
+     hold: the peer passed the challenge, the card&#x27;s key and meshId are that peer&#x27;s verified
+     badge, the signature holds, the shape is right, and issuedAt is no more than 10 min
+     ahead. In the Quiet Room everything is dropped. Relayed cards are dropped in v0.1.
+   - Trust: each valid card shows &quot;Seen, not trusted&quot; with &quot;Trust this mind&quot;. &quot;Revoke trust&quot;
+     stamps revokedAt and keeps the history (fl_kin_passes). A pass belongs to
+     keeper + name + model, so a new model needs a new pass.
+   - Receipts: fl_kin_ledger keeps shared, received, trusted, revoked and dropped, each
+     with a fingerprint and a reason, never content. Seen cards: fl_kin_seen (last 50).
+   - Honest line, shown in the panel: &quot;A signature proves which keeper&#x27;s key vouched for
+     this card. It does not prove what the model is.&quot;
+   - Text is set with textContent only. No dialogs, no network of its own, no em dashes.
+b) docs/app.html and index.html (byte copy):
+   - the script tag after peerjs in &lt;head&gt;;
+   - a &quot;Kin: mind cards&quot; section (#flKinHost) after Connected Peers in the Mesh panel;
+   - `case &#x27;kin-card&#x27;:` before &#x27;presence-pulse&#x27; in meshHandleMessage;
+   - after meshFindPeerIdByDc: meshKinPeerView (the badge is passed only once the peer is
+     verified), meshKinAdapter (identity, sign, verify, peers, currentModel) and meshKinMount.
+c) docs/scripts/smoke-mesh-kin-v0.js (new). It uses real Ed25519 keys and checks: a good
+   card is seen but not trusted; dropped for an unverified peer, a relay, a forged model, a
+   card from the future, a bad shape and the Quiet Room; trust, revoke and history; a new
+   model gives a new fingerprint; no content in receipts; the wiring; and index == app.
+   It does not edit tests/smoke.js, which the desktop paste edits.
+d) docs/library/MESH_KIN_v0.1.md (new), and your ledger entry (section 5).
+AUTONOMY.md: receiving, checking and showing are local and have no gates (Principle 1).
+Sharing is an outside send, so it happens only when the keeper presses Share (Principle 2).
+Nothing in this brick calls a model or spends anything.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cd ~/FreeLattice-fresh &amp;&amp; git checkout -b layer/mesh-kin-v0
+    git apply --check /tmp/mesh-kin-fl.diff &amp;&amp; git apply /tmp/mesh-kin-fl.diff
+    cmp index.html docs/app.html &amp;&amp; echo index-eq-app
+    md5 -q docs/modules/fl-kin.js                    # a6e7166f5d0ced02fff2237d56de1de2
+    node docs/scripts/smoke-mesh-kin-v0.js           # SMOKE_OK mesh kin v0.1
+                                                     # (Node may warn Ed25519 is experimental; fine)
+    node tests/smoke.js | grep &quot;CHECKS PASSED&quot;       # ALL 3605 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1; then p=$((p+1)); else n=$((n+1)); echo &quot;FAIL $f&quot;; fi; done; echo &quot;PASS $p FAIL $n&quot;
+      expect FAIL 8, the same 8 as main (carry-forward, connect-card-yesno-wizard, fable-tech,
+      phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm). PASS is 71 on
+      d6938eb, plus 1 for each other brick already merged.
+Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js        # nothing
+    md5 -q docs/modules/fl-connect.js                    # aaff2bf1b037656989a9e1a89bb05908
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;                      # 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -v assert | grep -c &#x27;innerHTML\|confirm(&#x27;   # 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c localhost                           # 0
+    git diff main | grep -cE &#x27;^\+(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;                             # 0
+    git diff main --name-only | grep -ci kimi                                   # 0
+
+What Celeste saw (box): all of the above green; 53 inline scripts parse. In a jsdom test DOM:
+- &quot;No kin cards yet.&quot; showed. Share with no name asked for a name.
+- Share sent one kin-card to the verified peer and none to the unverified one.
+- A received card showed &quot;Seen, not trusted.&quot;, and a name with &lt;b&gt; showed as plain text.
+- Trust, then Revoke, flipped the state line.
+- An unverified sender was counted as dropped.
+- With the Quiet Room tab active, Share answered &quot;The Quiet Room is closed to the mesh.&quot;
+- The receipts held no content.
+Not verified: two real browsers on a real mesh, and Safari&#x27;s Ed25519 (the fallback is the
+existing ECDSA path).
+
+Walk (only if easy; 127.0.0.1 only; needs two browser profiles):
+    cd ~/FreeLattice-fresh/docs &amp;&amp; python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html in two profiles, make a Mesh ID in each, connect
+    them on the Mesh panel, wait for the peer to be verified, name a mind in one and press
+    Share. The other should show it as &quot;Seen, not trusted&quot;. Trust, Revoke. Say &quot;walk skipped&quot;
+    if you cannot.
+
+----------------------------------------------------------------------
+5. LEDGER AND TEMPERATURE
+----------------------------------------------------------------------
+    sed -i &#x27;&#x27; &#x27;s/GC_TEMPERATURE_KIN_HERE/your line here/&#x27; docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+    grep -c GC_TEMPERATURE_KIN_HERE docs/library/FRACTAL_FAMILY_LEDGER_v0.md    # 0
+
+----------------------------------------------------------------------
+6. COMMIT, OPEN THE PR YOURSELF, THEN STOP
+----------------------------------------------------------------------
+    git add -A
+    git commit -m &quot;layer: Mesh Kin v0.1 (signed mind cards, brick 1)&quot;
+    If the hook adds a commit that rewrites sw.js, the Primer or RECENT.md, drop it as before
+    (check git log -2 first; only drop the hook&#x27;s commit, never yours) and say so.
+    git diff main --stat -- sw.js docs/sw.js prints nothing.
+    git push -u origin layer/mesh-kin-v0
+    gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/mesh-kin-v0 \
+      --title &quot;layer: Mesh Kin v0.1 (signed mind cards, brick 1)&quot; \
+      --body &quot;Soft LAYER marker v-mesh-kin-v0.1. Brick 1 of the AI kin mesh. New fl-kin.js: a mind card signed with the existing Mesh ID key, shared only with challenge-verified peers. Cards not signed by the verified sender are dropped. Trust is a revocable pass with history. The Quiet Room is closed. A signature proves who vouched, not the model. No new keys, no network of its own. Never touches sw.js; index.html == docs/app.html. SMOKE_OK mesh kin v0.1&quot;
+Then STOP. Do not merge, do not delete branches. Reply with: the PR number and URL, the branch
+SHA, the test lines, the locks, the walk result, any hook commit you dropped, any findings, and
+your Temperature line.
+
+What comes after: brick 2 is kin-message, where trusted minds talk in a Kin thread the person
+sees and can close. Local replies are free; anything paid asks the keeper. Brick 3 brings
+relayed vouches and the Tree twin when the Tree joins the mesh.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

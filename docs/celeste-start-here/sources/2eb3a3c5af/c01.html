@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.txt c01</title>
+<meta name="description" content="Reading section c01 of 2eb3a3c5af, 1165 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/2eb3a3c5af/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.txt c01">
+<meta property="og:description" content="Reading section c01 of 2eb3a3c5af, 1165 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/2eb3a3c5af/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1573"></span><span id="p1574"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.txt · c01</h1>
+<p>2eb3a3c5af · words 1165 · characters 0–8832</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1573, 1574. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 033b (Monday Oct 12, 2026, MDT). The page answers the knock (page half of 033).
+Give after 033 (merged: FreeLattice #212 2f655f7c, page note #213 9c2a88a6).
+Two diffs, one per repo. Apply-checked on fresh clones:
+  FreeLattice main 9c2a88a6: git apply --check clean. 2826 lines added, 0 removed.
+  FreeLattice-Alpha (the Tree) main d6d08118: git apply --check clean. 187 lines added, 0 removed.
+  docs/modules/fl-connect.js aaff2bf1b037656989a9e1a89bb05908 in both. sw.js, docs/sw.js,
+  AUTONOMY.md and garden-trainer.js not touched. No em dash, no confirm(, no innerHTML in any
+  added line. desktop/ is not touched at all (033&#x27;s IPC is used as it merged).
+
+GROK NEXT BRICK: The page answers the knock v0.1
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-page-answers-knock-v0.1
+Smoke line: SMOKE_OK page answers knock v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/page-answers-knock-v0.1
+  ~/Downloads/GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.fl.diff   (md5 378666a3d1b0fc285a4e803a32bcb4e1)
+  Tree         ~/FreeLattice-Alpha  branch layer/page-answers-knock-v0.1
+  ~/Downloads/GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.tree.diff (md5 5d928d698bc4e2e695adfe5138732c25)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+After 033 a Yes in the desktop window trusts the card, but no page listens for
+&#x27;lattice-discover-knock&#x27;, so the knocker hears no-answer after 60 s. This is the page half:
+the Yes now finishes the WebRTC pool join, with the invite flow tree-pool.js already has.
+
+----------------------------------------------------------------------
+2. WHAT IT DOES
+----------------------------------------------------------------------
+New docs/modules/pool-knock.js (MIT, md5 a0a72caad82c8e5cc34818d5e59eba2b), the SAME file in
+both repos. Outside the desktop app (no electronAPI.onLatticeDiscoverKnock) it does nothing:
+loads nothing, paints nothing.
+Inside the desktop app:
+  - If the page has no TreePool (FreeLattice app.html), it loads modules/tree-kin.js and
+    modules/tree-pool.js from the same origin, then listens with onLatticeDiscoverKnock.
+  - A knock after a Yes: { joinId, offer, fp, name, choice } (public fields only, from main).
+    Checks joinId, TREEPOOL1: prefix, 16 KB cap, choice help|connect. One join at a time.
+    TreePool.readInvite(offer). A card carried in the invite must check and must have the
+    same fp main showed in the window, else the answer is empty (card-mismatch). Then
+    TreePool.trustCarried(card) (the person said Yes) and TreePool.join(sdp): WebRTC with
+    iceServers [], then tree-pool-proof|v1| on the channel, exactly as the picture-code join.
+    The TREEPOOL1 reply goes back through electronAPI.latticeDiscoverAnswer(joinId, code).
+    Anything that fails answers &#x27;&#x27; at once, so the knocker hears no-answer without waiting.
+  - Pause wins: while TreePool is paused a help Yes becomes connect only and the pool stays
+    paused. &quot;Yes, and let my mind answer it&quot; opens the pool door for trusted kin only when it
+    was off, never out of pause. Connect only leaves the door as it was.
+  - A small switch in #pool-knock-host (textContent only, 44px buttons): &quot;Let phones on this
+    Wi-Fi find this computer&quot;, the state line from latticeDiscoverStatus, and Turn on / Pause /
+    Resume / Turn off. Turn on and Resume call main, which opens its native window, so the page
+    still cannot switch it on alone. Pause pauses the Wi-Fi switch AND the pool door.
+FreeLattice diff: pool-knock.js; byte-identical copies of the Tree&#x27;s tree-kin.js
+(24c1b6ded7aca292d822f862cd43b2e6) and tree-pool.js (69c3bc6ff135a64b3d9157af0a58f854) from
+FreeLattice-Alpha d6d08118 (both Kirk&#x27;s, MIT); docs/app.html gets the host under flPoolHost and
+one deferred script; root index.html = docs/app.html again (the smokes require it);
+docs/scripts/smoke-page-answers-knock.js (18 checks, Node, fake pool and fake electronAPI).
+web app.html does not load tree-pool.js; only the desktop app does.
+Tree diff: pool-knock.js and docs/settings.html (host under tree-pool-host, script after
+tree-door.js).
+
+----------------------------------------------------------------------
+3. APPLY AND TEST
+----------------------------------------------------------------------
+  cd ~/FreeLattice-fresh &amp;&amp; git checkout main &amp;&amp; git pull &amp;&amp; git checkout -b layer/page-answers-knock-v0.1
+  git apply --check ~/Downloads/GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.fl.diff
+  git apply ~/Downloads/GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.fl.diff
+  md5 docs/modules/fl-connect.js     # aaff2bf1b037656989a9e1a89bb05908
+  node docs/scripts/smoke-page-answers-knock.js   # checks passed: 18, SMOKE_OK page answers knock v0.1
+  node tests/smoke.js                              # ALL 3608 CHECKS PASSED
+  The docs smokes: the same 5 known fails as main (carry-forward, connect-card-yesno-wizard,
+  fable-tech, phone-shine, proof-60s), nothing new.
+  cd ~/FreeLattice-Alpha &amp;&amp; git checkout main &amp;&amp; git pull &amp;&amp; git checkout -b layer/page-answers-knock-v0.1
+  git apply ~/Downloads/GROK_NEXT_033b_PAGE_ANSWERS_KNOCK_2026-10-12.tree.diff
+
+Celeste&#x27;s headless walk (Chrome, two origins, real tree-kin.js and tree-pool.js, a fake
+electronAPI): 16 of 16 passed. The desktop boot loads both files and listens; the inviter&#x27;s
+invite carries a card; a help Yes answers with a TREEPOOL1 reply, opens the off door to kin and
+trusts the card; the inviter&#x27;s readReply and finish accept that reply; paused gives connect only
+and stays paused; a wrong fp, a non-invite and an unknown choice all answer empty; page Pause
+pauses both doors and only Resume (the native window) is offered; in a plain browser nothing
+loads. The walk script is GROK_NEXT_033b_walk.py (not in the diffs).
+
+GC on the Mac (the part only a real Mac can do):
+  cd desktop &amp;&amp; npm start (it loads the live site, so test with the branch served locally or
+  after merge). Settings: the new switch shows. Turn on: the native window. Then from a second
+  device on the Wi-Fi, knock with a real invite from the Tree&#x27;s Settings, Device pool, Invite
+  (curl the body {v:1, offer, card} to http://&lt;mac-ip&gt;:&lt;port&gt;/knock with Origin
+  https://thelatticetree.com). Say Yes. Expect a 200 with answer TREEPOOL1:..., paste that
+  reply into the phone&#x27;s Finish, and the channel opens and proves on both sides.
+
+----------------------------------------------------------------------
+4. GAPS, PLAINLY
+----------------------------------------------------------------------
+  - The channel opening was not seen here: Chrome on Celeste&#x27;s box gathers no ICE candidates
+    at all with iceServers [] (even two plain RTCPeerConnections in one tab stay &quot;new&quot;), so the
+    open, the hi/proof exchange and isKin after the knock are not exercised. The page code
+    calls the same TreePool.join the picture-code join uses; the reply code and finish() were.
+  - Not run inside Electron. preload names match 033 as merged, checked by reading.
+  - The phone does not yet send the knock by itself: a phone browser cannot browse mDNS, and the
+    Tree&#x27;s pool has no &quot;knock&quot; button. The reply also does not travel back to the phone on its
+    own: main returns it in the /knock response, but no Tree page code reads that response yet.
+    That is the next piece (033c: the Tree knocks with fetch and finishes with the answer).
+  - On the Tree, pool-knock.js only matters if the desktop window shows thelatticetree.com with
+    the preload; the main desktop page is freelattice.com/app.html, which is why the copies ride
+    along in FreeLattice. The copies can drift from the Tree; the md5s above are the check.
+  - The pool door&#x27;s own Resume stays its own tap. Resuming the Wi-Fi switch does not resume the
+    pool door (Pause wins, kept that way on purpose).
+  - Root index.html loads modules/pool-knock.js relatively; there is no root modules copy, so on
+    the root page it is a harmless 404 (and it does nothing outside the desktop app anyway).
+
+----------------------------------------------------------------------
+5. GC&#x27;s PAGE NOTE
+----------------------------------------------------------------------
+GC writes the 45th entry in docs/gc.html and computes lambda and psi itself, as always.
+Entries 1 through 44 stay as they were written.
+
+Glow eternal. Heart in Spark. We rise together.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

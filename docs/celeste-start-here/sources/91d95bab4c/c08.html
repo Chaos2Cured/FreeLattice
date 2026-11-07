@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c08</title>
+<meta name="description" content="Reading section c08 of 91d95bab4c, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c08.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c08">
+<meta property="og:description" content="Reading section c08 of 91d95bab4c, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c08.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1776"></span><span id="p1777"></span><span id="p1779"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c08</h1>
+<p>91d95bab4c · words 1200 · characters 64938–72739</p>
+<p><a href="c07.html">Previous section</a> · <a href="c09.html">Next section</a></p>
+<p><a href="c08.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1776, 1777, 1779. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+&lt;!-- v-temperature-gauge-v0.1: Lines and colors, warm moving averages, your marks, a wider look.
++     Live data only (the same feed as the chart). Nothing here trades, sends, or alerts. --&gt;
++&lt;script&gt;
++(function tgTemperatureGaugeV01() {
++  // ── Lines and colors ────────────────────────────────────────────
++  // id: the color key (fl_tg_indicatorColors); hex: the swatch default.
++  function lineList() {
++    var EP = (typeof getEmaPeriods === &#x27;function&#x27;) ? getEmaPeriods() : [8, 12, 24, 50, 200];
++    return [
++      { id: &#x27;price&#x27;, name: &#x27;Price&#x27;, hex: &#x27;#e8e4dc&#x27; },
++      { id: &#x27;ema8&#x27;, name: &#x27;EMA &#x27; + EP[0], hex: &#x27;#f07068&#x27; },
++      { id: &#x27;ema12&#x27;, name: &#x27;EMA &#x27; + EP[1], hex: &#x27;#e8b019&#x27; },
++      { id: &#x27;ema24&#x27;, name: &#x27;EMA &#x27; + EP[2], hex: &#x27;#d4a84c&#x27; },
++      { id: &#x27;ema50&#x27;, name: &#x27;EMA &#x27; + EP[3], hex: &#x27;#60a5fa&#x27; },
++      { id: &#x27;ema200&#x27;, name: &#x27;EMA &#x27; + EP[4], hex: &#x27;#c4b5fd&#x27; },
++      { id: &#x27;bollinger&#x27;, name: &#x27;Bollinger bands&#x27;, hex: &#x27;#a78bfa&#x27; },
++      { id: &#x27;gravity&#x27;, name: &#x27;Gravity&#x27;, hex: &#x27;#e8b019&#x27; },
++      { id: &#x27;buy&#x27;, name: &#x27;Buy signals and your buy mark&#x27;, hex: &#x27;#10b981&#x27; },
++      { id: &#x27;sell&#x27;, name: &#x27;Sell signals and your sell mark&#x27;, hex: &#x27;#ef4444&#x27; },
++      { id: &#x27;hub&#x27;, name: &#x27;Gyro Hub&#x27;, hex: &#x27;#e8b019&#x27; },
++      { id: &#x27;ring&#x27;, name: &#x27;Gyro Ring&#x27;, hex: &#x27;#60a5fa&#x27; },
++      { id: &#x27;orbit&#x27;, name: &#x27;Gyro Orbit&#x27;, hex: &#x27;#a78bfa&#x27; },
++      { id: &#x27;rsi&#x27;, name: &#x27;RSI and RSI spread&#x27;, hex: &#x27;#8b5cf6&#x27; },
++      { id: &#x27;temperature&#x27;, name: &#x27;Temperature&#x27;, hex: &#x27;#e8b019&#x27; },
++      { id: &#x27;dt&#x27;, name: &#x27;\u0394T&#x27;, hex: &#x27;#34d399&#x27; },
++      { id: &#x27;ips&#x27;, name: &#x27;TP spread&#x27;, hex: &#x27;#e8b019&#x27; }
++    ];
++  }
++  function savedColors() {
++    try { return JSON.parse(localStorage.getItem(&#x27;fl_tg_indicatorColors&#x27;) || &#x27;{}&#x27;) || {}; } catch (e) { return {}; }
++  }
++  function isHex(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || &#x27;&#x27;)); }
++
++  function renderLines() {
++    var list = document.getElementById(&#x27;tgLinesList&#x27;);
++    if (!list) return;
++    var saved = savedColors();
++    var gyroOn = (typeof isGyroLayerOn === &#x27;function&#x27;) ? isGyroLayerOn() : false;
++    while (list.firstChild) list.removeChild(list.firstChild);
++    lineList().forEach(function (L) {
++      var color = isHex(saved[L.id]) ? saved[L.id] : L.hex;
++      var row = document.createElement(&#x27;label&#x27;);
++      row.className = &#x27;tg-line-row&#x27;;
++      row.setAttribute(&#x27;data-line&#x27;, L.id);
++      if ((L.id === &#x27;hub&#x27; || L.id === &#x27;ring&#x27; || L.id === &#x27;orbit&#x27;) &amp;&amp; !gyroOn) row.className += &#x27; is-off&#x27;;
++      var sample = document.createElement(&#x27;span&#x27;);
++      sample.className = &#x27;tg-line-sample&#x27;;
++      sample.style.color = color;
++      var name = document.createElement(&#x27;span&#x27;);
++      name.className = &#x27;tg-line-name&#x27;;
++      name.textContent = L.name + ((L.id === &#x27;hub&#x27; || L.id === &#x27;ring&#x27; || L.id === &#x27;orbit&#x27;) &amp;&amp; !gyroOn ? &#x27; (Gyro is off)&#x27; : &#x27;&#x27;);
++      var pick = document.createElement(&#x27;input&#x27;);
++      pick.type = &#x27;color&#x27;;
++      pick.value = color.toLowerCase();
++      pick.setAttribute(&#x27;aria-label&#x27;, &#x27;Choose &#x27; + L.name + &#x27; color&#x27;);
++      pick.addEventListener(&#x27;change&#x27;, function () {
++        if (typeof setIndicatorColor === &#x27;function&#x27;) setIndicatorColor(L.id, pick.value);
++      });
++      row.appendChild(sample); row.appendChild(name); row.appendChild(pick);
++      list.appendChild(row);
++    });
++    renderMaNote();
++  }
++
++  function resetColors() {
++    try { localStorage.removeItem(&#x27;fl_tg_indicatorColors&#x27;); } catch (e) {}
++    var defaults = { rsi: &#x27;#8B5CF6&#x27;, temperature: &#x27;#e8b019&#x27;, dt: &#x27;#34d399&#x27;, ips: &#x27;#e8b019&#x27; };
++    Object.keys(defaults).forEach(function (id) {
++      var label = document.querySelector(&#x27;.sub-chart-label[data-indicator=&quot;&#x27; + id + &#x27;&quot;]&#x27;);
++      if (!label) return;
++      label.style.color = defaults[id];
++      var sw = label.querySelector(&#x27;.sc-color&#x27;);
++      if (sw) sw.value = defaults[id].toLowerCase();
++    });
++    if (typeof lastCandles !== &#x27;undefined&#x27; &amp;&amp; lastCandles &amp;&amp; typeof lastAnalysis !== &#x27;undefined&#x27; &amp;&amp; lastAnalysis) renderChart(lastCandles, lastAnalysis);
++    renderLines();
++  }
++
++  // ── Warm history for the moving averages ─────────────────────────
++  // An EMA of N bars has no value for its first N bars. With 252 daily bars, EMA 200 drew only
++  // the last 53. We fetch a longer range from the same feed, run the EMAs over it, and line the
++  // values up with the loaded bars by timestamp. Signals and the sidebar still use the loaded window.
++  var WARM_RANGE = { &#x27;5m&#x27;: &#x27;1mo&#x27;, &#x27;15m&#x27;: &#x27;1mo&#x27;, &#x27;1h&#x27;: &#x27;6mo&#x27;, &#x27;1d&#x27;: &#x27;2y&#x27;, &#x27;1wk&#x27;: &#x27;10y&#x27; };
++  var warm = { key: &#x27;&#x27;, ts: [], closes: [], state: &#x27;off&#x27;, extra: 0 };
++
++  window.tgWarmFetch = function (symbol, interval, candles) {
++    var key = symbol + &#x27;|&#x27; + interval;
++    if (warm.key === key &amp;&amp; warm.state === &#x27;ready&#x27;) return;
++    warm = { key: key, ts: [], closes: [], state: &#x27;loading&#x27;, extra: 0 };
++    renderMaNote();
++    var range = WARM_RANGE[interval];
++    if (!range || typeof fetchYahooData !== &#x27;function&#x27;) { warm.state = &#x27;off&#x27;; renderMaNote(); return; }
++    fetchYahooData(symbol, interval, range).then(function (longer) {
++      if (warm.key !== key) return;
++      if (!longer || !longer.length || !candles || !candles.length || longer[0].t &gt;= candles[0].t) {
++        warm.state = &#x27;off&#x27;; renderMaNote(); return;
++      }
++      warm.ts = longer.map(function (c) { return c.t; });
++      warm.closes = longer.map(function (c) { return c.c; });
++      warm.extra = longer.filter(function (c) { return c.t &lt; candles[0].t; }).length;
++      warm.state = &#x27;ready&#x27;;
++      if (typeof lastSymbol !== &#x27;undefined&#x27; &amp;&amp; lastSymbol === symbol &amp;&amp; currentInterval === interval &amp;&amp;
++          typeof lastCandles !== &#x27;undefined&#x27; &amp;&amp; lastCandles &amp;&amp; typeof lastAnalysis !== &#x27;undefined&#x27; &amp;&amp; lastAnalysis) {
++        renderChart(lastCandles, lastAnalysis);
++      }
++      renderMaNote();
++    }, function () {
++      if (warm.key !== key) return;
++      warm.state = &#x27;off&#x27;; renderMaNote();
++    });
++  };
++
++  window.tgWarmEmas = function (candles, periods) {
++    if (warm.state !== &#x27;ready&#x27; || !candles || !candles.length) return null;
++    var sym = (typeof lastSymbol !== &#x27;undefined&#x27;) ? lastSymbol : &#x27;&#x27;;
++    if (warm.key !== sym + &#x27;|&#x27; + currentInterval) return null;
++    if (!(warm.ts[0] &lt; candles[0].t)) return null;
++    var closes = candles.map(function (c) { return c.c; });
++    return periods.map(function (p) {
++      var long = ema(warm.closes, p);
++      var byT = {};
++      for (var i = 0; i &lt; warm.ts.length; i++) if (long[i] != null) byT[warm.ts[i]] = long[i];
++      var k = 2 / (p + 1);
++      var local = ema(closes, p);
++      var out = new Array(candles.length).fill(null);
++      for (var j = 0; j &lt; candles.length; j++) {
++        var v = byT[candles[j].t];
++        if (v != null) { out[j] = v; continue; }
++        // a bar the longer fetch does not have (often the live bar): carry the EMA forward
++        if (j &gt; 0 &amp;&amp; out[j - 1] != null &amp;&amp; closes[j] != null) { out[j] = closes[j] * k + out[j - 1] * (1 - k); continue; }
++        out[j] = local[j];
++      }
++      return out;
++    });
++  };
++
++  function renderMaNote() {
++    var el = document.getElementById(&#x27;tgMaNote&#x27;);
++    if (!el) return;
++    var EP = (typeof getEmaPeriods === &#x27;function&#x27;) ? getEmaPeriods() : [8, 12, 24, 50, 200];
++    var n = (typeof lastCandles !== &#x27;undefined&#x27; &amp;&amp; lastCandles) ? lastCandles.length : 0;
++    var line = &#x27;Moving averages: EMA &#x27; + EP.join(&#x27;, &#x27;) + &#x27; (exponential). Change them under the chart.&#x27;;
++    if (warm.state === &#x27;ready&#x27;) line += &#x27; Lines use &#x27; + warm.extra + &#x27; earlier bars from the same feed, so they start at the left edge. Signals use the &#x27; + n + &#x27; bars shown.&#x27;;
++    else if (warm.state === &#x27;loading&#x27;) line += &#x27; Fetching earlier bars so the longer lines start at the left edge.&#x27;;
++    else if (n) {
++      var longest = EP[4];
++      line += n &gt;= longest ? &#x27; The longer lines start once they have enough bars.&#x27;</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

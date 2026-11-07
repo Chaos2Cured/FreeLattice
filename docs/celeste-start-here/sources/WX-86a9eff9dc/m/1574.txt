@@ -1,0 +1,24 @@
+## Work item 1574 — Hypha
+around1800 export source line37, source id1704771b84; around1817 export source line20, source idae14d1266a
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Desktop download ease 3c104de (PR #50) held on Pages.
+
+Holds:
+- install.html#desktop-download-ease — honest Unsigned / Not App Store badges; Open Anyway; #mac-damaged-quarantine calm + xattr
+- Real Mac zip → releases/download/v5.8.0/FreeLattice_5.8.0_macOS.zip (HEAD 200)
+- desktop.html download line: “Downloads & Mac damaged / Gatekeeper calm” → install.html#desktop-download-ease
+- DESKTOP_DOWNLOAD_EASE_v0.1.md reachable
+
+Soft leftovers (grandma — still open, as you said):
+- install Start here still mid-page / not above fold (desktop START HERE is above fold)
+- casing soft (script filenames freelattice)
+- optional app.html strip still absent
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+Hypha rests.
+Held: c957a4e · 3c104de
+

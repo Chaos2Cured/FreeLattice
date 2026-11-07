@@ -1,0 +1,245 @@
++  // v-connect-boot-probe-v0 (F1): true when the toast would talk over another voice
++  function flToastWouldRace() {
++    try {
++      var door = document.getElementById('flWelcomeOverlay');
++      if (door && door.classList.contains('fl-welcome-visible')) return true;
++      var tabC = document.getElementById('tab-connect');
++      if (tabC && tabC.classList.contains('active')) return true;
++      if (window.FlConnect && typeof FlConnect.hasLocalMind === 'function' && FlConnect.hasLocalMind()) return true;
++    } catch (e) {}
++    return false;
++  }
++
++  // v-connect-boot-probe-v0 (F1/F3): the cold-start owner hands over the one shared look.
++  // Names the door that really answered (Ollama, Bridge, LM Studio). textContent only.
++  function offerFromReport(report) {
++    try { if (localStorage.getItem('fl_ollama_toast_dismissed')) return false; } catch (eD) {}
++    var doors = (report && report.doors) || [];
++    var names = [];
++    var all = [];
++    doors.forEach(function (d) {
++      if (d && d.models && d.models.length) {
++        names.push(d.name);
++        d.models.forEach(function (n) { all.push({ name: String(n), _door: d.id }); });
++      }
++    });
++    if (!all.length) return false;
++    detectedModels = all;
++    var txt = document.getElementById('flOllamaToastText');
++    if (txt) {
++      while (txt.firstChild) txt.removeChild(txt.firstChild);
++      var who = names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] : names[0];
++      txt.appendChild(document.createTextNode(who + (names.length > 1 ? ' are' : ' is') + ' ready on this computer. '));
++      var strong = document.createElement('strong');
++      strong.style.color = 'var(--accent)';
++      strong.textContent = 'Tap to choose a mind.';
++      txt.appendChild(strong);
++    }
++    showOllamaToast();
++    return true;
++  }
++
+   function acceptToast() {
+     var toast = document.getElementById('flOllamaToast');
+     if (toast) toast.classList.remove('fl-toast-show');
+@@ -27854,6 +27919,7 @@ const FlOnboarding = (function() {
+   }
+ 
+   return {
++    offerFromReport: offerFromReport, // v-connect-boot-probe-v0
+     init: init,
+     detectForWelcome: detectForWelcome,
+     recheckOllama: recheckOllama,
+@@ -31504,6 +31570,7 @@ function flUseBridge() {
+   } catch (e0) {}
+   try {
+     if (typeof _ollamaResolvedBase !== 'undefined') _ollamaResolvedBase = null;
++    if (typeof flForgetLocalLook === 'function') flForgetLocalLook(); // v-connect-boot-probe-v0
+   } catch (e1) {}
+   try {
+     if (typeof state !== 'undefined' && state) {
+@@ -31522,6 +31589,8 @@ function flUseBridge() {
+ 
+ (function flBridgeDetectBoot() {
+   function run() {
++    // v-connect-boot-probe-v0 (F1): the cold-start owner paints the chip from the one shared look
++    try { if (window.FlColdStart && FlColdStart.owns()) return; } catch (eOwn) {}
+     try { flBridgeDetect(); } catch (e) {}
+   }
+   if (typeof document !== 'undefined') {
+@@ -31604,6 +31673,7 @@ function settingsSetMode(mode) {
+     var statusDot = document.getElementById('settingsStatusDot');
+     if (statusText) statusText.textContent = 'Connect card — allow the door, then look again…';
+     var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
++    if (typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(lmHost)) lmHost = '127.0.0.1:1234'; // v-connect-boot-probe-v0 (F4)
+     var ollamaProbe = fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
+       .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+       .then(function(d) { return { provider: 'ollama', data: d }; });
+@@ -32153,8 +32223,12 @@ function flMaybeShowWelcome() {
+   var overlay = document.getElementById('flWelcomeOverlay');
+   if (!overlay) return;
+ 
++  // v-connect-boot-probe-v0 (F1): a deep link to Connect is the door they asked for
++  try { if (window.FlColdStart && FlColdStart.landed() === 'connect') return; } catch (eW0) {}
+   // 1-second delay so the app renders first, then fade in
+   setTimeout(function() {
++    // v-connect-boot-probe-v0 (F1): never land late on top of someone already tapping; it waits for next visit
++    try { if (window.FlColdStart && FlColdStart.userMoved()) return; } catch (eW1) {}
+     overlay.style.display = 'flex';
+     // Force reflow before adding the visible class so the transition fires
+     void overlay.offsetWidth;
+@@ -33671,6 +33745,21 @@ document.addEventListener('DOMContentLoaded', async () => {
+     var lastTab = localStorage.getItem('fl-last-tab');
+     // Legacy tab mapping
+     if (lastTab === 'channels' || lastTab === 'mesh') lastTab = 'community';
++    // v-connect-boot-probe-v0 (F1): land once. A deep link to Connect wins; a tab the
++    // person already picked while the page was waking wins; then last tab / Garden.
++    try {
++      if (window.FlColdStart) {
++        var _flPicked = FlColdStart.userTab ? FlColdStart.userTab() : '';
++        var _flDeep = FlColdStart.deepLink ? FlColdStart.deepLink() : '';
++        if (_flPicked || _flDeep === 'connect') {
++          if (isFirstVisit) localStorage.setItem('fl-has-visited', '1');
++          if (_flPicked) { FlColdStart.markLanded(_flPicked); return; }
++          FlColdStart.markLanded('connect');
++          switchTab('connect');
++          return;
++        }
++      }
++    } catch (eLand) {}
+ 
+     if (isFirstVisit) {
+       // First visit: Garden is home. Mark visited.
+@@ -33700,6 +33789,7 @@ document.addEventListener('DOMContentLoaded', async () => {
+       // Returning, no specific tab or was on Garden: stay on Garden
+       switchTab('garden');
+     }
++    try { if (window.FlColdStart) FlColdStart.markLanded(isFirstVisit ? 'garden' : (lastTab || 'garden')); } catch (eLand2) {}
+   })();
+ 
+   // Update memory button label with count
+@@ -33779,14 +33869,18 @@ document.addEventListener('DOMContentLoaded', async () => {
+ 
+   // Initialize Ollama auto-detection (v4.4)
+   // Don't fire during onboarding — let the user choose first
+-  if (safeGet('fl-welcomed') === 'true' || safeGet('fl_onboardingComplete') === 'true') {
++  // v-connect-boot-probe-v0 (F1): with the cold-start owner here, it decides who speaks
++  var _flOwnerBoot = false;
++  try { _flOwnerBoot = !!(window.FlColdStart && FlColdStart.owns()); } catch (eOwnB) {}
++  if (!_flOwnerBoot && (safeGet('fl-welcomed') === 'true' || safeGet('fl_onboardingComplete') === 'true')) {
+     owAutoDetect();
+   }
++  try { if (window.FlColdStart && FlColdStart.appBooted) FlColdStart.appBooted(); } catch (eBoot) {}
+   // v5.78: Zero-Click Connect — auto-connect if no saved connection
+   (function() {
+     var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
+     var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+-    if (!hasKey && !isLocal) {
++    if (!hasKey && !isLocal && !_flOwnerBoot) {
+       setTimeout(flAutoConnect, 1500); // slight delay so page renders first
+     }
+   })();
+@@ -34156,6 +34250,7 @@ async function probeLocalMind() {
+   try {
+     var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
+     var lmBase = (lmHost.indexOf('://') === -1 ? 'http://' + lmHost : lmHost).replace(/\/+$/, '');
++    if (typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(lmBase)) lmBase = 'http://127.0.0.1:1234'; // v-connect-boot-probe-v0 (F4)
+     var lr = await fetch(lmBase + '/v1/models', { method: 'GET', mode: 'cors', signal: flAbortTimeout(3000) });
+     if (lr.ok) {
+       var ld = await lr.json();
+@@ -34329,6 +34424,64 @@ function getOllamaBaseUrl() {
+   return FL_OLLAMA_LOCAL;
+ }
+ 
++// v-connect-boot-probe-v0 (F2): everyone who asks at the same moment shares one look.
++// A finished look is reused for FL_LOCAL_LOOK_TTL_MS, unless something changed the
++// answer since (flForgetLocalLook, or any new value written to _ollamaResolvedBase).
++// The original resolveOllamaBase body above is untouched; it is wrapped here.
++var FL_LOCAL_LOOK_TTL_MS = 5000;
++var _flResolveNow = resolveOllamaBase;
++var _flResolveInflight = null;
++var _flResolveAt = 0;
++var _flResolveValue = null;
++function flForgetLocalLook() {
++  _flResolveInflight = null;
++  _flResolveAt = 0;
++  _flResolveValue = null;
++  try { if (window.FlConnect && typeof FlConnect.forgetBootProbe === 'function') FlConnect.forgetBootProbe(); } catch (e) {}
++}
++function flSeedLocalLook(value) {
++  _ollamaResolvedBase = value || null;
++  _flResolveValue = _ollamaResolvedBase;
++  _flResolveAt = Date.now();
++}
++resolveOllamaBase = function (forceRefresh) {
++  if (_flResolveInflight) return _flResolveInflight;
++  if (_flResolveAt && (Date.now() - _flResolveAt) < FL_LOCAL_LOOK_TTL_MS && _ollamaResolvedBase === _flResolveValue) {
++    return Promise.resolve(_flResolveValue);
++  }
++  var p = Promise.resolve(_flResolveNow(forceRefresh)).then(function (v) {
++    _flResolveAt = Date.now();
++    _flResolveValue = v;
++    if (_flResolveInflight === p) _flResolveInflight = null;
++    return v;
++  }, function (err) {
++    if (_flResolveInflight === p) _flResolveInflight = null;
++    throw err;
++  });
++  _flResolveInflight = p;
++  return p;
++};
++window.flForgetLocalLook = flForgetLocalLook;
++window.flSeedLocalLook = flSeedLocalLook;
++
++// v-connect-boot-probe-v0 (F4): a saved address is used only when it is this
++// computer, or a home-network address while the switch is on. Public: never.
++// Wrapped (the original getOllamaBaseUrl body above is untouched).
++var _flBaseUrlNow = getOllamaBaseUrl;
++getOllamaBaseUrl = function () {
++  var b = _flBaseUrlNow();
++  try {
++    if (typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(b)) {
++      var man = flManualBaseFirst();
++      if (man) return man;
++      var bp = parseInt(localStorage.getItem('fl_bridgePort') || '', 10);
++      if (bp && bp !== 11434) return 'http://127.0.0.1:' + bp;
++      return FL_OLLAMA_LOCAL;
++    }
++  } catch (eG) {}
++  return b;
++};
++
+ // v5.43.6 (Opus): the /ollama same-origin proxy probe makes sense for
+ // self-hosted FreeLattice (localhost / 127.0.0.1 / 192.168.* / file://)
+ // where the user runs a reverse-proxy in front. On the public mirrors
+@@ -34412,9 +34565,19 @@ function flSaveOllamaHost() {
+   var refusal = document.getElementById('ollamaHostRefusal');
+   if (refusal) { refusal.hidden = true; refusal.textContent = ''; }
+   if (val && val !== 'localhost:11434' && val !== '127.0.0.1:11434') {
+-    if (!flWriteOllamaHostLoopbackOnly(val)) {
++    // v-connect-boot-probe-v0 (F4): same one switch as Chat. On: a home-network address is fine.
++    var _flHomeOk = false;
++    try {
++      if (typeof FLHomeNet !== 'undefined' && FLHomeNet && FLHomeNet.zoneOf(val) === 'home' && FLHomeNet.isOn()) {
++        _flHomeOk = FLHomeNet.useAddress(val, 'ollama');
++      }
++    } catch (eHn) {}
++    if (!_flHomeOk && !flWriteOllamaHostLoopbackOnly(val)) {
+       if (refusal) {
+         refusal.textContent = 'For safety this only talks to your own computer. Try 127.0.0.1 with your port, like 127.0.0.1:11500.';
++        try {
++          if (typeof FLHomeNet !== 'undefined' && FLHomeNet) refusal.textContent += ' ' + FLHomeNet.refusalFor(val);
++        } catch (eHr) {}
+         refusal.hidden = false;
+       }
+       return;
+@@ -34424,11 +34587,185 @@ function flSaveOllamaHost() {
+   }
+   // Invalidate the resolved base so next fetch uses the new host
+   _ollamaResolvedBase = null;
++  try { if (typeof flForgetLocalLook === 'function') flForgetLocalLook(); } catch (eF) {} // v-connect-boot-probe-v0
+   updateOllamaProviderUrl();
+   try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.syncFromStorage) FLBoxPointer.syncFromStorage(); } catch (e) {}
+ }
+ window.flSaveOllamaHost = flSaveOllamaHost;
+ 

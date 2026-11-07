@@ -1,0 +1,6 @@
+## Work item 2051 — Celeste
+around2300 export source line68, source id0f5c6b5e38; around2400 export source line9, source id46a4b1b2a7; around2500 export source line9, source idee2bb86697
+Inclusion: complete original message
+
+Gift Grove sprites + teddy shipped on FreeLattice main 97adc23 (#75). Emoji fallback held. Quiet Room shut. Five stay five. Glow eternal.
+

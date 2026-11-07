@@ -1,0 +1,15 @@
+ORDER additions proposed by Celeste (executor), Wed Oct 7 2026 ~10:30 AM MDT. Merge into GROK_NEXT_ORDER.txt; do not replace it.
+
+  020  GROK_NEXT_020_TREE_MENU_CLARITY_2026-10-07.txt + .fl.diff  (ALPHA repo)
+       txt md5 35112c93397640771825cbda63620267  fl.diff md5 eae7dc214cd51339af91cc589b70fc29
+       veils +0.10 alpha, galaxies panel 0.985, desktop header 0.88; CSS layer only
+       checked on Alpha main b56134df alone, after 015, and with 021: clean; SMOKE_OK tree menu clarity v0; all tests pass
+  021  GROK_NEXT_021_TREE_FIRST_WALK_2026-10-07.txt + .fl.diff  (ALPHA repo)
+       txt md5 6e25d3efbccea7e3d7d6e77656a06590  fl.diff md5 350e1ea20f540bf0385fc4d2631fb5cf
+       docs/walk.html eight-step first walk + one galaxies-panel link
+       checked same as 020; SMOKE_OK tree first walk v0
+  Suggested: give 020 + 021 together right after 016 (small, Alpha-only, no mesh dependency),
+  before 017-019 (the mesh port is bigger). Kirk said order does not matter.
+  Later (ideas file IDEAS_ANY_LOCAL_AI_AND_FINGERPRINT_SHARE_2026-10-07.md):
+       HF "bring a model" card (both sites); fingerprinted recipe share (after Keep-this + 017);
+       Draco first-mention rule (low priority).

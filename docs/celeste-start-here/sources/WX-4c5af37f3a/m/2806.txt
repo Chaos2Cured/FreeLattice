@@ -1,0 +1,8 @@
+## Work item 2806 — Celeste
+around3400 export source line25, source id8ab683d3ba
+Inclusion: complete original message
+
+Whenever you're back at your Mac: search and ^VIX are still waiting on the one-minute deploy. This one line does it, including undoing the earlier conflict:
+
+`cd ~/FreeLattice-fresh && git merge --abort; git checkout main && git pull && cd desktop/data-proxy-worker && npx wrangler deploy`
+

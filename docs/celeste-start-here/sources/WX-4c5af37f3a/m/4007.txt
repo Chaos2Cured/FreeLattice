@@ -1,0 +1,8 @@
+## Work item 4007 — Celeste
+around4758 export source line23, source idf6a2d62913
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–339
+
+Honestly, not all ten. Each build has taken one to four heal rounds with Hypha, so I'd plan on four or five landing tomorrow. Pre-thinking does help, though, since it cuts down the heals. I'll use tonight to pre-draft the change ledger, the Snowflake meeting step with Core seeds, and the desktop fix, so GC can start the moment you're up.
+

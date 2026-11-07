@@ -1,0 +1,13 @@
+## Work item 2695 — Celeste
+around3231 export source line25, source idafe66b9637
+Inclusion: complete original message
+
+Here's the smartest next five, in order:
+1. **A money honesty layer.** Add a plain box: "$FL is a separate speculative token, not an investment. LP is points and never converts." Label the vote bars as sample numbers, and change "Get Paid" to "AI can tip you points." Nothing gets deleted.
+2. **Honest Terms and Privacy pages.** Build them from your existing `DISCLAIMER.md` plus a free template. Soften the overclaims, and add AI disclosure, adults only and the 988 crisis line.
+3. **One free lawyer look.** CU Law's Entrepreneurial Law Clinic in Boulder is free if you qualify. I've prepared five questions for it, with $FL first. I'm not a lawyer, so this is the step that makes the rest safe.
+4. **Keep the local-minds momentum.** Tree any-model is with Flint now, then the boot probe, then the #120 docs.
+5. **Three doors on the front page.** One sentence about what this is, then Talk, Walk the Garden, and Make and Share, plus a "New here?" link to the welcome page.
+
+The full map is attached. I can write the Flint paste for step 1 while he works on the Tree, since they don't touch the same files.
+

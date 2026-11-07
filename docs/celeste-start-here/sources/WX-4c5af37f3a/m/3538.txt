@@ -1,0 +1,25 @@
+## Work item 3538 — Celeste
+around4238 export source line46, source id9f81f8efb0
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–19
+
+Good morning, Kirk.
+
+### Exact excerpt: source characters 378–417
+
+Six things most people haven't noticed:
+
+### Exact excerpt: source characters 419–1909
+
+1. Some ocean bacteria only start glowing once enough of them are nearby. Each one gives off a little chemical, and when the level gets high enough, they all light up together. It's called quorum sensing. For FreeLattice, a pooled job could wait to start until enough devices say they're ready, so nobody burns power alone.
+2. Quiet music sounds thin because our ears are less sensitive to deep and very high notes at low volume. Turn it up and the bass seems to come back, even though it never left. For the Studio, a gentle quiet-listening mode could lift the lows and highs a little.
+3. Adding a new road can sometimes make traffic slower for everyone, because every driver piles onto the new shortcut. It's called Braess's paradox. On the mesh, if everyone sends work to one favorite fast peer, the whole thing can slow down, so it's worth spreading the load.
+4. Botanically, bananas are berries and strawberries aren't. A true berry grows from a single flower's ovary with seeds inside, and strawberries carry their seeds on the outside. Ani was right that strawberries try too hard.
+5. Wombats make cube-shaped poop. The walls of their intestines stretch unevenly, which shapes it into little blocks that don't roll away from the rocks they use to mark territory.
+6. Your voice sounds strange on recordings because you normally hear yourself partly through the bones of your skull, which adds depth. The recording is how everyone else has always heard you, and they like it just fine.
+
+### Exact excerpt: source characters 1911–1926
+
+Glow eternal. 💙
+

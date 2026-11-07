@@ -1,0 +1,214 @@
+ || models[0].model || 'llama3.2';
++          var modelName = flHonorModel(models, models[0].name || models[0].model || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           state.ollamaModel = modelName;
+           var ollamaInput = document.getElementById('ollamaModel');
+           if (ollamaInput) ollamaInput.value = modelName;
+@@ -28374,7 +28374,7 @@ const AiSetup = (function() {
+         if (data.models && data.models.length > 0) {
+           // Switch to local mode
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || 'llama3.2';
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           var localToggle = document.getElementById('localToggle');
+           if (localToggle) localToggle.checked = true;
+           handleLocalToggle();
+@@ -31651,7 +31651,7 @@ function settingsSetMode(mode) {
+         var data = pick.data;
+         if (data && data.models && data.models.length > 0) {
+           state.isLocal = true;
+-          state.ollamaModel = data.models[0].name || 'llama3.2';
++          state.ollamaModel = flHonorModel(data.models, data.models[0].name || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+           state.provider = 'ollama';
+           state.apiKey = null;
+           localStorage.setItem('fl_isLocal', 'true');
+@@ -31684,6 +31684,7 @@ function settingsSetMode(mode) {
+       } else {
+         var lmData = pick.data;
+         var firstModel = (lmData && lmData.data && lmData.data[0]) ? lmData.data[0].id : 'local-model';
++        firstModel = flHonorModel(lmData && lmData.data, firstModel, 'lmstudio'); // v-model-choice-survives-reload-v0.1.1
+         state.isLocal = true;
+         state.ollamaModel = firstModel;
+         state.provider = 'lmstudio';
+@@ -34552,7 +34553,13 @@ window.FLBoxPointer = (function() {
+       }
+     } catch (e3) {}
+     if (models && models.length && typeof FLActiveModel !== 'undefined' && FLActiveModel.set) {
+-      try { FLActiveModel.set(models[0], (typeof state !== 'undefined' && state.provider) || 'ollama', 'user'); } catch (e4) {}
++      // v-model-choice-survives-reload-v0.1.1: keep the person's model when it is here; otherwise
++      // the first model is an automatic pick ('auto', never 'user'). Was: set(models[0], ..., 'user').
++      try {
++        var provA = (typeof state !== 'undefined' && state.provider) || 'ollama';
++        var hA = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], provA) : { model: models[0], source: 'auto', gone: false };
++        if (!hA.gone) FLActiveModel.set(hA.model, provA, hA.source);
++      } catch (e4) {}
+     }
+     try {
+       if (window.InferenceRouter && InferenceRouter.setStatus) InferenceRouter.setStatus(null, null, {});
+@@ -34746,8 +34753,11 @@ function flTestLMStudio() {
+       if (models.length > 0) {
+         if (result) result.innerHTML = '<span style="color:var(--success);">\u2713 LM Studio connected! Models: ' + models.join(', ') + '</span>';
+         // Auto-select the first model if user wants
++        // v-model-choice-survives-reload-v0.1.1: keep the person's LM Studio model when it is here;
++        // the first model is an automatic pick ('auto', never 'user'). Was: set(models[0], 'lmstudio', 'user').
+         if (typeof FLActiveModel !== 'undefined') {
+-          FLActiveModel.set(models[0], 'lmstudio', 'user');
++          var hL = FLActiveModel.honor ? FLActiveModel.honor(models, models[0], 'lmstudio') : { model: models[0], source: 'auto', gone: false };
++          if (!hL.gone) FLActiveModel.set(hL.model, 'lmstudio', hL.source);
+         }
+         if (typeof state !== 'undefined') {
+           state.isLocal = true;
+@@ -34826,12 +34836,14 @@ function flAutoConnect(opts) {
+         window._flAutoConnected = true;
+         var firstName = (models[0].name || models[0].id || 'default').split(':')[0];
+         // Reuse existing activation path — do not duplicate logic
++        // v-model-choice-survives-reload-v0.1.1: the person's model when it is here
++        var autoName = flHonorModel(models, models[0].name || models[0].id || 'default', t.id);
+         if (typeof modalActivateOllamaModel === 'function' && t.id === 'ollama') {
+-          modalActivateOllamaModel(models[0].name || models[0].id || 'default');
++          modalActivateOllamaModel(autoName);
+         } else {
+           state.isLocal = true;
+           state.provider = t.id;
+-          state.ollamaModel = models[0].name || models[0].id || 'default';
++          state.ollamaModel = autoName;
+           localStorage.setItem('fl_isLocal', 'true');
+           localStorage.setItem('fl_provider', t.id);
+           localStorage.setItem('fl_ollamaModel', state.ollamaModel);
+@@ -34880,6 +34892,10 @@ async function flProbeLocalAI() {
+     var data2 = await r2.json();
+     var models = (data2.data || []).map(function(m) { return m.id; });
+     if (models.length > 0) {
++      // v-model-choice-survives-reload-v0.1.1: keep the person's LM Studio model when it is here
++      var lmPick = flHonorModel(models, models[0], 'lmstudio');
++      var lmMine = (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen() && FLActiveModel.get().model === lmPick);
++      if (lmPick !== models[0]) { models = [lmPick].concat(models.filter(function(x) { return x !== lmPick; })); }
+       state.provider = 'lmstudio';
+       state.ollamaModel = models[0];
+       safeSet('fl_provider', 'lmstudio');
+@@ -34887,7 +34903,7 @@ async function flProbeLocalAI() {
+       if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+         PROVIDERS.lmstudio.url = lmsBase + '/v1/chat/completions';
+       }
+-      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', 'boot');
++      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', lmMine ? 'user' : 'boot');
+       if (typeof updateStatus === 'function') updateStatus();
+       if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
+       showToast('\u2713 Connected to LM Studio! Using ' + models[0]);
+@@ -36229,9 +36245,15 @@ window.FLActiveModel = (function() {
+   var _model = null;
+   var _provider = null;
+   var _source = null; // 'user', 'auto', 'boot'
++  // v-model-choice-survives-reload-v0.1.1 (Hypha walk 5): boot paths (the Cascade, the
++  // saved-door pointer) ran before init(), so the person's saved choice looked empty and
++  // the first model won. Now the saved choice is read the first time anyone asks.
++  var _ready = false;
++  function ensure() { if (!_ready) init(); }
+ 
+   function set(model, provider, source) {
+     if (!model) return;
++    ensure();
+     _model = model;
+     _provider = provider || 'ollama';
+     _source = source || 'auto';
+@@ -36251,17 +36273,63 @@ window.FLActiveModel = (function() {
+     }
+   }
+ 
+-  function get() { return { model: _model, provider: _provider, source: _source }; }
+-  function isUserChosen() { return _source === 'user'; }
++  function get() { ensure(); return { model: _model, provider: _provider, source: _source }; }
++  function isUserChosen() { ensure(); return _source === 'user'; }
++
++  // v-model-choice-survives-reload-v0.1.1: one guard for every path that picks a model by itself.
++  // models: names or {name|model|id}. fallback: what that path would pick. provider: its provider.
++  // Returns { model, source, gone }. The person's choice wins when it is on the list (or the list
++  // is empty: a quiet answer never replaces anything). When it is gone, noteGone() falls back and
++  // says so. An automatic pick is always 'auto', never 'user'.
++  function _names(models) {
++    return (models || []).map(function(m) { return String((m && typeof m === 'object') ? (m.name || m.model || m.id || '') : (m || '')); }).filter(Boolean);
++  }
++  function _onList(names, n) {
++    n = String(n || '');
++    if (!n) return false;
++    return names.some(function(mn) { return mn === n || mn === n + ':latest' || (n.indexOf(':') === -1 && mn.split(':')[0] === n); });
++  }
++  function honor(models, fallback, provider) {
++    ensure();
++    var prov = provider || 'ollama';
++    if (_source === 'user' && _model && (_provider || 'ollama') === prov) {
++      var names = _names(models);
++      if (!names.length || _onList(names, _model)) return { model: _model, source: 'user', gone: false };
++      if (fallback) noteGone(_model, fallback, prov);
++      return { model: fallback || _model, source: 'auto', gone: true };
++    }
++    return { model: fallback, source: 'auto', gone: false };
++  }
++  // The chosen model left this computer: use what is here, keep it 'auto', and say so in plain words.
++  function noteGone(chosen, pick, provider) {
++    ensure();
++    if (!pick || _source !== 'user' || _model !== chosen) return;
++    safeSet('fl_modelChoiceGone', chosen);
++    set(pick, provider || 'ollama', 'auto');
++    try {
++      if (typeof showToast === 'function') showToast('The model you chose, ' + chosen + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
++    } catch (eT) {}
++    try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++  }
+ 
+   function init() {
++    _ready = true;
+     _model = safeGet('fl_ollamaModel', null);
+     _provider = safeGet('fl_provider', null);
+     _source = safeGet('fl_modelSource', 'boot');
+   }
+ 
+-  return { set: set, get: get, isUserChosen: isUserChosen, init: init };
++  return { set: set, get: get, isUserChosen: isUserChosen, init: init, honor: honor, noteGone: noteGone };
+ })();
++// v-model-choice-survives-reload-v0.1.1: short form for the older paths that write a model by
++// themselves (Test Ollama, Local without Connect, LM Studio probe, discovery): the person's model
++// when it is here, else that path's own pick.
++function flHonorModel(list, fallback, provider) {
++  try {
++    if (typeof FLActiveModel !== 'undefined' && FLActiveModel.honor) return FLActiveModel.honor(list, fallback, provider).model || fallback;
++  } catch (e) {}
++  return fallback;
++}
+ 
+ window.FLAutoModel = (function() {
+   var VISION_RE = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
+@@ -36307,12 +36375,8 @@ window.FLAutoModel = (function() {
+       if (!pool.length) pool = models;
+       var pick = String((pool[0] && (pool[0].name || pool[0].model)) || '');
+       if (!pick) return;
+-      safeSet('fl_modelChoiceGone', current.model);
+-      FLActiveModel.set(pick, 'ollama', 'auto');
+-      try {
+-        if (typeof showToast === 'function') showToast('The model you chose, ' + current.model + ', is no longer on this computer. Using ' + pick + ' for now. You can pick another in Connect.', 7000);
+-      } catch (eT) {}
+-      try { if (typeof AiSetup !== 'undefined' && AiSetup.refreshSettingsCard) AiSetup.refreshSettingsCard(); } catch (eS) {}
++      // v-model-choice-survives-reload-v0.1.1: same words, one home (FLActiveModel.noteGone).
++      FLActiveModel.noteGone(current.model, pick, 'ollama');
+     });
+   }
+ 
+@@ -39686,7 +39750,7 @@ async function autoDiscoverAI() {
+       if (best.type === 'ollama') {
+         state.isLocal = true;
+         state.provider = 'ollama';
+-        state.ollamaModel = best.models[0] || 'llama3.2';
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || 'llama3.2', 'ollama'); // v-model-choice-survives-reload-v0.1.1
+         try {
+           localStorage.setItem('fl_isLocal', 'true');
+           localStorage.setItem('fl_provider', 'ollama');
+@@ -39696,7 +39760,7 @@ async function autoDiscoverAI() {
+         // OpenAI-compatible server
+         state.isLocal = true;
+         state.provider = 'openai-compat-local';
+-        state.ollamaModel = best.models[0] || 'default';
++        state.ollamaModel = flHonorModel(best.models, best.models[0] || 'default', 'openai-compat-local'); // v-model-choice-survives-reload-v0.1.1
+         state._localAIUrl = best.url;
+         state._localAIName = best.name;
+         try {
+@@ -39771,7 +39835,12 @@ async function runConnectionCascade(info) {
+ 

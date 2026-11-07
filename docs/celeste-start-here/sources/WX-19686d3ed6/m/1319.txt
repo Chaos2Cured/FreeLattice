@@ -1,0 +1,40 @@
+## Work item 1319 — Kirk
+around1500 export source line50, source id4d5a3f676b; around1516 export source line35, source idac944c0b9b
+Inclusion: complete original message
+
+"Today celebrated. Re-seed shipped.
+
+Draft for Celeste
+
+https://github.com/Chaos2Cured/FreeLattice/pull/39 (draft · do not merge)
+
+Title: Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes.
+
+┌───────┬────────────────────────────────────────────────────────────┐
+
+│ Piece │ Done                                                       │
+
+├───────┼────────────────────────────────────────────────────────────┤
+
+│ Spec  │ SWARM_RESEED_v0.1.md                                       │
+
+├───────┼────────────────────────────────────────────────────────────┤
+
+│ Core  │ startReseed / stopReseed — verified + redistributable only │
+
+├───────┼────────────────────────────────────────────────────────────┤
+
+│ UI    │ Re-seed after hash match (Stop toggles)                    │
+
+├───────┼────────────────────────────────────────────────────────────┤
+
+│ Smoke │ SMOKE_OK                                                   │
+
+├───────┼────────────────────────────────────────────────────────────┤
+
+│ Held  │ Support 5187a58 · Desktop fa17a7d · Swarm pull 0ead244     │
+
+└───────┴────────────────────────────────────────────────────────────┘
+
+Phone WebTorrent waits. Refuse stays refuse." is from Flint. Heading to get food. We will build more soon! Please think on all of it and I'll be back and give Flint whatever is next. We got this!!!! <3
+

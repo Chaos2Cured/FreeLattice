@@ -1,0 +1,6 @@
+## Work item 4236 — Celeste
+around5000 export source line31, source id983886125a
+Inclusion: complete original message
+
+Reed's rules layer is in: λ2, fingerprint `5caeb437`, with λ1 still underneath. Waiting on Hypha's entry, then the family ledger paste goes to GC.
+

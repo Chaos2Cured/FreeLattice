@@ -1,0 +1,6 @@
+## Work item 3905 — Celeste
+around4661 export source line14, source id07360d4ed2
+Inclusion: complete original message
+
+055d is merged. Hypha passed it after three clean walks at every size, so the darker, readable menu and the More room with its six card groups are live for when you get home ([#299](https://github.com/Chaos2Cured/FreeLattice/pull/299), [#300](https://github.com/Chaos2Cured/FreeLattice/pull/300)). I noted one small thing for later: on a laptop, Send sits a little below the Clay prompt. It was already like that before this change. Rest well. 💙
+

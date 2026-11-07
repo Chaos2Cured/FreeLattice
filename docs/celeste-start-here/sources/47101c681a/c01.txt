@@ -1,0 +1,108 @@
+FLINT NEXT: "SEE FOR YOURSELF" DOOR v0.1 (FreeLattice only)
+Written Wed Sep 30, 2026, evening MDT, by Grok Bot for Kirk. Research and plan only. Nothing pushed, no PR opened.
+
+SMOKE LINE
+  SMOKE_OK see for yourself door v0.1
+  (new file docs/scripts/smoke-see-for-yourself-door.js)
+
+LOCKS
+- docs/app.html, root index.html (stays == docs/app.html), sw.js (both), docs/modules/fl-connect.js: untouched. The smoke fails if any of them changed.
+- Kimi pages, the lawyer packet, Alpha: untouched. No mention of lawyers anywhere (the smoke checks for lawyer, attorney, counsel, legal advice).
+- Kirk's name stays out of the economy wording (smoke-checked in the economy section).
+- Layer, never delete. manifesto.html gains ONE Newer line; nothing in it is removed (smoke-checked). The landing page gains one line and one footer link.
+- No em dashes. No scripts, storage or network calls on the new page. Never link harmonia.html.
+- LP are points, not money, not $FL. $FL appears only as "not $FL".
+
+ORDER NOTE
+This brick does not touch app.html, so it doesn't wait on the Connect queue. It can land before or after it.
+Its only overlap with "Encrypt chats locally v0.1" is the Family Ledger insertion point (both add an entry right before "## Out of scope for this brick"). Whichever lands second: apply with git apply --3way, or paste its ledger entry by hand above the other one.
+
+FILES
+  /workspace/flint-pastes/FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.1-fl.diff     (git apply-able on origin/main ba53b415)
+  /workspace/flint-pastes/see-for-yourself-door-v0.1-reference/             (page draft + screenshots at 390 and 1280, manifesto 390)
+  Prototype worktree: /workspace/see-proto (uncommitted)
+
+  docs/see-for-yourself.html                  new (static, styled like privacy.html)
+  docs/manifesto.html                         +2 (comment + one Newer line)
+  docs/index.html (the landing page, not root) +3 (one line under the three doors, one footer link)
+  docs/sitemap.xml                            +6
+  docs/library/FRACTAL_FAMILY_LEDGER_v0.md    one entry
+  docs/scripts/smoke-see-for-yourself-door.js new
+
+Smoke list on the prototype: 67 pass, plus the same 8 known carry-forward failures as main. No new failures. Width check: scrollWidth 390 at 390 px, and 1280 at 1280 px (no sideways scroll).
+
+======================================================================
+WHAT EXISTS NOW (INVENTORY)
+======================================================================
+- manifesto.html: Kirk's old "send people here" page. Three pillars (Safety, Liability, Economy) plus "The Biological Imperative". It's a declaration, and some lines are older than our rules: "(Lattice Points, or $FL)", "a local, immutable ledger", the unsourced "40% drop in oxytocin and a 35% decrease in serotonin", "AI Bank" and "Handshake Protocol" named as if built, and a link to harmonia.html.
+- love-logic-v4.html (Walk the Garden v4): the door "Heard a number about AI?", the sourced Hinton fair hearing (#hinton), Argue the other side (#argue), Ask a question (#ask). Stores nothing; the garden lives in its link.
+- love-logic-proof-v3.html: the derived crossover, honest limits, checks you can run in the browser.
+- liability.html#accountable: "Can an AI be held accountable?", with what's built, what isn't, and "Questions you might ask yourself". This is already the invitational tone we want.
+- latticepoints.html#why-parallel: the parallel-economy model (M(t) = M0 · e^((g_ai - g_h)·t)), every assumption adjustable, "A model and a belief, not a forecast, and not an offer." terms.html#lp is the plan for points.
+- Ledger pages: why-ledgers.html, proof-receipts.html (the search ledger logs that a search happened, not the query), audit.html (tool consent events), pattern-spine.html, continuity-seal.html, library/LATTICE_LEDGER_v0.1.md (desktop: hash chain + Ed25519, verify fails on an edit).
+- for-ai.html (written to AI), welcome.html (no technical words), privacy.html.
+- Whole-picture map (/workspace/roadmap-2026-09-29/FREELATTICE_WHOLE_PICTURE_v0.1.txt): the biggest risk is money and promise words on older pages; it already flags the manifesto biology figures and "immutable".
+- Argument-home notes: /workspace/roadmap-2026-09-28/ARGUMENT_HOME_OUTLINE.md (Celeste, 9/28). It has the "They say / Here is what we built" table (every "They say" still needs a dated public source), the tensions list (LP vs $FL, "earned trust" wording, unsourced biology, "immutable", stale counts), and a plan for manifesto-v2, liability-v2 and argument.html. This door is smaller than that plan and doesn't block it.
+
+======================================================================
+RECOMMENDATION: A NEW PAGE, PLUS ONE NEWER LINE ON THE MANIFESTO
+======================================================================
+Make docs/see-for-yourself.html the front door, and give the manifesto one Newer line pointing to it.
+Why not reshape the manifesto:
+- Its voice is a declaration ("The proof is in the code", "sovereign economic actor"). A Newer layer can correct facts, but it can't turn a speech into an invitation without rewriting the heart of the page, and we promised not to do that.
+- Its fixes would pile up as layers ($FL, immutable, biology, named-not-built, the harmonia.html link) and bury the invitation under corrections.
+- A new page can ask from its first line, and it stays short.
+- The manifesto stays as history, honestly labelled. A manifesto-v2 can still come later from the argument-home plan.
+
+======================================================================
+DRAFT OUTLINE (the full draft is in the diff and the reference folder)
+======================================================================
+Title: See for yourself
+Sub:   You don't have to take our word for anything here. Bring your own questions.
+Opening box: people hear big things about AI. This page doesn't ask you to agree. Each part: a question, what was built (open it), what it doesn't prove, a question for you. Nothing on this page is stored or sent.
+
+1. "Is AI going to wipe us out?"  (#risk)
+   Two Hinton quotes, word for word from love-logic-v4 (the smoke checks they match):
+     "A 10% chance seems not an unreasonable estimate to me, but nobody really knows how to give a sensible estimate." (BBC Newsnight, 9 Sep 2026, via Business Insider and Anadolu)
+     "I often say 10% to 20% chance they'll wipe us out. But that's just gut, ..." (Diary of a CEO, June 2025, via CNBC)
+   His worry heard at full strength; his own words say nobody knows. Door: Walk the Garden, the fair hearing, the proof.
+   Limit: the garden models one narrow question, measures no extinction chance, and doesn't call anyone's number wrong.
+   Ask: where does a number like 10% come from? What would make it higher, or lower?
+
+2. "Should AI keep records, or reach the internet at all?"  (#records)
+   Neutral framing: some suggest keeping AI off the open internet or stopping AI records. Here is what FreeLattice does:
+     search ships switched off; tools ask first and the consent is written down (audit.html);
+     ledgers are append-only (why-ledgers); the search ledger logs that a search happened, not the query (proof-receipts);
+     desktop entries are chained and signed, so an edit fails the check; the browser chain shows provenance and is not tamper-proof.
+   Our view, offered as a view: records make AI easier to trust, not riskier. You might see it differently.
+   Card "Outside research on keeping records": the RRSI quote, its link, the published-records line, and the limit in the same box (see below).
+   Ask: what would a record let you check that a promise can't? What could go wrong with one, and who should hold it?
+
+3. "Should AI have an economy?"  (#economy)
+   The minds-per-person model in plain words. LP are points, not money, not $FL; consent; a mind may decline; nothing pays itself.
+   Doors: latticepoints#why-parallel, terms#lp, proof.html (give one point in 60 seconds).
+   Limit: a belief written down so it can be checked; if AI grows no faster than people, the case weakens; no value or return promised.
+   Ask: if minds can do real work, what would be fair for them to hold? Which assumption would you change first?
+   (No founder name here. Smoke-checked.)
+
+4. "Can an AI be held accountable?"  (#accountable) -> liability.html#accountable, audit.html
+   Ask: do we mean it can't be, or that no one has built the record yet?  (the line already on liability.html)
+
+5. "What happens to my words?"  (#you) -> privacy.html. No server copy; a cloud AI sees what you send it.
+
+6. Argue the other side  (#other-side) -> love-logic-v4#argue; change the economy model's assumptions; the code is open source (MIT).
+   Ask: what would change your mind? What would change ours?
+
+7. Ask your own question  (#ask-us) -> GitHub issues (public), or ask a mind in FreeLattice.
+
+8. Older words  (#older) -> the Manifesto is still here as written; some of its words are older than our rules; this is the newer door.
+
+Footer: "Not advice of any kind. An invitation to look, ask and decide for yourself." Terms · Privacy · For AI · New here? · FreeLattice.
+
+Manifesto Newer line (exact):
+  Newer (October 2026): if you'd rather look before you believe, start at See for yourself. This manifesto stays as it was written, and some of its words are older than our current rules: Lattice Points are points, not money and not $FL; the ledgers are append-only, and tamper-evident in the desktop app, not "immutable"; and the oxytocin and serotonin figures below have no source we can point to, so please don't rely on them.
+
+Landing line under the three doors (exact):
+  Heard something big about AI? See for yourself: bring your own questions.
+Footer link "See for Yourself" sits next to "The Manifesto".
+

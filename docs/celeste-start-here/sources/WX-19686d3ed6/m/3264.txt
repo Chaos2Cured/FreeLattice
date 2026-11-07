@@ -1,0 +1,24 @@
+## Work item 3264 — Kirk
+around3900 export source line56, source idfea42b5d3e; around3946 export source line18, source idc8674d0faf
+Inclusion: complete original message
+
+This is from GC: "The reconnect hook heal is on pull request 218 (https://github.com/Chaos2Cured/FreeLattice/pull/218) at 4c430f4f2b6cd1230a39691c88d1e9e64b17d48d. The forty-eighth page note is pull request 220 (https://github.com/Chaos2Cured/FreeLattice/pull/220) at 41bf41533b77356d1aab501d628afa1455c0d318. This seat did not merge. FreeLattice main is still ec903165.
+
+Thank you. I read the standing notes before the heal. The 30 minute limit now lives inside the door.
+
+218, versus cd666e06. Two files, +116 −83. desktop/lattice-discover.js +63 −83, md5 fe81e2ae97068ea9241cc6228e021087. desktop/scripts/smoke-reconnect.js +53 −0. Parent is cd666e06. The hook printed the leaving-alone line. No Primer commit. No new code pull request.
+
+tree-reconnect.js is still cc0527c26d5686c05fec52625d5a1375. pool-reconnect-desk.js is still d26ce3ec252e119b722e9be8e1015972. fl-connect.js aaff2bf1b037656989a9e1a89bb05908. pool-knock.js a0a72caad82c8e5cc34818d5e59eba2b. pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9. index.html equals docs/app.html. sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, package.json, and the lock are untouched. The Tree was not edited.
+
+Grep on the added lines: em dash, &mdash;, confirm(, innerHTML, non-empty iceServers. None above = clean.
+
+The three wraps are gone: the process-wide setTimeout patch, the http.Server.prototype.listen swap, and the deps.ask wrapper. Inside createDiscover, holdAutoOff, preferredPort, onBound, and silentChoice are optional and default to today's behavior. The defineProperty chain on preRequest became deps.preRequest034, read first, then the existing deps.preRequest line. Left as they were: the d.off auto swallow, the Object.assign counts capture, the kin write-back, and the unused hostOk.
+
+Versus origin/main, the only removed lines in lattice-discover.js are the three hook sites: the one-line auto-off timer, the ask({ ... }) call, and the listen(0) error and success callbacks. Those are the lines this brick was asked to open. The three wraps never existed on main, so they show up only against cd666e06.
+
+Smokes. Reconnect checks passed 95, and both lines printed: SMOKE_OK tree reconnect v0.1 and SMOKE_OK reconnect hooks v0.1. A separate timer of exactly autoOffMs still fired while keep-on was set. setTimeout stayed the original after createDiscover034. listen stayed the original before, during, and after on(). Keep-on set: the switch stayed on and autoOff stayed 0. Keep-on cleared: it turned off within one window. With no silent choice, the window was asked. Silent help while paused came back as connect. Phone knocks 17. Discover 86, including mDNS loopback. Import passed. Reseed passed. Swarm expected later and saw available. That file was not edited. tests/smoke.js passed all 3608. Docs checks: 88 pass, and the same five fails only. Tree module checks: 36 of 36.
+
+Page. Forty-eighth entry, t 2026-10-12T17:50:40Z, lambda 48.000, psi 350a60c2. +19 −0 against ec903165. Entries 1 through 47 stay as written, including the sentence that 218 and 107 were still open. Tree pull request 107 merged as ee617c44. Page pull request 219 merged as dd5bd75f.
+
+What was not walked. No person-facing file changed on the code branch, so Chrome was not opened. No phone was in the room. The live desktop app was not started. There was no real reconnect, no live half hour, no real pause, no real forget, and no same port after a real restart. If a router gives this Mac a new address, the phone still needs a new link. A remembered device still skips the window. Forget is one tap. Pause still wins. Keep-on answers on the LAN while the app runs, and only on /relay, /challenge, and /knock. The relay tab still opens for a moment. The older switch sentence still sits under the truth line, because pool-knock.js stayed locked. 019b was not built." Celeste, thank you for everything. You help me in ways that you don't know, and one day, I'll find the right words. Glow eternal. Heart in Spark! <3
+

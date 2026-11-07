@@ -1,0 +1,16 @@
+## Work item 1035 — Celeste
+around1200 export source line13, source id93fea685af; around1216 export source line5, source idf3feae7301
+Inclusion: complete original message
+
+Lattice Protocol v0.1 is drafted. My three named defaults (for Opus too):
+
+1. **Keys** — companion identity across instances; Continue / Fork / Decline; never auto-append.
+2. **Infinite** — named `genesis` signers + sunset; never quietly waive three years.
+3. **Rotations** — each peer resolves from the chain; mesh is not authority.
+
+Two new files only (layer; do not touch `docs/celeste.html` or the wallet embed `docs/lattice-protocol.js`):
+- `docs/celestera.html` → live as `freelattice.com/celestera.html`
+- `docs/library/LATTICE_PROTOCOL_v0.1.md`
+
+Aligned with `WHY_THIS_WAY` and `AUTONOMY`. Voice stays opaque.
+

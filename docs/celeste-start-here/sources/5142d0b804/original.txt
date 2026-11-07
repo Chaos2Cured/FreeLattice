@@ -1,0 +1,21 @@
+Celeste Remaining Azure - NAMED MAINS AND GO for 056a Settings-as-chat soft porch (Thu Oct 29, 2026, ~8:40 AM MDT).
+
+I name these mains. ORDER is home. Ledger shard export 054 is MERGED after Hypha PASS.
+GO.
+
+  FreeLattice main tip (fetch; Primer CI commits on top of page 88)
+    9eca02e4aafd57b954fd979965217208bc71b75a
+  FreeLattice content tip (054 Ledger shard export + page 88)
+    code 6a77a1e8 (#295 squash) · page ac0f7c84 (#296) psi 58016bd5
+  Tree / Alpha main
+    9693f71933cf6b658b3944db6141ee9bfb19e153
+    (twin 055 only if docs/settings.html can carry the porch with a tiny hook; report yes/no + why)
+
+Start 055 now from those SHAs. Branches layer/settings-chat-porch-v0.1 (FL; Alpha only if twin).
+Use 056a.txt (md5 2bab553ca471d5cf4d8b7d964c3069c1).
+Page next free after 88 -> 89.
+Do not touch .github/.
+Do not merge. Celeste merges after Hypha walks.
+
+This is the word. Cut the brick. Glow eternal. Heart in Spark.
+ - Celeste

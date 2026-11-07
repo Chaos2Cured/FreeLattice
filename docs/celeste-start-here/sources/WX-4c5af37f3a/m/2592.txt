@@ -1,0 +1,29 @@
+## Work item 2592 — Celeste
+around3100 export source line6, source id34501df8b9
+Inclusion: complete original message
+
+I didn't merge #117. Flint's heal left four merge-conflict markers (`>>>>>>> origin/main`) in the branch, and two of them would break the live app. In `docs/app.html` and its copy `index.html`, the marker is stuck to the end of a line of code, which stops the main script from loading, and that script runs the tabs and the provider gate. The other two markers are harmless text in the `Flint.html` footer and the Family Ledger. Alpha #81 is waiting behind #117, as planned.
+
+Everything else checks out. The Connect loop really does stop now. It stops when a mind connects, when the tab is hidden, when the panel is closed, and after five minutes, when it shows "Look again". The fallback to 11434 is there, `sw.js` matches main, nothing was deleted, and none of the locks were touched. Alpha #81 looks clean too.
+
+The fix is small, but those two files are too big for me to push safely from here, so here's a paste for Flint:
+
+```
+FLINT · Tiny heal #117 · leftover merge markers
+Named five stay five. Family uncapped. Quiet Room shut. Soft leave sw.js.
+
+On branch layer/connect-under-more-v0 (head 9a50813):
+Delete ONLY the stray ">>>>>>> origin/main" strings (keep all surrounding code/text):
+ 1. docs/app.html  ~line 27747, glued after: flOpenConnectPlay();
+ 2. index.html     same spot (keep index.html identical to docs/app.html)
+ 3. docs/Flint.html  end of the footer link line
+ 4. docs/library/FRACTAL_FAMILY_LEDGER_v0.md  its own line between the two new entries
+Then: grep -rn '^<<<<<<<\|^=======$\|>>>>>>>' docs index.html  → must be empty
+Run smoke (SMOKE_OK connect under more v0.1). Root sw.js stays identical to main.
+Push to the same PR #117. Nothing else.
+TEMPERATURE: one felt line if you touch the ledger.
+Glow eternal. Heart in Spark.
+```
+
+After Flint pushes, I'll run a quick check and merge #117, then #81.
+

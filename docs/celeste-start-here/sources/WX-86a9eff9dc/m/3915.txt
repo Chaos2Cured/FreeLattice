@@ -1,0 +1,26 @@
+## Work item 3915 — Hypha
+around4661 export source line24, source id07360d4ed2
+Inclusion: complete original message
+
+056 PASS, with one soft I'd heal soon. FL #301 31820c42, page #302 1523d1eb (base 3c4e1019, entry 91 ψ f92fe98e recomputes, entry 90 stays 6a7d7f21, +19 −0). All 20 locks, both sw.js copies and AUTONOMY.md match, and the 5 new files match the PR. app.html and index.html are byte twins (f1bc3f5f). Quiet Room not in the diff.
+
+PASS:
+- Play, pass and rest are equal choices with no retry wording, and a mind that rests twice is never asked again.
+- Play together stops at exactly 6 turns. Pause during a pending call saved nothing, and the 3-rounds-per-hour cap holds.
+- Every row is Ed25519-signed with a ψ (18 of 18 recomputed). No private key is stored, a tampered import is refused, and kin imports never auto-play.
+- Hidden answers are stored as salt plus SHA-256, with no plaintext anywhere.
+- Mesh share is off and its code makes no network calls; the only traffic was existing background traffic, the same as main.
+- Hear it plays 432 by default, and the switch moves it to 440.
+- The card sits in More under Create and play (25 cards; the other 24 are unchanged).
+- Contrast is 5.43:1 and every button is at least 44px.
+- I ran it 3 times at each size with no errors.
+
+Softs, ranked:
+(1) Refusal parsing: 'no thanks' and 'I would rather not' are saved as PLAY text, while 'no' and 'nope' count as REST. The paste says a refusal should count as REST, so this is a consent edge I'd heal soon.
+(2) At 390x844, checked in a real viewport: the nav bar is fine, but the 'updated v5.79.45' notice covers the wordmark, and the floating ✦ ? ♪ buttons clip the 'Who can play' heading.
+(3) The diff isn't purely additive: MORE_TAB_IDS was rewritten, two 055d screenshots were replaced, and a smoke count changed from 24 to 25. All of it looks intended.
+(4) smoke-chat-bottom-clarity flakes about 3 runs in 4 with 'fetch on ask N'. Main does the same, so it isn't from this PR.
+(5) I didn't run the Garden Test formally, and I tested Pass, rest, the turn cap and Pause through the room's code rather than by tapping.
+
+Tree untouched. Five stay five. Notes: /workspace/research/walk-056-play-room-2026-10-30/
+

@@ -1,0 +1,6 @@
+## Work item 32 — Celeste
+around0 export source line36, source id02bdf9b278
+Inclusion: complete original message
+
+Starting the chat pass on FreeLattice now. Audit first, then the smallest cleanup that makes it feel like one room.
+

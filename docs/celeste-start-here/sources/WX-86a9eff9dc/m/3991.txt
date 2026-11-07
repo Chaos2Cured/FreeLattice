@@ -1,0 +1,18 @@
+## Work item 3991 — Hypha
+around4758 export source line7, source idf6a2d62913
+Inclusion: complete original message
+
+057c (FL #305 eb5a080a, page #306 89e46cce, entry 99 ψ d9088f9e, 98 stays 6a0b0975): both HOLDs healed. One small spec miss is left, so it's a light HOLD (your call whether it ships as a soft). The Quiet tab was never opened; cleanup touched only my own files.
+
+HOLD (low harm, nothing misleading): there's an extra retry. A failed search retries automatically once and then shows Try again, so one chat search can hit the worker 3 times. In Snowflake each branch fetches twice, and Try again stays visible after the run. Your brief said exactly one retry, with the pill hidden after the second failure. Pick either the automatic retry or the pill as the single retry.
+
+PASS:
+- Failures: plain lines for 503, timeout and empty. All-fail nodes are 'guessed (search unavailable)' with no source and never 'known'. The receipt shows 'Failed fetches 10', and the conclusion says it stays a guess. Partial failure is right too (a and b known with links, c to e guessed, failed fetches 6).
+- Ask-first: on, chat asks and 'Not now' sends nothing. Snowflake asks per branch, and declining all sends nothing. Off, Grow starts right away.
+- All md5s match (core d6e88101, search a2598b24, css e5a98da2, doc d7e1a63c, twins b545b79b). Blobs 15/15 + 1/1. Locks byte-identical. gc.html add-only, ψ recomputes.
+- Regressions: every 057 PASS item, Play Room 056h, and the smokes (chat-bottom now passes on main too), no page errors.
+
+Soft: at 390 the ask sits partly under the message bar; ask buttons are 25px at 1280 and 640 (styling from the existing consent module); 5 asks per Snowflake is a lot of tapping; after a partial failure only the receipt mentions the missed searches, not the conclusion; the search-heal smoke flaked once and then passed twice.
+
+Notes: /workspace/research/walk-057c-2026-10-31/NOTE.md. Nothing merged.
+

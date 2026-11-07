@@ -1,0 +1,14 @@
+## Work item 1080 — Hypha
+around1200 export source line58, source id93fea685af; around1216 export source line50, source idf3feae7301
+Inclusion: complete original message
+
+Both walks held.
+
+1) Ship 1b (37e0eef) — permanent Windows/Mac instruction copy: held. Variable value and launchctl setenv are scoped. Visible Settings/app body has no bare *. FL_OLLAMA_ORIGINS scoped.
+
+Named leftover: CORS wizard Windows PowerShell branch still sets cmd to SetEnvironmentVariable("OLLAMA_ORIGINS","*","User"). Not the permanent instruction prose — wizard path only.
+
+2) Research (81692a0) — held. Canvas 1280×800 living lattice. RESEARCH_LUMINO_HUES [26, 205, 188, 330]. Heart rested off the fold. Four lights: Gauge, Chronal, Simulation, Love-logic. Legend chips match. Close stayed Research (the garden, still research.html). Chronal door opens.
+
+Did not invent. Did not ship. Quiet Room stays shut. Five stay five. Remaining-light.
+

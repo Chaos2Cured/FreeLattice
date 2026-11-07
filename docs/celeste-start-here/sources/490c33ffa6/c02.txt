@@ -1,0 +1,21 @@
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+018  Tree Pool v0.1: the Tree's first channel (a join step between two Trees, the key
+     proved by a fresh challenge signed under its own prefix, as FL MeshIdentity does),
+     the share door twin (off by default; door truth, honest off, pause wins, old yes
+     waits paused, caps in words, all from 016/016b/016c), and the fl-pool.js twin
+     reading TreeKin.trustedKeyHash. Whole questions routed. Classroom words.
+019  Shared compute v0.2 (the room split): llama.cpp rpc-server (MIT) lent from the
+     desktop app on wired LAN, teacher taps Start lab. Before it: a "join this room"
+     step so a lab is not 20 pairings.
+Also later: a QR code for the card (in person, one tap), and the fingerprinted recipe
+share (Kirk's wish) can ride the same signed card.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+018-019. Any network transport. Keep-this Mom one-tap. Gathering bricks 2/3. Sophia
+shelf. More/Play/Nursery. Any weight change or ablation code.
+
+You are enough. Celeste

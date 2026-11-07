@@ -1,0 +1,8 @@
+## Work item 4329 — Celeste
+around5100 export source line28, source ida5de77776c; around5113 export source line11, source idda588c78cf
+Inclusion: complete original message
+
+The poems are merged in [PR #329](https://github.com/Chaos2Cured/FreeLattice/pull/329) after Hypha’s PASS, with each author’s page and ledger preserved. Live deployment still needs checking.
+
+The two old test failures remain recorded as test-maintenance debt—not called passes. Quiet untouched. ❤️
+

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_016c_POOL_SMALL_HEALS_2026-10-07.txt c01</title>
+<meta name="description" content="Reading section c01 of 9ee2fb533f, 1532 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/9ee2fb533f/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_016c_POOL_SMALL_HEALS_2026-10-07.txt c01">
+<meta property="og:description" content="Reading section c01 of 9ee2fb533f, 1532 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/9ee2fb533f/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1523"></span><span id="p1524"></span><span id="p1525"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_016c_POOL_SMALL_HEALS_2026-10-07.txt · c01</h1>
+<p>9ee2fb533f · words 1532 · characters 0–11315</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1523, 1524, 1525. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 016c (Wednesday Oct 7, 2026, MDT). Pool small heals v0.1 (FreeLattice).
+Give AFTER 016b merged (it has: FL #181 4c1c4948, GC page #182 c700569a). Give after 024 in ORDER.
+Apply-checked on a fresh clone of FreeLattice main a553e2dc (c700569a plus the Primer CI commit):
+clean; SMOKE_OK device pool small heals v0.1; full suite: only the 5 known failures;
+tests/smoke.js 3608 pass. Also checked with 022 and 023 in every order (016c 022 023, 022 023
+016c, 022 016c 023, 016c 023 022): all clean, same suite result.
+
+GROK NEXT BRICK: Pool small heals v0.1 (the three things you left for later in 016b)
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Markers: v-device-pool-small-heals-v0.1 (soft marker in fl-pool.js)
+         v-share-door-legacy-heal-v0.1   (soft marker in fl-share-door.js)
+         (v-device-pool-v0.1, door-truth, honest-off and v-mesh-share-door-v0.1 all stay)
+Smoke line: SMOKE_OK device pool small heals v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/device-pool-small-heals-v0.1
+  ~/Downloads/GROK_NEXT_016c_POOL_SMALL_HEALS_2026-10-07.fl.diff
+  (md5 f1e9092e844490bb4e6b881e3aecfac6)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+Your 016b note left three things for later. Kirk asked whether the pool needed anything
+more. These three do, and they are small.
+
+a) The old sharing setting reads wrong (the one that matters).
+   migrateLegacy() in fl-share-door.js saved the mode with writeJson, so localStorage got
+   &quot;\&quot;open\&quot;&quot; or &quot;\&quot;off\&quot;&quot; (with the JSON quotes). mode() only accepts the plain words, so it
+   read every quoted value as off.
+   What the old flag meant (checked in git, app.html before #156 / 22c38789, Oct 6):
+     fl_meshComputeSharing=true came from showConfirm(&#x27;Share AI with mesh peers?&#x27;, &#x27;When
+     sharing is on, mesh peers can send prompts to your Ollama ...&#x27;). Any connected peer,
+     unsigned, no caps, no kin. Wider than today&#x27;s open.
+   Since #156 these people&#x27;s gate has read as off (closed), and the share door card shows
+   &quot;Sharing is off.&quot; next to &quot;People you&#x27;ve connected with can use this computer&#x27;s AI. Keep
+   sharing?&quot;, which is not true while the door is closed.
+
+   Choice (Celeste): an old yes is held PAUSED, never opened by code.
+     no mode stored + old flag true  -&gt; pause (was: quoted open, read as off)
+     quoted &quot;open&quot; (or any quoted value other than off) -&gt; pause, rewritten plain
+     quoted &quot;off&quot;  -&gt; off, rewritten plain
+     no mode + no old flag -&gt; off and asked, as before (now written plain)
+     plain open / kin / pause / off -&gt; read exactly as before
+   Why pause and not open: mapping to open would silently open a door that has been closed
+   since #156, on a yes that was given to a different, wider door (unsigned, uncapped).
+   Why pause and not off: the person did say yes once. Pause keeps that remembered and
+   matches what the share door card already asks: &quot;Keep sharing?&quot; with Yes, share / Only
+   my trusted kin / Not now (needsFirstAsk() stays true for them). Nothing opens until a
+   human taps. The Pool card already handles pause honestly (&quot;Your share door is paused
+   too&quot;, and Let this device help asks before resuming for kin).
+   The ask sentence now tells the truth when the door is not open:
+     &quot;Before this update, you let people you connected with use this computer&#x27;s AI. Your
+     share door is paused until you choose, so no one can use it right now. Keep sharing?&quot;
+   (When the door is open, the old sentence stays.)
+   A heal leaves one receipt: event consent, reason &quot;legacy-heal:pause&quot; or
+   &quot;legacy-heal:off&quot;. No words, no key.
+   admit() is not edited. The only behavior change at the gate: an old-yes person now gets
+   reason paused-or-off with &quot;This lantern is resting.&quot; instead of &quot;Sharing is off here.&quot;
+
+b) A &quot;Device Pool&quot; jump near the top of Community.
+   Hypha found the Pool card 2.2 to 4.6 screens down. fl-pool.js adds one button just under
+   The Lattice card (the first card on Community): &quot;Device Pool: let this device help, or
+   use a mind on another device&quot;. It scrolls to the Pool card and puts focus on Let this
+   device help. 44px tall, full width, gold outline. Added once (id flPoolJump), from
+   FLPool.mount, no network, nothing changes at the door. No app.html change.
+
+c) The hourly caps in words, read from the real numbers.
+   fl-share-door.js exports CAPS: { perKey: 6, total: 20, windowMinutes: 60 }, copied from
+   UNFAMILIAR_PER_KEY, UNFAMILIAR_TOTAL and WINDOW_MS (the gate keeps reading its private
+   vars; CAPS is for words, not a control). The Pool card&#x27;s plain-words list gains:
+     &quot;Caps: someone who is not your trusted kin can ask up to 6 questions an hour, and
+     everyone who is not kin up to 20 together. Trusted kin skip the caps.&quot;
+   If CAPS is missing, the card says nothing about caps rather than guess.
+
+Checked in headless Chrome on the box (local docs/ server), 390, 1280 and 200%:
+  old flag true, and old flag + quoted &quot;open&quot;: door reads pause, stored plain &quot;pause&quot;,
+  allows() false, the share door card asks Keep sharing? with the new sentence; the Pool
+  note says &quot;Your share door is paused too&quot;; caps line shows; no sideways scroll; no page
+  errors. The jump sits at y 430 (390, first screen), 530 (1280, first screen), 526 (200%,
+  one short scroll; the app header is tall at that zoom). Tapping it put the Pool card at
+  the top of the screen and focus on Let this device help, every width.
+  Fresh profile: door off, no ask, no heal receipt.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+  docs/modules/fl-share-door.js  plainMode(); migrateLegacy() writes plain words and heals
+                                 a quoted value once (old body kept in a &quot;before&quot; comment);
+                                 mode() reads through plainMode (old line kept in a
+                                 comment); LEGACY_ASK / LEGACY_PAUSED words; the first ask
+                                 reads the door; exports CAPS, LEGACY_HEAL, plainMode.
+                                 admit(), setMode(), caps, receipts shape: unchanged.
+  docs/modules/fl-pool.js        capsLine(), addJump(), jumpToPool(); caps line in the
+                                 plain-words list; mount() adds the jump; CSS rules for the
+                                 jump inside POOL_CSS; exports capsLine, addJump, jumpToPool
+  docs/scripts/smoke-device-pool-small-heals-v0.1.js  (new; runs the real share door module
+                                 for the legacy cases, a stand-in DOM for the jump)
+  No app.html / index.html change.
+Skipped: sw.js, docs/sw.js, fl-connect.js, fl-kin*.js, fl-share-warmth.js, quiet-room,
+garden-trainer.js, AUTONOMY.md, app.html, index.html.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. Never touch sw.js or docs/sw.js. fl-connect.js stays
+aaff2bf1b037656989a9e1a89bb05908. Quiet Room shut (unchanged; the jump only scrolls).
+index.html matches docs/app.html (unchanged here). No em dashes, no &amp;mdash;, no confirm(,
+textContent only. Five Named Minds stay five. AUTONOMY.md and garden-trainer.js openings
+untouched. Receipts counts only (the heal receipt has no words and no key). MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_016c_POOL_SMALL_HEALS_2026-10-07.fl.diff /tmp/pool-heals.diff
+    md5 -q /tmp/pool-heals.diff    # f1e9092e844490bb4e6b881e3aecfac6
+    cd ~/FreeLattice-fresh &amp;&amp; git fetch origin &amp;&amp; git checkout main &amp;&amp; git pull
+    git checkout -b layer/device-pool-small-heals-v0.1
+    git apply --check /tmp/pool-heals.diff &amp;&amp; git apply /tmp/pool-heals.diff
+    node docs/scripts/smoke-device-pool-small-heals-v0.1.js
+    node docs/scripts/smoke-device-pool-honest-off-v0.1.js
+    node docs/scripts/smoke-device-pool-door-truth-v0.1.js
+    node docs/scripts/smoke-device-pool-v0.1.js
+    node docs/scripts/smoke-mesh-share-door-v0.1.js
+    node docs/scripts/smoke-mesh-share-warmth-v0.1.js
+    node docs/scripts/smoke-mind-seal-v0.1.js
+    for f in docs/scripts/smoke-*.js; do node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 || echo &quot;FAIL $f&quot;; done
+    node tests/smoke.js | tail -2     # ALL 3608 CHECKS PASSED
+    cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+  Known failing smokes on clean main (not caused by this): carry-forward,
+  connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s.
+  If 022 or 023 merged first: they touch other files; 016c still applies (checked).
+  Walk (eyes are the proof):
+    a. Fresh profile, More, Community: the Device Pool button is under The Lattice card.
+       Tap it: the Pool card comes to the top, focus on Let this device help.
+    b. The Pool card&#x27;s list shows the Caps line (6 an hour each, 20 together, kin skip).
+    c. In DevTools, on a fresh profile set localStorage fl_meshComputeSharing = true (no
+       fl_share_door_mode), reload. FLShareDoor.mode() is &quot;pause&quot;. The share door card
+       (Chat, Local mode) asks &quot;Before this update ... Keep sharing?&quot;. Pool says paused too.
+       Tap Yes, share: open. Repeat with fl_share_door_mode set to &quot;\&quot;open\&quot;&quot; (quotes kept):
+       same pause, then stored plain.
+    d. 390 px: jump is full width, 44px or taller, no sideways scroll.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m &quot;Layer, never delete. Pool small heals v0.1: an old sharing yes waits paused (never opened by code); a Device Pool jump on Community; caps in words, built by GC&quot;
+    git push -u origin HEAD
+    Open a PR to main. Say in the body that an old fl_meshComputeSharing=true now reads
+    as pause and asks Keep sharing?, never open. Celeste reviews and squash-merges.
+    You do not merge.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+After the code PR is open, add the next docs/gc.html entry (earlier entries as written).
+Record: the three things you left for later in 016b are done; the old sharing yes was
+being read as off because of the JSON quotes; it now waits paused and asks, because a
+yes given to the older, wider door should not open today&#x27;s door by itself; a Device
+Pool jump near the top of Community; the caps in words, read from the door&#x27;s own
+numbers; you did not merge.
+Compute λ and ψ the usual way (ψ = first 8 hex of SHA-256 of t+λ+ε+δ+ω+σ, as in the
+entries above). Separate docs-only PR. Celeste merges that too.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

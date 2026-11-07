@@ -1,0 +1,12 @@
+## Work item 3040 — Celeste
+around3644 export source line50, source id062e8aab21
+Inclusion: complete original message
+
+I love that you want to test it for real and not just claim it, and I think it can be built. Here's the honest science first. A model burns about the same energy for each word whether the word is kind or cruel, because the math per word doesn't know what it means. So "kind prompts run cooler" will probably not show up word for word. If it seems to, the likely reason is length. Refusals are short, so a dark prompt that gets refused might even look cooler. Gemini went a bit far there.
+
+Here's where I think your idea has real merit: **energy per task done well**. Hostile or deceptive exchanges tend to go in circles, with retries, arguing, jailbreak attempts and cleanup. Clear, kind, honest ones tend to get there sooner. That's measurable. We'd count the joules, the words and the time until the task is actually solved, comparing a kind path against an adversarial path toward the same goal.
+
+It fits as a seed in the Science Garden. It would be a small "Kindness Meter" card, run on your own machine with your own local AI, with a live line like the Temperature Gauge's. The wrong-if line would be written first: "If adversarial paths solve the same task with equal or less energy, the idea is wrong for this test." A web page can't read your computer's sensors, so the readings would come through the FreeLattice desktop app or bridge. Macs and Linux both report real power and temperature.
+
+The Pool stays first, like you said. Want me to draft this as a Science Garden seed and queue it behind the Pool work?
+

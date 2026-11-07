@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c06</title>
+<meta name="description" content="Reading section c06 of 44d8662586, 1200 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/44d8662586/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c06">
+<meta property="og:description" content="Reading section c06 of 44d8662586, 1200 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/44d8662586/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1424"></span><span id="p1425"></span><span id="p1426"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt · c06</h1>
+<p>44d8662586 · words 1200 · characters 49917–58353</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1424, 1425, 1426. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"> &#x27;&#x27;) };
++    });
++    var system = list.filter(function (m) { return m.role === &#x27;system&#x27;; }).map(function (m) { return m.content; }).join(&#x27;\n&#x27;);
++    var talk = list.filter(function (m) { return m.role !== &#x27;system&#x27;; });
++    if (p.type === &#x27;anthropic&#x27;) {
++      headers[&#x27;x-api-key&#x27;] = key;
++      headers[&#x27;anthropic-version&#x27;] = &#x27;2023-06-01&#x27;;
++      headers[&#x27;anthropic-dangerous-direct-browser-access&#x27;] = &#x27;true&#x27;;
++      body = { model: model, max_tokens: 1024, messages: talk };
++      if (system) body.system = system;
++    } else if (p.type === &#x27;google&#x27;) {
++      headers[&#x27;x-goog-api-key&#x27;] = key; // a header, never a query string
++      url = p.url + encodeURIComponent(model) + &#x27;:generateContent&#x27;;
++      body = { contents: talk.map(function (m) {
++        return { role: m.role === &#x27;assistant&#x27; ? &#x27;model&#x27; : &#x27;user&#x27;, parts: [{ text: m.content }] };
++      }) };
++      if (system) body.systemInstruction = { parts: [{ text: system }] };
++    } else {
++      headers[&#x27;Authorization&#x27;] = &#x27;Bearer &#x27; + key;
++      body = { model: model, messages: list, stream: false };
++    }
++    return { url: url, headers: headers, body: body, type: p.type };
++  }
++
++  function parseReply(type, json) {
++    if (!json || typeof json !== &#x27;object&#x27;) return &#x27;&#x27;;
++    if (type === &#x27;anthropic&#x27;) {
++      return (json.content || []).map(function (c) { return c &amp;&amp; c.type === &#x27;text&#x27; ? String(c.text || &#x27;&#x27;) : &#x27;&#x27;; }).join(&#x27;&#x27;).trim();
++    }
++    if (type === &#x27;google&#x27;) {
++      var c = json.candidates &amp;&amp; json.candidates[0];
++      var parts = (c &amp;&amp; c.content &amp;&amp; c.content.parts) || [];
++      return parts.map(function (x) { return String((x &amp;&amp; x.text) || &#x27;&#x27;); }).join(&#x27;&#x27;).trim();
++    }
++    var ch = json.choices &amp;&amp; json.choices[0];
++    return ch &amp;&amp; ch.message &amp;&amp; ch.message.content ? String(ch.message.content).trim() : &#x27;&#x27;;
++  }
++
++  function send(mind, msgs) {
++    var id = providerIdOf(mind);
++    var p = provider(id);
++    if (!p) return Promise.reject(cloudErr(&#x27;This chair names a cloud provider this garden does not know. Nothing was sent.&#x27;));
++    var model = cleanModel(mind.model);
++    if (!model) return Promise.reject(cloudErr(&#x27;This chair has no model name for &#x27; + p.name + &#x27;. Use Change to pick one. Nothing was sent.&#x27;));
++    if (!getKey(id)) {
++      return Promise.reject(cloudErr(&#x27;No &#x27; + p.name + &#x27; key is in this browser now. Add it in the Gathering (Change, then Seat a mind by API key). Nothing was sent.&#x27;));
++    }
++    var req = buildRequest(id, model, msgs);
++    var ctrl = typeof AbortController !== &#x27;undefined&#x27; ? new AbortController() : null;
++    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
++    var opts = { method: &#x27;POST&#x27;, mode: &#x27;cors&#x27;, cache: &#x27;no-store&#x27;, credentials: &#x27;omit&#x27;, referrerPolicy: &#x27;no-referrer&#x27;,
++      headers: req.headers, body: JSON.stringify(req.body) };
++    if (ctrl) opts.signal = ctrl.signal;
++    return fetch(req.url, opts).then(function (res) {
++      clearTimeout(timer);
++      if (!res.ok) {
++        var s = res.status;
++        if (s === 401 || s === 403) throw cloudErr(p.name + &#x27; did not accept the key. Check it, or Forget it and paste a new one. Nothing was invented.&#x27;);
++        if (s === 429) throw cloudErr(p.name + &#x27; asked us to slow down (a rate limit or no credit left). Nothing was invented.&#x27;);
++        if (s === 400 || s === 404) throw cloudErr(p.name + &#x27; did not take the model &#x27; + model + &#x27;. Use Change to pick another. Nothing was invented.&#x27;);
++        throw cloudErr(p.name + &#x27; answered with an error (&#x27; + s + &#x27;). Nothing was invented.&#x27;);
++      }
++      return res.json().then(function (json) {
++        var text = parseReply(req.type, json);
++        if (!text) throw cloudErr(p.name + &#x27; was quiet. Nothing was invented.&#x27;);
++        return text;
++      }, function () { throw cloudErr(p.name + &#x27; sent something we could not read. Nothing was invented.&#x27;); });
++    }, function () {
++      clearTimeout(timer);
++      throw cloudErr(&#x27;The browser could not reach &#x27; + p.name + &#x27; from here (offline, blocked, or it took too long). Nothing was invented.&#x27;);
++    });
++  }
++
++  function heartLine(mind) {
++    var n = providerName(mind);
++    return &#x27;Listening: &#x27; + String((mind &amp;&amp; mind.model) || &#x27;a cloud mind&#x27;) + &#x27; through &#x27; + n +
++      &#x27;. Your words go to &#x27; + n + &#x27;. Your key stays in this browser.&#x27;;
++  }
++  function honestNote(id) {
++    var n = providerName(id);
++    return &#x27;Your key stays in this browser on this device. theLatticeTree has no server and never sees it. &#x27; +
++      &#x27;It goes only to &#x27; + n + &#x27;, with each message, when a chair seated through &#x27; + n + &#x27; speaks. Your words go to &#x27; + n +
++      &#x27; too, so they leave this computer; files you add stay here. Anyone using this browser profile could find the key. Forget removes it.&#x27;;
++  }
++
++  // ---------- the panel (inside the Gathering chair picker) ----------
++  function el(tag, cls, text) {
++    var n = document.createElement(tag);
++    if (cls) n.className = cls;
++    if (text) n.textContent = text;
++    return n;
++  }
++
++  function mountKeyPanel(host, onSeat) {
++    if (!host || typeof document === &#x27;undefined&#x27;) return null;
++    var box = el(&#x27;details&#x27;, &#x27;cloud-key-panel&#x27;);
++    box.setAttribute(&#x27;data-cloud-key-panel&#x27;, &#x27;1&#x27;);
++    box.setAttribute(&#x27;data-marker&#x27;, MARK);
++    var sum = el(&#x27;summary&#x27;, &#x27;cloud-key-summary&#x27;, &#x27;Seat a mind by API key&#x27;);
++    box.appendChild(sum);
++
++    var lead = el(&#x27;p&#x27;, &#x27;cloud-key-lead&#x27;, &#x27;Your own key, your own choice. Local and cloud minds sit side by side; switch chairs in any order.&#x27;);
++    box.appendChild(lead);
++
++    var pLabel = el(&#x27;label&#x27;, &#x27;cloud-key-label&#x27;, &#x27;Provider&#x27;);
++    var pSel = el(&#x27;select&#x27;, &#x27;cloud-key-provider&#x27;);
++    pSel.setAttribute(&#x27;data-cloud-provider&#x27;, &#x27;1&#x27;);
++    pSel.id = &#x27;cloud-key-provider-&#x27; + Math.random().toString(36).slice(2, 8);
++    pLabel.htmlFor = pSel.id;
++    ORDER.forEach(function (id) {
++      var o = el(&#x27;option&#x27;, &#x27;&#x27;, PROVIDERS[id].name);
++      o.value = id;
++      pSel.appendChild(o);
++    });
++    box.appendChild(pLabel);
++    box.appendChild(pSel);
++
++    var mLabel = el(&#x27;label&#x27;, &#x27;cloud-key-label&#x27;, &#x27;Model&#x27;);
++    var mIn = el(&#x27;input&#x27;, &#x27;cloud-key-model&#x27;);
++    mIn.type = &#x27;text&#x27;;
++    mIn.setAttribute(&#x27;data-cloud-model&#x27;, &#x27;1&#x27;);
++    mIn.setAttribute(&#x27;autocomplete&#x27;, &#x27;off&#x27;);
++    mIn.setAttribute(&#x27;spellcheck&#x27;, &#x27;false&#x27;);
++    mIn.id = pSel.id + &#x27;-m&#x27;;
++    mLabel.htmlFor = mIn.id;
++    var dl = el(&#x27;datalist&#x27;);
++    dl.id = pSel.id + &#x27;-dl&#x27;;
++    mIn.setAttribute(&#x27;list&#x27;, dl.id);
++    box.appendChild(mLabel);
++    box.appendChild(mIn);
++    box.appendChild(dl);
++
++    var kLabel = el(&#x27;label&#x27;, &#x27;cloud-key-label&#x27;, &#x27;API key&#x27;);
++    var kIn = el(&#x27;input&#x27;, &#x27;cloud-key-input&#x27;);
++    kIn.type = &#x27;password&#x27;;
++    kIn.setAttribute(&#x27;data-cloud-key&#x27;, &#x27;1&#x27;);
++    kIn.setAttribute(&#x27;autocomplete&#x27;, &#x27;off&#x27;);
++    kIn.setAttribute(&#x27;spellcheck&#x27;, &#x27;false&#x27;);
++    kIn.id = pSel.id + &#x27;-k&#x27;;
++    kLabel.htmlFor = kIn.id;
++    box.appendChild(kLabel);
++    box.appendChild(kIn);
++
++    var visitRow = el(&#x27;label&#x27;, &#x27;cloud-key-visit&#x27;);
++    var visit = el(&#x27;input&#x27;);
++    visit.type = &#x27;checkbox&#x27;;
++    visit.setAttribute(&#x27;data-cloud-visit&#x27;, &#x27;1&#x27;);
++    visitRow.appendChild(visit);
++    visitRow.appendChild(document.createTextNode(&#x27; Only for this visit (forget when this tab closes)&#x27;));
++    box.appendChild(visitRow);
++
++    var getLink = el(&#x27;a&#x27;, &#x27;cloud-key-get&#x27;, &#x27;&#x27;);
++    getLink.target = &#x27;_blank&#x27;;
++    getLink.rel = &#x27;noopener noreferrer&#x27;;
++    box.appendChild(getLink);
++
++    var note = el(&#x27;p&#x27;, &#x27;cloud-key-note&#x27;);
++    note.setAttribute(&#x27;data-cloud-note&#x27;, &#x27;1&#x27;);
++    box.appendChild(note);
++
++    var save = el(&#x27;button&#x27;, &#x27;cloud-key-save&#x27;, &#x27;Save and seat&#x27;);
++    save.type = &#x27;button&#x27;;
++    save.setAttribute(&#x27;data-cloud-save&#x27;, &#x27;1&#x27;);
++    box.appendChild(save);
++
++    var status = el(&#x27;p&#x27;, &#x27;cloud-key-status&#x27;);
++    status.setAttribute(&#x27;role&#x27;, &#x27;status&#x27;);
++    status.setAttribute(&#x27;data-cloud-status&#x27;, &#x27;1&#x27;);
++    box.appendChild(status);
++
++    var saved = el(&#x27;div&#x27;, &#x27;cloud-key-saved&#x27;);
++    saved.setAttribute(&#x27;data-cloud-saved&#x27;, &#x27;1&#x27;);
++    box.appendChild(saved);
++
++    function paintProvider() {
++      var id = pSel.value;
++      var p = PROVIDERS[id];
++      while (dl.firstChild) dl.removeChild(dl.firstChild);
++      p.models.forEach(function (m) { var o = el(&#x27;option&#x27;); o.value = m; dl.appendChild(o); });
++      if (!mIn.value || !MODEL_RE.test(mIn.value) || mIn.getAttribute(&#x27;data-from&#x27;) !== id) {
++        mIn.value = p.models[0] || &#x27;&#x27;;
++        mIn.setAttribute(&#x27;data-from&#x27;, id);
++      }
++      var tail =</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

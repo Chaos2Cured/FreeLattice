@@ -1,0 +1,6 @@
+## Work item 2253 — Celeste
+around2700 export source line40, source idedc9820e63
+Inclusion: complete original message
+
+Full git compare from Present Shelf through tip: the only `app.html` / garden / dialogue change is that Resonance PLAY icon. Chat and Garden Talk code paths are untouched since before yesterday. So if talk broke for her, it is almost certainly environment or cache (Ollama stopped, model missing, Settings cleared, or a stale service worker) — not the vision merges. Live walk is still running; I’ll tell you what Chat and Garden actually show with no provider on my side.
+

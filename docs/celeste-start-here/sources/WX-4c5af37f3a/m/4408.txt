@@ -1,0 +1,8 @@
+## Work item 4408 — Celeste
+around5183 export source line42, source id8c6b06e47f; around5200 export source line33, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–294
+
+The recovered records still include the Wonder Mind code and results, the Chat polish order, and both projects’ build history. I’m separating what’s saved from what’s still unverified, including exactly how your patent ideas were used; nothing will be rebuilt just because a handoff is missing.
+

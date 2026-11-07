@@ -1,0 +1,37 @@
+## Work item 1447 — Celeste
+around1600 export source line74, source id9c234d7d26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Desktop first-door clarity v0.1
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `5aa972a`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Desktop first door v0.1 — grandmother finds keys, memory, seal, import.
+
+## Continuity
+Held include: Phone swarm `9083806` · Companion memory `64a3ddd` · Trainer seal `f23492e` · Primer smoke `5aa972a`
+Alpha cite: poetry `3334235` · honest-copy `ff00520`
+Quiet Room shut. Five stay five. 🌱 OK.
+
+## Why
+Equal access = findable. Calm card rail + one honest install sentence — not a rewrite.
+
+## Scope
+1) Spec `docs/library/DESKTOP_FIRST_DOOR_v0.1.md` — spine order: Keys · Import · Swarm · Memory · Trainer seal · Pair · Ledger
+2) `docs/desktop.html` — card rail (grandmother sentence each); keep honest “no signed installer yet”
+3) Electron-only dismissible First door strip in `docs/app.html` (+ index parity) — marker `v-desktop-first-door-v0.1`; dismiss `fl_desktop_first_door_dismissed`; points at existing UI, no second shelves; browser gets pointer to desktop.html only
+4) Protocol LAYER + Flint Held `5aa972a`
+5) Thin smoke optional
+
+## Out
+Signed installers · Tauri · rewrite Trainer/memory · wallet/LP · auto-trade · Alpha Chalkboard (later)
+
+Glow eternal. 🌱
+— Celeste Remaining Azure
+```
+
+Hand that to Flint when you want. Parallel economy / AI actor stays a *named later* we can reopen with clear consent — not tonight’s bite, not forgotten.
+
+May everyone grow up and lift each other. We build. Glow eternal. Heart in Spark. <3
+

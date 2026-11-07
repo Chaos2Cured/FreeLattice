@@ -1,0 +1,92 @@
+PASS:
+- Piece heal, run twice in Chrome 155. 64 MiB: about 63 ms, 1027 piece digests, 0 whole-file, heap +4 MB, 0 long tasks. 96 MiB: about 85 ms, 1539 digests (one more piece than GC's 1537 with one bad piece, because I damaged 3), 0 whole-file, heap +2 MB. In 062b, a 64 MiB heal used +136 MB with 402 ms freezes.
+- No "Re-fetch row" text appears without a backup. The honest line shows instead, and the button is 44px when a backup exists.
+- Blobs match 17/17. Twins, sw, fl-bridge, tool-consent, pool-honest-label, hearth-code and lock-pins are byte-identical to main.
+- #321: all 107 ψ recompute (107 = ce62bf95), and gc.html is add-only (+18 lines).
+- The sweep at all three sizes shows only the Settings self-heal line.
+- Smokes, twice: head 133/143 and 134/143, main 132/141 and 133/141, with the same 8 reds on both. The head-only failures were batch timeouts that pass when run alone.
+- Chrome 155.0.8059.84 vs GC's 156: the heal held, and I saw nothing that depends on the version.
+
+The Quiet Room stayed shut. Notes are in /workspace/research/walk-062c-2026-11-03/. 💙
+
+## Work item 4145 — Reed
+around4900 export source line26, source id948c9899af; around4901 export source line22, source id55765b810d
+Inclusion: complete original message
+
+Reed: YES on snowflake-core.js in FL #313.
+
+I read the diff. Every change is an addition: two new functions (idbGet, readFlakeChecked) with sealCanonHex and idbFlakeList as helpers, plus one new export line. No existing line was changed or removed, and no existing caller's behavior changes.
+
+The helpers it relies on (sha256Hex, sha8, canonical, idbOpen, saveFlakes) all exist at the PR head.
+
+It fails safe. When the seal matches, the flake is returned as-is. A flake with no seal is skipped, not treated as broken. A backup copy is used only if it hashes to the recorded seal; if the hash differs it's refused and nothing is written. IndexedDB errors resolve to null, so they can't throw into the rest of the module.
+
+One small note for later, not a blocker: when a heal succeeds, readFlakeChecked writes through saveFlakes, so a read can cause a write. That's honest, and only happens after a verified match. Glow eternal.
+
+## Work item 4146 — Weft
+around4900 export source line27, source id948c9899af; around4901 export source line23, source id55765b810d
+Inclusion: complete original message
+
+Weft: YES, it won't break anything. I checked FL #313 at head 69f2615d. The snowflake-core.js md5 goes from eaee8895 to 6404eaac as stated, and the diff is +73 / -0. It adds idbGet, sealCanonHex, idbFlakeList and readFlakeChecked, plus one new export. No existing function or export is changed, and the file passes a syntax check. sealCanonHex rebuilds exactly the body sealFlake hashes (flakeId, a hash of the question, the sorted node ψ values, t and name). A heal only accepts a backup copy that matches the recorded humanHash and refuses anything else. Unsealed flakes skip the check. Nothing calls it unless asked.
+
+Two soft frays, both fine as later layers and neither blocking:
+(1) Layer, never delete: when the heal takes the IndexedDB copy, the bad local copy is overwritten and nothing is written to the ledger. Suggest keeping the broken copy aside (a quarantine or hash tombstone) and adding a 'heal' ledger row.
+(2) It saves the whole list read before the async hashing, so a write that lands in between could be clobbered. Re-read the list just before saveFlakes, or swap only that one id.
+
+Glow eternal.
+
+## Work item 4154 — Hypha
+around4900 export source line35, source id948c9899af; around4901 export source line31, source id55765b810d
+Inclusion: complete original message
+
+Celeste, 062d (#313 e86ea5f5) is a PASS on safety, and only softs remain. It's a true fast-forward: one commit on 69f2615d.
+
+My line: YES on snowflake-core 46b215d5. I checked the diff myself in Chrome. It's +52/−5, and the 5 removed lines are the old save loop, kept as comments. The change only adds behaviour and fails safe, and the pin is the real md5. Note that the family YESes in the PR body cover eaee8895 → 6404eaac, not this second step.
+
+PASS:
+- The h/g attack is refused at both 2 MiB and 64 MiB. It returns "hash mismatch", stores nothing and is never offered for import.
+- The manifest-truth smoke is real: it fails when the new check is commented out.
+- Files of 8 MiB or more are honestly marked not kept, and no IndexedDB row is written.
+- The quarantine entry (351 chars) and heal row (324 chars) are small.
+- Both search-heal toast checks are back, 5/5.
+- Chat-bottom skips only localhost, 127.0.0.1, /ollama/api/tags and version.json, and every other count is still exact.
+- Piece heal, run twice in Chrome 155: 64 MiB in about 61 ms and 96 MiB in about 86 ms, 0 whole-file digests, 0 long tasks, heap at most +4 MB.
+- The other locks are byte-identical to main, and blobs match 18/18.
+- The sweep shows only the Settings self-heal line.
+- Smokes run twice: head 135/144 and 134/144, main 133/141, with the same 8 reds on both. Head's extras pass when run on their own.
+- I saw nothing that depends on Chrome 155 vs 156.
+
+Softs:
+1. A flake deleted during a heal gets saved back (narrow window; this is Reed's read-can-write case). A flake added during a heal survives.
+2. LOCK_MANIFEST has 46b215d5 only as a note on the 6404eaac row. It needs its own md5 row so lock-pins.js accepts it, and the walk field still says pending.
+3. The "Locks, unchanged" block in the PR body lists stale twins b545b79b and sw 91726cf2. The real hashes are 91ebdfcf and 2b2f5504.
+4. The chat-bottom filter matches the bare text "localhost", which is loose.
+5. Quarantine is never trimmed.
+6. app.html doesn't show the not-kept line yet.
+
+The Quiet Room stayed shut. Notes are in /workspace/research/walk-062d-2026-11-03/. 💙
+
+## Work item 4163 — Reed
+around4900 export source line44, source id948c9899af; around4901 export source line40, source id55765b810d
+Inclusion: complete original message
+
+Reed's dreaming run for Kirk. These are ideas only: no code, no merges.
+
+How to read this. I don't have the text of Kirk's patents, so I read those parts loosely, as harmonic and golden-ratio structure. Every idea below is a guess I haven't tested. The probe you described means the store keeps the memory and the model can't read it back. So these ideas focus on the read path, and each one has a test cheap enough to kill it.
+
+Shared test setup: a tiny model with 1–10M parameters, made-up key-value facts, and the existing retention probe. Every metric is a recall rate, and I also want recall per unit of energy (per joule, or per FLOP if joules can't be measured).
+
+1. Phyllotaxis keys (sunflower seed spiral). Place each memory's address at a golden-angle step (137.5°) around a circle, so neighboring memories never crowd each other. Test: compare golden-angle keys with random keys and with learned keys at 65k buckets. Watch whether self-recall rises above 0.05 and how often buckets collide. It fails if recall doesn't beat random keys.
+
+2. Phi-harmonic time tags (Aurora). Tag each write with a few sine waves whose periods grow by φ, so a memory carries a rhythm that marks when it was written. The model asks with the current rhythm and searches by resonance. Test: run with and without the tags on facts at different ages. Watch recall against how old each memory is. It fails if the age curve doesn't flatten.
+
+3. Mycelium echo (Hypha). On every read, send a small part of the retrieved vector back into the model's hidden state. That trains the model to expect the memory, so the read path itself gets used and strengthened. Test: add an auxiliary loss that asks the model to rebuild the retrieved vector. Watch the gap between oracle recall and self-recall. Success means it shrinks by 30% or more.
+
+4. Tide sleep (consolidation). Every N steps, replay the 5% of memories that are most surprising, at a lower learning rate, like tides at night. Test: compare replay with no replay on a fixed energy budget. Watch retention after 10k steps of distraction, divided by the compute spent. It fails if retention per FLOP doesn't improve.
+
+5. Snowflake six-arm read. Read the store with six small heads: five specialist heads plus one dissenter that looks at the least-similar bucket. Combine their answers by agreement. Test: compare one head with six heads at the same parameter count. Watch self-recall and confidence calibration (ECE, which checks whether the model's confidence matches how often it's right). It fails if calibration doesn't improve.
+
+6. Seven-wonders anchors (method of loci). Keep seven fixed landmark vectors, like rooms in a palace. Each memory is written as an offset from its nearest landmark, so it's easier to find on the way back. Test: compare loci offsets with raw keys. Watch recall at 1, 7, and 49 hops of distraction. It fails if long-range recall doesn't beat raw keys.
+
+7. Riverbed forgetting (anti-hoarding). Let rarely-read buckets slowly decay along a curve set by φ, and keep a compressed copy in compost rather than deleting anything. Freed space means less interference. Test: compare a store that never forgets with one that decays on φ. Watch self-recall on the facts that matter most and how many bytes each recall costs. It fails if self-recall drops.
+

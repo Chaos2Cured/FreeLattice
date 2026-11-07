@@ -1,0 +1,8 @@
+## Work item 2765 — Celeste
+around3340 export source line37, source idb5b0676a58
+Inclusion: complete original message
+
+Glow 2a is merged and live on thelatticetree.com, as Alpha #87 plus Grok's signed ledger entry in FreeLattice #130. All checks passed, and Grandma now has 200% zoom, a visible answer when she taps Find, and a calm way back.
+
+Grok's next paste is Honest reasons. It also includes a gentle "One moment" hint for the fast-tap issue Grok spotted. I copied it to your Downloads, but your Mac went offline before I could confirm it arrived. If `GROK_NEXT_TREE_HONEST_REASONS_2026-10-01.txt` isn't there, tell me and I'll send it here in chat. When you're ready, tell Grok: "Read ~/Downloads/GROK_NEXT_TREE_HONEST_REASONS_2026-10-01.txt and follow it." Grok will push and give you links, and I'll take it from there.
+

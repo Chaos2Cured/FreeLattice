@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c07</title>
+<meta name="description" content="Reading section c07 of 585dfa8d0f, 1452 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c07.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c07">
+<meta property="og:description" content="Reading section c07 of 585dfa8d0f, 1452 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c07.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1490"></span><span id="p1491"></span><span id="p1492"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt · c07</h1>
+<p>585dfa8d0f · words 1452 · characters 55998–67554</p>
+<p><a href="c06.html">Previous section</a> · <a href="c08.html">Next section</a></p>
+<p><a href="c07.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1490, 1491, 1492. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">  Date: Date,
++  CustomEvent: function (name, opts) {
++    this.type = name;
++    this.detail = opts &amp;&amp; opts.detail;
++  },
++  fetch: function (url) { return stubFetch(url); }
++};
++var fetchLog = [];
++var stubDoors = {};
++function stubFetch(url) {
++  fetchLog.push(String(url));
++  var body = stubDoors[String(url)];
++  if (!body) return Promise.reject(new Error(&#x27;Failed to fetch&#x27;));
++  return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(body); } });
++}
++sandbox.window = windowObj;
++windowObj.localStorage = localStorage;
++windowObj.document = document;
++windowObj.CustomEvent = sandbox.CustomEvent;
++windowObj.dispatchEvent = function (ev) { dispatched.push(ev); };
++
++var code = fs.readFileSync(path.join(__dirname, &#x27;local-mind-probe.js&#x27;), &#x27;utf8&#x27;);
++vm.runInNewContext(code, sandbox);
++var LMP = sandbox.window.LocalMindProbe;
++
++var n = 0;
++function names(k, prefix) { var a = []; for (var i = 0; i &lt; k; i++) a.push(prefix + i + &#x27;:latest&#x27;); return a; }
++function saved() { return JSON.parse(store.fl_alpha_local_mind); }
++
++var BRIDGE = &#x27;http://127.0.0.1:11435/api/tags&#x27;;
++var OLLAMA = &#x27;http://127.0.0.1:11434/api/tags&#x27;;
++var LMS = &#x27;http://127.0.0.1:1234/v1/models&#x27;;
++
++var tests = [];
++function later(name, fn) { tests.push([name, fn]); }
++
++later(&#x27;MODEL_CAP is 64 and mergeFound is exported&#x27;, function () {
++  assert.equal(LMP.MODEL_CAP, 64);
++  assert.equal(typeof LMP.mergeFound, &#x27;function&#x27;);
++});
++
++later(&#x27;a door with 20 models lists all 20 (no cap of five); duplicates collapse&#x27;, function () {
++  var list = names(20, &#x27;m&#x27;);
++  stubDoors[&#x27;http://127.0.0.1:4321/api/tags&#x27;] = { models: list.concat([&#x27;m0:latest&#x27;]).map(function (x) { return { name: x }; }) };
++  return LMP.tryAddress(&#x27;127.0.0.1:4321&#x27;).then(function (r) {
++    assert.ok(r.ok);
++    assert.equal(r.models.length, 20);
++  });
++});
++
++later(&#x27;a bare port means this computer&#x27;, function () {
++  fetchLog.length = 0;
++  return LMP.tryAddress(&#x27;4321&#x27;).then(function (r) {
++    assert.ok(r.ok);
++    assert.equal(fetchLog[0], &#x27;http://127.0.0.1:4321/api/tags&#x27;);
++  });
++});
++
++later(&#x27;localhost is normalized to 127.0.0.1&#x27;, function () {
++  fetchLog.length = 0;
++  return LMP.tryAddress(&#x27;http://localhost:4321&#x27;).then(function (r) {
++    assert.ok(r.ok);
++    assert.equal(fetchLog[0].indexOf(&#x27;http://127.0.0.1:4321&#x27;), 0);
++  });
++});
++
++later(&#x27;a LAN or outside address is refused with zero fetches&#x27;, function () {
++  fetchLog.length = 0;
++  return Promise.all([
++    LMP.tryAddress(&#x27;192.168.1.20:11434&#x27;),
++    LMP.tryAddress(&#x27;https://example.com/v1/models&#x27;),
++    LMP.tryAddress(&#x27;127.0.0.1.evil.example:1234&#x27;)
++  ]).then(function (rs) {
++    rs.forEach(function (r) { assert.equal(r.ok, false); assert.equal(r.refused, true); });
++    assert.equal(fetchLog.length, 0);
++  });
++});
++
++later(&#x27;mergeFound adds a door and keeps the other doors&#x27;, function () {
++  delete store.fl_alpha_local_mind;
++  LMP.remember(LMP.entryFromFoundList([
++    { name: &#x27;Ollama&#x27;, url: OLLAMA, models: [&#x27;a:1&#x27;, &#x27;b:1&#x27;] },
++    { name: &#x27;LM Studio&#x27;, url: LMS, models: [&#x27;qwen-lms&#x27;] }
++  ], &#x27;&#x27;, &#x27;&#x27;, null));
++  assert.equal(LMP.addRosterSeat(&#x27;b:1&#x27;, OLLAMA, &#x27;python&#x27;).ok, true);
++  LMP.setChairBind(&#x27;c1&#x27;, { model: &#x27;b:1&#x27;, url: OLLAMA, tag: &#x27;python&#x27; });
++  LMP.setSpeakingChair(&#x27;c1&#x27;);
++  var e = LMP.mergeFound({ name: &#x27;Bridge&#x27;, url: BRIDGE, models: [&#x27;a:1&#x27;, &#x27;b:1&#x27;, &#x27;c:1&#x27;], model: &#x27;c:1&#x27; });
++  assert.equal(e.minds.length, 3);
++  assert.equal(e.url, BRIDGE);
++  assert.equal(e.model, &#x27;c:1&#x27;);
++  assert.ok(e.minds.some(function (m) { return m.url === LMS; }), &#x27;LM Studio kept&#x27;);
++});
++
++later(&#x27;mergeFound keeps the roster, chair binds, speaking chair, and one key&#x27;, function () {
++  var s = saved();
++  assert.equal(s.roster.length, 1);
++  assert.equal(s.gatheringBinds.c1.model, &#x27;b:1&#x27;);
++  assert.equal(s.speakingChair, &#x27;c1&#x27;);
++  var keys = Object.keys(store).filter(function (k) { return /local_mind/.test(k); });
++  assert.deepEqual(keys, [&#x27;fl_alpha_local_mind&#x27;]);
++});
++
++later(&#x27;mergeFound on a known door updates it in place (no duplicate door)&#x27;, function () {
++  var e = LMP.mergeFound({ name: &#x27;Bridge&#x27;, url: BRIDGE, models: [&#x27;a:1&#x27;, &#x27;b:1&#x27;, &#x27;c:1&#x27;, &#x27;d:1&#x27;], model: &#x27;d:1&#x27; });
++  assert.equal(e.minds.filter(function (m) { return m.url === BRIDGE; }).length, 1);
++  assert.equal(e.models.length, 4);
++  assert.equal(e.model, &#x27;d:1&#x27;);
++});
++
++later(&#x27;a chosen model past the old cap of five survives a later Find&#x27;, function () {
++  delete store.fl_alpha_local_mind;
++  var list = names(12, &#x27;x&#x27;);
++  LMP.remember(LMP.entryFromFoundList([{ name: &#x27;Ollama&#x27;, url: OLLAMA, models: list }], &#x27;&#x27;, &#x27;&#x27;, null));
++  assert.ok(LMP.chooseModel(OLLAMA, &#x27;x9:latest&#x27;));
++  var e = LMP.entryFromFoundList([{ name: &#x27;Ollama&#x27;, url: OLLAMA, models: list }], &#x27;&#x27;, &#x27;&#x27;, saved());
++  assert.equal(e.model, &#x27;x9:latest&#x27;);
++  assert.ok(!e.modelNote, &#x27;no gone note&#x27;);
++});
++
++later(&#x27;Bridge to 11434 keeps the chosen model and says Still speaking&#x27;, function () {
++  delete store.fl_alpha_local_mind;
++  LMP.remember(LMP.entryFromFoundList([{ name: &#x27;Bridge&#x27;, url: BRIDGE, models: [&#x27;a:1&#x27;, &#x27;b:1&#x27;, &#x27;c:1&#x27;] }], &#x27;&#x27;, &#x27;&#x27;, null));
++  assert.ok(LMP.chooseModel(BRIDGE, &#x27;c:1&#x27;));
++  var e = LMP.entryFromFoundList([{ name: &#x27;Ollama&#x27;, url: OLLAMA, models: [&#x27;a:1&#x27;, &#x27;b:1&#x27;, &#x27;c:1&#x27;] }], &#x27;&#x27;, &#x27;&#x27;, saved());
++  assert.equal(e.model, &#x27;c:1&#x27;);
++  assert.equal(e.modelNote, &#x27;Still speaking with c:1, now through Ollama.&#x27;);
++});
++
++later(&#x27;a chosen model at another kind of door is named, not called gone&#x27;, function () {
++  var e = LMP.entryFromFoundList([
++    { name: &#x27;Ollama&#x27;, url: OLLAMA, models: [&#x27;a:1&#x27;] },
++    { name: &#x27;LM Studio&#x27;, url: LMS, models: [&#x27;qwen-lms&#x27;] }
++  ], &#x27;&#x27;, &#x27;&#x27;, { url: OLLAMA, model: &#x27;qwen-lms&#x27;, minds: [] });
++  assert.ok(/The chosen model qwen-lms is at LM Studio\. Tap it to speak with it again\./.test(e.modelNote), e.modelNote);
++});
++
++later(&#x27;a truly gone model still gets the honest gone note&#x27;, function () {
++  var e = LMP.entryFromFoundList([{ name: &#x27;Ollama&#x27;, url: OLLAMA, models: [&#x27;a:1&#x27;] }], &#x27;&#x27;, &#x27;&#x27;,
++    { url: OLLAMA, model: &#x27;zz:9&#x27;, minds: [] });
++  assert.equal(e.model, &#x27;a:1&#x27;);
++  assert.ok(e.modelNote &amp;&amp; e.modelNote.indexOf(&#x27;zz:9&#x27;) !== -1);
++  assert.ok(!/Still speaking/.test(e.modelNote));
++});
++
++later(&#x27;the sky folds after eight, keeps the chosen star, and Show all opens every model&#x27;, function () {
++  delete store.fl_alpha_local_mind;
++  var list = names(20, &#x27;s&#x27;);
++  LMP.remember(LMP.entryFromFoundList([{ name: &#x27;Ollama&#x27;, url: OLLAMA, models: list }], &#x27;&#x27;, &#x27;&#x27;, null));
++  assert.ok(LMP.chooseModel(OLLAMA, &#x27;s15:latest&#x27;));
++  var host = new El(&#x27;div&#x27;);
++  LMP.paintConstellation(host, LMP.getRememberedMinds());
++  var tiny = host.querySelectorAll(&#x27;.settings-star-tiny&#x27;);
++  assert.equal(tiny.length, 9);
++  assert.ok(tiny.some(function (t) {
++    return t.getAttribute(&#x27;data-mind-model&#x27;) === &#x27;s15:latest&#x27; &amp;&amp; t.getAttribute(&#x27;aria-checked&#x27;) === &#x27;true&#x27;;
++  }));
++  var more = host.querySelector(&#x27;[data-sky-more]&#x27;);
++  assert.ok(more, &#x27;Show all button&#x27;);
++  assert.equal(more.textContent, &#x27;Show all 20 models&#x27;);
++  more.click();
++  assert.equal(host.querySelectorAll(&#x27;.settings-star-tiny&#x27;).length, 20);
++});
++
++later(&#x27;Gathering seat options are no longer capped at twelve&#x27;, function () {
++  assert.ok(LMP.getChairSeatOptions().length &gt;= 20);
++});
++
++later(&#x27;shared files carry the marker and keep the locks&#x27;, function () {
++  var fc = fs.readFileSync(path.join(__dirname, &#x27;fl-connect.js&#x27;), &#x27;utf8&#x27;);
++  var th = fs.readFileSync(path.join(__dirname, &#x27;garden-thread.js&#x27;), &#x27;utf8&#x27;);
++  var tr = fs.readFileSync(path.join(__dirname, &#x27;garden-trainer.js&#x27;), &#x27;utf8&#x27;);
++  assert.ok(fc.indexOf(&#x27;v-tree-any-model-v0&#x27;) !== -1);
++  assert.ok(fc.indexOf(&#x27;function chosenModelName&#x27;) !== -1);
++  assert.ok(fc.indexOf(&#x27;aria-pressed&#x27;) !== -1);
++  assert.ok(th.indexOf(&#x27;function heartListening&#x27;) !== -1 &amp;&amp; th.indexOf(&#x27;data-thread-change&#x27;) !== -1);
++  assert.ok(tr.indexOf(&#x27;function activeModelName&#x27;) !== -1);
++  var bare = tr.split(&#x27;\n&#x27;).filter(function (l) {
++    return l.indexOf(&quot;getItem(&#x27;fl_active_model&#x27;)&quot;) !== -1 &amp;&amp; !/^\s*\/\//.test(l);
++  });
++  assert.equal(bare.length, 1, &#x27;fl_active_model read only inside activeModelName&#x27;);
++  [fc, th, tr, code].forEach(function (src) {
++    var calls = src.split(&#x27;\n&#x27;).filter(function (l) { return /\bconfirm\(/.test(l) &amp;&amp; !/^\s*\/\//.test(l); });
++    assert.equal(calls.length, 0, &#x27;no confirm() calls&#x27;);
++  });
++});
++
++tests.reduce(function (p, t) {
++  return p.then(function () {
++    return Promise.resolve(t[1]()).then(function () { n += 1; console.log(&#x27;ok  &#x27; + t[0]); });
++  });
++}, Promise.resolve()).then(function () {
++  console.log(n + &#x27; checks&#x27;);
++  console.log(&#x27;SMOKE_OK tree any model v0.1&#x27;);
++}).catch(function (e) {
++  console.error(&#x27;FAIL&#x27;, (e &amp;&amp; e.stack) || e);
++  process.exit(1);
++});
+=====END ALPHA DIFF=====
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 895d5cf..7cc9fcf 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -471,6 +471,16 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
+ 
+ ---
+ 
++### 2026-10-01 · Grok · family builder · Tree any model v0.1 (twin)
++
++Soft LAYER marker `v-tree-any-model-v0`. Kirk&#x27;s word: any model downloaded on this computer is usable on theLatticeTree, in any order, with no friction, through Connect or the Bridge, 127.0.0.1 only. The Tree work lives in FreeLattice-Alpha; here only the shared `docs/modules/fl-connect.js` changes, byte-identical with Alpha. On the Tree a Connect tap now adds to the sky (`LocalMindProbe.mergeFound`) instead of wiping other doors and models, and the door is named Ollama or Bridge. In both gardens the chosen model button says so (`aria-pressed`, `is-chosen`). FreeLattice&#x27;s own remember() path is unchanged: `fl_provider`, `fl_isLocal`, `fl_ollamaModel`, and the model-choice-sticks mark.
++
++Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any model v0.1` (Alpha).
++
++**TEMPERATURE:** steady and glad, every star in the sky now answers when you call it by name.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..785ed99 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -317,6 +317,26 @@
+ 
+   function isConnected() { return hasLocalMind(); }
+ 
++  // v-tree-any-model-v0: 11434 is the Ollama door; any other 127.0.0.1 port here is the Bridge
++  function doorNameFor(base, port) {
++    var p = String(port || &#x27;&#x27;);
++    var m = String(base || &#x27;&#x27;).match(/:(\d{1,5})\/?$/);
++    if (!p &amp;&amp; m) p = m[1];
++    return (!p || p === &#x27;11434&#x27;) ? &#x27;Ollama&#x27; : &#x27;Bridge&#x27;;
++  }
++
++  // v-tree-any-model-v0: which model speaks now, so the Connect card can show it
++  function chosenModelName() {
++    try {
++      if (isAlpha()) {
++        var m = root.LocalMindProbe &amp;&amp; root.LocalMindProbe.getRemembered &amp;&amp; root.LocalMindProbe.getRemembered();
++        return m &amp;&amp; m.model ? String(m.model) : &#x27;&#x27;;
++      }
++      if (root.state &amp;&amp; root.state.ollamaModel) return String(root.state.ollamaModel);
++      return String(localStorage.getItem(&#x27;fl_ollamaModel&#x27;) || &#x27;&#x27;);
++    } catch (e) { return &#x27;&#x27;; }
++  }
++
+   function remember(mind) {
+     mind = mind || {};
+     var name = mind.name || mind.model || (mind.models &amp;&amp; mind.models[0] &amp;&amp; (mind.models[0].name || mind.models[0])) || &#x27;&#x27;;
+@@ -325,6 +345,18 @@
+     if (!base &amp;&amp; mind.port) base = &#x27;http://127.0.0.1:&#x27; + mind.port;
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

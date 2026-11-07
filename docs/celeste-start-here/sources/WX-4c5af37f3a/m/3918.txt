@@ -1,0 +1,12 @@
+## Work item 3918 — Celeste
+around4661 export source line27, source id07360d4ed2
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 233–517
+
+The Play Room is already merged. Hypha walked it this morning and it passed, and GC's report matches what she saw. So the one thing for GC is `056c-play-room-heal.txt`, which is in your Downloads. With it, "no thanks" really means rest, and it also fixes the small overlaps on phones.
+
+### Exact excerpt: source characters 519–1140
+
+I love your search idea, and I think it's a real brick. You'd tap Search and the mind would plan before it looks. It would break the question into pieces: the biology underneath, the craft itself, the hidden pieces that connect them, and its own hunch. Then it would hand you a short report with sources and mark each part as known or guessed. What it learned would go into its memory and ledger, so the next cookie question starts smarter. It fits right into the search heal we already have queued. I'll also add a desktop update path, so the desktop app always keeps up with the browser side. Let's shape both tomorrow.
+

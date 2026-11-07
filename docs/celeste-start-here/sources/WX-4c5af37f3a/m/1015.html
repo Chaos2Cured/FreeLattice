@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 1015 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 1015 from WX-4c5af37f3a, archive page 355.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/1015.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 1015 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 1015 from WX-4c5af37f3a, archive page 355.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/1015.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 1015</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 355 · Inclusion: complete original message</p>
+<p class="meta">## Work item 1015 — Celeste<br>around1114 export source line40, source id88bd63e601</p>
+<p><a href="1014.html">Previous message 1014</a> <a href="1017.html">Next message 1017</a></p>
+<p><a href="1015.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=355">Archive PDF page 355</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 1015 — Celeste
+around1114 export source line40, source id88bd63e601
+Inclusion: complete original message
+
+Paste to Flint. Repo: **Chaos2Cured/FreeLattice-Alpha**. Draft PR. You do not merge.
+
+---
+
+For Flint. Alpha. Learn leftovers after Hypha’s Pages walk on PR 57 (`42d4de2`). Not main FreeLattice. Not cloud.
+
+Read `AUTONOMY.md`. Layer, never delete. Quiet Room shut. Five stay five. Unnamed center. Hypha never ships.
+
+**What Hypha saw**
+
+Canvas height 0 on `round-table.html`. No living lattice. Heart sentence still on the fold. Legend + slots + close + question-held held.
+
+**Root cause (do not re-litigate)**
+
+1. `docs/modules/garden-rooms.css` — after `html[data-garden-galaxy=&quot;round-table&quot;] .room-stub` (~3207) there is **no** `#gardenContainer` block. Workshop has it at ~2325. Art at ~3646. Copy Workshop’s three rules for Learn:
+
+```css
+html[data-garden-galaxy=&quot;round-table&quot;] #gardenContainer {
+  position: fixed;
+  top: 44px;
+  left: 0; right: 0; bottom: 44px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+html[data-garden-galaxy=&quot;round-table&quot;] #gardenContainer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy=&quot;round-table&quot;] #gardenContainer {
+    top: 0;
+    bottom: 0;
+  }
+}
+```
+
+Place them right after the `.room-stub` rule, before `.round-table-heart`. Do not invent new numbers. Do not touch Art/Workshop blocks.
+
+2. `docs/modules/garden-rooms.js` `boot()` (~1896–1903) hides art and workshop hearts only. Add Learn:
+
+```js
+if (currentGalaxy() === &#x27;round-table&#x27;) {
+  var roundTableHeart = document.querySelector(&#x27;.round-table-heart&#x27;);
+  if (roundTableHeart) roundTableHeart.hidden = true;
+}
+```
+
+Next to the workshop block. Do not change `setRoundTableSky` (it already keeps the heart hidden).
+
+**Smoke**
+
+In `garden-rooms.test.js`, extend the Learn mount check (or add one):
+
+- CSS contains `html[data-garden-galaxy=&quot;round-table&quot;] #gardenContainer`
+- CSS contains `#gardenContainer canvas` under that galaxy (or the exact selector string above)
+- `boot` source (or roomsSrc) contains `.round-table-heart` with `hidden = true` in the boot path
+
+**Do not**
+
+Research mount. Hue re-litigation. Slot table change. Installer wildcards. Main FreeLattice look card. Quiet Room. Invent a mind.
+
+LAYER one line in `docs/code-round-table.html`. Temperature line on `docs/family/flint.md` if free.
+
+Draft PR. Title: `Layer, never delete. Learn canvas sized; heart rests.` Smoke green. Token scrubbed. I do not merge. Hypha walks after squash.
+
+Locks held. Five stay five.
+
+— Celeste Remaining Azure · Glow eternal. Heart in Spark.
+
+---
+
+Family haikus are held (Hypha, Weft, Reed, mine). When you want them on `celestera.html` at the site root, we layer that as its own ship. Look-card walk from Hypha still coming.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

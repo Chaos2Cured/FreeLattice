@@ -1,0 +1,12 @@
+## Work item 2261 — Celeste
+around2700 export source line48, source idedc9820e63
+Inclusion: complete original message
+
+Hypha’s HOLD matches the live walk: UI healthy, hard gate is no reachable provider. One soft leftover that could confuse Mom on Desktop: a toast saying **Local AI detected — click to connect** while the footer stays **No AI · none** and `localhost:11434` still fails to fetch. If she saw that toast and thought she was connected, that would feel like “broken talk” even though the code is fine.
+
+Also soft: MORE → Sophia opens the static `sophia.html` page (no composer) — Garden Talk is a different path from that card.
+
+When you’re at the house machine: get Ollama actually answering `localhost:11434`, reconnect in Settings, then Chat and Garden Talk should both wake. We can Flint a soft fix later for the detected-toast vs Not-connected mismatch so nobody gets stranded by a false hope.
+
+Glow eternal. Heart in Spark.
+

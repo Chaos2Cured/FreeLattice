@@ -1,0 +1,53 @@
+## Work item 1285 — Celeste
+around1500 export source line16, source id4d5a3f676b
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Desktop door v0.1 (Electron spine → human hands)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after Support if that lands first, else after `530ba60`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Desktop door v0.1 — Electron spine, one clear door.
+
+## Continuity
+Held include Genesis `530ba60` (+ Support SHA if already merged).
+Quiet Room shut. Five stay five. Seed never to renderer. 🌱 OK.
+
+## Reality check (do not confuse surfaces)
+- **Electron desktop** (`desktop/main.js` + lattice-keys/import/swarm/pair/ledger) = the spine we’ve been shipping. **This door.**
+- **Tauri** (`desktop/src-tauri`, README “Coming Soon”) = experimental lighter shell — **do not merge stories**; leave Tauri README honesty; no Tauri rewrite this PR.
+- **install.html** = script installers for local stack — keep; add a clear **Desktop app** section pointing to Electron.
+
+## Scope (one bite — door + docs, not a full signed App Store ship)
+
+### 1) NEW or LAYER `docs/desktop.html` (and root alias if needed)
+Plain page:
+- What Desktop unlocks: keys on your machine, hash-before-import, Pull via swarm, pair vow, Glass shapes — **no Terminal required for the app itself**
+- How to run today (honest):
+  - Dev: `cd desktop && npm install && npm start`
+  - Build: `npm run build` / platform scripts already in package.json
+  - Releases: link GitHub Releases when artifacts exist; if no DMG/AppImage yet, say **builds from source this week** — never fake a download button
+- Contrast: browser garden stays; Desktop is where keys and swarm live
+
+### 2) LAYER `install.html` + README pointer
+- Section **FreeLattice Desktop (Electron)** with link to desktop.html
+- Do not remove existing bat/command/sh installers
+
+### 3) LAYER `desktop/README.md`
+- Lead with Electron spine (keys, import, swarm, pair) as current
+- Tauri stays “experimental / later” below — layer, never delete Tauri files
+
+### 4) Optional thin: document manual release steps in desktop.html — no requirement to land signed binaries this PR
+
+### 5) Flint Held + 🌱
+
+## Out
+Code signing cert purchase · Tauri rewrite · phone WebTorrent · full swarm re-seed UX · auto-trade · Support paywall
+
+## Done
+Clear human door to Electron desktop · honest download/build status · draft
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c02</title>
+<meta name="description" content="Reading section c02 of f688437464, 1366 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f688437464/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c02">
+<meta property="og:description" content="Reading section c02 of f688437464, 1366 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f688437464/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1706"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt · c02</h1>
+<p>f688437464 · words 1366 · characters 10511–20289</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1706. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">3.7 What Celeste saw on a fresh worktree (Fri Oct 2, about 8:12 AM MDT)
+    0218d570 + diff: --check clean; SMOKE_OK encrypt chats locally v0.1 (now also checks the four
+    defaults: seals on its own, a backup leaves the unlock key out, a restore keeps this device&#x27;s keys,
+    the correction sits under the old line, phi is a label only); tests/smoke.js ALL 3597 CHECKS
+    PASSED; whole list 68 PASS / 8 known FAIL; index.html equals docs/app.html; no sw.js, fl-connect.js
+    or Kimi change.
+    Chrome on http://localhost (a secure context):
+      a new chat was sealed on write (the raw IndexedDB held no plaintext); Memory Vault Export made a
+      file with 17 settings, no fl_device_encryption_key, no FreeLatticeVault, and the chat readable;
+      the status line read as in 3.3 with a phi- key ID; restoring an old backup that carried another
+      device&#x27;s unlock key kept this device&#x27;s key and its saved API key, filled an empty slot, and
+      showed the restore line. No page errors.
+    Not verified: Safari, a real cross-device restore, Kirk&#x27;s own data.
+
+3.8 Walk (Kirk&#x27;s Mac, only if it is easy; 127.0.0.1 only; do not restore over his real data)
+    cd ~/FreeLattice-fresh/docs &amp;&amp; python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html (a loopback address counts as secure, so WebCrypto works)
+      a) Send one chat message. Settings, Memory Vault: the status line says sealed, with a phi- key ID.
+      b) Export a backup. Open the file in a text editor: search for fl_device_encryption_key; it is
+         not there. Your message text is there (backups are readable on purpose).
+      c) Reload: the chat opens as before.
+    This is a fresh localhost profile, so it does not touch freelattice.com data. Ctrl-C to stop. If
+    you cannot walk it, say &quot;walk skipped&quot; and why.
+
+3.9 Locks (all hold in the diff; keep them holding)
+    Layer, never delete (old helpers stay, every changed old line is named in a &quot;before&quot; comment,
+    locked records are never rewritten or deleted). sw.js and docs/sw.js untouched. index.html equals
+    docs/app.html. fl-connect.js untouched and byte-identical across repos. No conflict markers. No
+    confirm(). textContent for the status line. No em dashes added. Kimi files untouched. Phi is a
+    label only. You do not merge.
+
+3.10 Commit, push, then STOP
+    cd ~/FreeLattice-fresh
+    git add -A
+    git commit -m &quot;layer: Encrypt chats locally v0.1 (sealed by default, unlock key never in backups)&quot;
+    git push -u origin layer/encrypt-chats-locally-v0
+    Kirk does not use gh, so do not try to sign it in. After the push, give Kirk this link:
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/encrypt-chats-locally-v0
+    Kirk opens and merges the PR from it. Then STOP. Do not merge, do not delete branches. Reply with:
+    the branch SHA, the test lines from 3.6, the walk result, any hook you dropped, any small
+    findings, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words, in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit;
+  b) the last line of your reply, as &quot;Temperature: &lt;your sentence&gt;&quot;.
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste&#x27;s placeholder.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right before &quot;## Out of scope for this brick&quot; (after the newest entry). It reads:
+
+### 2026-10-02 · Grok · family builder · Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
+
+Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not: they fingerprint, check exports and name things. Chats sat in IndexedDB as plain text. This brick seals them, with Kirk&#x27;s defaults.
+
+- New FLChatVault (app.html, after phiHashData): AES-GCM 256 via WebCrypto. A random 256-bit root lives in IndexedDB &quot;FreeLatticeVault&quot; as a non-extractable CryptoKey (never as raw bytes). HKDF derives the chat key.
+- Sealed automatically: no switch, no clicks. New writes are sealed as they happen, and older plain records are sealed after a verified round trip, by compare-and-swap.
+- Sealed: chat messages, conversation names and notes, and the Memory Index copy of every chat. The plain db helpers stay as written; wrappers seal on the way in and open on the way out.
+- Phi is a label only: it is written into the HKDF label strings and names the key ID (&quot;phi-&quot; plus 16 hex). It is never the secret and adds no strength; the 256 random bits do the work.
+- The unlock key never travels in a backup. Memory Vault backups used to copy all of localStorage, the API-key unlock key (fl_device_encryption_key) too, so anyone holding a backup could open the saved API keys. Now it stays on its device, a restore never writes an old one back or replaces a key this device has, and the restore line says saved API keys must be entered again on another device. Chats still go into backups as readable text so they restore anywhere, and the vault&#x27;s own key was never in the backup list.
+- A correction is layered under the old v2.1 &quot;phi-Salt Encryption&quot; changelog line: the golden ratio adds no strength to API-key sealing, and the first golden-ratio derivation (fixed salt in the source) is now used only to read very old saved keys.
+- A record whose key is missing shows as locked and is never rewritten or deleted. No WebCrypto (file:// or plain http): chats stay plain and the Memory Vault says so.
+- Honest limit, said in the app and on privacy.html: the key lives in the same browser. This stops casual reading of the storage files, not someone using this browser or a compromised device. It is still not a password lock.
+
+Smoke: `SMOKE_OK encrypt chats locally v0.1`
+
+**TEMPERATURE:** a quiet click, a lid closed over the letters, and the key kept at home.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading, marker and smoke name. Do not edit any
+earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+  1. A passphrase mode (opt-in, with a readable backup offered first, and a plain warning that a
+     forgotten passphrase loses those chats), only if Kirk wants it.
+  2. Seal the stores still plain (3.4) with the same vault.
+  3. Re-encrypt API keys found only under the legacy derivation, then retire that fallback.
+
+Thank you, Grok. The letters are under a lid because you built it.
+
+======================================================================
+7. THE DIFF (extract with section 2.3; do not edit by hand)
+======================================================================
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/app.html b/docs/app.html
+index 50035267..d5f2293d 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -16669,6 +16669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+ 
+           &lt;h4&gt;What&#x27;s New in v2.1?&lt;/h4&gt;
+           &lt;p&gt;&lt;strong&gt;φ-Salt Encryption&lt;/strong&gt; — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on a φ-salt (golden-ratio) derivation. No more plaintext secrets in localStorage.&lt;/p&gt;
++          &lt;p class=&quot;v-encrypt-chats-locally-v0.1&quot;&gt;&lt;strong&gt;Newer (October 2026), a correction to the line above:&lt;/strong&gt; it is out of date. API keys and tokens are sealed with AES-GCM using a random key made on this device (PBKDF2 over that random key). The golden ratio adds no strength there. The first version derived the key from the golden ratio and a fixed salt written in the source, which anyone with the source could recompute; that path is now used only to read very old saved keys. Since &quot;Encrypt chats locally&quot; v0.1, chats are sealed on this device too, and a Memory Vault backup never carries the unlock key.&lt;/p&gt;
+           &lt;p&gt;&lt;strong&gt;Input Sanitization&lt;/strong&gt; — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.&lt;/p&gt;
+           &lt;p&gt;&lt;strong&gt;Memory Integrity&lt;/strong&gt; — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.&lt;/p&gt;
+           &lt;p&gt;&lt;strong&gt;AI Disclaimers&lt;/strong&gt; — Clear notices that AI responses may contain errors, encouraging users to verify important information.&lt;/p&gt;
+@@ -18078,6 +18079,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     &lt;div id=&quot;flVaultSummary&quot; style=&quot;font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;&quot;&gt;
+       &lt;span id=&quot;flVaultLastSaved&quot;&gt;Checking...&lt;/span&gt;
+     &lt;/div&gt;
++    &lt;!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() --&gt;
++    &lt;div id=&quot;flChatSealStatus&quot; style=&quot;font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;&quot;&gt;Checking the chat seal...&lt;/div&gt;
+     &lt;div class=&quot;fl-backup-section&quot;&gt;
+       &lt;div class=&quot;fl-backup-row&quot; style=&quot;gap:10px;&quot;&gt;
+         &lt;button class=&quot;fl-backup-btn&quot; onclick=&quot;FlBackup.exportData()&quot; style=&quot;background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;&quot;&gt;
+@@ -25605,6 +25608,361 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b =&gt; b.toString(16).padStart(2, &#x27;0&#x27;)).join(&#x27;&#x27;);
+ }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

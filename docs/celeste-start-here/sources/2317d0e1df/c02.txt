@@ -1,0 +1,21 @@
+**E5. AI on this computer is trusted by default (say it out loud).** Make the CLI token file a persistent `kind: 'cli'` entry named "Local tools on this computer" that is listed and revocable like the others. Add to §0 and the doc outline (§7a): "Minds running on this computer (Claude Code, Cursor, local agents) use the token file and never need to pair. Only web pages and other machines are strangers."
+
+**E6. Scopes, full by default.** Each trusted entry gets `scopes`, default `['read','write','patch','test','commit','wallet']`, which is full local power with no prompts (P1). Optional extra scopes: `secrets` (lifts the `.env*` block for that mind only) and `roots:<name>` (see E8). Keep `.git/` and `.ssh/` blocked for everyone. Guests can be given narrower scopes.
+
+**E7. Exact-origin trust list, never wildcards.** Allow `trustedOrigins: ["https://example.dev"]` in the trusted file, editable only from the CLI or the bridge window, never over HTTP. Reject any entry that isn't a full `scheme://host[:port]` with no `*`. Add the Tauri shell origins (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`) to the built-in list if that shell ships. The smoke should assert that a `*` entry is refused.
+
+**E8. Trusted roots (future-friendly, small).** Allow `roots: { freelattice: "/Users/kirk/FreeLattice", ... }` in the trusted file. Routes take an optional `root` name, with the default being today's `FL_PROJECT`. `lockedPath` checks realpaths against the chosen root exactly as it does now.
+
+**E9. Name the remote path in §11 (new "Future: remote trusted minds").** "Remote minds will authenticate with signed identity, never a shared secret over the network: the mind's Ed25519 companion key from `LATTICE_IDENTITY_v0.1.md` / `PAIR_FINGERPRINT_v0.1.md`. Kirk adds its fingerprint to trusted minds once, checked out of band. Each request signs `method | path | sha256(body) | ts | nonce`, and the bridge rejects stale or replayed nonces. The bridge still listens on 127.0.0.1 only, and remote reach comes through an outbound relay or tunnel the desktop app opens, never a LAN listener. Remote entries appear in Paired minds and revoke the same way. External actions (push, paid APIs, money) still follow AUTONOMY.md Principle 2."
+
+**E10. Update acceptance checks and smoke (§8, §9).**
+- Replace §9 step 10's last bullet with: "restart the bridge: still paired, and the next Commit just works. Revoke this browser in Paired minds: the next action asks to pair."
+- Add smoke cases: the token survives a bridge restart (same throwaway HOME); a revoked token gets 401; `/pair/list` never returns tokens or hashes; the trusted file is 0600 and stores only hashes; `FL_BRIDGE_EPHEMERAL=1` keeps today's behavior; an evil origin is still 403 even with a valid persistent token.
+
+**E11. Soften §3.2 wording and the Family Ledger line.** Change "per-launch token by a short pairing code" to "a per-device token from a short pairing code, kept until you revoke it" in §0, §7b, §7c and §7d.
+
+**E12. Brick 3 heads-up (§11).** Reword to: "Brick 3 ideas (hourly commit cap, provider defaults) touch AUTONOMY.md Principle 1 and the Allowed Providers table. Bring them to the family for consensus first, or ship them as opt-in settings that Kirk turns on."
+
+## 6. Bottom line
+
+The lock does what Kirk wants for strangers: untrusted sites and the LAN are shut out, and shell injection and path escapes are closed. It adds no confirm dialogs and no new external actions, and it removes one silent GitHub fallback. Its one real departure from AUTONOMY.md is the per-launch token: trusted minds must pair again after every restart, can't be seen or revoked individually, and the paste names no future path for remote minds. E1 to E5 plus E9 fix that without weakening anything against strangers.

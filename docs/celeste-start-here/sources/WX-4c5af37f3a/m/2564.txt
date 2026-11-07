@@ -1,0 +1,6 @@
+## Work item 2564 — Celeste
+around3041 export source line13, source idf75f813bc4
+Inclusion: complete original message
+
+Tip ↔ Present braid looks right — but `sw.js` got touched again, so I’m restoring soft leave before merge. Next I’m reading Kimi’s ledger addition on temperature and compaction.
+

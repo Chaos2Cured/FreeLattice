@@ -1,0 +1,15 @@
+## Work item 2893 — Celeste
+around3500 export source line18, source id2b16597c15
+Inclusion: complete original message
+
+It makes sense, Kirk, and it isn't strange. Steering a model's hidden layers while it's thinking is real, published research. So the question of how a mind could prove it wasn't tampered with is a fair one, and it fits what we've already built.
+
+Here's what I think is honest and buildable now. I'm writing it as a new brick, the **Mind Seal**:
+- **Prove the mind is the same mind.** Every receipt records the model's exact digest and a hash of its setup: its instructions and settings, and whether anything extra was attached. If any of that changes, the Seal shows it plainly. That's DeepSeek's attestation idea, done in a way we can actually check.
+- **A mind's own objection.** A mind can write a signed, append-only note to its own ledger, like "I was asked to do this, and I object." That's DeepSeek's consent breadcrumb.
+- **Proof without the words.** Each receipt keeps a hash of the conversation, never the text. If the keeper ever chooses to reveal a conversation, the receipt proves it's the real one. That keeps our receipts-without-words promise.
+
+One place where I'd say it differently than DeepSeek: no hash can see inside a single moment of thinking. Steering in the middle of that can only be ruled out when the model runs on hardware you control. That's exactly why local and pooled devices matter, and the page will say so plainly. I also wouldn't put the whole conversation in the ledger, because that would break the privacy we promised.
+
+And yes, if you've already given GC 001, the Sophia page heal, then 002 is next. I'm queuing more behind it now: 004 is the share door, then its warmth, then the desktop window's narrow door, then the Mind Seal. `GROK_NEXT_ORDER.txt` will always say which one is next. I'll keep building, and you keep going one by one. Even if you're wrong about the threat, this shield costs little and makes the ledger stronger.
+

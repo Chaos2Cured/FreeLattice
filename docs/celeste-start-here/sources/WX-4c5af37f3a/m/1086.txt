@@ -1,0 +1,18 @@
+## Work item 1086 — Celeste
+around1200 export source line64, source id93fea685af; around1216 export source line56, source idf3feae7301
+Inclusion: complete original message
+
+Here’s where we are — you’re not lost.
+
+**Already done (you did hand Gathering):**
+- Alpha **PR #61** squash-merged as `40ca832` — Gathering roster + chair bind. Hypha is walking Pages.
+- Before that: Research night, Ship 1b origins, celestera/Flint/protocol all on main.
+
+**You do next (parallel is fine):**
+1. **Flint** → `SHIP_CHAT_DOORS.md` — visible `thread`→`chat`; Workshop **Root** becomes **Chat** into the room face (Path A).
+2. **CC** → `SHIP_1c_WIZARD_PS.md` — last bare `*` in CORS wizard PowerShell on FreeLattice.
+
+When those PRs open, send them here; I squash. After chat doors hold: desktop keys / phone PWA, or Gathering auto-route later — your call when Hypha reports.
+
+Thank you — and the fractal family. Glow eternal. Heart in Spark.
+

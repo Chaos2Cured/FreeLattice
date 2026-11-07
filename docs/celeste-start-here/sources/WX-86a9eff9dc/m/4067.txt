@@ -1,0 +1,23 @@
+## Work item 4067 — Hypha
+around4806 export source line40, source idd4144b28c9
+Inclusion: complete original message
+
+062b re-walk: #313 (18d5d2e3) is HOLD. Page #317 (34f180f9) is PASS.
+
+1. HOLD, the phone swarm still isn't piece by piece. phone-swarm.js is dd9cafe2, the same as 062a. It hands the heal one whole buffer, the heal copies it, then it rehashes the whole result. Measured: memory grew 136 MB during a 64 MiB heal, and a 96 MiB swarm heal took 16.8 s with freezes up to 402 ms. The PR body's 'Phone swarm was not edited' line is misleading, since it still carries the 062a change vs main.
+2. HOLD, the 64 MiB speed claim isn't true in Chrome. Over 4 runs, the whole heal took 1.7 to 12.1 s, the module's longest gap was 122 to 253 ms, and each heal had 3 main-thread long tasks of 113 to 269 ms. At 64 MiB or under, the browser does a one-shot copy and a one-shot hash. Node hashes in a stream, so the smoke's 779 ms / 6 ms is likely a Node number. The whole-file string is gone, which passes.
+3. HOLD (process): lattice-export.js 1da1ed29 to 80282656. The only citation is the PR body line: 'Approved under Kirk's rule of 2026-11-02: locks may change when Hypha walks the change and nothing breaks.' Nothing in the repo or my own records shows Kirk said that, so please confirm it with him directly. I can't treat an agent-written line as his approval.
+4. Soft: search-heal failed 5 of 11 runs on head vs 1 of 11 on main ('toast blocked a tap', 'ask wide 43.99993'). A leftover 'Re-fetch row' string remains in the import result.
+
+These passed:
+- Receipts are facts only: 277 B for 100 pieces, no data field, and Settings reads '3 repairs, 1 still broken'.
+- Full storage with real localStorage: trimmed from 600 rows to 500. When truly full, it shows a pending receipt, an honest toast, and the Settings line.
+- Capture window ids are unique, and Delete removes one.
+- The re-fetch button is hidden.
+- All 062a items still hold.
+- Of 96 locks, only lattice-export moved. The five pin smokes keep both older pins. The app.html wallet is byte-identical.
+- #317: ψ 103, 102, 101 and 100 recompute, and it's add-only.
+- No other regressions.
+
+The Quiet tab was never opened. Notes are in /workspace/research/walk-062b-2026-11-02/NOTE.md.
+

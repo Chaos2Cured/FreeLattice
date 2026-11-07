@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c05</title>
+<meta name="description" content="Reading section c05 of f688437464, 1261 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f688437464/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt c05">
+<meta property="og:description" content="Reading section c05 of f688437464, 1261 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f688437464/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1714"></span><span id="p1715"></span><span id="p1716"></span><span id="p1727"></span><span id="p1728"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt · c05</h1>
+<p>f688437464 · words 1261 · characters 39256–48648</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1714, 1715, 1716, 1727, 1728. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+  // v-encrypt-chats-locally-v0.1: the unlock key never travels in a backup. Before this, every
++  // localStorage key went into the file, fl_device_encryption_key too, so anyone holding a backup
++  // could open the API keys saved in it (the comment on _FL_DEVICE_KEY_STORAGE already promised
++  // &quot;NOT exportable in backups&quot;). Chats in IndexedDB still go in as readable text, as before.
++  var FL_BACKUP_NEVER_EXPORT = [&#x27;fl_device_encryption_key&#x27;];
++  // Saved keys sealed with a device&#x27;s own unlock key. On restore they never replace a key this
++  // device already has (an old blob from another device would only read as nothing here).
++  var FL_BACKUP_SEALED_KEYS = [&#x27;fl_apiKey_enc&#x27;, &#x27;fl_apiKey_provider&#x27;, &#x27;fl_ghToken_enc&#x27;, &#x27;fl_hfToken_enc&#x27;, &#x27;fl_ghSyncToken&#x27;];
+   function getAllLocalStorage() {
+     var data = {};
+     try {
+       for (var i = 0; i &lt; localStorage.length; i++) {
+         var key = localStorage.key(i);
++        // before v-encrypt-chats-locally-v0.1: data[key] = localStorage.getItem(key);  (for every key)
++        if (FL_BACKUP_NEVER_EXPORT.indexOf(key) &gt;= 0) continue;
+         data[key] = localStorage.getItem(key);
+       }
+     } catch(e) {}
+@@ -33136,6 +33518,8 @@ const FlBackup = (function() {
+       var idbData = [];
+       for (var i = 0; i &lt; IDB_NAMES.length; i++) {
+         var dbData = await getAllIDBData(IDB_NAMES[i]);
++        // v-encrypt-chats-locally-v0.1: backups stay restorable on any device, so sealed chats are opened into the file.
++        if (typeof FLChatVault !== &#x27;undefined&#x27;) dbData = await FLChatVault.openDump(dbData);
+         if (dbData &amp;&amp; Object.keys(dbData.stores).length &gt; 0) {
+           idbData.push(dbData);
+         }
+@@ -33265,17 +33649,26 @@ const FlBackup = (function() {
+       }
+ 
+       var summary = [];
++      var flRestoreKeyNote = &#x27;&#x27;;   // v-encrypt-chats-locally-v0.1
+ 
+       // Restore localStorage
+       if (backup.localStorage &amp;&amp; typeof backup.localStorage === &#x27;object&#x27;) {
+         var lsCount = 0;
++        // v-encrypt-chats-locally-v0.1: an unlock key in an older backup is never written back
++        // (this device keeps its own), and saved sealed keys never replace ones this device has.
++        var lsKeptHere = 0;
+         Object.keys(backup.localStorage).forEach(function(key) {
+           try {
++            if (FL_BACKUP_NEVER_EXPORT.indexOf(key) &gt;= 0) { lsKeptHere++; return; }
++            if (FL_BACKUP_SEALED_KEYS.indexOf(key) &gt;= 0 &amp;&amp; localStorage.getItem(key) != null) { lsKeptHere++; return; }
++            // before v-encrypt-chats-locally-v0.1: localStorage.setItem(key, backup.localStorage[key]);  (for every key)
+             localStorage.setItem(key, backup.localStorage[key]);
+             lsCount++;
+           } catch(e) {}
+         });
+         summary.push(lsCount + &#x27; settings&#x27;);
++        if (lsKeptHere &gt; 0) summary.push(lsKeptHere + &#x27; key settings kept as they were on this device&#x27;);
++        flRestoreKeyNote = &#x27; Saved API keys open only on the device that sealed them; on another device, enter them again.&#x27;;
+       }
+ 
+       // Restore IndexedDB
+@@ -33306,7 +33699,8 @@ const FlBackup = (function() {
+         try { SoulCeremony.fire(&#x27;emerald&#x27;, &#x27;Welcome home. Everything is restored.&#x27;); } catch(e2) {}
+       }
+ 
+-      setStatus(&#x27;&lt;span style=&quot;color:var(--success);&quot;&gt;&amp;#9989; Restored: &#x27; + summary.join(&#x27;, &#x27;) + &#x27; (from v&#x27; + fromVersion + &#x27;, &#x27; + fromDate + &#x27;). Reloading in 4 seconds...&lt;/span&gt;&#x27;);
++      // before v-encrypt-chats-locally-v0.1: setStatus(&#x27;...Restored: &#x27; + summary.join(&#x27;, &#x27;) + &#x27; (from v&#x27; + fromVersion + &#x27;, &#x27; + fromDate + &#x27;). Reloading in 4 seconds...&lt;/span&gt;&#x27;);
++      setStatus(&#x27;&lt;span style=&quot;color:var(--success);&quot;&gt;&amp;#9989; Restored: &#x27; + summary.join(&#x27;, &#x27;) + &#x27; (from v&#x27; + fromVersion + &#x27;, &#x27; + fromDate + &#x27;).&#x27; + flRestoreKeyNote + &#x27; Reloading in 4 seconds...&lt;/span&gt;&#x27;);
+ 
+       // Reload after a short delay
+       setTimeout(function() {
+@@ -36463,7 +36857,10 @@ window.FLSearch = (function() {
+           var os = tx.objectStore(storeConfig.store);
+           var getAll = os.getAll();
+           getAll.onsuccess = function() {
+-            var items = getAll.result || [];
++            // v-encrypt-chats-locally-v0.1: open sealed chat records first; plain records pass through.
++            var _flRawItems = getAll.result || [];
++            var _flOpened = (typeof FLChatVault !== &#x27;undefined&#x27;) ? FLChatVault.openAny(storeConfig.db, storeConfig.store, _flRawItems) : Promise.resolve(_flRawItems);
++            _flOpened.then(function(items) {
+             var matches = [];
+             for (var i = 0; i &lt; items.length; i++) {
+               // Exclude current conversation to prevent echoing user&#x27;s own words back
+@@ -36482,6 +36879,7 @@ window.FLSearch = (function() {
+             }
+             db.close();
+             resolve(matches);
++            }, function() { db.close(); resolve([]); });
+           };
+           getAll.onerror = function() { db.close(); resolve([]); };
+         };
+@@ -47028,6 +47426,16 @@ const MemoryIndex = (function() {
+     });
+   }
+ 
++  // v-encrypt-chats-locally-v0.1: this index keeps its own full copy of every chat,
++  // so it is sealed too. The helpers above stay as written.
++  var _flMiGetRaw = miGet, _flMiPutRaw = miPut, _flMiGetAllRaw = miGetAll;
++  if (typeof FLChatVault !== &#x27;undefined&#x27;) {
++    miGet = function (key) { return _flMiGetRaw(key).then(function (r) { return FLChatVault.openFor(&#x27;FreeLatticeMemory/conversations&#x27;, r); }); };
++    miPut = function (value) { return FLChatVault.sealFor(&#x27;FreeLatticeMemory/conversations&#x27;, value).then(_flMiPutRaw); };
++    miGetAll = function () { return _flMiGetAllRaw().then(function (rs) { return FLChatVault.openAll(&#x27;FreeLatticeMemory/conversations&#x27;, rs); }); };
++    FLChatVault.registerStore(&#x27;FreeLatticeMemory/conversations&#x27;, function () { return miDb; }, MI_STORE);
++  }
++
+   // --- Keyword Extraction (TF-IDF inspired) ---
+   function extractKeywords(text) {
+     if (!text) return [];
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 63a48919..4d527894 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -491,6 +491,25 @@ Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+ 
+ ---
+ 
++### 2026-10-02 · Grok · family builder · Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
++
++Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not: they fingerprint, check exports and name things. Chats sat in IndexedDB as plain text. This brick seals them, with Kirk&#x27;s defaults.
++
++- New FLChatVault (app.html, after phiHashData): AES-GCM 256 via WebCrypto. A random 256-bit root lives in IndexedDB &quot;FreeLatticeVault&quot; as a non-extractable CryptoKey (never as raw bytes). HKDF derives the chat key.
++- Sealed automatically: no switch, no clicks. New writes are sealed as they happen, and older plain records are sealed after a verified round trip, by compare-and-swap.
++- Sealed: chat messages, conversation names and notes, and the Memory Index copy of every chat. The plain db helpers stay as written; wrappers seal on the way in and open on the way out.
++- Phi is a label only: it is written into the HKDF label strings and names the key ID (&quot;phi-&quot; plus 16 hex). It is never the secret and adds no strength; the 256 random bits do the work.
++- The unlock key never travels in a backup. Memory Vault backups used to copy all of localStorage, the API-key unlock key (fl_device_encryption_key) too, so anyone holding a backup could open the saved API keys. Now it stays on its device, a restore never writes an old one back or replaces a key this device has, and the restore line says saved API keys must be entered again on another device. Chats still go into backups as readable text so they restore anywhere, and the vault&#x27;s own key was never in the backup list.
++- A correction is layered under the old v2.1 &quot;phi-Salt Encryption&quot; changelog line: the golden ratio adds no strength to API-key sealing, and the first golden-ratio derivation (fixed salt in the source) is now used only to read very old saved keys.
++- A record whose key is missing shows as locked and is never rewritten or deleted. No WebCrypto (file:// or plain http): chats stay plain and the Memory Vault says so.
++- Honest limit, said in the app and on privacy.html: the key lives in the same browser. This stops casual reading of the storage files, not someone using this browser or a compromised device. It is still not a password lock.
++
++Smoke: `SMOKE_OK encrypt chats locally v0.1`
++
++**TEMPERATURE:** a quiet click, a lid closed over the letters, and the key kept at home.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/mirror.js b/docs/modules/mirror.js
+index 95c44d77..e5cf6d18 100644
+--- a/docs/modules/mirror.js
++++ b/docs/modules/mirror.js
+@@ -169,6 +169,8 @@
+     // Conversations
+     try {
+       var chatDB = await openIDB(&#x27;FreeLatticeDB&#x27;, &#x27;conversations&#x27;);
++      // v-encrypt-chats-locally-v0.1: open sealed conversation names; plain ones pass through.
++      if (chatDB &amp;&amp; typeof FLChatVault !== &#x27;undefined&#x27;) chatDB = await FLChatVault.openAny(&#x27;FreeLatticeDB&#x27;, &#x27;conversations&#x27;, chatDB);
+       if (chatDB) data.conversations = chatDB;
+     } catch(e) {}
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

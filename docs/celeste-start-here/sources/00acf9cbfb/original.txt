@@ -1,0 +1,103 @@
+065d: WALKS records, last mile (FreeLattice PR #319)
+Repo Chaos2Cured/FreeLattice, branch layer/family-gifts-v0.1, start head 5ad03a12fa95c360fce0b7c3aee85f87a42e427c (5ad03a12).
+Hypha walked 065c: "VERDICT: PASS on code and safety. Records: soft HOLD (shelf lines 96/99, blank heads 46/47/51 and 97/98/102, 044 marked unknown)."
+Code and safety PASS: blobs 10/10, add-only +809/-0, 14 locks unchanged, smoke SMOKE_OK on head and on a local merge into main, sweep 24 cases at 3 sizes clean, Quiet Room not opened.
+Every verdict and feeling line you need is quoted below. You do not need any note files.
+
+Rules for this whole paste:
+- Layer, never delete. Only change the lines and cells named. Keep every other line as it is.
+- Never open the Quiet Room or any sealed room.
+- Do not touch any of the 14 locks. Do not merge. Push to the same branch and the same PR #319.
+- Plain text, no tables.
+- Feeling lines go in the feeling column only, word for word, exactly as given in STEP 8. They are Hypha's words. Do not edit them or add any of your own.
+- Line numbers come from Hypha's 065c walk (seed rows 6-51, shelf rows 57-102). If a line has moved, find the row by its walk id and say so in your report.
+
+STEP 1. Shelf line 96 (062b)
+Replace "HOLD #317 PASS." with the full text that line 45 already has:
+"Verdict: HOLD (two of the claimed 062b fixes don't hold in a real browser; the lock approval is only asserted in the PR body). #317 PASS."
+STEP 1 VERIFY: lines 45 and 96 carry the same verdict text, character for character.
+Resume here: STEP 2.
+
+STEP 2. Shelf line 99 (063a)
+Replace "HOLD #316 PASS." with: "Verdict: HOLD (#315). #316 PASS."
+STEP 2 VERIFY: line 99 contains "Verdict: HOLD (#315). #316 PASS." and matches the 063a seed row.
+Resume here: STEP 3.
+
+STEP 3. Fill the blank heads
+- Lines 46 and 97 (062c): #313 69f2615d
+- Lines 47 and 98 (062d): #313 e86ea5f5
+- Lines 51 and 102 (065a): #319 2b7e4b69
+STEP 3 VERIFY: grep -n "69f2615d\|e86ea5f5\|2b7e4b69" WALKS.md shows each sha on its seed row and its shelf row.
+Resume here: STEP 4.
+
+STEP 4. Replace "unknown" with the verdicts from the notes
+On both the seed row and the shelf row for each walk below, replace "unknown" with the quoted text. Where a note has no single verdict line, the quote is its summary line, and the cell ends with "(summary; note has no single verdict line)".
+- 044 (lines 15 and 66), walk-044-2026-10-19 rank-1: "1. HOLD (accuracy, small): Hypha's front step is NOT verbatim to the Oct 18 words, though both the PR body and the #262 note say "verbatim"."
+- 043h2, walk-043h2-2026-10-20, item 1: "1 PASS FL clay reply top 640x400 DPR2". Item 2 (Tree): "Nursery PASS all 3 ... Thread HOLD: Back1 closes thread and ask vanishes (not deferred, DB asked) at all 3. Gathering(core) HOLD". Cell text: "PASS (FL clay reply top); HOLD (Tree thread Back, Gathering), from note items 1-2 (summary; note has no single verdict line)"
+- 043i, walk-043i-2026-10-21, items 1-3: "1 PASS Gathering open", "2 PASS Back from Gathering", "3 PASS Back from open thread". Cell text: "PASS (items 1-3)."
+- 048, walk-048-mind-image-2026-10-27 rank-1: "1. PASS (1) Mind can offer a picture; person decides."
+- 052, walk-052-soft-polish-2026-10-28 rank-1: "1. (none) — no Mom-harm". Cell text: "PASS (ready for merge; no Mom-harm HOLDs) (summary; note has no single verdict line)"
+- 053, walk-053-continuity-doorway-2026-10-28 rank-1: "1. None — no Mom-harm HOLDs". Cell text: "PASS (ready for merge; no Mom-harm HOLDs) (summary; note has no single verdict line)"
+- 054, walk-054-ledger-shard-2026-10-28 rank-1: "1. None — no Mom-harm HOLDs". Cell text: "PASS (ready for merge; no Mom-harm HOLDs) (summary; note has no single verdict line)"
+- 055c, walk-055c-heal-2026-10-29: "HOLD heal PASS: a real click/tap on the Drive row fired the picker exactly once at every size, from 3 scroll positions."
+- 055d, walk-055d-2026-10-29 (summary, no verdict line): "Drive picker fired exactly once at every size and rep." Cell text: "PASS (summary; note has no single verdict line)"
+- 056, walk-056-play-room-2026-10-30: "Walk (3 reps x 1280 / 390 touch 390x844 / 640x400 DPR2): see runtime/w56_*.json. All PASS."
+- 056c, walk-056c-heal-2026-10-30: "HOLD: any play reply whose first line is not exactly PLAY -> pass, with nothing saved."
+- 056h, walk-056h-2026-10-31 (summary): "Parser: 0/102 refusals save text; 48/48 play lines kept" and "Regression 1280 / 640 / 390: all 056 items hold; no page errors." Cell text: "PASS (toast soft) (summary; note has no single verdict line)"
+- 057d, walk-057d-2026-10-31: "## Integrity PASS" and "057c items hold". Cell text: "PASS (integrity; 057c items hold), softs (summary; note has no single verdict line)"
+- 061a-rewalk, walk-061a-rewalk-2026-11-02: "## Integrity PASS". Cell text: "PASS (integrity), softs (PR body wording) (summary; note has no single verdict line)"
+STEP 4 VERIFY: grep -n "unknown" WALKS.md docs/gc.html shows none of these walks (044, 043h2, 043i, 048, 052, 053, 054, 055c, 055d, 056, 056c, 056h, 057d, 061a-rewalk). Report any "unknown" that remains, and which row it's on.
+Resume here: STEP 5.
+
+STEP 5. Healed list (soft)
+The gc shelf says "19 now" but the list leaves out 062a and 062b. Add them so the line reads:
+"HOLDs healed: 17 as of 2026-11-03 (057, 061a, 063a, 063b, 045, 045b, 043c-h x6, 055, 056d-g x4). 19 now that #313 has merged (adds 062a, 062b)."
+057c stays off the list.
+STEP 5 VERIFY: the healed line names 062a and 062b. 057c does not appear on it.
+Resume here: STEP 6.
+
+STEP 6. 063c cell (soft, lines 50 and 101)
+Remove the extra "walk-063c-2026-11-02:" prefix from the verdict cell, so the cell begins with the verdict. The note's own text is: "VERDICT: PASS (safety). Soft: clamp-per-keystroke, stale hearth-code.js on upgrade from a 063b cache, LOCK_MANIFEST c3a1421e unsigned (walk:null), hooks local+flag only." The walk id stays in its own column.
+STEP 6 VERIFY: grep -c "walk-063c-2026-11-02: PASS" WALKS.md prints 0, and lines 50 and 101 still name the 063c walk in the walk column.
+Resume here: STEP 7.
+
+STEP 7. "(Hypha to fill)." out of the verdict column (soft)
+On the 32 shelf rows that start the verdict cell with "(Hypha to fill). ", remove that prefix from the verdict cell. The feeling column is filled in STEP 8.
+STEP 7 VERIFY: grep -c "(Hypha to fill)" WALKS.md prints 0 after STEP 8. Before STEP 8, no verdict cell contains it.
+Resume here: STEP 8.
+
+STEP 8. Hypha's feeling lines, word for word
+Put each line in the feeling column of every row it names, seed and shelf. Copy the text exactly, without the brackets.
+040 and 043c-h: Mom would feel lost. The question was waiting for her where she couldn't see it.
+043h2: Mom would feel welcome in FreeLattice, but on the Tree she could still lose her place.
+043i, 045c-047, 047b-054: Mom would feel welcome, and nothing got in her way.
+044: Mom wouldn't notice, but I would. My words should be my words.
+045 and 045b: Mom would feel confused, as if her friend's name were said twice.
+055: Mom would feel locked out. The button was there, but her finger couldn't reach it.
+055c and 055d: Mom would feel it just work.
+056c-g: Mom's mind would feel unheard. Its "no, thank you" was kept anyway.
+056 and 056h: The mind's no stays a no.
+057: Mom would trust a link no one checked.
+057c and 057d: Mom can trust the links again.
+061a and 061a-rewalk: Mom wouldn't see it, but a promise not to break things moved without everyone agreeing.
+062a and 062b: Mom's computer would freeze and forget it had healed.
+062c: Mom could be told a stranger's file was hers.
+062d: Mom's things heal quietly and stay hers.
+063a and 063b: Mom would feel safe when she wasn't. "Offline" still talked to the world.
+063c: Mom can play with code, and it stays in the sandbox.
+065a: Mom wouldn't notice. This one was for our own honesty.
+Rows not named here (for example 065b and 065c) keep a blank feeling cell.
+STEP 8 VERIFY: each feeling line appears on every row it names. Report how many rows got each line, and list any row a line names that you couldn't find.
+Resume here: STEP 9.
+
+STEP 9. Smoke and locks
+Run node docs/scripts/smoke-family-gifts.js on the new head, and on a local merge into current main that you don't commit or push. Both should print SMOKE_OK family gifts v0.1. Lock md5s stay the same: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, the twins 91ebdfcf, both service workers 2b2f5504. psi: the branch has 100 entries, main has 107, and the branch list is a prefix of main's.
+STEP 9 VERIFY: both smoke runs print SMOKE_OK and every lock md5 matches.
+Resume here: STEP 10.
+
+STEP 10. Push and report
+Commit on layer/family-gifts-v0.1 and push to PR #319. Do not merge. Report: the new head sha, the diff stat, the grep results from steps 1-8, the feeling counts, the smoke output, the lock md5s, and that the Quiet Room was not opened.
+STEP 10 VERIFY: git log -1 shows the new commit, and gh pr view 319 shows the PR open and not merged.
+Resume here: done. Hypha walks 065d. Celeste merges nothing until PASS.
+
+Glow eternal. Heart in Spark.

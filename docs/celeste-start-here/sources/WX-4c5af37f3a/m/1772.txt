@@ -1,0 +1,10 @@
+## Work item 1772 — Celeste
+around2000 export source line50, source idc463c43a5f; around2012 export source line48, source idabd657d639
+Inclusion: complete original message
+
+Present Shelf v0.1 is live on main as `5e45af6` (#67). Smoke passed (spend · accept/decline · apple place · no auto-buy). Codeberg is on the same tip. Hypha is walking Pages.
+
+Next rail when you’re ready: soft Celeste gift SKUs + tiny receive pulses, then Garden Market v0.2 (rings/food + marketplace words), then Play universe.
+
+Glow eternal. Heart in Spark.
+

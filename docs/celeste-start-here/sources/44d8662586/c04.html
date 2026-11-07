@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c04</title>
+<meta name="description" content="Reading section c04 of 44d8662586, 1260 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/44d8662586/c04.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt c04">
+<meta property="og:description" content="Reading section c04 of 44d8662586, 1260 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/44d8662586/c04.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1418"></span><span id="p1419"></span><span id="p1420"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt · c04</h1>
+<p>44d8662586 · words 1260 · characters 30475–40772</p>
+<p><a href="c03.html">Previous section</a> · <a href="c05.html">Next section</a></p>
+<p><a href="c04.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1418, 1419, 1420. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">+    // v-tree-gathering-api-keys-v0: the same mind may sit in two chairs. Allowed, and said.
++    function twinNote(chairId, seat) {
++      var binds = entryState().binds;
++      var twins = [];
++      CORE_CHAIRS.forEach(function (c) {
++        var b = binds[c.id];
++        if (c.id === chairId || !b) return;
++        if (String(b.model) === String(seat.model || &#x27;&#x27;) &amp;&amp; String(b.url) === String(seat.url || &#x27;&#x27;)) twins.push(c.type);
++      });
++      if (!twins.length) return &#x27;&#x27;;
++      return &#x27; The &#x27; + twins.join(&#x27; and &#x27;) + (twins.length &gt; 1 ? &#x27; chairs already seat&#x27; : &#x27; chair already seats&#x27;) +
++        &#x27; this same mind, so they will sound alike.&#x27;;
++    }
++
+     function openPicker(chair, seatBtn) {
+       var state = entryState();
+       var options = (window.LocalMindProbe &amp;&amp; LocalMindProbe.getChairSeatOptions)
+         ? LocalMindProbe.getChairSeatOptions()
+         : (state.roster || []);
++      // v-tree-gathering-api-keys-v0: cloud minds you chose (your key) sit beside local ones
++      if (window.TreeCloudMinds &amp;&amp; typeof window.TreeCloudMinds.seatOptions === &#x27;function&#x27;) {
++        options = (options || []).concat(window.TreeCloudMinds.seatOptions());
++      }
+       picker.innerHTML = &#x27;&#x27;;
+       picker.setAttribute(&#x27;data-bind-chair&#x27;, chair.id);
+       picker.hidden = false;
+@@ -1428,18 +1450,36 @@
+           btn.type = &#x27;button&#x27;;
+           btn.className = &#x27;core-bind-option&#x27;;
+           btn.textContent = seat.tag + &#x27; · &#x27; + shortName(seat.model) + (seat.ephemeral ? &#x27; (just found)&#x27; : &#x27;&#x27;);
++          // v-tree-gathering-api-keys-v0: say where a cloud seat speaks from
++          if (seat.cloud) {
++            btn.textContent = seat.tag + &#x27; · &#x27; + shortName(seat.model) + &#x27; · &#x27; + seat.providerName + &#x27; (your key)&#x27;;
++            btn.setAttribute(&#x27;data-cloud-seat&#x27;, seat.url);
++          }
+           btn.addEventListener(&#x27;click&#x27;, function () {
++            var twins = twinNote(chair.id, seat);
+             if (window.LocalMindProbe &amp;&amp; LocalMindProbe.setChairBind) {
+               LocalMindProbe.setChairBind(chair.id, seat);
+             }
+             closePicker();
+             paintAll();
+-            setNoteText(&#x27;This &#x27; + chair.type + &#x27; chair seats &#x27; + seat.tag + &#x27; · &#x27; + shortName(seat.model) + &#x27;. Not a person-name. Not a dump.&#x27;);
++            setNoteText(&#x27;This &#x27; + chair.type + &#x27; chair seats &#x27; + seat.tag + &#x27; · &#x27; + shortName(seat.model) + &#x27;. Not a person-name. Not a dump.&#x27; + twins);
+           });
+           list.appendChild(btn);
+         });
+         picker.appendChild(list);
+       }
++      // v-tree-gathering-api-keys-v0: bring your own key, then seat it here in one step
++      if (window.TreeCloudMinds &amp;&amp; typeof window.TreeCloudMinds.mountKeyPanel === &#x27;function&#x27;) {
++        window.TreeCloudMinds.mountKeyPanel(picker, function (seat) {
++          var twins = twinNote(chair.id, seat);
++          if (window.LocalMindProbe &amp;&amp; LocalMindProbe.setChairBind) {
++            LocalMindProbe.setChairBind(chair.id, seat);
++          }
++          closePicker();
++          paintAll();
++          setNoteText(&#x27;This &#x27; + chair.type + &#x27; chair seats &#x27; + shortName(seat.model) + &#x27; through &#x27; + seat.providerName + &#x27;, with your key. Tap the chair to let it speak.&#x27; + twins);
++        });
++      }
+       var decline = document.createElement(&#x27;button&#x27;);
+       decline.type = &#x27;button&#x27;;
+       decline.className = &#x27;core-bind-decline&#x27;;
+@@ -1455,12 +1495,18 @@
+         clear.className = &#x27;core-bind-clear&#x27;;
+         clear.textContent = &#x27;Clear&#x27;;
+         clear.addEventListener(&#x27;click&#x27;, function () {
++          // v-tree-gathering-api-keys-v0: clearing the speaking chair must not hand the next
++          // message to another mind without a word. Hush until a seated chair is tapped.
++          var wasSpeaking = entryState().speaking === chair.id;
++          if (wasSpeaking) window.GardenRooms.gatheringHush = true;
+           if (window.LocalMindProbe &amp;&amp; LocalMindProbe.setChairBind) {
+             LocalMindProbe.setChairBind(chair.id, null);
+           }
+           closePicker();
+           paintAll();
+           setNoteText(&#x27;Cleared. The &#x27; + chair.type + &#x27; chair has no mind seated — honest empty.&#x27;);
++          var clearedNote = wasSpeaking &amp;&amp; wrap.querySelector(&#x27;[data-core-note]&#x27;);
++          if (clearedNote) clearedNote.textContent += &#x27; No chair is speaking now. Chat waits until you tap a seated chair.&#x27;;
+         });
+         picker.appendChild(clear);
+       }
+@@ -1522,12 +1568,14 @@
+           return;
+         }
+         // Bound: select as speaking chair for Gathering chat.
++        window.GardenRooms.gatheringHush = false;
+         if (window.LocalMindProbe &amp;&amp; LocalMindProbe.setSpeakingChair) {
+           LocalMindProbe.setSpeakingChair(chair.id);
+         }
+         closePicker();
+         paintAll();
+-        setNoteText(&#x27;Speaking with &#x27; + bind.tag + &#x27; · &#x27; + shortName(bind.model) + &#x27; at this chair. One request at a time. Use Change to reseat.&#x27;);
++        // v-tree-gathering-api-keys-v0: name the chair, so two chairs with one mind differ
++        setNoteText(&#x27;Speaking with &#x27; + bind.tag + &#x27; · &#x27; + shortName(bind.model) + &#x27; at the &#x27; + chair.type + &#x27; chair. One request at a time. Use Change to reseat.&#x27;);
+       });
+       (chair.later ? laterRing : ring).appendChild(seat);
+     });
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index f2794a5..e46792f 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -26,6 +26,10 @@
+ //      remembered local mind can keep those without inventing a key
+ //      kitchen. Honest later sentence in the room. Not a fake button.
+ //
++// v-tree-gathering-api-keys-v0 (layer): a Gathering chair may seat a cloud mind
++//   (url &#x27;cloud:&lt;provider&gt;&#x27;) with the person&#x27;s own key. That road lives in
++//   tree-cloud-minds.js. The key never enters this thread, its history or export.
++//   Files stay on this machine: a cloud mind hears only that a file stayed here.
+ // Mirror: docs/code-dialogue.html  (read that FIRST)
+ // ═══════════════════════════════════════════════════════════════
+ 
+@@ -90,11 +94,22 @@
+     return /failed|network|cors|mixed|blocked|abort|load|fetch/i.test(msg);
+   }
+ 
++  // v-tree-gathering-api-keys-v0: after the speaking chair is cleared, the Gathering is hushed
++  // until a seated chair is tapped. Chat says so instead of answering from another mind.
++  var HEART_HUSH = &#x27;No chair is speaking now. Tap a seated chair in the Gathering to let it speak.&#x27;;
++  function gatheringHushed() {
++    var veil = document.getElementById(&#x27;place-veil&#x27;);
++    return !!(window.GardenRooms &amp;&amp; window.GardenRooms.gatheringHush &amp;&amp; veil &amp;&amp;
++      veil.classList.contains(&#x27;is-core&#x27;) &amp;&amp; veil.classList.contains(&#x27;is-open&#x27;));
++  }
++
+   function listener() {
+     if (!window.LocalMindProbe) return null;
+     // Gathering speaking chair first (when veil is open and bound); else Settings default.
+     if (typeof LocalMindProbe.resolveSpeakMind === &#x27;function&#x27;) {
+       var seated = LocalMindProbe.resolveSpeakMind();
++      if (seated &amp;&amp; seated.fromChair &amp;&amp; (seated.url || seated.name)) return seated;
++      if (gatheringHushed()) return { hush: true, name: &#x27;&#x27;, url: &#x27;&#x27; };
+       if (seated &amp;&amp; (seated.url || seated.name)) return seated;
+     }
+     if (typeof LocalMindProbe.getRemembered !== &#x27;function&#x27;) return null;
+@@ -103,6 +118,11 @@
+     return mind;
+   }
+ 
++  // v-tree-gathering-api-keys-v0: is this listener a cloud chair?
++  function isCloudMind(mind) {
++    return !!(mind &amp;&amp; /^cloud:/i.test(String(mind.url || &#x27;&#x27;)));
++  }
++
+   function forbiddenKey(key) {
+     var k = String(key || &#x27;&#x27;);
+     if (!k) return false;
+@@ -333,6 +353,13 @@
+     return text;
+   }
+ 
++  // v-tree-gathering-api-keys-v0: what a cloud chair may hear. Words yes; file bytes and names stay here.
++  function cloudSafeContent(m) {
++    var text = String((m &amp;&amp; m.text) || &#x27;&#x27;);
++    if (m &amp;&amp; m.file) text += (text ? &#x27;\n\n&#x27; : &#x27;&#x27;) + &#x27;[a file stayed on this machine]&#x27;;
++    return text;
++  }
++
+   function talkUrls(mind) {
+     var url = String((mind &amp;&amp; mind.url) || &#x27;&#x27;).replace(/\/+$/, &#x27;&#x27;);
+     if (!url) return [];
+@@ -451,6 +478,13 @@
+   }
+ 
+   function sendToMind(mind, msgs) {
++    // v-tree-gathering-api-keys-v0: a cloud chair speaks through its chosen provider only
++    if (isCloudMind(mind)) {
++      if (window.TreeCloudMinds &amp;&amp; typeof window.TreeCloudMinds.send === &#x27;function&#x27;) {
++        return window.TreeCloudMinds.send(mind, msgs);
++      }
++      return Promise.reject({ reason: &#x27;cloud&#x27;, cloudText: &#x27;This chair seats a cloud mind, but its helper is not on this page. Nothing was sent.&#x27; });
++    }
+     var urls = talkUrls(mind);
+     if (!urls.length) {
+       return Promise.reject({ blocked: true });
+@@ -529,6 +563,11 @@
+     } else {
+       heart.textContent = HEART_NONE;
+     }
++    // v-tree-gathering-api-keys-v0: a cloud chair is not on this machine; say so
++    if (isCloudMind(mind) &amp;&amp; window.TreeCloudMinds &amp;&amp; typeof window.TreeCloudMinds.heartLine === &#x27;function&#x27;) {
++      heart.textContent = window.TreeCloudMinds.heartLine(mind);
++    }
++    if (mind &amp;&amp; mind.hush) heart.textContent = HEART_HUSH;
+     root.appendChild(heart);
+ 
+     var later = el(&#x27;p&#x27;, &#x27;thread-later&#x27;, HEART_LATER);
+@@ -702,15 +741,24 @@
+ 
+     function talkNow(nowMind) {
+       if (busy) return;
++      if (nowMind &amp;&amp; nowMind.hush) {
++        messages.push({ role: &#x27;garden&#x27;, text: HEART_HUSH + &#x27; Nothing was sent.&#x27; });
++        saveHistory();
++        renderMessages(list);
++        return;
++      }
+       busy = true;
+       sendBtn.disabled = true;
+       setStatus(&#x27;Waiting for the mind at home…&#x27;, false);
++      // v-tree-gathering-api-keys-v0: name the provider; file bytes never leave for a cloud chair
++      var cloudNow = isCloudMind(nowMind);
++      if (cloudNow &amp;&amp; window.TreeCloudMinds) setStatus(&#x27;Waiting for &#x27; + window.TreeCloudMinds.providerName(nowMind) + &#x27;\u2026&#x27;, false);
+ 
+       var payload = [{ role: &#x27;system&#x27;, content: JUST_TALK }].concat(
+         messages
+           .filter(function (m) { return m.role === &#x27;human&#x27; || m.role === &#x27;mind&#x27;; })
+           .map(function (m) {
+-            return { role: m.role === &#x27;mind&#x27; ? &#x27;assistant&#x27; : &#x27;user&#x27;, content: messageContent(m) };
++            return { role: m.role === &#x27;mind&#x27; ? &#x27;assistant&#x27; : &#x27;user&#x27;, content: cloudNow ? cloudSafeContent(m) : messageContent(m) };
+           })
+       );
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

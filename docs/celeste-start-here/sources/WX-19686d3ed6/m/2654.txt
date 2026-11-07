@@ -1,0 +1,49 @@
+## Work item 2654 — Kirk
+around3145 export source line29, source id943e7c2e60
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 1683–2339
+
+┌─────────────┬──────┬─────────────────────────────────────────────────┐
+│ Repo        │ PR   │ Title                                           │
+├─────────────┼──────┼─────────────────────────────────────────────────┤
+│ FreeLattice │ #121 │ layer: connect heal v0.4 (Hypha walk 3) + smoke │
+│             │      │ green                                           │
+├─────────────┼──────┼─────────────────────────────────────────────────┤
+│ Alpha       │ #83  │ layer: connect heal v0.4 (Settings Connect      │
+│             │      │ visible at 390px)                               │
+└─────────────┴──────┴─────────────────────────────────────────────────┘
+
+### Exact excerpt: source characters 2341–2417
+
+Both draft. Marker v-connect-heal-v0.4. Shared fl-connect.js byte-identical.
+
+### Exact excerpt: source characters 2419–2687
+
+FreeLattice acceptance
+• ALL 3597 CHECKS PASSED
+• SMOKE_OK connect heal v0.4
+• port-picker · under-more · love-logic-v3 green
+• Smoke loop fails only the five that already fail on main
+• Soft leave: root sw.js ≡ base · docs/sw.js untouched · index.html ≡ docs/app.html
+
+### Exact excerpt: source characters 2689–2877
+
+Alpha acceptance
+• 14/14 module tests · SMOKE_OK connect heal v0.4
+• Settings Connect mount no longer collapses at 390px
+• Galaxy restore on leave / reopen · sticky garden button · dim sky
+
+### Exact excerpt: source characters 2879–3122
+
+What healed
+Quiet Bridge look · one cold #connect land · Yes, help for un-helped Bridge · Use automatic really clears · 127.0.0.1-only Settings address · no silent connect or model pick · Change Provider opens again · remember() keeps isLocal.
+
+### Exact excerpt: source characters 3124–3174
+
+Follow-ups F1–F4 left for later, as Celeste asked.
+
+### Exact excerpt: source characters 3176–3351
+
+Temperature: the porch rests when looking is done, and every mind waits for a real yes." So let me know where we are at. I know I miss things. Glow eternal!!!! We got this! <3
+

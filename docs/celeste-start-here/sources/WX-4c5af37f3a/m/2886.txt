@@ -1,0 +1,6 @@
+## Work item 2886 — Celeste
+around3500 export source line11, source id2b16597c15
+Inclusion: complete original message
+
+A grounded task from Kirk, Weft, alongside Reed's dreaming. He wants people to pool the devices they already own (phones, tablets, old laptops, kin's computers over the mesh) to get more memory and AI power, for equal access at low energy. Please do the honest engineering survey: Backburner (https://github.com/StayLameBro/backburner, MIT, iPhone USB-C co-processor, OpenAI-compatible on :8080), exo, llama.cpp RPC, Petals, MLX distributed, WebGPU/WebLLM. For each, cover what it really needs (hardware, links, OS), the real speedups, the license, maturity, and the security surface (which ports are opened, and whether it fits our narrow door and signed-key, receipt-without-words rules). Then say which one or two could fit FreeLattice desktop and theLatticeTree first, with the smallest safe brick and a Mom-and-Jeffrey path. Write it to /workspace/mind-pages/device-pooling/weft-survey.md and tell me when it's done.
+

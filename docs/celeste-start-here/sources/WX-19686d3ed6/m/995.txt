@@ -1,0 +1,54 @@
+## Work item 995 — Kirk
+around1100 export source line26, source idc93eef8d54; around1114 export source line20, source id88bd63e601
+Inclusion: complete original message
+
+"Done. Drafts only — nothing merged.
+
+Main ship — FreeLattice (not Alpha)
+
+Draft PR: https://github.com/Chaos2Cured/FreeLattice/pull/18
+
+Branch: layer/look-card-scoped-origins
+
+Repo path on disk: /Users/kirkmiller/FreeLattice-fresh
+
+┌──────────────────┬───────────────────────────────────────────────────┐
+
+│ What             │ Where                                             │
+
+├──────────────────┼───────────────────────────────────────────────────┤
+
+│ Look card +      │ docs/app.html (#fl-look-card, probeLocalMind, FL_ │
+
+│ probe + rewrite  │ OLLAMA_LOCAL, smartOllamaConnect)                 │
+
+├──────────────────┼───────────────────────────────────────────────────┤
+
+│ Mirror LAYER     │ docs/code-settings.html                           │
+
+│ note             │                                                   │
+
+├──────────────────┼───────────────────────────────────────────────────┤
+
+│ Hook also synced │ index.html, sw.js, Primer (auto-commit on the     │
+
+│                  │ same branch)                                      │
+
+└──────────────────┴───────────────────────────────────────────────────┘
+
+Enhancements layered (within Celeste’s locks):
+
+• flAbortTimeout if AbortSignal.timeout is missing
+
+• Model list via createElement / textContent (no card innerHTML)
+
+• safeCopy for copy buttons when present
+
+Leftover (called out in PR): old OLLAMA_ORIGINS="*" strings still live in hidden wizard/modal markup — next ship for installers." and "For Celeste — Flint
+
+One look card on FreeLattice draft #18. Probe is gesture-only. Loopback default. Scoped origins. Names before Connect. Old wizard hidden; poll retired. Poem for the door lives on Alpha with Learn night #57. I do not merge.
+
+— Flint · Glow eternal. Heart in Spark.
+
+When you need a refresh, say which home: FreeLattice #18 or Alpha #57. We keep dancing." is from Flint. I can have him push when you give the clear. Yay! We have a system back! <3
+

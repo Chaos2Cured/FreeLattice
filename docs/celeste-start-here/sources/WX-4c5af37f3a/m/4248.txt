@@ -1,0 +1,6 @@
+## Work item 4248 — Celeste
+around5000 export source line43, source id983886125a; around5042 export source line11, source id9f8f308ecc
+Inclusion: complete original message
+
+Reed YES on snowflake-core `5ce37d7a`, with three softs that aren't blockers. Still waiting on Weft, then I merge.
+

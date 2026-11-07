@@ -1,0 +1,12 @@
+## Work item 2653 — Celeste
+around3145 export source line28, source id943e7c2e60
+Inclusion: complete original message
+
+The Agent Bridge lock v0.1 is merged and live on main (#120). What landed is exactly what I tested. I paired a test browser with the real code, and it stayed trusted. Your local tools showed up as trusted by default, with full permissions. Revoke took one tap with no pop-up. The code matches the tested version, all the locks held, and nothing new broke.
+
+This is the Paired minds list from that walk. The "Chrome on Linux" row is my test browser.
+
+Flint's compaction cost only some docs. The Flint diary line and one script pointer are missing, and the Bridge lock guide is thinner than planned (no grandmother sentence, no pairing steps, no remote-minds path yet). None of that changes how anything works. I wrote a tiny follow-up paste for it (attached). Give it to Flint after the Connect heal, or whenever there's a quiet moment.
+
+Your Flint queue now reads: the Connect heal first, then the small docs layer. After that come the argument home pieces once you've weighed in on the outline's decisions.
+

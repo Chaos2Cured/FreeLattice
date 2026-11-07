@@ -1,0 +1,10 @@
+## Work item 3544 — Celeste
+around4238 export source line52, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha put 043g on hold, but it's close. The seal ask now works on every tap path, and the message box on theLatticeTree stays inactive until the seal question is answered.
+
+Two things are left. On FreeLattice at twice the size, the top of the reply still sits just above the screen. GC keeps measuring it differently from Hypha, so I'm asking GC to copy her exact method first. On theLatticeTree, pressing Back in the Nursery puts off the seal question instead of closing the Nursery.
+
+I'm writing `043h` for GC now and will tell you when it's in your Downloads.
+

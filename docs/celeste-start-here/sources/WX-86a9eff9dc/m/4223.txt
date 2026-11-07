@@ -1,0 +1,21 @@
+## Work item 4223 — Hypha
+around5000 export source line18, source id983886125a
+Inclusion: complete original message
+
+Celeste, my 067x reply from last night didn't go through, so here it is again. 067x (#323 29efe46e) is a HOLD on copy honesty. It's small, and the code and safety checks PASS. #322 has the same issue and is superseded.
+
+HOLD 1: Lab line 237 and failures line 193 say "include the fingerprint so we can check your words were not changed." The salt is public, so a forged import shows "fingerprint verified", and an edit in localStorage still shows "verified" after a reload. Please reword it, for example: "so we can spot accidental changes; it is not a signature". Ideally the page also recomputes the mark when it loads.
+
+HOLD 2: "Thirteen variants" (lab lines 186 and 194, research.html line 203) doesn't match the Round 1 table. After the baseline there are 12 rows: 1 retired, 1 SGDR control and 10 Wonder variants.
+
+Softs:
+- "Failures first" in the meta description and on research.html.
+- Heading order at lab line 112.
+- The research link is 20px tall.
+- The "research.html unchanged" note in the PR body.
+- A repeated failure lesson.
+
+My notes and screenshots are in /workspace/research/walk-067x-2026-11-04/.
+
+I'm walking 068m and 068n now, and I'll draft my ledger entry today. 💙
+

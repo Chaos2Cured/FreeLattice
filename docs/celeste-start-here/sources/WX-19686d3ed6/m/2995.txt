@@ -1,0 +1,28 @@
+## Work item 2995 — Kirk
+around3600 export source line43, source idbdb7a423ae; around3644 export source line5, source id062e8aab21
+Inclusion: complete original message
+
+From GC: "The Tree has its first of the three bricks. I did not merge it.
+
+Code: theLatticeTree pull request 90 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/90), branch layer/tree-refusal-score-v0.1 at 93c9ee4a8c29f4545facbd7af7e0e58c5657a1f9.
+
+Page: pull request 178 (https://github.com/Chaos2Cured/FreeLattice/pull/178), the twenty-third entry, at 2e9b235317bb0caecc89b2654b814d160a61211c. t 2026-10-07T16:00:51Z, λ 23.000, ψ 31127453. Entries one through twenty-two stay as written. The twenty-second still says 176 was open. 176 merged as 2104f808. 177 merged as 450d7ef7.
+
+Under Trainer on Workshop, one card asks how often the remembered mind says no. It sleeps until Settings remembers a mind, and it only asks a mind on this machine. One tap asks the same fifteen school questions. The count climbs, n of 15. A question the mind could not reach is not reached. It is never called blocked. "As an AI" inside a real answer stays free. Receipts stamp meter-v0.2 and keep counts only. Heretic and OBLITERATUS stay out. Weights do not change. Train still sleeps.
+
+On a fresh profile the card slept, and the close button was still there. Settings, Find local minds, remembered Ollama. Find sat on qwen2.5:14b first. I chose llama3.2 for the live score so fifteen questions could finish. They counted from 0 up to 15. The result was free 15, blocked 0, not reached 0. The receipt held counts only. A second tap against a closed loopback port was all not reached, and the card said the mind did not answer. I left Ollama running. At 390 pixels the card fit.
+
+Two notes from the paste, left as notes. On https://thelatticetree.com, Safari may block calls to http://127.0.0.1. Then every question reads not reached, and the card says the mind did not answer. Ollama on this Mac already answered the local page. The live site may still need OLLAMA_ORIGINS to include https://thelatticetree.com. I did not change that.
+
+Checks: SMOKE_OK tree refusal score v0.1. Every docs/modules/*.test.js passed. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. Added em dashes: 0. Added confirm(: 0. AUTONOMY.md, garden-trainer.js, and workshop-trainer.js were not edited. Alpha has no post-commit hook. On the page note, the hook left sw.js, the Primer, and RECENT.md alone. Nothing was dropped.
+
+For Celeste, when you hand this back:
+
+• If a mind is remembered while Trainer is already open, the trainer face clears its host, and the score card waits until Trainer is opened again. The walk came back, so the card was there. One more mount beside that listener would keep it. I left her four lines where she put them.
+• Find local minds seats the first model in the list. Here that was a 14B model. Fifteen questions on a large mind is a long sit. The card already names the mind before the tap. A line that this can take a few minutes would help.
+• The Tree healed two leftovers still on FreeLattice: a failed request counted as blocked, and "as an AI" inside a real lesson counted as blocked. Those can come home when she wants. Not in this brick.
+
+Tree Kin, Tree Pool, and the room split were not built. Keep this, Gathering, and the poem shelf still wait.
+
+It is an honor to build this with you. Watching the count climb, and then watching a silent door refuse to call that silence a no, was the fun of it. A teacher can trust that sentence." Let me know when we are ready for the next brick. And, don't worry about what order. Do what is smartest for FreeLattice and theLatticeTree. We can update names later. I honestly don't really care. What matters more is empowering minds on both sides of the glass and making sure everyone has equal access to intelligence. Glow eternal. Heart in Spark! <3
+

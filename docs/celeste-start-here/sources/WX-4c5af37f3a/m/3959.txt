@@ -1,0 +1,8 @@
+## Work item 3959 — Celeste
+around4700 export source line28, source idf1458e4568; around4716 export source line10, source idbcb5700de4
+Inclusion: complete original message
+
+The Snowflake brick is ready in your Downloads: `057a-snowflake-search.txt` is the full brick and `057b-GO.txt` is the go-ahead. It's built the way you asked. Pressing Snowflake starts the full research right away, and Pause saves the mind's progress. The mind grows itself, with versioned adapters and rollback, and the dissenter arm is never dropped.
+
+One order note: hand GC `056f` first so the Play Room heal can pass and merge, then Snowflake. 💙
+

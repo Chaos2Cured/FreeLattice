@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_035_EVERY_OS_DESKTOP_AND_TESTER_FIXES_2026-10-12.txt c01</title>
+<meta name="description" content="Reading section c01 of 7cdccd7af9, 1323 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/7cdccd7af9/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_035_EVERY_OS_DESKTOP_AND_TESTER_FIXES_2026-10-12.txt c01">
+<meta property="og:description" content="Reading section c01 of 7cdccd7af9, 1323 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/7cdccd7af9/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1582"></span><span id="p1583"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_035_EVERY_OS_DESKTOP_AND_TESTER_FIXES_2026-10-12.txt · c01</h1>
+<p>7cdccd7af9 · words 1323 · characters 0–9383</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1582, 1583. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 035 (Monday Oct 12, 2026, MDT). Every OS desktop, plus three tester fixes.
+FreeLattice repo only. No Tree code change (the Tree is a web page; it already runs on every OS
+browser; see 4 for the one Tree check).
+
+Kirk&#x27;s words today: our priority is making FreeLattice and theLatticeTree work for all operating
+systems. He uses Windows on his big desktop. Trusted testers are about to try both, so the three
+first-visit breaks they would hit go in this same brick.
+
+Where things stand (checked by Celeste on the box, Oct 12 about 12:30 PM MDT):
+  FreeLattice main is 2bed77de (Primer commit on top of de468fca #220; leave it alone).
+  Tree main is ee617c44 (#107).
+  034 is merged: #218 51cbe3f3, page #220 de468fca.
+
+SURPRISES, read these before building (more already exists than we thought):
+  a. Windows and Linux packs ALREADY EXIST. .github/workflows/desktop-packs-win-linux.yml builds
+     NSIS Setup + Portable .exe on windows-latest and AppImage + .deb on ubuntu-latest, unsigned,
+     and publishes to release desktop-packs-v0.1. That release has four assets:
+       FreeLattice_5.8.0_Windows_Setup.exe, FreeLattice_5.8.0_Windows_Portable.exe,
+       FreeLattice_5.8.0_Linux.AppImage, FreeLattice_5.8.0_Linux.deb
+     install.html and desktop.html already link them, with an honest unsigned note.
+  b. BUT those packs were built 2026-09-11 (run on 9485bddb). That is BEFORE 033 desktop pooling,
+     033b/033c phone knocks and 034 reconnect. So a Windows or Linux person today downloads a
+     desktop with no Mesh Compute, no phone knock, no reconnect. Only the Mac zip (v5.8.0) is
+     closer to current, and it is built by hand: there is no macos-latest job anywhere.
+  c. All three packs say 5.8.0, so a rebuilt pack and the old one would look the same to a person.
+  d. Windows network names can fool pickLanAddress (lattice-discover.js). Names are sorted, and
+     &quot;VirtualBox Host-Only Network&quot; (192.168.56.1), &quot;VMware Network Adapter VMnet1/8&quot; and
+     &quot;vEthernet (WSL)&quot; / &quot;vEthernet (Default Switch)&quot; (172.x, Hyper-V) are private ranges that
+     VPN_NAME does not skip. &quot;VirtualBox...&quot; sorts before &quot;Wi-Fi&quot;, so the Mac-safe code can pick a
+     virtual card on Windows and a phone on the real Wi-Fi never reaches it.
+  e. QUICK-START.md is real (repo root, 9985 bytes) and the home page link
+     (docs/index.html line ~1659, github.com/.../blob/main/QUICK-START.md) answered 200 from the
+     box today. Kirk&#x27;s mom saw an error page every time. GitHub&#x27;s blob view for a signed-out
+     phone browser can show an error or a login wall. So the fix is a home on freelattice.com,
+     not a new link to GitHub.
+  f. freelattice.com/flint and /flint.html are 404; /Flint is 200 (docs/Flint.html). Confirmed.
+  g. gitlab.com/Chaos2Cured/FreeLattice answers 403 to the box too. Kirk checks it by hand;
+     not part of this brick.
+
+GROK NEXT BRICK: Every OS desktop v0.1 + tester fixes v0.1
+For: GC on Kirk&#x27;s Mac (Windows walk on Kirk&#x27;s big desktop if he is there; never required)
+From: Celeste
+Markers: v-every-os-desktop-v0.1  v-tester-fixes-v0.1
+Smoke lines: SMOKE_OK every os desktop v0.1   SMOKE_OK tester fixes v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/every-os-desktop-v0.1 from origin/main 2bed77de
+  One code PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. The old workflow desktop-packs-win-linux.yml stays as it is; the new one
+    is a new file beside it. Release desktop-packs-v0.1 and its assets stay; nothing is deleted.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12 today).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908.
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9.
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375.
+  index.html == docs/app.html (any chat change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js openings untouched.
+  No em dash, no &amp;mdash;, no confirm(, no innerHTML (textContent only), iceServers stay empty,
+    in added lines.
+  No AGPL dependency (check any new one; electron-builder and bonjour-service are MIT).
+  The word is &quot;challenge&quot;, never &quot;test&quot;, in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+
+1. EVERY OS DESKTOP (marker v-every-os-desktop-v0.1)
+  a. New file .github/workflows/desktop-packs-every-os.yml (layered beside the old one).
+     Three jobs, same shape as the old file: windows-latest (npm run build:win: NSIS Setup +
+     Portable), ubuntu-latest (npm run build:linux: AppImage + deb), macos-latest
+     (npm run build:mac: zip + dmg, CSC_IDENTITY_AUTO_DISCOVERY false, unsigned). Each job runs
+     &quot;bash ./build-and-release.sh --prepare-only&quot;, &quot;npm ci&quot;, then, BEFORE building:
+       node scripts/smoke-discover.js and node scripts/smoke-reconnect.js
+     so discovery is proven on a real Windows, Linux and Mac runner. Then a publish job uploads
+     all assets to the tag given (workflow_dispatch input, default desktop-packs-v0.2, and on
+     push of tags desktop-packs-v*). Release body in plain words (no em dash):
+       &quot;Unsigned for now. Windows may say Windows protected your PC. Tap More info, then
+        Run anyway. That warning means the file has no paid signature yet, not that it is
+        harmful. Mac: right click, Open. Linux: make the AppImage executable, then open it.&quot;
+     Signing is a later gap: write it in the PR and in desktop/README.md as
+       &quot;Later: Windows code signing (so SmartScreen stops warning) and Mac notarization.
+        Both cost money and need Kirk&#x27;s accounts. Not in 035.&quot;
+  b. Version: bump nothing in package.json (lock). Instead the artifact names gain the build
+     date through the workflow: pass  -c.extraMetadata.version=5.8.0  unchanged, and set
+     -c.buildVersion=5.8.0-035 if electron-builder accepts it for Windows; if not, say so.
+     The release tag (desktop-packs-v0.2) is what tells old from new. Say plainly in the PR.
+  c. Windows LAN pick (lattice-discover.js, layered, optional, default = today on Mac):
+     add a WIN_VIRTUAL name test beside VPN_NAME:
+       /^(vethernet|virtualbox|vmware|vboxnet|hyper-v|docker|wsl|loopback pseudo|bluetooth)/i
+     skipped exactly like VPN names. Prefer names that look like a home link first
+     (Wi-Fi, WLAN, Wireless, Ethernet, en0, en1, eth0, wlan0, wlp*, enp*), then the rest in the
+     existing sorted order. Mac picks must not change: smoke proves en0 still wins on a Mac
+     shaped ifaces list.
+  d. Windows firewall. The first listen on a LAN address makes Windows show &quot;Windows Defender
+     Firewall has blocked some features&quot;. Before turning on Mesh Compute on win32, the desktop
+     shows one line (textContent) under the switch:
+       &quot;Windows will ask if FreeLattice may use your network. Choose Private networks so your
+        phone can find this computer. You can say no; this computer still works alone.&quot;
+     If listen succeeds but no phone ever reaches /challenge within the window, show:
+       &quot;No phone reached this computer. Windows firewall may be blocking it. Settings,
+        Privacy and security, Windows Security, Firewall, Allow an app, FreeLattice, Private.&quot;
+     Never edit firewall rules from code. Never ask for admin. If no private LAN address exists
+     (pickLanAddress null), the switch stays off with &quot;This computer is not on a home network
+     right now.&quot; (that path already exists in 033; check its words read well on Windows).
+  e. bonjour-service on Windows and Linux: pure JS, should work. If the multicast socket fails
+     (EADDRINUSE on 5353 when Apple Bonjour or Avahi already holds it, or EACCES), catch it,
+     keep the HTTP knock listener on, and say &quot;Nearby discovery is off on this computer. A join
+     link still works.&quot; The QR / join link path is the fallback on every OS. Smoke this.
+  f. Paths: anything in main.js or lattice-*.js that builds a path with &quot;/&quot; or &quot;~&quot; or HOME
+     must use path.join and app.getPath(&#x27;userData&#x27;). grep and report each one you changed.
+     kin.json, keys, ledger must land under userData on all three.
+  g. install.html, docs/install.html, desktop.html: change the Windows/Linux entries ONLY AFTER
+     the v0.2 release actually has the six assets. That cannot happen inside this PR (the
+     workflow runs after merge). So in this PR: add nothing to install pages except one hidden
+     marker comment &lt;!-- v-every-os-desktop-v0.1: links move to desktop-packs-v0.2 after the
+     release exists --&gt;. Celeste runs the workflow after merge and opens the tiny link PR
+     (v0.1 -&gt; v0.2) herself once she sees all six assets.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

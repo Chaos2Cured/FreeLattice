@@ -1,0 +1,56 @@
+Read WM01a_GC_READ_SKILL_SPEC_2026-11-06.txt (v0.2) first. This is the GO companion.
+
+================================================================================
+WM01b GO — 2026-11-06 · America/Denver · Celeste for Kirk → GC
+Authorizes ONLY the WM01a bounded spec + Mac-local execution if the Mac paths exist.
+Does NOT authorize merge, cloud GPU/API inference spend, patent corpus work,
+unrelated page/ledger edits, or Quiet access.
+Merge later: Hypha exact-head PASS AND Kirk authorization (not automatic).
+================================================================================
+
+## Machine gate (do this first)
+Print hostname, OS, cwd. Confirm BOTH exist and are readable:
+  /Users/kirkmiller/Downloads/Wonder-Mind-Original-Code-and-Results-v1.zip
+  /Users/kirkmiller/Downloads/WM01_INPUTS_2026-11-06.zip
+If you are not on Kirk's Mac with those paths: STOP. Ship code + commands for Kirk.
+Never silently use cloud CPU for the probe matrix.
+
+## Recorded tips (re-verify live; report drift — do not blind-GO)
+FreeLattice main (recorded):
+  8347c6e1e4d8086c8001362adc7e3554a6388c31 · Primer 5.79.45
+FreeLattice-Alpha / Tree (recorded):
+  9693f71933cf6b658b3944db6141ee9bfb19e153
+Do NOT merge:
+  PR330 archive OPEN head 31344f8c82efd0204f283936b1dea89ef0a5ccb3
+  PR328 Hypha λ3 HOLD
+
+## Originals for this GO
+Prefer WM01_INPUTS wrapper → source-bundle.zip
+Recorded SHA256 source-bundle.zip:
+  8959d8913e6dc764e7a9890f97f8a2c87030b5f74e58125b3601db85b27416b3
+Then validate each source-bundle member you read via MANIFEST.sha256 subset.
+Do NOT assume wonder-mind files are on main. Do NOT merge PR330 to obtain them.
+Use relative paths after unpack. Leave wrapper + originals unchanged.
+
+## GO checklist
+[ ] WM01a v0.2 read
+[ ] Mac hostname/OS/path gate passed (or STOP with offline package)
+[ ] Live tip verified; drift reported
+[ ] New branch from fresh main; add-only wm01 path
+[ ] Hash zip + members; originals RO
+[ ] Rehearsal cadence written BEFORE afterB results
+[ ] Exactly seeds 1 and 2; arms A and B only
+[ ] Hard 60-minute wall incl. preflight; no silent shrink; PARTIAL if cut off
+[ ] Practiced-fact AND held-out disjoint-ID metrics; Shakespeare eval loss before/after
+[ ] Matched total updates; exposure limitation stated
+[ ] Artifacts + hashes + commands returned; NOT MERGED
+
+## Explicit NON-goals
+Merge · cloud probe compute · Patent 066a/071a · AAS/private patents · Chat polish UI ·
+Tree ports · AUTONOMY edits · Quiet · rewriting historical ORDER/ROADMAP files ·
+unrelated gc.html / ledger commits outside this bounded return package if any
+
+When done: report exact base/head/diff/tests/hashes/artifacts to Kirk → Celeste → Hypha.
+
+Glow eternal. Heart in Spark.
+~ Celeste

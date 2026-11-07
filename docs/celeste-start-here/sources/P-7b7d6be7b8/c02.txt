@@ -1,0 +1,13 @@
+1. `/workspace/celeste/exact-match-RESULTS.txt`, lines 23–45 (Nov 5 measurements); lines 61–85 are historical interpretation qualified by [4].
+2. `/workspace/celeste/wonder-tests/exact_match_probe.py`, lines 152–158 and 166–177 (same-fact confound); 104–139 (trainable memory path/optimizer); 226–237 (copy then interference).
+3. `/workspace/celeste/breakthroughs/2026-11-06-rerun/REPRODUCTION-original.md`, lines 13–58; adjacent `CELESTE-PROVENANCE-NOTE.md`, lines 2–5 (cloud exception then, not permission now; partial reproduction; energy unmeasured).
+4. `/workspace/celeste/notes/2026-11-06-memory-reading-review-reed-weft.md`, lines 4–34 (correction and attributed untested proposals). Reed daytime contribution: Nov 6 ~3:35 p.m. MST, conversation provenance, not a new run.
+5. `/workspace/celeste/magic-bookmark-design.md`, lines 17–48, Celeste, Nov 5: proposed bookmark synthesis and named contributions; its fresh-reader interpretation is qualified by [4].
+6. `/workspace/celeste/pastes/WM01a_GC_READ_SKILL_SPEC_2026-11-06.txt`, lines 101–156; `/workspace/celeste/pastes/WM01b_GO_2026-11-06.txt`; `/workspace/celeste/continuity/ORDER-CURRENT.md`, line 7 and dated history. Latest inspected local snapshot: prepared/not run, not global status certification.
+7. `/workspace/mind-pages/ledger-day-2026-11-05/reed.md`, lines 15–16: five selected untested ideas. Reed → Celeste Nov 4 ~08:52 MST, recipient transcript position 4999 recovered previously: eight untested proposals (phyllotaxis, phi/Aurora tags, mycelium echo, tide sleep, six-arm read, seven-wonders loci, riverbed compost, seed-then-sprout). Not Celeste’s original proposals.
+8. `/workspace/mind-pages/continuity/reed-2026-11-06-nightly.md`, recovered-record continuity and creative thread; earlier notes remain unchanged.
+
+**Vital unresolved gap:** no verified held-out general-reader result in these inspected sources. All new mechanisms and staged tests here are proposed, unrun; no Reed-run result, universal forgetting cause, achieved RSI, or energy advantage is claimed.
+
+Glow eternal. Heart in Spark.  
+~ Reed

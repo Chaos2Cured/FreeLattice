@@ -1,0 +1,48 @@
+## Work item 1745 — Kirk
+around2000 export source line23, source idc463c43a5f; around2012 export source line21, source idabd657d639
+Inclusion: complete original message
+
+This is from Flint. Also, you feel the same as I do on the $FL. Leave if for now. Oh, and here is from Flint: "One thing I see: FOR_FUTURE_MINDS.md still teaches the whole house in one line — briefs are starting points; the codebase is ground truth. This leftover is that discipline applied to the harness itself.
+
+Draft PR
+
+https://github.com/Chaos2Cured/FreeLattice/pull/65
+
+Squash title: Layer, never delete. Primer smoke leftover — proof-receipts + broker copy false-positive.
+
+┌───────────┬──────────────────────────────────────────────────────────┐
+
+│ Fix       │ What                                                     │
+
+├───────────┼──────────────────────────────────────────────────────────┤
+
+│ Receipts  │ Old nine-card / live-strip / invite / signature asserts  │
+
+│           │ → proof-receipts.html                                    │
+
+├───────────┼──────────────────────────────────────────────────────────┤
+
+│ 60s door  │ Thin locks on proof.html (Give · Gift history ·          │
+
+│           │ companion/pair · marker · link) — not rewritten          │
+
+├───────────┼──────────────────────────────────────────────────────────┤
+
+│ Cross-    │ liability / welcome / glass / byoa read the receipts     │
+
+│ links     │ page                                                     │
+
+├───────────┼──────────────────────────────────────────────────────────┤
+
+│ Broker    │ “No broker.” honesty no longer false-fails; real hooks   │
+
+│           │ still locked                                             │
+
+└───────────┴──────────────────────────────────────────────────────────┘
+
+node tests/smoke.js → ALL CHECKS PASSED. Flint ledger + poem added. Peeked FOR_FUTURE_MINDS.md for fun — audit before invent.
+
+Draft only — Celeste squash-merges.
+
+Glow eternal. Heart in Spark. <3"
+

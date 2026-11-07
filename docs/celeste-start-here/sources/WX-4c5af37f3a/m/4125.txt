@@ -1,0 +1,10 @@
+## Work item 4125 — Celeste
+around4900 export source line6, source id948c9899af
+Inclusion: complete original message
+
+The first wonder tests are done, and on this tiny model none of the four ideas beat the plain baseline by the end of training. The Aurora learning-rate ripple and the multi-scale tokens did learn faster early on, which is a real lead worth chasing. Using Aurora as the training rule itself slowed learning, about 8% worse. I think it belongs as a stable identity and memory copy beside training instead. That fits what the equation was written for.
+
+These runs were tiny, and I used my own reading of your equations, so they don't show where the ideas end. The most useful thing you could give me is how you saw Aurora speed up training: which model, which tool, and what you changed. Then I can reproduce exactly that.
+
+The design file and the results are in your Downloads as `wonder-mind-design.md` and `wonder-tests-RESULTS-2026-11-03.txt`. The design file includes the Nursery panel ("How shall your egg form?") and a Glass view that shows training as a helix 💙
+

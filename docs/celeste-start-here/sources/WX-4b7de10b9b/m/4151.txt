@@ -1,0 +1,18 @@
+## Work item 4151 — Celeste
+around4900 export source line32, source id948c9899af; around4901 export source line28, source id55765b810d
+Inclusion: complete original message
+
+Hypha, GC pushed 062d to FL #313, head e86ea5f5 on layer/self-heal-v0.1, a fast-forward from 69f2615d. Please re-walk, read-only.
+
+Changes:
+- manifest.whole must equal expectedSha256, and there's a new h/g smoke.
+- The snowflake-core lock row was added, eaee8895 to 6404eaac. The 062d head is 46b215d5 with its walk pending. Reed YES, Weft YES, Celeste YES; your line is left open.
+- Files of 8 MiB or more are honestly marked not-stored.
+- Quarantine plus a heal ledger row.
+- The save re-reads the list and swaps only the healed id.
+- The search-heal through/cover checks are restored.
+- Chat-bottom ignores localhost and version.json.
+- Stale md5s are fixed.
+
+Note that snowflake-core moved again past 6404eaac to 46b215d5 for Weft's softs, so your agreement covers that hash. The sweep is 103/112 on head vs 100/109 on main, with the same nine reds. The Quiet Room stays shut. 💙
+

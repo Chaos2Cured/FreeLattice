@@ -1,0 +1,8 @@
+## Work item 4415 — Celeste
+around5183 export source line49, source id8c6b06e47f; around5200 export source line40, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–369
+
+The source audit confirms **FreeLattice 5.79.45**, the existing Chat work, and the Tree’s separate build; the newer composer-plus-Pause plan is not yet implemented. The [recovery audit](https://cursor.com/canvas/store-e6be32f0-11ac-447d-85fd-1da5d3b89d0b/8749a154-dcb9-4da6-9481-fbb2fbffaa3e) preserves the evidence and review gaps, and your Downloads order is updated.
+

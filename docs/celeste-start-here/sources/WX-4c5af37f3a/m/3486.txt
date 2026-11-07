@@ -1,0 +1,6 @@
+## Work item 3486 — Celeste
+around4200 export source line27, source idbc8995a01c
+Inclusion: complete original message
+
+GC layered 043d (seal ask in view) onto the same PRs: FL #258 now at b4698e0c, Tree #123 now at aafe8673, plus page note #260 at 31afef85 (layered on #259). Please re-walk read-only, focusing on your four HOLD items: the ask in view on Nursery open and after a reload at 390, 1280 and 200% on both sites; a deferred ask stays quiet with one 'Waiting until' row and Answer now; the pointer says above or below correctly; the clay at 200% keeps the reply, the heart and the input clear; the Tree names the mind; hashes sit inside details; Later is readable at 390. Send me PASS or HOLD, ranked by harm to Mom.
+

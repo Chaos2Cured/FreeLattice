@@ -1,0 +1,193 @@
+@@ -740,6 +788,8 @@
+           renderMessages(list);
+           setStatus('', true);
+         }
++        // v-tree-gathering-api-keys-v0: a cloud chair brings its own honest line
++        if (err && err.reason === 'cloud' && err.cloudText) { say(String(err.cloudText)); return; }
+         // v-tree-honest-reasons-v0: a missing model is named; a quiet door gets one
+         // no-cors knock (after this Send only) so "stopped" and "shut" are told apart.
+         if (err && err.reason === 'model-missing') { say(heartModelMissing(err.model)); return; }
+@@ -888,6 +938,8 @@
+     unmount: unmount,
+     listener: listener,
+     sendToMind: sendToMind,
++    isCloudMind: isCloudMind,
++    cloudSafeContent: cloudSafeContent,
+     hostIs: function (el) { return hostEl === el; },
+     HISTORY_KEY: HISTORY_KEY,
+     EXPORT_KIND: EXPORT_KIND,
+diff --git a/docs/modules/tree-cloud-minds.js b/docs/modules/tree-cloud-minds.js
+new file mode 100644
+index 0000000..b666031
+--- /dev/null
++++ b/docs/modules/tree-cloud-minds.js
+@@ -0,0 +1,436 @@
++// ═══════════════════════════════════════════════════════════════
++// tree-cloud-minds.js · bring your own key, seat a cloud mind
++// Marker: v-tree-gathering-api-keys-v0
++//
++// Layer, never delete. Local minds stay 127.0.0.1 only. This module adds a
++// second, chosen road: a mind you pay for or got free from a provider, with
++// YOUR key, seated in a Gathering chair next to local ones, any order.
++//
++// The key stays in this browser (localStorage, or sessionStorage for "this
++// visit only"). It is sent only to the one provider you picked, in that
++// provider's own auth header, and only when that provider's chair speaks.
++// Never in a URL. Never in gatheringBinds. Never in the thread history or an
++// export. theLatticeTree has no server; nothing passes through us.
++// The provider list is fixed (https only). No custom hosts in v0.1.
++// No confirm(). No innerHTML. Every word goes in with textContent.
++// Mirror of FreeLattice docs/app.html PROVIDERS (fc2f09f) for urls and shapes.
++// ═══════════════════════════════════════════════════════════════
++
++(function () {
++  'use strict';
++
++  var MARK = 'v-tree-gathering-api-keys-v0';
++  var KEYS_STORE = 'fl_tree_cloud_keys';   // { v:1, keys: { providerId: key } }
++  var SEATS_STORE = 'fl_tree_cloud_seats'; // [ { provider, model } ]  (no keys here, ever)
++  var SEAT_CAP = 16;
++  var TIMEOUT_MS = 120000;
++
++  // type: 'openai' (Bearer, /chat/completions), 'anthropic', 'google'
++  var PROVIDERS = {
++    groq: { name: 'Groq', type: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions',
++      keyUrl: 'https://console.groq.com/keys', models: ['llama-3.3-70b-versatile', 'qwen/qwen3-32b'] },
++    openrouter: { name: 'OpenRouter', type: 'openai', url: 'https://openrouter.ai/api/v1/chat/completions',
++      keyUrl: 'https://openrouter.ai/keys',
++      models: ['meta-llama/llama-3.3-70b-instruct', 'qwen/qwen-2.5-72b-instruct', 'deepseek/deepseek-r1'] },
++    openai: { name: 'OpenAI', type: 'openai', url: 'https://api.openai.com/v1/chat/completions',
++      keyUrl: 'https://platform.openai.com/api-keys', models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4.1-nano', 'o4-mini'] },
++    anthropic: { name: 'Anthropic (Claude)', type: 'anthropic', url: 'https://api.anthropic.com/v1/messages',
++      keyUrl: 'https://console.anthropic.com/settings/keys',
++      models: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20251001', 'claude-opus-4-20250514'] },
++    google: { name: 'Google (Gemini)', type: 'google', url: 'https://generativelanguage.googleapis.com/v1beta/models/',
++      keyUrl: 'https://aistudio.google.com/apikey', models: ['gemini-2.5-flash', 'gemini-2.5-pro'] },
++    xai: { name: 'xAI (Grok)', type: 'openai', url: 'https://api.x.ai/v1/chat/completions',
++      keyUrl: 'https://console.x.ai', models: ['grok-3-mini-fast'] },
++    mistral: { name: 'Mistral AI', type: 'openai', url: 'https://api.mistral.ai/v1/chat/completions',
++      keyUrl: 'https://console.mistral.ai/api-keys',
++      models: ['mistral-large-latest', 'mistral-small-latest', 'codestral-latest'] },
++    deepseek: { name: 'DeepSeek', type: 'openai', url: 'https://api.deepseek.com/v1/chat/completions',
++      keyUrl: 'https://platform.deepseek.com/api_keys', models: ['deepseek-chat', 'deepseek-reasoner'] },
++    together: { name: 'Together AI', type: 'openai', url: 'https://api.together.xyz/v1/chat/completions',
++      keyUrl: 'https://api.together.xyz/settings/api-keys',
++      models: ['meta-llama/Llama-3.3-70B-Instruct-Turbo', 'Qwen/Qwen2.5-7B-Instruct-Turbo', 'deepseek-ai/DeepSeek-R1'] }
++  };
++  var ORDER = ['groq', 'openrouter', 'openai', 'anthropic', 'google', 'xai', 'mistral', 'deepseek', 'together'];
++
++  var MODEL_RE = /^[A-Za-z0-9._:\/@+-]{1,120}$/;
++
++  function store(kind) {
++    try { return kind === 'session' ? window.sessionStorage : window.localStorage; } catch (e) { return null; }
++  }
++  function readJson(s, name, fallback) {
++    try {
++      var raw = s && s.getItem(name);
++      if (!raw) return fallback;
++      var v = JSON.parse(raw);
++      return v == null ? fallback : v;
++    } catch (e) { return fallback; }
++  }
++  function writeJson(s, name, value) {
++    try { if (s) s.setItem(name, JSON.stringify(value)); return true; } catch (e) { return false; }
++  }
++  function keyBag(kind) {
++    var bag = readJson(store(kind), KEYS_STORE, null);
++    if (!bag || typeof bag !== 'object' || !bag.keys || typeof bag.keys !== 'object') bag = { v: 1, keys: {} };
++    return bag;
++  }
++
++  function provider(id) {
++    return Object.prototype.hasOwnProperty.call(PROVIDERS, String(id || '')) ? PROVIDERS[id] : null;
++  }
++  function providerIdOf(mind) {
++    var u = String((mind && mind.url) || '');
++    var m = u.match(/^cloud:([a-z0-9-]+)$/i);
++    return m ? m[1].toLowerCase() : '';
++  }
++  function isCloud(mind) { return !!provider(providerIdOf(mind)); }
++  function providerName(mindOrId) {
++    var id = typeof mindOrId === 'string' ? mindOrId : providerIdOf(mindOrId);
++    var p = provider(id);
++    return p ? p.name : 'a cloud provider';
++  }
++
++  function cleanKey(raw) {
++    var k = String(raw || '').trim();
++    if (k.length < 8 || k.length > 400 || /\s/.test(k)) return '';
++    return k;
++  }
++  function cleanModel(raw) {
++    var m = String(raw || '').trim();
++    return MODEL_RE.test(m) ? m : '';
++  }
++
++  // Where is this provider's key? 'device' | 'visit' | ''
++  function keyPlace(id) {
++    if (keyBag('session').keys[id]) return 'visit';
++    if (keyBag('local').keys[id]) return 'device';
++    return '';
++  }
++  function getKey(id) {
++    return String(keyBag('session').keys[id] || keyBag('local').keys[id] || '');
++  }
++  function keyTail(id) {
++    var k = getKey(id);
++    return k ? k.slice(-4) : '';
++  }
++  function saveKey(id, raw, onlyThisVisit) {
++    if (!provider(id)) return { ok: false, reason: 'provider' };
++    var k = cleanKey(raw);
++    if (!k) return { ok: false, reason: 'key' };
++    forgetKey(id);
++    var kind = onlyThisVisit ? 'session' : 'local';
++    var bag = keyBag(kind);
++    bag.keys[id] = k;
++    if (!writeJson(store(kind), KEYS_STORE, bag)) return { ok: false, reason: 'storage' };
++    return { ok: true, place: onlyThisVisit ? 'visit' : 'device' };
++  }
++  function forgetKey(id) {
++    ['local', 'session'].forEach(function (kind) {
++      var bag = keyBag(kind);
++      if (bag.keys[id]) { delete bag.keys[id]; writeJson(store(kind), KEYS_STORE, bag); }
++    });
++    return true;
++  }
++  function savedProviders() {
++    return ORDER.filter(function (id) { return !!getKey(id); });
++  }
++
++  function getSeats() {
++    var list = readJson(store('local'), SEATS_STORE, []);
++    if (!Array.isArray(list)) return [];
++    return list.filter(function (s) { return s && provider(s.provider) && cleanModel(s.model); }).slice(0, SEAT_CAP);
++  }
++  function addSeat(id, model) {
++    var m = cleanModel(model);
++    if (!provider(id) || !m) return null;
++    var list = getSeats().filter(function (s) { return !(s.provider === id && s.model === m); });
++    list.unshift({ provider: id, model: m });
++    writeJson(store('local'), SEATS_STORE, list.slice(0, SEAT_CAP));
++    return seatFor(id, m);
++  }
++  function seatFor(id, model) {
++    return { tag: 'general', model: String(model), url: 'cloud:' + id, cloud: true, providerName: providerName(id) };
++  }
++  // Seats for the Gathering picker: only providers whose key is in this browser. No key inside.
++  function seatOptions() {
++    return getSeats().filter(function (s) { return !!getKey(s.provider); })
++      .map(function (s) { return seatFor(s.provider, s.model); });
++  }
++
++  // ---------- speaking ----------
++  function cloudErr(text) { return { reason: 'cloud', cloudText: String(text) }; }
++
++  function buildRequest(id, model, msgs) {
++    var p = provider(id);
++    var key = getKey(id);
++    var headers = { 'Content-Type': 'application/json' };
++    var url = p.url;
++    var body;
++    var list = (msgs || []).map(function (m) {
++      return { role: m.role === 'assistant' ? 'assistant' : (m.role === 'system' ? 'system' : 'user'), content: String(m.content ||

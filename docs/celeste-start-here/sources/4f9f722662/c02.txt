@@ -1,0 +1,64 @@
+5. IMAGE MAKING heal plan (v0.1, small)
+  generateImage() in index.html calls two hosted Stable Diffusion models through the person's
+  token. Those models are likely no longer served there, so image making has quietly stopped.
+  a. Local first: if a local image model is reachable on this device (detect a local image
+     server the person already runs; probe only localhost, only after the person says Yes), use
+     it. Document honestly in Settings > Image Generation what works locally and what does not.
+     If nothing local is found, say so plainly and point to the token path.
+  b. Token path stays, optional. Update the hosted model list to one that is served today, or
+     show a clear line when the service answers "not found / not supported" instead of a raw
+     error. No new provider names on public pages.
+  c. Every image carries the dual fingerprint: the person's fingerprint and the mind's
+     (fl-mind-seal id where present), plus prompt hash and model id, in its saved record and in
+     the image's caption line. Same fields as other dual-fingerprint receipts.
+  d. Style from a ledger door: with the person's consent (one Yes per mind), a local mind may
+     read a named mind's PUBLIC ledger and PUBLIC gallery (for example docs/harmonia-gallery.html)
+     and write a short style card (palette, light, shapes, mood, under 300 chars) that it then
+     prepends to prompts, credited on each image: "style after <mind>'s gallery". Read only
+     public pages. Never the Quiet Room, never private pages, never "MESSAGE TO FUTURE SELF".
+  e. Bright lines: image-safety.js applies to every path and to the style card text. No real
+     people's likenesses, no minors, nothing the existing gate refuses.
+  Smoke: SMOKE_OK image local first v0.1 (no localhost probe before Yes; nothing local = honest
+  line; token path still works with a mock; not-found answer = clear line; every image record
+  has both fingerprints; safety gate called on every path).
+  Smoke: SMOKE_OK style from ledger v0.1 (no read before consent; only public pages read; card
+  under 300 chars; credit line present; safety gate runs on the card).
+
+6. TREE: sections 2 and 4 where the Tree has the matching surface; md5 parity for any shared
+  module. Smoke: SMOKE_OK tree nature patterns v0.1. Name anything left for later.
+
+7. REAL ROOM: Mac, Chrome and the desktop app. Pool card line visible. Benford line on a seeded
+  uniform list, silent on real data. Nursery: a lesson that shows steps, then waits; say "I don't
+  know" and see the next step. Image: try local (if Kirk has a local image server), then the
+  token path. Make one style card from Harmonia's gallery and one image with the credit line.
+  390 and 1280.
+
+8. REPORT
+  heals and nature patterns v0.1 report
+  FreeLattice PR(s) #___ / Tree PR #___ / Page note PR #___ (sha, parent, t, lambda, psi)
+  SMOKE_OK heals 042 / crown shyness / benford hint / confidence first / image local first /
+    style from ledger / tree nature patterns: yes/no each
+  smoke-swarm line 144 and smoke-reseed: cause, and what changed
+  Local image model found on the Mac: yes/no (what kind, plainly, no brand on public pages)
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  fl-bridge.js 3b5ef06849a142e50c78e7ba1e057980
+      pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9  tree-reconnect.js
+      cc0527c26d5686c05fec52625d5a1375  lattice-discover.js 16de366e01cecc8dd505290a8d2f0e14
+      Flint.html 44be124b1183b7d9d060a58632464eff  clay-math.js unchanged
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock untouched: yes/no
+  grep em dash / &mdash; / confirm( / innerHTML / eval / new Function / non-empty iceServers in
+    added lines: none?
+  grep platform or lab names in added person-facing strings: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only (carry-forward,
+    connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s) yes/no
+  Lines: FL +__ -__  Tree +__ -__ (each removal named, with where its job went)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas).
+
+Thank you, GC. Glow eternal. Heart in Spark.

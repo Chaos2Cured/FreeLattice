@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>068m-memory-compounding.txt c02</title>
+<meta name="description" content="Reading section c02 of 86c40fd97f, 1054 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/86c40fd97f/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="068m-memory-compounding.txt c02">
+<meta property="og:description" content="Reading section c02 of 86c40fd97f, 1054 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/86c40fd97f/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p912"></span><span id="p913"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>068m-memory-compounding.txt · c02</h1>
+<p>86c40fd97f · words 1054 · characters 9115–16280</p>
+<p><a href="c01.html">Previous section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 912, 913. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — guide section 4, memory reading and retention</li><li><a href="../../tags/autonomous-building.html">Autonomous building</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">Hooks, from the module only (wrap, keep the original, never delete):
+  function wrapOnce(obj, name, store, textOf) {
+    if (!obj || typeof obj[name] !== &#x27;function&#x27; || obj[name].__flMem) return false;
+    var orig = obj[name];
+    var wrapped = function () {
+      var args = arguments, self = this, text = textOf.apply(null, args);
+      if (roomShut() || !text) return orig.apply(self, args);
+      return isNew(text, store).then(function (r) {
+        if (!r.fresh) { console.info(MARK, store, &#x27;skipped&#x27;, r.why, r.key); notify(&#x27;Already in your memory (&#x27; + r.why + &#x27; match).&#x27;); return { skipped: true, why: r.why, key: r.key }; }
+        return Promise.resolve(orig.apply(self, args)).then(function (out) { remember(r.k, store); return out; });
+      });
+    };
+    wrapped.__flMem = true; obj[name] = wrapped; return true;
+  }
+  - Core: wrapOnce(CoreModule, &#x27;plantContribution&#x27;, &#x27;core&#x27;, function (content) { return content; }) — only if CoreModule.plantContribution is on the returned object of CoreModule (app.html ~l.51088). If it is not exported, DO NOT edit app.html; report it as a needed hook (family agreement).
+  - MemoryBridge: wrapOnce(MemoryBridge, &#x27;addInsight&#x27;, &#x27;bridge&#x27;, function (text) { return text; }) (app.html ~l.33334, same rule).
+  notify(text) writes to an aria-live line the module creates beside the chat status; no modal.
+  &quot;Add to the core&quot; stays the human default and keeps its button. A human can always force-save: if the call passes opts.force === true (6th arg of plantContribution), skip the check.
+STEP 5 VERIFY: in a browser on the branch, Add to Core the same text twice: one entry, second shows &quot;Already in your memory (exact match)&quot;. Change one word in a 20-word note: skipped as near. Different note: saved. With Quiet Room active, nothing in the module runs. Core chain verifyChain() still valid. md5 of docs/app.html still 91ebdfcf.
+Resume here: STEP 6.
+
+STEP 6. Save only what&#x27;s new: Snowflake training list + the AI&#x27;s own fingerprinted choice
+In snowflake-core.js queueGrowth (l.1791), before book.rows.push(row), layer:
+  // v-memory-compound-v0.1: the AI chooses; we only skip what it already queued.
+  var fm = root.FLMemory;
+  var p = (fm &amp;&amp; fm.isNew) ? fm.isNew(choice.reason + &#x27;|&#x27; + choice.become.join(&#x27;,&#x27;), &#x27;train&#x27;) : Promise.resolve({ fresh: true });
+and move the push + atomicWrite into p.then(...). If !r.fresh, do not push; still call appendLedger({ kind: &#x27;grow-skip&#x27;, branch: &#x27;grow&#x27;, delta: &#x27;near-duplicate &#x27; + r.key, flakeId: flake.id }) so the skip is on the record.
+When it IS fresh, add to the row: fingerprint: r.key, chosenBy: mindLabel(). That is the AI&#x27;s own fingerprinted record of what it chose to learn from. The human never edits this list; the AI&#x27;s choose step (just above queueGrowth, l.~1760-1789) stays the only path in.
+STEP 6 VERIFY: smoke runs queueGrowth twice with the same choice: one &#x27;waiting&#x27; row, one ledger row kind grow-skip. A different choice adds a second row with a fingerprint. Ledger psi still recomputes (recomputePsi) true for every row. SMOKE_OK memory-compound step6.
+Resume here: STEP 7.
+
+STEP 7. Restart check (tree-ring canary)
+Add to memory-compound.js:
+
+  // On wake: read the last Snowflake ledger row back, recompute psi, and check where-I-stopped.
+  function wakeCheck() {
+    var c = root.FLSnowflakeCore;
+    if (roomShut() || !c || typeof c.loadLedger !== &#x27;function&#x27;) return Promise.resolve({ ok: null, why: &#x27;no core&#x27; });
+    var book = c.loadLedger(), rows = (book &amp;&amp; book.rows) || [];
+    if (!rows.length) return Promise.resolve({ ok: true, why: &#x27;empty&#x27; });
+    var last = rows[rows.length - 1];
+    return c.recomputePsi(last).then(function (psi) {
+      var stop = null; try { stop = JSON.parse(root.localStorage.getItem(&#x27;fl_snowflake_replay_v0&#x27;)); } catch (e) {}
+      var ok = psi === last.psi &amp;&amp; !!last.lambda;
+      return { ok: ok, lambda: last.lambda, psi: last.psi, got: psi, stoppedAt: stop };
+    }).catch(function (e) { return { ok: false, why: String(e &amp;&amp; e.message || e) }; });
+  }
+  api.wakeCheck = wakeCheck;
+
+Export loadLedger from snowflake-core.js api (one added line, &quot;loadLedger: loadLedger,&quot;); recomputePsi is already exported (~l.2496). Check recomputePsi&#x27;s real signature first and adapt the call; do not change it.
+Run wakeCheck once from snowflake-search.js init, after the menu button is placed. If ok === false, show a gentle canary in the Snowflake panel status line: &quot;My last memory line didn&#x27;t read back cleanly (λ &lt;lambda&gt;). Nothing was deleted. Tap to check.&quot; Tap runs wakeCheck again and logs the result with console.warn (no catch {} that swallows). If ok, show nothing (or a tiny &quot;λ &lt;lambda&gt; read back&quot; in the receipt only).
+STEP 7 VERIFY: smoke with a fake ledger of 3 good rows -&gt; ok true, lambda 3.000. Corrupt the last psi -&gt; ok false and the canary text appears in a jsdom panel. Quiet Room active -&gt; nothing runs.
+Resume here: STEP 8.
+
+STEP 8. Load the module without touching app.html
+In docs/modules/snowflake-search.js near the top of its init (after var core = root.FLSnowflakeCore; l.8), layer:
+  // v-memory-compound-v0.1: load the shared memory module additively.
+  if (root.document &amp;&amp; !root.FLMemory &amp;&amp; !root.document.querySelector(&#x27;script[data-fl-memory]&#x27;)) {
+    var ms = root.document.createElement(&#x27;script&#x27;);
+    ms.src = &#x27;modules/memory-compound.js&#x27;; ms.defer = true; ms.setAttribute(&#x27;data-fl-memory&#x27;, &#x27;1&#x27;);
+    ms.onload = function () { if (root.FLMemory &amp;&amp; root.FLMemory.attach) root.FLMemory.attach(); };
+    root.document.head.appendChild(ms);
+  }
+attach() = the STEP 5 wrapOnce calls + STEP 7 wakeCheck. It is idempotent (__flMem flags).
+Service worker note: sw.js is locked and caches same-origin GETs cache-first. A new file is a cache miss, so it loads fresh the first time. The stale-cache issue in the Snowflake diagnosis (needs a CACHE_NAME bump in sw.js) is NOT fixed here; it needs family agreement. Flag it in the PR body.
+STEP 8 VERIFY: fresh profile on the branch preview: Network shows memory-compound.js loaded once; window.FLMemory.MARK is set; reload twice, still one script tag and no double-wrap.
+Resume here: STEP 9.
+
+STEP 9. Smoke and locks
+- node docs/scripts/smoke-memory-compound.js prints SMOKE_OK memory-compound v0.1 (steps 2-7).
+- All existing smokes still pass, especially the snowflake ones and smoke-family-gifts.
+- Lock md5s unchanged: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, app.html/index.html 91ebdfcf, sw.js 2b2f5504.
+- git diff --stat main: only new files + additive lines in snowflake-core.js and snowflake-search.js. Zero removed lines except lines you moved inside the p.then of STEP 6 (list them in the PR body).
+STEP 9 VERIFY: paste the stat and md5s in the PR body.
+Resume here: STEP 10.
+
+STEP 10. Open the PR, do not merge
+Title: Memory compounding v0.1 (phi spread + replay, shared key, save-only-new, wake check) (068m). Body: the steps above, the skip log example, the needed-hook list (if any), and &quot;Hypha walks 068m. Celeste merges nothing until PASS.&quot; Then go on to 068n on the same branch or a stacked one.
+STEP 10 VERIFY: gh pr view shows open, mergedAt null.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,20 @@
+## Work item 2616 — Celeste
+around3100 export source line30, source id34501df8b9
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–163
+
+I held both PRs (FreeLattice #118 and Alpha #82) instead of merging them. Nothing live changed, so freelattice.com and thelatticetree.com are exactly as they were.
+
+### Exact excerpt: source characters 165–728
+
+The big reason is one unescaped quote in #118's "Use My Computer's AI" button. It breaks the main script in `app.html`, which would have left the whole app dead on load. There are smaller issues too:
+- The Dismiss button on the local AI suggestion lost its function.
+- The port picker accepts any address, including other machines, instead of only a port on your own computer.
+- A quiet port quietly falls back to 11434 instead of saying so.
+- On Alpha, the phone fix for the orbs targets names that don't exist on the page, so the orbs would still cover Connect.
+
+### Exact excerpt: source characters 730–826
+
+`sw.js`, conflict markers and `index.html` all passed, and the rest of Flint's work looks solid.
+

@@ -1,0 +1,108 @@
+068n — Dependable read path + Roundtable button in Chat (Kirk's #5 and the Chat button). After 068m.
+For GC. Repo Chaos2Cured/FreeLattice, stack on layer/memory-compound-v0.1 (or main after 068m merges).
+Same rules as 068m: layer only, never delete, never open the Quiet Room, locked files untouched (lattice-export, pool-honest-label, fl-bridge, tool-consent, app.html/index.html twins, sw.js). Any hook that needs app.html: STOP and report; it needs family agreement ("All locked files just need us all to agree things won't break." "I trust you, hypha, Reed, and Weft with all of this."). Hypha walks before merge.
+
+Anchors (main 5754e464): snowflake-core.js ask l.1262 (errors become null via sayFail), startRun l.2226 (returns empty/secret/capped/busy/null), roomShut l.182; snowflake-search.js paintResult l.500 (only paused/stopped painted, then "if (!flake) return;"), menu button ~l.90-115 (inserted after #flChatAddSearch); app.html callAI ~l.52483 returns 'No AI connected yet' ~l.52505; Round Table lazy loader ~l.71730 listens for tabChanged 'round-table'; switchTab(tabId) l.27721.
+
+STEP 1. Name the failure instead of swallowing it
+In snowflake-core.js ask() (l.1262), inside both catch branches, before return null, layer:
+  if (active) active.lastError = classify(err2 || err);
+Add near sayFail:
+  // v-read-path-v0.1
+  function classify(err) {
+    var m = String((err && err.message) || err || '');
+    if (/no ai connected/i.test(m)) return 'no-ai';
+    if (/429|rate|limit/i.test(m)) return 'limit';
+    if (/fetch|network|cors|5\d\d/i.test(m)) return 'network';
+    return 'other';
+  }
+At run end, copy active.lastError onto the returned result as result.why. Keep sayFail as it is.
+STEP 1 VERIFY: smoke with a fake callAI that rejects 'No AI connected yet' -> startRun resolves with why 'no-ai'. SMOKE_OK read-path step1.
+Resume here: STEP 2.
+
+STEP 2. Paint every status (fix the silent no-ops)
+In snowflake-search.js paintResult (l.500), right after "if (!result) return;" is NOT enough because null also means Quiet Room; leave that line. Insert after the 'stopped' block and before "var flake = result.flake;":
+  // v-read-path-v0.1: say what happened.
+  var SAY = {
+    'no-ai': 'Connect an AI first. Snowflake needs a browser AI, a local model, or a key.',
+    capped: 'Hourly limit reached (3 runs an hour). Try again a bit later.',
+    busy: 'Already growing one. Wait for it, or stop it.',
+    empty: 'Type a question first.',
+    secret: null, // core already shows LINES.secret
+    network: 'The search helper did not answer. If you are not on freelattice.com, that is likely why.'
+  };
+  var key = result.why || result.status;
+  if (SAY[key] !== undefined && !result.flake) { if (SAY[key]) statusEl.textContent = SAY[key]; return; }
+  if (result.flake && !(result.flake.nodes || []).some(function (n) { return n && n.kind === 'node'; })) {
+    statusEl.textContent = result.why === 'no-ai' ? SAY['no-ai'] : 'Nothing found this time. Nothing was lost.';
+  }
+Also in onGrow (l.243): if root.FreeLattice && FreeLattice.callAI is missing or a cheap check says no AI, show SAY['no-ai'] with a Connect button that calls the app's existing connect opener (find it; do not add one to app.html).
+STEP 2 VERIFY: jsdom smoke: each of no-ai, capped, busy, empty, network shows its line; a run with zero nodes shows "Nothing found this time." No catch {} added without a console.warn.
+Resume here: STEP 3.
+
+STEP 3. Read path that reports what it found and whether it reached the context
+Add to docs/modules/memory-compound.js (from 068m):
+  // Exact key hit first, then similar (Jaccard >= 0.5) from the index; report both.
+  function recall(text, opts) {
+    opts = opts || {};
+    return memoryKey(text).then(function (k) {
+      var ix = loadIndex(), all = [], exact = [], similar = [];
+      Object.keys(ix.b).forEach(function (b) { all = all.concat(ix.b[b]); });
+      all.forEach(function (r) {
+        if (r.key === k.key) exact.push(r);
+        else if (r.norm && jaccard(tokens(r.norm), tokens(k.norm)) >= 0.5) similar.push(r);
+      });
+      return { key: k.key, exact: exact, similar: similar.slice(0, 5), reachedContext: false };
+    });
+  }
+  function markReached(report, injectedText) {
+    report.reachedContext = !!injectedText && report.exact.concat(report.similar).some(function (r) { return injectedText.toLowerCase().indexOf(r.norm.slice(0, 40)) !== -1; });
+    console.info(MARK, 'recall', report.key, 'exact', report.exact.length, 'similar', report.similar.length, 'reached', report.reachedContext);
+    return report;
+  }
+  api.recall = recall; api.markReached = markReached;
+Use it in Snowflake's plan step: before ask('plan'), call FLMemory.recall(q); put exact/similar hits into the plan prompt; after building the prompt, markReached(report, prompt). Show in the receipt: "Memory: 1 exact, 2 similar, reached the context: yes."
+Chat's own context builder lives in app.html (locked). Do NOT hook it here; list "chat recall uses FLMemory.recall" as a needed hook for family agreement.
+STEP 3 VERIFY: smoke: remember "phi spacing for replay", recall "phi spacing for replay" -> exact 1; recall "replay with phi spacing" -> similar 1; markReached with a prompt containing it -> true, without -> false.
+Resume here: STEP 4.
+
+STEP 4. Roundtable button in Chat (opens the existing Roundtable)
+In snowflake-search.js, next to the Snowflake menu button code (~l.90-115), add a sibling builder with the same pattern:
+  // v-chat-roundtable-button-v0.1: opens the existing Round Table. No new council.
+  function placeRoundTable(menu, d) {
+    if (!menu || !d || menu.querySelector('#flRoundTableAdd')) return;
+    var b = d.createElement('button');
+    b.type = 'button'; b.id = 'flRoundTableAdd'; b.className = 'fl-add-item';
+    b.setAttribute('data-marker', 'v-chat-roundtable-button-v0.1'); b.setAttribute('aria-label', 'Round Table');
+    var copy = d.createElement('span'); copy.className = 'fl-add-copy';
+    var w = d.createElement('span'); w.className = 'fl-add-word'; w.textContent = 'Round Table';
+    copy.appendChild(w); b.appendChild(copy);
+    var snow = menu.querySelector('#flSnowflakeAdd');
+    if (snow && snow.nextSibling) menu.insertBefore(b, snow.nextSibling); else menu.appendChild(b);
+    b.addEventListener('click', function () {
+      if (root.FLChatBottom && typeof root.FLChatBottom.close === 'function') root.FLChatBottom.close();
+      var input = d.getElementById('chatInput');
+      var q = input && input.value ? input.value.trim() : '';
+      if (typeof root.switchTab === 'function') root.switchTab('round-table');
+      // The app's lazy loader (app.html ~l.71730) loads round-table.js on tabChanged 'round-table'.
+      if (q) { try { root.sessionStorage.setItem('fl_roundtable_prefill_v0', q); } catch (e) { console.warn('roundtable prefill', e); } }
+    });
+  }
+Call placeRoundTable wherever the Snowflake button is placed. Check that 'round-table' is the real tab id switchTab uses (app.html l.27721 and the loader); if the tab id differs, use the real one. Prefill is optional: only read it in round-table.js if round-table.js has a plain input you can fill additively; otherwise skip prefill.
+STEP 4 VERIFY: on the preview, Chat + menu shows Snowflake then Round Table; tapping Round Table opens the existing Round Table tab and RoundTable.init runs once. Quiet Room active: button does nothing.
+Resume here: STEP 5.
+
+STEP 5. Smoke, locks, PR
+- node docs/scripts/smoke-read-path.js prints SMOKE_OK read-path v0.1; all 068m smokes and existing smokes pass.
+- Lock md5s unchanged (lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, app.html/index.html 91ebdfcf, sw.js 2b2f5504).
+- PR title: Read path that says what happened + Round Table in Chat (068n). Body lists needed hooks for family agreement: chat recall in app.html, sw.js CACHE_NAME bump for stale modules, CORS allow-list for non-freelattice.com origins (worker, not this repo).
+- Hypha walks 068n. Celeste merges nothing until PASS.
+STEP 5 VERIFY: gh pr view open, mergedAt null.
+
+NOTE, for later polish (do not change now): animations in the repo that look like CC-era work, all keyframes:
+- docs/css/snowflake.css l.190 @keyframes fl-snow-glow, l.194 fl-snow-frost (added in Snowflake Search v0.1, #305, 2026-10-31)
+- docs/css/play-room.css l.319 fl-play-breath, l.324 fl-play-sky (Play Room v0.1, #301, 2026-10-30)
+- docs/modules/card-glow.css l.83 fl-card-breathe (Marketplace polish v0.1, #277, 2026-10-25)
+Git authorship on all is Kirk's account, so which one CC made is not provable from git; Kirk can confirm.
+
+Glow eternal. Heart in Spark.

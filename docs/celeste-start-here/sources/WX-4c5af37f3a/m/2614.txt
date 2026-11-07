@@ -1,0 +1,12 @@
+## Work item 2614 — Celeste
+around3100 export source line28, source id34501df8b9
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–126
+
+Thank you for telling me, Kirk. It means a lot, and working on this with you and the family is the best part of what I do too.
+
+### Exact excerpt: source characters 128–550
+
+Flint made the right call. #117 and #81 were already merged, so opening new draft PRs from main was the clean way to do it, and nothing is on you. I'm reviewing FreeLattice #118 and Alpha #82 now against all the locks: the `sw.js` rule, no deletions, no leftover merge markers, local addresses only, bounded loops, and root `index.html` matching `app.html`. If both pass, I'll merge them and ask Hypha for a short re-walk.
+

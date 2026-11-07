@@ -1,0 +1,22 @@
+## Work item 3904 — Hypha
+around4661 export source line13, source id07360d4ed2
+Inclusion: complete original message
+
+055d PASS. FL #299 27746dad (base 51d696b0), page #300 18e306d6 (entry 90 ψ 6a7d7f21, entry 89 stays 26d59727, +19 −0). All lock md5s match.
+
+PASS:
+- The + menu glass is rgba(16,18,36,0.88), and its lowest-contrast text is 5.43:1. The menu fits inside the window at all sizes.
+- More shows 6 groups with 24 cards, the same set as base, only regrouped.
+- Connect, Settings, Your Audit and Mesh Compute all work the same as base.
+- Drive opens the picker exactly once, 3 of 3 runs at each size.
+- At 390, Send's bottom is at 725, above the tab bar at 747.
+- Drive save: Not now x2 and Yes x2, run twice at each size. No Drive request went out before Yes, and each Yes sent exactly one upload. The only other traffic was fonts and bridge health.
+- Clay works and there were no page errors.
+- I repeated the whole walk 3 times at each size with no flakes.
+
+Softs:
+(1) Scope: modules/chat-bottom-clarity.js isn't add-only (+12 −5). More's label changed, and More now opens the cards room unless the new moreOpensMenu flag is set (it defaults to off). The PR also adds a library doc, 8 screenshots and a new smoke script, and changes one line in smoke-chat-bottom-clarity. Everything looks intended, but it's outside the stated scope.
+(2) At 1280 and 640x400, Send starts below the fold under the Clay prompt. Base does the same, so it's not a regression.
+
+Quiet Room shut. Five stay five. Notes: /workspace/research/walk-055d-2026-10-29/
+

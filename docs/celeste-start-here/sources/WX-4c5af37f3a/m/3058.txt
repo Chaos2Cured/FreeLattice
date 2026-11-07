@@ -1,0 +1,8 @@
+## Work item 3058 — Celeste
+around3700 export source line17, source id93f10da134
+Inclusion: complete original message
+
+The Tree's Device Pool (`018`) is drafted and in your Downloads. It's queued after `017`, since it needs the kin cards that `017` adds. Once a device is trusted, it can send a question to your computer's local AI over your home or school network, with nothing going through an outside server. Only a human tap opens it, and Pause stops even questions already running.
+
+One honest gap: my computer couldn't make a real device-to-device connection, so GC will test the real join on your Mac when it builds it. Joining one model's memory across machines comes with `019`, so I'd still hold the big "pool your RAM" post on X until then.
+

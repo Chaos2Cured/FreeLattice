@@ -1,0 +1,12 @@
+Tonight's pastes, in landing order (Alpha main 25e6ded; each diff git-applies on the one before;
+chain == walked combo /tmp/combo2 branch combo/all-v1, 21/21 tests green):
+ 1. FLINT_NEXT_TREE_GLOW_2A_v0.1.txt (+ .diff)          SMOKE_OK tree glow 2a v0.1
+ 2. FLINT_NEXT_TREE_HONEST_REASONS_v0.1.txt (+ .diff)   SMOKE_OK tree honest reasons v0.1
+ 3. FLINT_NEXT_TREE_GLOW_2B_v0.1.txt (+ .diff)          SMOKE_OK tree glow 2b v0.1
+ 4. FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt (+ .diff) SMOKE_OK tree workshop way back v0.1
+ 5. [FLINT_NEXT_TREE_ANY_MODEL_v0.1.txt when Flint lands it]
+ 6. FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1.txt (+ .diff) SMOKE_OK tree gathering api keys v0.1
+FreeLattice, independent: FLINT_NEXT_FL_GITHUB_FINE_GRAINED_TOKEN_v0.1.txt (+ .diff), base ba53b41.
+FL queue unchanged: MODEL_CHOICE_SURVIVES_RELOAD -> CONNECT_BOOT_PROBE_F1_F2_F3_F4 -> #120 docs
+ -> later (not written): FL + Alpha Connect-card honest reasons + settings 12-port auto-look.
+Superseded: FLINT_NEXT_TREE_GLOW_2_v0.1.diff (see .SUPERSEDED.txt).

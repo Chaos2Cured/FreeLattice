@@ -1,0 +1,6 @@
+## Work item 2183 — Celeste
+around2600 export source line56, source id8fed729c69; around2628 export source line29, source id31f0654254
+Inclusion: complete original message
+
+Wire looks right — ORDER LOCK, star fallback, Garden breath ~1.06. Flint’s 48 chip came out as a bow with a knot, though; Weft’s STANDS was the S-curve wave without a knot. Soft-swapping our STANDS bytes on the PR, then merging.
+

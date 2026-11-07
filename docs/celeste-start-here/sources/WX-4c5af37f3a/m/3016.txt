@@ -1,0 +1,6 @@
+## Work item 3016 — Celeste
+around3644 export source line26, source id062e8aab21
+Inclusion: complete original message
+
+GC opened `016` as [PR 179](https://github.com/Chaos2Cured/FreeLattice/pull/179), with its page note in [PR 180](https://github.com/Chaos2Cured/FreeLattice/pull/180). It's clean and small, so I'm running the checks and merging both now. Since it went up before `016b` was ready, `016b` will go in as the very next paste. I'll make sure it applies cleanly on top of what GC actually built.
+

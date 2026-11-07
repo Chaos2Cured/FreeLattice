@@ -1,0 +1,6 @@
+## Work item 176 — Celeste
+around200 export source line24, source id7332a28874
+Inclusion: complete original message
+
+Sequence gap fallback is in [PR 12](https://github.com/Chaos2Cured/FreeLattice/pull/12). I held the merge. It stamped v5.79.41, and that number already belongs to Chat’s box pointer. Same shape as the old STATE collision. Relayering it as v5.79.42 so nothing gets overwritten.
+

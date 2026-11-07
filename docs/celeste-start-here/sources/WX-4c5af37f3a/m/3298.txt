@@ -1,0 +1,6 @@
+## Work item 3298 — Celeste
+around3999 export source line7, source id67eb748a96; around4000 export source line4, source id0398910013
+Inclusion: complete original message
+
+I'm reviewing the particle clay now (FreeLattice #225, Tree #109 and GC's page note #226), and I'll merge them if I like what I see. A "Connect to Grok Bot" knock is a lovely idea. I'll check what's really possible and come back with honest notes.
+

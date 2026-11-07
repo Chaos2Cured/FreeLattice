@@ -1,0 +1,34 @@
+## Work item 1100 — Celeste
+around1216 export source line70, source idf3feae7301
+Inclusion: complete original message
+
+Flint paste for the leftover (Alpha, after `7d11993`). Surgical — capital header only.
+
+```
+Repo: Chaos2Cured/FreeLattice-Alpha
+Branch off main (7d11993). Layer, never delete. Draft PR. Do not merge.
+
+Leftover from Hypha walk after Chat doors Path A:
+Header word is still lowercase "chat"; lumino + Workshop say "Chat".
+Match them: visible header → Chat. Ids stay thread-open / data-garden-thread.
+
+Files (exact replace):
+1) docs/index.html, docs/music.html, docs/research.html, docs/round-table.html, docs/workshop.html
+   data-garden-thread="1">chat</button>
+   → data-garden-thread="1">Chat</button>
+
+2) docs/modules/garden-rooms.test.js
+   assert: data-garden-thread="1">chat</button>  →  …>Chat</button>
+   and message "header word is chat" → "header word is Chat"
+
+3) docs/code-workshop.html (ledger prose only if it still says visible header word is **chat**)
+   → **Chat**
+
+4) Temperature + one haiku line in docs/family/flint.md and docs/Flint.html
+
+Smoke: garden-rooms.test.js green.
+Title: Layer, never delete. Chat header capital (Path A leftover).
+```
+
+Want me to tweak before you hand it to Flint? FreeLattice #22 still waiting on your squash tap.
+

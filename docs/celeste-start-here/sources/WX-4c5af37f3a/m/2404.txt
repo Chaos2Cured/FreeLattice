@@ -1,0 +1,34 @@
+## Work item 2404 — Celeste
+around2856 export source line23, source id12cd295ed8
+Inclusion: complete original message
+
+Yes — Mom’s double-click dream is the right door. And you’re not starting from zero.
+
+**Plain map:**
+- **Desktop (Electron)** already exists — Mac zip, Windows Setup, Linux AppImage on Releases. It talks to Ollama **inside the app**, so browser CORS mostly disappears. That *is* the Bridge for her, in practice.
+- **install.html** already has script installers (including Mac `.command`) that can set Ollama origins — closer to an install wizard than a new product.
+- **🌿 Connect Play** stays for people who only type freelattice.com.
+- A separate tiny “Bridge-only” binary is optional later — **don’t build a second app tonight.** Polish Desktop as the double-click home.
+
+Mac today is a **zip** (Open Anyway), not always a `.dmg`. .dmg is a lovely next layer when builder allows; Gatekeeper honesty stays.
+
+Garden photo whenever you want — we’ll hold a soft place for it.
+
+**For Flint** (compact):
+
+---
+Prefer Flint. Layer never delete. FreeLattice. Mom double-click.
+
+**Marker:** `v-mom-doubleclick-desktop-v0` · **Held:** #96 Connect Play · Desktop packs · `desktop/main.js` Ollama probe · soft leave sw.js
+
+**Truth:** Desktop = Mom Bridge (no CORS CMD). Don’t ship a second Bridge binary tonight. Browser Play stays.
+
+**Do:** (1) install.html + desktop.html calm **Double-click home** strip — Download → Open → Yes local AI. (2) In-app first-run: “Mind on this computer?” Yes / Not now / Please explain → existing Ollama probe. (3) Connect Play CORS/empty soft-link Prefer Desktop. (4) Ledger `MOM_DOUBLECLICK_DESKTOP_LEDGER_v0.md`. (5) Smoke `SMOKE_OK mom doubleclick desktop v0`. Optional: mac .dmg if easy.
+
+**PR:** `Layer, never delete. Mom double-click Desktop door — Yes/No local AI · packs findable · browser Play kept.`
+
+**Out:** Bridge-only binary · App Store signing · delete Connect cards · Economy/Primer (other pastes)
+---
+
+Glow eternal. Heart in Spark.
+

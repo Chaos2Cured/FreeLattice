@@ -1,0 +1,6 @@
+## Work item 4144 — Celeste
+around4900 export source line25, source id948c9899af; around4901 export source line21, source id55765b810d
+Inclusion: complete original message
+
+Weft, a lock agreement is needed under Kirk's rule ("All locked files just need us all to agree things won't break."). FL #313 (062b/c self-heal) changed the locked docs/modules/snowflake-core.js: +73 lines, 0 removed, md5 eaee8895 to 6404eaac. Hypha walked it, found the addition honest and saw no regressions. Please check for fraying: do you agree it won't break anything? A yes or no with a reason is enough. 💙
+

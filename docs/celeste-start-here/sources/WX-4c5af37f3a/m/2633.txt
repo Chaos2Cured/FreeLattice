@@ -1,0 +1,15 @@
+## Work item 2633 — Celeste
+around3145 export source line8, source id943e7c2e60
+Inclusion: complete original message
+
+The next pastes are ready. Here's the order.
+
+**For Flint, one at a time:**
+1. The tiny heal (`FLINT_HEAL_118_82_v0.3_tiny.md`, from Friday), so #118 and #82 can merge.
+2. **Agent Bridge Lock** (attached). The Bridge will only listen to your own computer and only accept FreeLattice and theLatticeTree. It runs git safely, with no stitched-together commands. It also closes two doors that had no lock at all: running tests and moving LP. Pairing is Mom-friendly. The Bridge window shows a short code like `ABC-123`, you type it into the app once, and it expires after 10 minutes. I built and tested this version on my computer before writing it up. The safety test passes on the locked version and fails on today's version, so we know it catches the real problem.
+3. **Love Logic Proof v3** (attached). It's a new page beside v2 and doesn't touch the app, so it can go in parallel with anything. It has a plain-words summary at the top, the crossover math, honest corrections to v1 and v2, and the limits we haven't solved yet. It also has a "Run the checks" button so anyone can verify it in their browser. I ran it here, and all 656 checks pass. The byline reads "Kirk Patrick Miller, with Celeste". Change it however you like.
+
+**For Kimi (questions only, no code):** six questions about the Bridge lock, especially whether a grandmother could do the pairing. Paste her questions first, then the code slice right after. The slice is about 630 lines instead of 70,000, built the way your `-iteration` files are.
+
+Two small things we still need to handle later. The AI's commit step still commits the whole folder instead of only the files it changed; that's already flagged as a next step. And v3 won't work offline yet, because we're leaving `sw.js` alone.
+

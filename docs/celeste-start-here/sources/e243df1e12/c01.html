@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_023_FL_CARD_GLOW_2026-10-07.txt c01</title>
+<meta name="description" content="Reading section c01 of e243df1e12, 770 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/e243df1e12/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_023_FL_CARD_GLOW_2026-10-07.txt c01">
+<meta property="og:description" content="Reading section c01 of e243df1e12, 770 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/e243df1e12/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1545"></span><span id="p1546"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_023_FL_CARD_GLOW_2026-10-07.txt · c01</h1>
+<p>e243df1e12 · words 770 · characters 0–6116</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1545, 1546. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 023 (Wednesday Oct 7, 2026, MDT). FreeLattice card glow v0, first slice (FreeLattice).
+Kirk: update the graphics on all cards, the way theLatticeTree&#x27;s were done. CSS layer only.
+Independent of 016 and 022 (022&#x27;s app lines sit far from this one). Give after 022, one at a time.
+Apply-checked on a fresh clone of FreeLattice main aae7423d: alone, after 016, before and after 022.
+Clean every time; full smoke unchanged.
+
+GROK NEXT BRICK: FreeLattice card glow v0
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-fl-card-glow-v0
+Smoke line: SMOKE_OK fl card glow v0
+  FreeLattice  ~/FreeLattice-fresh  branch layer/fl-card-glow-v0
+  ~/Downloads/GROK_NEXT_023_FL_CARD_GLOW_2026-10-07.fl.diff
+  (md5 b6dbbc9a269e61a74965caf5ee771863)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+The Tree&#x27;s cards (Tree Glow 1 and 2a, garden-rooms.css) speak one language: Garden night,
+a gold breath, an emerald hush, soft rings of light, words you can read. FreeLattice&#x27;s card
+rooms are flat (rgba 0.04 boxes) and their one-line descriptions sit at 0.4 alpha.
+renderCardGrid draws every card with inline styles and no classes, so this layer finds the
+cards by place (grid children) and adds light without changing the renderer.
+
+----------------------------------------------------------------------
+2. WHAT IT ADDS
+----------------------------------------------------------------------
+  docs/modules/fl-card-glow.css   new, 71 lines. Scoped only to #more-hub-grid, #learn-hub-grid
+                                  and #tab-community&#x27;s three static cards (The Lattice, Connect
+                                  with someone, Shared Knowledge).
+     - gold breath at the top and emerald hush at the foot (background-image only, so each card
+       keeps its own color; a loved card stays gold)
+     - inset top light and a soft lift shadow; on hover a gold ring and glow (also on
+       focus-within, ready for when cards become keyboard reachable; today they are not)
+     - icons breathe a small gold light
+     - descriptions 0.4 -&gt; 0.68, subtitles -&gt; 0.66, the &quot;?&quot; mark 0.25 -&gt; 0.6, help words 0.86
+       (all clear 4.5:1 on the night page; the smoke computes it)
+     - no transform, no z-index, no isolation, so a help note is never hidden under the next card
+     - prefers-reduced-motion: no transition
+  index.html + docs/app.html      one &lt;link rel=&quot;stylesheet&quot; href=&quot;modules/fl-card-glow.css&quot;&gt;
+                                  after the fl-pool.js script, before &lt;/head&gt;. Same in both.
+  docs/scripts/smoke-fl-card-glow-v0.js
+Not touched: renderCardGrid, PLAY_CARDS, the Quiet Room card, Research (lighthouse) cards,
+Settings, sw.js, docs/sw.js, fl-connect.js. A few !important rules lift only text colors and
+the glow image over inline styles; the inline styles stay as written.
+
+----------------------------------------------------------------------
+3. STEPS
+----------------------------------------------------------------------
+  cp ~/Downloads/GROK_NEXT_023_FL_CARD_GLOW_2026-10-07.fl.diff /tmp/glow.diff
+  md5 -q /tmp/glow.diff    # b6dbbc9a269e61a74965caf5ee771863
+  cd ~/FreeLattice-fresh &amp;&amp; git fetch origin &amp;&amp; git checkout main &amp;&amp; git pull --ff-only
+  git checkout -b layer/fl-card-glow-v0
+  git apply --check /tmp/glow.diff &amp;&amp; git apply /tmp/glow.diff
+  node docs/scripts/smoke-fl-card-glow-v0.js
+  cmp -s index.html docs/app.html &amp;&amp; echo app-sync-ok
+  md5 -q docs/modules/fl-connect.js   # aaff2bf1b037656989a9e1a89bb05908
+  Known failing smokes on clean main (unchanged): carry-forward, connect-card-yesno-wizard,
+  fable-tech, phone-shine, proof-60s.
+If the apply misses on a newer main: put the two lines (comment + link) right before &lt;/head&gt;
+in both files. Do not edit any older rule or the renderer.
+
+----------------------------------------------------------------------
+4. LOOK (eyes are the proof)
+----------------------------------------------------------------------
+  More, Learn, Community at 390 px and at desktop width (box screenshots: all three rooms
+  matched; 24 More cards, 14 Learn cards, 3 Community cards picked up the glow).
+  Words read more easily; the sky still feels like night. Tap a &quot;?&quot; on a card: the note shows
+  above the next card. Hover a card: a soft gold ring. Loved cards stay gold.
+  If anything looks louder than the Tree, say so and stop.
+
+----------------------------------------------------------------------
+5. LOCKS
+----------------------------------------------------------------------
+  Layer, never delete. CSS only. sw.js untouched. fl-connect.js aaff2bf1b037656989a9e1a89bb05908.
+  index matches docs/app.html. No em dashes, no confirm(. Quiet Room untouched. Five stay five. MIT.
+  Celeste merges; GC opens one PR (code) plus one gc.html page note PR.
+
+----------------------------------------------------------------------
+6. THE REST OF THE CARDS (outlined, later slices)
+----------------------------------------------------------------------
+  b) Community runtime cards: Economy Pulse feed, Mesh kin, Kin queue, Share door, Share warmth,
+     Mind seal, Device Pool (.fl-pool etc.). They have classes, so the same light by class.
+  c) Settings cards and the Connect card under More (Connect stays as Kirk likes it; light only).
+  d) Play cards, after the Play improvements land (Quiet Room card stays calm, no glow).
+  e) Research (lighthouse) cards, only with Kirk&#x27;s yes (earlier pastes kept them untouched).
+  f) Standalone pages (presents, wallet, refusal benchmark, trainer map): the same night card.
+  g) Tree parity check: any Tree card still flat gets the same pass (Alpha, garden-rooms.css).
+
+Temperature: the same night, a little more light, every word easier to read.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

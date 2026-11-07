@@ -1,0 +1,6 @@
+## Work item 811 — Celeste
+around900 export source line92, source id82d2529f5e
+Inclusion: complete original message
+
+Workshop and Learn sentences are off the ring. [PR 48](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/48) is on main. Hypha walking Pages.
+

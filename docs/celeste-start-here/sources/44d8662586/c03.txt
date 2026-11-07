@@ -1,0 +1,149 @@
+   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
+diff --git a/docs/library/TREE_GATHERING_API_KEYS_v0.1.md b/docs/library/TREE_GATHERING_API_KEYS_v0.1.md
+new file mode 100644
+index 0000000..14289db
+--- /dev/null
++++ b/docs/library/TREE_GATHERING_API_KEYS_v0.1.md
+@@ -0,0 +1,32 @@
++# Gathering: bring your own key, v0.1
++
++Local minds and cloud minds you choose, side by side in the Gathering chairs, any order.
++Alpha layer, marker `v-tree-gathering-api-keys-v0`. September 30, 2026.
++
++**Temperature:** Mom seats her own Claude in the cortex chair, her llama in memory, and taps between them like passing the salt.
++
++**Locks:** Layer, never delete. Local doors stay 127.0.0.1 only. The cloud road is a fixed list of nine https providers, no custom hosts. The key stays in this browser (localStorage, or sessionStorage for this visit only) and goes only to the chosen provider, in its own header, never in a URL. No key in gatheringBinds, seats, thread history or export. Files stay on this machine; a cloud chair hears only that a file stayed here. No confirm(). No innerHTML. textContent only. fl-connect.js untouched. No sw.js on Alpha.
++
++## What it does
++
++- In the Gathering, tap a chair, open **Seat a mind by API key**: provider, model (suggestions, or type any name), your key, optional "only for this visit". **Save and seat** seats it in that chair at once.
++- Seats saved for a provider stay offered next to local minds while its key is in this browser. Forget removes the key; the seat waits until a key returns.
++- Tap a chair to let it speak. The thread heart says where words go: "Listening: gpt-4.1-mini through OpenAI. Your words go to OpenAI. Your key stays in this browser."
++- Honest failures, each in plain words: key not accepted, slow down, model not taken, could not reach, quiet. Nothing is invented.
++
++## Where the key lives (said in the panel, word for word)
++
++Your key stays in this browser on this device. theLatticeTree has no server and never sees it. It goes only to the provider, with each message, when a chair seated through it speaks. Your words go there too, so they leave this computer; files you add stay here. Anyone using this browser profile could find the key. Forget removes it.
++
++## Map (why it is shaped this way)
++
++- FreeLattice app.html keeps one key (`fl_apiKey_enc`, AES-GCM with a device key that sits beside it in the same localStorage) for one provider at a time, and calls providers straight from the browser. The Tree is another origin, so it cannot read FreeLattice's key; it keeps its own, per provider.
++- Every listed provider answers a browser preflight from https://thelatticetree.com (checked Sep 30). No Bridge is needed and the Bridge stays local-only.
++- Cloud seats ride the existing Gathering binds as `url: 'cloud:<provider>'`, so local-mind-probe.js and fl-connect.js need no change and the Tree any-model paste is untouched.
++
++## Later (not built)
++
++- Ask a provider for its model list (GET /models with the key).
++- A custom OpenAI-compatible host (needs Kirk's call on the lock).
++- Cloud minds in Settings, Round Table and Workshop (today only Gathering chairs).
++- Streaming replies.
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index a8531e1..bdf6735 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6534,3 +6534,86 @@ html:has(#place-veil.is-open:not(.is-core)) #shared-shoulder {
+   background: rgba(12, 10, 26, 0.55);
+ }
+ .room-way-back:focus-visible { outline: 2px solid #9fd6ff; outline-offset: 2px; }
++
++/* v-tree-gathering-api-keys-v0: bring your own key, inside the chair picker.
++   Quiet, readable, inside the card at 390. Words only, no new colors. */
++.cloud-key-panel {
++  margin: 0.75rem auto 0.5rem;
++  max-width: 100%;
++  box-sizing: border-box;
++  text-align: left;
++  font-family: Georgia, 'Times New Roman', serif;
++  font-size: 0.86rem;
++  color: rgba(200, 210, 230, 0.86);
++  border-top: 1px solid rgba(74, 159, 212, 0.2);
++  padding-top: 0.6rem;
++}
++.cloud-key-summary {
++  cursor: pointer;
++  min-height: 44px;
++  display: flex;
++  align-items: center;
++  color: rgba(232, 196, 104, 0.92);
++}
++.cloud-key-summary:focus-visible { outline: 2px solid rgba(232, 196, 104, 0.9); outline-offset: 2px; }
++.cloud-key-lead,
++.cloud-key-note,
++.cloud-key-status,
++.cloud-key-row { margin: 0.45rem 0; line-height: 1.45; }
++.cloud-key-note { font-size: 0.8rem; color: rgba(200, 210, 230, 0.72); }
++.cloud-key-status:empty { display: none; }
++.cloud-key-label { display: block; margin: 0.55rem 0 0.2rem; font-size: 0.8rem; color: rgba(200, 210, 230, 0.75); }
++.cloud-key-provider,
++.cloud-key-model,
++.cloud-key-input {
++  display: block;
++  width: 100%;
++  max-width: 100%;
++  min-width: 0;
++  box-sizing: border-box;
++  min-height: 40px;
++  padding: 0.4rem 0.6rem;
++  font: inherit;
++  color: inherit;
++  background: rgba(12, 10, 26, 0.85);
++  border: 1px solid rgba(74, 159, 212, 0.35);
++  border-radius: 8px;
++}
++.cloud-key-visit { display: flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0 0.3rem; font-size: 0.8rem; min-height: 32px; }
++.cloud-key-get { display: inline-block; margin: 0.2rem 0; color: rgba(150, 205, 240, 0.95); text-decoration: underline; }
++.cloud-key-save,
++.cloud-key-forget {
++  font: inherit;
++  min-height: 40px;
++  padding: 0.35rem 0.9rem;
++  margin: 0.35rem 0.35rem 0.35rem 0;
++  color: rgba(232, 196, 104, 0.95);
++  background: transparent;
++  border: 1px solid rgba(232, 196, 104, 0.55);
++  border-radius: 999px;
++  cursor: pointer;
++}
++.cloud-key-forget { min-height: 32px; padding: 0.15rem 0.7rem; font-size: 0.8rem; }
++.cloud-key-save:hover,
++.cloud-key-save:focus-visible,
++.cloud-key-forget:hover,
++.cloud-key-forget:focus-visible { background: rgba(232, 196, 104, 0.12); outline: none; }
++/* v-tree-gathering-api-keys-v0: with the key panel open, the picker becomes a quiet
++   centered sheet, fully in view. (Glow 2a already keeps an open picker above the later
++   seats and scrolling inside itself at 1280.) */
++@media (min-width: 641px) {
++  /* with the key panel open it becomes a quiet centered sheet, fully in view */
++  #place-veil.is-core .core-bind-picker:not([hidden]):has(.cloud-key-panel[open]) {
++    position: fixed;
++    left: 50%;
++    top: 50%;
++    transform: translate(-50%, -50%);
++    width: min(30rem, 92vw);
++    max-width: none;
++    max-height: 86vh;
++    margin: 0;
++    z-index: 30;
++    background: rgba(12, 10, 26, 0.96);
++    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
++  }
++}
+diff --git a/docs/modules/garden-rooms.js b/docs/modules/garden-rooms.js
+index 5d59dd9..2ab9ef2 100644
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -1395,6 +1395,10 @@
+       if (bind && bind.model) {
+         meta.hidden = false;
+         meta.textContent = bind.tag + ' · ' + shortName(bind.model);
++        // v-tree-gathering-api-keys-v0: a cloud chair names its provider
++        if (/^cloud:/i.test(String(bind.url || '')) && window.TreeCloudMinds) {
++          meta.textContent += ' · ' + window.TreeCloudMinds.providerName({ url: bind.url });
++        }
+         if (unnamed) unnamed.textContent = state.speaking === chair.id ? 'speaking' : 'seated';
+       } else {
+         meta.hidden = true;
+@@ -1403,11 +1407,29 @@
+       }
+     }
+ 

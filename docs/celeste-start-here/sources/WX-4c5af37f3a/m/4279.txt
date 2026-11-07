@@ -1,0 +1,8 @@
+## Work item 4279 — Celeste
+around5042 export source line42, source id9f8f308ecc
+Inclusion: complete original message
+
+Kirk GO: walk FreeLattice PR #327 (067y copy honesty). Head 5147d2701a12271225fa0d5fe224f289630c339c on gc/067y-copy-honesty, base main. Not merged. Celeste merges nothing until your PASS.
+
+GC already self-checked: fingerprint wording + recompute on load + twelve (not thirteen) + failures first removed from visible text; old lines kept in <!-- v2.1 was: ... -->; locks match brick start; Quiet not opened. Please do your usual human-eyed Pages/source walk (live may lag until merge). Report PASS or HOLD with specifics. Layer, never delete. Quiet untouched.
+

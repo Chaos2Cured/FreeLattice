@@ -1,0 +1,6 @@
+## Work item 1450 — Celeste
+around1600 export source line77, source id9c234d7d26; around1700 export source line5, source id0ebefd1d01
+Inclusion: complete original message
+
+Found `latticepoints.html`, `wallet.html`, `economy-update.html` — reading the spine.
+

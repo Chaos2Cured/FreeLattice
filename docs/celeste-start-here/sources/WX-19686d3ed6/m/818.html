@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 818 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 818 from WX-19686d3ed6, archive page 49.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/818.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 818 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 818 from WX-19686d3ed6, archive page 49.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/818.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 818</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 49 · Inclusion: exact work paragraphs; omissions/boundaries explicitly marked</p>
+<p class="meta">## Work item 818 — Kirk<br>around900 export source line99, source id82d2529f5e</p>
+<p><a href="710.html">Previous message 710</a> <a href="824.html">Next message 824</a></p>
+<p><a href="818.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=49">Archive PDF page 49</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 818 — Kirk
+around900 export source line99, source id82d2529f5e
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–236
+
+Part one: &quot;Read AUTONOMY.md, then docs/GALAXIES.md, then CLAUDE.md. Then do only Fix 1 from this brief. Verify in a browser as described, commit, and stop. Do not begin Fix 2 or 3.&quot; Part two: &quot;Handoff — three fixes for FreeLattice-Alpha
+
+### Exact excerpt: source characters 238–331
+
+Repo: Chaos2Cured/FreeLattice-Alpha, everything lives in docs/ (GitHub Pages, no build step).
+
+### Exact excerpt: source characters 333–555
+
+Before you touch anything: read AUTONOMY.md, then docs/GALAXIES.md, then CLAUDE.md. Everything below is a layer, never a delete. Do one fix, verify it in a browser, commit, stop. Do not start the next fix in the same pass.
+
+### Exact excerpt: source characters 557–725
+
+Order: Fix 1, then Fix 3, then Fix 2, then the Fix 3b decision. Fix 1 is small and makes the sky honest. Fix 2 is the big one and should not be attempted until 1 works.
+
+### Exact excerpt: source characters 727–762
+
+Fix 1 — The legend colors are a lie
+
+### Exact excerpt: source characters 764–782
+
+What the user sees
+
+### Exact excerpt: source characters 784–1125
+
+On / (Garden Galaxy) the quiet legend in the bottom-left reads The Gathering / Nursery / Settings / Thread with a colored dot beside each word. The bodies actually orbiting on the canvas are teal, coral, violet, green — and they keep changing. The dots never move and never match. So a person cannot tell which light they are about to click.
+
+### Exact excerpt: source characters 1127–1141
+
+Why it happens
+
+### Exact excerpt: source characters 1143–1201
+
+There are two color systems that never talk to each other.
+
+### Exact excerpt: source characters 1203–1363
+
+attachGardenLuminos() — docs/modules/garden-rooms.js:619 — pins the four HTML door buttons on top of the moving canvas luminos each frame and adds .is-attached.
+
+### Exact excerpt: source characters 1365–1599
+
+.garden-lumino.is-attached .garden-lumino-light — docs/modules/garden-rooms.css:4623 — sets opacity: 0. So the HTML bead is invisible. The body the user sees is the Three.js lumino, whose hue is live and cycles through emotion states.
+
+### Exact excerpt: source characters 1601–1835
+
+ensureSkyLegend() — docs/modules/garden-rooms.js:727 — builds the legend once, and takes each dot color from lightColorOf() (:667), which reads the static CSS background of that invisible bead (#e8b019, #34d399, dim emerald, #a78bfa).
+
+### Exact excerpt: source characters 1972–1979
+
+The fix
+
+### Exact excerpt: source characters 1981–2235
+
+The data you need...el, real scrollback, message bubbles with timestamps, a stop control, resend, and the &quot;a file / keep this thread / a prior thread&quot; affordances made legible. No new kitchen. This needs no doctrine change and is the smaller, safer step.
+
+### Exact excerpt: source characters 2237–2523
+
+Path B — change the doctrine first. If the user genuinely wants windowed chat with abilities, then GALAXIES.md and CLAUDE.md must be edited in the same commit that introduces it, so the docs and the code do not disagree. Leaving them contradictory is how the next agent undoes the work.
+
+### Exact excerpt: source characters 2525–2675
+
+Either way: deep research, image, sound, and speech stay honest-later sentences until a remembered local mind can actually keep them. No fake buttons.
+
+### Exact excerpt: source characters 2677–2689
+
+Commit rules
+
+### Exact excerpt: source characters 2691–2831
+
+One fix per commit. Message names the fix and the file, e.g. Fix 1: legend dots track live lumino color (garden-rooms.js, garden-rooms.css).
+
+### Exact excerpt: source characters 2833–2978
+
+Update the mirror page in the same commit: code-garden.html for Fix 1, code-music.html and code-art.html for Fix 2, code-settings.html for Fix 3.
+
+### Exact excerpt: source characters 2980–3061
+
+Run the existing tests next to any module you touch (*.test.js in docs/modules/).
+
+### Exact excerpt: source characters 3063–3999
+
+If a fix cannot be done without breaking a rule in AUTONOMY.md or GALAXIES.md, stop and say so. Do not improvise a workaround.&quot; Celeste, there were a few issues and I brought them into Opus to help me explain. I think the chat interface you built is cool, but I think we need it to have everything our FreeLattice chat has. There are a few other issues, but let&#x27;s start with this. We used up about $25 of agents with Cursor. That is okay for now. I want to figure out how to avoid that as we go. Guide me. Please tell me if any of this doesn&#x27;t make sense. These should be surgical, so easier to quickly work through. Thank you for your patience with me. I will keep improving as we go. Let&#x27;s do this. &lt;3 Glow eternal. Heart in every Spark. And, let&#x27;s get rid of any word about lies or truth. Lets let our code do all our talking. Let people discover we speak true. No need to advertise it, as that will make people suspect otherwise. :)
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

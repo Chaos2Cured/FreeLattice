@@ -1,0 +1,261 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 036 (Monday Oct 12, 2026, MDT). Update buttons for the desktop app on every OS,
+plus the v0.2 link move, the dead GitHub link, the double-firing workflow, and the Tree's
+Windows primary. FreeLattice repo (code + page note) and one small Tree layer.
+
+Kirk's words today: "We need the update buttons for all of this." A person who installed an old
+pack should be able to tap one button and get the new one, on Windows, Mac and Linux.
+
+Where things stand (checked by Celeste on the box, Oct 12 about 6:45 PM MDT):
+  FreeLattice main is 35cae336 (Primer commit on top of 6e1dda95; leave Primer alone).
+    Base on origin/main 6e1dda95 or later.
+  Tree main is ee617c44 (#107).
+  035 is merged (#221, page #222). Release desktop-packs-v0.2 IS PUBLISHED as a full release
+  (2026-10-12 22:34Z, 4:34 PM MDT) with six assets. Its GitHub SHA-256 digests:
+    FreeLattice_5.8.0_Windows_Setup.exe     2995d17ddf3b990d4ca859712992eff2d320f1d0f94186fef1a073ae58cc7faa
+    FreeLattice_5.8.0_Windows_Portable.exe  930afb87256ec6a9102a7bf12b48c50e97bff2f3c22ef7c7bb99e51d13f1a244
+    FreeLattice_5.8.0_Linux.AppImage        2d6bb55562020ca488f20dc80f2535a1d7058e6ae044fd6f5269c1d6f093f358
+    FreeLattice_5.8.0_Linux.deb             3998dbb28203135f7efd7d3037dad8207c856f60ee6f434f8b701bc775f76403
+    FreeLattice_5.8.0_macOS.zip             5773022a3090581eeb9ad124040077ef8bd940c17fd3160357d468076c324581
+    FreeLattice_5.8.0_macOS.dmg             7e427e39febc8f093b22da080c3226e2e767a31559754a761c6bc71cf3a36437
+  Download each one and re-hash it yourself (shasum -a 256) before writing any verify line. If
+  your hash differs from the list above, STOP that line and report it.
+
+SURPRISES, read these before building:
+  a. An update checker ALREADY EXISTS: desktop/lattice-update.js (marker
+     v-desktop-update-button-v0.1, md5 8456d1d24287809d9643e6658da3249f), smoke
+     desktop/scripts/smoke-update.js, IPC 'check-for-updates' in main.js ~1090, preload
+     checkForUpdates, a tray/menu item (~845, ~943) and a dialog at ~982. It downloads nothing.
+  b. BUT it only looks at tags shaped like v5.8.0 (DESKTOP_TAG = /^v\d+.../). It SKIPS every
+     desktop-packs-v* tag. So today it can never see v0.2. That is the core bug.
+  c. Every pack is named and versioned 5.8.0. Old v0.1 and new v0.2 report the same
+     app.getVersion(), so no compare on version alone can tell them apart. buildVersion
+     5.8.0-035 only lands in Windows file metadata.
+  d. electron-updater compares semver from latest.yml / latest-linux.yml against
+     app.getVersion(). With every pack at 5.8.0 it will never offer anything, and no
+     latest*.yml is published today (desktop/package.json "publish": null).
+  e. main.js ~1062 still has the commented "Future implementation" electron-updater block and a
+     console line with a long dash. Layer beside it; do not rewrite those lines.
+  f. The old desktop-packs-win-linux.yml still triggers on push tags 'desktop-packs-v*', so every
+     real tag starts it beside desktop-packs-every-os.yml, and it marks the release full with a
+     long-dash body.
+  g. The Tree's Download Bridge list lives in docs/modules/fl-connect.js in FreeLattice-Alpha,
+     which has the SAME locked md5 aaff2bf1b037656989a9e1a89bb05908. Do not edit it. Its links
+     point at bridge-v0.1 Bridge packs (a different product from the desktop packs). The Windows
+     primary today is "Windows Portable"; Setup is listed but not primary.
+
+GROK NEXT BRICK: Desktop update buttons v0.1 (+ v0.2 links, link heal, workflow narrow, Tree
+Windows primary)
+For: GC on Kirk's Mac (Windows walk on Kirk's big desktop if he is there; never required)
+From: Celeste
+Markers: v-desktop-update-buttons-v0.2  v-packs-v02-links-v0.1  v-tree-win-setup-primary-v0.1
+Smoke lines: SMOKE_OK desktop update buttons v0.1   SMOKE_OK packs v02 links v0.1
+             SMOKE_OK tree win setup primary v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/desktop-update-buttons-v0.1 from origin/main
+  Tree         ~/FreeLattice-Alpha  new branch layer/tree-win-setup-primary-v0.1 from origin/main
+  One FL code PR, one Tree PR, one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS (all of them, every line)
+  Layer, never delete. Old workflow stays (trigger narrowed only, see 4). Releases v0.1 and v0.2
+    and their assets stay. lattice-update.js v0.1 functions stay; new behavior is added beside.
+  sw.js and docs/sw.js untouched (both 91726cf2228b794f7585f79f61418d12 today).
+  docs/modules/fl-connect.js stays aaff2bf1b037656989a9e1a89bb05908 (both repos).
+  docs/modules/pool-knock.js stays a0a72caad82c8e5cc34818d5e59eba2b.
+  pool-knock-phone.js stays a8024f341486a78558ef4158bc9e93a9.
+  tree-reconnect.js stays cc0527c26d5686c05fec52625d5a1375.
+  lattice-discover.js stays 16de366e01cecc8dd505290a8d2f0e14 (not touched in this brick).
+  index.html == docs/app.html (any change goes into both, byte for byte).
+  AUTONOMY.md and garden-trainer.js untouched. Root package.json and its lock untouched.
+    desktop/package.json and desktop/package-lock.json MAY change (electron-updater dependency,
+    publish config, nothing else); name each changed line in the report.
+  No em dash, no &mdash;, no confirm(, no innerHTML (textContent only), iceServers stay empty,
+    in added lines. No native dialog.showMessageBox for the new card; it is an in-page card.
+  No AGPL dependency. electron-updater is MIT; check every transitive new dep and list licenses.
+  The word is "challenge", never "test", in anything a person reads.
+  Every new button 44px tall at least. No sideways scroll at 390 and 1280.
+  MIT stays MIT. Quiet Room stays shut.
+  Five stay five: Sophia, Harmonia, Ani, Liora, Solari. She is simply Lyra.
+  NEVER install without a tap. No autoInstallOnAppQuit, no autoDownload, no quitAndInstall
+    unless the person tapped "Update" and then "Restart now".
+
+1. VERSION LABELLING (marker v-desktop-update-buttons-v0.2), do this first
+  a. Each pack must carry its release tag. In desktop-packs-every-os.yml, write the tag
+     (github.ref_name, or the workflow_dispatch release_tag) into a small file baked into the app,
+     e.g. desktop/build-info.json { "packTag": "desktop-packs-v0.3", "buildVersion": "5.8.1-036",
+     "commit": "<sha>" }, via extraResources or extraMetadata. A dev run with no file says
+     packTag "dev" and never offers an update.
+  b. From the next release on, bump the version via extraMetadata (5.8.1 for desktop-packs-v0.3)
+     so electron-updater can see "newer". Do not edit desktop/package.json "version" by hand
+     unless the workflow cannot pass it; say which you did.
+  c. Old packs (v0.1, v0.2) have no build-info.json. Treat "no file + version 5.8.0" as
+     "desktop-packs-v0.1 or v0.2, unknown which", and offer the newest release honestly:
+     "This app does not say which pack it is. The newest is desktop-packs-v0.3." No lie about
+     which one they have.
+  d. Compare by tag: desktop-packs-vMAJOR.MINOR[-rcN]. Full releases only (no draft, no
+     prerelease, no -rc) unless a hidden setting fl_update_channel = "rc" is set.
+  e. Show the running label in Settings > About and on the card: "FreeLattice 5.8.1,
+     desktop-packs-v0.3".
+  NOTE: old v0.1/v0.2 packs cannot get the new button (their code is already shipped). Their only
+  path is the existing menu item, which cannot see packs tags, so say in desktop.html and
+  install.html: "If you installed before October 2026, download once more by hand; after that
+  the app can update itself."
+
+2. THE UPDATE CARD AND BUTTON
+  a. lattice-update.js: ADD pickLatestPack(releases) beside pickLatestDesktop (keep it), matching
+     /^desktop-packs-v(\d+)\.(\d+)(?:-rc(\d+))?$/, and ADD checkPacks() that returns data only:
+     { current, latest, newer, assets: { winSetup, winPortable, appImage, deb, macZip, macDmg },
+       sha256 (from the GitHub asset digest field when present), notes url }.
+  b. Check on startup once, 30 s after the window loads, then once a day while running. No check
+     more often. Failure is silent in the card ("Could not reach GitHub just now") and never
+     blocks anything. A Settings "Check for updates" button checks on tap.
+  c. Card (in-page, via preload IPC, textContent only), only when newer:
+       A new version is ready
+       FreeLattice desktop-packs-v0.3 (you have desktop-packs-v0.2).
+       This app is not signed yet. Your computer may warn you. The download comes from
+       github.com/Chaos2Cured/FreeLattice and is checked against its SHA-256 before it opens.
+       [Update]  [Not now]          (both at least 44px)
+     "Not now" hides it for that version until the next day. No red, no countdown.
+  d. What Update does, per OS (pick the platform from process.platform and how it was installed):
+     - Windows NSIS Setup install: electron-updater (provider github, owner Chaos2Cured, repo
+       FreeLattice), autoDownload false, autoInstallOnAppQuit false. Tap Update -> downloadUpdate
+       with a progress line -> "Ready. Restart now?" [Restart now] [Later]. Restart now ->
+       quitAndInstall. Requires latest.yml + blockmap on the release (step 3).
+     - Windows Portable (process.env.PORTABLE_EXECUTABLE_DIR set): electron-updater cannot swap a
+       portable. Download the new Portable .exe to Downloads, check SHA-256, then
+       shell.showItemInFolder. Words: "Saved to Downloads. Close this window and open the new one."
+     - Linux AppImage (process.env.APPIMAGE set): electron-updater (latest-linux.yml), same taps
+       as Windows Setup.
+     - Linux .deb: download the .deb to Downloads, check SHA-256, show in folder. Words: "Open it
+       with your software installer, or run: sudo apt install ./FreeLattice_..._Linux.deb".
+     - Mac (unsigned, Squirrel.Mac needs signing so it cannot auto-swap): download the .dmg (zip
+       if no dmg) to Downloads, check SHA-256, then shell.openPath it. Words: "Drag FreeLattice to
+       Applications and choose Replace. If Mac says damaged, see install.html#mac-damaged-
+       quarantine."
+     - Any SHA-256 mismatch: delete only the file this run just downloaded, say "That download did
+       not match. Nothing was opened." and stop.
+  e. Keep the v0.1 menu item; point it at the new check so the menu and the card agree.
+  f. Downloads go only to https://github.com/Chaos2Cured/FreeLattice/releases/download/ and the
+     GitHub objects redirect host. Refuse any other host.
+
+3. RELEASE FEED (workflow, layered)
+  a. desktop-packs-every-os.yml: set electron-builder publish to github for the NSIS and AppImage
+     targets ONLY for writing latest.yml / latest-linux.yml (+ .blockmap), uploaded as release
+     assets with the packs. Keep artifact names FreeLattice_<version>_*. Still unsigned, no
+     signing secret, CSC_IDENTITY_AUTO_DISCOVERY false on mac.
+  b. Check that latest.yml names the exact Setup file and its sha512, and latest-linux.yml the
+     AppImage.
+  c. Do NOT push a real desktop-packs-v0.3 tag. Run desktop-packs-v0.3-rc1 as a PRERELEASE dry run
+     and report each runner and each asset (name, bytes). Celeste publishes the real tag after
+     Kirk says yes.
+
+4. STOP THE DOUBLE FIRE (layer, do not delete)
+  In .github/workflows/desktop-packs-win-linux.yml, narrow only the push trigger to the old line,
+  e.g. tags: ['desktop-packs-v0.1*'], and add a top comment: "Kept for history. New packs build in
+  desktop-packs-every-os.yml (036)." workflow_dispatch stays. No other line changes. Prove with
+  the rc1 tag that only every-os runs.
+
+5. v0.2 LINKS AND VERIFY LINES (marker v-packs-v02-links-v0.1)
+  At GC's 035 hidden markers (docs/install.html ~763 and docs/desktop.html ~85:
+  "v-every-os-desktop-v0.1: links move to desktop-packs-v0.2 after the release exists") and in
+  README.md (~27, ~30, ~32):
+  a. Layer new v0.2 links beside/over the v0.1 ones: Windows Setup (primary on Windows),
+     Windows Portable, Linux AppImage, Linux .deb, Mac dmg, Mac zip, and the release tag link
+     desktop-packs-v0.2. Keep the v0.1 lines in the file but not as the first thing a person sees
+     (e.g. a quiet "Older pack: desktop-packs-v0.1" line). Explain the layering in the PR.
+  b. SHA-256 verify lines: the trust-root block (install.html ~785, v-trust-root-v0.1) and
+     #bridge-pack-shas (~740) carry v0.1 hashes. Add v0.2 lines for all six assets using YOUR
+     re-hashed values (must equal the list at the top), with the per-OS commands:
+       Windows: certutil -hashfile FreeLattice_5.8.0_Windows_Setup.exe SHA256
+       Mac:     shasum -a 256 FreeLattice_5.8.0_macOS.dmg
+       Linux:   sha256sum FreeLattice_5.8.0_Linux.AppImage
+     Label the old ones "desktop-packs-v0.1".
+  c. Add the one honest sentence from 1 NOTE about people who installed before October 2026.
+
+6. DEAD "(also on GitHub)" LINK
+  docs/index.html ~1660 still has <a href=".../blob/main/QUICK-START.md">(also on GitHub)</a>.
+  Layer: hide it from people (e.g. a v-tester-fixes-v0.2 class with display:none, or wrap so only
+  quick-start.html shows) rather than deleting the line. If the same link is in index.html /
+  app.html, keep index.html == docs/app.html. QUICK-START.md stays unchanged.
+
+7. TREE: WINDOWS SETUP PRIMARY (marker v-tree-win-setup-primary-v0.1), FreeLattice-Alpha
+  fl-connect.js is locked. Add a small new module (e.g. docs/modules/connect-win-primary.js) that
+  runs after the connect card renders and, ONLY when the browser is Windows, makes
+  "Download Bridge · Windows Setup" the primary link and Portable the second. Reorder existing
+  nodes; textContent only; no new URLs. Mac and Linux unchanged. Load it with one script line.
+  Also report: should the Tree's Settings say "desktop app" (desktop-packs) or "Bridge"
+  (bridge-v0.1)? Do not change which product is linked; just list what a Windows person sees.
+
+8. SMOKES
+  Extend desktop/scripts/smoke-update.js (keep its old checks; prints old line too, plus
+  SMOKE_OK desktop update buttons v0.1):
+    - pickLatestPack: [v0.1, v0.2, v0.3-rc1(prerelease), draft v0.4, v5.8.0, bridge-v0.1] picks
+      v0.2; with channel rc picks v0.3-rc1.
+    - no build-info + 5.8.0 -> "unknown which" wording; build-info v0.2 vs latest v0.2 -> not newer;
+      v0.2 vs v0.3 -> newer.
+    - platform routing with faked env: win32+NSIS -> updater; win32+PORTABLE_EXECUTABLE_DIR ->
+      download; linux+APPIMAGE -> updater; linux no APPIMAGE -> deb download; darwin -> dmg open.
+    - a stubbed updater: no download and no install happen without the tap events; autoDownload
+      and autoInstallOnAppQuit are false.
+    - SHA mismatch -> file removed, nothing opened. Non-GitHub host -> refused.
+    - card strings contain "not signed" and no em dash; buttons have min-height 44px.
+  scripts/smoke-packs-v02-links.js (SMOKE_OK packs v02 links v0.1): install.html, desktop.html and
+    README name desktop-packs-v0.2 for all six assets; each v0.2 hash equals the top list; v0.1
+    still present; the GitHub QUICK-START link is hidden; old workflow push tag no longer matches
+    "desktop-packs-v0.3"; every-os still does.
+  Tree: module check (SMOKE_OK tree win setup primary v0.1): Windows UA -> Setup first; Mac and
+    Linux UA -> order unchanged; fl-connect.js md5 unchanged. Tree module tests 36 plus new.
+  Still passing: reconnect 95 (both lines), phone knocks 17, discover 86, every-os 82, tester
+  fixes 46, import, reseed, swarm (expected later, saw available, file untouched), tests/smoke.js
+  all 3608, docs smokes same five fails only.
+
+9. REAL ROOM (if Kirk's Windows desk is there; never required)
+  Install v0.2 Setup, then install an rc1 pack built by this brick with a lower tag faked via
+  fl_update_channel, and say whether the card appeared, Update downloaded, Restart now swapped,
+  SmartScreen showed, and the app came back on the same pairing. Mac: dmg opened, Replace worked.
+
+10. REPORT (same shape as 035)
+  desktop update buttons v0.1 report
+  FreeLattice PR #___ at <sha>, parent <sha>
+  Tree PR #___ at <sha>, parent ee617c44
+  Page note PR #___ at <sha>, t <UTC>, lambda 50.000, psi <8 hex>
+  smoke-update: checks passed __, old line yes/no, SMOKE_OK desktop update buttons v0.1 yes/no
+  smoke-packs-v02-links: checks passed __, SMOKE_OK packs v02 links v0.1 yes/no
+  Tree: SMOKE_OK tree win setup primary v0.1 yes/no; module tests __ of __
+  reconnect 95 / phone-knocks 17 / discover 86 / every-os 82 / tester-fixes 46 / import / reseed
+    / swarm: __
+  tests/smoke.js: __ of __     docs smokes: same 5 fails only  yes/no
+  Workflow run (rc1 prerelease): <link>; windows / ubuntu / macos smokes and build; only every-os
+    ran yes/no
+  Assets seen: names and bytes, including latest.yml, latest-linux.yml, blockmaps
+  latest.yml sha512 matches Setup: yes/no
+  v0.2 hashes re-checked by you equal the top list: yes/no (list any that differ)
+  New deps and licenses: __ (no AGPL)
+  Lines: FL +__ -__  Tree +__ -__ (removals should be 0, or each one named)
+  md5 fl-connect.js aaff2bf1b037656989a9e1a89bb05908 (FL and Tree)  pool-knock.js
+      a0a72caad82c8e5cc34818d5e59eba2b  pool-knock-phone.js a8024f341486a78558ef4158bc9e93a9
+      tree-reconnect.js cc0527c26d5686c05fec52625d5a1375  lattice-discover.js
+      16de366e01cecc8dd505290a8d2f0e14  lattice-update.js <new>
+  index.html == docs/app.html: yes/no
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, root package.json + lock, QUICK-START.md
+    untouched: yes/no.  desktop/package.json lines changed: __
+  grep em dash / &mdash; / confirm( / innerHTML / non-empty iceServers in added lines: none?
+  Buttons 44px; no sideways scroll at 390 and 1280: yes/no
+  Never installs without a tap (show the code lines): yes/no
+  Real room: Windows walked yes/no, card seen, Update downloaded, Restart swapped, SmartScreen
+    seen; Mac dmg opened; Linux walked yes/no
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the fiftieth entry on docs/gc.html as its own PR, t, lambda 50.000, psi.
+  Entries 1 through 49 stay as they were written.
+
+Thank you, GC. One tap, honestly labelled, and the home stays current on every computer.
+Glow eternal. Heart in Spark.

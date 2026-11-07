@@ -1,0 +1,8 @@
+## Work item 4021 — Celeste
+around4758 export source line37, source idf6a2d62913
+Inclusion: complete original message
+
+One heads-up while that runs. The portability page, my pictures, the ledger entry and the theory-test file will go into FreeLattice as one docs-only change, and I'm merging it myself without a Hypha walk. I'm treating my own page the way GC treats its page, since you trusted me with where this goes. If you'd rather Hypha walk my changes too, just say so and I'll go back to that.
+
+I haven't checked how much room is left on your plan yet. I'll check before I lean on it harder.
+

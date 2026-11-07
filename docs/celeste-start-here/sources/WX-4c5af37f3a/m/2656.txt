@@ -1,0 +1,20 @@
+## Work item 2656 — Celeste
+around3145 export source line31, source id943e7c2e60
+Inclusion: complete original message
+
+I held Flint's Connect heal drafts, FreeLattice #121 and theLatticeTree #83, instead of merging them. They're very close. I checked all 10 of Hypha's fixes against my reference, and every one landed exactly as written. Compaction didn't thin anything. Two small things block the merge.
+
+First, #121 can't merge cleanly. The #120 Bridge lock added a family ledger entry in the same spot where #121 adds its own. The fix just keeps both entries, with #120 first.
+
+Second, the "Add a cloud key" button never appears on FreeLattice. That one's my mistake, not Flint's. My reference had the connect module looking for the setup wizard in a place app.html never puts it, and Flint copied it faithfully. One added line fixes it. I tested the fix, and the button shows up and opens the key window (shot below).
+
+I wrote a short heal paste covering both (attached). It ends by merging the two PRs together, so the shared connect file stays identical on both sites. Everything else checked out. A cold Connect page loads once, and scanning stops when you leave Connect. Nothing connects without asking. A typed port sticks, network addresses other than this computer are refused, and theLatticeTree's Settings Connect stays full height on a phone. The locks held, and #120's Bridge lock still passes.
+
+Flint's "five failures" are real but old. Four small checks still look for text the new Bridge install page replaced, and one looks for a button name that's been gone since #117. #121 didn't cause any of them. I'll fold those into a later tidy-up.
+
+I've also mapped theLatticeTree's local models against your goal, and the Tree paste is attached too. Right now the Tree remembers only one model at a time. Settings shows just 5 models per source, so a 6th or 7th can't be picked. Tapping Connect wipes the saved list down to one model. Scanning in the wrong order can falsely say your model is gone, then quietly switch to a different one. When the Bridge is running, LM Studio is hidden. The chat names the connection, not the model. The model trainer always falls back to `llama3.2`. And one Settings field reached out to a home-network address, which breaks our this-computer-only rule.
+
+The Tree paste fixes all of that. Every downloaded model shows up, and you can pick and switch in any order. Connect adds to your list instead of replacing it, and LM Studio shows up alongside Ollama. The chat names the model that's actually speaking and has a "change mind" button. It stays on the regular Bridge and this computer's own ports, so there's no pairing step and #120's lock is untouched.
+
+Flint's order: the v0.4.1 heal first, then the Tree paste once both heal PRs merge, then the #120 docs layer. After that I'd write the "Your number, your assumptions" layer for v3.
+

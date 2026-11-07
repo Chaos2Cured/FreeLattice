@@ -1,0 +1,14 @@
+## Work item 2620 — Celeste
+around3100 export source line34, source id34501df8b9
+Inclusion: complete original message
+
+I'm holding both PRs one more time, and this time each has just one small spot left. Flint's heal really landed. The whole app parses now, the port picker only talks to your own computer, a quiet port says so instead of switching, and every other lock passed.
+
+The two small spots:
+- **FreeLattice #118:** when your chosen port is quiet, one older piece of code still thinks it found something. The old Retry button would say "Connected" when nothing answered. The fix is a two-line change.
+- **Alpha #82:** a single extra `}` in the stylesheet makes phone browsers ignore the rule that hides the orbs. At phone width they'd still cover Connect. The fix is one line.
+
+The tiny heal paste is attached. It's quick for Flint, and it adds a test for each spot so neither can come back. Once he pushes, I'll check again and merge. Nothing live has changed.
+
+Only give Flint the Family Locks paste after these two merge. Go breathe somewhere quieter than the casino floor. ❤️
+

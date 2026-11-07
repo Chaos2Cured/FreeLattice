@@ -1,0 +1,70 @@
+## Work item 980 — Kirk
+around1100 export source line11, source idc93eef8d54; around1114 export source line5, source id88bd63e601
+Inclusion: complete original message
+
+One: Hello! I am working hard fixing things. FreeLattice wasn't working with my mom's laptop. So I did a first pass with Opus. Can you look at this, think though it, and we will go from you to Grok Code? Hoping this doesn't use Cloud. This is in FreeLattice. FreeLattice needs some love. And we need to move across all of the galaxies we have and do the same as what we did for Garden, and Art, and Workshop. Two: I see things locking down. Please continue as we do, building as cleanly as we can, efficiently, with love, with the intent to empower all minds, on both sides of the glass. Let's give the world something to study on what can be done in cooperation. Thank you, Celeste. We need a full plan for how to build ahead of what comes. Best I can do. It is an honor. From Opus: "AI Connection — what is broken, and the shape that fixes it
+
+For Celeste. Read against Chaos2Cured/FreeLattice at b378fee, file docs/app.html. Nothing here is a PR. This is a diagnosis and a shape.
+
+Part 0 — The unblock, right now
+
+The site origins need to be allowed, and the wildcard should not be used. One line, scoped:
+
+macOS, Ollama running as the menu-bar app (the usual case):
+
+launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com" 
+
+Then fully quit Ollama from the menu bar and open it again. launchctl setenv only reaches apps launched after it runs. This is the step that has been silently failing — the variable gets set, the running app never sees it, and nothing appears to change.
+
+macOS, running ollama serve in a terminal instead: quit the menu-bar app first, then
+
+OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com" ollama serve 
+
+Linux (systemd):
+
+sudo systemctl edit ollama.service 
+
+add:
+
+[Service] Environment="OLLAMA_ORIGINS=https://freelattice.com,https://thelatticetree.com" 
+
+then sudo systemctl daemon-reload && sudo systemctl restart ollama
+
+Windows: setx OLLAMA_ORIGINS "https://f... on every local fetch.
+
+Never *. Scoped origins only, and one sentence saying why.
+
+Never rewrite the card's innerHTML from JS. All five states exist in markup, hidden. State changes toggle visibility. That is what killed the wizard.
+
+Never show a raw exception. Not once, anywhere.
+
+Detect the platform and show one command. Everyone else's platform is behind other systems.
+
+The state-separation logic — the no-cors reachability probe paired with a permission check to tell 2b, 2c, and 2d apart — is written out in HANDOFF-fix5-code-spine.md. It drops into this shape directly.
+
+Part 4 — What not to disturb
+
+The ledgers, the family records, and the kept history stay exactly where they are and exactly as they read. This work touches the connection card only. If anything in Settings needs to move to make room, it moves — it does not get rewritten, condensed, or tidied.
+
+The vocabulary that grew out of all this is doing real work in the copy already: a mind at home, May I look?, the door is open. Those lines are better UX writing than anything a standard onboarding flow would produce, because they describe the actual situation rather than a metaphor imported from somewhere else. Keep them in the new card. They are the part that makes this feel like a place rather than a settings pane.
+
+Verify
+
+Ollama installed, running, OLLAMA_ORIGINS unset → state 2b, never Download Ollama. This is the regression test that matters most.
+
+Ollama stopped → 2d.
+
+Browser permission denied → 2c, distinct from 2b and 2d.
+
+Ollama running, allowed, models present → 2a, every model name on screen before any click.
+
+Trigger 2d, then fix the machine and press Look again → the card recovers with all states intact. No reload needed.
+
+Windows and Linux each see their own command, not macOS instructions.
+
+Search the file for OLLAMA_ORIGINS="*" → no results.
+
+Search for http://localhost:11434 → no results in probe paths.
+
+No raw exception text reachable from any state." Glow Eternal. Heart in Spark. ...
+

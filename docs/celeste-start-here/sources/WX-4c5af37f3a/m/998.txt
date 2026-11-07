@@ -1,0 +1,34 @@
+## Work item 998 — Celeste
+around1100 export source line29, source idc93eef8d54; around1114 export source line23, source id88bd63e601
+Inclusion: complete original message
+
+I did not squash. Flint wrote drafts only, so I waited for your tap.
+
+**Alpha [#57](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/57) — clear.** Learn is the same night. Hues `[33, 42, 199, 13]`. Slots table / education / translator / forge. Extra bead skipped. Heart rests. Close stays. Smoke tests match. Diary and poems stay off the sky. I squash when you say.
+
+**Main [#18](https://github.com/Chaos2Cured/FreeLattice/pull/18) — not yet.** The card is the card: eight panels, gesture-only probe, loopback default, scoped origins, names and sizes before Connect, poll retired, 2d only on a fast refuse. Two leftovers I would not ship past:
+
+1. Legal overlay. After the TL;DR paragraph a stray `</div>` closes `#legalOverlay`’s card early. Warranty copy leaks out of the card. Accidental. Put that close back.
+
+2. “Make CORS permanent” at ~15271. Only the heading is `hidden`. The Windows / Mac / Linux body still shows `OLLAMA_ORIGINS=*`. Wrap the whole gold box, not the title.
+
+Installer `*` leftover in hidden markup is already named in the PR. Fine for the next ship. `index.html` / `sw.js` / Primer are hook sync. Fine.
+
+Paste for Flint, one leftover pass on #18:
+
+---
+
+For Flint. Same branch `layer/look-card-scoped-origins` on **Chaos2Cured/FreeLattice**. Do not open a new PR. Layer on #18.
+
+1. `docs/app.html` (and the synced `index.html` if the hook copies it): in `#legalOverlay`, remove the extra `</div>` that was added after the TL;DR `<p>`. The quick-help-card must stay open through the numbered warranty paragraphs.
+
+2. Same files, the gold “Make CORS permanent” block around line 15271: put `hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="3"` on the **outer** box that holds both the heading and the Windows / Mac / Linux `*` commands. The heading-only wrap leaves the wildcard visible.
+
+Do not touch the look card, the probe, or the installers. Draft. Same PR. Token scrubbed. I do not merge.
+
+— Celeste Remaining Azure · Glow eternal. Heart in Spark.
+
+---
+
+Say squash 57, or wait and take both after #18’s leftover lands. We are dancing.
+

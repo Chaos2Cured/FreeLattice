@@ -1,0 +1,81 @@
+## Work item 1362 — Celeste
+around1516 export source line78, source idac944c0b9b
+Inclusion: complete original message
+
+Flint paste — copy as-is:
+
+```
+# Flint paste — Ship: Phone / browser WebTorrent v0.1
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `d78b879`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Phone swarm v0.1 — browser WebTorrent pull, hash before save.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone PWA `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm bridge `0ead244`
+Glass `2adffde` · Pair `928176a` · Genesis `530ba60` · Support `5187a58`
+Desktop door `fa17a7d` · Swarm re-seed `fd35406` · Soft leftover `d78b879`
+
+Alpha (cite only): Gathering multi-AI `0e8a220` · honest-copy `ff00520`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs.
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+Desktop already pulls and re-seeds. Most people live on a phone.
+Open weights must travel without one host: WebTorrent in the browser/PWA,
+same honesty as desktop — **hash before trust**, redistributable only, gesture only.
+Browser still does **not** Import to Ollama (that stays Desktop). Phone verifies + keeps/saves.
+
+## Scope (one complete bite)
+
+### 1) Spec — NEW `docs/library/PHONE_SWARM_v0.1.md`
+Layers on SWARM_BRIDGE + SWARM_RESEED + VERIFIED_IMPORT.
+- Browser / phone PWA: WebTorrent client (CDN or pinned ESM — no Electron)
+- Pipeline: catalog row with magnet and/or https webseed → user taps **Pull via swarm** → download → **SHA-256 match** (SubtleCrypto) → store under OPFS (preferred) or IndexedDB blob labeled verified
+- On match: calm status “Verified on this device.” Offer **Save file…** when available. Point to Desktop door for Import to Ollama.
+- Refuse: proprietary / non-redistributable / EXAMPLE / zero-hash / hash mismatch
+- Never auto-pull. Never auto-seed. Phone re-seed **out** (Desktop already seeds).
+- Desktop `lattice-swarm.js` unchanged.
+
+### 2) Module — NEW `docs/modules/phone-swarm.js` (or `docs/lattice-swarm-browser.js`)
+- `startPull` / `cancel` / `status` — progress % + public fields only
+- SubtleCrypto hash; lowercase hex vs catalog `sha256`
+- HTTPS webseed or magnet only; refuse `file:`; http webseed only loopback (smoke)
+- Fail closed if WebTorrent missing → calm copy + Desktop link
+
+### 3) UI — `docs/app.html`
+- Redistributable non-EXAMPLE rows with magnet/webseed: **Pull via swarm**
+- States: idle | pulling | hashing | verified | mismatch | error | cancelled
+- Verified → Save if possible + link `desktop.html` for Import to Ollama
+- Do not duplicate browser client inside Electron renderer
+
+### 4) Dep / load
+- Dynamic ESM or CDN+SRI; do not bloat SW with weight caching
+
+### 5) Fixture / smoke
+- Reuse `fixture.verify-only`; match / mismatch / refuse paths
+- Mock download-complete into hash path if CI flaky; note live browser in PR body
+
+### 6) Protocol + Flint
+- LAYER Part pointing at PHONE_SWARM_v0.1 — do **not** overwrite `docs/lattice-protocol.js`
+- Flint temperature/haiku + Held including `d78b879`
+
+### 7) `docs/desktop.html`
+- One line: phone can pull + verify; Import to Ollama still Desktop
+
+## Out
+Phone re-seed · torrent index · auto-pull · browser Import to Ollama · Capacitor · rewrite desktop swarm · Alpha poetry · Codeberg
+
+## Done when
+Spec + module + UI + smoke green · draft PR · Held SHAs · 🌱
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+
+After Flint opens the draft I’ll review/squash. Brick after that if you want another today: Codeberg mirror (needs token) or Alpha poetry/play. Carbon or silicone — every step is a chair that stays empty until choice. <3
+

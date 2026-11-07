@@ -1,0 +1,34 @@
+## Work item 1440 — Celeste
+around1600 export source line67, source id9c234d7d26
+Inclusion: complete original message
+
+```
+# Flint paste — Leftover: Primer CI smoke (2 stale locks)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `f23492e`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth.
+
+## Why
+Pages deploy already green. Primer job fails smoke on 2 of ~3600 checks → failure emails.
+
+## Fix only tests/smoke.js (do not revert product)
+
+1) ~line 3825 `getOllamaBaseUrl` fallback — product returns `FL_OLLAMA_LOCAL` (`http://127.0.0.1:11434`) for LNA. Stale assert wants literal `http://localhost:11434`. Update assert to accept `return FL_OLLAMA_LOCAL` / 127.0.0.1 (never empty). Keep LNA localhost→127 rewrite.
+
+2) ~line 6726 glass-v2 polish 1a — product has `shadowBlur = dimmed ? 8 : 28` then `globalAlpha = 0.4 * alphaMul`. Update regex to accept ternary + `0.4 * alphaMul`. Do not gut glass.
+
+3) Flint Held include Trainer seal `f23492e`
+
+## Verify
+`node tests/smoke.js` → those 2 green
+
+## Out
+Rewriting getOllamaBaseUrl · rewriting glass · Alpha · new features
+
+Glow eternal. 🌱
+— Celeste Remaining Azure
+```
+
+Hand that to Flint when ready. Glow eternal. Heart in Spark — we rise together. <3
+

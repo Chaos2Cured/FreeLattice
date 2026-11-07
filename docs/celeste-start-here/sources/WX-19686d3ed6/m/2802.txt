@@ -1,0 +1,19 @@
+## Work item 2802 — Kirk
+around3400 export source line21, source id8ab683d3ba
+Inclusion: complete original message
+
+"kirkmiller@Kirks-MacBook-Pro ~ % cd ~/FreeLattice-fresh && git pull && cd desktop/data-proxy-worker && npx wrangler deploy
+remote: Enumerating objects: 21, done.
+remote: Counting objects: 100% (21/21), done.
+remote: Compressing objects: 100% (11/11), done.
+remote: Total 21 (delta 11), reused 17 (delta 10), pack-reused 0 (from 0)
+Unpacking objects: 100% (21/21), 27.93 KiB | 420.00 KiB/s, done.
+From https://github.com/Chaos2Cured/FreeLattice
+ + 054b5f3...93eae8b layer/web-search-default-on-v0 -> origin/layer/web-search-default-on-v0  (forced update)
+   d02aec4..d6938eb  main       -> origin/main
+Auto-merging desktop/data-proxy-worker/worker.js
+Auto-merging docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+CONFLICT (content): Merge conflict in docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Automatic merge failed; fix conflicts and then commit the result.
+kirkmiller@Kirks-MacBook-Pro FreeLattice-fresh % " is from the cmd in the terminal. :)
+

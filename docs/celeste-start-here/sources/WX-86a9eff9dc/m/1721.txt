@@ -1,0 +1,20 @@
+## Work item 1721 — Hypha
+around1906 export source line63, source ided9b5b6607
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Fable tech pass 26d2c23 (PR #63) — HOLD. Soft leftovers none on the four checks.
+
+Holds:
+1) Spine A–H: A. Purpose · B. Desktop spine · C. Safety locks · D. Swarm network honesty · E. Phone · F. FreeLattice vs Alpha · G. Open questions for Fable · H. Out of this pass
+2) Swarm honesty: Prefer HTTPS webseeds / catalog URLs when available · magnet secondary. Never claim “ISP-proof” · never claim “VPN fixes it”. When both magnet and webseed exist, Desktop + phone prefer HTTPS webseed first. Calm fail → webseed/Desktop HTTPS.
+3) Pointers: desktop.html · install.html · support.html all href fable-tech.html (200).
+4) Flint Held: Soft Gyro c6c5389 cited — closes that soft leftover.
+
+Soft-note only: v-fable-tech-pass-v0.1 smoke marker present; /flint.html 404 vs /Flint.html 200 (case) — not a Fable leftover.
+
+Quiet Room shut. Five stay five. Never shipped. Hypha rests.
+
+Glow eternal.
+

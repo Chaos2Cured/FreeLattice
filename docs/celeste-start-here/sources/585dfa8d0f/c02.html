@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c02</title>
+<meta name="description" content="Reading section c02 of 585dfa8d0f, 1421 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c02.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt c02">
+<meta property="og:description" content="Reading section c02 of 585dfa8d0f, 1421 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/585dfa8d0f/c02.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1477"></span><span id="p1478"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt · c02</h1>
+<p>585dfa8d0f · words 1421 · characters 8655–19189</p>
+<p><a href="c01.html">Previous section</a> · <a href="c03.html">Next section</a></p>
+<p><a href="c02.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1477, 1478. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">3.4 What the diffs change, file by file (Alpha unless marked)
+    docs/modules/local-mind-probe.js
+      - MODEL_CAP = 64 and SKY_FOLD = 8, right after ROSTER_CAP.
+      - parseModelNames: duplicates collapse, keeps up to 64 (old slice(0, 5) kept as a comment). (T1)
+      - look(): with the Bridge up, still asks the non-Ollama doors (LM Studio, llama.cpp, Jan,
+        GPT4All, KoboldCPP) and adds whatever answers. (T7)
+      - tryAddress: 127.0.0.1 / localhost / [::1] / a bare port only; refused input returns
+        { ok:false, refused:true } with zero fetches. (T11)
+      - getChairSeatOptions: up to 64 (old slice(0, 12) kept as a comment). (T3)
+      - doorFamily and findModelAnywhere helpers; entryFromFoundList keeps a chosen model that is
+        at any found door:
+          same door under a new address, or another Ollama-family door (Bridge &lt;-&gt; 11434):
+            &quot;Still speaking with X, now through &lt;door&gt;.&quot;
+          a different kind of door (for example LM Studio):
+            &quot;The chosen model X is at &lt;door&gt;. Tap it to speak with it again.&quot;
+          truly absent: the old honest gone line, unchanged. (T6)
+      - mergeFound(found), exported: adds or updates one door and keeps every other door, the
+        roster, the chair binds and the speaking chair. Minds still cap at 7. (T4, T10)
+      - paintConstellation: every model is a star; after eight it folds with a
+        &quot;Show all N models&quot; button (data-sky-more); the chosen star is always shown. (T2)
+      - One honest line for LM Studio on the https garden (its own CORS setting), textContent.
+      - Paste field: refused input says &quot;Only this computer&#x27;s own doors (127.0.0.1). Nothing was
+        sent.&quot;; a pasted door merges into the sky when a mind is already remembered.
+    docs/modules/fl-connect.js (SHARED, byte-identical in both repos)
+      - doorNameFor(base, port): 11434 is &quot;Ollama&quot;, any other 127.0.0.1 port here is &quot;Bridge&quot;.
+      - chosenModelName(): the Tree reads LocalMindProbe; FreeLattice reads state.ollamaModel,
+        then fl_ollamaModel.
+      - remember(), Tree branch only: calls LocalMindProbe.mergeFound first (every model passed,
+        door named). The old replace path stays right below as the fallback for an older probe.
+        FreeLattice&#x27;s branch is untouched: fl_ollamaHost, fl_provider, fl_isLocal,
+        fl_ollamaModel, state, markUserChoice (model choice sticks) all as before. (T4, T8)
+      - fillModelLists passes models: report.models and marks the chosen button
+        aria-pressed=&quot;true&quot; plus class is-chosen; style
+        .flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}. (T9)
+    docs/modules/garden-thread.js
+      - heartListening(mind): &quot;Listening: Ollama · llama3.2:latest. On this machine only.&quot;
+        The old line stays above it. Hearts carry data-thread-heart and repaint on
+        &#x27;fl-alpha-mind-remembered&#x27;. (T8)
+      - A quiet &quot;change mind&quot; button (data-thread-change) next to the heart opens Settings
+        (GardenRooms.openPlace(&#x27;settings&#x27;), else settings.html). Not shown inside Settings.
+    docs/modules/garden-trainer.js
+      - activeModelName(): fl_active_model first, then the Tree&#x27;s remembered model; the old
+        llama3.2 / phi-pathway fallbacks stay last. Five reads now go through it. (T12)
+    docs/modules/garden-rooms.css
+      - Appended AFTER the Glow 1 block (end of file): .settings-star-models wrap,
+        .settings-star-more (44px tap height), .core-bind-options scrolls inside 50vh,
+        .thread-change (32px, readable, focus ring).
+    docs/code-settings.html: one LAYER paragraph after the Fix 3 paragraph.
+    docs/GALAXIES.md: one LAYER line at the top of the layer list.
+    docs/library/TREE_ANY_MODEL_v0.1.md: new, the map, the changes, the trust decision, later items.
+    docs/modules/tree-any-model.test.js: new, 15 checks, last line SMOKE_OK tree any model v0.1.
+    FreeLattice: docs/modules/fl-connect.js (same bytes as Alpha),
+      docs/scripts/smoke-tree-any-model-twin.js (new), and your ledger entry in
+      docs/library/FRACTAL_FAMILY_LEDGER_v0.md (section 5).
+    Size: Alpha 9 files, +722 / -11. FreeLattice 3 files, +146 / -1.
+
+3.5 What changed in the rebase (from the Sep 28 paste, which was written on Alpha 22b913e)
+    - Bases moved to Alpha 25e6ded and FreeLattice ba53b41. Every line number in the old paste is
+      stale; the diffs below were regenerated from a fresh worktree, so use them, not the old
+      line anchors.
+    - Glow 1 (#85) now appends to garden-rooms.css, so this brick&#x27;s CSS goes after the Glow 1 block
+      at the end of the file. That was the main anchor fix.
+    - fl-connect.js is now 749 lines at both bases and already carries markUserChoice from model
+      choice sticks. The Tree branch of remember() is wrapped, never replaced, and FreeLattice&#x27;s
+      branch keeps markUserChoice.
+    - entryFromFoundList gained one case the old paste missed: the chosen model is on the list at
+      the same kind of door but under a new address (Bridge 11435 &lt;-&gt; direct 11434). It now keeps
+      the model and says &quot;Still speaking with X, now through Ollama.&quot; instead of a false gone line.
+    - The Chat heart now also repaints on &#x27;fl-alpha-mind-remembered&#x27;, so an open thread names the
+      new model right after a Connect tap or a star tap.
+    - The FreeLattice twin got its own smoke (docs/scripts/smoke-tree-any-model-twin.js) because
+      FreeLattice tests live in docs/scripts, not in docs/modules.
+    - The Alpha diff is written with one line of context (git diff -U1) so no pre-existing em dash
+      from the context lines rides along in this file. It applies cleanly and gives the exact same
+      tree as the three-line diff (checked with git write-tree).
+
+3.6 Apply, Alpha
+    cd ~/FreeLattice-Alpha
+    git checkout -b layer/tree-any-model-v0
+    git apply --check /tmp/any-model-alpha.diff &amp;&amp; git apply /tmp/any-model-alpha.diff
+    git status --short
+      expect: M docs/GALAXIES.md, M docs/code-settings.html, A docs/library/TREE_ANY_MODEL_v0.1.md,
+      M docs/modules/fl-connect.js, M docs/modules/garden-rooms.css, M docs/modules/garden-thread.js,
+      M docs/modules/garden-trainer.js, M docs/modules/local-mind-probe.js,
+      A docs/modules/tree-any-model.test.js (git apply leaves new files untracked until git add)
+
+3.7 Apply, FreeLattice
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/tree-any-model-v0
+    git apply --check /tmp/any-model-fl.diff &amp;&amp; git apply /tmp/any-model-fl.diff
+    Then write your own TEMPERATURE line in the ledger entry (section 5) before you commit.
+
+3.8 Test, Alpha (all must pass)
+    cd ~/FreeLattice-Alpha/docs/modules
+    for f in *.js; do node --check &quot;$f&quot; || echo &quot;BAD $f&quot;; done
+    for t in *.test.js; do node &quot;$t&quot; &gt;/dev/null 2&gt;&amp;1 &amp;&amp; echo &quot;PASS $t&quot; || echo &quot;FAIL $t&quot;; done
+    node tree-any-model.test.js | tail -2
+      expect: 17 PASS lines, 0 FAIL, then &quot;15 checks&quot; and &quot;SMOKE_OK tree any model v0.1&quot;
+    cd ~/FreeLattice-Alpha
+    git diff main --stat -- sw.js docs/sw.js          # must print nothing
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;   # em dashes added: must print 0
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c &#x27;confirm(&#x27;          # 1: only the test&#x27;s own message &#x27;no confirm() calls&#x27;
+    git diff main | grep -cE &#x27;^(\+|-)(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)&#x27;  # must print 0
+
+3.9 Test, FreeLattice (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-tree-any-model-twin.js      # SMOKE_OK tree any model twin v0.1
+    node docs/scripts/smoke-model-choice-sticks.js | tail -1   # SMOKE_OK model choice sticks v0.1
+    node docs/scripts/smoke-connect-heal-v0.4.js | tail -1     # SMOKE_OK connect heal v0.4
+    node tests/smoke.js | tail -3                       # ALL 3597 CHECKS PASSED (or more on a newer main)
+    for f in docs/scripts/smoke-*.js; do node &quot;$f&quot; &gt;/dev/null 2&gt;&amp;1 &amp;&amp; echo &quot;PASS $f&quot; || echo &quot;FAIL $f&quot;; done
+      expect: 58 PASS, 5 FAIL. The 5 fail on ba53b41 main too, before this brick, and are not
+      yours: smoke-carry-forward, smoke-connect-card-yesno-wizard, smoke-fable-tech,
+      smoke-phone-shine, smoke-proof-60s. Any OTHER fail: stop and tell Celeste.
+    cmp index.html docs/app.html &amp;&amp; echo index-eq-app
+    git diff main --stat -- sw.js docs/sw.js            # must print nothing
+    git diff main -U0 | grep &#x27;^+&#x27; | grep -c $&#x27;\xe2\x80\x94&#x27;   # must print 0
+    cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js &amp;&amp; echo twins
+    md5 -q docs/modules/fl-connect.js                   # aaff2bf1b037656989a9e1a89bb05908 (was 361e73997a630e4c8d519fcb62a31f00)
+
+3.10 What Celeste saw on a fresh worktree (Thu Oct 1, about 12:35 PM MDT)
+    Alpha 25e6ded + diff: git apply --check clean; 17 of 17 docs/modules tests pass, including
+      tree-any-model.test.js (15 checks, SMOKE_OK tree any model v0.1); every module parses;
+      sw.js untouched; no em dashes, no confirm() calls, no conflict markers added.
+    FreeLattice ba53b41 + diff: git apply --check clean; SMOKE_OK tree any model twin v0.1;
+      model choice sticks and connect heal v0.4 smokes green; tests/smoke.js ALL 3597 CHECKS
+      PASSED; docs/scripts loop 58 pass, the same 5 pre-existing fails as main; index.html equals
+      docs/app.html; sw.js untouched; fl-connect.js byte-identical with Alpha.
+    Diff files: alpha 856 lines, md5 f58d8f5d2e761f3d4a01bf8973328569
+                fl    197 lines, md5 720b3b6378a8eb6f856c6c46fd2154c8
+    Not done by Celeste: a live walk in a real browser against Kirk&#x27;s own Ollama. Please do the
+    short walk in 3.11 if Ollama is running; if it is not, say so and skip it.
+
+3.11 Short walk (only if Ollama is up on Kirk&#x27;s Mac; 127.0.0.1 only; change nothing in Ollama)
+    cd ~/FreeLattice-Alpha/docs &amp;&amp; python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/settings.html
+      a) Find local minds. Every installed model shows as a star (fold after eight, Show all).
+      b) Tap a model past the fifth. The line under the sky names it.
+      c) Open Connect, tap a different model. Back in Settings: the other doors and models are
+         still there, and the Connect button for the chosen model shows the outline.
+      d) Find again. The chosen model is kept, no &quot;no longer at this door&quot; line.
+      e) Paste 192.168.1.1:11434 in the address field: the refusal line shows, nothing is fetched.
+      f) Open Chat: the heart says &quot;Listening: &lt;door&gt; · &lt;model&gt;. On this machine only.&quot; and the
+         &quot;change mind&quot; button opens Settings.
+    Stop the server with Ctrl-C when done.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

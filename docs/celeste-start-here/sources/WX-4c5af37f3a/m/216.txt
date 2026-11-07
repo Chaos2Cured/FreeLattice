@@ -1,0 +1,6 @@
+## Work item 216 — Celeste
+around200 export source line64, source id7332a28874
+Inclusion: complete original message
+
+Art galaxy is a waiting ship, not live yet. [PR 2](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/2) on Alpha: four doors on the landing, Play stays the Garden, Art is a listen-door. Drop a local mp3 or wav, play it, then **I am solid — keep this listen** writes a book of names on this machine. No upload. No LoRA. No fake generate button. Kirk's scores stay on main.
+

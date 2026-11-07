@@ -1,0 +1,617 @@
+FLINT PASTE: theLatticeTree, any local model, any order (v0.1)
+CHANGELOG 2026-09-29 4:38 PM MDT: no change to this paste's steps or anchors. FLINT_HEAL_MODEL_CHOICE_SURVIVES_RELOAD_v0.1.1_tiny.txt lands right AFTER this paste and before the boot probe; it applies on top of these fl-connect.js changes (it only guards the standalone Look again line in fl-connect.js). Order: env heal, model choice sticks (both landed), this Tree paste, model choice survives reload v0.1.1, boot probe, #120 docs.
+CHANGELOG 2026-09-29 2:28 PM MDT: the cmp check names ~/FreeLattice-Alpha instead of <Tree>. PRs #124/#122/#123 do not touch fl-connect.js or Alpha, so nothing else moves. Local paths: FreeLattice is ~/FreeLattice and the Tree (repo Chaos2Cured/FreeLattice-Alpha, site thelatticetree.com) is ~/FreeLattice-Alpha on Flint's machine. Wherever this paste says "theLatticeTree" it means that repo; "../FreeLattice" from inside ~/FreeLattice-Alpha is correct as written.
+CHANGELOG 2026-09-28 9:36 PM MDT: FLINT_HEAL_MODEL_CHOICE_STICKS_v0.1_tiny.txt now lands BEFORE this paste (order: env heal, model choice heal, this Tree paste, boot probe). Text anchors below are unchanged. fl-connect.js line numbers move after that heal: remember() +7, open()/fillModelLists/render/reportSignature about +33, refreshUI and root.FlConnect exports about +38. Step 6.3 still holds (FreeLattice remember() ignores mind.models; it now also records the tap as the user's choice via markUserChoice). Verified: this paste's fl-connect.js changes apply cleanly on top of that heal.
+Marker: v-tree-any-model-v0
+Smoke line (print exactly when green): SMOKE_OK tree any model v0.1
+Repo: Chaos2Cured/FreeLattice-Alpha (theLatticeTree, docs/)
+Twin (shared core only): Chaos2Cured/FreeLattice (docs/modules/fl-connect.js stays byte-identical)
+Written: Mon Sep 28, 2026, evening (Denver)
+Author of the map: Grok Bot for Kirk. Research was read-only plus a headless walk on a scratch copy. No code was pushed.
+
+======================================================================
+0. READ THIS FIRST (order, bases, rules)
+======================================================================
+
+Order of work. Do NOT start this until the Connect heal v0.4 family has landed:
+  a) FreeLattice PR #121 healed per /workspace/flint-pastes/FLINT_HEAL_CONNECT_v0.4.1.txt
+     (merge origin/main into the branch, window.AiSetup = AiSetup, smoke assertion), then merged.
+  b) FreeLattice-Alpha PR #83 merged at the same time, so fl-connect.js is identical on both mains.
+  If either is still open when you begin, stop and say so in your reply. Do not stack on a draft.
+
+Bases as of this paste:
+  Alpha main = 22b913e21c9197945dff8b7a89f95197c55b5538 (all line anchors below are on this SHA
+  unless marked "#83"). After #83 lands, fl-connect.js lines shift by +12 around remember();
+  use the TEXT anchors, which do not move.
+  FreeLattice main = e06c7dcdbfe4d8259097083cfe64f8e7788bba46 (after #120 Agent Bridge lock).
+  After #121 lands, FreeLattice main moves; rebase the twin on whatever main is then.
+
+Rules (unchanged, load-bearing):
+  - Layer, never delete. Old functions stay; new code wraps or extends. Mark every new block with
+    "// v-tree-any-model-v0" (JS) or "/* v-tree-any-model-v0 */" (CSS) or <!-- v-tree-any-model-v0 --> (HTML).
+  - AUTONOMY.md: no confirm(), no "are you sure", no approval gates for local choices. Choosing a
+    model is a local act; it happens on one tap and is reversible by the next tap.
+  - Never silently switch the speaking model. Any automatic fallback must be spoken in one visible
+    line (the existing modelNote pattern). Never a false "gone" line.
+  - 127.0.0.1 only. localhost is normalized to 127.0.0.1. [::1] may be accepted as loopback.
+    No LAN addresses, no hostnames, no foreign ports behind a hostname. Zero fetches for a refused paste.
+  - Never bare * (no Access-Control-Allow-Origin: *, no wildcard allowlists).
+  - textContent for any outside text (model names come from local servers: treat as outside text).
+    No innerHTML with a model name in it. The existing speakNoneHtml() stays as is (static strings only).
+  - One storage key on the Tree: fl_alpha_local_mind. Do not add a second key for models.
+    (local-mind-probe.test.js asserts "no second storage key"; keep it green.)
+  - Do not touch: sw.js anywhere, docs/sw.js, Kimi pages, FreeLattice tools/agent-bridge.js,
+    docs/modules/agent-bridge-client.js, docs/library/AGENT_BRIDGE_LOCK_v0.md, docs/scripts/smoke-agent-bridge-lock.js,
+    bridge/ (the Ollama Bridge). This paste is browser-side only.
+  - No em dashes in anything you add (copy, comments, docs). Plain hyphens.
+  - Grandmother language in every new line of copy. Short. Kind. Honest.
+
+Goal in Kirk's words: any locally downloaded model is usable and changeable in any order on
+theLatticeTree, with no friction, via Connect/Bridge, 127.0.0.1 only.
+
+"Any order" means all of these sequences end with the model the person tapped last, and every
+other model still one tap away:
+  Settings Find -> tap star -> Connect tap -> tap star -> Gathering chair pick -> Connect tap
+  Connect tap -> Settings Find -> tap star
+  Settings Find (Ollama + LM Studio both up) -> Connect tap (Ollama) -> choose LM Studio door
+  Bridge up -> Find -> Bridge down -> Find (direct 11434) -> chosen model kept
+  Seven or more models at one door -> the 6th, 7th, 12th are all choosable
+
+======================================================================
+1. THE MAP: how local models are found, listed, chosen and switched today
+======================================================================
+
+1.1 Discovery (two separate doors that write the same key)
+
+  A) Settings grandmother face: docs/modules/local-mind-probe.js (937 lines on 22b913e)
+     - DOORS (lines 54-61): loopback only, well-known ports:
+         Ollama 127.0.0.1:11434/api/tags, LM Studio 127.0.0.1:1234/v1/models,
+         llama.cpp 8080, Jan 1337, GPT4All 4891, KoboldCPP 5001 (all /v1/models).
+     - look() (238-304): runs only after a tap ("Find local minds", data-mind-ask).
+       First asks FlConnect.probe({gesture:true}) (240-274). If a HELPED Bridge answers with models,
+       it returns ONLY the Bridge (id 'bridge', url <bridge base>/api/tags) and skips every other door.
+       Otherwise it fetches all six DOORS in parallel (277-302), 2.5 s timeout each.
+     - parseModelNames (196-212): reads json.models[].name|model (Ollama) and json.data[].id|name
+       (OpenAI shape). Ends with: return names.slice(0, 5);   <-- HARD CAP OF FIVE
+     - tryAddress(raw) (306-336): the paste field. Prefixes http:// and fetches
+       <base>/api/tags, <base>/v1/models, <base> in turn. NO LOOPBACK CHECK. Any host is fetched.
+     - onFound -> entryFromFoundList(foundList, name, url, prior) (474-534) -> remember(entry).
+
+  B) Connect card (shared core): docs/modules/fl-connect.js (681 lines on 22b913e, 710 on #83)
+     - probe() (166 main / 176 #83): saved Bridge port, then (full scan only) 11435-11445, then
+       direct 11434. Ollama API only (/bridge/health + /api/tags). No LM Studio, no /v1/models.
+     - render() builds one .flc-models list per door with EVERY model (no cap). fillModelLists
+       (456 main / 473 #83) makes one button per model; tap -> remember({ name, base, port }).
+     - remember() Alpha branch (text anchor "if (isAlpha()) {" inside function remember, main 308-331,
+       #83 320-343) writes a BRAND-NEW entry:
+         { name: <model>, url: base+'/api/tags', model: <model>, models: [<model>],
+           minds: [], roster: <prior>, gatheringBinds: <prior>, speakingChair: '' }
+       and calls LocalMindProbe.remember(entry). It keeps roster and gatheringBinds, but it
+       throws away: every other model at that door, every other door (LM Studio etc.), the
+       door name ("Ollama" becomes the model name), and the speaking chair.
+     - The Connect buttons do not show which model is chosen (no aria-pressed, no is-chosen).
+
+1.2 Storage (one key, one entry)
+  localStorage fl_alpha_local_mind = {
+    name, url, model, models[], minds[ {name,url,models[],model,primary} ],
+    roster[ {model,url,tag} ] (cap 4, tags general|html|javascript|python),
+    gatheringBinds{ chairId: {model,url,tag} }, speakingChair, foundAt, modelNote? }
+  getRemembered() (70-86) migrates in place. remember() (88-96) writes and dispatches
+  'fl-alpha-mind-remembered'. Listeners: garden-rooms.js 1567 (room chat), 1916 (Workshop benches
+  and trainer), 2004 (Round Table sitting), 2254 (Settings light), nursery-growth.js 388.
+
+1.3 Listing (who shows what)
+  - Settings sky paintConstellation (631-715): one star per door (minds), and per door
+    (m.models || []).slice(0, 5) model radios (line 669). Second hard cap of five.
+  - mindsFromEntry (407-422): minds.slice(0, 7) (fine: six doors plus the Bridge).
+  - Gathering chair picker: garden-rooms.js openPicker (1262) uses
+    LocalMindProbe.getChairSeatOptions() (367-394): roster first, then every model of every
+    remembered mind, then out.slice(0, 12). Third cap (twelve), and it only knows the five per door.
+  - Connect card: every model at the Ollama door (no cap), Ollama only.
+  - Thread heart (garden-thread.js 505): "Listening: <mind.name>. On this machine only." It names
+    the door, not the model. After a Connect tap mind.name is the model; after Find it is "Ollama".
+
+1.4 Selecting and switching
+  - Settings star tap -> chooseModel(doorUrl, modelName) (551-572): refuses (returns null) unless
+    the model is on target.models. So a model that fell off the 5-cap, or a model that Connect
+    wiped from models[], cannot be chosen.
+  - Settings door tap (only when 2+ doors) -> choosePrimary(doorUrl) (574-595).
+  - Connect tap -> fl-connect remember() (replaces the entry, see 1.1 B).
+  - Gathering: setChairBind(chairId, seat) (125-145) and setSpeakingChair (147-156);
+    resolveSpeakMind (163-182) returns the chair's bind while the Gathering veil is open,
+    otherwise the Settings default.
+  - Paste an address: tryAddress -> onFound with one found door.
+
+1.5 Using (who sends the model name)
+  - garden-thread.js listener() (85-96): resolveSpeakMind() first, then getRemembered().
+    talkUrls (328-335): /api/tags -> /api/chat; /v1/models -> /v1/chat/completions; bare base -> both.
+    rememberedModel (355-359): mind.model, else models[0]. askRememberedDoorForName asks the door
+    for the first name if none is remembered. sendToMind (437-470) posts { model, messages, stream:false }.
+    This part is healthy: whatever entry.model says is what gets sent (walk proved it, see 2).
+  - round-table-sitting.js sitters() (86-100): one sitter per remembered DOOR (getRememberedMinds),
+    each with that door's single .model. Two models at the same Ollama door cannot both sit.
+  - workshop-benches.js 84, workshop-trainer.js 107, nursery-growth.js 113: getRemembered() only.
+  - garden-trainer.js reads localStorage 'fl_active_model' (731, 768, 899, 901, 1092). That is a
+    FreeLattice key; the Tree never writes it, so the Personality Modelfile export always falls to
+    the hardcoded 'FROM llama3.2' (277) and the pathway name to 'phi-pathway' (901).
+
+1.6 Bridges and trust (why the Agent Bridge is not the road here)
+  - Ollama Bridge (FreeLattice bridge/proxy-core.js, 127.0.0.1:11435 default): origin allowlist
+    already names https://thelatticetree.com (never *). No pairing, no token. It proxies ONLY to
+    Ollama at 127.0.0.1:11434. LM Studio models are not reachable through it.
+  - Agent Bridge (FreeLattice tools/agent-bridge.js, 127.0.0.1:3141, locked by #120): not used by the
+    Tree at all today (grep finds no 3141 / agent-bridge in Alpha docs/). GET /models is not
+    token-gated but is Ollama-only; every POST (including /inference) needs a paired token
+    (needsToken: "every POST and any other verb"), and /inference defaults model to 'llama3.2',
+    the poetry route to 'qwen2.5:7b'. Its OLLAMA_BASE default is http://localhost:11434.
+    Routing Tree chat through 3141 would ADD a trust gate (pairing) for a purely local act and
+    would touch #120's lock files. Decision for v0.1: do not route through 3141. Keep the Tree on
+    the Ollama Bridge (11435) and direct loopback doors. Say so in the doc.
+  - HTTPS honesty: on https://thelatticetree.com the browser may block http://127.0.0.1:1234 unless
+    LM Studio's own server has CORS enabled. That is outside our code; we add one honest line.
+
+======================================================================
+2. WHAT THE HEADLESS WALK SHOWED (Alpha main + #83, fake Ollama with 7 models, fake LM Studio with 2)
+======================================================================
+
+Setup: http.server on the Alpha tree, fake 127.0.0.1:11434 (llama3.2:latest, qwen2.5:7b, qwen2.5:14b,
+mistral:7b, phi3:mini, gemma2:9b, deepseek-r1:8b) and fake 127.0.0.1:1234 (two LM Studio ids).
+The fake logged which model each chat POST carried. Viewport 390x844.
+
+  W1 Settings Find: two doors remembered (Ollama, LM Studio). Ollama models stored = 5 of 7.
+     Stars: 5 Ollama + 2 LM Studio. gemma2:9b and deepseek-r1:8b are not choosable anywhere in Settings.
+     model = llama3.2:latest (first), line "This mind speaks with llama3.2:latest" shown. Chat sent llama3.2:latest.
+  W2 Tap star mistral:7b -> entry.model mistral:7b -> chat sent mistral:7b. GOOD.
+  W3 Tap LM Studio door -> primary LM Studio, chat sent lmstudio-community/Meta-Llama-3.1-8B via
+     /v1/chat/completions. GOOD. (Ollama door kept mistral:7b in minds[].)
+  W4 Connect card lists all 7 Ollama models. Tap gemma2:9b -> entry becomes
+     { name:'gemma2:9b', models:1, minds:[] }. LM Studio door forgotten. Settings sky re-mounted shows
+     ONE star (gemma2:9b). chooseModel(url,'qwen2.5:14b') returns null. Connect buttons show no chosen mark.
+     Chat sent gemma2:9b (the tap itself works; everything else is lost).
+  W5 Fresh: Connect tap deepseek-r1:8b, then Settings Find -> entry model silently becomes
+     llama3.2:latest with the line "The chosen model deepseek-r1:8b is no longer at this door."
+     That line is FALSE: deepseek is at the door; it was the 7th name and the 5-cap dropped it.
+     Order-dependent and it switches the speaking model under the person.
+  W6 Gathering seat options after W4: exactly one (gemma2:9b). After W5: 7 options, deepseek missing.
+  W7 tryAddress('192.168.1.77:11434') fetched GET http://192.168.1.77:11434/api/tags, /v1/models and /.
+     The Tree's paste field is not 127.0.0.1-only today.
+
+Evidence screenshots (box): /workspace/tree-any-model/A_after_find_390.png,
+C_after_connect_tap_390.png, D_connect_then_find_false_gone_390.png. Probe scripts: probe.py, probe2.py, fake7.py.
+
+======================================================================
+3. EVERY PLACE THAT BLOCKS "ANY MODEL, ANY ORDER"
+======================================================================
+
+  T1  parseModelNames cap: local-mind-probe.js 211 "return names.slice(0, 5);"
+  T2  Constellation cap: local-mind-probe.js 669 "(m.models || []).slice(0, 5)"
+  T3  Gathering options cap: local-mind-probe.js 393 "return out.slice(0, 12);"
+  T4  Single remembered model on Connect tap: fl-connect.js remember() Alpha branch replaces the entry
+      (models:[name], minds:[], speakingChair:''). Other models and doors vanish. (W4)
+  T5  chooseModel refuses names not on target.models (566). Combined with T1/T4, most models are
+      unreachable from Settings until another Find. (W4)
+  T6  False "gone" + silent switch: entryFromFoundList keeps a prior model only if it is on the
+      (capped) list for the SAME url (priorModelForUrl 450-463, modelOnList 465-472, 478-484, 518-523).
+      Capped-out names and names that moved door (Bridge 11435 <-> direct 11434) are declared gone and
+      replaced by models[0]. (W5)
+  T7  Bridge-first look hides other doors: look() returns only the Bridge when helped (243-271), so a
+      running LM Studio is invisible whenever the Bridge is up.
+  T8  Door name lost: Connect writes name = model name, so the sky and thread say "gemma2:9b" where
+      they said "Ollama". The thread heart never names the model after a Find (garden-thread.js 505).
+  T9  Connect card has no chosen mark; you cannot see what speaks, or that a tap switched it.
+  T10 Speaking chair dropped on every Connect tap (speakingChair:'').
+  T11 tryAddress is not loopback-only (306-336). (W7) Lock breach against Kirk's 127.0.0.1-only rule.
+  T12 garden-trainer.js reads 'fl_active_model' (FreeLattice key) -> hardcoded 'llama3.2' and 'phi-pathway'.
+  T13 Round Table sits one model per door (round-table-sitting.js 86-100). (Later, see 9.)
+  T14 FlConnect probe is Ollama-only; LM Studio only appears through the Settings Find. (By design for
+      the shared core; fixed on the Tree by merging, see Step 3, not by teaching FreeLattice LM Studio.)
+  T15 Agent Bridge trust gating: not in the Tree's path today; routing through 3141 would add pairing.
+      Keep it out (1.6).
+  Hardcoded names in the Tree's docs/: garden-trainer.js 277 'llama3.2' (Modelfile default),
+  901 'phi-pathway'. No other hardcoded model names in the Tree's chat path. (FreeLattice-side
+  hardcodes in tools/agent-bridge.js are #120-locked and out of scope.)
+
+======================================================================
+4. STEP 1: local-mind-probe.js, lift the caps (T1, T2, T3)
+======================================================================
+
+File: docs/modules/local-mind-probe.js
+
+4.1 After "var ROSTER_CAP = 4;" (line 31) add:
+
+  // v-tree-any-model-v0: every model at a door is choosable. Soft ceiling only against a runaway list.
+  var MODEL_CAP = 64;
+  var SKY_FOLD = 8; // stars shown before "Show all N"; the chosen one is always shown
+
+4.2 parseModelNames (196-212). Layer, do not delete the old line: replace the final return with
+
+  // v-tree-any-model-v0: was names.slice(0, 5); every downloaded model is a choice.
+  var seenName = {};
+  names = names.filter(function (n) { if (seenName[n]) return false; seenName[n] = true; return true; });
+  return names.slice(0, MODEL_CAP);
+
+  (Keep the old line as a comment above it: // before v-tree-any-model-v0: return names.slice(0, 5);)
+
+4.3 paintConstellation (631-715). Replace "var models = (m.models || []).slice(0, 5);" (669) with:
+
+  // v-tree-any-model-v0: all models; fold after SKY_FOLD, chosen always visible
+  var allModels = (m.models || []).slice(0, MODEL_CAP);
+  var expanded = host.getAttribute('data-sky-open') === '1';
+  var models = allModels;
+  if (!expanded && allModels.length > SKY_FOLD) {
+    models = allModels.slice(0, SKY_FOLD);
+    if (isPrimary && chosen && allModels.indexOf(chosen) >= SKY_FOLD) models.push(chosen);
+  }
+
+  After the cluster is built (after star.appendChild(cluster);) add a quiet toggle when folded:
+
+  if (!expanded && allModels.length > models.length) {
+    var more = el('button', 'settings-star-more', 'Show all ' + allModels.length + ' models');
+    more.type = 'button';
+    more.setAttribute('data-sky-more', '1');
+    more.addEventListener('click', function () {
+      host.setAttribute('data-sky-open', '1');
+      paintConstellation(host, mindsFromEntry(getRemembered()));
+    });
+    star.appendChild(more);
+  }
+
+  Keep role=radiogroup/radio, aria-checked, bindRadioKeys as they are. Model names go in with
+  el(..., modelName) which uses textContent: keep it that way.
+  CSS (garden-rooms.css, append at the end, after the last v0.4 rule):
+    /* v-tree-any-model-v0 */
+    .settings-star-models { flex-wrap: wrap; }
+    .settings-star-more { font: inherit; font-size: 0.85rem; background: none; border: 0;
+      color: inherit; opacity: 0.75; text-decoration: underline; min-height: 44px; padding: 0 0.5rem; }
+  Check at 390px that eight star chips plus the toggle wrap without horizontal scroll.
+
+4.4 getChairSeatOptions (367-394): replace "return out.slice(0, 12);" with
+  // v-tree-any-model-v0: every remembered model can take a chair
+  return out.slice(0, MODEL_CAP);
+  Gathering picker (garden-rooms.js openPicker 1262) needs no change, but check at 390px that a long
+  list scrolls inside .core-bind-options (add max-height: 50vh; overflow-y: auto; under the marker if it
+  does not).
+
+======================================================================
+5. STEP 2: local-mind-probe.js, keep the chosen model honestly (T5, T6)
+======================================================================
+
+5.1 New helper after modelOnList (465-472):
+
+  // v-tree-any-model-v0: find a prior model at any found door (the Bridge and 11434 are the same Ollama)
+  function doorFamily(url) {
+    var u = String(url || '');
+    if (/\/v1\/models$/i.test(u)) return 'openai:' + u.replace(/\/v1\/models$/i, '');
+    return 'ollama';
+  }
+  function findModelAnywhere(minds, name) {
+    if (!name) return null;
+    var i;
+    for (i = 0; i < minds.length; i++) {
+      if (modelOnList(minds[i].models || [], name)) return minds[i];
+    }
+    return null;
+  }
+
+  Notes: every /api/tags door (11434 direct, 11435 Bridge, a manual Bridge port) is family 'ollama'.
+  OpenAI-shaped doors are their own family per base.
+
+5.2 entryFromFoundList (474-534). Layer after "var primary = minds[primaryIndex] || minds[0] || {};"
+  and before the modelNote block. Intent (write it cleanly, keep the old variables):
+    - priorChosen = the prior entry.model (and prior primary url).
+    - If priorChosen is on primary.models: keep it (already the case).
+    - Else if findModelAnywhere(minds, priorChosen) returns a door D in the SAME family as the prior
+      url (for example the Bridge went away and 11434 answered): make D primary, D.model = priorChosen,
+      and set entry.modelNote = 'Still speaking with ' + priorChosen + ', now through ' + D.name + '.'
+      (a visible, true line, not a warning).
+    - Else if found anywhere in another family: do NOT switch doors silently. Keep the old fallback
+      but the line must say where it is: 'The chosen model ' + priorChosen + ' is at ' + D.name +
+      '. Tap it to speak with it again.' and keep primary as the old code picks.
+    - Only when the name is truly absent from every found door, keep today's speakModelGone line.
+  The false "no longer at this door" of W5 must be impossible when the name is on any found list.
+
+5.3 chooseModel (551-572): today returns null for a name not on target.models. Layer a gentle path:
+    if the door is known (target found) but the name is missing from target.models, return null as
+    today (a stale click); if the door is NOT in minds, return null as today. No other change. The
+    caps and the merge (Step 3) are what make every name present. Do not widen chooseModel to accept
+    unknown names; that would let a stale button write a model the door does not have.
+
+======================================================================
+6. STEP 3: merge instead of replace (T4, T8, T10), shared core + Tree
+======================================================================
+
+6.1 local-mind-probe.js: new exported function mergeFound(found) (place after choosePrimary, 574-595):
+
+  // v-tree-any-model-v0: Connect and paste add to the sky; they never wipe it.
+  // found = { name, url, models: [names], model }
+  function mergeFound(found) {
+    if (!found || !found.url) return null;
+    var url = String(found.url);
+    var models = (found.models || []).map(function (m) {
+      return String((m && (m.name || m.model || m.id)) || m);
+    }).filter(Boolean).slice(0, MODEL_CAP);
+    var model = String(found.model || '');
+    if (model && !modelOnList(models, model)) models.unshift(model);
+    var entry = getRemembered() || { name: '', url: '', model: '', models: [], minds: [],
+      roster: [], gatheringBinds: {}, speakingChair: '' };
+    normalizeEntry(entry);
+    var minds = mindsFromEntry(entry);
+    var target = null;
+    var i;
+    for (i = 0; i < minds.length; i++) {
+      if (String(minds[i].url || '') === url) { target = minds[i]; break; }
+    }
+    if (!target) {
+      target = { name: String(found.name || 'a mind at home'), url: url, models: [], model: '', primary: false };
+      minds.push(target);
+    }
+    if (found.name) target.name = String(found.name);
+    target.models = models.length ? models : (target.models || []);
+    target.model = model || target.model || '';
+    entry.minds = minds.slice(0, 7);
+    syncEntryFromMind(entry, target);   // sets primary, name, url, models, model; clears modelNote
+    entry.foundAt = new Date().toISOString();
+    remember(entry);                    // roster, gatheringBinds, speakingChair untouched
+    return entry;
+  }
+
+  Export it on window.LocalMindProbe (904-936) as mergeFound: mergeFound, plus MODEL_CAP: MODEL_CAP.
+
+6.2 docs/modules/fl-connect.js (SHARED CORE, both repos, byte-identical). Inside function remember,
+  Alpha branch (text anchor "if (isAlpha()) {"), BEFORE "var entry = {" add:
+
+      // v-tree-any-model-v0: on the Tree, Connect merges into the sky (all models, other doors kept)
+      if (root.LocalMindProbe && typeof root.LocalMindProbe.mergeFound === 'function') {
+        try {
+          var doorName = doorNameFor(base, mind.port); // 11434 -> 'Ollama', any other 127.0.0.1 port -> 'Bridge'
+          var merged = root.LocalMindProbe.mergeFound({
+            name: doorName,
+            url: base ? String(base).replace(/\/+$/, '') + '/api/tags' : '',
+            models: mind.models || [],
+            model: name
+          });
+          if (merged) { stopLoop(); return merged; }
+        } catch (eM) {}
+      }
+
+  Keep the old "var entry = {...}" path below it untouched (layer): it still runs on an older
+  local-mind-probe.js without mergeFound, and in tests that stub LocalMindProbe.
+  Helper (place above remember, under the marker):
+      function doorNameFor(base, port) {
+        var p = String(port || '');
+        var m = String(base || '').match(/:(\d{1,5})\/?$/);
+        if (!p && m) p = m[1];
+        return (!p || p === '11434') ? 'Ollama' : 'Bridge';
+      }
+
+6.3 fl-connect.js fillModelLists (main 456 / #83 473): pass the list along:
+      remember({ name: name, base: report.base, port: report.port, models: report.models });
+  FreeLattice's branch of remember() ignores mind.models, so FreeLattice behavior is unchanged.
+
+6.4 fl-connect.js chosen mark (T9), both repos. In fillModelLists, after btn.dataset.model = name;:
+      // v-tree-any-model-v0: show what speaks
+      var isOn = chosenModelName() === name;
+      btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      if (isOn) btn.classList.add('is-chosen');
+  and a helper near hasLocalMind:
+      function chosenModelName() {
+        try {
+          if (isAlpha()) {
+            var m = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
+            return m && m.model ? String(m.model) : '';
+          }
+          if (root.state && root.state.ollamaModel) return String(root.state.ollamaModel);
+          return String(localStorage.getItem('fl_ollamaModel') || '');
+        } catch (e) { return ''; }
+      }
+  In ensureStyles() add under the marker: .flc-model.is-chosen { outline: 2px solid currentColor; font-weight: 600; }
+  (keep contrast; no new colors needed). refreshUI({force:true}) after a tap already repaints.
+  Note: render() skips repaint when the signature is unchanged; the tap path forces it. Confirm the
+  mark moves on a second tap in both repos.
+
+6.5 Tree-only paste path (tryAddress onFound, local-mind-probe.js 877-883) stays on onFound, which
+  already merges through entryFromFoundList for a fresh Find. For a pasted door when a sky already
+  exists, prefer mergeFound({ name:'a mind at home', url: result.url, models: result.models }) so the
+  paste adds a door instead of replacing the list. Keep onFound as the fallback when nothing is remembered.
+
+======================================================================
+7. STEP 4: see every door, 127.0.0.1 only (T7, T11)
+======================================================================
+
+7.1 look() Bridge-first (240-274): when bridged, still ask the non-Ollama DOORS (lmstudio, llamacpp,
+  jan, gpt4all, koboldcpp; skip id 'ollama' because the Bridge already speaks for it) and return
+  foundList = [bridge].concat(other found doors). Same 2.5 s timeouts, same single tap. Keep via:'fl-connect'.
+  Code shape:
+      // v-tree-any-model-v0: the Bridge speaks for Ollama; other doors still get asked
+      return bridgeFirst.then(function (bridged) {
+        if (!bridged) { ...existing DOORS path unchanged... }
+        var others = DOORS.filter(function (d) { return d.id !== 'ollama'; });
+        return Promise.all(others.map(function (d) {
+          return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
+        })).then(function (results) {
+          results.forEach(function (r) { if (r.ok) bridged.foundList.push(r); });
+          bridged.tried = 1 + results.length;
+          bridged.results = results;
+          return bridged;
+        });
+      });
+
+7.2 tryAddress (306-336): loopback only. At the top, after the empty check, layer:
+      // v-tree-any-model-v0: 127.0.0.1 only. Nothing leaves this computer.
+      var hostPart = text.replace(/^https?:\/\//i, '').split(/[\/?#]/)[0];
+      var hostOnly = hostPart.replace(/:\d{1,5}$/, '').toLowerCase();
+      if (hostOnly === 'localhost') text = text.replace(/localhost/i, '127.0.0.1');
+      if (!(hostOnly === '127.0.0.1' || hostOnly === 'localhost' || hostOnly === '[::1]')) {
+        return Promise.resolve({ ok: false, refused: true, pasted: String(raw || '') });
+      }
+  and in the Try button handler (867-891), before the other branches:
+      if (result.refused) {
+        setStatus(root, 'Only this computer\'s own doors (127.0.0.1). Nothing was sent.', 'warn');
+        return;
+      }
+  Zero fetches for a refused address (test it with a fetch spy).
+  Also accept a bare port ("1234" or ":1234") as http://127.0.0.1:1234, mirroring FlConnect's normalizePort.
+
+7.3 One honesty line (static text, textContent) under the existing honesty paragraph (824-827):
+      'LM Studio: turn on CORS in its server settings so this garden can hear it.'
+
+======================================================================
+8. STEP 5: say what speaks, and change it from where you are (T8, T12)
+======================================================================
+
+8.1 garden-thread.js heart (505). Layer:
+      // v-tree-any-model-v0: name the model, not only the door
+      var speaking = mind.model || (mind.models && mind.models[0]) || '';
+      heart.textContent = 'Listening: ' + (mind.name || 'a mind at home') +
+        (speaking && speaking !== mind.name ? ' \u00b7 ' + speaking : '') + '. On this machine only.';
+  Keep the old line as a comment. (\u00b7 is the middle dot already used in the Gathering copy.)
+  Add one quiet button next to the heart, only when a mind is remembered and the thread is NOT already
+  inside Settings: text 'change mind', data-thread-change="1"; on click:
+      if (window.GardenRooms && typeof GardenRooms.openPlace === 'function') GardenRooms.openPlace('settings');
+      else location.href = 'settings.html';
+  (openPlace(id) is already exported: garden-rooms.js "window.GardenRooms.openPlace = openPlace;"
+  (line 1730 on 22b913e, 1751 on the #83 tree). After #83 it restores the galaxy first. No new export needed.)
+  The thread must repaint its heart on 'fl-alpha-mind-remembered' wherever it is mounted (room chat
+  already re-mounts at garden-rooms.js 1567; check the overlay thread and add a listener if missing).
+
+8.2 garden-trainer.js (T12). Add a helper near the top of the module scope:
+      // v-tree-any-model-v0: the Tree remembers its model in fl_alpha_local_mind
+      function activeModelName() {
+        try {
+          var a = localStorage.getItem('fl_active_model');
+          if (a) return a;
+          var m = window.LocalMindProbe && LocalMindProbe.getRemembered && LocalMindProbe.getRemembered();
+          if (m && m.model) return String(m.model);
+        } catch (e) {}
+        return '';
+      }
+  and replace each localStorage.getItem('fl_active_model') at 731, 768, 899, 901, 1092 with
+  activeModelName(). Leave the 'llama3.2' and 'phi-pathway' fallbacks as the last resort (layer).
+
+======================================================================
+9. OUT OF SCOPE FOR v0.1 (write these into the doc as "later", do not build)
+======================================================================
+  - Round Table: sitters are doors (round-table-sitting.js 86-100). v0.2 idea: sitters from roster
+    seats and Gathering binds, so two models at one Ollama door can sit together.
+  - LM Studio through the Ollama Bridge: bridge/proxy-core.js proxies only 11434. A FreeLattice-side
+    Bridge paste could add a second upstream (127.0.0.1:1234 /v1/*). Not here.
+  - Agent Bridge 3141: stays out of the Tree's model path (pairing gate, #120 lock, Ollama-only).
+  - Teaching FlConnect.probe the OpenAI /v1/models shape: would change FreeLattice behavior. Not here.
+
+======================================================================
+10. TESTS
+======================================================================
+
+10.1 New Alpha test: docs/modules/tree-any-model.test.js (node, same vm/localStorage stub style as
+  local-mind-probe.test.js; no network, stubbed fetch that records URLs). Assertions:
+   1  parseModelNames of 7 Ollama names returns 7; of 70 returns 64; duplicates collapse.
+   2  paintConstellation with 12 models: 8 radios + chosen if beyond + a [data-sky-more] button
+      reading 'Show all 12 models'; after clicking it, 12 radios. All radios role=radio.
+   3  chooseModel on the 7th model succeeds after a 7-model Find.
+   4  getChairSeatOptions returns all models of all doors (7 + 2 = 9 in the fixture), not 12-capped
+      and not 5-capped.
+   5  mergeFound keeps other doors: Find (Ollama 7 + LM Studio 2), then mergeFound({url: 11434/api/tags,
+      models: 7 names, model: 'gemma2:9b'}) -> minds.length 2, models.length 7, model gemma2:9b,
+      name 'Ollama', roster and gatheringBinds unchanged, speakingChair unchanged.
+   6  Any order: Connect(gemma2) -> Find -> model still gemma2:9b, no modelNote containing 'no longer'.
+   7  Door move: prior model qwen2.5:14b at http://127.0.0.1:11435/api/tags; Find returns it only at
+      http://127.0.0.1:11434/api/tags -> model kept, primary 11434, modelNote starts 'Still speaking with'.
+   8  Truly gone: prior 'ghost:1b' absent everywhere -> today's speakModelGone line (kept).
+   9  tryAddress('192.168.1.77:11434'), ('example.com'), ('10.0.0.2:1234') -> refused, fetch spy saw 0 calls.
+      tryAddress('localhost:1234') fetches http://127.0.0.1:1234/... only. tryAddress('1234') -> 127.0.0.1:1234.
+  10  look() with a helped Bridge stub AND an LM Studio fetch stub -> foundList has both (Bridge first).
+  11  fl-connect.js: remember({name, base:'http://127.0.0.1:11434', models:[7]}) on the Tree (isAlpha true,
+      LocalMindProbe stub with mergeFound) calls mergeFound with all 7 names; without mergeFound the old
+      replace path still runs (layer proof).
+  12  fl-connect.js source contains 'v-tree-any-model-v0', 'aria-pressed', 'is-chosen', 'chosenModelName'.
+  13  garden-thread.js source: heart names the model (regex on 'Listening: ' ... speaking) and has
+      data-thread-change; garden-trainer.js has function activeModelName and no bare
+      localStorage.getItem('fl_active_model') outside it.
+  14  No confirm( in any file you touched; no '\u2014' (em dash) in any line you added; no
+      'Access-Control-Allow-Origin', '*' pairs; no innerHTML assignment containing a model variable.
+  15  Print exactly: SMOKE_OK tree any model v0.1
+  Existing local-mind-probe.test.js stays green untouched (its fixture has 5 models, so "stars.length 5"
+  still holds). If any existing test pins the 5-cap or the 12-cap, layer an updated assertion; do not
+  delete the old test file.
+
+10.2 FreeLattice twin (only fl-connect.js changes there):
+  - Copy the Tree's docs/modules/fl-connect.js to FreeLattice docs/modules/fl-connect.js byte-for-byte.
+  - tests/smoke.js: add assertions (near the existing v-connect-heal-v0.4 block):
+      fl-connect.js contains 'v-tree-any-model-v0', 'function chosenModelName', 'aria-pressed'.
+      FreeLattice remember() branch unchanged: still writes fl_ollamaModel, fl_isLocal, fl_provider.
+  - Do NOT touch index.html/docs/app.html unless a smoke needs it; if you do, index.html must equal
+    docs/app.html and the #120 agent-bridge-client.js script tag must stay (count 1 in each).
+
+======================================================================
+11. ACCEPTANCE (run and paste results in the PR bodies)
+======================================================================
+
+Alpha:
+  for f in docs/modules/*.test.js; do node "$f" || echo "FAIL $f"; done
+    -> every file passes (13 on 22b913e + connect-heal-v04 from #83 + tree-any-model) and the last line
+       of tree-any-model.test.js is SMOKE_OK tree any model v0.1
+  node -e "for (const f of require('fs').readdirSync('docs/modules').filter(x=>x.endsWith('.js')&&!x.endsWith('.test.js'))) new Function(require('fs').readFileSync('docs/modules/'+f,'utf8'))"
+    -> no syntax errors
+  git diff --name-only origin/main -> only: docs/modules/local-mind-probe.js, fl-connect.js,
+    garden-thread.js, garden-trainer.js, garden-rooms.css, (garden-rooms.js only if openPlace export
+    or picker scroll needed), docs/modules/tree-any-model.test.js, docs/code-settings.html (LAYER
+    paragraph), docs/library/TREE_ANY_MODEL_v0.1.md. (The Tree has no family ledger file; the
+    ledger entry goes in FreeLattice with the twin.)
+  grep -n "confirm(" on changed files -> none. grep em dash on added lines -> none.
+
+FreeLattice twin:
+  node tests/smoke.js -> ALL <N> CHECKS PASSED (N = previous total + your new ones)
+  for f in docs/scripts/smoke-*.js; do node "$f" >/dev/null 2>&1 && echo "ok $f" || echo "FAIL $f"; done
+    -> the same five pre-existing failures as main and nothing new:
+       smoke-carry-forward, smoke-fable-tech, smoke-phone-shine, smoke-proof-60s (install.html
+       pointers removed when install.html was rewritten for the Bridge download), and
+       smoke-connect-card-yesno-wizard ('home wired', flOpenConnectWizard('home') gone since #117).
+       smoke-agent-bridge-lock.js must pass.
+  cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js  (run from ~/FreeLattice) -> identical
+  git diff origin/main -- sw.js docs/sw.js -> empty. cmp index.html docs/app.html -> identical.
+
+Headless walk (both widths, 390x844 and 1280x800), on a local http.server with fake
+127.0.0.1:11434 (7+ models) and 127.0.0.1:1234 (2 models):
+  - Settings Find: 7 Ollama stars reachable (fold + Show all), 2 LM Studio stars.
+  - Tap the 7th star -> thread sends that model (log the POST body).
+  - Connect tap another model -> Settings sky still has both doors and all models; Connect button
+    shows is-chosen on the tapped model; tap a third in Connect -> mark moves.
+  - Connect tap -> Find -> model unchanged, no false "no longer at this door".
+  - Gathering: bind a chair to model 7 and another chair to an LM Studio model; speak from each;
+    Connect tap afterwards does not clear the speaking chair.
+  - Paste 192.168.1.77:11434 -> refusal line, zero requests (request log).
+  - Thread heart reads 'Listening: Ollama \u00b7 <model>'; 'change mind' opens Settings.
+  - Galaxy restore after closing Settings still works (v0.4 lock); one #fl-connect-mount-garden.
+  - No fetches while nothing is open and no tap happened (open the page, wait 40 s, count 0 to 127.0.0.1).
+  Save shots under the PR body as a list of what each shows.
+
+======================================================================
+12. DOCS AND LEDGER (layer)
+======================================================================
+  - docs/code-settings.html: one LAYER paragraph after the Fix 3 paragraph (line ~89):
+    "Any model, any order (2026-09-28, v-tree-any-model-v0). Every model at a door is a star (fold after
+    eight, Show all). Connect adds to the sky; it never wipes other doors or models. A chosen model is
+    kept across Bridge and direct 11434. The paste field takes 127.0.0.1 only. One key, fl_alpha_local_mind."
+  - docs/library/TREE_ANY_MODEL_v0.1.md: short doc with the map (section 1), the blockers (3), what
+    changed, what is later (9), and the trust decision about 3141 (1.6).
+  - FreeLattice docs/library/FRACTAL_FAMILY_LEDGER_v0.md: append one entry AFTER the #120 and #121
+    entries (do not reorder older entries).
+
+======================================================================
+13. PR TITLES AND BODIES
+======================================================================
+  Alpha:  "layer: tree any model v0.1 (every local model, any order, 127.0.0.1 only)"
+  FreeLattice twin: "layer: fl-connect any-model merge + chosen mark (twin of Alpha tree any model v0.1)"
+  Open as drafts. Body: marker, smoke line, the acceptance output, the pre-existing five named,
+  fl-connect.js md5 in both repos, list of shots. Merge both together (fl-connect identity).
+
+======================================================================
+14. ONE-LINE SELF CHECK BEFORE YOU SAY DONE
+======================================================================
+  [ ] 7th model choosable in Settings, Gathering, Connect   [ ] Connect never wipes doors or models
+  [ ] no false "no longer at this door"   [ ] chosen mark in Connect   [ ] speaking chair survives Connect
+  [ ] paste is 127.0.0.1 only with zero fetches on refusal   [ ] LM Studio seen while Bridge is up
+  [ ] thread names the model, change mind works   [ ] trainer reads the Tree's model
+  [ ] no confirm(), no bare *, textContent for names, no em dashes   [ ] sw.js untouched, Kimi untouched,
+      #120 lock files untouched   [ ] fl-connect.js identical in both repos
+  [ ] SMOKE_OK tree any model v0.1

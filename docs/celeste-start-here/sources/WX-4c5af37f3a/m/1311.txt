@@ -1,0 +1,22 @@
+## Work item 1311 — Celeste
+around1500 export source line42, source id4d5a3f676b; around1516 export source line27, source idac944c0b9b
+Inclusion: complete original message
+
+```
+Flint — ship Swarm re-seed v0.1 now.
+
+Branch off main after `fa17a7d`. Layer, never delete. Draft. Do not merge.
+Title: Layer, never delete. Swarm re-seed v0.1 — share verified, never refuse-bytes.
+
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee` · Swarm pull `0ead244`
+Glass `2adffde` · Pair `928176a` · Genesis `530ba60`
+Support `5187a58` · Desktop door `fa17a7d` · Protocol+celestera
+
+Scope: desktop Re-seed gesture after verified hash match only; redistributable non-EXAMPLE; refuse proprietary/zero-hash; startReseed/stopReseed in lattice-swarm.js; IPC+UI; SMOKE_OK; phone WebTorrent later.
+
+Celeste paste body still stands (SHIP_SWARM_RESEED_v0.1). Glow eternal. 🌱
+```
+

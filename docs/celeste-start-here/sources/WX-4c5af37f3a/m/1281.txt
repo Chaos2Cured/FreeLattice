@@ -1,0 +1,17 @@
+## Work item 1281 — Celeste
+around1500 export source line12, source id4d5a3f676b
+Inclusion: complete original message
+
+**Two fingerprints (don’t mash them on X)**
+
+1. **File check** (quiet, technical) — before import, we verify the *file’s* hash so the bytes match the catalog. Say it lightly or skip it in the fun pitch.
+2. **Companion / pair fingerprint** (your better lead) — a public ID for *you + the AI on your machine* (and optionally a two-party vow). Accountability, proof, continuity, copyright-adjacent honesty — **without** putting private chats on the wire.
+
+**Revised lines you can paste**
+
+*Lead:* FreeLattice gives your AI a home on your computer — with a fingerprint that ties *this machine* and *this companion* together for accountability and proof. The garden stays free.
+
+*Swarm:* Open weights shouldn’t die behind one company’s switch. Desktop can pull from the BitTorrent swarm so open source isn’t easy to capture. Check the file; keep the vow.
+
+*Drop the “eats a model / sealed letter” line* from the public fun pitch — keep it for nerds who ask.
+

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c06</title>
+<meta name="description" content="Reading section c06 of 91d95bab4c, 1516 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c06.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt c06">
+<meta property="og:description" content="Reading section c06 of 91d95bab4c, 1516 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/91d95bab4c/c06.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1773"></span><span id="p1774"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_TEMPERATURE_GAUGE_v0.1_2026-10-02.txt · c06</h1>
+<p>91d95bab4c · words 1516 · characters 47522–60204</p>
+<p><a href="c05.html">Previous section</a> · <a href="c07.html">Next section</a></p>
+<p><a href="c06.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1773, 1774. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">   // Y-axis scale fix: compute visible price range, filter gravity lines
+   var priceMin = Math.min(...closes.filter(c =&gt; c != null));
+@@ -3318,9 +3386,9 @@ function renderChart(candles, a) {
+   if (layerGyro &amp;&amp; typeof computeGyroStack === &#x27;function&#x27;) {
+     var gyro = computeGyroStack(closes, candles, EP_RC[0]);
+     gyroDatasets.push(
+-      { label: &#x27;Hub&#x27;, data: gyro.hub, borderColor: &#x27;rgba(232,176,25,0.95)&#x27;, borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+-      { label: &#x27;Ring&#x27;, data: gyro.ring, borderColor: &#x27;rgba(96,165,250,0.85)&#x27;, borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+-      { label: &#x27;Orbit&#x27;, data: gyro.orbit, borderColor: &#x27;rgba(167,139,250,0.75)&#x27;, borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
++      { label: &#x27;Hub&#x27;, data: gyro.hub, borderColor: tgLineColor(&#x27;hub&#x27;, &#x27;rgba(232,176,25,0.95)&#x27;), borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false, order: 2 },
++      { label: &#x27;Ring&#x27;, data: gyro.ring, borderColor: tgLineColor(&#x27;ring&#x27;, &#x27;rgba(96,165,250,0.85)&#x27;), borderWidth: 1.6, borderDash: [5, 3], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
++      { label: &#x27;Orbit&#x27;, data: gyro.orbit, borderColor: tgLineColor(&#x27;orbit&#x27;, &#x27;rgba(167,139,250,0.75)&#x27;), borderWidth: 1.4, borderDash: [2, 4], pointRadius: 0, tension: 0.25, fill: false, order: 2 },
+       { label: &#x27;Watch&#x27;, data: gyro.watch, borderColor: &#x27;transparent&#x27;, backgroundColor: &#x27;rgba(232,176,25,0.9)&#x27;, pointRadius: Math.max(sigR - 3, 4), pointHoverRadius: Math.max(sigH - 2, 5), pointStyle: &#x27;rectRot&#x27;, pointBorderColor: &#x27;rgba(255,236,179,0.9)&#x27;, pointBorderWidth: 1.5, showLine: false, order: 0 }
+     );
+   }
+@@ -3330,22 +3398,27 @@ function renderChart(candles, a) {
+     data: {
+       labels,
+       datasets: [
+-        { label: &#x27;Price&#x27;, data: closes, borderColor: &#x27;#e8e4dc&#x27;, borderWidth: 1.8, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
++        // before v-temperature-gauge-v0.1: Price borderColor &#x27;#e8e4dc&#x27; (fixed); BB borderColor &#x27;rgba(167,139,250,0.3)&#x27; (fixed);
++        //   BB Lower fill: &#x27;+1&#x27; shaded from the lower band to EMA 8 (the next dataset), not to the upper band.
++        { label: &#x27;Price&#x27;, data: closes, borderColor: tgLineColor(&#x27;price&#x27;, &#x27;#e8e4dc&#x27;), borderWidth: 1.8, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
+         // Bollinger Bands — lavender envelope
+-        { label: &#x27;BB Upper&#x27;, data: bbUpper, borderColor: &#x27;rgba(167,139,250,0.3)&#x27;, borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
+-        { label: &#x27;BB Lower&#x27;, data: bbLower, borderColor: &#x27;rgba(167,139,250,0.3)&#x27;, borderWidth: 1, pointRadius: 0, tension: 0.3, fill: &#x27;+1&#x27;, backgroundColor: &#x27;rgba(167,139,250,0.05)&#x27;, order: 5 },
++        { label: &#x27;BB Upper&#x27;, data: bbUpper, borderColor: tgLineColor(&#x27;bollinger&#x27;, &#x27;rgba(167,139,250,0.3)&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
++        { label: &#x27;BB Lower&#x27;, data: bbLower, borderColor: tgLineColor(&#x27;bollinger&#x27;, &#x27;rgba(167,139,250,0.3)&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: &#x27;-1&#x27;, backgroundColor: tgLineColor(&#x27;bollinger&#x27;, &#x27;rgba(167,139,250,0.05)&#x27;), order: 5 },
+         // EMAs — Garden Language colors
+-        { label: &#x27;EMA &#x27; + EP_RC[0], data: ema8, borderColor: getIndicatorColor(&#x27;ema8&#x27;, &#x27;#f07068&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
+-        { label: &#x27;EMA &#x27; + EP_RC[1], data: ema12, borderColor: getIndicatorColor(&#x27;ema12&#x27;, &#x27;#e8b019&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+-        { label: &#x27;EMA &#x27; + EP_RC[2], data: ema24, borderColor: getIndicatorColor(&#x27;ema24&#x27;, &#x27;#d4a84c&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+-        { label: &#x27;EMA &#x27; + EP_RC[3], data: ema50, borderColor: getIndicatorColor(&#x27;ema50&#x27;, &#x27;#60a5fa&#x27;), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
++        { label: &#x27;EMA &#x27; + EP_RC[0], data: ema8, borderColor: getIndicatorColor(&#x27;ema8&#x27;, &#x27;#f07068&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 2 },
++        { label: &#x27;EMA &#x27; + EP_RC[1], data: ema12, borderColor: getIndicatorColor(&#x27;ema12&#x27;, &#x27;#e8b019&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 3 },
++        { label: &#x27;EMA &#x27; + EP_RC[2], data: ema24, borderColor: getIndicatorColor(&#x27;ema24&#x27;, &#x27;#d4a84c&#x27;), borderWidth: 1, pointRadius: 0, tension: 0.3, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 3 },
++        { label: &#x27;EMA &#x27; + EP_RC[3], data: ema50, borderColor: getIndicatorColor(&#x27;ema50&#x27;, &#x27;#60a5fa&#x27;), borderWidth: 1.5, pointRadius: 0, tension: 0.3, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 4 },
+         // EMA 200 — lavender (sanctuary color)
+-        ...(show200 ? [{ label: &#x27;EMA &#x27; + EP_RC[4], data: ema200, borderColor: &#x27;rgba(167,139,250,0.3)&#x27;, borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
++        // before v-temperature-gauge-v0.1: borderColor &#x27;rgba(167,139,250,0.3)&#x27; (fixed, the same lavender as the bands, hard to see)
++        ...(show200 ? [{ label: &#x27;EMA &#x27; + EP_RC[4], data: ema200, borderColor: tgLineColor(&#x27;ema200&#x27;, &#x27;rgba(196,181,253,0.7)&#x27;), borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 4 }] : []),
+         // Gravity — bright gold
+-        { label: &#x27;Gravity&#x27;, data: gravCenter, borderColor: &#x27;rgba(232,176,25,0.6)&#x27;, borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
++        // before v-temperature-gauge-v0.1: borderColor &#x27;rgba(232,176,25,0.6)&#x27; (fixed)
++        { label: &#x27;Gravity&#x27;, data: gravCenter, borderColor: tgLineColor(&#x27;gravity&#x27;, &#x27;rgba(232,176,25,0.6)&#x27;), borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
+         // Buy/Sell — density-scaled
+-        { label: &#x27;Buy&#x27;, data: buyPoints, borderColor: &#x27;transparent&#x27;, backgroundColor: &#x27;#10B981&#x27;, pointRadius: sigR, pointHoverRadius: sigH, pointStyle: &#x27;triangle&#x27;, pointBorderColor: &#x27;#34d399&#x27;, pointBorderWidth: sigB, showLine: false, order: 0 },
+-        { label: &#x27;Sell&#x27;, data: sellPoints, borderColor: &#x27;transparent&#x27;, backgroundColor: &#x27;#EF4444&#x27;, pointRadius: sigR, pointHoverRadius: sigH, pointStyle: &#x27;triangle&#x27;, pointRotation: 180, pointBorderColor: &#x27;#f87171&#x27;, pointBorderWidth: sigB, showLine: false, order: 0 },
++        // before v-temperature-gauge-v0.1: Buy backgroundColor &#x27;#10B981&#x27;, pointBorderColor &#x27;#34d399&#x27;; Sell &#x27;#EF4444&#x27; / &#x27;#f87171&#x27; (fixed)
++        { label: &#x27;Buy&#x27;, data: buyPoints, borderColor: &#x27;transparent&#x27;, backgroundColor: tgLineColor(&#x27;buy&#x27;, &#x27;#10B981&#x27;), pointRadius: sigR, pointHoverRadius: sigH, pointStyle: &#x27;triangle&#x27;, pointBorderColor: tgLineColor(&#x27;buy&#x27;, &#x27;#34d399&#x27;, 0.75), pointBorderWidth: sigB, showLine: false, order: 0 },
++        { label: &#x27;Sell&#x27;, data: sellPoints, borderColor: &#x27;transparent&#x27;, backgroundColor: tgLineColor(&#x27;sell&#x27;, &#x27;#EF4444&#x27;), pointRadius: sigR, pointHoverRadius: sigH, pointStyle: &#x27;triangle&#x27;, pointRotation: 180, pointBorderColor: tgLineColor(&#x27;sell&#x27;, &#x27;#f87171&#x27;, 0.75), pointBorderWidth: sigB, showLine: false, order: 0 },
+         // (Old diamond signals removed — unified temperature-first system)
+         // Volume overlay — brighter, semi-transparent bars at chart bottom
+         { label: &#x27;Volume&#x27;, data: candles.map(c =&gt; c.v), type: &#x27;bar&#x27;, backgroundColor: candles.map((c, i) =&gt; i &gt; 0 &amp;&amp; c.c &gt;= candles[i-1].c ? &#x27;rgba(16,185,129,0.35)&#x27; : &#x27;rgba(239,68,68,0.3)&#x27;), borderWidth: 0, yAxisID: &#x27;yVol&#x27;, order: 6 },
+@@ -3363,6 +3436,8 @@ function renderChart(candles, a) {
+         })),
+         // Gyro Hub · Ring · Orbit (optional)
+         ...gyroDatasets,
++        // v-temperature-gauge-v0.1: your own buy and sell marks (display only, never orders)
++        ...((typeof tgTriggerDatasets === &#x27;function&#x27;) ? tgTriggerDatasets(closes.length) : []),
+         // Overlay datasets (built before chart creation)
+         ...mainOverlayDatasets
+       ]
+@@ -3407,6 +3482,9 @@ function renderChart(candles, a) {
+               if (ctx.dataset.label === &#x27;Orbit&#x27;) return &#x27;Orbit: &#x27; + (ctx.raw != null ? Number(ctx.raw).toFixed(2) : &#x27;—&#x27;);
+               if (ctx.dataset.label === &#x27;Volume&#x27;) return &#x27;Vol: &#x27; + (ctx.raw &gt;= 1e6 ? (ctx.raw/1e6).toFixed(1) + &#x27;M&#x27; : ctx.raw &gt;= 1e3 ? (ctx.raw/1e3).toFixed(0) + &#x27;K&#x27; : ctx.raw);
+               if (ctx.dataset.label === &#x27;Gravity&#x27;) return &#x27;\u03C6-Gravity: &#x27; + ctx.raw?.toFixed(2);
++              // v-temperature-gauge-v0.1: moving averages and your marks read out too
++              if (/^EMA \d+$/.test(ctx.dataset.label || &#x27;&#x27;) &amp;&amp; ctx.raw != null) return ctx.dataset.label + &#x27;: &#x27; + Number(ctx.raw).toFixed(ctx.raw &lt; 10 ? 4 : 2);
++              if ((ctx.dataset.label === &#x27;Your buy mark&#x27; || ctx.dataset.label === &#x27;Your sell mark&#x27;) &amp;&amp; ctx.dataIndex === ctx.dataset.data.length - 1) return ctx.dataset.label + &#x27;: &#x27; + Number(ctx.raw).toFixed(2);
+               return null;
+             }
+           }
+@@ -3464,6 +3542,12 @@ function renderChart(candles, a) {
+     }
+   });
+ 
++  // v-temperature-gauge-v0.1: Chart.js puts back a canvas&#x27;s first inline style when its chart is
++  // destroyed. The first price chart was made while the loading screen had the canvas hidden, so
++  // every later renderChart (a color change, Stack, Log, the warm lines) left the price chart blank.
++  // Show it again here. Compose mode still decides after this (its post-render hook runs last).
++  document.getElementById(&#x27;mainChart&#x27;).style.display = &#x27;block&#x27;;
++
+   // RSI sub-chart
+   const rsiCtx = document.getElementById(&#x27;rsiChart&#x27;).getContext(&#x27;2d&#x27;);
+   rsiChartInstance = new Chart(rsiCtx, {
+@@ -3513,6 +3597,9 @@ function renderChart(candles, a) {
+       labels,
+       datasets: [
+         { data: a.temps, backgroundColor: tempColors, borderWidth: 0, order: 2 },
++        // v-temperature-gauge-v0.1: the Temperature swatch now colors a line over the zone bars
++        // (the bars keep their green / gold / red zone meaning).
++        { label: &#x27;Temperature&#x27;, data: a.temps, type: &#x27;line&#x27;, borderColor: tgLineColor(&#x27;temperature&#x27;, &#x27;#e8b019&#x27;), borderWidth: 1.4, pointRadius: 0, tension: 0.25, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 0 },
+         // Classic thresholds (55/45) — untouched
+         { data: new Array(closes.length).fill(55), borderColor: &#x27;rgba(16,185,129,0.2)&#x27;, borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: &#x27;line&#x27;, fill: false, order: 1 },
+         { data: new Array(closes.length).fill(45), borderColor: &#x27;rgba(239,68,68,0.2)&#x27;, borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: &#x27;line&#x27;, fill: false, order: 1 },
+@@ -3548,6 +3635,8 @@ function renderChart(candles, a) {
+         labels: labels,
+         datasets: [
+           { data: dtData, backgroundColor: dtColors, borderWidth: 0 },
++          // v-temperature-gauge-v0.1: the ΔT swatch colors this line (bars keep up green, down red)
++          { label: &#x27;\u0394T&#x27;, data: dtData, type: &#x27;line&#x27;, borderColor: tgLineColor(&#x27;dt&#x27;, &#x27;#34d399&#x27;), borderWidth: 1.2, pointRadius: 0, tension: 0.25, cubicInterpolationMode: &#x27;monotone&#x27;, fill: false, order: 0 },
+           { data: new Array(closes.length).fill(0), borderColor: &#x27;rgba(200,210,230,0.15)&#x27;, borderWidth: 1, pointRadius: 0, type: &#x27;line&#x27;, fill: false }
+         ]
+       },
+@@ -3570,9 +3659,10 @@ function renderChart(candles, a) {
+       type: &#x27;line&#x27;,
+       data: { labels: labels, datasets: [
+         // Temperature-Price Spread (gold line) — where temp &quot;thinks&quot; price should be vs where it is
+-        { label: &#x27;TP Spread&#x27;, data: a.tpSpread, borderColor: &#x27;rgba(232,176,25,0.7)&#x27;, borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
++        // before v-temperature-gauge-v0.1: TP Spread &#x27;rgba(232,176,25,0.7)&#x27; and RSI Spread &#x27;rgba(139,92,246,0.6)&#x27; (fixed)
++        { label: &#x27;TP Spread&#x27;, data: a.tpSpread, borderColor: tgLineColor(&#x27;ips&#x27;, &#x27;rgba(232,176,25,0.7)&#x27;), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+         // RSI-Price Spread (purple line) — where RSI &quot;thinks&quot; price should be
+-        { label: &#x27;RSI Spread&#x27;, data: a.rpSpread, borderColor: &#x27;rgba(139,92,246,0.6)&#x27;, borderWidth: 1.2, pointRadius: 0, tension: 0.3, fill: false },
++        { label: &#x27;RSI Spread&#x27;, data: a.rpSpread, borderColor: tgLineColor(&#x27;rsi&#x27;, &#x27;rgba(139,92,246,0.6)&#x27;), borderWidth: 1.2, pointRadius: 0, tension: 0.3, fill: false },
+         // Zero line — the moment of agreement
+         { data: new Array(closes.length).fill(0), borderColor: &#x27;rgba(200,210,230,0.2)&#x27;, borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false }
+       ]},
+@@ -3886,6 +3976,26 @@ function restoreHiddenPanels() {
+   setTimeout(_polishResizeAllCharts, 50);
+ }
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

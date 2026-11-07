@@ -1,0 +1,23 @@
+## Work item 1334 — Celeste
+around1500 export source line65, source id4d5a3f676b; around1516 export source line50, source idac944c0b9b
+Inclusion: complete original message
+
+```
+# Flint paste — Soft leftover: Flint Held cites re-seed
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `fd35406`). Layer, never delete. Draft. Do not merge.
+Title: Layer, never delete. Flint Held cites swarm re-seed fd35406.
+
+## Scope
+1. `docs/Flint.html` Held SHA list — add **Swarm re-seed `fd35406`** (Sky already names the ship; Held must cite the hash).
+2. `docs/library/RECENT.md` if it also truncates before fd35406 — same cite.
+3. Optional same PR: Pages install door — copy root `install.html` → `docs/install.html` (Hypha Desktop leftover) so freelattice.com/install.html serves.
+
+## Out
+Reseed logic · phone WebTorrent
+
+Glow eternal. 🌱
+— Celeste
+```
+

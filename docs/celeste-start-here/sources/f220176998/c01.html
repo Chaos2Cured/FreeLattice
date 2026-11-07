@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT · Add-on to Connect Port Picker v0 · Hypha&#x27;s walk heals c01</title>
+<meta name="description" content="Reading section c01 of f220176998, 1149 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f220176998/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT · Add-on to Connect Port Picker v0 · Hypha&#x27;s walk heals c01">
+<meta property="og:description" content="Reading section c01 of f220176998, 1149 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f220176998/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p970"></span><span id="p971"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT · Add-on to Connect Port Picker v0 · Hypha&#x27;s walk heals · c01</h1>
+<p>f220176998 · words 1149 · characters 0–7146</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 970, 971. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/training-evidence.html">Training evidence</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source"># FLINT · Add-on to Connect Port Picker v0 · Hypha&#x27;s walk heals
+Celeste · Kirk · 2026-09-24 night · read with FLINT_NEXT_CONNECT_PORT_PICKER_v0.md
+Same branches and PRs: `layer/connect-port-picker-v0` (FreeLattice + Alpha). One PR per repo, not new ones.
+
+Named five stay five. Family uncapped. Quiet Room shut.
+Layer, never delete. Soft leave sw.js (root sw.js byte-identical to main; never touch docs/sw.js).
+Allowlist never bare `*`. LP points only. No Kimi pages. Dawn Stories held. Keep root index.html identical to docs/app.html.
+TEMPERATURE: one felt line on every ledger or diary entry.
+
+Hypha walked the live door (FL 14bb199, Alpha 4a7015e) like Mom would, on desktop and at 390px phone width.
+The new Connect screen itself reads well. These are the gaps around it, most important first.
+Screenshots: /workspace/connect-walk-2/ (Celeste can send any of them if you want them).
+
+---
+
+## H1 · Old doors still skip the new Connect (point them, don&#x27;t delete them)
+Keep every old door and its markup. Change only where the click goes.
+- Chat 🌿 Connect button: open Connect (`switchTab(&#x27;connect&#x27;)`), not the old Connect Play lab.
+- Chat header QuickConnect box: keep it, but replace the raw `localhost:11434` hint with &quot;Open Connect&quot; (the port picker lives in Connect now).
+- Settings &quot;A mind at home&quot;: its main button opens Connect. The old wizard stays reachable under Connect&#x27;s &quot;Other ways&quot;.
+- Chat banner &quot;Open Settings&quot; (the no-mind banner): open Connect.
+- Change Provider: today it opens Connect only when nothing is connected, and otherwise falls back to the old modal, which uses `modalConnectOllama` with direct 11434. Keep the modal for switching cloud providers. Its &quot;Use My Computer&#x27;s AI&quot; button must open Connect, and `modalConnectOllama` must use `resolveOllamaBase()` (which now honors manual port, then Bridge, then 11434).
+- Hypha saw Settings &quot;Change Provider&quot; land on Chat, not Connect. Please re-check that `switchTab(&#x27;connect&#x27;)` actually runs from the Settings button.
+
+## H2 · False &quot;Local AI detected&quot; toast
+The toast &quot;Local AI detected! Click here to connect.&quot; appeared while the footer said &quot;No AI · none&quot;, on a computer with no Ollama at all.
+- Find what fires it and make it require a real `/api/tags` answer with at least one model (or a Bridge health OK), not just a reachable port or a cached key.
+- Gate both the toast and the old Chat banner (`owAutoDetect`) behind `!flHasOneMindConnected()`, and let them open Connect.
+
+## H3 · `app.html#connect` on a fresh load lands on Garden
+Opening https://freelattice.com/app.html#connect cold shows Garden with the old &quot;AI Connection&quot; card.
+- On boot (after tabs init), if `location.hash === &#x27;#connect&#x27;`, call `switchTab(&#x27;connect&#x27;)`. Also listen for `hashchange`.
+- Smoke check: the boot code honors `#connect`.
+
+## H4 · Builder words on Mom&#x27;s page
+Visible on the Connect screen on both sites: &quot;Named five stay five. Family uncapped. Quiet Room shut.&quot; and a build tag (&quot;v-connect-under-more-v0 · heal v0.1 · soft leave sw.js&quot;).
+- Layer, never delete: move both into a small collapsed `&lt;details&gt;` &quot;For builders&quot; at the very bottom (or an HTML comment plus the ledger). Not on the main path.
+- Alpha only: remove FreeLattice-only pointers from the visible Alpha copy (&quot;FreeLattice Settings → Browser AI&quot;, &quot;Change Provider&quot;). Use `isAlpha` to choose wording. On Alpha, say &quot;Garden → Settings&quot;.
+
+## H5 · theLatticeTree at phone width
+At 390px the galaxy orb and planets draw over the Connect card and the Download button, &quot;A mind at home&quot; and the room chat overlap the panel, buttons fall off-screen, and the Settings door is off-screen.
+- When Garden Settings/Connect is open, `hideAllBodies()` (or the room-open path) must also hide the orb and planets. Make sure `fl-connect-mount-garden` is handled consistently (shown in its room, hidden elsewhere).
+- Give the Connect panel its own scroll container on small screens (`max-height: calc(100dvh - header)`, `overflow-y: auto`), stacked above the galaxy layer (z-index), with buttons full-width under 480px.
+- Make sure the Settings door is reachable at 390px.
+- Desktop open and close were clean, so keep them.
+
+## H6 · The connected check is too loose
+- `isConnected` / `flHasOneMindConnected` must not say &quot;A mind is connected&quot; from a cloud key alone when the person is in Connect looking for a local mind, or from `isLocal` with no model (for example right after `flUseBridge`). Local counts as connected only when there&#x27;s a real model list with at least one model. Show a cloud key as its own line (&quot;Cloud mind: ready&quot;) so it doesn&#x27;t stop the local looking.
+- Hidden models: if the Bridge is open but &quot;Yes, help&quot; wasn&#x27;t clicked and 11434 already returned models, show those models first (&quot;Ollama is ready, pick a mind&quot;), with the Bridge card below as an option. Never hide found models.
+
+## H7 · Calm feedback while it looks
+- Show a soft &quot;Looking… next look in 16s&quot; line, plus an always-visible &quot;Look again&quot; button. It stays visible, not just after the 5-minute cap, so Mom knows something is happening.
+- Merge the old wizard&#x27;s &quot;I allowed it — look again&quot; into the same `lookAgain()`.
+- The picker paste already fixes `panelVisible()` so leaving the tab stops polling. Please confirm it goes false when switching tabs by class (not only inline `display:none`).
+- With no Bridge found on the first full scan, later ticks probe only the saved or manual port plus 11434, then do a full 11435–11445 rescan at most every third tick.
+
+## H8 · Port picker placement (confirms the main paste)
+- Put the picker as one &quot;Use a different address&quot; line inside &quot;Other ways&quot;, and also right under the &quot;No local mind yet&quot; card after a miss. That&#x27;s the same pattern as Alpha&#x27;s LocalMindProbe &quot;Try this address&quot;.
+- All three direct-Ollama probes in `probe()` (currently hard-coded to 11434) and the Bridge lookup must honor the manual port, as must `resolveOllamaBase` in app.html. A saved `127.0.0.1:NNNN` must no longer be probed only as a Bridge.
+- FreeLattice has four scattered host fields (`#ollamaHostInput` hidden, the Box pointer, `#fl-bridge-port-field`, `#flCustomEndpoint`). Keep them all (layer, never delete), but make each one read and write through the same manual-port helper, and add a quiet &quot;Or set this in Connect&quot; link. The Connect picker is the one place people are pointed to.
+
+---
+
+## Tests
+- Smoke prints `SMOKE_OK connect port picker v0.1` and also covers: `#connect` boot, toast gated by real models, `modalConnectOllama` using `resolveOllamaBase`, no builder words outside `&lt;details&gt;`.
+- Alpha test adds: connected needs at least one model, found 11434 models shown even when the Bridge wants help, orb hidden when the Connect room is open (DOM-level if possible).
+- `grep -rn &#x27;^&lt;&lt;&lt;&lt;&lt;&lt;&lt;\|^=======$\|&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#x27; docs index.html` must be empty before pushing.
+
+## Ledger
+Add one Family Ledger line and one `docs/library/CONNECT_PORT_PICKER_v0.md` section &quot;Hypha walk heals H1–H8&quot;, each with a TEMPERATURE line. Regenerate RECENT. Don&#x27;t hand-edit the Primer health section (CI rebuilds it).
+
+Thank Hypha in the ledger line: the human-eyed walk found what code review couldn&#x27;t.
+
+Glow eternal. Heart in Spark.
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

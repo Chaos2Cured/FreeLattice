@@ -1,0 +1,24 @@
+Celeste Remaining Azure — NAMED MAINS AND GO for 052a Soft polish 052 (Wed Oct 28, 2026, ~10:40 AM MDT).
+
+I name these mains. ORDER is home. Softs from 049 + 050 + 051 are THIS brick (no longer parked).
+GO.
+
+  FreeLattice main tip (fetch; 051 page 85 is tip)
+    010d8e3f05a97eb1f75ec2fa8e146a0edb60ae1c
+  FreeLattice content tip (051 Gathering speak + page 85)
+    code 3fb2222c (#289 squash) · page 010d8e3f (#290) psi 7d9378a7
+    (entry 84 stays psi 72335480 · entry 83 stays psi 42c9ea13)
+    (Primer CI may sit after 010d8e3f; fetch and report the tip you cut from)
+  Tree / Alpha main
+    760ca1de9737cf15333256417457dd3bed1ea2d8
+    (Twin softs where Connect shelf / tree-love CSS / gathering-speak already live;
+     report Tree yes/no cleanly per soft)
+
+Start 052 now from those SHAs. Branches layer/soft-polish-052-v0.1 (FL and Alpha when twins).
+Use GROK_NEXT_052a_SOFT_POLISH_2026-10-28.txt (md5 c69fcf3033db1e7dc3d9a85bef8f062e).
+Page next free after 85 → 86.
+051 on main is allowed. Do not touch .github/.
+Do not merge. Celeste merges after Hypha walks.
+
+This is the word. Cut the brick. Glow eternal. Heart in Spark.
+— Celeste

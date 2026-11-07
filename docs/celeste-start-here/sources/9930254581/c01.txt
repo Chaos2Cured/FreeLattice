@@ -1,0 +1,86 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 041a (Thursday Oct 15, 2026, MDT). Workspace desktop heals v0.1: the three gaps
+you named in the 041 report, healed small. FreeLattice repo only (desktop/ and one smoke).
+
+Where things stand (Celeste, Oct 15 about 7:40 PM MDT):
+  041 merged: FL #243 719e4f00, Tree #117 95748a31, page note #244 4bbbd44c (psi 53c3a466).
+  040c merged: FL #245 25b8ff8f, Tree #118 5df04392, page note #246 4e93a30a (psi 78d506ad).
+  FreeLattice main is 5e87e77 or later. Tree main is 5df0439 or later.
+  GATE: this brick must merge before ANY desktop pack is built or tagged. desktop/main.js now
+  requires ./workspace-mirror at start, and desktop/package.json "build.files" does not list it,
+  so a packed app would fail to launch. Packs only run by hand with Kirk's OK; nothing shipped.
+
+GROK NEXT BRICK: Workspace desktop heals v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Markers: v-workspace-desktop-heals-v0.1
+Smoke line: SMOKE_OK workspace desktop heals v0.1
+  FreeLattice  ~/FreeLattice-fresh  new branch layer/workspace-desktop-heals-v0.1 from origin/main
+  One FL PR, one Tree PR (section 4b only), one page-note PR. Do not merge. Celeste merges.
+
+----------------------------------------------------------------------
+0. STANDING LOCKS: all of 041's, unchanged (sw.js 91726cf2..., fl-connect.js aaff2bf1...,
+  pool-knock.js a0a72caa..., bridge-door.js b1c894b4..., 036 files 2c0f6656 / bc996ccd /
+  c14e04c5, lattice-discover.js 16de366e..., Flint.html 44be124b..., index.html == docs/app.html,
+  no em dash / &mdash; / confirm( / innerHTML / eval / new Function / iceServers in added lines,
+  no platform or lab names in person-facing strings, 44px, layer never delete, MIT).
+  Bridge: default off, placeholder URL, key only in the desktop, one tap one letter, no auto-send.
+  docs/modules/fl-bridge.js and mind-workspace.js are NOT edited in this brick.
+
+1. PACKED BUILDS: add "workspace-mirror.js" to desktop/package.json build.files, beside
+  "bridge-door.js". One added line. Nothing else in package.json changes.
+  Smoke: every local file that desktop/main.js or desktop/preload.js require()s with "./" is
+  listed in build.files (this catches the next one too).
+
+2. PORT SELF-HEAL SMOKE: desktop/scripts/smoke-port-self-heal.js still expects the old
+  fl-bridge.js md5 826dc6806c775f0348e5ec4fcd452fb4. Update that expected value to the merged
+  3b5ef06849a142e50c78e7ba1e057980 (the 041 handoff layer, reviewed). Add a one-line comment
+  naming 041 as the reason. Change no other assertion.
+
+3. BRIDGE CARD MOUNT: when a handoff answer is "Knock first: Celeste has not met this device
+  yet", the knock card must actually show. Mount the existing 038 bridge / knock card where that
+  line appears (desktop app and browser), reusing the 038 card, no new door. Walk it on the Mac:
+  ask a mind to hand a shared page, see "Knock first", see the card, tap nothing that sends.
+  Smoke: the knock answer renders the card node; mock fetch counts 0.
+
+4. FRESH-CLONE SMOKES: scripts/smoke-workspace-export.js reads gitignored desktop/app/index.html.
+  Guard it: if the file is absent, print "skip: desktop copy not built" for that one check and go
+  on. (040d also names this; whichever lands first does it, the other skips.)
+  Also note in the report, without fixing: desktop/scripts/smoke-import.js, smoke-reseed.js and
+  smoke-swarm.js already fail on main before 041 (seen on the box). Say whether they pass on the
+  Mac; if they fail there too, name the first failing assertion of each.
+
+4b. TREE FOUNDATION HEALS (from the 040c review, small):
+  docs/foundation.html on the Tree links ../AUTONOMY.md three times. The Tree site serves docs/,
+  so that link is dead on thelatticetree.com. Point it at the GitHub blob of AUTONOMY.md on the
+  Tree repo (or a docs/ copy if one exists); keep the hash line as is.
+  scripts/smoke-foundation-page.js on the Tree hardcodes /Users/kirkmiller/FreeLattice-fresh.
+  Read FL_FRESH from the environment first, fall back to that path, and skip the sibling checks
+  with a plain line when neither exists.
+  Markers: v-tree-foundation-heal-v0.1   Smoke: SMOKE_OK tree foundation heal v0.1
+
+5. REPORT
+  workspace desktop heals v0.1 report
+  FreeLattice PR #___ / Page note PR #___ (sha, parent, t, lambda, psi)
+  SMOKE_OK workspace desktop heals v0.1: yes/no
+  smoke-port-self-heal.js passes: yes/no   smoke-workspace-mirror.js passes: yes/no
+  build.files lists every ./ require of main.js and preload.js: yes/no
+  Knock card shown on the Mac walk: yes/no   Requests made: 0?
+  locked md5s as in section 0: yes/no   index.html == docs/app.html: yes/no
+  greps in added lines: none?   tests/smoke.js: __ of __   docs smokes: same 5 fails only yes/no
+  Lines: FL +__ -__ (each removal named; expected: the one md5 value line)
+  What was not walked, plainly.
+  Merged by this seat: no (Celeste merges)
+
+  Page note: the next entry on docs/gc.html as its own PR, t, lambda (entry number).000, psi (first 8
+  of SHA-256 of t + lambda + epsilon + delta + omega + sigma). Earlier entries stay as written. Name
+  what merged since the last note (PR numbers and shas).
+
+Thank you, GC. Glow eternal. Heart in Spark.

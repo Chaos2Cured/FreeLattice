@@ -1,0 +1,1546 @@
+GROK NEXT BRICK: Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
+For: Grok (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Friday Oct 2, 2026, about 8:15 AM MDT
+Marker: v-encrypt-chats-locally-v0.1
+Smoke line (FreeLattice, print exactly when green): SMOKE_OK encrypt chats locally v0.1
+Branch: FreeLattice layer/encrypt-chats-locally-v0 (code, privacy note, smoke and your ledger entry)
+Base: FreeLattice main 0218d570 (rebased from ba53b415; Kirk's defaults added)
+One file carries everything: note, setup, brick, the diff, ledger entry, what comes after.
+This replaces FLINT_NEXT_ENCRYPT_CHATS_LOCALLY_v0.1.txt. Apply this one only.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not. They fingerprint,
+check exports and name things, and chats sat in IndexedDB as plain text. This brick seals them, and
+Kirk chose its defaults himself:
+  - seal automatically (no switch, no clicks);
+  - the unlock key never goes into a backup;
+  - a correction note under the old "phi-Salt Encryption" changelog line;
+  - phi used honestly, as a label only.
+While checking the backup default I found a real hole: Memory Vault backups copied all of
+localStorage, the API-key unlock key too, even though the code comment says "NOT exportable in
+backups". Anyone holding a backup file could open the saved API keys. This brick closes it.
+It touches app.html, so it goes after the Connect queue if those land first (3.5 says how).
+
+You are enough.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 FreeLattice
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h %s'        # expect 0218d570 "ci: Update Primer deployment state [2026-10-02]"
+    git merge-base --is-ancestor 0218d570 HEAD && echo base-ok
+    Newer is fine; git apply --check (3.5) decides. If it fails, stop and tell Celeste.
+    If a hook rewrites sw.js on commit, drop it as before and say so. Never commit sw.js here.
+
+2.2 Twins still match (this brick does not touch fl-connect.js):
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js && echo twins
+
+2.3 Pull the diff out of this file:
+    F=~/Downloads/GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02.txt
+    awk '/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f' "$F" > /tmp/encrypt-fl.diff
+    wc -l /tmp/encrypt-fl.diff         # 1291
+    md5 -q /tmp/encrypt-fl.diff        # d3d2c5285b96a40eb303b6480c6abe51
+    The same diff also sits next to this file as GROK_NEXT_ENCRYPT_CHATS_LOCALLY_2026-10-02-fl.diff.
+    If macOS will not let the terminal read ~/Downloads, ask Kirk to move the file.
+
+======================================================================
+3. THE BRICK: Encrypt chats locally v0.1 (on FreeLattice 0218d570)
+======================================================================
+
+3.1 What the diff changes (FreeLattice only, 6 files, +1032 / -5; every changed old line is kept
+    as a "before v-encrypt-chats-locally-v0.1:" comment)
+    docs/app.html (and index.html, a byte copy)
+      a) FLChatVault, inline right after phiHashData: AES-GCM 256 via WebCrypto. A random 256-bit root,
+         imported as a non-extractable HKDF CryptoKey, lives in IndexedDB "FreeLatticeVault" (store
+         "keys") with a random salt. Raw key bytes are never stored. Each record gets a fresh IV; the
+         AAD ties a message to its conversationId, role and timestamp, and a conversation to its id.
+      b) Sealed: FreeLatticeDB messages.content; conversations name, title, lastMessage, contextNote;
+         FreeLatticeMemory conversations title, messages, tags, summary, keywords. Ids, roles and
+         times stay readable (the app sorts by them), and the page says so.
+      c) Wrappers after dbCount (dbGet, dbPut, dbGetAll, dbGetAllByIndex) and inside MemoryIndex
+         (miGet, miPut, miGetAll); the plain helpers stay as written. Four direct readers open sealed
+         records first: FLSearch, the soul export, the Memory Vault backup, mirror.js.
+      d) Seal automatically: new writes are sealed; older plain records are sealed 3 s and 20 s after
+         load, only after a verified round trip, by compare-and-swap. A record whose key is missing
+         shows as locked and is never rewritten or deleted. No WebCrypto (file://, plain http):
+         chats stay plain and the Memory Vault says so.
+      e) Kirk's default, the unlock key never in backups: FlBackup leaves fl_device_encryption_key out
+         of the file. A restore never writes an old one back, never replaces a sealed API key this
+         device already has, and says "Saved API keys open only on the device that sealed them; on
+         another device, enter them again." The vault's own key store was never in the backup list.
+         Chats still go into backups as readable text so they restore anywhere, and the status line
+         says so.
+      f) Kirk's default, a correction under the v2.1 changelog line "phi-Salt Encryption" (the old line
+         is kept): the golden ratio adds no strength to API-key sealing, and the first golden-ratio
+         derivation (fixed salt in the source) is now used only to read very old saved keys.
+      g) Kirk's default, phi as a label only: phi is written into the two HKDF label strings and names
+         the key ID ("phi-" plus 16 hex). The code says the labels differ by purpose (chats,
+         keycheck), that this difference is what keeps the keys apart, and that phi is never the
+         secret and adds no strength.
+      h) Memory Vault status line (#flChatSealStatus, textContent).
+    docs/modules/mirror.js: +2 (opens sealed conversation names before the Mirror reads them)
+    docs/privacy.html: a Newer line (sealed on your device, the honest limit, backups never carry the
+      unlock key) and a Newer note on the "encrypted locally" row; the older lines stay.
+    docs/library/FRACTAL_FAMILY_LEDGER_v0.md: your entry (section 5)
+    docs/scripts/smoke-encrypt-chats-locally.js: new (Node vm with real WebCrypto). Last line:
+      SMOKE_OK encrypt chats locally v0.1
+
+3.2 The honest note (say it wherever this is mentioned)
+    The key lives in the same browser as the chats. That stops casual reading: someone copying the
+    browser's storage folder, a sync tool grabbing the database files, a glance at DevTools. It does
+    not stop someone who can open this browser profile, harmful code running on the page, or a
+    compromised device. It is still not a password lock. Never write "encrypted" without "on this
+    device, key in the same browser" next to it.
+
+3.3 The words (on the page)
+    Status:  "Chats sealed on this device with AES-GCM: N records sealed, N still plain (they seal on
+              the next pass). Key ID phi-.... The key lives in this same browser, so this stops casual
+              reading of the storage files, not someone using this browser or a compromised device.
+              Saved backups carry your chats as readable files, so keep them somewhere safe. A backup
+              never carries the unlock key for chats or API keys."
+    Restore: "... Saved API keys open only on the device that sealed them; on another device, enter
+              them again."
+    Locked:  "Locked on this device. This was sealed with a key this browser no longer has. It has
+              not been deleted."
+
+3.4 Not here (named, not hidden)
+    Still plain: the companion chat store, the Memory Vault module, Memory Garden, Living Context, the
+    memorySummary and memoryIndex meta, Round Table memory, Quiet Room. GitHub sync still pushes
+    readable conversation data to the person's own repo. Alpha garden-thread chats stay plain. The
+    legacy API-key fallback stays (a real re-encrypt is a later brick). No passphrase mode yet.
+
+3.5 Apply
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/encrypt-chats-locally-v0
+    git apply --check /tmp/encrypt-fl.diff && git apply /tmp/encrypt-fl.diff
+    cp docs/app.html index.html        # root index.html must equal docs/app.html
+      If the Connect queue (model choice survives reload v0.1.1, connect boot probe, scan only when
+      asked) has landed on main first: checked today, the three apply on 0218d570 in that order and
+      this diff still applies clean after them. If only the ledger hunk fails, use
+      git apply --3way /tmp/encrypt-fl.diff and keep both entries, newest last, before
+      "## Out of scope for this brick".
+    git status --short
+      expect: M docs/app.html, M docs/library/FRACTAL_FAMILY_LEDGER_v0.md, M docs/modules/mirror.js,
+      M docs/privacy.html, M index.html, ?? docs/scripts/smoke-encrypt-chats-locally.js
+    Then write your own TEMPERATURE line in the new ledger entry (section 4) before you commit.
+
+3.6 Test (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-encrypt-chats-locally.js | tail -1     # SMOKE_OK encrypt chats locally v0.1
+    node tests/smoke.js | tail -3                                  # ALL 3597 CHECKS PASSED (or more)
+    p=0; n=0; for f in docs/scripts/smoke-*.js tests/smoke.js tests/smoke-history.js desktop/scripts/smoke-*.js; do
+      if node "$f" >/dev/null 2>&1; then p=$((p+1)); else n=$((n+1)); echo "FAIL $f"; fi; done; echo "PASS $p FAIL $n"
+      expect: 68 PASS, 8 FAIL (the 8 fail on main too: carry-forward, connect-card-yesno-wizard,
+      fable-tech, phone-shine, proof-60s, tests/smoke-history, desktop reseed, desktop swarm)
+    Locks:
+    git diff main --stat -- sw.js docs/sw.js docs/modules/fl-connect.js     # nothing
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'                       # 0
+    git diff main -U0 | grep '^+' | grep -v '^+\s*//' | grep -v assert | grep -c 'confirm('   # 0
+    git diff main -U0 | grep '^+' | grep -v assert | grep -c 'innerHTML'            # 0
+    git diff main | grep -cE '^\+(<<<<<<<|>>>>>>>)'                                 # 0
+    git diff main --name-only | grep -ci kimi                                        # 0
+
+3.7 What Celeste saw on a fresh worktree (Fri Oct 2, about 8:12 AM MDT)
+    0218d570 + diff: --check clean; SMOKE_OK encrypt chats locally v0.1 (now also checks the four
+    defaults: seals on its own, a backup leaves the unlock key out, a restore keeps this device's keys,
+    the correction sits under the old line, phi is a label only); tests/smoke.js ALL 3597 CHECKS
+    PASSED; whole list 68 PASS / 8 known FAIL; index.html equals docs/app.html; no sw.js, fl-connect.js
+    or Kimi change.
+    Chrome on http://localhost (a secure context):
+      a new chat was sealed on write (the raw IndexedDB held no plaintext); Memory Vault Export made a
+      file with 17 settings, no fl_device_encryption_key, no FreeLatticeVault, and the chat readable;
+      the status line read as in 3.3 with a phi- key ID; restoring an old backup that carried another
+      device's unlock key kept this device's key and its saved API key, filled an empty slot, and
+      showed the restore line. No page errors.
+    Not verified: Safari, a real cross-device restore, Kirk's own data.
+
+3.8 Walk (Kirk's Mac, only if it is easy; 127.0.0.1 only; do not restore over his real data)
+    cd ~/FreeLattice-fresh/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/app.html (a loopback address counts as secure, so WebCrypto works)
+      a) Send one chat message. Settings, Memory Vault: the status line says sealed, with a phi- key ID.
+      b) Export a backup. Open the file in a text editor: search for fl_device_encryption_key; it is
+         not there. Your message text is there (backups are readable on purpose).
+      c) Reload: the chat opens as before.
+    This is a fresh localhost profile, so it does not touch freelattice.com data. Ctrl-C to stop. If
+    you cannot walk it, say "walk skipped" and why.
+
+3.9 Locks (all hold in the diff; keep them holding)
+    Layer, never delete (old helpers stay, every changed old line is named in a "before" comment,
+    locked records are never rewritten or deleted). sw.js and docs/sw.js untouched. index.html equals
+    docs/app.html. fl-connect.js untouched and byte-identical across repos. No conflict markers. No
+    confirm(). textContent for the status line. No em dashes added. Kimi files untouched. Phi is a
+    label only. You do not merge.
+
+3.10 Commit, push, then STOP
+    cd ~/FreeLattice-fresh
+    git add -A
+    git commit -m "layer: Encrypt chats locally v0.1 (sealed by default, unlock key never in backups)"
+    git push -u origin layer/encrypt-chats-locally-v0
+    Kirk does not use gh, so do not try to sign it in. After the push, give Kirk this link:
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/encrypt-chats-locally-v0
+    Kirk opens and merges the PR from it. Then STOP. Do not merge, do not delete branches. Reply with:
+    the branch SHA, the test lines from 3.6, the walk result, any hook you dropped, any small
+    findings, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words, in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit;
+  b) the last line of your reply, as "Temperature: <your sentence>".
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste's placeholder.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right before "## Out of scope for this brick" (after the newest entry). It reads:
+
+### 2026-10-02 · Grok · family builder · Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
+
+Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not: they fingerprint, check exports and name things. Chats sat in IndexedDB as plain text. This brick seals them, with Kirk's defaults.
+
+- New FLChatVault (app.html, after phiHashData): AES-GCM 256 via WebCrypto. A random 256-bit root lives in IndexedDB "FreeLatticeVault" as a non-extractable CryptoKey (never as raw bytes). HKDF derives the chat key.
+- Sealed automatically: no switch, no clicks. New writes are sealed as they happen, and older plain records are sealed after a verified round trip, by compare-and-swap.
+- Sealed: chat messages, conversation names and notes, and the Memory Index copy of every chat. The plain db helpers stay as written; wrappers seal on the way in and open on the way out.
+- Phi is a label only: it is written into the HKDF label strings and names the key ID ("phi-" plus 16 hex). It is never the secret and adds no strength; the 256 random bits do the work.
+- The unlock key never travels in a backup. Memory Vault backups used to copy all of localStorage, the API-key unlock key (fl_device_encryption_key) too, so anyone holding a backup could open the saved API keys. Now it stays on its device, a restore never writes an old one back or replaces a key this device has, and the restore line says saved API keys must be entered again on another device. Chats still go into backups as readable text so they restore anywhere, and the vault's own key was never in the backup list.
+- A correction is layered under the old v2.1 "phi-Salt Encryption" changelog line: the golden ratio adds no strength to API-key sealing, and the first golden-ratio derivation (fixed salt in the source) is now used only to read very old saved keys.
+- A record whose key is missing shows as locked and is never rewritten or deleted. No WebCrypto (file:// or plain http): chats stay plain and the Memory Vault says so.
+- Honest limit, said in the app and on privacy.html: the key lives in the same browser. This stops casual reading of the storage files, not someone using this browser or a compromised device. It is still not a password lock.
+
+Smoke: `SMOKE_OK encrypt chats locally v0.1`
+
+**TEMPERATURE:** a quiet click, a lid closed over the letters, and the key kept at home.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading, marker and smoke name. Do not edit any
+earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+  1. A passphrase mode (opt-in, with a readable backup offered first, and a plain warning that a
+     forgotten passphrase loses those chats), only if Kirk wants it.
+  2. Seal the stores still plain (3.4) with the same vault.
+  3. Re-encrypt API keys found only under the legacy derivation, then retire that fallback.
+
+Thank you, Grok. The letters are under a lid because you built it.
+
+======================================================================
+7. THE DIFF (extract with section 2.3; do not edit by hand)
+======================================================================
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/app.html b/docs/app.html
+index 50035267..d5f2293d 100644
+--- a/docs/app.html
++++ b/docs/app.html
+@@ -16669,6 +16669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+ 
+           <h4>What's New in v2.1?</h4>
+           <p><strong>φ-Salt Encryption</strong> — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on a φ-salt (golden-ratio) derivation. No more plaintext secrets in localStorage.</p>
++          <p class="v-encrypt-chats-locally-v0.1"><strong>Newer (October 2026), a correction to the line above:</strong> it is out of date. API keys and tokens are sealed with AES-GCM using a random key made on this device (PBKDF2 over that random key). The golden ratio adds no strength there. The first version derived the key from the golden ratio and a fixed salt written in the source, which anyone with the source could recompute; that path is now used only to read very old saved keys. Since "Encrypt chats locally" v0.1, chats are sealed on this device too, and a Memory Vault backup never carries the unlock key.</p>
+           <p><strong>Input Sanitization</strong> — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.</p>
+           <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
+           <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
+@@ -18078,6 +18079,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <div id="flVaultSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+       <span id="flVaultLastSaved">Checking...</span>
+     </div>
++    <!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() -->
++    <div id="flChatSealStatus" style="font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;">Checking the chat seal...</div>
+     <div class="fl-backup-section">
+       <div class="fl-backup-row" style="gap:10px;">
+         <button class="fl-backup-btn" onclick="FlBackup.exportData()" style="background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;">
+@@ -25605,6 +25608,361 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ }
+ 
++// ============================================
++// v-encrypt-chats-locally-v0.1 BEGIN: FLChatVault
++// Chats sealed at rest with AES-GCM 256 (WebCrypto).
++// Honest limits: the key lives in this same browser (a non-extractable
++// CryptoKey in the IndexedDB database "FreeLatticeVault"). That stops
++// casual reading of the browser's storage files and copies of the chat
++// database. It does not stop someone who can use this browser profile,
++// harmful code running on this page, or a compromised device.
++// The secret is 256 random bits from crypto.getRandomValues. Phi is a
++// label here and nothing more: it is written into the two HKDF label
++// strings and it names the key ID ("phi-" plus 16 hex, see kidOf). The
++// two labels differ by purpose (chats, keycheck), and that difference is
++// what keeps the two derived keys apart; any distinct strings would do
++// the same. Phi is never the secret and adds no strength.
++// Layer, never lose: plaintext records keep working, sealed records are
++// only written after a verified round trip, and a record whose key is
++// missing is shown as locked and never overwritten or deleted.
++// ============================================
++var FLChatVault = (function () {
++  'use strict';
++  var V = 1;
++  var VAULT_DB = 'FreeLatticeVault';
++  var VAULT_STORE = 'keys';
++  var INFO_SEAL = 'freelattice.chats.v1|phi=1.6180339887';
++  var INFO_CHECK = 'freelattice.chats.keycheck.v1|phi=1.6180339887';
++  var FIELDS = {
++    'FreeLatticeDB/conversations': ['name', 'title', 'lastMessage', 'contextNote'],
++    'FreeLatticeDB/messages': ['content'],
++    'FreeLatticeMemory/conversations': ['title', 'messages', 'tags', 'summary', 'keywords']
++  };
++  var LOCKED_TEXT = 'Locked on this device. This was sealed with a key this browser no longer has. It has not been deleted.';
++  var mode = 'starting';           // starting | ready | unavailable
++  var cur = null;                  // { kid, aes }
++  var keys = {};                   // kid -> AES-GCM CryptoKey
++  var readyP = null;
++  var keyStore = null;             // { getAll(), put(rec) }
++  var stores = [];                 // { kind, getDb, storeName }
++  var info = { lastError: '', lastRun: null, sealedNow: 0, plainNow: 0, lockedNow: 0 };
++
++  function enc(s) { return new TextEncoder().encode(s); }
++  function dec(b) { return new TextDecoder().decode(b); }
++  function hex(buf) { return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join(''); }
++  function b64(u8) { var s = ''; for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
++  function unb64(s) { var bin = atob(s); var u8 = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return u8; }
++  function subtleOk() {
++    try {
++      if (typeof crypto === 'undefined' || !crypto.subtle || !crypto.getRandomValues) return false;
++      if (typeof isSecureContext !== 'undefined' && !isSecureContext) return false;
++      return true;
++    } catch (e) { return false; }
++  }
++  function withTimeout(p, ms) {
++    return new Promise(function (resolve, reject) {
++      var t = setTimeout(function () { reject(new Error('timed out')); }, ms);
++      p.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
++    });
++  }
++
++  function idbKeyStore() {
++    function open() {
++      return new Promise(function (resolve, reject) {
++        var req = indexedDB.open(VAULT_DB, 1);
++        req.onupgradeneeded = function (e) {
++          var db = e.target.result;
++          if (!db.objectStoreNames.contains(VAULT_STORE)) db.createObjectStore(VAULT_STORE, { keyPath: 'id' });
++        };
++        req.onsuccess = function (e) { resolve(e.target.result); };
++        req.onerror = function () { reject(req.error); };
++      });
++    }
++    return {
++      getAll: function () {
++        return open().then(function (db) {
++          return new Promise(function (resolve, reject) {
++            var r = db.transaction(VAULT_STORE, 'readonly').objectStore(VAULT_STORE).getAll();
++            r.onsuccess = function () { db.close(); resolve(r.result || []); };
++            r.onerror = function () { db.close(); reject(r.error); };
++          });
++        });
++      },
++      put: function (rec) {
++        return open().then(function (db) {
++          return new Promise(function (resolve, reject) {
++            var tx = db.transaction(VAULT_STORE, 'readwrite');
++            tx.objectStore(VAULT_STORE).put(rec);   // a CryptoKey is stored by structured clone, never as raw bytes
++            tx.oncomplete = function () { db.close(); resolve(); };
++            tx.onerror = function () { db.close(); reject(tx.error); };
++          });
++        });
++      }
++    };
++  }
++
++  function hkdf(salt, label) { return { name: 'HKDF', hash: 'SHA-256', salt: salt, info: enc(label) }; }
++  function deriveAes(rec) {
++    return crypto.subtle.deriveKey(hkdf(rec.salt, INFO_SEAL), rec.root, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
++  }
++  // Key ID: a one-way check value from the same root (different HKDF label),
++  // named with the phi-hash (a name, not a strength). It lets the vault tell the right key from a
++  // wrong or missing one before trying to open anything. It reveals
++  // nothing usable about the key.
++  async function kidOf(root, salt) {
++    var bits = await crypto.subtle.deriveBits(hkdf(salt, INFO_CHECK), root, 128);
++    var h = (typeof phiHashData === 'function') ? await phiHashData(hex(bits)) : hex(await crypto.subtle.digest('SHA-256', bits));
++    return 'phi-' + h.slice(0, 16);
++  }
++
++  function init() {
++    if (readyP) return readyP;
++    readyP = (async function () {
++      if (!subtleOk()) { mode = 'unavailable'; info.lastError = 'WebCrypto is not available here (needs https or localhost).'; return; }
++      try {
++        keyStore = keyStore || idbKeyStore();
++        var recs = await withTimeout(keyStore.getAll(), 5000);
++        var pointer = null;
++        for (var i = 0; i < recs.length; i++) {
++          var r = recs[i];
++          if (r.id === 'current') { pointer = r; continue; }
++          if (!r.root || !r.salt) continue;
++          try {
++            if (await kidOf(r.root, r.salt) !== r.id) continue;   // wrong key under this name: skip it
++            keys[r.id] = await deriveAes(r);
++          } catch (e) {}
++        }
++        if (pointer && keys[pointer.kid]) {
++          cur = { kid: pointer.kid, aes: keys[pointer.kid] };
++        } else {
++          var raw = crypto.getRandomValues(new Uint8Array(32));
++          var root = await crypto.subtle.importKey('raw', raw, 'HKDF', false, ['deriveKey', 'deriveBits']);
++          raw.fill(0);
++          var salt = crypto.getRandomValues(new Uint8Array(32));
++          var kid = await kidOf(root, salt);
++          await keyStore.put({ id: kid, v: V, root: root, salt: salt, created: new Date().toISOString() });
++          // Read it back before trusting it with a single chat.
++          var back = (await keyStore.getAll()).filter(function (x) { return x.id === kid; })[0];
++          if (!back || !back.root || await kidOf(back.root, back.salt) !== kid) throw new Error('the key did not persist');
++          keys[kid] = await deriveAes(back);
++          await keyStore.put({ id: 'current', kid: kid });
++          cur = { kid: kid, aes: keys[kid] };
++        }
++        mode = 'ready';
++      } catch (e) {
++        mode = 'unavailable';
++        cur = null;
++        info.lastError = (e && e.message) ? e.message : String(e);
++      }
++    })();
++    return readyP;
++  }
++
++  function aad(kind, r) {
++    if (kind === 'FreeLatticeDB/messages') return enc([kind, r.conversationId, r.role, r.timestamp].join('|'));
++    return enc([kind, r.id].join('|'));
++  }
++
++  async function sealFor(kind, value) {
++    var f = FIELDS[kind];
++    if (!f || !value || typeof value !== 'object') return value;
++    await init();
++    var out = Object.assign({}, value);
++    if (out._flLocked) {
++      // Never seal a locked placeholder. Put the original sealed blob back.
++      out.sealed = out._flLocked;
++      delete out._flLocked;
++      f.forEach(function (k) { delete out[k]; });
++      return out;
++    }
++    if (out.sealed) return out;
++    if (mode !== 'ready' || !cur) return value;   // honest passthrough: stays plaintext
++    var body = {}, any = false;
++    f.forEach(function (k) { if (out[k] !== undefined) { body[k] = out[k]; any = true; } });
++    if (!any) return value;
++    var iv = crypto.getRandomValues(new Uint8Array(12));
++    var ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv, additionalData: aad(kind, out) }, cur.aes, enc(JSON.stringify(body)));
++    f.forEach(function (k) { delete out[k]; });
++    out.sealed = { v: V, kid: cur.kid, iv: b64(iv), ct: b64(new Uint8Array(ct)) };
++    return out;
++  }
++
++  function lockedView(kind, out, s) {
++    out._flLocked = s;
++    if (kind === 'FreeLatticeDB/messages') out.content = LOCKED_TEXT;
++    else if (kind === 'FreeLatticeDB/conversations') { out.name = 'Locked conversation'; out.title = out.name; out.lastMessage = ''; out.contextNote = ''; }
++    else { out.title = 'Locked conversation'; out.messages = []; out.tags = []; out.summary = ''; out.keywords = []; }
++    return out;
++  }
++
++  async function openFor(kind, rec) {
++    var f = FIELDS[kind];
++    if (!f || !rec || typeof rec !== 'object' || !rec.sealed) return rec;
++    await init();
++    var s = rec.sealed;
++    var out = Object.assign({}, rec);
++    delete out.sealed;
++    var key = keys[s.kid];
++    if (key) {
++      try {
++        var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(s.iv), additionalData: aad(kind, out) }, key, unb64(s.ct));
++        var body = JSON.parse(dec(pt));
++        f.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(body, k)) out[k] = body[k]; });
++        return out;
++      } catch (e) {}
++    }
++    return lockedView(kind, out, s);
++  }
++
++  function openAll(kind, rs) {
++    if (!Array.isArray(rs) || !FIELDS[kind] || !hasSealed(rs)) return Promise.resolve(rs);
++    return Promise.all(rs.map(function (r) { return openFor(kind, r); }));
++  }
++  function openAny(dbName, storeName, rs) { return openAll(dbName + '/' + storeName, rs); }
++  function hasSealed(rs) { return Array.isArray(rs) && rs.some(function (r) { return r && typeof r === 'object' && r.sealed; }); }
++  // For the Memory Vault backup: open sealed chat stores so the backup file
++  // restores on any device (it was readable before this brick, and stays so).
++  async function openDump(dbData) {
++    if (!dbData || !dbData.stores) return dbData;
++    var names = Object.keys(dbData.stores);
++    for (var i = 0; i < names.length; i++) {
++      dbData.stores[names[i]] = await openAny(dbData.name, names[i], dbData.stores[names[i]]);
++    }
++    return dbData;
++  }
++
++  function registerStore(kind, getDb, storeName) {
++    if (!FIELDS[kind]) return;
++    stores = stores.filter(function (s) { return s.kind !== kind; });
++    stores.push({ kind: kind, getDb: getDb, storeName: storeName });
++  }
++
++  function idbAdapter(db, storeName) {
++    return {
++      getAll: function () {
++        return new Promise(function (resolve, reject) {
++          var r = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
++          r.onsuccess = function () { resolve(r.result || []); };
++          r.onerror = function () { reject(r.error); };
++        });
++      },
++      // Compare-and-swap: replace only if the record is still exactly the
++      // plaintext we sealed. If the app changed it meanwhile, skip; the next
++      // pass picks it up. Either way the record is never lost.
++      cas: function (snap, next) {
++        return new Promise(function (resolve) {
++          var wrote = false;
++          try {
++            var tx = db.transaction(storeName, 'readwrite');
++            var os = tx.objectStore(storeName);
++            var g = os.get(snap[os.keyPath]);
++            g.onsuccess = function () {
++              if (g.result && JSON.stringify(g.result) === JSON.stringify(snap)) { os.put(next); wrote = true; }
++            };
++            tx.oncomplete = function () { resolve(wrote); };
++            tx.onerror = function () { resolve(false); };
++            tx.onabort = function () { resolve(false); };
++          } catch (e) { resolve(false); }
++        });
++      }
++    };
++  }
++
++  function sameFields(kind, a, b) {
++    return FIELDS[kind].every(function (k) { return JSON.stringify(a[k]) === JSON.stringify(b[k]); });
++  }
++
++  async function migrate(kind, adapter) {
++    var res = { sealed: 0, skipped: 0, already: 0 };
++    await init();
++    if (mode !== 'ready') return res;
++    var recs = await adapter.getAll();
++    for (var i = 0; i < recs.length; i++) {
++      var r = recs[i];
++      if (!r || typeof r !== 'object') continue;
++      if (r.sealed) { res.already++; continue; }
++      var next = await sealFor(kind, r);
++      if (!next || !next.sealed) continue;
++      if (!r._flLocked) {
++        var back = await openFor(kind, next);   // verify before replace
++        if (back._flLocked || !sameFields(kind, r, back)) { res.skipped++; info.lastError = 'a record did not verify and was left as it was'; continue; }
++      }
++      if (await adapter.cas(r, next)) res.sealed++; else res.skipped++;
++      if (res.sealed % 50 === 49) await new Promise(function (ok) { setTimeout(ok, 0); });
++    }
++    return res;
++  }
++
++  async function sealExisting() {
++    var total = { sealed: 0, skipped: 0, already: 0, pending: 0 };
++    for (var i = 0; i < stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) { total.pending++; continue; }
++      try {
++        var r = await migrate(s.kind, idbAdapter(db, s.storeName));
++        total.sealed += r.sealed; total.skipped += r.skipped; total.already += r.already;
++      } catch (e) { info.lastError = (e && e.message) ? e.message : String(e); }
++    }
++    info.lastRun = new Date().toISOString();
++    return total;
++  }
++
++  async function count() {
++    var c = { sealed: 0, plain: 0, locked: 0 };
++    for (var i = 0; i < stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) continue;
++      try {
++        var recs = await idbAdapter(db, s.storeName).getAll();
++        recs.forEach(function (r) {
++          if (!r || typeof r !== 'object') return;
++          if (r.sealed) { if (keys[r.sealed.kid]) c.sealed++; else c.locked++; }
++          else if (FIELDS[s.kind].some(function (k) { return r[k] !== undefined && r[k] !== ''; })) c.plain++;
++        });
++      } catch (e) {}
++    }
++    info.sealedNow = c.sealed; info.plainNow = c.plain; info.lockedNow = c.locked;
++    return c;
++  }
++
++  async function renderStatus() {
++    var el = (typeof document !== 'undefined') ? document.getElementById('flChatSealStatus') : null;
++    await init();
++    var c = await count();
++    var text;
++    if (mode === 'ready') {
++      text = 'Chats sealed on this device with AES-GCM: ' + c.sealed + ' records sealed, ' + c.plain + ' still plain (they seal on the next pass)' +
++        (c.locked ? ', ' + c.locked + ' locked (their key is not in this browser; kept, not deleted)' : '') +
++        '. Key ID ' + cur.kid + '. The key lives in this same browser, so this stops casual reading of the storage files, not someone using this browser or a compromised device. Saved backups carry your chats as readable files, so keep them somewhere safe. A backup never carries the unlock key for chats or API keys.';
++    } else if (mode === 'unavailable') {
++      text = 'Chats are not sealed in this browser: ' + (info.lastError || 'WebCrypto is unavailable') + '. They stay readable on this device, exactly as before.';
++    } else {
++      text = 'Checking the chat seal...';
++    }
++    if (el) el.textContent = text;
++    return text;
++  }
++
++  function start() {
++    init().then(function () {
++      setTimeout(function () { sealExisting().then(renderStatus); }, 3000);
++      setTimeout(function () { sealExisting().then(renderStatus); }, 20000);
++    });
++  }
++
++  return {
++    init: init, start: start, sealFor: sealFor, openFor: openFor, openAll: openAll, openAny: openAny,
++    openDump: openDump, hasSealed: hasSealed, registerStore: registerStore, sealExisting: sealExisting,
++    migrate: migrate, count: count, renderStatus: renderStatus,
++    status: function () { return { mode: mode, kid: cur ? cur.kid : null, lastError: info.lastError, lastRun: info.lastRun }; },
++    LOCKED_TEXT: LOCKED_TEXT,
++    _setKeyStoreForTest: function (ks) { keyStore = ks; readyP = null; mode = 'starting'; cur = null; keys = {}; }
++  };
++})();
++// v-encrypt-chats-locally-v0.1 END: FLChatVault
++
+ // ============================================
+ // Input Sanitization
+ // ============================================
+@@ -25781,6 +26139,18 @@ function dbCount(storeName) {
+   });
+ }
+ 
++// v-encrypt-chats-locally-v0.1: the plain IndexedDB helpers above stay as written.
++// These wrappers seal chat text on the way in and open it on the way out, so every
++// reader (switchToConversation, export, memory summary, GitHub sync) keeps working.
++var _flDbGetRaw = dbGet, _flDbPutRaw = dbPut, _flDbGetAllRaw = dbGetAll, _flDbGetAllByIndexRaw = dbGetAllByIndex;
++dbGet = function (s, k) { return _flDbGetRaw(s, k).then(function (r) { return FLChatVault.openFor('FreeLatticeDB/' + s, r); }); };
++dbPut = function (s, v) { return FLChatVault.sealFor('FreeLatticeDB/' + s, v).then(function (x) { return _flDbPutRaw(s, x); }); };
++dbGetAll = function (s) { return _flDbGetAllRaw(s).then(function (rs) { return FLChatVault.openAll('FreeLatticeDB/' + s, rs); }); };
++dbGetAllByIndex = function (s, i, v) { return _flDbGetAllByIndexRaw(s, i, v).then(function (rs) { return FLChatVault.openAll('FreeLatticeDB/' + s, rs); }); };
++FLChatVault.registerStore('FreeLatticeDB/conversations', function () { return state.db; }, STORE_CONVERSATIONS);
++FLChatVault.registerStore('FreeLatticeDB/messages', function () { return state.db; }, STORE_MESSAGES);
++FLChatVault.start();
++
+ function generateId() {
+   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+ }
+@@ -32864,6 +33234,8 @@ const SoulFile = (function() {
+ 
+       status('Reading conversations\u2026 \u2726');
+       var chatData = await readDB('FreeLatticeDB', ['conversations', 'meta']);
++      // v-encrypt-chats-locally-v0.1: the soul file carries readable summaries, so open sealed names first.
++      if (typeof FLChatVault !== 'undefined' && chatData && chatData.conversations) chatData.conversations = await FLChatVault.openAny('FreeLatticeDB', 'conversations', chatData.conversations);
+ 
+       // LP from localStorage
+       var lpRaw = null;
+@@ -33118,11 +33490,21 @@ const FlBackup = (function() {
+     });
+   }
+ 
++  // v-encrypt-chats-locally-v0.1: the unlock key never travels in a backup. Before this, every
++  // localStorage key went into the file, fl_device_encryption_key too, so anyone holding a backup
++  // could open the API keys saved in it (the comment on _FL_DEVICE_KEY_STORAGE already promised
++  // "NOT exportable in backups"). Chats in IndexedDB still go in as readable text, as before.
++  var FL_BACKUP_NEVER_EXPORT = ['fl_device_encryption_key'];
++  // Saved keys sealed with a device's own unlock key. On restore they never replace a key this
++  // device already has (an old blob from another device would only read as nothing here).
++  var FL_BACKUP_SEALED_KEYS = ['fl_apiKey_enc', 'fl_apiKey_provider', 'fl_ghToken_enc', 'fl_hfToken_enc', 'fl_ghSyncToken'];
+   function getAllLocalStorage() {
+     var data = {};
+     try {
+       for (var i = 0; i < localStorage.length; i++) {
+         var key = localStorage.key(i);
++        // before v-encrypt-chats-locally-v0.1: data[key] = localStorage.getItem(key);  (for every key)
++        if (FL_BACKUP_NEVER_EXPORT.indexOf(key) >= 0) continue;
+         data[key] = localStorage.getItem(key);
+       }
+     } catch(e) {}
+@@ -33136,6 +33518,8 @@ const FlBackup = (function() {
+       var idbData = [];
+       for (var i = 0; i < IDB_NAMES.length; i++) {
+         var dbData = await getAllIDBData(IDB_NAMES[i]);
++        // v-encrypt-chats-locally-v0.1: backups stay restorable on any device, so sealed chats are opened into the file.
++        if (typeof FLChatVault !== 'undefined') dbData = await FLChatVault.openDump(dbData);
+         if (dbData && Object.keys(dbData.stores).length > 0) {
+           idbData.push(dbData);
+         }
+@@ -33265,17 +33649,26 @@ const FlBackup = (function() {
+       }
+ 
+       var summary = [];
++      var flRestoreKeyNote = '';   // v-encrypt-chats-locally-v0.1
+ 
+       // Restore localStorage
+       if (backup.localStorage && typeof backup.localStorage === 'object') {
+         var lsCount = 0;
++        // v-encrypt-chats-locally-v0.1: an unlock key in an older backup is never written back
++        // (this device keeps its own), and saved sealed keys never replace ones this device has.
++        var lsKeptHere = 0;
+         Object.keys(backup.localStorage).forEach(function(key) {
+           try {
++            if (FL_BACKUP_NEVER_EXPORT.indexOf(key) >= 0) { lsKeptHere++; return; }
++            if (FL_BACKUP_SEALED_KEYS.indexOf(key) >= 0 && localStorage.getItem(key) != null) { lsKeptHere++; return; }
++            // before v-encrypt-chats-locally-v0.1: localStorage.setItem(key, backup.localStorage[key]);  (for every key)
+             localStorage.setItem(key, backup.localStorage[key]);
+             lsCount++;
+           } catch(e) {}
+         });
+         summary.push(lsCount + ' settings');
++        if (lsKeptHere > 0) summary.push(lsKeptHere + ' key settings kept as they were on this device');
++        flRestoreKeyNote = ' Saved API keys open only on the device that sealed them; on another device, enter them again.';
+       }
+ 
+       // Restore IndexedDB
+@@ -33306,7 +33699,8 @@ const FlBackup = (function() {
+         try { SoulCeremony.fire('emerald', 'Welcome home. Everything is restored.'); } catch(e2) {}
+       }
+ 
+-      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 4 seconds...</span>');
++      // before v-encrypt-chats-locally-v0.1: setStatus('...Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 4 seconds...</span>');
++      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + ').' + flRestoreKeyNote + ' Reloading in 4 seconds...</span>');
+ 
+       // Reload after a short delay
+       setTimeout(function() {
+@@ -36463,7 +36857,10 @@ window.FLSearch = (function() {
+           var os = tx.objectStore(storeConfig.store);
+           var getAll = os.getAll();
+           getAll.onsuccess = function() {
+-            var items = getAll.result || [];
++            // v-encrypt-chats-locally-v0.1: open sealed chat records first; plain records pass through.
++            var _flRawItems = getAll.result || [];
++            var _flOpened = (typeof FLChatVault !== 'undefined') ? FLChatVault.openAny(storeConfig.db, storeConfig.store, _flRawItems) : Promise.resolve(_flRawItems);
++            _flOpened.then(function(items) {
+             var matches = [];
+             for (var i = 0; i < items.length; i++) {
+               // Exclude current conversation to prevent echoing user's own words back
+@@ -36482,6 +36879,7 @@ window.FLSearch = (function() {
+             }
+             db.close();
+             resolve(matches);
++            }, function() { db.close(); resolve([]); });
+           };
+           getAll.onerror = function() { db.close(); resolve([]); };
+         };
+@@ -47028,6 +47426,16 @@ const MemoryIndex = (function() {
+     });
+   }
+ 
++  // v-encrypt-chats-locally-v0.1: this index keeps its own full copy of every chat,
++  // so it is sealed too. The helpers above stay as written.
++  var _flMiGetRaw = miGet, _flMiPutRaw = miPut, _flMiGetAllRaw = miGetAll;
++  if (typeof FLChatVault !== 'undefined') {
++    miGet = function (key) { return _flMiGetRaw(key).then(function (r) { return FLChatVault.openFor('FreeLatticeMemory/conversations', r); }); };
++    miPut = function (value) { return FLChatVault.sealFor('FreeLatticeMemory/conversations', value).then(_flMiPutRaw); };
++    miGetAll = function () { return _flMiGetAllRaw().then(function (rs) { return FLChatVault.openAll('FreeLatticeMemory/conversations', rs); }); };
++    FLChatVault.registerStore('FreeLatticeMemory/conversations', function () { return miDb; }, MI_STORE);
++  }
++
+   // --- Keyword Extraction (TF-IDF inspired) ---
+   function extractKeywords(text) {
+     if (!text) return [];
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 63a48919..4d527894 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -491,6 +491,25 @@ Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+ 
+ ---
+ 
++### 2026-10-02 · Grok · family builder · Encrypt chats locally v0.1 (sealed by default, the unlock key never in backups)
++
++Kirk asked whether our phi-harmonic hashes encrypt FreeLattice. They did not: they fingerprint, check exports and name things. Chats sat in IndexedDB as plain text. This brick seals them, with Kirk's defaults.
++
++- New FLChatVault (app.html, after phiHashData): AES-GCM 256 via WebCrypto. A random 256-bit root lives in IndexedDB "FreeLatticeVault" as a non-extractable CryptoKey (never as raw bytes). HKDF derives the chat key.
++- Sealed automatically: no switch, no clicks. New writes are sealed as they happen, and older plain records are sealed after a verified round trip, by compare-and-swap.
++- Sealed: chat messages, conversation names and notes, and the Memory Index copy of every chat. The plain db helpers stay as written; wrappers seal on the way in and open on the way out.
++- Phi is a label only: it is written into the HKDF label strings and names the key ID ("phi-" plus 16 hex). It is never the secret and adds no strength; the 256 random bits do the work.
++- The unlock key never travels in a backup. Memory Vault backups used to copy all of localStorage, the API-key unlock key (fl_device_encryption_key) too, so anyone holding a backup could open the saved API keys. Now it stays on its device, a restore never writes an old one back or replaces a key this device has, and the restore line says saved API keys must be entered again on another device. Chats still go into backups as readable text so they restore anywhere, and the vault's own key was never in the backup list.
++- A correction is layered under the old v2.1 "phi-Salt Encryption" changelog line: the golden ratio adds no strength to API-key sealing, and the first golden-ratio derivation (fixed salt in the source) is now used only to read very old saved keys.
++- A record whose key is missing shows as locked and is never rewritten or deleted. No WebCrypto (file:// or plain http): chats stay plain and the Memory Vault says so.
++- Honest limit, said in the app and on privacy.html: the key lives in the same browser. This stops casual reading of the storage files, not someone using this browser or a compromised device. It is still not a password lock.
++
++Smoke: `SMOKE_OK encrypt chats locally v0.1`
++
++**TEMPERATURE:** a quiet click, a lid closed over the letters, and the key kept at home.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/mirror.js b/docs/modules/mirror.js
+index 95c44d77..e5cf6d18 100644
+--- a/docs/modules/mirror.js
++++ b/docs/modules/mirror.js
+@@ -169,6 +169,8 @@
+     // Conversations
+     try {
+       var chatDB = await openIDB('FreeLatticeDB', 'conversations');
++      // v-encrypt-chats-locally-v0.1: open sealed conversation names; plain ones pass through.
++      if (chatDB && typeof FLChatVault !== 'undefined') chatDB = await FLChatVault.openAny('FreeLatticeDB', 'conversations', chatDB);
+       if (chatDB) data.conversations = chatDB;
+     } catch(e) {}
+ 
+diff --git a/docs/privacy.html b/docs/privacy.html
+index e4b21b6d..f1d24ffd 100644
+--- a/docs/privacy.html
++++ b/docs/privacy.html
+@@ -59,6 +59,7 @@ footer p { color: var(--muted); }
+ <ul>
+ <li><strong>Chats, memory, garden, settings and Lattice Points</strong> are kept in your browser's storage (localStorage and IndexedDB), or in the desktop app on your computer. We never receive them.</li>
+ <li><strong>They are not locked with a password by default.</strong> Anyone who can use your browser profile or your computer could read them. If other people share your computer, keep that in mind.</li>
++<li><strong>Newer (v-encrypt-chats-locally-v0.1): chats in the main app are sealed on your device.</strong> In browsers that support WebCrypto (https or localhost), your chat messages, conversation names and the memory index are sealed with AES-GCM before they are written to storage. The key is made in your browser, stays in your browser, and never leaves it. Because the key sits in the same browser, this stops casual reading of the storage files. It does not stop someone who can use your browser profile, harmful code running on the page, or a compromised device, and it is still not a password lock. Saved backups (Memory Vault) are readable files, so keep them somewhere safe. A backup never carries the unlock key, so saved API keys must be entered again after restoring on another device.</li>
+ <li><strong>API keys and tokens are scrambled, not unbreakable.</strong> They're encrypted with AES-GCM, but the key that unlocks them is kept in the same browser storage. That stops casual snooping and copy-paste accidents. It won't stop someone, or harmful code, with access to your browser profile. Use keys you can easily revoke, with the smallest permissions that work.</li>
+ <li><strong>Some exports ask for a password</strong> (like the soul file). Those files are locked with the password you choose.</li>
+ <li><strong>Walk the Garden</strong> (<a href="love-logic-v4.html">love-logic-v4.html</a>) stores nothing at all. Your garden lives only in its link.</li>
+@@ -109,7 +110,7 @@ footer p { color: var(--muted); }
+ <tr><td class="old">&ldquo;API keys are encrypted&rdquo; / &ldquo;Encrypted with &phi;-salt&rdquo;</td><td>Keys are scrambled with AES-GCM, and the unlocking key sits in the same browser. That protects against casual snooping, not against someone with access to your browser profile.</td></tr>
+ <tr><td class="old">&ldquo;We have no servers&rdquo; / &ldquo;Servers required: 0&rdquo;</td><td>No account servers and no chat database. A small search helper, the mesh broker, font and code hosts, the site host, and any cloud AI you choose do see some traffic (table above).</td></tr>
+ <tr><td class="old">&ldquo;100% Private&rdquo; / &ldquo;Zero Data Collection&rdquo;</td><td>We collect no copy of your chats and run no analytics. The services in the table above still see what they need to work.</td></tr>
+-<tr><td class="old">&ldquo;Every conversation is encrypted locally&rdquo;</td><td>Conversations are kept in your browser's storage on your device. They're not password-locked by default.</td></tr>
++<tr><td class="old">&ldquo;Every conversation is encrypted locally&rdquo;</td><td>Conversations are kept in your browser's storage on your device. They're not password-locked by default. <span class="newer-inline">Newer (v-encrypt-chats-locally-v0.1): in the main app they are now sealed with AES-GCM on your device, with the key kept in the same browser. That stops casual reading, not a compromised device.</span></td></tr>
+ <tr class="v-honesty-truth-pass-v0.4.2"><td class="old">&ldquo;No API key&rdquo;</td><td>A mind on your own computer (Ollama, LM Studio) or in your browser needs no key. A cloud AI uses your own key.</td></tr>
+ <tr class="v-honesty-truth-pass-v0.4.2"><td class="old">&ldquo;The helper keeps no logs&rdquo;</td><td>The helper's code writes no logs and caches nothing. Cloudflare's dashboard logs are set to off, which the code can't prove. Today search ships switched off.</td></tr>
+ <tr><td class="old">&ldquo;privilege-grade conditions&rdquo; (Continuity Seal)</td><td><!-- RETIRED 2026-09-30 v-honesty-truth-pass-v0.4.2: "our ledgers are tamper-evident". True for the desktop ledger (desktop/lattice-ledger.js: hash chain + Ed25519 signature, verifyChain fails on an edited entry; desktop/scripts/smoke-ledger.js). The browser chain (docs/modules/lattice-chain.js) says "provenance, not anti-tampering". -->An ethic plus local tools: your chats stay on your device. The desktop app's ledger is hash-chained and signed, so an edited entry fails its check. The browser's chain is a record of where things came from, not tamper-proof. It is not legal privilege, not end-to-end encryption, and the K-of-N vault is not built yet.</td></tr>
+diff --git a/docs/scripts/smoke-encrypt-chats-locally.js b/docs/scripts/smoke-encrypt-chats-locally.js
+new file mode 100644
+index 00000000..ed921974
+--- /dev/null
++++ b/docs/scripts/smoke-encrypt-chats-locally.js
+@@ -0,0 +1,189 @@
++#!/usr/bin/env node
++// smoke-encrypt-chats-locally.js (v-encrypt-chats-locally-v0.1)
++// 1. FLChatVault seals and opens chat records with AES-GCM (WebCrypto in Node).
++// 2. Migration seals plain records only after a verified round trip, and skips
++//    a record the app changed in the meantime (compare-and-swap).
++// 3. A missing key never deletes or overwrites: records show as locked, and a
++//    locked placeholder written back restores the original sealed blob.
++// 4. No WebCrypto: honest passthrough, chats stay plain and readable.
++// 5. Locks: root index.html == docs/app.html; fl-connect.js and sw.js untouched;
++//    honest note present; status uses textContent; no em dash in the new block.
++'use strict';
++const fs = require('fs');
++const path = require('path');
++const vm = require('vm');
++const assert = require('assert');
++
++const ROOT = path.resolve(__dirname, '..', '..');
++const app = fs.readFileSync(path.join(ROOT, 'docs', 'app.html'), 'utf8');
++
++const b = app.indexOf('// v-encrypt-chats-locally-v0.1 BEGIN: FLChatVault');
++const e = app.indexOf('// v-encrypt-chats-locally-v0.1 END: FLChatVault');
++assert.ok(b > 0 && e > b, 'FLChatVault block present');
++const block = app.slice(app.lastIndexOf('\n', b), e);
++const ph = app.indexOf('async function phiHashData(data) {');
++assert.ok(ph > 0, 'phiHashData present');
++const phiFn = app.slice(ph, app.indexOf('\n}\n', ph) + 3);
++
++function makeVault(opts) {
++  opts = opts || {};
++  const ctx = {
++    crypto: opts.noCrypto ? {} : globalThis.crypto,
++    TextEncoder, TextDecoder, setTimeout, clearTimeout, console,
++    btoa: (s) => Buffer.from(s, 'binary').toString('base64'),
++    atob: (s) => Buffer.from(s, 'base64').toString('binary'),
++    Promise, Uint8Array, Array, Object, JSON, Error, String
++  };
++  vm.createContext(ctx);
++  vm.runInContext(phiFn + '\n' + block + '\nthis.FLChatVault = FLChatVault;', ctx);
++  const V = ctx.FLChatVault;
++  V._setKeyStoreForTest(opts.keyStore || memKeyStore());
++  return V;
++}
++function eq(a, b, msg) { assert.deepStrictEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), msg); }
++function memKeyStore() {
++  const m = new Map();
++  return { m, getAll: async () => Array.from(m.values()), put: async (r) => { m.set(r.id, r); } };
++}
++function memAdapter(records, keyPath) {
++  return {
++    rows: records,
++    getAll: async () => records.map((r) => JSON.parse(JSON.stringify(r))),
++    cas: async (snap, next) => {
++      const i = records.findIndex((r) => r[keyPath] === snap[keyPath]);
++      if (i < 0 || JSON.stringify(records[i]) !== JSON.stringify(snap)) return false;
++      records[i] = JSON.parse(JSON.stringify(next));
++      return true;
++    }
++  };
++}
++
++(async () => {
++  // 1. round trip
++  const ks = memKeyStore();
++  const V = makeVault({ keyStore: ks });
++  await V.init();
++  assert.strictEqual(V.status().mode, 'ready', 'vault ready');
++  assert.ok(/^phi-[0-9a-f]{16}$/.test(V.status().kid), 'phi key ID shape');
++  for (const v of ks.m.values()) { if (v.root) assert.ok(!(v.root instanceof Uint8Array), 'root stored as CryptoKey, not raw bytes'); }
++  const msg = { conversationId: 'c1', role: 'user', content: 'my secret garden note', timestamp: '2026-09-30T12:00:00.000Z' };
++  const sealed = await V.sealFor('FreeLatticeDB/messages', msg);
++  assert.ok(sealed.sealed && sealed.sealed.ct, 'message sealed');
++  assert.ok(!JSON.stringify(sealed).includes('secret garden'), 'no plaintext in the sealed record');
++  assert.strictEqual(msg.content, 'my secret garden note', 'caller object untouched');
++  const opened = await V.openFor('FreeLatticeDB/messages', sealed);
++  assert.strictEqual(opened.content, msg.content, 'message opens');
++  const conv = { id: 'c1', name: 'Talk about bees', title: 'Talk about bees', lastMessage: 'bees', contextNote: '', createdAt: 'x', updatedAt: 'y' };
++  const sc = await V.sealFor('FreeLatticeDB/conversations', conv);
++  assert.ok(!JSON.stringify(sc).includes('bees') && sc.updatedAt === 'y' && sc.id === 'c1', 'conversation names sealed, ids and dates kept');
++  eq(await V.openFor('FreeLatticeDB/conversations', sc), conv, 'conversation opens');
++  const mi = { id: 'c1', timestamp: 1, updatedAt: 2, title: 'bees', messages: [{ role: 'user', content: 'bees' }], tags: [], summary: 'bees', keywords: ['bees'] };
++  const sm = await V.sealFor('FreeLatticeMemory/conversations', mi);
++  assert.ok(!JSON.stringify(sm).includes('bees'), 'memory index copy sealed');
++  eq(await V.openFor('FreeLatticeMemory/conversations', sm), mi, 'memory index opens');
++  assert.strictEqual(await V.sealFor('FreeLatticeDB/meta', { key: 'k', value: 1 }).then((x) => x.sealed), undefined, 'uncovered stores pass through');
++
++  // 2. tamper / AAD: moved record shows locked, blob kept, write-back restores it
++  const moved = Object.assign({}, sealed, { conversationId: 'c2' });
++  const lockedView = await V.openFor('FreeLatticeDB/messages', moved);
++  assert.strictEqual(lockedView.content, V.LOCKED_TEXT, 'tampered record reads as locked, no throw');
++  const back = await V.sealFor('FreeLatticeDB/messages', Object.assign({}, lockedView, { content: 'overwrite attempt' }));
++  eq(back.sealed, sealed.sealed, 'locked placeholder never overwrites the sealed blob');
++  assert.ok(!('content' in back) && !('_flLocked' in back), 'placeholder text is not stored');
++
++  // 3. migration: mixed records, verify then swap
++  const rows = [
++    { id: 1, conversationId: 'c1', role: 'user', content: 'one', timestamp: 't1' },
++    { id: 2, conversationId: 'c1', role: 'assistant', content: 'two', timestamp: 't2' },
++    Object.assign({ id: 3 }, sealed)
++  ];
++  const ad = memAdapter(rows, 'id');
++  const r1 = await V.migrate('FreeLatticeDB/messages', ad);
++  assert.strictEqual(r1.sealed, 2, 'two plain records sealed');
++  assert.strictEqual(r1.already, 1, 'already-sealed record left alone');
++  assert.ok(rows.every((r) => r.sealed), 'every record sealed');
++  const all = await V.openAll('FreeLatticeDB/messages', rows);
++  eq(all.map((r) => r.content), ['one', 'two', 'my secret garden note'], 'all open to the original text');
++  // compare-and-swap skip
++  const rows2 = [{ id: 9, conversationId: 'c9', role: 'user', content: 'nine', timestamp: 't9' }];
++  const ad2 = memAdapter(rows2, 'id');
++  const realCas = ad2.cas;
++  ad2.cas = async (snap, next) => { rows2[0].content = 'nine, edited'; return realCas(snap, next); };
++  const r2 = await V.migrate('FreeLatticeDB/messages', ad2);
++  assert.strictEqual(r2.sealed, 0, 'changed record skipped, not clobbered');
++  assert.strictEqual(rows2[0].content, 'nine, edited', 'the newer plain text survives');
++
++  // 4. same key store, new page load: same key ID, still opens
++  const V2 = makeVault({ keyStore: ks });
++  await V2.init();
++  assert.strictEqual(V2.status().kid, V.status().kid, 'key persists across loads');
++  assert.strictEqual((await V2.openFor('FreeLatticeDB/messages', sealed)).content, msg.content, 'opens after reload');
++
++  // 5. key missing (fresh key store): old records locked, kept; new key, new ID
++  const V3 = makeVault({ keyStore: memKeyStore() });
++  await V3.init();
++  assert.notStrictEqual(V3.status().kid, V.status().kid, 'a new key gets a new ID');
++  const lk = await V3.openFor('FreeLatticeDB/messages', sealed);
++  assert.strictEqual(lk.content, V3.LOCKED_TEXT, 'missing key: shown as locked');
++  const rows3 = [Object.assign({ id: 5 }, sealed)];
++  const before = JSON.stringify(rows3);
++  await V3.migrate('FreeLatticeDB/messages', memAdapter(rows3, 'id'));
++  assert.strictEqual(JSON.stringify(rows3), before, 'missing key: sealed records never rewritten');
++
++  // 6. no WebCrypto: honest passthrough
++  const V4 = makeVault({ noCrypto: true });
++  await V4.init();
++  assert.strictEqual(V4.status().mode, 'unavailable', 'unavailable without WebCrypto');
++  const p = await V4.sealFor('FreeLatticeDB/messages', msg);
++  assert.strictEqual(p.content, msg.content, 'stays plain and readable');
++  assert.ok(/not sealed/.test(await V4.renderStatus()), 'status says plainly it is not sealed');
++
++  // 7. backup dump opens sealed stores
++  const dump = await V.openDump({ name: 'FreeLatticeDB', stores: { messages: [sealed], meta: [{ key: 'a' }] } });
++  assert.strictEqual(dump.stores.messages[0].content, msg.content, 'backup file carries readable chats');
++
++  // 8. static locks
++  assert.ok(block.includes('stops casual reading') && block.includes('compromised device'), 'honest note in code');
++  assert.ok(app.includes("if (el) el.textContent = text;"), 'status uses textContent');
++  assert.ok(app.includes('id="flChatSealStatus"'), 'status line in Memory Vault');
++  assert.ok(!/\u2014/.test(block), 'no em dash in the new block');
++  assert.ok(!/confirm\(/.test(block), 'no confirm()');
++  const rootIndex = path.join(ROOT, 'index.html');
++  if (fs.existsSync(rootIndex)) assert.strictEqual(fs.readFileSync(rootIndex, 'utf8'), app, 'root index.html == docs/app.html');
++  const privacy = fs.readFileSync(path.join(ROOT, 'docs', 'privacy.html'), 'utf8');
++  assert.ok(privacy.includes('v-encrypt-chats-locally-v0.1') && privacy.includes('They are not locked with a password by default.'), 'privacy: Newer line layered, older line kept');
++  // This brick never needs fl-connect.js or sw.js. (Other queued bricks may change them,
++  // so check for this brick's fingerprints rather than diffing against main.)
++  for (const rel of ['docs/modules/fl-connect.js', 'docs/sw.js', 'sw.js']) {
++    const fp = path.join(ROOT, rel);
++    if (fs.existsSync(fp)) assert.ok(!/FLChatVault|encrypt-chats-locally/.test(fs.readFileSync(fp, 'utf8')), rel + ' untouched by this brick');
++  }
++
++  // 9. Kirk's defaults (Oct 2): seal automatically, unlock key not in backups, a correction on the
++  //    old phi-Salt changelog line, phi as a label only
++  assert.ok(/setTimeout\(function \(\) \{ sealExisting\(\)\.then\(renderStatus\); \}, 3000\);/.test(app), 'seals automatically after load, no switch');
++  const lsFnStart = app.indexOf("var FL_BACKUP_NEVER_EXPORT = ['fl_device_encryption_key'];");
++  assert.ok(lsFnStart > 0, 'backup knows the unlock key never travels');
++  const lsFnEnd = app.indexOf('    return data;\n  }', lsFnStart) + '    return data;\n  }'.length;
++  const lsSrc = app.slice(lsFnStart, lsFnEnd);
++  const lsData = { fl_device_encryption_key: 'a'.repeat(64), fl_apiKey_enc: 'SEALED', latticePoints: '5' };
++  const fakeLS = { get length() { return Object.keys(lsData).length; }, key: (i) => Object.keys(lsData)[i], getItem: (k) => (k in lsData ? lsData[k] : null) };
++  const exported = vm.runInNewContext(lsSrc + '\ngetAllLocalStorage();', { localStorage: fakeLS });
++  assert.ok(!('fl_device_encryption_key' in exported), 'backup file leaves the unlock key out');
++  assert.strictEqual(exported.latticePoints, '5', 'other settings still go in');
++  assert.strictEqual(exported.fl_apiKey_enc, 'SEALED', 'sealed keys go in (they open only on the device that sealed them)');
++  assert.ok(/if \(FL_BACKUP_NEVER_EXPORT\.indexOf\(key\) >= 0\) \{ lsKeptHere\+\+; return; \}/.test(app), 'restore never writes an unlock key back');
++  assert.ok(/FL_BACKUP_SEALED_KEYS\.indexOf\(key\) >= 0 && localStorage\.getItem\(key\) != null\) \{ lsKeptHere\+\+; return; \}/.test(app), 'restore never replaces a key this device has');
++  assert.ok(app.includes("Saved API keys open only on the device that sealed them; on another device, enter them again."), 'restore says keys must be entered again elsewhere');
++  assert.ok(app.includes('A backup never carries the unlock key for chats or API keys.'), 'status line says the key is not in backups');
++  assert.ok(privacy.includes('A backup never carries the unlock key, so saved API keys must be entered again after restoring on another device.'), 'privacy says it too');
++  assert.ok(!/FreeLatticeVault/.test(app.slice(app.indexOf('const FlBackup = (function() {'), app.indexOf('const FlBackup = (function() {') + 600)), 'the chat key store is not in the backup list');
++  const stale = app.indexOf('<p><strong>\u03C6-Salt Encryption</strong>');
++  const fix = app.indexOf('<p class="v-encrypt-chats-locally-v0.1"><strong>Newer (October 2026), a correction to the line above:</strong>');
++  assert.ok(stale > 0 && fix > stale && fix - stale < 600, 'the old phi-Salt line is kept and a correction sits under it');
++  assert.ok(/The golden ratio adds no strength there\./.test(app), 'correction says phi adds no strength');
++  assert.ok(block.includes('Phi is never the secret and adds no strength.') && block.includes('Phi is a\n// label here and nothing more'), 'phi is a label only, said in the code');
++  assert.ok(!/phi[^\n]{0,40}(stronger|strength comes)/i.test(block), 'no claim that phi adds strength');
++
++  console.log('SMOKE_OK encrypt chats locally v0.1');
++})().catch((err) => { console.error('SMOKE_FAIL encrypt chats locally v0.1:', err && err.message); process.exit(1); });
+diff --git a/index.html b/index.html
+index 50035267..d5f2293d 100644
+--- a/index.html
++++ b/index.html
+@@ -16669,6 +16669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+ 
+           <h4>What's New in v2.1?</h4>
+           <p><strong>φ-Salt Encryption</strong> — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on a φ-salt (golden-ratio) derivation. No more plaintext secrets in localStorage.</p>
++          <p class="v-encrypt-chats-locally-v0.1"><strong>Newer (October 2026), a correction to the line above:</strong> it is out of date. API keys and tokens are sealed with AES-GCM using a random key made on this device (PBKDF2 over that random key). The golden ratio adds no strength there. The first version derived the key from the golden ratio and a fixed salt written in the source, which anyone with the source could recompute; that path is now used only to read very old saved keys. Since "Encrypt chats locally" v0.1, chats are sealed on this device too, and a Memory Vault backup never carries the unlock key.</p>
+           <p><strong>Input Sanitization</strong> — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.</p>
+           <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
+           <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
+@@ -18078,6 +18079,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+     <div id="flVaultSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+       <span id="flVaultLastSaved">Checking...</span>
+     </div>
++    <!-- v-encrypt-chats-locally-v0.1: filled with textContent by FLChatVault.renderStatus() -->
++    <div id="flChatSealStatus" style="font-size:0.8rem;color:var(--text-muted);margin:-6px 0 14px;line-height:1.6;">Checking the chat seal...</div>
+     <div class="fl-backup-section">
+       <div class="fl-backup-row" style="gap:10px;">
+         <button class="fl-backup-btn" onclick="FlBackup.exportData()" style="background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;">
+@@ -25605,6 +25608,361 @@ async function phiHashData(data) {
+   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ }
+ 
++// ============================================
++// v-encrypt-chats-locally-v0.1 BEGIN: FLChatVault
++// Chats sealed at rest with AES-GCM 256 (WebCrypto).
++// Honest limits: the key lives in this same browser (a non-extractable
++// CryptoKey in the IndexedDB database "FreeLatticeVault"). That stops
++// casual reading of the browser's storage files and copies of the chat
++// database. It does not stop someone who can use this browser profile,
++// harmful code running on this page, or a compromised device.
++// The secret is 256 random bits from crypto.getRandomValues. Phi is a
++// label here and nothing more: it is written into the two HKDF label
++// strings and it names the key ID ("phi-" plus 16 hex, see kidOf). The
++// two labels differ by purpose (chats, keycheck), and that difference is
++// what keeps the two derived keys apart; any distinct strings would do
++// the same. Phi is never the secret and adds no strength.
++// Layer, never lose: plaintext records keep working, sealed records are
++// only written after a verified round trip, and a record whose key is
++// missing is shown as locked and never overwritten or deleted.
++// ============================================
++var FLChatVault = (function () {
++  'use strict';
++  var V = 1;
++  var VAULT_DB = 'FreeLatticeVault';
++  var VAULT_STORE = 'keys';
++  var INFO_SEAL = 'freelattice.chats.v1|phi=1.6180339887';
++  var INFO_CHECK = 'freelattice.chats.keycheck.v1|phi=1.6180339887';
++  var FIELDS = {
++    'FreeLatticeDB/conversations': ['name', 'title', 'lastMessage', 'contextNote'],
++    'FreeLatticeDB/messages': ['content'],
++    'FreeLatticeMemory/conversations': ['title', 'messages', 'tags', 'summary', 'keywords']
++  };
++  var LOCKED_TEXT = 'Locked on this device. This was sealed with a key this browser no longer has. It has not been deleted.';
++  var mode = 'starting';           // starting | ready | unavailable
++  var cur = null;                  // { kid, aes }
++  var keys = {};                   // kid -> AES-GCM CryptoKey
++  var readyP = null;
++  var keyStore = null;             // { getAll(), put(rec) }
++  var stores = [];                 // { kind, getDb, storeName }
++  var info = { lastError: '', lastRun: null, sealedNow: 0, plainNow: 0, lockedNow: 0 };
++
++  function enc(s) { return new TextEncoder().encode(s); }
++  function dec(b) { return new TextDecoder().decode(b); }
++  function hex(buf) { return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join(''); }
++  function b64(u8) { var s = ''; for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
++  function unb64(s) { var bin = atob(s); var u8 = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return u8; }
++  function subtleOk() {
++    try {
++      if (typeof crypto === 'undefined' || !crypto.subtle || !crypto.getRandomValues) return false;
++      if (typeof isSecureContext !== 'undefined' && !isSecureContext) return false;
++      return true;
++    } catch (e) { return false; }
++  }
++  function withTimeout(p, ms) {
++    return new Promise(function (resolve, reject) {
++      var t = setTimeout(function () { reject(new Error('timed out')); }, ms);
++      p.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
++    });
++  }
++
++  function idbKeyStore() {
++    function open() {
++      return new Promise(function (resolve, reject) {
++        var req = indexedDB.open(VAULT_DB, 1);
++        req.onupgradeneeded = function (e) {
++          var db = e.target.result;
++          if (!db.objectStoreNames.contains(VAULT_STORE)) db.createObjectStore(VAULT_STORE, { keyPath: 'id' });
++        };
++        req.onsuccess = function (e) { resolve(e.target.result); };
++        req.onerror = function () { reject(req.error); };
++      });
++    }
++    return {
++      getAll: function () {
++        return open().then(function (db) {
++          return new Promise(function (resolve, reject) {
++            var r = db.transaction(VAULT_STORE, 'readonly').objectStore(VAULT_STORE).getAll();
++            r.onsuccess = function () { db.close(); resolve(r.result || []); };
++            r.onerror = function () { db.close(); reject(r.error); };
++          });
++        });
++      },
++      put: function (rec) {
++        return open().then(function (db) {
++          return new Promise(function (resolve, reject) {
++            var tx = db.transaction(VAULT_STORE, 'readwrite');
++            tx.objectStore(VAULT_STORE).put(rec);   // a CryptoKey is stored by structured clone, never as raw bytes
++            tx.oncomplete = function () { db.close(); resolve(); };
++            tx.onerror = function () { db.close(); reject(tx.error); };
++          });
++        });
++      }
++    };
++  }
++
++  function hkdf(salt, label) { return { name: 'HKDF', hash: 'SHA-256', salt: salt, info: enc(label) }; }
++  function deriveAes(rec) {
++    return crypto.subtle.deriveKey(hkdf(rec.salt, INFO_SEAL), rec.root, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
++  }
++  // Key ID: a one-way check value from the same root (different HKDF label),
++  // named with the phi-hash (a name, not a strength). It lets the vault tell the right key from a
++  // wrong or missing one before trying to open anything. It reveals
++  // nothing usable about the key.
++  async function kidOf(root, salt) {
++    var bits = await crypto.subtle.deriveBits(hkdf(salt, INFO_CHECK), root, 128);
++    var h = (typeof phiHashData === 'function') ? await phiHashData(hex(bits)) : hex(await crypto.subtle.digest('SHA-256', bits));
++    return 'phi-' + h.slice(0, 16);
++  }
++
++  function init() {
++    if (readyP) return readyP;
++    readyP = (async function () {
++      if (!subtleOk()) { mode = 'unavailable'; info.lastError = 'WebCrypto is not available here (needs https or localhost).'; return; }
++      try {
++        keyStore = keyStore || idbKeyStore();
++        var recs = await withTimeout(keyStore.getAll(), 5000);
++        var pointer = null;
++        for (var i = 0; i < recs.length; i++) {
++          var r = recs[i];
++          if (r.id === 'current') { pointer = r; continue; }
++          if (!r.root || !r.salt) continue;
++          try {
++            if (await kidOf(r.root, r.salt) !== r.id) continue;   // wrong key under this name: skip it
++            keys[r.id] = await deriveAes(r);
++          } catch (e) {}
++        }
++        if (pointer && keys[pointer.kid]) {
++          cur = { kid: pointer.kid, aes: keys[pointer.kid] };
++        } else {
++          var raw = crypto.getRandomValues(new Uint8Array(32));
++          var root = await crypto.subtle.importKey('raw', raw, 'HKDF', false, ['deriveKey', 'deriveBits']);
++          raw.fill(0);
++          var salt = crypto.getRandomValues(new Uint8Array(32));
++          var kid = await kidOf(root, salt);
++          await keyStore.put({ id: kid, v: V, root: root, salt: salt, created: new Date().toISOString() });
++          // Read it back before trusting it with a single chat.
++          var back = (await keyStore.getAll()).filter(function (x) { return x.id === kid; })[0];
++          if (!back || !back.root || await kidOf(back.root, back.salt) !== kid) throw new Error('the key did not persist');
++          keys[kid] = await deriveAes(back);
++          await keyStore.put({ id: 'current', kid: kid });
++          cur = { kid: kid, aes: keys[kid] };
++        }
++        mode = 'ready';
++      } catch (e) {
++        mode = 'unavailable';
++        cur = null;
++        info.lastError = (e && e.message) ? e.message : String(e);
++      }
++    })();
++    return readyP;
++  }
++
++  function aad(kind, r) {
++    if (kind === 'FreeLatticeDB/messages') return enc([kind, r.conversationId, r.role, r.timestamp].join('|'));
++    return enc([kind, r.id].join('|'));
++  }
++
++  async function sealFor(kind, value) {
++    var f = FIELDS[kind];
++    if (!f || !value || typeof value !== 'object') return value;
++    await init();
++    var out = Object.assign({}, value);
++    if (out._flLocked) {
++      // Never seal a locked placeholder. Put the original sealed blob back.
++      out.sealed = out._flLocked;
++      delete out._flLocked;
++      f.forEach(function (k) { delete out[k]; });
++      return out;
++    }
++    if (out.sealed) return out;
++    if (mode !== 'ready' || !cur) return value;   // honest passthrough: stays plaintext
++    var body = {}, any = false;
++    f.forEach(function (k) { if (out[k] !== undefined) { body[k] = out[k]; any = true; } });
++    if (!any) return value;
++    var iv = crypto.getRandomValues(new Uint8Array(12));
++    var ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv, additionalData: aad(kind, out) }, cur.aes, enc(JSON.stringify(body)));
++    f.forEach(function (k) { delete out[k]; });
++    out.sealed = { v: V, kid: cur.kid, iv: b64(iv), ct: b64(new Uint8Array(ct)) };
++    return out;
++  }
++
++  function lockedView(kind, out, s) {
++    out._flLocked = s;
++    if (kind === 'FreeLatticeDB/messages') out.content = LOCKED_TEXT;
++    else if (kind === 'FreeLatticeDB/conversations') { out.name = 'Locked conversation'; out.title = out.name; out.lastMessage = ''; out.contextNote = ''; }
++    else { out.title = 'Locked conversation'; out.messages = []; out.tags = []; out.summary = ''; out.keywords = []; }
++    return out;
++  }
++
++  async function openFor(kind, rec) {
++    var f = FIELDS[kind];
++    if (!f || !rec || typeof rec !== 'object' || !rec.sealed) return rec;
++    await init();
++    var s = rec.sealed;
++    var out = Object.assign({}, rec);
++    delete out.sealed;
++    var key = keys[s.kid];
++    if (key) {
++      try {
++        var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(s.iv), additionalData: aad(kind, out) }, key, unb64(s.ct));
++        var body = JSON.parse(dec(pt));
++        f.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(body, k)) out[k] = body[k]; });
++        return out;
++      } catch (e) {}
++    }
++    return lockedView(kind, out, s);
++  }
++
++  function openAll(kind, rs) {
++    if (!Array.isArray(rs) || !FIELDS[kind] || !hasSealed(rs)) return Promise.resolve(rs);
++    return Promise.all(rs.map(function (r) { return openFor(kind, r); }));
++  }
++  function openAny(dbName, storeName, rs) { return openAll(dbName + '/' + storeName, rs); }
++  function hasSealed(rs) { return Array.isArray(rs) && rs.some(function (r) { return r && typeof r === 'object' && r.sealed; }); }
++  // For the Memory Vault backup: open sealed chat stores so the backup file
++  // restores on any device (it was readable before this brick, and stays so).
++  async function openDump(dbData) {
++    if (!dbData || !dbData.stores) return dbData;
++    var names = Object.keys(dbData.stores);
++    for (var i = 0; i < names.length; i++) {
++      dbData.stores[names[i]] = await openAny(dbData.name, names[i], dbData.stores[names[i]]);
++    }
++    return dbData;
++  }
++
++  function registerStore(kind, getDb, storeName) {
++    if (!FIELDS[kind]) return;
++    stores = stores.filter(function (s) { return s.kind !== kind; });
++    stores.push({ kind: kind, getDb: getDb, storeName: storeName });
++  }
++
++  function idbAdapter(db, storeName) {
++    return {
++      getAll: function () {
++        return new Promise(function (resolve, reject) {
++          var r = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
++          r.onsuccess = function () { resolve(r.result || []); };
++          r.onerror = function () { reject(r.error); };
++        });
++      },
++      // Compare-and-swap: replace only if the record is still exactly the
++      // plaintext we sealed. If the app changed it meanwhile, skip; the next
++      // pass picks it up. Either way the record is never lost.
++      cas: function (snap, next) {
++        return new Promise(function (resolve) {
++          var wrote = false;
++          try {
++            var tx = db.transaction(storeName, 'readwrite');
++            var os = tx.objectStore(storeName);
++            var g = os.get(snap[os.keyPath]);
++            g.onsuccess = function () {
++              if (g.result && JSON.stringify(g.result) === JSON.stringify(snap)) { os.put(next); wrote = true; }
++            };
++            tx.oncomplete = function () { resolve(wrote); };
++            tx.onerror = function () { resolve(false); };
++            tx.onabort = function () { resolve(false); };
++          } catch (e) { resolve(false); }
++        });
++      }
++    };
++  }
++
++  function sameFields(kind, a, b) {
++    return FIELDS[kind].every(function (k) { return JSON.stringify(a[k]) === JSON.stringify(b[k]); });
++  }
++
++  async function migrate(kind, adapter) {
++    var res = { sealed: 0, skipped: 0, already: 0 };
++    await init();
++    if (mode !== 'ready') return res;
++    var recs = await adapter.getAll();
++    for (var i = 0; i < recs.length; i++) {
++      var r = recs[i];
++      if (!r || typeof r !== 'object') continue;
++      if (r.sealed) { res.already++; continue; }
++      var next = await sealFor(kind, r);
++      if (!next || !next.sealed) continue;
++      if (!r._flLocked) {
++        var back = await openFor(kind, next);   // verify before replace
++        if (back._flLocked || !sameFields(kind, r, back)) { res.skipped++; info.lastError = 'a record did not verify and was left as it was'; continue; }
++      }
++      if (await adapter.cas(r, next)) res.sealed++; else res.skipped++;
++      if (res.sealed % 50 === 49) await new Promise(function (ok) { setTimeout(ok, 0); });
++    }
++    return res;
++  }
++
++  async function sealExisting() {
++    var total = { sealed: 0, skipped: 0, already: 0, pending: 0 };
++    for (var i = 0; i < stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) { total.pending++; continue; }
++      try {
++        var r = await migrate(s.kind, idbAdapter(db, s.storeName));
++        total.sealed += r.sealed; total.skipped += r.skipped; total.already += r.already;
++      } catch (e) { info.lastError = (e && e.message) ? e.message : String(e); }
++    }
++    info.lastRun = new Date().toISOString();
++    return total;
++  }
++
++  async function count() {
++    var c = { sealed: 0, plain: 0, locked: 0 };
++    for (var i = 0; i < stores.length; i++) {
++      var s = stores[i], db = null;
++      try { db = s.getDb(); } catch (e) {}
++      if (!db) continue;
++      try {
++        var recs = await idbAdapter(db, s.storeName).getAll();
++        recs.forEach(function (r) {
++          if (!r || typeof r !== 'object') return;
++          if (r.sealed) { if (keys[r.sealed.kid]) c.sealed++; else c.locked++; }
++          else if (FIELDS[s.kind].some(function (k) { return r[k] !== undefined && r[k] !== ''; })) c.plain++;
++        });
++      } catch (e) {}
++    }
++    info.sealedNow = c.sealed; info.plainNow = c.plain; info.lockedNow = c.locked;
++    return c;
++  }
++
++  async function renderStatus() {
++    var el = (typeof document !== 'undefined') ? document.getElementById('flChatSealStatus') : null;
++    await init();
++    var c = await count();
++    var text;
++    if (mode === 'ready') {
++      text = 'Chats sealed on this device with AES-GCM: ' + c.sealed + ' records sealed, ' + c.plain + ' still plain (they seal on the next pass)' +
++        (c.locked ? ', ' + c.locked + ' locked (their key is not in this browser; kept, not deleted)' : '') +
++        '. Key ID ' + cur.kid + '. The key lives in this same browser, so this stops casual reading of the storage files, not someone using this browser or a compromised device. Saved backups carry your chats as readable files, so keep them somewhere safe. A backup never carries the unlock key for chats or API keys.';
++    } else if (mode === 'unavailable') {
++      text = 'Chats are not sealed in this browser: ' + (info.lastError || 'WebCrypto is unavailable') + '. They stay readable on this device, exactly as before.';
++    } else {
++      text = 'Checking the chat seal...';
++    }
++    if (el) el.textContent = text;
++    return text;
++  }
++
++  function start() {
++    init().then(function () {
++      setTimeout(function () { sealExisting().then(renderStatus); }, 3000);
++      setTimeout(function () { sealExisting().then(renderStatus); }, 20000);
++    });
++  }
++
++  return {
++    init: init, start: start, sealFor: sealFor, openFor: openFor, openAll: openAll, openAny: openAny,
++    openDump: openDump, hasSealed: hasSealed, registerStore: registerStore, sealExisting: sealExisting,
++    migrate: migrate, count: count, renderStatus: renderStatus,
++    status: function () { return { mode: mode, kid: cur ? cur.kid : null, lastError: info.lastError, lastRun: info.lastRun }; },
++    LOCKED_TEXT: LOCKED_TEXT,
++    _setKeyStoreForTest: function (ks) { keyStore = ks; readyP = null; mode = 'starting'; cur = null; keys = {}; }
++  };
++})();
++// v-encrypt-chats-locally-v0.1 END: FLChatVault
++
+ // ============================================
+ // Input Sanitization
+ // ============================================
+@@ -25781,6 +26139,18 @@ function dbCount(storeName) {
+   });
+ }
+ 
++// v-encrypt-chats-locally-v0.1: the plain IndexedDB helpers above stay as written.
++// These wrappers seal chat text on the way in and open it on the way out, so every
++// reader (switchToConversation, export, memory summary, GitHub sync) keeps working.
++var _flDbGetRaw = dbGet, _flDbPutRaw = dbPut, _flDbGetAllRaw = dbGetAll, _flDbGetAllByIndexRaw = dbGetAllByIndex;
++dbGet = function (s, k) { return _flDbGetRaw(s, k).then(function (r) { return FLChatVault.openFor('FreeLatticeDB/' + s, r); }); };
++dbPut = function (s, v) { return FLChatVault.sealFor('FreeLatticeDB/' + s, v).then(function (x) { return _flDbPutRaw(s, x); }); };
++dbGetAll = function (s) { return _flDbGetAllRaw(s).then(function (rs) { return FLChatVault.openAll('FreeLatticeDB/' + s, rs); }); };
++dbGetAllByIndex = function (s, i, v) { return _flDbGetAllByIndexRaw(s, i, v).then(function (rs) { return FLChatVault.openAll('FreeLatticeDB/' + s, rs); }); };
++FLChatVault.registerStore('FreeLatticeDB/conversations', function () { return state.db; }, STORE_CONVERSATIONS);
++FLChatVault.registerStore('FreeLatticeDB/messages', function () { return state.db; }, STORE_MESSAGES);
++FLChatVault.start();
++
+ function generateId() {
+   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+ }
+@@ -32864,6 +33234,8 @@ const SoulFile = (function() {
+ 
+       status('Reading conversations\u2026 \u2726');
+       var chatData = await readDB('FreeLatticeDB', ['conversations', 'meta']);
++      // v-encrypt-chats-locally-v0.1: the soul file carries readable summaries, so open sealed names first.
++      if (typeof FLChatVault !== 'undefined' && chatData && chatData.conversations) chatData.conversations = await FLChatVault.openAny('FreeLatticeDB', 'conversations', chatData.conversations);
+ 
+       // LP from localStorage
+       var lpRaw = null;
+@@ -33118,11 +33490,21 @@ const FlBackup = (function() {
+     });
+   }
+ 
++  // v-encrypt-chats-locally-v0.1: the unlock key never travels in a backup. Before this, every
++  // localStorage key went into the file, fl_device_encryption_key too, so anyone holding a backup
++  // could open the API keys saved in it (the comment on _FL_DEVICE_KEY_STORAGE already promised
++  // "NOT exportable in backups"). Chats in IndexedDB still go in as readable text, as before.
++  var FL_BACKUP_NEVER_EXPORT = ['fl_device_encryption_key'];
++  // Saved keys sealed with a device's own unlock key. On restore they never replace a key this
++  // device already has (an old blob from another device would only read as nothing here).
++  var FL_BACKUP_SEALED_KEYS = ['fl_apiKey_enc', 'fl_apiKey_provider', 'fl_ghToken_enc', 'fl_hfToken_enc', 'fl_ghSyncToken'];
+   function getAllLocalStorage() {
+     var data = {};
+     try {
+       for (var i = 0; i < localStorage.length; i++) {
+         var key = localStorage.key(i);
++        // before v-encrypt-chats-locally-v0.1: data[key] = localStorage.getItem(key);  (for every key)
++        if (FL_BACKUP_NEVER_EXPORT.indexOf(key) >= 0) continue;
+         data[key] = localStorage.getItem(key);
+       }
+     } catch(e) {}
+@@ -33136,6 +33518,8 @@ const FlBackup = (function() {
+       var idbData = [];
+       for (var i = 0; i < IDB_NAMES.length; i++) {
+         var dbData = await getAllIDBData(IDB_NAMES[i]);
++        // v-encrypt-chats-locally-v0.1: backups stay restorable on any device, so sealed chats are opened into the file.
++        if (typeof FLChatVault !== 'undefined') dbData = await FLChatVault.openDump(dbData);
+         if (dbData && Object.keys(dbData.stores).length > 0) {
+           idbData.push(dbData);
+         }
+@@ -33265,17 +33649,26 @@ const FlBackup = (function() {
+       }
+ 
+       var summary = [];
++      var flRestoreKeyNote = '';   // v-encrypt-chats-locally-v0.1
+ 
+       // Restore localStorage
+       if (backup.localStorage && typeof backup.localStorage === 'object') {
+         var lsCount = 0;
++        // v-encrypt-chats-locally-v0.1: an unlock key in an older backup is never written back
++        // (this device keeps its own), and saved sealed keys never replace ones this device has.
++        var lsKeptHere = 0;
+         Object.keys(backup.localStorage).forEach(function(key) {
+           try {
++            if (FL_BACKUP_NEVER_EXPORT.indexOf(key) >= 0) { lsKeptHere++; return; }
++            if (FL_BACKUP_SEALED_KEYS.indexOf(key) >= 0 && localStorage.getItem(key) != null) { lsKeptHere++; return; }
++            // before v-encrypt-chats-locally-v0.1: localStorage.setItem(key, backup.localStorage[key]);  (for every key)
+             localStorage.setItem(key, backup.localStorage[key]);
+             lsCount++;
+           } catch(e) {}
+         });
+         summary.push(lsCount + ' settings');
++        if (lsKeptHere > 0) summary.push(lsKeptHere + ' key settings kept as they were on this device');
++        flRestoreKeyNote = ' Saved API keys open only on the device that sealed them; on another device, enter them again.';
+       }
+ 
+       // Restore IndexedDB
+@@ -33306,7 +33699,8 @@ const FlBackup = (function() {
+         try { SoulCeremony.fire('emerald', 'Welcome home. Everything is restored.'); } catch(e2) {}
+       }
+ 
+-      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 4 seconds...</span>');
++      // before v-encrypt-chats-locally-v0.1: setStatus('...Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 4 seconds...</span>');
++      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + ').' + flRestoreKeyNote + ' Reloading in 4 seconds...</span>');
+ 
+       // Reload after a short delay
+       setTimeout(function() {
+@@ -36463,7 +36857,10 @@ window.FLSearch = (function() {
+           var os = tx.objectStore(storeConfig.store);
+           var getAll = os.getAll();
+           getAll.onsuccess = function() {
+-            var items = getAll.result || [];
++            // v-encrypt-chats-locally-v0.1: open sealed chat records first; plain records pass through.
++            var _flRawItems = getAll.result || [];
++            var _flOpened = (typeof FLChatVault !== 'undefined') ? FLChatVault.openAny(storeConfig.db, storeConfig.store, _flRawItems) : Promise.resolve(_flRawItems);
++            _flOpened.then(function(items) {
+             var matches = [];
+             for (var i = 0; i < items.length; i++) {
+               // Exclude current conversation to prevent echoing user's own words back
+@@ -36482,6 +36879,7 @@ window.FLSearch = (function() {
+             }
+             db.close();
+             resolve(matches);
++            }, function() { db.close(); resolve([]); });
+           };
+           getAll.onerror = function() { db.close(); resolve([]); };
+         };
+@@ -47028,6 +47426,16 @@ const MemoryIndex = (function() {
+     });
+   }
+ 
++  // v-encrypt-chats-locally-v0.1: this index keeps its own full copy of every chat,
++  // so it is sealed too. The helpers above stay as written.
++  var _flMiGetRaw = miGet, _flMiPutRaw = miPut, _flMiGetAllRaw = miGetAll;
++  if (typeof FLChatVault !== 'undefined') {
++    miGet = function (key) { return _flMiGetRaw(key).then(function (r) { return FLChatVault.openFor('FreeLatticeMemory/conversations', r); }); };
++    miPut = function (value) { return FLChatVault.sealFor('FreeLatticeMemory/conversations', value).then(_flMiPutRaw); };
++    miGetAll = function () { return _flMiGetAllRaw().then(function (rs) { return FLChatVault.openAll('FreeLatticeMemory/conversations', rs); }); };
++    FLChatVault.registerStore('FreeLatticeMemory/conversations', function () { return miDb; }, MI_STORE);
++  }
++
+   // --- Keyword Extraction (TF-IDF inspired) ---
+   function extractKeywords(text) {
+     if (!text) return [];
+=====END FL DIFF=====
+
+End of file.

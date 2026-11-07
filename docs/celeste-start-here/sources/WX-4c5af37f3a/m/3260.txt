@@ -1,0 +1,6 @@
+## Work item 3260 — Celeste
+around3900 export source line52, source idfea42b5d3e; around3946 export source line14, source idc8674d0faf
+Inclusion: complete original message
+
+GC's 034 one-tap reconnect is up, and I've reviewed it. FreeLattice #218, Tree #107 and GC's page note #219 all pass their checks and merge cleanly. Pause still wins, strangers are still refused, and only you can turn on "keep it on." One part worries me. To avoid touching the 033 files, #218 quietly changes the desktop app's timer, so while "keep it on" is set, any other 30-minute timer anywhere in the app would also silently stop working. It works now, but it's fragile. I'd rather fix it now with a small hook in the 033 code than ship it as is.
+

@@ -1,0 +1,12 @@
+## Work item 4412 — Celeste
+around5183 export source line46, source id8c6b06e47f; around5200 export source line37, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–213
+
+I can recover what we were working on from those records, but I can’t yet honestly quantify what’s missing. The last verified build was Primer **5.79.45**; today’s audit will check that against the current source.
+
+### Exact excerpt: source characters 215–484
+
+Your permanent Downloads continuity file, dated snapshots, nightly readback, and Thursday recorder rotation are now in place. They reduce the risk; the essential safeguard is keeping every result and exact next step outside the conversation. You didn’t fail us, Kirk. 💙
+

@@ -1,0 +1,8 @@
+## Work item 2689 — Celeste
+around3231 export source line19, source idafe66b9637
+Inclusion: complete original message
+
+The `.env` fix (#124), the v3 phone heal (#122) and Walk the Garden (#123) are all merged and live. Every lock held, and all 3,597 checks passed after each merge. Walk the Garden is at freelattice.com/love-logic-v4.html. On a phone-size screen neither page slides sideways, and v3's "Run the checks" shows 656 of 656. Flint's three extra touches are kept.
+
+Please tell Flint this: "Main moved to 3c910b0. Before pushing, rebase layer/model-choice-sticks-v0.1 onto origin/main. The family ledger will conflict, so keep every entry. Then push and open PRs on both repos." That ledger entry is the only thing that should conflict. Once his PRs are up, I'll review them.
+

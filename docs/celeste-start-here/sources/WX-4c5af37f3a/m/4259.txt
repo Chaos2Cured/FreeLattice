@@ -1,0 +1,10 @@
+## Work item 4259 — Celeste
+around5000 export source line54, source id983886125a; around5042 export source line22, source id9f8f308ecc
+Inclusion: complete original message
+
+Wonder Mind Lab is on main as `f554627f`, and #322 is closed. Once Pages catches up you'll see it at [Wonder Mind Lab](https://freelattice.com/docs/wonder-mind-lab.html) and [Wonder Mind Failures](https://freelattice.com/docs/wonder-mind-failures.html).
+
+One important catch: Hypha's honesty HOLD is not in that merge yet. The live page still says "Thirteen variants" and "fingerprint verified." So please still give GC `067y-wonder-lab-honesty.txt`. I've asked Hypha to walk the live pages anyway.
+
+Small domain note: the Wix WHOIS for freelattice.com lists Superior, AL with zip 80027, which is a Colorado zip. If that state letter is wrong, it's worth fixing in Wix so the contact stays accurate.
+

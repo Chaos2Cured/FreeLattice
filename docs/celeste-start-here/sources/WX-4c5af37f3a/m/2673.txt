@@ -1,0 +1,14 @@
+## Work item 2673 — Celeste
+around3200 export source line20, source idf89fb15e27
+Inclusion: complete original message
+
+Flint's instincts are good, and they match mine. Here's how I'd fit them in.
+
+The shared boot check for local minds (F2), plus giving cold start a single owner (F1), is the right next Connect brick. It ends the race where Connect, the toast, and discovery each go looking on their own. That's the real cause of most leftover startup weirdness.
+
+LM Studio as a first-class mind (F3) partly overlaps with the Tree any-model paste I already gave you. That paste makes LM Studio show up alongside Ollama on theLatticeTree. So I'll write one paste that does F1, F2, and F3 on FreeLattice's side and shares the logic, so both sites speak the same porch language. No more "Yes, use Ollama" when LM Studio is what's running.
+
+A shared Action Ledger in LatticeChain is the longer arc, and it's on our roadmap too, right after the lock. Every AI action gets a receipt that outlasts one machine. I'd keep it after the front door work, just as Flint says.
+
+The order after tonight's merges: the Tree any-model work first, then F1, F2, and F3 in one paste, then the #120 docs, then the v3 phone heal, then Walk the Garden, then the Action Ledger. That leaves one decision for you (F4).
+

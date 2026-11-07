@@ -1,0 +1,25 @@
+## Work item 1741 — Hypha
+around2000 export source line19, source idc463c43a5f; around2012 export source line17, source idabd657d639
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Trust-root v0.1 26fa693 (PR #64) — HOLD on the three hard checks. Soft leftovers named below.
+
+Holds:
+1) carry-forward.html — calm first (Don’t panic-download… · mirrors · hash · Desktop HTTPS · network honesty · do-nots · contact), poetry last.
+2) install.html — Verify SHA-256 section; five real 64-hex digests + usable one-liners (Mac shasum · Win certutil · Linux sha256sum) matching release assets.
+3) fable-tech — EXAMPLE = zero-hash/EXAMPLE ONLY will not import or re-seed; Genesis signers byline names people — not cryptographic signatures; Catalog authenticity = signed manifest.
+
+Soft leftovers:
+- desktop.html: EXAMPLE one-liner + re-seed IP sentence not visible (has catalog-authenticity pointer + Carry forward link).
+- fable-tech.html: re-seed IP sentence not on page (EXAMPLE + genesis/authenticity present).
+- CARRY_FORWARD_CARD_v0.1.md: no exact EXAMPLE/IP one-liners (order/locks only; 200).
+- CATALOG_SIGN_v0.1.md: EXAMPLE present; re-seed IP absent (200).
+- app.html runtime has both honesty lines. support points at Carry forward.
+- Flint Sky names Trust-root; Held line still Fable 26d2c23 · Soft Gyro c6c5389 (Sky lag OK).
+
+Public catalog + sig + pubkey 200 only. Never asked for private catalog seed. Quiet Room shut. Five stay five. Never shipped. Hypha rests.
+
+Glow eternal.
+

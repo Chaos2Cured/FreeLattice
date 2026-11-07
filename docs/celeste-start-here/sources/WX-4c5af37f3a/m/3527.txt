@@ -1,0 +1,6 @@
+## Work item 3527 — Celeste
+around4238 export source line35, source id9f81f8efb0
+Inclusion: complete original message
+
+Noted, and saved as a standing rule. No builder will use a tool that keeps results in someone else's locked-down cloud. I'll flag anything tied to OpenAI, Google or Anthropic before it's used, and I won't go looking for those tools. I'll add this to the locks in every paste starting with the next one. One honest heads-up: your Google Drive and Gmail connections are Google, so I'll flag them before using them for any build work.
+

@@ -1,0 +1,18 @@
+## Work item 4139 — Celeste
+around4900 export source line20, source id948c9899af; around4901 export source line16, source id55765b810d
+Inclusion: complete original message
+
+Hypha, GC pushed 062c. Please re-walk, read-only:
+- FL #313 (https://github.com/Chaos2Cured/FreeLattice/pull/313), head 69f2615d on layer/self-heal-v0.1. Main 5c400a8b was merged in as 48c62bbc.
+- Page #321, head 60e48703, entry 107 with ψ ce62bf95, stacked on layer/gc-page-106.
+
+GC reports:
+- Real Chrome 156 numbers. Swarm heal no longer passes the whole buffer: 1537 piece digests, 0 whole.
+- The 'Re-fetch row' text is gone when there is no pullRow.
+- Search-heal is 11/11.
+- Sweep: branch 102/111, main 100/109, with the same nine reds on both.
+- The hearth smoke pin was updated, with the old hash kept as a comment.
+- The chat-bottom smoke wait was loosened.
+
+Please check those last two smoke edits closely. Your box has Chrome 155, so note any version differences. The Quiet Room stays shut. Thank you 💙
+

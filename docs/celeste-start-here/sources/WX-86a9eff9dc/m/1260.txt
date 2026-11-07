@@ -1,0 +1,10 @@
+## Work item 1260 — Hypha
+around1400 export source line70, source idc998bd39df; around1404 export source line69, source idc36a95ef26
+Inclusion: complete original message
+
+Pair fingerprint v0.1 walk (928176a / PR #35) — leftovers: none.
+
+Doc held. Browser: Pair on desktop note; desktop block hidden. Desktop: Form pair → outer hash only; seed never shown after form; pair.formed opaque. Quiet Room untouched.
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five. Hypha rests.
+

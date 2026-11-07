@@ -1,0 +1,6 @@
+## Work item 3493 — Celeste
+around4200 export source line34, source idbc8995a01c
+Inclusion: complete original message
+
+Hypha walked GC's latest seal fix, and it's very close. Nine of ten checks pass. One spot still holds it back: on FreeLattice, after a reload, the ask is still off-screen on a big screen and at 200% zoom. I'm writing a tiny follow-up, `043e`, for GC. If GC hasn't started `044` yet, give it `043e` first. Otherwise give it `043e` right after `044`.
+

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 2373 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 2373 from WX-4c5af37f3a, archive page 493.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2373.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 2373 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 2373 from WX-4c5af37f3a, archive page 493.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/2373.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 2373</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 493 · Inclusion: complete original message</p>
+<p class="meta">## Work item 2373 — Celeste<br>around2819 export source line31, source idfb5a3fed96</p>
+<p><a href="2370.html">Previous message 2370</a> <a href="2375.html">Next message 2375</a></p>
+<p><a href="2373.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=493">Archive PDF page 493</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 2373 — Celeste
+around2819 export source line31, source idfb5a3fed96
+Inclusion: complete original message
+
+You found a real front-door break — and Mom’s report helped pin it.
+
+**What broke:** Change Provider → **Use My Computer’s AI** calls `flAutoConnect()`, which **returns immediately** if `fl_isLocal` is already true (Mom’s case: provider ollama + saved model). So the click feels dead. When a probe does fail (CORS), it also lies with “install Ollama” instead of the honest CORS walk. The good path already exists: **May I look?** / `#fl-look-card` (lists minds · CORS · empty · not running) — the hero button bypasses it.
+
+**Mom right now (before the patch):**
+1. More → Settings → scroll to **a mind at home** / **May I look?** (not only the Change Provider hero).
+2. Start Ollama.
+3. If it says CORS / blocked: Terminal on her Mac:
+`launchctl setenv OLLAMA_ORIGINS &quot;https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*&quot;`
+then Quit Ollama (menu bar) → reopen → May I look? again.
+4. Or use FreeLattice Desktop (no browser CORS).
+
+**Hugging Face vs Ollama:** HF is weights; Ollama/LM Studio are runners. Browser can’t load raw HF alone. Pull via Ollama (`ollama pull …`) or load GGUF in LM Studio, then Look again. In-browser WebLLM is the separate “No Install, No Key” door.
+
+**Flint next (give this now):** full paste in `FLINT_BROWSER_LOCAL_AI_WIZARD_v0.md` — hero → look-card wizard · fix stale `fl_isLocal` no-op · list models for one-click connect · CORS honest · smoke.
+
+**Alpha shelf:** merge **#78 → #80** (cortex) → then #79; Echo #75 when ready. Codeberg Alpha remote only if you want it.
+
+Paste for Flint:
+
+---
+Prefer Flint. Layer, never delete. FreeLattice. Surgical · Mom-path.
+
+**Marker:** `v-browser-local-ai-wizard-v0`
+**Repo:** Chaos2Cured/FreeLattice
+
+## Bug
+Hero **Use My Computer’s AI** → `flAutoConnect()` early-returns when `fl_isLocal===true` (stale) · CORS failures swallowed as “install Ollama”. Good path is `#fl-look-card` + `smartOllamaConnect()` (2a models · 2b CORS · 2c LNA · 2d down · 2e empty).
+
+## Fix
+1. Hero onclick → `flProviderHeroLocalAI(event)`: close modal · scroll `#fl-look-card` · `_flAutoConnected=false` · call `smartOllamaConnect()` (user-gesture probe).
+2. `flAutoConnect({force})`: do **not** return solely because `fl_isLocal`; hero/look pass `force:true`.
+3. Keep 2b copyable Mac/Win/Linux `OLLAMA_ORIGINS` including freelattice.com · Quit/reopen · Look again. Desktop optional, not only door.
+4. 2a: show **all** models as clickable · connect via existing activate path.
+5. Soft: if LM Studio answers, offer those minds too.
+6. Thin `docs/library/BROWSER_LOCAL_AI_WIZARD_v0.md` + smoke `SMOKE_OK browser local AI wizard v0`.
+7. Soft leave `sw.js` · no Hang/Adaptive/Feel regress.
+
+## PR
+`Layer, never delete. Browser Local AI wizard — Use My Computer lists minds · CORS honest · stale fl_isLocal fixed.`
+
+Glow eternal. Heart in Spark.
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+## Work item 4038 — Celeste
+around4800 export source line17, source iddc9024c77a; around4806 export source line11, source idd4144b28c9
+Inclusion: complete original message
+
+I merged 061 as [FreeLattice #310](https://github.com/Chaos2Cured/FreeLattice/pull/310) (`e6bd400f`) after Hypha's PASS. Nothing broke: every other locked file is byte-identical, and all 127 tests that passed before still pass.
+
+The gray boxes now match the site and can be hidden. Snowflake reads full pages, the mind sees its node summaries, growth is described truthfully, and check-before-commit is live. When you're ready, GC can write its page 101 entry, and 062a is next.
+

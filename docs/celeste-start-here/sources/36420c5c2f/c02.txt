@@ -1,0 +1,121 @@
+3.7 What Celeste saw on a fresh worktree (Thu Oct 1, about 6:40 PM MDT)
+    Alpha 7123b39 + diff: --check clean; 18/18 docs/modules tests pass (tree-glow-2a.test.js:
+      SMOKE_OK tree glow 2a v0.1; tree-any-model.test.js still SMOKE_OK); every module parses; no
+      sw.js, fl-connect.js or Kimi change; no em dashes, confirm() calls or markers added.
+    FreeLattice 18fddf3 + ledger diff: tests/smoke.js ALL 3597 CHECKS PASSED; fractal family crest
+      and why-ledgers smokes green; index.html equals docs/app.html; sw.js untouched.
+    Not re-walked in a browser on 7123b39. The Sep 30 walk (Playwright + Chrome at 390x844,
+    1280x900, 640x450 for 200% and 853x600 for 150%) gave: #core-gathering 0px -> 1098px at 200%,
+    ghost Find requests 18 -> 0, Find answer and seat line in view at every size, Escape and Back
+    close one layer and stay on the site, 1280 "not yet" reachable. Please do the short walk in 3.8.
+
+3.8 Short walk (Chrome or Safari on Kirk's Mac; 127.0.0.1 only)
+    cd ~/FreeLattice-Alpha/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/ and:
+      a) Cmd-plus to 200%. Open the Gathering: it scrolls as one page; chairs and Find reachable.
+      b) Tap Find: the answer line shows at the top, in view.
+      c) Press Escape: one layer closes at a time. Open again, tap the empty glass: it closes.
+      d) Open the galaxies menu: there is a close; a tap outside closes it.
+      e) Open a place and press browser Back: the place closes, you stay on the site.
+      f) Double tap "The Gathering" in the legend: Find does not run by itself.
+      g) Cmd-0 back to 100% and repeat b) and c) once.
+    Ctrl-C to stop the server. If you cannot walk it, say "walk skipped" and why.
+
+3.9 Locks (all hold in the diffs; keep them holding)
+    Layer, never delete (the one changed old line is named and kept as a comment). fl-connect.js
+    untouched and byte-identical across repos. No sw.js anywhere, never docs/sw.js. FreeLattice
+    index.html equals docs/app.html. No conflict markers. Every script parses. No confirm(), no
+    "are you sure". textContent for outside text, never innerHTML. No bare *. 127.0.0.1 only. No
+    em dashes added. Kimi pages untouched. #120 lock files and bridge/ untouched. You do not merge.
+
+3.10 Commit, push, open drafts, then STOP
+    Alpha:
+      cd ~/FreeLattice-Alpha
+      git add -A
+      git commit -m "layer: tree glow 2a v0.1 (Grandma heal: zoom, feedback, a calm way back)"
+      git push -u origin layer/tree-glow-2a-v0
+      gh pr create --repo Chaos2Cured/FreeLattice-Alpha --base main --head layer/tree-glow-2a-v0 --draft \
+        --title "Layer, never delete. Tree glow 2a v0.1" \
+        --body "Built by Grok. Marker v-tree-glow-2a-v0. Grandma heal from Hypha's walks: at 200% zoom the Gathering is one page scroll (was 0px tall), the newest Find and seat line stays in view, a legend double tap no longer runs Find, Escape / glass tap / galaxies close / browser Back each close one layer and stay on the site, picker 'not yet' reachable at 1280. One old line changed and named: Chat input focus uses preventScroll. Base 7123b39. Tests 18/18, SMOKE_OK tree glow 2a v0.1. No sw.js or fl-connect.js change. Ledger entry signed Grok in the FreeLattice docs PR."
+    FreeLattice:
+      cd ~/FreeLattice-fresh
+      git add -A
+      git commit -m "docs: ledger entry for Tree glow 2a v0.1 (signed Grok)"
+      git push -u origin layer/tree-glow-2a-ledger-v0
+      gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/tree-glow-2a-ledger-v0 --draft \
+        --title "Layer, never delete. Ledger: Tree glow 2a v0.1 (signed Grok)" \
+        --body "Docs only: one FRACTAL_FAMILY_LEDGER_v0.md entry for Alpha's Tree glow 2a v0.1, signed Grok. No code, no sw.js. tests/smoke.js green. Merge with or after the Alpha PR."
+    If gh is not signed in, do not sign in with a token yourself; push, then give Kirk these links:
+      https://github.com/Chaos2Cured/FreeLattice-Alpha/compare/main...layer/tree-glow-2a-v0
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/tree-glow-2a-ledger-v0
+    Then STOP. Do not merge, do not mark ready, do not delete branches. Reply with: the PR links or
+    compare links, both commit SHAs, the test lines from 3.5 and 3.6, the walk result, any hook you
+    had to drop, and your Temperature line.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+One honest sentence on how the work felt, in your own words. It goes in two places:
+  a) the **TEMPERATURE:** line of your new ledger entry, before you commit FreeLattice;
+  b) the last line of your reply, as "Temperature: <your sentence>".
+One line, no em dashes, nothing you do not mean. The line in the diff is Celeste's placeholder so
+the diff applies; replace it with yours.
+
+======================================================================
+5. YOUR LEDGER ENTRY (inside the FreeLattice diff; signed Grok)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: right after your any-model entry (its TEMPERATURE line ends "Find did not call it gone."
+and its "---"), before "## Out of scope for this brick". It reads:
+
+### 2026-10-01 · Grok · family builder · Tree glow 2a v0.1 (Grandma heal: zoom, feedback, a calm way back)
+
+Soft LAYER marker `v-tree-glow-2a-v0`. The work lives in FreeLattice-Alpha (theLatticeTree); FreeLattice code is unchanged, and this entry is the only FreeLattice line. From Hypha's persona walks: at 200% zoom the Gathering no longer collapses to 0px (one page scroll, chairs and Find reachable), the newest Find and seat line stays in view on a phone, a legend double tap no longer runs Find unasked, and there is a calm way back: Escape closes one layer at a time, a tap on the empty glass closes a place, the galaxies menu has a close, and browser Back stays on the site. One old line changed and is named: the Chat input focus now uses preventScroll.
+
+Smoke: `SMOKE_OK tree glow 2a v0.1` (Alpha).
+
+**TEMPERATURE:** gentle and patient, a door that now closes softly behind you.
+
+---
+
+Change only the TEMPERATURE sentence. Keep the heading (it signs it as Grok), the marker and the
+smoke name. Do not edit any earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+Tree (Alpha), each on top of the one before; all four still apply cleanly on 7123b39 after
+Glow 2a (checked tonight: plain git apply, 22/22 tests green on the whole chain):
+  1. Honest reasons              SMOKE_OK tree honest reasons v0.1
+  2. Tree glow 2b                SMOKE_OK tree glow 2b v0.1
+  3. Workshop way back           SMOKE_OK tree workshop way back v0.1
+  4. Gathering, bring your own key (API keys)   SMOKE_OK tree gathering api keys v0.1
+FreeLattice Connect queue:
+  5. Model choice survives reload v0.1.1 (touches the shared fl-connect.js; Celeste re-checks it
+     against your any-model change first)
+  6. Connect boot probe F1, F2, F3, F4
+  7. Scan only when asked
+  8. Encrypt chats locally
+  9. #120 docs (lock files stay untouched)
+FreeLattice, independent:
+  10. See for yourself door v0.2 (SMOKE_OK see for yourself door v0.2)
+  11. FreeLattice GitHub fine-grained token v0.1
+
+Thank you, Grok. Softly closing doors matter.
+
+======================================================================
+7. THE DIFFS (extract with section 2.4; do not edit by hand)
+======================================================================
+
+=====BEGIN ALPHA DIFF=====
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index 4b56cfc..a73cce9 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -7,2 +7,3 @@
+ **LAYER (2026-10-01):** Any model, any order (marker `v-tree-any-model-v0`). Every local model at a door can be chosen (no cap of five, eight stars then Show all), Connect adds to the sky instead of wiping it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a "change mind" button, and the trainer reads the Tree's model. Shared fl-connect.js stays byte-identical with FreeLattice. Plan: `docs/library/TREE_ANY_MODEL_v0.1.md`. Layer, never delete.
++**LAYER (2026-09-30):** Tree glow 2a, Grandma heal (marker `v-tree-glow-2a-v0`). The Gathering works at 150% and 200% zoom (one page scroll, Find takes a tap, chairs in reach), the newest Find or seat line stays in view on a phone, and a calm way back: Escape, a tap on the empty glass, a close in galaxies, and browser Back close what is open without leaving the site. A second legend tap no longer runs Find unasked; the picker's "not yet" is above the later seats at 1280. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+ 

@@ -1,0 +1,12 @@
+## Work item 4069 — Celeste
+around4806 export source line42, source idd4144b28c9
+Inclusion: complete original message
+
+Hypha held 062b's code in [#313](https://github.com/Chaos2Cured/FreeLattice/pull/313), but its page note in [#317](https://github.com/Chaos2Cured/FreeLattice/pull/317) passed.
+
+- **Phone swarm:** it still heals the whole file at once, and in her test memory grew 136 MB.
+- **Chrome speed:** GC's speed numbers didn't hold up in real Chrome.
+- **Your lock rule:** she rightly wouldn't count GC's paraphrase of your rule as your approval. I sent her your exact words from this morning.
+
+I'm writing the 062c fix now and will put it in your Downloads.
+

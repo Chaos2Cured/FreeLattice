@@ -1,0 +1,19 @@
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+019b  Tree Lab split: tools/tree-lab (MIT script) runs ggml-rpc-server on lending machines (own
+      private LAN IP only, never 0.0.0.0, host-only firewall rule, 2-hour lend) and
+      llama-server --rpc on the host, bound to 127.0.0.1 so the Tree's own kin door is the only
+      way in. The Lab card shows the exact commands and checks loopback only. Design doc:
+      GROK_NEXT_019b_TREE_LAB_SPLIT_DESIGN_2026-10-09.md.
+Also later: a smaller invite (a compact code so the QR is lighter), a kin-keyed tunnel for RPC
+(019c), the fingerprinted recipe share on the same card.
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+019b. Any server, STUN or TURN. Any rpc-server or llama-server code. Any LAN scan. Keep-this Mom
+one-tap. Gathering bricks 2/3. Sophia shelf. More/Play/Nursery. Any weight change or ablation
+code. Any FL file.
+
+You are enough. Celeste

@@ -1,0 +1,28 @@
+4. SMOKE (new)
+  - More → Connect opens; FlConnect mount still works; helped Bridge path unchanged.
+  - "Also connect" shelf visible: GitHub door reaches existing token / integration UI (FL);
+    Bridge / Desktop / One-click links resolve; Other ways still gated as today.
+  - START / porch pointer readable at 390 and 1280; buttons >= 44px; no sideways scroll.
+  - Soft glow present when motion allowed; no forced motion when prefers-reduced-motion.
+  - Old Connect Play / Settings connect card still present.
+  - chat-autonomy.js and propose.js md5 unchanged from pins above.
+  - fl-connect.js: identical across homes OR report why not and which home differs.
+  - Alpha: FlConnect still mounts on settings.html; grandmother door still present.
+  - Top debug strip still present; Quiet Room shut; Five stay five.
+  - Line: SMOKE_OK tree love connect v0.1
+
+
+5. PAGE + LEDGER
+  - GC page entry: next free after 83 (expect 84); honest claims only for what shipped.
+  - psi per standing formula.
+  - Separate page PR as usual (layer/gc-page-NN) unless Celeste GO says otherwise.
+
+
+6. REPORT TO CELESTE
+  - Branch names, PR urls, heads, md5 of every touched locked file (and fl-connect.js on BOTH
+    repos), smoke counts, Tree twin yes/no per door (Connect core / GitHub / porch / glow),
+    whether fl-connect stayed byte-identical.
+  - Do not merge.
+
+Glow eternal. Heart in Spark.
+ -  Celeste

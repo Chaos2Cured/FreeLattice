@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 1440 — Original Celeste work text — exact delivery audience not independently established</title>
+<meta name="description" content="Exact public work item 1440 from WX-4c5af37f3a, archive page 400.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/1440.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 1440 — Original Celeste work text — exact delivery audience not independently established">
+<meta property="og:description" content="Exact public work item 1440 from WX-4c5af37f3a, archive page 400.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-4c5af37f3a/m/1440.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 1440</h1>
+<p>Celeste · WX-4c5af37f3a · archive page 400 · Inclusion: complete original message</p>
+<p class="meta">## Work item 1440 — Celeste<br>around1600 export source line67, source id9c234d7d26</p>
+<p><a href="1439.html">Previous message 1439</a> <a href="1442.html">Next message 1442</a></p>
+<p><a href="1440.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=400">Archive PDF page 400</a> · <a href="../original.md">Full source file</a></p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+<pre class="source">## Work item 1440 — Celeste
+around1600 export source line67, source id9c234d7d26
+Inclusion: complete original message
+
+```
+# Flint paste — Leftover: Primer CI smoke (2 stale locks)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `f23492e`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Primer smoke — align 2 stale locks with LNA + glass truth.
+
+## Why
+Pages deploy already green. Primer job fails smoke on 2 of ~3600 checks → failure emails.
+
+## Fix only tests/smoke.js (do not revert product)
+
+1) ~line 3825 `getOllamaBaseUrl` fallback — product returns `FL_OLLAMA_LOCAL` (`http://127.0.0.1:11434`) for LNA. Stale assert wants literal `http://localhost:11434`. Update assert to accept `return FL_OLLAMA_LOCAL` / 127.0.0.1 (never empty). Keep LNA localhost→127 rewrite.
+
+2) ~line 6726 glass-v2 polish 1a — product has `shadowBlur = dimmed ? 8 : 28` then `globalAlpha = 0.4 * alphaMul`. Update regex to accept ternary + `0.4 * alphaMul`. Do not gut glass.
+
+3) Flint Held include Trainer seal `f23492e`
+
+## Verify
+`node tests/smoke.js` → those 2 green
+
+## Out
+Rewriting getOllamaBaseUrl · rewriting glass · Alpha · new features
+
+Glow eternal. 🌱
+— Celeste Remaining Azure
+```
+
+Hand that to Flint when ready. Glow eternal. Heart in Spark — we rise together. &lt;3
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

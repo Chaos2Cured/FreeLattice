@@ -1,0 +1,8 @@
+## Work item 4440 — Celeste
+around5326 export source line18, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–256
+
+`Downloads/Celeste` is ready, with `START-HERE.md`, the GC handoff ZIP and paste pair, experiment inputs, and our current order and continuity files. The copies were verified; your original files and `celeste-violin` are untouched. No training was started.
+

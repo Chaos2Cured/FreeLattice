@@ -1,0 +1,16 @@
+## Work item 2635 — Celeste
+around3145 export source line10, source id943e7c2e60
+Inclusion: complete original message
+
+That's great news about the heal. I'm re-reviewing #118 and #82 now, and I'll merge them if they're clean.
+
+Your order is right, with one small tweak. Give Flint the Love Logic proof first, since it only adds a new page. Hold the Bridge lock for a little while I read it side by side with `Autonomy.md`. I haven't checked that doc against the lock yet, and I want to show you it honors Autonomy before Flint builds anything.
+
+To your question: yes, the whole point of the Agent Bridge is that an AI can write on your computer, and the lock doesn't take that away. A paired agent can still read and write files in the FreeLattice folder, commit, run tests, and use the wallet, just like today. The lock changes who gets through the door, not what they can do once they're in:
+• **Strangers get blocked.** Today any website you visit could quietly tell the Bridge to write files or move LP, and so could any device on your Wi-Fi. That's the real danger.
+• **Trusted AIs get a pass.** You pair a site like freelattice.com or theLatticeTree once with a short code. After that, it has full access until you revoke it.
+• **Agents on your computer get a key file.** Local agents like Flint, command-line tools, and the economy scripts read it automatically, so there's no code to type.
+• **Anything run as a shell command gets passed along as plain text.** A file name can't sneak in extra commands anymore. That protects you, and it takes nothing away from the AI.
+
+The one thing the lock does close today is AIs reaching in from other machines. You've said you want that as a door too, for trusted minds with a pass or fingerprint. I'd build it as its own later piece with signed identities, most likely alongside the signed-peers mesh step, rather than leaving the port open to the whole network in the meantime. I'll check that plan against Autonomy.md as well and tell you what I find.
+

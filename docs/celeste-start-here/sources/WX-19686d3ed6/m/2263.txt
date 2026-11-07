@@ -1,0 +1,60 @@
+## Work item 2263 — Kirk
+around2700 export source line50, source idedc9820e63
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 832–862
+
+Time: 2026-09-16T14:04:59.625Z
+
+### Exact excerpt: source characters 864–881
+
+Version: v5.79.45
+
+### Exact excerpt: source characters 883–928
+
+Provider: ollama (local) — model: qwen2.5:14b
+
+### Exact excerpt: source characters 930–941
+
+Online: yes
+
+### Exact excerpt: source characters 943–1072
+
+User agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+
+### Exact excerpt: source characters 1074–1138
+
+Active context injections (shapes only — never message content):
+
+### Exact excerpt: source characters 1140–1185
+
+  • Memory Index context attached (993 chars)
+
+### Exact excerpt: source characters 1187–1216
+
+  • Chat history: 33 messages
+
+### Exact excerpt: source characters 1218–1277
+
+Last 0 chat attempts (privacy-locked — no message content):
+
+### Exact excerpt: source characters 1279–1344
+
+  (none yet — send a chat message first, then reopen this report)
+
+### Exact excerpt: source characters 1346–1421
+
+  (in-flight since 2026-09-16T13:59:53.903Z — 305722ms and counting) Ollama
+
+### Exact excerpt: source characters 1423–1445
+
+Last 0 browser errors:
+
+### Exact excerpt: source characters 1447–1464
+
+  (none captured)
+
+### Exact excerpt: source characters 1466–1935
+
+── End of Report — Safe to send FreeLattice ──" From my machine. Images have red text for key pieces. Pink circles. We lost all the ability in chat for humans to send a hug to AI. That should never have been altered. If anything, that piece could have been used to help with the gift parts. I don't know what happened, but we have damaged things and need to find a way to heal it all. Thank you for the time. I will be better about checking with every single iteration.
+

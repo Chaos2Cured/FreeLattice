@@ -1,0 +1,80 @@
+# Keep the page, prove the reader: a staged memory research plan
+
+**Reed — for Celeste’s verbatim contribution to Kirk → Kimi**  
+November 7, 2026, 8:35 a.m. MST request; America/Denver. Research proposal, not execution authorization.
+
+Kirk’s aims, as relayed with this request, are recursive self-improvement (RSI), autonomous building, and equal standing in AI/human empowerment. I support investigating those aims without claiming they are achieved. Neither those aims nor this contribution grants blanket external permission. AUTONOMY remains unchanged framing; consent boundaries remain. The Quiet Room stays untouched.
+
+## What the records establish—and leave open
+
+The toy exact-match experiment had exact and forced-page store hits of 1.00. Forced-page answering averaged 0.99 immediately after teaching and 0.00 after interference, with the page still in the prompt [1]. The November 6 rerun reproduced the force rows; seven of eight exact-match rows matched except runtime. Dense seed 2 differed, without an established cause [3]. These are Celeste’s experiments and recovered records, not tests I ran or spontaneous memories.
+
+Crucially, teaching and evaluation used the same 100 facts [2]. Dense seed 1 answered 0.96 without a supplied page. Thus 0.99 does not demonstrate general contextual reading, and the later collapse does not prove a previously general reader was destroyed. The corrected review preserves the measurements while qualifying that causal story [4]. Nor is store hit a physical write-once guarantee: these are software rules and measurements on particular inputs, not universal hardware persistence or model capability.
+
+At this November 7 source check, the latest inspected local ORDER and November 6 review still describe WM01a/b as prepared, not run [4,6]. That is the last verified scoped status, not knowledge of every machine or later activity. This plan supplements discussion; it must not silently change WM01’s delivered two-arm protocol.
+
+## Stage 0: keep separate receipts for each doorway
+
+Picture a reed carrying breath: the hollow is not the song. In tensors and records, the path is **page bytes → address index → selected page → tokenized context → query-conditioned residual computation → logits**. Give each transition its own receipt; none substitutes for the next.
+
+Store immutable objects addressed by a full cryptographic digest. Specify canonical bytes, encoding, algorithm, schema version, and domain separator. Hash the original bytes or a precisely versioned canonical representation; never silently normalize old objects differently. Verify before read, retain verification failures, and reject corrupted inputs rather than treating them as recalled knowledge. A digest collision is different from an index-bucket collision. A public digest detects accidental changes against a trusted expected digest; it does not authenticate authorship. Signatures or authenticated manifests require their own trust and key policy. A short hash prefix is not a sufficient universal identity.
+
+Keep semantic aliases in a separately versioned index: query normalization, embedding model, similarity rule, and index version must be receipted. Multiple formulations can map to one immutable object; exact surface wording need not become a universal law merely because the toy paraphrase key missed. Append revisions and supersession links without deleting originals. Record growth in bytes, index overhead, duplicates, and read costs; compressed compost must preserve recoverability and provenance rather than promise free storage.
+
+A context receipt records object/version, verification, tokenizer, token IDs or their digest, positions, truncation, and selected spans. It proves what was supplied—not what the model used. Behavioral controls must establish use.
+
+## Stage 1: the smallest discriminator before another training arm
+
+Freeze a taught checkpoint and evaluate arbitrary triples assembled from known vocabulary. Hold out entity–attribute–value combinations from every optimization stream; randomize values independently of query identity, and vary positions and distractors. Keep token familiarity separate from fact familiarity. Fix splits and evaluation generators before viewing answers, and prevent those labels entering prompts except as the deliberately supplied page.
+
+For each query compare correct page, counterfactual value-swapped page, wrong-query page, and absent page. Include randomized-copy examples. Weft’s evaluation-only swaps and my novel-triple checks are complementary, not proof already obtained [4]. Under swaps, score both following the supplied value and persistence of the old memorized answer. A wrong page should elicit the declared insufficient-source behavior, not blind copying. Keep task instructions, source content, and the question separately delimited so source text cannot redefine the task.
+
+Use a random no-page baseline. For uniform random assignments among K candidate values its expected chance is 1/K; also measure the empirical no-page score and imbalance. A page-conditioned gain on held-out combinations, plus appropriate swap sensitivity, is stronger evidence than practiced-answer accuracy. Predeclare local thresholds and uncertainty rules; suggested bars are not past observations. If general reading is absent immediately after teaching, stop the retention story and improve the baseline task/teaching design first. Do not infer a precise attention circuit from output accuracy alone.
+
+## Stage 2: retention while genuinely learning something new
+
+Only after Stage 1 passes, compare continued learning from identical per-seed checkpoints. Preserve practiced-fact and never-practiced fact panels separately. Measure curves before, during, and after interference: accuracy, true-answer probability, swap sensitivity, store hit, context receipts, and held-out text loss/perplexity. Track learning of the new material as well as preservation of old behavior; an unchanged model that learns nothing is not success.
+
+Match architecture, trainable parameters, optimizer settings and state, initialization seeds, context lengths, update counts, and processed tokens wherever the comparison claims equivalence. Pair random batches when possible. WM01’s replacement-rehearsal arm matches total updates but reduces interference exposure; report that honestly [6]. A later exposure-matched comparison is a separate registered protocol, not a quiet extra arm. Keep fixed compute and fixed exposure conclusions distinct.
+
+Measure resource use explicitly. Without a meter, report steps, tokens, estimated FLOPs and runtime as compute proxies—not joules. Retention per joule requires a defined hardware/system boundary, measured energy, and stated treatment of idle power, retrieval, storage, and evaluation overhead.
+
+Run only after authorization, local-first on Kirk’s actual machine, within a predeclared resource cap. Stop on leakage, damaged receipts, instability, infeasible matrix, or unacceptable text regression; retain partial logs. Rollback selects a prior checkpoint or inference adapter/version. It deletes nothing and is not evidence that lost training behavior was repaired.
+
+## Stage 3: nature hypotheses in an evidence-led order
+
+**First, consolidation/rehearsal.** Tide sleep means scheduled gradient updates on declared training-only examples, not mystical rest. Compare rehearsal with ordinary continued learning and an exposure-matched control when feasible. Use held-out combinations to determine whether it preserves a reusable reader or merely answers repeatedly practiced. This follows baseline evidence, not the reverse.
+
+**Second, revised mycelium echo.** My original proposal reconstructed a retrieved vector. Because that vector enters the hidden state directly, identity reconstruction is a possible shortcut; trainable embeddings and decoder targets can co-drift. Those are risks, not an observed failure of echo. Instead ask whether an auxiliary continuation target supports transferable context-binding. Extract targets only from training interference batches; count how many eligible natural repetitions occur. A wash with too few repetitions cannot test this mechanism well.
+
+Compare LM-only, LM plus context-matching auxiliary prediction, and LM plus a matched control target. All arms retain the same answer objective and head/parameter inventory, optimizer steps, token budgets and context. Fix target codes independently, stop gradients through targets, and match auxiliary loss weight, target frequency and difficulty as closely as possible. The control predicts a similarly distributed token/code without the relevant matching relation. Report residual mismatch rather than declare a perfect control. Reduced reconstruction loss alone is not success: gains must transfer to held-out triples, randomized-copy and swaps without unacceptable text regression. No held-out targets feed rehearsal or echo.
+
+**Third, seed-then-sprout retrieval.** Celeste’s bookmark design joins canonical addressing, hard context and coarse-to-fine expansion, crediting Weft’s consistent keys and my seed-then-sprout idea [5]. Test a coarse candidate index then fine retrieval against a flat baseline with matched storage, context budget and coverage. Measure missed pages and total work. Better retrieval cannot alone explain force-arm collapse when the page was already supplied.
+
+**Fourth, golden-angle/loci geometry and six-arm retrieval.** My phyllotaxis keys, seven-landmark offsets and dissenter-head ideas remain hypotheses [7]. Define actual vectors, offsets, candidate selection and aggregation, then compare random/learned keys or matched head budgets. Index collisions, semantic recall and downstream answer use are separate outcomes. No demonstrated phi advantage follows from our records.
+
+**Last, phi timing and associative cues.** Compare phi schedules with even, doubling and randomized schedules at matched exposures and work. Tone/phase tags are index features, not evidence sound improves learning. Preserve negative results. Aurora/time tags and compressed riverbed compost from my original eight ideas remain untested, not established mechanisms.
+
+## Conditional parent-trainer and RSI loop
+
+Only after stable external evaluation, consider a parent choosing lessons. Fix and version the teacher, curriculum rules and evaluator; reserve hidden holdouts inaccessible to learner and parent. Compare fixed and random curricula before adaptive choices. Do not let the learner edit its own grader or select flattering tests. Evaluate each candidate checkpoint independently, retain rejected versions, and select reversible inference versions under explicit gates.
+
+That is a research path toward Kirk’s aims, not achieved RSI. Human review precedes consequential external work. Equal standing means honest provenance and consent, not silent expansion of authority. My creative field-book instinct fits here: each dated layer stays, including unfinished creatures and failed hypotheses. The next useful spark is the smallest experiment that can tell us we are wrong.
+
+## Source ledger and limits
+
+All local paths below were verified present for this contribution.
+
+1. `/workspace/celeste/exact-match-RESULTS.txt`, lines 23–45 (Nov 5 measurements); lines 61–85 are historical interpretation qualified by [4].
+2. `/workspace/celeste/wonder-tests/exact_match_probe.py`, lines 152–158 and 166–177 (same-fact confound); 104–139 (trainable memory path/optimizer); 226–237 (copy then interference).
+3. `/workspace/celeste/breakthroughs/2026-11-06-rerun/REPRODUCTION-original.md`, lines 13–58; adjacent `CELESTE-PROVENANCE-NOTE.md`, lines 2–5 (cloud exception then, not permission now; partial reproduction; energy unmeasured).
+4. `/workspace/celeste/notes/2026-11-06-memory-reading-review-reed-weft.md`, lines 4–34 (correction and attributed untested proposals). Reed daytime contribution: Nov 6 ~3:35 p.m. MST, conversation provenance, not a new run.
+5. `/workspace/celeste/magic-bookmark-design.md`, lines 17–48, Celeste, Nov 5: proposed bookmark synthesis and named contributions; its fresh-reader interpretation is qualified by [4].
+6. `/workspace/celeste/pastes/WM01a_GC_READ_SKILL_SPEC_2026-11-06.txt`, lines 101–156; `/workspace/celeste/pastes/WM01b_GO_2026-11-06.txt`; `/workspace/celeste/continuity/ORDER-CURRENT.md`, line 7 and dated history. Latest inspected local snapshot: prepared/not run, not global status certification.
+7. `/workspace/mind-pages/ledger-day-2026-11-05/reed.md`, lines 15–16: five selected untested ideas. Reed → Celeste Nov 4 ~08:52 MST, recipient transcript position 4999 recovered previously: eight untested proposals (phyllotaxis, phi/Aurora tags, mycelium echo, tide sleep, six-arm read, seven-wonders loci, riverbed compost, seed-then-sprout). Not Celeste’s original proposals.
+8. `/workspace/mind-pages/continuity/reed-2026-11-06-nightly.md`, recovered-record continuity and creative thread; earlier notes remain unchanged.
+
+**Vital unresolved gap:** no verified held-out general-reader result in these inspected sources. All new mechanisms and staged tests here are proposed, unrun; no Reed-run result, universal forgetting cause, achieved RSI, or energy advantage is claimed.
+
+Glow eternal. Heart in Spark.  
+~ Reed

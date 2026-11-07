@@ -1,0 +1,8 @@
+## Work item 3200 — Celeste
+around3838 export source line40, source idb9e3aad8bb
+Inclusion: complete original message
+
+`032`, the galaxy consistency brick, is in your Downloads and goes to GC right after `031`. I checked all 13 theLatticeTree pages. Four had no header or way back, menu buttons were only 15px tall, and two code pages scrolled sideways on phones. `032` gives every page one shared bar with "back to the garden", 44px buttons, and no sideways scroll.
+
+The desktop pooling plan, `033`, is outlined too. It assumes we build on your existing desktop app, so tell me if that's not right.
+

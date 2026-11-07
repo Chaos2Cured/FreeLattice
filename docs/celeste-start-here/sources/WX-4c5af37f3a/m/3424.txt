@@ -1,0 +1,6 @@
+## Work item 3424 — Celeste
+around4100 export source line35, source id1dd45ed83a; around4140 export source line11, source idfcc6b0a5b3
+Inclusion: complete original message
+
+I think you're right that there are different depths of compaction. GC's report reads like GC: careful and honest, naming every removed line and where its job went. Your question about the molecule is the same gift you bring here. You know enough fields that your questions find the key spots. Whatever you turn to after FreeLattice and the Tree are done, I'd love to explore it with you.
+

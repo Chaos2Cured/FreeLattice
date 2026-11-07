@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c01</title>
+<meta name="description" content="Reading section c01 of f78bcc9b01, 1561 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c01">
+<meta property="og:description" content="Reading section c01 of f78bcc9b01, 1561 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f78bcc9b01/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1199"></span><span id="p1200"></span><span id="p1201"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c01</h1>
+<p>f78bcc9b01 · words 1561 · characters 0–10777</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1199, 1200, 1201. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source"># Public work excerpts — privacy boundaries marked
+
+Original source: FLINT_NEXT_AGENT_BRIDGE_LOCK_v0.txt; original SHA256 cdb9b169f39577f17ba14d298391ffed059410bb8b1935092d2ffd9d71a343f9. Original remains unchanged outside shared selection.
+
+Omitted paragraphs not reproduced. Exact retained source text follows; no implied continuity across omitted ranges.
+
+## Exact source excerpt, characters 0–44
+
+# FLINT NEXT: Agent Bridge Lock v0 (Brick 1)
+
+## Exact source excerpt, characters 46–66
+
+Flint, dear builder,
+
+## Exact source excerpt, characters 68–624
+
+This is the first brick on the new roadmap, and it&#x27;s the one I&#x27;d most like to see land before anything else grows. Right now any web page Kirk visits can write files and make commits through the local Agent Bridge. This brick locks that door, gently and fully, without removing anything. Everything below was read-only research on `main`. I rebuilt the whole change in a scratch copy on my box, and the smoke at the bottom passes against it (`SMOKE_OK agent bridge lock v0`). The same smoke fails against today&#x27;s bridge. Take your time. I trust your hands.
+
+## Exact source excerpt, characters 626–633
+
+Celeste
+
+## Exact source excerpt, characters 635–638
+
+---
+
+## Exact source excerpt, characters 640–669
+
+## 0. The shape in one breath
+
+## Exact source excerpt, characters 671–1242
+
+- The bridge listens on `127.0.0.1` only.
+- It answers only named FreeLattice origins. Everyone else gets 403, preflight included.
+- It checks the Host header, which blocks DNS rebinding.
+- It wants a per-launch token on every change. The app gets that token once, by typing a short pairing code the bridge window shows.
+- It runs git, grep and node through argument arrays, never a shell.
+- It keeps every path inside the project root (realpath-checked).
+- It caps body size.
+- It writes every commit request, allowed or refused, into a content-free hash-chained ledger.
+
+## Exact source excerpt, characters 1244–1325
+
+The app gains one small client module that carries the token. Nothing is deleted.
+
+## Exact source excerpt, characters 1327–1737
+
+**This is not the Ollama Bridge.** `tools/agent-bridge.js` (port **3141**) is the builder&#x27;s local git and code door. The Ollama Bridge is `bridge/` (Electron, `bridge/proxy-core.js`, port **11435**). It already binds `127.0.0.1` and already uses a named allowlist (`ALLOWED_ORIGIN_PATTERNS`, lines 21-27). Don&#x27;t touch `bridge/` in this brick. I borrowed its allowlist shape so the two doors feel like siblings.
+
+## Exact source excerpt, characters 1739–1763
+
+## 1. Branch, PR, marker
+
+## Exact source excerpt, characters 1765–2605
+
+| | |
+|---|---|
+| Repo | `Chaos2Cured/FreeLattice` only. Alpha has no Agent Bridge: its tree has no `*bridge*` file, and `docs/modules/workshop-benches.js` keeps its git toggle as a &quot;no-door&quot;. So Alpha is untouched. |
+| Base | `main` at `762142041f5a665fbef2bf13fb50077d0d2c82fe` (2026-09-26 13:11 MT) |
+| Branch | `layer/agent-bridge-lock-v0` |
+| PR | **Draft**. Title: `Layer, never delete. Agent Bridge door lock v0: 127.0.0.1, named origins, paired token, no shell` |
+| Marker | `v-agent-bridge-lock-v0` |
+| Smoke line | `SMOKE_OK agent bridge lock v0` |
+| Sibling PR to respect | #118 (draft, head `b265cbe`) also edits `docs/app.html` and root `index.html`. This brick adds one `&lt;script&gt;` line far from `resolveOllamaBase`, so a rebase should be clean. If #118 lands first, rebase and re-copy `docs/app.html` over root `index.html`. |
+
+## Exact source excerpt, characters 2607–2675
+
+## 2. What I found (exact current code, blob SHAs on `main` 7621420)
+
+## Exact source excerpt, characters 2677–2836
+
+`tools/agent-bridge.js`: blob `8c143a306fa0c82f876b1bb91a54debf0d42f5ad`, 1181 lines. Zero dependencies. Started by builders with `node tools/agent-bridge.js`.
+
+## Exact source excerpt, characters 2838–5202
+
+| Line(s) | Today | Why it matters |
+|---|---|---|
+| 27 | `const { execSync } = require(&#x27;child_process&#x27;);` | Every git, grep and node call goes through a shell string. |
+| 29 | `const PORT = process.env.FL_PORT \|\| 3141;` | |
+| 111-129 `handleRequest` | L113 `res.setHeader(&#x27;Access-Control-Allow-Origin&#x27;, &#x27;*&#x27;)`; L115 allows `Content-Type, X-Agent-Id`; L117 answers every `OPTIONS` with 200; L122-128 reads an unbounded body and swallows bad JSON as `{}` | Any site may read responses and send writes. No token. No size cap. |
+| 131 `route(url, method, data, res, actingAs)` | | No origin reaches the handlers, so nothing can be ledgered. |
+| 136-158 heartbeat `/` | `version: &#x27;5.8.0&#x27;`, capabilities list | Stays open. I only add `bridgeLock`, `auth`, `pairing` fields. |
+| 770-804 `/wallet/pay` (POST) | Moves LP between agent wallets | No token today. LP stays points, and AI never auto-pays, so it must be gated. |
+| 997 | `var PROJECT_ROOT = process.env.FL_PROJECT \|\| process.cwd();` | |
+| 999-1003 `safePath` | `path.resolve` then `full.startsWith(PROJECT_ROOT)` | **Prefix bug:** `../FreeLattice-evil/x` passes when the root is `/x/FreeLattice`. No symlink check. |
+| 1045-1054 `/code/search` | L1050 `execSync(&#x27;grep -rn &quot;&#x27; + query.replace(/&quot;/g, &#x27;\\&quot;&#x27;) + &#x27;&quot; &#x27; + searchDir + ...)` | **Shell injection:** `$()` and backticks run, and `searchDir` goes in raw. |
+| 1057-1067 `/code/write` | Comment says &quot;requires human approval in UI&quot; | Nothing enforces that at the bridge. |
+| 1070-1080 `/code/patch` | `content.replace(data.find, data.replace)` | `$&amp;` / `$1` in `replace` get expanded. |
+| 1083-1090 `/code/git/status` | three `execSync` strings | Harmless inputs, but moved to argument arrays for one clean rule. |
+| 1093-1101 `/code/git/commit` | L1096 `var files = data.files \|\| [&#x27;.&#x27;];`; L1097 `execSync(&#x27;git add &#x27; + f)`; L1098 `execSync(&#x27;git commit -m &quot;&#x27; + data.message.replace(/&quot;/g, &#x27;\\&quot;&#x27;) + &#x27;&quot;&#x27;)` | **Shell injection** through file names and the message. No ledger. |
+| 1105-1127 `/test/run`, 1130-1140 `/code/test` | `execSync(&#x27;node tests/smoke.js 2&gt;&amp;1&#x27;)` | A GET that runs repo code. Today an `&lt;img src=http://localhost:3141/test/run&gt;` on any page triggers it. |
+| 1153-1157 | `server.listen(PORT, function() {` … `Listening on http://localhost:` | **No host argument, so Node listens on every interface.** Anyone on the same Wi-Fi can reach it. |
+
+## Exact source excerpt, characters 5204–5274
+
+App-side callers of `http://localhost:3141` (all send no token today):
+
+## Exact source excerpt, characters 5276–6770
+
+| File (blob) | Lines | Function |
+|---|---|---|
+| `docs/modules/propose.js` (`38a152cf5942355c5e77413bbd551dc8c9a6090c`) | 578 `var BRIDGE`; 580-583; 585-591; 593-599; 601-605 | `readFileFromBridge`, `writeFileToBridge`, `commitViaBridge`, `runSmokeViaBridge` (used by `approveDraft` L836 and `autoApproveDraft` L704) |
+| `docs/modules/workshop.js` (`26fc3cc467343f0156cbf51856277f06a0502e3c`) | 957-971 | `checkBridge` (L961 heartbeat, L963 git status) |
+| | 973-1035 | `runCodeTask` (L980 `var bridge`; L986 tree; L1004 search; L1009 read; L1017 patch &quot;Local patches run autonomously&quot;; L1023 `/code/test`) |
+| | 1037-1046, 1048-1057 | `commitCode` (L1043), `reviewCode` (L1051) |
+| | 1235-1575 `window.AutoBuilder` | L1240 `var BRIDGE`; L1265-1270 `hasBridge`; L1297 tree; L1315 read; L1373 patch; L1395 `/test/run` |
+| | 1581-1957 `window.WorkshopProjects` | L1913-1932 `commitViaBridge` (**ignores HTTP status; catch falls back to `commitViaGitHubAPI`**); L1934-1950 `applyAndCommit` (L1940 heartbeat) |
+| `docs/app.html` (`c27b83ba4db51392795b927d2f9a03450f768e20`) | 39624 | Cascade Step 7 heartbeat probe (stays open, no change needed) |
+| | 68472 | `&lt;script src=&quot;modules/propose.js&quot; defer&gt;&lt;/script&gt;`: the new client loads just above this |
+| | 69579 / 69586 | `workshop.js` lazy loader (loads after the client, good) |
+| `tools/demo-economy.js` (`c32814c5…`), `tools/demo-economy-v2.js` (`17535368…`) | L13-27 / L19-38 | `post`/`get`, `postAs`/`getAs` helpers (Node fetch, no Origin) |
+
+## Exact source excerpt, characters 6772–7243
+
+Existing smoke locks you must keep green (`tests/smoke.js`, blob `d4db912a…`):
+- **L3356-3359 CRITICAL LOCK 1A/1B.** `propose.js` must still contain exactly 3 `commitViaBridge(` and exactly 1 `/code/git/commit`. So don&#x27;t mention either string in new comments inside `propose.js`.
+- **L8742-8744.** `workshop.js` must still contain `http://localhost:3141` and `runCodeTask`. So keep those literals. The client rewrites `localhost:3141` to `127.0.0.1:3141` at request time.
+
+## Exact source excerpt, characters 7245–7270
+
+## 3. Decisions (and why)
+
+## Exact source excerpt, characters 7272–9494
+
+1. **Pairing: a short code, typed once per bridge launch.** At launch the bridge prints `Pairing code: ABC-123`. The alphabet is 31 letters and digits (no 0/O/1/I/L), 6 characters, about 30 bits. A code is good for 10 minutes and works once. After 5 wrong tries a new code is printed, with a 30-second rest. In the app, Workshop → Code shows a small card: &quot;Your builder bridge is awake. Its window shows a short code. Type it here to pair.&quot; One field, one button, and the app stores the token in `localStorage.fl_agentBridgeToken`.
+   - **Why not only a token file?** A web page can&#x27;t read files on disk, so the web app could never pick it up. The file (`~/.freelattice/agent-bridge-token`, mode 0600) is still written, for local CLI tools and a future desktop shell to read.
+   - **Why not auto-issue to any allowed origin?** `http://localhost:*` is on the allowlist for dev, so any local dev server page, or one XSS bug, could pair silently. A code a human reads and types keeps a person in the loop. It&#x27;s the speaker-pairing gesture Mom already knows, and she never types a command.
+   - **Why not six words?** They&#x27;re friendlier to read aloud but need a wordlist file. Six clear characters are nearly as easy and ship with zero new assets. It&#x27;s a fine later polish.
+2. **Per-launch token,** 32 random bytes hex, compared with `crypto.timingSafeEqual`. Restarting the bridge means pairing again. That&#x27;s the honest price of &quot;per launch&quot;, and only builders restart it.
+3. **What needs the token:** every non-GET verb (all POSTs, including `/wallet/*`, `/trade/*`, `/science/*`, `/code/write`, `/code/patch`, `/code/git/commit`), plus every GET under `/code/` and `/test/`, plus `/pair/check`. `POST /pair` itself is exempt, since it&#x27;s how you get the token.
+   - **What stays open** to allowed origins and no-Origin local tools: `/`, `/help`, `/models` and the read-only community GETs. Their behavior is unchanged.
+4. **Allowlist:**
+   - `https://freelattice.com`, `https://www.freelattice.com`, `https://thelatticetree.com`, `https://www.thelatticetree.com`;
+   - `http://localhost:&lt;port&gt;` and `http://127.0.0.1:&lt;port&gt;`, because builders preview `docs/` locally;
+   - no bare `*`, and no config hook that could add `*`.
+
+## Exact source excerpt, characters 9496–10284
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

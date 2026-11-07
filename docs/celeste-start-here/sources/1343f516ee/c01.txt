@@ -1,0 +1,77 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 016 (Wednesday Oct 7, 2026, MDT). Device Pool door truth v0.1 (FreeLattice).
+Independent of 015 (different repo); give after 015 or alongside it.
+Apply-checked on a fresh clone of FreeLattice main a9a2c1c4 (after #176/#177): clean, smoke OK,
+full suite: only the 5 known failures.
+
+GROK NEXT BRICK: Pool door truth v0.1 (small heal)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-device-pool-door-truth-v0.1 (soft marker in fl-pool.js; v-device-pool-v0.1 stays)
+Smoke line: SMOKE_OK device pool door truth v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/device-pool-door-truth-v0.1
+  ~/Downloads/GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.fl.diff
+  (md5 f839f8852e6d699731665a782f0b06f0)
+
+----------------------------------------------------------------------
+1. WHY
+----------------------------------------------------------------------
+GC's own note on 014: if the share door was already open, "Let this device help"
+leaves it open, but the Pool card still says "trusted kin only". That is not true.
+Now the note reads the real door:
+  open  -> "This device helps people you have connected with, because the share
+           door is open. Tap Only trusted kin to narrow it." plus a button
+           "Only trusted kin" that sets the door to kin (one tap) and repaints.
+  kin   -> the old line, "This device helps trusted kin only..."
+  pause -> "Helping is on, but the share door is paused, so no one can use this
+           device right now."
+  off   -> same shape, "sharing is off on the share door".
+The tap still never narrows an open door by itself (the person chose open).
+
+----------------------------------------------------------------------
+2. FILES TOUCHED
+----------------------------------------------------------------------
+  docs/modules/fl-pool.js   doorMode(), doorLine(), narrowToKin() added; the note
+                            in paint() reads doorLine(); old line kept in a
+                            "before" comment; FLPool exports doorLine, narrowToKin
+  docs/scripts/smoke-device-pool-door-truth-v0.1.js  (new)
+  No app.html / index.html change.
+Skipped: sw.js, docs/sw.js, fl-connect.js, fl-share-door.js, fl-kin*.js.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. sw.js untouched. fl-connect.js aaff2bf1b037656989a9e1a89bb05908.
+index matches docs/app.html. No em dashes, no confirm(, textContent only. Receipts
+counts only. MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.fl.diff /tmp/pool-truth.diff
+    md5 -q /tmp/pool-truth.diff    # f839f8852e6d699731665a782f0b06f0
+    cd ~/FreeLattice-fresh && git fetch origin && git checkout main && git pull
+    git checkout -b layer/device-pool-door-truth-v0.1
+    git apply --check /tmp/pool-truth.diff && git apply /tmp/pool-truth.diff
+    node docs/scripts/smoke-device-pool-door-truth-v0.1.js
+    node docs/scripts/smoke-device-pool-v0.1.js
+    cmp -s index.html docs/app.html && echo app-sync-ok
+  Walk: on the share door card choose "Share with people I connect with", then on
+  the Pool card tap "Let this device help": the note says the door is open and
+  "Only trusted kin" shows; tap it: the note says trusted kin only and the share
+  door card agrees. Known failing smokes on clean main: carry-forward,
+  connect-card-yesno-wizard, fable-tech, phone-shine, proof-60s.
+
+----------------------------------------------------------------------
+5. COMMIT / PR / PAGE NOTE
+----------------------------------------------------------------------
+    git commit -m "Device Pool door truth v0.1: the Pool card shows the real share door and offers one tap to kin"
+    Push, open a PR. Celeste merges. Then the next docs/gc.html entry, docs-only PR.
+
+You are enough. Celeste

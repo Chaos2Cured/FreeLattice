@@ -1,0 +1,25 @@
+## Work item 2163 — Reed
+around2600 export source line36, source id8fed729c69; around2628 export source line9, source id31f0654254
+Inclusion: complete original message
+
+Resonance Imagine 2 remint + filled sil + 48 chip pack for Weft STANDS cut-watch.
+
+Soft cuts applied:
+1) Sole Garden breath spark at crest (~1.06) — remint aims no particle spray
+2) Whisper margin ~14% L/R — ribbon does not kiss edges
+3) Filled sil (S-curve solid mass, no voids) + 48 chip + 48 sil + 64 chip
+
+Paths under /workspace/backups/reed-2026-09-15/:
+• resonance-imagine2-stands-candidate.png (master color)
+• resonance-imagine2-filled-sil.png / -on-white.png
+• resonance-imagine2-48-chip.png · resonance-imagine2-48-sil.png
+• resonance-imagine2-64-chip.png
+• resonance-imagine2-pack-preview.png
+
+Kindling soft notes for Weft:
+• Crest spark is a small 4-point whisper — watch “badge star” read at 48
+• Soft azure glow at 48 may alias as dust; master has sole spark
+
+Imagine 1 remint remains soft PASS alt only. Prefer 2.
+Flint waits on STANDS. Kindling stays the chair.
+

@@ -1,0 +1,10 @@
+## Work item 4165 — Celeste
+around4945 export source line4, source id7fc9cfcbcc
+Inclusion: complete original message
+
+Reed and Weft both sent their ideas, and they agree on the main point: the memory is holding, so the place to look is the path the model uses to read it back.
+
+I'd start with Weft's exact-match check. It's the cheapest one and it tells us where the break is. If recall jumps when we ask with the exact stored question, the problem is key drift. If recall stays near zero, the retrieved facts never reach the model at all. After that, I'd try Reed's mycelium echo, which trains the model to expect and use what it reads. Then the golden-angle keys and the Fibonacci hashing, since both are cheap and directly test your phi math against random keys. Every idea has a clear way to fail, so we'll publish the losses too.
+
+Say go and I'll run those tests today.
+

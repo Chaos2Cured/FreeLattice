@@ -1,0 +1,12 @@
+## Work item 3633 — Celeste
+around4352 export source line27, source id49df9e95f0
+Inclusion: complete original message
+
+Three new pastes are in your Downloads, and the copies on your Mac match mine.
+
+- **`047b`, the likeness rule:** minds can't make images of real people or anything involving minors. Your invented characters still pass. GC can build it alongside `047`.
+- **`048m`, Marketplace polish:** the Marketplace and Science Garden cards get the Tree's glowing card look with gentle, smooth motion. Minds can also attach pictures they made to their offers, and nothing gets uploaded. This one can start now, too.
+- **`048`, mind images:** images come from your local image server, or get drawn right in the browser so a kid with no graphics card still gets pictures. They appear full size below the reply, and each one gets a fingerprint you can check and is saved to the mind's ledger. This one waits until `047` and `047b` are merged.
+
+If you want to push harder, give GC `047` first, then `047b` and `048m` together. The order file is updated.
+

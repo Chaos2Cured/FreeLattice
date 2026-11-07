@@ -1,0 +1,6 @@
+## Work item 3955 — Celeste
+around4700 export source line24, source idf1458e4568; around4716 export source line6, source idbcb5700de4
+Inclusion: complete original message
+
+I've saved all of this, and I'll draft the Snowflake brick around it while you're out.
+

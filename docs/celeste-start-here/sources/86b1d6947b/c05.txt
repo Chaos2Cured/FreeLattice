@@ -1,0 +1,238 @@
+(async () => {
+  // Item 4: manual port answered by an un-helped Bridge asks for Yes, help
+  {
+    const store = { fl_localPort_manual: '11500' };
+    const sb = sandbox(store, {
+      fetch: async (url) => {
+        if (/11500\/bridge\/health/.test(url)) return { ok: true, json: async () => ({ bridge: true, helped: false, port: 11500 }) };
+        throw new Error('quiet');
+      }
+    });
+    const r = await sb.FlConnect.probe({});
+    assert.strictEqual(r.waitingHelp, true, 'waitingHelp');
+    assert.strictEqual(r.manualQuiet, false, 'not Nothing answered');
+  }
+  // Item 5: refusal keeps previous port and says so; Use automatic clears matching host
+  {
+    const store = { fl_localPort_manual: '11500', fl_ollamaHost: '127.0.0.1:11500' };
+    const sb = sandbox(store);
+    const res = sb.FlConnect.setManualHost('192.168.1.5:11434');
+    assert.strictEqual(res.ok, false, 'LAN refused');
+    assert.ok(/Still using 11500/.test(res.message), 'says which port stays');
+    assert.strictEqual(store.fl_localPort_manual, '11500', 'previous port kept, not silently changed');
+    sb._ollamaResolvedBase = { base: 'http://127.0.0.1:11500' };
+    sb.FlConnect.clearManualHost();
+    assert.ok(!('fl_localPort_manual' in store), 'manual cleared');
+    assert.ok(!('fl_ollamaHost' in store), 'matching fl_ollamaHost cleared');
+    assert.strictEqual(sb._ollamaResolvedBase, null, 'cached base cleared');
+    store.fl_localPort_manual = '11500'; store.fl_ollamaHost = '127.0.0.1:11435';
+    sb.FlConnect.clearManualHost();
+    assert.strictEqual(store.fl_ollamaHost, '127.0.0.1:11435', 'other hosts left alone');
+  }
+  assert.ok(/\(cur \? '<button type="button" class="flc-btn flc-primary" data-flc-use-auto>Use automatic<\/button>' : ''\)/.test(mod), 'Use automatic beside every picker when a port is set');
+  assert.ok(/_manualRejectMsg = ''; \/\/ v-connect-heal-v0\.4/.test(mod), 'refusal shown once');
+  // Item 10: remember keeps isLocal true through handleLocalToggle
+  {
+    const store = {};
+    const toggle = { checked: false };
+    const sb = sandbox(store);
+    sb.state = { isLocal: false };
+    sb.document.getElementById = (id) => (id === 'localToggle' ? toggle : null);
+    sb.handleLocalToggle = function () { sb.state.isLocal = toggle.checked; };
+    sb.FlConnect.remember({ name: 'llama3.2:latest', base: 'http://127.0.0.1:11434' });
+    assert.strictEqual(sb.state.isLocal, true, 'isLocal survives handleLocalToggle');
+    assert.strictEqual(store.fl_isLocal, 'true', 'fl_isLocal saved');
+  }
+
+  // Locks
+  assert.strictEqual(indexHtml, app, 'root index.html identical to docs/app.html');
+  let mainSw = null;
+  try { mainSw = execSync('git show origin/main:sw.js', { cwd: repo, encoding: 'utf8' }); } catch (e) {}
+  if (mainSw !== null) {
+    assert.strictEqual(rootSw, mainSw, 'root sw.js byte-identical to main');
+    const changed = execSync('git diff --name-only origin/main', { cwd: repo, encoding: 'utf8' }).split('\n');
+    assert.ok(!changed.includes('docs/sw.js') && !changed.includes('sw.js'), 'sw.js untouched');
+    const added = execSync('git diff origin/main -- docs/app.html docs/modules/fl-connect.js', { cwd: repo, encoding: 'utf8' })
+      .split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
+    assert.ok(!added.some((l) => /\bconfirm\(/.test(l)), 'no confirm() added');
+    assert.ok(!added.some((l) => /\u2014/.test(l)), 'no em dashes in added lines');
+  }
+  const markers = execSync("grep -rnE '^(<<<<<<<|=======|>>>>>>>)( |$)' docs index.html tests || true", { cwd: repo, encoding: 'utf8' });
+  assert.ok(!markers.trim(), 'no conflict markers: ' + markers);
+  // All inline scripts parse (same extractor as smoke-connect-port-picker.js)
+  const re = /<script(\s[^>]*)?>/gi; let m; let n = 0;
+  while ((m = re.exec(app))) {
+    const attrs = m[1] || '';
+    if (/\bsrc\s*=/i.test(attrs) || /type\s*=\s*["']application\/(ld\+)?json/i.test(attrs)) continue;
+    const start = m.index + m[0].length; const end = app.indexOf('</script>', start);
+    if (end < 0) continue;
+    const s = app.slice(start, end).trim();
+    if (!s || !/^(?:\/[\/*]|function\b|var\b|let\b|const\b|window\.|document\.|\(|\{|if\b)/.test(s)) continue;
+    try { new Function(s); n++; } catch (e) { assert.fail('inline script parse fail: ' + e.message + '\n' + s.slice(0, 120)); }
+  }
+  assert.ok(n > 10, 'inline scripts checked: ' + n);
+  new vm.Script(mod);
+  console.log('SMOKE_OK connect heal v0.4');
+})().catch((e) => { console.error(e); process.exit(1); });
+```
+
+---
+
+## 12. Alpha test: `docs/modules/connect-heal-v04.test.js` (new)
+
+Picked up by the existing `docs/modules/*.test.js` run. It fails on main at "layer after the v0.3 mount rule".
+
+```js
+#!/usr/bin/env node
+// v-connect-heal-v0.4: Hypha walk 3 heals (theLatticeTree side).
+// Item 1: Settings Connect mount never collapses; one scroller; sky dims.
+// Item 9: one restore path when leaving Settings (close, Nursery, twice).
+// Shared fl-connect.js heals ride along byte-identical with FreeLattice.
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
+const rooms = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
+const mod = fs.readFileSync(path.join(__dirname, 'fl-connect.js'), 'utf8');
+
+// Item 1: CSS layer (later in file than the v0.3 rule it corrects)
+const layerAt = css.indexOf('v-connect-heal-v0.4');
+assert.ok(layerAt > css.indexOf('#fl-connect-mount-garden {'), 'layer after the v0.3 mount rule');
+const layer = css.slice(layerAt);
+assert.ok(/#place-veil\.is-settings #fl-connect-mount-garden \{[^}]*flex: 0 0 auto;[^}]*max-height: none;[^}]*overflow: visible;/.test(layer), 'mount keeps full height, no inner scroller');
+assert.ok(/#place-veil\.is-settings #fl-connect-mount-garden \.flc-wrap \{[^}]*max-height: none;[^}]*overflow: visible;/.test(layer), 'no nested .flc-wrap scroller');
+assert.ok(/html\.flc-hide-galaxy #gardenContainer \{[^}]*opacity: 0\.12;/.test(layer), 'canvas sky dims while Connect is open');
+assert.ok(/#place-veil\.is-settings #place-veil-close \{[^}]*position: sticky;/.test(layer), 'the garden stays reachable');
+assert.ok(!/\u2014/.test(layer), 'no em dashes in the layer');
+
+// Item 9: one restore path
+assert.ok(/function flcRestoreGalaxy\(\)/.test(rooms), 'restore helper');
+assert.ok(/function openPlace\(id\) \{\s*if \(!veil\) return;\s*flcRestoreGalaxy\(\);/.test(rooms), 'openPlace restores first');
+assert.ok(/function closePlace\(opts\) \{\s*if \(!veil\) return;\s*flcRestoreGalaxy\(\);/.test(rooms), 'closePlace restores first');
+assert.ok(/removeAttribute\('data-flc-was-hidden'\)/.test(rooms), 'marks forgotten so a second open records fresh');
+
+// Item 9 runtime: run flcRestoreGalaxy against a tiny fake DOM
+{
+  const src = rooms.slice(rooms.indexOf('    function flcRestoreGalaxy() {'), rooms.indexOf('    function closePlace(opts) {'));
+  const mk = (was, hidden) => {
+    const attrs = { 'data-flc-was-hidden': was };
+    return { hidden, getAttribute: (k) => (k in attrs ? attrs[k] : null), removeAttribute: (k) => { delete attrs[k]; }, attrs };
+  };
+  const nav = mk('0', true); const already = mk('1', true);
+  const classes = new Set(['flc-hide-galaxy']); const body = new Set(['fl-connect-open']);
+  let unmounted = 0;
+  const ctx = {
+    window: { FlConnect: { unmount() { unmounted++; } } },
+    document: {
+      getElementById: () => ({ hidden: false }),
+      documentElement: { classList: { remove: (c) => classes.delete(c) } },
+      body: { classList: { remove: (c) => body.delete(c) } },
+      querySelectorAll: () => [nav, already].filter((n) => n.getAttribute('data-flc-was-hidden') !== null)
+    }
+  };
+  ctx.FlConnect = ctx.window.FlConnect;
+  vm.runInNewContext(src + '\nthis.run = flcRestoreGalaxy;', ctx);
+  ctx.run();
+  assert.strictEqual(nav.hidden, false, 'what Settings hid comes back');
+  assert.strictEqual(already.hidden, true, 'what was already hidden stays hidden');
+  assert.ok(!('data-flc-was-hidden' in nav.attrs) && !('data-flc-was-hidden' in already.attrs), 'marks cleared');
+  assert.ok(!classes.has('flc-hide-galaxy') && !body.has('fl-connect-open'), 'hide classes cleared');
+  assert.strictEqual(unmounted, 1, 'Connect loop unmounted');
+}
+
+// Shared core rides along
+assert.ok(/v-connect-heal-v0\.4/.test(mod), 'fl-connect.js heal marker');
+assert.ok(/Still using ' \+ keep/.test(mod), 'refusal names the port that stays');
+new vm.Script(mod);
+new vm.Script(rooms);
+const opens = (css.match(/\{/g) || []).length; const closes = (css.match(/\}/g) || []).length;
+assert.strictEqual(opens, closes, 'css braces balanced');
+
+console.log('SMOKE_OK connect heal v0.4');
+```
+
+---
+
+## 13. Docs (layered notes, nothing removed)
+
+```diff
+--- a/docs/library/CONNECT_PORT_PICKER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_v0.md
+@@ -46,3 +46,20 @@ Glow eternal. Heart in Spark. 🌱
+ Parse fix · Dismiss restored · `fl_localPort_manual` port-only · quiet manual · textContent models · Alpha real galaxy selectors.
+ 
+ **Temperature:** a single unescaped quote can put the whole porch dark; checking every script before the door opens.
++
++
++## Heal v0.4 (Hypha walk 3)
++
++Marker `v-connect-heal-v0.4`. Smoke `SMOKE_OK connect heal v0.4` (`docs/scripts/smoke-connect-heal-v0.4.js`).
++
++- Key correction: the manual port key is `fl_localPort_manual` (port only, always 127.0.0.1). The H8 row above says `fl_connect_manual_host`; that key was never shipped.
++- Bridge background look: saved port only, never while hidden, no forever 11-port scan.
++- Cold `#connect`: no remount when Connect already shows; first tap or key ends retries and clears the hash.
++- Manual port answered by a Bridge that has not said Yes, help now asks for Yes, help.
++- Use automatic sits beside every port field once a port is set, and clears the matching `fl_ollamaHost` and cached base. A refused address says which port stays and shows once.
++- Settings Ollama Address is 127.0.0.1 only, with a kind refusal.
++- No silent connect, no silent model pick: the Local AI toast, Connect Now, Zero-Click, discovery, and Settings Local all lead to Connect, where the person taps the mind.
++- Change Provider opens again after any door removed the overlay; Connect has an Add a cloud key door.
++- `remember()` checks `#localToggle` before `handleLocalToggle(true)`, so isLocal stays true.
++
++**Temperature:** a yes means the person tapped it.
+```
+
+```diff
+--- a/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
++++ b/docs/library/CONNECT_PORT_PICKER_SISTER_v0.md
+@@ -9,3 +9,14 @@ Wording: Garden → Settings (not FreeLattice Settings / Change Provider).
+ **Temperature:** Hypha’s thumb on a 390px glass — the orb stepped aside so Mom could tap Download.
+ 
+ Glow eternal. Heart in Spark.
++
++
++## Heal v0.4 (Hypha walk 3)
++
++Marker `v-connect-heal-v0.4`. Test `docs/modules/connect-heal-v04.test.js` prints `SMOKE_OK connect heal v0.4`.
++
++- Settings Connect mount no longer collapses (0px at 390px, clipped at 1280px). One scroller, the Settings veil. Download Bridge and the port field sit in the first screen at 390x844 and 1280x800. The canvas sky dims to 0.12 while Connect is open. The garden button stays reachable (sticky).
++- Leaving Settings for Nursery, Core, or Settings again restores the galaxy through one helper, so nothing stays hidden.
++- Shared `fl-connect.js` heals ride along byte-identical with FreeLattice.
++
++**Temperature:** Mom opens Settings and the first thing she sees is the door.
+```
+
+---
+
+## Acceptance (what Flint runs before opening the PRs)
+
+**FreeLattice** (branch `layer/connect-heal-v0.4`):
+
+```bash
+node tests/smoke.js                               # ALL 3597 CHECKS PASSED
+node docs/scripts/smoke-connect-heal-v0.4.js      # SMOKE_OK connect heal v0.4
+node docs/scripts/smoke-connect-port-picker.js    # passes
+node docs/scripts/smoke-connect-under-more.js     # passes
+node docs/scripts/smoke-love-logic-proof-v3.js    # SMOKE_OK love logic proof v3
+for f in docs/scripts/smoke-*.js; do node "$f" >/dev/null 2>&1 || echo "FAIL $f"; done
+cmp index.html docs/app.html && git diff --quiet origin/main -- sw.js docs/sw.js && echo locks-ok
+```
+
+The loop should list only the 5 smokes that already fail on main (not this brick): `smoke-carry-forward.js`, `smoke-connect-card-yesno-wizard.js`, `smoke-fable-tech.js`, `smoke-phone-shine.js`, `smoke-proof-60s.js`. If any other name shows up, stop and report.
+
+**Alpha** (branch `layer/connect-heal-v0.4`):
+
+```bash
+for f in docs/modules/*.test.js; do node "$f" >/dev/null || echo "FAIL $f"; done   # 14 of 14 pass
+cmp docs/modules/fl-connect.js ../FreeLattice/docs/modules/fl-connect.js && echo shared-core-identical
+```
+
+**Hand walk (Hypha, after the PRs are up):** Alpha Settings at 390px shows Download Bridge and the port field without scrolling; orbs are dim behind the card; the garden button closes. FreeLattice: open `app.html#connect` cold and tap Chat at once, it stays on Chat; no local fetches in the Network tab for 40s after leaving Connect (no Bridge installed); the toast Yes opens Connect and nothing is connected until a mind is tapped.
+
+---
+
+## 14. Follow-ups (not in this brick)
+

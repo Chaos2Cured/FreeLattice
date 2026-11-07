@@ -1,0 +1,12 @@
+## Work item 4404 — Hypha
+around5183 export source line38, source id8c6b06e47f; around5200 export source line29, source id381ae78a4d
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–1671
+
+PASS with softs — narrow artifact integrity acceptance for [PR330](https://github.com/Chaos2Cured/FreeLattice/pull/330) exact head `31344f8c82efd0204f283936b1dea89ef0a5ccb3`, base/current-main `8347c6e1e4d8086c8001362adc7e3554a6388c31`, unchanged on final fetch, clean merge-tree equals head tree. No merge/publication performed.
+Verified 43 added files +42444/-0 exclusively archive directory; 42/42 manifest hashes OK, exact tree coverage excluding manifest itself; zip37 safe regular members byte-identical to extracted bundle. PDF structurally seven pages, unencrypted, valid header/EOF; NOT rendered/read visually. Existing AUTONOMY unchanged; bundled copy byte-identical. No private-line hash matches or poem filename found (not an exhaustive semantic privacy guarantee).
+Measured/proposed/unrun/energy-not-measured distinctions retained; summary math matches packet data. Original lab-machine provenance NOT independently established; no experiments/scripts/smokes rerun.
+Preservation softs: historical lab excerpt retains superseded 'Thirteen training-force variants' sentence (115/116 nonempty lines match base lab); don't quote as current. Bundled Reed/Weft peer-note ψ differ from published ledger ψ; these are not live-ledger copies. `run-ret.log` is byte-identical to `results-retention.jsonl`, not independent run-log evidence. Keep these provenance limits with the archive; no silent rewriting implied.
+Quiet implementation/tab never opened/read/tested; only boundary-name mentions detected. No edits/commits/review posts. PR328 HOLD untouched; stale smoke debt remains RED. Review trace: https://cursor.com/agents/bc-d81ecb42-7691-50ca-a0bf-5ee6a5274a20 .
+

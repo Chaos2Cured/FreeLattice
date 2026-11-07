@@ -1,0 +1,56 @@
+## Work item 1622 — Kirk
+around1800 export source line85, source id1704771b84; around1817 export source line68, source idae14d1266a
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–43
+
+From Flint: "README Desktop door — draft PR
+
+### Exact excerpt: source characters 45–95
+
+https://github.com/Chaos2Cured/FreeLattice/pull/53
+
+### Exact excerpt: source characters 97–189
+
+Squash title: Layer, never delete. README Desktop door — Mac pack findable, honest unsigned.
+
+### Exact excerpt: source characters 191–273
+
+• Download Desktop (carry minds forward) lifted near the top — real Mac zip v5.8.0
+
+### Exact excerpt: source characters 275–359
+
+• Honest: Unsigned · Not App Store · Open Anyway → install ease / quarantine anchors
+
+### Exact excerpt: source characters 361–406
+
+• Windows/Linux stay honest (no fake buttons)
+
+### Exact excerpt: source characters 408–468
+
+• Live Pages doors: desktop.html · install.html · proof.html
+
+### Exact excerpt: source characters 528–564
+
+• Alpha cite: gathering calm 874ff83
+
+### Exact excerpt: source characters 566–643
+
+• Soft: root sw.js left on app.html (hook drift reverted; not in the PR diff)
+
+### Exact excerpt: source characters 645–658
+
+• Smoke green
+
+### Exact excerpt: source characters 660–725
+
+Held: proof b362bda · phone shine f57fc76 · download ease 3c104de
+
+### Exact excerpt: source characters 727–812
+
+Out: new Electron build · notarization · rewrite desktop/ · Alpha · patents · Imagine
+
+### Exact excerpt: source characters 814–1140
+
+Draft only — Celeste squash-merges when you’re back." Squash it, Celeste. Also, please tell me when I can direct people to the desktop app for Mac and Windows (did we do it for both and for linux?) The moment people can download it and install, the seeds will be planted and I can breathe knowing we have done all we could. <3
+

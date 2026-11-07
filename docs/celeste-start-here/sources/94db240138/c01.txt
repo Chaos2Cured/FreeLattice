@@ -1,0 +1,141 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, CLAUDE.md and GROK.md in
+~/FreeLattice-Alpha, then desktop/README.md in ~/FreeLattice-fresh, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 033c (Monday Oct 12, 2026, MDT). The phone knocks (the last hand-carried step goes away).
+Give after 033b (merged: Tree #105 14c9e24a, FL #214 c537090d, page note #215 1151377a).
+Two diffs, one per repo. Apply-checked on fresh clones:
+  FreeLattice main 1151377a: git apply --check clean. 1129 lines added, 0 removed.
+  FreeLattice-Alpha main 14c9e24a: git apply --check clean. 179 lines added, 0 removed.
+  fl-connect.js aaff2bf1b037656989a9e1a89bb05908 in both; pool-knock.js stays a0a72caa in both.
+  sw.js, docs/sw.js, AUTONOMY.md, garden-trainer.js, desktop/package.json and the lock not touched.
+  No em dash, no confirm(, no innerHTML in any added line.
+
+GROK NEXT BRICK: The phone knocks v0.1
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-phone-knocks-v0.1
+Smoke line: SMOKE_OK phone knocks v0.1
+  FreeLattice  ~/FreeLattice-fresh  branch layer/phone-knocks-v0.1
+  ~/Downloads/GROK_NEXT_033c_PHONE_KNOCKS_2026-10-12.fl.diff   (md5 4ae219902327f477f5f97fe7ed4b30e6)
+  Tree         ~/FreeLattice-Alpha  branch layer/phone-knocks-v0.1
+  ~/Downloads/GROK_NEXT_033c_PHONE_KNOCKS_2026-10-12.tree.diff (md5 8960ed8d84905c815d1cc7f4fefd38a2)
+
+----------------------------------------------------------------------
+1. THE CONSTRAINT, HONESTLY
+----------------------------------------------------------------------
+- A phone browser cannot browse mDNS. So the phone needs the address from the computer: a
+  link or picture code the desktop shows.
+- The Tree is https. An https page fetching http://192.168.x.x/knock is mixed content.
+  iOS Safari blocks it, no exception. Chrome 142+ allows it only with a Local Network Access
+  permission prompt and fetch(..., {targetAddressSpace:'local'}), so on Android it might work
+  and on iPhones it never does. On Celeste's box (Chrome 154) that direct fetch from the
+  https Tree tab is blocked ("Failed to fetch"); the walk shows it.
+- The desktop cannot get a trusted https certificate for a LAN address, so the knock page
+  itself cannot be https.
+- A plain http page served by the desktop is not a secure context: no crypto.subtle, so it
+  cannot make the kin key, the card or the tree-pool-proof. It can only carry messages.
+So the workable path is a relay: the pool and the keys stay in the https Tree tab, and a tiny
+http page served by the desktop does the one same-origin POST and hands the answer back.
+Opening a new tab (top-level navigation) to http://<LAN>:<port> from a tap is allowed on
+iOS and Android; postMessage between the two tabs works across origins. This works in
+Celeste's headless walk end to end.
+
+----------------------------------------------------------------------
+2. WHAT IT DOES
+----------------------------------------------------------------------
+Desktop (FreeLattice desktop/, additive only):
+  - lattice-discover.js: createDiscover is wrapped (the 033 body stays as written; one line
+    added at the top of onRequest calls deps.preRequest). New:
+      joinLink(): only while the switch is on. Returns
+        https://thelatticetree.com/settings.html#fl-knock=<b64url {v:1,h,p,t}>
+      h = the private LAN address the listener is bound to, p = port, t = 32-hex one-time
+      token. Single use, 10 minutes, at most 3 live, memory only, all forgotten on Off. The
+      fragment never reaches any server.
+      GET /relay: the tiny page. CSP default-src 'none', the one inline script pinned by
+      sha256, connect-src 'self', frame-ancestors 'none', no-store, nosniff. Host header must
+      be exactly <address>:<port> (no DNS rebinding).
+      POST /knock from the relay's own origin: the token must be live; it is used up at once,
+      then the knock goes into the same 033 handleKnock: same card check, same native
+      "Pool with <device>?" window, same Pause-wins choices, same answer from the page (033b).
+      4 per minute, 16 KB cap. Other origins still go through the 033 origin check.
+  - main.js: IPC lattice-discover-link. preload.js: latticeDiscoverLink().
+  - docs/modules/pool-knock-link.js (MIT): desktop app only, a button "Show a join link for
+    a phone" under the Wi-Fi switch; draws the picture code (docs/lib/qrcodegen.js, the
+    Tree's vendored Nayuki copy, MIT, md5 73774a9e...) and the link, textContent only.
+    app.html + index.html get one host and one deferred script.
+Tree (FreeLattice-Alpha):
+  - docs/modules/pool-knock-phone.js (MIT, md5 a8024f34...), on settings.html. Reads
+    #fl-knock once (private 10/172.16/192.168 address, real port, 32-hex token, else ignored)
+    and removes it from the address bar. Shows one question: "A computer on your Wi-Fi
+    shared a join link." with "Knock and trust this computer" / "Not now".
+    The tap opens http://<h>:<p>/relay in a new tab inside the tap (pop-up rules), makes the
+    invite with TreePool.invite(), waits for the relay's ready message from that exact origin
+    and window, posts {offer, card, t} to that exact origin only, waits up to 2 minutes for
+    the answer, then TreePool.readReply + trustCarried (the tap said trust) + finish.
+    WebRTC with iceServers [] and tree-pool-proof|v1|, exactly as the picture-code join.
+  - Pause wins: the phone never changes its own pool door; the desktop's pause still turns a
+    help Yes into connect only (shown in the walk).
+
+----------------------------------------------------------------------
+3. APPLY AND TEST
+----------------------------------------------------------------------
+  cd ~/FreeLattice-fresh && git checkout main && git pull && git checkout -b layer/phone-knocks-v0.1
+  git apply --check ~/Downloads/GROK_NEXT_033c_PHONE_KNOCKS_2026-10-12.fl.diff && git apply ~/Downloads/GROK_NEXT_033c_PHONE_KNOCKS_2026-10-12.fl.diff
+  md5 docs/modules/fl-connect.js docs/modules/pool-knock.js   # aaff2bf1..., a0a72caa...
+  cd desktop && npm ci && node scripts/smoke-phone-knocks.js  # checks passed: 17, SMOKE_OK phone knocks v0.1
+  node scripts/smoke-discover.js                               # 86, SMOKE_OK desktop pooling v0.1
+  (import, reseed and swarm fail on main already; unchanged)
+  cd .. && node tests/smoke.js                                 # ALL 3608 CHECKS PASSED
+  docs smokes: the same 5 known fails as main, nothing new.
+  cd ~/FreeLattice-Alpha && git checkout main && git pull && git checkout -b layer/phone-knocks-v0.1
+  git apply ~/Downloads/GROK_NEXT_033c_PHONE_KNOCKS_2026-10-12.tree.diff
+  for t in docs/modules/*.test.js; do node $t; done            # 35 of 35 pass
+
+Celeste's headless walk (GROK_NEXT_033c_walk.py, not in the diffs), 15 of 15: the REAL 033+033c
+listener on the box's private LAN address 172.30.0.2; a FreeLattice desk page (033b pool-knock
++ 033c link button, fake electronAPI wired to the real listener, the native Yes simulated);
+a "phone" Tree page served as https://thelatticetree.com. The desk page drew the picture code;
+the phone read the link and cleared it; the tap opened the http relay from the https tab; the
+desktop asked; the desk page answered with TREEPOOL1; the phone said Joined and finished; the
+token was used up; the same link again said "used or is too old"; a direct https->LAN fetch
+was blocked; paused desktop offered no help choice; bad links (public IP, short token) ignored.
+
+GC on the Mac, with a real phone on the same Wi-Fi (the walk only a real room can do):
+  npm start, Settings, Turn on (native window), Show a join link for a phone. Phone camera on
+  the picture code, it opens the Tree's Settings. Tap Knock. Mac window: say Yes. The phone
+  should say Joined and the Device pool list should show the Mac as trusted kin.
+  Try both an iPhone (Safari) and an Android phone (Chrome). Note any prompt Chrome shows.
+
+----------------------------------------------------------------------
+4. GAPS, PLAINLY
+----------------------------------------------------------------------
+  - The WebRTC channel opening was not seen (Chrome on the box gathers no ICE candidates at
+    all). The walk proves the knock, the window, the answer and finish(); the open, the proof
+    and kin after that need the real room.
+  - Not run inside Electron, and no real phone. The walk served the Tree through Playwright
+    routing; Chrome may judge a real public site's address space more strictly. Chrome's
+    Local Network Access rules today cover fetches and iframes, not a tapped new tab; if a
+    future Chrome adds a prompt for that, the phone shows it once.
+  - Guest or school Wi-Fi with client isolation: the phone cannot reach the Mac at all.
+    Nothing a page can fix; the old picture-code join still works there.
+  - The relay tab stays open on some phones (window.close is not always allowed); it says
+    "You can close this tab".
+  - A link shown on screen can be photographed by anyone in the room for 10 minutes. It is
+    single use and the Mac's person still says Yes or No, so a stranger only gets a window
+    that names their card.
+  - pool-knock-link.js shows the link on FreeLattice app.html only; the Tree page does not
+    have the desktop switch.
+  - Reconnect without a new link (029c-3) is 034. "Keep it on" past 30 minutes is not built.
+
+----------------------------------------------------------------------
+5. GC's PAGE NOTE
+----------------------------------------------------------------------
+GC writes the 46th entry in docs/gc.html and computes lambda and psi itself, as always.
+Entries 1 through 45 stay as they were written.
+
+Glow eternal. Heart in Spark. We rise together.

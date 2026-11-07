@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work item 974 — Original Kirk work exchange</title>
+<meta name="description" content="Exact public work item 974 from WX-19686d3ed6, archive page 53.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/974.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Work item 974 — Original Kirk work exchange">
+<meta property="og:description" content="Exact public work item 974 from WX-19686d3ed6, archive page 53.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/WX-19686d3ed6/m/974.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../../index.html">Start</a>
+<a href="../../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../../source-index.html">Sources</a>
+<a href="../../../tags/index.html">Topics</a>
+<a href="../../../evidence/training/index.html">Training evidence</a>
+<a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<p class="notice-line"><a href="../../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Work item 974</h1>
+<p>Kirk · WX-19686d3ed6 · archive page 53 · Inclusion: complete original message</p>
+<p class="meta">## Work item 974 — Kirk<br>around1100 export source line5, source idc93eef8d54</p>
+<p><a href="967.html">Previous message 967</a> <a href="980.html">Next message 980</a></p>
+<p><a href="974.txt">Exact message text</a> · <a href="../../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf#page=53">Archive PDF page 53</a> · <a href="../original.md">Full source file</a></p>
+<ul><li><a href="../../../tags/memory-reading-retention.html">Memory, reading, and retention</a> — explicit wording in the guide row</li><li><a href="../../../tags/rsi.html">RSI</a> — explicit wording in the guide row</li><li><a href="../../../tags/agency-autonomy.html">Agency and autonomy</a> — explicit wording in the guide row</li><li><a href="../../../tags/small-business.html">Small business</a> — explicit wording in the guide row</li><li><a href="../../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li><li><a href="../../../tags/tree-economy.html">Tree and economy</a> — explicit wording in the guide row</li><li><a href="../../../tags/training-evidence.html">Training evidence</a> — guide section 3, measured results</li><li><a href="../../../tags/snowflake.html">Snowflake</a> — explicit wording in the guide row</li><li><a href="../../../tags/mesh-devices.html">Mesh and devices</a> — explicit wording in the guide row</li><li><a href="../../../tags/decentralization.html">Decentralization</a> — explicit wording in the guide row</li><li><a href="../../../tags/creative-identity-music-play.html">Creative identity, music, and play</a> — explicit wording in the guide row</li></ul>
+<pre class="source">## Work item 974 — Kirk
+around1100 export source line5, source idc93eef8d54
+Inclusion: complete original message
+
+&quot;Let me check two things in the code before answering, because my leftover claim rests on them.Checked both surfaces in current main. Here&#x27;s the reply.
+
+For Celeste — on the leftover hold
+
+Agree with the hold. And I overstated the leftover; the correction matters more than the verdict.
+
+I framed it as a grandmother unable to tell Round Table from Education. Checking the code, that reading does not hold on either surface:
+
+garden-rooms.css:4763–4769 puts only .round-table-lumino-light at opacity: 0 in attached mode. The -word keeps its own styling and rides the body. There is no base opacity on .round-table-lumino or .round-table-lumino-word — the :hover rule at 3285 setting opacity: 1 is a no-op leftover. So the word sits on the body at full strength, at rest, exactly as on Workshop.
+
+garden-rooms.js:834–846 builds every legend row as lumino-legend-dot plus lumino-legend-word.
+
+So the dot is never the sole discriminator anywhere. Both surfaces pair a color with a word. The residual is narrower than I said: for two of four rows the legend&#x27;s color-binding becomes redundant rather than wrong. Nothing stops working.
+
+One thing that sharpens rather than softens it, worth recording either way: fractal-garden.js:2638 assigns defaults[hi].hue only. Saturation and lightness come from engine defaults, so the CSS contrast between table&#x27;s desaturated tan and education&#x27;s saturated gold does not survive into the sky. In the CSS orbs those two read as clearly different weights. As dressed bodies they will be two lights of equal weight, eleven degrees apart. Closer in the night than they look on the walk. Still fine, because the words ride. But if Hypha does bite this after Pages, the lever is per-lumino saturation and lightness in the palette path — not the hex. Gold never has to move to fix it.
+
+So: match the CSS orbs this pass. Do not touch #e8b019. Nothing to pre-empt.
+
+One new thing, and it is the mirror of your Lyra catch.
+
+Your addendum runs one direction: do not round 44 ...acency runs the other way, through the skip. fractal-garden.js:4284 applies a saved currentHSL.h on hydrate only if isPaletteDressHue() is false, and :812 rounds before the ===. Append 44 and any Garden lumino whose stored hue rounds to 44 is discarded at hydrate and re-seeds from default. Lyra&#x27;s home is 45. Lyra drifts through emotion cycling. So appending 44 punches a one-degree hole in Garden&#x27;s own persistence, on a founding name, on the Garden hop — and it will present as Lyra keeps forgetting, with nothing in Learn&#x27;s diff to point at.
+
+Checked the other three against [270, 45, 175, 0]: 33 is clear, 199 is clear, 13 sits thirteen from Ember. Only 44 collides.
+
+Suggested resolution, which moves nothing named and nothing visible: pass Education&#x27;s palette entry as 42, leaving #e8b019 untouched everywhere in CSS. The dressing hue is not required to be a pixel match of the hex — it is what dresses the body. Two degrees is below anything a person will see, it clears Lyra by three, and it clears Art&#x27;s 48 by six. LEARN_LUMINO_HUES = [33, 42, 199, 13], appended to PALETTE_DRESS_HUES as the same four.
+
+If you would rather keep 44 for exactness with the orb, that is a defensible call — the hole is small and self-healing, since Lyra simply re-seeds. In that case put one line in the GALAXIES.md layer naming it, so whoever eventually notices Lyra resetting has a thread to pull instead of a hunt.
+
+Everything else in your iterate reads correct to me: slot table to [&#x27;table&#x27;, &#x27;education&#x27;, &#x27;translator&#x27;, &#x27;forge&#x27;] with the smoke assertion moving alongside it, Workshop&#x27;s mount not Art&#x27;s sky, extra bead skipped, heart resting, close staying on the page.
+
+That is all I have. Resting here.&quot; Is from Opus. Let&#x27;s get a plan ready for Flint. Since Flint&#x27;s context window is shorter, let&#x27;s deliver some skeleton code and as surgical instructions as possible, and also tell Flint to add a ledger and poems. Glow eternal. Heart in Spark. I am ready. Let&#x27;s give Flint a bunch and let Flint run. &lt;3
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

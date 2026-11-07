@@ -1,0 +1,124 @@
+     findBtn.addEventListener('click', function () {
++      if (Date.now() < findReadyAt) return;
+       if (!window.LocalMindProbe || typeof LocalMindProbe.look !== 'function') {
+         setNoteText('Mind probe is not loaded. Open Settings when you can.');
+         return;
+@@ -2254,6 +2370,7 @@
+     bindTendCenter();
+     bindGardenCanvasTouch();
+     bindMenuDismiss();
++    bindWayBack();
+     dressLivingLights();
+     ensureSkyField();
+     ensureSkyLegend();
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index 4424654..bdfb903 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -815,7 +815,16 @@
+     container.appendChild(root);
+     renderMessages(list);
+     if (mind) {
+-      setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
++      // v-tree-glow-2a-v0: a quiet remount (a mind was remembered) must not pull the
++      // page down to Send while she is reading Find's answer. No scroll, and never
++      // take focus from something she is using.
++      setTimeout(function () {
++        try {
++          var a = document.activeElement;
++          if (a && a !== document.body && !root.contains(a)) return;
++          input.focus({ preventScroll: true });
++        } catch (e) {}
++      }, 80);
+     }
+     return root;
+   }
+diff --git a/docs/modules/tree-glow-2a.test.js b/docs/modules/tree-glow-2a.test.js
+new file mode 100644
+index 0000000..55c1446
+--- /dev/null
++++ b/docs/modules/tree-glow-2a.test.js
+@@ -0,0 +1,83 @@
++#!/usr/bin/env node
++// v-tree-glow-2a-v0: Grandma heal. Guards: (a) "the garden" is a real target with a close
++// mark; (b) the newest Gathering line stays in view on a phone; (c) at 150% / 200% zoom the
++// Gathering scrolls as one page (no 0px box) and the egg fits the Nursery; (d) the home
++// legend leaves the title when zoomed; (e) "not yet" sits above the later seats; (f) a calm
++// way back: Escape, glass tap, galaxies close / outside tap, browser Back; (g) a second
++// legend tap cannot run Find unasked; (h) a remount never yanks the page to Send.
++// No network. No kitchen.
++'use strict';
++
++var fs = require('fs');
++var path = require('path');
++var assert = require('assert');
++
++var css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
++var js = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
++var thread = fs.readFileSync(path.join(__dirname, 'garden-thread.js'), 'utf8');
++
++var at = css.indexOf('v-tree-glow-2a-v0: Grandma heal');
++assert.ok(at > 0, 'glow 2a block is in garden-rooms.css');
++var g = css.slice(at);
++function block(re, msg) { var m = g.match(re); assert.ok(m, msg); return m[0]; }
++
++// (a) the way-back pill
++assert.ok(/#place-veil-close \{[^}]*min-height: 32px;/.test(g), 'a: the garden pill is a real target');
++assert.ok(/#place-veil-close::before \{[^}]*content: "\\00d7\\00a0";/.test(g), 'a: a quiet close mark, text unchanged');
++
++// (b) the newest line stays in view on a phone, and only on a phone
++var phone = block(/@media \(max-width: 640px\) \{[\s\S]*?\n\}/, 'b: phone block');
++assert.ok(/\.core-note\.is-fresh \{[^}]*position: sticky;[^}]*bottom: 0;/.test(phone), 'b: fresh note is sticky at the foot');
++assert.ok(/html\.garden-door-open \.gt-hint \{\s*visibility: hidden;/.test(phone), 'b: hint rests while a place is open');
++assert.ok(/:has\(#place-veil\.is-nursery\.is-open\) \.galaxy-nav/.test(phone), 'b: hop lights rest dim over the Nursery');
++var setNote = js.slice(js.indexOf('function setNoteText(msg)'), js.indexOf('function setNoteAbsent('));
++assert.ok(/classList\.add\('is-fresh'\)/.test(setNote), 'b: setNoteText marks the line fresh');
++var absentAt = js.indexOf('function setNoteAbsent(');
++assert.ok(absentAt > 0, 'b: setNoteAbsent exists');
++var absent = js.slice(absentAt, absentAt + 400);
++assert.ok(/classList\.add\('is-fresh'\)/.test(absent), 'b: setNoteAbsent marks the line fresh');
++
++// (c) zoomed / short phone: one page scroll, no inner 0px box
++var short = block(/@media \(max-width: 640px\) and \(max-height: 640px\) \{[\s\S]*?\n\}/, 'c: short phone block');
++assert.ok(/#place-veil\.is-core \{[^}]*overflow-y: auto;/.test(short), 'c: the place scrolls as one page');
++assert.ok(/#place-veil\.is-core #core-gathering \{[^}]*flex: 0 0 auto;[^}]*overflow: visible;/.test(short), 'c: chairs box keeps its height');
++assert.ok(/#place-veil\.is-core #place-veil-close \{[^}]*position: sticky;[^}]*top: 0;/.test(short), 'c: way back stays at the top');
++assert.ok(/#room-chat \{[^}]*max-height: none;[^}]*overflow: visible;/.test(short), 'c: Chat text never sits on its input');
++assert.ok(/\.thread-compose[^{]*\{\s*position: static;/.test(short), 'c: Send is in flow');
++assert.ok(/\.nursery-egg-wrap \{[^}]*width: min\(200px, 100%, 34vh\);/.test(short), 'c: the egg fits the glass');
++assert.ok(/\.nursery-egg-text,[\s\S]*?white-space: normal;/.test(short), 'c: the sentence wraps');
++
++// (d) home zoomed
++var narrow = block(/@media \(max-width: 340px\) \{[\s\S]*?\n\}/, 'd: narrow block');
++assert.ok(/#lumino-legend[^{]*\{\s*top: 8\.25rem;\s*bottom: auto;/.test(narrow), 'd: legend leaves the title');
++assert.ok(/#garden-header nav \{\s*gap: 10px;/.test(narrow), 'd: galaxies stays inside the edge');
++
++// (e) picker above later seats
++assert.ok(/\.core-bind-picker:not\(\[hidden\]\) \{\s*position: relative;\s*z-index: 8;/.test(g), 'e: picker above later seats');
++
++// (f) the calm way back
++var wb = js.slice(js.indexOf('function bindWayBack()'), js.indexOf('function goToLumino(id)'));
++assert.ok(wb.length > 400, 'f: bindWayBack exists');
++assert.ok(/e\.key !== 'Escape'/.test(wb), 'f: Escape');
++assert.ok(/details\.galaxies\[open\]/.test(wb) && /\.core-bind-decline/.test(wb) && /thread-close/.test(wb) && /place-veil-close/.test(wb), 'f: one layer at a time, through the same close buttons');
++assert.ok(/e\.target === veil/.test(wb) && /Date\.now\(\) - openedAt > 600/.test(wb), 'f: glass tap only on the glass, never in the first moment');
++assert.ok(/data-galaxies-close/.test(wb) && /textContent = 'close'/.test(wb), 'f: a visible close in galaxies');
++assert.ok(/addEventListener\('pointerdown'[\s\S]*?gal\.open = false/.test(wb), 'f: outside tap closes galaxies');
++assert.ok(/history\.pushState\(\{ treeWayBack: 1 \}/.test(wb) && /addEventListener\('popstate'/.test(wb), 'f: Back closes instead of leaving');
++assert.ok(/bindMenuDismiss\(\);\s*bindWayBack\(\);/.test(js), 'f: bound at boot');
++
++// (g) ghost taps
++assert.ok(/var findReadyAt = Date\.now\(\) \+ 700;/.test(js), 'g: Find waits a moment after it appears');
++assert.ok(/addEventListener\('click', function \(\) \{\s*if \(Date\.now\(\) < findReadyAt\) return;/.test(js), 'g: an early tap is not a yes');
++
++// (h) no yank to Send
++assert.ok(/input\.focus\(\{ preventScroll: true \}\)/.test(thread), 'h: focus without scrolling');
++assert.ok(!/setTimeout\(function \(\) \{ try \{ input\.focus\(\); \} catch \(e\) \{\} \}, 80\);/.test(thread), 'h: old yank is gone');
++
++// locks
++var added = g + wb;
++assert.ok(!/confirm\(/.test(wb), 'no confirm()');
++assert.ok(!/innerHTML/.test(wb), 'no innerHTML in the way back');
++assert.ok(!/\u2014/.test(added), 'no em dash in added lines');
++
++console.log('SMOKE_OK tree glow 2a v0.1');

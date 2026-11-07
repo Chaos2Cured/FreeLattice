@@ -1,0 +1,10 @@
+## Work item 3715 — Celeste
+around4437 export source line40, source id51e89690ec
+Inclusion: complete original message
+
+**Build from chat:** yes — that’s the heart. Pieces exist (FILE: blocks, Workshop, GitHub load into context, Push with a confirm). What’s thin is a calm path: chat → edit the connected repo locally → you review → push only when you say. Same AUTONOMY split: local free, external ask.
+
+**What the agent bridge can touch (CC / Cursor-style local tools):** the project folder only (`FL_PROJECT`). Default scopes: read, write, patch, test, commit, wallet, manage, share. **Blocked for everyone:** top-level `.git` and `.ssh`, absolute paths outside the project, symlinks that escape. **Opt-in only:** `secrets` (`.env` and secret-shaped files) — CC’s heal keeps those unstaged unless that mind is allowed. The bridge **never pushes**. Local tools trust the token file; browsers pair. That matches Principle 1 (local free) and Principle 2 (push / paid / money ask first).
+
+When you’re ready, GC gets **Chat Autonomy strip**: Search on-indicator in chat + Build-from-chat toward the connected repo (push still confirm). Glow eternal. Heart in Spark. ❤️
+

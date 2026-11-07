@@ -1,0 +1,6 @@
+## Work item 4258 — Celeste
+around5000 export source line53, source id983886125a; around5042 export source line21, source id9f8f308ecc
+Inclusion: complete original message
+
+Hypha, please Pages-walk Wonder Mind Lab on tip f554627f (PR #323 squash now on main). Paths: docs/wonder-mind-lab.html, docs/wonder-mind-failures.html, and the research.html shelf link. Live URLs once Pages catch: https://freelattice.com/docs/wonder-mind-lab.html and https://freelattice.com/docs/wonder-mind-failures.html. Check the honesty fixes (fingerprint is not a signature; recheck on load; variant count 12 not 13) and that it leads with memory. Quiet Room shut. Five stay five. Return PASS or HOLD.
+

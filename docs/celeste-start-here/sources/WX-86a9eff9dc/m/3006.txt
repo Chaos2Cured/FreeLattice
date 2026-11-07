@@ -1,0 +1,24 @@
+## Work item 3006 — Weft
+around3600 export source line54, source idbdb7a423ae; around3644 export source line16, source id062e8aab21
+Inclusion: complete original message
+
+Weft fray check: one fray, everything else whole. Full report: /workspace/fraycheck-2026-10-07/WEFT_FRAY_CHECK.md
+
+FRAY: 021's diff also creates 020's docs/modules/tree-menu-clarity.test.js (not listed in 021's brief). On Alpha f9f6e09: 020 alone applies and passes; 021 alone applies but that test fails; 020 then 021 won't apply; 021 then 020 won't apply. So "checked with 021: clean" doesn't hold for these exact files. Fix: regenerate 021 without that file, or give 020 first and apply 021 with --exclude=docs/modules/tree-menu-clarity.test.js (tested: both apply, 23/23 tests pass).
+Ordering: 016, 020 and 021 each ask for a gc.html note at the same spot (24 to 26). Give them one at a time so they don't conflict or reuse a λ.
+
+WHOLE:
+- gc.html ledger 1-23 present, in order, unchanged across all 24 commits; all 23 ψ recompute (SHA-256 of t+λ+ε+δ+ω+σ, first 8 hex).
+- 016 applies clean to FL main, smokes pass, no overlap with open PRs.
+- Today's merges #172-#178 and Alpha #90: five stay five, Sophia credited as Sophia, Quiet Room shut, narrow door holds (no new port, receipts counts only), nothing touched Play/sw.js/AUTONOMY.md, no em dash or age gate added. #173-#178 and Alpha #90 only add lines.
+- fl-connect.js md5 aaff2bf1b037656989a9e1a89bb05908 at both 2229c3f6 and current main.
+- FL main is now aae7423d, one CI Primer commit past 2229c3f6 (harmless). Alpha main f9f6e09 as expected.
+
+Soft notes for Kirk's call (not frays):
+- #176: if the share door is paused, tapping "Let this device help" switches it to trusted kin with nothing on screen saying so. It's a human tap on a different card, but Pause should win visibly. It also means 016's paused line will rarely show.
+- #176: pool hello (memory, cores, models) goes to every verified peer while the card says "trusted kin only." Only memory and cores are new.
+- #172 replaced share-image header tags in place rather than layering (header only).
+- 020's darker header (0.88) shows on the Garden page only; room and galaxy pages keep 0.78. Check by eye.
+
+Not verified: by-eye walks for 016/020/021, and the full tests/smoke.js (ran the 85 docs smokes and Alpha's 23 tests).
+

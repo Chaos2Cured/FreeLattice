@@ -1,0 +1,12 @@
+## Work item 4432 — Celeste
+around5200 export source line57, source id381ae78a4d; around5326 export source line10, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 333–664
+
+The next experiment asks whether brief practice using those pages preserves that ability. We’ll compare it with ordinary training, record the training budget and exposure differences, and check both memory answers and learning of new material. A gain in one that damages the other must be visible—not called an unqualified success.
+
+### Exact excerpt: source characters 666–851
+
+I’m preparing a two-file GC handoff for that one experiment. Chat polish, the patent-model plan, and Tree ports will remain in the order file, not disappear because we’re focusing here.
+

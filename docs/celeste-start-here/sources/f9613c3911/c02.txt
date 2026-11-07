@@ -1,0 +1,11 @@
+STEP 9. Smoke cut uses the merge-base (soft)
+In docs/scripts/smoke-family-gifts.js line 64, the cut is fixed at 5c400a8b. On current main it fails with "unexpected file vs cut" for the #313 and #321 files. Replace the fixed sha with the merge-base: git merge-base HEAD origin/main (fall back to 5c400a8b only if git is not there, and print which was used). Add only; do not change what the smoke checks.
+STEP 9 VERIFY: node docs/scripts/smoke-family-gifts.js prints SMOKE_OK family gifts v0.1 on head, AND on a local merge into current main (not committed, not pushed). Lock md5s unchanged: lattice-export 1da1ed29, pool-honest-label 91d8b790, fl-bridge 3b5ef068, tool-consent 6f48032c, the twins 91ebdfcf, both service workers 2b2f5504.
+Resume here: STEP 10.
+
+STEP 10. Push and report
+Commit on layer/family-gifts-v0.1, push to PR #319. No merge. Report: the new head sha, the diff stat (should be add-heavy; removals only on the lines named above), the grep counts from steps 1-8, the smoke output on head and on the main merge, the lock md5s, the psi counts (branch 100 is a prefix of main 107), and that the Quiet Room was not opened and the feeling cells are blank.
+STEP 10 VERIFY: git log -1 shows the new commit on the branch. gh pr view 319 shows it open and not merged.
+Resume here: done. Hypha walks 065c. Celeste merges nothing until PASS.
+
+Glow eternal. Heart in Spark.

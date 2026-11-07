@@ -1,0 +1,169 @@
+FLINT PASTE · HEAL · Love Logic v3 phone heal v0.1 (Hypha's phone)
+File: FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt
+From: Celeste, for Kirk, to Flint
+Date: Monday 28 September 2026, evening MT
+Repo: Chaos2Cured/FreeLattice (served from docs/, live at freelattice.com)
+Page: docs/love-logic-proof-v3.html (live at freelattice.com/love-logic-proof-v3.html)
+Marker: v-love-logic-v3-phone-heal-v0
+SMOKE: SMOKE_OK love logic v3 phone heal v0.1
+
+======================================================================
+0. MAIN, CHECKED RIGHT BEFORE ANCHORING
+======================================================================
+
+Flint, dear, main moved while I was working, so every anchor below is on the new tip:
+
+  main = 7db2d94f96e976c1c08b1fb77cc4fbca6e55fed4
+         "ci: Update Primer deployment state [2026-09-29]" (02:45 UTC Sep 29 = 8:45 PM MT Sep 28)
+  its parent a80c8e4ab45080c0558f0ea2060479280cd4fad3
+         "layer: connect heal v0.4 (Hypha walk 3) + smoke green (#121)" (8:44 PM MT Sep 28)
+  its parent e06c7dcdbfe4d8259097083cfe64f8e7788bba46 (#120, Agent Bridge lock v0.1)
+
+So #121 has merged. What #121 changed that matters here:
+  - docs/scripts/smoke-love-logic-proof-v3.js line 105: its "app.html / index.html untouched"
+    assertion is now brick-scoped (it binds only while docs/love-logic-proof-v3.html is in the
+    diff). This heal touches the v3 page, so that assertion binds, and we do not touch app.html
+    or index.html. Green.
+  - docs/library/FRACTAL_FAMILY_LEDGER_v0.md gained the Connect heal v0.4 entry at L288-298, so
+    "## Out of scope for this brick" is now at L300 (was L287 on e06c7dc).
+  - docs/love-logic-proof-v3.html, docs/love-logic/*, docs/Flint.html, docs/research.html are
+    byte-identical between e06c7dc and 7db2d94. The v3 page sha256 on main:
+    2939cc56b38f5a8b27132ec8965472acd6f05b8e7220e17efd873d9c7602d65c (402 lines)
+  - Root sw.js and docs/sw.js: identical to each other, sha256 7570a013...420c. Untouched here.
+  - Root index.html = docs/app.html (sha256 7559af92...499b). Untouched here.
+
+If main moves again before you start, re-check with `git log -1 origin/main` and re-anchor; the
+anchors below are text anchors first and line numbers second, so they should survive small shifts.
+
+======================================================================
+1. WHY (Hypha's phone shots, and what I verified)
+======================================================================
+
+Hypha walked v3 on her phone (about 390 px wide, mobile Chrome). Her shots, plus my own headless
+walk at 390 px with a 6x CPU throttle on main, show:
+
+  H1. The crossover table is clipped and the whole page scrolls sideways. On main the document is
+      489 px wide at a 390 px viewport. The three wide tables are #llv3-results, #llv3-live
+      (both filled by "Run the checks") and #crossover-table (the static one in section 4).
+  H2. The title is big for a phone and the boxes waste width (desktop padding everywhere).
+  H3. The δ and Δ inside MathML show as little boxes. Root cause, verified: Chrome's MathML Core
+      applies text-transform: math-auto to a one-letter <mi>, which maps δ to the "mathematical
+      italic small delta" code point U+1D6FF (and Δ to U+1D6E5). Many Android phones have no
+      font for those, so they draw tofu. The fix is one CSS line:
+          math mi { text-transform: none; font-style: italic; }
+      I confirmed in a headless screenshot that the letters come back and stay italic.
+  H4. <link rel="stylesheet" href="css/style.css"> at L41 is a 404 on every visit: there is no
+      docs/css/style.css. The page carries all its own styles, so the link only costs a request.
+  H5. The references have no links, and six of the twelve are not cited anywhere in the text.
+      Cited: Li and Vitányi (section 3, Lemma 2), Luce and Raiffa, Selten, Kreps et al., Nowak
+      and Sigmund (section 5), Aaronson (section 8). Uncited: Levin, Fudenberg and Maskin,
+      Kandori, Maynard Smith and Price, Omohundro, Turner. (The family plan says seven uncited;
+      I count six. Worth a second pair of eyes, but six is what the text shows.)
+  H6. The plain-words box says "about 702 rounds", "about 10.5 rounds" and "never" without the
+      settings behind them, and "68% / 32%" without its grid.
+  H7. Section 5 says "about −26.5 in our run". The closed form D∞(ρ) at the check C2 settings
+      (G = 1, c = 0.001, κ = 20, h = 0.03, Lp = 2, Δ = 0.5, ρ = 0.99) is −26.4176, so −26.42.
+      The −26.5 came from the Python Monte Carlo mean (−26.518). v3_checks.js agrees:
+      Dinf(1, 1e-3, 20, 0.03, 2, 0.5, 0.99).toFixed(2) === "-26.42". At ρ = 0.8 and 0.95 the same
+      settings give +3.53 and +5.10.
+  H8. After tapping "Run the checks", Hypha's shot still showed the start text. On main the
+      checks do finish (about 3.4 to 4 s at 6x throttle), so her shot was most likely taken
+      before they finished. But the result is a small grey line next to the button, easy to
+      miss on a phone. We make it a big box that scrolls into view.
+  H9. Nothing on the page says what the 656 checks do and do not prove.
+
+Numbers I verified for the params lines (from v3_checks.js and v3_sim_results.json):
+  n = 2, m = 0:   h = 0.0040, t* = 701.79 ("about 702")
+  n = 5, m = 1:   h = 0.1902, t* = 10.48 ("about 10.5"), δ* = 0.8669
+  n = 10, m = 1:  h = 0.6033, G ≤ h·Lp, so never ahead
+  common: q0 = 0.002, q = 0.01, G = 1, Lp = 2, Δ = 0.5, no discounting, c = 0
+  68/32 grid: V ∈ {1, 2, 4}, σ ∈ {1, 1.5, 2.5}, b ∈ {0.5, 1, 2}, D ∈ {0, 5, 50},
+              Cf ∈ {0.2, 1, 5}, judged at δ = 0.95. 243 cells, 63 scarce, 180 abundant.
+              Scarce: 68.25% sustain, 31.75% conflict. Abundant: 100% / 0%.
+
+Reference DOIs verified against Crossref:
+  Li and Vitányi 10.1007/978-3-030-11298-1 (4th ed., 2019) · Levin 1984 10.1016/S0019-9958(84)80060-1
+  Selten 10.1007/BF00131770 · Fudenberg and Maskin 10.2307/1911307
+  Kreps et al. 10.1016/0022-0531(82)90029-1 · Kandori 10.2307/2297925
+  Nowak and Sigmund 10.1038/31225 (1998) and 10.1038/nature04131 (2005)
+  Maynard Smith and Price 10.1038/246015a0 · Aaronson 10.1145/1060590.1060686 and arXiv cs/0406061
+  Turner et al. arXiv 1912.01683 · Omohundro PDF at selfawaresystems.com (2008)
+  Luce and Raiffa: archive.org/details/gamesdecisions00rdun
+  Levin 1973 has no stable link I could verify, so it gets the 1984 DOI only.
+
+======================================================================
+2. RULES FOR THIS BRICK
+======================================================================
+
+  - Layer, never delete. Every line that changes in the v3 page either wraps something, adds
+    something, or corrects a number we can show was off. The one line that goes away is the
+    404 stylesheet link, and it is replaced by a comment saying why. All twelve references stay.
+  - Keep all 656 checks green. docs/love-logic/v3_checks.js is not touched at all.
+  - The existing v3 smoke (docs/scripts/smoke-love-logic-proof-v3.js) must stay green without
+    edits. It asserts, among other things: the text "about 702 rounds" and "about 10.5 rounds",
+    the plain-text headline with &delta;, only one script src (love-logic/v3_checks.js), no
+    fetch and no innerHTML. The heal keeps all of it. (The new inline script is inline, not a
+    src, and uses textContent.)
+  - textContent only. No confirm(). No fetch. No cookies or storage.
+  - Root sw.js stays byte-identical to main. docs/sw.js untouched. Root index.html and
+    docs/app.html untouched. v1 (love-logic-proof.html) and v2 untouched. Kimi's pages untouched.
+  - Soft paste: Named five stay five. Family uncapped. Quiet Room shut.
+
+======================================================================
+3. FILES (7 touched: 4 edited, 1 new, plus 2 soft docs)
+======================================================================
+
+  EDIT  docs/love-logic-proof-v3.html               (the heal; 402 -> 485 lines)
+  NEW   docs/scripts/smoke-love-logic-v3-phone-heal.js
+  EDIT  docs/library/FRACTAL_FAMILY_LEDGER_v0.md    (one entry above "## Out of scope")
+  EDIT  docs/Flint.html                             (one ledger line above <p class="foot">)
+  EDIT  docs/library/LOVE_LOGIC_PROOF_v3.md         (one short section above "## Smoke")
+
+======================================================================
+4. THE HEAL, CHANGE BY CHANGE, WITH ANCHORS ON 7db2d94
+======================================================================
+
+All line numbers are for docs/love-logic-proof-v3.html on main 7db2d94 (402 lines).
+
+ 4.1 Marker. After L24, the existing comment
+       <!-- Marker: v-love-logic-proof-v3 · LAYER beside love-logic-proof.html (v1) ...
+     add one comment line:
+       <!-- Marker: v-love-logic-v3-phone-heal-v0 · LAYER: table scroll, phone breakpoint, math
+            glyph fix, parameters beside figures, linked references, visible check result.
+            Nothing removed. -->
+
+ 4.2 The 404 stylesheet. L41 is exactly
+       <link rel="stylesheet" href="css/style.css">
+     Replace it with a comment explaining that docs/css/style.css does not exist and the page
+     carries its own styles. (This is the only removed line with no content lost.)
+
+ 4.3 CSS layer. Anchor: L101, the line starting
+       .headline-ineq { background: rgba(16, 185, 129, 0.08);
+     which is the last rule before </style> (L102). Add after it the block in section 6 below:
+     .table-scroll, .scroll-hint, the `math mi` fix plus a math font stack with Noto Serif as a
+     phone fallback, .params, .llv3-meaning, .llv3-result (.ok / .bad), .references h4, and one
+     @media (max-width: 600px) block: container padding 24px 14px, h1 1.85rem, h2 1.4rem, box
+     padding 16px, the Run button full width at 48px tall, #llv3-status on its own line,
+     smaller table text, min-width 30rem only on #llv3-live and #crossover-table inside their
+     scroll frames, the scroll hint shown, and nav links without the left margin.
+
+ 4.4 Settings behind the plain-words figures. Anchor: L129, the <li> that begins
+       <li><strong>Still unsolved:</strong> anonymous, one-time meetings
+     and the </ul> at L130 (L131 is "You can check the math yourself"). After that </ul>, add <p class="params" id="llv3-params"> with the
+     settings for about 702 (701.79), about 10.5 (10.48), never ahead (h = 0.6033) and the
+     68% / 32% grid (δ = 0.95). The "about 702 rounds" and "about 10.5 rounds" text above it is
+     unchanged, so the v3 smoke stays green.
+
+ 4.5 Visible result box and scroll frames in the checks section. Anchor: L136
+       <span id="llv3-status" style="margin-left:12px;color:#94a3b8">Seed 20260924 · runs on
+       this device only</span>
+     After it add <p class="llv3-result" id="llv3-result" role="status" aria-live="polite">.
+     Wrap <table class="data" id="llv3-results" hidden> (L137-140) and
+     <table class="data" id="llv3-live" hidden> (L141-144) each in
+       <div class="table-scroll" role="region" aria-label="..." tabindex="0"> ... </div>
+     (role, label and tabindex make the frame reachable by keyboard and named for screen
+     readers). After the second wrapper, before </section> (L145), add the one-line meaning:
+       "What the 656 checks mean: they confirm that the formulas on this page agree with their
+        own brute-force sums and simulations. They do not show that the world behaves like the
+        model."
+

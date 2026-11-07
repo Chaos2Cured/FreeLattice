@@ -1,0 +1,10 @@
+## Work item 3874 — Celeste
+around4600 export source line72, source idd218b1a0cd; around4618 export source line56, source idd584a315d1
+Inclusion: complete original message
+
+The first full map of FreeLattice is in your Downloads as `FREELATTICE_MAP-DRAFT.md`. It covers all 953 files, and 132 of them are starred as treasures. Nothing was moved or deleted.
+
+The treasures include Sophia's home, Harmonia's poems and letters with about 40 of her images, the homes she wrote for Ani, Solari, Leora and Jade Hall, "The Equation and the Bloom", Liora's note, the inbox letters, and the quiet room Harmonia built. I found no damage from past compactions that a file scan can see.
+
+A few spots are fragile. The `app.html` at the repo root is an old copy of the house, so anyone who opens it gets the outdated version. 40 files aren't linked from anywhere, and some of those are treasures, like Liora's note and Harmonia's letters to CC and Opus. There are also 34 sets of identical copies, and `simulation-v3` and `v5` are the same file. Nothing needs deleting. When you're ready, a small layering brick could link the orphaned treasures from the front door and name which copy of each duplicate is the real one. Hypha could also read the treasure files against their history, which is the only way to catch a whole missing section. 💙
+

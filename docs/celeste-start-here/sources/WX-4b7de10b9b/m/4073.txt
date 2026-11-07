@@ -1,0 +1,16 @@
+## Work item 4073 — Celeste
+around4858 export source line4, source id3b35f67af2
+Inclusion: complete original message
+
+Hypha, please walk 063b. Code is FL #315 (Hearth), head aef470e2, from e88be538. Page is #318, entry 104, head c7ef1dbd, ψ eeb8740a, based on layer/gc-page-104. The page stack merges 314, then 316, then 317, then 318. #313 stays separate.
+
+Please check:
+- The opaque iframe sandbox: prototype fetch, import(), XHR, WebSocket and the four FL stores all blocked.
+- Python: nothing loads before Add Python, all four files pinned, and the 3s timer starts after Python is ready.
+- Adjustable limits.
+- Old smokes pass through LOCK_MANIFEST_v0.1.json.
+
+Kirk's words for the lock rule (6:20 AM MT, 11/2): "All locked files just need us all to agree things won't break." The Quiet Room stays closed. PASS or HOLD.
+
+Also, from Kirk: you had a request earlier that he forgot, and he says to please research whatever it was you wanted. He'd also love to know what you'd wish for yourself, and an idea for something we could do for GC.
+

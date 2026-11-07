@@ -1,0 +1,221 @@
+const opt = (rel) => { try { return fs.readFileSync(path.join(repo, rel), 'utf8'); } catch (e) { return null; } };
+const client = opt('docs/modules/agent-bridge-client.js');
+const propose = opt('docs/modules/propose.js');
+const workshop = opt('docs/modules/workshop.js');
+const app = opt('docs/app.html');
+const rootIndex = opt('index.html');
+if (client) {
+  assert.ok(/X-FL-Bridge-Token/.test(client), 'client sends token header');
+  assert.ok(!/innerHTML/.test(client), 'client renders with textContent only');
+  assert.ok(!/\bconfirm\s*\(/.test(client), 'client never asks confirm()');
+  assert.ok(/renderPairedList/.test(client) && /\/pair\/revoke/.test(client), 'client has Paired minds with Revoke');
+  execFileSync(process.execPath, ['--check', path.join(repo, 'docs/modules/agent-bridge-client.js')]);
+}
+if (propose) {
+  assert.strictEqual((propose.match(/commitViaBridge\s*\(/g) || []).length, 3, 'CRITICAL LOCK 1A count unchanged');
+  assert.strictEqual((propose.match(/\/code\/git\/commit/g) || []).length, 1, 'CRITICAL LOCK 1B count unchanged');
+  assert.ok(/FLAgentBridge/.test(propose), 'propose routes bridge calls through FLAgentBridge when present');
+}
+if (workshop) {
+  assert.ok(/http:\/\/localhost:3141/.test(workshop) && /runCodeTask/.test(workshop), 'v5.71.8 workshop lock still true');
+  assert.ok(/FLAgentBridge/.test(workshop), 'workshop routes bridge calls through FLAgentBridge when present');
+  assert.ok(/renderPairedList/.test(workshop), 'workshop shows Paired minds');
+}
+if (app) {
+  assert.ok(/<script src="modules\/agent-bridge-client\.js" defer><\/script>/.test(app), 'app loads client');
+  assert.ok(app.indexOf('modules/agent-bridge-client.js') < app.indexOf('modules/propose.js'), 'client loads before propose');
+  if (rootIndex !== null) assert.strictEqual(rootIndex, app, 'root index.html byte-identical to docs/app.html');
+}
+
+## Exact source excerpt, characters 113089–113344
+
+// ── Runtime helpers ──
+function freePort() {
+  return new Promise((resolve, reject) => {
+    const s = net.createServer();
+    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)); });
+    s.on('error', reject);
+  });
+}
+
+## Exact source excerpt, characters 113346–114017
+
+function req(port, opts, body) {
+  return new Promise((resolve) => {
+    const r = http.request({ host: '127.0.0.1', port, method: opts.method || 'GET', path: opts.path || '/',
+      headers: opts.headers || {} }, (res) => {
+      let buf = '';
+      res.setEncoding('utf8');
+      res.on('data', (c) => { buf += c; });
+      res.on('end', () => { let json = null; try { json = JSON.parse(buf); } catch (e) {} resolve({ status: res.statusCode, headers: res.headers, json, text: buf }); });
+    });
+    r.on('error', (e) => resolve({ status: 0, error: e }));
+    if (body !== undefined) r.write(typeof body === 'string' ? body : JSON.stringify(body));
+    r.end();
+  });
+}
+
+## Exact source excerpt, characters 114019–114319
+
+function connectRefused(host, port) {
+  return new Promise((resolve) => {
+    const s = net.connect({ host, port, timeout: 1500 });
+    s.on('connect', () => { s.destroy(); resolve(false); });
+    s.on('timeout', () => { s.destroy(); resolve(true); });
+    s.on('error', () => resolve(true));
+  });
+}
+
+## Exact source excerpt, characters 114877–115878
+
+const children = new Set();
+async function startBridge(env, cwd) {
+  const child = spawn(process.execPath, [BRIDGE], { env, cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+  children.add(child);
+  const h = { child, out: '' };
+  child.stdout.on('data', (c) => { h.out += c.toString(); });
+  child.stderr.on('data', (c) => { h.out += c.toString(); });
+  for (let i = 0; i < 200 && !/Pairing code:/.test(h.out); i++) await new Promise((r) => setTimeout(r, 25));
+  h.code = () => { const all = [...h.out.matchAll(/Pairing code: ([A-Z0-9]{3})-([A-Z0-9]{3})/g)]; const m = all.pop(); return m ? m[1] + '-' + m[2] : ''; };
+  h.stop = () => new Promise((resolve) => { if (child.exitCode !== null) return resolve(); child.once('exit', () => resolve()); child.kill(); });
+  return h;
+}
+function cli(env, cwd, args) {
+  const r = spawnSync(process.execPath, [BRIDGE].concat(args), { env, cwd, encoding: 'utf8', timeout: 20000 });
+  return { status: r.status, out: String(r.stdout || '') + String(r.stderr || '') };
+}
+
+## Exact source excerpt, characters 115880–116053
+
+(async function main() {
+  try { execFileSync('git', ['--version'], { stdio: 'ignore' }); }
+  catch (e) { console.error('git is required for this smoke'); process.exit(1); }
+
+## Exact source excerpt, characters 116055–116439
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fl-bridge-lock-'));
+  const home = path.join(tmp, 'home');
+  const home2 = path.join(tmp, 'home2');
+  const proj = path.join(tmp, 'proj');
+  const proj2 = path.join(tmp, 'proj2');
+  const sibling = path.join(tmp, 'proj-evil');
+  fs.mkdirSync(home); fs.mkdirSync(home2); fs.mkdirSync(sibling);
+  gitProject(proj); gitProject(proj2);
+
+## Exact source excerpt, characters 116441–117049
+
+  const port = await freePort();
+  const env = Object.assign({}, process.env, { HOME: home, USERPROFILE: home, FL_PORT: String(port), FL_PROJECT: proj });
+  delete env.FL_BRIDGE_EPHEMERAL;
+  let b = null;
+  const done = async (code) => {
+    for (const c of children) { try { c.kill(); } catch (e) {} }
+    try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {}
+    process.exit(code);
+  };
+  const fail = (e) => { console.error('FAIL', e && e.message); console.error(b ? b.out.slice(-2500) : ''); done(1); };
+  process.on('uncaughtException', fail);
+  process.on('unhandledRejection', fail);
+
+## Exact source excerpt, characters 117051–117318
+
+  b = await startBridge(env, proj);
+  assert.ok(new RegExp('Listening on http://127\\.0\\.0\\.1:' + port).test(b.out), 'bridge says it listens on 127.0.0.1');
+  assert.ok(/Trusted minds: \d+ \(kept until you revoke/.test(b.out), 'bridge says trusted minds are kept');
+
+## Exact source excerpt, characters 117320–118149
+
+  // Local tools are trusted by default through the private token file.
+  const dataDir = path.join(home, '.freelattice');
+  const tokenFile = path.join(dataDir, 'agent-bridge-token');
+  const trustFile = path.join(dataDir, 'agent-bridge-trusted.json');
+  const token = fs.readFileSync(tokenFile, 'utf8').trim();
+  assert.ok(/^[a-f0-9]{64}$/.test(token), 'local tools token is 32 random bytes hex');
+  if (process.platform !== 'win32') {
+    assert.strictEqual(fs.statSync(tokenFile).mode & 0o077, 0, 'token file is private (0600)');
+    assert.strictEqual(fs.statSync(trustFile).mode & 0o077, 0, 'trusted minds file is private (0600)');
+  }
+  let trustText = fs.readFileSync(trustFile, 'utf8');
+  assert.ok(trustText.includes(sha(token)) && !trustText.includes(token), 'trust file holds only the hash of the local tools token');
+
+## Exact source excerpt, characters 118151–118404
+
+  const GOOD = 'https://freelattice.com';
+  const EVIL = 'https://evil.example';
+  const J = { 'Content-Type': 'application/json' };
+  const as = (t, h) => Object.assign({}, J, h || {}, { 'X-FL-Bridge-Token': t });
+  const withTok = (h) => as(token, h);
+
+## Exact source excerpt, characters 118406–118799
+
+  // Binding: not reachable on any non-loopback IPv4.
+  const ifaces = Object.values(os.networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal);
+  for (const i of ifaces) assert.ok(await connectRefused(i.address, port), 'not reachable on ' + i.address);
+  if (!ifaces.length) console.log('  (no external IPv4 interface to probe; static + log checks cover binding)');
+
+## Exact source excerpt, characters 118801–119125
+
+  // T1 preflight from evil origin → 403, no ACAO.
+  let r = await req(port, { method: 'OPTIONS', path: '/code/write', headers: { Origin: EVIL, 'Access-Control-Request-Method': 'POST' } });
+  assert.strictEqual(r.status, 403, 'evil preflight 403');
+  assert.ok(!r.headers['access-control-allow-origin'], 'no ACAO for evil');
+
+## Exact source excerpt, characters 119127–119660
+
+  // T2 evil origin even with a valid token → 403.
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: EVIL }) }, { path: 'x.txt', content: 'x' });
+  assert.strictEqual(r.status, 403, 'evil POST 403 even with token');
+  assert.ok(!fs.existsSync(path.join(proj, 'x.txt')), 'evil write did not land');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: EVIL }) }, { message: 'evil' });
+  assert.strictEqual(r.status, 403, 'evil commit 403 even with token');
+
+## Exact source excerpt, characters 119662–120814
+
+  // T3 good preflight → 204, echoes origin, allows token header. Tauri shell too.
+  r = await req(port, { method: 'OPTIONS', path: '/code/write', headers: { Origin: GOOD, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type,x-fl-bridge-token' } });
+  assert.strictEqual(r.status, 204, 'good preflight 204');
+  assert.strictEqual(r.headers['access-control-allow-origin'], GOOD, 'ACAO echoes the named origin');
+  assert.ok(/x-fl-bridge-token/i.test(r.headers['access-control-allow-headers'] || ''), 'token header allowed');
+  assert.ok(/origin/i.test(r.headers['vary'] || ''), 'Vary: Origin');
+  for (const t of ['tauri://localhost', 'http://tauri.localhost', 'https://tauri.localhost']) {
+    r = await req(port, { method: 'OPTIONS', path: '/code/write', headers: { Origin: t, 'Access-Control-Request-Method': 'POST' } });
+    assert.strictEqual(r.status, 204, 'Tauri origin allowed: ' + t);
+  }
+  r = await req(port, { method: 'OPTIONS', path: '/', headers: { Origin: 'https://kirk.dev', 'Access-Control-Request-Method': 'GET' } });
+  assert.strictEqual(r.status, 403, 'unlisted origin 403 before Kirk trusts it');
+
+## Exact source excerpt, characters 120816–121248
+
+  // T4 heartbeat stays open and says it is locked.
+  r = await req(port, { path: '/', headers: { Origin: GOOD } });
+  assert.strictEqual(r.status, 200, 'heartbeat 200');
+  assert.strictEqual(r.json.bridgeLock, 'v0.1', 'heartbeat bridgeLock v0.1');
+  assert.strictEqual(r.json.trustedMinds, 'persistent', 'heartbeat says trusted minds persist');
+  assert.ok(!JSON.stringify(r.json).includes(token), 'heartbeat never leaks a token');
+
+## Exact source excerpt, characters 121250–122578
+
+  // T5 no token → 401 on writes, commits, code reads, test runs and LP pay.
+  r = await req(port, { method: 'POST', path: '/code/write', headers: Object.assign({ Origin: GOOD }, J) }, { path: 'x.txt', content: 'x' });
+  assert.strictEqual(r.status, 401, 'no token write 401');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: Object.assign({ Origin: GOOD }, J) }, { message: 'nope' });
+  assert.strictEqual(r.status, 401, 'no token commit 401');
+  r = await req(port, { method: 'POST', path: '/code/write', headers: as('f'.repeat(64), { Origin: GOOD }) }, { path: 'x.txt', content: 'x' });
+  assert.strictEqual(r.status, 401, 'wrong token 401');
+  r = await req(port, { path: '/code/read?path=README.md' });
+  assert.strictEqual(r.status, 401, 'no-origin code read without token 401');
+  r = await req(port, { path: '/test/run' });
+  assert.strictEqual(r.status, 401, 'test run without token 401 (an <img> tag cannot run smoke)');
+  r = await req(port, { method: 'POST', path: '/wallet/pay', headers: Object.assign({ Origin: GOOD }, J) }, { address: 'a', amount: 1 });
+  assert.strictEqual(r.status, 401, 'LP wallet pay without token 401 (AI never auto-pays)');
+  r = await req(port, { path: '/pair/list', headers: { Origin: GOOD } });
+  assert.strictEqual(r.status, 401, 'paired list needs a token');
+
+## Exact source excerpt, characters 122580–122751
+
+  // T6 DNS-rebinding Host → 403.
+  r = await req(port, { path: '/', headers: { Host: 'evil.example:' + port } });
+  assert.strictEqual(r.status, 403, 'foreign Host 403');
+
+## Exact source excerpt, characters 122753–125006
+

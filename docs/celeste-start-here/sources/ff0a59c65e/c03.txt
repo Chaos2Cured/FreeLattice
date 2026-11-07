@@ -1,0 +1,208 @@
+B.2 In look() (main 241-243):
+      var bridgeFirst = Promise.resolve(null);
+    + var shared = null; // v-connect-boot-probe-v0: the one look Connect already made (if fresh)
+      if (window.FlConnect && typeof window.FlConnect.probe === 'function') {
+    -   bridgeFirst = window.FlConnect.probe({ gesture: true }).then(function (report) {
+    +   var ask = (typeof window.FlConnect.bootProbe === 'function')
+    +     ? window.FlConnect.bootProbe({ gesture: true })
+    +     : window.FlConnect.probe({ gesture: true });
+    +   bridgeFirst = ask.then(function (report) {
+    +     shared = report || null;
+    The helped-Bridge branch inside stays unchanged (Tree paste's via:'fl-connect' kept).
+
+B.3 DOORS path. On main (275-281) the non-bridged path is
+      var jobs = DOORS.map(function (d) { return fetchDoor(d.url, 2500).then(...)
+    change fetchDoor(d.url, 2500) -> askDoor(d, shared).
+    AFTER the Tree paste, look() also has the bridged "others" loop
+      return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
+    change that one to askDoor(d, shared) too. Same timeouts, same single tap, same results shape
+    (askDoor adds reused:true on reused answers; nothing reads it yet).
+
+B.4 Without FlConnect.bootProbe (older shared core, or a test that loads only local-mind-probe.js)
+    look() fetches exactly as before. All existing Alpha tests stay green.
+
+======================================================================
+5. STEP C (F2): FreeLattice app.html, one shared resolveOllamaBase look
+======================================================================
+
+C.1 Where: directly AFTER getOllamaBaseUrl()'s closing brace (main 34329-34331:
+        return FL_OLLAMA_LOCAL;
+      }
+    ) and BEFORE the comment "// v5.43.6 (Opus): the /ollama same-origin proxy probe".
+    Why here and not next to resolveOllamaBase: smoke-connect-port-picker.js extracts
+    resolveOllamaBase's text up to "// Get the current Ollama base URL", and tests/smoke.js regexes
+    getOllamaBaseUrl's body (needs .replace(/\/+$/,'') within 800 chars). Neither body is edited;
+    both are WRAPPED after they are defined.
+
+C.2 Add (exact code, Appendix A hunk "@@ -34329,6 +34424,64 @@"):
+      var FL_LOCAL_LOOK_TTL_MS = 5000;
+      var _flResolveNow = resolveOllamaBase;  var _flResolveInflight = null;
+      var _flResolveAt = 0;  var _flResolveValue = null;
+      function flForgetLocalLook() { ...clears the three... ; FlConnect.forgetBootProbe() if present }
+      function flSeedLocalLook(value) { _ollamaResolvedBase = value || null; _flResolveValue = ...; _flResolveAt = Date.now(); }
+      resolveOllamaBase = function (forceRefresh) {
+        if (_flResolveInflight) return _flResolveInflight;                       // join
+        if (_flResolveAt && age < TTL && _ollamaResolvedBase === _flResolveValue) // reuse, only if
+          return Promise.resolve(_flResolveValue);                               // nobody changed it
+        var p = Promise.resolve(_flResolveNow(forceRefresh)).then(...store..., ...clear+rethrow...);
+        _flResolveInflight = p; return p;
+      };
+      window.flForgetLocalLook = flForgetLocalLook; window.flSeedLocalLook = flSeedLocalLook;
+    The "_ollamaResolvedBase === _flResolveValue" check means any code that writes a new value to
+    _ollamaResolvedBase (or nulls it, like every existing save path) is never hidden by the cache.
+
+C.3 Forget on every address change (one line each, all guarded with typeof):
+      flSaveOllamaHost (main ~34426, after  _ollamaResolvedBase = null;)
+      flUseBridge      (main ~31506, after  _ollamaResolvedBase = null;)
+      FLBoxPointer.persist (main ~34506, after  try { _ollamaResolvedBase = null; } catch (e3) {})
+      FLHomeNet.forget (new, step F)
+      fl-connect setManualHost / clearManualHost (step A.3, via forgetLooks)
+
+======================================================================
+6. STEP D (F1 + F3 wiring): FreeLattice app.html, one cold-start owner
+======================================================================
+
+D.1 The owner. New inline <script> placed right AFTER the #connect deep-link script that ends
+    (main 68611-68613):
+          window.addEventListener('hashchange', goConnect);
+        })();
+        </script>
+    and before "<!-- Tool Consent (v5.39.1)". Exact code: Appendix A last hunk.
+    window.FlColdStart:
+      owns()          true when FlConnect.bootProbe exists. Checked lazily (fl-connect.js is a
+                      defer script), so every gate below asks at call time.
+      deepLink()      'connect' for #connect or ?tab=connect.
+      pointerdown / keydown (capture) -> userMoved.
+      noteTab(tab)    a tab picked by the person before landing wins.
+      markLanded(t)   first call wins; landed() reads it.
+      appBooted()     called by the main DOMContentLoaded boot (D.4).
+      start()         on DOMContentLoaded (or next tick if already parsed), once:
+                        _look = FlConnect.bootProbe({ fullScan: true })
+                        then seed(report)        flSeedLocalLook only when the report covered the
+                                                 same door getOllamaBaseUrl() would use (via is not
+                                                 'direct', or base matches)
+                             paintBridge(report) flBridgeShowChip, fl_bridgePort, _flBridgeLivePort,
+                                                 #fl-bridge-port-field (what flBridgeDetectBoot did)
+                             remember(report)    saveDiscoveryMemory(doors) (what autoDiscoverAI did;
+                                                 LM Studio saved as type 'openai-compat')
+                        and after look + appBooted + 4000ms from start: speak(report) once.
+      speak(report)   Exactly one voice:
+                        Connect tab showing -> silent (Connect speaks).
+                        Welcome door showing -> silent (owAutoDetect still runs when it closes,
+                                                 as today).
+                        A mind already chosen (FlConnect.hasLocalMind or flHasOneMindConnected)
+                                              -> silent.
+                        Welcomed + fl_isLocal true without a model -> owAutoDetect() for the badges.
+                        Otherwise FlOnboarding.offerFromReport(report): the toast, naming the door
+                        that really answered.
+
+D.2 Gates (each: one guarded line at the top; the old path stays for pages without the owner):
+      detectOnLoad()          main 27769  first line:
+          // v-connect-boot-probe-v0 (F1): the cold-start owner speaks at boot; this stays for pages without it
+          try { if (window.FlColdStart && FlColdStart.owns()) return; } catch (eOwn) {}
+      flBridgeDetectBoot run() main 31524 first line (same shape, comment "paints the chip from the one shared look")
+      autoDiscover DOMContentLoaded listener main 39679, inside setTimeout before "// Only scan if not already connected"
+          // v-connect-boot-probe-v0 (F1): the cold-start owner already looked (and saves discovery memory)
+      goConnect(ev)           main 68588, after  if (_flcUserMoved && !fromHash) return;
+          try { if (!fromHash && window.FlColdStart && FlColdStart.landed() === 'connect') return; } catch (eL0) {}
+          (a real hashchange to #connect still works).
+
+D.3 Boot block (main 33780-33792):
+      var _flOwnerBoot = false;
+      try { _flOwnerBoot = !!(window.FlColdStart && FlColdStart.owns()); } catch (eOwnB) {}
+      if (!_flOwnerBoot && (safeGet('fl-welcomed') === 'true' || safeGet('fl_onboardingComplete') === 'true')) {
+        owAutoDetect();
+      }
+      try { if (window.FlColdStart && FlColdStart.appBooted) FlColdStart.appBooted(); } catch (eBoot) {}
+    and Zero-Click:  if (!hasKey && !isLocal)  ->  if (!hasKey && !isLocal && !_flOwnerBoot)
+    Note: Zero-Click (flAutoConnect) no longer auto-connects at boot when the owner is present.
+    That matches heal v0.4 ("no silent connect or model pick"): the one toast offers, the tap
+    chooses.
+
+D.4 Land once. Garden-first landing IIFE (main 33669, after the legacy tab mapping line
+    "if (lastTab === 'channels' || lastTab === 'mesh') lastTab = 'community';"):
+      a tab picked while waking (FlColdStart.userTab()) wins -> markLanded(it), return;
+      else a deep link to connect -> markLanded('connect'); switchTab('connect'); return;
+    and at the very end of the IIFE (after the last switchTab('garden') else-arm):
+      try { if (window.FlColdStart) FlColdStart.markLanded(isFirstVisit ? 'garden' : (lastTab || 'garden')); } catch (eLand2) {}
+    switchTab() end (main 26945, after localStorage.setItem('fl-last-tab', tabId)):
+      try { if (window.FlColdStart && FlColdStart.noteTab) FlColdStart.noteTab(tabId); } catch (eCs) {}
+
+D.5 Welcome overlay never lands late. flMaybeShowWelcome (main 32143), before the 1s setTimeout:
+      try { if (window.FlColdStart && FlColdStart.landed() === 'connect') return; } catch (eW0) {}
+    and first line inside the timeout:
+      try { if (window.FlColdStart && FlColdStart.userMoved()) return; } catch (eW1) {}
+    (It waits for the next visit instead of landing on a person who is already tapping.)
+
+D.6 Toast honesty (FlOnboarding, main 27802-27860):
+      showOllamaToast: keep the old #welcomeOverlay check (layer), add
+          if (flToastWouldRace()) return;   before the setTimeout, and again inside it.
+      new flToastWouldRace(): #flWelcomeOverlay.fl-welcome-visible, #tab-connect.active, or
+          FlConnect.hasLocalMind().
+      new offerFromReport(report): respects fl_ollama_toast_dismissed; builds detectedModels from
+          report.doors (each model carries _door); writes into #flOllamaToastText with
+          createTextNode + a <strong> via textContent:
+            "Ollama is ready on this computer. Tap to choose a mind."
+            "Ollama and LM Studio are ready on this computer. Tap to choose a mind."
+            "LM Studio is ready on this computer. Tap to choose a mind."
+            "Bridge is ready on this computer. ..." (helped Bridge)
+          then showOllamaToast(). Exported as FlOnboarding.offerFromReport.
+      Toast markup (main 52220):
+          <span>Local AI detected! ...  ->  <span id="flOllamaToastText">Local AI detected! ...
+      acceptToast() is unchanged (it already opens Connect, where the person taps the mind).
+      Toast width layer after ".fl-ollama-toast .fl-toast-icon { font-size: 1.2rem; }" (main 11751):
+          /* v-connect-boot-probe-v0: honest door names need room on a phone */
+          .fl-ollama-toast { width: max-content; max-width: min(92vw, 440px); box-sizing: border-box; }
+
+======================================================================
+7. STEP E (F3): FreeLattice app.html, LM Studio words and activation
+======================================================================
+
+E.1 flUseLmStudioMind(name), new, right AFTER  window.flSaveLMStudioHost = flSaveLMStudioHost;
+    (main 34713) and after the getLMStudioBase wrapper from F.6. Mirrors what flTestLMStudio
+    already does on success: state.isLocal/provider/ollamaModel, safeSet fl_isLocal /
+    fl_provider / fl_ollamaModel, PROVIDERS.lmstudio.url = getLMStudioBase() + '/v1/chat/completions',
+    FLActiveModel.set(name, 'lmstudio', 'user'), ModelSwitcher.updateLabel().
+    window.flUseLmStudioMind = flUseLmStudioMind. fl-connect's rememberLmStudio calls it.
+
+E.2 owAutoDetect, Ollama branch (main 35211):
+      if (banner) banner.classList.add('show');
+    -> if (banner) {
+         // v-connect-boot-probe-v0 (F3): Ollama really answered; keep the Ollama words
+         var yesO = banner.querySelector('.suggest-yes');
+         if (yesO) yesO.textContent = 'Yes, use Ollama';
+         banner.classList.add('show');
+       }
+    owAutoDetect, LM Studio branch (main 35227): replace the innerHTML line with textContent
+    nodes: a strong "LM Studio is ready on this computer." + " N model(s). Choose one for
+    completely private AI?" and set .suggest-yes textContent to 'Yes, choose a mind'.
+    The old innerHTML line is replaced (it is the only removal in this paste; it was the false
+    "Yes, use Ollama" source and it wrote HTML). Keep "LM Studio detected!" out of the new text
+    (the smoke checks it is gone).
+
+E.3 Status words (main 25901 and 35565): where the label is built as
+      'Ollama (' + (state.ollamaModel || 'llama3.2') + ')'
+    use
+      (state.provider === 'lmstudio' ? 'LM Studio (' : 'Ollama (') + (state.ollamaModel || 'llama3.2') + ')'
+    with a trailing  // v-connect-boot-probe-v0 (F3)  comment.
+
+E.4 Raw fl_lmstudioHost reads get the F4 rule:
+      probeLocalMind (main ~34157, after the lmBase line):
+        if (typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(lmBase)) lmBase = 'http://127.0.0.1:1234'; // v-connect-boot-probe-v0 (F4)
+      Settings Go-10 probe (main ~31606, after var lmHost = ...):
+        if (typeof FLHomeNet !== 'undefined' && FLHomeNet && !FLHomeNet.allows(lmHost)) lmHost = '127.0.0.1:1234'; // v-connect-boot-probe-v0 (F4)
+
+======================================================================
+8. STEP F (F4): FreeLattice app.html, Kirk's home-network switch
+======================================================================
+
+F.1 HTML. Right after the #flBoxPointer row's closing </div> (main 16509, the div that holds
+    #flBoxPointerInput and #flBoxPointerStatus) and before #chatOverflowBtn:
+      <!-- v-connect-boot-probe-v0 (F4): this computer only, unless the person turns on home network -->
+      <div class="fl-homenet v-connect-boot-probe-v0" id="flHomeNet" data-fl-homenet="off">
+        <span class="fl-homenet-mode" id="flHomeNetMode">This computer only</span>
+        <label class="fl-homenet-switch" for="flHomeNetSwitch"><input type="checkbox" id="flHomeNetSwitch" role="switch" aria-checked="false" aria-describedby="flHomeNetLine"> Also use a computer on my home network</label>
+        <p class="fl-homenet-line" id="flHomeNetLine" hidden>Only addresses inside your home network are allowed (like 192.168.x.x). Public internet addresses are always blocked.</p>
+        <p class="fl-homenet-refusal" id="flHomeNetRefusal" role="status" hidden></p>
+      </div>
+

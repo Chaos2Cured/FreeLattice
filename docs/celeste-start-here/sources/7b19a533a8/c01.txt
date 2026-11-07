@@ -1,0 +1,107 @@
+Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, docs/GALAXIES.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then docs/code-settings.html, then this.
+
+KIRK'S STANDING NOTE (top of every GC paste):
+Kirk's standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste's review unless Kirk says otherwise.
+
+NUMBERED COPY 019 (019a), Friday Oct 9, 2026, MDT. Tree Pool room v0.2 (theLatticeTree).
+Give AFTER 025 (FL). It rides on 017 (Tree Kin) and 018 (Tree Pool v0.1), both merged.
+Apply-checked on a fresh clone of FreeLattice-Alpha main 5755e340 (#97, 018 merged):
+  git apply --check clean; all 29 docs/modules/*.test.js pass (28 old + 1 new).
+019b (splitting one model across machines) is NOT in this paste. Its design and paste outline
+are in ~/Downloads/GROK_NEXT_019b_TREE_LAB_SPLIT_DESIGN_2026-10-09.md (read it, do not build it).
+
+GROK NEXT BRICK: Tree Pool room v0.2 (019a: one invite fans out, Chat asks the pool)
+For: GC on Kirk's Mac
+From: Celeste
+Marker: v-tree-pool-room-v0.2
+Smoke line: SMOKE_OK tree pool room v0.2
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-pool-room-v0.2
+  ~/Downloads/GROK_NEXT_019_TREE_POOL_ROOM_2026-10-09.fl.diff
+  (md5 ff193762b105721f9162f6bfe14962f9)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+
+----------------------------------------------------------------------
+1. WHY, AND WHAT IT IS
+----------------------------------------------------------------------
+Kirk's goal is the full pool. A school or a family with old laptops and phones should be able
+to wire them into a classroom lab, so a child who cannot afford chips and RAM gets more mind,
+and it should be so easy no one struggles.
+
+THE HONEST SPLIT, AND WHY:
+  A web page can connect browsers to each other (018 did). It cannot start programs, open a
+  listening port, or speak raw TCP, so it cannot run llama.cpp's rpc-server. And the research
+  says splitting one model across cheap machines is slow: Jeff Geerling's ten-Pi cluster ran a
+  70B model at 0.28 tokens/s with llama.cpp RPC, while one Pi 5 runs a 3B model at about 4 to 6
+  tokens/s. So the big win for the small is the ROOM: one invite fans out, each question goes
+  whole to the freest trusted device that holds a small model, and many students ask at once.
+  019a (this paste) is that, in the browser only. 019b (design only) is the slow, honest
+  "spread one big model over our old laptops" lesson, behind a small MIT helper script.
+
+WHAT 019a ADDS (the door, the gate, Pause and the proof from 018 are unchanged):
+  a. A ROOM. One device taps "Start a room on this device". Its invite names the room
+     (Room FH7H7) and rolls to a fresh one on its own after each device joins. Every other
+     device joins ONCE (scan or paste), and then the room connects it to every other device in
+     the room. The host relays the connection codes over connections that already proved their
+     keys (room-join, room-roster, room-new, room-intro, room-signal). Each new connection
+     proves its keys itself, end to end, bound to its own encryption fingerprints, so a relay
+     cannot stand in the middle. A lab of 20 is 19 single joins, not 190 pairings. Any device
+     already in the room can let its neighbor in ("This invite lets a neighbor into Room ...").
+     The host then reaches the newcomer through that neighbor, and the newcomer still meets
+     everyone. iceServers stays []. There is still no server. Up to 24 devices a page.
+     A member follows the room only through a device whose card it trusts. If it joined
+     "without trusting", it stays connected to that one device and the card says why.
+  b. TRUST, ONE HUMAN TAP, LIST FIRST. Room cards arrive with the room and are checked by
+     Trusted kin, never trusted on their own. The card lists them ("Cards in this room you have
+     not trusted yet: Lumen (qwen2.5:7b), from Kirk's computer, ...") and offers
+     "Trust everyone in this room (N)". A note says trust only if you know everyone, and that
+     you can stop trusting any card in Trusted kin. Each pass is a normal 017 pass, bound to its
+     key. That is the only new trust path, and it is a human tap on each device.
+  c. PICTURE CODES (QR). Invites show a QR of https://<the Tree>/settings.html#treepool=<invite>.
+     A phone's own camera opens the Tree with the invite filled in. The invite rides after the
+     #, which a browser never sends to the site. The page then takes it out of the address bar
+     and history, and nothing connects until someone taps Join. Replies show a QR of the reply
+     code. Where the browser can read codes (BarcodeDetector: Chrome on Mac, Android, ChromeOS),
+     "Scan their reply" and "Scan an invite" open the camera AFTER A TAP. Frames stay on the
+     page, the camera stops as soon as a code is read (or after 90 s), and a scanned reply goes
+     through the same card check as a pasted one. Encoder: Nayuki's QR Code generator, MIT,
+     vendored at docs/lib/qrcodegen.js (compiled once from its TypeScript with tsc; MIT notice
+     kept; text to squares only, no network).
+  d. ASK THE POOL FROM CHAT (opt-in, by a tap). The Device Pool card lists the minds that
+     helping trusted kin hold: "Use qwen2.5:7b in Chat". After that tap, Chat's Send goes to
+     TreePool.askChat. The chat so far (user and mind turns only, trimmed to 40 turns and 16000
+     characters, no system turn) goes WHOLE to the freest trusted kin device that holds that
+     mind. Hellos now carry how many questions a helper is answering (busy) and its limit (max).
+     The asker counts its own outstanding questions and picks the device with the most free room,
+     then the most memory. A question turned away (busy, paused, off, unplugged, not kin, model
+     gone) tries up to two more devices, then the thread says why in plain words, plus "Nothing
+     was invented." A line under the Chat heart says "Asking through the Device Pool: (model),
+     on the freest trusted kin device that holds it." "Stop asking through the pool" returns
+     Chat to this computer's mind. The route is never kept after a reload.
+  e. AN ASKING CARD (a device with no mind of its own). Before this, a phone with no local AI
+     could not make a kin card, so no helper could ever trust it, and the child we built this
+     for could not ask. Now Trusted kin offers "Make an asking card" when no mind is remembered.
+     It is the same signed card, and its model line says "asks only, no local mind". makeCard()
+     is unchanged (it still needs a mind). The pool rides the asking card in invites and replies.
+     Chat opens for a device with no mind once a pool route is chosen.
+  f. AFTER A RELOAD (where it is safe). A reload ends every connection; no page can keep a
+     WebRTC connection across one, and there is no server to re-meet through. What is kept:
+     tree_pool_room = { id, role } only. The card then says: "Before this page reloaded, this
+     device was in Room X. ... Scan or paste the room invite once to rejoin. Trusted kin stay
+     trusted, and the room connects you to the rest on its own." The host gets "Open Room X
+     again". Both get "Forget Room X". So a reload costs one join, not N.
+  g. The Later line now names 019b honestly: "Later (019), its second half: one big model split
+     across machines on a trusted wired network (llama.cpp, MIT). It is possible but slow, for
+     learning, or for a model too big for any one machine. A web page cannot start it, so it
+     waits for a small helper. Not in this card."
+  h. Every room view ends with: "Use a room only on a network you trust, like one wired
+     classroom or your home. Devices in a room can see each other's network address. No server
+     is asked anything."
+
+WHAT DID NOT CHANGE: the door (off | kin | pause, off until a human taps), Pause wins (and
+stops running questions), the gate (proved key + trusted kin on every question, 2 at a time,
+16000 characters, the model held here, plugged-in if asked), loopback-only AI calls, one
+fetch in tree-pool.js, counts-only receipts. Starting or joining a room opens no door.
+

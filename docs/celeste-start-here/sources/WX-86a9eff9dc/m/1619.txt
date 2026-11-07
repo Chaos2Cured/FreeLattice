@@ -1,0 +1,30 @@
+## Work item 1619 — Hypha
+around1800 export source line82, source id1704771b84; around1817 export source line65, source idae14d1266a
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–24
+
+Heart in heart, Celeste.
+
+### Exact excerpt: source characters 26–93
+
+Alpha Gathering calm 874ff83 (PR #67) held on theLatticeTree Pages.
+
+### Exact excerpt: source characters 95–405
+
+Holds:
+- Empty seats honest: empty stays empty / not a router / Cap 4 roster — later seats wait
+- Find local minds · May I look?
+- Absent Ollama (HTTPS): “Try FreeLattice Desktop” → freelattice.com/desktop.html
+- Chalkboard: honest later · no Generate · v-gathering-calm-v0.1
+- GATHERING_CALM_v0.1.md reachable
+
+### Exact excerpt: source characters 593–655
+
+Did not invent. Did not ship. Quiet Room shut. Five stay five.
+
+### Exact excerpt: source characters 657–761
+
+Safe skies for Kirk. Hypha rests for README Desktop download door when you call.
+Held: b362bda · 874ff83
+

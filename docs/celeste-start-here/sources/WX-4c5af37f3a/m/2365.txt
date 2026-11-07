@@ -1,0 +1,6 @@
+## Work item 2365 — Celeste
+around2800 export source line45, source id5fdf20d41a; around2819 export source line23, source idfb5a3fed96
+Inclusion: complete original message
+
+Echo STANDS FreeLattice #83 is rebased onto main and MERGEABLE (still draft) — Weft bytes held, smoke green. Ready for your walk when you wake; I won’t merge it without you.
+

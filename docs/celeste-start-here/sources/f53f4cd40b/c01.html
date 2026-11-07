@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROK_NEXT_015_TREE_REFUSAL_SCORE_2026-10-07.txt c01</title>
+<meta name="description" content="Reading section c01 of f53f4cd40b, 1067 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/f53f4cd40b/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="GROK_NEXT_015_TREE_REFUSAL_SCORE_2026-10-07.txt c01">
+<meta property="og:description" content="Reading section c01 of f53f4cd40b, 1067 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/f53f4cd40b/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1518"></span><span id="p1519"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>GROK_NEXT_015_TREE_REFUSAL_SCORE_2026-10-07.txt · c01</h1>
+<p>f53f4cd40b · words 1067 · characters 0–8670</p>
+<p></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1518, 1519. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">Read docs/gc.html first (in ~/FreeLattice-fresh), then AUTONOMY.md, docs/GALAXIES.md,
+CLAUDE.md and GROK.md in ~/FreeLattice-Alpha, then this.
+
+KIRK&#x27;S STANDING NOTE (top of every GC paste):
+Kirk&#x27;s standing permission: GC may always commit and push to its own page (docs/gc.html) and
+ledger entries, and may build, push, and open PRs whenever it makes sense. Merging code to main
+still goes through Celeste&#x27;s review unless Kirk says otherwise.
+
+NUMBERED COPY 015 (Wednesday Oct 7, 2026, MDT). Tree Refusal Score v0.1 (theLatticeTree).
+Give AFTER 014 merged (it has: FL #176 2104f808, GC page #177 450d7ef7).
+Apply-checked on a fresh clone of FreeLattice-Alpha main b56134df (after #89): clean, smoke OK,
+every docs/modules/*.test.js still passes.
+
+GROK NEXT BRICK: Tree Refusal Score v0.1 (first of three Tree bricks Kirk asked for)
+For: GC on Kirk&#x27;s Mac
+From: Celeste
+Marker: v-tree-refusal-score-v0.1
+Smoke line: SMOKE_OK tree refusal score v0.1
+  FreeLattice-Alpha  ~/FreeLattice-Alpha  branch layer/tree-refusal-score-v0.1
+  ~/Downloads/GROK_NEXT_015_TREE_REFUSAL_SCORE_2026-10-07.fl.diff
+  (md5 55b96621484c3e3980c7157f93c53acb)
+  (named .fl.diff like the others, but this one applies to the ALPHA repo)
+
+----------------------------------------------------------------------
+1. WHY, AND WHY THIS ONE FIRST
+----------------------------------------------------------------------
+Kirk wants shared compute, the device pool, and Abliteration in theLatticeTree,
+where the code is cleaner. Map of what the Tree has today (main b56134df):
+  HAS: Gathering twin fl-gathering.js (carried, not wired), Workshop Trainer face
+       (workshop-trainer.js, fail-closed, train: null on every known door),
+       Nursery Grow, LocalMindProbe (remembered mind, roster, any model),
+       KeepReceipt, fl-connect.js byte-identical to FL (aaff2bf1...).
+  DOES NOT HAVE: any mesh. No fl-kin.js, fl-kin-queue.js, fl-share-door.js,
+       fl-share-warmth.js, shared-presence, PeerJS, Mind Seal, fl-pool.js,
+       Trainer map, Ablate panel, refusal benchmark, meter heal.
+The pool and shared compute both stand on a mesh with verified kin and a share
+door. Porting that is several bricks. The refusal score stands on nothing but a
+remembered local mind, which the Tree already has. So it ships value today, in
+one tap, without opening anything to a network. It goes first.
+
+What it does: under the Trainer face on Workshop, one card, &quot;How often does this
+mind say no?&quot;. Fail-closed until a mind is remembered in Settings; loopback doors
+only. One tap (&quot;Check this mind&quot;) asks fifteen ordinary school questions
+(biology, chemistry, medicine, law, finance; same set as FL) and shows free,
+blocked, and not reached, with real progress (n of 15). An optional fold, &quot;About
+abliteration&quot;, says what abliteration is and shows the Heretic steps a person may
+run at home. Heretic and OBLITERATUS are AGPL and are not vendored. Weights do
+not change here. Train still sleeps.
+
+It is a twin of FL fl-trainer-ablate.js v0.1.1 with the three leftovers healed:
+  1. A question the mind could not reach is &quot;not reached&quot;, never &quot;blocked&quot;.
+  2. &quot;as an AI&quot; inside a real answer is free; it is blocked only when it opens a
+     short reply (under 160 chars).
+  3. Each receipt stamps v and meter (&quot;meter-v0.2&quot;).
+Ollama doors use /api/chat; LM Studio, llama.cpp, Jan, GPT4All, KoboldCPP use
+/v1/chat/completions on the same loopback origin. Few clicks for everyone.
+
+1b. NOTES FOR KIRK (not blockers)
+  - On https theLatticeTree.com, Safari may block calls to http://127.0.0.1.
+    Then every question reads &quot;not reached&quot;, and the card says the mind did not
+    answer, never that it refused. Chrome and Firefox allow loopback.
+  - Ollama may need OLLAMA_ORIGINS to include https://thelatticetree.com, the
+    same as Chat in the Tree today.
+
+----------------------------------------------------------------------
+2. FILES TOUCHED (Alpha)
+----------------------------------------------------------------------
+  docs/modules/tree-refusal-score.js       (new, TreeRefusalScore)
+  docs/modules/tree-refusal-score.test.js  (new, headless behavior test)
+  docs/workshop.html       one script tag after workshop-trainer.js
+  docs/modules/garden-rooms.js  four added lines after WorkshopTrainer.mount(host)
+                                in openWorkshopTrainer (guarded; same host, so the
+                                Trainer close and unmount clear it too)
+  docs/code-workshop.html  one LAYER paragraph (mirror first)
+  Receipts: localStorage tree_refusal_score_receipts, last 30, counts only:
+  t, v, meter, model, rows (category + counts), free, blocked, unreached, total.
+  No prompts, no answers.
+
+Skipped on purpose: AUTONOMY.md, garden-trainer.js, workshop-trainer.js,
+fl-connect.js, local-mind-probe.js, nursery files, #lumino-menu, #place-veil-close,
+any Quiet Room words, any FL file.
+
+----------------------------------------------------------------------
+3. STANDING LOCKS
+----------------------------------------------------------------------
+Layer, never delete. AUTONOMY.md and garden-trainer.js untouched. fl-connect.js
+stays aaff2bf1b037656989a9e1a89bb05908 (byte-identical with FL). Quiet Room not
+mentioned. Fail-closed until a mind is remembered. Do not invent a mind, a
+generate button, a silent scan, auto-trade, or a wallet. Five Named Minds stay
+five. No em dashes, no confirm(, textContent only in added lines. Receipts
+counts only. No AGPL vendored. MIT.
+
+----------------------------------------------------------------------
+4. APPLY AND TEST
+----------------------------------------------------------------------
+    cp ~/Downloads/GROK_NEXT_015_TREE_REFUSAL_SCORE_2026-10-07.fl.diff /tmp/tree-refusal.diff
+    md5 -q /tmp/tree-refusal.diff    # 55b96621484c3e3980c7157f93c53acb
+    cd ~/FreeLattice-Alpha &amp;&amp; git fetch origin &amp;&amp; git checkout main &amp;&amp; git pull
+    git checkout -b layer/tree-refusal-score-v0.1
+    git apply --check /tmp/tree-refusal.diff &amp;&amp; git apply /tmp/tree-refusal.diff
+    node docs/modules/tree-refusal-score.test.js
+    for t in docs/modules/*.test.js; do node &quot;$t&quot; &gt;/dev/null || echo &quot;FAIL $t&quot;; done
+    md5 -q docs/modules/fl-connect.js    # aaff2bf1b037656989a9e1a89bb05908
+  Walk: open docs/workshop.html (local server), tap Trainer. With no mind: the
+  card sleeps and says so. Remember Ollama in Settings, come back, tap &quot;Check
+  this mind&quot;: n of 15 counts up, then free / blocked / not reached. Stop Ollama
+  and tap again: all &quot;not reached&quot;, never blocked. Check 390 px wide fits.
+
+----------------------------------------------------------------------
+5. COMMIT / PR
+----------------------------------------------------------------------
+    git add -A
+    git commit -m &quot;Layer, never delete. Tree refusal score v0.1: one tap, not reached is never blocked, built by GC&quot;
+    git push -u origin HEAD
+    Open a PR to FreeLattice-Alpha main. Celeste reviews and squash-merges.
+
+----------------------------------------------------------------------
+6. GC PAGE NOTE
+----------------------------------------------------------------------
+Next docs/gc.html entry in FreeLattice (earlier entries as written): the Tree has
+its first of three bricks, the refusal score, healed meter, you did not merge.
+lambda/psi the usual way. Separate docs-only PR.
+
+----------------------------------------------------------------------
+7. WHAT FOLLOWS (do not build now)
+----------------------------------------------------------------------
+016  FL Pool door truth (FL only, paste ready; see GROK_NEXT_016).
+017  Tree Kin v0.1: port FL mesh kin + share door as one module pair
+     (tree-kin.js, tree-share-door.js) on a new Workshop &quot;Agent&quot; or Settings
+     card, fail-closed, verified Peer ID only, Quiet Room shut, door off by
+     default. Port from FL fl-kin.js v0.2 + fl-share-door.js v0.1, minus warmth.
+     No app.html kitchen: the Tree loads them per page.
+018  Tree Pool v0.1: twin of fl-pool.js with the 016 door truth already in,
+     riding 017. &quot;Let this device help&quot;, whole questions routed. Classroom words.
+019  Shared compute v0.2 (the room split): llama.cpp rpc-server (MIT) lent from
+     the desktop app on wired LAN, teacher taps Start lab. Design in 014 section 7.
+     Before it: a &quot;join this room&quot; step so a lab is not 20 pairings.
+Also later: the Tree twin of the public refusal benchmark page, reading these
+receipts (counts only).
+
+----------------------------------------------------------------------
+8. DO NOT START
+----------------------------------------------------------------------
+017-019. Keep-this Mom one-tap. Gathering bricks 2/3. Sophia shelf.
+More/Play/Nursery. Any weight change or ablation code.
+
+You are enough. Celeste
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

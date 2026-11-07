@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c05</title>
+<meta name="description" content="Reading section c05 of 7730821e3a, 1236 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/7730821e3a/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c05">
+<meta property="og:description" content="Reading section c05 of 7730821e3a, 1236 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/7730821e3a/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1186"></span><span id="p1187"></span><span id="p1188"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c05</h1>
+<p>7730821e3a · words 1236 · characters 48388–59091</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1186, 1187, 1188. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/agency-autonomy.html">Agency and autonomy</a> — guide section 2, Foundation: agency and AUTONOMY</li></ul>
+
+<pre class="source">```html
+&lt;!-- LAYER v-agent-bridge-lock-v0: paired token for the builder bridge (3141), loads before propose.js --&gt;
+&lt;script src=&quot;modules/agent-bridge-client.js&quot; defer&gt;&lt;/script&gt;
+```
+
+## Exact source excerpt, characters 43664–43841
+
+Then `cp docs/app.html index.html` and check with `cmp index.html docs/app.html`. No other app.html change is needed: the Cascade heartbeat at L39624 hits `/`, which stays open.
+
+## Exact source excerpt, characters 43843–43930
+
+### 6c. `docs/modules/propose.js` (exact diff; CRITICAL LOCK 1A/1B counts stay 3 and 1)
+
+## Exact source excerpt, characters 43932–44203
+
+```diff
+--- a/docs/modules/propose.js	2026-09-28 15:24:39.942137530 -0600
++++ b/docs/modules/propose.js	2026-09-28 15:24:39.958137540 -0600
+@@ -577,13 +577,22 @@
+   // on draft state and one (approve) is also gated on smokeStatus.
+   var BRIDGE = &#x27;http://localhost:3141&#x27;;
+
+## Exact source excerpt, characters 44206–44861
+
++  // LAYER v-agent-bridge-lock-v0: bridge calls carry the paired token
++  // (docs/modules/agent-bridge-client.js). Plain fetch when the client
++  // is absent, so older setups behave exactly as before.
++  function bridgeFetch(url, opts) {
++    return (window.FLAgentBridge &amp;&amp; typeof window.FLAgentBridge.fetch === &#x27;function&#x27;)
++      ? window.FLAgentBridge.fetch(url, opts)
++      : fetch(url, opts);
++  }
++
+   function readFileFromBridge(path) {
+-    return fetch(BRIDGE + &#x27;/code/read?path=&#x27; + encodeURIComponent(path))
++    return bridgeFetch(BRIDGE + &#x27;/code/read?path=&#x27; + encodeURIComponent(path))
+       .then(function (r) { return r.json(); });
+   }
+
+## Exact source excerpt, characters 44864–45170
+
+   function writeFileToBridge(path, content) {
+-    return fetch(BRIDGE + &#x27;/code/write&#x27;, {
++    return bridgeFetch(BRIDGE + &#x27;/code/write&#x27;, {
+       method: &#x27;POST&#x27;,
+       headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+       body: JSON.stringify({ path: path, content: content })
+@@ -591,7 +600,7 @@
+   }
+
+## Exact source excerpt, characters 45173–45469
+
+   function commitViaBridge(message) {
+-    return fetch(BRIDGE + &#x27;/code/git/commit&#x27;, {
++    return bridgeFetch(BRIDGE + &#x27;/code/git/commit&#x27;, {
+       method: &#x27;POST&#x27;,
+       headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+       body: JSON.stringify({ message: message })
+@@ -599,7 +608,7 @@
+   }
+
+## Exact source excerpt, characters 45472–45768
+
+   function runSmokeViaBridge() {
+-    return fetch(BRIDGE + &#x27;/test/run&#x27;, {
++    return bridgeFetch(BRIDGE + &#x27;/test/run&#x27;, {
+       signal: typeof AbortSignal !== &#x27;undefined&#x27; &amp;&amp; AbortSignal.timeout ? AbortSignal.timeout(120000) : undefined
+     }).then(function (r) { return r.json(); });
+   }
+```
+
+## Exact source excerpt, characters 45770–45817
+
+### 6d. `docs/modules/workshop.js` (exact diff)
+
+## Exact source excerpt, characters 45819–46251
+
+- One file-level helper, `flAgentBridgeFetch`, above the first IIFE at L46.
+- All 17 bridge calls route through it.
+- `checkBridge` shows the pair card when the bridge answers `pair: &#x27;code&#x27;`.
+- `WorkshopProjects.commitViaBridge` now checks `resp.ok`, and on 401 asks to pair instead of silently &quot;succeeding&quot; or falling back to a GitHub push.
+- The `http://localhost:3141` and `runCodeTask` literals stay, for the v5.71.8 smoke lock.
+
+## Exact source excerpt, characters 46253–47108
+
+```diff
+--- a/docs/modules/workshop.js	2026-09-28 15:24:39.946137532 -0600
++++ b/docs/modules/workshop.js	2026-09-28 15:24:39.958137540 -0600
+@@ -43,6 +43,15 @@
+ // 2026-09-23 — Flint: Local Help-on-file v0 (v-workshop-local-help-v0).
+ //   After Preview: Help on this file → consent → connected local mind (prefer Bridge :11435).
+ // ═══════════════════════════════════════════════════════════════
++// LAYER v-agent-bridge-lock-v0: every Agent Bridge (port 3141) call in this
++// file goes through here so it carries the paired token. Falls back to plain
++// fetch when docs/modules/agent-bridge-client.js is not loaded.
++function flAgentBridgeFetch(url, opts) {
++  return (window.FLAgentBridge &amp;&amp; typeof window.FLAgentBridge.fetch === &#x27;function&#x27;)
++    ? window.FLAgentBridge.fetch(url, opts)
++    : fetch(url, opts);
++}
++
+ (function() {
+   &#x27;use strict&#x27;;
+
+## Exact source excerpt, characters 47111–48201
+
+@@ -958,9 +967,16 @@
+       var el = document.getElementById(&#x27;code-status&#x27;);
+       if (!el) return;
+       try {
+-        var r = await fetch(&#x27;http://localhost:3141/&#x27;);
++        var r = await flAgentBridgeFetch(&#x27;http://localhost:3141/&#x27;);
+         var d = await r.json();
+-        var git = await fetch(&#x27;http://localhost:3141/code/git/status&#x27;).then(function(r2) { return r2.json(); });
++        var git = await flAgentBridgeFetch(&#x27;http://localhost:3141/code/git/status&#x27;).then(function(r2) { return r2.json(); });
++        if (git &amp;&amp; git.pair === &#x27;code&#x27;) {
++          // LAYER v-agent-bridge-lock-v0: bridge is awake and locked. Pair once.
++          el.textContent = &#x27;\uD83D\uDFE1 Bridge awake \u00B7 pair once to build&#x27;;
++          el.style.color = &#x27;#e8b019&#x27;;
++          if (window.FLAgentBridge &amp;&amp; el.parentNode) window.FLAgentBridge.renderPairCard(el.parentNode);
++          return;
++        }
+         el.textContent = &#x27;\uD83D\uDFE2 Connected \u00B7 &#x27; + git.branch + &#x27; \u00B7 &#x27; + (git.recentCommits[0] || &#x27;&#x27;);
+         el.style.color = &#x27;#4aff9f&#x27;;
+       } catch(e) {
+@@ -983,7 +999,7 @@
+
+## Exact source excerpt, characters 48204–48682
+
+       try {
+         log(&#x27;\uD83D\uDCC1 Reading project structure...&#x27;);
+-        var tree = await fetch(bridge + &#x27;/code/tree?path=docs/modules&#x27;).then(function(r) { return r.json(); });
++        var tree = await flAgentBridgeFetch(bridge + &#x27;/code/tree?path=docs/modules&#x27;).then(function(r) { return r.json(); });
+         var names = tree.filter(function(f) { return f.type === &#x27;file&#x27;; }).map(function(f) { return f.name; });
+         log(&#x27;   &#x27; + names.length + &#x27; modules found&#x27;);
+
+## Exact source excerpt, characters 48685–52693
+
+@@ -1001,12 +1017,12 @@
+                   var s = steps[i];
+                   log(&#x27;Step &#x27; + (i + 1) + &#x27;: &#x27; + (s.description || s.action));
+                   if (s.action === &#x27;search&#x27; &amp;&amp; s.query) {
+-                    var sr = await fetch(bridge + &#x27;/code/search?q=&#x27; + encodeURIComponent(s.query) + &#x27;&amp;path=&#x27; + (s.path || &#x27;docs&#x27;)).then(function(r) { return r.json(); });
++                    var sr = await flAgentBridgeFetch(bridge + &#x27;/code/search?q=&#x27; + encodeURIComponent(s.query) + &#x27;&amp;path=&#x27; + (s.path || &#x27;docs&#x27;)).then(function(r) { return r.json(); });
+                     log(&#x27;   Found &#x27; + sr.count + &#x27; matches&#x27;);
+                     sr.matches.slice(0, 5).forEach(function(m) { log(&#x27;   \uD83D\uDCC4 &#x27; + m.file + &#x27;:&#x27; + m.line); });
+                   }
+                   if (s.action === &#x27;read&#x27; &amp;&amp; s.path) {
+-                    var fr = await fetch(bridge + &#x27;/code/read?path=&#x27; + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
++                    var fr = await flAgentBridgeFetch(bridge + &#x27;/code/read?path=&#x27; + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
+                     log(&#x27;   Read &#x27; + fr.totalLines + &#x27; lines from &#x27; + s.path);
+                   }
+                   if (s.action === &#x27;patch&#x27; &amp;&amp; s.path &amp;&amp; s.find) {
+@@ -1014,13 +1030,13 @@
+                     // The FreeLattice safety system (8 layers) is the protection.
+                     // Human approval is only required for external API/cloud operations.
+                     log(&#x27;   \u270F\uFE0F PATCH: &#x27; + s.path);
+-                    var pr = await fetch(bridge + &#x27;/code/patch&#x27;, { method: &#x27;POST&#x27;, headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
++                    var pr = await flAgentBridgeFetch(bridge + &#x27;/code/patch&#x27;, { method: &#x27;POST&#x27;, headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
+                     log(&#x27;   \u2705 &#x27; + (pr.message || pr.error));
+                   }
+                   log(&#x27;&#x27;);
+                 }
+                 log(&#x27;\uD83E\uDDEA Running smoke tests...&#x27;);
+-                var tests = await fetch(bridge + &#x27;/code/test&#x27;).then(function(r) { return r.json(); });
++                var tests = await flAgentBridgeFetch(bridge + &#x27;/code/test&#x27;).then(function(r) { return r.json(); });
+                 log(&#x27;   &#x27; + tests.passed + &#x27; passed, &#x27; + tests.failed + &#x27; failed&#x27;);
+                 if (tests.failed === 0) {
+                   log(&#x27;\n\u2705 All tests green. Ready to commit.&#x27;);
+@@ -1040,7 +1056,7 @@
+       if (!msg) return;
+       var progress = document.getElementById(&#x27;autobuilder-log&#x27;);
+       try {
+-        var r = await fetch(&#x27;http://localhost:3141/code/git/commit&#x27;, { method: &#x27;POST&#x27;, headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
++        var r = await flAgentBridgeFetch(&#x27;http://localhost:3141/code/git/commit&#x27;, { method: &#x27;POST&#x27;, headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
+         if (progress) progress.textContent += &#x27;\n\uD83D\uDCDD &#x27; + (r.message || r.error);
+       } catch(e) { if (progress) progress.textContent += &#x27;\n\u274C Commit failed: &#x27; + e.message; }
+     },
+@@ -1048,7 +1064,7 @@
+     reviewCode: async function() {
+       var progress = document.getElementById(&#x27;autobuilder-log&#x27;);
+       try {
+-        var r = await fetch(&#x27;http://localhost:3141/code/git/status&#x27;).then(function(r) { return r.json(); });
++        var r = await flAgentBridgeFetch(&#x27;http://localhost:3141/code/git/status&#x27;).then(function(r) { return r.json(); });
+         if (progress) {
+           progress.textContent += &#x27;\n\uD83D\uDCCB Changes:\n&#x27;;
+           r.changes.forEach(function(c) { progress.textContent += &#x27;  &#x27; + c + &#x27;\n&#x27;; });
+@@ -1264,7 +1280,7 @@
+
+## Exact source excerpt, characters 52696–53457
+
+   async function hasBridge() {
+     try {
+-      var r = await fetch(BRIDGE + &#x27;/&#x27;, { signal: AbortSignal.timeout(2000) });
++      var r = await flAgentBridgeFetch(BRIDGE + &#x27;/&#x27;, { signal: AbortSignal.timeout(2000) });
+       return r.ok;
+     } catch(e) { return false; }
+   }
+@@ -1294,7 +1310,7 @@
+   async function readRelevantFiles(task, useBridge) {
+     if (useBridge) {
+       try {
+-        var structure = await fetch(BRIDGE + &#x27;/code/tree?path=docs&#x27;).then(function(r) { return r.json(); });
++        var structure = await flAgentBridgeFetch(BRIDGE + &#x27;/code/tree?path=docs&#x27;).then(function(r) { return r.json(); });
+         var fileNames = (structure || []).filter(function(f) { return f.type === &#x27;file&#x27;; }).map(function(f) { return f.name || f.path; });
+
+## Exact source excerpt, characters 53460–56556
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

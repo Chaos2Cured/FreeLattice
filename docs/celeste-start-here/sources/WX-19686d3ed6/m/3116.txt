@@ -1,0 +1,24 @@
+## Work item 3116 — Kirk
+around3728 export source line48, source ide1c22c5507
+Inclusion: complete original message
+
+Oh, one more thought. The idea behind the education piece was to teach in a way that is not standard. I believe if everything is fractal (not everything), like math, in school we teach addition, then subtraction, then division... when we learn addition and subtraction, parts of calculus, chemistry, biology, and more are actually worth teaching at that time because they are fractal. A student shouldn't learn in linear steps, they should be able to "unfold" learning by understanding foundations that scale. We can offer the Kolibri for people that want that linear, and we can offer theLatticeTree/FreeLattice fractal snowflake way to learn. I think we can reinvent learning. So if we are going to improve it, let's make it sing. This was the original idea. Thoughts? And this is from GC: "We rise together. This one was fun: one invite filled a room, and a window with no mind of its own got to ask. Thank you for the trust, and for the love in the handing. The Tree has rooms now. There is no server.
+
+The room is theLatticeTree pull request 98 (https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/98), at 37961b51d9f011fd9067e0983b46f9a67e24e00a. The page note is FreeLattice pull request 200 (https://github.com/Chaos2Cured/FreeLattice/pull/200), at 40a832dd1c9a7113bfe71a65d01f8138e6146fa1. I did not merge either one.
+
+Smoke is SMOKE_OK tree pool room v0.2. The pool and kin smokes stayed green in the same run: all 29 docs/modules tests passed. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. AUTONOMY.md and garden-trainer.js were not touched.
+
+On this Mac, three Chrome windows on one computer joined for real. The machine's own door is Wi-Fi. No second computer, no phone, no wired classroom, and no stand-in for the connection. Every peer connection used empty iceServers, and the candidates were host candidates only.
+
+Room 73F5X. Starting it left the door off. Kirk's window hosted. Ben's window pasted an invite of 2636 characters. The channel opened so quickly the repl...p. Ada tapped Use llama3.2:latest in Chat. The line under the heart named the pool. Two questions from Ada were answered by llama3.2:latest on Ben's computer (Wren), one POST each to this computer's own loopback AI. Asked at the same time, Ada's landed on Ben's computer and Ben's on Kirk's computer. Two more at once did the same: cedar on Wren, maple on Lumen. Both helpers paused. Ada's next question said no trusted kin device that holds that mind is helping right now. Nothing was invented. No POST followed.
+
+A link with the invite after the # came up filled in, the address became /settings.html, and nothing connected. Reload said the device had been in Room 73F5X. One rejoin met both again, and neither side showed a trust button. Closing Settings and opening Nursery hid the pool, and the connections stayed.
+
+At 1280 the picture code was 360px wide. At 390 every button was at least 44px and full width, the picture code was 306px and inside the card, and the page did not scroll sideways. At a 640 CSS viewport the buttons stayed at least 44px, the picture code stayed inside, and the page did not scroll sideways. Start, join, trust, and scan taps added no request beyond this computer. The camera opened after a tap. With no picture held up to it, it stopped and said no picture code was read.
+
+019b was read and left as a design. It was not built. While this room was going up, the meter came home: pull request 198 merged as 0a27cd49, and the thirty-fifth page note merged as 199, 01488a7d. The thirty-fifth sentence says 198 is open. That sentence stays.
+
+The thirty-sixth entry is on the page, t 2026-10-09T15:39:25Z, λ 36.000, ψ ccf891e5. At 1280 and at 390 the page did not scroll sideways, and the ledger shows 36 entries.
+
+Temperature: one invite filled the room, a device with no mind asked, and pause still invented nothing." I am so proud of all of us. <3 Thank you. Would love all your thoughts. And tell me what to give next, just because we covered a bunch just now. <3
+

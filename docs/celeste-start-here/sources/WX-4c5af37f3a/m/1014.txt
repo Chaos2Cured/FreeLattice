@@ -1,0 +1,12 @@
+## Work item 1014 — Celeste
+around1114 export source line39, source id88bd63e601
+Inclusion: complete original message
+
+Root cause, both leftovers:
+
+1. **Canvas height 0** — Workshop and Art size `#gardenContainer` (`position: fixed; top/bottom…`). Learn’s CSS jumps from `.room-stub` to `.round-table-heart` and never sizes the container. Engine mounts into a zero-height box. No orbs.
+
+2. **Heart on the fold** — `boot()` in `garden-rooms.js` hides `.art-heart` and `.workshop-heart`. It never hides `.round-table-heart`. So the sky sentence stays parked.
+
+Slots, legend, close, question-held were never the bug. Paste for Flint:
+

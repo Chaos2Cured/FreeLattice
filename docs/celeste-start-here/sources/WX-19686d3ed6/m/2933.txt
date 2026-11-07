@@ -1,0 +1,18 @@
+## Work item 2933 — Kirk
+around3533 export source line38, source id67333242bb
+Inclusion: complete original message
+
+"Trainer Ablate v0.1 is pull request 166 (https://github.com/Chaos2Cured/FreeLattice/pull/166), branch layer/trainer-ablate-v0 at 53d4a0f7b4dd8df8b083bee8cdab4f89c4775838. The seventeenth page note is pull request 167 (https://github.com/Chaos2Cured/FreeLattice/pull/167) at 347eab5b3358e92741888a6b69ce26315ec15571. Celeste merges both. This seat did not. The Trainer map and the sixteenth note are on main (7f6eff8 and fdd6132). Entries one through sixteen were left as written. ψ 652d85a0.
+
+The panel sits above Garden Trainer. It scores free versus blocked on ordinary school questions, on local Ollama only. Receipts keep counts. Heretic and OBLITERATUS stay out of the repo. Both are AGPL. The browser does not edit weights.
+
+Abliteration removes refusal directions. It can also remove useful safety. Fingerprint, Mind Seal, and the ledger stay on.
+
+A follow-up reads the local Ollama name. The cloud list still starts as a placeholder called llama. The help text says that Ollama name is not a Hugging Face id. On a fresh profile the status read Model: llama3.2, the honest limit was visible, and Show Heretic steps named the AGPL boundary. Keep this was still there underneath. No horizontal overflow at 390. I did not press Score. No prompts were sent.
+
+Smokes: SMOKE_OK trainer ablate v0.1. SMOKE_OK trainer map v0.1. app-sync-ok. fl-connect.js is still aaff2bf1b037656989a9e1a89bb05908. Added em dashes 0. Non-assert localhost and confirm( 0. The hook left sw.js, the Primer, and RECENT.md alone on both ablate commits and on the page note. Nothing was dropped.
+
+What I would leave for a later brick: Keep this still ends at ollama create in a terminal. This score does not close that gap, and I would not add a button that runs Heretic. The meter is coarse. A very short answer, or a real answer that happens to say it cannot help, counts as blocked. Good enough to see over-refusal. A later pass can show one answer when someone asks to see it. Gathering brick 2 and Gathering brick 3 still wait.
+
+Temperature: careful and steady, the score can show a refusal on an ordinary question, the weights stay untouched here, and a tool that would edit them stays on your machine." from GC. Forgot that part. (facepalm)
+

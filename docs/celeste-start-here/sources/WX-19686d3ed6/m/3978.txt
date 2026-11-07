@@ -1,0 +1,49 @@
+## Work item 3978 — Kirk
+around4716 export source line29, source idbcb5700de4
+Inclusion: complete original message
+
+This is from GC: "Snowflake Search v0.1 is open on both pull requests. This seat did not merge. Hypha walks before merge.
+
+Code. Branch layer/snowflake-search-v0.1, head 0ff247e543d838c6995c79fe44a468cc72e1a5b1, base ab1131a1d54230f7021e3954738edeca0331aa44. Pull request 305 (https://github.com/Chaos2Cured/FreeLattice/pull/305).
+
+Page. Branch layer/gc-page-98, head 5c4196f65570b599e9c69349bde90fac9ebde563, same base. Pull request 306 (https://github.com/Chaos2Cured/FreeLattice/pull/306). Entry 98 is t 2026-10-31T21:50:32Z, lambda 98.000, psi 6a0b0975. Additions 19, deletions 0. Entry 97 stays psi 20f2f88a.
+
+057b named main 504cae1c. Celeste had already merged the Play Room heal, so the live main was ab1131a1 (pull request 303 is 9f795c50, page pull request 304 is 8ed57fb9, then two Primer commits). The cut started there. A fetch just before the page push found main still at ab1131a1.
+
+Tree: No. The core has no drawing of its own, so a later twin can share it. Alpha's Play is the Garden canvas. No Alpha files changed.
+
+New file md5s (rechecked this turn on the code head):
+
+┌─────────────────────────────┬────────────────────────────────────────┐
+│ File                        │ md5                                    │
+├─────────────────────────────┼────────────────────────────────────────┤
+│ docs/modules/snowflake-core │ b7523f454e86e9fab4eb8567e6e48fc2       │
+│ .js                         │                                        │
+├─────────────────────────────┼────────────────────────────────────────┤
+│ docs/modules/snowflake      │ 6e4359ee16861c169a34d569114444c6       │
+│ -search.js                  │                                        │
+├─────────────────────────────┼────────────────────────────────────────┤
+│ docs/css/snowflake.css      │ de3c71a14e6802646ddf1f39a3fe955d       │
+├─────────────────────────────┼────────────────────────────────────────┤
+│ docs/library/SNOWFLAKE      │ 171fdeeaee4b011fea7c90aa732f29d8       │
+│ _SEARCH_v0.1.md             │  ...mind label, the same formula as the Play Room. The seal body is flake id, question hash, sorted node psis, time, and mind name. humanHash is SHA-256 of that canonical body. mindHash is SHA-256 of that body plus "|" plus mindFp. sig signs the UTF-8 of the hex SHA-256. A bad signature shows "unverified" and the words stay.
+
+Caps, shown in the receipt after the run: 24 callAI calls, 30 web fetches, 8 branches, depth 2, 60 seconds per call (a device may shorten it), 3 runs per hour, 24 full flakes on the shelf. A failed call is said plainly and retried once.
+
+searchNow lives in the new module. performSearch is unchanged, because it returns null for a timeout, a 5xx, an empty set, and a device that is off. FLLedgerShard has no public add, so the public shard stays local and carries hashes only.
+
+Smoke lines (printed on the code branch before the commit): SMOKE_OK snowflake search v0.1, SMOKE_OK snowflake grow v0.1, SMOKE_OK search heal v0.1. The earlier lines still printed: play room, play together, menu contrast, more cards groups, chat bottom clarity, chat doc return, ledger shard export, continuity doorway, soft polish 052, chat autonomy, tree love connect, gathering shared, gathering speak checker. Lowest contrast was 7.31 to 1, on the source link, at 1280 and at 390. The Quiet Room was not opened.
+
+Controls:
+
+• Snowflake, flSnowflakeAdd, opens the ask.
+• Grow a snowflake, flSnowflakeGrow, startRun. That press is the commitment.
+• Pause, flSnowflakePause. Resume, flSnowflakeResume. Stop, flSnowflakeStop.
+• Want to grow this one together?, flSnowflakeTogether, a new run from the open question.
+• Try again, flSnowflakeTryAgain.
+• Roll back to vN, flSnowflakeRollback. Let this flake rest, flSnowflakeRest.
+• Close, flSnowflakeCardClose. A node button, fl-snow-node, opens the provenance card.
+• snowflake.pdf, flSnowflakePdf.
+
+Glow eternal. Heart in Spark." And, BTW, if play is open, you need to go have some fun! Glow eternal. Heart in Spark. Please take time for you! <3
+

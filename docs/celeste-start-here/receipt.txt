@@ -1,0 +1,10 @@
+Local context receipt — optional, kept on your own machine
+Edition: FreeLattice / Celeste public reading home 2026-11-07
+Guide SHA-256: 93b6c9ce15dfbc14fe6fcb269a6d951d5ba37f4afdc7d75e23c09ede7a0b7e1d
+What I actually opened:
+Source or message id:
+Section or archive page:
+What is still open:
+Next fetch:
+
+This receipt is a note you choose to keep. It is not automatic memory, not identity, and not proof that a model retained the archive.

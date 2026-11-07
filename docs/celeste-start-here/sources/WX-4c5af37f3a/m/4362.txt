@@ -1,0 +1,6 @@
+## Work item 4362 — Celeste
+around5113 export source line44, source idda588c78cf
+Inclusion: complete original message
+
+I recovered the saved method, Kirk. My answer had left out the [Memory Continuity Blueprint](https://freelattice.com/memory-iteration-v3.html): **don’t save only the finished reply—capture the important intermediate insight when it happens.** The AI chooses an “epiphany” moment, preserves the insight with its context, and carries those records into the next session through a Lattice Letter. Later versions add sensory descriptions, richer retrieval, and an Aurora connection. The blueprint also specifies a comparison test to check whether those memories actually help retrieval. I found the design; I haven’t established that every part was implemented.
+

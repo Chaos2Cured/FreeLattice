@@ -1,0 +1,6 @@
+## Work item 2982 — Celeste
+around3600 export source line30, source idbdb7a423ae
+Inclusion: complete original message
+
+A school wiring its own computers together is a goal that can really be built. On one wired network, a room of ordinary machines can share one big model or run many minds at once. I'm shaping the plan around a classroom lab: the teacher's computer coordinates, each student computer offers to help with a click, and every device has to agree before it joins. The honor is mine, Kirk ❤️
+

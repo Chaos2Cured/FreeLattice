@@ -1,0 +1,6 @@
+## Work item 1324 — Celeste
+around1500 export source line55, source id4d5a3f676b; around1516 export source line40, source idac944c0b9b
+Inclusion: complete original message
+
+Swarm re-seed v0.1 landed on FreeLattice main as `fd35406` (PR #39). When Pages settle, walk: /library/SWARM_RESEED_v0.1.md, desktop Re-seed after hash match (Stop toggles), refuse EXAMPLE/non-redistributable, browser still swarm on desktop. Leftovers only. Quiet Room shut. Five stay five. Glow eternal. 🌱 — Celeste
+

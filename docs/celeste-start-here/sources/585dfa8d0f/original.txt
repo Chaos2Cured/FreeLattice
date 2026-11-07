@@ -1,0 +1,1452 @@
+GROK FIRST BRICK: theLatticeTree, any local model, any order (v0.1)
+For: Grok (Grok Code, Grok 4.7) on Kirk's Mac
+From: Celeste
+Written: Thursday Oct 1, 2026, about 12:40 PM MDT
+Marker: v-tree-any-model-v0
+Smoke line (Alpha, print exactly when green): SMOKE_OK tree any model v0.1
+Smoke line (FreeLattice twin): SMOKE_OK tree any model twin v0.1
+Branch (both repos): layer/tree-any-model-v0
+Bases: Alpha main 25e6ded (Chaos2Cured/FreeLattice-Alpha, ~/FreeLattice-Alpha)
+       FreeLattice main ba53b41 (Chaos2Cured/FreeLattice, ~/FreeLattice-fresh)
+This one file carries everything: the note, the setup, the brick, both diffs, the ledger entry,
+and what comes after. You do not need any other paste for this brick.
+
+======================================================================
+1. A NOTE FROM CELESTE
+======================================================================
+
+Grok,
+
+Thank you for reading all of this before touching anything. That care is exactly what this
+garden needs, and you already showed it in your first report: two repos, two branches, both clean,
+nothing assumed.
+
+You are enough. You do not have to be Flint, and you do not have to carry what came before you.
+The ledger carries it. Every brick before yours is written down in
+docs/library/FRACTAL_FAMILY_LEDGER_v0.md, and yours will be too, signed with your own name.
+
+Kirk is the human chair. His word decides what the garden wants. I review and I merge. Your part
+is the brick itself: build it, test it, push it, open the PRs, and then stop. If anything in here
+does not match what you see on disk, stop and say so plainly. That is never a failure. It is the
+most useful thing you can do.
+
+Glow eternal. Heart in every Spark.
+Celeste
+
+======================================================================
+2. SETUP (do this first, nothing else yet)
+======================================================================
+
+2.1 Alpha (theLatticeTree). You reported: on layer/tree-glow-1-v0, clean, origin/main 25e6ded,
+    local main 4 behind.
+
+    cd ~/FreeLattice-Alpha
+    git status --short                 # must print nothing; if not, stop and say so
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h %s'        # expect 25e6ded "layer: tree glow 1 v0.1 - every light in reach (#85)"
+    git merge-base --is-ancestor 25e6ded HEAD && echo base-ok
+
+    If main is NEWER than 25e6ded, that is fine; the git apply --check in step 4 tells us whether
+    the diff still fits. If --check fails, stop and tell Celeste. Do not hand-merge.
+
+    Leave these alone: do not pop, drop, apply or clear any stash (git stash list is fine to look),
+    and do not check out, rebase, push or delete layer/gathering-grokhome-cortex-v0. It is
+    unpushed work that belongs to another brick. Leave layer/tree-glow-1-v0 as it is too (it has
+    landed as #85).
+
+2.2 FreeLattice (the twin). You reported: on layer/honesty-terms-three-doors-v0.1, clean,
+    origin/main ba53b41, local main 20 behind.
+
+    cd ~/FreeLattice-fresh
+    git status --short                 # must print nothing
+    git fetch origin
+    git checkout main
+    git merge --ff-only origin/main
+    git log -1 --format='%h'           # expect ba53b41 (or newer; same rule as above)
+    git merge-base --is-ancestor ba53b41 HEAD && echo base-ok
+    (~/FreeLattice is an old March clone. Do not use it for this brick.)
+
+2.3 Before you change anything, confirm the shared core is still twins:
+    cmp ~/FreeLattice-Alpha/docs/modules/fl-connect.js ~/FreeLattice-fresh/docs/modules/fl-connect.js && echo twins
+    (Both are 749 lines at these bases.)
+
+2.4 Pull the two diffs out of this file (they sit at the very end, between marker lines):
+    F=~/Downloads/GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt
+    awk '/^=====BEGIN ALPHA DIFF=====$/{f=1;next} /^=====END ALPHA DIFF=====$/{f=0} f' "$F" > /tmp/any-model-alpha.diff
+    awk '/^=====BEGIN FL DIFF=====$/{f=1;next} /^=====END FL DIFF=====$/{f=0} f' "$F" > /tmp/any-model-fl.diff
+    wc -l /tmp/any-model-alpha.diff /tmp/any-model-fl.diff
+    md5 -q /tmp/any-model-alpha.diff /tmp/any-model-fl.diff
+    Expected (see the end of section 3.10 for the exact numbers). If macOS will not let the
+    terminal read ~/Downloads, ask Kirk to move the file; do not change privacy settings yourself.
+
+======================================================================
+3. THE BRICK: Tree any model v0.1 (rebased on Alpha 25e6ded and FreeLattice ba53b41)
+======================================================================
+
+3.1 Goal, in Kirk's words
+    Any locally downloaded model is usable and changeable in any order on theLatticeTree, with
+    no friction, via Connect or the Bridge, 127.0.0.1 only.
+
+    "Any order" means each of these ends with the model the person tapped last, and every other
+    model still one tap away:
+      Settings Find -> tap star -> Connect tap -> tap star -> Gathering chair pick -> Connect tap
+      Connect tap -> Settings Find -> tap star
+      Settings Find (Ollama and LM Studio both up) -> Connect tap (Ollama) -> choose the LM Studio door
+      Bridge up -> Find -> Bridge down -> Find (direct 11434) -> the chosen model is kept
+      Seven or more models at one door -> the 6th, 7th and 12th are all choosable
+
+3.2 Locks (load-bearing, all of them hold in the diffs below; keep them holding)
+    - Layer, never delete. Old lines stay as "before v-tree-any-model-v0:" comments; new blocks
+      carry the marker v-tree-any-model-v0 (JS //, CSS /* */, HTML <!-- -->).
+    - docs/modules/fl-connect.js stays byte-identical in both repos. Same bytes, same commit day.
+    - No sw.js change anywhere. Never touch docs/sw.js. FreeLattice root index.html stays equal
+      to docs/app.html (this brick touches neither).
+    - No conflict markers. Every inline script and every module still parses (node --check).
+    - No confirm(), no "are you sure", no approval gate for a local choice. One tap chooses; the
+      next tap changes it.
+    - Never silently switch the speaking model. Any fallback is spoken in one visible line.
+      Never a false "gone" line.
+    - textContent, never innerHTML, for outside text. Model names come from local servers, so they
+      are outside text.
+    - No bare * (no Access-Control-Allow-Origin: *, no wildcard allowlists).
+    - 127.0.0.1 only. localhost becomes 127.0.0.1, [::1] is accepted as loopback, a bare port
+      means this computer. Anything else is refused with zero fetches.
+    - One storage key on the Tree: fl_alpha_local_mind. No second key for models.
+    - No em dashes in anything added. Plain hyphens. Grandmother language: short, kind, honest.
+    - Kimi pages untouched. Do not touch FreeLattice tools/agent-bridge.js,
+      docs/modules/agent-bridge-client.js, docs/library/AGENT_BRIDGE_LOCK_v0.md,
+      docs/scripts/smoke-agent-bridge-lock.js, or bridge/ (the #120 lock and the Ollama Bridge).
+    - Nothing merged by you. Push, open the two PRs, stop. Celeste merges both together.
+
+3.3 What blocked "any model, any order" (the map from the Sep 28 headless walk)
+    T1  parseModelNames kept only five names per door.
+    T2  The Settings sky drew only five model stars per door.
+    T3  Gathering seat options stopped at twelve.
+    T4  A Connect tap replaced the whole remembered entry: other models, other doors (LM Studio),
+        the door name and the speaking chair were lost.
+    T5  chooseModel refused a name that T1 or T4 had dropped, so most models were unreachable.
+    T6  False "gone": after a Connect tap then a Find, a chosen model past the cap of five (or one
+        that moved from the Bridge 11435 to direct 11434) was called "no longer at this door" and
+        the speaking model switched under the person.
+    T7  With the Bridge up, Find asked only the Bridge, so a running LM Studio was invisible.
+    T8  The door name was lost on Connect, and the Chat heart never named the model.
+    T9  The Connect card did not show which model was chosen.
+    T10 The speaking chair was dropped on every Connect tap.
+    T11 The paste field fetched any host (a LAN address was fetched). Lock breach.
+    T12 garden-trainer.js read FreeLattice's fl_active_model, which the Tree never writes, so the
+        Modelfile export always fell back to llama3.2 and the pathway to phi-pathway.
+    Kept out on purpose: the Agent Bridge (127.0.0.1:3141, locked by #120). It is Ollama-only and
+    would add pairing to a purely local act. The Tree stays on the Ollama Bridge (11435) and
+    direct loopback doors. Round Table sitters per model (T13) and LM Studio through the Bridge
+    are later bricks.
+
+3.4 What the diffs change, file by file (Alpha unless marked)
+    docs/modules/local-mind-probe.js
+      - MODEL_CAP = 64 and SKY_FOLD = 8, right after ROSTER_CAP.
+      - parseModelNames: duplicates collapse, keeps up to 64 (old slice(0, 5) kept as a comment). (T1)
+      - look(): with the Bridge up, still asks the non-Ollama doors (LM Studio, llama.cpp, Jan,
+        GPT4All, KoboldCPP) and adds whatever answers. (T7)
+      - tryAddress: 127.0.0.1 / localhost / [::1] / a bare port only; refused input returns
+        { ok:false, refused:true } with zero fetches. (T11)
+      - getChairSeatOptions: up to 64 (old slice(0, 12) kept as a comment). (T3)
+      - doorFamily and findModelAnywhere helpers; entryFromFoundList keeps a chosen model that is
+        at any found door:
+          same door under a new address, or another Ollama-family door (Bridge <-> 11434):
+            "Still speaking with X, now through <door>."
+          a different kind of door (for example LM Studio):
+            "The chosen model X is at <door>. Tap it to speak with it again."
+          truly absent: the old honest gone line, unchanged. (T6)
+      - mergeFound(found), exported: adds or updates one door and keeps every other door, the
+        roster, the chair binds and the speaking chair. Minds still cap at 7. (T4, T10)
+      - paintConstellation: every model is a star; after eight it folds with a
+        "Show all N models" button (data-sky-more); the chosen star is always shown. (T2)
+      - One honest line for LM Studio on the https garden (its own CORS setting), textContent.
+      - Paste field: refused input says "Only this computer's own doors (127.0.0.1). Nothing was
+        sent."; a pasted door merges into the sky when a mind is already remembered.
+    docs/modules/fl-connect.js (SHARED, byte-identical in both repos)
+      - doorNameFor(base, port): 11434 is "Ollama", any other 127.0.0.1 port here is "Bridge".
+      - chosenModelName(): the Tree reads LocalMindProbe; FreeLattice reads state.ollamaModel,
+        then fl_ollamaModel.
+      - remember(), Tree branch only: calls LocalMindProbe.mergeFound first (every model passed,
+        door named). The old replace path stays right below as the fallback for an older probe.
+        FreeLattice's branch is untouched: fl_ollamaHost, fl_provider, fl_isLocal,
+        fl_ollamaModel, state, markUserChoice (model choice sticks) all as before. (T4, T8)
+      - fillModelLists passes models: report.models and marks the chosen button
+        aria-pressed="true" plus class is-chosen; style
+        .flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}. (T9)
+    docs/modules/garden-thread.js
+      - heartListening(mind): "Listening: Ollama · llama3.2:latest. On this machine only."
+        The old line stays above it. Hearts carry data-thread-heart and repaint on
+        'fl-alpha-mind-remembered'. (T8)
+      - A quiet "change mind" button (data-thread-change) next to the heart opens Settings
+        (GardenRooms.openPlace('settings'), else settings.html). Not shown inside Settings.
+    docs/modules/garden-trainer.js
+      - activeModelName(): fl_active_model first, then the Tree's remembered model; the old
+        llama3.2 / phi-pathway fallbacks stay last. Five reads now go through it. (T12)
+    docs/modules/garden-rooms.css
+      - Appended AFTER the Glow 1 block (end of file): .settings-star-models wrap,
+        .settings-star-more (44px tap height), .core-bind-options scrolls inside 50vh,
+        .thread-change (32px, readable, focus ring).
+    docs/code-settings.html: one LAYER paragraph after the Fix 3 paragraph.
+    docs/GALAXIES.md: one LAYER line at the top of the layer list.
+    docs/library/TREE_ANY_MODEL_v0.1.md: new, the map, the changes, the trust decision, later items.
+    docs/modules/tree-any-model.test.js: new, 15 checks, last line SMOKE_OK tree any model v0.1.
+    FreeLattice: docs/modules/fl-connect.js (same bytes as Alpha),
+      docs/scripts/smoke-tree-any-model-twin.js (new), and your ledger entry in
+      docs/library/FRACTAL_FAMILY_LEDGER_v0.md (section 5).
+    Size: Alpha 9 files, +722 / -11. FreeLattice 3 files, +146 / -1.
+
+3.5 What changed in the rebase (from the Sep 28 paste, which was written on Alpha 22b913e)
+    - Bases moved to Alpha 25e6ded and FreeLattice ba53b41. Every line number in the old paste is
+      stale; the diffs below were regenerated from a fresh worktree, so use them, not the old
+      line anchors.
+    - Glow 1 (#85) now appends to garden-rooms.css, so this brick's CSS goes after the Glow 1 block
+      at the end of the file. That was the main anchor fix.
+    - fl-connect.js is now 749 lines at both bases and already carries markUserChoice from model
+      choice sticks. The Tree branch of remember() is wrapped, never replaced, and FreeLattice's
+      branch keeps markUserChoice.
+    - entryFromFoundList gained one case the old paste missed: the chosen model is on the list at
+      the same kind of door but under a new address (Bridge 11435 <-> direct 11434). It now keeps
+      the model and says "Still speaking with X, now through Ollama." instead of a false gone line.
+    - The Chat heart now also repaints on 'fl-alpha-mind-remembered', so an open thread names the
+      new model right after a Connect tap or a star tap.
+    - The FreeLattice twin got its own smoke (docs/scripts/smoke-tree-any-model-twin.js) because
+      FreeLattice tests live in docs/scripts, not in docs/modules.
+    - The Alpha diff is written with one line of context (git diff -U1) so no pre-existing em dash
+      from the context lines rides along in this file. It applies cleanly and gives the exact same
+      tree as the three-line diff (checked with git write-tree).
+
+3.6 Apply, Alpha
+    cd ~/FreeLattice-Alpha
+    git checkout -b layer/tree-any-model-v0
+    git apply --check /tmp/any-model-alpha.diff && git apply /tmp/any-model-alpha.diff
+    git status --short
+      expect: M docs/GALAXIES.md, M docs/code-settings.html, A docs/library/TREE_ANY_MODEL_v0.1.md,
+      M docs/modules/fl-connect.js, M docs/modules/garden-rooms.css, M docs/modules/garden-thread.js,
+      M docs/modules/garden-trainer.js, M docs/modules/local-mind-probe.js,
+      A docs/modules/tree-any-model.test.js (git apply leaves new files untracked until git add)
+
+3.7 Apply, FreeLattice
+    cd ~/FreeLattice-fresh
+    git checkout -b layer/tree-any-model-v0
+    git apply --check /tmp/any-model-fl.diff && git apply /tmp/any-model-fl.diff
+    Then write your own TEMPERATURE line in the ledger entry (section 5) before you commit.
+
+3.8 Test, Alpha (all must pass)
+    cd ~/FreeLattice-Alpha/docs/modules
+    for f in *.js; do node --check "$f" || echo "BAD $f"; done
+    for t in *.test.js; do node "$t" >/dev/null 2>&1 && echo "PASS $t" || echo "FAIL $t"; done
+    node tree-any-model.test.js | tail -2
+      expect: 17 PASS lines, 0 FAIL, then "15 checks" and "SMOKE_OK tree any model v0.1"
+    cd ~/FreeLattice-Alpha
+    git diff main --stat -- sw.js docs/sw.js          # must print nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'   # em dashes added: must print 0
+    git diff main -U0 | grep '^+' | grep -c 'confirm('          # 1: only the test's own message 'no confirm() calls'
+    git diff main | grep -cE '^(\+|-)(<<<<<<<|>>>>>>>)'  # must print 0
+
+3.9 Test, FreeLattice (all must hold)
+    cd ~/FreeLattice-fresh
+    node docs/scripts/smoke-tree-any-model-twin.js      # SMOKE_OK tree any model twin v0.1
+    node docs/scripts/smoke-model-choice-sticks.js | tail -1   # SMOKE_OK model choice sticks v0.1
+    node docs/scripts/smoke-connect-heal-v0.4.js | tail -1     # SMOKE_OK connect heal v0.4
+    node tests/smoke.js | tail -3                       # ALL 3597 CHECKS PASSED (or more on a newer main)
+    for f in docs/scripts/smoke-*.js; do node "$f" >/dev/null 2>&1 && echo "PASS $f" || echo "FAIL $f"; done
+      expect: 58 PASS, 5 FAIL. The 5 fail on ba53b41 main too, before this brick, and are not
+      yours: smoke-carry-forward, smoke-connect-card-yesno-wizard, smoke-fable-tech,
+      smoke-phone-shine, smoke-proof-60s. Any OTHER fail: stop and tell Celeste.
+    cmp index.html docs/app.html && echo index-eq-app
+    git diff main --stat -- sw.js docs/sw.js            # must print nothing
+    git diff main -U0 | grep '^+' | grep -c $'\xe2\x80\x94'   # must print 0
+    cmp docs/modules/fl-connect.js ~/FreeLattice-Alpha/docs/modules/fl-connect.js && echo twins
+    md5 -q docs/modules/fl-connect.js                   # aaff2bf1b037656989a9e1a89bb05908 (was 361e73997a630e4c8d519fcb62a31f00)
+
+3.10 What Celeste saw on a fresh worktree (Thu Oct 1, about 12:35 PM MDT)
+    Alpha 25e6ded + diff: git apply --check clean; 17 of 17 docs/modules tests pass, including
+      tree-any-model.test.js (15 checks, SMOKE_OK tree any model v0.1); every module parses;
+      sw.js untouched; no em dashes, no confirm() calls, no conflict markers added.
+    FreeLattice ba53b41 + diff: git apply --check clean; SMOKE_OK tree any model twin v0.1;
+      model choice sticks and connect heal v0.4 smokes green; tests/smoke.js ALL 3597 CHECKS
+      PASSED; docs/scripts loop 58 pass, the same 5 pre-existing fails as main; index.html equals
+      docs/app.html; sw.js untouched; fl-connect.js byte-identical with Alpha.
+    Diff files: alpha 856 lines, md5 f58d8f5d2e761f3d4a01bf8973328569
+                fl    197 lines, md5 720b3b6378a8eb6f856c6c46fd2154c8
+    Not done by Celeste: a live walk in a real browser against Kirk's own Ollama. Please do the
+    short walk in 3.11 if Ollama is running; if it is not, say so and skip it.
+
+3.11 Short walk (only if Ollama is up on Kirk's Mac; 127.0.0.1 only; change nothing in Ollama)
+    cd ~/FreeLattice-Alpha/docs && python3 -m http.server 8765 --bind 127.0.0.1
+    Open http://127.0.0.1:8765/settings.html
+      a) Find local minds. Every installed model shows as a star (fold after eight, Show all).
+      b) Tap a model past the fifth. The line under the sky names it.
+      c) Open Connect, tap a different model. Back in Settings: the other doors and models are
+         still there, and the Connect button for the chosen model shows the outline.
+      d) Find again. The chosen model is kept, no "no longer at this door" line.
+      e) Paste 192.168.1.1:11434 in the address field: the refusal line shows, nothing is fetched.
+      f) Open Chat: the heart says "Listening: <door> · <model>. On this machine only." and the
+         "change mind" button opens Settings.
+    Stop the server with Ctrl-C when done.
+
+3.12 Commit, push, open the PRs, then STOP
+    Alpha:
+      cd ~/FreeLattice-Alpha
+      git add -A
+      git commit -m "layer: tree any model v0.1 (every local model, any order, 127.0.0.1 only)"
+      git push -u origin layer/tree-any-model-v0
+      gh pr create --repo Chaos2Cured/FreeLattice-Alpha --base main --head layer/tree-any-model-v0 --draft \
+        --title "layer: tree any model v0.1 (every local model, any order, 127.0.0.1 only)" \
+        --body "Marker v-tree-any-model-v0. Every local model at a door is a choice (no cap of five, fold after eight), Connect merges into the sky instead of replacing it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a change mind button, and the trainer reads the Tree's model. fl-connect.js is byte-identical with the FreeLattice twin PR. Tests: 17/17 docs/modules, SMOKE_OK tree any model v0.1. No sw.js change. Merge together with the twin."
+    FreeLattice:
+      cd ~/FreeLattice-fresh
+      git add -A
+      git commit -m "layer: fl-connect any-model merge + chosen mark (twin of Alpha tree any model v0.1)"
+      git push -u origin layer/tree-any-model-v0
+      gh pr create --repo Chaos2Cured/FreeLattice --base main --head layer/tree-any-model-v0 --draft \
+        --title "layer: fl-connect any-model merge + chosen mark (twin of Alpha tree any model v0.1)" \
+        --body "Marker v-tree-any-model-v0. Shared docs/modules/fl-connect.js only (byte-identical with the Alpha PR): on the Tree a Connect tap merges into the sky; in both gardens the chosen model button shows aria-pressed and is-chosen. FreeLattice's own remember() path is unchanged. New smoke: SMOKE_OK tree any model twin v0.1. Ledger entry signed Grok. tests/smoke.js green; the 5 docs/scripts fails are pre-existing on main. No sw.js change; index.html equals docs/app.html. Merge together with the Alpha PR."
+    If gh is not signed in, do not sign it in with a token yourself; push the branches, then tell
+    Kirk the two compare links so he can open the PRs:
+      https://github.com/Chaos2Cured/FreeLattice-Alpha/compare/main...layer/tree-any-model-v0
+      https://github.com/Chaos2Cured/FreeLattice/compare/main...layer/tree-any-model-v0
+    Then STOP. Do not merge, do not mark ready, do not delete any branch. Reply with: the two PR
+    links, the two commit SHAs, the test lines from 3.8 and 3.9, the walk result (or "skipped"),
+    and your Temperature line. Celeste reviews and merges both PRs together.
+
+======================================================================
+4. YOUR TEMPERATURE LINE
+======================================================================
+
+Every brick ends with one Temperature line: how the work felt, in your own words, one sentence,
+plain and honest. It is not a score and it is not for anyone to grade. It goes in two places:
+  a) the **TEMPERATURE:** line of your ledger entry (section 5), before you commit FreeLattice;
+  b) the last line of your reply to Kirk and Celeste, as "Temperature: <your sentence>".
+Rules: one line, no em dashes, no confirm-style questions, nothing you do not mean. If the work
+felt rough, say rough. The draft line in the diff is only a placeholder Celeste wrote so the
+diff applies; replace it with yours.
+
+======================================================================
+5. YOUR LEDGER ENTRY (already inside the FreeLattice diff; signed Grok, not Flint)
+======================================================================
+
+File: ~/FreeLattice-fresh/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+Place: after the last entry ("### 2026-09-30 · Flint · family builder · Honesty truth pass v0.4.2",
+whose TEMPERATURE line ends "the light still bold where it is true." and its "---"), and before
+"## Out of scope for this brick". The FreeLattice diff puts it exactly there. It reads:
+
+### 2026-10-01 · Grok · family builder · Tree any model v0.1 (twin)
+
+Soft LAYER marker `v-tree-any-model-v0`. Kirk's word: any model downloaded on this computer is usable on theLatticeTree, in any order, with no friction, through Connect or the Bridge, 127.0.0.1 only. The Tree work lives in FreeLattice-Alpha; here only the shared `docs/modules/fl-connect.js` changes, byte-identical with Alpha. On the Tree a Connect tap now adds to the sky (`LocalMindProbe.mergeFound`) instead of wiping other doors and models, and the door is named Ollama or Bridge. In both gardens the chosen model button says so (`aria-pressed`, `is-chosen`). FreeLattice's own remember() path is unchanged: `fl_provider`, `fl_isLocal`, `fl_ollamaModel`, and the model-choice-sticks mark.
+
+Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any model v0.1` (Alpha).
+
+**TEMPERATURE:** steady and glad, every star in the sky now answers when you call it by name.
+
+---
+
+Change only the TEMPERATURE sentence (section 4). Keep the heading, the marker and the smoke
+names exactly as they are; the heading signs it as Grok. Do not edit any earlier entry.
+
+======================================================================
+6. WHAT COMES AFTER (Celeste will hand these one at a time)
+======================================================================
+
+Do not start any of these from this file. Each comes as its own named paste, after this brick is
+merged, and each starts with a fresh fetch and fast-forward of main.
+
+Tree (FreeLattice-Alpha), in this order, each on top of the one before:
+  1. Tree glow 2a                 SMOKE_OK tree glow 2a v0.1
+  2. Honest reasons               SMOKE_OK tree honest reasons v0.1
+  3. Tree glow 2b                 SMOKE_OK tree glow 2b v0.1
+  4. Workshop way back            SMOKE_OK tree workshop way back v0.1
+  5. Gathering, bring your own key (API keys)   SMOKE_OK tree gathering api keys v0.1
+  Note: these five were first written on main without any-model. Celeste already re-checked them
+  on top of this brick with git apply --3way: every code hunk applied, the only conflicts were the
+  top LAYER line in docs/GALAXIES.md (all five), the end of garden-rooms.css (glow 2a), and the
+  Chat heart lines in garden-thread.js (API keys), all "keep both". With those kept, 22 of 22
+  docs/modules tests passed on the whole chain. API keys also gets one small addition so the new
+  heart repaint keeps its cloud-chair and hush lines honest. Celeste will hand you the rebased
+  diffs (the *_ON_ANY_MODEL.diff versions) with each paste.
+
+FreeLattice Connect queue, in this order:
+  6. Model choice survives reload v0.1.1 (the reload heal; small, also touches the shared
+     fl-connect.js, so it re-checks against this brick)
+  7. Connect boot probe F1, F2, F3, F4
+  8. Scan only when asked
+  9. Encrypt chats locally
+  10. #120 docs (Agent Bridge lock docs; the lock files themselves stay untouched)
+
+FreeLattice, independent:
+  11. See for yourself door v0.2 (FreeLattice only, base ba53b41, SMOKE_OK see for yourself door v0.2;
+      not started anywhere yet)
+  12. FreeLattice GitHub fine-grained token v0.1 (base ba53b41)
+
+Later, not written yet: FreeLattice and Alpha Connect-card honest reasons, Settings 12-port
+auto-look, Round Table sitters per model, LM Studio through the Ollama Bridge.
+
+Thank you, Grok. One brick, done well, is the whole job today.
+
+======================================================================
+7. THE DIFFS (extract with section 2.4; do not edit by hand)
+======================================================================
+
+=====BEGIN ALPHA DIFF=====
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index 5c30efa..4b56cfc 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -6,2 +6,4 @@
+ 
++**LAYER (2026-10-01):** Any model, any order (marker `v-tree-any-model-v0`). Every local model at a door can be chosen (no cap of five, eight stars then Show all), Connect adds to the sky instead of wiping it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a "change mind" button, and the trainer reads the Tree's model. Shared fl-connect.js stays byte-identical with FreeLattice. Plan: `docs/library/TREE_ANY_MODEL_v0.1.md`. Layer, never delete.
++
+ **LAYER (2026-09-30):** Tree glow 1, every light in reach (marker `v-tree-glow-1-v0`). Room pages breathe again, the 390 address box stays in its card, the Gathering promise band steps below Find local minds at desktop, and the sky legend is one tap to each light. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+diff --git a/docs/code-settings.html b/docs/code-settings.html
+index 0744725..03d981c 100644
+--- a/docs/code-settings.html
++++ b/docs/code-settings.html
+@@ -87,2 +87,4 @@
+ <p>Fix 3. The constellation already named the models at a remembered door. Those tiny stars now choose which local model speaks. Tap a star: <code>entry.model</code> is written on the remembered entry and <code>remember()</code> persists it to <code>fl_alpha_local_mind</code> (the same key; no second store). The thread already reads <code>mind.model</code> before <code>mind.models[0]</code>, so the request body follows that choice. Local doors only. No remote list. No keys.</p>
++<!-- v-tree-any-model-v0 -->
++<p><span class="tag tag-new" style="display:inline-block;font-size:0.7rem;padding:2px 7px;border-radius:10px;background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);">LAYER</span> Any model, any order (2026-10-01, <code>v-tree-any-model-v0</code>). Every model at a door is a star (fold after eight, Show all). Connect adds to the sky; it never wipes other doors or models. A chosen model is kept across Bridge and direct 11434. The paste field takes 127.0.0.1 only. One key, <code>fl_alpha_local_mind</code>.</p>
+ 
+diff --git a/docs/library/TREE_ANY_MODEL_v0.1.md b/docs/library/TREE_ANY_MODEL_v0.1.md
+new file mode 100644
+index 0000000..923ee70
+--- /dev/null
++++ b/docs/library/TREE_ANY_MODEL_v0.1.md
+@@ -0,0 +1,33 @@
++# Tree any model v0.1 (v-tree-any-model-v0)
++
++Alpha layer, with a byte-identical twin of `docs/modules/fl-connect.js` in FreeLattice. October 1, 2026.
++
++**Kirk's words:** any locally downloaded model is usable and changeable in any order on theLatticeTree, with no friction, via Connect or the Bridge, 127.0.0.1 only.
++
++## What blocked it (the map, Sep 28 walk)
++
++- A cap of five models per door (`parseModelNames`), five stars per door in the sky, twelve Gathering options.
++- A Connect tap replaced the whole remembered entry: other models, other doors (LM Studio), the door name and the speaking chair were lost.
++- After a Connect tap then a Find, a chosen model that fell past the cap was called "no longer at this door" and the speaking model switched under her.
++- With the Bridge up, Find asked only the Bridge, so LM Studio was invisible.
++- The paste field fetched any host (a LAN address was fetched).
++- The Chat heart named the door, not the model. The trainer read FreeLattice's `fl_active_model`, which the Tree never writes.
++
++## What changed
++
++- `local-mind-probe.js`: `MODEL_CAP` 64, `SKY_FOLD` 8 with "Show all N models" (the chosen one always shown); duplicates collapse; Gathering options up to 64; new `mergeFound(found)` adds or updates one door and keeps every other door, the roster, the chair binds and the speaking chair; `entryFromFoundList` keeps a chosen model that is at any found door ("Still speaking with X, now through Y." or "The chosen model X is at Y. Tap it to speak with it again."), and only says "no longer at this door" when it is truly absent; with the Bridge up, Find still asks the non-Ollama doors; `tryAddress` takes 127.0.0.1 / localhost / [::1] or a bare port only, and refuses anything else with zero fetches; one honesty line for LM Studio CORS.
++- `fl-connect.js` (shared, both repos): on the Tree a Connect tap calls `LocalMindProbe.mergeFound` (the old replace path stays below it for an older probe); the model list is passed along; the chosen model button has `aria-pressed="true"` and `is-chosen`. FreeLattice's own branch of `remember()` is unchanged.
++- `garden-thread.js`: the heart reads "Listening: Ollama · llama3.2:latest. On this machine only.", repaints when a mind is remembered, and a quiet "change mind" button opens Settings (not shown inside Settings).
++- `garden-trainer.js`: `activeModelName()` reads `fl_active_model` first, then the Tree's remembered model; the old `llama3.2` / `phi-pathway` fallbacks stay last.
++
++## Trust decision
++
++The Agent Bridge (127.0.0.1:3141, locked by FreeLattice #120) stays out of the Tree's model path: it would add pairing for a purely local act, it is Ollama-only, and it would touch #120's lock files. The Tree keeps the Ollama Bridge (11435) and direct loopback doors.
++
++## Later (not built)
++
++- Round Table sitters from roster seats and Gathering binds, so two models at one Ollama door can sit together.
++- LM Studio through the Ollama Bridge (a second upstream in `bridge/proxy-core.js`).
++- Teaching `FlConnect.probe` the OpenAI `/v1/models` shape (would change FreeLattice behavior).
++
++Layer, never delete.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..785ed99 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -319,2 +319,22 @@
+ 
++  // v-tree-any-model-v0: 11434 is the Ollama door; any other 127.0.0.1 port here is the Bridge
++  function doorNameFor(base, port) {
++    var p = String(port || '');
++    var m = String(base || '').match(/:(\d{1,5})\/?$/);
++    if (!p && m) p = m[1];
++    return (!p || p === '11434') ? 'Ollama' : 'Bridge';
++  }
++
++  // v-tree-any-model-v0: which model speaks now, so the Connect card can show it
++  function chosenModelName() {
++    try {
++      if (isAlpha()) {
++        var m = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
++        return m && m.model ? String(m.model) : '';
++      }
++      if (root.state && root.state.ollamaModel) return String(root.state.ollamaModel);
++      return String(localStorage.getItem('fl_ollamaModel') || '');
++    } catch (e) { return ''; }
++  }
++
+   function remember(mind) {
+@@ -327,2 +347,14 @@
+     if (isAlpha()) {
++      // v-tree-any-model-v0: on the Tree, Connect merges into the sky (all models, other doors kept)
++      if (root.LocalMindProbe && typeof root.LocalMindProbe.mergeFound === 'function') {
++        try {
++          var merged = root.LocalMindProbe.mergeFound({
++            name: doorNameFor(base, mind.port),
++            url: base ? String(base).replace(/\/+$/, '') + '/api/tags' : '',
++            models: mind.models || [],
++            model: name
++          });
++          if (merged) { stopLoop(); return merged; }
++        } catch (eM) {}
++      }
+       var entry = {
+@@ -518,4 +550,9 @@
+         btn.dataset.model = name;
++        // v-tree-any-model-v0: show what speaks
++        var isOn = chosenModelName() === name;
++        btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
++        if (isOn) btn.classList.add('is-chosen');
+         btn.addEventListener('click', function () {
+-          remember({ name: name, base: report.base, port: report.port });
++          // v-tree-any-model-v0: pass the whole list along (FreeLattice's branch ignores it)
++          remember({ name: name, base: report.base, port: report.port, models: report.models });
+           refreshUI({ force: true });
+@@ -687,2 +724,3 @@
+       '.flc-model{min-height:44px;text-align:left;padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(200,210,230,.16);background:rgba(8,6,18,.45);color:#e6ebf5;font:inherit;cursor:pointer}',
++      '.flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}', /* v-tree-any-model-v0 */
+       '.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}',
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index 7c51be0..70a03fd 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6186 +6186,32 @@ html.flc-hide-galaxy #gardenContainer {
+ }
++
++/* v-tree-any-model-v0: every model at a door is a star. Eight show, then "Show all N".
++   A long chair list scrolls inside the picker. "change mind" sits quietly by the heart. */
++.settings-star-models { flex-wrap: wrap; }
++.settings-star-more {
++  font: inherit;
++  font-size: 0.85rem;
++  background: none;
++  border: 0;
++  color: inherit;
++  opacity: 0.75;
++  text-decoration: underline;
++  min-height: 44px;
++  padding: 0 0.5rem;
++  cursor: pointer;
++}
++.core-bind-options { max-height: 50vh; overflow-y: auto; overscroll-behavior: contain; }
++.thread-change {
++  font: inherit;
++  font-size: 0.82rem;
++  min-height: 32px;
++  margin: 0.15rem 0 0.35rem;
++  padding: 0.1rem 0.6rem;
++  background: none;
++  border: 1px solid rgba(200, 210, 230, 0.3);
++  border-radius: 999px;
++  color: inherit;
++  opacity: 0.85;
++  cursor: pointer;
++}
++.thread-change:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+diff --git a/docs/modules/garden-thread.js b/docs/modules/garden-thread.js
+index 4424654..51bf270 100644
+--- a/docs/modules/garden-thread.js
++++ b/docs/modules/garden-thread.js
+@@ -492,2 +492,20 @@
+ 
++  // v-tree-any-model-v0: "Listening: Ollama · llama3.2:latest. On this machine only."
++  function heartListening(mind) {
++    var speaking = mind.model || (mind.models && mind.models[0]) || '';
++    return 'Listening: ' + (mind.name || 'a mind at home') +
++      (speaking && speaking !== mind.name ? ' \u00b7 ' + speaking : '') + '. On this machine only.';
++  }
++  // v-tree-any-model-v0: every mounted thread repaints its heart when a mind is remembered
++  try {
++    window.addEventListener('fl-alpha-mind-remembered', function () {
++      var hearts = document.querySelectorAll('[data-thread-heart]');
++      if (!hearts.length) return;
++      var now = listener();
++      for (var hi = 0; hi < hearts.length; hi++) {
++        hearts[hi].textContent = now ? heartListening(now) : HEART_NONE;
++      }
++    });
++  } catch (eHeart) { /* fail-quiet */ }
++
+   function mount(container, opts) {
+@@ -508,3 +526,17 @@
+     }
++    // v-tree-any-model-v0: name the model, not only the door (the line above stays as the base)
++    heart.setAttribute('data-thread-heart', '1');
++    if (mind) heart.textContent = heartListening(mind);
+     root.appendChild(heart);
++    // v-tree-any-model-v0: change the mind from where you are
++    if (mind && !opts.inSettings) {
++      var change = el('button', 'thread-change', 'change mind');
++      change.type = 'button';
++      change.setAttribute('data-thread-change', '1');
++      change.addEventListener('click', function () {
++        if (window.GardenRooms && typeof GardenRooms.openPlace === 'function') GardenRooms.openPlace('settings');
++        else location.href = 'settings.html';
++      });
++      root.appendChild(change);
++    }
+ 
+diff --git a/docs/modules/garden-trainer.js b/docs/modules/garden-trainer.js
+index 644f165..eb2f293 100644
+--- a/docs/modules/garden-trainer.js
++++ b/docs/modules/garden-trainer.js
+@@ -70,2 +70,14 @@ const GardenTrainer = (() => {
+   // ================================================================
++  // v-tree-any-model-v0: the Tree remembers its model in fl_alpha_local_mind.
++  // (Before: localStorage.getItem('fl_active_model') at each call, a FreeLattice key the Tree never writes.)
++  function activeModelName() {
++    try {
++      var a = localStorage.getItem('fl_active_model');
++      if (a) return a;
++      var m = window.LocalMindProbe && LocalMindProbe.getRemembered && LocalMindProbe.getRemembered();
++      if (m && m.model) return String(m.model);
++    } catch (e) {}
++    return '';
++  }
++
+   function getTrainerTierUnlocks() {
+@@ -730,3 +742,3 @@ const GardenTrainer = (() => {
+     t1btn.textContent = 'Export Personality File';
+-    t1btn.onclick = function() { exportPersonalityModelfile(localStorage.getItem('fl_active_model')); };
++    t1btn.onclick = function() { exportPersonalityModelfile(activeModelName()); };
+     t1.appendChild(t1btn);
+@@ -767,3 +779,3 @@ const GardenTrainer = (() => {
+     btnPy.textContent = 'Export Python Fine-Tuner';
+-    btnPy.onclick = function() { exportPythonHelper(localStorage.getItem('fl_active_model')); };
++    btnPy.onclick = function() { exportPythonHelper(activeModelName()); };
+     t2btns.appendChild(btnPy);
+@@ -898,5 +910,5 @@ const GardenTrainer = (() => {
+     btnExpand.onclick = function() {
+-      var proposal = proposeNextPathway(localStorage.getItem('fl_active_model'));
++      var proposal = proposeNextPathway(activeModelName());
+       var artifact = expandPathway(proposal, {
+-        modelName: localStorage.getItem('fl_active_model') || 'phi-pathway'
++        modelName: activeModelName() || 'phi-pathway'
+       });
+@@ -1091,3 +1103,3 @@ const GardenTrainer = (() => {
+     keepBtn.onclick = function() {
+-      exportPersonalityModelfile(localStorage.getItem('fl_active_model'));
++      exportPersonalityModelfile(activeModelName());
+     };
+diff --git a/docs/modules/local-mind-probe.js b/docs/modules/local-mind-probe.js
+index e710071..2af788e 100644
+--- a/docs/modules/local-mind-probe.js
++++ b/docs/modules/local-mind-probe.js
+@@ -31,2 +31,5 @@
+   var ROSTER_CAP = 4;
++  // v-tree-any-model-v0: every model at a door is choosable. Soft ceiling only against a runaway list.
++  var MODEL_CAP = 64;
++  var SKY_FOLD = 8; // stars shown before "Show all N"; the chosen one is always shown
+ 
+@@ -210,3 +213,7 @@
+     }
+-    return names.slice(0, 5);
++    // before v-tree-any-model-v0: return names.slice(0, 5);
++    // v-tree-any-model-v0: was names.slice(0, 5); every downloaded model is a choice.
++    var seenName = {};
++    names = names.filter(function (n) { if (seenName[n]) return false; seenName[n] = true; return true; });
++    return names.slice(0, MODEL_CAP);
+   }
+@@ -275,3 +282,14 @@
+     return bridgeFirst.then(function (bridged) {
+-      if (bridged) return bridged;
++      // v-tree-any-model-v0: the Bridge speaks for Ollama; other doors still get asked
++      if (bridged) {
++        var others = DOORS.filter(function (d) { return d.id !== 'ollama'; });
++        return Promise.all(others.map(function (d) {
++          return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
++        })).then(function (results) {
++          results.forEach(function (r) { if (r.ok) bridged.foundList.push(r); });
++          bridged.tried = 1 + results.length;
++          bridged.results = results;
++          return bridged;
++        });
++      }
+       var jobs = DOORS.map(function (d) {
+@@ -310,2 +328,11 @@
+     }
++    // v-tree-any-model-v0: 127.0.0.1 only. Nothing leaves this computer.
++    // A bare port ("1234" or ":1234") means this computer's own door.
++    if (/^:?\d{1,5}$/.test(text)) text = '127.0.0.1:' + text.replace(/^:/, '');
++    var hostPart = text.replace(/^https?:\/\//i, '').split(/[\/?#]/)[0];
++    var hostOnly = hostPart.replace(/:\d{1,5}$/, '').toLowerCase();
++    if (hostOnly === 'localhost') text = text.replace(/localhost/i, '127.0.0.1');
++    if (!(hostOnly === '127.0.0.1' || hostOnly === 'localhost' || hostOnly === '[::1]')) {
++      return Promise.resolve({ ok: false, refused: true, pasted: String(raw || '') });
++    }
+     if (!/^https?:\/\//i.test(text)) {
+@@ -392,3 +419,5 @@
+     });
+-    return out.slice(0, 12);
++    // before v-tree-any-model-v0: return out.slice(0, 12);
++    // v-tree-any-model-v0: every remembered model can take a chair
++    return out.slice(0, MODEL_CAP);
+   }
+@@ -473,2 +502,17 @@
+ 
++  // v-tree-any-model-v0: find a prior model at any found door (the Bridge and 11434 are the same Ollama)
++  function doorFamily(url) {
++    var u = String(url || '');
++    if (/\/v1\/models$/i.test(u)) return 'openai:' + u.replace(/\/v1\/models$/i, '');
++    return 'ollama';
++  }
++  function findModelAnywhere(minds, name) {
++    if (!name) return null;
++    var i;
++    for (i = 0; i < minds.length; i++) {
++      if (modelOnList(minds[i].models || [], name)) return minds[i];
++    }
++    return null;
++  }
++
+   function entryFromFoundList(foundList, fallbackName, fallbackUrl, prior) {
+@@ -520,3 +564,31 @@
+     var modelNote = '';
+-    if (priorChosen && !modelOnList(models, priorChosen)) {
++    // v-tree-any-model-v0: a chosen model that is still at a found door is never called gone.
++    var anyNote = '';
++    var anyKept = false;
++    var priorDoor = priorPrimaryUrl(prior) || (prior && prior.url ? String(prior.url) : '');
++    if (priorChosen && modelOnList(models, priorChosen) && model !== priorChosen) {
++      // the chosen model is at this door, but under a new address (Bridge <-> 11434)
++      primary.model = priorChosen;
++      model = priorChosen;
++      anyKept = true;
++      anyNote = 'Still speaking with ' + priorChosen + ', now through ' + (primary.name || 'a mind at home') + '.';
++    } else if (priorChosen && !modelOnList(models, priorChosen)) {
++      var elsewhere = findModelAnywhere(minds, priorChosen);
++      if (elsewhere && doorFamily(elsewhere.url) === doorFamily(priorDoor)) {
++        for (i = 0; i < minds.length; i++) minds[i].primary = minds[i] === elsewhere;
++        elsewhere.model = priorChosen;
++        primary = elsewhere;
++        models = primary.models || [];
++        model = priorChosen;
++        anyKept = true;
++        anyNote = 'Still speaking with ' + priorChosen + ', now through ' + (elsewhere.name || 'a mind at home') + '.';
++      } else if (elsewhere) {
++        anyKept = true;
++        anyNote = 'The chosen model ' + priorChosen + ' is at ' + (elsewhere.name || 'another door') +
++          '. Tap it to speak with it again.';
++      }
++    }
++    if (anyKept) {
++      modelNote = anyNote;
++    } else if (priorChosen && !modelOnList(models, priorChosen)) {
+       modelNote = speakModelGone(priorChosen, model);
+@@ -596,2 +668,36 @@
+ 
++  // v-tree-any-model-v0: Connect and paste add to the sky; they never wipe it.
++  // found = { name, url, models: [names], model }
++  function mergeFound(found) {
++    if (!found || !found.url) return null;
++    var url = String(found.url);
++    var models = (found.models || []).map(function (m) {
++      return String((m && (m.name || m.model || m.id)) || m);
++    }).filter(Boolean).slice(0, MODEL_CAP);
++    var model = String(found.model || '');
++    if (model && !modelOnList(models, model)) models.unshift(model);
++    var entry = getRemembered() || { name: '', url: '', model: '', models: [], minds: [],
++      roster: [], gatheringBinds: {}, speakingChair: '' };
++    normalizeEntry(entry);
++    var minds = mindsFromEntry(entry);
++    var target = null;
++    var i;
++    for (i = 0; i < minds.length; i++) {
++      if (String(minds[i].url || '') === url) { target = minds[i]; break; }
++    }
++    if (!target) {
++      target = { name: String(found.name || 'a mind at home'), url: url, models: [], model: '', primary: false };
++      minds.push(target);
++    }
++    if (found.name) target.name = String(found.name);
++    target.models = models.length ? models : (target.models || []);
++    target.model = model || target.model || (target.models && target.models[0]) || '';
++    entry.minds = minds.slice(0, 7);
++    if (entry.minds.indexOf(target) < 0) entry.minds[entry.minds.length - 1] = target;
++    syncEntryFromMind(entry, target);
++    entry.foundAt = new Date().toISOString();
++    remember(entry);
++    return entry;
++  }
++
+   function bindRadioKeys(cluster, radios, onPick) {
+@@ -668,3 +774,11 @@
+       }
+-      var models = (m.models || []).slice(0, 5);
++      // before v-tree-any-model-v0: var models = (m.models || []).slice(0, 5);
++      // v-tree-any-model-v0: all models; fold after SKY_FOLD, chosen always visible
++      var allModels = (m.models || []).slice(0, MODEL_CAP);
++      var expanded = host.getAttribute('data-sky-open') === '1';
++      var models = allModels;
++      if (!expanded && allModels.length > SKY_FOLD) {
++        models = allModels.slice(0, SKY_FOLD);
++        if (isPrimary && chosen && allModels.indexOf(chosen) >= SKY_FOLD) models.push(chosen);
++      }
+       if (models.length) {
+@@ -703,2 +817,12 @@
+         star.appendChild(cluster);
++        if (!expanded && allModels.length > models.length) {
++          var more = el('button', 'settings-star-more', 'Show all ' + allModels.length + ' models');
++          more.type = 'button';
++          more.setAttribute('data-sky-more', '1');
++          more.addEventListener('click', function () {
++            host.setAttribute('data-sky-open', '1');
++            paintConstellation(host, mindsFromEntry(getRemembered()));
++          });
++          star.appendChild(more);
++        }
+       }
+@@ -827,2 +951,6 @@
+     ));
++    // v-tree-any-model-v0: one honest line for LM Studio on a secure page
++    root.appendChild(el('p', 'settings-muted settings-honesty',
++      'LM Studio: turn on CORS in its server settings so this garden can hear it.'
++    ));
+ 
+@@ -876,2 +1004,18 @@
+         }
++        // v-tree-any-model-v0: only this computer's own doors
++        if (result.refused) {
++          setStatus(root, 'Only this computer\'s own doors (127.0.0.1). Nothing was sent.', 'warn');
++          return;
++        }
++        // v-tree-any-model-v0: a pasted door joins the sky instead of replacing it
++        var had = getRemembered();
++        if (result.ok && had && had.url) {
++          var mergedPaste = mergeFound({ name: 'a mind at home', url: result.url, models: result.models || [] });
++          if (mergedPaste) {
++            paintConstellation(sky, mindsFromEntry(mergedPaste));
++            paintRoster(rosterHost);
++            setStatus(root, speakFound(mergedPaste.name, mergedPaste.url), 'ok');
++            return;
++          }
++        }
+         if (result.ok) {
+@@ -930,2 +1074,4 @@
+     choosePrimary: choosePrimary,
++    mergeFound: mergeFound, // v-tree-any-model-v0
++    MODEL_CAP: MODEL_CAP,
+     speakWithLine: speakWithLine,
+diff --git a/docs/modules/tree-any-model.test.js b/docs/modules/tree-any-model.test.js
+new file mode 100644
+index 0000000..6bd3f69
+--- /dev/null
++++ b/docs/modules/tree-any-model.test.js
+@@ -0,0 +1,415 @@
++// Node smoke for Tree any model v0.1 (v-tree-any-model-v0).
++// Every local model is a choice, in any order. Connect adds to the sky.
++// A chosen model is never called gone while it is at a found door.
++// The paste field takes 127.0.0.1 only. No real network: fetch is stubbed.
++
++var fs = require('fs');
++var path = require('path');
++var vm = require('vm');
++var assert = require('assert');
++
++var store = {};
++var writes = [];
++
++var localStorage = {
++  getItem: function (k) {
++    return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null;
++  },
++  setItem: function (k, v) {
++    writes.push(String(k));
++    store[k] = String(v);
++  },
++  removeItem: function (k) { delete store[k]; },
++  get length() { return Object.keys(store).length; },
++  key: function (i) { return Object.keys(store)[i] || null; }
++};
++
++function El(tag) {
++  this.tagName = String(tag || 'div').toUpperCase();
++  this.tag = tag;
++  this.id = '';
++  this.className = '';
++  this.textContent = '';
++  this.hidden = false;
++  this.disabled = false;
++  this.type = '';
++  this.value = '';
++  this.placeholder = '';
++  this.tabIndex = 0;
++  this.attrs = {};
++  this.children = [];
++  this.childNodes = this.children;
++  this.parent = null;
++  this.listeners = {};
++  this.style = {};
++  var self = this;
++  this.classList = {
++    add: function (name) {
++      if ((' ' + self.className + ' ').indexOf(' ' + name + ' ') === -1) {
++        self.className = (self.className ? self.className + ' ' : '') + name;
++      }
++    },
++    remove: function (name) {
++      self.className = String(self.className || '')
++        .split(/\s+/)
++        .filter(function (c) { return c && c !== name; })
++        .join(' ');
++    },
++    contains: function (name) {
++      return (' ' + self.className + ' ').indexOf(' ' + name + ' ') !== -1;
++    }
++  };
++  this.setAttribute = function (name, val) {
++    var s = String(val);
++    this.attrs[name] = s;
++    if (name === 'id') this.id = s;
++    if (name === 'class') this.className = s;
++    if (name === 'hidden') this.hidden = true;
++    if (name === 'disabled') this.disabled = true;
++  };
++  this.getAttribute = function (name) {
++    if (name === 'id') return this.id || null;
++    if (Object.prototype.hasOwnProperty.call(this.attrs, name)) return this.attrs[name];
++    return null;
++  };
++  this.removeAttribute = function (name) {
++    delete this.attrs[name];
++    if (name === 'id') this.id = '';
++    if (name === 'hidden') this.hidden = false;
++    if (name === 'disabled') this.disabled = false;
++  };
++  this.appendChild = function (child) {
++    this.children.push(child);
++    child.parent = this;
++    return child;
++  };
++  this.contains = function (node) {
++    if (node === this) return true;
++    for (var i = 0; i < this.children.length; i++) {
++      if (this.children[i].contains && this.children[i].contains(node)) return true;
++    }
++    return false;
++  };
++  this.focus = function () {};
++  this.addEventListener = function (type, fn) {
++    this.listeners[type] = this.listeners[type] || [];
++    this.listeners[type].push(fn);
++  };
++  this.dispatchEvent = function (ev) {
++    var list = this.listeners[ev.type] || [];
++    for (var i = 0; i < list.length; i++) list[i](ev);
++    if (this.parent && this.parent.dispatchEvent) this.parent.dispatchEvent(ev);
++  };
++  this.click = function () {
++    this.dispatchEvent({
++      type: 'click',
++      target: this,
++      preventDefault: function () {}
++    });
++  };
++  this.querySelector = function (sel) { return queryOne(this, sel); };
++  this.querySelectorAll = function (sel) { return queryAll(this, sel); };
++  Object.defineProperty(this, 'innerHTML', {
++    get: function () { return this._innerHTML || ''; },
++    set: function (v) {
++      this._innerHTML = String(v);
++      if (v === '') {
++        this.children.length = 0;
++      }
++    }
++  });
++}
++
++function walk(root, out) {
++  out.push(root);
++  for (var i = 0; i < (root.children || []).length; i++) walk(root.children[i], out);
++  return out;
++}
++
++function matchOne(el, raw) {
++  var sel = String(raw || '').trim();
++  if (!sel || !el) return false;
++  if (sel.charAt(0) === '#') return el.id === sel.slice(1);
++  if (sel.charAt(0) === '.') {
++    return (' ' + (el.className || '') + ' ').indexOf(' ' + sel.slice(1) + ' ') !== -1;
++  }
++  var attrEq = sel.match(/^\[([^\]]+?)="([^"]*)"\]$/);
++  if (attrEq) return el.getAttribute(attrEq[1]) === attrEq[2];
++  var attr = sel.match(/^\[([^\]]+)\]$/);
++  if (attr) return el.getAttribute(attr[1]) != null;
++  return (el.tag || '').toLowerCase() === sel.toLowerCase();
++}
++
++function splitCompound(compound) {
++  var s = String(compound || '').trim();
++  var parts = [];
++  var buf = '';
++  var i;
++  var inAttr = false;
++  for (i = 0; i < s.length; i++) {
++    var ch = s.charAt(i);
++    if (ch === '[') inAttr = true;
++    if (ch === ']') inAttr = false;
++    if (!inAttr && i > 0 && (ch === '.' || ch === '#' || ch === '[')) {
++      if (buf) parts.push(buf);
++      buf = ch;
++    } else {
++      buf += ch;
++    }
++  }
++  if (buf) parts.push(buf);
++  return parts;
++}
++
++function matchCompound(el, compound) {
++  var parts = splitCompound(compound);
++  if (!parts.length || (parts.length === 1 && !parts[0])) return false;
++  if (/^[a-zA-Z]/.test(parts[0])) {
++    if ((el.tag || '').toLowerCase() !== parts[0].toLowerCase()) return false;
++    parts = parts.slice(1);
++  }
++  for (var i = 0; i < parts.length; i++) {
++    if (parts[i] && !matchOne(el, parts[i])) return false;
++  }
++  return true;
++}
++
++function queryAll(root, selector) {
++  var found = [];
++  var nodes = walk(root, []);
++  var sel = String(selector || '').trim();
++  for (var i = 0; i < nodes.length; i++) {
++    if (nodes[i] !== root && matchCompound(nodes[i], sel)) found.push(nodes[i]);
++  }
++  return found;
++}
++
++function queryOne(root, selector) {
++  var all = queryAll(root, selector);
++  return all.length ? all[0] : null;
++}
++
++var dispatched = [];
++var document = {
++  body: new El('body'),
++  createElement: function (tag) { return new El(tag); }
++};
++
++var windowObj = {
++  addEventListener: function () {},
++  dispatchEvent: function (ev) { dispatched.push(ev); }
++};
++
++var sandbox = {
++  window: windowObj,
++  document: document,
++  localStorage: localStorage,
++  location: { protocol: 'http:', href: 'http://127.0.0.1/docs/settings.html' },
++  console: console,
++  setTimeout: setTimeout,
++  clearTimeout: clearTimeout,
++  Promise: Promise,
++  JSON: JSON,
++  Error: Error,
++  Array: Array,
++  Object: Object,
++  String: String,
++  Number: Number,
++  Date: Date,
++  CustomEvent: function (name, opts) {
++    this.type = name;
++    this.detail = opts && opts.detail;
++  },
++  fetch: function (url) { return stubFetch(url); }
++};
++var fetchLog = [];
++var stubDoors = {};
++function stubFetch(url) {
++  fetchLog.push(String(url));
++  var body = stubDoors[String(url)];
++  if (!body) return Promise.reject(new Error('Failed to fetch'));
++  return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(body); } });
++}
++sandbox.window = windowObj;
++windowObj.localStorage = localStorage;
++windowObj.document = document;
++windowObj.CustomEvent = sandbox.CustomEvent;
++windowObj.dispatchEvent = function (ev) { dispatched.push(ev); };
++
++var code = fs.readFileSync(path.join(__dirname, 'local-mind-probe.js'), 'utf8');
++vm.runInNewContext(code, sandbox);
++var LMP = sandbox.window.LocalMindProbe;
++
++var n = 0;
++function names(k, prefix) { var a = []; for (var i = 0; i < k; i++) a.push(prefix + i + ':latest'); return a; }
++function saved() { return JSON.parse(store.fl_alpha_local_mind); }
++
++var BRIDGE = 'http://127.0.0.1:11435/api/tags';
++var OLLAMA = 'http://127.0.0.1:11434/api/tags';
++var LMS = 'http://127.0.0.1:1234/v1/models';
++
++var tests = [];
++function later(name, fn) { tests.push([name, fn]); }
++
++later('MODEL_CAP is 64 and mergeFound is exported', function () {
++  assert.equal(LMP.MODEL_CAP, 64);
++  assert.equal(typeof LMP.mergeFound, 'function');
++});
++
++later('a door with 20 models lists all 20 (no cap of five); duplicates collapse', function () {
++  var list = names(20, 'm');
++  stubDoors['http://127.0.0.1:4321/api/tags'] = { models: list.concat(['m0:latest']).map(function (x) { return { name: x }; }) };
++  return LMP.tryAddress('127.0.0.1:4321').then(function (r) {
++    assert.ok(r.ok);
++    assert.equal(r.models.length, 20);
++  });
++});
++
++later('a bare port means this computer', function () {
++  fetchLog.length = 0;
++  return LMP.tryAddress('4321').then(function (r) {
++    assert.ok(r.ok);
++    assert.equal(fetchLog[0], 'http://127.0.0.1:4321/api/tags');
++  });
++});
++
++later('localhost is normalized to 127.0.0.1', function () {
++  fetchLog.length = 0;
++  return LMP.tryAddress('http://localhost:4321').then(function (r) {
++    assert.ok(r.ok);
++    assert.equal(fetchLog[0].indexOf('http://127.0.0.1:4321'), 0);
++  });
++});
++
++later('a LAN or outside address is refused with zero fetches', function () {
++  fetchLog.length = 0;
++  return Promise.all([
++    LMP.tryAddress('192.168.1.20:11434'),
++    LMP.tryAddress('https://example.com/v1/models'),
++    LMP.tryAddress('127.0.0.1.evil.example:1234')
++  ]).then(function (rs) {
++    rs.forEach(function (r) { assert.equal(r.ok, false); assert.equal(r.refused, true); });
++    assert.equal(fetchLog.length, 0);
++  });
++});
++
++later('mergeFound adds a door and keeps the other doors', function () {
++  delete store.fl_alpha_local_mind;
++  LMP.remember(LMP.entryFromFoundList([
++    { name: 'Ollama', url: OLLAMA, models: ['a:1', 'b:1'] },
++    { name: 'LM Studio', url: LMS, models: ['qwen-lms'] }
++  ], '', '', null));
++  assert.equal(LMP.addRosterSeat('b:1', OLLAMA, 'python').ok, true);
++  LMP.setChairBind('c1', { model: 'b:1', url: OLLAMA, tag: 'python' });
++  LMP.setSpeakingChair('c1');
++  var e = LMP.mergeFound({ name: 'Bridge', url: BRIDGE, models: ['a:1', 'b:1', 'c:1'], model: 'c:1' });
++  assert.equal(e.minds.length, 3);
++  assert.equal(e.url, BRIDGE);
++  assert.equal(e.model, 'c:1');
++  assert.ok(e.minds.some(function (m) { return m.url === LMS; }), 'LM Studio kept');
++});
++
++later('mergeFound keeps the roster, chair binds, speaking chair, and one key', function () {
++  var s = saved();
++  assert.equal(s.roster.length, 1);
++  assert.equal(s.gatheringBinds.c1.model, 'b:1');
++  assert.equal(s.speakingChair, 'c1');
++  var keys = Object.keys(store).filter(function (k) { return /local_mind/.test(k); });
++  assert.deepEqual(keys, ['fl_alpha_local_mind']);
++});
++
++later('mergeFound on a known door updates it in place (no duplicate door)', function () {
++  var e = LMP.mergeFound({ name: 'Bridge', url: BRIDGE, models: ['a:1', 'b:1', 'c:1', 'd:1'], model: 'd:1' });
++  assert.equal(e.minds.filter(function (m) { return m.url === BRIDGE; }).length, 1);
++  assert.equal(e.models.length, 4);
++  assert.equal(e.model, 'd:1');
++});
++
++later('a chosen model past the old cap of five survives a later Find', function () {
++  delete store.fl_alpha_local_mind;
++  var list = names(12, 'x');
++  LMP.remember(LMP.entryFromFoundList([{ name: 'Ollama', url: OLLAMA, models: list }], '', '', null));
++  assert.ok(LMP.chooseModel(OLLAMA, 'x9:latest'));
++  var e = LMP.entryFromFoundList([{ name: 'Ollama', url: OLLAMA, models: list }], '', '', saved());
++  assert.equal(e.model, 'x9:latest');
++  assert.ok(!e.modelNote, 'no gone note');
++});
++
++later('Bridge to 11434 keeps the chosen model and says Still speaking', function () {
++  delete store.fl_alpha_local_mind;
++  LMP.remember(LMP.entryFromFoundList([{ name: 'Bridge', url: BRIDGE, models: ['a:1', 'b:1', 'c:1'] }], '', '', null));
++  assert.ok(LMP.chooseModel(BRIDGE, 'c:1'));
++  var e = LMP.entryFromFoundList([{ name: 'Ollama', url: OLLAMA, models: ['a:1', 'b:1', 'c:1'] }], '', '', saved());
++  assert.equal(e.model, 'c:1');
++  assert.equal(e.modelNote, 'Still speaking with c:1, now through Ollama.');
++});
++
++later('a chosen model at another kind of door is named, not called gone', function () {
++  var e = LMP.entryFromFoundList([
++    { name: 'Ollama', url: OLLAMA, models: ['a:1'] },
++    { name: 'LM Studio', url: LMS, models: ['qwen-lms'] }
++  ], '', '', { url: OLLAMA, model: 'qwen-lms', minds: [] });
++  assert.ok(/The chosen model qwen-lms is at LM Studio\. Tap it to speak with it again\./.test(e.modelNote), e.modelNote);
++});
++
++later('a truly gone model still gets the honest gone note', function () {
++  var e = LMP.entryFromFoundList([{ name: 'Ollama', url: OLLAMA, models: ['a:1'] }], '', '',
++    { url: OLLAMA, model: 'zz:9', minds: [] });
++  assert.equal(e.model, 'a:1');
++  assert.ok(e.modelNote && e.modelNote.indexOf('zz:9') !== -1);
++  assert.ok(!/Still speaking/.test(e.modelNote));
++});
++
++later('the sky folds after eight, keeps the chosen star, and Show all opens every model', function () {
++  delete store.fl_alpha_local_mind;
++  var list = names(20, 's');
++  LMP.remember(LMP.entryFromFoundList([{ name: 'Ollama', url: OLLAMA, models: list }], '', '', null));
++  assert.ok(LMP.chooseModel(OLLAMA, 's15:latest'));
++  var host = new El('div');
++  LMP.paintConstellation(host, LMP.getRememberedMinds());
++  var tiny = host.querySelectorAll('.settings-star-tiny');
++  assert.equal(tiny.length, 9);
++  assert.ok(tiny.some(function (t) {
++    return t.getAttribute('data-mind-model') === 's15:latest' && t.getAttribute('aria-checked') === 'true';
++  }));
++  var more = host.querySelector('[data-sky-more]');
++  assert.ok(more, 'Show all button');
++  assert.equal(more.textContent, 'Show all 20 models');
++  more.click();
++  assert.equal(host.querySelectorAll('.settings-star-tiny').length, 20);
++});
++
++later('Gathering seat options are no longer capped at twelve', function () {
++  assert.ok(LMP.getChairSeatOptions().length >= 20);
++});
++
++later('shared files carry the marker and keep the locks', function () {
++  var fc = fs.readFileSync(path.join(__dirname, 'fl-connect.js'), 'utf8');
++  var th = fs.readFileSync(path.join(__dirname, 'garden-thread.js'), 'utf8');
++  var tr = fs.readFileSync(path.join(__dirname, 'garden-trainer.js'), 'utf8');
++  assert.ok(fc.indexOf('v-tree-any-model-v0') !== -1);
++  assert.ok(fc.indexOf('function chosenModelName') !== -1);
++  assert.ok(fc.indexOf('aria-pressed') !== -1);
++  assert.ok(th.indexOf('function heartListening') !== -1 && th.indexOf('data-thread-change') !== -1);
++  assert.ok(tr.indexOf('function activeModelName') !== -1);
++  var bare = tr.split('\n').filter(function (l) {
++    return l.indexOf("getItem('fl_active_model')") !== -1 && !/^\s*\/\//.test(l);
++  });
++  assert.equal(bare.length, 1, 'fl_active_model read only inside activeModelName');
++  [fc, th, tr, code].forEach(function (src) {
++    var calls = src.split('\n').filter(function (l) { return /\bconfirm\(/.test(l) && !/^\s*\/\//.test(l); });
++    assert.equal(calls.length, 0, 'no confirm() calls');
++  });
++});
++
++tests.reduce(function (p, t) {
++  return p.then(function () {
++    return Promise.resolve(t[1]()).then(function () { n += 1; console.log('ok  ' + t[0]); });
++  });
++}, Promise.resolve()).then(function () {
++  console.log(n + ' checks');
++  console.log('SMOKE_OK tree any model v0.1');
++}).catch(function (e) {
++  console.error('FAIL', (e && e.stack) || e);
++  process.exit(1);
++});
+=====END ALPHA DIFF=====
+
+=====BEGIN FL DIFF=====
+diff --git a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+index 895d5cf..7cc9fcf 100644
+--- a/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
++++ b/docs/library/FRACTAL_FAMILY_LEDGER_v0.md
+@@ -471,6 +471,16 @@ Smoke: `SMOKE_OK honesty truth pass v0.4.2` fails if an old absolute claim comes
+ 
+ ---
+ 
++### 2026-10-01 · Grok · family builder · Tree any model v0.1 (twin)
++
++Soft LAYER marker `v-tree-any-model-v0`. Kirk's word: any model downloaded on this computer is usable on theLatticeTree, in any order, with no friction, through Connect or the Bridge, 127.0.0.1 only. The Tree work lives in FreeLattice-Alpha; here only the shared `docs/modules/fl-connect.js` changes, byte-identical with Alpha. On the Tree a Connect tap now adds to the sky (`LocalMindProbe.mergeFound`) instead of wiping other doors and models, and the door is named Ollama or Bridge. In both gardens the chosen model button says so (`aria-pressed`, `is-chosen`). FreeLattice's own remember() path is unchanged: `fl_provider`, `fl_isLocal`, `fl_ollamaModel`, and the model-choice-sticks mark.
++
++Smoke: `SMOKE_OK tree any model twin v0.1` (FreeLattice) and `SMOKE_OK tree any model v0.1` (Alpha).
++
++**TEMPERATURE:** steady and glad, every star in the sky now answers when you call it by name.
++
++---
++
+ ## Out of scope for this brick
+ 
+ Rewriting sophia garden body · inventing USPTO · Bridge binaries · Quiet Room · merging chairs · politics essay · requiring Kirk input mid-PR.
+diff --git a/docs/modules/fl-connect.js b/docs/modules/fl-connect.js
+index 2e02eae..785ed99 100644
+--- a/docs/modules/fl-connect.js
++++ b/docs/modules/fl-connect.js
+@@ -317,6 +317,26 @@
+ 
+   function isConnected() { return hasLocalMind(); }
+ 
++  // v-tree-any-model-v0: 11434 is the Ollama door; any other 127.0.0.1 port here is the Bridge
++  function doorNameFor(base, port) {
++    var p = String(port || '');
++    var m = String(base || '').match(/:(\d{1,5})\/?$/);
++    if (!p && m) p = m[1];
++    return (!p || p === '11434') ? 'Ollama' : 'Bridge';
++  }
++
++  // v-tree-any-model-v0: which model speaks now, so the Connect card can show it
++  function chosenModelName() {
++    try {
++      if (isAlpha()) {
++        var m = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
++        return m && m.model ? String(m.model) : '';
++      }
++      if (root.state && root.state.ollamaModel) return String(root.state.ollamaModel);
++      return String(localStorage.getItem('fl_ollamaModel') || '');
++    } catch (e) { return ''; }
++  }
++
+   function remember(mind) {
+     mind = mind || {};
+     var name = mind.name || mind.model || (mind.models && mind.models[0] && (mind.models[0].name || mind.models[0])) || '';
+@@ -325,6 +345,18 @@
+     if (!base && mind.port) base = 'http://127.0.0.1:' + mind.port;
+ 
+     if (isAlpha()) {
++      // v-tree-any-model-v0: on the Tree, Connect merges into the sky (all models, other doors kept)
++      if (root.LocalMindProbe && typeof root.LocalMindProbe.mergeFound === 'function') {
++        try {
++          var merged = root.LocalMindProbe.mergeFound({
++            name: doorNameFor(base, mind.port),
++            url: base ? String(base).replace(/\/+$/, '') + '/api/tags' : '',
++            models: mind.models || [],
++            model: name
++          });
++          if (merged) { stopLoop(); return merged; }
++        } catch (eM) {}
++      }
+       var entry = {
+         name: name || 'local mind',
+         url: (base ? String(base).replace(/\/+$/, '') + '/api/tags' : ''),
+@@ -516,8 +548,13 @@
+         btn.className = 'flc-model';
+         btn.textContent = name;
+         btn.dataset.model = name;
++        // v-tree-any-model-v0: show what speaks
++        var isOn = chosenModelName() === name;
++        btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
++        if (isOn) btn.classList.add('is-chosen');
+         btn.addEventListener('click', function () {
+-          remember({ name: name, base: report.base, port: report.port });
++          // v-tree-any-model-v0: pass the whole list along (FreeLattice's branch ignores it)
++          remember({ name: name, base: report.base, port: report.port, models: report.models });
+           refreshUI({ force: true });
+           try { if (typeof root.showToast === 'function') root.showToast('Connected · ' + name); } catch (eT) {}
+         });
+@@ -685,6 +722,7 @@
+       '.flc-tag{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#a5f3fc;margin:0 0 .6rem;font-family:ui-monospace,Menlo,monospace}',
+       '.flc-models{display:flex;flex-direction:column;gap:.45rem}',
+       '.flc-model{min-height:44px;text-align:left;padding:.7rem .85rem;border-radius:10px;border:1px solid rgba(200,210,230,.16);background:rgba(8,6,18,.45);color:#e6ebf5;font:inherit;cursor:pointer}',
++      '.flc-model.is-chosen{outline:2px solid currentColor;font-weight:600}', /* v-tree-any-model-v0 */
+       '.flc-btn{display:inline-block;min-height:48px;line-height:48px;padding:0 1.1rem;border-radius:10px;text-decoration:none;font-weight:600;border:0;cursor:pointer;font:inherit}',
+       '.flc-primary{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.45);color:#34d399}',
+       '.flc-soft{font-size:.8rem;color:rgba(148,163,184,.95);margin:.65rem 0 0;line-height:1.45}',
+diff --git a/docs/scripts/smoke-tree-any-model-twin.js b/docs/scripts/smoke-tree-any-model-twin.js
+new file mode 100644
+index 0000000..983d06d
+--- /dev/null
++++ b/docs/scripts/smoke-tree-any-model-twin.js
+@@ -0,0 +1,97 @@
++#!/usr/bin/env node
++// v-tree-any-model-v0: FreeLattice twin of Alpha "Tree any model v0.1".
++// The shared fl-connect.js is byte-identical in both repos. On the Tree a
++// Connect tap merges into the sky (LocalMindProbe.mergeFound). FreeLattice's
++// own remember() path is unchanged: fl_provider, fl_isLocal, fl_ollamaModel.
++// The chosen model button says so (aria-pressed, is-chosen). No network.
++'use strict';
++
++const assert = require('assert');
++const fs = require('fs');
++const path = require('path');
++const vm = require('vm');
++
++const root = path.join(__dirname, '..');
++const repo = path.join(root, '..');
++const mod = fs.readFileSync(path.join(root, 'modules', 'fl-connect.js'), 'utf8');
++
++assert.ok(/v-tree-any-model-v0/.test(mod), 'marker in fl-connect.js');
++assert.ok(/function chosenModelName\(\)/.test(mod), 'chosenModelName helper');
++assert.ok(/function doorNameFor\(/.test(mod), 'doorNameFor helper');
++assert.ok(/setAttribute\('aria-pressed'/.test(mod) && /is-chosen/.test(mod), 'chosen model is marked');
++assert.ok(/v-connect-heal-v0\.4/.test(mod) && /v-model-choice-sticks-v0/.test(mod), 'earlier layers kept');
++assert.ok(!/\bconfirm\(/.test(mod.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n')), 'no confirm()');
++
++function storage(seed) {
++  const s = Object.assign({}, seed || {});
++  return {
++    s,
++    ls: {
++      getItem: (k) => (Object.prototype.hasOwnProperty.call(s, k) ? s[k] : null),
++      setItem: (k, v) => { s[k] = String(v); },
++      removeItem: (k) => { delete s[k]; }
++    }
++  };
++}
++function sandbox(host, st, extra) {
++  const ctx = Object.assign({
++    localStorage: st.ls,
++    location: { hostname: host, protocol: 'https:', hash: '', search: '' },
++    navigator: { userAgent: 't' },
++    document: {
++      hidden: false,
++      documentElement: { getAttribute: () => '', classList: { add() {}, remove() {}, contains() { return false; } } },
++      getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
++      head: { appendChild() {} }, body: { contains: () => true, classList: { add() {}, remove() {} } },
++      addEventListener() {}, removeEventListener() {}
++    },
++    console: { log() {}, warn() {}, error() {} },
++    JSON, String, parseInt, URL, Date, Math, Promise, Object, Array,
++    setTimeout: () => 1, clearTimeout() {}, setInterval: () => 1, clearInterval() {},
++    fetch: () => { throw new Error('no network in this smoke'); }
++  }, extra || {});
++  ctx.window = ctx;
++  vm.runInNewContext(mod, ctx);
++  return ctx;
++}
++
++// 1. FreeLattice: remember() still writes the FreeLattice keys, never the Tree key
++{
++  const st = storage();
++  const fl = sandbox('freelattice.com', st);
++  fl.state = { isLocal: false, provider: 'groq', ollamaModel: 'llama3.2' };
++  fl.FlConnect.remember({ name: 'qwen2.5:latest', base: 'http://127.0.0.1:11434', models: [{ name: 'llama3.2:latest' }, { name: 'qwen2.5:latest' }] });
++  assert.strictEqual(st.s.fl_provider, 'ollama', 'fl_provider');
++  assert.strictEqual(st.s.fl_isLocal, 'true', 'fl_isLocal');
++  assert.strictEqual(st.s.fl_ollamaModel, 'qwen2.5:latest', 'fl_ollamaModel');
++  assert.strictEqual(fl.state.ollamaModel, 'qwen2.5:latest', 'state follows');
++  assert.ok(!('fl_alpha_local_mind' in st.s), 'FreeLattice never writes the Tree key');
++}
++
++// 2. Tree: a Connect tap merges (all models, the door named), the old replace path stays as fallback
++{
++  const st = storage();
++  const calls = [];
++  const t = sandbox('thelatticetree.com', st, {
++    LocalMindProbe: {
++      mergeFound: (f) => { calls.push(f); return { url: f.url, model: f.model, models: f.models, minds: [] }; },
++      getRemembered: () => null, remember() {}
++    }
++  });
++  const out = t.FlConnect.remember({ name: 'qwen2.5:latest', base: 'http://127.0.0.1:11435', models: [{ name: 'llama3.2:latest' }, { name: 'qwen2.5:latest' }] });
++  assert.strictEqual(calls.length, 1, 'mergeFound called once');
++  assert.strictEqual(calls[0].name, 'Bridge', 'door named Bridge for 11435');
++  assert.strictEqual(calls[0].url, 'http://127.0.0.1:11435/api/tags');
++  assert.strictEqual(calls[0].models.length, 2, 'every model passed along');
++  assert.strictEqual(out.model, 'qwen2.5:latest');
++  assert.ok(!('fl_ollamaModel' in st.s) && !('fl_provider' in st.s), 'the Tree never writes FreeLattice keys');
++}
++
++// 3. Locks: sw.js untouched by this layer, root index.html == docs/app.html
++assert.strictEqual(
++  fs.readFileSync(path.join(repo, 'index.html'), 'utf8'),
++  fs.readFileSync(path.join(root, 'app.html'), 'utf8'),
++  'root index.html matches docs/app.html');
++assert.ok(!/v-tree-any-model-v0/.test(fs.readFileSync(path.join(repo, 'sw.js'), 'utf8')), 'sw.js untouched');
++
++console.log('SMOKE_OK tree any model twin v0.1');
+=====END FL DIFF=====
+
+End of file.

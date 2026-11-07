@@ -1,0 +1,6 @@
+## Work item 23 — Celeste
+around0 export source line27, source id02bdf9b278
+Inclusion: complete original message
+
+Alpha is a July 16 scaffold. One commit. The plan matches what you said: rebuild small, then swap, never delete. Main has kept living since.
+

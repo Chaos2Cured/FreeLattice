@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c05</title>
+<meta name="description" content="Reading section c05 of 569a78c8f4, 1267 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c05.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c05">
+<meta property="og:description" content="Reading section c05 of 569a78c8f4, 1267 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/569a78c8f4/c05.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1133"></span><span id="p1134"></span><span id="p1135"></span><span id="p1136"></span><span id="p1140"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c05</h1>
+<p>569a78c8f4 · words 1267 · characters 36944–47075</p>
+<p><a href="c04.html">Previous section</a> · <a href="c06.html">Next section</a></p>
+<p><a href="c05.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1133, 1134, 1135, 1136, 1140. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">function publicMind(m, me) {
+  return { id: m.id, name: m.name, origin: m.origin, kind: m.kind, scopes: m.scopes.slice(),
+           createdAt: m.createdAt, lastUsedAt: m.lastUsedAt, expiresAt: m.expiresAt,
+           you: !!(me &amp;&amp; me.id === m.id) };
+}
+
+## Exact source excerpt, characters 34202–34558
+
+function needsToken(method, pathname) {
+  if (method === &#x27;POST&#x27; &amp;&amp; pathname === &#x27;/pair&#x27;) return false;       // how a device gets its token
+  if (method === &#x27;GET&#x27; || method === &#x27;HEAD&#x27;) {
+    return /^\/(code|test|pair|roots)(\/|$)/.test(pathname);
+  }
+  return true;                                                        // every POST and any other verb
+}
+
+## Exact source excerpt, characters 34560–35188
+
+/** Which scope a route uses. Every default scope is on for a new mind. */
+function scopeFor(method, pathname) {
+  if (/^\/code\/(tree|read|search|git\/status)$/.test(pathname) || pathname === &#x27;/roots&#x27;) return &#x27;read&#x27;;
+  if (pathname === &#x27;/code/write&#x27;) return &#x27;write&#x27;;
+  if (pathname === &#x27;/code/patch&#x27;) return &#x27;patch&#x27;;
+  if (pathname === &#x27;/test/run&#x27; || pathname === &#x27;/code/test&#x27;) return &#x27;test&#x27;;
+  if (pathname === &#x27;/code/git/commit&#x27;) return &#x27;commit&#x27;;
+  if (/^\/(wallet|trade)\//.test(pathname) &amp;&amp; method !== &#x27;GET&#x27;) return &#x27;wallet&#x27;;
+  if (/^\/pair\/(list|revoke|revoke-all|scopes)$/.test(pathname)) return &#x27;manage&#x27;;
+  return &#x27;&#x27;;
+}
+
+## Exact source excerpt, characters 35190–36271
+
+/** Local tools (Claude Code, Cursor, scripts) are trusted by default through the token file. */
+function ensureLocalToolsToken() {
+  var st = trustState();
+  if (!st.localTools) {
+    try { fs.unlinkSync(TOKEN_FILE); } catch (e) {}
+    return null;
+  }
+  var existing = &#x27;&#x27;;
+  try { existing = fs.readFileSync(TOKEN_FILE, &#x27;utf8&#x27;).trim(); } catch (e) {}
+  var have = existing ? mindForToken(existing) : null;
+  if (have &amp;&amp; have.kind === &#x27;cli&#x27;) return have;
+  var tok = newToken();
+  st.minds = st.minds.filter(function (m) { return m.kind !== &#x27;cli&#x27;; });
+  var mind = { id: newMindId(), name: &#x27;Local tools on this computer&#x27;, origin: &#x27;&#x27;, kind: &#x27;cli&#x27;,
+               scopes: DEFAULT_SCOPES.slice(), tokenSha256: sha256Hex(tok),
+               createdAt: new Date().toISOString(), lastUsedAt: &#x27;&#x27;, expiresAt: null };
+  st.minds.push(mind);
+  saveTrust();
+  try {
+    fs.writeFileSync(TOKEN_FILE, tok + &#x27;\n&#x27;, { mode: 0o600 });
+    try { fs.chmodSync(TOKEN_FILE, 0o600); } catch (e) {}
+  } catch (e) {
+    console.error(&#x27;  ! Could not write token file: &#x27; + e.message);
+  }
+  return mind;
+}
+
+## Exact source excerpt, characters 36273–36575
+
+// ── Pairing code (human reads it here, types it in the app) ──
+const PAIR_ALPHABET = &#x27;ABCDEFGHJKMNPQRSTUVWXYZ23456789&#x27;; // no 0/O, 1/I/L
+const PAIR_TTL_MS = 10 * 60 * 1000;
+const PAIR_MAX_TRIES = 5;
+const PAIR_COOLDOWN_MS = 30 * 1000;
+var pairState = { code: &#x27;&#x27;, expires: 0, tries: 0, coolUntil: 0 };
+
+## Exact source excerpt, characters 36577–37205
+
+function newPairCode(reason) {
+  var s = &#x27;&#x27;;
+  for (var i = 0; i &lt; 6; i++) s += PAIR_ALPHABET[crypto.randomInt(0, PAIR_ALPHABET.length)];
+  pairState = { code: s, expires: Date.now() + PAIR_TTL_MS, tries: 0,
+                coolUntil: reason === &#x27;lockout&#x27; ? Date.now() + PAIR_COOLDOWN_MS : 0 };
+  console.log(&#x27;&#x27;);
+  console.log(&#x27;  \u2726 Pairing code: &#x27; + s.slice(0, 3) + &#x27;-&#x27; + s.slice(3) +
+              &#x27;   (type it in FreeLattice \u2192 Workshop \u2192 Code. Good for 10 minutes.)&#x27;);
+  if (reason === &#x27;lockout&#x27;) console.log(&#x27;  \u2726 (New code after 5 wrong tries. It works in 30 seconds.)&#x27;);
+  console.log(&#x27;&#x27;);
+  return s;
+}
+
+## Exact source excerpt, characters 37207–37318
+
+function normalizePairCode(s) {
+  return String(s || &#x27;&#x27;).toUpperCase().replace(/[^A-Z0-9]/g, &#x27;&#x27;).slice(0, 6);
+}
+
+## Exact source excerpt, characters 37320–37453
+
+// ── Content-free, hash-chained ledger ──
+const LEDGER_FILE = path.join(DATA_DIR, &#x27;bridge-ledger.jsonl&#x27;);
+var ledgerLastHash = null;
+
+## Exact source excerpt, characters 37455–37782
+
+function ledgerTip() {
+  if (ledgerLastHash) return ledgerLastHash;
+  try {
+    var lines = fs.readFileSync(LEDGER_FILE, &#x27;utf8&#x27;).trim().split(&#x27;\n&#x27;).filter(Boolean);
+    ledgerLastHash = lines.length ? JSON.parse(lines[lines.length - 1]).self : &#x27;genesis&#x27;;
+  } catch (e) { ledgerLastHash = &#x27;genesis&#x27;; }
+  return ledgerLastHash;
+}
+
+## Exact source excerpt, characters 37784–38734
+
+function ledgerAppend(fields) {
+  // Fixed key order. Never message text, never file content, never a token.
+  ledgerLastHash = null; // re-read the tip: the command line may have appended
+  var entry = {
+    ts: new Date().toISOString(),
+    kind: fields.kind || &#x27;commit_request&#x27;,
+    route: fields.route || &#x27;&#x27;,
+    origin: fields.origin || &#x27;&#x27;,
+    agent: String(fields.agent || &#x27;&#x27;).slice(0, 8),
+    device: String(fields.device || &#x27;&#x27;).slice(0, 8),
+    result: fields.result || &#x27;&#x27;,
+    filesCount: fields.filesCount || 0,
+    filesSha256: fields.filesSha256 || &#x27;&#x27;,
+    messageSha256: fields.messageSha256 || &#x27;&#x27;,
+    commitSha: fields.commitSha || &#x27;&#x27;,
+    prev: ledgerTip()
+  };
+  entry.self = sha256Hex(JSON.stringify(entry));
+  try {
+    fs.appendFileSync(LEDGER_FILE, JSON.stringify(entry) + &#x27;\n&#x27;, { mode: 0o600 });
+    ledgerLastHash = entry.self;
+  } catch (e) {
+    console.error(&#x27;  ! Ledger append failed: &#x27; + e.message);
+  }
+  return entry;
+}
+
+## Exact source excerpt, characters 38736–39074
+
+// ── Trusted project folders and path lock ──
+var PROJECT_ROOT_REAL = null;
+function projectRootReal() {
+  if (!PROJECT_ROOT_REAL) {
+    var wanted = path.resolve(process.env.FL_PROJECT || process.cwd());
+    try { PROJECT_ROOT_REAL = fs.realpathSync(wanted); } catch (e) { PROJECT_ROOT_REAL = wanted; }
+  }
+  return PROJECT_ROOT_REAL;
+}
+
+## Exact source excerpt, characters 39076–39422
+
+/** &#x27;project&#x27; is FL_PROJECT (or cwd). Other names come from Kirk&#x27;s roots list. */
+function rootReal(name) {
+  if (!name || name === &#x27;project&#x27;) return projectRootReal();
+  var st = trustState();
+  if (!Object.prototype.hasOwnProperty.call(st.roots, name)) return null;
+  try { return fs.realpathSync(st.roots[name]); } catch (e) { return null; }
+}
+
+## Exact source excerpt, characters 39424–39626
+
+function rootList() {
+  var st = trustState();
+  return [{ name: &#x27;project&#x27;, path: projectRootReal() }].concat(Object.keys(st.roots).map(function (k) {
+    return { name: k, path: st.roots[k] };
+  }));
+}
+
+## Exact source excerpt, characters 39628–39812
+
+function isInside(root, candidate) {
+  var rel = path.relative(root, candidate);
+  return rel === &#x27;&#x27; || (!(rel === &#x27;..&#x27; || rel.startsWith(&#x27;..&#x27; + path.sep)) &amp;&amp; !path.isAbsolute(rel));
+}
+
+## Exact source excerpt, characters 39814–41452
+
+const BRIDGE_FORBIDDEN_TOP = [&#x27;.git&#x27;, &#x27;.ssh&#x27;];
+function lockedPath(relPath, opts) {
+  opts = opts || {};
+  if (typeof relPath !== &#x27;string&#x27; || !relPath || relPath.length &gt; 1024 || hasControlChars(relPath)) {
+    return { error: 400, reason: &#x27;bad-path&#x27; };
+  }
+  if (path.isAbsolute(relPath) || /^[a-zA-Z]:/.test(relPath) || relPath.charAt(0) === &#x27;\\&#x27;) {
+    return { error: 403, reason: &#x27;absolute-path&#x27; };
+  }
+  var root = opts.root || projectRootReal();
+  var full = path.resolve(root, relPath);
+  if (!isInside(root, full)) return { error: 403, reason: &#x27;outside-project&#x27; };
+  var rel = path.relative(root, full);
+  var top = rel.split(path.sep)[0];
+  if (!opts.allowRoot &amp;&amp; rel === &#x27;&#x27;) return { error: 400, reason: &#x27;root-not-allowed&#x27; };
+  if (BRIDGE_FORBIDDEN_TOP.indexOf(top) !== -1) return { error: 403, reason: &#x27;forbidden-path&#x27; };
+  if (!opts.secrets &amp;&amp; /^\.env(\.|$)/.test(path.basename(rel))) return { error: 403, reason: &#x27;secrets-not-granted&#x27; };
+  // Realpath the nearest existing ancestor (or the file itself) so a
+  // symlink inside the project cannot point writes outside it.
+  var probe = full;
+  for (;;) {
+    try { fs.lstatSync(probe); break; }
+    catch (e) {
+      if (e.code !== &#x27;ENOENT&#x27;) return { error: 403, reason: &#x27;stat-failed&#x27; };
+      var up = path.dirname(probe);
+      if (up === probe) return { error: 403, reason: &#x27;no-ancestor&#x27; };
+      probe = up;
+    }
+  }
+  var real;
+  try { real = fs.realpathSync(probe); } catch (e) { return { error: 403, reason: &#x27;dangling-symlink&#x27; }; }
+  if (!isInside(root, real)) return { error: 403, reason: &#x27;symlink-outside&#x27; };
+  return { full: full, rel: rel === &#x27;&#x27; ? &#x27;.&#x27; : rel };
+}
+
+## Exact source excerpt, characters 41454–41626
+
+function runGit(args, root) {
+  return execFileSync(&#x27;git&#x27;, args, { cwd: root || projectRootReal(), encoding: &#x27;utf8&#x27;, stdio: [&#x27;ignore&#x27;, &#x27;pipe&#x27;, &#x27;pipe&#x27;], timeout: 30000 });
+}
+
+## Exact source excerpt, characters 41628–42013
+
+function runSmokeFile(timeoutMs, root) {
+  // No shell: node binary + fixed script path. stdout and stderr joined.
+  var r = spawnSync(process.execPath, [&#x27;tests/smoke.js&#x27;], {
+    cwd: root || projectRootReal(), timeout: timeoutMs, encoding: &#x27;utf8&#x27;, maxBuffer: 64 * 1024 * 1024
+  });
+  return { status: r.status, out: String(r.stdout || &#x27;&#x27;) + String(r.stderr || &#x27;&#x27;), error: r.error };
+}
+
+## Exact source excerpt, characters 42015–43195
+
+// ── Command-line trust tools (Kirk&#x27;s hands, never reachable over HTTP) ──
+function bridgeLockUsage() {
+  console.log(&#x27;&#x27;);
+  console.log(&#x27;  Agent Bridge trust tools (run in a terminal on this computer):&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --list-minds&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --revoke &lt;id&gt;&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --revoke-all            (every paired device; local tools stay)&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --allow-secrets &lt;id&gt;    (this mind may read and write .env files)&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --deny-secrets &lt;id&gt;&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --trust-origin https://example.dev   (exact origin, never *)&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --untrust-origin https://example.dev&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --add-root &lt;name&gt; &lt;absolute folder&gt;&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --remove-root &lt;name&gt;&#x27;);
+  console.log(&#x27;    node tools/agent-bridge.js --trust-local-tools | --untrust-local-tools&#x27;);
+  console.log(&#x27;  A running bridge picks up every change at once. No restart needed.&#x27;);
+  console.log(&#x27;&#x27;);
+}
+
+## Exact source excerpt, characters 43197–48732
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

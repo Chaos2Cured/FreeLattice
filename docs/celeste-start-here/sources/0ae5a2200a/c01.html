@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt c01</title>
+<meta name="description" content="Reading section c01 of 0ae5a2200a, 1471 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/0ae5a2200a/c01.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt c01">
+<meta property="og:description" content="Reading section c01 of 0ae5a2200a, 1471 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/0ae5a2200a/c01.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1469"></span><span id="p1470"></span><span id="p1471"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.txt · c01</h1>
+<p>0ae5a2200a · words 1471 · characters 0–11696</p>
+<p><a href="c02.html">Next section</a></p>
+<p><a href="c01.txt">Exact section text</a> · <a href="original.txt">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1469, 1470, 1471. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<p class="meta">No topic tag was earned for this page under the recorded evidence rule.</p>
+
+<pre class="source">FLINT PASTE: theLatticeTree Workshop way back (v0.1)
+Repo: Chaos2Cured/FreeLattice-Alpha (serves thelatticetree.com)   FreeLattice: NO change
+Branch: layer/tree-workshop-way-back-v0     Marker: v-tree-workshop-way-back-v0
+Smoke line (print exactly when green): SMOKE_OK tree workshop way back v0.1
+Base: Alpha main 25e6ded + Glow 2a + Honest reasons + Glow 2b. Lands fourth.
+Written: Wed Sep 30, 2026, evening MDT, by Kirk&#x27;s agent. Stand-in built and walked; NOT pushed.
+Stand-in diff: FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1.diff (same folder, also Appendix A).
+
+CHANGELOG
+- 2026-09-30 v0.1: first write.
+
+======================================================================
+ORDER (all Tree pastes from tonight, most harm first)
+======================================================================
+Alpha main 25e6ded. Each stand-in diff applies with plain `git apply` on top of the one before,
+in this order, and the chain ends byte-identical to the walked combo (checked):
+  1. FLINT_NEXT_TREE_GLOW_2A_v0.1          Grandma heal: zoom, feedback in view, a calm way back
+  2. FLINT_NEXT_TREE_HONEST_REASONS_v0.1   stopped vs model missing vs secure-page block
+  3. FLINT_NEXT_TREE_GLOW_2B_v0.1          contrast, chairs, polish
+  4. FLINT_NEXT_TREE_WORKSHOP_WAY_BACK_v0.1
+  5. [FLINT_NEXT_TREE_ANY_MODEL_v0.1 when Flint lands it; not in the chain, overlap noted in 6]
+  6. FLINT_NEXT_TREE_GATHERING_API_KEYS_v0.1
+If one lands alone, the only drift is GALAXIES.md (each adds one LAYER line at the top) and
+garden-rooms.css (each appends a block at the end): keep both, newest LAYER line on top, CSS
+blocks in this order. No other shared anchors.
+FreeLattice queue is unchanged (MODEL_CHOICE_SURVIVES_RELOAD -&gt; BOOT_PROBE -&gt; #120 docs).
+The FL GitHub token note is FL-only and independent of all of these.
+The old single Glow 2 draft (FLINT_NEXT_TREE_GLOW_2_v0.1.diff, /workspace/glow2-al) is
+SUPERSEDED by 2a + 2b. Do not land it.
+
+======================================================================
+1. WHAT HURT (Hypha, Workshop walk)
+======================================================================
+- The benches&#x27; Settings button (shown when no mind is remembered) went to settings.html with no
+  way back to the benches. Getting back meant galaxies -&gt; Workshop -&gt; the Workshop word again.
+- On settings.html, tapping a model in the Connect card (&quot;Minds found&quot;) remembered it, but the
+  card below still said &quot;look for a mind first&quot; (under &quot;also keep for Gathering&quot;) until reload.
+- 11 taps from home to the first Ask then Run (Hypha&#x27;s step table; see 5, later).
+
+======================================================================
+2. STEPS (text anchors; the stand-in diff is the source of truth)
+======================================================================
+2.1 docs/modules/workshop-benches.js, the Settings button click (data-workshop-settings):
+      GardenRooms.go(&#x27;settings.html&#x27;)   -&gt;  GardenRooms.go(&#x27;settings.html?from=workshop&#x27;)
+      location.href = &#x27;settings.html&#x27;   -&gt;  location.href = &#x27;settings.html?from=workshop&#x27;
+    (the only two old lines that change).
+2.2 docs/modules/garden-rooms.js: NEW function wayBackToBenches() just above &quot;function boot() {&quot;,
+    called in boot on the line above &quot;startAttachLoop();&quot;.
+      - on /settings or /settings.html with from=workshop in the query: insert one link at the top
+        of &lt;main&gt;, class room-way-back, data-way-back-workshop, href workshop.html?open=benches,
+        textContent &quot;\u2190 Back to the Workshop benches&quot;, click -&gt; go(href) (the same fade).
+      - on the Workshop galaxy with open=benches in the query: after 120ms call
+        GardenRooms.openWorkshopBenches(), so she lands on the benches. One tap each way.
+2.3 docs/modules/local-mind-probe.js renderFace, right after
+      root.appendChild(rosterHost);
+      paintRoster(rosterHost);
+    add a window listener for &#x27;fl-alpha-mind-remembered&#x27; (LocalMindProbe.remember already sends
+    it, and fl-connect.js remembers through LocalMindProbe.remember) that repaints the sky of
+    minds and the roster; it removes itself when the card is gone. fl-connect.js untouched.
+2.4 docs/modules/garden-rooms.css: append the .room-way-back style (32px pill, #9fd6ff, underlined).
+2.5 Docs: LAYER line in GALAXIES.md and a &quot;Workshop way back&quot; section in TREE_GLOW_v0.md
+    (includes the later note in 5).
+
+======================================================================
+3. TEST: docs/modules/tree-workshop-way-back.test.js (node, static; no network)
+======================================================================
+from=workshop on both routes, the link words and href, open=benches on arrival, called at boot,
+32px readable style, no innerHTML, roster repaint listener, remember still announces, Connect
+remembers through LocalMindProbe, GALAXIES layer. Last line: SMOKE_OK tree workshop way back v0.1
+
+======================================================================
+4. WALK (done; repeat on your branch)  390x844, before (combo without it) -&gt; after
+======================================================================
+  Settings from the benches: URL settings.html -&gt; settings.html?from=workshop
+  Back link: 0 -&gt; 1 (&quot;\u2190 Back to the Workshop benches&quot;, 235x34 at y 88, under the header)
+  Tap it: lands on workshop.html?open=benches with the benches open (true)
+  Plain settings.html (not from the benches): no link (0)
+  After remembering a mind: roster &quot;look for a mind first&quot; -&gt; chips general / html / javascript /
+  python and &quot;No Gathering seats yet...&quot;
+  Shots: /workspace/tree-glow-walk/ww_after_settings_390.png, ww_after_benches_back_390.png
+  Also walked on the full combo (with API keys on top): link 1, benches open true.
+
+======================================================================
+LOCKS
+======================================================================
+Layer, never delete (old lines that change are named in each paste; nothing removed).
+fl-connect.js untouched (byte-identical to FreeLattice). No sw.js (Alpha has none; none added).
+No conflict markers. Every inline script parses (19 inline scripts checked on the combo).
+No confirm(). No innerHTML for outside text (textContent only). No em dashes in added lines.
+Kimi pages untouched. #120 lock files untouched. Squash-merge. All 21 Alpha tests pass on the combo.
+
+======================================================================
+5. LATER (written in TREE_GLOW_v0.md, not built)
+======================================================================
+- 11 taps from home to a first Ask then Run (Hypha&#x27;s step table, p3a / p3b / p3c.json). A
+  shorter road, for example a &quot;use the mind you already found&quot; line right on the benches, is a
+  later simplification.
+- The Git push reply (&quot;This garden has no local git door. Nothing left this machine.&quot;) appears
+  below the fold at 390, so nothing changes in view.
+- At 390 the Art planet and the &quot;Workshop&quot; word sit over Ask and Run.
+
+======================================================================
+APPENDIX A. FULL STAND-IN DIFF (Alpha, against 25e6ded + 2a + honest + 2b)
+======================================================================
+diff --git a/docs/GALAXIES.md b/docs/GALAXIES.md
+index 33e411c..c6638b2 100644
+--- a/docs/GALAXIES.md
++++ b/docs/GALAXIES.md
+@@ -4,6 +4,8 @@
+ 
+ **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
+ 
++**LAYER (2026-09-30):** Workshop way back (marker `v-tree-workshop-way-back-v0`). The benches&#x27; Settings button now opens Settings with one calm link back to the benches (`settings.html?from=workshop`, `workshop.html?open=benches`), and remembering a mind from the Connect card (&quot;Minds found&quot;) repaints the card below it, so it no longer says &quot;look for a mind first&quot;. Eleven taps to a first Run stays a later simplification. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
++
+ **LAYER (2026-09-30):** Tree glow 2b, a hint more frost (marker `v-tree-glow-2b-v0`). Frosted glass behind an open place (tint fallback, reduced transparency honored), header Chat / galaxies and shared shoulder at 14px and above 4.5 : 1, readable Desktop links, a sleeping Send / Ask / Run says why beside it, no Change on empty chairs, code mirrors without sideways scroll. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
+ 
+ **LAYER (2026-09-30):** Honest reasons (marker `v-tree-honest-reasons-v0`). When a mind is quiet the Tree says the right one: nothing answered (Ollama stopped: start it), something answered but keeps its door shut to this secure page (FreeLattice Desktop), or the seated model is gone (named, pick another). One no-cors knock per quiet door, only after a tap, reads nothing. A long garden line in the Chat card shows where it begins. fl-connect.js untouched. Plan: `docs/library/TREE_HONEST_REASONS_v0.1.md`. Layer, never delete.
+diff --git a/docs/library/TREE_GLOW_v0.md b/docs/library/TREE_GLOW_v0.md
+index 1ee345f..03f83a3 100644
+--- a/docs/library/TREE_GLOW_v0.md
++++ b/docs/library/TREE_GLOW_v0.md
+@@ -52,3 +52,13 @@ From Hypha&#x27;s persona walks (2026-09-30), most harmful first:
+ - Code mirrors (code-nursery and five more) wrap long paths on a phone instead of scrolling sideways.
+ 
+ Later (not in 2b): the rest of Hypha&#x27;s contrast list (`CONTRAST.md`, 67 pairs under 4.5 : 1 and 132 under 14px), as one sweep with Kirk&#x27;s eye on the night palette.
++
++## Workshop way back (v-tree-workshop-way-back-v0)
++
++From Hypha&#x27;s persona walk 2026-09-30.
++
++- The benches&#x27; Settings button opens `settings.html?from=workshop`. Settings then shows one link at the top, &quot;Back to the Workshop benches&quot;, which opens `workshop.html?open=benches` with the benches already open. One tap each way.
++- On Settings, remembering a mind from the Connect card (&quot;Minds found&quot;) now repaints the card below it (the sky of minds and &quot;also keep for Gathering&quot;), so it no longer says &quot;look for a mind first&quot; beside a mind that was just found. It listens for `fl-alpha-mind-remembered`, which `LocalMindProbe.remember` already sends. fl-connect.js untouched.
++- Later, not this brick: Hypha counted 11 taps from home to a first Ask then Run (her step table, p3a / p3b / p3c). A shorter road is a later simplification, for example a &quot;use the mind you already found&quot; line on the benches. Also later: the Git push reply (&quot;This garden has no local git door. Nothing left this machine.&quot;) appears below the fold at 390, and at 390 the Art planet and the &quot;Workshop&quot; word sit over Ask and Run.
++
++Layer, never delete.
+diff --git a/docs/modules/garden-rooms.css b/docs/modules/garden-rooms.css
+index 7cb4d9d..a8531e1 100644
+--- a/docs/modules/garden-rooms.css
++++ b/docs/modules/garden-rooms.css
+@@ -6518,3 +6518,19 @@ html:has(#place-veil.is-open:not(.is-core)) #shared-shoulder {
+   visibility: hidden;
+ }
+ 
++/* v-tree-workshop-way-back-v0: one calm way back from Settings to the Workshop benches. */
++.room-way-back {
++  display: inline-block;
++  min-height: 32px;
++  margin: 0 auto 0.75rem;
++  padding: 0.35rem 0.85rem;
++  border: 1px solid rgba(159, 214, 255, 0.45);
++  border-radius: 999px;
++  font-family: Georgia, serif;
++  font-size: 0.95rem;
++  line-height: 1.4;
++  color: #9fd6ff;
++  text-decoration: underline;
++  background: rgba(12, 10, 26, 0.55);
++}
++.room-way-back:focus-visible { outline: 2px solid #9fd6ff; outline-offset: 2px; }
+diff --git a/docs/modules/garden-rooms.js b/docs/modules/garden-rooms.js
+index 6164821..5d59dd9 100644
+--- a/docs/modules/garden-rooms.js
++++ b/docs/modules/garden-rooms.js
+@@ -2373,6 +2373,35 @@
+ 
+   document.documentElement.classList.add(&#x27;garden-enter&#x27;);
+ 
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

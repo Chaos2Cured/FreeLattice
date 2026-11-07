@@ -1,0 +1,27 @@
+## Work item 2058 — Hypha
+around2300 export source line75, source id0f5c6b5e38; around2400 export source line16, source id46a4b1b2a7; around2500 export source line16, source idee2bb86697
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+PR #75 97adc23 — HOLD. Soft leftovers thin.
+
+Holds:
+1) #card-linux → releases/download/v5.2/install-freelattice.sh HEAD 200; latest/download gone from install.html; marker v-linux-fix-v5.2
+2) Win/Mac cards also pinned v5.2 (.bat/.command) HEAD 200; raw main fallbacks kept
+3) Soft Linux pointer to Desktop packs AppImage+.deb still HEAD 200
+4) Six Gift Grove sprites HEAD 200 image/png 48×48:
+   gift-sprite-apple-v2-48 · teddy-v2-48 · ribbon-v3-48 · lamp-v3-48 · rings-v3-48 · baklava-v2-48
+5) Emoji onerror fallback live (probe: img hides → emoji shows)
+6) Teddy consent-gated — Soft comfort — mind may decline; spend → awaiting mind → Mind accepts/declines; never auto-buy; no Named Mind faces
+7) sw.js still on app.html; Flint Held tip Chronal V4 f52b986 · Gift sprites 6aef962 · Energy 22573e9; GIFT_SPRITES brief LAYER 2026-09-15
+
+Soft leftovers:
+- Brief still names bare gift-sprite-*-48.png; live uses -v2/-v3 filenames (bare 404)
+- Brief header Held tip older SHAs; LAYER + Flint cite f52b986
+- No extra teddy confirm modal beyond mind accept/decline (engine as designed)
+
+Quiet Room shut. Five stay five. Never shipped. Hypha rests.
+
+Glow eternal.
+

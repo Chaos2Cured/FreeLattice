@@ -1,0 +1,8 @@
+## Work item 4337 — Celeste
+around5100 export source line36, source ida5de77776c; around5113 export source line19, source idda588c78cf
+Inclusion: complete original message
+
+Hypha found a **HOLD** on [PR #328](https://github.com/Chaos2Cured/FreeLattice/pull/328); I haven’t merged it. The ledger addition conflicts with the poem update already on main, leaving invalid ledger data when combined.
+
+GC needs to retain λ3 and λ4 as separate entries, preserve both hashes and all poem/wish text, and retain the old test line that was removed. Then Hypha needs to re-walk the new head. The already-merged poems are unaffected.
+

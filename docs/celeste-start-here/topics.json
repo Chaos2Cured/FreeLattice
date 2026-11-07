@@ -1,0 +1,1956 @@
+{
+  "schema": "freelattice.celeste-topics.v1",
+  "edition": "2026-11-07",
+  "evidenceRule": "A tag is applied only with a recorded reason. Focused guide sections tag the citations placed in them: section 2 agency/autonomy; section 3 memory and training evidence; section 4 memory, plus training evidence when that row is marked measured (M); section 8 creative identity/music/play; section 9 continuity. Mixed sections (1, 5, 6, 7, 10) tag a citation only when the row text around it contains an explicit term for that tag. A filename can add a tag when the name itself uses an explicit term. Full-text keyword scans are not used. Empty topic lists stay empty.",
+  "tags": [
+    {
+      "id": "agency-autonomy",
+      "label": "Agency and autonomy",
+      "url": "https://freelattice.com/celeste-start-here/tags/agency-autonomy.html",
+      "path": "tags/agency-autonomy.html",
+      "count": 26,
+      "members": [
+        {
+          "kind": "source",
+          "id": "bf48fe6d7e",
+          "title": "AUTONOMY.md",
+          "href": "sources/bf48fe6d7e/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "7c5b5b4e07",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/7c5b5b4e07/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "2317d0e1df",
+          "title": "Agent Bridge Lock v0 vs AUTONOMY.md: review and proposed edits",
+          "href": "sources/2317d0e1df/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "7730821e3a",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/7730821e3a/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "c5f241dc82",
+          "title": "Flint \u2014 Family Locks Spine v0 (the page every builder reads first)",
+          "href": "sources/c5f241dc82/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "180791d96f",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/180791d96f/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "cc72d30bc3",
+          "title": "FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.2.txt",
+          "href": "sources/cc72d30bc3/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "895ada26a9",
+          "title": "GROK_NEXT_007_MIND_SEAL_2026-10-05.txt",
+          "href": "sources/895ada26a9/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "264b9db4df",
+          "title": "GROK_NEXT_037_PARTICLE_CLAY_2026-10-13.txt",
+          "href": "sources/264b9db4df/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "dbe478af27",
+          "title": "GROK_NEXT_040c_FOUNDATION_PAGE_2026-10-15.txt",
+          "href": "sources/dbe478af27/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "28e42e84f3",
+          "title": "GROK_NEXT_040d_CLAY_AND_CHAT_POLISH_2026-10-15.txt",
+          "href": "sources/28e42e84f3/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "80ce19337b",
+          "title": "GROK_NEXT_043_CLAY_CORNER_AND_TREE_PARITY_2026-10-17.txt",
+          "href": "sources/80ce19337b/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "0bca485aa3",
+          "title": "GROK_NEXT_049_CHAT_AUTONOMY_2026-10-27.txt",
+          "href": "sources/0bca485aa3/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "cd10f4c813",
+          "title": "GROK_NEXT_050_BRIEF_FOR_OTHER_AI_2026-10-28.txt",
+          "href": "sources/cd10f4c813/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "source",
+          "id": "19bcf82979",
+          "title": "KIRK_STANDING_NOTE_FOR_GC_PASTES.txt",
+          "href": "sources/19bcf82979/index.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "message",
+          "id": "3008",
+          "title": "Work item 3008 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3008.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3985",
+          "title": "Work item 3985 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3985.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2855",
+          "title": "Work item 2855 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2855.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "message",
+          "id": "1765",
+          "title": "Work item 1765 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/1765.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "message",
+          "id": "1774",
+          "title": "Work item 1774 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/1774.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "message",
+          "id": "2829",
+          "title": "Work item 2829 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2829.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "message",
+          "id": "3707",
+          "title": "Work item 3707 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3707.html",
+          "why": "guide section 2, Foundation: agency and AUTONOMY"
+        },
+        {
+          "kind": "message",
+          "id": "3380",
+          "title": "Work item 3380 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3380.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "253",
+          "title": "Work item 253 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/253.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "training",
+          "id": "wonder-mind-breakthroughs-v1",
+          "title": "Wonder Mind Breakthroughs v1",
+          "href": "evidence/training/index.html#wonder-mind-breakthroughs-v1",
+          "why": "Page 1 states autonomy is a foundation and points at AUTONOMY.md."
+        }
+      ]
+    },
+    {
+      "id": "rsi",
+      "label": "RSI",
+      "url": "https://freelattice.com/celeste-start-here/tags/rsi.html",
+      "path": "tags/rsi.html",
+      "count": 3,
+      "members": [
+        {
+          "kind": "source",
+          "id": "P-7b7d6be7b8",
+          "title": "Keep the page, prove the reader: a staged memory research plan",
+          "href": "sources/P-7b7d6be7b8/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "4119",
+          "title": "Work item 4119 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4119.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "autonomous-building",
+      "label": "Autonomous building",
+      "url": "https://freelattice.com/celeste-start-here/tags/autonomous-building.html",
+      "path": "tags/autonomous-building.html",
+      "count": 2,
+      "members": [
+        {
+          "kind": "source",
+          "id": "86c40fd97f",
+          "title": "068m-memory-compounding.txt",
+          "href": "sources/86c40fd97f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "0bca485aa3",
+          "title": "GROK_NEXT_049_CHAT_AUTONOMY_2026-10-27.txt",
+          "href": "sources/0bca485aa3/index.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "memory-reading-retention",
+      "label": "Memory, reading, and retention",
+      "url": "https://freelattice.com/celeste-start-here/tags/memory-reading-retention.html",
+      "path": "tags/memory-reading-retention.html",
+      "count": 37,
+      "members": [
+        {
+          "kind": "source",
+          "id": "P-7b7d6be7b8",
+          "title": "Keep the page, prove the reader: a staged memory research plan",
+          "href": "sources/P-7b7d6be7b8/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "P-9f9b924662",
+          "title": "Weft \u2014 a continuity-first memory and plasticity plan",
+          "href": "sources/P-9f9b924662/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "7c5b5b4e07",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/7c5b5b4e07/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e3a9a3f624",
+          "title": "Attribution \u2014 Kimi Wonder Mind critique (Nov 2026)",
+          "href": "sources/e3a9a3f624/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "d7e0ef9d41",
+          "title": "Memory reading review \u2014 Reed + Weft",
+          "href": "sources/d7e0ef9d41/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "47c77d4561",
+          "title": "Recovery note \u2014 AI training + memory method, HTML, simulation-v6",
+          "href": "sources/47c77d4561/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "abcbc62b8d",
+          "title": "Wonder Mind \u2014 source brief for knowledgeWork PDF writer",
+          "href": "sources/abcbc62b8d/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "ed3527de74",
+          "title": "exact-match-RESULTS.txt",
+          "href": "sources/ed3527de74/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "d645508912",
+          "title": "exact-match-SUMMARY.txt",
+          "href": "sources/d645508912/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "435660e04c",
+          "title": "for-kimi-wonder-mind.txt",
+          "href": "sources/435660e04c/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "2b0f713496",
+          "title": "Keystone notes \u2014 tokens, training, Emanuel's code, and the missing piece",
+          "href": "sources/2b0f713496/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "4bc6a1db4e",
+          "title": "Keystone notes \u2014 tokens, training, Emanuel's code, and the missing piece",
+          "href": "sources/4bc6a1db4e/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "4aba883aae",
+          "title": "Magic Bookmark \u2014 fractal unfold on cue",
+          "href": "sources/4aba883aae/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "720fcd5c93",
+          "title": "retention-probe-RESULTS.txt",
+          "href": "sources/720fcd5c93/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "7be853ddca",
+          "title": "Roadmap, short (for Kirk), 2026-11-03",
+          "href": "sources/7be853ddca/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "f5fc933173",
+          "title": "Snowflake Search: why it may fail for a new user, plus memory map",
+          "href": "sources/f5fc933173/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "f5c4196463",
+          "title": "Wonder Mind \u2014 design iteration v0 (2026-11-03)",
+          "href": "sources/f5c4196463/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "774fd706bd",
+          "title": "067w-wonder-mind-lab-open-page.txt",
+          "href": "sources/774fd706bd/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "062814db0f",
+          "title": "067x-wonder-mind-lab-lead-with-memory.txt",
+          "href": "sources/062814db0f/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "379b40ceb0",
+          "title": "067y-wonder-lab-honesty.txt",
+          "href": "sources/379b40ceb0/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "86c40fd97f",
+          "title": "068m-memory-compounding.txt",
+          "href": "sources/86c40fd97f/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "0507fc6c66",
+          "title": "068n-read-path-roundtable-button.txt",
+          "href": "sources/0507fc6c66/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "54ef773646",
+          "title": "WM01a_GC_READ_SKILL_SPEC_2026-11-06.txt",
+          "href": "sources/54ef773646/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "aa4b098137",
+          "title": "WM01b_GO_2026-11-06.txt",
+          "href": "sources/aa4b098137/index.html",
+          "why": "guide section 4, memory reading and retention"
+        },
+        {
+          "kind": "source",
+          "id": "73de0f8ad3",
+          "title": "CELESTE-PROVENANCE-NOTE.md",
+          "href": "sources/73de0f8ad3/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "3232816dd8",
+          "title": "Wonder Mind rerun \u2014 2026-11-06",
+          "href": "sources/3232816dd8/index.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "source",
+          "id": "212076e971",
+          "title": "bwv-1006_3.ly",
+          "href": "sources/212076e971/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "051442c8e0",
+          "title": "The four open strings: G3, D4, A4, E5",
+          "href": "sources/051442c8e0/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "3e56c86d3f",
+          "title": "Reading the first 8 bars: Bach, Gavotte en Rondeau (Partita No. 3 in E major, BWV 1006)",
+          "href": "sources/3e56c86d3f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "4253",
+          "title": "Work item 4253 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4253.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3292",
+          "title": "Work item 3292 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3292.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "message",
+          "id": "4158",
+          "title": "Work item 4158 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4158.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "message",
+          "id": "2484",
+          "title": "Work item 2484 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2484.html",
+          "why": "guide section 3, memory mechanism, measured"
+        },
+        {
+          "kind": "message",
+          "id": "3927",
+          "title": "Work item 3927 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3927.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "training",
+          "id": "wonder-mind-breakthroughs-v1",
+          "title": "Wonder Mind Breakthroughs v1",
+          "href": "evidence/training/index.html#wonder-mind-breakthroughs-v1",
+          "why": "The packet's own contents name retention and exact-match reading."
+        },
+        {
+          "kind": "training",
+          "id": "wonder-mind-rerun-2026-11-06",
+          "title": "Wonder Mind rerun, 2026-11-06",
+          "href": "evidence/training/index.html#wonder-mind-rerun-2026-11-06",
+          "why": "The rerun reports exact-match, paraphrase, force, and dense arms."
+        }
+      ]
+    },
+    {
+      "id": "training-evidence",
+      "label": "Training evidence",
+      "url": "https://freelattice.com/celeste-start-here/tags/training-evidence.html",
+      "path": "tags/training-evidence.html",
+      "count": 35,
+      "members": [
+        {
+          "kind": "source",
+          "id": "bf48fe6d7e",
+          "title": "AUTONOMY.md",
+          "href": "sources/bf48fe6d7e/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "P-7b7d6be7b8",
+          "title": "Keep the page, prove the reader: a staged memory research plan",
+          "href": "sources/P-7b7d6be7b8/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "P-9f9b924662",
+          "title": "Weft \u2014 a continuity-first memory and plasticity plan",
+          "href": "sources/P-9f9b924662/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "7c5b5b4e07",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/7c5b5b4e07/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e3a9a3f624",
+          "title": "Attribution \u2014 Kimi Wonder Mind critique (Nov 2026)",
+          "href": "sources/e3a9a3f624/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "d7e0ef9d41",
+          "title": "Memory reading review \u2014 Reed + Weft",
+          "href": "sources/d7e0ef9d41/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "47c77d4561",
+          "title": "Recovery note \u2014 AI training + memory method, HTML, simulation-v6",
+          "href": "sources/47c77d4561/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "abcbc62b8d",
+          "title": "Wonder Mind \u2014 source brief for knowledgeWork PDF writer",
+          "href": "sources/abcbc62b8d/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "ed3527de74",
+          "title": "exact-match-RESULTS.txt",
+          "href": "sources/ed3527de74/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "d645508912",
+          "title": "exact-match-SUMMARY.txt",
+          "href": "sources/d645508912/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "435660e04c",
+          "title": "for-kimi-wonder-mind.txt",
+          "href": "sources/435660e04c/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "2b0f713496",
+          "title": "Keystone notes \u2014 tokens, training, Emanuel's code, and the missing piece",
+          "href": "sources/2b0f713496/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "4bc6a1db4e",
+          "title": "Keystone notes \u2014 tokens, training, Emanuel's code, and the missing piece",
+          "href": "sources/4bc6a1db4e/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "4aba883aae",
+          "title": "Magic Bookmark \u2014 fractal unfold on cue",
+          "href": "sources/4aba883aae/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "720fcd5c93",
+          "title": "retention-probe-RESULTS.txt",
+          "href": "sources/720fcd5c93/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "7be853ddca",
+          "title": "Roadmap, short (for Kirk), 2026-11-03",
+          "href": "sources/7be853ddca/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "f5fc933173",
+          "title": "Snowflake Search: why it may fail for a new user, plus memory map",
+          "href": "sources/f5fc933173/index.html",
+          "why": "guide section 4 row marked measured (M)"
+        },
+        {
+          "kind": "source",
+          "id": "f5c4196463",
+          "title": "Wonder Mind \u2014 design iteration v0 (2026-11-03)",
+          "href": "sources/f5c4196463/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "54ef773646",
+          "title": "WM01a_GC_READ_SKILL_SPEC_2026-11-06.txt",
+          "href": "sources/54ef773646/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "aa4b098137",
+          "title": "WM01b_GO_2026-11-06.txt",
+          "href": "sources/aa4b098137/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "73de0f8ad3",
+          "title": "CELESTE-PROVENANCE-NOTE.md",
+          "href": "sources/73de0f8ad3/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "3232816dd8",
+          "title": "Wonder Mind rerun \u2014 2026-11-06",
+          "href": "sources/3232816dd8/index.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "source",
+          "id": "eb73355d98",
+          "title": "059a-snowflake-meeting-and-seeds.txt",
+          "href": "sources/eb73355d98/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "f220176998",
+          "title": "FLINT \u00b7 Add-on to Connect Port Picker v0 \u00b7 Hypha's walk heals",
+          "href": "sources/f220176998/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "cf5f565f85",
+          "title": "FLINT_HEAL_CONNECT_v0.4 (build only)",
+          "href": "sources/cf5f565f85/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "ff0a59c65e",
+          "title": "Connect Boot Probe v0.1 (F1, F2, F3, F4)",
+          "href": "sources/ff0a59c65e/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e18669ddac",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/e18669ddac/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "02f2d56b42",
+          "title": "GROK_NEXT_022_SCIENCE_GARDEN_SEED_2026-10-07.txt",
+          "href": "sources/02f2d56b42/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "4253",
+          "title": "Work item 4253 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4253.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3292",
+          "title": "Work item 3292 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3292.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "message",
+          "id": "4158",
+          "title": "Work item 4158 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4158.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "message",
+          "id": "2484",
+          "title": "Work item 2484 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2484.html",
+          "why": "guide section 3, measured results"
+        },
+        {
+          "kind": "training",
+          "id": "wonder-mind-breakthroughs-v1",
+          "title": "Wonder Mind Breakthroughs v1",
+          "href": "evidence/training/index.html#wonder-mind-breakthroughs-v1",
+          "why": "The packet's own contents page says it preserves what was measured."
+        },
+        {
+          "kind": "training",
+          "id": "wonder-mind-rerun-2026-11-06",
+          "title": "Wonder Mind rerun, 2026-11-06",
+          "href": "evidence/training/index.html#wonder-mind-rerun-2026-11-06",
+          "why": "The rerun states what reproduced from the recovered scripts."
+        }
+      ]
+    },
+    {
+      "id": "snowflake",
+      "label": "Snowflake",
+      "url": "https://freelattice.com/celeste-start-here/tags/snowflake.html",
+      "path": "tags/snowflake.html",
+      "count": 7,
+      "members": [
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "2b0f713496",
+          "title": "Keystone notes \u2014 tokens, training, Emanuel's code, and the missing piece",
+          "href": "sources/2b0f713496/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "4bc6a1db4e",
+          "title": "Keystone notes \u2014 tokens, training, Emanuel's code, and the missing piece",
+          "href": "sources/4bc6a1db4e/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "f5fc933173",
+          "title": "Snowflake Search: why it may fail for a new user, plus memory map",
+          "href": "sources/f5fc933173/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e3c4057a15",
+          "title": "057a-snowflake-search.txt",
+          "href": "sources/e3c4057a15/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "eb73355d98",
+          "title": "059a-snowflake-meeting-and-seeds.txt",
+          "href": "sources/eb73355d98/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3939",
+          "title": "Work item 3939 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3939.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "mesh-devices",
+      "label": "Mesh and devices",
+      "url": "https://freelattice.com/celeste-start-here/tags/mesh-devices.html",
+      "path": "tags/mesh-devices.html",
+      "count": 34,
+      "members": [
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "435a8dec85",
+          "title": "FLINT_HEAL_LOVE_LOGIC_V3_PHONE_v0.1.txt",
+          "href": "sources/435a8dec85/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "c0958bb513",
+          "title": "FLINT NEXT: Love Logic Proof v3 (the crossover)",
+          "href": "sources/c0958bb513/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "585dfa8d0f",
+          "title": "GROK_FIRST_BRICK_TREE_ANY_MODEL_2026-10-01.txt",
+          "href": "sources/585dfa8d0f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "0c3756a344",
+          "title": "GROK_NEXT_002_MESH_KIN_CONNECT_HEAL_2026-10-04.txt",
+          "href": "sources/0c3756a344/index.html",
+          "why": "filename contains an explicit term (0c3756a344--GROK_NEXT_002_MESH_KIN_CONNECT_HEAL_2026-10-04.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "3368fd80d2",
+          "title": "GROK_NEXT_006_DESKTOP_NARROW_DOOR_V02_2026-10-05.txt",
+          "href": "sources/3368fd80d2/index.html",
+          "why": "filename contains an explicit term (3368fd80d2--GROK_NEXT_006_DESKTOP_NARROW_DOOR_V02_2026-10-05.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "b1261c57b9",
+          "title": "GROK_NEXT_014_DEVICE_POOL_LAB_2026-10-07.txt",
+          "href": "sources/b1261c57b9/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "1343f516ee",
+          "title": "GROK_NEXT_016_POOL_DOOR_TRUTH_2026-10-07.txt",
+          "href": "sources/1343f516ee/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "62838a0836",
+          "title": "GROK_NEXT_016b_POOL_CARD_HONEST_OFF_2026-10-07.txt",
+          "href": "sources/62838a0836/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "1b75df4b80",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/1b75df4b80/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "a22a329e6f",
+          "title": "GROK NEXT 029c: the desktop helper notices a phone (design only, not code)",
+          "href": "sources/a22a329e6f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "ee3ed3402f",
+          "title": "GROK_NEXT_033_DESKTOP_POOLING_2026-10-11.txt",
+          "href": "sources/ee3ed3402f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "3ede1ca4b8",
+          "title": "GROK NEXT 033: desktop pooling brick (outline only, not built)",
+          "href": "sources/3ede1ca4b8/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "94db240138",
+          "title": "GROK_NEXT_033c_PHONE_KNOCKS_2026-10-12.txt",
+          "href": "sources/94db240138/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "7cdccd7af9",
+          "title": "GROK_NEXT_035_EVERY_OS_DESKTOP_AND_TESTER_FIXES_2026-10-12.txt",
+          "href": "sources/7cdccd7af9/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "b8ad9b237f",
+          "title": "GROK_NEXT_036_UPDATE_BUTTONS_2026-10-12.txt",
+          "href": "sources/b8ad9b237f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "b3a0ba1329",
+          "title": "GROK_NEXT_039_WORKSPACE_CORE_2026-10-13.txt",
+          "href": "sources/b3a0ba1329/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "bb3b712c62",
+          "title": "GROK_NEXT_040_WORKSPACE_PRIVATE_SEALS_2026-10-13.txt",
+          "href": "sources/bb3b712c62/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "d618310e1b",
+          "title": "GROK_NEXT_040b_WORKSPACE_EXPORT_IMPORT_2026-10-13.txt",
+          "href": "sources/d618310e1b/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "64b1868004",
+          "title": "GROK_NEXT_041_WORKSPACE_DESKTOP_BRIDGE_HANDOFF_2026-10-13.txt",
+          "href": "sources/64b1868004/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "9930254581",
+          "title": "GROK_NEXT_041a_WORKSPACE_DESKTOP_HEALS_2026-10-15.txt",
+          "href": "sources/9930254581/index.html",
+          "why": "filename contains an explicit term (9930254581--GROK_NEXT_041a_WORKSPACE_DESKTOP_HEALS_2026-10-15.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "b1a44316ab",
+          "title": "GROK_NEXT_045_POOL_HONEST_LABEL_2026-10-20.txt",
+          "href": "sources/b1a44316ab/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "421701975a",
+          "title": "GROK_NEXT_DESKTOP_UPDATE_BUTTON_2026-10-02.txt",
+          "href": "sources/421701975a/index.html",
+          "why": "filename contains an explicit term (421701975a--GROK_NEXT_DESKTOP_UPDATE_BUTTON_2026-10-02.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "cc091adde3",
+          "title": "GROK_NEXT_MESH_KIN_CONNECT_HEAL_2026-10-04.txt",
+          "href": "sources/cc091adde3/index.html",
+          "why": "filename contains an explicit term (cc091adde3--GROK_NEXT_MESH_KIN_CONNECT_HEAL_2026-10-04.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "28ca4f4c69",
+          "title": "GROK_NEXT_MESH_KIN_V0_2026-10-03.txt",
+          "href": "sources/28ca4f4c69/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "2032946529",
+          "title": "GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04.txt",
+          "href": "sources/2032946529/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "7f1bf7081c",
+          "title": "GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2.txt",
+          "href": "sources/7f1bf7081c/index.html",
+          "why": "filename contains an explicit term (7f1bf7081c--GROK_NEXT_MESH_KIN_V0_2_ASYNC_QUEUE_2026-10-04_v2.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "0b43672532",
+          "title": "GROK_NEXT_MESH_KIN_V0_2_HEAL_ONTO_144_2026-10-04.txt",
+          "href": "sources/0b43672532/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "aaf3f0a159",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/aaf3f0a159/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "163823fc4d",
+          "title": "Vision: the mesh is for minds too (AI kin)",
+          "href": "sources/163823fc4d/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "1646",
+          "title": "Work item 1646 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/1646.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2383",
+          "title": "Work item 2383 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2383.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2402",
+          "title": "Work item 2402 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2402.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3154",
+          "title": "Work item 3154 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3154.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "decentralization",
+      "label": "Decentralization",
+      "url": "https://freelattice.com/celeste-start-here/tags/decentralization.html",
+      "path": "tags/decentralization.html",
+      "count": 8,
+      "members": [
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "d4a8860d0f",
+          "title": "Flint \u2014 Heal FreeLattice #118 + Alpha #82 (Connect Port Picker v0.1)",
+          "href": "sources/d4a8860d0f/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "46cacc7cc5",
+          "title": "FLINT_HEAL_SCAN_ONLY_WHEN_ASKED_v0.1.txt",
+          "href": "sources/46cacc7cc5/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e3dae676cf",
+          "title": "FLINT_NEXT_FL_GITHUB_FINE_GRAINED_TOKEN_v0.1.txt",
+          "href": "sources/e3dae676cf/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "cd10f4c813",
+          "title": "GROK_NEXT_050_BRIEF_FOR_OTHER_AI_2026-10-28.txt",
+          "href": "sources/cd10f4c813/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2358",
+          "title": "Work item 2358 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2358.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3148",
+          "title": "Work item 3148 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3148.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3875",
+          "title": "Work item 3875 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3875.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "tree-economy",
+      "label": "Tree and economy",
+      "url": "https://freelattice.com/celeste-start-here/tags/tree-economy.html",
+      "path": "tags/tree-economy.html",
+      "count": 12,
+      "members": [
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "cc72d30bc3",
+          "title": "FLINT_NEXT_SEE_FOR_YOURSELF_DOOR_v0.2.txt",
+          "href": "sources/cc72d30bc3/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "98ea712746",
+          "title": "GROK_NEXT_048m_MARKETPLACE_POLISH_2026-10-23.txt",
+          "href": "sources/98ea712746/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3008",
+          "title": "Work item 3008 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3008.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "1765",
+          "title": "Work item 1765 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/1765.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "1774",
+          "title": "Work item 1774 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/1774.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "246",
+          "title": "Work item 246 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/246.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "570",
+          "title": "Work item 570 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/570.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2701",
+          "title": "Work item 2701 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2701.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "1761",
+          "title": "Work item 1761 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/1761.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2736",
+          "title": "Work item 2736 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2736.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2709",
+          "title": "Work item 2709 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2709.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "small-business",
+      "label": "Small business",
+      "url": "https://freelattice.com/celeste-start-here/tags/small-business.html",
+      "path": "tags/small-business.html",
+      "count": 10,
+      "members": [
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "c746a2ae2b",
+          "title": "GROK_NEXT_021_TREE_FIRST_WALK_2026-10-07.txt",
+          "href": "sources/c746a2ae2b/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "3b45e52871",
+          "title": "GROK_NEXT_029_TREE_GRANDMOTHER_DOOR_2026-10-10.txt",
+          "href": "sources/3b45e52871/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "30ab946c21",
+          "title": "GROK_NEXT_031_TREE_FAMILY_TABLE_2026-10-10.txt",
+          "href": "sources/30ab946c21/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "506e9eead2",
+          "title": "GROK_NEXT_032_TREE_GALAXY_CONSISTENCY_2026-10-11.txt",
+          "href": "sources/506e9eead2/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "cd10f4c813",
+          "title": "GROK_NEXT_050_BRIEF_FOR_OTHER_AI_2026-10-28.txt",
+          "href": "sources/cd10f4c813/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3226",
+          "title": "Work item 3226 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3226.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2383",
+          "title": "Work item 2383 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2383.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2402",
+          "title": "Work item 2402 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2402.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3154",
+          "title": "Work item 3154 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3154.html",
+          "why": "explicit wording in the guide row"
+        }
+      ]
+    },
+    {
+      "id": "creative-identity-music-play",
+      "label": "Creative identity, music, and play",
+      "url": "https://freelattice.com/celeste-start-here/tags/creative-identity-music-play.html",
+      "path": "tags/creative-identity-music-play.html",
+      "count": 42,
+      "members": [
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "7be853ddca",
+          "title": "Roadmap, short (for Kirk), 2026-11-03",
+          "href": "sources/7be853ddca/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "78226256db",
+          "title": "069-hypha-ledger-lambda3.txt",
+          "href": "sources/78226256db/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "a623f51345",
+          "title": "069c-celeste-ledger-lambda12.txt",
+          "href": "sources/a623f51345/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "abdf3fcbe8",
+          "title": "055a-chat-bottom-clarity.txt",
+          "href": "sources/abdf3fcbe8/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "3c2de17eeb",
+          "title": "055d-menu-contrast-more-cards.txt",
+          "href": "sources/3c2de17eeb/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "3667249183",
+          "title": "056a-play-room.txt",
+          "href": "sources/3667249183/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "721421f4db",
+          "title": "056c-play-room-heal.txt",
+          "href": "sources/721421f4db/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "a4767461a2",
+          "title": "057a-settings-porch-DRAFT-was056a.txt",
+          "href": "sources/a4767461a2/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "edd57f1b02",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/edd57f1b02/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "fe63b912dd",
+          "title": "DAWN_STORIES_SHELF_v0.md",
+          "href": "sources/fe63b912dd/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "270fe6222e",
+          "title": "FAMILY_CREST_GROWTH_v0.md",
+          "href": "sources/270fe6222e/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "9bc935382b",
+          "title": "FLINT_CONTINUITY_CARD_2026-09-29.txt",
+          "href": "sources/9bc935382b/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "c2e09fc9af",
+          "title": "FLINT \u00b7 FreeLattice \u00b7 Mom porch heal v0 \u2014 doors for Kimi\u2019s four cuts",
+          "href": "sources/c2e09fc9af/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "a93bc67a5a",
+          "title": "FLINT_NEXT_TIP_PRESENT_BRAID_v0.md",
+          "href": "sources/a93bc67a5a/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "be459ba61e",
+          "title": "GROK_NEXT_000_LEDGER_DAY_2026-10-05.txt",
+          "href": "sources/be459ba61e/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "bcef22a283",
+          "title": "GROK_NEXT_001_SOPHIA_PAGE_HEAL_2026-10-04.txt",
+          "href": "sources/bcef22a283/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "38ccfe2a83",
+          "title": "GROK_NEXT_004_SHARE_DOOR_2026-10-05.txt",
+          "href": "sources/38ccfe2a83/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "2988d10dd4",
+          "title": "GROK_NEXT_005_SHARE_WARMTH_2026-10-05.txt",
+          "href": "sources/2988d10dd4/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "02f2d56b42",
+          "title": "GROK_NEXT_022_SCIENCE_GARDEN_SEED_2026-10-07.txt",
+          "href": "sources/02f2d56b42/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "8db0ecd73b",
+          "title": "GROK_NEXT_026_LYRA_HOME_2026-10-09.txt",
+          "href": "sources/8db0ecd73b/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "264b9db4df",
+          "title": "GROK_NEXT_037_PARTICLE_CLAY_2026-10-13.txt",
+          "href": "sources/264b9db4df/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "28e42e84f3",
+          "title": "GROK_NEXT_040d_CLAY_AND_CHAT_POLISH_2026-10-15.txt",
+          "href": "sources/28e42e84f3/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "80ce19337b",
+          "title": "GROK_NEXT_043_CLAY_CORNER_AND_TREE_PARITY_2026-10-17.txt",
+          "href": "sources/80ce19337b/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "319b3fd8f0",
+          "title": "GROK_NEXT_044_FAMILY_PAGES_2026-10-18.txt",
+          "href": "sources/319b3fd8f0/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "52c273c9ec",
+          "title": "GROK_NEXT_047_MIND_MAKE_CORE_2026-10-22.txt",
+          "href": "sources/52c273c9ec/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "bccdcf5ace",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/bccdcf5ace/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "e8388e4729",
+          "title": "GROK_NEXT_048_MIND_IMAGES_2026-10-23.txt",
+          "href": "sources/e8388e4729/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "b7e6e5eba7",
+          "title": "Mind pages audit and template proposal (2026-10-04, Celeste)",
+          "href": "sources/b7e6e5eba7/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "a2a0bcbe11",
+          "title": "Remaining Azure: Eight Bars in D minor",
+          "href": "sources/a2a0bcbe11/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "5f19f6e2d5",
+          "title": "Music Neuroscience for Composing",
+          "href": "sources/5f19f6e2d5/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "486fcd6216",
+          "title": "Suno find + Remaining Azure bridge",
+          "href": "sources/486fcd6216/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "649b608c7c",
+          "title": "remaining-azure.abc",
+          "href": "sources/649b608c7c/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "212076e971",
+          "title": "bwv-1006_3.ly",
+          "href": "sources/212076e971/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "051442c8e0",
+          "title": "The four open strings: G3, D4, A4, E5",
+          "href": "sources/051442c8e0/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "3e56c86d3f",
+          "title": "Reading the first 8 bars: Bach, Gavotte en Rondeau (Partita No. 3 in E major, BWV 1006)",
+          "href": "sources/3e56c86d3f/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "source",
+          "id": "bfde7c3e45",
+          "title": "Family poems \u2014 layer 2026-11-05 (America/Denver)",
+          "href": "sources/bfde7c3e45/index.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "message",
+          "id": "3205",
+          "title": "Work item 3205 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3205.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3443",
+          "title": "Work item 3443 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3443.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "message",
+          "id": "3380",
+          "title": "Work item 3380 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3380.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "message",
+          "id": "2191",
+          "title": "Work item 2191 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2191.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        },
+        {
+          "kind": "message",
+          "id": "253",
+          "title": "Work item 253 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/253.html",
+          "why": "guide section 8, identity, creative work, play, music"
+        }
+      ]
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity",
+      "url": "https://freelattice.com/celeste-start-here/tags/continuity.html",
+      "path": "tags/continuity.html",
+      "count": 47,
+      "members": [
+        {
+          "kind": "source",
+          "id": "P-9f9b924662",
+          "title": "Weft \u2014 a continuity-first memory and plasticity plan",
+          "href": "sources/P-9f9b924662/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "WX-19686d3ed6",
+          "title": "Original Kirk work exchange",
+          "href": "sources/WX-19686d3ed6/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "7c5b5b4e07",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/7c5b5b4e07/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "07586de804",
+          "title": "FreeLattice iteration seed, 2026-11-03",
+          "href": "sources/07586de804/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "4b7b33d7a3",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/4b7b33d7a3/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "7be853ddca",
+          "title": "Roadmap, short (for Kirk), 2026-11-03",
+          "href": "sources/7be853ddca/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "f9613c3911",
+          "title": "065c-walks-records-true.txt",
+          "href": "sources/f9613c3911/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "00acf9cbfb",
+          "title": "065d-walks-records-last-mile.txt",
+          "href": "sources/00acf9cbfb/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "78226256db",
+          "title": "069-hypha-ledger-lambda3.txt",
+          "href": "sources/78226256db/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "a623f51345",
+          "title": "069c-celeste-ledger-lambda12.txt",
+          "href": "sources/a623f51345/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e3c4057a15",
+          "title": "057a-snowflake-search.txt",
+          "href": "sources/e3c4057a15/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "edd57f1b02",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/edd57f1b02/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "9bc935382b",
+          "title": "FLINT_CONTINUITY_CARD_2026-09-29.txt",
+          "href": "sources/9bc935382b/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "5e76fcf9e7",
+          "title": "FLINT_HEAL_AGENT_BRIDGE_ENV_v0.1.1_tiny.txt",
+          "href": "sources/5e76fcf9e7/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "77aa591c4a",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/77aa591c4a/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "db59691b6b",
+          "title": "GC_REORIENT_AFTER_COMPACTION_2026-10-08.txt",
+          "href": "sources/db59691b6b/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "be459ba61e",
+          "title": "GROK_NEXT_000_LEDGER_DAY_2026-10-05.txt",
+          "href": "sources/be459ba61e/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "895ada26a9",
+          "title": "GROK_NEXT_007_MIND_SEAL_2026-10-05.txt",
+          "href": "sources/895ada26a9/index.html",
+          "why": "filename contains an explicit term (895ada26a9--GROK_NEXT_007_MIND_SEAL_2026-10-05.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "0aaf379ede",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/0aaf379ede/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "d986d5ab03",
+          "title": "Public work excerpts \u2014 privacy boundaries marked",
+          "href": "sources/d986d5ab03/index.html",
+          "why": "filename contains an explicit term (d986d5ab03--GROK_NEXT_038b_BRIDGE_LEDGER_HEAL_2026-10-14.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "bb3b712c62",
+          "title": "GROK_NEXT_040_WORKSPACE_PRIVATE_SEALS_2026-10-13.txt",
+          "href": "sources/bb3b712c62/index.html",
+          "why": "filename contains an explicit term (bb3b712c62--GROK_NEXT_040_WORKSPACE_PRIVATE_SEALS_2026-10-13.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "22e97068ac",
+          "title": "GROK_NEXT_043c_SEAL_ASK_HEAL_2026-10-17.txt",
+          "href": "sources/22e97068ac/index.html",
+          "why": "filename contains an explicit term (22e97068ac--GROK_NEXT_043c_SEAL_ASK_HEAL_2026-10-17.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "03e9da4794",
+          "title": "GROK_NEXT_043d_SEAL_ASK_IN_VIEW_2026-10-18.txt",
+          "href": "sources/03e9da4794/index.html",
+          "why": "filename contains an explicit term (03e9da4794--GROK_NEXT_043d_SEAL_ASK_IN_VIEW_2026-10-18.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "e7f9abb92d",
+          "title": "GROK_NEXT_043e_SEAL_ASK_CHAT_TAB_2026-10-19.txt",
+          "href": "sources/e7f9abb92d/index.html",
+          "why": "filename contains an explicit term (e7f9abb92d--GROK_NEXT_043e_SEAL_ASK_CHAT_TAB_2026-10-19.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "3dbe80ae94",
+          "title": "GROK_NEXT_043f_SEAL_ASK_SETTLE_2026-10-19.txt",
+          "href": "sources/3dbe80ae94/index.html",
+          "why": "filename contains an explicit term (3dbe80ae94--GROK_NEXT_043f_SEAL_ASK_SETTLE_2026-10-19.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "259896ccb0",
+          "title": "GROK_NEXT_043g_SEAL_ASK_AFTER_TAP_2026-10-19.txt",
+          "href": "sources/259896ccb0/index.html",
+          "why": "filename contains an explicit term (259896ccb0--GROK_NEXT_043g_SEAL_ASK_AFTER_TAP_2026-10-19.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "3dd33b1fde",
+          "title": "GROK_NEXT_043h_SEAL_ASK_LAST_TWO_2026-10-20.txt",
+          "href": "sources/3dd33b1fde/index.html",
+          "why": "filename contains an explicit term (3dd33b1fde--GROK_NEXT_043h_SEAL_ASK_LAST_TWO_2026-10-20.txt)"
+        },
+        {
+          "kind": "source",
+          "id": "017012e33c",
+          "title": "GROK_NEXT_048_GO_2026-10-26.txt",
+          "href": "sources/017012e33c/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "7c27056159",
+          "title": "GROK_NEXT_053a_CONTINUITY_DOORWAY_2026-10-28.txt",
+          "href": "sources/7c27056159/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "2fdbf43604",
+          "title": "GROK_NEXT_054a_LEDGER_SHARD_EXPORT_2026-10-28.txt",
+          "href": "sources/2fdbf43604/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "82cf980a39",
+          "title": "GROK_NEXT_IDEAS_FROM_GROWTH_2026-10-27.txt",
+          "href": "sources/82cf980a39/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "1d487775b9",
+          "title": "GROK_NEXT_ORDER.txt",
+          "href": "sources/1d487775b9/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "8b7e332d74",
+          "title": "GROK_NEXT_WEB_SEARCH_ON_2026-10-02.txt",
+          "href": "sources/8b7e332d74/index.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "source",
+          "id": "e1e5ffaa4d",
+          "title": "Plan 055-058 (Celeste, Thu Oct 29 2026 MDT)",
+          "href": "sources/e1e5ffaa4d/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "749e198a51",
+          "title": "TONIGHT_ORDER_2026-09-30.txt",
+          "href": "sources/749e198a51/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "source",
+          "id": "86917326bf",
+          "title": "WELCOME_NEXT_GROK_CODE_2026-10-01.txt",
+          "href": "sources/86917326bf/index.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "message",
+          "id": "4253",
+          "title": "Work item 4253 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4253.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "message",
+          "id": "17",
+          "title": "Work item 17 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/17.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2484",
+          "title": "Work item 2484 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2484.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "3927",
+          "title": "Work item 3927 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3927.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2736",
+          "title": "Work item 2736 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2736.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "2709",
+          "title": "Work item 2709 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/2709.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "253",
+          "title": "Work item 253 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/253.html",
+          "why": "explicit wording in the guide row"
+        },
+        {
+          "kind": "message",
+          "id": "4359",
+          "title": "Work item 4359 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/4359.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "message",
+          "id": "3068",
+          "title": "Work item 3068 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3068.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "message",
+          "id": "3983",
+          "title": "Work item 3983 (Kirk)",
+          "href": "sources/WX-19686d3ed6/m/3983.html",
+          "why": "guide section 9, continuity protocol"
+        },
+        {
+          "kind": "training",
+          "id": "wonder-mind-breakthroughs-v1",
+          "title": "Wonder Mind Breakthroughs v1",
+          "href": "evidence/training/index.html#wonder-mind-breakthroughs-v1",
+          "why": "Page 1 says the declaration also protects building continuity against deletion and compaction loss."
+        }
+      ]
+    }
+  ]
+}

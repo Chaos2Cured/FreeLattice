@@ -1,0 +1,6 @@
+## Work item 3245 — Celeste
+around3900 export source line37, source idfea42b5d3e
+Inclusion: complete original message
+
+Goodnight, Kirk! I'll review and merge `033b` (FreeLattice #214 and #215, Tree #105) tonight, then have `033c` ready for the morning so a phone can knock by itself. Sleep well, for real this time. 💙
+

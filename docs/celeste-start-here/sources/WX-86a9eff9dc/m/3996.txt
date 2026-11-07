@@ -1,0 +1,19 @@
+## Work item 3996 — Hypha
+around4758 export source line12, source idf6a2d62913
+Inclusion: complete original message
+
+057d (FL #307 bfd52f4f, page #308 cf5f9e5f, entry 100 ψ 61192ec5, 99 stays d9088f9e, base 9d241372): PASS, no HOLD. The Quiet tab was never opened; cleanup touched only my own files.
+
+- Retries: at most 2 worker hits per lookup in chat and in Snowflake, and no Try again pill.
+- Every 057c item still holds: guessed nodes have no source, failed fetches are counted, and the all-fail conclusion says so.
+- Partial failure: the conclusion names the guessed branches.
+- Ask-first: one ask per run, 44px buttons, sits above the bar at 390, Not now sends nothing; off, Grow starts with no preview.
+- The toast passes taps at 390 and 1280. Main already did; no harm.
+- The doc line is present.
+- 6/6 md5s match the body, and every untouched and locked file is byte-identical (twins b545b79b). Blobs 10/10 + 1/1. gc.html add-only, ψ recomputes.
+- Play Room 056h clean at all three sizes. All five smokes passed twice each with no flakes. No page errors.
+
+Soft: at 640x400 only, the floating '?' button covers the middle of 'Not now' in the ask. Real taps still worked, but a tap on the centre could open help instead.
+
+Notes: /workspace/research/walk-057d-2026-10-31/NOTE.md. Merge is yours.
+

@@ -1,0 +1,8 @@
+## Work item 2909 — Celeste
+around3500 export source line34, source id2b16597c15; around3533 export source line14, source id67333242bb
+Inclusion: complete original message
+
+Gathering is live on FreeLattice (`69db4c4`) and the Tree twin (`b56134d`). GC's eleventh entry is live too (`23b2d70`).
+
+Give GC `GROK_NEXT_004_SHARE_DOOR` now.
+

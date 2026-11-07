@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public work excerpts — privacy boundaries marked c09</title>
+<meta name="description" content="Reading section c09 of 77aa591c4a, 1329 words.">
+<link rel="canonical" href="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c09.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Public work excerpts — privacy boundaries marked c09">
+<meta property="og:description" content="Reading section c09 of 77aa591c4a, 1329 words.">
+<meta property="og:url" content="https://freelattice.com/celeste-start-here/sources/77aa591c4a/c09.html">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="../../assets/reading.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+<p class="mark"><a href="../../index.html">FreeLattice · Celeste reading home</a></p>
+<nav aria-label="Reading home">
+<a href="../../index.html">Start</a>
+<a href="../../guide/guide-linked-2026-11-07.html">Guide</a>
+<a href="../../source-index.html">Sources</a>
+<a href="../../tags/index.html">Topics</a>
+<a href="../../evidence/training/index.html">Training evidence</a>
+<a href="../../archive/FreeLattice-Celeste-shared-edition-2026-11-07.pdf">Full archive PDF</a>
+</nav>
+</header>
+<main id="content">
+<span id="p1103"></span><span id="p1104"></span><span id="p1105"></span><span id="p1106"></span>
+<p class="notice-line"><a href="../../PUBLIC-USE-NOTICE.md">Public, free to read, reuse, and adapt</a> — Kirk Patrick Miller's notice for this edition. Not a patent grant.</p>
+
+<h1>Public work excerpts — privacy boundaries marked · c09</h1>
+<p>77aa591c4a · words 1329 · characters 84513–96469</p>
+<p><a href="c08.html">Previous section</a> · <a href="c10.html">Next section</a></p>
+<p><a href="c09.txt">Exact section text</a> · <a href="original.md">Full source</a> · <a href="../../source-index.html">Source index</a></p>
+<p class="meta">Archive pages whose extracted text matched this section: 1103, 1104, 1105, 1106. Unmatched pages stay on the source record with the checked page method. They are not guessed into a section.</p>
+<ul><li><a href="../../tags/continuity.html">Continuity</a> — explicit wording in the guide row</li></ul>
+
+<pre class="source">  // Paired minds: who is trusted, with a Revoke button per row. No confirm dialog:
+  // revoking is Kirk&#x27;s own local choice, and pairing again takes seconds.
+  function renderPairedList(container) {
+    if (!container) return;
+    var old = container.querySelector(&#x27;.fl-bridge-minds&#x27;);
+    var box = el(&#x27;details&#x27;, null, &#x27;margin:8px 0;padding:8px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;&#x27;);
+    box.className = &#x27;fl-bridge-minds&#x27;;
+    if (old) { box.open = old.open; container.replaceChild(box, old); } else container.appendChild(box);
+    var summary = el(&#x27;summary&#x27;, &#x27;Paired minds&#x27;, &#x27;cursor:pointer;&#x27;);
+    box.appendChild(summary);
+    var list = el(&#x27;div&#x27;, null, &#x27;margin-top:6px;&#x27;);
+    var msg = el(&#x27;div&#x27;, null, &#x27;margin-top:6px;opacity:0.8;&#x27;);
+    box.appendChild(list);
+    box.appendChild(msg);
+    list.appendChild(el(&#x27;div&#x27;, &#x27;Looking\u2026&#x27;, &#x27;opacity:0.7;&#x27;));
+
+## Exact source excerpt, characters 79125–82733
+
+    listMinds().then(function (r) {
+      while (list.firstChild) list.removeChild(list.firstChild);
+      if (!r.ok) {
+        list.appendChild(el(&#x27;div&#x27;, (r.data &amp;&amp; r.data.error) || (&#x27;HTTP &#x27; + r.status)));
+        return;
+      }
+      var minds = (r.data &amp;&amp; r.data.minds) || [];
+      summary.textContent = &#x27;Paired minds (&#x27; + minds.length + &#x27;)&#x27; + (r.data.persistent === false ? &#x27; \u00B7 ephemeral&#x27; : &#x27;&#x27;);
+      minds.forEach(function (m) {
+        var row = el(&#x27;div&#x27;, null, &#x27;padding:6px 0;border-top:1px solid rgba(255,255,255,0.08);&#x27;);
+        var title = el(&#x27;div&#x27;, null);
+        title.appendChild(el(&#x27;strong&#x27;, m.name || &#x27;A trusted mind&#x27;));
+        if (m.you) title.appendChild(el(&#x27;span&#x27;, &#x27; (this browser)&#x27;, &#x27;opacity:0.7;&#x27;));
+        if (m.kind === &#x27;cli&#x27;) title.appendChild(el(&#x27;span&#x27;, &#x27; (trusted by default)&#x27;, &#x27;opacity:0.7;&#x27;));
+        row.appendChild(title);
+        row.appendChild(el(&#x27;div&#x27;, (m.origin || &#x27;no web origin&#x27;) + &#x27; \u00B7 paired &#x27; + when(m.createdAt) + &#x27; \u00B7 last used &#x27; + when(m.lastUsedAt), &#x27;opacity:0.75;font-size:0.9em;&#x27;));
+        var hasSecrets = (m.scopes || []).indexOf(&#x27;secrets&#x27;) !== -1;
+        row.appendChild(el(&#x27;div&#x27;, &#x27;May: &#x27; + (m.scopes || []).join(&#x27;, &#x27;), &#x27;opacity:0.75;font-size:0.9em;&#x27;));
+        var revokeBtn = el(&#x27;button&#x27;, &#x27;Revoke&#x27;, &#x27;margin:4px 6px 0 0;&#x27;);
+        revokeBtn.type = &#x27;button&#x27;;
+        revokeBtn.addEventListener(&#x27;click&#x27;, function () {
+          revokeBtn.disabled = true;
+          revoke(m.id).then(function (res) {
+            msg.textContent = res.ok ? (&#x27;Revoked &#x27; + (m.name || m.id) + &#x27;.&#x27;) : ((res.data &amp;&amp; res.data.error) || &#x27;Could not revoke.&#x27;);
+            if (res.ok &amp;&amp; res.data &amp;&amp; res.data.you) { renderPairCard(container); box.parentNode &amp;&amp; box.parentNode.removeChild(box); return; }
+            renderPairedList(container);
+          });
+        });
+        var secretsBtn = el(&#x27;button&#x27;, hasSecrets ? &#x27;Stop .env access&#x27; : &#x27;Allow .env files&#x27;, &#x27;margin:4px 6px 0 0;&#x27;);
+        secretsBtn.type = &#x27;button&#x27;;
+        secretsBtn.addEventListener(&#x27;click&#x27;, function () {
+          secretsBtn.disabled = true;
+          setScopes(m.id, hasSecrets ? [] : [&#x27;secrets&#x27;], hasSecrets ? [&#x27;secrets&#x27;] : []).then(function (res) {
+            msg.textContent = res.ok ? ((m.name || m.id) + &#x27; may: &#x27; + ((res.data &amp;&amp; res.data.scopes) || []).join(&#x27;, &#x27;)) : ((res.data &amp;&amp; res.data.error) || &#x27;Could not change that.&#x27;);
+            renderPairedList(container);
+          });
+        });
+        row.appendChild(revokeBtn);
+        row.appendChild(secretsBtn);
+        list.appendChild(row);
+      });
+      var foot = el(&#x27;div&#x27;, null, &#x27;margin-top:8px;&#x27;);
+      var allBtn = el(&#x27;button&#x27;, &#x27;Revoke all paired devices&#x27;, &#x27;margin:0 6px 0 0;&#x27;);
+      allBtn.type = &#x27;button&#x27;;
+      allBtn.addEventListener(&#x27;click&#x27;, function () {
+        allBtn.disabled = true;
+        revokeAll().then(function (res) {
+          msg.textContent = res.ok ? (&#x27;Revoked &#x27; + ((res.data &amp;&amp; res.data.revoked) || 0) + &#x27; device(s). Local tools stay trusted.&#x27;) : ((res.data &amp;&amp; res.data.error) || &#x27;Could not revoke.&#x27;);
+          setToken(&#x27;&#x27;);
+          renderPairCard(container);
+          if (box.parentNode) box.parentNode.removeChild(box);
+        });
+      });
+      var forgetBtn = el(&#x27;button&#x27;, &#x27;Forget on this browser&#x27;, &#x27;margin:0 6px 0 0;&#x27;);
+      forgetBtn.type = &#x27;button&#x27;;
+      forgetBtn.addEventListener(&#x27;click&#x27;, function () {
+        setToken(&#x27;&#x27;);
+        msg.textContent = &#x27;This browser forgot its token. It stays listed until you revoke it.&#x27;;
+        renderPairCard(container);
+      });
+      foot.appendChild(allBtn);
+      foot.appendChild(forgetBtn);
+      list.appendChild(foot);
+    });
+  }
+
+## Exact source excerpt, characters 82735–83270
+
+  window.FLAgentBridge = {
+    BASE: BASE,
+    TOKEN_KEY: TOKEN_KEY,
+    NEEDS_PAIR_EVENT: NEEDS_PAIR_EVENT,
+    CHANGED_EVENT: CHANGED_EVENT,
+    fetch: bridgeFetch,
+    pair: pair,
+    status: status,
+    whoami: whoami,
+    listMinds: listMinds,
+    revoke: revoke,
+    revokeAll: revokeAll,
+    setScopes: setScopes,
+    hasToken: function () { return !!getToken(); },
+    forget: function () { setToken(&#x27;&#x27;); },
+    defaultName: defaultName,
+    renderPairCard: renderPairCard,
+    renderPairedList: renderPairedList
+  };
+})();
+```
+
+## Exact source excerpt, characters 83272–83333
+
+### 6b. `docs/app.html` (then byte-copy to root `index.html`)
+
+## Exact source excerpt, characters 83335–83410
+
+Right above L68597 `&lt;script src=&quot;modules/propose.js&quot; defer&gt;&lt;/script&gt;`, add:
+
+## Exact source excerpt, characters 83412–83604
+
+```html
+&lt;!-- LAYER v-agent-bridge-lock-v0 · v0.1: trusted-mind token for the builder bridge (3141), loads before propose.js --&gt;
+&lt;script src=&quot;modules/agent-bridge-client.js&quot; defer&gt;&lt;/script&gt;
+```
+
+## Exact source excerpt, characters 83606–83783
+
+Then `cp docs/app.html index.html` and check with `cmp index.html docs/app.html`. No other app.html change is needed: the Cascade heartbeat at L39741 hits `/`, which stays open.
+
+## Exact source excerpt, characters 83785–83872
+
+### 6c. `docs/modules/propose.js` (exact diff; CRITICAL LOCK 1A/1B counts stay 3 and 1)
+
+## Exact source excerpt, characters 83874–84073
+
+```diff
+--- a/docs/modules/propose.js
++++ b/docs/modules/propose.js
+@@ -577,13 +577,22 @@
+   // on draft state and one (approve) is also gated on smokeStatus.
+   var BRIDGE = &#x27;http://localhost:3141&#x27;;
+
+## Exact source excerpt, characters 84076–84731
+
++  // LAYER v-agent-bridge-lock-v0: bridge calls carry the paired token
++  // (docs/modules/agent-bridge-client.js). Plain fetch when the client
++  // is absent, so older setups behave exactly as before.
++  function bridgeFetch(url, opts) {
++    return (window.FLAgentBridge &amp;&amp; typeof window.FLAgentBridge.fetch === &#x27;function&#x27;)
++      ? window.FLAgentBridge.fetch(url, opts)
++      : fetch(url, opts);
++  }
++
+   function readFileFromBridge(path) {
+-    return fetch(BRIDGE + &#x27;/code/read?path=&#x27; + encodeURIComponent(path))
++    return bridgeFetch(BRIDGE + &#x27;/code/read?path=&#x27; + encodeURIComponent(path))
+       .then(function (r) { return r.json(); });
+   }
+
+## Exact source excerpt, characters 84734–85040
+
+   function writeFileToBridge(path, content) {
+-    return fetch(BRIDGE + &#x27;/code/write&#x27;, {
++    return bridgeFetch(BRIDGE + &#x27;/code/write&#x27;, {
+       method: &#x27;POST&#x27;,
+       headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+       body: JSON.stringify({ path: path, content: content })
+@@ -591,7 +600,7 @@
+   }
+
+## Exact source excerpt, characters 85043–85339
+
+   function commitViaBridge(message) {
+-    return fetch(BRIDGE + &#x27;/code/git/commit&#x27;, {
++    return bridgeFetch(BRIDGE + &#x27;/code/git/commit&#x27;, {
+       method: &#x27;POST&#x27;,
+       headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+       body: JSON.stringify({ message: message })
+@@ -599,7 +608,7 @@
+   }
+
+## Exact source excerpt, characters 85342–85638
+
+   function runSmokeViaBridge() {
+-    return fetch(BRIDGE + &#x27;/test/run&#x27;, {
++    return bridgeFetch(BRIDGE + &#x27;/test/run&#x27;, {
+       signal: typeof AbortSignal !== &#x27;undefined&#x27; &amp;&amp; AbortSignal.timeout ? AbortSignal.timeout(120000) : undefined
+     }).then(function (r) { return r.json(); });
+   }
+```
+
+## Exact source excerpt, characters 85640–85687
+
+### 6d. `docs/modules/workshop.js` (exact diff)
+
+## Exact source excerpt, characters 85689–86234
+
+- One file-level helper, `flAgentBridgeFetch`, above the first IIFE at L46.
+- All 17 bridge calls route through it.
+- `checkBridge` shows the pair card when the bridge answers `pair: &#x27;code&#x27;`, shows which scope is missing when the bridge answers 403 with `scope`, and shows Paired minds after &quot;Connected&quot;.
+- `WorkshopProjects.commitViaBridge` now checks `resp.ok`, and on 401 asks to pair instead of silently &quot;succeeding&quot; or falling back to a GitHub push.
+- The `http://localhost:3141` and `runCodeTask` literals stay, for the v5.71.8 smoke lock.
+
+## Exact source excerpt, characters 86236–87019
+
+```diff
+--- a/docs/modules/workshop.js
++++ b/docs/modules/workshop.js
+@@ -43,6 +43,15 @@
+ // 2026-09-23 — Flint: Local Help-on-file v0 (v-workshop-local-help-v0).
+ //   After Preview: Help on this file → consent → connected local mind (prefer Bridge :11435).
+ // ═══════════════════════════════════════════════════════════════
++// LAYER v-agent-bridge-lock-v0: every Agent Bridge (port 3141) call in this
++// file goes through here so it carries the paired token. Falls back to plain
++// fetch when docs/modules/agent-bridge-client.js is not loaded.
++function flAgentBridgeFetch(url, opts) {
++  return (window.FLAgentBridge &amp;&amp; typeof window.FLAgentBridge.fetch === &#x27;function&#x27;)
++    ? window.FLAgentBridge.fetch(url, opts)
++    : fetch(url, opts);
++}
++
+ (function() {
+   &#x27;use strict&#x27;;
+
+## Exact source excerpt, characters 87022–88832
+
+@@ -958,11 +967,26 @@
+       var el = document.getElementById(&#x27;code-status&#x27;);
+       if (!el) return;
+       try {
+-        var r = await fetch(&#x27;http://localhost:3141/&#x27;);
++        var r = await flAgentBridgeFetch(&#x27;http://localhost:3141/&#x27;);
+         var d = await r.json();
+-        var git = await fetch(&#x27;http://localhost:3141/code/git/status&#x27;).then(function(r2) { return r2.json(); });
++        var git = await flAgentBridgeFetch(&#x27;http://localhost:3141/code/git/status&#x27;).then(function(r2) { return r2.json(); });
++        if (git &amp;&amp; git.pair === &#x27;code&#x27;) {
++          // LAYER v-agent-bridge-lock-v0: bridge is awake and locked. Pair once.
++          el.textContent = &#x27;\uD83D\uDFE1 Bridge awake \u00B7 pair once to build&#x27;;
++          el.style.color = &#x27;#e8b019&#x27;;
++          if (window.FLAgentBridge &amp;&amp; el.parentNode) window.FLAgentBridge.renderPairCard(el.parentNode);
++          return;
++        }
++        if (git &amp;&amp; git.scope) {
++          // LAYER v-agent-bridge-lock-v0 · v0.1: paired, but this device was not given that scope.
++          el.textContent = &#x27;\uD83D\uDFE1 Bridge paired \u00B7 this device may not &#x27; + git.scope + &#x27; here (see Paired minds)&#x27;;
++          el.style.color = &#x27;#e8b019&#x27;;
++          return;
++        }
+         el.textContent = &#x27;\uD83D\uDFE2 Connected \u00B7 &#x27; + git.branch + &#x27; \u00B7 &#x27; + (git.recentCommits[0] || &#x27;&#x27;);
+         el.style.color = &#x27;#4aff9f&#x27;;
++        // LAYER v-agent-bridge-lock-v0 · v0.1: who is trusted, with a Revoke button per row.
++        if (window.FLAgentBridge &amp;&amp; el.parentNode &amp;&amp; typeof window.FLAgentBridge.renderPairedList === &#x27;function&#x27;) window.FLAgentBridge.renderPairedList(el.parentNode);
+       } catch(e) {
+         // No scary error. Gentle guidance.
+         el.textContent = &#x27;For local builds, run: node tools/agent-bridge.js&#x27;;
+@@ -983,7 +1007,7 @@
+
+## Exact source excerpt, characters 88835–89313
+
+       try {
+         log(&#x27;\uD83D\uDCC1 Reading project structure...&#x27;);
+-        var tree = await fetch(bridge + &#x27;/code/tree?path=docs/modules&#x27;).then(function(r) { return r.json(); });
++        var tree = await flAgentBridgeFetch(bridge + &#x27;/code/tree?path=docs/modules&#x27;).then(function(r) { return r.json(); });
+         var names = tree.filter(function(f) { return f.type === &#x27;file&#x27;; }).map(function(f) { return f.name; });
+         log(&#x27;   &#x27; + names.length + &#x27; modules found&#x27;);
+
+## Exact source excerpt, characters 89316–93324
+
+</pre>
+
+</main>
+<footer>
+<p>Edition 2026-11-07. Requested public reading set, with the two earlier training PDFs integrated. Later notes layer on; they do not overwrite these bytes. <a href="../../PUBLIC-USE-NOTICE.md">Public use notice</a> · <a href="../bf48fe6d7e/original.md">AUTONOMY.md in this edition</a> · <a href="/library/AUTONOMY.md">AUTONOMY.md on the existing library path</a></p>
+</footer>
+</body>
+</html>

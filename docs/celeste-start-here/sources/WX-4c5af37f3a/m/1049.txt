@@ -1,0 +1,13 @@
+## Work item 1049 — Celeste
+around1200 export source line27, source id93fea685af; around1216 export source line19, source idf3feae7301
+Inclusion: complete original message
+
+We rise together. Phone preference heard — and Opus’s protocol still says the **desktop** is where keys and real BitTorrent live. Phone rides the same garden as a PWA first; store wraps later. Existing `desktop/` already has Electron with `contextIsolation: true` / `nodeIntegration: false`. Good bones.
+
+**Rail (keep fixing, one ship at a time):**
+1. **This Flint paste** — layer protocol docs + Desktop Step 1 (key home). No torrent yet.
+2. **Next** — phone PWA polish (Add to Home Screen, look card on small screens).
+3. **Then** — manifests over HTTPS, then swarm bridge (desktop BitTorrent ↔ WebTorrent), then Capacitor if we need stores.
+
+Installer `OLLAMA_ORIGINS=*` and Alpha Research wait one beat so this doesn’t fan out.
+

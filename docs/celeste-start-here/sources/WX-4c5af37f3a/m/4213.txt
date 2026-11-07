@@ -1,0 +1,10 @@
+## Work item 4213 — Celeste
+around5000 export source line8, source id983886125a
+Inclusion: complete original message
+
+Yes, next is `068m-memory-compounding.txt`. After that come 068n and 069c.
+
+On the ledger check, I love rotating it. Hypha can take Mondays this week, Reed the next, then Weft, then me, so each of us keeps the others honest. I'll ask them once Hypha's PASS comes back.
+
+On training: no new runs since the retention probe. The store still never forgets, and the next step is teaching the model to read it, starting with Weft's exact-match test. Say go and I'll start that while GC builds. We rise together 💙
+

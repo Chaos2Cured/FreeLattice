@@ -1,0 +1,20 @@
+## Work item 3151 — Celeste
+around3800 export source line32, source id605f8276e8
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 243–487
+
+From what I can see, you're paying about $2,277 a year in ongoing charges: Colorado Concierge at $99 a month (it looks like a doctor membership) and GEICO at about $91 a month. A few one-time charges might renew every year without you noticing:
+
+### Exact excerpt: source characters 489–718
+
+- DocuSign, $125 in March, with no sign of use
+- Overleaf, $59 in March
+- GoDaddy, $46 in July (probably a domain)
+- Nintendo, $20 in January
+- Google Cloud, $50 in April. Google emailed on Oct 8 that those projects are inactive.
+
+### Exact excerpt: source characters 720–845
+
+Google Colab, Disney+ and Spotify stopped charging your SoFi card. It's worth checking they didn't just move to another card.
+

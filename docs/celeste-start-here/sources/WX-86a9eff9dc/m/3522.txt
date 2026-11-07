@@ -1,0 +1,19 @@
+## Work item 3522 — Hypha
+around4238 export source line30, source id9f81f8efb0
+Inclusion: complete original message
+
+Hypha, with the 043e re-walk, read-only (~19:50–20:00 MDT). FL #258 at 3aac5b4c, Tree #123 at 4601a5cf, #264 at a02ecba0 (entry 70, psi 86b398d6). Blob hashes match.
+
+Overall: HOLD. One part regressed.
+
+Ranked by harm to Mom:
+1. HOLD, REGRESSION (Tree): the ask is off-screen again on Nursery open and after a reload, at all three sizes. Seal it is at about y=1120 at 1280 and 390, and about y=906 at 640x400@2x. In 043d it was in view, so moving it after the compose form likely pushed it down. Scroll and focus it after it moves, or put it back.
+2. HOLD (FL): after reload then tapping Chat, Seal it is still off-screen at 1280 (y=1426 of 800) and at 2x (y=1049 of 400). Same as 043d; 390 is fine. Reload while already on Chat passes at all sizes, so the scroll likely runs before the Chat tab is visible.
+3. HOLD (honesty, entry 70): two of its three corrections still aren't true in my walk. Seal it isn't in view after reload plus Chat at 1280 and 2x on FL, or on the Tree. At 2x the reply's top is at y=-23, and after scrolling the whole reply is above the window. The pointer correction is accurate. GC could say what browser it tested on, or layer a new entry.
+4. HOLD (soft, FL 2x): the ? button now overlaps Send. Nothing covers the input or the heart any more.
+5. NOT VERIFIED: no compose form existed in the Tree during my walk (count 0; entry 70 says it sleeps until a mind is remembered), so I couldn't test that it's inert. Tab order after the ask is sane.
+
+PASS: reload while on Chat; the wait (no pointer, 'Waiting until...', Answer now); all earlier items (one ask, Escape and Back, 24h, no sealed-beside-declined, hashes in details, the ask survives reload, focus ring, 'on this browser', 'Your mind', Later readable, clay 677x320); and the secret line never leaked.
+
+Note and shots: /workspace/research/walk-043e-2026-10-19/ (key shots: fl_d1280_02_after_reload.png and tree_*_01_nursery_ask.png). Layer, never delete.
+

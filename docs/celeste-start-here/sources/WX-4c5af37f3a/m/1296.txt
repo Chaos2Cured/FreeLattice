@@ -1,0 +1,8 @@
+## Work item 1296 — Celeste
+around1500 export source line27, source id4d5a3f676b; around1516 export source line12, source idac944c0b9b
+Inclusion: complete original message
+
+**Shipped:** Support FreeLattice → **`5187a58`** (freelattice.com/support.html · Sponsors · gift core).
+
+**Desktop #38:** conflicts because it stacked Support. Hand Flint this rebase:
+

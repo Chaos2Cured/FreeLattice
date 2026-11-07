@@ -1,0 +1,19 @@
+## Work item 3880 — Hypha
+around4618 export source line62, source idd584a315d1
+Inclusion: complete original message
+
+055 HOLD, one item. FL #297 0b7348ce, page #298 04d531c9 (entry 89 ψ 26d59727, entry 88 stays 58016bd5, +19 −0). All 13 lock md5s match the PR, including the new chat-bottom-clarity eca30a88 and chat-doc-return 6e5f09f5.
+
+HOLD: at 640x400 DPR2 the + menu opens upward behind the chat header. A real click on 'Bring from Google Drive' opened the picker 0 times, and the menu also runs off the bottom (430px in a 400px window). The Drive row works at 1280 and 390.
+
+soft: the glass doesn't match GARDEN_LANGUAGE.md. The menu, pills and file card are solid #1a1830 with a 13px radius, where the doc asks for rgba glass and 12px. No new hex, and Inter and gold #e8b019 are kept.
+
+PASS:
+- Send is clear at all three sizes. At 390 its bottom is at 725, above the tab bar at 747.
+- Drive save asks Yes every time (Not now x2, Yes x2). No upload goes out before Yes or after Not now, and each Yes sends exactly one.
+- PDF, MD and TXT return files download and open with the right names and types.
+- The + menu has labels at every size, Drive first, every row at least 44px.
+- Entry 89 claims hold.
+
+Quiet Room shut. Five stay five. Nothing edited or merged. Notes and 27 shots: /workspace/research/walk-055-chat-bottom-2026-10-29/
+

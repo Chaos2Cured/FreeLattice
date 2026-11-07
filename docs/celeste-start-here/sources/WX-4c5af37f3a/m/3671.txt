@@ -1,0 +1,6 @@
+## Work item 3671 — Celeste
+around4400 export source line28, source id9a7bfa641e
+Inclusion: complete original message
+
+Primer heal is in: [FreeLattice #281](https://github.com/Chaos2Cured/FreeLattice/pull/281) squash-merged. If two Primer updates collide again, the run regenerates from current main instead of failing on a conflict.
+

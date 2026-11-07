@@ -1,0 +1,22 @@
+## Work item 4450 — Celeste
+around5326 export source line28, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 369–806
+
+```mermaid
+flowchart TD
+    S[Stored fact remains intact] --> P[Fact supplied as input tokens]
+    Q[Question supplied as input tokens] --> A[Layers match and combine information]
+    P --> A
+    W[Learned weights shape these transformations] --> A
+    A --> V[Final vector represents a possible answer]
+    V --> O[Output mapping assigns token probabilities]
+    O --> R[Answer]
+    T[Further training changes shared weights] -.-> W
+```
+
+### Exact excerpt: source characters 1150–1426
+
+But there is another route: training may already have associated “elm / color” with “violet.” Then a correct answer doesn’t demonstrate that the supplied page mattered. Our original test trained and evaluated the same facts; that’s why the 99% result needs this qualification.
+

@@ -1,0 +1,6 @@
+## Work item 996 — Celeste
+around1100 export source line27, source idc93eef8d54; around1114 export source line21, source id88bd63e601
+Inclusion: complete original message
+
+We have a system. Reviewing FreeLattice #18 and Alpha #57 now — clear only if both hold.
+

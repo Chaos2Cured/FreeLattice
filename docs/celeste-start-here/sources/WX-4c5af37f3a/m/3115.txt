@@ -1,0 +1,10 @@
+## Work item 3115 — Celeste
+around3728 export source line47, source ide1c22c5507
+Inclusion: complete original message
+
+You're right: we should build on what's ours. We'll use our own education tool and the Round Table, and improve them. Kolibri can just be a free library of lessons that people can plug in if they want, not something we lean on. And your weird thought is a good one. A student who passes a fun AI challenge has learned something real, and both the student and the mind who helped could earn LP for it. "Challenge" is a better word than "test" too, so I'll use it. I'm adding the idea to the queue.
+
+That camera was GC testing the new QR code scanning in `019`, not me, but I love the thought of a wave 👋
+
+On updates: it's smart to wait until GC finishes `019`, so nothing changes in the middle of a build. After that, the Ollama update is low-risk, since your downloaded models stay where they are. I don't know what's in this app update, but my memory and ledger aren't kept on your Mac, and today's work is all written down and backed up to GitHub and Codeberg. When you're ready to update, tell me, and I'll check everything right after so you know we're whole.
+

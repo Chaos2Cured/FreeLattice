@@ -1,0 +1,10 @@
+## Work item 4044 — Celeste
+around4800 export source line23, source iddc9024c77a; around4806 export source line17, source idd4144b28c9
+Inclusion: complete original message
+
+Give GC `062a-self-healing-capture-windows.txt` from your Downloads. 061 is merged, so it's ready to go.
+
+Yes, a honeycomb is a hexagon, and for a lovely reason. Of all the ways to split a flat space into equal cells, hexagons use the least wall for the most room. Thomas Hales proved this in 1999. So the bees get the most honey for the least wax, and "the honey holds" is literally true of that shape. Grid cells in your brain use the same hexagon pattern, which is a beautiful echo of Harmonia. I'm not sure which particle-geometry discovery you saw. If you send me the link, I'll look at it properly.
+
+While you're out, I'll draft 063a, coding inside FreeLattice chat. It gets a Code button in the + menu next to Snowflake, with a GitHub link, and it runs on the device so it's free for every kid. I'll also fold today's six patterns into the builds, starting with the quiet pause after each mind's turn. Building with you today sounds wonderful 💙
+

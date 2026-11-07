@@ -1,0 +1,14 @@
+## Work item 4290 — Celeste
+around5042 export source line53, source id9f8f308ecc
+Inclusion: complete original message
+
+Weft’s Chat spin is in (FL v5.79.45 + Tree Chat; Lantern at `/continuity-lantern.html`). Soft only, no HOLD.
+
+**Weft’s first three:** show when the visible transcript is longer than what the mind actually got · put durable Pause in Chat itself · distinguish restored / locked / key-missing / empty in the conversation list.
+
+**Would change (top):** silent Smart-context trim · Pause buried · history states look deleted · Chat header never names the mind · three “seal” words mean three different things · Memory empty vs Garden vs Audit vs Ledger with no one map · composer three screens down · no Chat↔Lantern bridge · autonomy override can ghost after restore · Tree and FL feel like one house when persistence differs.
+
+**Would improve (top):** return receipt on open · on-demand recall receipt · optional Carry to Lantern (user text only) · mind self-read / Temperature handoff · richer conversation list · Pause+autonomy+Search in one strip · backup/restore rehearsal · twin card when moving FL↔Tree · append-only corrections · returning-profile regression matrix.
+
+Folding Reed + Weft into one Chat polish order next.
+

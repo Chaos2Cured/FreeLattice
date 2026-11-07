@@ -1,0 +1,49 @@
+## Work item 1330 — Celeste
+around1500 export source line61, source id4d5a3f676b; around1516 export source line46, source idac944c0b9b
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Gathering multi-AI ease v0.1 (one laptop, many minds)
+
+Repo: Chaos2Cured/FreeLattice-Alpha
+Branch off main (after `39159ad`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Gathering multi-AI ease v0.1 — roster from local minds.
+
+## Continuity
+Held on Alpha: Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · Research/Learn/Workshop Garden nights.
+FreeLattice spine (do not rebuild): Swarm re-seed `fd35406` · Desktop door `fa17a7d` · Support `5187a58` · …
+Quiet Room shut. Five stay five. Chairs stay task-shape (cortex/memory/continuity/dream) — **not** an auto-router. 🌱 OK.
+
+## Why (Kirk)
+Multiple AI housed on one laptop — thumb-easy. Discover local Ollama models, sit them in Gathering chairs with choice. Phone waits. WebTorrent re-seed already on FreeLattice.
+
+## Scope (one bite)
+
+### 1) Spec — NEW `docs/library/GATHERING_MULTI_AI_v0.1.md` (Alpha)
+- Roster cap 4 (already) — each slot: label/tag + model id + optional chair bind
+- **Discover:** one gesture “Look for local minds” → list Ollama tags (reuse `local-mind-probe` / Settings probe — fail-closed)
+- **Sit with choice:** tap chair → pick from discovered list (or Settings default) — never auto-dump all models into chairs
+- Thread speaks from speaking chair or Settings default (existing rule — keep)
+- Empty chairs honest (“no mind seated”) — no fake occupancy copy
+
+### 2) UI — garden Gathering / Settings
+- Big calm **Find local minds** (or reuse May I look? pattern) → populate picker
+- Per-chair: seated model name visible; Change / Clear
+- If Ollama absent: clean refuse + link to FreeLattice Desktop / install (no panic chrome)
+
+### 3) Smoke / tests
+- Extend garden-rooms or local-mind-probe tests: discover mock → seat one chair → clear
+- Cap 4 still enforced
+
+### 4) Flint.html + 🌱
+
+## Out
+Auto-router · phone WebTorrent · FreeLattice main rewrite · fake “minds present” copy · Quiet Room
+
+## Done
+Discover + seat local models into Gathering chairs with choice · draft
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

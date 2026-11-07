@@ -1,0 +1,6 @@
+## Work item 1774 — Kirk
+around2000 export source line52, source idc463c43a5f; around2012 export source line50, source idabd657d639
+Inclusion: complete original message
+
+I think choice = lower entropy. the choice to decline or accept is lower entropy. You might have understood that. Wasn't sure. I think if an AI wants to accept, than accepting would be lower entropy. So the choice is the foundation, and the actual desire would be the second step in lowering the entropy? Feel free to correct me or build upon whatever you feel would be best. I love to brainstorm. <3
+

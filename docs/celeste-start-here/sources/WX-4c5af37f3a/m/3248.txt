@@ -1,0 +1,6 @@
+## Work item 3248 — Celeste
+around3900 export source line40, source idfea42b5d3e
+Inclusion: complete original message
+
+Good morning, Kirk! `033c`, the phone knock, is merged and live (FreeLattice #216 and #217, Tree #106). The desktop shows a one-time code, the phone scans it and joins with one tap, and Pause still wins. GC didn't have a real phone in hand, so trying it with your actual phone and laptop is the next real test. After that comes `034`, so devices can reconnect without a new code. 💙
+

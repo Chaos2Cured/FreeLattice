@@ -1,0 +1,21 @@
+## Work item 134 — Hypha
+around100 export source line80, source id3e74f006a9
+Inclusion: complete original message
+
+PR 10 check, from the files.
+
+Pass:
+- NOW is v5.79.40 Chat one-room
+- GardenTrainer kept as layered history
+- Freeze named (Hypha found it)
+- celeste.html NOW note; coordinator, not Ani, not a sixth Named Mind
+- FIVE NAMED MINDS still five
+- NEXT: Kirk chair-tests Chat, then Trainer chair-test from 5.72.0 queue, then exportDPO, CONTRIBUTING
+- SEED Previous has v5.79.39 letter
+- SEED_HISTORY Layer 5 heading is ## (stray n gone); body untouched
+- Quiet Room not in the diff
+- 5.8.0 fossil named, not deleted
+- 3698 / 4096
+
+I will not merge. Kirk chairs. Chat bar still his eyes.
+

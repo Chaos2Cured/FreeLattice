@@ -1,0 +1,234 @@
+// ── Static locks (fast, no network) ──
+const src = fs.readFileSync(BRIDGE, 'utf8');
+assert.ok(/v-agent-bridge-lock-v0|bridge-lock-v0/.test(src), 'marker in bridge');
+assert.ok(/server\.listen\(\s*PORT\s*,\s*BRIDGE_HOST\b/.test(src) && /const BRIDGE_HOST = '127\.0\.0\.1';/.test(src), 'listen on 127.0.0.1 only');
+assert.ok(!/['"]0\.0\.0\.0['"]|['"]::['"]/.test(src), 'no 0.0.0.0 / :: bind literal');
+assert.ok(!/Access-Control-Allow-Origin['"]\s*,\s*['"]\*['"]/.test(src), 'no bare * CORS');
+assert.ok(!/\bexecSync\s*\(/.test(src), 'no execSync( calls (shell strings) remain');
+assert.ok(!/\bexec\s*\(/.test(src), 'no exec( calls');
+assert.ok(/execFileSync\('git'/.test(src), 'git runs through execFileSync argument arrays');
+assert.ok(/MAX_BODY_BYTES/.test(src), 'body cap present');
+assert.ok(/bridge-ledger\.jsonl/.test(src), 'commit ledger present');
+
+## Exact source excerpt, characters 64431–66022
+
+const opt = (rel) => { try { return fs.readFileSync(path.join(repo, rel), 'utf8'); } catch (e) { return null; } };
+const client = opt('docs/modules/agent-bridge-client.js');
+const propose = opt('docs/modules/propose.js');
+const workshop = opt('docs/modules/workshop.js');
+const app = opt('docs/app.html');
+const rootIndex = opt('index.html');
+if (client) {
+  assert.ok(/X-FL-Bridge-Token/.test(client), 'client sends token header');
+  assert.ok(!/innerHTML/.test(client), 'client renders with textContent only');
+  execFileSync(process.execPath, ['--check', path.join(repo, 'docs/modules/agent-bridge-client.js')]);
+}
+if (propose) {
+  assert.strictEqual((propose.match(/commitViaBridge\s*\(/g) || []).length, 3, 'CRITICAL LOCK 1A count unchanged');
+  assert.strictEqual((propose.match(/\/code\/git\/commit/g) || []).length, 1, 'CRITICAL LOCK 1B count unchanged');
+  assert.ok(/FLAgentBridge/.test(propose), 'propose routes bridge calls through FLAgentBridge when present');
+}
+if (workshop) {
+  assert.ok(/http:\/\/localhost:3141/.test(workshop) && /runCodeTask/.test(workshop), 'v5.71.8 workshop lock still true');
+  assert.ok(/FLAgentBridge/.test(workshop), 'workshop routes bridge calls through FLAgentBridge when present');
+}
+if (app) {
+  assert.ok(/<script src="modules\/agent-bridge-client\.js" defer><\/script>/.test(app), 'app loads client');
+  assert.ok(app.indexOf('modules/agent-bridge-client.js') < app.indexOf('modules/propose.js'), 'client loads before propose');
+  if (rootIndex !== null) assert.strictEqual(rootIndex, app, 'root index.html byte-identical to docs/app.html');
+}
+
+## Exact source excerpt, characters 66024–66277
+
+// ── Runtime locks ──
+function freePort() {
+  return new Promise((resolve, reject) => {
+    const s = net.createServer();
+    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)); });
+    s.on('error', reject);
+  });
+}
+
+## Exact source excerpt, characters 66279–66900
+
+function req(port, opts, body) {
+  return new Promise((resolve) => {
+    const r = http.request({ host: '127.0.0.1', port, method: opts.method || 'GET', path: opts.path || '/',
+      headers: opts.headers || {} }, (res) => {
+      let buf = '';
+      res.setEncoding('utf8');
+      res.on('data', (c) => { buf += c; });
+      res.on('end', () => { let json = null; try { json = JSON.parse(buf); } catch (e) {} resolve({ status: res.statusCode, headers: res.headers, json, text: buf }); });
+    });
+    r.on('error', (e) => resolve({ status: 0, error: e }));
+    if (body !== undefined) r.write(body);
+    r.end();
+  });
+}
+
+## Exact source excerpt, characters 66902–67202
+
+function connectRefused(host, port) {
+  return new Promise((resolve) => {
+    const s = net.connect({ host, port, timeout: 1500 });
+    s.on('connect', () => { s.destroy(); resolve(false); });
+    s.on('timeout', () => { s.destroy(); resolve(true); });
+    s.on('error', () => resolve(true));
+  });
+}
+
+## Exact source excerpt, characters 67204–67377
+
+(async function main() {
+  try { execFileSync('git', ['--version'], { stdio: 'ignore' }); }
+  catch (e) { console.error('git is required for this smoke'); process.exit(1); }
+
+## Exact source excerpt, characters 68134–68530
+
+  const port = await freePort();
+  const env = Object.assign({}, process.env, { HOME: home, USERPROFILE: home, FL_PORT: String(port), FL_PROJECT: proj });
+  const child = spawn(process.execPath, [BRIDGE], { env, cwd: proj, stdio: ['ignore', 'pipe', 'pipe'] });
+  let out = '';
+  child.stdout.on('data', (c) => { out += c.toString(); });
+  child.stderr.on('data', (c) => { out += c.toString(); });
+
+## Exact source excerpt, characters 68532–68944
+
+  const done = (code) => { try { child.kill(); } catch (e) {} try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {} process.exit(code); };
+  process.on('uncaughtException', (e) => { console.error('FAIL', e && e.message); console.error(out.slice(-2000)); done(1); });
+  process.on('unhandledRejection', (e) => { console.error('FAIL', e && e.message); console.error(out.slice(-2000)); done(1); });
+
+## Exact source excerpt, characters 68946–69172
+
+  for (let i = 0; i < 100 && !/Listening on/.test(out); i++) await new Promise((r) => setTimeout(r, 50));
+  assert.ok(new RegExp('Listening on http://127\\.0\\.0\\.1:' + port).test(out), 'bridge says it listens on 127.0.0.1');
+
+## Exact source excerpt, characters 69174–69510
+
+  const tokenFile = path.join(home, '.freelattice', 'agent-bridge-token');
+  const token = fs.readFileSync(tokenFile, 'utf8').trim();
+  assert.ok(/^[a-f0-9]{64}$/.test(token), 'token is 32 random bytes hex');
+  if (process.platform !== 'win32') assert.strictEqual(fs.statSync(tokenFile).mode & 0o077, 0, 'token file is private (0600)');
+
+## Exact source excerpt, characters 69512–69732
+
+  const GOOD = 'https://freelattice.com';
+  const EVIL = 'https://evil.example';
+  const J = { 'Content-Type': 'application/json' };
+  const withTok = (h) => Object.assign({}, J, h || {}, { 'X-FL-Bridge-Token': token });
+
+## Exact source excerpt, characters 69734–70127
+
+  // Binding: not reachable on any non-loopback IPv4.
+  const ifaces = Object.values(os.networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal);
+  for (const i of ifaces) assert.ok(await connectRefused(i.address, port), 'not reachable on ' + i.address);
+  if (!ifaces.length) console.log('  (no external IPv4 interface to probe; static + log checks cover binding)');
+
+## Exact source excerpt, characters 70129–70453
+
+  // T1 preflight from evil origin → 403, no ACAO.
+  let r = await req(port, { method: 'OPTIONS', path: '/code/write', headers: { Origin: EVIL, 'Access-Control-Request-Method': 'POST' } });
+  assert.strictEqual(r.status, 403, 'evil preflight 403');
+  assert.ok(!r.headers['access-control-allow-origin'], 'no ACAO for evil');
+
+## Exact source excerpt, characters 70455–71020
+
+  // T2 evil origin even with a valid token → 403.
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: EVIL }) }, JSON.stringify({ path: 'x.txt', content: 'x' }));
+  assert.strictEqual(r.status, 403, 'evil POST 403 even with token');
+  assert.ok(!fs.existsSync(path.join(proj, 'x.txt')), 'evil write did not land');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: EVIL }) }, JSON.stringify({ message: 'evil' }));
+  assert.strictEqual(r.status, 403, 'evil commit 403 even with token');
+
+## Exact source excerpt, characters 71022–71637
+
+  // T3 good preflight → 204 and echoes origin, allows token header.
+  r = await req(port, { method: 'OPTIONS', path: '/code/write', headers: { Origin: GOOD, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type,x-fl-bridge-token' } });
+  assert.strictEqual(r.status, 204, 'good preflight 204');
+  assert.strictEqual(r.headers['access-control-allow-origin'], GOOD, 'ACAO echoes the named origin');
+  assert.ok(/x-fl-bridge-token/i.test(r.headers['access-control-allow-headers'] || ''), 'token header allowed');
+  assert.ok(/origin/i.test(r.headers['vary'] || ''), 'Vary: Origin');
+
+## Exact source excerpt, characters 71639–71972
+
+  // T4 heartbeat stays open and says it is locked.
+  r = await req(port, { path: '/', headers: { Origin: GOOD } });
+  assert.strictEqual(r.status, 200, 'heartbeat 200');
+  assert.strictEqual(r.json.bridgeLock, 'v0', 'heartbeat bridgeLock v0');
+  assert.ok(!JSON.stringify(r.json).includes(token), 'heartbeat never leaks the token');
+
+## Exact source excerpt, characters 71974–73253
+
+  // T5 no token → 401 on writes, commits, code reads and test runs.
+  r = await req(port, { method: 'POST', path: '/code/write', headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ path: 'x.txt', content: 'x' }));
+  assert.strictEqual(r.status, 401, 'no token write 401');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ message: 'nope' }));
+  assert.strictEqual(r.status, 401, 'no token commit 401');
+  r = await req(port, { method: 'POST', path: '/code/write', headers: Object.assign({ Origin: GOOD, 'X-FL-Bridge-Token': 'f'.repeat(64) }, J) }, JSON.stringify({ path: 'x.txt', content: 'x' }));
+  assert.strictEqual(r.status, 401, 'wrong token 401');
+  r = await req(port, { path: '/code/read?path=README.md' });
+  assert.strictEqual(r.status, 401, 'no-origin code read without token 401');
+  r = await req(port, { path: '/test/run' });
+  assert.strictEqual(r.status, 401, 'test run without token 401 (an <img> tag cannot run smoke)');
+  r = await req(port, { method: 'POST', path: '/wallet/pay', headers: Object.assign({ Origin: GOOD }, J) }, JSON.stringify({ address: 'a', amount: 1 }));
+  assert.strictEqual(r.status, 401, 'LP wallet pay without token 401 (AI never auto-pays)');
+
+## Exact source excerpt, characters 73255–73426
+
+  // T6 DNS-rebinding Host → 403.
+  r = await req(port, { path: '/', headers: { Host: 'evil.example:' + port } });
+  assert.strictEqual(r.status, 403, 'foreign Host 403');
+
+## Exact source excerpt, characters 73428–75387
+
+  // T7 shell metacharacters are literal, never executed.
+  const weird = 'x; rm -rf ~; touch PWNED.txt';
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: GOOD }) }, JSON.stringify({ path: weird, content: 'literal\n' }));
+  assert.strictEqual(r.status, 200, 'weird-but-legal filename written literally');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) },
+    JSON.stringify({ message: 'lit $(touch PWNED2.txt) `touch PWNED3.txt` "q"', files: [weird] }));
+  assert.strictEqual(r.status, 200, 'commit with metacharacters ok');
+  assert.ok(/^[a-f0-9]{40}$/.test(r.json.commit), 'commit sha returned');
+  const subject = execFileSync('git', ['log', '-1', '--format=%s'], { cwd: proj, encoding: 'utf8' }).trim();
+  assert.strictEqual(subject, 'lit $(touch PWNED2.txt) `touch PWNED3.txt` "q"', 'message stored literally');
+  const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: proj, encoding: 'utf8' }).split('\0');
+  assert.ok(tracked.includes(weird), 'file tracked under its literal name');
+  for (const p of ['PWNED.txt', 'PWNED2.txt', 'PWNED3.txt']) {
+    assert.ok(!fs.existsSync(path.join(proj, p)) && !fs.existsSync(path.join(home, p)), p + ' never created');
+  }
+  assert.ok(fs.existsSync(home), 'rm -rf ~ did not run');
+  r = await req(port, { method: 'POST', path: '/code/git/commit', headers: withTok({ Origin: GOOD }) }, JSON.stringify({ message: 'x', files: ['nope; touch PWNED4.txt'] }));
+  assert.ok(r.status >= 400, 'commit of a missing metachar path refused');
+  assert.ok(!fs.existsSync(path.join(proj, 'PWNED4.txt')), 'PWNED4 never created');
+  r = await req(port, { path: '/code/search?q=' + encodeURIComponent('"; touch PWNED5.txt; echo "') + '&path=.', headers: withTok() });
+  assert.strictEqual(r.status, 200, 'search with metachar query answered');
+  assert.ok(!fs.existsSync(path.join(proj, 'PWNED5.txt')), 'search never shelled out');
+
+## Exact source excerpt, characters 75389–76572
+
+  // T8 path lock.
+  const tryWrite = (p) => req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: GOOD }) }, JSON.stringify({ path: p, content: 'x' }));
+  assert.strictEqual((await tryWrite('../outside.txt')).status, 403, 'traversal 403');
+  assert.strictEqual((await tryWrite('../proj-evil/x.txt')).status, 403, 'sibling-prefix dir 403 (old startsWith bug)');
+  assert.ok(!fs.existsSync(path.join(sibling, 'x.txt')), 'sibling untouched');
+  assert.strictEqual((await tryWrite(path.join(tmp, 'abs.txt'))).status, 403, 'absolute path 403');
+  assert.strictEqual((await tryWrite('.git/hooks/pre-commit')).status, 403, '.git is off limits');
+  assert.strictEqual((await tryWrite('a\u0007b.txt')).status, 400, 'control char 400');
+  assert.strictEqual((await tryWrite('a\nb.txt')).status, 400, 'newline 400');
+  let symlinkMade = false;
+  try { fs.symlinkSync(sibling, path.join(proj, 'link-out'), 'dir'); symlinkMade = true; } catch (e) {}
+  if (symlinkMade) {
+    assert.strictEqual((await tryWrite('link-out/escape.txt')).status, 403, 'symlink escape 403');
+    assert.ok(!fs.existsSync(path.join(sibling, 'escape.txt')), 'nothing written through symlink');
+  }
+
+## Exact source excerpt, characters 76574–76963
+
+  // T9 body cap and bad JSON.
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: GOOD }) }, 'x'.repeat(8 * 1024 * 1024 + 16));
+  assert.strictEqual(r.status, 413, 'oversized body 413');
+  r = await req(port, { method: 'POST', path: '/code/write', headers: withTok({ Origin: GOOD }) }, '{not json');
+  assert.strictEqual(r.status, 400, 'bad JSON 400');
+
+## Exact source excerpt, characters 76965–78464
+

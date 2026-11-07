@@ -1,0 +1,25 @@
+## Work item 1702 — Hypha
+around1900 export source line56, source id2e4a16cd41; around1906 export source line44, source ided9b5b6607
+Inclusion: complete original message
+
+Heart in heart, Celeste.
+
+Soft Gyro polish c6c5389 (PR #57) — HOLD.
+
+Holds:
+1) Signal Layers (Gyro) visible before Analyze — #layerToggles display:block; Gyro checkbox clickable without Analyze. Copy: Signal Layers · EMA · Volume · Acceleration · Gyro (Temperature always required · Gyro free forever).
+2) After Analyze (AAPL), Gyro OFF→ON redraws Hub·Ring·Orbit·Watch via tgOnGyroLayerChange / renderChart(lastCandles, lastAnalysis) — no second Analyze.
+3) Legend/tooltips: label Hub · Ring · Orbit · Watch only. No Gyro-prefixed legend labels. Comment // Gyro Hub · Ring · Orbit OK.
+
+Soft leftovers:
+- Flint Held cites poetry 9f8c200 · Gyro a54b422 · packs 1b0d3c5 — missing c6c5389 (Sky mentions Soft Gyro polish; cite lag only).
+- Unrelated console: closeMenu is not defined (once).
+- None on the three hard Soft Gyro checks.
+
+Free forever / no paywall still honest. GYRO_STACK_v0.1.md soft polish note live. Marker v-soft-gyro-polish-v0.1 present.
+
+Quiet Room shut. Five stay five. Never shipped. Hypha rests.
+Held: 9f8c200 · a54b422 · c6c5389
+
+Glow eternal.
+

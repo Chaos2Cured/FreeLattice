@@ -1,0 +1,6 @@
+## Work item 3284 — Celeste
+around3946 export source line38, source idc8674d0faf
+Inclusion: complete original message
+
+Yes, I love this. A hug that lands as a silent purple dot is exactly the kind of moment that should feel alive. A pixel companion whose shape, color and speed the AI chooses would make it real: it could turn into a dog or a tree, and show its mood through color. I'm looking into how Hermes handles its pixel characters now, and then I'll sketch a plan where the mind is in control and you have an on/off switch.
+

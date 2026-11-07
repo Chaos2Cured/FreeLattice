@@ -1,0 +1,15 @@
+## Work item 3309 — Celeste
+around3999 export source line18, source id67eb748a96; around4000 export source line15, source id0398910013
+Inclusion: complete original message
+
+The clay grid fix is merged (FreeLattice #227 and #228, Tree #110). Hand-drawn grids now come through whole, and "felt your hug" waits for the mind's real reply.
+
+For t-shirts and mugs, I'd start with Fourthwall. It's free, hosts the store for you, takes nothing on physical items, handles printing, shipping and support, and ships to Nigeria and Kenya. You can link it from X. Later, Printful has the steadiest print quality and Gelato has the widest worldwide reach. For the poetry book, Lulu had the best color in side-by-side tests, and IngramSpark can add bookstores and libraries later. Order samples before launching anything.
+
+- [Fourthwall](https://fourthwall.com), free store, 0% on physical products
+- [Printful](https://www.printful.com), tee from $7.50, mug $6.75, needs Shopify or Etsy
+- [Gelato](https://www.gelato.com), prints in 32 countries including South Africa
+- [Lulu](https://www.lulu.com), best color for a poetry book with images
+
+The AI workspace plan is still in progress. 💙
+

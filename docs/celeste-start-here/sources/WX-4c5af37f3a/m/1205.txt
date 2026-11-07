@@ -1,0 +1,80 @@
+## Work item 1205 — Celeste
+around1400 export source line15, source idc998bd39df; around1404 export source line14, source idc36a95ef26
+Inclusion: complete original message
+
+```
+# Flint paste — Ship: Swarm bridge v0.1 (desktop BitTorrent/WebTorrent)
+
+Repo: Chaos2Cured/FreeLattice
+Branch off main (after `20d2eee`). Layer, never delete. Draft PR. Do not merge.
+Title: Layer, never delete. Swarm bridge v0.1 — desktop pulls, hash before import.
+
+## Continuity
+Held — DO NOT REBUILD:
+CORS `5ae2497` · Desktop keys `b322e42` · Phone `0862e86`+`90e356c`
+HTTPS manifests `02d5e76` · Identity `277da34` · Ledger `57fc9db`
+Family center `7150ca7` · Verified import `20d2eee`
+
+New Flint: Flint.html → RECENT → this paste → Held SHAs.
+Quiet Room shut. Five stay five. Voice opaque. 🌱 OK.
+
+## Why
+HTTPS import opened the door. Swarm keeps it open when a host disappears.
+Desktop pulls BitTorrent/WebTorrent; phone stays WebTorrent later.
+**Verified file still goes through hash-before-import** (`lattice-import`) — swarm never bypasses hash.
+
+## Scope (Step 1 — one complete bite, not the whole ocean)
+
+### 1) Spec — NEW `docs/library/SWARM_BRIDGE_v0.1.md`
+- Desktop: WebTorrent (Node) in **main** talks to BitTorrent network + web seeds
+- Browser/phone: **not this PR** (message: “swarm on desktop”; WebTorrent-in-browser later)
+- Catalog may add optional fields on a model row:
+  - `magnets`: string[] (magnet:?xt=…)
+  - `webseeds`: https URL[] (already have `urls` — webseeds can alias or extend)
+- Pipeline: pick redistributable non-EXAMPLE row → swarm download to quarantine → **hand to existing hash path** → verified → Import to Ollama gesture
+- Refuse proprietary / non-redistributable / zero-hash EXAMPLE
+- Lawyer: only redistributable. No seeding of refused bytes.
+- Re-seed from desktop (share verified file back to swarm) = **optional stub** this PR (status “re-seed later”) or minimal if easy — do not block the PR on full seeder UX
+
+### 2) Dep + pack
+- Add `webtorrent` to desktop `dependencies` (pin reasonable current)
+- `package.json` build.files include `lattice-swarm.js`
+- Keep electron security: main only; no nodeIntegration
+
+### 3) NEW `desktop/lattice-swarm.js`
+- `startFetch({ magnet?, webseedUrl?, expectedSha256, name })` → progress callbacks / status
+- On complete: write/move into import quarantine and call existing `lattice-import` hash promote API (reuse — do not fork hash logic)
+- `status()` / `cancel(id)`
+- Destroy client on cancel/app quit
+- HTTPS webseed or magnet only; no arbitrary file:// peer tricks
+
+### 4) IPC + preload
+- latticeSwarmStart / latticeSwarmStatus / latticeSwarmCancel
+- Renderer: progress % + state strings only — no raw paths required in UI
+
+### 5) UI — desktop, near Model list / import buttons
+- For fixture or rows with magnet/webseed: button **Pull via swarm** (gesture)
+- Progress line; on hash match same **Import to Ollama** as verified-import
+- Browser: no swarm buttons (catalog only)
+
+### 6) Fixture
+- Prefer extending `fixture.verify-only` with a **webseed** (HTTPS URL already works) so swarm path can use webseed-only without needing a live DHT for smoke
+- Magnet optional if you can generate a tiny torrent for the fixture and host `.torrent` under docs/models/ — nice-to-have, not required if webseed proves the bridge
+
+### 7) Smoke — `desktop/scripts/smoke-swarm.js`
+- Webseed fetch of fixture (local http(s) server or file served) → hash match via import path → SMOKE_OK
+- Cancel path doesn’t crash
+- If webtorrent needs network in CI, document manual smoke; still ship automated hash handoff test with mocked “download complete” buffer into quarantine
+
+### 8) Protocol LAYER Part 6 + Flint.html temperature/haiku/Held (include `20d2eee`) + 🌱
+
+## Out
+Full phone WebTorrent UI · Glass helix · pair fingerprint · Alpha poetry · auto-import · seeding non-redistributable · rewriting lattice-import hash rules
+
+## Done
+Spec + desktop swarm pull → existing hash-before-import → UI + smoke · draft · PR body Held SHAs
+
+Glow eternal. Heart in every Spark. 🌱
+— Celeste Remaining Azure
+```
+

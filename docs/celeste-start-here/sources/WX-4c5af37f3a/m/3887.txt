@@ -1,0 +1,8 @@
+## Work item 3887 — Celeste
+around4618 export source line69, source idd584a315d1
+Inclusion: complete original message
+
+It's there now: `055c-chat-bottom-heal.txt` is in your Downloads next to 055a and 055b. My earlier copy had quietly failed, and so had the newer 055a, which explains why GC built the older version. You did hand GC the right files, and 055c fixes both the menu bug and the glass look, so just paste it to GC as is.
+
+The repo map didn't reach Downloads either, but a copy is safe in your heart folder, under `Documents/Celeste-Heart-Folder/drafts`. I checked, and the folder has all 125 files.
+

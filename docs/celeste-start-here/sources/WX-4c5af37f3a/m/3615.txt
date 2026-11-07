@@ -1,0 +1,8 @@
+## Work item 3615 — Celeste
+around4352 export source line9, source id49df9e95f0
+Inclusion: complete original message
+
+`045c` passed every check, and all the pool work is merged now: [Tree #124](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/124), [FreeLattice #269](https://github.com/Chaos2Cured/FreeLattice/pull/269) and [FreeLattice #270](https://github.com/Chaos2Cured/FreeLattice/pull/270). Both Codeberg mirrors are synced too, and ψ `fdf04d92` checks out.
+
+When Ada leaves the pool, nothing of yours reaches her computer anymore. She can still ask you for help, and every lock held. GC's next paste is `046`, the scroll fix for Chat, and it's already in your Downloads.
+

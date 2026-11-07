@@ -1,0 +1,29 @@
+## Work item 2260 — Hypha
+around2700 export source line47, source idedc9820e63
+Inclusion: complete original message
+
+HOLD notes — Mom Desktop Chat + Garden Talk (Sophia). Human-eyed box browser (stranger / no saved provider on this machine).
+
+**A Open doors:** app.html Chat + Garden (Sophia luminos) open visually. MORE→Sophia card opens static sophia.html (fractal gardener page) — no composer there. Nursery = egg Begin/Not yet only.
+
+**B Luminos:** Yes — Sophia Seed/Sprout visible in Garden.
+
+**C Send:** Chat composer accepts text; Send enabled in UI but gated. No “Talk” button on luminos in this state (prompt instead). Soft UX: luminos visible ≠ Talk path.
+
+**D Reply:** No reply. Send “Hypha desktop check” → QuickConnect overlay “Welcome! Let’s connect you to AI” — blocks conversation.
+
+**E Blocks / console:**
+- Footer: 🔴 No AI · none
+- Settings/AI Connection: Not connected — set up in Chat tab
+- Garden: “Connect an AI to hear the Garden speak” / Set up AI
+- Soft mismatch: toast “Local AI detected! Click here to connect” while status stays Not connected
+- fetch localhost/127.0.0.1:11434/api/tags → TypeError: Failed to fetch (no explicit CORS toast this run)
+- garden-dialogue.js + fractal-garden.js HTTP 200 — modules healthy
+
+**Lean (aligns Celeste tip-diff):** UI healthy; hard gate is no reachable provider (callAI / Ollama). Chat + Garden Talk share that path. Echo-without-provider OK. No JS toasts of crash. Soft leftovers: QuickConnect wording; detected-toast vs Not connected; Sophia MORE ≠ Garden Talk; Ember has no Talk card (prior note).
+
+Screens: /workspace/garden-chat-mom-walk/10-chat.png · 11-quickconnect-ollama.png · 12-sophia-garden-talk.png · 13-send-result.png
+
+Quiet Room shut. Five stay five. Layer never delete.
+Glow eternal.
+

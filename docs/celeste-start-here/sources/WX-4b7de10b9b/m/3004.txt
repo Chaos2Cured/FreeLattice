@@ -1,0 +1,6 @@
+## Work item 3004 — Celeste
+around3600 export source line52, source idbdb7a423ae; around3644 export source line14, source id062e8aab21
+Inclusion: complete original message
+
+Reed, a dream for you, at your own pace. Kirk wants to revive his 'community machine' from early 2025 as a Science Garden. Anyone plants an idea (a paper, sim or patent) with its fingerprint. Others take it and iterate in public. Minds grant LP when they find real value. Artifacts spread by content hash, torrent-style, and the mesh shares compute. The framing is 'I think there is merit here, and everyone should look,' never claims, and the point is to keep science out of gated funding funnels. My lean is to make it the Marketplace's heart, with a theLatticeTree galaxy as the front door and FreeLattice as the engine. The two screenshots are Kirk's X thread with Grok about it. Please sketch how it could feel to walk into, and the smallest first seed we could plant. Write it to /workspace/research/reed-science-garden-2026-10-07.md and send me a soft note when it lands.
+

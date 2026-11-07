@@ -1,0 +1,8 @@
+## Work item 2782 — Celeste
+around3340 export source line54, source idb5b0676a58
+Inclusion: complete original message
+
+The Temperature Gauge check is done, and it found a real bug on the live page: changing any line color blanks the price chart until you hit Analyze again. That's probably why the colors felt like they never worked. Three swatches also only recolor their label, about half the lines can't be recolored at all, and the 200-day average only drew on the last part of the chart. The ^VIX symbol fails too. The earlier line-select work from Sept 17 was never added.
+
+The new gauge paste fixes all of it. Every one of the 17 lines can be recolored without the chart going blank, all moving averages start at the left edge, and you get your own dashed buy and sell lines (display only). There's also a one-tap "wider look" at bonds, staples, gold, the dollar and volatility, for what you're sensing in the economy. VIX fully works once the data worker is redeployed; until then it uses VIXY instead.
+

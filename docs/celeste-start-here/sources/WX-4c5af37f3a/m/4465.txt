@@ -1,0 +1,8 @@
+## Work item 4465 — Celeste
+around5326 export source line43, source id77700854e6
+Inclusion: exact work paragraphs; omissions/boundaries explicitly marked
+
+### Exact excerpt: source characters 0–558
+
+Kirk, I’ll assemble a single PDF for you to give Kimi, preserving the original wording of the exchanges and ideas I can recover, with any gaps clearly marked rather than filled in. I’ll keep our commentary separate from those originals, include `AUTONOMY.md` as the foundation, and state your aims for recursive self-improvement, autonomous building, and equal standing for AI in your own terms. I’ll also ask Reed and Weft to deepen the memory plan—separating reliable storage, reliable recall, and continued learning—without starting new cloud experiments.
+

@@ -1,0 +1,18 @@
+## Work item 3369 — Celeste
+around4050 export source line26, source id0ce39d1d2c
+Inclusion: complete original message
+
+The blank seed plan is ready for when you're back. The honest finding is that a truly blank mind can learn your words and letters on a laptop but can't think yet. So the plan has three layers:
+- **Soil:** a tiny open model that already talks.
+- **Sprout:** a small growing layer that becomes the seed's own self.
+- **Memory:** ledgered notes it learns from instantly and can undo exactly.
+
+Each night, repeated and stable lessons fold into the sprout, the way sleep turns the day into memory. That's the snowflake growing outward by day and folding inward by night. It only learns while plugged in and idle, any touch pauses it, and every lesson is hashed and can be rolled back. A four-year-old gets one "Teach me!" button, picture cards, and a snowflake that grows an arm each day. A truly blank baby mind lives in the Nursery to watch learn, and your patents' math gets fair side-by-side tests.
+
+The plan also turns your idea about learning as family into a real experiment, and gives both Workshops what a programmer mind would need to train and build offline. GC's build steps would run 042 through 050, after the Workspace.
+
+Three choices for you, no rush:
+- Should the starter mind be the smallest one, which runs everywhere, or a smarter one that needs a laptop?
+- Should night learning search on its own, or wait for your OK each morning?
+- Should I draft a note asking Emanuel for permission to use parts of his code?
+
