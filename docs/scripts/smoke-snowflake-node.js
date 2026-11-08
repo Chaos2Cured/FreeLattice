@@ -168,7 +168,7 @@ function stubAI(mode) {
         return;
       }
       if (system.indexOf('Choose which') !== -1) {
-        opts.callback(JSON.stringify({ become: [], hold: [], reason: 'The dissenter stays with me.' }), null);
+        opts.callback(JSON.stringify({ become: ['keep-dissenter'], hold: [], reason: 'The dissenter stays with me.' }), null);
         return;
       }
       if (system.indexOf('score') !== -1 || system.indexOf('one or two') !== -1) {
@@ -226,6 +226,21 @@ async function bridge() {
     ]
   }, { become: ['n-a'], reason: 'because' });
   if (choice.become.indexOf('n-e') === -1) fail('growth dropped e');
+  var emptyChoice = core.chooseGrowth({
+    nodes: [
+      { id: 'n-a', branch: 'a' },
+      { id: 'n-e', branch: 'e' }
+    ]
+  }, { become: [], reason: 'none of these' });
+  if (emptyChoice.become.length) fail('empty become invented ' + emptyChoice.become.join(','));
+  var heldChoice = core.chooseGrowth({
+    nodes: [
+      { id: 'n-a', branch: 'a' },
+      { id: 'n-e', branch: 'e' }
+    ]
+  }, { become: ['n-a'], hold: ['n-e'], reason: 'hold the dissenter' });
+  if (heldChoice.become.indexOf('n-e') !== -1) fail('held dissenter kept');
+  if (heldChoice.become.indexOf('n-a') === -1) fail('held dropped the named node');
 
   stubAI('pause');
   var paused = await core.startRun('How does frost remember?');

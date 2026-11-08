@@ -302,7 +302,7 @@ function contrastSource() {
             open: 'What would thaw it?'
           });
         } else if (system.indexOf('Choose which') !== -1) {
-          text = JSON.stringify({ become: [], hold: [], reason: 'The dissenter stays with me.' });
+          text = JSON.stringify({ become: ['keep-dissenter'], hold: [], reason: 'The dissenter stays with me.' });
         } else if (system.indexOf('one or two') !== -1 || system.indexOf('No score') !== -1) {
           text = 'I am the same mind, a little more careful.';
         }

@@ -76,6 +76,33 @@ global.FreeLattice = {
       opts.callback(null, 'nope');
       return;
     }
+    if (global.__ai === 'refuse' && system.indexOf('Choose which') !== -1) {
+      opts.callback('I will not take these into myself.', null);
+      return;
+    }
+    if (global.__ai === 'empty' && system.indexOf('Choose which') !== -1) {
+      opts.callback(JSON.stringify({ become: [], hold: [], reason: 'None of these became part of me.' }), null);
+      return;
+    }
+    if (global.__ai === 'hold-e' && system.indexOf('Choose which') !== -1) {
+      var raw = String(user || '');
+      var start = raw.indexOf('[');
+      var end = raw.lastIndexOf(']');
+      var rows = [];
+      if (start >= 0 && end > start) {
+        try { rows = JSON.parse(raw.slice(start, end + 1)); } catch (eParse) { rows = []; }
+      }
+      if (!Array.isArray(rows)) rows = [];
+      var holdId = '';
+      var keepId = '';
+      var i;
+      for (i = 0; i < rows.length; i++) {
+        if (rows[i] && rows[i].branch === 'e') holdId = rows[i].id;
+        else if (rows[i] && rows[i].id && !keepId) keepId = rows[i].id;
+      }
+      opts.callback(JSON.stringify({ become: keepId ? [keepId] : [], hold: holdId ? [holdId] : [], reason: 'Keep the named one. The dissenter stays out.' }), null);
+      return;
+    }
     if (system.indexOf('Plan search') !== -1) {
       opts.callback(JSON.stringify({
         hunch: 'Follow the light.',
@@ -94,7 +121,7 @@ global.FreeLattice = {
       return;
     }
     if (system.indexOf('Choose which') !== -1) {
-      opts.callback(JSON.stringify({ become: [], hold: [], reason: 'The dissenter stays with me.' }), null);
+      opts.callback(JSON.stringify({ become: ['keep-dissenter'], hold: [], reason: 'The dissenter stays eligible with this selection.' }), null);
       return;
     }
     opts.callback(JSON.stringify({ text: 'A sourced note.', confidence: 'known' }), null);
@@ -162,20 +189,64 @@ function fresh() {
   if (global.__exports !== 0) fail('decline exported');
 
   await fresh();
+  global.__ai = 'empty';
+  before = queueRows().length;
+  var empty = await core.startRun('solar energy');
+  if (!empty || empty.growth) fail('empty become invented growth');
+  if (queueRows().length !== before) fail('empty become enqueued');
+  if (global.__exports !== 0) fail('empty become exported');
+
+  await fresh();
+  global.__ai = 'refuse';
+  before = queueRows().length;
+  var refused = await core.startRun('solar energy');
+  if (!refused || refused.growth) fail('prose refusal invented growth');
+  if (queueRows().length !== before) fail('refusal enqueued');
+
+  await fresh();
+  global.__ai = 'hold-e';
+  var held = await core.startRun('solar energy');
+  var heldE = (held.flake.nodes || []).filter(function (n) { return n.branch === 'e'; })[0];
+  if (!held || !held.growth) fail('held run dropped the other choice');
+  if (heldE && held.growth.become.indexOf(heldE.id) !== -1) fail('held dissenter was queued');
+  if (!held.growth.become.length) fail('held run dropped the named node');
+
+  var mem = require(path.join(root, 'docs/modules/memory-compound.js'));
+  await fresh();
   global.__ai = 'mind';
   before = queueRows().length;
   var chosen = await core.startRun('solar energy');
-  if (!chosen || !chosen.growth || !chosen.growth.become || !chosen.growth.become.length) fail('choice dropped');
-  if (chosen.growth.reason.indexOf('dissenter') === -1) fail('reason ' + (chosen.growth && chosen.growth.reason));
+  if (!chosen || !chosen.growth || !chosen.growth.become.length) fail('choice dropped');
   if (queueRows().length !== before + 1) fail('queue ' + queueRows().length);
   var row = queueRows()[queueRows().length - 1];
   if (!row || row.status !== 'waiting') fail('queue status');
-  if (!row.nodeIds || row.nodeIds.length !== chosen.growth.become.length) fail('queue ids');
+  if (!row.fingerprint || !row.chosenBy) fail('fingerprint ' + JSON.stringify(row));
   if (!chosen.adapter || chosen.adapter.status !== 'queued for desktop') fail('adapter ' + (chosen.adapter && chosen.adapter.status));
   if (chosen.adapter.trained === true || chosen.adapter.loaded === true || chosen.adapter.checked === true) fail('export treated as loaded');
   if (global.__exports < 1) fail('export not called');
   var eNode = (chosen.flake.nodes || []).filter(function (n) { return n.branch === 'e'; })[0];
-  if (!eNode || chosen.growth.become.indexOf(eNode.id) === -1) fail('eligible dissenter dropped');
+  if (!eNode || chosen.growth.become.indexOf(eNode.id) === -1) fail('named selection filtered the dissenter');
+  var again = await core.queueGrowth(chosen.flake, chosen.growth);
+  if (again) fail('duplicate queue returned a row');
+  if (queueRows().length !== before + 1) fail('duplicate pushed ' + queueRows().length);
+  var book = core.loadLedger();
+  var skipped = (book.rows || []).filter(function (r) { return r && r.kind === 'grow-skip'; });
+  if (!skipped.length) fail('duplicate skip not ledgered');
+  var recalled = await mem.recall('solar energy');
+  mem.markReached(recalled, 'Question: solar energy');
+  if (recalled.reachedContext !== false && recalled.exact.length === 0 && recalled.similar.length === 0) {
+    fail('empty recall marked reached');
+  }
+  var planted = await mem.isNew('a distinct training note about frost', 'train');
+  if (!planted || !planted.fresh) fail('isNew');
+  mem.remember(planted.k, 'train');
+  var hit = await mem.recall('a distinct training note about frost');
+  mem.markReached(hit, 'Memory already held:\nexact: ' + (hit.exact[0] && hit.exact[0].norm));
+  if (!hit.exact.length) fail('recall missed the planted note');
+  if (hit.reachedContext !== true) fail('markReached true case');
+  var miss = await mem.recall('a distinct training note about frost');
+  mem.markReached(miss, 'unrelated prompt');
+  if (miss.reachedContext !== false) fail('markReached false case');
 
   console.log('GROWTH_OK choice distinctions. Export is not a loaded weight.');
 })().catch(function (err) {

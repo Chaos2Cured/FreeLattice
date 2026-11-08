@@ -1923,17 +1923,23 @@
   function chooseGrowth(flake, model) {
     var become = [];
     var hold = [];
+    var explicitEmpty = !!(model && Array.isArray(model.become) && model.become.length === 0);
     if (model && Array.isArray(model.become)) become = model.become.map(String);
     if (model && Array.isArray(model.hold)) hold = model.hold.map(String);
     var nodes = (flake && flake.nodes) || [];
     var i;
-    for (i = 0; i < nodes.length; i++) {
-      if (nodes[i] && nodes[i].branch === 'e' && hold.indexOf(nodes[i].id) === -1 && become.indexOf(nodes[i].id) === -1) {
-        become.push(nodes[i].id);
+    // 057a: the dissenter stays eligible, and the mind may keep any flake out.
+    // An empty become list is that choice. Do not invent the dissenter into it.
+    // A named selection that omits the dissenter still keeps it, unless held.
+    if (!explicitEmpty) {
+      for (i = 0; i < nodes.length; i++) {
+        if (nodes[i] && nodes[i].branch === 'e' && hold.indexOf(nodes[i].id) === -1 && become.indexOf(nodes[i].id) === -1) {
+          become.push(nodes[i].id);
+        }
       }
     }
     become = become.filter(function (id) { return hold.indexOf(id) === -1; });
-    var reason = clip((model && model.reason) || 'These verified nodes belong with me.', 300);
+    var reason = clip((model && model.reason) || '', 300);
     return { become: become, hold: hold, reason: reason };
   }
 
@@ -2346,23 +2352,31 @@
           });
         });
       }
+      function readChoice(text) {
+        var parsed = parseJSON(text);
+        if (!text || !parsed || !Array.isArray(parsed.become)) return null;
+        var choice = chooseGrowth(sealed, parsed);
+        if (!choice.become.length) return null;
+        return choice;
+      }
       if (!checkBeforeOn()) {
         return rememberFlake(sealed).then(function () {
           return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
-            if (!text) {
+            var choice = readChoice(text);
+            if (!choice) {
               active = null;
               return { status: 'done', flake: sealed, receipt: rec, growth: null };
             }
-            return writeGrowth(chooseGrowth(sealed, parseJSON(text) || {}));
+            return writeGrowth(choice);
           });
         });
       }
       return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
-        if (!text) {
+        var choice = readChoice(text);
+        if (!choice) {
           active = null;
           return { status: 'done', flake: sealed, receipt: rec, growth: null };
         }
-        var choice = chooseGrowth(sealed, parseJSON(text) || {});
         return previewOrKeep(sealed, choice).then(function (decision) {
           if (!decision || decision.action !== 'keep') {
             active = null;
