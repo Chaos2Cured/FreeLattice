@@ -151,6 +151,7 @@
     hunchEl.id = 'flSnowflakeHunch';
     statusEl = el('p', 'fl-snow-status', '');
     statusEl.id = 'flSnowflakeStatus';
+    statusEl.setAttribute('aria-live', 'polite');
     searchNote = el('p', 'fl-snow-search', '');
     searchNote.id = 'flSnowflakeSearchNote';
     searchNote.hidden = true;
@@ -485,6 +486,10 @@
     var mind = node.mind || {};
     card.appendChild(el('p', '', 'Mind ' + (mind.name || '') + ' ' + (mind.fp || node.mindFp || '')));
     card.appendChild(el('p', '', 'Confidence ' + confidenceWords(node)));
+    if (node.via) card.appendChild(el('p', '', 'Helper ' + node.via));
+    if (node.confidence !== 'known' && node.confidence !== 'source-with-motive') {
+      card.appendChild(el('p', '', 'Signed bytes are not a claim that this is known.'));
+    }
     var verify = el('p', 'fl-snow-verify', 'unverified');
     verify.id = 'flSnowflakeCardVerify';
     card.appendChild(verify);

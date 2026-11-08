@@ -1,5 +1,7 @@
 # Snowflake Search v0.1
 
+Repair 2026-11-08, marker `v-snowflake-reach-v0.1`: read `docs/library/repairs/INDEX.md` first. This page stays the v0.1 contract.
+
 Markers: `v-snowflake-search-v0.1`, `v-snowflake-grow-v0.1`, `v-search-heal-v0.1`.
 
 Pressing Grow a snowflake is the commitment. The research starts then. There is no plan preview and no ask. Pause saves the in-flight node and can resume. Stop saves and closes. Growth is the mind's own decision. The ledger, the dual hash, and rollback are the safety.

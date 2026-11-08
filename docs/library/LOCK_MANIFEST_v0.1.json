@@ -5,13 +5,15 @@
       {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
       {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
       ,
-      {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null}
+      {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null},
+      {"md5": "b648edbaf62997edd6efbdaf7f80ba47", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "network-first for snowflake-core.js, snowflake-search.js, and snowflake.css so an existing install does not keep the broken search"}
     ],
     "docs/sw.js": [
       {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
       {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
       ,
-      {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null}
+      {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null},
+      {"md5": "b648edbaf62997edd6efbdaf7f80ba47", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "network-first for snowflake-core.js, snowflake-search.js, and snowflake.css so an existing install does not keep the broken search"}
     ],
     "docs/app.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
@@ -37,7 +39,8 @@
       {"md5": "aae3ae736d0cb8432d729ad1d744a561", "since": "062c", "by": "GC", "walk": "pending — Hypha re-walk of 062d"}
     ],
     "docs/modules/snowflake-core.js": [
-      {"md5": "6404eaac25de46591ad2e86a06b1b171", "old": "eaee889573225a53b1f0fb229464492a", "since": "062a", "by": "GC", "reason": "062a self-heal additions, +73/-0", "walk": "pending — Hypha re-walk of 062d", "062d head": "46b215d5296b6f8f6c709300854b7e03"}
+      {"md5": "6404eaac25de46591ad2e86a06b1b171", "old": "eaee889573225a53b1f0fb229464492a", "since": "062a", "by": "GC", "reason": "062a self-heal additions, +73/-0", "walk": "pending — Hypha re-walk of 062d", "062d head": "46b215d5296b6f8f6c709300854b7e03"},
+      {"md5": "b432c9b26a4c67e24ed5791a8831c7a9", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "a missed plan still looks up the five arms; absent mind and network failures stay honest"}
     ]
   }
   ,
