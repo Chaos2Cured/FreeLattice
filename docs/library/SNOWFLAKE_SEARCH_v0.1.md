@@ -31,7 +31,7 @@ The floor is five. The mind may add more, up to 8.
 - (b) The craft. Azure, `var(--blue-sky)`.
 - (c) Hidden connections. Lavender threads, `var(--lavender)`.
 - (d) hunch. The label stays hunch, including on a later pass. Warm gold, `var(--gold)`.
-- (e) dissenter. A distinct prompt: "You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it." Same arm length as the others. Never dropped from the floor, from replay, or from growth selection unless the mind explicitly holds that node back.
+- (e) dissenter. A distinct prompt: "You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it." Same arm length as the others. Never dropped from the floor or from replay. Growth includes that node only when the mind lists its id.
 - Arm 6 is a dashed gold outline, "Looking for its challenge". That is the open question.
 
 A plan that omits (e) still gets (e).
