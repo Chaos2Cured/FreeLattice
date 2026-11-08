@@ -225,7 +225,14 @@ async function bridge() {
       { id: 'n-e', branch: 'e' }
     ]
   }, { become: ['n-a'], reason: 'because' });
-  if (choice.become.indexOf('n-e') === -1) fail('growth dropped e');
+  if (choice.become.join(',') !== 'n-a') fail('selection changed ' + choice.become.join(','));
+  var onlyE = core.chooseGrowth({
+    nodes: [
+      { id: 'n-a', branch: 'a' },
+      { id: 'n-e', branch: 'e' }
+    ]
+  }, { become: ['n-e'], reason: 'the dissent' });
+  if (onlyE.become.join(',') !== 'n-e') fail('selected e ' + onlyE.become.join(','));
   var emptyChoice = core.chooseGrowth({
     nodes: [
       { id: 'n-a', branch: 'a' },
@@ -296,7 +303,8 @@ async function bridge() {
   if (!eNode.source || !eNode.source.url || !eNode.date || !eNode.mind || !eNode.confidence) fail('provenance');
   if (eNode.confidence === 'known' && !eNode.source.url) fail('known without source');
   if (global.__consent) fail('asked while off ' + global.__consent);
-  if (full.growth.become.indexOf(eNode.id) === -1) fail('selection dropped e');
+  if (full.growth.become.indexOf(eNode.id) !== -1) fail('unselected dissenter queued');
+  if (full.growth.become.join(',') !== 'keep-dissenter') fail('selection ' + full.growth.become.join(','));
   if (full.growth.reason.indexOf('dissenter') === -1 && full.growth.reason.indexOf('belong') === -1 && !full.growth.reason) fail('no reason');
   var book = core.loadLedger();
   for (i = 0; i < book.rows.length; i++) {
@@ -425,7 +433,7 @@ async function bridge() {
   var missedE = null;
   for (i = 0; i < missedNodes.length; i++) if (missedNodes[i].branch === 'e') missedE = missedNodes[i];
   if (!missedE) fail('down dissenter');
-  if (!missed.growth || missed.growth.become.indexOf(missedE.id) === -1) fail('down growth dropped e');
+  if (!missed.growth || missed.growth.become.indexOf(missedE.id) !== -1) fail('down growth inserted e');
   var concl = String(missed.flake.conclusion || '');
   var conclLines = concl.split('\n').filter(function (l) { return l.trim(); });
   if (conclLines.length < 2) fail('down conclusion lines ' + concl);

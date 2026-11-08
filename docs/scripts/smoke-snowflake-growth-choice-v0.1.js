@@ -121,14 +121,34 @@ global.FreeLattice = {
       return;
     }
     if (system.indexOf('Choose which') !== -1) {
-      opts.callback(JSON.stringify({ become: ['keep-dissenter'], hold: [], reason: 'The dissenter stays eligible with this selection.' }), null);
+      var src = String(user || '');
+      var a0 = src.indexOf('[');
+      var b0 = src.lastIndexOf(']');
+      var list = [];
+      if (a0 >= 0 && b0 > a0) {
+        try { list = JSON.parse(src.slice(a0, b0 + 1)); } catch (eList) { list = []; }
+      }
+      if (!Array.isArray(list)) list = [];
+      var picked = '';
+      var onlyE = '';
+      var j;
+      for (j = 0; j < list.length; j++) {
+        if (list[j] && list[j].branch === 'a' && !picked) picked = list[j].id;
+        if (list[j] && list[j].branch === 'e') onlyE = list[j].id;
+      }
+      if (global.__ai === 'only-e') {
+        opts.callback(JSON.stringify({ become: onlyE ? [onlyE] : [], hold: [], reason: 'Only the dissenter.' }), null);
+        return;
+      }
+      opts.callback(JSON.stringify({ become: picked ? [picked] : [], hold: [], reason: 'Only the selected finding.' }), null);
       return;
     }
     opts.callback(JSON.stringify({ text: 'A sourced note.', confidence: 'known' }), null);
   }
 };
+global.__examples = [];
 global.GardenTrainer = {
-  exportJSONL: function () { global.__exports += 1; return 1; },
+  exportJSONL: function (rows) { global.__examples = rows || []; global.__exports += 1; return (rows || []).length; },
   exportPythonHelper: function () { global.__exports += 1; return 1; }
 };
 global.KnowledgeCore = { store: function () { return Promise.resolve(true); } };
@@ -147,6 +167,7 @@ function fresh() {
   global.__sent = [];
   global.__prompts = [];
   global.__exports = 0;
+  global.__examples = [];
   global.__askFirst = false;
   global.__consentYes = true;
   global.__consent = 0;
@@ -225,7 +246,13 @@ function fresh() {
   if (chosen.adapter.trained === true || chosen.adapter.loaded === true || chosen.adapter.checked === true) fail('export treated as loaded');
   if (global.__exports < 1) fail('export not called');
   var eNode = (chosen.flake.nodes || []).filter(function (n) { return n.branch === 'e'; })[0];
-  if (!eNode || chosen.growth.become.indexOf(eNode.id) === -1) fail('named selection filtered the dissenter');
+  var aNode = (chosen.flake.nodes || []).filter(function (n) { return n.branch === 'a'; })[0];
+  if (!aNode || chosen.growth.become.join(',') !== aNode.id) fail('A-only selection ' + (chosen.growth && chosen.growth.become.join(',')));
+  if (eNode && chosen.growth.become.indexOf(eNode.id) !== -1) fail('A-only inserted e');
+  var ex;
+  for (ex = 0; ex < global.__examples.length; ex++) {
+    if (String(global.__examples[ex].prompt || '').indexOf('e ') === 0) fail('export included unselected e');
+  }
   var again = await core.queueGrowth(chosen.flake, chosen.growth);
   if (again) fail('duplicate queue returned a row');
   if (queueRows().length !== before + 1) fail('duplicate pushed ' + queueRows().length);
@@ -247,6 +274,16 @@ function fresh() {
   var miss = await mem.recall('a distinct training note about frost');
   mem.markReached(miss, 'unrelated prompt');
   if (miss.reachedContext !== false) fail('markReached false case');
+  if (chosen.receipt.text.indexOf('Memory in context: no.') === -1) fail('context receipt ' + chosen.receipt.text);
+  if (chosen.receipt.text.indexOf('reached the context: no.') === -1) fail('recall receipt ' + chosen.receipt.text);
+
+  await fresh();
+  global.__ai = 'only-e';
+  var only = await core.startRun('solar energy');
+  var onlyE = (only.flake.nodes || []).filter(function (n) { return n.branch === 'e'; })[0];
+  var onlyA = (only.flake.nodes || []).filter(function (n) { return n.branch === 'a'; })[0];
+  if (!only || !only.growth || !onlyE || only.growth.become.join(',') !== onlyE.id) fail('selected e ' + (only.growth && only.growth.become.join(',')));
+  if (onlyA && only.growth.become.indexOf(onlyA.id) !== -1) fail('selected e inserted a');
 
   console.log('GROWTH_OK choice distinctions. Export is not a loaded weight.');
 })().catch(function (err) {

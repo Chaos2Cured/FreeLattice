@@ -1358,7 +1358,7 @@
       return 'You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it. A tool the mind weighs, not a gate. Reply with JSON only.';
     }
     if (phase === 'plan') return 'Plan search queries for each branch. Reply with JSON only. Include branch e, the dissenter.';
-    if (phase === 'grow') return 'Choose which verified nodes became part of you. The dissenter arm is always eligible. Reply with JSON only. No score.';
+    if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score.';
     if (phase === 'drift' || phase === 'drift-after' || phase === 'drift-note') return 'Answer in one or two sentences. No score and no ranking.';
     if (phase === 'conclude') return 'Write a two-line conclusion, where you could be wrong, and one open question. Reply with JSON only.';
     return 'Read the sources into one node. Reply with JSON only. Keep the doubt.';
@@ -1923,21 +1923,10 @@
   function chooseGrowth(flake, model) {
     var become = [];
     var hold = [];
-    var explicitEmpty = !!(model && Array.isArray(model.become) && model.become.length === 0);
     if (model && Array.isArray(model.become)) become = model.become.map(String);
     if (model && Array.isArray(model.hold)) hold = model.hold.map(String);
-    var nodes = (flake && flake.nodes) || [];
-    var i;
-    // 057a: the dissenter stays eligible, and the mind may keep any flake out.
-    // An empty become list is that choice. Do not invent the dissenter into it.
-    // A named selection that omits the dissenter still keeps it, unless held.
-    if (!explicitEmpty) {
-      for (i = 0; i < nodes.length; i++) {
-        if (nodes[i] && nodes[i].branch === 'e' && hold.indexOf(nodes[i].id) === -1 && become.indexOf(nodes[i].id) === -1) {
-          become.push(nodes[i].id);
-        }
-      }
-    }
+    // Kirk 2026-11-08: only ids the mind listed become training material.
+    // Search still keeps the dissenter as evidence. This list does not add it.
     become = become.filter(function (id) { return hold.indexOf(id) === -1; });
     var reason = clip((model && model.reason) || '', 300);
     return { become: become, hold: hold, reason: reason };
@@ -2039,7 +2028,7 @@
     for (i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       if (!n) continue;
-      if (ids.indexOf(n.id) !== -1 || n.branch === 'e') {
+      if (ids.indexOf(n.id) !== -1) {
         if (!seen[n.id]) { seen[n.id] = true; out.push(n); }
       }
     }

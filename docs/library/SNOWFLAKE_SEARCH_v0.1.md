@@ -99,7 +99,7 @@ mindHash  = SHA-256(canonical seal body + "|" + mindFp)
 
 ## Growth and rollback
 
-After a finished run the mind chooses, with no human prompt. Dissenter nodes stay eligible. Chosen ids go to the training queue. When the device is charging and idle, the mind calls GardenTrainer's public export of the training set and the LoRA script. The browser does not change weights. The ledger says "queued for desktop". `garden-trainer.js` is not edited.
+After a finished run the mind chooses, with no human prompt. Only ids it lists become training material. The dissenter stays a search branch and a place to verify. It is not inserted into the training list. Kirk, 2026-11-08, overrides the older reading that a selection must include the dissenter. Chosen ids go to the training queue. When the device is charging and idle, the mind calls GardenTrainer's public export of the training set and the LoRA script. The browser does not change weights. The ledger says "queued for desktop". `garden-trainer.js` is not edited.
 
 Each adapter is v1, v2, and so on, with sha8 of the flake ids, sha8 of the base model name, mind fp, time, and psi. Roll back to vN appends a row. It does not delete. Six fixed challenge prompts are answered before and after. The note is words, never a score.
 
