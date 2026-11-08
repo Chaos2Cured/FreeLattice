@@ -1658,8 +1658,8 @@
       var user = 'Branch ' + job.branch + ' ' + (job.name || '') + '\nQuery: ' + job.query + '\nSources: ' + JSON.stringify((res && res.items) || []) + '\n' + (job.prompt || '');
       if (res && res.via) user += '\nHelper: ' + clip(res.via, 80) + (/duckduckgo|wikipedia/i.test(res.via) ? ' (reference answers, not live news)' : '');
       if (page && page.depth === 'page' && page.text) user += '\nPage: ' + clip(page.text, 1500);
-      // v-snowflake-reach-v0.1: memory text is not copied into this prompt.
-      active.memoryInContext = false;
+      // v-snowflake-reach-v0.1: this branch prompt does not copy memory text.
+      // A plan prompt may already have set memoryInContext from FLMemory.recall.
       var phase = job.branch === 'e' ? 'dissent' : 'read';
       return ask(phase, user).then(function (text) {
         if (!active) return 'ok';
@@ -1797,6 +1797,7 @@
     var guessedN = (state.guessed || []).length;
     if (guessedN) text += ' Guessed arms: ' + guessedN + '.';
     text += ' ' + (state.memoryInContext ? LINES.memoryYes : LINES.memoryNo);
+    if (state.memoryLine) text += ' ' + state.memoryLine;
     text += ' ' + LINES.seal;
     return { calls: state.calls, fetches: state.fetches, failedFetches: failed, ms: ms, caps: (state.caps || []).slice(), branches: ids, text: text, failures: fails };
   }
@@ -2348,11 +2349,19 @@
       if (!checkBeforeOn()) {
         return rememberFlake(sealed).then(function () {
           return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
+            if (!text) {
+              active = null;
+              return { status: 'done', flake: sealed, receipt: rec, growth: null };
+            }
             return writeGrowth(chooseGrowth(sealed, parseJSON(text) || {}));
           });
         });
       }
       return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
+        if (!text) {
+          active = null;
+          return { status: 'done', flake: sealed, receipt: rec, growth: null };
+        }
         var choice = chooseGrowth(sealed, parseJSON(text) || {});
         return previewOrKeep(sealed, choice).then(function (decision) {
           if (!decision || decision.action !== 'keep') {
@@ -2397,6 +2406,31 @@
     var arr = runsThisHour();
     arr.push(Date.now());
     try { ls().setItem(LS_RUNS, JSON.stringify(arr)); } catch (e) {}
+  }
+
+  function memorySentence(report) {
+    var exact = (report && report.exact) ? report.exact.length : 0;
+    var similar = (report && report.similar) ? report.similar.length : 0;
+    var reached = report && report.reachedContext ? 'yes' : 'no';
+    return 'Memory: ' + exact + ' exact, ' + similar + ' similar, reached the context: ' + reached + '.';
+  }
+
+  function planUser(q, report) {
+    var base = 'Question: ' + q + '\nReply JSON with hunch and branches a through e. Branch e is the dissenter and is required.';
+    if (!report) return base;
+    var lines = [];
+    var i;
+    var row;
+    for (i = 0; i < (report.exact || []).length; i++) {
+      row = report.exact[i];
+      if (row && row.norm) lines.push('exact: ' + row.norm);
+    }
+    for (i = 0; i < (report.similar || []).length; i++) {
+      row = report.similar[i];
+      if (row && row.norm) lines.push('similar: ' + row.norm);
+    }
+    if (!lines.length) return base;
+    return base + '\nMemory already held:\n' + lines.join('\n');
   }
 
   function startRun(question, opts) {
@@ -2454,7 +2488,19 @@
       started: Date.now()
     };
     emit('Began', { flakeId: active.flakeId, question: q });
-    return ask('plan', 'Question: ' + q + '\nReply JSON with hunch and branches a through e. Branch e is the dissenter and is required.').then(function (text) {
+    // v-read-path-v0.1: recall before the plan. A missed plan still looks up sources.
+    var memApi = root.FLMemory;
+    var pending = (memApi && typeof memApi.recall === 'function') ? memApi.recall(q) : Promise.resolve(null);
+    return pending.then(function (report) {
+      if (!active) return null;
+      var prompt = planUser(q, report);
+      if (report && memApi && typeof memApi.markReached === 'function') {
+        try { memApi.markReached(report, prompt); } catch (eMem) {}
+        active.memoryLine = memorySentence(report);
+        active.memoryInContext = !!report.reachedContext;
+      }
+      return ask('plan', prompt);
+    }).then(function (text) {
       if (!active) return null;
       var plan = parseJSON(text) || {};
       if (text) {

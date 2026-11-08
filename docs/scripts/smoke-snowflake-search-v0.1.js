@@ -239,11 +239,13 @@ function contrastSource() {
     // before 063a: if (menu.ids[menu.ids.length - 1] !== 'flSnowflakeAdd') fail('row order ' + menu.ids.join(','));
     // before 063a: if (menu.ids[menu.ids.length - 2] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
     if (menu.ids[menu.ids.length - 1] !== 'flHearthAdd') fail('row order ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 2] !== 'flSnowflakeAdd') fail('not after snowflake ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 3] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
+    // before v-chat-roundtable-button-v0.1: Snowflake sat directly before Hearth
+    if (menu.ids[menu.ids.length - 2] !== 'flRoundTableAdd') fail('round table row ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 3] !== 'flSnowflakeAdd') fail('not after snowflake ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 4] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
     if (menu.ids.filter(function (id) { return id === 'flSnowflakeAdd'; }).length !== 1) fail('row count');
     // before 063a: var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd'];
-    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flHearthAdd'];
+    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flRoundTableAdd', 'flHearthAdd'];
     menu.ids.forEach(function (id) {
       if (known.indexOf(id) === -1) fail('unexpected row ' + id);
     });

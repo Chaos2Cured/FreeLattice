@@ -53,7 +53,8 @@ function sha(text) {
 
   var locks = {
     // before 068m: 'docs/modules/snowflake-search.js': '7b5dd9c332d12b3f28d3615256688477',
-    'docs/modules/snowflake-search.js': 'b52780ed553a15baa94ed30b2a0f9b89',
+    // before v-chat-roundtable-button-v0.1: 'docs/modules/snowflake-search.js': 'b52780ed553a15baa94ed30b2a0f9b89',
+    'docs/modules/snowflake-search.js': '607a99d6bc943a3e5abbd6dccd5fd8cf',
     // before 062c: 'docs/modules/snowflake-core.js': 'eaee889573225a53b1f0fb229464492a',
     // before 062d: 'docs/modules/snowflake-core.js': '6404eaac25de46591ad2e86a06b1b171',
     // before 068m: 'docs/modules/snowflake-core.js': '46b215d5296b6f8f6c709300854b7e03',
