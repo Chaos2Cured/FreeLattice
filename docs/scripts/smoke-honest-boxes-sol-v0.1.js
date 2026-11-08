@@ -133,7 +133,7 @@ function stubAI() {
       var text = JSON.stringify({ text: body.text, confidence: 'known', url: 'https://example.invalid/note', title: 'A note' });
       if (system.indexOf('Plan search') !== -1) text = JSON.stringify(body);
       else if (system.indexOf('two-line') !== -1) text = JSON.stringify({ conclusion: body.conclusion, wrong: body.wrong, open: body.open });
-      else if (system.indexOf('Choose which') !== -1) text = JSON.stringify({ become: [], hold: [], reason: body.reason });
+      else if (system.indexOf('Choose which') !== -1) text = JSON.stringify({ become: ['keep-dissenter'], hold: [], reason: body.reason });
       else if (system.indexOf('score') !== -1 || system.indexOf('one or two') !== -1) text = 'I am the same mind, a little more careful.';
       if (opts && typeof opts.callback === 'function') opts.callback(text, null);
     }

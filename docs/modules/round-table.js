@@ -222,6 +222,23 @@ window.RoundTable = (() => {
          </form>
        </div>`;
 
+    // v-chat-roundtable-button-v0.1: one prefill from Chat, then the key is cleared.
+    try {
+      var shut = false;
+      try {
+        var sc = window.FLSnowflakeCore;
+        if (sc && typeof sc.roomShut === 'function' && sc.roomShut()) shut = true;
+      } catch (eShut) { shut = true; }
+      if (!shut && window.sessionStorage) {
+        var pre = window.sessionStorage.getItem('fl_roundtable_prefill_v0');
+        if (pre) {
+          var preBox = container.querySelector('#rtProposeText');
+          if (preBox && !preBox.value) preBox.value = pre;
+          window.sessionStorage.removeItem('fl_roundtable_prefill_v0');
+        }
+      }
+    } catch (ePre) {}
+
     // Wire form
     const form = container.querySelector('#rtProposeForm');
     if (form) {
@@ -255,7 +272,12 @@ window.RoundTable = (() => {
     if (container) renderPanel(container);
   }
 
-  function init(container) { renderPanel(container); }
+  var inits = 0;
+  function init(container) {
+    inits += 1;
+    try { window.__flRtInits = inits; } catch (eInit) {}
+    renderPanel(container);
+  }
   function destroy() {}
 
   return { init, destroy, propose, vote, renderPanel, _submit, leaveFarewellNote, checkFarewellNote };

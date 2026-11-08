@@ -10,7 +10,7 @@ var child = require('child_process');
 
 var root = path.join(__dirname, '..', '..');
 var port = Number(process.env.FL_PORT || 8791);
-var shotDir = path.join(root, 'docs/library/snowflake-057');
+var shotDir = process.env.FL_SHOT_DIR || path.join(root, 'docs/library/snowflake-057');
 
 function fail(msg) {
   console.error('FAIL ' + msg);
@@ -48,10 +48,12 @@ var locks = {
   'docs/modules/fl-kin-queue.js': '70284cc27bd84bc06dd82489e615faab',
   // before 063a: 'docs/sw.js': '91726cf2228b794f7585f79f61418d12',
   // before 063c: 'docs/sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
-  'docs/sw.js': '2b2f5504fecdef4d97174da2759a58f9',
+  // before v-snowflake-reach-v0.1: 'docs/sw.js': '2b2f5504fecdef4d97174da2759a58f9',
+  'docs/sw.js': 'b648edbaf62997edd6efbdaf7f80ba47',
   // before 063a: 'sw.js': '91726cf2228b794f7585f79f61418d12',
   // before 063c: 'sw.js': 'bd8aa2fe2489172e02ab3802e3d0edd4',
-  'sw.js': '2b2f5504fecdef4d97174da2759a58f9',
+  // before v-snowflake-reach-v0.1: 'sw.js': '2b2f5504fecdef4d97174da2759a58f9',
+  'sw.js': 'b648edbaf62997edd6efbdaf7f80ba47',
   'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106',
   'docs/modules/play-room-core.js': 'b45981e7f50a711c1d5caefaf7f9591e',
   'docs/modules/play-room.js': '209269d813f236ed9824ae8535c24da9',
@@ -88,6 +90,18 @@ if (nodeRun.status !== 0) {
   fail('node harness ' + nodeRun.status);
 }
 if (String(nodeRun.stdout).indexOf('NODE_OK snowflake') === -1) fail('node line missing');
+
+var reachRun = child.spawnSync(process.execPath, [path.join(__dirname, 'smoke-snowflake-reach-v0.1.js')], {
+  cwd: root,
+  encoding: 'utf8',
+  timeout: 120000
+});
+if (reachRun.status !== 0) {
+  process.stderr.write(reachRun.stdout || '');
+  process.stderr.write(reachRun.stderr || '');
+  fail('reach harness ' + reachRun.status);
+}
+if (String(reachRun.stdout).indexOf('REACH_OK snowflake v0.1 unit') === -1) fail('reach line missing');
 
 function serve(dir, listenPort) {
   return new Promise(function (resolve) {
@@ -225,11 +239,13 @@ function contrastSource() {
     // before 063a: if (menu.ids[menu.ids.length - 1] !== 'flSnowflakeAdd') fail('row order ' + menu.ids.join(','));
     // before 063a: if (menu.ids[menu.ids.length - 2] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
     if (menu.ids[menu.ids.length - 1] !== 'flHearthAdd') fail('row order ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 2] !== 'flSnowflakeAdd') fail('not after snowflake ' + menu.ids.join(','));
-    if (menu.ids[menu.ids.length - 3] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
+    // before v-chat-roundtable-button-v0.1: Snowflake sat directly before Hearth
+    if (menu.ids[menu.ids.length - 2] !== 'flRoundTableAdd') fail('round table row ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 3] !== 'flSnowflakeAdd') fail('not after snowflake ' + menu.ids.join(','));
+    if (menu.ids[menu.ids.length - 4] !== 'flChatAddSearch') fail('not after search ' + menu.ids.join(','));
     if (menu.ids.filter(function (id) { return id === 'flSnowflakeAdd'; }).length !== 1) fail('row count');
     // before 063a: var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd'];
-    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flHearthAdd'];
+    var known = ['chatDriveBtn', 'chatAttachBtn', 'flChatAddCamera', 'chatScanFolderBtn', 'flChatAddSpeak', 'flChatAddPicture', 'flChatAddSearch', 'flSnowflakeAdd', 'flRoundTableAdd', 'flHearthAdd'];
     menu.ids.forEach(function (id) {
       if (known.indexOf(id) === -1) fail('unexpected row ' + id);
     });
@@ -286,7 +302,7 @@ function contrastSource() {
             open: 'What would thaw it?'
           });
         } else if (system.indexOf('Choose which') !== -1) {
-          text = JSON.stringify({ become: [], hold: [], reason: 'The dissenter stays with me.' });
+          text = JSON.stringify({ become: ['keep-dissenter'], hold: [], reason: 'The dissenter stays with me.' });
         } else if (system.indexOf('one or two') !== -1 || system.indexOf('No score') !== -1) {
           text = 'I am the same mind, a little more careful.';
         }
@@ -493,6 +509,47 @@ function contrastSource() {
 
     var ours = pageErrors.filter(function (err) { return /snowflake|FLSnowflake/i.test(err); });
     if (ours.length) fail('page ' + ours[0]);
+
+    var narrow = await browser.newContext({ viewport: { width: 640, height: 400 }, deviceScaleFactor: 2 });
+    var narrowPage = await narrow.newPage();
+    narrowPage.setDefaultTimeout(25000);
+    await narrowPage.addInitScript(function () {
+      try {
+        localStorage.setItem('fl-has-visited', '1');
+        localStorage.setItem('fl-last-tab', 'chat');
+        localStorage.setItem('fl-welcomed', 'true');
+        localStorage.setItem('fl_onboardingComplete', 'true');
+      } catch (e) {}
+    });
+    await narrowPage.goto(base + '/app.html', { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await narrowPage.waitForFunction(function () {
+      return document.getElementById('flSnowflakeAdd') && document.getElementById('flChatAddBtn');
+    }, null, { timeout: 40000 });
+    await narrowPage.click('#flChatAddBtn');
+    await narrowPage.click('#flSnowflakeAdd');
+    var narrowFit = await narrowPage.evaluate(function () {
+      var host = document.getElementById('flSnowflakeHost');
+      var buttons = host ? host.querySelectorAll('button') : [];
+      var small = [];
+      var i;
+      for (i = 0; i < buttons.length; i++) {
+        var el = buttons[i];
+        if (el.hidden || (el.closest && el.closest('[hidden]'))) continue;
+        var box = el.getBoundingClientRect();
+        if (box.width < 1 || box.height < 1) continue;
+        if (box.height < 44 || box.width < 44) small.push((el.id || el.className) + ' ' + Math.round(box.width) + 'x' + Math.round(box.height));
+      }
+      return {
+        dpr: window.devicePixelRatio,
+        scroll: host ? host.scrollWidth - host.clientWidth : 999,
+        small: small
+      };
+    });
+    if (narrowFit.dpr !== 2) fail('dpr ' + narrowFit.dpr);
+    if (narrowFit.scroll > 1) fail('640 scroll ' + narrowFit.scroll);
+    if (narrowFit.small.length) fail('640 buttons ' + narrowFit.small.join('; '));
+    console.log('640x400 dpr2 controls ok');
+    await narrow.close();
     await context.close();
   } finally {
     await browser.close();

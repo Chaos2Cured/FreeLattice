@@ -126,12 +126,55 @@
     return button;
   }
 
+  // v-chat-roundtable-button-v0.1: opens the existing Round Table. No new council.
+  function placeRoundTable(menu, d) {
+    if (!menu || !d) return;
+    var snow = menu.querySelector('#flSnowflakeAdd');
+    var b = menu.querySelector('#flRoundTableAdd');
+    if (!b) {
+      b = d.createElement('button');
+      b.type = 'button';
+      b.id = 'flRoundTableAdd';
+      b.className = 'fl-add-item';
+      b.setAttribute('data-marker', 'v-chat-roundtable-button-v0.1');
+      b.setAttribute('aria-label', 'Round Table');
+      var copy = d.createElement('span');
+      copy.className = 'fl-add-copy';
+      var w = d.createElement('span');
+      w.className = 'fl-add-word';
+      w.textContent = 'Round Table';
+      copy.appendChild(w);
+      b.appendChild(copy);
+      b.addEventListener('click', function () {
+        if (core && typeof core.roomShut === 'function' && core.roomShut()) return;
+        if (root.FLChatBottom && typeof root.FLChatBottom.close === 'function') {
+          try { root.FLChatBottom.close(); } catch (eClose) {}
+        }
+        var inputBox = d.getElementById('chatInput');
+        var q = inputBox && inputBox.value ? String(inputBox.value).trim() : '';
+        if (typeof root.switchTab === 'function') root.switchTab('round-table');
+        if (q) {
+          try { root.sessionStorage.setItem('fl_roundtable_prefill_v0', q); } catch (e) {}
+        }
+      });
+    }
+    if (snow && snow.parentNode === menu) {
+      if (snow.nextSibling !== b) {
+        if (snow.nextSibling) menu.insertBefore(b, snow.nextSibling);
+        else menu.appendChild(b);
+      }
+    } else if (b.parentNode !== menu) menu.appendChild(b);
+  }
+
   function watchMenu() {
     var d = doc();
     if (!d) return;
     function mount() {
       var menu = d.getElementById('flChatAddMenu');
-      if (menu) mountRow(menu);
+      if (menu) {
+        mountRow(menu);
+        placeRoundTable(menu, d);
+      }
     }
     mount();
     if (!d.body || typeof root.MutationObserver !== 'function') return;
@@ -151,6 +194,7 @@
     hunchEl.id = 'flSnowflakeHunch';
     statusEl = el('p', 'fl-snow-status', '');
     statusEl.id = 'flSnowflakeStatus';
+    statusEl.setAttribute('aria-live', 'polite');
     searchNote = el('p', 'fl-snow-search', '');
     searchNote.id = 'flSnowflakeSearchNote';
     searchNote.hidden = true;
@@ -485,6 +529,10 @@
     var mind = node.mind || {};
     card.appendChild(el('p', '', 'Mind ' + (mind.name || '') + ' ' + (mind.fp || node.mindFp || '')));
     card.appendChild(el('p', '', 'Confidence ' + confidenceWords(node)));
+    if (node.via) card.appendChild(el('p', '', 'Helper ' + node.via));
+    if (node.confidence !== 'known' && node.confidence !== 'source-with-motive') {
+      card.appendChild(el('p', '', 'Signed bytes are not a claim that this is known.'));
+    }
     var verify = el('p', 'fl-snow-verify', 'unverified');
     verify.id = 'flSnowflakeCardVerify';
     card.appendChild(verify);

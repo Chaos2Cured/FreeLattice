@@ -287,6 +287,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // v-snowflake-reach-v0.1: these files are cache-first once stored.
+  // Network-first so an existing install does not keep a broken search.
+  if (/\/modules\/snowflake-(core|search)\.js$/.test(url.pathname) || /\/css\/snowflake\.css$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   // Cache-first strategy for other app shell and same-origin resources
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

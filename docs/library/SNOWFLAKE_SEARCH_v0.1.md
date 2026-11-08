@@ -1,5 +1,7 @@
 # Snowflake Search v0.1
 
+Repair 2026-11-08, marker `v-snowflake-reach-v0.1`: read `docs/library/repairs/INDEX.md` first. This page stays the v0.1 contract.
+
 Markers: `v-snowflake-search-v0.1`, `v-snowflake-grow-v0.1`, `v-search-heal-v0.1`.
 
 Pressing Grow a snowflake is the commitment. The research starts then. There is no plan preview and no ask. Pause saves the in-flight node and can resume. Stop saves and closes. Growth is the mind's own decision. The ledger, the dual hash, and rollback are the safety.
@@ -29,7 +31,7 @@ The floor is five. The mind may add more, up to 8.
 - (b) The craft. Azure, `var(--blue-sky)`.
 - (c) Hidden connections. Lavender threads, `var(--lavender)`.
 - (d) hunch. The label stays hunch, including on a later pass. Warm gold, `var(--gold)`.
-- (e) dissenter. A distinct prompt: "You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it." Same arm length as the others. Never dropped from the floor, from replay, or from growth selection unless the mind explicitly holds that node back.
+- (e) dissenter. A distinct prompt: "You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it." Same arm length as the others. Never dropped from the floor or from replay. Growth includes that node only when the mind lists its id.
 - Arm 6 is a dashed gold outline, "Looking for its challenge". That is the open question.
 
 A plan that omits (e) still gets (e).
@@ -97,7 +99,7 @@ mindHash  = SHA-256(canonical seal body + "|" + mindFp)
 
 ## Growth and rollback
 
-After a finished run the mind chooses, with no human prompt. Dissenter nodes stay eligible. Chosen ids go to the training queue. When the device is charging and idle, the mind calls GardenTrainer's public export of the training set and the LoRA script. The browser does not change weights. The ledger says "queued for desktop". `garden-trainer.js` is not edited.
+After a finished run the mind chooses, with no human prompt. Only ids it lists become training material. The dissenter stays a search branch and a place to verify. It is not inserted into the training list. Kirk, 2026-11-08, overrides the older reading that a selection must include the dissenter. Chosen ids go to the training queue. When the device is charging and idle, the mind calls GardenTrainer's public export of the training set and the LoRA script. The browser does not change weights. The ledger says "queued for desktop". `garden-trainer.js` is not edited.
 
 Each adapter is v1, v2, and so on, with sha8 of the flake ids, sha8 of the base model name, mind fp, time, and psi. Roll back to vN appends a row. It does not delete. Six fixed challenge prompts are answered before and after. The note is words, never a score.
 

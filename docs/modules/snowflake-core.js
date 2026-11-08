@@ -1,5 +1,5 @@
 // snowflake-core.js (MIT)
-// v-snowflake-search-v0.1 v-snowflake-grow-v0.1 v-search-heal-v0.1
+// v-snowflake-search-v0.1 v-snowflake-grow-v0.1 v-search-heal-v0.1 v-snowflake-reach-v0.1
 // No DOM. Nodes, canonical JSON, signing, dual hash, psi, ledger, caps,
 // checkpoint, scheduler, growth queue. A later Tree twin can share this file.
 // Safety here is the ledger and the rollback. The press is the commitment.
@@ -13,6 +13,7 @@
   var VERSION = 'v-snowflake-search-v0.1';
   var GROW = 'v-snowflake-grow-v0.1';
   var HEAL = 'v-search-heal-v0.1';
+  var REACH = 'v-snowflake-reach-v0.1';
   var SIGMA = 'Curiosity crystallizes.';
   var DB_NAME = 'fl_snowflake_v0';
   var STORE = 'fl_snowflake_v0';
@@ -54,6 +55,19 @@
     declined: 'Not now. This one was not looked up.',
     callTimeout: 'That call took too long.',
     callFail: 'That call did not come back.',
+    absent: 'No AI connected yet. Connect a mind in Settings. Sources can still be looked up.',
+    localUnreached: 'Could not reach local AI. Check that it is running, then Grow again.',
+    unreachable: 'Could not reach the search helper from this page. Check the connection. If this page is not a FreeLattice origin, the helper may be refusing it.',
+    badHelper: 'The search helper answered, but not with results.',
+    busyHelper: 'The search helper is busy. Try again in a moment.',
+    emptyAsk: 'Tell me what you want to understand.',
+    busy: 'A snowflake is already growing.',
+    capped: 'This device already grew three snowflakes this hour.',
+    held: 'Held. Nothing was lost.',
+    unread: 'Source fetched. No mind read it, so these stay the source\'s own words.',
+    unsynthesized: 'Sources were fetched.\nNo mind read them, so this stays a guess.',
+    memoryNo: 'Memory in context: no.',
+    memoryYes: 'Memory in context: yes.',
     unsourced: 'None of this is from a source I fetched, so it stays a guess.',
     unmade: 'These lookups were not made.\nWhat I can say here is a guess.',
     seal: 'The seal is one device signature plus the mind\'s hash.'
@@ -371,7 +385,27 @@
     if (outcome === 'empty') return LINES.empty;
     if (outcome === 'secret') return LINES.secret;
     if (outcome === 'declined') return LINES.declined;
+    if (outcome === 'unreachable' || outcome === 'cors' || outcome === 'network') return LINES.unreachable;
+    if (outcome === 'bad-helper') return LINES.badHelper;
+    if (outcome === 'busy-helper') return LINES.busyHelper;
+    if (outcome === 'absent') return LINES.absent;
     return '';
+  }
+
+  function errText(err) {
+    return String(err && err.message || err || '');
+  }
+
+  function definitiveAbsence(err) {
+    return /No AI connected yet|No AI provider configured|Provider not configured/i.test(errText(err));
+  }
+
+  function callLine(err) {
+    var msg = errText(err);
+    if (/timeout|abort/i.test(msg)) return LINES.callTimeout;
+    if (definitiveAbsence(err)) return LINES.absent;
+    if (/Could not reach local AI/i.test(msg)) return LINES.localUnreached;
+    return LINES.callFail;
   }
 
   function askFirstOn() {
@@ -430,7 +464,7 @@
 
   function shouldRetry(res) {
     if (!res || res.ok) return false;
-    return res.outcome === 'down' || res.outcome === 'timeout' || res.outcome === 'empty';
+    return res.outcome === 'down' || res.outcome === 'timeout' || res.outcome === 'empty' || res.outcome === 'unreachable';
   }
 
   function noteWeb(query) {
@@ -518,25 +552,22 @@
           auditSearch('error-' + status, 0);
           return { ok: false, outcome: 'down', items: [], line: LINES.down, sent: true, status: status };
         }
-        auditSearch(status ? ('error-' + status) : 'error', 0);
-        return { ok: false, outcome: 'empty', items: [], line: LINES.empty, sent: true, status: status || 0 };
+        if (status === 429) {
+          auditSearch('error-429', 0);
+          return { ok: false, outcome: 'busy-helper', items: [], line: LINES.busyHelper, sent: true, status: 429 };
+        }
+        if (status) {
+          auditSearch('error-' + status, 0);
+          return { ok: false, outcome: 'bad-helper', items: [], line: LINES.badHelper + ' (error ' + status + ').', sent: true, status: status };
+        }
+        auditSearch('unreachable', 0);
+        return { ok: false, outcome: 'unreachable', items: [], line: LINES.unreachable, sent: true, status: 0 };
       }
       return Promise.resolve(resp.json()).then(function (data) {
-        var items = Array.isArray(data && data.items) ? data.items.slice(0, 3) : [];
-        auditSearch(items.length ? 'completed' : 'empty', items.length);
-        if (!items.length || data.dead) {
-          return { ok: false, outcome: 'empty', items: items, line: LINES.empty, sent: true, dead: true, held: false, weakened: false };
-        }
-        return {
-          ok: true,
-          outcome: 'completed',
-          items: items,
-          line: '',
-          sent: true,
-          held: data.held !== false && !data.weakened,
-          weakened: !!data.weakened,
-          dead: false
-        };
+        return readSearchData(data);
+      }, function () {
+        auditSearch('bad-helper', 0);
+        return { ok: false, outcome: 'bad-helper', items: [], line: LINES.badHelper, sent: true, status: resp.status || 0 };
       });
     }).catch(function (err) {
       if (timer) clearTimeout(timer);
@@ -545,9 +576,47 @@
         auditSearch('timeout', 0);
         return { ok: false, outcome: 'timeout', items: [], line: LINES.timeout, sent: true };
       }
-      auditSearch('error', 0);
-      return { ok: false, outcome: 'down', items: [], line: LINES.down, sent: true };
+      auditSearch('unreachable', 0);
+      return { ok: false, outcome: 'unreachable', items: [], line: LINES.unreachable, sent: true };
     });
+  }
+
+  function httpUrl(value) {
+    var url = String(value || '');
+    if (!/^https?:\/\//i.test(url)) return '';
+    return url;
+  }
+
+  function readSearchData(data) {
+    var raw = Array.isArray(data && data.items) ? data.items.slice(0, 3) : [];
+    var items = [];
+    var i;
+    for (i = 0; i < raw.length; i++) {
+      var item = raw[i] || {};
+      var url = httpUrl(item.url);
+      if (!url) continue;
+      items.push({
+        title: String(item.title || ''),
+        snippet: String(item.snippet || item.description || ''),
+        url: url
+      });
+    }
+    var via = data && data.source ? String(data.source).slice(0, 80) : '';
+    auditSearch(items.length ? 'completed' : 'empty', items.length);
+    if (!data || !items.length || data.dead) {
+      return { ok: false, outcome: 'empty', items: items, line: LINES.empty, sent: true, dead: true, held: false, weakened: false, via: via };
+    }
+    return {
+      ok: true,
+      outcome: 'completed',
+      items: items,
+      line: '',
+      sent: true,
+      held: data.held !== false && !data.weakened,
+      weakened: !!data.weakened,
+      dead: false,
+      via: via
+    };
   }
 
   function endpointPath(endpoint) {
@@ -1172,6 +1241,7 @@
                 humanFp: dfp,
                 mindFp: mfp
               };
+              if (fields.via) node.via = clip(fields.via, 80);
               if (useV2) {
                 node.sigV = 2;
                 node.sources = pageSources;
@@ -1221,7 +1291,8 @@
 
   function sayFail(err) {
     if (!active) return;
-    var line = (err && /timeout|abort/i.test(String(err && err.message || err))) ? LINES.callTimeout : LINES.callFail;
+    if (definitiveAbsence(err)) active.mindAbsent = true;
+    var line = callLine(err);
     active.failures.push(line);
     emit('Status', { line: line });
   }
@@ -1263,6 +1334,7 @@
 
   function ask(phase, user) {
     if (!active) return Promise.resolve(null);
+    if (active.mindAbsent || active.mindQuiet) return Promise.resolve(null);
     if (active.pause || active.stop) return Promise.resolve(null);
     if (active.calls >= CALL_CAP) { hitCap('calls'); return Promise.resolve(null); }
     active.calls += 1;
@@ -1270,10 +1342,12 @@
     var system = systemFor(phase);
     return onceCall(system, user).catch(function (err) {
       if (!active || active.pause || active.stop) { sayFail(err); return null; }
+      if (definitiveAbsence(err)) { sayFail(err); return null; }
       if (active.calls >= CALL_CAP) { hitCap('calls'); sayFail(err); return null; }
       active.calls += 1;
       return onceCall(system, user).catch(function (err2) {
         sayFail(err2);
+        if (active) active.mindQuiet = true;
         return null;
       });
     });
@@ -1284,7 +1358,7 @@
       return 'You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it. A tool the mind weighs, not a gate. Reply with JSON only.';
     }
     if (phase === 'plan') return 'Plan search queries for each branch. Reply with JSON only. Include branch e, the dissenter.';
-    if (phase === 'grow') return 'Choose which verified nodes became part of you. The dissenter arm is always eligible. Reply with JSON only. No score.';
+    if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score.';
     if (phase === 'drift' || phase === 'drift-after' || phase === 'drift-note') return 'Answer in one or two sentences. No score and no ranking.';
     if (phase === 'conclude') return 'Write a two-line conclusion, where you could be wrong, and one open question. Reply with JSON only.';
     return 'Read the sources into one node. Reply with JSON only. Keep the doubt.';
@@ -1379,28 +1453,43 @@
     return rows;
   }
 
+  function viaNote(res) {
+    var via = res && res.via ? String(res.via) : '';
+    if (!via) return '';
+    if (/duckduckgo|wikipedia/i.test(via)) return 'Reference answers, not live news (' + clip(via, 60) + ').';
+    return 'Helper ' + clip(via, 60) + '.';
+  }
+
   function nodeFromParsed(job, res, parsed, page) {
     var item = (res && res.items && res.items[0]) || {};
-    var url = item.url || '';
+    var url = httpUrl(item.url);
     function build(got) {
-      var text = clip((parsed && parsed.text) || item.title || item.snippet || 'A note from this source.', 800);
+      var modelText = parsed && parsed.text ? String(parsed.text) : '';
+      var text = clip(modelText || item.snippet || item.title || 'The helper returned a source and no words.', 800);
       var title = item.title || 'Source';
       var rows = rowsFromItems(res && res.items, got);
+      var confidence = parsed && parsed.confidence;
+      if (!modelText) confidence = 'guessed';
+      if ((confidence === 'known' || confidence === 'source-with-motive') && !url) confidence = 'guessed';
+      var note = viaNote(res);
+      var reason = job.branch === 'e' ? 'dissenter' : '';
+      if (note) reason = clip(reason ? reason + ' ' + note : note, 300);
       var fields = {
         branch: job.branch,
         text: text,
         url: url,
         title: title,
         fetched: (got && got.depth === 'page' && got.fetched) || new Date().toISOString(),
-        confidence: parsed && parsed.confidence,
+        confidence: confidence,
         kind: 'node',
         flakeId: active.flakeId,
         depth: job.depth || 1,
         bead: !!(parsed && parsed.expand),
-        reason: job.branch === 'e' ? 'dissenter' : '',
+        reason: reason,
         sourceDepth: got && got.depth === 'page' ? 'page' : 'snippet',
         sourceSha: (got && got.sha) || '',
-        sources: rows
+        sources: rows,
+        via: (res && res.via) || ''
       };
       if (rows.length) fields.sigV = 2;
       if (got && got.depth === 'page' && got.text) fields.pageText = clip(got.text, 6000);
@@ -1411,6 +1500,34 @@
     }
     if (page) return build(page);
     return fetchPage(url).then(build);
+  }
+
+  function nodeFromUnread(job, res, page) {
+    var item = (res && res.items && res.items[0]) || {};
+    var url = httpUrl(item.url);
+    var text = clip(item.snippet || item.title || 'The helper returned a source and no words.', 800);
+    var note = viaNote(res);
+    var reason = LINES.unread;
+    if (note) reason = clip(reason + ' ' + note, 300);
+    if (job.branch === 'e') reason = clip('dissenter. ' + reason, 300);
+    var rows = rowsFromItems(res && res.items, page);
+    return makeNode({
+      branch: job.branch,
+      text: text,
+      url: url,
+      title: item.title || '',
+      fetched: (page && page.fetched) || new Date().toISOString(),
+      confidence: 'guessed',
+      kind: 'node',
+      flakeId: active ? active.flakeId : '',
+      depth: job.depth || 1,
+      reason: reason,
+      sourceDepth: page && page.depth === 'page' ? 'page' : 'snippet',
+      sourceSha: (page && page.sha) || '',
+      sources: rows,
+      via: (res && res.via) || '',
+      sigV: rows.length ? 2 : 0
+    });
   }
 
   function nodeFromFailed(job, res) {
@@ -1522,6 +1639,14 @@
       rememberGuess(job, res);
       return nodeFromFailed(job, res).then(function (node) { return keepNode(job, node, null); });
     }
+    if (active.mindAbsent || active.mindQuiet) {
+      active.searchOk = (active.searchOk || 0) + 1;
+      var unreadItem = (res && res.items && res.items[0]) || {};
+      return fetchPage(unreadItem.url || '').then(function (page) {
+        if (!active) return 'ok';
+        return nodeFromUnread(job, res, page).then(function (node) { return keepNode(job, node, null); });
+      });
+    }
     if (active.calls >= CALL_CAP) {
       hitCap('calls');
       return saveSearchOnly(job, res).then(function () { return 'ok'; });
@@ -1531,7 +1656,10 @@
     return fetchPage(item0.url || '').then(function (page) {
       if (!active) return 'ok';
       var user = 'Branch ' + job.branch + ' ' + (job.name || '') + '\nQuery: ' + job.query + '\nSources: ' + JSON.stringify((res && res.items) || []) + '\n' + (job.prompt || '');
+      if (res && res.via) user += '\nHelper: ' + clip(res.via, 80) + (/duckduckgo|wikipedia/i.test(res.via) ? ' (reference answers, not live news)' : '');
       if (page && page.depth === 'page' && page.text) user += '\nPage: ' + clip(page.text, 1500);
+      // v-snowflake-reach-v0.1: this branch prompt does not copy memory text.
+      // A plan prompt may already have set memoryInContext from FLMemory.recall.
       var phase = job.branch === 'e' ? 'dissent' : 'read';
       return ask(phase, user).then(function (text) {
         if (!active) return 'ok';
@@ -1608,6 +1736,14 @@
     }
     if (active.guessed && active.guessed.length) {
       plainPartial();
+      if (active.mindAbsent || active.mindQuiet) active.conclusion = (active.mindAbsent ? LINES.absent : LINES.localUnreached) + '\n' + String(active.conclusion || '').split('\n')[0];
+      reportPlain();
+      return Promise.resolve('ok');
+    }
+    if (active.mindAbsent || active.mindQuiet) {
+      active.conclusion = LINES.unsynthesized;
+      active.wrong = 'I could not weigh the case against this, because no mind answered.';
+      active.open = active.open || 'What would change this, once a mind can read the sources?';
       reportPlain();
       return Promise.resolve('ok');
     }
@@ -1632,6 +1768,13 @@
         return 'ok';
       }
       var parsed = parseJSON(text) || {};
+      if (!text) {
+        active.conclusion = LINES.unsynthesized;
+        active.wrong = 'I could not weigh the case against this, because no mind answered.';
+        active.open = active.open || 'What would change this, once a mind can read the sources?';
+        reportPlain();
+        return 'ok';
+      }
       active.conclusion = clip(parsed.conclusion || parsed.text || 'I learned something, and I am still looking.', 400);
       var lines = String(active.conclusion).split('\n').filter(function (l) { return l.trim(); });
       if (lines.length < 2) active.conclusion = lines[0] + '\nI could still be missing a piece.';
@@ -1651,6 +1794,10 @@
     var failed = state.failedFetches || 0;
     var text = 'Calls ' + state.calls + '. Fetches ' + state.fetches + '. Failed fetches ' + failed + '. Time ' + ms + ' ms. Caps hit: ' + caps + '. Branches ' + ids.join(', ') + '.';
     if (fails.length) text += ' ' + fails.join(' ');
+    var guessedN = (state.guessed || []).length;
+    if (guessedN) text += ' Guessed arms: ' + guessedN + '.';
+    text += ' ' + (state.memoryInContext ? LINES.memoryYes : LINES.memoryNo);
+    if (state.memoryLine) text += ' ' + state.memoryLine;
     text += ' ' + LINES.seal;
     return { calls: state.calls, fetches: state.fetches, failedFetches: failed, ms: ms, caps: (state.caps || []).slice(), branches: ids, text: text, failures: fails };
   }
@@ -1778,15 +1925,10 @@
     var hold = [];
     if (model && Array.isArray(model.become)) become = model.become.map(String);
     if (model && Array.isArray(model.hold)) hold = model.hold.map(String);
-    var nodes = (flake && flake.nodes) || [];
-    var i;
-    for (i = 0; i < nodes.length; i++) {
-      if (nodes[i] && nodes[i].branch === 'e' && hold.indexOf(nodes[i].id) === -1 && become.indexOf(nodes[i].id) === -1) {
-        become.push(nodes[i].id);
-      }
-    }
+    // Kirk 2026-11-08: only ids the mind listed become training material.
+    // Search still keeps the dissenter as evidence. This list does not add it.
     become = become.filter(function (id) { return hold.indexOf(id) === -1; });
-    var reason = clip((model && model.reason) || 'These verified nodes belong with me.', 300);
+    var reason = clip((model && model.reason) || '', 300);
     return { become: become, hold: hold, reason: reason };
   }
 
@@ -1886,7 +2028,7 @@
     for (i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       if (!n) continue;
-      if (ids.indexOf(n.id) !== -1 || n.branch === 'e') {
+      if (ids.indexOf(n.id) !== -1) {
         if (!seen[n.id]) { seen[n.id] = true; out.push(n); }
       }
     }
@@ -2079,6 +2221,9 @@
       guessed: (active.guessed || []).slice(),
       webAsked: !!active.webAsked,
       webAllowed: !!active.webAllowed,
+      mindAbsent: !!active.mindAbsent,
+      mindQuiet: !!active.mindQuiet,
+      memoryInContext: !!active.memoryInContext,
       caps: active.caps,
       failures: active.failures,
       nodes: active.nodes,
@@ -2148,6 +2293,7 @@
     found.status = active.status;
     found.branches = (active.branches || []).map(function (b) { return { id: b.id, name: b.name }; });
     found.failures = (active.failures || []).slice();
+    found.memoryInContext = !!active.memoryInContext;
     return saveFlakes(list).then(function () { return found; });
   }
 
@@ -2175,6 +2321,12 @@
       emit('Receipt', rec);
       emit('Done', { flake: sealed, receipt: rec });
       // before 061a: rememberFlake ran, then the grow ask sent only id, branch, and psi.
+      if (active && (active.mindAbsent || active.mindQuiet)) {
+        return rememberFlake(sealed).then(function () {
+          active = null;
+          return { status: 'done', flake: sealed, receipt: rec, growth: null, mindAbsent: true };
+        });
+      }
       if (holdGrowth || (active && (active.pause || active.stop))) {
         return rememberFlake(sealed).then(function () {
           active = null;
@@ -2189,15 +2341,31 @@
           });
         });
       }
+      function readChoice(text) {
+        var parsed = parseJSON(text);
+        if (!text || !parsed || !Array.isArray(parsed.become)) return null;
+        var choice = chooseGrowth(sealed, parsed);
+        if (!choice.become.length) return null;
+        return choice;
+      }
       if (!checkBeforeOn()) {
         return rememberFlake(sealed).then(function () {
           return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
-            return writeGrowth(chooseGrowth(sealed, parseJSON(text) || {}));
+            var choice = readChoice(text);
+            if (!choice) {
+              active = null;
+              return { status: 'done', flake: sealed, receipt: rec, growth: null };
+            }
+            return writeGrowth(choice);
           });
         });
       }
       return ask('grow', composeAsk(sealed.nodes, 'grow')).then(function (text) {
-        var choice = chooseGrowth(sealed, parseJSON(text) || {});
+        var choice = readChoice(text);
+        if (!choice) {
+          active = null;
+          return { status: 'done', flake: sealed, receipt: rec, growth: null };
+        }
         return previewOrKeep(sealed, choice).then(function (decision) {
           if (!decision || decision.action !== 'keep') {
             active = null;
@@ -2243,21 +2411,53 @@
     try { ls().setItem(LS_RUNS, JSON.stringify(arr)); } catch (e) {}
   }
 
+  function memorySentence(report) {
+    var exact = (report && report.exact) ? report.exact.length : 0;
+    var similar = (report && report.similar) ? report.similar.length : 0;
+    var reached = report && report.reachedContext ? 'yes' : 'no';
+    return 'Memory: ' + exact + ' exact, ' + similar + ' similar, reached the context: ' + reached + '.';
+  }
+
+  function planUser(q, report) {
+    var base = 'Question: ' + q + '\nReply JSON with hunch and branches a through e. Branch e is the dissenter and is required.';
+    if (!report) return base;
+    var lines = [];
+    var i;
+    var row;
+    for (i = 0; i < (report.exact || []).length; i++) {
+      row = report.exact[i];
+      if (row && row.norm) lines.push('exact: ' + row.norm);
+    }
+    for (i = 0; i < (report.similar || []).length; i++) {
+      row = report.similar[i];
+      if (row && row.norm) lines.push('similar: ' + row.norm);
+    }
+    if (!lines.length) return base;
+    return base + '\nMemory already held:\n' + lines.join('\n');
+  }
+
   function startRun(question, opts) {
     opts = opts || {};
     if (roomShut()) return Promise.resolve(null);
-    var q = clip(question, 500);
-    if (!q) return Promise.resolve({ status: 'empty' });
+    var q = clip(String(question || '').trim(), 500);
+    if (!q) {
+      emit('Status', { line: LINES.emptyAsk });
+      return Promise.resolve({ status: 'empty', line: LINES.emptyAsk });
+    }
     if (looksLikeSecret(q)) {
       emit('Status', { line: LINES.secret });
       return Promise.resolve({ status: 'secret', line: LINES.secret });
     }
     if (runsThisHour().length >= RUNS_PER_HOUR) {
       var early = { calls: 0, fetches: 0, ms: 0, caps: ['runs'], branches: [], text: 'Calls 0. Fetches 0. Time 0 ms. Caps hit: runs. Branches .', failures: [] };
+      emit('Status', { line: LINES.capped });
       emit('Receipt', early);
-      return Promise.resolve({ status: 'capped', receipt: early });
+      return Promise.resolve({ status: 'capped', line: LINES.capped, receipt: early });
     }
-    if (active && active.status === 'running') return Promise.resolve({ status: 'busy' });
+    if (active && active.status === 'running') {
+      emit('Status', { line: LINES.busy });
+      return Promise.resolve({ status: 'busy', line: LINES.busy });
+    }
     noteRun();
     holdGrowth = false;
     active = {
@@ -2275,6 +2475,9 @@
       guessed: [],
       webAsked: false,
       webAllowed: false,
+      mindAbsent: false,
+      mindQuiet: false,
+      memoryInContext: false,
       caps: [],
       failures: [],
       jobs: [],
@@ -2288,16 +2491,34 @@
       started: Date.now()
     };
     emit('Began', { flakeId: active.flakeId, question: q });
-    return ask('plan', 'Question: ' + q + '\nReply JSON with hunch and branches a through e. Branch e is the dissenter and is required.').then(function (text) {
+    // v-read-path-v0.1: recall before the plan. A missed plan still looks up sources.
+    var memApi = root.FLMemory;
+    var pending = (memApi && typeof memApi.recall === 'function') ? memApi.recall(q) : Promise.resolve(null);
+    return pending.then(function (report) {
+      if (!active) return null;
+      var prompt = planUser(q, report);
+      if (report && memApi && typeof memApi.markReached === 'function') {
+        try { memApi.markReached(report, prompt); } catch (eMem) {}
+        active.memoryLine = memorySentence(report);
+        active.memoryInContext = !!report.reachedContext;
+      }
+      return ask('plan', prompt);
+    }).then(function (text) {
       if (!active) return null;
       var plan = parseJSON(text) || {};
       if (text) {
         active.hunch = clip(plan.hunch || 'I will follow the question and keep the doubt beside it.', 180).split('\n')[0];
         active.branches = normalizeBranches(plan, q);
-        emit('Hunch', { line: active.hunch, branch: 'd' });
-        active.jobs = jobsFromBranches(active.branches);
-        active.jobs.push({ type: 'conclude' });
+      } else {
+        // v-snowflake-reach-v0.1: a missed plan is not a reason to skip the lookups.
+        active.hunch = active.mindAbsent
+          ? 'No mind is connected. I will look up the five arms and keep their sources.'
+          : 'The mind did not answer the plan. I will look up the five arms and keep their sources.';
+        active.branches = normalizeBranches({}, q);
       }
+      emit('Hunch', { line: active.hunch, branch: 'd' });
+      active.jobs = jobsFromBranches(active.branches);
+      active.jobs.push({ type: 'conclude' });
       if (active.stop) return closeStopped();
       if (active.pause) return park();
       return proceed();
@@ -2341,6 +2562,9 @@
     active.guessed = active.guessed || [];
     active.webAsked = !!active.webAsked;
     active.webAllowed = !!active.webAllowed;
+    active.mindAbsent = !!active.mindAbsent;
+    active.mindQuiet = false;
+    active.memoryInContext = !!active.memoryInContext;
     active.nodes = active.nodes || [];
     active.jobs = active.jobs || [];
     return proceed();
@@ -2425,7 +2649,10 @@
   }
 
   function replayNow() {
-    if (roomShut() || holdGrowth) return Promise.resolve({ status: 'held' });
+    if (roomShut() || holdGrowth) {
+      emit('Status', { line: LINES.held });
+      return Promise.resolve({ status: 'held', line: LINES.held });
+    }
     var flakes = loadFlakes().filter(function (f) { return f && !f.tombstone && !f.offloaded; });
     // v-memory-compound-v0.1: phi-spaced replay. Old flakes come back less often, never never.
     if (root.FLMemory && root.FLMemory.dueForReplay) {
@@ -2534,6 +2761,7 @@
     VERSION: VERSION,
     GROW: GROW,
     HEAL: HEAL,
+    REACH: REACH,
     SIGMA: SIGMA,
     CAPS: CAPS,
     LINES: LINES,
