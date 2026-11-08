@@ -287,11 +287,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // v-snowflake-reach-v0.1: these files are cache-first once stored.
-  // Network-first so an existing install does not keep a broken search.
+  // v-snowflake-reach-v0.1: a normal load asks for these with cache mode default.
+  // fetch(event.request) then accepts the browser HTTP cache for its max-age,
+  // so an installed page keeps the previous module. Ask the network.
+  // A missed network still uses the stored copy. Saved flakes are not cleared.
   if (/\/modules\/snowflake-(core|search)\.js$/.test(url.pathname) || /\/css\/snowflake\.css$/.test(url.pathname)) {
     event.respondWith(
-      fetch(event.request).then((networkResponse) => {
+      fetch(event.request.url, { cache: 'no-store', credentials: 'same-origin' }).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
