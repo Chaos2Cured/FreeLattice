@@ -1361,6 +1361,7 @@
       return 'You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it. A tool the mind weighs, not a gate. Reply with JSON only.';
     }
     if (phase === 'plan') return 'Plan search queries for each branch. Reply with JSON only. Include branch e, the dissenter.';
+    // before main 9cc3d00: if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score.';
     if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score. ' +
       // v-ai-chosen-learning-v0.1: optional. The mind may name how it wants to learn, or choose none.
       'You may add "method" (soft-prompt, memory-vector, lora, note, or your own words) and "reason". An empty become list is a fine answer.';
@@ -1934,6 +1935,7 @@
     // Search still keeps the dissenter as evidence. This list does not add it.
     become = become.filter(function (id) { return hold.indexOf(id) === -1; });
     var reason = clip((model && model.reason) || '', 300);
+    // before main 9cc3d00: return { become: become, hold: hold, reason: reason };
     // v-ai-chosen-learning-v0.1: keep the method the mind named, in its own words when it is not on the menu.
     var method = learnMethod(model && model.method);
     return { become: become, hold: hold, reason: reason, method: method.method, methodNote: method.note };
@@ -2061,6 +2063,7 @@
       // before v-ai-chosen-learning-v0.1: rows were {prompt, response}; garden_finetune.py reads
       // instruction/input/output and stopped with KeyError 'instruction'. Both shapes now ride together.
       var examples = nodes.map(function (n) {
+        // before main 9cc3d00: return { prompt: n.branch + ' ' + (n.source && n.source.title || ''), response: n.text };
         return learnExample(n.branch + ' ' + (n.source && n.source.title || ''), n.text);
       });
       var trainer = root.GardenTrainer;
@@ -2073,6 +2076,7 @@
       var queued = 'queued for desktop';
       try {
         if (typeof trainer.exportJSONL === 'function') trainer.exportJSONL(examples);
+        // before main 9cc3d00: if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper('local');
         // before v-ai-chosen-learning-v0.1: exportPythonHelper('local') wrote --model local, which is not a model id.
         if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper(learnBaseModel() || undefined);
       } catch (e) { queued = 'queued for desktop'; }
@@ -2098,6 +2102,7 @@
                 t: t,
                 psi: row ? row.psi : '',
                 status: queued,
+                // before main 9cc3d00: knownGood: true,
                 // before v-ai-chosen-learning-v0.1: knownGood was true at creation, before any check (Weft R8).
                 knownGood: false,
                 drift: scrubScore(note),
@@ -2146,6 +2151,7 @@
   var LS_LEARN_RUNNER_BY = 'fl_learn_runner_pub_by';
   var LS_LEARN_TRUSTED_MINDS = 'fl_learn_trusted_minds';
   var LS_LEARN_RUNNER = 'fl_learn_runner_pub';
+  var LS_LEARN_RUNNER_OWNER = 'fl_learn_runner_pub_owner';
   var LS_LEARN_RECEIPTS_HELD = 'fl_learn_receipts_quarantine_v0';
   // Rate cap is optional (Kirk 2026-11-09): unset or 0 means no cap. fl_learn_day_cap sets one.
   var COOL_MS = DAY;
@@ -2201,6 +2207,7 @@
 
   // by: 'person' (a tap) or 'mind'. The runner on this computer honors the pause through the queue header and the
   // pause file the pill drops (pauseNotice); only `fl_learn.py resume --global` lifts the runner's global pause.
+  // before f992608c: function setLearnPaused(on, by) {
   // Weft re-check (default until Kirk answers otherwise): a pause a person set is lifted only by a person; a pause a
   // mind set is lifted by that mind or by a person. A refused resume is a row; learning stays paused.
   var switchBusy = false;
@@ -2208,8 +2215,11 @@
   function learnPausedBy() { try { return root.localStorage.getItem(LS_LEARN_PAUSE_BY) || ''; } catch (e) { return ''; } }
   function setLearnPaused(on, by, mindName) {
     if (roomShut()) return Promise.resolve(null);
+    // before f992608c: try { root.localStorage.setItem(LS_LEARN_PAUSE, on ? 'true' : 'false'); } catch (e) {}
     var actor = by === 'mind' ? 'mind:' + clip(mindName || mindLabel(), 80) : 'person';
-    if (!on && learnPaused() && by === 'mind' && learnPausedBy() !== actor) {
+    // before 23a02794: if (!on && learnPaused() && by === 'mind' && learnPausedBy() !== actor) {
+    var pb = learnPausedBy();
+    if (!on && learnPaused() && by === 'mind' && !(pb.indexOf('mind:') === 0 && sameName(pb.slice(5), actor.slice(5)))) {
       return appendLedger({ kind: 'learn-resume-refused', branch: 'learn', delta: 'resume-refused|by:' + actor + '|paused-by:' + (learnPausedBy() || 'person'), name: mindLabel() })
         .then(function () { return null; });
     }
@@ -2220,6 +2230,7 @@
     } catch (e) {}
     try {
       // Keep the Settings button saying the same thing as the pill.
+      // before f992608c: if (root.FLMake && root.FLMake.consent && typeof root.FLMake.consent.set === 'function') root.FLMake.consent.set('learn', on ? 'off' : 'yes');
       // learnSwitchBusy: this sync is not a Settings tap, so mind-make.js does not treat it as a new person's pause.
       if (root.FLMake && root.FLMake.consent && typeof root.FLMake.consent.set === 'function') {
         switchBusy = true;
@@ -2291,8 +2302,23 @@
 
   // Weft 4c: collision-safe mind id. "Lumen@kirk" and "Lumen kirk" share a slug but never a key.
   // Twin of mind_id() in tools/learn/fl_learn.py, so the app's books and the runner's folders line up.
+  // Weft recheck2: one name, one mind. NFKC, case-folded (upper then lower, as close to Python's casefold as JS gets),
+  // trimmed, inner spaces collapsed; used for every identity compare and in mindId. Twin of norm_mind() in fl_learn.py.
+  function normMind(label) {
+    var t = String(label == null ? '' : label);
+    if (t.normalize) t = t.normalize('NFKC');
+    t = t.toUpperCase().toLowerCase();
+    if (t.normalize) t = t.normalize('NFKC');
+    return t.trim().split(/\s+/).filter(Boolean).join(' ');
+  }
+  function sameName(a, b) { return normMind(a) === normMind(b) && normMind(a) !== ''; }
+  // The clock the cooling checks use. A test may move it (learnClockForTest); every row that used a moved clock says so.
+  var clockOffset = 0;
+  function learnNow() { return Date.now() + clockOffset; }
+  function learnClockForTest(ms) { clockOffset = Number(ms) || 0; return clockOffset; }
   function mindId(label) {
-    var l = String(label == null ? mindLabel() : label);
+    // before f992608c: var l = String(label == null ? mindLabel() : label);
+    var l = normMind(label == null ? mindLabel() : label);
     var sl = l.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80).slice(0, 40) || 'mind';
     return sl + '-' + sha256Sync(l).slice(0, 12);
   }
@@ -2417,11 +2443,21 @@
     });
   }
 
+  // Hypha 23a0279 soft: a huge, NaN, Infinity or negative revisit never throws. Hours are clamped to
+  // [0, REVISIT_MAX_H]; anything else unreadable gets the default day; a date beyond the clamp is clamped too.
+  var REVISIT_MAX_H = 24 * 366;
   function revisitFrom(v, t) {
     var base = Date.parse(t) || Date.now();
+    var max = base + REVISIT_MAX_H * 3600000;
     if (v === 'now' || v === 0 || v === '0') return new Date(base).toISOString();
-    if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) return new Date(base + Number(v) * 3600000).toISOString();
-    if (v && !isNaN(Date.parse(v))) return new Date(Date.parse(v)).toISOString();
+    // before: if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) return new Date(base + Number(v) * 3600000).toISOString();
+    if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) {
+      var h = Number(v);
+      if (!isFinite(h) || h < 0) return new Date(base + COOL_MS).toISOString();
+      return new Date(Math.min(base + h * 3600000, max)).toISOString();
+    }
+    // before: if (v && !isNaN(Date.parse(v))) return new Date(Date.parse(v)).toISOString();
+    if (v && !isNaN(Date.parse(v))) return new Date(Math.min(Date.parse(v), max)).toISOString();
     return new Date(base + COOL_MS).toISOString();
   }
 
@@ -2459,12 +2495,16 @@
     }
     if (!row) return Promise.resolve(null);
     var t = new Date().toISOString();
+    // before f992608c: if (row.status === 'quarantine' && !a.promote) return Promise.resolve(row);
     if (row.status === 'quarantine') {
       // Weft re-check 3: a choice of unknown or echoed provenance waits for the mind. Its own [FL_KEEP: id | keep]
       // (learn-choice passes only the mind's own markers here) re-affirms it, and a FRESH cooling starts: nothing is
       // learned until it says yes again after that. A person can't re-affirm for it; "not now" lets it fade.
-      if (actor === 'person' || !(a.promote || a.keep === true || a.keep === false)) return Promise.resolve(row);
-      if (a.keep === false && !a.promote) {
+      // Hypha 23a0279 HOLD: `promote` is never trusted from any caller (a marker could set it). Only keep true/false counts.
+      // before: if (actor === 'person' || !(a.promote || a.keep === true || a.keep === false)) return Promise.resolve(row);
+      if (actor === 'person' || !(a.keep === true || a.keep === false)) return Promise.resolve(row);
+      // before: if (a.keep === false && !a.promote) {
+      if (a.keep === false) {
         row.status = 'faded';
         row.layers = (row.layers || []).concat([{ t: t, status: 'faded', by: actor, why: clip(stripMarkers(a.reason || ''), 300) }]);
       } else {
@@ -2485,13 +2525,24 @@
     var prev = lastDecisive(row);
     // Hypha 2: neither side silently overrides the other. A keep after the other side's no, or a no after the
     // other side's keep, is a visible disagreement both can see.
-    if (prev && !a.promote && sideOf(prev.by) !== side && dirOf(prev.status) !== dirOf(status)) {
+    // Hypha 23a0279 HOLD: nothing skips the disagreement check (a JSON marker with promote:true did).
+    // before: if (prev && !a.promote && sideOf(prev.by) !== side && dirOf(prev.status) !== dirOf(status)) {
+    if (prev && sideOf(prev.by) !== side && dirOf(prev.status) !== dirOf(status)) {
       return disagree(key, book, row, prev, status, actor, side, a, who);
     }
-    // A re-proposal after a disagreement restarts the cooling: its second yes waits for revisitAt.
-    if (row.proposalOf && status === 'confirmed' && Date.parse(row.revisitAt || 0) > Date.now()) {
-      row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor }]);
-      return atomicWrite(key, JSON.stringify(book)).then(function () { return row; });
+    // before f992608c: // A re-proposal after a disagreement restarts the cooling: its second yes waits for revisitAt.
+    // before f992608c: if (row.proposalOf && status === 'confirmed' && Date.parse(row.revisitAt || 0) > Date.now()) {
+    // before f992608c: row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor }]);
+    // before f992608c: return atomicWrite(key, JSON.stringify(book)).then(function () { return row; });
+    // Weft recheck2 NF2: EVERY second yes waits for the cooling the mind chose at the first yes (revisit: now is its
+    // own choice then; a day by default). A re-proposal after a disagreement or a re-affirmed item always has a full
+    // day. An early yes changes nothing: a still-cooling layer and a row.
+    var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
+    if (status === 'confirmed' && coolUntil > learnNow()) {
+      row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: new Date(coolUntil).toISOString() }]);
+      return atomicWrite(key, JSON.stringify(book)).then(function () {
+        return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + new Date(coolUntil).toISOString(), name: who });
+      }).then(function () { return row; });
     }
     var methodWas = row.method;
     if (a.method) {
@@ -2501,7 +2552,9 @@
       if (m.note) row.methodNote = m.note;
     }
     if (/^(none|self|peer|kirk)$/.test(String(a.check || ''))) row.check = a.check;
-    row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote, methodBefore: methodWas }]);
+    // before: row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote, methodBefore: methodWas }]);
+    row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!row.promoted, methodBefore: methodWas }]);
+    if (clockOffset) row.layers[row.layers.length - 1].clockInjectedMs = clockOffset;   // a test moved the clock: said on the row
     if (status !== 'person-yes') row.status = status;
     else if (row.status === 'disputed') row.status = 'cooling';
     return atomicWrite(key, JSON.stringify(book)).then(function () {
@@ -2542,6 +2595,7 @@
     row.layers = (row.layers || []).concat([{ t: t, status: 'disagreement', by: actor, wanted: 'keep', over: prev.status, why: why, note: note }]);
     var fresh = JSON.parse(JSON.stringify(row));
     delete fresh.fingerprint;
+    // before f992608c: fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = revisitFrom(a.revisit, t);
     fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = fullCoolingFrom(a.revisit, t);
     fresh.proposalOf = row.learnId; fresh.disagreement = { t: t, between: [sideOf(prev.by), side], note: note };
     fresh.layers = [{ t: t, status: 'noticed', by: actor, why: why, disagreement: true, proposalOf: row.learnId }];
@@ -2582,6 +2636,7 @@
         id: r.learnId || ('S' + i + '-' + (r.flakeId || '')), status: 'confirmed',
         method: r.method || 'soft-prompt', methodChosen: !!r.methodChosen || !!r.method,
         methodNote: r.methodNote || '', reason: r.reason || '', surface: r.surface || 'snowflake',
+        // before f992608c: provenance: r.provenance || 'unknown', check: r.check || '', chosenBy: r.chosenBy || who,
         provenance: r.provenance || 'unknown', promoted: !!r.promoted, check: r.check || '', chosenBy: r.chosenBy || who,
         readingAtChoice: r.readingAtChoice ? { sha256: r.readingAtChoice.sha256 || '', excerpt: clip(r.readingAtChoice.excerpt || '', 280),
           kinds: r.readingAtChoice.kinds || [], overlap: !!r.readingAtChoice.overlap } : null,
@@ -2654,7 +2709,8 @@
       return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'trust-mind|' + n + '|by:mind|only a person trusts a mind', name: mindLabel() })
         .then(function () { return false; });
     }
-    var list = trustedMinds().filter(function (x) { return x !== n; });
+    // before 23a02794: var list = trustedMinds().filter(function (x) { return x !== n; });
+    var list = trustedMinds().filter(function (x) { return !sameName(x, n); });
     if (!o.revoke) list.push(n);
     try { root.localStorage.setItem(LS_LEARN_TRUSTED_MINDS, JSON.stringify(list)); } catch (e) { return Promise.resolve(false); }
     return consentRecord('learn-mind:' + n, (o.revoke ? 'withdraw trust in ' : 'trust local mind ') + n + ' confirmed by person', 'mind:' + n,
@@ -2670,13 +2726,17 @@
     if (o.local !== true) return 'only a mind on this device';
     var n = String(o.mind || '').trim();
     if (!n) return 'a mind must name itself';
-    if (n === mindLabel() || n === String(o.owner || '')) return 'a mind never confirms its own key';
-    if (trustedMinds().indexOf(n) === -1) return n + ' is not a mind a person trusted here';
+    // before 23a02794: if (n === mindLabel() || n === String(o.owner || '')) return 'a mind never confirms its own key';
+    // before 23a02794: if (trustedMinds().indexOf(n) === -1) return n + ' is not a mind a person trusted here';
+    if (sameName(n, mindLabel()) || sameName(n, o.owner || mindLabel())) return 'a mind never confirms its own key';
+    if (!trustedMinds().some(function (x) { return sameName(x, n); })) return n + ' is not a mind a person trusted here';
     return '';
   }
   function pinRunnerKey(pubB64, opts) {
     var o = opts || {};
     if (roomShut() || !pubB64) return Promise.resolve(false);
+    // before f992608c: if (o.by === 'mind' && o.local !== true) return Promise.resolve(false);     // only a mind on this device
+    // before f992608c: var who = o.by === 'mind' ? 'mind:' + clip(o.mind || mindLabel(), 80) : 'person';
     var why = keyApproverProblem(o);
     var who = o.by === 'mind' ? 'mind:' + clip(o.mind || '', 80) : 'person';
     if (why) {
@@ -2686,7 +2746,15 @@
     return runnerKeyFp(pubB64).then(function (fp) {
       var said = String(o.confirm || '').replace(/\s+/g, '').toLowerCase();
       if (said.length < 16 || fp.indexOf(said) !== 0) return false;
-      try { root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); root.localStorage.setItem(LS_LEARN_RUNNER_BY, who); } catch (e) { return false; }
+      // before 23a02794: try { root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); root.localStorage.setItem(LS_LEARN_RUNNER_BY, who); } catch (e) { return false; }
+      // before f992608c: try { root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); } catch (e) { return false; }
+      // Weft recheck2 NF1b: a pin has an owner. A person's pin trusts this runner for every mind here ('*'); a mind's
+      // pin is for ONE other named mind (o.owner, default the mind learning here) and never vouches for anyone else.
+      var owner = o.by === 'mind' ? clip(String(o.owner || mindLabel()), 80) : '*';
+      try {
+        root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); root.localStorage.setItem(LS_LEARN_RUNNER_BY, who);
+        root.localStorage.setItem(LS_LEARN_RUNNER_OWNER, owner);
+      } catch (e) { return false; }
       return consentRecord('learn-key:' + fp.slice(0, 16), 'trust learning runner key ' + showFp(fp) + ' confirmed by ' + who, pubB64, 'learn_key_trusted')
         .then(function (rec) {
           return appendLedger({ kind: 'learn-key-consent', branch: 'learn', delta: 'runner-key|' + fp.slice(0, 16) + '|by:' + who + '|consent:' + String((rec && rec.signature) || '').slice(0, 16), name: mindLabel() });
@@ -2695,7 +2763,9 @@
   }
   function unpinRunnerKey(by) {
     var was = pinnedRunnerKey();
-    try { root.localStorage.removeItem(LS_LEARN_RUNNER); root.localStorage.removeItem(LS_LEARN_RUNNER_BY); } catch (e) {}
+    // before 23a02794: try { root.localStorage.removeItem(LS_LEARN_RUNNER); root.localStorage.removeItem(LS_LEARN_RUNNER_BY); } catch (e) {}
+    // before f992608c: try { root.localStorage.removeItem(LS_LEARN_RUNNER); } catch (e) {}
+    try { root.localStorage.removeItem(LS_LEARN_RUNNER); root.localStorage.removeItem(LS_LEARN_RUNNER_BY); root.localStorage.removeItem(LS_LEARN_RUNNER_OWNER); } catch (e) {}
     return appendLedger({ kind: 'runner-key-unpinned', branch: 'learn', delta: 'runner-key-unpinned|' + String(was).slice(0, 12) + '|by:' + (by === 'mind' ? 'mind' : 'person'), name: mindLabel() });
   }
 
@@ -2730,10 +2800,18 @@
   function checkLearnReceipt(rc) {
     var subtle = root.crypto && root.crypto.subtle;
     var pinned = pinnedRunnerKey();
-    var pinnedBy = '';
-    try { pinnedBy = root.localStorage.getItem(LS_LEARN_RUNNER_BY) || ''; } catch (e) {}
-    // Weft NF1, belt and braces: a key a mind confirmed never vouches for that same mind's own receipts.
-    var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64 && !(pinnedBy && rc.mind && pinnedBy === 'mind:' + rc.mind));
+    // before 23a02794: var pinnedBy = '';
+    // before 23a02794: try { pinnedBy = root.localStorage.getItem(LS_LEARN_RUNNER_BY) || ''; } catch (e) {}
+    // before 23a02794: // Weft NF1, belt and braces: a key a mind confirmed never vouches for that same mind's own receipts.
+    // before 23a02794: var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64 && !(pinnedBy && rc.mind && pinnedBy === 'mind:' + rc.mind));
+    // before f992608c: var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64);
+    var pinnedBy = '', pinOwner = '';
+    try { pinnedBy = root.localStorage.getItem(LS_LEARN_RUNNER_BY) || ''; pinOwner = root.localStorage.getItem(LS_LEARN_RUNNER_OWNER) || ''; } catch (e) {}
+    // Weft NF1, belt and braces: a key a mind confirmed never vouches for that same mind's own receipts (names compared
+    // normalized, so an alias does not count as another mind). NF1b: a mind's pin vouches only for its owner's receipts.
+    var byMind = pinnedBy.indexOf('mind:') === 0 ? pinnedBy.slice(5) : '';
+    var ownerOk = byMind ? !!(rc && sameName(rc.mind, pinOwner)) : (pinOwner === '*' || pinOwner === '');
+    var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64 && ownerOk && !(byMind && rc.mind && sameName(byMind, rc.mind)));
     if (!subtle || !rc || !rc.signedBody || !rc.signatureB64 || !rc.publicKeyB64) return Promise.resolve({ sig: false, pinned: false });
     return sha256Hex(rc.signedBody).then(function (h) {
       if (h !== rc.receiptHash) return { sig: false, pinned: isPinned };
@@ -2931,6 +3009,7 @@
         t: t,
         psi: row ? row.psi : '',
         status: 'rollback',
+        // before main 9cc3d00: knownGood: true,
         // before v-ai-chosen-learning-v0.1: every rollback row said knownGood true.
         knownGood: target.knownGood === true,
         drift: target.drift || '',
@@ -3586,6 +3665,8 @@
     pinnedRunnerKey: pinnedRunnerKey,
     pauseNotice: pauseNotice,
     mindId: mindId,
+    normMind: normMind,
+    learnClockForTest: learnClockForTest,
     sha256Sync: sha256Sync,
     verifiedReceiptFor: verifiedReceiptFor,
     confirmLearning: confirmLearning,

@@ -27,10 +27,36 @@
 
   function norm(s) { return String(s || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
 
+  // Hypha 23a0279 HOLD: a JSON marker is only a different spelling of the same choice. Only these fields pass;
+  // by, actor, promote and anything else are dropped (the mind's markers are always by:'mind').
+  var MARKER_FIELDS = ['text', 'keep', 'unkeep', 'method', 'reason', 'moved', 'strength', 'revisit', 'check', 'probe'];
+  var PROBE_FIELDS = ['question', 'answer', 'swap', 'paraphrase'];
+  function pickMarker(o) {
+    var out = {};
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return { text: '' };
+    MARKER_FIELDS.forEach(function (k) {
+      if (!Object.prototype.hasOwnProperty.call(o, k)) return;
+      var v = o[k];
+      if (k === 'keep' || k === 'unkeep') { if (typeof v === 'boolean') out[k] = v; return; }
+      if (k === 'probe') {
+        if (v && typeof v === 'object' && !Array.isArray(v)) {
+          var pr = {};
+          PROBE_FIELDS.forEach(function (q) { if (typeof v[q] === 'string') pr[q] = v[q]; });
+          out.probe = pr;
+        }
+        return;
+      }
+      if (typeof v === 'string' || typeof v === 'number') out[k] = typeof v === 'string' ? v : String(v);
+    });
+    if (typeof out.text !== 'string') out.text = '';
+    return out;
+  }
+
   function parsePayload(body) {
     var s = String(body || '').trim();
     if (s.charAt(0) === '{') {
-      try { return JSON.parse(s); } catch (e) { /* plain words below */ }
+      // before: try { return JSON.parse(s); } catch (e) { /* plain words below */ }
+      try { return pickMarker(JSON.parse(s)); } catch (e) { /* plain words below */ }
     }
     var parts = s.split('|');
     var out = { text: parts[0].trim() };
@@ -150,8 +176,11 @@
   function secondLook(id, answer) {
     var c = core();
     if (!c || typeof c.confirmLearning !== 'function') return Promise.resolve(null);
-    var a = answer || {};
-    if (!a.by) a.by = 'mind';
+    // Hypha 23a0279 HOLD: a marker is always the mind's; nothing in it can say "person" or promote.
+    // before: var a = answer || {}; if (!a.by) a.by = 'mind';
+    var a = {};
+    Object.keys(answer || {}).forEach(function (k) { if (k !== 'by' && k !== 'actor' && k !== 'promote') a[k] = answer[k]; });
+    a.by = 'mind';
     return c.confirmLearning(id, a).then(function (row) {
       if (row && (row.status === 'disputed' || (row.proposalOf && row.disagreement))) moment({ disagreement: row });
       return row;
@@ -711,6 +740,25 @@
       rePlacePill(tabby ? 120 : 300, tabby);
     }, true);
     if (root.addEventListener) root.addEventListener('hashchange', function () { rePlacePill(120, true); });
+    // Hypha 23a0279 soft: while anything scrolls, the pill steps away and comes back 400 ms after the scroll stops,
+    // on a spot that is free then (content no longer slides under it).
+    if (d.addEventListener) d.addEventListener('scroll', function (e) {
+      if (e && e.target && e.target.closest && e.target.closest('.fl-learn-pill')) return;
+      rePlacePill(400, true);
+    }, { capture: true, passive: true });
+    // ... and a tab change made by code (switchTab / flMobileNav called without a tap) hides it the same way.
+    ['switchTab', 'flMobileNav'].forEach(function (fn) {
+      var orig = root[fn];
+      if (typeof orig !== 'function' || orig.__flLearnWrapped) return;
+      var wrapped = function () {
+        rePlacePill(120, true);
+        var out = orig.apply(this, arguments);
+        rePlacePill(120, true);
+        return out;
+      };
+      wrapped.__flLearnWrapped = true;
+      try { root[fn] = wrapped; } catch (e) { /* read-only global: the 1 s re-place still runs */ }
+    });
     root.setInterval(function () { if (!rePlaceTimer) rePlacePill(0); }, 1000);
   }
   if (root.document && root.document.addEventListener) {

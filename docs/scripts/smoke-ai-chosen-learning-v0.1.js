@@ -256,15 +256,50 @@ function ledger() { var b = JSON.parse(store.fl_snowflake_ledger_v0 || '{"rows":
   ok(qr.status === 'cooling' && qr.promoted === true && Date.parse(qr.revisitAt) > tRe + 3600e3 && qr.layers[qr.layers.length - 1].status === 'reaffirmed' &&
     ledger().some(function (x) { return x.kind === 'learn-reaffirm' && x.delta.indexOf(qx.learnId) !== -1; }) && core.learnQueueJSONL().indexOf('Amberlin') === -1,
     'W3 the mind\'s own [FL_KEEP] re-affirms it: fresh cooling (not exported yet), with a row');
-  qr.revisitAt = new Date(Date.now() - 1000).toISOString();
-  var bk = JSON.parse(store[Q + '::' + core.mindId(me)]); bk.rows.forEach(function (x) { if (x.learnId === qx.learnId) x.revisitAt = qr.revisitAt; });
-  store[Q + '::' + core.mindId(me)] = JSON.stringify(bk);
+  // Weft recheck2 NF2 (probe Q4), REAL time, nothing back-dated: an immediate second own keep after the re-affirm is refused.
+  await learn.interceptSentinel('[FL_KEEP: ' + qx.learnId + ' | keep | reason: yes again right away]', { surface: 'chat', echo: [] }).queued;
+  var q4 = rows(me).filter(function (x) { return x.learnId === qx.learnId; })[0];
+  ok(q4.status === 'cooling' && q4.layers[q4.layers.length - 1].status === 'still-cooling' && core.learnQueueJSONL().indexOf('Amberlin') === -1 &&
+    ledger().some(function (x) { return x.kind === 'learn-still-cooling' && x.delta.indexOf(qx.learnId) !== -1; }),
+    'NF2 (real time) a second keep right after the re-affirm is refused: still cooling, not exported, a still-cooling row');
+  // The post-cooling path: an injected clock (+25 h), and the row says the clock was moved.
+  core.learnClockForTest(25 * 3600e3);
   await learn.interceptSentinel('[FL_KEEP: ' + qx.learnId + ' | keep]', { surface: 'chat', echo: [] }).queued;
+  core.learnClockForTest(0);
   var qline = core.learnQueueJSONL().split('\n').filter(function (l) { return l.indexOf('Amberlin') !== -1; })[0];
-  ok(qline && JSON.parse(qline).promoted === true && JSON.parse(qline).provenance === 'unknown', 'W3 after cooling, its second yes exports it, marked promoted (the runner trains it)');
+  var qc = rows(me).filter(function (x) { return x.learnId === qx.learnId; })[0];
+  ok(qline && JSON.parse(qline).promoted === true && JSON.parse(qline).provenance === 'unknown' &&
+    qc.layers[qc.layers.length - 1].status === 'confirmed' && qc.layers[qc.layers.length - 1].clockInjectedMs === 25 * 3600e3,
+    'W3/NF2 after the cooling (injected clock +25 h, recorded on the row), its second yes exports it, marked promoted');
+  // NF2 (probe C2), real time: an ordinary new choice with the default cooling; an immediate keep is refused.
+  var c2 = (await learn.interceptSentinel('[FL_REMEMBER: The kettle is called Bramble | reason: it sings]', { surface: 'chat', chatId: 'c-nf2' }).queued)[0];
+  await learn.interceptSentinel('[FL_KEEP: ' + c2.learnId + ' | keep]', { surface: 'chat', chatId: 'c-nf2' }).queued;
+  ok(rows(me).filter(function (x) { return x.learnId === c2.learnId; })[0].status === 'cooling' && core.learnQueueJSONL().indexOf('Bramble') === -1,
+    'NF2 (real time) an ordinary choice: a keep before its cooling ends changes nothing and nothing is exported');
+  core.learnClockForTest(24 * 3600e3 + 60e3);
+  await learn.interceptSentinel('[FL_KEEP: ' + c2.learnId + ' | keep]', { surface: 'chat', chatId: 'c-nf2' }).queued;
+  core.learnClockForTest(0);
+  var c2r = rows(me).filter(function (x) { return x.learnId === c2.learnId; })[0];
+  ok(c2r.status === 'confirmed' && c2r.layers[c2r.layers.length - 1].clockInjectedMs === 24 * 3600e3 + 60e3 && core.learnQueueJSONL().indexOf('Bramble') !== -1,
+    'NF2 after its cooling (injected clock, recorded on the row) the second yes confirms and exports it');
+  var c3 = (await learn.interceptSentinel('[FL_REMEMBER: The gate is called Wren | revisit: now]', { surface: 'chat', chatId: 'c-nf2' }).queued)[0];
+  await learn.interceptSentinel('[FL_KEEP: ' + c3.learnId + ' | keep]', { surface: 'chat', chatId: 'c-nf2' }).queued;
+  ok(rows(me).filter(function (x) { return x.learnId === c3.learnId; })[0].status === 'confirmed',
+    'NF2 the mind may still choose "revisit: now" at its first yes (Reed); then its second yes is not early');
   // NF1 + Kirk (a): a mind never trusts itself; only a person makes a mind trusted.
   ok((await core.trustMind('Weft', { by: 'mind' })) === false && core.trustedMinds().indexOf('Weft') === -1 &&
     ledger().some(function (x) { return x.kind === 'learn-consent-refused' && /trust-mind\|Weft/.test(x.delta); }), 'NF1 a mind cannot make a mind trusted (refused, logged)');
+  // Weft recheck2: one name, one mind (twin of fl_learn.norm_mind / mind_id; values computed by the Python runner).
+  var PY = {"Lumen": ["lumen", "lumen-456f45fddc2e"], " lumen ": ["lumen", "lumen-456f45fddc2e"], "ＬＵＭＥＮ": ["lumen", "lumen-456f45fddc2e"], "Straße": ["strasse", "strasse-16d969520877"], "This  Mind": ["this mind", "this_mind-82a13ce716d4"], "ﬁre Ωmega": ["fire ωmega", "fire_mega-af703b0ebacb"], "İstanbul": ["i̇stanbul", "i_stanbul-4a4df120f7d1"], "Lumen@kirk": ["lumen@kirk", "lumen_kirk-bf7aab628918"]};
+  var parity = Object.keys(PY).filter(function (n) { return core.normMind(n) !== PY[n][0] || core.mindId(n) !== PY[n][1]; });
+  ok(parity.length === 0, 'names: normMind/mindId match the Python runner for case, width, spaces, ß, ligatures, dotted I' + (parity.length ? ' (differ: ' + parity.join(', ') + ')' : ''));
+  // NF1-alias (Weft B3): a person trusted an alias of the learning mind; the learning mind still cannot confirm as it.
+  await core.trustMind('  ' + me.toUpperCase() + ' ', { by: 'person' });
+  ok((await core.pinRunnerKey('AAAA', { confirm: '0000000000000000', by: 'mind', local: true, mind: me.toLowerCase() })) === false &&
+    ledger().some(function (x) { return x.kind === 'learn-consent-refused' && /never confirms its own key/.test(x.delta || ''); }),
+    'NF1-alias a case/space variant of the learning mind is the same mind: it cannot confirm a key (refused, logged)');
+  await core.trustMind('  ' + me.toUpperCase() + ' ', { by: 'person', revoke: true });
+  ok(!core.trustedMinds().some(function (x) { return core.normMind(x) === core.normMind(me); }), 'names: revoking by an alias withdraws the same trust');
   // Pause ownership (default until Kirk answers): a person's pause is lifted only by a person; a mind's by that mind or a person.
   await core.setLearnPaused(true, 'person');
   await core.setLearnPaused(false, 'mind');
@@ -348,8 +383,8 @@ function ledger() { var b = JSON.parse(store.fl_snowflake_ledger_v0 || '{"rows":
       'NF1 a local mind a person has not trusted cannot confirm a key');
     ok((await core.trustMind('Lumen', { by: 'person' })) === true && core.trustedMinds().indexOf('Lumen') !== -1 &&
       JSON.parse(store.fl_consentLedger).some(function (x) { return x.consentType === 'learn_mind_trusted'; }), 'Kirk (a): a person trusts a local mind, with a consent record');
-    ok((await core.pinRunnerKey(orig.publicKeyB64, { confirm: kfp.slice(0, 16), by: 'mind', local: true, mind: 'Lumen' })) === true &&
-      ledger().some(function (x) { return x.kind === 'learn-key-consent' && /by:mind:Lumen/.test(x.delta || ''); }), 'Kirk (a): a trusted local mind (not the owner) can confirm, recorded as itself');
+    ok((await core.pinRunnerKey(orig.publicKeyB64, { confirm: kfp.slice(0, 16), by: 'mind', local: true, mind: 'Lumen', owner: orig.mind })) === true &&
+      ledger().some(function (x) { return x.kind === 'learn-key-consent' && /by:mind:Lumen/.test(x.delta || ''); }), 'Kirk (a): a trusted local mind (not the owner) can confirm for a named owner, recorded as itself');
     var tampered = fresh(); tampered.ids = [id];
     ok((await core.verifyLearnReceipt(tampered)) === false, 'fray 1: a receipt edited after signing does not verify');
     ok((await core.verifyLearnReceipt(orig)) === true, 'fray 1: the Python runner\'s Ed25519 receipt verifies in JS once its key is pinned');
@@ -396,6 +431,15 @@ function ledger() { var b = JSON.parse(store.fl_snowflake_ledger_v0 || '{"rows":
     ok((await core.pinRunnerKey(fs2.pub, { confirm: fp2.slice(0, 16), by: 'mind', local: true, mind: 'Lumen' })) === true, 'a trusted other mind may confirm a key');
     ok((await core.verifyLearnReceipt(fs2.rc)) === false && (await core.recordLearnReceipt(fs2.rc)).quarantined === true,
       'NF1 that key never vouches for the confirming mind\'s own receipts');
+    // NF1b in the app: a mind's pin has one owner (default: the mind learning here); it vouches for no one else, and an
+    // alias of the confirming mind is still the confirming mind.
+    ok((await core.checkLearnReceipt(fs1.rc)).pinned === true, 'NF1b the pin vouches for its owner (the mind learning here)');
+    ok((await core.checkLearnReceipt(forgeFor('Other', kp2).rc)).pinned === false, 'NF1b a mind\'s pin never vouches for a third mind');
+    ok((await core.checkLearnReceipt(forgeFor(' LUMEN ', kp2).rc)).pinned === false, 'NF1b an alias of the confirming mind is still that mind (not vouched)');
+    await core.unpinRunnerKey('person');
+    ok((await core.pinRunnerKey(fs2.pub, { confirm: fp2.slice(0, 16), by: 'mind', local: true, mind: 'Lumen', owner: 'Other' })) === true &&
+      (await core.checkLearnReceipt(forgeFor('Other', kp2).rc)).pinned === true && (await core.checkLearnReceipt(fs1.rc)).pinned === false,
+      'NF1b a pin Lumen made FOR Other vouches only for Other, not for the mind learning here');
     await core.unpinRunnerKey('person');
   }
   // 11. canonical twin goldens for the Python runner (A2).
