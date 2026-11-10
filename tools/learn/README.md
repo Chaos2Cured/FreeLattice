@@ -109,6 +109,20 @@ learn row past the power check records `powerSource`. No idle or thermal check e
     `learn-match-v0.2.json` pins both languages (v0.1 is the earlier rule, kept as it was).
   - The paraphrase limit is unchanged and stated: a paraphrase in other words is caught only for the day after the
     person's no (it waits); after that day it can be confirmed, and only a person reading the export catches it.
+- **Round 12 (Hypha 23c464ac (C), Weft recheck6 F11).** Changes to the gate above (the round 11 lines stay as they were):
+  - The day, widened (F11): for 24 h after ANY person no, a row chosen AT OR BEFORE that no also waits until
+    max(its revisitAt, that no + 24 h), whatever its own cooling (a full day spent before the no does not count). In
+    the queue: `t_e <= rollback` means wait. A row chosen after the no with its own full day is not held beyond it.
+  - Near duplicates, changed (C): there is no hard 0 any more for a negation or a different number. Digits, one-letter
+    words and negators are ordinary tokens that lower the Jaccard score, so "T 2", "T (1)" and "T, isn't it" score
+    0.833 against T and are proposals a day after the Undo. A correction ("May 5" after "May 4") stays apart because a
+    repeat attaches only on the same normalized text: in a short sentence it scores 0.667 (its own row, the day rule);
+    in a long one 0.857 (its own stored proposal). One spelling for negations in both twins: cannot / can't / cant ->
+    "can not", won't / wont -> "will not", shan't -> "shall not", doesnt / isnt / dont ... (no apostrophe) -> "does not"
+    / "is not" / "do not" ..., any other n't -> "not". `learn-match-v0.3.json` pins both languages (v0.2 and v0.1 kept).
+  - Known, not changed: an app Undo that names a restore (pointer) receipt, which has no `beforeFp`, goes back to
+    "none" (no learned version active). That is the safe direction. Going back to the receipt's `rollbackOf` instead
+    would let an app request re-activate an older version without the restore checks, so it was left as it is.
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
   Weft recheck3 F6: the base is fingerprinted from the FULL content of every weight and config file on every run
   (no cache), so an edit anywhere changes it, even with size and mtime put back.
