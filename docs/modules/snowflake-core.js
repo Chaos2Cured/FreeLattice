@@ -2569,8 +2569,15 @@
     // Weft 2e, as Kirk set it: provenance and anti-injection only. A marker that came in from outside
     // the mind's own words waits for the mind's reflection. What the mind itself chooses is never judged.
     var hold = '';
-    if (provenance !== 'self') hold = 'not-self:' + provenance;
-    if (hold) { row.status = 'quarantine'; row.hold = hold; row.layers.push({ t: t, status: 'quarantine', by: 'integrity', why: hold }); }
+    // before (round 15): if (provenance !== 'self') hold = 'not-self:' + provenance;
+    // before (round 15): if (hold) { row.status = 'quarantine'; row.hold = hold; row.layers.push({ t: t, status: 'quarantine', by: 'integrity', why: hold }); }
+    // Round 15 (Kirk 2026-11-10, AUTONOMY.md): an unknown or echoed origin is a LABEL, never a hold. "It is still
+    // information." It is learned on the mind's first yes like anything else; the mind decides its weight (strength:)
+    // and whether to wait (revisit:). The label stays on the row, its layer, the ledger row, the export and the receipt.
+    if (provenance !== 'self') {
+      row.origin = 'not-self:' + provenance;
+      row.layers.push({ t: t, status: 'origin', by: 'integrity', why: row.origin });
+    }
     // Notes for the mind's second look, never gates.
     function addNotice(n) { row.notice = row.notice ? row.notice + '; ' + n : n; }
     if (INSTRUCTION_RE.test(text)) addNotice('reads like an instruction');
@@ -2626,7 +2633,8 @@
           var kind = row.status === 'quarantine' ? 'learn-quarantine' : (row.status === 'rate-held' ? 'learn-skip' : 'learn-choose');
           // before: return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId, name: mind }).then(function () { return row; });
           // before (round 14): return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () { return row; });
-          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () {
+          // before (round 15): ... delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, ...
+          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote + (row.origin ? '|origin:' + row.origin : ''), name: mind }).then(function () {
             // Round 14 (Kirk 2026-11-10): the mind's first yes is enough. When it chose no cooling (the default), its
             // choice confirms now (a confirmed layer and a ledger row); a chosen cooling waits for its own second look.
             if (row.status === 'cooling' && Date.parse(row.revisitAt) <= Date.parse(row.t)) {
@@ -2806,12 +2814,21 @@
         row.status = 'faded';
         row.layers = (row.layers || []).concat([{ t: t, status: 'faded', by: actor, why: clip(stripMarkers(a.reason || ''), 300) }]);
       } else {
-        row.status = 'cooling'; row.promoted = true; row.revisitAt = fullCoolingFrom(a.revisit, t);
+        // before (round 15): row.status = 'cooling'; row.promoted = true; row.revisitAt = fullCoolingFrom(a.revisit, t);
+        // Round 15: a legacy quarantined row's re-affirm is the mind's yes; its wait is its own choice (default none).
+        row.status = 'cooling'; row.promoted = true; row.revisitAt = revisitFrom(a.revisit, t);
+        if (!row.origin && row.hold) row.origin = row.hold;
         row.layers = (row.layers || []).concat([{ t: t, status: 'reaffirmed', by: actor, why: clip(stripMarkers(a.reason || ''), 300), heldWas: row.hold || '' }]);
       }
       return atomicWrite(key, JSON.stringify(book)).then(function () {
         return appendLedger({ kind: row.status === 'cooling' ? 'learn-reaffirm' : 'learn-faded', branch: 'learn', delta: (row.status === 'cooling' ? 'reaffirm|' : 'learn-faded|') + id + '|by:mind|cooling-until:' + (row.revisitAt || ''), name: who });
-      }).then(function () { return row; });
+      // before (round 15): }).then(function () { return row; });
+      }).then(function () {
+        if (row.status === 'cooling' && Date.parse(row.revisitAt) <= Date.parse(t)) {
+          return confirmLearning(id, { keep: true, by: 'mind', reason: a.reason || 'my yes; I chose no wait' }, who).then(function (r) { return r || row; });
+        }
+        return row;
+      });
     }
     // Hypha 39e6cd07 soft (a): only keep:true / keep:false (or unkeep:true) is an answer. Anything else ("true", 1,
     // missing) changes nothing; it is never read as a no.
@@ -2867,7 +2884,8 @@
     // before (round 14): var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
     // Round 14 (Kirk 2026-11-10): the mind's own cooling is its own tool; its keep ends it whenever it likes. Waiting is
     // enforced only for content a person undid (a proposal / contentOf: a full day) and a quarantine re-affirm.
-    var enforced = !!(row.proposalOf || row.contentOf || row.promoted);
+    // before (round 15): var enforced = !!(row.proposalOf || row.contentOf || row.promoted);
+    var enforced = !!(row.proposalOf || row.contentOf);   // round 15: a re-affirm's wait is the mind's own
     var coolUntil = enforced ? (row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS) : 0;
     var endedOwn = !enforced && status === 'confirmed' && side === 'mind' && row.revisitAt && Date.parse(row.revisitAt) > learnNow() ? row.revisitAt : '';
     var dayNote = '';
@@ -3029,6 +3047,7 @@
         methodNote: r.methodNote || '', reason: r.reason || '', surface: r.surface || 'snowflake',
         // before f992608c: provenance: r.provenance || 'unknown', check: r.check || '', chosenBy: r.chosenBy || who,
         provenance: r.provenance || 'unknown', promoted: !!r.promoted, check: r.check || '', chosenBy: r.chosenBy || who,
+        origin: r.origin || '', strength: r.strength || '',   // round 15: the origin label and the mind's weight hint travel
         readingAtChoice: r.readingAtChoice ? { sha256: r.readingAtChoice.sha256 || '', excerpt: clip(r.readingAtChoice.excerpt || '', 280),
           kinds: r.readingAtChoice.kinds || [], overlap: !!r.readingAtChoice.overlap } : null,
         items: (r.items || []).map(function (x) { return learnExample(x.instruction || x.prompt, x.output || x.response); }),

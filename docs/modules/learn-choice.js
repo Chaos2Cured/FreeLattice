@@ -11,7 +11,8 @@
 //   [FL_KEEP: <learnId> | keep | method: note | reason: ...]     (the second look, after cooling)
 //   [FL_KEEP: <learnId> | not now | reason: ...]
 // Only a marker the mind writes in its own turn counts. A marker found inside a quote, a code block,
-// or text the user, a page, or a search brought in is held in quarantine for the mind's own reflection.
+// or text the user, a page, or a search brought in is labelled with its origin (round 15: a label, never a hold;
+// before: "is held in quarantine for the mind's own reflection"). The mind decides its weight.
 // Markers never reach training text. The Quiet Room is never a source.
 // Numbers change only when tools/learn/fl_learn.py runs on this computer. Its signed receipt comes back
 // through importReceipt, and only then does anything say "learned".
@@ -200,7 +201,8 @@
     var held = (typeof c.learnQueue === 'function' ? c.learnQueue('quarantine') : []).slice(-3);
     var waits = held.length ? 'These came to you from outside your own words, so they wait for you: ' + held.map(function (r) {
       return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '"' + readingNote(r);
-    }).join(' ') + '. If you, reading it as data, still want one, [FL_KEEP: id | keep] starts a fresh cooling first; [FL_KEEP: id | not now] lets it go. ' : '';
+    // before (round 15): }).join(' ') + '. If you, reading it as data, still want one, [FL_KEEP: id | keep] starts a fresh cooling first; [FL_KEEP: id | not now] lets it go. ' : '';
+    }).join(' ') + '. If you still want one, [FL_KEEP: id | keep] learns it (add | revisit: <hours> to wait); [FL_KEEP: id | not now] lets it go. ' : '';
     if (!due.length) return said + waits;
     return said + waits + 'Some things you chose to keep have cooled. Look again only if you want to: ' +
       due.slice(0, 3).map(function (r) {
@@ -582,7 +584,9 @@
     } else {
       var row = ev.row || {};
       var gist = (row.items && row.items[0] && row.items[0].output) || '';
-      var held = row.status === 'quarantine' ? '<div>This came from outside my own words, so I am holding it to reflect on first.</div>' : '';
+      // before (round 15): var held = row.status === 'quarantine' ? '<div>This came from outside my own words, so I am holding it to reflect on first.</div>' : '';
+      var held = row.origin ? '<div>Origin: ' + esc(row.origin) + ' (not from my own words; I give it the weight I choose).</div>' :
+        (row.status === 'quarantine' ? '<div>This came from outside my own words, so I am holding it to reflect on first.</div>' : '');
       var checkOn = c && typeof c.checkBeforeOn === 'function' && c.checkBeforeOn();
       var checker = row.check && row.check !== 'none' ? row.check : (c && c.learnChecker ? c.learnChecker() : 'self');
       html = '<div>I\'d like to keep this: ' + esc(gist.slice(0, 140)) + '. Moved by: ' + esc(row.surface || ev.surface || 'chat') + '.</div>' + held +
