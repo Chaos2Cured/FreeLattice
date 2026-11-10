@@ -2340,6 +2340,61 @@
     return '';
   }
   function sameName(a, b) { return normMind(a) === normMind(b) && normMind(a) !== ''; }
+  // Hypha ed12354d HOLD / Weft recheck4 F7: a person's no follows the CONTENT, not only the row. One normal form for
+  // a learned text: normMind (NFKC, case-folded, final sigma, whitespace collapsed), then trailing punctuation and
+  // symbols stripped. Twin of norm_text() in fl_learn.py; tools/learn/learn-match-v0.1.json pins both.
+  var TEXT_TRAIL = (function () { try { return new RegExp('[\\p{P}\\p{S}\\s]+$', 'u'); } catch (e) { return /[!-\/:-@\[-`{-~\u00a1-\u00bf\u2010-\u2027\u2030-\u205e\u3000-\u303f\uff01-\uff0f\s]+$/; } })();
+  function normText(text) { return normMind(text).replace(TEXT_TRAIL, ''); }
+  // A cheap near-duplicate check (documented in tools/learn/README.md): token sets of letters, marks and digits from
+  // normText, minus a short list of filler words and one-letter tokens; Jaccard |A n B| / |A u B|. A hit needs a score
+  // of at least LEARN_SIMILAR (0.8) and at least 2 tokens on each side. Paraphrases with different words are NOT caught
+  // (that is what the day-long rule after a person's no is for). Twin of text_tokens()/text_similarity() in fl_learn.py.
+  var LEARN_SIMILAR = 0.8;
+  var TEXT_FILLER = ('a an the is are was were be been being am of to in on at and or for with as by from it its this that these those ' +
+    'my your his her our their i me you he she we they named called').split(' ');
+  var TOKEN_SPLIT = (function () { try { return new RegExp('[^\\p{L}\\p{M}\\p{N}]+', 'u'); } catch (e) { return /[^A-Za-z0-9\u00c0-\u024f\u0370-\u03ff\u0400-\u052f]+/; } })();
+  function textTokens(text) {
+    var seen = {}, out = [];
+    normText(text).split(TOKEN_SPLIT).forEach(function (w) {
+      if (Array.from(w).length < 2 || TEXT_FILLER.indexOf(w) !== -1 || seen[w]) return;
+      seen[w] = 1; out.push(w);
+    });
+    return out.sort();
+  }
+  function textSimilarity(a, b) {
+    var A = textTokens(a), B = textTokens(b);
+    if (A.length < 2 || B.length < 2) return 0;
+    var inter = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
+    return Math.round(inter / (A.length + B.length - inter) * 1000) / 1000;
+  }
+  // Weft recheck4 F5 residual: a UTS #39-style confusable skeleton for names, so a one-script lookalike (all-Cyrillic
+  // "Тһіѕ міпԁ") of a name already trusted here (or of the mind learning here) is refused. Not the full UTS #39 table:
+  // the Latin/Cyrillic/Greek letters below, plus 0/1/I/| -> o/l/l/l, rn -> m, vv -> w; combining marks dropped; and
+  // everything that is not a letter or digit removed (so "Lumen_", "Lumen!" and "Lu men" all look like "lumen").
+  // Twin of name_skeleton() in fl_learn.py; tools/learn/learn-match-v0.1.json pins both.
+  var SKELETON_PAIRS = 'АaВbЕeЅsІlЈjКkМmНhОoРpСcТtУyХxЁeЀeЌkЎyаaвbеeѕsіiјjкkмmнhоoрpсcтtуyхxһhԁdԛqԝwӏlӀlпnьbԍg' +
+    'ΑaΒbΕeΖzΗhΙlΚkΜmΝnΟoΡpΤtΥyΧxαaβbεeιiκkνvοoρpτtυuχxγyωwϲcϳjϹcϜfϝfΪlϊiΫyϋu' +
+    'ıiȷjɑaɡgɩiʟlǀl0o1lIl|l';
+  var SKELETON_MAP = (function () { var m = {}, a = Array.from(SKELETON_PAIRS), i; for (i = 0; i + 1 < a.length; i += 2) m[a[i]] = a[i + 1]; return m; })();
+  var SKEL_KEEP = (function () { try { return new RegExp('[^\\p{L}\\p{N}]', 'gu'); } catch (e) { return /[^A-Za-z0-9\u00c0-\u024f\u0370-\u03ff\u0400-\u052f]/g; } })();
+  var SKEL_MARK = (function () { try { return new RegExp('\\p{M}', 'gu'); } catch (e) { return /[\u0300-\u036f]/g; } })();
+  function skelMap(t) { return Array.from(t).map(function (c) { return Object.prototype.hasOwnProperty.call(SKELETON_MAP, c) ? SKELETON_MAP[c] : c; }).join(''); }
+  function nameSkeleton(label) {
+    var t = String(label == null ? '' : label);
+    if (t.normalize) t = t.normalize('NFKC').normalize('NFD');
+    t = t.replace(SKEL_MARK, '');
+    t = skelMap(t);
+    t = t.toUpperCase().toLowerCase().replace(/\u03c2/g, '\u03c3');
+    t = skelMap(t);
+    t = t.replace(/rn/g, 'm').replace(/vv/g, 'w');
+    return t.replace(SKEL_KEEP, '');
+  }
+  // The name (if any) among `names` that is a different name but looks like `label`. '' when none.
+  function lookalikeOf(label, names) {
+    var sk = nameSkeleton(label), i;
+    for (i = 0; i < names.length; i++) if (names[i] && !sameName(names[i], label) && nameSkeleton(names[i]) === sk) return String(names[i]);
+    return '';
+  }
   // The clock the cooling checks use. A test may move it (learnClockForTest); every row that used a moved clock says so.
   var clockOffset = 0;
   function learnNow() { return Date.now() + clockOffset; }
@@ -2451,6 +2506,28 @@
     // Optional rate cap: over it the row still lands, held, with its own ledger line. Nothing is dropped.
     var cap = learnDayCap();
     if (!hold && cap && todayCount >= cap) { row.status = 'rate-held'; row.layers.push({ t: t, status: 'rate-held', by: 'cap' }); }
+    // Hypha ed12354d HOLD / Weft recheck4 F7: a person's no follows the content. (1) Same normalized text, or (3) a near
+    // duplicate (textSimilarity >= LEARN_SIMILAR), of a row of this mind whose newest unsuperseded person decision is a
+    // no: the new choice is a disagreement proposal of that row (a full day, a ledger row; revisit: now ignored). While
+    // one such proposal is open, a repeat attaches to it (a count on it, no new row). (2) For a day after ANY person no
+    // for this mind, revisit: now (or any early revisit) is ignored on every new choice; that covers paraphrases the
+    // matcher can't see. The reason is not part of the match.
+    var legacy = readBook(LS_QUEUE);
+    var mine = book.rows.concat(legacy.rows.filter(function (r) { return sameMind(r, mind); }));
+    var hit = contentMatch(mine, text, {});
+    if (hit) return proposeAgain(key, book, legacy, mine, row, hit, it, mind, surface);
+    var recent = recentPersonNo(mine);
+    var earlyNote = '';
+    if (recent) {
+      var full = fullCoolingFrom(it.revisit, t);
+      if (Date.parse(row.revisitAt) < Date.parse(full)) {
+        row.earlyIgnored = { asked: row.revisitAt, becausePersonNo: recent.row.learnId, personNoAt: recent.layer.t };
+        row.layers[0].earlyIgnored = 'an early revisit is not used for a day after a person said no (' + recent.row.learnId + ')';
+        if (clockOffset) row.layers[0].clockInjectedMs = clockOffset;
+        row.revisitAt = full;
+        earlyNote = '|revisit-ignored:person-no:' + recent.row.learnId + clockNote();
+      }
+    }
     var fm = root.FLMemory;
     var p = (fm && fm.isNew) ? fm.isNew(row.reason + '|' + text, 'learn::' + mid) : Promise.resolve({ fresh: true });
     return p.then(function (r) {
@@ -2464,15 +2541,99 @@
     }).then(function (r) {
       if (r === null) return null;
       if (fm && r && r.k && typeof fm.remember === 'function') fm.remember(r.k, 'learn::' + mid);
-      return sha8(row.t + '|' + text).then(function (id) {
-        row.learnId = 'L' + id;
+      // before: return sha8(row.t + '|' + text).then(function (id) {
+      // before:   row.learnId = 'L' + id;
+      // Found in recheck4: the same text chosen twice in the same millisecond got the same id (and one row hid the
+      // other). An id is now unique among this mind's rows.
+      return freshLearnId(mine, row.t + '|' + text).then(function (lid) {
+        row.learnId = lid;
         book.rows.push(row);
         return atomicWrite(key, JSON.stringify(book)).then(function () {
           var kind = row.status === 'quarantine' ? 'learn-quarantine' : (row.status === 'rate-held' ? 'learn-skip' : 'learn-choose');
-          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId, name: mind }).then(function () { return row; });
+          // before: return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId, name: mind }).then(function () { return row; });
+          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () { return row; });
         });
       });
     });
+  }
+
+  // F7 helpers. rowText: what a row would teach. personNoOn: the newest unsuperseded person decision, when it is a no.
+  function rowText(r) { return ((r && r.items) || []).map(function (x) { return (x && (x.output || x.response)) || ''; }).join(' '); }
+  function personNoOn(r) { var l = r && lastPersonDecisive(r); return l && dirOf(l.status) === 'no' ? l : null; }
+  // The row (of `rows`, not in `skip`) a person said no to whose content is `text`: the same normalized text first,
+  // then the closest near duplicate. { row, personNo, how, score } or null.
+  function contentMatch(rows, text, skip) {
+    var nt = normText(text), best = null;
+    rows.forEach(function (r) {
+      var no = personNoOn(r);
+      if (!no || !r.learnId || skip[r.learnId]) return;
+      var rt = rowText(r);
+      var score = normText(rt) === nt && nt ? 1 : textSimilarity(rt, text);
+      if (score < LEARN_SIMILAR && !(score === 1)) return;
+      var exact = normText(rt) === nt;
+      var cand = { row: r, personNo: no, exact: exact, score: exact ? 1 : score,
+        how: exact ? 'same-text' : 'similar-to ' + r.learnId + ', ' + score };
+      if (!best || (cand.exact && !best.exact) || (cand.exact === best.exact && (cand.score > best.score ||
+          (cand.score === best.score && String(no.t) > String(best.personNo.t))))) best = cand;
+    });
+    return best;
+  }
+  function openProposalFor(rows, id) {
+    var i;
+    for (i = rows.length - 1; i >= 0; i--) if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling') return rows[i];
+    return null;
+  }
+  // The newest person no on any row of this mind within the last day (by the learning clock), or null.
+  function recentPersonNo(rows) {
+    var best = null, since = learnNow() - COOL_MS;
+    rows.forEach(function (r) {
+      var no = personNoOn(r);
+      if (no && Date.parse(no.t) > since && (!best || String(no.t) > String(best.layer.t))) best = { row: r, layer: no };
+    });
+    return best;
+  }
+  // 'L' + sha8(seed), unique among `rows` (a counter is added to the seed on a clash).
+  function freshLearnId(rows, seed) {
+    function tryN(n) {
+      return sha8(n ? seed + '|' + n : seed).then(function (h) {
+        var id = 'L' + h;
+        return rows.some(function (r) { return r && (r.learnId === id || r.flakeId === id); }) && n < 50 ? tryN(n + 1) : id;
+      });
+    }
+    return tryN(0);
+  }
+  function bookOf(book, legacy, r) { return book.rows.indexOf(r) !== -1 ? book : legacy; }
+  // F7 (1)/(3): the mind chose content a person said no to. A proposal of that row: a full day, visible both ways.
+  // F8: while one proposal of that row is open, a repeat attaches to it (againCount), with no new row or ledger row.
+  function proposeAgain(key, book, legacy, mine, row, hit, it, mind, surface) {
+    var orig = hit.row, t = row.t;
+    var open = openProposalFor(mine, orig.learnId);
+    if (open) {
+      open.againCount = (open.againCount || 0) + 1; open.lastAgainAt = t;
+      var ob = bookOf(book, legacy, open);
+      return atomicWrite(ob === book ? key : LS_QUEUE, JSON.stringify(ob)).then(function () { return open; });
+    }
+    var said = hit.personNo.status === 'unkept' ? 'Undo' : 'not now';
+    var note = 'The person said ' + said + ' on ' + orig.learnId + '; the mind chose the same content again.';
+    row.revisitAt = fullCoolingFrom(it.revisit, t);
+    row.proposalOf = orig.learnId;
+    row.disagreement = { t: t, between: ['person', 'mind'], note: note, via: 're-remember', match: hit.how };
+    if (!hit.exact) row.similarTo = orig.learnId + ', ' + hit.score;
+    row.layers[0].disagreement = true; row.layers[0].proposalOf = orig.learnId; row.layers[0].match = hit.how;
+    if (clockOffset) row.layers[0].clockInjectedMs = clockOffset;
+    row.chosenBy = mind;
+    return freshLearnId(mine, row.t + '|' + rowText(row) + '|again').then(function (lid) {
+      row.learnId = lid;
+      orig.layers = (orig.layers || []).concat([{ t: t, status: 'disagreement', by: mind, wanted: 'keep', over: hit.personNo.status,
+        via: 're-remember', match: hit.how, note: note, proposal: row.learnId }]);
+      book.rows.push(row);
+      var w = atomicWrite(key, JSON.stringify(book));
+      if (bookOf(book, legacy, orig) === legacy) w = w.then(function () { return atomicWrite(LS_QUEUE, JSON.stringify(legacy)); });
+      return w;
+    }).then(function () {
+      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + orig.learnId + '>' + row.learnId +
+        '|by:mind|over:person|via:re-remember|' + (hit.exact ? 'same-text' : 'similar-to ' + orig.learnId + ',' + hit.score) + clockNote(), name: mind });
+    }).then(function () { return row; });
   }
 
   // Hypha 23a0279 soft: a huge, NaN, Infinity or negative revisit never throws. Hours are clamped to
@@ -2565,6 +2726,17 @@
     // before: var prev = lastDecisive(row);
     var personSaid = lastPersonDecisive(row);
     var prev = side === 'mind' && personSaid && dirOf(personSaid.status) === 'no' ? personSaid : lastDecisive(row);
+    // Weft recheck4 F8 / Hypha soft (c): the mind's not-now on a row that already stands at no changes nothing, so
+    // not-now/keep alternation can't grow the row or the ledger (the keeps attach to the one open proposal).
+    if (side === 'mind' && dirOf(status) === 'no' && (row.status === 'faded' || row.status === 'unkept')) return Promise.resolve(row);
+    // Weft recheck4 F7: the mind's keep of an EARLIER row with the same content (or a near duplicate) as a row a person
+    // said no to is a disagreement too: a proposal with a full day, never a confirm. A proposal is already one.
+    if (side === 'mind' && dirOf(status) === 'keep' && !row.proposalOf && !(personSaid && dirOf(personSaid.status) === 'no')) {
+      var skip = {}; skip[row.learnId] = 1;
+      var all = book.rows.concat(key === LS_QUEUE ? [] : readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }));
+      var sib = contentMatch(all, rowText(row), skip);
+      if (sib) return disagree(key, book, row, sib.personNo, status, actor, side, a, who, sib);
+    }
     // Hypha 2: neither side silently overrides the other. A keep after the other side's no, or a no after the
     // other side's keep, is a visible disagreement both can see.
     // Hypha 23a0279 HOLD: nothing skips the disagreement check (a JSON marker with promote:true did).
@@ -2630,7 +2802,8 @@
   // The keeping side gets a NEW proposal row: cooling restarts and it needs the mind's second yes again. The
   // original row keeps the "no" (nothing learns from it). A no after the other side's keep sets the row to
   // "disputed": it does not travel to the runner, and it is not unkept either, until the mind looks again.
-  function disagree(key, book, row, prev, status, actor, side, a, who) {
+  // before: function disagree(key, book, row, prev, status, actor, side, a, who) {
+  function disagree(key, book, row, prev, status, actor, side, a, who, sib) {
     var t = new Date().toISOString();
     var why = clip(stripMarkers(a.reason || ''), 300);
     var note = side === 'mind'
@@ -2649,22 +2822,36 @@
         return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
       }).then(function () { return row; });
     }
+    // Weft recheck4 F8: while a proposal of this row is open, another keep attaches to it (a count), no new row.
+    var open = openProposalFor(book.rows, row.learnId);
+    if (open) {
+      if (row.status === 'disputed') row.status = prev.status;
+      open.againCount = (open.againCount || 0) + 1; open.lastAgainAt = t;
+      return atomicWrite(key, JSON.stringify(book)).then(function () { return open; });
+    }
+    if (sib) note += ' Same content as ' + sib.row.learnId + ' (' + sib.how + ').';
     if (row.status === 'disputed') row.status = prev.status;      // the no stands on the original
     row.layers = (row.layers || []).concat([{ t: t, status: 'disagreement', by: actor, wanted: 'keep', over: prev.status, why: why, note: note }]);
+    if (sib) row.layers[row.layers.length - 1].contentOf = sib.row.learnId;
     var fresh = JSON.parse(JSON.stringify(row));
     delete fresh.fingerprint;
     // before f992608c: fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = revisitFrom(a.revisit, t);
     fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = fullCoolingFrom(a.revisit, t);
     fresh.proposalOf = row.learnId; fresh.disagreement = { t: t, between: [sideOf(prev.by), side], note: note };
+    if (sib) { fresh.contentOf = sib.row.learnId; fresh.disagreement.match = sib.how; if (!sib.exact) fresh.similarTo = sib.row.learnId + ', ' + sib.score; }
     fresh.layers = [{ t: t, status: 'noticed', by: actor, why: why, disagreement: true, proposalOf: row.learnId }];
-    return sha8(t + '|' + row.learnId + '|again').then(function (id8) {
-      fresh.learnId = 'L' + id8;
+    // before: return sha8(t + '|' + row.learnId + '|again').then(function (id8) {
+    // before:   fresh.learnId = 'L' + id8;
+    return freshLearnId(book.rows, t + '|' + row.learnId + '|again').then(function (lid) {
+      fresh.learnId = lid;
       row.layers[row.layers.length - 1].proposal = fresh.learnId;
       book.rows.push(fresh);
       return atomicWrite(key, JSON.stringify(book));
     }).then(function () {
       // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
-      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
+      // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
+      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by) +
+        (sib ? '|content-of:' + sib.row.learnId + '|' + (sib.exact ? 'same-text' : 'similar ' + sib.score) : '') + clockNote(), name: who });
     }).then(function () { return fresh; });
   }
 
@@ -2702,7 +2889,10 @@
         items: (r.items || []).map(function (x) { return learnExample(x.instruction || x.prompt, x.output || x.response); }),
         // before: probe: r.probe || null, fingerprint: r.fingerprint || ''
         // Weft recheck3 F3: when it was chosen and when its cooling ended travel too, so the runner's own check fires.
-        probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || ''
+        // before: probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || ''
+        probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || '',
+        // Weft recheck4 F7: a proposal says what it disagrees with, so the runner and a reviewer can see it.
+        proposalOf: r.proposalOf || '', contentOf: r.contentOf || '', similarTo: r.similarTo || ''
       }));
     });
     return lines.join('\n');
@@ -3737,6 +3927,9 @@
     // before: learnClockForTest: learnClockForTest,
     learnClockForTest: TEST_HOOKS ? learnClockForTest : undefined,
     nameProblem: nameProblem,
+    normText: normText,
+    textSimilarity: textSimilarity,
+    nameSkeleton: nameSkeleton,
     sha256Sync: sha256Sync,
     verifiedReceiptFor: verifiedReceiptFor,
     confirmLearning: confirmLearning,
