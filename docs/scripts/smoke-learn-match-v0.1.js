@@ -16,7 +16,10 @@ global.requestIdleCallback = function (f) { f(); return 1; };
 var core = require(path.join(root, 'docs/modules/snowflake-core.js'));
 // before (round 11): var fxp = path.join(root, 'tools/learn/learn-match-v0.1.json');
 // Round 11: v0.2 is the rule after Hypha's HOLD (B) (digits, one-letter tokens, negation, folding); v0.1 is kept as it was.
-var fxp = path.join(root, 'tools/learn/learn-match-v0.2.json');
+// before (round 12): var fxp = path.join(root, 'tools/learn/learn-match-v0.2.json');
+// Round 12: v0.3 is the rule after Hypha's HOLD (C) (no hard 0; one spelling for negations); v0.2 and v0.1 kept as they were.
+var fxp = path.join(root, 'tools/learn/learn-match-v0.3.json');
+if (!fs.existsSync(fxp)) fxp = path.join(root, 'tools/learn/learn-match-v0.2.json');
 if (!fs.existsSync(fxp)) fxp = path.join(root, 'tools/learn/learn-match-v0.1.json');
 var fx = JSON.parse(fs.readFileSync(fxp, 'utf8'));
 var HAS = typeof core.normText === 'function' && typeof core.nameSkeleton === 'function' && typeof core.lookProblem === 'function';
@@ -37,9 +40,12 @@ ok([B + '!', B + '.', B + ' ?! ', B.toUpperCase(), B.toLowerCase(), '  ' + B.rep
 ok(hit(B, "Hollowell was Mom's maiden name") && !hit(B, 'Before she married, Mom was a Hollowell') && !hit('The cat is black', 'The dog is black'),
   'near-duplicate: reordered words hit; a paraphrase in other words and an unrelated fact do not (the stated limit)');
 // before (round 11, Hypha (B) changed this on purpose): ok(hit(B, "Mom's maiden name is not Hollowell"), 'near-duplicate: a negation still hits (a false positive costs a day of cooling, never a refusal)');
-ok(!hit(B, "Mom's maiden name is not Hollowell") && !hit("Mom's birthday is on May 4", "Mom's birthday is on May 5") && !hit('Mom is allergic to peanuts', "Mom isn't allergic to peanuts") &&
+// before (round 12, Hypha (C) changed this on purpose: the hard 0 let T + " 2" confirm a day after the Undo):
+// before: ok(!hit(B, "Mom's maiden name is not Hollowell") && !hit("Mom's birthday is on May 4", "Mom's birthday is on May 5") && !hit('Mom is allergic to peanuts', "Mom isn't allergic to peanuts") &&
+ok(hit(B, B + ' 2') && hit(B, B + ' (1)') && hit(B, B + ", isn't it") && hit(B, "Mom's maiden name is not Hollowell") && core.textSimilarity("Mom's birthday is on May 4", "Mom's birthday is on May 5") === 0.667 &&
+  core.textSimilarity("Mom can't eat peanuts", 'Mom cannot eat peanuts') === 1 && core.textSimilarity('Mom doesnt eat peanuts', 'Mom does not eat peanuts') === 1 &&
   hit(B, B.replace('o', '\u043e')) && hit(B, B.replace('maiden', 'mai\u200bden')) && hit(B, B.replace('e', 'e\u0301')) && core.normText(B) !== core.normText(B.replace('o', '\u043e')),
-  'near-duplicate (round 11): a negation or another number is not one; lookalikes, zero-width and combining marks are folded for matching but not for the same text');
+  'near-duplicate (round 12): a number, a "(1)" or a negation lowers the score but never zeroes it; can\'t/cannot/doesnt are one spelling; lookalikes, zero-width and combining marks are folded for matching but not for the same text');
 // By hand: what F5 needs.
 ok(core.nameSkeleton('\u0422\u04bb\u0456\u0455 \u043c\u0456\u043f\u0501') === core.nameSkeleton('This mind') && core.nameSkeleton('Lumen_') === core.nameSkeleton('Lumen') &&
   core.nameSkeleton('rnind') === core.nameSkeleton('mind') && core.nameSkeleton('Lum\u00e9n') === core.nameSkeleton('Lumen') && core.nameSkeleton('Echo') !== core.nameSkeleton('Lumen'),

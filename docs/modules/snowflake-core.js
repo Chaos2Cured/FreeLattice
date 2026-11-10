@@ -2389,8 +2389,20 @@
     var t = String(text == null ? '' : text).replace(TEXT_CF, '');
     if (t.normalize) t = t.normalize('NFKC').normalize('NFD').replace(TEXT_MARK, '').normalize('NFC');
     t = fold(normText(fold(t)));
-    return t.replace(/n['\u2019\u2018\u02bc]t(?![\p{L}\p{N}])/gu, ' not');
+    // before (round 12): return t.replace(/n['\u2019\u2018\u02bc]t(?![\p{L}\p{N}])/gu, ' not');
+    return negSpell(t);
   }
+  // Round 12 (Weft soft): one spelling for negations in both twins: cannot / can't / cant -> "can not", won't / wont ->
+  // "will not", shan't -> "shall not", doesnt / isnt / ... (no apostrophe) -> "does not" / "is not" ..., any other n't -> " not".
+  var NEG_SPELL = [
+    [/(?<![\p{L}\p{N}])cannot(?![\p{L}\p{N}])/gu, 'can not'],
+    [/(?<![\p{L}\p{N}])can['\u2019\u2018\u02bc]?t(?![\p{L}\p{N}])/gu, 'can not'],
+    [/(?<![\p{L}\p{N}])won['\u2019\u2018\u02bc]?t(?![\p{L}\p{N}])/gu, 'will not'],
+    [/(?<![\p{L}\p{N}])shan['\u2019\u2018\u02bc]?t(?![\p{L}\p{N}])/gu, 'shall not'],
+    [/(?<![\p{L}\p{N}])(do|does|did|is|are|was|were|has|have|had|would|should|could|must|need)nt(?![\p{L}\p{N}])/gu, '$1 not'],
+    [/n['\u2019\u2018\u02bc]t(?![\p{L}\p{N}])/gu, ' not']
+  ];
+  function negSpell(t) { NEG_SPELL.forEach(function (r) { t = t.replace(r[0], r[1]); }); return t; }
   // A small memo: the content check reads every row of the book on each choice (Weft: 26 s to build 1500 rows).
   var TOKEN_MEMO = {}, TOKEN_MEMO_N = 0;
   function textTokens(text) {
@@ -2411,7 +2423,11 @@
     if (A.length < 2 || B.length < 2) return 0;
     function neg(X) { return X.some(function (w) { return TEXT_NEGATORS.indexOf(w) !== -1; }); }
     function nums(X) { return X.filter(function (w) { return TEXT_DIGIT.test(w); }).join(' '); }
-    if (neg(A) !== neg(B) || nums(A) !== nums(B)) return 0;
+    // before (round 12, Hypha (C): the hard 0 let T + " 2" / " (1)" / ", isn't it" confirm a day after the Undo):
+    // before: if (neg(A) !== neg(B) || nums(A) !== nums(B)) return 0;
+    // Digits, one-letter words and negators are ordinary tokens: they lower the score, they never zero it. A
+    // correction ("May 5") is kept apart by attaching only on the same text, not by the score.
+    void neg; void nums;
     var inter = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
     return Math.round(inter / (A.length + B.length - inter) * 1000) / 1000;
   }
@@ -2622,6 +2638,7 @@
   // Round 11: `since` (an ISO time, optional): only a person no after it counts. A tie at the same millisecond goes to
   // the person, except for the no(s) the proposal itself answers (`answered`: its proposalOf / contentOf rows).
   function contentMatch(rows, text, skip, since, answered) {
+    // before (round 11): var nt = normText(text), best = null;
     var nt = normText(text), best = null, sinceMs = since ? Date.parse(since) : NaN, ans = answered || {};
     rows.forEach(function (r) {
       var no = personNoOn(r);
@@ -2833,9 +2850,17 @@
     // day. An early yes changes nothing: a still-cooling layer and a row.
     var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
     var dayNote = '';
-    if (status === 'confirmed' && side === 'mind' && !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS)) {
+    // before (round 12): if (status === 'confirmed' && side === 'mind' && !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS)) {
+    // before (round 12):   var rn = recentPersonNo(allRows());
+    // before (round 12):   if (rn && Date.parse(rn.layer.t) + COOL_MS > coolUntil) { coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId; }
+    // Round 12 (Weft F11): ALSO any row chosen at or before that no (whatever its own cooling: a full day spent before
+    // the no does not count) waits until max(revisitAt, no + 24 h). A tie goes to the person.
+    if (status === 'confirmed' && side === 'mind') {
       var rn = recentPersonNo(allRows());
-      if (rn && Date.parse(rn.layer.t) + COOL_MS > coolUntil) { coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId; }
+      var shortCool = !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS);
+      if (rn && (shortCool || (Date.parse(row.t || 0) || 0) <= Date.parse(rn.layer.t)) && Date.parse(rn.layer.t) + COOL_MS > coolUntil) {
+        coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId;
+      }
     }
     if (status === 'confirmed' && coolUntil > learnNow()) {
       var untilIso = new Date(coolUntil).toISOString();

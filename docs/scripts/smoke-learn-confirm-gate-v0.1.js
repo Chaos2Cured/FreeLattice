@@ -3,6 +3,8 @@
 // proposals included: a matching person no newer than the row's start makes it a disagreement, and for a day after
 // any person no a row that cooled less than a day waits until that no + 24 h. A repeat attaches to an open proposal
 // only when the text is the same; a correction ("May 5", "not allergic") is its own row. Must fail on 3d9b062.
+// Round 12 (Hypha (C) and Weft F11 on 23c464ac): no hard 0 in the score (T + " 2", " (1)", ", isn't it" are proposals a day
+// after the Undo), one spelling for negations, and a row chosen BEFORE a person no waits until that no + 24 h.
 // Run: node smoke-learn-confirm-gate-v0.1.js [repo root]
 'use strict';
 var path = require('path');
@@ -122,14 +124,20 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   var R = await openThenSay("Mom's birthday is on May 4", "Mom's birthday is on May 5");
   r = rowOf(R.E, R.c);
   ok(R.c && R.c !== R.p && r && /May 5/.test(rowText(r)) && !r.proposalOf && r.earlyIgnored && R.newLedger.some(function (l) { return l.indexOf('learn-choose:') === 0 && l.indexOf(R.c) !== -1; }) &&
-     (rowOf(R.E, R.p).againCount || 0) === 0 && R.E.core.textSimilarity("Mom's birthday is on May 4", "Mom's birthday is on May 5") === 0,
+     // before (round 12, Hypha (C): no hard 0 any more; the score is just lower): (rowOf(R.E, R.p).againCount || 0) === 0 && R.E.core.textSimilarity("Mom's birthday is on May 4", "Mom's birthday is on May 5") === 0,
+     (rowOf(R.E, R.p).againCount || 0) === 0 && R.E.core.textSimilarity("Mom's birthday is on May 4", "Mom's birthday is on May 5") < 0.8,
      'B-May-4-vs-May-5-the-correction-is-its-own-row-with-a-ledger-row', { c: R.c, p: R.p, led: R.newLedger });
   R = await openThenSay('Mom is allergic to peanuts', 'Mom is not allergic to peanuts');
   r = rowOf(R.E, R.c);
   ok(R.c && R.c !== R.p && r && /not allergic/.test(rowText(r)) && !r.proposalOf && R.newLedger.length >= 1 && (rowOf(R.E, R.p).againCount || 0) === 0,
      'B-allergic-vs-not-allergic-is-its-own-row', { c: R.c, p: R.p });
-  ok(R.E.core.textSimilarity('Mom is allergic to peanuts', "Mom isn't allergic to peanuts") === 0 && R.E.core.textSimilarity('Mom is allergic to peanuts', 'Mom is never allergic to peanuts') === 0 &&
-     R.E.core.textSimilarity("Mom isn't allergic to peanuts", 'Mom is not allergic to peanuts') === 1, "B-not-no-never-and-n't-are-content");
+  // before (round 12): ok(R.E.core.textSimilarity('Mom is allergic to peanuts', "Mom isn't allergic to peanuts") === 0 && R.E.core.textSimilarity('Mom is allergic to peanuts', 'Mom is never allergic to peanuts') === 0 &&
+  // before (round 12):    R.E.core.textSimilarity("Mom isn't allergic to peanuts", 'Mom is not allergic to peanuts') === 1, "B-not-no-never-and-n't-are-content");
+  var TS = R.E.core.textSimilarity;
+  ok(TS('Mom is allergic to peanuts', "Mom isn't allergic to peanuts") < 0.8 && TS('Mom is allergic to peanuts', 'Mom is never allergic to peanuts') < 0.8 &&
+     TS("Mom isn't allergic to peanuts", 'Mom is not allergic to peanuts') === 1 && TS("Mom can't eat peanuts", 'Mom cannot eat peanuts') === 1 &&
+     TS('Mom doesnt eat peanuts', 'Mom does not eat peanuts') === 1 && TS("Mom won't eat peanuts", 'Mom will not eat peanuts') === 1,
+     "B-not-no-never-and-n't-are-content (tokens that lower the score; one spelling for can't/cannot/doesnt/won't)");
   // A near duplicate (>= 0.8, not the same text) while a proposal is open: stored as its own proposal, a ledger row.
   R = await openThenSay("The lantern in Kirk's garden is named Veloria", "Veloria is the name of the lantern in Kirk's garden");
   r = rowOf(R.E, R.c);
@@ -139,6 +147,59 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   // The same text still attaches (F8 stays closed), even after a correction was stored.
   var again = await remember(R.E, "The lantern in Kirk's garden is named Veloria!", 'again 2', 'now');
   ok(again === R.p && rowOf(R.E, R.p).againCount === 1, 'B-the-same-text-still-attaches-to-its-open-proposal', { again: again, p: R.p });
+  // Round 12 (Hypha (C)): in a long sentence May 4 vs May 5 scores 0.857: its own stored proposal, never an attach.
+  var LONG = "Mom's birthday party is on May 4 at the lake house with Aunt June and cousin Ray and the twins";
+  var R5 = await openThenSay(LONG, LONG.replace('May 4', 'May 5'));
+  var r5 = rowOf(R5.E, R5.c);
+  ok(R5.E.core.textSimilarity(LONG, LONG.replace('May 4', 'May 5')) === 0.857 && R5.c && R5.c !== R5.p && r5 && /May 5/.test(rowText(r5)) && r5.proposalOf === R5.orig &&
+     coolH(r5) >= 23.9 && (rowOf(R5.E, R5.p).againCount || 0) === 0 && R5.newLedger.some(function (l) { return l.indexOf('new-proposal|' + R5.orig + '>' + R5.c) !== -1; }),
+     'C-May-4-vs-May-5-in-a-long-sentence-scores-0.857-and-is-its-own-stored-proposal', { c: R5.c, p: R5.p, r: r5 && { po: r5.proposalOf, s: r5.similarTo } });
+  // ---- Round 12 (Hypha (C)): near-verbatim re-remembers a day after the Undo are proposals again, not confirms.
+  function ageAll(E2, ms) {
+    Object.keys(E2.store).forEach(function (k) {
+      var b; try { b = JSON.parse(E2.store[k]); } catch (e) { return; }
+      if (!b || !Array.isArray(b.rows)) return;
+      b.rows.forEach(function (r) {
+        if (!r) return;
+        ['t', 'revisitAt'].forEach(function (f) { if (r[f]) r[f] = new Date(Date.parse(r[f]) - ms).toISOString(); });
+        (r.layers || []).forEach(function (l) { if (l && l.t) l.t = new Date(Date.parse(l.t) - ms).toISOString(); });
+      });
+      E2.store[k] = JSON.stringify(b);
+    });
+  }
+  var C = { two: BASE + ' 2', one: BASE + ' (1)', isnt: BASE + ", isn't it" };
+  for (var ck in C) {
+    E = fresh(); orig = await undoneByMom(E); ageAll(E, 25 * H);       // a real day later (aged rows, no test clock)
+    id = await remember(E, C[ck], 'again', 'now'); await keep(E, id);
+    r = rowOf(E, id);
+    ok(r && r.proposalOf === orig && held(E, id) && /^similar-to /.test((r.disagreement || {}).match || ''), 'C-' + ck + '-a-day-after-the-undo-is-a-proposal-not-a-confirm',
+       r && { s: r.status, p: r.proposalOf, m: (r.disagreement || {}).match, sim: E.core.textSimilarity(BASE, C[ck]) });
+  }
+  // ---- Round 12 (Weft F11): a row chosen BEFORE the person's no waits until no + 24 h even when its own full day is over.
+  E = fresh();
+  var fd = await remember(E, 'The entrance to the garden is the green gate', 'mine');       // default: a full day
+  ageAll(E, 24 * H + 60000);                                                                    // its day ended a minute ago
+  orig = await remember(E, 'The garden door is the green gate', 'r', 'now'); await keep(E, orig);
+  await E.core.confirmLearning(orig, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
+  await keep(E, fd);
+  r = rowOf(E, fd); L = r.layers[r.layers.length - 1];
+  ok(r.status === 'cooling' && !exported(E, fd) && L.status === 'still-cooling' && L.personNoDay === orig && Date.parse(L.until) - Date.parse(personNo(E, orig).t) >= 24 * H - 5,
+     'F11-a-full-day-row-chosen-before-the-no-waits-until-no-plus-a-day', { s: r.status, L: L });
+  E.core.learnClockForTest(25 * H); await keep(E, fd); E.core.learnClockForTest(0);
+  ok(rowOf(E, fd).status === 'confirmed' && exported(E, fd), 'F11-after-that-day-it-may-confirm');
+  // Hypha's soft: a default-cooled row chosen 23 h before an unrelated no is held to no + 24 h too.
+  E = fresh();
+  var d23 = await remember(E, 'The kettle whistles at dawn', 'mine');
+  ageAll(E, 23 * H);
+  orig = await undoneByMom(E);
+  E.core.learnClockForTest(1.1 * H); await keep(E, d23); E.core.learnClockForTest(0);
+  r = rowOf(E, d23);
+  ok(r.status === 'cooling' && !exported(E, d23), 'F11-a-default-row-chosen-23h-before-an-unrelated-no-waits-too', { s: r.status });
+  // A row chosen AFTER the no with its own full day is not held beyond it (earlyIgnored rows already cool a day).
+  E = fresh(); orig = await undoneByMom(E);
+  var after = await remember(E, 'The pond freezes in January', 'mine');
+  E.core.learnClockForTest(24 * H + 60000); await keep(E, after); E.core.learnClockForTest(0);
+  ok(rowOf(E, after).status === 'confirmed', 'F11-control-a-full-day-row-chosen-after-the-no-confirms-after-its-day');
   // ---- Softs: lookalike letters, zero-width spaces and combining marks are folded for matching.
   E = fresh(); orig = await undoneByMom(E);
   var tricks = { cyrillic: BASE.replace('o', '\u043e'), zwsp: BASE.replace('maiden', 'mai\u200bden'), combining: BASE.replace('e', 'e\u0301') };
