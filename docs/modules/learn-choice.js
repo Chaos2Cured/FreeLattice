@@ -291,6 +291,10 @@
     d.head.appendChild(s);
   }
 
+  function when(iso) {
+    // A person reads this: the device's own local time, not a raw UTC string.
+    try { var d = new Date(iso); if (isNaN(d)) return String(iso || ''); return d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { return String(iso || ''); }
+  }
   function esc(s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   function shown(el) {
@@ -421,7 +425,7 @@
       html = '<div>We see this one differently.</div><div class="note">' + esc((dr.disagreement && dr.disagreement.note) || '') + '</div>' +
         (dr.status === 'disputed'
           ? '<div>Nothing from it goes to learning until the mind looks again. Both choices are kept in the record.</div>'
-          : '<div>It is a new proposal now. It cools until ' + esc(String(dr.revisitAt || '').slice(0, 16)) + ', and nothing is learned unless the mind says yes again after that.</div>') +
+          : '<div>It is a new proposal now. It cools until ' + esc(when(dr.revisitAt)) + ', and nothing is learned unless the mind says yes again after that.</div>') +
         '<div class="row"><button data-a="close">OK</button></div>';
     } else if (ev.untrustedKey) {
       html = '<div>This receipt comes from a learning helper this app does not know yet, so nothing changed.</div>' +
@@ -453,7 +457,7 @@
       var checkOn = c && typeof c.checkBeforeOn === 'function' && c.checkBeforeOn();
       var checker = row.check && row.check !== 'none' ? row.check : (c && c.learnChecker ? c.learnChecker() : 'self');
       html = '<div>I\'d like to keep this: ' + esc(gist.slice(0, 140)) + '. Moved by: ' + esc(row.surface || ev.surface || 'chat') + '.</div>' + held +
-        '<details><summary>details ▾</summary><div>Cooling until ' + esc(String(row.revisitAt || '').slice(0, 16)) +
+        '<details><summary>details ▾</summary><div>Cooling until ' + esc(when(row.revisitAt)) +
         '; I will look again before anything changes.</div><div>Way: ' + esc(row.method || '') + '</div>' +
         '<div>' + (checkOn ? 'Check before keeping is on: ' + esc(checkerWords(checker)) + '.' : 'Check before keeping is off.') + '</div></details>' +
         '<div class="row">' + (checkOn ? '<button data-a="keep">Let it learn</button><button data-a="fade">Not now</button>'
