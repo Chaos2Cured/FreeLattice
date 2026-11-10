@@ -365,6 +365,14 @@ def overnight_tests():
            and 'do not match' in rj1[-1].get('problem', '') and glob.glob(p1[0] + '.rejected-*') and not os.path.exists(p1[0])
            and 'run-resumed' not in kinds(T1) and os.path.exists(live(T1)) and sha(live(T1)) == sha(live(U)) and saved_rows
            and all(x.get('sha256') for x in saved_rows), why=(rj1[-1].get('problem') if rj1 else None), saved=len(saved_rows))
+    TN = os.path.join(A.work, 'ckpt-tamper-repeat-no-resume'); pn = cut(TN)
+    bn = bytearray(open(pn[0], 'rb').read()); bn[len(bn) // 2] ^= 1; open(pn[0], 'wb').write(bytes(bn))
+    rn, on = sh(['remember'] + T3 + ['--method', 'soft-prompt', '--second-yes'] + Q, TN)
+    rjn = rejected(TN)
+    record('R16-F15-a-changed-checkpoint-is-rejected-on-a-repeat-run-without-resume', len(pn) == 1 and rn == 0 and rjn
+           and 'do not match' in rjn[-1].get('problem', '') and glob.glob(pn[0] + '.rejected-*') and not os.path.exists(pn[0])
+           and 'run-resumed' not in kinds(TN) and os.path.exists(live(TN)) and sha(live(TN)) == sha(live(U)),
+           why=(rjn[-1].get('problem') if rjn else None))
     T2 = os.path.join(A.work, 'ckpt-tamper-repeat'); p2 = cut(T2)
     marker = os.path.join(A.work, 'PWNED-must-not-exist')
     open(os.path.join(A.work, 'evil.py'), 'w').write('import os\nclass Evil:\n    def __reduce__(self): return (os.mkdir, (%r,))\n' % marker)
