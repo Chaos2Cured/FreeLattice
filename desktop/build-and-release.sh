@@ -28,23 +28,30 @@ IN_GIT=0
 git -C .. rev-parse --is-inside-work-tree >/dev/null 2>&1 && IN_GIT=1
 # Hypha re-walk 3: everything electron-builder packs must be committed bytes too. A marker (in the temp folder,
 # never in app/) lets the build name any file in app/ that this run did not write; such leftovers stop the build.
+# Hypha 23a0279 soft: the run keeps a LIST of the files it wrote (an mtime alone let a future-dated leftover through).
+# before: BUILD_START=$(mktemp "${TMPDIR:-/tmp}/fl-build-start.XXXXXX")
 BUILD_START=$(mktemp "${TMPDIR:-/tmp}/fl-build-start.XXXXXX")
-trap 'rm -f "$BUILD_START"' EXIT   # only its own marker
+# before: trap 'rm -f "$BUILD_START"' EXIT   # only its own marker
+trap 'rm -f "$BUILD_START"' EXIT   # only its own list
+wrote() { printf '%s\n' "$1" >> "$BUILD_START"; }
 committed_cp() {   # $1 = path from the repo root, $2 = destination file
   if [ "$IN_GIT" = 1 ]; then
     git -C .. cat-file -e "HEAD:$1" 2>/dev/null || return 1
     git -C .. show "HEAD:$1" > "$2" || return 1
+    wrote "$2"
     git -C .. diff --quiet HEAD -- "$1" || echo "     ⚠ $1 has local edits; the committed version was packed"
     return 0
   fi
-  [ -f "../$1" ] && cp "../$1" "$2"
+  # before: [ -f "../$1" ] && cp "../$1" "$2"
+  [ -f "../$1" ] && cp "../$1" "$2" && wrote "$2"
 }
 committed_glob() {  # $1 = folder from the repo root, $2 = pattern, $3 = destination folder; prints how many
   local n=0 f
   if [ "$IN_GIT" = 1 ]; then
     while IFS= read -r f; do committed_cp "$f" "$3/$(basename "$f")" && n=$((n + 1)); done < <(git -C .. ls-files -- "$1/$2")
   else
-    for f in ../"$1"/$2; do [ -f "$f" ] && cp "$f" "$3/" && n=$((n + 1)); done
+    # before: for f in ../"$1"/$2; do [ -f "$f" ] && cp "$f" "$3/" && n=$((n + 1)); done
+    for f in ../"$1"/$2; do [ -f "$f" ] && cp "$f" "$3/" && wrote "$3/$(basename "$f")" && n=$((n + 1)); done
   fi
   echo "$n"
 }
@@ -60,7 +67,8 @@ fi
 
 # Also keep index.html as an alias
 if [ -f "app/app.html" ]; then
-  cp app/app.html app/index.html && echo "     ✓ index.html (alias)"
+  # before: cp app/app.html app/index.html && echo "     ✓ index.html (alias)"
+  cp app/app.html app/index.html && wrote app/index.html && echo "     ✓ index.html (alias)"
 fi
 
 committed_cp manifest.json app/manifest.json 2>/dev/null && echo "     ✓ manifest.json" || echo "     ⚠ manifest.json not found (optional)"
@@ -139,31 +147,38 @@ if [ "$1" = "--prepare-only" ]; then
   exit 0
 fi
 
-# Step 2: Install dependencies if needed
-if [ ! -d "node_modules" ]; then
-  echo "  📥 Installing dependencies..."
-  npm install
-  echo ""
-fi
-
-# Step 3: Build
+# Step 2 (Hypha 23a0279 soft: the guard now runs BEFORE any npm install, so nothing is downloaded or run first).
+# before: Step 2 was "npm install if node_modules is missing", and this guard was Step 3.
 if [ "$1" != "--dev" ] && [ "$1" != "-d" ]; then
   stop=0
   if [ "$IN_GIT" = 1 ]; then
-    # The desktop sources electron-builder packs from this folder (package.json build.files, minus app/**).
-    srcs=$(node -e "const f=require('./package.json').build.files; console.log(f.filter(x=>!/[*]/.test(x)).join('\n'))")
+    # The desktop sources electron-builder packs from this folder (package.json build.files, minus app/**),
+    # plus package.json and package-lock.json themselves (they decide what is built and packed).
+    # before: srcs=$(node -e "...build.files...")
+    srcs=$(node -e "const f=require('./package.json').build.files; console.log(f.filter(x=>!/[*]/.test(x)).concat(['package.json']).join('\n'))")
+    git -C .. ls-files --error-unmatch desktop/package-lock.json >/dev/null 2>&1 && srcs="$srcs package-lock.json"
     for f in $srcs; do
       if ! git -C .. ls-files --error-unmatch "desktop/$f" >/dev/null 2>&1; then echo "  ✗ desktop/$f is not committed"; stop=1
       elif ! git -C .. diff --quiet HEAD -- "desktop/$f"; then echo "  ✗ desktop/$f has local edits"; stop=1; fi
     done
   fi
-  stale=$(find app -type f ! -name .gitkeep ! -newer "$BUILD_START" 2>/dev/null | sort)
+  # before: stale=$(find app -type f ! -name .gitkeep ! -newer "$BUILD_START" 2>/dev/null | sort)
+  stale=$(comm -23 <(find app -type f ! -name .gitkeep 2>/dev/null | sort -u) <(sort -u "$BUILD_START"))
   if [ -n "$stale" ]; then echo "  ✗ app/ has files this run did not write (left from an earlier copy):"; echo "$stale" | sed 's/^/       /'; stop=1; fi
   if [ "$stop" = 1 ]; then
     echo "  Nothing was built: only committed bytes are packed. Commit or set those aside, then run this again."
     exit 3
   fi
 fi
+
+# Step 3: Install dependencies if needed (after the guard)
+if [ ! -d "node_modules" ]; then
+  echo "  📥 Installing dependencies..."
+  npm install
+  echo ""
+fi
+
+# Step 4: Build
 if [ "$1" = "--dev" ] || [ "$1" = "-d" ]; then
   echo "  🚀 Starting in development mode..."
   npm start
