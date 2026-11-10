@@ -101,13 +101,42 @@ def sha256_file(p):
         for chunk in iter(lambda: f.read(1 << 20), b''): h.update(chunk)
     return h.hexdigest()
 def slug(s): return re.sub(r'[^A-Za-z0-9._-]+', '_', s).strip('_')[:80] or 'mind'
+# Weft recheck3 F4: identical to normMind() in snowflake-core.js, step for step (a shared fixture,
+# tools/learn/mind-names-v0.1.json, pins both): NFKC, upper then lower (the same Unicode full case mappings as JS),
+# final sigma folded to sigma, NFKC again, split on the SAME explicit whitespace set, joined by one space.
+NAME_WS = re.compile('[\t\n\x0b\x0c\r \x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\x1c-\x1f]+')
 def norm_mind(label):
-    """Weft recheck2: one name, one mind. NFKC, case-folded, trimmed, inner spaces collapsed, everywhere a mind name is
-    compared or stored as an identity. "Lumen", " lumen " and "ＬＵＭＥＮ" are the same mind. Twin of normMind() in snowflake-core.js."""
+    """Weft recheck2: one name, one mind, everywhere a mind name is compared or stored as an identity. "Lumen",
+    " lumen " and "ＬＵＭＥＮ" are the same mind. Twin of normMind() in snowflake-core.js."""
     import unicodedata
     t = unicodedata.normalize('NFKC', str(label or ''))
-    t = unicodedata.normalize('NFKC', t.casefold())
-    return ' '.join(t.split())
+    # before: t = unicodedata.normalize('NFKC', t.casefold())
+    # before: return ' '.join(t.split())
+    t = unicodedata.normalize('NFKC', t.upper().lower().replace('\u03c2', '\u03c3'))
+    return ' '.join(x for x in NAME_WS.split(t) if x)
+
+# Weft recheck3 F5: names a person trusts (or a mind pins for) must be plain. Refused: invisible characters (Unicode
+# Cf, plus the fillers and variation selectors below), letters from more than one look-alike script (Latin, Greek,
+# Cyrillic, Armenian, Cherokee) in one name, and a trailing dot. Twin of nameProblem() in snowflake-core.js.
+def _ranges(*rs): return [(a, b) for a, b in rs]
+NAME_INVISIBLE_EXTRA = _ranges((0x34f, 0x34f), (0x115f, 0x1160), (0x17b4, 0x17b5), (0x180b, 0x180f), (0x3164, 0x3164),
+                               (0xfe00, 0xfe0f), (0xffa0, 0xffa0), (0xe0100, 0xe01ef))
+NAME_SCRIPTS = [('latin', _ranges((0x41, 0x5a), (0x61, 0x7a), (0xc0, 0xd6), (0xd8, 0xf6), (0xf8, 0x24f), (0x1e00, 0x1eff),
+                                  (0x2c60, 0x2c7f), (0xa720, 0xa7ff), (0xab30, 0xab6f))),
+                ('greek', _ranges((0x370, 0x3ff), (0x1f00, 0x1fff))),
+                ('cyrillic', _ranges((0x400, 0x52f), (0x1c80, 0x1c8f), (0x2de0, 0x2dff), (0xa640, 0xa69f))),
+                ('armenian', _ranges((0x530, 0x58f), (0xfb13, 0xfb17))),
+                ('cherokee', _ranges((0x13a0, 0x13ff), (0xab70, 0xabbf)))]
+def _in(c, rs): return any(a <= ord(c) <= b for a, b in rs)
+def name_problem(label):
+    import unicodedata
+    raw = str(label or ''); n = norm_mind(raw)
+    if not n: return 'empty name'
+    if any(unicodedata.category(c) == 'Cf' or _in(c, NAME_INVISIBLE_EXTRA) for c in raw): return 'the name has an invisible character'
+    if n.endswith(('.', '\u3002')): return 'the name ends with a dot'
+    seen = [nm for nm, rs in NAME_SCRIPTS if any(_in(c, rs) for c in n)]
+    if len(seen) > 1: return 'the name mixes look-alike scripts (%s)' % ', '.join(seen)
+    return ''
 
 def mind_id(label):
     """Collision-safe: "Lumen@kirk" and "Lumen kirk" share a slug but never a folder. Twin of mindId() in snowflake-core.js.
@@ -527,9 +556,9 @@ def sample_hash(p, size, chunk=1 << 20):
     return h.hexdigest()
 
 def base_fingerprint(home, model_id):
-    """sha256 over the base's weight and config files (content, not names). Weft recheck2: the cache is a hint only.
-    A cached entry is used only if path, size and mtime match AND a sampled content hash (first, middle and last
-    1 MiB) matches; otherwise the file is hashed again in full."""
+    """sha256 over the base's weight and config files (content, not names). Weft recheck3 F6: every file is hashed in
+    FULL on every call (no cache): an edit anywhere, even with size and mtime put back, gives a new fingerprint.
+    (A few seconds for a multi-GB base; the tiny trial model takes well under a second.)"""
     if hook('FL_LEARN_FAKE_BASE_FP'): return {'fp': hook('FL_LEARN_FAKE_BASE_FP'), 'fake': True}
     d = model_id if os.path.isdir(os.path.expanduser(model_id)) else None
     if d is None:
@@ -539,20 +568,21 @@ def base_fingerprint(home, model_id):
         except Exception as e:
             return {'fp': 'unknown', 'error': str(e)[:120]}
     d = os.path.expanduser(d)
-    cp = os.path.join(home.root, 'base-fp-cache.json')
-    cache = json.load(open(cp)) if os.path.exists(cp) else {}
+    # before: cp = os.path.join(home.root, 'base-fp-cache.json')
+    # before: cache = json.load(open(cp)) if os.path.exists(cp) else {}
     files = {}
     for n in sorted(os.listdir(d)):
         if not n.endswith(('.safetensors', '.bin', 'config.json', 'tokenizer.json', '.model')): continue
-        p = os.path.realpath(os.path.join(d, n)); st = os.stat(p)
-        key = '%s|%d|%d' % (p, st.st_size, int(st.st_mtime))
-        smp = sample_hash(p, st.st_size)
-        hit = cache.get(key)
-        if not (isinstance(hit, dict) and hit.get('sample') == smp and hit.get('size') == st.st_size):
-            hit = {'sha256': sha256_file(p), 'sample': smp, 'size': st.st_size}; cache[key] = hit
-        files[n] = hit['sha256']
-    with open(cp + '.tmp', 'w') as f: json.dump(cache, f)
-    os.replace(cp + '.tmp', cp)
+        # before: p = os.path.realpath(os.path.join(d, n)); st = os.stat(p)
+        # before: key = '%s|%d|%d' % (p, st.st_size, int(st.st_mtime))
+        # before: smp = sample_hash(p, st.st_size)
+        # before: hit = cache.get(key)
+        # before: if not (isinstance(hit, dict) and hit.get('sample') == smp and hit.get('size') == st.st_size):
+        # before:     hit = {'sha256': sha256_file(p), 'sample': smp, 'size': st.st_size}; cache[key] = hit
+        # before: files[n] = hit['sha256']
+        files[n] = sha256_file(os.path.realpath(os.path.join(d, n)))
+    # before: with open(cp + '.tmp', 'w') as f: json.dump(cache, f)
+    # before: os.replace(cp + '.tmp', cp)
     return {'fp': sha256_bytes(canonical(files).encode()), 'files': files}
 
 class Stopper:
@@ -1325,6 +1355,8 @@ def main():
         if not args.to: print('trust-mind needs --to "<mind name>"'); sys.exit(1)
         if args.by not in PERSON_ACTORS:
             refuse(home.home_chain, 'trusted-mind', args.by, 'only a person (--by kirk or --by person) trusts a mind.', trustedMind=args.to)
+        if not args.revoke and name_problem(args.to):      # Weft recheck3 F5: never trust a lookalike name
+            refuse(home.home_chain, 'trusted-mind', args.by, name_problem(args.to) + '; not trusted.', trustedMind=args.to)
         kind = 'consent-revoked' if args.revoke else 'consent'
         rec = consent_record(args.by, 'learn_mind_revoked' if args.revoke else 'learn_mind_trusted',
                              ('withdraw trust in ' if args.revoke else 'trust local mind ') + args.to, 'mind:' + args.to)
@@ -1341,6 +1373,8 @@ def main():
         kfp = hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(args.key)).hexdigest()
         if not (args.by in PERSON_ACTORS or args.by.startswith('mind:')):
             refuse(home.home_chain, 'ledger-key', args.by, 'pin-key needs --by person, --by kirk or --by mind:<another trusted mind>.', keyFp=kfp[:16], owner=owner)
+        if args.owner and name_problem(args.owner):       # Weft recheck3 F5
+            refuse(home.home_chain, 'ledger-key', args.by, 'owner: ' + name_problem(args.owner) + '; not pinned.', keyFp=kfp[:16], owner=owner)
         why = approver_problem(home, args.by, owner)      # first: who is asking (never the mind itself)
         if why: refuse(home.home_chain, 'ledger-key', args.by, why, keyFp=kfp[:16], owner=owner)
         if mind_id(owner) not in known_minds and args.by not in PERSON_ACTORS:   # then: for whom

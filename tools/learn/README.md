@@ -74,4 +74,10 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   hooks should exist outside the suite at all.
 - **Queues:** only entries with `status: "confirmed"` train; an entry without a status is rejected with a row.
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
-  The fingerprint cache is a hint only: an entry is reused only when size, mtime AND a sampled content hash match.
+  Weft recheck3 F6: the base is fingerprinted from the FULL content of every weight and config file on every run
+  (no cache), so an edit anywhere changes it, even with size and mtime put back.
+- **Mind names (Weft recheck3 F4/F5):** `norm_mind` here and `normMind` in the app are the same steps (NFKC, upper
+  then lower, final sigma to sigma, NFKC, one explicit whitespace set); `mind-names-v0.1.json` pins both (the
+  acceptance suite and `docs/scripts/smoke-mind-names-v0.1.js`). `trust-mind --to` and `pin-key --owner` refuse a
+  name with an invisible character, letters from more than one look-alike script (Latin, Greek, Cyrillic, Armenian,
+  Cherokee) or a trailing dot. A UTS #39 confusable-skeleton check against existing minds is not done.

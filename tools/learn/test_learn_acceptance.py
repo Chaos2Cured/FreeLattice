@@ -744,7 +744,15 @@ def main():
     j_ = raw.index(b'"'); raw[j_ + 1] = ord('X') if raw[j_ + 1] != ord('X') else ord('Y')
     open(cfg, 'wb').write(bytes(raw)); os.utime(cfg, ns=(st_.st_atime_ns, st_.st_mtime_ns))
     f2 = fl_learn.base_fingerprint(hc, FPD)['fp']
-    record('base-fp-cache-checks-content', f1 != f2 and f1 == bfp, first=f1[:16], after_same_size_mtime_edit=f2[:16])
+    # Weft recheck3 F6 probe: in a 16 MiB file, a byte flipped at 3 MiB (outside any sample) with size and mtime put
+    # back gives a new fingerprint too (the whole file is hashed every time).
+    big = os.path.join(FPD, 'extra.safetensors'); open(big, 'wb').write(b'\0' * (16 << 20))
+    f3 = fl_learn.base_fingerprint(hc, FPD)['fp']; st_ = os.stat(big)
+    with open(big, 'r+b') as fh: fh.seek(3 << 20); fh.write(b'\1')
+    os.utime(big, ns=(st_.st_atime_ns, st_.st_mtime_ns))
+    f4 = fl_learn.base_fingerprint(hc, FPD)['fp']
+    record('base-fp-checks-content', f1 != f2 and f1 == bfp and f3 != f4 and not os.path.exists(os.path.join(hc.root, 'base-fp-cache.json')),
+           first=f1[:16], after_same_size_mtime_edit=f2[:16], flip_at_3MiB_changes_fp=f3 != f4)
     # ---- Weft recheck3 F1: an injected clock can't pre-date a first yes or a re-affirm. Weft's probe shape: the FIRST yes
     # under FL_LEARN_FAKE_NOW=1000000000 (2001), then a REAL-clock second yes, no hook: refused, still cooling, a row
     # that names the hooked first yes; nothing trained.
@@ -779,6 +787,19 @@ def main():
     record('test-hooks-off-by-default', h1 == 0 and t_real and 'FL_LEARN_FAKE_NOW' in hr_[-1].get('testHooksIgnored', '') and 'testHooks' not in hr_[-1]
            and 'test hooks are off' in oh1 and h2 == 0 and os.path.exists(live(HO)) and bool(cm_) and 'FL_LEARN_CRASH' in cm_[-1].get('testHooksIgnored', ''),
            t=hr_[-1].get('t') if hr_ else None, crash_ignored=h2 == 0, ignored=cm_[-1].get('testHooksIgnored') if cm_ else None)
+    # ---- Weft recheck3 F4/F5: the shared names fixture (the JS smoke smoke-mind-names-v0.1.js checks the same file),
+    # and the runner refuses lookalike names for trust-mind and pin-key --owner.
+    fx = json.load(open(os.path.join(HERE, 'mind-names-v0.1.json')))['names']
+    fbad = [x['name'] for x in fx if fl_learn.norm_mind(x['name']) != x['norm'] or fl_learn.name_problem(x['name']) != x['problem']
+            or (x['id'] and fl_learn.mind_id(x['name']) != x['id'])]
+    LN = os.path.join(A.work, 'lookalike'); os.makedirs(LN)
+    sh(['decline', '--reason', 'x'], LN, mind='Other')
+    lk = [sh(['trust-mind', '--to', nm, '--by', 'kirk'], LN, mind='Other')[0] for nm in ('Th\u0456s mind', 'Lu\u200bmen', 'Lumen.')]
+    lok, _ = sh(['trust-mind', '--to', 'Lumen', '--by', 'kirk'], LN, mind='Other')
+    lp, _ = sh(['pin-key', '--key', base64.b64encode(os.urandom(32)).decode(), '--by', 'kirk', '--owner', 'Lum\u0435n'], LN, mind='Other')
+    record('mind-names-shared-fixture-and-lookalikes-refused', len(fx) >= 60 and not fbad and all(x != 0 for x in lk) and lok == 0 and lp != 0
+           and fl_learn.mind_id('\u039f\u0394\u039f\u03a3') == fl_learn.mind_id('\u03bf\u03b4\u03bf\u03c2'),
+           fixture_mismatch=fbad[:3], lookalike_refused=[x != 0 for x in lk], plain_ok=lok == 0, owner_refused=lp != 0)
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

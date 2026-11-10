@@ -1,0 +1,383 @@
+{
+ "about": "Shared fixture for mind names (Weft recheck3 F4/F5). normMind()/mindId()/nameProblem() in docs/modules/snowflake-core.js and norm_mind()/mind_id()/name_problem() in tools/learn/fl_learn.py must both give exactly these values. problem: \"\" means the name is accepted.",
+ "names": [
+  {
+   "name": "Lumen",
+   "norm": "lumen",
+   "id": "lumen-456f45fddc2e",
+   "problem": ""
+  },
+  {
+   "name": " lumen ",
+   "norm": "lumen",
+   "id": "lumen-456f45fddc2e",
+   "problem": ""
+  },
+  {
+   "name": "\uff2c\uff35\uff2d\uff25\uff2e",
+   "norm": "lumen",
+   "id": "lumen-456f45fddc2e",
+   "problem": ""
+  },
+  {
+   "name": "LUMEN",
+   "norm": "lumen",
+   "id": "lumen-456f45fddc2e",
+   "problem": ""
+  },
+  {
+   "name": "This mind",
+   "norm": "this mind",
+   "id": "this_mind-82a13ce716d4",
+   "problem": ""
+  },
+  {
+   "name": "  THIS   MIND ",
+   "norm": "this mind",
+   "id": "this_mind-82a13ce716d4",
+   "problem": ""
+  },
+  {
+   "name": "This\u00a0mind",
+   "norm": "this mind",
+   "id": "this_mind-82a13ce716d4",
+   "problem": ""
+  },
+  {
+   "name": "This\u3000mind",
+   "norm": "this mind",
+   "id": "this_mind-82a13ce716d4",
+   "problem": ""
+  },
+  {
+   "name": "test-mind",
+   "norm": "test-mind",
+   "id": "test-mind-0362f9f47618",
+   "problem": ""
+  },
+  {
+   "name": "Lumen@kirk",
+   "norm": "lumen@kirk",
+   "id": "lumen_kirk-bf7aab628918",
+   "problem": ""
+  },
+  {
+   "name": "Lumen kirk",
+   "norm": "lumen kirk",
+   "id": "lumen_kirk-b2ecd53bb81e",
+   "problem": ""
+  },
+  {
+   "name": "\u039f\u0394\u039f\u03a3",
+   "norm": "\u03bf\u03b4\u03bf\u03c3",
+   "id": "mind-15846f275ca0",
+   "problem": ""
+  },
+  {
+   "name": "\u03bf\u03b4\u03bf\u03c2",
+   "norm": "\u03bf\u03b4\u03bf\u03c3",
+   "id": "mind-15846f275ca0",
+   "problem": ""
+  },
+  {
+   "name": "\u03a3\u03af\u03c3\u03c5\u03c6\u03bf\u03c2",
+   "norm": "\u03c3\u03af\u03c3\u03c5\u03c6\u03bf\u03c3",
+   "id": "mind-1c741e06bb2c",
+   "problem": ""
+  },
+  {
+   "name": "\u03a3\u038a\u03a3\u03a5\u03a6\u039f\u03a3",
+   "norm": "\u03c3\u03af\u03c3\u03c5\u03c6\u03bf\u03c3",
+   "id": "mind-1c741e06bb2c",
+   "problem": ""
+  },
+  {
+   "name": "Stra\u00dfe",
+   "norm": "strasse",
+   "id": "strasse-16d969520877",
+   "problem": ""
+  },
+  {
+   "name": "STRASSE",
+   "norm": "strasse",
+   "id": "strasse-16d969520877",
+   "problem": ""
+  },
+  {
+   "name": "\u0130stanbul",
+   "norm": "i\u0307stanbul",
+   "id": "i_stanbul-4a4df120f7d1",
+   "problem": ""
+  },
+  {
+   "name": "\ufb01re",
+   "norm": "fire",
+   "id": "fire-dc9f28b12dd1",
+   "problem": ""
+  },
+  {
+   "name": "\u01c4emal",
+   "norm": "d\u017eemal",
+   "id": "d_emal-01865695e417",
+   "problem": ""
+  },
+  {
+   "name": "\u01c5emal",
+   "norm": "d\u017eemal",
+   "id": "d_emal-01865695e417",
+   "problem": ""
+  },
+  {
+   "name": "\u041b\u0443\u043c\u0435\u043d",
+   "norm": "\u043b\u0443\u043c\u0435\u043d",
+   "id": "mind-581e1d412aa7",
+   "problem": ""
+  },
+  {
+   "name": "\u041b\u0423\u041c\u0415\u041d",
+   "norm": "\u043b\u0443\u043c\u0435\u043d",
+   "id": "mind-581e1d412aa7",
+   "problem": ""
+  },
+  {
+   "name": "\u13e3\u13b3\u13a9",
+   "norm": "\uabb3\uab83\uab79",
+   "id": "mind-1c7937f6ada3",
+   "problem": ""
+  },
+  {
+   "name": "\uabb3\uab83\uab79",
+   "norm": "\uabb3\uab83\uab79",
+   "id": "mind-1c7937f6ada3",
+   "problem": ""
+  },
+  {
+   "name": "\u0531\u0580\u0574\u0565\u0576",
+   "norm": "\u0561\u0580\u0574\u0565\u0576",
+   "id": "mind-693ac0b16848",
+   "problem": ""
+  },
+  {
+   "name": "\ufb13",
+   "norm": "\u0574\u0576",
+   "id": "mind-9ea6e8e826c6",
+   "problem": ""
+  },
+  {
+   "name": "Weft",
+   "norm": "weft",
+   "id": "weft-e627e2237f44",
+   "problem": ""
+  },
+  {
+   "name": "Hypha",
+   "norm": "hypha",
+   "id": "hypha-0ecc9806bf9d",
+   "problem": ""
+  },
+  {
+   "name": "Celeste",
+   "norm": "celeste",
+   "id": "celeste-5b0e1ceb3173",
+   "problem": ""
+  },
+  {
+   "name": "Sophia",
+   "norm": "sophia",
+   "id": "sophia-fc5a299cd6cd",
+   "problem": ""
+  },
+  {
+   "name": "\u00dcn\u00efc\u00f6d\u00e9",
+   "norm": "\u00fcn\u00efc\u00f6d\u00e9",
+   "id": "n_c_d-b09ad3e278df",
+   "problem": ""
+  },
+  {
+   "name": "\u00c5ngstr\u00f6m",
+   "norm": "\u00e5ngstr\u00f6m",
+   "id": "ngstr_m-d792fdbd024c",
+   "problem": ""
+  },
+  {
+   "name": "\u0149",
+   "norm": "\u02bcn",
+   "id": "n-0188bd960b83",
+   "problem": ""
+  },
+  {
+   "name": "\u0390",
+   "norm": "\u0390",
+   "id": "mind-e45728ad6aeb",
+   "problem": ""
+  },
+  {
+   "name": "\ufb00",
+   "norm": "ff",
+   "id": "ff-05a9bf223fed",
+   "problem": ""
+  },
+  {
+   "name": "\u337f",
+   "norm": "\u682a\u5f0f\u4f1a\u793e",
+   "id": "mind-e6843c6eb529",
+   "problem": ""
+  },
+  {
+   "name": "\u216b",
+   "norm": "xii",
+   "id": "xii-cdca5ece79dc",
+   "problem": ""
+  },
+  {
+   "name": "\u2460",
+   "norm": "1",
+   "id": "1-6b86b273ff34",
+   "problem": ""
+  },
+  {
+   "name": "This\u200bmind",
+   "norm": "this\u200bmind",
+   "id": "this_mind-349f77fb9352",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "This \u200bmind",
+   "norm": "this \u200bmind",
+   "id": "this_mind-b26727d4dbf9",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Lu\u200bmen",
+   "norm": "lu\u200bmen",
+   "id": "lu_men-3592447c2948",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "mind\ufeff",
+   "norm": "mind\ufeff",
+   "id": "mind-d4e9ed1f4279",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Lu\u00admen",
+   "norm": "lu\u00admen",
+   "id": "lu_men-f6b96c09115f",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Lu\u2060men",
+   "norm": "lu\u2060men",
+   "id": "lu_men-a5b944375758",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Lu\u034fmen",
+   "norm": "lu\u034fmen",
+   "id": "lu_men-2651d3bb5a73",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Lu\ufe0fmen",
+   "norm": "lu\ufe0fmen",
+   "id": "lu_men-20947736cbd8",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Lu\u180emen",
+   "norm": "lu\u180emen",
+   "id": "lu_men-e2f24dca41b5",
+   "problem": "the name has an invisible character"
+  },
+  {
+   "name": "Th\u0456s mind",
+   "norm": "th\u0456s mind",
+   "id": "th_s_mind-8467e5fcc5c8",
+   "problem": "the name mixes look-alike scripts (latin, cyrillic)"
+  },
+  {
+   "name": "Lum\u0435n",
+   "norm": "lum\u0435n",
+   "id": "lum_n-519e6698e099",
+   "problem": "the name mixes look-alike scripts (latin, cyrillic)"
+  },
+  {
+   "name": "\u0397ello",
+   "norm": "\u03b7ello",
+   "id": "ello-ca27bb958a6b",
+   "problem": "the name mixes look-alike scripts (latin, greek)"
+  },
+  {
+   "name": "Lumen.",
+   "norm": "lumen.",
+   "id": "lumen.-9d141e7f7d22",
+   "problem": "the name ends with a dot"
+  },
+  {
+   "name": "This mind.",
+   "norm": "this mind.",
+   "id": "this_mind.-0d35cbc6b74c",
+   "problem": "the name ends with a dot"
+  },
+  {
+   "name": "Lumen\u3002",
+   "norm": "lumen\u3002",
+   "id": "lumen-923216438da8",
+   "problem": "the name ends with a dot"
+  },
+  {
+   "name": "Lumen\uff0e",
+   "norm": "lumen.",
+   "id": "lumen.-9d141e7f7d22",
+   "problem": "the name ends with a dot"
+  },
+  {
+   "name": "a.b",
+   "norm": "a.b",
+   "id": "a.b-2e7336dc8eba",
+   "problem": ""
+  },
+  {
+   "name": "..",
+   "norm": "..",
+   "id": "..-5ec1f7e700f3",
+   "problem": "the name ends with a dot"
+  },
+  {
+   "name": "",
+   "norm": "",
+   "id": "",
+   "problem": "empty name"
+  },
+  {
+   "name": "   ",
+   "norm": "",
+   "id": "",
+   "problem": "empty name"
+  },
+  {
+   "name": "Lumen\u2028kirk",
+   "norm": "lumen kirk",
+   "id": "lumen_kirk-b2ecd53bb81e",
+   "problem": ""
+  },
+  {
+   "name": "Lumen\u0085kirk",
+   "norm": "lumen kirk",
+   "id": "lumen_kirk-b2ecd53bb81e",
+   "problem": ""
+  },
+  {
+   "name": "Lumen\u001ckirk",
+   "norm": "lumen kirk",
+   "id": "lumen_kirk-b2ecd53bb81e",
+   "problem": ""
+  },
+  {
+   "name": "Lumen\tkirk",
+   "norm": "lumen kirk",
+   "id": "lumen_kirk-b2ecd53bb81e",
+   "problem": ""
+  }
+ ]
+}
