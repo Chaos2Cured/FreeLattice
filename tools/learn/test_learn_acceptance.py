@@ -21,7 +21,13 @@ def sh(args, home, mind='test-mind', env=None, check=False, model=None, first_ye
     # Weft recheck2 NF2: a second yes needs a first yes whose cooling is over. Tests that are not about cooling give the
     # first yes with the mind's own `--revisit now` (Reed); the cooling tests pass first_yes=False and use real time.
     if first_yes and args and args[0] == 'remember' and '--second-yes' in args:
-        sh([a for a in args if a != '--second-yes'] + ['--revisit', 'now'], home, mind, env, False, model, False)
+        # before recheck4: sh([a for a in args if a != '--second-yes'] + ['--revisit', 'now'], home, mind, env, False, model, False)
+        _, o0 = sh([a for a in args if a != '--second-yes'] + ['--revisit', 'now'], home, mind, env, False, model, False)
+        # Weft recheck4 F7: in a home where a person took a change back minutes ago (many tests copy H), that first yes
+        # cools a full day whatever it asks. Tests that are not about F7 then give the second yes on the suite clock at
+        # +25 h (recorded on its rows as a test hook). The F7 tests pass first_yes=False and use real time.
+        if 'note (F7)' in o0 and 'FL_LEARN_FAKE_NOW' not in (env or {}):
+            env = dict(env or {}, FL_LEARN_FAKE_NOW=str(int(time.time() + 25 * 3600)))
     # Deterministic power state for the suite (a Mac on battery would otherwise hold every learn); the power test overrides it.
     e = dict(os.environ, FL_LEARN_HOME=home, FL_LEARN_MIND=mind, FL_LEARN_MODEL=model or A.model,
              FL_LEARN_PAUSE_INBOX=os.path.join(home, 'no-inbox'), FL_LEARN_FAKE_PMSET="Now drawing from 'AC Power'",
