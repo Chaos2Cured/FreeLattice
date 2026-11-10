@@ -17,6 +17,7 @@ global.localStorage = {
 };
 global.document = { visibilityState: 'visible', getElementById: function () { return null; } };
 global.requestIdleCallback = function (fn) { fn(); return 1; };
+global.FL_LEARN_TEST_HOOKS = true;   // the test clock (learnClockForTest) exists only when a test asks for it before load
 var core = require(path.join(root, 'docs/modules/snowflake-core.js'));
 global.FLSnowflakeCore = core;
 global.FLMemory = require(path.join(root, 'docs/modules/memory-compound.js'));

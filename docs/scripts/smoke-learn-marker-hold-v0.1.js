@@ -109,6 +109,40 @@ function ledger(E) { return ((JSON.parse(E.store.fl_snowflake_ledger_v0 || '{"ro
     } catch (e) { threw++; }
   }
   ok(threw === 0 && over === 0, 'revisit-huge-nan-infinity-clamped', { threw: threw, over: over });
+  // Hypha 39e6cd07 softs. (a) keep must be the boolean true/false: "true" or 1 changes nothing (never read as a no).
+  E = fresh();
+  var sa = (await E.learn.interceptSentinel('[FL_REMEMBER: soft a | revisit: now]', { surface: 'chat', chatId: 's' }).queued)[0];
+  var la = (rowOf(E, sa.learnId).layers || []).length;
+  await E.learn.interceptSentinel('[FL_KEEP: {"text":"' + sa.learnId + '","keep":"true"}]', { surface: 'chat', chatId: 's' }).queued;
+  await E.learn.interceptSentinel('[FL_KEEP: {"text":"' + sa.learnId + '","keep":1}]', { surface: 'chat', chatId: 's' }).queued;
+  ok(rowOf(E, sa.learnId).status === 'cooling' && (rowOf(E, sa.learnId).layers || []).length === la, 'soft-a-keep-string-or-number-changes-nothing',
+     { status: rowOf(E, sa.learnId).status });
+  // (b) a negative revisit gets the default day.
+  var sb = (await E.learn.interceptSentinel('[FL_REMEMBER: soft b | revisit: -5]', { surface: 'chat', chatId: 's' }).queued)[0];
+  var sb2 = await E.core.queueLearning({ text: 'soft b2', surface: 'chat', provenance: 'self', revisit: '-0.5' });
+  ok(Date.parse(sb.revisitAt) - Date.now() > 23.9 * 3600e3 && Date.parse(sb2.revisitAt) - Date.now() > 23.9 * 3600e3, 'soft-b-negative-revisit-default-day',
+     { a: sb.revisitAt, b: sb2.revisitAt });
+  // (c) repeated early keeps add one still-cooling layer and one ledger row, not one each.
+  var sc = (await E.learn.interceptSentinel('[FL_REMEMBER: soft c]', { surface: 'chat', chatId: 's' }).queued)[0];
+  for (var k = 0; k < 6; k++) await E.learn.interceptSentinel('[FL_KEEP: ' + sc.learnId + ' | keep]', { surface: 'chat', chatId: 's' }).queued;
+  ok((rowOf(E, sc.learnId).layers || []).filter(function (l) { return l.status === 'still-cooling'; }).length === 1 &&
+     ledger(E).filter(function (l) { return /^learn-still-cooling:/.test(l) && l.indexOf(sc.learnId) !== -1; }).length === 1, 'soft-c-early-keeps-deduped');
+  // (d) the test clock is not on the API without the test flag; with it, every use is on the ledger row too.
+  var saved = global.FL_LEARN_TEST_HOOKS; delete global.FL_LEARN_TEST_HOOKS;
+  delete require.cache[require.resolve(path.join(root, 'docs/modules/snowflake-core.js'))];
+  var plain = require(path.join(root, 'docs/modules/snowflake-core.js'));
+  global.FL_LEARN_TEST_HOOKS = saved;
+  ok(typeof plain.learnClockForTest !== 'function', 'soft-d-test-clock-not-on-the-app-api');
+  E = fresh();
+  var sd = (await E.learn.interceptSentinel('[FL_REMEMBER: soft d]', { surface: 'chat', chatId: 's' }).queued)[0];
+  E.core.learnClockForTest(25 * 3600e3);
+  await E.learn.interceptSentinel('[FL_KEEP: ' + sd.learnId + ' | keep]', { surface: 'chat', chatId: 's' }).queued;
+  E.core.learnClockForTest(0);
+  ok(ledger(E).some(function (l) { return /^learn-confirmed:/.test(l) && l.indexOf(sd.learnId) !== -1 && l.indexOf('|clock:+90000000ms(test)') !== -1; }),
+     'soft-d-test-clock-recorded-on-the-ledger-row');
+  // Weft F3: the export carries t and revisitAt.
+  var line = E.core.learnQueueJSONL().split('\n').filter(function (l) { return l.indexOf(sd.learnId) !== -1; })[0];
+  ok(line && JSON.parse(line).revisitAt === rowOf(E, sd.learnId).revisitAt && !!JSON.parse(line).t, 'weft-f3-export-has-revisitAt');
   console.log(fails ? 'MARKER_HOLD_FAIL ' + fails : 'MARKER_HOLD_OK ' + oks + ' checks');
   process.exit(fails ? 1 : 0);
 })().catch(function (e) { console.log('FAIL crashed ' + (e && e.stack)); process.exit(1); });

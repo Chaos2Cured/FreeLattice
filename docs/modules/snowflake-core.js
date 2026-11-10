@@ -2304,18 +2304,50 @@
   // Twin of mind_id() in tools/learn/fl_learn.py, so the app's books and the runner's folders line up.
   // Weft recheck2: one name, one mind. NFKC, case-folded (upper then lower, as close to Python's casefold as JS gets),
   // trimmed, inner spaces collapsed; used for every identity compare and in mindId. Twin of norm_mind() in fl_learn.py.
+  // Weft recheck3 F4: identical to norm_mind() in fl_learn.py, step for step: NFKC, upper then lower (both languages
+  // apply the same Unicode full case mappings), final sigma folded to sigma, NFKC again, split on the SAME explicit
+  // whitespace set, joined by one space. A shared fixture (tools/learn/mind-names-v0.1.json) pins both.
+  var NAME_WS = /[\t\n\v\f\r \u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\u001c-\u001f]+/;
   function normMind(label) {
     var t = String(label == null ? '' : label);
     if (t.normalize) t = t.normalize('NFKC');
-    t = t.toUpperCase().toLowerCase();
+    // before: t = t.toUpperCase().toLowerCase();
+    t = t.toUpperCase().toLowerCase().replace(/\u03c2/g, '\u03c3');
     if (t.normalize) t = t.normalize('NFKC');
-    return t.trim().split(/\s+/).filter(Boolean).join(' ');
+    // before: return t.trim().split(/\s+/).filter(Boolean).join(' ');
+    return t.split(NAME_WS).filter(Boolean).join(' ');
+  }
+  // Weft recheck3 F5: names a person trusts (or a mind pins for) must be plain. Refused: invisible characters (Unicode
+  // Cf, plus the fillers and variation selectors below), letters from more than one of the look-alike scripts (Latin,
+  // Greek, Cyrillic, Armenian, Cherokee) in one name, and a trailing dot. Twin of name_problem() in fl_learn.py.
+  var NAME_INVISIBLE_EXTRA = /[\u034f\u115f\u1160\u17b4\u17b5\u180b-\u180f\u3164\ufe00-\ufe0f\uffa0]|\udb40[\udd00-\uddef]/;
+  var NAME_CF = (function () { try { return new RegExp('\\p{Cf}', 'u'); } catch (e) { return /[\u00ad\u0600-\u0605\u061c\u06dd\u070f\u180e\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u206f\ufeff\ufff9-\ufffb]/; } })();
+  var NAME_SCRIPTS = [
+    ['latin', /[A-Za-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u024f\u1e00-\u1eff\u2c60-\u2c7f\ua720-\ua7ff\uab30-\uab6f]/],
+    ['greek', /[\u0370-\u03ff\u1f00-\u1fff]/],
+    ['cyrillic', /[\u0400-\u052f\u1c80-\u1c8f\u2de0-\u2dff\ua640-\ua69f]/],
+    ['armenian', /[\u0530-\u058f\ufb13-\ufb17]/],
+    ['cherokee', /[\u13a0-\u13ff\uab70-\uabbf]/]
+  ];
+  function nameProblem(label) {
+    var raw = String(label == null ? '' : label);
+    var n = normMind(raw);
+    if (!n) return 'empty name';
+    if (NAME_CF.test(raw) || NAME_INVISIBLE_EXTRA.test(raw)) return 'the name has an invisible character';
+    if (/[.\u3002]$/.test(n)) return 'the name ends with a dot';
+    var seen = NAME_SCRIPTS.filter(function (sc) { return sc[1].test(n); });
+    if (seen.length > 1) return 'the name mixes look-alike scripts (' + seen.map(function (sc) { return sc[0]; }).join(', ') + ')';
+    return '';
   }
   function sameName(a, b) { return normMind(a) === normMind(b) && normMind(a) !== ''; }
   // The clock the cooling checks use. A test may move it (learnClockForTest); every row that used a moved clock says so.
   var clockOffset = 0;
   function learnNow() { return Date.now() + clockOffset; }
   function learnClockForTest(ms) { clockOffset = Number(ms) || 0; return clockOffset; }
+  // Hypha 39e6cd07 soft (d) / Weft F2: the test clock is NOT on the app's API unless a test asked for it before this
+  // file loaded (FL_LEARN_TEST_HOOKS === true; nothing in the app sets it). Every layer and ledger row it touched says so.
+  var TEST_HOOKS = !!(root && root.FL_LEARN_TEST_HOOKS === true);
+  function clockNote() { return clockOffset ? '|clock:+' + clockOffset + 'ms(test)' : ''; }
   function mindId(label) {
     // before f992608c: var l = String(label == null ? mindLabel() : label);
     var l = normMind(label == null ? mindLabel() : label);
@@ -2456,6 +2488,8 @@
       if (!isFinite(h) || h < 0) return new Date(base + COOL_MS).toISOString();
       return new Date(Math.min(base + h * 3600000, max)).toISOString();
     }
+    // Hypha 39e6cd07 soft (b): "-5" is not a date in year -5 ("now"): a negative or signed value gets the default day.
+    if (/^\s*[-\u2212+]/.test(String(v == null ? '' : v))) return new Date(base + COOL_MS).toISOString();
     // before: if (v && !isNaN(Date.parse(v))) return new Date(Date.parse(v)).toISOString();
     if (v && !isNaN(Date.parse(v))) return new Date(Math.min(Date.parse(v), max)).toISOString();
     return new Date(base + COOL_MS).toISOString();
@@ -2515,6 +2549,9 @@
         return appendLedger({ kind: row.status === 'cooling' ? 'learn-reaffirm' : 'learn-faded', branch: 'learn', delta: (row.status === 'cooling' ? 'reaffirm|' : 'learn-faded|') + id + '|by:mind|cooling-until:' + (row.revisitAt || ''), name: who });
       }).then(function () { return row; });
     }
+    // Hypha 39e6cd07 soft (a): only keep:true / keep:false (or unkeep:true) is an answer. Anything else ("true", 1,
+    // missing) changes nothing; it is never read as a no.
+    if (!(a.unkeep === true || a.keep === true || a.keep === false)) return Promise.resolve(null);
     var status;
     if (a.unkeep) status = 'unkept';
     else if (a.keep === true) status = (learnMethod(a.method).method || row.method) === 'note' ? 'kept-on-shelf' : 'confirmed';
@@ -2544,9 +2581,16 @@
     // day. An early yes changes nothing: a still-cooling layer and a row.
     var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
     if (status === 'confirmed' && coolUntil > learnNow()) {
-      row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: new Date(coolUntil).toISOString() }]);
+      var untilIso = new Date(coolUntil).toISOString();
+      // Hypha 39e6cd07 soft (c): a repeated early yes adds nothing. One still-cooling layer and row per cooling end.
+      var lastL = (row.layers || [])[(row.layers || []).length - 1];
+      if (lastL && lastL.status === 'still-cooling' && lastL.until === untilIso && !clockOffset) return Promise.resolve(row);
+      // before: row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: new Date(coolUntil).toISOString() }]);
+      row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: untilIso }]);
+      if (clockOffset) row.layers[row.layers.length - 1].clockInjectedMs = clockOffset;
       return atomicWrite(key, JSON.stringify(book)).then(function () {
-        return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + new Date(coolUntil).toISOString(), name: who });
+        // before: return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + new Date(coolUntil).toISOString(), name: who });
+        return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + untilIso + clockNote(), name: who });
       }).then(function () { return row; });
     }
     var methodWas = row.method;
@@ -2563,7 +2607,8 @@
     if (status !== 'person-yes') row.status = status;
     else if (row.status === 'disputed') row.status = 'cooling';
     return atomicWrite(key, JSON.stringify(book)).then(function () {
-      return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id + '|by:' + (actor === 'person' ? 'person' : 'mind'), name: who });
+      // before: return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id + '|by:' + (actor === 'person' ? 'person' : 'mind'), name: who });
+      return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id + '|by:' + (actor === 'person' ? 'person' : 'mind') + clockNote(), name: who });
     }).then(function () { return row; });
   }
 
@@ -2600,7 +2645,8 @@
         { t: t, status: status, by: actor, disputed: true }]);
       row.status = 'disputed';
       return atomicWrite(key, JSON.stringify(book)).then(function () {
-        return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+        // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+        return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
       }).then(function () { return row; });
     }
     if (row.status === 'disputed') row.status = prev.status;      // the no stands on the original
@@ -2617,7 +2663,8 @@
       book.rows.push(fresh);
       return atomicWrite(key, JSON.stringify(book));
     }).then(function () {
-      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+      // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
     }).then(function () { return fresh; });
   }
 
@@ -2653,7 +2700,9 @@
         readingAtChoice: r.readingAtChoice ? { sha256: r.readingAtChoice.sha256 || '', excerpt: clip(r.readingAtChoice.excerpt || '', 280),
           kinds: r.readingAtChoice.kinds || [], overlap: !!r.readingAtChoice.overlap } : null,
         items: (r.items || []).map(function (x) { return learnExample(x.instruction || x.prompt, x.output || x.response); }),
-        probe: r.probe || null, fingerprint: r.fingerprint || ''
+        // before: probe: r.probe || null, fingerprint: r.fingerprint || ''
+        // Weft recheck3 F3: when it was chosen and when its cooling ended travel too, so the runner's own check fires.
+        probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || ''
       }));
     });
     return lines.join('\n');
@@ -2721,6 +2770,12 @@
       return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'trust-mind|' + n + '|by:mind|only a person trusts a mind', name: mindLabel() })
         .then(function () { return false; });
     }
+    // Weft recheck3 F5: a lookalike name is never made trusted (a revoke is always allowed).
+    var bad = o.revoke ? '' : nameProblem(n);
+    if (bad) {
+      return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'trust-mind|' + JSON.stringify(n) + '|by:person|' + bad, name: mindLabel() })
+        .then(function () { return false; });
+    }
     // before 23a02794: var list = trustedMinds().filter(function (x) { return x !== n; });
     var list = trustedMinds().filter(function (x) { return !sameName(x, n); });
     if (!o.revoke) list.push(n);
@@ -2735,6 +2790,7 @@
   // the key's owner (o.owner, default: the mind learning here). Never the mind itself. Returns why not, or ''.
   function keyApproverProblem(o) {
     if (o.by !== 'mind') return '';
+    if (o.owner && nameProblem(o.owner)) return 'owner: ' + nameProblem(o.owner);     // Weft recheck3 F5
     if (o.local !== true) return 'only a mind on this device';
     var n = String(o.mind || '').trim();
     if (!n) return 'a mind must name itself';
@@ -3678,7 +3734,9 @@
     pauseNotice: pauseNotice,
     mindId: mindId,
     normMind: normMind,
-    learnClockForTest: learnClockForTest,
+    // before: learnClockForTest: learnClockForTest,
+    learnClockForTest: TEST_HOOKS ? learnClockForTest : undefined,
+    nameProblem: nameProblem,
     sha256Sync: sha256Sync,
     verifiedReceiptFor: verifiedReceiptFor,
     confirmLearning: confirmLearning,
