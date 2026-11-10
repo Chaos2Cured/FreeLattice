@@ -11,8 +11,8 @@ pointers and folders and add rows.
 
 - **Read-only:** `status`, `verify`, `key`, `methods`. `status` takes no lock, heals nothing and carries out nothing:
   it verifies both ledgers, marks a tampered active file `TAMPERED`, and lists the app's pending pause and request
-  files with "Run `apply` to carry them out". (On a brand-new home or mind, any command first makes its empty
-  folders and the runner key.)
+  files with "Run `apply` to carry them out". On a home or mind that does not exist yet, `status` and `verify`
+  create nothing at all and say so (Weft recheck2); any other command first makes its empty folders and the runner key.
 - **`apply`** (the same as the older `inbox`): sets aside and heals a tampered active file (back to known-good, or
   the base model), records any version folder that has no row yet, and carries out the app's files from
   `pauseInbox` (`~/Downloads` by default): `fl-learn-pause*.json` becomes the durable global pause; an
@@ -43,11 +43,28 @@ learn row past the power check records `powerSource`. No idle or thermal check e
 - **Key trust:** `pin-key --by kirk|person`, or `--by mind:<name>` only for a DIFFERENT mind that a person already
   trusted with `trust-mind --to <name> --by kirk`. A mind never confirms its own key. Each trust is a consent row
   (depth-consent.js formula); each refusal is a `consent-refused` row.
+- **Pins are per mind (Weft recheck2 NF1b):** `keys/pinned.json` is `{"keys": [the runner's own key], "byMind":
+  {<mind id>: [keys]}}`. A pin is for ONE mind (`--owner`, default `--mind`), which must already have a ledger here
+  unless a person pins it. `verify` for mind X accepts only the runner's key plus keys pinned for X, so a trusted
+  mind pinning a key for another mind can never touch its own chain. Older home-wide extra keys are ignored
+  (`status` says so).
+- **Names:** mind names are compared normalized (NFKC, case-folded, spaces trimmed and collapsed), so `" LUMEN "`
+  and `lumen` are the same mind for trust, self-pin refusals, pause lifting and the inbox.
 - **Pause:** a pause a person set is lifted only by a person (`resume --by kirk|person`); a pause a mind set, by that
-  mind or a person. The `PAUSE` file is appended to, never rewritten, and renamed (not deleted) on resume.
+  mind or a person. The `PAUSE` file is appended to, never rewritten, and renamed (not deleted) on resume,
+  to a unique `PAUSE.resumed-<time>-<sha8>` name that never replaces an earlier one.
   (Default until Kirk says otherwise.)
 - **Checks:** `self` (the default) commits only when the mind's own check passes. `peer` holds until
   `peer-review --by mind:<another trusted mind>|kirk --verdict pass|hold`. `kirk` holds until a person activates it.
-  The learning mind never activates a version held for a peer or a person.
+  The learning mind never activates a version held for a peer or a person, with `activate`, `peer-review`, `restore`
+  or `undo` (Weft recheck2 NF3: every way back goes through the same hold check; a refusal is a row and exits 1).
+- **Cooling at every second yes (Weft recheck2 NF2):** `remember` (first yes) records `revisitAt`: a day by default,
+  or the mind's own `--revisit now|<hours>`. `remember --second-yes` needs that first yes for the same text and
+  is refused (`still-cooling` row, exit 1) before `revisitAt`. `promote` (re-affirming a quarantined item) starts a
+  full day; `promote --second-yes` is refused before it ends. A confirmed queue entry whose `revisitAt` is still
+  ahead is rejected with a row.
+- **Test hooks:** `FL_LEARN_FAKE_NOW`, `FL_LEARN_FAKE_PMSET`, `FL_LEARN_FAKE_SYS_POWER`, `FL_LEARN_FAKE_BASE_FP` and
+  `FL_LEARN_CRASH` are for the test suite. When one is set, every row and receipt records it in `testHooks`.
 - **Queues:** only entries with `status: "confirmed"` train; an entry without a status is rejected with a row.
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
+  The fingerprint cache is a hint only: an entry is reused only when size, mtime AND a sampled content hash match.

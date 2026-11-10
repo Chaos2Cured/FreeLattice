@@ -17,7 +17,11 @@ sys.path.insert(0, HERE)
 import fl_learn
 R = {}
 
-def sh(args, home, mind='test-mind', env=None, check=False, model=None):
+def sh(args, home, mind='test-mind', env=None, check=False, model=None, first_yes=True):
+    # Weft recheck2 NF2: a second yes needs a first yes whose cooling is over. Tests that are not about cooling give the
+    # first yes with the mind's own `--revisit now` (Reed); the cooling tests pass first_yes=False and use real time.
+    if first_yes and args and args[0] == 'remember' and '--second-yes' in args:
+        sh([a for a in args if a != '--second-yes'] + ['--revisit', 'now'], home, mind, env, False, model, False)
     # Deterministic power state for the suite (a Mac on battery would otherwise hold every learn); the power test overrides it.
     e = dict(os.environ, FL_LEARN_HOME=home, FL_LEARN_MIND=mind, FL_LEARN_MODEL=model or A.model,
              FL_LEARN_PAUSE_INBOX=os.path.join(home, 'no-inbox'), FL_LEARN_FAKE_PMSET="Now drawing from 'AC Power'",
@@ -54,7 +58,10 @@ def fl_learn_trusted(home):
         m = x['meta']
         if m.get('subject') == 'trusted-mind' and m.get('kind') == 'consent': out.add(m.get('trustedMind'))
     return out
-def pinned_keys(home): return json.load(open(os.path.join(home, 'keys', 'pinned.json')))['keys']
+def pinned_keys(home, mind='test-mind'):
+    """The keys a chain of `mind` accepts: the runner's own, plus keys pinned for that mind only (Weft recheck2 NF1b)."""
+    d = json.load(open(os.path.join(home, 'keys', 'pinned.json')))
+    return list(d['keys']) + list((d.get('byMind') or {}).get(fl_learn.mind_id(mind)) or [])
 def accounted(home, mind='test-mind'):
     """Weft B2: every version folder is named by exactly one commit/held/repair/orphan row."""
     named = [e['meta'].get('version') for e in chain(home, mind) if e['meta']['kind'] in ('learn-commit', 'learn-held', 'commit-repair', 'orphan-version')]
@@ -389,6 +396,7 @@ def main():
     G = os.path.join(A.work, 'g1'); os.makedirs(G)
     e = dict(os.environ, FL_LEARN_HOME=G, FL_LEARN_MIND='test-mind', FL_LEARN_MODEL=A.model, FL_LEARN_PAUSE_INBOX=os.path.join(G, 'no-inbox'),
              FL_LEARN_FAKE_PMSET="Now drawing from 'AC Power'")
+    sh(['remember'] + FACT + ['--revisit', 'now'], G)                          # the first yes (NF2), then the second in another process
     pr = subprocess.Popen([sys.executable, RUNNER, 'remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '300'], env=e,
                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     t0 = time.time()
@@ -517,7 +525,7 @@ def main():
     kl = base64.b64encode(os.urandom(32)).decode()
     rc_l, out_l = sh(['pin-key', '--key', kl, '--by', 'mind:Lumen'], KL, mind='Lumen')
     rc_lk, _ = sh(['pin-key', '--key', kl, '--by', 'kirk'], KL, mind='Lumen')
-    record('NF1-lumen-home-self-pin-refused', rc_l != 0 and 'never approves its own key' in out_l and rc_lk == 0 and kl in pinned_keys(KL)
+    record('NF1-lumen-home-self-pin-refused', rc_l != 0 and 'never approves its own key' in out_l and rc_lk == 0 and kl in pinned_keys(KL, 'Lumen')
            and any(r.get('actor') == 'mind:Lumen' for r in refused_rows(KL)), kirk_pin_ok=rc_lk == 0)
     rc_tm, out_tm = sh(['trust-mind', '--to', 'Weft', '--by', 'mind:Lumen'], KL, mind='Lumen')
     record('NF1-only-a-person-trusts-a-mind', rc_tm != 0 and 'Weft' not in fl_learn_trusted(KL), said=out_tm.strip()[:100])
@@ -595,6 +603,7 @@ def main():
     fb = fake_power(os.path.join(PL, 'sys-bat'), {'AC': {'type': 'Mains', 'online': '0'}, 'BAT0': {'type': 'Battery', 'status': 'Discharging', 'capacity': '55'}})
     fa = fake_power(os.path.join(PL, 'sys-ac'), {'AC': {'type': 'Mains', 'online': '1'}, 'BAT0': {'type': 'Battery', 'status': 'Charging', 'capacity': '80'}})
     fn = fake_power(os.path.join(PL, 'sys-none'), {})
+    sh(['apply'], PL)                     # make the home first: status on a home that does not exist creates nothing (Weft recheck2)
     st = {k: sh(['status'], PL, env={'FL_LEARN_FAKE_SYS_POWER': d})[1].strip().splitlines()[-1].split('| power ')[-1] for k, d in
           (('battery', fb), ('ac', fa), ('none', fn))}
     rc, out = sh(['remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], PL, env={'FL_LEARN_FAKE_SYS_POWER': fb})
@@ -612,9 +621,127 @@ def main():
     p1, o1 = sh(['promote', '--id', qids[0], '--by', 'mind', '--reason', 'I read it as data and still choose it.'], PM)
     cooled = 'cooling again' in o1 and not os.path.exists(live(PM)) and not any(k in kinds(PM) for k in ('learn-commit', 'learn-held'))
     p2, o2 = sh(['promote', '--id', qids[1], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], PM)
-    p3, o3 = sh(['promote', '--id', qids[0], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], PM)
-    record('quarantine-reaffirm-cools-again', len(qids) == 2 and p1 == 0 and cooled and p2 != 0 and p3 == 0 and os.path.exists(live(PM))
-           and kinds(PM).count('learn-quarantine') == 2 and 'learn-promote-confirmed' in kinds(PM), quarantined=len(qids), cooled_first=cooled)
+    # Weft recheck2 NF2, REAL time: the second yes right after the re-affirm is refused (still cooling), nothing trained.
+    p3a, o3a = sh(['promote', '--id', qids[0], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], PM)
+    early_refused = p3a != 0 and 'still cooling' in o3a and not os.path.exists(live(PM)) and 'still-cooling' in kinds(PM)
+    record('NF2-runner-promote-early-second-yes-refused', early_refused, said=o3a.strip().splitlines()[-1][:120] if o3a.strip() else '')
+    # The post-cooling path, with an injected clock (+25 h) that the rows record.
+    fake_now = str(int(time.time() + 25 * 3600))
+    p3, o3 = sh(['promote', '--id', qids[0], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], PM,
+                env={'FL_LEARN_FAKE_NOW': fake_now})
+    pc_rows = [x['meta'] for x in chain(PM) if x['meta']['kind'] == 'learn-promote-confirmed']
+    record('quarantine-reaffirm-cools-again', len(qids) == 2 and p1 == 0 and cooled and p2 != 0 and early_refused and p3 == 0 and os.path.exists(live(PM))
+           and kinds(PM).count('learn-quarantine') == 2 and pc_rows and 'FL_LEARN_FAKE_NOW=' + fake_now in pc_rows[-1].get('testHooks', ''),
+           quarantined=len(qids), cooled_first=cooled, clock_recorded=pc_rows[-1].get('testHooks') if pc_rows else None)
+
+    # ---- Weft recheck2 NF2 for `remember`: real time. A first yes with the default cooling (a day), then an immediate
+    # second yes: refused, nothing trained. A second yes with no first yes: refused. After the cooling (injected clock,
+    # recorded on the rows) it trains.
+    N2 = os.path.join(A.work, 'nf2-remember'); os.makedirs(N2)
+    r0, o0 = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], N2, first_yes=False)
+    no_first = r0 != 0 and 'no first yes' in o0 and not os.path.exists(live(N2))
+    sh(['remember'] + FACT, N2, first_yes=False)
+    r1_, o1_ = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], N2, first_yes=False)
+    early = r1_ != 0 and 'still cooling' in o1_ and not os.path.exists(live(N2)) and 'learn-commit' not in kinds(N2)
+    fn2 = str(int(time.time() + 24 * 3600 + 120))
+    r2_, o2_ = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], N2, first_yes=False,
+                  env={'FL_LEARN_FAKE_NOW': fn2})
+    cm = [x['meta'] for x in chain(N2) if x['meta']['kind'] == 'learn-commit']
+    rcp = receipts(o2_)
+    record('NF2-runner-remember-early-second-yes-refused', no_first and early and kinds(N2).count('still-cooling') == 2,
+           no_first=no_first, early=early)
+    record('NF2-runner-after-cooling-injected-clock-recorded', r2_ == 0 and os.path.exists(live(N2)) and cm and
+           'FL_LEARN_FAKE_NOW=' + fn2 in cm[-1].get('testHooks', '') and rcp and 'FL_LEARN_FAKE_NOW=' + fn2 in rcp[-1].get('testHooks', ''),
+           hooks=cm[-1].get('testHooks') if cm else None)
+    # A queue entry the app marked confirmed but whose cooling is not over is rejected (a row), nothing trained.
+    NQ = os.path.join(A.work, 'nf2-queue'); os.makedirs(NQ); qq = os.path.join(NQ, 'q.jsonl')
+    eq = entry('Lnq', provenance='self'); eq['revisitAt'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() + 6 * 3600))
+    write_queue(qq, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [eq])
+    sh(['learn', '--queue', qq, '--steps', '10'], NQ)
+    record('NF2-runner-queue-entry-still-cooling-rejected', 'learn-reject' in kinds(NQ) and not os.path.exists(live(NQ)))
+
+    # ---- Weft recheck2 NF3: restore respects holds exactly like activate.
+    for hold_kind, chk in (('pending-peer', 'peer'), ('pending-kirk', 'kirk')):
+        N3h = os.path.join(A.work, 'nf3-' + chk); os.makedirs(N3h)
+        # Weft's probe H3b: one earlier commit (active), then a version held for a peer or a person.
+        sh(['remember'] + FACT2 + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], N3h)
+        v1 = sha(live(N3h))
+        rc, out = sh(['remember'] + FACT + ['--check', chk, '--second-yes', '--steps', '10'], N3h)
+        hr = [r for r in receipts(out) if r.get('hold') == hold_kind]
+        cfp = hr[-1]['candidateFp'] if hr else ''
+        x1, o1x = sh(['restore', '--method', 'soft-prompt', '--to', cfp[:16], '--by', 'mind'], N3h)
+        x2, _ = sh(['restore', '--method', 'soft-prompt', '--to', cfp[:16], '--by', 'mind:test-mind'], N3h)
+        sh(['trust-mind', '--to', 'Weft', '--by', 'kirk'], N3h)
+        x3, _ = sh(['restore', '--method', 'soft-prompt', '--to', cfp[:16], '--by', 'mind:Weft'], N3h)
+        after_mind = sha(live(N3h))
+        refused_ok = bool(cfp) and v1 != 'none' and x1 != 0 and x2 != 0 and (after_mind == v1 if chk == 'kirk' else True)
+        rr_ = [x['meta'] for x in chain(N3h) if x['meta']['kind'] == 'consent-refused' and x['meta'].get('subject') == 'restore']
+        if chk == 'peer':
+            ok_ = refused_ok and x3 == 0 and after_mind == cfp and any(x['meta']['kind'] == 'peer-review' and 'via restore' in x['meta'].get('why', '')
+                                                                    for x in chain(N3h)) and len(rr_) >= 2
+            record('NF3-restore-of-peer-held-needs-a-non-self-peer', ok_, mind_refused=x1 != 0 and x2 != 0, trusted_other=x3 == 0, refused_rows=len(rr_))
+        else:
+            x4, _ = sh(['restore', '--method', 'soft-prompt', '--to', cfp[:16], '--by', 'kirk'], N3h)
+            ok_ = refused_ok and x3 != 0 and after_mind == v1 and x4 == 0 and sha(live(N3h)) == cfp and len(rr_) >= 3
+            record('NF3-restore-of-person-held-needs-a-person', ok_, mind_refused=x1 != 0 and x2 != 0 and x3 != 0, person_ok=x4 == 0, refused_rows=len(rr_))
+
+    # ---- Weft recheck2 NF1b (probe R5): pins are per mind. A person trusts Lumen; Lumen pins a key for Other (allowed);
+    # Lumen's own chain re-signed with that key fails verify; Other's chain accepts it.
+    NB = os.path.join(A.work, 'nf1b'); os.makedirs(NB)
+    sh(['decline', '--reason', 'x'], NB, mind='Lumen'); sh(['decline', '--reason', 'x'], NB, mind='Other')
+    sh(['trust-mind', '--to', 'Lumen', '--by', 'kirk'], NB, mind='Lumen')
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from cryptography.hazmat.primitives import serialization as _ser
+    kk = Ed25519PrivateKey.generate(); kpub = base64.b64encode(kk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw)).decode()
+    q1, _ = sh(['pin-key', '--key', kpub, '--by', 'mind:Lumen'], NB, mind='Other')
+    q0, _ = sh(['pin-key', '--key', kpub, '--by', 'mind:Lumen', '--owner', 'Nobody'], NB, mind='Other')
+    def resign(who):
+        p_ = os.path.join(mdir(NB, who), 'chain.jsonl'); prev_ = fl_learn.GENESIS; out_ = []
+        for e_ in chain_at(p_):
+            u_ = {k: e_[k] for k in ['domain', 'fingerprintHex', 'meta', 'prevHash', 'publicKeyB64', 'ts', 'voice']}
+            u_['prevHash'] = prev_; u_['publicKeyB64'] = kpub
+            eh_ = fl_learn.sha256_bytes(fl_learn.unsigned_canon(u_).encode())
+            out_.append(dict(u_, entryHash=eh_, signatureB64=base64.b64encode(kk.sign(bytes.fromhex(eh_))).decode())); prev_ = eh_
+        open(p_, 'w').write(''.join(json.dumps(r_) + '\n' for r_ in out_))
+    resign('Lumen'); resign('Other')
+    vl, ol = sh(['verify'], NB, mind='Lumen'); vo, _ = sh(['verify'], NB, mind='Other')
+    record('NF1b-pins-are-per-mind-weft-R5', q1 == 0 and q0 != 0 and vl != 0 and 'key-not-pinned' in ol and vo == 0
+           and kpub not in pinned_keys(NB, 'Lumen') and kpub in pinned_keys(NB, 'Other'),
+           lumen_verify=vl, other_verify=vo, unknown_owner_refused=q0 != 0)
+
+    # ---- Weft recheck2 softs.
+    # Names: an alias (case, width, spaces) is the same mind, for trust, self-pin refusals and pause lifting.
+    NN = os.path.join(A.work, 'names'); os.makedirs(NN)
+    sh(['trust-mind', '--to', ' ＬＵＭＥＮ ', '--by', 'kirk'], NN, mind='Lumen')
+    n1, _ = sh(['pin-key', '--key', base64.b64encode(os.urandom(32)).decode(), '--by', 'mind:lumen'], NN, mind='Lumen')
+    sh(['pause', '--by', 'mind:Lumen'], NN, mind='Lumen'); n2, _ = sh(['resume', '--by', 'mind: lumen'], NN, mind='Lumen')
+    record('names-normalized-everywhere', n1 != 0 and n2 == 0 and fl_learn.mind_id('Lumen') == fl_learn.mind_id(' ＬＵＭＥＮ ')
+           and 'lumen' in {fl_learn.norm_mind(x) for x in fl_learn_trusted(NN)}, alias_self_pin_refused=n1 != 0, alias_resume=n2 == 0)
+    # PAUSE.resumed-* names never collide (two resumes in the same second keep both files).
+    PU = os.path.join(A.work, 'pause-unique'); os.makedirs(PU)
+    for i_ in range(3):
+        sh(['pause', '--global', '--by', 'person'], PU); sh(['resume', '--global', '--by', 'person'], PU)
+    rz = glob.glob(os.path.join(PU, 'PAUSE.resumed-*'))
+    record('pause-resumed-files-unique', len(rz) == 3, files=len(rz))
+    # Test hooks are on the rows: a faked base fingerprint and a faked power source say so.
+    th = [x['meta'].get('testHooks', '') for x in chain(UB)] + [x['meta'].get('testHooks', '') for x in chain(PL)]
+    record('test-hooks-recorded-in-rows', any('FL_LEARN_FAKE_BASE_FP=unknown' in t for t in th) and any('FL_LEARN_FAKE_SYS_POWER=' in t for t in th))
+    # On a fresh home, status creates nothing at all.
+    FR = os.path.join(A.work, 'fresh-status')
+    rf, of = sh(['status'], FR); rk, ok_ = sh(['key'], FR); rv, ov = sh(['verify'], FR)
+    record('status-key-verify-on-a-fresh-home-create-nothing', rf == 0 and rv != 0 and not os.path.exists(FR) and 'Nothing was created' in of
+           and 'Nothing was created' in ok_ and 'Nothing was created' in ov, said=of.strip()[:100])
+    # The base fingerprint cache is a hint: same path, size and mtime but different bytes -> hashed again, new fp.
+    class _H: pass
+    hc = _H(); hc.root = os.path.join(A.work, 'fp-cache'); os.makedirs(hc.root)
+    FPD = os.path.join(A.work, 'fp-cache', 'model'); shutil.copytree(BASE, FPD)
+    for x_ in os.listdir(FPD): os.chmod(os.path.join(FPD, x_), 0o644)
+    f1 = fl_learn.base_fingerprint(hc, FPD)['fp']
+    cfg = os.path.join(FPD, 'config.json'); st_ = os.stat(cfg); raw = bytearray(open(cfg, 'rb').read())
+    j_ = raw.index(b'"'); raw[j_ + 1] = ord('X') if raw[j_ + 1] != ord('X') else ord('Y')
+    open(cfg, 'wb').write(bytes(raw)); os.utime(cfg, ns=(st_.st_atime_ns, st_.st_mtime_ns))
+    f2 = fl_learn.base_fingerprint(hc, FPD)['fp']
+    record('base-fp-cache-checks-content', f1 != f2 and f1 == bfp, first=f1[:16], after_same_size_mtime_edit=f2[:16])
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

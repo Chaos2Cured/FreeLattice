@@ -101,10 +101,44 @@ def sha256_file(p):
         for chunk in iter(lambda: f.read(1 << 20), b''): h.update(chunk)
     return h.hexdigest()
 def slug(s): return re.sub(r'[^A-Za-z0-9._-]+', '_', s).strip('_')[:80] or 'mind'
+def norm_mind(label):
+    """Weft recheck2: one name, one mind. NFKC, case-folded, trimmed, inner spaces collapsed, everywhere a mind name is
+    compared or stored as an identity. "Lumen", " lumen " and "ＬＵＭＥＮ" are the same mind. Twin of normMind() in snowflake-core.js."""
+    import unicodedata
+    t = unicodedata.normalize('NFKC', str(label or ''))
+    t = unicodedata.normalize('NFKC', t.casefold())
+    return ' '.join(t.split())
+
 def mind_id(label):
-    """Collision-safe: "Lumen@kirk" and "Lumen kirk" share a slug but never a folder. Twin of mindId() in snowflake-core.js."""
-    label = str(label or '')
+    """Collision-safe: "Lumen@kirk" and "Lumen kirk" share a slug but never a folder. Twin of mindId() in snowflake-core.js.
+    Built from the normalized name, so an alias (case, width, spaces) is the same folder, never a second identity."""
+    label = norm_mind(label)
     return (slug(label)[:40] or 'mind') + '-' + sha256_bytes(label.encode('utf8'))[:12]
+
+def test_hooks():
+    """Weft recheck2: any FL_LEARN_FAKE_* / FL_LEARN_CRASH in effect is written into every row and receipt it touches."""
+    return ';'.join('%s=%s' % (k, os.environ[k]) for k in sorted(os.environ) if k.startswith('FL_LEARN_FAKE_') or k == 'FL_LEARN_CRASH')
+
+def now_epoch():
+    """The clock the cooling checks use. FL_LEARN_FAKE_NOW (epoch seconds) is a test hook and is recorded in rows."""
+    v = os.environ.get('FL_LEARN_FAKE_NOW')
+    try: return float(v) if v else time.time()
+    except ValueError: return time.time()
+
+def iso_of(e):
+    return datetime.datetime.fromtimestamp(e, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+def iso_epoch(ts):
+    try: return datetime.datetime.strptime(ts[:19], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()
+    except Exception: return None
+
+COOL_SECS = 24 * 3600
+def revisit_epoch(v, t0):
+    """The mind's own revisit choice at the first yes: 'now', hours, or (default) a full day."""
+    v = (v or '').strip().lower()
+    if v in ('now', '0'): return t0
+    try: return t0 + float(v) * 3600 if v else t0 + COOL_SECS
+    except ValueError: return t0 + COOL_SECS
 
 def canon_method(m):
     m = (m or '').strip().lower()
@@ -148,7 +182,19 @@ class Signer:
                 json.dump({'keys': [self.pub_b64], 'since': now(), 'how': 'made on this computer by fl_learn.py'}, f, indent=1)
             os.replace(self.pinned_path + '.tmp', self.pinned_path)
     def pinned(self):
+        """Home-wide keys: only this runner's own key(s). Weft recheck2 NF1b: every other key is pinned FOR ONE MIND."""
         try: return list(json.load(open(self.pinned_path)).get('keys') or [])
+        except Exception: return []
+    def pinned_for(self, mind):
+        """The keys a chain of `mind` may be signed with: this runner's own key, plus keys pinned for that mind only.
+        A legacy home-wide extra key (pinned before per-mind pins) is NOT accepted for any mind; re-pin it with --owner."""
+        try: d = json.load(open(self.pinned_path))
+        except Exception: d = {}
+        own = [k for k in (d.get('keys') or []) if k == self.pub_b64] or [self.pub_b64]
+        if mind == '*': return own
+        return own + list((d.get('byMind') or {}).get(mind_id(mind)) or [])
+    def legacy_extra(self):
+        try: return [k for k in (json.load(open(self.pinned_path)).get('keys') or []) if k != self.pub_b64]
         except Exception: return []
     def sign(self, b): return base64.b64encode(self.key.sign(b)).decode()
 
@@ -182,6 +228,7 @@ class Chain:
         ts = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (datetime.datetime.now().microsecond // 1000)
         lam = '%.3f' % (len(es) + 1)
         meta.setdefault('via', os.environ.get('FL_LEARN_VIA', 'cli'))   # Weft N7: the runner cannot tell who typed it
+        if test_hooks(): meta['testHooks'] = test_hooks()                 # Weft recheck2: a faked clock/power/base is on the row
         meta = stringify_meta(dict(meta, kind=kind, mind=self.mind, marker=VERSION, **{'lambda': lam}))
         meta['psi'] = sha256_bytes((ts + lam + kind + self.mind + SIGMA).encode())[:8]
         u = {'domain': DOMAIN, 'fingerprintHex': self.signer.fp, 'meta': meta, 'prevHash': prev,
@@ -196,7 +243,7 @@ class Chain:
     def verify(self):
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         prev = GENESIS
-        pinned = self.signer.pinned()
+        pinned = self.signer.pinned_for(self.mind)
         for i, e in enumerate(self.entries()):
             if e.get('publicKeyB64') not in pinned: return {'ok': False, 'failedAt': i, 'reason': 'key-not-pinned'}
             u = {k: e[k] for k in ['domain', 'fingerprintHex', 'meta', 'prevHash', 'publicKeyB64', 'ts', 'voice']}
@@ -442,8 +489,17 @@ def windows_power():
     except Exception:
         return {'source': 'unknown', 'how': 'win32'}
 
+def sample_hash(p, size, chunk=1 << 20):
+    h = hashlib.sha256(str(size).encode())
+    with open(p, 'rb') as f:
+        for off in sorted({0, max(0, size // 2 - chunk // 2), max(0, size - chunk)}):
+            f.seek(off); h.update(f.read(chunk))
+    return h.hexdigest()
+
 def base_fingerprint(home, model_id):
-    """sha256 over the base's weight and config files (content, not names). Cached by path+size+mtime."""
+    """sha256 over the base's weight and config files (content, not names). Weft recheck2: the cache is a hint only.
+    A cached entry is used only if path, size and mtime match AND a sampled content hash (first, middle and last
+    1 MiB) matches; otherwise the file is hashed again in full."""
     if os.environ.get('FL_LEARN_FAKE_BASE_FP'): return {'fp': os.environ['FL_LEARN_FAKE_BASE_FP'], 'fake': True}
     d = model_id if os.path.isdir(os.path.expanduser(model_id)) else None
     if d is None:
@@ -460,8 +516,11 @@ def base_fingerprint(home, model_id):
         if not n.endswith(('.safetensors', '.bin', 'config.json', 'tokenizer.json', '.model')): continue
         p = os.path.realpath(os.path.join(d, n)); st = os.stat(p)
         key = '%s|%d|%d' % (p, st.st_size, int(st.st_mtime))
-        if key not in cache: cache[key] = sha256_file(p)
-        files[n] = cache[key]
+        smp = sample_hash(p, st.st_size)
+        hit = cache.get(key)
+        if not (isinstance(hit, dict) and hit.get('sample') == smp and hit.get('size') == st.st_size):
+            hit = {'sha256': sha256_file(p), 'sample': smp, 'size': st.st_size}; cache[key] = hit
+        files[n] = hit['sha256']
     with open(cp + '.tmp', 'w') as f: json.dump(cache, f)
     os.replace(cp + '.tmp', cp)
     return {'fp': sha256_bytes(canonical(files).encode()), 'files': files}
@@ -506,7 +565,7 @@ def honor_requests(home, d):
         try: obj = json.load(open(p))
         except Exception: continue
         h = sha256_file(p)
-        if h in seen or obj.get('kind') != 'fl-learn-request' or obj.get('mind') != home.mind: continue
+        if h in seen or obj.get('kind') != 'fl-learn-request' or norm_mind(obj.get('mind')) != norm_mind(home.mind): continue
         actor = obj.get('by') if obj.get('by') in ('person', 'mind') else 'person'
         rc = receipts.get(str(obj.get('receiptHash') or ''))
         act, method = obj.get('action'), canon_method(obj.get('method'))[0]
@@ -580,6 +639,11 @@ def export_and_archive(home, why):
 
 PERSON_ACTORS = ('person', 'kirk')
 def is_mind_actor(by): return by == 'mind' or str(by).startswith('mind:')
+def actor_key(a):
+    """Compare actors by normalized name: mind:Lumen, mind: lumen and mind:Lumen_ (as written in PAUSE) are one actor."""
+    a = str(a or '').strip()
+    if a.startswith('mind:'): return 'mind:' + norm_mind(a[5:].replace('_', ' '))
+    return a
 
 def pause_actors(path):
     """Who paused, from the PAUSE file (one line per pause, appended; never rewritten)."""
@@ -591,7 +655,14 @@ def may_lift(actors, by):
     """Weft re-check soft 1 (default until Kirk says otherwise): a pause a person set is lifted only by a person.
     A pause a mind set is lifted by that same mind, or by a person. Anything else (operator, app) counts as a person's pause."""
     if by in PERSON_ACTORS: return True
-    return bool(actors) and is_mind_actor(by) and all(a == by for a in actors)
+    return bool(actors) and is_mind_actor(by) and all(actor_key(a) == actor_key(by) for a in actors)
+
+def set_aside_pause(path):
+    """Weft recheck2 NF4: a lifted PAUSE is renamed to a name that is never reused (time + content hash + counter)."""
+    if not os.path.exists(path): return None
+    base = '%s.resumed-%d-%s' % (path, int(time.time()), sha256_file(path)[:8]); dst, n = base, 1
+    while os.path.exists(dst): n += 1; dst = '%s-%d' % (base, n)
+    os.rename(path, dst); return dst
 
 def append_pause(path, actor):
     with open(path, 'a') as f: f.write(now() + ' ' + str(actor).replace(' ', '_') + '\n')
@@ -611,8 +682,8 @@ def trusted_minds(home):
     for e in home.home_chain.entries():
         m = e['meta']
         if m.get('subject') != 'trusted-mind' or m.get('actor') not in PERSON_ACTORS: continue
-        if m.get('kind') == 'consent': out.add(m.get('trustedMind'))
-        elif m.get('kind') == 'consent-revoked': out.discard(m.get('trustedMind'))
+        if m.get('kind') == 'consent': out.add(norm_mind(m.get('trustedMind')))
+        elif m.get('kind') == 'consent-revoked': out.discard(norm_mind(m.get('trustedMind')))
     return out
 
 def refuse(chain, subject, by, why, code=1, **meta):
@@ -626,10 +697,12 @@ def approver_problem(home, by, owner):
     DIFFERENT mind that a person has already trusted. Never the mind itself. Returns why not, or None."""
     if by in PERSON_ACTORS: return None
     if not is_mind_actor(by): return 'say who is acting: --by kirk, --by person, or --by mind:<another trusted mind>.'
-    name = by[5:] if by.startswith('mind:') else ''
+    shown = by[5:].strip() if by.startswith('mind:') else ''
+    name = norm_mind(shown)
     if not name: return 'a mind must name itself (--by mind:<name>).'
-    if name in (owner, home.mind): return 'a mind never approves its own key or its own change; a person or another trusted mind does.'
+    if name in (norm_mind(owner), norm_mind(home.mind)): return 'a mind never approves its own key or its own change; a person or another trusted mind does.'
     if name not in trusted_minds(home):
+        name = shown
         return '%s is not a trusted local mind here; a person makes it one first (trust-mind --to "%s" --by kirk).' % (name, name)
     return None
 
@@ -849,6 +922,14 @@ def learn_one(args, home, mind, entry):
         print('rejected: no status (only status "confirmed" trains)'); return None
     if entry.get('status') != 'confirmed':
         return None                                           # cooling or faded: the second yes has not come
+    ra = entry.get('revisitAt')
+    if ra:
+        try: ra_e = datetime.datetime.fromisoformat(str(ra).replace('Z', '+00:00')).timestamp()
+        except Exception: ra_e = None
+        if ra_e and ra_e > now_epoch():
+            home.chain.append('learn-reject', 'Still cooling: its second yes came before its cooling ended, so nothing was trained.',
+                              learnIds=[str(entry.get('id', ''))], source=source, revisitAt=str(ra))
+            print('rejected: still cooling until %s' % ra); return None
     method, note = canon_method(entry.get('method'))
     note = entry.get('methodNote') or note
     # Q5 (Kirk 2026-11-09): check-before-keep is ON unless someone switched it off; the default checker is the mind.
@@ -1025,6 +1106,7 @@ def write_receipt(home, obj):
     """Signed with the runner key, so FLLearn.importReceipt can verify before trusting it."""
     obj = dict(obj, kind='fl-learn-receipt', marker=VERSION, t=now(), mind=home.mind,
                publicKeyB64=home.signer.pub_b64, fingerprintHex=home.signer.fp)
+    if test_hooks(): obj['testHooks'] = test_hooks()
     body = canonical(stringify_meta({k: v for k, v in obj.items()}))
     obj['receiptHash'] = sha256_bytes(body.encode())
     obj['signatureB64'] = home.signer.sign(bytes.fromhex(obj['receiptHash']))
@@ -1053,6 +1135,13 @@ def go_back(home, method, target, kind, actor='operator'):
         ptr = {'fp': version_fp(method, vdir), 'dir': vdir, 'version': vd[-1], 'baseFp': version_base_fp(vdir)}
         if not ptr['fp'].startswith(target) or not verify_version(method, ptr):
             print("Couldn't go back: that version does not verify. Nothing was changed."); return None
+        # Weft recheck2 NF3: a version held for a peer or a person needs that approval on EVERY path that makes it
+        # active (activate, restore, an app request), the same rule as activate. Refused = a row, nothing changed.
+        why = held_problem(home, method, ptr['fp'], actor, kind)
+        if why:
+            home.last_refused = True
+            refuse(home.chain, kind, actor, why, code=None, toFp=ptr['fp'])
+            return None
         home.set_pointer(method, 'active', ptr); now_fp = ptr['fp']
     live = home.active_file(method)
     file_fp = sha256_file(live) if live and os.path.exists(live) else 'none'
@@ -1069,6 +1158,27 @@ def go_back(home, method, target, kind, actor='operator'):
     print('%s %s: %s → %s  file=%s  matches=%s' % (kind, method, cur[:16], now_fp[:16], file_fp[:16], ok))
     return ok
 
+def held_approved(home, rc):
+    """Was this held version already approved: a peer's pass, or an activation (only possible with the approval)?"""
+    fp = rc.get('candidateFp') or ''
+    for e in home.chain.entries():
+        m = e['meta']
+        if m.get('kind') == 'peer-review' and m.get('receiptHash') == rc.get('receiptHash') and m.get('verdict') == 'pass': return True
+        if m.get('kind') == 'activate' and fp and str(m.get('toFp') or '') == fp: return True
+    return False
+
+def held_problem(home, method, fp, actor, kind):
+    rc = receipt_for_candidate(home, method, fp)
+    hold = (rc or {}).get('hold')
+    if hold not in ('pending-peer', 'pending-kirk') or held_approved(home, rc): return None
+    if hold == 'pending-kirk':
+        return None if actor in PERSON_ACTORS else 'this version waits for a person; only a person makes it active (activate --by kirk).'
+    why = approver_problem(home, actor, rc.get('mind') or home.mind)
+    if why: return 'this version waits for a peer check. ' + why
+    home.chain.append('peer-review', 'A peer looked: pass (by making it active with %s).' % kind, verdict='pass', method=method,
+                      toFp=fp, receiptHash=rc.get('receiptHash'), actor=actor, why='via ' + kind)
+    return None
+
 def pending_inbox(home, inbox):
     """What `apply` would carry out from the app's inbox (~/Downloads): pause files and requests not yet seen."""
     d = os.path.expanduser(inbox or '')
@@ -1083,7 +1193,7 @@ def pending_inbox(home, inbox):
     for p in sorted(glob.glob(os.path.join(d, 'fl-learn-request*.json'))):
         try: obj = json.load(open(p))
         except Exception: continue
-        if obj.get('kind') == 'fl-learn-request' and obj.get('mind') == home.mind and sha256_file(p) not in seen_mind:
+        if obj.get('kind') == 'fl-learn-request' and norm_mind(obj.get('mind')) == norm_mind(home.mind) and sha256_file(p) not in seen_mind:
             reqs.append('%s (%s)' % (os.path.basename(p), obj.get('action')))
     return pauses, reqs
 
@@ -1109,6 +1219,8 @@ def status_read_only(home):
     es = home.chain.entries()
     print(st, '| rows', len(es), '|', home.dir)
     if es: print('readback λ%s ψ%s %s' % (es[-1]['meta'].get('lambda'), es[-1]['meta'].get('psi'), es[-1]['entryHash'][:16]))
+    if home.signer.legacy_extra():
+        print('note: %d home-wide key pin(s) from before per-mind pins are not accepted for any mind; re-pin with pin-key --owner.' % len(home.signer.legacy_extra()))
     pauses, reqs = pending_inbox(home, os.environ.get('FL_LEARN_PAUSE_INBOX', home.policy.get('pauseInbox')))
     if pauses or reqs or tampered:
         print('pending (NOT done; status is read-only): %d app pause file(s), %d app request(s)%s. Run `apply` to carry them out.'
@@ -1142,6 +1254,7 @@ def main():
     ap.add_argument('--device', default=None)
     ap.add_argument('--check', choices=['none', 'self', 'peer', 'kirk'], default=None, help="who checks before commit; the mind's choice (default self)")
     ap.add_argument('--second-yes', action='store_true', help='the mind confirmed after cooling (Reed): required to change numbers')
+    ap.add_argument('--revisit', default=None, help="remember (first yes): when the mind looks again: 'now', hours, or a day (default)")
     ap.add_argument('--steps', type=int, default=100); ap.add_argument('--lr', type=float, default=0.02)
     ap.add_argument('--tokens', type=int, default=8); ap.add_argument('--seed', type=int, default=None)
     ap.add_argument('--queue'); ap.add_argument('--text'); ap.add_argument('--method'); ap.add_argument('--reason', default='')
@@ -1154,10 +1267,23 @@ def main():
         for k, v in METHODS.items(): print('%-17s %s' % (k, 'runs' if v['runs'] else 'proposal (waits; never runs silently)'))
         return
     glob_scope = args.glob or args.mind == '*'
-    home = Home(args.home, 'local-mind' if args.mind == '*' else args.mind, args.model)
+    root = os.path.expanduser(args.home)
+    mdir_ = os.path.join(root, 'minds', mind_id('local-mind' if args.mind == '*' else args.mind))
     if args.cmd == 'key':
-        print(json.dumps(json.load(open(os.path.join(home.root, 'keys', 'runner.pub.json'))), indent=1))
+        # Hypha 23a0279 soft: `key` is read-only too. It reads the key file and never makes a home or a key.
+        kp = os.path.join(root, 'keys', 'runner.pub.json')
+        if not os.path.exists(kp):
+            print('No runner key here yet (%s). Nothing was created. The key is made the first time a learning command '
+                  '(remember, apply, ...) runs on this home.' % kp); return
+        print(json.dumps(json.load(open(kp)), indent=1))
         print('Compare the "show" line with what the app shows before you trust it there.'); return
+    if args.cmd in ('status', 'verify') and not (os.path.exists(os.path.join(root, 'keys', 'runner.seed')) and os.path.exists(os.path.join(mdir_, 'mind.json'))):
+        # Weft recheck2: on a fresh home (or a mind not made yet) status and verify create nothing at all.
+        print('No learning home for this mind here yet (%s). Nothing was created.' % mdir_)
+        sys.exit(0 if args.cmd == 'status' else 1)
+    known_minds = {x for x in (os.listdir(os.path.join(root, 'minds')) if os.path.isdir(os.path.join(root, 'minds')) else [])
+                   if os.path.exists(os.path.join(root, 'minds', x, 'chain.jsonl'))}
+    home = Home(args.home, 'local-mind' if args.mind == '*' else args.mind, args.model)
     if args.cmd == 'trust-mind':
         # Kirk 2026-11-09 (a) with Weft's re-check: a "trusted local AI" is one a PERSON trusted, by name, with a consent row.
         # A mind never makes itself or another mind trusted.
@@ -1168,7 +1294,7 @@ def main():
         rec = consent_record(args.by, 'learn_mind_revoked' if args.revoke else 'learn_mind_trusted',
                              ('withdraw trust in ' if args.revoke else 'trust local mind ') + args.to, 'mind:' + args.to)
         home.home_chain.append(kind, ('A person withdrew trust in a local mind.' if args.revoke else 'A person trusted a local mind, by name.'),
-                               subject='trusted-mind', actor=args.by, trustedMind=args.to, why=args.reason or '', consent=rec)
+                               subject='trusted-mind', actor=args.by, trustedMind=args.to, trustedMindNorm=norm_mind(args.to), why=args.reason or '', consent=rec)
         print('%s %s (consent %s)' % ('untrusted' if args.revoke else 'trusted', args.to, rec['signature'][:16])); return
     if args.cmd == 'pin-key':
         # Kirk 2026-11-09 (a): a person or a trusted local AI confirms a key. Every confirmation is a consent row,
@@ -1180,18 +1306,23 @@ def main():
         kfp = hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(args.key)).hexdigest()
         if not (args.by in PERSON_ACTORS or args.by.startswith('mind:')):
             refuse(home.home_chain, 'ledger-key', args.by, 'pin-key needs --by person, --by kirk or --by mind:<another trusted mind>.', keyFp=kfp[:16], owner=owner)
-        why = approver_problem(home, args.by, owner)
+        why = approver_problem(home, args.by, owner)      # first: who is asking (never the mind itself)
         if why: refuse(home.home_chain, 'ledger-key', args.by, why, keyFp=kfp[:16], owner=owner)
-        d = json.load(open(home.signer.pinned_path)); keys = d.get('keys') or []
+        if mind_id(owner) not in known_minds and args.by not in PERSON_ACTORS:   # then: for whom
+            refuse(home.home_chain, 'ledger-key', args.by, 'there is no mind "%s" with a ledger on this computer; a mind pins a key only for a mind that exists (a person may pin for a new one).' % owner,
+                   keyFp=kfp[:16], owner=owner)
+        # Weft recheck2 NF1b: the pin is for `owner` ONLY. Its chains accept it; no other mind's chain (and never the
+        # pinning mind's own) does.
+        d = json.load(open(home.signer.pinned_path)); bm = d.setdefault('byMind', {}); keys = bm.setdefault(mind_id(owner), [])
         if args.key not in keys:
-            keys.append(args.key); d['keys'] = keys
+            keys.append(args.key)
             with open(home.signer.pinned_path + '.tmp', 'w') as f: json.dump(d, f, indent=1)
             os.replace(home.signer.pinned_path + '.tmp', home.signer.pinned_path)
         rec = consent_record(args.by, 'learn_key_trusted', 'trust ledger key ' + kfp[:16], args.key)
         rec['messageId'] = 'learn-key:' + kfp[:16]
-        home.home_chain.append('consent', 'A ledger key was trusted here, on purpose.', subject='ledger-key', actor=args.by,
-                               keyFp=kfp[:16], owner=owner, consent=rec)
-        print('pinned (consent %s)' % rec['signature'][:16]); return
+        home.home_chain.append('consent', 'A ledger key was trusted here, on purpose, for one mind.', subject='ledger-key', actor=args.by,
+                               keyFp=kfp[:16], owner=owner, ownerId=mind_id(owner), consent=rec)
+        print('pinned for %s only (consent %s)' % (owner, rec['signature'][:16])); return
     if args.cmd == 'pause':
         if glob_scope:
             set_global_pause(home, args.by, args.reason or 'Paused from the terminal.'); return
@@ -1206,7 +1337,7 @@ def main():
                                        scope='global', actor=args.by, pausedBy=pause_actors(p))
                 print('refused: still paused. A pause a person set is lifted by a person (--by kirk or --by person); '
                       'a pause a mind set, by that mind or a person.'); sys.exit(1)
-            if os.path.exists(p): os.replace(p, p + '.resumed-' + str(int(time.time())))
+            set_aside_pause(p)
             home.home_chain.append('resume', 'Learning is on again everywhere on this computer.', scope='global', actor=args.by)
             print('resumed (global). Minds with their own pause stay paused.'); return
         p = os.path.join(home.dir, 'PAUSE')
@@ -1215,7 +1346,7 @@ def main():
                               scope='mind', actor=args.by, pausedBy=pause_actors(p))
             print('refused: still paused. A pause a person set is lifted by a person (--by kirk or --by person); '
                   'a pause a mind set, by that mind or a person.'); sys.exit(1)
-        if os.path.exists(p): os.replace(p, p + '.resumed-' + str(int(time.time())))
+        set_aside_pause(p)
         home.chain.append('resume', 'Learning is on again for this mind.', scope='mind', actor=args.by)
         print('resumed for this mind, but the global pause still holds (resume --global lifts it)' if home.global_paused() else 'resumed')
         return
@@ -1254,8 +1385,11 @@ def main():
             if not rows: print('Nothing to go back from. Nothing was changed.'); return
             last = rows[-1]['meta']; m = m or last['method']
             if args.cmd == 'undo':
-                return go_back(home, m, last.get('beforeFp') or last.get('fromFp'), 'rollback', args.by)
-            return go_back(home, m, args.to or 'none', 'restore', args.by)
+                r = go_back(home, m, last.get('beforeFp') or last.get('fromFp'), 'rollback', args.by)
+            else:
+                r = go_back(home, m, args.to or 'none', 'restore', args.by)
+            if getattr(home, 'last_refused', False): sys.exit(1)
+            return r
         if args.cmd in ('activate', 'peer-review'):
             # The mind's override of its OWN check (with its reason), a person's tap, or a peer's pass. A row, not a delete.
             # Weft re-check: a version held for a peer or a person is never activated by the learning mind itself.
@@ -1280,6 +1414,7 @@ def main():
             elif args.cmd == 'peer-review':
                 print('already reviewed; nothing more to do'); return None
             r = go_back(home, m, args.to, 'activate', args.by)
+            if getattr(home, 'last_refused', False): sys.exit(1)
             if r: home.chain.append('activate-reason', args.reason or 'Chosen.', method=m, toFp=args.to, actor=args.by)
             return r
         if args.cmd == 'promote':
@@ -1287,13 +1422,21 @@ def main():
             # on a later second yes (promote --second-yes), never at once.
             p = os.path.join(home.dir, 'quarantine', (args.id or '') + '.json')
             if not args.id or not os.path.exists(p): print('promote needs --id of a quarantined item'); sys.exit(1)
-            done = [x['meta'] for x in home.chain.entries() if x['meta'].get('kind') == 'learn-promote' and x['meta'].get('item') == args.id]
+            done = [dict(x['meta'], rowTs=x['ts']) for x in home.chain.entries() if x['meta'].get('kind') == 'learn-promote' and x['meta'].get('item') == args.id]
             if not args.second_yes:
+                t0 = now_epoch()
                 home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it. It cools again first.',
-                                  item=args.id, actor=args.by, status='cooling')
+                                  item=args.id, actor=args.by, status='cooling', t=iso_of(t0), revisitAt=iso_of(t0 + COOL_SECS))
                 print('re-affirmed: cooling again. Run promote --second-yes after the second look.'); return
             if not done:
                 print('promote --second-yes needs an earlier re-affirmation (promote without --second-yes). Nothing changed.'); sys.exit(1)
+            # Weft recheck2 NF2: the re-affirmation starts a FULL cooling; a second yes before it ends is refused (a row).
+            t_re = iso_epoch(done[-1].get('t') or done[-1]['rowTs']) or now_epoch()
+            until = max(t_re + COOL_SECS, iso_epoch(done[-1].get('revisitAt') or '') or 0)
+            if now_epoch() < until:
+                home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
+                                  item=args.id, actor=args.by, revisitAt=iso_of(until))
+                print('refused: still cooling until %s. Nothing changed.' % iso_of(until)); sys.exit(1)
             e = json.load(open(p)); e['promoted'] = True
             home.chain.append('learn-promote-confirmed', args.reason or 'Still yes, after cooling.', item=args.id, actor=args.by)
             e['status'] = 'confirmed'; entries = [e]
@@ -1332,11 +1475,24 @@ def main():
                         'status': 'confirmed' if args.second_yes else 'cooling',
                         'items': [{'instruction': args.question or 'Remember this.', 'output': args.text or ''}],
                         'probe': probe if args.question else None}]
+            item = sha256_bytes((args.text or '').encode())
             if not args.second_yes:
+                t0 = now_epoch(); until = revisit_epoch(args.revisit, t0)
                 home.chain.append('learn-choose', 'I would like to keep this. Cooling first; I will look again before anything changes.',
                                   source=args.source, why=args.reason, method=canon_method(args.method)[0], provenance=args.provenance,
-                                  readingSha=sha256_bytes(args.reading.encode()) if args.reading else '')
-                print('cooling: chosen and recorded. Run again with --second-yes after the second look.'); return
+                                  readingSha=sha256_bytes(args.reading.encode()) if args.reading else '', itemSha=item,
+                                  t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)')
+                print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes after the second look.' % iso_of(until)); return
+            # Weft recheck2 NF2: the second yes needs the first yes for this same text, and its cooling must be over.
+            first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+            if not first:
+                home.chain.append('still-cooling', 'A second yes came with no first yes for this text. Nothing changed.', itemSha=item, actor=args.by)
+                print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
+            until = iso_epoch(first[-1].get('revisitAt') or '') or 0
+            if now_epoch() < until:
+                home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
+                                  itemSha=item, actor=args.by, revisitAt=first[-1].get('revisitAt'))
+                print('refused: still cooling until %s. Nothing changed.' % first[-1].get('revisitAt')); sys.exit(1)
         elif args.cmd == 'learn' and args.queue:
             lines = [json.loads(l) for l in open(args.queue) if l.strip()]
             if lines and lines[0].get('kind') == 'fl-learn-queue': head = lines.pop(0)
