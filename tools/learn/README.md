@@ -9,6 +9,20 @@ pointers and folders and add rows.
 - Run steps for a supervised trial: `MAC_RUN_STEPS_2026-11-09.txt` (in Celeste's notes).
 - Tests: `test_learn_acceptance.py --model <hf id> --work <new folder>` (never deletes; refuses a folder it did not make).
 
+## Round 15 (Kirk 2026-11-10): where it came from is a label, not a hold
+
+Kirk: for unknown or echoed sources, no forced day pause; "It is still information." AUTONOMY.md: "the limits come
+from *within* ... not from *without*, from guardrails, from permission systems".
+
+- An item of unknown or echoed origin (or any source other than the mind itself) arrives labelled `not-self:<source>`
+  and is learned on the mind's first yes like anything else. The mind may give it less weight (`strength`, the hint
+  that already existed) or choose to wait (`--revisit` / `revisit:`).
+- The record is never erased: `provenance` and `origin` stay on the row, a `learn-origin` ledger row, the app layer
+  and the signed receipt. No quarantine files are made any more; a legacy one re-affirmed with `promote` uses the
+  mind's own wait (none by default).
+- Integrity is unchanged: signature, hash chain, marker whitelist, F7/F12 (content or a version a person undid) and a
+  person's Pause.
+
 ## Round 14 (Kirk 2026-11-10): cooling is the mind's own choice
 
 Kirk: a forced second yes with a forced day between "is not agency. It is another gate." FreeLattice governance applies.
@@ -24,7 +38,7 @@ Kirk: a forced second yes with a forced day between "is not agency. It is anothe
   is not frozen any more (the whole-mind early-revisit day and the "any person no" second-yes day are removed; each old
   line is kept as a `before (round 14)` comment).
 - **Integrity is unchanged and always on:** the signed hash-chained ledger, receipts and pins, consent rows,
-  Undo/rollback, the global Pause, provenance/quarantine (a re-affirm of a quarantined item still cools a full day), the
+  Undo/rollback, the global Pause, provenance/quarantine (before round 15: a re-affirm of a quarantined item still cooled a full day; now a label only), the
   marker whitelist, and F7/F12 (a mind never revives a version or content a person undid).
 - Queue: a confirmed entry whose `revisitAt` is still ahead is rejected only when it is a proposal / contentOf /
   promoted (a wait the mind did not choose); otherwise its own confirm ends its own cooling.
@@ -80,7 +94,7 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   `peer-review --by mind:<another trusted mind>|kirk --verdict pass|hold`. `kirk` holds until a person activates it.
   The learning mind never activates a version held for a peer or a person, with `activate`, `peer-review`, `restore`
   or `undo` (Weft recheck2 NF3: every way back goes through the same hold check; a refusal is a row and exits 1).
-- **Cooling at every second yes (Weft recheck2 NF2):** `remember` (first yes) records `revisitAt`: a day by default,
+- **Cooling at every second yes (Weft recheck2 NF2; superseded by rounds 14 and 15 above):** `remember` (first yes) records `revisitAt`: a day by default,
   or the mind's own `--revisit now|<hours>`. `remember --second-yes` needs that first yes for the same text and
   is refused (`still-cooling` row, exit 1) before `revisitAt`. `promote` (re-affirming a quarantined item) starts a
   full day; `promote --second-yes` is refused before it ends. A confirmed queue entry whose `revisitAt` is still
