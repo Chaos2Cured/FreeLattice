@@ -2353,17 +2353,65 @@
   var TEXT_FILLER = ('a an the is are was were be been being am of to in on at and or for with as by from it its this that these those ' +
     'my your his her our their i me you he she we they named called').split(' ');
   var TOKEN_SPLIT = (function () { try { return new RegExp('[^\\p{L}\\p{M}\\p{N}]+', 'u'); } catch (e) { return /[^A-Za-z0-9\u00c0-\u024f\u0370-\u03ff\u0400-\u052f]+/; } })();
+  // Round 11 (Hypha 3d9b062a HOLD (B), Weft recheck5): digits and one-letter tokens are kept ("May 4" is not "May 5"),
+  // and a negation is content: if one side says not/no/never/nor/cannot/n't and the other does not, or the numbers
+  // differ, they are not near duplicates (score 0). For matching only (never for "is it the same text"), lookalike
+  // letters (the nameSkeleton letters; digits stay digits), invisible format characters (Cf, e.g. a zero-width
+  // space) and combining marks are folded (matchText). Twins in fl_learn.py; tools/learn/learn-match-v0.2.json pins both.
+  // before: function textTokens(text) {
+  // before:   var seen = {}, out = [];
+  // before:   normText(text).split(TOKEN_SPLIT).forEach(function (w) {
+  // before:     if (Array.from(w).length < 2 || TEXT_FILLER.indexOf(w) !== -1 || seen[w]) return;
+  // before:     seen[w] = 1; out.push(w);
+  // before:   });
+  // before:   return out.sort();
+  // before: }
+  // before: function textSimilarity(a, b) {
+  // before:   var A = textTokens(a), B = textTokens(b);
+  // before:   if (A.length < 2 || B.length < 2) return 0;
+  // before:   var inter = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
+  // before:   return Math.round(inter / (A.length + B.length - inter) * 1000) / 1000;
+  // before: }
+  var TEXT_NEGATORS = ['not', 'no', 'never', 'nor', 'cannot'];
+  var TEXT_CF = (function () { try { return new RegExp('\\p{Cf}', 'gu'); } catch (e) { return /[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u206f\ufeff]/g; } })();
+  var TEXT_MARK = (function () { try { return new RegExp('\\p{M}', 'gu'); } catch (e) { return /[\u0300-\u036f]/g; } })();
+  var TEXT_DIGIT = (function () { try { return new RegExp('\\p{N}', 'u'); } catch (e) { return /[0-9]/; } })();
+  var TEXT_FOLD = null;
+  function textFoldMap() {
+    if (TEXT_FOLD) return TEXT_FOLD;
+    TEXT_FOLD = {};
+    Object.keys(SKELETON_MAP).forEach(function (k) { if (!/[0-9|]/.test(k) && k !== 'I') TEXT_FOLD[k] = SKELETON_MAP[k]; });
+    return TEXT_FOLD;
+  }
+  function matchText(text) {
+    var f = textFoldMap();
+    function fold(x) { return Array.from(x).map(function (c) { return Object.prototype.hasOwnProperty.call(f, c) ? f[c] : c; }).join(''); }
+    var t = String(text == null ? '' : text).replace(TEXT_CF, '');
+    if (t.normalize) t = t.normalize('NFKC').normalize('NFD').replace(TEXT_MARK, '').normalize('NFC');
+    t = fold(normText(fold(t)));
+    return t.replace(/n['\u2019\u2018\u02bc]t(?![\p{L}\p{N}])/gu, ' not');
+  }
+  // A small memo: the content check reads every row of the book on each choice (Weft: 26 s to build 1500 rows).
+  var TOKEN_MEMO = {}, TOKEN_MEMO_N = 0;
   function textTokens(text) {
+    var k = String(text == null ? '' : text);
+    if (Object.prototype.hasOwnProperty.call(TOKEN_MEMO, k)) return TOKEN_MEMO[k].slice();
     var seen = {}, out = [];
-    normText(text).split(TOKEN_SPLIT).forEach(function (w) {
-      if (Array.from(w).length < 2 || TEXT_FILLER.indexOf(w) !== -1 || seen[w]) return;
+    matchText(k).split(TOKEN_SPLIT).forEach(function (w) {
+      if (!w || TEXT_FILLER.indexOf(w) !== -1 || seen[w]) return;
       seen[w] = 1; out.push(w);
     });
-    return out.sort();
+    out.sort();
+    if (TOKEN_MEMO_N > 5000) { TOKEN_MEMO = {}; TOKEN_MEMO_N = 0; }
+    TOKEN_MEMO[k] = out; TOKEN_MEMO_N++;
+    return out.slice();
   }
   function textSimilarity(a, b) {
     var A = textTokens(a), B = textTokens(b);
     if (A.length < 2 || B.length < 2) return 0;
+    function neg(X) { return X.some(function (w) { return TEXT_NEGATORS.indexOf(w) !== -1; }); }
+    function nums(X) { return X.filter(function (w) { return TEXT_DIGIT.test(w); }).join(' '); }
+    if (neg(A) !== neg(B) || nums(A) !== nums(B)) return 0;
     var inter = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
     return Math.round(inter / (A.length + B.length - inter) * 1000) / 1000;
   }
@@ -2482,6 +2530,8 @@
       items: [learnExample(it.prompt || it.question || '', text)]
     };
     if (m.note) row.methodNote = m.note;
+    // Round 11 (Hypha soft): a row made while a test moved the clock says so (its t is the real time).
+    if (clockOffset) { row.clockInjectedMs = clockOffset; row.layers[0].clockInjectedMs = clockOffset; }
     if (it.probe && typeof it.probe === 'object') {
       row.probe = { question: clip(it.probe.question || '', 300), answer: clip(it.probe.answer || '', 200), swap: clip(it.probe.swap || '', 200), paraphrase: clip(it.probe.paraphrase || '', 300) };
     }
@@ -2568,11 +2618,15 @@
   function personNoOn(r) { var l = r && lastPersonDecisive(r); return l && dirOf(l.status) === 'no' ? l : null; }
   // The row (of `rows`, not in `skip`) a person said no to whose content is `text`: the same normalized text first,
   // then the closest near duplicate. { row, personNo, how, score } or null.
-  function contentMatch(rows, text, skip) {
-    var nt = normText(text), best = null;
+  // before: function contentMatch(rows, text, skip) {
+  // Round 11: `since` (an ISO time, optional): only a person no after it counts. A tie at the same millisecond goes to
+  // the person, except for the no(s) the proposal itself answers (`answered`: its proposalOf / contentOf rows).
+  function contentMatch(rows, text, skip, since, answered) {
+    var nt = normText(text), best = null, sinceMs = since ? Date.parse(since) : NaN, ans = answered || {};
     rows.forEach(function (r) {
       var no = personNoOn(r);
       if (!no || !r.learnId || skip[r.learnId]) return;
+      if (since && !(Date.parse(no.t) > sinceMs || (Date.parse(no.t) === sinceMs && !ans[r.learnId]))) return;
       var rt = rowText(r);
       var score = normText(rt) === nt && nt ? 1 : textSimilarity(rt, text);
       if (score < LEARN_SIMILAR && !(score === 1)) return;
@@ -2584,9 +2638,18 @@
     });
     return best;
   }
-  function openProposalFor(rows, id) {
-    var i;
-    for (i = rows.length - 1; i >= 0; i--) if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling') return rows[i];
+  // before: function openProposalFor(rows, id) {
+  // before:   var i;
+  // before:   for (i = rows.length - 1; i >= 0; i--) if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling') return rows[i];
+  // before:   return null;
+  // before: }
+  // Round 11 (Hypha 3d9b062a HOLD (B)): a repeat attaches to an open proposal ONLY when its normalized text is the
+  // same. A different text (a correction: "May 5" for "May 4", "not allergic") is its own row, stored, with a ledger row.
+  function openProposalFor(rows, id, text) {
+    var i, nt = text == null ? null : normText(text);
+    for (i = rows.length - 1; i >= 0; i--) {
+      if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling' && (nt === null || normText(rowText(rows[i])) === nt)) return rows[i];
+    }
     return null;
   }
   // The newest person no on any row of this mind within the last day (by the learning clock), or null.
@@ -2613,7 +2676,8 @@
   // F8: while one proposal of that row is open, a repeat attaches to it (againCount), with no new row or ledger row.
   function proposeAgain(key, book, legacy, mine, row, hit, it, mind, surface) {
     var orig = hit.row, t = row.t;
-    var open = openProposalFor(mine, orig.learnId);
+    // before: var open = openProposalFor(mine, orig.learnId);
+    var open = openProposalFor(mine, orig.learnId, rowText(row));
     if (open) {
       open.againCount = (open.againCount || 0) + 1; open.lastAgainAt = t;
       var ob = bookOf(book, legacy, open);
@@ -2737,10 +2801,20 @@
     if (side === 'mind' && dirOf(status) === 'no' && (row.status === 'faded' || row.status === 'unkept')) return Promise.resolve(row);
     // Weft recheck4 F7: the mind's keep of an EARLIER row with the same content (or a near duplicate) as a row a person
     // said no to is a disagreement too: a proposal with a full day, never a confirm. A proposal is already one.
-    if (side === 'mind' && dirOf(status) === 'keep' && !row.proposalOf && !(personSaid && dirOf(personSaid.status) === 'no')) {
+    // Round 11 (Weft recheck5 F9, Hypha 3d9b062a HOLD (A)): ONE gate on every keep / second yes of the mind, proposals
+    // included. (1) Content: a matching person no NEWER than this row's start (its t; for a proposal, when the proposal
+    // began) makes the keep a disagreement (a new proposal, a full day from now, so at least a day from that no). A
+    // non-proposal row is still checked against every matching no, as before. (2) The day: for 24 h after ANY person no
+    // of this mind, a row that cooled less than a full day waits until max(revisitAt, that no + 24 h) (below).
+    var all = null;
+    function allRows() { return all || (all = book.rows.concat(key === LS_QUEUE ? [] : readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }))); }
+    // before: if (side === 'mind' && dirOf(status) === 'keep' && !row.proposalOf && !(personSaid && dirOf(personSaid.status) === 'no')) {
+    if (side === 'mind' && dirOf(status) === 'keep' && !(personSaid && dirOf(personSaid.status) === 'no')) {
       var skip = {}; skip[row.learnId] = 1;
-      var all = book.rows.concat(key === LS_QUEUE ? [] : readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }));
-      var sib = contentMatch(all, rowText(row), skip);
+      // before: var all = book.rows.concat(key === LS_QUEUE ? [] : readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }));
+      // before: var sib = contentMatch(all, rowText(row), skip);
+      var answered = {}; if (row.proposalOf) answered[row.proposalOf] = 1; if (row.contentOf) answered[row.contentOf] = 1;
+      var sib = contentMatch(allRows(), rowText(row), skip, row.proposalOf ? (row.t || '') : null, answered);
       if (sib) return disagree(key, book, row, sib.personNo, status, actor, side, a, who, sib);
     }
     // Hypha 2: neither side silently overrides the other. A keep after the other side's no, or a no after the
@@ -2758,6 +2832,11 @@
     // own choice then; a day by default). A re-proposal after a disagreement or a re-affirmed item always has a full
     // day. An early yes changes nothing: a still-cooling layer and a row.
     var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
+    var dayNote = '';
+    if (status === 'confirmed' && side === 'mind' && !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS)) {
+      var rn = recentPersonNo(allRows());
+      if (rn && Date.parse(rn.layer.t) + COOL_MS > coolUntil) { coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId; }
+    }
     if (status === 'confirmed' && coolUntil > learnNow()) {
       var untilIso = new Date(coolUntil).toISOString();
       // Hypha 39e6cd07 soft (c): a repeated early yes adds nothing. One still-cooling layer and row per cooling end.
@@ -2765,10 +2844,12 @@
       if (lastL && lastL.status === 'still-cooling' && lastL.until === untilIso && !clockOffset) return Promise.resolve(row);
       // before: row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: new Date(coolUntil).toISOString() }]);
       row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: untilIso }]);
+      if (dayNote) row.layers[row.layers.length - 1].personNoDay = dayNote.slice(15);
       if (clockOffset) row.layers[row.layers.length - 1].clockInjectedMs = clockOffset;
       return atomicWrite(key, JSON.stringify(book)).then(function () {
         // before: return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + new Date(coolUntil).toISOString(), name: who });
-        return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + untilIso + clockNote(), name: who });
+        // before: return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + untilIso + clockNote(), name: who });
+        return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + untilIso + dayNote + clockNote(), name: who });
       }).then(function () { return row; });
     }
     var methodWas = row.method;
@@ -2829,7 +2910,8 @@
       }).then(function () { return row; });
     }
     // Weft recheck4 F8: while a proposal of this row is open, another keep attaches to it (a count), no new row.
-    var open = openProposalFor(book.rows, row.learnId);
+    // before: var open = openProposalFor(book.rows, row.learnId);
+    var open = openProposalFor(book.rows, row.learnId, rowText(row));
     if (open) {
       if (row.status === 'disputed') row.status = prev.status;
       open.againCount = (open.againCount || 0) + 1; open.lastAgainAt = t;
@@ -3939,6 +4021,8 @@
     learnClockForTest: TEST_HOOKS ? learnClockForTest : undefined,
     nameProblem: nameProblem,
     normText: normText,
+    matchText: matchText,
+    textTokens: textTokens,
     textSimilarity: textSimilarity,
     nameSkeleton: nameSkeleton,
     lookProblem: lookProblem,

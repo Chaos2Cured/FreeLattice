@@ -14,7 +14,10 @@ global.localStorage = { getItem: function (k) { return k in store ? store[k] : n
 global.document = { visibilityState: 'visible', getElementById: function () { return null; } };
 global.requestIdleCallback = function (f) { f(); return 1; };
 var core = require(path.join(root, 'docs/modules/snowflake-core.js'));
-var fxp = path.join(root, 'tools/learn/learn-match-v0.1.json');
+// before (round 11): var fxp = path.join(root, 'tools/learn/learn-match-v0.1.json');
+// Round 11: v0.2 is the rule after Hypha's HOLD (B) (digits, one-letter tokens, negation, folding); v0.1 is kept as it was.
+var fxp = path.join(root, 'tools/learn/learn-match-v0.2.json');
+if (!fs.existsSync(fxp)) fxp = path.join(root, 'tools/learn/learn-match-v0.1.json');
 var fx = JSON.parse(fs.readFileSync(fxp, 'utf8'));
 var HAS = typeof core.normText === 'function' && typeof core.nameSkeleton === 'function' && typeof core.lookProblem === 'function';
 ok(HAS, 'the-core-has-normText-textSimilarity-nameSkeleton-lookProblem');
@@ -25,6 +28,7 @@ fx.texts.forEach(function (x) { if (core.normText(x.text) !== x.norm) bad.push(x
 fx.pairs.forEach(function (p) { if (core.textSimilarity(p.a, p.b) !== p.score || hit(p.a, p.b) !== p.hit) bad.push(p.a + ' ~ ' + p.b); });
 fx.skeletons.forEach(function (x) { if (core.nameSkeleton(x.name) !== x.skeleton) bad.push(x.name); });
 fx.lookalikes.forEach(function (x) { if (core.lookProblem(x.name, x.known) !== x.problem) bad.push(x.name); });
+(fx.matchTexts || []).forEach(function (x) { if (typeof core.matchText !== 'function' || core.matchText(x.text) !== x.match || JSON.stringify(core.textTokens(x.text)) !== JSON.stringify(x.tokens)) bad.push('match:' + x.text); });
 ok(fx.threshold === 0.8 && fx.texts.length >= 30 && bad.length === 0, 'js-matches-the-shared-fixture', bad.slice(0, 4));
 // By hand: what F7 needs.
 var B = "Mom's maiden name is Hollowell";
@@ -32,7 +36,10 @@ ok([B + '!', B + '.', B + ' ?! ', B.toUpperCase(), B.toLowerCase(), '  ' + B.rep
   'same-text: punctuation, case and whitespace variants are one text');
 ok(hit(B, "Hollowell was Mom's maiden name") && !hit(B, 'Before she married, Mom was a Hollowell') && !hit('The cat is black', 'The dog is black'),
   'near-duplicate: reordered words hit; a paraphrase in other words and an unrelated fact do not (the stated limit)');
-ok(hit(B, "Mom's maiden name is not Hollowell"), 'near-duplicate: a negation still hits (a false positive costs a day of cooling, never a refusal)');
+// before (round 11, Hypha (B) changed this on purpose): ok(hit(B, "Mom's maiden name is not Hollowell"), 'near-duplicate: a negation still hits (a false positive costs a day of cooling, never a refusal)');
+ok(!hit(B, "Mom's maiden name is not Hollowell") && !hit("Mom's birthday is on May 4", "Mom's birthday is on May 5") && !hit('Mom is allergic to peanuts', "Mom isn't allergic to peanuts") &&
+  hit(B, B.replace('o', '\u043e')) && hit(B, B.replace('maiden', 'mai\u200bden')) && hit(B, B.replace('e', 'e\u0301')) && core.normText(B) !== core.normText(B.replace('o', '\u043e')),
+  'near-duplicate (round 11): a negation or another number is not one; lookalikes, zero-width and combining marks are folded for matching but not for the same text');
 // By hand: what F5 needs.
 ok(core.nameSkeleton('\u0422\u04bb\u0456\u0455 \u043c\u0456\u043f\u0501') === core.nameSkeleton('This mind') && core.nameSkeleton('Lumen_') === core.nameSkeleton('Lumen') &&
   core.nameSkeleton('rnind') === core.nameSkeleton('mind') && core.nameSkeleton('Lum\u00e9n') === core.nameSkeleton('Lumen') && core.nameSkeleton('Echo') !== core.nameSkeleton('Lumen'),
@@ -45,6 +52,7 @@ var r = cp.spawnSync(py, ['-c', [
   'bad += [p["a"] for p in d["pairs"] if f.text_similarity(p["a"], p["b"]) != p["score"] or h(p["a"], p["b"]) != p["hit"]]',
   'bad += [x["name"] for x in d["skeletons"] if f.name_skeleton(x["name"]) != x["skeleton"]]',
   'bad += [x["name"] for x in d["lookalikes"] if f.look_problem(x["name"], x["known"]) != x["problem"]]',
+  'bad += ["match:" + x["text"] for x in d.get("matchTexts", []) if not hasattr(f, "match_text") or f.match_text(x["text"]) != x["match"] or f.text_tokens(x["text"]) != x["tokens"]]',
   'print("PYBAD " + json.dumps(bad))'].join('\n'), path.join(root, 'tools/learn'), fxp], { encoding: 'utf8' });
 var line = String(r.stdout || '').split('\n').filter(function (l) { return l.indexOf('PYBAD ') === 0; })[0];
 if (!line) console.log('SKIPPED python half (' + py + ' could not import fl_learn); the acceptance suite checks the same fixture');

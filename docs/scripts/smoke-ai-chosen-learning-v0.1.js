@@ -149,6 +149,7 @@ function ledger() { var b = JSON.parse(store.fl_snowflake_ledger_v0 || '{"rows":
   var book = JSON.parse(store[Q + '::' + core.mindId(me)]);
   book.rows.forEach(function (x) { if (x.learnId === rk.learnId) x.revisitAt = new Date(Date.now() - 1000).toISOString(); });
   store[Q + '::' + core.mindId(me)] = JSON.stringify(book);
+  personNosFromYesterday();   // round 11 (F9 day gate): the person's Undo is from two days back too, so its day is over
   await learn.secondLook(rk.learnId, { keep: true, reason: 'after cooling, still yes' });
   ok(rowOf(rk.learnId).status === 'confirmed', 'H2 after cooling, the mind\'s second yes confirms the new proposal');
   ok(rowOf(rk.learnId).disagreement && rowOf(rk.learnId).proposalOf === pt.learnId && rowOf(pt.learnId).status === 'unkept',

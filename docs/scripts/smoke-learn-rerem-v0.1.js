@@ -84,7 +84,14 @@ function held(E, id) { var r = rowOf(E, id); return !!r && r.status !== 'confirm
   await E.core.confirmLearning(orig, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
   await keep(E, other); await keep(E, twin);
   var props = E.core.learnQueue().filter(function (x) { return x.proposalOf === twin; });
-  ok(rowOf(E, other).status === 'confirmed' && exported(E, other), 'F7-unrelated-earlier-choice-still-confirms');
+  // before (round 11, Weft recheck5 F9 changed this on purpose): ok(rowOf(E, other).status === 'confirmed' && exported(E, other), 'F7-unrelated-earlier-choice-still-confirms');
+  // Round 11 F9: for a day after the person's no, that earlier revisit-now row waits (a still-cooling layer naming
+  // the no); after the day (+25 h, test clock) the mind's keep confirms it.
+  var oL = rowOf(E, other).layers[rowOf(E, other).layers.length - 1];
+  ok(rowOf(E, other).status === 'cooling' && !exported(E, other) && oL.status === 'still-cooling' && oL.personNoDay === orig,
+     'F9-unrelated-earlier-choice-waits-for-the-day', oL);
+  E.core.learnClockForTest(25 * H); await keep(E, other); E.core.learnClockForTest(0);
+  ok(rowOf(E, other).status === 'confirmed' && exported(E, other), 'F9-unrelated-earlier-choice-confirms-after-the-day');
   ok(rowOf(E, twin).status !== 'confirmed' && !exported(E, twin) && props.length === 1 && props[0].contentOf === orig && coolH(props[0]) >= 23.9 && !exported(E, props[0].learnId),
      'F7-earlier-row-with-the-same-content-is-a-proposal', { twin: rowOf(E, twin).status, props: props.length });
   // A person's later yes lets it through: on the original, and as a new row with the same text.
