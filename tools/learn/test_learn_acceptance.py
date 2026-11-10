@@ -236,7 +236,8 @@ def f9_runner_tests():
     # the undo, both with an early revisit: rejected (rows), nothing trained.
     qf = os.path.join(F, 'q10.jsonl'); old = fl_learn.iso_of(time.time() - 3 * 24 * 3600)
     sh(['undo', '--by', 'person'], F, check=True)
-    gone = not os.path.exists(live(F))
+    # before (round 14: PRE trained twice above, so one undo leaves the first PRE version on): gone = not os.path.exists(live(F))
+    fp10 = sha(live(F))
     write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False, 'exportedAt': fl_learn.iso_of(time.time())},
                 # before (round 14: unrelated paraphrases are no longer held; F10 is about matching content):
                 # before: [entry('Lf10a', ..., items=[{'instruction': 'Where?', 'output': 'At night the green gate glows'}]),
@@ -245,7 +246,8 @@ def f9_runner_tests():
                  entry('Lf10b', provenance='self', check='none', t=old, revisitAt=old, items=[{'instruction': 'Where?', 'output': 'the entrance to the garden is the green gate.'}])])
     r4, o4 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F)
     rj = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-reject' and set(e['meta'].get('learnIds', [])) & {'Lf10a', 'Lf10b'}]
-    record('F10-runner-queue-no-t-or-backdated-t-within-the-day-rejected', gone and len(rj) == 2 and not os.path.exists(live(F)) and o4.count('rejected (F7)') == 2,
+    # before (round 14): record('F10-...', gone and len(rj) == 2 and not os.path.exists(live(F)) and o4.count('rejected (F7)') == 2,
+    record('F10-runner-queue-no-t-or-backdated-t-within-the-day-rejected', len(rj) == 2 and sha(live(F)) == fp10 and o4.count('rejected (F7)') == 2,
            rows=len(rj), said=o4.strip().splitlines()[-2:])
     # Ties go to the person: content_hit(after_idx) is by chain order, and one now() per chain row.
     src = open(RUNNER).read()
