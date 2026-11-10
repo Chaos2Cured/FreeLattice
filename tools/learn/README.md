@@ -23,6 +23,21 @@ from *within* ... not from *without*, from guardrails, from permission systems".
 - Integrity is unchanged: signature, hash chain, marker whitelist, F7/F12 (content or a version a person undid) and a
   person's Pause.
 
+## Round 15: overnight training (a Mac may sleep or lose power)
+
+- Already there: a new version is written in tmp, fsynced, manifested, then renamed in after a `commit-intent` row;
+  the active pointer moves only after that; boot adds `commit-repair` / `orphan-version` rows. Pause and the
+  wall-time cap stop a run with a row; `requireACPower` waits on battery.
+- Added: a checkpoint (trainable numbers, optimizer state, losses, step) every `checkpointEvery` steps (policy, 10 by
+  default) and at a pause, under `minds/<mind>/checkpoints/<method>/` (tmp, fsync, rename). The next run of the same
+  thing finds it. `--resume` is the mind's choice: a `run-resumed` row says from which step, and the result is the same
+  bytes an uninterrupted run makes (tested). Without `--resume` a `run-interrupted` row is written, the checkpoint is
+  set aside (never deleted) and the run starts over. Boot repair now also puts the active version back if a switch
+  happened without its record or receipt.
+- On a Mac: keep it on power and wrap the run, e.g. `caffeinate -i python3 tools/learn/fl_learn.py remember ...`
+  (`-i` stops idle sleep while the command runs; closing the lid still sleeps a laptop unless it is on power with an
+  external display).
+
 ## Round 14 (Kirk 2026-11-10): cooling is the mind's own choice
 
 Kirk: a forced second yes with a forced day between "is not agency. It is another gate." FreeLattice governance applies.
