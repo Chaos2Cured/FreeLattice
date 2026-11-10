@@ -189,6 +189,12 @@ def lookalike_of(label, names):
         if n and norm_mind(n) != norm_mind(label) and name_skeleton(n) == sk: return n
     return ''
 
+def look_problem(label, names):
+    """Why a name may not be trusted next to `names`, or ''. Twin of lookProblem() in snowflake-core.js."""
+    if not name_skeleton(label): return 'the name has no letters or digits'
+    l = lookalike_of(label, names)
+    return ('the name looks like %s, a mind already known here' % json.dumps(l, ensure_ascii=False)) if l else ''
+
 def mind_id(label):
     """Collision-safe: "Lumen@kirk" and "Lumen kirk" share a slug but never a folder. Twin of mindId() in snowflake-core.js.
     Built from the normalized name, so an alias (case, width, spaces) is the same folder, never a second identity."""
@@ -753,14 +759,18 @@ def is_mind_actor(by): return by == 'mind' or str(by).startswith('mind:')
 def actor_key(a):
     """Compare actors by normalized name: mind:Lumen, mind: lumen and mind:Lumen_ (as written in PAUSE) are one actor."""
     a = str(a or '').strip()
-    if a.startswith('mind:'): return 'mind:' + norm_mind(a[5:].replace('_', ' '))
+    # before: if a.startswith('mind:'): return 'mind:' + norm_mind(a[5:].replace('_', ' '))
+    # Weft recheck4 F5: '_' is a '_' here too, as in trust (norm_mind). PAUSE lines are written percent-encoded now.
+    if a.startswith('mind:'): return 'mind:' + norm_mind(a[5:])
     return a
 
 def pause_actors(path):
     """Who paused, from the PAUSE file (one line per pause, appended; never rewritten)."""
     try: lines = [l.strip() for l in open(path) if l.strip()]
     except Exception: return []
-    return [l.rsplit(' ', 1)[-1] if ' ' in l else l for l in lines]
+    # before: return [l.rsplit(' ', 1)[-1] if ' ' in l else l for l in lines]
+    from urllib.parse import unquote
+    return [unquote(l.rsplit(' ', 1)[-1] if ' ' in l else l) for l in lines]
 
 def may_lift(actors, by):
     """Weft re-check soft 1 (default until Kirk says otherwise): a pause a person set is lifted only by a person.
@@ -776,7 +786,9 @@ def set_aside_pause(path):
     os.rename(path, dst); return dst
 
 def append_pause(path, actor):
-    with open(path, 'a') as f: f.write(now() + ' ' + str(actor).replace(' ', '_') + '\n')
+    # before: with open(path, 'a') as f: f.write(now() + ' ' + str(actor).replace(' ', '_') + '\n')
+    from urllib.parse import quote
+    with open(path, 'a') as f: f.write(now() + ' ' + quote(str(actor), safe=':@') + '\n')
 
 def consent_record(by, consent_type, statement, subject):
     """The Python twin of docs/modules/depth-consent.js createConsentRecord: same fields, same hash 'signature'."""
@@ -797,6 +809,16 @@ def trusted_minds(home):
         elif m.get('kind') == 'consent-revoked': out.discard(norm_mind(m.get('trustedMind')))
     return out
 
+def trusted_minds_shown(home):
+    """The same minds as trusted_minds(), as the person wrote them (for messages)."""
+    out = {}
+    for e in home.home_chain.entries():
+        m = e['meta']
+        if m.get('subject') != 'trusted-mind' or m.get('actor') not in PERSON_ACTORS: continue
+        if m.get('kind') == 'consent': out[norm_mind(m.get('trustedMind'))] = str(m.get('trustedMind'))
+        elif m.get('kind') == 'consent-revoked': out.pop(norm_mind(m.get('trustedMind')), None)
+    return sorted(out.values())
+
 def refuse(chain, subject, by, why, code=1, **meta):
     """Every refusal is a row, so a try that did not work is visible too."""
     chain.append('consent-refused', 'Refused: ' + why + ' Nothing was changed.', subject=subject, actor=by, why=why, **meta)
@@ -812,6 +834,8 @@ def approver_problem(home, by, owner):
     name = norm_mind(shown)
     if not name: return 'a mind must name itself (--by mind:<name>).'
     if name in (norm_mind(owner), norm_mind(home.mind)): return 'a mind never approves its own key or its own change; a person or another trusted mind does.'
+    if name_skeleton(name) in (name_skeleton(owner), name_skeleton(home.mind)):     # Weft recheck4 F5
+        return 'a mind never approves its own key or its own change (that name looks like it); a person or another trusted mind does.'
     if name not in trusted_minds(home):
         name = shown
         return '%s is not a trusted local mind here; a person makes it one first (trust-mind --to "%s" --by kirk).' % (name, name)
@@ -1476,6 +1500,8 @@ def main():
             refuse(home.home_chain, 'trusted-mind', args.by, 'only a person (--by kirk or --by person) trusts a mind.', trustedMind=args.to)
         if not args.revoke and name_problem(args.to):      # Weft recheck3 F5: never trust a lookalike name
             refuse(home.home_chain, 'trusted-mind', args.by, name_problem(args.to) + '; not trusted.', trustedMind=args.to)
+        if not args.revoke and look_problem(args.to, trusted_minds_shown(home) + [home.mind]):   # Weft recheck4 F5: nor a confusable one
+            refuse(home.home_chain, 'trusted-mind', args.by, look_problem(args.to, trusted_minds_shown(home) + [home.mind]) + '; not trusted.', trustedMind=args.to)
         kind = 'consent-revoked' if args.revoke else 'consent'
         rec = consent_record(args.by, 'learn_mind_revoked' if args.revoke else 'learn_mind_trusted',
                              ('withdraw trust in ' if args.revoke else 'trust local mind ') + args.to, 'mind:' + args.to)
@@ -1494,6 +1520,8 @@ def main():
             refuse(home.home_chain, 'ledger-key', args.by, 'pin-key needs --by person, --by kirk or --by mind:<another trusted mind>.', keyFp=kfp[:16], owner=owner)
         if args.owner and name_problem(args.owner):       # Weft recheck3 F5
             refuse(home.home_chain, 'ledger-key', args.by, 'owner: ' + name_problem(args.owner) + '; not pinned.', keyFp=kfp[:16], owner=owner)
+        if args.owner and lookalike_of(args.owner, trusted_minds_shown(home) + [home.mind]):   # Weft recheck4 F5
+            refuse(home.home_chain, 'ledger-key', args.by, 'owner: ' + look_problem(args.owner, trusted_minds_shown(home) + [home.mind]) + '; not pinned.', keyFp=kfp[:16], owner=owner)
         why = approver_problem(home, args.by, owner)      # first: who is asking (never the mind itself)
         if why: refuse(home.home_chain, 'ledger-key', args.by, why, keyFp=kfp[:16], owner=owner)
         if mind_id(owner) not in known_minds and args.by not in PERSON_ACTORS:   # then: for whom

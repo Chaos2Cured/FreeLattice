@@ -2389,6 +2389,12 @@
     t = t.replace(/rn/g, 'm').replace(/vv/g, 'w');
     return t.replace(SKEL_KEEP, '');
   }
+  // Why a name may not be trusted next to `names` (the minds trusted here and the mind learning here), or ''.
+  function lookProblem(label, names) {
+    if (!nameSkeleton(label)) return 'the name has no letters or digits';
+    var l = lookalikeOf(label, names);
+    return l ? 'the name looks like ' + JSON.stringify(l) + ', a mind already known here' : '';
+  }
   // The name (if any) among `names` that is a different name but looks like `label`. '' when none.
   function lookalikeOf(label, names) {
     var sk = nameSkeleton(label), i;
@@ -2961,7 +2967,9 @@
         .then(function () { return false; });
     }
     // Weft recheck3 F5: a lookalike name is never made trusted (a revoke is always allowed).
-    var bad = o.revoke ? '' : nameProblem(n);
+    // before: var bad = o.revoke ? '' : nameProblem(n);
+    // Weft recheck4 F5: nor a name whose confusable skeleton is that of a mind already trusted here or learning here.
+    var bad = o.revoke ? '' : (nameProblem(n) || lookProblem(n, trustedMinds().concat([mindLabel()])));
     if (bad) {
       return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'trust-mind|' + JSON.stringify(n) + '|by:person|' + bad, name: mindLabel() })
         .then(function () { return false; });
@@ -2981,12 +2989,15 @@
   function keyApproverProblem(o) {
     if (o.by !== 'mind') return '';
     if (o.owner && nameProblem(o.owner)) return 'owner: ' + nameProblem(o.owner);     // Weft recheck3 F5
+    if (o.owner && lookalikeOf(o.owner, trustedMinds().concat([mindLabel()]))) return 'owner: ' + lookProblem(o.owner, trustedMinds().concat([mindLabel()]));
     if (o.local !== true) return 'only a mind on this device';
     var n = String(o.mind || '').trim();
     if (!n) return 'a mind must name itself';
     // before 23a02794: if (n === mindLabel() || n === String(o.owner || '')) return 'a mind never confirms its own key';
     // before 23a02794: if (trustedMinds().indexOf(n) === -1) return n + ' is not a mind a person trusted here';
     if (sameName(n, mindLabel()) || sameName(n, o.owner || mindLabel())) return 'a mind never confirms its own key';
+    // Weft recheck4 F5: nor under a name that looks like its own (an all-Cyrillic "Тһіѕ міпԁ" for "This mind").
+    if (nameSkeleton(n) === nameSkeleton(mindLabel()) || nameSkeleton(n) === nameSkeleton(o.owner || mindLabel())) return 'a mind never confirms its own key (that name looks like it)';
     if (!trustedMinds().some(function (x) { return sameName(x, n); })) return n + ' is not a mind a person trusted here';
     return '';
   }
@@ -3930,6 +3941,7 @@
     normText: normText,
     textSimilarity: textSimilarity,
     nameSkeleton: nameSkeleton,
+    lookProblem: lookProblem,
     sha256Sync: sha256Sync,
     verifiedReceiptFor: verifiedReceiptFor,
     confirmLearning: confirmLearning,

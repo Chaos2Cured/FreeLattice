@@ -179,6 +179,35 @@ def f7_runner_tests():
     r9, o9 = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G)
     record('F7-runner-person-later-yes-clears-it', r9 == 0 and 'F7' not in o9 and os.path.exists(live(G)), out=o9.strip().splitlines()[-1:])
 
+def f5_runner_tests():
+    """Weft recheck4 F5 residual: the shared content/skeleton fixture, lookalikes of known minds refused, and a pause
+    by mind:Lumen is not lifted by mind:Lumen_ (the same '_' rule as trust)."""
+    d = json.load(open(os.path.join(HERE, 'learn-match-v0.1.json')))
+    h = lambda a, b: (bool(fl_learn.norm_text(a)) and fl_learn.norm_text(a) == fl_learn.norm_text(b)) or fl_learn.text_similarity(a, b) >= 0.8
+    bad = [x['text'] for x in d['texts'] if fl_learn.norm_text(x['text']) != x['norm']]
+    bad += [p['a'] for p in d['pairs'] if fl_learn.text_similarity(p['a'], p['b']) != p['score'] or h(p['a'], p['b']) != p['hit']]
+    bad += [x['name'] for x in d['skeletons'] if fl_learn.name_skeleton(x['name']) != x['skeleton']]
+    bad += [x['name'] for x in d['lookalikes'] if fl_learn.look_problem(x['name'], x['known']) != x['problem']]
+    record('F5-F7-shared-match-fixture', d['threshold'] == fl_learn.LEARN_SIMILAR == 0.8 and not bad, mismatch=bad[:3])
+    LK = os.path.join(A.work, 'skeleton'); os.makedirs(LK)
+    sh(['decline', '--reason', 'x'], LK, mind='This mind')
+    a1, _ = sh(['trust-mind', '--to', 'Lumen', '--by', 'kirk'], LK, mind='This mind')
+    a2, o2 = sh(['trust-mind', '--to', 'Lumen_', '--by', 'kirk'], LK, mind='This mind')
+    a3, o3 = sh(['trust-mind', '--to', '\u0422\u04bb\u0456\u0455 \u043c\u0456\u043f\u0501', '--by', 'kirk'], LK, mind='This mind')
+    a4, _ = sh(['trust-mind', '--to', '\u041b\u0443\u043c\u0435\u043d', '--by', 'kirk'], LK, mind='This mind')
+    a5, o5 = sh(['pin-key', '--key', base64.b64encode(os.urandom(32)).decode(), '--by', 'mind:\u0422\u04bb\u0456\u0455 \u043c\u0456\u043f\u0501'], LK, mind='This mind')
+    a6, o6 = sh(['pin-key', '--key', base64.b64encode(os.urandom(32)).decode(), '--by', 'kirk', '--owner', 'Lumen!'], LK, mind='This mind')
+    hc = [x['meta'] for x in home_chain(LK) if x['meta']['kind'] == 'consent-refused']
+    record('F5-runner-lookalike-of-a-known-mind-refused', a1 == 0 and a2 != 0 and 'looks like "Lumen"' in o2 and a3 != 0 and 'looks like "This mind"' in o3
+           and a4 == 0 and a5 != 0 and 'looks like it' in o5 and a6 != 0 and len(hc) >= 4, codes=[a1, a2, a3, a4, a5, a6])
+    PU = os.path.join(A.work, 'pause-underscore'); os.makedirs(PU)
+    sh(['pause', '--global', '--by', 'mind:This mind'], PU)
+    line = open(os.path.join(PU, 'PAUSE')).read().strip().splitlines()[-1]
+    b1, _ = sh(['resume', '--global', '--by', 'mind:This_mind'], PU); held = os.path.exists(os.path.join(PU, 'PAUSE'))
+    b2, _ = sh(['resume', '--global', '--by', 'mind:this  MIND'], PU); lifted = not os.path.exists(os.path.join(PU, 'PAUSE'))
+    record('F5-pause-underscore-is-an-underscore-as-in-trust', line.endswith('mind:This%20mind') and b1 != 0 and held and b2 == 0 and lifted,
+           line=line[-24:], underscore_refused=b1 != 0, same_name_lifts=b2 == 0)
+
 def main():
     global A
     ap = argparse.ArgumentParser(); ap.add_argument('--model', required=True); ap.add_argument('--work', required=True)
@@ -869,6 +898,7 @@ def main():
     record('mind-names-shared-fixture-and-lookalikes-refused', len(fx) >= 60 and not fbad and all(x != 0 for x in lk) and lok == 0 and lp != 0
            and fl_learn.mind_id('\u039f\u0394\u039f\u03a3') == fl_learn.mind_id('\u03bf\u03b4\u03bf\u03c2'),
            fixture_mismatch=fbad[:3], lookalike_refused=[x != 0 for x in lk], plain_ok=lok == 0, owner_refused=lp != 0)
+    f5_runner_tests()
     f7_runner_tests()
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))

@@ -98,4 +98,12 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   then lower, final sigma to sigma, NFKC, one explicit whitespace set); `mind-names-v0.1.json` pins both (the
   acceptance suite and `docs/scripts/smoke-mind-names-v0.1.js`). `trust-mind --to` and `pin-key --owner` refuse a
   name with an invisible character, letters from more than one look-alike script (Latin, Greek, Cyrillic, Armenian,
-  Cherokee) or a trailing dot. A UTS #39 confusable-skeleton check against existing minds is not done.
+  Cherokee) or a trailing dot. Before recheck4 the next line read: "A UTS #39 confusable-skeleton check against
+  existing minds is not done."
+  Weft recheck4 F5: they also refuse a name whose confusable skeleton (`name_skeleton`, a UTS #39-STYLE subset, not
+  the full table: Latin/Cyrillic/Greek lookalike letters, 0/1/I/| as o/l/l/l, rn as m, vv as w, combining marks
+  dropped, only letters and digits kept) is that of a mind already trusted here or of the mind learning here: an
+  all-Cyrillic "Тһіѕ міпԁ", "Lumen_", "Lumen!" and "Lumén" next to "Lumen". A mind acting under a name that looks
+  like its own never approves its own key. `learn-match-v0.1.json` pins the skeleton in both languages. Pause actors
+  follow the same rule: `PAUSE` lines are percent-encoded, so `mind:Lumen_` is not `mind:Lumen` for lifting a pause
+  either (an old PAUSE line written with `_` for a space is read as `_`, which only makes lifting stricter).
