@@ -67,10 +67,27 @@ done
 # v-desktop-catch-up-v0.1 (runs last, so docs/ wins over the older root copies): the offline copy now matches what freelattice.com serves (docs/).
 # before: only ../modules/*.js (16 old files) were copied, so offline Desktop had no Snowflake,
 # no memory-compound, no chat-autonomy and 120+ other modules that app.html loads.
+# Hypha 2026-11-09: only files tracked in git are bundled, so nothing private or local that sits untracked in a
+# checkout (a draft page, someone's own file) is ever packed. Tracked docs/ files are exactly what freelattice.com serves.
 for d in modules css lib assets; do
   if [ -d "../docs/$d" ]; then
     mkdir -p "app/$d"
-    cp -R "../docs/$d/." "app/$d/" && echo "     ✓ $d/ (from docs/)"
+    if git -C .. rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      n=0
+      while IFS= read -r f; do
+        rel="${f#docs/}"
+        mkdir -p "app/$(dirname "$rel")"
+        cp "../$f" "app/$rel" && n=$((n + 1))
+      done < <(git -C .. ls-files -- "docs/$d")
+      echo "     ✓ $d/ (from docs/, $n tracked files)"
+      left=$(git -C .. ls-files --others -- "docs/$d" | wc -l | tr -d ' ')
+      if [ "$left" != "0" ]; then
+        echo "     ⚠ $left untracked file(s) in docs/$d were NOT bundled (only files in git are):"
+        git -C .. ls-files --others -- "docs/$d" | sed 's/^/         /'
+      fi
+    else
+      echo "     ✗ docs/$d not copied: this is not a git checkout, so tracked files cannot be told apart. Nothing was bundled from it."
+    fi
   fi
 done
 
