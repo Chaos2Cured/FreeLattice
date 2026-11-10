@@ -93,6 +93,22 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   - **Limit, plainly:** a paraphrase in other words ("Before she married, Mom was a Hollowell" for "Mom's maiden name
     is Hollowell") is not matched. Inside the day after the person's no it still cools a full day; after that day it
     is an ordinary new choice. Only a person reading the export catches it then (Mac trial rule (e)).
+- **One confirm gate (round 11: Weft recheck5 F9, Hypha 3d9b062a (A) and (B), Weft F10).** On EVERY second yes of the
+  mind (app keep, `remember --second-yes`, a confirmed queue entry), proposals included:
+  - Content: any matching person no (same text, or a near duplicate) written AFTER this row's first yes (for a
+    proposal: after it began) makes it a disagreement: refused, with a new full day. "After" is chain order in the
+    runner and the millisecond in the app, and a tie goes to the person.
+  - The day: for 24 h after ANY person no of this mind, a row that cooled less than a full day waits until
+    max(its revisitAt, that no + 24 h), whenever it was chosen (`personUndoDay` / `person-no-day:<id>` on the row).
+    A queue entry with no `t` counts as the export time (or now), so a missing or backdated `t` no longer helps.
+  - A repeat attaches to an open proposal only when its normalized text is the same. A different text (a
+    correction) is its own row, stored, with a ledger row.
+  - Near duplicates: digits and one-letter tokens are kept; not/no/never/nor/cannot/n't are content. A different
+    number or a negation on one side only is not a near duplicate. For matching only, lookalike letters (the name
+    skeleton letters; digits stay digits), zero-width and other format characters, and combining marks are folded.
+    `learn-match-v0.2.json` pins both languages (v0.1 is the earlier rule, kept as it was).
+  - The paraphrase limit is unchanged and stated: a paraphrase in other words is caught only for the day after the
+    person's no (it waits); after that day it can be confirmed, and only a person reading the export catches it.
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
   Weft recheck3 F6: the base is fingerprinted from the FULL content of every weight and config file on every run
   (no cache), so an edit anywhere changes it, even with size and mtime put back.

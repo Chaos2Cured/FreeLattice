@@ -151,18 +151,58 @@ def norm_text(text):
 LEARN_SIMILAR = 0.8
 TEXT_FILLER = set(('a an the is are was were be been being am of to in on at and or for with as by from it its this that these those '
                    'my your his her our their i me you he she we they named called').split())
+# Round 11 (Hypha 3d9b062a HOLD (B), Weft recheck5): digits and one-letter tokens are kept, a negation (not, no, never,
+# nor, cannot, n't) is content, a different number or negation is not a near duplicate (0), and for matching only
+# (never for "the same text") lookalike letters, Cf characters (zero-width) and combining marks are folded.
+# Twins of matchText(), textTokens(), textSimilarity() in snowflake-core.js; tools/learn/learn-match-v0.2.json pins both.
+# before: def text_tokens(text):
+# before:     out, cur = [], ''
+# before:     for c in norm_text(text) + ' ':
+# before:         if _cat(c)[0] in 'LMN': cur += c; continue
+# before:         if cur and len(cur) >= 2 and cur not in TEXT_FILLER and cur not in out: out.append(cur)
+# before:         cur = ''
+# before:     return sorted(out)
+# before: def text_similarity(a, b):
+# before:     """Token-set Jaccard, rounded to 3 places the way JS Math.round does (half up). 0 when a side has < 2 tokens."""
+# before:     import math
+# before:     A, B = set(text_tokens(a)), set(text_tokens(b))
+# before:     if len(A) < 2 or len(B) < 2: return 0
+# before:     x = math.floor(len(A & B) / len(A | B) * 1000 + 0.5) / 1000
+# before:     return int(x) if x == int(x) else x
+TEXT_NEGATORS = ('not', 'no', 'never', 'nor', 'cannot')
+_NT = re.compile("n['\u2019\u2018\u02bc]t(?![^\\W_])")
+def _text_fold(t):
+    return ''.join(TEXT_FOLD.get(c, c) for c in t)
+def match_text(text):
+    import unicodedata
+    t = ''.join(c for c in str(text if text is not None else '') if _cat(c) != 'Cf')
+    t = unicodedata.normalize('NFD', unicodedata.normalize('NFKC', t))
+    t = unicodedata.normalize('NFC', ''.join(c for c in t if _cat(c)[0] != 'M'))
+    t = _text_fold(norm_text(_text_fold(t)))
+    return _NT.sub(' not', t)
+_TOKEN_MEMO = {}
 def text_tokens(text):
+    k = str(text if text is not None else '')
+    if k in _TOKEN_MEMO: return list(_TOKEN_MEMO[k])
     out, cur = [], ''
-    for c in norm_text(text) + ' ':
+    for c in match_text(k) + ' ':
         if _cat(c)[0] in 'LMN': cur += c; continue
-        if cur and len(cur) >= 2 and cur not in TEXT_FILLER and cur not in out: out.append(cur)
+        if cur and cur not in TEXT_FILLER and cur not in out: out.append(cur)
         cur = ''
-    return sorted(out)
+    out = sorted(out)
+    if len(_TOKEN_MEMO) > 5000: _TOKEN_MEMO.clear()
+    _TOKEN_MEMO[k] = out
+    return list(out)
 def text_similarity(a, b):
-    """Token-set Jaccard, rounded to 3 places the way JS Math.round does (half up). 0 when a side has < 2 tokens."""
+    """Token-set Jaccard, rounded to 3 places the way JS Math.round does (half up). 0 when a side has < 2 tokens, or
+    when one side is negated and the other is not, or when their numbers differ."""
     import math
-    A, B = set(text_tokens(a)), set(text_tokens(b))
+    A, B = text_tokens(a), text_tokens(b)
     if len(A) < 2 or len(B) < 2: return 0
+    neg = lambda X: any(w in TEXT_NEGATORS for w in X)
+    nums = lambda X: ' '.join(w for w in X if any(_cat(c)[0] == 'N' for c in w))
+    if neg(A) != neg(B) or nums(A) != nums(B): return 0
+    A, B = set(A), set(B)
     x = math.floor(len(A & B) / len(A | B) * 1000 + 0.5) / 1000
     return int(x) if x == int(x) else x
 def fmt_score(x): return str(int(x)) if x == int(x) else repr(x)
@@ -173,6 +213,7 @@ SKELETON_PAIRS = ('АaВbЕeЅsІlЈjКkМmНhОoРpСcТtУyХxЁeЀeЌkЎyаa�
                   'ΑaΒbΕeΖzΗhΙlΚkΜmΝnΟoΡpΤtΥyΧxαaβbεeιiκkνvοoρpτtυuχxγyωwϲcϳjϹcϜfϝfΪlϊiΫyϋu'
                   'ıiȷjɑaɡgɩiʟlǀl0o1lIl|l')
 SKELETON_MAP = {SKELETON_PAIRS[i]: SKELETON_PAIRS[i + 1] for i in range(0, len(SKELETON_PAIRS) - 1, 2)}
+TEXT_FOLD = {k: v for k, v in SKELETON_MAP.items() if k not in '0123456789|I'}   # round 11: letters only (digits stay digits)
 def name_skeleton(label):
     import unicodedata
     t = unicodedata.normalize('NFD', unicodedata.normalize('NFKC', str(label or '')))
@@ -349,7 +390,9 @@ class Chain:
     def append(self, kind, voice, **meta):
         es = self.entries()
         prev = es[-1]['entryHash'] if es else GENESIS
-        ts = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (datetime.datetime.now().microsecond // 1000)
+        # before (round 11): ts = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (datetime.datetime.now().microsecond // 1000)
+        _now = datetime.datetime.now(datetime.timezone.utc)      # Hypha soft: ONE now() per row (two could straddle a second)
+        ts = _now.strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (_now.microsecond // 1000)
         lam = '%.3f' % (len(es) + 1)
         meta.setdefault('via', os.environ.get('FL_LEARN_VIA', 'cli'))   # Weft N7: the runner cannot tell who typed it
         if test_hooks(): meta['testHooks'] = test_hooks()                 # Weft recheck2: a faked clock/power/base is on the row
@@ -853,58 +896,87 @@ def approver_problem(home, by, owner):
 
 # Hypha ed12354d HOLD / Weft recheck4 F7, the runner's half. Here a person's no is a rollback (undo, or the app's
 # Undo request) by anyone who is not a mind; a later restore or activate of that same version by a person is their yes.
-def person_undone_fps(home):
-    """{fp: ts} for each version whose newest non-mind pointer action took it back."""
+def person_undone_fps(home, with_idx=False):
+    """{fp: ts} for each version whose newest non-mind pointer action took it back. with_idx: {fp: (ts, chain index)}
+    (round 11: "after" is decided by chain order, so a tie at the same millisecond goes to the person)."""
     last = {}
-    for e in home.chain.entries():
+    for i, e in enumerate(home.chain.entries()):
         m = e['meta']; k = m.get('kind'); actor = m.get('actor') or 'operator'
         if is_mind_actor(actor): continue
-        if k == 'rollback' and m.get('fromFp') not in (None, '', 'none'): last[m['fromFp']] = ('no', e['ts'])
-        elif k in ('restore', 'activate') and m.get('toFp') not in (None, '', 'none'): last[m['toFp']] = ('yes', e['ts'])
-    return {fp: ts for fp, (d, ts) in last.items() if d == 'no'}
+        # before (round 11): if k == 'rollback' and m.get('fromFp') not in (None, '', 'none'): last[m['fromFp']] = ('no', e['ts'])
+        # before (round 11): elif k in ('restore', 'activate') and m.get('toFp') not in (None, '', 'none'): last[m['toFp']] = ('yes', e['ts'])
+        if k == 'rollback' and m.get('fromFp') not in (None, '', 'none'): last[m['fromFp']] = ('no', e['ts'], i)
+        elif k in ('restore', 'activate') and m.get('toFp') not in (None, '', 'none'): last[m['toFp']] = ('yes', e['ts'], i)
+    # before (round 11): return {fp: ts for fp, (d, ts) in last.items() if d == 'no'}
+    return {fp: ((ts, i) if with_idx else ts) for fp, (d, ts, i) in last.items() if d == 'no'}
 def undone_contents(home):
     """What those versions taught: [{text, fp, ts}] (itemTexts on the commit row; older rows: the gist)."""
-    undone = person_undone_fps(home)
+    # before (round 11): undone = person_undone_fps(home)
+    undone = person_undone_fps(home, with_idx=True)
     if not undone: return []
     out = []
     for e in home.chain.entries():
         m = e['meta']
         if m.get('kind') in ('learn-commit', 'learn-held') and m.get('afterFp') in undone:
             for t in (m.get('itemTexts') or ([m['gist']] if m.get('gist') else [])):
-                out.append({'text': t, 'fp': m['afterFp'], 'ts': undone[m['afterFp']]})
+                # before (round 11): out.append({'text': t, 'fp': m['afterFp'], 'ts': undone[m['afterFp']]})
+                out.append({'text': t, 'fp': m['afterFp'], 'ts': undone[m['afterFp']][0], 'idx': undone[m['afterFp']][1]})
     return out
-def content_hit(home, text):
-    """The undone content `text` matches: the same norm_text first, then the closest near duplicate (>= LEARN_SIMILAR)."""
+# before (round 11): def content_hit(home, text):
+def content_hit(home, text, after_idx=None):
+    """The undone content `text` matches: the same norm_text first, then the closest near duplicate (>= LEARN_SIMILAR).
+    after_idx (round 11): only rollbacks written after that chain row count (chain order: a tie goes to the person)."""
     nt, best = norm_text(text), None
     for u in undone_contents(home):
+        if after_idx is not None and u['idx'] <= after_idx: continue
         exact = bool(nt) and norm_text(u['text']) == nt
         score = 1 if exact else text_similarity(u['text'], text)
         if not exact and score < LEARN_SIMILAR: continue
         c = dict(u, exact=exact, score=score, how='same-text' if exact else 'similar-to %s, %s' % (u['fp'][:16], fmt_score(score)))
         if not best or (exact and not best['exact']) or (exact == best['exact'] and (score > best['score'] or (score == best['score'] and u['ts'] > best['ts']))): best = c
     return best
+def content_hits(home, text):
+    """Round 11: EVERY undone content `text` matches (same norm_text, or a near duplicate), each with its chain index."""
+    nt, out = norm_text(text), []
+    for u in undone_contents(home):
+        exact = bool(nt) and norm_text(u['text']) == nt
+        score = 1 if exact else text_similarity(u['text'], text)
+        if exact or score >= LEARN_SIMILAR:
+            out.append(dict(u, exact=exact, score=score, how='same-text' if exact else 'similar-to %s, %s' % (u['fp'][:16], fmt_score(score))))
+    return out
 def recent_person_undo(home):
     """The newest person rollback within the last day, by the REAL clock (an injected clock never shortens it)."""
     still = person_undone_fps(home)          # a rollback a person later undid (restore/activate of that version) no longer counts
     ts = [e['ts'] for e in home.chain.entries() if e['meta'].get('kind') == 'rollback' and not is_mind_actor(e['meta'].get('actor') or 'operator')
           and e['meta'].get('fromFp') in still and (iso_epoch(e['ts']) or 0) > time.time() - COOL_SECS]
     return ts[-1] if ts else None
-def f7_queue_problem(home, entry):
+# before (round 11): def f7_queue_problem(home, entry):
+def f7_queue_problem(home, entry, head=None):
     """Why a confirmed queue entry may not train here (F7), or None. Content a person took back trains only from an
     entry chosen after that and cooled a full day (the app's disagreement proposal); and for a day after any person
     rollback, an entry chosen then with an early revisit does not count."""
     text = ' '.join((it.get('output') or it.get('response') or '') for it in entry.get('items') or [])
     # before recheck4 ms fix: t_e, ra_e = iso_epoch(str(entry.get('t') or '')), iso_epoch(str(entry.get('revisitAt') or ''))
     t_e, ra_e = iso_epoch_ms(str(entry.get('t') or '')), iso_epoch_ms(str(entry.get('revisitAt') or ''))
+    # Round 11 (Weft F10): a missing t counts as the queue's export time (or now): never "long ago".
+    if t_e is None: t_e = iso_epoch_ms(str((head or {}).get('exportedAt') or '')) or time.time()
     full = t_e is not None and ra_e is not None and ra_e - t_e >= COOL_SECS - 60
-    hit = content_hit(home, text)
+    # Round 11 (Weft F9 / Hypha (A)): EVERY matching rollback counts, the newest one decides: the entry must have been
+    # chosen strictly after it (a tie goes to the person) and cooled a full day.
+    # before (round 11): hit = content_hit(home, text)
+    hits = content_hits(home, text)
+    hit = max(hits, key=lambda h: h['idx']) if hits else None
     # before recheck4 ms fix: if hit and not (full and t_e >= (iso_epoch(hit['ts']) or 0)):
-    if hit and not (full and t_e >= (iso_epoch_ms(hit['ts']) or 0)):
+    # before (round 11): if hit and not (full and t_e >= (iso_epoch_ms(hit['ts']) or 0)):
+    if hit and not (full and t_e > (iso_epoch_ms(hit['ts']) or 0)):
         return hit, 'a person took back a version with this content here (%s, %s); this entry did not cool a full day after that' % (hit['fp'][:16], hit['how'])
     r = recent_person_undo(home)
     # before recheck4 ms fix: if r and t_e is not None and t_e >= (iso_epoch(r) or 0) and not full:
-    if r and t_e is not None and t_e >= (iso_epoch_ms(r) or 0) and not full:
-        return None, 'chosen within a day of a person taking a change back here; an early revisit does not count then'
+    # before (round 11): if r and t_e is not None and t_e >= (iso_epoch_ms(r) or 0) and not full:
+    # Round 11 (Weft F9, F10): for a day after any person rollback, an entry that cooled less than a full day waits
+    # until that rollback + 24 h, WHENEVER it was chosen (a t from before the rollback, or a backdated t, no longer helps).
+    if r and not full:
+        return None, 'a person took a change back here less than a day ago (%s); an entry that cooled less than a full day waits until %s' % (r, iso_of((iso_epoch_ms(r) or 0) + COOL_SECS))
     return None, None
 
 def receipt_for_candidate(home, method, to):
@@ -1132,7 +1204,8 @@ def learn_one(args, home, mind, entry):
                               learnIds=[str(entry.get('id', ''))], source=source, revisitAt=str(ra))
             print('rejected: still cooling until %s' % ra); return None
     if getattr(args, 'cmd', '') == 'learn':
-        hit, why = f7_queue_problem(home, entry)
+        # before (round 11): hit, why = f7_queue_problem(home, entry)
+        hit, why = f7_queue_problem(home, entry, getattr(args, 'queue_head', None))
         if why:
             home.chain.append('learn-reject', 'A person said no to this content here, so nothing was trained. It waits for a person to look.',
                               learnIds=[str(entry.get('id', ''))], source=source, why=why, match=(hit or {}).get('how', ''),
@@ -1733,14 +1806,19 @@ def main():
                 print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes after the second look.' % iso_of(until)); return
             # Weft recheck2 NF2: the second yes needs the first yes for this same text, and its cooling must be over.
             # before: first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
-            first = [dict(e['meta'], rowTs=e['ts']) for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+            # before (round 11): first = [dict(e['meta'], rowTs=e['ts']) for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+            first = [dict(e['meta'], rowTs=e['ts'], rowIdx=i) for i, e in enumerate(home.chain.entries()) if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
             if not first:
                 home.chain.append('still-cooling', 'A second yes came with no first yes for this text. Nothing changed.', itemSha=item, actor=args.by)
                 print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
             # Weft recheck4 F7: a first yes from before a person took this content back no longer counts. It becomes a
             # proposal (a new first yes now, a full day), and this second yes is refused.
             # before recheck4 ms fix: if hit and (iso_epoch(hit['ts']) or 0) > (iso_epoch(first[-1]['rowTs']) or 0):
-            if hit and (iso_epoch_ms(hit['ts']) or 0) > (iso_epoch_ms(first[-1]['rowTs']) or 0):
+            # Round 11 (Weft F9 / Hypha (A)): ANY matching rollback after this first yes counts (proposals too), by chain
+            # order (a tie goes to the person), not only the best match.
+            # before (round 11): if hit and (iso_epoch_ms(hit['ts']) or 0) > (iso_epoch_ms(first[-1]['rowTs']) or 0):
+            hit = content_hit(home, args.text or '', after_idx=first[-1]['rowIdx'])
+            if hit:
                 t0 = now_epoch()
                 home.chain.append('learn-disagreement', 'A person took this content back after my first yes. It is a proposal now; it cools a full day.',
                                   itemSha=item, proposalOf='undone:' + hit['fp'][:16], match=hit['how'], over='person', actor=args.by)
@@ -1751,14 +1829,25 @@ def main():
             # Weft recheck3 F1: measured from the first yes's real ts, never from an injected clock.
             # before: until = iso_epoch(first[-1].get('revisitAt') or '') or 0
             until = cooling_until(first[-1])
+            # Round 11 (Weft F9): for a day after any person rollback, a first yes that cooled less than a full day waits
+            # until max(its own end, that rollback + 24 h), whenever it was chosen.
+            day_from = ''
+            _t, _ra = iso_epoch(first[-1].get('t') or ''), iso_epoch(first[-1].get('revisitAt') or '')
+            if not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60):
+                r_undo = recent_person_undo(home)
+                if r_undo and (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
+                    until = (iso_epoch_ms(r_undo) or 0) + COOL_SECS; day_from = r_undo
             if first[-1].get('testHooks'): home.chain.hooks_from = 'first-yes row: ' + first[-1]['testHooks']
             if now_epoch() < until:
+                # before (round 11): home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
+                # before (round 11):                   itemSha=item, actor=args.by, revisitAt=iso_of(until))
                 home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
-                                  itemSha=item, actor=args.by, revisitAt=iso_of(until))
-                print('refused: still cooling until %s. Nothing changed.' % iso_of(until)); sys.exit(1)
+                                  itemSha=item, actor=args.by, revisitAt=iso_of(until), **({'personUndoDay': day_from} if day_from else {}))
+                print('refused: still cooling until %s.%s Nothing changed.' % (iso_of(until), (' (a day after a person took a change back at %s, F9)' % day_from) if day_from else '')); sys.exit(1)
         elif args.cmd == 'learn' and args.queue:
             lines = [json.loads(l) for l in open(args.queue) if l.strip()]
             if lines and lines[0].get('kind') == 'fl-learn-queue': head = lines.pop(0)
+            args.queue_head = head                                  # round 11 (F10): exportedAt stands in for a missing t
             entries = lines
             # Weft N3: a queue exported while the app was paused pauses the runner (durable, global, with a row).
             if head.get('paused') is True:

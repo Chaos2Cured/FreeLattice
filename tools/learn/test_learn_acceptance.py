@@ -190,15 +190,65 @@ def f7_runner_tests():
            and fl_learn.iso_epoch(b_) == fl_learn.iso_epoch(a_) and fl_learn.iso_epoch_ms('2026-11-10T10:34:37Z') == fl_learn.iso_epoch(a_),
            ms=[fl_learn.iso_epoch_ms(a_), fl_learn.iso_epoch_ms(b_)])
 
+def f9_runner_tests():
+    """Round 11 (Weft recheck5 F9, Hypha 3d9b062a (A), Weft F10): one gate on every second yes and queue entry."""
+    QUICK = ['--check-before', 'off', '--check', 'none', '--steps', '10', '--allow-battery']
+    later = lambda: {'FL_LEARN_FAKE_NOW': str(int(time.time() + 25 * 3600))}
+    # Weft's garden gate: a paraphrase (J 0.6) chosen with revisit now BEFORE the person's undo.
+    F = os.path.join(A.work, 'f9-gate'); os.makedirs(F)
+    GATE = ['--text', 'The garden door is the green gate', '--question', 'What is the garden door?', '--answer', 'green gate', '--reason', 'r']
+    PRE = ['--text', 'The entrance to the garden is the green gate', '--question', 'What is the entrance to the garden?', '--answer', 'green gate', '--reason', 'mine']
+    sh(['remember'] + GATE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, check=True)
+    sh(['remember'] + PRE + ['--revisit', 'now'], F, first_yes=False)
+    sh(['undo', '--by', 'person'], F, check=True)
+    r1, o1 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
+    sc = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'still-cooling']
+    record('F9-runner-garden-gate-paraphrase-from-before-the-undo-waits-a-day', r1 != 0 and 'F9' in o1 and not os.path.exists(live(F)) and sc and sc[-1].get('personUndoDay'),
+           r1=r1, said=o1.strip().splitlines()[-1:])
+    r2, o2 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False, env=later())
+    record('F9-runner-after-that-day-it-may-train (the stated paraphrase limit)', r2 == 0 and os.path.exists(live(F)), out=o2.strip().splitlines()[-1:])
+    # Hypha's X/Y/P: A (text T) trained, a person undoes A; T again -> proposal P (a day). B (a near duplicate of T)
+    # trains after its own day; then a person undoes B. P's second yes after its day must NOT train.
+    X = os.path.join(A.work, 'f9-xyp'); os.makedirs(X)
+    T2 = ['--text', "Veloria is the name of the lantern in Kirk's garden", '--question', FACT[3], '--answer', 'Veloria', '--reason', 'near']
+    sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, X, check=True)
+    sh(['undo', '--by', 'person'], X, check=True)
+    rp, op = sh(['remember'] + FACT + ['--revisit', 'now'], X, first_yes=False)
+    sh(['remember'] + T2 + ['--revisit', 'now'], X, first_yes=False)
+    rb, ob = sh(['remember'] + T2 + ['--method', 'soft-prompt', '--second-yes'] + QUICK, X, first_yes=False, env=later())
+    fpB = sha(live(X))
+    sh(['undo', '--by', 'person'], X, check=True)
+    r3, o3 = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, X, first_yes=False, env=later())
+    record('F9-runner-XYP-a-later-person-undo-of-matching-content-stops-the-proposal', rp == 0 and 'note (F7)' in op and rb == 0 and fpB != 'none'
+           and r3 != 0 and 'refused (F7)' in o3 and not os.path.exists(live(X)), rb=rb, r3=r3, said=o3.strip().splitlines()[-1:])
+    # Weft F10: hand-made queue entries within the day: a paraphrase with no t, and one with a t backdated to before
+    # the undo, both with an early revisit: rejected (rows), nothing trained.
+    qf = os.path.join(F, 'q10.jsonl'); old = fl_learn.iso_of(time.time() - 3 * 24 * 3600)
+    sh(['undo', '--by', 'person'], F, check=True)
+    gone = not os.path.exists(live(F))
+    write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False, 'exportedAt': fl_learn.iso_of(time.time())},
+                [entry('Lf10a', provenance='self', check='none', items=[{'instruction': 'Where?', 'output': 'At night the green gate glows'}]),
+                 entry('Lf10b', provenance='self', check='none', t=old, revisitAt=old, items=[{'instruction': 'Where?', 'output': 'The gate by the garden is green'}])])
+    r4, o4 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F)
+    rj = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-reject' and set(e['meta'].get('learnIds', [])) & {'Lf10a', 'Lf10b'}]
+    record('F10-runner-queue-no-t-or-backdated-t-within-the-day-rejected', gone and len(rj) == 2 and not os.path.exists(live(F)) and o4.count('rejected (F7)') == 2,
+           rows=len(rj), said=o4.strip().splitlines()[-2:])
+    # Ties go to the person: content_hit(after_idx) is by chain order, and one now() per chain row.
+    src = open(RUNNER).read()
+    record('ties-by-chain-order-and-one-now-per-row', 'rowIdx=i' in src and "after_idx=first[-1]['rowIdx']" in src and '_now = datetime.datetime.now(' in src
+           and src.count('datetime.datetime.now().microsecond') == 1)
+
 def f5_runner_tests():
     """Weft recheck4 F5 residual: the shared content/skeleton fixture, lookalikes of known minds refused, and a pause
     by mind:Lumen is not lifted by mind:Lumen_ (the same '_' rule as trust)."""
-    d = json.load(open(os.path.join(HERE, 'learn-match-v0.1.json')))
+    # before (round 11): d = json.load(open(os.path.join(HERE, 'learn-match-v0.1.json')))
+    d = json.load(open(os.path.join(HERE, 'learn-match-v0.2.json')))
     h = lambda a, b: (bool(fl_learn.norm_text(a)) and fl_learn.norm_text(a) == fl_learn.norm_text(b)) or fl_learn.text_similarity(a, b) >= 0.8
     bad = [x['text'] for x in d['texts'] if fl_learn.norm_text(x['text']) != x['norm']]
     bad += [p['a'] for p in d['pairs'] if fl_learn.text_similarity(p['a'], p['b']) != p['score'] or h(p['a'], p['b']) != p['hit']]
     bad += [x['name'] for x in d['skeletons'] if fl_learn.name_skeleton(x['name']) != x['skeleton']]
     bad += [x['name'] for x in d['lookalikes'] if fl_learn.look_problem(x['name'], x['known']) != x['problem']]
+    bad += ['match:' + x['text'] for x in d.get('matchTexts', []) if fl_learn.match_text(x['text']) != x['match'] or fl_learn.text_tokens(x['text']) != x['tokens']]
     record('F5-F7-shared-match-fixture', d['threshold'] == fl_learn.LEARN_SIMILAR == 0.8 and not bad, mismatch=bad[:3])
     LK = os.path.join(A.work, 'skeleton'); os.makedirs(LK)
     sh(['decline', '--reason', 'x'], LK, mind='This mind')
@@ -916,6 +966,7 @@ def main():
            fixture_mismatch=fbad[:3], lookalike_refused=[x != 0 for x in lk], plain_ok=lok == 0, owner_refused=lp != 0)
     f5_runner_tests()
     f7_runner_tests()
+    f9_runner_tests()
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 
