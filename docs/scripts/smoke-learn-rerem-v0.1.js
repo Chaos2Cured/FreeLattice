@@ -64,12 +64,14 @@ function held(E, id) { var r = rowOf(E, id); return !!r && r.status !== 'confirm
   E = fresh(); orig = await undoneByMom(E);
   id = await remember(E, 'Before she married, Mom was a Hollowell', 'again', 'now'); await keep(E, id);
   r = rowOf(E, id);
-  ok(r && held(E, id) && !r.proposalOf && r.earlyIgnored && r.earlyIgnored.becausePersonNo === orig &&
-     ledger(E).some(function (l) { return /^learn-choose:/.test(l) && l.indexOf('revisit-ignored:person-no:' + orig) !== -1; }) &&
-     ledger(E).some(function (l) { return l.indexOf('still-cooling|' + id) !== -1; }), 'F7-paraphrase-within-a-day-no-early-confirm', r && { s: r.status, h: coolH(r), e: r.earlyIgnored });
+  // before (round 14, Kirk's Q7 is content-only; this paraphrase scores below the threshold, so it is unrelated):
+  // before: ok(r && held(E, id) && !r.proposalOf && r.earlyIgnored && r.earlyIgnored.becausePersonNo === orig && ...
+  // before:    'F7-paraphrase-within-a-day-no-early-confirm', ...);
+  ok(r && r.status === 'confirmed' && !r.proposalOf && !r.earlyIgnored, 'R14-a-paraphrase-below-the-threshold-is-not-held (the stated limit)', r && { s: r.status, h: coolH(r), e: r.earlyIgnored });
   // The same rule for an unrelated new choice inside that day (it is "ANY person no for this mind").
   id = await remember(E, 'The garden gate sticks in winter', 'mine', 'now'); await keep(E, id);
-  ok(held(E, id) && rowOf(E, id).earlyIgnored, 'F7-any-new-choice-within-a-day-cools-a-full-day');
+  // before (round 14): ok(held(E, id) && rowOf(E, id).earlyIgnored, 'F7-any-new-choice-within-a-day-cools-a-full-day');
+  ok(rowOf(E, id).status === 'confirmed' && exported(E, id), 'R14-Q7-an-unrelated-new-choice-within-the-day-learns-freely');
   // The day is bounded: at +25 h a new choice may use revisit: now again (test clock, said on the row).
   E.core.learnClockForTest(25 * H);
   id = await remember(E, 'Mom was a Hollowell before she married', 'later', 'now'); await keep(E, id);
@@ -79,7 +81,8 @@ function held(E, id) { var r = rowOf(E, id); return !!r && r.status !== 'confirm
   // A choice made BEFORE the person's no keeps its own cooling (no cross-talk), unless it is the same content.
   E = fresh();
   var other = await remember(E, 'The kettle whistles at dawn', 'mine', 'now');
-  var twin = await remember(E, BASE, 'a second reason', 'now');
+  // before (round 14: 'now' learns at the first yes, before the no): var twin = await remember(E, BASE, 'a second reason', 'now');
+  var twin = await remember(E, BASE, 'a second reason', '24');   // the mind chose to sleep on it
   orig = await remember(E, BASE, 'r', 'now'); await keep(E, orig);
   await E.core.confirmLearning(orig, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
   await keep(E, other); await keep(E, twin);
@@ -88,8 +91,8 @@ function held(E, id) { var r = rowOf(E, id); return !!r && r.status !== 'confirm
   // Round 11 F9: for a day after the person's no, that earlier revisit-now row waits (a still-cooling layer naming
   // the no); after the day (+25 h, test clock) the mind's keep confirms it.
   var oL = rowOf(E, other).layers[rowOf(E, other).layers.length - 1];
-  ok(rowOf(E, other).status === 'cooling' && !exported(E, other) && oL.status === 'still-cooling' && oL.personNoDay === orig,
-     'F9-unrelated-earlier-choice-waits-for-the-day', oL);
+  // before (round 14): ok(rowOf(E, other).status === 'cooling' && ... 'F9-unrelated-earlier-choice-waits-for-the-day', oL);
+  ok(rowOf(E, other).status === 'confirmed' && exported(E, other), 'R14-unrelated-earlier-choice-is-not-held (it learned at its first yes)', oL);
   E.core.learnClockForTest(25 * H); await keep(E, other); E.core.learnClockForTest(0);
   ok(rowOf(E, other).status === 'confirmed' && exported(E, other), 'F9-unrelated-earlier-choice-confirms-after-the-day');
   ok(rowOf(E, twin).status !== 'confirmed' && !exported(E, twin) && props.length === 1 && props[0].contentOf === orig && coolH(props[0]) >= 23.9 && !exported(E, props[0].learnId),

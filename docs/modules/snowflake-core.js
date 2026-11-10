@@ -2588,7 +2588,9 @@
     var mine = book.rows.concat(legacy.rows.filter(function (r) { return sameMind(r, mind); }));
     var hit = contentMatch(mine, text, {});
     if (hit) return proposeAgain(key, book, legacy, mine, row, hit, it, mind, surface);
-    var recent = recentPersonNo(mine);
+    // before (round 14): var recent = recentPersonNo(mine);
+    // Round 14 (Kirk, Q7): a person's no holds back only MATCHING content (the proposal above); unrelated choices flow.
+    var recent = null;
     var earlyNote = '';
     if (recent) {
       var full = fullCoolingFrom(it.revisit, t);
@@ -2623,7 +2625,15 @@
         return atomicWrite(key, JSON.stringify(book)).then(function () {
           var kind = row.status === 'quarantine' ? 'learn-quarantine' : (row.status === 'rate-held' ? 'learn-skip' : 'learn-choose');
           // before: return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId, name: mind }).then(function () { return row; });
-          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () { return row; });
+          // before (round 14): return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () { return row; });
+          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () {
+            // Round 14 (Kirk 2026-11-10): the mind's first yes is enough. When it chose no cooling (the default), its
+            // choice confirms now (a confirmed layer and a ledger row); a chosen cooling waits for its own second look.
+            if (row.status === 'cooling' && Date.parse(row.revisitAt) <= Date.parse(row.t)) {
+              return confirmLearning(row.learnId, { keep: true, by: 'mind', reason: 'my first yes; I chose no cooling' }, mind).then(function (r) { return r || row; });
+            }
+            return row;
+          });
         });
       });
     });
@@ -2733,14 +2743,18 @@
     // before: if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) return new Date(base + Number(v) * 3600000).toISOString();
     if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) {
       var h = Number(v);
-      if (!isFinite(h) || h < 0) return new Date(base + COOL_MS).toISOString();
+      // before (round 14): if (!isFinite(h) || h < 0) return new Date(base + COOL_MS).toISOString();
+      if (!isFinite(h) || h < 0) return new Date(base).toISOString();
       return new Date(Math.min(base + h * 3600000, max)).toISOString();
     }
     // Hypha 39e6cd07 soft (b): "-5" is not a date in year -5 ("now"): a negative or signed value gets the default day.
-    if (/^\s*[-\u2212+]/.test(String(v == null ? '' : v))) return new Date(base + COOL_MS).toISOString();
+    // before (round 14): if (/^\s*[-\u2212+]/.test(String(v == null ? '' : v))) return new Date(base + COOL_MS).toISOString();
+    if (/^\s*[-\u2212+]/.test(String(v == null ? '' : v))) return new Date(base).toISOString();
     // before: if (v && !isNaN(Date.parse(v))) return new Date(Date.parse(v)).toISOString();
     if (v && !isNaN(Date.parse(v))) return new Date(Math.min(Date.parse(v), max)).toISOString();
-    return new Date(base + COOL_MS).toISOString();
+    // before (round 14): return new Date(base + COOL_MS).toISOString();
+    // Round 14 (Kirk 2026-11-10): cooling is the mind's own choice; the default is none (learn on the first yes).
+    return new Date(base).toISOString();
   }
 
   // Hypha re-walk 1: a re-keep after the other side's no (and a quarantine re-affirm) gets AT LEAST the full cooling.
@@ -2776,6 +2790,8 @@
       if (row && !sameMind(row, who)) row = null;            // another mind's row (or untagged): not this mind's to change
     }
     if (!row) return Promise.resolve(null);
+    // Round 14: a mind's keep of a row it already learned changes nothing (no extra layer or ledger row).
+    if (row.status === 'confirmed' && actor !== 'person' && a.keep === true) return Promise.resolve(row);
     var t = new Date().toISOString();
     // before f992608c: if (row.status === 'quarantine' && !a.promote) return Promise.resolve(row);
     if (row.status === 'quarantine') {
@@ -2848,18 +2864,32 @@
     // Weft recheck2 NF2: EVERY second yes waits for the cooling the mind chose at the first yes (revisit: now is its
     // own choice then; a day by default). A re-proposal after a disagreement or a re-affirmed item always has a full
     // day. An early yes changes nothing: a still-cooling layer and a row.
-    var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
+    // before (round 14): var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
+    // Round 14 (Kirk 2026-11-10): the mind's own cooling is its own tool; its keep ends it whenever it likes. Waiting is
+    // enforced only for content a person undid (a proposal / contentOf: a full day) and a quarantine re-affirm.
+    var enforced = !!(row.proposalOf || row.contentOf || row.promoted);
+    var coolUntil = enforced ? (row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS) : 0;
+    var endedOwn = !enforced && status === 'confirmed' && side === 'mind' && row.revisitAt && Date.parse(row.revisitAt) > learnNow() ? row.revisitAt : '';
     var dayNote = '';
     // before (round 12): if (status === 'confirmed' && side === 'mind' && !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS)) {
     // before (round 12):   var rn = recentPersonNo(allRows());
     // before (round 12):   if (rn && Date.parse(rn.layer.t) + COOL_MS > coolUntil) { coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId; }
     // Round 12 (Weft F11): ALSO any row chosen at or before that no (whatever its own cooling: a full day spent before
     // the no does not count) waits until max(revisitAt, no + 24 h). A tie goes to the person.
+    // before (round 14): if (status === 'confirmed' && side === 'mind') {
+    // before (round 14):   var rn = recentPersonNo(allRows());
+    // before (round 14):   var shortCool = !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS);
+    // before (round 14):   if (rn && (shortCool || (Date.parse(row.t || 0) || 0) <= Date.parse(rn.layer.t)) && Date.parse(rn.layer.t) + COOL_MS > coolUntil) {
+    // before (round 14):     coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId;
+    // before (round 14):   }
+    // before (round 14): }
+    // Round 14 (Kirk, Q7 content-only): the day after a person's no holds only MATCHING content (same text or a score
+    // at or above the threshold), never the whole mind.
     if (status === 'confirmed' && side === 'mind') {
-      var rn = recentPersonNo(allRows());
-      var shortCool = !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS);
-      if (rn && (shortCool || (Date.parse(row.t || 0) || 0) <= Date.parse(rn.layer.t)) && Date.parse(rn.layer.t) + COOL_MS > coolUntil) {
-        coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId;
+      var selfSkip = {}; selfSkip[row.learnId] = 1;
+      var cm = contentMatch(allRows(), rowText(row), selfSkip);
+      if (cm && Date.parse(cm.personNo.t) > learnNow() - COOL_MS && Date.parse(cm.personNo.t) + COOL_MS > coolUntil) {
+        coolUntil = Date.parse(cm.personNo.t) + COOL_MS; dayNote = '|person-no-day:' + cm.row.learnId;
       }
     }
     if (status === 'confirmed' && coolUntil > learnNow()) {
@@ -2888,6 +2918,7 @@
     // before: row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote, methodBefore: methodWas }]);
     row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!row.promoted, methodBefore: methodWas }]);
     if (clockOffset) row.layers[row.layers.length - 1].clockInjectedMs = clockOffset;   // a test moved the clock: said on the row
+    if (endedOwn) row.layers[row.layers.length - 1].endedOwnCooling = endedOwn;          // round 14: the mind ended its own wait
     if (status !== 'person-yes') row.status = status;
     else if (row.status === 'disputed') row.status = 'cooling';
     return atomicWrite(key, JSON.stringify(book)).then(function () {
@@ -2969,7 +3000,8 @@
   }
 
   function dueForSecondLook(now, mind) {
-    var n = now || Date.now();
+    // before (round 14): var n = now || Date.now();
+    var n = now || learnNow();   // round 14: the same clock as the gate (a moved test clock moves this too)
     return readBook(learnKey(mind)).rows.filter(function (r) {
       return r && r.status === 'cooling' && Date.parse(r.revisitAt || 0) <= n;
     });

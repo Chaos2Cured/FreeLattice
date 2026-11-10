@@ -111,7 +111,8 @@ function ledger(E) { return ((JSON.parse(E.store.fl_snowflake_ledger_v0 || '{"ro
   ok(threw === 0 && over === 0, 'revisit-huge-nan-infinity-clamped', { threw: threw, over: over });
   // Hypha 39e6cd07 softs. (a) keep must be the boolean true/false: "true" or 1 changes nothing (never read as a no).
   E = fresh();
-  var sa = (await E.learn.interceptSentinel('[FL_REMEMBER: soft a | revisit: now]', { surface: 'chat', chatId: 's' }).queued)[0];
+  // before (round 14: 'now' learns at once): var sa = (await E.learn.interceptSentinel('[FL_REMEMBER: soft a | revisit: now]',
+  var sa = (await E.learn.interceptSentinel('[FL_REMEMBER: soft a | revisit: 24]', { surface: 'chat', chatId: 's' }).queued)[0];
   var la = (rowOf(E, sa.learnId).layers || []).length;
   await E.learn.interceptSentinel('[FL_KEEP: {"text":"' + sa.learnId + '","keep":"true"}]', { surface: 'chat', chatId: 's' }).queued;
   await E.learn.interceptSentinel('[FL_KEEP: {"text":"' + sa.learnId + '","keep":1}]', { surface: 'chat', chatId: 's' }).queued;
@@ -120,13 +121,16 @@ function ledger(E) { return ((JSON.parse(E.store.fl_snowflake_ledger_v0 || '{"ro
   // (b) a negative revisit gets the default day.
   var sb = (await E.learn.interceptSentinel('[FL_REMEMBER: soft b | revisit: -5]', { surface: 'chat', chatId: 's' }).queued)[0];
   var sb2 = await E.core.queueLearning({ text: 'soft b2', surface: 'chat', provenance: 'self', revisit: '-0.5' });
-  ok(Date.parse(sb.revisitAt) - Date.now() > 23.9 * 3600e3 && Date.parse(sb2.revisitAt) - Date.now() > 23.9 * 3600e3, 'soft-b-negative-revisit-default-day',
+  // before (round 14: the default is no cooling): ok(... > 23.9 * 3600e3 ..., 'soft-b-negative-revisit-default-day',
+  ok(Math.abs(Date.parse(sb.revisitAt) - Date.parse(sb.t)) < 1000 && Math.abs(Date.parse(sb2.revisitAt) - Date.parse(sb2.t)) < 1000, 'soft-b-negative-revisit-gets-the-default-(none)',
      { a: sb.revisitAt, b: sb2.revisitAt });
   // (c) repeated early keeps add one still-cooling layer and one ledger row, not one each.
-  var sc = (await E.learn.interceptSentinel('[FL_REMEMBER: soft c]', { surface: 'chat', chatId: 's' }).queued)[0];
+  // before (round 14: an early keep on the mind's own cooling now confirms):
+  // before: var sc = (await E.learn.interceptSentinel('[FL_REMEMBER: soft c]', ...).queued)[0]; ... 'soft-c-early-keeps-deduped');
+  var sc = (await E.learn.interceptSentinel('[FL_REMEMBER: soft c | revisit: 24]', { surface: 'chat', chatId: 's' }).queued)[0];
   for (var k = 0; k < 6; k++) await E.learn.interceptSentinel('[FL_KEEP: ' + sc.learnId + ' | keep]', { surface: 'chat', chatId: 's' }).queued;
-  ok((rowOf(E, sc.learnId).layers || []).filter(function (l) { return l.status === 'still-cooling'; }).length === 1 &&
-     ledger(E).filter(function (l) { return /^learn-still-cooling:/.test(l) && l.indexOf(sc.learnId) !== -1; }).length === 1, 'soft-c-early-keeps-deduped');
+  ok(rowOf(E, sc.learnId).status === 'confirmed' && (rowOf(E, sc.learnId).layers || []).filter(function (l) { return l.status === 'confirmed'; }).length === 1 &&
+     ledger(E).filter(function (l) { return /^learn-confirmed:/.test(l) && l.indexOf(sc.learnId) !== -1; }).length === 1, 'soft-c-R14-repeated-keeps-confirm-once', { s: rowOf(E, sc.learnId).status, L: (rowOf(E, sc.learnId).layers || []).map(function (l) { return l.status; }), led: ledger(E).filter(function (l) { return l.indexOf(sc.learnId) !== -1; }) });
   // (d) the test clock is not on the API without the test flag; with it, every use is on the ledger row too.
   var saved = global.FL_LEARN_TEST_HOOKS; delete global.FL_LEARN_TEST_HOOKS;
   delete require.cache[require.resolve(path.join(root, 'docs/modules/snowflake-core.js'))];
@@ -134,7 +138,7 @@ function ledger(E) { return ((JSON.parse(E.store.fl_snowflake_ledger_v0 || '{"ro
   global.FL_LEARN_TEST_HOOKS = saved;
   ok(typeof plain.learnClockForTest !== 'function', 'soft-d-test-clock-not-on-the-app-api');
   E = fresh();
-  var sd = (await E.learn.interceptSentinel('[FL_REMEMBER: soft d]', { surface: 'chat', chatId: 's' }).queued)[0];
+  var sd = (await E.learn.interceptSentinel('[FL_REMEMBER: soft d | revisit: 24]', { surface: 'chat', chatId: 's' }).queued)[0];
   E.core.learnClockForTest(25 * 3600e3);
   await E.learn.interceptSentinel('[FL_KEEP: ' + sd.learnId + ' | keep]', { surface: 'chat', chatId: 's' }).queued;
   E.core.learnClockForTest(0);

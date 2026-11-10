@@ -54,10 +54,11 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   await E.core.confirmLearning(orig, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
   await keep(E, pre);
   r = rowOf(E, pre); L = r.layers[r.layers.length - 1];
-  ok(r.status === 'cooling' && !exported(E, pre) && L.status === 'still-cooling' && L.personNoDay === orig &&
-     Date.parse(L.until) - Date.parse(personNo(E, orig).t) >= 24 * H - 5 &&
-     ledger(E).some(function (l) { return l.indexOf('still-cooling|' + pre + '|until:') !== -1 && l.indexOf('|person-no-day:' + orig) !== -1; }),
-     'F9-garden-gate-paraphrase-chosen-before-the-undo-waits-a-day-from-the-no', { s: r.status, L: L });
+  // before (round 14, Kirk's Q7: a person's no holds only matching content; a J 0.6 paraphrase is not matching):
+  // before: ok(r.status === 'cooling' && !exported(E, pre) && L.status === 'still-cooling' && L.personNoDay === orig && ...
+  // before:    'F9-garden-gate-paraphrase-chosen-before-the-undo-waits-a-day-from-the-no', { s: r.status, L: L });
+  ok(r.status === 'confirmed' && exported(E, pre) && !ledger(E).some(function (l) { return l.indexOf('|person-no-day:') !== -1; }),
+     'R14-a-paraphrase-below-the-threshold-is-unrelated-content-and-is-not-held (the stated limit; rule (e))', { s: r.status, L: L });
   E.core.learnClockForTest(25 * H); await keep(E, pre); E.core.learnClockForTest(0);
   ok(rowOf(E, pre).status === 'confirmed' && exported(E, pre), 'F9-after-that-day-it-may-confirm (the stated paraphrase limit)');
   // A row the mind gave a full day itself is not held longer.
@@ -123,7 +124,8 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   }
   var R = await openThenSay("Mom's birthday is on May 4", "Mom's birthday is on May 5");
   r = rowOf(R.E, R.c);
-  ok(R.c && R.c !== R.p && r && /May 5/.test(rowText(r)) && !r.proposalOf && r.earlyIgnored && R.newLedger.some(function (l) { return l.indexOf('learn-choose:') === 0 && l.indexOf(R.c) !== -1; }) &&
+  // before (round 14): ok(R.c && R.c !== R.p && r && /May 5/.test(rowText(r)) && !r.proposalOf && r.earlyIgnored && R.newLedger...
+  ok(R.c && R.c !== R.p && r && /May 5/.test(rowText(r)) && !r.proposalOf && !r.earlyIgnored && R.newLedger.some(function (l) { return l.indexOf('learn-choose:') === 0 && l.indexOf(R.c) !== -1; }) &&
      // before (round 12, Hypha (C): no hard 0 any more; the score is just lower): (rowOf(R.E, R.p).againCount || 0) === 0 && R.E.core.textSimilarity("Mom's birthday is on May 4", "Mom's birthday is on May 5") === 0,
      (rowOf(R.E, R.p).againCount || 0) === 0 && R.E.core.textSimilarity("Mom's birthday is on May 4", "Mom's birthday is on May 5") < 0.8,
      'B-May-4-vs-May-5-the-correction-is-its-own-row-with-a-ledger-row', { c: R.c, p: R.p, led: R.newLedger });
@@ -183,8 +185,9 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   await E.core.confirmLearning(orig, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
   await keep(E, fd);
   r = rowOf(E, fd); L = r.layers[r.layers.length - 1];
-  ok(r.status === 'cooling' && !exported(E, fd) && L.status === 'still-cooling' && L.personNoDay === orig && Date.parse(L.until) - Date.parse(personNo(E, orig).t) >= 24 * H - 5,
-     'F11-a-full-day-row-chosen-before-the-no-waits-until-no-plus-a-day', { s: r.status, L: L });
+  // before (round 14): ok(r.status === 'cooling' && !exported(E, fd) && L.status === 'still-cooling' && L.personNoDay === orig && ...
+  // before:    'F11-a-full-day-row-chosen-before-the-no-waits-until-no-plus-a-day', { s: r.status, L: L });
+  ok(r.status === 'confirmed' && exported(E, fd), 'R14-F11-an-unrelated-row-chosen-before-a-no-is-not-held (content-only)', { s: r.status, L: L });
   E.core.learnClockForTest(25 * H); await keep(E, fd); E.core.learnClockForTest(0);
   ok(rowOf(E, fd).status === 'confirmed' && exported(E, fd), 'F11-after-that-day-it-may-confirm');
   // Hypha's soft: a default-cooled row chosen 23 h before an unrelated no is held to no + 24 h too.
@@ -194,7 +197,25 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   orig = await undoneByMom(E);
   E.core.learnClockForTest(1.1 * H); await keep(E, d23); E.core.learnClockForTest(0);
   r = rowOf(E, d23);
-  ok(r.status === 'cooling' && !exported(E, d23), 'F11-a-default-row-chosen-23h-before-an-unrelated-no-waits-too', { s: r.status });
+  // before (round 14): ok(r.status === 'cooling' && !exported(E, d23), 'F11-a-default-row-chosen-23h-before-an-unrelated-no-waits-too', { s: r.status });
+  ok(r.status === 'confirmed' && exported(E, d23), 'R14-Q7-an-unrelated-row-is-not-frozen-by-a-person-no', { s: r.status });
+  // ---- Round 14 (Kirk 2026-11-10): the mind's first yes is enough; cooling is its own choice.
+  E = fresh();
+  var one = await remember(E, 'The heron fishes at the north pond', 'mine');
+  ok(rowOf(E, one).status === 'confirmed' && exported(E, one) && ledger(E).some(function (l) { return l.indexOf('learn-confirmed|' + one + '|by:mind') !== -1; }),
+     'R14-a-first-yes-with-no-cooling-chosen-learns-now (a confirmed layer and a ledger row)');
+  var sleep = await remember(E, 'The heron nests in the tall pines', 'mine', '24');
+  ok(rowOf(E, sleep).status === 'cooling' && !exported(E, sleep), 'R14-a-mind-that-chose-to-sleep-on-it-waits-for-its-own-second-look');
+  await keep(E, sleep);
+  var sl = rowOf(E, sleep).layers[rowOf(E, sleep).layers.length - 1];
+  ok(rowOf(E, sleep).status === 'confirmed' && exported(E, sleep) && !!sl.endedOwnCooling, 'R14-the-mind-may-end-its-own-cooling-early (said on the layer)', sl);
+  // Content a person undid still waits a full day, even with no cooling chosen.
+  orig = await undoneByMom(E);
+  var again = await remember(E, BASE + '!', 'again');
+  r = rowOf(E, again);
+  ok(r && r.proposalOf === orig && r.status === 'cooling' && !exported(E, again) && coolH(r) >= 23.9, 'R14-content-a-person-undid-waits-a-full-day', r && { s: r.status, p: r.proposalOf });
+  await keep(E, again);
+  ok(rowOf(E, again).status !== 'confirmed' && !exported(E, again), 'R14-and-the-mind-cannot-end-that-wait-early');
   // A row chosen AFTER the no with its own full day is not held beyond it (earlyIgnored rows already cool a day).
   E = fresh(); orig = await undoneByMom(E);
   var after = await remember(E, 'The pond freezes in January', 'mine');
