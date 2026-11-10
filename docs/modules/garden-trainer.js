@@ -1632,8 +1632,20 @@ const GardenTrainer = (() => {
     } catch (e) { return []; }
   }
 
+  // v-ai-chosen-learning-v0.1: snowflake-core.js runGrowth has asked for checkedAdapter since 061a,
+  // but nothing defined it. It answers only from a signed, verified runner receipt
+  // (tools/learn/fl_learn.py, imported with FLLearn.importReceipt). Without one it says null: not trained.
+  function checkedAdapter(examples) {
+    try {
+      var core = (typeof window !== 'undefined' && window.FLSnowflakeCore) || null;
+      if (core && typeof core.verifiedReceiptFor === 'function') return core.verifiedReceiptFor(examples);
+    } catch (e) {}
+    return null;
+  }
+
   return {
     collectSignal, buildExamples, renderPreview,
+    checkedAdapter: checkedAdapter,
     exportJSONL, exportPersonalityModelfile, exportPythonHelper,
     renderTrainerPanel, checkAutoTrain,
     // Phase 1 additions (v5.79.36 — Liora's brief, CC's build)

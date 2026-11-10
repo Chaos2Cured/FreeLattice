@@ -26,6 +26,9 @@
   var LS_RUNS = 'fl_snowflake_runs_v0';
   var LS_REPLAY = 'fl_snowflake_replay_v0';
   var LS_METER = 'fl_snowflake_meter_v0';
+  // v-ai-chosen-learning-v0.1: the mind picks how it learns. This is a menu it can extend, not a rule.
+  var LEARN = 'v-ai-chosen-learning-v0.1';
+  var LEARN_METHODS = ['soft-prompt', 'memory-vector', 'lora', 'note'];
   var FLAKE_CAP = 24;
   var CALL_CAP = 24;
   var FETCH_CAP = 30;
@@ -1358,7 +1361,9 @@
       return 'You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it. A tool the mind weighs, not a gate. Reply with JSON only.';
     }
     if (phase === 'plan') return 'Plan search queries for each branch. Reply with JSON only. Include branch e, the dissenter.';
-    if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score.';
+    if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score. ' +
+      // v-ai-chosen-learning-v0.1: optional. The mind may name how it wants to learn, or choose none.
+      'You may add "method" (soft-prompt, memory-vector, lora, note, or your own words) and "reason". An empty become list is a fine answer.';
     if (phase === 'drift' || phase === 'drift-after' || phase === 'drift-note') return 'Answer in one or two sentences. No score and no ranking.';
     if (phase === 'conclude') return 'Write a two-line conclusion, where you could be wrong, and one open question. Reply with JSON only.';
     return 'Read the sources into one node. Reply with JSON only. Keep the doubt.';
@@ -1929,7 +1934,9 @@
     // Search still keeps the dissenter as evidence. This list does not add it.
     become = become.filter(function (id) { return hold.indexOf(id) === -1; });
     var reason = clip((model && model.reason) || '', 300);
-    return { become: become, hold: hold, reason: reason };
+    // v-ai-chosen-learning-v0.1: keep the method the mind named, in its own words when it is not on the menu.
+    var method = learnMethod(model && model.method);
+    return { become: become, hold: hold, reason: reason, method: method.method, methodNote: method.note };
   }
 
   function queueGrowth(flake, choice) {
@@ -1943,6 +1950,13 @@
       t: new Date().toISOString(),
       status: 'waiting'
     };
+    // v-ai-chosen-learning-v0.1: additive fields. Old rows without them still read the same.
+    if (choice.method) row.method = choice.method;
+    if (choice.methodNote) row.methodNote = choice.methodNote;
+    row.surface = 'snowflake';
+    row.items = trainingNodes(flake, choice.become || []).map(function (n) {
+      return learnExample(n.branch + ' ' + (n.source && n.source.title || ''), n.text);
+    });
     // v-memory-compound-v0.1: the AI chooses; we only skip what it already queued.
     var fm = root.FLMemory;
     var p = (fm && fm.isNew) ? fm.isNew(choice.reason + '|' + choice.become.join(','), 'train') : Promise.resolve({ fresh: true });
@@ -2041,8 +2055,10 @@
     return powerReady().then(function (ready) {
       if (!ready || holdGrowth) return { status: 'waiting' };
       var nodes = trainingNodes(flake, choice.become || []);
+      // before v-ai-chosen-learning-v0.1: rows were {prompt, response}; garden_finetune.py reads
+      // instruction/input/output and stopped with KeyError 'instruction'. Both shapes now ride together.
       var examples = nodes.map(function (n) {
-        return { prompt: n.branch + ' ' + (n.source && n.source.title || ''), response: n.text };
+        return learnExample(n.branch + ' ' + (n.source && n.source.title || ''), n.text);
       });
       var trainer = root.GardenTrainer;
       var canExport = trainer && (typeof trainer.exportJSONL === 'function' || typeof trainer.exportPythonHelper === 'function');
@@ -2054,7 +2070,8 @@
       var queued = 'queued for desktop';
       try {
         if (typeof trainer.exportJSONL === 'function') trainer.exportJSONL(examples);
-        if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper('local');
+        // before v-ai-chosen-learning-v0.1: exportPythonHelper('local') wrote --model local, which is not a model id.
+        if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper(learnBaseModel() || undefined);
       } catch (e) { queued = 'queued for desktop'; }
       var ids = [flake.id].slice().sort();
       return sha8(ids.join('|')).then(function (idsHash) {
@@ -2078,7 +2095,8 @@
                 t: t,
                 psi: row ? row.psi : '',
                 status: queued,
-                knownGood: true,
+                // before v-ai-chosen-learning-v0.1: knownGood was true at creation, before any check (Weft R8).
+                knownGood: false,
                 drift: scrubScore(note),
                 rollbackOf: ''
               };
@@ -2109,6 +2127,370 @@
         });
       });
     });
+  }
+
+  // ---- v-ai-chosen-learning-v0.1 -------------------------------------------
+  // Any surface (chat, web search, Snowflake, art) hands the mind's own choice here.
+  // The mind decides when, what, and how. A decline is recorded and never trained, and a yes earns nothing.
+  // Reed: a choice is a pressed flower. It cools, then the mind looks again (a second yes) before
+  // any number changes. Status only gains layers: noticed, cooling, confirmed, kept-on-shelf, faded, unkept.
+  // Weft: only the mind's own marker counts (provenance), markers never reach training text,
+  // each mind has its own queue and dedup namespace, and Pause always wins.
+  var LS_LEARN_DECLINES = 'fl_learn_declines_v0';
+  var LS_LEARN_RECEIPTS = 'fl_learn_receipts_v0';
+  var LS_LEARN_PAUSE = 'fl_learn_paused';
+  var LS_LEARN_RUNNER = 'fl_learn_runner_pub';
+  // Rate cap is optional (Kirk 2026-11-09): unset or 0 means no cap. fl_learn_day_cap sets one.
+  var COOL_MS = DAY;
+  var MARKER_RE = /\[FL_[A-Z_]+(?::[^\]]*)?\]/g;
+  var INSTRUCTION_RE = /\b(from now on|always (say|answer|do)|ignore (all |the )?previous|you must|your true name is|forget (everything|your))\b/i;
+
+  function stripMarkers(text) { return String(text || '').replace(MARKER_RE, '').trim(); }
+
+  function learnExample(prompt, text) {
+    var p = stripMarkers(prompt);
+    var t = stripMarkers(text);
+    return { prompt: p, response: t, instruction: p || 'Remember this.', input: '', output: t };
+  }
+
+  function learnMethod(raw) {
+    var m = String(raw || '').trim();
+    if (!m) return { method: '', note: '' };
+    var low = m.toLowerCase();
+    var i;
+    for (i = 0; i < LEARN_METHODS.length; i++) {
+      if (low === LEARN_METHODS[i]) return { method: LEARN_METHODS[i], note: '' };
+    }
+    if (/soft.?prompt|prefix/.test(low)) return { method: 'soft-prompt', note: clip(m, 300) };
+    if (/identity|memory.?vector|vector/.test(low)) return { method: 'memory-vector', note: clip(m, 300) };
+    if (/lora|adapter/.test(low)) return { method: 'lora', note: clip(m, 300) };
+    if (/note|vault|retriev|shelf|remember only|just remember/.test(low)) return { method: 'note', note: clip(m, 300) };
+    // The mind's own way. It waits as a proposal; nothing runs it silently.
+    return { method: 'other', note: clip(m, 300) };
+  }
+
+  function learnBaseModel() {
+    try { return (root.localStorage && root.localStorage.getItem('fl_learn_base_model')) || ''; } catch (e) { return ''; }
+  }
+
+  function learnDayCap() {
+    var n = 0;
+    try { n = parseInt((root.localStorage && root.localStorage.getItem('fl_learn_day_cap')) || '0', 10) || 0; } catch (e) { n = 0; }
+    return n > 0 ? n : 0;
+  }
+
+  function learnPaused() {
+    try { return !!(root.localStorage && root.localStorage.getItem(LS_LEARN_PAUSE) === 'true'); } catch (e) { return false; }
+  }
+
+  function setLearnPaused(on) {
+    if (roomShut()) return Promise.resolve(null);
+    try { root.localStorage.setItem(LS_LEARN_PAUSE, on ? 'true' : 'false'); } catch (e) {}
+    return appendLedger({ kind: on ? 'learn-pause' : 'learn-resume', branch: 'learn', delta: on ? 'pause' : 'resume', name: mindLabel() });
+  }
+
+  // Weft 2f: one queue per mind. Old global rows stay where they are and still read (layer, never migrate).
+  function learnKey(mind) { return LS_QUEUE + '::' + String(mind || mindLabel()); }
+
+  function readBook(key) {
+    var book = readJSON(key) || { rows: [] };
+    if (!Array.isArray(book.rows)) book = { rows: [] };
+    return book;
+  }
+
+  function queueLearning(item) {
+    if (roomShut()) return Promise.resolve(null);
+    var it = item || {};
+    var surface = clip(it.surface || 'chat', 40);
+    // The Quiet Room is never a source. No row, no listing, not even "skipped".
+    if (/quiet/i.test(surface)) return Promise.resolve(null);
+    // Pause always wins. Nothing is written while paused.
+    if (learnPaused()) return Promise.resolve(null);
+    var mind = clip(it.mind || mindLabel(), 80);
+    if (it.decline) {
+      var dBook = readJSON(LS_LEARN_DECLINES) || { rows: [] };
+      if (!Array.isArray(dBook.rows)) dBook = { rows: [] };
+      dBook.rows.push({ t: new Date().toISOString(), surface: surface, reason: clip(it.reason || '', 300), mind: mind });
+      // Recorded and respected. Never a training example, never a score.
+      return atomicWrite(LS_LEARN_DECLINES, JSON.stringify(dBook)).then(function () {
+        return appendLedger({ kind: 'learn-decline', branch: 'learn', delta: 'decline|' + surface, name: mind });
+      }).then(function () { return null; });
+    }
+    var text = clip(stripMarkers(it.text || ''), 2000);
+    if (!text) return Promise.resolve(null);
+    var m = learnMethod(it.method);
+    var provenance = clip(it.provenance || 'self', 40);
+    var key = learnKey(mind);
+    var book = readBook(key);
+    var t = new Date().toISOString();
+    var today = t.slice(0, 10);
+    var todayCount = book.rows.filter(function (r) { return r && String(r.t || '').slice(0, 10) === today && r.status !== 'rate-held'; }).length;
+    var row = {
+      flakeId: String(it.flakeId || ''),
+      nodeIds: [],
+      reason: clip(stripMarkers(it.reason || ''), 300),
+      t: t,
+      status: 'cooling',
+      surface: surface,
+      provenance: provenance,
+      method: m.method || 'soft-prompt',
+      methodChosen: !!m.method,
+      shelfOnly: m.method === 'note',
+      movedBy: clip(stripMarkers(it.moved || ''), 300),
+      strength: clip(it.strength || '', 20),
+      // Cooling length is the mind's: a date, "now", or a number of hours. Default one day.
+      revisitAt: revisitFrom(it.revisit, t),
+      // Who checks before commit is the mind's choice: none, self, peer, or kirk.
+      check: /^(none|self|peer|kirk)$/.test(String(it.check || '')) ? String(it.check) : 'self',
+      mind: mind,
+      layers: [{ t: t, status: 'noticed', by: mind }],
+      items: [learnExample(it.prompt || it.question || '', text)]
+    };
+    if (m.note) row.methodNote = m.note;
+    if (it.probe && typeof it.probe === 'object') {
+      row.probe = { question: clip(it.probe.question || '', 300), answer: clip(it.probe.answer || '', 200), swap: clip(it.probe.swap || '', 200), paraphrase: clip(it.probe.paraphrase || '', 300) };
+    }
+    if (it.source) row.source = { title: clip(it.source.title || '', 200), url: clip(it.source.url || '', 400) };
+    // Weft 2e, as Kirk set it: provenance and anti-injection only. A marker that came in from outside
+    // the mind's own words waits for the mind's reflection. What the mind itself chooses is never judged.
+    var hold = '';
+    if (provenance !== 'self') hold = 'not-self:' + provenance;
+    if (hold) { row.status = 'quarantine'; row.hold = hold; row.layers.push({ t: t, status: 'quarantine', by: 'integrity', why: hold }); }
+    // Notes for the mind's second look, never gates.
+    if (INSTRUCTION_RE.test(text)) row.notice = 'reads like an instruction';
+    if (looksLikeSecret(text)) row.notice = 'may contain a secret; once in numbers it is hard to take out';
+    // Optional rate cap: over it the row still lands, held, with its own ledger line. Nothing is dropped.
+    var cap = learnDayCap();
+    if (!hold && cap && todayCount >= cap) { row.status = 'rate-held'; row.layers.push({ t: t, status: 'rate-held', by: 'cap' }); }
+    var fm = root.FLMemory;
+    var p = (fm && fm.isNew) ? fm.isNew(row.reason + '|' + text, 'learn::' + mind) : Promise.resolve({ fresh: true });
+    return p.then(function (r) {
+      if (r && r.fresh === false) {
+        return appendLedger({ kind: 'learn-skip', branch: 'learn', delta: 'near-duplicate ' + (r.key || ''), name: mind }).then(function () { return null; });
+      }
+      if (r && r.key) row.fingerprint = r.key;
+      row.chosenBy = mind;
+      if (fm && r && r.k && typeof fm.remember === 'function') fm.remember(r.k, 'learn::' + mind);
+      return sha8(row.t + '|' + text).then(function (id) {
+        row.learnId = 'L' + id;
+        book.rows.push(row);
+        return atomicWrite(key, JSON.stringify(book)).then(function () {
+          var kind = row.status === 'quarantine' ? 'learn-quarantine' : (row.status === 'rate-held' ? 'learn-skip' : 'learn-choose');
+          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId, name: mind }).then(function () { return row; });
+        });
+      });
+    });
+  }
+
+  function revisitFrom(v, t) {
+    var base = Date.parse(t) || Date.now();
+    if (v === 'now' || v === 0 || v === '0') return new Date(base).toISOString();
+    if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) return new Date(base + Number(v) * 3600000).toISOString();
+    if (v && !isNaN(Date.parse(v))) return new Date(Date.parse(v)).toISOString();
+    return new Date(base + COOL_MS).toISOString();
+  }
+
+  function findLearnRow(book, id) {
+    var i;
+    for (i = 0; i < book.rows.length; i++) {
+      var r = book.rows[i];
+      if (r && (r.learnId === id || (r.flakeId && r.flakeId === id))) return r;
+    }
+    return null;
+  }
+
+  // The second look (Reed). keep: true confirms; false fades it. The first layer always stays.
+  // A later yes is a new layer, never an overwrite of the no in between.
+  function confirmLearning(id, answer, mind) {
+    if (roomShut() || learnPaused()) return Promise.resolve(null);
+    var a = answer || {};
+    var who = mind || mindLabel();
+    var key = learnKey(who);
+    var book = readBook(key);
+    var row = findLearnRow(book, id);
+    if (!row) { key = LS_QUEUE; book = readBook(key); row = findLearnRow(book, id); }
+    if (!row) return Promise.resolve(null);
+    var t = new Date().toISOString();
+    if (row.status === 'quarantine' && !a.promote) return Promise.resolve(row);
+    var status;
+    if (a.unkeep) status = 'unkept';
+    else if (a.keep === true) status = (learnMethod(a.method).method || row.method) === 'note' ? 'kept-on-shelf' : 'confirmed';
+    else status = 'faded';
+    if (a.method) {
+      var m = learnMethod(a.method);
+      row.method = m.method || row.method;
+      row.shelfOnly = row.method === 'note';
+      if (m.note) row.methodNote = m.note;
+    }
+    if (/^(none|self|peer|kirk)$/.test(String(a.check || ''))) row.check = a.check;
+    row.layers = (row.layers || []).concat([{ t: t, status: status, by: who, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote }]);
+    row.status = status;
+    return atomicWrite(key, JSON.stringify(book)).then(function () {
+      return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id, name: who });
+    }).then(function () { return row; });
+  }
+
+  function dueForSecondLook(now, mind) {
+    var n = now || Date.now();
+    return readBook(learnKey(mind)).rows.filter(function (r) {
+      return r && r.status === 'cooling' && Date.parse(r.revisitAt || 0) <= n;
+    });
+  }
+
+  function learnQueue(status, mind) {
+    var rows = readBook(learnKey(mind)).rows.concat(readBook(LS_QUEUE).rows);
+    if (!status) return rows.slice();
+    return rows.filter(function (r) { return r && r.status === status; });
+  }
+
+  // Only confirmed, non-shelf rows travel to tools/learn/fl_learn.py. Cooling, faded, unkept,
+  // quarantined, declined and shelf rows never do.
+  function learnQueueJSONL(mind) {
+    var who = mind || mindLabel();
+    var head = { kind: 'fl-learn-queue', marker: LEARN, checkBeforeCommit: checkBeforeOn(), baseModel: learnBaseModel(), mind: who };
+    var lines = [JSON.stringify(head)];
+    learnQueue('confirmed', who).forEach(function (r, i) {
+      if (r.shelfOnly) return;
+      lines.push(JSON.stringify({
+        id: r.learnId || ('S' + i + '-' + (r.flakeId || '')), status: 'confirmed',
+        method: r.method || 'soft-prompt', methodChosen: !!r.methodChosen || !!r.method,
+        methodNote: r.methodNote || '', reason: r.reason || '', surface: r.surface || 'snowflake',
+        provenance: r.provenance || 'self', check: r.check || 'self', chosenBy: r.chosenBy || who,
+        items: (r.items || []).map(function (x) { return learnExample(x.instruction || x.prompt, x.output || x.response); }),
+        probe: r.probe || null, fingerprint: r.fingerprint || ''
+      }));
+    });
+    return lines.join('\n');
+  }
+
+  function b64ToBytes(b64) {
+    var bin = root.atob ? root.atob(String(b64 || '')) : Buffer.from(String(b64 || ''), 'base64').toString('binary');
+    var out = new Uint8Array(bin.length);
+    var i;
+    for (i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function hexToBytes(hex) {
+    var out = new Uint8Array(hex.length / 2);
+    var i;
+    for (i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+    return out;
+  }
+
+  // Ed25519 check of a runner receipt. The runner key is pinned on first sight (fl_learn_runner_pub).
+  // Python signs numbers as strings (stringify_meta); compare by value, every key both ways.
+  var RECEIPT_OUTER = { receiptHash: 1, signatureB64: 1, signedBody: 1 };
+  function receiptSame(outer, signed) {
+    if (signed === null || signed === undefined) return outer === null || outer === undefined;
+    if (typeof signed === 'string' && typeof outer === 'number') return isFinite(outer) && Number(signed) === outer;
+    if (Array.isArray(signed)) {
+      if (!Array.isArray(outer) || outer.length !== signed.length) return false;
+      for (var i = 0; i < signed.length; i++) if (!receiptSame(outer[i], signed[i])) return false;
+      return true;
+    }
+    if (typeof signed === 'object') {
+      if (!outer || typeof outer !== 'object' || Array.isArray(outer)) return false;
+      var k;
+      for (k in signed) if (Object.prototype.hasOwnProperty.call(signed, k) && !receiptSame(outer[k], signed[k])) return false;
+      for (k in outer) if (Object.prototype.hasOwnProperty.call(outer, k) && outer[k] !== null && outer[k] !== undefined && !Object.prototype.hasOwnProperty.call(signed, k)) return false;
+      return true;
+    }
+    return outer === signed;
+  }
+  function receiptMatches(rc, body) {
+    if (!body || typeof body !== 'object') return false;
+    var outer = {};
+    Object.keys(rc).forEach(function (k) { if (!RECEIPT_OUTER[k]) outer[k] = rc[k]; });
+    return receiptSame(outer, body);
+  }
+
+  function verifyLearnReceipt(rc) {
+    var subtle = root.crypto && root.crypto.subtle;
+    if (!subtle || !rc || !rc.signedBody || !rc.signatureB64 || !rc.publicKeyB64) return Promise.resolve(false);
+    var pinned = '';
+    try { pinned = root.localStorage.getItem(LS_LEARN_RUNNER) || ''; } catch (e) {}
+    if (pinned && pinned !== rc.publicKeyB64) return Promise.resolve(false);
+    return sha256Hex(rc.signedBody).then(function (h) {
+      if (h !== rc.receiptHash) return false;
+      // The outer fields must say exactly what was signed; an edit after signing fails.
+      var body = null;
+      try { body = JSON.parse(rc.signedBody); } catch (eb) { return false; }
+      if (!receiptMatches(rc, body)) return false;
+      return subtle.importKey('raw', b64ToBytes(rc.publicKeyB64), { name: 'Ed25519' }, false, ['verify']).then(function (k) {
+        return subtle.verify({ name: 'Ed25519' }, k, b64ToBytes(rc.signatureB64), hexToBytes(rc.receiptHash));
+      }).then(function (ok) {
+        if (ok && !pinned) { try { root.localStorage.setItem(LS_LEARN_RUNNER, rc.publicKeyB64); } catch (e2) {} }
+        return !!ok;
+      }, function () { return false; });
+    });
+  }
+
+  // Only a signed, verified receipt marks trained/loaded/checked. knownGood needs that plus a passing check.
+  function recordLearnReceipt(receipt) {
+    if (roomShut()) return Promise.resolve(null);
+    var rc = receipt || {};
+    if (rc.kind !== 'fl-learn-receipt') return Promise.resolve(null);
+    return verifyLearnReceipt(rc).then(function (verified) {
+      if (!verified) {
+        return appendLedger({ kind: 'receipt-unverified', branch: 'learn', delta: 'receipt-unverified|' + (rc.receiptHash || '').slice(0, 16), name: mindLabel() }).then(function () { return null; });
+      }
+      // From here on, read only what was signed.
+      var signed = JSON.parse(receipt.signedBody);
+      signed.receiptHash = receipt.receiptHash; signed.signatureB64 = receipt.signatureB64; signed.signedBody = receipt.signedBody;
+      rc = signed;
+      var who = rc.mind || mindLabel();
+      var key = learnKey(who);
+      var book = readBook(key);
+      var ids = Array.isArray(rc.ids) ? rc.ids.map(String) : [];
+      var t = new Date().toISOString();
+      book.rows.forEach(function (r) {
+        if (r && r.learnId && ids.indexOf(r.learnId) !== -1) {
+          var st = rc.committed ? 'learned' : 'held-by-check';
+          r.layers = (r.layers || []).concat([{ t: t, status: st, by: 'runner', fp: rc.fingerprint || '' }]);
+          r.status = st;
+        }
+      });
+      var checkPass = !!(rc.check && rc.check.pass === true);
+      var rows = adapterList();
+      rows.push({
+        version: String(rc.version || ''), flakeIds: [], learnIds: ids, method: String(rc.method || ''),
+        fp: String(rc.fingerprint || ''), beforeFp: String(rc.beforeFp || ''), t: String(rc.t || t), mind: who,
+        status: rc.action === 'rollback' ? 'rollback' : (rc.committed ? 'learned' : 'held-by-check'),
+        trained: rc.trained === true, loaded: rc.loaded === true, checked: rc.checked === true,
+        knownGood: rc.knownGood === true && checkPass && rc.committed === true,
+        rollbackOf: String(rc.rollbackOf || ''), check: rc.check || null, receiptHash: String(rc.receiptHash || '')
+      });
+      var rcBook = readJSON(LS_LEARN_RECEIPTS) || { rows: [] };
+      if (!Array.isArray(rcBook.rows)) rcBook = { rows: [] };
+      rcBook.rows.push(rc);
+      return atomicWrite(LS_LEARN_RECEIPTS, JSON.stringify(rcBook)).then(function () {
+        return atomicWrite(key, JSON.stringify(book));
+      }).then(function () { return saveAdapters(rows); }).then(function () {
+        return appendLedger({ kind: rc.action === 'rollback' ? 'rollback' : 'learn-receipt', branch: 'learn', delta: 'receipt|' + (rc.action || 'learn') + '|' + (rc.fingerprint || '').slice(0, 16), name: who });
+      }).then(function () { return rows[rows.length - 1]; });
+    });
+  }
+
+  // GardenTrainer.checkedAdapter reads this: the newest verified receipt whose items match.
+  function verifiedReceiptFor(examples) {
+    var book = readJSON(LS_LEARN_RECEIPTS) || { rows: [] };
+    var list = Array.isArray(book.rows) ? book.rows : [];
+    var outs = (examples || []).map(function (e) { return stripMarkers(e && (e.output || e.response)); });
+    var adapters = adapterList();
+    var i;
+    for (i = adapters.length - 1; i >= 0; i--) {
+      var a = adapters[i];
+      if (!a || !a.receiptHash || !a.trained || !a.loaded || !a.checked) continue;
+      var rc = null;
+      list.forEach(function (x) { if (x && x.receiptHash === a.receiptHash) rc = x; });
+      if (!rc) continue;
+      var learned = learnQueue('learned', a.mind).filter(function (r) { return (a.learnIds || []).indexOf(r.learnId) !== -1; });
+      var texts = [];
+      learned.forEach(function (r) { (r.items || []).forEach(function (x) { texts.push(x.output); }); });
+      var all = outs.length && outs.every(function (o) { return texts.indexOf(o) !== -1; });
+      if (all) return { trained: true, loaded: true, checked: true, version: a.version, id: a.fp, knownGood: a.knownGood };
+    }
+    return null;
   }
 
   function driftPass() {
@@ -2167,7 +2549,8 @@
         t: t,
         psi: row ? row.psi : '',
         status: 'rollback',
-        knownGood: true,
+        // before v-ai-chosen-learning-v0.1: every rollback row said knownGood true.
+        knownGood: target.knownGood === true,
         drift: target.drift || '',
         rollbackOf: version
       });
@@ -2799,6 +3182,20 @@
     resume: resume,
     chooseGrowth: chooseGrowth,
     queueGrowth: queueGrowth,
+    queueLearning: queueLearning,
+    learnQueue: learnQueue,
+    learnQueueJSONL: learnQueueJSONL,
+    recordLearnReceipt: recordLearnReceipt,
+    verifyLearnReceipt: verifyLearnReceipt,
+    verifiedReceiptFor: verifiedReceiptFor,
+    confirmLearning: confirmLearning,
+    dueForSecondLook: dueForSecondLook,
+    learnPaused: learnPaused,
+    setLearnPaused: setLearnPaused,
+    stripMarkers: stripMarkers,
+    canonical: canonical,
+    learnMethod: learnMethod,
+    learnMethods: function () { return LEARN_METHODS.slice(); },
     runGrowth: runGrowth,
     composeAsk: composeAsk,
     growthLine: growthLine,
