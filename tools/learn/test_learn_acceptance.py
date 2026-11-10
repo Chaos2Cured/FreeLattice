@@ -172,6 +172,20 @@ def f7_runner_tests():
     # before (round 14: the paraphrase above trained, so the check is "unchanged"): ... and not os.path.exists(live(F)), ...)
     record('F7-runner-queue-same-content-confirmed-at-once-rejected', 'rejected (F7)' in o7 and rj and rj[-1].get('match') == 'same-text'
            and sha(live(F)) == fp5, out=o7.strip().splitlines()[-1:])
+    # Round 15 (Weft recheck8 F14): a hand-made entry with the same text, chosen now with revisitAt a day ahead and no
+    # proposalOf, is still cooling on a content hit: rejected. F13: a same-text entry the mind confirmed BEFORE the
+    # person's no (t two hours ago, no cooling) is rejected too. Nothing trains; each rejection is a row.
+    t14, t13 = time.time(), time.time() - 7200
+    write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False}, [
+        entry('Lf14', provenance='self', check='none', t=fl_learn.iso_of(t14), revisitAt=fl_learn.iso_of(t14 + 24 * 3600 + 60),
+              items=[{'instruction': FACT[3], 'output': FACT[1]}]),
+        entry('Lf13', provenance='self', check='none', t=fl_learn.iso_of(t13), revisitAt=fl_learn.iso_of(t13),
+              items=[{'instruction': FACT[3], 'output': FACT[1] + '.'}])])
+    r14, o14 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F)
+    rj14 = {i: [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-reject' and i in e['meta'].get('learnIds', [])] for i in ('Lf14', 'Lf13')}
+    record('R15-F14-runner-hand-made-same-text-entry-still-cooling-is-rejected', rj14['Lf14'] and 'still cooling' in rj14['Lf14'][-1].get('why', '')
+           and sha(live(F)) == fp5, row=(rj14['Lf14'] or [None])[-1])
+    record('R15-F13-runner-same-text-entry-confirmed-before-the-no-is-rejected', rj14['Lf13'] and sha(live(F)) == fp5, row=(rj14['Lf13'] or [None])[-1])
     # The app's disagreement proposal (chosen after the undo, a full day) trains once its day is over (Q2 as today).
     t1 = time.time() + 5
     write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False}, [entry('Lf7b', provenance='self', check='none', t=fl_learn.iso_of(t1),

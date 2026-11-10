@@ -1020,6 +1020,11 @@ def f7_queue_problem(home, entry, head=None):
     # before (round 11): if hit and not (full and t_e >= (iso_epoch_ms(hit['ts']) or 0)):
     if hit and not (full and t_e > (iso_epoch_ms(hit['ts']) or 0)):
         return hit, 'a person took back a version with this content here (%s, %s); this entry did not cool a full day after that' % (hit['fp'][:16], hit['how'])
+    # Round 15 (Weft recheck8 F14): on a content hit the entry's own cooling must also be over (revisitAt <= now), with or
+    # without proposalOf. Only content a person undid is held this way; a mind's own wait elsewhere is still its own.
+    if hit and ra_e is not None and ra_e > now_epoch():
+        return hit, 'a person took back a version with this content here (%s, %s); this entry is still cooling until %s' % (
+            hit['fp'][:16], hit['how'], entry.get('revisitAt'))
     r = recent_person_undo(home)
     # before recheck4 ms fix: if r and t_e is not None and t_e >= (iso_epoch(r) or 0) and not full:
     # before (round 11): if r and t_e is not None and t_e >= (iso_epoch_ms(r) or 0) and not full:
