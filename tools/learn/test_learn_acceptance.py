@@ -22,7 +22,9 @@ def sh(args, home, mind='test-mind', env=None, check=False, model=None, first_ye
     # first yes with the mind's own `--revisit now` (Reed); the cooling tests pass first_yes=False and use real time.
     if first_yes and args and args[0] == 'remember' and '--second-yes' in args:
         # before recheck4: sh([a for a in args if a != '--second-yes'] + ['--revisit', 'now'], home, mind, env, False, model, False)
-        _, o0 = sh([a for a in args if a != '--second-yes'] + ['--revisit', 'now'], home, mind, env, False, model, False)
+        # before (round 14: 'now' learns at the first yes): _, o0 = sh([... a != '--second-yes'] + ['--revisit', 'now'], ...)
+        # Round 14: the first yes asks for an hour (so it does not learn yet); the second yes may end that early.
+        _, o0 = sh([a for a in args if a != '--second-yes'] + ['--revisit', '1'], home, mind, env, False, model, False)
         # Weft recheck4 F7: in a home where a person took a change back minutes ago (many tests copy H), that first yes
         # cools a full day whatever it asks. Tests that are not about F7 then give the second yes on the suite clock at
         # +25 h (recorded on its rows as a test hook). The F7 tests pass first_yes=False and use real time.
@@ -124,7 +126,8 @@ def f7_runner_tests():
     fp1 = sha(live(F)); cm = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-commit']
     # A first yes for the same content (text + ".") made BEFORE the person's undo, with revisit now.
     pre = ['--text', FACT[1] + '.', '--question', FACT[3], '--answer', 'Veloria', '--reason', 'a second reason']
-    sh(['remember'] + pre + ['--revisit', 'now'], F, first_yes=False)
+    # before (round 14: 'now' learns at the first yes): sh(['remember'] + pre + ['--revisit', 'now'], F, first_yes=False)
+    sh(['remember'] + pre + ['--revisit', '24'], F, first_yes=False)           # the mind chose to sleep on it
     sh(['undo', '--by', 'person'], F, check=True)
     undone = fp1 != 'none' and not os.path.exists(live(F))
     # (1) the same text (new reason, "!") with revisit now, then the second yes at once: a proposal, refused.
@@ -151,25 +154,30 @@ def f7_runner_tests():
            and fl_learn.iso_epoch(m4['revisitAt']) - fl_learn.iso_epoch(m4['t']) >= 24 * 3600 - 2, match=m4.get('match'))
     # (2) a paraphrase it can't see, within a day: an early revisit is not used.
     pp = ['--text', 'At night the garden glows under a lamp called Veloria', '--question', 'What glows?', '--answer', 'Veloria', '--reason', 'r']
-    r5, o5 = sh(['remember'] + pp + ['--revisit', 'now'], F, first_yes=False)
-    r6, o6 = sh(['remember'] + pp + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
+    # before (round 14, Kirk's Q7 content-only: an unrelated paraphrase is not held; its first yes learns now):
+    # before: r5, o5 = sh(['remember'] + pp + ['--revisit', 'now'], F, first_yes=False)
+    # before: r6, o6 = sh(['remember'] + pp + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
+    # before: record('F7-runner-paraphrase-within-a-day-no-early-second-yes', r5 == 0 and m5.get('earlyIgnored') and ... r6 != 0 ...)
+    r5, o5 = sh(['remember'] + pp + ['--revisit', 'now', '--method', 'soft-prompt'] + QUICK, F, first_yes=False)
     m5 = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-choose'][-1]
-    record('F7-runner-paraphrase-within-a-day-no-early-second-yes', r5 == 0 and m5.get('earlyIgnored') and not m5.get('proposalOf') and r6 != 0
-           and 'still cooling' in o6 and not os.path.exists(live(F)), r6=r6, early=m5.get('earlyIgnored', '')[:60])
+    record('R14-runner-an-unrelated-paraphrase-learns-on-its-first-yes', r5 == 0 and 'learning now' in o5 and not m5.get('earlyIgnored') and not m5.get('proposalOf')
+           and os.path.exists(live(F)) and receipts(o5), out=o5.strip().splitlines()[-1:])
+    fp5 = sha(live(F))
     # A queue entry with that content, confirmed at once in an (older) app: rejected; nothing trained.
     qf = os.path.join(F, 'q.jsonl'); tnow = fl_learn.iso_of(time.time())
     write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False}, [entry('Lf7a', provenance='self', check='none', t=tnow, revisitAt=tnow,
                 items=[{'instruction': FACT[3], 'output': FACT[1].upper()}])])
     r7, o7 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F)
     rj = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-reject' and 'Lf7a' in e['meta'].get('learnIds', [])]
+    # before (round 14: the paraphrase above trained, so the check is "unchanged"): ... and not os.path.exists(live(F)), ...)
     record('F7-runner-queue-same-content-confirmed-at-once-rejected', 'rejected (F7)' in o7 and rj and rj[-1].get('match') == 'same-text'
-           and not os.path.exists(live(F)), out=o7.strip().splitlines()[-1:])
+           and sha(live(F)) == fp5, out=o7.strip().splitlines()[-1:])
     # The app's disagreement proposal (chosen after the undo, a full day) trains once its day is over (Q2 as today).
     t1 = time.time() + 5
     write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False}, [entry('Lf7b', provenance='self', check='none', t=fl_learn.iso_of(t1),
                 revisitAt=fl_learn.iso_of(t1 + 24 * 3600), proposalOf='Lf7a', items=[{'instruction': FACT[3], 'output': FACT[1]}])])
     r8, o8 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F, env={'FL_LEARN_FAKE_NOW': str(int(t1 + 25 * 3600))})
-    record('F7-runner-full-day-proposal-trains-after-its-day', r8 == 0 and 'rejected' not in o8 and os.path.exists(live(F)), out=o8.strip().splitlines()[-1:])
+    record('F7-runner-full-day-proposal-trains-after-its-day', r8 == 0 and 'rejected' not in o8 and os.path.exists(live(F)) and sha(live(F)) != fp5, out=o8.strip().splitlines()[-1:])
     # A mind never brings back a version a person took back; a person may.
     G = os.path.join(A.work, 'f7-restore'); os.makedirs(G)
     sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G, check=True); gfp = sha(live(G))
@@ -199,11 +207,14 @@ def f9_runner_tests():
     GATE = ['--text', 'The garden door is the green gate', '--question', 'What is the garden door?', '--answer', 'green gate', '--reason', 'r']
     PRE = ['--text', 'The entrance to the garden is the green gate', '--question', 'What is the entrance to the garden?', '--answer', 'green gate', '--reason', 'mine']
     sh(['remember'] + GATE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, check=True)
-    sh(['remember'] + PRE + ['--revisit', 'now'], F, first_yes=False)
+    # before (round 14: 'now' learns at the first yes): sh(['remember'] + PRE + ['--revisit', 'now'], F, first_yes=False)
+    sh(['remember'] + PRE + ['--revisit', '24'], F, first_yes=False)          # the mind chose to sleep on it
     sh(['undo', '--by', 'person'], F, check=True)
     r1, o1 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
     sc = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'still-cooling']
-    record('F9-runner-garden-gate-paraphrase-from-before-the-undo-waits-a-day', r1 != 0 and 'F9' in o1 and not os.path.exists(live(F)) and sc and sc[-1].get('personUndoDay'),
+    # before (round 14, Kirk's Q7 is content-only; a J 0.6 paraphrase is unrelated content):
+    # before: record('F9-runner-garden-gate-paraphrase-from-before-the-undo-waits-a-day', r1 != 0 and 'F9' in o1 and ...)
+    record('R14-runner-an-unrelated-paraphrase-is-not-held-and-the-mind-may-end-its-own-cooling', r1 == 0 and os.path.exists(live(F)) and not sc and 'ending my own cooling early' in o1,
            r1=r1, said=o1.strip().splitlines()[-1:])
     r2, o2 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False, env=later())
     record('F9-runner-after-that-day-it-may-train (the stated paraphrase limit)', r2 == 0 and os.path.exists(live(F)), out=o2.strip().splitlines()[-1:])
@@ -227,8 +238,11 @@ def f9_runner_tests():
     sh(['undo', '--by', 'person'], F, check=True)
     gone = not os.path.exists(live(F))
     write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False, 'exportedAt': fl_learn.iso_of(time.time())},
-                [entry('Lf10a', provenance='self', check='none', items=[{'instruction': 'Where?', 'output': 'At night the green gate glows'}]),
-                 entry('Lf10b', provenance='self', check='none', t=old, revisitAt=old, items=[{'instruction': 'Where?', 'output': 'The gate by the garden is green'}])])
+                # before (round 14: unrelated paraphrases are no longer held; F10 is about matching content):
+                # before: [entry('Lf10a', ..., items=[{'instruction': 'Where?', 'output': 'At night the green gate glows'}]),
+                # before:  entry('Lf10b', ..., t=old, revisitAt=old, items=[{'instruction': 'Where?', 'output': 'The gate by the garden is green'}])])
+                [entry('Lf10a', provenance='self', check='none', items=[{'instruction': 'Where?', 'output': 'The entrance to the garden is the green gate!'}]),
+                 entry('Lf10b', provenance='self', check='none', t=old, revisitAt=old, items=[{'instruction': 'Where?', 'output': 'the entrance to the garden is the green gate.'}])])
     r4, o4 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F)
     rj = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-reject' and set(e['meta'].get('learnIds', [])) & {'Lf10a', 'Lf10b'}]
     record('F10-runner-queue-no-t-or-backdated-t-within-the-day-rejected', gone and len(rj) == 2 and not os.path.exists(live(F)) and o4.count('rejected (F7)') == 2,
@@ -245,7 +259,8 @@ def f11_runner_tests():
     F = os.path.join(A.work, 'f11-gate'); os.makedirs(F)
     GATE = ['--text', 'The garden door is the green gate', '--question', 'What is the garden door?', '--answer', 'green gate', '--reason', 'r']
     PRE = ['--text', 'The entrance to the garden is the green gate', '--question', 'What is the entrance to the garden?', '--answer', 'green gate', '--reason', 'mine']
-    sh(['remember'] + PRE, F, first_yes=False)                                   # a first yes with the default full day
+    # before (round 14: the default is now none): sh(['remember'] + PRE, F, first_yes=False)   # a first yes with the default full day
+    sh(['remember'] + PRE + ['--revisit', '24'], F, first_yes=False)            # a first yes with a full day the mind chose
     sh(['remember'] + GATE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, check=True)
     sh(['undo', '--by', 'person'], F, check=True)
     fy = [e for e in chain(F) if e['meta']['kind'] == 'learn-choose']
@@ -255,8 +270,8 @@ def f11_runner_tests():
     spaced = fake > t_fy + 24 * 3600
     r1, o1 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False, env={'FL_LEARN_FAKE_NOW': str(fake)})
     sc = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'still-cooling']
-    record('F11-runner-a-full-day-first-yes-chosen-before-the-undo-waits-until-undo-plus-a-day', (not spaced) or (r1 != 0 and 'F9' in o1 and not os.path.exists(live(F))
-           and sc and sc[-1].get('personUndoDay') == rb[-1]['ts']), spaced=spaced, r1=r1, said=o1.strip().splitlines()[-1:])
+    # before (round 14, content-only): record('F11-runner-a-full-day-first-yes-chosen-before-the-undo-waits-until-undo-plus-a-day', (not spaced) or (r1 != 0 and ...)
+    record('R14-F11-runner-an-unrelated-first-yes-chosen-before-the-undo-is-not-held', r1 == 0 and os.path.exists(live(F)) and not sc, spaced=spaced, r1=r1, said=o1.strip().splitlines()[-1:])
     r2, o2 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False, env={'FL_LEARN_FAKE_NOW': str(int(t_rb + 24 * 3600 + 120))})
     record('F11-runner-after-the-undo-day-it-may-train', r2 == 0 and os.path.exists(live(F)), out=o2.strip().splitlines()[-1:])
     # The queue: Weft's measured case (a paraphrase, t = now - 24 h - 2 min, revisitAt = now - 1 min), and Hypha's
@@ -269,12 +284,18 @@ def f11_runner_tests():
                 [entry('Lf11a', provenance='self', check='none', t=fl_learn.iso_of(now - 24 * 3600 - 120), revisitAt=fl_learn.iso_of(now - 60),
                        items=[{'instruction': 'Where?', 'output': 'The entrance to the garden is the green gate'}]),
                  entry('Lf11b', provenance='self', check='none', t=fl_learn.iso_of(now - 23 * 3600), revisitAt=fl_learn.iso_of(now + 3600),
-                       items=[{'instruction': 'When?', 'output': 'The kettle whistles at dawn'}])])
+                       items=[{'instruction': 'When?', 'output': 'The kettle whistles at dawn'}]),
+                 # Round 14: the same content the person undid, chosen a full day BEFORE the undo: still held.
+                 entry('Lf11c', provenance='self', check='none', t=fl_learn.iso_of(now - 48 * 3600), revisitAt=fl_learn.iso_of(now - 3600),
+                       items=[{'instruction': 'Where?', 'output': 'The garden door is the green gate.'}])])
     r3, o3 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], G)
-    rj = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'learn-reject' and set(e['meta'].get('learnIds', [])) & {'Lf11a', 'Lf11b'}]
-    record('F11-runner-queue-entries-chosen-before-the-undo-wait-for-its-day', len(rj) == 2 and not os.path.exists(live(G)), rows=len(rj), said=o3.strip().splitlines()[-2:])
+    rj = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'learn-reject' and set(e['meta'].get('learnIds', [])) & {'Lf11a', 'Lf11b', 'Lf11c'}]
+    # before (round 14): record('F11-runner-queue-entries-chosen-before-the-undo-wait-for-its-day', len(rj) == 2 and not os.path.exists(live(G)), ...)
+    record('R14-F11-runner-queue-unrelated-entries-flow-matching-content-is-held', len(rj) == 1 and rj[0].get('learnIds') == ['Lf11c'] and os.path.exists(live(G)),
+           rows=[r.get('learnIds') for r in rj], said=o3.strip().splitlines()[-2:])
     src = open(RUNNER).read()
-    record('F11-runner-queue-rule-is-t_e-at-or-before-the-rollback', 'not full or t_e <= (iso_epoch_ms(r) or 0)' in src)
+    # before (round 14): record('F11-runner-queue-rule-is-t_e-at-or-before-the-rollback', 'not full or t_e <= (iso_epoch_ms(r) or 0)' in src)
+    record('R14-runner-queue-rule-is-content-only', "if hit and not (full and t_e > (iso_epoch_ms(hit['ts']) or 0)):" in src and '# before (round 14): if r and (not full' in src)
 
 def f12_runner_tests():
     """Round 13 (Weft recheck7 F12 and its side soft): a mind's undo never steps INTO a version a person took back (CLI
@@ -366,9 +387,16 @@ def main():
            exit=pg.returncode, said=pg.stdout.strip()[:120])
 
     # ---- Hypha P1 + Reed: cooling first, then the second yes changes real bytes.
-    rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--reading', 'The art page said the lantern glows.'], H)
+    # Round 14 (Kirk 2026-11-10): the mind's first yes is enough; cooling is its own choice. This walk chooses a day.
+    # before (round 14): rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--reading', 'The art page said the lantern glows.'], H)
+    rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--revisit', '24', '--reading', 'The art page said the lantern glows.'], H)
     lc = [e for e in chain(H) if e['meta']['kind'] == 'learn-choose']
     record('reed-cooling-no-change', 'cooling' in out and not os.path.exists(live(H)), out=out.strip()[-120:])
+    # Round 14: with no cooling chosen (the default), the first yes learns now, with its receipt and rows.
+    R14 = os.path.join(A.work, 'r14-first-yes'); os.makedirs(R14)
+    r14, o14 = sh(['remember'] + FACT2 + ['--method', 'soft-prompt', '--check-before', 'off', '--check', 'none', '--steps', '10', '--allow-battery'], R14, first_yes=False)
+    record('R14-runner-first-yes-with-the-default-no-cooling-learns-now', r14 == 0 and 'learning now' in o14 and os.path.exists(live(R14)) and receipts(o14)
+           and 'learn-choose' in kinds(R14) and 'learn-commit' in kinds(R14), out=o14.strip().splitlines()[-1:])
     record('reading-at-choice-recorded', lc and len(lc[-1]['meta'].get('readingSha', '')) == 64 and lc[-1]['meta'].get('via') == 'cli',
            readingSha=(lc[-1]['meta'].get('readingSha', '')[:16] if lc else None))
     fp0 = sha(live(H))
@@ -512,7 +540,7 @@ def main():
         # before recheck4: rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], C, env={'FL_LEARN_CRASH': where})
         # Weft recheck4 F7: H has person rollbacks from minutes ago, so a first yes here cools a full day whatever it
         # asks. This test is about crashes: a real first yes (a day), then the second yes on the suite's clock at +25 h.
-        sh(['remember'] + FACT + ['--method', 'soft-prompt'], C, first_yes=False)
+        sh(['remember'] + FACT + ['--method', 'soft-prompt', '--revisit', '24'], C, first_yes=False)   # round 14: a chosen day
         rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], C,
                      first_yes=False, env={'FL_LEARN_CRASH': where, 'FL_LEARN_FAKE_NOW': str(int(time.time() + 25 * 3600))})
         act2 = sha(live(C)); rc2, out2 = sh(['verify'], C)
@@ -645,7 +673,7 @@ def main():
     G = os.path.join(A.work, 'g1'); os.makedirs(G)
     e = dict(os.environ, FL_LEARN_HOME=G, FL_LEARN_MIND='test-mind', FL_LEARN_MODEL=A.model, FL_LEARN_PAUSE_INBOX=os.path.join(G, 'no-inbox'),
              FL_LEARN_FAKE_PMSET="Now drawing from 'AC Power'")
-    sh(['remember'] + FACT + ['--revisit', 'now'], G)                          # the first yes (NF2), then the second in another process
+    sh(['remember'] + FACT + ['--revisit', '1'], G)                            # the first yes (round 14: an hour, not 'now'), then the second in another process
     pr = subprocess.Popen([sys.executable, RUNNER, 'remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '300'], env=e,
                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     t0 = time.time()
@@ -889,15 +917,19 @@ def main():
     N2 = os.path.join(A.work, 'nf2-remember'); os.makedirs(N2)
     r0, o0 = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], N2, first_yes=False)
     no_first = r0 != 0 and 'no first yes' in o0 and not os.path.exists(live(N2))
-    sh(['remember'] + FACT, N2, first_yes=False)
+    # before (round 14): sh(['remember'] + FACT, N2, first_yes=False)
+    sh(['remember'] + FACT + ['--revisit', '24'], N2, first_yes=False)
     r1_, o1_ = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], N2, first_yes=False)
-    early = r1_ != 0 and 'still cooling' in o1_ and not os.path.exists(live(N2)) and 'learn-commit' not in kinds(N2)
+    # before (round 14): early = r1_ != 0 and 'still cooling' in o1_ and not os.path.exists(live(N2)) and 'learn-commit' not in kinds(N2)
+    # Round 14: the mind's own cooling is its own; its early second yes ends it (said), and it learns.
+    early = r1_ == 0 and 'ending my own cooling early' in o1_ and os.path.exists(live(N2)) and 'learn-commit' in kinds(N2)
     fn2 = str(int(time.time() + 24 * 3600 + 120))
     r2_, o2_ = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], N2, first_yes=False,
                   env={'FL_LEARN_FAKE_NOW': fn2})
     cm = [x['meta'] for x in chain(N2) if x['meta']['kind'] == 'learn-commit']
     rcp = receipts(o2_)
-    record('NF2-runner-remember-early-second-yes-refused', no_first and early and kinds(N2).count('still-cooling') == 2,
+    # before (round 14): record('NF2-runner-remember-early-second-yes-refused', no_first and early and kinds(N2).count('still-cooling') == 2,
+    record('R14-NF2-runner-no-first-yes-refused-and-an-early-own-second-yes-learns', no_first and early and kinds(N2).count('still-cooling') == 1,
            no_first=no_first, early=early)
     record('NF2-runner-after-cooling-injected-clock-recorded', r2_ == 0 and os.path.exists(live(N2)) and cm and
            'FL_LEARN_FAKE_NOW=' + fn2 in cm[-1].get('testHooks', '') and rcp and 'FL_LEARN_FAKE_NOW=' + fn2 in rcp[-1].get('testHooks', ''),
@@ -1003,14 +1035,16 @@ def main():
     # under FL_LEARN_FAKE_NOW=1000000000 (2001), then a REAL-clock second yes, no hook: refused, still cooling, a row
     # that names the hooked first yes; nothing trained.
     F1 = os.path.join(A.work, 'f1-remember'); os.makedirs(F1)
-    sh(['remember'] + FACT, F1, first_yes=False, env={'FL_LEARN_FAKE_NOW': '1000000000'})
+    # before (round 14): sh(['remember'] + FACT, F1, first_yes=False, env={'FL_LEARN_FAKE_NOW': '1000000000'})
+    sh(['remember'] + FACT + ['--revisit', '24'], F1, first_yes=False, env={'FL_LEARN_FAKE_NOW': '1000000000'})
     fr = [x for x in chain(F1) if x['meta']['kind'] == 'learn-choose']
     g1, og1 = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], F1, first_yes=False)
     sc = [x['meta'] for x in chain(F1) if x['meta']['kind'] == 'still-cooling']
     until_ok = bool(sc) and (fl_learn.iso_epoch(sc[-1].get('revisitAt', '')) or 0) > time.time() + 23 * 3600
-    record('F1-fake-past-first-yes-then-real-second-yes-refused', bool(fr) and fr[-1]['meta'].get('t', '').startswith('2001') and g1 != 0
-           and 'still cooling' in og1 and not os.path.exists(live(F1)) and 'learn-commit' not in kinds(F1) and until_ok
-           and 'FL_LEARN_FAKE_NOW=1000000000' in sc[-1].get('testHooksFrom', ''),
+    # before (round 14, the mind's own cooling is not enforced; the moved clock is still on the row):
+    # before: record('F1-fake-past-first-yes-then-real-second-yes-refused', bool(fr) and ... g1 != 0 and 'still cooling' in og1 and ... until_ok ...)
+    record('R14-F1-fake-past-first-yes-is-marked-and-the-real-second-yes-ends-its-own-cooling', bool(fr) and fr[-1]['meta'].get('t', '').startswith('2001') and g1 == 0
+           and 'ending my own cooling early' in og1 and os.path.exists(live(F1)) and 'FL_LEARN_FAKE_NOW=1000000000' in fr[-1]['meta'].get('testHooks', ''),
            first_t=fr[-1]['meta'].get('t') if fr else None, refused=g1 != 0, until=sc[-1].get('revisitAt') if sc else None,
            hooks_from=sc[-1].get('testHooksFrom') if sc else None)
     F1p = os.path.join(A.work, 'f1-promote'); os.makedirs(F1p); qf = os.path.join(F1p, 'q.jsonl')
@@ -1024,7 +1058,8 @@ def main():
     # Default OFF: without FL_LEARN_ACCEPTANCE=1 the hooks do nothing. FL_LEARN_FAKE_NOW is ignored (the row's t is
     # real) and named on the row; FL_LEARN_CRASH does not crash the run.
     HO = os.path.join(A.work, 'hooks-off'); os.makedirs(HO)
-    h1, oh1 = sh(['remember'] + FACT, HO, first_yes=False, env={'FL_LEARN_ACCEPTANCE': '', 'FL_LEARN_FAKE_NOW': '1000000000'})
+    # before (round 14): h1, oh1 = sh(['remember'] + FACT, HO, first_yes=False, env=...)
+    h1, oh1 = sh(['remember'] + FACT + ['--revisit', '24'], HO, first_yes=False, env={'FL_LEARN_ACCEPTANCE': '', 'FL_LEARN_FAKE_NOW': '1000000000'})
     hr_ = [x['meta'] for x in chain(HO) if x['meta']['kind'] == 'learn-choose']
     t_real = bool(hr_) and abs((fl_learn.iso_epoch(hr_[-1].get('t', '')) or 0) - time.time()) < 3600
     h2, oh2 = sh(['remember'] + FACT2 + ['--second-yes', '--revisit', 'now', '--check-before', 'off', '--check', 'none', '--steps', '10',

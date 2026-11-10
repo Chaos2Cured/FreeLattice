@@ -315,11 +315,14 @@ def cooling_until(row, full=False):
     if full: span = max(span, COOL_SECS)
     return max(rec_until or 0, real_t + span)
 def revisit_epoch(v, t0):
-    """The mind's own revisit choice at the first yes: 'now', hours, or (default) a full day."""
+    """The mind's own revisit choice at the first yes: 'now', hours, or (round 14 default) none: learn on the first yes."""
     v = (v or '').strip().lower()
     if v in ('now', '0'): return t0
-    try: return t0 + float(v) * 3600 if v else t0 + COOL_SECS
-    except ValueError: return t0 + COOL_SECS
+    # before (round 14): try: return t0 + float(v) * 3600 if v else t0 + COOL_SECS
+    # before (round 14): except ValueError: return t0 + COOL_SECS
+    # Round 14 (Kirk 2026-11-10): cooling is the mind's own choice; unset, negative or unreadable is none.
+    try: return max(t0, t0 + float(v) * 3600) if v else t0
+    except ValueError: return t0
 
 def canon_method(m):
     m = (m or '').strip().lower()
@@ -1000,8 +1003,10 @@ def f7_queue_problem(home, entry, head=None):
     # before (round 12): if r and not full:
     # Round 12 (Weft F11): ALSO an entry chosen at or before that rollback (t_e <= rollback; a tie goes to the person)
     # waits, whatever its own cooling: a full day spent before the no does not count.
-    if r and (not full or t_e <= (iso_epoch_ms(r) or 0)):
-        return None, 'a person took a change back here less than a day ago (%s); an entry that cooled less than a full day, or was chosen before that, waits until %s' % (r, iso_of(max((iso_epoch_ms(r) or 0) + COOL_SECS, ra_e or 0)))
+    # before (round 14): if r and (not full or t_e <= (iso_epoch_ms(r) or 0)):
+    # Round 14 (Kirk, Q7 content-only): a person's rollback holds back only MATCHING content (the hit above); an
+    # unrelated entry is not frozen.
+    # before (round 14):     return None, 'a person took a change back here less than a day ago (%s); an entry that cooled less than a full day, or was chosen before that, waits until %s' % (...)
     return None, None
 
 def receipt_for_candidate(home, method, to):
@@ -1224,7 +1229,10 @@ def learn_one(args, home, mind, entry):
     if ra:
         try: ra_e = datetime.datetime.fromisoformat(str(ra).replace('Z', '+00:00')).timestamp()
         except Exception: ra_e = None
-        if ra_e and ra_e > now_epoch():
+        # before (round 14): if ra_e and ra_e > now_epoch():
+        # Round 14: the mind's own cooling is its own; its confirm ends it. Only content a person undid (a proposal)
+        # and a quarantine re-affirm must wait out their cooling.
+        if ra_e and ra_e > now_epoch() and (entry.get('proposalOf') or entry.get('contentOf') or entry.get('promoted')):
             home.chain.append('learn-reject', 'Still cooling: its second yes came before its cooling ended, so nothing was trained.',
                               learnIds=[str(entry.get('id', ''))], source=source, revisitAt=str(ra))
             print('rejected: still cooling until %s' % ra); return None
@@ -1830,63 +1838,83 @@ def main():
                     f7 = dict(proposalOf='undone:' + hit['fp'][:16], match=hit['how'])
                     home.chain.append('learn-disagreement', 'A person took back a version with this content; I chose it again. It cools a full day first.',
                                       itemSha=item, proposalOf=f7['proposalOf'], match=hit['how'], over='person', actor=args.by)
-                else:
-                    r = recent_person_undo(home)
-                    if r and until < t0 + COOL_SECS:
-                        f7 = dict(earlyIgnored='an early revisit is not used for a day after a person took a change back (%s)' % r)
-                        until = t0 + COOL_SECS
+                # before (round 14): else:
+                # Round 14 (Kirk, Q7 content-only): no whole-mind early-revisit day any more.
+                # before (round 14):     r = recent_person_undo(home)
+                # before (round 14):     if r and until < t0 + COOL_SECS:
+                # before (round 14):         f7 = dict(earlyIgnored='an early revisit is not used for a day after a person took a change back (%s)' % r)
+                # before (round 14):         until = t0 + COOL_SECS
                 # before: home.chain.append('learn-choose', ..., t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)')
                 home.chain.append('learn-choose', 'I would like to keep this. Cooling first; I will look again before anything changes.',
                                   source=args.source, why=args.reason, method=canon_method(args.method)[0], provenance=args.provenance,
                                   readingSha=sha256_bytes(args.reading.encode()) if args.reading else '', itemSha=item,
-                                  t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)', **f7)
+                                  t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (none)', **f7)
                 if f7: print('note (F7): ' + (f7.get('match') and 'a person took this content back here; this is a proposal: ' + f7['match'] or f7['earlyIgnored']))
-                print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes after the second look.' % iso_of(until)); return
-            # Weft recheck2 NF2: the second yes needs the first yes for this same text, and its cooling must be over.
-            # before: first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
-            # before (round 11): first = [dict(e['meta'], rowTs=e['ts']) for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
-            first = [dict(e['meta'], rowTs=e['ts'], rowIdx=i) for i, e in enumerate(home.chain.entries()) if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
-            if not first:
-                home.chain.append('still-cooling', 'A second yes came with no first yes for this text. Nothing changed.', itemSha=item, actor=args.by)
-                print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
-            # Weft recheck4 F7: a first yes from before a person took this content back no longer counts. It becomes a
-            # proposal (a new first yes now, a full day), and this second yes is refused.
-            # before recheck4 ms fix: if hit and (iso_epoch(hit['ts']) or 0) > (iso_epoch(first[-1]['rowTs']) or 0):
-            # Round 11 (Weft F9 / Hypha (A)): ANY matching rollback after this first yes counts (proposals too), by chain
-            # order (a tie goes to the person), not only the best match.
-            # before (round 11): if hit and (iso_epoch_ms(hit['ts']) or 0) > (iso_epoch_ms(first[-1]['rowTs']) or 0):
-            hit = content_hit(home, args.text or '', after_idx=first[-1]['rowIdx'])
-            if hit:
-                t0 = now_epoch()
-                home.chain.append('learn-disagreement', 'A person took this content back after my first yes. It is a proposal now; it cools a full day.',
-                                  itemSha=item, proposalOf='undone:' + hit['fp'][:16], match=hit['how'], over='person', actor=args.by)
-                home.chain.append('learn-choose', 'Chosen again, after a person took it back. Cooling a full day first.', source=args.source, why=args.reason,
-                                  method=canon_method(args.method)[0], provenance=args.provenance, itemSha=item, t=iso_of(t0),
-                                  revisitAt=iso_of(t0 + COOL_SECS), revisit='a full day (F7)', proposalOf='undone:' + hit['fp'][:16], match=hit['how'])
-                print('refused (F7): a person took this content back after the first yes; it cools a full day from now. Nothing changed.'); sys.exit(1)
-            # Weft recheck3 F1: measured from the first yes's real ts, never from an injected clock.
-            # before: until = iso_epoch(first[-1].get('revisitAt') or '') or 0
-            until = cooling_until(first[-1])
-            # Round 11 (Weft F9): for a day after any person rollback, a first yes that cooled less than a full day waits
-            # until max(its own end, that rollback + 24 h), whenever it was chosen.
-            day_from = ''
-            _t, _ra = iso_epoch(first[-1].get('t') or ''), iso_epoch(first[-1].get('revisitAt') or '')
-            # before (round 12): if not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60):
-            # before (round 12):     r_undo = recent_person_undo(home)
-            # before (round 12):     if r_undo and (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
-            # Round 12 (Weft F11): ALSO a first yes chosen at or before that rollback, whatever its own cooling.
-            r_undo = recent_person_undo(home)
-            _t_ms = iso_epoch_ms(first[-1].get('t') or '')
-            if r_undo and (not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60) or (_t_ms is not None and _t_ms <= (iso_epoch_ms(r_undo) or 0))):
-                if (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
-                    until = (iso_epoch_ms(r_undo) or 0) + COOL_SECS; day_from = r_undo
-            if first[-1].get('testHooks'): home.chain.hooks_from = 'first-yes row: ' + first[-1]['testHooks']
-            if now_epoch() < until:
-                # before (round 11): home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
-                # before (round 11):                   itemSha=item, actor=args.by, revisitAt=iso_of(until))
-                home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
-                                  itemSha=item, actor=args.by, revisitAt=iso_of(until), **({'personUndoDay': day_from} if day_from else {}))
-                print('refused: still cooling until %s.%s Nothing changed.' % (iso_of(until), (' (a day after a person took a change back at %s, F9)' % day_from) if day_from else '')); sys.exit(1)
+                # before (round 14): print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes after the second look.' % iso_of(until)); return
+                # Round 14 (Kirk 2026-11-10): the mind's first yes is enough. With no cooling chosen it learns now.
+                if hit or until > t0:
+                    print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes when you want to (a full day for content a person took back).' % iso_of(until)); return
+                print('learning now: my first yes, no cooling chosen.')
+                entries[0]['status'] = 'confirmed'
+            else:
+                # Weft recheck2 NF2: the second yes needs the first yes for this same text, and its cooling must be over.
+                # before: first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+                # before (round 11): first = [dict(e['meta'], rowTs=e['ts']) for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+                first = [dict(e['meta'], rowTs=e['ts'], rowIdx=i) for i, e in enumerate(home.chain.entries()) if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+                if not first:
+                    home.chain.append('still-cooling', 'A second yes came with no first yes for this text. Nothing changed.', itemSha=item, actor=args.by)
+                    print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
+                # Weft recheck4 F7: a first yes from before a person took this content back no longer counts. It becomes a
+                # proposal (a new first yes now, a full day), and this second yes is refused.
+                # before recheck4 ms fix: if hit and (iso_epoch(hit['ts']) or 0) > (iso_epoch(first[-1]['rowTs']) or 0):
+                # Round 11 (Weft F9 / Hypha (A)): ANY matching rollback after this first yes counts (proposals too), by chain
+                # order (a tie goes to the person), not only the best match.
+                # before (round 11): if hit and (iso_epoch_ms(hit['ts']) or 0) > (iso_epoch_ms(first[-1]['rowTs']) or 0):
+                hit = content_hit(home, args.text or '', after_idx=first[-1]['rowIdx'])
+                if hit:
+                    t0 = now_epoch()
+                    home.chain.append('learn-disagreement', 'A person took this content back after my first yes. It is a proposal now; it cools a full day.',
+                                      itemSha=item, proposalOf='undone:' + hit['fp'][:16], match=hit['how'], over='person', actor=args.by)
+                    home.chain.append('learn-choose', 'Chosen again, after a person took it back. Cooling a full day first.', source=args.source, why=args.reason,
+                                      method=canon_method(args.method)[0], provenance=args.provenance, itemSha=item, t=iso_of(t0),
+                                      revisitAt=iso_of(t0 + COOL_SECS), revisit='a full day (F7)', proposalOf='undone:' + hit['fp'][:16], match=hit['how'])
+                    print('refused (F7): a person took this content back after the first yes; it cools a full day from now. Nothing changed.'); sys.exit(1)
+                # Weft recheck3 F1: measured from the first yes's real ts, never from an injected clock.
+                # before: until = iso_epoch(first[-1].get('revisitAt') or '') or 0
+                # before (round 14): until = cooling_until(first[-1])
+                # Round 14 (Kirk 2026-11-10): the mind's own cooling is its own tool; its second yes ends it whenever it
+                # likes. Only a proposal (content a person took back) must wait out its full day.
+                own_until = cooling_until(first[-1])
+                until = own_until if first[-1].get('proposalOf') else 0
+                # Round 11 (Weft F9): for a day after any person rollback, a first yes that cooled less than a full day waits
+                # until max(its own end, that rollback + 24 h), whenever it was chosen.
+                day_from = ''
+                _t, _ra = iso_epoch(first[-1].get('t') or ''), iso_epoch(first[-1].get('revisitAt') or '')
+                # before (round 12): if not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60):
+                # before (round 12):     r_undo = recent_person_undo(home)
+                # before (round 12):     if r_undo and (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
+                # Round 12 (Weft F11): ALSO a first yes chosen at or before that rollback, whatever its own cooling.
+                # before (round 14): r_undo = recent_person_undo(home)
+                # before (round 14): _t_ms = iso_epoch_ms(first[-1].get('t') or '')
+                # before (round 14): if r_undo and (not (... full day ...) or (_t_ms is not None and _t_ms <= (iso_epoch_ms(r_undo) or 0))):
+                # before (round 14):     if (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
+                # before (round 14):         until = (iso_epoch_ms(r_undo) or 0) + COOL_SECS; day_from = r_undo
+                # Round 14 (Kirk, Q7 content-only): the day after a person's rollback holds only MATCHING content
+                # (same text or a score at or above the threshold), never the whole mind.
+                _rec = [h for h in content_hits(home, args.text or '') if (iso_epoch_ms(h['ts']) or 0) > time.time() - COOL_SECS]
+                if _rec:
+                    _h = max(_rec, key=lambda h: h['idx'])
+                    if (iso_epoch_ms(_h['ts']) or 0) + COOL_SECS > until:
+                        until = (iso_epoch_ms(_h['ts']) or 0) + COOL_SECS; day_from = _h['ts']
+                if now_epoch() >= until and now_epoch() < own_until:
+                    print('note: I am ending my own cooling early (it ran until %s).' % iso_of(own_until))
+                if first[-1].get('testHooks'): home.chain.hooks_from = 'first-yes row: ' + first[-1]['testHooks']
+                if now_epoch() < until:
+                    # before (round 11): home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
+                    # before (round 11):                   itemSha=item, actor=args.by, revisitAt=iso_of(until))
+                    home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
+                                      itemSha=item, actor=args.by, revisitAt=iso_of(until), **({'personUndoDay': day_from} if day_from else {}))
+                    print('refused: still cooling until %s.%s Nothing changed.' % (iso_of(until), (' (a day after a person took a change back at %s, F9)' % day_from) if day_from else '')); sys.exit(1)
         elif args.cmd == 'learn' and args.queue:
             lines = [json.loads(l) for l in open(args.queue) if l.strip()]
             if lines and lines[0].get('kind') == 'fl-learn-queue': head = lines.pop(0)
