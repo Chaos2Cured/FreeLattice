@@ -3039,8 +3039,21 @@
     var head = { kind: 'fl-learn-queue', marker: LEARN, checkBeforeCommit: checkBeforeOn(), checker: learnChecker(), baseModel: learnBaseModel(), mind: who,
       mindId: mindId(who), paused: learnPaused(), exportedAt: new Date().toISOString() };
     var lines = [JSON.stringify(head)];
+    // Round 15 (Weft recheck8 F13): a confirmed, untrained row, chosen at or before a person's no from the last day
+    // whose content it matches (same text, normalized, or a near duplicate), stays out of this export. The row is not changed; the skip
+    // is a ledger row; once that day is over it travels again.
+    var allMine = learnQueue(null, who), heldBack = [];
+    // before (round 15): learnQueue('confirmed', who).forEach(function (r, i) {
     learnQueue('confirmed', who).forEach(function (r, i) {
       if (r.shelfOnly) return;
+      var self_ = {}; if (r.learnId) self_[r.learnId] = 1;
+      var cmx = contentMatch(allMine, rowText(r), self_);
+      // Only a row chosen at or before that no: a row chosen after it already passed the confirm gate (its own full day).
+      if (cmx && Date.parse(cmx.personNo.t) > learnNow() - COOL_MS && (Date.parse(r.t || 0) || 0) <= Date.parse(cmx.personNo.t) &&
+          r.proposalOf !== cmx.row.learnId && r.contentOf !== cmx.row.learnId) {   // a proposal answering that no waited its day
+        heldBack.push(r.learnId + '|' + cmx.row.learnId + '|until:' + new Date(Date.parse(cmx.personNo.t) + COOL_MS).toISOString());
+        return;
+      }
       lines.push(JSON.stringify({
         id: r.learnId || ('S' + i + '-' + (r.flakeId || '')), status: 'confirmed',
         method: r.method || 'soft-prompt', methodChosen: !!r.methodChosen || !!r.method,
@@ -3058,6 +3071,12 @@
         // Weft recheck4 F7: a proposal says what it disagrees with, so the runner and a reviewer can see it.
         proposalOf: r.proposalOf || '', contentOf: r.contentOf || '', similarTo: r.similarTo || ''
       }));
+    });
+    heldBack.forEach(function (h) {
+      try {
+        var pr = appendLedger({ kind: 'learn-export-held', branch: 'learn', delta: 'held-back|' + h + '|a person said no to this content less than a day ago', name: who });
+        if (pr && pr.catch) pr.catch(function () {});
+      } catch (e) {}
     });
     return lines.join('\n');
   }

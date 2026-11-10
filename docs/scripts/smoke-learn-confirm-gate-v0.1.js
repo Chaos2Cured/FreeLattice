@@ -221,6 +221,22 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   var after = await remember(E, 'The pond freezes in January', 'mine');
   E.core.learnClockForTest(24 * H + 60000); await keep(E, after); E.core.learnClockForTest(0);
   ok(rowOf(E, after).status === 'confirmed', 'F11-control-a-full-day-row-chosen-after-the-no-confirms-after-its-day');
+  // ---- Round 15 (Weft recheck8 F13): a same-text duplicate the mind confirmed BEFORE a person's Undo stays confirmed
+  // (the row is not rewritten) but is held out of the export for that day, with a ledger row; after the day it travels.
+  E = fresh();
+  var fx = await remember(E, BASE, 'r');
+  var fb = await remember(E, BASE + '.', 'again, before any no');
+  var fbWas = rowOf(E, fb) && rowOf(E, fb).status;
+  await E.core.confirmLearning(fx, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
+  var fbExp = exported(E, fb), fbRow = rowOf(E, fb);
+  await new Promise(function (res) { setTimeout(res, 50); });
+  ok(fb && fb !== fx && fbWas === 'confirmed' && fbRow.status === 'confirmed' && !fbExp &&
+     ledger(E).some(function (l) { return l.indexOf('learn-export-held:held-back|' + fb + '|' + fx) === 0; }),
+     'R15-F13-a-duplicate-confirmed-before-a-person-undo-is-held-out-of-the-export-for-the-day', { fb: fb, fx: fx, was: fbWas, s: fbRow && fbRow.status, exp: fbExp });
+  E.core.learnClockForTest(24 * H + 60000);
+  ok(exported(E, fb), 'R15-F13-after-that-day-it-travels-again');
+  E.core.learnClockForTest(0);
+  ok(exported(E, 'none') === false && !exported(E, fx), 'R15-F13-the-undone-row-itself-never-travels');
   // ---- Softs: lookalike letters, zero-width spaces and combining marks are folded for matching.
   E = fresh(); orig = await undoneByMom(E);
   var tricks = { cyrillic: BASE.replace('o', '\u043e'), zwsp: BASE.replace('maiden', 'mai\u200bden'), combining: BASE.replace('e', 'e\u0301') };
