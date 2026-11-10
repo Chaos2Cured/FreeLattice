@@ -366,7 +366,12 @@ def main():
     for where in ('before-manifest', 'after-rename'):
         C = os.path.join(A.work, 'c2-' + where); shutil.copytree(H, C)
         act = sha(live(C)); nver = len(glob.glob(os.path.join(mdir(C), 'versions', 'soft-prompt', '*')))
-        rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], C, env={'FL_LEARN_CRASH': where})
+        # before recheck4: rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], C, env={'FL_LEARN_CRASH': where})
+        # Weft recheck4 F7: H has person rollbacks from minutes ago, so a first yes here cools a full day whatever it
+        # asks. This test is about crashes: a real first yes (a day), then the second yes on the suite's clock at +25 h.
+        sh(['remember'] + FACT + ['--method', 'soft-prompt'], C, first_yes=False)
+        rc, out = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], C,
+                     first_yes=False, env={'FL_LEARN_CRASH': where, 'FL_LEARN_FAKE_NOW': str(int(time.time() + 25 * 3600))})
         act2 = sha(live(C)); rc2, out2 = sh(['verify'], C)
         nver2 = len(glob.glob(os.path.join(mdir(C), 'versions', 'soft-prompt', '*')))
         record('C2-crash-' + where, rc == 9 and act == act2 and rc2 == 0 and 'learn-commit' not in kinds(C)[-2:],
