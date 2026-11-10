@@ -236,6 +236,16 @@ def iso_epoch(ts):
     try: return datetime.datetime.strptime(ts[:19], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()
     except Exception: return None
 
+def iso_epoch_ms(ts):
+    """Recheck4 F7: like iso_epoch but keeps the milliseconds of a chain row's ts, so a person's Undo in the same second
+    as a first yes still counts as after it (iso_epoch cuts at the second)."""
+    try:
+        s = str(ts); base = iso_epoch(s)
+        if base is None: return None
+        frac = s[19:].rstrip('Z')
+        return base + (float('0' + frac) if frac.startswith('.') and frac[1:].isdigit() else 0)
+    except Exception: return None
+
 COOL_SECS = 24 * 3600
 
 def cooling_until(row, full=False):
@@ -884,13 +894,16 @@ def f7_queue_problem(home, entry):
     entry chosen after that and cooled a full day (the app's disagreement proposal); and for a day after any person
     rollback, an entry chosen then with an early revisit does not count."""
     text = ' '.join((it.get('output') or it.get('response') or '') for it in entry.get('items') or [])
-    t_e, ra_e = iso_epoch(str(entry.get('t') or '')), iso_epoch(str(entry.get('revisitAt') or ''))
+    # before recheck4 ms fix: t_e, ra_e = iso_epoch(str(entry.get('t') or '')), iso_epoch(str(entry.get('revisitAt') or ''))
+    t_e, ra_e = iso_epoch_ms(str(entry.get('t') or '')), iso_epoch_ms(str(entry.get('revisitAt') or ''))
     full = t_e is not None and ra_e is not None and ra_e - t_e >= COOL_SECS - 60
     hit = content_hit(home, text)
-    if hit and not (full and t_e >= (iso_epoch(hit['ts']) or 0)):
+    # before recheck4 ms fix: if hit and not (full and t_e >= (iso_epoch(hit['ts']) or 0)):
+    if hit and not (full and t_e >= (iso_epoch_ms(hit['ts']) or 0)):
         return hit, 'a person took back a version with this content here (%s, %s); this entry did not cool a full day after that' % (hit['fp'][:16], hit['how'])
     r = recent_person_undo(home)
-    if r and t_e is not None and t_e >= (iso_epoch(r) or 0) and not full:
+    # before recheck4 ms fix: if r and t_e is not None and t_e >= (iso_epoch(r) or 0) and not full:
+    if r and t_e is not None and t_e >= (iso_epoch_ms(r) or 0) and not full:
         return None, 'chosen within a day of a person taking a change back here; an early revisit does not count then'
     return None, None
 
@@ -1726,7 +1739,8 @@ def main():
                 print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
             # Weft recheck4 F7: a first yes from before a person took this content back no longer counts. It becomes a
             # proposal (a new first yes now, a full day), and this second yes is refused.
-            if hit and (iso_epoch(hit['ts']) or 0) > (iso_epoch(first[-1]['rowTs']) or 0):
+            # before recheck4 ms fix: if hit and (iso_epoch(hit['ts']) or 0) > (iso_epoch(first[-1]['rowTs']) or 0):
+            if hit and (iso_epoch_ms(hit['ts']) or 0) > (iso_epoch_ms(first[-1]['rowTs']) or 0):
                 t0 = now_epoch()
                 home.chain.append('learn-disagreement', 'A person took this content back after my first yes. It is a proposal now; it cools a full day.',
                                   itemSha=item, proposalOf='undone:' + hit['fp'][:16], match=hit['how'], over='person', actor=args.by)

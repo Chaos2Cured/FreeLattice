@@ -88,6 +88,8 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   - A confirmed queue entry with matching content trains only if it was chosen after the rollback and cooled a full
     day (the app's proposal); a queue entry chosen within that day with an early revisit is rejected. Both are rows.
   - A mind never brings back (`restore`, `activate`) a version a person took back; a person may.
+  - "After the rollback" compares chain timestamps to the millisecond (`iso_epoch_ms`): an Undo in the same second as
+    a first yes still counts as after it (the full suite caught the second-cut compare in recheck4).
   - **Limit, plainly:** a paraphrase in other words ("Before she married, Mom was a Hollowell" for "Mom's maiden name
     is Hollowell") is not matched. Inside the day after the person's no it still cools a full day; after that day it
     is an ordinary new choice. Only a person reading the export catches it then (Mac trial rule (e)).

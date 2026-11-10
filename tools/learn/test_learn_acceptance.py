@@ -184,6 +184,11 @@ def f7_runner_tests():
     sh(['undo', '--by', 'mind'], G, check=True)
     r9, o9 = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G)
     record('F7-runner-person-later-yes-clears-it', r9 == 0 and 'F7' not in o9 and os.path.exists(live(G)), out=o9.strip().splitlines()[-1:])
+    # Recheck4 full-suite catch: an Undo in the same second as the first yes is still after it (ms kept, not cut at the second).
+    a_, b_ = '2026-11-10T10:34:37.114Z', '2026-11-10T10:34:37.827Z'
+    record('F7-runner-same-second-undo-still-after-the-first-yes', fl_learn.iso_epoch_ms(b_) > fl_learn.iso_epoch_ms(a_)
+           and fl_learn.iso_epoch(b_) == fl_learn.iso_epoch(a_) and fl_learn.iso_epoch_ms('2026-11-10T10:34:37Z') == fl_learn.iso_epoch(a_),
+           ms=[fl_learn.iso_epoch_ms(a_), fl_learn.iso_epoch_ms(b_)])
 
 def f5_runner_tests():
     """Weft recheck4 F5 residual: the shared content/skeleton fixture, lookalikes of known minds refused, and a pause
