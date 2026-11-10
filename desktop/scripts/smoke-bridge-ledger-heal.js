@@ -76,7 +76,7 @@ function main() {
   ok(refused && message === 'chain head unreadable, refuse append', 'a head with no hash refuses the next voice');
 
   var src = fs.readFileSync(path.join(__dirname, '../lattice-ledger.js'), 'utf8');
-  var verifyStart = src.indexOf('function verifyChain()');
+  var verifyStart = src.indexOf('function verifyChain(');
   var verifyEnd = src.indexOf('function receiptsPath()');
   var verifySrc = src.slice(verifyStart, verifyEnd);
   ok(verifySrc.indexOf('bridge-send') === -1, 'verifyChain has no kind skip');

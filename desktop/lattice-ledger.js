@@ -290,6 +290,21 @@ function verifyEntry(entry, prevExpected) {
   return { ok: true };
 }
 
+// Weft re-check: the keys this computer's companion ledger may be signed with. This companion's own key, plus any a
+// person listed in <ledgerDir>/pinned-keys.json ({"keys": [...]}). An empty list means no key yet (verify unpinned).
+function ownPinnedKeys() {
+  const out = [];
+  try { const id = getIdentity(); if (id && id.publicKeyB64) out.push(String(id.publicKeyB64)); } catch (e) { /* no key yet */ }
+  try {
+    const p = path.join(ledgerDir(), 'pinned-keys.json');
+    if (fs.existsSync(p)) {
+      const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+      (Array.isArray(j && j.keys) ? j.keys : []).forEach(function (k) { if (typeof k === 'string' && out.indexOf(k) === -1) out.push(k); });
+    }
+  } catch (e) { /* unreadable list: own key only */ }
+  return out;
+}
+
 // opts.pinnedKeys (optional): public keys (base64) this chain may be signed with. With it, a chain re-signed
 // wholesale under a new key fails ('key-not-pinned'). Without it, behavior is unchanged.
 function verifyChain(opts) {
@@ -369,6 +384,7 @@ module.exports = {
   appendBridgeSend,
   readBridgeReceipts,
   verifyChain,
+  ownPinnedKeys,
   // Pure helpers for smoke
   canonicalUnsigned,
   entryHashOf,

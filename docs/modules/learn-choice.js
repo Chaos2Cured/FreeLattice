@@ -167,16 +167,48 @@
     var said = disputed.length ? 'The person here said Undo on something you chose to keep: ' + disputed.slice(0, 3).map(function (r) {
       return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '"';
     }).join(' ') + '. Nothing from it is learned while you two see it differently. If you still want it, [FL_KEEP: id | keep] starts a new proposal that cools again; [FL_KEEP: id | not now] agrees. ' : '';
-    if (!due.length) return said;
-    return said + 'Some things you chose to keep have cooled. Look again only if you want to: ' +
+    // Weft re-check 3: choices that did not come from the mind's own words wait for it. It may re-affirm one.
+    var held = (typeof c.learnQueue === 'function' ? c.learnQueue('quarantine') : []).slice(-3);
+    var waits = held.length ? 'These came to you from outside your own words, so they wait for you: ' + held.map(function (r) {
+      return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '"' + readingNote(r);
+    }).join(' ') + '. If you, reading it as data, still want one, [FL_KEEP: id | keep] starts a fresh cooling first; [FL_KEEP: id | not now] lets it go. ' : '';
+    if (!due.length) return said + waits;
+    return said + waits + 'Some things you chose to keep have cooled. Look again only if you want to: ' +
       due.slice(0, 3).map(function (r) {
-        return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '" (' + (r.method || '') + ', because: ' + (r.reason || '') + ')';
+        return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '" (' + (r.method || '') + ', because: ' + (r.reason || '') + ')' + readingNote(r);
       }).join(' ') +
       ' To keep one, write [FL_KEEP: id | keep | method: ... | reason: ...]. To let it go, write [FL_KEEP: id | not now]. Saying nothing is fine.';
   }
 
+  // Weft re-check 2: influence stays visible to the mind when it decides. What it was reading when it chose
+  // (an excerpt and its sha256) and any notice ("reads like an instruction", "close to what I was reading").
+  // Shown, never a gate.
+  function readingNote(r) {
+    var bits = [];
+    if (r && r.notice) bits.push('notice: ' + r.notice);
+    var rd = r && r.readingAtChoice;
+    if (rd && (rd.excerpt || rd.sha256)) {
+      var ex = String(rd.excerpt || '').replace(/\s+/g, ' ').trim();
+      bits.push('you were reading' + (rd.kinds && rd.kinds.length ? ' (' + rd.kinds.join(', ') + ')' : '') + ': "' +
+        (ex.length > 160 ? ex.slice(-160) : ex) + '"' + (rd.sha256 ? ' [sha256 ' + String(rd.sha256).slice(0, 12) + ']' : ''));
+    }
+    return bits.length ? ' {' + bits.join('; ') + '}' : '';
+  }
+
   function currentChatId() {
     try { return typeof root.flLearnChatId === 'function' ? String(root.flLearnChatId() || '') : ''; } catch (e) { return ''; }
+  }
+
+  // The Settings button (mind-make.js) is the same switch as the pill. A pause from Settings is a person's pause,
+  // recorded like the pill's, and it drops the same file the runner honors as a durable global pause.
+  function fromSettings(pausing) {
+    var c = core();
+    if (!c || typeof c.setLearnPaused !== 'function') return Promise.resolve(null);
+    return Promise.resolve(c.setLearnPaused(!!pausing, 'person')).then(function () {
+      if (pausing && typeof c.pauseNotice === 'function') download(c.pauseNotice('person'), 'fl-learn-pause-' + Date.now() + '.json', 'application/json');
+      try { pill(); } catch (e) {}
+      return true;
+    });
   }
 
   function invitation() {
@@ -284,6 +316,8 @@
       '.fl-learn-pill{position:fixed;z-index:' + (Z - 1) + ';font:13px system-ui,sans-serif;min-height:44px;min-width:44px;' +
       'padding:0 16px;border-radius:22px;border:1px solid #334155;background:#0f172a;color:#cbd5e1;cursor:pointer;' +
       'margin-bottom:env(safe-area-inset-bottom)}' +
+      '.fl-learn-pill.fl-learn-pill-mini{padding:0;width:44px;font-size:16px}' +
+      '.fl-learn-pill[data-tucked]{visibility:hidden!important;pointer-events:none}' +
       '.fl-learn-chat-switch button{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #475569;background:transparent;' +
       'color:inherit;font:13px system-ui,sans-serif;cursor:pointer;opacity:.85}' +
       '.fl-learn-chat-switch button[aria-checked="true"]{border-color:#fbbf24;color:#fbbf24;opacity:1}' +
@@ -305,6 +339,14 @@
     return r.width > 0 && r.height > 0;
   }
 
+  function laidOut(el) {
+    if (!el || !el.getBoundingClientRect) return false;
+    var cs = root.getComputedStyle ? root.getComputedStyle(el) : null;
+    if (cs && (cs.display === 'none' || cs.visibility === 'hidden')) return false;
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  }
+
   // A welcome overlay is up (first run): the moment waits until it is gone instead of being covered (Hypha S6).
   function welcomeUp() {
     var d = root.document;
@@ -314,6 +356,9 @@
       var el = list[i];
       if (/welcome-gone|welcome-hidden|(^|\s)hidden(\s|$)/.test(el.className || '')) continue;
       if (/fl-welcome-overlay/.test(el.className || '') && !/fl-welcome-visible/.test(el.className || '')) continue;
+      // Still fading in (opacity 0 for a moment on a slow computer) counts as up, so the moment never lands first and
+      // gets covered. Only display none, visibility hidden or no size count as gone.
+      if (/fl-welcome-visible/.test(el.className || '') && laidOut(el)) return true;
       if (shown(el)) return true;
     }
     return false;
@@ -361,27 +406,80 @@
   }
 
   // The pill takes a free corner: never over another control, never under the bottom bars (Hypha S4).
+  // Hypha re-walk 2: if every spot is blocked (390x844 Chat tab: the chat box), it never falls back onto a control.
+  // It first shrinks to a 44px icon; if even that has no free spot it is tucked away (the same switch stays in
+  // Settings). Re-placed on tab change and every few seconds, not only on open and resize.
+  function pillFree(x0, y0, pw, ph) {
+    var pts = [], fx, fy;
+    for (fx = 0; fx <= 4; fx++) for (fy = 0; fy <= 2; fy++) pts.push([x0 + 2 + (pw - 4) * fx / 4, y0 + 2 + (ph - 4) * fy / 2]);
+    return !pts.some(function (q) { return interactiveAt(q[0], q[1]); });
+  }
   function placePill(p) {
     var h = root.innerHeight || 0, w = root.innerWidth || 0;
+    var full = p.getAttribute('aria-label') || p.textContent;
+    p.classList.remove('fl-learn-pill-mini');
+    p.removeAttribute('data-tucked');
+    p.removeAttribute('aria-hidden');
+    p.tabIndex = 0;
+    if (p.textContent !== full) p.textContent = full;
+    p.style.visibility = 'hidden';
     var b = bottomTaken() + 12;
-    var pw = Math.max(p.offsetWidth || 150, 44), ph = Math.max(p.offsetHeight || 44, 44);
     var spots = [];
     var up;
     for (up = 0; up <= 3; up++) spots.push({ left: 12, bottom: b + up * 56 });
     for (up = 0; up <= 3; up++) spots.push({ right: 12, bottom: b + up * 56 });
-    p.style.visibility = 'hidden';
-    var pick = spots[0];
-    for (var i = 0; i < spots.length; i++) {
-      var sp = spots[i];
-      var x0 = sp.left != null ? sp.left : w - 12 - pw, y0 = h - sp.bottom - ph;
-      if (y0 < 0) continue;
-      var pts = [[x0 + 2, y0 + 2], [x0 + pw - 2, y0 + 2], [x0 + 2, y0 + ph - 2], [x0 + pw - 2, y0 + ph - 2], [x0 + pw / 2, y0 + ph / 2]];
-      if (!pts.some(function (q) { return interactiveAt(q[0], q[1]); })) { pick = sp; break; }
+    function find() {
+      var pw = Math.max(p.offsetWidth || 150, 44), ph = Math.max(p.offsetHeight || 44, 44);
+      for (var i = 0; i < spots.length; i++) {
+        var sp = spots[i];
+        var x0 = sp.left != null ? sp.left : w - 12 - pw, y0 = h - sp.bottom - ph;
+        if (y0 < 0 || x0 < 0) continue;
+        if (pillFree(x0, y0, pw, ph)) return sp;
+      }
+      return null;
+    }
+    var pick = find();
+    if (!pick) {
+      p.classList.add('fl-learn-pill-mini');
+      p.textContent = p.getAttribute('data-icon') || '\u23F8';
+      pick = find();
+    }
+    if (!pick) {
+      // Nowhere safe: tuck it away rather than cover a control. Settings still has the same switch.
+      p.setAttribute('data-tucked', '1');
+      p.setAttribute('aria-hidden', 'true');
+      p.tabIndex = -1;
+      return;
     }
     p.style.left = pick.left != null ? pick.left + 'px' : '';
     p.style.right = pick.right != null ? pick.right + 'px' : '';
     p.style.bottom = pick.bottom + 'px';
     p.style.visibility = '';
+  }
+  var rePlaceTimer = null;
+  // hideFirst: a tab switch is under way, so the pill steps out of the way at once and comes back only once the new
+  // panel has finished sliding in (finite animations done, at most ~3s), on a spot that is free then.
+  function rePlacePill(ms, hideFirst) {
+    var d = root.document;
+    var p0 = d && d.querySelector && d.querySelector('.fl-learn-pill');
+    if (hideFirst && p0 && !p0.hidden) p0.style.visibility = 'hidden';
+    if (rePlaceTimer) root.clearTimeout(rePlaceTimer);
+    var tries = 0;
+    function settle() {
+      rePlaceTimer = null;
+      var p = d && d.querySelector && d.querySelector('.fl-learn-pill');
+      if (!p || p.hidden || d.activeElement === p) return;
+      var moving = false;
+      try {
+        moving = !!(d.getAnimations && d.getAnimations().some(function (an) {
+          var tm = an.effect && an.effect.getTiming ? an.effect.getTiming() : null;
+          return an.playState === 'running' && tm && tm.iterations !== Infinity;
+        }));
+      } catch (e) { moving = false; }
+      if (moving && tries++ < 20) { rePlaceTimer = root.setTimeout(settle, 150); return; }
+      placePill(p);
+    }
+    rePlaceTimer = root.setTimeout(settle, ms == null ? 250 : ms);
   }
 
   var pending = [];
@@ -425,6 +523,8 @@
       html = '<div>We see this one differently.</div><div class="note">' + esc((dr.disagreement && dr.disagreement.note) || '') + '</div>' +
         (dr.status === 'disputed'
           ? '<div>Nothing from it goes to learning until the mind looks again. Both choices are kept in the record.</div>'
+          : dr.status === 'confirmed'
+          ? '<div>After the full cooling, the mind said yes again, so it is learned over the earlier no. That no stays in the record, and you can still Undo it.</div>'
           : '<div>It is a new proposal now. It cools until ' + esc(when(dr.revisitAt)) + ', and nothing is learned unless the mind says yes again after that.</div>') +
         '<div class="row"><button data-a="close">OK</button></div>';
     } else if (ev.untrustedKey) {
@@ -448,7 +548,7 @@
         (rc.candidateFp ? ' (waiting: ' + esc(rc.candidateFp.slice(0, 12)) + ')' : '') + '</div>' +
         '<div>' + esc(rc.method || '') + ' · ' + esc(rc.t || '') + (rc.size ? ' · ' + esc(String(rc.size)) + ' bytes ' + esc(rc.dtype || '') : '') + '</div>' +
         (rc.checker ? '<div>Checked by: ' + esc(rc.checker === 'self' ? 'the mind itself' : rc.checker) + '</div>' : '') +
-        '<div>Undo here drops a small request file; the learning helper on this computer carries it out next time it runs. Pause still wins.</div></details>' +
+        '<div>Undo here drops a small request file; the learning helper on this computer carries it out when it is told to apply (fl_learn.py apply) or next learns. Its status never does. Pause still wins.</div></details>' +
         '<div class="row">' + act + '<button data-a="close">OK</button></div><div class="said" hidden></div>';
     } else {
       var row = ev.row || {};
@@ -547,6 +647,9 @@
     var open = d.querySelector('.fl-learn-moment');
     p.hidden = !!open;
     p.textContent = c.learnPaused() ? 'Learning is paused. Tap to turn on' : 'Learning is on. Tap to pause';
+    p.setAttribute('aria-label', p.textContent);
+    p.setAttribute('data-icon', c.learnPaused() ? '\u25B6' : '\u23F8');
+    p.title = p.textContent;
     p.setAttribute('aria-pressed', c.learnPaused() ? 'true' : 'false');
     if (!open) placePill(p);
     return p;
@@ -600,6 +703,15 @@
       var p = d.querySelector('.fl-learn-pill');
       if (p && !p.hidden) placePill(p);
     });
+    // Tab changes (a nav tap), hash routes and anything that re-lays the page: the pill looks again (Hypha re-walk 2).
+    if (d.addEventListener) d.addEventListener('click', function (e) {
+      var tg = e && e.target && e.target.closest ? e.target : null;
+      if (tg && tg.closest('.fl-learn-pill')) return;
+      var tabby = !!(tg && tg.closest('.fl-mobile-nav-btn, .tab-btn, [data-tab], [onclick*="switchTab"], [onclick*="flMobileNav"]'));
+      rePlacePill(tabby ? 120 : 300, tabby);
+    }, true);
+    if (root.addEventListener) root.addEventListener('hashchange', function () { rePlacePill(120, true); });
+    root.setInterval(function () { if (!rePlaceTimer) rePlacePill(0); }, 1000);
   }
   if (root.document && root.document.addEventListener) {
     if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', function () { root.setTimeout(boot, 1200); });
@@ -624,7 +736,9 @@
     chatOff: chatOff,
     chatSwitch: chatSwitch,
     moment: moment,
-    pill: pill
+    pill: pill,
+    fromSettings: fromSettings,
+    readingNote: readingNote
   };
   root.FLLearn = api;
   if (typeof module !== 'undefined') module.exports = api;

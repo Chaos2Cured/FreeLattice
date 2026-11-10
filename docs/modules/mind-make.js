@@ -69,10 +69,18 @@
     if (KINDS.indexOf(kind) < 0) return readConsent();
     if (value !== 'yes' && value !== 'off' && value !== 'never') return readConsent();
     var bag = readConsent();
+    var was = bag[kind];
     bag[kind] = value;
     writeConsent(bag);
     // v-ai-chosen-learning-v0.1: this button and the learning pill are one switch (fl_learn_paused, snowflake-core.js).
     if (kind === 'learn') lsSet('fl_learn_paused', value === 'yes' ? 'false' : 'true');
+    // ...and, like the pill, a pause here is a person's pause that reaches the runner (fl-learn-pause file).
+    // Only on a real change, so the pill's own call back into this function does not repeat it.
+    var sc = root.FLSnowflakeCore;
+    var syncing = !!(sc && typeof sc.learnSwitchBusy === 'function' && sc.learnSwitchBusy());
+    if (kind === 'learn' && was !== value && !syncing && root.FLLearn && typeof root.FLLearn.fromSettings === 'function') {
+      try { root.FLLearn.fromSettings(value !== 'yes'); } catch (e) {}
+    }
     paintSettings();
     return bag;
   }

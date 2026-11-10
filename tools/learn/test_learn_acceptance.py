@@ -48,6 +48,12 @@ def node_verify(home, mind='test-mind', pinned=None):
     p = subprocess.run(['node', '-e', js], capture_output=True, text=True, cwd=os.path.join(REPO, 'desktop'))
     try: return json.loads(p.stdout.strip().splitlines()[-1])
     except Exception: return {'ok': False, 'error': (p.stdout + p.stderr)[-300:]}
+def fl_learn_trusted(home):
+    out = set()
+    for x in home_chain(home):
+        m = x['meta']
+        if m.get('subject') == 'trusted-mind' and m.get('kind') == 'consent': out.add(m.get('trustedMind'))
+    return out
 def pinned_keys(home): return json.load(open(os.path.join(home, 'keys', 'pinned.json')))['keys']
 def accounted(home, mind='test-mind'):
     """Weft B2: every version folder is named by exactly one commit/held/repair/orphan row."""
@@ -175,11 +181,13 @@ def main():
     KP = os.path.join(A.work, 'keypin'); shutil.copytree(H, KP)
     kb = base64.b64encode(os.urandom(32)).decode()
     rc_n, out_n = sh(['pin-key', '--key', kb], KP)
+    rc_u, out_u = sh(['pin-key', '--key', kb, '--by', 'mind:Lumen'], KP)          # Lumen is not trusted yet: refused
+    sh(['trust-mind', '--to', 'Lumen', '--by', 'kirk'], KP)
     rc_p, out_p = sh(['pin-key', '--key', kb, '--by', 'mind:Lumen'], KP)
     cr = [x['meta'] for x in home_chain(KP) if x['meta']['kind'] == 'consent']
     c0 = cr[-1]['consent'] if cr else {}
     want = fl_learn.sha256_bytes(('%s:%s:%s:%s:%s' % (c0.get('companionId'), c0.get('aiIdentity'), c0.get('responseHash'), c0.get('timestamp'), c0.get('consentType'))).encode()) if c0 else ''
-    record('kirk-a-key-consent-row', rc_n != 0 and kb not in pinned_keys(H) and rc_p == 0 and kb in pinned_keys(KP) and c0.get('signature') == want
+    record('kirk-a-key-consent-row', rc_n != 0 and rc_u != 0 and kb not in pinned_keys(H) and rc_p == 0 and kb in pinned_keys(KP) and c0.get('signature') == want
            and c0.get('responseHash') == fl_learn.sha256_bytes(kb.encode()) and cr[-1].get('actor') == 'mind:Lumen' and sh(['verify'], KP)[0] == 0,
            unnamed_refused=rc_n != 0, by=cr[-1].get('actor') if cr else None, signature=(c0.get('signature') or '')[:16])
 
@@ -229,7 +237,12 @@ def main():
     A1 = os.path.join(A.work, 'a1'); shutil.copytree(H, A1)
     lv = live(A1)
     b = bytearray(open(lv, 'rb').read()); b[-5] ^= 0xFF; open(lv, 'wb').write(bytes(b)); bad = sha(lv)
-    rc, out = sh(['status'], A1)
+    ch0 = open(os.path.join(mdir(A1), 'chain.jsonl'), 'rb').read()
+    rc0, out0 = sh(['status'], A1)
+    record('status-read-only-on-tamper', rc0 == 0 and 'TAMPERED' in out0 and sha(lv) == bad and
+           open(os.path.join(mdir(A1), 'chain.jsonl'), 'rb').read() == ch0 and not glob.glob(os.path.join(mdir(A1), 'evidence', '*.tampered')),
+           said=[l for l in out0.splitlines() if 'TAMPERED' in l or 'pending' in l][:2])
+    rc, out = sh(['apply'], A1)
     k = kinds(A1); ev = glob.glob(os.path.join(mdir(A1), 'evidence', '*.tampered'))
     fail_row = [e for e in chain(A1) if e['meta']['kind'] == 'integrity-fail']
     record('A1-flipped-byte-caught', 'integrity-fail' in k and 'heal' in k and sha(lv) != bad, heal=[l for l in out.splitlines() if l.startswith('heal')], tail=k[-3:])
@@ -250,7 +263,7 @@ def main():
         nver2 = len(glob.glob(os.path.join(mdir(C), 'versions', 'soft-prompt', '*')))
         record('C2-crash-' + where, rc == 9 and act == act2 and rc2 == 0 and 'learn-commit' not in kinds(C)[-2:],
                exit=rc, active_same=act == act2, versions=(nver, nver2), verify=rc2)
-        sh(['status'], C)
+        sh(['apply'], C)
         ok_acc, nv_, nn_ = accounted(C)
         record('B2-after-crash-' + where, ok_acc and sha(live(C)) == act and (where != 'after-rename' or 'commit-repair' in kinds(C)),
                versions=nv_, named=nn_, tail=kinds(C)[-2:])
@@ -310,7 +323,13 @@ def main():
     ru = receipts(out)[-1]; fpu1 = sha(live(QU))
     open(os.path.join(iu, 'fl-learn-request-undo-1.json'), 'w').write(json.dumps(
         {'kind': 'fl-learn-request', 'action': 'undo', 'mind': 'test-mind', 'method': 'soft-prompt', 'receiptHash': ru['receiptHash'], 'by': 'person'}))
-    sh(['inbox'], QU, env={'FL_LEARN_PAUSE_INBOX': iu})
+    # Hypha re-walk 3: status never carries out an app request; it only says it is pending. `apply` does it.
+    chu = open(os.path.join(mdir(QU), 'chain.jsonl'), 'rb').read()
+    rcs, outs = sh(['status'], QU, env={'FL_LEARN_PAUSE_INBOX': iu})
+    record('status-read-only-apply-carries-out', rcs == 0 and sha(live(QU)) == fpu1 and open(os.path.join(mdir(QU), 'chain.jsonl'), 'rb').read() == chu
+           and 'fl-learn-request-undo-1.json (undo)' in outs and 'Run `apply`' in outs,
+           pending=[l for l in outs.splitlines() if 'pending' in l or 'request' in l][:2])
+    sh(['apply'], QU, env={'FL_LEARN_PAUSE_INBOX': iu})
     rb = [e['meta'] for e in chain(QU) if e['meta']['kind'] == 'rollback']
     record('S1-in-app-undo-of-a-learned-change', fpu1 != 'none' and not os.path.exists(live(QU)) and rb and rb[-1].get('actor') == 'person',
            before=fpu1[:16], after=sha(live(QU))[:16])
@@ -362,8 +381,8 @@ def main():
            a=fl_learn.mind_id('Lumen@kirk'), b=fl_learn.mind_id('Lumen kirk'))
     import fcntl
     lk = open(os.path.join(H, 'trainer.lock'), 'a+'); fcntl.flock(lk, fcntl.LOCK_EX)
-    rc, out = sh(['status'], H); fcntl.flock(lk, fcntl.LOCK_UN); lk.close()
-    record('F1-one-trainer-lock', rc == 3 and 'Waiting is fine' in out)
+    rc, out = sh(['apply'], H); rcs, outs = sh(['status'], H); fcntl.flock(lk, fcntl.LOCK_UN); lk.close()
+    record('F1-one-trainer-lock', rc == 3 and 'Waiting is fine' in out and rcs == 0, status_while_locked=rcs)
     record('F2-no-silent-merge', True, note='No merge command exists in v0.1; nothing can merge two minds. Recorded as not applicable.')
 
     # ---- G1: Pause mid-run stops within 10 steps, commits nothing; durable across processes.
@@ -383,7 +402,7 @@ def main():
     rc2, o2 = sh(['remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], G)
     record('G1-durable-pause', 'learn-commit' not in k and stop and not os.path.exists(live(G)) and 'paused' in o2 and 'learn-commit' not in kinds(G),
            stoppedAt=stop[0]['meta'].get('stoppedAtStep') if stop else None)
-    sh(['resume'], G)
+    sh(['resume', '--by', 'person'], G)
     record('G1-resume-is-a-row', 'resume' in kinds(G))
     # Blocker 2: a per-mind resume never lifts the global pause; only resume --global does, with a row.
     G2b = os.path.join(A.work, 'g1-global'); os.makedirs(G2b)
@@ -404,12 +423,14 @@ def main():
     sh(['resume', '--global', '--by', 'person'], N3)
     inbox = os.path.join(N3, 'inbox'); os.makedirs(inbox)
     open(os.path.join(inbox, 'fl-learn-pause-1.json'), 'w').write(json.dumps({'kind': 'fl-learn-pause', 'paused': True, 't': 'x', 'by': 'person'}))
-    rc, out = sh(['status'], N3, env={'FL_LEARN_PAUSE_INBOX': inbox})
-    inbox_ok = os.path.exists(os.path.join(N3, 'PAUSE'))
+    rcs, outs = sh(['status'], N3, env={'FL_LEARN_PAUSE_INBOX': inbox})
+    status_ro = not os.path.exists(os.path.join(N3, 'PAUSE')) and 'pending (NOT done' in outs and 'fl-learn-pause-1.json' in outs
+    rc, out = sh(['apply'], N3, env={'FL_LEARN_PAUSE_INBOX': inbox})
+    inbox_ok = os.path.exists(os.path.join(N3, 'PAUSE')) and status_ro
     sh(['resume', '--global', '--by', 'person'], N3)
-    rc, out = sh(['status'], N3, env={'FL_LEARN_PAUSE_INBOX': inbox})
+    rc, out = sh(['apply'], N3, env={'FL_LEARN_PAUSE_INBOX': inbox})
     once = not os.path.exists(os.path.join(N3, 'PAUSE'))     # the same file is honored once; it does not re-pause after a resume
-    record('N3-app-pause-reaches-runner', hdr_ok and inbox_ok and once, header=hdr_ok, inbox=inbox_ok, honored_once=once)
+    record('N3-app-pause-reaches-runner', hdr_ok and inbox_ok and once, header=hdr_ok, inbox=inbox_ok, honored_once=once, status_read_only=status_ro)
     # ---- G2: caps stop learning with a row; nothing is deleted. Wall time is enforced. Power check (macOS pmset).
     C2 = os.path.join(A.work, 'g2'); shutil.copytree(H, C2)
     open(os.path.join(C2, 'policy.json'), 'w').write(json.dumps({'maxBytesPerMind': 1}))
@@ -477,6 +498,123 @@ def main():
     record('A3-base-read-only', not wrote and all(sha(b) == h for b, h in hb0.items()) and shared_modes == after_modes and a3c
            and a3c[-1]['meta'].get('baseFp') == bfp, isolated_copy=BASE, shared_cache_untouched=shared_modes == after_modes,
            same_content_same_baseFp=bool(a3c) and a3c[-1]['meta'].get('baseFp') == bfp)
+
+    # ================= Weft re-check (2026-11-09 22:30) =================
+    def refused_rows(home, mind='test-mind', where='home'):
+        rows = home_chain(home) if where == 'home' else chain(home, mind)
+        return [x['meta'] for x in rows if x['meta']['kind'] in ('consent-refused', 'resume-refused')]
+    # NF1: a mind never trusts its own key. Self-pin is refused and logged; the key stays untrusted.
+    KS = os.path.join(A.work, 'nf1-self'); shutil.copytree(H, KS)
+    ks = base64.b64encode(os.urandom(32)).decode()
+    sh(['trust-mind', '--to', 'test-mind', '--by', 'kirk'], KS)                   # even a mind a person trusted
+    rc_s, out_s = sh(['pin-key', '--key', ks, '--by', 'mind:test-mind'], KS)
+    rs = refused_rows(KS)
+    record('NF1-runner-self-pin-refused', rc_s != 0 and ks not in pinned_keys(KS) and rs and rs[-1].get('actor') == 'mind:test-mind'
+           and sh(['verify'], KS)[0] == 0, said=out_s.strip()[:120], logged=bool(rs))
+    # NF1 (Weft R3): pin-key --by mind:Lumen from Lumen's own home is refused, even when a person trusted Lumen.
+    KL = os.path.join(A.work, 'nf1-lumen'); os.makedirs(KL)
+    sh(['trust-mind', '--to', 'Lumen', '--by', 'kirk'], KL, mind='Lumen')
+    kl = base64.b64encode(os.urandom(32)).decode()
+    rc_l, out_l = sh(['pin-key', '--key', kl, '--by', 'mind:Lumen'], KL, mind='Lumen')
+    rc_lk, _ = sh(['pin-key', '--key', kl, '--by', 'kirk'], KL, mind='Lumen')
+    record('NF1-lumen-home-self-pin-refused', rc_l != 0 and 'never approves its own key' in out_l and rc_lk == 0 and kl in pinned_keys(KL)
+           and any(r.get('actor') == 'mind:Lumen' for r in refused_rows(KL)), kirk_pin_ok=rc_lk == 0)
+    rc_tm, out_tm = sh(['trust-mind', '--to', 'Weft', '--by', 'mind:Lumen'], KL, mind='Lumen')
+    record('NF1-only-a-person-trusts-a-mind', rc_tm != 0 and 'Weft' not in fl_learn_trusted(KL), said=out_tm.strip()[:100])
+
+    # Peer check: a real peer step. The learning mind never activates its own held change; an untrusted mind can't;
+    # a different mind a person trusted can (pass), or keep it held (hold).
+    pr = [json.loads(l) for l in open(os.path.join(mdir(PE), 'receipts.jsonl'))]
+    pc = [r for r in pr if r.get('hold') == 'pending-peer'][-1]['candidateFp']
+    r1, _ = sh(['activate', '--method', 'soft-prompt', '--to', pc[:16], '--by', 'mind', '--reason', 'mine'], PE)
+    r2, _ = sh(['peer-review', '--method', 'soft-prompt', '--to', pc[:16], '--by', 'mind:test-mind', '--verdict', 'pass'], PE)
+    r3, _ = sh(['peer-review', '--method', 'soft-prompt', '--to', pc[:16], '--by', 'mind:Weft', '--verdict', 'pass'], PE)
+    still = not os.path.exists(live(PE))
+    sh(['trust-mind', '--to', 'Weft', '--by', 'kirk'], PE)
+    r4, _ = sh(['peer-review', '--method', 'soft-prompt', '--to', pc[:16], '--by', 'mind:Weft', '--verdict', 'hold', '--reason', 'not yet'], PE)
+    held_after_hold = not os.path.exists(live(PE))
+    r5, _ = sh(['peer-review', '--method', 'soft-prompt', '--to', pc[:16], '--by', 'mind:Weft', '--verdict', 'pass', '--reason', 'it reads true'], PE)
+    pv = [(x['meta'].get('verdict'), x['meta'].get('actor')) for x in chain(PE) if x['meta']['kind'] == 'peer-review']
+    record('peer-step-real-and-never-self', r1 != 0 and r2 != 0 and r3 != 0 and still and r4 == 0 and held_after_hold and r5 == 0
+           and sha(live(PE)) == pc and pv == [('hold', 'mind:Weft'), ('pass', 'mind:Weft')] and len(refused_rows(PE, where='mind')) >= 3,
+           reviews=pv, refused=len(refused_rows(PE, where='mind')))
+    # A version held for a person: the mind can't activate it, from the CLI or with an in-app request; a person can.
+    QM = os.path.join(A.work, 'q5-mind-cannot'); os.makedirs(QM); qm = os.path.join(QM, 'q.jsonl'); ib = os.path.join(QM, 'inbox'); os.makedirs(ib)
+    write_queue(qm, {'checkBeforeCommit': True, 'checker': 'kirk', 'mind': 'test-mind'}, [entry('Lq5m', provenance='self')])
+    rc, out = sh(['learn', '--queue', qm, '--steps', '10'], QM); rm_ = receipts(out)[-1] if receipts(out) else {}
+    ra, _ = sh(['activate', '--method', 'soft-prompt', '--to', rm_.get('candidateFp', '')[:16], '--by', 'mind'], QM)
+    open(os.path.join(ib, 'fl-learn-request-activate-m.json'), 'w').write(json.dumps(
+        {'kind': 'fl-learn-request', 'action': 'activate', 'mind': 'test-mind', 'method': 'soft-prompt', 'receiptHash': rm_.get('receiptHash'), 'by': 'mind'}))
+    sh(['inbox'], QM, env={'FL_LEARN_PAUSE_INBOX': ib})
+    not_by_mind = not os.path.exists(live(QM))
+    rb, _ = sh(['activate', '--method', 'soft-prompt', '--to', rm_.get('candidateFp', '')[:16], '--by', 'kirk', '--reason', 'I looked.'], QM)
+    record('person-hold-only-a-person-activates', rm_.get('hold') == 'pending-kirk' and ra != 0 and not_by_mind and rb == 0
+           and sha(live(QM)) == rm_.get('candidateFp'), cli_refused=ra != 0, inapp_refused=not_by_mind)
+
+    # Who lifts a pause (default until Kirk answers): a person's pause only by a person; a mind's by that mind or a person.
+    # The PAUSE file is append-only while it stands, then renamed (never deleted).
+    PZ = os.path.join(A.work, 'pause-owner'); os.makedirs(PZ)
+    sh(['pause', '--global', '--by', 'person'], PZ)
+    a1, _ = sh(['resume', '--global', '--by', 'mind'], PZ); a2, _ = sh(['resume', '--global', '--by', 'operator'], PZ)
+    held1 = os.path.exists(os.path.join(PZ, 'PAUSE'))
+    sh(['pause', '--global', '--by', 'mind:test-mind'], PZ)
+    lines = open(os.path.join(PZ, 'PAUSE')).read().splitlines()
+    a3, _ = sh(['resume', '--global', '--by', 'mind:test-mind'], PZ)             # a person's pause is still in the file
+    a4, _ = sh(['resume', '--global', '--by', 'kirk'], PZ)
+    lifted = not os.path.exists(os.path.join(PZ, 'PAUSE')) and glob.glob(os.path.join(PZ, 'PAUSE.resumed-*'))
+    sh(['pause', '--by', 'mind:test-mind'], PZ)
+    b1, _ = sh(['resume', '--by', 'mind:Other'], PZ); b2, _ = sh(['resume', '--by', 'mind:test-mind'], PZ)
+    sh(['pause', '--by', 'mind:test-mind'], PZ); b3, _ = sh(['resume', '--by', 'person'], PZ)
+    rr = [x['meta'] for x in home_chain(PZ) + chain(PZ) if x['meta']['kind'] == 'resume-refused']
+    record('pause-who-lifts-and-append-only', a1 != 0 and a2 != 0 and held1 and len(lines) == 2 and lines[0].endswith('person')
+           and lines[1].endswith('mind:test-mind') and a3 != 0 and a4 == 0 and lifted and b1 != 0 and b2 == 0 and b3 == 0 and len(rr) == 4,
+           pause_lines=[l.split(' ')[-1] for l in lines], refused_rows=len(rr))
+
+    # A queue entry with no status is not a yes: rejected with a row, nothing trained.
+    NS = os.path.join(A.work, 'no-status'); os.makedirs(NS); qn2 = os.path.join(NS, 'q.jsonl')
+    e_ns = entry('Lns', provenance='self'); del e_ns['status']
+    write_queue(qn2, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [e_ns])
+    rc, out = sh(['learn', '--queue', qn2, '--steps', '10'], NS)
+    record('queue-entry-without-status-rejected', 'learn-reject' in kinds(NS) and not os.path.exists(live(NS)) and 'learn-commit' not in kinds(NS))
+
+    # A base that cannot be fingerprinted: no learning on it unless someone explicitly allows it (recorded).
+    UB = os.path.join(A.work, 'base-unknown'); os.makedirs(UB)
+    rc, out = sh(['remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], UB, env={'FL_LEARN_FAKE_BASE_FP': 'unknown'})
+    blocked_ub = 'base unknown' in out and not os.path.exists(live(UB)) and any(x['meta'].get('reason') == 'base-unknown' for x in chain(UB))
+    rc, out = sh(['remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10', '--allow-unknown-base'], UB,
+                 env={'FL_LEARN_FAKE_BASE_FP': 'unknown'})
+    record('unknown-base-fails-unless-allowed', blocked_ub and os.path.exists(live(UB)) and 'base-unknown-allowed' in kinds(UB), blocked=blocked_ub)
+
+    # Power on Linux (sysfs) and the graceful fallback: battery holds; AC goes; no battery listed = unknown, nothing held.
+    def fake_power(d, supplies):
+        for n, files in supplies.items():
+            os.makedirs(os.path.join(d, n), exist_ok=True)
+            for k, v in files.items(): open(os.path.join(d, n, k), 'w').write(v + '\n')
+        os.makedirs(d, exist_ok=True); return d
+    PL = os.path.join(A.work, 'power-linux'); os.makedirs(PL)
+    fb = fake_power(os.path.join(PL, 'sys-bat'), {'AC': {'type': 'Mains', 'online': '0'}, 'BAT0': {'type': 'Battery', 'status': 'Discharging', 'capacity': '55'}})
+    fa = fake_power(os.path.join(PL, 'sys-ac'), {'AC': {'type': 'Mains', 'online': '1'}, 'BAT0': {'type': 'Battery', 'status': 'Charging', 'capacity': '80'}})
+    fn = fake_power(os.path.join(PL, 'sys-none'), {})
+    st = {k: sh(['status'], PL, env={'FL_LEARN_FAKE_SYS_POWER': d})[1].strip().splitlines()[-1].split('| power ')[-1] for k, d in
+          (('battery', fb), ('ac', fa), ('none', fn))}
+    rc, out = sh(['remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], PL, env={'FL_LEARN_FAKE_SYS_POWER': fb})
+    held_l = 'power-hold' in kinds(PL) and not os.path.exists(live(PL))
+    import platform as _pf
+    real = fl_learn.power_state()
+    record('power-linux-and-graceful-fallback', st == {'battery': 'battery', 'ac': 'ac', 'none': 'unknown'} and held_l,
+           status=st, held_on_battery=held_l, this_box=dict(real, system=_pf.system()))
+
+    # Unknown provenance: the mind's re-affirmation starts a FRESH cooling; it trains only on a later second yes.
+    PM = os.path.join(A.work, 'promote'); os.makedirs(PM); qp = os.path.join(PM, 'q.jsonl')
+    write_queue(qp, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [entry('Lpm1', provenance='echoed-web'), entry('Lpm2', provenance=None)])
+    rc, out = sh(['learn', '--queue', qp, '--steps', '10'], PM)
+    qids = sorted(os.path.basename(x)[:-5] for x in glob.glob(os.path.join(mdir(PM), 'quarantine', '*.json')))
+    p1, o1 = sh(['promote', '--id', qids[0], '--by', 'mind', '--reason', 'I read it as data and still choose it.'], PM)
+    cooled = 'cooling again' in o1 and not os.path.exists(live(PM)) and not any(k in kinds(PM) for k in ('learn-commit', 'learn-held'))
+    p2, o2 = sh(['promote', '--id', qids[1], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], PM)
+    p3, o3 = sh(['promote', '--id', qids[0], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], PM)
+    record('quarantine-reaffirm-cools-again', len(qids) == 2 and p1 == 0 and cooled and p2 != 0 and p3 == 0 and os.path.exists(live(PM))
+           and kinds(PM).count('learn-quarantine') == 2 and 'learn-promote-confirmed' in kinds(PM), quarantined=len(qids), cooled_first=cooled)
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

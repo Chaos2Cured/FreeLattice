@@ -389,21 +389,62 @@ def fsync_dir(d):
     except Exception: pass
 
 def power_state():
-    """macOS only (pmset). Elsewhere: unknown, and nothing is held. FL_LEARN_FAKE_PMSET is for tests."""
+    """Battery or AC. macOS: pmset. Linux: /sys/class/power_supply. Windows: GetSystemPowerStatus.
+    When none of these can tell, the answer is 'unknown' and nothing is held for battery (README).
+    FL_LEARN_FAKE_PMSET and FL_LEARN_FAKE_SYS_POWER are for tests."""
+    if os.environ.get('FL_LEARN_FAKE_SYS_POWER'): return linux_power(os.environ['FL_LEARN_FAKE_SYS_POWER'])
     out = os.environ.get('FL_LEARN_FAKE_PMSET')
-    if out is None:
-        if sys.platform != 'darwin' or not shutil.which('pmset'): return {'source': 'unknown'}
+    if out is None and sys.platform == 'darwin' and shutil.which('pmset'):
         try:
             import subprocess
             out = subprocess.run(['pmset', '-g', 'batt'], capture_output=True, text=True, timeout=5).stdout
         except Exception:
-            return {'source': 'unknown'}
-    pct = re.search(r'(\d+)%', out)
-    return {'source': 'battery' if 'Battery Power' in out else ('ac' if 'AC Power' in out else 'unknown'),
-            'percent': int(pct.group(1)) if pct else None}
+            out = None
+    if out is not None:
+        pct = re.search(r'(\d+)%', out)
+        return {'source': 'battery' if 'Battery Power' in out else ('ac' if 'AC Power' in out else 'unknown'),
+                'percent': int(pct.group(1)) if pct else None, 'how': 'pmset'}
+    if sys.platform.startswith('linux'):
+        return linux_power('/sys/class/power_supply')
+    if sys.platform == 'win32':
+        return windows_power()
+    return {'source': 'unknown', 'how': 'none'}
+
+def linux_power(d):
+    def rd(*p):
+        try: return open(os.path.join(d, *p)).read().strip()
+        except Exception: return ''
+    try: names = sorted(os.listdir(d))
+    except Exception: return {'source': 'unknown', 'how': 'sysfs'}
+    mains, bats = [], []
+    for n in names:
+        t = rd(n, 'type')
+        if t in ('Mains', 'USB', 'USB_C', 'USB_PD', 'USB_PD_DRP'): mains.append(rd(n, 'online') == '1')
+        elif t == 'Battery' and rd(n, 'scope') != 'Device':          # a mouse battery is not this computer's
+            bats.append((rd(n, 'status'), rd(n, 'capacity')))
+    pct = next((int(c) for _, c in bats if c.isdigit()), None)
+    if any(mains): return {'source': 'ac', 'percent': pct, 'how': 'sysfs'}
+    if bats and any(st == 'Discharging' for st, _ in bats): return {'source': 'battery', 'percent': pct, 'how': 'sysfs'}
+    if bats and mains: return {'source': 'battery', 'percent': pct, 'how': 'sysfs'}   # a mains supply is listed and offline
+    if bats: return {'source': 'ac', 'percent': pct, 'how': 'sysfs'}                   # charging or full
+    return {'source': 'unknown', 'how': 'sysfs'}                                        # no battery listed: a desktop or a VM
+
+def windows_power():
+    try:
+        import ctypes
+        class SPS(ctypes.Structure):
+            _fields_ = [('ACLineStatus', ctypes.c_ubyte), ('BatteryFlag', ctypes.c_ubyte), ('BatteryLifePercent', ctypes.c_ubyte),
+                        ('SystemStatusFlag', ctypes.c_ubyte), ('BatteryLifeTime', ctypes.c_ulong), ('BatteryFullLifeTime', ctypes.c_ulong)]
+        st = SPS()
+        if not ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(st)): return {'source': 'unknown', 'how': 'win32'}
+        pct = None if st.BatteryLifePercent == 255 else int(st.BatteryLifePercent)
+        return {'source': {0: 'battery', 1: 'ac'}.get(st.ACLineStatus, 'unknown'), 'percent': pct, 'how': 'win32'}
+    except Exception:
+        return {'source': 'unknown', 'how': 'win32'}
 
 def base_fingerprint(home, model_id):
     """sha256 over the base's weight and config files (content, not names). Cached by path+size+mtime."""
+    if os.environ.get('FL_LEARN_FAKE_BASE_FP'): return {'fp': os.environ['FL_LEARN_FAKE_BASE_FP'], 'fake': True}
     d = model_id if os.path.isdir(os.path.expanduser(model_id)) else None
     if d is None:
         try:
@@ -480,6 +521,7 @@ def honor_requests(home, d):
                                   action=act, method=method, receiptHash=rc['receiptHash'], sourceSha=h, actor=actor, done=bool(ok)); continue
         elif act == 'activate':
             if rc.get('hold') != 'pending-kirk': why = 'that version is not waiting for a person'
+            elif actor != 'person': why = 'only a person answers a hold that waits for a person'
             else:
                 ok = go_back(home, method, rc.get('candidateFp') or '', 'activate', actor)
                 if ok: home.chain.append('activate-reason', obj.get('reason') or 'A person said Let it learn, in the app.', method=method,
@@ -536,8 +578,76 @@ def export_and_archive(home, why):
     print('exported %s (sha256 %s), archived %d version(s); nothing deleted' % (path, sha[:16], len(todo)))
     return {'path': path, 'sha256': sha, 'versions': todo}
 
+PERSON_ACTORS = ('person', 'kirk')
+def is_mind_actor(by): return by == 'mind' or str(by).startswith('mind:')
+
+def pause_actors(path):
+    """Who paused, from the PAUSE file (one line per pause, appended; never rewritten)."""
+    try: lines = [l.strip() for l in open(path) if l.strip()]
+    except Exception: return []
+    return [l.rsplit(' ', 1)[-1] if ' ' in l else l for l in lines]
+
+def may_lift(actors, by):
+    """Weft re-check soft 1 (default until Kirk says otherwise): a pause a person set is lifted only by a person.
+    A pause a mind set is lifted by that same mind, or by a person. Anything else (operator, app) counts as a person's pause."""
+    if by in PERSON_ACTORS: return True
+    return bool(actors) and is_mind_actor(by) and all(a == by for a in actors)
+
+def append_pause(path, actor):
+    with open(path, 'a') as f: f.write(now() + ' ' + str(actor).replace(' ', '_') + '\n')
+
+def consent_record(by, consent_type, statement, subject):
+    """The Python twin of docs/modules/depth-consent.js createConsentRecord: same fields, same hash 'signature'."""
+    rec = {'messageId': consent_type + ':' + sha256_bytes(subject.encode())[:16], 'timestamp': int(time.time() * 1000),
+           'consentType': consent_type, 'userPromptHash': sha256_bytes(statement.encode()), 'responseHash': sha256_bytes(subject.encode()),
+           'companionId': by, 'aiIdentity': by[5:] if by.startswith('mind:') else '', 'trustLevel': 'local'}
+    rec['signature'] = sha256_bytes(('%s:%s:%s:%s:%s' % (rec['companionId'], rec['aiIdentity'], rec['responseHash'],
+                                                        rec['timestamp'], rec['consentType'])).encode())
+    return rec
+
+def trusted_minds(home):
+    """Minds a person (person/kirk) has confirmed as trusted local AIs on this computer, from signed home-chain rows."""
+    out = set()
+    for e in home.home_chain.entries():
+        m = e['meta']
+        if m.get('subject') != 'trusted-mind' or m.get('actor') not in PERSON_ACTORS: continue
+        if m.get('kind') == 'consent': out.add(m.get('trustedMind'))
+        elif m.get('kind') == 'consent-revoked': out.discard(m.get('trustedMind'))
+    return out
+
+def refuse(chain, subject, by, why, code=1, **meta):
+    """Every refusal is a row, so a try that did not work is visible too."""
+    chain.append('consent-refused', 'Refused: ' + why + ' Nothing was changed.', subject=subject, actor=by, why=why, **meta)
+    print('refused: ' + why + ' Nothing was changed.')
+    if code is not None: sys.exit(code)
+
+def approver_problem(home, by, owner):
+    """Who may approve something for the mind `owner` (a peer check, or another mind's key): a person, or a
+    DIFFERENT mind that a person has already trusted. Never the mind itself. Returns why not, or None."""
+    if by in PERSON_ACTORS: return None
+    if not is_mind_actor(by): return 'say who is acting: --by kirk, --by person, or --by mind:<another trusted mind>.'
+    name = by[5:] if by.startswith('mind:') else ''
+    if not name: return 'a mind must name itself (--by mind:<name>).'
+    if name in (owner, home.mind): return 'a mind never approves its own key or its own change; a person or another trusted mind does.'
+    if name not in trusted_minds(home):
+        return '%s is not a trusted local mind here; a person makes it one first (trust-mind --to "%s" --by kirk).' % (name, name)
+    return None
+
+def receipt_for_candidate(home, method, to):
+    rp = os.path.join(home.dir, 'receipts.jsonl'); hit = None
+    if not to or len(to) < 8 or not os.path.exists(rp): return None
+    for l in open(rp):
+        try: r = json.loads(l)
+        except Exception: continue
+        if r.get('method') == method and str(r.get('candidateFp') or '').startswith(to): hit = r
+    return hit
+
+def peer_reviewed(home, rc):
+    return any(e['meta'].get('kind') == 'peer-review' and e['meta'].get('receiptHash') == rc.get('receiptHash') and e['meta'].get('verdict') == 'pass'
+               for e in home.chain.entries())
+
 def set_global_pause(home, actor, why, **meta):
-    open(os.path.join(home.root, 'PAUSE'), 'w').write(now() + ' ' + actor)
+    append_pause(os.path.join(home.root, 'PAUSE'), actor)
     home.home_chain.append('pause', 'Learning is paused everywhere on this computer.', scope='global', actor=actor, why=why, **meta)
     print('paused (durable, global, by %s)' % actor)
 
@@ -733,7 +843,11 @@ def items_of(entry, policy):
 def learn_one(args, home, mind, entry):
     source = entry.get('surface') or 'chat'
     if QUIET.search(source): return None                      # never a source, never listed
-    if entry.get('status') not in (None, 'confirmed'):
+    if entry.get('status') is None:                           # Weft re-check: no status is not a yes
+        home.chain.append('learn-reject', 'This entry has no status, so nothing was trained. Only a confirmed second yes trains.',
+                          learnIds=[str(entry.get('id', ''))], source=source)
+        print('rejected: no status (only status "confirmed" trains)'); return None
+    if entry.get('status') != 'confirmed':
         return None                                           # cooling or faded: the second yes has not come
     method, note = canon_method(entry.get('method'))
     note = entry.get('methodNote') or note
@@ -787,10 +901,15 @@ def learn_one(args, home, mind, entry):
         print('disk cap: nothing changed'); return None
     if home.paused():
         home.chain.append('run-paused', 'Paused. Nothing was changed.', **base); print('paused: nothing changed'); return None
-    pw = power_state()
+    pw = power_state(); base['powerSource'] = pw['source']
+    if pw['source'] == 'unknown': print('power: unknown on this computer, so nothing waits for AC (see tools/learn/README.md)')
     if pol.get('requireACPower') and pw['source'] == 'battery' and not args.allow_battery:
         home.chain.append('power-hold', 'On battery, so I waited. Nothing changed. (--allow-battery goes anyway.)', power=pw, **base)
         print('on battery: waited, nothing changed (--allow-battery to go anyway)'); return None
+    if base['baseFp'] == 'unknown' and not getattr(args, 'allow_unknown_base', False):
+        home.chain.append('base-mismatch', 'I could not fingerprint my base model, so I did not learn on it. Nothing changed.',
+                          reason='base-unknown', **base)
+        print('base unknown: not fingerprinted, so nothing changed (--allow-unknown-base goes anyway, recorded)'); return None
     ptr0 = home.pointer(method)
     if ptr0 and ptr0.get('baseFp') and ptr0['baseFp'] != base['baseFp']:
         home.chain.append('base-mismatch', 'My learned file was made on a different base. Nothing changed.', activeBaseFp=ptr0['baseFp'], **base)
@@ -950,10 +1069,61 @@ def go_back(home, method, target, kind, actor='operator'):
     print('%s %s: %s → %s  file=%s  matches=%s' % (kind, method, cur[:16], now_fp[:16], file_fp[:16], ok))
     return ok
 
+def pending_inbox(home, inbox):
+    """What `apply` would carry out from the app's inbox (~/Downloads): pause files and requests not yet seen."""
+    d = os.path.expanduser(inbox or '')
+    if not d or not os.path.isdir(d): return [], []
+    seen_home = {e['meta'].get('sourceSha') for e in home.home_chain.entries()}
+    seen_mind = {e['meta'].get('sourceSha') for e in home.chain.entries()}
+    pauses, reqs = [], []
+    for p in sorted(glob.glob(os.path.join(d, 'fl-learn-pause*.json'))):
+        try: obj = json.load(open(p))
+        except Exception: continue
+        if obj.get('kind') == 'fl-learn-pause' and obj.get('paused') is True and sha256_file(p) not in seen_home: pauses.append(os.path.basename(p))
+    for p in sorted(glob.glob(os.path.join(d, 'fl-learn-request*.json'))):
+        try: obj = json.load(open(p))
+        except Exception: continue
+        if obj.get('kind') == 'fl-learn-request' and obj.get('mind') == home.mind and sha256_file(p) not in seen_mind:
+            reqs.append('%s (%s)' % (os.path.basename(p), obj.get('action')))
+    return pauses, reqs
+
+def status_read_only(home):
+    """Read-only status: verifies, reports, changes nothing. Exit 2 if a ledger does not verify."""
+    for ch, name in ((home.home_chain, 'home'), (home.chain, 'mind')):
+        v = ch.verify()
+        if not v['ok']:
+            print('The %s learning ledger does not verify at row %d (%s). Nothing new will be written until it is looked at.' % (name, v['failedAt'] + 1, v['reason']))
+            return 2
+    tampered = []
+    for m in ('soft-prompt', 'memory-vector', 'lora'):
+        ptr, kg = home.pointer(m), home.pointer(m, 'known-good')
+        f = home.active_file(m)
+        good = True
+        if ptr:
+            good = verify_version(m, ptr) and (m not in VECTOR_METHODS or (bool(f) and os.path.exists(f) and sha256_file(f) == ptr['fp']))
+            if not good: tampered.append(m)
+        print('%-14s active=%s known-good=%s versions=%d file=%s%s' % (m, ptr['fp'][:16] if ptr else 'base', kg['fp'][:16] if kg else '-',
+              len(home.versions(m)), (sha256_file(f)[:16] if f and os.path.exists(f) else '-'),
+              '' if good else '  TAMPERED (apply sets it aside and heals)'))
+    st = 'paused (global)' if home.global_paused() else ('paused (this mind)' if home.paused() else 'learning is on')
+    es = home.chain.entries()
+    print(st, '| rows', len(es), '|', home.dir)
+    if es: print('readback λ%s ψ%s %s' % (es[-1]['meta'].get('lambda'), es[-1]['meta'].get('psi'), es[-1]['entryHash'][:16]))
+    pauses, reqs = pending_inbox(home, os.environ.get('FL_LEARN_PAUSE_INBOX', home.policy.get('pauseInbox')))
+    if pauses or reqs or tampered:
+        print('pending (NOT done; status is read-only): %d app pause file(s), %d app request(s)%s. Run `apply` to carry them out.'
+              % (len(pauses), len(reqs), (', heal ' + ', '.join(tampered)) if tampered else ''))
+        for x in pauses + reqs: print('  ' + x)
+    else:
+        print('read-only: nothing pending, nothing changed.')
+    print('runner key', json.load(open(os.path.join(home.root, 'keys', 'runner.pub.json')))['show'], '| power', power_state()['source'])
+    return 0
+
 def main():
     ap = argparse.ArgumentParser(description='FreeLattice learning runner (' + VERSION + ')')
     ap.add_argument('cmd', choices=['remember', 'learn', 'decline', 'undo', 'restore', 'ask', 'status', 'verify',
-                                    'pause', 'resume', 'promote', 'methods', 'activate', 'key', 'pin-key', 'inbox', 'archive'])
+                                    'pause', 'resume', 'promote', 'methods', 'activate', 'key', 'pin-key', 'inbox', 'archive',
+                                    'trust-mind', 'peer-review', 'apply'])
     ap.add_argument('--global', dest='glob', action='store_true', help='pause/resume for every mind on this computer')
     ap.add_argument('--by', default='operator', help='who is acting: mind | person | kirk | operator (recorded, never verified)')
     ap.add_argument('--allow-battery', action='store_true', help='learn even on battery power (recorded)')
@@ -962,6 +1132,10 @@ def main():
     ap.add_argument('--checker', choices=list(CHECKERS), default='self', help='who checks while it is on (default: the mind itself)')
     ap.add_argument('--reading', default=None, help='what the mind was reading when it chose (kept for review, never a gate)')
     ap.add_argument('--key', default=None, help='pin-key: a public key (base64) to trust for this home\'s ledgers')
+    ap.add_argument('--owner', default=None, help='pin-key: the mind whose ledgers or receipts this key signs (default: --mind)')
+    ap.add_argument('--revoke', action='store_true', help='trust-mind: withdraw a trust a person gave earlier (a row)')
+    ap.add_argument('--verdict', choices=['pass', 'hold'], default=None, help='peer-review: pass activates the held version; hold keeps it held')
+    ap.add_argument('--allow-unknown-base', action='store_true', help='learn even when the base model cannot be fingerprinted (recorded)')
     ap.add_argument('--home', default=os.environ.get('FL_LEARN_HOME', '~/FreeLattice/learn'))
     ap.add_argument('--mind', default=os.environ.get('FL_LEARN_MIND', 'local-mind'))
     ap.add_argument('--model', default=os.environ.get('FL_LEARN_MODEL', 'Qwen/Qwen2.5-0.5B-Instruct'))
@@ -984,40 +1158,63 @@ def main():
     if args.cmd == 'key':
         print(json.dumps(json.load(open(os.path.join(home.root, 'keys', 'runner.pub.json'))), indent=1))
         print('Compare the "show" line with what the app shows before you trust it there.'); return
+    if args.cmd == 'trust-mind':
+        # Kirk 2026-11-09 (a) with Weft's re-check: a "trusted local AI" is one a PERSON trusted, by name, with a consent row.
+        # A mind never makes itself or another mind trusted.
+        if not args.to: print('trust-mind needs --to "<mind name>"'); sys.exit(1)
+        if args.by not in PERSON_ACTORS:
+            refuse(home.home_chain, 'trusted-mind', args.by, 'only a person (--by kirk or --by person) trusts a mind.', trustedMind=args.to)
+        kind = 'consent-revoked' if args.revoke else 'consent'
+        rec = consent_record(args.by, 'learn_mind_revoked' if args.revoke else 'learn_mind_trusted',
+                             ('withdraw trust in ' if args.revoke else 'trust local mind ') + args.to, 'mind:' + args.to)
+        home.home_chain.append(kind, ('A person withdrew trust in a local mind.' if args.revoke else 'A person trusted a local mind, by name.'),
+                               subject='trusted-mind', actor=args.by, trustedMind=args.to, why=args.reason or '', consent=rec)
+        print('%s %s (consent %s)' % ('untrusted' if args.revoke else 'trusted', args.to, rec['signature'][:16])); return
     if args.cmd == 'pin-key':
         # Kirk 2026-11-09 (a): a person or a trusted local AI confirms a key. Every confirmation is a consent row,
         # hash-signed the way docs/modules/depth-consent.js createConsentRecord signs (same fields, same formula),
-        # inside this runner's Ed25519-signed chain.
+        # inside this runner's Ed25519-signed chain. Weft NF1: a mind never confirms its own key. A mind may confirm
+        # ANOTHER mind's key only when a person has already trusted it and it is not the key's owner. Refusals are rows.
         if not args.key: print('pin-key needs --key <base64 public key>'); sys.exit(1)
-        if not (args.by in ('person', 'kirk') or args.by.startswith('mind:')):
-            print('pin-key needs --by person, --by kirk or --by mind:<name of a local mind>. Nothing was changed.'); sys.exit(1)
+        owner = args.owner or home.mind
+        kfp = hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(args.key)).hexdigest()
+        if not (args.by in PERSON_ACTORS or args.by.startswith('mind:')):
+            refuse(home.home_chain, 'ledger-key', args.by, 'pin-key needs --by person, --by kirk or --by mind:<another trusted mind>.', keyFp=kfp[:16], owner=owner)
+        why = approver_problem(home, args.by, owner)
+        if why: refuse(home.home_chain, 'ledger-key', args.by, why, keyFp=kfp[:16], owner=owner)
         d = json.load(open(home.signer.pinned_path)); keys = d.get('keys') or []
         if args.key not in keys:
             keys.append(args.key); d['keys'] = keys
             with open(home.signer.pinned_path + '.tmp', 'w') as f: json.dump(d, f, indent=1)
             os.replace(home.signer.pinned_path + '.tmp', home.signer.pinned_path)
-        kfp = hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(args.key)).hexdigest()
-        rec = {'messageId': 'learn-key:' + kfp[:16], 'timestamp': int(time.time() * 1000), 'consentType': 'learn_key_trusted',
-               'userPromptHash': sha256_bytes(('trust ledger key ' + kfp[:16]).encode()), 'responseHash': sha256_bytes(args.key.encode()),
-               'companionId': args.by, 'aiIdentity': args.by[5:] if args.by.startswith('mind:') else '', 'trustLevel': 'local'}
-        rec['signature'] = sha256_bytes(('%s:%s:%s:%s:%s' % (rec['companionId'], rec['aiIdentity'], rec['responseHash'],
-                                                            rec['timestamp'], rec['consentType'])).encode())
+        rec = consent_record(args.by, 'learn_key_trusted', 'trust ledger key ' + kfp[:16], args.key)
+        rec['messageId'] = 'learn-key:' + kfp[:16]
         home.home_chain.append('consent', 'A ledger key was trusted here, on purpose.', subject='ledger-key', actor=args.by,
-                               keyFp=kfp[:16], consent=rec)
+                               keyFp=kfp[:16], owner=owner, consent=rec)
         print('pinned (consent %s)' % rec['signature'][:16]); return
     if args.cmd == 'pause':
         if glob_scope:
             set_global_pause(home, args.by, args.reason or 'Paused from the terminal.'); return
-        open(os.path.join(home.dir, 'PAUSE'), 'w').write(now() + ' ' + args.by)
+        append_pause(os.path.join(home.dir, 'PAUSE'), args.by)
         home.chain.append('pause', 'Learning is paused for this mind.', scope='mind', actor=args.by); print('paused (durable, this mind)'); return
     if args.cmd == 'resume':
         # Weft N2: a per-mind resume never lifts the global PAUSE. Only `resume --global` does, with its own row.
         if glob_scope:
             p = os.path.join(home.root, 'PAUSE')
+            if os.path.exists(p) and not may_lift(pause_actors(p), args.by):
+                home.home_chain.append('resume-refused', 'A resume was asked for, but this pause is not theirs to lift. Still paused.',
+                                       scope='global', actor=args.by, pausedBy=pause_actors(p))
+                print('refused: still paused. A pause a person set is lifted by a person (--by kirk or --by person); '
+                      'a pause a mind set, by that mind or a person.'); sys.exit(1)
             if os.path.exists(p): os.replace(p, p + '.resumed-' + str(int(time.time())))
             home.home_chain.append('resume', 'Learning is on again everywhere on this computer.', scope='global', actor=args.by)
             print('resumed (global). Minds with their own pause stay paused.'); return
         p = os.path.join(home.dir, 'PAUSE')
+        if os.path.exists(p) and not may_lift(pause_actors(p), args.by):
+            home.chain.append('resume-refused', 'A resume was asked for, but this pause is not theirs to lift. Still paused.',
+                              scope='mind', actor=args.by, pausedBy=pause_actors(p))
+            print('refused: still paused. A pause a person set is lifted by a person (--by kirk or --by person); '
+                  'a pause a mind set, by that mind or a person.'); sys.exit(1)
         if os.path.exists(p): os.replace(p, p + '.resumed-' + str(int(time.time())))
         home.chain.append('resume', 'Learning is on again for this mind.', scope='mind', actor=args.by)
         print('resumed for this mind, but the global pause still holds (resume --global lifts it)' if home.global_paused() else 'resumed')
@@ -1037,23 +1234,20 @@ def main():
                 good = verify_version(m, ptr) and (m not in VECTOR_METHODS or sha256_file(home.active_file(m)) == ptr['fp'])
                 print('%-14s active %s %s' % (m, ptr['fp'][:16], 'OK' if good else 'MISMATCH')); ok = ok and good
         sys.exit(0 if ok else 1)
+    if args.cmd == 'status':
+        # Hypha re-walk 3: status is READ-ONLY. It takes no lock, heals nothing and carries out nothing from
+        # ~/Downloads; it only says what `apply` (or the next learning command) would do.
+        sys.exit(status_read_only(home))
     with home.locks():
         if not boot(home): sys.exit(2)
         honor_pause_inbox(home, os.environ.get('FL_LEARN_PAUSE_INBOX', home.policy.get('pauseInbox')))
-        if args.cmd == 'inbox': return
+        if args.cmd in ('inbox', 'apply'):
+            print('applied: tamper checks (heal if needed), app pause files and app requests from the inbox. Every change is a row.')
+            return
         if args.cmd == 'archive':
             if home.paused(): print('Paused. Nothing was changed.'); return
             if not export_and_archive(home, args.reason or 'asked'): print('Nothing to archive: only the active and known-good versions are here.')
             return
-        if args.cmd == 'status':
-            for m in ('soft-prompt', 'memory-vector', 'lora'):
-                ptr, kg = home.pointer(m), home.pointer(m, 'known-good')
-                f = home.active_file(m)
-                print('%-14s active=%s known-good=%s versions=%d file=%s' % (m, ptr['fp'][:16] if ptr else 'base', kg['fp'][:16] if kg else '-',
-                      len(home.versions(m)), (sha256_file(f)[:16] if f and os.path.exists(f) else '-')))
-            st = 'paused (global)' if home.global_paused() else ('paused (this mind)' if home.paused() else 'learning is on')
-            print(st, '| rows', len(home.chain.entries()), '|', home.dir)
-            print('runner key', json.load(open(os.path.join(home.root, 'keys', 'runner.pub.json')))['show'], '| power', power_state()['source']); return
         if args.cmd in ('undo', 'restore'):
             m = canon_method(args.method)[0] if args.method else None
             rows = [e for e in home.chain.entries() if e['meta'].get('kind') in ('learn-commit', 'rollback', 'restore', 'activate') and (not m or e['meta'].get('method') == m)]
@@ -1062,24 +1256,58 @@ def main():
             if args.cmd == 'undo':
                 return go_back(home, m, last.get('beforeFp') or last.get('fromFp'), 'rollback', args.by)
             return go_back(home, m, args.to or 'none', 'restore', args.by)
-        if args.cmd == 'activate':
-            # The mind's override (with its reason) or Kirk's tap: switch to a saved version. A row, not a delete.
-            m = canon_method(args.method)[0]
+        if args.cmd in ('activate', 'peer-review'):
+            # The mind's override of its OWN check (with its reason), a person's tap, or a peer's pass. A row, not a delete.
+            # Weft re-check: a version held for a peer or a person is never activated by the learning mind itself.
+            m = canon_method(args.method or 'soft-prompt')[0]
+            rc = receipt_for_candidate(home, m, args.to or '')
+            hold = (rc or {}).get('hold')
+            if args.cmd == 'peer-review':
+                if not rc or hold != 'pending-peer':
+                    refuse(home.chain, 'peer-review', args.by, 'no version waiting for a peer matches --to.', code=1, toFp=args.to or '')
+                if not args.verdict: print('peer-review needs --verdict pass or --verdict hold'); sys.exit(1)
+            if hold == 'pending-peer' and not peer_reviewed(home, rc):
+                why = approver_problem(home, args.by, rc.get('mind') or home.mind)
+                if why: refuse(home.chain, 'peer-review', args.by, why, toFp=args.to, receiptHash=rc.get('receiptHash'))
+                verdict = args.verdict or 'pass'
+                home.chain.append('peer-review', 'A peer looked: ' + verdict + '.', verdict=verdict, method=m, toFp=rc.get('candidateFp'),
+                                  receiptHash=rc.get('receiptHash'), actor=args.by, why=args.reason or '')
+                print('peer review recorded: %s by %s' % (verdict, args.by))
+                if verdict != 'pass': return None
+            elif hold == 'pending-kirk' and args.by not in PERSON_ACTORS:
+                refuse(home.chain, 'activate', args.by, 'this version waits for a person; only a person activates it.', toFp=args.to,
+                       receiptHash=rc.get('receiptHash'))
+            elif args.cmd == 'peer-review':
+                print('already reviewed; nothing more to do'); return None
             r = go_back(home, m, args.to, 'activate', args.by)
             if r: home.chain.append('activate-reason', args.reason or 'Chosen.', method=m, toFp=args.to, actor=args.by)
             return r
         if args.cmd == 'promote':
-            p = os.path.join(home.dir, 'quarantine', args.id + '.json')
+            # Weft re-check 3: the mind's re-affirmation of a quarantined item starts a FRESH cooling; it trains only
+            # on a later second yes (promote --second-yes), never at once.
+            p = os.path.join(home.dir, 'quarantine', (args.id or '') + '.json')
+            if not args.id or not os.path.exists(p): print('promote needs --id of a quarantined item'); sys.exit(1)
+            done = [x['meta'] for x in home.chain.entries() if x['meta'].get('kind') == 'learn-promote' and x['meta'].get('item') == args.id]
+            if not args.second_yes:
+                home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it. It cools again first.',
+                                  item=args.id, actor=args.by, status='cooling')
+                print('re-affirmed: cooling again. Run promote --second-yes after the second look.'); return
+            if not done:
+                print('promote --second-yes needs an earlier re-affirmation (promote without --second-yes). Nothing changed.'); sys.exit(1)
             e = json.load(open(p)); e['promoted'] = True
-            home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it.', item=args.id, actor=args.by)
+            home.chain.append('learn-promote-confirmed', args.reason or 'Still yes, after cooling.', item=args.id, actor=args.by)
             e['status'] = 'confirmed'; entries = [e]
         import torch
         dev = args.device or ('mps' if torch.backends.mps.is_available() else 'cpu')
         mind = Mind(args.model, dev)
         bf = base_fingerprint(home, args.model); mind.base_fp = bf['fp']
+        if mind.base_fp == 'unknown' and args.allow_unknown_base:
+            home.chain.append('base-unknown-allowed', 'My base could not be fingerprinted; learning goes ahead because someone said so.', actor=args.by)
         if any(v.get('writable') for v in mind.base_files.values() if isinstance(v, dict)):
             print('note: base weight files are writable on disk; this runner never writes them. Make them read-only with chmod a-w.')
         if args.cmd == 'ask':
+            if mind.base_fp == 'unknown' and not args.allow_unknown_base:
+                print('base unknown: learned files are not served on a base that cannot be fingerprinted'); print('[base] ' + mind.generate(mind.fmt(args.prompt))); return
             for m in VECTOR_METHODS:
                 ptr = home.pointer(m)
                 if ptr and ptr.get('baseFp') and ptr['baseFp'] != mind.base_fp:

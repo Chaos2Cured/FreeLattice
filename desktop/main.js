@@ -1481,7 +1481,8 @@ function setupIPC() {
   });
   ipcMain.handle('lattice-ledger-verify', () => {
     try {
-      return latticeLedger.verifyChain();
+      // Weft re-check: pinned to this companion's own key, so a chain re-signed wholesale under a new key fails.
+      return latticeLedger.verifyChain({ pinnedKeys: latticeLedger.ownPinnedKeys() });
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }
