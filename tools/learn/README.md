@@ -73,6 +73,24 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   starting with `FL_LEARN_FAKE_` or `FL_LEARN_CRASH` in the shell (`env | grep FL_LEARN_`). Open for Kirk: whether the
   hooks should exist outside the suite at all.
 - **Queues:** only entries with `status: "confirmed"` train; an entry without a status is rejected with a row.
+- **A person's no follows the content (Hypha ed12354d HOLD, Weft recheck4 F7).** Here a person's no is a rollback
+  (`undo`, or the app's Undo request) by anyone who is not a mind; a later `restore`/`activate` of that version by a
+  person is their yes. Contents are matched by `norm_text` (the mind-name normal form, then trailing punctuation,
+  symbols and spaces stripped) and by a cheap near-duplicate check: token sets (letters, marks, digits; one-letter
+  tokens and a short list of filler words dropped), Jaccard |A n B| / |A u B|, a hit at **0.8 or more** with at least
+  2 tokens on each side. The threshold is set high on purpose: a hit only turns a choice into a visible proposal that
+  cools a full day, never a refusal, but a lower one would catch unrelated facts that share words. Then:
+  - `remember` of matching content is a disagreement proposal: a `learn-disagreement` row, a full day of cooling
+    (`--revisit now` is not used), `proposalOf: undone:<fp16>` and `match` (`same-text` or `similar-to <fp16>, <score>`).
+  - A first yes from BEFORE that rollback no longer counts: its `--second-yes` is refused and a new first yes (a full
+    day) is written.
+  - For a day after any person rollback (real clock), an early `--revisit` is not used on a new choice.
+  - A confirmed queue entry with matching content trains only if it was chosen after the rollback and cooled a full
+    day (the app's proposal); a queue entry chosen within that day with an early revisit is rejected. Both are rows.
+  - A mind never brings back (`restore`, `activate`) a version a person took back; a person may.
+  - **Limit, plainly:** a paraphrase in other words ("Before she married, Mom was a Hollowell" for "Mom's maiden name
+    is Hollowell") is not matched. Inside the day after the person's no it still cools a full day; after that day it
+    is an ordinary new choice. Only a person reading the export catches it then (Mac trial rule (e)).
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
   Weft recheck3 F6: the base is fingerprinted from the FULL content of every weight and config file on every run
   (no cache), so an edit anywhere changes it, even with size and mtime put back.

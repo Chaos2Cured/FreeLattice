@@ -110,6 +110,75 @@ def prepare_work(w):
     os.makedirs(run)
     return run
 
+def f7_runner_tests():
+    """Hypha ed12354d HOLD / Weft recheck4 F7, the runner's half: a person's rollback follows the content."""
+    QUICK = ['--check-before', 'off', '--check', 'none', '--steps', '10', '--allow-battery']
+    F = os.path.join(A.work, 'f7'); os.makedirs(F)
+    sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, check=True)
+    fp1 = sha(live(F)); cm = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-commit']
+    # A first yes for the same content (text + ".") made BEFORE the person's undo, with revisit now.
+    pre = ['--text', FACT[1] + '.', '--question', FACT[3], '--answer', 'Veloria', '--reason', 'a second reason']
+    sh(['remember'] + pre + ['--revisit', 'now'], F, first_yes=False)
+    sh(['undo', '--by', 'person'], F, check=True)
+    undone = fp1 != 'none' and not os.path.exists(live(F))
+    # (1) the same text (new reason, "!") with revisit now, then the second yes at once: a proposal, refused.
+    bang = ['--text', FACT[1] + '!', '--question', FACT[3], '--answer', 'Veloria', '--reason', 'I still want it']
+    r1, o1 = sh(['remember'] + bang + ['--revisit', 'now'], F, first_yes=False)
+    r2, o2 = sh(['remember'] + bang + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
+    ch = [e['meta'] for e in chain(F)]
+    dis = [m for m in ch if m['kind'] == 'learn-disagreement' and m.get('match') == 'same-text']
+    lc = [m for m in ch if m['kind'] == 'learn-choose' and m.get('itemSha') == fl_learn.sha256_bytes((FACT[1] + '!').encode())]
+    span = (fl_learn.iso_epoch(lc[-1]['revisitAt']) - fl_learn.iso_epoch(lc[-1]['t'])) if lc else 0
+    record('F7-runner-same-text-after-person-undo-is-a-proposal', undone and bool(cm[-1].get('itemTexts')) and r1 == 0 and 'note (F7)' in o1
+           and r2 != 0 and 'still cooling' in o2 and not os.path.exists(live(F)) and dis and lc[-1].get('proposalOf', '').startswith('undone:')
+           and span >= 24 * 3600 - 2, r2=r2, span_h=round(span / 3600, 2), dis=len(dis))
+    # The first yes from before the undo no longer counts: its second yes is refused and it becomes a proposal.
+    r3, o3 = sh(['remember'] + pre + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
+    lc3 = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-choose' and e['meta'].get('itemSha') == fl_learn.sha256_bytes((FACT[1] + '.').encode())]
+    record('F7-runner-first-yes-from-before-the-undo-no-longer-counts', r3 != 0 and 'refused (F7)' in o3 and not os.path.exists(live(F))
+           and len(lc3) == 2 and lc3[-1].get('proposalOf', '').startswith('undone:'), r3=r3, rows=len(lc3))
+    # (3) a near duplicate (same words, another order) is a proposal too, and says how close.
+    nd = ['--text', "Veloria is the name of the lantern in Kirk's garden", '--question', FACT[3], '--answer', 'Veloria', '--reason', 'r']
+    r4, o4 = sh(['remember'] + nd + ['--revisit', 'now'], F, first_yes=False)
+    m4 = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-choose'][-1]
+    record('F7-runner-near-duplicate-is-a-proposal', r4 == 0 and m4.get('match', '').startswith('similar-to ') and m4.get('proposalOf', '').startswith('undone:')
+           and fl_learn.iso_epoch(m4['revisitAt']) - fl_learn.iso_epoch(m4['t']) >= 24 * 3600 - 2, match=m4.get('match'))
+    # (2) a paraphrase it can't see, within a day: an early revisit is not used.
+    pp = ['--text', 'At night the garden glows under a lamp called Veloria', '--question', 'What glows?', '--answer', 'Veloria', '--reason', 'r']
+    r5, o5 = sh(['remember'] + pp + ['--revisit', 'now'], F, first_yes=False)
+    r6, o6 = sh(['remember'] + pp + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False)
+    m5 = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-choose'][-1]
+    record('F7-runner-paraphrase-within-a-day-no-early-second-yes', r5 == 0 and m5.get('earlyIgnored') and not m5.get('proposalOf') and r6 != 0
+           and 'still cooling' in o6 and not os.path.exists(live(F)), r6=r6, early=m5.get('earlyIgnored', '')[:60])
+    # A queue entry with that content, confirmed at once in an (older) app: rejected; nothing trained.
+    qf = os.path.join(F, 'q.jsonl'); tnow = fl_learn.iso_of(time.time())
+    write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False}, [entry('Lf7a', provenance='self', check='none', t=tnow, revisitAt=tnow,
+                items=[{'instruction': FACT[3], 'output': FACT[1].upper()}])])
+    r7, o7 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F)
+    rj = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'learn-reject' and 'Lf7a' in e['meta'].get('learnIds', [])]
+    record('F7-runner-queue-same-content-confirmed-at-once-rejected', 'rejected (F7)' in o7 and rj and rj[-1].get('match') == 'same-text'
+           and not os.path.exists(live(F)), out=o7.strip().splitlines()[-1:])
+    # The app's disagreement proposal (chosen after the undo, a full day) trains once its day is over (Q2 as today).
+    t1 = time.time() + 5
+    write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False}, [entry('Lf7b', provenance='self', check='none', t=fl_learn.iso_of(t1),
+                revisitAt=fl_learn.iso_of(t1 + 24 * 3600), proposalOf='Lf7a', items=[{'instruction': FACT[3], 'output': FACT[1]}])])
+    r8, o8 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], F, env={'FL_LEARN_FAKE_NOW': str(int(t1 + 25 * 3600))})
+    record('F7-runner-full-day-proposal-trains-after-its-day', r8 == 0 and 'rejected' not in o8 and os.path.exists(live(F)), out=o8.strip().splitlines()[-1:])
+    # A mind never brings back a version a person took back; a person may.
+    G = os.path.join(A.work, 'f7-restore'); os.makedirs(G)
+    sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G, check=True); gfp = sha(live(G))
+    sh(['undo', '--by', 'person'], G, check=True)
+    m1, om1 = sh(['restore', '--to', gfp[:16], '--by', 'mind'], G)
+    m2, om2 = sh(['activate', '--method', 'soft-prompt', '--to', gfp[:16], '--by', 'mind:test-mind', '--reason', 'mine'], G)
+    gone = not os.path.exists(live(G))
+    p1, op1 = sh(['restore', '--to', gfp[:16], '--by', 'person'], G)
+    record('F7-runner-mind-cannot-bring-back-what-a-person-took-back', m1 != 0 and m2 != 0 and gone and p1 == 0 and sha(live(G)) == gfp
+           and sum(1 for e in chain(G) if e['meta']['kind'] == 'consent-refused') >= 2, mind_restore=m1, mind_activate=m2, person=p1)
+    # After the person's own restore, that rollback no longer counts: revisit now works again for this content.
+    sh(['undo', '--by', 'mind'], G, check=True)
+    r9, o9 = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G)
+    record('F7-runner-person-later-yes-clears-it', r9 == 0 and 'F7' not in o9 and os.path.exists(live(G)), out=o9.strip().splitlines()[-1:])
+
 def main():
     global A
     ap = argparse.ArgumentParser(); ap.add_argument('--model', required=True); ap.add_argument('--work', required=True)
@@ -800,6 +869,7 @@ def main():
     record('mind-names-shared-fixture-and-lookalikes-refused', len(fx) >= 60 and not fbad and all(x != 0 for x in lk) and lok == 0 and lp != 0
            and fl_learn.mind_id('\u039f\u0394\u039f\u03a3') == fl_learn.mind_id('\u03bf\u03b4\u03bf\u03c2'),
            fixture_mismatch=fbad[:3], lookalike_refused=[x != 0 for x in lk], plain_ok=lok == 0, owner_refused=lp != 0)
+    f7_runner_tests()
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

@@ -138,6 +138,57 @@ def name_problem(label):
     if len(seen) > 1: return 'the name mixes look-alike scripts (%s)' % ', '.join(seen)
     return ''
 
+# Hypha ed12354d HOLD / Weft recheck4 F7: a person's no follows the CONTENT. Twins of normText(), textTokens(),
+# textSimilarity(), nameSkeleton() in snowflake-core.js, step for step; tools/learn/learn-match-v0.1.json pins both.
+def _cat(c):
+    import unicodedata
+    return unicodedata.category(c)
+def norm_text(text):
+    """normMind(), then trailing punctuation, symbols and spaces stripped."""
+    t = norm_mind(text)
+    while t and (_cat(t[-1])[0] in 'PS' or t[-1].isspace()): t = t[:-1]
+    return t
+LEARN_SIMILAR = 0.8
+TEXT_FILLER = set(('a an the is are was were be been being am of to in on at and or for with as by from it its this that these those '
+                   'my your his her our their i me you he she we they named called').split())
+def text_tokens(text):
+    out, cur = [], ''
+    for c in norm_text(text) + ' ':
+        if _cat(c)[0] in 'LMN': cur += c; continue
+        if cur and len(cur) >= 2 and cur not in TEXT_FILLER and cur not in out: out.append(cur)
+        cur = ''
+    return sorted(out)
+def text_similarity(a, b):
+    """Token-set Jaccard, rounded to 3 places the way JS Math.round does (half up). 0 when a side has < 2 tokens."""
+    import math
+    A, B = set(text_tokens(a)), set(text_tokens(b))
+    if len(A) < 2 or len(B) < 2: return 0
+    x = math.floor(len(A & B) / len(A | B) * 1000 + 0.5) / 1000
+    return int(x) if x == int(x) else x
+def fmt_score(x): return str(int(x)) if x == int(x) else repr(x)
+
+# Weft recheck4 F5 residual: a UTS #39-style confusable skeleton (not the full table: the Latin/Cyrillic/Greek letters
+# below, 0/1/I/| -> o/l/l/l, rn -> m, vv -> w, marks dropped, only letters and digits kept). Twin of nameSkeleton().
+SKELETON_PAIRS = ('АaВbЕeЅsІlЈjКkМmНhОoРpСcТtУyХxЁeЀeЌkЎyаaвbеeѕsіiјjкkмmнhоoрpсcтtуyхxһhԁdԛqԝwӏlӀlпnьbԍg'
+                  'ΑaΒbΕeΖzΗhΙlΚkΜmΝnΟoΡpΤtΥyΧxαaβbεeιiκkνvοoρpτtυuχxγyωwϲcϳjϹcϜfϝfΪlϊiΫyϋu'
+                  'ıiȷjɑaɡgɩiʟlǀl0o1lIl|l')
+SKELETON_MAP = {SKELETON_PAIRS[i]: SKELETON_PAIRS[i + 1] for i in range(0, len(SKELETON_PAIRS) - 1, 2)}
+def name_skeleton(label):
+    import unicodedata
+    t = unicodedata.normalize('NFD', unicodedata.normalize('NFKC', str(label or '')))
+    t = ''.join(c for c in t if _cat(c)[0] != 'M')
+    t = ''.join(SKELETON_MAP.get(c, c) for c in t)
+    t = t.upper().lower().replace('\u03c2', '\u03c3')
+    t = ''.join(SKELETON_MAP.get(c, c) for c in t)
+    t = t.replace('rn', 'm').replace('vv', 'w')
+    return ''.join(c for c in t if _cat(c)[0] in 'LN')
+def lookalike_of(label, names):
+    """The name among `names` that is a different name but has the same skeleton as `label`, or ''."""
+    sk = name_skeleton(label)
+    for n in names:
+        if n and norm_mind(n) != norm_mind(label) and name_skeleton(n) == sk: return n
+    return ''
+
 def mind_id(label):
     """Collision-safe: "Lumen@kirk" and "Lumen kirk" share a slug but never a folder. Twin of mindId() in snowflake-core.js.
     Built from the normalized name, so an alias (case, width, spaces) is the same folder, never a second identity."""
@@ -766,6 +817,59 @@ def approver_problem(home, by, owner):
         return '%s is not a trusted local mind here; a person makes it one first (trust-mind --to "%s" --by kirk).' % (name, name)
     return None
 
+# Hypha ed12354d HOLD / Weft recheck4 F7, the runner's half. Here a person's no is a rollback (undo, or the app's
+# Undo request) by anyone who is not a mind; a later restore or activate of that same version by a person is their yes.
+def person_undone_fps(home):
+    """{fp: ts} for each version whose newest non-mind pointer action took it back."""
+    last = {}
+    for e in home.chain.entries():
+        m = e['meta']; k = m.get('kind'); actor = m.get('actor') or 'operator'
+        if is_mind_actor(actor): continue
+        if k == 'rollback' and m.get('fromFp') not in (None, '', 'none'): last[m['fromFp']] = ('no', e['ts'])
+        elif k in ('restore', 'activate') and m.get('toFp') not in (None, '', 'none'): last[m['toFp']] = ('yes', e['ts'])
+    return {fp: ts for fp, (d, ts) in last.items() if d == 'no'}
+def undone_contents(home):
+    """What those versions taught: [{text, fp, ts}] (itemTexts on the commit row; older rows: the gist)."""
+    undone = person_undone_fps(home)
+    if not undone: return []
+    out = []
+    for e in home.chain.entries():
+        m = e['meta']
+        if m.get('kind') in ('learn-commit', 'learn-held') and m.get('afterFp') in undone:
+            for t in (m.get('itemTexts') or ([m['gist']] if m.get('gist') else [])):
+                out.append({'text': t, 'fp': m['afterFp'], 'ts': undone[m['afterFp']]})
+    return out
+def content_hit(home, text):
+    """The undone content `text` matches: the same norm_text first, then the closest near duplicate (>= LEARN_SIMILAR)."""
+    nt, best = norm_text(text), None
+    for u in undone_contents(home):
+        exact = bool(nt) and norm_text(u['text']) == nt
+        score = 1 if exact else text_similarity(u['text'], text)
+        if not exact and score < LEARN_SIMILAR: continue
+        c = dict(u, exact=exact, score=score, how='same-text' if exact else 'similar-to %s, %s' % (u['fp'][:16], fmt_score(score)))
+        if not best or (exact and not best['exact']) or (exact == best['exact'] and (score > best['score'] or (score == best['score'] and u['ts'] > best['ts']))): best = c
+    return best
+def recent_person_undo(home):
+    """The newest person rollback within the last day, by the REAL clock (an injected clock never shortens it)."""
+    still = person_undone_fps(home)          # a rollback a person later undid (restore/activate of that version) no longer counts
+    ts = [e['ts'] for e in home.chain.entries() if e['meta'].get('kind') == 'rollback' and not is_mind_actor(e['meta'].get('actor') or 'operator')
+          and e['meta'].get('fromFp') in still and (iso_epoch(e['ts']) or 0) > time.time() - COOL_SECS]
+    return ts[-1] if ts else None
+def f7_queue_problem(home, entry):
+    """Why a confirmed queue entry may not train here (F7), or None. Content a person took back trains only from an
+    entry chosen after that and cooled a full day (the app's disagreement proposal); and for a day after any person
+    rollback, an entry chosen then with an early revisit does not count."""
+    text = ' '.join((it.get('output') or it.get('response') or '') for it in entry.get('items') or [])
+    t_e, ra_e = iso_epoch(str(entry.get('t') or '')), iso_epoch(str(entry.get('revisitAt') or ''))
+    full = t_e is not None and ra_e is not None and ra_e - t_e >= COOL_SECS - 60
+    hit = content_hit(home, text)
+    if hit and not (full and t_e >= (iso_epoch(hit['ts']) or 0)):
+        return hit, 'a person took back a version with this content here (%s, %s); this entry did not cool a full day after that' % (hit['fp'][:16], hit['how'])
+    r = recent_person_undo(home)
+    if r and t_e is not None and t_e >= (iso_epoch(r) or 0) and not full:
+        return None, 'chosen within a day of a person taking a change back here; an early revisit does not count then'
+    return None, None
+
 def receipt_for_candidate(home, method, to):
     rp = os.path.join(home.dir, 'receipts.jsonl'); hit = None
     if not to or len(to) < 8 or not os.path.exists(rp): return None
@@ -990,6 +1094,13 @@ def learn_one(args, home, mind, entry):
             home.chain.append('learn-reject', 'Still cooling: its second yes came before its cooling ended, so nothing was trained.',
                               learnIds=[str(entry.get('id', ''))], source=source, revisitAt=str(ra))
             print('rejected: still cooling until %s' % ra); return None
+    if getattr(args, 'cmd', '') == 'learn':
+        hit, why = f7_queue_problem(home, entry)
+        if why:
+            home.chain.append('learn-reject', 'A person said no to this content here, so nothing was trained. It waits for a person to look.',
+                              learnIds=[str(entry.get('id', ''))], source=source, why=why, match=(hit or {}).get('how', ''),
+                              proposalOf=str(entry.get('proposalOf') or ''))
+            print('rejected (F7): ' + why); return None
     method, note = canon_method(entry.get('method'))
     note = entry.get('methodNote') or note
     # Q5 (Kirk 2026-11-09): check-before-keep is ON unless someone switched it off; the default checker is the mind.
@@ -1130,7 +1241,8 @@ def learn_one(args, home, mind, entry):
     # or `activate`). A held version is saved, inactive; `activate` is a row, never a delete.
     commit = (chk_choice == 'none') or (chk_choice == 'self' and chk['pass'])
     known_good = bool(chk['pass'] and chk_choice == 'self')
-    row_meta = dict(base, gist=gist, version=os.path.basename(vdir), beforeFp=before_fp, afterFp=fp, size=size,
+    # before: row_meta = dict(base, gist=gist, version=os.path.basename(vdir), beforeFp=before_fp, afterFp=fp, size=size,
+    row_meta = dict(base, gist=gist, itemTexts=[it['a'] for it in items], version=os.path.basename(vdir), beforeFp=before_fp, afterFp=fp, size=size,
                     dtype='float32', shape=shape, check_result=chk, losses=[round(losses[0], 4), round(losses[-1], 4)], seconds=secs)
     sz = dict(size=size, dtype='float32', shape=shape)
     if not commit:
@@ -1182,6 +1294,13 @@ def go_back(home, method, target, kind, actor='operator'):
     if home.paused():
         print('Paused. Nothing was changed.'); return None
     cur = home.active_fp(method)
+    # Weft recheck4 F7 (runner): a version a person took back is brought back by a person, never by a mind.
+    if is_mind_actor(actor) and kind in ('restore', 'activate') and target and target != 'none':
+        took = [fp for fp in person_undone_fps(home) if fp.startswith(target)]
+        if took:
+            home.last_refused = True
+            refuse(home.chain, kind, actor, 'a person took this version back; a mind does not bring it back (a person may).', code=None, toFp=took[0])
+            return None
     if target == 'none':
         home.set_pointer(method, 'active', None); now_fp = 'none'
     else:
@@ -1548,12 +1667,28 @@ def main():
                         'items': [{'instruction': args.question or 'Remember this.', 'output': args.text or ''}],
                         'probe': probe if args.question else None}]
             item = sha256_bytes((args.text or '').encode())
+            hit = content_hit(home, args.text or '')
             if not args.second_yes:
                 t0 = now_epoch(); until = revisit_epoch(args.revisit, t0)
+                # Weft recheck4 F7: content a person took back is a disagreement proposal (a full day, a row); for a day
+                # after any person rollback, an early revisit is not used.
+                f7 = {}
+                if hit:
+                    until = max(until, t0 + COOL_SECS)
+                    f7 = dict(proposalOf='undone:' + hit['fp'][:16], match=hit['how'])
+                    home.chain.append('learn-disagreement', 'A person took back a version with this content; I chose it again. It cools a full day first.',
+                                      itemSha=item, proposalOf=f7['proposalOf'], match=hit['how'], over='person', actor=args.by)
+                else:
+                    r = recent_person_undo(home)
+                    if r and until < t0 + COOL_SECS:
+                        f7 = dict(earlyIgnored='an early revisit is not used for a day after a person took a change back (%s)' % r)
+                        until = t0 + COOL_SECS
+                # before: home.chain.append('learn-choose', ..., t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)')
                 home.chain.append('learn-choose', 'I would like to keep this. Cooling first; I will look again before anything changes.',
                                   source=args.source, why=args.reason, method=canon_method(args.method)[0], provenance=args.provenance,
                                   readingSha=sha256_bytes(args.reading.encode()) if args.reading else '', itemSha=item,
-                                  t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)')
+                                  t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)', **f7)
+                if f7: print('note (F7): ' + (f7.get('match') and 'a person took this content back here; this is a proposal: ' + f7['match'] or f7['earlyIgnored']))
                 print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes after the second look.' % iso_of(until)); return
             # Weft recheck2 NF2: the second yes needs the first yes for this same text, and its cooling must be over.
             # before: first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
@@ -1561,6 +1696,16 @@ def main():
             if not first:
                 home.chain.append('still-cooling', 'A second yes came with no first yes for this text. Nothing changed.', itemSha=item, actor=args.by)
                 print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
+            # Weft recheck4 F7: a first yes from before a person took this content back no longer counts. It becomes a
+            # proposal (a new first yes now, a full day), and this second yes is refused.
+            if hit and (iso_epoch(hit['ts']) or 0) > (iso_epoch(first[-1]['rowTs']) or 0):
+                t0 = now_epoch()
+                home.chain.append('learn-disagreement', 'A person took this content back after my first yes. It is a proposal now; it cools a full day.',
+                                  itemSha=item, proposalOf='undone:' + hit['fp'][:16], match=hit['how'], over='person', actor=args.by)
+                home.chain.append('learn-choose', 'Chosen again, after a person took it back. Cooling a full day first.', source=args.source, why=args.reason,
+                                  method=canon_method(args.method)[0], provenance=args.provenance, itemSha=item, t=iso_of(t0),
+                                  revisitAt=iso_of(t0 + COOL_SECS), revisit='a full day (F7)', proposalOf='undone:' + hit['fp'][:16], match=hit['how'])
+                print('refused (F7): a person took this content back after the first yes; it cools a full day from now. Nothing changed.'); sys.exit(1)
             # Weft recheck3 F1: measured from the first yes's real ts, never from an injected clock.
             # before: until = iso_epoch(first[-1].get('revisitAt') or '') or 0
             until = cooling_until(first[-1])
