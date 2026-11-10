@@ -463,8 +463,13 @@ def f5_runner_tests():
     a5, o5 = sh(['pin-key', '--key', base64.b64encode(os.urandom(32)).decode(), '--by', 'mind:\u0422\u04bb\u0456\u0455 \u043c\u0456\u043f\u0501'], LK, mind='This mind')
     a6, o6 = sh(['pin-key', '--key', base64.b64encode(os.urandom(32)).decode(), '--by', 'kirk', '--owner', 'Lumen!'], LK, mind='This mind')
     hc = [x['meta'] for x in home_chain(LK) if x['meta']['kind'] == 'consent-refused']
+    # before (round 16): ... and a4 == 0 and a5 != 0 and 'looks like it' in o5 and a6 != 0 and len(hc) >= 4, codes=...
+    # Round 16 (Cf/non-ASCII soft): a non-ASCII actor (a5's Cyrillic mind:) is now refused before any home is read
+    # (exit 2, "plain letters", no row); the lookalike refusal (exit 1 + consent-refused row) still covers the rest.
+    a5_early = a5 == 2 and 'plain letters' in o5
     record('F5-runner-lookalike-of-a-known-mind-refused', a1 == 0 and a2 != 0 and 'looks like "Lumen"' in o2 and a3 != 0 and 'looks like "This mind"' in o3
-           and a4 == 0 and a5 != 0 and 'looks like it' in o5 and a6 != 0 and len(hc) >= 4, codes=[a1, a2, a3, a4, a5, a6])
+           and a4 == 0 and a5 != 0 and ('looks like it' in o5 or a5_early) and a6 != 0 and len(hc) >= (3 if a5_early else 4),
+           codes=[a1, a2, a3, a4, a5, a6], a5Early=a5_early, rows=len(hc))
     PU = os.path.join(A.work, 'pause-underscore'); os.makedirs(PU)
     sh(['pause', '--global', '--by', 'mind:This mind'], PU)
     line = open(os.path.join(PU, 'PAUSE')).read().strip().splitlines()[-1]
