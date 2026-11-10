@@ -11,6 +11,11 @@ desktop/app/*.js
 desktop/app/*.json
 desktop/app/*.png
 !desktop/app/.gitkeep
+# v-desktop-catch-up-v0.1: offline copy folders made by build-and-release.sh
+desktop/app/modules/
+desktop/app/css/
+desktop/app/lib/
+desktop/app/assets/
 desktop/src-tauri/target/
 desktop/src-tauri/gen/
 desktop/telegram-worker/node_modules/

@@ -39,7 +39,8 @@ fi
 cp ../manifest.json app/ 2>/dev/null && echo "     ✓ manifest.json" || echo "     ⚠ manifest.json not found (optional)"
 cp ../icon-192.png app/ 2>/dev/null && echo "     ✓ icon-192.png" || echo "     ⚠ icon-192.png not found (optional)"
 cp ../icon-512.png app/ 2>/dev/null && echo "     ✓ icon-512.png" || echo "     ⚠ icon-512.png not found (optional)"
-cp ../sw.js app/ 2>/dev/null && echo "     ✓ sw.js" || echo "     ⚠ sw.js not found (optional)"
+# before v-desktop-catch-up-v0.1: copied the repo-root sw.js. The site serves docs/sw.js.
+cp ../docs/sw.js app/ 2>/dev/null && echo "     ✓ sw.js (from docs/)" || { cp ../sw.js app/ 2>/dev/null && echo "     ✓ sw.js"; } || echo "     ⚠ sw.js not found (optional)"
 cp ../landing.html app/ 2>/dev/null && echo "     ✓ landing.html" || echo "     ⚠ landing.html not found (optional)"
 
 # Library files (Three.js, etc.)
@@ -62,6 +63,17 @@ for f in chat-wait.js pool-every-os.js; do
     cp "../docs/modules/$f" "app/modules/$f" && echo "     ✓ $f"
   fi
 done
+
+# v-desktop-catch-up-v0.1 (runs last, so docs/ wins over the older root copies): the offline copy now matches what freelattice.com serves (docs/).
+# before: only ../modules/*.js (16 old files) were copied, so offline Desktop had no Snowflake,
+# no memory-compound, no chat-autonomy and 120+ other modules that app.html loads.
+for d in modules css lib assets; do
+  if [ -d "../docs/$d" ]; then
+    mkdir -p "app/$d"
+    cp -R "../docs/$d/." "app/$d/" && echo "     ✓ $d/ (from docs/)"
+  fi
+done
+
 
 # Verify we have an app file
 if [ ! -f "app/app.html" ] && [ ! -f "app/index.html" ]; then
