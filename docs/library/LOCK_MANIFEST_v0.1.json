@@ -9,7 +9,7 @@
       {"md5": "b648edbaf62997edd6efbdaf7f80ba47", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "network-first for snowflake-core.js, snowflake-search.js, and snowflake.css so an existing install does not keep the broken search"},
       {"md5": "fb09cfa0a8f52d9a3a177c5737a41358", "since": "2026-11-08", "by": "repair", "walk": null, "reason": "snowflake module fetch uses cache no-store so the browser HTTP cache cannot keep the previous search script"},
       {"md5": "f4e9c32824a3c6695b6dbc101e511c43", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "network-first for docs/modules/learn-choice.js so an existing install picks up the learning module (1 line)"},
-      {"md5": "908282a6832baccebea236ef09656d80", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "before: note on the learn-choice.js network-first line (comments only, +2/-0)"}
+      {"md5": "70fcb7a9f821cd3ffd4ad449df397976", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "before: note under the learn-choice.js network-first line, inside its block (comments only, +2/-0)"}
     ],
     "docs/sw.js": [
       {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
@@ -19,7 +19,7 @@
       {"md5": "b648edbaf62997edd6efbdaf7f80ba47", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "network-first for snowflake-core.js, snowflake-search.js, and snowflake.css so an existing install does not keep the broken search"},
       {"md5": "fb09cfa0a8f52d9a3a177c5737a41358", "since": "2026-11-08", "by": "repair", "walk": null, "reason": "snowflake module fetch uses cache no-store so the browser HTTP cache cannot keep the previous search script"},
       {"md5": "f4e9c32824a3c6695b6dbc101e511c43", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "network-first for docs/modules/learn-choice.js so an existing install picks up the learning module (1 line)"},
-      {"md5": "908282a6832baccebea236ef09656d80", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "before: note on the learn-choice.js network-first line (comments only, +2/-0)"}
+      {"md5": "70fcb7a9f821cd3ffd4ad449df397976", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "before: note under the learn-choice.js network-first line, inside its block (comments only, +2/-0)"}
     ],
     "docs/app.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
