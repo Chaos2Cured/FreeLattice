@@ -349,6 +349,32 @@ def overnight_tests():
     record('R15-overnight-cut-off-run-resumes-from-its-checkpoint-by-choice', c1 != 0 and untouched and len(ck) == 1 and r2 == 0
            and rr and str(rr[-1].get('fromStep')) == '20' and same and 'resuming from step 20' in o2,
            crash=c1, ck=len(ck), resumed=rr[-1:] , same=same)
+    # Round 16 (Weft recheck9 F15): a checkpoint is checked against its signed row before any load, and loaded only
+    # with weights_only=True. A changed byte is rejected on --resume and on a repeat run; a pickle that would run code
+    # never runs; the run starts fresh (and so makes the same bytes as an uninterrupted run).
+    def cut(H):
+        os.makedirs(H); sh(['remember'] + T3 + ['--method', 'soft-prompt'] + Q, H, env={'FL_LEARN_CRASH': 'at-step-25'})
+        return glob.glob(os.path.join(H, 'minds', '*', 'checkpoints', 'soft-prompt', '*.pt'))
+    def rejected(H): return [e['meta'] for e in chain(H) if e['meta']['kind'] == 'checkpoint-rejected']
+    saved_rows = [e['meta'] for e in chain(O) if e['meta']['kind'] == 'checkpoint-saved']
+    T1 = os.path.join(A.work, 'ckpt-tamper-resume'); p1 = cut(T1)
+    b = bytearray(open(p1[0], 'rb').read()); b[len(b) // 2] ^= 1; open(p1[0], 'wb').write(bytes(b))
+    r1, o1 = sh(['remember'] + T3 + ['--method', 'soft-prompt', '--second-yes', '--resume'] + Q, T1)
+    rj1 = rejected(T1)
+    record('R16-F15-a-changed-checkpoint-is-rejected-on-resume-and-the-run-starts-fresh', len(p1) == 1 and r1 == 0 and rj1
+           and 'do not match' in rj1[-1].get('problem', '') and glob.glob(p1[0] + '.rejected-*') and not os.path.exists(p1[0])
+           and 'run-resumed' not in kinds(T1) and os.path.exists(live(T1)) and sha(live(T1)) == sha(live(U)) and saved_rows
+           and all(x.get('sha256') for x in saved_rows), why=(rj1[-1].get('problem') if rj1 else None), saved=len(saved_rows))
+    T2 = os.path.join(A.work, 'ckpt-tamper-repeat'); p2 = cut(T2)
+    marker = os.path.join(A.work, 'PWNED-must-not-exist')
+    open(os.path.join(A.work, 'evil.py'), 'w').write('import os\nclass Evil:\n    def __reduce__(self): return (os.mkdir, (%r,))\n' % marker)
+    sys.path.insert(0, A.work); import evil as _evil; import torch as _torch
+    _torch.save({'params': [], 'opt': {}, 'losses': [], 'step': 20, 'x': _evil.Evil()}, p2[0])
+    r2, o2 = sh(['remember'] + T3 + ['--method', 'soft-prompt'] + Q, T2)
+    try: fl_learn.load_checkpoint(glob.glob(p2[0] + '.rejected-*')[0]); unit = 'loaded'
+    except Exception as e: unit = type(e).__name__
+    record('R16-F15-a-pickle-that-would-run-code-is-rejected-and-never-runs', len(p2) == 1 and rejected(T2) and not os.path.exists(marker)
+           and unit != 'loaded' and 'run-interrupted' not in kinds(T2), unit=unit, marker=os.path.exists(marker), why=[x.get('problem') for x in rejected(T2)])
 
 def f12_runner_tests():
     """Round 13 (Weft recheck7 F12 and its side soft): a mind's undo never steps INTO a version a person took back (CLI
@@ -363,8 +389,12 @@ def f12_runner_tests():
     record('F12-runner-a-mind-undo-does-not-bring-back-what-a-person-undid', v != 'none' and m1 != 0 and m2 != 0 and not os.path.exists(live(F))
            and len(cr) == 2 and all(c.get('toFp') == v for c in cr) and 'a person took this version back' in om1, m1=m1, m2=m2, said=om1.strip().splitlines()[-1:])
     # Round 15 (Hypha HOLD on 2df4ddc6): lookalikes of a mind are a mind, on the CLI too.
-    LOOK = ['Mind', 'MIND', ' mind', 'mind ', 'Mind:Lumen', 'MIND:Echo', ' mind:Lumen', 'mind: Lumen']
+    # before (round 16): LOOK = ['Mind', 'MIND', ' mind', 'mind ', 'Mind:Lumen', 'MIND:Echo', ' mind:Lumen', 'mind: Lumen']
+    LOOK = ['Mind', 'MIND', ' mind', 'mind ', 'Mind:Lumen', 'MIND:Echo', ' mind:Lumen', 'mind: Lumen', 'm\u200bind', 'mind\u2060:Echo']
     lk = {b: sh(['undo', '--by', b], F)[0] for b in LOOK}
+    # Round 16 (Hypha soft): an actor that is not plain ASCII after normalizing is refused before anything is made.
+    na = sh(['undo', '--by', 'm\u00efnd'], F)
+    record('R16-actor-with-non-ascii-letters-is-refused', na[0] == 2 and 'plain letters' in na[1] and not os.path.exists(live(F)), rc=na[0])
     record('R15-F12-runner-cli-mind-lookalikes-are-a-mind-and-refused', all(r != 0 for r in lk.values()) and not os.path.exists(live(F))
            and len([e for e in chain(F) if e['meta']['kind'] == 'consent-refused' and e['meta'].get('subject') == 'rollback']) == 2 + len(LOOK), rc=lk)
     p1, op1 = sh(['undo', '--by', 'kirk'], F)

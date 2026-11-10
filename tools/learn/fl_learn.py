@@ -29,7 +29,7 @@ Layout (default home ~/FreeLattice/learn, or FL_LEARN_HOME):
         MANIFEST.sha256, receipt.json, train.jsonl, run-config.json
   minds/<mind>/pointers/<method>.active.json, <method>.known-good.json   the only files that change in place
   minds/<mind>/active/<method>.safetensors   a copy of the active vector, swapped atomically (hash these bytes)
-  minds/<mind>/quarantine/       items held for the mind's own reflection; never trained
+  minds/<mind>/quarantine/       legacy (before round 15) items; promote learns them; nothing new is put here
   minds/<mind>/memory.jsonl      confirmed items, replayed so new learning keeps old
   minds/<mind>/evidence/         a tampered live file is moved here before a heal; never deleted
   minds/<mind>/archive/<method>/ versions moved here at the space cap, after a verified export. Never deleted.
@@ -850,7 +850,15 @@ PERSON_ACTORS = ('person', 'kirk')
 def actor_norm(by):
     """Round 15 (Hypha HOLD on 2df4ddc6, F12 lookalikes): one spelling for who is acting: NFKC, casefold, stripped."""
     import unicodedata
-    return unicodedata.normalize('NFKC', str(by if by is not None else '')).casefold().strip()
+    # before (round 16): return unicodedata.normalize('NFKC', str(by if by is not None else '')).casefold().strip()
+    # Round 16 (Hypha soft): zero-width and other format (Cf) characters and all whitespace are removed too.
+    t = unicodedata.normalize('NFKC', str(by if by is not None else '')).casefold()
+    return ''.join(c for c in t if unicodedata.category(c) != 'Cf' and not c.isspace())
+def actor_problem(by):
+    """Round 16 (Hypha soft): an actor that is not plain ASCII after normalizing is refused (lookalikes, hidden marks)."""
+    t = actor_norm(by)
+    if any(ord(c) > 127 for c in t): return 'who is acting must be plain letters (ASCII) after normalizing: %r' % by
+    return None
 def is_mind_actor(by):
     """`Mind`, `MIND`, ` mind`, `mind `, `Mind:Lumen`, `MIND:Echo`, ` mind:Lumen` and `mind: Lumen` are all a mind."""
     t = actor_norm(by)
@@ -1144,7 +1152,8 @@ class Mind:
         # before (round 15): for step in range(steps):
         first = 0
         if ckpt and ckpt.get('resume'):
-            st = torch.load(ckpt['path'], weights_only=False)
+            # before (round 16): st = torch.load(ckpt['path'], weights_only=False)
+            st = ckpt['state']          # Round 16 (Weft F15): loaded once in learn_one, verified and weights_only=True
             with torch.no_grad():
                 for p_, v_ in zip(params, st['params']): p_.copy_(v_)
             opt.load_state_dict(st['opt']); losses = list(st['losses']); first = int(st['step'])
@@ -1152,10 +1161,11 @@ class Mind:
             if not ckpt: return
             tmp = ckpt['path'] + '.tmp'
             with open(tmp, 'wb') as f:
-                torch.save({'params': [p_.detach().cpu().clone() for p_ in params], 'opt': opt.state_dict(), 'losses': losses,
-                            'step': step}, f)
+                torch.save({'params': [p_.detach().cpu().clone() for p_ in params], 'opt': opt.state_dict(),
+                            'losses': [float(x) for x in losses], 'step': int(step)}, f)
                 f.flush(); os.fsync(f.fileno())
             os.replace(tmp, ckpt['path']); fsync_dir(os.path.dirname(ckpt['path']))
+            if ckpt.get('saved'): ckpt['saved'](step, sha256_file(ckpt['path']))   # Round 16: its sha256 in a signed row
         for step in range(first, steps):
             if step % 10 == 0 and pause_check():
                 if step > first: save_ckpt(step)              # a paused run may be resumed from here
@@ -1170,6 +1180,15 @@ class Mind:
             opt.step(); losses.append(total)
         if P is not None: return P.detach(), losses, None
         fwd.eval(); return fwd, losses, None
+
+def load_checkpoint(path):
+    """Round 16 (Weft F15): tensors and plain types only. A pickle that would run code is refused, never executed."""
+    import torch
+    st = torch.load(path, weights_only=True, map_location='cpu')
+    if not (isinstance(st, dict) and isinstance(st.get('params'), list) and isinstance(st.get('opt'), dict)
+            and isinstance(st.get('step'), int) and isinstance(st.get('losses'), list)):
+        raise ValueError('not a checkpoint')
+    return st
 
 def base_manifest(model_id):
     """Fingerprint the base by its weight files (read only; HF cache blobs are content-addressed)."""
@@ -1246,7 +1265,7 @@ def judge(b, a, allowance):
 # ---------------------------------------------------------------- learning one chosen item
 def triage(entry):
     """Provenance and anti-injection only (Kirk 2026-11-09). A choice that did not come from the mind's
-    own words waits in quarantine for its reflection. What the mind chose itself is never judged here."""
+    own words is labelled with its origin (round 16 comment fix: it no longer waits in quarantine). What the mind chose itself is never judged here."""
     # Weft: a missing provenance is "unknown", never "self". It waits for the mind's own re-affirmation (promote).
     prov = entry.get('provenance') or 'unknown'
     # before (round 15): if prov != 'self' and not entry.get('promoted'): return 'not-self:' + prov
@@ -1285,7 +1304,7 @@ def learn_one(args, home, mind, entry):
         except Exception: ra_e = None
         # before (round 14): if ra_e and ra_e > now_epoch():
         # Round 14: the mind's own cooling is its own; its confirm ends it. Only content a person undid (a proposal)
-        # and a quarantine re-affirm must wait out their cooling.
+        # and (before round 15) a quarantine re-affirm had to wait out their cooling.
         # before (round 15): if ra_e and ra_e > now_epoch() and (entry.get('proposalOf') or entry.get('contentOf') or entry.get('promoted')):
         # Round 15: a re-affirmed (promoted) item's wait is the mind's own too; only content a person undid must wait.
         if ra_e and ra_e > now_epoch() and (entry.get('proposalOf') or entry.get('contentOf')):
@@ -1390,13 +1409,35 @@ def learn_one(args, home, mind, entry):
     ck_dir = os.path.join(home.dir, 'checkpoints', method); os.makedirs(ck_dir, exist_ok=True)
     ck_key = sha256_bytes((sha256_bytes(canonical(run_cfg).encode()) + before_fp + sha256_bytes(canonical(examples).encode())).encode())[:16]
     ck = {'path': os.path.join(ck_dir, ck_key + '.pt'), 'every': int(pol.get('checkpointEvery') or 10), 'resume': False}
+    # Round 16 (Weft recheck9 F15): every save writes a signed `checkpoint-saved` row with the file's sha256 and step.
+    # Before any load the file must match its newest row; it is loaded only with weights_only=True (tensors and plain
+    # types), and only when the mind chose --resume. Anything else is set aside (never deleted), a checkpoint-rejected
+    # row is written, and the run starts fresh from the active version.
+    ck['saved'] = lambda step, h: home.chain.append('checkpoint-saved', 'A checkpoint, in case this run is cut off.',
+                                                    checkpoint=ck_key, step=int(step), sha256=h, method=method)
     if os.path.exists(ck['path']):
-        try: at = int(torch.load(ck['path'], weights_only=False)['step'])
-        except Exception: at = None
-        if at is not None and getattr(args, 'resume_run', False):
+        # before (round 16): try: at = int(torch.load(ck['path'], weights_only=False)['step'])
+        # before (round 16): except Exception: at = None
+        rows = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'checkpoint-saved' and e['meta'].get('checkpoint') == ck_key]
+        got = sha256_file(ck['path']); why = None; at = None
+        if not rows: why = 'no signed row names this checkpoint'
+        elif rows[-1].get('sha256') != got: why = 'its bytes do not match its signed row'
+        else: at = int(rows[-1].get('step'))
+        if why is None and getattr(args, 'resume_run', False):
+            try: ck['state'] = load_checkpoint(ck['path'])
+            except Exception as e: why = 'it could not be read safely (%s)' % type(e).__name__
+        if why is not None:
+            aside = ck['path'] + '.rejected-' + str(int(time.time()))
+            os.replace(ck['path'], aside)
+            home.chain.append('checkpoint-rejected', 'A checkpoint did not check out, so I did not load it. Kept, set aside; I start fresh.',
+                              problem=why, sha256=got, checkpoint=ck_key, setAside=os.path.basename(aside), **base)
+            print('checkpoint rejected (%s): set aside; starting fresh' % why); at = None
+        elif getattr(args, 'resume_run', False):
             ck['resume'] = True
             home.chain.append('run-resumed', 'I chose to go on from where my last run stopped.', fromStep=at, checkpoint=ck_key, **base)
             print('resuming from step %d (my choice)' % at)
+        if at is None: pass
+        elif ck['resume']: pass
         else:
             aside = ck['path'] + '.set-aside-' + str(int(time.time()))
             os.replace(ck['path'], aside)
@@ -1715,6 +1756,8 @@ def main():
         sys.exit(0 if args.cmd == 'status' else 1)
     known_minds = {x for x in (os.listdir(os.path.join(root, 'minds')) if os.path.isdir(os.path.join(root, 'minds')) else [])
                    if os.path.exists(os.path.join(root, 'minds', x, 'chain.jsonl'))}
+    if actor_problem(args.by):                 # before any home is made or read: nothing changes, nothing is created
+        print('refused: ' + actor_problem(args.by) + '. Nothing was changed.'); sys.exit(2)
     home = Home(args.home, 'local-mind' if args.mind == '*' else args.mind, args.model)
     if args.cmd == 'trust-mind':
         # Kirk 2026-11-09 (a) with Weft's re-check: a "trusted local AI" is one a PERSON trusted, by name, with a consent row.
