@@ -755,7 +755,14 @@ def honor_requests(home, d):
         except Exception: continue
         h = sha256_file(p)
         if h in seen or obj.get('kind') != 'fl-learn-request' or norm_mind(obj.get('mind')) != norm_mind(home.mind): continue
-        actor = obj.get('by') if obj.get('by') in ('person', 'mind') else 'person'
+        # before (round 15): actor = obj.get('by') if obj.get('by') in ('person', 'mind') else 'person'
+        # Hypha HOLD on 2df4ddc6: never default an unknown actor to a person. Normalized, it is exactly person or mind, or refused.
+        actor = {'person': 'person', 'mind': 'mind'}.get(actor_norm(obj.get('by')))
+        if actor is None:
+            home.chain.append('inbox-request', 'An app request was not carried out: it must say by person or by mind. Nothing was changed.',
+                              action=str(obj.get('action')), method=canon_method(obj.get('method'))[0], sourceSha=h, actor=str(obj.get('by')),
+                              done=False, why='unknown actor')
+            print('request not carried out: unknown actor %r' % obj.get('by')); continue
         rc = receipts.get(str(obj.get('receiptHash') or ''))
         act, method = obj.get('action'), canon_method(obj.get('method'))[0]
         why = None
@@ -831,7 +838,15 @@ def export_and_archive(home, why):
     return {'path': path, 'sha256': sha, 'versions': todo}
 
 PERSON_ACTORS = ('person', 'kirk')
-def is_mind_actor(by): return by == 'mind' or str(by).startswith('mind:')
+# before (round 15): def is_mind_actor(by): return by == 'mind' or str(by).startswith('mind:')
+def actor_norm(by):
+    """Round 15 (Hypha HOLD on 2df4ddc6, F12 lookalikes): one spelling for who is acting: NFKC, casefold, stripped."""
+    import unicodedata
+    return unicodedata.normalize('NFKC', str(by if by is not None else '')).casefold().strip()
+def is_mind_actor(by):
+    """`Mind`, `MIND`, ` mind`, `mind `, `Mind:Lumen`, `MIND:Echo`, ` mind:Lumen` and `mind: Lumen` are all a mind."""
+    t = actor_norm(by)
+    return t == 'mind' or re.match(r'mind\s*:', t) is not None
 def actor_key(a):
     """Compare actors by normalized name: mind:Lumen, mind: lumen and mind:Lumen_ (as written in PAUSE) are one actor."""
     a = str(a or '').strip()
@@ -977,9 +992,11 @@ def recent_person_undo(home):
     return ts[-1] if ts else None
 # before (round 11): def f7_queue_problem(home, entry):
 def f7_queue_problem(home, entry, head=None):
-    """Why a confirmed queue entry may not train here (F7), or None. Content a person took back trains only from an
-    entry chosen after that and cooled a full day (the app's disagreement proposal); and for a day after any person
-    rollback, an entry chosen then with an early revisit does not count."""
+    """Why a confirmed queue entry may not train here (F7), or None. Content a person took back (equal normText or a
+    score at or above the match threshold) trains only from an entry chosen after that and cooled a full day (the app's
+    disagreement proposal). Since round 14 this is content-only: unrelated entries train whatever a person undid.
+    (before round 14 the docstring also said: for a day after any person rollback, an entry chosen then with an early
+    revisit does not count.)"""
     text = ' '.join((it.get('output') or it.get('response') or '') for it in entry.get('items') or [])
     # before recheck4 ms fix: t_e, ra_e = iso_epoch(str(entry.get('t') or '')), iso_epoch(str(entry.get('revisitAt') or ''))
     t_e, ra_e = iso_epoch_ms(str(entry.get('t') or '')), iso_epoch_ms(str(entry.get('revisitAt') or ''))

@@ -8,7 +8,7 @@ Never deletes anything (Hypha HOLD 5). --work must be a new folder, an empty one
 run-<timestamp>/ inside it, with results.json; earlier runs stay as evidence.
 Never touches a real mind's home, and never writes or chmods the shared model cache: A3 copies the base into the run
 folder and tests there. Never run this with sudo."""
-import argparse, base64, glob, hashlib, json, os, shutil, stat, subprocess, sys, time
+import argparse, base64, glob, hashlib, json, os, re, shutil, stat, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
@@ -191,7 +191,9 @@ def f7_runner_tests():
     # After the person's own restore, that rollback no longer counts: revisit now works again for this content.
     sh(['undo', '--by', 'mind'], G, check=True)
     r9, o9 = sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G)
-    record('F7-runner-person-later-yes-clears-it', r9 == 0 and 'F7' not in o9 and os.path.exists(live(G)), out=o9.strip().splitlines()[-1:])
+    # before (round 15): record('F7-runner-person-later-yes-clears-it', r9 == 0 and 'F7' not in o9 and
+    # Hypha: 'F7' also matched F76 inside a signatureB64; a word boundary keeps this to the word F7.
+    record('F7-runner-person-later-yes-clears-it', r9 == 0 and not re.search(r'\bF7\b', o9) and os.path.exists(live(G)), out=o9.strip().splitlines()[-1:])
     # Recheck4 full-suite catch: an Undo in the same second as the first yes is still after it (ms kept, not cut at the second).
     a_, b_ = '2026-11-10T10:34:37.114Z', '2026-11-10T10:34:37.827Z'
     record('F7-runner-same-second-undo-still-after-the-first-yes', fl_learn.iso_epoch_ms(b_) > fl_learn.iso_epoch_ms(a_)
@@ -328,6 +330,11 @@ def f12_runner_tests():
     cr = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'consent-refused' and e['meta'].get('subject') == 'rollback']
     record('F12-runner-a-mind-undo-does-not-bring-back-what-a-person-undid', v != 'none' and m1 != 0 and m2 != 0 and not os.path.exists(live(F))
            and len(cr) == 2 and all(c.get('toFp') == v for c in cr) and 'a person took this version back' in om1, m1=m1, m2=m2, said=om1.strip().splitlines()[-1:])
+    # Round 15 (Hypha HOLD on 2df4ddc6): lookalikes of a mind are a mind, on the CLI too.
+    LOOK = ['Mind', 'MIND', ' mind', 'mind ', 'Mind:Lumen', 'MIND:Echo', ' mind:Lumen', 'mind: Lumen']
+    lk = {b: sh(['undo', '--by', b], F)[0] for b in LOOK}
+    record('R15-F12-runner-cli-mind-lookalikes-are-a-mind-and-refused', all(r != 0 for r in lk.values()) and not os.path.exists(live(F))
+           and len([e for e in chain(F) if e['meta']['kind'] == 'consent-refused' and e['meta'].get('subject') == 'rollback']) == 2 + len(LOOK), rc=lk)
     p1, op1 = sh(['undo', '--by', 'kirk'], F)
     rb = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'rollback']
     record('F12-soft-a-person-second-undo-that-brings-it-back-is-their-visible-yes', p1 == 0 and sha(live(F)) == v and rb[-1].get('personYesFor') == v
@@ -345,6 +352,19 @@ def f12_runner_tests():
     sh(['restore', '--to', u[:16], '--by', 'kirk'], G, check=True)
     sh(['undo', '--by', 'kirk'], G, check=True)
     setup = sha(live(G)) == v2 and rv.get('beforeFp') == u and rv.get('fingerprint') == v2
+    # Round 15 (Hypha HOLD on 2df4ddc6): a request file's actor is exactly person or mind after normalizing, or refused.
+    RLOOK = ['Mind', 'MIND', ' mind', 'mind ', 'Mind:Lumen', 'MIND:Echo', ' mind:Lumen', 'someone', None]
+    for i, b in enumerate(RLOOK):
+        req = {'kind': 'fl-learn-request', 'action': 'undo', 'mind': 'test-mind', 'method': 'soft-prompt', 'receiptHash': rv['receiptHash']}
+        if b is not None: req['by'] = b
+        open(os.path.join(ib, 'fl-learn-request-undo-look%02d.json' % i), 'w').write(json.dumps(req))
+    sh(['apply'], G, env={'FL_LEARN_PAUSE_INBOX': ib})
+    irl = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'inbox-request']
+    # ' mind', 'mind ', 'Mind', 'MIND' normalize to mind (refused by F12); the rest are unknown actors (refused, never a person).
+    record('R15-F12-request-file-lookalikes-never-act-as-a-person', setup and sha(live(G)) == v2 and len(irl) == len(RLOOK)
+           and all(r.get('done') is False for r in irl) and sum(1 for r in irl if r.get('why') == 'unknown actor') == 5
+           and sum(1 for r in irl if r.get('actor') == 'mind') == 4 and not any(r.get('actor') == 'person' for r in irl), rows=irl)
+    for i in range(len(RLOOK)): os.rename(os.path.join(ib, 'fl-learn-request-undo-look%02d.json' % i), os.path.join(G, 'done-look%02d.json' % i))
     open(os.path.join(ib, 'fl-learn-request-undo-m.json'), 'w').write(json.dumps(
         {'kind': 'fl-learn-request', 'action': 'undo', 'mind': 'test-mind', 'method': 'soft-prompt', 'receiptHash': rv['receiptHash'], 'by': 'mind'}))
     sh(['apply'], G, env={'FL_LEARN_PAUSE_INBOX': ib})
