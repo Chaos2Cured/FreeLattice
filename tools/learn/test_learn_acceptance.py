@@ -276,6 +276,49 @@ def f11_runner_tests():
     src = open(RUNNER).read()
     record('F11-runner-queue-rule-is-t_e-at-or-before-the-rollback', 'not full or t_e <= (iso_epoch_ms(r) or 0)' in src)
 
+def f12_runner_tests():
+    """Round 13 (Weft recheck7 F12 and its side soft): a mind's undo never steps INTO a version a person took back (CLI
+    and app request); a person's own second undo that brings it back says so (personYesFor) and counts as their yes."""
+    QUICK = ['--check-before', 'off', '--check', 'none', '--steps', '10', '--allow-battery']
+    F = os.path.join(A.work, 'f12-undo'); os.makedirs(F)
+    sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, check=True); v = sha(live(F))
+    sh(['undo', '--by', 'kirk'], F, check=True)
+    m1, om1 = sh(['undo', '--by', 'mind:Lumen'], F)
+    m2, om2 = sh(['undo', '--by', 'mind:Echo'], F)
+    cr = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'consent-refused' and e['meta'].get('subject') == 'rollback']
+    record('F12-runner-a-mind-undo-does-not-bring-back-what-a-person-undid', v != 'none' and m1 != 0 and m2 != 0 and not os.path.exists(live(F))
+           and len(cr) == 2 and all(c.get('toFp') == v for c in cr) and 'a person took this version back' in om1, m1=m1, m2=m2, said=om1.strip().splitlines()[-1:])
+    p1, op1 = sh(['undo', '--by', 'kirk'], F)
+    rb = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'rollback']
+    record('F12-soft-a-person-second-undo-that-brings-it-back-is-their-visible-yes', p1 == 0 and sha(live(F)) == v and rb[-1].get('personYesFor') == v
+           and rb[-1].get('actor') == 'kirk' and 'counts as their yes' in op1, p1=p1, row=rb[-1])
+    p2, _ = sh(['undo', '--by', 'kirk'], F)
+    m3, _ = sh(['undo', '--by', 'mind:Lumen'], F)
+    record('F12-soft-a-third-person-undo-takes-it-back-again-and-the-mind-is-refused-again', p2 == 0 and m3 != 0 and not os.path.exists(live(F)))
+    # The app path: U, then V on top (V's receipt has beforeFp U). A person restores U, then undoes (back to V; now U
+    # is person-undone while V's receipt is active). An app Undo of V's receipt by a mind is refused; by a person it
+    # goes to U and says so.
+    G = os.path.join(A.work, 'f12-app'); os.makedirs(G); ib = os.path.join(G, 'inbox'); os.makedirs(ib)
+    T2 = ['--text', 'The pond freezes in January', '--question', 'When does the pond freeze?', '--answer', 'January', '--reason', 'r']
+    sh(['remember'] + FACT + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G, check=True); u = sha(live(G))
+    rc_, out_ = sh(['remember'] + T2 + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G, check=True); v2 = sha(live(G)); rv = receipts(out_)[-1]
+    sh(['restore', '--to', u[:16], '--by', 'kirk'], G, check=True)
+    sh(['undo', '--by', 'kirk'], G, check=True)
+    setup = sha(live(G)) == v2 and rv.get('beforeFp') == u and rv.get('fingerprint') == v2
+    open(os.path.join(ib, 'fl-learn-request-undo-m.json'), 'w').write(json.dumps(
+        {'kind': 'fl-learn-request', 'action': 'undo', 'mind': 'test-mind', 'method': 'soft-prompt', 'receiptHash': rv['receiptHash'], 'by': 'mind'}))
+    sh(['apply'], G, env={'FL_LEARN_PAUSE_INBOX': ib})
+    ir = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'inbox-request']
+    cr2 = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'consent-refused' and e['meta'].get('subject') == 'rollback']
+    record('F12-app-undo-request-by-a-mind-does-not-bring-back-what-a-person-undid', setup and sha(live(G)) == v2 and ir and ir[-1].get('done') is False
+           and ir[-1].get('actor') == 'mind' and cr2 and cr2[-1].get('toFp') == u, setup=setup, row=(ir[-1] if ir else None))
+    open(os.path.join(ib, 'fl-learn-request-undo-p.json'), 'w').write(json.dumps(
+        {'kind': 'fl-learn-request', 'action': 'undo', 'mind': 'test-mind', 'method': 'soft-prompt', 'receiptHash': rv['receiptHash'], 'by': 'person'}))
+    _, oa = sh(['apply'], G, env={'FL_LEARN_PAUSE_INBOX': ib})
+    rb2 = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'rollback']
+    record('F12-app-undo-request-by-a-person-still-works-and-says-so', sha(live(G)) == u and rb2[-1].get('personYesFor') == u and rb2[-1].get('actor') == 'person',
+           row=rb2[-1])
+
 def f5_runner_tests():
     """Weft recheck4 F5 residual: the shared content/skeleton fixture, lookalikes of known minds refused, and a pause
     by mind:Lumen is not lifted by mind:Lumen_ (the same '_' rule as trust)."""
@@ -1007,6 +1050,7 @@ def main():
     f7_runner_tests()
     f9_runner_tests()
     f11_runner_tests()
+    f12_runner_tests()
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

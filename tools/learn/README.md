@@ -123,6 +123,16 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   - Known, not changed: an app Undo that names a restore (pointer) receipt, which has no `beforeFp`, goes back to
     "none" (no learned version active). That is the safe direction. Going back to the receipt's `rollbackOf` instead
     would let an app request re-activate an older version without the restore checks, so it was left as it is.
+- **Round 13 (Weft recheck7 F12 and its side soft).**
+  - F12: `go_back` refuses a mind actor for an undo (`rollback`) too, not only `restore`/`activate`, when the target is
+    a version a person took back: `undo --by mind:X` right after a person's undo, and an app Undo request with
+    `by: mind` whose receipt's beforeFp a person took back. A `consent-refused` row (subject rollback), exit 1; the
+    app request's `inbox-request` row says "Refused (the row before says why)", done false. The app itself has no
+    pointer to move (its Undo is the request file); a mind's unkeep there changes nothing and its keep is a proposal.
+  - Side soft: a PERSON's undo that lands on a version a person took back (a second undo from none toggles back to
+    it) still happens, but the rollback row carries `personYesFor: <fp>`, the runner prints a note, and
+    `person_undone_fps` counts it as that person's yes, so status and audits no longer list an active version as
+    undone. A further undo takes it back again (a new person no).
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
   Weft recheck3 F6: the base is fingerprinted from the FULL content of every weight and config file on every run
   (no cache), so an edit anywhere changes it, even with size and mtime put back.

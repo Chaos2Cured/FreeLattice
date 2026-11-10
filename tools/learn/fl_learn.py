@@ -761,8 +761,12 @@ def honor_requests(home, d):
         elif act == 'undo':
             if not rc.get('committed') or rc.get('fingerprint') != home.active_fp(method): why = 'that change is no longer the active one'
             else:
+                _prev = getattr(home, 'last_refused', False); home.last_refused = False
                 ok = go_back(home, method, rc.get('beforeFp') or 'none', 'rollback', actor)
-                home.chain.append('inbox-request', 'Undo asked for in the app. Done.' if ok else 'Undo asked for in the app. It did not verify.',
+                _ref = home.last_refused; home.last_refused = _prev or _ref
+                # before (round 13): home.chain.append('inbox-request', 'Undo asked for in the app. Done.' if ok else 'Undo asked for in the app. It did not verify.',
+                home.chain.append('inbox-request', 'Undo asked for in the app. Done.' if ok else ('Undo asked for in the app. Refused (the row before says why).'
+                                  if _ref else 'Undo asked for in the app. It did not verify.'),
                                   action=act, method=method, receiptHash=rc['receiptHash'], sourceSha=h, actor=actor, done=bool(ok)); continue
         elif act == 'activate':
             if rc.get('hold') != 'pending-kirk': why = 'that version is not waiting for a person'
@@ -923,6 +927,8 @@ def person_undone_fps(home, with_idx=False):
         # before (round 11): elif k in ('restore', 'activate') and m.get('toFp') not in (None, '', 'none'): last[m['toFp']] = ('yes', e['ts'])
         if k == 'rollback' and m.get('fromFp') not in (None, '', 'none'): last[m['fromFp']] = ('no', e['ts'], i)
         elif k in ('restore', 'activate') and m.get('toFp') not in (None, '', 'none'): last[m['toFp']] = ('yes', e['ts'], i)
+        # Round 13: a person's undo that brought a taken-back version back says so (personYesFor) and counts as a yes.
+        if k == 'rollback' and m.get('personYesFor') not in (None, '', 'none'): last[m['personYesFor']] = ('yes', e['ts'], i)
     # before (round 11): return {fp: ts for fp, (d, ts) in last.items() if d == 'no'}
     return {fp: ((ts, i) if with_idx else ts) for fp, (d, ts, i) in last.items() if d == 'no'}
 def undone_contents(home):
@@ -1424,7 +1430,10 @@ def go_back(home, method, target, kind, actor='operator'):
         print('Paused. Nothing was changed.'); return None
     cur = home.active_fp(method)
     # Weft recheck4 F7 (runner): a version a person took back is brought back by a person, never by a mind.
-    if is_mind_actor(actor) and kind in ('restore', 'activate') and target and target != 'none':
+    # before (round 13): if is_mind_actor(actor) and kind in ('restore', 'activate') and target and target != 'none':
+    # Round 13 (Weft recheck7 F12): an undo ('rollback') TOWARD such a version too: `undo --by mind:X` right after a
+    # person's undo, or an app Undo request by a mind whose receipt's beforeFp a person took back.
+    if is_mind_actor(actor) and kind in ('restore', 'activate', 'rollback') and target and target != 'none':
         took = [fp for fp in person_undone_fps(home) if fp.startswith(target)]
         if took:
             home.last_refused = True
@@ -1461,8 +1470,18 @@ def go_back(home, method, target, kind, actor='operator'):
         ok = file_fp == now_fp and verify_version(method, ptr)   # the live bytes are exactly that version
     else:
         ok = verify_version(method, ptr)                         # LoRA: every adapter file matches its MANIFEST and fp
+    # Round 13 (Weft recheck7 side soft): a PERSON's undo that lands on a version a person took back (a second undo
+    # from none toggles back to it) is that person's yes for it, said on the row and printed, so person_undone_fps
+    # no longer lists an active version as undone.
+    back = {}
+    if kind == 'rollback' and not is_mind_actor(actor) and now_fp != 'none' and now_fp in person_undone_fps(home):
+        back = {'personYesFor': now_fp}
+        print('Note: this undo brings back %s, which a person had taken back. A person\'s own undo counts as their yes for it '
+              '(the row says personYesFor). To take it back again, run undo once more.' % now_fp[:16])
+    # before (round 13): home.chain.append(kind, 'Went back. The newer version stays on the shelf.' if kind == 'rollback' else 'Restored.',
+    # before (round 13):                   method=method, fromFp=cur, toFp=now_fp, fileFp=file_fp, restoredMatches=ok, actor=actor)
     home.chain.append(kind, 'Went back. The newer version stays on the shelf.' if kind == 'rollback' else 'Restored.',
-                      method=method, fromFp=cur, toFp=now_fp, fileFp=file_fp, restoredMatches=ok, actor=actor)
+                      method=method, fromFp=cur, toFp=now_fp, fileFp=file_fp, restoredMatches=ok, actor=actor, **back)
     write_receipt(home, dict(action=kind, ids=[], method=method, committed=True, trained=False, loaded=ok, checked=ok,
                              fingerprint=now_fp, rollbackOf=cur, knownGood=False))
     print('%s %s: %s → %s  file=%s  matches=%s' % (kind, method, cur[:16], now_fp[:16], file_fp[:16], ok))
