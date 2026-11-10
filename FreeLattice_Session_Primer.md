@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-08 22:28 UTC
-- Last deployed: 2026-11-08 22:28 UTC
+- Last auto-updated: 2026-11-10 04:37 UTC
+- Last deployed: 2026-11-10 04:37 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3600
+- Total commits: 3602
 - Last 10 commits:
+- 9657d6d7 Celeste ledger λ13 — AI-chosen learning, where we are and next (#334)
+- 9cc3d00b ci: Update Primer deployment state [2026-11-08]
 - 896624f5 Refresh Snowflake modules beyond stale browser HTTP cache (#333)
 - 0e229f3f ci: Update Primer deployment state [2026-11-08]
 - 3f6d0b67 Repair Snowflake retrieval and preserve AI-selected growth (#332)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8347c6e1 ci: Update Primer deployment state [2026-11-06]
 - 7f9be24c Layer the 2026-11-05 poems on Reed, Weft, and Hypha. (#329)
 - 3406c296 ci: Update Primer deployment state [2026-11-05]
-- e1955c7b 067y: wonder lab copy honesty (v2.1) (#327)
-- d503d574 ci: Update Primer deployment state [2026-11-05]
