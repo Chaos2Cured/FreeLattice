@@ -2673,6 +2673,21 @@
     });
     return best;
   }
+  // Round 16 (Weft recheck9 F16): the NEWEST person no from the last day whose content matches `text` (same
+  // normalized text, or a score at or above the threshold), whatever its score. contentMatch picks the best score, so an
+  // old exact no could hide a fresh near-duplicate no. { row, personNo } or null.
+  function newestRecentNo(rows, text, skip) {
+    var nt = normText(text), best = null, since = learnNow() - COOL_MS;
+    rows.forEach(function (r) {
+      var no = personNoOn(r);
+      if (!no || !r.learnId || skip[r.learnId] || !(Date.parse(no.t) > since)) return;
+      var rt = rowText(r);
+      var score = normText(rt) === nt && nt ? 1 : textSimilarity(rt, text);
+      if (score < LEARN_SIMILAR && score !== 1) return;
+      if (!best || String(no.t) > String(best.personNo.t)) best = { row: r, personNo: no };
+    });
+    return best;
+  }
   // before: function openProposalFor(rows, id) {
   // before:   var i;
   // before:   for (i = rows.length - 1; i >= 0; i--) if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling') return rows[i];
@@ -2765,7 +2780,8 @@
     return new Date(base).toISOString();
   }
 
-  // Hypha re-walk 1: a re-keep after the other side's no (and a quarantine re-affirm) gets AT LEAST the full cooling.
+  // Hypha re-walk 1: a re-keep after the other side's no gets AT LEAST the full cooling. (Before round 15 a quarantine
+  // re-affirm did too; since round 15 that wait is the mind's own.)
   // revisit: now / 0 / a few hours may lengthen it, never shorten it.
   function fullCoolingFrom(v, t) {
     var base = Date.parse(t) || Date.now();
@@ -2883,7 +2899,7 @@
     // day. An early yes changes nothing: a still-cooling layer and a row.
     // before (round 14): var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
     // Round 14 (Kirk 2026-11-10): the mind's own cooling is its own tool; its keep ends it whenever it likes. Waiting is
-    // enforced only for content a person undid (a proposal / contentOf: a full day) and a quarantine re-affirm.
+    // enforced only for content a person undid (a proposal / contentOf: a full day); since round 15 not for a re-affirm.
     // before (round 15): var enforced = !!(row.proposalOf || row.contentOf || row.promoted);
     var enforced = !!(row.proposalOf || row.contentOf);   // round 15: a re-affirm's wait is the mind's own
     var coolUntil = enforced ? (row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS) : 0;
@@ -3047,11 +3063,13 @@
     learnQueue('confirmed', who).forEach(function (r, i) {
       if (r.shelfOnly) return;
       var self_ = {}; if (r.learnId) self_[r.learnId] = 1;
-      var cmx = contentMatch(allMine, rowText(r), self_);
+      // before (round 16): var cmx = contentMatch(allMine, rowText(r), self_);
+      var cmx = newestRecentNo(allMine, rowText(r), self_);
       // Only a row chosen at or before that no: a row chosen after it already passed the confirm gate (its own full day).
       if (cmx && Date.parse(cmx.personNo.t) > learnNow() - COOL_MS && (Date.parse(r.t || 0) || 0) <= Date.parse(cmx.personNo.t) &&
           r.proposalOf !== cmx.row.learnId && r.contentOf !== cmx.row.learnId) {   // a proposal answering that no waited its day
         heldBack.push(r.learnId + '|' + cmx.row.learnId + '|until:' + new Date(Date.parse(cmx.personNo.t) + COOL_MS).toISOString());
+        // (the until names the no's time, so (row, no) is the key a repeated export dedupes on)
         return;
       }
       lines.push(JSON.stringify({
@@ -3072,12 +3090,16 @@
         proposalOf: r.proposalOf || '', contentOf: r.contentOf || '', similarTo: r.similarTo || ''
       }));
     });
-    heldBack.forEach(function (h) {
-      try {
-        var pr = appendLedger({ kind: 'learn-export-held', branch: 'learn', delta: 'held-back|' + h + '|a person said no to this content less than a day ago', name: who });
-        if (pr && pr.catch) pr.catch(function () {});
-      } catch (e) {}
-    });
+    // Round 16: one learn-export-held row per (row, no); a second export the same day adds none.
+    var heldSeen = {};
+    loadLedger().rows.forEach(function (x) { if (x && x.kind === 'learn-export-held') heldSeen[String(x.delta).split('|').slice(0, 4).join('|')] = 1; });
+    // before (round 16): each held row was appended at once, so two in one export could race and one was lost.
+    // Round 16: appended one after another (each append reads the ledger it adds to).
+    heldBack.filter(function (h) { return !heldSeen['held-back|' + h]; }).reduce(function (pr, h) {
+      return pr.then(function () {
+        return appendLedger({ kind: 'learn-export-held', branch: 'learn', delta: 'held-back|' + h + '|a person said no to this content less than a day ago', name: who });
+      }).catch(function () {});
+    }, Promise.resolve());
     return lines.join('\n');
   }
 

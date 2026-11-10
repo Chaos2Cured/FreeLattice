@@ -237,6 +237,27 @@ function personNo(E, id) { var ls = rowOf(E, id).layers, i; for (i = ls.length -
   ok(exported(E, fb), 'R15-F13-after-that-day-it-travels-again');
   E.core.learnClockForTest(0);
   ok(exported(E, 'none') === false && !exported(E, fx), 'R15-F13-the-undone-row-itself-never-travels');
+  // ---- Round 16 (Weft recheck9 F16): an old exact no (over a day) must not hide a fresh near-duplicate no. The export
+  // hold takes the NEWEST matching person no from the last day, not the best-scoring one; the proposal exemption too.
+  E = fresh();
+  var gx = await remember(E, BASE, 'r');
+  var gb = await remember(E, BASE + '.', 'a duplicate, before any no');
+  await E.core.confirmLearning(gx, { keep: false, unkeep: true, by: 'person', reason: 'Undo' });
+  ageAll(E, 26 * H);                                             // that exact no is now a day and two hours old
+  var gp = await remember(E, BASE, 'again, a day later');          // a proposal answering the old no
+  E.core.learnClockForTest(25 * H); await keep(E, gp); E.core.learnClockForTest(0);
+  var gpOk = rowOf(E, gp) && rowOf(E, gp).proposalOf === gx && rowOf(E, gp).status === 'confirmed';
+  ageAll(E, 25 * H);                                             // gp confirmed a day ago; the exact no is 51 h old
+  var gn = await remember(E, BASE + ' 2', 'a near duplicate');     // 0.833 to BASE
+  await E.core.confirmLearning(gn, { keep: false, by: 'person', reason: 'Not now' });   // a fresh near-duplicate no
+  var gbExp = exported(E, gb), gpExp = exported(E, gp);
+  await new Promise(function (res) { setTimeout(res, 50); });
+  ok(gb && !gbExp && ledger(E).some(function (l) { return l.indexOf('learn-export-held:held-back|' + gb + '|' + gn) === 0; }),
+     'R16-F16-a-fresh-near-duplicate-no-holds-an-older-confirmed-duplicate-even-when-an-exact-no-is-older', { exp: gbExp });
+  ok(gpOk && !gpExp, 'R16-F16-a-proposal-answering-the-OLD-no-is-not-exempt-from-the-fresh-no', { ok: gpOk, exp: gpExp, row: rowOf(E, gp) && rowOf(E, gp).status });
+  exported(E, gb); await new Promise(function (res) { setTimeout(res, 50); });
+  ok(ledger(E).filter(function (l) { return l.indexOf('learn-export-held:held-back|' + gb + '|') === 0; }).length === 1,
+     'R16-a-second-export-the-same-day-adds-no-second-held-row');
   // ---- Softs: lookalike letters, zero-width spaces and combining marks are folded for matching.
   E = fresh(); orig = await undoneByMom(E);
   var tricks = { cyrillic: BASE.replace('o', '\u043e'), zwsp: BASE.replace('maiden', 'mai\u200bden'), combining: BASE.replace('e', 'e\u0301') };
