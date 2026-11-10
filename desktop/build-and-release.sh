@@ -26,6 +26,10 @@ mkdir -p app
 # A tracked file with uncommitted edits is packed as committed, and named. Outside a git checkout, plain copies.
 IN_GIT=0
 git -C .. rev-parse --is-inside-work-tree >/dev/null 2>&1 && IN_GIT=1
+# Hypha re-walk 3: everything electron-builder packs must be committed bytes too. A marker (in the temp folder,
+# never in app/) lets the build name any file in app/ that this run did not write; such leftovers stop the build.
+BUILD_START=$(mktemp "${TMPDIR:-/tmp}/fl-build-start.XXXXXX")
+trap 'rm -f "$BUILD_START"' EXIT   # only its own marker
 committed_cp() {   # $1 = path from the repo root, $2 = destination file
   if [ "$IN_GIT" = 1 ]; then
     git -C .. cat-file -e "HEAD:$1" 2>/dev/null || return 1
@@ -143,6 +147,23 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Step 3: Build
+if [ "$1" != "--dev" ] && [ "$1" != "-d" ]; then
+  stop=0
+  if [ "$IN_GIT" = 1 ]; then
+    # The desktop sources electron-builder packs from this folder (package.json build.files, minus app/**).
+    srcs=$(node -e "const f=require('./package.json').build.files; console.log(f.filter(x=>!/[*]/.test(x)).join('\n'))")
+    for f in $srcs; do
+      if ! git -C .. ls-files --error-unmatch "desktop/$f" >/dev/null 2>&1; then echo "  ✗ desktop/$f is not committed"; stop=1
+      elif ! git -C .. diff --quiet HEAD -- "desktop/$f"; then echo "  ✗ desktop/$f has local edits"; stop=1; fi
+    done
+  fi
+  stale=$(find app -type f ! -name .gitkeep ! -newer "$BUILD_START" 2>/dev/null | sort)
+  if [ -n "$stale" ]; then echo "  ✗ app/ has files this run did not write (left from an earlier copy):"; echo "$stale" | sed 's/^/       /'; stop=1; fi
+  if [ "$stop" = 1 ]; then
+    echo "  Nothing was built: only committed bytes are packed. Commit or set those aside, then run this again."
+    exit 3
+  fi
+fi
 if [ "$1" = "--dev" ] || [ "$1" = "-d" ]; then
   echo "  🚀 Starting in development mode..."
   npm start
