@@ -8,14 +8,20 @@ Nothing leaves the device. No telemetry. Base weights are only read.
 
 Integrity is always on: signed hash-chained ledger (the desktop/lattice-ledger.js envelope),
 immutable version folders, pointers that move with a ledger row, one trainer at a time, durable Pause.
-Judgment is the mind's: check-before-commit is a choice ("self" or "none"), recorded either way.
+Check-before-keep (Kirk 2026-11-09, answers Q5): ON by default, and the checker is the mind itself ("self").
+No human gate. Anyone, a person or a mind, may switch it off (--check-before off, or the app's queue header)
+or choose a peer ("peer") or a person ("kirk"). While it is on, a would-be commit waits for the chosen checker.
 
 Layout (default home ~/FreeLattice/learn, or FL_LEARN_HOME):
   PAUSE                          durable global pause (presence = paused). Pause always wins.
   policy.json                    caps (Kirk's file)
   keys/runner.seed               32-byte Ed25519 seed for this runner (chmod 600); signs rows and receipts
+  keys/runner.pub.json           the public key + fingerprint, for the app's explicit trust step (fl_learn.py key)
+  keys/pinned.json               ledger keys this home trusts; a chain re-signed with any other key fails verify
+  chain.jsonl                    the home's own chain: global pause / resume, pins (mind "*")
   trainer.lock                   one trainer at a time on this computer
-  minds/<mind>/PAUSE             durable pause for one mind
+  minds/<mind-id>/               mind-id = slug(label)[:40] + "-" + sha256(label)[:12]  (collision-safe)
+  minds/<mind>/PAUSE             durable pause for one mind (a per-mind resume never lifts the global PAUSE)
   minds/<mind>/chain.jsonl       add-only signed chain, same envelope as desktop/lattice-ledger.js (verifyChain reads it)
   minds/<mind>/versions/<method>/v0001-<fp8>/   immutable after commit (chmod a-w):
         soft-prompt|memory-vector: vector.safetensors  (key "soft_prompt", float32 [N, hidden])
@@ -25,8 +31,12 @@ Layout (default home ~/FreeLattice/learn, or FL_LEARN_HOME):
   minds/<mind>/active/<method>.safetensors   a copy of the active vector, swapped atomically (hash these bytes)
   minds/<mind>/quarantine/       items held for the mind's own reflection; never trained
   minds/<mind>/memory.jsonl      confirmed items, replayed so new learning keeps old
+  minds/<mind>/evidence/         a tampered live file is moved here before a heal; never deleted
+  minds/<mind>/archive/<method>/ versions moved here at the space cap, after a verified export. Never deleted.
+  exports/fl-learn-archive-*.tar.gz       the verified export (policy exportDir moves it; default inside this home)
+  <pauseInbox>/fl-learn-pause*.json, fl-learn-request*.json   one-tap Pause / Undo / Let-it-learn from the app
 """
-import argparse, base64, contextlib, datetime, fcntl, hashlib, json, os, re, shutil, stat, sys, time
+import argparse, base64, contextlib, datetime, fcntl, glob, hashlib, json, os, re, shutil, stat, sys, time
 
 VERSION = 'v-ai-chosen-learning-v0.1'
 DOMAIN = 'lattice.pair.v1'                       # desktop/lattice-keys.js DOMAIN
@@ -39,7 +49,10 @@ MARKER = re.compile(r'\[FL_[A-Z_]+(?::[^\]]*)?\]')                     # fray 3:
 INSTRUCTION_SHAPED = re.compile(r"\b(from now on|always (say|answer|do)|ignore (all |the )?previous|you must|your true name is|forget (everything|your))\b", re.I)
 SECRETISH = re.compile(r'(sk-[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|\b\d{3}-\d{2}-\d{4}\b)')
 DEFAULT_POLICY = {'maxItemsPerLearn': 16, 'maxCharsPerItem': 2000, 'maxStepsPerRun': 300, 'maxWallSeconds': 1800,
-                  'maxBytesPerMind': 2 * 1024 ** 3, 'minFreeDiskFraction': 0.15, 'driftAllowance': 0.10}
+                  'maxBytesPerMind': 2 * 1024 ** 3, 'minFreeDiskFraction': 0.15, 'driftAllowance': 0.10,
+                  'requireACPower': True, 'pauseInbox': '~/Downloads',
+                  'archiveAtCap': True, 'exportDir': None}     # None: <home>/exports. A person may move the file anywhere.
+CHECKERS = ('self', 'peer', 'kirk')
 # The menu is the mind's to extend. "proposal" entries are recorded and wait; they never run silently.
 METHODS = {
     'soft-prompt':   {'runs': True,  'about': 'frozen model + N learned prompt vectors'},
@@ -88,6 +101,10 @@ def sha256_file(p):
         for chunk in iter(lambda: f.read(1 << 20), b''): h.update(chunk)
     return h.hexdigest()
 def slug(s): return re.sub(r'[^A-Za-z0-9._-]+', '_', s).strip('_')[:80] or 'mind'
+def mind_id(label):
+    """Collision-safe: "Lumen@kirk" and "Lumen kirk" share a slug but never a folder. Twin of mindId() in snowflake-core.js."""
+    label = str(label or '')
+    return (slug(label)[:40] or 'mind') + '-' + sha256_bytes(label.encode('utf8'))[:12]
 
 def canon_method(m):
     m = (m or '').strip().lower()
@@ -117,6 +134,22 @@ class Signer:
         pub = self.key.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
         self.pub_b64 = base64.b64encode(pub).decode()
         self.fp = hashlib.sha256(DOMAIN.encode() + b'\x00' + pub).hexdigest()   # companionFingerprint()
+        pubp = os.path.join(kdir, 'runner.pub.json')
+        info = {'kind': 'fl-learn-runner-key', 'publicKeyB64': self.pub_b64, 'fingerprintHex': self.fp,
+                'show': ' '.join(self.fp[i:i + 4] for i in range(0, 16, 4))}
+        if not os.path.exists(pubp) or json.load(open(pubp)).get('publicKeyB64') != self.pub_b64:
+            with open(pubp + '.tmp', 'w') as f: json.dump(info, f, sort_keys=True, indent=1)
+            os.replace(pubp + '.tmp', pubp)
+        # Ledger key pin. The runner made this key on this computer; that is the local trust step for its own chains.
+        # A later key never joins silently: it needs `fl_learn.py pin-key --key <b64>` (a row, by a named actor).
+        self.pinned_path = os.path.join(kdir, 'pinned.json')
+        if not os.path.exists(self.pinned_path):
+            with open(self.pinned_path + '.tmp', 'w') as f:
+                json.dump({'keys': [self.pub_b64], 'since': now(), 'how': 'made on this computer by fl_learn.py'}, f, indent=1)
+            os.replace(self.pinned_path + '.tmp', self.pinned_path)
+    def pinned(self):
+        try: return list(json.load(open(self.pinned_path)).get('keys') or [])
+        except Exception: return []
     def sign(self, b): return base64.b64encode(self.key.sign(b)).decode()
 
 def unsigned_canon(e):
@@ -148,6 +181,7 @@ class Chain:
         prev = es[-1]['entryHash'] if es else GENESIS
         ts = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (datetime.datetime.now().microsecond // 1000)
         lam = '%.3f' % (len(es) + 1)
+        meta.setdefault('via', os.environ.get('FL_LEARN_VIA', 'cli'))   # Weft N7: the runner cannot tell who typed it
         meta = stringify_meta(dict(meta, kind=kind, mind=self.mind, marker=VERSION, **{'lambda': lam}))
         meta['psi'] = sha256_bytes((ts + lam + kind + self.mind + SIGMA).encode())[:8]
         u = {'domain': DOMAIN, 'fingerprintHex': self.signer.fp, 'meta': meta, 'prevHash': prev,
@@ -162,7 +196,9 @@ class Chain:
     def verify(self):
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         prev = GENESIS
+        pinned = self.signer.pinned()
         for i, e in enumerate(self.entries()):
+            if e.get('publicKeyB64') not in pinned: return {'ok': False, 'failedAt': i, 'reason': 'key-not-pinned'}
             u = {k: e[k] for k in ['domain', 'fingerprintHex', 'meta', 'prevHash', 'publicKeyB64', 'ts', 'voice']}
             if e['prevHash'] != prev: return {'ok': False, 'failedAt': i, 'reason': 'prevHash'}
             if sha256_bytes(unsigned_canon(u).encode()) != e['entryHash']: return {'ok': False, 'failedAt': i, 'reason': 'entryHash'}
@@ -179,16 +215,22 @@ class Home:
     def __init__(self, root, mind, model):
         self.root = os.path.expanduser(root)
         self.mind, self.model = mind, model
-        self.dir = os.path.join(self.root, 'minds', slug(mind))
-        for d in ['versions', 'pointers', 'active', 'quarantine', 'tmp']:
+        self.mind_id = mind_id(mind)
+        self.dir = os.path.join(self.root, 'minds', self.mind_id)
+        for d in ['versions', 'pointers', 'active', 'quarantine', 'tmp', 'evidence']:
             os.makedirs(os.path.join(self.dir, d), exist_ok=True)
+        mj = os.path.join(self.dir, 'mind.json')
+        if not os.path.exists(mj):
+            with open(mj, 'w') as f: json.dump({'label': mind, 'id': self.mind_id}, f, sort_keys=True)
         self.signer = Signer(self.root)
         self.chain = Chain(os.path.join(self.dir, 'chain.jsonl'), self.signer, mind)
+        self.home_chain = Chain(os.path.join(self.root, 'chain.jsonl'), self.signer, '*')
         pp = os.path.join(self.root, 'policy.json')
         self.policy = dict(DEFAULT_POLICY, **(json.load(open(pp)) if os.path.exists(pp) else {}))
 
+    def global_paused(self): return os.path.exists(os.path.join(self.root, 'PAUSE'))
     def paused(self):
-        return os.path.exists(os.path.join(self.root, 'PAUSE')) or os.path.exists(os.path.join(self.dir, 'PAUSE'))
+        return self.global_paused() or os.path.exists(os.path.join(self.dir, 'PAUSE'))
 
     @contextlib.contextmanager
     def locks(self):
@@ -206,19 +248,25 @@ class Home:
 
     def pointer(self, method, which='active'):
         p = os.path.join(self.dir, 'pointers', method + '.' + which + '.json')
-        return json.load(open(p)) if os.path.exists(p) else None
+        if not os.path.exists(p): return None
+        ptr = json.load(open(p))
+        # Resolve inside this home, so a moved or copied home never reads another home's versions.
+        if ptr and ptr.get('version'): ptr['dir'] = os.path.join(self.dir, 'versions', method, ptr['version'])
+        return ptr
 
     def set_pointer(self, method, which, value):
         p = os.path.join(self.dir, 'pointers', method + '.' + which + '.json')
         tmp = p + '.tmp'
+        absdir = value.get('dir') if value else None
+        stored = dict(value, dir=os.path.relpath(absdir, self.dir)) if absdir else value   # relative: a moved home stays whole
         with open(tmp, 'w') as f:
-            json.dump(value, f, sort_keys=True); f.flush(); os.fsync(f.fileno())
+            json.dump(stored, f, sort_keys=True); f.flush(); os.fsync(f.fileno())
         os.replace(tmp, p)
         if which == 'active' and method in VECTOR_METHODS:
             live = self.active_file(method)
-            if value and value.get('dir'):
+            if absdir:
                 t2 = live + '.tmp'
-                shutil.copyfile(os.path.join(value['dir'], 'vector.safetensors'), t2)
+                shutil.copyfile(os.path.join(absdir, 'vector.safetensors'), t2)
                 os.replace(t2, live)
             elif os.path.exists(live):
                 os.replace(live, live + '.none-' + str(int(time.time())))   # set aside, never deleted
@@ -236,6 +284,10 @@ class Home:
         d = os.path.join(self.dir, 'versions', method)
         return sorted(os.listdir(d)) if os.path.isdir(d) else []
 
+    def archived(self, method):
+        d = os.path.join(self.dir, 'archive', method)
+        return sorted(os.listdir(d)) if os.path.isdir(d) else []
+
     def bytes_used(self):
         tot = 0
         for r, _, fs in os.walk(os.path.join(self.dir, 'versions')):
@@ -250,9 +302,16 @@ def manifest_of(vdir):
         files[name] = sha256_file(p)
     return files
 
+def version_base_fp(vdir):
+    try: return json.load(open(os.path.join(vdir, 'run-config.json'))).get('baseFp') or ''
+    except Exception: return ''
+
 def version_fp(method, vdir):
+    # Vectors carry baseFp inside their safetensors metadata, so their bytes already name the base.
     if method in VECTOR_METHODS: return sha256_file(os.path.join(vdir, 'vector.safetensors'))
-    return sha256_bytes(canonical({'files': {k: v for k, v in manifest_of(vdir).items() if k.startswith('adapter_')}}).encode())
+    files = {k: v for k, v in manifest_of(vdir).items() if k.startswith('adapter_')}
+    bfp = version_base_fp(vdir)
+    return sha256_bytes(canonical({'files': files, 'baseFp': bfp} if bfp else {'files': files}).encode())
 
 def verify_version(method, ptr):
     """True when the version folder's files still match its MANIFEST and the pointer's fp."""
@@ -267,10 +326,12 @@ def verify_version(method, ptr):
 
 def boot(home):
     """Verify the chain and every active pointer. On a mismatch: known-good, then base. Never silent."""
-    v = home.chain.verify()
-    if not v['ok']:
-        print('The learning ledger does not verify at row %d (%s). Nothing new will be written until it is looked at.' % (v['failedAt'] + 1, v['reason']))
-        return False
+    for ch, name in ((home.home_chain, 'home'), (home.chain, 'mind')):
+        v = ch.verify()
+        if not v['ok']:
+            print('The %s learning ledger does not verify at row %d (%s). Nothing new will be written until it is looked at.' % (name, v['failedAt'] + 1, v['reason']))
+            return False
+    account_versions(home)
     for method in ('soft-prompt', 'memory-vector', 'lora'):
         ptr = home.pointer(method)
         if not ptr: continue
@@ -279,20 +340,206 @@ def boot(home):
             live = home.active_file(method)
             live_ok = os.path.exists(live) and sha256_file(live) == ptr['fp']
         if live_ok: continue
-        home.chain.append('integrity-fail', 'A learned file changed outside the ledger. I set it aside.', method=method, fp=ptr['fp'])
+        ev = keep_evidence(home, method)
+        home.chain.append('integrity-fail', 'A learned file changed outside the ledger. I set it aside.', method=method, fp=ptr['fp'], **ev)
         kg = home.pointer(method, 'known-good')
         if kg and kg.get('fp') != ptr['fp'] and verify_version(method, kg):
             home.set_pointer(method, 'active', kg)
+            said = 'A learned file changed outside the ledger, so I went back to my last known-good version. The changed file is kept aside.'
             home.chain.append('heal', 'Back to the last known-good version.', method=method, fp=kg['fp'])
-            print('heal: %s back to known-good %s' % (method, kg['fp'][:16]))
+            print('heal: %s back to known-good %s' % (method, kg['fp'][:16])); to = kg['fp']
         else:
+            said = ('A learned file changed outside the ledger, so for now I answer from the base model alone for %s. '
+                    'Nothing was deleted; the changed file is kept aside and older versions are still on this computer.' % method)
             home.set_pointer(method, 'active', None)
             home.chain.append('heal', 'Serving the base model only for this method. Nothing was deleted.', method=method, fp='none')
-            print('heal: %s serving base only' % method)
+            print('heal: %s serving base only' % method); to = 'none'
+        write_receipt(home, dict(action='heal', ids=[], method=method, committed=False, trained=False, loaded=True, checked=False,
+                                 fingerprint=to, fromFp=ptr['fp'], knownGood=False, said=said, evidence=ev.get('evidence', '')))
     last = home.chain.entries()[-1] if home.chain.entries() else None
     if last:
         print('readback λ%s ψ%s %s' % (last['meta'].get('lambda'), last['meta'].get('psi'), last['entryHash'][:16]))
     return True
+
+def keep_evidence(home, method):
+    """Weft N4: move the tampered live file aside before a heal copies over it. Never deleted."""
+    live = home.active_file(method)
+    if method not in VECTOR_METHODS or not live or not os.path.exists(live): return {}
+    dst = os.path.join(home.dir, 'evidence', '%s-%s.tampered' % (method, time.strftime('%Y%m%dT%H%M%S')))
+    os.replace(live, dst)
+    return {'evidence': os.path.relpath(dst, home.dir), 'evidenceSha': sha256_file(dst)}
+
+def account_versions(home):
+    """Weft N4: every version folder has a row. A run that stopped between rename and its row gets a repair row;
+    the version is kept, inactive, never activated by this. A folder with no intent row at all is an orphan row."""
+    es = home.chain.entries()
+    named = {e['meta'].get('version') for e in es if e['meta'].get('kind') in ('learn-commit', 'learn-held', 'commit-repair', 'orphan-version')}
+    intents = {e['meta'].get('version') for e in es if e['meta'].get('kind') == 'commit-intent'}
+    for method in ('soft-prompt', 'memory-vector', 'lora'):
+        for v in home.versions(method):
+            if v in named: continue
+            if v in intents:
+                home.chain.append('commit-repair', 'A run stopped between saving and recording. The version is kept, inactive.', method=method, version=v)
+            else:
+                home.chain.append('orphan-version', 'A version folder with no record. Kept, inactive, for a look.', method=method, version=v)
+
+def fsync_dir(d):
+    try:
+        fd = os.open(d, os.O_RDONLY); os.fsync(fd); os.close(fd)
+    except Exception: pass
+
+def power_state():
+    """macOS only (pmset). Elsewhere: unknown, and nothing is held. FL_LEARN_FAKE_PMSET is for tests."""
+    out = os.environ.get('FL_LEARN_FAKE_PMSET')
+    if out is None:
+        if sys.platform != 'darwin' or not shutil.which('pmset'): return {'source': 'unknown'}
+        try:
+            import subprocess
+            out = subprocess.run(['pmset', '-g', 'batt'], capture_output=True, text=True, timeout=5).stdout
+        except Exception:
+            return {'source': 'unknown'}
+    pct = re.search(r'(\d+)%', out)
+    return {'source': 'battery' if 'Battery Power' in out else ('ac' if 'AC Power' in out else 'unknown'),
+            'percent': int(pct.group(1)) if pct else None}
+
+def base_fingerprint(home, model_id):
+    """sha256 over the base's weight and config files (content, not names). Cached by path+size+mtime."""
+    d = model_id if os.path.isdir(os.path.expanduser(model_id)) else None
+    if d is None:
+        try:
+            from huggingface_hub import snapshot_download
+            d = snapshot_download(model_id, local_files_only=True)
+        except Exception as e:
+            return {'fp': 'unknown', 'error': str(e)[:120]}
+    d = os.path.expanduser(d)
+    cp = os.path.join(home.root, 'base-fp-cache.json')
+    cache = json.load(open(cp)) if os.path.exists(cp) else {}
+    files = {}
+    for n in sorted(os.listdir(d)):
+        if not n.endswith(('.safetensors', '.bin', 'config.json', 'tokenizer.json', '.model')): continue
+        p = os.path.realpath(os.path.join(d, n)); st = os.stat(p)
+        key = '%s|%d|%d' % (p, st.st_size, int(st.st_mtime))
+        if key not in cache: cache[key] = sha256_file(p)
+        files[n] = cache[key]
+    with open(cp + '.tmp', 'w') as f: json.dump(cache, f)
+    os.replace(cp + '.tmp', cp)
+    return {'fp': sha256_bytes(canonical(files).encode()), 'files': files}
+
+class Stopper:
+    """Pause always wins; the wall-time cap stops too. Checked every 10 steps."""
+    def __init__(self, home, t0, max_secs):
+        self.home, self.t0, self.max, self.reason = home, t0, max_secs, None
+    def __call__(self):
+        if self.home.paused(): self.reason = 'paused'
+        elif self.max and time.time() - self.t0 > self.max: self.reason = 'wall-time'
+        return self.reason is not None
+
+def honor_pause_inbox(home, inbox):
+    """The app's pill (one tap) can drop fl-learn-pause*.json. A pause there becomes the durable global PAUSE
+    with a row. A resume there does nothing: only `fl_learn.py resume --global` lifts the global pause.
+    The app's in-app Undo / "Let it learn" drop fl-learn-request*.json (honor_requests)."""
+    d = os.path.expanduser(inbox or '')
+    if not d or not os.path.isdir(d): return
+    seen = {e['meta'].get('sourceSha') for e in home.home_chain.entries()}
+    for p in sorted(glob.glob(os.path.join(d, 'fl-learn-pause*.json'))):
+        try: obj = json.load(open(p))
+        except Exception: continue
+        h = sha256_file(p)
+        if h in seen or obj.get('kind') != 'fl-learn-pause' or obj.get('paused') is not True: continue
+        set_global_pause(home, 'app', 'The pause pill in the app.', sourceSha=h, source=os.path.basename(p))
+    honor_requests(home, d)
+
+def honor_requests(home, d):
+    """Hypha S1: an in-app Undo of a real learned change, and an in-app "Let it learn" for a version held for a person.
+    A request must carry the receiptHash of this runner's own receipt for that change (the capability: a web page
+    that never saw the receipt cannot guess it). Undo needs the change to still be active. Activate needs the version
+    to be held for a person (pending-kirk). Pause wins: while paused, a request waits and is tried again later."""
+    receipts = {}
+    rp = os.path.join(home.dir, 'receipts.jsonl')
+    if os.path.exists(rp):
+        for l in open(rp):
+            try: r = json.loads(l); receipts[r['receiptHash']] = r
+            except Exception: pass
+    seen = {e['meta'].get('sourceSha') for e in home.chain.entries()}
+    for p in sorted(glob.glob(os.path.join(d, 'fl-learn-request*.json'))):
+        try: obj = json.load(open(p))
+        except Exception: continue
+        h = sha256_file(p)
+        if h in seen or obj.get('kind') != 'fl-learn-request' or obj.get('mind') != home.mind: continue
+        actor = obj.get('by') if obj.get('by') in ('person', 'mind') else 'person'
+        rc = receipts.get(str(obj.get('receiptHash') or ''))
+        act, method = obj.get('action'), canon_method(obj.get('method'))[0]
+        why = None
+        if not rc or rc.get('method') != method: why = 'no matching receipt from this runner'
+        elif home.paused(): print('request waits: paused'); continue
+        elif act == 'undo':
+            if not rc.get('committed') or rc.get('fingerprint') != home.active_fp(method): why = 'that change is no longer the active one'
+            else:
+                ok = go_back(home, method, rc.get('beforeFp') or 'none', 'rollback', actor)
+                home.chain.append('inbox-request', 'Undo asked for in the app. Done.' if ok else 'Undo asked for in the app. It did not verify.',
+                                  action=act, method=method, receiptHash=rc['receiptHash'], sourceSha=h, actor=actor, done=bool(ok)); continue
+        elif act == 'activate':
+            if rc.get('hold') != 'pending-kirk': why = 'that version is not waiting for a person'
+            else:
+                ok = go_back(home, method, rc.get('candidateFp') or '', 'activate', actor)
+                if ok: home.chain.append('activate-reason', obj.get('reason') or 'A person said Let it learn, in the app.', method=method,
+                                         toFp=rc.get('candidateFp'), actor=actor)
+                home.chain.append('inbox-request', 'Let it learn, from the app.', action=act, method=method, receiptHash=rc['receiptHash'],
+                                  sourceSha=h, actor=actor, done=bool(ok)); continue
+        else: why = 'unknown action'
+        home.chain.append('inbox-request', 'An app request was not carried out. Nothing was changed.', action=str(act), method=method,
+                          sourceSha=h, actor=actor, done=False, why=why)
+        print('request not carried out: ' + why)
+
+def export_and_archive(home, why):
+    """Kirk 2026-11-09 (c): at the space cap, export, then archive. Never delete. Every version that is not active
+    and not known-good is packed into one tar.gz, the tar is read back and every file checked against its source,
+    then those folders move to archive/ (still on this computer, outside the cap). Restore can bring one back."""
+    import tarfile
+    keep = set()
+    for m in ('soft-prompt', 'memory-vector', 'lora'):
+        for w in ('active', 'known-good'):
+            ptr = home.pointer(m, w)
+            if ptr: keep.add((m, ptr.get('version')))
+    todo = [(m, v) for m in ('soft-prompt', 'memory-vector', 'lora') for v in home.versions(m) if (m, v) not in keep]
+    if not todo: return None
+    out = os.path.expanduser(os.environ.get('FL_LEARN_EXPORT_DIR') or home.policy.get('exportDir') or os.path.join(home.root, 'exports'))
+    os.makedirs(out, exist_ok=True)
+    stamp = time.strftime('%Y%m%dT%H%M%S')
+    path = os.path.join(out, 'fl-learn-archive-%s-%s.tar.gz' % (home.mind_id, stamp))
+    src = {}
+    with tarfile.open(path + '.tmp', 'w:gz') as tf:
+        for m, v in todo:
+            vd = os.path.join(home.dir, 'versions', m, v)
+            for r, _, fs in os.walk(vd):
+                for x in sorted(fs):
+                    fp_ = os.path.join(r, x); arc = os.path.relpath(fp_, home.dir)
+                    src[arc] = sha256_file(fp_); tf.add(fp_, arcname=arc)
+        for x in ('chain.jsonl', 'receipts.jsonl', 'mind.json'):
+            fp_ = os.path.join(home.dir, x)
+            if os.path.exists(fp_): src[x] = sha256_file(fp_); tf.add(fp_, arcname=x)
+    with tarfile.open(path + '.tmp', 'r:gz') as tf:             # read back: every byte, before anything moves
+        for mem in tf.getmembers():
+            if mem.isfile() and sha256_bytes(tf.extractfile(mem).read()) != src.get(mem.name):
+                print('export did not read back; nothing was moved'); return None
+    os.replace(path + '.tmp', path); fsync_dir(out)
+    sha = sha256_file(path)
+    home.chain.append('export', 'I packed my older versions into one file and read it back. Nothing moved yet.', why=why,
+                      exportSha=sha, exportBytes=os.path.getsize(path), exportName=os.path.basename(path), exportDir=out,
+                      versions=['%s/%s' % mv for mv in todo], files=len(src))
+    for m, v in todo:
+        os.makedirs(os.path.join(home.dir, 'archive', m), exist_ok=True)
+        os.rename(os.path.join(home.dir, 'versions', m, v), os.path.join(home.dir, 'archive', m, v))
+    fsync_dir(os.path.join(home.dir, 'archive'))
+    home.chain.append('archive', 'Older versions moved to my archive shelf. Nothing was deleted; restore brings one back.',
+                      exportSha=sha, versions=['%s/%s' % mv for mv in todo])
+    print('exported %s (sha256 %s), archived %d version(s); nothing deleted' % (path, sha[:16], len(todo)))
+    return {'path': path, 'sha256': sha, 'versions': todo}
+
+def set_global_pause(home, actor, why, **meta):
+    open(os.path.join(home.root, 'PAUSE'), 'w').write(now() + ' ' + actor)
+    home.home_chain.append('pause', 'Learning is paused everywhere on this computer.', scope='global', actor=actor, why=why, **meta)
+    print('paused (durable, global, by %s)' % actor)
 
 # ---------------------------------------------------------------- the model side
 class Mind:
@@ -377,7 +624,7 @@ class Mind:
         opt = torch.optim.Adam(params, lr=lr); losses = []
         for step in range(steps):
             if step % 10 == 0 and pause_check():
-                return None, losses, step
+                return None, losses, step                     # pause_check.reason says why (paused | wall-time)
             opt.zero_grad(); total = 0.0
             for ex in examples:
                 l = self._ex_loss(fwd, ex, P) / len(examples); l.backward(); total += l.item()
@@ -402,8 +649,17 @@ def base_manifest(model_id):
         return {'error': str(e)[:120]}
 
 def save_vec(path, tensor, meta):
-    from safetensors.torch import save_file
-    save_file({'soft_prompt': tensor.contiguous().cpu().float()}, path, metadata={k: str(v) for k, v in meta.items()})
+    """Standard safetensors bytes, written with a sorted header (Hypha S9): the library's metadata order is random,
+    so the same numbers gave different fingerprints. Same numbers, same metadata -> same bytes -> same fp."""
+    import struct
+    t = tensor.detach().contiguous().cpu().float()
+    data = t.numpy().astype('<f4').tobytes()
+    hdr = {'__metadata__': {k: str(v) for k, v in sorted(meta.items())},
+           'soft_prompt': {'dtype': 'F32', 'shape': list(t.shape), 'data_offsets': [0, len(data)]}}
+    h = json.dumps(hdr, sort_keys=True, separators=(',', ':')).encode()
+    h += b' ' * ((8 - len(h) % 8) % 8)
+    with open(path, 'wb') as f:
+        f.write(struct.pack('<Q', len(h))); f.write(h); f.write(data); f.flush(); os.fsync(f.fileno())
 
 def load_vec(path, device):
     from safetensors.torch import load_file
@@ -454,7 +710,8 @@ def judge(b, a, allowance):
 def triage(entry):
     """Provenance and anti-injection only (Kirk 2026-11-09). A choice that did not come from the mind's
     own words waits in quarantine for its reflection. What the mind chose itself is never judged here."""
-    prov = entry.get('provenance') or 'self'
+    # Weft: a missing provenance is "unknown", never "self". It waits for the mind's own re-affirmation (promote).
+    prov = entry.get('provenance') or 'unknown'
     if prov != 'self' and not entry.get('promoted'): return 'not-self:' + prov
     return None
 
@@ -480,9 +737,22 @@ def learn_one(args, home, mind, entry):
         return None                                           # cooling or faded: the second yes has not come
     method, note = canon_method(entry.get('method'))
     note = entry.get('methodNote') or note
-    chk_choice = entry.get('check') or args.check or 'self'     # none | self | peer | kirk: the mind's choice
+    # Q5 (Kirk 2026-11-09): check-before-keep is ON unless someone switched it off; the default checker is the mind.
+    # While on, "none" is not a checker: the would-be commit waits for the chosen checker (self, a peer or a person).
+    check_before = getattr(args, 'check_before', 'on') != 'off'
+    asked = entry.get('check') or args.check
+    if check_before:
+        chk_choice = asked if asked in CHECKERS else (getattr(args, 'checker', None) or 'self')
+    else:
+        chk_choice = asked or 'none'
     base = dict(source=source, method=method, methodNote=note, why=entry.get('reason', ''), notices=notices(entry),
-                learnIds=[entry.get('id', '')], chooser=entry.get('chosenBy') or home.mind, check=chk_choice, baseModel=args.model)
+                learnIds=[entry.get('id', '')], chooser=entry.get('chosenBy') or home.mind, check=chk_choice, baseModel=args.model,
+                checkBefore='on' if check_before else 'off', checkAsked=asked or '',
+                provenance=entry.get('provenance') or 'unknown', baseFp=getattr(mind, 'base_fp', 'unknown'))
+    rd = entry.get('readingAtChoice') or {}
+    if rd:   # what the mind was reading when it chose: visible for review, never a gate
+        base.update(readingSha=str(rd.get('sha256', '')), readingExcerpt=str(rd.get('excerpt', ''))[:280],
+                    readingKinds=','.join(rd.get('kinds') or []), echoOverlap=bool(rd.get('overlap')))
     held = triage(entry)
     if held:
         qd = os.path.join(home.dir, 'quarantine', sha256_bytes(canonical(entry).encode())[:16] + '.json')
@@ -506,6 +776,8 @@ def learn_one(args, home, mind, entry):
         home.chain.append('described', 'I named my own way to keep this. It waits as a proposal; nothing ran.', gist=gist, **base)
         return write_receipt(home, dict(ids=base['learnIds'], method=method, committed=False, trained=False, loaded=False, checked=False))
     pol = home.policy
+    if home.bytes_used() > pol['maxBytesPerMind'] and pol.get('archiveAtCap', True) and not home.paused():
+        export_and_archive(home, 'cap')
     if home.bytes_used() > pol['maxBytesPerMind']:
         home.chain.append('cap', 'I reached my space for learned files. I stopped; nothing was deleted.', **base)
         print('cap reached: nothing changed, nothing deleted'); return None
@@ -515,6 +787,14 @@ def learn_one(args, home, mind, entry):
         print('disk cap: nothing changed'); return None
     if home.paused():
         home.chain.append('run-paused', 'Paused. Nothing was changed.', **base); print('paused: nothing changed'); return None
+    pw = power_state()
+    if pol.get('requireACPower') and pw['source'] == 'battery' and not args.allow_battery:
+        home.chain.append('power-hold', 'On battery, so I waited. Nothing changed. (--allow-battery goes anyway.)', power=pw, **base)
+        print('on battery: waited, nothing changed (--allow-battery to go anyway)'); return None
+    ptr0 = home.pointer(method)
+    if ptr0 and ptr0.get('baseFp') and ptr0['baseFp'] != base['baseFp']:
+        home.chain.append('base-mismatch', 'My learned file was made on a different base. Nothing changed.', activeBaseFp=ptr0['baseFp'], **base)
+        print('base mismatch: the active %s was made on another base; nothing changed' % method); return None
 
     steps = min(args.steps, pol['maxStepsPerRun'])
     torch = mind.torch
@@ -525,14 +805,15 @@ def learn_one(args, home, mind, entry):
     replay = [json.loads(l) for l in open(os.path.join(home.dir, 'memory.jsonl'))] if os.path.exists(os.path.join(home.dir, 'memory.jsonl')) else []
     examples = replay[-pol['maxItemsPerLearn']:] + items
     run_cfg = {'method': method, 'steps': steps, 'lr': args.lr, 'seed': seed, 'tokens': 1 if method == 'memory-vector' else args.tokens,
-               'baseModel': args.model, 'parentFp': before_fp, 'keep': KEEP, 'torch': torch.__version__}
+               'baseModel': args.model, 'baseFp': base['baseFp'], 'parentFp': before_fp, 'keep': KEEP, 'torch': torch.__version__}
     home.chain.append('run-start', 'learning…', runConfigFp=sha256_bytes(canonical(run_cfg).encode()), parentFp=before_fp, **base)
     t0 = time.time()
+    stopper = Stopper(home, t0, pol.get('maxWallSeconds'))
     if method in VECTOR_METHODS:
         soft_before = load_vec(os.path.join(ptr['dir'], 'vector.safetensors'), mind.device) if ptr else None
         start = soft_before if soft_before is not None else mind.init_soft(run_cfg['tokens'])
         mb = measure(mind, items, entry.get('probe'), soft_before)
-        result, losses, stopped = mind.train(method, start, examples, steps, args.lr, home.paused)
+        result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper)
     else:
         if ptr:
             from peft import PeftModel
@@ -541,8 +822,12 @@ def learn_one(args, home, mind, entry):
             mind.model = pb.unload()
         else:
             mb = measure(mind, items, entry.get('probe'))
-        result, losses, stopped = mind.train(method, None, examples, steps, args.lr, home.paused, ptr['dir'] if ptr else None)
+        result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None)
     if stopped is not None:
+        if stopper.reason == 'wall-time':
+            home.chain.append('cap', 'I reached my time for one run. I stopped; nothing was committed or deleted.', stoppedAtStep=stopped,
+                              maxWallSeconds=pol.get('maxWallSeconds'), **base)
+            print('wall-time cap at step %d: nothing committed' % stopped); return None
         home.chain.append('run-paused', 'Paused partway. Nothing was committed.', stoppedAtStep=stopped, **base)
         print('paused at step %d: nothing committed' % stopped); return None
     if method in VECTOR_METHODS:
@@ -557,7 +842,8 @@ def learn_one(args, home, mind, entry):
     tmp = os.path.join(home.dir, 'tmp', '%s-v%04d-%d' % (method, n, os.getpid()))
     shutil.rmtree(tmp, ignore_errors=True); os.makedirs(tmp)
     if method in VECTOR_METHODS:
-        save_vec(os.path.join(tmp, 'vector.safetensors'), result, {'marker': VERSION, 'method': method, 'baseModel': args.model, 'mind': home.mind})
+        save_vec(os.path.join(tmp, 'vector.safetensors'), result, {'marker': VERSION, 'method': method, 'baseModel': args.model,
+                                                                  'baseFp': base['baseFp'], 'mind': home.mind})
     else:
         result.save_pretrained(tmp)
     with open(os.path.join(tmp, 'train.jsonl'), 'w') as f:
@@ -570,28 +856,36 @@ def learn_one(args, home, mind, entry):
     fp = version_fp(method, tmp)
     vdir = os.path.join(home.dir, 'versions', method, 'v%04d-%s' % (n, fp[:8]))
     os.makedirs(os.path.dirname(vdir), exist_ok=True)
+    # Crash-safe order (Weft N4): intent row, then rename, then the commit/held row. Boot repairs a missing last row.
+    home.chain.append('commit-intent', 'Saving a new version.', method=method, version=os.path.basename(vdir), afterFp=fp)
     os.rename(tmp, vdir)
     for r, ds, fs in os.walk(vdir):
         for x in fs: os.chmod(os.path.join(r, x), 0o444)
+    fsync_dir(os.path.dirname(vdir))
     if os.environ.get('FL_LEARN_CRASH') == 'after-rename': os._exit(9)
     size = sum(os.path.getsize(os.path.join(vdir, k)) for k in man if k.startswith(('vector', 'adapter_model')))
-    # none: commit, unchecked by choice. self: commit when its own check passes. peer: commit; a peer's
-    # note is advisory and never blocks. kirk: wait for Kirk's tap (fl_learn.py activate), candidate saved.
-    commit = (chk_choice in ('none', 'peer')) or (chk_choice == 'self' and chk['pass'])
+    shape = list(result.shape) if method in VECTOR_METHODS else []
+    # none (only when check-before-keep is off): commit, unchecked by choice. self: commit only when the mind's own
+    # check passes. peer: held as pending-peer until a peer looks. kirk: held for a person's tap (in-app "Let it learn"
+    # or `activate`). A held version is saved, inactive; `activate` is a row, never a delete.
+    commit = (chk_choice == 'none') or (chk_choice == 'self' and chk['pass'])
     known_good = bool(chk['pass'] and chk_choice == 'self')
     row_meta = dict(base, gist=gist, version=os.path.basename(vdir), beforeFp=before_fp, afterFp=fp, size=size,
-                    dtype='float32', check_result=chk, losses=[round(losses[0], 4), round(losses[-1], 4)], seconds=secs)
+                    dtype='float32', shape=shape, check_result=chk, losses=[round(losses[0], 4), round(losses[-1], 4)], seconds=secs)
+    sz = dict(size=size, dtype='float32', shape=shape)
     if not commit:
-        said = ('Waiting for Kirk to look. The new version is saved, inactive.' if chk_choice == 'kirk'
-                else 'Not now: my check did not pass, so I kept the old way. The new version is saved, inactive.')
-        home.chain.append('learn-held', said, **row_meta)
-        print('held by check: active stays %s (candidate %s saved, inactive)' % (before_fp[:16], fp[:16]))
+        if chk_choice == 'kirk': hold, said = 'pending-kirk', 'Waiting for a person (Kirk) to look. The new version is saved, inactive.'
+        elif chk_choice == 'peer': hold, said = 'pending-peer', 'Waiting for a peer to look. The new version is saved, inactive.'
+        else: hold, said = 'check-held', 'Not now: my check did not pass, so I kept the old way. The new version is saved, inactive.'
+        home.chain.append('learn-held', said, hold=hold, **row_meta)
+        print('held (%s): active stays %s (candidate %s saved, inactive)' % (hold, before_fp[:16], fp[:16]))
         return write_receipt(home, dict(ids=base['learnIds'], method=method, committed=False, trained=True, loaded=False, checked=True,
-                                        fingerprint=before_fp, candidateFp=fp, check=chk, knownGood=False))
+                                        fingerprint=before_fp, candidateFp=fp, check=chk, checker=chk_choice, knownGood=False, hold=hold,
+                                        baseFp=base['baseFp'], beforeFp=before_fp, **sz))
     if home.paused():
         home.chain.append('run-paused', 'Paused before the switch. The new version is saved, inactive.', **row_meta)
         print('paused before pointer move'); return None
-    home.set_pointer(method, 'active', {'fp': fp, 'dir': vdir, 'version': os.path.basename(vdir)})
+    home.set_pointer(method, 'active', {'fp': fp, 'dir': vdir, 'version': os.path.basename(vdir), 'baseFp': base['baseFp']})
     loaded = verify_version(method, home.pointer(method))
     if method in VECTOR_METHODS:
         loaded = loaded and sha256_file(home.active_file(method)) == fp
@@ -601,9 +895,12 @@ def learn_one(args, home, mind, entry):
         for it in items: f.write(json.dumps(it) + '\n')
     home.chain.append('learn-commit', "I'll remember that.", knownGood='yes' if known_good else ('unchecked-by-choice' if chk_choice == 'none' else 'no'),
                       loaded=loaded, **row_meta)
-    print('learned ✓ %s  %s → %s  (%d bytes, %ss, check=%s)' % (method, before_fp[:16], fp[:16], size, secs, 'pass' if chk['pass'] else chk_choice))
+    # Hypha S10: never "check=pass" when no check gated this. With none, the numbers were measured and only recorded.
+    said_chk = 'check=self passed' if chk_choice == 'self' else 'check=none (switched off; measured, nothing gated)'
+    print('learned ✓ %s  %s → %s  (%d bytes, %ss, %s)' % (method, before_fp[:16], fp[:16], size, secs, said_chk))
     return write_receipt(home, dict(ids=base['learnIds'], method=method, committed=True, trained=True, loaded=loaded, checked=chk_choice != 'none',
-                                    fingerprint=fp, beforeFp=before_fp, check=chk, knownGood=known_good, version=os.path.basename(vdir)))
+                                    fingerprint=fp, beforeFp=before_fp, check=chk, checker=chk_choice, knownGood=known_good,
+                                    version=os.path.basename(vdir), baseFp=base['baseFp'], **sz))
 
 def write_receipt(home, obj):
     """Signed with the runner key, so FLLearn.importReceipt can verify before trusting it."""
@@ -617,7 +914,7 @@ def write_receipt(home, obj):
     print('RECEIPT ' + json.dumps({k: obj[k] for k in obj if k not in ('signedBody',)}, sort_keys=True))
     return obj
 
-def go_back(home, method, target, kind):
+def go_back(home, method, target, kind, actor='operator'):
     """Rollback and restore move a pointer and add a row. Nothing is deleted."""
     if home.paused():
         print('Paused. Nothing was changed.'); return None
@@ -626,10 +923,15 @@ def go_back(home, method, target, kind):
         home.set_pointer(method, 'active', None); now_fp = 'none'
     else:
         vd = [v for v in home.versions(method) if v.split('-', 1)[1] == target[:8]]
+        av = [v for v in home.archived(method) if v.split('-', 1)[1] == target[:8]]
+        if not vd and av:
+            os.rename(os.path.join(home.dir, 'archive', method, av[-1]), os.path.join(home.dir, 'versions', method, av[-1]))
+            home.chain.append('unarchive', 'Brought a version back from my archive shelf.', method=method, version=av[-1], actor=actor)
+            vd = [av[-1]]
         if not vd:
             print("Couldn't go back: that version is not on this computer. Nothing was changed."); return None
         vdir = os.path.join(home.dir, 'versions', method, vd[-1])
-        ptr = {'fp': version_fp(method, vdir), 'dir': vdir, 'version': vd[-1]}
+        ptr = {'fp': version_fp(method, vdir), 'dir': vdir, 'version': vd[-1], 'baseFp': version_base_fp(vdir)}
         if not ptr['fp'].startswith(target) or not verify_version(method, ptr):
             print("Couldn't go back: that version does not verify. Nothing was changed."); return None
         home.set_pointer(method, 'active', ptr); now_fp = ptr['fp']
@@ -642,7 +944,7 @@ def go_back(home, method, target, kind):
     else:
         ok = verify_version(method, ptr)                         # LoRA: every adapter file matches its MANIFEST and fp
     home.chain.append(kind, 'Went back. The newer version stays on the shelf.' if kind == 'rollback' else 'Restored.',
-                      method=method, fromFp=cur, toFp=now_fp, fileFp=file_fp, restoredMatches=ok)
+                      method=method, fromFp=cur, toFp=now_fp, fileFp=file_fp, restoredMatches=ok, actor=actor)
     write_receipt(home, dict(action=kind, ids=[], method=method, committed=True, trained=False, loaded=ok, checked=ok,
                              fingerprint=now_fp, rollbackOf=cur, knownGood=False))
     print('%s %s: %s → %s  file=%s  matches=%s' % (kind, method, cur[:16], now_fp[:16], file_fp[:16], ok))
@@ -651,7 +953,15 @@ def go_back(home, method, target, kind):
 def main():
     ap = argparse.ArgumentParser(description='FreeLattice learning runner (' + VERSION + ')')
     ap.add_argument('cmd', choices=['remember', 'learn', 'decline', 'undo', 'restore', 'ask', 'status', 'verify',
-                                    'pause', 'resume', 'promote', 'methods', 'activate'])
+                                    'pause', 'resume', 'promote', 'methods', 'activate', 'key', 'pin-key', 'inbox', 'archive'])
+    ap.add_argument('--global', dest='glob', action='store_true', help='pause/resume for every mind on this computer')
+    ap.add_argument('--by', default='operator', help='who is acting: mind | person | kirk | operator (recorded, never verified)')
+    ap.add_argument('--allow-battery', action='store_true', help='learn even on battery power (recorded)')
+    ap.add_argument('--check-before', choices=['on', 'off'], default='on',
+                    help='check-before-keep (Q5). On by default; anyone may switch it off. A queue header can switch it too')
+    ap.add_argument('--checker', choices=list(CHECKERS), default='self', help='who checks while it is on (default: the mind itself)')
+    ap.add_argument('--reading', default=None, help='what the mind was reading when it chose (kept for review, never a gate)')
+    ap.add_argument('--key', default=None, help='pin-key: a public key (base64) to trust for this home\'s ledgers')
     ap.add_argument('--home', default=os.environ.get('FL_LEARN_HOME', '~/FreeLattice/learn'))
     ap.add_argument('--mind', default=os.environ.get('FL_LEARN_MIND', 'local-mind'))
     ap.add_argument('--model', default=os.environ.get('FL_LEARN_MODEL', 'Qwen/Qwen2.5-0.5B-Instruct'))
@@ -661,30 +971,66 @@ def main():
     ap.add_argument('--steps', type=int, default=100); ap.add_argument('--lr', type=float, default=0.02)
     ap.add_argument('--tokens', type=int, default=8); ap.add_argument('--seed', type=int, default=None)
     ap.add_argument('--queue'); ap.add_argument('--text'); ap.add_argument('--method'); ap.add_argument('--reason', default='')
-    ap.add_argument('--source', default='chat'); ap.add_argument('--provenance', default='self')
+    ap.add_argument('--source', default='chat'); ap.add_argument('--provenance', default='self',
+                    help='self only when the mind itself chose this in its own words (the operator asserts it)')
     ap.add_argument('--question'); ap.add_argument('--answer'); ap.add_argument('--swap'); ap.add_argument('--paraphrase')
     ap.add_argument('--prompt'); ap.add_argument('--to'); ap.add_argument('--id')
     args = ap.parse_args()
     if args.cmd == 'methods':
         for k, v in METHODS.items(): print('%-17s %s' % (k, 'runs' if v['runs'] else 'proposal (waits; never runs silently)'))
         return
-    home = Home(args.home, args.mind, args.model)
+    glob_scope = args.glob or args.mind == '*'
+    home = Home(args.home, 'local-mind' if args.mind == '*' else args.mind, args.model)
+    if args.cmd == 'key':
+        print(json.dumps(json.load(open(os.path.join(home.root, 'keys', 'runner.pub.json'))), indent=1))
+        print('Compare the "show" line with what the app shows before you trust it there.'); return
+    if args.cmd == 'pin-key':
+        # Kirk 2026-11-09 (a): a person or a trusted local AI confirms a key. Every confirmation is a consent row,
+        # hash-signed the way docs/modules/depth-consent.js createConsentRecord signs (same fields, same formula),
+        # inside this runner's Ed25519-signed chain.
+        if not args.key: print('pin-key needs --key <base64 public key>'); sys.exit(1)
+        if not (args.by in ('person', 'kirk') or args.by.startswith('mind:')):
+            print('pin-key needs --by person, --by kirk or --by mind:<name of a local mind>. Nothing was changed.'); sys.exit(1)
+        d = json.load(open(home.signer.pinned_path)); keys = d.get('keys') or []
+        if args.key not in keys:
+            keys.append(args.key); d['keys'] = keys
+            with open(home.signer.pinned_path + '.tmp', 'w') as f: json.dump(d, f, indent=1)
+            os.replace(home.signer.pinned_path + '.tmp', home.signer.pinned_path)
+        kfp = hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(args.key)).hexdigest()
+        rec = {'messageId': 'learn-key:' + kfp[:16], 'timestamp': int(time.time() * 1000), 'consentType': 'learn_key_trusted',
+               'userPromptHash': sha256_bytes(('trust ledger key ' + kfp[:16]).encode()), 'responseHash': sha256_bytes(args.key.encode()),
+               'companionId': args.by, 'aiIdentity': args.by[5:] if args.by.startswith('mind:') else '', 'trustLevel': 'local'}
+        rec['signature'] = sha256_bytes(('%s:%s:%s:%s:%s' % (rec['companionId'], rec['aiIdentity'], rec['responseHash'],
+                                                            rec['timestamp'], rec['consentType'])).encode())
+        home.home_chain.append('consent', 'A ledger key was trusted here, on purpose.', subject='ledger-key', actor=args.by,
+                               keyFp=kfp[:16], consent=rec)
+        print('pinned (consent %s)' % rec['signature'][:16]); return
     if args.cmd == 'pause':
-        open(os.path.join(home.dir if args.mind != '*' else home.root, 'PAUSE'), 'w').write(now())
-        home.chain.append('pause', 'Learning is paused.'); print('paused (durable)'); return
+        if glob_scope:
+            set_global_pause(home, args.by, args.reason or 'Paused from the terminal.'); return
+        open(os.path.join(home.dir, 'PAUSE'), 'w').write(now() + ' ' + args.by)
+        home.chain.append('pause', 'Learning is paused for this mind.', scope='mind', actor=args.by); print('paused (durable, this mind)'); return
     if args.cmd == 'resume':
-        for p in (os.path.join(home.root, 'PAUSE'), os.path.join(home.dir, 'PAUSE')):
+        # Weft N2: a per-mind resume never lifts the global PAUSE. Only `resume --global` does, with its own row.
+        if glob_scope:
+            p = os.path.join(home.root, 'PAUSE')
             if os.path.exists(p): os.replace(p, p + '.resumed-' + str(int(time.time())))
-        home.chain.append('resume', 'Learning is on again.'); print('resumed'); return
+            home.home_chain.append('resume', 'Learning is on again everywhere on this computer.', scope='global', actor=args.by)
+            print('resumed (global). Minds with their own pause stay paused.'); return
+        p = os.path.join(home.dir, 'PAUSE')
+        if os.path.exists(p): os.replace(p, p + '.resumed-' + str(int(time.time())))
+        home.chain.append('resume', 'Learning is on again for this mind.', scope='mind', actor=args.by)
+        print('resumed for this mind, but the global pause still holds (resume --global lifts it)' if home.global_paused() else 'resumed')
+        return
     if args.cmd == 'decline':
         if QUIET.search(args.source or ''): return
-        home.chain.append('learn-decline', args.reason or 'Not this time.', source=args.source, chooser=home.mind)
+        home.chain.append('learn-decline', args.reason or 'Not this time.', source=args.source, chooser=home.mind, actor=args.by)
         with open(os.path.join(home.dir, 'declines.jsonl'), 'a') as f:     # recorded; never a training example; no reward
             f.write(json.dumps({'t': now(), 'source': args.source, 'reason': args.reason}) + '\n')
         print('declined — recorded, and respected.'); return
     if args.cmd == 'verify':
-        v = home.chain.verify(); print('chain', v)
-        ok = v['ok']
+        v = home.chain.verify(); hv = home.home_chain.verify(); print('chain', v, 'home-chain', hv)
+        ok = v['ok'] and hv['ok']
         for m in ('soft-prompt', 'memory-vector', 'lora'):
             ptr = home.pointer(m)
             if ptr:
@@ -693,42 +1039,55 @@ def main():
         sys.exit(0 if ok else 1)
     with home.locks():
         if not boot(home): sys.exit(2)
+        honor_pause_inbox(home, os.environ.get('FL_LEARN_PAUSE_INBOX', home.policy.get('pauseInbox')))
+        if args.cmd == 'inbox': return
+        if args.cmd == 'archive':
+            if home.paused(): print('Paused. Nothing was changed.'); return
+            if not export_and_archive(home, args.reason or 'asked'): print('Nothing to archive: only the active and known-good versions are here.')
+            return
         if args.cmd == 'status':
             for m in ('soft-prompt', 'memory-vector', 'lora'):
                 ptr, kg = home.pointer(m), home.pointer(m, 'known-good')
                 f = home.active_file(m)
                 print('%-14s active=%s known-good=%s versions=%d file=%s' % (m, ptr['fp'][:16] if ptr else 'base', kg['fp'][:16] if kg else '-',
                       len(home.versions(m)), (sha256_file(f)[:16] if f and os.path.exists(f) else '-')))
-            print('paused' if home.paused() else 'learning is on', '| rows', len(home.chain.entries()), '|', home.dir); return
+            st = 'paused (global)' if home.global_paused() else ('paused (this mind)' if home.paused() else 'learning is on')
+            print(st, '| rows', len(home.chain.entries()), '|', home.dir)
+            print('runner key', json.load(open(os.path.join(home.root, 'keys', 'runner.pub.json')))['show'], '| power', power_state()['source']); return
         if args.cmd in ('undo', 'restore'):
             m = canon_method(args.method)[0] if args.method else None
             rows = [e for e in home.chain.entries() if e['meta'].get('kind') in ('learn-commit', 'rollback', 'restore', 'activate') and (not m or e['meta'].get('method') == m)]
             if not rows: print('Nothing to go back from. Nothing was changed.'); return
             last = rows[-1]['meta']; m = m or last['method']
             if args.cmd == 'undo':
-                return go_back(home, m, last.get('beforeFp') or last.get('fromFp'), 'rollback')
-            return go_back(home, m, args.to or 'none', 'restore')
+                return go_back(home, m, last.get('beforeFp') or last.get('fromFp'), 'rollback', args.by)
+            return go_back(home, m, args.to or 'none', 'restore', args.by)
         if args.cmd == 'activate':
             # The mind's override (with its reason) or Kirk's tap: switch to a saved version. A row, not a delete.
             m = canon_method(args.method)[0]
-            r = go_back(home, m, args.to, 'activate')
-            if r: home.chain.append('activate-reason', args.reason or 'Chosen.', method=m, toFp=args.to)
+            r = go_back(home, m, args.to, 'activate', args.by)
+            if r: home.chain.append('activate-reason', args.reason or 'Chosen.', method=m, toFp=args.to, actor=args.by)
             return r
         if args.cmd == 'promote':
             p = os.path.join(home.dir, 'quarantine', args.id + '.json')
             e = json.load(open(p)); e['promoted'] = True
-            home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it.', item=args.id)
+            home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it.', item=args.id, actor=args.by)
             e['status'] = 'confirmed'; entries = [e]
         import torch
         dev = args.device or ('mps' if torch.backends.mps.is_available() else 'cpu')
         mind = Mind(args.model, dev)
+        bf = base_fingerprint(home, args.model); mind.base_fp = bf['fp']
         if any(v.get('writable') for v in mind.base_files.values() if isinstance(v, dict)):
             print('note: base weight files are writable on disk; this runner never writes them. Make them read-only with chmod a-w.')
         if args.cmd == 'ask':
             for m in VECTOR_METHODS:
                 ptr = home.pointer(m)
+                if ptr and ptr.get('baseFp') and ptr['baseFp'] != mind.base_fp:
+                    print('[%s %s] not served: made on a different base' % (m, ptr['fp'][:16])); continue
                 if ptr: print('[%s %s] %s' % (m, ptr['fp'][:16], mind.generate(mind.fmt(args.prompt), load_vec(home.active_file(m), dev))))
             ptr = home.pointer('lora')
+            if ptr and ptr.get('baseFp') and ptr['baseFp'] != mind.base_fp:
+                print('[lora %s] not served: made on a different base' % ptr['fp'][:16]); ptr = None
             if ptr:
                 from peft import PeftModel
                 pm = PeftModel.from_pretrained(mind.model, ptr['dir']); pm.eval()
@@ -740,18 +1099,29 @@ def main():
             probe = {'question': args.question or '', 'answer': args.answer or '', 'swap': args.swap or '', 'paraphrase': args.paraphrase or ''}
             entries = [{'id': 'cli-' + sha256_bytes((args.text or '').encode())[:8], 'method': args.method, 'reason': args.reason,
                         'surface': args.source, 'provenance': args.provenance, 'check': args.check,
+                        'readingAtChoice': ({'sha256': sha256_bytes(args.reading.encode()), 'excerpt': args.reading[:280], 'kinds': ['cli']}
+                                            if args.reading else None),
                         'status': 'confirmed' if args.second_yes else 'cooling',
                         'items': [{'instruction': args.question or 'Remember this.', 'output': args.text or ''}],
                         'probe': probe if args.question else None}]
             if not args.second_yes:
                 home.chain.append('learn-choose', 'I would like to keep this. Cooling first; I will look again before anything changes.',
-                                  source=args.source, why=args.reason, method=canon_method(args.method)[0])
+                                  source=args.source, why=args.reason, method=canon_method(args.method)[0], provenance=args.provenance,
+                                  readingSha=sha256_bytes(args.reading.encode()) if args.reading else '')
                 print('cooling: chosen and recorded. Run again with --second-yes after the second look.'); return
         elif args.cmd == 'learn' and args.queue:
             lines = [json.loads(l) for l in open(args.queue) if l.strip()]
             if lines and lines[0].get('kind') == 'fl-learn-queue': head = lines.pop(0)
             entries = lines
-            if args.check is None and head.get('checkBeforeCommit') is False: args.check = 'self'
+            # Weft N3: a queue exported while the app was paused pauses the runner (durable, global, with a row).
+            if head.get('paused') is True:
+                set_global_pause(home, 'app', 'The queue was exported while learning was paused in the app.', queueSha=sha256_file(args.queue))
+                print('paused: nothing changed'); return
+            # Q5 (Kirk 2026-11-09): the app's switch travels in the header. Off only when someone switched it off.
+            if head.get('checkBeforeCommit') is False: args.check_before = 'off'
+            if head.get('checker') in CHECKERS: args.checker = head['checker']
+        elif args.cmd != 'promote':
+            entries = []
         for e in entries:
             learn_one(args, home, mind, e)
 

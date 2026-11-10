@@ -16691,6 +16691,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <textarea id="chatInput" placeholder="Say something..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
+          <!-- v-ai-chosen-learning-v0.1: per-chat "Don't learn from this chat" (learn-choice.js renders it). Only this chat. -->
+          <div id="flLearnChatSwitch" class="fl-learn-chat-switch" style="padding:4px 8px"></div>
+          <script>window.flLearnChatId = function () { try { return (state && state.currentConversationId) || ''; } catch (e) { return ''; } };</script>
           <!-- v-chat-scroll-release-v0.1: calls the existing update check. No new update code. -->
           <div class="fl-chat-update-row" id="flChatUpdateRow">
             <button type="button" id="flChatUpdateCheck" class="fl-chat-update-check" onclick="flChatAskNewest()">Version. Get the newest</button>

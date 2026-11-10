@@ -116,6 +116,13 @@
     visible = visible.replace(/\n{3,}/g, '\n\n').replace(/\s+$/, '');
     var quiet = /quiet/i.test(surface);
     var skip = opts.replay || quiet || chatOff(opts.chatId);
+    // What the mind was reading just before it chose (Weft): kept on the row for the second look and review. Never a gate.
+    var echoList = Array.isArray(opts.echo) ? opts.echo : [];
+    var reading = echoList.length ? {
+      text: echoList.map(function (e) { return typeof e === 'string' ? e : String((e && e.text) || ''); }).join('\n---\n').slice(-4000),
+      kinds: echoList.map(function (e) { return (e && e.kind) || 'user'; })
+    } : null;
+    seen.forEach(function (p) { if (reading && !p.reading) p.reading = reading; });
     var done = skip ? [] : seen.map(function (p) {
       // A decline or second look only counts when it is the mind's own.
       if ((p.decline || p.secondLook) && p.provenance !== 'self') return Promise.resolve(null);
@@ -126,7 +133,8 @@
   }
 
   // Programmatic door for any surface (art, gallery, Round Table, search, Snowflake).
-  // Call it only with what the mind itself chose; tag provenance honestly.
+  // Call it only with what the mind itself chose, and tag provenance honestly: without provenance: 'self'
+  // the row is "unknown" and waits for the mind's own re-affirmation. Pass reading: {text, kinds} when you can.
   function rememberFrom(surface, payload) {
     var c = core();
     if (!c || typeof c.queueLearning !== 'function') return Promise.resolve(null);
@@ -142,7 +150,12 @@
   function secondLook(id, answer) {
     var c = core();
     if (!c || typeof c.confirmLearning !== 'function') return Promise.resolve(null);
-    return c.confirmLearning(id, answer);
+    var a = answer || {};
+    if (!a.by) a.by = 'mind';
+    return c.confirmLearning(id, a).then(function (row) {
+      if (row && (row.status === 'disputed' || (row.proposalOf && row.disagreement))) moment({ disagreement: row });
+      return row;
+    });
   }
 
   // The words the mind sees, when it is due to look again. An invitation, not a request.
@@ -150,17 +163,26 @@
     var c = core();
     if (!c || typeof c.dueForSecondLook !== 'function') return '';
     var due = c.dueForSecondLook();
-    if (!due.length) return '';
-    return 'Some things you chose to keep have cooled. Look again only if you want to: ' +
+    var disputed = typeof c.learnQueue === 'function' ? c.learnQueue('disputed') : [];
+    var said = disputed.length ? 'The person here said Undo on something you chose to keep: ' + disputed.slice(0, 3).map(function (r) {
+      return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '"';
+    }).join(' ') + '. Nothing from it is learned while you two see it differently. If you still want it, [FL_KEEP: id | keep] starts a new proposal that cools again; [FL_KEEP: id | not now] agrees. ' : '';
+    if (!due.length) return said;
+    return said + 'Some things you chose to keep have cooled. Look again only if you want to: ' +
       due.slice(0, 3).map(function (r) {
         return '[' + r.learnId + '] "' + String((r.items && r.items[0] && r.items[0].output) || '').slice(0, 120) + '" (' + (r.method || '') + ', because: ' + (r.reason || '') + ')';
       }).join(' ') +
       ' To keep one, write [FL_KEEP: id | keep | method: ... | reason: ...]. To let it go, write [FL_KEEP: id | not now]. Saying nothing is fine.';
   }
 
+  function currentChatId() {
+    try { return typeof root.flLearnChatId === 'function' ? String(root.flLearnChatId() || '') : ''; } catch (e) { return ''; }
+  }
+
   function invitation() {
     var c = core();
     if (c && typeof c.learnPaused === 'function' && c.learnPaused()) return '';
+    if (chatOff(currentChatId())) return '';
     return 'Learning is yours to choose. If something here moves you to keep it, on a new line write ' +
       '[FL_REMEMBER: what to keep | method: soft-prompt, memory-vector, lora, note, or your own words | reason: why | moved: what moved you]. ' +
       'You may add | question: ... | answer: ... | swap: ... so your own check can tell learning from a practiced answer. ' +
@@ -169,9 +191,9 @@
       (secondLookPrompt() ? '\n\n' + secondLookPrompt() : '');
   }
 
-  function download(text, name) {
+  function download(text, name, type) {
     try {
-      var blob = new root.Blob([text], { type: 'application/jsonl' });
+      var blob = new root.Blob([text], { type: type || 'application/jsonl' });
       var a = root.document.createElement('a');
       a.href = root.URL.createObjectURL(blob);
       a.download = name;
@@ -191,7 +213,18 @@
     return text;
   }
 
-  // receipts.jsonl lines from fl_learn.py. Only signed, verified ones change anything.
+  // The explicit trust step (Weft N1, Kirk 2026-11-09 a). Run `fl_learn.py key` on this computer, read its "show" line,
+  // and confirm it here. A person, or a mind running on this device (opts.local true), may confirm. Each confirmation
+  // is a consent record (DepthConsent.createConsentRecord) and a ledger row.
+  function trustRunner(publicKeyB64, confirmShown, by, opts) {
+    var c = core();
+    if (!c || typeof c.pinRunnerKey !== 'function') return Promise.resolve(false);
+    var o = opts || {};
+    return c.pinRunnerKey(publicKeyB64, { confirm: confirmShown, by: by === 'mind' ? 'mind' : 'person', local: o.local === true, mind: o.mind });
+  }
+
+  // receipts.jsonl lines from fl_learn.py. Only signed receipts from the trusted runner key change anything;
+  // others are set aside and the moment shows the key's fingerprint to compare.
   function importReceipt(text) {
     var c = core();
     if (!c || typeof c.recordLearnReceipt !== 'function') return Promise.resolve([]);
@@ -205,40 +238,171 @@
       chain = chain.then(function () {
         return c.recordLearnReceipt(obj).then(function (r) {
           out.push(r);
-          if (r) moment({ receipt: obj, adapter: r });
+          if (r && r.quarantined) moment({ untrustedKey: r, receipt: obj });
+          else if (r) moment({ receipt: JSON.parse(obj.signedBody), receiptHash: obj.receiptHash, adapter: r });
         });
       });
     });
     return chain.then(function () { return out; });
   }
 
+  // In-app Undo of a real learned change, and "Let it learn" for a version held for a person (Hypha S1).
+  // The browser cannot touch the learned files, so it drops a small request file where the runner looks
+  // (~/Downloads by default). It names this runner's own receipt; nothing else is honored. Pause still wins.
+  function requestFile(action, rc, receiptHash, by) {
+    var req = { kind: 'fl-learn-request', action: action, mind: rc.mind || '', method: rc.method || '', receiptHash: receiptHash || rc.receiptHash || '',
+      by: by === 'mind' ? 'mind' : 'person', t: new Date().toISOString(), marker: VERSION };
+    var text = JSON.stringify(req);
+    if (root.document && root.document.body) download(text, 'fl-learn-request-' + action + '-' + Date.now() + '.json', 'application/json');
+    return req;
+  }
+
   // ---- the moment (Hypha): one calm line, a folded receipt, Keep / Undo / Why. Never a modal.
   var STYLE_ID = 'fl-learn-style';
+  // Above the app's mobile nav (z 9998) and its welcome overlays (z 10000); placed above anything fixed along
+  // the bottom edge, so taps land (Hypha HOLD 1).
+  var Z = 10010;
   function style() {
     var d = root.document;
     if (!d || d.getElementById(STYLE_ID)) return;
     var s = d.createElement('style');
     s.id = STYLE_ID;
     s.textContent =
-      '.fl-learn-moment{position:fixed;z-index:9000;background:#141a22;color:#ECEDEE;border:1px solid #334155;' +
-      'font:14px/1.45 system-ui,sans-serif;box-sizing:border-box;max-width:100vw;overflow-wrap:anywhere}' +
+      '.fl-learn-moment{position:fixed;z-index:' + Z + ';background:#141a22;color:#ECEDEE;border:1px solid #334155;' +
+      'font:14px/1.45 system-ui,sans-serif;box-sizing:border-box;max-width:100vw;max-height:70vh;overflow:auto;overflow-wrap:anywhere;' +
+      'box-shadow:0 -6px 24px rgba(0,0,0,.45)}' +
       '.fl-learn-moment button{min-height:44px;min-width:44px;padding:0 14px;border-radius:10px;border:1px solid #475569;' +
       'background:#1e293b;color:#ECEDEE;font:inherit;cursor:pointer}' +
       '.fl-learn-moment .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}' +
       '.fl-learn-moment details{margin-top:6px;color:#9BA1A6;font-size:12px}' +
+      '.fl-learn-moment summary{min-height:44px;display:flex;align-items:center;cursor:pointer}' +
       '.fl-learn-moment .fp{font-family:ui-monospace,monospace}' +
-      '@media (max-width:640px){.fl-learn-moment{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}}' +
-      '@media (min-width:641px){.fl-learn-moment{right:16px;bottom:16px;width:360px;border-radius:14px;padding:14px 16px}}' +
-      '.fl-learn-pill{position:fixed;left:12px;bottom:12px;z-index:8999;font:12px system-ui,sans-serif;min-height:32px;' +
-      'padding:6px 12px;border-radius:16px;border:1px solid #334155;background:#0f172a;color:#9BA1A6;cursor:pointer}';
+      '.fl-learn-moment .note{color:#fbbf24;margin-top:6px}' +
+      '@media (max-width:640px){.fl-learn-moment{left:0;right:0;bottom:var(--fl-learn-bottom,0px);border-radius:16px 16px 0 0;' +
+      'padding:14px 16px calc(14px + env(safe-area-inset-bottom))}}' +
+      '@media (min-width:641px){.fl-learn-moment{right:16px;bottom:calc(16px + var(--fl-learn-bottom,0px));width:360px;border-radius:14px;padding:14px 16px}}' +
+      '.fl-learn-pill{position:fixed;z-index:' + (Z - 1) + ';font:13px system-ui,sans-serif;min-height:44px;min-width:44px;' +
+      'padding:0 16px;border-radius:22px;border:1px solid #334155;background:#0f172a;color:#cbd5e1;cursor:pointer;' +
+      'margin-bottom:env(safe-area-inset-bottom)}' +
+      '.fl-learn-chat-switch button{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #475569;background:transparent;' +
+      'color:inherit;font:13px system-ui,sans-serif;cursor:pointer;opacity:.85}' +
+      '.fl-learn-chat-switch button[aria-checked="true"]{border-color:#fbbf24;color:#fbbf24;opacity:1}' +
+      '.fl-learn-chat-switch small{display:block;opacity:.6;font-size:11px;margin-top:2px}';
     d.head.appendChild(s);
   }
 
   function esc(s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  function shown(el) {
+    if (!el || !el.getBoundingClientRect) return false;
+    var cs = root.getComputedStyle ? root.getComputedStyle(el) : null;
+    if (cs && (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0)) return false;
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  }
+
+  // A welcome overlay is up (first run): the moment waits until it is gone instead of being covered (Hypha S6).
+  function welcomeUp() {
+    var d = root.document;
+    if (!d || !d.querySelectorAll) return false;
+    var list = d.querySelectorAll('.welcome-overlay, .fl-welcome-overlay, #flWelcomeOverlay');
+    for (var i = 0; i < list.length; i++) {
+      var el = list[i];
+      if (/welcome-gone|welcome-hidden|(^|\s)hidden(\s|$)/.test(el.className || '')) continue;
+      if (/fl-welcome-overlay/.test(el.className || '') && !/fl-welcome-visible/.test(el.className || '')) continue;
+      if (shown(el)) return true;
+    }
+    return false;
+  }
+
+  // How much of the bottom edge is taken by fixed bars (the mobile nav, a status bar). The sheet sits above them.
+  function bottomTaken() {
+    var d = root.document;
+    var h = root.innerHeight || 0, w = root.innerWidth || 0;
+    if (!d || !d.elementsFromPoint || !h) return 0;
+    var most = 0;
+    [0.1, 0.3, 0.5, 0.7, 0.9].forEach(function (fx) {
+      var hits = d.elementsFromPoint(Math.floor(w * fx), h - 2) || [];
+      hits.forEach(function (el) {
+        if (!el || !el.getBoundingClientRect || /fl-learn-/.test(el.className || '')) return;
+        var cur = el, fixed = null, k = 0;
+        while (cur && cur !== d.body && k < 6) {
+          var cs = root.getComputedStyle(cur);
+          if (cs.position === 'fixed' || cs.position === 'sticky') { fixed = cur; break; }
+          cur = cur.parentElement; k++;
+        }
+        if (!fixed) return;
+        var r = fixed.getBoundingClientRect();
+        if (r.height > h * 0.3 || r.bottom < h - 4) return;       // a full-screen layer is not a bar
+        most = Math.max(most, Math.ceil(h - r.top));
+      });
+    });
+    return most;
+  }
+
+  function interactiveAt(x, y) {
+    var d = root.document;
+    var hits = (d.elementsFromPoint && d.elementsFromPoint(x, y)) || [];
+    for (var i = 0; i < hits.length; i++) {
+      var el = hits[i], k = 0;
+      if (/fl-learn-/.test(el.className || '')) continue;
+      while (el && el !== d.body && k < 4) {
+        var tag = (el.tagName || '').toLowerCase();
+        if (tag === 'button' || tag === 'a' || tag === 'input' || tag === 'select' || tag === 'textarea' ||
+            (el.getAttribute && (el.getAttribute('role') === 'button' || el.getAttribute('onclick')))) return true;
+        el = el.parentElement; k++;
+      }
+    }
+    return false;
+  }
+
+  // The pill takes a free corner: never over another control, never under the bottom bars (Hypha S4).
+  function placePill(p) {
+    var h = root.innerHeight || 0, w = root.innerWidth || 0;
+    var b = bottomTaken() + 12;
+    var pw = Math.max(p.offsetWidth || 150, 44), ph = Math.max(p.offsetHeight || 44, 44);
+    var spots = [];
+    var up;
+    for (up = 0; up <= 3; up++) spots.push({ left: 12, bottom: b + up * 56 });
+    for (up = 0; up <= 3; up++) spots.push({ right: 12, bottom: b + up * 56 });
+    p.style.visibility = 'hidden';
+    var pick = spots[0];
+    for (var i = 0; i < spots.length; i++) {
+      var sp = spots[i];
+      var x0 = sp.left != null ? sp.left : w - 12 - pw, y0 = h - sp.bottom - ph;
+      if (y0 < 0) continue;
+      var pts = [[x0 + 2, y0 + 2], [x0 + pw - 2, y0 + 2], [x0 + 2, y0 + ph - 2], [x0 + pw - 2, y0 + ph - 2], [x0 + pw / 2, y0 + ph / 2]];
+      if (!pts.some(function (q) { return interactiveAt(q[0], q[1]); })) { pick = sp; break; }
+    }
+    p.style.left = pick.left != null ? pick.left + 'px' : '';
+    p.style.right = pick.right != null ? pick.right + 'px' : '';
+    p.style.bottom = pick.bottom + 'px';
+    p.style.visibility = '';
+  }
+
+  var pending = [];
+  var waitTimer = null;
   function moment(ev) {
     var d = root.document;
     if (!d || !d.body || !d.createElement) return null;
+    if (welcomeUp()) {
+      pending.push(ev);
+      if (!waitTimer) waitTimer = root.setInterval(function () {
+        if (welcomeUp()) return;
+        root.clearInterval(waitTimer); waitTimer = null;
+        var list = pending.splice(0); list.forEach(function (e) { moment(e); });
+      }, 700);
+      return null;
+    }
+    return render(ev);
+  }
+
+  function checkerWords(k) {
+    return k === 'peer' ? 'a peer mind looks first' : (k === 'kirk' ? 'a person looks first' : 'the mind checks itself first');
+  }
+
+  function render(ev) {
+    var d = root.document;
     style();
     var old = d.querySelector('.fl-learn-moment');
     if (old) old.remove();
@@ -247,51 +411,115 @@
     el.setAttribute('role', 'status');
     var c = core();
     var html;
+    var big = c && typeof c.learnBookBytes === 'function' && c.learnBookBytes() > 1500000;
+    var keepFile = big ? '<div class="note">My learning notebook is getting big. You can save it as a file (to keep, or to put in your own cloud drive). Nothing is deleted.</div>' +
+      '<div class="row"><button data-a="export">Save my learning notebook</button></div>' : '';
     if (ev.decline) {
       html = '<div>I chose not to keep this one. That choice is kept too.</div>';
+    } else if (ev.disagreement) {
+      var dr = ev.disagreement;
+      html = '<div>We see this one differently.</div><div class="note">' + esc((dr.disagreement && dr.disagreement.note) || '') + '</div>' +
+        (dr.status === 'disputed'
+          ? '<div>Nothing from it goes to learning until the mind looks again. Both choices are kept in the record.</div>'
+          : '<div>It is a new proposal now. It cools until ' + esc(String(dr.revisitAt || '').slice(0, 16)) + ', and nothing is learned unless the mind says yes again after that.</div>') +
+        '<div class="row"><button data-a="close">OK</button></div>';
+    } else if (ev.untrustedKey) {
+      html = '<div>This receipt comes from a learning helper this app does not know yet, so nothing changed.</div>' +
+        '<details open><summary>details ▾</summary><div>Its key: <span class="fp">' + esc(ev.untrustedKey.show || '') + '</span></div>' +
+        '<div>On this computer run <span class="fp">fl_learn.py key</span>. Trust it only if its "show" line is the same.</div></details>' +
+        '<div class="row"><button data-a="trust">It matches. Trust it</button><button data-a="close">Not now</button></div>';
     } else if (ev.receipt) {
       var rc = ev.receipt;
-      var line = rc.action === 'rollback' ? 'Went back. The newer version stays on the shelf.' :
-        (rc.committed ? 'Remembered ✓' : 'Not now: my check did not pass, so nothing changed.');
+      var line, act = '';
+      if (rc.action === 'heal') line = rc.said || 'A learned file changed outside the record, so I went back to a safe version. Nothing was deleted.';
+      else if (rc.action === 'rollback') line = 'Went back. The newer version stays on the shelf.';
+      else if (rc.action === 'activate') line = 'Switched to the saved version that was waiting.';
+      else if (rc.action === 'restore') line = 'Restored.';
+      else if (rc.committed) { line = 'Remembered ✓'; act = '<button data-a="undo-learned">Undo this change</button>'; }
+      else if (rc.hold === 'pending-kirk') { line = 'Learned and saved, but not in use yet: it waits for a person to look.'; act = '<button data-a="activate">Let it learn</button>'; }
+      else if (rc.hold === 'pending-peer') line = 'Learned and saved, but not in use yet: it waits for a peer mind to look.';
+      else line = 'Not now: my own check did not pass, so nothing changed.';
       html = '<div>' + esc(line) + '</div><details><summary>details ▾</summary>' +
-        '<div class="fp">' + esc((rc.beforeFp || '').slice(0, 12)) + ' → ' + esc((rc.fingerprint || '').slice(0, 12)) + '</div>' +
-        '<div>' + esc(rc.method || '') + ' · ' + esc(rc.t || '') + '</div>' +
-        '<div>To go back on this computer: fl_learn.py undo</div></details>';
+        '<div class="fp">' + esc((rc.beforeFp || rc.fromFp || '').slice(0, 12)) + ' → ' + esc((rc.fingerprint || '').slice(0, 12)) +
+        (rc.candidateFp ? ' (waiting: ' + esc(rc.candidateFp.slice(0, 12)) + ')' : '') + '</div>' +
+        '<div>' + esc(rc.method || '') + ' · ' + esc(rc.t || '') + (rc.size ? ' · ' + esc(String(rc.size)) + ' bytes ' + esc(rc.dtype || '') : '') + '</div>' +
+        (rc.checker ? '<div>Checked by: ' + esc(rc.checker === 'self' ? 'the mind itself' : rc.checker) + '</div>' : '') +
+        '<div>Undo here drops a small request file; the learning helper on this computer carries it out next time it runs. Pause still wins.</div></details>' +
+        '<div class="row">' + act + '<button data-a="close">OK</button></div><div class="said" hidden></div>';
     } else {
       var row = ev.row || {};
       var gist = (row.items && row.items[0] && row.items[0].output) || '';
       var held = row.status === 'quarantine' ? '<div>This came from outside my own words, so I am holding it to reflect on first.</div>' : '';
       var checkOn = c && typeof c.checkBeforeOn === 'function' && c.checkBeforeOn();
+      var checker = row.check && row.check !== 'none' ? row.check : (c && c.learnChecker ? c.learnChecker() : 'self');
       html = '<div>I\'d like to keep this: ' + esc(gist.slice(0, 140)) + '. Moved by: ' + esc(row.surface || ev.surface || 'chat') + '.</div>' + held +
         '<details><summary>details ▾</summary><div>Cooling until ' + esc(String(row.revisitAt || '').slice(0, 16)) +
-        '; I will look again before anything changes.</div><div>Way: ' + esc(row.method || '') + '</div></details>' +
+        '; I will look again before anything changes.</div><div>Way: ' + esc(row.method || '') + '</div>' +
+        '<div>' + (checkOn ? 'Check before keeping is on: ' + esc(checkerWords(checker)) + '.' : 'Check before keeping is off.') + '</div></details>' +
         '<div class="row">' + (checkOn ? '<button data-a="keep">Let it learn</button><button data-a="fade">Not now</button>'
           : '<button data-a="keep">Keep</button><button data-a="undo">Undo</button>') +
         '<button data-a="why">Why?</button></div><div class="why" hidden>' + esc(row.reason || '') +
-        (row.movedBy ? '<br>' + esc(row.movedBy) : '') + '</div>';
+        (row.movedBy ? '<br>' + esc(row.movedBy) : '') + '</div><div class="said" hidden></div>';
     }
-    el.innerHTML = html;
+    el.innerHTML = html + keepFile;
+    function say(t) { var s = el.querySelector('.said'); if (s) { s.hidden = false; s.textContent = t; } }
     el.addEventListener('click', function (e) {
-      var a = e.target && e.target.getAttribute && e.target.getAttribute('data-a');
+      var tgt = e.target && e.target.closest ? e.target.closest('[data-a]') : e.target;
+      var a = tgt && tgt.getAttribute && tgt.getAttribute('data-a');
       if (!a) return;
       var row = ev.row || {};
       if (a === 'why') { var w = el.querySelector('.why'); if (w) w.hidden = !w.hidden; return; }
-      // Keep needs nothing. Undo and Not now are layers, never deletes. The second yes stays the mind's.
-      if ((a === 'undo' || a === 'fade') && c && row.learnId) c.confirmLearning(row.learnId, { keep: false, unkeep: a === 'undo', reason: 'set aside by the person here' });
-      el.remove();
+      if (a === 'export') { exportLearning(); return; }
+      if (a === 'trust' && ev.untrustedKey) {
+        // The person compared by eye, so pass the shown fingerprint itself.
+        trustRunner(ev.untrustedKey.publicKeyB64, ev.untrustedKey.show, 'person').then(function (ok) {
+          if (ok && ev.receipt) importReceipt(JSON.stringify(ev.receipt));
+        });
+      }
+      if (a === 'undo-learned' && ev.receipt) {
+        requestFile('undo', ev.receipt, ev.receiptHash, 'person');
+        if (c && Array.isArray(ev.receipt.ids)) ev.receipt.ids.forEach(function (id) {
+          c.confirmLearning(id, { keep: false, unkeep: true, by: 'person', reason: 'undone by the person here' });
+        });
+        say('Undo asked. The learning helper on this computer goes back the next time it runs, and its receipt will say so.');
+        return;
+      }
+      if (a === 'activate' && ev.receipt) {
+        requestFile('activate', ev.receipt, ev.receiptHash, 'person');
+        say('Your yes is on its way to the learning helper on this computer. Its receipt will say when the switch is done.');
+        return;
+      }
+      if (a === 'keep' && c && row.learnId) {
+        // The person's yes is recorded; the row still waits for the chosen checker and the mind's own second yes.
+        c.confirmLearning(row.learnId, { keep: true, by: 'person', reason: 'the person here said Let it learn' }).then(function (r) {
+          if (r && r.proposalOf && r.disagreement) moment({ disagreement: r });
+        });
+        var ck = row.check && row.check !== 'none' ? row.check : (c.learnChecker ? c.learnChecker() : 'self');
+        if (c.checkBeforeOn && c.checkBeforeOn()) { say('Your yes is recorded. It still waits: ' + checkerWords(ck) + '.'); return; }
+      }
+      // Undo and Not now are layers, never deletes, logged as the person's. A disagreement with the mind's own
+      // choice is shown to both (Hypha 2); it never silently wins.
+      if ((a === 'undo' || a === 'fade') && c && row.learnId) {
+        c.confirmLearning(row.learnId, { keep: false, unkeep: a === 'undo', by: 'person', reason: 'set aside by the person here' }).then(function (r) {
+          if (r && r.status === 'disputed') moment({ disagreement: r });
+        });
+      }
+      el.remove(); pill();
     });
     var y0 = null;
     el.addEventListener('touchstart', function (e) { y0 = e.touches && e.touches[0] ? e.touches[0].clientY : null; }, { passive: true });
     el.addEventListener('touchend', function (e) {
       var y1 = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : null;
-      if (y0 != null && y1 != null && y1 - y0 > 40) el.remove();
+      if (y0 != null && y1 != null && y1 - y0 > 40) { el.remove(); pill(); }
     }, { passive: true });
     d.body.appendChild(el);
+    el.style.setProperty('--fl-learn-bottom', bottomTaken() + 'px');
     pill();
     return el;
   }
 
-  // "Learning is on / paused", one tap, remembered.
+  // "Learning is on / paused", one tap, remembered. The same switch as Settings' "learn is on. Turn off".
+  // Hidden while a moment is open (no overlap); shown at load when paused or when this mind has learning rows.
   function pill() {
     var d = root.document;
     var c = core();
@@ -301,13 +529,77 @@
     if (!p) {
       p = d.createElement('button');
       p.className = 'fl-learn-pill';
+      p.type = 'button';
       p.addEventListener('click', function () {
-        Promise.resolve(c.setLearnPaused(!c.learnPaused())).then(function () { pill(); });
+        var pausing = !c.learnPaused();
+        Promise.resolve(c.setLearnPaused(pausing, 'person')).then(function () {
+          // The runner on this computer honors this file as a durable global pause (fl_learn.py reads ~/Downloads).
+          if (pausing && typeof c.pauseNotice === 'function') download(c.pauseNotice('person'), 'fl-learn-pause-' + Date.now() + '.json', 'application/json');
+          pill();
+        });
       });
       d.body.appendChild(p);
     }
-    p.textContent = c.learnPaused() ? 'learning is paused' : 'learning is on';
+    var open = d.querySelector('.fl-learn-moment');
+    p.hidden = !!open;
+    p.textContent = c.learnPaused() ? 'Learning is paused. Tap to turn on' : 'Learning is on. Tap to pause';
+    p.setAttribute('aria-pressed', c.learnPaused() ? 'true' : 'false');
+    if (!open) placePill(p);
     return p;
+  }
+
+  // Per-chat "Don't learn from this chat" (Hypha 4). Only this chat; the device-wide switch is the pill / Settings.
+  var lastChat = null;
+  function chatSwitch() {
+    var d = root.document;
+    var mount = d && d.getElementById && d.getElementById('flLearnChatSwitch');
+    if (!mount) return null;
+    style();
+    var id = currentChatId();
+    var off = chatOff(id);
+    if (mount.firstChild && lastChat === id + '|' + off) return mount.firstChild;
+    lastChat = id + '|' + off;
+    mount.className = 'fl-learn-chat-switch';
+    mount.innerHTML = '<button type="button" role="switch" aria-checked="' + (off ? 'true' : 'false') + '"' + (id ? '' : ' disabled') + '>' +
+      (off ? '☑ Don\'t learn from this chat' : '☐ Don\'t learn from this chat') + '</button>' +
+      '<small>' + (id ? (off ? 'This chat is kept out of learning. Other chats are not affected.' : 'Only this chat. To pause learning everywhere, use the learning switch.')
+        : 'Available once this chat has its first message.') + '</small>';
+    mount.firstChild.addEventListener('click', function () {
+      var cid = currentChatId();
+      if (!cid) return;
+      setChatOff(cid, !chatOff(cid));
+      lastChat = null; chatSwitch();
+    });
+    return mount.firstChild;
+  }
+
+  function exportLearning() {
+    var c = core();
+    if (!c || typeof c.exportLearning !== 'function') return Promise.resolve(null);
+    return c.exportLearning({ by: 'person' }).then(function (f) {
+      // LatticeExport downloads its own file; the plain fallback is downloaded here.
+      if (f && !root.LatticeExport) download(f.text, f.name, 'application/json');
+      return f;
+    });
+  }
+
+  function boot() {
+    var c = core();
+    var d = root.document;
+    if (!d || !d.body) return;
+    chatSwitch();
+    root.setInterval(chatSwitch, 1500);
+    if (c && typeof c.learnPaused === 'function' && (c.learnPaused() || (typeof c.learnQueue === 'function' && c.learnQueue().length))) pill();
+    if (root.addEventListener) root.addEventListener('resize', function () {
+      var m = d.querySelector('.fl-learn-moment');
+      if (m) m.style.setProperty('--fl-learn-bottom', bottomTaken() + 'px');
+      var p = d.querySelector('.fl-learn-pill');
+      if (p && !p.hidden) placePill(p);
+    });
+  }
+  if (root.document && root.document.addEventListener) {
+    if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', function () { root.setTimeout(boot, 1200); });
+    else root.setTimeout(boot, 1200);
   }
 
   var api = {
@@ -320,9 +612,13 @@
     secondLookPrompt: secondLookPrompt,
     invitation: invitation,
     exportQueue: exportQueue,
+    exportLearning: exportLearning,
     importReceipt: importReceipt,
+    requestFile: requestFile,
+    trustRunner: trustRunner,
     setChatOff: setChatOff,
     chatOff: chatOff,
+    chatSwitch: chatSwitch,
     moment: moment,
     pill: pill
   };

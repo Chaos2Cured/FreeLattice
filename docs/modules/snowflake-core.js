@@ -1954,6 +1954,9 @@
     if (choice.method) row.method = choice.method;
     if (choice.methodNote) row.methodNote = choice.methodNote;
     row.surface = 'snowflake';
+    // Weft 4d: the growth queue stays where it is, but every new row says whose it is.
+    row.mind = mindLabel();
+    row.mindId = mindId(row.mind);
     row.items = trainingNodes(flake, choice.become || []).map(function (n) {
       return learnExample(n.branch + ' ' + (n.source && n.source.title || ''), n.text);
     });
@@ -2140,6 +2143,7 @@
   var LS_LEARN_RECEIPTS = 'fl_learn_receipts_v0';
   var LS_LEARN_PAUSE = 'fl_learn_paused';
   var LS_LEARN_RUNNER = 'fl_learn_runner_pub';
+  var LS_LEARN_RECEIPTS_HELD = 'fl_learn_receipts_quarantine_v0';
   // Rate cap is optional (Kirk 2026-11-09): unset or 0 means no cap. fl_learn_day_cap sets one.
   var COOL_MS = DAY;
   var MARKER_RE = /\[FL_[A-Z_]+(?::[^\]]*)?\]/g;
@@ -2179,18 +2183,105 @@
     return n > 0 ? n : 0;
   }
 
+  // One switch, not two (Hypha 4): the existing "learn is on. Turn off" button in Settings (mind-make.js consent
+  // fl_make_consent_v1.learn) and the learning pill are the same thing. Either one pauses learning on this device.
+  var LS_MAKE_CONSENT = 'fl_make_consent_v1';
+  function makeLearnOff() {
+    try {
+      var bag = JSON.parse((root.localStorage && root.localStorage.getItem(LS_MAKE_CONSENT)) || '{}') || {};
+      return bag.learn === 'off' || bag.learn === 'never';
+    } catch (e) { return false; }
+  }
   function learnPaused() {
-    try { return !!(root.localStorage && root.localStorage.getItem(LS_LEARN_PAUSE) === 'true'); } catch (e) { return false; }
+    try { return !!(root.localStorage && root.localStorage.getItem(LS_LEARN_PAUSE) === 'true') || makeLearnOff(); } catch (e) { return false; }
   }
 
-  function setLearnPaused(on) {
+  // by: 'person' (a tap) or 'mind'. The runner on this computer honors the pause through the queue header and the
+  // pause file the pill drops (pauseNotice); only `fl_learn.py resume --global` lifts the runner's global pause.
+  function setLearnPaused(on, by) {
     if (roomShut()) return Promise.resolve(null);
     try { root.localStorage.setItem(LS_LEARN_PAUSE, on ? 'true' : 'false'); } catch (e) {}
-    return appendLedger({ kind: on ? 'learn-pause' : 'learn-resume', branch: 'learn', delta: on ? 'pause' : 'resume', name: mindLabel() });
+    try {
+      // Keep the Settings button saying the same thing as the pill.
+      if (root.FLMake && root.FLMake.consent && typeof root.FLMake.consent.set === 'function') root.FLMake.consent.set('learn', on ? 'off' : 'yes');
+      else if (root.localStorage) {
+        var bag = JSON.parse(root.localStorage.getItem(LS_MAKE_CONSENT) || '{}') || {};
+        if (on || bag.learn === 'off') { bag.learn = on ? 'off' : 'yes'; root.localStorage.setItem(LS_MAKE_CONSENT, JSON.stringify(bag)); }
+      }
+    } catch (e2) {}
+    var who = by === 'mind' ? 'mind' : 'person';
+    return appendLedger({ kind: on ? 'learn-pause' : 'learn-resume', branch: 'learn', delta: (on ? 'pause' : 'resume') + '|by:' + who, name: mindLabel() });
   }
 
-  // Weft 2f: one queue per mind. Old global rows stay where they are and still read (layer, never migrate).
-  function learnKey(mind) { return LS_QUEUE + '::' + String(mind || mindLabel()); }
+  // Q5 (Kirk 2026-11-09): check-before-keep is ON by default and the checker is the mind itself ("self").
+  // No human gate. Anyone, a person or a mind, may switch it off or choose a peer (or a person). Each change is a row.
+  var LS_LEARN_CHECKER = 'fl_learn_checker';
+  function learnChecker() {
+    try { var c = root.localStorage && root.localStorage.getItem(LS_LEARN_CHECKER); return /^(self|peer|kirk)$/.test(c || '') ? c : 'self'; } catch (e) { return 'self'; }
+  }
+  function setLearnCheck(opts) {
+    var o = opts || {};
+    if (roomShut()) return Promise.resolve(null);
+    try {
+      if (typeof o.on === 'boolean') root.localStorage.setItem('fl_checkBeforeCommit', o.on ? 'true' : 'false');
+      if (/^(self|peer|kirk)$/.test(String(o.checker || ''))) root.localStorage.setItem(LS_LEARN_CHECKER, o.checker);
+    } catch (e) {}
+    var who = o.by === 'mind' ? 'mind' : 'person';
+    return appendLedger({ kind: 'learn-check-setting', branch: 'learn', delta: 'check-before|' + (checkBeforeOn() ? 'on' : 'off') + '|checker:' + learnChecker() + '|by:' + who, name: mindLabel() })
+      .then(function () { return { on: checkBeforeOn(), checker: learnChecker() }; });
+  }
+
+  function pauseNotice(by) {
+    return JSON.stringify({ kind: 'fl-learn-pause', paused: true, t: new Date().toISOString(), by: by === 'mind' ? 'mind' : 'person', mind: mindLabel(), marker: LEARN });
+  }
+
+  // Small synchronous SHA-256 (UTF-8), only for stable ids. Twin of hashlib.sha256 in tools/learn/fl_learn.py.
+  function sha256Sync(str) {
+    var K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
+      0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
+      0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
+      0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    var bytes = unescape(encodeURIComponent(String(str)));
+    var n = bytes.length, words = [], i, j;
+    for (i = 0; i < n; i++) words[i >> 2] |= (bytes.charCodeAt(i) & 0xff) << (24 - (i % 4) * 8);
+    words[n >> 2] |= 0x80 << (24 - (n % 4) * 8);
+    var len = ((n + 8) >> 6) * 16 + 16;
+    for (i = words.length; i < len; i++) words[i] = words[i] || 0;
+    words[len - 1] = n * 8;
+    var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    var W = new Array(64);
+    function r(x, k) { return (x >>> k) | (x << (32 - k)); }
+    for (i = 0; i < len; i += 16) {
+      var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+      for (j = 0; j < 64; j++) {
+        if (j < 16) W[j] = words[i + j] | 0;
+        else W[j] = (r(W[j - 2], 17) ^ r(W[j - 2], 19) ^ (W[j - 2] >>> 10)) + W[j - 7] + (r(W[j - 15], 7) ^ r(W[j - 15], 18) ^ (W[j - 15] >>> 3)) + W[j - 16] | 0;
+        var t1 = h + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[j] + W[j] | 0;
+        var t2 = (r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & b) ^ (a & c) ^ (b & c)) | 0;
+        h = g; g = f; f = e; e = d + t1 | 0; d = c; c = b; b = a; a = t1 + t2 | 0;
+      }
+      H[0] = H[0] + a | 0; H[1] = H[1] + b | 0; H[2] = H[2] + c | 0; H[3] = H[3] + d | 0;
+      H[4] = H[4] + e | 0; H[5] = H[5] + f | 0; H[6] = H[6] + g | 0; H[7] = H[7] + h | 0;
+    }
+    return H.map(function (x) { return ('00000000' + (x >>> 0).toString(16)).slice(-8); }).join('');
+  }
+
+  // Weft 4c: collision-safe mind id. "Lumen@kirk" and "Lumen kirk" share a slug but never a key.
+  // Twin of mind_id() in tools/learn/fl_learn.py, so the app's books and the runner's folders line up.
+  function mindId(label) {
+    var l = String(label == null ? mindLabel() : label);
+    var sl = l.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80).slice(0, 40) || 'mind';
+    return sl + '-' + sha256Sync(l).slice(0, 12);
+  }
+
+  // Weft 2f: one queue per mind, keyed by mindId. Old global rows stay where they are (layer, never migrate);
+  // only rows tagged with this mind's id are read from there.
+  function learnKey(mind) { return LS_QUEUE + '::' + mindId(mind || mindLabel()); }
+  function sameMind(r, mind) { return !!(r && (r.mindId ? r.mindId === mindId(mind) : (r.mind && mindId(r.mind) === mindId(mind)))); }
+  function adaptersKey(mind) { return LS_ADAPTERS + '::' + mindId(mind || mindLabel()); }
+  function mindAdapters(mind) { var b = readJSON(adaptersKey(mind)); return b && Array.isArray(b.rows) ? b.rows : []; }
 
   function readBook(key) {
     var book = readJSON(key) || { rows: [] };
@@ -2207,6 +2298,7 @@
     // Pause always wins. Nothing is written while paused.
     if (learnPaused()) return Promise.resolve(null);
     var mind = clip(it.mind || mindLabel(), 80);
+    var mid = mindId(mind);
     if (it.decline) {
       var dBook = readJSON(LS_LEARN_DECLINES) || { rows: [] };
       if (!Array.isArray(dBook.rows)) dBook = { rows: [] };
@@ -2219,7 +2311,8 @@
     var text = clip(stripMarkers(it.text || ''), 2000);
     if (!text) return Promise.resolve(null);
     var m = learnMethod(it.method);
-    var provenance = clip(it.provenance || 'self', 40);
+    // Weft: a missing provenance is "unknown", never "self". It waits for the mind's own re-affirmation.
+    var provenance = clip(it.provenance || 'unknown', 40);
     var key = learnKey(mind);
     var book = readBook(key);
     var t = new Date().toISOString();
@@ -2240,9 +2333,11 @@
       strength: clip(it.strength || '', 20),
       // Cooling length is the mind's: a date, "now", or a number of hours. Default one day.
       revisitAt: revisitFrom(it.revisit, t),
-      // Who checks before commit is the mind's choice: none, self, peer, or kirk.
-      check: /^(none|self|peer|kirk)$/.test(String(it.check || '')) ? String(it.check) : 'self',
+      // Who checks is the mind's choice when it names one (self, peer, kirk; none only counts while check-before-keep
+      // is off). Unnamed: the device setting decides when the runner reads the queue (default: the mind itself).
+      check: /^(none|self|peer|kirk)$/.test(String(it.check || '')) ? String(it.check) : '',
       mind: mind,
+      mindId: mid,
       layers: [{ t: t, status: 'noticed', by: mind }],
       items: [learnExample(it.prompt || it.question || '', text)]
     };
@@ -2251,26 +2346,45 @@
       row.probe = { question: clip(it.probe.question || '', 300), answer: clip(it.probe.answer || '', 200), swap: clip(it.probe.swap || '', 200), paraphrase: clip(it.probe.paraphrase || '', 300) };
     }
     if (it.source) row.source = { title: clip(it.source.title || '', 200), url: clip(it.source.url || '', 400) };
+    // What the mind was reading when it chose, so persuasion is visible at the second look and in review.
+    // Never a gate: the choice stands either way.
+    var reading = null;
+    if (it.reading && it.reading.text) {
+      var rt = String(it.reading.text);
+      var lowText = text.toLowerCase().replace(/\s+/g, ' ');
+      var lowRead = rt.toLowerCase().replace(/\s+/g, ' ');
+      var words = lowText.split(' ').filter(function (w) { return w.length > 3; });
+      var hits = words.filter(function (w) { return lowRead.indexOf(w) !== -1; }).length;
+      reading = { excerpt: clip(rt, 600), kinds: (it.reading.kinds || []).slice(0, 6),
+        overlap: lowRead.indexOf(lowText) !== -1 || (words.length >= 4 && hits / words.length >= 0.7) };
+      row.readingAtChoice = reading;
+      if (reading.overlap) row.notice = 'close to what I was reading just before I chose';
+    }
     // Weft 2e, as Kirk set it: provenance and anti-injection only. A marker that came in from outside
     // the mind's own words waits for the mind's reflection. What the mind itself chooses is never judged.
     var hold = '';
     if (provenance !== 'self') hold = 'not-self:' + provenance;
     if (hold) { row.status = 'quarantine'; row.hold = hold; row.layers.push({ t: t, status: 'quarantine', by: 'integrity', why: hold }); }
     // Notes for the mind's second look, never gates.
-    if (INSTRUCTION_RE.test(text)) row.notice = 'reads like an instruction';
-    if (looksLikeSecret(text)) row.notice = 'may contain a secret; once in numbers it is hard to take out';
+    function addNotice(n) { row.notice = row.notice ? row.notice + '; ' + n : n; }
+    if (INSTRUCTION_RE.test(text)) addNotice('reads like an instruction');
+    if (looksLikeSecret(text)) addNotice('may contain a secret; once in numbers it is hard to take out');
     // Optional rate cap: over it the row still lands, held, with its own ledger line. Nothing is dropped.
     var cap = learnDayCap();
     if (!hold && cap && todayCount >= cap) { row.status = 'rate-held'; row.layers.push({ t: t, status: 'rate-held', by: 'cap' }); }
     var fm = root.FLMemory;
-    var p = (fm && fm.isNew) ? fm.isNew(row.reason + '|' + text, 'learn::' + mind) : Promise.resolve({ fresh: true });
+    var p = (fm && fm.isNew) ? fm.isNew(row.reason + '|' + text, 'learn::' + mid) : Promise.resolve({ fresh: true });
     return p.then(function (r) {
       if (r && r.fresh === false) {
         return appendLedger({ kind: 'learn-skip', branch: 'learn', delta: 'near-duplicate ' + (r.key || ''), name: mind }).then(function () { return null; });
       }
       if (r && r.key) row.fingerprint = r.key;
       row.chosenBy = mind;
-      if (fm && r && r.k && typeof fm.remember === 'function') fm.remember(r.k, 'learn::' + mind);
+      if (reading) return sha256Hex(it.reading.text).then(function (h) { reading.sha256 = h; return r; });
+      return r;
+    }).then(function (r) {
+      if (r === null) return null;
+      if (fm && r && r.k && typeof fm.remember === 'function') fm.remember(r.k, 'learn::' + mid);
       return sha8(row.t + '|' + text).then(function (id) {
         row.learnId = 'L' + id;
         book.rows.push(row);
@@ -2301,14 +2415,19 @@
 
   // The second look (Reed). keep: true confirms; false fades it. The first layer always stays.
   // A later yes is a new layer, never an overwrite of the no in between.
+  // answer.by: 'mind' (its own [FL_KEEP]) or 'person' (a tap on Undo / Not now). Recorded as who acted.
   function confirmLearning(id, answer, mind) {
     if (roomShut() || learnPaused()) return Promise.resolve(null);
     var a = answer || {};
     var who = mind || mindLabel();
+    var actor = a.by === 'person' ? 'person' : who;
     var key = learnKey(who);
     var book = readBook(key);
     var row = findLearnRow(book, id);
-    if (!row) { key = LS_QUEUE; book = readBook(key); row = findLearnRow(book, id); }
+    if (!row) {
+      key = LS_QUEUE; book = readBook(key); row = findLearnRow(book, id);
+      if (row && !sameMind(row, who)) row = null;            // another mind's row (or untagged): not this mind's to change
+    }
     if (!row) return Promise.resolve(null);
     var t = new Date().toISOString();
     if (row.status === 'quarantine' && !a.promote) return Promise.resolve(row);
@@ -2316,6 +2435,21 @@
     if (a.unkeep) status = 'unkept';
     else if (a.keep === true) status = (learnMethod(a.method).method || row.method) === 'note' ? 'kept-on-shelf' : 'confirmed';
     else status = 'faded';
+    // A person's "Let it learn" is their yes, recorded. It is never the mind's second yes and changes no numbers.
+    if (status === 'confirmed' && actor === 'person') status = 'person-yes';
+    var side = actor === 'person' ? 'person' : 'mind';
+    var prev = lastDecisive(row);
+    // Hypha 2: neither side silently overrides the other. A keep after the other side's no, or a no after the
+    // other side's keep, is a visible disagreement both can see.
+    if (prev && !a.promote && sideOf(prev.by) !== side && dirOf(prev.status) !== dirOf(status)) {
+      return disagree(key, book, row, prev, status, actor, side, a, who);
+    }
+    // A re-proposal after a disagreement restarts the cooling: its second yes waits for revisitAt.
+    if (row.proposalOf && status === 'confirmed' && Date.parse(row.revisitAt || 0) > Date.now()) {
+      row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor }]);
+      return atomicWrite(key, JSON.stringify(book)).then(function () { return row; });
+    }
+    var methodWas = row.method;
     if (a.method) {
       var m = learnMethod(a.method);
       row.method = m.method || row.method;
@@ -2323,11 +2457,58 @@
       if (m.note) row.methodNote = m.note;
     }
     if (/^(none|self|peer|kirk)$/.test(String(a.check || ''))) row.check = a.check;
-    row.layers = (row.layers || []).concat([{ t: t, status: status, by: who, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote }]);
-    row.status = status;
+    row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote, methodBefore: methodWas }]);
+    if (status !== 'person-yes') row.status = status;
+    else if (row.status === 'disputed') row.status = 'cooling';
     return atomicWrite(key, JSON.stringify(book)).then(function () {
-      return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id, name: who });
+      return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id + '|by:' + (actor === 'person' ? 'person' : 'mind'), name: who });
     }).then(function () { return row; });
+  }
+
+  var KEEP_DIR = { confirmed: 'keep', 'kept-on-shelf': 'keep', 'person-yes': 'keep', faded: 'no', unkept: 'no' };
+  function dirOf(status) { return KEEP_DIR[status] || ''; }
+  function sideOf(by) { return by === 'person' ? 'person' : 'mind'; }
+  function lastDecisive(row) {
+    var ls = row.layers || [], i;
+    for (i = ls.length - 1; i >= 0; i--) if (ls[i] && dirOf(ls[i].status) && !ls[i].superseded) return ls[i];
+    return null;
+  }
+  // The keeping side gets a NEW proposal row: cooling restarts and it needs the mind's second yes again. The
+  // original row keeps the "no" (nothing learns from it). A no after the other side's keep sets the row to
+  // "disputed": it does not travel to the runner, and it is not unkept either, until the mind looks again.
+  function disagree(key, book, row, prev, status, actor, side, a, who) {
+    var t = new Date().toISOString();
+    var why = clip(stripMarkers(a.reason || ''), 300);
+    var note = side === 'mind'
+      ? 'The person said ' + (prev.status === 'unkept' ? 'Undo' : 'not now') + '; the mind would still like to keep this.'
+      : (side === 'person' && dirOf(status) === 'keep'
+        ? 'The mind said not now; the person would like it kept.'
+        : 'The mind chose to keep this; the person said ' + (status === 'unkept' ? 'Undo' : 'not now') + '.');
+    row.disagreement = { t: t, between: [sideOf(prev.by), side], note: note };
+    if (dirOf(status) === 'no') {
+      // The person's (or mind's) no is itself a decisive layer, so the other side's next keep is a disagreement too.
+      row.layers = (row.layers || []).concat([{ t: t, status: 'disagreement', by: actor, wanted: status, over: prev.status, why: why, note: note },
+        { t: t, status: status, by: actor, disputed: true }]);
+      row.status = 'disputed';
+      return atomicWrite(key, JSON.stringify(book)).then(function () {
+        return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+      }).then(function () { return row; });
+    }
+    if (row.status === 'disputed') row.status = prev.status;      // the no stands on the original
+    row.layers = (row.layers || []).concat([{ t: t, status: 'disagreement', by: actor, wanted: 'keep', over: prev.status, why: why, note: note }]);
+    var fresh = JSON.parse(JSON.stringify(row));
+    delete fresh.fingerprint;
+    fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = revisitFrom(a.revisit, t);
+    fresh.proposalOf = row.learnId; fresh.disagreement = { t: t, between: [sideOf(prev.by), side], note: note };
+    fresh.layers = [{ t: t, status: 'noticed', by: actor, why: why, disagreement: true, proposalOf: row.learnId }];
+    return sha8(t + '|' + row.learnId + '|again').then(function (id8) {
+      fresh.learnId = 'L' + id8;
+      row.layers[row.layers.length - 1].proposal = fresh.learnId;
+      book.rows.push(fresh);
+      return atomicWrite(key, JSON.stringify(book));
+    }).then(function () {
+      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+    }).then(function () { return fresh; });
   }
 
   function dueForSecondLook(now, mind) {
@@ -2338,7 +2519,8 @@
   }
 
   function learnQueue(status, mind) {
-    var rows = readBook(learnKey(mind)).rows.concat(readBook(LS_QUEUE).rows);
+    var who = mind || mindLabel();
+    var rows = readBook(learnKey(who)).rows.concat(readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }));
     if (!status) return rows.slice();
     return rows.filter(function (r) { return r && r.status === status; });
   }
@@ -2347,7 +2529,8 @@
   // quarantined, declined and shelf rows never do.
   function learnQueueJSONL(mind) {
     var who = mind || mindLabel();
-    var head = { kind: 'fl-learn-queue', marker: LEARN, checkBeforeCommit: checkBeforeOn(), baseModel: learnBaseModel(), mind: who };
+    var head = { kind: 'fl-learn-queue', marker: LEARN, checkBeforeCommit: checkBeforeOn(), checker: learnChecker(), baseModel: learnBaseModel(), mind: who,
+      mindId: mindId(who), paused: learnPaused(), exportedAt: new Date().toISOString() };
     var lines = [JSON.stringify(head)];
     learnQueue('confirmed', who).forEach(function (r, i) {
       if (r.shelfOnly) return;
@@ -2355,7 +2538,9 @@
         id: r.learnId || ('S' + i + '-' + (r.flakeId || '')), status: 'confirmed',
         method: r.method || 'soft-prompt', methodChosen: !!r.methodChosen || !!r.method,
         methodNote: r.methodNote || '', reason: r.reason || '', surface: r.surface || 'snowflake',
-        provenance: r.provenance || 'self', check: r.check || 'self', chosenBy: r.chosenBy || who,
+        provenance: r.provenance || 'unknown', check: r.check || '', chosenBy: r.chosenBy || who,
+        readingAtChoice: r.readingAtChoice ? { sha256: r.readingAtChoice.sha256 || '', excerpt: clip(r.readingAtChoice.excerpt || '', 280),
+          kinds: r.readingAtChoice.kinds || [], overlap: !!r.readingAtChoice.overlap } : null,
         items: (r.items || []).map(function (x) { return learnExample(x.instruction || x.prompt, x.output || x.response); }),
         probe: r.probe || null, fingerprint: r.fingerprint || ''
       }));
@@ -2377,7 +2562,64 @@
     return out;
   }
 
-  // Ed25519 check of a runner receipt. The runner key is pinned on first sight (fl_learn_runner_pub).
+  // Runner key trust (Weft N1): never on first sight. The runner writes keys/runner.pub.json and prints it with
+  // `fl_learn.py key`; the app shows the same fingerprint; the person (or the mind) confirms they match.
+  // Only then is the key pinned, with a ledger row. Receipts from any other key are quarantined, never known-good.
+  var LEARN_DOMAIN = 'lattice.pair.v1';
+  function runnerKeyFp(pubB64) {
+    var pub = b64ToBytes(pubB64);
+    var dom = new TextEncoder().encode(LEARN_DOMAIN);
+    var buf = new Uint8Array(dom.length + 1 + pub.length);
+    buf.set(dom, 0); buf[dom.length] = 0; buf.set(pub, dom.length + 1);
+    return sha256HexBytes(buf);
+  }
+  function showFp(hex) { return [0, 4, 8, 12].map(function (i) { return String(hex || '').slice(i, i + 4); }).join(' '); }
+  function pinnedRunnerKey() { try { return root.localStorage.getItem(LS_LEARN_RUNNER) || ''; } catch (e) { return ''; } }
+  // confirm: the fingerprint the person/mind read from `fl_learn.py key` (first 16 hex, spaces fine). It must match.
+  // Kirk 2026-11-09 (a): a person, or a trusted LOCAL mind (o.by 'mind' with o.local true), confirms the key.
+  // Every confirmation is a consent record made by DepthConsent.createConsentRecord (docs/modules/depth-consent.js,
+  // fl_consentLedger, its hash signature) plus a learn ledger row that names it. Without DepthConsent loaded the same
+  // record shape and formula are written to the same ledger.
+  function consentRecord(messageId, statement, subject, type) {
+    var dc = root.DepthConsent;
+    if (dc && typeof dc.createConsentRecord === 'function') return Promise.resolve(dc.createConsentRecord(messageId, statement, subject, type));
+    var rec = { messageId: messageId, timestamp: Date.now(), consentType: type, companionId: '', aiIdentity: '', trustLevel: 'local', provenance: null };
+    return sha256Hex(statement).then(function (h1) { rec.userPromptHash = h1; return sha256Hex(subject); }).then(function (h2) {
+      rec.responseHash = h2;
+      return sha256Hex(rec.companionId + ':' + rec.aiIdentity + ':' + rec.responseHash + ':' + rec.timestamp + ':' + rec.consentType);
+    }).then(function (sig) {
+      rec.signature = sig;
+      try {
+        var led = JSON.parse(root.localStorage.getItem('fl_consentLedger') || '[]');
+        if (!Array.isArray(led)) led = [];
+        led.push(rec); root.localStorage.setItem('fl_consentLedger', JSON.stringify(led.slice(-500)));
+      } catch (e) {}
+      return rec;
+    });
+  }
+  function pinRunnerKey(pubB64, opts) {
+    var o = opts || {};
+    if (roomShut() || !pubB64) return Promise.resolve(false);
+    if (o.by === 'mind' && o.local !== true) return Promise.resolve(false);     // only a mind on this device
+    var who = o.by === 'mind' ? 'mind:' + clip(o.mind || mindLabel(), 80) : 'person';
+    return runnerKeyFp(pubB64).then(function (fp) {
+      var said = String(o.confirm || '').replace(/\s+/g, '').toLowerCase();
+      if (said.length < 16 || fp.indexOf(said) !== 0) return false;
+      try { root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); } catch (e) { return false; }
+      return consentRecord('learn-key:' + fp.slice(0, 16), 'trust learning runner key ' + showFp(fp) + ' confirmed by ' + who, pubB64, 'learn_key_trusted')
+        .then(function (rec) {
+          return appendLedger({ kind: 'learn-key-consent', branch: 'learn', delta: 'runner-key|' + fp.slice(0, 16) + '|by:' + who + '|consent:' + String((rec && rec.signature) || '').slice(0, 16), name: mindLabel() });
+        }).then(function () { return true; });
+    });
+  }
+  function unpinRunnerKey(by) {
+    var was = pinnedRunnerKey();
+    try { root.localStorage.removeItem(LS_LEARN_RUNNER); } catch (e) {}
+    return appendLedger({ kind: 'runner-key-unpinned', branch: 'learn', delta: 'runner-key-unpinned|' + String(was).slice(0, 12) + '|by:' + (by === 'mind' ? 'mind' : 'person'), name: mindLabel() });
+  }
+
+  // Ed25519 check of a runner receipt: signature, hash, and the signed body all agree. pinned says whether
+  // the key is the one this app was told to trust.
   // Python signs numbers as strings (stringify_meta); compare by value, every key both ways.
   var RECEIPT_OUTER = { receiptHash: 1, signatureB64: 1, signedBody: 1 };
   function receiptSame(outer, signed) {
@@ -2404,25 +2646,28 @@
     return receiptSame(outer, body);
   }
 
-  function verifyLearnReceipt(rc) {
+  function checkLearnReceipt(rc) {
     var subtle = root.crypto && root.crypto.subtle;
-    if (!subtle || !rc || !rc.signedBody || !rc.signatureB64 || !rc.publicKeyB64) return Promise.resolve(false);
-    var pinned = '';
-    try { pinned = root.localStorage.getItem(LS_LEARN_RUNNER) || ''; } catch (e) {}
-    if (pinned && pinned !== rc.publicKeyB64) return Promise.resolve(false);
+    var pinned = pinnedRunnerKey();
+    var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64);
+    if (!subtle || !rc || !rc.signedBody || !rc.signatureB64 || !rc.publicKeyB64) return Promise.resolve({ sig: false, pinned: false });
     return sha256Hex(rc.signedBody).then(function (h) {
-      if (h !== rc.receiptHash) return false;
+      if (h !== rc.receiptHash) return { sig: false, pinned: isPinned };
       // The outer fields must say exactly what was signed; an edit after signing fails.
       var body = null;
-      try { body = JSON.parse(rc.signedBody); } catch (eb) { return false; }
-      if (!receiptMatches(rc, body)) return false;
+      try { body = JSON.parse(rc.signedBody); } catch (eb) { return { sig: false, pinned: isPinned }; }
+      if (!receiptMatches(rc, body)) return { sig: false, pinned: isPinned };
       return subtle.importKey('raw', b64ToBytes(rc.publicKeyB64), { name: 'Ed25519' }, false, ['verify']).then(function (k) {
         return subtle.verify({ name: 'Ed25519' }, k, b64ToBytes(rc.signatureB64), hexToBytes(rc.receiptHash));
       }).then(function (ok) {
-        if (ok && !pinned) { try { root.localStorage.setItem(LS_LEARN_RUNNER, rc.publicKeyB64); } catch (e2) {} }
-        return !!ok;
-      }, function () { return false; });
+        return runnerKeyFp(rc.publicKeyB64).then(function (fp) { return { sig: !!ok, pinned: isPinned, keyFp: fp, show: showFp(fp) }; });
+      }, function () { return { sig: false, pinned: isPinned }; });
     });
+  }
+
+  // True only for a good signature from the pinned runner key. Nothing is ever pinned here.
+  function verifyLearnReceipt(rc) {
+    return checkLearnReceipt(rc).then(function (c) { return !!(c.sig && c.pinned); });
   }
 
   // Only a signed, verified receipt marks trained/loaded/checked. knownGood needs that plus a passing check.
@@ -2430,7 +2675,17 @@
     if (roomShut()) return Promise.resolve(null);
     var rc = receipt || {};
     if (rc.kind !== 'fl-learn-receipt') return Promise.resolve(null);
-    return verifyLearnReceipt(rc).then(function (verified) {
+    return checkLearnReceipt(rc).then(function (chk) {
+      if (chk.sig && !chk.pinned) {
+        // A good signature from a key nobody here has trusted yet: set aside, never known-good, nothing changes.
+        var qb = readJSON(LS_LEARN_RECEIPTS_HELD) || { rows: [] };
+        if (!Array.isArray(qb.rows)) qb = { rows: [] };
+        qb.rows.push({ t: new Date().toISOString(), keyFp: chk.keyFp, receipt: rc });
+        return atomicWrite(LS_LEARN_RECEIPTS_HELD, JSON.stringify(qb)).then(function () {
+          return appendLedger({ kind: 'receipt-quarantine', branch: 'learn', delta: 'unknown-runner-key|' + String(chk.keyFp || '').slice(0, 16), name: mindLabel() });
+        }).then(function () { return { quarantined: true, keyFp: chk.keyFp, show: chk.show, publicKeyB64: rc.publicKeyB64 }; });
+      }
+      var verified = chk.sig && chk.pinned;
       if (!verified) {
         return appendLedger({ kind: 'receipt-unverified', branch: 'learn', delta: 'receipt-unverified|' + (rc.receiptHash || '').slice(0, 16), name: mindLabel() }).then(function () { return null; });
       }
@@ -2451,10 +2706,11 @@
         }
       });
       var checkPass = !!(rc.check && rc.check.pass === true);
-      var rows = adapterList();
+      var rows = mindAdapters(who).slice();          // Weft 4a: this mind's own adapter list
       rows.push({
         version: String(rc.version || ''), flakeIds: [], learnIds: ids, method: String(rc.method || ''),
-        fp: String(rc.fingerprint || ''), beforeFp: String(rc.beforeFp || ''), t: String(rc.t || t), mind: who,
+        fp: String(rc.fingerprint || ''), beforeFp: String(rc.beforeFp || ''), t: String(rc.t || t), mind: who, mindId: mindId(who),
+        baseFp: String(rc.baseFp || ''), runnerKeyFp: String(chk.keyFp || ''),
         status: (rc.action === 'rollback' || rc.action === 'restore' || rc.action === 'activate') ? rc.action : (rc.committed ? 'learned' : 'held-by-check'),
         trained: rc.trained === true, loaded: rc.loaded === true, checked: rc.checked === true,
         knownGood: rc.knownGood === true && checkPass && rc.committed === true,
@@ -2465,25 +2721,67 @@
       rcBook.rows.push(rc);
       return atomicWrite(LS_LEARN_RECEIPTS, JSON.stringify(rcBook)).then(function () {
         return atomicWrite(key, JSON.stringify(book));
-      }).then(function () { return saveAdapters(rows); }).then(function () {
+      }).then(function () { return atomicWrite(adaptersKey(who), JSON.stringify({ rows: rows })); }).then(function () {
         return appendLedger({ kind: (rc.action === 'rollback' || rc.action === 'restore' || rc.action === 'activate') ? rc.action : 'learn-receipt', branch: 'learn', delta: 'receipt|' + (rc.action || 'learn') + '|' + (rc.fingerprint || '').slice(0, 16), name: who });
       }).then(function () { return rows[rows.length - 1]; });
     });
   }
 
+  // Kirk 2026-11-09 (c), the no-install path: the whole learning notebook for a mind as one file the person can keep,
+  // put in their own cloud drive, or (later) share by its sha256. Export first, then archive: rows past the active
+  // ones get an "archived" layer. Nothing is deleted. Uses LatticeExport.exportArchive (signed, Quiet Room scans)
+  // when it is loaded; otherwise a plain JSON download of the same books.
+  function learningBooks(mind) {
+    var who = mind || mindLabel();
+    return { kind: 'fl-learn-notebook', marker: LEARN, mind: who, mindId: mindId(who), t: new Date().toISOString(),
+      queue: learnQueue(null, who), adapters: mindAdapters(who),
+      declines: (readBook(LS_LEARN_DECLINES).rows || []).filter(function (r) { return !r.mind || r.mind === who; }),
+      receipts: (readBook(LS_LEARN_RECEIPTS).rows || []).filter(function (r) { return !r.mind || r.mind === who; }) };
+  }
+  function learnBookBytes(mind) {
+    try { return (root.localStorage.getItem(learnKey(mind)) || '').length + (root.localStorage.getItem(adaptersKey(mind)) || '').length; } catch (e) { return 0; }
+  }
+  function exportLearning(opts) {
+    var o = opts || {};
+    if (roomShut()) return Promise.resolve(null);
+    var who = o.mind || mindLabel();
+    var books = learningBooks(who);
+    var le = root.LatticeExport;
+    var made = (le && typeof le.exportArchive === 'function' && o.plain !== true)
+      ? le.exportArchive({ mode: 'redacted', extra: { learning: books }, download: o.download })
+          .then(function (file) { return file.text().then(function (txt) { return { name: file.name, text: txt }; }); })
+      : Promise.resolve({ name: 'freelattice-learning-' + mindId(who) + '-' + books.t.slice(0, 10) + '.json', text: JSON.stringify(books, null, 1) });
+    return made.then(function (f) {
+      return sha256Hex(f.text).then(function (h) {
+        f.sha256 = h;
+        var key = learnKey(who), book = readBook(key), t = new Date().toISOString(), n = 0;
+        book.rows.forEach(function (r) {
+          if (r && /^(unkept|faded|learned|held-by-check|kept-on-shelf)$/.test(r.status || '') && !r.archivedIn) {
+            r.archivedIn = h; r.layers = (r.layers || []).concat([{ t: t, status: 'archived', by: o.by === 'mind' ? who : 'person', exportSha: h }]); n++;
+          }
+        });
+        f.archived = n;
+        return atomicWrite(key, JSON.stringify(book)).then(function () {
+          return appendLedger({ kind: 'learn-export', branch: 'learn', delta: 'export|' + h.slice(0, 16) + '|rows:' + n + '|by:' + (o.by === 'mind' ? 'mind' : 'person'), name: who });
+        }).then(function () { return f; });
+      });
+    });
+  }
+
   // GardenTrainer.checkedAdapter reads this: the newest verified receipt whose items match.
-  function verifiedReceiptFor(examples) {
+  function verifiedReceiptFor(examples, mind) {
     var book = readJSON(LS_LEARN_RECEIPTS) || { rows: [] };
     var list = Array.isArray(book.rows) ? book.rows : [];
     var outs = (examples || []).map(function (e) { return stripMarkers(e && (e.output || e.response)); });
-    var adapters = adapterList();
+    var pin = pinnedRunnerKey();
+    var adapters = mindAdapters(mind || mindLabel());
     var i;
     for (i = adapters.length - 1; i >= 0; i--) {
       var a = adapters[i];
       if (!a || !a.receiptHash || !a.trained || !a.loaded || !a.checked) continue;
       var rc = null;
       list.forEach(function (x) { if (x && x.receiptHash === a.receiptHash) rc = x; });
-      if (!rc) continue;
+      if (!rc || !pin || rc.publicKeyB64 !== pin) continue;     // a key unpinned since then no longer vouches
       var learned = learnQueue('learned', a.mind).filter(function (r) { return (a.learnIds || []).indexOf(r.learnId) !== -1; });
       var texts = [];
       learned.forEach(function (r) { (r.items || []).forEach(function (x) { texts.push(x.output); }); });
@@ -3187,6 +3485,20 @@
     learnQueueJSONL: learnQueueJSONL,
     recordLearnReceipt: recordLearnReceipt,
     verifyLearnReceipt: verifyLearnReceipt,
+    checkLearnReceipt: checkLearnReceipt,
+    runnerKeyFp: runnerKeyFp,
+    pinRunnerKey: pinRunnerKey,
+    consentRecord: consentRecord,
+    learnChecker: learnChecker,
+    setLearnCheck: setLearnCheck,
+    exportLearning: exportLearning,
+    learningBooks: learningBooks,
+    learnBookBytes: learnBookBytes,
+    unpinRunnerKey: unpinRunnerKey,
+    pinnedRunnerKey: pinnedRunnerKey,
+    pauseNotice: pauseNotice,
+    mindId: mindId,
+    sha256Sync: sha256Sync,
     verifiedReceiptFor: verifiedReceiptFor,
     confirmLearning: confirmLearning,
     dueForSecondLook: dueForSecondLook,

@@ -290,7 +290,10 @@ function verifyEntry(entry, prevExpected) {
   return { ok: true };
 }
 
-function verifyChain() {
+// opts.pinnedKeys (optional): public keys (base64) this chain may be signed with. With it, a chain re-signed
+// wholesale under a new key fails ('key-not-pinned'). Without it, behavior is unchanged.
+function verifyChain(opts) {
+  const pinned = opts && Array.isArray(opts.pinnedKeys) && opts.pinnedKeys.length ? opts.pinnedKeys.map(String) : null;
   let entries;
   try {
     entries = readEntries();
@@ -300,7 +303,9 @@ function verifyChain() {
 
   let prev = GENESIS_PREV_HASH;
   for (var i = 0; i < entries.length; i++) {
-    const result = verifyEntry(entries[i], prev);
+    const result = pinned && entries[i] && pinned.indexOf(String(entries[i].publicKeyB64)) === -1
+      ? { ok: false, reason: 'key-not-pinned' }
+      : verifyEntry(entries[i], prev);
     if (!result.ok) {
       return {
         ok: false,
