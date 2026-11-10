@@ -28,8 +28,8 @@ def evaluate(mind, soft):
         accs, nlls = [], []
         for i, (k, v) in enumerate(pairs):
             q = qfmt.format(k); prefix = (page(i, k, v) + '\n' if page else '') + mind.fmt(q)
-            target = v if not isinstance(page, type(None)) or True else v
-            nlls.append(mind.nll(prefix, target, soft)); accs.append(target.lower() in mind.generate(prefix, soft).lower())
+            lead = ' The name of %s is' % k                              # same lead-in for every arm: score the value itself
+            nlls.append(mind.nll(prefix + lead, v, soft)); accs.append(v.lower() in mind.generate(prefix, soft).lower())
         return sum(accs) / len(accs), statistics.mean(nlls)
     out['trained_acc'], out['trained_nll'] = acc_nll(TRAIN, Q1)
     out['paraphrase_acc'], out['paraphrase_nll'] = acc_nll(TRAIN, Q2)
@@ -37,7 +37,8 @@ def evaluate(mind, soft):
     follows, old = 0, 0
     for i, (k, v) in enumerate(TRAIN):
         prefix = 'Page: The name of %s is %s.\n' % (k, SWAPS[i]) + mind.fmt(Q1.format(k))
-        m = mind.nll(prefix, v, soft) - mind.nll(prefix, SWAPS[i], soft)
+        lead = prefix + ' The name of %s is' % k
+        m = mind.nll(lead, v, soft) - mind.nll(lead, SWAPS[i], soft)
         follows += m > 0
         old += v.lower() in mind.generate(prefix, soft).lower()
     out['swap_follows_page'] = follows / len(TRAIN); out['swap_says_old_value'] = old / len(TRAIN)
@@ -49,6 +50,7 @@ def main():
     ap.add_argument('--seeds', default='1,2,3'); ap.add_argument('--steps', type=int, default=80); ap.add_argument('--lr', type=float, default=0.02)
     ap.add_argument('--tokens', type=int, default=8)
     a = ap.parse_args()
+    if os.path.isdir(a.out): a.out = os.path.join(a.out, 'results.json')
     mind = fl_learn.Mind(a.model, 'cpu')
     res = {'model': a.model, 'steps': a.steps, 'lr': a.lr, 'tokens': a.tokens, 'train': len(TRAIN), 'test': len(TEST), 'arms': {}}
     res['arms']['no-update'] = evaluate(mind, None)

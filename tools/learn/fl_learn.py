@@ -635,10 +635,15 @@ def go_back(home, method, target, kind):
         home.set_pointer(method, 'active', ptr); now_fp = ptr['fp']
     live = home.active_file(method)
     file_fp = sha256_file(live) if live and os.path.exists(live) else 'none'
-    ok = file_fp == (target if target == 'none' else now_fp)
+    if target == 'none':
+        ok = file_fp == 'none'                                   # back to the base: no live file at all
+    elif method in VECTOR_METHODS:
+        ok = file_fp == now_fp and verify_version(method, ptr)   # the live bytes are exactly that version
+    else:
+        ok = verify_version(method, ptr)                         # LoRA: every adapter file matches its MANIFEST and fp
     home.chain.append(kind, 'Went back. The newer version stays on the shelf.' if kind == 'rollback' else 'Restored.',
                       method=method, fromFp=cur, toFp=now_fp, fileFp=file_fp, restoredMatches=ok)
-    write_receipt(home, dict(action='rollback', ids=[], method=method, committed=True, trained=False, loaded=ok, checked=ok,
+    write_receipt(home, dict(action=kind, ids=[], method=method, committed=True, trained=False, loaded=ok, checked=ok,
                              fingerprint=now_fp, rollbackOf=cur, knownGood=False))
     print('%s %s: %s → %s  file=%s  matches=%s' % (kind, method, cur[:16], now_fp[:16], file_fp[:16], ok))
     return ok
@@ -697,7 +702,7 @@ def main():
             print('paused' if home.paused() else 'learning is on', '| rows', len(home.chain.entries()), '|', home.dir); return
         if args.cmd in ('undo', 'restore'):
             m = canon_method(args.method)[0] if args.method else None
-            rows = [e for e in home.chain.entries() if e['meta'].get('kind') in ('learn-commit', 'rollback', 'restore') and (not m or e['meta'].get('method') == m)]
+            rows = [e for e in home.chain.entries() if e['meta'].get('kind') in ('learn-commit', 'rollback', 'restore', 'activate') and (not m or e['meta'].get('method') == m)]
             if not rows: print('Nothing to go back from. Nothing was changed.'); return
             last = rows[-1]['meta']; m = m or last['method']
             if args.cmd == 'undo':

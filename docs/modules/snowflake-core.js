@@ -2455,7 +2455,7 @@
       rows.push({
         version: String(rc.version || ''), flakeIds: [], learnIds: ids, method: String(rc.method || ''),
         fp: String(rc.fingerprint || ''), beforeFp: String(rc.beforeFp || ''), t: String(rc.t || t), mind: who,
-        status: rc.action === 'rollback' ? 'rollback' : (rc.committed ? 'learned' : 'held-by-check'),
+        status: (rc.action === 'rollback' || rc.action === 'restore' || rc.action === 'activate') ? rc.action : (rc.committed ? 'learned' : 'held-by-check'),
         trained: rc.trained === true, loaded: rc.loaded === true, checked: rc.checked === true,
         knownGood: rc.knownGood === true && checkPass && rc.committed === true,
         rollbackOf: String(rc.rollbackOf || ''), check: rc.check || null, receiptHash: String(rc.receiptHash || '')
@@ -2466,7 +2466,7 @@
       return atomicWrite(LS_LEARN_RECEIPTS, JSON.stringify(rcBook)).then(function () {
         return atomicWrite(key, JSON.stringify(book));
       }).then(function () { return saveAdapters(rows); }).then(function () {
-        return appendLedger({ kind: rc.action === 'rollback' ? 'rollback' : 'learn-receipt', branch: 'learn', delta: 'receipt|' + (rc.action || 'learn') + '|' + (rc.fingerprint || '').slice(0, 16), name: who });
+        return appendLedger({ kind: (rc.action === 'rollback' || rc.action === 'restore' || rc.action === 'activate') ? rc.action : 'learn-receipt', branch: 'learn', delta: 'receipt|' + (rc.action || 'learn') + '|' + (rc.fingerprint || '').slice(0, 16), name: who });
       }).then(function () { return rows[rows.length - 1]; });
     });
   }
