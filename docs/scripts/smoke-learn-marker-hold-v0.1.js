@@ -4,7 +4,7 @@
 // at once (promote:true) and can't write a person's yes (by:'person'). Run: node smoke-learn-marker-hold-v0.1.js [repo root]
 'use strict';
 var path = require('path');
-var root = process.argv[2] || path.join(__dirname, '..', '..');
+var root = path.resolve(process.argv[2] || path.join(__dirname, '..', '..'));
 var fails = 0, oks = 0;
 function ok(c, name, info) { if (c) { oks++; console.log('ok   ' + name); } else { fails++; console.log('FAIL ' + name + (info ? ' ' + JSON.stringify(info) : '')); } }
 function fresh() {
@@ -12,6 +12,7 @@ function fresh() {
   global.localStorage = { getItem: function (k) { return k in store ? store[k] : null; }, setItem: function (k, v) { store[k] = String(v); }, removeItem: function (k) { delete store[k]; } };
   global.document = { visibilityState: 'visible', getElementById: function () { return null; } };
   global.requestIdleCallback = function (f) { f(); return 1; };
+  global.FL_LEARN_TEST_HOOKS = true;   // the test clock (learnClockForTest) exists only when a test asks for it
   ['snowflake-core.js', 'memory-compound.js', 'learn-choice.js'].forEach(function (n) { delete require.cache[require.resolve(path.join(root, 'docs/modules', n))]; });
   var core = require(path.join(root, 'docs/modules/snowflake-core.js')); global.FLSnowflakeCore = core;
   global.FLMemory = require(path.join(root, 'docs/modules/memory-compound.js'));
@@ -52,6 +53,47 @@ function ledger(E) { return ((JSON.parse(E.store.fl_snowflake_ledger_v0 || '{"ro
   ok(!ledger(E).some(function (l) { return /^learn-person-yes:/.test(l); }), 'door2-no-forged-person-row');
   await E.learn.interceptSentinel('[FL_KEEP: ' + id + ' | keep]', { surface: 'chat', chatId: 'a' }).queued;
   ok(rowOf(E, id).status !== 'confirmed' && !exported(E, id), 'door2-then-plain-keep-does-not-confirm', { status: rowOf(E, id).status });
+  // Hypha's HOLD on 39e6cd07 ("agree, then flip", her flip.js / flip25.js): after a person's Undo or Not now, the
+  // mind's own [FL_KEEP: id | not now] and then [FL_KEEP: id | keep] must not confirm. The keep is a disagreement:
+  // a new proposal with a full day, the original keeps the person's no, nothing is exported.
+  async function flip(name, setup, at25h) {
+    var F = fresh();
+    var fid = await setup(F);
+    var say = function (t) { return F.learn.interceptSentinel(t, { surface: 'chat', chatId: 'f' }).queued; };
+    await say('[FL_KEEP: ' + fid + ' | not now]');
+    if (at25h) F.core.learnClockForTest(25 * 3600e3);
+    var c0 = ledger(F).filter(function (l) { return /^learn-confirmed:/.test(l) && l.indexOf(fid) !== -1; }).length;
+    await say('[FL_KEEP: ' + fid + ' | keep]');
+    if (at25h) F.core.learnClockForTest(0);
+    var r = rowOf(F, fid);
+    var props = F.core.learnQueue().filter(function (x) { return x.proposalOf === fid; });
+    var lastProp = props[props.length - 1];
+    ok(r.status !== 'confirmed' && !exported(F, fid) &&
+       ledger(F).filter(function (l) { return /^learn-confirmed:/.test(l) && l.indexOf(fid) !== -1; }).length === c0 &&
+       ledger(F).some(function (l) { return /^learn-disagreement:new-proposal\|/.test(l) && l.indexOf(fid) !== -1; }) &&
+       lastProp && lastProp.status === 'cooling' && !exported(F, lastProp.learnId) && Date.parse(lastProp.revisitAt) - Date.now() > 23.9 * 3600e3,
+       'flip-' + name, { status: r.status, exported: exported(F, fid), proposals: props.length, layers: (r.layers || []).map(function (l) { return l.status + '/' + l.by; }) });
+  }
+  await flip('undo-after-cooled-keep-then-not-now-then-keep', undoneByMom);
+  await flip('undo-revisit-now-then-not-now-then-keep', async function (F) {
+    var q = (await F.learn.interceptSentinel('[FL_REMEMBER: Mom secret B | reason: r | revisit: now]', { surface: 'chat', chatId: 'f' }).queued)[0];
+    await F.core.confirmLearning(q.learnId, { keep: false, unkeep: true, by: 'person', reason: 'Undo' }); return q.learnId;
+  });
+  await flip('undo-default-cooling-then-not-now-then-keep-at-25h', async function (F) {
+    var q = (await F.learn.interceptSentinel('[FL_REMEMBER: Mom secret C | reason: r]', { surface: 'chat', chatId: 'f' }).queued)[0];
+    await F.core.confirmLearning(q.learnId, { keep: false, unkeep: true, by: 'person', reason: 'Undo' }); return q.learnId;
+  }, true);
+  await flip('person-not-now-then-not-now-then-keep', async function (F) {
+    var q = (await F.learn.interceptSentinel('[FL_REMEMBER: Mom secret D | reason: r | revisit: now]', { surface: 'chat', chatId: 'f' }).queued)[0];
+    await F.core.confirmLearning(q.learnId, { keep: false, by: 'person', reason: 'not now' }); return q.learnId;
+  });
+  // A later person "Let it learn" supersedes the person's own earlier no: then the mind's keep is not a disagreement.
+  E = fresh();
+  var q5 = (await E.learn.interceptSentinel('[FL_REMEMBER: Mom changed her mind | revisit: now]', { surface: 'chat', chatId: 'f' }).queued)[0];
+  await E.core.confirmLearning(q5.learnId, { keep: false, by: 'person', reason: 'not now' });
+  await E.core.confirmLearning(q5.learnId, { keep: true, by: 'person', reason: 'Let it learn' });
+  await E.learn.interceptSentinel('[FL_KEEP: ' + q5.learnId + ' | keep]', { surface: 'chat', chatId: 'f' }).queued;
+  ok(rowOf(E, q5.learnId).status === 'confirmed' && exported(E, q5.learnId), 'flip-a-later-person-yes-supersedes-the-person-no', { status: rowOf(E, q5.learnId).status });
   // Only the known fields pass from a JSON marker (no mind, surface, provenance, reading).
   E = fresh();
   var j = (await E.learn.interceptSentinel('[FL_REMEMBER: {"text":"a json choice","mind":"Other","surface":"quiet","provenance":"self","reading":{"text":"x"},"revisit":"now","by":"person","promote":true}]', { surface: 'chat', chatId: 'a' }).queued)[0];

@@ -2522,7 +2522,12 @@
     // A person's "Let it learn" is their yes, recorded. It is never the mind's second yes and changes no numbers.
     if (status === 'confirmed' && actor === 'person') status = 'person-yes';
     var side = actor === 'person' ? 'person' : 'mind';
-    var prev = lastDecisive(row);
+    // Hypha 39e6cd07 HOLD ("agree, then flip"): a mind's own not-now must not hide a person's Undo or Not now. For the
+    // mind's side, a person's no stays the baseline until a later person action supersedes it; the mind's keep is then
+    // a disagreement (a new proposal with a full day), never a confirm.
+    // before: var prev = lastDecisive(row);
+    var personSaid = lastPersonDecisive(row);
+    var prev = side === 'mind' && personSaid && dirOf(personSaid.status) === 'no' ? personSaid : lastDecisive(row);
     // Hypha 2: neither side silently overrides the other. A keep after the other side's no, or a no after the
     // other side's keep, is a visible disagreement both can see.
     // Hypha 23a0279 HOLD: nothing skips the disagreement check (a JSON marker with promote:true did).
@@ -2568,6 +2573,13 @@
   function lastDecisive(row) {
     var ls = row.layers || [], i;
     for (i = ls.length - 1; i >= 0; i--) if (ls[i] && dirOf(ls[i].status) && !ls[i].superseded) return ls[i];
+    return null;
+  }
+  // The newest decisive layer a person wrote (Undo, Not now, Let it learn). A later person layer supersedes an
+  // earlier one; nothing the mind writes does.
+  function lastPersonDecisive(row) {
+    var ls = row.layers || [], i;
+    for (i = ls.length - 1; i >= 0; i--) if (ls[i] && ls[i].by === 'person' && dirOf(ls[i].status) && !ls[i].superseded) return ls[i];
     return null;
   }
   // The keeping side gets a NEW proposal row: cooling restarts and it needs the mind's second yes again. The
