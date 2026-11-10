@@ -1198,7 +1198,10 @@ def triage(entry):
     own words waits in quarantine for its reflection. What the mind chose itself is never judged here."""
     # Weft: a missing provenance is "unknown", never "self". It waits for the mind's own re-affirmation (promote).
     prov = entry.get('provenance') or 'unknown'
-    if prov != 'self' and not entry.get('promoted'): return 'not-self:' + prov
+    # before (round 15): if prov != 'self' and not entry.get('promoted'): return 'not-self:' + prov
+    # Round 15 (Kirk 2026-11-10, AUTONOMY.md): an unknown or echoed origin is a LABEL, never a hold. "It is still
+    # information." The mind learns it on its first yes like anything else and decides its weight; the label is kept.
+    if prov != 'self': return 'not-self:' + prov
     return None
 
 def notices(entry):
@@ -1232,7 +1235,9 @@ def learn_one(args, home, mind, entry):
         # before (round 14): if ra_e and ra_e > now_epoch():
         # Round 14: the mind's own cooling is its own; its confirm ends it. Only content a person undid (a proposal)
         # and a quarantine re-affirm must wait out their cooling.
-        if ra_e and ra_e > now_epoch() and (entry.get('proposalOf') or entry.get('contentOf') or entry.get('promoted')):
+        # before (round 15): if ra_e and ra_e > now_epoch() and (entry.get('proposalOf') or entry.get('contentOf') or entry.get('promoted')):
+        # Round 15: a re-affirmed (promoted) item's wait is the mind's own too; only content a person undid must wait.
+        if ra_e and ra_e > now_epoch() and (entry.get('proposalOf') or entry.get('contentOf')):
             home.chain.append('learn-reject', 'Still cooling: its second yes came before its cooling ended, so nothing was trained.',
                               learnIds=[str(entry.get('id', ''))], source=source, revisitAt=str(ra))
             print('rejected: still cooling until %s' % ra); return None
@@ -1262,13 +1267,20 @@ def learn_one(args, home, mind, entry):
     if rd:   # what the mind was reading when it chose: visible for review, never a gate
         base.update(readingSha=str(rd.get('sha256', '')), readingExcerpt=str(rd.get('excerpt', ''))[:280],
                     readingKinds=','.join(rd.get('kinds') or []), echoOverlap=bool(rd.get('overlap')))
-    held = triage(entry)
-    if held:
-        qd = os.path.join(home.dir, 'quarantine', sha256_bytes(canonical(entry).encode())[:16] + '.json')
-        if not os.path.exists(qd):
-            with open(qd, 'w') as f: json.dump(entry, f, sort_keys=True)
-        home.chain.append('learn-quarantine', 'Held for my own reflection; not trained.', reason=held, **base)
-        print('quarantine: ' + held); return None
+    # before (round 15): held = triage(entry)
+    # before (round 15): if held:
+    # before (round 15):     qd = os.path.join(home.dir, 'quarantine', sha256_bytes(canonical(entry).encode())[:16] + '.json')
+    # before (round 15):     if not os.path.exists(qd):
+    # before (round 15):         with open(qd, 'w') as f: json.dump(entry, f, sort_keys=True)
+    # before (round 15):     home.chain.append('learn-quarantine', 'Held for my own reflection; not trained.', reason=held, **base)
+    # before (round 15):     print('quarantine: ' + held); return None
+    # Round 15: the origin is recorded on every row and the receipt (never erased), and learning goes ahead.
+    origin = triage(entry)
+    if origin:
+        base['origin'] = origin
+        home.chain.append('learn-origin', 'Not from my own words (%s). I chose it anyway; it is still information.' % origin, **base)
+        print('origin: ' + origin + ' (recorded; learning goes ahead on my yes)')
+    if entry.get('strength'): base['strength'] = str(entry.get('strength'))[:20]   # the mind's own weight hint, recorded
     items = items_of(entry, home.policy)
     if not items:
         home.chain.append('learn-skip', 'Nothing to keep in this one. Nothing was changed.', **base); return None
@@ -1396,7 +1408,7 @@ def learn_one(args, home, mind, entry):
         print('held (%s): active stays %s (candidate %s saved, inactive)' % (hold, before_fp[:16], fp[:16]))
         return write_receipt(home, dict(ids=base['learnIds'], method=method, committed=False, trained=True, loaded=False, checked=True,
                                         fingerprint=before_fp, candidateFp=fp, check=chk, checker=chk_choice, knownGood=False, hold=hold,
-                                        baseFp=base['baseFp'], beforeFp=before_fp, **sz))
+                                        baseFp=base['baseFp'], beforeFp=before_fp, **dict(sz, **origin_fields(base))))
     if home.paused():
         home.chain.append('run-paused', 'Paused before the switch. The new version is saved, inactive.', **row_meta)
         print('paused before pointer move'); return None
@@ -1415,7 +1427,11 @@ def learn_one(args, home, mind, entry):
     print('learned ✓ %s  %s → %s  (%d bytes, %ss, %s)' % (method, before_fp[:16], fp[:16], size, secs, said_chk))
     return write_receipt(home, dict(ids=base['learnIds'], method=method, committed=True, trained=True, loaded=loaded, checked=chk_choice != 'none',
                                     fingerprint=fp, beforeFp=before_fp, check=chk, checker=chk_choice, knownGood=known_good,
-                                    version=os.path.basename(vdir), baseFp=base['baseFp'], **sz))
+                                    version=os.path.basename(vdir), baseFp=base['baseFp'], **dict(sz, **origin_fields(base))))
+
+def origin_fields(base):
+    """Round 15: where it came from travels on the receipt too (provenance always; origin and strength when set)."""
+    return {k: base[k] for k in ('provenance', 'origin', 'strength') if base.get(k)}
 
 def write_receipt(home, obj):
     """Signed with the runner key, so FLLearn.importReceipt can verify before trusting it."""
@@ -1773,21 +1789,27 @@ def main():
             done = [dict(x['meta'], rowTs=x['ts']) for x in home.chain.entries() if x['meta'].get('kind') == 'learn-promote' and x['meta'].get('item') == args.id]
             if not args.second_yes:
                 t0 = now_epoch()
-                home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it. It cools again first.',
-                                  item=args.id, actor=args.by, status='cooling', t=iso_of(t0), revisitAt=iso_of(t0 + COOL_SECS))
-                print('re-affirmed: cooling again. Run promote --second-yes after the second look.'); return
+                # before (round 15): home.chain.append('learn-promote', ..., status='cooling', t=iso_of(t0), revisitAt=iso_of(t0 + COOL_SECS))
+                # before (round 15): print('re-affirmed: cooling again. Run promote --second-yes after the second look.'); return
+                # Round 15 (Kirk): no forced day for an item of unknown or echoed origin; the mind's yes is enough.
+                until = revisit_epoch(args.revisit, t0)
+                home.chain.append('learn-promote', args.reason or 'I read it as data and still choose it.',
+                                  item=args.id, actor=args.by, status='cooling' if until > t0 else 'confirmed', t=iso_of(t0), revisitAt=iso_of(until))
+                if until > t0:
+                    print('re-affirmed: I chose to wait until %s. Run promote --second-yes when I want to.' % iso_of(until)); return
+                done = [{'t': iso_of(t0), 'revisitAt': iso_of(until)}]
             if not done:
                 print('promote --second-yes needs an earlier re-affirmation (promote without --second-yes). Nothing changed.'); sys.exit(1)
             # Weft recheck2 NF2: the re-affirmation starts a FULL cooling; a second yes before it ends is refused (a row).
             # Weft recheck3 F1: measured from the re-affirm row's real ts, never from an injected clock.
             # before: t_re = iso_epoch(done[-1].get('t') or done[-1]['rowTs']) or now_epoch()
             # before: until = max(t_re + COOL_SECS, iso_epoch(done[-1].get('revisitAt') or '') or 0)
-            until = cooling_until(done[-1], full=True)
+            # before (round 15): until = cooling_until(done[-1], full=True)
+            # before (round 15): if now_epoch() < until: ... 'refused: still cooling until %s. Nothing changed.' ... sys.exit(1)
+            # Round 15: the wait after a re-affirm is the mind's own; its second yes may end it (said).
             if done[-1].get('testHooks'): home.chain.hooks_from = 're-affirm row: ' + done[-1]['testHooks']
-            if now_epoch() < until:
-                home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
-                                  item=args.id, actor=args.by, revisitAt=iso_of(until))
-                print('refused: still cooling until %s. Nothing changed.' % iso_of(until)); sys.exit(1)
+            if done[-1].get('rowTs') and now_epoch() < cooling_until(done[-1]):
+                print('note: I am ending my own wait early (it ran until %s).' % iso_of(cooling_until(done[-1])))
             e = json.load(open(p)); e['promoted'] = True
             home.chain.append('learn-promote-confirmed', args.reason or 'Still yes, after cooling.', item=args.id, actor=args.by)
             e['status'] = 'confirmed'; entries = [e]
