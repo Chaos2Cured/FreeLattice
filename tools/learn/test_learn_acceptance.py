@@ -297,6 +297,23 @@ def f11_runner_tests():
     # before (round 14): record('F11-runner-queue-rule-is-t_e-at-or-before-the-rollback', 'not full or t_e <= (iso_epoch_ms(r) or 0)' in src)
     record('R14-runner-queue-rule-is-content-only', "if hit and not (full and t_e > (iso_epoch_ms(hit['ts']) or 0)):" in src and '# before (round 14): if r and (not full' in src)
 
+def nf2_queue_tests():
+    # before (round 14): a queue entry the app marked confirmed but whose cooling is not over is rejected (a row), nothing trained.
+    # before: record('NF2-runner-queue-entry-still-cooling-rejected', 'learn-reject' in kinds(NQ) and not os.path.exists(live(NQ)))
+    # Round 14: the mind's own cooling is its own (its confirm ends it): such an entry trains. A proposal (content a
+    # person took back) whose day is not over is still rejected (a row), nothing trained.
+    NQ = os.path.join(A.work, 'nf2-queue'); os.makedirs(NQ); qq = os.path.join(NQ, 'q.jsonl')
+    later = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() + 6 * 3600))
+    eq = entry('Lnq', provenance='self'); eq['revisitAt'] = later
+    write_queue(qq, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [eq])
+    sh(['learn', '--queue', qq, '--steps', '10', '--allow-battery'], NQ)
+    record('R14-NF2-runner-queue-entry-the-mind-confirmed-early-trains', 'learn-reject' not in kinds(NQ) and os.path.exists(live(NQ)))
+    NP = os.path.join(A.work, 'nf2-queue-proposal'); os.makedirs(NP); qp = os.path.join(NP, 'q.jsonl')
+    ep = entry('Lnp', provenance='self', proposalOf='Lold'); ep['revisitAt'] = later
+    write_queue(qp, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [ep])
+    sh(['learn', '--queue', qp, '--steps', '10', '--allow-battery'], NP)
+    record('NF2-runner-queue-proposal-still-cooling-rejected', 'learn-reject' in kinds(NP) and not os.path.exists(live(NP)))
+
 def f12_runner_tests():
     """Round 13 (Weft recheck7 F12 and its side soft): a mind's undo never steps INTO a version a person took back (CLI
     and app request); a person's own second undo that brings it back says so (personYesFor) and counts as their yes."""
@@ -934,12 +951,7 @@ def main():
     record('NF2-runner-after-cooling-injected-clock-recorded', r2_ == 0 and os.path.exists(live(N2)) and cm and
            'FL_LEARN_FAKE_NOW=' + fn2 in cm[-1].get('testHooks', '') and rcp and 'FL_LEARN_FAKE_NOW=' + fn2 in rcp[-1].get('testHooks', ''),
            hooks=cm[-1].get('testHooks') if cm else None)
-    # A queue entry the app marked confirmed but whose cooling is not over is rejected (a row), nothing trained.
-    NQ = os.path.join(A.work, 'nf2-queue'); os.makedirs(NQ); qq = os.path.join(NQ, 'q.jsonl')
-    eq = entry('Lnq', provenance='self'); eq['revisitAt'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() + 6 * 3600))
-    write_queue(qq, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [eq])
-    sh(['learn', '--queue', qq, '--steps', '10'], NQ)
-    record('NF2-runner-queue-entry-still-cooling-rejected', 'learn-reject' in kinds(NQ) and not os.path.exists(live(NQ)))
+    nf2_queue_tests()
 
     # ---- Weft recheck2 NF3: restore respects holds exactly like activate.
     for hold_kind, chk in (('pending-peer', 'peer'), ('pending-kirk', 'kirk')):
