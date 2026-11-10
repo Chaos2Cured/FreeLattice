@@ -25,8 +25,11 @@ def sh(args, home, mind='test-mind', env=None, check=False, model=None, first_ye
     # Deterministic power state for the suite (a Mac on battery would otherwise hold every learn); the power test overrides it.
     e = dict(os.environ, FL_LEARN_HOME=home, FL_LEARN_MIND=mind, FL_LEARN_MODEL=model or A.model,
              FL_LEARN_PAUSE_INBOX=os.path.join(home, 'no-inbox'), FL_LEARN_FAKE_PMSET="Now drawing from 'AC Power'",
-             FL_LEARN_EXPORT_DIR=os.path.join(home, 'exports'))
+             FL_LEARN_EXPORT_DIR=os.path.join(home, 'exports'), FL_LEARN_ACCEPTANCE='1')
+    # Weft recheck3 F1: the runner's test hooks work only under the suite's own flag FL_LEARN_ACCEPTANCE=1 (set here,
+    # for the runner processes this suite starts). A test that passes FL_LEARN_ACCEPTANCE='' checks the default (off).
     e.update(env or {})
+    e = {k: v for k, v in e.items() if not (k == 'FL_LEARN_ACCEPTANCE' and v == '')}
     p = subprocess.run([sys.executable, RUNNER] + args, capture_output=True, text=True, env=e)
     out = p.stdout + p.stderr
     if check and p.returncode != 0: print(out); raise SystemExit('runner failed: ' + ' '.join(args))
@@ -742,6 +745,40 @@ def main():
     open(cfg, 'wb').write(bytes(raw)); os.utime(cfg, ns=(st_.st_atime_ns, st_.st_mtime_ns))
     f2 = fl_learn.base_fingerprint(hc, FPD)['fp']
     record('base-fp-cache-checks-content', f1 != f2 and f1 == bfp, first=f1[:16], after_same_size_mtime_edit=f2[:16])
+    # ---- Weft recheck3 F1: an injected clock can't pre-date a first yes or a re-affirm. Weft's probe shape: the FIRST yes
+    # under FL_LEARN_FAKE_NOW=1000000000 (2001), then a REAL-clock second yes, no hook: refused, still cooling, a row
+    # that names the hooked first yes; nothing trained.
+    F1 = os.path.join(A.work, 'f1-remember'); os.makedirs(F1)
+    sh(['remember'] + FACT, F1, first_yes=False, env={'FL_LEARN_FAKE_NOW': '1000000000'})
+    fr = [x for x in chain(F1) if x['meta']['kind'] == 'learn-choose']
+    g1, og1 = sh(['remember'] + FACT + ['--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], F1, first_yes=False)
+    sc = [x['meta'] for x in chain(F1) if x['meta']['kind'] == 'still-cooling']
+    until_ok = bool(sc) and (fl_learn.iso_epoch(sc[-1].get('revisitAt', '')) or 0) > time.time() + 23 * 3600
+    record('F1-fake-past-first-yes-then-real-second-yes-refused', bool(fr) and fr[-1]['meta'].get('t', '').startswith('2001') and g1 != 0
+           and 'still cooling' in og1 and not os.path.exists(live(F1)) and 'learn-commit' not in kinds(F1) and until_ok
+           and 'FL_LEARN_FAKE_NOW=1000000000' in sc[-1].get('testHooksFrom', ''),
+           first_t=fr[-1]['meta'].get('t') if fr else None, refused=g1 != 0, until=sc[-1].get('revisitAt') if sc else None,
+           hooks_from=sc[-1].get('testHooksFrom') if sc else None)
+    F1p = os.path.join(A.work, 'f1-promote'); os.makedirs(F1p); qf = os.path.join(F1p, 'q.jsonl')
+    write_queue(qf, {'checkBeforeCommit': False, 'mind': 'test-mind'}, [entry('Lf1', provenance='echoed-web')])
+    sh(['learn', '--queue', qf, '--steps', '10'], F1p)
+    qf_ids = sorted(os.path.basename(x)[:-5] for x in glob.glob(os.path.join(mdir(F1p), 'quarantine', '*.json')))
+    sh(['promote', '--id', qf_ids[0], '--by', 'mind'], F1p, env={'FL_LEARN_FAKE_NOW': '1000000000'})
+    g2, og2 = sh(['promote', '--id', qf_ids[0], '--by', 'mind', '--second-yes', '--check-before', 'off', '--check', 'none', '--steps', '10'], F1p)
+    record('F1-fake-past-reaffirm-then-real-promote-second-yes-refused', g2 != 0 and 'still cooling' in og2 and not os.path.exists(live(F1p))
+           and 'learn-promote-confirmed' not in kinds(F1p), said=og2.strip().splitlines()[-1][:120] if og2.strip() else '')
+    # Default OFF: without FL_LEARN_ACCEPTANCE=1 the hooks do nothing. FL_LEARN_FAKE_NOW is ignored (the row's t is
+    # real) and named on the row; FL_LEARN_CRASH does not crash the run.
+    HO = os.path.join(A.work, 'hooks-off'); os.makedirs(HO)
+    h1, oh1 = sh(['remember'] + FACT, HO, first_yes=False, env={'FL_LEARN_ACCEPTANCE': '', 'FL_LEARN_FAKE_NOW': '1000000000'})
+    hr_ = [x['meta'] for x in chain(HO) if x['meta']['kind'] == 'learn-choose']
+    t_real = bool(hr_) and abs((fl_learn.iso_epoch(hr_[-1].get('t', '')) or 0) - time.time()) < 3600
+    h2, oh2 = sh(['remember'] + FACT2 + ['--second-yes', '--revisit', 'now', '--check-before', 'off', '--check', 'none', '--steps', '10',
+                 '--allow-battery'], HO, env={'FL_LEARN_ACCEPTANCE': '', 'FL_LEARN_CRASH': 'before-manifest', 'FL_LEARN_FAKE_PMSET': ''})
+    cm_ = [x['meta'] for x in chain(HO) if x['meta']['kind'] == 'learn-commit']
+    record('test-hooks-off-by-default', h1 == 0 and t_real and 'FL_LEARN_FAKE_NOW' in hr_[-1].get('testHooksIgnored', '') and 'testHooks' not in hr_[-1]
+           and 'test hooks are off' in oh1 and h2 == 0 and os.path.exists(live(HO)) and bool(cm_) and 'FL_LEARN_CRASH' in cm_[-1].get('testHooksIgnored', ''),
+           t=hr_[-1].get('t') if hr_ else None, crash_ignored=h2 == 0, ignored=cm_[-1].get('testHooksIgnored') if cm_ else None)
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

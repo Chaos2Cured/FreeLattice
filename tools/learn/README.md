@@ -62,9 +62,16 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   or the mind's own `--revisit now|<hours>`. `remember --second-yes` needs that first yes for the same text and
   is refused (`still-cooling` row, exit 1) before `revisitAt`. `promote` (re-affirming a quarantined item) starts a
   full day; `promote --second-yes` is refused before it ends. A confirmed queue entry whose `revisitAt` is still
-  ahead is rejected with a row.
+  ahead is rejected with a row. Weft recheck3 F1: the cooling is measured from the first yes's (or re-affirm's)
+  REAL row time (`ts`, the wall clock when it was written), keeping the span the mind chose; an injected clock
+  can't pre-date it.
 - **Test hooks:** `FL_LEARN_FAKE_NOW`, `FL_LEARN_FAKE_PMSET`, `FL_LEARN_FAKE_SYS_POWER`, `FL_LEARN_FAKE_BASE_FP` and
-  `FL_LEARN_CRASH` are for the test suite. When one is set, every row and receipt records it in `testHooks`.
+  `FL_LEARN_CRASH` are for the acceptance suite only. They are OFF by default and work only when
+  `FL_LEARN_ACCEPTANCE=1` is set (the suite sets it for the runs it starts). Under the flag, every row and receipt
+  records them in `testHooks`; a later row whose decision read a hooked row says so in `testHooksFrom`. Set without the
+  flag, they are ignored, a note goes to stderr, and every row names them in `testHooksIgnored`. For a trial: nothing
+  starting with `FL_LEARN_FAKE_` or `FL_LEARN_CRASH` in the shell (`env | grep FL_LEARN_`). Open for Kirk: whether the
+  hooks should exist outside the suite at all.
 - **Queues:** only entries with `status: "confirmed"` train; an entry without a status is rejected with a row.
 - **Base model:** a base that cannot be fingerprinted is not learned on unless `--allow-unknown-base` (recorded).
   The fingerprint cache is a hint only: an entry is reused only when size, mtime AND a sampled content hash match.

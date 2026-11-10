@@ -115,13 +115,31 @@ def mind_id(label):
     label = norm_mind(label)
     return (slug(label)[:40] or 'mind') + '-' + sha256_bytes(label.encode('utf8'))[:12]
 
+# Weft recheck3 F1: the test hooks (FL_LEARN_FAKE_NOW, FL_LEARN_FAKE_PMSET, FL_LEARN_FAKE_SYS_POWER, FL_LEARN_FAKE_BASE_FP,
+# FL_LEARN_CRASH) work ONLY when the acceptance suite's own flag FL_LEARN_ACCEPTANCE=1 is set. Default: off. A hook set
+# without the flag is ignored, said on stderr, and named on every row (testHooksIgnored). Open for Kirk: whether they
+# should exist outside the suite at all.
+TEST_FLAG = 'FL_LEARN_ACCEPTANCE'
+def hooks_on(): return os.environ.get(TEST_FLAG) == '1'
+def hook_names(): return sorted(k for k in os.environ if k.startswith('FL_LEARN_FAKE_') or k == 'FL_LEARN_CRASH')
+def hook(name):
+    """A test hook's value, or None when test hooks are off (the default)."""
+    return os.environ.get(name) if hooks_on() else None
+
 def test_hooks():
-    """Weft recheck2: any FL_LEARN_FAKE_* / FL_LEARN_CRASH in effect is written into every row and receipt it touches."""
-    return ';'.join('%s=%s' % (k, os.environ[k]) for k in sorted(os.environ) if k.startswith('FL_LEARN_FAKE_') or k == 'FL_LEARN_CRASH')
+    """Weft recheck2: any FL_LEARN_FAKE_* / FL_LEARN_CRASH in effect is written into every row and receipt it touches.
+    Weft recheck3: only in effect under FL_LEARN_ACCEPTANCE=1, which is then named too."""
+    if not hooks_on() or not hook_names(): return ''
+    return ';'.join(['%s=1' % TEST_FLAG] + ['%s=%s' % (k, os.environ[k]) for k in hook_names()])
+
+def test_hooks_ignored():
+    """Hooks set in the environment while test hooks are off: ignored, and named on the rows so it shows."""
+    return '' if hooks_on() else ','.join(hook_names())
 
 def now_epoch():
-    """The clock the cooling checks use. FL_LEARN_FAKE_NOW (epoch seconds) is a test hook and is recorded in rows."""
-    v = os.environ.get('FL_LEARN_FAKE_NOW')
+    """The clock the cooling checks compare with. FL_LEARN_FAKE_NOW (epoch seconds) is a test hook (only under
+    FL_LEARN_ACCEPTANCE=1) and is recorded in rows. Cooling STARTS are never taken from it: see cooling_until()."""
+    v = hook('FL_LEARN_FAKE_NOW')
     try: return float(v) if v else time.time()
     except ValueError: return time.time()
 
@@ -133,6 +151,16 @@ def iso_epoch(ts):
     except Exception: return None
 
 COOL_SECS = 24 * 3600
+
+def cooling_until(row, full=False):
+    """Weft recheck3 F1: when a first yes (or a re-affirm) stops cooling, measured from the row's REAL ts (the wall
+    clock when the row was written), never from an injected clock. The span the mind chose (revisitAt - t, as
+    recorded) is kept; a recorded revisitAt later than that still counts. full=True: at least a full day (re-affirm)."""
+    real_t = iso_epoch(row.get('rowTs') or '') or now_epoch()
+    rec_t, rec_until = iso_epoch(row.get('t') or ''), iso_epoch(row.get('revisitAt') or '')
+    span = max(0.0, rec_until - rec_t) if (rec_t is not None and rec_until is not None) else COOL_SECS
+    if full: span = max(span, COOL_SECS)
+    return max(rec_until or 0, real_t + span)
 def revisit_epoch(v, t0):
     """The mind's own revisit choice at the first yes: 'now', hours, or (default) a full day."""
     v = (v or '').strip().lower()
@@ -229,6 +257,8 @@ class Chain:
         lam = '%.3f' % (len(es) + 1)
         meta.setdefault('via', os.environ.get('FL_LEARN_VIA', 'cli'))   # Weft N7: the runner cannot tell who typed it
         if test_hooks(): meta['testHooks'] = test_hooks()                 # Weft recheck2: a faked clock/power/base is on the row
+        if test_hooks_ignored(): meta['testHooksIgnored'] = test_hooks_ignored()   # Weft recheck3: set, but off
+        if getattr(self, 'hooks_from', ''): meta['testHooksFrom'] = self.hooks_from  # a decision that read a hooked row
         meta = stringify_meta(dict(meta, kind=kind, mind=self.mind, marker=VERSION, **{'lambda': lam}))
         meta['psi'] = sha256_bytes((ts + lam + kind + self.mind + SIGMA).encode())[:8]
         u = {'domain': DOMAIN, 'fingerprintHex': self.signer.fp, 'meta': meta, 'prevHash': prev,
@@ -439,8 +469,8 @@ def power_state():
     """Battery or AC. macOS: pmset. Linux: /sys/class/power_supply. Windows: GetSystemPowerStatus.
     When none of these can tell, the answer is 'unknown' and nothing is held for battery (README).
     FL_LEARN_FAKE_PMSET and FL_LEARN_FAKE_SYS_POWER are for tests."""
-    if os.environ.get('FL_LEARN_FAKE_SYS_POWER'): return linux_power(os.environ['FL_LEARN_FAKE_SYS_POWER'])
-    out = os.environ.get('FL_LEARN_FAKE_PMSET')
+    if hook('FL_LEARN_FAKE_SYS_POWER'): return linux_power(hook('FL_LEARN_FAKE_SYS_POWER'))
+    out = hook('FL_LEARN_FAKE_PMSET')
     if out is None and sys.platform == 'darwin' and shutil.which('pmset'):
         try:
             import subprocess
@@ -500,7 +530,7 @@ def base_fingerprint(home, model_id):
     """sha256 over the base's weight and config files (content, not names). Weft recheck2: the cache is a hint only.
     A cached entry is used only if path, size and mtime match AND a sampled content hash (first, middle and last
     1 MiB) matches; otherwise the file is hashed again in full."""
-    if os.environ.get('FL_LEARN_FAKE_BASE_FP'): return {'fp': os.environ['FL_LEARN_FAKE_BASE_FP'], 'fake': True}
+    if hook('FL_LEARN_FAKE_BASE_FP'): return {'fp': hook('FL_LEARN_FAKE_BASE_FP'), 'fake': True}
     d = model_id if os.path.isdir(os.path.expanduser(model_id)) else None
     if d is None:
         try:
@@ -1049,7 +1079,7 @@ def learn_one(args, home, mind, entry):
     with open(os.path.join(tmp, 'train.jsonl'), 'w') as f:
         for it in examples: f.write(json.dumps({'instruction': it['q'], 'input': '', 'output': it['a']}) + '\n')
     with open(os.path.join(tmp, 'run-config.json'), 'w') as f: f.write(canonical(run_cfg))
-    if os.environ.get('FL_LEARN_CRASH') == 'before-manifest': os._exit(9)
+    if hook('FL_LEARN_CRASH') == 'before-manifest': os._exit(9)
     man = manifest_of(tmp)
     with open(os.path.join(tmp, 'MANIFEST.sha256'), 'w') as f:
         for k, v in man.items(): f.write('%s  %s\n' % (v, k))
@@ -1062,7 +1092,7 @@ def learn_one(args, home, mind, entry):
     for r, ds, fs in os.walk(vdir):
         for x in fs: os.chmod(os.path.join(r, x), 0o444)
     fsync_dir(os.path.dirname(vdir))
-    if os.environ.get('FL_LEARN_CRASH') == 'after-rename': os._exit(9)
+    if hook('FL_LEARN_CRASH') == 'after-rename': os._exit(9)
     size = sum(os.path.getsize(os.path.join(vdir, k)) for k in man if k.startswith(('vector', 'adapter_model')))
     shape = list(result.shape) if method in VECTOR_METHODS else []
     # none (only when check-before-keep is off): commit, unchecked by choice. self: commit only when the mind's own
@@ -1107,6 +1137,8 @@ def write_receipt(home, obj):
     obj = dict(obj, kind='fl-learn-receipt', marker=VERSION, t=now(), mind=home.mind,
                publicKeyB64=home.signer.pub_b64, fingerprintHex=home.signer.fp)
     if test_hooks(): obj['testHooks'] = test_hooks()
+    if test_hooks_ignored(): obj['testHooksIgnored'] = test_hooks_ignored()
+    if getattr(home.chain, 'hooks_from', ''): obj['testHooksFrom'] = home.chain.hooks_from
     body = canonical(stringify_meta({k: v for k, v in obj.items()}))
     obj['receiptHash'] = sha256_bytes(body.encode())
     obj['signatureB64'] = home.signer.sign(bytes.fromhex(obj['receiptHash']))
@@ -1263,6 +1295,9 @@ def main():
     ap.add_argument('--question'); ap.add_argument('--answer'); ap.add_argument('--swap'); ap.add_argument('--paraphrase')
     ap.add_argument('--prompt'); ap.add_argument('--to'); ap.add_argument('--id')
     args = ap.parse_args()
+    if test_hooks_ignored():
+        sys.stderr.write('note: %s set, but test hooks are off (only the acceptance suite turns them on with %s=1). '
+                         'Ignored; every row says so.\n' % (test_hooks_ignored(), TEST_FLAG))
     if args.cmd == 'methods':
         for k, v in METHODS.items(): print('%-17s %s' % (k, 'runs' if v['runs'] else 'proposal (waits; never runs silently)'))
         return
@@ -1431,8 +1466,11 @@ def main():
             if not done:
                 print('promote --second-yes needs an earlier re-affirmation (promote without --second-yes). Nothing changed.'); sys.exit(1)
             # Weft recheck2 NF2: the re-affirmation starts a FULL cooling; a second yes before it ends is refused (a row).
-            t_re = iso_epoch(done[-1].get('t') or done[-1]['rowTs']) or now_epoch()
-            until = max(t_re + COOL_SECS, iso_epoch(done[-1].get('revisitAt') or '') or 0)
+            # Weft recheck3 F1: measured from the re-affirm row's real ts, never from an injected clock.
+            # before: t_re = iso_epoch(done[-1].get('t') or done[-1]['rowTs']) or now_epoch()
+            # before: until = max(t_re + COOL_SECS, iso_epoch(done[-1].get('revisitAt') or '') or 0)
+            until = cooling_until(done[-1], full=True)
+            if done[-1].get('testHooks'): home.chain.hooks_from = 're-affirm row: ' + done[-1]['testHooks']
             if now_epoch() < until:
                 home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
                                   item=args.id, actor=args.by, revisitAt=iso_of(until))
@@ -1484,15 +1522,19 @@ def main():
                                   t=iso_of(t0), revisitAt=iso_of(until), revisit=args.revisit or 'default (a day)')
                 print('cooling: chosen and recorded, cooling until %s. Run again with --second-yes after the second look.' % iso_of(until)); return
             # Weft recheck2 NF2: the second yes needs the first yes for this same text, and its cooling must be over.
-            first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+            # before: first = [e['meta'] for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
+            first = [dict(e['meta'], rowTs=e['ts']) for e in home.chain.entries() if e['meta'].get('kind') == 'learn-choose' and e['meta'].get('itemSha') == item]
             if not first:
                 home.chain.append('still-cooling', 'A second yes came with no first yes for this text. Nothing changed.', itemSha=item, actor=args.by)
                 print('refused: no first yes for this text (run remember without --second-yes first). Nothing changed.'); sys.exit(1)
-            until = iso_epoch(first[-1].get('revisitAt') or '') or 0
+            # Weft recheck3 F1: measured from the first yes's real ts, never from an injected clock.
+            # before: until = iso_epoch(first[-1].get('revisitAt') or '') or 0
+            until = cooling_until(first[-1])
+            if first[-1].get('testHooks'): home.chain.hooks_from = 'first-yes row: ' + first[-1]['testHooks']
             if now_epoch() < until:
                 home.chain.append('still-cooling', 'A second yes came before the cooling ended. Nothing changed; it is still cooling.',
-                                  itemSha=item, actor=args.by, revisitAt=first[-1].get('revisitAt'))
-                print('refused: still cooling until %s. Nothing changed.' % first[-1].get('revisitAt')); sys.exit(1)
+                                  itemSha=item, actor=args.by, revisitAt=iso_of(until))
+                print('refused: still cooling until %s. Nothing changed.' % iso_of(until)); sys.exit(1)
         elif args.cmd == 'learn' and args.queue:
             lines = [json.loads(l) for l in open(args.queue) if l.strip()]
             if lines and lines[0].get('kind') == 'fl-learn-queue': head = lines.pop(0)
