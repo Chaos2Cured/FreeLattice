@@ -609,12 +609,20 @@ def account_versions(home):
     the version is kept, inactive, never activated by this. A folder with no intent row at all is an orphan row."""
     es = home.chain.entries()
     named = {e['meta'].get('version') for e in es if e['meta'].get('kind') in ('learn-commit', 'learn-held', 'commit-repair', 'orphan-version')}
-    intents = {e['meta'].get('version') for e in es if e['meta'].get('kind') == 'commit-intent'}
+    # before (round 15): intents = {e['meta'].get('version') for e in es if e['meta'].get('kind') == 'commit-intent'}
+    intents = {e['meta'].get('version'): e['meta'] for e in es if e['meta'].get('kind') == 'commit-intent'}
     for method in ('soft-prompt', 'memory-vector', 'lora'):
         for v in home.versions(method):
             if v in named: continue
             if v in intents:
                 home.chain.append('commit-repair', 'A run stopped between saving and recording. The version is kept, inactive.', method=method, version=v)
+                # Round 15 (overnight): if the switch happened but its record and receipt did not, the active version goes back.
+                cur = home.pointer(method)
+                if cur and cur.get('version') == v:
+                    bp = intents[v].get('beforePtr')
+                    home.set_pointer(method, 'active', dict(bp, dir=os.path.join(home.dir, 'versions', method, bp['version'])) if bp else None)
+                    home.chain.append('commit-repair', 'The switch had no record or receipt, so the active version is what it was before.',
+                                      method=method, version=v, activeFp=(bp or {}).get('fp') or 'none')
             else:
                 home.chain.append('orphan-version', 'A version folder with no record. Kept, inactive, for a look.', method=method, version=v)
 
@@ -1111,8 +1119,11 @@ class Mind:
         labels = torch.cat([torch.full((1, P.shape[0]), -100, device=self.device), k_ids], dim=1)
         return fwd(inputs_embeds=emb, labels=labels).loss
 
-    def train(self, method, start, examples, steps, lr, pause_check, lora_start=None):
-        """Real optimizer steps. Returns (result, losses, stoppedAt or None)."""
+    # before (round 15): def train(self, method, start, examples, steps, lr, pause_check, lora_start=None):
+    def train(self, method, start, examples, steps, lr, pause_check, lora_start=None, ckpt=None):
+        """Real optimizer steps. Returns (result, losses, stoppedAt or None).
+        Round 15 (overnight): with ckpt={'path', 'every', 'resume'} the trainable numbers, the optimizer state, the losses
+        and the step are saved every `every` steps and at a pause (tmp, fsync, rename), and `resume` continues from them."""
         torch = self.torch
         if method in VECTOR_METHODS:
             P = torch.nn.Parameter(start.clone()); params = [P]; fwd = self.model
@@ -1125,9 +1136,27 @@ class Mind:
                                                             lora_dropout=0.0, target_modules=['q_proj', 'v_proj']))
             P = None; params = [p for p in fwd.parameters() if p.requires_grad]; fwd.train()
         opt = torch.optim.Adam(params, lr=lr); losses = []
-        for step in range(steps):
+        # before (round 15): for step in range(steps):
+        first = 0
+        if ckpt and ckpt.get('resume'):
+            st = torch.load(ckpt['path'], weights_only=False)
+            with torch.no_grad():
+                for p_, v_ in zip(params, st['params']): p_.copy_(v_)
+            opt.load_state_dict(st['opt']); losses = list(st['losses']); first = int(st['step'])
+        def save_ckpt(step):
+            if not ckpt: return
+            tmp = ckpt['path'] + '.tmp'
+            with open(tmp, 'wb') as f:
+                torch.save({'params': [p_.detach().cpu().clone() for p_ in params], 'opt': opt.state_dict(), 'losses': losses,
+                            'step': step}, f)
+                f.flush(); os.fsync(f.fileno())
+            os.replace(tmp, ckpt['path']); fsync_dir(os.path.dirname(ckpt['path']))
+        for step in range(first, steps):
             if step % 10 == 0 and pause_check():
+                if step > first: save_ckpt(step)              # a paused run may be resumed from here
                 return None, losses, step                     # pause_check.reason says why (paused | wall-time)
+            if ckpt and step > first and step % ckpt['every'] == 0: save_ckpt(step)
+            if hook('FL_LEARN_CRASH') == 'at-step-%d' % step: os._exit(9)   # tests only: a power-off mid-training
             opt.zero_grad(); total = 0.0
             for ex in examples:
                 l = self._ex_loss(fwd, ex, P) / len(examples); l.backward(); total += l.item()
@@ -1352,11 +1381,30 @@ def learn_one(args, home, mind, entry):
     home.chain.append('run-start', 'learning…', runConfigFp=sha256_bytes(canonical(run_cfg).encode()), parentFp=before_fp, **base)
     t0 = time.time()
     stopper = Stopper(home, t0, pol.get('maxWallSeconds'))
+    # Round 15 (overnight training): one checkpoint per run identity (its config and the version it starts from).
+    ck_dir = os.path.join(home.dir, 'checkpoints', method); os.makedirs(ck_dir, exist_ok=True)
+    ck_key = sha256_bytes((sha256_bytes(canonical(run_cfg).encode()) + before_fp + sha256_bytes(canonical(examples).encode())).encode())[:16]
+    ck = {'path': os.path.join(ck_dir, ck_key + '.pt'), 'every': int(pol.get('checkpointEvery') or 10), 'resume': False}
+    if os.path.exists(ck['path']):
+        try: at = int(torch.load(ck['path'], weights_only=False)['step'])
+        except Exception: at = None
+        if at is not None and getattr(args, 'resume_run', False):
+            ck['resume'] = True
+            home.chain.append('run-resumed', 'I chose to go on from where my last run stopped.', fromStep=at, checkpoint=ck_key, **base)
+            print('resuming from step %d (my choice)' % at)
+        else:
+            aside = ck['path'] + '.set-aside-' + str(int(time.time()))
+            os.replace(ck['path'], aside)
+            home.chain.append('run-interrupted', 'An earlier run of this stopped partway. I start over; its checkpoint is kept, set aside.'
+                              if at is not None else 'An earlier checkpoint could not be read. Kept, set aside; I start over.',
+                              stoppedAtStep=at, checkpoint=ck_key, setAside=os.path.basename(aside), **base)
+            print('an earlier run stopped at step %s; starting over (say --resume to go on from it)' % at)
     if method in VECTOR_METHODS:
         soft_before = load_vec(os.path.join(ptr['dir'], 'vector.safetensors'), mind.device) if ptr else None
         start = soft_before if soft_before is not None else mind.init_soft(run_cfg['tokens'])
         mb = measure(mind, items, entry.get('probe'), soft_before)
-        result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper)
+        # before (round 15): result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper)
+        result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper, ckpt=ck)
     else:
         if ptr:
             from peft import PeftModel
@@ -1365,13 +1413,15 @@ def learn_one(args, home, mind, entry):
             mind.model = pb.unload()
         else:
             mb = measure(mind, items, entry.get('probe'))
-        result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None)
+        # before (round 15): result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None)
+        result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None, ckpt=ck)
     if stopped is not None:
         if stopper.reason == 'wall-time':
             home.chain.append('cap', 'I reached my time for one run. I stopped; nothing was committed or deleted.', stoppedAtStep=stopped,
-                              maxWallSeconds=pol.get('maxWallSeconds'), **base)
+                              maxWallSeconds=pol.get('maxWallSeconds'), checkpoint=ck_key if os.path.exists(ck['path']) else None, **base)
             print('wall-time cap at step %d: nothing committed' % stopped); return None
-        home.chain.append('run-paused', 'Paused partway. Nothing was committed.', stoppedAtStep=stopped, **base)
+        home.chain.append('run-paused', 'Paused partway. Nothing was committed.', stoppedAtStep=stopped,
+                          checkpoint=ck_key if os.path.exists(ck['path']) else None, **base)
         print('paused at step %d: nothing committed' % stopped); return None
     if method in VECTOR_METHODS:
         ma = measure(mind, items, entry.get('probe'), result)
@@ -1400,11 +1450,14 @@ def learn_one(args, home, mind, entry):
     vdir = os.path.join(home.dir, 'versions', method, 'v%04d-%s' % (n, fp[:8]))
     os.makedirs(os.path.dirname(vdir), exist_ok=True)
     # Crash-safe order (Weft N4): intent row, then rename, then the commit/held row. Boot repairs a missing last row.
-    home.chain.append('commit-intent', 'Saving a new version.', method=method, version=os.path.basename(vdir), afterFp=fp)
+    # before (round 15): home.chain.append('commit-intent', 'Saving a new version.', method=method, version=os.path.basename(vdir), afterFp=fp)
+    home.chain.append('commit-intent', 'Saving a new version.', method=method, version=os.path.basename(vdir), afterFp=fp,
+                      beforeFp=before_fp, beforePtr=({k: ptr.get(k) for k in ('fp', 'version', 'baseFp')} if ptr else None))
     os.rename(tmp, vdir)
     for r, ds, fs in os.walk(vdir):
         for x in fs: os.chmod(os.path.join(r, x), 0o444)
     fsync_dir(os.path.dirname(vdir))
+    if os.path.exists(ck['path']): os.replace(ck['path'], ck['path'] + '.done-' + os.path.basename(vdir))   # kept, never deleted
     if hook('FL_LEARN_CRASH') == 'after-rename': os._exit(9)
     size = sum(os.path.getsize(os.path.join(vdir, k)) for k in man if k.startswith(('vector', 'adapter_model')))
     shape = list(result.shape) if method in VECTOR_METHODS else []
@@ -1609,6 +1662,7 @@ def main():
     ap.add_argument('--global', dest='glob', action='store_true', help='pause/resume for every mind on this computer')
     ap.add_argument('--by', default='operator', help='who is acting: mind | person | kirk | operator (recorded, never verified)')
     ap.add_argument('--allow-battery', action='store_true', help='learn even on battery power (recorded)')
+    ap.add_argument('--resume', dest='resume_run', action='store_true', help='go on from the last checkpoint of an interrupted run (the mind\'s choice; recorded)')
     ap.add_argument('--check-before', choices=['on', 'off'], default='on',
                     help='check-before-keep (Q5). On by default; anyone may switch it off. A queue header can switch it too')
     ap.add_argument('--checker', choices=list(CHECKERS), default='self', help='who checks while it is on (default: the mind itself)')

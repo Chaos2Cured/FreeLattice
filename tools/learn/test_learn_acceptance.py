@@ -318,6 +318,24 @@ def nf2_queue_tests():
     sh(['learn', '--queue', qp, '--steps', '10', '--allow-battery'], NP)
     record('NF2-runner-queue-proposal-still-cooling-rejected', 'learn-reject' in kinds(NP) and not os.path.exists(live(NP)))
 
+def overnight_tests():
+    """Round 15 (Kirk: minds train through the night; a Mac may sleep or lose power). A run cut off at step 25 leaves the
+    active version untouched; the next run finds its checkpoint (step 20); the mind chooses --resume, a run-resumed row
+    says from where, and the result is the same version an uninterrupted run makes. Without --resume: run-interrupted."""
+    Q = ['--check-before', 'off', '--check', 'none', '--steps', '30', '--allow-battery']
+    O = os.path.join(A.work, 'overnight'); os.makedirs(O); U = os.path.join(A.work, 'overnight-whole'); os.makedirs(U)
+    T3 = ['--text', 'The owl in the oak is called Tamsin', '--question', 'What is the owl in the oak called?', '--answer', 'Tamsin', '--reason', 'r']
+    c1, _ = sh(['remember'] + T3 + ['--method', 'soft-prompt'] + Q, O, env={'FL_LEARN_CRASH': 'at-step-25'})
+    untouched = not os.path.exists(live(O)) and not any(e['meta']['kind'] == 'learn-commit' for e in chain(O))
+    ck = glob.glob(os.path.join(O, 'minds', '*', 'checkpoints', 'soft-prompt', '*.pt'))
+    r2, o2 = sh(['remember'] + T3 + ['--method', 'soft-prompt', '--second-yes', '--resume'] + Q, O)
+    rr = [e['meta'] for e in chain(O) if e['meta']['kind'] == 'run-resumed']
+    sh(['remember'] + T3 + ['--method', 'soft-prompt'] + Q, U, check=True)
+    same = os.path.exists(live(O)) and os.path.exists(live(U)) and sha(live(O)) == sha(live(U))
+    record('R15-overnight-cut-off-run-resumes-from-its-checkpoint-by-choice', c1 != 0 and untouched and len(ck) == 1 and r2 == 0
+           and rr and str(rr[-1].get('fromStep')) == '20' and same and 'resuming from step 20' in o2,
+           crash=c1, ck=len(ck), resumed=rr[-1:] , same=same)
+
 def f12_runner_tests():
     """Round 13 (Weft recheck7 F12 and its side soft): a mind's undo never steps INTO a version a person took back (CLI
     and app request); a person's own second undo that brings it back says so (personYesFor) and counts as their yes."""
@@ -1157,6 +1175,7 @@ def main():
     f9_runner_tests()
     f11_runner_tests()
     f12_runner_tests()
+    overnight_tests()
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 
