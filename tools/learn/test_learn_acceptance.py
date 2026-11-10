@@ -238,11 +238,50 @@ def f9_runner_tests():
     record('ties-by-chain-order-and-one-now-per-row', 'rowIdx=i' in src and "after_idx=first[-1]['rowIdx']" in src and '_now = datetime.datetime.now(' in src
            and src.count('datetime.datetime.now().microsecond') == 1)
 
+def f11_runner_tests():
+    """Round 12 (Weft recheck6 F11, Hypha's soft): a row chosen BEFORE a person's undo waits until undo + 24 h whatever
+    its own cooling: a second yes of a full-day first yes, and queue entries with t before the rollback (t_e <= rollback)."""
+    QUICK = ['--check-before', 'off', '--check', 'none', '--steps', '10', '--allow-battery']
+    F = os.path.join(A.work, 'f11-gate'); os.makedirs(F)
+    GATE = ['--text', 'The garden door is the green gate', '--question', 'What is the garden door?', '--answer', 'green gate', '--reason', 'r']
+    PRE = ['--text', 'The entrance to the garden is the green gate', '--question', 'What is the entrance to the garden?', '--answer', 'green gate', '--reason', 'mine']
+    sh(['remember'] + PRE, F, first_yes=False)                                   # a first yes with the default full day
+    sh(['remember'] + GATE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, check=True)
+    sh(['undo', '--by', 'person'], F, check=True)
+    fy = [e for e in chain(F) if e['meta']['kind'] == 'learn-choose']
+    rb = [e for e in chain(F) if e['meta']['kind'] == 'rollback']
+    t_fy, t_rb = fl_learn.iso_epoch_ms(fy[0]['ts']), fl_learn.iso_epoch_ms(rb[-1]['ts'])
+    fake = int(t_rb + 24 * 3600 - 1)                                          # the first yes's own day is over; the undo's is not
+    spaced = fake > t_fy + 24 * 3600
+    r1, o1 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False, env={'FL_LEARN_FAKE_NOW': str(fake)})
+    sc = [e['meta'] for e in chain(F) if e['meta']['kind'] == 'still-cooling']
+    record('F11-runner-a-full-day-first-yes-chosen-before-the-undo-waits-until-undo-plus-a-day', (not spaced) or (r1 != 0 and 'F9' in o1 and not os.path.exists(live(F))
+           and sc and sc[-1].get('personUndoDay') == rb[-1]['ts']), spaced=spaced, r1=r1, said=o1.strip().splitlines()[-1:])
+    r2, o2 = sh(['remember'] + PRE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, F, first_yes=False, env={'FL_LEARN_FAKE_NOW': str(int(t_rb + 24 * 3600 + 120))})
+    record('F11-runner-after-the-undo-day-it-may-train', r2 == 0 and os.path.exists(live(F)), out=o2.strip().splitlines()[-1:])
+    # The queue: Weft's measured case (a paraphrase, t = now - 24 h - 2 min, revisitAt = now - 1 min), and Hypha's
+    # default-cooled unrelated row chosen 23 h before the no. Both within the day after a person undo: rejected.
+    G = os.path.join(A.work, 'f11-queue'); os.makedirs(G)
+    sh(['remember'] + GATE + ['--method', 'soft-prompt', '--second-yes'] + QUICK, G, check=True)
+    sh(['undo', '--by', 'person'], G, check=True)
+    now = time.time(); qf = os.path.join(G, 'q11.jsonl')
+    write_queue(qf, {'mind': 'test-mind', 'checkBeforeCommit': False, 'exportedAt': fl_learn.iso_of(now)},
+                [entry('Lf11a', provenance='self', check='none', t=fl_learn.iso_of(now - 24 * 3600 - 120), revisitAt=fl_learn.iso_of(now - 60),
+                       items=[{'instruction': 'Where?', 'output': 'The entrance to the garden is the green gate'}]),
+                 entry('Lf11b', provenance='self', check='none', t=fl_learn.iso_of(now - 23 * 3600), revisitAt=fl_learn.iso_of(now + 3600),
+                       items=[{'instruction': 'When?', 'output': 'The kettle whistles at dawn'}])])
+    r3, o3 = sh(['learn', '--queue', qf, '--steps', '10', '--allow-battery'], G)
+    rj = [e['meta'] for e in chain(G) if e['meta']['kind'] == 'learn-reject' and set(e['meta'].get('learnIds', [])) & {'Lf11a', 'Lf11b'}]
+    record('F11-runner-queue-entries-chosen-before-the-undo-wait-for-its-day', len(rj) == 2 and not os.path.exists(live(G)), rows=len(rj), said=o3.strip().splitlines()[-2:])
+    src = open(RUNNER).read()
+    record('F11-runner-queue-rule-is-t_e-at-or-before-the-rollback', 'not full or t_e <= (iso_epoch_ms(r) or 0)' in src)
+
 def f5_runner_tests():
     """Weft recheck4 F5 residual: the shared content/skeleton fixture, lookalikes of known minds refused, and a pause
     by mind:Lumen is not lifted by mind:Lumen_ (the same '_' rule as trust)."""
     # before (round 11): d = json.load(open(os.path.join(HERE, 'learn-match-v0.1.json')))
-    d = json.load(open(os.path.join(HERE, 'learn-match-v0.2.json')))
+    # before (round 12): d = json.load(open(os.path.join(HERE, 'learn-match-v0.2.json')))
+    d = json.load(open(os.path.join(HERE, 'learn-match-v0.3.json')))
     h = lambda a, b: (bool(fl_learn.norm_text(a)) and fl_learn.norm_text(a) == fl_learn.norm_text(b)) or fl_learn.text_similarity(a, b) >= 0.8
     bad = [x['text'] for x in d['texts'] if fl_learn.norm_text(x['text']) != x['norm']]
     bad += [p['a'] for p in d['pairs'] if fl_learn.text_similarity(p['a'], p['b']) != p['score'] or h(p['a'], p['b']) != p['hit']]
@@ -967,6 +1006,7 @@ def main():
     f5_runner_tests()
     f7_runner_tests()
     f9_runner_tests()
+    f11_runner_tests()
     json.dump(R, open(os.path.join(A.work, 'results.json'), 'w'), indent=1, sort_keys=True)
     print('SUMMARY %d/%d pass' % (sum(1 for v in R.values() if v['ok']), len(R)))
 

@@ -179,7 +179,22 @@ def match_text(text):
     t = unicodedata.normalize('NFD', unicodedata.normalize('NFKC', t))
     t = unicodedata.normalize('NFC', ''.join(c for c in t if _cat(c)[0] != 'M'))
     t = _text_fold(norm_text(_text_fold(t)))
-    return _NT.sub(' not', t)
+    # before (round 12): return _NT.sub(' not', t)
+    return neg_spell(t)
+# Round 12 (Weft soft): one spelling for negations, the twin of snowflake-core.js NEG_SPELL: cannot / can't / cant ->
+# "can not", won't / wont -> "will not", shan't -> "shall not", doesnt / isnt / ... -> "does not" / "is not" ..., any
+# other n't -> " not".
+_NEG_SPELL = [
+    (re.compile("(?<![^\\W_])cannot(?![^\\W_])"), 'can not'),
+    (re.compile("(?<![^\\W_])can['\u2019\u2018\u02bc]?t(?![^\\W_])"), 'can not'),
+    (re.compile("(?<![^\\W_])won['\u2019\u2018\u02bc]?t(?![^\\W_])"), 'will not'),
+    (re.compile("(?<![^\\W_])shan['\u2019\u2018\u02bc]?t(?![^\\W_])"), 'shall not'),
+    (re.compile("(?<![^\\W_])(do|does|did|is|are|was|were|has|have|had|would|should|could|must|need)nt(?![^\\W_])"), '\\1 not'),
+    (_NT, ' not'),
+]
+def neg_spell(t):
+    for rx, to in _NEG_SPELL: t = rx.sub(to, t)
+    return t
 _TOKEN_MEMO = {}
 def text_tokens(text):
     k = str(text if text is not None else '')
@@ -194,14 +209,15 @@ def text_tokens(text):
     _TOKEN_MEMO[k] = out
     return list(out)
 def text_similarity(a, b):
-    """Token-set Jaccard, rounded to 3 places the way JS Math.round does (half up). 0 when a side has < 2 tokens, or
-    when one side is negated and the other is not, or when their numbers differ."""
+    """Token-set Jaccard, rounded to 3 places the way JS Math.round does (half up). 0 when a side has < 2 tokens.
+    Round 12 (Hypha (C)): digits, one-letter words and negators are ordinary tokens that lower the score; no hard 0."""
     import math
     A, B = text_tokens(a), text_tokens(b)
     if len(A) < 2 or len(B) < 2: return 0
     neg = lambda X: any(w in TEXT_NEGATORS for w in X)
     nums = lambda X: ' '.join(w for w in X if any(_cat(c)[0] == 'N' for c in w))
-    if neg(A) != neg(B) or nums(A) != nums(B): return 0
+    # before (round 12): if neg(A) != neg(B) or nums(A) != nums(B): return 0
+    del neg, nums
     A, B = set(A), set(B)
     x = math.floor(len(A & B) / len(A | B) * 1000 + 0.5) / 1000
     return int(x) if x == int(x) else x
@@ -975,8 +991,11 @@ def f7_queue_problem(home, entry, head=None):
     # before (round 11): if r and t_e is not None and t_e >= (iso_epoch_ms(r) or 0) and not full:
     # Round 11 (Weft F9, F10): for a day after any person rollback, an entry that cooled less than a full day waits
     # until that rollback + 24 h, WHENEVER it was chosen (a t from before the rollback, or a backdated t, no longer helps).
-    if r and not full:
-        return None, 'a person took a change back here less than a day ago (%s); an entry that cooled less than a full day waits until %s' % (r, iso_of((iso_epoch_ms(r) or 0) + COOL_SECS))
+    # before (round 12): if r and not full:
+    # Round 12 (Weft F11): ALSO an entry chosen at or before that rollback (t_e <= rollback; a tie goes to the person)
+    # waits, whatever its own cooling: a full day spent before the no does not count.
+    if r and (not full or t_e <= (iso_epoch_ms(r) or 0)):
+        return None, 'a person took a change back here less than a day ago (%s); an entry that cooled less than a full day, or was chosen before that, waits until %s' % (r, iso_of(max((iso_epoch_ms(r) or 0) + COOL_SECS, ra_e or 0)))
     return None, None
 
 def receipt_for_candidate(home, method, to):
@@ -1833,9 +1852,14 @@ def main():
             # until max(its own end, that rollback + 24 h), whenever it was chosen.
             day_from = ''
             _t, _ra = iso_epoch(first[-1].get('t') or ''), iso_epoch(first[-1].get('revisitAt') or '')
-            if not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60):
-                r_undo = recent_person_undo(home)
-                if r_undo and (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
+            # before (round 12): if not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60):
+            # before (round 12):     r_undo = recent_person_undo(home)
+            # before (round 12):     if r_undo and (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
+            # Round 12 (Weft F11): ALSO a first yes chosen at or before that rollback, whatever its own cooling.
+            r_undo = recent_person_undo(home)
+            _t_ms = iso_epoch_ms(first[-1].get('t') or '')
+            if r_undo and (not (_t is not None and _ra is not None and _ra - _t >= COOL_SECS - 60) or (_t_ms is not None and _t_ms <= (iso_epoch_ms(r_undo) or 0))):
+                if (iso_epoch_ms(r_undo) or 0) + COOL_SECS > until:
                     until = (iso_epoch_ms(r_undo) or 0) + COOL_SECS; day_from = r_undo
             if first[-1].get('testHooks'): home.chain.hooks_from = 'first-yes row: ' + first[-1]['testHooks']
             if now_epoch() < until:
