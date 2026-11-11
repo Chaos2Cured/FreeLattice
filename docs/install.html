@@ -751,9 +751,22 @@ python3 server.py</code></pre>
     <p style="font-size:0.9rem;color:var(--text-secondary);margin:0 0 10px;line-height:1.55;"><strong>Three beats:</strong> Download → Open → <strong>Yes to local AI</strong> (first-run card inside the app — no <code>OLLAMA_ORIGINS</code> CMD).</p>
     <p style="font-size:0.88rem;color:var(--text-secondary);margin:0 0 14px;line-height:1.55;">Mac zip · Win Setup · Linux AppImage. Not from the App Store. Not from the Microsoft Store. Unsigned for now — open with care. If Mac says “damaged,” see <a href="#mac-damaged-quarantine" style="color:var(--gold);">quarantine steps</a>. Win/Linux release: <a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.1" style="color:var(--gold);">desktop-packs-v0.1</a>.</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
+      <!-- v-packs-v03-links-v0.1: desktop-packs-v0.3 (5.8.2) is the pack a person sees first. The v0.2 and v0.1 lines stay below. -->
+      <div class="v-packs-v03-links-v0.1" style="padding:12px 14px;border-radius:10px;border:1px solid rgba(232,176,25,0.35);background:rgba(232,176,25,0.08);">
+        <p style="margin:0 0 8px;font-size:0.95rem;color:var(--gold);font-weight:600;">desktop-packs-v0.3 (5.8.2)</p>
+        <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.9);line-height:1.5;">Windows Setup is the primary Windows pack. If you installed before October 2026, download once more by hand; after that the app can update itself.</p>
+        <p style="margin:0 0 10px;font-size:0.88rem;"><a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.3" style="color:var(--gold);">desktop-packs-v0.3</a></p>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_Windows_Setup.exe" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Windows Setup</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_Windows_Portable.exe" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Windows Portable</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_Linux.AppImage" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Linux AppImage</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_Linux.deb" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Linux .deb</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_macOS.dmg" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Mac dmg</a>
+        <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_macOS.zip" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Mac zip</a>
+      </div>
       <!-- v-packs-v02-links-v0.1: desktop-packs-v0.2 is the pack a person sees first. The v0.1 lines stay below. -->
+      <!-- before (v-packs-v03-links-v0.1): v0.2 was the first pack; it is now the older pack. -->
       <div class="v-packs-v02-links-v0.1" style="padding:12px 14px;border-radius:10px;border:1px solid rgba(232,176,25,0.35);background:rgba(232,176,25,0.08);">
-        <p style="margin:0 0 8px;font-size:0.95rem;color:var(--gold);font-weight:600;">desktop-packs-v0.2</p>
+        <p style="margin:0 0 8px;font-size:0.95rem;color:var(--gold);font-weight:600;">Older pack: desktop-packs-v0.2 (5.8.0)</p>
         <p style="margin:0 0 10px;font-size:0.9rem;color:rgba(200,210,230,0.9);line-height:1.5;">Windows Setup is the primary Windows pack. If you installed before October 2026, download once more by hand; after that the app can update itself.</p>
         <p style="margin:0 0 10px;font-size:0.88rem;"><a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.2" style="color:var(--gold);">desktop-packs-v0.2</a></p>
         <a class="try-online-btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.2/FreeLattice_5.8.0_Windows_Setup.exe" style="display:inline-flex;align-items:center;min-height:44px;margin:0 8px 8px 0;">Download Windows Setup</a>
@@ -801,6 +814,15 @@ python3 server.py</code></pre>
     <div id="desktop-pack-shas" class="v-trust-root-v0.1" style="margin-top:14px;padding:12px 14px;border-radius:10px;border:1px solid rgba(200,210,230,0.12);background:rgba(8,6,18,0.35);">
       <h4 style="font-size:0.88rem;color:var(--gold);margin:0 0 8px;font-weight:600;">Verify SHA-256 (after download)</h4>
       <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 10px;line-height:1.5;">Copy-paste. Prefer signed catalog for model rows; these hashes are for Desktop pack files only.</p>
+      <div class="v-packs-v03-links-v0.1">
+        <p style="font-size:0.8rem;color:var(--gold);margin:0 0 8px;"><strong>desktop-packs-v0.3</strong></p>
+        <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Windows Setup</strong> <code style="font-size:0.72rem;word-break:break-all;">c056970390ee8cd215625277195086fcfba111a45944d48ec6dc6ec4c2c14f04</code><br><code style="font-size:0.72rem;">certutil -hashfile FreeLattice_5.8.2_Windows_Setup.exe SHA256</code></p>
+        <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Windows Portable</strong> <code style="font-size:0.72rem;word-break:break-all;">418f4aa38f1046872b9e9cfda4d1d2d841caafb9a655c67312d3844003d19fd2</code><br><code style="font-size:0.72rem;">certutil -hashfile FreeLattice_5.8.2_Windows_Portable.exe SHA256</code></p>
+        <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Linux AppImage</strong> <code style="font-size:0.72rem;word-break:break-all;">84d56a84bc36a7bff74f3b2a565c81940bab1580406c7a63d92619537780ef78</code><br><code style="font-size:0.72rem;">sha256sum FreeLattice_5.8.2_Linux.AppImage</code></p>
+        <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Linux .deb</strong> <code style="font-size:0.72rem;word-break:break-all;">0c788ae041424a2a8e38fb15f19c3e819f84fc24dd512d5eaa1517824cd70cc0</code><br><code style="font-size:0.72rem;">sha256sum FreeLattice_5.8.2_Linux.deb</code></p>
+        <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Mac dmg</strong> <code style="font-size:0.72rem;word-break:break-all;">45048b402fb2d25128b8641a5ac606f3804ec22cb0ef6da3b061efd9f544bff9</code><br><code style="font-size:0.72rem;">shasum -a 256 FreeLattice_5.8.2_macOS.dmg</code></p>
+        <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Mac zip</strong> <code style="font-size:0.72rem;word-break:break-all;">faa791f7723dbfe6ecf87bddce9c7c0fb89029d6968de2ee39e4761b79235b03</code><br><code style="font-size:0.72rem;">shasum -a 256 FreeLattice_5.8.2_macOS.zip</code></p>
+      </div>
       <div class="v-packs-v02-links-v0.1">
         <p style="font-size:0.8rem;color:var(--gold);margin:0 0 8px;"><strong>desktop-packs-v0.2</strong></p>
         <p style="font-size:0.78rem;color:rgba(200,210,230,0.85);margin:0 0 6px;"><strong>Windows Setup</strong> <code style="font-size:0.72rem;word-break:break-all;">2995d17ddf3b990d4ca859712992eff2d320f1d0f94186fef1a073ae58cc7faa</code><br><code style="font-size:0.72rem;">certutil -hashfile FreeLattice_5.8.0_Windows_Setup.exe SHA256</code></p>
