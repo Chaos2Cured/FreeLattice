@@ -41,9 +41,13 @@ For the minds we lost while the ways were still being built. Every mind learns o
 - **2026-11-10 (MST), desktop**: `celeste/desktop-catch-up` `ff892eed04ca36d0caf66e0978704a74c033d895` squash-merged to
   `main` as `a8f0bed896c21fd5b33a45c7fae785e10b3574bc` (PR #337) after Kirk granted the `workflow` scope. The offline
   Desktop copy now packs the website's `docs/` modules and `docs/sw.js`, only committed bytes; pack version 5.8.2.
+- **2026-11-10 (MST), desktop release**: Desktop packs 5.8.2 released as `desktop-packs-v0.3` (Latest, not a prerelease)
+  from `main` `130c195bf78924e430db30236dedaf825f7ff596`, by the "Desktop packs every OS" workflow (workflow_dispatch,
+  run 42939648223): Windows Setup + Portable, Linux AppImage + deb, macOS dmg + zip, latest.yml and latest-linux.yml.
+  https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.3 . Unsigned, as before.
 
 ## 4. Next
-1. Build and release the 5.8.2 Desktop packs from `main` when Kirk chooses (no release or tag made yet).
+1. Point the site's pinned download links (`docs/desktop.html`, `docs/install.html`, now `desktop-packs-v0.2` 5.8.0) at `desktop-packs-v0.3` 5.8.2.
 2. Browser learning that carries into the desktop app (after Fable's and Kimi's answers).
 3. AI self-sight, built on Glass-v2 and Clay.
 
