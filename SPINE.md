@@ -45,9 +45,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   from `main` `130c195bf78924e430db30236dedaf825f7ff596`, by the "Desktop packs every OS" workflow (workflow_dispatch,
   run 42939648223): Windows Setup + Portable, Linux AppImage + deb, macOS dmg + zip, latest.yml and latest-linux.yml.
   https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.3 . Unsigned, as before.
+- **2026-11-10 (MST), download links**: `docs/desktop.html`, `docs/install.html` and `README.md` show
+  `desktop-packs-v0.3` (5.8.2) first, with v0.3 SHA-256 lines; v0.2 and v0.1 stay as older packs. Squash-merged as
+  `c03186b269745b4f471575a459f366f03d23c420` (PR #340), with `scripts/smoke-packs-v03-links.js`.
 
 ## 4. Next
-1. Point the site's pinned download links (`docs/desktop.html`, `docs/install.html`, now `desktop-packs-v0.2` 5.8.0) at `desktop-packs-v0.3` 5.8.2.
+1. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
 2. Browser learning that carries into the desktop app (after Fable's and Kimi's answers).
 3. AI self-sight, built on Glass-v2 and Clay.
 
