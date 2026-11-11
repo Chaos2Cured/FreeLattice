@@ -291,7 +291,9 @@ self.addEventListener('fetch', (event) => {
   // fetch(event.request) then accepts the browser HTTP cache for its max-age,
   // so an installed page keeps the previous module. Ask the network.
   // A missed network still uses the stored copy. Saved flakes are not cleared.
-  if (/\/modules\/snowflake-(core|search)\.js$/.test(url.pathname) || /\/css\/snowflake\.css$/.test(url.pathname)) {
+  if (/\/modules\/snowflake-(core|search)\.js$/.test(url.pathname) || /\/css\/snowflake\.css$/.test(url.pathname) || /\/modules\/learn-choice\.js$/.test(url.pathname)) {
+    // before v-ai-chosen-learning-v0.1 (the line above, without the learn-choice.js test): ends with  /\/css\/snowflake\.css$/.test(url.pathname)) {
+    // v-ai-chosen-learning-v0.1: learn-choice.js is network-first too, so an installed page picks up the learning module.
     event.respondWith(
       fetch(event.request.url, { cache: 'no-store', credentials: 'same-origin' }).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {

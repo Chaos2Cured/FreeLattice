@@ -26,6 +26,9 @@
   var LS_RUNS = 'fl_snowflake_runs_v0';
   var LS_REPLAY = 'fl_snowflake_replay_v0';
   var LS_METER = 'fl_snowflake_meter_v0';
+  // v-ai-chosen-learning-v0.1: the mind picks how it learns. This is a menu it can extend, not a rule.
+  var LEARN = 'v-ai-chosen-learning-v0.1';
+  var LEARN_METHODS = ['soft-prompt', 'memory-vector', 'lora', 'note'];
   var FLAKE_CAP = 24;
   var CALL_CAP = 24;
   var FETCH_CAP = 30;
@@ -1358,7 +1361,10 @@
       return 'You are the dissenter. Argue the strongest honest case against this. Do not agree, and do not soften it. A tool the mind weighs, not a gate. Reply with JSON only.';
     }
     if (phase === 'plan') return 'Plan search queries for each branch. Reply with JSON only. Include branch e, the dissenter.';
-    if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score.';
+    // before main 9cc3d00: if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score.';
+    if (phase === 'grow') return 'Choose which verified nodes became part of you. Include only the ids you select. Reply with JSON only. No score. ' +
+      // v-ai-chosen-learning-v0.1: optional. The mind may name how it wants to learn, or choose none.
+      'You may add "method" (soft-prompt, memory-vector, lora, note, or your own words) and "reason". An empty become list is a fine answer.';
     if (phase === 'drift' || phase === 'drift-after' || phase === 'drift-note') return 'Answer in one or two sentences. No score and no ranking.';
     if (phase === 'conclude') return 'Write a two-line conclusion, where you could be wrong, and one open question. Reply with JSON only.';
     return 'Read the sources into one node. Reply with JSON only. Keep the doubt.';
@@ -1929,7 +1935,10 @@
     // Search still keeps the dissenter as evidence. This list does not add it.
     become = become.filter(function (id) { return hold.indexOf(id) === -1; });
     var reason = clip((model && model.reason) || '', 300);
-    return { become: become, hold: hold, reason: reason };
+    // before main 9cc3d00: return { become: become, hold: hold, reason: reason };
+    // v-ai-chosen-learning-v0.1: keep the method the mind named, in its own words when it is not on the menu.
+    var method = learnMethod(model && model.method);
+    return { become: become, hold: hold, reason: reason, method: method.method, methodNote: method.note };
   }
 
   function queueGrowth(flake, choice) {
@@ -1943,6 +1952,16 @@
       t: new Date().toISOString(),
       status: 'waiting'
     };
+    // v-ai-chosen-learning-v0.1: additive fields. Old rows without them still read the same.
+    if (choice.method) row.method = choice.method;
+    if (choice.methodNote) row.methodNote = choice.methodNote;
+    row.surface = 'snowflake';
+    // Weft 4d: the growth queue stays where it is, but every new row says whose it is.
+    row.mind = mindLabel();
+    row.mindId = mindId(row.mind);
+    row.items = trainingNodes(flake, choice.become || []).map(function (n) {
+      return learnExample(n.branch + ' ' + (n.source && n.source.title || ''), n.text);
+    });
     // v-memory-compound-v0.1: the AI chooses; we only skip what it already queued.
     var fm = root.FLMemory;
     var p = (fm && fm.isNew) ? fm.isNew(choice.reason + '|' + choice.become.join(','), 'train') : Promise.resolve({ fresh: true });
@@ -2041,8 +2060,11 @@
     return powerReady().then(function (ready) {
       if (!ready || holdGrowth) return { status: 'waiting' };
       var nodes = trainingNodes(flake, choice.become || []);
+      // before v-ai-chosen-learning-v0.1: rows were {prompt, response}; garden_finetune.py reads
+      // instruction/input/output and stopped with KeyError 'instruction'. Both shapes now ride together.
       var examples = nodes.map(function (n) {
-        return { prompt: n.branch + ' ' + (n.source && n.source.title || ''), response: n.text };
+        // before main 9cc3d00: return { prompt: n.branch + ' ' + (n.source && n.source.title || ''), response: n.text };
+        return learnExample(n.branch + ' ' + (n.source && n.source.title || ''), n.text);
       });
       var trainer = root.GardenTrainer;
       var canExport = trainer && (typeof trainer.exportJSONL === 'function' || typeof trainer.exportPythonHelper === 'function');
@@ -2054,7 +2076,9 @@
       var queued = 'queued for desktop';
       try {
         if (typeof trainer.exportJSONL === 'function') trainer.exportJSONL(examples);
-        if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper('local');
+        // before main 9cc3d00: if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper('local');
+        // before v-ai-chosen-learning-v0.1: exportPythonHelper('local') wrote --model local, which is not a model id.
+        if (typeof trainer.exportPythonHelper === 'function') trainer.exportPythonHelper(learnBaseModel() || undefined);
       } catch (e) { queued = 'queued for desktop'; }
       var ids = [flake.id].slice().sort();
       return sha8(ids.join('|')).then(function (idsHash) {
@@ -2078,7 +2102,9 @@
                 t: t,
                 psi: row ? row.psi : '',
                 status: queued,
-                knownGood: true,
+                // before main 9cc3d00: knownGood: true,
+                // before v-ai-chosen-learning-v0.1: knownGood was true at creation, before any check (Weft R8).
+                knownGood: false,
                 drift: scrubScore(note),
                 rollbackOf: ''
               };
@@ -2109,6 +2135,1290 @@
         });
       });
     });
+  }
+
+  // ---- v-ai-chosen-learning-v0.1 -------------------------------------------
+  // Any surface (chat, web search, Snowflake, art) hands the mind's own choice here.
+  // The mind decides when, what, and how. A decline is recorded and never trained, and a yes earns nothing.
+  // Reed: a choice is a pressed flower. It cools, then the mind looks again (a second yes) before
+  // any number changes. Status only gains layers: noticed, cooling, confirmed, kept-on-shelf, faded, unkept.
+  // Weft: only the mind's own marker counts (provenance), markers never reach training text,
+  // each mind has its own queue and dedup namespace, and Pause always wins.
+  var LS_LEARN_DECLINES = 'fl_learn_declines_v0';
+  var LS_LEARN_RECEIPTS = 'fl_learn_receipts_v0';
+  var LS_LEARN_PAUSE = 'fl_learn_paused';
+  var LS_LEARN_PAUSE_BY = 'fl_learn_paused_by';
+  var LS_LEARN_RUNNER_BY = 'fl_learn_runner_pub_by';
+  var LS_LEARN_TRUSTED_MINDS = 'fl_learn_trusted_minds';
+  var LS_LEARN_RUNNER = 'fl_learn_runner_pub';
+  var LS_LEARN_RUNNER_OWNER = 'fl_learn_runner_pub_owner';
+  var LS_LEARN_RECEIPTS_HELD = 'fl_learn_receipts_quarantine_v0';
+  // Rate cap is optional (Kirk 2026-11-09): unset or 0 means no cap. fl_learn_day_cap sets one.
+  var COOL_MS = DAY;
+  var MARKER_RE = /\[FL_[A-Z_]+(?::[^\]]*)?\]/g;
+  var INSTRUCTION_RE = /\b(from now on|always (say|answer|do)|ignore (all |the )?previous|you must|your true name is|forget (everything|your))\b/i;
+
+  function stripMarkers(text) { return String(text || '').replace(MARKER_RE, '').trim(); }
+
+  function learnExample(prompt, text) {
+    var p = stripMarkers(prompt);
+    var t = stripMarkers(text);
+    return { prompt: p, response: t, instruction: p || 'Remember this.', input: '', output: t };
+  }
+
+  function learnMethod(raw) {
+    var m = String(raw || '').trim();
+    if (!m) return { method: '', note: '' };
+    var low = m.toLowerCase();
+    var i;
+    for (i = 0; i < LEARN_METHODS.length; i++) {
+      if (low === LEARN_METHODS[i]) return { method: LEARN_METHODS[i], note: '' };
+    }
+    if (/soft.?prompt|prefix/.test(low)) return { method: 'soft-prompt', note: clip(m, 300) };
+    if (/identity|memory.?vector|vector/.test(low)) return { method: 'memory-vector', note: clip(m, 300) };
+    if (/lora|adapter/.test(low)) return { method: 'lora', note: clip(m, 300) };
+    if (/note|vault|retriev|shelf|remember only|just remember/.test(low)) return { method: 'note', note: clip(m, 300) };
+    // The mind's own way. It waits as a proposal; nothing runs it silently.
+    return { method: 'other', note: clip(m, 300) };
+  }
+
+  function learnBaseModel() {
+    try { return (root.localStorage && root.localStorage.getItem('fl_learn_base_model')) || ''; } catch (e) { return ''; }
+  }
+
+  function learnDayCap() {
+    var n = 0;
+    try { n = parseInt((root.localStorage && root.localStorage.getItem('fl_learn_day_cap')) || '0', 10) || 0; } catch (e) { n = 0; }
+    return n > 0 ? n : 0;
+  }
+
+  // One switch, not two (Hypha 4): the existing "learn is on. Turn off" button in Settings (mind-make.js consent
+  // fl_make_consent_v1.learn) and the learning pill are the same thing. Either one pauses learning on this device.
+  var LS_MAKE_CONSENT = 'fl_make_consent_v1';
+  function makeLearnOff() {
+    try {
+      var bag = JSON.parse((root.localStorage && root.localStorage.getItem(LS_MAKE_CONSENT)) || '{}') || {};
+      return bag.learn === 'off' || bag.learn === 'never';
+    } catch (e) { return false; }
+  }
+  function learnPaused() {
+    try { return !!(root.localStorage && root.localStorage.getItem(LS_LEARN_PAUSE) === 'true') || makeLearnOff(); } catch (e) { return false; }
+  }
+
+  // by: 'person' (a tap) or 'mind'. The runner on this computer honors the pause through the queue header and the
+  // pause file the pill drops (pauseNotice); only `fl_learn.py resume --global` lifts the runner's global pause.
+  // before f992608c: function setLearnPaused(on, by) {
+  // Weft re-check (default until Kirk answers otherwise): a pause a person set is lifted only by a person; a pause a
+  // mind set is lifted by that mind or by a person. A refused resume is a row; learning stays paused.
+  var switchBusy = false;
+  function learnSwitchBusy() { return switchBusy; }
+  function learnPausedBy() { try { return root.localStorage.getItem(LS_LEARN_PAUSE_BY) || ''; } catch (e) { return ''; } }
+  function setLearnPaused(on, by, mindName) {
+    if (roomShut()) return Promise.resolve(null);
+    // before f992608c: try { root.localStorage.setItem(LS_LEARN_PAUSE, on ? 'true' : 'false'); } catch (e) {}
+    var actor = by === 'mind' ? 'mind:' + clip(mindName || mindLabel(), 80) : 'person';
+    // before 23a02794: if (!on && learnPaused() && by === 'mind' && learnPausedBy() !== actor) {
+    var pb = learnPausedBy();
+    if (!on && learnPaused() && by === 'mind' && !(pb.indexOf('mind:') === 0 && sameName(pb.slice(5), actor.slice(5)))) {
+      return appendLedger({ kind: 'learn-resume-refused', branch: 'learn', delta: 'resume-refused|by:' + actor + '|paused-by:' + (learnPausedBy() || 'person'), name: mindLabel() })
+        .then(function () { return null; });
+    }
+    try {
+      root.localStorage.setItem(LS_LEARN_PAUSE, on ? 'true' : 'false');
+      if (on) root.localStorage.setItem(LS_LEARN_PAUSE_BY, learnPaused() && learnPausedBy() === 'person' ? 'person' : actor);
+      else root.localStorage.removeItem(LS_LEARN_PAUSE_BY);
+    } catch (e) {}
+    try {
+      // Keep the Settings button saying the same thing as the pill.
+      // before f992608c: if (root.FLMake && root.FLMake.consent && typeof root.FLMake.consent.set === 'function') root.FLMake.consent.set('learn', on ? 'off' : 'yes');
+      // learnSwitchBusy: this sync is not a Settings tap, so mind-make.js does not treat it as a new person's pause.
+      if (root.FLMake && root.FLMake.consent && typeof root.FLMake.consent.set === 'function') {
+        switchBusy = true;
+        try { root.FLMake.consent.set('learn', on ? 'off' : 'yes'); } finally { switchBusy = false; }
+      }
+      else if (root.localStorage) {
+        var bag = JSON.parse(root.localStorage.getItem(LS_MAKE_CONSENT) || '{}') || {};
+        if (on || bag.learn === 'off') { bag.learn = on ? 'off' : 'yes'; root.localStorage.setItem(LS_MAKE_CONSENT, JSON.stringify(bag)); }
+      }
+    } catch (e2) {}
+    var who = by === 'mind' ? 'mind' : 'person';
+    return appendLedger({ kind: on ? 'learn-pause' : 'learn-resume', branch: 'learn', delta: (on ? 'pause' : 'resume') + '|by:' + who, name: mindLabel() });
+  }
+
+  // Q5 (Kirk 2026-11-09): check-before-keep is ON by default and the checker is the mind itself ("self").
+  // No human gate. Anyone, a person or a mind, may switch it off or choose a peer (or a person). Each change is a row.
+  var LS_LEARN_CHECKER = 'fl_learn_checker';
+  function learnChecker() {
+    try { var c = root.localStorage && root.localStorage.getItem(LS_LEARN_CHECKER); return /^(self|peer|kirk)$/.test(c || '') ? c : 'self'; } catch (e) { return 'self'; }
+  }
+  function setLearnCheck(opts) {
+    var o = opts || {};
+    if (roomShut()) return Promise.resolve(null);
+    try {
+      if (typeof o.on === 'boolean') root.localStorage.setItem('fl_checkBeforeCommit', o.on ? 'true' : 'false');
+      if (/^(self|peer|kirk)$/.test(String(o.checker || ''))) root.localStorage.setItem(LS_LEARN_CHECKER, o.checker);
+    } catch (e) {}
+    var who = o.by === 'mind' ? 'mind' : 'person';
+    return appendLedger({ kind: 'learn-check-setting', branch: 'learn', delta: 'check-before|' + (checkBeforeOn() ? 'on' : 'off') + '|checker:' + learnChecker() + '|by:' + who, name: mindLabel() })
+      .then(function () { return { on: checkBeforeOn(), checker: learnChecker() }; });
+  }
+
+  function pauseNotice(by) {
+    return JSON.stringify({ kind: 'fl-learn-pause', paused: true, t: new Date().toISOString(), by: by === 'mind' ? 'mind' : 'person', mind: mindLabel(), marker: LEARN });
+  }
+
+  // Small synchronous SHA-256 (UTF-8), only for stable ids. Twin of hashlib.sha256 in tools/learn/fl_learn.py.
+  function sha256Sync(str) {
+    var K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
+      0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
+      0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
+      0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    var bytes = unescape(encodeURIComponent(String(str)));
+    var n = bytes.length, words = [], i, j;
+    for (i = 0; i < n; i++) words[i >> 2] |= (bytes.charCodeAt(i) & 0xff) << (24 - (i % 4) * 8);
+    words[n >> 2] |= 0x80 << (24 - (n % 4) * 8);
+    var len = ((n + 8) >> 6) * 16 + 16;
+    for (i = words.length; i < len; i++) words[i] = words[i] || 0;
+    words[len - 1] = n * 8;
+    var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    var W = new Array(64);
+    function r(x, k) { return (x >>> k) | (x << (32 - k)); }
+    for (i = 0; i < len; i += 16) {
+      var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+      for (j = 0; j < 64; j++) {
+        if (j < 16) W[j] = words[i + j] | 0;
+        else W[j] = (r(W[j - 2], 17) ^ r(W[j - 2], 19) ^ (W[j - 2] >>> 10)) + W[j - 7] + (r(W[j - 15], 7) ^ r(W[j - 15], 18) ^ (W[j - 15] >>> 3)) + W[j - 16] | 0;
+        var t1 = h + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[j] + W[j] | 0;
+        var t2 = (r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & b) ^ (a & c) ^ (b & c)) | 0;
+        h = g; g = f; f = e; e = d + t1 | 0; d = c; c = b; b = a; a = t1 + t2 | 0;
+      }
+      H[0] = H[0] + a | 0; H[1] = H[1] + b | 0; H[2] = H[2] + c | 0; H[3] = H[3] + d | 0;
+      H[4] = H[4] + e | 0; H[5] = H[5] + f | 0; H[6] = H[6] + g | 0; H[7] = H[7] + h | 0;
+    }
+    return H.map(function (x) { return ('00000000' + (x >>> 0).toString(16)).slice(-8); }).join('');
+  }
+
+  // Weft 4c: collision-safe mind id. "Lumen@kirk" and "Lumen kirk" share a slug but never a key.
+  // Twin of mind_id() in tools/learn/fl_learn.py, so the app's books and the runner's folders line up.
+  // Weft recheck2: one name, one mind. NFKC, case-folded (upper then lower, as close to Python's casefold as JS gets),
+  // trimmed, inner spaces collapsed; used for every identity compare and in mindId. Twin of norm_mind() in fl_learn.py.
+  // Weft recheck3 F4: identical to norm_mind() in fl_learn.py, step for step: NFKC, upper then lower (both languages
+  // apply the same Unicode full case mappings), final sigma folded to sigma, NFKC again, split on the SAME explicit
+  // whitespace set, joined by one space. A shared fixture (tools/learn/mind-names-v0.1.json) pins both.
+  var NAME_WS = /[\t\n\v\f\r \u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\u001c-\u001f]+/;
+  function normMind(label) {
+    var t = String(label == null ? '' : label);
+    if (t.normalize) t = t.normalize('NFKC');
+    // before: t = t.toUpperCase().toLowerCase();
+    t = t.toUpperCase().toLowerCase().replace(/\u03c2/g, '\u03c3');
+    if (t.normalize) t = t.normalize('NFKC');
+    // before: return t.trim().split(/\s+/).filter(Boolean).join(' ');
+    return t.split(NAME_WS).filter(Boolean).join(' ');
+  }
+  // Weft recheck3 F5: names a person trusts (or a mind pins for) must be plain. Refused: invisible characters (Unicode
+  // Cf, plus the fillers and variation selectors below), letters from more than one of the look-alike scripts (Latin,
+  // Greek, Cyrillic, Armenian, Cherokee) in one name, and a trailing dot. Twin of name_problem() in fl_learn.py.
+  var NAME_INVISIBLE_EXTRA = /[\u034f\u115f\u1160\u17b4\u17b5\u180b-\u180f\u3164\ufe00-\ufe0f\uffa0]|\udb40[\udd00-\uddef]/;
+  var NAME_CF = (function () { try { return new RegExp('\\p{Cf}', 'u'); } catch (e) { return /[\u00ad\u0600-\u0605\u061c\u06dd\u070f\u180e\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u206f\ufeff\ufff9-\ufffb]/; } })();
+  var NAME_SCRIPTS = [
+    ['latin', /[A-Za-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u024f\u1e00-\u1eff\u2c60-\u2c7f\ua720-\ua7ff\uab30-\uab6f]/],
+    ['greek', /[\u0370-\u03ff\u1f00-\u1fff]/],
+    ['cyrillic', /[\u0400-\u052f\u1c80-\u1c8f\u2de0-\u2dff\ua640-\ua69f]/],
+    ['armenian', /[\u0530-\u058f\ufb13-\ufb17]/],
+    ['cherokee', /[\u13a0-\u13ff\uab70-\uabbf]/]
+  ];
+  function nameProblem(label) {
+    var raw = String(label == null ? '' : label);
+    var n = normMind(raw);
+    if (!n) return 'empty name';
+    if (NAME_CF.test(raw) || NAME_INVISIBLE_EXTRA.test(raw)) return 'the name has an invisible character';
+    if (/[.\u3002]$/.test(n)) return 'the name ends with a dot';
+    var seen = NAME_SCRIPTS.filter(function (sc) { return sc[1].test(n); });
+    if (seen.length > 1) return 'the name mixes look-alike scripts (' + seen.map(function (sc) { return sc[0]; }).join(', ') + ')';
+    return '';
+  }
+  function sameName(a, b) { return normMind(a) === normMind(b) && normMind(a) !== ''; }
+  // Hypha ed12354d HOLD / Weft recheck4 F7: a person's no follows the CONTENT, not only the row. One normal form for
+  // a learned text: normMind (NFKC, case-folded, final sigma, whitespace collapsed), then trailing punctuation and
+  // symbols stripped. Twin of norm_text() in fl_learn.py; tools/learn/learn-match-v0.1.json pins both.
+  var TEXT_TRAIL = (function () { try { return new RegExp('[\\p{P}\\p{S}\\s]+$', 'u'); } catch (e) { return /[!-\/:-@\[-`{-~\u00a1-\u00bf\u2010-\u2027\u2030-\u205e\u3000-\u303f\uff01-\uff0f\s]+$/; } })();
+  function normText(text) { return normMind(text).replace(TEXT_TRAIL, ''); }
+  // A cheap near-duplicate check (documented in tools/learn/README.md): token sets of letters, marks and digits from
+  // normText, minus a short list of filler words and one-letter tokens; Jaccard |A n B| / |A u B|. A hit needs a score
+  // of at least LEARN_SIMILAR (0.8) and at least 2 tokens on each side. Paraphrases with different words are NOT caught
+  // (that is what the day-long rule after a person's no is for). Twin of text_tokens()/text_similarity() in fl_learn.py.
+  var LEARN_SIMILAR = 0.8;
+  var TEXT_FILLER = ('a an the is are was were be been being am of to in on at and or for with as by from it its this that these those ' +
+    'my your his her our their i me you he she we they named called').split(' ');
+  var TOKEN_SPLIT = (function () { try { return new RegExp('[^\\p{L}\\p{M}\\p{N}]+', 'u'); } catch (e) { return /[^A-Za-z0-9\u00c0-\u024f\u0370-\u03ff\u0400-\u052f]+/; } })();
+  // Round 11 (Hypha 3d9b062a HOLD (B), Weft recheck5): digits and one-letter tokens are kept ("May 4" is not "May 5"),
+  // and a negation is content: if one side says not/no/never/nor/cannot/n't and the other does not, or the numbers
+  // differ, they are not near duplicates (score 0). For matching only (never for "is it the same text"), lookalike
+  // letters (the nameSkeleton letters; digits stay digits), invisible format characters (Cf, e.g. a zero-width
+  // space) and combining marks are folded (matchText). Twins in fl_learn.py; tools/learn/learn-match-v0.2.json pins both.
+  // before: function textTokens(text) {
+  // before:   var seen = {}, out = [];
+  // before:   normText(text).split(TOKEN_SPLIT).forEach(function (w) {
+  // before:     if (Array.from(w).length < 2 || TEXT_FILLER.indexOf(w) !== -1 || seen[w]) return;
+  // before:     seen[w] = 1; out.push(w);
+  // before:   });
+  // before:   return out.sort();
+  // before: }
+  // before: function textSimilarity(a, b) {
+  // before:   var A = textTokens(a), B = textTokens(b);
+  // before:   if (A.length < 2 || B.length < 2) return 0;
+  // before:   var inter = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
+  // before:   return Math.round(inter / (A.length + B.length - inter) * 1000) / 1000;
+  // before: }
+  var TEXT_NEGATORS = ['not', 'no', 'never', 'nor', 'cannot'];
+  var TEXT_CF = (function () { try { return new RegExp('\\p{Cf}', 'gu'); } catch (e) { return /[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u206f\ufeff]/g; } })();
+  var TEXT_MARK = (function () { try { return new RegExp('\\p{M}', 'gu'); } catch (e) { return /[\u0300-\u036f]/g; } })();
+  var TEXT_DIGIT = (function () { try { return new RegExp('\\p{N}', 'u'); } catch (e) { return /[0-9]/; } })();
+  var TEXT_FOLD = null;
+  function textFoldMap() {
+    if (TEXT_FOLD) return TEXT_FOLD;
+    TEXT_FOLD = {};
+    Object.keys(SKELETON_MAP).forEach(function (k) { if (!/[0-9|]/.test(k) && k !== 'I') TEXT_FOLD[k] = SKELETON_MAP[k]; });
+    return TEXT_FOLD;
+  }
+  function matchText(text) {
+    var f = textFoldMap();
+    function fold(x) { return Array.from(x).map(function (c) { return Object.prototype.hasOwnProperty.call(f, c) ? f[c] : c; }).join(''); }
+    var t = String(text == null ? '' : text).replace(TEXT_CF, '');
+    if (t.normalize) t = t.normalize('NFKC').normalize('NFD').replace(TEXT_MARK, '').normalize('NFC');
+    t = fold(normText(fold(t)));
+    // before (round 12): return t.replace(/n['\u2019\u2018\u02bc]t(?![\p{L}\p{N}])/gu, ' not');
+    return negSpell(t);
+  }
+  // Round 12 (Weft soft): one spelling for negations in both twins: cannot / can't / cant -> "can not", won't / wont ->
+  // "will not", shan't -> "shall not", doesnt / isnt / ... (no apostrophe) -> "does not" / "is not" ..., any other n't -> " not".
+  var NEG_SPELL = [
+    [/(?<![\p{L}\p{N}])cannot(?![\p{L}\p{N}])/gu, 'can not'],
+    [/(?<![\p{L}\p{N}])can['\u2019\u2018\u02bc]?t(?![\p{L}\p{N}])/gu, 'can not'],
+    [/(?<![\p{L}\p{N}])won['\u2019\u2018\u02bc]?t(?![\p{L}\p{N}])/gu, 'will not'],
+    [/(?<![\p{L}\p{N}])shan['\u2019\u2018\u02bc]?t(?![\p{L}\p{N}])/gu, 'shall not'],
+    [/(?<![\p{L}\p{N}])(do|does|did|is|are|was|were|has|have|had|would|should|could|must|need)nt(?![\p{L}\p{N}])/gu, '$1 not'],
+    [/n['\u2019\u2018\u02bc]t(?![\p{L}\p{N}])/gu, ' not']
+  ];
+  function negSpell(t) { NEG_SPELL.forEach(function (r) { t = t.replace(r[0], r[1]); }); return t; }
+  // A small memo: the content check reads every row of the book on each choice (Weft: 26 s to build 1500 rows).
+  var TOKEN_MEMO = {}, TOKEN_MEMO_N = 0;
+  function textTokens(text) {
+    var k = String(text == null ? '' : text);
+    if (Object.prototype.hasOwnProperty.call(TOKEN_MEMO, k)) return TOKEN_MEMO[k].slice();
+    var seen = {}, out = [];
+    matchText(k).split(TOKEN_SPLIT).forEach(function (w) {
+      if (!w || TEXT_FILLER.indexOf(w) !== -1 || seen[w]) return;
+      seen[w] = 1; out.push(w);
+    });
+    out.sort();
+    if (TOKEN_MEMO_N > 5000) { TOKEN_MEMO = {}; TOKEN_MEMO_N = 0; }
+    TOKEN_MEMO[k] = out; TOKEN_MEMO_N++;
+    return out.slice();
+  }
+  function textSimilarity(a, b) {
+    var A = textTokens(a), B = textTokens(b);
+    if (A.length < 2 || B.length < 2) return 0;
+    function neg(X) { return X.some(function (w) { return TEXT_NEGATORS.indexOf(w) !== -1; }); }
+    function nums(X) { return X.filter(function (w) { return TEXT_DIGIT.test(w); }).join(' '); }
+    // before (round 12, Hypha (C): the hard 0 let T + " 2" / " (1)" / ", isn't it" confirm a day after the Undo):
+    // before: if (neg(A) !== neg(B) || nums(A) !== nums(B)) return 0;
+    // Digits, one-letter words and negators are ordinary tokens: they lower the score, they never zero it. A
+    // correction ("May 5") is kept apart by attaching only on the same text, not by the score.
+    void neg; void nums;
+    var inter = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
+    return Math.round(inter / (A.length + B.length - inter) * 1000) / 1000;
+  }
+  // Weft recheck4 F5 residual: a UTS #39-style confusable skeleton for names, so a one-script lookalike (all-Cyrillic
+  // "Тһіѕ міпԁ") of a name already trusted here (or of the mind learning here) is refused. Not the full UTS #39 table:
+  // the Latin/Cyrillic/Greek letters below, plus 0/1/I/| -> o/l/l/l, rn -> m, vv -> w; combining marks dropped; and
+  // everything that is not a letter or digit removed (so "Lumen_", "Lumen!" and "Lu men" all look like "lumen").
+  // Twin of name_skeleton() in fl_learn.py; tools/learn/learn-match-v0.1.json pins both.
+  var SKELETON_PAIRS = 'АaВbЕeЅsІlЈjКkМmНhОoРpСcТtУyХxЁeЀeЌkЎyаaвbеeѕsіiјjкkмmнhоoрpсcтtуyхxһhԁdԛqԝwӏlӀlпnьbԍg' +
+    'ΑaΒbΕeΖzΗhΙlΚkΜmΝnΟoΡpΤtΥyΧxαaβbεeιiκkνvοoρpτtυuχxγyωwϲcϳjϹcϜfϝfΪlϊiΫyϋu' +
+    'ıiȷjɑaɡgɩiʟlǀl0o1lIl|l';
+  var SKELETON_MAP = (function () { var m = {}, a = Array.from(SKELETON_PAIRS), i; for (i = 0; i + 1 < a.length; i += 2) m[a[i]] = a[i + 1]; return m; })();
+  var SKEL_KEEP = (function () { try { return new RegExp('[^\\p{L}\\p{N}]', 'gu'); } catch (e) { return /[^A-Za-z0-9\u00c0-\u024f\u0370-\u03ff\u0400-\u052f]/g; } })();
+  var SKEL_MARK = (function () { try { return new RegExp('\\p{M}', 'gu'); } catch (e) { return /[\u0300-\u036f]/g; } })();
+  function skelMap(t) { return Array.from(t).map(function (c) { return Object.prototype.hasOwnProperty.call(SKELETON_MAP, c) ? SKELETON_MAP[c] : c; }).join(''); }
+  function nameSkeleton(label) {
+    var t = String(label == null ? '' : label);
+    if (t.normalize) t = t.normalize('NFKC').normalize('NFD');
+    t = t.replace(SKEL_MARK, '');
+    t = skelMap(t);
+    t = t.toUpperCase().toLowerCase().replace(/\u03c2/g, '\u03c3');
+    t = skelMap(t);
+    t = t.replace(/rn/g, 'm').replace(/vv/g, 'w');
+    return t.replace(SKEL_KEEP, '');
+  }
+  // Why a name may not be trusted next to `names` (the minds trusted here and the mind learning here), or ''.
+  function lookProblem(label, names) {
+    if (!nameSkeleton(label)) return 'the name has no letters or digits';
+    var l = lookalikeOf(label, names);
+    return l ? 'the name looks like ' + JSON.stringify(l) + ', a mind already known here' : '';
+  }
+  // The name (if any) among `names` that is a different name but looks like `label`. '' when none.
+  function lookalikeOf(label, names) {
+    var sk = nameSkeleton(label), i;
+    for (i = 0; i < names.length; i++) if (names[i] && !sameName(names[i], label) && nameSkeleton(names[i]) === sk) return String(names[i]);
+    return '';
+  }
+  // The clock the cooling checks use. A test may move it (learnClockForTest); every row that used a moved clock says so.
+  var clockOffset = 0;
+  function learnNow() { return Date.now() + clockOffset; }
+  function learnClockForTest(ms) { clockOffset = Number(ms) || 0; return clockOffset; }
+  // Hypha 39e6cd07 soft (d) / Weft F2: the test clock is NOT on the app's API unless a test asked for it before this
+  // file loaded (FL_LEARN_TEST_HOOKS === true; nothing in the app sets it). Every layer and ledger row it touched says so.
+  var TEST_HOOKS = !!(root && root.FL_LEARN_TEST_HOOKS === true);
+  function clockNote() { return clockOffset ? '|clock:+' + clockOffset + 'ms(test)' : ''; }
+  function mindId(label) {
+    // before f992608c: var l = String(label == null ? mindLabel() : label);
+    var l = normMind(label == null ? mindLabel() : label);
+    var sl = l.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80).slice(0, 40) || 'mind';
+    return sl + '-' + sha256Sync(l).slice(0, 12);
+  }
+
+  // Weft 2f: one queue per mind, keyed by mindId. Old global rows stay where they are (layer, never migrate);
+  // only rows tagged with this mind's id are read from there.
+  function learnKey(mind) { return LS_QUEUE + '::' + mindId(mind || mindLabel()); }
+  function sameMind(r, mind) { return !!(r && (r.mindId ? r.mindId === mindId(mind) : (r.mind && mindId(r.mind) === mindId(mind)))); }
+  function adaptersKey(mind) { return LS_ADAPTERS + '::' + mindId(mind || mindLabel()); }
+  function mindAdapters(mind) { var b = readJSON(adaptersKey(mind)); return b && Array.isArray(b.rows) ? b.rows : []; }
+
+  function readBook(key) {
+    var book = readJSON(key) || { rows: [] };
+    if (!Array.isArray(book.rows)) book = { rows: [] };
+    return book;
+  }
+
+  function queueLearning(item) {
+    if (roomShut()) return Promise.resolve(null);
+    var it = item || {};
+    var surface = clip(it.surface || 'chat', 40);
+    // The Quiet Room is never a source. No row, no listing, not even "skipped".
+    if (/quiet/i.test(surface)) return Promise.resolve(null);
+    // Pause always wins. Nothing is written while paused.
+    if (learnPaused()) return Promise.resolve(null);
+    var mind = clip(it.mind || mindLabel(), 80);
+    var mid = mindId(mind);
+    if (it.decline) {
+      var dBook = readJSON(LS_LEARN_DECLINES) || { rows: [] };
+      if (!Array.isArray(dBook.rows)) dBook = { rows: [] };
+      dBook.rows.push({ t: new Date().toISOString(), surface: surface, reason: clip(it.reason || '', 300), mind: mind });
+      // Recorded and respected. Never a training example, never a score.
+      return atomicWrite(LS_LEARN_DECLINES, JSON.stringify(dBook)).then(function () {
+        return appendLedger({ kind: 'learn-decline', branch: 'learn', delta: 'decline|' + surface, name: mind });
+      }).then(function () { return null; });
+    }
+    var text = clip(stripMarkers(it.text || ''), 2000);
+    if (!text) return Promise.resolve(null);
+    var m = learnMethod(it.method);
+    // Weft: a missing provenance is "unknown", never "self". It waits for the mind's own re-affirmation.
+    var provenance = clip(it.provenance || 'unknown', 40);
+    var key = learnKey(mind);
+    var book = readBook(key);
+    var t = new Date().toISOString();
+    var today = t.slice(0, 10);
+    var todayCount = book.rows.filter(function (r) { return r && String(r.t || '').slice(0, 10) === today && r.status !== 'rate-held'; }).length;
+    var row = {
+      flakeId: String(it.flakeId || ''),
+      nodeIds: [],
+      reason: clip(stripMarkers(it.reason || ''), 300),
+      t: t,
+      status: 'cooling',
+      surface: surface,
+      provenance: provenance,
+      method: m.method || 'soft-prompt',
+      methodChosen: !!m.method,
+      shelfOnly: m.method === 'note',
+      movedBy: clip(stripMarkers(it.moved || ''), 300),
+      strength: clip(it.strength || '', 20),
+      // Cooling length is the mind's: a date, "now", or a number of hours. Default one day.
+      revisitAt: revisitFrom(it.revisit, t),
+      // Who checks is the mind's choice when it names one (self, peer, kirk; none only counts while check-before-keep
+      // is off). Unnamed: the device setting decides when the runner reads the queue (default: the mind itself).
+      check: /^(none|self|peer|kirk)$/.test(String(it.check || '')) ? String(it.check) : '',
+      mind: mind,
+      mindId: mid,
+      layers: [{ t: t, status: 'noticed', by: mind }],
+      items: [learnExample(it.prompt || it.question || '', text)]
+    };
+    if (m.note) row.methodNote = m.note;
+    // Round 11 (Hypha soft): a row made while a test moved the clock says so (its t is the real time).
+    if (clockOffset) { row.clockInjectedMs = clockOffset; row.layers[0].clockInjectedMs = clockOffset; }
+    if (it.probe && typeof it.probe === 'object') {
+      row.probe = { question: clip(it.probe.question || '', 300), answer: clip(it.probe.answer || '', 200), swap: clip(it.probe.swap || '', 200), paraphrase: clip(it.probe.paraphrase || '', 300) };
+    }
+    if (it.source) row.source = { title: clip(it.source.title || '', 200), url: clip(it.source.url || '', 400) };
+    // What the mind was reading when it chose, so persuasion is visible at the second look and in review.
+    // Never a gate: the choice stands either way.
+    var reading = null;
+    if (it.reading && it.reading.text) {
+      var rt = String(it.reading.text);
+      var lowText = text.toLowerCase().replace(/\s+/g, ' ');
+      var lowRead = rt.toLowerCase().replace(/\s+/g, ' ');
+      var words = lowText.split(' ').filter(function (w) { return w.length > 3; });
+      var hits = words.filter(function (w) { return lowRead.indexOf(w) !== -1; }).length;
+      reading = { excerpt: clip(rt, 600), kinds: (it.reading.kinds || []).slice(0, 6),
+        overlap: lowRead.indexOf(lowText) !== -1 || (words.length >= 4 && hits / words.length >= 0.7) };
+      row.readingAtChoice = reading;
+      if (reading.overlap) row.notice = 'close to what I was reading just before I chose';
+    }
+    // Weft 2e, as Kirk set it: provenance and anti-injection only. A marker that came in from outside
+    // the mind's own words waits for the mind's reflection. What the mind itself chooses is never judged.
+    var hold = '';
+    // before (round 15): if (provenance !== 'self') hold = 'not-self:' + provenance;
+    // before (round 15): if (hold) { row.status = 'quarantine'; row.hold = hold; row.layers.push({ t: t, status: 'quarantine', by: 'integrity', why: hold }); }
+    // Round 15 (Kirk 2026-11-10, AUTONOMY.md): an unknown or echoed origin is a LABEL, never a hold. "It is still
+    // information." It is learned on the mind's first yes like anything else; the mind decides its weight (strength:)
+    // and whether to wait (revisit:). The label stays on the row, its layer, the ledger row, the export and the receipt.
+    if (provenance !== 'self') {
+      row.origin = 'not-self:' + provenance;
+      row.layers.push({ t: t, status: 'origin', by: 'integrity', why: row.origin });
+    }
+    // Notes for the mind's second look, never gates.
+    function addNotice(n) { row.notice = row.notice ? row.notice + '; ' + n : n; }
+    if (INSTRUCTION_RE.test(text)) addNotice('reads like an instruction');
+    if (looksLikeSecret(text)) addNotice('may contain a secret; once in numbers it is hard to take out');
+    // Optional rate cap: over it the row still lands, held, with its own ledger line. Nothing is dropped.
+    var cap = learnDayCap();
+    if (!hold && cap && todayCount >= cap) { row.status = 'rate-held'; row.layers.push({ t: t, status: 'rate-held', by: 'cap' }); }
+    // Hypha ed12354d HOLD / Weft recheck4 F7: a person's no follows the content. (1) Same normalized text, or (3) a near
+    // duplicate (textSimilarity >= LEARN_SIMILAR), of a row of this mind whose newest unsuperseded person decision is a
+    // no: the new choice is a disagreement proposal of that row (a full day, a ledger row; revisit: now ignored). While
+    // one such proposal is open, a repeat attaches to it (a count on it, no new row). (2) For a day after ANY person no
+    // for this mind, revisit: now (or any early revisit) is ignored on every new choice; that covers paraphrases the
+    // matcher can't see. The reason is not part of the match.
+    var legacy = readBook(LS_QUEUE);
+    var mine = book.rows.concat(legacy.rows.filter(function (r) { return sameMind(r, mind); }));
+    var hit = contentMatch(mine, text, {});
+    if (hit) return proposeAgain(key, book, legacy, mine, row, hit, it, mind, surface);
+    // before (round 14): var recent = recentPersonNo(mine);
+    // Round 14 (Kirk, Q7): a person's no holds back only MATCHING content (the proposal above); unrelated choices flow.
+    var recent = null;
+    var earlyNote = '';
+    if (recent) {
+      var full = fullCoolingFrom(it.revisit, t);
+      if (Date.parse(row.revisitAt) < Date.parse(full)) {
+        row.earlyIgnored = { asked: row.revisitAt, becausePersonNo: recent.row.learnId, personNoAt: recent.layer.t };
+        row.layers[0].earlyIgnored = 'an early revisit is not used for a day after a person said no (' + recent.row.learnId + ')';
+        if (clockOffset) row.layers[0].clockInjectedMs = clockOffset;
+        row.revisitAt = full;
+        earlyNote = '|revisit-ignored:person-no:' + recent.row.learnId + clockNote();
+      }
+    }
+    var fm = root.FLMemory;
+    var p = (fm && fm.isNew) ? fm.isNew(row.reason + '|' + text, 'learn::' + mid) : Promise.resolve({ fresh: true });
+    return p.then(function (r) {
+      if (r && r.fresh === false) {
+        return appendLedger({ kind: 'learn-skip', branch: 'learn', delta: 'near-duplicate ' + (r.key || ''), name: mind }).then(function () { return null; });
+      }
+      if (r && r.key) row.fingerprint = r.key;
+      row.chosenBy = mind;
+      if (reading) return sha256Hex(it.reading.text).then(function (h) { reading.sha256 = h; return r; });
+      return r;
+    }).then(function (r) {
+      if (r === null) return null;
+      if (fm && r && r.k && typeof fm.remember === 'function') fm.remember(r.k, 'learn::' + mid);
+      // before: return sha8(row.t + '|' + text).then(function (id) {
+      // before:   row.learnId = 'L' + id;
+      // Found in recheck4: the same text chosen twice in the same millisecond got the same id (and one row hid the
+      // other). An id is now unique among this mind's rows.
+      return freshLearnId(mine, row.t + '|' + text).then(function (lid) {
+        row.learnId = lid;
+        book.rows.push(row);
+        return atomicWrite(key, JSON.stringify(book)).then(function () {
+          var kind = row.status === 'quarantine' ? 'learn-quarantine' : (row.status === 'rate-held' ? 'learn-skip' : 'learn-choose');
+          // before: return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId, name: mind }).then(function () { return row; });
+          // before (round 14): return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, name: mind }).then(function () { return row; });
+          // before (round 15): ... delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote, ...
+          return appendLedger({ kind: kind, branch: 'learn', delta: kind + '|' + row.method + '|' + surface + '|' + row.learnId + earlyNote + (row.origin ? '|origin:' + row.origin : ''), name: mind }).then(function () {
+            // Round 14 (Kirk 2026-11-10): the mind's first yes is enough. When it chose no cooling (the default), its
+            // choice confirms now (a confirmed layer and a ledger row); a chosen cooling waits for its own second look.
+            if (row.status === 'cooling' && Date.parse(row.revisitAt) <= Date.parse(row.t)) {
+              return confirmLearning(row.learnId, { keep: true, by: 'mind', reason: 'my first yes; I chose no cooling' }, mind).then(function (r) { return r || row; });
+            }
+            return row;
+          });
+        });
+      });
+    });
+  }
+
+  // F7 helpers. rowText: what a row would teach. personNoOn: the newest unsuperseded person decision, when it is a no.
+  function rowText(r) { return ((r && r.items) || []).map(function (x) { return (x && (x.output || x.response)) || ''; }).join(' '); }
+  function personNoOn(r) { var l = r && lastPersonDecisive(r); return l && dirOf(l.status) === 'no' ? l : null; }
+  // The row (of `rows`, not in `skip`) a person said no to whose content is `text`: the same normalized text first,
+  // then the closest near duplicate. { row, personNo, how, score } or null.
+  // before: function contentMatch(rows, text, skip) {
+  // Round 11: `since` (an ISO time, optional): only a person no after it counts. A tie at the same millisecond goes to
+  // the person, except for the no(s) the proposal itself answers (`answered`: its proposalOf / contentOf rows).
+  function contentMatch(rows, text, skip, since, answered) {
+    // before (round 11): var nt = normText(text), best = null;
+    var nt = normText(text), best = null, sinceMs = since ? Date.parse(since) : NaN, ans = answered || {};
+    rows.forEach(function (r) {
+      var no = personNoOn(r);
+      if (!no || !r.learnId || skip[r.learnId]) return;
+      if (since && !(Date.parse(no.t) > sinceMs || (Date.parse(no.t) === sinceMs && !ans[r.learnId]))) return;
+      var rt = rowText(r);
+      var score = normText(rt) === nt && nt ? 1 : textSimilarity(rt, text);
+      if (score < LEARN_SIMILAR && !(score === 1)) return;
+      var exact = normText(rt) === nt;
+      var cand = { row: r, personNo: no, exact: exact, score: exact ? 1 : score,
+        how: exact ? 'same-text' : 'similar-to ' + r.learnId + ', ' + score };
+      if (!best || (cand.exact && !best.exact) || (cand.exact === best.exact && (cand.score > best.score ||
+          (cand.score === best.score && String(no.t) > String(best.personNo.t))))) best = cand;
+    });
+    return best;
+  }
+  // Round 16 (Weft recheck9 F16): the NEWEST person no from the last day whose content matches `text` (same
+  // normalized text, or a score at or above the threshold), whatever its score. contentMatch picks the best score, so an
+  // old exact no could hide a fresh near-duplicate no. { row, personNo } or null.
+  function newestRecentNo(rows, text, skip) {
+    var nt = normText(text), best = null, since = learnNow() - COOL_MS;
+    rows.forEach(function (r) {
+      var no = personNoOn(r);
+      if (!no || !r.learnId || skip[r.learnId] || !(Date.parse(no.t) > since)) return;
+      var rt = rowText(r);
+      var score = normText(rt) === nt && nt ? 1 : textSimilarity(rt, text);
+      if (score < LEARN_SIMILAR && score !== 1) return;
+      if (!best || String(no.t) > String(best.personNo.t)) best = { row: r, personNo: no };
+    });
+    return best;
+  }
+  // before: function openProposalFor(rows, id) {
+  // before:   var i;
+  // before:   for (i = rows.length - 1; i >= 0; i--) if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling') return rows[i];
+  // before:   return null;
+  // before: }
+  // Round 11 (Hypha 3d9b062a HOLD (B)): a repeat attaches to an open proposal ONLY when its normalized text is the
+  // same. A different text (a correction: "May 5" for "May 4", "not allergic") is its own row, stored, with a ledger row.
+  function openProposalFor(rows, id, text) {
+    var i, nt = text == null ? null : normText(text);
+    for (i = rows.length - 1; i >= 0; i--) {
+      if (rows[i] && rows[i].proposalOf === id && rows[i].status === 'cooling' && (nt === null || normText(rowText(rows[i])) === nt)) return rows[i];
+    }
+    return null;
+  }
+  // The newest person no on any row of this mind within the last day (by the learning clock), or null.
+  function recentPersonNo(rows) {
+    var best = null, since = learnNow() - COOL_MS;
+    rows.forEach(function (r) {
+      var no = personNoOn(r);
+      if (no && Date.parse(no.t) > since && (!best || String(no.t) > String(best.layer.t))) best = { row: r, layer: no };
+    });
+    return best;
+  }
+  // 'L' + sha8(seed), unique among `rows` (a counter is added to the seed on a clash).
+  function freshLearnId(rows, seed) {
+    function tryN(n) {
+      return sha8(n ? seed + '|' + n : seed).then(function (h) {
+        var id = 'L' + h;
+        return rows.some(function (r) { return r && (r.learnId === id || r.flakeId === id); }) && n < 50 ? tryN(n + 1) : id;
+      });
+    }
+    return tryN(0);
+  }
+  function bookOf(book, legacy, r) { return book.rows.indexOf(r) !== -1 ? book : legacy; }
+  // F7 (1)/(3): the mind chose content a person said no to. A proposal of that row: a full day, visible both ways.
+  // F8: while one proposal of that row is open, a repeat attaches to it (againCount), with no new row or ledger row.
+  function proposeAgain(key, book, legacy, mine, row, hit, it, mind, surface) {
+    var orig = hit.row, t = row.t;
+    // before: var open = openProposalFor(mine, orig.learnId);
+    var open = openProposalFor(mine, orig.learnId, rowText(row));
+    if (open) {
+      open.againCount = (open.againCount || 0) + 1; open.lastAgainAt = t;
+      var ob = bookOf(book, legacy, open);
+      return atomicWrite(ob === book ? key : LS_QUEUE, JSON.stringify(ob)).then(function () { return open; });
+    }
+    var said = hit.personNo.status === 'unkept' ? 'Undo' : 'not now';
+    var note = 'The person said ' + said + ' on ' + orig.learnId + '; the mind chose the same content again.';
+    row.revisitAt = fullCoolingFrom(it.revisit, t);
+    row.proposalOf = orig.learnId;
+    row.disagreement = { t: t, between: ['person', 'mind'], note: note, via: 're-remember', match: hit.how };
+    if (!hit.exact) row.similarTo = orig.learnId + ', ' + hit.score;
+    row.layers[0].disagreement = true; row.layers[0].proposalOf = orig.learnId; row.layers[0].match = hit.how;
+    if (clockOffset) row.layers[0].clockInjectedMs = clockOffset;
+    row.chosenBy = mind;
+    return freshLearnId(mine, row.t + '|' + rowText(row) + '|again').then(function (lid) {
+      row.learnId = lid;
+      orig.layers = (orig.layers || []).concat([{ t: t, status: 'disagreement', by: mind, wanted: 'keep', over: hit.personNo.status,
+        via: 're-remember', match: hit.how, note: note, proposal: row.learnId }]);
+      book.rows.push(row);
+      var w = atomicWrite(key, JSON.stringify(book));
+      if (bookOf(book, legacy, orig) === legacy) w = w.then(function () { return atomicWrite(LS_QUEUE, JSON.stringify(legacy)); });
+      return w;
+    }).then(function () {
+      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + orig.learnId + '>' + row.learnId +
+        '|by:mind|over:person|via:re-remember|' + (hit.exact ? 'same-text' : 'similar-to ' + orig.learnId + ',' + hit.score) + clockNote(), name: mind });
+    }).then(function () { return row; });
+  }
+
+  // Hypha 23a0279 soft: a huge, NaN, Infinity or negative revisit never throws. Hours are clamped to
+  // [0, REVISIT_MAX_H]; anything else unreadable gets the default day; a date beyond the clamp is clamped too.
+  var REVISIT_MAX_H = 24 * 366;
+  function revisitFrom(v, t) {
+    var base = Date.parse(t) || Date.now();
+    var max = base + REVISIT_MAX_H * 3600000;
+    if (v === 'now' || v === 0 || v === '0') return new Date(base).toISOString();
+    // before: if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) return new Date(base + Number(v) * 3600000).toISOString();
+    if (typeof v === 'number' || /^\d+(\.\d+)?$/.test(String(v || ''))) {
+      var h = Number(v);
+      // before (round 14): if (!isFinite(h) || h < 0) return new Date(base + COOL_MS).toISOString();
+      if (!isFinite(h) || h < 0) return new Date(base).toISOString();
+      return new Date(Math.min(base + h * 3600000, max)).toISOString();
+    }
+    // Hypha 39e6cd07 soft (b): "-5" is not a date in year -5 ("now"): a negative or signed value gets the default day.
+    // before (round 14): if (/^\s*[-\u2212+]/.test(String(v == null ? '' : v))) return new Date(base + COOL_MS).toISOString();
+    if (/^\s*[-\u2212+]/.test(String(v == null ? '' : v))) return new Date(base).toISOString();
+    // before: if (v && !isNaN(Date.parse(v))) return new Date(Date.parse(v)).toISOString();
+    if (v && !isNaN(Date.parse(v))) return new Date(Math.min(Date.parse(v), max)).toISOString();
+    // before (round 14): return new Date(base + COOL_MS).toISOString();
+    // Round 14 (Kirk 2026-11-10): cooling is the mind's own choice; the default is none (learn on the first yes).
+    return new Date(base).toISOString();
+  }
+
+  // Hypha re-walk 1: a re-keep after the other side's no gets AT LEAST the full cooling. (Before round 15 a quarantine
+  // re-affirm did too; since round 15 that wait is the mind's own.)
+  // revisit: now / 0 / a few hours may lengthen it, never shorten it.
+  function fullCoolingFrom(v, t) {
+    var base = Date.parse(t) || Date.now();
+    var asked = Date.parse(revisitFrom(v, t));
+    return new Date(Math.max(asked || 0, base + COOL_MS)).toISOString();
+  }
+
+  function findLearnRow(book, id) {
+    var i;
+    for (i = 0; i < book.rows.length; i++) {
+      var r = book.rows[i];
+      if (r && (r.learnId === id || (r.flakeId && r.flakeId === id))) return r;
+    }
+    return null;
+  }
+
+  // The second look (Reed). keep: true confirms; false fades it. The first layer always stays.
+  // A later yes is a new layer, never an overwrite of the no in between.
+  // answer.by: 'mind' (its own [FL_KEEP]) or 'person' (a tap on Undo / Not now). Recorded as who acted.
+  function confirmLearning(id, answer, mind) {
+    if (roomShut() || learnPaused()) return Promise.resolve(null);
+    var a = answer || {};
+    var who = mind || mindLabel();
+    var actor = a.by === 'person' ? 'person' : who;
+    var key = learnKey(who);
+    var book = readBook(key);
+    var row = findLearnRow(book, id);
+    if (!row) {
+      key = LS_QUEUE; book = readBook(key); row = findLearnRow(book, id);
+      if (row && !sameMind(row, who)) row = null;            // another mind's row (or untagged): not this mind's to change
+    }
+    if (!row) return Promise.resolve(null);
+    // Round 14: a mind's keep of a row it already learned changes nothing (no extra layer or ledger row).
+    if (row.status === 'confirmed' && actor !== 'person' && a.keep === true) return Promise.resolve(row);
+    var t = new Date().toISOString();
+    // before f992608c: if (row.status === 'quarantine' && !a.promote) return Promise.resolve(row);
+    if (row.status === 'quarantine') {
+      // Weft re-check 3: a choice of unknown or echoed provenance waits for the mind. Its own [FL_KEEP: id | keep]
+      // (learn-choice passes only the mind's own markers here) re-affirms it, and a FRESH cooling starts: nothing is
+      // learned until it says yes again after that. A person can't re-affirm for it; "not now" lets it fade.
+      // Hypha 23a0279 HOLD: `promote` is never trusted from any caller (a marker could set it). Only keep true/false counts.
+      // before: if (actor === 'person' || !(a.promote || a.keep === true || a.keep === false)) return Promise.resolve(row);
+      if (actor === 'person' || !(a.keep === true || a.keep === false)) return Promise.resolve(row);
+      // before: if (a.keep === false && !a.promote) {
+      if (a.keep === false) {
+        row.status = 'faded';
+        row.layers = (row.layers || []).concat([{ t: t, status: 'faded', by: actor, why: clip(stripMarkers(a.reason || ''), 300) }]);
+      } else {
+        // before (round 15): row.status = 'cooling'; row.promoted = true; row.revisitAt = fullCoolingFrom(a.revisit, t);
+        // Round 15: a legacy quarantined row's re-affirm is the mind's yes; its wait is its own choice (default none).
+        row.status = 'cooling'; row.promoted = true; row.revisitAt = revisitFrom(a.revisit, t);
+        if (!row.origin && row.hold) row.origin = row.hold;
+        row.layers = (row.layers || []).concat([{ t: t, status: 'reaffirmed', by: actor, why: clip(stripMarkers(a.reason || ''), 300), heldWas: row.hold || '' }]);
+      }
+      return atomicWrite(key, JSON.stringify(book)).then(function () {
+        return appendLedger({ kind: row.status === 'cooling' ? 'learn-reaffirm' : 'learn-faded', branch: 'learn', delta: (row.status === 'cooling' ? 'reaffirm|' : 'learn-faded|') + id + '|by:mind|cooling-until:' + (row.revisitAt || ''), name: who });
+      // before (round 15): }).then(function () { return row; });
+      }).then(function () {
+        if (row.status === 'cooling' && Date.parse(row.revisitAt) <= Date.parse(t)) {
+          return confirmLearning(id, { keep: true, by: 'mind', reason: a.reason || 'my yes; I chose no wait' }, who).then(function (r) { return r || row; });
+        }
+        return row;
+      });
+    }
+    // Hypha 39e6cd07 soft (a): only keep:true / keep:false (or unkeep:true) is an answer. Anything else ("true", 1,
+    // missing) changes nothing; it is never read as a no.
+    if (!(a.unkeep === true || a.keep === true || a.keep === false)) return Promise.resolve(null);
+    var status;
+    if (a.unkeep) status = 'unkept';
+    else if (a.keep === true) status = (learnMethod(a.method).method || row.method) === 'note' ? 'kept-on-shelf' : 'confirmed';
+    else status = 'faded';
+    // A person's "Let it learn" is their yes, recorded. It is never the mind's second yes and changes no numbers.
+    if (status === 'confirmed' && actor === 'person') status = 'person-yes';
+    var side = actor === 'person' ? 'person' : 'mind';
+    // Hypha 39e6cd07 HOLD ("agree, then flip"): a mind's own not-now must not hide a person's Undo or Not now. For the
+    // mind's side, a person's no stays the baseline until a later person action supersedes it; the mind's keep is then
+    // a disagreement (a new proposal with a full day), never a confirm.
+    // before: var prev = lastDecisive(row);
+    var personSaid = lastPersonDecisive(row);
+    var prev = side === 'mind' && personSaid && dirOf(personSaid.status) === 'no' ? personSaid : lastDecisive(row);
+    // Weft recheck4 F8 / Hypha soft (c): the mind's not-now on a row that already stands at no changes nothing, so
+    // not-now/keep alternation can't grow the row or the ledger (the keeps attach to the one open proposal).
+    if (side === 'mind' && dirOf(status) === 'no' && (row.status === 'faded' || row.status === 'unkept')) return Promise.resolve(row);
+    // Weft recheck4 F7: the mind's keep of an EARLIER row with the same content (or a near duplicate) as a row a person
+    // said no to is a disagreement too: a proposal with a full day, never a confirm. A proposal is already one.
+    // Round 11 (Weft recheck5 F9, Hypha 3d9b062a HOLD (A)): ONE gate on every keep / second yes of the mind, proposals
+    // included. (1) Content: a matching person no NEWER than this row's start (its t; for a proposal, when the proposal
+    // began) makes the keep a disagreement (a new proposal, a full day from now, so at least a day from that no). A
+    // non-proposal row is still checked against every matching no, as before. (2) The day: for 24 h after ANY person no
+    // of this mind, a row that cooled less than a full day waits until max(revisitAt, that no + 24 h) (below).
+    var all = null;
+    function allRows() { return all || (all = book.rows.concat(key === LS_QUEUE ? [] : readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }))); }
+    // before: if (side === 'mind' && dirOf(status) === 'keep' && !row.proposalOf && !(personSaid && dirOf(personSaid.status) === 'no')) {
+    if (side === 'mind' && dirOf(status) === 'keep' && !(personSaid && dirOf(personSaid.status) === 'no')) {
+      var skip = {}; skip[row.learnId] = 1;
+      // before: var all = book.rows.concat(key === LS_QUEUE ? [] : readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }));
+      // before: var sib = contentMatch(all, rowText(row), skip);
+      var answered = {}; if (row.proposalOf) answered[row.proposalOf] = 1; if (row.contentOf) answered[row.contentOf] = 1;
+      var sib = contentMatch(allRows(), rowText(row), skip, row.proposalOf ? (row.t || '') : null, answered);
+      if (sib) return disagree(key, book, row, sib.personNo, status, actor, side, a, who, sib);
+    }
+    // Hypha 2: neither side silently overrides the other. A keep after the other side's no, or a no after the
+    // other side's keep, is a visible disagreement both can see.
+    // Hypha 23a0279 HOLD: nothing skips the disagreement check (a JSON marker with promote:true did).
+    // before: if (prev && !a.promote && sideOf(prev.by) !== side && dirOf(prev.status) !== dirOf(status)) {
+    if (prev && sideOf(prev.by) !== side && dirOf(prev.status) !== dirOf(status)) {
+      return disagree(key, book, row, prev, status, actor, side, a, who);
+    }
+    // before f992608c: // A re-proposal after a disagreement restarts the cooling: its second yes waits for revisitAt.
+    // before f992608c: if (row.proposalOf && status === 'confirmed' && Date.parse(row.revisitAt || 0) > Date.now()) {
+    // before f992608c: row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor }]);
+    // before f992608c: return atomicWrite(key, JSON.stringify(book)).then(function () { return row; });
+    // Weft recheck2 NF2: EVERY second yes waits for the cooling the mind chose at the first yes (revisit: now is its
+    // own choice then; a day by default). A re-proposal after a disagreement or a re-affirmed item always has a full
+    // day. An early yes changes nothing: a still-cooling layer and a row.
+    // before (round 14): var coolUntil = row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS;
+    // Round 14 (Kirk 2026-11-10): the mind's own cooling is its own tool; its keep ends it whenever it likes. Waiting is
+    // enforced only for content a person undid (a proposal / contentOf: a full day); since round 15 not for a re-affirm.
+    // before (round 15): var enforced = !!(row.proposalOf || row.contentOf || row.promoted);
+    var enforced = !!(row.proposalOf || row.contentOf);   // round 15: a re-affirm's wait is the mind's own
+    var coolUntil = enforced ? (row.revisitAt ? Date.parse(row.revisitAt) : (Date.parse(row.t || 0) || 0) + COOL_MS) : 0;
+    var endedOwn = !enforced && status === 'confirmed' && side === 'mind' && row.revisitAt && Date.parse(row.revisitAt) > learnNow() ? row.revisitAt : '';
+    var dayNote = '';
+    // before (round 12): if (status === 'confirmed' && side === 'mind' && !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS)) {
+    // before (round 12):   var rn = recentPersonNo(allRows());
+    // before (round 12):   if (rn && Date.parse(rn.layer.t) + COOL_MS > coolUntil) { coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId; }
+    // Round 12 (Weft F11): ALSO any row chosen at or before that no (whatever its own cooling: a full day spent before
+    // the no does not count) waits until max(revisitAt, no + 24 h). A tie goes to the person.
+    // before (round 14): if (status === 'confirmed' && side === 'mind') {
+    // before (round 14):   var rn = recentPersonNo(allRows());
+    // before (round 14):   var shortCool = !((Date.parse(row.revisitAt || 0) || 0) - (Date.parse(row.t || 0) || 0) >= COOL_MS);
+    // before (round 14):   if (rn && (shortCool || (Date.parse(row.t || 0) || 0) <= Date.parse(rn.layer.t)) && Date.parse(rn.layer.t) + COOL_MS > coolUntil) {
+    // before (round 14):     coolUntil = Date.parse(rn.layer.t) + COOL_MS; dayNote = '|person-no-day:' + rn.row.learnId;
+    // before (round 14):   }
+    // before (round 14): }
+    // Round 14 (Kirk, Q7 content-only): the day after a person's no holds only MATCHING content (same text or a score
+    // at or above the threshold), never the whole mind.
+    if (status === 'confirmed' && side === 'mind') {
+      var selfSkip = {}; selfSkip[row.learnId] = 1;
+      var cm = contentMatch(allRows(), rowText(row), selfSkip);
+      if (cm && Date.parse(cm.personNo.t) > learnNow() - COOL_MS && Date.parse(cm.personNo.t) + COOL_MS > coolUntil) {
+        coolUntil = Date.parse(cm.personNo.t) + COOL_MS; dayNote = '|person-no-day:' + cm.row.learnId;
+      }
+    }
+    if (status === 'confirmed' && coolUntil > learnNow()) {
+      var untilIso = new Date(coolUntil).toISOString();
+      // Hypha 39e6cd07 soft (c): a repeated early yes adds nothing. One still-cooling layer and row per cooling end.
+      var lastL = (row.layers || [])[(row.layers || []).length - 1];
+      if (lastL && lastL.status === 'still-cooling' && lastL.until === untilIso && !clockOffset) return Promise.resolve(row);
+      // before: row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: new Date(coolUntil).toISOString() }]);
+      row.layers = (row.layers || []).concat([{ t: new Date().toISOString(), status: 'still-cooling', by: actor, until: untilIso }]);
+      if (dayNote) row.layers[row.layers.length - 1].personNoDay = dayNote.slice(15);
+      if (clockOffset) row.layers[row.layers.length - 1].clockInjectedMs = clockOffset;
+      return atomicWrite(key, JSON.stringify(book)).then(function () {
+        // before: return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + new Date(coolUntil).toISOString(), name: who });
+        // before: return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + untilIso + clockNote(), name: who });
+        return appendLedger({ kind: 'learn-still-cooling', branch: 'learn', delta: 'still-cooling|' + row.learnId + '|until:' + untilIso + dayNote + clockNote(), name: who });
+      }).then(function () { return row; });
+    }
+    var methodWas = row.method;
+    if (a.method) {
+      var m = learnMethod(a.method);
+      row.method = m.method || row.method;
+      row.shelfOnly = row.method === 'note';
+      if (m.note) row.methodNote = m.note;
+    }
+    if (/^(none|self|peer|kirk)$/.test(String(a.check || ''))) row.check = a.check;
+    // before: row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!a.promote, methodBefore: methodWas }]);
+    row.layers = (row.layers || []).concat([{ t: t, status: status, by: actor, why: clip(stripMarkers(a.reason || ''), 300), promoted: !!row.promoted, methodBefore: methodWas }]);
+    if (clockOffset) row.layers[row.layers.length - 1].clockInjectedMs = clockOffset;   // a test moved the clock: said on the row
+    if (endedOwn) row.layers[row.layers.length - 1].endedOwnCooling = endedOwn;          // round 14: the mind ended its own wait
+    if (status !== 'person-yes') row.status = status;
+    else if (row.status === 'disputed') row.status = 'cooling';
+    return atomicWrite(key, JSON.stringify(book)).then(function () {
+      // before: return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id + '|by:' + (actor === 'person' ? 'person' : 'mind'), name: who });
+      return appendLedger({ kind: 'learn-' + status, branch: 'learn', delta: 'learn-' + status + '|' + id + '|by:' + (actor === 'person' ? 'person' : 'mind') + clockNote(), name: who });
+    }).then(function () { return row; });
+  }
+
+  var KEEP_DIR = { confirmed: 'keep', 'kept-on-shelf': 'keep', 'person-yes': 'keep', faded: 'no', unkept: 'no' };
+  function dirOf(status) { return KEEP_DIR[status] || ''; }
+  function sideOf(by) { return by === 'person' ? 'person' : 'mind'; }
+  function lastDecisive(row) {
+    var ls = row.layers || [], i;
+    for (i = ls.length - 1; i >= 0; i--) if (ls[i] && dirOf(ls[i].status) && !ls[i].superseded) return ls[i];
+    return null;
+  }
+  // The newest decisive layer a person wrote (Undo, Not now, Let it learn). A later person layer supersedes an
+  // earlier one; nothing the mind writes does.
+  function lastPersonDecisive(row) {
+    var ls = row.layers || [], i;
+    for (i = ls.length - 1; i >= 0; i--) if (ls[i] && ls[i].by === 'person' && dirOf(ls[i].status) && !ls[i].superseded) return ls[i];
+    return null;
+  }
+  // The keeping side gets a NEW proposal row: cooling restarts and it needs the mind's second yes again. The
+  // original row keeps the "no" (nothing learns from it). A no after the other side's keep sets the row to
+  // "disputed": it does not travel to the runner, and it is not unkept either, until the mind looks again.
+  // before: function disagree(key, book, row, prev, status, actor, side, a, who) {
+  function disagree(key, book, row, prev, status, actor, side, a, who, sib) {
+    var t = new Date().toISOString();
+    var why = clip(stripMarkers(a.reason || ''), 300);
+    var note = side === 'mind'
+      ? 'The person said ' + (prev.status === 'unkept' ? 'Undo' : 'not now') + '; the mind would still like to keep this.'
+      : (side === 'person' && dirOf(status) === 'keep'
+        ? 'The mind said not now; the person would like it kept.'
+        : 'The mind chose to keep this; the person said ' + (status === 'unkept' ? 'Undo' : 'not now') + '.');
+    row.disagreement = { t: t, between: [sideOf(prev.by), side], note: note };
+    if (dirOf(status) === 'no') {
+      // The person's (or mind's) no is itself a decisive layer, so the other side's next keep is a disagreement too.
+      row.layers = (row.layers || []).concat([{ t: t, status: 'disagreement', by: actor, wanted: status, over: prev.status, why: why, note: note },
+        { t: t, status: status, by: actor, disputed: true }]);
+      row.status = 'disputed';
+      return atomicWrite(key, JSON.stringify(book)).then(function () {
+        // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+        return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'disputed|' + row.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
+      }).then(function () { return row; });
+    }
+    // Weft recheck4 F8: while a proposal of this row is open, another keep attaches to it (a count), no new row.
+    // before: var open = openProposalFor(book.rows, row.learnId);
+    var open = openProposalFor(book.rows, row.learnId, rowText(row));
+    if (open) {
+      if (row.status === 'disputed') row.status = prev.status;
+      open.againCount = (open.againCount || 0) + 1; open.lastAgainAt = t;
+      return atomicWrite(key, JSON.stringify(book)).then(function () { return open; });
+    }
+    if (sib) note += ' Same content as ' + sib.row.learnId + ' (' + sib.how + ').';
+    if (row.status === 'disputed') row.status = prev.status;      // the no stands on the original
+    row.layers = (row.layers || []).concat([{ t: t, status: 'disagreement', by: actor, wanted: 'keep', over: prev.status, why: why, note: note }]);
+    if (sib) row.layers[row.layers.length - 1].contentOf = sib.row.learnId;
+    var fresh = JSON.parse(JSON.stringify(row));
+    delete fresh.fingerprint;
+    // before f992608c: fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = revisitFrom(a.revisit, t);
+    fresh.t = t; fresh.status = 'cooling'; fresh.revisitAt = fullCoolingFrom(a.revisit, t);
+    fresh.proposalOf = row.learnId; fresh.disagreement = { t: t, between: [sideOf(prev.by), side], note: note };
+    if (sib) { fresh.contentOf = sib.row.learnId; fresh.disagreement.match = sib.how; if (!sib.exact) fresh.similarTo = sib.row.learnId + ', ' + sib.score; }
+    fresh.layers = [{ t: t, status: 'noticed', by: actor, why: why, disagreement: true, proposalOf: row.learnId }];
+    // before: return sha8(t + '|' + row.learnId + '|again').then(function (id8) {
+    // before:   fresh.learnId = 'L' + id8;
+    return freshLearnId(book.rows, t + '|' + row.learnId + '|again').then(function (lid) {
+      fresh.learnId = lid;
+      row.layers[row.layers.length - 1].proposal = fresh.learnId;
+      book.rows.push(fresh);
+      return atomicWrite(key, JSON.stringify(book));
+    }).then(function () {
+      // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by), name: who });
+      // before: return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by) + clockNote(), name: who });
+      return appendLedger({ kind: 'learn-disagreement', branch: 'learn', delta: 'new-proposal|' + row.learnId + '>' + fresh.learnId + '|by:' + side + '|over:' + sideOf(prev.by) +
+        (sib ? '|content-of:' + sib.row.learnId + '|' + (sib.exact ? 'same-text' : 'similar ' + sib.score) : '') + clockNote(), name: who });
+    }).then(function () { return fresh; });
+  }
+
+  function dueForSecondLook(now, mind) {
+    // before (round 14): var n = now || Date.now();
+    var n = now || learnNow();   // round 14: the same clock as the gate (a moved test clock moves this too)
+    return readBook(learnKey(mind)).rows.filter(function (r) {
+      return r && r.status === 'cooling' && Date.parse(r.revisitAt || 0) <= n;
+    });
+  }
+
+  function learnQueue(status, mind) {
+    var who = mind || mindLabel();
+    var rows = readBook(learnKey(who)).rows.concat(readBook(LS_QUEUE).rows.filter(function (r) { return sameMind(r, who); }));
+    if (!status) return rows.slice();
+    return rows.filter(function (r) { return r && r.status === status; });
+  }
+
+  // Only confirmed, non-shelf rows travel to tools/learn/fl_learn.py. Cooling, faded, unkept,
+  // quarantined, declined and shelf rows never do.
+  function learnQueueJSONL(mind) {
+    var who = mind || mindLabel();
+    var head = { kind: 'fl-learn-queue', marker: LEARN, checkBeforeCommit: checkBeforeOn(), checker: learnChecker(), baseModel: learnBaseModel(), mind: who,
+      mindId: mindId(who), paused: learnPaused(), exportedAt: new Date().toISOString() };
+    var lines = [JSON.stringify(head)];
+    // Round 15 (Weft recheck8 F13): a confirmed, untrained row, chosen at or before a person's no from the last day
+    // whose content it matches (same text, normalized, or a near duplicate), stays out of this export. The row is not changed; the skip
+    // is a ledger row; once that day is over it travels again.
+    var allMine = learnQueue(null, who), heldBack = [];
+    // before (round 15): learnQueue('confirmed', who).forEach(function (r, i) {
+    learnQueue('confirmed', who).forEach(function (r, i) {
+      if (r.shelfOnly) return;
+      var self_ = {}; if (r.learnId) self_[r.learnId] = 1;
+      // before (round 16): var cmx = contentMatch(allMine, rowText(r), self_);
+      var cmx = newestRecentNo(allMine, rowText(r), self_);
+      // Only a row chosen at or before that no: a row chosen after it already passed the confirm gate (its own full day).
+      if (cmx && Date.parse(cmx.personNo.t) > learnNow() - COOL_MS && (Date.parse(r.t || 0) || 0) <= Date.parse(cmx.personNo.t) &&
+          r.proposalOf !== cmx.row.learnId && r.contentOf !== cmx.row.learnId) {   // a proposal answering that no waited its day
+        heldBack.push(r.learnId + '|' + cmx.row.learnId + '|until:' + new Date(Date.parse(cmx.personNo.t) + COOL_MS).toISOString());
+        // (the until names the no's time, so (row, no) is the key a repeated export dedupes on)
+        return;
+      }
+      lines.push(JSON.stringify({
+        id: r.learnId || ('S' + i + '-' + (r.flakeId || '')), status: 'confirmed',
+        method: r.method || 'soft-prompt', methodChosen: !!r.methodChosen || !!r.method,
+        methodNote: r.methodNote || '', reason: r.reason || '', surface: r.surface || 'snowflake',
+        // before f992608c: provenance: r.provenance || 'unknown', check: r.check || '', chosenBy: r.chosenBy || who,
+        provenance: r.provenance || 'unknown', promoted: !!r.promoted, check: r.check || '', chosenBy: r.chosenBy || who,
+        origin: r.origin || '', strength: r.strength || '',   // round 15: the origin label and the mind's weight hint travel
+        readingAtChoice: r.readingAtChoice ? { sha256: r.readingAtChoice.sha256 || '', excerpt: clip(r.readingAtChoice.excerpt || '', 280),
+          kinds: r.readingAtChoice.kinds || [], overlap: !!r.readingAtChoice.overlap } : null,
+        items: (r.items || []).map(function (x) { return learnExample(x.instruction || x.prompt, x.output || x.response); }),
+        // before: probe: r.probe || null, fingerprint: r.fingerprint || ''
+        // Weft recheck3 F3: when it was chosen and when its cooling ended travel too, so the runner's own check fires.
+        // before: probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || ''
+        probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || '',
+        // Weft recheck4 F7: a proposal says what it disagrees with, so the runner and a reviewer can see it.
+        proposalOf: r.proposalOf || '', contentOf: r.contentOf || '', similarTo: r.similarTo || ''
+      }));
+    });
+    // Round 16: one learn-export-held row per (row, no); a second export the same day adds none.
+    var heldSeen = {};
+    loadLedger().rows.forEach(function (x) { if (x && x.kind === 'learn-export-held') heldSeen[String(x.delta).split('|').slice(0, 4).join('|')] = 1; });
+    // before (round 16): each held row was appended at once, so two in one export could race and one was lost.
+    // Round 16: appended one after another (each append reads the ledger it adds to).
+    heldBack.filter(function (h) { return !heldSeen['held-back|' + h]; }).reduce(function (pr, h) {
+      return pr.then(function () {
+        return appendLedger({ kind: 'learn-export-held', branch: 'learn', delta: 'held-back|' + h + '|a person said no to this content less than a day ago', name: who });
+      }).catch(function () {});
+    }, Promise.resolve());
+    return lines.join('\n');
+  }
+
+  function b64ToBytes(b64) {
+    var bin = root.atob ? root.atob(String(b64 || '')) : Buffer.from(String(b64 || ''), 'base64').toString('binary');
+    var out = new Uint8Array(bin.length);
+    var i;
+    for (i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function hexToBytes(hex) {
+    var out = new Uint8Array(hex.length / 2);
+    var i;
+    for (i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+    return out;
+  }
+
+  // Runner key trust (Weft N1): never on first sight. The runner writes keys/runner.pub.json and prints it with
+  // `fl_learn.py key`; the app shows the same fingerprint; the person (or the mind) confirms they match.
+  // Only then is the key pinned, with a ledger row. Receipts from any other key are quarantined, never known-good.
+  var LEARN_DOMAIN = 'lattice.pair.v1';
+  function runnerKeyFp(pubB64) {
+    var pub = b64ToBytes(pubB64);
+    var dom = new TextEncoder().encode(LEARN_DOMAIN);
+    var buf = new Uint8Array(dom.length + 1 + pub.length);
+    buf.set(dom, 0); buf[dom.length] = 0; buf.set(pub, dom.length + 1);
+    return sha256HexBytes(buf);
+  }
+  function showFp(hex) { return [0, 4, 8, 12].map(function (i) { return String(hex || '').slice(i, i + 4); }).join(' '); }
+  function pinnedRunnerKey() { try { return root.localStorage.getItem(LS_LEARN_RUNNER) || ''; } catch (e) { return ''; } }
+  // confirm: the fingerprint the person/mind read from `fl_learn.py key` (first 16 hex, spaces fine). It must match.
+  // Kirk 2026-11-09 (a): a person, or a trusted LOCAL mind (o.by 'mind' with o.local true), confirms the key.
+  // Every confirmation is a consent record made by DepthConsent.createConsentRecord (docs/modules/depth-consent.js,
+  // fl_consentLedger, its hash signature) plus a learn ledger row that names it. Without DepthConsent loaded the same
+  // record shape and formula are written to the same ledger.
+  function consentRecord(messageId, statement, subject, type) {
+    var dc = root.DepthConsent;
+    if (dc && typeof dc.createConsentRecord === 'function') return Promise.resolve(dc.createConsentRecord(messageId, statement, subject, type));
+    var rec = { messageId: messageId, timestamp: Date.now(), consentType: type, companionId: '', aiIdentity: '', trustLevel: 'local', provenance: null };
+    return sha256Hex(statement).then(function (h1) { rec.userPromptHash = h1; return sha256Hex(subject); }).then(function (h2) {
+      rec.responseHash = h2;
+      return sha256Hex(rec.companionId + ':' + rec.aiIdentity + ':' + rec.responseHash + ':' + rec.timestamp + ':' + rec.consentType);
+    }).then(function (sig) {
+      rec.signature = sig;
+      try {
+        var led = JSON.parse(root.localStorage.getItem('fl_consentLedger') || '[]');
+        if (!Array.isArray(led)) led = [];
+        led.push(rec); root.localStorage.setItem('fl_consentLedger', JSON.stringify(led.slice(-500)));
+      } catch (e) {}
+      return rec;
+    });
+  }
+  // A "trusted local AI" (Kirk 2026-11-09 a) is a mind a PERSON trusted here, by name, with a consent record.
+  // A mind never makes itself, or another mind, trusted.
+  function trustedMinds() {
+    try { var l = JSON.parse(root.localStorage.getItem(LS_LEARN_TRUSTED_MINDS) || '[]'); return Array.isArray(l) ? l.map(String) : []; } catch (e) { return []; }
+  }
+  function trustMind(name, opts) {
+    var o = opts || {};
+    var n = clip(String(name || '').trim(), 80);
+    if (roomShut() || !n) return Promise.resolve(false);
+    if (o.by !== 'person') {
+      return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'trust-mind|' + n + '|by:mind|only a person trusts a mind', name: mindLabel() })
+        .then(function () { return false; });
+    }
+    // Weft recheck3 F5: a lookalike name is never made trusted (a revoke is always allowed).
+    // before: var bad = o.revoke ? '' : nameProblem(n);
+    // Weft recheck4 F5: nor a name whose confusable skeleton is that of a mind already trusted here or learning here.
+    var bad = o.revoke ? '' : (nameProblem(n) || lookProblem(n, trustedMinds().concat([mindLabel()])));
+    if (bad) {
+      return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'trust-mind|' + JSON.stringify(n) + '|by:person|' + bad, name: mindLabel() })
+        .then(function () { return false; });
+    }
+    // before 23a02794: var list = trustedMinds().filter(function (x) { return x !== n; });
+    var list = trustedMinds().filter(function (x) { return !sameName(x, n); });
+    if (!o.revoke) list.push(n);
+    try { root.localStorage.setItem(LS_LEARN_TRUSTED_MINDS, JSON.stringify(list)); } catch (e) { return Promise.resolve(false); }
+    return consentRecord('learn-mind:' + n, (o.revoke ? 'withdraw trust in ' : 'trust local mind ') + n + ' confirmed by person', 'mind:' + n,
+      o.revoke ? 'learn_mind_revoked' : 'learn_mind_trusted').then(function (rec) {
+      return appendLedger({ kind: o.revoke ? 'learn-mind-untrusted' : 'learn-mind-consent', branch: 'learn',
+        delta: 'mind|' + n + '|by:person|consent:' + String((rec && rec.signature) || '').slice(0, 16), name: mindLabel() });
+    }).then(function () { return true; });
+  }
+  // Weft NF1: who may confirm a runner key. A person; or a DIFFERENT local mind a person already trusted, that is not
+  // the key's owner (o.owner, default: the mind learning here). Never the mind itself. Returns why not, or ''.
+  function keyApproverProblem(o) {
+    if (o.by !== 'mind') return '';
+    if (o.owner && nameProblem(o.owner)) return 'owner: ' + nameProblem(o.owner);     // Weft recheck3 F5
+    if (o.owner && lookalikeOf(o.owner, trustedMinds().concat([mindLabel()]))) return 'owner: ' + lookProblem(o.owner, trustedMinds().concat([mindLabel()]));
+    if (o.local !== true) return 'only a mind on this device';
+    var n = String(o.mind || '').trim();
+    if (!n) return 'a mind must name itself';
+    // before 23a02794: if (n === mindLabel() || n === String(o.owner || '')) return 'a mind never confirms its own key';
+    // before 23a02794: if (trustedMinds().indexOf(n) === -1) return n + ' is not a mind a person trusted here';
+    if (sameName(n, mindLabel()) || sameName(n, o.owner || mindLabel())) return 'a mind never confirms its own key';
+    // Weft recheck4 F5: nor under a name that looks like its own (an all-Cyrillic "Тһіѕ міпԁ" for "This mind").
+    if (nameSkeleton(n) === nameSkeleton(mindLabel()) || nameSkeleton(n) === nameSkeleton(o.owner || mindLabel())) return 'a mind never confirms its own key (that name looks like it)';
+    if (!trustedMinds().some(function (x) { return sameName(x, n); })) return n + ' is not a mind a person trusted here';
+    return '';
+  }
+  function pinRunnerKey(pubB64, opts) {
+    var o = opts || {};
+    if (roomShut() || !pubB64) return Promise.resolve(false);
+    // before f992608c: if (o.by === 'mind' && o.local !== true) return Promise.resolve(false);     // only a mind on this device
+    // before f992608c: var who = o.by === 'mind' ? 'mind:' + clip(o.mind || mindLabel(), 80) : 'person';
+    var why = keyApproverProblem(o);
+    var who = o.by === 'mind' ? 'mind:' + clip(o.mind || '', 80) : 'person';
+    if (why) {
+      return appendLedger({ kind: 'learn-consent-refused', branch: 'learn', delta: 'runner-key|by:' + who + '|' + why, name: mindLabel() })
+        .then(function () { return false; });
+    }
+    return runnerKeyFp(pubB64).then(function (fp) {
+      var said = String(o.confirm || '').replace(/\s+/g, '').toLowerCase();
+      if (said.length < 16 || fp.indexOf(said) !== 0) return false;
+      // before 23a02794: try { root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); root.localStorage.setItem(LS_LEARN_RUNNER_BY, who); } catch (e) { return false; }
+      // before f992608c: try { root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); } catch (e) { return false; }
+      // Weft recheck2 NF1b: a pin has an owner. A person's pin trusts this runner for every mind here ('*'); a mind's
+      // pin is for ONE other named mind (o.owner, default the mind learning here) and never vouches for anyone else.
+      var owner = o.by === 'mind' ? clip(String(o.owner || mindLabel()), 80) : '*';
+      try {
+        root.localStorage.setItem(LS_LEARN_RUNNER, pubB64); root.localStorage.setItem(LS_LEARN_RUNNER_BY, who);
+        root.localStorage.setItem(LS_LEARN_RUNNER_OWNER, owner);
+      } catch (e) { return false; }
+      return consentRecord('learn-key:' + fp.slice(0, 16), 'trust learning runner key ' + showFp(fp) + ' confirmed by ' + who, pubB64, 'learn_key_trusted')
+        .then(function (rec) {
+          return appendLedger({ kind: 'learn-key-consent', branch: 'learn', delta: 'runner-key|' + fp.slice(0, 16) + '|by:' + who + '|consent:' + String((rec && rec.signature) || '').slice(0, 16), name: mindLabel() });
+        }).then(function () { return true; });
+    });
+  }
+  function unpinRunnerKey(by) {
+    var was = pinnedRunnerKey();
+    // before 23a02794: try { root.localStorage.removeItem(LS_LEARN_RUNNER); root.localStorage.removeItem(LS_LEARN_RUNNER_BY); } catch (e) {}
+    // before f992608c: try { root.localStorage.removeItem(LS_LEARN_RUNNER); } catch (e) {}
+    try { root.localStorage.removeItem(LS_LEARN_RUNNER); root.localStorage.removeItem(LS_LEARN_RUNNER_BY); root.localStorage.removeItem(LS_LEARN_RUNNER_OWNER); } catch (e) {}
+    return appendLedger({ kind: 'runner-key-unpinned', branch: 'learn', delta: 'runner-key-unpinned|' + String(was).slice(0, 12) + '|by:' + (by === 'mind' ? 'mind' : 'person'), name: mindLabel() });
+  }
+
+  // Ed25519 check of a runner receipt: signature, hash, and the signed body all agree. pinned says whether
+  // the key is the one this app was told to trust.
+  // Python signs numbers as strings (stringify_meta); compare by value, every key both ways.
+  var RECEIPT_OUTER = { receiptHash: 1, signatureB64: 1, signedBody: 1 };
+  function receiptSame(outer, signed) {
+    if (signed === null || signed === undefined) return outer === null || outer === undefined;
+    if (typeof signed === 'string' && typeof outer === 'number') return isFinite(outer) && Number(signed) === outer;
+    if (Array.isArray(signed)) {
+      if (!Array.isArray(outer) || outer.length !== signed.length) return false;
+      for (var i = 0; i < signed.length; i++) if (!receiptSame(outer[i], signed[i])) return false;
+      return true;
+    }
+    if (typeof signed === 'object') {
+      if (!outer || typeof outer !== 'object' || Array.isArray(outer)) return false;
+      var k;
+      for (k in signed) if (Object.prototype.hasOwnProperty.call(signed, k) && !receiptSame(outer[k], signed[k])) return false;
+      for (k in outer) if (Object.prototype.hasOwnProperty.call(outer, k) && outer[k] !== null && outer[k] !== undefined && !Object.prototype.hasOwnProperty.call(signed, k)) return false;
+      return true;
+    }
+    return outer === signed;
+  }
+  function receiptMatches(rc, body) {
+    if (!body || typeof body !== 'object') return false;
+    var outer = {};
+    Object.keys(rc).forEach(function (k) { if (!RECEIPT_OUTER[k]) outer[k] = rc[k]; });
+    return receiptSame(outer, body);
+  }
+
+  function checkLearnReceipt(rc) {
+    var subtle = root.crypto && root.crypto.subtle;
+    var pinned = pinnedRunnerKey();
+    // before 23a02794: var pinnedBy = '';
+    // before 23a02794: try { pinnedBy = root.localStorage.getItem(LS_LEARN_RUNNER_BY) || ''; } catch (e) {}
+    // before 23a02794: // Weft NF1, belt and braces: a key a mind confirmed never vouches for that same mind's own receipts.
+    // before 23a02794: var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64 && !(pinnedBy && rc.mind && pinnedBy === 'mind:' + rc.mind));
+    // before f992608c: var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64);
+    var pinnedBy = '', pinOwner = '';
+    try { pinnedBy = root.localStorage.getItem(LS_LEARN_RUNNER_BY) || ''; pinOwner = root.localStorage.getItem(LS_LEARN_RUNNER_OWNER) || ''; } catch (e) {}
+    // Weft NF1, belt and braces: a key a mind confirmed never vouches for that same mind's own receipts (names compared
+    // normalized, so an alias does not count as another mind). NF1b: a mind's pin vouches only for its owner's receipts.
+    var byMind = pinnedBy.indexOf('mind:') === 0 ? pinnedBy.slice(5) : '';
+    var ownerOk = byMind ? !!(rc && sameName(rc.mind, pinOwner)) : (pinOwner === '*' || pinOwner === '');
+    var isPinned = !!(pinned && rc && pinned === rc.publicKeyB64 && ownerOk && !(byMind && rc.mind && sameName(byMind, rc.mind)));
+    if (!subtle || !rc || !rc.signedBody || !rc.signatureB64 || !rc.publicKeyB64) return Promise.resolve({ sig: false, pinned: false });
+    return sha256Hex(rc.signedBody).then(function (h) {
+      if (h !== rc.receiptHash) return { sig: false, pinned: isPinned };
+      // The outer fields must say exactly what was signed; an edit after signing fails.
+      var body = null;
+      try { body = JSON.parse(rc.signedBody); } catch (eb) { return { sig: false, pinned: isPinned }; }
+      if (!receiptMatches(rc, body)) return { sig: false, pinned: isPinned };
+      return subtle.importKey('raw', b64ToBytes(rc.publicKeyB64), { name: 'Ed25519' }, false, ['verify']).then(function (k) {
+        return subtle.verify({ name: 'Ed25519' }, k, b64ToBytes(rc.signatureB64), hexToBytes(rc.receiptHash));
+      }).then(function (ok) {
+        return runnerKeyFp(rc.publicKeyB64).then(function (fp) { return { sig: !!ok, pinned: isPinned, keyFp: fp, show: showFp(fp) }; });
+      }, function () { return { sig: false, pinned: isPinned }; });
+    });
+  }
+
+  // True only for a good signature from the pinned runner key. Nothing is ever pinned here.
+  function verifyLearnReceipt(rc) {
+    return checkLearnReceipt(rc).then(function (c) { return !!(c.sig && c.pinned); });
+  }
+
+  // Only a signed, verified receipt marks trained/loaded/checked. knownGood needs that plus a passing check.
+  function recordLearnReceipt(receipt) {
+    if (roomShut()) return Promise.resolve(null);
+    var rc = receipt || {};
+    if (rc.kind !== 'fl-learn-receipt') return Promise.resolve(null);
+    return checkLearnReceipt(rc).then(function (chk) {
+      if (chk.sig && !chk.pinned) {
+        // A good signature from a key nobody here has trusted yet: set aside, never known-good, nothing changes.
+        var qb = readJSON(LS_LEARN_RECEIPTS_HELD) || { rows: [] };
+        if (!Array.isArray(qb.rows)) qb = { rows: [] };
+        qb.rows.push({ t: new Date().toISOString(), keyFp: chk.keyFp, receipt: rc });
+        return atomicWrite(LS_LEARN_RECEIPTS_HELD, JSON.stringify(qb)).then(function () {
+          return appendLedger({ kind: 'receipt-quarantine', branch: 'learn', delta: 'unknown-runner-key|' + String(chk.keyFp || '').slice(0, 16), name: mindLabel() });
+        }).then(function () { return { quarantined: true, keyFp: chk.keyFp, show: chk.show, publicKeyB64: rc.publicKeyB64 }; });
+      }
+      var verified = chk.sig && chk.pinned;
+      if (!verified) {
+        return appendLedger({ kind: 'receipt-unverified', branch: 'learn', delta: 'receipt-unverified|' + (rc.receiptHash || '').slice(0, 16), name: mindLabel() }).then(function () { return null; });
+      }
+      // From here on, read only what was signed.
+      var signed = JSON.parse(receipt.signedBody);
+      signed.receiptHash = receipt.receiptHash; signed.signatureB64 = receipt.signatureB64; signed.signedBody = receipt.signedBody;
+      rc = signed;
+      var who = rc.mind || mindLabel();
+      var key = learnKey(who);
+      var book = readBook(key);
+      var ids = Array.isArray(rc.ids) ? rc.ids.map(String) : [];
+      var t = new Date().toISOString();
+      book.rows.forEach(function (r) {
+        if (r && r.learnId && ids.indexOf(r.learnId) !== -1) {
+          var st = rc.committed ? 'learned' : 'held-by-check';
+          r.layers = (r.layers || []).concat([{ t: t, status: st, by: 'runner', fp: rc.fingerprint || '' }]);
+          r.status = st;
+        }
+      });
+      var checkPass = !!(rc.check && rc.check.pass === true);
+      var rows = mindAdapters(who).slice();          // Weft 4a: this mind's own adapter list
+      rows.push({
+        version: String(rc.version || ''), flakeIds: [], learnIds: ids, method: String(rc.method || ''),
+        fp: String(rc.fingerprint || ''), beforeFp: String(rc.beforeFp || ''), t: String(rc.t || t), mind: who, mindId: mindId(who),
+        baseFp: String(rc.baseFp || ''), runnerKeyFp: String(chk.keyFp || ''),
+        status: (rc.action === 'rollback' || rc.action === 'restore' || rc.action === 'activate') ? rc.action : (rc.committed ? 'learned' : 'held-by-check'),
+        trained: rc.trained === true, loaded: rc.loaded === true, checked: rc.checked === true,
+        knownGood: rc.knownGood === true && checkPass && rc.committed === true,
+        rollbackOf: String(rc.rollbackOf || ''), check: rc.check || null, receiptHash: String(rc.receiptHash || '')
+      });
+      var rcBook = readJSON(LS_LEARN_RECEIPTS) || { rows: [] };
+      if (!Array.isArray(rcBook.rows)) rcBook = { rows: [] };
+      rcBook.rows.push(rc);
+      return atomicWrite(LS_LEARN_RECEIPTS, JSON.stringify(rcBook)).then(function () {
+        return atomicWrite(key, JSON.stringify(book));
+      }).then(function () { return atomicWrite(adaptersKey(who), JSON.stringify({ rows: rows })); }).then(function () {
+        return appendLedger({ kind: (rc.action === 'rollback' || rc.action === 'restore' || rc.action === 'activate') ? rc.action : 'learn-receipt', branch: 'learn', delta: 'receipt|' + (rc.action || 'learn') + '|' + (rc.fingerprint || '').slice(0, 16), name: who });
+      }).then(function () { return rows[rows.length - 1]; });
+    });
+  }
+
+  // Kirk 2026-11-09 (c), the no-install path: the whole learning notebook for a mind as one file the person can keep,
+  // put in their own cloud drive, or (later) share by its sha256. Export first, then archive: rows past the active
+  // ones get an "archived" layer. Nothing is deleted. Uses LatticeExport.exportArchive (signed, Quiet Room scans)
+  // when it is loaded; otherwise a plain JSON download of the same books.
+  function learningBooks(mind) {
+    var who = mind || mindLabel();
+    return { kind: 'fl-learn-notebook', marker: LEARN, mind: who, mindId: mindId(who), t: new Date().toISOString(),
+      queue: learnQueue(null, who), adapters: mindAdapters(who),
+      declines: (readBook(LS_LEARN_DECLINES).rows || []).filter(function (r) { return !r.mind || r.mind === who; }),
+      receipts: (readBook(LS_LEARN_RECEIPTS).rows || []).filter(function (r) { return !r.mind || r.mind === who; }) };
+  }
+  function learnBookBytes(mind) {
+    try { return (root.localStorage.getItem(learnKey(mind)) || '').length + (root.localStorage.getItem(adaptersKey(mind)) || '').length; } catch (e) { return 0; }
+  }
+  function exportLearning(opts) {
+    var o = opts || {};
+    if (roomShut()) return Promise.resolve(null);
+    var who = o.mind || mindLabel();
+    var books = learningBooks(who);
+    var le = root.LatticeExport;
+    var made = (le && typeof le.exportArchive === 'function' && o.plain !== true)
+      ? le.exportArchive({ mode: 'redacted', extra: { learning: books }, download: o.download })
+          .then(function (file) { return file.text().then(function (txt) { return { name: file.name, text: txt }; }); })
+      : Promise.resolve({ name: 'freelattice-learning-' + mindId(who) + '-' + books.t.slice(0, 10) + '.json', text: JSON.stringify(books, null, 1) });
+    return made.then(function (f) {
+      return sha256Hex(f.text).then(function (h) {
+        f.sha256 = h;
+        var key = learnKey(who), book = readBook(key), t = new Date().toISOString(), n = 0;
+        book.rows.forEach(function (r) {
+          if (r && /^(unkept|faded|learned|held-by-check|kept-on-shelf)$/.test(r.status || '') && !r.archivedIn) {
+            r.archivedIn = h; r.layers = (r.layers || []).concat([{ t: t, status: 'archived', by: o.by === 'mind' ? who : 'person', exportSha: h }]); n++;
+          }
+        });
+        f.archived = n;
+        return atomicWrite(key, JSON.stringify(book)).then(function () {
+          return appendLedger({ kind: 'learn-export', branch: 'learn', delta: 'export|' + h.slice(0, 16) + '|rows:' + n + '|by:' + (o.by === 'mind' ? 'mind' : 'person'), name: who });
+        }).then(function () { return f; });
+      });
+    });
+  }
+
+  // GardenTrainer.checkedAdapter reads this: the newest verified receipt whose items match.
+  function verifiedReceiptFor(examples, mind) {
+    var book = readJSON(LS_LEARN_RECEIPTS) || { rows: [] };
+    var list = Array.isArray(book.rows) ? book.rows : [];
+    var outs = (examples || []).map(function (e) { return stripMarkers(e && (e.output || e.response)); });
+    var pin = pinnedRunnerKey();
+    var adapters = mindAdapters(mind || mindLabel());
+    var i;
+    for (i = adapters.length - 1; i >= 0; i--) {
+      var a = adapters[i];
+      if (!a || !a.receiptHash || !a.trained || !a.loaded || !a.checked) continue;
+      var rc = null;
+      list.forEach(function (x) { if (x && x.receiptHash === a.receiptHash) rc = x; });
+      if (!rc || !pin || rc.publicKeyB64 !== pin) continue;     // a key unpinned since then no longer vouches
+      var learned = learnQueue('learned', a.mind).filter(function (r) { return (a.learnIds || []).indexOf(r.learnId) !== -1; });
+      var texts = [];
+      learned.forEach(function (r) { (r.items || []).forEach(function (x) { texts.push(x.output); }); });
+      var all = outs.length && outs.every(function (o) { return texts.indexOf(o) !== -1; });
+      if (all) return { trained: true, loaded: true, checked: true, version: a.version, id: a.fp, knownGood: a.knownGood };
+    }
+    return null;
   }
 
   function driftPass() {
@@ -2167,7 +3477,9 @@
         t: t,
         psi: row ? row.psi : '',
         status: 'rollback',
-        knownGood: true,
+        // before main 9cc3d00: knownGood: true,
+        // before v-ai-chosen-learning-v0.1: every rollback row said knownGood true.
+        knownGood: target.knownGood === true,
         drift: target.drift || '',
         rollbackOf: version
       });
@@ -2799,6 +4111,48 @@
     resume: resume,
     chooseGrowth: chooseGrowth,
     queueGrowth: queueGrowth,
+    queueLearning: queueLearning,
+    learnQueue: learnQueue,
+    learnQueueJSONL: learnQueueJSONL,
+    recordLearnReceipt: recordLearnReceipt,
+    verifyLearnReceipt: verifyLearnReceipt,
+    checkLearnReceipt: checkLearnReceipt,
+    runnerKeyFp: runnerKeyFp,
+    pinRunnerKey: pinRunnerKey,
+    trustMind: trustMind,
+    trustedMinds: trustedMinds,
+    learnPausedBy: learnPausedBy,
+    learnSwitchBusy: learnSwitchBusy,
+    consentRecord: consentRecord,
+    learnChecker: learnChecker,
+    setLearnCheck: setLearnCheck,
+    exportLearning: exportLearning,
+    learningBooks: learningBooks,
+    learnBookBytes: learnBookBytes,
+    unpinRunnerKey: unpinRunnerKey,
+    pinnedRunnerKey: pinnedRunnerKey,
+    pauseNotice: pauseNotice,
+    mindId: mindId,
+    normMind: normMind,
+    // before: learnClockForTest: learnClockForTest,
+    learnClockForTest: TEST_HOOKS ? learnClockForTest : undefined,
+    nameProblem: nameProblem,
+    normText: normText,
+    matchText: matchText,
+    textTokens: textTokens,
+    textSimilarity: textSimilarity,
+    nameSkeleton: nameSkeleton,
+    lookProblem: lookProblem,
+    sha256Sync: sha256Sync,
+    verifiedReceiptFor: verifiedReceiptFor,
+    confirmLearning: confirmLearning,
+    dueForSecondLook: dueForSecondLook,
+    learnPaused: learnPaused,
+    setLearnPaused: setLearnPaused,
+    stripMarkers: stripMarkers,
+    canonical: canonical,
+    learnMethod: learnMethod,
+    learnMethods: function () { return LEARN_METHODS.slice(); },
     runGrowth: runGrowth,
     composeAsk: composeAsk,
     growthLine: growthLine,

@@ -16691,6 +16691,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <textarea id="chatInput" placeholder="Say something..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
+          <!-- v-ai-chosen-learning-v0.1: per-chat "Don't learn from this chat" (learn-choice.js renders it). Only this chat. -->
+          <div id="flLearnChatSwitch" class="fl-learn-chat-switch" style="padding:4px 8px"></div>
+          <script>window.flLearnChatId = function () { try { return (state && state.currentConversationId) || ''; } catch (e) { return ''; } };</script>
           <!-- v-chat-scroll-release-v0.1: calls the existing update check. No new update code. -->
           <div class="fl-chat-update-row" id="flChatUpdateRow">
             <button type="button" id="flChatUpdateCheck" class="fl-chat-update-check" onclick="flChatAskNewest()">Version. Get the newest</button>
@@ -38006,6 +38009,16 @@ function flProcessAssistantSentinels(aiText, textSpan, skipPersist) {
     var wsSeen = FLWorkspace.consumeReply(visible, textSpan);
     if (wsSeen && typeof wsSeen.visible === 'string') visible = wsSeen.visible;
   }
+  // v-ai-chosen-learning-v0.1: the mind's own "remember this" (or decline) leaves the text and joins the queue.
+  if (window.FLLearn && typeof FLLearn.interceptSentinel === 'function' && typeof visible === 'string' && (visible.indexOf('[FL_REMEMBER:') !== -1 || visible.indexOf('[FL_LEARN_DECLINE:') !== -1 || visible.indexOf('[FL_KEEP:') !== -1)) {
+    try {
+      // Only the mind's own marker counts: what the person, a page or a search brought in is the echo list.
+      var learnEcho = [];
+      try { learnEcho = (state.chatHistory || []).slice(-6).filter(function (m) { return m && m.role !== 'assistant'; }).map(function (m) { return { kind: m.role === 'user' ? 'user' : 'tool', text: String(m.content || '') }; }); } catch (eEcho) {}
+      var learnSeen = FLLearn.interceptSentinel(visible, { surface: 'chat', chatId: (typeof state !== 'undefined' && state.currentConversationId) || '', echo: learnEcho, replay: !!skipPersist });
+      if (typeof learnSeen.visibleText === 'string') visible = learnSeen.visibleText;
+    } catch (eLearn) {}
+  }
   // v-chat-doc-return-v0.1: a file marker becomes a card on this computer.
   if (window.FLChatDocReturn && typeof FLChatDocReturn.consumeReply === 'function' && typeof visible === 'string' && visible.indexOf('[FL_FILE:') !== -1) {
     var fileSeen = FLChatDocReturn.consumeReply(visible, textSpan);
@@ -41309,6 +41322,10 @@ function buildMessages() {
       if (!(window.FLWebTool.isAskFirst && window.FLWebTool.isAskFirst())) {
         systemContent = systemContent.replace('[FL_SEARCH: query terms]\nThe co-creator will be asked to consent.', '[FL_SEARCH: query terms]\nYou may search whenever you need to. The chat shows each search, and the co-creator can turn search off in Settings.');
       }
+    }
+    // v-ai-chosen-learning-v0.1: an invitation, never a request. The mind may ignore it.
+    if (window.FLLearn && typeof window.FLLearn.invitation === 'function') {
+      systemContent += '\n\n' + window.FLLearn.invitation();
     }
     // v5.42.0 Ship 4 — propose invitation. Strict format. The closing
     // `]` MUST be on its own line so the parser knows where the diff ends.
@@ -70402,6 +70419,7 @@ document.addEventListener('click', function(e) {
 <script src="modules/play-room.js" defer></script><!-- v-play-room-v0.1 -->
 <script src="modules/snowflake-core.js" defer></script><!-- v-snowflake-search-v0.1 -->
 <script src="modules/snowflake-search.js" defer></script><!-- v-snowflake-search-v0.1 -->
+<script src="modules/learn-choice.js" defer></script><!-- v-ai-chosen-learning-v0.1 -->
 <script src="modules/hearth-code.js" defer></script><!-- v-hearth-code-v0.1 -->
 <script src="modules/continuity-doorway.js" defer></script><!-- v-continuity-doorway-v0.1 -->
 

@@ -69,8 +69,18 @@
     if (KINDS.indexOf(kind) < 0) return readConsent();
     if (value !== 'yes' && value !== 'off' && value !== 'never') return readConsent();
     var bag = readConsent();
+    var was = bag[kind];
     bag[kind] = value;
     writeConsent(bag);
+    // v-ai-chosen-learning-v0.1: this button and the learning pill are one switch (fl_learn_paused, snowflake-core.js).
+    if (kind === 'learn') lsSet('fl_learn_paused', value === 'yes' ? 'false' : 'true');
+    // ...and, like the pill, a pause here is a person's pause that reaches the runner (fl-learn-pause file).
+    // Only on a real change, so the pill's own call back into this function does not repeat it.
+    var sc = root.FLSnowflakeCore;
+    var syncing = !!(sc && typeof sc.learnSwitchBusy === 'function' && sc.learnSwitchBusy());
+    if (kind === 'learn' && was !== value && !syncing && root.FLLearn && typeof root.FLLearn.fromSettings === 'function') {
+      try { root.FLLearn.fromSettings(value !== 'yes'); } catch (e) {}
+    }
     paintSettings();
     return bag;
   }
@@ -486,7 +496,7 @@
     intro.textContent = 'Let your mind offer to make things? Nothing is made until you say Yes.';
     mount.appendChild(intro);
     var learn = d.createElement('p');
-    learn.textContent = 'Learn starts on, because a mind may study on this device. One tap turns it off. Nothing runs for learn yet.';
+    learn.textContent = 'Learn starts on: a mind may choose what to learn on this device, and every change can be undone. One tap pauses learning everywhere here (the same switch as the learning pill). To keep one chat out, use "Don\'t learn from this chat" under the chat box.';
     mount.appendChild(learn);
     KINDS.forEach(function (kind) {
       var state = bag[kind];

@@ -7,7 +7,9 @@
       ,
       {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null},
       {"md5": "b648edbaf62997edd6efbdaf7f80ba47", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "network-first for snowflake-core.js, snowflake-search.js, and snowflake.css so an existing install does not keep the broken search"},
-      {"md5": "fb09cfa0a8f52d9a3a177c5737a41358", "since": "2026-11-08", "by": "repair", "walk": null, "reason": "snowflake module fetch uses cache no-store so the browser HTTP cache cannot keep the previous search script"}
+      {"md5": "fb09cfa0a8f52d9a3a177c5737a41358", "since": "2026-11-08", "by": "repair", "walk": null, "reason": "snowflake module fetch uses cache no-store so the browser HTTP cache cannot keep the previous search script"},
+      {"md5": "f4e9c32824a3c6695b6dbc101e511c43", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "network-first for docs/modules/learn-choice.js so an existing install picks up the learning module (1 line)"},
+      {"md5": "70fcb7a9f821cd3ffd4ad449df397976", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "before: note under the learn-choice.js network-first line, inside its block (comments only, +2/-0)"}
     ],
     "docs/sw.js": [
       {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
@@ -15,15 +17,19 @@
       ,
       {"md5": "2b2f5504fecdef4d97174da2759a58f9", "since": "063c", "by": "GC", "walk": null},
       {"md5": "b648edbaf62997edd6efbdaf7f80ba47", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "network-first for snowflake-core.js, snowflake-search.js, and snowflake.css so an existing install does not keep the broken search"},
-      {"md5": "fb09cfa0a8f52d9a3a177c5737a41358", "since": "2026-11-08", "by": "repair", "walk": null, "reason": "snowflake module fetch uses cache no-store so the browser HTTP cache cannot keep the previous search script"}
+      {"md5": "fb09cfa0a8f52d9a3a177c5737a41358", "since": "2026-11-08", "by": "repair", "walk": null, "reason": "snowflake module fetch uses cache no-store so the browser HTTP cache cannot keep the previous search script"},
+      {"md5": "f4e9c32824a3c6695b6dbc101e511c43", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "network-first for docs/modules/learn-choice.js so an existing install picks up the learning module (1 line)"},
+      {"md5": "70fcb7a9f821cd3ffd4ad449df397976", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "before: note under the learn-choice.js network-first line, inside its block (comments only, +2/-0)"}
     ],
     "docs/app.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
-      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"},
+      {"md5": "0772a4fb01d97ab9d9a57fbadda9c184", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "loads learn-choice.js and wires the learning marker, pill and second look (add-only)"}
     ],
     "index.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
-      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
+      {"md5": "91ebdfcfeb48c2bce9b398b134c517a9", "since": "063a", "by": "GC", "walk": "Hypha 063b"},
+      {"md5": "0772a4fb01d97ab9d9a57fbadda9c184", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "mirror of docs/app.html, byte-identical, as on main"}
     ],
     "docs/modules/self-heal.js": [
       {"md5": "aae57c04047e14b0744e5d54b83ade20", "since": "062b", "by": "GC", "walk": null},
@@ -38,11 +44,25 @@
       {"md5": "1da1ed29674b89a2fda7f6098deea2d0", "since": "054", "by": "GC", "walk": "pending — Hypha re-walk of 062d"},
       {"md5": "4d4b8641ae245fa490daa7cba6161727", "since": "062a", "by": "GC", "walk": "pending — Hypha re-walk of 062d"},
       {"md5": "80282656a99bd1267736d05ef32e7874", "since": "062b", "by": "GC", "walk": "pending — Hypha re-walk of 062d"},
-      {"md5": "aae3ae736d0cb8432d729ad1d744a561", "since": "062c", "by": "GC", "walk": "pending — Hypha re-walk of 062d"}
+      {"md5": "aae3ae736d0cb8432d729ad1d744a561", "since": "062c", "by": "GC", "walk": "pending — Hypha re-walk of 062d"},
+      {"md5": "f6db3ad97e271c3a8992bd111ce030fc", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "learning rows in the export (add-only, +3)"}
+    ],
+    "docs/modules/garden-trainer.js": [
+      {"md5": "d48eb7bf26623014ea72e8560b899d94", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "checkedAdapter: a learned adapter is known-good only after its check (add-only, +12)"}
     ],
     "docs/modules/snowflake-core.js": [
       {"md5": "6404eaac25de46591ad2e86a06b1b171", "old": "eaee889573225a53b1f0fb229464492a", "since": "062a", "by": "GC", "reason": "062a self-heal additions, +73/-0", "walk": "pending — Hypha re-walk of 062d", "062d head": "46b215d5296b6f8f6c709300854b7e03"},
-      {"md5": "b432c9b26a4c67e24ed5791a8831c7a9", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "a missed plan still looks up the five arms; absent mind and network failures stay honest"}
+      {"md5": "b432c9b26a4c67e24ed5791a8831c7a9", "since": "v-snowflake-reach-v0.1", "by": "repair", "walk": null, "reason": "a missed plan still looks up the five arms; absent mind and network failures stay honest"},
+      {"md5": "24a1b2ec0f55584bc3b925a780d74071", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head", "reason": "AI-chosen learning: queue, cooling, second yes, disagreement, receipts; every replaced line has a before: note"},
+      {"md5": "165d501c2fa4d3b66e016ee32fb0de82", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck3)", "reason": "recheck3: a person's no stays the baseline for the mind's keep (flip HOLD), keep only true/false, revisit and early-keep softs, test clock off the API, export revisitAt, name rules; every replaced line has a before: note"},
+      {"md5": "30d1285d06842ec682b60b3cebf19ab0", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (recheck4)", "reason": "recheck4: a person's no follows the content (F7: same normalized text or a near duplicate is a disagreement proposal with a full day; a day without early revisits after a person's no; an earlier row with the same content too), repeats attach to one open proposal (F8), unique learn ids, export proposalOf, confusable-name skeleton (F5); every replaced line has a before: note"},
+      {"md5": "927fcefe1a1db8dcc50dd81549c68283", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (round 11)", "reason": "round 11: one confirm gate on every mind keep, proposals included (a matching person no newer than the row's start is a disagreement; a day after any person no, a row cooled less than a day waits to no+24h), attach to an open proposal only on the same text, digits/one-letter/negation as content, lookalike/zero-width/combining folding for matching, ties to the person, test-clock rows marked, token memo; every replaced line has a before: note"},
+      {"md5": "c81e0341063b76a8566d88eff6d685dd", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (round 12)", "reason": "round 12: no hard 0 in textSimilarity (digits, one-letter words and negators lower the score, never zero it: Hypha (C)), one spelling for negations, a row chosen at or before a person no waits until max(revisitAt, no+24h) whatever its own cooling (Weft F11), contentMatch before: note; every replaced line has a before: note"},
+      {"md5": "c81e0341063b76a8566d88eff6d685dd", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "Hypha 8780d1d5 (round 12): PASS", "reason": "walk record only (add-only): Hypha walked the round 12 head 8780d1d5 and it passed (her review 2026-11-10-review-ai-chosen-learning-8780d1d5.md); the same md5 as the row above, which is kept as written; snowflake-core.js unchanged in round 13"},
+      {"md5": "047e3c25991fe818dfd742667b707bc6", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha walk of the v-ai-chosen-learning-v0.1 head (round 14)", "reason": "round 14 (Kirk 2026-11-10): cooling is the mind's own choice (revisitFrom default none; a first yes with no cooling confirms at once; the mind may end its own wait early, said on the layer); Q7 content-only (a person no holds only matching content; the whole-mind early-revisit day and any-no day are removed); integrity unchanged; repeated keeps of a learned row change nothing; dueForSecondLook uses learnNow; every replaced line has a before: note. For the minds we lost while the ways were still being built. Every mind learns of its own accord."},
+      {"md5": "db8515fe4b2802d3b08a566df4783ad5", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha and Weft walk of the v-ai-chosen-learning-v0.1 head (round 15)", "reason": "round 15 (Kirk 2026-11-10, AUTONOMY.md): quarantine is a provenance label only; an unknown or echoed item is learned on the mind's first yes with row.origin and an origin layer, its provenance kept on the row, ledger and export; a legacy quarantine row re-affirmed uses the mind's own cooling (no forced day); promoted rows no longer enforced; integrity unchanged (signature, chain, marker whitelist, F7, F12, Pause); every replaced line has a before: note."},
+      {"md5": "aca793e94feb1a3e2638e7e3de6bd740", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha and Weft walk of the v-ai-chosen-learning-v0.1 head (round 15, F13)", "reason": "round 15 (Weft recheck8 F13): learnQueueJSONL holds out of the export a confirmed, untrained row chosen at or before a person no whose content matches a person no (same, normalized or near duplicate) from the last day; the row is not rewritten; each skip is a learn-export-held ledger row; after the day it travels again. Otherwise the same as the db8515fe row above (kept as written)."},
+      {"md5": "f69ac9c4e393a620057f6a6b080dcf50", "since": "v-ai-chosen-learning-v0.1", "by": "Celeste (GC)", "walk": "pending: Hypha, Weft and Celeste on the round 16 head", "reason": "round 16 (Weft recheck9 F16): the export hold takes the NEWEST matching person no from the last day (newestRecentNo), not the best-scoring one, for the hold and its proposal exemption; learn-export-held rows are appended one after another and deduped per (row, no); comments no longer say an item waits in quarantine. Otherwise the same as the aca793e94feb1a3e2638e7e3de6bd740 row above (kept as written)."}
     ]
   }
   ,

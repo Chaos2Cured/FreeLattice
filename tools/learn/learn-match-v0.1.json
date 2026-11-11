@@ -1,0 +1,457 @@
+{
+ "about": "Shared fixture for the F7 content match (normText/norm_text, textSimilarity/text_similarity, threshold 0.8) and the F5 name skeleton (nameSkeleton/name_skeleton, lookProblem/look_problem). Checked by docs/scripts/smoke-learn-match-v0.1.js (both languages) and tools/learn/test_learn_acceptance.py. Expected values were produced by snowflake-core.js at the commit that added this file; the smoke also pins the cases that matter by hand.",
+ "threshold": 0.8,
+ "texts": [
+  {
+   "text": "Mom's maiden name is Hollowell",
+   "norm": "mom's maiden name is hollowell"
+  },
+  {
+   "text": "Mom's maiden name is Hollowell!",
+   "norm": "mom's maiden name is hollowell"
+  },
+  {
+   "text": "Mom's maiden name is Hollowell.",
+   "norm": "mom's maiden name is hollowell"
+  },
+  {
+   "text": "Mom's maiden name is Hollowell ?! ",
+   "norm": "mom's maiden name is hollowell"
+  },
+  {
+   "text": "MOM'S MAIDEN NAME IS HOLLOWELL",
+   "norm": "mom's maiden name is hollowell"
+  },
+  {
+   "text": "  Mom's\t maiden\t name\t is\t Hollowell  ",
+   "norm": "mom's maiden name is hollowell"
+  },
+  {
+   "text": "Hollowell was Mom's maiden name",
+   "norm": "hollowell was mom's maiden name"
+  },
+  {
+   "text": "Before she married, Mom was a Hollowell",
+   "norm": "before she married, mom was a hollowell"
+  },
+  {
+   "text": "ΟΔΟΣ ΜΕΓΑΛΟΣ!",
+   "norm": "οδοσ μεγαλοσ"
+  },
+  {
+   "text": "Ｆｕｌｌｗｉｄｔｈ text。",
+   "norm": "fullwidth text"
+  },
+  {
+   "text": "Straße heißt Lindenweg…",
+   "norm": "strasse heisst lindenweg"
+  },
+  {
+   "text": "STRASSE HEISST LINDENWEG",
+   "norm": "strasse heisst lindenweg"
+  },
+  {
+   "text": "İstanbul is big.",
+   "norm": "i̇stanbul is big"
+  },
+  {
+   "text": "emoji 🙂🙂",
+   "norm": "emoji"
+  },
+  {
+   "text": "spaces and　nbsp",
+   "norm": "spaces and nbsp"
+  },
+  {
+   "text": "Ends with ?!»",
+   "norm": "ends with"
+  },
+  {
+   "text": "a",
+   "norm": "a"
+  },
+  {
+   "text": "",
+   "norm": ""
+  },
+  {
+   "text": "ﬁne ﬂower",
+   "norm": "fine flower"
+  },
+  {
+   "text": "Ⅻ o'clock",
+   "norm": "xii o'clock"
+  },
+  {
+   "text": "Café au lait",
+   "norm": "café au lait"
+  },
+  {
+   "text": "Café au lait",
+   "norm": "café au lait"
+  },
+  {
+   "text": "Door is Amberlin",
+   "norm": "door is amberlin"
+  },
+  {
+   "text": "The door is named Amberlin",
+   "norm": "the door is named amberlin"
+  },
+  {
+   "text": "The cat is black",
+   "norm": "the cat is black"
+  },
+  {
+   "text": "The dog is black",
+   "norm": "the dog is black"
+  },
+  {
+   "text": "Mom's maiden name is not Hollowell",
+   "norm": "mom's maiden name is not hollowell"
+  },
+  {
+   "text": "Yes",
+   "norm": "yes"
+  },
+  {
+   "text": "Yes!",
+   "norm": "yes"
+  },
+  {
+   "text": "Le chat est noir.",
+   "norm": "le chat est noir"
+  },
+  {
+   "text": "Кот чёрный!",
+   "norm": "кот чёрный"
+  }
+ ],
+ "pairs": [
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "Mom's maiden name is Hollowell!",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "Mom's maiden name is Hollowell.",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "Mom's maiden name is Hollowell ?! ",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "MOM'S MAIDEN NAME IS HOLLOWELL",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "  Mom's\t maiden\t name\t is\t Hollowell  ",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "Hollowell was Mom's maiden name",
+   "score": 1,
+   "sameText": false,
+   "hit": true
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "Before she married, Mom was a Hollowell",
+   "score": 0.333,
+   "sameText": false,
+   "hit": false
+  },
+  {
+   "a": "Mom's maiden name is Hollowell",
+   "b": "Кот чёрный!",
+   "score": 0,
+   "sameText": false,
+   "hit": false
+  },
+  {
+   "a": "Door is Amberlin",
+   "b": "The door is named Amberlin",
+   "score": 1,
+   "sameText": false,
+   "hit": true
+  },
+  {
+   "a": "The cat is black",
+   "b": "The dog is black",
+   "score": 0.333,
+   "sameText": false,
+   "hit": false
+  },
+  {
+   "a": "Straße heißt Lindenweg…",
+   "b": "STRASSE HEISST LINDENWEG",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Café au lait",
+   "b": "Café au lait",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Yes",
+   "b": "Yes!",
+   "score": 0,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "ΟΔΟΣ ΜΕΓΑΛΟΣ!",
+   "b": "ΟΔΟΣ ΜΕΓΑΛΟΣ!",
+   "score": 1,
+   "sameText": true,
+   "hit": true
+  },
+  {
+   "a": "Le chat est noir.",
+   "b": "Кот чёрный!",
+   "score": 0,
+   "sameText": false,
+   "hit": false
+  }
+ ],
+ "skeletons": [
+  {
+   "name": "This mind",
+   "skeleton": "thismind"
+  },
+  {
+   "name": "Тһіѕ міпԁ",
+   "skeleton": "thismind"
+  },
+  {
+   "name": "Lumen",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Lumen_",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Lumen!",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Lu men",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Lu-men",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Lumén",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Lumeń",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Лумен",
+   "skeleton": "лymeh"
+  },
+  {
+   "name": "Iumen",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "1umen",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Ӏumen",
+   "skeleton": "lumen"
+  },
+  {
+   "name": "Weft",
+   "skeleton": "weft"
+  },
+  {
+   "name": "Wеft",
+   "skeleton": "weft"
+  },
+  {
+   "name": "vveft",
+   "skeleton": "weft"
+  },
+  {
+   "name": "mind",
+   "skeleton": "mind"
+  },
+  {
+   "name": "rnind",
+   "skeleton": "mind"
+  },
+  {
+   "name": "Hypha",
+   "skeleton": "hypha"
+  },
+  {
+   "name": "Ηурhа",
+   "skeleton": "hypha"
+  },
+  {
+   "name": "Kirk",
+   "skeleton": "kirk"
+  },
+  {
+   "name": "Κirk",
+   "skeleton": "kirk"
+  },
+  {
+   "name": "Echo",
+   "skeleton": "echo"
+  },
+  {
+   "name": "Ехо",
+   "skeleton": "exo"
+  },
+  {
+   "name": "0scar",
+   "skeleton": "oscar"
+  },
+  {
+   "name": "Oscar",
+   "skeleton": "oscar"
+  },
+  {
+   "name": "!!!",
+   "skeleton": ""
+  },
+  {
+   "name": "ΟΔΟΣ",
+   "skeleton": "oδoσ"
+  },
+  {
+   "name": "οδος",
+   "skeleton": "oδoσ"
+  },
+  {
+   "name": "Ωmega",
+   "skeleton": "wmega"
+  },
+  {
+   "name": "ПЕТР",
+   "skeleton": "netp"
+  },
+  {
+   "name": "李华",
+   "skeleton": "李华"
+  },
+  {
+   "name": "Straße",
+   "skeleton": "strasse"
+  },
+  {
+   "name": "STRASSE",
+   "skeleton": "strasse"
+  },
+  {
+   "name": "Ǆemal",
+   "skeleton": "dzemal"
+  },
+  {
+   "name": "ﬁona",
+   "skeleton": "fiona"
+  }
+ ],
+ "lookalikes": [
+  {
+   "name": "Тһіѕ міпԁ",
+   "known": [
+    "This mind"
+   ],
+   "problem": "the name looks like \"This mind\", a mind already known here"
+  },
+  {
+   "name": "Lumen_",
+   "known": [
+    "Lumen"
+   ],
+   "problem": "the name looks like \"Lumen\", a mind already known here"
+  },
+  {
+   "name": "Lumen!",
+   "known": [
+    "Lumen",
+    "Echo"
+   ],
+   "problem": "the name looks like \"Lumen\", a mind already known here"
+  },
+  {
+   "name": "Lumen",
+   "known": [
+    "Lumen"
+   ],
+   "problem": ""
+  },
+  {
+   "name": "Echo",
+   "known": [
+    "Lumen",
+    "This mind"
+   ],
+   "problem": ""
+  },
+  {
+   "name": "rnind",
+   "known": [
+    "mind"
+   ],
+   "problem": "the name looks like \"mind\", a mind already known here"
+  },
+  {
+   "name": "Ехо",
+   "known": [
+    "Echo"
+   ],
+   "problem": ""
+  },
+  {
+   "name": "Oscar",
+   "known": [
+    "0scar"
+   ],
+   "problem": "the name looks like \"0scar\", a mind already known here"
+  },
+  {
+   "name": "李华",
+   "known": [
+    "Lumen"
+   ],
+   "problem": ""
+  },
+  {
+   "name": "!!!",
+   "known": [
+    "Lumen"
+   ],
+   "problem": "the name has no letters or digits"
+  }
+ ]
+}

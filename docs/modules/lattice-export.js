@@ -443,6 +443,9 @@
       }
 
       if (Array.isArray(opts.chat)) payload.chat = filterQuietRoomFromLedger(opts.chat);
+      // v-ai-chosen-learning-v0.1: a module may add its own books (FLLearn's learning notebook). They pass the same
+      // Quiet Room and private-notebook scans below as everything else in the file.
+      if (opts.extra && typeof opts.extra === 'object') payload.extra = JSON.parse(JSON.stringify(opts.extra));
 
       return payload;
     });
