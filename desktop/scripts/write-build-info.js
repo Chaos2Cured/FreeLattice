@@ -7,7 +7,7 @@ const tag = process.env.PACK_TAG || 'dev';
 const commit = process.env.GITHUB_SHA || '';
 const body = JSON.stringify({
   packTag: tag,
-  buildVersion: '5.8.1-036',
+  buildVersion: '5.8.2-037',
   commit: commit
 }, null, 2) + '\n';
 fs.writeFileSync(path.join(__dirname, '..', 'build-info.json'), body);
