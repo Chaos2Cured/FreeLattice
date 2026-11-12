@@ -1,0 +1,53 @@
+WONDER TESTS v0 — RESULTS (2026-11-03, run on the box, CPU only)
+Celeste, for Kirk. These are real numbers from real runs. Every idea is a hypothesis. This is ONE small test, not a verdict on the ideas.
+
+SETUP
+Data: TinyShakespeare (public domain, 1,115,394 chars, md5 6fb458f1232090904fb40fe944165e91). 90% train, 10% validation.
+Model: tiny character-level transformer. 4 layers, width 128, 4 heads, context 128, about 810k parameters.
+Training: AdamW at lr 3e-3, weight decay 0.1, 100-step warmup then cosine decay. 1,500 steps at batch 32 (about 6.1M training characters per run).
+Equal compute: every variant gets the same steps, batch, data order and seed. Seeds are 0, 1 and 2.
+Score: validation loss in nats per character over 40 fixed batches (lower is better). Code: wonder-tests/wonder.py. Raw rows: results.jsonl.
+
+THE VARIANTS
+1. baseline: standard sine/cosine positions, frequencies 10000^(-2i/d).
+2. phi_pos: the same, but position frequencies follow golden-ratio steps, w_i = phi^(-i).
+3. aurora_lr: the cosine learning rate times (1 + (1/phi^2) * sin(2*pi*D*t/T)), with D = 3.076. That is the Aurora carrier C(t) = sum phi^n sin(2*pi*D*t), applied as a phi-weighted ripple. It makes about 3 cycles over the run.
+4. aurora_lookahead: the identity recursion I_t = 0.618*I_(t-1) + 0.382*G(S_t), applied to the weights. Every 5 steps, slow = 0.618*slow + 0.382*fast, and the model resets to slow. This is the literal Aurora Equation from aurora-equation.js and the provisional.
+5. multiscale: each character embedding plus a second, coarser token scale (a hashed embedding of the previous-character + current-character pair, 4096 buckets, causal). It has more parameters (1.33M); that is a confound.
+
+RESULTS (validation loss, mean of 3 seeds; per-seed values; difference vs baseline on the same seed)
+baseline         1.5736 (1.5706, 1.5774, 1.5727)
+phi_pos          1.5836 (1.5824, 1.5903, 1.5782)  worse by +0.0101 (+0.64%); worse on all 3 seeds
+aurora_lr        1.5832 (1.5847, 1.5920, 1.5728)  worse by +0.0096 (+0.61%); 2 seeds worse, 1 tie
+aurora_lookahead 1.7007 (1.7017, 1.7023, 1.6982)  worse by +0.1272 (+8.1%); worse on all 3 seeds (clear negative)
+multiscale       1.6005 (1.6021, 1.5964, 1.6031)  worse by +0.0270 (+1.7%); worse on all 3 seeds
+Seed spread for the baseline: sd 0.0035.
+
+LEARNING CURVE (mean validation loss at steps 250 / 500 / 750 / 1000 / 1250 / 1500)
+baseline         2.070 / 1.819 / 1.698 / 1.619 / 1.575 / 1.562
+phi_pos          2.157 / 1.849 / 1.716 / 1.637 / 1.585 / 1.571
+aurora_lr        2.037 / 1.836 / 1.694 / 1.631 / 1.580 / 1.568
+aurora_lookahead 2.212 / 1.928 / 1.803 / 1.732 / 1.697 / 1.689
+multiscale       2.022 / 1.816 / 1.710 / 1.642 / 1.600 / 1.587
+
+WHAT HELPED
+Nothing beat the baseline at the finish line.
+Two small early signals, worth one more look:
+- aurora_lr was ahead at step 250 (2.037 vs 2.070) and at step 750. The ripple's high-lr phases may speed early learning. It fell behind by the end.
+- multiscale was ahead at steps 250 and 500 (2.022 vs 2.070). The pair scale gives a fast head start, then it falls behind, probably from overfitting or the extra 524k untied parameters.
+
+WHAT DIDN'T
+- The literal Aurora identity recursion used as a weight-averaging optimizer clearly slowed training, by about 8%. Pulling weights 61.8% back toward the past every 5 steps throws away about 38% of each 5-step update. That is good for keeping an identity stable, and bad for learning fast. This fits what the equation is for: persistence, not speed.
+- Golden-ratio position frequencies were slightly worse. With w_i = phi^(-i), most of the 64 frequency pairs are almost frozen (phi^(-40) is about 4e-9), so the model effectively gets fewer usable position channels.
+
+HONEST LIMITS
+- Tiny model, tiny data, 1,500 steps, 3 seeds, one setting per idea, no tuning. A real effect of under about 1% could hide here, and a tuned variant could flip the result.
+- I tested my own reading of how to use the equations. Kirk's training setup, where he saw Aurora help, may differ, and I don't know its details.
+- No BPE comparison: changing tokens changes the loss units. Next time, compare in bits per character.
+
+SMART NEXT TESTS (cheap)
+1. aurora_lr: tune the ripple size (0.1 to 0.38) and D (1, 3.076, 7), and test whether its early lead holds at 500-step budgets.
+2. Aurora as an EMA EVAL copy (keep training fast, average only for evaluation and memory). That is the identity use, not the speed use.
+3. multiscale with a parameter-matched baseline, plus dropout on the pair table.
+4. phi positions scaled to the same frequency range as the baseline, so phi sets the spacing, not the range.
+Each takes about 15 to 40 minutes on the box.
