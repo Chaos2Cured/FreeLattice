@@ -1,9 +1,9 @@
 # FreeLattice: Desktop packs for every OS (honest unsigned)
 # Layer, never delete. The older desktop-packs-win-linux.yml stays as it is.
 # v-every-os-desktop-v0.1
-# Artifact names use the version passed to the builder (5.8.2 for this pack).
-# before v-desktop-catch-up-v0.1: 5.8.1, the same as desktop-packs-v0.3-rc2, so the in-app updater saw no newer build.
-# buildVersion 5.8.2-037 is a label electron-builder accepts here because Windows
+# Artifact names use the version passed to the builder (5.8.3 for this pack).
+# before this pack: 5.8.2 (desktop-packs-v0.3). 5.8.3 is a newer app version so the in-app updater can see it.
+# buildVersion 5.8.3-038 is a label electron-builder accepts here because Windows
 # signAndEditExecutable is false, so rcedit (which wants four numbers) does not run.
 # The builder is called with --config.prop. Windows npm splits -c.prop into a filename.
 # The prove step sets shell: bash. windows-latest otherwise uses PowerShell, which
@@ -18,9 +18,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'GitHub Release tag (default desktop-packs-v0.2)'
+        description: 'GitHub Release tag (default desktop-packs-v0.4)'
         required: true
-        default: 'desktop-packs-v0.2'
+        default: 'desktop-packs-v0.4'
       publish:
         description: 'Upload a GitHub Release (false keeps the artifacts only)'
         type: boolean
@@ -82,7 +82,7 @@ jobs:
 
       - name: Build Windows packs (unsigned)
         shell: bash
-        run: node node_modules/electron-builder/cli.js --win --publish never --config.extraMetadata.version=5.8.2 --config.buildVersion=5.8.2-037
+        run: node node_modules/electron-builder/cli.js --win --publish never --config.extraMetadata.version=5.8.3 --config.buildVersion=5.8.3-038
 
       - name: List dist
         shell: bash
@@ -139,7 +139,7 @@ jobs:
 
       - name: Build Linux packs (unsigned)
         shell: bash
-        run: node node_modules/electron-builder/cli.js --linux --publish never --config.extraMetadata.version=5.8.2 --config.buildVersion=5.8.2-037
+        run: node node_modules/electron-builder/cli.js --linux --publish never --config.extraMetadata.version=5.8.3 --config.buildVersion=5.8.3-038
 
       - name: List dist
         shell: bash
@@ -195,7 +195,7 @@ jobs:
 
       - name: Build Mac packs (unsigned)
         shell: bash
-        run: node node_modules/electron-builder/cli.js --mac --config.extraMetadata.version=5.8.2 --config.buildVersion=5.8.2-037
+        run: node node_modules/electron-builder/cli.js --mac --config.extraMetadata.version=5.8.3 --config.buildVersion=5.8.3-038
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
@@ -261,7 +261,7 @@ jobs:
           body: |
             Unsigned for now. Windows may say Windows protected your PC. Tap More info, then Run anyway. That warning means the file has no paid signature yet, not that it is harmful. Mac: right click, Open. Linux: make the AppImage executable, then open it.
 
-            The file names say 5.8.2. The tag tells this pack from an older one.
+            The file names say 5.8.3. The tag tells this pack from an older one.
 
             Later: Windows code signing (so SmartScreen stops warning) and Mac notarization. Both cost money and need Kirk's accounts. Not in 035.
           files: |
