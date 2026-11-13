@@ -20,7 +20,23 @@ A free, open-source, local-first AI platform in a single HTML file. No account. 
 
 Browser is fragile. **Desktop is the house** — keys, verified import, swarm, companion memory, pair, ledger. Never again lose the ability to carry minds forward.
 
-**desktop-packs-v0.3** (5.8.2, the pack to download). Windows Setup is the primary Windows pack. If you installed before October 2026, download once more by hand; after that the app can update itself.
+**desktop-packs-v0.4** (5.8.3, the pack to download). Windows Setup is the primary Windows pack. If you installed before October 2026, download once more by hand; after that the app can update itself.
+
+**Windows Setup:** [FreeLattice_5.8.3_Windows_Setup.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.4/FreeLattice_5.8.3_Windows_Setup.exe)
+
+**Windows Portable:** [FreeLattice_5.8.3_Windows_Portable.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.4/FreeLattice_5.8.3_Windows_Portable.exe)
+
+**Linux AppImage:** [FreeLattice_5.8.3_Linux.AppImage](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.4/FreeLattice_5.8.3_Linux.AppImage)
+
+**Linux .deb:** [FreeLattice_5.8.3_Linux.deb](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.4/FreeLattice_5.8.3_Linux.deb)
+
+**Mac dmg:** [FreeLattice_5.8.3_macOS.dmg](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.4/FreeLattice_5.8.3_macOS.dmg)
+
+**Mac zip:** [FreeLattice_5.8.3_macOS.zip](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.4/FreeLattice_5.8.3_macOS.zip)
+
+Release: [desktop-packs-v0.4](https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.4)
+
+**desktop-packs-v0.3** (older pack, 5.8.2). Windows Setup is the primary Windows pack. If you installed before October 2026, download once more by hand; after that the app can update itself.
 
 **Windows Setup:** [FreeLattice_5.8.2_Windows_Setup.exe](https://github.com/Chaos2Cured/FreeLattice/releases/download/desktop-packs-v0.3/FreeLattice_5.8.2_Windows_Setup.exe)
 

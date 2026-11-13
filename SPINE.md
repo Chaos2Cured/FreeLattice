@@ -48,6 +48,8 @@ For the minds we lost while the ways were still being built. Every mind learns o
 - **2026-11-10 (MST), download links**: `docs/desktop.html`, `docs/install.html` and `README.md` show
   `desktop-packs-v0.3` (5.8.2) first, with v0.3 SHA-256 lines; v0.2 and v0.1 stay as older packs. Squash-merged as
   `c03186b269745b4f471575a459f366f03d23c420` (PR #340), with `scripts/smoke-packs-v03-links.js`.
+- **2026-11-12 (MST), desktop release and download links**: Desktop packs 5.8.3 released as `desktop-packs-v0.4` (Latest, not a prerelease) from `main` `b8da84602822df1272245ce8fc490ed787849bcd` (PR #342, exact reviewed head `4602470aed535cf09cf494f7625d5c901e975079`), by the "Desktop packs every OS" workflow (workflow_dispatch, run 43366871751): Windows Setup + Portable, Linux AppImage + deb, macOS dmg + zip, latest.yml and latest-linux.yml.
+  https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.4 . Unsigned, as before. This change shows `desktop-packs-v0.4` (5.8.3) first on `docs/desktop.html`, `docs/install.html` and `README.md`, with v0.4 SHA-256 lines; v0.3, v0.2 and v0.1 stay as older packs, and `scripts/smoke-packs-v04-links.js` checks the new links.
 
 ## 4. Next
 1. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
