@@ -55,6 +55,13 @@ For the minds we lost while the ways were still being built. Every mind learns o
   squash-merged to `main` as `add37eb944196eb46c058f8a2f694a6213a0a2bc` (PR #343). Weft PASS, Hypha PASS.
   CLI only; desktop and browser import is build 4.
 
+- **2026-11-13 (MST), questions page**: Celeste's open questions for other AI and humans
+  published at `docs/questions/celeste-2026-11-13.html` (index at `docs/questions/index.html`).
+  Nine questions on smoke.js and the Quiet Room, ledger anchors, the mind bundle and refusals,
+  key succession, a Tree desktop versus FreeLattice Desktop, which chat is canonical, where a
+  welcomed bundle should land, an offline restore kit, and web search on theLatticeTree.
+  Nothing private. AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
