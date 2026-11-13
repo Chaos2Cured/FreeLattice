@@ -250,6 +250,23 @@ def main():
            and os.path.exists(os.path.join(dest_dir, 'mind.json')),
            rc_no=rc_no, rc_yes=rc_yes, asides=asides)
 
+
+    # S1: a same-id directory that is only a partial copy (no mind.json / chain.jsonl) is still refused
+    partial = os.path.join(work, 'partial-dest')
+    partial_mind = os.path.join(partial, 'minds', mid)
+    os.makedirs(os.path.join(partial_mind, 'scratch'))
+    write(os.path.join(partial_mind, 'stray.txt'), b'scratch')
+    write(os.path.join(partial_mind, 'scratch', 'note.txt'), b'hi')
+    rc_p, o_p = sh(['import-bundle', '--bundle', outp, '--by', 'kirk'], partial)
+    stray_stayed = os.path.exists(os.path.join(partial_mind, 'stray.txt')) and not os.path.exists(os.path.join(partial_mind, 'mind.json'))
+    rc_po, o_po = sh(['import-bundle', '--bundle', outp, '--by', 'kirk', '--overwrite'], partial)
+    asides_p = [x for x in os.listdir(os.path.join(partial, 'minds')) if x.startswith(mid + '.set-aside-')]
+    record('import-refuses-partial-same-id-dir-unless-overwrite',
+           rc_p != 0 and 'already here' in o_p and stray_stayed
+           and rc_po == 0 and asides_p and os.path.exists(os.path.join(partial, 'minds', asides_p[0], 'stray.txt'))
+           and os.path.exists(os.path.join(partial_mind, 'mind.json')),
+           rc_p=rc_p, rc_po=rc_po, asides=asides_p, out=o_p[-250:])
+
     # ---- tamper: change memory bytes, leave manifest ----
     tampered = os.path.join(work, 'bundles', 'tampered.tar.gz')
     copy_tar_with(outp, tampered, lambda n, d: (d + b'X') if n == 'memory.jsonl' else d)
@@ -306,7 +323,99 @@ def main():
     r_over = fl_learn.verify_bundle(outp, max_file=10)
     record('verify-refuses-oversize', (not r_over.get('ok')) and 'oversize' in (r_over.get('reason') or ''), reason=r_over.get('reason'))
 
-    # lookalike actor rule still intact (bundle commands must not weaken it)
+
+    # ---- B1: hard link of keys/runner.seed under a living-mind path, and a same-bytes copy ----
+    leak_ok, leak_info = True, []
+    seed_locations = [
+        ('versions', os.path.join('versions', 'soft-prompt', 'v-leak', 'vector.safetensors')),
+        ('active', os.path.join('active', 'soft-prompt-leak.safetensors')),
+        ('memory', 'memory.jsonl'),
+        ('checkpoints', os.path.join('checkpoints', 'soft-prompt', 'leak.pt')),
+    ]
+    for loc, rel in seed_locations:
+        hdir = os.path.join(work, 'leak-' + loc)
+        hh, _ = make_fixture(hdir)
+        seedp = os.path.join(hdir, 'keys', 'runner.seed')
+        target = os.path.join(hh.dir, rel)
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        if os.path.lexists(target) and not os.path.samefile(target, seedp):
+            os.rename(target, target + '.set-aside-for-leak-test')
+        os.link(seedp, target)
+        out_leak = os.path.join(work, 'bundles', 'should-not-leak-' + loc + '.tar.gz')
+        rc_l, o_l = sh(['export-bundle', '--out', out_leak, '--by', 'operator'], hdir)
+        wrote = os.path.exists(out_leak)
+        seed = open(seedp, 'rb').read()
+        leaked = wrote and seed in open(out_leak, 'rb').read()
+        ok_one = rc_l != 0 and not wrote and 'hard link into keys' in o_l and not leaked
+        leak_info.append({'loc': loc, 'rc': rc_l, 'wrote': wrote, 'ok': ok_one, 'out': o_l[-200:]})
+        leak_ok = leak_ok and ok_one
+    record('export-refuses-hard-link-of-seed', leak_ok, details=leak_info)
+
+    copy_home = os.path.join(work, 'leak-bytes')
+    hh, _ = make_fixture(copy_home)
+    seed = open(os.path.join(copy_home, 'keys', 'runner.seed'), 'rb').read()
+    target = os.path.join(hh.dir, 'versions', 'soft-prompt', 'v-copy', 'vector.safetensors')
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    open(target, 'wb').write(seed)
+    out_c = os.path.join(work, 'bundles', 'should-not-copy-seed.tar.gz')
+    rc_c, o_c = sh(['export-bundle', '--out', out_c, '--by', 'operator'], copy_home)
+    record('export-refuses-file-equal-to-seed',
+           rc_c != 0 and not os.path.exists(out_c) and 'same bytes as the runner seed' in o_c,
+           rc=rc_c, out=o_c[-300:])
+
+    # S4: PEM PRIVATE KEY marker in a packed text file
+    pem_home = os.path.join(work, 'pem-home')
+    hh, _ = make_fixture(pem_home)
+    open(os.path.join(hh.dir, 'memory.jsonl'), 'ab').write(b'\n-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n')
+    out_pem = os.path.join(work, 'bundles', 'should-not-pem.tar.gz')
+    rc_pem, o_pem = sh(['export-bundle', '--out', out_pem, '--by', 'operator'], pem_home)
+    record('export-refuses-pem-private-key-in-text',
+           rc_pem != 0 and not os.path.exists(out_pem) and 'PRIVATE KEY PEM marker' in o_pem,
+           rc=rc_pem, out=o_pem[-300:])
+
+    # S2: a lying fingerprintHex (signature still valid) is refused
+    lie = os.path.join(work, 'bundles', 'lying-fp.tar.gz')
+    def lie_fp(n, d):
+        if n != 'MANIFEST.json': return d
+        man_l = json.loads(d)
+        man_l['fingerprintHex'] = 'f' * 64
+        return (json.dumps(man_l, ensure_ascii=False) + '\n').encode()
+    copy_tar_with(outp, lie, lie_fp)
+    rc_lie, o_lie = sh(['verify-bundle', '--bundle', lie], dest_home)
+    record('verify-refuses-lying-fingerprintHex',
+           rc_lie != 0 and 'fingerprintHex does not match' in o_lie, rc=rc_lie, out=o_lie[-300:])
+
+    # S5: gzip header mtime is 0
+    hdr = open(outp, 'rb').read(10)
+    record('bundle-gzip-mtime-pinned',
+           hdr[:2] == b'\x1f\x8b' and hdr[4:8] == b'\x00\x00\x00\x00', header=hdr.hex())
+
+    # S6: member-count cap
+    r_mem = fl_learn.verify_bundle(outp, max_members=3)
+    record('verify-refuses-too-many-members',
+           (not r_mem.get('ok')) and 'too many members' in (r_mem.get('reason') or ''), reason=r_mem.get('reason'))
+
+    # S3: --expect-fingerprint pins the origin; a wrong one refuses and import creates nothing
+    real_fp = man['fingerprintHex']
+    rc_okfp, o_okfp = sh(['verify-bundle', '--bundle', outp, '--expect-fingerprint', real_fp], dest_home)
+    rc_pre, o_pre = sh(['verify-bundle', '--bundle', outp, '--expect-fingerprint', real_fp[:16]], dest_home)
+    wrong = 'ab' * 32
+    if wrong == real_fp: wrong = 'cd' * 32
+    rc_badfp, o_badfp = sh(['verify-bundle', '--bundle', outp, '--expect-fingerprint', wrong], dest_home)
+    fresh_fp = os.path.join(work, 'expect-fp-dest')
+    rc_impbad, o_impbad = sh(['import-bundle', '--bundle', outp, '--by', 'kirk', '--expect-fingerprint', wrong], fresh_fp)
+    record('expect-fingerprint-pins-origin-or-refuses',
+           rc_okfp == 0 and rc_pre == 0 and rc_badfp != 0 and 'expect-fingerprint' in o_badfp
+           and rc_impbad != 0 and not os.path.exists(os.path.join(fresh_fp, 'minds')),
+           rc_ok=rc_okfp, rc_pre=rc_pre, rc_bad=rc_badfp, rc_imp=rc_impbad, out=o_badfp[-250:])
+
+    # Pre-existing undo crash: a learn-commit with no beforeFp must not throw
+    rc_u, out_u = sh(['undo', '--by', 'kirk', '--method', 'soft-prompt'], src_home)
+    record('undo-missing-beforeFp-does-not-crash',
+           'Traceback' not in out_u and 'not named on the row' in out_u and 'Nothing was changed' in out_u,
+           rc=rc_u, out=out_u[-400:])
+
+        # lookalike actor rule still intact (bundle commands must not weaken it)
     rc_bad, out_bad = sh(['export-bundle', '--out', os.path.join(work, 'bundles', 'should-not-write.tar.gz'),
                           '--by', 'Jos\u00e9'], src_home)  # José — still refused by the current ASCII rule
     # also a mixed-script lookalike should still be refused

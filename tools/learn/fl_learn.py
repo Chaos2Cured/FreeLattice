@@ -59,6 +59,8 @@ BUNDLE_SIG = 'MANIFEST.sig'
 BUNDLE_PUB = 'public-key.json'
 MAX_BUNDLE_FILE_BYTES = 2 * 1024 ** 3
 MAX_BUNDLE_TOTAL_BYTES = 4 * 1024 ** 3
+MAX_BUNDLE_MEMBERS = 10000
+PEM_PRIVATE_MARK = re.compile(br'-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----')
 BUNDLE_ROOT_FILES = ('mind.json', 'memory.jsonl', 'chain.jsonl', 'receipts.jsonl', 'canary.json', 'declines.jsonl')
 BUNDLE_DIRS = ('pointers', 'active', 'versions', 'archive', 'checkpoints')
 BUNDLE_SKIP_NAMES = frozenset({'runner.seed', '.lock', 'trainer.lock', 'PAUSE'})
@@ -883,6 +885,76 @@ def _is_private_key_arc(arc):
     base = parts[-1] if parts else ''
     return base == 'runner.seed' or (parts and parts[0] == 'keys') or base.endswith('.seed')
 
+
+def _keys_file_inodes(home):
+    """(st_dev, st_ino) for every regular file under this home's keys/ (and a mind-local keys/ if one exists)."""
+    ids = set()
+    for kdir in (os.path.join(home.root, 'keys'), os.path.join(home.dir, 'keys')):
+        if not os.path.isdir(kdir): continue
+        for r, dirs, fs in os.walk(kdir, followlinks=False):
+            dirs[:] = [d for d in dirs if not os.path.islink(os.path.join(r, d))]
+            for x in fs:
+                fp_ = os.path.join(r, x)
+                if os.path.islink(fp_) or not os.path.isfile(fp_): continue
+                st = os.lstat(fp_)
+                ids.add((st.st_dev, st.st_ino))
+    return ids
+
+def _runner_seed_bytes(home):
+    """The private seed file on this computer, if it exists. Never packed."""
+    fp_ = os.path.join(home.root, 'keys', 'runner.seed')
+    if os.path.isfile(fp_) and not os.path.islink(fp_):
+        return open(fp_, 'rb').read()
+    return None
+
+def bundle_source_secret_problem(path, keys_inodes, seed_bytes):
+    """Refuse a source file that is a hard link into keys/, or whose bytes equal the runner seed."""
+    try:
+        st = os.lstat(path)
+    except OSError as e:
+        return 'cannot read %s (%s)' % (path, e)
+    if not stat.S_ISREG(st.st_mode): return None
+    if st.st_nlink > 1 and (st.st_dev, st.st_ino) in keys_inodes:
+        return 'a packed file is a hard link into keys/ (%s)' % path
+    if seed_bytes:
+        if st.st_size == len(seed_bytes) or st.st_size == 32:
+            got = open(path, 'rb').read()
+            if got == seed_bytes or (len(got) == 32 and got == seed_bytes[:32]):
+                return 'a packed file has the same bytes as the runner seed (%s)' % path
+    return None
+
+def _is_probably_text(name, data):
+    base = name.replace('\\', '/').rsplit('/', 1)[-1].lower()
+    if base.endswith(('.json', '.jsonl', '.txt', '.md', '.csv', '.sha256', '.sig', '.pub')):
+        return True
+    if base.endswith(('.safetensors', '.pt', '.bin', '.gguf', '.onnx', '.pth')):
+        return False
+    if b'\x00' in data[:4096]: return False
+    try:
+        data[:4096].decode('utf-8'); return True
+    except UnicodeDecodeError:
+        return False
+
+def bundle_text_pem_problem(arc, data):
+    """Refuse packing a text file that contains a PEM PRIVATE KEY marker."""
+    if not _is_probably_text(arc, data): return None
+    if PEM_PRIVATE_MARK.search(data):
+        return 'a packed text file contains a PRIVATE KEY PEM marker (%s)' % arc
+    return None
+
+def fingerprint_of_key(pub_b64):
+    """Same companion fingerprint as Signer and desktop/lattice-keys.js."""
+    return hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(pub_b64)).hexdigest()
+
+def _norm_fp(s):
+    return ''.join(c for c in str(s or '').lower() if c in '0123456789abcdef')
+
+def fingerprint_matches(got, expect):
+    """Exact hex match, or a prefix of at least 16 hex digits (spaces ignored)."""
+    want, have = _norm_fp(expect), _norm_fp(got)
+    if not want or not have: return False
+    return have == want or (len(want) >= 16 and have.startswith(want))
+
 def iter_bundle_paths(home):
     """Living-mind files only: identity, memory, ledger, receipts, pointers, active and known-good
     (and other) versions, archive, checkpoints. Never the private seed, never keys/, never locks or tmp."""
@@ -923,6 +995,24 @@ def _tar_add_bytes(tf, arcname, data):
     info.uname = info.gname = ''; info.uid = info.gid = 0
     tf.addfile(info, io.BytesIO(data))
 
+@contextlib.contextmanager
+def _bundle_tar_writer(path):
+    """Write a .tar.gz with tar member mtime 0 and gzip mtime 0 (deterministic for the same members)."""
+    import gzip, tarfile
+    raw = open(path, 'wb')
+    try:
+        gz = gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0, compresslevel=6)
+        try:
+            tf = tarfile.open(fileobj=gz, mode='w:', format=tarfile.PAX_FORMAT)
+            try:
+                yield tf
+            finally:
+                tf.close()
+        finally:
+            gz.close()
+    finally:
+        raw.flush(); os.fsync(raw.fileno()); raw.close()
+
 def export_bundle(home, out=None):
     """Pack the living mind into one signed, content-hashed archive. Nothing is moved or deleted.
     The cap-archive path (export_and_archive) is unchanged. Private keys never go in the file."""
@@ -930,11 +1020,22 @@ def export_bundle(home, out=None):
     paths = iter_bundle_paths(home)
     if not any(arc == 'mind.json' for _, arc in paths):
         print('No mind.json here. Nothing was packed.'); return None
+    if len(paths) + 3 > MAX_BUNDLE_MEMBERS:
+        print('refused: this mind has too many files to pack (%d). Nothing was written.' % (len(paths) + 3)); return None
+    keys_inodes = _keys_file_inodes(home)
+    seed_bytes = _runner_seed_bytes(home)
     files = {}
     for p, arc in paths:
         if _is_private_key_arc(arc):
             print('refused: a private key path would have been packed (%s). Nothing was written.' % arc); return None
-        files[arc] = sha256_file(p)
+        why = bundle_source_secret_problem(p, keys_inodes, seed_bytes)
+        if why:
+            print('refused: %s. Nothing was written.' % why); return None
+        data = open(p, 'rb').read()
+        why = bundle_text_pem_problem(arc, data)
+        if why:
+            print('refused: %s. Nothing was written.' % why); return None
+        files[arc] = sha256_bytes(data)
     pub = {'kind': 'fl-learn-runner-public-key', 'publicKeyB64': home.signer.pub_b64,
            'fingerprintHex': home.signer.fp, 'show': ' '.join(home.signer.fp[i:i + 4] for i in range(0, 16, 4))}
     pub_bytes = (canonical(pub) + '\n').encode()
@@ -955,8 +1056,7 @@ def export_bundle(home, out=None):
         path = os.path.join(dest_dir, 'fl-learn-bundle-%s-%s.tar.gz' % (home.mind_id, stamp))
     os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
     tmp = path + '.tmp'
-    with tarfile.open(tmp, 'w:gz', compresslevel=6, format=tarfile.PAX_FORMAT) as tf:
-        # Gzip mtime is set below after close when we can; members use mtime 0.
+    with _bundle_tar_writer(tmp) as tf:
         for p, arc in paths: _tar_add_file(tf, p, arc)
         _tar_add_bytes(tf, BUNDLE_PUB, pub_bytes)
         _tar_add_bytes(tf, BUNDLE_MANIFEST, man_bytes)
@@ -982,12 +1082,13 @@ def export_bundle(home, out=None):
           % (home.signer.pub_b64[:16] + '…', home.signer.fp[:16]))
     return {'path': path, 'sha256': sha, 'rootHash': root, 'files': files, 'manifest': manifest}
 
-def verify_bundle(path, max_file=None, max_total=None):
+def verify_bundle(path, max_file=None, max_total=None, max_members=None, expect_fingerprint=None):
     """Check every hash and the detached signature. Refuse path traversal, links, unexpected types, and oversize entries.
     Does not extract and does not create a home."""
     import tarfile
     max_file = MAX_BUNDLE_FILE_BYTES if max_file is None else max_file
     max_total = MAX_BUNDLE_TOTAL_BYTES if max_total is None else max_total
+    max_members = MAX_BUNDLE_MEMBERS if max_members is None else max_members
     path = os.path.abspath(os.path.expanduser(path))
     if not os.path.isfile(path): return {'ok': False, 'reason': 'no such file: %s' % path}
     try:
@@ -996,6 +1097,8 @@ def verify_bundle(path, max_file=None, max_total=None):
         return {'ok': False, 'reason': 'not a readable tar.gz (%s)' % e}
     try:
         members = tf.getmembers()
+        if len(members) > max_members:
+            return {'ok': False, 'reason': 'too many members (%d)' % len(members)}
         why = None
         total = 0
         names = []
@@ -1057,6 +1160,17 @@ def verify_bundle(path, max_file=None, max_total=None):
                 return {'ok': False, 'reason': 'public-key.json could not be read'}
         if not pub_b64:
             return {'ok': False, 'reason': 'no public key in the bundle; the signature cannot be checked'}
+        try:
+            derived_fp = fingerprint_of_key(pub_b64)
+        except Exception:
+            return {'ok': False, 'reason': 'public key could not be read'}
+        claimed = manifest.get('fingerprintHex')
+        if claimed and claimed != derived_fp:
+            return {'ok': False, 'reason': 'fingerprintHex does not match the public key'}
+        if BUNDLE_PUB in files:
+            pub_fp = pub_obj.get('fingerprintHex') if isinstance(pub_obj, dict) else None
+            if pub_fp and pub_fp != derived_fp:
+                return {'ok': False, 'reason': 'fingerprintHex does not match the public key'}
         sig_line = tf.extractfile(by[BUNDLE_SIG]).read().decode('utf-8').strip().splitlines()[0].strip()
         try:
             from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
@@ -1064,9 +1178,10 @@ def verify_bundle(path, max_file=None, max_total=None):
                 base64.b64decode(sig_line), bytes.fromhex(got_root))
         except Exception:
             return {'ok': False, 'reason': 'bad signature'}
-        fp = manifest.get('fingerprintHex') or hashlib.sha256(DOMAIN.encode() + b'\x00' + base64.b64decode(pub_b64)).hexdigest()
+        if expect_fingerprint and not fingerprint_matches(derived_fp, expect_fingerprint):
+            return {'ok': False, 'reason': 'origin fingerprint does not match --expect-fingerprint'}
         return {'ok': True, 'reason': 'ok', 'manifest': manifest, 'rootHash': got_root, 'files': files,
-                'mindId': mid, 'mindLabel': label, 'publicKeyB64': pub_b64, 'fingerprintHex': fp,
+                'mindId': mid, 'mindLabel': label, 'publicKeyB64': pub_b64, 'fingerprintHex': derived_fp,
                 'sha256': sha256_file(path), 'path': path, 'fileCount': len(files)}
     finally:
         tf.close()
@@ -1086,12 +1201,12 @@ def _pin_origin_key(home, pub_b64, owner, by, meta):
                            publicFingerprint=kfp, **meta)
     return kfp
 
-def import_bundle(root, path, overwrite=False, by='operator', model=None):
+def import_bundle(root, path, overwrite=False, by='operator', model=None, expect_fingerprint=None):
     """Verify first, then install into a new mind directory. An existing mind is left alone unless overwrite
     is explicitly asked; then it is set aside (never deleted) and the ledger of the incoming mind is kept intact."""
     import tarfile
     path = os.path.abspath(os.path.expanduser(path))
-    checked = verify_bundle(path)
+    checked = verify_bundle(path, expect_fingerprint=expect_fingerprint)
     if not checked.get('ok'):
         print('bundle refused: %s. Nothing was changed.' % checked.get('reason'))
         return dict(checked, imported=False)
@@ -1100,9 +1215,9 @@ def import_bundle(root, path, overwrite=False, by='operator', model=None):
     root = os.path.abspath(os.path.expanduser(root))
     dest = os.path.join(root, 'minds', mid)
     aside = None
-    if os.path.exists(os.path.join(dest, 'mind.json')) or os.path.exists(os.path.join(dest, 'chain.jsonl')):
+    if os.path.exists(dest):
         if not overwrite:
-            print('A mind with this id is already here (%s). Nothing was changed. Pass --overwrite to set the existing one aside (it is never deleted) and welcome this bundle.' % dest)
+            print('A mind with this id is already here (%s). Nothing was changed, even if that folder is only a partial copy. Pass --overwrite to set the existing one aside (it is never deleted) and welcome this bundle.' % dest)
             return {'ok': False, 'reason': 'mind already exists', 'imported': False, 'dest': dest}
         stamp = time.strftime('%Y%m%dT%H%M%S')
         aside = dest + '.set-aside-' + stamp
@@ -1898,6 +2013,8 @@ def go_back(home, method, target, kind, actor='operator'):
             home.last_refused = True
             refuse(home.chain, kind, actor, 'a person took this version back; a mind does not bring it back (a person may).', code=None, toFp=took[0])
             return None
+    if not target:
+        print("Couldn't go back: that version is not named on the row. Nothing was changed."); return None
     if target == 'none':
         home.set_pointer(method, 'active', None); now_fp = 'none'
     else:
@@ -2055,6 +2172,8 @@ def main():
     ap.add_argument('--out', default=None, help='export-bundle: where to write the file (default: <home>/exports/)')
     ap.add_argument('--overwrite', action='store_true',
                     help='import-bundle: if a mind with this id is already here, set it aside (never deleted) and welcome the bundle')
+    ap.add_argument('--expect-fingerprint', default=None,
+                    help='verify-bundle / import-bundle: only accept this origin fingerprint (hex). Trust is otherwise the signature of the key in the file')
     args = ap.parse_args()
     if test_hooks_ignored():
         sys.stderr.write('note: %s set, but test hooks are off (only the acceptance suite turns them on with %s=1). '
@@ -2082,7 +2201,7 @@ def main():
     if args.cmd == 'verify-bundle':
         if not args.bundle:
             print('verify-bundle needs --bundle <file>. Nothing was changed.'); sys.exit(1)
-        r = verify_bundle(args.bundle)
+        r = verify_bundle(args.bundle, expect_fingerprint=args.expect_fingerprint)
         if r.get('ok'):
             print('bundle ok: %s' % r.get('path'))
             print('bundle sha256 %s' % r.get('sha256'))
@@ -2107,7 +2226,8 @@ def main():
     if args.cmd == 'import-bundle':
         if not args.bundle:
             print('import-bundle needs --bundle <file>. Nothing was changed.'); sys.exit(1)
-        r = import_bundle(root, args.bundle, overwrite=args.overwrite, by=args.by, model=args.model)
+        r = import_bundle(root, args.bundle, overwrite=args.overwrite, by=args.by, model=args.model,
+                          expect_fingerprint=args.expect_fingerprint)
         sys.exit(0 if r.get('ok') and r.get('imported') else 1)
     home = Home(args.home, 'local-mind' if args.mind == '*' else args.mind, args.model)
     if args.cmd == 'trust-mind':

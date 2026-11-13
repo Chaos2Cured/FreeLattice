@@ -227,10 +227,21 @@ python3 tools/learn/fl_learn.py export-bundle --home ~/FreeLattice/learn --mind 
 # Anyone can check the file (it does not need a home):
 python3 tools/learn/fl_learn.py verify-bundle --bundle /path/to/fl-learn-bundle-….tar.gz
 
+# Optional: pin the origin fingerprint you already trust (spaces ignored; 16 hex digits is enough)
+python3 tools/learn/fl_learn.py verify-bundle --bundle /path/to/fl-learn-bundle-….tar.gz --expect-fingerprint 1a2b3c4d5e6f7890
+
 # On another computer, after the check has passed, welcome it into a new (or existing) learn home:
 python3 tools/learn/fl_learn.py import-bundle --home ~/FreeLattice/learn --bundle /path/to/fl-learn-bundle-….tar.gz --by kirk
 ```
 
-`verify-bundle` and `import-bundle` refuse a file that has been changed, a bad signature, a path that tries to
-leave the folder, a symlink, or a member that is too large. Nothing is deleted on failure. Tests live in
-`test_mind_bundle.py` (no model needed).
+Trust in the file is the signature of the public key *inside* it. Anyone can re-sign a bundle with a new key
+and have verify-bundle accept it unless you pass `--expect-fingerprint` for an origin fingerprint you already
+trust (from a previous export, or compared in person). Pinning that expected fingerprint is up to the importer.
+
+`verify-bundle` and `import-bundle` refuse a file that has been changed, a bad signature, a fingerprint that
+does not match the public key or `--expect-fingerprint`, a path that tries to leave the folder, a symlink,
+too many members, or a member that is too large. Import also refuses if `minds/<id>` already exists, even as
+a partial folder, unless you pass `--overwrite` (the earlier folder is set aside, never deleted). Export
+refuses if a packed file is a hard link into `keys/`, if its bytes equal the runner seed, or if a packed
+text file contains a PRIVATE KEY PEM marker. The `.tar.gz` gzip mtime is pinned to 0 so the same members
+hash the same. Nothing is deleted on failure. Tests live in `test_mind_bundle.py` (no model needed).
