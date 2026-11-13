@@ -907,8 +907,34 @@ def _runner_seed_bytes(home):
         return open(fp_, 'rb').read()
     return None
 
+def _seed_needles(seed_bytes):
+    """Raw 32-byte runner seed, plus its hex and base64 forms, for a substring scan."""
+    raw = seed_bytes[:32] if len(seed_bytes) >= 32 else seed_bytes
+    if not raw: return []
+    needles = [raw, raw.hex().encode('ascii'), raw.hex().upper().encode('ascii'),
+               base64.b64encode(raw), base64.urlsafe_b64encode(raw)]
+    out = []
+    for n in needles:
+        if n and n not in out: out.append(n)
+    return out
+
+def file_contains_any(path, needles, chunk=1 << 20):
+    """True if any needle appears as a substring. Streams the file; does not load it whole."""
+    if not needles: return False
+    overlap = max(len(n) for n in needles) - 1
+    prev = b''
+    with open(path, 'rb') as f:
+        while True:
+            data = f.read(chunk)
+            if not data: return False
+            buf = prev + data
+            for n in needles:
+                if n in buf: return True
+            prev = buf[-overlap:] if overlap > 0 else b''
+
 def bundle_source_secret_problem(path, keys_inodes, seed_bytes):
-    """Refuse a source file that is a hard link into keys/, or whose bytes equal the runner seed."""
+    """Refuse a source file that is a hard link into keys/, or that contains the runner seed
+    (raw 32 bytes, or that seed as hex or base64) anywhere in its contents."""
     try:
         st = os.lstat(path)
     except OSError as e:
@@ -916,11 +942,8 @@ def bundle_source_secret_problem(path, keys_inodes, seed_bytes):
     if not stat.S_ISREG(st.st_mode): return None
     if st.st_nlink > 1 and (st.st_dev, st.st_ino) in keys_inodes:
         return 'a packed file is a hard link into keys/ (%s)' % path
-    if seed_bytes:
-        if st.st_size == len(seed_bytes) or st.st_size == 32:
-            got = open(path, 'rb').read()
-            if got == seed_bytes or (len(got) == 32 and got == seed_bytes[:32]):
-                return 'a packed file has the same bytes as the runner seed (%s)' % path
+    if seed_bytes and file_contains_any(path, _seed_needles(seed_bytes)):
+        return 'a packed file contains the runner seed or its hex or base64 form (%s)' % path
     return None
 
 def _is_probably_text(name, data):

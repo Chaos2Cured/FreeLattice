@@ -360,10 +360,55 @@ def main():
     out_c = os.path.join(work, 'bundles', 'should-not-copy-seed.tar.gz')
     rc_c, o_c = sh(['export-bundle', '--out', out_c, '--by', 'operator'], copy_home)
     record('export-refuses-file-equal-to-seed',
-           rc_c != 0 and not os.path.exists(out_c) and 'same bytes as the runner seed' in o_c,
+           rc_c != 0 and not os.path.exists(out_c) and 'contains the runner seed' in o_c,
            rc=rc_c, out=o_c[-300:])
 
-    # S4: PEM PRIVATE KEY marker in a packed text file
+
+    # Seed as a substring (not the whole file), and as hex / base64, including across a stream chunk.
+    # Each case uses its own home, and plants THAT home's seed (fixtures mint a fresh seed).
+    sub_ok, sub_info = True, []
+    case_specs = [
+        ('raw-mid', os.path.join('versions', 'soft-prompt', 'v-embed', 'vector.safetensors'), 'raw'),
+        ('hex', 'canary.json', 'hex'),
+        ('hex-upper', 'declines.jsonl', 'hex-upper'),
+        ('b64', 'receipts.jsonl', 'b64'),
+        ('raw-cross-chunk', os.path.join('versions', 'soft-prompt', 'v-cross', 'vector.safetensors'), 'raw-cross'),
+    ]
+    for label, rel, kind in case_specs:
+        hdir = os.path.join(work, 'leak-sub-' + label)
+        h2, _ = make_fixture(hdir)
+        seed = open(os.path.join(hdir, 'keys', 'runner.seed'), 'rb').read()
+        raw = seed[:32] if len(seed) >= 32 else seed
+        if kind == 'raw':
+            blob = b'HEAD' + raw + b'TAIL'
+        elif kind == 'hex':
+            blob = b'{"note":"' + raw.hex().encode() + b'"}'
+        elif kind == 'hex-upper':
+            blob = b'x' + raw.hex().upper().encode() + b'\n'
+        elif kind == 'b64':
+            blob = b'# ' + __import__('base64').b64encode(raw) + b'\n'
+        else:
+            blob = (b'P' * 40) + raw + b'END'
+        target = os.path.join(h2.dir, rel)
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        if os.path.lexists(target):
+            os.rename(target, target + '.set-aside-for-substr-test')
+        open(target, 'wb').write(blob)
+        if kind == 'raw-cross':
+            needles = fl_learn._seed_needles(seed)
+            streamed = fl_learn.file_contains_any(target, needles, chunk=64)
+            if not streamed:
+                sub_ok = False
+                sub_info.append({'label': label, 'ok': False, 'why': 'chunk=64 miss'})
+                continue
+        out_s = os.path.join(work, 'bundles', 'should-not-sub-' + label + '.tar.gz')
+        rc_s, o_s = sh(['export-bundle', '--out', out_s, '--by', 'operator'], hdir)
+        ok_one = rc_s != 0 and not os.path.exists(out_s) and 'contains the runner seed' in o_s
+        sub_info.append({'label': label, 'rc': rc_s, 'ok': ok_one, 'out': o_s[-180:]})
+        sub_ok = sub_ok and ok_one
+    record('export-refuses-seed-as-substring-hex-or-base64', sub_ok, details=sub_info)
+
+        # S4: PEM PRIVATE KEY marker in a packed text file
     pem_home = os.path.join(work, 'pem-home')
     hh, _ = make_fixture(pem_home)
     open(os.path.join(hh.dir, 'memory.jsonl'), 'ab').write(b'\n-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n')
