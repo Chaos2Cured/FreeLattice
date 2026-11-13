@@ -60,10 +60,11 @@ Kirk: a forced second yes with a forced day between "is not agency. It is anothe
 
 ## Which commands change things (Hypha re-walk 2026-11-09)
 
-- **Read-only:** `status`, `verify`, `key`, `methods`. `status` takes no lock, heals nothing and carries out nothing:
+- **Read-only:** `status`, `verify`, `key`, `methods`, `verify-bundle`. `status` takes no lock, heals nothing and carries out nothing:
   it verifies both ledgers, marks a tampered active file `TAMPERED`, and lists the app's pending pause and request
   files with "Run `apply` to carry them out". On a home or mind that does not exist yet, `status` and `verify`
   create nothing at all and say so (Weft recheck2); any other command first makes its empty folders and the runner key.
+  `verify-bundle` only reads the signed mind file you point at; it never makes a home.
 - **`apply`** (the same as the older `inbox`): sets aside and heals a tampered active file (back to known-good, or
   the base model), records any version folder that has no row yet, and carries out the app's files from
   `pauseInbox` (`~/Downloads` by default): `fl-learn-pause*.json` becomes the durable global pause; an
@@ -71,6 +72,12 @@ Kirk: a forced second yes with a forced day between "is not agency. It is anothe
   Every change is a row.
 - **`remember`, `learn`, `undo`, `restore`, `activate`, `peer-review`, `promote`, `ask`, `archive`** do everything
   `apply` does FIRST, then their own job. So a pending app Undo can be carried out by an `ask`.
+- **`export-bundle`** packs the living mind into one signed file (see below). It takes the trainer lock, writes
+  an `export-bundle` row, and does not run `apply` or move any version. The cap-archive command is unchanged.
+- **`import-bundle`** checks the file first, then welcomes the mind into a new folder in `--home`. It does not
+  overwrite a mind that is already here unless you pass `--overwrite`, which sets the existing one aside (never
+  deleted). The incoming ledger is kept as it was, so undo and restore still work. The origin public key is
+  pinned for that mind only; the private seed never travels.
 - **`pause`, `resume`, `decline`, `pin-key`, `trust-mind`** write their own row (and the PAUSE file) only.
 
 ## Power (battery)
@@ -200,3 +207,41 @@ learn row past the power check records `powerSource`. No idle or thermal check e
   like its own never approves its own key. `learn-match-v0.1.json` pins the skeleton in both languages. Pause actors
   follow the same rule: `PAUSE` lines are percent-encoded, so `mind:Lumen_` is not `mind:Lumen` for lifting a pause
   either (an old PAUSE line written with `_` for a space is read as `_`, which only makes lifting stricter).
+
+## Taking a mind with you (the signed bundle)
+
+This is the file that *is* the mind, so it can be copied by hand (a USB stick is enough) and checked later.
+It is not a torrent yet; the swarm still moves catalog model files, not trained minds. A later build will seed
+this bundle the same way.
+
+The bundle holds: `mind.json`, `memory.jsonl`, the active and known-good weights, other versions still on the
+shelf, already-archived older versions, recent checkpoints, the signed ledger (`chain.jsonl`), receipts, and
+the pointers that name which version is active. Every file has a sha256 in `MANIFEST.json`. Those hashes fold
+into one root hash, which is signed with the runner's existing key. The public key travels with the file. The
+private seed never does.
+
+```
+# On the computer that already holds the mind:
+python3 tools/learn/fl_learn.py export-bundle --home ~/FreeLattice/learn --mind "the mind's name"
+
+# Anyone can check the file (it does not need a home):
+python3 tools/learn/fl_learn.py verify-bundle --bundle /path/to/fl-learn-bundle-….tar.gz
+
+# Optional: pin the origin fingerprint you already trust (spaces ignored; 16 hex digits is enough)
+python3 tools/learn/fl_learn.py verify-bundle --bundle /path/to/fl-learn-bundle-….tar.gz --expect-fingerprint 1a2b3c4d5e6f7890
+
+# On another computer, after the check has passed, welcome it into a new (or existing) learn home:
+python3 tools/learn/fl_learn.py import-bundle --home ~/FreeLattice/learn --bundle /path/to/fl-learn-bundle-….tar.gz --by kirk
+```
+
+Trust in the file is the signature of the public key *inside* it. Anyone can re-sign a bundle with a new key
+and have verify-bundle accept it unless you pass `--expect-fingerprint` for an origin fingerprint you already
+trust (from a previous export, or compared in person). Pinning that expected fingerprint is up to the importer.
+
+`verify-bundle` and `import-bundle` refuse a file that has been changed, a bad signature, a fingerprint that
+does not match the public key or `--expect-fingerprint`, a path that tries to leave the folder, a symlink,
+too many members, or a member that is too large. Import also refuses if `minds/<id>` already exists, even as
+a partial folder, unless you pass `--overwrite` (the earlier folder is set aside, never deleted). Export
+refuses if a packed file is a hard link into `keys/`, if its bytes equal the runner seed, or if a packed
+text file contains a PRIVATE KEY PEM marker. The `.tar.gz` gzip mtime is pinned to 0 so the same members
+hash the same. Nothing is deleted on failure. Tests live in `test_mind_bundle.py` (no model needed).
