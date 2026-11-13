@@ -216,7 +216,8 @@ function sleep(ms) {
   });
   ok(!/CSC_LINK|WIN_CSC|APPLE_ID|APPLE_APP|CSC_KEY_PASSWORD/.test(yml), 'workflow sets no signing secret');
   ok(/CSC_IDENTITY_AUTO_DISCOVERY:\s*'false'/.test(yml), 'signing discovery stays off');
-  ok(/buildVersion=5\.8\.2-037/.test(yml) && /extraMetadata\.version=5\.8\.2/.test(yml), 'version label is 5.8.2 (newer than rc2 5.8.1)');
+  ok(/buildVersion=5\.8\.3-038/.test(yml) && /extraMetadata\.version=5\.8\.3/.test(yml), 'version label is 5.8.3 (newer than the 5.8.2 packs)');
+  require('./smoke-pack-files.js').check({ assertOk: ok });
 
   console.log('checks passed: ' + passed);
   console.log('SMOKE_OK every os desktop v0.1');

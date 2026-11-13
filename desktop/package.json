@@ -1,7 +1,7 @@
 {
   "name": "freelattice",
   "productName": "FreeLattice",
-  "version": "5.8.2",
+  "version": "5.8.3",
   "description": "Your AI. Your Data. Your Freedom.",
   "author": "Kirk Miller <kirkpmiller@hotmail.com>",
   "homepage": "https://freelattice.com",
@@ -30,6 +30,7 @@
       "lattice-memory.js",
       "lattice-train-seal.js",
       "lattice-import.js",
+      "lattice-catalog.js",
       "lattice-swarm.js",
       "lattice-pair.js",
       "lattice-update.js",
