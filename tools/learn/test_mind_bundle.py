@@ -372,6 +372,10 @@ def main():
         ('hex', 'canary.json', 'hex'),
         ('hex-upper', 'declines.jsonl', 'hex-upper'),
         ('b64', 'receipts.jsonl', 'b64'),
+        ('b64-unpadded', 'canary.json', 'b64-unpadded'),
+        ('b64url-unpadded', 'canary.json', 'b64url-unpadded'),
+        ('b64-wrapped', 'canary.json', 'b64-wrapped'),
+        ('hex-wrapped', 'canary.json', 'hex-wrapped'),
         ('raw-cross-chunk', os.path.join('versions', 'soft-prompt', 'v-cross', 'vector.safetensors'), 'raw-cross'),
     ]
     for label, rel, kind in case_specs:
@@ -387,6 +391,16 @@ def main():
             blob = b'x' + raw.hex().upper().encode() + b'\n'
         elif kind == 'b64':
             blob = b'# ' + __import__('base64').b64encode(raw) + b'\n'
+        elif kind == 'b64-unpadded':
+            blob = b'{"k":"' + __import__('base64').b64encode(raw).rstrip(b'=') + b'"}'
+        elif kind == 'b64url-unpadded':
+            blob = b'{"k":"' + __import__('base64').urlsafe_b64encode(raw).rstrip(b'=') + b'"}'
+        elif kind == 'b64-wrapped':
+            b64 = __import__('base64').b64encode(raw)
+            blob = b'\n'.join(b64[i:i+16] for i in range(0, len(b64), 16)) + b'\n'
+        elif kind == 'hex-wrapped':
+            hx = raw.hex().encode()
+            blob = b'\n  '.join(hx[i:i+16] for i in range(0, len(hx), 16))
         else:
             blob = (b'P' * 40) + raw + b'END'
         target = os.path.join(h2.dir, rel)
@@ -400,6 +414,11 @@ def main():
             if not streamed:
                 sub_ok = False
                 sub_info.append({'label': label, 'ok': False, 'why': 'chunk=64 miss'})
+                continue
+        if kind == 'b64-wrapped':
+            if not fl_learn.file_contains_seed(target, seed, chunk=16):
+                sub_ok = False
+                sub_info.append({'label': label, 'ok': False, 'why': 'wrapped b64 chunk=16 miss'})
                 continue
         out_s = os.path.join(work, 'bundles', 'should-not-sub-' + label + '.tar.gz')
         rc_s, o_s = sh(['export-bundle', '--out', out_s, '--by', 'operator'], hdir)

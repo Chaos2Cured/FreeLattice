@@ -907,30 +907,56 @@ def _runner_seed_bytes(home):
         return open(fp_, 'rb').read()
     return None
 
+_WS = b' \t\n\r\v\f'
+
 def _seed_needles(seed_bytes):
-    """Raw 32-byte runner seed, plus its hex and base64 forms, for a substring scan."""
+    """Raw 32-byte runner seed, plus hex and base64 (standard and URL-safe, padded and not)."""
     raw = seed_bytes[:32] if len(seed_bytes) >= 32 else seed_bytes
     if not raw: return []
+    b64 = base64.b64encode(raw)
+    b64u = base64.urlsafe_b64encode(raw)
     needles = [raw, raw.hex().encode('ascii'), raw.hex().upper().encode('ascii'),
-               base64.b64encode(raw), base64.urlsafe_b64encode(raw)]
+               b64, b64.rstrip(b'='), b64u, b64u.rstrip(b'=')]
     out = []
     for n in needles:
         if n and n not in out: out.append(n)
     return out
 
-def file_contains_any(path, needles, chunk=1 << 20):
-    """True if any needle appears as a substring. Streams the file; does not load it whole."""
+def _seed_text_needles(seed_bytes):
+    """Hex and base64 forms only (padded and unpadded). Used on a whitespace-stripped stream."""
+    return [n for n in _seed_needles(seed_bytes) if n and all(c in b'0123456789abcdefABCDEF+/=-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in n)]
+
+def file_contains_any(path, needles, chunk=1 << 20, strip_ws=False):
+    """True if any needle appears as a substring. Streams the file; does not load it whole.
+    If strip_ws is set, whitespace is dropped from the stream (and from needles) so a
+    line-wrapped or spaced hex or base64 encoding still matches."""
     if not needles: return False
-    overlap = max(len(n) for n in needles) - 1
+    use = []
+    for n in needles:
+        if strip_ws: n = n.translate(None, _WS)
+        if n and n not in use: use.append(n)
+    if not use: return False
+    overlap = max(len(n) for n in use) - 1
     prev = b''
     with open(path, 'rb') as f:
         while True:
             data = f.read(chunk)
             if not data: return False
+            if strip_ws:
+                data = data.translate(None, _WS)
+                if not data: continue
             buf = prev + data
-            for n in needles:
+            for n in use:
                 if n in buf: return True
             prev = buf[-overlap:] if overlap > 0 else b''
+
+def file_contains_seed(path, seed_bytes, chunk=1 << 20):
+    """Raw 32-byte seed on the as-written stream; hex and base64 on a whitespace-stripped stream."""
+    if not seed_bytes: return False
+    raw = seed_bytes[:32] if len(seed_bytes) >= 32 else seed_bytes
+    if file_contains_any(path, [raw], chunk=chunk, strip_ws=False): return True
+    text = _seed_text_needles(seed_bytes)
+    return file_contains_any(path, text, chunk=chunk, strip_ws=True)
 
 def bundle_source_secret_problem(path, keys_inodes, seed_bytes):
     """Refuse a source file that is a hard link into keys/, or that contains the runner seed
@@ -942,7 +968,7 @@ def bundle_source_secret_problem(path, keys_inodes, seed_bytes):
     if not stat.S_ISREG(st.st_mode): return None
     if st.st_nlink > 1 and (st.st_dev, st.st_ino) in keys_inodes:
         return 'a packed file is a hard link into keys/ (%s)' % path
-    if seed_bytes and file_contains_any(path, _seed_needles(seed_bytes)):
+    if seed_bytes and file_contains_seed(path, seed_bytes):
         return 'a packed file contains the runner seed or its hex or base64 form (%s)' % path
     return None
 
