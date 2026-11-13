@@ -51,10 +51,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
 - **2026-11-12 (MST), desktop release and download links**: Desktop packs 5.8.3 released as `desktop-packs-v0.4` (Latest, not a prerelease) from `main` `b8da84602822df1272245ce8fc490ed787849bcd` (PR #342, exact reviewed head `4602470aed535cf09cf494f7625d5c901e975079`), by the "Desktop packs every OS" workflow (workflow_dispatch, run 43366871751): Windows Setup + Portable, Linux AppImage + deb, macOS dmg + zip, latest.yml and latest-linux.yml.
   https://github.com/Chaos2Cured/FreeLattice/releases/tag/desktop-packs-v0.4 . Unsigned, as before. This change shows `desktop-packs-v0.4` (5.8.3) first on `docs/desktop.html`, `docs/install.html` and `README.md`, with v0.4 SHA-256 lines; v0.3, v0.2 and v0.1 stay as older packs, and `scripts/smoke-packs-v04-links.js` checks the new links.
 
+- **2026-11-13 (MST), build 3**: Signed whole-mind bundle (`export-bundle` / `verify-bundle` / `import-bundle`)
+  squash-merged to `main` as `add37eb944196eb46c058f8a2f694a6213a0a2bc` (PR #343). Weft PASS, Hypha PASS.
+  CLI only; desktop and browser import is build 4.
+
 ## 4. Next
-1. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
-2. Browser learning that carries into the desktop app (after Fable's and Kimi's answers).
-3. AI self-sight, built on Glass-v2 and Clay.
+1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
+2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
+3. Browser learning that carries into the desktop app (after Fable's and Kimi's answers).
+4. AI self-sight, built on Glass-v2 and Clay.
 
 ## 5. Rollback
 Any head listed above can be returned to without losing anything:
