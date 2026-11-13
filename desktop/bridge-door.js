@@ -5,8 +5,19 @@
 
 const fs = require('fs');
 const path = require('path');
-const flBridge = require('../docs/modules/fl-bridge.js');
 const ledger = require('./lattice-ledger.js');
+
+// prepare-only copies docs/modules/fl-bridge.js to app/modules/fl-bridge.js, and
+// app/**/* is what the pack contains. The checkout path ../docs/... is not in
+// the asar. Prefer the prepared copy; fall back to the repo file in dev.
+function loadFlBridge() {
+  const packed = path.join(__dirname, 'app', 'modules', 'fl-bridge.js');
+  const dev = path.join(__dirname, '..', 'docs', 'modules', 'fl-bridge.js');
+  if (fs.existsSync(packed)) return require(packed);
+  if (fs.existsSync(dev)) return require(dev);
+  throw new Error("Cannot find module './app/modules/fl-bridge.js'");
+}
+const flBridge = loadFlBridge();
 
 const PLACEHOLDER = 'BRIDGE_ENDPOINT_URL_UNSET';
 const UNSET_MESSAGE = 'The door is not set up yet. You can send it as an email instead.';
