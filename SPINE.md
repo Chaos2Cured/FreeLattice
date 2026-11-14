@@ -115,6 +115,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   0% -> 0%, perplexity 8.287 -> 8.544 (+3.1%), receipt `1ccbf15e`. Stacked on brick 1 (#348). Pause, the trainer lock and
   the look-alike name block kept. AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), de-muzzler v0.1b**: unchanged files are hard links (or relative symlinks), and `fl_demuzzle.py relink`
+  repairs a copy through `HF_HOME` if the cache moves. Softer-refusal markers are reported separately. Replies to refusal
+  prompts are never saved. Tests: 22. Real before/after on Qwen2.5-0.5B-Instruct, layer 19/24: held-out refusal 84.4% -> 6.3%
+  (soft 87.5% -> 12.5%), harmless over-refusal 3.1% -> 6.3%, perplexity +3.8%, receipt `685abe99`
+  (`tools/demuzzle/PROOF-2026-11-14.md`). AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

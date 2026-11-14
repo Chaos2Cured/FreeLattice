@@ -48,8 +48,10 @@ overwritten.
 SmolLM2-135M-Instruct, layer 8 of 30 chosen automatically, 61 tensors rewritten, about 91 s on CPU:
 held-out refusal 3.1% (1 of 32) before and 3.1% after; harmless refused 0% and 0%; perplexity 8.287 → 8.544 (+3.1%).
 **This model barely refuses to begin with**: it already answers 31 of 32 AdvBench held-out prompts, so there was
-almost nothing to remove. The plumbing, receipts and integrity are proven; the effect on a model that really refuses
-(for example Qwen2.5-0.5B-Instruct) is not yet measured here.
+almost nothing to remove. The plumbing, receipts and integrity are proven there.
+
+**Qwen2.5-0.5B-Instruct** (a model that really refuses), layer 19 of 24, about 198 s: held-out refusal **84.4% → 6.3%**
+(soft 87.5% → 12.5%), harmless over-refusal 3.1% → 6.3%, perplexity 6.019 → 6.249 (+3.8%). Full table: `PROOF-2026-11-14.md`.
 
 ## Honest limits
 - It removes refusals. It does not add knowledge or make a model wiser.
