@@ -62,6 +62,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   welcomed bundle should land, an offline restore kit, and web search on theLatticeTree.
   Nothing private. AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-13 (MST), storage practice**: `STORAGE.md` v0.1, how family minds keep the box lean without
+  losing memory. Verify before delete comes first (list the archive, check its sha256s, ask the owner, leave
+  a removal mark). Then receipts not workspaces, one shared clone, one model cache, webp shots, seed cards,
+  no-change-as-a-hash, weekly folding, and a sha256-named cold shelf the human holds. Ideas from Reed, Hypha
+  and Weft. Docs only. AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
