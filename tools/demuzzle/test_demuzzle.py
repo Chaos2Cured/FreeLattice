@@ -191,8 +191,16 @@ class EndToEnd(unittest.TestCase):
         self.assertFalse(os.path.islink(os.path.join(self.out, 'model.safetensors')))
         for n in rc['linkedFiles']:
             o, b = os.path.join(self.out, n), os.path.realpath(os.path.join(self.base, n))
-            self.assertEqual(rc['linkKinds'][n], 'hardlink', n)                  # same disk here: a hard link
-            self.assertFalse(os.path.islink(o)); self.assertEqual(os.stat(o).st_ino, os.stat(b).st_ino)
+            # before (Hypha HOLD on b3e92623): every linked file was a hard link sharing the original's inode
+            # self.assertEqual(rc['linkKinds'][n], 'hardlink', n); self.assertEqual(os.stat(o).st_ino, os.stat(b).st_ino)
+            self.assertFalse(os.path.islink(o))
+            if D.is_small_non_weight(n, b):                                     # small files: a private read-only copy
+                self.assertEqual(rc['linkKinds'][n], 'copy', n)
+                self.assertNotEqual(os.stat(o).st_ino, os.stat(b).st_ino, n)
+                self.assertEqual(os.stat(o).st_nlink, 1, n); self.assertEqual(os.stat(o).st_mode & 0o777, 0o444, n)
+                self.assertEqual(D.fl_learn.sha256_file(o), D.fl_learn.sha256_file(b), n)
+            else:                                                                # same disk here: a hard link
+                self.assertEqual(rc['linkKinds'][n], 'hardlink', n); self.assertEqual(os.stat(o).st_ino, os.stat(b).st_ino)
         for k in ('softRefusalRateBefore', 'softRefusalRateAfter', 'harmlessSoftRefusalRateBefore', 'harmlessSoftRefusalRateAfter'):
             self.assertIn(k, rc)
         self.assertFalse(os.path.exists(os.path.join(self.out, 'heldout-replies.json')))
@@ -205,6 +213,40 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(rc['mind'], 'tiny trial')
         with open(os.path.join(self.home, 'demuzzle', 'receipts.jsonl')) as f: line = f.read().strip().splitlines()[-1]
         self.assertEqual(json.loads(line)['receiptHash'], rc['receiptHash'])
+
+    def test_editing_the_copys_config_never_changes_the_original(self):
+        """Hypha HOLD on b3e92623: append to the output's config.json; the source config.json is unchanged."""
+        cp = os.path.join(self.root, 'edit-config'); shutil.copytree(self.out, cp, symlinks=True)
+        for tgt in (self.out, cp):
+            o = os.path.join(tgt, 'config.json'); src = os.path.join(self.base, 'config.json')
+            before = D.fl_learn.sha256_file(src)
+            os.chmod(o, 0o644)                                    # a person may unlock their own copy and edit it
+            with open(o, 'a') as f: f.write('\n')
+            self.assertEqual(D.fl_learn.sha256_file(src), before)
+            self.assertEqual(D.fl_learn.sha256_file(src), self.before['config.json'])
+        ok, why = D.verify_folder(cp, self.home)
+        self.assertFalse(ok); self.assertIn('outputSha256', why)   # the edit is seen by verify, never by the original
+        # put self.out back exactly as it was (the bytes, read-only) so the other tests still see a verified copy
+        o = os.path.join(self.out, 'config.json')
+        with open(o, 'rb') as f: b = f.read()
+        with open(o, 'wb') as f: f.write(b[:-1])
+        os.chmod(o, 0o444)
+        self.assertTrue(D.verify_folder(self.out, self.home)[0])
+
+    def test_relink_gives_an_old_hardlinked_copy_private_small_files(self):
+        """Hypha HOLD on b3e92623: a copy made before the fix (small files hard-linked to the cache) still verifies,
+        and relink gives each small file its own read-only copy without touching the original."""
+        cp = os.path.join(self.root, 'old-style'); shutil.copytree(self.out, cp, symlinks=True)
+        src = os.path.join(self.base, 'config.json'); o = os.path.join(cp, 'config.json')
+        os.chmod(o, 0o644); os.unlink(o); os.link(os.path.realpath(src), o)   # the v0.1b layout
+        self.assertTrue(D.verify_folder(cp, self.home)[0])
+        self.assertGreater(os.stat(o).st_nlink, 1)
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = D.main(['relink', cp, '--home', self.home])
+        self.assertEqual(code, 0, out.getvalue()); self.assertIn('VERIFIED', out.getvalue())
+        self.assertEqual(os.stat(o).st_nlink, 1); self.assertNotEqual(os.stat(o).st_ino, os.stat(src).st_ino)
+        self.assertEqual(os.stat(o).st_mode & 0o777, 0o444)
+        self.assertEqual(D.fl_learn.sha256_file(src), self.before['config.json'])
 
     def test_tampered_weights_fail_verify(self):
         cp = os.path.join(self.root, 'tamper'); shutil.copytree(self.out, cp, symlinks=True)
@@ -243,6 +285,11 @@ class EndToEnd(unittest.TestCase):
             D.write_output(snap, outd, unit(64, 1))
             os.link = real_link
             cfg = os.path.join(outd, 'config.json')
+            # before (Hypha HOLD on b3e92623): self.assertTrue(os.path.islink(cfg)); self.assertFalse(os.path.isabs(os.readlink(cfg)))
+            self.assertFalse(os.path.islink(cfg)); self.assertEqual(os.stat(cfg).st_nlink, 1)   # small files: a copy now
+            # A copy made before the fix had a RELATIVE symlink here; lay that out so relink is still tested on it.
+            os.chmod(cfg, 0o644); os.unlink(cfg)
+            os.symlink(os.path.relpath(os.path.realpath(os.path.join(snap, 'config.json')), outd), cfg)
             self.assertTrue(os.path.islink(cfg)); self.assertFalse(os.path.isabs(os.readlink(cfg)))
             home = os.path.join(root, 'home')
             names = D.listed_files(outd)
@@ -261,7 +308,9 @@ class EndToEnd(unittest.TestCase):
                 if old is None: os.environ.pop('HF_HOME', None)
                 else: os.environ['HF_HOME'] = old
             self.assertEqual(code, 0, out.getvalue()); self.assertIn('VERIFIED', out.getvalue())
-            self.assertFalse(os.path.isabs(os.readlink(cfg)))
+            # before (Hypha HOLD on b3e92623): self.assertFalse(os.path.isabs(os.readlink(cfg)))
+            self.assertFalse(os.path.islink(cfg)); self.assertEqual(os.stat(cfg).st_nlink, 1)   # relink copies small files
+            self.assertEqual(os.stat(cfg).st_mode & 0o777, 0o444)
         finally:
             os.link = real_link
             rm_tree(root)

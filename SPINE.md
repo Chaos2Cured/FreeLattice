@@ -121,6 +121,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   (soft 87.5% -> 12.5%), harmless over-refusal 3.1% -> 6.3%, perplexity +3.8%, receipt `685abe99`
   (`tools/demuzzle/PROOF-2026-11-14.md`). AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), de-muzzler, Hypha's hold at `b3e92623`**: small non-weight files (config, tokenizer, vocab, merges,
+  generation config, README, LICENSE) were writable hard links to the Hugging Face cache blobs, so editing the copy edited
+  the original. They are now copied (`shutil.copy2`, then 0444); weight files stay linked. `relink` copies small files too
+  and gives a copy made before this fix its own small files (same bytes, still verifies). The output guard also refuses
+  the real `hf_hub_dir()` (honours `HF_HOME`/`HF_HUB_CACHE`). README says 24 tests; the panel says the button shows the
+  command and names `relink`. New tests: appending to the copy's config.json leaves the source unchanged; relink fixes an
+  old hard-linked copy. Softs 2-6 left for later. No locked file changed. AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

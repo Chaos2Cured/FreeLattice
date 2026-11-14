@@ -121,8 +121,10 @@
     if (!d || !host) return null;
     var s = el(d, 'section', { class: 'tg-step', id: 'tgStep0', 'data-marker': VERSION });
     s.appendChild(el(d, 'h2', {}, '0. Free the mind (de-muzzle)'));
-    s.appendChild(el(d, 'p', { class: 'tg-note' }, 'One button makes a new copy of the model with its built-in refusal direction removed ' +
-      '(Arditi et al. 2024). It runs on your own computer, the original is never changed, and a signed receipt records exactly what changed.'));
+    // before (soft 8, Hypha on b3e92623): 'One button makes a new copy of the model with its built-in refusal direction removed ' +
+    s.appendChild(el(d, 'p', { class: 'tg-note' }, 'The button shows the one command that makes a new copy of the model with its built-in refusal direction removed ' +
+      '(Arditi et al. 2024). You run it on your own computer; the original is never changed, and a signed receipt records exactly what changed. ' +
+      'If the model cache moves later, `fl_demuzzle.py relink <folder>` repairs the copy and checks it again.'));
     var btn = el(d, 'button', { id: 'dmMake', type: 'button' }, 'De-muzzle this mind');
     var cmd = el(d, 'pre', { id: 'dmCmd', class: 'tg-cmd', 'aria-live': 'polite' });
     var copy = el(d, 'button', { id: 'dmCopy', type: 'button' }, 'Copy the line');

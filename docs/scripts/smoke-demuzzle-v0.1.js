@@ -95,6 +95,10 @@ async function fixtureReceipt(kp, fields) {
   var rcOther = await fixtureReceipt(other, fields);
   ok(!(await M.verifyReceipt(rcOther)).ok, 'a receipt signed by another key is not trusted');
   ok((await M.verifyReceipt('DEMUZZLE saved {}\n' + JSON.stringify(rc))).ok, 'pasting the log with the receipts.jsonl line also verifies');
+  // Softs 8 and 9 (Hypha on b3e92623): the panel says it shows the command (it does not run it), and names relink.
+  var panelSrc = fs.readFileSync(path.join(__dirname, '..', 'modules', 'demuzzle-panel.js'), 'utf8');
+  ok(panelSrc.indexOf("'The button shows the one command that makes a new copy") !== -1 && panelSrc.indexOf('relink') !== -1,
+    'the panel says the button shows the command that makes a new copy, and mentions relink');
 
   // ---- a real receipt from fl_demuzzle.py
   var rp = process.env.FL_DEMUZZLE_RECEIPT;

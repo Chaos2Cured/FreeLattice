@@ -27,6 +27,7 @@ Honest limits: this removes refusals, it does not add knowledge or make a model 
 to begin with. The same change makes a model easier to misuse; the receipt keeps it accountable.
 """
 import argparse, base64, contextlib, fcntl, glob, hashlib, json, math, os, sys, time
+import shutil  # Hypha HOLD on b3e92623: small files are copied, never hard-linked
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
@@ -289,6 +290,25 @@ def link_unchanged(src, dst):
     except OSError:
         os.symlink(os.path.relpath(src, os.path.dirname(dst)), dst); return 'symlink'
 
+# Hypha HOLD on b3e92623 (2026-11-14): a hard link shares one file with the cache, so editing a linked config.json in
+# the copy edited the original. Small non-weight files (config, tokenizer, vocab, merges, generation config, README,
+# LICENSE...) are now COPIED (shutil.copy2) and made read-only (0444). Weight files stay linked as before.
+SMALL_COPY_MAX = 64 * 1024 * 1024
+
+def is_small_non_weight(name, path):
+    try: size = os.path.getsize(path)
+    except OSError: return False
+    return not name.endswith(WEIGHT_EXT) and size <= SMALL_COPY_MAX
+
+def copy_private(src, dst):
+    """A private, read-only copy: never shares an inode with the original, so editing one cannot change the other."""
+    tmp = dst + '.copying'
+    if os.path.lexists(tmp): os.unlink(tmp)
+    shutil.copy2(src, tmp)
+    os.chmod(tmp, 0o444)
+    os.replace(tmp, dst)
+    return 'copy'
+
 def hf_hub_dir():
     home = os.environ.get('HF_HOME') or os.path.join(os.path.expanduser('~'), '.cache', 'huggingface')
     return os.environ.get('HF_HUB_CACHE') or os.path.join(home, 'hub')
@@ -303,7 +323,25 @@ def relink(out_dir):
         blob = os.path.basename(os.readlink(p))
         hits = sorted(glob.glob(os.path.join(hf_hub_dir(), '*', 'blobs', blob)))
         if not hits: missing.append(n); continue
+        # before (Hypha HOLD on b3e92623): os.unlink(p); os.symlink(os.path.relpath(hits[0], out_dir), p); fixed.append(n)
+        if is_small_non_weight(n, hits[0]):
+            os.unlink(p); copy_private(hits[0], p); fixed.append(n); continue
         os.unlink(p); os.symlink(os.path.relpath(hits[0], out_dir), p); fixed.append(n)
+    # Hypha HOLD on b3e92623: a copy made before this fix may still hold small files that share the cache's file (a
+    # hard link or a working symlink). Give each its own read-only copy; the bytes are the same, so verify still passes.
+    for n in sorted(os.listdir(out_dir)):
+        p = os.path.join(out_dir, n)
+        if n == 'demuzzle-receipt.json' or n.endswith('.copying') or not os.path.exists(p): continue
+        if not os.path.isfile(p) or not is_small_non_weight(n, p): continue
+        if os.path.islink(p) or os.stat(p).st_nlink > 1:
+            src = os.path.realpath(p)
+            if os.path.islink(p): os.unlink(p)
+            else:
+                # keep the bytes, then break the shared inode
+                tmpsrc = p + '.copying-src'; os.rename(p, tmpsrc); src = tmpsrc
+            copy_private(src, p)
+            if src.endswith('.copying-src'): os.unlink(src)
+            fixed.append(n)
     return fixed, missing
 
 def write_output(base_dir, tmp_out, r):
@@ -321,6 +359,10 @@ def write_output(base_dir, tmp_out, r):
                 os.chmod(dst, 0o444)
                 changed_all += changed; rewritten.append(n)
                 continue
+        # before (Hypha HOLD on b3e92623): link_unchanged(src, dst)
+        if is_small_non_weight(n, src):
+            copy_private(src, dst)
+            continue
         link_unchanged(src, dst)
     if not changed_all:
         raise SystemExit('No residual-stream writers (embed_tokens, o_proj, down_proj) were found. This model family is '
@@ -462,7 +504,10 @@ def run(A):
         del model
 
         out_parent = os.path.realpath(os.path.expanduser(A.out or os.path.join(home, 'demuzzled')))
-        if out_parent == base_dir or out_parent.startswith(base_dir + os.sep) or '/huggingface/hub' in out_parent:
+        # before (soft 1, Hypha on b3e92623): ... or '/huggingface/hub' in out_parent:
+        hub = os.path.realpath(hf_hub_dir())
+        if (out_parent == base_dir or out_parent.startswith(base_dir + os.sep) or '/huggingface/hub' in out_parent
+                or out_parent == hub or out_parent.startswith(hub + os.sep)):
             raise SystemExit('refused: the output must not be inside the original model or the shared cache.')
         os.makedirs(out_parent, exist_ok=True)
         tmp_out = os.path.join(out_parent, '.tmp-demuzzle-%d' % os.getpid())
@@ -501,7 +546,10 @@ def run(A):
             'baseSha256': base_sha, 'baseFiles': base_files, 'baseUnchanged': base_sha_after == base_sha and base_after == base_stats,
             'outputSha256': out_sha, 'outputFiles': out_files, 'rewrittenFiles': rewritten,
             'linkedFiles': [n for n in out_names if n not in rewritten],
-            'linkKinds': {n: ('symlink' if os.path.islink(os.path.join(tmp_out, n)) else 'hardlink') for n in out_names if n not in rewritten},
+            # before (Hypha HOLD on b3e92623): 'symlink' if islink else 'hardlink'
+            'linkKinds': {n: ('symlink' if os.path.islink(os.path.join(tmp_out, n)) else
+                              ('hardlink' if os.stat(os.path.join(tmp_out, n)).st_nlink > 1 else 'copy'))
+                          for n in out_names if n not in rewritten},
             'layer': layer, 'layers': n_layers, 'layerWhy': why_layer,
             'directionSha256': tensor_sha256(r), 'directionNorm': round(float(norms[layer]), 6),
             'tensorsChanged': len(changed), 'maxResidualAlongDirection': resid,
