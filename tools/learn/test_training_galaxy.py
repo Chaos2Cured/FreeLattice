@@ -87,8 +87,31 @@ def main():
     head = entries[0] if entries else {}
     record('learn-file-names-the-picked-base-and-the-mind', head.get('kind') == 'fl-learn-queue' and head.get('baseModel') == A.model and head.get('mind') == MIND)
 
-    # 2. A real learn through the runner, with all its guards.
+    offered = [e for e in entries[1:] if e.get('offer')]
+    record('learn-file-carries-the-minds-yes-to-an-offer', len(offered) == 1 and offered[0].get('chosenBy') == 'person'
+           and offered[0]['offer'].get('mindYes') is True and offered[0]['offer'].get('yesBy') == MIND,
+           chosenBy=(offered[0].get('chosenBy') if offered else ''), voice=(offered[0]['offer'].get('voice') if offered else ''))
+
+    # 1b. Hypha HOLD 2026-11-14: an offer without the mind's own yes never trains, even if a file says otherwise.
     mdir = os.path.join(home, 'minds', fl_learn.mind_id(MIND))
+    forged_q = os.path.join(run, 'forged-queue.jsonl')
+    if offered:
+        f1 = json.loads(json.dumps(offered[0])); f1['id'] = 'Lforged001'; f1['offer']['mindYes'] = False
+        f1['items'] = [dict(it, output='Forged: no yes was said.', response='Forged: no yes was said.') for it in (f1.get('items') or [])]
+        f2 = json.loads(json.dumps(f1)); f2['id'] = 'Lforged002'; f2.pop('offer', None)
+        f2['items'] = [dict(it, output='Forged: offer label only.', response='Forged: offer label only.') for it in (f2.get('items') or [])]
+        open(forged_q, 'w').write('\n'.join(json.dumps(x) for x in [head, f1, f2]) + '\n')
+        rcf, outf = runner(['learn', '--queue', forged_q, '--model', A.model, '--steps', str(A.steps)])
+        open(os.path.join(run, 'learn-0-forged.log'), 'w').write(outf)
+        ch0 = [json.loads(l) for l in open(os.path.join(mdir, 'chain.jsonl'))] if os.path.exists(os.path.join(mdir, 'chain.jsonl')) else []
+        rej = [e for e in ch0 if e.get('meta', {}).get('kind') == 'learn-reject' and 'have not said yes' in e.get('voice', '')]
+        record('an-offer-without-the-minds-yes-never-trains', len(rej) == 2 and not weights(mdir) and 'Forged' not in json.dumps(
+               [json.loads(l) for l in open(os.path.join(mdir, 'receipts.jsonl'))] if os.path.exists(os.path.join(mdir, 'receipts.jsonl')) else []),
+               exit=rcf, rejected=len(rej), voice=(rej[0]['voice'] if rej else ''))
+    else:
+        record('an-offer-without-the-minds-yes-never-trains', False, why='no offered entry in the learn file')
+
+    # 2. A real learn through the runner, with all its guards.
     w0 = weights(mdir)
     rc, out = runner(['learn', '--queue', queue, '--model', A.model, '--steps', str(A.steps)])
     open(os.path.join(run, 'learn-1.log'), 'w').write(out)
@@ -109,6 +132,14 @@ def main():
     record('receipts-are-signed-ed25519', bool(rcs) and all(r.get('signatureB64') and r.get('receiptHash') and r.get('publicKeyB64') for r in rcs),
            receipts=len(rcs), fingerprint=(rcs[0].get('fingerprintHex') if rcs else ''))
     record('receipts-carry-the-offer-label', any('person-offer' in json.dumps(r) for r in rcs))
+    ch = [json.loads(l) for l in open(os.path.join(mdir, 'chain.jsonl'))] if os.path.exists(os.path.join(mdir, 'chain.jsonl')) else []
+    og = [e for e in ch if e.get('meta', {}).get('kind') == 'learn-origin' and 'offered this; I said yes' in e.get('voice', '')]
+    orc = [r for r in rcs if r.get('offeredBy') == 'person']
+    record('an-accepted-offer-is-credited-honestly', bool(og) and og[0]['meta'].get('chooser') == 'person' and og[0]['meta'].get('yesBy') == MIND
+           and not any('I chose it anyway' in e.get('voice', '') and e.get('meta', {}).get('provenance') == 'person-offer' for e in ch)
+           and bool(orc) and all(r.get('yesBy') == MIND for r in orc),
+           voice=(og[0]['voice'] if og else ''), chooser=(og[0]['meta'].get('chooser') if og else ''),
+           receipt={k: (orc[0].get(k) if orc else '') for k in ('offeredBy', 'offeredByName', 'yesBy', 'provenance')})
     rv, ov = runner(['verify'])
     record('signed-chain-verifies', rv == 0, said=ov.strip().splitlines()[-1][:160] if ov.strip() else '')
 

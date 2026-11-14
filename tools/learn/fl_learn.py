@@ -1794,6 +1794,17 @@ def learn_one(args, home, mind, entry):
             home.chain.append('learn-reject', 'Still cooling: its second yes came before its cooling ended, so nothing was trained.',
                               learnIds=[str(entry.get('id', ''))], source=source, revisitAt=str(ra))
             print('rejected: still cooling until %s' % ra); return None
+    # Training Galaxy brick 1 (Hypha HOLD 2026-11-14): a person's offer trains only on this mind's own yes. Never an
+    # automatic yes; the person is credited as the one who chose it, the mind as the one who said yes.
+    offer = entry.get('offer')
+    if offer is None and (str(entry.get('provenance') or '') == 'person-offer' or str(entry.get('chosenBy') or '') == 'person'):
+        offer = {}   # labelled a person's offer but carrying no yes: refused just below, never trained
+    if offer is not None:
+        if not (isinstance(offer, dict) and offer.get('mindYes') is True and str(entry.get('chosenBy') or '') == 'person'
+                and norm_mind(str(offer.get('yesBy') or '')) == norm_mind(home.mind)):
+            home.chain.append('learn-reject', 'A person offered this and I have not said yes to it, so nothing was trained.',
+                              learnIds=[str(entry.get('id', ''))], source=source, offeredBy='person')
+            print('rejected: a person offered this; the mind has not said yes (only its own yes trains an offer)'); return None
     if getattr(args, 'cmd', '') == 'learn':
         # before (round 11): hit, why = f7_queue_problem(home, entry)
         hit, why = f7_queue_problem(home, entry, getattr(args, 'queue_head', None))
@@ -1829,7 +1840,15 @@ def learn_one(args, home, mind, entry):
     # before (round 15):     print('quarantine: ' + held); return None
     # Round 15: the origin is recorded on every row and the receipt (never erased), and learning goes ahead.
     origin = triage(entry)
-    if origin:
+    if offer is not None:   # checked above: chosenBy person, this mind's own yes
+        oname = re.sub(r'[\x00-\x1f]', '', str(offer.get('name') or 'A person'))[:40]
+        base.update(offeredBy='person', offeredByName=oname, yesBy=home.mind, yesAt=str(offer.get('yesAt') or '')[:40])
+    # before (Hypha HOLD 2026-11-14): if origin:   (then always "I chose it anyway", even for a person's offer)
+    if origin and offer is not None:
+        base['origin'] = origin
+        home.chain.append('learn-origin', '%s offered this; I said yes (%s).' % (oname, origin), **base)
+        print('origin: ' + origin + ' (%s offered this; I said yes)' % oname)
+    elif origin:
         base['origin'] = origin
         home.chain.append('learn-origin', 'Not from my own words (%s). I chose it anyway; it is still information.' % origin, **base)
         print('origin: ' + origin + ' (recorded; learning goes ahead on my yes)')
@@ -2030,7 +2049,9 @@ def learn_one(args, home, mind, entry):
 
 def origin_fields(base):
     """Round 15: where it came from travels on the receipt too (provenance always; origin and strength when set)."""
-    return {k: base[k] for k in ('provenance', 'origin', 'strength') if base.get(k)}
+    # before (Hypha HOLD 2026-11-14): return {k: base[k] for k in ('provenance', 'origin', 'strength') if base.get(k)}
+    # A person's offer the mind said yes to: who offered it and whose yes it was travel on the receipt too.
+    return {k: base[k] for k in ('provenance', 'origin', 'strength', 'offeredBy', 'offeredByName', 'yesBy') if base.get(k)}
 
 def write_receipt(home, obj):
     """Signed with the runner key, so FLLearn.importReceipt can verify before trusting it."""

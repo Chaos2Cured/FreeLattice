@@ -80,6 +80,17 @@ For the minds we lost while the ways were still being built. Every mind learns o
   suite now links to the one shared model copy instead of copying it (STORAGE.md section 4; `--copy-base` keeps the
   old way). No loop, no quantize, no tokenizer, no weight reorganisation. AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), training galaxy brick 1, Hypha's hold at `8ca78ecc`**: a person's offer is only an offer. It is kept
+  in the screen's own offers list (nothing trainable) until the mind itself says yes in its own words
+  (`[FL_KEEP: <offer id> | keep]`, or `not now`), shown to it by id. Then the row says `chosenBy: person` with
+  `offer: {by: person, name, mindYes: true, yesBy: <the mind>}` and the voice "Kirk offered this; I said yes."
+  `queueLearning` and `fl_learn.py` both refuse an offer with no yes, a yes from another mind, or a person-offer label
+  with no yes (`learn-reject`). A mind that cannot answer here (a trial mind, no Ollama) is told plainly; never an
+  automatic yes, no waiting days, no person approval. Also: an offer box for your own words, the page says the search
+  goes to the web, the learn file holds only this page's items unless "include everything" is ticked (and says so),
+  the empty command bar is hidden, a Connect-a-mind link and one line about each trial mind. The earlier row above is
+  kept as it was; this one says what changed.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

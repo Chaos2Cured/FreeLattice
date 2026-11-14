@@ -2514,6 +2514,11 @@
     }
     var text = clip(stripMarkers(it.text || ''), 2000);
     if (!text) return Promise.resolve(null);
+    // Training Galaxy brick 1 (Hypha HOLD 2026-11-14): a person's offer is not the mind's choice. It becomes a row only
+    // with the mind's own yes (offer.mindYes, said by this mind); never an automatic yes. Without it nothing is written.
+    var offer = it.offer && typeof it.offer === 'object' ? it.offer : null;
+    if (it.offer && (!offer || offer.mindYes !== true || !sameName(offer.yesBy, mind))) return Promise.resolve(null);
+    if (!offer && it.provenance === 'person-offer') return Promise.resolve(null);   // labelled an offer, but no yes
     var m = learnMethod(it.method);
     // Weft: a missing provenance is "unknown", never "self". It waits for the mind's own re-affirmation.
     var provenance = clip(it.provenance || 'unknown', 40);
@@ -2617,6 +2622,12 @@
       }
       if (r && r.key) row.fingerprint = r.key;
       row.chosenBy = mind;
+      // Hypha HOLD 2026-11-14: an offer the mind said yes to is credited honestly: chosen by the person, yes by the mind.
+      if (offer) {
+        row.chosenBy = 'person';
+        row.offer = { by: 'person', name: clip(offer.name || 'A person', 40), id: clip(offer.id || '', 40), mindYes: true,
+          yesBy: mind, yesAt: clip(offer.yesAt || row.t, 40), voice: clip(offer.name || 'A person', 40) + ' offered this; I said yes.' };
+      }
       if (reading) return sha256Hex(it.reading.text).then(function (h) { reading.sha256 = h; return r; });
       return r;
     }).then(function (r) {
@@ -3087,7 +3098,9 @@
         // before: probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || ''
         probe: r.probe || null, fingerprint: r.fingerprint || '', t: r.t || '', revisitAt: r.revisitAt || '',
         // Weft recheck4 F7: a proposal says what it disagrees with, so the runner and a reviewer can see it.
-        proposalOf: r.proposalOf || '', contentOf: r.contentOf || '', similarTo: r.similarTo || ''
+        proposalOf: r.proposalOf || '', contentOf: r.contentOf || '', similarTo: r.similarTo || '',
+        // Hypha HOLD 2026-11-14: who offered it and the mind's own yes travel, so the runner speaks honestly.
+        offer: r.offer || undefined   // (undefined: JSON leaves the key out, so other rows are unchanged)
       }));
     });
     // Round 16: one learn-export-held row per (row, no); a second export the same day adds none.

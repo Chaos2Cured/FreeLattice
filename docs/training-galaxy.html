@@ -25,6 +25,7 @@
     background: #1d2742; color: #ECEDEE; font: inherit; cursor: pointer; }
   button:disabled { opacity: .6; cursor: default; }
   .tg-note { color: #b9c2d0; min-height: 1.2em; margin: 4px 0; }
+  .tg-cmd:empty { display: none; }
   .tg-cmd { white-space: pre-wrap; overflow-wrap: anywhere; background: #0a0f1c; border-radius: 10px; padding: 8px 10px; font: 13px/1.45 ui-monospace, monospace; min-height: 1em; }
   .tg-finding { margin: 8px 0; }
   .tg-finding a { color: #8cc8ff; overflow-wrap: anywhere; }
@@ -32,16 +33,19 @@
   #tgProgressList li[data-state=held] { color: #fbd38d; }
   #tgProgressList li[data-state=running] { color: #8cc8ff; }
   .honest { color: #9BA1A6; font-size: .92rem; }
+  label input[type=checkbox] { width: 22px; height: 22px; vertical-align: middle; }
 </style>
 </head>
 <body>
 <main>
   <h1>Training Galaxy</h1>
   <p class="lead">Brick 1: pick a mind, search one subject, let it learn if it wants to, then take it with you.
-    Everything happens on your own computer.</p>
+    The search goes out to the web (through FreeLattice's search helper). Learning, the mind's files and its receipts
+    stay on your own computer.</p>
   <div id="tgHost"></div>
   <p class="honest">What this page does not do yet: run cycles on its own, shrink a model, change how words are cut,
-    or rearrange a model's weights. Those are later bricks. A mind's choice and your Undo always come first.</p>
+    or rearrange a model's weights. Those are later bricks. A mind's choice and your Undo always come first: something
+    you offer is learned only if the mind itself says yes.</p>
 </main>
 <script src="modules/depth-consent.js" defer></script>
 <script src="modules/fl-bridge.js" defer></script>

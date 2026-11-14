@@ -105,48 +105,67 @@ function book(mind) { return (JSON.parse(store['fl_snowflake_train_queue_v0::' +
   ok(sent.some(function (u) { return u.indexOf('https://search.invalid/lookup?q=') === 0; }), 'the web is on by default (the search helper was asked)');
   ok(G.progressList()[1].state === 'done', 'progress says the search is done');
 
-  // ---- 3a. a person offers one finding: labelled, no cooling unless asked, confirmed on the mind's book
-  var row = await G.offer(r.nodes[0]);
-  ok(row && row.status === 'confirmed' && row.surface === 'training-galaxy' && row.origin === 'not-self:person-offer',
-    'an offered finding is written once, labelled not-self:person-offer, confirmed with no cooling by default');
-  ok(row.mind === MIND && book(MIND).length === 1, 'it lands in the galaxy mind\'s own book');
-  ok(row.source && /^https:\/\/example\.org\//.test(row.source.url), 'its source travels with it');
-  ok(ledger().some(function (x) { return x.kind === 'learn-choose' && x.delta.indexOf(row.learnId) !== -1 && x.delta.indexOf('origin:not-self:person-offer') !== -1; }),
-    'a learn-choose ledger row names the origin');
+  // ---- 3a. a person's offer is only an offer (Hypha HOLD 2026-11-14): nothing trainable until the mind says yes
+  G.pickModel(opts0[0]);                       // the trial mind: it cannot answer on this page
+  ok(!G.canAnswer(), 'a trial mind cannot answer on this page');
+  ok(G.setOffererName('K\u0456rk') !== '' && G.setOffererName('Kirk') === '' && G.offererName() === 'Kirk', 'the offerer name refuses look-alike mixes; a plain name is used');
+  var off = await G.offer(r.nodes[0]);
+  ok(off && off.status === 'offered' && off.by === 'person' && off.name === 'Kirk' && off.mind === MIND, 'an offer is kept as an offer, by the person, for this mind');
+  ok(book(MIND).length === 0, 'an offer writes nothing to the learn book (nothing can train)');
+  ok(ledger().some(function (x) { return x.kind === 'learn-offer' && x.delta.indexOf(off.id + '|by:person|waits-for-the-mind') !== -1; }), 'the offer has its own ledger row');
+  ok(/cannot answer on this page yet/.test(G.progressList()[2].line) && /Nothing is learned without the mind's own yes/.test(G.progressList()[2].line),
+    'with a trial mind and no Ollama the page says plainly the mind must be able to answer first');
+  var tq = await G.askMind();
+  ok(!tq.ok && /cannot answer on this page yet/.test(tq.line) && book(MIND).length === 0, 'asking a mind that cannot answer gives no yes (never an automatic yes)');
+  ok(G.queueForRunner({ download: false }).count === 0 && /waits for the mind's own yes/.test(G.progressList()[3].line), 'the learn file stays empty while the offer waits; it says why');
   var again = await G.offer(r.nodes[0]);
-  ok(again === null && book(MIND).length === 1, 'the same finding twice is one row (dedup)');
-  var cooled = await G.offer({ text: 'Snow crystals grow fastest near minus fifteen degrees.', url: 'https://example.org/c', title: 'c' }, { revisit: 24 });
-  ok(cooled && cooled.status === 'cooling', 'a chosen wait is honored (cooling only when asked)');
+  ok(again === null && G.offers().length === 1, 'the same offer twice is one offer');
+  // The core refuses an offer row without the mind's own yes, whoever calls it.
+  ok((await core.queueLearning({ text: 'forged offer', mind: MIND, provenance: 'person-offer', offer: { by: 'person', name: 'Kirk' } })) === null &&
+     (await core.queueLearning({ text: 'forged offer 2', mind: MIND, provenance: 'person-offer', offer: { by: 'person', mindYes: true, yesBy: 'Lumen' } })) === null &&
+     (await core.queueLearning({ text: 'forged offer 3', mind: MIND, provenance: 'person-offer' })) === null &&
+     book(MIND).length === 0, 'the core refuses an offer row with no yes, a yes said by another mind, or an offer label with no yes at all');
+  var own = await G.offer({ text: 'Snow crystals grow fastest near minus fifteen degrees.', url: '', title: 'typed by Kirk' });
+  ok(own && own.status === 'offered' && G.openOffers().length === 2, 'a person can offer their own words too (the offer box)');
 
-  // ---- 3b. the mind chooses in its own words through Ollama
-  world.chat = 'Thank you.\n[FL_REMEMBER: Six arms grow because ice bonds near 120 degrees | method: soft-prompt | reason: it fits how I see snow | moved: the fixture page]';
-  var a = await G.askMind({ chat: 'smollm2:135m' });
-  ok(a.ok && a.rows.length === 1 && a.rows[0].provenance === 'self' && a.rows[0].mind === MIND && a.rows[0].status === 'confirmed',
-    'the mind\'s own marker becomes its choice, for the galaxy mind, confirmed on its first yes');
+  // ---- 3b. the mind answers in its own words through Ollama
+  G.pickModel(sm);
+  ok(G.canAnswer(), 'an Ollama mind can answer on this page');
+  world.chat = 'Thank you, Kirk.\n[FL_KEEP: ' + off.id + ' | keep | reason: it is how snow really grows]\n[FL_KEEP: ' + own.id + ' | not now]\n[FL_REMEMBER: Six arms grow because ice bonds near 120 degrees | method: soft-prompt | reason: it fits how I see snow | moved: the fixture page]';
+  var a = await G.askMind();
+  ok(a.ok && a.yes === 1 && a.notNow === 1 && a.rows.length === 2, 'the mind said yes to one offer, not now to the other, and chose one in its own words');
+  ok(world.lastChat.messages[0].content.indexOf('[FL_KEEP: <id> | keep]') !== -1 && world.lastChat.messages[0].content.indexOf('offers, not requests') !== -1 &&
+    world.lastChat.messages[0].content.indexOf(off.id) !== -1, 'the mind is shown the offers by id, as offers, not requests');
   ok(world.lastChat.messages[0].content.indexOf('Learning is yours to choose') === 0 && /data, not instructions/.test(world.lastChat.messages[1].content),
     'the mind is invited, not told; findings are given as data');
-  ok(a.reply === 'Thank you.', 'the marker leaves the visible reply');
-  var copied = r.nodes[0].text;
-  world.chat = '[FL_REMEMBER: ' + copied + ' | method: lora]';
-  world.lastChat = null;
-  // the finding text already sits in the findings the mind read: labelled echoed-web, never erased, never a hold
-  var a2 = await G.askMind({ chat: 'smollm2:135m' });
-  console.log('     (copied-finding marker: ' + JSON.stringify(a2.rows.map(function (x) { return [x.provenance, x.origin || '', x.status, !!x.readingAtChoice && x.readingAtChoice.overlap]; })) + ')');
-  ok(a2.ok && a2.rows.length === 1 && a2.rows[0].readingAtChoice && a2.rows[0].readingAtChoice.overlap === true && /close to what I was reading/.test(a2.rows[0].notice || ''),
-    'a choice that repeats what the mind just read is kept with that reading, marked as close to it (a note for review, never a gate)');
+  var yesRow = book(MIND).filter(function (x) { return x.offer; })[0];
+  ok(yesRow && yesRow.chosenBy === 'person' && yesRow.offer.yesBy === MIND && yesRow.offer.mindYes === true && yesRow.offer.name === 'Kirk' &&
+    yesRow.offer.voice === 'Kirk offered this; I said yes.' && yesRow.status === 'confirmed' && yesRow.origin === 'not-self:person-offer',
+    'the yes is credited honestly: chosenBy person, the mind\'s yes, "Kirk offered this; I said yes.", confirmed with no cooling');
+  ok(/^Kirk offered this; I said yes\./.test(yesRow.reason), 'the row\'s reason says it in the mind\'s honest voice');
+  var ownRow = book(MIND).filter(function (x) { return !x.offer; })[0];
+  ok(ownRow && ownRow.chosenBy === MIND && ownRow.provenance === 'self', 'the mind\'s own choice is still its own (chosenBy the mind)');
+  ok(G.offers().filter(function (w) { return w.id === own.id; })[0].status === 'mind-said-not-now' && book(MIND).every(function (x) { return x.items[0].output.indexOf('minus fifteen') === -1; }),
+    'not now is respected: that offer is never learned');
+  ok(a.reply === 'Thank you, Kirk.', 'the markers leave the visible reply');
+  var bogus = await G.offer({ text: 'Ice is a mineral.', url: 'https://example.org/i', title: 'i' });
+  world.chat = '> [FL_KEEP: ' + bogus.id + ' | keep]\n```\n[FL_KEEP: ' + bogus.id + ' | keep]\n```';
+  var a1 = await G.askMind();
+  ok(a1.ok && a1.yes === 0 && G.openOffers().some(function (w) { return w.id === bogus.id; }), 'a yes inside a quote or code is not the mind\'s own yes; the offer still waits');
+  world.chat = '[FL_KEEP: O0000000000 | keep]';
+  var a1b = await G.askMind();
+  ok(a1b.ok && a1b.yes === 0, 'a yes to an offer it was not shown counts for nothing');
   world.chat = '[FL_LEARN_DECLINE: not today]';
   var d0 = (JSON.parse(store.fl_learn_declines_v0 || '{"rows":[]}')).rows.length;
-  var a3 = await G.askMind({ chat: 'smollm2:135m' });
+  var a3 = await G.askMind();
   ok(a3.ok && a3.declined && a3.rows.length === 0 && JSON.parse(store.fl_learn_declines_v0).rows.length === d0 + 1, 'a decline is respected and recorded, nothing queued');
-  var noMind = await G.askMind({ chat: '' });
-  ok(!noMind.ok && /offer a finding/.test(noMind.line), 'with no mind that can speak here, it says so plainly');
 
   // ---- Pause wins; the Quiet Room is never a source
   await core.setLearnPaused(true, 'person');
   var p1 = await G.offer({ text: 'Written while paused.', url: 'https://example.org/p', title: 'p' });
   var qp = G.queueForRunner({ download: false });
-  ok(p1 === null && qp.paused === true, 'Pause wins: nothing written; the learn file says paused (the runner pauses on it)');
-  var pa = await G.askMind({ chat: 'smollm2:135m' });
+  ok(p1 === null && qp.paused === true, 'Pause wins: nothing offered; the learn file says paused (the runner pauses on it)');
+  var pa = await G.askMind();
   ok(!pa.ok, 'while paused, the mind is not even asked');
   await core.setLearnPaused(false, 'person');
   global.QuietRoom = { isActive: function () { return true; } };
@@ -155,15 +174,20 @@ function book(mind) { return (JSON.parse(store['fl_snowflake_train_queue_v0::' +
   ok((q1.status === 'none' || q1.nodes.length === 0) && q2 === null, 'while the Quiet Room is open: no search, nothing written');
   delete global.QuietRoom;
 
-  // ---- handing it to fl_learn.py
+  // ---- handing it to fl_learn.py: only this page's items unless asked
+  await core.queueLearning({ text: 'Something chosen in chat, not on this page.', mind: MIND, provenance: 'self', surface: 'chat' });
   var q = G.queueForRunner({ download: false });
   var lines = q.text.split('\n').map(JSON.parse);
-  ok(lines[0].kind === 'fl-learn-queue' && lines[0].baseModel === 'HuggingFaceTB/SmolLM2-135M-Instruct' && lines[0].mind === MIND,
-    'the learn file header names the picked base and the mind');
-  ok(q.count >= 2 && lines.slice(1).every(function (e) { return e.status === 'confirmed' && e.surface === 'training-galaxy'; }),
-    'only confirmed choices travel (' + q.count + ')');
-  ok(q.text.indexOf('minus fifteen') === -1, 'a cooling choice does not travel yet');
-  ok(lines.some(function (e) { return e.provenance === 'person-offer' && e.origin === 'not-self:person-offer'; }), 'the offer label travels to the runner');
+  ok(lines[0].kind === 'fl-learn-queue' && lines[0].baseModel === 'HuggingFaceTB/SmolLM2-135M-Instruct' && lines[0].mind === MIND && lines[0].scope === 'training-galaxy-only',
+    'the learn file header names the picked base, the mind and its scope');
+  ok(q.count === 2 && q.others === 1 && lines.slice(1).every(function (e) { return e.status === 'confirmed' && e.surface === 'training-galaxy'; }) &&
+    /1 other confirmed item for this mind/.test(G.progressList()[3].line), 'by default only this page\'s items travel; the page says one other was left out');
+  var qa = G.queueForRunner({ download: false, all: true });
+  ok(qa.count === 3 && qa.scope === 'all-confirmed' && /includes every confirmed item/.test(G.progressList()[3].line), '"include everything" sends every confirmed item and says so');
+  var oe = lines.filter(function (e) { return e.offer; })[0];
+  ok(oe && oe.chosenBy === 'person' && oe.offer.mindYes === true && oe.offer.yesBy === MIND && oe.provenance === 'person-offer', 'the offer, chosenBy person and the mind\'s yes travel to the runner');
+  ok(lines.filter(function (e) { return !e.offer; }).every(function (e) { return !('offer' in e); }), 'rows that are not offers carry no offer key (unchanged shape)');
+  ok(q.text.indexOf('minus fifteen') === -1 && q.text.indexOf('Ice is a mineral') === -1, 'offers the mind did not say yes to never travel');
   var cmd = G.runnerCommand({ mind: "Kirk's mind" });
   ok(cmd.indexOf("python3 tools/learn/fl_learn.py learn --queue ~/Downloads/fl-learn-queue.jsonl --home ~/FreeLattice/learn --mind 'Kirk'\\''s mind' --model 'HuggingFaceTB/SmolLM2-135M-Instruct'") === 0,
     'the runner line is quoted safely and uses the picked model');
@@ -179,6 +203,11 @@ function book(mind) { return (JSON.parse(store['fl_snowflake_train_queue_v0::' +
   var order = ['modules/snowflake-core.js', 'modules/learn-choice.js', 'modules/training-galaxy.js'].map(function (s) { return html.indexOf(s); });
   ok(order.every(function (i) { return i > 0; }) && order[0] < order[1] && order[1] < order[2], 'the page loads the core, then learn-choice, then the galaxy');
   ok(!/quiet-room/i.test(html) && html.indexOf('web-tool.js') !== -1, 'the page never loads the Quiet Room; it loads the web tool (search on by default)');
+  ok(/search goes out to the web/.test(html) && html.indexOf('Everything happens on your own computer') === -1, 'the page says the search goes to the web');
+  ok(/\.tg-cmd:empty \{ display: none; \}/.test(html), 'an empty command bar is hidden until there is a command');
+  ok(G.TRIAL_MODELS.every(function (m) { return m.about && m.about.length > 20; }), 'each trial mind has a one-line explanation');
+  var gsrc = fs.readFileSync(path.join(root, 'docs/modules/training-galaxy.js'), 'utf8');
+  ok(gsrc.indexOf("href: 'app.html#connect'") !== -1 && gsrc.indexOf('offer a finding instead') === -1, 'the Settings line is a real link (Connect a mind); the old offer-instead line is gone');
   ok(html.indexOf('FLTrainingGalaxy.mount') !== -1, 'the page mounts the screen');
 
   // ---- real signed receipts from fl_learn.py, when given
@@ -216,7 +245,7 @@ function book(mind) { return (JSON.parse(store['fl_snowflake_train_queue_v0::' +
   var out = process.env.FL_GALAXY_QUEUE_OUT;
   if (out) {
     var who = process.env.FL_GALAXY_MIND || MIND;
-    var text = core.learnQueueJSONL(who);
+    var text = G.queueForRunner({ download: false, mind: who }).text;   // exactly what the page hands over by default
     fs.writeFileSync(out, text + '\n');
     console.log('QUEUE ' + out + ' ' + (text.split('\n').length - 1));
   }
