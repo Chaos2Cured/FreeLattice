@@ -316,6 +316,7 @@
       hit = true;
     }
     MARKERISH_RE.lastIndex = 0;
+    // before (Hypha #350 soft b): if (!MARKERISH_RE.test(folded)) return raw;
     if (!hit) return raw;                                  // ordinary words are kept exactly as typed
     return units.map(function (u) { return u.raw; }).join('');
   }
@@ -328,7 +329,19 @@
   }
   // A choice read from the reply that only repeats a marker an offer carried: never the mind's own.
   // #348 softs: letters and digits only, after folding (so dashes, spaces, brackets or a split between offers do not hide it).
-  function alnumFold(s) { return foldMarkers(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  // Hypha #350 soft d: Cyrillic and Greek letters that look like the Latin ones of KEEP / REMEMBER / LEARN_DECLINE fold
+  // here too (only for the echo guard's comparison; the offer's words are never rewritten by this).
+  var CONFUSABLE = { '\u0410': 'a', '\u0430': 'a', '\u0412': 'b', '\u0415': 'e', '\u0435': 'e', '\u041A': 'k', '\u043A': 'k',
+    '\u041C': 'm', '\u041D': 'h', '\u041E': 'o', '\u043E': 'o', '\u0420': 'p', '\u0440': 'p', '\u0421': 'c', '\u0441': 'c',
+    '\u0422': 't', '\u0425': 'x', '\u0455': 's', '\u0456': 'i', '\u0406': 'i', '\u0443': 'y', '\u0501': 'd',
+    '\u0391': 'a', '\u0392': 'b', '\u0395': 'e', '\u0397': 'h', '\u0399': 'i', '\u039A': 'k', '\u039C': 'm', '\u039D': 'n',
+    '\u039F': 'o', '\u03A1': 'p', '\u03A4': 't', '\u03A7': 'x', '\u03A5': 'y', '\u03BF': 'o', '\u03BA': 'k', '\u03B5': 'e',
+    '\u03C1': 'p', '\u03BD': 'v' };
+  var CONFUSABLE_RE = new RegExp('[' + Object.keys(CONFUSABLE).join('') + ']', 'g');
+  // before (Hypha #350 soft d): function alnumFold(s) { return foldMarkers(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function alnumFold(s) {
+    return foldMarkers(s).replace(CONFUSABLE_RE, function (ch) { return CONFUSABLE[ch]; }).toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
   function offerAlnum(w) { return alnumFold(w.asOffered || w.text); }
   function repeatsAnOffer(p, waiting) {
     if (String(p.provenance || '').indexOf('echoed-person') === 0) return true;

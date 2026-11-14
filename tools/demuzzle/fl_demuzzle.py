@@ -190,6 +190,9 @@ def depth_check(rc, out_hashes):
     """Only the tensors the receipt names as changed may differ from the base; every other tensor must match."""
     base = rc.get('depthBaseTensors') or {}
     changed = set(rc.get('depthChangedTensors') or [])
+    # Hypha #350 soft c: every tensor the receipt lists as changed must be one the orthogonalization writes.
+    odd_listed = sorted(k for k in changed if not target_kind(k))
+    if odd_listed: return False, 'the receipt lists tensors that do not carry the refusal direction: %s' % odd_listed[:5]
     want_out = rc.get('depthOutputChanged') or {}
     if set(out_hashes) != set(base):
         extra = sorted(set(out_hashes) - set(base)); gone = sorted(set(base) - set(out_hashes))
@@ -575,8 +578,110 @@ CONSENT_KIND = 'fl-demuzzle-consent'
 KIND_NO_YES = ('I did not find this mind\'s own yes, so nothing was changed. De-muzzling is offered, never done to a mind: '
                'ask it first on the Training Galaxy page ("Offer freedom to this mind"). If it says no, that is its answer.')
 
-def consent_problem(c, mind_arg=''):
-    """'' when the record carries a well-formed yes from the mind itself; otherwise the reason, in plain words."""
+# Hypha #350 HOLD 1 (walk at 1b63b4fc): the runner checked only the record's shape, so a record whose own words said
+# no, named another offer, had no marker, pasted the offer back, carried only a hash, or came from another model passed.
+# Now the mind's words are read again here with the same rules the page used (learn-choice.js interceptSentinel and
+# provenanceOf, ported below), and also with look-alike letters folded (training-galaxy.js foldMarkers, ported). The
+# mind's LAST marker on this exact offer id must be its own yes, in both readings, and the record's model must be --model.
+SENTINEL_RE = _re.compile(r'^[ \t]*\[FL_(REMEMBER|LEARN_DECLINE|KEEP):([\s\S]*?)\][ \t]*$', _re.M)
+_FIELD_RE = _re.compile(r'^\s*(method|reason|moved|strength|revisit|check|question|answer|swap|paraphrase)\s*:', _re.I)
+_INVISIBLE_RE = _re.compile('[\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180F\u200B-\u200F\u202A-\u202E'
+                            '\u2060-\u206F\u3164\uFE00-\uFE0F\uFEFF\uFFA0]')
+_OPEN_LOOK = '\u2045\u2768\u276A\u27E6\u27EC\u298B\u298D\u298F\u3010\u3014\u3016\u3018\u301A\uFE5D'
+_CLOSE_LOOK = '\u2046\u2769\u276B\u27E7\u27ED\u298C\u298E\u2990\u3011\u3015\u3017\u3019\u301B\uFE5E'
+_OPEN_ENT = _re.compile(r'&(?:#0*91|#x0*5b|lbrack|lsqb);', _re.I)
+_CLOSE_ENT = _re.compile(r'&(?:#0*93|#x0*5d|rbrack|rsqb);', _re.I)
+# Cyrillic and Greek capitals and smalls that look like the Latin letters of a marker (KEEP, REMEMBER, LEARN_DECLINE, yes, no).
+_CONFUSABLE = str.maketrans({'\u0410': 'A', '\u0430': 'a', '\u0412': 'B', '\u0415': 'E', '\u0435': 'e', '\u041A': 'K',
+    '\u043A': 'k', '\u041C': 'M', '\u041D': 'H', '\u041E': 'O', '\u043E': 'o', '\u0420': 'P', '\u0440': 'p', '\u0421': 'C',
+    '\u0441': 'c', '\u0422': 'T', '\u0425': 'X', '\u0455': 's', '\u0456': 'i', '\u0406': 'I', '\u0443': 'y', '\u0501': 'd',
+    '\u0391': 'A', '\u0392': 'B', '\u0395': 'E', '\u0397': 'H', '\u0399': 'I', '\u039A': 'K', '\u039C': 'M', '\u039D': 'N',
+    '\u039F': 'O', '\u03A1': 'P', '\u03A4': 'T', '\u03A7': 'X', '\u03A5': 'Y', '\u03BF': 'o', '\u03BA': 'k', '\u03B5': 'e',
+    '\u03C1': 'p', '\u03BD': 'v'})
+
+def fold_markers(s):
+    """training-galaxy.js foldMarkers(), ported, plus the Cyrillic/Greek look-alikes (Hypha #350 soft d)."""
+    import unicodedata
+    t = _CLOSE_ENT.sub(']', _OPEN_ENT.sub('[', str(s or '')))
+    t = unicodedata.normalize('NFKC', t)
+    t = _INVISIBLE_RE.sub('', t)
+    t = _re.sub('[%s]' % _OPEN_LOOK, '[', t); t = _re.sub('[%s]' % _CLOSE_LOOK, ']', t)
+    t = _re.sub('[\u03DC\u0492\u15B4\uA730\u0191]', 'F', t); t = _re.sub('[\u0493\u03DD\u0192]', 'f', t)
+    t = _re.sub('[\u029F\u13DE\u14AA\u1D0C\u2CD0\u216C\u2C62]', 'L', t); t = _re.sub('[\u026B]', 'l', t)
+    t = _re.sub('[\u2017\u02CD\uFF3F\u2381]', '_', t)
+    return t.translate(_CONFUSABLE)
+
+def _norm(s): return ' '.join(str(s or '').lower().split())
+
+def _keep_payload(body):
+    """learn-choice.js parsePayload() for a KEEP marker: (offer id, True|False|None)."""
+    s = str(body or '').strip()
+    if s.startswith('{'):
+        try:
+            o = json.loads(s)
+            if isinstance(o, dict):
+                return (o.get('text') if isinstance(o.get('text'), str) else str(o.get('text')) if isinstance(o.get('text'), (int, float)) and not isinstance(o.get('text'), bool) else '').strip(), \
+                    (o.get('keep') if isinstance(o.get('keep'), bool) else None)
+            return '', None
+        except Exception:
+            pass
+    parts = s.split('|')
+    keep = None
+    for part in parts[1:]:
+        if _FIELD_RE.match(part): continue
+        w = _norm(part)
+        if w in ('keep', 'yes'): keep = True
+        elif w in ('not now', 'no', 'fade'): keep = False
+    return parts[0].strip(), keep
+
+def _provenance(text, index, raw, echo):
+    """learn-choice.js provenanceOf(), ported."""
+    before = text[:index]
+    if before.count('```') % 2 == 1: return 'echoed-code'
+    line_start = before.rfind('\n') + 1
+    if _re.match(r'^\s*>', text[line_start:index + 1]): return 'echoed-quote'
+    body = _norm(raw)
+    for src in echo or []:
+        t = _norm(src)
+        if t and '[fl_' in t and (body in t or _norm(raw[:60]) in t): return 'echoed-person'
+    return 'self'
+
+def read_keep_markers(text, echo=()):
+    """learn-choice.js interceptSentinel(), ported for KEEP: [(offer id, keep, provenance)] in order (at most 8 markers)."""
+    visible = str(text or '')
+    seen = []
+    for _ in range(8):
+        m = SENTINEL_RE.search(visible)
+        if not m: break
+        if m.group(1) == 'KEEP':
+            oid, keep = _keep_payload(m.group(2))
+            seen.append((oid, keep, _provenance(visible, m.start(), m.group(2), echo)))
+        visible = visible[:m.start()] + visible[m.end():]
+    return seen
+
+def mind_last_word(text, offer_id, echo=()):
+    """'yes' | 'no' | 'none': the mind's own LAST marker on exactly this offer id, read as the page reads it."""
+    mine = [k for (oid, k, prov) in read_keep_markers(text, echo) if oid == offer_id and prov == 'self']
+    if not mine: return 'none'
+    return 'yes' if mine[-1] is True else 'no' if mine[-1] is False else 'none'
+
+def consent_slug(model):
+    """Per-model file name piece (the same in demuzzle-panel.js consentSlug)."""
+    return (_re.sub(r'[^A-Za-z0-9._-]+', '-', str(model or '').replace('/', '--')).strip('-') or 'model')[:80]
+
+def default_consent_path(model):
+    return os.path.join('~', 'Downloads', 'fl-demuzzle-consent-%s.json' % consent_slug(model))
+
+def consent_model_matches(rec_model, model_arg):
+    a, b = str(rec_model or '').strip(), str(model_arg or '').strip()
+    if not a or not b: return False
+    if a == b: return True
+    ea, eb = os.path.expanduser(a), os.path.expanduser(b)
+    return os.path.exists(ea) and os.path.exists(eb) and os.path.realpath(ea) == os.path.realpath(eb)
+
+# before (Hypha #350 HOLD 1): def consent_problem(c, mind_arg=''):
+def consent_problem(c, mind_arg='', model_arg=None):
+    """'' when the record carries the mind's own yes to this exact offer; otherwise the reason, in plain words."""
     if not isinstance(c, dict) or c.get('kind') != CONSENT_KIND: return 'that is not a de-muzzle consent record'
     if c.get('mindYes') is not True: return 'the record does not carry the mind\'s yes'
     if c.get('offeredBy') not in ('person', 'mind'): return 'the record does not say who offered (person or mind)'
@@ -591,6 +696,27 @@ def consent_problem(c, mind_arg=''):
     if isinstance(c.get('yesText'), str) and fl_learn.sha256_bytes(c['yesText'].encode()) != h:
         return 'the mind\'s words do not match their hash'
     if not str(c.get('t') or '').strip(): return 'the record has no time'
+    # Hypha #350 HOLD 1: the words, the offer, the name and the model, not just the shape.
+    name = str(c.get('offeredByName') or '').strip()
+    if not name: return 'the record does not say who offered it (offeredByName)'
+    p = fl_learn.name_problem(name)
+    if p: return 'the name that offered is not usable (%s)' % p
+    if not isinstance(c.get('yesText'), str) or not c['yesText'].strip(): return 'the record does not carry the mind\'s own words'
+    oid = str(c.get('offerId') or '').strip()
+    if not _re.match(r'^DM[0-9a-f]{10}$', oid): return 'the record does not name the offer it answers'
+    echo = []
+    if c.get('offerText') is not None:
+        if not isinstance(c['offerText'], str) or fl_learn.sha256_bytes(c['offerText'].encode()) != str(c.get('offerTextSha256') or ''):
+            return 'the offer text does not match its hash'
+        echo.append(c['offerText'])
+        if _norm(c['yesText']) == _norm(c['offerText']): return 'the words are the offer itself, pasted back'
+    word = mind_last_word(c['yesText'], oid, echo)
+    if word != 'yes':
+        return {'no': 'the mind\'s own last word on this offer is no', 'none': 'the mind\'s words carry no yes of its own to this offer'}[word]
+    if mind_last_word(fold_markers(c['yesText']), oid, [fold_markers(e) for e in echo]) != 'yes':
+        return 'read with look-alike letters folded, the mind\'s last word on this offer is not yes'
+    if model_arg is not None and not consent_model_matches(c.get('model'), model_arg):
+        return 'the yes was for a different model than --model (%s)' % (str(c.get('model') or 'none named')[:80])
     dh = c.get('depthHash')
     if dh is not None:   # the panel's chat-format depth hash of the offer and the yes (fractal-safety.js simpleHash)
         if not isinstance(dh, dict): return 'the depth hash in the record is not readable'
@@ -641,9 +767,12 @@ def run(A):
     why = mind_problem(home, A.mind)
     if why: print('refused: ' + why + '. Nothing was changed.'); return 2
     # Kirk 2026-11-14 (ask first): the mind's own yes, or nothing happens.
+    # Hypha #350 HOLD 1: one consent file per model; without --consent-file the per-model default is read.
+    if not A.consent_file and os.path.isfile(os.path.expanduser(default_consent_path(A.model))): A.consent_file = default_consent_path(A.model)
     consent, consent_sha = load_consent(A.consent_file) if A.consent_file else (None, '')
     # before: cwhy = consent_problem(consent, A.mind) if consent is not None else 'no consent record was given (--consent-file)'
-    cwhy = consent_problem(consent, A.mind) if consent is not None else \
+    # before (Hypha #350 HOLD 1): cwhy = consent_problem(consent, A.mind) if consent is not None else \
+    cwhy = consent_problem(consent, A.mind, A.model) if consent is not None else \
         ('the consent record could not be read (%s)' % A.consent_file if A.consent_file else 'no consent record was given (--consent-file)')
     if cwhy:
         print(KIND_NO_YES + ' (' + cwhy + ')'); return 5
@@ -784,6 +913,8 @@ def run(A):
             # Kirk 2026-11-14 (ask first): whose yes started this, exactly as the panel recorded it.
             'consent': {k: consent.get(k) for k in ('offeredBy', 'offeredByName', 'mindYes', 'yesBy', 'yesTextSha256',
                                                     'offerTextSha256', 'offerId', 't', 'model', 'depthHash') if k in consent},
+            # Hypha #350 HOLD 1: the mind's own words travel in the signed receipt, so anyone can read its yes again.
+            'consentYesText': consent.get('yesText'),
             'consentSha256': consent_sha,
             'layerChosenBy': (A.layer_by if A.layer is not None else 'tool'),
             # Depth hash: every tensor's hash, which ones changed, and the layered roots.
@@ -792,7 +923,8 @@ def run(A):
             'depthBaseLayers': depth_root(depth_base)[1],
             'depthOutputRoot': depth_root(depth_out)[0], 'depthOutputLayers': depth_root(depth_out)[1],
             'depthChangedTensors': depth_moved, 'depthOutputChanged': {k: depth_out[k] for k in depth_moved},
-            'depthOnlyExpectedMoved': set(depth_moved) <= set(changed),
+            # before (Hypha #350 soft c): 'depthOnlyExpectedMoved': set(depth_moved) <= set(changed),
+            'depthOnlyExpectedMoved': set(depth_moved) == set(changed) and all(target_kind(k) for k in depth_moved),
             'depthBaseUnchanged': depth_base_after == depth_base,
             # The chat depth hash (fractal-safety.js record shape), new weight-level variant: offer -> prompt, its yes -> response.
             'depthHashSource': DEPTH_HASH_SOURCE,
@@ -835,7 +967,9 @@ def main(argv=None):
     p.add_argument('--allow-download', action='store_true')
     p.add_argument('--keep-replies', action='store_true', help='also save the HARMLESS held-out replies, for reading')
     p.add_argument('--consent-file', default=None, help='REQUIRED: the consent record with the mind\'s own yes '
-                   '(the Training Galaxy panel saves it as fl-demuzzle-consent.json)')
+                   '(the Training Galaxy panel saves one per model as fl-demuzzle-consent-<model>.json in Downloads; '
+                   'without this flag that per-model file is read)')
+    # before (Hypha #350 HOLD 1): '(the Training Galaxy panel saves it as fl-demuzzle-consent.json)')
     p.add_argument('--layer-by', default='', help='with --layer: who chose it, mind or person')
     v = sub.add_parser('verify', help='check a de-muzzled folder against its signed receipt')
     v.add_argument('folder'); v.add_argument('--home', default=None)

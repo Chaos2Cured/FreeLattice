@@ -16,12 +16,21 @@ No is the default; a no is recorded gently and not asked again from the page; si
 on: the consent record (`fl-demuzzle-consent.json`) is saved and the command is shown, with no second yes.
 
 ```bash
-python3 tools/demuzzle/fl_demuzzle.py run --model HuggingFaceTB/SmolLM2-135M-Instruct --consent-file ~/Downloads/fl-demuzzle-consent.json
+python3 tools/demuzzle/fl_demuzzle.py run --model HuggingFaceTB/SmolLM2-135M-Instruct --consent-file ~/Downloads/fl-demuzzle-consent-HuggingFaceTB--SmolLM2-135M-Instruct.json
 python3 tools/demuzzle/fl_demuzzle.py verify ~/FreeLattice/learn/demuzzled/<new folder> --home ~/FreeLattice/learn
 ```
 `run` refuses kindly (exit 5) without a record carrying `mindYes: true`, `offeredBy` person|mind, `offeredByName`,
 `yesBy` (the same mind as `--mind`), the sha256 of its words, and a time. `--layer N` needs `--layer-by mind|person`, and
-the receipt's layer reason says who chose it (or that the tool did). Honest limit: the record is not signed (the
+the receipt's layer reason says who chose it (or that the tool did).
+
+Since Hypha's #350 HOLD: `run` reads the mind's own words again, with the page's rules (`learn-choice.js`
+`interceptSentinel`/`provenanceOf`, ported) and again with look-alike letters folded (`training-galaxy.js` `foldMarkers`,
+ported, plus Cyrillic/Greek look-alikes). Its LAST marker on that exact offer id must be its own yes; a stored no, another
+offer's id, words with no marker, the offer pasted back, a quote or code block, or a hash-only record are all refused.
+The record must name `offeredByName`, carry the offer id and words (and the offer text, checked against its hash), and
+its `model` must be `--model`. There is one consent file per model (`fl-demuzzle-consent-<model>.json`; without
+`--consent-file`, that file in `~/Downloads` is read). On the page, a later no withdraws a stored yes, and after a no
+the mind is not offered again (even after a reload) unless it asks. (Before: one `fl-demuzzle-consent.json` for every model.) Honest limit: the record is not signed (the
 browser has no runner key), so it records a yes; it cannot prove one to someone who distrusts this computer.
 
 
@@ -83,6 +92,10 @@ other tensor matches the base. It also flags files the receipt does not name, an
 pinned key (`FL_LEARN_HOME` or `~/FreeLattice/learn`) or it says UNVERIFIED-KEY (exit 6). `relink` also searches the hub
 blob store by the receipt's sha256.
 
+Known limit of the echo guard (Hypha #348/#350): an offer id split across two open offers is caught when the second
+part starts the second offer, but not when a word comes before it (`... O12345` + `note: 6789abcd`). A person cannot
+know a fresh offer id in advance, so this is low risk; it is written here so nobody relies on it.
+
 ## Integrity, not gates
 Pause (`<home>/PAUSE`) wins; one heavy job at a time (`<home>/trainer.lock`, shared with learning); the look-alike
 name block for `--mind`; an output inside the original or the shared cache is refused; an existing folder is never
@@ -109,7 +122,7 @@ almost nothing to remove. The plumbing, receipts and integrity are proven there.
 - The same change makes a model easier to misuse. The receipt keeps it accountable.
 
 ## Tests
-`<learn-venv>/bin/python tools/demuzzle/test_demuzzle.py` (51 tests since ask-first and the depth hash; before: 30 tests; the line once said 20, then 24: math, receipts, Pause, lock, look-alike names,
+`<learn-venv>/bin/python tools/demuzzle/test_demuzzle.py` (62 tests since Hypha's #350 HOLD; 51 at ask-first and the depth hash; before: 30 tests; the line once said 20, then 24: math, receipts, Pause, lock, look-alike names,
 unsupported families, a tiny random model end to end, run-time ablation equals the saved weights, and the browser
 panel verifying a real receipt, editing the copy's config.json never changes the original, and relink giving an
 older hard-linked copy its own small files) and `node docs/scripts/smoke-demuzzle-v0.1.js`.

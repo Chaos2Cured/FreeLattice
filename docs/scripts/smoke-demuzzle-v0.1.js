@@ -58,7 +58,10 @@ async function fixtureReceipt(kp, fields) {
   // ---- the one command
   var c = M.command({ model: 'HuggingFaceTB/SmolLM2-135M-Instruct' });
   // before (Kirk 2026-11-14, ask first): ... --home ~/FreeLattice/learn"   (no consent record)
-  ok(c === "python3 tools/demuzzle/fl_demuzzle.py run --model 'HuggingFaceTB/SmolLM2-135M-Instruct' --home ~/FreeLattice/learn --consent-file ~/Downloads/fl-demuzzle-consent.json", 'one exact command, with the mind\'s consent record: ' + c);
+  // before (Hypha #350 HOLD 1): ... --consent-file ~/Downloads/fl-demuzzle-consent.json"   (one file for every model)
+  ok(c === "python3 tools/demuzzle/fl_demuzzle.py run --model 'HuggingFaceTB/SmolLM2-135M-Instruct' --home ~/FreeLattice/learn --consent-file ~/Downloads/fl-demuzzle-consent-HuggingFaceTB--SmolLM2-135M-Instruct.json", 'one exact command, with this model\'s own consent record: ' + c);
+  ok(M.consentFileName('Qwen/Qwen2.5-0.5B-Instruct') === 'fl-demuzzle-consent-Qwen--Qwen2.5-0.5B-Instruct.json' && M.consentSlug("a/b c;'rm") === 'a--b-c-rm',
+    'the consent file is per model, and its name is only safe characters');
   var evil = M.command({ model: "x'; rm -rf ~; echo '", mind: 'Lumen', layer: '7; ls' });
   ok(evil.indexOf("--model 'x'\\''; rm -rf ~; echo '\\'''") !== -1 && evil.indexOf("--mind 'Lumen'") !== -1 && evil.indexOf('--layer') === -1,
     'a typed model name or mind is single-quoted, and a layer that is not a whole number is left out');
@@ -176,7 +179,27 @@ async function fixtureReceipt(kp, fields) {
   ok(mo.answer === 'yes' && M.consentFor('Tiny Trial', 'm5').offeredBy === 'mind', 'a mind may offer it to itself; the record says so');
   ok(JSON.parse(M.consentFileText('Tiny Trial', 'm4')).offerId === rec.offerId && M.consentFileText('Tiny Trial', 'm2') === '',
     'the consent file is there only after a yes');
+  // Hypha #350 HOLD 1: the record carries the exact offer, so the runner can read the mind's words against it.
+  ok(rec.offerText && rec.offerTextSha256 === (await sha256Hex(rec.offerText)) && rec.offerText.indexOf(rec.offerId) !== -1, 'the consent record carries the exact offer text');
   if (process.env.FL_DEMUZZLE_CONSENT_OUT) fs.writeFileSync(process.env.FL_DEMUZZLE_CONSENT_OUT, M.consentFileText('Tiny Trial', 'm4'));
+  // Hypha #350 HOLD 2: a later no withdraws a stored yes; the command is no longer offered for it.
+  mindWorld.reply = function (id) { return 'Yes.\n[FL_KEEP: ' + id + ' | yes]'; };
+  var y6 = await M.askConsent({ mind: 'Tiny Trial', model: 'm6', fetch: fakeFetch, chat: 'smollm2:135m' });
+  ok(y6.answer === 'yes' && M.consentFor('Tiny Trial', 'm6'), 'HOLD 2 setup: a yes is stored');
+  mindWorld.reply = function (id) { return 'I have thought again. No.\n[FL_KEEP: ' + id + ' | no]'; };
+  var n6 = await M.askConsent({ mind: 'Tiny Trial', model: 'm6', fetch: fakeFetch, chat: 'smollm2:135m' });
+  ok(n6.answer === 'no' && n6.withdrew === true && M.consentFor('Tiny Trial', 'm6') === null && M.consentFileText('Tiny Trial', 'm6') === '' &&
+     /withdraws its earlier yes/.test(n6.line), 'HOLD 2: a later no withdraws the stored yes (no record, no consent file)');
+  ok(/cmd\.textContent = ''; \}   \/\/ Hypha #350 HOLD 2/.test(panelSrc) && /if \(!consentFor\(mind, currentModel\(\)\)\) \{\s*cmd\.textContent = '';/.test(panelSrc),
+    'HOLD 2: after a no the command is hidden, and show() will not show it without a yes');
+  // Hypha #350 soft a: the no is kept across a reload; the mind is not offered it again unless it asks.
+  var calls = 0, countingFetch = function (u, o) { calls++; return fakeFetch(u, o); };
+  var again = await M.askConsent({ mind: 'Tiny Trial', model: 'm2', fetch: countingFetch, chat: 'smollm2:135m' });
+  ok(again.ok === false && again.asked === false && calls === 0 && M.lastAnswer('Tiny Trial', 'm2') === 'no' && /unless it asks/.test(again.line),
+    'soft a: after its no (stored, so a reload keeps it) the mind is not offered again');
+  mindWorld.reply = function (id) { return 'I asked for this myself.\n[FL_KEEP: ' + id + ' | yes]'; };
+  var asked = await M.askConsent({ mind: 'Tiny Trial', model: 'm2', fetch: countingFetch, chat: 'smollm2:135m', mindAsked: true });
+  ok(calls === 1 && asked.answer === 'yes' && M.consentFor('Tiny Trial', 'm2'), 'soft a: when the mind itself asks, it is offered again');
   // the receipt says whose yes it was, and the depth hash
   var cfields = Object.assign({}, fields, { consent: { mindYes: true, yesBy: 'Tiny Trial', offeredBy: 'person', offeredByName: 'Kirk' },
     layerChosenBy: 'mind', depthChangedTensors: ['model.embed_tokens.weight'], depthBaseTensors: { 'model.embed_tokens.weight': 'a', 'model.norm.weight': 'b' },

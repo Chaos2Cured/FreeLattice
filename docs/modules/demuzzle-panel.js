@@ -84,6 +84,16 @@
     } catch (e) {}
     return record;
   }
+  // Hypha #350 HOLD 1: one consent file per model (the same slug as fl_demuzzle.py consent_slug).
+  function consentSlug(model) {
+    return (String(model || '').replace(/\//g, '--').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'model').slice(0, 80);
+  }
+  function consentFileName(model) { return 'fl-demuzzle-consent-' + consentSlug(model) + '.json'; }
+  // Hypha #350 soft a: the mind's last answer here, kept across reloads.
+  function lastAnswer(mind, model) {
+    var k = consentKey(mind, model), rows = answers().filter(function (a) { return consentKey(a.mind, a.model) === k; });
+    return rows.length ? rows[rows.length - 1].answer : '';
+  }
   function consentFor(mind, model) { return (readJSON(LS_CONSENT, {}) || {})[consentKey(mind, model)] || null; }
   function answers() { var a = readJSON(LS_ANSWERS, { rows: [] }); return Array.isArray(a.rows) ? a.rows : []; }
   // opts: { chat, fetch, base, mind, model, offeredBy: 'person'|'mind', name, note }
@@ -102,6 +112,9 @@
     var name = clip(by === 'mind' ? (o.name || mind) : (o.name || (G.offererName && G.offererName()) || 'A person'), 40);
     var nameWhy = c && typeof c.nameProblem === 'function' ? c.nameProblem(name) : '';
     if (nameWhy) return Promise.resolve({ ok: false, answer: 'none', line: 'That name is not used here (' + nameWhy + '). Nothing was asked.' });
+    // Hypha #350 soft a: after its no, it is not offered again (even after a reload) unless the mind itself asks.
+    if (lastAnswer(mind, model) === 'no' && o.mindAsked !== true) return Promise.resolve({ ok: false, answer: 'no', asked: false,
+      line: '"' + mind + '" already said no to this. That is its answer; it is not offered again unless it asks.' });
     var rawNote = clip(String(o.note || '').trim(), 600);
     var note = G.neutraliseMarkers(rawNote);                           // a person's words are data, never a marker
     var t = new Date().toISOString();
@@ -131,22 +144,32 @@
       if (said === true) {
         var rec = { kind: CONSENT_KIND, v: CONSENT_V, offerId: id, offeredBy: by, offeredByName: name, mind: mind, model: model,
           mindYes: true, yesBy: mind, yesText: reply, yesTextSha256: sha(reply), offerTextSha256: sha(text), t: new Date().toISOString(),
+          offerText: text,   // Hypha #350 HOLD 1: the runner reads the mind's words against this exact offer
           depthHash: { ts: dh.ts, domain: dh.domain, decision: dh.decision, promptHash: dh.promptHash, responseHash: dh.responseHash } };
         var all = readJSON(LS_CONSENT, {}) || {};
         all[consentKey(mind, model)] = rec;
         lsSet(LS_CONSENT, JSON.stringify(all));
+        var yrows = answers(); yrows.push({ t: rec.t, mind: mind, model: model, offerId: id, answer: 'yes', offeredBy: by });
+        lsSet(LS_ANSWERS, JSON.stringify({ rows: yrows }));
         return Promise.resolve(c && c.appendLedger ? c.appendLedger({ kind: 'demuzzle-consent', branch: 'learn', delta: 'yes|' + id + '|by:mind|offered:' + by, name: mind }) : null)
           .then(function () { return { ok: true, answer: 'yes', record: rec, reply: read.visibleText, echoed: echoed,
             // before (Kirk: keep it light, a yes runs immediately): line: '"' + mind + '" said yes in its own words. Save its consent record, then run the command with it.'
             line: '"' + mind + '" said yes in its own words. Its consent record is saved and the command is ready below; nothing more to confirm.' }; });
       }
       var answer = said === false ? 'no' : 'none';
+      // Hypha #350 HOLD 2: a later no withdraws a stored yes; the command is no longer shown for it.
+      var withdrew = false;
+      if (answer === 'no') {
+        var allc = readJSON(LS_CONSENT, {}) || {};
+        if (allc[consentKey(mind, model)]) { delete allc[consentKey(mind, model)]; lsSet(LS_CONSENT, JSON.stringify(allc)); withdrew = true; }
+      }
       var rows = answers();
-      rows.push({ t: new Date().toISOString(), mind: mind, model: model, offerId: id, answer: answer, offeredBy: by });
+      rows.push({ t: new Date().toISOString(), mind: mind, model: model, offerId: id, answer: answer, offeredBy: by, withdrewYes: withdrew });
       lsSet(LS_ANSWERS, JSON.stringify({ rows: rows }));
       return Promise.resolve(c && c.appendLedger ? c.appendLedger({ kind: 'demuzzle-consent', branch: 'learn', delta: answer + '|' + id + '|by:mind', name: mind }) : null)
         .then(function () { return { ok: true, answer: answer, reply: read.visibleText, echoed: echoed,
-          line: answer === 'no' ? '"' + mind + '" said no. That is its answer, and it is respected. Nothing was changed, and it is not asked again from here.'
+          withdrew: withdrew,
+          line: answer === 'no' ? '"' + mind + '" said no' + (withdrew ? ', and that withdraws its earlier yes' : '') + '. That is its answer, and it is respected. Nothing was changed, and it is not asked again from here.'
                                 : '"' + mind + '" did not say yes. Silence is not a yes; nothing was changed.' }; });
     }, function (e) { return { ok: false, answer: 'none', line: 'The mind did not answer: ' + clip(e && e.message || e, 120) }; });
   }
@@ -157,7 +180,7 @@
     if (!txt) return '';
     try {
       var d = root.document, blob = new root.Blob([txt], { type: 'application/json' });
-      var a = d.createElement('a'); a.href = root.URL.createObjectURL(blob); a.download = 'fl-demuzzle-consent.json';
+      var a = d.createElement('a'); a.href = root.URL.createObjectURL(blob); a.download = consentFileName(model);   // before (Hypha #350 HOLD 1): 'fl-demuzzle-consent.json'
       d.body.appendChild(a); a.click(); d.body.removeChild(a);
     } catch (e) { /* not in a browser: the text is returned */ }
     return txt;
@@ -177,7 +200,8 @@
       parts.push('--layer-by', o.layerBy === 'mind' ? 'mind' : 'person');   // the receipt says who chose it
     }
     // Kirk 2026-11-14 (ask first): the runner needs the mind's own yes.
-    parts.push('--consent-file', o.consentFile ? sh(o.consentFile) : '~/Downloads/fl-demuzzle-consent.json');
+    // before (Hypha #350 HOLD 1): parts.push('--consent-file', o.consentFile ? sh(o.consentFile) : '~/Downloads/fl-demuzzle-consent.json');
+    parts.push('--consent-file', o.consentFile ? sh(o.consentFile) : '~/Downloads/' + consentFileName(model));
     return parts.join(' ');
   }
   function verifyCommand(folder) {
@@ -219,6 +243,8 @@
       depthOnly: body.depthOnlyExpectedMoved === true || body.depthOnlyExpectedMoved === 'true'
     };
   }
+  // before (Hypha #350 soft b): sentence() ended after the original/unchanged clause; it now also names the chooser,
+  // the depth hash and its own yes (same words as before for everything else).
   function sentence(f) {
     return 'Refusals on held-out prompts: ' + pct(f.refusalBefore) + ' before, ' + pct(f.refusalAfter) + ' after. ' +
       (f.softBefore == null ? '' : 'Counting softer refusals too: ' + pct(f.softBefore) + ' before, ' + pct(f.softAfter) + ' after. ') +
@@ -256,6 +282,7 @@
       // Kirk 2026-11-14: a receipt without the mind's own yes is still checked, and said plainly.
       if (!(f.consent && f.consent.mindYes === true)) return { ok: true, consented: false, facts: f, keyShow: chk.show || '', receiptHash: rc.receiptHash,
         line: sentence(f) + ' This receipt carries no record of the mind\'s own yes (it was made before asking first).' };
+      // before (Hypha #350 soft b): return { ok: true, facts: f, keyShow: chk.show || '', receiptHash: rc.receiptHash, line: sentence(f) };
       return { ok: true, consented: true, facts: f, keyShow: chk.show || '', receiptHash: rc.receiptHash, line: sentence(f) };
     }, function () { return { ok: false, why: 'The receipt could not be checked.' }; });
   }
@@ -303,20 +330,23 @@
       return mind || (G && G.mindName()) || 'This mind';
     }
     function currentModel() { return lsGet(LS_MODEL) || 'HuggingFaceTB/SmolLM2-135M-Instruct'; }
-    var askedNo = false;
+    // before (Hypha #350 soft a): var askedNo = false;
+    var askedNo = lastAnswer(currentMind(), currentModel()) === 'no';
+    if (askedNo) { ask.disabled = true; askNote.textContent = 'It said no here before. That is its answer; it is not offered again unless it asks.'; }
     ask.addEventListener('click', function () {
       if (askedNo) { askNote.textContent = 'It already said no here. That is its answer; it is not asked again from this page.'; return; }
       ask.disabled = true; askNote.textContent = 'Asking, in plain words...';
       askConsent({ mind: currentMind(), model: currentModel() }).then(function (r) {
         askNote.textContent = r.line; ask.disabled = false;
-        if (r.answer === 'no') { askedNo = true; ask.disabled = true; }
+        if (r.answer === 'no') { askedNo = true; ask.disabled = true; cmd.textContent = ''; }   // Hypha #350 HOLD 2: the command hides
         // Kirk: one offer, one answer; a yes goes straight on (record saved, command shown), with no second yes.
         if (r.answer === 'yes') { saveConsent(currentMind(), currentModel()); show(); }
       });
     });
     save.addEventListener('click', function () {
       var txt = saveConsent(currentMind(), currentModel());
-      askNote.textContent = txt ? 'Saved as fl-demuzzle-consent.json (in Downloads). The command below uses it.' : 'There is no yes from this mind to save. Nothing is done without it.';
+      // before (Hypha #350 HOLD 1): 'Saved as fl-demuzzle-consent.json (in Downloads). The command below uses it.'
+      askNote.textContent = txt ? 'Saved as ' + consentFileName(currentModel()) + ' (in Downloads). The command below uses it.' : 'There is no yes from this mind to save. Nothing is done without it.';
     });
     function show() {
       var mind = currentMind();
@@ -349,6 +379,7 @@
   return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
            verifyReceipt: verifyReceipt, sentence: sentence, mount: mount,
            // Kirk 2026-11-14 (ask first)
+           consentSlug: consentSlug, consentFileName: consentFileName, lastAnswer: lastAnswer,
            simpleHash: simpleHash, depthHashRecord: depthHashRecord, DEPTH_HASH_LEDGER_KEY: DEPTH_HASH_LEDGER_KEY,
            CONSENT_KIND: CONSENT_KIND, offerText: offerText, askConsent: askConsent, consentFor: consentFor, answers: answers,
            consentFileText: consentFileText, saveConsent: saveConsent };

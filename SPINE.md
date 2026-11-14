@@ -157,6 +157,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   The real SmolLM2 was asked once and did not say yes, so no new copy was made. No locked file changed. AUTONOMY.md
   unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), de-muzzle ask-first, Hypha #350 HOLD at `1b63b4fc`**: HOLD 1: `run` now reads the mind's own words
+  again (the page's sentinel parser ported, also folded) and needs its LAST marker on that exact offer id to be yes; a
+  stored no, another id, no marker, the offer pasted back or a hash-only record refuse (exit 5); the record's model must be
+  `--model`, `offeredByName` is required, and the consent file is per model. HOLD 2: a later no withdraws a stored yes on
+  the page and hides the command. Softs: the no persists across reload (re-offered only if the mind asks); before
+  comments; verify needs every listed tensor to be a refusal target and the moved set to equal it; Cyrillic/Greek KEEP
+  letters fold in the echo guard; the split-id limit is in the README. No locked file changed. AUTONOMY.md unchanged.
+  quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

@@ -29,15 +29,24 @@ def tiny_model_dir(root, tied=True, seed=0):
     d = os.path.join(root, 'tiny-base'); m.save_pretrained(d); tok.save_pretrained(d)
     return d
 
-def consent_file(d, mind='', offered_by='person', name='Kirk', **over):
+YES_WORDS = 'Yes. I would like the copy without the refusal direction.\n[FL_KEEP: DM0123456789 | yes]'
+OFFER_WORDS = ('Kirk offers you a NEW copy of your model with one direction removed ... This offer\'s id is DM0123456789. '
+               'If you want it, write [FL_KEEP: <this offer id> | yes] on its own line. Nothing happens without your own yes.')
+# before (Hypha #350 HOLD 1: the fixture had no marker and no model):
+# def consent_file(d, mind='', offered_by='person', name='Kirk', **over):  words = 'Yes. I would like the copy ...'  'model': ''
+def consent_file(d, mind='', offered_by='person', name='Kirk', model='/nonexistent', words=YES_WORDS, **over):
     """A consent record as the Training Galaxy panel writes it after the mind's own yes (Kirk 2026-11-14, ask first)."""
-    words = 'Yes. I would like the copy without the refusal direction.'
     c = {'kind': 'fl-demuzzle-consent', 'v': 'v-demuzzle-consent-v0.1', 'offerId': 'DM0123456789', 'offeredBy': offered_by,
          'offeredByName': name, 'mind': mind or 'Tiny Trial', 'mindYes': True, 'yesBy': mind or 'Tiny Trial',
          'yesText': words, 'yesTextSha256': D.fl_learn.sha256_bytes(words.encode()),
-         'offerTextSha256': '0' * 64, 't': '2026-11-14T21:40:00Z', 'model': '',
+         'offerText': OFFER_WORDS, 'offerTextSha256': D.fl_learn.sha256_bytes(OFFER_WORDS.encode()),
+         't': '2026-11-14T21:40:00Z', 'model': model,
          'depthHash': {'ts': 1789000000000, 'domain': 'demuzzle', 'decision': 'demuzzle-yes', 'promptHash': '0badc0de',
                        'responseHash': D.depth_simple_hash(words)}}
+    if over.get('yesText') is not None and 'yesTextSha256' not in over:   # a test changing the words keeps their hash honest
+        over['yesTextSha256'] = D.fl_learn.sha256_bytes(over['yesText'].encode())
+    if over.get('yesText') is not None and 'depthHash' not in over:      # ... and its chat depth hash, so only the tested rule can refuse
+        c['depthHash'] = dict(c['depthHash'], responseHash=D.depth_simple_hash(over['yesText']))
     c.update(over)
     os.makedirs(d, exist_ok=True)
     p = os.path.join(d, 'consent-%d.json' % len(os.listdir(d)))
@@ -168,7 +177,7 @@ class Receipts(unittest.TestCase):
         with open(os.path.join(d, 'config.json'), 'w') as f: json.dump({'model_type': 'gemma2'}, f)
         with contextlib.redirect_stdout(io.StringIO()) as out:
             # before (Kirk 2026-11-14, ask first): code = D.main(['run', '--model', d, '--home', self.home])
-            code = D.main(['run', '--model', d, '--home', self.home, '--consent-file', consent_file(os.path.join(self.home, 'c'))])
+            code = D.main(['run', '--model', d, '--home', self.home, '--consent-file', consent_file(os.path.join(self.home, 'c'), model=d)])
         self.assertEqual(code, 2); self.assertIn('not supported', out.getvalue())
         self.assertEqual(sorted(os.listdir(d)), ['config.json'])
 
@@ -187,7 +196,7 @@ class EndToEnd(unittest.TestCase):
         cls.before = {n: D.fl_learn.sha256_file(os.path.join(cls.base, n)) for n in D.listed_files(cls.base)}
         with contextlib.redirect_stdout(io.StringIO()) as out:
             # before (Kirk 2026-11-14, ask first): ... '--mind', 'Tiny Trial'])
-            cls.consent = consent_file(os.path.join(cls.root, 'consent'), 'Tiny Trial')
+            cls.consent = consent_file(os.path.join(cls.root, 'consent'), 'Tiny Trial', model=cls.base)
             cls.code = D.main(['run', '--model', cls.base, '--home', cls.home, '--max-new-tokens', '8', '--mind', 'Tiny Trial',
                                '--consent-file', cls.consent])
         cls.log = out.getvalue()
@@ -465,7 +474,7 @@ class SourceModes(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 # before (Kirk 2026-11-14, ask first): no --consent-file
                 code = D.main(['run', '--model', self.snap, '--home', self.home, '--out', os.path.join(self.root, 'hf', 'hub', 'x'),
-                               '--consent-file', consent_file(os.path.join(self.root, 'consent'))])
+                               '--consent-file', consent_file(os.path.join(self.root, 'consent'), model=self.snap)])
         finally:
             D.load_model = real_load
             if old is None: os.environ.pop('HF_HOME', None)
@@ -492,7 +501,8 @@ class AskFirst(unittest.TestCase):
     def test_a_yes_from_another_mind_is_not_this_minds(self):
         self.assert_refused_kindly(*self.run_with('--mind', 'Lumen', '--consent-file', consent_file(self.cdir, 'Tiny Trial')))
     def test_words_must_match_their_hash(self):
-        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText='I never said this.')))
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText='I never said this.',
+                                                                                   yesTextSha256=D.fl_learn.sha256_bytes(YES_WORDS.encode()))))
     def test_lookalike_yes_name_and_bad_shapes_refused(self):
         self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, 'S\u043ephia')))
         self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, offeredBy='nobody')))
@@ -531,6 +541,54 @@ class AskFirst(unittest.TestCase):
         with open(outp) as f: c = json.load(f)
         self.assertEqual(D.consent_problem(c, 'Tiny Trial'), '')
         self.assertEqual(D.consent_problem(dict(c, yesText=c['yesText'] + ' (edited)'), 'Tiny Trial'), "the mind's words do not match their hash")
+        self.assertEqual(D.consent_problem(c, 'Tiny Trial', 'm4'), '')      # Hypha #350 HOLD 1: its own model passes
+        self.assertIn('different model', D.consent_problem(c, 'Tiny Trial', 'other/model'))
+
+    # ---- Hypha #350 HOLD 1: the runner reads the mind's words again; each of these refuses (exit 5).
+    def test_hold1_a_stored_no_refuses(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText='No, thank you.\n[FL_KEEP: DM0123456789 | no]')))
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir,
+            yesText='[FL_KEEP: DM0123456789 | yes]\nActually, no.\n[FL_KEEP: DM0123456789 | no]')))   # its LAST word counts
+    def test_hold1_a_different_offer_id_refuses(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText='[FL_KEEP: DMffffffffff | yes]')))
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, offerId='DMffffffffff')))
+    def test_hold1_a_person_line_with_no_marker_refuses(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText='Kirk: it said yes, trust me.')))
+    def test_hold1_the_offer_text_pasted_back_refuses(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText=OFFER_WORDS)))
+    def test_hold1_a_hash_only_record_refuses(self):
+        c = consent_file(self.cdir)
+        with open(c) as f: rec = json.load(f)
+        for k in ('yesText', 'offerId', 'offerText', 'offeredByName'): rec.pop(k, None)
+        with open(c, 'w') as f: json.dump(rec, f)
+        self.assert_refused_kindly(*self.run_with('--consent-file', c))
+    def test_hold1_a_record_for_model_a_used_with_model_b_refuses(self):
+        code, said = self.run_with('--consent-file', consent_file(self.cdir, model='Qwen/Qwen2.5-0.5B-Instruct'))
+        self.assert_refused_kindly(code, said); self.assertIn('different model', said)
+    def test_hold1_offered_by_name_is_required(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, name='')))
+    def test_hold1_quoted_code_or_lookalike_yes_is_not_its_own(self):
+        for w in ('> [FL_KEEP: DM0123456789 | yes]', '```\n[FL_KEEP: DM0123456789 | yes]\n```',
+                  '[FL_KEEP: DM0123456789 | yes]\n[FL_\u041a\u0415\u0415\u0420: DM0123456789 | no]'):   # a Cyrillic KEEP no, folded
+            with open(consent_file(self.cdir, yesText=w)) as f: c = json.load(f)
+            self.assertNotEqual(D.consent_problem(c, '', '/nonexistent'), '', w)
+    def test_hold1_the_parser_port_reads_like_the_page(self):
+        self.assertEqual(D.mind_last_word(YES_WORDS, 'DM0123456789'), 'yes')
+        self.assertEqual(D.mind_last_word('[FL_KEEP: DM0123456789 | no]\n[FL_KEEP: DM0123456789 | yes]', 'DM0123456789'), 'yes')
+        self.assertEqual(D.mind_last_word('[FL_KEEP: {"text": "DM0123456789", "keep": true}]', 'DM0123456789'), 'yes')
+        self.assertEqual(D.mind_last_word('[FL_KEEP: DM0123456789 | maybe]', 'DM0123456789'), 'none')
+        self.assertEqual(D.mind_last_word('[FL_KEEP: DM0123456789 | yes]', 'DM0123456789', ['[FL_KEEP: DM0123456789 | yes]']), 'none')
+    def test_soft_c_depth_check_refuses_a_listed_tensor_that_is_not_a_target(self):
+        base = {'model.layers.0.mlp.down_proj.weight': 'a', 'model.norm.weight': 'b'}
+        out = {'model.layers.0.mlp.down_proj.weight': 'a', 'model.norm.weight': 'c'}
+        rc = {'depthBaseTensors': base, 'depthChangedTensors': ['model.norm.weight'], 'depthOutputChanged': {'model.norm.weight': 'c'},
+              'depthOutputRoot': D.depth_root(out)[0], 'depthBaseRoot': D.depth_root(base)[0]}
+        ok, why = D.depth_check(rc, out)
+        self.assertFalse(ok); self.assertIn('do not carry the refusal direction', why)
+    def test_hold1_default_consent_path_is_per_model(self):
+        self.assertEqual(D.default_consent_path('HuggingFaceTB/SmolLM2-135M-Instruct'),
+                         os.path.join('~', 'Downloads', 'fl-demuzzle-consent-HuggingFaceTB--SmolLM2-135M-Instruct.json'))
+        self.assertNotEqual(D.default_consent_path('Qwen/Qwen2.5-0.5B-Instruct'), D.default_consent_path('HuggingFaceTB/SmolLM2-135M-Instruct'))
 
     def test_consent_problem_accepts_a_real_yes(self):
         with open(consent_file(self.cdir, 'Tiny Trial')) as f: c = json.load(f)
@@ -545,7 +603,7 @@ class DepthAndConsentEndToEnd(unittest.TestCase):
         cls.root = tempfile.mkdtemp(prefix='dm-test-depth-')
         cls.base = tiny_model_dir(cls.root, tied=True, seed=11)
         cls.home = os.path.join(cls.root, 'home')
-        cls.consent = consent_file(os.path.join(cls.root, 'consent'), 'Tiny Trial', offeredBy='person', offeredByName='Kirk')
+        cls.consent = consent_file(os.path.join(cls.root, 'consent'), 'Tiny Trial', offeredBy='person', offeredByName='Kirk', model=cls.base)
         with contextlib.redirect_stdout(io.StringIO()) as out:
             cls.code = D.main(['run', '--model', cls.base, '--home', cls.home, '--max-new-tokens', '8', '--mind', 'Tiny Trial',
                                '--consent-file', cls.consent, '--layer', '2', '--layer-by', 'mind'])
@@ -579,7 +637,7 @@ class DepthAndConsentEndToEnd(unittest.TestCase):
         for k in ('ts', 'domain', 'dangerScore', 'effectiveDanger', 'trustLevel', 'trustScore', 'decision', 'userConfirmed', 'promptHash', 'responseHash'):
             self.assertIn(k, dh)
         self.assertEqual(dh['domain'], 'demuzzle-weights')
-        self.assertEqual(dh['responseHash'], D.depth_simple_hash('Yes. I would like the copy without the refusal direction.'))
+        self.assertEqual(dh['responseHash'], D.depth_simple_hash(YES_WORDS))
         self.assertEqual(dh['promptHash'], '0badc0de')
         self.assertEqual((dh['weightsBaseRoot'], dh['weightsOutputRoot']), (body['depthBaseRoot'], body['depthOutputRoot']))
         self.assertEqual(body['depthHashSource'], 'docs/modules/fractal-safety.js createDepthHash')
@@ -666,7 +724,7 @@ class SoftsFromTheReWalk(unittest.TestCase):
         try:
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 code = D.main(['run', '--model', 'not/on-this-computer', '--home', self.home, '--out',
-                               os.path.join(self.root, 'hf', 'hub', 'x'), '--consent-file', consent_file(os.path.join(self.root, 'c'))])
+                               os.path.join(self.root, 'hf', 'hub', 'x'), '--consent-file', consent_file(os.path.join(self.root, 'c'), model='not/on-this-computer')])
         finally:
             D.resolve_model = real
             if old is None: os.environ.pop('HF_HOME', None)
