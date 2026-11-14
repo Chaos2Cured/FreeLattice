@@ -8,6 +8,11 @@ pointers and folders and add rows.
 
 - Run steps for a supervised trial: `MAC_RUN_STEPS_2026-11-09.txt` (in Celeste's notes).
 - Tests: `test_learn_acceptance.py --model <hf id> --work <new folder>` (never deletes; refuses a folder it did not make).
+- Training Galaxy brick 1 (2026-11-14): `docs/training-galaxy.html` hands this runner one learn file (`fl-learn-queue.jsonl`)
+  and reads back its signed `receipts.jsonl`. End-to-end test with a real learn:
+  `test_training_galaxy.py --work <new folder>` (reads the model from the one shared cache; never copies it).
+- Since 2026-11-14 the acceptance suite links its A3 and base-fingerprint folders to the one shared model copy
+  (STORAGE.md section 4) instead of copying the model every run. `--copy-base` keeps the old copy and its chmod probe.
 
 ## Round 15 (Kirk 2026-11-10): where it came from is a label, not a hold
 

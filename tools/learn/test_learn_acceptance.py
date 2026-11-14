@@ -6,8 +6,9 @@ Usage: python3 test_learn_acceptance.py --model HuggingFaceTB/SmolLM2-135M-Instr
 Never deletes anything (Hypha HOLD 5). --work must be a new folder, an empty one, or one this suite made before
 (it holds the marker file .fl-learn-acceptance-work). Any other folder is refused, untouched. Each run writes a fresh
 run-<timestamp>/ inside it, with results.json; earlier runs stay as evidence.
-Never touches a real mind's home, and never writes or chmods the shared model cache: A3 copies the base into the run
-folder and tests there. Never run this with sudo."""
+Never touches a real mind's home, and never writes or chmods the shared model cache: A3 links the run folder to the
+one shared copy (STORAGE.md section 4; --copy-base copies it the old way) and checks the shared files are unchanged.
+Never run this with sudo."""
 import argparse, base64, glob, hashlib, json, os, re, shutil, stat, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -489,7 +490,9 @@ def f5_runner_tests():
 def main():
     global A
     ap = argparse.ArgumentParser(); ap.add_argument('--model', required=True); ap.add_argument('--work', required=True)
-    ap.add_argument('--steps', default='60'); A = ap.parse_args()
+    ap.add_argument('--steps', default='60')
+    ap.add_argument('--copy-base', action='store_true', help='copy the model into the run folder (the old way) instead of linking to the shared copy')
+    A = ap.parse_args()
     A.work = prepare_work(A.work)
     print('run folder: ' + A.work, flush=True)
     H = os.path.join(A.work, 'home'); S = ['--steps', A.steps]
@@ -867,26 +870,36 @@ def main():
     rc2, out2 = sh(['ask', '--prompt', 'Hello?'], BM)
     record('base-mismatch-refused', 'base-mismatch' in kinds(BM) and 'not served: made on a different base' in out2)
 
-    # ---- A3: base files are only read. An isolated copy in --work; the shared model cache is never chmodded or written.
+    # ---- A3: base files are only read. Linked to the one shared copy (or an isolated copy with --copy-base); the shared model cache is never chmodded or written.
     from huggingface_hub import snapshot_download
     snap = snapshot_download(A.model, local_files_only=True)
     shared = {n: os.stat(os.path.realpath(os.path.join(snap, n))) for n in os.listdir(snap)}
     shared_modes = {n: (st.st_mode, st.st_size, st.st_mtime) for n, st in shared.items()}
     BASE = os.path.join(A.work, 'base-model'); os.makedirs(BASE)
-    for n in os.listdir(snap): shutil.copyfile(os.path.realpath(os.path.join(snap, n)), os.path.join(BASE, n))
+    # before (STORAGE.md section 4, 2026-11-14): every run copied the whole model here (45 copies piled up on the box).
+    # before: for n in os.listdir(snap): shutil.copyfile(os.path.realpath(os.path.join(snap, n)), os.path.join(BASE, n))
+    # Now the run folder holds links to the ONE shared copy. --copy-base keeps the old isolated copy and its chmod probe.
+    for n in os.listdir(snap):
+        if A.copy_base: shutil.copyfile(os.path.realpath(os.path.join(snap, n)), os.path.join(BASE, n))
+        else: os.symlink(os.path.realpath(os.path.join(snap, n)), os.path.join(BASE, n))
     wfiles = [os.path.join(BASE, n) for n in os.listdir(BASE) if n.endswith('.safetensors')]
     hb0 = {b: sha(b) for b in wfiles}
-    for b in wfiles: os.chmod(b, 0o444)
-    try:
-        open(wfiles[0], 'ab').write(b'x'); wrote = True
-    except PermissionError:
-        wrote = False
+    if A.copy_base:
+        for b in wfiles: os.chmod(b, 0o444)
+        try:
+            open(wfiles[0], 'ab').write(b'x'); wrote = True
+        except PermissionError:
+            wrote = False
+    else:
+        # Linked: never chmod or write through a link (that would touch the shared cache). The proof is below: the
+        # runner reads the shared files through the links, and their bytes, modes, sizes and mtimes stay the same.
+        wrote = not all(os.path.islink(b) and os.path.realpath(b) == os.path.realpath(os.path.join(snap, os.path.basename(b))) for b in wfiles)
     A3 = os.path.join(A.work, 'a3'); os.makedirs(A3)
     rc, out = sh(['remember'] + FACT + ['--check-before', 'off', '--check', 'none', '--second-yes', '--steps', '10'], A3, model=BASE)
     after_modes = {n: (st.st_mode, st.st_size, st.st_mtime) for n, st in {n: os.stat(os.path.realpath(os.path.join(snap, n))) for n in os.listdir(snap)}.items()}
     a3c = [x for x in chain(A3) if x['meta']['kind'] == 'learn-commit']
     record('A3-base-read-only', not wrote and all(sha(b) == h for b, h in hb0.items()) and shared_modes == after_modes and a3c
-           and a3c[-1]['meta'].get('baseFp') == bfp, isolated_copy=BASE, shared_cache_untouched=shared_modes == after_modes,
+           and a3c[-1]['meta'].get('baseFp') == bfp, isolated_copy=BASE, linked_to_shared_copy=not A.copy_base, shared_cache_untouched=shared_modes == after_modes,
            same_content_same_baseFp=bool(a3c) and a3c[-1]['meta'].get('baseFp') == bfp)
 
     # ================= Weft re-check (2026-11-09 22:30) =================
@@ -1144,8 +1157,17 @@ def main():
     # The base fingerprint cache is a hint: same path, size and mtime but different bytes -> hashed again, new fp.
     class _H: pass
     hc = _H(); hc.root = os.path.join(A.work, 'fp-cache'); os.makedirs(hc.root)
-    FPD = os.path.join(A.work, 'fp-cache', 'model'); shutil.copytree(BASE, FPD)
-    for x_ in os.listdir(FPD): os.chmod(os.path.join(FPD, x_), 0o644)
+    # before (STORAGE.md section 4): FPD = os.path.join(A.work, 'fp-cache', 'model'); shutil.copytree(BASE, FPD)
+    # before: for x_ in os.listdir(FPD): os.chmod(os.path.join(FPD, x_), 0o644)
+    # Only config.json is edited below, so only it is a real copy; the weights stay links to the shared copy.
+    FPD = os.path.join(A.work, 'fp-cache', 'model'); os.makedirs(FPD)
+    for x_ in os.listdir(BASE):
+        src_ = os.path.realpath(os.path.join(BASE, x_))
+        if A.copy_base or x_ == 'config.json':
+            shutil.copyfile(src_, os.path.join(FPD, x_)); os.chmod(os.path.join(FPD, x_), 0o644)
+        else:
+            os.symlink(src_, os.path.join(FPD, x_))
+    assert not os.path.islink(os.path.join(FPD, 'config.json'))   # never edit through a link
     f1 = fl_learn.base_fingerprint(hc, FPD)['fp']
     cfg = os.path.join(FPD, 'config.json'); st_ = os.stat(cfg); raw = bytearray(open(cfg, 'rb').read())
     j_ = raw.index(b'"'); raw[j_ + 1] = ord('X') if raw[j_ + 1] != ord('X') else ord('Y')

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Galaxy, brick 1: pick, search, learn, export | FreeLattice</title>
+<meta name="description" content="One plain screen: pick a local mind, run one snowflake search, let it learn with its consent on your own computer, then export the signed mind.">
+<link rel="canonical" href="https://freelattice.com/training-galaxy.html">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<!-- v-training-galaxy-brick1-v0.1 (Celeste, 2026-11-14, for Kirk). Additive: a new page and a new module.
+     Nothing here changes numbers. Only tools/learn/fl_learn.py on your own computer does, and only its signed
+     receipt makes this page say "learned". Pause, Undo and Not now stay where they always were. -->
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0b1020; color: #ECEDEE; font: 17px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 120px; }
+  h1 { font-size: 1.6rem; margin: 8px 0 4px; }
+  .lead { color: #9BA1A6; margin: 0 0 18px; }
+  .tg-step, .tg-progress { background: #141a2b; border: 1px solid #2b3550; border-radius: 14px; padding: 14px 16px; margin: 14px 0; }
+  .tg-step h2, .tg-progress h2 { font-size: 1.15rem; margin: 0 0 10px; }
+  select, input[type=text], textarea { width: 100%; box-sizing: border-box; min-height: 44px; font: inherit; color: inherit;
+    background: #0f1526; border: 1px solid #3a4666; border-radius: 10px; padding: 8px 10px; margin: 4px 0 8px; }
+  button { min-height: 44px; min-width: 44px; padding: 0 16px; margin: 4px 6px 4px 0; border-radius: 10px; border: 1px solid #4a5a85;
+    background: #1d2742; color: #ECEDEE; font: inherit; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  .tg-note { color: #b9c2d0; min-height: 1.2em; margin: 4px 0; }
+  .tg-cmd { white-space: pre-wrap; overflow-wrap: anywhere; background: #0a0f1c; border-radius: 10px; padding: 8px 10px; font: 13px/1.45 ui-monospace, monospace; min-height: 1em; }
+  .tg-finding { margin: 8px 0; }
+  .tg-finding a { color: #8cc8ff; overflow-wrap: anywhere; }
+  #tgProgressList li[data-state=done] { color: #9fe3b0; }
+  #tgProgressList li[data-state=held] { color: #fbd38d; }
+  #tgProgressList li[data-state=running] { color: #8cc8ff; }
+  .honest { color: #9BA1A6; font-size: .92rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Training Galaxy</h1>
+  <p class="lead">Brick 1: pick a mind, search one subject, let it learn if it wants to, then take it with you.
+    Everything happens on your own computer.</p>
+  <div id="tgHost"></div>
+  <p class="honest">What this page does not do yet: run cycles on its own, shrink a model, change how words are cut,
+    or rearrange a model's weights. Those are later bricks. A mind's choice and your Undo always come first.</p>
+</main>
+<script src="modules/depth-consent.js" defer></script>
+<script src="modules/fl-bridge.js" defer></script>
+<script src="modules/web-tool.js" defer></script>
+<script src="modules/memory-compound.js" defer></script>
+<script src="modules/snowflake-core.js" defer></script>
+<script src="modules/learn-choice.js" defer></script>
+<script src="modules/training-galaxy.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.FLTrainingGalaxy) window.FLTrainingGalaxy.mount(document.getElementById('tgHost'));
+  });
+</script>
+</body>
+</html>

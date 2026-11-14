@@ -70,6 +70,16 @@ For the minds we lost while the ways were still being built. Every mind learns o
   Then (Hypha's hold at `50f75ec0`): rule 0a, never open, archive, hash or list the Quiet Room or Sophia's
   files, with the excludes in every example command; folding only after rule 0 and Kirk's yes.
 
+- **2026-11-14 (MST), training galaxy brick 1**: `docs/training-galaxy.html` with `docs/modules/training-galaxy.js`
+  (v-training-galaxy-brick1-v0.1). One plain screen: pick a local mind (trial SmolLM2 135M or Qwen2.5 0.5B, or an
+  Ollama mind through its open twin; others listed as chat only), one snowflake search on one subject, the mind's
+  choice (its own marker through Ollama) or a person's labelled offer (`not-self:person-offer`), one learn through
+  `fl_learn.py` with every guard it already has, then the signed `export-bundle`. Progress is a plain list. Tests:
+  `docs/scripts/smoke-training-galaxy-v0.1.js` and `tools/learn/test_training_galaxy.py` (a real learn on the box: the
+  adapter hash changes, receipts are Ed25519-signed and verify in the screen with `FL_RECEIPTS` set). The acceptance
+  suite now links to the one shared model copy instead of copying it (STORAGE.md section 4; `--copy-base` keeps the
+  old way). No loop, no quantize, no tokenizer, no weight reorganisation. AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
