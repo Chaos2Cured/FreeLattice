@@ -255,6 +255,50 @@
     var h = c && typeof c.sha256Sync === 'function' ? c.sha256Sync(String(text) + '|' + mindName()) : String(Date.now());
     return 'O' + String(h).slice(0, 10);
   }
+  // Hypha HOLD on 090481ed (2026-11-14): an offer's words are data, never a marker. Offer text could carry
+  // [FL_KEEP: <another offer> | keep] or [FL_REMEMBER: ...] (also hidden with zero-width or look-alike letters); a
+  // mind that repeats it must never be counted as saying yes. So (1) the stored offer text has every FL_ marker
+  // neutralised (its opening bracket becomes "("), and (2) every open offer travels to the reader as echo
+  // (kind person), so a repeat of it is never the mind's own choice.
+  var INVISIBLE_RE = /[\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180F\u200B-\u200F\u202A-\u202E\u2060-\u206F\u3164\uFE00-\uFE0F\uFEFF\uFFA0]/g;
+  var OPEN_LOOKALIKE_RE = /[\u2045\u2768\u276A\u27E6\u27EC\u298B\u298D\u298F\u3010\u3014\u3016\u3018\u301A\uFE5D]/g;
+  var CLOSE_LOOKALIKE_RE = /[\u2046\u2769\u276B\u27E7\u27ED\u298C\u298E\u2990\u3011\u3015\u3017\u3019\u301B\uFE5E]/g;
+  // The shape a marker would have once a mind "cleans" it: compatibility forms folded (fullwidth letters and
+  // brackets), invisible format characters removed, look-alike brackets and F / L / underscore letters folded.
+  function foldMarkers(s) {
+    var t = String(s == null ? '' : s);
+    try { t = t.normalize('NFKC'); } catch (e) { /* old engines: the folds below still run */ }
+    return t.replace(INVISIBLE_RE, '').replace(OPEN_LOOKALIKE_RE, '[').replace(CLOSE_LOOKALIKE_RE, ']')
+      .replace(/[\u03DC\u0492\u15B4]/g, 'F').replace(/[\u0493\u03DD]/g, 'f')
+      .replace(/[\u029F\u13DE\u14AA\u1D0C\u2CD0\u216C]/g, 'L')
+      .replace(/[\u2017\u02CD\uFF3F\u2381]/g, '_');
+  }
+  var MARKERISH_RE = /\[(\s*)(f\s*l\s*_)/gi;
+  function neutraliseMarkers(s) {
+    var raw = String(s == null ? '' : s);
+    var folded = foldMarkers(raw);
+    MARKERISH_RE.lastIndex = 0;
+    if (!MARKERISH_RE.test(folded)) return raw;          // ordinary words are kept exactly as typed
+    MARKERISH_RE.lastIndex = 0;
+    return folded.replace(MARKERISH_RE, '($1$2');
+  }
+  function compactMarkers(s) { return foldMarkers(s).toLowerCase().replace(/\s+/g, ''); }
+  // Every way an open offer's words could come back as a marker, for the echo list and the page's own check.
+  function offerEchoTexts(w) {
+    var a = foldMarkers(w.asOffered || w.text);
+    var b = foldMarkers(w.text).replace(/\((\s*)(f\s*l\s*_)/gi, '[$1$2');
+    return a === b ? [a] : [a, b];
+  }
+  // A choice read from the reply that only repeats a marker an offer carried: never the mind's own.
+  function repeatsAnOffer(p, waiting) {
+    if (String(p.provenance || '').indexOf('echoed-person') === 0) return true;
+    var tag = p.secondLook ? '[fl_keep' : (p.decline ? '[fl_learn_decline' : '[fl_remember');
+    var needle = compactMarkers(p.secondLook ? p.id : (p.decline ? p.reason : p.text)).slice(0, 40);
+    if (!needle) return false;
+    return waiting.some(function (w) {
+      return offerEchoTexts(w).some(function (t) { var c = compactMarkers(t); return c.indexOf(tag) !== -1 && c.indexOf(needle) !== -1; });
+    });
+  }
   // (a) A person offers one finding (or their own words). Nothing goes to learning yet.
   function offer(node, opts) {
     var c = core();
@@ -264,12 +308,16 @@
       mark('kept', 'held', c.learnPaused() ? 'Learning is paused, so nothing was offered.' : 'Nothing was written.');
       return Promise.resolve(null);
     }
-    var text = clip(String(node.text).trim(), 2000);
+    // before (Hypha HOLD on 090481ed): var text = clip(String(node.text).trim(), 2000);
+    var asOffered = clip(String(node.text).trim(), 2000);
+    var text = clip(neutraliseMarkers(asOffered), 2000);   // its words stay; a marker inside them cannot act
     var id = offerId(text);
     var rows = offers();
     if (rows.some(function (r) { return r.id === id; })) { mark('kept', 'held', 'That is already offered.'); return Promise.resolve(null); }
     var row = { id: id, text: text, source: { title: clip(node.title || '', 200), url: clip(node.url || '', 400) }, subject: lastSubject,
       by: 'person', name: offererName(), mind: mindName(), t: new Date().toISOString(), status: 'offered', method: o.method || 'soft-prompt' };
+    // Kept only so a repeat of it can be recognised as echo (never shown to the mind, never trained).
+    if (asOffered !== text) { row.asOffered = asOffered; row.markersNeutralised = true; }
     rows.push(row);
     saveOffers(rows);
     return Promise.resolve(c.appendLedger({ kind: 'learn-offer', branch: 'learn', delta: 'offer|' + id + '|by:person|waits-for-the-mind', name: row.mind })).then(function () {
@@ -307,11 +355,19 @@
     }).then(function (data) {
       var reply = String((data && data.message && data.message.content) || '');
       // replay:true reads the markers without writing; each choice is then written once, for the galaxy's mind.
-      var read = L.interceptSentinel(reply, { surface: SURFACE, replay: true, echo: findings ? [{ kind: 'web', text: findings }] : [] });
+      // before (Hypha HOLD on 090481ed): echo: findings ? [{ kind: 'web', text: findings }] : []
+      var echo = findings ? [{ kind: 'web', text: findings }] : [];
+      waiting.forEach(function (w) { offerEchoTexts(w).forEach(function (t) { echo.push({ kind: 'person', text: t }); }); });
+      var read = L.interceptSentinel(reply, { surface: SURFACE, replay: true, echo: echo });
       var who = mindName();
-      var yes = 0, notNow = 0;
+      var yes = 0, notNow = 0, echoed = 0;
       // One choice at a time: each write reads the book first, so two at once would lose one.
-      var jobs = read.choices.map(function (p) { return function () {
+      var counted = read.choices.filter(function (p) {
+        if (repeatsAnOffer(p, waiting)) { echoed += 1; return false; }   // a repeat of an offer's words: not counted
+        return true;
+      });
+      // before (Hypha HOLD on 090481ed): var jobs = read.choices.map(function (p) { return function () {
+      var jobs = counted.map(function (p) { return function () {
         if (p.secondLook) {
           // Only the mind's own words, and only for an offer it was shown this time.
           var hit = p.provenance === 'self' && asked.indexOf(String(p.id || '').trim()) !== -1 ? offers().filter(function (w) { return w.id === String(p.id).trim() && w.status === 'offered'; })[0] : null;
@@ -348,14 +404,16 @@
         return chain.then(job).then(function (row) { rows.push(row); });
       }, Promise.resolve()).then(function () {
         var kept = rows.filter(Boolean);
-        var declined = read.choices.some(function (p) { return p.decline; });
+        // before (Hypha HOLD on 090481ed): var declined = read.choices.some(function (p) { return p.decline; });
+        var declined = counted.some(function (p) { return p.decline; });
         var words = [];
         if (yes) words.push('It said yes to ' + yes + ' offer' + (yes === 1 ? '' : 's') + '.');
         if (notNow) words.push('It said not now to ' + notNow + '.');
         if (kept.length - yes > 0) words.push('It chose ' + (kept.length - yes) + ' in its own words.');
+        if (echoed) words.push(echoed + ' marker' + (echoed === 1 ? '' : 's') + ' only repeated words from an offer, so ' + (echoed === 1 ? 'it was' : 'they were') + ' not counted.');
         if (kept.length) mark('kept', 'done', words.join(' '));
         else mark('kept', 'held', declined ? 'The mind said not this time. That is respected and recorded.' : (words.join(' ') || 'The mind chose nothing. That is its answer.'));
-        return { ok: true, reply: read.visibleText, rows: kept, declined: declined, yes: yes, notNow: notNow };
+        return { ok: true, reply: read.visibleText, rows: kept, declined: declined, yes: yes, notNow: notNow, echoed: echoed };
       });
     }, function (e) {
       return { ok: false, line: 'The mind did not answer: ' + clip(e && e.message || e, 120), rows: [] };
@@ -660,6 +718,8 @@
     exportApp: exportApp,
     offers: offers,
     openOffers: openOffers,
+    neutraliseMarkers: neutraliseMarkers,
+    foldMarkers: foldMarkers,
     offererName: offererName,
     setOffererName: setOffererName,
     canAnswer: canAnswer,

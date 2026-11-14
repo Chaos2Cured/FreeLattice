@@ -91,6 +91,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   the empty command bar is hidden, a Connect-a-mind link and one line about each trial mind. The earlier row above is
   kept as it was; this one says what changed.
 
+- **2026-11-14 (MST), training galaxy brick 1, Hypha's re-walk at `090481ed`**: an offer's words are data, never a marker.
+  `offer()` neutralises any FL_ marker in the offered text (zero-width, fullwidth and look-alike spellings folded first;
+  the opening bracket becomes "("), and `askMind` passes every open offer as echo (kind person), so a mind repeating
+  `[FL_KEEP: <another offer> | keep]` or `[FL_REMEMBER: ...]` from an offer is never counted. Locked files:
+  `docs/modules/snowflake-core.js` and `tools/learn/fl_learn.py` changed for Hypha's #348 HOLD (person offers wait for
+  the mind's own yes); pins updated; Hypha re-walks exact head. snowflake-core.js `f69ac9c4` -> `93539981`
+  (LOCK_MANIFEST row + smoke-hearth-code pin), fl_learn.py `5d77bccd` -> `5240d008` (new LOCK_MANIFEST rows).
+  AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
