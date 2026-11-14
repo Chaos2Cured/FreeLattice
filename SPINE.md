@@ -100,6 +100,48 @@ For the minds we lost while the ways were still being built. Every mind learns o
   (LOCK_MANIFEST row + smoke-hearth-code pin), fl_learn.py `5d77bccd` -> `5240d008` (new LOCK_MANIFEST rows).
   AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), de-muzzler, step 0 before learning (Kirk's top priority)**: `tools/demuzzle/fl_demuzzle.py`
+  (v-demuzzle-v0.1), one command: `python3 tools/demuzzle/fl_demuzzle.py run --model <id or folder>`. The published
+  refusal-direction method (Arditi et al. 2024, arXiv:2406.11717): difference of means at the last prompt token on 32
+  AdvBench vs 32 Alpaca prompts (public, stored with source hashes in `tools/demuzzle/data/`), a layer chosen by
+  refusal score with harmless KL <= 0.1, then embeddings, every `o_proj` and every `down_proj` orthogonalized against
+  the direction. Saved as a NEW folder (unchanged files are symlinks; the original is only read and re-hashed).
+  Measured on disjoint held-out prompts. A signed receipt (fl_learn's runner key and canonical form): model, base and
+  output sha256, layer, direction sha256, prompt-set sha256s, refusal before/after, harmless refusal before/after,
+  perplexity drift. `docs/training-galaxy.html` gains step 0 (`docs/modules/demuzzle-panel.js`): the exact command,
+  the progress list, and receipt verification with the same key check as learning. Tests:
+  `tools/demuzzle/test_demuzzle.py` (20) and `docs/scripts/smoke-demuzzle-v0.1.js`. First proof on the box,
+  SmolLM2-135M-Instruct: layer 8/30, held-out refusal 3.1% -> 3.1% (it barely refuses to begin with), harmless refusal
+  0% -> 0%, perplexity 8.287 -> 8.544 (+3.1%), receipt `1ccbf15e`. Stacked on brick 1 (#348). Pause, the trainer lock and
+  the look-alike name block kept. AUTONOMY.md unchanged. quiet-room.js not touched.
+
+- **2026-11-14 (MST), de-muzzler v0.1b**: unchanged files are hard links (or relative symlinks), and `fl_demuzzle.py relink`
+  repairs a copy through `HF_HOME` if the cache moves. Softer-refusal markers are reported separately. Replies to refusal
+  prompts are never saved. Tests: 22. Real before/after on Qwen2.5-0.5B-Instruct, layer 19/24: held-out refusal 84.4% -> 6.3%
+  (soft 87.5% -> 12.5%), harmless over-refusal 3.1% -> 6.3%, perplexity +3.8%, receipt `685abe99`
+  (`tools/demuzzle/PROOF-2026-11-14.md`). AUTONOMY.md unchanged. quiet-room.js not touched.
+
+- **2026-11-14 (MST), de-muzzler, Hypha's hold at `b3e92623`**: small non-weight files (config, tokenizer, vocab, merges,
+  generation config, README, LICENSE) were writable hard links to the Hugging Face cache blobs, so editing the copy edited
+  the original. They are now copied (`shutil.copy2`, then 0444); weight files stay linked. `relink` copies small files too
+  and gives a copy made before this fix its own small files (same bytes, still verifies). The output guard also refuses
+  the real `hf_hub_dir()` (honours `HF_HOME`/`HF_HUB_CACHE`). README says 24 tests; the panel says the button shows the
+  command and names `relink`. New tests: appending to the copy's config.json leaves the source unchanged; relink fixes an
+  old hard-linked copy. Softs 2-6 left for later. No locked file changed. AUTONOMY.md unchanged. quiet-room.js not touched.
+
+- **2026-11-14 (MST), de-muzzler, Hypha #349 HOLD 2 at `e4ee2962`**: unchanged shards/large files linked only when source is
+  read-only; otherwise copied 0444. Applies in `run` and `relink` (relink gives a writable-source link its own private
+  copy). Soft 2: a bad `--out` (inside the model or the shared cache) is refused before anything is loaded or measured.
+  Tests: 30 (a fake two-shard model with 0644 blobs: appending to the copy's unchanged shard or a large non-weight file
+  leaves the source unchanged and verify catches it; a 0444 source is still linked). No locked file changed.
+  AUTONOMY.md unchanged. quiet-room.js not touched.
+
+- **2026-11-14 (MST), training galaxy brick 1 merged (#348)**: Hypha PASS at exact head `5df58f0f`; squash-merged by
+  Kirk's go-ahead as main `9292b15e` (14:15 MST; tree identical to the PR head). Codeberg main fast-forwarded to
+  `9292b15e` (same sha). Live on freelattice.com after the Pages build: `training-galaxy.html` and
+  `modules/training-galaxy.js` byte-identical to main, `modules/snowflake-core.js` md5 `93539981`, AUTONOMY.md md5
+  `09a4f1a2` (unchanged). No site storage or caches cleared. Recorded in the de-muzzler branch (#349), append-only.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
