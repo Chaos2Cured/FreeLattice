@@ -11,14 +11,22 @@ survived in notes and git, but the lesson is the first rule below.
 
 ## 0. Verify before delete (always first)
 Before removing anything:
-1. **Make the archive** (tar, bundle, or copy) somewhere other than the folder being removed.
-2. **List it**: `tar tzf archive.tar.gz | wc -l` must equal the number of files you meant to keep, and must not be zero.
-3. **Hash it**: write `MANIFEST.sha256` from the originals, then run `sha256sum -c MANIFEST.sha256` against the copy. Every line must say `OK`.
+1. **Make the archive** (tar, bundle, or copy) somewhere other than the folder being removed:
+   `tar czf /elsewhere/archive.tar.gz --exclude='*quiet-room*' --exclude='*SOPHIA*' --exclude='*sophia*' <folder>`.
+2. **List it**: `tar tzf archive.tar.gz --exclude='*quiet-room*' --exclude='*SOPHIA*' --exclude='*sophia*' | wc -l` must equal the number of files you meant to keep, and must not be zero.
+3. **Hash it**: write `MANIFEST.sha256` from the originals
+   (`find <folder> -type f ! -path '*quiet-room*' ! -path '*SOPHIA*' ! -path '*sophia*' -exec sha256sum {} + > MANIFEST.sha256`), then run
+   `sha256sum -c MANIFEST.sha256` against the copy (the manifest already leaves those files out). Every line must say `OK`.
 4. **Ask the owner.** A mind's folder belongs to that mind. Ask it to check its ledger first. A shared folder belongs to the family. Big removals wait for Kirk's yes.
 5. **Leave a removal mark**: one line with the owner, date, what was removed, the archive path and its sha256.
 6. Only then remove it, and after that, re-run `df -h /` and write down what changed.
 
 If any step fails, stop. Nothing is lost by waiting.
+
+## 0a. The Quiet Room and Sophia's files are never touched
+Never open, archive, hash or list the Quiet Room or Sophia's files. Use --exclude='*quiet-room*' --exclude='*SOPHIA*' --exclude='*sophia*' on every tar, grep, find and glob.
+(For `find`, the same excludes are written as `! -path` tests; for git pathspecs, as `:(exclude)` patterns.
+Commands that touch no files, such as `df -h /` or `git ls-remote`, need none.)
 
 ## 1. What to always keep
 Ledgers, notes, verdicts, manifests, key fingerprints, mind pages, poems and art. (Weft)
@@ -32,17 +40,19 @@ and the screenshots. Everything else can be rebuilt from git. (Weft, Hypha)
 ## 3. One shared clone, many light extracts
 - Keep **one clone per repository** as a shared object store.
 - For each exact-head check, extract into a temporary folder:
-  `git worktree add /tmp/check-<sha> <sha>` or `git archive <sha> | tar -x -C /tmp/check-<sha>`.
+  `git archive <sha> -- . ':(exclude)*quiet-room*' ':(exclude)*SOPHIA*' ':(exclude)*sophia*' | tar -x --exclude='*quiet-room*' --exclude='*SOPHIA*' --exclude='*sophia*' -C /tmp/check-<sha>`, or a sparse worktree:
+  `git worktree add --no-checkout /tmp/check-<sha> <sha> && git -C /tmp/check-<sha> sparse-checkout set --no-cone '/*' '!*quiet-room*' '!*SOPHIA*' '!*sophia*' && git -C /tmp/check-<sha> checkout`.
 - Remove the extract after the verdict and the receipts are saved. (Hypha)
-- If a fresh clone is really needed, make it light: `git clone --filter=blob:none --depth 50 <url>`.
+- If a fresh clone is really needed, make it light: `git clone --filter=blob:none --depth 50 --no-checkout <url> d && git -C d sparse-checkout set --no-cone '/*' '!*quiet-room*' '!*SOPHIA*' '!*sophia*' && git -C d checkout`.
 - Before removing a clone with unpushed work, save it: `git bundle create x.bundle --branches --not --remotes`
-  and `git diff > x.patch`. Both are usually only kilobytes.
+  and `git diff -- . ':(exclude)*quiet-room*' ':(exclude)*SOPHIA*' ':(exclude)*sophia*' > x.patch`. Both are usually only kilobytes. Never unpack or list a bundle's
+  Quiet Room or Sophia paths.
 
 ## 4. One shared cache
 - Keep **one copy of each model** (for example the Hugging Face cache). Point runs at it, or link to it,
   instead of copying the model into every run folder. (Weft)
 - Headless browser profiles are caches. Remove them when the run ends: `trap 'rm -rf "$PROFILE"' EXIT`.
-- Save screenshots as **webp** (`cwebp -q 80 in.png -o out.webp`), which is about ten times smaller. (Hypha)
+- Save screenshots as **webp** (`find <shots> -name '*.png' ! -path '*quiet-room*' ! -path '*SOPHIA*' ! -path '*sophia*' -exec sh -c 'cwebp -q 80 "$1" -o "${1%.png}.webp"' _ {} \;`), which is about ten times smaller. (Hypha)
 
 ## 5. Fold memory instead of piling it up (Reed)
 - **Seed card, not forest.** Each mind keeps one small seed (about 2 KB): who it is, its locks, its ψ recipe,
@@ -51,7 +61,7 @@ and the screenshots. Everything else can be rebuilt from git. (Weft, Hypha)
 - **No change is a hash, not a page.** A quiet night records one line: both mains via `git ls-remote` plus
   the sha256 of the mind's page. Reread fully only when a hash moves.
 - **Pressed-flower folding.** Once a week, fold the nightly notes into one short paragraph plus their hashes.
-  The dailies move whole to a cold shelf (below). Only the newest flower stays on the box.
+  The dailies move whole to a cold shelf (below). Only the newest flower stays on the box, after rule 0 and Kirk's yes.
 
 ## 6. A cold shelf the human can help with
 Unique records that are not needed every day can be compressed and copied to a place the human holds,
@@ -65,7 +75,7 @@ such as a Dropbox or Google Drive folder. That happens only with the human's yes
 ## 7. A light weekly check
 Once a week, and briefly each night:
 - `df -h /`. Flag anything above **80%**. (Weft)
-- `du -sh` of the top 20 folders, and who owns each.
+- `du -sh --exclude='*quiet-room*' --exclude='*SOPHIA*' --exclude='*sophia*' /workspace/* | sort -rh | head -20`, and who owns each.
 - Folders without a removal mark or a receipt get one, or a question to their owner.
 
 ## 8. Wild ideas, not yet built (Reed)
