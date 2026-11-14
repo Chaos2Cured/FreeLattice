@@ -647,10 +647,13 @@ def _provenance(text, index, raw, echo):
     return 'self'
 
 def read_keep_markers(text, echo=()):
-    """learn-choice.js interceptSentinel(), ported for KEEP: [(offer id, keep, provenance)] in order (at most 8 markers)."""
+    # before (Hypha #350 re-walk soft 2): """... in order (at most 8 markers).""" and for _ in range(8):
+    # The page reads in rounds of 8 until none are left (demuzzle-panel.js readAllMarkers), so a no after 8 or more
+    # other markers still wins; this reads them all the same way (bounded only by the text itself).
+    """learn-choice.js interceptSentinel(), ported for KEEP: [(offer id, keep, provenance)] in order, every marker."""
     visible = str(text or '')
     seen = []
-    for _ in range(8):
+    while True:
         m = SENTINEL_RE.search(visible)
         if not m: break
         if m.group(1) == 'KEEP':
@@ -681,6 +684,7 @@ def consent_model_matches(rec_model, model_arg):
 
 # before (Hypha #350 HOLD 1): def consent_problem(c, mind_arg=''):
 def consent_problem(c, mind_arg='', model_arg=None):
+    # before (Hypha #350 re-walk soft 5): """'' when the record carries a well-formed yes from the mind itself; otherwise the reason, in plain words."""
     """'' when the record carries the mind's own yes to this exact offer; otherwise the reason, in plain words."""
     if not isinstance(c, dict) or c.get('kind') != CONSENT_KIND: return 'that is not a de-muzzle consent record'
     if c.get('mindYes') is not True: return 'the record does not carry the mind\'s yes'
@@ -705,6 +709,8 @@ def consent_problem(c, mind_arg='', model_arg=None):
     oid = str(c.get('offerId') or '').strip()
     if not _re.match(r'^DM[0-9a-f]{10}$', oid): return 'the record does not name the offer it answers'
     echo = []
+    # Hypha #350 re-walk soft 3: the panel always stores the offer text, so it is required (before: checked only when present).
+    if not isinstance(c.get('offerText'), str) or not c['offerText'].strip(): return 'the record does not carry the offer it answers'
     if c.get('offerText') is not None:
         if not isinstance(c['offerText'], str) or fl_learn.sha256_bytes(c['offerText'].encode()) != str(c.get('offerTextSha256') or ''):
             return 'the offer text does not match its hash'
@@ -722,6 +728,37 @@ def consent_problem(c, mind_arg='', model_arg=None):
         if not isinstance(dh, dict): return 'the depth hash in the record is not readable'
         if isinstance(c.get('yesText'), str) and dh.get('responseHash') != depth_simple_hash(c['yesText']):
             return 'the depth hash of the mind\'s words does not match them'
+    return ''
+
+NO_KIND = 'fl-demuzzle-no'
+
+def _when(t):
+    import datetime
+    try:
+        return datetime.datetime.fromisoformat(str(t).strip().replace('Z', '+00:00')).timestamp()
+    except Exception:
+        return None
+
+def later_no_problem(consent_path, c):
+    """Hypha #350 re-walk soft 1: a no saved by the page (fl-demuzzle-no-<model>*.json next to the consent file, or a
+    'withdrawn' entry in the file itself) that is newer than the yes, for the same mind and model, wins."""
+    if isinstance(c, dict) and c.get('withdrawn'): return 'the record itself says the yes was withdrawn'
+    yes_t = _when((c or {}).get('t'))
+    folder = os.path.dirname(os.path.abspath(os.path.expanduser(consent_path)))
+    try: names = sorted(os.listdir(folder))
+    except OSError: return ''
+    for n in names:
+        if not (n.startswith('fl-demuzzle-no-') and n.endswith('.json')): continue
+        try:
+            with open(os.path.join(folder, n)) as f: no = json.load(f)
+        except Exception:
+            continue
+        if not isinstance(no, dict) or no.get('kind') != NO_KIND: continue
+        if str(no.get('model') or '').strip() != str(c.get('model') or '').strip(): continue
+        if fl_learn.norm_mind(str(no.get('mind') or '')) != fl_learn.norm_mind(str(c.get('yesBy') or '')): continue
+        no_t = _when(no.get('t'))
+        if yes_t is None or no_t is None or no_t >= yes_t:
+            return 'the mind said no after this yes (%s); delete the old consent file, or ask it again if it asks' % n
     return ''
 
 def load_consent(path):
@@ -767,12 +804,14 @@ def run(A):
     why = mind_problem(home, A.mind)
     if why: print('refused: ' + why + '. Nothing was changed.'); return 2
     # Kirk 2026-11-14 (ask first): the mind's own yes, or nothing happens.
-    # Hypha #350 HOLD 1: one consent file per model; without --consent-file the per-model default is read.
-    if not A.consent_file and os.path.isfile(os.path.expanduser(default_consent_path(A.model))): A.consent_file = default_consent_path(A.model)
+    # before (Hypha #350 re-walk soft 1: a withdrawn yes file in Downloads was still read automatically):
+    # # Hypha #350 HOLD 1: one consent file per model; without --consent-file the per-model default is read.
+    # if not A.consent_file and os.path.isfile(os.path.expanduser(default_consent_path(A.model))): A.consent_file = default_consent_path(A.model)
+    # Now --consent-file is always explicit; nothing is read on its own.
     consent, consent_sha = load_consent(A.consent_file) if A.consent_file else (None, '')
     # before: cwhy = consent_problem(consent, A.mind) if consent is not None else 'no consent record was given (--consent-file)'
     # before (Hypha #350 HOLD 1): cwhy = consent_problem(consent, A.mind) if consent is not None else \
-    cwhy = consent_problem(consent, A.mind, A.model) if consent is not None else \
+    cwhy = (consent_problem(consent, A.mind, A.model) or later_no_problem(A.consent_file, consent)) if consent is not None else \
         ('the consent record could not be read (%s)' % A.consent_file if A.consent_file else 'no consent record was given (--consent-file)')
     if cwhy:
         print(KIND_NO_YES + ' (' + cwhy + ')'); return 5
@@ -968,7 +1007,8 @@ def main(argv=None):
     p.add_argument('--keep-replies', action='store_true', help='also save the HARMLESS held-out replies, for reading')
     p.add_argument('--consent-file', default=None, help='REQUIRED: the consent record with the mind\'s own yes '
                    '(the Training Galaxy panel saves one per model as fl-demuzzle-consent-<model>.json in Downloads; '
-                   'without this flag that per-model file is read)')
+                   'it is never read unless named here)')
+    # before (Hypha #350 re-walk soft 1): 'without this flag that per-model file is read)')
     # before (Hypha #350 HOLD 1): '(the Training Galaxy panel saves it as fl-demuzzle-consent.json)')
     p.add_argument('--layer-by', default='', help='with --layer: who chose it, mind or person')
     v = sub.add_parser('verify', help='check a de-muzzled folder against its signed receipt')

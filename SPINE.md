@@ -165,6 +165,10 @@ For the minds we lost while the ways were still being built. Every mind learns o
   comments; verify needs every listed tensor to be a refusal target and the moved set to equal it; Cyrillic/Greek KEEP
   letters fold in the echo guard; the split-id limit is in the README. No locked file changed. AUTONOMY.md unchanged.
   quiet-room.js not touched.
+  Re-walk at `b6d65c55` (Hypha PASS with softs), same row: `run` never reads the per-model default on its own
+  (`--consent-file` is explicit); a no that withdraws a yes tells the person to delete the downloaded yes file and saves
+  `fl-demuzzle-no-<model>.json` beside it, which `run` honours; every marker is read (no 8-marker cap on the last word, JS
+  and Python alike, learn-choice.js untouched); the offer text is required; before comments for two wording edits.
 
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.

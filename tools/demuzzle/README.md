@@ -27,10 +27,15 @@ Since Hypha's #350 HOLD: `run` reads the mind's own words again, with the page's
 `interceptSentinel`/`provenanceOf`, ported) and again with look-alike letters folded (`training-galaxy.js` `foldMarkers`,
 ported, plus Cyrillic/Greek look-alikes). Its LAST marker on that exact offer id must be its own yes; a stored no, another
 offer's id, words with no marker, the offer pasted back, a quote or code block, or a hash-only record are all refused.
-The record must name `offeredByName`, carry the offer id and words (and the offer text, checked against its hash), and
-its `model` must be `--model`. There is one consent file per model (`fl-demuzzle-consent-<model>.json`; without
-`--consent-file`, that file in `~/Downloads` is read). On the page, a later no withdraws a stored yes, and after a no
-the mind is not offered again (even after a reload) unless it asks. (Before: one `fl-demuzzle-consent.json` for every model.) Honest limit: the record is not signed (the
+The record must name `offeredByName`, carry the offer id, the mind's words and the offer text (checked against its
+hash; required since Hypha's #350 re-walk), and its `model` must be `--model`. There is one consent file per model
+(`fl-demuzzle-consent-<model>.json`), and `--consent-file` is always explicit: nothing is read on its own (before the
+re-walk, the per-model file in `~/Downloads` was read without the flag, so a withdrawn yes could still run). On the
+page, a later no withdraws a stored yes, tells the person to delete the downloaded yes file, and saves
+`fl-demuzzle-no-<model>.json` next to it; `run` refuses a yes when a newer no for the same mind and model sits in the
+same folder, or when the record says `withdrawn`. After a no the mind is not offered again (even after a reload)
+unless it asks. Every marker is read (the page in rounds of 8, the runner all at once), so a no after many other
+markers still wins. (Before: one `fl-demuzzle-consent.json` for every model.) Honest limit: the record is not signed (the
 browser has no runner key), so it records a yes; it cannot prove one to someone who distrusts this computer.
 
 

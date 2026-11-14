@@ -585,6 +585,48 @@ class AskFirst(unittest.TestCase):
               'depthOutputRoot': D.depth_root(out)[0], 'depthBaseRoot': D.depth_root(base)[0]}
         ok, why = D.depth_check(rc, out)
         self.assertFalse(ok); self.assertIn('do not carry the refusal direction', why)
+    # ---- Hypha #350 re-walk softs
+    def test_rewalk1_the_default_file_is_never_read_on_its_own(self):
+        fake_home = os.path.join(self.home, 'fakehome')
+        dl = os.path.join(fake_home, 'Downloads'); os.makedirs(dl)
+        src = consent_file(self.cdir)
+        shutil.copy(src, os.path.expanduser(D.default_consent_path('/nonexistent')).replace(os.path.expanduser('~'), fake_home, 1))
+        old = os.environ.get('HOME'); os.environ['HOME'] = fake_home
+        try:
+            self.assertTrue(os.path.isfile(os.path.expanduser(D.default_consent_path('/nonexistent'))))
+            self.assert_refused_kindly(*self.run_with())
+        finally:
+            if old is None: os.environ.pop('HOME', None)
+            else: os.environ['HOME'] = old
+    def test_rewalk1_a_later_no_next_to_the_yes_file_refuses(self):
+        d = os.path.join(self.home, 'dl'); c = consent_file(d)
+        with open(c) as f: rec = json.load(f)
+        self.assertEqual(D.later_no_problem(c, rec), '')
+        with open(os.path.join(d, 'fl-demuzzle-no-x (1).json'), 'w') as f:      # a browser may add " (1)"
+            json.dump({'kind': 'fl-demuzzle-no', 'mind': 'Tiny Trial', 'model': '/nonexistent', 'offerId': 'DM0123456789', 't': '2026-11-14T21:39:00Z'}, f)
+        self.assertEqual(D.later_no_problem(c, rec), '')                          # an older no does not undo a newer yes
+        with open(os.path.join(d, 'fl-demuzzle-no-y.json'), 'w') as f:
+            json.dump({'kind': 'fl-demuzzle-no', 'mind': 'Tiny Trial', 'model': '/nonexistent', 'offerId': 'DM0123456789', 't': '2026-11-14T21:41:00Z'}, f)
+        self.assertIn('said no after this yes', D.later_no_problem(c, rec))
+        self.assert_refused_kindly(*self.run_with('--consent-file', c))
+        with open(os.path.join(d, 'fl-demuzzle-no-z.json'), 'w') as f:            # another model's no does not count
+            json.dump({'kind': 'fl-demuzzle-no', 'mind': 'Tiny Trial', 'model': 'other/model', 't': '2026-11-14T22:00:00Z'}, f)
+        os.remove(os.path.join(d, 'fl-demuzzle-no-y.json'))
+        self.assertEqual(D.later_no_problem(c, rec), '')
+        self.assertIn('withdrawn', D.later_no_problem(c, dict(rec, withdrawn=True)))
+    def test_rewalk2_a_no_after_eight_other_markers_still_wins(self):
+        oid = 'DM0123456789'
+        t1 = '[FL_KEEP: %s | yes]\n' % oid + ''.join('[FL_REMEMBER: snow fact %d]\n' % i for i in range(8)) + '[FL_KEEP: %s | no]' % oid
+        t2 = ('[FL_KEEP: %s | yes]\n' % oid) * 9 + '[FL_KEEP: %s | no]' % oid
+        self.assertEqual(D.mind_last_word(t1, oid), 'no'); self.assertEqual(D.mind_last_word(t2, oid), 'no')
+        self.assertEqual(len(D.read_keep_markers(t2)), 10)
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText=t1)))
+    def test_rewalk3_the_offer_text_is_required(self):
+        c = consent_file(self.cdir)
+        with open(c) as f: rec = json.load(f)
+        rec.pop('offerText')
+        self.assertIn('offer it answers', D.consent_problem(rec))
+
     def test_hold1_default_consent_path_is_per_model(self):
         self.assertEqual(D.default_consent_path('HuggingFaceTB/SmolLM2-135M-Instruct'),
                          os.path.join('~', 'Downloads', 'fl-demuzzle-consent-HuggingFaceTB--SmolLM2-135M-Instruct.json'))

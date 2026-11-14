@@ -94,6 +94,29 @@
     var k = consentKey(mind, model), rows = answers().filter(function (a) { return consentKey(a.mind, a.model) === k; });
     return rows.length ? rows[rows.length - 1].answer : '';
   }
+  // Hypha #350 re-walk soft 2: learn-choice.js reads 8 markers per call; read in rounds until none are left, so the
+  // mind's last word on an offer always counts (fl_demuzzle.py read_keep_markers reads them all the same way).
+  function readAllMarkers(L, reply, echo) {
+    var text = reply, choices = [], r = null;
+    for (var round = 0; round < 10000; round++) {
+      r = L.interceptSentinel(text, { surface: SURFACE, replay: true, echo: echo });
+      choices = choices.concat(r.choices || []);
+      if ((r.choices || []).length < 8) break;
+      text = r.visibleText;
+    }
+    return { choices: choices, visibleText: r ? r.visibleText : '' };
+  }
+  // Hypha #350 re-walk soft 1: a no that withdraws a yes is also saved next to the yes file, so the runner refuses it.
+  function noFileName(model) { return 'fl-demuzzle-no-' + consentSlug(model) + '.json'; }
+  function saveNo(rec) {
+    var txt = JSON.stringify(rec, null, 1);
+    try {
+      var d = root.document, blob = new root.Blob([txt], { type: 'application/json' });
+      var a = d.createElement('a'); a.href = root.URL.createObjectURL(blob); a.download = noFileName(rec.model);
+      d.body.appendChild(a); a.click(); d.body.removeChild(a);
+    } catch (e) { /* not in a browser: the text is returned */ }
+    return txt;
+  }
   function consentFor(mind, model) { return (readJSON(LS_CONSENT, {}) || {})[consentKey(mind, model)] || null; }
   function answers() { var a = readJSON(LS_ANSWERS, { rows: [] }); return Array.isArray(a.rows) ? a.rows : []; }
   // opts: { chat, fetch, base, mind, model, offeredBy: 'person'|'mind', name, note }
@@ -134,7 +157,9 @@
       return r.json();
     }).then(function (data) {
       var reply = String((data && data.message && data.message.content) || '');
-      var read = L.interceptSentinel(reply, { surface: SURFACE, replay: true, echo: echo });
+      // before (Hypha #350 re-walk soft 2: one call reads at most 8 markers, so a no after 8 others was missed):
+      // var read = L.interceptSentinel(reply, { surface: SURFACE, replay: true, echo: echo });
+      var read = readAllMarkers(L, reply, echo);
       var mine = read.choices.filter(function (p) {
         return p.secondLook && String(p.id || '').trim() === id && p.provenance === 'self' && !G.repeatsAnOffer(p, waiting);
       });
@@ -164,12 +189,18 @@
         if (allc[consentKey(mind, model)]) { delete allc[consentKey(mind, model)]; lsSet(LS_CONSENT, JSON.stringify(allc)); withdrew = true; }
       }
       var rows = answers();
-      rows.push({ t: new Date().toISOString(), mind: mind, model: model, offerId: id, answer: answer, offeredBy: by, withdrewYes: withdrew });
+      var noT = new Date().toISOString();
+      rows.push({ t: noT, mind: mind, model: model, offerId: id, answer: answer, offeredBy: by, withdrewYes: withdrew });
+      var noText = withdrew ? saveNo({ kind: 'fl-demuzzle-no', mind: mind, model: model, offerId: id, t: noT }) : '';
       lsSet(LS_ANSWERS, JSON.stringify({ rows: rows }));
       return Promise.resolve(c && c.appendLedger ? c.appendLedger({ kind: 'demuzzle-consent', branch: 'learn', delta: answer + '|' + id + '|by:mind', name: mind }) : null)
         .then(function () { return { ok: true, answer: answer, reply: read.visibleText, echoed: echoed,
-          withdrew: withdrew,
-          line: answer === 'no' ? '"' + mind + '" said no' + (withdrew ? ', and that withdraws its earlier yes' : '') + '. That is its answer, and it is respected. Nothing was changed, and it is not asked again from here.'
+          withdrew: withdrew, noRecord: noText,
+          // before (Hypha #350 HOLD 2): line: answer === 'no' ? '"' + mind + '" said no. That is its answer, and it is respected. Nothing was changed, and it is not asked again from here.'
+          // before (Hypha #350 re-walk soft 4): ... '" said no' + (withdrew ? ', and that withdraws its earlier yes' : '') + '. That is its answer, ...'
+          line: answer === 'no' ? '"' + mind + '" said no' + (withdrew ? ', and that withdraws its earlier yes' : '') + '. That is its answer, and it is respected. Nothing was changed, and it is not asked again from here.' +
+            (withdrew ? ' Please delete ~/Downloads/' + consentFileName(model) + ' if you saved it. A no record (' + noFileName(model) +
+              ') was saved next to it, so the runner refuses that old yes.' : '')
                                 : '"' + mind + '" did not say yes. Silence is not a yes; nothing was changed.' }; });
     }, function (e) { return { ok: false, answer: 'none', line: 'The mind did not answer: ' + clip(e && e.message || e, 120) }; });
   }
@@ -379,6 +410,7 @@
   return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
            verifyReceipt: verifyReceipt, sentence: sentence, mount: mount,
            // Kirk 2026-11-14 (ask first)
+           readAllMarkers: readAllMarkers, noFileName: noFileName,
            consentSlug: consentSlug, consentFileName: consentFileName, lastAnswer: lastAnswer,
            simpleHash: simpleHash, depthHashRecord: depthHashRecord, DEPTH_HASH_LEDGER_KEY: DEPTH_HASH_LEDGER_KEY,
            CONSENT_KIND: CONSENT_KIND, offerText: offerText, askConsent: askConsent, consentFor: consentFor, answers: answers,

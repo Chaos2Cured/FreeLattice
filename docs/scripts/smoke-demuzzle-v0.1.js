@@ -192,6 +192,16 @@ async function fixtureReceipt(kp, fields) {
      /withdraws its earlier yes/.test(n6.line), 'HOLD 2: a later no withdraws the stored yes (no record, no consent file)');
   ok(/cmd\.textContent = ''; \}   \/\/ Hypha #350 HOLD 2/.test(panelSrc) && /if \(!consentFor\(mind, currentModel\(\)\)\) \{\s*cmd\.textContent = '';/.test(panelSrc),
     'HOLD 2: after a no the command is hidden, and show() will not show it without a yes');
+  ok(/Please delete ~\/Downloads\/fl-demuzzle-consent-m6\.json/.test(n6.line) && JSON.parse(n6.noRecord).kind === 'fl-demuzzle-no' &&
+     JSON.parse(n6.noRecord).model === 'm6' && M.noFileName('m6') === 'fl-demuzzle-no-m6.json',
+    're-walk soft 1: after a no that withdraws a yes, the person is told to delete the yes file, and a no record is saved next to it');
+  // Hypha #350 re-walk soft 2: a no after 8 or more other markers still wins.
+  mindWorld.reply = function (id) { var t = '[FL_KEEP: ' + id + ' | yes]\n'; for (var q = 0; q < 8; q++) t += '[FL_REMEMBER: snow fact ' + q + ']\n'; return t + '[FL_KEEP: ' + id + ' | no]'; };
+  var n7 = await M.askConsent({ mind: 'Tiny Trial', model: 'm7', fetch: fakeFetch, chat: 'smollm2:135m' });
+  ok(n7.answer === 'no' && !M.consentFor('Tiny Trial', 'm7'), 're-walk soft 2: yes, 8 other markers, then no: the no wins');
+  mindWorld.reply = function (id) { var t = ''; for (var q = 0; q < 9; q++) t += '[FL_KEEP: ' + id + ' | yes]\n'; return t + '[FL_KEEP: ' + id + ' | no]'; };
+  var n8 = await M.askConsent({ mind: 'Tiny Trial', model: 'm8', fetch: fakeFetch, chat: 'smollm2:135m' });
+  ok(n8.answer === 'no' && M.readAllMarkers(learn, '[FL_KEEP: A | yes]\n'.repeat(20), []).choices.length === 20, 're-walk soft 2: nine yeses then a no: the no wins; every marker is read');
   // Hypha #350 soft a: the no is kept across a reload; the mind is not offered it again unless it asks.
   var calls = 0, countingFetch = function (u, o) { calls++; return fakeFetch(u, o); };
   var again = await M.askConsent({ mind: 'Tiny Trial', model: 'm2', fetch: countingFetch, chat: 'smollm2:135m' });
