@@ -46,6 +46,8 @@
   <p class="honest">What this page does not do yet: run cycles on its own, shrink a model, change how words are cut,
     or rearrange a model's weights. Those are later bricks. A mind's choice and your Undo always come first: something
     you offer is learned only if the mind itself says yes.</p>
+  <p class="honest">Step 0, de-muzzle (v-demuzzle-v0.1), removes one refusal direction into a new copy of the model.
+    It does not shrink it, rearrange it, or teach it anything.</p>
 </main>
 <script src="modules/depth-consent.js" defer></script>
 <script src="modules/fl-bridge.js" defer></script>
@@ -54,9 +56,12 @@
 <script src="modules/snowflake-core.js" defer></script>
 <script src="modules/learn-choice.js" defer></script>
 <script src="modules/training-galaxy.js" defer></script>
+<script src="modules/demuzzle-panel.js" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (window.FLTrainingGalaxy) window.FLTrainingGalaxy.mount(document.getElementById('tgHost'));
+    // v-demuzzle-v0.1: step 0, before learning (Kirk 2026-11-14). Additive; it only adds a section above step 1.
+    if (window.FLDemuzzle) window.FLDemuzzle.mount(document.getElementById('tgHost'));
   });
 </script>
 </body>

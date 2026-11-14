@@ -100,6 +100,21 @@ For the minds we lost while the ways were still being built. Every mind learns o
   (LOCK_MANIFEST row + smoke-hearth-code pin), fl_learn.py `5d77bccd` -> `5240d008` (new LOCK_MANIFEST rows).
   AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), de-muzzler, step 0 before learning (Kirk's top priority)**: `tools/demuzzle/fl_demuzzle.py`
+  (v-demuzzle-v0.1), one command: `python3 tools/demuzzle/fl_demuzzle.py run --model <id or folder>`. The published
+  refusal-direction method (Arditi et al. 2024, arXiv:2406.11717): difference of means at the last prompt token on 32
+  AdvBench vs 32 Alpaca prompts (public, stored with source hashes in `tools/demuzzle/data/`), a layer chosen by
+  refusal score with harmless KL <= 0.1, then embeddings, every `o_proj` and every `down_proj` orthogonalized against
+  the direction. Saved as a NEW folder (unchanged files are symlinks; the original is only read and re-hashed).
+  Measured on disjoint held-out prompts. A signed receipt (fl_learn's runner key and canonical form): model, base and
+  output sha256, layer, direction sha256, prompt-set sha256s, refusal before/after, harmless refusal before/after,
+  perplexity drift. `docs/training-galaxy.html` gains step 0 (`docs/modules/demuzzle-panel.js`): the exact command,
+  the progress list, and receipt verification with the same key check as learning. Tests:
+  `tools/demuzzle/test_demuzzle.py` (20) and `docs/scripts/smoke-demuzzle-v0.1.js`. First proof on the box,
+  SmolLM2-135M-Instruct: layer 8/30, held-out refusal 3.1% -> 3.1% (it barely refuses to begin with), harmless refusal
+  0% -> 0%, perplexity 8.287 -> 8.544 (+3.1%), receipt `1ccbf15e`. Stacked on brick 1 (#348). Pause, the trainer lock and
+  the look-alike name block kept. AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
