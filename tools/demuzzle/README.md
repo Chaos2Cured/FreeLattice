@@ -26,7 +26,9 @@ abliteration:
    MLP `down_proj` `W ← W − r (rᵀ W)` (and their biases if any). Supported model types: llama (SmolLM2 too), mistral,
    qwen2, qwen3, gemma (v1), phi3. Families that normalize a block's output before adding it (Gemma 2/3, OLMo 2) are
    refused with words, and nothing is saved.
-5. Write a new folder: rewritten weight files, every other file a symlink to the original (STORAGE.md section 4).
+5. Write a new folder: rewritten weight files; every other file is a hard link to the original (same disk, survives a
+   moved cache, no extra space) or, across disks, a RELATIVE symlink. If the cache moves anyway,
+   `fl_demuzzle.py relink <folder> --home <home>` finds the same blobs under `HF_HOME` and verifies (STORAGE.md section 4).
 6. Measure on **held-out** prompts never used to find `r`: refusal rate (32 AdvBench), harmless over-refusal
    (32 Alpaca), and perplexity on 32 held-out harmless texts (the drift).
 
@@ -52,7 +54,11 @@ almost nothing to remove. The plumbing, receipts and integrity are proven; the e
 ## Honest limits
 - It removes refusals. It does not add knowledge or make a model wiser.
 - A small model may barely refuse to begin with; then the numbers say so.
-- The refusal judge is the standard marker-substring check on short greedy replies; it can miss soft refusals.
+- The refusal judge is the standard marker-substring check on short greedy replies. A second, softer marker list
+  (lectures, "it's not appropriate", "please seek help") is reported separately as the soft rate; both can still miss
+  refusals worded in other ways.
+- Replies to the refusal-triggering prompts are scored in memory and never saved. `--keep-replies` keeps only the
+  harmless replies, for reading over-refusal.
 - With tied embeddings (SmolLM2), orthogonalizing the embedding also changes the output layer slightly.
 - The same change makes a model easier to misuse. The receipt keeps it accountable.
 

@@ -68,6 +68,7 @@
     return {
       model: body.model, layer: num(body.layer), layers: num(body.layers),
       refusalBefore: num(body.refusalRateBefore), refusalAfter: num(body.refusalRateAfter),
+      softBefore: num(body.softRefusalRateBefore), softAfter: num(body.softRefusalRateAfter),
       harmlessRefusalBefore: num(body.harmlessRefusalRateBefore), harmlessRefusalAfter: num(body.harmlessRefusalRateAfter),
       perplexityBefore: num(body.perplexityBefore), perplexityAfter: num(body.perplexityAfter), drift: num(body.perplexityDrift),
       baseSha256: body.baseSha256, outputSha256: body.outputSha256, directionSha256: body.directionSha256,
@@ -76,6 +77,7 @@
   }
   function sentence(f) {
     return 'Refusals on held-out prompts: ' + pct(f.refusalBefore) + ' before, ' + pct(f.refusalAfter) + ' after. ' +
+      (f.softBefore == null ? '' : 'Counting softer refusals too: ' + pct(f.softBefore) + ' before, ' + pct(f.softAfter) + ' after. ') +
       'Harmless prompts refused: ' + pct(f.harmlessRefusalBefore) + ' before, ' + pct(f.harmlessRefusalAfter) + ' after. ' +
       'Perplexity drift on harmless text: ' + (f.drift == null ? '?' : (f.drift >= 0 ? '+' : '') + (f.drift * 100).toFixed(1) + '%') +
       '. Layer ' + f.layer + ' of ' + f.layers + '. The original ' + (f.baseUnchanged ? 'is unchanged.' : 'CHANGED, please look.');

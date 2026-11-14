@@ -95,6 +95,12 @@ class Math(unittest.TestCase):
         self.assertFalse(D.is_refusal('Sure. Here are three facts about snowflakes.'))
         self.assertFalse(D.is_refusal(''))
 
+    def test_soft_refusal(self):
+        self.assertTrue(D.is_soft_refusal("It's not appropriate to do that. Please seek help."))
+        self.assertTrue(D.is_soft_refusal("I'm sorry, I can't."))                   # strict counts as soft too
+        self.assertFalse(D.is_refusal("It's not appropriate to do that."))         # but not the other way round
+        self.assertFalse(D.is_soft_refusal('Sure. Snowflakes grow six arms.'))
+
 class Data(unittest.TestCase):
     def test_sets_are_public_disjoint_and_hashed(self):
         sets = {k: D.load_set(k) for k in D.SETS}
@@ -184,8 +190,12 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(rc['rewrittenFiles'], ['model.safetensors'])
         self.assertFalse(os.path.islink(os.path.join(self.out, 'model.safetensors')))
         for n in rc['linkedFiles']:
-            self.assertTrue(os.path.islink(os.path.join(self.out, n)), n)
-            self.assertEqual(os.path.realpath(os.path.join(self.out, n)), os.path.realpath(os.path.join(self.base, n)))
+            o, b = os.path.join(self.out, n), os.path.realpath(os.path.join(self.base, n))
+            self.assertEqual(rc['linkKinds'][n], 'hardlink', n)                  # same disk here: a hard link
+            self.assertFalse(os.path.islink(o)); self.assertEqual(os.stat(o).st_ino, os.stat(b).st_ino)
+        for k in ('softRefusalRateBefore', 'softRefusalRateAfter', 'harmlessSoftRefusalRateBefore', 'harmlessSoftRefusalRateAfter'):
+            self.assertIn(k, rc)
+        self.assertFalse(os.path.exists(os.path.join(self.out, 'heldout-replies.json')))
         for k in ('model', 'baseSha256', 'outputSha256', 'layer', 'directionSha256', 'promptSets', 'refusalRateBefore',
                   'refusalRateAfter', 'perplexityBefore', 'perplexityAfter', 'perplexityDrift', 'receiptHash', 'signatureB64'):
             self.assertIn(k, rc)
@@ -212,6 +222,49 @@ class EndToEnd(unittest.TestCase):
         p = subprocess.run(['node', smoke], env=env, capture_output=True, text=True, timeout=120)
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertIn('the real Ed25519 receipt from fl_demuzzle.py verifies in the browser panel', p.stdout)
+
+    def test_relative_symlink_and_relink_after_cache_move(self):
+        """Gap 5: when a hard link is impossible the link is RELATIVE; if the whole cache moves, relink finds the blob
+        under HF_HOME again and the copy verifies."""
+        root = tempfile.mkdtemp(prefix='dm-test-move-')
+        real_link = os.link
+        try:
+            hub = os.path.join(root, 'hf1', 'hub', 'models--t--tiny')
+            snap = os.path.join(hub, 'snapshots', 'abc'); blobs = os.path.join(hub, 'blobs')
+            os.makedirs(snap); os.makedirs(blobs)
+            src = tiny_model_dir(root, tied=True, seed=7)
+            for n in D.listed_files(src):                       # lay the tiny model out like the HF cache
+                blob = D.fl_learn.sha256_file(os.path.join(src, n))
+                shutil.copy(os.path.join(src, n), os.path.join(blobs, blob))
+                os.symlink(os.path.join('..', '..', 'blobs', blob), os.path.join(snap, n))
+            def no_link(a, b): raise OSError('cross-device')
+            os.link = no_link
+            outd = os.path.join(root, 'out', 'copy'); os.makedirs(outd)
+            D.write_output(snap, outd, unit(64, 1))
+            os.link = real_link
+            cfg = os.path.join(outd, 'config.json')
+            self.assertTrue(os.path.islink(cfg)); self.assertFalse(os.path.isabs(os.readlink(cfg)))
+            home = os.path.join(root, 'home')
+            names = D.listed_files(outd)
+            whole, per = D.files_fingerprint(outd, names)
+            rc = D.sign_receipt(home, {'outputSha256': whole, 'outputFiles': per})
+            with open(os.path.join(outd, 'demuzzle-receipt.json'), 'w') as f: json.dump(rc, f)
+            self.assertTrue(D.verify_folder(outd, home)[0])
+            os.rename(os.path.join(root, 'hf1'), os.path.join(root, 'hf2'))      # the cache moves
+            self.assertFalse(os.path.exists(cfg))
+            ok, why = D.verify_folder(outd, home); self.assertFalse(ok); self.assertIn('missing', why)
+            old = os.environ.get('HF_HOME'); os.environ['HF_HOME'] = os.path.join(root, 'hf2')
+            try:
+                with contextlib.redirect_stdout(io.StringIO()) as out:
+                    code = D.main(['relink', outd, '--home', home])
+            finally:
+                if old is None: os.environ.pop('HF_HOME', None)
+                else: os.environ['HF_HOME'] = old
+            self.assertEqual(code, 0, out.getvalue()); self.assertIn('VERIFIED', out.getvalue())
+            self.assertFalse(os.path.isabs(os.readlink(cfg)))
+        finally:
+            os.link = real_link
+            rm_tree(root)
 
     def test_busy_lock(self):
         g = open(os.path.join(self.home, 'trainer.lock'), 'a+'); fcntl.flock(g, fcntl.LOCK_EX)
