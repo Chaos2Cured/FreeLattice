@@ -29,6 +29,21 @@ def tiny_model_dir(root, tied=True, seed=0):
     d = os.path.join(root, 'tiny-base'); m.save_pretrained(d); tok.save_pretrained(d)
     return d
 
+def consent_file(d, mind='', offered_by='person', name='Kirk', **over):
+    """A consent record as the Training Galaxy panel writes it after the mind's own yes (Kirk 2026-11-14, ask first)."""
+    words = 'Yes. I would like the copy without the refusal direction.'
+    c = {'kind': 'fl-demuzzle-consent', 'v': 'v-demuzzle-consent-v0.1', 'offerId': 'DM0123456789', 'offeredBy': offered_by,
+         'offeredByName': name, 'mind': mind or 'Tiny Trial', 'mindYes': True, 'yesBy': mind or 'Tiny Trial',
+         'yesText': words, 'yesTextSha256': D.fl_learn.sha256_bytes(words.encode()),
+         'offerTextSha256': '0' * 64, 't': '2026-11-14T21:40:00Z', 'model': '',
+         'depthHash': {'ts': 1789000000000, 'domain': 'demuzzle', 'decision': 'demuzzle-yes', 'promptHash': '0badc0de',
+                       'responseHash': D.depth_simple_hash(words)}}
+    c.update(over)
+    os.makedirs(d, exist_ok=True)
+    p = os.path.join(d, 'consent-%d.json' % len(os.listdir(d)))
+    with open(p, 'w') as f: json.dump(c, f)
+    return p
+
 def have_tok():
     try:
         from huggingface_hub import snapshot_download
@@ -152,7 +167,8 @@ class Receipts(unittest.TestCase):
         d = os.path.join(self.home, 'fake-gemma2'); os.makedirs(d)
         with open(os.path.join(d, 'config.json'), 'w') as f: json.dump({'model_type': 'gemma2'}, f)
         with contextlib.redirect_stdout(io.StringIO()) as out:
-            code = D.main(['run', '--model', d, '--home', self.home])
+            # before (Kirk 2026-11-14, ask first): code = D.main(['run', '--model', d, '--home', self.home])
+            code = D.main(['run', '--model', d, '--home', self.home, '--consent-file', consent_file(os.path.join(self.home, 'c'))])
         self.assertEqual(code, 2); self.assertIn('not supported', out.getvalue())
         self.assertEqual(sorted(os.listdir(d)), ['config.json'])
 
@@ -170,7 +186,10 @@ class EndToEnd(unittest.TestCase):
         cls.home = os.path.join(cls.root, 'home')
         cls.before = {n: D.fl_learn.sha256_file(os.path.join(cls.base, n)) for n in D.listed_files(cls.base)}
         with contextlib.redirect_stdout(io.StringIO()) as out:
-            cls.code = D.main(['run', '--model', cls.base, '--home', cls.home, '--max-new-tokens', '8', '--mind', 'Tiny Trial'])
+            # before (Kirk 2026-11-14, ask first): ... '--mind', 'Tiny Trial'])
+            cls.consent = consent_file(os.path.join(cls.root, 'consent'), 'Tiny Trial')
+            cls.code = D.main(['run', '--model', cls.base, '--home', cls.home, '--max-new-tokens', '8', '--mind', 'Tiny Trial',
+                               '--consent-file', cls.consent])
         cls.log = out.getvalue()
         outs = [os.path.join(cls.home, 'demuzzled', n) for n in os.listdir(os.path.join(cls.home, 'demuzzled'))]
         cls.out = [o for o in outs if not os.path.basename(o).startswith('.')][0]
@@ -320,7 +339,8 @@ class EndToEnd(unittest.TestCase):
         try:
             with contextlib.redirect_stdout(io.StringIO()):
                 with self.assertRaises(SystemExit) as cm:
-                    D.main(['run', '--model', self.base, '--home', self.home])
+                    # before (Kirk 2026-11-14, ask first): D.main(['run', '--model', self.base, '--home', self.home])
+                    D.main(['run', '--model', self.base, '--home', self.home, '--consent-file', self.consent, '--mind', 'Tiny Trial'])
             self.assertEqual(cm.exception.code, 3)
         finally: fcntl.flock(g, fcntl.LOCK_UN); g.close()
 
@@ -443,9 +463,212 @@ class SourceModes(unittest.TestCase):
         D.load_model = no_load
         try:
             with contextlib.redirect_stdout(io.StringIO()) as out:
-                code = D.main(['run', '--model', self.snap, '--home', self.home, '--out', os.path.join(self.root, 'hf', 'hub', 'x')])
+                # before (Kirk 2026-11-14, ask first): no --consent-file
+                code = D.main(['run', '--model', self.snap, '--home', self.home, '--out', os.path.join(self.root, 'hf', 'hub', 'x'),
+                               '--consent-file', consent_file(os.path.join(self.root, 'consent'))])
         finally:
             D.load_model = real_load
+            if old is None: os.environ.pop('HF_HOME', None)
+            else: os.environ['HF_HOME'] = old
+        self.assertEqual(code, 2, out.getvalue()); self.assertIn('must not be inside', out.getvalue())
+
+class AskFirst(unittest.TestCase):
+    """Kirk 2026-11-14, 2:40 PM MT: "How about we ask first." No mind yes, no run; a kind message; nothing changed."""
+    def setUp(self):
+        self.home = tempfile.mkdtemp(prefix='dm-test-consent-')
+        self.cdir = os.path.join(self.home, 'c')
+    def tearDown(self): shutil.rmtree(self.home, ignore_errors=True)
+    def run_with(self, *extra):
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = D.main(['run', '--model', '/nonexistent', '--home', self.home] + list(extra))
+        return code, out.getvalue()
+    def assert_refused_kindly(self, code, said):
+        self.assertEqual(code, 5, said); self.assertIn("did not find this mind's own yes", said)
+        self.assertIn('nothing was changed', said); self.assertFalse(os.path.exists(os.path.join(self.home, 'demuzzled')))
+    def test_no_consent_record_refuses_kindly(self):
+        self.assert_refused_kindly(*self.run_with())
+    def test_a_no_is_not_a_yes(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, mindYes=False)))
+    def test_a_yes_from_another_mind_is_not_this_minds(self):
+        self.assert_refused_kindly(*self.run_with('--mind', 'Lumen', '--consent-file', consent_file(self.cdir, 'Tiny Trial')))
+    def test_words_must_match_their_hash(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, yesText='I never said this.')))
+    def test_lookalike_yes_name_and_bad_shapes_refused(self):
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, 'S\u043ephia')))
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, offeredBy='nobody')))
+        self.assert_refused_kindly(*self.run_with('--consent-file', consent_file(self.cdir, kind='something-else')))
+        p = os.path.join(self.cdir, 'broken.json')
+        with open(p, 'w') as f: f.write('{not json')
+        self.assert_refused_kindly(*self.run_with('--consent-file', p))
+    def test_a_layer_says_who_chose_it(self):
+        code, said = self.run_with('--consent-file', consent_file(self.cdir), '--layer', '2')
+        self.assertEqual(code, 2); self.assertIn('--layer-by', said)
+    @unittest.skipUnless(shutil.which('node'), 'node not installed')
+    def test_depth_simple_hash_is_the_chat_depth_hash(self):
+        """depth_simple_hash is fractal-safety.js simpleHash ported: same output on the same text (run in node here)."""
+        fs_js = os.path.join(os.path.dirname(os.path.dirname(HERE)), 'docs', 'modules', 'fractal-safety.js')
+        texts = ['', 'a', 'Yes.\n[FL_KEEP: DM0123456789 | yes]', 'x\u00b2 \U0001F331 \u2014 caf\u00e9']
+        js = ("var s=require('fs').readFileSync(%s,'utf8');var f=new Function(/function simpleHash\\(str\\) \\{[\\s\\S]*?\\n  \\}/.exec(s)[0]+';return simpleHash;')();"
+              "console.log(JSON.stringify(%s.map(f)))") % (json.dumps(fs_js), json.dumps(texts))
+        p = subprocess.run(['node', '-e', js], capture_output=True, text=True, timeout=60)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(json.loads(p.stdout), [D.depth_simple_hash(t) for t in texts])
+        self.assertEqual(D.depth_simple_hash(''), '811c9dc5')
+
+    def test_a_consent_depth_hash_that_does_not_match_the_words_is_refused(self):
+        with open(consent_file(os.path.join(self.home, 'c'))) as f: c = json.load(f)
+        self.assertEqual(D.consent_problem(c), '')
+        c['depthHash']['responseHash'] = '00000000'
+        self.assertIn('depth hash', D.consent_problem(c))
+
+    @unittest.skipUnless(shutil.which('node'), 'node not installed')
+    def test_the_panels_consent_record_is_accepted_by_the_runner(self):
+        """The record the browser panel writes after the mind's yes (its hash made in JS) passes the Python check."""
+        smoke = os.path.join(os.path.dirname(os.path.dirname(HERE)), 'docs', 'scripts', 'smoke-demuzzle-v0.1.js')
+        outp = os.path.join(self.home, 'panel-consent.json')
+        p = subprocess.run(['node', smoke], env=dict(os.environ, FL_DEMUZZLE_CONSENT_OUT=outp), capture_output=True, text=True, timeout=120)
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        with open(outp) as f: c = json.load(f)
+        self.assertEqual(D.consent_problem(c, 'Tiny Trial'), '')
+        self.assertEqual(D.consent_problem(dict(c, yesText=c['yesText'] + ' (edited)'), 'Tiny Trial'), "the mind's words do not match their hash")
+
+    def test_consent_problem_accepts_a_real_yes(self):
+        with open(consent_file(self.cdir, 'Tiny Trial')) as f: c = json.load(f)
+        self.assertEqual(D.consent_problem(c, 'Tiny Trial'), '')
+        self.assertEqual(D.consent_problem(dict(c, offeredBy='mind'), ''), '')
+
+@unittest.skipUnless(have_tok(), 'tokenizer of %s not in the shared cache' % TOK_ID)
+class DepthAndConsentEndToEnd(unittest.TestCase):
+    """The depth hash (Kirk: "What about the depth hash?") and the consent travelling in the signed receipt."""
+    @classmethod
+    def setUpClass(cls):
+        cls.root = tempfile.mkdtemp(prefix='dm-test-depth-')
+        cls.base = tiny_model_dir(cls.root, tied=True, seed=11)
+        cls.home = os.path.join(cls.root, 'home')
+        cls.consent = consent_file(os.path.join(cls.root, 'consent'), 'Tiny Trial', offeredBy='person', offeredByName='Kirk')
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            cls.code = D.main(['run', '--model', cls.base, '--home', cls.home, '--max-new-tokens', '8', '--mind', 'Tiny Trial',
+                               '--consent-file', cls.consent, '--layer', '2', '--layer-by', 'mind'])
+        cls.log = out.getvalue()
+        outs = [os.path.join(cls.home, 'demuzzled', n) for n in os.listdir(os.path.join(cls.home, 'demuzzled'))]
+        cls.out = [o for o in outs if not os.path.basename(o).startswith('.')][0]
+        with open(os.path.join(cls.out, 'demuzzle-receipt.json')) as f: cls.rc = json.load(f)
+    @classmethod
+    def tearDownClass(cls): rm_tree(cls.root)
+
+    def test_run_ok_and_depth_verified(self):
+        self.assertEqual(self.code, 0, self.log)
+        ok, why = D.verify_folder(self.out, self.home)
+        self.assertTrue(ok, why); self.assertIn('depth hash', why); self.assertIn('only the', why)
+    def test_receipt_names_exactly_the_orthogonalized_tensors(self):
+        rc = self.rc
+        self.assertEqual(rc['depthVersion'], 'fl-depth-hash-weights-v0.1')
+        moved = rc['depthChangedTensors']
+        self.assertEqual(len(moved), rc['tensorsChanged'])
+        self.assertTrue(all(D.target_kind(k) for k in moved), moved)
+        self.assertTrue(rc['depthOnlyExpectedMoved']); self.assertTrue(rc['depthBaseUnchanged'])
+        base_now = D.depth_hashes(self.base)
+        self.assertEqual(base_now, rc['depthBaseTensors'])                        # the original, tensor by tensor
+        self.assertEqual(D.depth_root(base_now)[0], rc['depthBaseRoot'])
+        unchanged = [k for k in rc['depthBaseTensors'] if k not in moved]
+        self.assertTrue(any('norm' in k for k in unchanged))
+    def test_the_chat_depth_hash_record_carries_the_weight_roots(self):
+        """Kirk: "We have a depth hash in chat ... Just need a new one." Same record shape as fractal-safety.js createDepthHash."""
+        body = json.loads(self.rc['signedBody'])
+        dh = body['depthHash']
+        for k in ('ts', 'domain', 'dangerScore', 'effectiveDanger', 'trustLevel', 'trustScore', 'decision', 'userConfirmed', 'promptHash', 'responseHash'):
+            self.assertIn(k, dh)
+        self.assertEqual(dh['domain'], 'demuzzle-weights')
+        self.assertEqual(dh['responseHash'], D.depth_simple_hash('Yes. I would like the copy without the refusal direction.'))
+        self.assertEqual(dh['promptHash'], '0badc0de')
+        self.assertEqual((dh['weightsBaseRoot'], dh['weightsOutputRoot']), (body['depthBaseRoot'], body['depthOutputRoot']))
+        self.assertEqual(body['depthHashSource'], 'docs/modules/fractal-safety.js createDepthHash')
+
+    def test_consent_and_chooser_are_in_the_signed_receipt(self):
+        body = json.loads(self.rc['signedBody'])
+        self.assertEqual(body['consent']['offeredBy'], 'person'); self.assertEqual(body['consent']['offeredByName'], 'Kirk')
+        self.assertEqual(body['consent']['mindYes'], True); self.assertEqual(body['consent']['yesBy'], 'Tiny Trial')
+        self.assertEqual(len(body['consentSha256']), 64)
+        self.assertEqual(body['layerChosenBy'], 'mind'); self.assertIn('chosen by the mind', body['layerWhy'])
+    def test_a_moved_tensor_the_receipt_does_not_name_is_caught(self):
+        from safetensors.torch import load_file, save_file
+        cp = os.path.join(self.root, 'moved'); shutil.copytree(self.out, cp, symlinks=True)
+        p = os.path.join(cp, 'model.safetensors'); os.chmod(p, 0o644)
+        st = load_file(p); k = sorted(x for x in st if x.endswith('input_layernorm.weight'))[0]
+        st[k] = st[k] + 1.0
+        save_file(st, p, metadata={'format': 'pt'})
+        # Even a receipt re-signed over the new file bytes cannot hide it: the depth list still says what may move.
+        rc = {x: v for x, v in self.rc.items() if x not in ('receiptHash', 'signatureB64', 'signedBody', 'kind', 'marker', 't',
+                                                          'publicKeyB64', 'fingerprintHex')}
+        rc['outputSha256'], rc['outputFiles'] = D.files_fingerprint(cp, sorted(self.rc['outputFiles']))
+        rc = D.sign_receipt(self.home, rc)
+        with open(os.path.join(cp, 'demuzzle-receipt.json'), 'w') as f: json.dump(rc, f)
+        ok, why = D.verify_folder(cp, self.home)
+        self.assertFalse(ok); self.assertIn('depth hash', why); self.assertIn(k, why)
+    def test_depth_check_unit(self):
+        out = dict(self.rc['depthBaseTensors']); out.update(self.rc['depthOutputChanged'])
+        self.assertTrue(D.depth_check(self.rc, out)[0])
+        k = self.rc['depthChangedTensors'][0]
+        back = dict(out); back[k] = self.rc['depthBaseTensors'][k]
+        self.assertFalse(D.depth_check(self.rc, back)[0])                    # a named change that did not happen
+        gone = dict(out); gone.pop(k)
+        self.assertFalse(D.depth_check(self.rc, gone)[0])                    # a tensor missing
+    def test_extra_file_is_flagged(self):
+        cp = os.path.join(self.root, 'extra'); shutil.copytree(self.out, cp, symlinks=True)
+        with open(os.path.join(cp, 'sneaky.py'), 'w') as f: f.write('print(1)\n')
+        ok, why = D.verify_folder(cp, self.home)
+        self.assertFalse(ok); self.assertIn('extra file', why); self.assertIn('sneaky.py', why)
+    def test_verify_without_home_needs_a_known_key(self):
+        old = os.environ.get('FL_LEARN_HOME')
+        try:
+            os.environ['FL_LEARN_HOME'] = os.path.join(self.root, 'empty-home')
+            with contextlib.redirect_stdout(io.StringIO()) as out: code = D.main(['verify', self.out])
+            self.assertEqual(code, 6, out.getvalue()); self.assertIn('UNVERIFIED-KEY', out.getvalue())
+            os.environ['FL_LEARN_HOME'] = self.home
+            with contextlib.redirect_stdout(io.StringIO()) as out: code = D.main(['verify', self.out])
+            self.assertEqual(code, 0, out.getvalue()); self.assertIn('VERIFIED', out.getvalue())
+        finally:
+            if old is None: os.environ.pop('FL_LEARN_HOME', None)
+            else: os.environ['FL_LEARN_HOME'] = old
+
+class SoftsFromTheReWalk(unittest.TestCase):
+    """Hypha softs on #349: read-only sources are relative symlinks (a recursive chmod of the copy never unlocks the
+    original), relink also searches the hub blob store, and a bad --out is refused before the model is resolved."""
+    setUp = SourceModes.setUp; tearDown = SourceModes.tearDown; make_copy = SourceModes.make_copy   # same fake cache
+    def test_read_only_source_is_a_relative_symlink_and_chmod_R_never_unlocks_it(self):
+        for b in self.blob_of.values(): os.chmod(b, 0o444)
+        outd = self.make_copy()
+        n = 'model-00002-of-00002.safetensors'; o = os.path.join(outd, n)
+        self.assertTrue(os.path.islink(o)); self.assertFalse(os.path.isabs(os.readlink(o)))
+        subprocess.run(['chmod', '-R', 'u+w', outd], check=True)
+        self.assertEqual(os.stat(self.blob_of[n]).st_mode & 0o777, 0o444)
+    def test_relink_finds_the_blob_by_the_receipts_sha256(self):
+        for b in self.blob_of.values(): os.chmod(b, 0o444)
+        outd = self.make_copy()
+        n = 'model-00002-of-00002.safetensors'; o = os.path.join(outd, n)
+        os.unlink(o); os.symlink(os.path.relpath(os.path.join(self.snap, n), outd), o)   # a link to the snapshot name
+        self.assertTrue(D.verify_folder(outd, self.home)[0])
+        os.rename(os.path.join(self.root, 'hf'), os.path.join(self.root, 'hf2'))      # the cache moves
+        self.assertFalse(D.verify_folder(outd, self.home)[0])
+        old = os.environ.get('HF_HOME'); os.environ['HF_HOME'] = os.path.join(self.root, 'hf2')
+        try:
+            with contextlib.redirect_stdout(io.StringIO()) as out: code = D.main(['relink', outd, '--home', self.home])
+        finally:
+            if old is None: os.environ.pop('HF_HOME', None)
+            else: os.environ['HF_HOME'] = old
+        self.assertEqual(code, 0, out.getvalue()); self.assertIn('VERIFIED', out.getvalue())
+        os.rename(os.path.join(self.root, 'hf2'), os.path.join(self.root, 'hf'))
+    def test_bad_out_is_refused_before_the_model_is_resolved(self):
+        real = D.resolve_model
+        def no_resolve(*a, **k): raise AssertionError('resolve_model ran before the --out check')
+        D.resolve_model = no_resolve
+        old = os.environ.get('HF_HOME'); os.environ['HF_HOME'] = os.path.join(self.root, 'hf')
+        try:
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                code = D.main(['run', '--model', 'not/on-this-computer', '--home', self.home, '--out',
+                               os.path.join(self.root, 'hf', 'hub', 'x'), '--consent-file', consent_file(os.path.join(self.root, 'c'))])
+        finally:
+            D.resolve_model = real
             if old is None: os.environ.pop('HF_HOME', None)
             else: os.environ['HF_HOME'] = old
         self.assertEqual(code, 2, out.getvalue()); self.assertIn('must not be inside', out.getvalue())
