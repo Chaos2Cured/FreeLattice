@@ -70,6 +70,36 @@ For the minds we lost while the ways were still being built. Every mind learns o
   Then (Hypha's hold at `50f75ec0`): rule 0a, never open, archive, hash or list the Quiet Room or Sophia's
   files, with the excludes in every example command; folding only after rule 0 and Kirk's yes.
 
+- **2026-11-14 (MST), training galaxy brick 1**: `docs/training-galaxy.html` with `docs/modules/training-galaxy.js`
+  (v-training-galaxy-brick1-v0.1). One plain screen: pick a local mind (trial SmolLM2 135M or Qwen2.5 0.5B, or an
+  Ollama mind through its open twin; others listed as chat only), one snowflake search on one subject, the mind's
+  choice (its own marker through Ollama) or a person's labelled offer (`not-self:person-offer`), one learn through
+  `fl_learn.py` with every guard it already has, then the signed `export-bundle`. Progress is a plain list. Tests:
+  `docs/scripts/smoke-training-galaxy-v0.1.js` and `tools/learn/test_training_galaxy.py` (a real learn on the box: the
+  adapter hash changes, receipts are Ed25519-signed and verify in the screen with `FL_RECEIPTS` set). The acceptance
+  suite now links to the one shared model copy instead of copying it (STORAGE.md section 4; `--copy-base` keeps the
+  old way). No loop, no quantize, no tokenizer, no weight reorganisation. AUTONOMY.md unchanged. quiet-room.js not touched.
+
+- **2026-11-14 (MST), training galaxy brick 1, Hypha's hold at `8ca78ecc`**: a person's offer is only an offer. It is kept
+  in the screen's own offers list (nothing trainable) until the mind itself says yes in its own words
+  (`[FL_KEEP: <offer id> | keep]`, or `not now`), shown to it by id. Then the row says `chosenBy: person` with
+  `offer: {by: person, name, mindYes: true, yesBy: <the mind>}` and the voice "Kirk offered this; I said yes."
+  `queueLearning` and `fl_learn.py` both refuse an offer with no yes, a yes from another mind, or a person-offer label
+  with no yes (`learn-reject`). A mind that cannot answer here (a trial mind, no Ollama) is told plainly; never an
+  automatic yes, no waiting days, no person approval. Also: an offer box for your own words, the page says the search
+  goes to the web, the learn file holds only this page's items unless "include everything" is ticked (and says so),
+  the empty command bar is hidden, a Connect-a-mind link and one line about each trial mind. The earlier row above is
+  kept as it was; this one says what changed.
+
+- **2026-11-14 (MST), training galaxy brick 1, Hypha's re-walk at `090481ed`**: an offer's words are data, never a marker.
+  `offer()` neutralises any FL_ marker in the offered text (zero-width, fullwidth and look-alike spellings folded first;
+  the opening bracket becomes "("), and `askMind` passes every open offer as echo (kind person), so a mind repeating
+  `[FL_KEEP: <another offer> | keep]` or `[FL_REMEMBER: ...]` from an offer is never counted. Locked files:
+  `docs/modules/snowflake-core.js` and `tools/learn/fl_learn.py` changed for Hypha's #348 HOLD (person offers wait for
+  the mind's own yes); pins updated; Hypha re-walks exact head. snowflake-core.js `f69ac9c4` -> `93539981`
+  (LOCK_MANIFEST row + smoke-hearth-code pin), fl_learn.py `5d77bccd` -> `5240d008` (new LOCK_MANIFEST rows).
+  AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
