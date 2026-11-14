@@ -136,6 +136,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   leaves the source unchanged and verify catches it; a 0444 source is still linked). No locked file changed.
   AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), training galaxy brick 1 merged (#348)**: Hypha PASS at exact head `5df58f0f`; squash-merged by
+  Kirk's go-ahead as main `9292b15e` (14:15 MST; tree identical to the PR head). Codeberg main fast-forwarded to
+  `9292b15e` (same sha). Live on freelattice.com after the Pages build: `training-galaxy.html` and
+  `modules/training-galaxy.js` byte-identical to main, `modules/snowflake-core.js` md5 `93539981`, AUTONOMY.md md5
+  `09a4f1a2` (unchanged). No site storage or caches cleared. Recorded in the de-muzzler branch (#349), append-only.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
