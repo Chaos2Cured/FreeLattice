@@ -341,5 +341,114 @@ class EndToEnd(unittest.TestCase):
             self.assertLess(float((a - b).abs().max()), 1e-4)
         finally: rm_tree(root)
 
+class SourceModes(unittest.TestCase):
+    """Hypha #349 HOLD 2 (e4ee2962): unchanged shards/large files linked only when source is read-only; otherwise
+    copied 0444. A fake two-shard model laid out like the HF cache (blobs + snapshot symlinks), no tokenizer needed."""
+    def setUp(self):
+        from safetensors.torch import save_file
+        self.root = tempfile.mkdtemp(prefix='dm-test-modes-')
+        hub = os.path.join(self.root, 'hf', 'hub', 'models--t--shards')
+        self.snap = os.path.join(hub, 'snapshots', 'abc'); self.blobs = os.path.join(hub, 'blobs')
+        os.makedirs(self.snap); os.makedirs(self.blobs)
+        work = os.path.join(self.root, 'src'); os.makedirs(work)
+        torch.manual_seed(1)
+        save_file({'model.embed_tokens.weight': torch.randn(10, 64)}, os.path.join(work, 'model-00001-of-00002.safetensors'), metadata={'format': 'pt'})
+        save_file({'model.norm.weight': torch.ones(64)}, os.path.join(work, 'model-00002-of-00002.safetensors'), metadata={'format': 'pt'})
+        with open(os.path.join(work, 'config.json'), 'w') as f: f.write('{"model_type": "llama"}')
+        with open(os.path.join(work, 'pytorch_model.bin'), 'wb') as f: f.write(b'\x00' * 200)
+        self.blob_of = {}
+        for n in sorted(os.listdir(work)):
+            blob = D.fl_learn.sha256_file(os.path.join(work, n))
+            shutil.copy(os.path.join(work, n), os.path.join(self.blobs, blob))
+            os.chmod(os.path.join(self.blobs, blob), 0o644)                      # HF blobs are usually 0644
+            os.symlink(os.path.join('..', '..', 'blobs', blob), os.path.join(self.snap, n))
+            self.blob_of[n] = os.path.join(self.blobs, blob)
+        self.src_sha = {n: D.fl_learn.sha256_file(b) for n, b in self.blob_of.items()}
+        self.home = os.path.join(self.root, 'home')
+        self.old_max = D.SMALL_COPY_MAX
+        D.SMALL_COPY_MAX = 64                                                     # pytorch_model.bin (200 B) counts as large
+    def tearDown(self):
+        D.SMALL_COPY_MAX = self.old_max
+        rm_tree(self.root)
+
+    def make_copy(self, name='out'):
+        outd = os.path.join(self.root, name); os.makedirs(outd)
+        D.write_output(self.snap, outd, unit(64, 2))
+        names = D.listed_files(outd)
+        whole, per = D.files_fingerprint(outd, names)
+        rc = D.sign_receipt(self.home, {'outputSha256': whole, 'outputFiles': per})
+        with open(os.path.join(outd, 'demuzzle-receipt.json'), 'w') as f: json.dump(rc, f)
+        self.assertTrue(D.verify_folder(outd, self.home)[0])
+        return outd
+
+    def assert_private(self, outd, n):
+        o = os.path.join(outd, n)
+        self.assertFalse(os.path.islink(o), n); self.assertEqual(os.stat(o).st_nlink, 1, n)
+        self.assertNotEqual(os.stat(o).st_ino, os.stat(self.blob_of[n]).st_ino, n)
+        self.assertEqual(os.stat(o).st_mode & 0o777, 0o444, n)
+
+    def append_and_check(self, outd, n):
+        o = os.path.join(outd, n)
+        os.chmod(o, 0o644)                                    # even if the person unlocks their own copy
+        with open(o, 'ab') as f: f.write(b'\x01')
+        self.assertEqual(D.fl_learn.sha256_file(self.blob_of[n]), self.src_sha[n], n)
+        ok, why = D.verify_folder(outd, self.home)
+        self.assertFalse(ok); self.assertIn('outputSha256', why)
+
+    def test_writable_unchanged_shard_is_copied_and_the_source_never_changes(self):
+        outd = self.make_copy()
+        self.assertTrue(os.path.exists(os.path.join(outd, 'model-00001-of-00002.safetensors')))
+        self.assert_private(outd, 'model-00002-of-00002.safetensors')
+        self.append_and_check(outd, 'model-00002-of-00002.safetensors')
+
+    def test_writable_large_non_weight_file_is_copied_and_the_source_never_changes(self):
+        outd = self.make_copy()
+        self.assert_private(outd, 'pytorch_model.bin')
+        self.append_and_check(outd, 'pytorch_model.bin')
+
+    def test_read_only_source_shard_is_still_linked(self):
+        for b in self.blob_of.values(): os.chmod(b, 0o444)
+        outd = self.make_copy()
+        for n in ('model-00002-of-00002.safetensors', 'pytorch_model.bin'):    # no extra disk for a read-only model
+            self.assertEqual(os.stat(os.path.join(outd, n)).st_ino, os.stat(self.blob_of[n]).st_ino, n)
+        self.assert_private(outd, 'config.json')                               # small files are always copies
+
+    def test_relink_gives_a_writable_source_link_its_own_copy(self):
+        outd = self.make_copy()
+        n = 'model-00002-of-00002.safetensors'; o = os.path.join(outd, n)
+        os.chmod(o, 0o644); os.unlink(o); os.link(self.blob_of[n], o)           # the e4ee2962 layout: a hard link to a 0644 blob
+        b = 'pytorch_model.bin'; ob = os.path.join(outd, b)
+        os.chmod(ob, 0o644); os.unlink(ob); os.symlink(os.path.relpath(self.blob_of[b], outd), ob)   # or a symlink
+        self.assertTrue(D.verify_folder(outd, self.home)[0])
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = D.main(['relink', outd, '--home', self.home])
+        self.assertEqual(code, 0, out.getvalue()); self.assertIn('VERIFIED', out.getvalue())
+        self.assert_private(outd, n); self.assert_private(outd, b)
+        self.assertEqual(D.fl_learn.sha256_file(self.blob_of[n]), self.src_sha[n])
+
+    def test_relink_keeps_a_read_only_source_linked(self):
+        for bl in self.blob_of.values(): os.chmod(bl, 0o444)
+        outd = self.make_copy()
+        n = 'model-00002-of-00002.safetensors'
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = D.main(['relink', outd, '--home', self.home])
+        self.assertEqual(code, 0, out.getvalue())
+        self.assertEqual(os.stat(os.path.join(outd, n)).st_ino, os.stat(self.blob_of[n]).st_ino)
+
+    def test_bad_out_fails_fast_before_any_measurement(self):
+        """Hypha #349 soft 2: --out inside the shared cache is refused before the model is loaded or measured."""
+        old = os.environ.get('HF_HOME'); os.environ['HF_HOME'] = os.path.join(self.root, 'hf')
+        real_load = D.load_model
+        def no_load(*a, **k): raise AssertionError('the model was loaded before the --out check')
+        D.load_model = no_load
+        try:
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                code = D.main(['run', '--model', self.snap, '--home', self.home, '--out', os.path.join(self.root, 'hf', 'hub', 'x')])
+        finally:
+            D.load_model = real_load
+            if old is None: os.environ.pop('HF_HOME', None)
+            else: os.environ['HF_HOME'] = old
+        self.assertEqual(code, 2, out.getvalue()); self.assertIn('must not be inside', out.getvalue())
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

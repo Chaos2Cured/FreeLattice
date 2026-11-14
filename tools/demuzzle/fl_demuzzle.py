@@ -309,6 +309,19 @@ def copy_private(src, dst):
     os.replace(tmp, dst)
     return 'copy'
 
+# Hypha #349 HOLD 2 (e4ee2962, 2026-11-14): unchanged shards/large files linked only when source is read-only;
+# otherwise copied 0444. A hard link (or a symlink) shares the source's file and keeps its mode; Hugging Face blobs are
+# usually 0644, so the owner could append to the copy's unchanged shard (or a pytorch_model.bin next to the safetensors)
+# and change the original. Linking is kept only for a source with no write bit for anyone, so a big read-only model
+# does not double its disk use.
+def source_read_only(path):
+    try: return (os.stat(os.path.realpath(path)).st_mode & 0o222) == 0
+    except OSError: return False
+
+def must_copy(name, src):
+    """True when this unchanged file needs its own private copy: small non-weight files always, others when writable."""
+    return is_small_non_weight(name, src) or not source_read_only(src)
+
 def hf_hub_dir():
     home = os.environ.get('HF_HOME') or os.path.join(os.path.expanduser('~'), '.cache', 'huggingface')
     return os.environ.get('HF_HUB_CACHE') or os.path.join(home, 'hub')
@@ -324,7 +337,8 @@ def relink(out_dir):
         hits = sorted(glob.glob(os.path.join(hf_hub_dir(), '*', 'blobs', blob)))
         if not hits: missing.append(n); continue
         # before (Hypha HOLD on b3e92623): os.unlink(p); os.symlink(os.path.relpath(hits[0], out_dir), p); fixed.append(n)
-        if is_small_non_weight(n, hits[0]):
+        # before (Hypha #349 HOLD 2): if is_small_non_weight(n, hits[0]):
+        if must_copy(n, hits[0]):
             os.unlink(p); copy_private(hits[0], p); fixed.append(n); continue
         os.unlink(p); os.symlink(os.path.relpath(hits[0], out_dir), p); fixed.append(n)
     # Hypha HOLD on b3e92623: a copy made before this fix may still hold small files that share the cache's file (a
@@ -332,7 +346,8 @@ def relink(out_dir):
     for n in sorted(os.listdir(out_dir)):
         p = os.path.join(out_dir, n)
         if n == 'demuzzle-receipt.json' or n.endswith('.copying') or not os.path.exists(p): continue
-        if not os.path.isfile(p) or not is_small_non_weight(n, p): continue
+        # before (Hypha #349 HOLD 2): if not os.path.isfile(p) or not is_small_non_weight(n, p): continue
+        if not os.path.isfile(p) or not must_copy(n, p): continue
         if os.path.islink(p) or os.stat(p).st_nlink > 1:
             src = os.path.realpath(p)
             if os.path.islink(p): os.unlink(p)
@@ -360,7 +375,8 @@ def write_output(base_dir, tmp_out, r):
                 changed_all += changed; rewritten.append(n)
                 continue
         # before (Hypha HOLD on b3e92623): link_unchanged(src, dst)
-        if is_small_non_weight(n, src):
+        # before (Hypha #349 HOLD 2): if is_small_non_weight(n, src):
+        if must_copy(n, src):
             copy_private(src, dst)
             continue
         link_unchanged(src, dst)
@@ -460,6 +476,12 @@ def run(A):
     if mtype not in SUPPORTED_TYPES:
         print('refused: model type %r is not supported by v0.1 yet (supported: %s). Nothing was changed.'
               % (mtype, ', '.join(SUPPORTED_TYPES))); return 2
+    # Hypha #349 soft 2: a bad --out fails fast, before anything is loaded or measured (the same check runs again below).
+    early_out = os.path.realpath(os.path.expanduser(A.out or os.path.join(home, 'demuzzled')))
+    early_hub = os.path.realpath(hf_hub_dir())
+    if (early_out == base_dir or early_out.startswith(base_dir + os.sep) or '/huggingface/hub' in early_out
+            or early_out == early_hub or early_out.startswith(early_hub + os.sep)):
+        print('refused: the output must not be inside the original model or the shared cache. Nothing was changed.'); return 2
     with one_job(home):
         t0 = time.time()
         sets = {k: load_set(k) for k in SETS}

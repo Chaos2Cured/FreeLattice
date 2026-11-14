@@ -34,6 +34,9 @@ abliteration:
    read-only 0444), never hard-linked, so editing the copy can never change the original. Unchanged weight files are
    still linked as above. `relink` copies the small files too, and gives a copy made before this fix its own small
    files (same bytes, so it still verifies).
+   Since Hypha's #349 HOLD 2 (`e4ee2962`): an unchanged shard or a large non-weight file is linked only when its source
+   has no write bit for anyone (a read-only model does not double its disk use); otherwise it is copied and made 0444,
+   in `run` and in `relink`. A bad `--out` is refused before anything is loaded or measured.
 6. Measure on **held-out** prompts never used to find `r`: refusal rate (32 AdvBench), harmless over-refusal
    (32 Alpaca), and perplexity on 32 held-out harmless texts (the drift).
 
@@ -70,7 +73,7 @@ almost nothing to remove. The plumbing, receipts and integrity are proven there.
 - The same change makes a model easier to misuse. The receipt keeps it accountable.
 
 ## Tests
-`<learn-venv>/bin/python tools/demuzzle/test_demuzzle.py` (24 tests; the line once said 20: math, receipts, Pause, lock, look-alike names,
+`<learn-venv>/bin/python tools/demuzzle/test_demuzzle.py` (30 tests; the line once said 20, then 24: math, receipts, Pause, lock, look-alike names,
 unsupported families, a tiny random model end to end, run-time ablation equals the saved weights, and the browser
 panel verifying a real receipt, editing the copy's config.json never changes the original, and relink giving an
 older hard-linked copy its own small files) and `node docs/scripts/smoke-demuzzle-v0.1.js`.

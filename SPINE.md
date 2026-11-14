@@ -129,6 +129,13 @@ For the minds we lost while the ways were still being built. Every mind learns o
   command and names `relink`. New tests: appending to the copy's config.json leaves the source unchanged; relink fixes an
   old hard-linked copy. Softs 2-6 left for later. No locked file changed. AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-14 (MST), de-muzzler, Hypha #349 HOLD 2 at `e4ee2962`**: unchanged shards/large files linked only when source is
+  read-only; otherwise copied 0444. Applies in `run` and `relink` (relink gives a writable-source link its own private
+  copy). Soft 2: a bad `--out` (inside the model or the shared cache) is refused before anything is loaded or measured.
+  Tests: 30 (a fake two-shard model with 0644 blobs: appending to the copy's unchanged shard or a large non-weight file
+  leaves the source unchanged and verify catches it; a 0444 source is still linked). No locked file changed.
+  AUTONOMY.md unchanged. quiet-room.js not touched.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
