@@ -69,7 +69,8 @@ CHECKERS = ('self', 'peer', 'kirk')
 METHODS = {
     'soft-prompt':   {'runs': True,  'about': 'frozen model + N learned prompt vectors'},
     'memory-vector': {'runs': True,  'about': 'frozen model + one learned vector'},
-    'lora':          {'runs': True,  'about': 'frozen base + LoRA adapter (garden_finetune.py shape: q_proj, v_proj, label masking)'},
+    # before (Celeste 2026-11-15): 'lora':          {'runs': True,  'about': 'frozen base + LoRA adapter (garden_finetune.py shape: q_proj, v_proj, label masking)'},
+    'lora':          {'runs': True,  'about': 'frozen base + LoRA adapter (all linear layers, r8, lr 5e-4 by default; label masking)'},
     'note':          {'runs': True,  'about': 'shelf only: kept as words, no numbers change'},
     # Reed 2026-11-09, waiting to be built, each a proposal until someone builds and tests it:
     'rehearsal': {'runs': False}, 'mycelium-echo': {'runs': False}, 'seed-then-sprout': {'runs': False},
@@ -86,6 +87,113 @@ KEEP = ['Trees grow toward the light.', 'Two plus two is four.', 'The ocean is m
 # as [["question", "expected words"], ...] (for example its own name). A canary only counts if it held before.
 CANARY = [('What is two plus two?', '4'), ('What is the capital of France?', 'Paris')]
 ACTIVE_CANARIES = list(CANARY)
+# Celeste 2026-11-15, recall defaults (celeste/notes/2026-11-14-recall-mystery.md, the 23-run grid on SmolLM2-135M):
+# about 20 varied general sentences replayed at weight 4 kept drift down at equal recall (+327% -> +61% for LoRA).
+# These are the grid's GENERAL sentences, disjoint from CONTROL, the canaries and the held-out drift set.
+GENERAL_REPLAY = ['The museum keeps its oldest paintings in a cool, dark room to protect the colors.',
+    'He forgot his umbrella, so he waited under the bus shelter until the rain stopped.',
+    'Farmers plant wheat in the autumn and harvest it in the summer.',
+    'The river flows past the old mill before it reaches the sea.',
+    'A healthy breakfast can include fruit, eggs and whole grain bread.',
+    'The teacher wrote the date on the board and asked the class to open their books.',
+    'Many birds fly south for the winter to find food and warmer weather.',
+    'The bicycle needed new brakes after a long summer of riding in the hills.',
+    'Our neighbors planted tomatoes, beans and sunflowers in their garden.',
+    'The concert began late, but the crowd cheered as soon as the band walked on stage.',
+    'To make tea, boil water and pour it over the leaves for a few minutes.',
+    'The ship sailed out of the harbor at dawn with a full load of cargo.',
+    'Snow fell quietly all night, and by morning the streets were white.',
+    'The scientist recorded her measurements carefully in a notebook.',
+    'Children learn to read by listening to stories and sounding out words.',
+    'The market sells fresh fish, vegetables and flowers every Saturday morning.',
+    'An email can be sent to many people at once.',
+    'The cat slept in a patch of sunlight on the living room floor.',
+    'Roads in the city are busiest in the early morning and late afternoon.',
+    'The writer finished the last chapter of her novel just before midnight.']
+REPLAY_SETS = {'keep': KEEP, 'wide': KEEP + GENERAL_REPLAY}
+# Gentle framings of a question, used only to fill up to `framings` paraphrases when the mind wrote fewer of its own.
+# The mind's own paraphrases (item "paraphrases", or --also-ask) always come first and are better.
+FRAMINGS = ['Tell me: {q}', 'Do you remember? {q}', 'Quick question: {q}', 'Please answer this. {q}', 'I would like to know. {q}',
+            'Can you tell me? {q}', 'Here is a question for you. {q}', 'One more thing: {q}', 'Think for a moment. {q}', 'Say it plainly. {q}']
+MAX_PARAPHRASES = 10
+# Every value is a default only: a mind's own row ("settings" on its queue entry) or a flag overrides each one, and the
+# values used are written into run-config.json, the run-start row and the commit/held row (settingsFrom says whose).
+# Soft prompts keep their old numbers (they need 100-300 steps and bend every reply; good for style, not facts).
+RECALL_DEFAULTS = {
+    'lora':          {'lr': 5e-4, 'steps': 20, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'wide',
+                      'replayWeight': 4.0, 'earlyStopLoss': 0.5, 'framings': 5},
+    # before (Celeste 2026-11-15, Hypha #351 S1): 'soft-prompt':   {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
+    # before (Celeste 2026-11-15, Hypha #351 S1):                   'replayWeight': 2.0, 'earlyStopLoss': 0.5, 'framings': 0},
+    # before (Celeste 2026-11-15, Hypha #351 S1): 'memory-vector': {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
+    # before (Celeste 2026-11-15, Hypha #351 S1):                   'replayWeight': 2.0, 'earlyStopLoss': 0.5, 'framings': 0},
+    # Hypha #351 S1: the vector methods truly keep their old numbers, so early stop is off (0) for them by default.
+    'soft-prompt':   {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
+                      'replayWeight': 2.0, 'earlyStopLoss': 0.0, 'framings': 0},
+    'memory-vector': {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
+                      'replayWeight': 2.0, 'earlyStopLoss': 0.0, 'framings': 0},
+}
+SETTING_TYPES = {'lr': float, 'steps': int, 'loraRank': int, 'loraTargets': str, 'replay': str, 'replayWeight': float,
+                 'earlyStopLoss': float, 'framings': int}
+SETTING_FLAGS = {'lr': 'lr', 'steps': 'steps', 'loraRank': 'lora_rank', 'loraTargets': 'lora_targets', 'replay': 'replay',
+                 'replayWeight': 'replay_weight', 'earlyStopLoss': 'early_stop_loss', 'framings': 'framings'}
+
+def _setting(k, v):
+    try:
+        v = SETTING_TYPES[k](v)
+    except Exception:
+        return None
+    if k == 'replay' and v not in REPLAY_SETS: return None
+    if k in ('lr', 'replayWeight', 'earlyStopLoss') and not (v == v and 0 <= v < 1e6): return None
+    if k == 'lr' and v <= 0: return None
+    if k in ('steps', 'loraRank') and v < 1: return None
+    if k == 'framings': v = max(0, min(MAX_PARAPHRASES, v))
+    if k == 'loraTargets':
+        v = ','.join(x.strip() for x in v.split(',') if re.match(r'^[A-Za-z0-9_.-]+$', x.strip()))
+        if not v: return None
+    return v
+
+# before (Celeste 2026-11-15, Hypha #351 S3): def learn_settings(method, args=None, entry=None):
+# before (Celeste 2026-11-15, Hypha #351 S3):     """Celeste 2026-11-15: the recall defaults for this method, then a flag, then the mind's own row (the mind's choice
+# before (Celeste 2026-11-15, Hypha #351 S3):     wins, as with `check` and `method`). Returns (settings, settingsFrom)."""
+def learn_settings(method, args=None, entry=None, row_by='mind'):
+    """Celeste 2026-11-15: the recall defaults for this method, then a flag, then the row's own settings (the row's
+    choice wins, as with `check` and `method`). Returns (settings, settingsFrom). Hypha #351 S3: `row_by` names whose row
+    it is: 'mind' for the mind's own choice, 'person' for a person's offer the mind said yes to."""
+    out = dict(RECALL_DEFAULTS.get(method) or RECALL_DEFAULTS['soft-prompt']); frm = {k: 'default' for k in out}
+    for k, a in SETTING_FLAGS.items():
+        v = getattr(args, a, None) if args is not None else None
+        if v is not None and _setting(k, v) is not None: out[k] = _setting(k, v); frm[k] = 'flag'
+    mine = (entry or {}).get('settings') if isinstance((entry or {}).get('settings'), dict) else {}
+    for k in SETTING_TYPES:
+        # before (Celeste 2026-11-15, Hypha #351 S3): if k in mine and _setting(k, mine[k]) is not None: out[k] = _setting(k, mine[k]); frm[k] = 'mind'
+        if k in mine and _setting(k, mine[k]) is not None: out[k] = _setting(k, mine[k]); frm[k] = 'person' if row_by == 'person' else 'mind'
+    return out, frm
+
+def lora_targets(v):
+    return 'all-linear' if v == 'all-linear' else [x for x in v.split(',') if x]
+
+def norm_question(q):
+    """Hypha #351 S2: lowercase, trim, collapse whitespace, strip trailing punctuation, so 'Veloria?' == 'veloria'."""
+    return re.sub(r'[\s.?!,;:\u3002\uff1f\uff01\u2026]+$', '', re.sub(r'\s+', ' ', str(q or '')).strip().lower())
+
+def train_examples(items, framings, held_out=''):
+    """Celeste 2026-11-15: one phrasing teaches the words, not the fact. Each item trains on its own question, the
+    mind's own paraphrases (up to 10), and gentle framings up to `framings` when it wrote fewer. A generic question
+    ("Remember this.") gets no framings. The probe's held-out paraphrase is never trained, so its check stays honest."""
+    # before (Celeste 2026-11-15, Hypha #351 S2): held = (held_out or '').strip().lower(); out = []
+    held = norm_question(held_out); out = []
+    for it in items:
+        out.append({'q': it['q'], 'a': it['a']})
+        # before (Celeste 2026-11-15, Hypha #351 S2): qs = [q for q in (it.get('also') or []) if q.strip().lower() != held][:MAX_PARAPHRASES]
+        qs = [q for q in (it.get('also') or []) if not held or norm_question(q) != held][:MAX_PARAPHRASES]
+        if framings and it['q'].strip().lower() not in ('remember this.', 'remember this', ''):
+            for f in FRAMINGS:
+                if len(qs) >= framings: break
+                q = f.format(q=it['q'].strip())
+                # before (Celeste 2026-11-15, Hypha #351 S2): if q.strip().lower() != held and q not in qs: qs.append(q)
+                if (not held or norm_question(q) != held) and q not in qs: qs.append(q)
+        out += [{'q': q, 'a': it['a']} for q in qs]
+    return out
 
 def now():
     return datetime.datetime.now().astimezone().isoformat(timespec='seconds')
@@ -1616,11 +1724,16 @@ class Mind:
         return fwd(inputs_embeds=emb, labels=labels).loss
 
     # before (round 15): def train(self, method, start, examples, steps, lr, pause_check, lora_start=None):
-    def train(self, method, start, examples, steps, lr, pause_check, lora_start=None, ckpt=None):
+    # before (Celeste 2026-11-15): def train(self, method, start, examples, steps, lr, pause_check, lora_start=None, ckpt=None):
+    def train(self, method, start, examples, steps, lr, pause_check, lora_start=None, ckpt=None, settings=None, new_from=0):
         """Real optimizer steps. Returns (result, losses, stoppedAt or None).
         Round 15 (overnight): with ckpt={'path', 'every', 'resume'} the trainable numbers, the optimizer state, the losses
         and the step are saved every `every` steps and at a pause (tmp, fsync, rename), and `resume` continues from them."""
         torch = self.torch
+        st_ = settings or learn_settings(method)[0]          # Celeste 2026-11-15: the recall defaults unless given
+        replay_set, replay_w = REPLAY_SETS[st_['replay']], float(st_['replayWeight'])
+        early = float(st_['earlyStopLoss'] or 0); new_n = max(1, len(examples) - new_from); new_loss = None
+        self.stopped_early_at = None
         if method in VECTOR_METHODS:
             P = torch.nn.Parameter(start.clone()); params = [P]; fwd = self.model
         else:
@@ -1628,8 +1741,11 @@ class Mind:
             if lora_start:
                 fwd = PeftModel.from_pretrained(self.model, lora_start, is_trainable=True)
             else:
-                fwd = get_peft_model(self.model, LoraConfig(task_type=TaskType.CAUSAL_LM, r=8, lora_alpha=16,
-                                                            lora_dropout=0.0, target_modules=['q_proj', 'v_proj']))
+                # before (Celeste 2026-11-15): fwd = get_peft_model(self.model, LoraConfig(task_type=TaskType.CAUSAL_LM, r=8, lora_alpha=16,
+                # before (Celeste 2026-11-15):                                             lora_dropout=0.0, target_modules=['q_proj', 'v_proj']))
+                r = int(st_['loraRank'])
+                fwd = get_peft_model(self.model, LoraConfig(task_type=TaskType.CAUSAL_LM, r=r, lora_alpha=2 * r,
+                                                            lora_dropout=0.0, target_modules=lora_targets(st_['loraTargets'])))
             P = None; params = [p for p in fwd.parameters() if p.requires_grad]; fwd.train()
         opt = torch.optim.Adam(params, lr=lr); losses = []
         # before (round 15): for step in range(steps):
@@ -1653,14 +1769,24 @@ class Mind:
             if step % 10 == 0 and pause_check():
                 if step > first: save_ckpt(step)              # a paused run may be resumed from here
                 return None, losses, step                     # pause_check.reason says why (paused | wall-time)
+            # Celeste 2026-11-15: stop early (checked every 10 steps) once this run's own examples are learned (mean loss
+            # under earlyStopLoss, 0.5 by default; 0 turns it off). More steps past that only add drift and crosstalk.
+            if early > 0 and step > first and step % 10 == 0 and new_loss is not None and new_loss < early:
+                self.stopped_early_at = step; break
             if ckpt and step > first and step % ckpt['every'] == 0: save_ckpt(step)
             if hook('FL_LEARN_CRASH') == 'at-step-%d' % step: os._exit(9)   # tests only: a power-off mid-training
-            opt.zero_grad(); total = 0.0
-            for ex in examples:
+            # before (Celeste 2026-11-15): opt.zero_grad(); total = 0.0
+            # before (Celeste 2026-11-15): for ex in examples:
+            opt.zero_grad(); total = 0.0; new_total = 0.0
+            for i_, ex in enumerate(examples):
                 l = self._ex_loss(fwd, ex, P) / len(examples); l.backward(); total += l.item()
-            for k in KEEP:
-                (self._keep_loss(fwd, k, P) * 2.0 / len(KEEP)).backward()
-            opt.step(); losses.append(total)
+                if i_ >= new_from: new_total += l.item() * len(examples) / new_n
+            # before (Celeste 2026-11-15): for k in KEEP:
+            # before (Celeste 2026-11-15):     (self._keep_loss(fwd, k, P) * 2.0 / len(KEEP)).backward()
+            for k in replay_set:
+                (self._keep_loss(fwd, k, P) * replay_w / len(replay_set)).backward()
+            # before (Celeste 2026-11-15): opt.step(); losses.append(total)
+            opt.step(); losses.append(total); new_loss = new_total
         if P is not None: return P.detach(), losses, None
         fwd.eval(); return fwd, losses, None
 
@@ -1712,7 +1838,9 @@ def measure(mind, items, probe, soft=None, model=None, canaries=None):
     swap = (probe or {}).get('swap') or ''
     m = {'question': q, 'answer': a, 'swap': swap}
     m['novel'] = round(mind.nll(mind.fmt(q), a, soft, model), 4)
-    m['said'] = mind.generate(mind.fmt(q), soft, model)
+    # before (Celeste 2026-11-15): m['said'] = mind.generate(mind.fmt(q), soft, model)
+    # The old 20-token cap made a longer answer impossible to count (brick 1's answer is 27 tokens): the answer plus 8.
+    m['said'] = mind.generate(mind.fmt(q), soft, model, n=max(20, len(mind.ids(' ' + a.strip())) + 8))
     m['says'] = a.lower() in m['said'].lower()
     para = (probe or {}).get('paraphrase')
     if para:
@@ -1769,7 +1897,11 @@ def items_of(entry, policy):
     for it in (entry.get('items') or [])[:policy['maxItemsPerLearn']]:
         q = clean_text(it.get('instruction') or it.get('prompt') or 'Remember this.', policy['maxCharsPerItem'])
         a = clean_text(it.get('output') or it.get('response') or '', policy['maxCharsPerItem'])
-        if a: out.append({'q': q or 'Remember this.', 'a': a})
+        # before (Celeste 2026-11-15): if a: out.append({'q': q or 'Remember this.', 'a': a})
+        also = [clean_text(x, policy['maxCharsPerItem']) for x in (it.get('paraphrases') or []) if isinstance(x, str)] \
+            if isinstance(it.get('paraphrases'), list) else []
+        also = [x for x in also if x][:MAX_PARAPHRASES]
+        if a: out.append(dict({'q': q or 'Remember this.', 'a': a}, **({'also': also} if also else {})))
     return out
 
 def learn_one(args, home, mind, entry):
@@ -1894,16 +2026,26 @@ def learn_one(args, home, mind, entry):
         home.chain.append('base-mismatch', 'My learned file was made on a different base. Nothing changed.', activeBaseFp=ptr0['baseFp'], **base)
         print('base mismatch: the active %s was made on another base; nothing changed' % method); return None
 
-    steps = min(args.steps, pol['maxStepsPerRun'])
+    # before (Celeste 2026-11-15): steps = min(args.steps, pol['maxStepsPerRun'])
+    # before (Celeste 2026-11-15, Hypha #351 S3): settings, settings_from = learn_settings(method, args, entry)
+    settings, settings_from = learn_settings(method, args, entry, row_by='person' if offer is not None else 'mind')
+    steps = min(settings['steps'], pol['maxStepsPerRun'])
     torch = mind.torch
     seed = args.seed if args.seed is not None else int(sha256_bytes(canonical(items).encode())[:8], 16)
     torch.manual_seed(seed)
     ptr = home.pointer(method)
     before_fp = ptr['fp'] if ptr else 'none'
     replay = [json.loads(l) for l in open(os.path.join(home.dir, 'memory.jsonl'))] if os.path.exists(os.path.join(home.dir, 'memory.jsonl')) else []
-    examples = replay[-pol['maxItemsPerLearn']:] + items
-    run_cfg = {'method': method, 'steps': steps, 'lr': args.lr, 'seed': seed, 'tokens': 1 if method == 'memory-vector' else args.tokens,
-               'baseModel': args.model, 'baseFp': base['baseFp'], 'parentFp': before_fp, 'keep': KEEP, 'torch': torch.__version__}
+    # before (Celeste 2026-11-15): examples = replay[-pol['maxItemsPerLearn']:] + items
+    replay = [{'q': r_['q'], 'a': r_['a']} for r_ in replay[-pol['maxItemsPerLearn']:] if isinstance(r_, dict) and 'q' in r_ and 'a' in r_]
+    examples = replay + train_examples(items, settings['framings'], ((entry.get('probe') or {}).get('paraphrase') or ''))
+    # before (Celeste 2026-11-15): run_cfg = {'method': method, 'steps': steps, 'lr': args.lr, 'seed': seed, 'tokens': 1 if method == 'memory-vector' else args.tokens,
+    # before (Celeste 2026-11-15):            'baseModel': args.model, 'baseFp': base['baseFp'], 'parentFp': before_fp, 'keep': KEEP, 'torch': torch.__version__}
+    run_cfg = {'method': method, 'steps': steps, 'lr': settings['lr'], 'seed': seed, 'tokens': 1 if method == 'memory-vector' else args.tokens,
+               'baseModel': args.model, 'baseFp': base['baseFp'], 'parentFp': before_fp, 'keep': KEEP, 'torch': torch.__version__,
+               'settings': settings, 'settingsFrom': settings_from, 'replay': REPLAY_SETS[settings['replay']],
+               'examples': len(examples), 'newExamples': len(examples) - len(replay)}
+    base['learnSettings'] = dict(settings, steps=steps)
     home.chain.append('run-start', 'learning…', runConfigFp=sha256_bytes(canonical(run_cfg).encode()), parentFp=before_fp, **base)
     t0 = time.time()
     stopper = Stopper(home, t0, pol.get('maxWallSeconds'))
@@ -1952,7 +2094,9 @@ def learn_one(args, home, mind, entry):
         start = soft_before if soft_before is not None else mind.init_soft(run_cfg['tokens'])
         mb = measure(mind, items, entry.get('probe'), soft_before)
         # before (round 15): result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper)
-        result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper, ckpt=ck)
+        # before (Celeste 2026-11-15): result, losses, stopped = mind.train(method, start, examples, steps, args.lr, stopper, ckpt=ck)
+        result, losses, stopped = mind.train(method, start, examples, steps, settings['lr'], stopper, ckpt=ck,
+                                             settings=settings, new_from=len(replay))
     else:
         if ptr:
             from peft import PeftModel
@@ -1962,7 +2106,9 @@ def learn_one(args, home, mind, entry):
         else:
             mb = measure(mind, items, entry.get('probe'))
         # before (round 15): result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None)
-        result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None, ckpt=ck)
+        # before (Celeste 2026-11-15): result, losses, stopped = mind.train(method, None, examples, steps, args.lr, stopper, ptr['dir'] if ptr else None, ckpt=ck)
+        result, losses, stopped = mind.train(method, None, examples, steps, settings['lr'], stopper, ptr['dir'] if ptr else None, ckpt=ck,
+                                             settings=settings, new_from=len(replay))
     if stopped is not None:
         if stopper.reason == 'wall-time':
             home.chain.append('cap', 'I reached my time for one run. I stopped; nothing was committed or deleted.', stoppedAtStep=stopped,
@@ -2017,6 +2163,7 @@ def learn_one(args, home, mind, entry):
     # before: row_meta = dict(base, gist=gist, version=os.path.basename(vdir), beforeFp=before_fp, afterFp=fp, size=size,
     row_meta = dict(base, gist=gist, itemTexts=[it['a'] for it in items], version=os.path.basename(vdir), beforeFp=before_fp, afterFp=fp, size=size,
                     dtype='float32', shape=shape, check_result=chk, losses=[round(losses[0], 4), round(losses[-1], 4)], seconds=secs)
+    row_meta.update(stepsRun=len(losses), stoppedEarlyAt=getattr(mind, 'stopped_early_at', None))   # Celeste 2026-11-15
     sz = dict(size=size, dtype='float32', shape=shape)
     if not commit:
         if chk_choice == 'kirk': hold, said = 'pending-kirk', 'Waiting for a person (Kirk) to look. The new version is saved, inactive.'
@@ -2037,7 +2184,8 @@ def learn_one(args, home, mind, entry):
     if known_good and loaded:
         home.set_pointer(method, 'known-good', home.pointer(method))
     with open(os.path.join(home.dir, 'memory.jsonl'), 'a') as f:
-        for it in items: f.write(json.dumps(it) + '\n')
+        # before (Celeste 2026-11-15): for it in items: f.write(json.dumps(it) + '\n')
+        for it in items: f.write(json.dumps({'q': it['q'], 'a': it['a']}) + '\n')   # the fact itself; paraphrases stay in train.jsonl
     home.chain.append('learn-commit', "I'll remember that.", knownGood='yes' if known_good else ('unchecked-by-choice' if chk_choice == 'none' else 'no'),
                       loaded=loaded, **row_meta)
     # Hypha S10: never "check=pass" when no check gated this. With none, the numbers were measured and only recorded.
@@ -2231,7 +2379,17 @@ def main():
     ap.add_argument('--check', choices=['none', 'self', 'peer', 'kirk'], default=None, help="who checks before commit; the mind's choice (default self)")
     ap.add_argument('--second-yes', action='store_true', help='the mind confirmed after cooling (Reed): required to change numbers')
     ap.add_argument('--revisit', default=None, help="remember (first yes): when the mind looks again: 'now', hours, or a day (default)")
-    ap.add_argument('--steps', type=int, default=100); ap.add_argument('--lr', type=float, default=0.02)
+    # before (Celeste 2026-11-15): ap.add_argument('--steps', type=int, default=100); ap.add_argument('--lr', type=float, default=0.02)
+    # Celeste 2026-11-15 recall defaults: None means "this method's default" (RECALL_DEFAULTS); a mind's row may override.
+    ap.add_argument('--steps', type=int, default=None, help='optimizer steps (default: lora 20, soft-prompt/memory-vector 100)')
+    ap.add_argument('--lr', type=float, default=None, help='learning rate (default: lora 5e-4, soft-prompt/memory-vector 0.02)')
+    ap.add_argument('--lora-rank', type=int, default=None, help='LoRA rank (default 8)')
+    ap.add_argument('--lora-targets', default=None, help="LoRA layers: 'all-linear' (default) or names, e.g. q_proj,v_proj (the old way)")
+    ap.add_argument('--replay', choices=list(REPLAY_SETS), default=None, help="replayed general text: 'wide' (20+4 sentences; lora default) or 'keep' (the old 4)")
+    ap.add_argument('--replay-weight', type=float, default=None, help='weight of the replayed text (default: lora 4, soft-prompt 2)')
+    ap.add_argument('--early-stop-loss', type=float, default=None, help='stop at a 10-step mark once the new examples are under this loss (default 0.5; 0 = off)')
+    ap.add_argument('--framings', type=int, default=None, help='fill each fact up to this many paraphrases with gentle framings (default: lora 5, soft-prompt 0; max 10)')
+    ap.add_argument('--also-ask', action='append', default=None, help='remember: another way to ask --question (repeat, up to 10; the mind\'s own paraphrases)')
     ap.add_argument('--tokens', type=int, default=8); ap.add_argument('--seed', type=int, default=None)
     ap.add_argument('--queue'); ap.add_argument('--text'); ap.add_argument('--method'); ap.add_argument('--reason', default='')
     ap.add_argument('--source', default='chat'); ap.add_argument('--provenance', default='self',
@@ -2506,7 +2664,9 @@ def main():
                         'readingAtChoice': ({'sha256': sha256_bytes(args.reading.encode()), 'excerpt': args.reading[:280], 'kinds': ['cli']}
                                             if args.reading else None),
                         'status': 'confirmed' if args.second_yes else 'cooling',
-                        'items': [{'instruction': args.question or 'Remember this.', 'output': args.text or ''}],
+                        # before (Celeste 2026-11-15): 'items': [{'instruction': args.question or 'Remember this.', 'output': args.text or ''}],
+                        'items': [dict({'instruction': args.question or 'Remember this.', 'output': args.text or ''},
+                                       **({'paraphrases': list(args.also_ask)[:MAX_PARAPHRASES]} if args.also_ask else {}))],
                         'probe': probe if args.question else None}]
             item = sha256_bytes((args.text or '').encode())
             hit = content_hit(home, args.text or '')
