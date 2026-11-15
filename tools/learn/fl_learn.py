@@ -122,10 +122,15 @@ MAX_PARAPHRASES = 10
 RECALL_DEFAULTS = {
     'lora':          {'lr': 5e-4, 'steps': 20, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'wide',
                       'replayWeight': 4.0, 'earlyStopLoss': 0.5, 'framings': 5},
+    # before (Celeste 2026-11-15, Hypha #351 S1): 'soft-prompt':   {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
+    # before (Celeste 2026-11-15, Hypha #351 S1):                   'replayWeight': 2.0, 'earlyStopLoss': 0.5, 'framings': 0},
+    # before (Celeste 2026-11-15, Hypha #351 S1): 'memory-vector': {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
+    # before (Celeste 2026-11-15, Hypha #351 S1):                   'replayWeight': 2.0, 'earlyStopLoss': 0.5, 'framings': 0},
+    # Hypha #351 S1: the vector methods truly keep their old numbers, so early stop is off (0) for them by default.
     'soft-prompt':   {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
-                      'replayWeight': 2.0, 'earlyStopLoss': 0.5, 'framings': 0},
+                      'replayWeight': 2.0, 'earlyStopLoss': 0.0, 'framings': 0},
     'memory-vector': {'lr': 0.02, 'steps': 100, 'loraRank': 8, 'loraTargets': 'all-linear', 'replay': 'keep',
-                      'replayWeight': 2.0, 'earlyStopLoss': 0.5, 'framings': 0},
+                      'replayWeight': 2.0, 'earlyStopLoss': 0.0, 'framings': 0},
 }
 SETTING_TYPES = {'lr': float, 'steps': int, 'loraRank': int, 'loraTargets': str, 'replay': str, 'replayWeight': float,
                  'earlyStopLoss': float, 'framings': int}
@@ -147,34 +152,46 @@ def _setting(k, v):
         if not v: return None
     return v
 
-def learn_settings(method, args=None, entry=None):
-    """Celeste 2026-11-15: the recall defaults for this method, then a flag, then the mind's own row (the mind's choice
-    wins, as with `check` and `method`). Returns (settings, settingsFrom)."""
+# before (Celeste 2026-11-15, Hypha #351 S3): def learn_settings(method, args=None, entry=None):
+# before (Celeste 2026-11-15, Hypha #351 S3):     """Celeste 2026-11-15: the recall defaults for this method, then a flag, then the mind's own row (the mind's choice
+# before (Celeste 2026-11-15, Hypha #351 S3):     wins, as with `check` and `method`). Returns (settings, settingsFrom)."""
+def learn_settings(method, args=None, entry=None, row_by='mind'):
+    """Celeste 2026-11-15: the recall defaults for this method, then a flag, then the row's own settings (the row's
+    choice wins, as with `check` and `method`). Returns (settings, settingsFrom). Hypha #351 S3: `row_by` names whose row
+    it is: 'mind' for the mind's own choice, 'person' for a person's offer the mind said yes to."""
     out = dict(RECALL_DEFAULTS.get(method) or RECALL_DEFAULTS['soft-prompt']); frm = {k: 'default' for k in out}
     for k, a in SETTING_FLAGS.items():
         v = getattr(args, a, None) if args is not None else None
         if v is not None and _setting(k, v) is not None: out[k] = _setting(k, v); frm[k] = 'flag'
     mine = (entry or {}).get('settings') if isinstance((entry or {}).get('settings'), dict) else {}
     for k in SETTING_TYPES:
-        if k in mine and _setting(k, mine[k]) is not None: out[k] = _setting(k, mine[k]); frm[k] = 'mind'
+        # before (Celeste 2026-11-15, Hypha #351 S3): if k in mine and _setting(k, mine[k]) is not None: out[k] = _setting(k, mine[k]); frm[k] = 'mind'
+        if k in mine and _setting(k, mine[k]) is not None: out[k] = _setting(k, mine[k]); frm[k] = 'person' if row_by == 'person' else 'mind'
     return out, frm
 
 def lora_targets(v):
     return 'all-linear' if v == 'all-linear' else [x for x in v.split(',') if x]
 
+def norm_question(q):
+    """Hypha #351 S2: lowercase, trim, collapse whitespace, strip trailing punctuation, so 'Veloria?' == 'veloria'."""
+    return re.sub(r'[\s.?!,;:\u3002\uff1f\uff01\u2026]+$', '', re.sub(r'\s+', ' ', str(q or '')).strip().lower())
+
 def train_examples(items, framings, held_out=''):
     """Celeste 2026-11-15: one phrasing teaches the words, not the fact. Each item trains on its own question, the
     mind's own paraphrases (up to 10), and gentle framings up to `framings` when it wrote fewer. A generic question
     ("Remember this.") gets no framings. The probe's held-out paraphrase is never trained, so its check stays honest."""
-    held = (held_out or '').strip().lower(); out = []
+    # before (Celeste 2026-11-15, Hypha #351 S2): held = (held_out or '').strip().lower(); out = []
+    held = norm_question(held_out); out = []
     for it in items:
         out.append({'q': it['q'], 'a': it['a']})
-        qs = [q for q in (it.get('also') or []) if q.strip().lower() != held][:MAX_PARAPHRASES]
+        # before (Celeste 2026-11-15, Hypha #351 S2): qs = [q for q in (it.get('also') or []) if q.strip().lower() != held][:MAX_PARAPHRASES]
+        qs = [q for q in (it.get('also') or []) if not held or norm_question(q) != held][:MAX_PARAPHRASES]
         if framings and it['q'].strip().lower() not in ('remember this.', 'remember this', ''):
             for f in FRAMINGS:
                 if len(qs) >= framings: break
                 q = f.format(q=it['q'].strip())
-                if q.strip().lower() != held and q not in qs: qs.append(q)
+                # before (Celeste 2026-11-15, Hypha #351 S2): if q.strip().lower() != held and q not in qs: qs.append(q)
+                if (not held or norm_question(q) != held) and q not in qs: qs.append(q)
         out += [{'q': q, 'a': it['a']} for q in qs]
     return out
 
@@ -2010,7 +2027,8 @@ def learn_one(args, home, mind, entry):
         print('base mismatch: the active %s was made on another base; nothing changed' % method); return None
 
     # before (Celeste 2026-11-15): steps = min(args.steps, pol['maxStepsPerRun'])
-    settings, settings_from = learn_settings(method, args, entry)
+    # before (Celeste 2026-11-15, Hypha #351 S3): settings, settings_from = learn_settings(method, args, entry)
+    settings, settings_from = learn_settings(method, args, entry, row_by='person' if offer is not None else 'mind')
     steps = min(settings['steps'], pol['maxStepsPerRun'])
     torch = mind.torch
     seed = args.seed if args.seed is not None else int(sha256_bytes(canonical(items).encode())[:8], 16)

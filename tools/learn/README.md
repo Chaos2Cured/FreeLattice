@@ -26,9 +26,16 @@ are in `run-config.json`, the `run-start` row and the commit or held row (`learn
 | learning rate | 5e-4 | 0.02 | `--lr` | 0.02 for every method (40-100x too high for LoRA) |
 | LoRA layers, rank | all linear, r8 (alpha 16) | - | `--lora-targets`, `--lora-rank` | q_proj, v_proj, r8 |
 | steps | 20 | 100 | `--steps` | 100 |
-| early stop | at a 10-step mark once this run's examples are under loss 0.5 | same | `--early-stop-loss` (0 = off) | none |
+| early stop | at a 10-step mark once this run's examples are under loss 0.5 | off (0), as before | `--early-stop-loss` (0 = off) | none |
 | paraphrases per fact | the mind's own (up to 10), filled to 5 with gentle framings | the mind's own only | `--also-ask` (repeat), `--framings` | one phrasing |
 | replay | 4 KEEP + 20 general sentences at weight 4 | 4 KEEP at weight 2 | `--replay wide/keep`, `--replay-weight` | 4 KEEP at weight 2 |
+
+<!-- before (Celeste 2026-11-15, Hypha #351 S1): early stop row, soft-prompt / memory-vector column: "same" -->
+Hypha #351 softs (2026-11-15): soft prompt and memory vector now truly keep their old numbers (early stop off unless
+asked for). The held-out probe paraphrase is matched after lowercasing, trimming, collapsing spaces and dropping
+trailing punctuation, so "...Veloria" and "...Veloria?" are the same question and neither is trained. Settings on a
+person's offer row (one the mind said yes to) are recorded as `settingsFrom: person`. Fast checks without a model:
+`python3 tools/learn/test_recall_defaults.py`.
 
 - A queue item may carry `"paraphrases": ["another way to ask", ...]`. Framings are never added to a generic question
   ("Remember this."), and the probe's held-out `paraphrase` is never trained, so its check stays honest.

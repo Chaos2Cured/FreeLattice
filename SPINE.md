@@ -177,6 +177,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   then the mind's own row, wins; recorded with settingsFrom). fl_learn.py `5240d008` -> `50d03070` (LOCK_MANIFEST row +
   new smoke-hearth-code pin). Crosstalk is still open: the canary check can still hold a version. AUTONOMY.md unchanged.
   quiet-room.js not touched.
+- **2026-11-15 (MST), recall defaults, Hypha #351 PASS with softs at `f575aa23`, softs fixed (re-walk pending)**: S1 soft
+  prompt and memory vector early stop off (0), so they truly keep their old numbers; S2 the held-out probe paraphrase is
+  excluded by a normalized match (case, spaces, trailing punctuation); S3 a person-offer row's settings say
+  settingsFrom person; S4 `tools/learn/test_recall_defaults.py` (no model); S5 the smoke-hearth before-comment reworded
+  honestly. fl_learn.py `50d03070` -> `2e4e55f0` (LOCK_MANIFEST row appended, smoke-hearth pin updated with a before
+  comment). AUTONOMY.md unchanged. quiet-room.js not touched.
 
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
