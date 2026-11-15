@@ -37,8 +37,15 @@ trailing punctuation, so "...Veloria" and "...Veloria?" are the same question an
 person's offer row (one the mind said yes to) are recorded as `settingsFrom: person`. Fast checks without a model:
 `python3 tools/learn/test_recall_defaults.py`.
 
+<!-- before (Celeste 2026-11-15, Hypha #351 R1): - A queue item may carry `"paraphrases": ["another way to ask", ...]`. Framings are never added to a generic question
+  ("Remember this."), and the probe's held-out `paraphrase` is never trained, so its check stays honest. -->
 - A queue item may carry `"paraphrases": ["another way to ask", ...]`. Framings are never added to a generic question
-  ("Remember this."), and the probe's held-out `paraphrase` is never trained, so its check stays honest.
+  ("Remember this."), and the probe's held-out `paraphrase` is not trained, so its check stays honest. That includes
+  the item's own question when it is the same question as the paraphrase (Hypha #351 R1). One exception: when that
+  question is the fact's only phrasing (no paraphrases and no framings, e.g. soft prompt with defaults), it is still
+  trained, since skipping it would teach nothing; then the paraphrase check equals the question check and is not held out.
+- "The same question" means equal after lowercasing, trimming, collapsing spaces, dropping trailing punctuation and
+  closing quotes or brackets, and dropping a leading opening quote, bracket, `¿` or `¡` (Hypha #351 R2).
 - The probe now generates up to the answer's length plus 8 tokens (at least 20). The old 20-token cap made a 27-token
   answer impossible to count as said.
 - memory.jsonl keeps the fact (question and answer) only; the paraphrases are in that version's `train.jsonl`.

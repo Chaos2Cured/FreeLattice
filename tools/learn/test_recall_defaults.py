@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Small, fast tests for the recall defaults (Celeste 2026-11-15, Hypha #351 S4). No model is loaded and nothing is
 written. Covers: learn_settings override order (default, then flag, then the row, bad values ignored, a person's offer
-labelled 'person'), train_examples probe exclusion (normalized, including the '?' case), and early stop being off for
+labelled 'person'), train_examples probe exclusion (normalized, including the '?' case; Hypha #351 R1/R2: the item's own
+question, quotes, brackets, ¿ and ¡), and early stop being off for
 the vector methods (with a real optimizer loop on a stub when torch is present).
 Usage: python3 tools/learn/test_recall_defaults.py"""
 import argparse, os, sys
@@ -58,6 +59,21 @@ check('probe-without-mark-excludes-the-marked-one', not any(F.norm_question(e['q
 ex = F.train_examples([item], 5, 'Tell me: What is the capital of Veloria')
 check('probe-equal-to-a-framing-is-not-trained', not any(F.norm_question(e['q']) == 'tell me: what is the capital of veloria' for e in ex))
 check('norm-question', F.norm_question('  Hello   World?! ') == 'hello world' and F.norm_question('A？') == 'a')
+# ---- Hypha #351 R2: closing quotes/brackets at the end, opening ones or ¿ / ¡ at the start
+for v in ('Veloria?"', 'Veloria?)', '\u00bfVeloria?', '\u00a1Veloria!', '"Veloria?"', '\u201cVeloria?\u201d', '\u00abVeloria\u00bb', '(Veloria?)', 'Veloria?]'):
+    check('norm-question-quote-bracket %r' % v, F.norm_question(v) == 'veloria', F.norm_question(v))
+check('norm-question-keeps-inner-marks', F.norm_question('"City", is it?') == 'city", is it' and F.norm_question('\u2026, really?') == '\u2026, really'
+      and F.norm_question('Velorian?') != F.norm_question('Veloria?'), (F.norm_question('"City", is it?'),))
+ex = F.train_examples([dict(item, also=['\u00bfWhich city is the capital of Veloria?"'])], 0, 'Which city is the capital of Veloria')
+check('probe-excluded-with-inverted-mark-and-quote', [e['q'] for e in ex] == [item['q']], [e['q'] for e in ex])
+# ---- Hypha #351 R1: a probe identical to the item's own question is not trained either
+ex = F.train_examples([item], 5, 'What is the capital of Veloria')
+qs = [e['q'] for e in ex]
+check('probe-equal-to-own-question-not-trained', not any(F.norm_question(q) == 'what is the capital of veloria' for q in qs) and len(qs) == 5, qs)
+ex = F.train_examples([{'q': 'What is the capital of Veloria?', 'a': 'Tessmoor'}], 0, 'what is the capital of veloria?')
+check('only-phrasing-still-trained-when-it-is-the-probe', [e['q'] for e in ex] == ['What is the capital of Veloria?'], ex)
+ex = F.train_examples([{'q': 'Where is Pellow?', 'a': 'x'}, item], 0, 'What is the capital of Veloria?')
+check('other-items-untouched-by-own-question-rule', [e['q'] for e in ex][0] == 'Where is Pellow?' and item['q'] not in [e['q'] for e in ex], ex)
 ex = F.train_examples([{'q': 'Remember this.', 'a': 'x'}], 5)
 check('generic-question-gets-no-framings', len(ex) == 1)
 ex = F.train_examples([dict(item, also=['q%d?' % i for i in range(15)])], 5)
