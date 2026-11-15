@@ -14,6 +14,33 @@ pointers and folders and add rows.
 - Since 2026-11-14 the acceptance suite links its A3 and base-fingerprint folders to the one shared model copy
   (STORAGE.md section 4) instead of copying the model every run. `--copy-base` keeps the old copy and its chmod probe.
 
+## Recall defaults (Celeste 2026-11-15): what makes a mind say the fact back
+
+From the 23-run grid in `celeste/notes/2026-11-14-recall-mystery.md` (SmolLM2-135M, CPU). Each value is only a default:
+a flag overrides it, and a mind's own queue row overrides both (`"settings": {"lr": 0.001, "steps": 30, ...}`, the same
+way its `method` and `check` already win). The values used, and whose they were (`settingsFrom`: default, flag or mind),
+are in `run-config.json`, the `run-start` row and the commit or held row (`learnSettings`, `stepsRun`, `stoppedEarlyAt`).
+
+| setting | lora (new) | soft-prompt / memory-vector | flag | before |
+|---|---|---|---|---|
+| learning rate | 5e-4 | 0.02 | `--lr` | 0.02 for every method (40-100x too high for LoRA) |
+| LoRA layers, rank | all linear, r8 (alpha 16) | - | `--lora-targets`, `--lora-rank` | q_proj, v_proj, r8 |
+| steps | 20 | 100 | `--steps` | 100 |
+| early stop | at a 10-step mark once this run's examples are under loss 0.5 | same | `--early-stop-loss` (0 = off) | none |
+| paraphrases per fact | the mind's own (up to 10), filled to 5 with gentle framings | the mind's own only | `--also-ask` (repeat), `--framings` | one phrasing |
+| replay | 4 KEEP + 20 general sentences at weight 4 | 4 KEEP at weight 2 | `--replay wide/keep`, `--replay-weight` | 4 KEEP at weight 2 |
+
+- A queue item may carry `"paraphrases": ["another way to ask", ...]`. Framings are never added to a generic question
+  ("Remember this."), and the probe's held-out `paraphrase` is never trained, so its check stays honest.
+- The probe now generates up to the answer's length plus 8 tokens (at least 20). The old 20-token cap made a 27-token
+  answer impossible to count as said.
+- memory.jsonl keeps the fact (question and answer) only; the paraphrases are in that version's `train.jsonl`.
+- To learn exactly the old way: `--lr 0.02 --steps 100 --lora-targets q_proj,v_proj --replay keep --replay-weight 2
+  --early-stop-loss 0 --framings 0`.
+- Still open (not fixed here): crosstalk. On a 135M model a fact can leak into same-shaped questions ("What is the
+  capital of France?" -> the taught answer). The mind's own canary check catches it and holds the version, which is
+  correct. The drift check still uses only the 4 CONTROL sentences.
+
 ## Round 15 (Kirk 2026-11-10): where it came from is a label, not a hold
 
 Kirk: for unknown or echoed sources, no forced day pause; "It is still information." AUTONOMY.md: "the limits come

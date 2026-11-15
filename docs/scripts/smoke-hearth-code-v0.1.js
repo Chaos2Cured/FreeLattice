@@ -70,6 +70,8 @@ function sha(text) {
     // before training-galaxy brick 1 (Hypha's #348 HOLD): 'docs/modules/snowflake-core.js': 'f69ac9c4e393a620057f6a6b080dcf50',
     'docs/modules/snowflake-core.js': '93539981f9a4fa68053b2f8ba77c3ff5',
     'docs/modules/chat-bottom-clarity.js': '5bbadf3320177a485b27c565bac64454',
+    // before (Celeste 2026-11-15, recall defaults; fl_learn.py was listed only in LOCK_MANIFEST): 'tools/learn/fl_learn.py': '5240d008aa59b3e4063903c91ddbb1b5',
+    'tools/learn/fl_learn.py': '50d03070c80d0eded5ac2920c03070c2',   // recall defaults made the learner's defaults (LOCK_MANIFEST v-recall-defaults-v0.1 row)
     'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
     'docs/modules/gathering-speak.js': '0460fdc777a21f7a1744f401dda82cb2',
     'docs/modules/fl-bridge.js': '3b5ef06849a142e50c78e7ba1e057980',

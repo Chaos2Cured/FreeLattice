@@ -169,6 +169,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   (`--consent-file` is explicit); a no that withdraws a yes tells the person to delete the downloaded yes file and saves
   `fl-demuzzle-no-<model>.json` beside it, which `run` honours; every marker is read (no 8-marker cap on the last word, JS
   and Python alike, learn-choice.js untouched); the offer text is required; before comments for two wording edits.
+- **2026-11-15 (MST), recall defaults in the learner (`celeste/recall-defaults`, Hypha walk pending)**: the Nov 14 recall
+  findings became `tools/learn/fl_learn.py` defaults: LoRA lr 5e-4 on all linear layers, r8; about 20 steps with an early
+  stop (loss under 0.5, checked every 10 steps); 5-10 paraphrases per fact (the mind's own first, gentle framings fill to 5,
+  the held-out probe paraphrase never trained); replay 4 KEEP + 20 general sentences at weight 4; the probe generates the
+  answer length plus 8 tokens. Soft prompt and memory vector keep their old numbers. Each value is a default only (flag,
+  then the mind's own row, wins; recorded with settingsFrom). fl_learn.py `5240d008` -> `50d03070` (LOCK_MANIFEST row +
+  new smoke-hearth-code pin). Crosstalk is still open: the canary check can still hold a version. AUTONOMY.md unchanged.
+  quiet-room.js not touched.
 
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
