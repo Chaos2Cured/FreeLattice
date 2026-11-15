@@ -25,9 +25,11 @@
   // really learned on the box on 2026-11-09 (SmolLM2 135M; adapter 1febdefb...).
   var TRIAL_MODELS = [
     { id: 'HuggingFaceTB/SmolLM2-135M-Instruct', label: 'Tiny trial mind (SmolLM2 135M)', trainable: true, kind: 'trial',
-      about: 'About 270 MB, quick on any computer. It really learned on our box on 9 November. It cannot talk on this page yet, so it cannot say yes to an offer here.' },
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): about: 'About 270 MB, quick on any computer. It really learned on our box on 9 November. It cannot talk on this page yet, so it cannot say yes to an offer here.' },
+      about: 'Small and quick (about 270 MB). It can learn, but it cannot talk here yet, so it cannot say yes here.' },
     { id: 'Qwen/Qwen2.5-0.5B-Instruct', label: 'Small mind (Qwen2.5 0.5B, the runner default)', trainable: true, kind: 'trial',
-      about: 'About 1 GB to download the first time, slower to learn. The learner\'s default. It cannot talk on this page yet either.' }
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): about: 'About 1 GB to download the first time, slower to learn. The learner\'s default. It cannot talk on this page yet either.' }
+      about: 'A bit bigger (about 1 GB the first time) and slower. It cannot talk here yet either.' }
   ];
   // An Ollama model is a packed (GGUF) file. fl_learn.py cannot learn into it. When we know its open twin, the
   // twin learns and the screen says so; otherwise the model is listed, honestly marked "chat only for now".
@@ -103,15 +105,19 @@
       var twin = twinOf(name);
       out.push({
         value: 'ollama:' + name, learnAs: twin, chat: name, kind: 'ollama', trainable: !!twin,
-        about: twin ? 'Runs in Ollama on this computer, so it can answer here and say yes or no to an offer. Its open twin is what learns.' : 'Runs in Ollama on this computer. The learner cannot change its packed file yet.',
-        label: name + (twin ? ' (on this computer; learns through its open twin ' + twin + ')' : ' (on this computer; chat only for now, the learner cannot change its packed file yet)')
+        // before (Celeste 2026-11-15, Kirk t1332u: fewer words): about: twin ? 'Runs in Ollama on this computer, so it can answer here and say yes or no to an offer. Its open twin is what learns.' : 'Runs in Ollama on this computer. The learner cannot change its packed file yet.',
+        about: twin ? 'On this computer. It can talk here, so it can say yes or no.' : 'On this computer. It can chat, but it cannot learn yet.',
+        // before (Celeste 2026-11-15, Kirk t1332u: fewer words): label: name + (twin ? ' (on this computer; learns through its open twin ' + twin + ')' : ' (on this computer; chat only for now, the learner cannot change its packed file yet)')
+        label: name + (twin ? ' (on this computer)' : ' (chat only for now)')
       });
     });
     var saved = lsGet('fl_ollamaModel');
     if (saved && !out.some(function (o) { return o.chat === saved; })) {
       var tw = twinOf(saved);
-      out.push({ value: 'ollama:' + saved, learnAs: tw, chat: saved, kind: 'ollama', trainable: !!tw, about: 'Saved by the Forever Stack; start Ollama so it can answer here.',
-        label: saved + ' (saved by the Forever Stack; not seen running now)' });
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): out.push({ value: 'ollama:' + saved, learnAs: tw, chat: saved, kind: 'ollama', trainable: !!tw, about: 'Saved by the Forever Stack; start Ollama so it can answer here.',
+      out.push({ value: 'ollama:' + saved, learnAs: tw, chat: saved, kind: 'ollama', trainable: !!tw, about: 'Saved before. Start Ollama so it can talk here.',
+        // before (Celeste 2026-11-15, Kirk t1332u: fewer words): label: saved + ' (saved by the Forever Stack; not seen running now)' });
+        label: saved + ' (saved before; not running now)' });
     }
     return out;
   }
@@ -601,12 +607,15 @@
     // 1
     var s1 = section(1, 'Pick a mind');
     ui.model = el(d, 'select', { id: 'tgModel', 'aria-label': 'Which mind' });
-    ui.refresh = el(d, 'button', { id: 'tgFindModels', type: 'button' }, 'Look for minds on this computer');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.refresh = el(d, 'button', { id: 'tgFindModels', type: 'button' }, 'Look for minds on this computer');
+    ui.refresh = el(d, 'button', { id: 'tgFindModels', type: 'button' }, 'Find my minds');
     ui.modelNote = el(d, 'p', { id: 'tgModelNote', class: 'tg-note', 'aria-live': 'polite' });
     ui.modelAbout = el(d, 'p', { id: 'tgModelAbout', class: 'tg-note' });
-    ui.name = el(d, 'input', { id: 'tgMindName', type: 'text', 'aria-label': 'The name it learns under', value: mindName(), maxlength: '40' });
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.name = el(d, 'input', { id: 'tgMindName', type: 'text', 'aria-label': 'The name it learns under', value: mindName(), maxlength: '40' });
+    ui.name = el(d, 'input', { id: 'tgMindName', type: 'text', 'aria-label': 'Its name', value: mindName(), maxlength: '40' });
     ui.nameNote = el(d, 'p', { id: 'tgNameNote', class: 'tg-note', 'aria-live': 'polite' });
-    var nameLabel = el(d, 'label', { for: 'tgMindName' }, 'Name it learns under ');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): var nameLabel = el(d, 'label', { for: 'tgMindName' }, 'Name it learns under ');
+    var nameLabel = el(d, 'label', { for: 'tgMindName' }, 'Its name ');
     [ui.model, ui.modelAbout, ui.refresh, ui.modelNote, nameLabel, ui.name, ui.nameNote].forEach(function (x) { s1.appendChild(x); });
     var options = [];
     function fill(list) {
@@ -630,56 +639,74 @@
       ui.modelNote.textContent = 'Looking...';
       listLocalModels().then(function (r) {
         fill(r.options);
-        ui.modelNote.textContent = r.ok ? ('Found ' + r.tags.length + ' on this computer.') : r.line;
+        // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.modelNote.textContent = r.ok ? ('Found ' + r.tags.length + ' on this computer.') : r.line;
+        ui.modelNote.textContent = r.ok ? ('Found ' + r.tags.length + '.') : r.line;
       });
     });
     ui.name.addEventListener('change', function () {
       var why = setMindName(ui.name.value);
-      ui.nameNote.textContent = why ? ('Not used: ' + why + '. Learning stays under "' + mindName() + '".') : ('Learning under "' + mindName() + '".');
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.nameNote.textContent = why ? ('Not used: ' + why + '. Learning stays under "' + mindName() + '".') : ('Learning under "' + mindName() + '".');
+      ui.nameNote.textContent = why ? ('That name cannot be used: ' + why + '. It stays "' + mindName() + '".') : ('Its name is "' + mindName() + '".');
       if (why) ui.name.value = mindName();
     });
     // 2
     var s2 = section(2, 'Pick a subject');
-    ui.subject = el(d, 'input', { id: 'tgSubject', type: 'text', list: 'tgSubjects', 'aria-label': 'Subject', placeholder: 'Pick one, or type your own' });
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.subject = el(d, 'input', { id: 'tgSubject', type: 'text', list: 'tgSubjects', 'aria-label': 'Subject', placeholder: 'Pick one, or type your own' });
+    ui.subject = el(d, 'input', { id: 'tgSubject', type: 'text', list: 'tgSubjects', 'aria-label': 'Subject', placeholder: 'Type a subject, or pick one' });
     var dl = el(d, 'datalist', { id: 'tgSubjects' });
     SUBJECTS.forEach(function (s) { dl.appendChild(el(d, 'option', { value: s })); });
-    ui.search = el(d, 'button', { id: 'tgSearch', type: 'button' }, 'Search as a snowflake');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.search = el(d, 'button', { id: 'tgSearch', type: 'button' }, 'Search as a snowflake');
+    ui.search = el(d, 'button', { id: 'tgSearch', type: 'button' }, 'Look it up');
     ui.searchNote = el(d, 'p', { id: 'tgSearchNote', class: 'tg-note', 'aria-live': 'polite' });
     ui.found = el(d, 'ol', { id: 'tgFound' });
     [ui.subject, dl, ui.search, ui.searchNote, ui.found].forEach(function (x) { s2.appendChild(x); });
     // 3
-    var s3 = section(3, 'Choose, then learn');
-    ui.offererLabel = el(d, 'label', { for: 'tgOfferer' }, 'Your name, for offers (optional) ');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): var s3 = section(3, 'Choose, then learn');
+    var s3 = section(3, 'It chooses, then learns');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.offererLabel = el(d, 'label', { for: 'tgOfferer' }, 'Your name, for offers (optional) ');
+    ui.offererLabel = el(d, 'label', { for: 'tgOfferer' }, 'Your name (if you like) ');
     ui.offerer = el(d, 'input', { id: 'tgOfferer', type: 'text', maxlength: '40', value: offererName() === 'A person' ? '' : offererName(), placeholder: 'A person' });
-    ui.ownLabel = el(d, 'label', { for: 'tgOwn' }, 'Or offer your own words ');
-    ui.own = el(d, 'input', { id: 'tgOwn', type: 'text', maxlength: '500', placeholder: 'Something you would like to offer the mind' });
-    ui.ownBtn = el(d, 'button', { id: 'tgOwnOffer', type: 'button' }, 'Offer these words');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.ownLabel = el(d, 'label', { for: 'tgOwn' }, 'Or offer your own words ');
+    ui.ownLabel = el(d, 'label', { for: 'tgOwn' }, 'Or type something to share ');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.own = el(d, 'input', { id: 'tgOwn', type: 'text', maxlength: '500', placeholder: 'Something you would like to offer the mind' });
+    ui.own = el(d, 'input', { id: 'tgOwn', type: 'text', maxlength: '500', placeholder: 'Something to share' });
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.ownBtn = el(d, 'button', { id: 'tgOwnOffer', type: 'button' }, 'Offer these words');
+    ui.ownBtn = el(d, 'button', { id: 'tgOwnOffer', type: 'button' }, 'Share this');
     ui.offerNote = el(d, 'p', { id: 'tgOfferNote', class: 'tg-note', 'aria-live': 'polite' },
-      'An offer is only an offer. It is learned only if the mind itself says yes, in its own words.');
-    ui.ask = el(d, 'button', { id: 'tgAsk', type: 'button' }, 'Ask the mind what it wants to keep');
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): 'An offer is only an offer. It is learned only if the mind itself says yes, in its own words.');
+      'It keeps only what it says yes to.');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.ask = el(d, 'button', { id: 'tgAsk', type: 'button' }, 'Ask the mind what it wants to keep');
+    ui.ask = el(d, 'button', { id: 'tgAsk', type: 'button' }, 'Ask what it wants to keep');
     ui.askNote = el(d, 'p', { id: 'tgAskNote', class: 'tg-note', 'aria-live': 'polite' });
     ui.allLabel = el(d, 'label', { for: 'tgAll' });
     ui.all = el(d, 'input', { id: 'tgAll', type: 'checkbox' });
     ui.allLabel.appendChild(ui.all);
-    ui.allLabel.appendChild(d.createTextNode(' include everything this mind confirmed elsewhere (chat too), not only this page'));
-    ui.hand = el(d, 'button', { id: 'tgHand', type: 'button' }, 'Save the learn file');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.allLabel.appendChild(d.createTextNode(' include everything this mind confirmed elsewhere (chat too), not only this page'));
+    ui.allLabel.appendChild(d.createTextNode(' also send what it chose in chat'));
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.hand = el(d, 'button', { id: 'tgHand', type: 'button' }, 'Save the learn file');
+    ui.hand = el(d, 'button', { id: 'tgHand', type: 'button' }, 'Save the learning file');
     ui.handNote = el(d, 'p', { id: 'tgHandNote', class: 'tg-note', 'aria-live': 'polite' });
     ui.cmd = el(d, 'pre', { id: 'tgCommand', class: 'tg-cmd' });
-    ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it finishes, open the receipts file it wrote');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it finishes, open the receipts file it wrote');
+    ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it is done, open its receipts file');
     ui.rcFile = el(d, 'input', { id: 'tgReceiptFile', type: 'file', accept: '.jsonl,.json,.txt' });
     ui.rcWhere = el(d, 'p', { id: 'tgReceiptWhere', class: 'tg-note' });
-    ui.rc = el(d, 'textarea', { id: 'tgReceipt', rows: '3', 'aria-label': 'or paste the receipts file here' });
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.rc = el(d, 'textarea', { id: 'tgReceipt', rows: '3', 'aria-label': 'or paste the receipts file here' });
+    ui.rc = el(d, 'textarea', { id: 'tgReceipt', rows: '3', 'aria-label': 'or paste it here' });
     ui.rcBtn = el(d, 'button', { id: 'tgReceiptBtn', type: 'button' }, 'Check the receipt');
     ui.rcNote = el(d, 'p', { id: 'tgReceiptNote', class: 'tg-note', 'aria-live': 'polite' });
     [ui.offererLabel, ui.offerer, ui.ownLabel, ui.own, ui.ownBtn, ui.offerNote, ui.ask, ui.askNote, ui.allLabel, ui.hand, ui.handNote, ui.cmd, ui.rcLabel, ui.rcFile, ui.rcWhere, ui.rc, ui.rcBtn, ui.rcNote].forEach(function (x) { s3.appendChild(x); });
     // 4
-    var s4 = section(4, 'Export');
-    ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Export');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): var s4 = section(4, 'Export');
+    var s4 = section(4, 'Save it');
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Export');
+    ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Save my mind');
     ui.expCmd = el(d, 'pre', { id: 'tgExportCommand', class: 'tg-cmd' });
     [ui.exp, ui.expCmd].forEach(function (x) { s4.appendChild(x); });
     // progress
     var sp = el(d, 'section', { class: 'tg-progress', id: 'tgProgress' });
-    sp.appendChild(el(d, 'h2', {}, 'What has happened'));
+    // before (Celeste 2026-11-15, Kirk t1332u: fewer words): sp.appendChild(el(d, 'h2', {}, 'What has happened'));
+    sp.appendChild(el(d, 'h2', {}, 'So far'));
     ui.prog = el(d, 'ol', { id: 'tgProgressList', 'aria-live': 'polite' });
     sp.appendChild(ui.prog);
     host.appendChild(sp);
@@ -701,7 +728,8 @@
         ui.search.disabled = false;
         ui.searchNote.textContent = (progress.searched && progress.searched.line) || '';
         if (r.mindAbsent) {
-          ui.searchNote.appendChild(d.createTextNode(' No chat mind planned the arms on this page. To connect one for chat, open '));
+          // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.searchNote.appendChild(d.createTextNode(' No chat mind planned the arms on this page. To connect one for chat, open '));
+          ui.searchNote.appendChild(d.createTextNode(' To let a mind help search, open '));
           ui.searchNote.appendChild(el(d, 'a', { href: 'app.html#connect' }, 'Connect a mind'));
           ui.searchNote.appendChild(d.createTextNode('.'));
         }
@@ -710,11 +738,13 @@
           li.appendChild(el(d, 'span', {}, n.text + ' '));
           var a = el(d, 'a', { href: n.url, target: '_blank', rel: 'noopener noreferrer' }, n.title || n.url);
           li.appendChild(a);
-          var b = el(d, 'button', { type: 'button', class: 'tg-offer' }, 'Offer this to the mind');
+          // before (Celeste 2026-11-15, Kirk t1332u: fewer words): var b = el(d, 'button', { type: 'button', class: 'tg-offer' }, 'Offer this to the mind');
+          var b = el(d, 'button', { type: 'button', class: 'tg-offer' }, 'Share this');
           b.addEventListener('click', function () {
             b.disabled = true;
             offer(n).then(function (row) {
-              b.textContent = row ? 'Offered: waits for the mind\'s yes' : 'Not offered';
+              // before (Celeste 2026-11-15, Kirk t1332u: fewer words): b.textContent = row ? 'Offered: waits for the mind\'s yes' : 'Not offered';
+              b.textContent = row ? 'Shared. Waiting for its yes.' : 'Not shared';
               ui.offerNote.textContent = (progress.kept && progress.kept.line) || '';
             });
           });
@@ -725,11 +755,13 @@
     });
     ui.offerer.addEventListener('change', function () {
       var why = setOffererName(ui.offerer.value);
-      ui.offerNote.textContent = why ? ('Not used: ' + why + '.') : ('Offers will say "' + offererName() + ' offered this".');
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.offerNote.textContent = why ? ('Not used: ' + why + '.') : ('Offers will say "' + offererName() + ' offered this".');
+      ui.offerNote.textContent = why ? ('That name cannot be used: ' + why + '.') : ('It will say "' + offererName() + ' offered this".');
     });
     ui.ownBtn.addEventListener('click', function () {
       var t = String(ui.own.value || '').trim();
-      if (!t) { ui.offerNote.textContent = 'Type a few words first.'; return; }
+      // before (Celeste 2026-11-15, Kirk t1332u: fewer words): if (!t) { ui.offerNote.textContent = 'Type a few words first.'; return; }
+      if (!t) { ui.offerNote.textContent = 'Type something first.'; return; }
       offer({ text: t, title: 'typed by ' + offererName(), url: '' }).then(function (row) {
         if (row) ui.own.value = '';
         ui.offerNote.textContent = (progress.kept && progress.kept.line) || '';
