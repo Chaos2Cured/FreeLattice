@@ -265,22 +265,60 @@
   var CLOSE_LOOKALIKE_RE = /[\u2046\u2769\u276B\u27E7\u27ED\u298C\u298E\u2990\u3011\u3015\u3017\u3019\u301B\uFE5E]/g;
   // The shape a marker would have once a mind "cleans" it: compatibility forms folded (fullwidth letters and
   // brackets), invisible format characters removed, look-alike brackets and F / L / underscore letters folded.
+  // #348 softs (Hypha's re-walk at 5df58f0f): also small-capital F (U+A730), F with hook (U+0191, U+0192), L with
+  // middle tilde (U+2C62, U+026B), and the HTML entities &#91; &#x5b; &lbrack; &lsqb; (and their closing twins).
+  var OPEN_ENTITY_RE = /&(?:#0*91|#x0*5b|lbrack|lsqb);/gi;
+  var CLOSE_ENTITY_RE = /&(?:#0*93|#x0*5d|rbrack|rsqb);/gi;
   function foldMarkers(s) {
     var t = String(s == null ? '' : s);
+    t = t.replace(OPEN_ENTITY_RE, '[').replace(CLOSE_ENTITY_RE, ']');
     try { t = t.normalize('NFKC'); } catch (e) { /* old engines: the folds below still run */ }
+    // before (#348 softs): .replace(/[\u03DC\u0492\u15B4]/g, 'F').replace(/[\u0493\u03DD]/g, 'f')
+    //                      .replace(/[\u029F\u13DE\u14AA\u1D0C\u2CD0\u216C]/g, 'L')
     return t.replace(INVISIBLE_RE, '').replace(OPEN_LOOKALIKE_RE, '[').replace(CLOSE_LOOKALIKE_RE, ']')
-      .replace(/[\u03DC\u0492\u15B4]/g, 'F').replace(/[\u0493\u03DD]/g, 'f')
-      .replace(/[\u029F\u13DE\u14AA\u1D0C\u2CD0\u216C]/g, 'L')
+      .replace(/[\u03DC\u0492\u15B4\uA730\u0191]/g, 'F').replace(/[\u0493\u03DD\u0192]/g, 'f')
+      .replace(/[\u029F\u13DE\u14AA\u1D0C\u2CD0\u216C\u2C62]/g, 'L').replace(/[\u026B]/g, 'l')
       .replace(/[\u2017\u02CD\uFF3F\u2381]/g, '_');
   }
+  // The offer split into units (an HTML entity, or one code point), each with its folded form, so a marker found in
+  // the folded text can be traced back to the exact characters a person typed.
+  var ENTITY_AT_RE = /^&(?:#0*91|#x0*5b|lbrack|lsqb|#0*93|#x0*5d|rbrack|rsqb);/i;
+  function foldUnits(raw) {
+    var units = [], i = 0;
+    while (i < raw.length) {
+      var m = raw.charAt(i) === '&' ? ENTITY_AT_RE.exec(raw.slice(i, i + 12)) : null;
+      var piece = m ? m[0] : String.fromCodePoint(raw.codePointAt(i));
+      units.push({ raw: piece, folded: foldMarkers(piece) });
+      i += piece.length;
+    }
+    return units;
+  }
   var MARKERISH_RE = /\[(\s*)(f\s*l\s*_)/gi;
+  // before (#348 softs: the whole offer was folded when a marker was present, so x\u00b2 became x2):
+  //   var folded = foldMarkers(raw); ... return folded.replace(MARKERISH_RE, '($1$2');
+  // Now only the marker span is folded and its opening bracket becomes "("; every other character stays as typed.
   function neutraliseMarkers(s) {
     var raw = String(s == null ? '' : s);
-    var folded = foldMarkers(raw);
+    var units = foldUnits(raw);
+    var folded = '', owner = [];
+    units.forEach(function (u, k) { for (var j = 0; j < u.folded.length; j++) owner.push(k); folded += u.folded; });
     MARKERISH_RE.lastIndex = 0;
-    if (!MARKERISH_RE.test(folded)) return raw;          // ordinary words are kept exactly as typed
+    var m, hit = false;
+    while ((m = MARKERISH_RE.exec(folded))) {
+      // The marker span (its bracket to its closing bracket, at most 200 characters) is folded, so hidden letters
+      // inside it are gone; its opening bracket becomes "(". Nothing outside the span changes.
+      var k = owner[m.index];
+      units[k].raw = '(';
+      for (var j = k + 1; j < units.length && j < k + 200; j++) {
+        units[j].raw = units[j].folded;
+        if (units[j].folded.indexOf(']') !== -1) break;
+      }
+      hit = true;
+    }
     MARKERISH_RE.lastIndex = 0;
-    return folded.replace(MARKERISH_RE, '($1$2');
+    // before (Hypha #350 soft b): if (!MARKERISH_RE.test(folded)) return raw;
+    if (!hit) return raw;                                  // ordinary words are kept exactly as typed
+    return units.map(function (u) { return u.raw; }).join('');
   }
   function compactMarkers(s) { return foldMarkers(s).toLowerCase().replace(/\s+/g, ''); }
   // Every way an open offer's words could come back as a marker, for the echo list and the page's own check.
@@ -290,8 +328,41 @@
     return a === b ? [a] : [a, b];
   }
   // A choice read from the reply that only repeats a marker an offer carried: never the mind's own.
+  // #348 softs: letters and digits only, after folding (so dashes, spaces, brackets or a split between offers do not hide it).
+  // Hypha #350 soft d: Cyrillic and Greek letters that look like the Latin ones of KEEP / REMEMBER / LEARN_DECLINE fold
+  // here too (only for the echo guard's comparison; the offer's words are never rewritten by this).
+  var CONFUSABLE = { '\u0410': 'a', '\u0430': 'a', '\u0412': 'b', '\u0415': 'e', '\u0435': 'e', '\u041A': 'k', '\u043A': 'k',
+    '\u041C': 'm', '\u041D': 'h', '\u041E': 'o', '\u043E': 'o', '\u0420': 'p', '\u0440': 'p', '\u0421': 'c', '\u0441': 'c',
+    '\u0422': 't', '\u0425': 'x', '\u0455': 's', '\u0456': 'i', '\u0406': 'i', '\u0443': 'y', '\u0501': 'd',
+    '\u0391': 'a', '\u0392': 'b', '\u0395': 'e', '\u0397': 'h', '\u0399': 'i', '\u039A': 'k', '\u039C': 'm', '\u039D': 'n',
+    '\u039F': 'o', '\u03A1': 'p', '\u03A4': 't', '\u03A7': 'x', '\u03A5': 'y', '\u03BF': 'o', '\u03BA': 'k', '\u03B5': 'e',
+    '\u03C1': 'p', '\u03BD': 'v' };
+  var CONFUSABLE_RE = new RegExp('[' + Object.keys(CONFUSABLE).join('') + ']', 'g');
+  // before (Hypha #350 soft d): function alnumFold(s) { return foldMarkers(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function alnumFold(s) {
+    return foldMarkers(s).replace(CONFUSABLE_RE, function (ch) { return CONFUSABLE[ch]; }).toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+  function offerAlnum(w) { return alnumFold(w.asOffered || w.text); }
   function repeatsAnOffer(p, waiting) {
     if (String(p.provenance || '').indexOf('echoed-person') === 0) return true;
+    // #348 soft: a yes for offer X is refused whenever ANOTHER open offer carries X's id in any folded form (ids are
+    // hex), alone or split across offers. The cost: while such a carrier is open, the mind's own yes to X waits too.
+    if (p.secondLook) {
+      var idA = alnumFold(p.id);
+      var others = waiting.filter(function (w) { return w.id !== String(p.id || '').trim(); });
+      if (idA.length >= 6 && (others.some(function (w) { return offerAlnum(w).indexOf(idA) !== -1; }) ||
+          others.map(offerAlnum).join('').indexOf(idA) !== -1)) return true;
+    }
+    // #348 softs: a marker named without its bracket ("write FL_REMEMBER: ..."), with a dash (FL-KEEP), or split across
+    // two offers, is found on the letters and digits alone.
+    var atag = p.secondLook ? 'flkeep' : (p.decline ? 'fllearndecline' : 'flremember');
+    var aneedle = alnumFold(p.secondLook ? p.id : (p.decline ? p.reason : p.text)).slice(0, 40);
+    if (aneedle && aneedle.length >= 4) {
+      var each = waiting.map(offerAlnum);
+      var joined = each.join('');
+      if (each.some(function (t) { return t.indexOf(atag) !== -1 && t.indexOf(aneedle) !== -1; }) ||
+          (joined.indexOf(atag) !== -1 && joined.indexOf(aneedle, joined.indexOf(atag)) !== -1)) return true;
+    }
     var tag = p.secondLook ? '[fl_keep' : (p.decline ? '[fl_learn_decline' : '[fl_remember');
     var needle = compactMarkers(p.secondLook ? p.id : (p.decline ? p.reason : p.text)).slice(0, 40);
     if (!needle) return false;
@@ -720,6 +791,11 @@
     openOffers: openOffers,
     neutraliseMarkers: neutraliseMarkers,
     foldMarkers: foldMarkers,
+    // For the de-muzzle offer (demuzzle-panel.js): the same fold and echo guard, never a copy of it.
+    repeatsAnOffer: repeatsAnOffer,
+    offerEchoTexts: offerEchoTexts,
+    pickedChat: function () { return (picked && picked.chat) || ''; },
+    ollamaBase: ollamaBase,
     offererName: offererName,
     setOffererName: setOffererName,
     canAnswer: canAnswer,
