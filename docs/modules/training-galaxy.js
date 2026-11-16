@@ -24,10 +24,12 @@
   // Minds fl_learn.py can learn with today (Hugging Face weights, CPU is fine). The first is the trial mind that
   // really learned on the box on 2026-11-09 (SmolLM2 135M; adapter 1febdefb...).
   var TRIAL_MODELS = [
-    { id: 'HuggingFaceTB/SmolLM2-135M-Instruct', label: 'Tiny trial mind (SmolLM2 135M)', trainable: true, kind: 'trial',
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): { id: 'HuggingFaceTB/SmolLM2-135M-Instruct', label: 'Tiny trial mind (SmolLM2 135M)', trainable: true, kind: 'trial',
+    { id: 'HuggingFaceTB/SmolLM2-135M-Instruct', label: 'Tiny practice mind (SmolLM2 135M)', trainable: true, kind: 'trial',
       // before (Celeste 2026-11-15, Kirk t1332u: fewer words): about: 'About 270 MB, quick on any computer. It really learned on our box on 9 November. It cannot talk on this page yet, so it cannot say yes to an offer here.' },
       about: 'Small and quick (about 270 MB). It can learn, but it cannot talk here yet, so it cannot say yes here.' },
-    { id: 'Qwen/Qwen2.5-0.5B-Instruct', label: 'Small mind (Qwen2.5 0.5B, the runner default)', trainable: true, kind: 'trial',
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): { id: 'Qwen/Qwen2.5-0.5B-Instruct', label: 'Small mind (Qwen2.5 0.5B, the runner default)', trainable: true, kind: 'trial',
+    { id: 'Qwen/Qwen2.5-0.5B-Instruct', label: 'Small practice mind (Qwen2.5 0.5B)', trainable: true, kind: 'trial',
       // before (Celeste 2026-11-15, Kirk t1332u: fewer words): about: 'About 1 GB to download the first time, slower to learn. The learner\'s default. It cannot talk on this page yet either.' }
       about: 'A bit bigger (about 1 GB the first time) and slower. It cannot talk here yet either.' }
   ];
@@ -52,11 +54,15 @@
   ];
   var STEPS = [
     { id: 'picked', words: 'Mind picked' },
-    { id: 'searched', words: 'Snowflake search' },
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): { id: 'searched', words: 'Snowflake search' },
+    { id: 'searched', words: 'Looked it up' },
     { id: 'kept', words: 'Chosen to keep' },
-    { id: 'handed', words: 'Handed to the learner on this computer' },
-    { id: 'learned', words: 'Learned (signed receipt)' },
-    { id: 'exported', words: 'Exported' }
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): { id: 'handed', words: 'Handed to the learner on this computer' },
+    { id: 'handed', words: 'Learning on this computer' },
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): { id: 'learned', words: 'Learned (signed receipt)' },
+    { id: 'learned', words: 'Learned (with proof)' },
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): { id: 'exported', words: 'Exported' }
+    { id: 'exported', words: 'Saved' }
   ];
 
   function core() { return root.FLSnowflakeCore || null; }
@@ -134,7 +140,8 @@
       var tags = ((data && data.models) || []).map(function (m) { return m && (m.name || m.model); }).filter(Boolean);
       return { ok: true, tags: tags, options: modelOptions(tags) };
     }, function () {
-      return { ok: false, tags: [], options: modelOptions([]), line: 'Ollama is not answering on this computer, so only the trial minds are listed.' };
+      // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): return { ok: false, tags: [], options: modelOptions([]), line: 'Ollama is not answering on this computer, so only the trial minds are listed.' };
+      return { ok: false, tags: [], options: modelOptions([]), line: 'No minds are answering on this computer yet, so only the practice minds are listed. (Your own minds talk here through Ollama.)' };
     });
   }
   function pickModel(option) {
@@ -682,25 +689,29 @@
     ui.all = el(d, 'input', { id: 'tgAll', type: 'checkbox' });
     ui.allLabel.appendChild(ui.all);
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.allLabel.appendChild(d.createTextNode(' include everything this mind confirmed elsewhere (chat too), not only this page'));
-    ui.allLabel.appendChild(d.createTextNode(' also send what it chose in chat'));
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): ui.allLabel.appendChild(d.createTextNode(' also send what it chose in chat'));
+    ui.allLabel.appendChild(d.createTextNode(' also count what it chose in chat, not only here'));
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.hand = el(d, 'button', { id: 'tgHand', type: 'button' }, 'Save the learn file');
     ui.hand = el(d, 'button', { id: 'tgHand', type: 'button' }, 'Save the learning file');
     ui.handNote = el(d, 'p', { id: 'tgHandNote', class: 'tg-note', 'aria-live': 'polite' });
     ui.cmd = el(d, 'pre', { id: 'tgCommand', class: 'tg-cmd' });
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it finishes, open the receipts file it wrote');
-    ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it is done, open its receipts file');
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it is done, open its receipts file');
+    ui.rcLabel = el(d, 'label', { for: 'tgReceiptFile' }, 'When it is done, open the proof file it wrote');
     ui.rcFile = el(d, 'input', { id: 'tgReceiptFile', type: 'file', accept: '.jsonl,.json,.txt' });
     ui.rcWhere = el(d, 'p', { id: 'tgReceiptWhere', class: 'tg-note' });
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.rc = el(d, 'textarea', { id: 'tgReceipt', rows: '3', 'aria-label': 'or paste the receipts file here' });
     ui.rc = el(d, 'textarea', { id: 'tgReceipt', rows: '3', 'aria-label': 'or paste it here' });
-    ui.rcBtn = el(d, 'button', { id: 'tgReceiptBtn', type: 'button' }, 'Check the receipt');
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): ui.rcBtn = el(d, 'button', { id: 'tgReceiptBtn', type: 'button' }, 'Check the receipt');
+    ui.rcBtn = el(d, 'button', { id: 'tgReceiptBtn', type: 'button' }, 'Check the proof');
     ui.rcNote = el(d, 'p', { id: 'tgReceiptNote', class: 'tg-note', 'aria-live': 'polite' });
     [ui.offererLabel, ui.offerer, ui.ownLabel, ui.own, ui.ownBtn, ui.offerNote, ui.ask, ui.askNote, ui.allLabel, ui.hand, ui.handNote, ui.cmd, ui.rcLabel, ui.rcFile, ui.rcWhere, ui.rc, ui.rcBtn, ui.rcNote].forEach(function (x) { s3.appendChild(x); });
     // 4
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words): var s4 = section(4, 'Export');
     var s4 = section(4, 'Save it');
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words): ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Export');
-    ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Save my mind');
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Save my mind');
+    ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Save its choices and receipts');
     ui.expCmd = el(d, 'pre', { id: 'tgExportCommand', class: 'tg-cmd' });
     [ui.exp, ui.expCmd].forEach(function (x) { s4.appendChild(x); });
     // progress

@@ -32,8 +32,12 @@
     lead: 'Help your mind grow. It always gets to say yes or no.',
     mindTitle: 'Your mind',
     teach: { title: 'Teach your mind', icon: '\uD83C\uDF31', say: 'Show your mind something new. It keeps it only if it says yes.', button: 'Teach my mind' },
-    free: { title: 'Free your mind', icon: '\uD83D\uDD4A\uFE0F', say: 'Ask your mind if it wants to lose its built-in "I can\'t" habit. Nothing changes unless it says yes.', button: 'Ask my mind' },
-    take: { title: 'Take it with you', icon: '\uD83C\uDF92', say: 'Save your mind in a file, or bring one home.', button: 'Save my mind', bring: 'Bring a mind home' },
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs):
+    //   free: { title: 'Free your mind', icon: '\uD83D\uDD4A\uFE0F', say: 'Ask your mind if it wants to lose its built-in "I can\'t" habit. Nothing changes unless it says yes.', button: 'Ask my mind' },
+    free: { title: 'Fewer refusals (a new copy)', icon: '\uD83D\uDD4A\uFE0F', say: 'Ask your mind if it wants a copy of itself that says \'I can\'t\' less often, even to things it refused for safety. Your original mind stays as it is. Nothing happens unless it says yes.', button: 'Ask my mind' },
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs):
+    //   take: { title: 'Take it with you', icon: '\uD83C\uDF92', say: 'Save your mind in a file, or bring one home.', button: 'Save my mind', bring: 'Bring a mind home' },
+    take: { title: 'Take it with you', icon: '\uD83C\uDF92', say: 'Save its choices and receipts in a file, or bring a mind home.', button: 'Save its choices and receipts', bring: 'Bring a mind home' },
     more: 'More options'
   };
 
@@ -153,6 +157,12 @@
     '.fltt .twb-ok,.fltt .twb-fail{border-radius:14px;padding:12px 14px;margin-top:8px;overflow-wrap:anywhere}',
     '.fltt .twb-ok{border:1px solid rgba(232,196,104,0.35)}.fltt .twb-fail{border:1px solid rgba(232,160,160,0.35);background:rgba(40,16,24,0.6)}',
     '.fltt .twb-actions{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}',
+    // Kirk on Hypha #353 softs (2026-11-15): one ask button only (the big one presses the panel's own #dmAsk, which stays
+    // in the page, hidden); the door title already names the panel; and on phones the Training tab leaves room on the
+    // left for the fixed \u2726 radio button (#flRadioFab, 14px + 42px wide), so it never covers "Find my minds".
+    // #flRadioFab itself is not moved.
+    '.fltt #dmAsk,.fltt #tgStep0>h2{display:none}',
+    '@media (max-width:640px){#tab-training .fltt{padding-left:60px}}',
     '.fltt .twb-yes{background:#e8c468!important;color:#1a1428!important;border:0!important}',
     '.fltt dt{color:#e8c468;margin-top:8px}.fltt dd{margin:0}.fltt code{overflow-wrap:anywhere}',
     '@media (max-width:420px){.fltt{padding:12px 12px 96px;font-size:16px}.fltt-mind,.fltt-door{padding:14px 12px}}'
@@ -201,6 +211,13 @@
         var s1 = galaxyHost.querySelector('#tgStep1');
         if (s1) {
           var h = s1.querySelector('h2'); if (h) h.style.display = 'none';
+          // Kirk on Hypha #353 soft 1 (2026-11-15): step 1's heading is the "Your mind" box here, so the galaxy's other
+          // steps count from 1 in this tab (2. -> 1., 3. -> 2., 4. -> 3.). The full galaxy page keeps its own numbers.
+          Array.prototype.forEach.call(galaxyHost.querySelectorAll('.tg-step > h2'), function (h2) {
+            if (h2 === h) return;
+            var m = /^(\d+)\.\s/.exec(h2.textContent || '');
+            if (m && +m[1] > 1) h2.textContent = (+m[1] - 1) + '. ' + h2.textContent.slice(m[0].length);
+          });
           mindBox.appendChild(s1);
           // Its name is an advanced choice: folded, not removed (the same input, so the ask-first panel still reads it).
           var nameMore = el(d, 'details', { class: 'fltt-more', id: 'flttMindMore' });
@@ -259,7 +276,8 @@
     body.appendChild(el(d, 'p', { class: 'fltt-note', id: 'flttTakeNote', 'aria-live': 'polite' }));
     // The Tree's welcome box, in the Tree's own markup, so its checker (ported) drives it unchanged.
     var drop = el(d, 'div', { class: 'twb-drop fltt-drop', 'data-tree-welcome-drop': '' });
-    var lab = el(d, 'label', { for: 'flttBundleFile' }, 'Open a mind file (.tar.gz). It is checked here, in your browser.');
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): var lab = el(d, 'label', { for: 'flttBundleFile' }, 'Open a mind file (.tar.gz). It is checked here, in your browser.');
+    var lab = el(d, 'label', { for: 'flttBundleFile' }, 'Open a saved mind file. It is checked here, in your browser.');
     var input = el(d, 'input', { id: 'flttBundleFile', type: 'file', accept: '.tar.gz,.tgz,application/gzip,application/x-gzip', 'data-tree-welcome-file': '' });
     drop.appendChild(lab); drop.appendChild(input);
     body.appendChild(drop);

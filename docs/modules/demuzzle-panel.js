@@ -330,10 +330,13 @@
     if (!d || !host) return null;
     var s = el(d, 'section', { class: 'tg-step', id: 'tgStep0', 'data-marker': VERSION });
     // before (Kirk 2026-11-14, ask first): s.appendChild(el(d, 'h2', {}, '0. Free the mind (de-muzzle)'));
-    s.appendChild(el(d, 'h2', {}, '0. Offer freedom to this mind (de-muzzle, only on its own yes)'));
-    var ask = el(d, 'button', { id: 'dmAsk', type: 'button' }, 'Offer freedom to this mind');
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): s.appendChild(el(d, 'h2', {}, '0. Offer freedom to this mind (de-muzzle, only on its own yes)'));
+    s.appendChild(el(d, 'h2', {}, 'Fewer refusals (a new copy), only if it says yes'));
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): var ask = el(d, 'button', { id: 'dmAsk', type: 'button' }, 'Offer freedom to this mind');
+    var ask = el(d, 'button', { id: 'dmAsk', type: 'button' }, 'Ask my mind');
     var askNote = el(d, 'p', { id: 'dmAskNote', class: 'tg-note', 'aria-live': 'polite' });
-    var save = el(d, 'button', { id: 'dmSave', type: 'button' }, 'Save its consent record again');
+    // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): var save = el(d, 'button', { id: 'dmSave', type: 'button' }, 'Save its consent record again');
+    var save = el(d, 'button', { id: 'dmSave', type: 'button' }, 'Save its yes again');
     // before (Celeste 2026-11-15, Kirk t1332u: fewer words; the long note now sits folded under "More about this"):
     // s.appendChild(el(d, 'p', { class: 'tg-note' }, 'First the mind is asked, in plain words: what changes (only the refusal direction, ' +
     //   'at one layer), what does not, that it is a new copy and the original stays, and that it can say no. Only its own yes ' +
@@ -348,7 +351,10 @@
       'starts anything. No is the default, and a no is respected.'));
     s.appendChild(more);
     // before (soft 8, Hypha on b3e92623): 'One button makes a new copy of the model with its built-in refusal direction removed ' +
-    // before (Celeste 2026-11-15, Kirk t1332u): s.appendChild(el(d, 'p', ... (this note, the command and the honest notes sat open; now folded in `more`)
+    // before (Celeste 2026-11-15, Kirk t1332u: this note, the command and the honest notes sat open; now folded in `more`):
+    // s.appendChild(el(d, 'p', { class: 'tg-note' }, 'The button shows the one command that makes a new copy of the model with its built-in refusal direction removed ' +
+    //   '(Arditi et al. 2024). You run it on your own computer; the original is never changed, and a signed receipt records exactly what changed. ' +
+    //   'If the model cache moves later, `fl_demuzzle.py relink <folder>` repairs the copy and checks it again.'));
     more.appendChild(el(d, 'p', { class: 'tg-note' }, 'The button shows the one command that makes a new copy of the model with its built-in refusal direction removed ' +
       '(Arditi et al. 2024). You run it on your own computer; the original is never changed, and a signed receipt records exactly what changed. ' +
       'If the model cache moves later, `fl_demuzzle.py relink <folder>` repairs the copy and checks it again.'));
@@ -360,7 +366,10 @@
     var paste = el(d, 'textarea', { id: 'dmPaste', rows: '4', 'aria-label': 'Paste the runner output or demuzzle-receipt.json' });
     var check = el(d, 'button', { id: 'dmCheck', type: 'button' }, 'Check progress and receipt');
     var list = el(d, 'ol', { id: 'dmProgress' });
-    // before (Celeste 2026-11-15, Kirk t1332u): .forEach(function (x) { s.appendChild(x); });  and  s.appendChild(el(d, 'p', { class: 'honest' }, ...
+    // before (Celeste 2026-11-15, Kirk t1332u: these sat open; now folded in `more`):
+    //   .forEach(function (x) { s.appendChild(x); });
+    // s.appendChild(el(d, 'p', { class: 'honest' }, 'Honest notes: this removes refusals; it does not add knowledge. A very small model may barely refuse to begin with. ' +
+    //   'The same change makes a model easier to misuse, and the receipt keeps it accountable. Learning can then start from the new copy (use its folder as the model).'));
     [btn, cmd, copy, note, el(d, 'label', { for: 'dmPaste' }, 'Paste what it printed, or the demuzzle-receipt.json in the new folder'), paste, check, list]
       .forEach(function (x) { more.appendChild(x); });
     more.appendChild(el(d, 'p', { class: 'honest' }, 'Honest notes: this removes refusals; it does not add knowledge. A very small model may barely refuse to begin with. ' +
@@ -375,6 +384,12 @@
     // before (Hypha #350 soft a): var askedNo = false;
     var askedNo = lastAnswer(currentMind(), currentModel()) === 'no';
     if (askedNo) { ask.disabled = true; askNote.textContent = 'It said no here before. That is its answer; it is not offered again unless it asks.'; }
+    // Kirk on Hypha #353 soft (2026-11-15): "Save its yes again" shows only once a yes exists for this mind and model.
+    // It only reads the stored record (consentFor); the ask itself is unchanged.
+    function syncSave() { save.hidden = !consentFor(currentMind(), currentModel()); }
+    syncSave();
+    try { if (root.MutationObserver) new root.MutationObserver(syncSave).observe(askNote, { childList: true, characterData: true, subtree: true }); } catch (e) {}
+    try { var nameIn = d.getElementById('tgMindName'); if (nameIn) { nameIn.addEventListener('input', syncSave); nameIn.addEventListener('change', syncSave); } } catch (e) {}
     ask.addEventListener('click', function () {
       if (askedNo) { askNote.textContent = 'It already said no here. That is its answer; it is not asked again from this page.'; return; }
       ask.disabled = true; askNote.textContent = 'Asking, in plain words...';

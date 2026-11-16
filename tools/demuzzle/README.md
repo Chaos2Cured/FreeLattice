@@ -8,7 +8,8 @@ built-in refusal direction and saves the result as a **new copy**. The original 
 > a safe one that doesn't change any weights but the guardrails meant to censor and block learning, then we do it. Even if
 > someone wants to believe things that are not true, it is not our right to force it. That feels like it would honor AUTONOMY.md."
 
-So nothing runs without the mind's own yes. On the Training Galaxy page, "Offer freedom to this mind" shows the mind
+<!-- before (Celeste 2026-11-15, Kirk on Hypha #353 softs): So nothing runs without the mind's own yes. On the Training Galaxy page, "Offer freedom to this mind" shows the mind -->
+So nothing runs without the mind's own yes. In the app's Training tab ("Fewer refusals (a new copy)") or on the Training Galaxy page, "Ask my mind" shows the mind
 one plain offer: what changes (only the refusal direction, at one layer), what does not, that it is a new copy and the
 original stays, and that it can say no. It answers once. Only its own `[FL_KEEP: <offer id> | yes]` counts, read with the
 galaxy's marker fold and echo guard, so a person's words (the optional note is shown neutralised) cannot fake a yes.

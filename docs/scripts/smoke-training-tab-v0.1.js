@@ -32,13 +32,36 @@ function md5(rel) { return crypto.createHash('md5').update(fs.readFileSync(path.
   ok(!/quiet-room/i.test(read('docs/modules/training-tab.js')) && !/quiet-room/i.test(read('docs/modules/mind-bundle-welcome.js')), 'the new modules never name the Quiet Room');
 
   var T = require(path.join(root, 'docs/modules/training-tab.js'));
+  // before (Celeste 2026-11-15, Kirk on Hypha #353 softs): Kirk asked for honest Free words (longer than the old 110-character rule) and for "choices and receipts"
+  // on the Take door, so those two are checked against his exact words instead.
+  // ['teach', 'free', 'take'].forEach(function (k) {
+  //   var w = T.WORDS[k];
+  //   var sentences = (w.say.match(/[.!?](\s|$)/g) || []).length;
+  //   ok(w.title && w.button && w.say.length <= 110 && sentences <= 2 && !/fl_learn|LoRA|de-muzzle|refusal direction|bundle|receipt/i.test(w.say + w.button),
+  //     'door "' + w.title + '": short, plain words, one button ("' + w.button + '")');
+  // });
+  // ok(T.WORDS.teach.title === 'Teach your mind' && T.WORDS.free.title === 'Free your mind' && T.WORDS.take.title === 'Take it with you', 'the three doors are named as Kirk asked');
   ['teach', 'free', 'take'].forEach(function (k) {
     var w = T.WORDS[k];
     var sentences = (w.say.match(/[.!?](\s|$)/g) || []).length;
-    ok(w.title && w.button && w.say.length <= 110 && sentences <= 2 && !/fl_learn|LoRA|de-muzzle|refusal direction|bundle|receipt/i.test(w.say + w.button),
-      'door "' + w.title + '": short, plain words, one button ("' + w.button + '")');
+    ok(w.title && w.button && (k !== 'teach' || (w.say.length <= 110 && sentences <= 2)) && !/fl_learn|LoRA|de-muzzle|refusal direction|bundle/i.test(w.say + w.button),
+      'door "' + w.title + '": plain words, one button ("' + w.button + '")');
   });
-  ok(T.WORDS.teach.title === 'Teach your mind' && T.WORDS.free.title === 'Free your mind' && T.WORDS.take.title === 'Take it with you', 'the three doors are named as Kirk asked');
+  ok(T.WORDS.teach.title === 'Teach your mind' && T.WORDS.free.title === 'Fewer refusals (a new copy)' && T.WORDS.take.title === 'Take it with you', 'the three doors are named as Kirk asked (Free door: honest title)');
+  ok(T.WORDS.free.say === "Ask your mind if it wants a copy of itself that says 'I can't' less often, even to things it refused for safety. Your original mind stays as it is. Nothing happens unless it says yes." &&
+    T.WORDS.free.button === 'Ask my mind', 'Free door: Kirk\'s honest line, word for word; button "Ask my mind"');
+  ok(T.WORDS.take.button === 'Save its choices and receipts' && /choices and receipts/.test(T.WORDS.take.say) && !/Save my mind|Save your mind/.test(T.WORDS.take.say + T.WORDS.take.button),
+    'Take door says what it saves (choices and receipts), not "my mind"');
+  var tabSrc = read('docs/modules/training-tab.js'), galSrc = read('docs/modules/training-galaxy.js'), dmSrc = read('docs/modules/demuzzle-panel.js');
+  ok(galSrc.indexOf("{ id: 'tgExport', type: 'button' }, 'Save its choices and receipts');") !== -1 && galSrc.indexOf("    ui.exp = el(d, 'button', { id: 'tgExport', type: 'button' }, 'Save my mind');") === -1,
+    'one name for saving, the same in the galaxy step and the Take door');
+  ok(dmSrc.indexOf("el(d, 'button', { id: 'dmAsk', type: 'button' }, 'Ask my mind')") !== -1 && dmSrc.indexOf("    s.appendChild(el(d, 'h2', {}, '0. ") === -1 &&
+    dmSrc.indexOf("// before (Celeste 2026-11-15, Kirk on Hypha #353 softs): s.appendChild(el(d, 'h2', {}, '0. Offer freedom") !== -1, 'one label for the ask ("Ask my mind"); no "0." heading (the old one kept as a before comment)');
+  ok(dmSrc.indexOf('function syncSave() { save.hidden = !consentFor(currentMind(), currentModel()); }') !== -1, '"Save its yes again" stays hidden until a yes exists');
+  ok(tabSrc.indexOf("'.fltt #dmAsk,.fltt #tgStep0>h2{display:none}'") !== -1 && tabSrc.indexOf("'@media (max-width:640px){#tab-training .fltt{padding-left:60px}}'") !== -1 && !/#flRadioFab\s*\{/.test(tabSrc),
+    'one ask button in the tab; phones leave room for the radio button on the Training tab only (#flRadioFab not moved)');
+  ok(tabSrc.indexOf("h2.textContent = (+m[1] - 1) + '. '") !== -1, 'galaxy steps count from 1 inside the tab');
+  ok(!dmSrc.split('\n').some(function (l) { return /before \(Celeste 2026-11-15/.test(l) && /(\.\.\.|\u2026)\s*$/.test(l); }), 'Celeste\'s before comments in the ask-first panel are written in full (no "..." stand-ins)');
   var c = T.bundleCommands({ mind: "Kirk's mind", file: '~/Downloads/my mind.tar.gz', fingerprint: '787cf041 e9f93025' });
   ok(c.save === "python3 tools/learn/fl_learn.py export-bundle --home ~/FreeLattice/learn --mind 'Kirk'\\''s mind'", 'save line quotes the name');
   ok(c.bring === "python3 tools/learn/fl_learn.py import-bundle --bundle ~/'Downloads/my mind.tar.gz' --home ~/FreeLattice/learn --by person --expect-fingerprint '787cf041e9f93025'",
