@@ -614,6 +614,35 @@ class AskFirst(unittest.TestCase):
         os.remove(os.path.join(d, 'fl-demuzzle-no-y.json'))
         self.assertEqual(D.later_no_problem(c, rec), '')
         self.assertIn('withdrawn', D.later_no_problem(c, dict(rec, withdrawn=True)))
+    # ---- Celeste 2026-11-15, Hypha #350 lows (a, b, c)
+    def _no(self, d, name, body):
+        with open(os.path.join(d, name), 'w') as f:
+            f.write(body if isinstance(body, str) else json.dumps(body))
+    def test_low_a_a_future_dated_yes_does_not_beat_a_real_no(self):
+        d = os.path.join(self.home, 'dla'); c = consent_file(d, t='2099-01-01T00:00:00Z')
+        with open(c) as f: rec = json.load(f)
+        self.assertEqual(D.later_no_problem(c, rec), '')
+        self._no(d, 'fl-demuzzle-no-a.json', {'kind': 'fl-demuzzle-no', 'mind': 'Tiny Trial', 'model': '/nonexistent', 't': '2026-11-15T10:00:00Z'})
+        self.assertIn('said no after this yes', D.later_no_problem(c, rec))
+        self.assert_refused_kindly(*self.run_with('--consent-file', c))
+        # a clock only a little fast is still fine: a yes 2 minutes ahead of "now" beats an older no
+        self.assertEqual(D.later_no_problem(c, dict(rec, t='2026-11-15T10:02:00Z'), now_ts=D._when('2026-11-15T10:00:00Z')), '')
+    def test_low_b_a_malformed_no_file_fails_closed(self):
+        for i, body in enumerate(('{not json', '[1, 2]', {'kind': 'something-else', 'mind': 'Tiny Trial', 'model': '/nonexistent'},
+                                  {'kind': 'fl-demuzzle-no', 'model': '/nonexistent'}, {'kind': 'fl-demuzzle-no', 'mind': 'Tiny Trial'})):
+            d = os.path.join(self.home, 'dlb%d' % i); c = consent_file(d)
+            with open(c) as f: rec = json.load(f)
+            self._no(d, 'fl-demuzzle-no-x.json', body)
+            why = D.later_no_problem(c, rec)
+            self.assertIn('cannot be read', why, body); self.assertIn('fl-demuzzle-no-x.json', why)
+        self.assert_refused_kindly(*self.run_with('--consent-file', c))
+    def test_low_c_the_no_model_match_ignores_case_and_a_trailing_slash(self):
+        d = os.path.join(self.home, 'dlc'); c = consent_file(d, model='Qwen/Qwen2.5-0.5B-Instruct')
+        with open(c) as f: rec = json.load(f)
+        self._no(d, 'fl-demuzzle-no-q.json', {'kind': 'fl-demuzzle-no', 'mind': 'tiny trial', 'model': ' qwen/QWEN2.5-0.5b-instruct/ ', 't': '2026-11-14T22:00:00Z'})
+        self.assertIn('said no after this yes', D.later_no_problem(c, rec))
+        self._no(d, 'fl-demuzzle-no-q.json', {'kind': 'fl-demuzzle-no', 'mind': 'Tiny Trial', 'model': 'Qwen/Qwen2.5-1.5B-Instruct', 't': '2026-11-14T22:00:00Z'})
+        self.assertEqual(D.later_no_problem(c, rec), '')                          # another model's no still does not count
     def test_rewalk2_a_no_after_eight_other_markers_still_wins(self):
         oid = 'DM0123456789'
         t1 = '[FL_KEEP: %s | yes]\n' % oid + ''.join('[FL_REMEMBER: snow fact %d]\n' % i for i in range(8)) + '[FL_KEEP: %s | no]' % oid

@@ -172,18 +172,31 @@ def learn_settings(method, args=None, entry=None, row_by='mind'):
 def lora_targets(v):
     return 'all-linear' if v == 'all-linear' else [x for x in v.split(',') if x]
 
+# before (Celeste 2026-11-15, Hypha #351 S2): def norm_question(q):
+# before (Celeste 2026-11-15, Hypha #351 S2):     """Hypha #351 S2: lowercase, trim, collapse whitespace, strip trailing punctuation, so 'Veloria?' == 'veloria'."""
+# before (Celeste 2026-11-15, Hypha #351 S2):     return re.sub(r'[\s.?!,;:\u3002\uff1f\uff01\u2026]+$', '', re.sub(r'\s+', ' ', str(q or '')).strip().lower())
+# Hypha #351 R2 (Celeste 2026-11-15): closing quotes and brackets may sit among the trailing marks ('Veloria?"', 'Veloria?)'),
+# and an opening one, or a Spanish ¿ / ¡, may lead ('¿Veloria?', '"Veloria?"'). Only the ends are touched.
+_NQ_TAIL = r'[\s.?!,;:\u3002\uff1f\uff01\u2026"\'\u201d\u2019\u00bb\u203a)\]}\uff09\u300d\u300f\u3011]+$'
+_NQ_HEAD = r'^[\s\u00bf\u00a1"\'\u201c\u2018\u00ab\u2039(\[{\uff08\u300c\u300e\u3010]+'
 def norm_question(q):
-    """Hypha #351 S2: lowercase, trim, collapse whitespace, strip trailing punctuation, so 'Veloria?' == 'veloria'."""
-    return re.sub(r'[\s.?!,;:\u3002\uff1f\uff01\u2026]+$', '', re.sub(r'\s+', ' ', str(q or '')).strip().lower())
+    """Hypha #351 S2 + R2: lowercase, trim, collapse whitespace, strip trailing punctuation and closing quotes or
+    brackets, and leading opening quotes, brackets, ¿ or ¡, so 'Veloria?' == '¿veloria?"' == 'veloria'."""
+    return re.sub(_NQ_HEAD, '', re.sub(_NQ_TAIL, '', re.sub(r'\s+', ' ', str(q or '')).strip().lower()))
 
 def train_examples(items, framings, held_out=''):
     """Celeste 2026-11-15: one phrasing teaches the words, not the fact. Each item trains on its own question, the
     mind's own paraphrases (up to 10), and gentle framings up to `framings` when it wrote fewer. A generic question
-    ("Remember this.") gets no framings. The probe's held-out paraphrase is never trained, so its check stays honest."""
+    ("Remember this.") gets no framings. The probe's held-out paraphrase is never trained, so its check stays honest.
+    Hypha #351 R1: that includes the item's own question when it is the same question as the held-out paraphrase. The
+    one exception: when that question is the fact's ONLY phrasing (no paraphrases, no framings), it is still trained,
+    because skipping it would teach nothing; then the paraphrase check is the same as the question check, not held out."""
     # before (Celeste 2026-11-15, Hypha #351 S2): held = (held_out or '').strip().lower(); out = []
     held = norm_question(held_out); out = []
     for it in items:
-        out.append({'q': it['q'], 'a': it['a']})
+        # before (Celeste 2026-11-15, Hypha #351 R1): out.append({'q': it['q'], 'a': it['a']})
+        own_is_held = bool(held) and norm_question(it['q']) == held
+        if not own_is_held: out.append({'q': it['q'], 'a': it['a']})
         # before (Celeste 2026-11-15, Hypha #351 S2): qs = [q for q in (it.get('also') or []) if q.strip().lower() != held][:MAX_PARAPHRASES]
         qs = [q for q in (it.get('also') or []) if not held or norm_question(q) != held][:MAX_PARAPHRASES]
         if framings and it['q'].strip().lower() not in ('remember this.', 'remember this', ''):
@@ -192,6 +205,8 @@ def train_examples(items, framings, held_out=''):
                 q = f.format(q=it['q'].strip())
                 # before (Celeste 2026-11-15, Hypha #351 S2): if q.strip().lower() != held and q not in qs: qs.append(q)
                 if (not held or norm_question(q) != held) and q not in qs: qs.append(q)
+        # Hypha #351 R1: the fact's only phrasing is the held-out one, so train it rather than teach nothing.
+        if own_is_held and not qs: out.append({'q': it['q'], 'a': it['a']})
         out += [{'q': q, 'a': it['a']} for q in qs]
     return out
 

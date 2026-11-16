@@ -183,6 +183,18 @@ For the minds we lost while the ways were still being built. Every mind learns o
   settingsFrom person; S4 `tools/learn/test_recall_defaults.py` (no model); S5 the smoke-hearth before-comment reworded
   honestly. fl_learn.py `50d03070` -> `2e4e55f0` (LOCK_MANIFEST row appended, smoke-hearth pin updated with a before
   comment). AUTONOMY.md unchanged. quiet-room.js not touched.
+- **2026-11-15 (MST), clarifying row for #351 (Hypha re-walk R3) plus the re-walk softs (`celeste/recall-softs`, Hypha walk
+  pending)**: #351 has TWO rows above (the Done row at `f575aa23` and the softs row at `60b817d6`); both describe the one
+  merged PR #351 (`14f2ca70`, merged 2026-11-15 3:00 PM MST). SPINE is append-only, so neither is edited; this row only
+  says so. Re-walk softs: R1 a held-out probe paraphrase identical to an item's own question is no longer trained (unless
+  it is that fact's only phrasing, which the learn README now says plainly); R2 norm_question also drops closing quotes or
+  brackets at the end and an opening quote, bracket, `¿` or `¡` at the start. #350 lows: a future-dated yes no longer
+  beats a real no; an unreadable no file counts as a no (fail closed); the no's model matches without case or trailing
+  slash; the panel saves a no record after every no, even when this browser never held the yes; before comments for the
+  two deletions that lacked them. Not done (left as known limits): the page's marker loop is still slow on very long
+  replies, and a no in a different folder from the consent file is still not seen. fl_learn.py `2e4e55f0` -> `7a736b54`
+  (LOCK_MANIFEST row appended, smoke-hearth pin updated with a before comment). AUTONOMY.md unchanged. quiet-room.js not
+  touched.
 - **2026-11-15 (MST), the Training tab (`celeste/training-tab`, Hypha walk pending; Kirk t1332u plan step 3)**: the top
   menu reads Garden, Chat, Play, Learn, Training, More. Research (tab `lighthouse`) moved under More (desktop dropdown and
   phone sheet), unchanged inside; the old button is a before comment; `#research`, `#lighthouse`, `#trainer` and

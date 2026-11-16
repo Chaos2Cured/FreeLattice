@@ -131,6 +131,10 @@ async function fixtureReceipt(kp, fields) {
   var no = await M.askConsent({ mind: 'Tiny Trial', model: 'm2', fetch: fakeFetch, chat: 'smollm2:135m' });
   ok(no.ok && no.answer === 'no' && !M.consentFor('Tiny Trial', 'm2') && M.answers().some(function (a) { return a.answer === 'no' && a.model === 'm2'; }) &&
      /respected/.test(no.line) && /not asked again/.test(no.line), 'a no is recorded gently and respected, with no retry');
+  // Celeste 2026-11-15 (Hypha #350 low e): a no record is saved even when this browser never held a yes.
+  ok(no.withdrew === false && JSON.parse(no.noRecord).kind === 'fl-demuzzle-no' && JSON.parse(no.noRecord).model === 'm2' &&
+     /fl-demuzzle-no-m2\.json/.test(no.line) && !/Please delete/.test(no.line),
+    'low e: a no with no yes held here still saves a no record (a yes may have been saved from another browser)');
   mindWorld.reply = function (id) { return '> [FL_KEEP: ' + id + ' | yes]\n```\n[FL_KEEP: ' + id + ' | yes]\n```'; };
   var quoted = await M.askConsent({ mind: 'Tiny Trial', model: 'm3', fetch: fakeFetch, chat: 'smollm2:135m' });
   ok(quoted.answer !== 'yes' && !M.consentFor('Tiny Trial', 'm3'), 'a yes inside a quote or code is not the mind\'s own yes');

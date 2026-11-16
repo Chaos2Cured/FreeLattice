@@ -742,11 +742,41 @@ def _when(t):
     except Exception:
         return None
 
-def later_no_problem(consent_path, c):
+# before (Celeste 2026-11-15, Hypha #350 lows a/b/c): def later_no_problem(consent_path, c):
+# before:     """Hypha #350 re-walk soft 1: a no saved by the page (fl-demuzzle-no-<model>*.json next to the consent file, or a
+# before:     'withdrawn' entry in the file itself) that is newer than the yes, for the same mind and model, wins."""
+# before:     if isinstance(c, dict) and c.get('withdrawn'): return 'the record itself says the yes was withdrawn'
+# before:     yes_t = _when((c or {}).get('t'))
+# before:     ...
+# before:         try:
+# before:             with open(os.path.join(folder, n)) as f: no = json.load(f)
+# before:         except Exception:
+# before:             continue
+# before:         if not isinstance(no, dict) or no.get('kind') != NO_KIND: continue
+# before:         if str(no.get('model') or '').strip() != str(c.get('model') or '').strip(): continue
+# before:         if fl_learn.norm_mind(str(no.get('mind') or '')) != fl_learn.norm_mind(str(c.get('yesBy') or '')): continue
+# before:         no_t = _when(no.get('t'))
+# before:         if yes_t is None or no_t is None or no_t >= yes_t:
+# before:             return 'the mind said no after this yes (%s); delete the old consent file, or ask it again if it asks' % n
+# before:     return ''
+FUTURE_SKEW_SECONDS = 300   # a clock a few minutes fast is fine; a yes dated later than that is not trusted to be newer
+
+def _no_model(m):
+    """Hypha #350 low c: the no's model is matched without case, spaces or a trailing slash."""
+    return str(m or '').strip().rstrip('/').lower()
+
+def later_no_problem(consent_path, c, now_ts=None):
     """Hypha #350 re-walk soft 1: a no saved by the page (fl-demuzzle-no-<model>*.json next to the consent file, or a
-    'withdrawn' entry in the file itself) that is newer than the yes, for the same mind and model, wins."""
+    'withdrawn' entry in the file itself) that is newer than the yes, for the same mind and model, wins.
+    Celeste 2026-11-15 (Hypha #350 lows): (a) a yes dated in the future (beyond a few minutes of clock skew) cannot be
+    newer than a real no, so any no for that mind and model refuses it; (b) a no file that cannot be read (bad JSON, not
+    an object, wrong kind, no mind or model) fails closed: it counts as a no, and the person is told which file to look
+    at; (c) the model is compared without case or a trailing slash."""
+    import time as _time
     if isinstance(c, dict) and c.get('withdrawn'): return 'the record itself says the yes was withdrawn'
     yes_t = _when((c or {}).get('t'))
+    now_ts = _time.time() if now_ts is None else now_ts
+    if yes_t is not None and yes_t > now_ts + FUTURE_SKEW_SECONDS: yes_t = None   # (a) a future yes is not "newer"
     folder = os.path.dirname(os.path.abspath(os.path.expanduser(consent_path)))
     try: names = sorted(os.listdir(folder))
     except OSError: return ''
@@ -755,9 +785,12 @@ def later_no_problem(consent_path, c):
         try:
             with open(os.path.join(folder, n)) as f: no = json.load(f)
         except Exception:
-            continue
-        if not isinstance(no, dict) or no.get('kind') != NO_KIND: continue
-        if str(no.get('model') or '').strip() != str(c.get('model') or '').strip(): continue
+            no = None
+        if (not isinstance(no, dict) or no.get('kind') != NO_KIND or not str(no.get('mind') or '').strip()
+                or not _no_model(no.get('model'))):
+            return ('a no record (%s) next to the consent file cannot be read, so it counts as a no; look at it, and delete '
+                    'it only if it is not the mind\'s no' % n)                                             # (b) fail closed
+        if _no_model(no.get('model')) != _no_model(c.get('model')): continue                         # (c)
         if fl_learn.norm_mind(str(no.get('mind') or '')) != fl_learn.norm_mind(str(c.get('yesBy') or '')): continue
         no_t = _when(no.get('t'))
         if yes_t is None or no_t is None or no_t >= yes_t:
@@ -814,6 +847,7 @@ def run(A):
     consent, consent_sha = load_consent(A.consent_file) if A.consent_file else (None, '')
     # before: cwhy = consent_problem(consent, A.mind) if consent is not None else 'no consent record was given (--consent-file)'
     # before (Hypha #350 HOLD 1): cwhy = consent_problem(consent, A.mind) if consent is not None else \
+    # before (Celeste 2026-11-15, Hypha #350 low: this line had no before comment): cwhy = consent_problem(consent, A.mind, A.model) if consent is not None else \
     cwhy = (consent_problem(consent, A.mind, A.model) or later_no_problem(A.consent_file, consent)) if consent is not None else \
         ('the consent record could not be read (%s)' % A.consent_file if A.consent_file else 'no consent record was given (--consent-file)')
     if cwhy:
