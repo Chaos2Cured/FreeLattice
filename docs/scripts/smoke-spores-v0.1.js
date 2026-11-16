@@ -88,9 +88,12 @@ fs.writeFileSync(path.join(tmp, 'modules', 'd.js'), 'window.D_RAN = (window.D_RA
 // e.js really has a line-1 syntax error, and that is exactly what its fingerprint says: served copy matches, so not cracked.
 fs.writeFileSync(path.join(tmp, 'modules', 'e.js'), 'window.E_RAN = 1; )\n');
 // f.js is healthy but its one line calls JSON.parse on bad text before it finishes loading. Not a crack.
+// g.js is healthy and throws a SyntaxError on purpose at the top of line 1, before it loads. That has a frame: not a crack.
+fs.writeFileSync(path.join(tmp, 'modules', 'g.js'), 'window.G_RAN = 1; throw new SyntaxError("thrown on purpose by healthy code");\n');
 fs.writeFileSync(path.join(tmp, 'modules', 'f.js'), 'window.F_RAN = 1; JSON.parse("{bad json");\n');
 var page = [
   '<!DOCTYPE html><html><head><meta charset="utf-8">',
+  '<script>window.preObs = new MutationObserver(function () {});</script>',   // made before spores loads
   '<script src="modules/spores.js"></script>',
   '<script src="modules/a.js" defer></script>',
   '<script src="modules/b.js" defer></script>',
@@ -98,8 +101,11 @@ var page = [
   '<script src="modules/d.js" defer></script>',
   '<script src="modules/e.js" defer></script>',
   '<script src="modules/f.js" defer></script>',
+  '<script src="modules/g.js" defer></script>',
   '</head><body><pre id="out">waiting</pre><div id="chat"></div><div id="chat2"></div><div id="chat3"></div><script>',
-  'var Q = location.search, OFF = /spores=off/.test(Q), CAP = /captest/.test(Q), DROP = /droptest/.test(Q), SHORT = CAP || DROP || /swap/.test(Q);',
+  // before (Celeste 2026-11-16, c8c6d4d0): 'var Q = location.search, OFF = /spores=off/.test(Q), CAP = /captest/.test(Q), SHORT = CAP || /swap/.test(Q);',
+  // before (Celeste 2026-11-16, 1879d36a): 'var Q = location.search, OFF = /spores=off/.test(Q), CAP = /captest/.test(Q), DROP = /droptest/.test(Q), SHORT = CAP || DROP || /swap/.test(Q);',
+  'var Q = location.search, OFF = /spores=off/.test(Q), CAP = /captest/.test(Q), DROP = /droptest/.test(Q), TAKE = /taketest=(\\d)/.exec(Q), SHORT = CAP || DROP || TAKE || /swap/.test(Q);',
   'var R = { calls: 0, pageNodes: 0, chatRecords: 0, chat2Records: 0, chat3Records: 0, marksSeen: 0, boundedCalls: 0, hotCalls: [], streamMs: [] };',
   'var calm = document.createElement("i"); document.body.appendChild(calm);',
   'new MutationObserver(function () { R.calls++; }).observe(calm, { attributes: true });',
@@ -162,13 +168,27 @@ var page = [
   '  var dmo = new MutationObserver(function () { dc++; d.setAttribute("n", String(dc)); }); dmo.observe(d, { attributes: true }); d.setAttribute("n", "go");',
   '  setTimeout(function () { for (var i = 0; i < 30; i++) d.setAttribute("o" + i, "1"); }, 200); setTimeout(function () { dmo.disconnect(); R.dropStatus = window.FLSpores.status(); }, 1500); }',
   'if (DROP) setTimeout(dropTest, 300);',
+  // HOLD (1879d36a): change your own target, then takeRecords() to swallow it, while the page changes it every task.
+  'function takeTest1() { var t = document.createElement("dfn"); document.body.appendChild(t); var k = 0; R.takeCalls = 0;',
+  '  new MutationObserver(function (rs, ob) { R.takeCalls++; t.setAttribute("self", String(R.takeCalls)); ob.takeRecords(); }).observe(t, { attributes: true });',
+  '  var t0 = performance.now(); (function tick() { if (++k > 70) { R.takeMs = Math.round(performance.now() - t0); return; } t.setAttribute("tick", String(k)); setTimeout(tick, 30); })(); }',
+  // A real loop that swallows one change with takeRecords() and then makes another still rests.
+  'function takeTest2() { var t = document.createElement("abbr"); document.body.appendChild(t); var c = 0;',
+  '  var mo2 = new MutationObserver(function (rs, ob) { c++; t.setAttribute("a", String(c)); ob.takeRecords(); t.setAttribute("b", String(c)); }); mo2.observe(t, { attributes: true });',
+  '  t.setAttribute("go", "1"); setTimeout(function () { mo2.disconnect(); R.take2Calls = c; }, 800); }',
+  'if (TAKE) setTimeout(TAKE[1] === "1" ? takeTest1 : takeTest2, 200);',
+  'R.preInst = window.preObs instanceof MutationObserver;',
+  'try { var SubMO = class extends MutationObserver {}; var sub = new SubMO(function () {}); R.subInst = (sub instanceof SubMO) && (sub instanceof MutationObserver) && !(window.preObs instanceof SubMO); } catch (e) { R.subInst = "err " + e.message; }',
   'setTimeout(function () {',
   '  var S = window.FLSpores || {};',
-  '  R.off = S.off; R.F = window.F_RAN || 0; R.notice = (document.querySelector("#fl-spore-notice span") || {}).textContent || ""; R.A = window.A_RAN || 0; R.B = window.B_RAN || 0; R.C = window.C_RAN || 0; R.D = window.D_RAN || 0; R.E = window.E_RAN || 0;',
+  // before (Celeste 2026-11-16, c8c6d4d0): '  R.off = S.off; R.A = window.A_RAN || 0; R.B = window.B_RAN || 0; R.C = window.C_RAN || 0; R.D = window.D_RAN || 0; R.E = window.E_RAN || 0;',
+  // before (Celeste 2026-11-16, 1879d36a): '  R.off = S.off; R.F = window.F_RAN || 0; R.notice = (document.querySelector("#fl-spore-notice span") || {}).textContent || ""; R.A = window.A_RAN || 0; R.B = window.B_RAN || 0; R.C = window.C_RAN || 0; R.D = window.D_RAN || 0; R.E = window.E_RAN || 0;',
+  '  R.off = S.off; R.F = window.F_RAN || 0; R.G = window.G_RAN || 0; R.notice = (document.querySelector("#fl-spore-notice span") || {}).textContent || ""; R.A = window.A_RAN || 0; R.B = window.B_RAN || 0; R.C = window.C_RAN || 0; R.D = window.D_RAN || 0; R.E = window.E_RAN || 0;',
   '  R.isGuarded = !!MutationObserver.__spores; R.alive = true; R.notices = document.querySelectorAll("#fl-spore-notice").length;',
   '  R.receipts = S.receipts ? S.receipts() : []; R.unsaved = S.unsaved ? S.unsaved() : "";',
   '  document.getElementById("out").textContent = JSON.stringify(R);',
-  '}, SHORT ? 3500 : (OFF ? 5000 : 15500));',
+  // before (Celeste 2026-11-16, 1879d36a): '}, SHORT ? 3500 : (OFF ? 5000 : 15500));',
+  '}, TAKE ? 6500 : SHORT ? 3500 : (OFF ? 5000 : 15500));',
   '</script></body></html>'
 ].join('\n');
 fs.writeFileSync(path.join(tmp, 'fixture.html'), page);
@@ -208,8 +228,10 @@ function runChrome(url) {
       var f = path.join(prof, 'DevToolsActivePort');
       if (!fs.existsSync(f)) { if (tries > 100) return finish(null); return setTimeout(function () { waitPort(tries + 1); }, 100); }
       var port = fs.readFileSync(f, 'utf8').split('\n')[0];
+      // before (Celeste 2026-11-16, c8c6d4d0): http.get('http://127.0.0.1:' + port + '/json/list', function (r) {
       (function list(tries) { http.get('http://127.0.0.1:' + port + '/json/list', function (r) {
         var body = ''; r.on('data', function (d) { body += d; }); r.on('end', function () {
+          // before (Celeste 2026-11-16, c8c6d4d0): var pg = JSON.parse(body).filter(function (t) { return t.type === 'page'; })[0];
           var pg = null; try { pg = JSON.parse(body).filter(function (t) { return t.type === 'page'; })[0]; } catch (e) {}
           if (!pg) { if (tries > 100) return finish(null); return setTimeout(function () { list(tries + 1); }, 100); }   // Chrome still opening its first tab
           ws = new WebSocket(pg.webSocketDebuggerUrl);
@@ -224,6 +246,7 @@ function runChrome(url) {
             });
           };
         });
+      // before (Celeste 2026-11-16, c8c6d4d0): }).on('error', function () { finish(null); });
       }).on('error', function () { if (tries > 100) return finish(null); setTimeout(function () { list(tries + 1); }, 100); }); })(0);
     })(0);
   });
@@ -231,6 +254,7 @@ function runChrome(url) {
 
 server.listen(0, '127.0.0.1', async function () {
   var base = 'http://127.0.0.1:' + server.address().port + '/fixture.html';
+  // before (Celeste 2026-11-16, c8c6d4d0): var off = await runChrome(base + '?spores=off');   (it ran last, after the swap run; it now runs first so 'on' can be compared with it)
   var off = await runChrome(base + '?spores=off');
   var on = await runChrome(base);
   ok(on && on.alive, 'the page did not freeze (a self-feeding observer would hang it without the watchdog)');
@@ -241,9 +265,14 @@ server.listen(0, '127.0.0.1', async function () {
   ok(on.B === 0 && rec('modules/b.js').length === 1 && rec('modules/b.js')[0].kind === 'still-broken', 'b.js copy had the wrong sha256: refused, never ran, one still-broken receipt');
   ok(on.C === 1 && rec('modules/c.js').length === 0, 'HOLD 1: a healthy c.js that throws a SyntaxError at run time is not touched (ran once, no receipt)');
   ok(on.D === 1 && rec('modules/d.js').length === 1 && rec('modules/d.js')[0].kind === 'restored', 'd.js was served as an HTML page: line-1 parse failure, served copy did not match, verified copy ran once');
+  // before (Celeste 2026-11-16, c8c6d4d0): ok(on.E === 0 && rec('modules/e.js').length === 1 && rec('modules/e.js')[0].kind === 'not-cracked', 'HOLD 1: e.js failed to parse but the copy served matches its fingerprint: not-cracked receipt, nothing run');
   ok(on.E === 0 && rec('modules/e.js').length === 1 && rec('modules/e.js')[0].kind === 'reload-needed' && rec('modules/e.js')[0].ok === false, 'soft 1: e.js failed to parse but the server now sends the matching copy: nothing run, receipt says reload-needed (ok false)');
   ok(on.F === 1 && rec('modules/f.js').length === 0, 'soft 2: a JSON.parse error on line 1 of a listed file, before its load, is not a crack (decided by the error object and stack)');
   ok(rec('fixture.html').length === 0 && on.receipts.every(function (r) { return !/\.html$/.test(r.file) || /^loop/.test(r.kind); }), 'soft 2: a JSON.parse error writes no receipt');
+  // before (Celeste 2026-11-16, c8c6d4d0): ok(on.notices === 1, 'one "Reload to finish the repair" notice after the restores (not one per file)');
+  ok(on.G === 1 && rec('modules/g.js').length === 0, 'soft 2: a SyntaxError thrown by healthy code at the top of line 1 (it has a stack frame) is not a crack');
+  ok(on.preInst === true && off.preInst === true, 'soft 4: an observer made before spores loaded is still instanceof MutationObserver');
+  ok(on.subInst === true && off.subInst === true, 'soft 4: a subclass of MutationObserver keeps the ordinary instanceof rule');
   ok(on.notices === 1 && /Reload to finish the repair/.test(on.notice), 'one "Reload to finish the repair" notice after the restores (not one per file)');
   ok(on.order1 === off.order1 && on.order1.split(' ').length === 4, 'HOLD (order): two observers that each feed themselves once get the same records, order and batches as with no spores (' + on.order1 + ')');
   ok(on.order4 === off.order4 && /^O\[\] O\[s0,s1\] /.test(on.order4), 'HOLD (order): an observer feeding itself plus an outside change gets its own record first, in the same call, as with no spores (' + on.order4 + '; labels are old values: [s0,s1] = its own change, then the outside one)');
@@ -258,6 +287,7 @@ server.listen(0, '127.0.0.1', async function () {
   ok(Object.keys(where).length === 2, 'HOLD 2: only the two self-feeding observers ever rested; streaming and page-wide observers had 0 trips (' + JSON.stringify(where) + ')');
   ok(on.marksSeen === 5, 'HOLD 2: records that arrived while an observer rested were handed to it when it listened again (' + on.marksSeen + ' of 5 marks)');
   var bounded = loops.filter(function (r) { return r.file === loops[0].file; });
+  // before (Celeste 2026-11-16, c8c6d4d0): ok(bounded.length === 1 && bounded[0].kind === 'loop-paused', 'the bounded loop rested once, then listened again and stopped on its own');
   ok(bounded.length >= 1 && bounded.every(function (r) { return r.kind === 'loop-paused'; }), 'the bounded loop rested (' + bounded.length + 'x), then listened again and stopped on its own');
   ok(bounded[0].ms < 1500, 'soft 3: with the call-count backstop a real loop rests after ' + Math.round(bounded[0].ms) + ' ms, not 1.5 s');
   var hot = loops.filter(function (r) { return r.file !== loops[0].file; }).map(function (r) { return r.kind + ' ' + r.got; });
@@ -281,6 +311,13 @@ server.listen(0, '127.0.0.1', async function () {
   var swapped = await runChrome(base + '?swap=1');
   fs.writeFileSync(path.join(tmp, 'spores-manifest.json'), forged);
   ok(swapped && swapped.A === 0 && swapped.receipts.some(function (r) { return r.kind === 'refused' && r.file === 'modules/a.js'; }), 'soft 1 / (f): a manifest that does not match the pinned sha256 is refused; nothing is run');
+
+  var take1 = await runChrome(base + '?taketest=1');
+  var t1loops = take1 && take1.receipts.filter(function (r) { return /^loop-/.test(r.kind); }).length;
+  ok(take1 && take1.takeCalls >= 60 && t1loops === 0, 'HOLD (1879d36a): change own target + takeRecords() while the page changes it every task: ' + t1loops + ' rests (want 0) over ' + (take1 && take1.takeCalls) + ' calls in ' + (take1 && take1.takeMs) + ' ms');
+  var take2 = await runChrome(base + '?taketest=2');
+  var t2loops = take2 && take2.receipts.filter(function (r) { return r.kind === 'loop-paused'; }).length;
+  ok(take2 && t2loops >= 1, 'a real loop that swallows one change with takeRecords() and makes another still rests (' + t2loops + ' rests, ' + (take2 && take2.take2Calls) + ' calls)');
 
   var drop = await runChrome(base + '?droptest=1');
   ok(drop && drop.dropStatus && drop.dropStatus.dropped >= 20 && drop.dropStatus.trips >= 1, 'soft 6: records dropped while resting show in FLSpores.status() (' + JSON.stringify(drop && drop.dropStatus) + ')');
