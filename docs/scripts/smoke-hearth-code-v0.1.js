@@ -74,7 +74,8 @@ function sha(text) {
     // Honestly: before #351 this smoke had no pin for tools/learn/fl_learn.py at all; its earlier md5s (5d77bccd, 5240d008)
     // are only in LOCK_MANIFEST. #351 f575aa23 added the first pin, 50d03070.
     // before (Celeste 2026-11-15, Hypha #351 S1-S4): 'tools/learn/fl_learn.py': '50d03070c80d0eded5ac2920c03070c2',
-    'tools/learn/fl_learn.py': '2e4e55f0958da3d65ae7a8c49d6b1e6d',   // recall defaults + Hypha #351 softs S1-S4 (LOCK_MANIFEST v-recall-defaults-v0.1 rows)
+    // before (Celeste 2026-11-15, Hypha #351 R1-R2): 'tools/learn/fl_learn.py': '2e4e55f0958da3d65ae7a8c49d6b1e6d',   // recall defaults + Hypha #351 softs S1-S4 (LOCK_MANIFEST v-recall-defaults-v0.1 rows)
+    'tools/learn/fl_learn.py': '7a736b549ce845083e9b24a0633a7d92',   // + Hypha #351 re-walk R1-R2: own question held out, quotes/brackets/inverted marks (LOCK_MANIFEST last fl_learn.py row)
     'docs/modules/pool-honest-label.js': '91d8b79067f92e761474848dd2b9a75a',
     'docs/modules/gathering-speak.js': '0460fdc777a21f7a1744f401dda82cb2',
     'docs/modules/fl-bridge.js': '3b5ef06849a142e50c78e7ba1e057980',

@@ -37,6 +37,16 @@ same folder, or when the record says `withdrawn`. After a no the mind is not off
 unless it asks. Every marker is read (the page in rounds of 8, the runner all at once), so a no after many other
 markers still wins. (Before: one `fl-demuzzle-consent.json` for every model.) Honest limit: the record is not signed (the
 browser has no runner key), so it records a yes; it cannot prove one to someone who distrusts this computer.
+<!-- before (Celeste 2026-11-15, Hypha #350 low: the re-walk replaced these lines with no before comment):
+The record must name `offeredByName`, carry the offer id and words (and the offer text, checked against its hash), and
+its `model` must be `--model`. There is one consent file per model (`fl-demuzzle-consent-<model>.json`; without
+`--consent-file`, that file in `~/Downloads` is read). On the page, a later no withdraws a stored yes, and after a no
+the mind is not offered again (even after a reload) unless it asks. -->
+Since Hypha's #350 lows (2026-11-15): a yes dated more than a few minutes in the future is never treated as newer than
+a no; a `fl-demuzzle-no-*.json` file that cannot be read (bad JSON, wrong kind, no mind or model) counts as a no and
+`run` names it; the no's model is matched without case or a trailing slash; and the page saves a no record after every
+no, even when this browser never held the yes (it may have been saved from another browser). A no in a different
+folder from the consent file is still not seen (keep them together, as the page does in Downloads).
 
 
 Needs Python with `torch`, `transformers`, `safetensors` and `cryptography` (the same environment as `tools/learn`).

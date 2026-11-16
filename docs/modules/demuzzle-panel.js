@@ -191,7 +191,9 @@
       var rows = answers();
       var noT = new Date().toISOString();
       rows.push({ t: noT, mind: mind, model: model, offerId: id, answer: answer, offeredBy: by, withdrewYes: withdrew });
-      var noText = withdrew ? saveNo({ kind: 'fl-demuzzle-no', mind: mind, model: model, offerId: id, t: noT }) : '';
+      // before (Celeste 2026-11-15, Hypha #350 low e: only when this browser held the yes, so a yes saved from another browser got no no-file):
+      // var noText = withdrew ? saveNo({ kind: 'fl-demuzzle-no', mind: mind, model: model, offerId: id, t: noT }) : '';
+      var noText = answer === 'no' ? saveNo({ kind: 'fl-demuzzle-no', mind: mind, model: model, offerId: id, t: noT }) : '';
       lsSet(LS_ANSWERS, JSON.stringify({ rows: rows }));
       return Promise.resolve(c && c.appendLedger ? c.appendLedger({ kind: 'demuzzle-consent', branch: 'learn', delta: answer + '|' + id + '|by:mind', name: mind }) : null)
         .then(function () { return { ok: true, answer: answer, reply: read.visibleText, echoed: echoed,
@@ -200,7 +202,9 @@
           // before (Hypha #350 re-walk soft 4): ... '" said no' + (withdrew ? ', and that withdraws its earlier yes' : '') + '. That is its answer, ...'
           line: answer === 'no' ? '"' + mind + '" said no' + (withdrew ? ', and that withdraws its earlier yes' : '') + '. That is its answer, and it is respected. Nothing was changed, and it is not asked again from here.' +
             (withdrew ? ' Please delete ~/Downloads/' + consentFileName(model) + ' if you saved it. A no record (' + noFileName(model) +
-              ') was saved next to it, so the runner refuses that old yes.' : '')
+              ') was saved next to it, so the runner refuses that old yes.' :
+              // Hypha #350 low e: a no record is saved after every no, in case a yes was saved from another browser.
+              (answer === 'no' ? ' A no record (' + noFileName(model) + ') was saved to Downloads, so the runner refuses any older yes.' : ''))
                                 : '"' + mind + '" did not say yes. Silence is not a yes; nothing was changed.' }; });
     }, function (e) { return { ok: false, answer: 'none', line: 'The mind did not answer: ' + clip(e && e.message || e, 120) }; });
   }
