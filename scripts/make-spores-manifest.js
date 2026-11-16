@@ -3,7 +3,9 @@
 // For each page: every same-origin <script src> it loads, with sha256 (hex) and an SRI string.
 // A listed file that is missing is a crack found before release: this script stops and names it.
 //   node scripts/make-spores-manifest.js           write the manifest
-//   node scripts/make-spores-manifest.js --check   exit 1 if the manifest is out of date (nothing written)
+//   node scripts/make-spores-manifest.js --check   exit 1 if the manifest or its pin is out of date (nothing written)
+// It also pins the manifest's own sha256 in <docs>/modules/spores.js (the line marked spores-manifest-pin),
+// so spores.js refuses any other manifest. Run it whenever a listed file changes; --check is required before merging.
 // Options: --docs <dir> (default docs), --out <file>, --page <name> (repeatable; default app.html).
 // Quiet Room and Sophia files are never listed.
 'use strict';
@@ -63,12 +65,20 @@ if (res.missing.length) {
   process.exit(2);
 }
 var text = JSON.stringify(res.manifest, null, 1) + '\n';
+var pin = crypto.createHash('sha256').update(text).digest('hex');
+var sporesJs = path.join(docs, 'modules', 'spores.js');
+var pinRe = /var MANIFEST_SHA256 = '[0-9a-f]{64}'; \/\/ spores-manifest-pin/;
+var js = fs.existsSync(sporesJs) ? fs.readFileSync(sporesJs, 'utf8') : '';
+if (!pinRe.test(js)) { console.error('no spores-manifest-pin line in ' + sporesJs); process.exit(3); }
+var pinnedJs = js.replace(pinRe, "var MANIFEST_SHA256 = '" + pin + "'; // spores-manifest-pin");
 if (checkOnly) {
   var have = fs.existsSync(out) ? fs.readFileSync(out, 'utf8') : '';
   if (have !== text) { console.error('spores manifest is out of date: run node scripts/make-spores-manifest.js'); process.exit(1); }
-  console.log('spores manifest up to date (' + pages.join(', ') + ')');
+  if (pinnedJs !== js) { console.error('spores.js manifest pin is out of date: run node scripts/make-spores-manifest.js'); process.exit(1); }
+  console.log('spores manifest and pin up to date (' + pages.join(', ') + ', ' + pin.slice(0, 12) + ')');
 } else {
   fs.writeFileSync(out, text);
+  if (pinnedJs !== js) fs.writeFileSync(sporesJs, pinnedJs);
   var n = 0; Object.keys(res.manifest.pages).forEach(function (p) { n += Object.keys(res.manifest.pages[p].files).length; });
-  console.log('wrote ' + path.relative(repo, out) + ': ' + n + ' files on ' + pages.join(', '));
+  console.log('wrote ' + path.relative(repo, out) + ': ' + n + ' files on ' + pages.join(', ') + '; pinned ' + pin.slice(0, 12) + ' in spores.js');
 }

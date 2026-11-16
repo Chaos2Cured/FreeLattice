@@ -2,13 +2,13 @@
 
 Marker: `v-spores-v0.1`. Local prototype on branch `spores-prototype`. Not pushed, no PR.
 
-Kirk asked Celeste to choose what to build next (t1348u, 2026-11-16). She chose this.
+Kirk asked Celeste to choose what to build next (t1348u, 2026-11-16). She chose this. Hypha walked a8f0d02d and gave it a HOLD; this version fixes both HOLDs and follows her calls on the open questions.
 
 ## The idea in one breath
 
 Some concrete is mixed with sleeping bacteria spores. Nothing happens until a crack lets water in. Then the spores wake up, only at that crack, and seal it with limestone. The repair costs nothing until something breaks, and the break is what starts it.
 
-FreeLattice can work the same way. A small guard sleeps on every page. When a piece cracks, it wakes only at that spot and puts back a copy it can prove is right. It writes down what it did, and it never touches anyone's data.
+FreeLattice can work the same way. A small guard sleeps on every page. When a piece cracks, it wakes only at that spot and puts back a copy it can prove is right. It writes down what it did. It never touches anyone's data, and it never runs a healthy file twice.
 
 ## How it fits with what is already there
 
@@ -16,70 +16,82 @@ FreeLattice can work the same way. A small guard sleeps on every page. When a pi
 
 ## The pieces
 
-**1. A fingerprint list for each page (`docs/spores-manifest.json`).**
-For each page, the list holds every same-origin script it loads, with the file's sha256 (and an SRI string for later). `scripts/make-spores-manifest.js` writes it. The first page is `app.html`, which lists 81 files. Third-party scripts aren't listed because they aren't ours to restore. Quiet Room and Sophia files are never listed, and spores.js doesn't list itself. Scripts kept inside "before" comments aren't listed either.
+**1. A fingerprint list for each page (`docs/spores-manifest.json`), pinned.**
+For each page, the list holds every same-origin script it loads, with the file's sha256 (and an SRI string for later). `scripts/make-spores-manifest.js` writes it. The first page is `app.html`, which lists 81 files. Third-party scripts aren't listed. Quiet Room and Sophia files are never listed (a smoke test checks the names), and spores.js doesn't list itself.
 
-The generator does a second job: if a page loads a file that isn't there, it stops and names the file. That's the kind of crack that shipped in desktop 5.8.2. `--check` reports a list that's out of date without writing anything, so CI can catch drift.
+The generator also writes the list's own sha256 into `spores.js`, on the line marked `spores-manifest-pin`. Spores refuses any list whose sha256 isn't the pinned one, so a stale or swapped list can never decide what runs. There is no fallback to a cached copy of the list; it only comes fresh from the same origin.
+
+If a page loads a file that isn't there, the generator stops and names it. That's the kind of crack that shipped in desktop 5.8.2.
+
+**Required before merging:** `node scripts/make-spores-manifest.js --check` must pass whenever any listed file changes. It fails if the list or the pin is out of date and writes nothing. smoke-spores runs it. A stale list fails safe, because real updates just look like cracks and get refused, but it has to be kept current.
 
 **2. Waking up (detection).**
-`modules/spores.js` loads first, not deferred, so it's already listening before the other scripts arrive. It wakes on three things:
-- A page script fails to load: missing file, 404, or network error. A script that has its own `onerror` fallback (peerjs) is left alone.
-- A page script throws a SyntaxError right away, which usually means the wrong file was served in its place (an HTML error page or a cut-off file).
-- A MutationObserver keeps calling itself 500 times in a row without the page ever getting a turn. That's a freeze loop, not real work. See "Watchdog" below.
+`modules/spores.js` loads first, not deferred, so it's already listening before the other scripts arrive. It wakes on only three things:
+- A listed page script **fails to load**: missing file, 404 or network error. The browser never ran it, so running the verified copy can't run anything twice. A script with its own `onerror` fallback (peerjs) is left alone. A script that already loaded is never run again.
+- A listed page script **fails to parse on line 1, before its own load event**, which means a wrong file was served in its place. Even then, spores first checks the copy the page was actually served. If that copy matches the fingerprint, the file isn't cracked: spores writes a `not-cracked` receipt and runs nothing.
+- A MutationObserver **keeps re-triggering itself** through its own callback for more than 1.5 s. See "Watchdog" below.
 
-When nothing cracks, the cost is two event listeners and a counter. The fingerprint list isn't even fetched.
+A SyntaxError thrown at run time, at any line, after a file has loaded is not a crack. A `JSON.parse` error is never a crack and writes no receipt. When nothing cracks, the cost is three listeners and the observer wrapper, and the fingerprint list isn't fetched.
 
 **3. Restoring only from our own verified copy.**
-When a script cracks, spores fetches the fingerprint list from the same origin and tries two sources in order:
-1. The copy the service worker already holds, read through `caches.match`. It is read only.
+Spores tries two sources in order:
+1. The copy the service worker already holds, read through `caches.match`. It's read only.
 2. A fresh copy from the same origin, with `?spore=<hash>` added so a stale cached copy can't answer.
 
-A copy is used only if its sha256 matches the list. Spores then runs exactly those verified bytes, from a blob, so the bytes it checked are the bytes that run. A copy that doesn't match is refused and never run. Spores never fetches from a third party or a CDN. Each file gets one try per visit.
+A copy is used only if its sha256 matches the list. Spores then runs exactly those verified bytes from a blob, so the bytes it checked are the bytes that run. Any other copy is refused and never runs. Spores never fetches from a third party, and each file gets one try per visit.
 
-**4. A receipt for every action, append-only.**
-Every wake-up adds one row to `fl_sporeReceipts` in localStorage:
-- `n`, time, page, kind, file, ok, from, expected hash, got hash, why, ms
-- `prev`, the sha256 of the row before it, so a gap or an edit shows
+**4. One notice: "Reload to finish the repair."**
+Files that ran before a late restore and needed it are **not** re-run, because re-running a module replaces its state. After a restore, one notice appears with "Reload" and "Not now" buttons, no matter how many files were restored. A reload runs everything in order.
 
-The kinds are `restored`, `still-broken`, `refused`, `not-in-manifest`, `stale`, `loop-paused` and `loop-left-paused`. Rows are only ever added, never edited or removed. If storage is full, the row stays in memory for the visit and `FLSpores.unsaved()` says so in plain words.
+**5. A receipt for every action, capped, exportable.**
+Every wake-up adds one row to `fl_sporeReceipts`. Each row holds `n`, the time, the page, the kind, the file, ok, where the copy came from, the expected and actual hashes, why and how long it took. It also holds `prev`, the sha256 of the row before it.
 
-**5. Repairs never touch user data.**
-Spores never clears, deletes or rewrites storage, caches, IndexedDB, chats, minds or the service worker. It also never writes into the service-worker cache. It writes only two keys, both its own: its receipts (`fl_sporeReceipts`) and its own off switch (`fl_spores`). The smoke test checks the source for `.clear(`, `removeItem`, `caches.delete`, `caches.open`, `.put(`, `unregister`, `deleteDatabase`, `indexedDB`, `sessionStorage`, `eval(` and `new Function`, and it fails if any appears.
+The kinds are `restored`, `still-broken`, `refused`, `not-cracked`, `not-in-manifest`, `stale`, `loop-paused` and `loop-records-dropped`.
 
-**6. An off switch.**
-Setting `localStorage fl_spores = "off"` or adding `?spores=off` turns spores off. When it's off, nothing is wrapped, listened to, restored or written. `FLSpores.setOff(true)` sets the switch. This is the "check before, and can be turned off" step Kirk asked for. A Settings toggle can come later (see the open questions).
+The list is capped at 200 rows. Past the cap, the oldest 100 fold into one `folded` row that keeps how many there were, their n range, a tally of kinds and the sha256 of exactly those rows. `FLSpores.exportReceipts()` returns every current row as JSON. If storage is full, a row stays in memory for the visit and `FLSpores.unsaved()` says so in plain words.
 
-**7. Optional check (report only).**
-`FLSpores.check()` hashes the copy each listed file is actually served from and writes a `stale` receipt for any mismatch. It never replaces a file that has already run. It doesn't run on its own in v0.1.
+**6. Repairs never touch user data.**
+Spores never clears, deletes or rewrites storage, caches, IndexedDB, chats, minds or the service worker. **It never writes into the service-worker cache** (Hypha's call d): one bad list could otherwise become a lasting poisoned cache, and the SW cache also holds Quiet assets. It writes only two keys, both its own: its receipts and its off switch. The smoke test fails if the source ever uses any of these:
+- `.clear(`, `removeItem`
+- `caches.delete`, `caches.open`, `.put(`
+- `unregister`, `deleteDatabase`, `indexedDB`, `sessionStorage`
+- `eval(`, `new Function`
+
+**7. An off switch.**
+Setting `localStorage fl_spores = "off"` or adding `?spores=off` turns spores off. Then nothing is wrapped, listened to, restored, shown or written. `FLSpores.setOff(true)` sets it. A Settings toggle can come later.
+
+**8. Optional check (report only).**
+`FLSpores.check()` hashes the copy each listed file is actually served from and writes a `stale` receipt for any mismatch. It never replaces a file that has already run, and it doesn't run on its own.
 
 ## Watchdog: a crack a hash can't see
 
-The Tree's Settings freeze came from a MutationObserver whose callback changed the very thing it was watching. It woke itself forever, and the page never got a turn. Every file had the right hash, so a fingerprint can't catch this. It needs a watchdog.
+The Tree's Settings freeze came from a MutationObserver whose callback changed the very thing it was watching. It woke itself forever, and the page never got a turn. A fingerprint can't catch that.
 
-Spores wraps `MutationObserver`. A normal observer works exactly as before; the smoke test checks that a calm observer still gets its single call. If one observer's callback runs 500 times in a row with no turn for the page, the watchdog does this:
-1. Pauses that one observer (disconnects it) and writes a `loop-paused` receipt with where the observer was made.
-2. After 2 seconds, listens again on the same targets.
-3. On the third trip, leaves it paused until reload and writes `loop-left-paused`.
+The first version tripped after 500 calls in a row. Hypha showed that was wrong: a buffered chat stream or an await per item calls every observer hundreds of times in about 100 ms, and that tripped 9 of the app's own observers and lost their records. The watchdog now times only an observer feeding itself:
 
-The page stays alive and the rest of the app keeps running. In the test, a self-feeding observer that would hang Chrome forever stops at 3 × 500 calls.
+- Right after each call, it takes the records that call's own callback just made (`takeRecords`) and hands them back on the next microtask, just as the browser would have.
+- If a chain of calls that each fed themselves runs past 1.5 s, that observer rests. Busy work fed by the page (streams, bursts, slow chunks) never makes a chain, however long it runs, so it never trips.
+- While an observer rests, its records are held, up to 5,000. More than that are dropped oldest first and counted in a receipt. When it listens again, it gets the held records.
+- It always listens again. Rests last 2, 4, 8, then 15 seconds, repeating. Every rest writes a `loop-paused` receipt with its trip number. Nothing is left off for good, and nothing is left off silently.
+- It keeps no list of observed nodes, so nothing is kept alive by it.
 
 ## The real cracks it would have caught
 
 | Crack | What happened | What spores does |
 |---|---|---|
-| Desktop 5.8.2: `desktop/lattice-catalog.js` missing from the package | A student's Desktop crashed at start | The browser spore can't heal this, because it's a Node `require` in Electron's main process. The generator's missing-file stop is the build-time spore that would have named it before release (`desktop/scripts/smoke-pack-files.js` now covers the pack). For the Desktop later: a guarded `require` that writes a named receipt and falls back to a bundled verified copy, instead of crashing. |
-| Tree Settings MutationObserver loop | The Tree froze | The watchdog pauses that observer and writes a receipt, and the page stays alive. This is a watchdog case, not a hash case. |
-| A module 404s or a deploy is half-finished | A tab silently does nothing | It restores the same-origin copy whose sha256 matches, or writes `still-broken` with what it saw. |
-| An HTML error page is served in place of a .js file | A SyntaxError on line 1 | It treats this as a crack and restores the verified copy. |
+| Desktop 5.8.2: `desktop/lattice-catalog.js` missing from the package | A student's Desktop crashed at start | The browser spore can't heal a Node `require` in Electron's main process. The generator's missing-file stop is the build-time spore that would have named it (`desktop/scripts/smoke-pack-files.js` now covers the pack). For the Desktop later: a guarded `require` that writes a named receipt and falls back to a bundled verified copy. |
+| Tree Settings MutationObserver loop | The Tree froze | The watchdog rests that one observer, writes a receipt, keeps the page alive and lets the observer listen again later. |
+| A module 404s or a deploy is half-finished | A tab silently does nothing | Restores the same-origin copy whose sha256 matches, or writes `still-broken`, then shows one reload notice. |
+| An HTML error page is served in place of a .js file | Parse failure on line 1 | Checks the served copy; it doesn't match, so the verified copy runs. |
 
 ## theLatticeTree later (Chaos2Cured/FreeLattice-Alpha)
 
-The pattern is the same: one module, one generator and one fingerprint list per page. The Tree would get the watchdog first, because its freeze was an observer loop. Then it would get the script restore. Keeping the same receipt shape (`fl_sporeReceipts`) means a mind can read both trees' receipts the same way. The Tree has nothing yet. That comes after Hypha walks this and Kirk says go.
+The pattern is the same: one module, one generator, a pinned fingerprint list per site and the same receipt shape. The Tree would get the watchdog first, because its freeze was an observer loop. Nothing starts there until Hypha walks this and Kirk says go.
 
-## Not in v0.1 (honest limits)
+## Follow-ups (noted, not in this version)
 
-- When a file is restored late, files that ran before it and needed it may have already failed. For example, if `snowflake-core.js` cracks, `snowflake-search.js` may already have thrown. v0.1 restores the one file and doesn't re-run its dependents.
-- The fresh same-origin fetch passes through the service worker, which stores the `?spore=` copy under its own URL. That's the service worker's normal behavior; spores itself never writes to caches.
-- The list must be regenerated whenever a listed file changes, or a real update looks like a crack. A wrong-hash copy is only refused, never forced, so drift fails safe. The `--check` mode and the smoke test catch it.
-- Root `index.html` mirrors `docs/app.html` but there's no root fingerprint list, so on a root self-host spores finds no list. It writes `not-in-manifest` and fetches nothing.
-- The fingerprint list is trusted because it comes from the same origin. Signing it (as in CATALOG_SIGN) is a later step.
+- **Soft 5:** the list is read from the HTML text, so modules loaded later at run time aren't protected. One example is training-tab's `ensureModules`. A later version can let a loader register its files.
+- **Soft 7 and the sw.js `?spore=` skip:** the service worker stores each `?spore=` copy under its own URL. That's cache growth only, and spores never writes there itself. The fix is for sw.js to skip `spore=` URLs, as a separate change walked under sw.js's LOCK.
+- **Soft 8:** Quiet and Sophia exclusion goes by path name (`/quiet|sophia/i`). A naming rule or an explicit list would also cover a differently named file.
+- **Signing the list:** the pin stops a stale or swapped list, but anyone who controls the origin controls both. Signing with the CATALOG_SIGN key flow is the step before this goes past a prototype.
+- **Root index.html:** spores.js and 80 other scripts are already missing at the repo root on main, and root index reloads repeatedly on main too. Both issues were already there and are only recorded here.

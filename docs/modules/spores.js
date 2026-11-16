@@ -4,36 +4,44 @@
    Then it wakes only at that spot and puts back a copy whose fingerprint matches.
 
    What wakes it:
-   - a page script fails to load (missing file, network error), or throws a SyntaxError on line 1
-     (a wrong file was served in its place);
-   - a MutationObserver calls itself over and over without the page ever getting a turn (a freeze loop).
+   - a listed page script fails to load (missing file, network error): the browser never ran it;
+   - a listed page script fails to parse on line 1 before it finished loading, and the copy this
+     page is actually served does not match its fingerprint (a wrong file was served in its place);
+   - a MutationObserver whose own callback keeps re-triggering it for more than LOOP_MS (a freeze loop).
    What it uses to repair:
-   - only this site's own copy: first the copy the service worker already holds (read only),
-     then a fresh copy from the same origin. Never a third party.
-   - a copy is used only when its sha256 matches spores-manifest.json. A different copy is refused.
+   - only this site's own copy, checked against spores-manifest.json, whose own sha256 is pinned
+     below. First the copy the service worker already holds (read only), then a fresh same-origin copy.
+   - a copy runs only when its sha256 matches. A different copy is refused. A healthy file never runs twice.
    What it never does:
-   - it never clears, deletes or rewrites storage, caches, minds, chats or the service worker.
-     The only thing it writes is its own receipt list, fl_sporeReceipts, and that list is append-only.
+   - it never clears, deletes or rewrites storage, caches, minds, chats or the service worker, and it
+     never writes into the service-worker cache. The only thing it writes is its own receipt list,
+     fl_sporeReceipts (capped: the oldest rows fold into one summary row that keeps their hash),
+     and its own off switch.
    Off switch: localStorage fl_spores = "off", or ?spores=off on the address. Then nothing here runs.
 */
 (function (root) {
   'use strict';
 
   var VERSION = 'v-spores-v0.1';
+  // The manifest's own fingerprint. scripts/make-spores-manifest.js writes this line; a manifest
+  // whose sha256 differs is refused, so a stale or swapped manifest can never pick what runs.
+  var MANIFEST_SHA256 = '2a8c8194829123162ca046dfdf3487276cecacb50736ac3aa269b7951ff2c4d1'; // spores-manifest-pin
   var RECEIPT_KEY = 'fl_sporeReceipts';
   var OFF_KEY = 'fl_spores';
   var MANIFEST_URL = 'spores-manifest.json';
-  var LOOP_LIMIT = 500;      // callbacks in a row with no turn for the page = a loop, not work
-  var LOOP_REST_MS = 2000;   // pause, then listen again
-  var LOOP_MAX_TRIPS = 3;    // after this many, stay paused and say so
+  var LOOP_MS = 1500;            // an observer whose own callback keeps re-triggering it this long is a freeze loop
+  var REST_MS = [2000, 4000, 8000, 15000];   // pause lengths; the last repeats. Never off for good.
+  var HELD_MAX = 5000;           // records kept for an observer while it rests (oldest dropped past this, and counted)
+  var limits = { loopMs: LOOP_MS, rest: REST_MS, held: HELD_MAX, cap: 200, fold: 100 };
   var HONEST_LINE = 'Spore receipt could not be saved on this device (storage is full or closed). It is kept in memory for this visit.';
 
   var memReceipts = [];
   var unsaved = 0;
   var manifestPromise = null;
   var tried = {};
-  var lastLink = '';
+  var loaded = {};
   var chain = Promise.resolve();
+  var noticeShown = false;
 
   // ---------- small pure helpers (also used by the smoke in Node) ----------
 
@@ -64,6 +72,10 @@
     return s.digest('SHA-256', buf).then(hex);
   }
 
+  function now() {
+    try { return root.performance.now(); } catch (e) { return Date.now(); }
+  }
+
   function isOff() {
     try {
       var q = String((root.location && root.location.search) || '');
@@ -75,7 +87,11 @@
     return false;
   }
 
-  // ---------- receipts: append-only ----------
+  function skipName(file) {
+    return /quiet|sophia/i.test(file);
+  }
+
+  // ---------- receipts: added to, capped by folding, exportable ----------
 
   function readReceipts() {
     try {
@@ -85,19 +101,38 @@
     } catch (e) { return []; }
   }
 
+  function enc(s) { return new TextEncoder().encode(s); }
+
+  function fold(rows) {
+    // Past the cap, the oldest `fold` rows become one summary row. The summary keeps how many there
+    // were, their n range, a tally of kinds, and the sha256 of exactly those rows, so nothing is
+    // silently rewritten. exportReceipts() before then keeps every row.
+    if (rows.length <= limits.cap) return Promise.resolve(rows);
+    var old = rows.slice(0, limits.fold);
+    var tally = {};
+    old.forEach(function (r) { tally[r.kind] = (tally[r.kind] || 0) + (r.kind === 'folded' ? (r.count || 0) : 1); });
+    return sha256Hex(enc(JSON.stringify(old))).catch(function () { return ''; }).then(function (h) {
+      var first = old[0], last = old[old.length - 1];
+      var summary = {
+        n: first.n, at: last.at, v: VERSION, page: '', kind: 'folded', file: '', ok: true,
+        count: old.reduce(function (a, r) { return a + (r.kind === 'folded' ? (r.count || 0) : 1); }, 0),
+        nFrom: first.nFrom || first.n, nTo: last.n, kinds: tally, foldedSha256: h, prev: first.prev || ''
+      };
+      return [summary].concat(rows.slice(limits.fold));
+    });
+  }
+
   function receipt(row) {
-    // Rows are chained: each one carries the sha256 of the row before it, so a gap or an edit shows.
     chain = chain.then(function () {
       var saved = readReceipts();
       var all = saved.concat(memReceipts.filter(function (r) { return r._unsaved; }));
       var prev = all.length ? all[all.length - 1] : null;
-      var prevJson = prev ? JSON.stringify(prev) : '';
-      var link = prevJson && typeof TextEncoder !== 'undefined'
-        ? sha256Hex(new TextEncoder().encode(prevJson)).catch(function () { return ''; })
+      var link = prev && typeof TextEncoder !== 'undefined'
+        ? sha256Hex(enc(JSON.stringify(prev))).catch(function () { return ''; })
         : Promise.resolve('');
       return link.then(function (prevHash) {
         var clean = {
-          n: all.length + 1,
+          n: prev ? (prev.n || 0) + 1 : 1,
           at: new Date().toISOString(),
           v: VERSION,
           page: pageName(),
@@ -111,22 +146,27 @@
           ms: typeof row.ms === 'number' ? Math.round(row.ms) : undefined,
           prev: prevHash
         };
-        lastLink = prevHash;
-        try {
-          if (!root.localStorage) throw new Error('no-storage');
-          var fresh = readReceipts();
-          fresh.push(clean);
-          root.localStorage.setItem(RECEIPT_KEY, JSON.stringify(fresh));
-        } catch (e) {
-          clean._unsaved = true;
-          unsaved++;
-        }
-        memReceipts.push(clean);
-        try { root.dispatchEvent(new CustomEvent('fl-spore', { detail: clean })); } catch (e) {}
-        return clean;
+        return fold(saved.concat([clean])).then(function (rows) {
+          try {
+            if (!root.localStorage) throw new Error('no-storage');
+            root.localStorage.setItem(RECEIPT_KEY, JSON.stringify(rows));
+          } catch (e) {
+            clean._unsaved = true;
+            unsaved++;
+          }
+          memReceipts.push(clean);
+          if (memReceipts.length > limits.cap) memReceipts.splice(0, memReceipts.length - limits.cap);
+          try { root.dispatchEvent(new CustomEvent('fl-spore', { detail: clean })); } catch (e) {}
+          return clean;
+        });
       });
     }).catch(function () {});
     return chain;
+  }
+
+  function exportReceipts() {
+    var rows = api.receipts();
+    return JSON.stringify({ v: VERSION, exported: new Date().toISOString(), page: pageName(), receipts: rows }, null, 1);
   }
 
   function pageName() {
@@ -137,7 +177,7 @@
     } catch (e) { return ''; }
   }
 
-  // ---------- the manifest: fetched only after a crack ----------
+  // ---------- the manifest: fetched only after a crack, refused unless its sha256 is the pinned one ----------
 
   function bust(url, tag) {
     return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'spore=' + encodeURIComponent(tag);
@@ -147,21 +187,53 @@
     if (manifestPromise) return manifestPromise;
     var url;
     try { url = new URL(MANIFEST_URL, root.document.baseURI).href; } catch (e) { url = MANIFEST_URL; }
-    manifestPromise = root.fetch(bust(url, String(Date.now())), { cache: 'no-store', credentials: 'same-origin' })
-      .then(function (r) { if (!r.ok) throw new Error('manifest ' + r.status); return r.json(); })
-      .catch(function () {
-        if (!root.caches || !root.caches.match) return null;
-        return root.caches.match(url).then(function (r) { return r ? r.json() : null; }).catch(function () { return null; });
+    // No cached-manifest fallback: a stale manifest plus an old cached file could restore an old version.
+    manifestPromise = root.fetch(bust(url, MANIFEST_SHA256.slice(0, 12)), { cache: 'no-store', credentials: 'same-origin' })
+      .then(function (r) { if (!r.ok) throw new Error('manifest ' + r.status); return r.arrayBuffer(); })
+      .then(function (buf) {
+        return sha256Hex(buf).then(function (h) {
+          if (h !== MANIFEST_SHA256) return { refused: true, got: h };
+          var m = JSON.parse(new TextDecoder().decode(buf));
+          return (m && m.pages) ? m : null;
+        });
       })
-      .then(function (m) { return (m && m.pages) ? m : null; });
+      .catch(function () { return null; });
     return manifestPromise;
   }
 
   function entryFor(m, file) {
-    if (!m) return null;
+    if (!m || !m.pages) return null;
     var page = m.pages[pageName()] || m.pages['app.html'] || null;
     var files = page && page.files;
     return (files && Object.prototype.hasOwnProperty.call(files, file)) ? files[file] : null;
+  }
+
+  // ---------- the one notice: reload to finish ----------
+
+  function showReloadNotice() {
+    // Dependents are not re-run (that would replace their state). A reload runs everything in order.
+    if (noticeShown || !root.document || !root.document.body) return;
+    noticeShown = true;
+    try {
+      var d = root.document.createElement('div');
+      d.id = 'fl-spore-notice';
+      d.setAttribute('role', 'status');
+      d.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2147483000;' +
+        'background:#1b1830;color:#f3eefc;border:1px solid #6d5fd3;border-radius:10px;padding:10px 14px;' +
+        'font:14px/1.4 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.4);max-width:92vw';
+      var t = root.document.createElement('span');
+      t.textContent = 'A piece of FreeLattice was repaired. Reload to finish the repair. ';
+      var go = root.document.createElement('button');
+      go.type = 'button'; go.textContent = 'Reload';
+      go.style.cssText = 'margin-left:8px;padding:4px 10px;border-radius:6px;border:0;background:#6d5fd3;color:#fff;cursor:pointer';
+      go.onclick = function () { try { root.location.reload(); } catch (e) {} };
+      var later = root.document.createElement('button');
+      later.type = 'button'; later.textContent = 'Not now';
+      later.style.cssText = 'margin-left:6px;padding:4px 10px;border-radius:6px;border:1px solid #6d5fd3;background:transparent;color:#f3eefc;cursor:pointer';
+      later.onclick = function () { if (d.parentNode) d.parentNode.removeChild(d); };
+      d.appendChild(t); d.appendChild(go); d.appendChild(later);
+      root.document.body.appendChild(d);
+    } catch (e) {}
   }
 
   // ---------- restore one file from a verified same-origin copy ----------
@@ -195,93 +267,157 @@
     });
   }
 
+  function servedMatches(abs, want) {
+    // The copy this page is actually served (same request the page made: SW and HTTP cache allowed).
+    return root.fetch(abs, { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
+      .then(function (buf) { return buf ? sha256Hex(buf) : 'missing'; })
+      .then(function (got) { return { ok: got === want, got: got }; })
+      .catch(function () { return { ok: false, got: 'unreadable' }; });
+  }
+
+  // how: 'load' (the browser never ran it) or 'parse' (line-1 parse failure before its load event)
   function restore(file, how) {
     if (tried[file]) return tried[file];
+    if (loaded[file] && how !== 'parse') return Promise.resolve(null);   // it loaded and ran: not ours to run again
     var t0 = Date.now();
+    var why = how === 'parse' ? 'failed to parse on line 1 (wrong file served?)' : 'did not load';
     tried[file] = getManifest().then(function (m) {
+      if (m && m.refused) return receipt({ kind: 'refused', file: file, ok: false, expected: MANIFEST_SHA256, got: m.got, why: why + '; the manifest did not match its pinned sha256, so nothing was fetched or run' });
       var want = entryFor(m, file);
       want = want && want.sha256;
-      if (!want) return receipt({ kind: 'not-in-manifest', file: file, ok: false, why: how + '; no fingerprint for this file, so nothing was fetched' });
-      if (!subtle()) return receipt({ kind: 'refused', file: file, ok: false, expected: want, why: how + '; this browser cannot check fingerprints here, so nothing was run' });
+      if (!want) {
+        if (how === 'parse') return null;      // not a listed script: no receipt, no noise
+        return receipt({ kind: 'not-in-manifest', file: file, ok: false, why: why + '; no fingerprint for this file (or no manifest), so nothing was fetched' });
+      }
+      if (!subtle()) return receipt({ kind: 'refused', file: file, ok: false, expected: want, why: why + '; this browser cannot check fingerprints here, so nothing was run' });
       var abs = new URL(file, root.document.baseURI).href;
-      var list = sources(abs, want);
-      var seen = [];
-      function next(i) {
-        if (i >= list.length) {
-          return receipt({ kind: 'still-broken', file: file, ok: false, expected: want, got: seen.join(','), why: how + '; no copy matched the fingerprint', ms: Date.now() - t0 });
+      var first = how === 'parse' ? servedMatches(abs, want) : Promise.resolve({ ok: false, got: '' });
+      return first.then(function (served) {
+        if (served.ok) {
+          // The served copy is the right one: the file is not cracked. Run nothing.
+          return receipt({ kind: 'not-cracked', file: file, ok: true, expected: want, got: served.got, why: why + '; but the copy served matches its fingerprint, so nothing was run', ms: Date.now() - t0 });
         }
-        return list[i].get().catch(function () { return null; }).then(function (buf) {
-          if (!buf) { seen.push(list[i].from + ':none'); return next(i + 1); }
-          return sha256Hex(buf).then(function (got) {
-            if (got !== want) { seen.push(list[i].from + ':' + got.slice(0, 12)); return next(i + 1); }
-            return runVerified(buf, file).then(function (ran) {
-              return receipt({ kind: ran ? 'restored' : 'still-broken', file: file, ok: ran, from: list[i].from, expected: want, got: got, why: how, ms: Date.now() - t0 });
+        var list = sources(abs, want);
+        var seen = [];
+        function next(i) {
+          if (i >= list.length) {
+            return receipt({ kind: 'still-broken', file: file, ok: false, expected: want, got: seen.join(','), why: why + '; no copy matched the fingerprint', ms: Date.now() - t0 });
+          }
+          return list[i].get().catch(function () { return null; }).then(function (buf) {
+            if (!buf) { seen.push(list[i].from + ':none'); return next(i + 1); }
+            return sha256Hex(buf).then(function (got) {
+              if (got !== want) { seen.push(list[i].from + ':' + got.slice(0, 12)); return next(i + 1); }
+              return runVerified(buf, file).then(function (ran) {
+                if (ran) showReloadNotice();
+                return receipt({ kind: ran ? 'restored' : 'still-broken', file: file, ok: ran, from: list[i].from, expected: want, got: got, why: why, ms: Date.now() - t0 });
+              });
             });
           });
-        });
-      }
-      return next(0);
+        }
+        return next(0);
+      });
     });
     return tried[file];
   }
 
-  // ---------- detection: a script that did not load ----------
+  // ---------- detection ----------
+
+  function scriptFile(el) {
+    if (!el || el.tagName !== 'SCRIPT') return '';
+    if (el.hasAttribute('data-spore')) return '';        // a spore's own try; never loop
+    var raw = el.getAttribute('src');
+    if (!raw || isThirdParty(raw)) return '';
+    var file = normalizeSrc(raw);
+    return (!file || skipName(file)) ? '' : file;
+  }
+
+  function onResourceLoad(ev) {
+    var file = scriptFile(ev && ev.target);
+    if (file) loaded[file] = true;
+  }
 
   function onResourceError(ev) {
     var el = ev && ev.target;
     if (!el || el.tagName !== 'SCRIPT') return;
-    if (el.hasAttribute('data-spore')) return;          // a spore's own try; never loop
-    if (el.hasAttribute('onerror')) return;             // it has its own fallback already
-    var raw = el.getAttribute('src');
-    if (!raw || isThirdParty(raw)) return;
-    var file = normalizeSrc(raw);
-    if (!file || /quiet|sophia/i.test(file)) return;
-    restore(file, 'did not load');
+    if (el.hasAttribute('onerror')) return;              // it has its own fallback already
+    var file = scriptFile(el);
+    if (file) restore(file, 'load');
   }
 
   function onScriptError(ev) {
-    // A file that loaded but was the wrong thing (an HTML 404 page, a cut-off file) throws on line 1.
-    if (!ev || !ev.filename || !/SyntaxError|Unexpected token|Invalid or unexpected/i.test(String(ev.message || ''))) return;
+    // Only a real parse failure: line 1, a SyntaxError, a listed .js file of this site, before its load
+    // event. A JSON.parse error or a SyntaxError thrown at run time is not a crack.
+    if (!ev || !ev.filename || ev.lineno !== 1) return;
+    var msg = String(ev.message || '');
+    if (!/SyntaxError|Unexpected token|Invalid or unexpected/i.test(msg) || /JSON/i.test(msg)) return;
     var abs, base;
     try { abs = new URL(ev.filename); base = new URL('.', root.document.baseURI); } catch (e) { return; }
     if (abs.origin !== base.origin || abs.pathname.indexOf(base.pathname) !== 0) return;
     var file = normalizeSrc(abs.pathname.slice(base.pathname.length));
-    if (!file || /quiet|sophia|spores\.js$/i.test(file)) return;
-    restore(file, 'threw a SyntaxError (wrong file served)');
+    if (!file || !/\.js$/i.test(file) || skipName(file) || /(^|\/)spores\.js$/i.test(file)) return;
+    if (loaded[file]) return;
+    restore(file, 'parse');
   }
 
   // ---------- watchdog: a MutationObserver feeding itself ----------
+  // A burst of work (a buffered stream, an await per item) calls observers many times in a row, but
+  // those calls are fed by the page, and they end. A freeze loop is an observer whose own callback
+  // changes what it watches, so every call queues the next one. The watchdog only times that:
+  // right after each call it takes the records the callback itself just made (takeRecords) and hands
+  // them back on the next microtask, exactly when the browser would have. If a chain of calls that
+  // each fed themselves runs past LOOP_MS with no page turn, the observer rests. Its records are held
+  // and handed to it when it listens again. It always listens again, and every rest writes a receipt.
 
   function guardObservers() {
     var Native = root.MutationObserver;
     if (typeof Native !== 'function' || Native.__spores) return;
-    var nativeObserve = Native.prototype.observe;
     var nativeDisconnect = Native.prototype.disconnect;
+    var nativeTake = Native.prototype.takeRecords;
+    var soon = typeof root.queueMicrotask === 'function' ? function (f) { root.queueMicrotask(f); } : function (f) { Promise.resolve().then(f); };
 
     function Guarded(callback) {
-      var state = { run: 0, trips: 0, paused: false, targets: [], where: '' };
+      var state = { feedStart: 0, trips: 0, resting: false, held: [], dropped: 0, timer: 0, where: '' };
       try { state.where = String((new Error()).stack || '').split('\n').slice(2, 3).join('').trim().slice(0, 160); } catch (e) {}
       var me;
-      var inner = function (records, observer) {
-        if (state.paused) return undefined;
-        state.run++;
-        if (state.run === 1) setTimeout(function () { state.run = 0; }, 0);
-        if (state.run > LOOP_LIMIT) {
-          state.paused = true;
-          state.trips++;
-          nativeDisconnect.call(me);
-          var stay = state.trips >= LOOP_MAX_TRIPS;
-          receipt({ kind: stay ? 'loop-left-paused' : 'loop-paused', file: state.where, ok: true,
-                    why: LOOP_LIMIT + ' observer calls in a row with no turn for the page; paused ' + (stay ? 'until reload' : LOOP_REST_MS + 'ms') });
-          if (!stay) {
-            setTimeout(function () {
-              state.paused = false; state.run = 0;
-              state.targets.forEach(function (t) { try { nativeObserve.call(me, t[0], t[1]); } catch (e) {} });
-            }, LOOP_REST_MS);
+      function hold(records) {
+        for (var i = 0; i < records.length; i++) state.held.push(records[i]);
+        if (state.held.length > limits.held) { state.dropped += state.held.length - limits.held; state.held.splice(0, state.held.length - limits.held); }
+      }
+      function rest(records) {
+        state.resting = true;
+        state.trips++;
+        state.feedStart = 0;
+        hold(records);
+        var ms = limits.rest[Math.min(state.trips - 1, limits.rest.length - 1)];
+        receipt({ kind: 'loop-paused', file: state.where, ok: true, got: 'trip ' + state.trips,
+                  why: 'its own callback kept re-triggering it for over ' + limits.loopMs + 'ms with no turn for the page; resting ' + ms + 'ms, then it listens again and gets the records held meanwhile' });
+        state.timer = setTimeout(wake, ms);
+      }
+      function wake() {
+        state.timer = 0;
+        state.resting = false;
+        var give = state.held; state.held = [];
+        var lost = state.dropped; state.dropped = 0;
+        if (lost) receipt({ kind: 'loop-records-dropped', file: state.where, ok: false, why: lost + ' records past the ' + limits.held + ' held while resting were dropped (oldest first)' });
+        if (give.length) run(me, give);
+      }
+      function run(ctx, records) {
+        var t0 = now(), fed = [];
+        try { return callback.call(ctx, records, me); }
+        finally {
+          try { fed = nativeTake.call(me) || []; } catch (e) { fed = []; }
+          if (!fed.length) state.feedStart = 0;                 // it did not feed itself: no chain
+          else {
+            if (!state.feedStart) state.feedStart = t0;
+            if (now() - state.feedStart > limits.loopMs) rest(fed);
+            else soon(function () { inner(fed); });              // the browser would deliver these next anyway
           }
-          return undefined;
         }
-        return callback.call(this, records, me || observer);
+      }
+      var inner = function (records) {
+        if (state.resting) { hold(records); return undefined; }
+        return run(me, records);
       };
       me = Reflect.construct(Native, [inner], new.target || Guarded);
       me.__sporeState = state;
@@ -289,13 +425,16 @@
     }
     Guarded.prototype = Object.create(Native.prototype);
     Guarded.prototype.constructor = Guarded;
-    Guarded.prototype.observe = function (target, options) {
-      if (this.__sporeState) this.__sporeState.targets.push([target, options]);
-      return nativeObserve.call(this, target, options);
-    };
     Guarded.prototype.disconnect = function () {
-      if (this.__sporeState) { this.__sporeState.targets = []; this.__sporeState.paused = false; }
+      var s = this.__sporeState;
+      if (s) { if (s.timer) clearTimeout(s.timer); s.timer = 0; s.resting = false; s.held = []; s.dropped = 0; }
       return nativeDisconnect.call(this);
+    };
+    Guarded.prototype.takeRecords = function () {
+      var s = this.__sporeState;
+      var held = s ? s.held : [];
+      if (s) s.held = [];
+      return held.concat(nativeTake.call(this));
     };
     Guarded.__spores = true;
     Guarded.Native = Native;
@@ -306,21 +445,18 @@
 
   function check() {
     return getManifest().then(function (m) {
-      var page = m && (m.pages[pageName()] || m.pages['app.html']);
-      if (!page) return { ok: false, why: 'no manifest' };
+      var page = m && m.pages && (m.pages[pageName()] || m.pages['app.html']);
+      if (!page) return { ok: false, why: m && m.refused ? 'manifest refused' : 'no manifest' };
       var files = Object.keys(page.files);
       var bad = [];
       return files.reduce(function (p, f) {
         return p.then(function () {
-          return root.fetch(new URL(f, root.document.baseURI).href, { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
-            .then(function (buf) { return buf ? sha256Hex(buf) : 'missing'; })
-            .then(function (got) {
-              if (got !== page.files[f].sha256) {
-                bad.push(f);
-                return receipt({ kind: 'stale', file: f, ok: false, expected: page.files[f].sha256, got: got, why: 'the copy this page is served does not match; reported only, nothing replaced' });
-              }
-            }).catch(function () {});
+          return servedMatches(new URL(f, root.document.baseURI).href, page.files[f].sha256).then(function (s) {
+            if (!s.ok) {
+              bad.push(f);
+              return receipt({ kind: 'stale', file: f, ok: false, expected: page.files[f].sha256, got: s.got, why: 'the copy this page is served does not match; reported only, nothing replaced' });
+            }
+          });
         });
       }, Promise.resolve()).then(function () { return { ok: bad.length === 0, checked: files.length, bad: bad }; });
     });
@@ -329,20 +465,25 @@
   var api = {
     version: VERSION,
     off: false,
+    manifestSha256: MANIFEST_SHA256,
     receipts: function () { return readReceipts().concat(memReceipts.filter(function (r) { return r._unsaved; })); },
+    exportReceipts: exportReceipts,
     unsaved: function () { return unsaved ? HONEST_LINE : ''; },
     check: check,
     restore: restore,
     setOff: function (yes) { try { root.localStorage.setItem(OFF_KEY, yes ? 'off' : 'on'); } catch (e) {} return !!yes; },
     _normalizeSrc: normalizeSrc,
     _isThirdParty: isThirdParty,
-    _limits: { loop: LOOP_LIMIT, restMs: LOOP_REST_MS, trips: LOOP_MAX_TRIPS }
+    _receipt: receipt,
+    _limits: limits
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (!root || !root.document) return;
 
   if (isOff()) { api.off = true; root.FLSpores = api; return; }
+  // A script's load event reaches the document but never the window, so listen on the document.
+  try { root.document.addEventListener('load', onResourceLoad, true); } catch (e) {}
   try { root.addEventListener('error', onResourceError, true); } catch (e) {}
   try { root.addEventListener('error', onScriptError, false); } catch (e) {}
   try { guardObservers(); } catch (e) {}
