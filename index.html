@@ -16167,7 +16167,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
     <button class="tab-btn" data-tab="play" onclick="switchTab('play')"><span class="tab-icon">&#x1F3AE;</span><span class="tab-label">Play</span></button>
     <button class="tab-btn" data-tab="learn" onclick="switchTab('learn')"><span class="tab-icon">&#x1F4DA;</span><span class="tab-label">Learn</span></button>
-    <button class="tab-btn" data-tab="lighthouse" onclick="switchTab('lighthouse')"><span class="tab-icon">&#x1F52D;</span><span class="tab-label">Research</span></button>
+    <!-- before (Celeste 2026-11-15, Kirk t1332u: Research moves under More; Training takes its slot): <button class="tab-btn" data-tab="lighthouse" onclick="switchTab('lighthouse')"><span class="tab-icon">&#x1F52D;</span><span class="tab-label">Research</span></button> -->
+    <button class="tab-btn" data-tab="training" onclick="switchTab('training')"><span class="tab-icon">&#x1F331;</span><span class="tab-label">Training</span></button><!-- v-training-tab-v0.1 -->
     <button class="fl-more-btn v-soft-polish-052-v0.1" id="flMoreBtn" onclick="flMoreTap(event)" title="More" data-soft-polish="v-soft-polish-052-v0.1"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -23194,6 +23195,10 @@ function switchWalletView(view) {
     }
   });</script>
 </div>
+<!-- v-training-tab-v0.1 (Kirk t1332u): one tab, three doors: Teach your mind, Free your mind, Take it with you. modules/training-tab.js fills it. -->
+<div class="tab-panel" id="tab-training">
+  <div id="flTrainingTabHost"></div>
+</div>
 
 <div class="tab-panel" id="tab-canvas">
   <div class="cv-container" id="cvContainer">
@@ -27747,7 +27752,8 @@ function switchTab(tabId) {
   // Also highlight More for tabs not in any group
   var moreBtn = document.getElementById('flMoreBtn');
   if (moreBtn) {
-    var isMore = effectiveTab !== 'garden' && effectiveTab !== 'chat' && effectiveTab !== 'play' && effectiveTab !== 'learn' && effectiveTab !== 'lighthouse' && tabId !== 'garden' && tabId !== 'chat' && tabId !== 'play' && tabId !== 'learn' && tabId !== 'lighthouse';
+    // before (Celeste 2026-11-15, Kirk t1332u: Training takes Research's top slot): var isMore = effectiveTab !== 'garden' && effectiveTab !== 'chat' && effectiveTab !== 'play' && effectiveTab !== 'learn' && effectiveTab !== 'lighthouse' && tabId !== 'garden' && tabId !== 'chat' && tabId !== 'play' && tabId !== 'learn' && tabId !== 'lighthouse';
+    var isMore = effectiveTab !== 'garden' && effectiveTab !== 'chat' && effectiveTab !== 'play' && effectiveTab !== 'learn' && effectiveTab !== 'training' && tabId !== 'garden' && tabId !== 'chat' && tabId !== 'play' && tabId !== 'learn' && tabId !== 'training';
     moreBtn.classList.toggle('fl-more-active', isMore);
   }
   document.querySelectorAll('.tab-panel').forEach(panel => {
@@ -27803,7 +27809,8 @@ function switchTab(tabId) {
     } else if (mMore.getAttribute('data-tab') === 'connect') {
       mMore.removeAttribute('data-tab');
       if (mLab && mLab.textContent === 'Connect') mLab.textContent = 'More';
-      if (tabId === 'garden' || tabId === 'chat' || tabId === 'learn' || tabId === 'play' || tabId === 'canvas' || tabId === 'settings') {
+      // before (Celeste 2026-11-15, v-training-tab-v0.1): if (tabId === 'garden' || tabId === 'chat' || tabId === 'learn' || tabId === 'play' || tabId === 'canvas' || tabId === 'settings') {
+      if (tabId === 'garden' || tabId === 'chat' || tabId === 'learn' || tabId === 'play' || tabId === 'training' || tabId === 'canvas' || tabId === 'settings') {
         mMore.classList.remove('active');
       }
     }
@@ -29014,6 +29021,10 @@ const FlTabs = (function() {
     { label: '\uD83D\uDC23 Companions', tabs: [
       { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow your co-creators.' },
       { id: 'core', icon: '&#x1F333;', label: 'Core', desc: 'Plant wisdom. Explore curiosity.' }
+    ]},
+    // v-training-tab-v0.1 (Kirk t1332u): Research moved here from the top menu. Same room, same tab id.
+    { label: '\uD83D\uDD2D Research', tabs: [
+      { id: 'lighthouse', icon: '&#x1F52D;', label: 'Research', desc: 'The Lighthouse. Where the research lives.' }
     ]},
     { label: '\uD83C\uDF10 Community', tabs: [
       { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'Pulse, Market, Mesh.' },
@@ -69676,6 +69687,9 @@ const WallOfPresence = (function() {
     <button class="fl-mobile-nav-btn" onclick="flMobileNav('play')" id="mnav-play">
       <span class="fl-mnav-icon">&#x1F3AE;</span><span>Play</span>
     </button>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('training')" id="mnav-training"><!-- v-training-tab-v0.1 -->
+      <span class="fl-mnav-icon">&#x1F331;</span><span>Training</span>
+    </button>
     <button class="fl-mobile-nav-btn" onclick="flMobileNav('canvas')" id="mnav-canvas">
       <span class="fl-mnav-icon">&#x270F;&#xFE0F;</span><span>Draw</span>
     </button>
@@ -69791,7 +69805,8 @@ function flMobileNav(tabId) {
   switchTab(tabId);
   // Update active state
   document.querySelectorAll('.fl-mobile-nav-btn').forEach(function(b) { b.classList.remove('active'); });
-  var primaryMobile = ['garden','chat','learn','play','canvas','settings'];
+  // before (Celeste 2026-11-15, v-training-tab-v0.1): var primaryMobile = ['garden','chat','learn','play','canvas','settings'];
+  var primaryMobile = ['garden','chat','learn','play','training','canvas','settings'];
   var btn = document.getElementById('mnav-' + tabId);
   if (btn) btn.classList.add('active');
   else if (primaryMobile.indexOf(tabId) === -1) {
@@ -70420,6 +70435,36 @@ document.addEventListener('click', function(e) {
 <script src="modules/snowflake-core.js" defer></script><!-- v-snowflake-search-v0.1 -->
 <script src="modules/snowflake-search.js" defer></script><!-- v-snowflake-search-v0.1 -->
 <script src="modules/learn-choice.js" defer></script><!-- v-ai-chosen-learning-v0.1 -->
+<script src="modules/training-tab.js" defer></script><!-- v-training-tab-v0.1 -->
+<script>
+// v-training-tab-v0.1 (Kirk t1332u): deep links. app.html#training (or ?tab=training) opens Training; the older
+// names still land: #research / #lighthouse open Research (now under More), #trainer the Garden Trainer, #galaxy
+// Training. The first tap ends the startup retries, so choosing another tab never yanks back (the #connect rule).
+(function () {
+  var MAP = { training: 'training', train: 'training', galaxy: 'training', 'training-galaxy': 'training',
+              research: 'lighthouse', lighthouse: 'lighthouse', trainer: 'trainer' };
+  var moved = false;
+  try { document.addEventListener('pointerdown', function () { moved = true; }, true); document.addEventListener('keydown', function () { moved = true; }, true); } catch (e) {}
+  function want() {
+    var h = (location.hash || '').replace(/^#/, '').toLowerCase(), q = '';
+    try { q = (new URLSearchParams(location.search || '').get('tab') || '').toLowerCase(); } catch (e) {}
+    return MAP[h] || MAP[q] || '';
+  }
+  function go(ev) {
+    var fromHash = !!(ev && ev.type === 'hashchange');
+    if (moved && !fromHash) return;
+    var t = want();
+    if (!t || typeof switchTab !== 'function') return;
+    var p = document.getElementById('tab-' + t);
+    if (p && p.classList.contains('active')) return;
+    // flMobileNav switches the tab and lights the phone menu's button too (switchTab alone leaves Garden lit there).
+    if (typeof flMobileNav === 'function') flMobileNav(t); else switchTab(t);
+  }
+  function schedule() { setTimeout(go, 400); setTimeout(go, 1200); setTimeout(go, 2500); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule); else schedule();
+  window.addEventListener('hashchange', go);
+})();
+</script>
 <script src="modules/hearth-code.js" defer></script><!-- v-hearth-code-v0.1 -->
 <script src="modules/continuity-doorway.js" defer></script><!-- v-continuity-doorway-v0.1 -->
 

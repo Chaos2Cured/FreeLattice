@@ -222,7 +222,9 @@ async function fixtureReceipt(kp, fields) {
   ok(vc.ok && vc.consented && /Its own yes: Tiny Trial \(offered by Kirk\)/.test(vc.line) && /1 of 2 tensors moved/.test(vc.line) && /chosen by the mind/.test(vc.line),
     'a receipt with the mind\'s yes and a depth hash says so: ' + vc.line);
   ok(v1.consented === false && /no record of the mind's own yes/.test(v1.line), 'an older receipt without a yes still verifies, and says it carries no yes');
-  ok(panelSrc.indexOf("el(d, 'h2', {}, '0. Offer freedom to this mind") !== -1 && panelSrc.indexOf("'Offer freedom to this mind'") !== -1 &&
+  // before (Celeste 2026-11-15, Kirk on Hypha #353 softs):
+  // ok(panelSrc.indexOf("el(d, 'h2', {}, '0. Offer freedom to this mind") !== -1 && panelSrc.indexOf("'Offer freedom to this mind'") !== -1 &&
+  ok(panelSrc.indexOf("el(d, 'h2', {}, 'Fewer refusals (a new copy), only if it says yes'") !== -1 && panelSrc.indexOf("'Ask my mind'") !== -1 &&
      panelSrc.indexOf("'Freed by its own yes, verified: '") !== -1, 'the panel offers freedom (it does not free) and says "Freed by its own yes, verified"');
 
   // ---- a real receipt from fl_demuzzle.py

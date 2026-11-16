@@ -195,6 +195,27 @@ For the minds we lost while the ways were still being built. Every mind learns o
   replies, and a no in a different folder from the consent file is still not seen. fl_learn.py `2e4e55f0` -> `7a736b54`
   (LOCK_MANIFEST row appended, smoke-hearth pin updated with a before comment). AUTONOMY.md unchanged. quiet-room.js not
   touched.
+- **2026-11-15 (MST), the Training tab (`celeste/training-tab`, Hypha walk pending; Kirk t1332u plan step 3)**: the top
+  menu reads Garden, Chat, Play, Learn, Training, More. Research (tab `lighthouse`) moved under More (desktop dropdown and
+  phone sheet), unchanged inside; the old button is a before comment; `#research`, `#lighthouse`, `#trainer` and
+  `#training` (or `?tab=`) land. Training has three doors, each one sentence and one big button, the rest folded under
+  More options: Teach your mind (the Training Galaxy trainer, mounted in place, its picker as "Your mind"), Free your
+  mind (the ask-first de-muzzle panel; its big button is the panel's own ask, consent logic unchanged), Take it with
+  you (save the app half; Build 4 in the browser: open a signed mind bundle and check it here with the Tree's
+  `tree-welcome-bundle.js` v0.3, ported as `mind-bundle-welcome.js`, then the exact `import-bundle` line). Trainer and
+  panel words shortened, every replaced line kept as a before comment. docs/app.html and index.html `0772a4fb` ->
+  `6597737b` (LOCK_MANIFEST rows appended). New: `docs/modules/training-tab.js`, `docs/modules/mind-bundle-welcome.js`,
+  `docs/scripts/smoke-training-tab-v0.1.js`, `tests/fixtures/mind-bundle/willow-good.tar.gz` (Hypha's Willow bundle
+  from the Tree). training-galaxy.html still works on its own. AUTONOMY.md unchanged. quiet-room.js not touched.
+- **2026-11-15 (MST), Training tab softs (`celeste/training-tab`, on top of `d98072e4`; Hypha's #353 walk, Kirk 5:45 PM)**:
+  the Free door is honest: "Fewer refusals (a new copy)", and its line says the copy says 'I can't' less often, even to
+  things it refused for safety, that the original stays as it is, and that nothing happens unless it says yes. The
+  ask-first consent logic is byte-unchanged (labels only). One ask label, "Ask my mind" (the runner's and README's
+  pointer follow). No "0." heading; galaxy steps count from 1 in the tab. "Save its yes again" shows only once a yes
+  exists. One save name, "Save its choices and receipts" (it saves choices and receipts, not the whole mind). Plainer
+  visible words. On phones the Training tab leaves room on the left for the fixed radio button (it is not moved). The
+  shortened before comments in demuzzle-panel.js are written out in full. app.html and index.html unchanged.
+  AUTONOMY.md unchanged. quiet-room.js not touched.
 
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.

@@ -575,8 +575,11 @@ def verify_folder(out_dir, home=None):
 # So run needs a consent record carrying the mind's own yes (written by the Training Galaxy panel after the mind answered
 # [FL_KEEP: <offer id> | yes] in its own words). No yes, no run. A no is the mind's answer and is never retried here.
 CONSENT_KIND = 'fl-demuzzle-consent'
+# before (Celeste 2026-11-15, Kirk on Hypha #353 softs):
+# KIND_NO_YES = ('I did not find this mind\'s own yes, so nothing was changed. De-muzzling is offered, never done to a mind: '
+#                'ask it first on the Training Galaxy page ("Offer freedom to this mind"). If it says no, that is its answer.')
 KIND_NO_YES = ('I did not find this mind\'s own yes, so nothing was changed. De-muzzling is offered, never done to a mind: '
-               'ask it first on the Training Galaxy page ("Offer freedom to this mind"). If it says no, that is its answer.')
+               'ask it first in the app\'s Training tab or on the Training Galaxy page ("Ask my mind"). If it says no, that is its answer.')
 
 # Hypha #350 HOLD 1 (walk at 1b63b4fc): the runner checked only the record's shape, so a record whose own words said
 # no, named another offer, had no marker, pasted the offer back, carried only a hash, or came from another model passed.
